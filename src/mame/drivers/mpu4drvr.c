@@ -1167,13 +1167,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dealem )
 	PORT_START_TAG("ORANGE1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Gamble")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Pontoon")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Rear Door") PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
 	PORT_START_TAG("ORANGE2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN5) PORT_NAME("20p Token")PORT_IMPULSE(3)
@@ -1187,13 +1187,13 @@ static INPUT_PORTS_START( dealem )
 
 	PORT_START_TAG("BLACK1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Collect")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) //Duplicate for Pontoon button
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Pontoon")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Rear Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START_TAG("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo")
@@ -1495,21 +1495,6 @@ GFXDECODE_END
 
 static UINT8 *dealem_videoram;
 
-static WRITE8_HANDLER( dealem_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-static READ8_HANDLER( dealem_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-static WRITE8_HANDLER( dealem_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -1585,10 +1570,10 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(dealem_mc6845_address_w)
-	AM_RANGE(0x0801, 0x0801) AM_READWRITE(dealem_mc6845_register_r, dealem_mc6845_register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 
-//  AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w) // write bank (rom page select)
+//  AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)    // write bank (rom page select)
 
 //  AM_RANGE(0x08E0, 0x08E7) AM_READ( 68681_duart_r)
 //  AM_RANGE(0x08E0, 0x08E7) AM_WRITE( 68681_duart_w)
@@ -1627,7 +1612,7 @@ static MACHINE_DRIVER_START( mpu4_vid )
 
 	MDRV_CPU_ADD_TAG("video", M68000, VIDEO_MASTER_CLOCK )
 	MDRV_CPU_PROGRAM_MAP(mpu4_68k_map,0)
-	MDRV_CPU_VBLANK_INT(mpu4_vid_irq,1)
+	MDRV_CPU_VBLANK_INT("main", mpu4_vid_irq)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)				// confirm
 
@@ -1676,7 +1661,7 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 100)					// generate 50 hz signal
 
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)

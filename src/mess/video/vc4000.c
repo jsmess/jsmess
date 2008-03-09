@@ -139,12 +139,12 @@ READ8_HANDLER(vc4000_video_r)
  
 #ifndef ANALOG_HACK
 	case 0xcc:
-		if (!activecpu_get_reg(S2650_FO)) data=input_port_7_r(0);
-		else data=input_port_8_r(0);
+		if (!activecpu_get_reg(S2650_FO)) data=readinputport(7);
+		else data=readinputport(8);
 		break;
 	case 0xcd:
-		if (!activecpu_get_reg(S2650_FO)) data=input_port_9_r(0);
-		else data=input_port_10_r(0);
+		if (!activecpu_get_reg(S2650_FO)) data=readinputport(9);
+		else data=readinputport(10);
 		break;
 #else
 
@@ -153,13 +153,13 @@ READ8_HANDLER(vc4000_video_r)
 		// between 20 and 225
 		if (!activecpu_get_reg(S2650_FO))
 		{
-			if (input_port_7_r(0)&0x1) data=20;
-			if (input_port_7_r(0)&0x2) data=225;
+			if (readinputport(7)&0x1) data=20;
+			if (readinputport(7)&0x2) data=225;
 		}
 		else
 		{
-			if (input_port_7_r(0)&0x4) data=225;
-			if (input_port_7_r(0)&0x8) data=20;
+			if (readinputport(7)&0x4) data=225;
+			if (readinputport(7)&0x8) data=20;
 		}
 		break;
 
@@ -167,13 +167,13 @@ READ8_HANDLER(vc4000_video_r)
 		data = 0x66;
 		if (!activecpu_get_reg(S2650_FO))
 		{
-			if (input_port_7_r(0)&0x10) data=20;
-			if (input_port_7_r(0)&0x20) data=225;
+			if (readinputport(7)&0x10) data=20;
+			if (readinputport(7)&0x20) data=225;
 		}
 		else
 		{
-			if (input_port_7_r(0)&0x40) data=225;
-			if (input_port_7_r(0)&0x80) data=20;
+			if (readinputport(7)&0x40) data=225;
+			if (readinputport(7)&0x80) data=20;
 		}
 		break;
 #endif

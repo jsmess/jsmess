@@ -63,8 +63,7 @@ WRITE8_HANDLER( meadows_videoram_w )
 
 WRITE8_HANDLER( meadows_spriteram_w )
 {
-	if (spriteram[offset] != data)
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_now(0);
 	spriteram[offset] = data;
 }
 
@@ -76,7 +75,7 @@ WRITE8_HANDLER( meadows_spriteram_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *clip)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *clip)
 {
 	int i;
 

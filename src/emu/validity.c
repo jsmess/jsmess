@@ -683,55 +683,57 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 			for ( ; !IS_AMENTRY_END(map); map++)
 				if (!IS_AMENTRY_EXTENDED(map))
 				{
-					int ismatchmask = ((map->flags & AM_FLAGS_MATCH_MASK) != 0);
 					UINT32 start = SPACE_SHIFT(map->start);
-					UINT32 end = ismatchmask ? SPACE_SHIFT(map->end) : SPACE_SHIFT_END(map->end);
+					UINT32 end = SPACE_SHIFT_END(map->end);
 
+					/* look for inverted start/end pairs */
+					if (end < start)
 					{
-						/* look for inverted start/end pairs */
-						if (end < start)
+						mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end);
+						error = TRUE;
+					}
+
+					/* look for misaligned entries */
+					if ((start & (alignunit-1)) != 0 || (end & (alignunit-1)) != (alignunit-1))
+					{
+						mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end, alignunit);
+						error = TRUE;
+					}
+
+					/* if this is a program space, auto-assign implicit ROM entries */
+					if ((FPTR)map->read.handler == STATIC_ROM && !map->region)
+					{
+						map->region = REGION_CPU1 + cpunum;
+						map->region_offs = map->start;
+					}
+
+					/* if this entry references a memory region, validate it */
+					if (map->region && map->share == 0)
+					{
+						offs_t length = region_length[map->region];
+
+						if (length == 0)
 						{
-							mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end);
+							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
 							error = TRUE;
 						}
-
-						/* look for misaligned entries */
-						if ((start & (alignunit-1)) != 0 || (end & (alignunit-1)) != (alignunit-1))
+						else if (map->region_offs + (end - start + 1) > length)
 						{
-							mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end, alignunit);
+							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region, length);
 							error = TRUE;
 						}
+					}
 
-						/* if this is a program space, auto-assign implicit ROM entries */
-						if ((FPTR)map->read.handler == STATIC_ROM && !map->region)
-						{
-							map->region = REGION_CPU1 + cpunum;
-							map->region_offs = map->start;
-						}
-
-						/* if this entry references a memory region, validate it */
-						if (map->region && map->share == 0)
-						{
-							offs_t length = region_length[map->region];
-
-							if (length == 0)
-							{
-								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
-								error = TRUE;
-							}
-							else if (map->region_offs + (end - start + 1) > length)
-							{
-								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region, length);
-								error = TRUE;
-							}
-						}
-
-						/* If this is a match/mask, make sure the match bits are present in the mask */
-						if (ismatchmask && (start & end) != start)
-						{
-							mame_printf_error("%s: %s CPU %d space %d memory map entry match %X contains bits not in mask %X for region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
-							error = TRUE;
-						}
+					/* make sure all devices exist */
+					if (map->read_devtype != NULL && device_list_find_by_tag(config->devicelist, map->read_devtype, map->read_devtag) == NULL)
+					{
+						mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(map->read_devtype), map->read_devtag);
+						error = TRUE;
+					}
+					if (map->write_devtype != NULL && device_list_find_by_tag(config->devicelist, map->write_devtype, map->write_devtag) == NULL)
+					{
+						mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(map->write_devtype), map->write_devtag);
+						error = TRUE;
 					}
 				}
 				else
@@ -759,6 +761,50 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 						}
 					}
 				}
+
+			/* validate the interrupts */
+			if (cpu->vblank_interrupt != NULL)
+			{
+				if (video_screen_count(config) == 0)
+				{
+					mame_printf_error("%s: %s cpu #%d has a VBLANK interrupt, but the driver is screenless !\n", driver->source_file, driver->name, cpunum);
+					error = TRUE;
+				}
+				else if (cpu->vblank_interrupts_per_frame == 0)
+				{
+					mame_printf_error("%s: %s cpu #%d has a VBLANK interrupt handler with 0 interrupts!\n", driver->source_file, driver->name, cpunum);
+					error = TRUE;
+				}
+				else if (cpu->vblank_interrupts_per_frame == 1)
+				{
+					if (cpu->vblank_interrupt_screen == NULL)
+					{
+						mame_printf_error("%s: %s cpu #%d has a valid VBLANK interrupt handler with no screen tag supplied!\n", driver->source_file, driver->name, cpunum);
+						error = TRUE;
+					}
+					else if (device_list_index(config->devicelist, VIDEO_SCREEN, cpu->vblank_interrupt_screen) == -1)
+					{
+						mame_printf_error("%s: %s cpu #%d VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, cpunum, cpu->vblank_interrupt_screen);
+						error = TRUE;
+					}
+				}
+			}
+			else if (cpu->vblank_interrupts_per_frame != 0)
+			{
+				mame_printf_error("%s: %s cpu #%d has no VBLANK interrupt handler but a non-0 interrupt count is given!\n", driver->source_file, driver->name, cpunum);
+				error = TRUE;
+			}
+
+			if ((cpu->timed_interrupt != NULL) && (cpu->timed_interrupt_period == 0))
+			{
+				mame_printf_error("%s: %s cpu #%d has a timer interrupt handler with 0 period!\n", driver->source_file, driver->name, cpunum);
+				error = TRUE;
+			}
+			else if ((cpu->timed_interrupt == NULL) && (cpu->timed_interrupt_period != 0))
+			{
+				mame_printf_error("%s: %s cpu #%d has a no timer interrupt handler but has a non-0 period given!\n", driver->source_file, driver->name, cpunum);
+				error = TRUE;
+			}
 		}
 	}
 

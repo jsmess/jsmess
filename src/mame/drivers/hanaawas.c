@@ -69,7 +69,7 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 		}
 	}
 
-	return (input_port_0_r(0) & 0xf0) | ordinal;
+	return (input_port_0_r(machine,0) & 0xf0) | ordinal;
 }
 
 static WRITE8_HANDLER( hanaawas_inputs_mux_w )
@@ -208,7 +208,7 @@ static MACHINE_DRIVER_START( hanaawas )
 	MDRV_CPU_ADD(Z80,18432000/6)	/* 3.072 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -115,18 +115,6 @@ WRITE8_HANDLER( rockola_charram_w )
 }
 
 
-WRITE8_HANDLER( rockola_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-
-WRITE8_HANDLER( rockola_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
-
 WRITE8_HANDLER( rockola_flipscreen_w )
 {
 	int bank;
@@ -275,7 +263,7 @@ WRITE8_HANDLER( satansat_b002_w )
 	/* it controls only IRQs, not NMIs. Here I am affecting both, which */
 	/* is wrong. */
 
-	interrupt_enable_w(0,data & 0x02);
+	interrupt_enable_w(machine,0,data & 0x02);
 
 	/* other bits unused */
 }

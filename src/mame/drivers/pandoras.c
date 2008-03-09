@@ -62,7 +62,7 @@ static WRITE8_HANDLER( pandoras_int_control_w ){
 					break;
 		case 0x03:	coin_counter_w(1,data & 0x01);
 					break;
-		case 0x05:	pandoras_flipscreen_w(0, data);
+		case 0x05:	pandoras_flipscreen_w(machine, 0, data);
 					break;
 		case 0x06:	if (!data) cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
 					irq_enable_b = data;
@@ -379,11 +379,11 @@ static MACHINE_DRIVER_START( pandoras )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,18432000/6)	/* CPU A */
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_a,pandoras_writemem_a)
-	MDRV_CPU_VBLANK_INT(pandoras_interrupt_a,1)
+	MDRV_CPU_VBLANK_INT("main", pandoras_interrupt_a)
 
 	MDRV_CPU_ADD(M6809,18432000/6)	/* CPU B */
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_b,pandoras_writemem_b)
-	MDRV_CPU_VBLANK_INT(pandoras_interrupt_b,1)
+	MDRV_CPU_VBLANK_INT("main", pandoras_interrupt_b)
 
 	MDRV_CPU_ADD(Z80,14318000/8)
 	/* audio CPU */

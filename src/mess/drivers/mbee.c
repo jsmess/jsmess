@@ -256,7 +256,7 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_CPU_PROGRAM_MAP(mbee_mem, 0)
 	MDRV_CPU_IO_MAP(mbee_ports, 0)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
-	MDRV_CPU_VBLANK_INT(mbee_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", mbee_interrupt)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( mbee )

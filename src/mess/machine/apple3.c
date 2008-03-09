@@ -184,14 +184,14 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			result = applefdc_r(offset);
+			result = applefdc_r(machine, offset);
 			break;
 
 		case 0xF0:
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			result = acia_6551_r(offset & 0x03);
+			result = acia_6551_r(machine, offset & 0x03);
 			break;
 	}
 	return result;
@@ -245,14 +245,14 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			applefdc_w(offset, data);
+			applefdc_w(machine, offset, data);
 			break;
 
 		case 0xF0:
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			acia_6551_w(offset & 0x03, data);
+			acia_6551_w(machine, offset & 0x03, data);
 			break;
 	}
 }

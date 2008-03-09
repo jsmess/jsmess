@@ -659,7 +659,7 @@ static WRITE8_HANDLER( brickzn_palettebank_w )
 	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",activecpu_get_pc(),data);
 
 	/* Also used as soundlatch - depending on c0c0? */
-	soundlatch_w(0,data);
+	soundlatch_w(machine,0,data);
 }
 
 /*
@@ -960,7 +960,7 @@ static WRITE8_HANDLER( sparkman_rombank_w )
 
 static READ8_HANDLER( sparkman_c0a3_r )
 {
-	return (cpu_getcurrentframe() & 1) ? 0x80 : 0;
+	return (video_screen_get_frame_number(0) & 1) ? 0x80 : 0;
 }
 
 static ADDRESS_MAP_START( sparkman_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1553,13 +1553,13 @@ static MACHINE_DRIVER_START( hardhead )
 	MDRV_CPU_ADD(Z80, 24000000 / 4)			/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_readmem,hardhead_writemem)
 	MDRV_CPU_IO_MAP(hardhead_readport,hardhead_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* No NMI */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* No NMI */
 
 	MDRV_CPU_ADD(Z80, 24000000 / 4)
 	/* audio CPU */					/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
 	MDRV_CPU_IO_MAP(hardhead_sound_readport,hardhead_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* No NMI */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1608,13 +1608,13 @@ static MACHINE_DRIVER_START( rranger )
 	MDRV_CPU_ADD(Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(rranger_readmem,rranger_writemem)
 	MDRV_CPU_IO_MAP(rranger_readport,rranger_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* IRQ & NMI ! */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ & NMI ! */
 
 	MDRV_CPU_ADD(Z80, 24000000 / 4)
 	/* audio CPU */					/* ? */
 	MDRV_CPU_PROGRAM_MAP(rranger_sound_readmem,rranger_sound_writemem)
 	MDRV_CPU_IO_MAP(rranger_sound_readport,rranger_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* NMI = retn */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* NMI = retn */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1666,8 +1666,8 @@ static MACHINE_DRIVER_START( brickzn )
 	MDRV_CPU_ADD_TAG("main", Z80, 24000000 / 4)		/* SUNA PROTECTION BLOCK */
 	MDRV_CPU_PROGRAM_MAP(brickzn_readmem,brickzn_writemem)
 	MDRV_CPU_IO_MAP(brickzn_readport,brickzn_writeport)
-//  MDRV_CPU_VBLANK_INT(brickzn_interrupt, 2)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	// nmi breaks ramtest but is needed!
+//  MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt, 2)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// nmi breaks ramtest but is needed!
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 24000000 / 4)	/* Z0840006PSC */
 	/* audio CPU */
@@ -1736,7 +1736,7 @@ static INTERRUPT_GEN( hardhea2_interrupt )
 
 static MACHINE_RESET( hardhea2 )
 {
-	hardhea2_rambank_0_w(0,0);
+	hardhea2_rambank_0_w(machine,0,0);
 }
 
 static MACHINE_DRIVER_START( hardhea2 )
@@ -1744,7 +1744,7 @@ static MACHINE_DRIVER_START( hardhea2 )
 	MDRV_IMPORT_FROM( brickzn )
 	MDRV_CPU_MODIFY("main")			/* SUNA T568009 */
 	MDRV_CPU_PROGRAM_MAP(hardhea2_readmem,hardhea2_writemem)
-	MDRV_CPU_VBLANK_INT(hardhea2_interrupt,2)	/* IRQ & NMI */
+	MDRV_CPU_VBLANK_INT_HACK(hardhea2_interrupt,2)	/* IRQ & NMI */
 
 	MDRV_MACHINE_RESET(hardhea2)
 	MDRV_PALETTE_LENGTH(256)
@@ -1769,14 +1769,14 @@ static MACHINE_DRIVER_START( starfigh )
 	MDRV_CPU_ADD(Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(starfigh_readmem,starfigh_writemem)
 	MDRV_CPU_IO_MAP(starfigh_readport,starfigh_writeport)
-	MDRV_CPU_VBLANK_INT(brickzn_interrupt,2)	/* IRQ & NMI */
+	MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt,2)	/* IRQ & NMI */
 
 	/* The sound section is identical to that of hardhead */
 	MDRV_CPU_ADD(Z80, 24000000 / 4)
 	/* audio CPU */					/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
 	MDRV_CPU_IO_MAP(hardhead_sound_readport,hardhead_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* No NMI */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1829,13 +1829,13 @@ static MACHINE_DRIVER_START( sparkman )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(sparkman_readmem,sparkman_writemem)
-	MDRV_CPU_VBLANK_INT(sparkman_interrupt,2)	/* IRQ & NMI */
+	MDRV_CPU_VBLANK_INT_HACK(sparkman_interrupt,2)	/* IRQ & NMI */
 
 	MDRV_CPU_ADD(Z80, 24000000 / 4)
 	/* audio CPU */					/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
 	MDRV_CPU_IO_MAP(hardhead_sound_readport,hardhead_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* No NMI */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

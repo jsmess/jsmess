@@ -372,7 +372,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_CPU_ADD_TAG("main", Z80, 2216800)        /* 2,2168 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cgenie_mem, 0)
 	MDRV_CPU_IO_MAP(cgenie_io, 0)
-	MDRV_CPU_VBLANK_INT(cgenie_frame_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cgenie_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(cgenie_timer_interrupt, 40)
 	MDRV_INTERLEAVE(4)
 

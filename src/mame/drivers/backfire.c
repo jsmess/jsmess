@@ -27,8 +27,8 @@ extern void decrypt156(void);
 static UINT32 *backfire_spriteram32_1;
 static UINT32 *backfire_spriteram32_2;
 static UINT32 *backfire_mainram;
-static mame_bitmap * backfire_left;
-static mame_bitmap * backfire_right;
+static bitmap_t *backfire_left;
+static bitmap_t *backfire_right;
 
 //UINT32 *backfire_180010, *backfire_188010;
 static UINT32 *backfire_left_priority, *backfire_right_priority;
@@ -90,7 +90,7 @@ static VIDEO_START(backfire)
 	backfire_right = auto_bitmap_alloc(80*8, 32*8, BITMAP_FORMAT_INDEXED16);
 }
 
-static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect, UINT32 *backfire_spriteram32, int region)
+static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect, UINT32 *backfire_spriteram32, int region)
 {
 	int offs;
 
@@ -104,7 +104,7 @@ static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rect
 
 		y = backfire_spriteram32[offs]&0xffff;
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		x = backfire_spriteram32[offs+2]&0xffff;
 		colour = (x >>9) & 0x1f;
@@ -264,21 +264,21 @@ static WRITE32_HANDLER(backfire_eeprom_w)
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 
 static READ32_HANDLER( deco156_snd_r )
 {
-	return YMZ280B_status_0_r(0);
+	return YMZ280B_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( deco156_snd_w )
 {
 	if (offset)
-		YMZ280B_data_0_w(0, data);
+		YMZ280B_data_0_w(machine, 0, data);
 	else
-		YMZ280B_register_0_w(0, data);
+		YMZ280B_register_0_w(machine, 0, data);
 }
 
 /* map 32-bit writes to 16-bit */
@@ -299,10 +299,10 @@ static READ32_HANDLER( backfire_pf1_data_r ) {	return deco16_pf1_data[offset]^0x
 static READ32_HANDLER( backfire_pf2_data_r ) {	return deco16_pf2_data[offset]^0xffff0000; }
 static READ32_HANDLER( backfire_pf3_data_r ) {	return deco16_pf3_data[offset]^0xffff0000; }
 static READ32_HANDLER( backfire_pf4_data_r ) {	return deco16_pf4_data[offset]^0xffff0000; }
-static WRITE32_HANDLER( backfire_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf3_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf3_data_w(offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf4_data_w(offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(machine,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(machine,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf3_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf3_data_w(machine,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf4_data_w(machine,offset,data,mem_mask); }
 
 #ifdef UNUSED_FUNCTION
 READ32_HANDLER( backfire_unknown_wheel_r )
@@ -489,7 +489,7 @@ static MACHINE_DRIVER_START( backfire )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(backfire_map,0)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("left", deco32_vbl_interrupt)	/* or is it "right?" */
 
 	MDRV_NVRAM_HANDLER(93C46)
 

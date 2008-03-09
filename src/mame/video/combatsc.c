@@ -340,8 +340,8 @@ WRITE8_HANDLER( combasc_vreg_w )
 
 static WRITE8_HANDLER( combascb_sh_irqtrigger_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static READ8_HANDLER( combascb_io_r )
@@ -440,7 +440,7 @@ MACHINE_RESET( combasc )
 	memset( combasc_page[1], 0x00, 0x2000 );
 
 	combasc_bank_select = -1;
-	combasc_bankselect_w( 0,0 );
+	combasc_bankselect_w( machine,0,0 );
 }
 
 WRITE8_HANDLER( combasc_pf_control_w )
@@ -477,7 +477,7 @@ WRITE8_HANDLER( combasc_scrollram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *source,int circuit,UINT32 pri_mask)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source,int circuit,UINT32 pri_mask)
 {
 	int base_color = (circuit*4)*16+(K007121_ctrlram[circuit][6]&0x10)*2;
 
@@ -600,7 +600,7 @@ byte #4:
 
 ***************************************************************************/
 
-static void bootleg_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
+static void bootleg_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
 {
 	const gfx_element *gfx = machine->gfx[circuit+2];
 

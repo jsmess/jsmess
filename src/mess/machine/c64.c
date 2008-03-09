@@ -473,17 +473,17 @@ WRITE8_HANDLER( c64_write_io )
 {
 	c64_io_mirror[ offset ] = data;
 	if (offset < 0x400) {
-		vic2_port_w (offset & 0x3ff, data);
+		vic2_port_w (machine, offset & 0x3ff, data);
 	} else if (offset < 0x800) {
-		sid6581_0_port_w (offset & 0x3ff, data);
+		sid6581_0_port_w (machine, offset & 0x3ff, data);
 	} else if (offset < 0xc00)
 		c64_colorram[offset & 0x3ff] = data | 0xf0;
 	else if (offset < 0xd00)
-		cia_0_w(offset, data);
+		cia_0_w(machine, offset, data);
 	else if (offset < 0xe00)
 	{
 		if (c64_cia1_on)
-			cia_1_w(offset, data);
+			cia_1_w(machine, offset, data);
 		else
 			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 	}
@@ -515,7 +515,7 @@ static UINT8 *c64_io_ram_r_ptr;
 WRITE8_HANDLER(c64_ioarea_w)
 {
 	if ( c64_io_enabled ) {
-		c64_write_io( offset, data );
+		c64_write_io( machine, offset, data );
 	} else {
 		c64_io_ram_w_ptr[ offset ] = data;
 	}
@@ -524,15 +524,15 @@ WRITE8_HANDLER(c64_ioarea_w)
 READ8_HANDLER( c64_read_io )
 {
 	if (offset < 0x400)
-		return vic2_port_r (offset & 0x3ff);
+		return vic2_port_r (machine, offset & 0x3ff);
 	else if (offset < 0x800)
-		return sid6581_0_port_r (offset & 0x3ff);
+		return sid6581_0_port_r (machine, offset & 0x3ff);
 	else if (offset < 0xc00)
 		return c64_colorram[offset & 0x3ff];
 	else if (offset < 0xd00)
-		return cia_0_r(offset);
+		return cia_0_r(machine, offset);
 	else if (c64_cia1_on && (offset < 0xe00))
-		return cia_1_r(offset);
+		return cia_1_r(machine, offset);
 	DBG_LOG (1, "io read", ("%.3x\n", offset));
 	return 0xff;
 }
@@ -540,7 +540,7 @@ READ8_HANDLER( c64_read_io )
 READ8_HANDLER(c64_ioarea_r)
 {
 	if ( c64_io_enabled ) {
-		return c64_read_io( offset );
+		return c64_read_io( machine, offset );
 	}
 	return c64_io_ram_r_ptr[ offset ];
 }
@@ -974,7 +974,7 @@ static OPBASE_HANDLER( c64_opbase ) {
 			opcode_base = c64_io_mirror;
 			opcode_memory_min = 0x0000;
 			opcode_memory_max = 0xcfff;
-			c64_io_mirror[address & 0x0fff] = c64_read_io( address & 0x0fff );
+			c64_io_mirror[address & 0x0fff] = c64_read_io( machine, address & 0x0fff );
 		} else {
 			opcode_mask = 0x0fff;
 			opcode_arg_base = c64_io_ram_r_ptr;

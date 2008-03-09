@@ -220,7 +220,7 @@ VIDEO_START( namcona1 )
 {
 	int i;
 	gfx_element *gfx0,*gfx1;
-	static const tile_get_info_callback get_info[4] =
+	static const tile_get_info_func get_info[4] =
 	{ tilemap_get_info0, tilemap_get_info1, tilemap_get_info2, tilemap_get_info3 };
 
 	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
@@ -249,7 +249,7 @@ VIDEO_START( namcona1 )
 /*************************************************************************/
 
 static void pdraw_masked_tile(running_machine *machine,
-		mame_bitmap *bitmap,
+		bitmap_t *bitmap,
 		const rectangle *cliprect,
 		unsigned code,
 		int color,
@@ -387,7 +387,7 @@ static void pdraw_masked_tile(running_machine *machine,
 } /* pdraw_masked_tile */
 
 static void pdraw_opaque_tile(running_machine *machine,
-		mame_bitmap *bitmap,
+		bitmap_t *bitmap,
 		const rectangle *cliprect,
 		unsigned code,
 		int color,
@@ -460,12 +460,12 @@ static void pdraw_opaque_tile(running_machine *machine,
 
 static const UINT8 pri_mask[8] = { 0x00,0x01,0x03,0x07,0x0f,0x1f,0x3f,0x7f };
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int which;
 	const UINT16 *source = spriteram16;
 	void (*drawtile)(running_machine *,
-		mame_bitmap *,
+		bitmap_t *,
 		const rectangle *,
 		unsigned code,
 		int color,
@@ -557,7 +557,7 @@ static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const 
 	} /* next x */
 } /* draw_pixel_line */
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int which, int primask )
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int which, int primask )
 {
 	/*          scrollx lineselect
      *  tmap0   ffe000  ffe200

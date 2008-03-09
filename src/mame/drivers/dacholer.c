@@ -261,7 +261,7 @@ static VIDEO_START( dacholer )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs,code,attr,sx,sy,flipx,flipy;
 
@@ -337,7 +337,7 @@ static MACHINE_DRIVER_START( dacholer )
 	MDRV_CPU_ADD(Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(snd_map, 0)

@@ -144,8 +144,8 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 
 static WRITE16_HANDLER ( wwfsstar_soundwrite )
 {
-	soundlatch_w(1,data & 0xff);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w(machine,1,data & 0xff);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE16_HANDLER( wwfsstar_flipscreen_w )
@@ -362,7 +362,7 @@ static MACHINE_DRIVER_START( wwfsstar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(wwfsstars_interrupt,272)
+	MDRV_CPU_VBLANK_INT_HACK(wwfsstars_interrupt,272)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)

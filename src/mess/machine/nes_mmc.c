@@ -49,11 +49,11 @@ static UINT8 IRQ_mode;
 
 int MMC1_extended;	/* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
 
-write8_handler mmc_write_low;
-read8_handler mmc_read_low;
-write8_handler mmc_write_mid;
-read8_handler mmc_read_mid;
-write8_handler mmc_write;
+write8_machine_func mmc_write_low;
+read8_machine_func mmc_read_low;
+write8_machine_func mmc_write_mid;
+read8_machine_func mmc_read_mid;
+write8_machine_func mmc_write;
 /*void (*ppu_latch)(offs_t offset);*/
 
 static int vrom_bank[16];
@@ -106,7 +106,7 @@ static TIMER_CALLBACK(nes_irq_callback)
 
 WRITE8_HANDLER( nes_low_mapper_w )
 {
-	if (mmc_write_low) (*mmc_write_low)(offset, data);
+	if (mmc_write_low) (*mmc_write_low)(machine, offset, data);
 	else
 	{
 		logerror("Unimplemented LOW mapper write, offset: %04x, data: %02x\n", offset, data);
@@ -124,7 +124,7 @@ WRITE8_HANDLER( nes_low_mapper_w )
 READ8_HANDLER( nes_low_mapper_r )
 {
 	if (mmc_read_low)
-		return (*mmc_read_low)(offset);
+		return (*mmc_read_low)(machine, offset);
 	else
 		logerror("low mapper area read, addr: %04x\n", offset + 0x4100);
 
@@ -133,7 +133,7 @@ READ8_HANDLER( nes_low_mapper_r )
 
 WRITE8_HANDLER ( nes_mid_mapper_w )
 {
-	if (mmc_write_mid) (*mmc_write_mid)(offset, data);
+	if (mmc_write_mid) (*mmc_write_mid)(machine, offset, data);
 	else if (nes.mid_ram_enable)
 		battery_ram[offset] = data;
 //	else
@@ -159,7 +159,7 @@ READ8_HANDLER ( nes_mid_mapper_r )
 
 WRITE8_HANDLER ( nes_mapper_w )
 {
-	if (mmc_write) (*mmc_write)(offset, data);
+	if (mmc_write) (*mmc_write)(machine, offset, data);
 	else
 	{
 		logerror("Unimplemented mapper write, offset: %04x, data: %02x\n", offset, data);
@@ -901,7 +901,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 	/* Send $5000-$5015 to the sound chip */
 	if ((offset >= 0xf00) && (offset <= 0xf15))
 	{
-		NESPSG_0_w (offset & 0x1f, data);
+		NESPSG_0_w (machine, offset & 0x1f, data);
 		return;
 	}
 
@@ -2959,7 +2959,7 @@ static WRITE8_HANDLER( mapper44_w )
 		break;
 
 	default:
-		mapper4_w( offset, data );
+		mapper4_w( machine, offset, data );
 		break;
 	}
 }
@@ -4419,7 +4419,7 @@ static WRITE8_HANDLER( mapper206_w )
 	if ( (offset & 0x6001) == 0x2000 )
 		return;
 
-	mapper4_w( offset, data );
+	mapper4_w( machine, offset, data );
 }
 
 static WRITE8_HANDLER( mapper225_w )

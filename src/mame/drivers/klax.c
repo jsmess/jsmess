@@ -54,8 +54,8 @@ static void scanline_update(running_machine *machine, int scrnum, int scanline)
 
 static WRITE16_HANDLER( interrupt_ack_w )
 {
-	atarigen_scanline_int_ack_w(offset, data, mem_mask);
-	atarigen_video_int_ack_w(offset, data, mem_mask);
+	atarigen_scanline_int_ack_w(machine, offset, data, mem_mask);
+	atarigen_video_int_ack_w(machine, offset, data, mem_mask);
 }
 
 
@@ -83,14 +83,14 @@ static MACHINE_RESET( klax )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return OKIM6295_status_0_r(offset) | 0xff00;
+	return OKIM6295_status_0_r(machine, offset) | 0xff00;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_LSB)
-		OKIM6295_data_0_w(offset, data & 0xff);
+		OKIM6295_data_0_w(machine, offset, data & 0xff);
 }
 
 
@@ -198,7 +198,7 @@ static MACHINE_DRIVER_START( klax )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
-	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
+	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 
 	MDRV_MACHINE_RESET(klax)
 	MDRV_NVRAM_HANDLER(atarigen)

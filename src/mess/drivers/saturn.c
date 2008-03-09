@@ -1848,14 +1848,14 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 static READ32_HANDLER( stv_scsp_regs_r32 )
 {
 	offset <<= 1;
-	return (SCSP_0_r(offset+1, 0xffff) | (SCSP_0_r(offset, 0xffff)<<16));
+	return (SCSP_0_r(machine, offset+1, 0xffff) | (SCSP_0_r(machine, offset, 0xffff)<<16));
 }
 
 static WRITE32_HANDLER( stv_scsp_regs_w32 )
 {
 	offset <<= 1;
-	SCSP_0_w(offset, data>>16, mem_mask >> 16);
-	SCSP_0_w(offset+1, data, mem_mask);
+	SCSP_0_w(machine, offset + 0, data >> 16, mem_mask >> 16);
+	SCSP_0_w(machine, offset + 1, data >>  0, mem_mask);
 }
 
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  *
@@ -2282,7 +2282,7 @@ static MACHINE_DRIVER_START( saturn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MDRV_CPU_PROGRAM_MAP(saturn_mem, 0)
-	MDRV_CPU_VBLANK_INT(stv_interrupt,264)/*264 lines,224 display lines*/
+	MDRV_CPU_VBLANK_INT_HACK(stv_interrupt, 264)/*264 lines,224 display lines*/
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD(SH2, MASTER_CLOCK_352/2) // 28.6364 MHz

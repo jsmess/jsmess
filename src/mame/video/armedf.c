@@ -228,7 +228,7 @@ WRITE16_HANDLER( armedf_mcu_cmd )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 
@@ -351,5 +351,5 @@ VIDEO_UPDATE( armedf )
 
 VIDEO_EOF( armedf )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }

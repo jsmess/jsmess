@@ -5,8 +5,8 @@
 /*
 	prototype for CRU handlers in expansion system
 */
-typedef int (*cru_read_handler)(int offset);
-typedef void (*cru_write_handler)(int offset, int data);
+typedef int (*cru_read_handler)(running_machine *machine, int offset);
+typedef void (*cru_write_handler)(running_machine *machine, int offset, int data);
 
 /*
 	Descriptor for TI peripheral expansion cards (8-bit bus)
@@ -16,8 +16,8 @@ typedef struct ti99_peb_card_handlers_t
 	cru_read_handler cru_read;		/* card CRU read handler */
 	cru_write_handler cru_write;	/* card CRU handler */
 
-	read8_handler mem_read;		/* card mem read handler (8 bits) */
-	write8_handler mem_write;	/* card mem write handler (8 bits) */
+	read8_machine_func mem_read;		/* card mem read handler (8 bits) */
+	write8_machine_func mem_write;	/* card mem write handler (8 bits) */
 } ti99_peb_card_handlers_t;
 
 /*
@@ -30,8 +30,8 @@ typedef struct ti99_peb_16bit_card_handlers_t
 	cru_read_handler cru_read;		/* card CRU read handler */
 	cru_write_handler cru_write;	/* card CRU handler */
 
-	read16_handler mem_read;		/* card mem read handler (16 bits) */
-	write16_handler mem_write;		/* card mem write handler (16 bits) */
+	read16_machine_func mem_read;		/* card mem read handler (16 bits) */
+	write16_machine_func mem_write;		/* card mem write handler (16 bits) */
 } ti99_peb_16bit_card_handlers_t;
 
 /* masks for ila and ilb */

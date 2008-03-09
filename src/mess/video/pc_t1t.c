@@ -282,7 +282,7 @@ static int pc_t1t_color_select_r(void)
  */
 static int pc_t1t_status_r(void)
 {
-    int data = (input_port_0_r(0) & 0x08) | pcjr.status;
+    int data = (readinputport(0) & 0x08) | pcjr.status;
     pcjr.status ^= 0x01;
     return data;
 }

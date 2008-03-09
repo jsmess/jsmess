@@ -123,20 +123,20 @@ extern WRITE8_HANDLER ( europc_jim_w )
 		}
 		break;
 	case 0xa:
-		europc_rtc_w(0, data);
+		europc_rtc_w(machine, 0, data);
 		return;
 	}
 	logerror("jim write %.2x %.2x\n",offset,data);
 	europc_jim.data[offset]=data;
 }
 
-extern  READ8_HANDLER ( europc_jim_r )
+READ8_HANDLER ( europc_jim_r )
 {
 	int data=0;
 	switch(offset) {
 	case 4: case 5: case 6: case 7: data=europc_jim.data[offset];break;
 	case 0: case 1: case 2: case 3: data=0;break;
-	case 0xa: return europc_rtc_r(0);
+	case 0xa: return europc_rtc_r(machine, 0);
 	}
 	return data;
 }

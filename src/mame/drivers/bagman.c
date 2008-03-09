@@ -54,6 +54,9 @@ I/O C  ;AY-3-8910 Data Read Reg.
         Port A of the 8910 is connected to IN0
         Port B of the 8910 is connected to IN1
 
+DIP locations verified for:
+    - bagman (manual)
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -83,7 +86,7 @@ static int speech_rom_address = 0;
 static UINT8 ls259_buf[8] = {0,0,0,0,0,0,0,0};
 
 
-static void start_talking (void)
+static void start_talking (running_machine *machine)
 {
 #if 0
 	logerror("Talk started: selected bit %1i, selected roms QS %i  QT %i\n",
@@ -96,30 +99,30 @@ static void start_talking (void)
 #endif
 
 	speech_rom_address = 0x0;
-	tms5110_CTL_w(0,TMS5110_CMD_SPEAK);
-	tms5110_PDC_w(0,0);
-	tms5110_PDC_w(0,1);
-	tms5110_PDC_w(0,0);
+	tms5110_CTL_w(machine,0,TMS5110_CMD_SPEAK);
+	tms5110_PDC_w(machine,0,0);
+	tms5110_PDC_w(machine,0,1);
+	tms5110_PDC_w(machine,0,0);
 }
 
-static void reset_talking (void)
+static void reset_talking (running_machine *machine)
 {
 /*To be extremely accurate there should be a delays between each of
   the function calls below. In real they happen with the frequency of 160 kHz.
 */
 
-	tms5110_CTL_w(0,TMS5110_CMD_RESET);
-	tms5110_PDC_w(0,0);
-	tms5110_PDC_w(0,1);
-	tms5110_PDC_w(0,0);
+	tms5110_CTL_w(machine,0,TMS5110_CMD_RESET);
+	tms5110_PDC_w(machine,0,0);
+	tms5110_PDC_w(machine,0,1);
+	tms5110_PDC_w(machine,0,0);
 
-	tms5110_PDC_w(0,0);
-	tms5110_PDC_w(0,1);
-	tms5110_PDC_w(0,0);
+	tms5110_PDC_w(machine,0,0);
+	tms5110_PDC_w(machine,0,1);
+	tms5110_PDC_w(machine,0,0);
 
-	tms5110_PDC_w(0,0);
-	tms5110_PDC_w(0,1);
-	tms5110_PDC_w(0,0);
+	tms5110_PDC_w(machine,0,0);
+	tms5110_PDC_w(machine,0,1);
+	tms5110_PDC_w(machine,0,0);
 
 	speech_rom_address = 0x0;
 }
@@ -164,7 +167,7 @@ static READ8_HANDLER( bagman_ls259_r )
 
 static WRITE8_HANDLER( bagman_ls259_w )
 {
-	bagman_pal16r6_w(offset,data); /*this is just a simulation*/
+	bagman_pal16r6_w(machine,offset,data); /*this is just a simulation*/
 
 	if (ls259_buf[offset] != (data&1) )
 	{
@@ -174,11 +177,11 @@ static WRITE8_HANDLER( bagman_ls259_w )
 		{
 			if (ls259_buf[3] == 0)	/* 1->0 transition */
 			{
-				reset_talking();
+				reset_talking(machine);
 			}
 			else
 			{
-				start_talking();	/* 0->1 transition */
+				start_talking(machine);	/* 0->1 transition */
 			}
 		}
 	}
@@ -268,7 +271,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( bagman )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -278,7 +281,7 @@ static INPUT_PORTS_START( bagman )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -288,222 +291,84 @@ static INPUT_PORTS_START( bagman )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START	/* DSW */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(	0x03, "2" )
 	PORT_DIPSETTING(	0x02, "3" )
 	PORT_DIPSETTING(	0x01, "4" )
 	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(	0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
 	PORT_DIPSETTING(	0x04, "1C/1C 1C/2C 1C/6C 1C/14C" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(	0x18, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( Medium ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )			PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(	0x20, DEF_STR( English ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( French ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(	0x40, "30000" )
 	PORT_DIPSETTING(	0x00, "40000" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(	0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-/* EXACTLY the same as bagman, the only difference is that
-Languade dip is replaced by Demo Sounds */
 static INPUT_PORTS_START( bagmans )
-	PORT_START	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	 ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_INCLUDE( bagman )
 
-	PORT_START	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	 ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-
-	PORT_START	/* DSW */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x03, "2" )
-	PORT_DIPSETTING(	0x02, "3" )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
-	PORT_DIPSETTING(	0x04, "1C/1C 1C/2C 1C/6C 1C/14C" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x18, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR ( Demo_Sounds ) )
 	PORT_DIPSETTING(	0x00, DEF_STR ( Off ) )
 	PORT_DIPSETTING(	0x20, DEF_STR ( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x40, "30000" )
-	PORT_DIPSETTING(	0x00, "40000" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-
-/* EXACTLY the same as bagman, the only difference is that the START1 button */
-/* also acts as the shoot button. */
 static INPUT_PORTS_START( sbagman )
-	PORT_START	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* double-function button, start and shoot */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_INCLUDE( bagman )
 
-	PORT_START	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* double-function button, start and shoot */
+
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL /* double-function button, start and shoot */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-
-	PORT_START	/* DSW */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x03, "2" )
-	PORT_DIPSETTING(	0x02, "3" )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
-	PORT_DIPSETTING(	0x04, "1C/1C 1C/2C 1C/6C 1C/14C" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x18, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( English ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( French ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x40, "30000" )
-	PORT_DIPSETTING(	0x00, "40000" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pickin )
-	PORT_START	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_INCLUDE( bagman )
 
-	PORT_START	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-
-	PORT_START	/* DSW */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(	0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
 	PORT_DIPSETTING(	0x01, "1C/1C 1C/2C 1C/6C 1C/14C" )
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(	0x06, "2" )
 	PORT_DIPSETTING(	0x04, "3" )
 	PORT_DIPSETTING(	0x02, "4" )
 	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )			PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(	0x40, DEF_STR( English ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( French ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botanic )
-	PORT_START	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_INCLUDE( bagman )
 
-	PORT_START	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-
-	PORT_START	/* DSW */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x00, "2" )
-	PORT_DIPSETTING(	0x03, "3" )
-	PORT_DIPSETTING(	0x02, "4" )
-	PORT_DIPSETTING(	0x01, "5" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x04, "2C/1C 1C/1C 1C/3C 1C/7C" )
-	PORT_DIPSETTING(	0x00, "1C/1C 1C/2C 1C/6C 1C/14C" )
-	PORT_DIPNAME( 0x08, 0x08, "Invulnerability Fruits" )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x08, 0x08, "Invulnerability Fruits" )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(	0x08, "3" )
 	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
 INPUT_PORTS_END
 
 
@@ -565,7 +430,7 @@ static MACHINE_DRIVER_START( bagman )
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(bagman)
 
@@ -601,7 +466,7 @@ static MACHINE_DRIVER_START( pickin )
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(pickin_readmem,pickin_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(bagman)
 
@@ -651,7 +516,7 @@ static MACHINE_DRIVER_START( botanic )
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(pickin_readmem,pickin_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(bagman)
 
@@ -942,13 +807,13 @@ static DRIVER_INIT( bagnarda )
 	*bagman_video_enable = 1;
 }
 
-GAME( 1982, bagman,	 0, 	  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Bagman", 0 )
+GAME( 1982, bagman,	  0,	   bagman,  bagman,  0,        ROT270, "Valadon Automation", "Bagman", 0 )
 GAME( 1982, bagnard,  bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Le Bagnard (set 1)", 0 )
 GAME( 1982, bagnarda, bagman,  bagman,  bagman,  bagnarda, ROT270, "Valadon Automation", "Le Bagnard (set 2)", 0 )
 GAME( 1982, bagmans,  bagman,  bagman,  bagmans, 0,        ROT270, "Valadon Automation (Stern license)", "Bagman (Stern set 1)", 0 )
 GAME( 1982, bagmans2, bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation (Stern license)", "Bagman (Stern set 2)", 0 )
-GAME( 1984, sbagman,  0, 	  bagman,  sbagman, 0,        ROT270, "Valadon Automation", "Super Bagman", 0 )
+GAME( 1984, sbagman,  0, 	   bagman,  sbagman, 0,        ROT270, "Valadon Automation", "Super Bagman", 0 )
 GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern license)", "Super Bagman (Stern)", 0 )
-GAME( 1983, pickin,	 0, 	  pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 )
+GAME( 1983, pickin,	  0,	   pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 )
 GAME( 1984, botanic,  0,       botanic, botanic, 0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
 

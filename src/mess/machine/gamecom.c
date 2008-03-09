@@ -89,9 +89,9 @@ MACHINE_RESET( gamecom )
 	gamecom_dma.enabled = 0;
 
 	memset( internal_registers, 0x00, sizeof(internal_registers) );
-	gamecom_internal_w( SM8521_URTT, 0xFF );
-	gamecom_internal_w( SM8521_URTS, 0x42 );
-	gamecom_internal_w( SM8521_WDTC, 0x38 );
+	gamecom_internal_w( machine, SM8521_URTT, 0xFF );
+	gamecom_internal_w( machine, SM8521_URTS, 0x42 );
+	gamecom_internal_w( machine, SM8521_WDTC, 0x38 );
 }
 
 static void gamecom_set_mmu( int mmu, UINT8 data ) {

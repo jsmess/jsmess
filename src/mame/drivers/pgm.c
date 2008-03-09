@@ -445,15 +445,15 @@ static WRITE16_HANDLER ( m68k_l1_w )
 {
 	if(ACCESSING_LSB) {
 		if (PGMLOGERROR) logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, activecpu_get_pc());
-		soundlatch_w(0, data);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(machine, 0, data);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 	}
 }
 
 static WRITE8_HANDLER( z80_l3_w )
 {
 	if (PGMLOGERROR) logerror("SL 3 z80.w %02x (%04x)\n", data, activecpu_get_pc());
-	soundlatch3_w(0, data);
+	soundlatch3_w(machine, 0, data);
 }
 
 static void sound_irq(int level)
@@ -1559,7 +1559,7 @@ static MACHINE_DRIVER_START( pgm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 20000000) /* 20 mhz! verified on real board */
 	MDRV_CPU_PROGRAM_MAP(pgm_mem,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 8468000)
 	MDRV_CPU_PROGRAM_MAP(z80_mem, 0)
@@ -1593,7 +1593,7 @@ static MACHINE_DRIVER_START( drgw2 )
 	MDRV_IMPORT_FROM(pgm)
 
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
 MACHINE_DRIVER_END
 
 static MACHINE_RESET( killbld );

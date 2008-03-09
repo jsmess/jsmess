@@ -142,7 +142,7 @@ static WRITE8_HANDLER( shr_w )
 {
 	/* bit 3 = watchdog */
 	if (data & 0x08)
-		watchdog_reset_w(0, 0);
+		watchdog_reset(machine);
 
 	/* bit 2-0 = SH0-2 */
 	sh = data & 0x07;
@@ -159,9 +159,9 @@ static WRITE8_HANDLER( shr_w )
 static READ8_HANDLER( ioread )
 {
 	if (offset & 0x08)
-		return ppi8255_0_r(offset & 3);
+		return ppi8255_0_r(machine, offset & 3);
 	else if (offset & 0x10)
-		return ppi8255_1_r(offset & 3);
+		return ppi8255_1_r(machine, offset & 3);
 	return 0xff;
 }
 
@@ -169,9 +169,9 @@ static READ8_HANDLER( ioread )
 static WRITE8_HANDLER( iowrite )
 {
 	if (offset & 0x08)
-		ppi8255_0_w(offset & 3, data);
+		ppi8255_0_w(machine, offset & 3, data);
 	else if (offset & 0x10)
-		ppi8255_1_w(offset & 3, data);
+		ppi8255_1_w(machine, offset & 3, data);
 	else if (offset & 0x40)
 	{
 		dr = ds;
@@ -301,7 +301,7 @@ static MACHINE_DRIVER_START( dribling )
 	MDRV_CPU_ADD(Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(dribling_irq_gen,1)
+	MDRV_CPU_VBLANK_INT("main", dribling_irq_gen)
 
 	MDRV_MACHINE_RESET(dribling)
 

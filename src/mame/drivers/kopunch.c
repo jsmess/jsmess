@@ -18,12 +18,12 @@ static INTERRUPT_GEN( kopunch_interrupt )
 {
 	if (cpu_getiloops() == 0)
 	{
-		if (~input_port_1_r(0) & 0x80)	/* coin 1 */
+		if (~input_port_1_r(machine,0) & 0x80)	/* coin 1 */
 		{
 			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xf7);	/* RST 30h */
 			return;
 		}
-		else if (~input_port_1_r(0) & 0x08)	/* coin 2 */
+		else if (~input_port_1_r(machine,0) & 0x08)	/* coin 2 */
 		{
 			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xef);	/* RST 28h */
 			return;
@@ -37,9 +37,9 @@ static READ8_HANDLER( kopunch_in_r )
 {
 	/* port 31 + low 3 bits of port 32 contain the punch strength */
 	if (offset == 0)
-		return mame_rand(Machine);
+		return mame_rand(machine);
 	else
-		return (mame_rand(Machine) & 0x07) | input_port_1_r(0);
+		return (mame_rand(machine) & 0x07) | input_port_1_r(machine,0);
 }
 
 static WRITE8_HANDLER( kopunch_lamp_w )
@@ -168,7 +168,7 @@ static MACHINE_DRIVER_START( kopunch )
 	MDRV_CPU_ADD(8080, 4000000)	/* 4 MHz ???? appears to use 8080 instructions, not z80 */
 	MDRV_CPU_PROGRAM_MAP(kopunch_map,0)
 	MDRV_CPU_IO_MAP(kopunch_io_map,0)
-	MDRV_CPU_VBLANK_INT(kopunch_interrupt,4)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(kopunch_interrupt,4)	/* ??? */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

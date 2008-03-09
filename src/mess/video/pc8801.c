@@ -151,8 +151,8 @@ static WRITE8_HANDLER(write_gvram)
 	XXX(2)
 
 #define XXX(n) \
-static WRITE8_HANDLER(write_gvram##n##_bank5){write_gvram(offset+0x4000*n,data);} \
-static WRITE8_HANDLER(write_gvram##n##_bank6){write_gvram(offset+0x4000*n+0x3000,data);}
+static WRITE8_HANDLER(write_gvram##n##_bank5){write_gvram(machine, offset+0x4000*n,data);} \
+static WRITE8_HANDLER(write_gvram##n##_bank6){write_gvram(machine, offset+0x4000*n+0x3000,data);}
 	VVV
 #undef XXX
 
@@ -183,8 +183,8 @@ static  READ8_HANDLER(read_gvram_alu##x) \
     (x & 2 ? gVRAM[offset+0x4000] : ~gVRAM[offset+0x4000]) & \
     (x & 4 ? gVRAM[offset+0x8000] : ~gVRAM[offset+0x8000]); \
 } \
-static  READ8_HANDLER(read_gvram_alu##x##_bank5){return read_gvram_alu##x(offset);} \
-static  READ8_HANDLER(read_gvram_alu##x##_bank6){return read_gvram_alu##x(offset+0x3000);}
+static  READ8_HANDLER(read_gvram_alu##x##_bank5){return read_gvram_alu##x(machine, offset);} \
+static  READ8_HANDLER(read_gvram_alu##x##_bank6){return read_gvram_alu##x(machine, offset+0x3000);}
 
 YYY
 
@@ -195,13 +195,13 @@ static WRITE8_HANDLER(write_gvram_alu0)
 #define WWW(x) \
   switch(ALU1&(0x11<<x)) { \
   case 0x00<<x: \
-    write_gvram(offset+x*0x4000,gVRAM[offset+x*0x4000]&(~data)); \
+    write_gvram(machine, offset+x*0x4000,gVRAM[offset+x*0x4000]&(~data)); \
     break; \
   case 0x01<<x: \
-    write_gvram(offset+x*0x4000,gVRAM[offset+x*0x4000]|data); \
+    write_gvram(machine, offset+x*0x4000,gVRAM[offset+x*0x4000]|data); \
     break; \
   case 0x10<<x: \
-    write_gvram(offset+x*0x4000,gVRAM[offset+x*0x4000]^data); \
+    write_gvram(machine, offset+x*0x4000,gVRAM[offset+x*0x4000]^data); \
     break; \
   case 0x11<<x: \
     break; \
@@ -215,16 +215,16 @@ static WRITE8_HANDLER(write_gvram_alu0)
 }
 static WRITE8_HANDLER(write_gvram_alu1)
 {
-  write_gvram(offset+0x0000 , ALU_save0);
-  write_gvram(offset+0x4000 , ALU_save1);
-  write_gvram(offset+0x8000 , ALU_save2);
+  write_gvram(machine, offset+0x0000 , ALU_save0);
+  write_gvram(machine, offset+0x4000 , ALU_save1);
+  write_gvram(machine, offset+0x8000 , ALU_save2);
 }
-static WRITE8_HANDLER(write_gvram_alu2){write_gvram(offset+0x0000,ALU_save1);}
-static WRITE8_HANDLER(write_gvram_alu3){write_gvram(offset+0x4000,ALU_save0);}
+static WRITE8_HANDLER(write_gvram_alu2){write_gvram(machine, offset+0x0000,ALU_save1);}
+static WRITE8_HANDLER(write_gvram_alu3){write_gvram(machine, offset+0x4000,ALU_save0);}
 
 #define XXX(x) \
-static WRITE8_HANDLER(write_gvram_alu##x##_bank5){write_gvram_alu##x(offset,data);} \
-static WRITE8_HANDLER(write_gvram_alu##x##_bank6){write_gvram_alu##x(offset+0x3000,data);}
+static WRITE8_HANDLER(write_gvram_alu##x##_bank5){write_gvram_alu##x(machine, offset,data);} \
+static WRITE8_HANDLER(write_gvram_alu##x##_bank6){write_gvram_alu##x(machine, offset+0x3000,data);}
 
 ZZZ
 
@@ -232,8 +232,8 @@ ZZZ
 
 int is_pc8801_vram_select(void)
 {
-	read8_handler rh5 = NULL, rh6 = NULL;
-	write8_handler wh5 = NULL, wh6 = NULL;
+	read8_machine_func rh5 = NULL, rh6 = NULL;
+	write8_machine_func wh5 = NULL, wh6 = NULL;
 
   if(ALUON) {
     /* ALU mode */

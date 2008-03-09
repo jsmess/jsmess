@@ -21,7 +21,7 @@ static tilemap *bg_tilemap;
 WRITE8_HANDLER( amspdwy_paletteram_w )
 {
 	data ^= 0xff;
-	paletteram_BBGGGRRR_w(offset,data);
+	paletteram_BBGGGRRR_w(machine,offset,data);
 //  paletteram_RRRGGGBB_w(offset,data);
 }
 
@@ -102,7 +102,7 @@ Offset:     Format:     Value:
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int i;
 	int max_x = machine->screen[0].width  - 1;

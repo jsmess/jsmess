@@ -76,7 +76,7 @@ static render_texture *video_texture;
 static render_texture *overlay_texture;
 static UINT32 last_seqid;
 
-static mame_bitmap *overlay_bitmap;
+static bitmap_t *overlay_bitmap;
 
 static const UINT8 led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
@@ -164,7 +164,7 @@ static void video_cleanup(running_machine *machine)
 
 static VIDEO_START( dlair )
 {
-	mame_bitmap *vidbitmap;
+	bitmap_t *vidbitmap;
 
 	/* create textures */
 	last_seqid = laserdisc_get_video(discinfo, &vidbitmap);
@@ -207,7 +207,7 @@ static VIDEO_START( dleuro )
 
 static VIDEO_UPDATE( dlair )
 {
-	mame_bitmap *vidbitmap;
+	bitmap_t *vidbitmap;
 	UINT32 seqid;
 
 	/* get the current video and update the bitmap if different */
@@ -229,7 +229,7 @@ static VIDEO_UPDATE( dlair )
 
 static VIDEO_UPDATE( dleuro )
 {
-	mame_bitmap *vidbitmap;
+	bitmap_t *vidbitmap;
 	UINT32 seqid;
 	int x, y;
 
@@ -680,6 +680,7 @@ static INPUT_PORTS_START( dlaire )
 INPUT_PORTS_END
 
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( dleuro )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -751,7 +752,7 @@ static INPUT_PORTS_START( dleuro )
 	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1",0x04,PORTCOND_EQUALS,0x04)
 	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1",0x04,PORTCOND_EQUALS,0x04)
 INPUT_PORTS_END
-
+#endif
 
 
 /*************************************
@@ -803,7 +804,7 @@ static MACHINE_DRIVER_START( dlair )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK_US/4)
 	MDRV_CPU_PROGRAM_MAP(dlus_map,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)MASTER_CLOCK_US/8/16/16/16/16)
 
 	MDRV_MACHINE_START(dlair)
@@ -843,7 +844,7 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_CPU_CONFIG(dleuro_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(dleuro_map,0)
 	MDRV_CPU_IO_MAP(dleuro_io_map,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback)
 
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 

@@ -258,34 +258,34 @@ static INTERRUPT_GEN(ddd_interrupt)
 
 static WRITE16_HANDLER( sound_cmd1_w )
 {
-	soundlatch_w(0, data&0xff);
+	soundlatch_w(machine, 0, data&0xff);
 }
 
 static WRITE16_HANDLER( sound_cmd1_msb_w )
 {
-	soundlatch_w(0, data>>8);
+	soundlatch_w(machine, 0, data>>8);
 }
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
-	soundlatch2_w(0, data&0xff);
+	soundlatch2_w(machine, 0, data&0xff);
 	return;
 }
 
 static WRITE16_HANDLER( sound_cmd2_msb_w )
 {
-	soundlatch2_w(0, data>>8);
+	soundlatch2_w(machine, 0, data>>8);
 	return;
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
 {
-	int latch = soundlatch3_r(0);
+	int latch = soundlatch3_r(machine,0);
 
 	if ((latch & 0xf) == 0xe) latch |= 1;
 
@@ -294,7 +294,7 @@ static READ16_HANDLER( sound_status_r )
 
 static READ16_HANDLER( sound_status_msb_r )
 {
-	int latch = soundlatch3_r(0);
+	int latch = soundlatch3_r(machine,0);
 
 	if ((latch & 0xf) == 0xe) latch |= 1;
 
@@ -303,7 +303,7 @@ static READ16_HANDLER( sound_status_msb_r )
 
 static WRITE16_HANDLER( irq_ack_w )
 {
-	K056832_b_word_w(offset, data, mem_mask);
+	K056832_b_word_w(machine, offset, data, mem_mask);
 
 	if (offset == 3 && ACCESSING_LSB)
 	{
@@ -369,7 +369,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return K053247_word_r(offset,mem_mask);
+		return K053247_word_r(machine,offset,mem_mask);
 	}
 }
 
@@ -384,7 +384,7 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		K053247_word_w(offset,data,mem_mask);
+		K053247_word_w(machine,offset,data,mem_mask);
 	}
 }
 
@@ -557,7 +557,7 @@ static READ16_HANDLER( K053247_martchmp_word_r )
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
-		return K053247_word_r(offset,mem_mask);
+		return K053247_word_r(machine,offset,mem_mask);
 	}
 }
 
@@ -571,7 +571,7 @@ static WRITE16_HANDLER( K053247_martchmp_word_w )
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
 
-		K053247_word_w(offset,data,mem_mask);
+		K053247_word_w(machine,offset,data,mem_mask);
 	}
 }
 
@@ -931,7 +931,7 @@ static MACHINE_DRIVER_START( mystwarr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz (confirmed) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(mystwarr_interrupt, 3)
+	MDRV_CPU_VBLANK_INT_HACK(mystwarr_interrupt, 3)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
 	/* audio CPU */
@@ -981,7 +981,7 @@ static MACHINE_DRIVER_START( viostorm )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(vsreadmem,vswritemem)
-	MDRV_CPU_VBLANK_INT(metamrph_interrupt, 40)
+	MDRV_CPU_VBLANK_INT_HACK(metamrph_interrupt, 40)
 
 	/* video hardware */
 	MDRV_VIDEO_START(viostorm)
@@ -1001,7 +1001,7 @@ static MACHINE_DRIVER_START( metamrph )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mmreadmem,mmwritemem)
-	MDRV_CPU_VBLANK_INT(metamrph_interrupt, 40)
+	MDRV_CPU_VBLANK_INT_HACK(metamrph_interrupt, 40)
 
 	/* video hardware */
 	MDRV_VIDEO_START(metamrph)
@@ -1021,7 +1021,7 @@ static MACHINE_DRIVER_START( dadandrn )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(dddreadmem, dddwritemem)
-	MDRV_CPU_VBLANK_INT(ddd_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", ddd_interrupt)
 
 	MDRV_GFXDECODE(dadandrn)
 
@@ -1043,7 +1043,7 @@ static MACHINE_DRIVER_START( gaiapols )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(gaiareadmem,gaiawritemem)
-	MDRV_CPU_VBLANK_INT(ddd_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", ddd_interrupt)
 
 	MDRV_GFXDECODE(gaiapols)
 
@@ -1067,7 +1067,7 @@ static MACHINE_DRIVER_START( martchmp )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mcreadmem,mcwritemem)
-	MDRV_CPU_VBLANK_INT(mchamp_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mchamp_interrupt, 2)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
 

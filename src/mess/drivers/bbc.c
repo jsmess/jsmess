@@ -700,8 +700,8 @@ ROM_END
 
 static INTERRUPT_GEN( bbcb_vsync )
 {
-	via_0_ca1_w(0,1);
-	via_0_ca1_w(0,0);
+	via_0_ca1_w(machine, 0,1);
+	via_0_ca1_w(machine, 0,0);
 	bbc_frameclock();
 }
 
@@ -718,7 +718,7 @@ static MACHINE_DRIVER_START( bbca )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, 2000000)        /* 2.00Mhz */
 	MDRV_CPU_PROGRAM_MAP( bbca_mem, 0 )
-	MDRV_CPU_VBLANK_INT(bbcb_vsync, 1)				/* screen refresh interrupts */
+	MDRV_CPU_VBLANK_INT("main", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -781,7 +781,7 @@ static MACHINE_DRIVER_START( bbcm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M65SC02, 2000000)        /* 2.00Mhz */
 	MDRV_CPU_PROGRAM_MAP( bbcm_mem, 0 )
-	MDRV_CPU_VBLANK_INT(bbcb_vsync, 1)				/* screen refresh interrupts */
+	MDRV_CPU_VBLANK_INT("main", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */
 	MDRV_INTERLEAVE(1)
 

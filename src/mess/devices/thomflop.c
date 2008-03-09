@@ -278,7 +278,7 @@ static UINT8 to7_5p14_select;
 static READ8_HANDLER ( to7_5p14_r )
 {
 	if ( offset < 4 )
-		return wd17xx_r( offset );
+		return wd17xx_r( machine, offset );
 	else if ( offset == 8 )
 		return to7_5p14_select;
 	else
@@ -291,7 +291,7 @@ static READ8_HANDLER ( to7_5p14_r )
 static WRITE8_HANDLER( to7_5p14_w )
 {
 	if ( offset < 4 )
-		wd17xx_w( offset, data );
+		wd17xx_w( machine, offset, data );
 	else if ( offset == 8 )
 	{
 		/* drive select */
@@ -375,7 +375,7 @@ static UINT8 to7_5p14sd_select;
 static READ8_HANDLER ( to7_5p14sd_r )
 {
 	if ( offset < 8 )
-		return mc6843_r( offset );
+		return mc6843_r( machine, offset );
 	else if ( offset >= 8 && offset <= 9 )
 		return to7_5p14sd_select;
 	else
@@ -388,7 +388,7 @@ static READ8_HANDLER ( to7_5p14sd_r )
 static WRITE8_HANDLER( to7_5p14sd_w )
 {
 	if ( offset < 8 )
-		mc6843_w( offset, data );
+		mc6843_w( machine, offset, data );
 	else if ( offset >= 8 && offset <= 9 )
 	{
 		/* drive select */
@@ -1711,7 +1711,7 @@ static void to7_network_reset( void )
 static READ8_HANDLER ( to7_network_r )
 {
 	if ( offset >= 0 && offset < 4 )
-		return mc6854_r( offset );
+		return mc6854_r( machine, offset );
 
 	if ( offset == 8 )
 	{
@@ -1730,7 +1730,7 @@ static READ8_HANDLER ( to7_network_r )
 static WRITE8_HANDLER ( to7_network_w )
 {
 	if ( offset >= 0 && offset < 4 )
-		mc6854_w( offset, data );
+		mc6854_w( machine, offset, data );
 	else
 	{
 		logerror( "%f $%04x to7_network_w: invalid write offset %i (data=$%02X)\n",
@@ -1820,19 +1820,19 @@ READ8_HANDLER ( to7_floppy_r )
 	{
 
 	case 1:
-		return to7_5p14sd_r( offset );
+		return to7_5p14sd_r( machine, offset );
 
 	case 2:
-		return to7_5p14_r( offset );
+		return to7_5p14_r( machine, offset );
 
 	case 3:
-		return thmfc_floppy_r( offset );
+		return thmfc_floppy_r( machine, offset );
 
 	case 4:
-		return to7_qdd_r( offset );
+		return to7_qdd_r( machine, offset );
 
 	case 5:
-		return to7_network_r( offset );
+		return to7_network_r( machine, offset );
 	}
 
 	return 0;
@@ -1846,11 +1846,11 @@ WRITE8_HANDLER ( to7_floppy_w )
 	{
 
 	case 1:
-		to7_5p14sd_w( offset, data );
+		to7_5p14sd_w( machine, offset, data );
 		return;
 
 	case 2:
-		to7_5p14_w( offset, data );
+		to7_5p14_w( machine, offset, data );
 		break;
 
 	case 3:
@@ -1861,15 +1861,15 @@ WRITE8_HANDLER ( to7_floppy_w )
 			VLOG (( "to7_floppy_w: set CD 90-351 ROM bank to %i\n", data & 3 ));
 		}
 		else
-			thmfc_floppy_w( offset, data );
+			thmfc_floppy_w( machine, offset, data );
 		break;
 
 	case 4:
-		to7_qdd_w( offset, data );
+		to7_qdd_w( machine, offset, data );
 		break;
 
 	case 5:
-		to7_network_w( offset, data );
+		to7_network_w( machine, offset, data );
 		break;
 	}
 }
@@ -1912,15 +1912,15 @@ void to9_floppy_reset( void )
 READ8_HANDLER ( to9_floppy_r )
 {
 	if ( THOM_FLOPPY_EXT )
-		return to7_floppy_r( offset );
+		return to7_floppy_r( machine, offset );
 	else
-		return  to7_5p14_r( offset );
+		return  to7_5p14_r( machine, offset );
 }
 
 WRITE8_HANDLER ( to9_floppy_w )
 {
 	if ( THOM_FLOPPY_EXT )
-		to7_floppy_w( offset, data );
+		to7_floppy_w( machine, offset, data );
 	else
-		to7_5p14_w( offset, data );
+		to7_5p14_w( machine, offset, data );
 }

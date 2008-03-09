@@ -63,7 +63,7 @@ static NVRAM_HANDLER( magicstk )
 
 static READ16_HANDLER( magicstk_port2_r )
 {
-	return (input_port_2_r(0) & 0xfe) | EEPROM_read_bit();
+	return (input_port_2_r(machine,0) & 0xfe) | EEPROM_read_bit();
 }
 
 static WRITE16_HANDLER( magicstk_coin_eeprom_w )
@@ -335,7 +335,7 @@ static TILE_GET_INFO( powerbal_get_bg_tile_info )
 	SET_TILE_INFO(1,code,colr >> 12,0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	int height = machine->gfx[0]->height;
@@ -413,7 +413,7 @@ static MACHINE_DRIVER_START( powerbal )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(powerbal_main_map, 0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -441,7 +441,7 @@ static MACHINE_DRIVER_START( magicstk )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(magicstk_main_map, 0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(magicstk)
 

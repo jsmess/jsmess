@@ -1023,6 +1023,7 @@ static INPUT_PORTS_START( cps2_3p3b )
 INPUT_PORTS_END
 
 /* 3 players and 2 buttons */
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( cps2_3p2b )
 	PORT_INCLUDE(cps2_3p3b)
 
@@ -1033,6 +1034,7 @@ static INPUT_PORTS_START( cps2_3p2b )
 	PORT_MODIFY("IN1")
     PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(3) */
 INPUT_PORTS_END
+#endif
 
 /* 2 players and 4 buttons */
 static INPUT_PORTS_START( cps2_2p4b )
@@ -1239,7 +1241,7 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_CONFIG(cps2_encryption)
 	MDRV_CPU_PROGRAM_MAP(cps2_readmem,cps2_writemem)
-	MDRV_CPU_VBLANK_INT(cps2_interrupt,262)	// 262  /* ??? interrupts per frame */
+	MDRV_CPU_VBLANK_INT_HACK(cps2_interrupt,262)	// 262  /* ??? interrupts per frame */
 
 	MDRV_CPU_ADD(Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(qsound_readmem,qsound_writemem)
@@ -2239,7 +2241,7 @@ ROM_START( ddtodj )
 	ROM_LOAD16_WORD_SWAP( "dad.12m",   0x200000, 0x200000, CRC(2f0b5a4e) SHA1(8d1ebbb811aa469b0f0d29d719d2b9af28fb63a2) )
 ROM_END
 
-ROM_START( ddtodjr2 )
+ROM_START( ddtodjr1 )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "dadj.03b", 0x000000, 0x80000, CRC(87606b85) SHA1(1311c9ae321207db4632572f6c838b732974b087) )
 	ROM_LOAD16_WORD_SWAP( "dadj.04b", 0x080000, 0x80000, CRC(24d49575) SHA1(419d7d2f970c23c39334a7f2e8c5caa237769c5d) )
@@ -2266,7 +2268,7 @@ ROM_START( ddtodjr2 )
 	ROM_LOAD16_WORD_SWAP( "dad.12m",   0x200000, 0x200000, CRC(2f0b5a4e) SHA1(8d1ebbb811aa469b0f0d29d719d2b9af28fb63a2) )
 ROM_END
 
-ROM_START( ddtodjr1 )
+ROM_START( ddtodjr2 )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "dadj.03a", 0x000000, 0x80000, CRC(711638dc) SHA1(30c1d1a694aa8e51d072b26b47ba55aed6d77b7b) )
 	ROM_LOAD16_WORD_SWAP( "dadj.04a", 0x080000, 0x80000, CRC(4869639c) SHA1(1544813e6712a78267c1d27b6b49148d42c11127) )

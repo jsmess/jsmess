@@ -90,7 +90,7 @@ DRIVER_INIT( mz700 )
 	videoram = auto_malloc(videoram_size);
 	colorram = auto_malloc(0x800);
 
-	mz700_bank_w(4, 0);
+	mz700_bank_w(machine, 4, 0);
 }
 
 
@@ -233,7 +233,7 @@ static WRITE8_HANDLER ( pio_port_c_w )
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = pit8253_0_r(offset & 3);
+		data = pit8253_0_r(machine, offset & 3);
         break;
 
 	case 8:
@@ -258,12 +258,12 @@ WRITE8_HANDLER ( mz700_mmio_w )
 
 	/* the next four ports are connected to a 8253 PIT */
     case 4: case 5: case 6: case 7:
-		pit8253_0_w(offset & 3, data);
+		pit8253_0_w(machine, offset & 3, data);
 		break;
 
 	case 8:
 		LOG(1,"mz700_e008_w",("%02X\n", data));
-		pit8253_0_gate_w(0, data & 1);
+		pit8253_0_gate_w(machine, 0, data & 1);
         break;
 	}
 }
@@ -477,7 +477,7 @@ WRITE8_HANDLER ( mz700_bank_w )
 	case 6: /* 0000-0FFF no chg D000-FFFF unlocked */
 		LOG(1,"mz700_bank_w",("6: D000-FFFF unlocked\n"));
 		if (mz700_locked == 1)
-			mz700_bank_w(vio_lock, 0); /* old config for D000-DFFF */
+			mz700_bank_w(machine, vio_lock, 0); /* old config for D000-DFFF */
         break;
     }
 }
@@ -515,7 +515,7 @@ static UINT8 mz800_palette_bank;
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = pit8253_0_r(offset & 3);
+		data = pit8253_0_r(machine, offset & 3);
         break;
 
 	default:
@@ -637,7 +637,7 @@ WRITE8_HANDLER( mz800_scroll_border_w )
 WRITE8_HANDLER( mz800_mmio_w )
 {
 	/* just wrap to the mz700 handler */
-    mz700_mmio_w(offset,data);
+    mz700_mmio_w(machine, offset,data);
 }
 
 /* port E0-E9 */
@@ -705,7 +705,7 @@ WRITE8_HANDLER ( mz800_bank_w )
     case 6: /* 0000-0FFF no chg D000-FFFF unlocked */
 		LOG(1,"mz800_bank_w",("6: D000-FFFF unlocked\n"));
         if (mz800_locked == 1)
-            mz800_bank_w(vio_lock, 0); /* old config for D000-DFFF */
+            mz800_bank_w(machine, vio_lock, 0); /* old config for D000-DFFF */
         break;
 
 	case 8: /* set MZ700 enable bit 7 ? */
@@ -776,9 +776,9 @@ DRIVER_INIT( mz800 )
     mem = memory_region(REGION_USER1);
 	memset(&mem[0x00000], 0xff, 0x10000);
 
-    mz800_display_mode_w(0,0x08);   /* set MZ700 mode */
-	mz800_bank_r(1);
-	mz800_bank_w(4, 0);
+    mz800_display_mode_w(machine, 0, 0x08);   /* set MZ700 mode */
+	mz800_bank_r(machine, 1);
+	mz800_bank_w(machine, 4, 0);
 }
 
 

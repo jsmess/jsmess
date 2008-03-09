@@ -241,7 +241,7 @@ static WRITE8_HANDLER( looping_colorram_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *source;
 	looping_state *state = machine->driver_data;
@@ -312,21 +312,21 @@ static INTERRUPT_GEN( looping_interrupt )
 static WRITE8_HANDLER( level2_irq_set )
 {
 	if (!(data & 1))
-		cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, 4);
+		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 4);
 }
 
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
 	if (data == 0)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( looping_souint_clr )
 {
 	if (data == 0)
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 
@@ -338,8 +338,8 @@ static void looping_spcint(int state)
 
 static WRITE8_HANDLER( looping_soundlatch_w )
 {
-	soundlatch_w(offset, data);
-	cpunum_set_input_line_and_vector(Machine, 1, 0, ASSERT_LINE, 4);
+	soundlatch_w(machine, offset, data);
+	cpunum_set_input_line_and_vector(machine, 1, 0, ASSERT_LINE, 4);
 }
 
 
@@ -581,7 +581,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_CPU_ADD(TMS9995, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(looping_map,0)
 	MDRV_CPU_IO_MAP(looping_io_map,0)
-	MDRV_CPU_VBLANK_INT(looping_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", looping_interrupt)
 
 	MDRV_CPU_ADD(TMS9980, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(looping_sound_map,0)

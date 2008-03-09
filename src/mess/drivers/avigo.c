@@ -94,7 +94,7 @@ static NVRAM_HANDLER( avigo )
 	}
 }
 
-static void avigo_setbank(int bank, void *address, read8_handler rh, write8_handler wh)
+static void avigo_setbank(int bank, void *address, read8_machine_func rh, write8_machine_func wh)
 {
 	if (address)
 	{

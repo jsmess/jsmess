@@ -26,7 +26,7 @@ static int char_dirty[1024];
 static UINT8 btime_palette = 0;
 static UINT8 bnj_scroll1 = 0;
 static UINT8 bnj_scroll2 = 0;
-static mame_bitmap *background_bitmap;
+static bitmap_t *background_bitmap;
 static UINT8 lnc_sound_interrupt_enabled = 0;
 
 /***************************************************************************
@@ -156,7 +156,7 @@ VIDEO_START( bnj )
 WRITE8_HANDLER( btime_paletteram_w )
 {
     /* RGB output is inverted */
-    paletteram_BBGGGRRR_w(offset,~data);
+    paletteram_BBGGGRRR_w(machine,offset,~data);
 }
 
 WRITE8_HANDLER( lnc_videoram_w )
@@ -210,7 +210,7 @@ WRITE8_HANDLER( lnc_mirrorvideoram_w )
     y = offset % 32;
     offset = 32 * y + x;
 
-    lnc_videoram_w(offset,data);
+    lnc_videoram_w(machine,offset,data);
 }
 
 WRITE8_HANDLER( btime_mirrorcolorram_w )
@@ -289,8 +289,8 @@ WRITE8_HANDLER( bnj_video_control_w )
     /* For now we just check 0x40 in DSW1, and ignore the write if we */
     /* are in upright controls mode. */
 
-    if (input_port_3_r(0) & 0x40) /* cocktail mode */
-        btime_video_control_w(offset, data);
+    if (input_port_3_r(machine, 0) & 0x40) /* cocktail mode */
+        btime_video_control_w(machine, offset, data);
 }
 
 WRITE8_HANDLER( lnc_video_control_w )
@@ -299,14 +299,14 @@ WRITE8_HANDLER( lnc_video_control_w )
     // figure out how NMI's are disabled by the sound processor
     lnc_sound_interrupt_enabled = data & 0x08;
 
-    bnj_video_control_w(offset, data & 0x01);
+    bnj_video_control_w(machine, offset, data & 0x01);
 }
 
 WRITE8_HANDLER( disco_video_control_w )
 {
 	btime_palette = (data >> 2) & 0x03;
 
-	if (!(input_port_3_r(0) & 0x40)) /* cocktail mode */
+	if (!(input_port_3_r(machine,0) & 0x40)) /* cocktail mode */
 	{
 		flip_screen_set(data & 0x01);
 	}
@@ -320,7 +320,7 @@ INTERRUPT_GEN( lnc_sound_interrupt )
 }
 
 
-static void draw_chars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 transparency, UINT8 color, int priority)
+static void draw_chars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 transparency, UINT8 color, int priority)
 {
     offs_t offs;
 
@@ -349,7 +349,7 @@ static void draw_chars(running_machine *machine, mame_bitmap *bitmap, const rect
     }
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 color,
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 color,
                          UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
                          UINT8 *sprite_ram, offs_t interleave)
 {
@@ -401,7 +401,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8* tmap, UINT8 color)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8* tmap, UINT8 color)
 {
     int i;
 

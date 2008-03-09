@@ -203,6 +203,7 @@ INLINE void waveram_plot_check_depth(int y, int x, UINT16 color, UINT16 depth)
 	}
 }
 
+#ifdef UNUSED_FUNCTON
 INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 depth)
 {
 	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
@@ -212,7 +213,7 @@ INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 
 			WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 	}
 }
-
+#endif
 
 
 /*************************************
@@ -1058,7 +1059,7 @@ static void zeus_draw_model(UINT32 texdata, int logit)
 
 static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit)
 {
-	poly_draw_scanline callback;
+	poly_draw_scanline_func callback;
 	poly_extra_data *extra;
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];

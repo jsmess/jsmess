@@ -31,6 +31,24 @@ UINT8 *superpet_memory;
 UINT8 *pet_videoram;
 static UINT8 *pet80_bank1_base;
 
+static READ8_HANDLER( pet_mc6845_register_r )
+{
+	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	return mc6845_register_r(devconf, offset);
+}
+
+static WRITE8_HANDLER( pet_mc6845_register_w )
+{
+	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	mc6845_register_w(devconf, offset, data);
+}
+
+static WRITE8_HANDLER( pet_mc6845_address_w )
+{
+	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	mc6845_address_w(devconf, offset, data);
+}
+
 /* pia at 0xe810
    port a
     7 sense input (low for diagnostics)
@@ -249,27 +267,27 @@ static struct {
 static WRITE8_HANDLER(cbm8096_io_w)
 {
 	if (offset<0x10) ;
-	else if (offset<0x14) pia_0_w(offset&3,data);
+	else if (offset<0x14) pia_0_w(machine, offset&3,data);
 	else if (offset<0x20) ;
-	else if (offset<0x24) pia_1_w(offset&3,data);
+	else if (offset<0x24) pia_1_w(machine, offset&3,data);
 	else if (offset<0x40) ;
-	else if (offset<0x50) via_0_w(offset&0xf,data);
+	else if (offset<0x50) via_0_w(machine, offset&0xf,data);
 	else if (offset<0x80) ;
-	else if (offset == 0x80) pet_mc6845_address_w(offset, data);
-	else if (offset == 0x81) pet_mc6845_register_w(offset, data);
+	else if (offset == 0x80) pet_mc6845_address_w(machine, offset, data);
+	else if (offset == 0x81) pet_mc6845_register_w(machine, offset, data);
 }
 
-static  READ8_HANDLER(cbm8096_io_r)
+static READ8_HANDLER(cbm8096_io_r)
 {
 	int data=0xff;
 	if (offset<0x10) ;
-	else if (offset<0x14) data=pia_0_r(offset&3);
+	else if (offset<0x14) data=pia_0_r(machine, offset&3);
 	else if (offset<0x20) ;
-	else if (offset<0x24) data=pia_1_r(offset&3);
+	else if (offset<0x24) data=pia_1_r(machine, offset&3);
 	else if (offset<0x40) ;
-	else if (offset<0x50) data=via_0_r(offset&0xf);
+	else if (offset<0x50) data=via_0_r(machine, offset&0xf);
 	else if (offset<0x80) ;
-	else if (offset == 0x81) data=pet_mc6845_register_r(offset);
+	else if (offset == 0x81) data=pet_mc6845_register_r(machine, offset);
 	return data;
 }
 
@@ -290,8 +308,8 @@ static WRITE8_HANDLER(pet80_bank1_w) {
 */
 WRITE8_HANDLER(cbm8096_w)
 {
-	read8_handler rh;
-	write8_handler wh;
+	read8_machine_func rh;
+	write8_machine_func wh;
 
 	if (data&0x80)
 	{
@@ -434,7 +452,7 @@ static TIMER_CALLBACK(pet_interrupt)
 {
 	static int level=0;
 
-	pia_0_cb1_w(0,level);
+	pia_0_cb1_w(machine, 0,level);
 	level=!level;
 }
 
@@ -558,7 +576,7 @@ MACHINE_RESET( pet )
 		{
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfff0, 0xfff0, 0, 0, MWA8_NOP);
 		}
-		cbm8096_w(0,0);
+		cbm8096_w(machine, 0, 0);
 	}
 
 	cbm_drive_0_config (IEEE8ON ? IEEE : 0, 8);

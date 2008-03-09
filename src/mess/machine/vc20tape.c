@@ -31,7 +31,7 @@ static struct
 
 	int data;
 	int motor;
-	write8_handler read_callback;
+	write8_machine_func read_callback;
 
 	int type;						   /* 0 nothing */
 }
@@ -885,11 +885,11 @@ static TIMER_CALLBACK(vc20_prg_timer)
 		}
 	}
 	if (tape.read_callback)
-		tape.read_callback (0, tape.data);
+		tape.read_callback (machine, 0, tape.data);
 	vc20_prg_state ();
 }
 
-void vc20_tape_open (write8_handler read_callback)
+void vc20_tape_open (write8_machine_func read_callback)
 {
 	tape.read_callback = read_callback;
 #ifndef NEW_GAMEDRIVER

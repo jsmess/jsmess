@@ -63,13 +63,13 @@ AMSPDWY_WHEEL_R( 1 )
 
 static READ8_HANDLER( amspdwy_sound_r )
 {
-	return (YM2151_status_port_0_r(0) & ~ 0x30) | readinputport(4);
+	return (YM2151_status_port_0_r(machine,0) & ~ 0x30) | readinputport(4);
 }
 
 static WRITE8_HANDLER( amspdwy_sound_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -257,7 +257,7 @@ static MACHINE_DRIVER_START( amspdwy )
 	MDRV_CPU_ADD(Z80,3000000)
 	MDRV_CPU_PROGRAM_MAP(amspdwy_map,0)
 	MDRV_CPU_IO_MAP(amspdwy_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* IRQ: 60Hz, NMI: retn */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ: 60Hz, NMI: retn */
 
 	MDRV_CPU_ADD(Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
 	MDRV_CPU_PROGRAM_MAP(amspdwy_sound_map,0)

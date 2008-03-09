@@ -108,7 +108,7 @@ static WRITE8_HANDLER( tmc2000_bankswitch_w )
 {
 	memory_set_bank(1, data & 0x01);
 
-	cdp1864_tone_latch_w(0, data);
+	cdp1864_tone_latch_w(machine, 0, data);
 }
 
 /* Memory Maps */

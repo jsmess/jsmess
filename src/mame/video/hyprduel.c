@@ -127,6 +127,7 @@ static UINT8 *empty_tiles;
 
 
 /* 8x8x4 tiles only */
+#ifdef UNUSED_FUNCTON
 INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
 {
 	UINT16 code;
@@ -159,7 +160,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 				(((tile & 0x0ff00000) >> 20) ^ 0x0f) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
 }
-
+#endif
 
 /* 8x8x4 or 8x8x8 tiles. It's the tile's color that decides: if its low 4
    bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
@@ -204,6 +205,7 @@ INLINE void get_tile_info_8bit(running_machine *machine,tile_data *tileinfo,int 
 
 /* 16x16x4 or 16x16x8 tiles. It's the tile's color that decides: if its low 4
    bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
+#ifdef UNUSED_FUNCTON
 INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
 {
 	UINT16 code;
@@ -242,7 +244,7 @@ INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinf
 				(((tile & 0x0ff00000) >> 20) ^ 0x0f) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
 }
-
+#endif
 
 INLINE void hyprduel_vram_w(offs_t offset,UINT16 data,UINT16 mem_mask,int layer,UINT16 *vram)
 {
@@ -390,7 +392,7 @@ VIDEO_START( hyprduel_14220 )
 
 /* Draw sprites */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const int region		=	REGION_GFX1;
 
@@ -542,7 +544,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 ***************************************************************************/
 
 /* Draw all the layers that match the given priority */
-static void draw_layers(mame_bitmap *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
+static void draw_layers(bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
 {
 	UINT16 layers_pri = hyprduel_videoregs[0x10/2];
 	int layer;

@@ -119,6 +119,7 @@ Abnormalities:
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "toaplan1.h"
 #include "cpu/m68000/m68000.h"
 
@@ -318,12 +319,12 @@ static void toaplan1_set_scrolls(void)
 
 static void rallybik_flipscreen(void)
 {
-	rallybik_bcu_flipscreen_w(0, bcu_flipscreen, 0);
+	rallybik_bcu_flipscreen_w(Machine, 0, bcu_flipscreen, 0);
 }
 
 static void toaplan1_flipscreen(void)
 {
-	toaplan1_bcu_flipscreen_w(0, bcu_flipscreen, 0);
+	toaplan1_bcu_flipscreen_w(Machine, 0, bcu_flipscreen, 0);
 }
 
 
@@ -531,7 +532,7 @@ READ16_HANDLER( toaplan1_colorram1_r )
 WRITE16_HANDLER( toaplan1_colorram1_w )
 {
 	COMBINE_DATA(&toaplan1_colorram1[offset]);
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset, data, mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine,offset, data, mem_mask);
 }
 
 /* sprite palette */
@@ -543,7 +544,7 @@ READ16_HANDLER( toaplan1_colorram2_r )
 WRITE16_HANDLER( toaplan1_colorram2_w )
 {
 	COMBINE_DATA(&toaplan1_colorram2[offset]);
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset+(toaplan1_colorram1_size/2), data, mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine,offset+(toaplan1_colorram1_size/2), data, mem_mask);
 }
 
 READ16_HANDLER( toaplan1_spriteram16_r )
@@ -599,7 +600,7 @@ WRITE16_HANDLER( toaplan1_bcu_control_w )
 	if (toaplan1_unk_reset_port && toaplan1_reset)
 	{
 		toaplan1_reset = 0;
-		toaplan1_reset_sound(0,0,0);
+		toaplan1_reset_sound(machine,0,0,0);
 	}
 }
 
@@ -649,7 +650,7 @@ READ16_HANDLER( toaplan1_tileram16_r )
 
 READ16_HANDLER( rallybik_tileram16_r )
 {
-	UINT16 data = toaplan1_tileram16_r(offset, mem_mask);
+	UINT16 data = toaplan1_tileram16_r(machine, offset, mem_mask);
 
 	if (offset == 0)	/* some bit lines may be stuck to others */
 	{
@@ -941,7 +942,7 @@ static void toaplan1_log_vram(void)
 ***************************************************************************/
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void toaplan1_draw_sprite_custom(mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void toaplan1_draw_sprite_custom(bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int priority)
 {
@@ -1040,7 +1041,7 @@ static void toaplan1_draw_sprite_custom(mame_bitmap *dest_bmp,const gfx_element 
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT16 *source = (UINT16 *)(buffered_spriteram16);
 	UINT16 *size   = (UINT16 *)(toaplan1_buffered_spritesizeram16);
@@ -1106,7 +1107,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void rallybik_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void rallybik_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 
@@ -1140,7 +1141,7 @@ static void rallybik_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 
 /***************************************************************************
-    Draw the game screen in the given mame_bitmap.
+    Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
 VIDEO_UPDATE( rallybik )
@@ -1229,18 +1230,18 @@ VIDEO_UPDATE( demonwld )
 
 VIDEO_EOF( rallybik )
 {
-	buffer_spriteram16_w(0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0);
 }
 
 VIDEO_EOF( toaplan1 )
 {
-	buffer_spriteram16_w(0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0);
 	memcpy(toaplan1_buffered_spritesizeram16, toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 }
 
 VIDEO_EOF( samesame )
 {
-	buffer_spriteram16_w(0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0);
 	memcpy(toaplan1_buffered_spritesizeram16, toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 	cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);	/* Frame done */
 }

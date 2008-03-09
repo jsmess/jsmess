@@ -105,7 +105,7 @@ static READ16_HANDLER( track_r )
 
 static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 {
-	seibu_main_word_w(4,data,mem_mask);
+	seibu_main_word_w(machine,4,data,mem_mask);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
@@ -540,7 +540,7 @@ static MACHINE_DRIVER_START( cabal )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 20000000/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu,writemem_cpu)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3579580) /* verified on pcb */
 	/* audio CPU */
@@ -585,7 +585,7 @@ static MACHINE_DRIVER_START( cabalbl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000) /* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_readmem_cpu,cabalbl_writemem_cpu)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cabalbl_readmem_sound,cabalbl_writemem_sound)

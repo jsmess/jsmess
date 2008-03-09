@@ -216,7 +216,7 @@ static void hercules_mode_control_w(int data)
  */
 static int pc_mda_status_r(void)
 {
-    int data = (input_port_0_r(0) & 0x80) | 0x08 | mda.status;
+    int data = (readinputport(0) & 0x80) | 0x08 | mda.status;
 	mda.status ^= 0x01;
 	return data;
 }

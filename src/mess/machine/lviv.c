@@ -143,11 +143,11 @@ static WRITE8_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			return ppi8255_0_r(offset & 3);
+			return ppi8255_0_r(machine, offset & 3);
 			break;
 
 		case 1:
-			return ppi8255_1_r(offset & 3);
+			return ppi8255_1_r(machine, offset & 3);
 			break;
 
 		case 2:
@@ -180,11 +180,11 @@ WRITE8_HANDLER ( lviv_io_w )
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			ppi8255_0_w(offset & 3, data);
+			ppi8255_0_w(machine, offset & 3, data);
 			break;
 
 		case 1:
-			ppi8255_1_w(offset & 3, data);
+			ppi8255_1_w(machine, offset & 3, data);
 			break;
 
 		case 2:

@@ -213,5 +213,5 @@ WRITE8_HANDLER( cirrus_42E8_w )
 
 
 
-WRITE64_HANDLER( cirrus_64be_42E8_w ) { write64be_with_write8_handler(cirrus_42E8_w, offset, data, mem_mask); }
+WRITE64_HANDLER( cirrus_64be_42E8_w ) { write64be_with_write8_handler(cirrus_42E8_w, machine, offset, data, mem_mask); }
 

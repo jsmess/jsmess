@@ -56,7 +56,7 @@ static MACHINE_RESET(ssrj)
 
 static READ8_HANDLER(ssrj_wheel_r)
 {
-	int port= input_port_1_r(0) -0x80;
+	int port= input_port_1_r(machine,0) -0x80;
 	int retval=port-oldport;
 	oldport=port;
 	return retval;
@@ -173,7 +173,7 @@ static MACHINE_DRIVER_START( ssrj )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

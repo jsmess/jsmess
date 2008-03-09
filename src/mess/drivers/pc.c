@@ -19,6 +19,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 
 #include "machine/8255ppi.h"
@@ -90,7 +91,7 @@
 static READ8_HANDLER( pc_YM3812_0_r )
 {
 	if ((offset % 1) == 0)
-		return YM3812_status_port_0_r(0);
+		return YM3812_status_port_0_r(machine, 0);
 	else
 		return 0x00;
 }
@@ -98,16 +99,16 @@ static READ8_HANDLER( pc_YM3812_0_r )
 static WRITE8_HANDLER( pc_YM3812_0_w )
 {
 	if ((offset % 1) == 0)
-		YM3812_control_port_0_w(0, data);
+		YM3812_control_port_0_w(machine, 0, data);
 	else
-		YM3812_write_port_0_w(0, data);
+		YM3812_write_port_0_w(machine, 0, data);
 }
 
-static READ16_HANDLER( pc16le_YM3812_0_r ) { return read16le_with_read8_handler(pc_YM3812_0_r, offset, mem_mask); }
-static WRITE16_HANDLER( pc16le_YM3812_0_w ) { write16le_with_write8_handler(pc_YM3812_0_w, offset, data, mem_mask); }
+static READ16_HANDLER( pc16le_YM3812_0_r ) { return read16le_with_read8_handler(pc_YM3812_0_r, machine, offset, mem_mask); }
+static WRITE16_HANDLER( pc16le_YM3812_0_w ) { write16le_with_write8_handler(pc_YM3812_0_w, machine, offset, data, mem_mask); }
 
 #ifdef UNUSED_FUNCTION
-static WRITE16_HANDLER( pc16le_SN76496_0_w ) { write16le_with_write8_handler(SN76496_0_w, offset, data, mem_mask); }
+static WRITE16_HANDLER( pc16le_SN76496_0_w ) { write16le_with_write8_handler(SN76496_0_w, machine, offset, data, mem_mask); }
 #endif
 
 // IO Expansion, only a little bit for ibm bios self tests
@@ -1148,7 +1149,7 @@ static const struct YM3812interface ym3812_interface =
 	MDRV_CPU_ADD_TAG("main", type, clock)				\
 	MDRV_CPU_PROGRAM_MAP(mem##_map, 0)			\
 	MDRV_CPU_IO_MAP(port##_io, 0)				\
-	MDRV_CPU_VBLANK_INT(vblankfunc, 4)					\
+	MDRV_CPU_VBLANK_INT_HACK(vblankfunc, 4)					\
 	MDRV_CPU_CONFIG(i86_address_mask)
 
 
@@ -1157,7 +1158,7 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_CPU_ADD_TAG("main", V20, 4772720)
 	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
 	MDRV_CPU_IO_MAP(pc8_io, 0)
-	MDRV_CPU_VBLANK_INT(pc_mda_frame_interrupt, 4)
+	MDRV_CPU_VBLANK_INT_HACK(pc_mda_frame_interrupt, 4)
 
 	MDRV_MACHINE_RESET(pc_mda)
 

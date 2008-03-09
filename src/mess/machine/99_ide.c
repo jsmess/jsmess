@@ -29,9 +29,9 @@
 /* prototypes */
 static void ide_interrupt_callback(int state);
 
-static int ide_cru_r(int offset);
-static void ide_cru_w(int offset, int data);
-static  READ8_HANDLER(ide_mem_r);
+static int ide_cru_r(running_machine *machine, int offset);
+static void ide_cru_w(running_machine *machine, int offset, int data);
+static READ8_HANDLER(ide_mem_r);
 static WRITE8_HANDLER(ide_mem_w);
 
 /* pointer to the IDE RAM area */
@@ -167,7 +167,7 @@ int ti99_ide_save_memcard(void)
 /*
 	Read ide CRU interface
 */
-static int ide_cru_r(int offset)
+static int ide_cru_r(running_machine *machine, int offset)
 {
 	int reply;
 
@@ -191,7 +191,7 @@ static int ide_cru_r(int offset)
 /*
 	Write ide CRU interface
 */
-static void ide_cru_w(int offset, int data)
+static void ide_cru_w(running_machine *machine, int offset, int data)
 {
 	offset &= 7;
 

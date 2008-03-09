@@ -26,20 +26,20 @@ static WRITE32_HANDLER( vega_vram_w )
 	switch(mem_mask)
 	{
 		case 0:
-			vega_vram_w(offset,data,0x00ffffff);
-			vega_vram_w(offset,data,0xff00ffff);
-			vega_vram_w(offset,data,0xffff00ff);
-			vega_vram_w(offset,data,0xffffff00);
+			vega_vram_w(machine,offset,data,0x00ffffff);
+			vega_vram_w(machine,offset,data,0xff00ffff);
+			vega_vram_w(machine,offset,data,0xffff00ff);
+			vega_vram_w(machine,offset,data,0xffffff00);
 			return;
 
 		case 0x0000ffff:
-			vega_vram_w(offset,data,0x00ffffff);
-			vega_vram_w(offset,data,0xff00ffff);
+			vega_vram_w(machine,offset,data,0x00ffffff);
+			vega_vram_w(machine,offset,data,0xff00ffff);
 			return;
 
 		case 0xffff0000:
-			vega_vram_w(offset,data,0xffff00ff);
-			vega_vram_w(offset,data,0xffffff00);
+			vega_vram_w(machine,offset,data,0xffff00ff);
+			vega_vram_w(machine,offset,data,0xffffff00);
 			return;
 
 		default:
@@ -163,7 +163,7 @@ static VIDEO_UPDATE( vega )
 static MACHINE_DRIVER_START( vega )
 	MDRV_CPU_ADD_TAG("cpu", GMS30C2132, 55000000)	/* 55 MHz */
 	MDRV_CPU_PROGRAM_MAP(vega_map,0)
-	MDRV_CPU_VBLANK_INT(eolith_speedup,262)
+	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
 	/* sound cpu */
 

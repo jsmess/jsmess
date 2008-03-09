@@ -78,6 +78,7 @@ Not emulated:
 
 /* Core includes */
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/trs80.h"
 
 /* Components */
@@ -95,7 +96,7 @@ static READ8_HANDLER (trs80_wd179x_r)
 {
 	if (readinputport(0) & 0x80)
 	{
-		return wd17xx_status_r(offset);
+		return wd17xx_status_r(machine, offset);
 	}
 	else
 	{
@@ -317,7 +318,7 @@ static MACHINE_DRIVER_START( level1 )
 	MDRV_CPU_ADD_TAG("main", Z80, 1796000)        /* 1.796 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mem_level1, 0)
 	MDRV_CPU_IO_MAP(io_level1, 0)
-	MDRV_CPU_VBLANK_INT(trs80_frame_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", trs80_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(trs80_timer_interrupt, 40)
 	MDRV_INTERLEAVE(1)
 
@@ -358,7 +359,7 @@ static MACHINE_DRIVER_START( model3 )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP( mem_model3, 0 )
 	MDRV_CPU_IO_MAP( io_model3, 0 )
-	MDRV_CPU_VBLANK_INT(trs80_frame_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(trs80_frame_interrupt, 2)
 MACHINE_DRIVER_END
 
 /***************************************************************************

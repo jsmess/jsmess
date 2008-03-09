@@ -1,7 +1,7 @@
 #include "driver.h"
 
 int eolith_buffer = 0;
-static mame_bitmap *bitmaps[2];
+static bitmap_t *bitmaps[2];
 static UINT32 *eo_vram;
 
 static void plot_pixel_rgb(int x, int y, int color)
@@ -25,8 +25,8 @@ WRITE32_HANDLER( eolith_vram_w )
 	switch(mem_mask)
 	{
 		case 0:
-			eolith_vram_w(offset,data,0x0000ffff);
-			eolith_vram_w(offset,data,0xffff0000);
+			eolith_vram_w(machine,offset,data,0x0000ffff);
+			eolith_vram_w(machine,offset,data,0xffff0000);
 			return;
 
 		case 0xffff:

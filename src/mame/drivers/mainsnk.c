@@ -117,7 +117,7 @@ static READ8_HANDLER( sound_ack_r )
 
 static READ8_HANDLER( mainsnk_port_0_r )
 {
-	int result = input_port_0_r( 0 );
+	int result = input_port_0_r( machine, 0 );
 	if( !sound_cpu_ready ) result |= 0x20;
 	return result;
 }
@@ -374,7 +374,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mainsnk )
 	MDRV_CPU_ADD(Z80, 3360000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,4000000)
 	/* audio CPU */

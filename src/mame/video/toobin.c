@@ -215,7 +215,7 @@ WRITE16_HANDLER( toobin_slip_w )
 		video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	/* update the data */
-	atarimo_0_slipram_w(offset, data, mem_mask);
+	atarimo_0_slipram_w(machine, offset, data, mem_mask);
 }
 
 
@@ -229,7 +229,7 @@ WRITE16_HANDLER( toobin_slip_w )
 VIDEO_UPDATE( toobin )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

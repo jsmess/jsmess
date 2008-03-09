@@ -129,8 +129,8 @@ static WRITE8_HANDLER( wc90b_bankswitch1_w )
 
 static WRITE8_HANDLER( wc90b_sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 2,0,HOLD_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 2,0,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( adpcm_control_w )
@@ -393,11 +393,11 @@ static MACHINE_DRIVER_START( wc90b )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90b_readmem1,wc90b_writemem1)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90b_readmem2,wc90b_writemem2)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 2510000) // based on goal92 speed measured by guru (although maybe it should be 10mhz / 4 which is close)
 	/* audio CPU */	/* 2.51 MHz */

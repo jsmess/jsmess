@@ -114,8 +114,8 @@ enum
 	cr_ramena  = 0x8000
 };
 
-static void hsgpl_cru_w(int offset, int data);
-static  READ8_HANDLER(hsgpl_dsr_r);
+static void hsgpl_cru_w(running_machine *machine, int offset, int data);
+static READ8_HANDLER(hsgpl_dsr_r);
 
 static const ti99_peb_card_handlers_t hsgpl_handlers =
 {
@@ -285,7 +285,7 @@ void ti99_hsgpl_reset(void)
 /*
 	Write hsgpl CRU interface
 */
-static void hsgpl_cru_w(int offset, int data)
+static void hsgpl_cru_w(running_machine *machine, int offset, int data)
 {
 	offset &= 0xf;
 

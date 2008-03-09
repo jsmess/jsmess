@@ -172,7 +172,7 @@ static  READ8_HANDLER ( oric_via_in_a_func )
 		/* if psg is in read register state return reg data */
 		if (oric_psg_control==0x01)
 		{
-			return AY8910_read_port_0_r(0);
+			return AY8910_read_port_0_r(machine, 0);
 		}
 
 		/* return high-impedance */
@@ -199,6 +199,8 @@ static  READ8_HANDLER ( oric_via_in_b_func )
 /* read/write data depending on state of bdir, bc1 pins and data output to psg */
 static void oric_psg_connection_refresh(void)
 {
+	running_machine *machine = Machine;
+
 	if (oric_psg_control!=0)
 	{
 		switch (oric_psg_control)
@@ -209,19 +211,19 @@ static void oric_psg_connection_refresh(void)
 			/* read register data */
 			case 1:
 			{
-				//oric_via_port_a_data = AY8910_read_port_0_r(0);
+				//oric_via_port_a_data = AY8910_read_port_0_r(machine, 0);
 			}
 			break;
 			/* write register data */
 			case 2:
 			{
-				AY8910_write_port_0_w (0, oric_via_port_a_data);
+				AY8910_write_port_0_w(machine, 0, oric_via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
-				AY8910_control_port_0_w (0, oric_via_port_a_data);
+				AY8910_control_port_0_w(machine, 0, oric_via_port_a_data);
 			}
 			break;
 
@@ -593,7 +595,7 @@ static void oric_install_apple2_v2_interface(void)
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0380, 0x0383, 0, 0, apple2_v2_interface_w);
 
-	apple2_v2_interface_w(0,0);
+	apple2_v2_interface_w(Machine, 0, 0);
 }
 
 /********************/
@@ -722,19 +724,19 @@ static  READ8_HANDLER (oric_jasmin_r)
 	{
 		/* jasmin floppy disc interface */
 		case 0x04:
-			data = wd17xx_status_r(0);
+			data = wd17xx_status_r(machine, 0);
 			break;
 		case 0x05:
-			data =wd17xx_track_r(0);
+			data =wd17xx_track_r(machine, 0);
 			break;
 		case 0x06:
-			data = wd17xx_sector_r(0);
+			data = wd17xx_sector_r(machine, 0);
 			break;
 		case 0x07:
-			data = wd17xx_data_r(0);
+			data = wd17xx_data_r(machine, 0);
 			break;
 		default:
-			data = via_0_r(offset & 0x0f);
+			data = via_0_r(machine, offset & 0x0f);
 			logerror("unhandled io read: %04x %02x\n", offset, data);
 			break;
 
@@ -749,16 +751,16 @@ static WRITE8_HANDLER(oric_jasmin_w)
 	{
 		/* microdisc floppy disc interface */
 		case 0x04:
-			wd17xx_command_w(0,data);
+			wd17xx_command_w(machine, 0, data);
 			break;
 		case 0x05:
-			wd17xx_track_w(0,data);
+			wd17xx_track_w(machine, 0, data);
 			break;
 		case 0x06:
-			wd17xx_sector_w(0,data);
+			wd17xx_sector_w(machine, 0, data);
 			break;
 		case 0x07:
-			wd17xx_data_w(0,data);
+			wd17xx_data_w(machine, 0, data);
 			break;
 		/* bit 0 = side */
 		case 0x08:
@@ -787,7 +789,7 @@ static WRITE8_HANDLER(oric_jasmin_w)
 			break;
 
 		default:
-			via_0_w(offset & 0x0f, data);
+			via_0_w(machine, offset & 0x0f, data);
 			break;
 	}
 }
@@ -954,16 +956,16 @@ READ8_HANDLER (oric_microdisc_r)
 	{
 		/* microdisc floppy disc interface */
 		case 0x00:
-			data = wd17xx_status_r(0);
+			data = wd17xx_status_r(machine, 0);
 			break;
 		case 0x01:
-			data =wd17xx_track_r(0);
+			data =wd17xx_track_r(machine, 0);
 			break;
 		case 0x02:
-			data = wd17xx_sector_r(0);
+			data = wd17xx_sector_r(machine, 0);
 			break;
 		case 0x03:
-			data = wd17xx_data_r(0);
+			data = wd17xx_data_r(machine, 0);
 			break;
 		case 0x04:
 			data = port_314_r | 0x07f;
@@ -975,7 +977,7 @@ READ8_HANDLER (oric_microdisc_r)
 			break;
 
 		default:
-			data = via_0_r(offset & 0x0f);
+			data = via_0_r(machine, offset & 0x0f);
 			break;
 
 	}
@@ -989,16 +991,16 @@ WRITE8_HANDLER(oric_microdisc_w)
 	{
 		/* microdisc floppy disc interface */
 		case 0x00:
-			wd17xx_command_w(0,data);
+			wd17xx_command_w(machine, 0, data);
 			break;
 		case 0x01:
-			wd17xx_track_w(0,data);
+			wd17xx_track_w(machine, 0, data);
 			break;
 		case 0x02:
-			wd17xx_sector_w(0,data);
+			wd17xx_sector_w(machine, 0, data);
 			break;
 		case 0x03:
-			wd17xx_data_w(0,data);
+			wd17xx_data_w(machine, 0, data);
 			break;
 		case 0x04:
 		{
@@ -1031,7 +1033,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 		break;
 
 		default:
-			via_0_w(offset & 0x0f, data);
+			via_0_w(machine, offset & 0x0f, data);
 			break;
 	}
 }
@@ -1228,7 +1230,7 @@ READ8_HANDLER ( oric_IO_r )
 		}
 	}
 	/* it is repeated */
-	return via_0_r(offset & 0x0f);
+	return via_0_r(machine, offset & 0x0f);
 }
 
 WRITE8_HANDLER ( oric_IO_w )
@@ -1267,7 +1269,7 @@ WRITE8_HANDLER ( oric_IO_w )
 		logerror("via 0 w: %04x %02x %04x\n",offset,data,(unsigned) cpunum_get_reg(0, REG_PC));
 	}
 
-	via_0_w(offset & 0x0f,data);
+	via_0_w(machine, offset & 0x0f,data);
 }
 
 
@@ -1344,8 +1346,8 @@ static struct telestrat_mem_block	telestrat_blocks[8];
 
 static void	telestrat_refresh_mem(void)
 {
-	read8_handler rh;
-	write8_handler wh;
+	read8_machine_func rh;
+	write8_machine_func wh;
 
 	struct telestrat_mem_block *mem_block = &telestrat_blocks[telestrat_bank_selection];
 

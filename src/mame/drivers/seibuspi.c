@@ -853,14 +853,14 @@ static READ32_HANDLER( spi_unknown_r )
 static WRITE32_HANDLER( ds2404_reset_w )
 {
 	if( ACCESSING_LSB32 ) {
-		DS2404_1W_reset_w(offset, data);
+		DS2404_1W_reset_w(machine, offset, data);
 	}
 }
 
 static READ32_HANDLER( ds2404_data_r )
 {
 	if( ACCESSING_LSB32 ) {
-		return DS2404_data_r(offset);
+		return DS2404_data_r(machine, offset);
 	}
 	return 0;
 }
@@ -868,14 +868,14 @@ static READ32_HANDLER( ds2404_data_r )
 static WRITE32_HANDLER( ds2404_data_w )
 {
 	if( ACCESSING_LSB32 ) {
-		DS2404_data_w(offset, data);
+		DS2404_data_w(machine, offset, data);
 	}
 }
 
 static WRITE32_HANDLER( ds2404_clk_w )
 {
 	if( ACCESSING_LSB32 ) {
-		DS2404_clk_w(offset, data);
+		DS2404_clk_w(machine, offset, data);
 	}
 }
 
@@ -938,25 +938,25 @@ static READ32_HANDLER( spi_controls2_r )
 
 static READ32_HANDLER( spi_6295_0_r )
 {
-	return OKIM6295_status_0_r(0);
+	return OKIM6295_status_0_r(machine, 0);
 }
 
 static READ32_HANDLER( spi_6295_1_r )
 {
-	return OKIM6295_status_1_r(0);
+	return OKIM6295_status_1_r(machine, 0);
 }
 
 static WRITE32_HANDLER( spi_6295_0_w )
 {
 	if( ACCESSING_LSB32 ) {
-		OKIM6295_data_0_w(0, data & 0xff);
+		OKIM6295_data_0_w(machine, 0, data & 0xff);
 	}
 }
 
 static WRITE32_HANDLER( spi_6295_1_w )
 {
 	if( ACCESSING_LSB32 ) {
-		OKIM6295_data_1_w(0, data & 0xff);
+		OKIM6295_data_1_w(machine, 0, data & 0xff);
 	}
 }
 
@@ -1780,7 +1780,7 @@ static MACHINE_DRIVER_START( spi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",I386, 50000000/2)	/* Intel 386DX, 25MHz */
 	MDRV_CPU_PROGRAM_MAP(spi_map, 0)
-	MDRV_CPU_VBLANK_INT(spi_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", spi_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 28636360/4)
 	/* audio CPU */
@@ -2099,7 +2099,7 @@ static MACHINE_DRIVER_START( seibu386 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I386, 40000000)	/* AMD 386DX, 40MHz */
 	MDRV_CPU_PROGRAM_MAP(seibu386_map, 0)
-	MDRV_CPU_VBLANK_INT(spi_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", spi_interrupt)
 
 	MDRV_NVRAM_HANDLER(sxx2f)
 	MDRV_MACHINE_RESET(seibu386)

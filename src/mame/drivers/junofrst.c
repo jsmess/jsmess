@@ -168,8 +168,8 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	tutankhm_flip_screen_x_w(0, data);
-	tutankhm_flip_screen_y_w(0, data);
+	tutankhm_flip_screen_x_w(machine, 0, data);
+	tutankhm_flip_screen_y_w(machine, 0, data);
 }
 
 
@@ -337,7 +337,7 @@ static MACHINE_DRIVER_START( junofrst )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 1500000)			/* 1.5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,14318000/8)
 	/* audio CPU */	/* 1.78975 MHz */

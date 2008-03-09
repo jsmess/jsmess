@@ -215,7 +215,7 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_CPU_ADD_TAG("main", Z80, 3500000)
 	MDRV_CPU_PROGRAM_MAP(aquarius_mem, 0)
 	MDRV_CPU_IO_MAP(aquarius_io, 0)
-	MDRV_CPU_VBLANK_INT( aquarius_interrupt, 1 )
+	MDRV_CPU_VBLANK_INT("main", aquarius_interrupt)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( aquarius )

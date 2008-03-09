@@ -331,7 +331,7 @@ static MACHINE_DRIVER_START(tx0_64kw)
 	MDRV_CPU_CONFIG(tx0_reset_param)
 	MDRV_CPU_PROGRAM_MAP(tx0_64kw_map, 0)
 	/* dummy interrupt: handles input */
-	MDRV_CPU_VBLANK_INT(tx0_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", tx0_interrupt)
 
 	MDRV_MACHINE_START( tx0 )
 	MDRV_MACHINE_RESET( tx0 )

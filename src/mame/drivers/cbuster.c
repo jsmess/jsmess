@@ -38,15 +38,15 @@ static WRITE16_HANDLER( twocrude_control_w )
 {
 	switch (offset<<1) {
 	case 0: /* DMA flag */
-		buffer_spriteram16_w(0,0,0);
+		buffer_spriteram16_w(machine,0,0,0);
 		return;
 
 	case 6: /* IRQ ack */
 		return;
 
     case 2: /* Sound CPU write */
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
     	return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
@@ -158,10 +158,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		YM2151_register_port_0_w(0,data);
+		YM2151_register_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2151_data_port_0_w(0,data);
+		YM2151_data_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -170,10 +170,10 @@ static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
 	case 0:
-		YM2203_control_port_0_w(0,data);
+		YM2203_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2203_write_port_0_w(0,data);
+		YM2203_write_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START( twocrude )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000) /* Custom chip 59 */
 	MDRV_CPU_PROGRAM_MAP(twocrude_readmem,twocrude_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(H6280,32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)

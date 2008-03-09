@@ -236,7 +236,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_0_w )
 	if (offset == 7)
 		tilemap_set_flip(fg_tilemap,(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	K007121_ctrl_0_w(offset,data);
+	K007121_ctrl_0_w(machine,offset,data);
 }
 
 WRITE8_HANDLER( contra_K007121_ctrl_1_w )
@@ -256,7 +256,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 	if (offset == 7)
 		tilemap_set_flip(bg_tilemap,(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	K007121_ctrl_1_w(offset,data);
+	K007121_ctrl_1_w(machine,offset,data);
 }
 
 
@@ -267,7 +267,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank )
 {
 	const UINT8 *source;
 	int base_color = (K007121_ctrlram[bank][6]&0x30)*2;

@@ -383,7 +383,7 @@ static MACHINE_DRIVER_START( rastan )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(rastan_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(rastan_s_map,0)
@@ -407,12 +407,12 @@ static MACHINE_DRIVER_START( rastan )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD(YM2151, XTAL_16MHz/4)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD(MSM5205, XTAL_384kHz)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

@@ -16,6 +16,7 @@ Todo:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/gamecom.h"
 #include "cpu/sm8500/sm8500.h"
 #include "devices/cartslot.h"
@@ -92,7 +93,7 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_CPU_ADD_TAG( "main", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map, 0 )
 	MDRV_CPU_CONFIG( gamecom_cpu_config )
-	MDRV_CPU_VBLANK_INT( gamecom_scanline, 200 )
+	MDRV_CPU_VBLANK_INT_HACK(gamecom_scanline, 200)
 
 	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_REFRESH_RATE( 59.732155 )

@@ -77,8 +77,8 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( bigkarnk_sound_command_w )
 {
 	if (ACCESSING_LSB){
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,M6809_FIRQ_LINE,HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,M6809_FIRQ_LINE,HOLD_LINE);
 	}
 }
 
@@ -211,7 +211,7 @@ INPUT_PORTS_END
 TILELAYOUT8(0x100000);
 TILELAYOUT16(0x100000);
 
-GFXDECODEINFO(0x100000,64);
+GFXDECODEINFO(0x100000,64)
 
 
 static MACHINE_DRIVER_START( bigkarnk )
@@ -219,7 +219,7 @@ static MACHINE_DRIVER_START( bigkarnk )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)	/* MC68000P10, 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(bigkarnk_readmem,bigkarnk_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(M6809, 8867000/4)	/* 68B09, 2.21675 MHz? */
 	/* audio CPU */
@@ -474,7 +474,7 @@ static MACHINE_DRIVER_START( maniacsq )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(maniacsq_readmem,maniacsq_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1110,7 +1110,7 @@ static MACHINE_DRIVER_START( squash )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,squash_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_INTERLEAVE(10)
 
@@ -1278,7 +1278,7 @@ static MACHINE_DRIVER_START( thoop )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,thoop_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_INTERLEAVE(10)
 

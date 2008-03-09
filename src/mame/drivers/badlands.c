@@ -138,7 +138,7 @@ static void scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_ack_r(0);
+		atarigen_6502_irq_ack_r(machine, 0);
 	else if (!(readinputport(0) & 0x40))
 		atarigen_6502_irq_gen(machine, 0);
 }
@@ -166,7 +166,7 @@ static MACHINE_RESET( badlands )
 
 static INTERRUPT_GEN( vblank_int )
 {
-	int pedal_state = input_port_4_r(0);
+	int pedal_state = input_port_4_r(machine, 0);
 	int i;
 
 	/* update the pedals once per frame */
@@ -226,7 +226,7 @@ static READ8_HANDLER( audio_io_r )
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(offset);
+			result = atarigen_6502_sound_r(machine, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -248,7 +248,7 @@ static READ8_HANDLER( audio_io_r )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* /VOICE */
@@ -274,7 +274,7 @@ static WRITE8_HANDLER( audio_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* n/c */
@@ -282,7 +282,7 @@ static WRITE8_HANDLER( audio_io_w )
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(offset, data);
+			atarigen_6502_sound_w(machine, offset, data);
 			break;
 
 		case 0x204:		/* WRIO */
@@ -440,7 +440,7 @@ static MACHINE_DRIVER_START( badlands )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(vblank_int,1)
+	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
 	MDRV_CPU_ADD(M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)

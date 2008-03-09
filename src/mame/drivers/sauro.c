@@ -103,13 +103,13 @@ VIDEO_UPDATE( trckydoc );
 static WRITE8_HANDLER( sauro_sound_command_w )
 {
 	data |= 0x80;
-	soundlatch_w(offset, data);
+	soundlatch_w(machine, offset, data);
 }
 
 static READ8_HANDLER( sauro_sound_command_r )
 {
-	int ret	= soundlatch_r(offset);
-	soundlatch_clear_w(offset, 0);
+	int ret	= soundlatch_r(machine, offset);
+	soundlatch_clear_w(machine, offset, 0);
 	return ret;
 }
 
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static WRITE8_HANDLER( adpcm_w )
 {
-	sp0256_ALD_w(0, data);
+	sp0256_ALD_w(machine, 0, data);
 }
 
 static void lrq_callback(int state)
@@ -363,7 +363,7 @@ static INTERRUPT_GEN( sauro_interrupt )
 static MACHINE_DRIVER_START( tecfri )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 4000000)        // 4 MHz???
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -406,7 +406,7 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_CPU_ADD(Z80, 4000000)	// 4 MHz?
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sauro_sound_readmem, sauro_sound_writemem)
-	MDRV_CPU_VBLANK_INT(sauro_interrupt, 8) // ?
+	MDRV_CPU_VBLANK_INT_HACK(sauro_interrupt, 8) // ?
 
 	MDRV_GFXDECODE(sauro)
 

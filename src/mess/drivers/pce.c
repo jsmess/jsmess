@@ -52,6 +52,7 @@ Super System Card:
 **********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
@@ -143,7 +144,7 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_CPU_ADD(H6280, MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(pce_mem, 0)
 	MDRV_CPU_IO_MAP(pce_io, 0)
-	MDRV_CPU_VBLANK_INT(pce_interrupt, VDC_LPF)
+	MDRV_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( pce )
@@ -182,7 +183,7 @@ static MACHINE_DRIVER_START( sgx )
 	MDRV_CPU_ADD(H6280, MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(sgx_mem, 0)
 	MDRV_CPU_IO_MAP(sgx_io, 0)
-	MDRV_CPU_VBLANK_INT(sgx_interrupt, VDC_LPF)
+	MDRV_CPU_VBLANK_INT_HACK(sgx_interrupt, VDC_LPF)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( pce )

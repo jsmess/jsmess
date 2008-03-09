@@ -35,7 +35,7 @@ static UINT8 ldv1000_input_latch;
 static UINT8 ldv1000_output_latch;
 
 /* VIDEO GOODS */
-static void astron_draw_characters(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void astron_draw_characters(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	UINT8 characterX, characterY;
 
@@ -50,7 +50,7 @@ static void astron_draw_characters(running_machine *machine, mame_bitmap *bitmap
 	}
 }
 
-static void astron_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void astron_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* Heisted from Daphne */
 	const UINT8 SPR_Y_TOP     = 0;
@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START( astron )
 	MDRV_CPU_ADD(Z80, SCHEMATIC_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback_astron, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback_astron)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1000.0/59.94)
 
 	MDRV_MACHINE_START(astron)

@@ -131,33 +131,33 @@ static struct {
 static READ8_HANDLER ( pc_aga_mda_r )
 {
 	if (aga.mode==AGA_MONO)
-		return pc_MDA_r(offset);
+		return pc_MDA_r(machine, offset);
 	return 0xff;
 }
 
 static WRITE8_HANDLER ( pc_aga_mda_w )
 {
 	if (aga.mode==AGA_MONO)
-		pc_MDA_w(offset, data);
+		pc_MDA_w(machine, offset, data);
 }
 
 static READ8_HANDLER ( pc_aga_cga_r )
 {
 	if (aga.mode==AGA_COLOR)
-		return pc_cga8_r(offset);
+		return pc_cga8_r(machine, offset);
 	return 0xff;
 }
 
 static WRITE8_HANDLER ( pc_aga_cga_w )
 {
 	if (aga.mode==AGA_COLOR)
-		pc_cga8_w(offset, data);
+		pc_cga8_w(machine, offset, data);
 }
 
-static READ16_HANDLER ( pc16le_aga_mda_r ) { return read16le_with_read8_handler(pc_aga_mda_r, offset, mem_mask); }
-static WRITE16_HANDLER ( pc16le_aga_mda_w ) { write16le_with_write8_handler(pc_aga_mda_w, offset, data, mem_mask); }
-static READ16_HANDLER ( pc16le_aga_cga_r ) { return read16le_with_read8_handler(pc_aga_cga_r, offset, mem_mask); }
-static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_aga_cga_w, offset, data, mem_mask); }
+static READ16_HANDLER ( pc16le_aga_mda_r ) { return read16le_with_read8_handler(pc_aga_mda_r, machine, offset, mem_mask); }
+static WRITE16_HANDLER ( pc16le_aga_mda_w ) { write16le_with_write8_handler(pc_aga_mda_w, machine, offset, data, mem_mask); }
+static READ16_HANDLER ( pc16le_aga_cga_r ) { return read16le_with_read8_handler(pc_aga_cga_r, machine, offset, mem_mask); }
+static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_aga_cga_w, machine, offset, data, mem_mask); }
 
 
 
@@ -290,10 +290,10 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
 	switch (aga.mode) {
 	case AGA_COLOR:
 		if (offset>=0x8000)
-			pc_video_videoram_w(offset-0x8000, data);
+			pc_video_videoram_w(machine, offset-0x8000, data);
 		break;
 	case AGA_MONO:
-		pc_video_videoram_w(offset,data);
+		pc_video_videoram_w(machine, offset,data);
 		break;
 	case AGA_OFF: break;
 	}
@@ -331,16 +331,16 @@ WRITE8_HANDLER ( pc200_videoram_w )
 	{
 		default:
 			if (offset>=0x8000)
-				pc_video_videoram_w(offset-0x8000, data);
+				pc_video_videoram_w(machine, offset-0x8000, data);
 			break;
 		case AGA_MONO:
-			pc_video_videoram_w(offset,data);
+			pc_video_videoram_w(machine, offset,data);
 			break;
 	}
 }
 
-READ16_HANDLER( pc200_videoram16le_r )	{ return read16le_with_read8_handler(pc200_videoram_r, offset, mem_mask); }
-WRITE16_HANDLER( pc200_videoram16le_w )	{ write16le_with_write8_handler(pc200_videoram_w, offset, data, mem_mask); }
+READ16_HANDLER( pc200_videoram16le_r )	{ return read16le_with_read8_handler(pc200_videoram_r, machine, offset, mem_mask); }
+WRITE16_HANDLER( pc200_videoram16le_w )	{ write16le_with_write8_handler(pc200_videoram_w, machine, offset, data, mem_mask); }
 
 
 static struct {
@@ -354,12 +354,12 @@ WRITE8_HANDLER( pc200_cga_w )
 	switch(offset) {
 	case 4:
 		pc200.portd |= 0x20;
-		pc_cga8_w(offset,data);
+		pc_cga8_w(machine, offset,data);
 		break;
 	case 8:
 		pc200.port8 = data;
 		pc200.portd |= 0x80;
-		pc_cga8_w(offset,data);
+		pc_cga8_w(machine, offset,data);
 		break;
 	case 0xe:
 		pc200.portd = 0x1f;
@@ -384,7 +384,7 @@ WRITE8_HANDLER( pc200_cga_w )
 		break;
 
 	default:
-		pc_cga8_w(offset,data);
+		pc_cga8_w(machine, offset,data);
 		break;
 	}
 }
@@ -407,15 +407,15 @@ READ8_HANDLER ( pc200_cga_r )
 	case 0xe:
 		// 0x20 low cga
 		// 0x10 low special
-		result = input_port_1_r(0)&0x38;
+		result = readinputport(1)&0x38;
 		break;
 
 	default:
-		result = pc_cga8_r(offset);
+		result = pc_cga8_r(machine, offset);
 		break;
 	}
 	return result;
 }
 
-READ16_HANDLER( pc200_cga16le_r ) { return read16le_with_read8_handler(pc200_cga_r, offset, mem_mask); }
-WRITE16_HANDLER( pc200_cga16le_w ) { write16le_with_write8_handler(pc200_cga_w, offset, data, mem_mask); }
+READ16_HANDLER( pc200_cga16le_r ) { return read16le_with_read8_handler(pc200_cga_r, machine, offset, mem_mask); }
+WRITE16_HANDLER( pc200_cga16le_w ) { write16le_with_write8_handler(pc200_cga_w, machine, offset, data, mem_mask); }

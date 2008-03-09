@@ -404,7 +404,7 @@ WRITE8_HANDLER( a7800_TIA_w )
 		}
 		break;
 	}
-	tia_sound_w(offset,data);
+	tia_sound_w(machine, offset,data);
 	ROM[offset] = data;
 }
 
@@ -428,7 +428,7 @@ WRITE8_HANDLER( a7800_cart_w )
 		}
 		else if(a7800_cart_type & 0x01)
 		{
-			pokey1_w(offset,data);
+			pokey1_w(machine, offset,data);
 		}
 		else
 		{

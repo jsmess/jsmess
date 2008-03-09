@@ -165,8 +165,8 @@ static WRITE8_HANDLER( tehkanwc_track_1_reset_w )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static TIMER_CALLBACK( reset_callback )
@@ -176,7 +176,7 @@ static TIMER_CALLBACK( reset_callback )
 
 static WRITE8_HANDLER( sound_answer_w )
 {
-	soundlatch2_w(0,data);
+	soundlatch2_w(machine,0,data);
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
@@ -661,16 +661,16 @@ static MACHINE_DRIVER_START( tehkanwc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 18432000/4)	/* 18.432000 / 4 */
 	MDRV_CPU_PROGRAM_MAP(main_mem,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 18432000/4)
 	MDRV_CPU_PROGRAM_MAP(sub_mem,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 18432000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_mem,0)
 	MDRV_CPU_IO_MAP(sound_port,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 

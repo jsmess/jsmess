@@ -164,14 +164,14 @@ static WRITE32_HANDLER( cmos_protect_w )
 
 static READ32_HANDLER( timekeeper_r )
 {
-	return timekeeper_0_r(offset) | 0xffffff00;
+	return timekeeper_0_r(machine, offset) | 0xffffff00;
 }
 
 
 static WRITE32_HANDLER( timekeeper_w )
 {
 	if (bitlatch[2] && !cmos_protected)
-		timekeeper_0_w(offset, data);
+		timekeeper_0_w(machine, offset, data);
 	else
 		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", activecpu_get_pc(), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
@@ -1116,7 +1116,7 @@ static MACHINE_DRIVER_START( midzeus )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", TMS32032, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zeus_map,0)
-	MDRV_CPU_VBLANK_INT(display_irq,1)
+	MDRV_CPU_VBLANK_INT("main", display_irq)
 
 	MDRV_MACHINE_START(midzeus)
 	MDRV_MACHINE_RESET(midzeus)
@@ -1142,7 +1142,7 @@ static MACHINE_DRIVER_START( midzeus2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", TMS32032, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zeus2_map,0)
-	MDRV_CPU_VBLANK_INT(display_irq,1)
+	MDRV_CPU_VBLANK_INT("main", display_irq)
 
 	MDRV_MACHINE_START(midzeus2)
 	MDRV_MACHINE_RESET(midzeus)

@@ -368,7 +368,7 @@ static WRITE16_HANDLER( io_control_w )
 	case 0x00: select_controller(data & 0x00ff); break;
 	case 0x18: set_output_latch(data & 0x00ff); break;
 	case 0x20: set_output_data(data & 0x00ff); break;
-	case 0x28: pd4990a_control_16_w(0, data, mem_mask); break;
+	case 0x28: pd4990a_control_16_w(machine, 0, data, mem_mask); break;
 //  case 0x30: break; // coin counters
 //  case 0x31: break; // coin counters
 //  case 0x32: break; // coin lockout
@@ -444,7 +444,7 @@ static void calendar_clock(void)
 
 static CUSTOM_INPUT( get_calendar_status )
 {
-	return (pd4990a_databit_r(0) << 1) | pd4990a_testbit_r(0);
+	return (pd4990a_databit_r(machine, 0) << 1) | pd4990a_testbit_r(machine, 0);
 }
 
 
@@ -564,7 +564,7 @@ static WRITE16_HANDLER( audio_command_w )
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0xff00)
 	{
-		soundlatch_w(0, data >> 8);
+		soundlatch_w(machine, 0, data >> 8);
 
 		audio_cpu_assert_nmi();
 
@@ -578,12 +578,12 @@ static WRITE16_HANDLER( audio_command_w )
 
 static READ8_HANDLER( audio_command_r )
 {
-	UINT8 ret = soundlatch_r(0);
+	UINT8 ret = soundlatch_r(machine, 0);
 
 	if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", activecpu_get_pc(), ret);
 
 	/* this is a guess */
-	audio_cpu_clear_nmi_w(0, 0);
+	audio_cpu_clear_nmi_w(machine, 0, 0);
 
 	return ret;
 }
@@ -877,7 +877,7 @@ static WRITE16_HANDLER( watchdog_w )
 	/* only an LSB write resets the watchdog */
 	if (ACCESSING_LSB)
 	{
-		watchdog_reset16_w(offset, data, mem_mask);
+		watchdog_reset16_w(machine, offset, data, mem_mask);
 	}
 }
 
@@ -1008,7 +1008,7 @@ static MACHINE_RESET( neogeo )
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
-		system_control_w(offs, 0, 0xff00);
+		system_control_w(machine, offs, 0, 0xff00);
 
 	neogeo_reset_rng();
 
@@ -1085,10 +1085,10 @@ static ADDRESS_MAP_START( auido_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_WRITE(YM2610_data_port_0_B_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
-	AM_SPACE(0x08, 0x0f) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
-	AM_SPACE(0x09, 0x0f) AM_READ(audio_cpu_bank_select_e000_efff_r)
-	AM_SPACE(0x0a, 0x0f) AM_READ(audio_cpu_bank_select_c000_dfff_r)
-	AM_SPACE(0x0b, 0x0f) AM_READ(audio_cpu_bank_select_8000_bfff_r)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
+	AM_RANGE(0x09, 0x09) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_e000_efff_r)
+	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_c000_dfff_r)
+	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_8000_bfff_r)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(audio_result_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
 ADDRESS_MAP_END

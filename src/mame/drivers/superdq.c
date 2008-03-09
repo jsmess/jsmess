@@ -36,7 +36,7 @@ static int superdq_color_bank = 0;
 
 static render_texture *video_texture;
 static render_texture *overlay_texture;
-static mame_bitmap *last_video_bitmap;
+static bitmap_t *last_video_bitmap;
 
 static void video_cleanup(running_machine *machine)
 {
@@ -66,7 +66,7 @@ static VIDEO_UPDATE( superdq )
 
 	if (!video_skip_this_frame() && discinfo != NULL)
 	{
-		mame_bitmap *vidbitmap;
+		bitmap_t *vidbitmap;
 		rectangle fixedvis = machine->screen[screen].visarea;
 		fixedvis.max_x++;
 		fixedvis.max_y++;
@@ -338,7 +338,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(superdq_map,0)
 	MDRV_CPU_IO_MAP(superdq_io,0)
-	MDRV_CPU_VBLANK_INT(superdq_vblank, 1)
+	MDRV_CPU_VBLANK_INT("main", superdq_vblank)
 
 	MDRV_MACHINE_START(superdq)
 

@@ -123,7 +123,7 @@ WRITE8_HANDLER( dynax_blit2_dest_w )
 }
 WRITE8_HANDLER( tenkai_blit_dest_w )
 {
-	dynax_blit_dest_w(0, BITSWAP8(data, 7,6,5,4, 0,1,2,3));
+	dynax_blit_dest_w(machine, 0, BITSWAP8(data, 7,6,5,4, 0,1,2,3));
 }
 
 /* Background Color */
@@ -656,7 +656,7 @@ WRITE8_HANDLER( dynax_blitter_rev2_w )
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
 		case 4: blit_src	=	(blit_src & 0xff00ff) | (data << 8); break;
 		case 5: blit_src	=	(blit_src & 0x00ffff) | (data <<16); break;
-		case 6: dynax_blit_scroll_w(0,data); break;
+		case 6: dynax_blit_scroll_w(machine,0,data); break;
 	}
 }
 
@@ -671,7 +671,7 @@ WRITE8_HANDLER( tenkai_blitter_rev2_w )
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
 		case 4: blit_src	=	(blit_src & 0xff00ff) | (data << 8); break;
 		case 5: blit_src	=	(blit_src & 0x00ffff) | (data <<16); break;
-		case 6: tenkai_blit_scroll_w(0,data); break;
+		case 6: tenkai_blit_scroll_w(machine,0,data); break;
 	}
 }
 
@@ -686,7 +686,7 @@ WRITE8_HANDLER( jantouki_blitter_rev2_w )
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
 		case 4: blit_src	=	(blit_src & 0xff00ff) | (data << 8); break;
 		case 5: blit_src	=	(blit_src & 0x00ffff) | (data <<16); break;
-		case 6: dynax_blit_scroll_w(0,data); break;
+		case 6: dynax_blit_scroll_w(machine,0,data); break;
 	}
 }
 
@@ -700,7 +700,7 @@ WRITE8_HANDLER( jantouki_blitter2_rev2_w )
 		case 3:	blit2_src	=	(blit2_src & 0xffff00) | (data << 0); break;
 		case 4: blit2_src	=	(blit2_src & 0xff00ff) | (data << 8); break;
 		case 5: blit2_src	=	(blit2_src & 0x00ffff) | (data <<16); break;
-		case 6: dynax_blit2_scroll_w(0,data); break;
+		case 6: dynax_blit2_scroll_w(machine,0,data); break;
 	}
 }
 
@@ -848,7 +848,7 @@ VIDEO_START( neruton )
 
 ***************************************************************************/
 
-static void hanamai_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
+static void hanamai_copylayer(bitmap_t *bitmap,const rectangle *cliprect,int i)
 {
 	int color;
 	int scrollx,scrolly;
@@ -913,7 +913,7 @@ static void hanamai_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int 
 }
 
 
-static void jantouki_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i, int y)
+static void jantouki_copylayer(bitmap_t *bitmap,const rectangle *cliprect,int i, int y)
 {
 	int color,scrollx,scrolly,palettes,palbank;
 
@@ -982,7 +982,7 @@ static void jantouki_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int
 }
 
 
-static void mjdialq2_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
+static void mjdialq2_copylayer(bitmap_t *bitmap,const rectangle *cliprect,int i)
 {
 	int color;
 	int scrollx,scrolly;
@@ -1072,7 +1072,7 @@ static int debug_mask(void)
     I,O        -  Change palette (-,+)
     J,K & N,M  -  Change "tile"  (-,+, slow & fast)
     R          -  move "tile" to the next 1/8th of the gfx  */
-static int debug_viewer(mame_bitmap *bitmap,const rectangle *cliprect)
+static int debug_viewer(bitmap_t *bitmap,const rectangle *cliprect)
 {
 #ifdef MAME_DEBUG
 	static int toggle;
@@ -1252,7 +1252,7 @@ VIDEO_UPDATE( mjdialq2 )
 
 // htengoku uses the mixer chip from ddenlovr
 
-static mame_bitmap *framebuffer;
+static bitmap_t *framebuffer;
 
 VIDEO_START(htengoku)
 {

@@ -48,6 +48,7 @@ enum
 	MCONFIG_TOKEN_CPU_DATA_MAP,
 	MCONFIG_TOKEN_CPU_IO_MAP,
 	MCONFIG_TOKEN_CPU_VBLANK_INT,
+	MCONFIG_TOKEN_CPU_VBLANK_INT_HACK,
 	MCONFIG_TOKEN_CPU_PERIODIC_INT,
 
 	MCONFIG_TOKEN_DRIVER_DATA,
@@ -138,7 +139,7 @@ struct _machine_config
 	void				(*video_start)(running_machine *machine);		/* one-time video start callback */
 	void				(*video_reset)(running_machine *machine);		/* video reset callback */
 	void				(*video_eof)(running_machine *machine);			/* end-of-frame video callback */
-	UINT32				(*video_update)(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect); /* video update callback */
+	UINT32				(*video_update)(running_machine *machine, int screen, bitmap_t *bitmap, const rectangle *cliprect); /* video update callback */
 
 	sound_config		sound[MAX_SOUND];			/* array of sound chips in the system */
 
@@ -188,7 +189,7 @@ union _machine_config_token
 
 /* use this to declare external references to a machine driver */
 #define MACHINE_DRIVER_EXTERN(_name) \
-	extern const machine_config_token machine_config_##_name[];
+	extern const machine_config_token machine_config_##_name[]
 
 
 /* importing data from other machine drivers */
@@ -284,8 +285,9 @@ union _machine_config_token
 	TOKEN_PTR(voidptr, construct_map_##_map1), \
 	TOKEN_PTR(voidptr, construct_map_##_map2), \
 
-#define MDRV_CPU_VBLANK_INT(_func, _rate) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_CPU_VBLANK_INT, 8, _rate, 24), \
+#define MDRV_CPU_VBLANK_INT(_tag, _func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_VBLANK_INT, 8), \
+	TOKEN_STRING(_tag), \
 	TOKEN_PTR(interrupt, _func),
 
 #define MDRV_CPU_PERIODIC_INT(_func, _rate)	\

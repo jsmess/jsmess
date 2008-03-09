@@ -755,21 +755,21 @@ WRITE8_HANDLER( trs80_motor_w )
 	int result = 0;
 
 	if (offset & 1)
-		result |= input_port_1_r(0);
+		result |= readinputport(1);
 	if (offset & 2)
-		result |= input_port_2_r(0);
+		result |= readinputport(2);
 	if (offset & 4)
-		result |= input_port_3_r(0);
+		result |= readinputport(3);
 	if (offset & 8)
-		result |= input_port_4_r(0);
+		result |= readinputport(4);
 	if (offset & 16)
-		result |= input_port_5_r(0);
+		result |= readinputport(5);
 	if (offset & 32)
-		result |= input_port_6_r(0);
+		result |= readinputport(6);
 	if (offset & 64)
-		result |= input_port_7_r(0);
+		result |= readinputport(7);
 	if (offset & 128)
-		result |= input_port_8_r(0);
+		result |= readinputport(8);
 
 	return result;
 }

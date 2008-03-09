@@ -922,7 +922,7 @@ INLINE UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *she
 
 /***********************************************************************************************/
 
-static const poly_draw_scanline render_funcs[8] =
+static const poly_draw_scanline_func render_funcs[8] =
 {
 	model2_3d_render_0,	/* checker = 0, textured = 0, translucent = 0 */
 	model2_3d_render_1,	/* checker = 0, textured = 0, translucent = 1 */
@@ -934,7 +934,7 @@ static const poly_draw_scanline render_funcs[8] =
 	model2_3d_render_7	/* checker = 1, textured = 1, translucent = 1 */
 };
 
-static void model2_3d_render( mame_bitmap *bitmap, triangle *tri, const rectangle *cliprect )
+static void model2_3d_render( bitmap_t *bitmap, triangle *tri, const rectangle *cliprect )
 {
 	poly_extra_data *extra = poly_get_extra_data(poly);
 	UINT8		renderer;

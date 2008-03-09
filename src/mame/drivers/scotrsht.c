@@ -37,8 +37,8 @@ static INTERRUPT_GEN( scotrsht_interrupt )
 
 static WRITE8_HANDLER( scotrsht_soundlatch_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( scotrsht_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -226,7 +226,7 @@ static MACHINE_DRIVER_START( scotrsht )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 18432000/6)        /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(scotrsht_map,0)
-	MDRV_CPU_VBLANK_INT(scotrsht_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", scotrsht_interrupt)
 
 	MDRV_CPU_ADD(Z80, 18432000/6)
 	/* audio CPU */        /* 3.072 MHz */

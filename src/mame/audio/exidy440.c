@@ -73,8 +73,8 @@ typedef struct sound_cache_entry
 
 
 /* globals */
-UINT8 exidy440_sound_command;
-UINT8 exidy440_sound_command_ack;
+UINT8 *exidy440_sound_command;
+UINT8  exidy440_sound_command_ack;
 
 /* local allocated storage */
 static UINT8 *sound_banks;
@@ -136,9 +136,8 @@ static void *exidy440_sh_start(int clock, const struct CustomSound_interface *co
 	int i, length;
 
 	/* reset the system */
-	exidy440_sound_command = 0;
+	*exidy440_sound_command = 0;
 	exidy440_sound_command_ack = 1;
-	state_save_register_global(exidy440_sound_command);
 	state_save_register_global(exidy440_sound_command_ack);
 
 	/* reset the 6844 */
@@ -343,7 +342,7 @@ static READ8_HANDLER( sound_command_r )
 	cpunum_set_input_line(Machine, 1, 1, CLEAR_LINE);
 	exidy440_sound_command_ack = 1;
 
-	return exidy440_sound_command;
+	return *exidy440_sound_command;
 }
 
 
@@ -932,7 +931,7 @@ MACHINE_DRIVER_START( exidy440_audio )
 
 	MDRV_CPU_ADD(M6809, EXIDY440_AUDIO_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(exidy440_audio_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 

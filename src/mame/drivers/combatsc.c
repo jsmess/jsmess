@@ -237,7 +237,7 @@ static emu_timer *combasc_interleave_timer;
 static READ8_HANDLER ( combasc_YM2203_status_port_0_r )
 {
 	static int boost = 1;
-	int status = YM2203_status_port_0_r(0);
+	int status = YM2203_status_port_0_r(machine,0);
 
 	if (activecpu_get_pc() == 0x334)
 	{
@@ -662,7 +662,7 @@ static MACHINE_DRIVER_START( combasc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309, 3000000*4)	/* 3 MHz? */
 	MDRV_CPU_PROGRAM_MAP(combasc_readmem,combasc_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,3579545)	/* 3.579545 MHz */
 	/* audio CPU */
@@ -705,7 +705,7 @@ static MACHINE_DRIVER_START( combascb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309, 3000000*4)	/* 3 MHz? */
 	MDRV_CPU_PROGRAM_MAP(combascb_readmem,combascb_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,3579545)	/* 3.579545 MHz */
 	/* audio CPU */

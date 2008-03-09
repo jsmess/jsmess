@@ -14,7 +14,7 @@
 void vc20tape_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 /* the function which should be called by change on readline */
-extern void vc20_tape_open (write8_handler read_callback);
+extern void vc20_tape_open (write8_machine_func read_callback);
 extern void c16_tape_open (void);
 extern void vc20_tape_close (void);
 

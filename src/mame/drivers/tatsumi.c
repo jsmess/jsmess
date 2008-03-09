@@ -170,8 +170,8 @@ static WRITE16_HANDLER(bigfight_a60000_w) { COMBINE_DATA(&bigfight_a60000[offset
 
 static WRITE16_HANDLER(cyclwarr_sound_w)
 {
-	soundlatch_w(0, data >> 8);
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, 0, data >> 8);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -826,7 +826,7 @@ static MACHINE_DRIVER_START( apache3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(apache3_v30_map,0)
-	MDRV_CPU_VBLANK_INT(roundup5_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", roundup5_interrupt)
 
 	MDRV_CPU_ADD(M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(apache3_68000_map,0)
@@ -872,7 +872,7 @@ static MACHINE_DRIVER_START( roundup5 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(roundup5_v30_map,0)
-	MDRV_CPU_VBLANK_INT(roundup5_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", roundup5_interrupt)
 
 	MDRV_CPU_ADD(M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(roundup5_68000_map,0)
@@ -915,11 +915,11 @@ static MACHINE_DRIVER_START( cyclwarr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000a_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000b_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, 16000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
@@ -959,11 +959,11 @@ static MACHINE_DRIVER_START( bigfight )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(bigfight_68000a_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(bigfight_68000b_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, 16000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)

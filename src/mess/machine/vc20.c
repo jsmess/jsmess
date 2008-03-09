@@ -574,7 +574,7 @@ MACHINE_RESET( vc20 )
 		cbm_drive_1_config (SERIAL, 9);
 	}
 	via_reset ();
-	via_0_ca1_w (0, vc20_via0_read_ca1(0) );
+	via_0_ca1_w(machine, 0, vc20_via0_read_ca1(machine, 0) );
 }
 
 static int vc20_rom_id(mess_image *image)
@@ -713,7 +713,7 @@ DEVICE_LOAD(vc20_rom)
 
 INTERRUPT_GEN( vc20_frame_interrupt )
 {
-	via_0_ca1_w (0, vc20_via0_read_ca1 (0));
+	via_0_ca1_w(machine, 0, vc20_via0_read_ca1 (machine, 0));
 	keyboard[0] = readinputportbytag( TAG_KEYBOARD_ROW0 );
 	keyboard[1] = readinputportbytag( TAG_KEYBOARD_ROW1 );
 	keyboard[2] = readinputportbytag( TAG_KEYBOARD_ROW2 );

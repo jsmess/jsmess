@@ -158,7 +158,7 @@ static VIDEO_START( talbot )
 	bg_tilemap = tilemap_create(get_tile_info_bg, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -237,7 +237,7 @@ static MACHINE_DRIVER_START( talbot )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* (?) */
 	MDRV_CPU_PROGRAM_MAP(cpu_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* MCU */
 //  MDRV_CPU_ADD(ALPHA8201, 18432000/6/8/2) /* (?) */

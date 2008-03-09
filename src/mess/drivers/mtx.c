@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_CPU_ADD(Z80, MTX_SYSTEM_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mtx_mem, 0)
 	MDRV_CPU_IO_MAP(mtx_io, 0)
-	MDRV_CPU_VBLANK_INT(mtx_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", mtx_interrupt)
 	MDRV_CPU_CONFIG(mtx_daisy_chain)
 
 	/* video hardware */

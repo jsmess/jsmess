@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "z80dart.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -159,10 +160,10 @@ struct _z80dart
 	UINT8		int_state[8];		/* interrupt states */
 
 	void (*irq_cb)(int state);
-	write8_handler dtr_changed_cb;
-	write8_handler rts_changed_cb;
-	write8_handler break_changed_cb;
-	write8_handler transmit_cb;
+	write8_machine_func dtr_changed_cb;
+	write8_machine_func rts_changed_cb;
+	write8_machine_func break_changed_cb;
+	write8_machine_func transmit_cb;
 	int (*receive_poll_cb)(int which);
 };
 
@@ -344,6 +345,7 @@ void z80dart_c_w(int which, int ch, UINT8 data)
 	dart_channel *chan = &dart->chan[ch];
 	int reg = chan->regs[0] & 7;
 	UINT8 old = chan->regs[reg];
+	running_machine *machine = Machine;
 
 	if (reg != 0 || (reg & 0xf8))
 		VPRINTF(("%04X:dart_reg_w(%c,%d) = %02X\n", activecpu_get_pc(), 'A' + ch, reg, data));
@@ -397,11 +399,11 @@ void z80dart_c_w(int which, int ch, UINT8 data)
 		/* DART write register 5 */
 		case 5:
 			if (((old ^ data) & DART_WR5_DTR) && dart->dtr_changed_cb)
-				(*dart->dtr_changed_cb)(ch, (data & DART_WR5_DTR) != 0);
+				(*dart->dtr_changed_cb)(machine, ch, (data & DART_WR5_DTR) != 0);
 			if (((old ^ data) & DART_WR5_SEND_BREAK) && dart->break_changed_cb)
-				(*dart->break_changed_cb)(ch, (data & DART_WR5_SEND_BREAK) != 0);
+				(*dart->break_changed_cb)(machine, ch, (data & DART_WR5_SEND_BREAK) != 0);
 			if (((old ^ data) & DART_WR5_RTS) && dart->rts_changed_cb)
-				(*dart->rts_changed_cb)(ch, (data & DART_WR5_RTS) != 0);
+				(*dart->rts_changed_cb)(machine, ch, (data & DART_WR5_RTS) != 0);
 			break;
 	}
 }
@@ -645,7 +647,7 @@ static TIMER_CALLBACK(serial_callback)
 
 		/* actually transmit the character */
 		if (dart->transmit_cb != NULL)
-			(*dart->transmit_cb)(ch, chan->outbuf);
+			(*dart->transmit_cb)(machine, ch, chan->outbuf);
 
 		/* update the status register */
 		chan->status[0] |= DART_RR0_TX_BUFFER_EMPTY;

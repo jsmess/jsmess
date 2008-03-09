@@ -61,6 +61,7 @@ The End
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 
 static int nSndNum=0x10;
@@ -105,8 +106,8 @@ static WRITE8_HANDLER(ay1_sel)
 {
 	if(activecpu_get_previouspc()==0x309)
 	{
-		AY8910_control_port_0_w(0,nAyCtrl);
-		AY8910_write_port_0_w(0,nAyData);
+		AY8910_control_port_0_w(machine,0,nAyCtrl);
+		AY8910_write_port_0_w(machine,0,nAyData);
 	}
 }
 
@@ -115,8 +116,8 @@ static WRITE8_HANDLER(ay2_sel)
 
 	if(activecpu_get_previouspc()==0x309)
 	{
-		AY8910_control_port_1_w(0,nAyCtrl);
-		AY8910_write_port_1_w(0,nAyData);
+		AY8910_control_port_1_w(machine,0,nAyCtrl);
+		AY8910_write_port_1_w(machine,0,nAyData);
 	}
 }
 
@@ -179,7 +180,7 @@ static MACHINE_DRIVER_START( mirax )
 	MDRV_CPU_ADD(Z80, 12000000) // audio cpu ?
 	MDRV_CPU_PROGRAM_MAP(memory_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

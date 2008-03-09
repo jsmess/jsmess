@@ -28,6 +28,7 @@ rom/ram selection
 #include "devices/snapquik.h"
 #include "includes/amstrad.h"
 #include "sound/ay8910.h"
+#include "deprecat.h"
 
 
 void amstrad_setup_machine(void)
@@ -38,6 +39,7 @@ void amstrad_setup_machine(void)
 /* load CPCEMU style snapshots */
 void amstrad_handle_snapshot(unsigned char *pSnapshot)
 {
+	running_machine *machine = Machine;
 	int RegData;
 	int i;
 
@@ -144,12 +146,12 @@ void amstrad_handle_snapshot(unsigned char *pSnapshot)
 	/* PSG */
 	for (i=0; i<16; i++)
 	{
-		AY8910_control_port_0_w(0,i);
+		AY8910_control_port_0_w(machine, 0,i);
 
-		AY8910_write_port_0_w(0,pSnapshot[0x05b + i] & 0x0ff);
+		AY8910_write_port_0_w(machine, 0,pSnapshot[0x05b + i] & 0x0ff);
 	}
 
-	AY8910_control_port_0_w(0,pSnapshot[0x05a]);
+	AY8910_control_port_0_w(machine, 0,pSnapshot[0x05a]);
 
 	{
 		int MemSize;

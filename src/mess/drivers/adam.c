@@ -630,7 +630,7 @@ static MACHINE_DRIVER_START( adam )
 	//MDRV_CPU_ADD(M6800, 4000000)       /* 4.0 Mhz */
 	//MDRV_CPU_PROGRAM_MAP(master6801_mem, 0)
 
-	MDRV_CPU_VBLANK_INT(adam_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", adam_interrupt)
 
 	MDRV_MACHINE_START( adam )
 	MDRV_MACHINE_RESET( adam )

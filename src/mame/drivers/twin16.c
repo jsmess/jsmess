@@ -139,7 +139,7 @@ static READ16_HANDLER( twin16_gfx_rom2_r )
 static WRITE16_HANDLER( sound_command_w )
 {
 	COMBINE_DATA(&twin16_sound_command);
-	soundlatch_w( 0, twin16_sound_command&0xff );
+	soundlatch_w( machine, 0, twin16_sound_command&0xff );
 }
 
 static READ16_HANDLER( twin16_sprite_status_r )
@@ -960,11 +960,11 @@ static MACHINE_DRIVER_START( twin16 )
 
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sub,writemem_sub)
-	MDRV_CPU_VBLANK_INT(CPUB_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", CPUB_interrupt)
 
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(CPUA_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", CPUA_interrupt)
 
 	MDRV_INTERLEAVE(100)
 
@@ -1018,7 +1018,7 @@ static MACHINE_DRIVER_START( fround )
 
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(fround_readmem,fround_writemem)
-	MDRV_CPU_VBLANK_INT(CPUA_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", CPUA_interrupt)
 
 	MDRV_INTERLEAVE(100)
 

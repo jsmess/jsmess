@@ -3,7 +3,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "deco16ic.h"
 
 /*
@@ -36,7 +35,7 @@ x = xpos
 
 /* spriteram is really 16-bit.. this can be changed to use 16-bit ram like the tilemaps
  its the same sprite chip Data East used on many, many 16-bit era titles */
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -51,7 +50,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 		y = spriteram32[offs]&0xffff;
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		x = spriteram32[offs+2]&0xffff;
 		colour = (x >>9) & 0x1f;

@@ -367,7 +367,7 @@ static MACHINE_DRIVER_START(ti99_2)
 	MDRV_CPU_CONFIG(ti99_2_processor_config)
 	MDRV_CPU_PROGRAM_MAP(ti99_2_memmap, 0)
 	MDRV_CPU_IO_MAP(ti99_2_readcru, ti99_2_writecru)
-	MDRV_CPU_VBLANK_INT(ti99_2_vblank_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", ti99_2_vblank_interrupt)
 
 	MDRV_MACHINE_RESET( ti99_2 )
 

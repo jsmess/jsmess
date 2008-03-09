@@ -160,7 +160,7 @@ static void MameUIOutput(void *param, const char *format, va_list argptr)
 
 static int ProcessAuditResults(int game, audit_record *audit, int audit_records)
 {
-	output_callback prevcb;
+	output_callback_func prevcb;
 	void *prevparam;
 	int res;
 

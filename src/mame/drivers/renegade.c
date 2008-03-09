@@ -200,8 +200,8 @@ static WRITE8_HANDLER( adpcm_play_w )
 
 static WRITE8_HANDLER( sound_w )
 {
-	soundlatch_w(offset, data);
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(machine, offset, data);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /********************************************************************************************/
@@ -788,7 +788,7 @@ static MACHINE_DRIVER_START( renegade )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 12000000/8)	/* 1.5 MHz (measured) */
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
-	MDRV_CPU_VBLANK_INT(renegade_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(renegade_interrupt,2)
 
 	MDRV_CPU_ADD(M6809, 12000000/8)
 	/* audio CPU */

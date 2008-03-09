@@ -1582,16 +1582,16 @@ WRITE8_HANDLER ( wd17xx_data_w )
 
 	switch(offset % 4) {
 	case 0:
-		result = wd17xx_status_r(0);
+		result = wd17xx_status_r(machine, 0);
 		break;
 	case 1:
-		result = wd17xx_track_r(0);
+		result = wd17xx_track_r(machine, 0);
 		break;
 	case 2:
-		result = wd17xx_sector_r(0);
+		result = wd17xx_sector_r(machine, 0);
 		break;
 	case 3:
-		result = wd17xx_data_r(0);
+		result = wd17xx_data_r(machine, 0);
 		break;
 	}
 	return result;
@@ -1603,16 +1603,16 @@ WRITE8_HANDLER( wd17xx_w )
 {
 	switch(offset % 4) {
 	case 0:
-		wd17xx_command_w(0, data);
+		wd17xx_command_w(machine, 0, data);
 		break;
 	case 1:
-		wd17xx_track_w(0, data);
+		wd17xx_track_w(machine, 0, data);
 		break;
 	case 2:
-		wd17xx_sector_w(0, data);
+		wd17xx_sector_w(machine, 0, data);
 		break;
 	case 3:
-		wd17xx_data_w(0, data);
+		wd17xx_data_w(machine, 0, data);
 		break;
 	}
 }

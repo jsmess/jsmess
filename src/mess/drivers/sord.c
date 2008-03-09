@@ -332,7 +332,7 @@ static READ8_HANDLER(sord_ctc_r)
 {
 	unsigned char data;
 
-	data = z80ctc_0_r(offset & 0x03);
+	data = z80ctc_0_r(machine, offset & 0x03);
 
 	logerror("sord ctc r: %04x %02x\n",(offset & 0x03), data);
 
@@ -343,7 +343,7 @@ static WRITE8_HANDLER(sord_ctc_w)
 {
 	logerror("sord ctc w: %04x %02x\n",(offset & 0x03), data);
 
-	z80ctc_0_w(offset & 0x03, data);
+	z80ctc_0_w(machine, offset & 0x03, data);
 }
 
 static  READ8_HANDLER(sord_sys_r)
@@ -449,8 +449,8 @@ static void sordm5_video_interrupt_callback(int state)
 {
 	if (state)
 	{
-		z80ctc_0_trg3_w(0,1);
-		z80ctc_0_trg3_w(0,0);
+		z80ctc_0_trg3_w(Machine, 0, 1);
+		z80ctc_0_trg3_w(Machine, 0, 0);
 	}
 }
 
@@ -625,7 +625,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 	MDRV_CPU_ADD_TAG("main", Z80, 3800000)
 	MDRV_CPU_PROGRAM_MAP(sord_m5_mem, 0)
 	MDRV_CPU_IO_MAP(sord_m5_io, 0)
-	MDRV_CPU_VBLANK_INT(sord_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", sord_interrupt)
 	MDRV_CPU_CONFIG( sord_m5_daisy_chain )
 	MDRV_INTERLEAVE(1)
 

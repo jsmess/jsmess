@@ -49,6 +49,7 @@ Sound :
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
@@ -70,9 +71,9 @@ static WRITE8_HANDLER( sound_control_w )
 	if ((last & 0x04) == 0x04 && (data & 0x4) == 0x00)
 	{
 		if (last & 0x01)
-			AY8910_control_port_0_w(0,soundlatch);
+			AY8910_control_port_0_w(machine,0,soundlatch);
 		else
-			AY8910_write_port_0_w(0,soundlatch);
+			AY8910_write_port_0_w(machine,0,soundlatch);
 	}
 	last=data;
 }
@@ -161,7 +162,7 @@ static MACHINE_DRIVER_START( 4enraya )
 	MDRV_CPU_ADD(Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

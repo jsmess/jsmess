@@ -18,7 +18,7 @@ static tilemap *background_tilemap, *fix_tilemap;
 static UINT8 deco16_io_ram[16];
 
 #if 0
-void debug_print(mame_bitmap *bitmap)
+void debug_print(bitmap_t *bitmap)
 {
 	int i,j;
 	char buf[20*16];
@@ -100,11 +100,11 @@ WRITE8_HANDLER( deco16_io_w )
 			/* Todo */
 			break;
 		case 8: /* Irq ack */
-			cpunum_set_input_line(Machine, 0,DECO16_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(machine, 0,DECO16_IRQ_LINE,CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			soundlatch_w(0,data);
-			cpunum_set_input_line(Machine, 1,M6502_IRQ_LINE,HOLD_LINE);
+			soundlatch_w(machine,0,data);
+			cpunum_set_input_line(machine, 1,M6502_IRQ_LINE,HOLD_LINE);
 			break;
 	}
 }
@@ -147,7 +147,7 @@ VIDEO_START( liberate )
 WRITE8_HANDLER( prosport_paletteram_w )
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_w(offset,~data);
+	paletteram_BBGGGRRR_w(machine,offset,~data);
 }
 
 PALETTE_INIT( liberate )
@@ -182,7 +182,7 @@ PALETTE_INIT( liberate )
 
 /***************************************************************************/
 
-static void liberate_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -248,7 +248,7 @@ static void liberate_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void prosport_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
 
@@ -303,7 +303,7 @@ static void prosport_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void boomrang_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
 

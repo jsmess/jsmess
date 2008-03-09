@@ -93,13 +93,13 @@ static UINT8 ins8154_read(int which, offs_t offset)
 	{
 	case 0x20:
 		if (i->intf->in_a_func)
-			val = i->intf->in_a_func(0);
+			val = i->intf->in_a_func(Machine, 0);
 		i->in_a = val;
 		break;
 		
 	case 0x21:
 		if (i->intf->in_b_func)
-			val = i->intf->in_b_func(0);
+			val = i->intf->in_b_func(Machine, 0);
 		i->in_b = val;
 		break;
 		
@@ -107,13 +107,13 @@ static UINT8 ins8154_read(int which, offs_t offset)
 		if (offset < 0x08)
 		{
 			if (i->intf->in_a_func)
-				val = (i->intf->in_a_func(0) << (8 - offset)) & 0x80;
+				val = (i->intf->in_a_func(Machine, 0) << (8 - offset)) & 0x80;
 			i->in_a = val;
 		}
 		else
 		{
 			if (i->intf->in_a_func)
-				val = (i->intf->in_a_func(0) << (8 - (offset >> 4))) & 0x80;
+				val = (i->intf->in_a_func(Machine, 0) << (8 - (offset >> 4))) & 0x80;
 			i->in_b = val;
 		}
 		break;
@@ -133,7 +133,7 @@ static void ins8154_write_port_a(int which, int data)
 	if (i->odra)
 	{
 		if (i->intf->out_a_func)
-			i->intf->out_a_func(0, (data & i->odra) | (i->odra ^ 0xff));
+			i->intf->out_a_func(Machine, 0, (data & i->odra) | (i->odra ^ 0xff));
 		else
 			logerror("INS8154 chip #%d (%08x): Write to port A but no write handler defined!\n",
 				which, safe_activecpu_get_pc());
@@ -151,7 +151,7 @@ static void ins8154_write_port_b(int which, int data)
 	if (i->odrb)
 	{
 		if (i->intf->out_b_func)
-			i->intf->out_b_func(0, (data & i->odrb) | (i->odrb ^ 0xff));
+			i->intf->out_b_func(Machine, 0, (data & i->odrb) | (i->odrb ^ 0xff));
 		else
 			logerror("INS8154 chip #%d (%08x): Write to port B but no write handler defined!\n",
 				which, safe_activecpu_get_pc());

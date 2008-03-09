@@ -140,6 +140,7 @@ static const int thumbCycles[256] =
 /* 17 processor registers are visible at any given time,
  * banked depending on processor mode.
  */
+
 static const int sRegisterTable[ARM7_NUM_MODES][18] =
 {
     { /* USR */

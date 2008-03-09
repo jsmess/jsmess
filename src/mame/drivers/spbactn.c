@@ -139,8 +139,8 @@ static WRITE16_HANDLER( soundcommand_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(offset,data & 0xff);
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(machine,offset,data & 0xff);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -356,7 +356,7 @@ static MACHINE_DRIVER_START( spbactn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(spbactn_readmem,spbactn_writemem)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* 4 MHz ??? */

@@ -87,7 +87,7 @@ WRITE8_HANDLER( tagteam_mirrorvideoram_w )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	tagteam_videoram_w(offset,data);
+	tagteam_videoram_w(machine,offset,data);
 }
 
 WRITE8_HANDLER( tagteam_mirrorcolorram_w )
@@ -99,7 +99,7 @@ WRITE8_HANDLER( tagteam_mirrorcolorram_w )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	tagteam_colorram_w(offset,data);
+	tagteam_colorram_w(machine,offset,data);
 }
 
 WRITE8_HANDLER( tagteam_control_w )
@@ -133,7 +133,7 @@ VIDEO_START( tagteam )
 		 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

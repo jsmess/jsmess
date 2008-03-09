@@ -636,15 +636,15 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static WRITE16_HANDLER( wgp_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (0, data & 0xff);
+		taitosound_port_w (machine, 0, data & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (0, data & 0xff);
+		taitosound_comm_w (machine, 0, data & 0xff);
 }
 
 static READ16_HANDLER( wgp_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (0) & 0xff));
+		return ((taitosound_comm_r (machine, 0) & 0xff));
 	else return 0;
 }
 
@@ -982,7 +982,7 @@ static MACHINE_DRIVER_START( wgp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wgp_readmem,wgp_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4 MHz ??? */
 	/* audio CPU */
@@ -990,7 +990,7 @@ static MACHINE_DRIVER_START( wgp )
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wgp_cpub_readmem,wgp_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(wgp_cpub_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", wgp_cpub_interrupt)
 
 	MDRV_MACHINE_START(wgp)
 
@@ -1027,7 +1027,7 @@ static MACHINE_DRIVER_START( wgp2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wgp_readmem,wgp_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4 MHz ??? */
 	/* audio CPU */
@@ -1035,7 +1035,7 @@ static MACHINE_DRIVER_START( wgp2 )
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wgp_cpub_readmem,wgp_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(wgp_cpub_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", wgp_cpub_interrupt)
 
 	MDRV_MACHINE_START(wgp)
 

@@ -44,15 +44,15 @@ logerror("%04x: write %02x to 0010\n",activecpu_get_pc(),data);
 
 static READ8_HANDLER( rollerg_K051316_r )
 {
-	if (readzoomroms) return K051316_rom_0_r(offset);
-	else return K051316_0_r(offset);
+	if (readzoomroms) return K051316_rom_0_r(machine, offset);
+	else return K051316_0_r(machine, offset);
 }
 
 static READ8_HANDLER( rollerg_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return K053260_0_r(2 + offset);
+	return K053260_0_r(machine, 2 + offset);
 }
 
 static WRITE8_HANDLER( soundirq_w )
@@ -247,7 +247,7 @@ static MACHINE_DRIVER_START( rollerg )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */

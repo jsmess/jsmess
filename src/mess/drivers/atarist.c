@@ -89,6 +89,7 @@ static struct FDC
 
 static void atarist_fdc_dma_transfer(void)
 {
+	running_machine *machine = Machine;
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	if ((fdc.mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
@@ -97,11 +98,11 @@ static void atarist_fdc_dma_transfer(void)
 		{
 			if (fdc.mode & ATARIST_FLOPPY_MODE_WRITE)
 			{
-				wd17xx_data_w(0, RAM[fdc.dmabase]);
+				wd17xx_data_w(machine, 0, RAM[fdc.dmabase]);
 			}
 			else
 			{
-				RAM[fdc.dmabase] = wd17xx_data_r(0);
+				RAM[fdc.dmabase] = wd17xx_data_r(machine, 0);
 			}
 
 			fdc.dmabase++;
@@ -164,7 +165,7 @@ static READ16_HANDLER( atarist_fdc_data_r )
 		}
 		else
 		{
-			return wd17xx_r((fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
+			return wd17xx_r(machine, (fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
 		}
 	}
 }
@@ -193,7 +194,7 @@ static WRITE16_HANDLER( atarist_fdc_data_w )
 		}
 		else
 		{
-			wd17xx_w((fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
+			wd17xx_w(machine, (fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
 		}
 	}
 }
@@ -754,7 +755,7 @@ static READ16_HANDLER( megaste_scc8530_r )
 {
 	if (ACCESSING_MSB16)
 	{
-		return scc_r(offset);
+		return scc_r(machine, offset);
 	}
 	else
 	{
@@ -766,7 +767,7 @@ static WRITE16_HANDLER( megaste_scc8530_w )
 {
 	if (ACCESSING_MSB16)
 	{
-		scc_w(offset, data);
+		scc_w(machine, offset, data);
 	}
 }
 

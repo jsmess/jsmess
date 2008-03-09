@@ -295,46 +295,6 @@ static void via_1_irq(int state)
 }
 
 /**************************************************************
- * VIA read wrappers
- **************************************************************/
-
-static const char *const via_name[16] = {
-    "PB  ","PA  ","DDRB","DDRA",
-    "T1CL","T1CH","T1LL","T1LH",
-    "T2CL","T2CH","SR  ","ACR ",
-    "PCR ","IFR ","IER ","PANH"
-};
-
- READ8_HANDLER( microtan_via_0_r )
-{
-    int data = via_0_r(offset);
-    LOG(("microtan_via_0_r %s -> %02X\n", via_name[offset], data));
-    return data;
-}
-
- READ8_HANDLER( microtan_via_1_r )
-{
-    int data = via_1_r(offset);
-    LOG(("microtan_via_1_r %s -> %02X\n", via_name[offset], data));
-    return data;
-}
-
-/**************************************************************
- * VIA write wrappers
- **************************************************************/
-WRITE8_HANDLER( microtan_via_0_w )
-{
-    LOG(("via_0_w (%2d) %s <- %02X\n", offset, via_name[offset], data));
-    via_0_w(offset,data);
-}
-
-WRITE8_HANDLER( microtan_via_1_w )
-{
-    LOG(("via_1_w (%2d) %s <- %02X\n", offset, via_name[offset], data));
-    via_1_w(offset,data);
-}
-
-/**************************************************************
  * VIA interface structure
  **************************************************************/
 static const struct via6522_interface via6522[2] =
@@ -370,22 +330,7 @@ static TIMER_CALLBACK(microtan_read_cassette)
 		via_set_input_cb2(0,1);
 }
 
- READ8_HANDLER( microtan_sio_r )
-{
-    int data;
-	data = acia_6551_r(offset);
-    LOG(("microtan_sio_r: %d -> %02x\n", offset, data));
-    return data;
-}
-
-WRITE8_HANDLER( microtan_sio_w )
-{
-    LOG(("microtan_sio_w: %d <- %02x\n", offset, data));
-	acia_6551_w(offset,data);
-}
-
-
- READ8_HANDLER( microtan_sound_r )
+READ8_HANDLER( microtan_sound_r )
 {
     int data = 0xff;
     LOG(("microtan_sound_r: -> %02x\n", data));
@@ -747,6 +692,7 @@ static void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
 
 static void microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size)
 {
+	running_machine *machine = Machine;
     UINT8 *RAM = memory_region(REGION_CPU1);
 
     /* check for .DMP file format */
@@ -803,35 +749,35 @@ static void microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size)
 
         /* first set of VIA6522 registers */
         for (i = 0; i < 16; i++ )
-            via_0_w(i, snapshot_buff[base++]);
+            via_0_w(machine, i, snapshot_buff[base++]);
 
         /* second set of VIA6522 registers */
         for (i = 0; i < 16; i++ )
-            via_1_w(i, snapshot_buff[base++]);
+            via_1_w(machine, i, snapshot_buff[base++]);
 
         /* microtan IO bff0-bfff */
         for (i = 0; i < 16; i++ )
         {
             RAM[0xbff0+i] = snapshot_buff[base++];
             if (i < 4)
-                microtan_bffx_w(i,RAM[0xbff0+i]);
+                microtan_bffx_w(machine, i, RAM[0xbff0+i]);
         }
 
-        microtan_sound_w(0, snapshot_buff[base++]);
+        microtan_sound_w(machine, 0, snapshot_buff[base++]);
         microtan_chunky_graphics = snapshot_buff[base++];
 
         /* first set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            AY8910_control_port_0_w(0, i);
-            AY8910_write_port_0_w(0, snapshot_buff[base++]);
+            AY8910_control_port_0_w(machine, 0, i);
+            AY8910_write_port_0_w(machine, 0, snapshot_buff[base++]);
         }
 
         /* second set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            AY8910_control_port_0_w(0, i);
-            AY8910_write_port_0_w(0, snapshot_buff[base++]);
+            AY8910_control_port_0_w(machine, 0, i);
+            AY8910_write_port_0_w(machine, 0, snapshot_buff[base++]);
         }
 
         for (i = 0; i < 32*16; i++)

@@ -1013,13 +1013,13 @@ static READ16_HANDLER( xymg_magic_r )
 static WRITE16_HANDLER( igs_YM3812_control_port_0_w )
 {
 	if (ACCESSING_LSB)
-		YM3812_control_port_0_w(0,data);
+		YM3812_control_port_0_w(machine,0,data);
 }
 
 static WRITE16_HANDLER( igs_YM3812_write_port_0_w )
 {
 	if (ACCESSING_LSB)
-		YM3812_write_port_0_w(0,data);
+		YM3812_write_port_0_w(machine,0,data);
 }
 
 static ADDRESS_MAP_START( chindrag_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1158,9 +1158,9 @@ static READ16_HANDLER( ics2115_0_word_r )
 {
 	switch(offset)
 	{
-		case 0:	return ics2115_r(0);
-		case 1:	return ics2115_r(1);
-		case 2:	return (ics2115_r(3) << 8) | ics2115_r(2);
+		case 0:	return ics2115_r(machine,0);
+		case 1:	return ics2115_r(machine,1);
+		case 2:	return (ics2115_r(machine,3) << 8) | ics2115_r(machine,2);
 	}
 	return 0xff;
 }
@@ -1170,11 +1170,11 @@ static WRITE16_HANDLER( ics2115_0_word_w )
 	switch(offset)
 	{
 		case 1:
-			if (ACCESSING_LSB)	ics2115_w(1,data);
+			if (ACCESSING_LSB)	ics2115_w(machine,1,data);
 			break;
 		case 2:
-			if (ACCESSING_LSB)	ics2115_w(2,data);
-			if (ACCESSING_MSB)	ics2115_w(3,data>>8);
+			if (ACCESSING_LSB)	ics2115_w(machine,2,data);
+			if (ACCESSING_MSB)	ics2115_w(machine,3,data>>8);
 			break;
 	}
 }
@@ -2399,7 +2399,7 @@ static MACHINE_DRIVER_START( chmplst2 )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(chmplst2_readmem,chmplst2_writemem)
-	MDRV_CPU_VBLANK_INT(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
+	MDRV_CPU_VBLANK_INT_HACK(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
 //  MDRV_GFXDECODE(chmplst2)
 
@@ -2412,7 +2412,7 @@ static MACHINE_DRIVER_START( chindrag )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(chindrag_readmem,chindrag_writemem)
-	MDRV_CPU_VBLANK_INT(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
+	MDRV_CPU_VBLANK_INT_HACK(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
 	MDRV_SOUND_ADD(YM3812, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -2432,7 +2432,7 @@ static MACHINE_DRIVER_START( grtwall )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(grtwall_readmem,grtwall_writemem)
-	MDRV_CPU_VBLANK_INT(grtwall_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(grtwall_interrupt,2)
 MACHINE_DRIVER_END
 
 
@@ -2451,7 +2451,7 @@ static MACHINE_DRIVER_START( lhb )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(lhb_readmem,lhb_writemem)
-	MDRV_CPU_VBLANK_INT(lhb_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(lhb_interrupt,3)
 MACHINE_DRIVER_END
 
 
@@ -2482,7 +2482,7 @@ static MACHINE_DRIVER_START( vbowl )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(vbowl_readmem,vbowl_writemem)
-	MDRV_CPU_VBLANK_INT(vbowl_interrupt,3+4)
+	MDRV_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
 
 	MDRV_VIDEO_EOF(vbowl)	// trackball
 //  MDRV_GFXDECODE(chmplst2)
@@ -2499,7 +2499,7 @@ static MACHINE_DRIVER_START( xymg )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(xymg_readmem,xymg_writemem)
-	MDRV_CPU_VBLANK_INT(grtwall_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(grtwall_interrupt,2)
 MACHINE_DRIVER_END
 
 

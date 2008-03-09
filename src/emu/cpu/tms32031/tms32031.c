@@ -297,14 +297,15 @@ UINT32 convert_double_to_tms3203x_fp(double dval)
     EXECEPTION HANDLING
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 INLINE void generate_exception(int exception)
 {
 }
 
-
 INLINE void invalid_instruction(UINT32 op)
 {
 }
+#endif
 
 
 
@@ -634,9 +635,6 @@ static UINT32 boot_loader(UINT32 boot_rom_addr)
 			WMEM(offs++, data);
 		}
 	}
-
-	/* keep the compiler happy */
-	return 0;
 }
 
 

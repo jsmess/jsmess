@@ -1410,7 +1410,7 @@ static void apply_artifacts(UINT32 *line)
 
 
 
-static void artifacting_changed(void *param, UINT32 val, UINT32 mask)
+static INPUT_CHANGED( artifacting_changed )
 {
 	set_dirty();
 }
@@ -1419,7 +1419,7 @@ static void artifacting_changed(void *param, UINT32 val, UINT32 mask)
 
 INPUT_PORTS_START( m6847_artifacting )
 	PORT_START_TAG("artifacting")
-	PORT_CONFNAME( 0x03, 0x01, "Artifacting" )
+	PORT_CONFNAME( 0x03, 0x01, "Artifacting" ) PORT_CHANGED(artifacting_changed, NULL)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Standard ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( Reverse ) )
@@ -1811,7 +1811,6 @@ void m6847_init(const m6847_config *cfg)
 	UINT32 frequency;
 	attoseconds_t period, frame_period, cpu0_clock_period = 0;
 	double total_scanlines;
-	int portnum;
 
 	/* identify proper M6847 variant */
 	assert(cfg->type < sizeof(variants) / sizeof(variants[0]));
@@ -1898,11 +1897,6 @@ void m6847_init(const m6847_config *cfg)
 
 	/* build font */
 	build_fontdata(v);
-
-	/* artifact callbacks */
-	portnum = port_tag_to_index("artifacting");
-	if (portnum >= 0)
-		input_port_set_changed_callback(portnum, ~0, artifacting_changed, NULL);
 
 	/* dump stats */
 	if (LOG_STATS)

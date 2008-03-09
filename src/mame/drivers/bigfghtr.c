@@ -214,7 +214,7 @@ static WRITE16_HANDLER( bg_scrolly_w )
 
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
@@ -272,14 +272,14 @@ static VIDEO_UPDATE( bigfghtr )
 
 static VIDEO_EOF( bigfghtr )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }
 
 
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_LSB)
-		soundlatch_w(0,((data & 0x7f) << 1) | 1);
+		soundlatch_w(machine,0,((data & 0x7f) << 1) | 1);
 }
 
 static WRITE16_HANDLER( io_w )
@@ -317,7 +317,7 @@ static READ16_HANDLER(sharedram_r)
 			break;
 
 			case 0x46/2:
-				return (input_port_0_word_r(0,0)&0xffff)^0xffff;
+				return (input_port_0_word_r(machine,0,0)&0xffff)^0xffff;
 
 
 		}
@@ -357,7 +357,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( soundlatch_clear_r )
 {
-	soundlatch_clear_w(0,0);
+	soundlatch_clear_w(machine,0,0);
 	return 0;
 }
 
@@ -421,13 +421,13 @@ static MACHINE_DRIVER_START( bigfghtr )
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3072000)
 	/* audio CPU */	/* 3.072 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(soundmem,0)
 	MDRV_CPU_IO_MAP(soundport,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,128)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

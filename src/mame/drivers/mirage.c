@@ -39,7 +39,7 @@ MR_01-.3A    [a0b758aa]
 
 #include "deco16ic.h"
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -52,7 +52,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 		y = spriteram16[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		x = spriteram16[offs+2];
 		colour = (x >>9) & 0x1f;
@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( mirage )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 28000000/2)
 	MDRV_CPU_PROGRAM_MAP(mirage_readmem,mirage_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

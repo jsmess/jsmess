@@ -31,6 +31,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/wswan.h"
 #include "devices/cartslot.h"
 #include "sound/custom.h"
@@ -129,7 +130,7 @@ static MACHINE_DRIVER_START( wswan )
 	MDRV_CPU_ADD_TAG("main", V30MZ, 3072000)
 	MDRV_CPU_PROGRAM_MAP(wswan_mem, 0)
 	MDRV_CPU_IO_MAP(wswan_io, 0)
-	MDRV_CPU_VBLANK_INT(wswan_scanline_interrupt, 159)	/* 1 int each scanline */
+	MDRV_CPU_VBLANK_INT_HACK(wswan_scanline_interrupt, 159)	/* 1 int each scanline */
 
 	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_REFRESH_RATE(75)

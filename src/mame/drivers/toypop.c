@@ -137,7 +137,7 @@ static READ8_HANDLER( toypop_sound_sharedram_r )
 static WRITE8_HANDLER( toypop_sound_sharedram_w )
 {
 	if (offset < 0x40)
-		namco_15xx_w(offset,data);
+		namco_15xx_w(machine,offset,data);
 	else
 		namco_soundregs[offset] = data;
 }
@@ -571,16 +571,16 @@ static MACHINE_DRIVER_START( liblrabl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
 	MDRV_CPU_PROGRAM_MAP(readmem_mainCPU_liblrabl,writemem_mainCPU_liblrabl)
-	MDRV_CPU_VBLANK_INT(toypop_main_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toypop_main_interrupt)
 
 	MDRV_CPU_ADD(M6809, 1536000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_soundCPU,writemem_soundCPU)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD(M68000, 6144000)	/* 6.144 MHz (measured on Libble Rabble board) */
 	MDRV_CPU_PROGRAM_MAP(readmem_68k,writemem_68k)
-	MDRV_CPU_VBLANK_INT(toypop_m68000_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toypop_m68000_interrupt)
 
 	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */

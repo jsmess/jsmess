@@ -149,13 +149,13 @@ WRITE16_HANDLER( btoads_scroll1_w )
 
 WRITE16_HANDLER( btoads_paletteram_w )
 {
-	tlc34076_lsb_w(offset/2, data, mem_mask);
+	tlc34076_lsb_w(machine, offset/2, data, mem_mask);
 }
 
 
 READ16_HANDLER( btoads_paletteram_r )
 {
-	return tlc34076_lsb_r(offset/2, mem_mask);
+	return tlc34076_lsb_r(machine, offset/2, mem_mask);
 }
 
 
@@ -342,7 +342,7 @@ void btoads_from_shiftreg(UINT32 address, UINT16 *shiftreg)
  *
  *************************************/
 
-void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+void btoads_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 4;
 	UINT16 *bg0_base = &btoads_vram_bg0[(fulladdr + (yscroll0 << 10)) & 0x3fc00];

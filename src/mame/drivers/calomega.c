@@ -473,7 +473,7 @@
     TODO:
 
     - Parent/clone relationship.
-    - System 905 inputs.
+    - System 903/905 inputs.
     - System 905 sound through PIAs.
     - Fix lamps.
 
@@ -491,9 +491,6 @@
 /* from video */
 WRITE8_HANDLER( calomega_videoram_w );
 WRITE8_HANDLER( calomega_colorram_w );
-WRITE8_HANDLER( calomega_mc6845_address_w );
-READ8_HANDLER( calomega_mc6845_register_r );
-WRITE8_HANDLER( calomega_mc6845_register_w );
 PALETTE_INIT( calomega );
 VIDEO_START( calomega );
 VIDEO_UPDATE( calomega );
@@ -507,8 +504,8 @@ static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0840, 0x0840) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x0841, 0x0841) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0880, 0x0880) AM_WRITE(calomega_mc6845_address_w)
-	AM_RANGE(0x0881, 0x0881) AM_READWRITE(calomega_mc6845_register_r, calomega_mc6845_register_w)
+	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
@@ -520,8 +517,8 @@ static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0880, 0x0880) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x0881, 0x0881) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x1080, 0x1080) AM_WRITE(calomega_mc6845_address_w)
-	AM_RANGE(0x1081, 0x1081) AM_READWRITE(calomega_mc6845_register_r, calomega_mc6845_register_w)
+	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x10c4, 0x10c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x10c8, 0x10cb) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
@@ -1053,10 +1050,10 @@ static READ8_HANDLER( mux_port_r )
 {
 	switch( mux_data&0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_0_r(0);
-		case 0x20: return input_port_1_r(0);
-		case 0x40: return input_port_2_r(0);
-		case 0x80: return input_port_3_r(0);
+		case 0x10: return input_port_0_r(machine,0);
+		case 0x20: return input_port_1_r(machine,0);
+		case 0x40: return input_port_2_r(machine,0);
+		case 0x80: return input_port_3_r(machine,0);
 	}
 	return 0xff;
 }
@@ -1150,7 +1147,7 @@ static MACHINE_DRIVER_START( sys903 )
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK/16)	/* confirmed */
 	MDRV_CPU_PROGRAM_MAP(sys903_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -2118,6 +2115,6 @@ GAME( 198?, comg905d, 0,        sys905,   gdrawpkr, calomega, ROT0, "Cal Omega I
 GAME( 1982, elgrande, 0,        sys903,   elgrande, elgrande, ROT0, "Tuni Electro Service / E.T. Marketing", "El Grande - 5 Card Draw (New)",                 0 )
 GAME( 1983, jjpoker,  0,        sys903,   jjpoker,  jjpoker,  ROT0, "Enter-Tech (ETL)",                      "Jackpot Joker Poker (set 1)",                   0 )
 GAME( 1983, jjpokerb, jjpoker,  sys903,   jjpoker,  jjpoker,  ROT0, "Enter-Tech (ETL)",                      "Jackpot Joker Poker (set 2)",                   0 )
-GAME( 1988, ssipkr24, jjpoker,  sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v2.4)",                              0 )
-GAME( 1988, ssipkr30, jjpoker,  sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v3.0)",                              0 )
-GAME( 1990, ssipkr40, jjpoker,  sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v4.0)",                              0 )
+GAME( 1988, ssipkr24, 0,        sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v2.4)",                              0 )
+GAME( 1988, ssipkr30, ssipkr24, sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v3.0)",                              0 )
+GAME( 1990, ssipkr40, ssipkr24, sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v4.0)",                              0 )

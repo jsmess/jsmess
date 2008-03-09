@@ -487,7 +487,7 @@ static WRITE8_HANDLER( mpf1_portc_w )
 	data = ~kbdlatch;
 
 	// watchdog reset
-	watchdog_reset_w(0, ~data & 0x40);
+	watchdog_reset(machine);
 
 	// TONE led & speaker
 	led_tone = (~data & 0x80) >> 7;
@@ -541,7 +541,7 @@ static MACHINE_DRIVER_START( mpf1 )
 	MDRV_CPU_ADD(Z80, 3579500/2)	// 1.79 MHz
 	MDRV_CPU_PROGRAM_MAP(mpf1_map, 0)
 	MDRV_CPU_IO_MAP(mpf1_io_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET( mpf1 )
 

@@ -94,7 +94,7 @@ static WRITE32_HANDLER( fg_videoram_w )
 
 static WRITE32_HANDLER( spotty_soundlatch_w )
 {
-	soundlatch_w(0, (data >> 16) & 0xff);
+	soundlatch_w(machine, 0, (data >> 16) & 0xff);
 }
 
 /*****************************************************************************************************
@@ -189,7 +189,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 }
 
 // sprites aren't tile based (except for 8x8 ones)
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i;
 	int sprites_on_screen = (limenko_videoreg[0] & 0x1ff0000) >> 16;
@@ -479,7 +479,7 @@ static MACHINE_DRIVER_START( limenko )
 	MDRV_CPU_ADD(E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(limenko_map,0)
 	MDRV_CPU_IO_MAP(limenko_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
@@ -504,7 +504,7 @@ static MACHINE_DRIVER_START( spotty )
 	MDRV_CPU_ADD(GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(spotty_map,0)
 	MDRV_CPU_IO_MAP(spotty_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(I8051, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(spotty_sound_prg_map, 0)

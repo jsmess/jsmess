@@ -60,8 +60,8 @@ static READ16_HANDLER( nvram_r )
 
 static READ16_HANDLER( joystick_r )
 {
-    return (((input_port_0_r (offset) - 0xf) << 8) |
-            ((input_port_1_r (offset) - 0xf) & 0xff));
+    return (((input_port_0_r (machine,offset) - 0xf) << 8) |
+            ((input_port_1_r (machine,offset) - 0xf) & 0xff));
 }
 
 
@@ -150,7 +150,7 @@ static MACHINE_DRIVER_START( aztarac )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)

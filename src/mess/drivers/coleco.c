@@ -63,12 +63,12 @@
 
 READ8_HANDLER(coleco_video_r)
 {
-    return ((offset & 0x01) ? TMS9928A_register_r(1) : TMS9928A_vram_r(0));
+    return ((offset & 0x01) ? TMS9928A_register_r(machine, 1) : TMS9928A_vram_r(machine, 0));
 }
 
 WRITE8_HANDLER(coleco_video_w)
 {
-    (offset & 0x01) ? TMS9928A_register_w(1, data) : TMS9928A_vram_w(0, data);
+    (offset & 0x01) ? TMS9928A_register_w(machine, 1, data) : TMS9928A_vram_w(machine, 0, data);
 }
 
 static ADDRESS_MAP_START( coleco_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -237,7 +237,7 @@ static MACHINE_DRIVER_START( coleco )
 	MDRV_CPU_ADD(Z80, 7159090/2)	// 3.579545 MHz
 	MDRV_CPU_PROGRAM_MAP(coleco_map, 0)
 	MDRV_CPU_IO_MAP(coleco_io_map, 0)
-	MDRV_CPU_VBLANK_INT(coleco_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", coleco_interrupt)
 
 	MDRV_MACHINE_START(coleco)
 	MDRV_MACHINE_RESET(coleco)

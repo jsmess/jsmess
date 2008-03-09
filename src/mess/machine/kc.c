@@ -155,14 +155,14 @@ static void kc85_disc_hw_ctc_interrupt(int state)
 }
 #endif
 
- READ8_HANDLER(kc85_disk_hw_ctc_r)
+READ8_HANDLER(kc85_disk_hw_ctc_r)
 {
-	return z80ctc_1_r(offset);
+	return z80ctc_1_r(machine, offset);
 }
 
 WRITE8_HANDLER(kc85_disk_hw_ctc_w)
 {
-	z80ctc_1_w(offset,data);
+	z80ctc_1_w(machine, offset, data);
 }
 
 WRITE8_HANDLER(kc85_disc_interface_ram_w)
@@ -179,7 +179,7 @@ WRITE8_HANDLER(kc85_disc_interface_ram_w)
 	program_write_byte(addr|0x0f000,data);
 }
 
- READ8_HANDLER(kc85_disc_interface_ram_r)
+READ8_HANDLER(kc85_disc_interface_ram_r)
 {
 	int addr;
 
@@ -1242,8 +1242,8 @@ static void kc85_4_update_0x00000(void)
 /* update status of memory area 0x4000-0x07fff */
 static void kc85_4_update_0x04000(void)
 {
-	read8_handler rh;
-	write8_handler wh;
+	read8_machine_func rh;
+	write8_machine_func wh;
 
 	/* access ram? */
 	if (kc85_86_data & (1<<0))
@@ -1292,7 +1292,7 @@ static void kc85_4_update_0x04000(void)
 /* update memory address 0x0c000-0x0e000 */
 static void kc85_4_update_0x0c000(void)
 {
-	read8_handler rh;
+	read8_machine_func rh;
 
 	if (kc85_86_data & (1<<7))
 	{
@@ -1333,7 +1333,7 @@ static void kc85_4_update_0x0c000(void)
 /* update memory address 0x0e000-0x0ffff */
 static void kc85_4_update_0x0e000(void)
 {
-	read8_handler rh;
+	read8_machine_func rh;
 
 	if (kc85_pio_data[0] & (1<<0))
 	{
@@ -1447,7 +1447,7 @@ WRITE8_HANDLER ( kc85_4_84_w )
 /* update memory region 0x0c000-0x0e000 */
 static void kc85_3_update_0x0c000(void)
 {
-	read8_handler rh;
+	read8_machine_func rh;
 
 	if (kc85_pio_data[0] & (1<<7))
 	{
@@ -1469,7 +1469,7 @@ static void kc85_3_update_0x0c000(void)
 /* update memory address 0x0e000-0x0ffff */
 static void kc85_3_update_0x0e000(void)
 {
-	read8_handler rh;
+	read8_machine_func rh;
 
 	if (kc85_pio_data[0] & (1<<0))
 	{
@@ -1493,8 +1493,8 @@ static void kc85_3_update_0x0e000(void)
 for write operations */
 static void kc85_3_update_0x00000(void)
 {
-	read8_handler rh;
-	write8_handler wh;
+	read8_machine_func rh;
+	write8_machine_func wh;
 
 	/* access ram? */
 	if (kc85_pio_data[0] & (1<<1))
@@ -1542,8 +1542,8 @@ static void kc85_3_update_0x00000(void)
 /* MRA8_BANK3 is used for read, MWA8_BANK8 is used for write */
 static void kc85_3_update_0x08000(void)
 {
-	read8_handler rh;
-	write8_handler wh;
+	read8_machine_func rh;
+	write8_machine_func wh;
     unsigned char *ram_page;
 
     if (kc85_pio_data[0] & (1<<2))
@@ -1713,7 +1713,7 @@ WRITE8_HANDLER ( kc85_pio_control_w )
 {
 	unsigned char data;
 
-	data = z80ctc_0_r(offset);
+	data = z80ctc_0_r(machine, offset);
 	//LOG_KBD(("ctc data r:%02x\n",data));
 	return data;
 }
@@ -1722,7 +1722,7 @@ WRITE8_HANDLER ( kc85_ctc_w )
 {
 	//logerror("ctc data w:%02x\n",data);
 
-	z80ctc_0_w(offset,data);
+	z80ctc_0_w(machine, offset,data);
 }
 
 
@@ -1787,8 +1787,8 @@ static TIMER_CALLBACK(kc85_15khz_timer_callback)
 	kc85_15khz_state^=1;
 
 	/* set clock input for channel 2 and 3 to ctc */
-	z80ctc_0_trg0_w(0,kc85_15khz_state);
-	z80ctc_0_trg1_w(0,kc85_15khz_state);
+	z80ctc_0_trg0_w(machine, 0,kc85_15khz_state);
+	z80ctc_0_trg1_w(machine, 0,kc85_15khz_state);
 
 	kc85_15khz_count++;
 
@@ -1800,8 +1800,8 @@ static TIMER_CALLBACK(kc85_15khz_timer_callback)
 		kc85_50hz_state^=1;
 
 		/* set clock input for channel 2 and 3 to ctc */
-		z80ctc_0_trg2_w(0,kc85_50hz_state);
-		z80ctc_0_trg3_w(0,kc85_50hz_state);
+		z80ctc_0_trg2_w(machine, 0, kc85_50hz_state);
+		z80ctc_0_trg3_w(machine, 0, kc85_50hz_state);
 	}
 }
 

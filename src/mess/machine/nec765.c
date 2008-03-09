@@ -2097,16 +2097,16 @@ WRITE8_HANDLER(nec765_dack_w)
 	nec765_set_dma_drq(CLEAR_LINE);
 
 	/* write data */
-	nec765_data_w(offset, data);
+	nec765_data_w(machine, offset, data);
 }
 
- READ8_HANDLER(nec765_dack_r)
+READ8_HANDLER(nec765_dack_r)
 {
 	/* clear data request */
 	nec765_set_dma_drq(CLEAR_LINE);
 
 	/* read data */
-	return nec765_data_r(offset);
+	return nec765_data_r(machine, offset);
 }
 
 

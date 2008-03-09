@@ -75,7 +75,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( io_0x00_w )
 {
-	mrjong_flipscreen_w(0, ((data & 0x04) > 2));
+	mrjong_flipscreen_w(machine, 0, ((data & 0x04) > 2));
 }
 
 static READ8_HANDLER( io_0x03_r )
@@ -182,7 +182,7 @@ static MACHINE_DRIVER_START( mrjong )
 	MDRV_CPU_ADD(Z80,15468000/6)	/* 2.578 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

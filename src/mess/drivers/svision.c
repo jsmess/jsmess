@@ -166,10 +166,10 @@ static WRITE8_HANDLER(svision_w)
 			svision_soundport_w(svision_channel + 1, offset & 3, data);
 			break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
-			svision_sounddma_w(offset - 0x18, data);
+			svision_sounddma_w(machine, offset - 0x18, data);
 			break;
 		case 0x28: case 0x29: case 0x2a:
-			svision_noise_w(offset - 0x28, data);
+			svision_noise_w(machine, offset - 0x28, data);
 			break;
 		default:
 			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time()), offset, data);
@@ -185,11 +185,11 @@ static READ8_HANDLER(tvlink_r)
 			if (offset >= 0x800 && offset < 0x840)
 			{
 				/* strange effects when modifying palette */
-				return svision_r(offset);
+				return svision_r(machine, offset);
 			}
 			else
 			{
-				return svision_r(offset);
+				return svision_r(machine, offset);
 			}
 	}
 }
@@ -219,7 +219,7 @@ static WRITE8_HANDLER(tvlink_w)
 			}
 			break;
 		default:
-			svision_w(offset,data);
+			svision_w(machine, offset,data);
 			if (offset >= 0x800 && offset < 0x840)
 			{
 				UINT16 c;
@@ -480,7 +480,7 @@ static MACHINE_DRIVER_START( svision )
 	/* basic machine hardware */
 	 MDRV_CPU_ADD_TAG("main", M65C02, 4000000)        /* ? stz used! speed? */
 	MDRV_CPU_PROGRAM_MAP(svision_mem, 0)
-	MDRV_CPU_VBLANK_INT(svision_frame_int, 1)
+	MDRV_CPU_VBLANK_INT("main", svision_frame_int)
 
 	MDRV_MACHINE_RESET( svision )
 

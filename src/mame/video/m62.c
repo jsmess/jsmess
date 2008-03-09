@@ -340,7 +340,7 @@ WRITE8_HANDLER( m62_textram_w )
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int colormask, int prioritymask, int priority)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int colormask, int prioritymask, int priority)
 {
 	int offs;
 
@@ -399,7 +399,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-static void m62_start( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+static void m62_start( tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
 	m62_background = tilemap_create( tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2 );
 
@@ -418,7 +418,7 @@ static void m62_start( tile_get_info_callback tile_get_info, int rows, int cols,
 	}
 }
 
-static void m62_textlayer( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+static void m62_textlayer( tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
 	m62_foreground = tilemap_create( tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2 );
 
@@ -800,8 +800,8 @@ VIDEO_START( spelunkr )
 
 WRITE8_HANDLER( spelunk2_gfxport_w )
 {
-	m62_hscroll_high_w(0,(data&2)>>1);
-	m62_vscroll_high_w(0,(data&1));
+	m62_hscroll_high_w(machine,0,(data&2)>>1);
+	m62_vscroll_high_w(machine,0,(data&1));
 	if (spelunkr_palbank != ((data & 0x0c) >> 2))
 	{
 		spelunkr_palbank = (data & 0x0c) >> 2;

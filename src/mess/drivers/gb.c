@@ -556,7 +556,7 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_CPU_ADD_TAG("main", Z80GB, 4194304)			/* 4.194304 Mhz */
 	MDRV_CPU_PROGRAM_MAP(gb_map, 0)
 	MDRV_CPU_CONFIG(dmg_cpu_reset)
-	MDRV_CPU_VBLANK_INT(gb_scanline_interrupt, 1)	/* 1 dummy int each frame */
+	MDRV_CPU_VBLANK_INT("main", gb_scanline_interrupt)	/* 1 dummy int each frame */
 
 	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
@@ -673,7 +673,7 @@ static MACHINE_DRIVER_START( megaduck )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80GB, 4194304)			/* 4.194304 Mhz */
 	MDRV_CPU_PROGRAM_MAP( megaduck_map, 0 )
-	MDRV_CPU_VBLANK_INT(gb_scanline_interrupt, 1)	/* 1 int each scanline ! */
+	MDRV_CPU_VBLANK_INT("main", gb_scanline_interrupt)	/* 1 int each scanline ! */
 	MDRV_CPU_CONFIG(megaduck_cpu_reset)
 
 	MDRV_SCREEN_ADD("main", LCD)

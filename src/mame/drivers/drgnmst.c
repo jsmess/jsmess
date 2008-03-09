@@ -70,8 +70,8 @@ static READ8_HANDLER( drgnmst_snd_command_r )
 
 	switch (drgnmst_oki_control & 0x1f)
 	{
-		case 0x12:	data = (OKIM6295_status_1_r(0) & 0x0f); break;
-		case 0x16:	data = (OKIM6295_status_0_r(0) & 0x0f); break;
+		case 0x12:	data = (OKIM6295_status_1_r(machine, 0) & 0x0f); break;
+		case 0x16:	data = (OKIM6295_status_0_r(machine, 0) & 0x0f); break;
 		case 0x0b:
 		case 0x0f:	data = drgnmst_snd_command; break;
 		default:	break;
@@ -151,12 +151,12 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
 		case 0x11:
 //                  logerror("Writing %02x to OKI1",drgnmst_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n",drgnmst_oki_control,drgnmst_snd_command,drgnmst_oki0_bank,drgnmst_oki1_bank);
-					OKIM6295_data_1_w(0, drgnmst_oki_command);
+					OKIM6295_data_1_w(machine, 0, drgnmst_oki_command);
 					break;
 		case 0x15:
 //                  logerror("Writing %02x to OKI0",drgnmst_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n",drgnmst_oki_control,drgnmst_snd_command,drgnmst_oki0_bank,drgnmst_oki1_bank);
-					OKIM6295_data_0_w(0, drgnmst_oki_command);
+					OKIM6295_data_0_w(machine, 0, drgnmst_oki_command);
 					break;
 		default:	break;
 	}
@@ -360,7 +360,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( drgnmst )
 	MDRV_CPU_ADD(M68000, 12000000) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map, 0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(PIC16C55, 32000000/8)	/* Confirmed */
 	/* Program and Data Maps are internal to the MCU */

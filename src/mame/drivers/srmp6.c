@@ -535,7 +535,7 @@ static WRITE16_HANDLER(tileram_w)
 	if (offset >= 0xfff00/2 && offset <= 0xfff1a/2 )
 	{
 		offset &=0x1f;
-		srmp6_dma_w(offset,data,mem_mask);
+		srmp6_dma_w(machine,offset,data,mem_mask);
 	}
 }
 
@@ -544,7 +544,7 @@ static WRITE16_HANDLER(paletteram_w)
 	INT8 r, g, b;
 	int brg = brightness - 0x60;
 
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset, data, mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset, data, mem_mask);
 
 	if(brg)
 	{
@@ -709,7 +709,7 @@ static INTERRUPT_GEN(srmp6_interrupt)
 static MACHINE_DRIVER_START( srmp6 )
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(srmp6,0)
-	MDRV_CPU_VBLANK_INT(srmp6_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(srmp6_interrupt,2)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

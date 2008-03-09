@@ -239,18 +239,20 @@ static unsigned char amstrad_Psg_FunctionSelected;
 
 static void update_psg(void)
 {
+	running_machine *machine = Machine;
+
 	if(aleste_mode & 0x20)  // RTC selected
 	{
 		switch(aleste_rtc_function)
 		{
 		case 0x02:  // AS
-			mc146818_port_w(0,ppi_port_outputs[amstrad_ppi_PortA]);
+			mc146818_port_w(machine, 0,ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x04:  // DS write
-			mc146818_port_w(1,ppi_port_outputs[amstrad_ppi_PortA]);
+			mc146818_port_w(machine, 1,ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x05:  // DS read
-			ppi_port_inputs[amstrad_ppi_PortA] = mc146818_port_r(1);
+			ppi_port_inputs[amstrad_ppi_PortA] = mc146818_port_r(machine, 1);
 			break;
 		}
 		return;
@@ -262,17 +264,17 @@ static void update_psg(void)
 		} break;
   	case 1: 
 		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
-  			ppi_port_inputs[amstrad_ppi_PortA] = AY8910_read_port_0_r(0);
+  			ppi_port_inputs[amstrad_ppi_PortA] = AY8910_read_port_0_r(machine, 0);
   		} 
 		break;
   	case 2: 
 		{/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
-  			AY8910_write_port_0_w(0, ppi_port_outputs[amstrad_ppi_PortA]);
+  			AY8910_write_port_0_w(machine, 0, ppi_port_outputs[amstrad_ppi_PortA]);
   		} 
 		break;
   	case 3: 
 		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-  			AY8910_control_port_0_w(0, ppi_port_outputs[amstrad_ppi_PortA]);
+  			AY8910_control_port_0_w(machine, 0, ppi_port_outputs[amstrad_ppi_PortA]);
 			prev_reg = ppi_port_outputs[amstrad_ppi_PortA];
   		} 
 		break;
@@ -1319,10 +1321,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				int b8b0 = ((offset & (1<<8)) >> (8 - 1)) | (offset & (0x01));
 				switch (b8b0) {
   				case 0x02: {
-  						data = nec765_status_r(0);
+  						data = nec765_status_r(machine, 0);
   				} break;
   				case 0x03: {
-  						data = nec765_data_r(0);
+  						data = nec765_data_r(machine, 0);
   				} break;
   				default: {
   				} break;
@@ -1451,7 +1453,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			  break;
 
 		  case 0x03: /* Write Data register of FDC */
-					nec765_data_w(0,data);
+					nec765_data_w(machine, 0,data);
 				break;
 				default:
 				break;
@@ -1489,7 +1491,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			video_screen_configure(0,800,312,&rect,HZ_TO_ATTOSECONDS(AMSTRAD_FPS));
 		}
 	}
-	multiface_io_write(offset,data);
+	multiface_io_write(machine, offset,data);
 }
 
 // Handler for checking the ASIC unlocking sequence

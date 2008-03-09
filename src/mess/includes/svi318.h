@@ -46,8 +46,6 @@ WRITE8_HANDLER( svi318_fdc_density_side_w );
 DEVICE_LOAD( svi318_floppy );
 
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row );
-READ8_HANDLER( svi806_r );
-WRITE8_HANDLER( svi806_w );
 WRITE8_HANDLER( svi806_ram_enable_w );
 VIDEO_START( svi328_806 );
 VIDEO_UPDATE( svi328_806 );

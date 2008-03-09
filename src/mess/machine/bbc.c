@@ -574,18 +574,18 @@ long myo;
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
 		myo=offset-0x200;
-		if ((myo>=0x00) && (myo<=0x07)) return BBC_6845_r(myo-0x00);		/* Video Controller */
-		if ((myo>=0x08) && (myo<=0x0f)) return BBC_6850_r(myo-0x08);		/* Serial Controller */
+		if ((myo>=0x00) && (myo<=0x07)) return BBC_6845_r(machine, myo-0x00);		/* Video Controller */
+		if ((myo>=0x08) && (myo<=0x0f)) return BBC_6850_r(machine, myo-0x08);		/* Serial Controller */
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;						/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(myo-0x18);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(machine, myo-0x18);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;						/* VideoULA */
-		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(myo-0x24); /* 1770 */
-		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(myo-0x28);  /* disc control latch */
+		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(machine, myo-0x24); /* 1770 */
+		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(machine, myo-0x28);  /* disc control latch */
 		if ((myo>=0x30) && (myo<=0x33)) return 0xfe;						/* page select */
-		if ((myo>=0x34) && (myo<=0x37)) return bbcm_ACCCON_read(myo-0x34);	/* ACCCON */
+		if ((myo>=0x34) && (myo<=0x37)) return bbcm_ACCCON_read(machine, myo-0x34);	/* ACCCON */
 		if ((myo>=0x38) && (myo<=0x3f)) return 0xfe;						/* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) return via_0_r(myo-0x40);
-		if ((myo>=0x60) && (myo<=0x7f)) return via_1_r(myo-0x60);
+		if ((myo>=0x40) && (myo<=0x5f)) return via_0_r(machine, myo-0x40);
+		if ((myo>=0x60) && (myo<=0x7f)) return via_1_r(machine, myo-0x60);
 		if ((myo>=0x80) && (myo<=0x9f)) return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf)) return 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf)) return 0xfe;
@@ -602,18 +602,18 @@ long myo;
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
 		myo=offset-0x200;
-		if ((myo>=0x00) && (myo<=0x07)) BBC_6845_w(myo-0x00,data);			/* Video Controller */
-		if ((myo>=0x08) && (myo<=0x0f)) BBC_6850_w(myo-0x08,data);			/* Serial Controller */
-		if ((myo>=0x10) && (myo<=0x17)) BBC_SerialULA_w(myo-0x10,data);		/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(myo-0x18,data);			/* A to D converter */
-		if ((myo>=0x20) && (myo<=0x23)) videoULA_w(myo-0x20,data);			/* VideoULA */
-		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(myo-0x24,data); 	/* 1770 */
-		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(myo-0x28,data);  	/* disc control latch */
-		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(myo-0x30,data);		/* page select */
-		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(myo-0x34,data);	/* ACCCON */
+		if ((myo>=0x00) && (myo<=0x07)) BBC_6845_w(machine, myo-0x00,data);			/* Video Controller */
+		if ((myo>=0x08) && (myo<=0x0f)) BBC_6850_w(machine, myo-0x08,data);			/* Serial Controller */
+		if ((myo>=0x10) && (myo<=0x17)) BBC_SerialULA_w(machine, myo-0x10,data);		/* Serial System Chip */
+		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(machine, myo-0x18,data);			/* A to D converter */
+		if ((myo>=0x20) && (myo<=0x23)) videoULA_w(machine, myo-0x20,data);			/* VideoULA */
+		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(machine, myo-0x24,data); 	/* 1770 */
+		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(machine, myo-0x28,data);  	/* disc control latch */
+		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(machine, myo-0x30,data);		/* page select */
+		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(machine, myo-0x34,data);	/* ACCCON */
 		//if ((myo>=0x38) && (myo<=0x3f)) 									/* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) via_0_w(myo-0x40,data);
-		if ((myo>=0x60) && (myo<=0x7f)) via_1_w(myo-0x60,data);
+		if ((myo>=0x40) && (myo<=0x5f)) via_0_w(machine, myo-0x40,data);
+		if ((myo>=0x60) && (myo<=0x7f)) via_1_w(machine, myo-0x60,data);
 		//if ((myo>=0x80) && (myo<=0x9f))
 		//if ((myo>=0xa0) && (myo<=0xbf))
 		//if ((myo>=0xc0) && (myo<=0xdf))
@@ -767,13 +767,13 @@ INTERRUPT_GEN( bbcb_keyscan )
 
 			if ((readinputport(column)|0x01)!=0xff)
 			{
-				via_0_ca2_w(0,1);
+				via_0_ca2_w(machine, 0,1);
 			} else {
-				via_0_ca2_w(0,0);
+				via_0_ca2_w(machine, 0,0);
 			}
 
 		} else {
-			via_0_ca2_w(0,0);
+			via_0_ca2_w(machine, 0,0);
 		}
 	}
 }
@@ -799,20 +799,20 @@ INTERRUPT_GEN( bbcm_keyscan )
 
 			if ((readinputport(column)|0x01)!=0xff)
 			{
-				via_0_ca2_w(0,1);
+				via_0_ca2_w(machine, 0,1);
 			} else {
-				via_0_ca2_w(0,0);
+				via_0_ca2_w(machine, 0,0);
 			}
 
 		} else {
-			via_0_ca2_w(0,0);
+			via_0_ca2_w(machine, 0,0);
 		}
 	}
 }
 
 
 
-static int bbc_keyboard(int data)
+static int bbc_keyboard(running_machine *machine, int data)
 {
 	int bit;
 	int row;
@@ -834,9 +834,9 @@ static int bbc_keyboard(int data)
 
 	if ((res|1)!=0xff)
 	{
-		via_0_ca2_w(0,1);
+		via_0_ca2_w(machine, 0,1);
 	} else {
-		via_0_ca2_w(0,0);
+		via_0_ca2_w(machine, 0,0);
 	}
 
 	return (data & 0x7f) | (bit<<7);
@@ -858,7 +858,7 @@ static void bbcb_IC32_initialise(void)
 
 
 /* This the BBC Masters Real Time Clock and NVRam IC */
-static void MC146818_set(void)
+static void MC146818_set(running_machine *machine)
 {
 	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",MC146818_WR,MC146818_DS,MC146818_AS,MC146818_CE);
 
@@ -870,10 +870,10 @@ static void MC146818_set(void)
 		{
 			if (MC146818_WR)
 			{
-				via_system_porta=mc146818_port_r(1);
+				via_system_porta=mc146818_port_r(machine, 1);
 				//logerror("read 146818 data %d \n",via_system_porta);
 			} else {
-				mc146818_port_w(1,via_system_porta);
+				mc146818_port_w(machine, 1,via_system_porta);
 				//logerror("write 146818 data %d \n",via_system_porta);
 			}
 		}
@@ -881,7 +881,7 @@ static void MC146818_set(void)
 		// if address select is set then set the address in the 146818
 		if (MC146818_AS)
 		{
-			mc146818_port_w(0,via_system_porta);
+			mc146818_port_w(machine, 0,via_system_porta);
 			//logerror("write 146818 address %d \n",via_system_porta);
 		}
 	}
@@ -897,14 +897,14 @@ static WRITE8_HANDLER( bbcb_via_system_write_porta )
 	if (b0_sound==0)
 	{
  		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		SN76496_0_w(0,via_system_porta);
+		SN76496_0_w(machine, 0,via_system_porta);
 	}
 	if (b3_keyboard==0)
 	{
  		//logerror("Doing an unsafe write to the keyboard %d \n",data);
-		via_system_porta=bbc_keyboard(via_system_porta);
+		via_system_porta=bbc_keyboard(machine, via_system_porta);
 	}
-	if (bbc_Master) MC146818_set();
+	if (bbc_Master) MC146818_set(machine);
 }
 
 
@@ -931,7 +931,7 @@ static WRITE8_HANDLER( bbcb_via_system_write_portb )
 				{
 					/* BBC MASTER has NV RAM Here */
 					MC146818_WR=1;
-					MC146818_set();
+					MC146818_set(machine);
 				}
 			} else {
 				if (b1_speech_read==0) {
@@ -947,7 +947,7 @@ static WRITE8_HANDLER( bbcb_via_system_write_portb )
 				{
 					/* BBC MASTER has NV RAM Here */
 					MC146818_DS=1;
-					MC146818_set();
+					MC146818_set(machine);
 				}
 			} else {
 				if (b2_speech_write==0) {
@@ -992,7 +992,7 @@ static WRITE8_HANDLER( bbcb_via_system_write_portb )
 		case 0:
 			if (b0_sound==1) {
 				b0_sound=0;
-				SN76496_0_w(0,via_system_porta);
+				SN76496_0_w(machine, 0,via_system_porta);
 			}
 			break;
 		case 1:
@@ -1002,7 +1002,7 @@ static WRITE8_HANDLER( bbcb_via_system_write_portb )
 				{
 					/* BBC MASTER has NV RAM Here */
 					MC146818_WR=0;
-					MC146818_set();
+					MC146818_set(machine);
 				}
 			} else {
 				if (b1_speech_read==1) {
@@ -1018,7 +1018,7 @@ static WRITE8_HANDLER( bbcb_via_system_write_portb )
 				{
 					/* BBC MASTER has NV RAM Here */
 					MC146818_DS=0;
-					MC146818_set();
+					MC146818_set(machine);
 				}
 			} else {
 				if (b2_speech_write==1) {
@@ -1031,7 +1031,7 @@ static WRITE8_HANDLER( bbcb_via_system_write_portb )
 			if (b3_keyboard==1) {
 				b3_keyboard=0;
 				/* *** call keyboard enabled *** */
-				via_system_porta=bbc_keyboard(via_system_porta);
+				via_system_porta=bbc_keyboard(machine, via_system_porta);
 			}
 			break;
 		case 4:
@@ -1069,14 +1069,14 @@ static WRITE8_HANDLER( bbcb_via_system_write_portb )
 		if (MC146818_AS != ((data>>7)&1))
 		{
 			MC146818_AS=(data>>7)&1;
-			MC146818_set();
+			MC146818_set(machine);
 		}
 
 		//if CE changes
 		if (MC146818_CE != ((data>>6)&1))
 		{
 			MC146818_CE=(data>>6)&1;
-			MC146818_set();
+			MC146818_set(machine);
 		}
 	}
 }
@@ -1129,7 +1129,7 @@ static  READ8_HANDLER( bbcb_via_system_read_ca1 )
 /* joystick EOC */
 static  READ8_HANDLER( bbcb_via_system_read_cb1 )
 {
-  return uPD7002_EOC_r(0);
+  return uPD7002_EOC_r(machine, 0);
 }
 
 
@@ -1250,7 +1250,7 @@ static WRITE8_HANDLER( bbcb_via_user_write_ca2 )
 	/* this is a very bad way of returning an acknowledge
 	by just linking the strobe output into the acknowledge input */
 	bbc_printer_ca1=data;
-	via_1_ca1_w(0,data);
+	via_1_ca1_w(machine, 0,data);
 }
 
 static void bbc_via_user_irq(int level)
@@ -1305,7 +1305,7 @@ static int BBC_get_analogue_input(int channel_number)
 
 static void BBC_uPD7002_EOC(int data)
 {
-	via_0_cb1_w(0,data);
+	via_0_cb1_w(Machine, 0,data);
 }
 
 static const struct uPD7002_interface BBC_uPD7002 =
@@ -1541,11 +1541,11 @@ int ret;
 		case 2:
 		case 3:
 			/* 8271 registers */
-			ret=i8271_r(offset);
+			ret=i8271_r(machine, offset);
 			logerror("  %d\n",ret);
 			return ret;
 		case 4:
-			ret=i8271_data_r(offset);
+			ret=i8271_data_r(machine, offset);
 			logerror("  %d\n",ret);
 			return ret;
 		default:
@@ -1566,10 +1566,10 @@ static WRITE8_HANDLER( bbc_i8271_write )
 		case 2:
 		case 3:
 			/* 8271 registers */
-			i8271_w(offset, data);
+			i8271_w(machine, offset, data);
 			return;
 		case 4:
-			i8271_data_w(offset, data);
+			i8271_data_w(machine, offset, data);
 			return;
 		default:
 			break;
@@ -1722,16 +1722,16 @@ READ8_HANDLER ( bbc_wd1770_read )
 	switch (offset)
 	{
 	case 4:
-		retval=wd17xx_status_r(0);
+		retval=wd17xx_status_r(machine, 0);
 		break;
 	case 5:
-		retval=wd17xx_track_r(0);
+		retval=wd17xx_track_r(machine, 0);
 		break;
 	case 6:
-		retval=wd17xx_sector_r(0);
+		retval=wd17xx_sector_r(machine, 0);
 		break;
 	case 7:
-		retval=wd17xx_data_r(0);
+		retval=wd17xx_data_r(machine, 0);
 		break;
 	default:
 		break;
@@ -1747,19 +1747,19 @@ WRITE8_HANDLER ( bbc_wd1770_write )
 	switch (offset)
 	{
 	case 0:
-		bbc_wd177x_status_w(0, data);
+		bbc_wd177x_status_w(machine, 0, data);
 		break;
 	case 4:
-		wd17xx_command_w(0, data);
+		wd17xx_command_w(machine, 0, data);
 		break;
 	case 5:
-		wd17xx_track_w(0, data);
+		wd17xx_track_w(machine, 0, data);
 		break;
 	case 6:
-		wd17xx_sector_w(0, data);
+		wd17xx_sector_w(machine, 0, data);
 		break;
 	case 7:
-		wd17xx_data_w(0, data);
+		wd17xx_data_w(machine, 0, data);
 		break;
 	default:
 		break;
@@ -1842,16 +1842,16 @@ READ8_HANDLER( bbc_opus_read )
 			switch (offset)
 			{
 				case 0xf8:
-					return wd17xx_status_r(0);
+					return wd17xx_status_r(machine, 0);
 					break;
 				case 0xf9:
-					return wd17xx_track_r(0);
+					return wd17xx_track_r(machine, 0);
 					break;
 				case 0xfa:
-					return wd17xx_sector_r(0);
+					return wd17xx_sector_r(machine, 0);
 					break;
 				case 0xfb:
-					return wd17xx_data_r(0);
+					return wd17xx_data_r(machine, 0);
 					break;
 			}
 
@@ -1873,19 +1873,19 @@ WRITE8_HANDLER (bbc_opus_write)
 			switch (offset)
 			{
 				case 0xf8:
-					wd17xx_command_w(0, data);
+					wd17xx_command_w(machine, 0, data);
 					break;
 				case 0xf9:
-					wd17xx_track_w(0, data);
+					wd17xx_track_w(machine, 0, data);
 					break;
 				case 0xfa:
-					wd17xx_sector_w(0, data);
+					wd17xx_sector_w(machine, 0, data);
 					break;
 				case 0xfb:
-					wd17xx_data_w(0, data);
+					wd17xx_data_w(machine, 0, data);
 					break;
 				case 0xfc:
-					bbc_opus_status_w(0,data);
+					bbc_opus_status_w(machine, 0,data);
 					break;
 				case 0xfe:
 					opusbank=(opusbank & 0xff) | (data<<8);
@@ -1912,16 +1912,16 @@ READ8_HANDLER ( bbcm_wd1770_read )
 	switch (offset)
 	{
 	case 0:
-		retval=wd17xx_status_r(0);
+		retval=wd17xx_status_r(machine, 0);
 		break;
 	case 1:
-		retval=wd17xx_track_r(0);
+		retval=wd17xx_track_r(machine, 0);
 		break;
 	case 2:
-		retval=wd17xx_sector_r(0);
+		retval=wd17xx_sector_r(machine, 0);
 		break;
 	case 3:
-		retval=wd17xx_data_r(0);
+		retval=wd17xx_data_r(machine, 0);
 		break;
 	default:
 		break;
@@ -1936,16 +1936,16 @@ WRITE8_HANDLER ( bbcm_wd1770_write )
 	switch (offset)
 	{
 	case 0:
-		wd17xx_command_w(0, data);
+		wd17xx_command_w(machine, 0, data);
 		break;
 	case 1:
-		wd17xx_track_w(0, data);
+		wd17xx_track_w(machine, 0, data);
 		break;
 	case 2:
-		wd17xx_sector_w(0, data);
+		wd17xx_sector_w(machine, 0, data);
 		break;
 	case 3:
-		wd17xx_data_w(0, data);
+		wd17xx_data_w(machine, 0, data);
 		break;
 	default:
 		break;
@@ -1996,15 +1996,15 @@ READ8_HANDLER( bbc_disc_r )
 	switch (bbc_DFSType){
 	/* case 0 to 3 are all standard 8271 interfaces */
 	case 0: case 1: case 2: case 3:
-		return bbc_i8271_read(offset);
+		return bbc_i8271_read(machine, offset);
 		break;
 	/* case 4 is the acown 1770 interface */
 	case 4:
-		return bbc_wd1770_read(offset);
+		return bbc_wd1770_read(machine, offset);
 		break;
 	/* case 5 is the watford 1770 interface */
 	case 5:
-		return bbc_wd1770_read(offset);
+		return bbc_wd1770_read(machine, offset);
 		break;
 	/* case 6 is the Opus challenger interface */
 	case 6:
@@ -2022,15 +2022,15 @@ WRITE8_HANDLER ( bbc_disc_w )
 	switch (bbc_DFSType){
 	/* case 0 to 3 are all standard 8271 interfaces */
 	case 0: case 1: case 2: case 3:
-		bbc_i8271_write(offset,data);
+		bbc_i8271_write(machine, offset,data);
 		break;
 	/* case 4 is the acown 1770 interface */
 	case 4:
-		bbc_wd1770_write(offset,data);
+		bbc_wd1770_write(machine, offset,data);
 		break;
 	/* case 5 is the watford 1770 interface */
 	case 5:
-		bbc_wd1770_write(offset,data);
+		bbc_wd1770_write(machine, offset,data);
 		break;
 	/* case 6 is the Opus challenger interface */
 	case 6:

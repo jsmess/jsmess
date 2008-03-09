@@ -11,15 +11,15 @@ Taxi Driver  (c) 1984 Graphic Techno
 
 
 
-static WRITE8_HANDLER( p2a_w ) { taxidrvr_spritectrl_w(0,data); }
-static WRITE8_HANDLER( p2b_w ) { taxidrvr_spritectrl_w(1,data); }
-static WRITE8_HANDLER( p2c_w ) { taxidrvr_spritectrl_w(2,data); }
-static WRITE8_HANDLER( p3a_w ) { taxidrvr_spritectrl_w(3,data); }
-static WRITE8_HANDLER( p3b_w ) { taxidrvr_spritectrl_w(4,data); }
-static WRITE8_HANDLER( p3c_w ) { taxidrvr_spritectrl_w(5,data); }
-static WRITE8_HANDLER( p4a_w ) { taxidrvr_spritectrl_w(6,data); }
-static WRITE8_HANDLER( p4b_w ) { taxidrvr_spritectrl_w(7,data); }
-static WRITE8_HANDLER( p4c_w ) { taxidrvr_spritectrl_w(8,data); }
+static WRITE8_HANDLER( p2a_w ) { taxidrvr_spritectrl_w(machine,0,data); }
+static WRITE8_HANDLER( p2b_w ) { taxidrvr_spritectrl_w(machine,1,data); }
+static WRITE8_HANDLER( p2c_w ) { taxidrvr_spritectrl_w(machine,2,data); }
+static WRITE8_HANDLER( p3a_w ) { taxidrvr_spritectrl_w(machine,3,data); }
+static WRITE8_HANDLER( p3b_w ) { taxidrvr_spritectrl_w(machine,4,data); }
+static WRITE8_HANDLER( p3c_w ) { taxidrvr_spritectrl_w(machine,5,data); }
+static WRITE8_HANDLER( p4a_w ) { taxidrvr_spritectrl_w(machine,6,data); }
+static WRITE8_HANDLER( p4b_w ) { taxidrvr_spritectrl_w(machine,7,data); }
+static WRITE8_HANDLER( p4c_w ) { taxidrvr_spritectrl_w(machine,8,data); }
 
 
 
@@ -362,16 +362,16 @@ static MACHINE_DRIVER_START( taxidrvr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem1,writemem1)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* ??? */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem3,writemem3)
 	MDRV_CPU_IO_MAP(readport3,writeport3)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* ??? */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */

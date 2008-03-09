@@ -217,7 +217,7 @@ static MACHINE_DRIVER_START( gmaster )
 MDRV_CPU_PROGRAM_MAP(gmaster_mem, 0)
 MDRV_CPU_IO_MAP( gmaster_io, 0 )
 MDRV_CPU_CONFIG( config )
-MDRV_CPU_VBLANK_INT(gmaster_interrupt,1)
+MDRV_CPU_VBLANK_INT("main", gmaster_interrupt)
 
      MDRV_SCREEN_ADD("main", LCD)
      MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

@@ -74,7 +74,7 @@ static void v9938_cpu_to_vdp (UINT8 V);
 static UINT8 v9938_command_unit_w (UINT8 Op);
 static UINT8 v9938_vdp_to_cpu (void);
 static void v9938_set_mode (void);
-static void v9938_refresh_line (mame_bitmap *bmp, int line);
+static void v9938_refresh_line (bitmap_t *bmp, int line);
 
 /***************************************************************************
 
@@ -386,7 +386,7 @@ WRITE8_HANDLER (v9938_command_w)
 			{
 			vdp.address_latch =
 				(((UINT16)data << 8) | vdp.cmd_write) & 0x3fff;
-			if ( !(data & 0x40) ) v9938_vram_r (0); /* read ahead! */
+			if ( !(data & 0x40) ) v9938_vram_r (machine,0); /* read ahead! */
 			}
 
 		vdp.cmd_write_first = 0;
@@ -1052,7 +1052,7 @@ static void v9938_set_mode (void)
 	vdp.mode = i;
 	}
 
-static void v9938_refresh_16 (mame_bitmap *bmp, int line)
+static void v9938_refresh_16 (bitmap_t *bmp, int line)
 	{
 	int i, double_lines;
 	UINT8 col[256];
@@ -1111,7 +1111,7 @@ static void v9938_refresh_16 (mame_bitmap *bmp, int line)
 		memcpy (ln2, ln, (512 + 32) * 2);
 	}
 
-static void v9938_refresh_line (mame_bitmap *bmp, int line)
+static void v9938_refresh_line (bitmap_t *bmp, int line)
 	{
 	int ind16, ind256;
 

@@ -29,7 +29,7 @@ READ16_HANDLER( pc1512_16le_r );
 WRITE16_HANDLER( pc1512_16le_w );
 WRITE16_HANDLER( pc1512_videoram16le_w );
 
-#define CGA_FONT		(input_port_20_r(0)&3)
+#define CGA_FONT		(readinputport(20)&3)
 
 //internal use
 void pc_cga_cursor(struct mscrtc6845_cursor *cursor);

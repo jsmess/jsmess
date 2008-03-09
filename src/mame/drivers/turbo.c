@@ -639,7 +639,7 @@ static READ8_HANDLER( buckrog_port_3_r )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-    ppi8255_0_w(param >> 8, param & 0xff);
+    ppi8255_0_w(machine, param >> 8, param & 0xff);
 }
 
 
@@ -1001,7 +1001,7 @@ static MACHINE_DRIVER_START( turbo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(turbo_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1027,7 +1027,7 @@ static MACHINE_DRIVER_START( subroc3d )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(subroc3d_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_GFXDECODE(turbo)
@@ -1052,7 +1052,7 @@ static MACHINE_DRIVER_START( buckrog )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(buckrog_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(buckrog_cpu2_map,0)

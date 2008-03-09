@@ -9,10 +9,6 @@
 
 #include "video/mc6845.h"
 
-READ8_HANDLER( pet_mc6845_register_r );
-WRITE8_HANDLER( pet_mc6845_register_w );
-WRITE8_HANDLER( pet_mc6845_address_w );
-
 /*----------- defined in video/pet.c -----------*/
 
 /* call to init videodriver */
@@ -29,10 +25,10 @@ extern int pet_font;
 
 /*----------- defined in machine/pet.c -----------*/
 
-#define CBM8096_MEMORY (input_port_11_r(0)&8)
-#define M6809_SELECT (input_port_11_r(0)&4)
-#define IEEE8ON (input_port_11_r(0)&2)
-#define IEEE9ON (input_port_11_r(0)&1)
+#define CBM8096_MEMORY (readinputport(11)&8)
+#define M6809_SELECT (readinputport(11)&4)
+#define IEEE8ON (readinputport(11)&2)
+#define IEEE9ON (readinputport(11)&1)
 
 extern UINT8 *pet_memory;
 extern UINT8 *pet_videoram;

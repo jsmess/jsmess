@@ -40,7 +40,7 @@ static VIDEO_START( dominob )
 
 static UINT8 *bgram;
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( dominob_d008_w )
 
 static READ8_HANDLER( dominob_input_2_r )
 {
-	return input_port_2_r(offset);
+	return input_port_2_r(machine, offset);
 }
 
 
@@ -254,7 +254,7 @@ static MACHINE_DRIVER_START( dominob )
 	MDRV_CPU_ADD(Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -112,10 +112,10 @@ static READ8_HANDLER( quasar_IO_r )
 {
 	UINT8 ans = 0;
 
-	if (IOpage == 0) ans = input_port_0_r(0);
-	if (IOpage == 1) ans = input_port_1_r(0);
-	if (IOpage == 2) ans = input_port_2_r(0);
-	if (IOpage == 3) ans = input_port_3_r(0);
+	if (IOpage == 0) ans = input_port_0_r(machine, 0);
+	if (IOpage == 1) ans = input_port_1_r(machine, 0);
+	if (IOpage == 2) ans = input_port_2_r(machine, 0);
+	if (IOpage == 3) ans = input_port_3_r(machine, 0);
 
 	return ans;
 }
@@ -150,7 +150,7 @@ static READ8_HANDLER( quasar_sh_command_r )
 	// return input_port_5_r(0);
 
 	// Add in sound DIP switch
-	return (Quasar_Command) + (input_port_5_r(0) & 0x30);
+	return (Quasar_Command) + (input_port_5_r(machine, 0) & 0x30);
 }
 
 static READ8_HANDLER( Quasar_T1_r )
@@ -160,7 +160,7 @@ static READ8_HANDLER( Quasar_T1_r )
 
 static WRITE8_HANDLER( Quasar_DAC_w )
 {
-	DAC_0_signed_data_w(0,data);
+	DAC_0_signed_data_w(machine,0,data);
 }
 
 // memory map taken from the manual
@@ -345,7 +345,7 @@ static MACHINE_DRIVER_START( quasar )
 	MDRV_CPU_ADD_TAG("main", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */
 	MDRV_CPU_PROGRAM_MAP(quasar,0)
 	MDRV_CPU_IO_MAP(quasar_io,0)
-	MDRV_CPU_VBLANK_INT(quasar_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", quasar_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
 	/* audio CPU */

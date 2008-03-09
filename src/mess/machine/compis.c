@@ -204,12 +204,12 @@ static void compis_osp_pic_irq(UINT8 irq)
 
 READ16_HANDLER ( compis_osp_pic_r )
 {
-	return pic8259_0_r (offset);
+	return pic8259_0_r(machine, offset);
 }
 
 WRITE16_HANDLER ( compis_osp_pic_w )
 {
-	pic8259_0_w (offset, data);
+	pic8259_0_w(machine, offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -328,7 +328,7 @@ READ16_HANDLER (compis_fdc_dack_r)
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
   	if (readinputport(7))
   	{
-		data = nec765_dack_r(0);
+		data = nec765_dack_r(machine, 0);
 	}
 
 	return data;
@@ -339,7 +339,7 @@ WRITE16_HANDLER (compis_fdc_w)
 	switch(offset)
 	{
 		case 2:
-			nec765_data_w(0, data);
+			nec765_data_w(machine, 0, data);
 			break;
 		default:
 			logerror("FDC Unknown Port Write %04X = %04X\n", offset, data);
@@ -354,10 +354,10 @@ READ16_HANDLER (compis_fdc_r)
 	switch(offset)
 	{
 		case 0:
-			data = nec765_status_r(0);
+			data = nec765_status_r(machine, 0);
 			break;
 		case 1:
-			data = nec765_data_r(0);
+			data = nec765_data_r(machine, 0);
 			break;
 		default:
 			logerror("FDC Unknown Port Read %04X\n", offset);
@@ -448,12 +448,12 @@ static const ppi8255_interface compis_ppi_interface =
 
 READ16_HANDLER ( compis_ppi_r )
 {
-	return ppi8255_0_r (offset);
+	return ppi8255_0_r(machine, offset);
 }
 
 WRITE16_HANDLER ( compis_ppi_w )
 {
-	ppi8255_0_w (offset, data);
+	ppi8255_0_w(machine, offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -488,12 +488,12 @@ static const struct pit8253_config compis_pit_config[2] =
 
 READ16_HANDLER ( compis_pit_r )
 {
-	return pit8253_0_r (offset);
+	return pit8253_0_r(machine, offset);
 }
 
 WRITE16_HANDLER ( compis_pit_w )
 {
-	pit8253_0_w (offset , data);
+	pit8253_0_w(machine, offset , data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -502,12 +502,12 @@ WRITE16_HANDLER ( compis_pit_w )
 
 READ16_HANDLER ( compis_osp_pit_r )
 {
-	return pit8253_1_r (offset);
+	return pit8253_1_r(machine, offset);
 }
 
 WRITE16_HANDLER ( compis_osp_pit_w )
 {
-	pit8253_1_w (offset, data);
+	pit8253_1_w(machine, offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -544,7 +544,7 @@ static const struct msm8251_interface compis_usart_interface=
 
 READ16_HANDLER ( compis_usart_r )
 {
-	return msm8251_data_r ( offset);
+	return msm8251_data_r(machine, offset);
 }
 
 WRITE16_HANDLER ( compis_usart_w )
@@ -552,10 +552,10 @@ WRITE16_HANDLER ( compis_usart_w )
 	switch (offset)
 	{
 		case 0x00:
-			msm8251_data_w (0,data);
+			msm8251_data_w(machine, 0, data);
 			break;
 		case 0x01:
-			msm8251_control_w (0,data);
+			msm8251_control_w(machine, 0, data);
 			break;
 		default:
 			logerror("USART Unknown Port Write %04X = %04X\n", offset, data);

@@ -31,7 +31,7 @@ static tilemap *tilemap_fg;
 static tilemap *tilemap_edge1[4];
 static tilemap *tilemap_edge2[4];
 
-static mame_bitmap *headlight_bitmap;
+static bitmap_t *headlight_bitmap;
 
 
 static PALETTE_INIT( madalien )
@@ -81,22 +81,6 @@ static PALETTE_INIT( madalien )
 
 	for (i = 0x20; i < 0x30; i++)
 		colortable_entry_set_value(machine->colortable, i, (i - 0x20) | 0x10);
-}
-
-
-WRITE8_HANDLER( madalien_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-READ8_HANDLER( madalien_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-WRITE8_HANDLER( madalien_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
 }
 
 
@@ -150,7 +134,7 @@ static VIDEO_START( madalien )
 {
 	int i;
 
-	static const tilemap_mapper_callback scan_functions[4] =
+	static const tilemap_mapper_func scan_functions[4] =
 	{
 		scan_mode0, scan_mode1, scan_mode2, scan_mode3
 	};
@@ -185,7 +169,7 @@ static VIDEO_START( madalien )
 }
 
 
-static void draw_edges(mame_bitmap *bitmap, const rectangle *cliprect, int flip, int scroll_mode)
+static void draw_edges(bitmap_t *bitmap, const rectangle *cliprect, int flip, int scroll_mode)
 {
 	rectangle clip_edge1;
 	rectangle clip_edge2;
@@ -223,7 +207,7 @@ static void draw_edges(mame_bitmap *bitmap, const rectangle *cliprect, int flip,
 }
 
 
-static void draw_headlight(mame_bitmap *bitmap, const rectangle *cliprect, int flip)
+static void draw_headlight(bitmap_t *bitmap, const rectangle *cliprect, int flip)
 {
 	if (BIT(*madalien_video_flags, 0))
 	{
@@ -258,7 +242,7 @@ static void draw_headlight(mame_bitmap *bitmap, const rectangle *cliprect, int f
 }
 
 
-static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int flip)
+static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int flip)
 {
 	int i;
 
@@ -404,7 +388,9 @@ static const mc6845_interface mc6845_intf =
 	NULL,             /* before pixel update callback */
 	NULL,             /* row update callback */
 	NULL,             /* after pixel update callback */
-	NULL              /* call back for display state changes */
+	NULL,             /* callback for display state changes */
+	NULL,			  /* HSYNC callback */
+	NULL			  /* VSYNC callback */
 };
 
 

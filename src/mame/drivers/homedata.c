@@ -298,7 +298,7 @@ static int sndbank;
 static READ8_HANDLER( mrokumei_sound_io_r )
 {
 	if (sndbank & 4)
-		return(soundlatch_r(0));
+		return(soundlatch_r(machine,0));
 	else
 		return memory_region(REGION_CPU2)[0x10000 + offset + (sndbank & 1) * 0x10000];
 }
@@ -326,8 +326,8 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 
 static WRITE8_HANDLER( mrokumei_sound_cmd_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 
@@ -373,17 +373,17 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* write clock 1->0 */
 	{
 		if (BIT(data,3))
-			YM2203_write_port_0_w(0,upd7807_porta);
+			YM2203_write_port_0_w(machine,0,upd7807_porta);
 		else
-			YM2203_control_port_0_w(0,upd7807_porta);
+			YM2203_control_port_0_w(machine,0,upd7807_porta);
 	}
 
 	if (BIT(upd7807_portc,4) && !BIT(data,4))	/* read clock 1->0 */
 	{
 		if (BIT(data,3))
-			upd7807_porta = YM2203_read_port_0_r(0);
+			upd7807_porta = YM2203_read_port_0_r(machine,0);
 		else
-			upd7807_porta = YM2203_status_port_0_r(0);
+			upd7807_porta = YM2203_status_port_0_r(machine,0);
 	}
 
 	upd7807_portc = data;
@@ -393,7 +393,7 @@ static MACHINE_RESET( reikaids_upd7807 )
 {
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_which=homedata_priority;
-	reikaids_upd7807_portc_w(0,0xff);
+	reikaids_upd7807_portc_w(machine,0,0xff);
 }
 
 static READ8_HANDLER( reikaids_io_r )
@@ -529,7 +529,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 	coin_counter_w(0,~data & 0x80);
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* clock 1->0 */
-		SN76496_0_w(0,upd7807_porta);
+		SN76496_0_w(machine,0,upd7807_porta);
 
 	upd7807_portc = data;
 }
@@ -537,7 +537,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 static MACHINE_RESET( pteacher_upd7807 )
 {
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	pteacher_upd7807_portc_w(0,0xff);
+	pteacher_upd7807_portc_w(machine,0,0xff);
 }
 
 
@@ -1262,7 +1262,7 @@ static MACHINE_DRIVER_START( mrokumei )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mrokumei_readmem,mrokumei_writemem)
-	MDRV_CPU_VBLANK_INT(homedata_irq,1)	/* also triggered by the blitter */
+	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4MHz ? */
 	/* audio CPU */
@@ -1319,13 +1319,13 @@ static MACHINE_DRIVER_START( reikaids )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(reikaids_readmem,reikaids_writemem)
-	MDRV_CPU_VBLANK_INT(homedata_irq,1)	/* also triggered by the blitter */
+	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD(UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_readmem,reikaids_upd7807_writemem)
 	MDRV_CPU_IO_MAP(reikaids_upd7807_readport,reikaids_upd7807_writeport)
-	MDRV_CPU_VBLANK_INT(upd7807_irq,1)
+	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
 	MDRV_INTERLEAVE(500)	// very high interleave required to sync for startup tests
 
@@ -1369,13 +1369,13 @@ static MACHINE_DRIVER_START( pteacher )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(pteacher_readmem,pteacher_writemem)
-	MDRV_CPU_VBLANK_INT(homedata_irq,1)	/* also triggered by the blitter */
+	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD_TAG("sound", UPD7807, 9000000)	/* 9MHz ? */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_readmem,pteacher_upd7807_writemem)
 	MDRV_CPU_IO_MAP(pteacher_upd7807_readport,pteacher_upd7807_writeport)
-	MDRV_CPU_VBLANK_INT(upd7807_irq,1)
+	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
 	MDRV_INTERLEAVE(100)	// should be enough
 

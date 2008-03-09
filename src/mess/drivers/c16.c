@@ -688,7 +688,7 @@ static MACHINE_DRIVER_START( c16 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M7501, 1400000)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(c16_readmem, c16_writemem)
-	MDRV_CPU_VBLANK_INT(c16_frame_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", c16_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(ted7360_raster_interrupt, TED7360_HRETRACERATE)
 	MDRV_INTERLEAVE(1)
 
@@ -783,17 +783,17 @@ static MACHINE_DRIVER_START( c364 )
 	MDRV_CPU_PROGRAM_MAP(c364_readmem, c364_writemem)
 MACHINE_DRIVER_END
 
-static DRIVER_INIT( c16 )		{ c16_driver_init(); }
+static DRIVER_INIT( c16 )		{ c16_driver_init(machine); }
 #ifdef UNUSED_FUNCTION
-DRIVER_INIT( c16hun )	{ c16_driver_init(); }
-DRIVER_INIT( c16c )		{ c16_driver_init(); }
-DRIVER_INIT( c16v )		{ c16_driver_init(); }
+DRIVER_INIT( c16hun )	{ c16_driver_init(machine); }
+DRIVER_INIT( c16c )		{ c16_driver_init(machine); }
+DRIVER_INIT( c16v )		{ c16_driver_init(machine); }
 #endif
-static DRIVER_INIT( plus4 )	{ c16_driver_init(); }
+static DRIVER_INIT( plus4 )	{ c16_driver_init(machine); }
 #ifdef UNUSED_FUNCTION
-DRIVER_INIT( plus4c )	{ c16_driver_init(); }
-DRIVER_INIT( plus4v )	{ c16_driver_init(); }
-DRIVER_INIT( c364 )		{ c16_driver_init(); }
+DRIVER_INIT( plus4c )	{ c16_driver_init(machine); }
+DRIVER_INIT( plus4v )	{ c16_driver_init(machine); }
+DRIVER_INIT( c364 )		{ c16_driver_init(machine); }
 #endif
 
 static void c16cart_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

@@ -796,7 +796,7 @@ VIDEO_UPDATE( atari )
 	return 0;
 }
 
-static renderer_function antic_renderer = antic_mode_0_xx;
+static atari_renderer_func antic_renderer = antic_mode_0_xx;
 
 static void artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 {
@@ -1060,7 +1060,7 @@ static int cycle(void)
 	return video_screen_get_hpos(0) * CYCLES_PER_LINE / Machine->screen[0].width;
 }
 
-static void after(int cycles, timer_callback function, const char *funcname)
+static void after(int cycles, timer_fired_func function, const char *funcname)
 {
     attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(0)) * cycles / CYCLES_PER_LINE);
     (void)funcname;
@@ -1083,7 +1083,7 @@ static TIMER_CALLBACK( antic_issue_dli )
 }
 
 
-static const renderer_function renderer[2][19][5] = {
+static const atari_renderer_func renderer[2][19][5] = {
 	/*   no playfield    narrow          normal          wide         */
 	{
 		{antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx},
@@ -1198,16 +1198,16 @@ static TIMER_CALLBACK( antic_scanline_render )
             if( antic.w.dmactl & DMA_MISSILE )
             {
                 antic.steal_cycles += 1;
-                atari_gtia_w(0x11, RDPMGFXD(3*256));
+                atari_gtia_w(machine, 0x11, RDPMGFXD(3*256));
             }
             /* transport player data to GTIA ? */
             if( antic.w.dmactl & DMA_PLAYER )
             {
                 antic.steal_cycles += 4;
-                atari_gtia_w(0x0d, RDPMGFXD(4*256));
-                atari_gtia_w(0x0e, RDPMGFXD(5*256));
-                atari_gtia_w(0x0f, RDPMGFXD(6*256));
-                atari_gtia_w(0x10, RDPMGFXD(7*256));
+                atari_gtia_w(machine, 0x0d, RDPMGFXD(4*256));
+                atari_gtia_w(machine, 0x0e, RDPMGFXD(5*256));
+                atari_gtia_w(machine, 0x0f, RDPMGFXD(6*256));
+                atari_gtia_w(machine, 0x10, RDPMGFXD(7*256));
             }
         }
         else
@@ -1217,17 +1217,17 @@ static TIMER_CALLBACK( antic_scanline_render )
             {
 				if( (antic.scanline & 1) == 0 ) 	 /* even line ? */
 					antic.steal_cycles += 1;
-                atari_gtia_w(0x11, RDPMGFXS(3*128));
+                atari_gtia_w(machine, 0x11, RDPMGFXS(3*128));
             }
             /* transport player data to GTIA ? */
             if( antic.w.dmactl & DMA_PLAYER )
             {
 				if( (antic.scanline & 1) == 0 ) 	 /* even line ? */
 					antic.steal_cycles += 4;
-                atari_gtia_w(0x0d, RDPMGFXS(4*128));
-                atari_gtia_w(0x0e, RDPMGFXS(5*128));
-                atari_gtia_w(0x0f, RDPMGFXS(6*128));
-                atari_gtia_w(0x10, RDPMGFXS(7*128));
+                atari_gtia_w(machine, 0x0d, RDPMGFXS(4*128));
+                atari_gtia_w(machine, 0x0e, RDPMGFXS(5*128));
+                atari_gtia_w(machine, 0x0f, RDPMGFXS(6*128));
+                atari_gtia_w(machine, 0x10, RDPMGFXS(7*128));
             }
         }
     }

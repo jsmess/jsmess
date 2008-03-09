@@ -219,11 +219,11 @@ READ8_HANDLER( thepit_input_port_0_r )
        horizontal flip switch. (This is how the real PCB does it) */
 	if (thepit_flip_screen_x)
 	{
-		return input_port_3_r(offset);
+		return input_port_3_r(machine,offset);
 	}
 	else
 	{
-		return input_port_0_r(offset);
+		return input_port_0_r(machine,offset);
 	}
 }
 
@@ -236,7 +236,7 @@ READ8_HANDLER( thepit_input_port_0_r )
  *************************************/
 
 static void draw_sprites(running_machine *machine,
-						 mame_bitmap *bitmap,
+						 bitmap_t *bitmap,
 						 const rectangle *cliprect,
 						 int priority_to_draw)
 {

@@ -177,11 +177,11 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 
 static void z88_install_memory_handler_pair(offs_t start, offs_t size, int bank_base, void *read_addr, void *write_addr)
 {
-	read8_handler read_handler;
-	write8_handler write_handler;
+	read8_machine_func read_handler;
+	write8_machine_func write_handler;
 
-	read_handler  = read_addr  ? (read8_handler)  (STATIC_BANK1 + (FPTR)(bank_base - 1 + 0)) : MRA8_ROM;
-	write_handler = write_addr ? (write8_handler) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : MWA8_UNMAP;
+	read_handler  = read_addr  ? (read8_machine_func)  (STATIC_BANK1 + (FPTR)(bank_base - 1 + 0)) : MRA8_ROM;
+	write_handler = write_addr ? (write8_machine_func) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : MWA8_UNMAP;
 
 	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, read_handler);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, write_handler);
@@ -496,7 +496,7 @@ static WRITE8_HANDLER(z88_port_w)
 		case 0x0d1:
 		case 0x0d2:
 		case 0x0d3:
-			blink_srx_w(port & 0x03, data);
+			blink_srx_w(machine, port & 0x03, data);
 			return;
 	}
 

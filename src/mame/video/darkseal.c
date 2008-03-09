@@ -164,7 +164,7 @@ WRITE16_HANDLER( darkseal_palette_24bit_b_w )
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -179,7 +179,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 		x = buffered_spriteram16[offs+2];
 
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		colour = (x >> 9) &0x1f;
 
@@ -251,7 +251,7 @@ WRITE16_HANDLER( darkseal_pf3_data_w )
 
 WRITE16_HANDLER( darkseal_pf3b_data_w ) /* Mirror */
 {
-	darkseal_pf3_data_w(offset+0x800,data,mem_mask);
+	darkseal_pf3_data_w(machine,offset+0x800,data,mem_mask);
 }
 
 WRITE16_HANDLER( darkseal_control_0_w )

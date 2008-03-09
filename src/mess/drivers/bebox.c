@@ -32,17 +32,17 @@
 #include "formats/pc_dsk.h"
 
 
-static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_1_r(offset / 2); }
-static WRITE8_HANDLER(at_dma8237_1_w) { dma8237_1_w(offset / 2, data); }
+static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_1_r(machine, offset / 2); }
+static WRITE8_HANDLER(at_dma8237_1_w) { dma8237_1_w(machine, offset / 2, data); }
 
 static READ64_HANDLER( bebox_dma8237_1_r )
 {
-	return read64be_with_read8_handler(at_dma8237_1_r, offset, mem_mask);
+	return read64be_with_read8_handler(at_dma8237_1_r, machine, offset, mem_mask);
 }
 
 static WRITE64_HANDLER( bebox_dma8237_1_w )
 {
-	write64be_with_write8_handler(at_dma8237_1_w, offset, data, mem_mask);
+	write64be_with_write8_handler(at_dma8237_1_w, machine, offset, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )

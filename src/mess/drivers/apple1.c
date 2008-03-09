@@ -94,9 +94,8 @@ static ADDRESS_MAP_START( apple1_map, ADDRESS_SPACE_PROGRAM, 8 )
        other address bits are ignored.  Thus $D010-$D013 is mirrored
        at all $Dxxx addresses with bit 4 high. */
 	AM_RANGE(0xd010, 0xd013) AM_MIRROR(0x0fec) AM_READWRITE(pia_0_r, pia_0_w)
-	/* $Dxxx addresses with bit 4 low are NOPs.
-       (Note this uses AM_SPACE, not AM_RANGE.) */
-	AM_SPACE(0xd000, 0xf010) AM_NOP
+	/* $Dxxx addresses with bit 4 low are NOPs. */
+	AM_RANGE(0xd000, 0xd00f) AM_NOP AM_MIRROR(0xfe0)
 
 	/* We always include the remapped RAM for cassette BASIC, both for
        simplicity and to allow the running of BASIC programs. */

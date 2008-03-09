@@ -339,7 +339,7 @@ VIDEO_START( gaelco2_dual )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int mask, int xoffs)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
 {
 	int j, x, y, ex, ey, px, py;
 	const gfx_element *gfx = machine->gfx[0];
@@ -507,5 +507,5 @@ VIDEO_UPDATE( gaelco2_dual )
 VIDEO_EOF( gaelco2 )
 {
 	/* sprites are one frame ahead */
-	buffer_spriteram16_w(0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0);
 }

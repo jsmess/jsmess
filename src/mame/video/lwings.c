@@ -183,7 +183,7 @@ INLINE int is_sprite_on(int offs)
 	return sx || sy;
 }
 
-static void lwings_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void lwings_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -220,7 +220,7 @@ static void lwings_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 	}
 }
 
-static void trojan_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void trojan_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -289,5 +289,5 @@ VIDEO_UPDATE( trojan )
 
 VIDEO_EOF( lwings )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }

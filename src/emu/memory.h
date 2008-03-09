@@ -15,6 +15,7 @@
 #define __MEMORY_H__
 
 #include "mamecore.h"
+#include "devintrf.h"
 
 
 
@@ -26,15 +27,25 @@
 typedef UINT32			offs_t;
 
 /* ----- typedefs for the various common data access handlers ----- */
-typedef UINT8			(*read8_handler)  (ATTR_UNUSED offs_t offset);
-typedef void			(*write8_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
-typedef UINT16			(*read16_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
-typedef void			(*write16_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
-typedef UINT32			(*read32_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
-typedef void			(*write32_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
-typedef UINT64			(*read64_handler) (ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
-typedef void			(*write64_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
-typedef offs_t			(*opbase_handler) (ATTR_UNUSED offs_t address);
+typedef UINT8			(*read8_machine_func)  (ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset);
+typedef void			(*write8_machine_func) (ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
+typedef UINT16			(*read16_machine_func) (ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
+typedef void			(*write16_machine_func)(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
+typedef UINT32			(*read32_machine_func) (ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
+typedef void			(*write32_machine_func)(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
+typedef UINT64			(*read64_machine_func) (ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
+typedef void			(*write64_machine_func)(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+
+typedef UINT8			(*read8_device_func)  (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset);
+typedef void			(*write8_device_func) (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
+typedef UINT16			(*read16_device_func) (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
+typedef void			(*write16_device_func)(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
+typedef UINT32			(*read32_device_func) (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
+typedef void			(*write32_device_func)(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
+typedef UINT64			(*read64_device_func) (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
+typedef void			(*write64_device_func)(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+
+typedef offs_t			(*opbase_handler_func) (ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t address);
 
 /* ----- this struct contains pointers to the live read/write routines ----- */
 typedef struct _data_accessors data_accessors;
@@ -58,15 +69,25 @@ struct _data_accessors
 ***************************************************************************/
 
 /* ----- macros for declaring the various common data access handlers ----- */
-#define READ8_HANDLER(name) 	UINT8  name(ATTR_UNUSED offs_t offset)
-#define WRITE8_HANDLER(name) 	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
-#define READ16_HANDLER(name)	UINT16 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
-#define WRITE16_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
-#define READ32_HANDLER(name)	UINT32 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
-#define WRITE32_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
-#define READ64_HANDLER(name)	UINT64 name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
-#define WRITE64_HANDLER(name)	void   name(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
-#define OPBASE_HANDLER(name)	offs_t name(ATTR_UNUSED offs_t address)
+#define READ8_HANDLER(name) 	UINT8  name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset)
+#define WRITE8_HANDLER(name) 	void   name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+#define READ16_HANDLER(name)	UINT16 name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
+#define WRITE16_HANDLER(name)	void   name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
+#define READ32_HANDLER(name)	UINT32 name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
+#define WRITE32_HANDLER(name)	void   name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
+#define READ64_HANDLER(name)	UINT64 name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
+#define WRITE64_HANDLER(name)	void   name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
+
+#define READ8_DEVICE_HANDLER(name) 		UINT8  name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset)
+#define WRITE8_DEVICE_HANDLER(name) 	void   name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+#define READ16_DEVICE_HANDLER(name)		UINT16 name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
+#define WRITE16_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
+#define READ32_DEVICE_HANDLER(name)		UINT32 name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
+#define WRITE32_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
+#define READ64_DEVICE_HANDLER(name)		UINT64 name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
+#define WRITE64_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
+
+#define OPBASE_HANDLER(name)	offs_t name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t address)
 
 /* ----- macros for accessing bytes and words within larger chunks ----- */
 #ifdef LSB_FIRST
@@ -108,8 +129,7 @@ struct _data_accessors
 
 /* ----- definitions for the flags in the address maps ----- */
 #define AM_FLAGS_EXTENDED		0x01					/* this is an extended entry with the below flags in the start field */
-#define AM_FLAGS_MATCH_MASK		0x02					/* this entry should have the start/end pair treated as a match/mask pair */
-#define AM_FLAGS_END			0x04					/* this is the terminating entry in the array */
+#define AM_FLAGS_END			0x02					/* this is the terminating entry in the array */
 
 /* ----- definitions for the extended flags in the address maps ----- */
 #define AMEF_SPECIFIES_SPACE	0x00000001				/* set if the address space is specified */
@@ -199,308 +219,308 @@ enum
 ***************************************************************************/
 
 /* 8-bit reads */
-#define MRA8_BANK1				((read8_handler)STATIC_BANK1)
-#define MRA8_BANK2				((read8_handler)STATIC_BANK2)
-#define MRA8_BANK3				((read8_handler)STATIC_BANK3)
-#define MRA8_BANK4				((read8_handler)STATIC_BANK4)
-#define MRA8_BANK5				((read8_handler)STATIC_BANK5)
-#define MRA8_BANK6				((read8_handler)STATIC_BANK6)
-#define MRA8_BANK7				((read8_handler)STATIC_BANK7)
-#define MRA8_BANK8				((read8_handler)STATIC_BANK8)
-#define MRA8_BANK9				((read8_handler)STATIC_BANK9)
-#define MRA8_BANK10				((read8_handler)STATIC_BANK10)
-#define MRA8_BANK11				((read8_handler)STATIC_BANK11)
-#define MRA8_BANK12				((read8_handler)STATIC_BANK12)
-#define MRA8_BANK13				((read8_handler)STATIC_BANK13)
-#define MRA8_BANK14				((read8_handler)STATIC_BANK14)
-#define MRA8_BANK15				((read8_handler)STATIC_BANK15)
-#define MRA8_BANK16				((read8_handler)STATIC_BANK16)
-#define MRA8_BANK17				((read8_handler)STATIC_BANK17)
-#define MRA8_BANK18				((read8_handler)STATIC_BANK18)
-#define MRA8_BANK19				((read8_handler)STATIC_BANK19)
-#define MRA8_BANK20				((read8_handler)STATIC_BANK20)
-#define MRA8_BANK21				((read8_handler)STATIC_BANK21)
-#define MRA8_BANK22				((read8_handler)STATIC_BANK22)
-#define MRA8_BANK23				((read8_handler)STATIC_BANK23)
-#define MRA8_BANK24				((read8_handler)STATIC_BANK24)
-#define MRA8_BANK25				((read8_handler)STATIC_BANK25)
-#define MRA8_BANK26				((read8_handler)STATIC_BANK26)
-#define MRA8_BANK27				((read8_handler)STATIC_BANK27)
-#define MRA8_BANK28				((read8_handler)STATIC_BANK28)
-#define MRA8_BANK29				((read8_handler)STATIC_BANK29)
-#define MRA8_BANK30				((read8_handler)STATIC_BANK30)
-#define MRA8_BANK31				((read8_handler)STATIC_BANK31)
-#define MRA8_BANK32				((read8_handler)STATIC_BANK32)
-#define MRA8_RAM				((read8_handler)STATIC_RAM)
-#define MRA8_ROM				((read8_handler)STATIC_ROM)
-#define MRA8_NOP				((read8_handler)STATIC_NOP)
-#define MRA8_UNMAP				((read8_handler)STATIC_UNMAP)
+#define MRA8_BANK1				((read8_machine_func)STATIC_BANK1)
+#define MRA8_BANK2				((read8_machine_func)STATIC_BANK2)
+#define MRA8_BANK3				((read8_machine_func)STATIC_BANK3)
+#define MRA8_BANK4				((read8_machine_func)STATIC_BANK4)
+#define MRA8_BANK5				((read8_machine_func)STATIC_BANK5)
+#define MRA8_BANK6				((read8_machine_func)STATIC_BANK6)
+#define MRA8_BANK7				((read8_machine_func)STATIC_BANK7)
+#define MRA8_BANK8				((read8_machine_func)STATIC_BANK8)
+#define MRA8_BANK9				((read8_machine_func)STATIC_BANK9)
+#define MRA8_BANK10				((read8_machine_func)STATIC_BANK10)
+#define MRA8_BANK11				((read8_machine_func)STATIC_BANK11)
+#define MRA8_BANK12				((read8_machine_func)STATIC_BANK12)
+#define MRA8_BANK13				((read8_machine_func)STATIC_BANK13)
+#define MRA8_BANK14				((read8_machine_func)STATIC_BANK14)
+#define MRA8_BANK15				((read8_machine_func)STATIC_BANK15)
+#define MRA8_BANK16				((read8_machine_func)STATIC_BANK16)
+#define MRA8_BANK17				((read8_machine_func)STATIC_BANK17)
+#define MRA8_BANK18				((read8_machine_func)STATIC_BANK18)
+#define MRA8_BANK19				((read8_machine_func)STATIC_BANK19)
+#define MRA8_BANK20				((read8_machine_func)STATIC_BANK20)
+#define MRA8_BANK21				((read8_machine_func)STATIC_BANK21)
+#define MRA8_BANK22				((read8_machine_func)STATIC_BANK22)
+#define MRA8_BANK23				((read8_machine_func)STATIC_BANK23)
+#define MRA8_BANK24				((read8_machine_func)STATIC_BANK24)
+#define MRA8_BANK25				((read8_machine_func)STATIC_BANK25)
+#define MRA8_BANK26				((read8_machine_func)STATIC_BANK26)
+#define MRA8_BANK27				((read8_machine_func)STATIC_BANK27)
+#define MRA8_BANK28				((read8_machine_func)STATIC_BANK28)
+#define MRA8_BANK29				((read8_machine_func)STATIC_BANK29)
+#define MRA8_BANK30				((read8_machine_func)STATIC_BANK30)
+#define MRA8_BANK31				((read8_machine_func)STATIC_BANK31)
+#define MRA8_BANK32				((read8_machine_func)STATIC_BANK32)
+#define MRA8_RAM				((read8_machine_func)STATIC_RAM)
+#define MRA8_ROM				((read8_machine_func)STATIC_ROM)
+#define MRA8_NOP				((read8_machine_func)STATIC_NOP)
+#define MRA8_UNMAP				((read8_machine_func)STATIC_UNMAP)
 
 /* 8-bit writes */
-#define MWA8_BANK1				((write8_handler)STATIC_BANK1)
-#define MWA8_BANK2				((write8_handler)STATIC_BANK2)
-#define MWA8_BANK3				((write8_handler)STATIC_BANK3)
-#define MWA8_BANK4				((write8_handler)STATIC_BANK4)
-#define MWA8_BANK5				((write8_handler)STATIC_BANK5)
-#define MWA8_BANK6				((write8_handler)STATIC_BANK6)
-#define MWA8_BANK7				((write8_handler)STATIC_BANK7)
-#define MWA8_BANK8				((write8_handler)STATIC_BANK8)
-#define MWA8_BANK9				((write8_handler)STATIC_BANK9)
-#define MWA8_BANK10				((write8_handler)STATIC_BANK10)
-#define MWA8_BANK11				((write8_handler)STATIC_BANK11)
-#define MWA8_BANK12				((write8_handler)STATIC_BANK12)
-#define MWA8_BANK13				((write8_handler)STATIC_BANK13)
-#define MWA8_BANK14				((write8_handler)STATIC_BANK14)
-#define MWA8_BANK15				((write8_handler)STATIC_BANK15)
-#define MWA8_BANK16				((write8_handler)STATIC_BANK16)
-#define MWA8_BANK17				((write8_handler)STATIC_BANK17)
-#define MWA8_BANK18				((write8_handler)STATIC_BANK18)
-#define MWA8_BANK19				((write8_handler)STATIC_BANK19)
-#define MWA8_BANK20				((write8_handler)STATIC_BANK20)
-#define MWA8_BANK21				((write8_handler)STATIC_BANK21)
-#define MWA8_BANK22				((write8_handler)STATIC_BANK22)
-#define MWA8_BANK23				((write8_handler)STATIC_BANK23)
-#define MWA8_BANK24				((write8_handler)STATIC_BANK24)
-#define MWA8_BANK25				((write8_handler)STATIC_BANK25)
-#define MWA8_BANK26				((write8_handler)STATIC_BANK26)
-#define MWA8_BANK27				((write8_handler)STATIC_BANK27)
-#define MWA8_BANK28				((write8_handler)STATIC_BANK28)
-#define MWA8_BANK29				((write8_handler)STATIC_BANK29)
-#define MWA8_BANK30				((write8_handler)STATIC_BANK30)
-#define MWA8_BANK31				((write8_handler)STATIC_BANK31)
-#define MWA8_BANK32				((write8_handler)STATIC_BANK32)
-#define MWA8_RAM				((write8_handler)STATIC_RAM)
-#define MWA8_ROM				((write8_handler)STATIC_ROM)
-#define MWA8_NOP				((write8_handler)STATIC_NOP)
-#define MWA8_UNMAP				((write8_handler)STATIC_UNMAP)
+#define MWA8_BANK1				((write8_machine_func)STATIC_BANK1)
+#define MWA8_BANK2				((write8_machine_func)STATIC_BANK2)
+#define MWA8_BANK3				((write8_machine_func)STATIC_BANK3)
+#define MWA8_BANK4				((write8_machine_func)STATIC_BANK4)
+#define MWA8_BANK5				((write8_machine_func)STATIC_BANK5)
+#define MWA8_BANK6				((write8_machine_func)STATIC_BANK6)
+#define MWA8_BANK7				((write8_machine_func)STATIC_BANK7)
+#define MWA8_BANK8				((write8_machine_func)STATIC_BANK8)
+#define MWA8_BANK9				((write8_machine_func)STATIC_BANK9)
+#define MWA8_BANK10				((write8_machine_func)STATIC_BANK10)
+#define MWA8_BANK11				((write8_machine_func)STATIC_BANK11)
+#define MWA8_BANK12				((write8_machine_func)STATIC_BANK12)
+#define MWA8_BANK13				((write8_machine_func)STATIC_BANK13)
+#define MWA8_BANK14				((write8_machine_func)STATIC_BANK14)
+#define MWA8_BANK15				((write8_machine_func)STATIC_BANK15)
+#define MWA8_BANK16				((write8_machine_func)STATIC_BANK16)
+#define MWA8_BANK17				((write8_machine_func)STATIC_BANK17)
+#define MWA8_BANK18				((write8_machine_func)STATIC_BANK18)
+#define MWA8_BANK19				((write8_machine_func)STATIC_BANK19)
+#define MWA8_BANK20				((write8_machine_func)STATIC_BANK20)
+#define MWA8_BANK21				((write8_machine_func)STATIC_BANK21)
+#define MWA8_BANK22				((write8_machine_func)STATIC_BANK22)
+#define MWA8_BANK23				((write8_machine_func)STATIC_BANK23)
+#define MWA8_BANK24				((write8_machine_func)STATIC_BANK24)
+#define MWA8_BANK25				((write8_machine_func)STATIC_BANK25)
+#define MWA8_BANK26				((write8_machine_func)STATIC_BANK26)
+#define MWA8_BANK27				((write8_machine_func)STATIC_BANK27)
+#define MWA8_BANK28				((write8_machine_func)STATIC_BANK28)
+#define MWA8_BANK29				((write8_machine_func)STATIC_BANK29)
+#define MWA8_BANK30				((write8_machine_func)STATIC_BANK30)
+#define MWA8_BANK31				((write8_machine_func)STATIC_BANK31)
+#define MWA8_BANK32				((write8_machine_func)STATIC_BANK32)
+#define MWA8_RAM				((write8_machine_func)STATIC_RAM)
+#define MWA8_ROM				((write8_machine_func)STATIC_ROM)
+#define MWA8_NOP				((write8_machine_func)STATIC_NOP)
+#define MWA8_UNMAP				((write8_machine_func)STATIC_UNMAP)
 
 /* 16-bit reads */
-#define MRA16_BANK1				((read16_handler)STATIC_BANK1)
-#define MRA16_BANK2				((read16_handler)STATIC_BANK2)
-#define MRA16_BANK3				((read16_handler)STATIC_BANK3)
-#define MRA16_BANK4				((read16_handler)STATIC_BANK4)
-#define MRA16_BANK5				((read16_handler)STATIC_BANK5)
-#define MRA16_BANK6				((read16_handler)STATIC_BANK6)
-#define MRA16_BANK7				((read16_handler)STATIC_BANK7)
-#define MRA16_BANK8				((read16_handler)STATIC_BANK8)
-#define MRA16_BANK9				((read16_handler)STATIC_BANK9)
-#define MRA16_BANK10			((read16_handler)STATIC_BANK10)
-#define MRA16_BANK11			((read16_handler)STATIC_BANK11)
-#define MRA16_BANK12			((read16_handler)STATIC_BANK12)
-#define MRA16_BANK13			((read16_handler)STATIC_BANK13)
-#define MRA16_BANK14			((read16_handler)STATIC_BANK14)
-#define MRA16_BANK15			((read16_handler)STATIC_BANK15)
-#define MRA16_BANK16			((read16_handler)STATIC_BANK16)
-#define MRA16_BANK17			((read16_handler)STATIC_BANK17)
-#define MRA16_BANK18			((read16_handler)STATIC_BANK18)
-#define MRA16_BANK19			((read16_handler)STATIC_BANK19)
-#define MRA16_BANK20			((read16_handler)STATIC_BANK20)
-#define MRA16_BANK21			((read16_handler)STATIC_BANK21)
-#define MRA16_BANK22			((read16_handler)STATIC_BANK22)
-#define MRA16_BANK23			((read16_handler)STATIC_BANK23)
-#define MRA16_BANK24			((read16_handler)STATIC_BANK24)
-#define MRA16_BANK25			((read16_handler)STATIC_BANK25)
-#define MRA16_BANK26			((read16_handler)STATIC_BANK26)
-#define MRA16_BANK27			((read16_handler)STATIC_BANK27)
-#define MRA16_BANK28			((read16_handler)STATIC_BANK28)
-#define MRA16_BANK29			((read16_handler)STATIC_BANK29)
-#define MRA16_BANK30			((read16_handler)STATIC_BANK30)
-#define MRA16_BANK31			((read16_handler)STATIC_BANK31)
-#define MRA16_BANK32			((read16_handler)STATIC_BANK32)
-#define MRA16_RAM				((read16_handler)STATIC_RAM)
-#define MRA16_ROM				((read16_handler)STATIC_ROM)
-#define MRA16_NOP				((read16_handler)STATIC_NOP)
-#define MRA16_UNMAP				((read16_handler)STATIC_UNMAP)
+#define MRA16_BANK1				((read16_machine_func)STATIC_BANK1)
+#define MRA16_BANK2				((read16_machine_func)STATIC_BANK2)
+#define MRA16_BANK3				((read16_machine_func)STATIC_BANK3)
+#define MRA16_BANK4				((read16_machine_func)STATIC_BANK4)
+#define MRA16_BANK5				((read16_machine_func)STATIC_BANK5)
+#define MRA16_BANK6				((read16_machine_func)STATIC_BANK6)
+#define MRA16_BANK7				((read16_machine_func)STATIC_BANK7)
+#define MRA16_BANK8				((read16_machine_func)STATIC_BANK8)
+#define MRA16_BANK9				((read16_machine_func)STATIC_BANK9)
+#define MRA16_BANK10			((read16_machine_func)STATIC_BANK10)
+#define MRA16_BANK11			((read16_machine_func)STATIC_BANK11)
+#define MRA16_BANK12			((read16_machine_func)STATIC_BANK12)
+#define MRA16_BANK13			((read16_machine_func)STATIC_BANK13)
+#define MRA16_BANK14			((read16_machine_func)STATIC_BANK14)
+#define MRA16_BANK15			((read16_machine_func)STATIC_BANK15)
+#define MRA16_BANK16			((read16_machine_func)STATIC_BANK16)
+#define MRA16_BANK17			((read16_machine_func)STATIC_BANK17)
+#define MRA16_BANK18			((read16_machine_func)STATIC_BANK18)
+#define MRA16_BANK19			((read16_machine_func)STATIC_BANK19)
+#define MRA16_BANK20			((read16_machine_func)STATIC_BANK20)
+#define MRA16_BANK21			((read16_machine_func)STATIC_BANK21)
+#define MRA16_BANK22			((read16_machine_func)STATIC_BANK22)
+#define MRA16_BANK23			((read16_machine_func)STATIC_BANK23)
+#define MRA16_BANK24			((read16_machine_func)STATIC_BANK24)
+#define MRA16_BANK25			((read16_machine_func)STATIC_BANK25)
+#define MRA16_BANK26			((read16_machine_func)STATIC_BANK26)
+#define MRA16_BANK27			((read16_machine_func)STATIC_BANK27)
+#define MRA16_BANK28			((read16_machine_func)STATIC_BANK28)
+#define MRA16_BANK29			((read16_machine_func)STATIC_BANK29)
+#define MRA16_BANK30			((read16_machine_func)STATIC_BANK30)
+#define MRA16_BANK31			((read16_machine_func)STATIC_BANK31)
+#define MRA16_BANK32			((read16_machine_func)STATIC_BANK32)
+#define MRA16_RAM				((read16_machine_func)STATIC_RAM)
+#define MRA16_ROM				((read16_machine_func)STATIC_ROM)
+#define MRA16_NOP				((read16_machine_func)STATIC_NOP)
+#define MRA16_UNMAP				((read16_machine_func)STATIC_UNMAP)
 
 /* 16-bit writes */
-#define MWA16_BANK1				((write16_handler)STATIC_BANK1)
-#define MWA16_BANK2				((write16_handler)STATIC_BANK2)
-#define MWA16_BANK3				((write16_handler)STATIC_BANK3)
-#define MWA16_BANK4				((write16_handler)STATIC_BANK4)
-#define MWA16_BANK5				((write16_handler)STATIC_BANK5)
-#define MWA16_BANK6				((write16_handler)STATIC_BANK6)
-#define MWA16_BANK7				((write16_handler)STATIC_BANK7)
-#define MWA16_BANK8				((write16_handler)STATIC_BANK8)
-#define MWA16_BANK9				((write16_handler)STATIC_BANK9)
-#define MWA16_BANK10			((write16_handler)STATIC_BANK10)
-#define MWA16_BANK11			((write16_handler)STATIC_BANK11)
-#define MWA16_BANK12			((write16_handler)STATIC_BANK12)
-#define MWA16_BANK13			((write16_handler)STATIC_BANK13)
-#define MWA16_BANK14			((write16_handler)STATIC_BANK14)
-#define MWA16_BANK15			((write16_handler)STATIC_BANK15)
-#define MWA16_BANK16			((write16_handler)STATIC_BANK16)
-#define MWA16_BANK17			((write16_handler)STATIC_BANK17)
-#define MWA16_BANK18			((write16_handler)STATIC_BANK18)
-#define MWA16_BANK19			((write16_handler)STATIC_BANK19)
-#define MWA16_BANK20			((write16_handler)STATIC_BANK20)
-#define MWA16_BANK21			((write16_handler)STATIC_BANK21)
-#define MWA16_BANK22			((write16_handler)STATIC_BANK22)
-#define MWA16_BANK23			((write16_handler)STATIC_BANK23)
-#define MWA16_BANK24			((write16_handler)STATIC_BANK24)
-#define MWA16_BANK25			((write16_handler)STATIC_BANK25)
-#define MWA16_BANK26			((write16_handler)STATIC_BANK26)
-#define MWA16_BANK27			((write16_handler)STATIC_BANK27)
-#define MWA16_BANK28			((write16_handler)STATIC_BANK28)
-#define MWA16_BANK29			((write16_handler)STATIC_BANK29)
-#define MWA16_BANK30			((write16_handler)STATIC_BANK30)
-#define MWA16_BANK31			((write16_handler)STATIC_BANK31)
-#define MWA16_BANK32			((write16_handler)STATIC_BANK32)
-#define MWA16_RAM				((write16_handler)STATIC_RAM)
-#define MWA16_ROM				((write16_handler)STATIC_ROM)
-#define MWA16_NOP				((write16_handler)STATIC_NOP)
-#define MWA16_UNMAP				((write16_handler)STATIC_UNMAP)
+#define MWA16_BANK1				((write16_machine_func)STATIC_BANK1)
+#define MWA16_BANK2				((write16_machine_func)STATIC_BANK2)
+#define MWA16_BANK3				((write16_machine_func)STATIC_BANK3)
+#define MWA16_BANK4				((write16_machine_func)STATIC_BANK4)
+#define MWA16_BANK5				((write16_machine_func)STATIC_BANK5)
+#define MWA16_BANK6				((write16_machine_func)STATIC_BANK6)
+#define MWA16_BANK7				((write16_machine_func)STATIC_BANK7)
+#define MWA16_BANK8				((write16_machine_func)STATIC_BANK8)
+#define MWA16_BANK9				((write16_machine_func)STATIC_BANK9)
+#define MWA16_BANK10			((write16_machine_func)STATIC_BANK10)
+#define MWA16_BANK11			((write16_machine_func)STATIC_BANK11)
+#define MWA16_BANK12			((write16_machine_func)STATIC_BANK12)
+#define MWA16_BANK13			((write16_machine_func)STATIC_BANK13)
+#define MWA16_BANK14			((write16_machine_func)STATIC_BANK14)
+#define MWA16_BANK15			((write16_machine_func)STATIC_BANK15)
+#define MWA16_BANK16			((write16_machine_func)STATIC_BANK16)
+#define MWA16_BANK17			((write16_machine_func)STATIC_BANK17)
+#define MWA16_BANK18			((write16_machine_func)STATIC_BANK18)
+#define MWA16_BANK19			((write16_machine_func)STATIC_BANK19)
+#define MWA16_BANK20			((write16_machine_func)STATIC_BANK20)
+#define MWA16_BANK21			((write16_machine_func)STATIC_BANK21)
+#define MWA16_BANK22			((write16_machine_func)STATIC_BANK22)
+#define MWA16_BANK23			((write16_machine_func)STATIC_BANK23)
+#define MWA16_BANK24			((write16_machine_func)STATIC_BANK24)
+#define MWA16_BANK25			((write16_machine_func)STATIC_BANK25)
+#define MWA16_BANK26			((write16_machine_func)STATIC_BANK26)
+#define MWA16_BANK27			((write16_machine_func)STATIC_BANK27)
+#define MWA16_BANK28			((write16_machine_func)STATIC_BANK28)
+#define MWA16_BANK29			((write16_machine_func)STATIC_BANK29)
+#define MWA16_BANK30			((write16_machine_func)STATIC_BANK30)
+#define MWA16_BANK31			((write16_machine_func)STATIC_BANK31)
+#define MWA16_BANK32			((write16_machine_func)STATIC_BANK32)
+#define MWA16_RAM				((write16_machine_func)STATIC_RAM)
+#define MWA16_ROM				((write16_machine_func)STATIC_ROM)
+#define MWA16_NOP				((write16_machine_func)STATIC_NOP)
+#define MWA16_UNMAP				((write16_machine_func)STATIC_UNMAP)
 
 /* 32-bit reads */
-#define MRA32_BANK1				((read32_handler)STATIC_BANK1)
-#define MRA32_BANK2				((read32_handler)STATIC_BANK2)
-#define MRA32_BANK3				((read32_handler)STATIC_BANK3)
-#define MRA32_BANK4				((read32_handler)STATIC_BANK4)
-#define MRA32_BANK5				((read32_handler)STATIC_BANK5)
-#define MRA32_BANK6				((read32_handler)STATIC_BANK6)
-#define MRA32_BANK7				((read32_handler)STATIC_BANK7)
-#define MRA32_BANK8				((read32_handler)STATIC_BANK8)
-#define MRA32_BANK9				((read32_handler)STATIC_BANK9)
-#define MRA32_BANK10			((read32_handler)STATIC_BANK10)
-#define MRA32_BANK11			((read32_handler)STATIC_BANK11)
-#define MRA32_BANK12			((read32_handler)STATIC_BANK12)
-#define MRA32_BANK13			((read32_handler)STATIC_BANK13)
-#define MRA32_BANK14			((read32_handler)STATIC_BANK14)
-#define MRA32_BANK15			((read32_handler)STATIC_BANK15)
-#define MRA32_BANK16			((read32_handler)STATIC_BANK16)
-#define MRA32_BANK17			((read32_handler)STATIC_BANK17)
-#define MRA32_BANK18			((read32_handler)STATIC_BANK18)
-#define MRA32_BANK19			((read32_handler)STATIC_BANK19)
-#define MRA32_BANK20			((read32_handler)STATIC_BANK20)
-#define MRA32_BANK21			((read32_handler)STATIC_BANK21)
-#define MRA32_BANK22			((read32_handler)STATIC_BANK22)
-#define MRA32_BANK23			((read32_handler)STATIC_BANK23)
-#define MRA32_BANK24			((read32_handler)STATIC_BANK24)
-#define MRA32_BANK25			((read32_handler)STATIC_BANK25)
-#define MRA32_BANK26			((read32_handler)STATIC_BANK26)
-#define MRA32_BANK27			((read32_handler)STATIC_BANK27)
-#define MRA32_BANK28			((read32_handler)STATIC_BANK28)
-#define MRA32_BANK29			((read32_handler)STATIC_BANK29)
-#define MRA32_BANK30			((read32_handler)STATIC_BANK30)
-#define MRA32_BANK31			((read32_handler)STATIC_BANK31)
-#define MRA32_BANK32			((read32_handler)STATIC_BANK32)
-#define MRA32_RAM				((read32_handler)STATIC_RAM)
-#define MRA32_ROM				((read32_handler)STATIC_ROM)
-#define MRA32_NOP				((read32_handler)STATIC_NOP)
-#define MRA32_UNMAP				((read32_handler)STATIC_UNMAP)
+#define MRA32_BANK1				((read32_machine_func)STATIC_BANK1)
+#define MRA32_BANK2				((read32_machine_func)STATIC_BANK2)
+#define MRA32_BANK3				((read32_machine_func)STATIC_BANK3)
+#define MRA32_BANK4				((read32_machine_func)STATIC_BANK4)
+#define MRA32_BANK5				((read32_machine_func)STATIC_BANK5)
+#define MRA32_BANK6				((read32_machine_func)STATIC_BANK6)
+#define MRA32_BANK7				((read32_machine_func)STATIC_BANK7)
+#define MRA32_BANK8				((read32_machine_func)STATIC_BANK8)
+#define MRA32_BANK9				((read32_machine_func)STATIC_BANK9)
+#define MRA32_BANK10			((read32_machine_func)STATIC_BANK10)
+#define MRA32_BANK11			((read32_machine_func)STATIC_BANK11)
+#define MRA32_BANK12			((read32_machine_func)STATIC_BANK12)
+#define MRA32_BANK13			((read32_machine_func)STATIC_BANK13)
+#define MRA32_BANK14			((read32_machine_func)STATIC_BANK14)
+#define MRA32_BANK15			((read32_machine_func)STATIC_BANK15)
+#define MRA32_BANK16			((read32_machine_func)STATIC_BANK16)
+#define MRA32_BANK17			((read32_machine_func)STATIC_BANK17)
+#define MRA32_BANK18			((read32_machine_func)STATIC_BANK18)
+#define MRA32_BANK19			((read32_machine_func)STATIC_BANK19)
+#define MRA32_BANK20			((read32_machine_func)STATIC_BANK20)
+#define MRA32_BANK21			((read32_machine_func)STATIC_BANK21)
+#define MRA32_BANK22			((read32_machine_func)STATIC_BANK22)
+#define MRA32_BANK23			((read32_machine_func)STATIC_BANK23)
+#define MRA32_BANK24			((read32_machine_func)STATIC_BANK24)
+#define MRA32_BANK25			((read32_machine_func)STATIC_BANK25)
+#define MRA32_BANK26			((read32_machine_func)STATIC_BANK26)
+#define MRA32_BANK27			((read32_machine_func)STATIC_BANK27)
+#define MRA32_BANK28			((read32_machine_func)STATIC_BANK28)
+#define MRA32_BANK29			((read32_machine_func)STATIC_BANK29)
+#define MRA32_BANK30			((read32_machine_func)STATIC_BANK30)
+#define MRA32_BANK31			((read32_machine_func)STATIC_BANK31)
+#define MRA32_BANK32			((read32_machine_func)STATIC_BANK32)
+#define MRA32_RAM				((read32_machine_func)STATIC_RAM)
+#define MRA32_ROM				((read32_machine_func)STATIC_ROM)
+#define MRA32_NOP				((read32_machine_func)STATIC_NOP)
+#define MRA32_UNMAP				((read32_machine_func)STATIC_UNMAP)
 
 /* 32-bit writes */
-#define MWA32_BANK1				((write32_handler)STATIC_BANK1)
-#define MWA32_BANK2				((write32_handler)STATIC_BANK2)
-#define MWA32_BANK3				((write32_handler)STATIC_BANK3)
-#define MWA32_BANK4				((write32_handler)STATIC_BANK4)
-#define MWA32_BANK5				((write32_handler)STATIC_BANK5)
-#define MWA32_BANK6				((write32_handler)STATIC_BANK6)
-#define MWA32_BANK7				((write32_handler)STATIC_BANK7)
-#define MWA32_BANK8				((write32_handler)STATIC_BANK8)
-#define MWA32_BANK9				((write32_handler)STATIC_BANK9)
-#define MWA32_BANK10			((write32_handler)STATIC_BANK10)
-#define MWA32_BANK11			((write32_handler)STATIC_BANK11)
-#define MWA32_BANK12			((write32_handler)STATIC_BANK12)
-#define MWA32_BANK13			((write32_handler)STATIC_BANK13)
-#define MWA32_BANK14			((write32_handler)STATIC_BANK14)
-#define MWA32_BANK15			((write32_handler)STATIC_BANK15)
-#define MWA32_BANK16			((write32_handler)STATIC_BANK16)
-#define MWA32_BANK17			((write32_handler)STATIC_BANK17)
-#define MWA32_BANK18			((write32_handler)STATIC_BANK18)
-#define MWA32_BANK19			((write32_handler)STATIC_BANK19)
-#define MWA32_BANK20			((write32_handler)STATIC_BANK20)
-#define MWA32_BANK21			((write32_handler)STATIC_BANK21)
-#define MWA32_BANK22			((write32_handler)STATIC_BANK22)
-#define MWA32_BANK23			((write32_handler)STATIC_BANK23)
-#define MWA32_BANK24			((write32_handler)STATIC_BANK24)
-#define MWA32_BANK25			((write32_handler)STATIC_BANK25)
-#define MWA32_BANK26			((write32_handler)STATIC_BANK26)
-#define MWA32_BANK27			((write32_handler)STATIC_BANK27)
-#define MWA32_BANK28			((write32_handler)STATIC_BANK28)
-#define MWA32_BANK29			((write32_handler)STATIC_BANK29)
-#define MWA32_BANK30			((write32_handler)STATIC_BANK30)
-#define MWA32_BANK31			((write32_handler)STATIC_BANK31)
-#define MWA32_BANK32			((write32_handler)STATIC_BANK32)
-#define MWA32_RAM				((write32_handler)STATIC_RAM)
-#define MWA32_ROM				((write32_handler)STATIC_ROM)
-#define MWA32_NOP				((write32_handler)STATIC_NOP)
-#define MWA32_UNMAP				((write32_handler)STATIC_UNMAP)
+#define MWA32_BANK1				((write32_machine_func)STATIC_BANK1)
+#define MWA32_BANK2				((write32_machine_func)STATIC_BANK2)
+#define MWA32_BANK3				((write32_machine_func)STATIC_BANK3)
+#define MWA32_BANK4				((write32_machine_func)STATIC_BANK4)
+#define MWA32_BANK5				((write32_machine_func)STATIC_BANK5)
+#define MWA32_BANK6				((write32_machine_func)STATIC_BANK6)
+#define MWA32_BANK7				((write32_machine_func)STATIC_BANK7)
+#define MWA32_BANK8				((write32_machine_func)STATIC_BANK8)
+#define MWA32_BANK9				((write32_machine_func)STATIC_BANK9)
+#define MWA32_BANK10			((write32_machine_func)STATIC_BANK10)
+#define MWA32_BANK11			((write32_machine_func)STATIC_BANK11)
+#define MWA32_BANK12			((write32_machine_func)STATIC_BANK12)
+#define MWA32_BANK13			((write32_machine_func)STATIC_BANK13)
+#define MWA32_BANK14			((write32_machine_func)STATIC_BANK14)
+#define MWA32_BANK15			((write32_machine_func)STATIC_BANK15)
+#define MWA32_BANK16			((write32_machine_func)STATIC_BANK16)
+#define MWA32_BANK17			((write32_machine_func)STATIC_BANK17)
+#define MWA32_BANK18			((write32_machine_func)STATIC_BANK18)
+#define MWA32_BANK19			((write32_machine_func)STATIC_BANK19)
+#define MWA32_BANK20			((write32_machine_func)STATIC_BANK20)
+#define MWA32_BANK21			((write32_machine_func)STATIC_BANK21)
+#define MWA32_BANK22			((write32_machine_func)STATIC_BANK22)
+#define MWA32_BANK23			((write32_machine_func)STATIC_BANK23)
+#define MWA32_BANK24			((write32_machine_func)STATIC_BANK24)
+#define MWA32_BANK25			((write32_machine_func)STATIC_BANK25)
+#define MWA32_BANK26			((write32_machine_func)STATIC_BANK26)
+#define MWA32_BANK27			((write32_machine_func)STATIC_BANK27)
+#define MWA32_BANK28			((write32_machine_func)STATIC_BANK28)
+#define MWA32_BANK29			((write32_machine_func)STATIC_BANK29)
+#define MWA32_BANK30			((write32_machine_func)STATIC_BANK30)
+#define MWA32_BANK31			((write32_machine_func)STATIC_BANK31)
+#define MWA32_BANK32			((write32_machine_func)STATIC_BANK32)
+#define MWA32_RAM				((write32_machine_func)STATIC_RAM)
+#define MWA32_ROM				((write32_machine_func)STATIC_ROM)
+#define MWA32_NOP				((write32_machine_func)STATIC_NOP)
+#define MWA32_UNMAP				((write32_machine_func)STATIC_UNMAP)
 
 /* 64-bit reads */
-#define MRA64_BANK1				((read64_handler)STATIC_BANK1)
-#define MRA64_BANK2				((read64_handler)STATIC_BANK2)
-#define MRA64_BANK3				((read64_handler)STATIC_BANK3)
-#define MRA64_BANK4				((read64_handler)STATIC_BANK4)
-#define MRA64_BANK5				((read64_handler)STATIC_BANK5)
-#define MRA64_BANK6				((read64_handler)STATIC_BANK6)
-#define MRA64_BANK7				((read64_handler)STATIC_BANK7)
-#define MRA64_BANK8				((read64_handler)STATIC_BANK8)
-#define MRA64_BANK9				((read64_handler)STATIC_BANK9)
-#define MRA64_BANK10			((read64_handler)STATIC_BANK10)
-#define MRA64_BANK11			((read64_handler)STATIC_BANK11)
-#define MRA64_BANK12			((read64_handler)STATIC_BANK12)
-#define MRA64_BANK13			((read64_handler)STATIC_BANK13)
-#define MRA64_BANK14			((read64_handler)STATIC_BANK14)
-#define MRA64_BANK15			((read64_handler)STATIC_BANK15)
-#define MRA64_BANK16			((read64_handler)STATIC_BANK16)
-#define MRA64_BANK17			((read64_handler)STATIC_BANK17)
-#define MRA64_BANK18			((read64_handler)STATIC_BANK18)
-#define MRA64_BANK19			((read64_handler)STATIC_BANK19)
-#define MRA64_BANK20			((read64_handler)STATIC_BANK20)
-#define MRA64_BANK21			((read64_handler)STATIC_BANK21)
-#define MRA64_BANK22			((read64_handler)STATIC_BANK22)
-#define MRA64_BANK23			((read64_handler)STATIC_BANK23)
-#define MRA64_BANK24			((read64_handler)STATIC_BANK24)
-#define MRA64_BANK25			((read64_handler)STATIC_BANK25)
-#define MRA64_BANK26			((read64_handler)STATIC_BANK26)
-#define MRA64_BANK27			((read64_handler)STATIC_BANK27)
-#define MRA64_BANK28			((read64_handler)STATIC_BANK28)
-#define MRA64_BANK29			((read64_handler)STATIC_BANK29)
-#define MRA64_BANK30			((read64_handler)STATIC_BANK30)
-#define MRA64_BANK31			((read64_handler)STATIC_BANK31)
-#define MRA64_BANK32			((read64_handler)STATIC_BANK32)
-#define MRA64_RAM				((read64_handler)STATIC_RAM)
-#define MRA64_ROM				((read64_handler)STATIC_ROM)
-#define MRA64_NOP				((read64_handler)STATIC_NOP)
-#define MRA64_UNMAP				((read64_handler)STATIC_UNMAP)
+#define MRA64_BANK1				((read64_machine_func)STATIC_BANK1)
+#define MRA64_BANK2				((read64_machine_func)STATIC_BANK2)
+#define MRA64_BANK3				((read64_machine_func)STATIC_BANK3)
+#define MRA64_BANK4				((read64_machine_func)STATIC_BANK4)
+#define MRA64_BANK5				((read64_machine_func)STATIC_BANK5)
+#define MRA64_BANK6				((read64_machine_func)STATIC_BANK6)
+#define MRA64_BANK7				((read64_machine_func)STATIC_BANK7)
+#define MRA64_BANK8				((read64_machine_func)STATIC_BANK8)
+#define MRA64_BANK9				((read64_machine_func)STATIC_BANK9)
+#define MRA64_BANK10			((read64_machine_func)STATIC_BANK10)
+#define MRA64_BANK11			((read64_machine_func)STATIC_BANK11)
+#define MRA64_BANK12			((read64_machine_func)STATIC_BANK12)
+#define MRA64_BANK13			((read64_machine_func)STATIC_BANK13)
+#define MRA64_BANK14			((read64_machine_func)STATIC_BANK14)
+#define MRA64_BANK15			((read64_machine_func)STATIC_BANK15)
+#define MRA64_BANK16			((read64_machine_func)STATIC_BANK16)
+#define MRA64_BANK17			((read64_machine_func)STATIC_BANK17)
+#define MRA64_BANK18			((read64_machine_func)STATIC_BANK18)
+#define MRA64_BANK19			((read64_machine_func)STATIC_BANK19)
+#define MRA64_BANK20			((read64_machine_func)STATIC_BANK20)
+#define MRA64_BANK21			((read64_machine_func)STATIC_BANK21)
+#define MRA64_BANK22			((read64_machine_func)STATIC_BANK22)
+#define MRA64_BANK23			((read64_machine_func)STATIC_BANK23)
+#define MRA64_BANK24			((read64_machine_func)STATIC_BANK24)
+#define MRA64_BANK25			((read64_machine_func)STATIC_BANK25)
+#define MRA64_BANK26			((read64_machine_func)STATIC_BANK26)
+#define MRA64_BANK27			((read64_machine_func)STATIC_BANK27)
+#define MRA64_BANK28			((read64_machine_func)STATIC_BANK28)
+#define MRA64_BANK29			((read64_machine_func)STATIC_BANK29)
+#define MRA64_BANK30			((read64_machine_func)STATIC_BANK30)
+#define MRA64_BANK31			((read64_machine_func)STATIC_BANK31)
+#define MRA64_BANK32			((read64_machine_func)STATIC_BANK32)
+#define MRA64_RAM				((read64_machine_func)STATIC_RAM)
+#define MRA64_ROM				((read64_machine_func)STATIC_ROM)
+#define MRA64_NOP				((read64_machine_func)STATIC_NOP)
+#define MRA64_UNMAP				((read64_machine_func)STATIC_UNMAP)
 
 /* 64-bit writes */
-#define MWA64_BANK1				((write64_handler)STATIC_BANK1)
-#define MWA64_BANK2				((write64_handler)STATIC_BANK2)
-#define MWA64_BANK3				((write64_handler)STATIC_BANK3)
-#define MWA64_BANK4				((write64_handler)STATIC_BANK4)
-#define MWA64_BANK5				((write64_handler)STATIC_BANK5)
-#define MWA64_BANK6				((write64_handler)STATIC_BANK6)
-#define MWA64_BANK7				((write64_handler)STATIC_BANK7)
-#define MWA64_BANK8				((write64_handler)STATIC_BANK8)
-#define MWA64_BANK9				((write64_handler)STATIC_BANK9)
-#define MWA64_BANK10			((write64_handler)STATIC_BANK10)
-#define MWA64_BANK11			((write64_handler)STATIC_BANK11)
-#define MWA64_BANK12			((write64_handler)STATIC_BANK12)
-#define MWA64_BANK13			((write64_handler)STATIC_BANK13)
-#define MWA64_BANK14			((write64_handler)STATIC_BANK14)
-#define MWA64_BANK15			((write64_handler)STATIC_BANK15)
-#define MWA64_BANK16			((write64_handler)STATIC_BANK16)
-#define MWA64_BANK17			((write64_handler)STATIC_BANK17)
-#define MWA64_BANK18			((write64_handler)STATIC_BANK18)
-#define MWA64_BANK19			((write64_handler)STATIC_BANK19)
-#define MWA64_BANK20			((write64_handler)STATIC_BANK20)
-#define MWA64_BANK21			((write64_handler)STATIC_BANK21)
-#define MWA64_BANK22			((write64_handler)STATIC_BANK22)
-#define MWA64_BANK23			((write64_handler)STATIC_BANK23)
-#define MWA64_BANK24			((write64_handler)STATIC_BANK24)
-#define MWA64_BANK25			((write64_handler)STATIC_BANK25)
-#define MWA64_BANK26			((write64_handler)STATIC_BANK26)
-#define MWA64_BANK27			((write64_handler)STATIC_BANK27)
-#define MWA64_BANK28			((write64_handler)STATIC_BANK28)
-#define MWA64_BANK29			((write64_handler)STATIC_BANK29)
-#define MWA64_BANK30			((write64_handler)STATIC_BANK30)
-#define MWA64_BANK31			((write64_handler)STATIC_BANK31)
-#define MWA64_BANK32			((write64_handler)STATIC_BANK32)
-#define MWA64_RAM				((write64_handler)STATIC_RAM)
-#define MWA64_ROM				((write64_handler)STATIC_ROM)
-#define MWA64_NOP				((write64_handler)STATIC_NOP)
-#define MWA64_UNMAP				((write64_handler)STATIC_UNMAP)
+#define MWA64_BANK1				((write64_machine_func)STATIC_BANK1)
+#define MWA64_BANK2				((write64_machine_func)STATIC_BANK2)
+#define MWA64_BANK3				((write64_machine_func)STATIC_BANK3)
+#define MWA64_BANK4				((write64_machine_func)STATIC_BANK4)
+#define MWA64_BANK5				((write64_machine_func)STATIC_BANK5)
+#define MWA64_BANK6				((write64_machine_func)STATIC_BANK6)
+#define MWA64_BANK7				((write64_machine_func)STATIC_BANK7)
+#define MWA64_BANK8				((write64_machine_func)STATIC_BANK8)
+#define MWA64_BANK9				((write64_machine_func)STATIC_BANK9)
+#define MWA64_BANK10			((write64_machine_func)STATIC_BANK10)
+#define MWA64_BANK11			((write64_machine_func)STATIC_BANK11)
+#define MWA64_BANK12			((write64_machine_func)STATIC_BANK12)
+#define MWA64_BANK13			((write64_machine_func)STATIC_BANK13)
+#define MWA64_BANK14			((write64_machine_func)STATIC_BANK14)
+#define MWA64_BANK15			((write64_machine_func)STATIC_BANK15)
+#define MWA64_BANK16			((write64_machine_func)STATIC_BANK16)
+#define MWA64_BANK17			((write64_machine_func)STATIC_BANK17)
+#define MWA64_BANK18			((write64_machine_func)STATIC_BANK18)
+#define MWA64_BANK19			((write64_machine_func)STATIC_BANK19)
+#define MWA64_BANK20			((write64_machine_func)STATIC_BANK20)
+#define MWA64_BANK21			((write64_machine_func)STATIC_BANK21)
+#define MWA64_BANK22			((write64_machine_func)STATIC_BANK22)
+#define MWA64_BANK23			((write64_machine_func)STATIC_BANK23)
+#define MWA64_BANK24			((write64_machine_func)STATIC_BANK24)
+#define MWA64_BANK25			((write64_machine_func)STATIC_BANK25)
+#define MWA64_BANK26			((write64_machine_func)STATIC_BANK26)
+#define MWA64_BANK27			((write64_machine_func)STATIC_BANK27)
+#define MWA64_BANK28			((write64_machine_func)STATIC_BANK28)
+#define MWA64_BANK29			((write64_machine_func)STATIC_BANK29)
+#define MWA64_BANK30			((write64_machine_func)STATIC_BANK30)
+#define MWA64_BANK31			((write64_machine_func)STATIC_BANK31)
+#define MWA64_BANK32			((write64_machine_func)STATIC_BANK32)
+#define MWA64_RAM				((write64_machine_func)STATIC_RAM)
+#define MWA64_ROM				((write64_machine_func)STATIC_ROM)
+#define MWA64_NOP				((write64_machine_func)STATIC_NOP)
+#define MWA64_UNMAP				((write64_machine_func)STATIC_UNMAP)
 
 
 
@@ -524,22 +544,22 @@ typedef struct _handler_data handler_data;
 typedef union _read_handlers read_handlers;
 union _read_handlers
 {
-	genf *				handler;
-	read8_handler		handler8;
-	read16_handler		handler16;
-	read32_handler		handler32;
-	read64_handler		handler64;
+	genf *					handler;
+	read8_machine_func		handler8;
+	read16_machine_func		handler16;
+	read32_machine_func		handler32;
+	read64_machine_func		handler64;
 };
 
 /* ----- a union of all the different write handler types ----- */
 typedef union _write_handlers write_handlers;
 union _write_handlers
 {
-	genf *				handler;
-	write8_handler		handler8;
-	write16_handler		handler16;
-	write32_handler		handler32;
-	write64_handler		handler64;
+	genf *					handler;
+	write8_machine_func		handler8;
+	write16_machine_func	handler16;
+	write32_machine_func	handler32;
+	write64_machine_func	handler64;
 };
 
 /* ----- a generic address map type ----- */
@@ -547,13 +567,17 @@ typedef struct _address_map address_map;
 struct _address_map
 {
 	UINT32				flags;				/* flags and additional info about this entry */
-	offs_t				start, end;			/* start/end (or mask/match) values */
+	offs_t				start, end;			/* start/end values */
 	offs_t				mirror;				/* mirror bits */
 	offs_t				mask;				/* mask bits */
 	read_handlers 		read;				/* read handler callback */
 	const char *		read_name;			/* read handler callback name */
+	device_type			read_devtype;		/* read device type for device references */
+	const char *		read_devtag;		/* read tag for the relevant device */
 	write_handlers 		write;				/* write handler callback */
 	const char *		write_name;			/* write handler callback name */
+	device_type			write_devtype;		/* read device type for device references */
+	const char *		write_devtag;		/* read tag for the relevant device */
 	void *				memory;				/* pointer to memory backing this entry */
 	UINT32				share;				/* index of a shared memory block */
 	void **				base;				/* receives pointer to memory (optional) */
@@ -583,26 +607,30 @@ struct _address_space
 void construct_address_map(address_map *map, const machine_config *drv, int cpunum, int spacenum);
 
 /* ----- a typedef for pointers to these functions ----- */
-typedef address_map *(*construct_map_t)(address_map *map);
+typedef address_map *(*construct_map_t)(running_machine *machine, address_map *map);
 
 /* use this to declare external references to a machine driver */
 #define ADDRESS_MAP_EXTERN(_name)										\
-address_map *construct_map_##_name(address_map *map)					\
+address_map *construct_map_##_name(running_machine *machine, address_map *map)					\
 
 /* ----- macros for starting, ending, and setting map flags ----- */
 #define ADDRESS_MAP_START(_name,_space,_bits)							\
-address_map *construct_map_##_name(address_map *map)					\
+address_map *construct_map_##_name(running_machine *machine, address_map *map)					\
 {																		\
-	extern read##_bits##_handler port_tag_to_handler##_bits(const char *); \
-	typedef read##_bits##_handler _rh_t;								\
-	typedef write##_bits##_handler _wh_t;								\
-	_rh_t read;															\
-	_wh_t write;														\
-	_rh_t (*port_tag_to_handler)(const char *) = port_tag_to_handler##_bits; \
+	extern read##_bits##_machine_func port_tag_to_handler##_bits(const char *); \
+	typedef read##_bits##_machine_func _rmf_t;							\
+	typedef write##_bits##_machine_func _wmf_t;							\
+	typedef read##_bits##_device_func _rdf_t;							\
+	typedef write##_bits##_device_func _wdf_t;							\
+	_rmf_t readm;														\
+	_wmf_t writem;														\
+	_rdf_t readd;														\
+	_wdf_t writed;														\
+	_rmf_t (*port_tag_to_handler)(const char *) = port_tag_to_handler##_bits; \
 	UINT##_bits **base;													\
 																		\
-	(void)read; (void)write; (void)base;								\
-	(void)port_tag_to_handler; \
+	(void)readm; (void)writem; (void)readd; (void)writed; (void)base;	\
+	(void)port_tag_to_handler; 											\
 	map->flags = AM_FLAGS_EXTENDED;										\
 	map->start = AMEF_DBITS(_bits) | AMEF_SPACE(_space);				\
 
@@ -624,12 +652,6 @@ address_map *construct_map_##_name(address_map *map)					\
 	map->start = (_start);												\
 	map->end = (_end);													\
 
-#define AM_SPACE(_match,_mask)											\
-	map++;																\
-	map->flags = AM_FLAGS_MATCH_MASK;									\
-	map->start = (_match);												\
-	map->end = (_mask);													\
-
 /* ----- these are optional entries after each map entry ----- */
 #define AM_MASK(_mask)													\
 	map->mask = (_mask);												\
@@ -638,15 +660,27 @@ address_map *construct_map_##_name(address_map *map)					\
 	map->mirror = (_mirror);											\
 
 #define AM_READ(_handler)												\
-	map->read.handler = (genf *)(read = _handler);						\
+	map->read.handler = (genf *)(readm = _handler);						\
 	map->read_name = #_handler;											\
 
-#define AM_READ_PORT(_tag) \
-	AM_READ((*port_tag_to_handler)(_tag))
+#define AM_READ_PORT(_tag) 												\
+	AM_READ((*port_tag_to_handler)(_tag))								\
+
+#define AM_DEVREAD(_type, _tag, _handler)								\
+	map->read.handler = (genf *)(readd = _handler);						\
+	map->read_name = #_handler;											\
+	map->read_devtype = _type;											\
+	map->read_devtag = _tag;											\
 
 #define AM_WRITE(_handler)												\
-	map->write.handler = (genf *)(write = _handler);					\
+	map->write.handler = (genf *)(writem = _handler);					\
 	map->write_name = #_handler;										\
+
+#define AM_DEVWRITE(_type, _tag, _handler)								\
+	map->write.handler = (genf *)(writed = _handler);					\
+	map->write_name = #_handler;										\
+	map->write_devtype = _type;											\
+	map->write_devtag = _tag;											\
 
 #define AM_REGION(_region, _offs)										\
 	map->region = (_region);											\
@@ -659,27 +693,28 @@ address_map *construct_map_##_name(address_map *map)					\
 	map->base = (void **)(base = _base);								\
 
 #define AM_BASE_MEMBER(_struct, _member)								\
-	if (Machine != NULL && Machine->driver_data != NULL)				\
-		map->base = (void **)(base = &((_struct *)Machine->driver_data)->_member);\
+	if (machine != NULL && machine->driver_data != NULL)				\
+		map->base = (void **)(base = &((_struct *)machine->driver_data)->_member);\
 
 #define AM_SIZE(_size)													\
 	map->size = _size;													\
 
 #define AM_SIZE_MEMBER(_struct, _member)								\
-	if (Machine != NULL && Machine->driver_data != NULL)				\
-		map->size = &((_struct *)Machine->driver_data)->_member;		\
+	if (machine != NULL && machine->driver_data != NULL)				\
+		map->size = &((_struct *)machine->driver_data)->_member;		\
 
 /* ----- common shortcuts ----- */
 #define AM_READWRITE(_read,_write)			AM_READ(_read) AM_WRITE(_write)
-#define AM_ROM								AM_READ((_rh_t)STATIC_ROM)
-#define AM_RAM								AM_READWRITE((_rh_t)STATIC_RAM, (_wh_t)STATIC_RAM)
-#define AM_WRITEONLY						AM_WRITE((_wh_t)STATIC_RAM)
-#define AM_UNMAP							AM_READWRITE((_rh_t)STATIC_UNMAP, (_wh_t)STATIC_UNMAP)
-#define AM_ROMBANK(_bank)					AM_READ((_rh_t)(STATIC_BANK1 + (_bank) - 1))
-#define AM_RAMBANK(_bank)					AM_READWRITE((_rh_t)(STATIC_BANK1 + (_bank) - 1), (_wh_t)(STATIC_BANK1 + (_bank) - 1))
-#define AM_NOP								AM_READWRITE((_rh_t)STATIC_NOP, (_wh_t)STATIC_NOP)
-#define AM_READNOP							AM_READ((_rh_t)STATIC_NOP)
-#define AM_WRITENOP							AM_WRITE((_wh_t)STATIC_NOP)
+#define AM_DEVREADWRITE(_type,_tag,_read,_write) AM_DEVREAD(_type,_tag,_read) AM_DEVWRITE(_type,_tag,_write)
+#define AM_ROM								AM_READ((_rmf_t)STATIC_ROM)
+#define AM_RAM								AM_READWRITE((_rmf_t)STATIC_RAM, (_wmf_t)STATIC_RAM)
+#define AM_WRITEONLY						AM_WRITE((_wmf_t)STATIC_RAM)
+#define AM_UNMAP							AM_READWRITE((_rmf_t)STATIC_UNMAP, (_wmf_t)STATIC_UNMAP)
+#define AM_ROMBANK(_bank)					AM_READ((_rmf_t)(STATIC_BANK1 + (_bank) - 1))
+#define AM_RAMBANK(_bank)					AM_READWRITE((_rmf_t)(STATIC_BANK1 + (_bank) - 1), (_wmf_t)(STATIC_BANK1 + (_bank) - 1))
+#define AM_NOP								AM_READWRITE((_rmf_t)STATIC_NOP, (_wmf_t)STATIC_NOP)
+#define AM_READNOP							AM_READ((_rmf_t)STATIC_NOP)
+#define AM_WRITENOP							AM_WRITE((_wmf_t)STATIC_NOP)
 
 
 
@@ -689,7 +724,6 @@ address_map *construct_map_##_name(address_map *map)					\
 
 /* ----- macros for identifying address map struct markers ----- */
 #define IS_AMENTRY_EXTENDED(ma)				(((ma)->flags & AM_FLAGS_EXTENDED) != 0)
-#define IS_AMENTRY_MATCH_MASK(ma)			(((ma)->flags & AM_FLAGS_MATCH_MASK) != 0)
 #define IS_AMENTRY_END(ma)					(((ma)->flags & AM_FLAGS_END) != 0)
 
 #define AM_EXTENDED_FLAGS(ma)				((ma)->start)
@@ -919,7 +953,7 @@ void		memory_set_context(int activecpu);
 const address_map *memory_get_map(int cpunum, int spacenum);
 
 /* ----- opcode base control ---- */
-opbase_handler memory_set_opbase_handler(int cpunum, opbase_handler function);
+opbase_handler_func memory_set_opbase_handler(int cpunum, opbase_handler_func function);
 void		memory_set_opbase(offs_t offset);
 
 /* ----- separate opcode/data encryption helper ---- */
@@ -944,31 +978,20 @@ int			memory_get_log_unmap(int spacenum);
 
 /* ----- dynamic address space mapping ----- */
 void *		_memory_install_read_handler   (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name);
-UINT8 *		_memory_install_read8_handler  (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_handler handler, const char *handler_name);
-UINT16 *	_memory_install_read16_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_handler handler, const char *handler_name);
-UINT32 *	_memory_install_read32_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_handler handler, const char *handler_name);
-UINT64 *	_memory_install_read64_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read64_handler handler, const char *handler_name);
+UINT8 *		_memory_install_read8_handler  (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_machine_func handler, const char *handler_name);
+UINT16 *	_memory_install_read16_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_machine_func handler, const char *handler_name);
+UINT32 *	_memory_install_read32_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_machine_func handler, const char *handler_name);
+UINT64 *	_memory_install_read64_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read64_machine_func handler, const char *handler_name);
 void *		_memory_install_write_handler  (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name);
-UINT8 *		_memory_install_write8_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_handler handler, const char *handler_name);
-UINT16 *	_memory_install_write16_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write16_handler handler, const char *handler_name);
-UINT32 *	_memory_install_write32_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write32_handler handler, const char *handler_name);
-UINT64 *	_memory_install_write64_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write64_handler handler, const char *handler_name);
+UINT8 *		_memory_install_write8_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_machine_func handler, const char *handler_name);
+UINT16 *	_memory_install_write16_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write16_machine_func handler, const char *handler_name);
+UINT32 *	_memory_install_write32_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write32_machine_func handler, const char *handler_name);
+UINT64 *	_memory_install_write64_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write64_machine_func handler, const char *handler_name);
 void *		_memory_install_readwrite_handler  (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);
-UINT8 *		_memory_install_readwrite8_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_handler rhandler, write8_handler whandler, const char *rhandler_name, const char *whandler_name);
-UINT16 *	_memory_install_readwrite16_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_handler rhandler, write16_handler whandler, const char *rhandler_name, const char *whandler_name);
-UINT32 *	_memory_install_readwrite32_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_handler rhandler, write32_handler whandler, const char *rhandler_name, const char *whandler_name);
-UINT64 *	_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read64_handler rhandler, write64_handler whandler, const char *rhandler_name, const char *whandler_name);
-
-void *		_memory_install_read_matchmask_handler   (int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name);
-UINT8 *		_memory_install_read8_matchmask_handler  (int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, read8_handler handler, const char *handler_name);
-UINT16 *	_memory_install_read16_matchmask_handler (int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, read16_handler handler, const char *handler_name);
-UINT32 *	_memory_install_read32_matchmask_handler (int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, read32_handler handler, const char *handler_name);
-UINT64 *	_memory_install_read64_matchmask_handler (int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, read64_handler handler, const char *handler_name);
-void *		_memory_install_write_matchmask_handler  (int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name);
-UINT8 *		_memory_install_write8_matchmask_handler (int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, write8_handler handler, const char *handler_name);
-UINT16 *	_memory_install_write16_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, write16_handler handler, const char *handler_name);
-UINT32 *	_memory_install_write32_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, write32_handler handler, const char *handler_name);
-UINT64 *	_memory_install_write64_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, write64_handler handler, const char *handler_name);
+UINT8 *		_memory_install_readwrite8_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT16 *	_memory_install_readwrite16_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT32 *	_memory_install_readwrite32_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT64 *	_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name);
 
 /* ----- memory debugging ----- */
 void 		memory_dump(FILE *file);
@@ -1046,28 +1069,6 @@ extern address_space	active_address_space[];		/* address spaces */
 	_memory_install_readwrite32_handler(cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 #define memory_install_readwrite64_handler(cpu, space, start, end, mask, mirror, rhandler, whandler)		\
 	_memory_install_readwrite64_handler(cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
-
-#define memory_install_read_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_read_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_read8_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_read8_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_read16_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_read16_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_read32_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_read32_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_read64_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_read64_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-
-#define memory_install_write_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_write_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_write8_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_write8_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_write16_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_write16_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_write32_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_write32_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_write64_matchmask_handler(cpu, space, start, end, mask, mirror, handler)			\
-	_memory_install_write64_matchmask_handler(cpu, space, start, end, mask, mirror, handler, #handler)
 
 /* ----- generic memory access ----- */
 INLINE UINT8  program_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_byte)(offset); }

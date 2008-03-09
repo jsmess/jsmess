@@ -226,7 +226,7 @@ static WRITE16_HANDLER( kodure_io_w )
 		int i;
 		for (i = 0; i < 0x1000; i++)
 		{
-			armedf_text_videoram_w(i, ' ', 0);
+			armedf_text_videoram_w(machine,i, ' ', 0);
 		}
 	}
 }
@@ -234,7 +234,7 @@ static WRITE16_HANDLER( kodure_io_w )
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_LSB)
-		soundlatch_w(0,((data & 0x7f) << 1) | 1);
+		soundlatch_w(machine,0,((data & 0x7f) << 1) | 1);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -446,7 +446,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( soundlatch_clear_r )
 {
-	soundlatch_clear_w(0,0);
+	soundlatch_clear_w(machine,0,0);
 	return 0;
 }
 
@@ -762,13 +762,13 @@ static MACHINE_DRIVER_START( terraf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(terraf_readmem,terraf_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3072000)
 	/* audio CPU */	/* 3.072 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(soundreadmem,soundwritemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,128)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -804,13 +804,13 @@ static MACHINE_DRIVER_START( kodure )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(kodure_readmem,kodure_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3072000)
 	/* audio CPU */	/* 3.072 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(soundreadmem,soundwritemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,128)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -846,13 +846,13 @@ static MACHINE_DRIVER_START( armedf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(armedf_readmem,armedf_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3072000)
 	/* audio CPU */	/* 3.072 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(soundreadmem,soundwritemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,128)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -888,13 +888,13 @@ static MACHINE_DRIVER_START( cclimbr2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_readmem,cclimbr2_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3072000)
 	/* audio CPU */	/* 3.072 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_soundreadmem,cclimbr2_soundwritemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,128)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -930,13 +930,13 @@ static MACHINE_DRIVER_START( legion )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_readmem,legion_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3072000)
 	/* audio CPU */	/* 3.072 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_soundreadmem,cclimbr2_soundwritemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,128)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -972,13 +972,13 @@ static MACHINE_DRIVER_START( legiono )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_readmem,legiono_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3072000)
 	/* audio CPU */	/* 3.072 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_soundreadmem,cclimbr2_soundwritemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,128)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

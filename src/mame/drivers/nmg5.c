@@ -245,8 +245,8 @@ static WRITE16_HANDLER( nmg5_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -805,7 +805,7 @@ static VIDEO_START( nmg5 )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -841,7 +841,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	}
 }
 
-static void draw_bitmap(mame_bitmap *bitmap)
+static void draw_bitmap(bitmap_t *bitmap)
 {
 	int yyy=256;
 	int xxx=512/4;
@@ -985,7 +985,7 @@ static MACHINE_DRIVER_START( nmg5 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(nmg5_map,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)		/* 4 MHz */
 	/* audio CPU */

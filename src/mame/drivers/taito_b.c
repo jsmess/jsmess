@@ -328,35 +328,35 @@ static INTERRUPT_GEN( sbm_interrupt )//5
 
 static READ16_HANDLER( tracky1_hi_r )
 {
-	return input_port_5_word_r(0,0);
+	return input_port_5_word_r(machine,0,0);
 }
 static READ16_HANDLER( tracky1_lo_r )
 {
-	return (input_port_5_word_r(0,0) & 0xff) <<8;
+	return (input_port_5_word_r(machine,0,0) & 0xff) <<8;
 }
 static READ16_HANDLER( trackx1_hi_r )
 {
-	return input_port_6_word_r(0,0);
+	return input_port_6_word_r(machine,0,0);
 }
 static READ16_HANDLER( trackx1_lo_r )
 {
-	return (input_port_6_word_r(0,0) & 0xff) <<8;
+	return (input_port_6_word_r(machine,0,0) & 0xff) <<8;
 }
 static READ16_HANDLER( tracky2_hi_r )
 {
-	return input_port_7_word_r(0,0);
+	return input_port_7_word_r(machine,0,0);
 }
 static READ16_HANDLER( tracky2_lo_r )
 {
-	return (input_port_7_word_r(0,0) & 0xff) <<8;
+	return (input_port_7_word_r(machine,0,0) & 0xff) <<8;
 }
 static READ16_HANDLER( trackx2_hi_r )
 {
-	return input_port_8_word_r(0,0);
+	return input_port_8_word_r(machine,0,0);
 }
 static READ16_HANDLER( trackx2_lo_r )
 {
-	return (input_port_8_word_r(0,0) & 0xff) <<8;
+	return (input_port_8_word_r(machine,0,0) & 0xff) <<8;
 }
 
 
@@ -413,7 +413,7 @@ static READ16_HANDLER( eeprom_r )
 	int res;
 
 	res = (EEPROM_read_bit() & 0x01);
-	res |= input_port_1_word_r(0,0) & 0xfe; /* coin inputs */
+	res |= input_port_1_word_r(machine,0,0) & 0xfe; /* coin inputs */
 
 	return res;
 }
@@ -482,10 +482,10 @@ static READ16_HANDLER( pbobble_input_bypass_r )
 	switch (offset)
 	{
 		case 0x01:
-			return eeprom_r(0,mem_mask) << 8;
+			return eeprom_r(machine,0,mem_mask) << 8;
 
 		default:
-			return TC0640FIO_r( offset ) << 8;
+			return TC0640FIO_r( machine,offset ) << 8;
 	}
 }
 
@@ -2641,7 +2641,7 @@ static MACHINE_DRIVER_START( rastsag2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(rastsag2_readmem,rastsag2_writemem)
-	MDRV_CPU_VBLANK_INT(rastansaga2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", rastansaga2_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -2679,7 +2679,7 @@ static MACHINE_DRIVER_START( ashura )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(rastsag2_readmem,rastsag2_writemem)
-	MDRV_CPU_VBLANK_INT(rastansaga2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", rastansaga2_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -2717,7 +2717,7 @@ static MACHINE_DRIVER_START( crimec )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(crimec_readmem,crimec_writemem)
-	MDRV_CPU_VBLANK_INT(crimec_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", crimec_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -2755,7 +2755,7 @@ static MACHINE_DRIVER_START( tetrist )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ???*/
 	MDRV_CPU_PROGRAM_MAP(tetrist_readmem,tetrist_writemem)
-	MDRV_CPU_VBLANK_INT(rastansaga2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", rastansaga2_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -2792,7 +2792,7 @@ static MACHINE_DRIVER_START( tetrista )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(tetrista_readmem,tetrista_writemem)
-	MDRV_CPU_VBLANK_INT(masterw_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", masterw_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(masterw_sound_readmem,masterw_sound_writemem)
@@ -2830,7 +2830,7 @@ static MACHINE_DRIVER_START( hitice )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(hitice_readmem, hitice_writemem)
-	MDRV_CPU_VBLANK_INT(hitice_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", hitice_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(viofight_sound_readmem, viofight_sound_writemem)
@@ -2874,7 +2874,7 @@ static MACHINE_DRIVER_START( rambo3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rambo3_readmem,rambo3_writemem)
-	MDRV_CPU_VBLANK_INT(rambo3_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", rambo3_interrupt)
 
 	MDRV_CPU_ADD(Z80, XTAL_24MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -2912,7 +2912,7 @@ static MACHINE_DRIVER_START( rambo3a )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rambo3_readmem,rambo3_writemem)
-	MDRV_CPU_VBLANK_INT(rambo3_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", rambo3_interrupt)
 
 	MDRV_CPU_ADD(Z80, XTAL_24MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -2950,7 +2950,7 @@ static MACHINE_DRIVER_START( pbobble )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(pbobble_readmem,pbobble_writemem)
-	MDRV_CPU_VBLANK_INT(pbobble_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", pbobble_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -2991,7 +2991,7 @@ static MACHINE_DRIVER_START( spacedx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(spacedx_readmem,spacedx_writemem)
-	MDRV_CPU_VBLANK_INT(pbobble_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", pbobble_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -3032,7 +3032,7 @@ static MACHINE_DRIVER_START( spacedxo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(spacedxo_readmem,spacedxo_writemem)
-	MDRV_CPU_VBLANK_INT(selfeena_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", selfeena_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -3070,7 +3070,7 @@ static MACHINE_DRIVER_START( qzshowby )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz according to the readme*/
 	MDRV_CPU_PROGRAM_MAP(qzshowby_readmem,qzshowby_writemem)
-	MDRV_CPU_VBLANK_INT(pbobble_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", pbobble_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -3111,7 +3111,7 @@ static MACHINE_DRIVER_START( viofight )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(viofight_readmem,viofight_writemem)
-	MDRV_CPU_VBLANK_INT(viofight_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", viofight_interrupt)
 
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz verified */
 	MDRV_CPU_PROGRAM_MAP(viofight_sound_readmem, viofight_sound_writemem)
@@ -3153,7 +3153,7 @@ static MACHINE_DRIVER_START( masterw )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(masterw_readmem,masterw_writemem)
-	MDRV_CPU_VBLANK_INT(masterw_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", masterw_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(masterw_sound_readmem,masterw_sound_writemem)
@@ -3192,7 +3192,7 @@ static MACHINE_DRIVER_START( silentd )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(silentd_readmem,silentd_writemem)
-	MDRV_CPU_VBLANK_INT(silentd_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", silentd_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -3230,7 +3230,7 @@ static MACHINE_DRIVER_START( selfeena )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(selfeena_readmem,selfeena_writemem)
-	MDRV_CPU_VBLANK_INT(selfeena_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", selfeena_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -3277,7 +3277,7 @@ static MACHINE_DRIVER_START( ryujin )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(selfeena_readmem,selfeena_writemem)
-	MDRV_CPU_VBLANK_INT(selfeena_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", selfeena_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -3322,7 +3322,7 @@ static MACHINE_DRIVER_START( sbm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(sbm_readmem,sbm_writemem)
-	MDRV_CPU_VBLANK_INT(sbm_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", sbm_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)

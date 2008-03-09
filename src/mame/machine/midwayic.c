@@ -250,11 +250,12 @@ INLINE UINT8 make_bcd(UINT8 data)
 }
 
 
+#ifdef UNUSED_FUNCTON
 INLINE UINT8 unmake_bcd(UINT8 data)
 {
 	return ((data & 0xf0) >> 4) * 10 + (data & 0x0f);
 }
-
+#endif
 
 static TIMER_CALLBACK( reset_timer )
 {
@@ -852,9 +853,9 @@ READ32_HANDLER( midway_ioasic_packed_r )
 {
 	UINT32 result = 0;
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= midway_ioasic_r(offset*2, 0xffff0000) & 0xffff;
+		result |= midway_ioasic_r(machine, offset*2, 0xffff0000) & 0xffff;
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= (midway_ioasic_r(offset*2+1, 0xffff0000) & 0xffff) << 16;
+		result |= (midway_ioasic_r(machine, offset*2+1, 0xffff0000) & 0xffff) << 16;
 	return result;
 }
 
@@ -948,9 +949,9 @@ READ32_HANDLER( midway_ioasic_r )
 WRITE32_HANDLER( midway_ioasic_packed_w )
 {
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		midway_ioasic_w(offset*2, data & 0xffff, 0xffff0000);
+		midway_ioasic_w(machine, offset*2, data & 0xffff, 0xffff0000);
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		midway_ioasic_w(offset*2+1, data >> 16, 0xffff0000);
+		midway_ioasic_w(machine, offset*2+1, data >> 16, 0xffff0000);
 }
 
 
@@ -1074,11 +1075,11 @@ READ32_HANDLER( midway_ide_asic_r )
 
 	/* offset 0 is a special case */
 	if (offset == 0)
-		result = ide_controller32_0_r(ideoffs, 0xffff0000);
+		result = ide_controller32_0_r(machine, ideoffs, 0xffff0000);
 
 	/* everything else is byte-sized */
 	else
-		result = ide_controller32_0_r(ideoffs, ~(0xff << shift)) >> shift;
+		result = ide_controller32_0_r(machine, ideoffs, ~(0xff << shift)) >> shift;
 	return result;
 }
 
@@ -1091,9 +1092,9 @@ WRITE32_HANDLER( midway_ide_asic_w )
 
 	/* offset 0 is a special case */
 	if (offset == 0)
-		ide_controller32_0_w(ideoffs, data, 0xffff0000);
+		ide_controller32_0_w(machine, ideoffs, data, 0xffff0000);
 
 	/* everything else is byte-sized */
 	else
-		ide_controller32_0_w(ideoffs, data << shift, ~(0xff << shift));
+		ide_controller32_0_w(machine, ideoffs, data << shift, ~(0xff << shift));
 }

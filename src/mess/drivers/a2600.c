@@ -712,7 +712,7 @@ static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(offset, data); riot_ram
 static OPBASE_HANDLER( modeF6_opbase )
 {
 	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 ) {
-		modeF6_switch_w( ( address & 0x1FFF ) - 0x1FF6, 0 );
+		modeF6_switch_w( machine, ( address & 0x1FFF ) - 0x1FF6, 0 );
 	}
 	return address;
 }
@@ -840,7 +840,7 @@ static READ8_HANDLER(modeSS_r)
 	/* Because the mame core caches opcode data and doesn't perform reads like normal */
 	/* we have to put in this little hack here to get Suicide Mission to work. */
 	if ( offset != 0xFF8 && ( activecpu_get_pc() & 0x1FFF ) == 0x1FF8 ) {
-		modeSS_r( 0xFF8 );
+		modeSS_r( machine, 0xFF8 );
 	}
 	return data;
 }
@@ -1011,7 +1011,7 @@ depending on last byte & 0x20 -> 0x00 -> switch to bank #1
 
  */
 
-static opbase_handler FE_old_opbase_handler;
+static opbase_handler_func FE_old_opbase_handler;
 static int FETimer;
 
 static OPBASE_HANDLER(modeFE_opbase_handler)
@@ -1159,7 +1159,7 @@ static void install_banks(int count, unsigned init)
 
 	for (i = 0; i < count; i++)
 	{
-		static const read8_handler handler[] =
+		static const read8_machine_func handler[] =
 		{
 			MRA8_BANK1,
 			MRA8_BANK2,

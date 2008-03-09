@@ -135,10 +135,10 @@ static INTERRUPT_GEN( fromanc2_interrupt )
 
 static WRITE16_HANDLER( fromanc2_sndcmd_w )
 {
-	soundlatch_w(offset, (data >> 8) & 0xff);	// 1P (LEFT)
-	soundlatch2_w(offset, data & 0xff);			// 2P (RIGHT)
+	soundlatch_w(machine, offset, (data >> 8) & 0xff);	// 1P (LEFT)
+	soundlatch2_w(machine, offset, data & 0xff);			// 2P (RIGHT)
 
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	fromanc2_sndcpu_nmi_flag = 0;
 }
 
@@ -705,7 +705,7 @@ static MACHINE_DRIVER_START( fromanc2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_main,fromanc2_writemem_main)
-	MDRV_CPU_VBLANK_INT(fromanc2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("left", fromanc2_interrupt)
 
 	MDRV_CPU_ADD(Z80,32000000/4)
 	/* audio CPU */		/* 8.00 MHz */
@@ -758,7 +758,7 @@ static MACHINE_DRIVER_START( fromancr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromancr_readmem_main,fromancr_writemem_main)
-	MDRV_CPU_VBLANK_INT(fromanc2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("left", fromanc2_interrupt)
 
 	MDRV_CPU_ADD(Z80,32000000/4)
 	/* audio CPU */		/* 8.00 MHz */
@@ -810,7 +810,7 @@ static MACHINE_DRIVER_START( fromanc4 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc4_readmem_main,fromanc4_writemem_main)
-	MDRV_CPU_VBLANK_INT(fromanc2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("left", fromanc2_interrupt)
 
 	MDRV_CPU_ADD(Z80,32000000/4)
 	/* audio CPU */		/* 8.00 MHz */

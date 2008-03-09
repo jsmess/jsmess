@@ -114,7 +114,7 @@ static const UINT8 protData[0x10]=
 
 static READ8_HANDLER(prot_r)
 {
-	return (input_port_1_r(0)&0x1f)|protData[protAdr];
+	return (input_port_1_r(machine,0)&0x1f)|protData[protAdr];
 }
 
 static WRITE8_HANDLER(prot_w)
@@ -171,8 +171,8 @@ static WRITE8_HANDLER(bg2_w)
 
 static WRITE8_HANDLER( sound_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( i8257_CH0_w )
@@ -399,12 +399,12 @@ static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 static MACHINE_DRIVER_START( ddayjlc )
 	MDRV_CPU_ADD(Z80,12000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
-	MDRV_CPU_VBLANK_INT(ddayjlc_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ddayjlc_interrupt)
 
 	MDRV_CPU_ADD(Z80, 12000000/4)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
-	MDRV_CPU_VBLANK_INT(ddayjlc_snd_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ddayjlc_snd_interrupt)
 
 	MDRV_INTERLEAVE(100)
 

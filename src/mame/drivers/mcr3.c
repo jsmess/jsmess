@@ -137,7 +137,7 @@ static WRITE8_HANDLER( demoderm_op6_w )
 	if (data & 0x40) input_mux = 1;
 
 	/* low 5 bits control the turbo CS */
-	turbocs_data_w(offset, data);
+	turbocs_data_w(machine, offset, data);
 }
 
 
@@ -204,14 +204,13 @@ static WRITE8_HANDLER( maxrpm_op5_w )
 	maxrpm_adc_control = data & 0x0f;
 
 	/* remaining bits go to standard connections */
-	mcrmono_control_port_w(offset, data);
+	mcrmono_control_port_w(machine, offset, data);
 }
 
 
 static WRITE8_HANDLER( maxrpm_op6_w )
 {
 	static const char *const inputs[] = { "MONO.IP1", "MONO.IP1.ALT1", "MONO.IP1.ALT2", "MONO.IP1.ALT3" };
-
 	/*
         Reflective Sensor Control:
             4 bits of input from OP5 are routed to a transceiver at U2, and
@@ -241,7 +240,7 @@ static WRITE8_HANDLER( maxrpm_op6_w )
 		maxrpm_adc_select = (maxrpm_adc_control >> 1) & 3;
 
 	/* low 5 bits control the turbo CS */
-	turbocs_data_w(offset, data);
+	turbocs_data_w(machine, offset, data);
 }
 
 
@@ -254,7 +253,7 @@ static WRITE8_HANDLER( maxrpm_op6_w )
 
 static READ8_HANDLER( rampage_ip4_r )
 {
-	return readinputportbytag("MONO.IP4") | (soundsgood_status_r(0) << 7);
+	return readinputportbytag("MONO.IP4") | (soundsgood_status_r(machine,0) << 7);
 }
 
 
@@ -264,7 +263,7 @@ static WRITE8_HANDLER( rampage_op6_w )
 	soundsgood_reset_w((~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	soundsgood_data_w(offset, data);
+	soundsgood_data_w(machine, offset, data);
 }
 
 
@@ -277,7 +276,7 @@ static WRITE8_HANDLER( rampage_op6_w )
 
 static READ8_HANDLER( powerdrv_ip2_r )
 {
-	return readinputportbytag("MONO.IP2") | (soundsgood_status_r(0) << 7);
+	return readinputportbytag("MONO.IP2") | (soundsgood_status_r(machine, 0) << 7);
 }
 
 
@@ -298,7 +297,7 @@ static WRITE8_HANDLER( powerdrv_op5_w )
 	set_led_status(2, (data >> 1) & 1);
 
 	/* remaining bits go to standard connections */
-	mcrmono_control_port_w(offset, data);
+	mcrmono_control_port_w(machine, offset, data);
 }
 
 
@@ -308,7 +307,7 @@ static WRITE8_HANDLER( powerdrv_op6_w )
 	soundsgood_reset_w((~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	soundsgood_data_w(offset, data);
+	soundsgood_data_w(machine, offset, data);
 }
 
 
@@ -322,7 +321,7 @@ static WRITE8_HANDLER( powerdrv_op6_w )
 static READ8_HANDLER( stargrds_ip0_r )
 {
 	UINT8 result = readinputportbytag(input_mux ? "MONO.IP0.ALT" : "MONO.IP0");
-	return result | ((soundsgood_status_r(0) << 4) & 0x10);
+	return result | ((soundsgood_status_r(machine, 0) << 4) & 0x10);
 }
 
 
@@ -339,7 +338,7 @@ static WRITE8_HANDLER( stargrds_op5_w )
 	set_led_status(2, (data >> 4) & 1);
 
 	/* remaining bits go to standard connections */
-	mcrmono_control_port_w(offset, data);
+	mcrmono_control_port_w(machine, offset, data);
 }
 
 
@@ -349,7 +348,7 @@ static WRITE8_HANDLER( stargrds_op6_w )
 	soundsgood_reset_w((~data >> 6) & 1);
 
 	/* unline the other games, the STROBE is in the high bit instead of the low bit */
-	soundsgood_data_w(offset, (data << 1) | (data >> 7));
+	soundsgood_data_w(machine, offset, (data << 1) | (data >> 7));
 }
 
 
@@ -362,7 +361,7 @@ static WRITE8_HANDLER( stargrds_op6_w )
 
 static READ8_HANDLER( spyhunt_ip1_r )
 {
-	return readinputportbytag("SSIO.IP1") | (csdeluxe_status_r(0) << 5);
+	return readinputportbytag("SSIO.IP1") | (csdeluxe_status_r(machine, 0) << 5);
 }
 
 
@@ -406,7 +405,7 @@ static WRITE8_HANDLER( spyhunt_op4_w )
 	last_op4 = data;
 
 	/* low 5 bits go to control the Chip Squeak Deluxe */
-	csdeluxe_data_w(offset, data);
+	csdeluxe_data_w(machine, offset, data);
 }
 
 
@@ -423,7 +422,7 @@ static READ8_HANDLER( turbotag_ip2_r )
 	if (input_mux)
 		return readinputportbytag("SSIO.IP2.ALT");
 
-	return readinputportbytag("SSIO.IP2") + 5 * (cpu_getcurrentframe() & 1);
+	return readinputportbytag("SSIO.IP2") + 5 * (video_screen_get_frame_number(0) & 1);
 }
 
 
@@ -1055,7 +1054,7 @@ static MACHINE_DRIVER_START( mcr3_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_CONFIG(mcr_daisy_chain)
-	MDRV_CPU_VBLANK_INT(mcr_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 	MDRV_MACHINE_START(mcr)

@@ -47,8 +47,7 @@ static const UINT8 ssingles_colors[NUM_PENS*3]=
 	0x00,0x00,0x00,	0xff,0x00,0xff,	0x80,0x00,0x80,	0x40,0x00,0x40
 };
 
-static void update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-		UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+static MC6845_UPDATE_ROW( update_row )
 {
 	int cx,x;
 	UINT32 tile_address;
@@ -92,6 +91,8 @@ static const mc6845_interface mc6845_intf =
 		NULL,
 		update_row,
 		NULL,
+		NULL,
+		NULL,
 		NULL
 };
 
@@ -103,17 +104,6 @@ static WRITE8_HANDLER(ssingles_videoram_w)
 static WRITE8_HANDLER(ssingles_colorram_w)
 {
 	ssingles_colorram[offset]=data;
-}
-
-static WRITE8_HANDLER( ssingles_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-
-static WRITE8_HANDLER( ssingles_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
 }
 
 
@@ -158,7 +148,7 @@ static WRITE8_HANDLER(c001_w)
 static READ8_HANDLER(controls_r)
 {
 	int data=7;
-	switch(input_port_1_r(0)) //multiplexed
+	switch(input_port_1_r(machine,0)) //multiplexed
 	{
 		case 0x01: data=1; break;
 		case 0x02: data=2; break;
@@ -168,7 +158,7 @@ static READ8_HANDLER(controls_r)
 		case 0x20: data=6; break;
 		case 0x40: data=0; break;
 	}
-	return (input_port_0_r(0)&(~0x1c))|(data<<2);
+	return (input_port_0_r(machine,0)&(~0x1c))|(data<<2);
 }
 
 static ADDRESS_MAP_START( ssingles_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -192,8 +182,8 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x18, 0x18) AM_READ(input_port_3_r)
 	AM_RANGE(0x1c, 0x1c) AM_READ(controls_r)
 	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(ssingles_mc6845_address_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(ssingles_mc6845_register_w)
+	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0xff, 0xff) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 
 ADDRESS_MAP_END
 
@@ -272,7 +262,7 @@ static MACHINE_DRIVER_START( ssingles )
 	MDRV_CPU_ADD(Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(ssingles_map,0)
 	MDRV_CPU_IO_MAP(ssingles_io_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

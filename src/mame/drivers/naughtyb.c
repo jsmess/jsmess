@@ -111,14 +111,14 @@ TODO:
 
 static READ8_HANDLER( in0_port_r )
 {
-	int in0 = input_port_0_r(0);
+	int in0 = input_port_0_r(machine,0);
 
 	if ( naughtyb_cocktail )
 	{
 		// cabinet == cocktail -AND- handling player 2
 
 		in0 = ( in0 & 0x03 ) |				// start buttons
-			  ( input_port_1_r(0) & 0xFC );	// cocktail inputs
+			  ( input_port_1_r(machine,0) & 0xFC );	// cocktail inputs
 	}
 
 	return in0;
@@ -128,8 +128,8 @@ static READ8_HANDLER( dsw0_port_r )
 {
 	// vblank replaces the cabinet dip
 
-	return ( ( input_port_2_r(0) & 0x7F ) |		// dsw0
-   			 ( input_port_3_r(0) & 0x80 ) );	// vblank
+	return ( ( input_port_2_r(machine,0) & 0x7F ) |		// dsw0
+   			 ( input_port_3_r(machine,0) & 0x80 ) );	// vblank
 }
 
 /* Pop Flamer
@@ -381,7 +381,7 @@ static MACHINE_DRIVER_START( naughtyb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(naughtyb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", naughtyb_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -418,7 +418,7 @@ static MACHINE_DRIVER_START( popflame )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,popflame_writemem)
-	MDRV_CPU_VBLANK_INT(naughtyb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", naughtyb_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

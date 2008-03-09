@@ -268,8 +268,8 @@ static READ16_HANDLER( kludge_r )
 
 static WRITE16_HANDLER( sound_cpu_w )
 {
-	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,0,data&0xff);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static READ16_HANDLER( mechatt_gun_r )
@@ -681,13 +681,13 @@ static INTERRUPT_GEN( bbuster )
 
 static VIDEO_EOF( bbuster )
 {
-	buffer_spriteram16_w(0,0,0);
-	buffer_spriteram16_2_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
+	buffer_spriteram16_2_w(machine,0,0,0);
 }
 
 static VIDEO_EOF( mechatt )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }
 
 static MACHINE_DRIVER_START( bbusters )
@@ -695,7 +695,7 @@ static MACHINE_DRIVER_START( bbusters )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bbuster_readmem,bbuster_writemem)
-	MDRV_CPU_VBLANK_INT(bbuster,4)
+	MDRV_CPU_VBLANK_INT_HACK(bbuster,4)
 
 	MDRV_CPU_ADD(Z80,4000000) /* Accurate */
 	/* audio CPU */
@@ -739,7 +739,7 @@ static MACHINE_DRIVER_START( mechatt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mechatt_readmem,mechatt_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,4000000) /* Accurate */
 	/* audio CPU */

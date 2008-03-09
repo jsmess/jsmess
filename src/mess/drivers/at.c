@@ -104,22 +104,22 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(at_dma8237_1_r)
 {
-	return dma8237_1_r(offset / 2);
+	return dma8237_1_r(machine, offset / 2);
 }
 
 static WRITE8_HANDLER(at_dma8237_1_w)
 {
-	dma8237_1_w(offset / 2, data);
+	dma8237_1_w(machine, offset / 2, data);
 }
 
 static READ32_HANDLER(at32_dma8237_1_r)
 {
-	return read32le_with_read8_handler(at_dma8237_1_r, offset, mem_mask);
+	return read32le_with_read8_handler(at_dma8237_1_r, machine, offset, mem_mask);
 }
 
 static WRITE32_HANDLER(at32_dma8237_1_w)
 {
-	write32le_with_write8_handler(at_dma8237_1_w, offset, data, mem_mask);
+	write32le_with_write8_handler(at_dma8237_1_w, machine, offset, data, mem_mask);
 }
 
 
@@ -405,16 +405,15 @@ static const struct YM3812interface ym3812_interface =
 
 
 
-#define MDRV_CPU_ATPC(mem, port, type, clock, vblankfunc)	\
+#define MDRV_CPU_ATPC(mem, port, type, clock)	\
 	MDRV_CPU_ADD_TAG("main", type, clock)					\
 	MDRV_CPU_PROGRAM_MAP(mem##_map, 0)				\
 	MDRV_CPU_IO_MAP(port##_io, 0)					\
-	MDRV_CPU_VBLANK_INT(vblankfunc, 4)						\
 	MDRV_CPU_CONFIG(i286_address_mask)
 
 static MACHINE_DRIVER_START( atcga )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at, at, I80286, 12000000, NULL)
+	MDRV_CPU_ATPC(at, at, I80286, 12000000)
 
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
@@ -448,7 +447,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ps2m30286 )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at, at, I80286, 12000000, NULL)
+	MDRV_CPU_ATPC(at, at, I80286, 12000000)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -478,7 +477,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atvga )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at, at, I80286, 12000000, NULL)
+	MDRV_CPU_ATPC(at, at, I80286, 12000000)
 
 	MDRV_IMPORT_FROM( pcvideo_vga )
 
@@ -515,7 +514,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( at386 )
     /* basic machine hardware */
 	/* original at 6 mhz, at03 8 megahertz */
-	MDRV_CPU_ATPC(at386, at386, I386, 12000000, NULL)
+	MDRV_CPU_ATPC(at386, at386, I386, 12000000)
 
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )

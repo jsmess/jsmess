@@ -62,8 +62,8 @@ static WRITE16_HANDLER( tecmo16_sound_command_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0x00,data & 0xff);
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(machine,0x00,data & 0xff);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -443,7 +443,7 @@ static MACHINE_DRIVER_START( fstarfrc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)			/* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(fstarfrc_readmem,fstarfrc_writemem)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */			/* 4MHz */
@@ -484,7 +484,7 @@ static MACHINE_DRIVER_START( ginkun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)			/* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(ginkun_readmem,ginkun_writemem)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */			/* 4MHz */

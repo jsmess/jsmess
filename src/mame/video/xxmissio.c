@@ -52,7 +52,7 @@ READ8_HANDLER( xxmissio_bgram_r )
 
 WRITE8_HANDLER( xxmissio_paletteram_w )
 {
-	paletteram_BBGGRRII_w(offset,data);
+	paletteram_BBGGRRII_w(machine,offset,data);
 }
 
 /****************************************************************************/
@@ -86,7 +86,7 @@ VIDEO_START( xxmissio )
 }
 
 
-static void draw_sprites(mame_bitmap *bitmap, gfx_element **gfx, const rectangle *cliprect)
+static void draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rectangle *cliprect)
 {
 	int offs;
 	int chr,col;

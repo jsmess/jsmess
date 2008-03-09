@@ -26,8 +26,8 @@ struct cartridge_slot
 {
 	void (*init)(const struct cartridge_callback *callbacks);
 	void (*term)(void);
-	read8_handler io_r;
-	write8_handler io_w;
+	read8_machine_func io_r;
+	write8_machine_func io_w;
 	void (*enablesound)(int enable);
 };
 

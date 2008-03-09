@@ -208,7 +208,7 @@ static READ16_HANDLER( bishjan_unk_r )
 		(mame_rand(Machine) & 0x9800)	|	// bit 7 eeprom?
 		(((bishjan_sel==0x12) ? 0x40:0x00) << 8) |
 //      (mame_rand() & 0xff);
-//      (((cpu_getcurrentframe()%60)==0)?0x18:0x00);
+//      (((video_screen_get_frame_number(0)%60)==0)?0x18:0x00);
 		0x18;
 }
 
@@ -228,7 +228,7 @@ static READ16_HANDLER( bishjan_input_r )
 
 	return	(res << 8) |
 			readinputport(3) |
-			((bishjan_hopper && !(cpu_getcurrentframe()%10)) ? 0x00 : 0x04)	// bit 2: hopper sensor
+			((bishjan_hopper && !(video_screen_get_frame_number(0)%10)) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }
 
@@ -442,7 +442,7 @@ static INTERRUPT_GEN( bishjan_interrupt )
 static MACHINE_DRIVER_START( bishjan )
 	MDRV_CPU_ADD(H83044, 44100000/3)
 	MDRV_CPU_PROGRAM_MAP( bishjan_map, 0 )
-	MDRV_CPU_VBLANK_INT(bishjan_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(bishjan_interrupt,2)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

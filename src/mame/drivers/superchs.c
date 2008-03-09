@@ -116,7 +116,7 @@ static READ32_HANDLER( superchs_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return (input_port_0_word_r(0,0) << 16) | input_port_1_word_r(0,0) |
+			return (input_port_0_word_r(machine,0,0) << 16) | input_port_1_word_r(machine,0,0) |
 				  (EEPROM_read_bit() << 7);
 
 		case 0x01:
@@ -145,7 +145,7 @@ static WRITE32_HANDLER( superchs_input_w )
 		{
 			if (ACCESSING_MSB32)	/* $300000 is watchdog */
 			{
-				watchdog_reset_w(0,data >> 24);
+				watchdog_reset(machine);
 			}
 
 			if (ACCESSING_LSB32)
@@ -177,12 +177,12 @@ static WRITE32_HANDLER( superchs_input_w )
 
 static READ32_HANDLER( superchs_stick_r )
 {
-	int fake = input_port_6_word_r(0,0);
+	int fake = input_port_6_word_r(machine,0,0);
 	int accel;
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
-		steer = input_port_2_word_r(0,0);
+		steer = input_port_2_word_r(machine,0,0);
 	}
 	else	/* Digital steer, with smoothing - speed depends on how often stick_r is called */
 	{
@@ -207,13 +207,13 @@ static READ32_HANDLER( superchs_stick_r )
 	}
 
 	/* Accelerator is an analogue input but the game treats it as digital (on/off) */
-	if (input_port_6_word_r(0,0) & 0x1)	/* pressing B1 */
+	if (input_port_6_word_r(machine,0,0) & 0x1)	/* pressing B1 */
 		accel = 0x0;
 	else
 		accel = 0xff;
 
 	/* Todo: Verify brake - and figure out other input */
-	return (steer << 24) | (accel << 16) | (input_port_4_word_r(0,0) << 8) | input_port_5_word_r(0,0);
+	return (steer << 24) | (accel << 16) | (input_port_4_word_r(machine,0,0) << 8) | input_port_5_word_r(machine,0,0);
 }
 
 static WRITE32_HANDLER( superchs_stick_w )
@@ -417,14 +417,14 @@ static MACHINE_DRIVER_START( superchs )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(superchs_readmem,superchs_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)/* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(superchs_cpub_readmem,superchs_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 
 	MDRV_INTERLEAVE(8)	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 

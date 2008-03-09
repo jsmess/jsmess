@@ -76,10 +76,10 @@ static UINT32 KeyStateSave[/*4*/3];
 
 static struct
 {
-	read8_handler reg_read;
-	write8_handler reg_write;
-	read8_handler rom_read;
-	write8_handler rom_write;
+	read8_machine_func reg_read;
+	write8_machine_func reg_write;
+	read8_machine_func rom_read;
+	write8_machine_func rom_write;
 } expansion_slots[4];
 
 static void concept_fdc_init(int slot);
@@ -111,8 +111,8 @@ MACHINE_START(concept)
 }
 
 static void install_expansion_slot(int slot,
-									read8_handler reg_read, write8_handler reg_write,
-									read8_handler rom_read, write8_handler rom_write)
+									read8_machine_func reg_read, write8_machine_func reg_write,
+									read8_machine_func rom_read, write8_machine_func rom_write)
 {
 	expansion_slots[slot].reg_read = reg_read;
 	expansion_slots[slot].reg_write = reg_write;
@@ -301,7 +301,7 @@ READ16_HANDLER(concept_io_r)
 			{
 				int slot = ((offset >> 4) & 7) - 1;
 				if (expansion_slots[slot].reg_read)
-					return expansion_slots[slot].reg_read(offset & 0xf);
+					return expansion_slots[slot].reg_read(machine, offset & 0xf);
 			}
 			break;
 
@@ -324,7 +324,7 @@ READ16_HANDLER(concept_io_r)
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", slot, offset << 1));
 			if (expansion_slots[slot].rom_read)
-				return expansion_slots[slot].rom_read(offset & 0xff);
+				return expansion_slots[slot].rom_read(machine, offset & 0xff);
 		}
 		break;
 
@@ -440,7 +440,7 @@ WRITE16_HANDLER(concept_io_w)
 				LOG(("concept_io_w: Slot I/O register written for slot %d at address 0x03%4.4x, data: 0x%4.4x\n",
 					slot, offset << 1, data));
 				if (expansion_slots[slot].reg_write)
-					expansion_slots[slot].reg_write(offset & 0xf, data);
+					expansion_slots[slot].reg_write(machine, offset & 0xf, data);
 			}
 			break;
 
@@ -463,7 +463,7 @@ WRITE16_HANDLER(concept_io_w)
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", slot, offset << 1, data));
 			if (expansion_slots[slot].rom_write)
-				expansion_slots[slot].rom_write(offset & 0xff, data);
+				expansion_slots[slot].rom_write(machine, offset & 0xff, data);
 		}
 		break;
 
@@ -614,22 +614,22 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 
 	case 8:
 		/* FDC STATUS REG */
-		return wd17xx_status_r(offset);
+		return wd17xx_status_r(machine, offset);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		return wd17xx_track_r(offset);
+		return wd17xx_track_r(machine, offset);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		return wd17xx_sector_r(offset);
+		return wd17xx_sector_r(machine, offset);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		return wd17xx_data_r(offset);
+		return wd17xx_data_r(machine, offset);
 		break;
 	}
 
@@ -658,22 +658,22 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 
 	case 8:
 		/* FDC COMMAMD REG */
-		wd17xx_command_w(offset, data);
+		wd17xx_command_w(machine, offset, data);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		wd17xx_track_w(offset, data);
+		wd17xx_track_w(machine, offset, data);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		wd17xx_sector_w(offset, data);
+		wd17xx_sector_w(machine, offset, data);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		wd17xx_data_w(offset, data);
+		wd17xx_data_w(machine, offset, data);
 		break;
 	}
 }
@@ -713,12 +713,12 @@ static  READ8_HANDLER(concept_hdc_reg_r)
 	{
 	case 0:
 		/* HDC Data Register */
-		return corvus_hdc_data_r(offset);
+		return corvus_hdc_data_r(machine, offset);
 		break;
 
 	case 1:
 		/* HDC Status Register */
-		return corvus_hdc_status_r(offset);
+		return corvus_hdc_status_r(machine, offset);
 		break;
 	}
 
@@ -734,7 +734,7 @@ static WRITE8_HANDLER(concept_hdc_reg_w)
 	{
 	case 0:
 		/* HDC Data Register */
-		corvus_hdc_data_w(offset, data);
+		corvus_hdc_data_w(machine, offset, data);
 		break;
 	}
 }

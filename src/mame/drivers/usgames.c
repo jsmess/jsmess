@@ -24,14 +24,13 @@ Sound: AY-3-8912
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 
 /* video */
 WRITE8_HANDLER( usgames_videoram_w );
 WRITE8_HANDLER( usgames_charram_w );
-WRITE8_HANDLER( usgames_mc6845_address_w );
-WRITE8_HANDLER( usgames_mc6845_register_w );
 VIDEO_START(usgames);
 PALETTE_INIT(usgames);
 VIDEO_UPDATE(usgames);
@@ -103,8 +102,8 @@ static ADDRESS_MAP_START( usgames_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(lamps1_w)
 	AM_RANGE(0x2030, 0x2030) AM_WRITE(lamps2_w)
 
-	AM_RANGE(0x2040, 0x2040) AM_WRITE(usgames_mc6845_address_w)
-	AM_RANGE(0x2041, 0x2041) AM_WRITE(usgames_mc6845_register_w)
+	AM_RANGE(0x2040, 0x2040) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x2041, 0x2041) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x2401, 0x2401) AM_WRITE(AY8910_write_port_0_w)
@@ -123,8 +122,8 @@ static ADDRESS_MAP_START( usg185_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2420, 0x2420) AM_WRITE(lamps1_w)
 	AM_RANGE(0x2430, 0x2430) AM_WRITE(lamps2_w)
 
-	AM_RANGE(0x2440, 0x2440) AM_WRITE(usgames_mc6845_address_w)
-	AM_RANGE(0x2441, 0x2441) AM_WRITE(usgames_mc6845_register_w)
+	AM_RANGE(0x2440, 0x2440) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x2441, 0x2441) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(AY8910_write_port_0_w)
@@ -292,7 +291,7 @@ static MACHINE_DRIVER_START( usg32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809, 2000000) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(usgames_readmem,usgames_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,5) /* ?? */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,5) /* ?? */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

@@ -167,18 +167,18 @@ INTERRUPT_GEN( kaypro_interrupt )
 	}
 
 	row = 9;
-	new = input_port_10_r(0);
+	new = readinputport(10);
 	chg = keyrows[row] ^ new;
 
-	if (!chg) { new = input_port_9_r(0); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_8_r(0); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_7_r(0); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_6_r(0); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_5_r(0); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_4_r(0); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_3_r(0); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_2_r(0); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_1_r(0); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = readinputport(9); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = readinputport(8); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = readinputport(7); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = readinputport(6); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = readinputport(5); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = readinputport(4); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = readinputport(3); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = readinputport(2); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = readinputport(1); chg = keyrows[--row] ^ new; }
 	if (!chg) --row;
 
 	if (row >= 0)
@@ -222,11 +222,11 @@ INTERRUPT_GEN( kaypro_interrupt )
 			if( key )	/* normal key */
 			{
 				repeater = 30;
-				kaypro_conin_w(0, key);
+				kaypro_conin_w(machine, 0, key);
 			}
 			else
 			if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-				kaypro_conin_w(0, 0);
+				kaypro_conin_w(machine, 0, 0);
 			keyrows[row] |= new;
 		}
 		else
@@ -237,7 +237,7 @@ INTERRUPT_GEN( kaypro_interrupt )
 	}
 	else if ( key && (keyrows[lastrow] & mask) && repeat == 0 )
 	{
-		kaypro_conin_w(0, key);
+		kaypro_conin_w(machine, 0, key);
 	}
 }
 

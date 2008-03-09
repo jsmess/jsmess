@@ -54,7 +54,7 @@ static READ8_HANDLER( scontra_bankedram_r )
 static WRITE8_HANDLER( scontra_bankedram_w )
 {
 	if (palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 	else
 		ram[offset] = data;
 }
@@ -96,7 +96,7 @@ static WRITE8_HANDLER( thunderx_bankedram_w )
 			logerror("%04x pmc internal ram %04x = %02x\n",activecpu_get_pc(),offset,data);
 	}
 	else
-		paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 }
 
 /*
@@ -699,7 +699,7 @@ static MACHINE_DRIVER_START( scontra )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000)	/* 052001 */
 	MDRV_CPU_PROGRAM_MAP(scontra_readmem,scontra_writemem)
-	MDRV_CPU_VBLANK_INT(scontra_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", scontra_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */		/* ? */
@@ -741,7 +741,7 @@ static MACHINE_DRIVER_START( thunderx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(thunderx_readmem,thunderx_writemem)
-	MDRV_CPU_VBLANK_INT(scontra_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", scontra_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */		/* ? */

@@ -311,8 +311,8 @@ static READ32_HANDLER( s1945_input_r )
 	switch(offset)
 	{
 		case 0x0:	return (readinputport(0) << 16) | psikyo_readcoinport(1);
-		case 0x1:	return (((readinputport(2) << 16) | readinputport(3)) & 0xffff000f) | s1945_mcu_r(offset-1, mem_mask);
-		case 0x2:	return s1945_mcu_r(offset-1, mem_mask);
+		case 0x1:	return (((readinputport(2) << 16) | readinputport(3)) & 0xffff000f) | s1945_mcu_r(machine, offset-1, mem_mask);
+		case 0x2:	return s1945_mcu_r(machine, offset-1, mem_mask);
 		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
 					return 0;
 	}
@@ -331,9 +331,9 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
 	paletteram16 = (UINT16 *)paletteram32;
 	if (ACCESSING_MSW32)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2, data >> 16, mem_mask >> 16);
+		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_LSW32)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2+1, data, mem_mask);
+		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2+1, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( psikyo_readmem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1565,7 +1565,7 @@ static MACHINE_DRIVER_START( sngkace )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ? */
@@ -1619,7 +1619,7 @@ static MACHINE_DRIVER_START( gunbird )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	/* audio CPU */
@@ -1681,7 +1681,7 @@ static MACHINE_DRIVER_START( s1945 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	/* audio CPU */

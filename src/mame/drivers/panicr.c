@@ -194,7 +194,7 @@ static VIDEO_START( panicr )
 	colortable_configure_tilemap_groups(machine->colortable, txttilemap, machine->gfx[0], 0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
 	int offs,fx,fy,x,y,color,sprite;
 
@@ -358,7 +358,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( panicr )
 	MDRV_CPU_ADD(V20,16000000/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MDRV_CPU_PROGRAM_MAP(panicr_map,0)
-	MDRV_CPU_VBLANK_INT(panicr_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(panicr_interrupt,2)
 
 	MDRV_CPU_ADD_TAG(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(t5182_map, 0)

@@ -28,17 +28,11 @@ QUICKLOAD_LOAD( microtan_hexfile );
 
 INTERRUPT_GEN( microtan_interrupt );
 
- READ8_HANDLER ( microtan_via_0_r );
- READ8_HANDLER ( microtan_via_1_r );
- READ8_HANDLER ( microtan_bffx_r );
- READ8_HANDLER ( microtan_sound_r );
- READ8_HANDLER ( microtan_sio_r );
+READ8_HANDLER ( microtan_bffx_r );
+READ8_HANDLER ( microtan_sound_r );
 
-WRITE8_HANDLER ( microtan_via_0_w );
-WRITE8_HANDLER ( microtan_via_1_w );
 WRITE8_HANDLER ( microtan_bffx_w );
 WRITE8_HANDLER ( microtan_sound_w );
-WRITE8_HANDLER ( microtan_sio_w );
 
 
 /*----------- defined in video/microtan.c -----------*/

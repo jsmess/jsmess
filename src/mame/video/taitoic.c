@@ -542,7 +542,7 @@ Newer version of the I/O chip ?
 /* These scanline drawing routines lifted from Taito F3: optimise / merge ? */
 
 INLINE void taitoic_drawscanline(
-		mame_bitmap *bitmap,int x,int y,
+		bitmap_t *bitmap,int x,int y,
 		const UINT16 *src,int transparent,UINT32 orient,int pri, const rectangle *cliprect)
 {
 	UINT16 *dsti = BITMAP_ADDR16(bitmap, y, x);
@@ -578,7 +578,7 @@ INLINE void taitoic_drawscanline(
 /* Note: various assumptions are made in these routines, typically that
    only CPU#0 is of interest. If in doubt, check the routine. */
 
-static int has_write_handler(int cpunum, write16_handler handler)
+static int has_write_handler(int cpunum, write16_machine_func handler)
 {
 	const address_map *map;
 	for (map = memory_get_map(cpunum, ADDRESS_SPACE_PROGRAM); map && !IS_AMENTRY_END(map); map++)
@@ -755,7 +755,7 @@ static TILE_GET_INFO( PC080SN_get_fg_tile_info_1 )
 	common_get_PC080SN_fg_tile_info(machine,tileinfo,tile_index,PC080SN_bg_ram[1][1],PC080SN_bg_gfx[1]);
 }
 
-static const tile_get_info_callback PC080SN_get_tile_info[PC080SN_MAX_CHIPS][2] =
+static const tile_get_info_func PC080SN_get_tile_info[PC080SN_MAX_CHIPS][2] =
 {
 	{ PC080SN_get_bg_tile_info_0, PC080SN_get_fg_tile_info_0 },
 	{ PC080SN_get_bg_tile_info_1, PC080SN_get_fg_tile_info_1 }
@@ -1069,15 +1069,15 @@ static UINT16 topspeed_get_road_pixel_color(UINT16 pixel,UINT16 color)
 }
 
 
-static void topspeed_custom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,
+static void topspeed_custom_draw(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,
 							UINT32 priority,UINT16 *color_ctrl_ram)
 {
 	UINT16 *dst16,*src16;
 	UINT8 *tsrc;
 	UINT16 scanline[1024];	/* won't be called by a wide-screen game, but just in case... */
 
-	mame_bitmap *srcbitmap = tilemap_get_pixmap(PC080SN_tilemap[chip][layer]);
-	mame_bitmap *flagsbitmap = tilemap_get_flagsmap(PC080SN_tilemap[chip][layer]);
+	bitmap_t *srcbitmap = tilemap_get_pixmap(PC080SN_tilemap[chip][layer]);
+	bitmap_t *flagsbitmap = tilemap_get_flagsmap(PC080SN_tilemap[chip][layer]);
 
 	UINT16 a,color;
 	int sx,x_index;
@@ -1160,12 +1160,12 @@ static void topspeed_custom_draw(mame_bitmap *bitmap,const rectangle *cliprect,i
 }
 
 
-void PC080SN_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
+void PC080SN_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
 {
 	tilemap_draw(bitmap,cliprect,PC080SN_tilemap[chip][layer],flags,priority);
 }
 
-void PC080SN_tilemap_draw_offset(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,int xoffs,int yoffs)
+void PC080SN_tilemap_draw_offset(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,int xoffs,int yoffs)
 {
 	int basedx = -16 - PC080SN_xoffs;
 	int basedxflip = -16 + PC080SN_xoffs;
@@ -1179,7 +1179,7 @@ void PC080SN_tilemap_draw_offset(mame_bitmap *bitmap,const rectangle *cliprect,i
 	tilemap_set_scrolldy(PC080SN_tilemap[chip][layer], basedy, basedyflip);
 }
 
-void PC080SN_tilemap_draw_special(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram)
+void PC080SN_tilemap_draw_special(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram)
 {
 	topspeed_custom_draw(bitmap,cliprect,chip,layer,flags,priority,ram);
 }
@@ -1276,7 +1276,7 @@ void PC090OJ_eof_callback(void)
 }
 
 
-void PC090OJ_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,int pri_type)
+void PC090OJ_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int pri_type)
 {
 	int offs,priority=0;
 	int sprite_colbank = (PC090OJ_sprite_ctrl & 0xf) << 4;	/* top nibble */
@@ -1695,7 +1695,7 @@ WRITE16_HANDLER( TC0080VCO_word_w )
 	else if (offset < 0x20800/2)	/* sprite ram */
 	{}
 	else if (offset < 0x20fff/2)
-		TC0080VCO_scrollram_w(offset-(0x20800/2),TC0080VCO_ram[offset],mem_mask);
+		TC0080VCO_scrollram_w(machine,offset-(0x20800/2),TC0080VCO_ram[offset],mem_mask);
 }
 
 
@@ -1760,7 +1760,7 @@ void TC0080VCO_tilemap_update(running_machine *machine)
 
 /* NB: orientation_flipx code in following routine has not been tested */
 
-static void TC0080VCO_bg0_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+static void TC0080VCO_bg0_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	UINT16 zoom = TC0080VCO_scroll_ram[6];
 	int zx, zy;
@@ -1777,8 +1777,8 @@ static void TC0080VCO_bg0_tilemap_draw(mame_bitmap *bitmap,const rectangle *clip
 		UINT16 *dst16,*src16;
 		UINT8 *tsrc;
 		UINT16 scanline[512];
-		mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0080VCO_tilemap[0]);
-		mame_bitmap *flagsbitmap = tilemap_get_flagsmap(TC0080VCO_tilemap[0]);
+		bitmap_t *srcbitmap = tilemap_get_pixmap(TC0080VCO_tilemap[0]);
+		bitmap_t *flagsbitmap = tilemap_get_flagsmap(TC0080VCO_tilemap[0]);
 
 		int sx,zoomx,zoomy;
 		int dx,ex,dy,ey;
@@ -1914,7 +1914,7 @@ static void TC0080VCO_bg0_tilemap_draw(mame_bitmap *bitmap,const rectangle *clip
 }
 
 
-static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	UINT8 layer=1;
 	UINT16 zoom = TC0080VCO_scroll_ram[6+layer];
@@ -1937,7 +1937,7 @@ static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, mame_bitmap *bi
 		int sx,sy;
 
 		/* shouldn't we set no_clip before doing this (see TC0480SCP) ? */
-		mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0080VCO_tilemap[layer]);
+		bitmap_t *srcbitmap = tilemap_get_pixmap(TC0080VCO_tilemap[layer]);
 
 		if (zoomx < 63)
 		{
@@ -1990,7 +1990,7 @@ static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, mame_bitmap *bi
 }
 
 
-void TC0080VCO_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+void TC0080VCO_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	int disable = 0x00;	/* possibly layer disable bits do exist ?? */
 
@@ -2165,7 +2165,7 @@ static TILE_GET_INFO( TC0100SCN_get_tx_tile_info_2 )
 
 /* This array changes with TC0100SCN_MAX_CHIPS */
 
-static const tile_get_info_callback TC0100SCN_get_tile_info[TC0100SCN_MAX_CHIPS][3] =
+static const tile_get_info_func TC0100SCN_get_tile_info[TC0100SCN_MAX_CHIPS][3] =
 {
 	{ TC0100SCN_get_bg_tile_info_0, TC0100SCN_get_fg_tile_info_0, TC0100SCN_get_tx_tile_info_0 },
 	{ TC0100SCN_get_bg_tile_info_1, TC0100SCN_get_fg_tile_info_1, TC0100SCN_get_tx_tile_info_1 },
@@ -2492,15 +2492,15 @@ WRITE16_HANDLER( TC0100SCN_word_2_w )
 
 WRITE16_HANDLER( TC0100SCN_dual_screen_w )
 {
-	TC0100SCN_word_0_w(offset,data,mem_mask);
-	TC0100SCN_word_1_w(offset,data,mem_mask);
+	TC0100SCN_word_0_w(machine,offset,data,mem_mask);
+	TC0100SCN_word_1_w(machine,offset,data,mem_mask);
 }
 
 WRITE16_HANDLER( TC0100SCN_triple_screen_w )
 {
-	TC0100SCN_word_0_w(offset,data,mem_mask);
-	TC0100SCN_word_1_w(offset,data,mem_mask);
-	TC0100SCN_word_2_w(offset,data,mem_mask);
+	TC0100SCN_word_0_w(machine,offset,data,mem_mask);
+	TC0100SCN_word_1_w(machine,offset,data,mem_mask);
+	TC0100SCN_word_2_w(machine,offset,data,mem_mask);
 }
 
 
@@ -2605,7 +2605,7 @@ WRITE16_HANDLER( TC0100SCN_ctrl_word_2_w )
 
 READ32_HANDLER( TC0100SCN_ctrl_long_r )
 {
-	return (TC0100SCN_ctrl_word_0_r(offset*2,0)<<16)|TC0100SCN_ctrl_word_0_r(offset*2+1,0);
+	return (TC0100SCN_ctrl_word_0_r(machine,offset*2,0)<<16)|TC0100SCN_ctrl_word_0_r(machine,offset*2+1,0);
 }
 
 WRITE32_HANDLER( TC0100SCN_ctrl_long_w )
@@ -2616,30 +2616,30 @@ WRITE32_HANDLER( TC0100SCN_ctrl_long_w )
 
 READ32_HANDLER( TC0100SCN_long_r )
 {
-	return (TC0100SCN_word_0_r(offset*2,0)<<16)|TC0100SCN_word_0_r(offset*2+1,0);
+	return (TC0100SCN_word_0_r(machine,offset*2,0)<<16)|TC0100SCN_word_0_r(machine,offset*2+1,0);
 }
 
 WRITE32_HANDLER( TC0100SCN_long_w )
 {
 	if (((mem_mask & 0xff000000) == 0) || ((mem_mask & 0x00ff0000) == 0))
 	{
-		int oldword = TC0100SCN_word_0_r(offset*2,0);
+		int oldword = TC0100SCN_word_0_r(machine,offset*2,0);
 		int newword = data>>16;
 		if ((mem_mask & 0x00ff0000) != 0)
 			newword |= (oldword &0x00ff);
 		if ((mem_mask & 0xff000000) != 0)
 			newword |= (oldword &0xff00);
-		TC0100SCN_word_0_w(offset*2,newword,0);
+		TC0100SCN_word_0_w(machine,offset*2,newword,0);
 	}
 	if (((mem_mask & 0x0000ff00) == 0) || ((mem_mask & 0x000000ff) == 0))
 	{
-		int oldword = TC0100SCN_word_0_r((offset*2)+1,0);
+		int oldword = TC0100SCN_word_0_r(machine,(offset*2)+1,0);
 		int newword = data&0xffff;
 		if ((mem_mask & 0x000000ff) != 0)
 			newword |= (oldword &0x00ff);
 		if ((mem_mask & 0x0000ff00) != 0)
 			newword |= (oldword &0xff00);
-		TC0100SCN_word_0_w((offset*2)+1,newword,0);
+		TC0100SCN_word_0_w(machine,(offset*2)+1,newword,0);
 	}
 }
 
@@ -2687,9 +2687,9 @@ void TC0100SCN_tilemap_update(running_machine *machine)
 	}
 }
 
-static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
+static void TC0100SCN_tilemap_draw_fg(bitmap_t *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
 {
-	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tmap);
+	const bitmap_t *src_bitmap = tilemap_get_pixmap(tmap);
 	int width_mask, height_mask, x, y, p;
 	int column_offset, src_x=0, src_y=0;
 	int scrollx_delta = - tilemap_get_scrolldx( tmap );
@@ -2730,7 +2730,7 @@ static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *clipr
 	}
 }
 
-int TC0100SCN_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
+int TC0100SCN_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
 {
 	int disable = TC0100SCN_ctrl[chip][6] & 0xf7;
 	rectangle clip = *cliprect;
@@ -2810,7 +2810,7 @@ READ16_HANDLER( TC0280GRD_word_r )
 
 READ16_HANDLER( TC0430GRW_word_r )
 {
-	return TC0280GRD_word_r(offset,mem_mask);
+	return TC0280GRD_word_r(machine,offset,mem_mask);
 }
 
 WRITE16_HANDLER( TC0280GRD_word_w )
@@ -2821,7 +2821,7 @@ WRITE16_HANDLER( TC0280GRD_word_w )
 
 WRITE16_HANDLER( TC0430GRW_word_w )
 {
-	TC0280GRD_word_w(offset,data,mem_mask);
+	TC0280GRD_word_w(machine,offset,data,mem_mask);
 }
 
 WRITE16_HANDLER( TC0280GRD_ctrl_word_w )
@@ -2831,7 +2831,7 @@ WRITE16_HANDLER( TC0280GRD_ctrl_word_w )
 
 WRITE16_HANDLER( TC0430GRW_ctrl_word_w )
 {
-	TC0280GRD_ctrl_word_w(offset,data,mem_mask);
+	TC0280GRD_ctrl_word_w(machine,offset,data,mem_mask);
 }
 
 void TC0280GRD_tilemap_update(int base_color)
@@ -2848,7 +2848,7 @@ void TC0430GRW_tilemap_update(int base_color)
 	TC0280GRD_tilemap_update(base_color);
 }
 
-static void zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority,int xmultiply)
+static void zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority,int xmultiply)
 {
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
@@ -2875,12 +2875,12 @@ static void zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffset,
 			0,priority);
 }
 
-void TC0280GRD_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority)
+void TC0280GRD_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority)
 {
 	zoom_draw(bitmap,cliprect,xoffset,yoffset,priority,2);
 }
 
-void TC0430GRW_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority)
+void TC0430GRW_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority)
 {
 	zoom_draw(bitmap,cliprect,xoffset,yoffset,priority,1);
 }
@@ -2914,7 +2914,7 @@ WRITE16_HANDLER( TC0360PRI_halfword_w )
 {
 	if (ACCESSING_LSB)
 	{
-		TC0360PRI_w(offset,data & 0xff);
+		TC0360PRI_w(machine,offset,data & 0xff);
 #if 0
 if (data & 0xff00)
 { logerror("CPU #0 PC %06x: warning - write %02x to MSB of TC0360PRI address %02x\n",activecpu_get_pc(),data,offset); }
@@ -2928,7 +2928,7 @@ WRITE16_HANDLER( TC0360PRI_halfword_swap_w )
 {
 	if (ACCESSING_MSB)
 	{
-		TC0360PRI_w(offset,(data >> 8) & 0xff);
+		TC0360PRI_w(machine,offset,(data >> 8) & 0xff);
 #if 0
 if (data & 0xff)
 { logerror("CPU #0 PC %06x: warning - write %02x to LSB of TC0360PRI address %02x\n",activecpu_get_pc(),data,offset); }
@@ -3013,7 +3013,7 @@ static TILE_GET_INFO( TC0480SCP_get_tx_tile_info )
 	common_get_tc0480tx_tile_info(machine,tileinfo,tile_index,TC0480SCP_tx_ram,TC0480SCP_tx_gfx);
 }
 
-static const tile_get_info_callback tc480_get_tile_info[5] =
+static const tile_get_info_func tc480_get_tile_info[5] =
 {
 	TC0480SCP_get_bg0_tile_info, TC0480SCP_get_bg1_tile_info,
 	TC0480SCP_get_bg2_tile_info, TC0480SCP_get_bg3_tile_info,
@@ -3270,43 +3270,43 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 
 READ32_HANDLER( TC0480SCP_ctrl_long_r )
 {
-	return (TC0480SCP_ctrl_word_r(offset*2,0)<<16)|TC0480SCP_ctrl_word_r(offset*2+1,0);
+	return (TC0480SCP_ctrl_word_r(machine,offset*2,0)<<16)|TC0480SCP_ctrl_word_r(machine,offset*2+1,0);
 }
 
 /* TODO: byte access ? */
 
 WRITE32_HANDLER( TC0480SCP_ctrl_long_w )
 {
-	if (ACCESSING_MSW32) TC0480SCP_ctrl_word_w(offset*2,data>>16,mem_mask>>16);
-	if (ACCESSING_LSW32) TC0480SCP_ctrl_word_w((offset*2)+1,data&0xffff,mem_mask&0xffff);
+	if (ACCESSING_MSW32) TC0480SCP_ctrl_word_w(machine,offset*2,data>>16,mem_mask>>16);
+	if (ACCESSING_LSW32) TC0480SCP_ctrl_word_w(machine,(offset*2)+1,data&0xffff,mem_mask&0xffff);
 }
 
 READ32_HANDLER( TC0480SCP_long_r )
 {
-	return (TC0480SCP_word_r(offset*2,0)<<16)|TC0480SCP_word_r(offset*2+1,0);
+	return (TC0480SCP_word_r(machine,offset*2,0)<<16)|TC0480SCP_word_r(machine,offset*2+1,0);
 }
 
 WRITE32_HANDLER( TC0480SCP_long_w )
 {
 	if (((mem_mask & 0xff000000) == 0) || ((mem_mask & 0x00ff0000) == 0))
 	{
-		int oldword = TC0480SCP_word_r(offset*2,0);
+		int oldword = TC0480SCP_word_r(machine,offset*2,0);
 		int newword = data>>16;
 		if ((mem_mask & 0x00ff0000) != 0)
 			newword |= (oldword &0x00ff);
 		if ((mem_mask & 0xff000000) != 0)
 			newword |= (oldword &0xff00);
-		TC0480SCP_word_w(offset*2,newword,0);
+		TC0480SCP_word_w(machine,offset*2,newword,0);
 	}
 	if (((mem_mask & 0x0000ff00) == 0) || ((mem_mask & 0x000000ff) == 0))
 	{
-		int oldword = TC0480SCP_word_r((offset*2)+1,0);
+		int oldword = TC0480SCP_word_r(machine,(offset*2)+1,0);
 		int newword = data&0xffff;
 		if ((mem_mask & 0x000000ff) != 0)
 			newword |= (oldword &0x00ff);
 		if ((mem_mask & 0x0000ff00) != 0)
 			newword |= (oldword &0xff00);
-		TC0480SCP_word_w((offset*2)+1,newword,0);
+		TC0480SCP_word_w(machine,(offset*2)+1,newword,0);
 	}
 }
 
@@ -3591,7 +3591,7 @@ Historical Issues
 
 **********************************************************************/
 
-static void TC0480SCP_bg01_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+static void TC0480SCP_bg01_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	/* X-axis zoom offers expansion only: 0 = no zoom, 0xff = max
        Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max
@@ -3611,8 +3611,8 @@ static void TC0480SCP_bg01_draw(mame_bitmap *bitmap,const rectangle *cliprect,in
 		UINT8 *tsrc;
 		UINT16 scanline[512];
 		UINT32 sx;
-		mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
-		mame_bitmap *flagsbitmap = tilemap_get_flagsmap
+		bitmap_t *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
+		bitmap_t *flagsbitmap = tilemap_get_flagsmap
 							(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
 		int flip = TC0480SCP_pri_reg & 0x40;
 		int i,y,y_index,src_y_index,row_index;
@@ -3742,14 +3742,14 @@ flipscreen.
 
 ****************************************************************/
 
-static void TC0480SCP_bg23_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+static void TC0480SCP_bg23_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
-	mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
-	mame_bitmap *flagsbitmap = tilemap_get_flagsmap
+	bitmap_t *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
+	bitmap_t *flagsbitmap = tilemap_get_flagsmap
 						(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
 
 	UINT16 *dst16,*src16;
-	UINT16 *tsrc;
+	UINT8 *tsrc;
 	int i,y,y_index,src_y_index,row_index,row_zoom;
 	int sx,x_index,x_step;
 	UINT32 zoomx,zoomy;
@@ -3831,7 +3831,7 @@ static void TC0480SCP_bg23_draw(mame_bitmap *bitmap,const rectangle *cliprect,in
 		}
 
 		src16 = BITMAP_ADDR16(srcbitmap, src_y_index, 0);
-		tsrc  = BITMAP_ADDR16(flagsbitmap, src_y_index, 0);
+		tsrc  = BITMAP_ADDR8(flagsbitmap, src_y_index, 0);
 		dst16 = scanline;
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
@@ -3868,7 +3868,7 @@ static void TC0480SCP_bg23_draw(mame_bitmap *bitmap,const rectangle *cliprect,in
 
 
 
-void TC0480SCP_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+void TC0480SCP_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	/* no layer disable bits */
 
@@ -4100,7 +4100,7 @@ lookup table from rom for the TaitoZ sprites.
 
 ******************************************************************************/
 
-void TC0150ROD_draw(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs,int palette_offs,int type,int road_trans,UINT32 low_priority,UINT32 high_priority)
+void TC0150ROD_draw(bitmap_t *bitmap,const rectangle *cliprect,int y_offs,int palette_offs,int type,int road_trans,UINT32 low_priority,UINT32 high_priority)
 {
 #ifdef MAME_DEBUG
 	static int dislayer[6];	/* Road Layer toggles to help get road correct */
@@ -4940,22 +4940,22 @@ READ8_HANDLER( TC0220IOC_r )
 	switch (offset)
 	{
 		case 0x00:	/* IN00-07 (DSA) */
-			return input_port_0_r(0);
+			return input_port_0_r(machine,0);
 
 		case 0x01:	/* IN08-15 (DSB) */
-			return input_port_1_r(0);
+			return input_port_1_r(machine,0);
 
 		case 0x02:	/* IN16-23 (1P) */
-			return input_port_2_r(0);
+			return input_port_2_r(machine,0);
 
 		case 0x03:	/* IN24-31 (2P) */
-			return input_port_3_r(0);
+			return input_port_3_r(machine,0);
 
 		case 0x04:	/* coin counters and lockout */
 			return TC0220IOC_regs[4];
 
 		case 0x07:	/* INB0-7 (coin) */
-			return input_port_4_r(0);
+			return input_port_4_r(machine,0);
 
 		default:
 logerror("PC %06x: warning - read TC0220IOC address %02x\n",activecpu_get_pc(),offset);
@@ -4970,7 +4970,7 @@ WRITE8_HANDLER( TC0220IOC_w )
 	switch (offset)
 	{
 		case 0x00:
-			watchdog_reset_w(offset,data);
+			watchdog_reset(machine);
 			break;
 
 		case 0x04:	/* coin counters and lockout, hi nibble irrelevant */
@@ -5002,71 +5002,71 @@ WRITE8_HANDLER( TC0220IOC_port_w )
 
 READ8_HANDLER( TC0220IOC_portreg_r )
 {
-	return TC0220IOC_r(TC0220IOC_port);
+	return TC0220IOC_r(machine, TC0220IOC_port);
 }
 
 WRITE8_HANDLER( TC0220IOC_portreg_w )
 {
-	TC0220IOC_w(TC0220IOC_port, data);
+	TC0220IOC_w(machine, TC0220IOC_port, data);
 }
 
 READ16_HANDLER( TC0220IOC_halfword_port_r )
 {
-	return TC0220IOC_port_r( offset );
+	return TC0220IOC_port_r( machine, offset );
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_port_w )
 {
 	if (ACCESSING_LSB)
-		TC0220IOC_port_w( offset, data & 0xff );
+		TC0220IOC_port_w( machine, offset, data & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_portreg_r )
 {
-	return TC0220IOC_portreg_r( offset );
+	return TC0220IOC_portreg_r( machine, offset );
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_portreg_w )
 {
 	if (ACCESSING_LSB)
-		TC0220IOC_portreg_w( offset, data & 0xff );
+		TC0220IOC_portreg_w( machine, offset, data & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_byteswap_port_r )
 {
-	return TC0220IOC_port_r( offset ) << 8;
+	return TC0220IOC_port_r( machine, offset ) << 8;
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_port_w )
 {
 	if (ACCESSING_MSB)
-		TC0220IOC_port_w( offset, (data>>8) & 0xff );
+		TC0220IOC_port_w( machine, offset, (data>>8) & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_byteswap_portreg_r )
 {
-	return TC0220IOC_portreg_r( offset )<<8;
+	return TC0220IOC_portreg_r( machine, offset )<<8;
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_portreg_w )
 {
 	if (ACCESSING_MSB)
-		TC0220IOC_portreg_w( offset, (data>>8) & 0xff );
+		TC0220IOC_portreg_w( machine, offset, (data>>8) & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_r )
 {
-	return TC0220IOC_r(offset);
+	return TC0220IOC_r(machine,offset);
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_w )
 {
 	if (ACCESSING_LSB)
-		TC0220IOC_w(offset,data & 0xff);
+		TC0220IOC_w(machine,offset,data & 0xff);
 	else
 	{
 		/* qtorimon writes here the coin counters - bug? */
-		TC0220IOC_w(offset,(data >> 8) & 0xff);
+		TC0220IOC_w(machine,offset,(data >> 8) & 0xff);
 
 		if (offset)		/* ainferno writes watchdog in msb */
 logerror("CPU #0 PC %06x: warning - write to MSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
@@ -5075,16 +5075,16 @@ logerror("CPU #0 PC %06x: warning - write to MSB of TC0220IOC address %02x\n",ac
 
 READ16_HANDLER( TC0220IOC_halfword_byteswap_r )
 {
-	return TC0220IOC_halfword_r(offset,mem_mask) << 8;
+	return TC0220IOC_halfword_r(machine,offset,mem_mask) << 8;
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_w )
 {
 	if (ACCESSING_MSB)
-		TC0220IOC_w(offset,(data >> 8) & 0xff);
+		TC0220IOC_w(machine,offset,(data >> 8) & 0xff);
 	else
 	{
-		TC0220IOC_w(offset,data & 0xff);
+		TC0220IOC_w(machine,offset,data & 0xff);
 
 logerror("CPU #0 PC %06x: warning - write to LSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
 	}
@@ -5101,22 +5101,22 @@ READ8_HANDLER( TC0510NIO_r )
 	switch (offset)
 	{
 		case 0x00:	/* DSA */
-			return input_port_0_r(0);
+			return input_port_0_r(machine,0);
 
 		case 0x01:	/* DSB */
-			return input_port_1_r(0);
+			return input_port_1_r(machine,0);
 
 		case 0x02:	/* 1P */
-			return input_port_2_r(0);
+			return input_port_2_r(machine,0);
 
 		case 0x03:	/* 2P */
-			return input_port_3_r(0);
+			return input_port_3_r(machine,0);
 
 		case 0x04:	/* coin counters and lockout */
 			return TC0510NIO_regs[4];
 
 		case 0x07:	/* coin */
-			return input_port_4_r(0);
+			return input_port_4_r(machine,0);
 
 		default:
 logerror("PC %06x: warning - read TC0510NIO address %02x\n",activecpu_get_pc(),offset);
@@ -5131,7 +5131,7 @@ WRITE8_HANDLER( TC0510NIO_w )
 	switch (offset)
 	{
 		case 0x00:
-			watchdog_reset_w(offset,data);
+			watchdog_reset(machine);
 			break;
 
 		case 0x04:	/* coin counters and lockout */
@@ -5149,29 +5149,29 @@ logerror("PC %06x: warning - write %02x to TC0510NIO address %02x\n",activecpu_g
 
 READ16_HANDLER( TC0510NIO_halfword_r )
 {
-	return TC0510NIO_r(offset);
+	return TC0510NIO_r(machine,offset);
 }
 
 WRITE16_HANDLER( TC0510NIO_halfword_w )
 {
 	if (ACCESSING_LSB)
-		TC0510NIO_w(offset,data & 0xff);
+		TC0510NIO_w(machine,offset,data & 0xff);
 	else
 	{
 		/* driftout writes the coin counters here - bug? */
 logerror("CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",activecpu_get_pc(),offset);
-		TC0510NIO_w(offset,(data >> 8) & 0xff);
+		TC0510NIO_w(machine,offset,(data >> 8) & 0xff);
 	}
 }
 
 READ16_HANDLER( TC0510NIO_halfword_wordswap_r )
 {
-	return TC0510NIO_halfword_r(offset ^ 1,mem_mask);
+	return TC0510NIO_halfword_r(machine,offset ^ 1,mem_mask);
 }
 
 WRITE16_HANDLER( TC0510NIO_halfword_wordswap_w )
 {
-	TC0510NIO_halfword_w(offset ^ 1,data,mem_mask);
+	TC0510NIO_halfword_w(machine,offset ^ 1,data,mem_mask);
 }
 
 
@@ -5184,22 +5184,22 @@ READ8_HANDLER( TC0640FIO_r )
 	switch (offset)
 	{
 		case 0x00:	/* DSA */
-			return input_port_0_r(0);
+			return input_port_0_r(machine,0);
 
 		case 0x01:	/* DSB */
-			return input_port_1_r(0);
+			return input_port_1_r(machine,0);
 
 		case 0x02:	/* 1P */
-			return input_port_2_r(0);
+			return input_port_2_r(machine,0);
 
 		case 0x03:	/* 2P */
-			return input_port_3_r(0);
+			return input_port_3_r(machine,0);
 
 		case 0x04:	/* coin counters and lockout */
 			return TC0640FIO_regs[4];
 
 		case 0x07:	/* coin */
-			return input_port_4_r(0);
+			return input_port_4_r(machine,0);
 
 		default:
 logerror("PC %06x: warning - read TC0640FIO address %02x\n",activecpu_get_pc(),offset);
@@ -5214,7 +5214,7 @@ WRITE8_HANDLER( TC0640FIO_w )
 	switch (offset)
 	{
 		case 0x00:
-			watchdog_reset_w(offset,data);
+			watchdog_reset(machine);
 			break;
 
 		case 0x04:	/* coin counters and lockout */
@@ -5232,32 +5232,32 @@ logerror("PC %06x: warning - write %02x to TC0640FIO address %02x\n",activecpu_g
 
 READ16_HANDLER( TC0640FIO_halfword_r )
 {
-	return TC0640FIO_r(offset);
+	return TC0640FIO_r(machine,offset);
 }
 
 WRITE16_HANDLER( TC0640FIO_halfword_w )
 {
 	if (ACCESSING_LSB)
-		TC0640FIO_w(offset,data & 0xff);
+		TC0640FIO_w(machine,offset,data & 0xff);
 	else
 	{
-		TC0640FIO_w(offset,(data >> 8) & 0xff);
+		TC0640FIO_w(machine,offset,(data >> 8) & 0xff);
 logerror("CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
 	}
 }
 
 READ16_HANDLER( TC0640FIO_halfword_byteswap_r )
 {
-	return TC0640FIO_halfword_r(offset,mem_mask) << 8;
+	return TC0640FIO_halfword_r(machine,offset,mem_mask) << 8;
 }
 
 WRITE16_HANDLER( TC0640FIO_halfword_byteswap_w )
 {
 	if (ACCESSING_MSB)
-		TC0640FIO_w(offset,(data >> 8) & 0xff);
+		TC0640FIO_w(machine,offset,(data >> 8) & 0xff);
 	else
 	{
-		TC0640FIO_w(offset,data & 0xff);
+		TC0640FIO_w(machine,offset,data & 0xff);
 logerror("CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
 	}
 }

@@ -16,6 +16,7 @@ DMAC controller.
 #include "machine/wd33c93.h"
 #include "machine/tpi6525.h"
 #include "matsucd.h"
+#include "deprecat.h"
 
 
 #define VERBOSE_DMAC 0
@@ -81,7 +82,7 @@ static void check_interrupts( void )
 		return;
 
 	/* otherwise, generate the IRQ */
-	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
+	amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
 }
 
 static TIMER_CALLBACK(dmac_dma_proc)
@@ -213,7 +214,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x67:
 		{
 			LOG(( "DMAC: PC=%08x - TPI6525 Read(%d)\n", activecpu_get_pc(), (offset - 0x58) ));
-			return tpi6525_0_port_r(offset - 0x58);
+			return tpi6525_0_port_r(machine, offset - 0x58);
 		}
 		break;
 
@@ -339,7 +340,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x67:
 		{
 			LOG(( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", activecpu_get_pc(), (offset - 0x58), data ));
-			tpi6525_0_port_w(offset - 0x58, data);
+			tpi6525_0_port_w(machine, offset - 0x58, data);
 		}
 		break;
 
@@ -451,7 +452,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 
 	if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 	{
-		amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
+		amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
 	}
 	else
 	{
@@ -467,7 +468,7 @@ static void tp6525_irq( int level )
 	{
 		if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 		{
-			amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
+			amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
 		}
 		else
 		{

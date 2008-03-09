@@ -88,6 +88,15 @@ struct _screen_config
 };
 
 
+/*-------------------------------------------------
+    vblank_state_changed_func - callback that a
+    screen calls to notify of a change of
+    the VBLANK state
+-------------------------------------------------*/
+
+typedef void (*vblank_state_changed_func)(running_machine *machine, screen_state *screen, int vblank_state);
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -97,9 +106,6 @@ struct _screen_config
 
 /* core initialization */
 void video_init(running_machine *machine);
-
-/* core VBLANK callback */
-void video_vblank_start(running_machine *machine);
 
 
 /* ----- screen management ----- */
@@ -127,22 +133,36 @@ int video_screen_get_hblank(int scrnum);
 /* return the time when the beam will reach a particular H,V position */
 attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
 
+/* return the time when the beam will reach the start of VBLANK */
+attotime video_screen_get_time_until_vblank_start(int scrnum);
+
+/* return the time when the beam will reach the end of VBLANK */
+attotime video_screen_get_time_until_vblank_end(int scrnum);
+
+/* return the time when the VIDEO_UPDATE function will be called */
+attotime video_screen_get_time_until_update(int scrnum);
+
 /* return the amount of time the beam takes to draw one scan line */
 attotime video_screen_get_scan_period(int scrnum);
 
 /* return the amount of time the beam takes to draw one complete frame */
 attotime video_screen_get_frame_period(int scrnum);
 
+/* return the current frame number -- this is always increasing */
+UINT64 video_screen_get_frame_number(int scrnum);
+
 /* returns whether a given screen exists */
 int video_screen_exists(int scrnum);
 
+/* registers a VBLANK callback for the given screen*/
+void video_screen_register_vbl_cb(running_machine *machine, void *screen, vblank_state_changed_func vbl_cb);
 
 
 /* ----- video screen device interface ----- */
 
 /* device get info callback */
-#define VIDEO_SCREEN video_screen_get_info
-void video_screen_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
+#define VIDEO_SCREEN DEVICE_GET_INFO_NAME(video_screen)
+DEVICE_GET_INFO( video_screen );
 
 
 

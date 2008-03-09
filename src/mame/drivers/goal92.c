@@ -31,8 +31,8 @@ static WRITE16_HANDLER( goal92_sound_command_w )
 {
 	if (ACCESSING_MSB)
 	{
-		soundlatch_w(0, (data >> 8) & 0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine, 0, (data >> 8) & 0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 
@@ -287,6 +287,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16
 };
 
+#ifdef UNUSED_FUNCTON
 static const gfx_layout layout_16x16x4_2 =
 {
 	16,16,
@@ -299,6 +300,7 @@ static const gfx_layout layout_16x16x4_2 =
 		256+0*32,256+1*32,256+2*32,256+3*32,256+4*32,256+5*32,256+6*32,256+7*32 },
 	1024
 };
+#endif
 
 static GFXDECODE_START( goal92 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,		   0*16, 8*16 ) // Sprites
@@ -314,7 +316,7 @@ static MACHINE_DRIVER_START( goal92 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(goal92_readmem,goal92_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1) /* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold) /* VBL */
 
 	MDRV_CPU_ADD(Z80, 2500000)
 	/* audio CPU */

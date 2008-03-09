@@ -102,16 +102,16 @@ static READ16_HANDLER(fake_4a00a_r)
 	//if it returns 1 there's no sound. is it used to sync the game and sound?
 	//or just a debug enable/disble register?
 	return 0;
-	return 1;
+	//return 1;
 }
 
 static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 {
 	if(ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
+		soundlatch_w(machine,0,data & 0xff);
 		//needed?
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 
@@ -143,9 +143,11 @@ static READ8_HANDLER(fake_6_r)
 	int ret = 0;
 	ret ^= 1;
 	return ret;
-	return 1;
-	return 0;
-	return mame_rand(Machine);
+	/* FIXME: earlier attemts to remove ?
+    return 1;
+    return 0;
+    return mame_rand(Machine);
+    */
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
@@ -335,7 +337,7 @@ static MACHINE_DRIVER_START( ashnojoe )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(ashnojoe_map,0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)

@@ -242,10 +242,10 @@ WRITE8_HANDLER(sms_version_w) {
 		smsVersion = (data & 0xA0);
 	}
 	if ( data & 0x08 ) {
-		sms_input_write( 0, ( data & 0x20 ) >> 5 );
+		sms_input_write( machine, 0, ( data & 0x20 ) >> 5 );
 	}
 	if ( data & 0x02 ) {
-		sms_input_write( 1, ( data & 0x80 ) >> 7 );
+		sms_input_write( machine, 1, ( data & 0x80 ) >> 7 );
 	}
 }
 
@@ -273,10 +273,10 @@ WRITE8_HANDLER(sms_version_w) {
 
 READ8_HANDLER(sms_count_r) {
 	if ( offset & 0x01 ) {
-		return sms_vdp_hcount_r(offset);
+		return sms_vdp_hcount_r(machine, offset);
 	} else {
 		/* VCount read */
-		return sms_vdp_vcount_r(offset);
+		return sms_vdp_vcount_r(machine, offset);
 	}
 }
 
@@ -305,14 +305,14 @@ void sms_check_pause_button( void ) {
 
 WRITE8_HANDLER(sms_YM2413_register_port_0_w) {
 	if ( HAS_FM ) {
-		YM2413_register_port_0_w(offset, (data & 0x3F));
+		YM2413_register_port_0_w(machine, offset, (data & 0x3F));
 	}
 }
 
 WRITE8_HANDLER(sms_YM2413_data_port_0_w) {
 	if ( HAS_FM ) {
 		logerror("data_port_0_w %x %x\n", offset, data);
-		YM2413_data_port_0_w(offset, data);
+		YM2413_data_port_0_w(machine, offset, data);
 	}
 }
 

@@ -442,13 +442,13 @@ static void bebox_pic_set_int_line(int which, int interrupt)
 static READ8_HANDLER( bebox_800001F0_8_r ) { return ide_controller_0_r(offset + 0x1F0); }
 static WRITE8_HANDLER( bebox_800001F0_8_w ) { ide_controller_0_w(offset + 0x1F0, data); }
 
-READ64_HANDLER( bebox_800001F0_r ) { return read64be_with_read8_handler(bebox_800001F0_8_r, offset, mem_mask); }
-WRITE64_HANDLER( bebox_800001F0_w ) { write64be_with_write8_handler(bebox_800001F0_8_w, offset, data, mem_mask); }
+READ64_HANDLER( bebox_800001F0_r ) { return read64be_with_read8_handler(bebox_800001F0_8_r, machine, offset, mem_mask); }
+WRITE64_HANDLER( bebox_800001F0_w ) { write64be_with_write8_handler(bebox_800001F0_8_w, machine, offset, data, mem_mask); }
 
 
 READ64_HANDLER( bebox_800003F0_r )
 {
-	UINT64 result = pc64be_fdc_r(offset, mem_mask | 0xFFFF);
+	UINT64 result = pc64be_fdc_r(machine, offset, mem_mask | 0xFFFF);
 
 	if (((mem_mask >> 8) & 0xFF) == 0)
 	{
@@ -467,7 +467,7 @@ READ64_HANDLER( bebox_800003F0_r )
 
 WRITE64_HANDLER( bebox_800003F0_w )
 {
-	pc64be_fdc_w(offset, data, mem_mask | 0xFFFF);
+	pc64be_fdc_w(machine, offset, data, mem_mask | 0xFFFF);
 
 	if (((mem_mask >> 8) & 0xFF) == 0)
 		ide_controller_0_w(0x3F6, (data >> 8) & 0xFF);
@@ -496,8 +496,8 @@ static const struct ide_interface bebox_ide_interface =
  *
  *************************************/
 
-static read8_handler bebox_vga_memory_rh;
-static write8_handler bebox_vga_memory_wh;
+static read8_machine_func bebox_vga_memory_rh;
+static write8_machine_func bebox_vga_memory_wh;
 
 static READ64_HANDLER( bebox_video_r )
 {
@@ -517,20 +517,20 @@ static WRITE64_HANDLER( bebox_video_w )
 
 static READ64_HANDLER( bebox_vga_memory_r )
 {
-	return read64be_with_read8_handler(bebox_vga_memory_rh, offset, mem_mask);
+	return read64be_with_read8_handler(bebox_vga_memory_rh, machine, offset, mem_mask);
 }
 
 
 static WRITE64_HANDLER( bebox_vga_memory_w )
 {
-	write64be_with_write8_handler(bebox_vga_memory_wh, offset, data, mem_mask);
+	write64be_with_write8_handler(bebox_vga_memory_wh, machine, offset, data, mem_mask);
 }
 
 
-static void bebox_map_vga_memory(offs_t begin, offs_t end, read8_handler rh, write8_handler wh)
+static void bebox_map_vga_memory(offs_t begin, offs_t end, read8_machine_func rh, write8_machine_func wh)
 {
-	read64_handler rh64 = (rh == MRA8_BANK4) ? MRA64_BANK4 : bebox_vga_memory_r;
-	write64_handler wh64 = (wh == MWA8_BANK4) ? MWA64_BANK4 : bebox_vga_memory_w;
+	read64_machine_func rh64 = (rh == MRA8_BANK4) ? MRA64_BANK4 : bebox_vga_memory_r;
+	write64_machine_func wh64 = (wh == MWA8_BANK4) ? MWA64_BANK4 : bebox_vga_memory_w;
 
 	bebox_vga_memory_rh = rh;
 	bebox_vga_memory_wh = wh;
@@ -615,13 +615,13 @@ static WRITE8_HANDLER(at_page8_w)
 
 READ64_HANDLER(bebox_page_r)
 {
-	return read64be_with_read8_handler(at_page8_r, offset, mem_mask);
+	return read64be_with_read8_handler(at_page8_r, machine, offset, mem_mask);
 }
 
 
 WRITE64_HANDLER(bebox_page_w)
 {
-	write64be_with_write8_handler(at_page8_w, offset, data, mem_mask);
+	write64be_with_write8_handler(at_page8_w, machine, offset, data, mem_mask);
 }
 
 
@@ -657,7 +657,7 @@ READ64_HANDLER(bebox_80000480_r)
 
 WRITE64_HANDLER(bebox_80000480_w)
 {
-	write64be_with_write8_handler(at_hipage8_w, offset, data, mem_mask);
+	write64be_with_write8_handler(at_hipage8_w, machine, offset, data, mem_mask);
 }
 
 
@@ -748,13 +748,13 @@ static WRITE8_HANDLER( bebox_flash8_w )
 
 READ64_HANDLER( bebox_flash_r )
 {
-	return read64be_with_read8_handler(bebox_flash8_r, offset, mem_mask);
+	return read64be_with_read8_handler(bebox_flash8_r, machine, offset, mem_mask);
 }
 
 
 WRITE64_HANDLER( bebox_flash_w )
 {
-	write64be_with_write8_handler(bebox_flash8_w, offset, data, mem_mask);
+	write64be_with_write8_handler(bebox_flash8_w, machine, offset, data, mem_mask);
 }
 
 

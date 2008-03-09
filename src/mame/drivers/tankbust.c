@@ -91,7 +91,7 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	switch (offset)
 	{
 	case 0:	/* 0xe000 interrupt enable */
-		interrupt_enable_w(0,data);
+		interrupt_enable_w(machine,0,data);
 	break;
 
 	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( tankbust )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)		/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP( readmem, writemem )
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)		/* 3.072 MHz ? */
 	MDRV_CPU_PROGRAM_MAP( readmem2, writemem2 )

@@ -568,7 +568,7 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_CPU_CONFIG(tutor_processor_config)
 	MDRV_CPU_PROGRAM_MAP(tutor_memmap, 0)
 	MDRV_CPU_IO_MAP(tutor_readcru, /*tutor_writecru*/0)
-	MDRV_CPU_VBLANK_INT(tutor_vblank_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", tutor_vblank_interrupt)
 
 	MDRV_MACHINE_START( tutor )
 	MDRV_MACHINE_RESET( tutor )

@@ -133,7 +133,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "audio/segasnd.h"
@@ -179,19 +178,16 @@ static UINT8 spinner_count;
  *
  *************************************/
 
-static void service_switch(void *param, UINT32 oldval, UINT32 newval)
+static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static MACHINE_START( g80v )
 {
-	/* request a callback if the service switch is pressed */
-	input_port_set_changed_callback(port_tag_to_index("SERVICESW"), 0x01, service_switch, NULL);
-
 	/* register for save states */
 	state_save_register_global_array(mult_data);
 	state_save_register_global(mult_result);
@@ -234,7 +230,7 @@ static offs_t decrypt_offset(offs_t offset)
 }
 
 static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(offset)] = data; }
-static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(decrypt_offset(offset), data); }
+static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(machine, decrypt_offset(offset), data); }
 static WRITE8_HANDLER( vectorram_w ) { vectorram[decrypt_offset(offset)] = data; }
 
 
@@ -508,7 +504,7 @@ static INPUT_PORTS_START( g80v_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.30 */
 
 	PORT_START_TAG("SERVICESW")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED(service_switch, 0)
 INPUT_PORTS_END
 
 
@@ -914,7 +910,7 @@ static MACHINE_DRIVER_START( g80v_base )
 	MDRV_CPU_ADD(Z80, CPU_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_START(g80v)
 	MDRV_MACHINE_RESET(g80v)

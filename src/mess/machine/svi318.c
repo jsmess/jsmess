@@ -239,12 +239,12 @@ static const ppi8255_interface svi318_ppi8255_interface =
 
 READ8_HANDLER( svi318_ppi_r )
 {
-	return ppi8255_0_r (offset);
+	return ppi8255_0_r(machine, offset);
 }
 
 WRITE8_HANDLER( svi318_ppi_w )
 {
-	ppi8255_0_w (offset + 2, data);
+	ppi8255_0_w(machine, offset + 2, data);
 }
 
 /* Printer port */
@@ -451,9 +451,13 @@ MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 	}
 }
 
-static void svi806_set_crtc_register(UINT8 reg, UINT8 data) {
-	mc6845_address_w(mc6845, reg);
-	mc6845_register_w(mc6845, data);
+static void svi806_set_crtc_register(UINT8 reg, UINT8 data) {	
+	/* 
+		NPW 9-Mar-2008 - This is bad; commenting out
+
+		mc6845_address_w(mc6845, 0, reg);
+		mc6845_register_w(mc6845, 0, data);
+	*/
 }
 
 static TIMER_CALLBACK(svi318_80col_init_registers) {
@@ -489,23 +493,6 @@ static void svi318_80col_init(void)
 	svi.svi806_gfx = memory_region(REGION_GFX1);
 
 	timer_set( attotime_zero, NULL, 0, svi318_80col_init_registers );
-}
-
-READ8_HANDLER( svi806_r )
-{
-	return mc6845_register_r( mc6845 );
-}
-
-WRITE8_HANDLER( svi806_w )
-{
-	switch( offset ) {
-	case 0:
-		mc6845_address_w( mc6845, data );
-		break;
-	case 1:
-		mc6845_register_w( mc6845, data );
-		break;
-	}
 }
 
 WRITE8_HANDLER( svi806_ram_enable_w )
@@ -644,7 +631,7 @@ MACHINE_RESET( svi318 )
 	TMS9928A_reset();
 
 	/* PPI */
-	ppi8255_0_w(3, 0x92);
+	ppi8255_0_w(machine, 3, 0x92);
 
 	svi.bank_switch = 0xff;
 	svi318_set_banks();

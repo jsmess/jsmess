@@ -200,7 +200,7 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8	port = TC0220IOC_port_r(0);	/* read port number */
+	UINT8	port = TC0220IOC_port_r(machine,0);	/* read port number */
 
 	switch( port )
 	{
@@ -241,7 +241,7 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 				return 0x00;
 
 		default:
-			return TC0220IOC_portreg_r( offset );
+			return TC0220IOC_portreg_r( machine,offset );
 	}
 }
 
@@ -578,7 +578,7 @@ static MACHINE_DRIVER_START( syvalion )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(syvalion_readmem,syvalion_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000 / 2)		/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -617,7 +617,7 @@ static MACHINE_DRIVER_START( recordbr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(recordbr_readmem,recordbr_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000 / 2)		/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -656,7 +656,7 @@ static MACHINE_DRIVER_START( dleague )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(dleague_readmem,dleague_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000 / 2)		/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)

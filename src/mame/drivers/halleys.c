@@ -1202,7 +1202,7 @@ static VIDEO_START( halleys )
 }
 
 
-static void copy_scroll_op(mame_bitmap *bitmap, UINT16 *source, int sx, int sy)
+static void copy_scroll_op(bitmap_t *bitmap, UINT16 *source, int sx, int sy)
 {
 
 //--------------------------------------------------------------------------
@@ -1240,7 +1240,7 @@ static void copy_scroll_op(mame_bitmap *bitmap, UINT16 *source, int sx, int sy)
 }
 
 
-static void copy_scroll_xp(mame_bitmap *bitmap, UINT16 *source, int sx, int sy)
+static void copy_scroll_xp(bitmap_t *bitmap, UINT16 *source, int sx, int sy)
 {
 
 //--------------------------------------------------------------------------
@@ -1296,7 +1296,7 @@ static void copy_scroll_xp(mame_bitmap *bitmap, UINT16 *source, int sx, int sy)
 
 
 
-static void copy_fixed_xp(mame_bitmap *bitmap, UINT16 *source)
+static void copy_fixed_xp(bitmap_t *bitmap, UINT16 *source)
 {
 	UINT16 *esi, *edi;
 	int dst_pitch, ecx, edx;
@@ -1331,7 +1331,7 @@ static void copy_fixed_xp(mame_bitmap *bitmap, UINT16 *source)
 }
 
 
-static void copy_fixed_2b(mame_bitmap *bitmap, UINT16 *source)
+static void copy_fixed_2b(bitmap_t *bitmap, UINT16 *source)
 {
 	UINT16 *esi, *edi;
 	int dst_pitch, ecx, edx;
@@ -1378,7 +1378,7 @@ static void copy_fixed_2b(mame_bitmap *bitmap, UINT16 *source)
 }
 
 
-static void filter_bitmap(mame_bitmap *bitmap, int mask)
+static void filter_bitmap(bitmap_t *bitmap, int mask)
 {
 	int dst_pitch;
 
@@ -1499,7 +1499,7 @@ static INTERRUPT_GEN( halleys_interrupt )
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
 				latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(0, latch_data);
+				soundlatch_w(machine, 0, latch_data);
 				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 			}
 
@@ -1539,7 +1539,7 @@ static INTERRUPT_GEN( benberob_interrupt )
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
 				latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(0, latch_data);
+				soundlatch_w(machine, 0, latch_data);
 				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 			}
 		break;
@@ -1950,7 +1950,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( halleys )
 	MDRV_CPU_ADD_TAG("main", M6809, 1664000) /* 19968000/12 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_CPU_VBLANK_INT(halleys_interrupt, 4)
+	MDRV_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)
 
 	MDRV_CPU_ADD(Z80, 6000000/2) /* (verified on pcb) */
 	/* audio CPU */
@@ -1977,16 +1977,16 @@ static MACHINE_DRIVER_START( halleys )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 6000000/4) /* (verified on pcb) */
+	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 6000000/4)
+	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 6000000/4)
+	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 6000000/4)
+	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_DRIVER_END
@@ -1995,7 +1995,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( benberob )
 	MDRV_IMPORT_FROM(halleys)
 	MDRV_CPU_REPLACE("main", M6809, 1000000) // 19.968MHz/20? (CAUTION: timing critical)
-	MDRV_CPU_VBLANK_INT(benberob_interrupt, 4)
+	MDRV_CPU_VBLANK_INT_HACK(benberob_interrupt, 4)
 	MDRV_VIDEO_UPDATE(benberob)
 MACHINE_DRIVER_END
 

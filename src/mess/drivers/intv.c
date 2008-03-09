@@ -325,7 +325,7 @@ static MACHINE_DRIVER_START( intv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MDRV_CPU_PROGRAM_MAP(intv_mem, 0)
-	MDRV_CPU_VBLANK_INT(intv_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", intv_interrupt)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( intv )
@@ -359,7 +359,7 @@ static MACHINE_DRIVER_START( intvkbd )
 
 	MDRV_CPU_ADD(M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(intv2_mem, 0)
-	MDRV_CPU_VBLANK_INT(intv_interrupt2, 1)
+	MDRV_CPU_VBLANK_INT("main", intv_interrupt2)
 
 	MDRV_INTERLEAVE(100)
 

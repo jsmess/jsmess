@@ -377,7 +377,7 @@ static UINT32 cps3_screenwidth;
 
 static UINT32* cps3_mame_colours;//[0x20000]; // actual values to write to 32-bit bitmap
 
-static mame_bitmap *renderbuffer_bitmap;
+static bitmap_t *renderbuffer_bitmap;
 static rectangle renderbuffer_clip;
 
 
@@ -386,10 +386,10 @@ static rectangle renderbuffer_clip;
 #define CPS3_TRANSPARENCY_PEN_INDEX 2
 #define CPS3_TRANSPARENCY_PEN_INDEX_BLEND 3
 
-INLINE void cps3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+INLINE void cps3_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
-		int scalex, int scaley,mame_bitmap *pri_buffer,UINT32 pri_mask)
+		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask)
 {
 	rectangle myclip;
 
@@ -941,7 +941,7 @@ static VIDEO_START(cps3)
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-static void cps3_draw_tilemapsprite_line(int tmnum, int drawline, mame_bitmap *bitmap, const rectangle *cliprect )
+static void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT32* tmapregs[4] = { tilemap20_regs_base, tilemap30_regs_base, tilemap40_regs_base, tilemap50_regs_base };
 	UINT32* regs;
@@ -1241,7 +1241,7 @@ static VIDEO_UPDATE(cps3)
 
 								if (current_ypos&0x200) current_ypos-=0x400;
 
-								//if ( (whichbpp) && (cpu_getcurrentframe() & 1)) continue;
+								//if ( (whichbpp) && (video_screen_get_frame_number(0) & 1)) continue;
 
 								/* use the palette value from the main list or the sublists? */
 								if (whichpal)
@@ -1914,17 +1914,16 @@ static WRITE32_HANDLER( cps3_eeprom_w )
 
 static READ32_HANDLER( cps3_cdrom_r )
 {
-
 	UINT32 retval = 0;
 
 	if (ACCESSING_MSB32)
 	{
-		retval |= ((UINT16)wd33c93_r(0))<<16;
+		retval |= ((UINT16)wd33c93_r(machine,0))<<16;
 	}
 
 	if (ACCESSING_LSB32)
 	{
-		retval |= (UINT16)wd33c93_r(1);
+		retval |= (UINT16)wd33c93_r(machine,1);
 	}
 
 	return retval;
@@ -1934,12 +1933,12 @@ static WRITE32_HANDLER( cps3_cdrom_w )
 {
 	if (ACCESSING_MSB32)
 	{
-		wd33c93_w(0,(data & 0x00ff0000)>>16);
+		wd33c93_w(machine,0,(data & 0x00ff0000)>>16);
 	}
 
 	if (ACCESSING_LSB32)
 	{
-		wd33c93_w(1,(data & 0x000000ff)>>0);
+		wd33c93_w(machine,1,(data & 0x000000ff)>>0);
 	}
 }
 
@@ -2726,7 +2725,7 @@ static MACHINE_DRIVER_START( cps3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
 	MDRV_CPU_PROGRAM_MAP(cps3_map,0)
-	MDRV_CPU_VBLANK_INT(cps3_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cps3_vbl_interrupt)
 	MDRV_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
 
 	/* video hardware */

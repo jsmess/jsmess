@@ -123,10 +123,10 @@ static int kbd_tail = 0;
 
 static struct terminal *kaypro_terminal;
 
-static void kaypro_putstr(const char * src)
+static void kaypro_putstr(running_machine *machine, const char * src)
 {
 	while (*src)
-		kaypro_conout_w(0, *src++);
+		kaypro_conout_w(machine, 0, *src++);
 }
 
 static int kaypro_getcursorcode(int code)
@@ -141,7 +141,7 @@ VIDEO_START( kaypro )
 
 	kaypro_terminal = terminal_create(0, ' ', 10, kaypro_getcursorcode, KAYPRO_SCREEN_W, KAYPRO_SCREEN_H);
 
-	kaypro_putstr(
+	kaypro_putstr(machine,
 	/* a test of GB1/GB2 video mode graphics */ \
 		"\033B5" /* start video mode */ \
 		"MESS KAYPRO Terminal Emulator          \200\220\200\263" \

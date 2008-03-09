@@ -199,14 +199,14 @@ MACHINE_DRIVER_END
 #define CGA_FONT_2				2
 #define CGA_FONT_3				3
 
-#define CGA_MONITOR		(input_port_20_r(0)&0x1C)
+#define CGA_MONITOR		(readinputport(20)&0x1C)
 #define CGA_MONITOR_RGB			0x00	/* Colour RGB */
 #define CGA_MONITOR_MONO		0x04	/* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE	0x08	/* Colour composite */
 #define CGA_MONITOR_TELEVISION	0x0C	/* Television */
 #define CGA_MONITOR_LCD			0x10	/* LCD, eg PPC512 */
 
-#define CGA_CHIPSET		(input_port_20_r(0)&0xE0)
+#define CGA_CHIPSET		(readinputport(20)&0xE0)
 #define CGA_CHIPSET_IBM			0x00	/* Original IBM CGA */
 #define CGA_CHIPSET_PC1512		0x20	/* PC1512 CGA subset */
 #define CGA_CHIPSET_PC200		0x40	/* PC200 in CGA mode */
@@ -430,7 +430,7 @@ static void pc_cga_plantronics_w(int data)
  */
 static int pc_cga_status_r(void)
 {
-	int data = ((~input_port_0_r(0)) & 0x08) | cga.status;
+	int data = ((~readinputport(0)) & 0x08) | cga.status;
 	cga.status ^= 0x01;
 	return data;
 }
@@ -485,10 +485,10 @@ WRITE8_HANDLER( pc_cga8_w )
 
 
 
-READ16_HANDLER( pc_cga16le_r ) { return read16le_with_read8_handler(pc_cga8_r, offset, mem_mask); }
-WRITE16_HANDLER( pc_cga16le_w ) { write16le_with_write8_handler(pc_cga8_w, offset, data, mem_mask); }
-READ32_HANDLER( pc_cga32le_r ) { return read32le_with_read8_handler(pc_cga8_r, offset, mem_mask); }
-WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w, offset, data, mem_mask); }
+READ16_HANDLER( pc_cga16le_r ) { return read16le_with_read8_handler(pc_cga8_r,machine,  offset, mem_mask); }
+WRITE16_HANDLER( pc_cga16le_w ) { write16le_with_write8_handler(pc_cga8_w, machine, offset, data, mem_mask); }
+READ32_HANDLER( pc_cga32le_r ) { return read32le_with_read8_handler(pc_cga8_r, machine, offset, mem_mask); }
+WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w, machine, offset, data, mem_mask); }
 
 
 
@@ -1269,11 +1269,11 @@ static WRITE8_HANDLER ( pc1512_w )
 			}
 		}
 		mscrtc6845_set_char_lines(mscrtc6845, 200 );
-		pc_cga8_w(offset, data);
+		pc_cga8_w(machine, offset, data);
 		break;
 
 	default:
-		pc_cga8_w(offset,data);
+		pc_cga8_w(machine, offset,data);
 		break;
 	}
 }
@@ -1292,7 +1292,7 @@ static READ8_HANDLER ( pc1512_r )
 		break;
 
 	default:
-		data = pc_cga8_r(offset);
+		data = pc_cga8_r(machine, offset);
 		break;
 	}
 	return data;
@@ -1313,9 +1313,9 @@ static WRITE8_HANDLER ( pc1512_videoram_w )
 
 
 
-READ16_HANDLER ( pc1512_16le_r ) { return read16le_with_read8_handler(pc1512_r, offset, mem_mask); }
-WRITE16_HANDLER ( pc1512_16le_w ) { write16le_with_write8_handler(pc1512_w, offset, data, mem_mask); }
-WRITE16_HANDLER ( pc1512_videoram16le_w ) { write16le_with_write8_handler(pc1512_videoram_w, offset, data, mem_mask); }
+READ16_HANDLER ( pc1512_16le_r ) { return read16le_with_read8_handler(pc1512_r, machine, offset, mem_mask); }
+WRITE16_HANDLER ( pc1512_16le_w ) { write16le_with_write8_handler(pc1512_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER ( pc1512_videoram16le_w ) { write16le_with_write8_handler(pc1512_videoram_w, machine, offset, data, mem_mask); }
 
 
 

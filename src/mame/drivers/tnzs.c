@@ -343,7 +343,7 @@ static WRITE8_HANDLER( kabukiz_sample_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
-		DAC_0_data_w(0, data );
+		DAC_0_data_w(machine, 0, data);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -435,8 +435,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tnzsb_sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line_and_vector(Machine, 2,0,HOLD_LINE,0xff);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line_and_vector(machine, 2,0,HOLD_LINE,0xff);
 }
 
 static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1292,11 +1292,11 @@ static MACHINE_DRIVER_START( arknoid2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(arknoid2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", arknoid2_interrupt)
 
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
 
@@ -1331,11 +1331,11 @@ static MACHINE_DRIVER_START( drtoppel )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(arknoid2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", arknoid2_interrupt)
 
 	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
 
@@ -1370,11 +1370,11 @@ static MACHINE_DRIVER_START( tnzs )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(I8X41,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(i8742_readmem,i8742_writemem)
@@ -1412,11 +1412,11 @@ static MACHINE_DRIVER_START( insectx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
 
@@ -1450,11 +1450,11 @@ static MACHINE_DRIVER_START( kageki )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kageki_sub_readmem,kageki_sub_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
 
@@ -1495,11 +1495,11 @@ static MACHINE_DRIVER_START( tnzsb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("cpu0", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu0_type2,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("cpu1", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("cpu2", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map,0)

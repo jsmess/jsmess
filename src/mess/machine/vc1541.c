@@ -355,7 +355,7 @@ static TIMER_CALLBACK(vc1541_timer)
 		vc1541->head.sync=0;
 		if (vc1541->type==TypeVC1541) {
 			cpunum_set_input_line(machine, vc1541->cpunumber, M6502_SET_OVERFLOW, 1);
-			via_3_ca1_w(0,1);
+			via_3_ca1_w(machine, 0,1);
 		}
 		return;
 	}
@@ -379,7 +379,7 @@ static TIMER_CALLBACK(vc1541_timer)
 	}
 	if (vc1541->type==TypeVC1541) {
 		cpunum_set_input_line(machine, vc1541->cpunumber, M6502_SET_OVERFLOW, 0);
-		via_3_ca1_w(0,0);
+		via_3_ca1_w(machine, 0,0);
 	}
 	vc1541->clock=0;
 }
@@ -966,7 +966,7 @@ static void c1551x_write_data (TPI6525 *This, int data)
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	tpi6525_0_port_a_w(0,data);
+	tpi6525_0_port_a_w(Machine, 0,data);
 }
 
 static int c1551x_read_data (TPI6525 *This)
@@ -975,7 +975,7 @@ static int c1551x_read_data (TPI6525 *This)
 #ifdef CPU_SYNC
 	cpu_sync ();
 #endif
-	data=tpi6525_0_port_a_r(0);
+	data=tpi6525_0_port_a_r(Machine, 0);
 	DBG_LOG(2, "c1551 cpu",("%d read data %.2x\n",
 						 cpu_getactivecpu (), data));
 	return data;
@@ -988,7 +988,7 @@ static void c1551x_write_handshake (TPI6525 *This, int data)
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	tpi6525_0_port_c_w(0,data&0x40?0xff:0x7f);
+	tpi6525_0_port_c_w(Machine, 0,data&0x40?0xff:0x7f);
 }
 
 static int c1551x_read_handshake (TPI6525 *This)
@@ -997,7 +997,7 @@ static int c1551x_read_handshake (TPI6525 *This)
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	data=tpi6525_0_port_c_r(0)&8?0x80:0;
+	data=tpi6525_0_port_c_r(Machine, 0)&8?0x80:0;
 	DBG_LOG(2, "c1551 cpu",("%d read handshake %.2x\n",
 						 cpu_getactivecpu (), data));
 	return data;
@@ -1009,7 +1009,7 @@ static int c1551x_read_status (TPI6525 *This)
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	data=tpi6525_0_port_c_r(0)&3;
+	data=tpi6525_0_port_c_r(Machine, 0)&3;
 	DBG_LOG(1, "c1551 cpu",("%d read status %.2x\n",
 						 cpu_getactivecpu (), data));
 	return data;

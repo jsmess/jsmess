@@ -170,7 +170,7 @@ static READ16_HANDLER( tmaster_tscreen_y_lo_r )	{	return 0x00;	}
 
 ***************************************************************************/
 
-static mame_bitmap *tmaster_bitmap[2][2];	// 2 layers, 2 buffers per layer
+static bitmap_t *tmaster_bitmap[2][2];	// 2 layers, 2 buffers per layer
 static UINT16 *tmaster_regs;
 static UINT16 tmaster_color;
 static UINT16 tmaster_addr;
@@ -253,7 +253,7 @@ static void tmaster_draw(void)
 
 	UINT16 data;
 
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 
 	buffer	=	(tmaster_regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
  	sw		=	 tmaster_regs[0x04/2];
@@ -681,7 +681,7 @@ static INTERRUPT_GEN( tm3k_interrupt )
 static MACHINE_DRIVER_START( tm3k )
 	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(tmaster_map,0)
-	MDRV_CPU_VBLANK_INT(tm3k_interrupt,2+5+20) // ??
+	MDRV_CPU_VBLANK_INT_HACK(tm3k_interrupt,2+5+20) // ??
 
 	MDRV_MACHINE_RESET(tmaster)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -721,7 +721,7 @@ static INTERRUPT_GEN( tm_interrupt )
 static MACHINE_DRIVER_START( tm )
 	MDRV_IMPORT_FROM(tm3k)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(tm_interrupt,3+20) // ??
+	MDRV_CPU_VBLANK_INT_HACK(tm_interrupt,3+20) // ??
 
 	MDRV_SOUND_REPLACE("OKI",OKIM6295, 1122000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
@@ -751,7 +751,7 @@ static MACHINE_RESET( galgames )
 static MACHINE_DRIVER_START( galgames )
 	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(galgames_map,0)
-	MDRV_CPU_VBLANK_INT(galgames_interrupt, 1+20)	// ??
+	MDRV_CPU_VBLANK_INT_HACK(galgames_interrupt, 1+20)	// ??
 
 	MDRV_NVRAM_HANDLER( galgames )
 	MDRV_MACHINE_RESET( galgames )

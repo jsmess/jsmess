@@ -750,9 +750,10 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_START_TAG("IN4")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+
 	PORT_START_TAG("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[0])
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
 INPUT_PORTS_END
 
 static const struct AICAinterface aica_interface =
@@ -774,7 +775,7 @@ static MACHINE_DRIVER_START( naomi )
 	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(naomi_map,0)
 	MDRV_CPU_IO_MAP(naomi_port,0)
-	MDRV_CPU_VBLANK_INT(naomi_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", naomi_vblank)
 
 	MDRV_CPU_ADD_TAG("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)

@@ -206,7 +206,7 @@ static MACHINE_DRIVER_START( compis )
 	MDRV_CPU_ADD_TAG("main", I80186, 8000000)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(compis_mem, 0)
 	MDRV_CPU_IO_MAP(compis_io, 0)
-	MDRV_CPU_VBLANK_INT(compis_vblank_int, 1)
+	MDRV_CPU_VBLANK_INT("main", compis_vblank_int)
 	MDRV_CPU_CONFIG(i86_address_mask)
 
 	MDRV_INTERLEAVE(1)

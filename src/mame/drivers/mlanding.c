@@ -13,7 +13,7 @@
 static UINT16 * ml_tileram;
 static UINT16 * ml_spriteram;
 static UINT16 * ml_unk;
-static mame_bitmap *ml_bitmap[8];
+static bitmap_t *ml_bitmap[8];
 #define ML_CHARS 0x2000
 static UINT8 dirtychar[ML_CHARS];
 static int status_bit;
@@ -363,18 +363,18 @@ static MACHINE_DRIVER_START( mlanding )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000 )		/* 12 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_mem, 0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000 )		/* 4 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_z80_mem,0)
 
 	MDRV_CPU_ADD(M68000, 12000000 )		/* 12 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_sub_mem,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,7)
+	MDRV_CPU_VBLANK_INT_HACK(irq6_line_hold,7)
 
 	MDRV_CPU_ADD(Z80, 4000000 )		/* 4 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_z80_sub_mem,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

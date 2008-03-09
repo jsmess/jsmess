@@ -104,7 +104,7 @@ TODO:
 
 
 UINT8 *ddenlovr_pixmap[8];
-static mame_bitmap *framebuffer;
+static bitmap_t *framebuffer;
 static int extra_layers;
 
 
@@ -236,7 +236,7 @@ static WRITE8_HANDLER( ddenlovr_bgcolor2_w )
 static WRITE16_HANDLER( ddenlovr16_bgcolor_w )
 {
 	if (ACCESSING_LSB)
-		ddenlovr_bgcolor_w(offset,data);
+		ddenlovr_bgcolor_w(machine,offset,data);
 }
 
 
@@ -253,7 +253,7 @@ static WRITE8_HANDLER( ddenlovr_priority2_w )
 static WRITE16_HANDLER( ddenlovr16_priority_w )
 {
 	if (ACCESSING_LSB)
-		ddenlovr_priority_w(offset,data);
+		ddenlovr_priority_w(machine,offset,data);
 }
 
 
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( ddenlovr_layer_enable2_w )
 static WRITE16_HANDLER( ddenlovr16_layer_enable_w )
 {
 	if (ACCESSING_LSB)
-		ddenlovr_layer_enable_w(offset,data);
+		ddenlovr_layer_enable_w(machine,offset,data);
 }
 
 
@@ -1062,11 +1062,11 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		case 0xe4:
-			ddenlovr_priority_w(0,data);
+			ddenlovr_priority_w(machine,0,data);
 			break;
 
 		case 0xe6:
-			ddenlovr_layer_enable_w(0,data);
+			ddenlovr_layer_enable_w(machine,0,data);
 			break;
 
 		case 0xe8:
@@ -1171,12 +1171,12 @@ static READ8_HANDLER( rongrong_gfxrom_r )
 
 static READ16_HANDLER( ddenlovr_gfxrom_r )
 {
-	return rongrong_gfxrom_r(offset);
+	return rongrong_gfxrom_r(machine, offset);
 }
 
 
 
-static void copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int layer)
+static void copylayer(bitmap_t *bitmap,const rectangle *cliprect,int layer)
 {
 	int x,y;
 	int scrollx = ddenlovr_scroll[layer/4*8 + (layer%4) + 0];
@@ -1358,13 +1358,13 @@ static WRITE8_HANDLER( rongrong_palette_w )
 	/* what were they smoking??? */
 	b = ((d1 & 0xe0) >> 5) | (d2 & 0xc0) >> 3;
 
-	palette_set_color_rgb(Machine,indx,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(machine,indx,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static WRITE16_HANDLER( ddenlovr_palette_w )
 {
 	if (ACCESSING_LSB)
-		rongrong_palette_w(offset,data & 0xff);
+		rongrong_palette_w(machine,offset,data & 0xff);
 }
 
 
@@ -1471,7 +1471,7 @@ static READ8_HANDLER( unk_r )
 
 static READ16_HANDLER( unk16_r )
 {
-	return unk_r(offset);
+	return unk_r(machine,offset);
 }
 
 
@@ -1965,8 +1965,8 @@ static WRITE8_HANDLER( mmpanic_rombank_w )
 
 static WRITE8_HANDLER( mmpanic_soundlatch_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( mmpanic_blitter_w )
@@ -2503,8 +2503,8 @@ static READ8_HANDLER( mjchuuka_keyb_r )
 
 static WRITE8_HANDLER( mjchuuka_blitter_w )
 {
-	hanakanz_blitter_reg_w(0,offset >> 8);
-	hanakanz_blitter_data_w(0,data);
+	hanakanz_blitter_reg_w(machine,0,offset >> 8);
+	hanakanz_blitter_data_w(machine,0,data);
 }
 
 static UINT8 mjchuuka_romdata[2];
@@ -2602,8 +2602,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjchuuka_writeport, ADDRESS_SPACE_IO, 8 )	// 16 bit I/O
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff00) AM_WRITE( hanakanz_rombank_w			)
-	AM_SPACE(0x20, 0xff)                   AM_WRITE( mjchuuka_blitter_w			)
-	AM_SPACE(0x21, 0xff)                   AM_WRITE( mjchuuka_palette_w			)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE( mjchuuka_blitter_w			)
+	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE( mjchuuka_palette_w			)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE( mjchuuka_coincounter_w		)
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff00) AM_WRITE( hanakanz_keyb_w			)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_WRITE( OKIM6295_data_0_w			)
@@ -2763,7 +2763,7 @@ static READ8_HANDLER( hginga_protection_r )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 	if (hginga_rombank & 0x10)
-		return hanakanz_rand_r(0);
+		return hanakanz_rand_r(machine,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xf601 - 0x8000];
 }
 
@@ -2931,7 +2931,7 @@ static UINT8 hgokou_hopper;
 
 static UINT8 hgokou_player_r(int player)
 {
-	UINT8 hopper_bit = ((hgokou_hopper && !(cpu_getcurrentframe()%10)) ? 0 : (1<<6));
+	UINT8 hopper_bit = ((hgokou_hopper && !(video_screen_get_frame_number(0)%10)) ? 0 : (1<<6));
 
 	if (!(ddenlovr_select2 & 0x01))	return readinputport(player * 5 + 1) | hopper_bit;
 	if (!(ddenlovr_select2 & 0x02))	return readinputport(player * 5 + 2) | hopper_bit;
@@ -2985,7 +2985,7 @@ static READ8_HANDLER( hgokou_protection_r )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 	if (hginga_rombank == 0)
-		return hanakanz_rand_r(0);
+		return hanakanz_rand_r(machine,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xe601 - 0x8000];
 }
 
@@ -5931,6 +5931,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( mjmyuniv )
 	PORT_START	// IN0 - Coins + Service Keys
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
@@ -6111,6 +6112,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( akamaru )
 	PORT_START	// IN0 - Player 1
@@ -6523,7 +6525,7 @@ static MACHINE_DRIVER_START( ddenlovr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000,24000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(ddenlovr_readmem,ddenlovr_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6638,7 +6640,7 @@ static MACHINE_DRIVER_START( quizchq )
 	MDRV_CPU_ADD_TAG("main", Z80, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(quizchq_readmem,quizchq_writemem)
 	MDRV_CPU_IO_MAP(quizchq_readport,quizchq_writeport)
-	MDRV_CPU_VBLANK_INT(quizchq_irq,1)
+	MDRV_CPU_VBLANK_INT("main", quizchq_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6708,12 +6710,12 @@ static MACHINE_DRIVER_START( mmpanic )
 	MDRV_CPU_ADD_TAG("main", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(mmpanic_readmem,mmpanic_writemem)
 	MDRV_CPU_IO_MAP(mmpanic_readport,mmpanic_writeport)
-	MDRV_CPU_VBLANK_INT(mmpanic_irq,1)
+	MDRV_CPU_VBLANK_INT("main", mmpanic_irq)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(mmpanic_sound_readmem,mmpanic_sound_writemem)
 	MDRV_CPU_IO_MAP(mmpanic_sound_readport,mmpanic_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	// NMI by main cpu
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// NMI by main cpu
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6777,7 +6779,7 @@ static MACHINE_DRIVER_START( hanakanz )
 	MDRV_CPU_ADD_TAG("main",Z80,8000000)	// TMPZ84C015BF-8
 	MDRV_CPU_PROGRAM_MAP(hanakanz_readmem,hanakanz_writemem)
 	MDRV_CPU_IO_MAP(hanakanz_readport,hanakanz_writeport)
-	MDRV_CPU_VBLANK_INT(hanakanz_irq,1)
+	MDRV_CPU_VBLANK_INT("main", hanakanz_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6850,7 +6852,7 @@ static MACHINE_DRIVER_START( mjchuuka )
 	MDRV_IMPORT_FROM( hanakanz )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(mjchuuka_readport,mjchuuka_writeport)
-	MDRV_CPU_VBLANK_INT(mjchuuka_irq,1)
+	MDRV_CPU_VBLANK_INT("main", mjchuuka_irq)
 
 	MDRV_SOUND_ADD(AY8910, 1789772)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -6863,7 +6865,7 @@ static MACHINE_DRIVER_START( funkyfig )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(funkyfig_readmem,funkyfig_writemem)
 	MDRV_CPU_IO_MAP(funkyfig_readport,funkyfig_writeport)
-	MDRV_CPU_VBLANK_INT(mjchuuka_irq,1)
+	MDRV_CPU_VBLANK_INT("main", mjchuuka_irq)
 
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_IO_MAP(funkyfig_sound_readport,mmpanic_sound_writeport)
@@ -6922,7 +6924,7 @@ static MACHINE_DRIVER_START( mjmyster )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mjmyster_readmem,mjmyster_writemem)
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
-	MDRV_CPU_VBLANK_INT(mjmyster_irq, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
 	MDRV_SOUND_ADD(AY8910, 3579545)
@@ -6969,7 +6971,7 @@ static MACHINE_DRIVER_START( hginga )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(hginga_readmem,hginga_writemem)
 	MDRV_CPU_IO_MAP(hginga_readport,hginga_writeport)
-	MDRV_CPU_VBLANK_INT(hginga_irq, 1)
+	MDRV_CPU_VBLANK_INT("main", hginga_irq)
 
 	MDRV_SOUND_ADD(AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
@@ -6982,7 +6984,7 @@ static MACHINE_DRIVER_START( hgokou )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(hgokou_readmem,hgokou_writemem)
 	MDRV_CPU_IO_MAP(hgokou_readport,hgokou_writeport)
-	MDRV_CPU_VBLANK_INT(hginga_irq, 1)
+	MDRV_CPU_VBLANK_INT("main", hginga_irq)
 
 	MDRV_SOUND_ADD(AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
@@ -7003,7 +7005,7 @@ static MACHINE_DRIVER_START( mjmyuniv )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mjmyster_readmem,mjmyster_writemem)
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
-	MDRV_CPU_VBLANK_INT(mjmyster_irq, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
 	MDRV_SOUND_ADD(AY8910, 1789772)
@@ -7016,7 +7018,7 @@ static MACHINE_DRIVER_START( mjmyornt )
 	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
-	MDRV_CPU_VBLANK_INT(mjmyster_irq, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
 	MDRV_SOUND_ADD(AY8910, 1789772)
@@ -7047,7 +7049,7 @@ static MACHINE_DRIVER_START( mjflove )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(rongrong_readmem,rongrong_writemem)
 	MDRV_CPU_IO_MAP(mjflove_readport,mjflove_writeport)
-	MDRV_CPU_VBLANK_INT(mjflove_irq, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mjflove_irq, 2)
 
 	MDRV_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
 
@@ -7068,7 +7070,7 @@ static MACHINE_DRIVER_START( hparadis )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(hparadis_readmem,hparadis_writemem)
 	MDRV_CPU_IO_MAP(hparadis_readport,hparadis_writeport)
-	MDRV_CPU_VBLANK_INT(hparadis_irq, 1)
+	MDRV_CPU_VBLANK_INT("main", hparadis_irq)
 MACHINE_DRIVER_END
 
 

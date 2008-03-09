@@ -61,7 +61,7 @@ VIDEO_START( gaelco2_dual );
 	{ 0,1,2,3,4,5,6,7, 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },	\
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8, 8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },		\
 	32*8																			\
-}
+};
 
 #define GFXDECODEINFO(NUM,ENTRIES) \
 static GFXDECODE_START( NUM )\
@@ -69,12 +69,12 @@ static GFXDECODE_START( NUM )\
 GFXDECODE_END
 
 
-TILELAYOUT16(0x0080000);
-GFXDECODEINFO(0x0080000, 128);
-TILELAYOUT16(0x0200000);
-GFXDECODEINFO(0x0200000, 128);
-TILELAYOUT16(0x0400000);
-GFXDECODEINFO(0x0400000, 128);
+TILELAYOUT16(0x0080000)
+GFXDECODEINFO(0x0080000, 128)
+TILELAYOUT16(0x0200000)
+GFXDECODEINFO(0x0200000, 128)
+TILELAYOUT16(0x0400000)
+GFXDECODEINFO(0x0400000, 128)
 
 
 /*============================================================================
@@ -193,7 +193,7 @@ static MACHINE_DRIVER_START( maniacsq )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 26000000/2)		/* 13 MHz? */
 	MDRV_CPU_PROGRAM_MAP(maniacsq_readmem, maniacsq_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START( bang )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(bang_readmem, bang_writemem)
-	MDRV_CPU_VBLANK_INT(bang_interrupt, 6)
+	MDRV_CPU_VBLANK_INT_HACK(bang_interrupt, 6)
 
 	MDRV_NVRAM_HANDLER(gaelco2)
 
@@ -551,7 +551,7 @@ static MACHINE_DRIVER_START( alighunt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(alighunt_readmem, alighunt_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -814,7 +814,7 @@ static MACHINE_DRIVER_START( touchgo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 32000000/2)			/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(touchgo_readmem, touchgo_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("left", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -1017,7 +1017,7 @@ static MACHINE_DRIVER_START( snowboar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(snowboar_readmem, snowboar_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_NVRAM_HANDLER(gaelco2)
 
@@ -1262,7 +1262,7 @@ static MACHINE_DRIVER_START( wrally2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 26000000/2)			/* 13 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrally2_readmem, wrally2_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("left", irq6_line_hold)
 
 	MDRV_NVRAM_HANDLER(gaelco2)
 

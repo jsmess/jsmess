@@ -45,7 +45,7 @@ VIDEO_UPDATE( trucocl );
 
 static WRITE8_HANDLER( irq_enable_w)
 {
-	interrupt_enable_w( 0, (~data) & 1 );
+	interrupt_enable_w( machine, 0, (~data) & 1 );
 }
 
 static int cur_dac_address = -1;
@@ -145,7 +145,7 @@ static MACHINE_DRIVER_START( trucocl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(trucocl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", trucocl_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

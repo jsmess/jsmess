@@ -40,7 +40,10 @@
 
 
 /* macro for a custom callback functions (PORT_CUSTOM) */
-#define CUSTOM_INPUT(name)	UINT32 name(void *param)
+#define CUSTOM_INPUT(name)	UINT32 name(running_machine *machine, void *param)
+
+/* macro for port changed callback functions (PORT_CHANGED) */
+#define INPUT_CHANGED(name)	void name(running_machine *machine, void *param, UINT32 oldval, UINT32 newval)
 
 
 /* sequence types for input_port_seq() call */
@@ -355,6 +358,7 @@ enum
 	INPUT_TOKEN_INVERT,
 	INPUT_TOKEN_UNUSED,
 	INPUT_TOKEN_CUSTOM,
+	INPUT_TOKEN_CHANGED,
 	INPUT_TOKEN_DIPNAME,
 	INPUT_TOKEN_DIPSETTING,
 	INPUT_TOKEN_DIPLOCATION,
@@ -497,8 +501,8 @@ typedef struct _input_port_init_params input_port_init_params;
 
 
 /* a custom input port callback function */
-typedef UINT32 (*input_port_custom_func)(void *param);
-typedef void (*input_port_changed_func)(void *param, UINT32 oldval, UINT32 newval);
+typedef UINT32 (*input_port_custom_func)(running_machine *machine, void *param);
+typedef void (*input_port_changed_func)(running_machine *machine, void *param, UINT32 oldval, UINT32 newval);
 
 
 /* this type is used to encode input port definitions */
@@ -508,6 +512,7 @@ union _input_port_token
 	TOKEN_COMMON_FIELDS
 	const input_port_token *tokenptr;
 	input_port_custom_func customptr;
+	input_port_changed_func changedptr;
 };
 
 
@@ -560,7 +565,10 @@ struct _input_port_entry
 	const char *name;			/* user-friendly name to display */
 	input_seq	seq;			/* input sequence affecting the input bits */
 	input_port_custom_func custom;/* custom callback routine */
-	void *		custom_param;	/* parameter for callback routine */
+	void *		custom_param;	/* parameter for custom callback routine */
+	input_port_changed_func changed;/* changed callback routine */
+	void *		changed_param;	/* parameter for changed callback routine */
+	UINT32		changed_last_value; /* the last value for changed detection purposes */
 
 	/* valid if type is between __ipt_analog_start and __ipt_analog_end */
 	struct
@@ -783,6 +791,12 @@ struct _ext_inp_header
 	TOKEN_PTR(customptr, _callback), \
 	TOKEN_PTR(voidptr, _param),
 
+/* changed callbacks */
+#define PORT_CHANGED(_callback, _param) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_CHANGED, 8), \
+	TOKEN_PTR(changedptr, _callback), \
+	TOKEN_PTR(voidptr, _param),
+
 /* dip switch definition */
 #define PORT_DIPNAME(_mask,_default,_name) \
 	TOKEN_UINT32_PACK1(INPUT_TOKEN_DIPNAME, 8), \
@@ -893,6 +907,7 @@ struct _ext_inp_header
 ***************************************************************************/
 
 void input_port_init(running_machine *machine, const input_port_token *ipt);
+void input_port_post_init(running_machine *machine);
 const char *input_port_string_from_token(const input_port_token token);
 
 input_port_entry *input_port_initialize(input_port_init_params *params, UINT32 type, const char *tag, UINT32 mask, UINT32 defval);
@@ -908,15 +923,14 @@ int port_type_is_analog_absolute(int type);
 int port_type_in_use(int type);
 int port_type_to_group(int type, int player);
 int port_tag_to_index(const char *tag);
-read8_handler port_tag_to_handler8(const char *tag);
-read16_handler port_tag_to_handler16(const char *tag);
-read32_handler port_tag_to_handler32(const char *tag);
-read64_handler port_tag_to_handler64(const char *tag);
+read8_machine_func port_tag_to_handler8(const char *tag);
+read16_machine_func port_tag_to_handler16(const char *tag);
+read32_machine_func port_tag_to_handler32(const char *tag);
+read64_machine_func port_tag_to_handler64(const char *tag);
 const char *input_port_name(const input_port_entry *in);
 const input_seq *input_port_seq(input_port_entry *in, input_seq_type seqtype);
 const input_seq *input_port_default_seq(int type, int player, input_seq_type seqtype);
 int input_port_condition(const input_port_entry *in);
-void input_port_set_changed_callback(int port, UINT32 mask, input_port_changed_func callback, void *param);
 
 const char *port_type_to_token(int type, int player);
 int token_to_port_type(const char *string, int *player);
@@ -926,8 +940,6 @@ int input_ui_pressed(int code);
 int input_ui_pressed_repeat(int code, int speed);
 
 void input_port_update_defaults(void);
-void input_port_vblank_start(void);	/* called by cpuintrf.c - not for external use */
-void input_port_vblank_end(void);	/* called by cpuintrf.c - not for external use */
 
 void input_port_set_digital_value(int port, UINT32 value, UINT32 mask);
 

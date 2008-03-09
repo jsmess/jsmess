@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_CPU_CONFIG(abc80_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc80_map, 0)
 	MDRV_CPU_IO_MAP(abc80_io_map, 0)
-	MDRV_CPU_VBLANK_INT(abc80_nmi_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", abc80_nmi_interrupt)
 
 	MDRV_MACHINE_START(abc80)
 

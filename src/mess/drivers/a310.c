@@ -408,7 +408,7 @@ static READ32_HANDLER(ioc_r)
 	else if (offset >= 0xc4000 && offset <= 0xc4010)
 	{
 		logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-		return wd17xx_data_r(offset&0xf);
+		return wd17xx_data_r(machine, offset&0xf);
 	}
 	else
 	{
@@ -505,7 +505,7 @@ static WRITE32_HANDLER(ioc_w)
 	else if (offset >= 0xc4000 && offset <= 0xc4010)
 	{
 		logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-		wd17xx_data_w(offset&0xf, data&0xff);
+		wd17xx_data_w(machine, offset&0xf, data&0xff);
 	}
 	else if (offset == 0xd40006)
 	{

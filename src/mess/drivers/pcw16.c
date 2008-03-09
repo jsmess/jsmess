@@ -175,7 +175,7 @@ static WRITE8_HANDLER(pcw16_palette_w)
 
 static char *pcw16_mem_ptr[4];
 
-static const write8_handler pcw16_write_handler_dram[4] =
+static const write8_machine_func pcw16_write_handler_dram[4] =
 {
 	MWA8_BANK5,
 	MWA8_BANK6,
@@ -183,7 +183,7 @@ static const write8_handler pcw16_write_handler_dram[4] =
 	MWA8_BANK8
 };
 
-static const read8_handler pcw16_read_handler_dram[4] =
+static const read8_machine_func pcw16_read_handler_dram[4] =
 {
 	MRA8_BANK1,
 	MRA8_BANK2,
@@ -260,7 +260,7 @@ static  READ8_HANDLER(pcw16_flash1_bank_handler3_r)
 	return pcw16_flash1_bank_handler_r(3, offset);
 }
 
-static const read8_handler pcw16_flash0_bank_handlers_r[4] =
+static const read8_machine_func pcw16_flash0_bank_handlers_r[4] =
 {
 	pcw16_flash0_bank_handler0_r,
 	pcw16_flash0_bank_handler1_r,
@@ -268,7 +268,7 @@ static const read8_handler pcw16_flash0_bank_handlers_r[4] =
 	pcw16_flash0_bank_handler3_r,
 };
 
-static const read8_handler pcw16_flash1_bank_handlers_r[4] =
+static const read8_machine_func pcw16_flash1_bank_handlers_r[4] =
 {
 	pcw16_flash1_bank_handler0_r,
 	pcw16_flash1_bank_handler1_r,
@@ -337,7 +337,7 @@ static WRITE8_HANDLER(pcw16_flash1_bank_handler3_w)
 	pcw16_flash1_bank_handler_w(3, offset, data);
 }
 
-static const write8_handler pcw16_flash0_bank_handlers_w[4] =
+static const write8_machine_func pcw16_flash0_bank_handlers_w[4] =
 {
 	pcw16_flash0_bank_handler0_w,
 	pcw16_flash0_bank_handler1_w,
@@ -345,7 +345,7 @@ static const write8_handler pcw16_flash0_bank_handlers_w[4] =
 	pcw16_flash0_bank_handler3_w,
 };
 
-static const write8_handler pcw16_flash1_bank_handlers_w[4] =
+static const write8_machine_func pcw16_flash1_bank_handlers_w[4] =
 {
 	pcw16_flash1_bank_handler0_w,
 	pcw16_flash1_bank_handler1_w,
@@ -374,8 +374,8 @@ static  READ8_HANDLER(pcw16_no_mem_r)
 
 static void pcw16_set_bank_handlers(int bank, PCW16_RAM_TYPE type)
 {
-	read8_handler read_handler;
-	write8_handler write_handler;
+	read8_machine_func read_handler;
+	write8_machine_func write_handler;
 
 	switch (type) {
 	case PCW16_MEM_ROM:
@@ -1159,36 +1159,36 @@ static WRITE8_HANDLER(pcw16_system_control_w)
 /* write to Super I/O chip. FDC Data Rate. */
 static WRITE8_HANDLER(pcw16_superio_fdc_datarate_w)
 {
-	pc_fdc_w(PC_FDC_DATA_RATE_REGISTER,data);
+	pc_fdc_w(machine, PC_FDC_DATA_RATE_REGISTER,data);
 }
 
 /* write to Super I/O chip. FDC Digital output register */
 static WRITE8_HANDLER(pcw16_superio_fdc_digital_output_register_w)
 {
-	pc_fdc_w(PC_FDC_DIGITAL_OUTPUT_REGISTER, data);
+	pc_fdc_w(machine, PC_FDC_DIGITAL_OUTPUT_REGISTER, data);
 }
 
 /* write to Super I/O chip. FDC Data Register */
 static WRITE8_HANDLER(pcw16_superio_fdc_data_w)
 {
-	pc_fdc_w(PC_FDC_DATA_REGISTER, data);
+	pc_fdc_w(machine, PC_FDC_DATA_REGISTER, data);
 }
 
 /* write to Super I/O chip. FDC Data Register */
 static  READ8_HANDLER(pcw16_superio_fdc_data_r)
 {
-	return pc_fdc_r(PC_FDC_DATA_REGISTER);
+	return pc_fdc_r(machine, PC_FDC_DATA_REGISTER);
 }
 
 /* write to Super I/O chip. FDC Main Status Register */
 static  READ8_HANDLER(pcw16_superio_fdc_main_status_register_r)
 {
-	return pc_fdc_r(PC_FDC_MAIN_STATUS_REGISTER);
+	return pc_fdc_r(machine, PC_FDC_MAIN_STATUS_REGISTER);
 }
 
 static  READ8_HANDLER(pcw16_superio_fdc_digital_input_register_r)
 {
-	return pc_fdc_r(PC_FDC_DIGITIAL_INPUT_REGISTER);
+	return pc_fdc_r(machine, PC_FDC_DIGITIAL_INPUT_REGISTER);
 }
 
 static void	pcw16_fdc_interrupt(int state)

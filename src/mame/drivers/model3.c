@@ -1287,10 +1287,10 @@ static READ64_HANDLER( model3_rtc_r )
 {
 	UINT64 r = 0;
 	if(!(mem_mask & U64(0xff00000000000000))) {
-		r |= (UINT64)rtc72421_r((offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
+		r |= (UINT64)rtc72421_r(machine, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
 	}
 	if(!(mem_mask & U64(0x00000000ff000000))) {
-		r |= (UINT64)rtc72421_r((offset*2)+1, (UINT32)(mem_mask));
+		r |= (UINT64)rtc72421_r(machine, (offset*2)+1, (UINT32)(mem_mask));
 	}
 	return r;
 }
@@ -1298,10 +1298,10 @@ static READ64_HANDLER( model3_rtc_r )
 static WRITE64_HANDLER( model3_rtc_w )
 {
 	if(!(mem_mask & U64(0xff00000000000000))) {
-		rtc72421_w((offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
+		rtc72421_w(machine, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
 	}
 	if(!(mem_mask & U64(0x00000000ff000000))) {
-		rtc72421_w((offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
+		rtc72421_w(machine, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
 	}
 }
 
@@ -1325,7 +1325,7 @@ static WRITE64_HANDLER(model3_sound_w)
 	// serial configuration writes
 	if ((mem_mask == U64(0x00ffffffffffffff)) && (offset == 0))
 	{
-		SCSP_MidiIn(0, (data>>56)&0xff, 0);
+		SCSP_MidiIn(machine, 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -4083,7 +4083,7 @@ static MACHINE_DRIVER_START( model3_10 )
 	MDRV_CPU_ADD(PPC603, 66000000)
 	MDRV_CPU_CONFIG(model3_10)
 	MDRV_CPU_PROGRAM_MAP(model3_mem, 0)
- 	MDRV_CPU_VBLANK_INT(model3_interrupt,2)
+ 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd, 0)
@@ -4122,7 +4122,7 @@ static MACHINE_DRIVER_START( model3_15 )
 	MDRV_CPU_ADD(PPC603, 100000000)
 	MDRV_CPU_CONFIG(model3_15)
 	MDRV_CPU_PROGRAM_MAP(model3_mem, 0)
- 	MDRV_CPU_VBLANK_INT(model3_interrupt,2)
+ 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd, 0)
@@ -4159,7 +4159,7 @@ static MACHINE_DRIVER_START( model3_20 )
 	MDRV_CPU_ADD(PPC603, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem, 0)
- 	MDRV_CPU_VBLANK_INT(model3_interrupt,2)
+ 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd, 0)
@@ -4195,7 +4195,7 @@ static MACHINE_DRIVER_START( model3_21 )
 	MDRV_CPU_ADD(PPC603, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem, 0)
- 	MDRV_CPU_VBLANK_INT(model3_interrupt,2)
+ 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd, 0)

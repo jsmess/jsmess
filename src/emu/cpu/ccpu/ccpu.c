@@ -19,24 +19,26 @@
 
 typedef struct
 {
-    UINT16	PC;
-    UINT16	A;
-    UINT16	B;
-    UINT8	I;
-    UINT16	J;
-    UINT8	P;
-    UINT16	X;
-    UINT16	Y;
-    UINT16	T;
-    UINT16 *acc;
+    UINT16		PC;
+    UINT16		A;
+    UINT16		B;
+    UINT8		I;
+    UINT16		J;
+    UINT8		P;
+    UINT16		X;
+    UINT16		Y;
+    UINT16		T;
+    UINT16 *	acc;
 
-    UINT16	a0flag, ncflag, cmpacc, cmpval;
-    UINT16	miflag, nextmiflag, nextnextmiflag;
-    UINT16	drflag;
+    UINT16		a0flag, ncflag, cmpacc, cmpval;
+    UINT16		miflag, nextmiflag, nextnextmiflag;
+    UINT16		drflag;
 
-	UINT8	(*external_input)(void);
-	void	(*vector_callback)(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
-	UINT8	scrnum;
+	UINT8		(*external_input)(void);
+	void		(*vector_callback)(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
+
+	UINT8		waiting;
+	UINT8		watchdog;
 } ccpuRegs;
 
 
@@ -123,6 +125,15 @@ static UINT8 read_jmi(void)
 }
 
 
+void ccpu_wdt_timer_trigger(void)
+{
+	ccpu.waiting = FALSE;
+	ccpu.watchdog++;
+	if (ccpu.watchdog >= 3)
+		ccpu.PC = 0;
+}
+
+
 static void ccpu_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
 	const struct CCPUConfig *config = _config;
@@ -140,7 +151,16 @@ static void ccpu_init(int index, int clock, const void *_config, int (*irqcallba
 	state_save_register_item("ccpu", clock, ccpu.X);
 	state_save_register_item("ccpu", clock, ccpu.Y);
 	state_save_register_item("ccpu", clock, ccpu.T);
-	state_save_register_item("ccpu", clock, ccpu.scrnum);
+	state_save_register_item("ccpu", clock, ccpu.a0flag);
+	state_save_register_item("ccpu", clock, ccpu.ncflag);
+	state_save_register_item("ccpu", clock, ccpu.cmpacc);
+	state_save_register_item("ccpu", clock, ccpu.cmpval);
+	state_save_register_item("ccpu", clock, ccpu.miflag);
+	state_save_register_item("ccpu", clock, ccpu.nextmiflag);
+	state_save_register_item("ccpu", clock, ccpu.nextnextmiflag);
+	state_save_register_item("ccpu", clock, ccpu.drflag);
+	state_save_register_item("ccpu", clock, ccpu.waiting);
+	state_save_register_item("ccpu", clock, ccpu.watchdog);
 }
 
 
@@ -165,6 +185,9 @@ static void ccpu_reset(void)
 	ccpu.cmpval = 1;
 	ccpu.miflag = ccpu.nextmiflag = ccpu.nextnextmiflag = 0;
 	ccpu.drflag = 0;
+
+	ccpu.waiting = FALSE;
+	ccpu.watchdog = 0;
 }
 
 
@@ -175,6 +198,9 @@ static void ccpu_reset(void)
 
 static int ccpu_execute(int cycles)
 {
+	if (ccpu.waiting)
+		return cycles;
+
 	ccpu_icount = cycles;
 
 	while (ccpu_icount >= 0)
@@ -545,20 +571,15 @@ static int ccpu_execute(int cycles)
 			/* FRM */
 			case 0xe5:
 			case 0xf5:
-/* FIXME: once vector game video system configuration is fixed,
-   remove section in brackets and uncomment line below.
-   Speed Freak should run nice and smooth, with no flickering. */
-{
-	attotime scantime, abstime;
-	extern emu_timer *refresh_timer;
-	scantime = timer_starttime(refresh_timer);
-	abstime = timer_get_time();
-	while (attotime_compare(abstime, scantime) >= 0)
-		scantime = attotime_add(scantime, video_screen_get_frame_period(ccpu.scrnum));
-	cpu_spinuntil_time(attotime_sub(scantime, abstime));
-}
-/*              cpu_spinuntil_time(video_screen_get_time_until_pos(ccpu.scrnum, Machine->screen[ccpu.scrnum].visarea.max_y + 1, 0)); */
-				NEXT_ACC_A(); CYCLES(1);
+				ccpu.waiting = TRUE;
+				NEXT_ACC_A();
+				ccpu_icount = -1;
+
+				/* some games repeat the FRM opcode twice; it apparently does not cause
+                   a second wait, so we make sure we skip any duplicate opcode at this
+                   point */
+				if (READOP(ccpu.PC) == opcode)
+					ccpu.PC++;
 				break;
 
 			/* STAP */
@@ -570,7 +591,7 @@ static int ccpu_execute(int cycles)
 
 			/* CST */
 			case 0xf7:
-				watchdog_reset(Machine);
+				ccpu.watchdog = 0;
 			/* ADDP */
 			case 0xe7:
 				tempval = RDMEM(ccpu.I);

@@ -161,13 +161,13 @@ static void gb_timer_increment( void );
 /* #define V_BANK*/			/* Display bank switching debug information */
 #endif
 
-static void gb_init_regs(void) {
+static void gb_init_regs(running_machine *machine) {
 	/* Initialize the registers */
 	SIODATA = 0x00;
 	SIOCONT = 0x7E;
 
-	gb_io_w( 0x05, 0x00 );		/* TIMECNT */
-	gb_io_w( 0x06, 0x00 );		/* TIMEMOD */
+	gb_io_w( machine, 0x05, 0x00 );		/* TIMECNT */
+	gb_io_w( machine, 0x06, 0x00 );		/* TIMEMOD */
 }
 
 static void gb_rom16_0000( UINT8 *addr ) {
@@ -188,7 +188,7 @@ static void gb_rom8_6000( UINT8 *addr ) {
 	memory_set_bankptr( 4, addr );
 }
 
-static void gb_init(void) {
+static void gb_init(running_machine *machine) {
 	/* Initialize the memory banks */
 	MBC1Mode = 0;
 	MBC3RTCBank = 0;
@@ -264,7 +264,7 @@ static void gb_init(void) {
 			break;
 	}
 
-	gb_sound_w( 0x16, 0x00 );       /* Initialize sound hardware */
+	gb_sound_w( machine, 0x16, 0x00 );       /* Initialize sound hardware */
 
 	/* Allocate the serial timer, and disable it */
 	gb_serial_timer = timer_alloc( gb_serial_timer_proc , NULL);
@@ -282,9 +282,9 @@ MACHINE_START( gb )
 
 MACHINE_RESET( gb )
 {
-	gb_init();
+	gb_init(machine);
 
-	gb_video_init( GB_VIDEO_DMG );
+	gb_video_init( machine, GB_VIDEO_DMG );
 
 	/* Enable BIOS rom */
 	memory_set_bankptr(5, memory_region(REGION_CPU1) );
@@ -295,11 +295,11 @@ MACHINE_RESET( gb )
 
 MACHINE_RESET( sgb )
 {
-	gb_init();
+	gb_init(machine);
 
-	gb_video_init( GB_VIDEO_SGB );
+	gb_video_init( machine, GB_VIDEO_SGB );
 
-	gb_init_regs();
+	gb_init_regs(machine);
 
 	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100 );
@@ -308,9 +308,9 @@ MACHINE_RESET( sgb )
 	memset( sgb_tile_data, 0, 0x2000 );
 
 	/* Initialize the Sound Registers */
-	gb_sound_w(0x16,0xF0);	/* F0 for SGB */
-	gb_sound_w(0x15,0xF3);
-	gb_sound_w(0x14,0x77);
+	gb_sound_w(machine, 0x16,0xF0);	/* F0 for SGB */
+	gb_sound_w(machine, 0x15,0xF3);
+	gb_sound_w(machine, 0x14,0x77);
 
 	sgb_window_mask = 0;
 	memset( sgb_pal_map, 0, 20*18 );
@@ -331,16 +331,16 @@ MACHINE_RESET( sgb )
 
 MACHINE_RESET( gbpocket )
 {
-	gb_init();
+	gb_init(machine);
 
-	gb_video_init( GB_VIDEO_MGB );
+	gb_video_init( machine, GB_VIDEO_MGB );
 
-	gb_init_regs();
+	gb_init_regs(machine);
 
 	/* Initialize the Sound registers */
-	gb_sound_w(0x16,0x80);
-	gb_sound_w(0x15,0xF3);
-	gb_sound_w(0x14,0x77);
+	gb_sound_w(machine, 0x16,0x80);
+	gb_sound_w(machine, 0x15,0xF3);
+	gb_sound_w(machine, 0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
 	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
@@ -353,16 +353,16 @@ MACHINE_RESET( gbc )
 {
 	int ii;
 
-	gb_init();
+	gb_init(machine);
 
-	gb_video_init( GB_VIDEO_CGB );
+	gb_video_init( machine, GB_VIDEO_CGB );
 
-	gb_init_regs();
+	gb_init_regs(machine);
 
 	/* Initialize the Sound registers */
-	gb_sound_w(0x16, 0x80);
-	gb_sound_w(0x15, 0xF3);
-	gb_sound_w(0x14, 0x77);
+	gb_sound_w(machine, 0x16, 0x80);
+	gb_sound_w(machine, 0x15, 0xF3);
+	gb_sound_w(machine, 0x14, 0x77);
 
 	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
@@ -372,16 +372,16 @@ MACHINE_RESET( gbc )
 		GBC_RAMMap[ii] = mess_ram + CGB_START_RAM_BANKS + ii * 0x1000;
 		memset (GBC_RAMMap[ii], 0, 0x1000);
 	}
-	gbc_io2_w( 0x30, 0x00 );
+	gbc_io2_w( machine, 0x30, 0x00 );
 
 	/* Initialise registers */
-	gb_io_w( 0x6C, 0xFE );
-	gb_io_w( 0x72, 0x00 );
-	gb_io_w( 0x73, 0x00 );
-	gb_io_w( 0x74, 0x8F );
-	gb_io_w( 0x75, 0x00 );
-	gb_io_w( 0x76, 0x00 );
-	gb_io_w( 0x77, 0x00 );
+	gb_io_w( machine, 0x6C, 0xFE );
+	gb_io_w( machine, 0x72, 0x00 );
+	gb_io_w( machine, 0x73, 0x00 );
+	gb_io_w( machine, 0x74, 0x8F );
+	gb_io_w( machine, 0x75, 0x00 );
+	gb_io_w( machine, 0x76, 0x00 );
+	gb_io_w( machine, 0x77, 0x00 );
 
 	/* Are we in colour or mono mode? */
 	if( gb_cart[0x143] == 0x80 || gb_cart[0x143] == 0xC0 )
@@ -823,7 +823,7 @@ WRITE8_HANDLER ( gb_io2_w )
 		/* disable BIOS ROM */
 		memory_set_bankptr(5, ROMMap[ROMBank00]);
 	} else {
-		gb_video_w( offset, data );
+		gb_video_w( machine, offset, data );
 	}
 }
 
@@ -1340,7 +1340,7 @@ WRITE8_HANDLER ( sgb_io_w )
 			return;
 		default:
 			/* we didn't handle the write, so pass it to the GB handler */
-			gb_io_w( offset, data );
+			gb_io_w( machine, offset, data );
 			return;
 	}
 
@@ -1881,7 +1881,7 @@ WRITE8_HANDLER ( gbc_io2_w )
 		default:
 			break;
 	}
-	gbc_video_w( offset, data );
+	gbc_video_w( machine, offset, data );
 }
 
 READ8_HANDLER( gbc_io2_r ) {
@@ -1893,7 +1893,7 @@ READ8_HANDLER( gbc_io2_r ) {
 	default:
 		break;
 	}
-	return gbc_video_r( offset );
+	return gbc_video_r( machine, offset );
 }
 
 /****************************************************************************
@@ -1905,9 +1905,9 @@ READ8_HANDLER( gbc_io2_r ) {
 MACHINE_RESET( megaduck )
 {
 	/* We may have to add some more stuff here, if not then it can be merged back into gb */
-	gb_init();
+	gb_init(machine);
 
-	gb_video_init( GB_VIDEO_DMG );
+	gb_video_init( machine, GB_VIDEO_DMG );
 }
 
 /*
@@ -1953,7 +1953,7 @@ MACHINE_RESET( megaduck )
 	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) ) {
 		offset ^= 0x0C;
 	}
-	data = gb_video_r( offset );
+	data = gb_video_r( machine, offset );
 	if ( offset )
 		return data;
 	return BITSWAP8(data,7,0,5,4,6,3,2,1);
@@ -1967,7 +1967,7 @@ WRITE8_HANDLER ( megaduck_video_w )
 	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) ) {
 		offset ^= 0x0C;
 	}
-	gb_video_w(offset, data );
+	gb_video_w(machine, offset, data );
 }
 
 /* Map megaduck audio offset to gameboy audio offsets */
@@ -1976,24 +1976,24 @@ static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 
 
 WRITE8_HANDLER( megaduck_sound_w1 )
 {
-	gb_sound_w( megaduck_sound_offsets[offset], data );
+	gb_sound_w( machine, megaduck_sound_offsets[offset], data );
 }
 
  READ8_HANDLER( megaduck_sound_r1 )
 {
-	return gb_sound_r( megaduck_sound_offsets[offset] );
+	return gb_sound_r( machine, megaduck_sound_offsets[offset] );
 }
 
 WRITE8_HANDLER( megaduck_sound_w2 )
 {
 	switch(offset) {
-		case 0x00:	gb_sound_w( 0x10, data );	break;
-		case 0x01:	gb_sound_w( 0x12, data );	break;
-		case 0x02:	gb_sound_w( 0x11, data );	break;
-		case 0x03:	gb_sound_w( 0x13, data );	break;
-		case 0x04:	gb_sound_w( 0x14, data );	break;
-		case 0x05:	gb_sound_w( 0x16, data );	break;
-		case 0x06:	gb_sound_w( 0x15, data );	break;
+		case 0x00:	gb_sound_w( machine, 0x10, data );	break;
+		case 0x01:	gb_sound_w( machine, 0x12, data );	break;
+		case 0x02:	gb_sound_w( machine, 0x11, data );	break;
+		case 0x03:	gb_sound_w( machine, 0x13, data );	break;
+		case 0x04:	gb_sound_w( machine, 0x14, data );	break;
+		case 0x05:	gb_sound_w( machine, 0x16, data );	break;
+		case 0x06:	gb_sound_w( machine, 0x15, data );	break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
@@ -2009,7 +2009,7 @@ WRITE8_HANDLER( megaduck_sound_w2 )
 
 READ8_HANDLER( megaduck_sound_r2 )
 {
-	return gb_sound_r(0x10 + megaduck_sound_offsets[offset]);
+	return gb_sound_r(machine, 0x10 + megaduck_sound_offsets[offset]);
 }
 
 WRITE8_HANDLER( megaduck_rom_bank_select_type1 )

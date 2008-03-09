@@ -163,17 +163,17 @@ WRITE16_HANDLER( gaiden_flip_w );
 
 static WRITE16_HANDLER( gaiden_sound_command_w )
 {
-	if (ACCESSING_LSB) soundlatch_w(0,data & 0xff);	/* Ninja Gaiden */
-	if (ACCESSING_MSB) soundlatch_w(0,data >> 8);	/* Tecmo Knight */
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	if (ACCESSING_LSB) soundlatch_w(machine,0,data & 0xff);	/* Ninja Gaiden */
+	if (ACCESSING_MSB) soundlatch_w(machine,0,data >> 8);	/* Tecmo Knight */
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE16_HANDLER( drgnbowl_sound_command_w )
 {
 	if (ACCESSING_MSB)
 	{
-		soundlatch_w(0,data >> 8);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data >> 8);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 
@@ -972,7 +972,7 @@ static MACHINE_DRIVER_START( shadoww )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 18432000/2)	/* 9.216 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	/* audio CPU */
@@ -1032,7 +1032,7 @@ static MACHINE_DRIVER_START( drgnbowl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 20000000/2)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(drgnbowl_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	/* audio CPU */

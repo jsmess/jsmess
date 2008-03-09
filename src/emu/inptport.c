@@ -169,22 +169,21 @@ struct _custom_port_info
 };
 
 
+typedef struct _changed_port_info changed_port_info;
+struct _changed_port_info
+{
+	changed_port_info *	next;		/* linked list */
+	input_port_entry *	port;		/* pointer to the input port referenced */
+	UINT8				shift;		/* right shift to apply before calling callback */
+};
+
+
 typedef struct _input_bit_info input_bit_info;
 struct _input_bit_info
 {
 	input_port_entry *	port;		/* port for this input */
 	UINT8				impulse;	/* counter for impulse controls */
 	UINT8				last;		/* were we pressed last time? */
-};
-
-
-typedef struct _changed_callback_info changed_callback_info;
-struct _changed_callback_info
-{
-	changed_callback_info *next;	/* linked list */
-	UINT32				mask;		/* mask we care about */
-	input_port_changed_func callback;/* callback */
-	void *				param;		/* parameter */
 };
 
 
@@ -202,8 +201,7 @@ struct _input_port_info
 	input_bit_info 		bit[MAX_BITS_PER_PORT]; /* info about each bit in the port */
 	analog_port_info *	analoginfo;	/* pointer to linked list of analog port info */
 	custom_port_info *	custominfo;	/* pointer to linked list of custom port info */
-	changed_callback_info *change_notify;/* list of people to notify if things change */
-	UINT32				changed_last_value;
+	changed_port_info *	changedinfo;/* pointer to linked list of changed port info */
 };
 
 
@@ -276,7 +274,7 @@ static double totalspeed;
     PORT HANDLER TABLES
 ***************************************************************************/
 
-static const read8_handler port_handler8[] =
+static const read8_machine_func port_handler8[] =
 {
 	input_port_0_r,			input_port_1_r,			input_port_2_r,			input_port_3_r,
 	input_port_4_r,			input_port_5_r,			input_port_6_r,			input_port_7_r,
@@ -289,7 +287,7 @@ static const read8_handler port_handler8[] =
 };
 
 
-static const read16_handler port_handler16[] =
+static const read16_machine_func port_handler16[] =
 {
 	input_port_0_word_r,	input_port_1_word_r,	input_port_2_word_r,	input_port_3_word_r,
 	input_port_4_word_r,	input_port_5_word_r,	input_port_6_word_r,	input_port_7_word_r,
@@ -302,7 +300,7 @@ static const read16_handler port_handler16[] =
 };
 
 
-static const read32_handler port_handler32[] =
+static const read32_machine_func port_handler32[] =
 {
 	input_port_0_dword_r,	input_port_1_dword_r,	input_port_2_dword_r,	input_port_3_dword_r,
 	input_port_4_dword_r,	input_port_5_dword_r,	input_port_6_dword_r,	input_port_7_dword_r,
@@ -1034,11 +1032,14 @@ static int default_ports_lookup[__ipt_max][MAX_PLAYERS];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state);
 static void setup_playback(running_machine *machine);
 static void setup_record(running_machine *machine);
 static void input_port_exit(running_machine *machine);
 static void input_port_load(int config_type, xml_data_node *parentnode);
 static void input_port_save(int config_type, xml_data_node *parentnode);
+static void input_port_vblank_start(running_machine *machine);
+static void input_port_vblank_end(void);
 static void update_digital_joysticks(void);
 static void update_analog_port(int port);
 static void interpolate_analog_port(int port);
@@ -1136,6 +1137,33 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 	setup_playback(machine);
 	setup_record(machine);
 }
+
+
+void input_port_post_init(running_machine *machine)
+{
+	/* set up callback for updating the ports */
+	video_screen_register_vbl_cb(machine, NULL, on_vblank);
+}
+
+
+
+/*************************************
+ *
+ *  VBLANK handler
+ *
+ *************************************/
+
+static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
+{
+	/* VBLANK starting - read keyboard & update the status of the input ports */
+	if (vblank_state)
+		input_port_vblank_start(machine);
+
+	/* VBLANK ending - update IPT_VBLANK input ports */
+	else
+		input_port_vblank_end();
+}
+
 
 
 /*************************************
@@ -1309,6 +1337,25 @@ static void input_port_postload(void)
 				/* hook in the list */
 				info->next = port_info[portnum].custominfo;
 				port_info[portnum].custominfo = info;
+			}
+
+			/* if this is a changed input, add it to the list */
+			else if (port->changed != NULL)
+			{
+				changed_port_info *info;
+
+				/* allocate memory */
+				info = auto_malloc(sizeof(*info));
+				memset(info, 0, sizeof(*info));
+
+				/* fill in the data */
+				info->port = port;
+				for (mask = port->mask; !(mask & 1); mask >>= 1)
+					info->shift++;
+
+				/* hook in the list */
+				info->next = port_info[portnum].changedinfo;
+				port_info[portnum].changedinfo = info;
 			}
 
 			/* if this is an analog port, create an info struct for it */
@@ -1492,7 +1539,7 @@ static void input_port_postload(void)
 	}
 
 	/* run an initial update */
-	input_port_vblank_start();
+	input_port_vblank_start(Machine);
 }
 
 
@@ -1529,6 +1576,7 @@ static int save_this_port_type(int type)
  *
  *************************************/
 
+#ifdef UNUSED_FUNCTION
 INLINE input_code get_default_code(int config_type, int type)
 {
 	switch (type)
@@ -1545,6 +1593,7 @@ INLINE input_code get_default_code(int config_type, int type)
 	}
 	return SEQCODE_END;
 }
+#endif
 
 
 INLINE int string_to_seq_index(const char *string)
@@ -2109,6 +2158,12 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				port->custom_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
 				break;
 
+			/* changed callbacks */
+			case INPUT_TOKEN_CHANGED:
+				port->changed = TOKEN_GET_PTR(ipt, changedptr);
+				port->changed_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
+				break;
+
 			/* dip switch definition */
 			case INPUT_TOKEN_DIPNAME:
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
@@ -2520,28 +2575,28 @@ int port_tag_to_index(const char *tag)
 }
 
 
-read8_handler port_tag_to_handler8(const char *tag)
+read8_machine_func port_tag_to_handler8(const char *tag)
 {
 	int port = port_tag_to_index(tag);
 	return (port == -1) ? MRA8_NOP : port_handler8[port];
 }
 
 
-read16_handler port_tag_to_handler16(const char *tag)
+read16_machine_func port_tag_to_handler16(const char *tag)
 {
 	int port = port_tag_to_index(tag);
 	return (port == -1) ? MRA16_NOP : port_handler16[port];
 }
 
 
-read32_handler port_tag_to_handler32(const char *tag)
+read32_machine_func port_tag_to_handler32(const char *tag)
 {
 	int port = port_tag_to_index(tag);
 	return (port == -1) ? MRA32_NOP : port_handler32[port];
 }
 
 
-read64_handler port_tag_to_handler64(const char *tag)
+read64_machine_func port_tag_to_handler64(const char *tag)
 {
 	return MRA64_NOP;
 }
@@ -2825,7 +2880,7 @@ void input_port_update_defaults(void)
  *
  *************************************/
 
-void input_port_vblank_start(void)
+static void input_port_vblank_start(running_machine *machine)
 {
 	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
 	int portnum, bitnum;
@@ -2843,6 +2898,7 @@ profiler_mark(PROFILER_INPUT);
 	{
 		input_port_info *portinfo = &port_info[portnum];
 		input_bit_info *info;
+		changed_port_info *changed;
 
 		/* compute the VBLANK mask */
 		portinfo->vblank = 0;
@@ -2850,7 +2906,7 @@ profiler_mark(PROFILER_INPUT);
 			if (info->port->type == IPT_VBLANK)
 			{
 				portinfo->vblank ^= info->port->mask;
-				if (Machine->screen[0].vblank == 0)
+				if (machine->screen[0].vblank == 0)
 					logerror("Warning: you are using IPT_VBLANK with vblank_time = 0. You need to increase vblank_time for IPT_VBLANK to work.\n");
 			}
 
@@ -2937,29 +2993,28 @@ profiler_mark(PROFILER_INPUT);
 
 				/* note that analog ports are handled instantaneously at port read time */
 			}
+
+		/* call changed handlers */
+		for (changed = portinfo->changedinfo; changed; changed = changed->next)
+			if (input_port_condition(changed->port))
+			{
+				input_port_entry *port = changed->port;
+
+				UINT32 new_unmasked_value = readinputport(portnum);
+				UINT32 newval = (new_unmasked_value       & port->mask) >> changed->shift;
+				UINT32 oldval = (port->changed_last_value & port->mask) >> changed->shift;
+
+				if (newval != oldval)
+					(*port->changed)(machine, port->changed_param, oldval, newval);
+
+				port->changed_last_value = new_unmasked_value;
+			}
 	}
 
 #ifdef MESS
 	/* less MESS to MESSy things */
 	inputx_update();
 #endif
-
-	/* call changed handlers */
-	for (portnum = 0; portnum < MAX_INPUT_PORTS; portnum++)
-		if (port_info[portnum].change_notify != NULL)
-		{
-			changed_callback_info *cbinfo;
-			UINT32 newvalue = readinputport(portnum);
-			UINT32 oldvalue = port_info[portnum].changed_last_value;
-			UINT32 delta = newvalue ^ oldvalue;
-
-			/* call all the callbacks whose mask matches the requested mask */
-			for (cbinfo = port_info[portnum].change_notify; cbinfo; cbinfo = cbinfo->next)
-				if (delta & cbinfo->mask)
-					(*cbinfo->callback)(cbinfo->param, oldvalue & cbinfo->mask, newvalue & cbinfo->mask);
-
-			port_info[portnum].changed_last_value = newvalue;
-		}
 
 	/* handle playback/record */
 	for (portnum = 0; portnum < MAX_INPUT_PORTS; portnum++)
@@ -2974,11 +3029,11 @@ profiler_mark(PROFILER_INPUT);
 	}
 
 	/* store speed read from INP file, if extended INP */
-	if (Machine->playback_file != NULL && extended_inp)
+	if (machine->playback_file != NULL && extended_inp)
 	{
 		UINT32 dummy;
-		mame_fread(Machine->playback_file, &rec_speed, sizeof(rec_speed));
-		mame_fread(Machine->playback_file, &dummy, sizeof(dummy));
+		mame_fread(machine->playback_file, &rec_speed, sizeof(rec_speed));
+		mame_fread(machine->playback_file, &dummy, sizeof(dummy));
 		framecount++;
 		rec_speed *= 100;
 		totalspeed += rec_speed;
@@ -2995,7 +3050,7 @@ profiler_mark(PROFILER_END);
  *
  *************************************/
 
-void input_port_vblank_end(void)
+static void input_port_vblank_end(void)
 {
 	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
 	int port;
@@ -3394,7 +3449,7 @@ UINT32 readinputport(int port)
 			/* replace the bits with bits from the custom routine */
 			input_port_entry *port = custom->port;
 			portinfo->digital &= ~port->mask;
-			portinfo->digital |= ((*port->custom)(port->custom_param) << custom->shift) & port->mask;
+			portinfo->digital |= ((*port->custom)(Machine, port->custom_param) << custom->shift) & port->mask;
 		}
 
 	/* compute the current result: default value XOR the digital, merged with the analog */
@@ -3415,18 +3470,8 @@ UINT32 readinputport(int port)
 		result = (result & ~portinfo->vblank) | (portinfo->defvalue & portinfo->vblank);
 
 		/* toggle VBLANK if we're in a VBLANK state */
-		if (Machine->screen[0].oldstyle_vblank_supplied)
-		{
-			int cpu_getvblank(void);
-
-			if (cpu_getvblank())
-				result ^= portinfo->vblank;
-		}
-		else
-		{
-			if (video_screen_get_vblank(0))
-				result ^= portinfo->vblank;
-		}
+		if (video_screen_get_vblank(0))
+			result ^= portinfo->vblank;
 	}
 	return result;
 }
@@ -3465,31 +3510,6 @@ void input_port_set_digital_value(int portnum, UINT32 value, UINT32 mask)
 	input_port_info *portinfo = &port_info[portnum];
 	portinfo->digital &= ~mask;
 	portinfo->digital |= value;
-}
-
-
-
-/*************************************
- *
- *  Input port callbacks
- *
- *************************************/
-
-void input_port_set_changed_callback(int port, UINT32 mask, void (*callback)(void *, UINT32, UINT32), void *param)
-{
-	input_port_info *portinfo = &port_info[port];
-	changed_callback_info *cbinfo;
-
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call input_port_set_changed_callback() at init time!");
-	assert_always((port >= 0) && (port < MAX_INPUT_PORTS), "Invalid port number passed to input_port_set_changed_callback()!");
-
-	cbinfo = auto_malloc(sizeof(*cbinfo));
-	cbinfo->next = portinfo->change_notify;
-	cbinfo->mask = mask;
-	cbinfo->callback = callback;
-	cbinfo->param = param;
-
-	portinfo->change_notify = cbinfo;
 }
 
 

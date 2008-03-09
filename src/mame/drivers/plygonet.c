@@ -110,8 +110,11 @@ static READ32_HANDLER( polygonet_eeprom_r )
 		return (readinputport(0)<<24);
 	}
 
+	/* FIXME: code will never execute */
+#if 0
 	logerror("unk access to eeprom port (mask %x)\n", mem_mask);
 	return 0;
+#endif
 }
 
 
@@ -163,7 +166,7 @@ static INTERRUPT_GEN(polygonet_interrupt)
 
 static READ32_HANDLER( sound_r )
 {
-	int latch = soundlatch3_r(0);
+	int latch = soundlatch3_r(machine, 0);
 
 	if (latch == 0xe) latch = 0xf;	/* hack: until 54539 NMI disable found */
 
@@ -174,11 +177,11 @@ static WRITE32_HANDLER( sound_w )
 {
 	if (ACCESSING_MSB)
 	{
-		soundlatch_w(0, (data>>8)&0xff);
+		soundlatch_w(machine, 0, (data>>8)&0xff);
 	}
 	else
 	{
-		soundlatch2_w(0, data&0xff);
+		soundlatch2_w(machine, 0, data&0xff);
 	}
 }
 
@@ -684,7 +687,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( plygonet )
 	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
 	MDRV_CPU_PROGRAM_MAP(polygonet_map, 0)
-	MDRV_CPU_VBLANK_INT(polygonet_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(polygonet_interrupt, 2)
 
 	MDRV_CPU_ADD(DSP56156, 10000000)		/* should be 40.0 MHz */
 	MDRV_CPU_FLAGS(CPU_DISABLE)

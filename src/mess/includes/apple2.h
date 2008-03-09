@@ -125,9 +125,9 @@ typedef struct _apple2_meminfo apple2_meminfo;
 struct _apple2_meminfo
 {
 	UINT32 read_mem;
-	read8_handler read_handler;
+	read8_machine_func read_handler;
 	UINT32 write_mem;
-	write8_handler write_handler;
+	write8_machine_func write_handler;
 };
 
 typedef struct _apple2_memmap_entry apple2_memmap_entry;

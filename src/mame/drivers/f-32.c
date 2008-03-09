@@ -16,47 +16,31 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-static UINT32 *vram;
+static UINT32 *mosaicf2_videoram;
 
 static READ32_HANDLER( oki_32bit_r )
 {
-	return OKIM6295_status_0_r(0);
+	return OKIM6295_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( oki_32bit_w )
 {
-	OKIM6295_data_0_w(0, data & 0xff);
+	OKIM6295_data_0_w(machine, 0, data & 0xff);
 }
 
 static READ32_HANDLER( ym2151_status_32bit_r )
 {
-	return YM2151_status_port_0_r(0);
+	return YM2151_status_port_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( ym2151_data_32bit_w )
 {
-	YM2151_data_port_0_w(0, data & 0xff);
+	YM2151_data_port_0_w(machine, 0, data & 0xff);
 }
 
 static WRITE32_HANDLER( ym2151_register_32bit_w )
 {
-	YM2151_register_port_0_w(0,data & 0xff);
-}
-
-static WRITE32_HANDLER( vram_w )
-{
-	int x,y;
-
-	COMBINE_DATA(&vram[offset]);
-
-	y = offset >> 8;
-	x = offset & 0xff;
-
-	if(x < 320/2 && y < 224)
-	{
-		*BITMAP_ADDR16(tmpbitmap, y, x*2+0) = (vram[offset] >> 16) & 0x7fff;
-		*BITMAP_ADDR16(tmpbitmap, y, x*2+1) = vram[offset] & 0x7fff;
-	}
+	YM2151_register_port_0_w(machine,0,data & 0xff);
 }
 
 static READ32_HANDLER( eeprom_r )
@@ -80,9 +64,30 @@ static WRITE32_HANDLER( eeprom_clock_line_w )
 }
 
 
+static VIDEO_UPDATE( mosaicf2 )
+{
+	offs_t offs;
+
+	for (offs = 0; offs < 0x10000; offs++)
+	{
+		int	y = offs >> 8;
+		int x = offs & 0xff;
+
+		if ((x < 0xa0) && (y < 0xe0))
+		{
+			*BITMAP_ADDR16(bitmap, y, (x * 2) + 0) = (mosaicf2_videoram[offs] >> 16) & 0x7fff;
+			*BITMAP_ADDR16(bitmap, y, (x * 2) + 1) = (mosaicf2_videoram[offs] >>  0) & 0x7fff;
+		}
+	}
+
+	return 0;
+}
+
+
+
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_WRITE(vram_w) AM_BASE(&vram)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(&mosaicf2_videoram)
 	AM_RANGE(0x80000000, 0x80ffffff) AM_ROM AM_REGION(REGION_USER2,0)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1,0)
 ADDRESS_MAP_END
@@ -93,7 +98,7 @@ static READ32_HANDLER( f32_input_port_1_r )
 	if ((activecpu_get_pc() == 0x000379de) ||
 	    (activecpu_get_pc() == 0x000379cc) ) activecpu_adjust_icount(-100);
 	//else printf("PC %08x\n", activecpu_get_pc() );
-	return input_port_1_dword_r(0, 0);
+	return input_port_1_dword_r(machine, 0, 0);
 }
 
 
@@ -147,7 +152,7 @@ static MACHINE_DRIVER_START( mosaicf2 )
 	MDRV_CPU_ADD_TAG("main", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(common_map,0)
 	MDRV_CPU_IO_MAP(mosaicf2_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
@@ -159,8 +164,7 @@ static MACHINE_DRIVER_START( mosaicf2 )
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(mosaicf2)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

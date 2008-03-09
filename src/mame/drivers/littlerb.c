@@ -302,7 +302,7 @@ PALETTE_INIT( littlerb )
 }
 #endif
 
-static void draw_sprite(mame_bitmap *bitmap, int xsize,int ysize, int offset, int xpos, int ypos )
+static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int xpos, int ypos )
 {
 	UINT16* spritegfx = littlerb_region4;
 	int x,y;
@@ -362,7 +362,7 @@ static VIDEO_UPDATE(littlerb)
 static MACHINE_DRIVER_START( littlerb )
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(littlerb_main, 0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

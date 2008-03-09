@@ -92,7 +92,7 @@ static tilemap *vmetal_mid2tilemap;
 
 /* video/metro.c */
 extern UINT16 *metro_videoregs;
-void metro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
+void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 WRITE16_HANDLER( metro_paletteram_w );
 
 static READ16_HANDLER ( varia_crom_read )
@@ -208,7 +208,7 @@ static WRITE16_HANDLER( vmetal_es8712_w )
     16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
     */
 
-	ES8712_data_0_lsb_w(offset, data, mem_mask);
+	ES8712_data_0_lsb_w(machine, offset, data, mem_mask);
 	logerror("PC:%06x - Writing %04x to ES8712 offset %02x\n",activecpu_get_previouspc(),data,offset);
 }
 
@@ -427,7 +427,7 @@ static VIDEO_UPDATE(varia)
 static MACHINE_DRIVER_START( varia )
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(varia_program_map, 0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1) // also level 3
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) // also level 3
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

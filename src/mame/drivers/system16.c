@@ -411,8 +411,8 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if( ACCESSING_LSB )
 {
-		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
+		soundlatch_w( machine,0,data&0xff );
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
 	}
 }
 
@@ -420,8 +420,8 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 {
 	if( ACCESSING_LSB )
 {
-		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w( machine,0,data&0xff );
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -450,7 +450,7 @@ static MACHINE_DRIVER_START( system16 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
-	MDRV_CPU_VBLANK_INT(sys16_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", sys16_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
 	/* audio CPU */
@@ -577,6 +577,7 @@ static void set_bg_page( int data )
 
 /***************************************************************************/
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( aliensyn )
 	SYS16_JOY1
 	SYS16_JOY2
@@ -604,7 +605,7 @@ static INPUT_PORTS_START( aliensyn )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
-
+#endif
 /****************************************************************************/
 
 
@@ -1204,7 +1205,7 @@ static READ16_HANDLER( ga_io_players_r ) {
 }
 static READ16_HANDLER( ga_io_service_r )
 {
-	return (input_port_2_word_r(0,0) << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
+	return (input_port_2_word_r(machine,0,0) << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
 }
 
 static ADDRESS_MAP_START( goldnaxe_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1229,7 +1230,7 @@ static WRITE16_HANDLER( ga_sound_command_w )
 	COMBINE_DATA( &sys16_workingram[(0xecfc-0xc000)/2] );
 	if( ACCESSING_MSB )
 {
-		soundlatch_w( 0,data>>8 );
+		soundlatch_w( machine,0,data>>8 );
 		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
 	}
 }
@@ -1399,7 +1400,7 @@ static int passht4b_io3_val;
 
 static READ16_HANDLER( passht4b_service_r )
 {
-	UINT16 val=input_port_2_word_r(offset,0);
+	UINT16 val=input_port_2_word_r(machine,offset,0);
 	if(!(readinputport(0) & 0x40)) val&=0xef;
 	if(!(readinputport(1) & 0x40)) val&=0xdf;
 	if(!(readinputport(5) & 0x40)) val&=0xbf;
@@ -1907,11 +1908,11 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 static READ16_HANDLER( tt_io_player1_r )
-{ return input_port_0_r( offset ) << 8; }
+{ return input_port_0_r( machine, offset ) << 8; }
 static READ16_HANDLER( tt_io_player2_r )
-{ return input_port_1_r( offset ) << 8; }
+{ return input_port_1_r( machine, offset ) << 8; }
 static READ16_HANDLER( tt_io_service_r )
-{ return input_port_2_r( offset ) << 8; }
+{ return input_port_2_r( machine, offset ) << 8; }
 
 
 
@@ -2523,6 +2524,7 @@ ROM_END
 
 
 // pre16
+#ifdef UNUSED_DEFINITION
 ROM_START( mjleague )
 	ROM_REGION( 0x030000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-7404.09b", 0x000000, 0x8000, CRC(ec1655b5) SHA1(5c1df364fa9733daa4478c5f88298089e4963c33) )
@@ -2561,6 +2563,7 @@ ROM_START( mjleague )
 	ROM_LOAD( "epr-7064.03a", 0x10000, 0x8000, CRC(159f6636) SHA1(66fa3f3e95a6ef3d3ff4ded09c05ab1131d9fbbb) )
 	ROM_LOAD( "epr-7066.04a", 0x18000, 0x8000, CRC(f5cfa91f) SHA1(c85d68cbcd03fe1436bed12235c033610acc11ee) )
 ROM_END
+#endif
 
 ROM_START( passht4b )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* 68000 code */

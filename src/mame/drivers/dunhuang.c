@@ -346,7 +346,7 @@ static WRITE8_HANDLER( dunhuang_input_w )	{	dunhuang_input = data;	}
 static READ8_HANDLER( dunhuang_service_r )
 {
 	return readinputport(5)
-	 | ((dunhuang_hopper && !(cpu_getcurrentframe()%10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
+	 | ((dunhuang_hopper && !(video_screen_get_frame_number(0)%10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
 	 | 0x80																// bit 7 low -> tiles block transferrer busy
 	;
 }
@@ -676,7 +676,7 @@ static MACHINE_DRIVER_START( dunhuang )
 	MDRV_CPU_ADD(Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(dunhuang_map,0)
 	MDRV_CPU_IO_MAP(dunhuang_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(5))
 

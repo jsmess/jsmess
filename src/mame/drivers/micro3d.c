@@ -137,7 +137,7 @@ static WRITE16_HANDLER( paletteram16_BBBBBRRRRRGGGGGG_word_w )
 }
 
 
-static void micro3d_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+static void micro3d_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -796,11 +796,11 @@ switch(offset)
 
                     if(data & 0x10)
                     {
-                    	upd7759_0_reset_w(0,0);
+                    	upd7759_0_reset_w(machine,0,0);
                     }
                     else
                     {
-                    	upd7759_0_reset_w(0,1);
+                    	upd7759_0_reset_w(machine,0,1);
                     }
                     break;
 }
@@ -812,7 +812,7 @@ static READ8_HANDLER(sound_io_r)
 switch(offset)
 {
         case 0x01:  return readinputport(3);                           /* Test push switch */
-        case 0x03:  return (int)(upd7759_0_busy_r(0))<<3;
+        case 0x03:  return (int)(upd7759_0_busy_r(machine,0))<<3;
         default:    return 0;
 }
 
@@ -861,7 +861,7 @@ static const tms34010_config vgb_config =
 static MACHINE_DRIVER_START( micro3d )
 	MDRV_CPU_ADD(M68000, 12000000 )
 	MDRV_CPU_PROGRAM_MAP(hostmem,0)
-	MDRV_CPU_VBLANK_INT(micro3d_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", micro3d_vblank)
 
  	MDRV_CPU_ADD(TMS34010, 40000000)
 	MDRV_CPU_CONFIG(vgb_config)

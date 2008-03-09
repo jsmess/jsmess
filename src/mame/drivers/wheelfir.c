@@ -75,7 +75,7 @@ static READ16_HANDLER( wheelfir_rand4 )
 
 static UINT16 *wheelfir_myram;
 static UINT16 wheelfir_blitdata[16];
-static mame_bitmap *wheelfir_tmp_bitmap[3];
+static bitmap_t *wheelfir_tmp_bitmap[3];
 
 /*
 
@@ -150,7 +150,7 @@ therefore a 512x256 page is
 
 /* it draws the background and road with direct writes to port 6... but where does this really go? an extra blit source page? */
 static int wheelfir_six_pos = 0;
-static mame_bitmap* render_bitmap;
+static bitmap_t* render_bitmap;
 
 static WRITE16_HANDLER(wheelfir_blit_w)
 {
@@ -631,11 +631,11 @@ static INTERRUPT_GEN( wheelfir_irq )
 static MACHINE_DRIVER_START( wheelfir )
 	MDRV_CPU_ADD_TAG("main", M68000, 32000000)
 	MDRV_CPU_PROGRAM_MAP(wheelfir_main, 0)
-	MDRV_CPU_VBLANK_INT(wheelfir_irq,256)  // 1,3,5 valid
+	MDRV_CPU_VBLANK_INT_HACK(wheelfir_irq,256)  // 1,3,5 valid
 
 	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(wheelfir_sub, 0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1) // 1 valid
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) // 1 valid
 
 	MDRV_MACHINE_RESET (wheelfir)
 

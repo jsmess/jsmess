@@ -93,20 +93,20 @@ static WRITE8_HANDLER( b800_w )
 		/* special case to return the value written to 0xb000 */
 		/* does it reset the chips too ? */
 		case 0:	break;
-		case 0xc4: b000_ret = AY8910_read_port_0_r(0);	break;
-		case 0x94: b000_ret = AY8910_read_port_1_r(0);	break;
-		case 0x86: b000_ret = AY8910_read_port_2_r(0);	break;
+		case 0xc4: b000_ret = AY8910_read_port_0_r(machine,0);	break;
+		case 0x94: b000_ret = AY8910_read_port_1_r(machine,0);	break;
+		case 0x86: b000_ret = AY8910_read_port_2_r(machine,0);	break;
 
 		case 0x80:
 			switch(b800_prev)
 			{
-				case 0xe0: AY8910_control_port_0_w(0,b000_val);	break;
-				case 0x98: AY8910_control_port_1_w(0,b000_val);	break;
-				case 0x83: AY8910_control_port_2_w(0,b000_val);	break;
+				case 0xe0: AY8910_control_port_0_w(machine,0,b000_val);	break;
+				case 0x98: AY8910_control_port_1_w(machine,0,b000_val);	break;
+				case 0x83: AY8910_control_port_2_w(machine,0,b000_val);	break;
 
-				case 0xa0: AY8910_write_port_0_w(0,b000_val);	break;
-				case 0x88: AY8910_write_port_1_w(0,b000_val);	break;
-				case 0x81: AY8910_write_port_2_w(0,b000_val);	break;
+				case 0xa0: AY8910_write_port_0_w(machine,0,b000_val);	break;
+				case 0x88: AY8910_write_port_1_w(machine,0,b000_val);	break;
+				case 0x81: AY8910_write_port_2_w(machine,0,b000_val);	break;
 
 			}
 		break;
@@ -230,7 +230,7 @@ static MACHINE_DRIVER_START( ettrivia )
 	MDRV_CPU_ADD(Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT(ettrivia_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ettrivia_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

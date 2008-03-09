@@ -67,6 +67,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cococart.h"
 #include "coco_vhd.h"
 #include "includes/coco.h"
@@ -281,20 +282,21 @@ static void fdc_coco_dskreg_w(coco_cartridge *cartridge, UINT8 data)
 
 static UINT8 fdc_coco_r(coco_cartridge *cartridge, UINT16 addr)
 {
+	running_machine *machine = Machine;
 	UINT8 result = 0;
 	switch(addr & 0xEF)
 	{
 		case 8:
-			result = wd17xx_status_r(0);
+			result = wd17xx_status_r(machine, 0);
 			break;
 		case 9:
-			result = wd17xx_track_r(0);
+			result = wd17xx_track_r(machine, 0);
 			break;
 		case 10:
-			result = wd17xx_sector_r(0);
+			result = wd17xx_sector_r(machine, 0);
 			break;
 		case 11:
-			result = wd17xx_data_r(0);
+			result = wd17xx_data_r(machine, 0);
 			break;
 	}
 	return result;
@@ -308,6 +310,7 @@ static UINT8 fdc_coco_r(coco_cartridge *cartridge, UINT16 addr)
 
 static void fdc_coco_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
+	running_machine *machine = Machine;
 	switch(addr & 0xEF)
 	{
 		case 0: case 1: case 2: case 3:
@@ -315,16 +318,16 @@ static void fdc_coco_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 			fdc_coco_dskreg_w(cartridge, data);
 			break;
 		case 8:
-			wd17xx_command_w(0, data);
+			wd17xx_command_w(machine, 0, data);
 			break;
 		case 9:
-			wd17xx_track_w(0, data);
+			wd17xx_track_w(machine, 0, data);
 			break;
 		case 10:
-			wd17xx_sector_w(0, data);
+			wd17xx_sector_w(machine, 0, data);
 			break;
 		case 11:
-			wd17xx_data_w(0, data);
+			wd17xx_data_w(machine, 0, data);
 			break;
 	};
 }
@@ -386,28 +389,29 @@ static rtc_type_t real_time_clock(void)
 
 static UINT8 fdc_coco3plus_r(coco_cartridge *cartridge, UINT16 addr)
 {
+	running_machine *machine = Machine;
 	UINT8 result = fdc_coco_r(cartridge, addr);
 
 	switch(addr)
 	{
 		case 0x10:	/* FF50 */
 			if (real_time_clock() == RTC_DISTO)
-				result = msm6242_r(msm6242_rtc_address);
+				result = msm6242_r(machine, msm6242_rtc_address);
 			break;
 
 		case 0x38:	/* FF78 */
 			if (real_time_clock() == RTC_CLOUD9)
-				ds1315_r_0(addr);
+				ds1315_r_0(machine, addr);
 			break;
 
 		case 0x39:	/* FF79 */
 			if (real_time_clock() == RTC_CLOUD9)
-				ds1315_r_1(addr);
+				ds1315_r_1(machine, addr);
 			break;
 
 		case 0x3C:	/* FF7C */
 			if (real_time_clock() == RTC_CLOUD9)
-				result = ds1315_r_data(addr);
+				result = ds1315_r_data(machine, addr);
 			break;
 
 		case 0x40:
@@ -417,7 +421,7 @@ static UINT8 fdc_coco3plus_r(coco_cartridge *cartridge, UINT16 addr)
 		case 0x44:
 		case 0x45:
 			if (device_count(IO_VHD) > 0)
-				result = coco_vhd_io_r(addr);
+				result = coco_vhd_io_r(machine, addr);
 			break;
 	}
 	return result;
@@ -431,13 +435,15 @@ static UINT8 fdc_coco3plus_r(coco_cartridge *cartridge, UINT16 addr)
 
 static void fdc_coco3plus_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
+	running_machine *machine = Machine;
+
 	fdc_coco_w(cartridge, addr, data);
 
 	switch(addr)
 	{
 		case 0x10:	/* FF50 */
 			if (real_time_clock() == RTC_DISTO)
-				msm6242_w(msm6242_rtc_address, data);
+				msm6242_w(machine, msm6242_rtc_address, data);
 			break;
 
 		case 0x11:	/* FF51 */
@@ -452,7 +458,7 @@ static void fdc_coco3plus_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 		case 0x44:
 		case 0x45:
 			if (device_count(IO_VHD) > 0)
-				coco_vhd_io_w(addr, data);
+				coco_vhd_io_w(machine, addr, data);
 			break;
 	}
 }
@@ -559,20 +565,21 @@ static void fdc_dragon_dskreg_w(coco_cartridge *cartridge, UINT8 data)
 
 static UINT8 fdc_dragon_r(coco_cartridge *cartridge, UINT16 addr)
 {
+	running_machine *machine = Machine;
 	UINT8 result = 0;
 	switch(addr & 0xEF)
 	{
 		case 0:
-			result = wd17xx_status_r(0);
+			result = wd17xx_status_r(machine, 0);
 			break;
 		case 1:
-			result = wd17xx_track_r(0);
+			result = wd17xx_track_r(machine, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(0);
+			result = wd17xx_sector_r(machine, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(0);
+			result = wd17xx_data_r(machine, 0);
 			break;
 	}
 	return result;
@@ -586,10 +593,11 @@ static UINT8 fdc_dragon_r(coco_cartridge *cartridge, UINT16 addr)
 
 static void fdc_dragon_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
+	running_machine *machine = Machine;
 	switch(addr & 0xEF)
 	{
 		case 0:
-			wd17xx_command_w(0, data);
+			wd17xx_command_w(machine, 0, data);
 
 			/* disk head is encoded in the command byte */
 			/* Only for type 3 & 4 commands */
@@ -597,13 +605,13 @@ static void fdc_dragon_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 				wd17xx_set_side((data & 0x02) ? 1 : 0);
 			break;
 		case 1:
-			wd17xx_track_w(0, data);
+			wd17xx_track_w(machine, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(0, data);
+			wd17xx_sector_w(machine, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(0, data);
+			wd17xx_data_w(machine, 0, data);
 			break;
 		case 8: case 9: case 10: case 11:
 		case 12: case 13: case 14: case 15:

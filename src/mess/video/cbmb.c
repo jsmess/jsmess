@@ -22,18 +22,6 @@ VIDEO_UPDATE( cbmb_crtc ) {
 	return 0;
 }
 
-READ8_HANDLER( cbmb_mc6845_register_r ) {
-	return mc6845_register_r( mc6845 );
-}
-
-WRITE8_HANDLER( cbmb_mc6845_register_w ) {
-	mc6845_register_w( mc6845, data );
-}
-
-WRITE8_HANDLER( cbmb_mc6845_address_w ) {
-	mc6845_address_w( mc6845, data );
-}
-
 void cbm600_vh_init(void)
 {
 	UINT8 *gfx = memory_region(REGION_GFX1);

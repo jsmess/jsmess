@@ -39,12 +39,12 @@ WRITE16_HANDLER( toki_control_w )
 
 VIDEO_EOF( toki )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }
 
 VIDEO_EOF( tokib )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -176,7 +176,7 @@ WRITE16_HANDLER( toki_background2_videoram16_w )
 ***************************************************************************/
 
 
-static void toki_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void toki_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int x,y,xoffs,yoffs,tile,flipx,flipy,color,offs;
 	UINT16 *sprite_word;
@@ -220,7 +220,7 @@ static void toki_draw_sprites(running_machine *machine, mame_bitmap *bitmap,cons
 }
 
 
-static void tokib_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void tokib_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int x,y,tile,flipx,color,offs;
 	UINT16 *sprite_word;

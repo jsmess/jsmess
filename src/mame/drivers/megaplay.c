@@ -240,6 +240,7 @@ static INPUT_PORTS_START ( mp_gaxe2 )
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 7") PORT_CODE(KEYCODE_K)
 INPUT_PORTS_END
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START ( mp_col3 )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
@@ -266,6 +267,7 @@ static INPUT_PORTS_START ( mp_col3 )
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 6") PORT_CODE(KEYCODE_J)
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 7") PORT_CODE(KEYCODE_K)
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START ( mp_twc )
 	GENESIS_PORTS
@@ -438,7 +440,7 @@ static READ8_HANDLER( bank_r )
 	UINT8* game = memory_region(REGION_CPU1);
 
 	if(game_banksel == 0x142) // Genesis I/O
-		return megaplay_genesis_io_r((offset & 0x1f) / 2, 0xffff);
+		return megaplay_genesis_io_r(machine, (offset & 0x1f) / 2, 0xffff);
 
 	if(bios_mode & MP_ROM)
 	{
@@ -471,7 +473,7 @@ static READ8_HANDLER( bank_r )
 static WRITE8_HANDLER ( bank_w )
 {
 	if(game_banksel == 0x142) // Genesis I/O
-		genesis_io_w((offset & 0x1f) / 2, data, 0xffff);
+		genesis_io_w(machine, (offset & 0x1f) / 2, data, 0xffff);
 
 	if(offset <= 0x1fff && (bios_width & 0x08))
 		ic37_ram[(0x2000 * (bios_bank & 0x03)) + offset] = data;
@@ -674,7 +676,7 @@ static MACHINE_DRIVER_START( mpnew )
 	MDRV_CPU_ADD_TAG("megaplay_bios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(megaplay_bios_readmem, megaplay_bios_writemem)
 	MDRV_CPU_IO_MAP(megaplay_bios_readport,megaplay_bios_writeport)
-	MDRV_CPU_VBLANK_INT(megaplay_bios_irq, 262)
+	MDRV_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
 
 	MDRV_INTERLEAVE(100)
 

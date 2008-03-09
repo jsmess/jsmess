@@ -76,7 +76,7 @@ static TIMER_CALLBACK( nvram_write_timeout );
  *
  *************************************/
 
-static void amerdart_scanline(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+static void amerdart_scanline(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -103,7 +103,7 @@ static void amerdart_scanline(running_machine *machine, int screen, mame_bitmap 
 }
 
 
-static void coolpool_scanline(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+static void coolpool_scanline(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -202,8 +202,8 @@ static WRITE16_HANDLER( nvram_data_w )
 
 static WRITE16_HANDLER( nvram_thrash_data_w )
 {
-	nvram_data_w(offset, data, mem_mask);
-	nvram_thrash_w(offset, data, mem_mask);
+	nvram_data_w(machine, offset, data, mem_mask);
+	nvram_thrash_w(machine, offset, data, mem_mask);
 }
 
 

@@ -69,8 +69,8 @@ WRITE8_HANDLER( cop01_vreg_w );
 
 static WRITE8_HANDLER( cop01_sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static READ8_HANDLER( cop01_sound_command_r )
@@ -80,7 +80,7 @@ static READ8_HANDLER( cop01_sound_command_r )
 #define TIMER_RATE 12000	/* total guess */
 
 
-	res = (soundlatch_r(offset) & 0x7f) << 1;
+	res = (soundlatch_r(machine,offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
 	if ((activecpu_gettotalcycles() / TIMER_RATE) & 1)
@@ -418,7 +418,7 @@ static MACHINE_DRIVER_START( cop01 )
 	MDRV_CPU_ADD(Z80, 4000000)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* ???? */
@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( mightguy )
 	MDRV_CPU_ADD(Z80, 4000000)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(mightguy_readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* ???? */

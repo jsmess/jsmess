@@ -706,7 +706,7 @@ static MACHINE_DRIVER_START( c64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6510, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem, 0)
-	MDRV_CPU_VBLANK_INT(c64_frame_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", c64_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC2_HRETRACERATE)
 	MDRV_INTERLEAVE(1)
 

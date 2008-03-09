@@ -999,9 +999,9 @@ static void amstrad_plus_dma_parse(int channel, int *addr)
 	switch(command & 0xf000)
 	{
 	case 0x0000:  // Load PSG register
-		AY8910_control_port_0_w(0,(command & 0x0f00) >> 8);
-		AY8910_write_port_0_w(0,command & 0x00ff);
-		AY8910_control_port_0_w(0,prev_reg);
+		AY8910_control_port_0_w(machine, 0,(command & 0x0f00) >> 8);
+		AY8910_write_port_0_w(machine, 0,command & 0x00ff);
+		AY8910_control_port_0_w(machine, 0,prev_reg);
 		logerror("DMA %i: LOAD %i, %i\n",channel,(command & 0x0f00) >> 8, command & 0x00ff);
 		break;
 	case 0x1000:  // Pause for n HSYNCs (0 - 4095)

@@ -802,7 +802,7 @@ static MACHINE_DRIVER_START(apexc)
 	MDRV_CPU_PROGRAM_MAP(apexc_mem_map, 0)
 	MDRV_CPU_IO_MAP(apexc_io_map, 0)
 	/* dummy interrupt: handles the control panel */
-	MDRV_CPU_VBLANK_INT(apexc_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", apexc_interrupt)
 	/*MDRV_CPU_PERIODIC_INT(func, rate)*/
 
 	MDRV_MACHINE_START( apexc )

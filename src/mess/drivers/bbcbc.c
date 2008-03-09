@@ -75,7 +75,7 @@ static MACHINE_DRIVER_START( bbcbc )
 	MDRV_MACHINE_START( bbcbc )
 	MDRV_MACHINE_RESET( bbcbc )
 
-	MDRV_CPU_VBLANK_INT( bbcbc_interrupt, 1 )
+	MDRV_CPU_VBLANK_INT("main", bbcbc_interrupt)
 	MDRV_IMPORT_FROM( tms9928a )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE( 50 )

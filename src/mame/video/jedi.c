@@ -89,7 +89,7 @@ static void get_pens(jedi_state *state, pen_t *pens)
 }
 
 
-static void do_pen_lookup(jedi_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
+static void do_pen_lookup(jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS];
@@ -111,7 +111,7 @@ static void do_pen_lookup(jedi_state *state, mame_bitmap *bitmap, const rectangl
 
 WRITE8_HANDLER( jedi_vscroll_w )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	state->vscroll = data | (offset << 8);
 }
@@ -119,7 +119,7 @@ WRITE8_HANDLER( jedi_vscroll_w )
 
 WRITE8_HANDLER( jedi_hscroll_w )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	state->hscroll = data | (offset << 8);
 }
@@ -133,7 +133,7 @@ WRITE8_HANDLER( jedi_hscroll_w )
  *
  *************************************/
 
-static void draw_background_and_text(jedi_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background_and_text(jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y;
 	int background_line_buffer[0x200];	/* RAM chip at 2A */
@@ -233,7 +233,7 @@ static void draw_background_and_text(jedi_state *state, mame_bitmap *bitmap, con
  *
  *************************************/
 
-static void draw_sprites(jedi_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	offs_t offs;
 	UINT8 *spriteram = state->spriteram;

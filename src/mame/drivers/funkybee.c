@@ -93,8 +93,8 @@ extern VIDEO_UPDATE( funkybee );
 
 static READ8_HANDLER( funkybee_input_port_0_r )
 {
-	watchdog_reset_r(0);
-	return input_port_0_r(offset);
+	watchdog_reset_r(machine,0);
+	return input_port_0_r(machine,offset);
 }
 
 static WRITE8_HANDLER( funkybee_coin_counter_w )
@@ -187,6 +187,7 @@ static INPUT_PORTS_START( funkybee )
 	PORT_DIPSETTING(	0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( funkbeeb )
 	PORT_INCLUDE(funkybee)
 
@@ -197,6 +198,7 @@ static INPUT_PORTS_START( funkbeeb )
 	PORT_DIPSETTING(	0x10, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( skylancr )
 	PORT_START_TAG("IN0")
@@ -306,7 +308,7 @@ static MACHINE_DRIVER_START( funkybee )
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

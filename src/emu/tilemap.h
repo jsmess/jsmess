@@ -148,7 +148,7 @@
     6. In your VIDEO_UPDATE callback, render the tiles by calling
         tilemap_draw() or tilemap_draw_roz(). If you need to do custom
         rendering and want access to the raw pixels, call
-        tilemap_get_pixmap() to get a pointer to the updated mame_bitmap
+        tilemap_get_pixmap() to get a pointer to the updated bitmap_t
         containing the tilemap graphics.
 
 ****************************************************************************
@@ -366,7 +366,6 @@
 /* Macros for setting tile attributes in the TILE_GET_INFO callback: */
 /*   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0 */
 /*   TILE_FLIP_XY assumes that flipy is in bit 0 and flipx is in bit 1 */
-/*   TILE_GROUP shifts a split group number appropriately to OR into the tile flags */
 #define TILE_FLIPYX(YX)					((YX) & 3)
 #define TILE_FLIPXY(XY)					((((XY) & 2) >> 1) | (((XY) & 1) << 1))
 
@@ -397,10 +396,10 @@ struct _tile_data
 
 
 /* callback function to get info about a tile */
-typedef void (*tile_get_info_callback)(running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param);
+typedef void (*tile_get_info_func)(running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param);
 
 /* callback function to map a column,row pair to a memory index */
-typedef tilemap_memory_index (*tilemap_mapper_callback)(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+typedef tilemap_memory_index (*tilemap_mapper_func)(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
 
 
 
@@ -408,7 +407,7 @@ typedef tilemap_memory_index (*tilemap_mapper_callback)(UINT32 col, UINT32 row, 
     GLOBAL VARIABLES
 ***************************************************************************/
 
-extern mame_bitmap *priority_bitmap;
+extern bitmap_t *priority_bitmap;
 
 
 
@@ -427,7 +426,7 @@ void tilemap_init(running_machine *machine);
 /* ----- tilemap creation and configuration ----- */
 
 /* create a new tilemap; note that tilemaps are tracked by the core so there is no dispose */
-tilemap *tilemap_create(tile_get_info_callback tile_get_info, tilemap_mapper_callback mapper, int tilewidth, int tileheight, int cols, int rows);
+tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
 
 /* specify a parameter to be passed into the tile_get_info callback */
 void tilemap_set_user_data(tilemap *tmap, void *user_data);
@@ -495,10 +494,10 @@ int tilemap_get_scrolly(tilemap *tmap, int col);
 /* ----- internal map access ----- */
 
 /* return a pointer to the (updated) internal pixmap for a tilemap */
-mame_bitmap *tilemap_get_pixmap(tilemap *tmap);
+bitmap_t *tilemap_get_pixmap(tilemap *tmap);
 
 /* return a pointer to the (updated) internal flagsmap for a tilemap */
-mame_bitmap *tilemap_get_flagsmap(tilemap *tmap);
+bitmap_t *tilemap_get_flagsmap(tilemap *tmap);
 
 /* return a pointer to the (updated) internal per-tile flags for a tilemap */
 UINT8 *tilemap_get_tile_flags(tilemap *tmap);
@@ -508,11 +507,11 @@ UINT8 *tilemap_get_tile_flags(tilemap *tmap);
 /* ----- tilemap rendering ----- */
 
 /* draw a tilemap to the destination with clipping; pixels apply priority/priority_mask to the priority bitmap */
-void tilemap_draw_primask(mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT8 priority, UINT8 priority_mask);
+void tilemap_draw_primask(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 
 /* draw a tilemap to the destination with clipping and arbitrary rotate/zoom; */
 /* pixels apply priority/priority_mask to the priority bitmap */
-void tilemap_draw_roz_primask(mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap,
+void tilemap_draw_roz_primask(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 
@@ -527,7 +526,7 @@ int tilemap_count(void);
 void tilemap_size_by_index(int number, UINT32 *width, UINT32 *height);
 
 /* render an indexed tilemap with fixed characteristics (no priority) */
-void tilemap_draw_by_index(mame_bitmap *dest, int number, UINT32 scrollx, UINT32 scrolly);
+void tilemap_draw_by_index(bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly);
 
 
 
@@ -584,7 +583,7 @@ INLINE void tilemap_map_pen_to_layer(tilemap *tmap, int group, pen_t pen, UINT8 
     tilemap_draw_primask
 -------------------------------------------------*/
 
-INLINE void tilemap_draw(mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT8 priority)
+INLINE void tilemap_draw(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT8 priority)
 {
 	tilemap_draw_primask(dest, cliprect, tmap, flags, priority, 0xff);
 }
@@ -595,7 +594,7 @@ INLINE void tilemap_draw(mame_bitmap *dest, const rectangle *cliprect, tilemap *
     tilemap_draw_roz_primask
 -------------------------------------------------*/
 
-INLINE void tilemap_draw_roz(mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap,
+INLINE void tilemap_draw_roz(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority)
 {

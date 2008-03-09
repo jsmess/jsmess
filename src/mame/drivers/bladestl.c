@@ -89,8 +89,8 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 
 static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 {
-	soundlatch_w(offset, data);
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(machine, offset, data);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 
@@ -434,7 +434,7 @@ static MACHINE_DRIVER_START( bladestl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309, 24000000/2)		/* 24MHz/2 (?) */
 	MDRV_CPU_PROGRAM_MAP(bladestl_readmem,bladestl_writemem)
-	MDRV_CPU_VBLANK_INT(bladestl_interrupt,2) /* (1 IRQ + 1 NMI) */
+	MDRV_CPU_VBLANK_INT_HACK(bladestl_interrupt,2) /* (1 IRQ + 1 NMI) */
 
 	MDRV_CPU_ADD(M6809, 2000000)
 	/* audio CPU */		/* ? */

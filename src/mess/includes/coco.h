@@ -55,6 +55,8 @@ DEVICE_LOAD(coco3_rom);
 DEVICE_UNLOAD(coco_rom);
 DEVICE_UNLOAD(coco3_rom);
 
+INPUT_CHANGED(coco_keyboard_changed);
+
 SNAPSHOT_LOAD ( coco_pak );
 SNAPSHOT_LOAD ( coco3_pak );
 READ8_HANDLER ( coco3_mmu_r );

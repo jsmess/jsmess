@@ -11,6 +11,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "mc6850.h"
 
 struct acia6850
@@ -44,11 +45,11 @@ int acia6850_read (int which, int offset)
 	{
 		case ACIA_6850_CTRL:
 			if ((*(*currptr).intf).in_status_func)
-							val = (*(*currptr).intf).in_status_func(0);
+							val = (*(*currptr).intf).in_status_func(Machine, 0);
 			break;
 		case ACIA_6850_DATA:
 			if ((*(*currptr).intf).in_recv_func)
-							val = (*(*currptr).intf).in_recv_func(0);
+							val = (*(*currptr).intf).in_recv_func(Machine, 0);
 			break;
 	}
 	return (val);
@@ -62,11 +63,11 @@ void acia6850_write (int which, int offset, int data)
 	{
 		case ACIA_6850_CTRL:
 			if ((*(*currptr).intf).out_status_func)
-							(*(*currptr).intf).out_status_func(0, data);
+							(*(*currptr).intf).out_status_func(Machine, 0, data);
 			break;
 		case ACIA_6850_DATA:
 			if ((*(*currptr).intf).out_tran_func)
-							(*(*currptr).intf).out_tran_func(0, data);
+							(*(*currptr).intf).out_tran_func(Machine, 0, data);
 			break;
 	}
 }

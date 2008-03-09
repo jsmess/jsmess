@@ -6,6 +6,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "video/tms9928a.h"
 #include "video/v9938.h"
@@ -726,7 +727,7 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_CPU_ADD(Z80, 3579545)		  /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(msx_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", msx_interrupt)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( msx )
@@ -774,7 +775,7 @@ static MACHINE_DRIVER_START( msx2 )
 	MDRV_CPU_ADD(Z80, 3579545)		  /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_IO_MAP(readport2,writeport2)
-	MDRV_CPU_VBLANK_INT(msx2_interrupt,262)
+	MDRV_CPU_VBLANK_INT_HACK(msx2_interrupt, 262)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( msx2 )

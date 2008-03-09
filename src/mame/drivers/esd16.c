@@ -70,8 +70,8 @@ static WRITE16_HANDLER( esd16_sound_command_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,0,ASSERT_LINE);		// Generate an IRQ
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0,ASSERT_LINE);		// Generate an IRQ
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other CPU to reply
 	}
 }
@@ -286,8 +286,8 @@ ADDRESS_MAP_END
 static READ8_HANDLER( esd16_sound_command_r )
 {
 	/* Clear IRQ only after reading the command, or some get lost */
-	cpunum_set_input_line(Machine, 1,0,CLEAR_LINE);
-	return soundlatch_r(0);
+	cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
+	return soundlatch_r(machine,0);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_readport, ADDRESS_SPACE_IO, 8 )
@@ -528,13 +528,13 @@ static MACHINE_DRIVER_START( multchmp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(multchmp_readmem,multchmp_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ? */
 	MDRV_CPU_PROGRAM_MAP(multchmp_sound_readmem,multchmp_sound_writemem)
 	MDRV_CPU_IO_MAP(multchmp_sound_readport,multchmp_sound_writeport)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,32)	/* IRQ By Main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)	/* IRQ By Main CPU */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

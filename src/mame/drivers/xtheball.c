@@ -45,7 +45,7 @@ static MACHINE_RESET( xtheball )
  *
  *************************************/
 
-static void xtheball_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+static void xtheball_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *srcbg = &vram_bg[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -148,7 +148,7 @@ static WRITE16_HANDLER( bit_controls_w )
 			switch (offset)
 			{
 				case 7:
-					ticket_dispenser_w(0, data << 7);
+					ticket_dispenser_w(machine, 0, data << 7);
 					break;
 
 				case 8:
@@ -208,7 +208,7 @@ static WRITE16_HANDLER( bit_controls_w )
 static READ16_HANDLER( port0_r )
 {
 	int result = readinputport(0);
-	result ^= ticket_dispenser_r(0) >> 3;
+	result ^= ticket_dispenser_r(machine,0) >> 3;
 	return result;
 }
 
@@ -222,7 +222,7 @@ static READ16_HANDLER( analogx_r )
 static READ16_HANDLER( analogy_watchdog_r )
 {
 	/* doubles as a watchdog address */
-	watchdog_reset_w(0,0);
+	watchdog_reset_w(machine,0,0);
 	return (readinputportbytag("ANALOGY") << 8) | 0x00ff;
 }
 

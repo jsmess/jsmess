@@ -122,21 +122,24 @@ void crtc6845_config(int index, const mc6845_interface *intf)
 
 WRITE8_HANDLER(crtc6845_0_address_w)
 {
-	mc6845_address_w(mslegacy_mc6845, data);
+	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	mc6845_address_w(devconf, offset, data);
 }
 
 
 
 READ8_HANDLER(crtc6845_0_register_r)
 {
-	return mc6845_register_r(mslegacy_mc6845);
+	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	return mc6845_register_r(devconf, offset);
 }
 
 
 
 WRITE8_HANDLER(crtc6845_0_register_w)
 {
-	mc6845_register_w(mslegacy_mc6845, data);
+	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	mc6845_register_w(devconf, offset, data);
 }
 
 

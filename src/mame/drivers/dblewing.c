@@ -10,7 +10,6 @@ the most protected of the DE102 games?
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "decocrpt.h"
 #include "deco16ic.h"
@@ -50,7 +49,7 @@ x = xpos
 
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -63,7 +62,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		y = spriteram16[offs];
 		flash=y&0x1000;
 		xsize = y&0x0800;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		x = spriteram16[offs+2];
 		colour = (x >>9) & 0x1f;
@@ -283,7 +282,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 	if ((offset*2)==0x104) { dblwings_104_data = data; return; } // p1 inputs select screen  OK
 	if ((offset*2)==0x200) { dblwings_200_data = data; return; }
 	if ((offset*2)==0x28c) { dblwings_28c_data = data; return; }
-	if ((offset*2)==0x380) { soundlatch_w(0,data&0xff);	/*cpunum_set_input_line(Machine, 1,0,HOLD_LINE);*/ return; } // sound write
+	if ((offset*2)==0x380) { soundlatch_w(machine,0,data&0xff);	/*cpunum_set_input_line(Machine, 1,0,HOLD_LINE);*/ return; } // sound write
 	if ((offset*2)==0x38e) { dblwings_38e_data = data; return; }
 	if ((offset*2)==0x406) { dblwings_406_data = data; return; } // p2 inputs select screen  OK
 	if ((offset*2)==0x408) { dblwings_408_data = data; return; } // 3rd player 1st level?
@@ -543,7 +542,7 @@ static MACHINE_DRIVER_START( dblewing )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)	/* DE102 */
 	MDRV_CPU_PROGRAM_MAP(dblewing_map,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)

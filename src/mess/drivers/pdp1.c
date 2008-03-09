@@ -397,7 +397,7 @@ static MACHINE_DRIVER_START(pdp1)
 	MDRV_CPU_ADD(PDP1, 1000000/*the CPU core uses microsecond counts*/)
 	MDRV_CPU_CONFIG(pdp1_reset_param)
 	MDRV_CPU_PROGRAM_MAP(pdp1_map, 0)
-	MDRV_CPU_VBLANK_INT(pdp1_interrupt, 1)	/* dummy interrupt: handles input */
+	MDRV_CPU_VBLANK_INT("main", pdp1_interrupt)	/* dummy interrupt: handles input */
 
 	MDRV_MACHINE_START( pdp1 )
 	MDRV_MACHINE_RESET( pdp1 )

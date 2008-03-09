@@ -79,7 +79,7 @@ static VIDEO_START(k3)
 	k3_bg_tilemap = tilemap_create(get_k3_bg_tile_info,tilemap_scan_rows,16, 16, 32,64);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[0];
 	UINT16 *source = k3_spriteram_1;
@@ -246,7 +246,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( k3 )
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(k3_map,0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_GFXDECODE(1945kiii)
 

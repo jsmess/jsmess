@@ -51,7 +51,8 @@ static char mtx_prt_data = 0;
 
 static void mtx_tms9929a_interrupt(int data)
 {
-	z80ctc_0_trg0_w(0, data ? 0 : 1);
+	running_machine *machine = Machine;
+	z80ctc_0_trg0_w(machine, 0, data ? 0 : 1);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -217,14 +218,14 @@ static void mtx_ctc_interrupt(int state)
 
 READ8_HANDLER( mtx_ctc_r )
 {
-	return z80ctc_0_r(offset);
+	return z80ctc_0_r(machine, offset);
 }
 
 WRITE8_HANDLER( mtx_ctc_w )
 {
 //  logerror("mtx_ctc_w: %02x\n", data);
 	if (offset < 3)
-		z80ctc_0_w(offset,data);
+		z80ctc_0_w(machine, offset,data);
 }
 
 static z80ctc_interface mtx_ctc_intf =

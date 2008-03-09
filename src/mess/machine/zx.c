@@ -43,7 +43,7 @@ static OPBASE_HANDLER ( pc8300_setopbase )
 	return address;
 }
 
-static void common_init_machine(opbase_handler setopbase)
+static void common_init_machine(opbase_handler_func setopbase)
 {
 	memory_set_opbase_handler(0, setopbase);
 	zx_tape_bit = 0x80;

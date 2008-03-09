@@ -106,8 +106,8 @@ static UINT16 *pal_lookup;
 
 static int real3d_display_list = 0;
 
-static mame_bitmap *bitmap3d;
-static mame_bitmap *zbuffer;
+static bitmap_t *bitmap3d;
+static bitmap_t *zbuffer;
 static rectangle clip3d;
 static rectangle *screen_clip;
 
@@ -178,7 +178,7 @@ VIDEO_START( model3 )
 	init_matrix_stack();
 }
 
-static void draw_tile_4bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
+static void draw_tile_4bit(bitmap_t *bitmap, int tx, int ty, int tilenum)
 {
 	int x, y;
 	UINT8 *tile_base = (UINT8*)m3_char_ram;
@@ -213,7 +213,7 @@ static void draw_tile_4bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
 	}
 }
 
-static void draw_tile_8bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
+static void draw_tile_8bit(bitmap_t *bitmap, int tx, int ty, int tilenum)
 {
 	int x, y;
 	UINT8 *tile_base = (UINT8*)m3_char_ram;
@@ -244,7 +244,7 @@ static void draw_tile_8bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
 	}
 }
 #if 0
-static void draw_texture_sheet(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_texture_sheet(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x,y;
 	for(y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -262,7 +262,7 @@ static void draw_texture_sheet(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 #endif
 
-static void draw_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer, int bitdepth)
+static void draw_layer(bitmap_t *bitmap, const rectangle *cliprect, int layer, int bitdepth)
 {
 	int x, y;
 	int tile_index = 0;
@@ -337,7 +337,7 @@ static void draw_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer
 }
 
 #ifdef UNUSED_FUNCTION
-static void copy_screen(mame_bitmap *bitmap, const rectangle *cliprect)
+static void copy_screen(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x,y;
 	for(y=cliprect->min_y; y <= cliprect->max_y; y++) {
@@ -707,6 +707,7 @@ INLINE void write_texture16(int xpos, int ypos, int width, int height, int page,
 	}
 }
 
+#ifdef UNUSED_FUNCTON
 INLINE void write_texture8(int xpos, int ypos, int width, int height, int page, UINT16 *data)
 {
 	int x,y,i,j;
@@ -729,6 +730,7 @@ INLINE void write_texture8(int xpos, int ypos, int width, int height, int page, 
 		}
 	}
 }
+#endif
 
 static void real3d_upload_texture(UINT32 header, UINT32 *data)
 {
@@ -882,10 +884,12 @@ WRITE64_HANDLER( real3d_cmd_w )
 /*****************************************************************************/
 /* matrix and vector operations */
 
+#ifdef UNUSED_FUNCTON
 INLINE float dot_product(VECTOR a, VECTOR b)
 {
 	return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]) + (a[3] * b[3]);
 }
+#endif
 
 INLINE float dot_product3(VECTOR3 a, VECTOR3 b)
 {
@@ -1057,7 +1061,9 @@ static int clip_polygon(const poly_vertex *v, int num_vertices, PLANE cp, poly_v
 	return clip_verts;
 }
 
+#ifdef UNUSED_DEFINITION
 static const int num_bits[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
+#endif
 
 static MATRIX coordinate_system;
 static float viewport_focal_length = 300;
@@ -1071,7 +1077,7 @@ static PLANE clip_plane[5];
 static void render_one(TRIANGLE *tri)
 {
 	poly_extra_data *extra = poly_get_extra_data(poly);
-	poly_draw_scanline callback = NULL;
+	poly_draw_scanline_func callback = NULL;
 
 	tri->v[0].pz = 1.0f / tri->v[0].pz;
 	tri->v[1].pz = 1.0f / tri->v[1].pz;
@@ -1312,7 +1318,6 @@ static UINT32 *get_memory_pointer(UINT32 address)
 		}
 		return &culling_ram[address];
 	}
-	return NULL;
 }
 
 static void load_matrix(int matrix_num, MATRIX *out)

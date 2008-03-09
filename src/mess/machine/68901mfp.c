@@ -284,7 +284,7 @@ static TIMER_CALLBACK( mc68901_gpio_poll_tick )
 {
 	mc68901_t *chip = ptr;
 
-	UINT8 gpio = chip->intf->gpio_r(0);
+	UINT8 gpio = chip->intf->gpio_r(machine, 0);
 
 	UINT8 gpold = (chip->gpip & ~chip->ddr) ^ chip->aer;
 	UINT8 gpnew = (gpio & ~chip->ddr) ^ chip->aer;
@@ -708,7 +708,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 
 		if (chip->intf->gpio_w)
 		{
-			chip->intf->gpio_w(0, chip->gpip);
+			chip->intf->gpio_w(Machine, 0, chip->gpip);
 		}
 		break;
 

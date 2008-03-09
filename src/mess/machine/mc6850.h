@@ -26,10 +26,10 @@
 
 struct acia6850_interface
 {
-	read8_handler in_status_func;
-	read8_handler in_recv_func;
-	write8_handler out_status_func;
-	write8_handler out_tran_func;
+	read8_machine_func in_status_func;
+	read8_machine_func in_recv_func;
+	write8_machine_func out_status_func;
+	write8_machine_func out_tran_func;
 };
 
 void acia6850_unconfig(void);

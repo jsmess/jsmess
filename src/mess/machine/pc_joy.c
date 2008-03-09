@@ -51,8 +51,8 @@ WRITE8_HANDLER ( pc_JOY_w )
 
 
 
-READ16_HANDLER ( pc16le_JOY_r ) { return read16le_with_read8_handler(pc_JOY_r, offset, mem_mask); }
-WRITE16_HANDLER ( pc16le_JOY_w ) { write16le_with_write8_handler(pc_JOY_w, offset, data, mem_mask); }
+READ16_HANDLER ( pc16le_JOY_r ) { return read16le_with_read8_handler(pc_JOY_r, machine, offset, mem_mask); }
+WRITE16_HANDLER ( pc16le_JOY_w ) { write16le_with_write8_handler(pc_JOY_w, machine, offset, data, mem_mask); }
 
 
 

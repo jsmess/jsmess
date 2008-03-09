@@ -220,22 +220,22 @@ static READ8_HANDLER( butasan_pagedram_r )
 	{
 		if (offset < 0x0800)		/* BG0 RAM */
 		{
-			return butasan_bg0ram_r( offset );
+			return butasan_bg0ram_r( machine, offset );
 		}
 		else if (offset < 0x1000)	/* Back BG0 RAM */
 		{
-			return butasan_bg0backram_r( offset - 0x0800 );
+			return butasan_bg0backram_r( machine, offset - 0x0800 );
 		}
 	}
 	else
 	{
 		if (offset < 0x0800)		/* Text RAM */
 		{
-			return butasan_txram_r( offset );
+			return butasan_txram_r( machine, offset );
 		}
 		else if (offset < 0x1000)	/* Back text RAM */
 		{
-			return butasan_txbackram_r( offset - 0x0800 );
+			return butasan_txbackram_r( machine, offset - 0x0800 );
 		}
 	}
 
@@ -248,11 +248,11 @@ static WRITE8_HANDLER( butasan_pagedram_w )
 	{
 		if (offset < 0x0800)		/* BG0 RAM */
 		{
-			butasan_bg0ram_w( offset, data );
+			butasan_bg0ram_w( machine, offset, data );
 		}
 		else if (offset < 0x1000)	/* Back BG0 RAM */
 		{
-			butasan_bg0backram_w( offset - 0x0800, data );
+			butasan_bg0backram_w( machine, offset - 0x0800, data );
 		}
 	}
 
@@ -260,11 +260,11 @@ static WRITE8_HANDLER( butasan_pagedram_w )
 	{
 		if (offset < 0x0800)		/* Text RAM */
 		{
-			butasan_txram_w( offset, data );
+			butasan_txram_w( machine, offset, data );
 		}
 		else if (offset < 0x1000)	/* Back text RAM */
 		{
-			butasan_txbackram_w( offset - 0x0800, data );
+			butasan_txbackram_w( machine, offset - 0x0800, data );
 		}
 	}
 }
@@ -773,7 +773,7 @@ static MACHINE_DRIVER_START( argus )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 5000000)			/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(argus_readmem,argus_writemem)
-	MDRV_CPU_VBLANK_INT(argus_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 5000000)
 	/* audio CPU */			/* 4 MHz */
@@ -811,7 +811,7 @@ static MACHINE_DRIVER_START( valtric )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(valtric_readmem,valtric_writemem)
-	MDRV_CPU_VBLANK_INT(argus_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 5000000)
 	/* audio CPU */			/* 5 MHz */
@@ -855,7 +855,7 @@ static MACHINE_DRIVER_START( butasan )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(butasan_readmem,butasan_writemem)
-	MDRV_CPU_VBLANK_INT(argus_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 5000000)
 	/* audio CPU */			/* 5 MHz */
@@ -899,7 +899,7 @@ static MACHINE_DRIVER_START( bombsa )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(bombsa_readmem,bombsa_writemem)
-	MDRV_CPU_VBLANK_INT(argus_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 12000000 / 2)
 	/* audio CPU */						/* 6 MHz */				/* maybe CPU speeds are reversed? Probably not (ajg) */

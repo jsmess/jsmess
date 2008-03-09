@@ -137,7 +137,7 @@ static READ16_HANDLER( wbeachvl_port0_r )
 
 	bit = EEPROM_read_bit() << 7;
 
-	return (input_port_0_r(0) & 0x7f) | bit;
+	return (input_port_0_r(machine,0) & 0x7f) | bit;
 }
 
 static READ16_HANDLER( hotmind_port2_r )
@@ -146,7 +146,7 @@ static READ16_HANDLER( hotmind_port2_r )
 
 	bit = EEPROM_read_bit() << 7;
 
-	return (input_port_2_r(0) & 0x7f) | bit;
+	return (input_port_2_r(machine,0) & 0x7f) | bit;
 }
 
 static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
@@ -202,7 +202,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 //      logerror("PortB reading %02x from the 68K\n",data);
 	}
 	else if ((playmark_oki_control & 0x38) == 0x28) {
-		data = (OKIM6295_status_0_r(0) & 0x0f);
+		data = (OKIM6295_status_0_r(machine,0) & 0x0f);
 //      logerror("PortB reading %02x from the OKI status port\n",data);
 	}
 
@@ -255,13 +255,12 @@ static WRITE8_HANDLER( playmark_snd_control_w )
         1   Not used
         0   Not used
     */
-
 	playmark_oki_control = data;
 
 	if ((data & 0x38) == 0x18)
 	{
 //      logerror("Writing %02x to OKI1, PortC=%02x, Code=%02x\n",playmark_oki_command,playmark_oki_control,playmark_snd_command);
-		OKIM6295_data_0_w(0, playmark_oki_command);
+		OKIM6295_data_0_w(machine, 0, playmark_oki_command);
 	}
 }
 
@@ -970,7 +969,7 @@ static MACHINE_DRIVER_START( bigtwin )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(bigtwin_main_map, 0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
@@ -1004,7 +1003,7 @@ static MACHINE_DRIVER_START( wbeachvl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(wbeachvl_main_map, 0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 //  MDRV_CPU_ADD(PIC16C57, 12000000)   /* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
@@ -1039,7 +1038,7 @@ static MACHINE_DRIVER_START( excelsr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(excelsr_main_map, 0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
@@ -1072,7 +1071,7 @@ static MACHINE_DRIVER_START( hotmind )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(hotmind_main_map, 0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
@@ -1107,7 +1106,7 @@ static MACHINE_DRIVER_START( hrdtimes )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(hrdtimes_main_map, 0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 //  MDRV_CPU_ADD(PIC16C57, 12000000)   /* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
@@ -1130,8 +1129,8 @@ static MACHINE_DRIVER_START( hrdtimes )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_ADD(OKIM6295, XTAL_1MHz) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

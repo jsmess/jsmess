@@ -190,8 +190,8 @@ static WRITE8_HANDLER( calorie_flipscreen_w )
 
 static READ8_HANDLER( calorie_soundlatch_r )
 {
-	UINT8 latch = soundlatch_r(0);
-	soundlatch_clear_w(0,0);
+	UINT8 latch = soundlatch_r(machine,0);
+	soundlatch_clear_w(machine,0,0);
 	return latch;
 }
 
@@ -362,7 +362,7 @@ static MACHINE_DRIVER_START( calorie )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,4000000)		 /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(calorie_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,3000000)		 /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(calorie_sound_map,0)

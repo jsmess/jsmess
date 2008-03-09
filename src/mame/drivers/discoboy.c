@@ -54,7 +54,7 @@ static VIDEO_START( discoboy )
 {
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int flipscreen = 0;
 	int offs,sx,sy;
@@ -203,8 +203,8 @@ static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
 {
 //  printf("unk discoboy_port_03_w %02x\n",data);
 //  cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,HOLD_LINE);
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( discoboy_port_06_w )
@@ -477,13 +477,13 @@ static MACHINE_DRIVER_START( discoboy )
 	MDRV_CPU_ADD(Z80,12000000/2)		 /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,10000000/2)		 /* 5 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-//  MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,32)
+//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

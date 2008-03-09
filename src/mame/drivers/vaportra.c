@@ -29,8 +29,8 @@ static WRITE16_HANDLER( vaportra_sound_w )
 {
 	/* Force synchronisation between CPUs with fake timer */
 	timer_call_after_resynch(NULL, 0, NULL);
-	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(Machine, 1,0,ASSERT_LINE);
+	soundlatch_w(machine,0,data & 0xff);
+	cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
 }
 
 static READ16_HANDLER( vaportra_control_r )
@@ -93,18 +93,18 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( vaportra_soundlatch_r )
 {
-	cpunum_set_input_line(Machine, 1,0,CLEAR_LINE);
-	return soundlatch_r(offset);
+	cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
+	return soundlatch_r(machine, offset);
 }
 
 static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		YM2151_register_port_0_w(0,data);
+		YM2151_register_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2151_data_port_0_w(0,data);
+		YM2151_data_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -113,10 +113,10 @@ static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
 	case 0:
-		YM2203_control_port_0_w(0,data);
+		YM2203_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2203_write_port_0_w(0,data);
+		YM2203_write_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( vaportra )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000) /* Custom chip 59 */
 	MDRV_CPU_PROGRAM_MAP(vaportra_readmem,vaportra_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280, 32220000/4) /* Custom chip 45; Audio section crystal is 32.220 MHz */
 	/* audio CPU */

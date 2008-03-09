@@ -29,6 +29,7 @@ Notes:
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "nb1413m3.h"
 #include "sound/ay8910.h"
 #include "sound/3812intf.h"
@@ -59,20 +60,20 @@ extern WRITE8_HANDLER( nbmj8991_clut_w );
 
 static WRITE8_HANDLER( nbmj8991_soundbank_w )
 {
-	if (!(data & 0x80)) soundlatch_clear_w(0, 0);
+	if (!(data & 0x80)) soundlatch_clear_w(machine, 0, 0);
 	memory_set_bank(1, data & 0x03);
 }
 
 static WRITE8_HANDLER( nbmj8991_sound_w )
 {
-	soundlatch_w(0, data);
+	soundlatch_w(machine, 0, data);
 }
 
 static READ8_HANDLER( nbmj8991_sound_r )
 {
 	int data;
 
-	data = soundlatch_r(0);
+	data = soundlatch_r(machine,0);
 	return data;
 }
 
@@ -1759,8 +1760,8 @@ static MACHINE_DRIVER_START( nbmjdrv1 )	// galkoku
 	MDRV_CPU_ADD_TAG("main", Z80, 25000000/5)		/* 5.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_galkoku, writemem_galkoku)
 	MDRV_CPU_IO_MAP(readport_galkoku, writeport_galkoku)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)
-	MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 1)
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
+	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nbmj8991)
 
@@ -1793,13 +1794,13 @@ static MACHINE_DRIVER_START( nbmjdrv2 )	// pstadium
 	MDRV_CPU_ADD_TAG("main", Z80, 6000000/2)	/* 3.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_pstadium, writemem_pstadium)
 	MDRV_CPU_IO_MAP(readport_pstadium, writeport_pstadium)
-	MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3900000)					/* 4.00 MHz */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_nbmj8991, sound_writemem_nbmj8991)
 	MDRV_CPU_IO_MAP(sound_readport_nbmj8991, sound_writeport_nbmj8991)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 128)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 128)
 
 	MDRV_MACHINE_RESET(nbmj8991)
 

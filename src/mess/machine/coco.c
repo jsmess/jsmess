@@ -833,7 +833,7 @@ static void coco3_raise_interrupt(UINT8 mask, int state)
 
 void coco3_horizontal_sync_callback(int data)
 {
-	pia_0_ca1_w(0, data);
+	pia_0_ca1_w(Machine, 0, data);
 	coco3_raise_interrupt(COCO3_INT_HBORD, data);
 }
 
@@ -841,7 +841,7 @@ void coco3_horizontal_sync_callback(int data)
 
 void coco3_field_sync_callback(int data)
 {
-	pia_0_cb1_w(0, data);
+	pia_0_cb1_w(Machine, 0, data);
 }
 
 void coco3_gime_field_sync_callback(void)
@@ -869,7 +869,7 @@ static TIMER_CALLBACK(coco3_recalc_interrupts)
 	coco3_recalc_irq();
 }
 
-static timer_callback recalc_interrupts;
+static timer_fired_func recalc_interrupts;
 
 void coco_set_halt_line(int halt_line)
 {
@@ -1240,21 +1240,21 @@ static UINT8 coco_update_keyboard(void)
 	joystick = mux_sel2;
 
 	/* poll keyoard keys */
-	if ((input_port_0_r(0) | pia0_pb) != 0xff) porta &= ~0x01;
-	if ((input_port_1_r(0) | pia0_pb) != 0xff) porta &= ~0x02;
-	if ((input_port_2_r(0) | pia0_pb) != 0xff) porta &= ~0x04;
-	if ((input_port_3_r(0) | pia0_pb) != 0xff) porta &= ~0x08;
-	if ((input_port_4_r(0) | pia0_pb) != 0xff) porta &= ~0x10;
-	if ((input_port_5_r(0) | pia0_pb) != 0xff) porta &= ~0x20;
-	if ((input_port_6_r(0) | pia0_pb) != 0xff) porta &= ~0x40;
+	if ((readinputport(0) | pia0_pb) != 0xff) porta &= ~0x01;
+	if ((readinputport(1) | pia0_pb) != 0xff) porta &= ~0x02;
+	if ((readinputport(2) | pia0_pb) != 0xff) porta &= ~0x04;
+	if ((readinputport(3) | pia0_pb) != 0xff) porta &= ~0x08;
+	if ((readinputport(4) | pia0_pb) != 0xff) porta &= ~0x10;
+	if ((readinputport(5) | pia0_pb) != 0xff) porta &= ~0x20;
+	if ((readinputport(6) | pia0_pb) != 0xff) porta &= ~0x40;
 
-	if ((input_port_0_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x01;
-	if ((input_port_1_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x02;
-	if ((input_port_2_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x04;
-	if ((input_port_3_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x08;
-	if ((input_port_4_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x10;
-	if ((input_port_5_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x20;
-	if ((input_port_6_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x40;
+	if ((readinputport(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x01;
+	if ((readinputport(1) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x02;
+	if ((readinputport(2) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x04;
+	if ((readinputport(3) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x08;
+	if ((readinputport(4) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x10;
+	if ((readinputport(5) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x20;
+	if ((readinputport(6) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x40;
 
 	switch(get_input_device(joystick ? INPUTPORT_LEFT_JOYSTICK : INPUTPORT_RIGHT_JOYSTICK))
 	{
@@ -1343,9 +1343,9 @@ static UINT8 coco3_update_keyboard(void)
 
 
 /* three functions that update the keyboard in varying ways */
-static WRITE8_HANDLER ( d_pia0_pb_w )									{ (*update_keyboard)(); }
-static void coco_poll_keyboard(void *param, UINT32 value, UINT32 mask)	{ (*update_keyboard)(); }
-static TIMER_CALLBACK(coco_update_keyboard_timerproc)					{ (*update_keyboard)(); }
+static WRITE8_HANDLER ( d_pia0_pb_w )					{ (*update_keyboard)(); }
+INPUT_CHANGED(coco_keyboard_changed)					{ (*update_keyboard)(); }
+static TIMER_CALLBACK(coco_update_keyboard_timerproc)	{ (*update_keyboard)(); }
 
 static WRITE8_HANDLER ( d_pia0_pa_w )
 {
@@ -1494,7 +1494,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 {
 	int ddr;
 
-	d_pia1_pb_w(0, data);
+	d_pia1_pb_w(machine, 0, data);
 
 	ddr = ~pia_get_port_b_z_mask(1);
 
@@ -1541,13 +1541,13 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 		case 0x00	: 		/* Inactive, do nothing */
 			break;
 		case 0x01	: 		/* Write to selected port */
-			AY8910_write_port_0_w(0, pia_get_output_b(2));
+			AY8910_write_port_0_w(machine, 0, pia_get_output_b(2));
 			break;
 		case 0x02	: 		/* Read from selected port */
-			pia_set_input_b(2, AY8910_read_port_0_r(0));
+			pia_set_input_b(2, AY8910_read_port_0_r(machine, 0));
 			break;
 		case 0x03	:		/* Select port to write to */
-			AY8910_control_port_0_w(0, pia_get_output_b(2));
+			AY8910_control_port_0_w(machine, 0, pia_get_output_b(2));
 			break;
 	}
 }
@@ -1576,13 +1576,15 @@ static void dragon_page_rom(int	romswitch)
 
 static void	dgnalpha_fdc_callback(wd17xx_state_t event, void *param)
 {
+	running_machine *machine = Machine;
+
 	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
 	/* for pia1 cb1 */
 	switch(event)
 	{
 		case WD17XX_IRQ_CLR:
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 		case WD17XX_IRQ_SET:
 			if(dgnalpha_just_reset)
@@ -1592,14 +1594,14 @@ static void	dgnalpha_fdc_callback(wd17xx_state_t event, void *param)
 			else
 			{
 				if (pia_get_output_ca2(2))
-					cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+					cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 			}
 			break;
 		case WD17XX_DRQ_CLR:
-			pia_2_cb1_w(0,CARTLINE_CLEAR);
+			pia_2_cb1_w(machine, 0, CARTLINE_CLEAR);
 			break;
 		case WD17XX_DRQ_SET:
-			pia_2_cb1_w(0,CARTLINE_ASSERTED);
+			pia_2_cb1_w(machine, 0, CARTLINE_ASSERTED);
 			break;
 	}
 }
@@ -1612,16 +1614,16 @@ READ8_HANDLER(wd2797_r)
 	switch(offset & 0x03)
 	{
 		case 0:
-			result = wd17xx_data_r(0);
+			result = wd17xx_data_r(machine, 0);
 			break;
 		case 1:
-			result = wd17xx_sector_r(0);
+			result = wd17xx_sector_r(machine, 0);
 			break;
 		case 2:
-			result = wd17xx_track_r(0);
+			result = wd17xx_track_r(machine, 0);
 			break;
 		case 3:
-			result = wd17xx_status_r(0);
+			result = wd17xx_status_r(machine, 0);
 			break;
 		default:
 			break;
@@ -1635,16 +1637,16 @@ WRITE8_HANDLER(wd2797_w)
     switch(offset & 0x3)
 	{
 		case 0:
-			wd17xx_data_w(0, data);
+			wd17xx_data_w(machine, 0, data);
 			break;
 		case 1:
-			wd17xx_sector_w(0, data);
+			wd17xx_sector_w(machine, 0, data);
 			break;
 		case 2:
-			wd17xx_track_w(0, data);
+			wd17xx_track_w(machine, 0, data);
 			break;
 		case 3:
-			wd17xx_command_w(0, data);
+			wd17xx_command_w(machine, 0, data);
 
 			/* disk head is encoded in the command byte */
 			wd17xx_set_side((data & 0x02) ? 1 : 0);
@@ -2543,7 +2545,7 @@ WRITE8_HANDLER(coco_cartridge_w)
 READ8_HANDLER(coco3_cartridge_r)
 {
 	/* this behavior is documented in Super Extended Basic Unravelled, page 14 */
-	return ((coco3_gimereg[0] & 0x04) || (offset >= 0x10)) ? coco_cartridge_r(offset) : 0;
+	return ((coco3_gimereg[0] & 0x04) || (offset >= 0x10)) ? coco_cartridge_r(machine, offset) : 0;
 }
 
 
@@ -2557,7 +2559,7 @@ WRITE8_HANDLER(coco3_cartridge_w)
 {
 	/* this behavior is documented in Super Extended Basic Unravelled, page 14 */
 	if ((coco3_gimereg[0] & 0x04) || (offset >= 0x10))
-		coco_cartridge_w(offset, data);
+		coco_cartridge_w(machine, offset, data);
 }
 
 
@@ -2568,7 +2570,7 @@ WRITE8_HANDLER(coco3_cartridge_w)
 
 static void coco_cart_timer_w(running_machine *machine, int data)
 {
-	pia_1_cb1_w(0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	pia_1_cb1_w(machine, 0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* special code for Q state */
 	if ((data == 0x02) || (data == 0x03) || (data == 0x04))
@@ -2718,7 +2720,7 @@ static void twiddle_cart_line_if_q(void)
 
 WRITE8_HANDLER(coco_pia_1_w)
 {
-	pia_1_w(offset, data);
+	pia_1_w(machine, offset, data);
 	twiddle_cart_line_if_q();
 }
 
@@ -2732,9 +2734,9 @@ struct _machine_init_interface
 {
 	const pia6821_interface *piaintf;			/* PIA initializer */
 	int	piaintf_count;							/* PIA count */
-	timer_callback recalc_interrupts_;			/* recalculate inturrupts callback */
+	timer_fired_func recalc_interrupts_;			/* recalculate inturrupts callback */
 	void (*printer_out_)(int data);				/* printer output callback */
-	timer_callback cart_timer_proc;				/* cartridge timer proc */
+	timer_fired_func cart_timer_proc;				/* cartridge timer proc */
 	const char *fdc_cart_hardware;				/* normal cartridge hardware */
 	void (*map_memory)(coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
 };
@@ -2748,7 +2750,6 @@ struct _machine_init_interface
 /* for everything except the coco3, so it made sense not to pass it as a parameter */
 static void generic_init_machine(running_machine *machine, const machine_init_interface *init)
 {
-	int portnum;
 	coco_cartridge_config cart_config;
 	mess_image *cart_image;
 	const char *extrainfo;
@@ -2815,10 +2816,6 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	cart_config.set_line = coco_setcartline;
 	cart_config.map_memory = init->map_memory;
 	coco_cart = cococart_init(cart_hardware, &cart_config);
-
-	/* set up callbacks to be invoked on key press */
-	for (portnum = 0; portnum <= 6; portnum++)
-		input_port_set_changed_callback(portnum, ~0, coco_poll_keyboard, NULL);
 
 #ifdef MAME_DEBUG
 	cpuintrf_set_dasm_override(0, coco_dasm_override);

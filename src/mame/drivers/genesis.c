@@ -271,11 +271,11 @@ READ16_HANDLER ( genesis_68k_to_z80_r )
 		switch (offset & 3)
 		{
 		case 0:
-			if (ACCESSING_MSB)	 return YM3438_status_port_0_A_r(0) << 8;
-			else 				 return YM3438_read_port_0_r(0);
+			if (ACCESSING_MSB)	 return YM3438_status_port_0_A_r(machine, 0) << 8;
+			else 				 return YM3438_read_port_0_r(machine, 0);
 			break;
 		case 2:
-			if (ACCESSING_MSB)	return YM3438_status_port_0_B_r(0) << 8;
+			if (ACCESSING_MSB)	return YM3438_status_port_0_B_r(machine, 0) << 8;
 			else 				return 0;
 			break;
 		}
@@ -331,11 +331,11 @@ READ16_HANDLER ( megaplay_68k_to_z80_r )
 		switch (offset & 3)
 		{
 		case 0:
-			if (ACCESSING_MSB)	 return YM3438_status_port_0_A_r(0) << 8;
-			else 				 return YM3438_read_port_0_r(0);
+			if (ACCESSING_MSB)	 return YM3438_status_port_0_A_r(machine, 0) << 8;
+			else 				 return YM3438_read_port_0_r(machine, 0);
 			break;
 		case 2:
-			if (ACCESSING_MSB)	return YM3438_status_port_0_B_r(0) << 8;
+			if (ACCESSING_MSB)	return YM3438_status_port_0_B_r(machine, 0) << 8;
 			else 				return 0;
 			break;
 		}
@@ -383,12 +383,12 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 		switch (offset & 3)
 		{
 		case 0:
-			if (ACCESSING_MSB)	YM3438_control_port_0_A_w	(0,	(data >> 8) & 0xff);
-			else 				YM3438_data_port_0_A_w		(0,	(data >> 0) & 0xff);
+			if (ACCESSING_MSB)	YM3438_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
+			else 				YM3438_data_port_0_A_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 		case 2:
-			if (ACCESSING_MSB)	YM3438_control_port_0_B_w	(0,	(data >> 8) & 0xff);
-			else 				YM3438_data_port_0_B_w		(0,	(data >> 0) & 0xff);
+			if (ACCESSING_MSB)	YM3438_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
+			else 				YM3438_data_port_0_B_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 		}
 	}
@@ -412,8 +412,8 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 
 		if ( (offset >= 0x10) && (offset <=0x17) )
 		{
-			if (ACCESSING_LSB) SN76496_0_w(0, data & 0xff);
-			if (ACCESSING_MSB) SN76496_0_w(0, (data >>8) & 0xff);
+			if (ACCESSING_LSB) SN76496_0_w(machine, 0, data & 0xff);
+			if (ACCESSING_MSB) SN76496_0_w(machine, 0, (data >>8) & 0xff);
 		}
 
 	}
@@ -677,9 +677,9 @@ READ8_HANDLER ( genesis_z80_r )
 	{
 		switch (offset & 3)
 		{
-		case 0: return YM3438_status_port_0_A_r(0);
-		case 1: return YM3438_read_port_0_r(0);
-		case 2: return YM3438_status_port_0_B_r(0);
+		case 0: return YM3438_status_port_0_A_r(machine, 0);
+		case 1: return YM3438_read_port_0_r(machine, 0);
+		case 2: return YM3438_status_port_0_B_r(machine, 0);
 		case 3: return 0;
 		}
 	}
@@ -714,13 +714,13 @@ WRITE8_HANDLER ( genesis_z80_w )
 	{
 		switch (offset & 3)
 		{
-		case 0: YM3438_control_port_0_A_w	(0,	data);
+		case 0: YM3438_control_port_0_A_w	(machine, 0,	data);
 			break;
-		case 1: YM3438_data_port_0_A_w		(0, data);
+		case 1: YM3438_data_port_0_A_w		(machine, 0, data);
 			break;
-		case 2: YM3438_control_port_0_B_w	(0,	data);
+		case 2: YM3438_control_port_0_B_w	(machine, 0,	data);
 			break;
-		case 3: YM3438_data_port_0_B_w		(0,	data);
+		case 3: YM3438_data_port_0_B_w		(machine, 0,	data);
 			break;
 		}
 	}
@@ -728,7 +728,7 @@ WRITE8_HANDLER ( genesis_z80_w )
 	/* Bank Register */
 	if ((offset >= 0x6000) && (offset <= 0x60ff))
 	{
-		genesis_bank_select_w(offset & 0xff, data);
+		genesis_bank_select_w(machine, offset & 0xff, data);
 	}
 
 	/* Unused / Illegal */
@@ -782,11 +782,11 @@ static MACHINE_DRIVER_START( genesis_base )
 	/*basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK / 7)
 	MDRV_CPU_PROGRAM_MAP(genesis_readmem, genesis_writemem)
-	MDRV_CPU_VBLANK_INT(genesis_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK / 15)
 	MDRV_CPU_PROGRAM_MAP(genesis_z80_readmem, genesis_z80_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1) /* from vdp at scanline 0xe0 */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
 	MDRV_INTERLEAVE(100)
 

@@ -105,16 +105,16 @@ static WRITE8_HANDLER( aim65_pia_b_w )
 
 static const pia6821_interface pia =
 {
-	NULL, // read8_handler in_a_func,
-	NULL, // read8_handler in_b_func,
-	NULL, // read8_handler in_ca1_func,
-	NULL, // read8_handler in_cb1_func,
-	NULL, // read8_handler in_ca2_func,
-	NULL, // read8_handler in_cb2_func,
+	NULL, // read8_machine_func in_a_func,
+	NULL, // read8_machine_func in_b_func,
+	NULL, // read8_machine_func in_ca1_func,
+	NULL, // read8_machine_func in_cb1_func,
+	NULL, // read8_machine_func in_ca2_func,
+	NULL, // read8_machine_func in_cb2_func,
 	aim65_pia_a_w,
 	aim65_pia_b_w,
-	NULL, // write8_handler out_ca2_func,
-	NULL, // write8_handler out_cb2_func,
+	NULL, // write8_machine_func out_ca2_func,
+	NULL, // write8_machine_func out_cb2_func,
 	NULL, // void (*irq_a_func)(int state),
 	NULL, // void (*irq_b_func)(int state),
 };
@@ -197,18 +197,18 @@ static READ8_HANDLER( aim65_via0_b_r )
 
 static const struct via6522_interface via0 =
 {
-	0, // read8_handler in_a_func;
-	aim65_via0_b_r, // read8_handler in_b_func;
-	0, // read8_handler in_ca1_func;
-	0, // read8_handler in_cb1_func;
-	0, // read8_handler in_ca2_func;
-	0, // read8_handler in_cb2_func;
-	aim65_via0_a_w,	// write8_handler out_a_func;
-	aim65_via0_b_w, // write8_handler out_b_func;
-	0, // write8_handler out_ca1_func;
-	0, // write8_handler out_cb1_func;
-	0, // write8_handler out_ca2_func;
-	aim65_printer_on, // write8_handler out_cb2_func;
+	0, // read8_machine_func in_a_func;
+	aim65_via0_b_r, // read8_machine_func in_b_func;
+	0, // read8_machine_func in_ca1_func;
+	0, // read8_machine_func in_cb1_func;
+	0, // read8_machine_func in_ca2_func;
+	0, // read8_machine_func in_cb2_func;
+	aim65_via0_a_w,	// write8_machine_func out_a_func;
+	aim65_via0_b_w, // write8_machine_func out_b_func;
+	0, // write8_machine_func out_ca1_func;
+	0, // write8_machine_func out_cb1_func;
+	0, // write8_machine_func out_ca2_func;
+	aim65_printer_on, // write8_machine_func out_cb2_func;
 	aim65_via_irq_func // void (*irq_func)(int state);
 };
 
@@ -242,8 +242,8 @@ DRIVER_INIT( aim65 )
 	r6532_reset(0);
 
 	via_config(0, &via0);
-	via_0_cb1_w(1, 1);
-	via_0_ca1_w(1, 0);
+	via_0_cb1_w(machine, 1, 1);
+	via_0_ca1_w(machine, 1, 0);
 
 	via_config(1, &user_via);
 	via_reset();

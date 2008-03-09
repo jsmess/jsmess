@@ -420,8 +420,8 @@ void ti99_floppy_controllers_init_all(void)
 /* prototypes */
 static void fdc_callback(wd17xx_state_t event, void *param);
 static TIMER_CALLBACK(motor_on_timer_callback);
-static int fdc_cru_r(int offset);
-static void fdc_cru_w(int offset, int data);
+static int fdc_cru_r(running_machine *machine, int offset);
+static void fdc_cru_w(running_machine *machine, int offset, int data);
 static READ8_HANDLER(fdc_mem_r);
 static WRITE8_HANDLER(fdc_mem_w);
 
@@ -466,7 +466,7 @@ void ti99_fdc_reset(void)
 	bit 6: always 1
 	bit 7: selected side
 */
-static int fdc_cru_r(int offset)
+static int fdc_cru_r(running_machine *machine, int offset)
 {
 	int reply;
 
@@ -493,7 +493,7 @@ static int fdc_cru_r(int offset)
 /*
 	Write disk CRU interface
 */
-static void fdc_cru_w(int offset, int data)
+static void fdc_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
 	{
@@ -576,16 +576,16 @@ static  READ8_HANDLER(fdc_mem_r)
 	switch (offset)
 	{
 	case 0x1FF0:					/* Status register */
-		return (wd17xx_status_r(offset) ^ 0xFF);
+		return (wd17xx_status_r(machine, offset) ^ 0xFF);
 		break;
 	case 0x1FF2:					/* Track register */
-		return wd17xx_track_r(offset) ^ 0xFF;
+		return wd17xx_track_r(machine, offset) ^ 0xFF;
 		break;
 	case 0x1FF4:					/* Sector register */
-		return wd17xx_sector_r(offset) ^ 0xFF;
+		return wd17xx_sector_r(machine, offset) ^ 0xFF;
 		break;
 	case 0x1FF6:					/* Data register */
-		return wd17xx_data_r(offset) ^ 0xFF;
+		return wd17xx_data_r(machine, offset) ^ 0xFF;
 		break;
 	default:						/* DSR ROM */
 		return ti99_disk_DSR[offset];
@@ -603,16 +603,16 @@ static WRITE8_HANDLER(fdc_mem_w)
 	switch (offset)
 	{
 	case 0x1FF8:					/* Command register */
-		wd17xx_command_w(offset, data);
+		wd17xx_command_w(machine, offset, data);
 		break;
 	case 0x1FFA:					/* Track register */
-		wd17xx_track_w(offset, data);
+		wd17xx_track_w(machine, offset, data);
 		break;
 	case 0x1FFC:					/* Sector register */
-		wd17xx_sector_w(offset, data);
+		wd17xx_sector_w(machine, offset, data);
 		break;
 	case 0x1FFE:					/* Data register */
-		wd17xx_data_w(offset, data);
+		wd17xx_data_w(machine, offset, data);
 		break;
 	}
 }
@@ -632,8 +632,8 @@ static WRITE8_HANDLER(fdc_mem_w)
 */
 
 /* prototypes */
-static int ccfdc_cru_r(int offset);
-static void ccfdc_cru_w(int offset, int data);
+static int ccfdc_cru_r(running_machine *machine, int offset);
+static void ccfdc_cru_w(running_machine *machine, int offset, int data);
 static READ8_HANDLER(ccfdc_mem_r);
 static WRITE8_HANDLER(ccfdc_mem_w);
 
@@ -834,9 +834,9 @@ static WRITE8_HANDLER(ccfdc_mem_w)
 */
 
 /* prototypes */
-static int bwg_cru_r(int offset);
-static void bwg_cru_w(int offset, int data);
-static  READ8_HANDLER(bwg_mem_r);
+static int bwg_cru_r(running_machine *machine, int offset);
+static void bwg_cru_w(running_machine *machine, int offset, int data);
+static READ8_HANDLER(bwg_mem_r);
 static WRITE8_HANDLER(bwg_mem_w);
 
 static const ti99_peb_card_handlers_t bwg_handlers =
@@ -886,7 +886,7 @@ void ti99_bwg_reset(void)
 	bit 1-3: drive n active
 	bit 4-7: dip switches 1-4
 */
-static int bwg_cru_r(int offset)
+static int bwg_cru_r(running_machine *machine, int offset)
 {
 	int reply;
 
@@ -911,7 +911,7 @@ static int bwg_cru_r(int offset)
 /*
 	Write disk CRU interface
 */
-static void bwg_cru_w(int offset, int data)
+static void bwg_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
 	{
@@ -1047,16 +1047,16 @@ static  READ8_HANDLER(bwg_mem_r)
 			switch (offset)
 			{
 			case 0x1FF0:					/* Status register */
-				reply = wd17xx_status_r(offset);
+				reply = wd17xx_status_r(machine, offset);
 				break;
 			case 0x1FF2:					/* Track register */
-				reply = wd17xx_track_r(offset);
+				reply = wd17xx_track_r(machine, offset);
 				break;
 			case 0x1FF4:					/* Sector register */
-				reply = wd17xx_sector_r(offset);
+				reply = wd17xx_sector_r(machine, offset);
 				break;
 			case 0x1FF6:					/* Data register */
-				reply = wd17xx_data_r(offset);
+				reply = wd17xx_data_r(machine, offset);
 				break;
 			default:
 				reply = 0;
@@ -1091,16 +1091,16 @@ static WRITE8_HANDLER(bwg_mem_w)
 			switch (offset)
 			{
 			case 0x1FF8:					/* Command register */
-				wd17xx_command_w(offset, data);
+				wd17xx_command_w(machine, offset, data);
 				break;
 			case 0x1FFA:					/* Track register */
-				wd17xx_track_w(offset, data);
+				wd17xx_track_w(machine, offset, data);
 				break;
 			case 0x1FFC:					/* Sector register */
-				wd17xx_sector_w(offset, data);
+				wd17xx_sector_w(machine, offset, data);
 				break;
 			case 0x1FFE:					/* Data register */
-				wd17xx_data_w(offset, data);
+				wd17xx_data_w(machine, offset, data);
 				break;
 			}
 		}
@@ -1126,8 +1126,8 @@ static WRITE8_HANDLER(bwg_mem_w)
 */
 
 /* prototypes */
-static int hfdc_cru_r(int offset);
-static void hfdc_cru_w(int offset, int data);
+static int hfdc_cru_r(running_machine *machine, int offset);
+static void hfdc_cru_w(running_machine *machine, int offset, int data);
 static  READ8_HANDLER(hfdc_mem_r);
 static WRITE8_HANDLER(hfdc_mem_w);
 
@@ -1254,7 +1254,7 @@ void ti99_hfdc_reset(void)
 /*
 	Read disk CRU interface
 */
-static int hfdc_cru_r(int offset)
+static int hfdc_cru_r(running_machine *machine, int offset)
 {
 	int reply;
 	switch (offset)
@@ -1294,7 +1294,7 @@ static int hfdc_cru_r(int offset)
 /*
 	Write disk CRU interface
 */
-static void hfdc_cru_w(int offset, int data)
+static void hfdc_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
 	{

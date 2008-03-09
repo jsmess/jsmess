@@ -198,6 +198,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/v9938.h"
 #include "includes/geneve.h"
 #include "machine/ti99_4x.h"
@@ -450,7 +451,7 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	MDRV_CPU_ADD(TMS9995, 12000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
-	MDRV_CPU_VBLANK_INT(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
+	MDRV_CPU_VBLANK_INT_HACK(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	MDRV_MACHINE_START( geneve )
 	MDRV_MACHINE_RESET( geneve )

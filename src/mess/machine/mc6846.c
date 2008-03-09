@@ -19,6 +19,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "mc6846.h"
 
 #define VERBOSE 0
@@ -69,7 +70,7 @@ static struct
 
 #define PORT								\
 	((mc6846.pdr & mc6846.ddr) |					\
-	 ((mc6846.iface->in_port_func ? mc6846.iface->in_port_func(0) : 0) & \
+	 ((mc6846.iface->in_port_func ? mc6846.iface->in_port_func(machine, 0) : 0) & \
 	  ~mc6846.ddr))
 
 #define CTO								\
@@ -126,7 +127,7 @@ INLINE void mc6846_update_irq( void )
 
 
 
-INLINE void mc6846_update_cto ( void )
+INLINE void mc6846_update_cto ( running_machine *machine )
 {
 	int cto = CTO;
 	static int old_cto;
@@ -136,12 +137,12 @@ INLINE void mc6846_update_cto ( void )
 		old_cto = cto;
 	}
 	if ( mc6846.iface->out_cto_func )
-		mc6846.iface->out_cto_func( 0, cto );
+		mc6846.iface->out_cto_func( machine, 0, cto );
 }
 
 
 
-INLINE void mc6846_timer_launch ( void )
+INLINE void mc6846_timer_launch ( running_machine *machine )
 {
 	int delay = FACTOR * (mc6846.preset+1);
 	LOG (( "%f: mc6846 timer launch called, mode=%i, preset=%i (x%i)\n", attotime_to_double(timer_get_time()), MODE, mc6846.preset, FACTOR ));
@@ -178,7 +179,7 @@ INLINE void mc6846_timer_launch ( void )
 	mc6846.timer_started = 1;
 
 	mc6846.csr &= ~1;
-	mc6846_update_cto();
+	mc6846_update_cto(machine);
 	mc6846_update_irq();
 }
 
@@ -223,7 +224,7 @@ static TIMER_CALLBACK(mc6846_timer_expire)
 	timer_reset( mc6846.interval, ATTOTIME_IN_CYCLES( delay, mc6846.iface->cpunum ) );
 
 	mc6846.csr |= 1;
-	mc6846_update_cto();
+	mc6846_update_cto(machine);
 	mc6846_update_irq();
 }
 
@@ -235,7 +236,7 @@ static TIMER_CALLBACK(mc6846_timer_one_shot)
 
 	/* 1 micro second after one-shot launch, we put cto to high */
 	mc6846.cto = 1;
-	mc6846_update_cto();
+	mc6846_update_cto(machine);
 }
 
 
@@ -355,7 +356,7 @@ WRITE8_HANDLER ( mc6846_w )
 		{
 			mc6846.cp2_cpu = (data >> 3) & 1;
 			if ( mc6846.iface->out_cp2_func )
-				mc6846.iface->out_cp2_func( 0, mc6846.cp2_cpu );
+				mc6846.iface->out_cp2_func( machine, 0, mc6846.cp2_cpu );
 		}
 		else
 			logerror( "$%04x mc6846 acknowledge not implemented\n", activecpu_get_previouspc() );
@@ -368,7 +369,7 @@ WRITE8_HANDLER ( mc6846_w )
 		{
 			mc6846.ddr = data;
 			if ( mc6846.iface->out_port_func )
-				mc6846.iface->out_port_func( 0, mc6846.pdr & mc6846.ddr );
+				mc6846.iface->out_port_func( machine, 0, mc6846.pdr & mc6846.ddr );
 		}
 		break;
 
@@ -378,7 +379,7 @@ WRITE8_HANDLER ( mc6846_w )
 		{
 			mc6846.pdr = data;
 			if ( mc6846.iface->out_port_func )
-				mc6846.iface->out_port_func( 0, mc6846.pdr & mc6846.ddr );
+				mc6846.iface->out_port_func( machine, 0, mc6846.pdr & mc6846.ddr );
 			if ( mc6846.csr1_to_be_cleared && (mc6846.csr & 2) )
 			{
 				mc6846.csr &= ~2;
@@ -416,7 +417,7 @@ WRITE8_HANDLER ( mc6846_w )
 			mc6846.csr &= ~1;
 			if ( MODE != 0x30 )
 				mc6846.cto = 0;
-			mc6846_update_cto();
+			mc6846_update_cto(machine);
 			timer_reset( mc6846.interval, attotime_never );
 			timer_reset( mc6846.one_shot, attotime_never );
 			mc6846.timer_started = 0;
@@ -425,7 +426,7 @@ WRITE8_HANDLER ( mc6846_w )
 		{
 			/* timer launch */
 			if ( ! mc6846.timer_started )
-				mc6846_timer_launch();
+				mc6846_timer_launch(machine);
 		}
 		mc6846_update_irq();
 	}
@@ -445,10 +446,10 @@ WRITE8_HANDLER ( mc6846_w )
 			mc6846.csr &= ~1;
 			mc6846_update_irq();
 			mc6846.cto = 0;
-			mc6846_update_cto();
+			mc6846_update_cto(machine);
 			/* launch only if started */
 			if (!(mc6846.tcr & 1))
-				mc6846_timer_launch();
+				mc6846_timer_launch(machine);
 		}
 		break;
 
@@ -502,6 +503,7 @@ void mc6846_set_input_cp2 ( int data )
 
 UINT8 mc6846_get_output_port ( void )
 {
+	running_machine *machine = Machine;
 	return PORT;
 }
 

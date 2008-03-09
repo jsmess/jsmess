@@ -59,15 +59,15 @@ static MACHINE_RESET( galivan )
 
 static WRITE8_HANDLER( galivan_sound_command_w )
 {
-	soundlatch_w(offset,(data << 1) | 1);
+	soundlatch_w(machine,offset,(data << 1) | 1);
 }
 
 static READ8_HANDLER( galivan_sound_command_r )
 {
 	int data;
 
-	data = soundlatch_r(offset);
-	soundlatch_clear_w(0,0);
+	data = soundlatch_r(machine,offset);
+	soundlatch_clear_w(machine,0,0);
 	return data;
 }
 
@@ -83,16 +83,16 @@ static WRITE8_HANDLER( ninjemak_videoreg_w )
 	switch (offset)
 	{
 		case	0x0b:
-			ninjemak_scrolly_w(0, data);
+			ninjemak_scrolly_w(machine, 0, data);
 			break;
 		case	0x0c:
-			ninjemak_scrolly_w(1, data);
+			ninjemak_scrolly_w(machine, 1, data);
 			break;
 		case	0x0d:
-			ninjemak_scrollx_w(0, data);
+			ninjemak_scrollx_w(machine, 0, data);
 			break;
 		case	0x0e:
-			ninjemak_scrollx_w(1, data);
+			ninjemak_scrollx_w(machine, 1, data);
 			break;
 		default:
 			break;
@@ -560,7 +560,7 @@ static MACHINE_DRIVER_START( galivan )
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */		/* 4 MHz? */
@@ -604,7 +604,7 @@ static MACHINE_DRIVER_START( ninjemak )
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,ninjemak_writemem)
 	MDRV_CPU_IO_MAP(ninjemak_readport,ninjemak_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */		/* 4 MHz? */

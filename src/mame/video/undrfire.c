@@ -80,7 +80,7 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -349,7 +349,7 @@ VIDEO_UPDATE( undrfire )
 	/* See if we should draw artificial gun targets */
 	/* (not yet implemented...) */
 
-	if (input_port_7_word_r(0,0) & 0x1)	/* Fake DSW */
+	if (input_port_7_word_r(machine,0,0) & 0x1)	/* Fake DSW */
 	{
 		popmessage("Gunsights on");
 	}

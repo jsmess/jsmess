@@ -90,7 +90,7 @@ static int phillips_code = 0;
 
 static render_texture *video_texture;
 static render_texture *overlay_texture;
-static mame_bitmap *last_video_bitmap;
+static bitmap_t *last_video_bitmap;
 
 static emu_timer *irq_timer;
 
@@ -112,7 +112,7 @@ static VIDEO_UPDATE( cliff )
 
 	if (discinfo != NULL)
 	{
-		mame_bitmap *vidbitmap;
+		bitmap_t *vidbitmap;
 		rectangle fixedvis = *TMS9928A_get_visarea();
 		fixedvis.max_x++;
 		fixedvis.max_y++;
@@ -205,8 +205,8 @@ static WRITE8_HANDLER( cliff_sound_overlay_w )
 	render_container_set_palette_alpha(render_container_get_screen(0), 1, overlay ? 0x00 : 0xff );
 
 	/* audio */
-	discrete_sound_w(CLIFF_ENABLE_SND_1, sound&1);
-	discrete_sound_w(CLIFF_ENABLE_SND_2, (sound>>1)&1);
+	discrete_sound_w(machine, CLIFF_ENABLE_SND_1, sound&1);
+	discrete_sound_w(machine, CLIFF_ENABLE_SND_2, (sound>>1)&1);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -738,7 +738,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 	MDRV_CPU_ADD(Z80, 4000000)       /* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
-	MDRV_CPU_VBLANK_INT(cliff_vsync,1)
+	MDRV_CPU_VBLANK_INT("main", cliff_vsync)
 
 	MDRV_MACHINE_START(cliffhgr)
 	MDRV_MACHINE_RESET(cliffhgr)

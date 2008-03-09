@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "deco16ic.h"
 
 static UINT16 * rohga_spriteram;
@@ -70,7 +69,7 @@ VIDEO_START( nitrobal )
 
 /******************************************************************************/
 
-static void rohga_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int is_schmeisr)
+static void rohga_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int is_schmeisr)
 {
 	int offs;
 
@@ -92,7 +91,7 @@ static void rohga_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 
 		y = spriteptr[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		// Sprite colour is different between Rohga (6bpp) and Schmeisr (4bpp plus wire mods on pcb)
 		if (is_schmeisr)
@@ -147,7 +146,7 @@ static void rohga_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 	}
 }
 
-static void wizdfire_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 *spriteptr, int mode, int bank)
+static void wizdfire_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *spriteptr, int mode, int bank)
 {
 	int offs;
 
@@ -191,7 +190,7 @@ static void wizdfire_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 		y = spriteptr[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 		colour = (x >> 9) &0x1f;
 
 		if (bank==4 && colour&0x10) {
@@ -244,7 +243,7 @@ static void wizdfire_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void nitrobal_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
+static void nitrobal_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
 {
 	int offs,end,inc;
 
@@ -298,7 +297,7 @@ Sprites 2:
 		w = (spriteptr[offs+2]&0x0f00)>> 8;
 
 		sy = spriteptr[offs];
-		if ((sy&0x2000) && (cpu_getcurrentframe() & 1)) {
+		if ((sy&0x2000) && (video_screen_get_frame_number(0) & 1)) {
 			offs+=inc;
 			continue;
 		}
@@ -436,7 +435,7 @@ sprite 2:
 
 /******************************************************************************/
 
-static void update_rohga(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int is_schmeisr)
+static void update_rohga(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int is_schmeisr)
 {
 	/* Update playfields */
 	flip_screen_set( deco16_pf12_control[0]&0x80 );

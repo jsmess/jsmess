@@ -1022,7 +1022,7 @@ READ16_HANDLER ( ti99_cart_r )
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
-		return ti99_hsgpl_rom6_r(offset, mem_mask);
+		return ti99_hsgpl_rom6_r(machine, offset, mem_mask);
 
 	if (cartridge_mbx && (offset >= 0x0600) && (offset <= 0x07fe))
 		return (cartridge_pages[0])[offset];
@@ -1036,7 +1036,7 @@ WRITE16_HANDLER ( ti99_cart_w )
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
-		ti99_hsgpl_rom6_w(offset, data, mem_mask);
+		ti99_hsgpl_rom6_w(machine, offset, data, mem_mask);
 	else if (cartridge_minimemory && offset >= 0x800)
 		/* handle minimem RAM */
 		COMBINE_DATA(current_page_ptr+offset);
@@ -1066,7 +1066,7 @@ READ16_HANDLER ( ti99_4p_cart_r )
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
-		return ti99_hsgpl_rom6_r(offset, mem_mask);
+		return ti99_hsgpl_rom6_r(machine, offset, mem_mask);
 
 	return 0;
 }
@@ -1083,7 +1083,7 @@ WRITE16_HANDLER ( ti99_4p_cart_w )
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
-		ti99_hsgpl_rom6_w(offset, data, mem_mask);
+		ti99_hsgpl_rom6_w(machine, offset, data, mem_mask);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -1123,7 +1123,7 @@ WRITE16_HANDLER ( ti99_wsnd_w )
 {
 	activecpu_adjust_icount(-4);
 
-	SN76496_0_w(offset, (data >> 8) & 0xff);
+	SN76496_0_w(machine, offset, (data >> 8) & 0xff);
 }
 
 /*
@@ -1135,11 +1135,11 @@ READ16_HANDLER ( ti99_rvdp_r )
 
 	if (offset & 1)
 	{	/* read VDP status */
-		return ((int) TMS9928A_register_r(0)) << 8;
+		return ((int) TMS9928A_register_r(machine, 0)) << 8;
 	}
 	else
 	{	/* read VDP RAM */
-		return ((int) TMS9928A_vram_r(0)) << 8;
+		return ((int) TMS9928A_vram_r(machine, 0)) << 8;
 	}
 }
 
@@ -1152,11 +1152,11 @@ WRITE16_HANDLER ( ti99_wvdp_w )
 
 	if (offset & 1)
 	{	/* write VDP address */
-		TMS9928A_register_w(0, (data >> 8) & 0xff);
+		TMS9928A_register_w(machine, 0, (data >> 8) & 0xff);
 	}
 	else
 	{	/* write VDP data */
-		TMS9928A_vram_w(0, (data >> 8) & 0xff);
+		TMS9928A_vram_w(machine, 0, (data >> 8) & 0xff);
 	}
 }
 
@@ -1169,11 +1169,11 @@ READ16_HANDLER ( ti99_rv38_r )
 
 	if (offset & 1)
 	{	/* read VDP status */
-		return ((int) v9938_status_r(0)) << 8;
+		return ((int) v9938_status_r(machine, 0)) << 8;
 	}
 	else
 	{	/* read VDP RAM */
-		return ((int) v9938_vram_r(0)) << 8;
+		return ((int) v9938_vram_r(machine, 0)) << 8;
 	}
 }
 
@@ -1188,19 +1188,19 @@ WRITE16_HANDLER ( ti99_wv38_w )
 	{
 	case 0:
 		/* write VDP data */
-		v9938_vram_w(0, (data >> 8) & 0xff);
+		v9938_vram_w(machine, 0, (data >> 8) & 0xff);
 		break;
 	case 1:
 		/* write VDP address */
-		v9938_command_w(0, (data >> 8) & 0xff);
+		v9938_command_w(machine, 0, (data >> 8) & 0xff);
 		break;
 	case 2:
 		/* write VDP palette */
-		v9938_palette_w(0, (data >> 8) & 0xff);
+		v9938_palette_w(machine, 0, (data >> 8) & 0xff);
 		break;
 	case 3:
 		/* write VDP register */
-		v9938_register_w(0, (data >> 8) & 0xff);
+		v9938_register_w(machine, 0, (data >> 8) & 0xff);
 		break;
 	}
 }
@@ -1212,7 +1212,7 @@ static READ16_HANDLER ( ti99_rspeech_r )
 {
 	activecpu_adjust_icount(-(18+3));		/* this is just a minimum, it can be more */
 
-	return ((int) tms5220_status_r(offset)) << 8;
+	return ((int) tms5220_status_r(machine, offset)) << 8;
 }
 
 #if 0
@@ -1255,7 +1255,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	}
 #endif
 
-	tms5220_data_w(offset, (data >> 8) & 0xff);
+	tms5220_data_w(machine, offset, (data >> 8) & 0xff);
 }
 
 /*
@@ -1297,7 +1297,7 @@ READ16_HANDLER ( ti99_rgpl_r )
 
 	if (hsgpl_crdena)
 		/* hsgpl buffers are stronger than console GROM buffers */
-		reply = ti99_hsgpl_gpl_r(offset, mem_mask);
+		reply = ti99_hsgpl_gpl_r(machine, offset, mem_mask);
 
 	return reply;
 }
@@ -1345,7 +1345,7 @@ WRITE16_HANDLER ( ti99_wgpl_w )
 	}
 
 	if (hsgpl_crdena)
-		ti99_hsgpl_gpl_w(offset, data, mem_mask);
+		ti99_hsgpl_gpl_w(machine, offset, data, mem_mask);
 }
 
 /*
@@ -1355,7 +1355,7 @@ READ16_HANDLER ( ti99_4p_rgpl_r )
 {
 	activecpu_adjust_icount(-4);		/* HSGPL is located on 8-bit bus? */
 
-	return /*hsgpl_crdena ?*/ ti99_hsgpl_gpl_r(offset, mem_mask) /*: 0*/;
+	return /*hsgpl_crdena ?*/ ti99_hsgpl_gpl_r(machine, offset, mem_mask) /*: 0*/;
 }
 
 /*
@@ -1366,7 +1366,7 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 	activecpu_adjust_icount(-4);		/* HSGPL is located on 8-bit bus? */
 
 	/*if (hsgpl_crdena)*/
-		ti99_hsgpl_gpl_w(offset, data, mem_mask);
+		ti99_hsgpl_gpl_w(machine, offset, data, mem_mask);
 }
 
 
@@ -1416,10 +1416,10 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 					{
 						if (offset & 2)
 							/* read VDP status */
-							reply = TMS9928A_register_r(0);
+							reply = TMS9928A_register_r(machine, 0);
 						else
 							/* read VDP RAM */
-							reply = TMS9928A_vram_r(0);
+							reply = TMS9928A_vram_r(machine, 0);
 					}
 				}
 				else
@@ -1435,14 +1435,14 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 				if (! (offset & 1))
 				{
 					activecpu_adjust_icount(-16*4);		/* this is just a minimum, it can be more */
-					reply = tms5220_status_r(0);
+					reply = tms5220_status_r(machine, 0);
 				}
 				break;
 
 			case 6:
 				/* GPL read */
 				if (! (offset & 1))
-					reply = ti99_rgpl_r(offset >> 1, 0) >> 8;
+					reply = ti99_rgpl_r(machine, offset >> 1, 0) >> 8;
 				break;
 
 			default:
@@ -1487,7 +1487,7 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 
 		case 2:
 			/* DSR space */
-			reply = ti99_8_peb_r(offset & 0x1fff);
+			reply = ti99_8_peb_r(machine, offset & 0x1fff);
 			break;
 
 		case 3:
@@ -1546,7 +1546,7 @@ WRITE8_HANDLER ( ti99_8_w )
 			case 1:
 				/* sound write + RAM */
 				if (offset < 0x8410)
-					SN76496_0_w(offset, data);
+					SN76496_0_w(machine, offset, data);
 				else
 					sRAM_ptr_8[offset & 0x1fff] = data;
 				break;
@@ -1587,10 +1587,10 @@ WRITE8_HANDLER ( ti99_8_w )
 				{
 					if (offset & 2)
 						/* read VDP status */
-						TMS9928A_register_w(0, data);
+						TMS9928A_register_w(machine, 0, data);
 					else
 						/* read VDP RAM */
-						TMS9928A_vram_w(0, data);
+						TMS9928A_vram_w(machine, 0, data);
 				}
 				break;
 
@@ -1617,14 +1617,14 @@ WRITE8_HANDLER ( ti99_8_w )
 						timer_set(attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 					}
 
-					tms5220_data_w(offset, data);
+					tms5220_data_w(machine, offset, data);
 				}
 				break;
 
 			case 7:
 				/* GPL write */
 				if (! (offset & 1))
-					ti99_wgpl_w(offset >> 1, data << 8, 0);
+					ti99_wgpl_w(machine, offset >> 1, data << 8, 0);
 				break;
 
 			default:
@@ -1664,7 +1664,7 @@ WRITE8_HANDLER ( ti99_8_w )
 
 		case 2:
 			/* DSR space */
-			ti99_8_peb_w(offset & 0x1fff, data);
+			ti99_8_peb_w(machine, offset & 0x1fff, data);
 			break;
 
 		case 3:
@@ -2467,7 +2467,7 @@ static void ti99_CS_output(int offset, int data)
 */
 
 /* prototypes */
-static void ti99_8_internal_dsr_cru_w(int offset, int data);
+static void ti99_8_internal_dsr_cru_w(running_machine *machine, int offset, int data);
 static  READ8_HANDLER(ti99_8_internal_dsr_r);
 
 
@@ -2494,7 +2494,7 @@ static void ti99_8_internal_dsr_reset(void)
 /* write CRU bit:
 	bit0: enable/disable internal DSR ROM,
 	bit1: hard reset */
-static void ti99_8_internal_dsr_cru_w(int offset, int data)
+static void ti99_8_internal_dsr_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
 	{
@@ -2524,7 +2524,7 @@ static  READ8_HANDLER(ti99_8_internal_dsr_r)
 */
 
 /* prototypes */
-static void ti99_4p_internal_dsr_cru_w(int offset, int data);
+static void ti99_4p_internal_dsr_cru_w(running_machine *machine, int offset, int data);
 static READ16_HANDLER(ti99_4p_internal_dsr_r);
 
 
@@ -2558,7 +2558,7 @@ static void ti99_4p_internal_dsr_reset(void)
 	bit1: enable/disable internal cartridge ROM
 	bit2: set/clear senila
 	bit3: set/clear senilb*/
-static void ti99_4p_internal_dsr_cru_w(int offset, int data)
+static void ti99_4p_internal_dsr_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
 	{
@@ -2655,7 +2655,7 @@ static WRITE16_HANDLER ( ti99_TIxramhigh_w )
 */
 
 /* prototypes */
-static void sAMS_cru_w(int offset, int data);
+static void sAMS_cru_w(running_machine *machine, int offset, int data);
 static  READ8_HANDLER(sAMS_mapper_r);
 static WRITE8_HANDLER(sAMS_mapper_w);
 
@@ -2700,7 +2700,7 @@ static void ti99_sAMSxram_init(void)
 /* write CRU bit:
 	bit0: enable/disable mapper registers in DSR space,
 	bit1: enable/disable address mapping */
-static void sAMS_cru_w(int offset, int data)
+static void sAMS_cru_w(running_machine *machine, int offset, int data)
 {
 	if (offset == 1)
 		sAMS_mapper_on = data;
@@ -2770,7 +2770,7 @@ static WRITE16_HANDLER ( ti99_sAMSxramhigh_w )
 */
 
 /* prototypes */
-static void ti99_4p_mapper_cru_w(int offset, int data);
+static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data);
 static READ16_HANDLER(ti99_4p_mapper_r);
 static WRITE16_HANDLER(ti99_4p_mapper_w);
 
@@ -2842,7 +2842,7 @@ static void ti99_4p_mapper_init(void)
 /* write CRU bit:
 	bit0: enable/disable mapper registers in DSR space,
 	bit1: enable/disable address mapping */
-static void ti99_4p_mapper_cru_w(int offset, int data)
+static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data)
 {
 	int i;
 
@@ -2920,8 +2920,8 @@ static WRITE16_HANDLER(ti99_4p_mapper_w)
 	Up to 512kb of RAM.  Straightforward mapper, works with 32kb chunks.
 */
 
-static int myarc_cru_r(int offset);
-static void myarc_cru_w(int offset, int data);
+static int myarc_cru_r(running_machine *machine, int offset);
+static void myarc_cru_w(running_machine *machine, int offset, int data);
 
 static READ16_HANDLER ( ti99_myarcxramlow_r );
 static WRITE16_HANDLER ( ti99_myarcxramlow_w );
@@ -2984,7 +2984,7 @@ static void ti99_myarcxram_init(void)
 
 /* read CRU bit:
 	bit 1-2 (128kb) or 1-4 (512kb): read current map offset */
-static int myarc_cru_r(int offset)
+static int myarc_cru_r(running_machine *machine, int offset)
 {
 	/*if (offset == 0)*/	/* right??? */
 	{
@@ -2994,7 +2994,7 @@ static int myarc_cru_r(int offset)
 
 /* write CRU bit:
 	bit 1-2 (128kb) or 1-4 (512kb): write map offset */
-static void myarc_cru_w(int offset, int data)
+static void myarc_cru_w(running_machine *machine, int offset, int data)
 {
 	offset &= 0x7;	/* right??? */
 	if (offset >= 1)
@@ -3051,8 +3051,8 @@ static WRITE16_HANDLER ( ti99_myarcxramhigh_w )
 */
 
 /* prototypes */
-static int evpc_cru_r(int offset);
-static void evpc_cru_w(int offset, int data);
+static int evpc_cru_r(running_machine *machine, int offset);
+static void evpc_cru_w(running_machine *machine, int offset, int data);
 static  READ8_HANDLER(evpc_mem_r);
 static WRITE8_HANDLER(evpc_mem_w);
 
@@ -3091,7 +3091,7 @@ static void ti99_evpc_reset(void)
 /*
 	Read evpc CRU interface
 */
-static int evpc_cru_r(int offset)
+static int evpc_cru_r(running_machine *machine, int offset)
 {
 	return 0;	/* dip-switch value */
 }
@@ -3099,7 +3099,7 @@ static int evpc_cru_r(int offset)
 /*
 	Write evpc CRU interface
 */
-static void evpc_cru_w(int offset, int data)
+static void evpc_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
 	{

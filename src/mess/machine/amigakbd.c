@@ -54,13 +54,13 @@ static TIMER_CALLBACK( kbd_update_callback )
 	}
 }
 
-static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
+static INPUT_CHANGED( kbd_update )
 {
 	int	index = *( (int*)(param) ), i;
-	UINT32	delta = oldvalue ^ newvalue;
+	UINT32	delta = oldval ^ newval;
 
 	/* Special case Page UP, which we will use as Action Replay button */
-	if ( (index == 3) && ( delta & 0x80000000 ) && ( newvalue & 0x80000000 ) )
+	if ( (index == 3) && ( delta & 0x80000000 ) && ( newval & 0x80000000 ) )
 	{
 		const amiga_machine_interface *amiga_intf = amiga_get_interface();
 
@@ -77,7 +77,7 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 		{
 			if ( delta & ( 1 << i ) )
 			{
-				int	down = ( newvalue & ( 1 << i ) ) ? 0 : 1;
+				int	down = ( newval & ( 1 << i ) ) ? 0 : 1;
 				int	scancode = ( ( (index*32)+i ) << 1 ) | down;
 				int amigacode = ~scancode;
 
@@ -97,18 +97,6 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 
 void amigakbd_init( void )
 {
-	/* register for changes on the keyboard ports */
-	int 	i;
-
-	for( i = 0; i < 4; i++ )
-	{
-		char	buf[64];
-
-		sprintf( buf, "amiga_keyboard_%d", i );
-
-		input_port_set_changed_callback( port_tag_to_index( buf ), 0xFFFFFFFF, kbd_update, &kbd_index[i] );
-	}
-
 	/* allocate a keyboard buffer */
 	key_buf = auto_malloc( KEYBOARD_BUFFER_SIZE );
 	key_buf_pos = 0;
@@ -120,7 +108,7 @@ void amigakbd_init( void )
 /*********************************************************************************************/
 
 INPUT_PORTS_START( amiga_keyboard )
-	PORT_START_TAG("amiga_keyboard_0")
+	PORT_START_TAG("amiga_keyboard_0") PORT_CHANGED(kbd_update, &kbd_index[0])
 	PORT_BIT( 0x00000001, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)		// 00
 	PORT_BIT( 0x00000002, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)		// 01
 	PORT_BIT( 0x00000004, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)		// 02
@@ -154,7 +142,7 @@ INPUT_PORTS_START( amiga_keyboard )
 	PORT_BIT( 0x40000000, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)		// 1E
 	PORT_BIT( 0x80000000, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)		// 1F
 
-	PORT_START_TAG("amiga_keyboard_1")
+	PORT_START_TAG("amiga_keyboard_1") PORT_CHANGED(kbd_update, &kbd_index[1])
 	PORT_BIT( 0x00000001, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)		// 20
 	PORT_BIT( 0x00000002, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)		// 21
 	PORT_BIT( 0x00000004, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)		// 22
@@ -188,7 +176,7 @@ INPUT_PORTS_START( amiga_keyboard )
 	PORT_BIT( 0x40000000, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)		// 3E
 	PORT_BIT( 0x80000000, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)		// 3F
 
-	PORT_START_TAG("amiga_keyboard_2")
+	PORT_START_TAG("amiga_keyboard_2") PORT_CHANGED(kbd_update, &kbd_index[2])
 	PORT_BIT( 0x00000001, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)		// 40
 	PORT_BIT( 0x00000002, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)	// 41
 	PORT_BIT( 0x00000004, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)		// 42
@@ -222,7 +210,7 @@ INPUT_PORTS_START( amiga_keyboard )
 	PORT_BIT( 0x40000000, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)		// 5E
 	PORT_BIT( 0x80000000, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT)		// 5F
 
-	PORT_START_TAG("amiga_keyboard_3")
+	PORT_START_TAG("amiga_keyboard_3") PORT_CHANGED(kbd_update, &kbd_index[3])
 	PORT_BIT( 0x00000001, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)		// 60
 	PORT_BIT( 0x00000002, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)		// 61
 	PORT_BIT( 0x00000004, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)		// 62

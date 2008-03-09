@@ -828,7 +828,7 @@ WRITE8_HANDLER( wswan_port_w )
 				   Bit 0-3 - Master volume
 				   Bit 4-7 - Unknown
 				*/
-			wswan_sound_port_w( offset, data );
+			wswan_sound_port_w( machine, offset, data );
 			break;
 		case 0xa0:	/* Hardware type - this is probably read only
 				   Bit 0   - Enable cartridge slot and/or disable bios
@@ -1378,7 +1378,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 	/* Handle Sound DMA */
 	if ( ( sound_dma.enable & 0x88 ) == 0x80 ) {
 		/* TODO: Output sound DMA byte */
-		wswan_port_w( 0x89, program_read_byte_8( sound_dma.source ) );
+		wswan_port_w( machine, 0x89, program_read_byte_8( sound_dma.source ) );
 		sound_dma.size--;
 		sound_dma.source = ( sound_dma.source + 1 ) & 0x0FFFFF;
 		if ( sound_dma.size == 0 ) {

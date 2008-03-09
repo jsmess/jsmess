@@ -228,7 +228,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* BANG */
-			rallyx_bang_w(0,bit);
+			rallyx_bang_w(machine,0,bit);
 			break;
 
 		case 0x01:	/* INT ON */
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* SOUNDON */
-			timeplt_sh_irqtrigger_w(0,bit);
+			timeplt_sh_irqtrigger_w(machine,0,bit);
 			break;
 
 		case 0x01:	/* INTST */
@@ -299,7 +299,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x07:	/* STARSON */
-			tactcian_starson_w(offset,bit);
+			tactcian_starson_w(machine,offset,bit);
 			break;
 	}
 }
@@ -840,7 +840,7 @@ static MACHINE_DRIVER_START( rallyx )
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(rallyx_map,0)
 	MDRV_CPU_IO_MAP(0,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -877,7 +877,7 @@ static MACHINE_DRIVER_START( jungler )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(jungler_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

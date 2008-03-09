@@ -92,7 +92,7 @@ DRIVER_INIT( at586 )
 
 
 
-static void at_map_vga_memory(offs_t begin, offs_t end, read8_handler rh, write8_handler wh)
+static void at_map_vga_memory(offs_t begin, offs_t end, read8_machine_func rh, write8_machine_func wh)
 {
 	int buswidth;
 	buswidth = cputype_databus_width(Machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);

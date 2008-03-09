@@ -15,10 +15,10 @@
 typedef struct _ins8154_interface ins8154_interface;
 struct _ins8154_interface
 {
-	read8_handler in_a_func;
-	read8_handler in_b_func;
-	write8_handler out_a_func;
-	write8_handler out_b_func;
+	read8_machine_func in_a_func;
+	read8_machine_func in_b_func;
+	write8_machine_func out_a_func;
+	write8_machine_func out_b_func;
 	void (*irq_func)(int state);	
 };
 

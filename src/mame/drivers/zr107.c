@@ -70,8 +70,8 @@ VIDEO_UPDATE( gticlub );
 // defined in drivers/nwk-tr.c
 int K001604_vh_start(running_machine *machine, int chip);
 void K001604_tile_update(running_machine *machine, int chip);
-void K001604_draw_front_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
-void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
+void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
+void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
 READ32_HANDLER(K001604_tile_r);
 READ32_HANDLER(K001604_char_r);
 WRITE32_HANDLER(K001604_tile_w);
@@ -358,9 +358,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_LSB16)
-		ret |= K054539_1_r(offset);
+		ret |= K054539_1_r(machine, offset);
 	if (ACCESSING_MSB16)
-		ret |= K054539_0_r(offset)<<8;
+		ret |= K054539_0_r(machine, offset)<<8;
 
 	return ret;
 }
@@ -368,9 +368,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_LSB16)
-		K054539_1_w(offset, data);
+		K054539_1_w(machine, offset, data);
 	if (ACCESSING_MSB16)
-		K054539_0_w(offset, data>>8);
+		K054539_0_w(machine, offset, data>>8);
 }
 
 static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )
@@ -573,7 +573,7 @@ static MACHINE_DRIVER_START( zr107 )
 	MDRV_CPU_ADD(PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_CONFIG(zr107_ppc_cfg)
 	MDRV_CPU_PROGRAM_MAP(zr107_map, 0)
-	MDRV_CPU_VBLANK_INT(zr107_vblank, 1)
+	MDRV_CPU_VBLANK_INT("main", zr107_vblank)
 
 	MDRV_CPU_ADD(M68000, 64000000/8)	/* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
@@ -618,7 +618,7 @@ static MACHINE_DRIVER_START( jetwave )
 	MDRV_CPU_ADD(PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_CONFIG(zr107_ppc_cfg)
 	MDRV_CPU_PROGRAM_MAP(jetwave_map, 0)
-	MDRV_CPU_VBLANK_INT(zr107_vblank, 1)
+	MDRV_CPU_VBLANK_INT("main", zr107_vblank)
 
 	MDRV_CPU_ADD(M68000, 64000000/8)	/* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)

@@ -54,8 +54,8 @@ VIDEO_START( xmen )
 	K053247_vh_start(machine,REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
 }
 
-static mame_bitmap * screen_right;
-static mame_bitmap * screen_left;
+static bitmap_t * screen_right;
+static bitmap_t * screen_left;
 static UINT16 *K053247_ram;
 
 VIDEO_START( xmen6p )
@@ -166,7 +166,7 @@ VIDEO_UPDATE( xmen6p )
 VIDEO_EOF( xmen6p )
 {
 	int layer[3];
-	mame_bitmap * renderbitmap;
+	bitmap_t * renderbitmap;
 	rectangle cliprect;
 	int offset;
 
@@ -198,7 +198,7 @@ VIDEO_EOF( xmen6p )
 		for (offset=0;offset<(0xc000/2);offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(offset,xmen6p_tilemapright[offset]&0x00ff);
+			K052109_w(machine,offset,xmen6p_tilemapright[offset]&0x00ff);
 		}
 
 
@@ -217,7 +217,7 @@ VIDEO_EOF( xmen6p )
 		for (offset=0;offset<(0xc000/2);offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(offset,xmen6p_tilemapleft[offset]&0x00ff);
+			K052109_w(machine,offset,xmen6p_tilemapleft[offset]&0x00ff);
 		}
 
 

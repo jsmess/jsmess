@@ -97,7 +97,7 @@ VIDEO_START( commando )
 	tilemap_set_transparent_pen(fg_tilemap, 3);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -137,5 +137,5 @@ VIDEO_UPDATE( commando )
 
 VIDEO_EOF( commando )
 {
-	buffer_spriteram_w(0, 0);
+	buffer_spriteram_w(machine, 0, 0);
 }

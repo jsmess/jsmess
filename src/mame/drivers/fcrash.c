@@ -65,7 +65,7 @@ static void fcrash_update_transmasks(void)
 	}
 }
 
-static void fcrash_render_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void fcrash_render_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int pos;
 	int base=0x50c8/2; // and 10c8/2 for the buffer?
@@ -92,7 +92,7 @@ static void fcrash_render_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 }
 
-static void fcrash_render_layer(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int layer,int primask)
+static void fcrash_render_layer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int layer,int primask)
 {
 	switch (layer)
 	{
@@ -107,7 +107,7 @@ static void fcrash_render_layer(running_machine *machine, mame_bitmap *bitmap,co
 	}
 }
 
-static void fcrash_render_high_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer)
+static void fcrash_render_high_layer(bitmap_t *bitmap, const rectangle *cliprect, int layer)
 {
 	switch (layer)
 	{
@@ -324,7 +324,7 @@ static MACHINE_DRIVER_START( fcrash )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(fcrash_readmem,fcrash_writemem)
-	MDRV_CPU_VBLANK_INT(cps1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
 //  MDRV_CPU_ADD_TAG("sound", Z80, 4000000) /* ???? */
 //  /* audio CPU */

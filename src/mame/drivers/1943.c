@@ -21,6 +21,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 
@@ -251,12 +252,12 @@ static MACHINE_DRIVER_START( 1943 )
 	// basic machine hardware
 	MDRV_CPU_ADD(Z80, 6000000)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(c1943_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3000000)	// 3 MHz
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
 	// video hardware
 
@@ -276,13 +277,13 @@ static MACHINE_DRIVER_START( 1943 )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, XTAL_24MHz/16)	/* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.10)
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, XTAL_24MHz/16)	/* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)

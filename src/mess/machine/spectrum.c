@@ -792,6 +792,7 @@ void spectrum_setup_z80(unsigned char *pSnapshot, unsigned long SnapshotSize)
 	int i;
 	unsigned char lo, hi, data;
 	SPECTRUM_Z80_SNAPSHOT_TYPE z80_type;
+	running_machine *machine = Machine;
 
 	z80_type = spectrum_identify_z80(pSnapshot, SnapshotSize);
 
@@ -954,10 +955,10 @@ void spectrum_setup_z80(unsigned char *pSnapshot, unsigned long SnapshotSize)
 			/* Only set up sound registers for 128K machine or TS2068! */
 			for (i = 0; i < 16; i++)
 			{
-				AY8910_control_port_0_w(0, i);
-				AY8910_write_port_0_w(0, pSnapshot[39 + i]);
+				AY8910_control_port_0_w(machine, 0, i);
+				AY8910_write_port_0_w(machine, 0, pSnapshot[39 + i]);
 			}
-			AY8910_control_port_0_w(0, pSnapshot[38]);
+			AY8910_control_port_0_w(machine, 0, pSnapshot[38]);
 		}
 
 		pSource = pSnapshot + header_size;

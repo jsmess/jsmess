@@ -181,7 +181,7 @@ static WRITE32_HANDLER( ms32_bg1_ram_w )
 
 /* ROZ Layers */
 
-static void draw_roz(mame_bitmap *bitmap, const rectangle *cliprect,int priority, int chip)
+static void draw_roz(bitmap_t *bitmap, const rectangle *cliprect,int priority, int chip)
 {
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
 
@@ -326,7 +326,7 @@ static int ms32_reverse_sprite_order = 0;
 static int flipscreen = 0;
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 *sprram_top, size_t sprram_size, int region)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 *sprram_top, size_t sprram_size, int region)
 {
 /***************************************************************************
 
@@ -1339,7 +1339,7 @@ static MACHINE_DRIVER_START( bnstars )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V70, 20000000) // 20MHz
 	MDRV_CPU_PROGRAM_MAP(bnstars_map,0)
-	MDRV_CPU_VBLANK_INT(ms32_interrupt,32)
+	MDRV_CPU_VBLANK_INT_HACK(ms32_interrupt,32)
 
 //  MDRV_CPU_ADD(Z80, 4000000) /* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(bnstars_z80_map, 0)

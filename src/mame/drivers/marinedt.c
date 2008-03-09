@@ -96,7 +96,7 @@ p2 ink doesn't always light up in test mode
 
 #include "driver.h"
 
-static mame_bitmap *tile, *obj1, *obj2;
+static bitmap_t *tile, *obj1, *obj2;
 static tilemap *tx_tilemap;
 
 static UINT8 *tx_tileram;
@@ -278,7 +278,7 @@ static WRITE8_HANDLER( marinedt_pf_w )
 
 //if(data&0xf0)
 //  logerror("pf:%02x %d\n",marinedt_pf);
-//logerror("pd:%02x %d\n",marinedt_pd, cpu_getcurrentframe());
+//logerror("pd:%02x %d\n",marinedt_pd, video_screen_get_frame_number(0));
 
 }
 
@@ -587,7 +587,7 @@ static MACHINE_DRIVER_START( marinedt )
 	MDRV_CPU_ADD(Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(marinedt_readmem,marinedt_writemem)
 	MDRV_CPU_IO_MAP(marinedt_readport,marinedt_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -138,7 +138,7 @@ static WRITE8_HANDLER( sym1_riot_b_w )
 	riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	ttl74145_0_w(0, data & 0x0f);
+	ttl74145_0_w(machine, 0, data & 0x0f);
 }
 
 

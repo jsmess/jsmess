@@ -97,26 +97,26 @@ static WRITE8_HANDLER( outport24_w )
 static WRITE8_HANDLER( hvymetal_videomode_w )
 {
 	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
-	system1_videomode_w(0, data);
+	system1_videomode_w(machine, 0, data);
 }
 
 static WRITE8_HANDLER( brain_videomode_w )
 {
 	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
-	system1_videomode_w(0, data);
+	system1_videomode_w(machine, 0, data);
 }
 
 static WRITE8_HANDLER( chplft_videomode_w )
 {
 	memory_set_bank(1, (data & 0x0c)>>2);
-	system1_videomode_w(0, data);
+	system1_videomode_w(machine, 0, data);
 }
 
 
 static WRITE8_HANDLER( system1_soundport_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 }
@@ -2486,12 +2486,12 @@ static MACHINE_DRIVER_START( system1 )
 	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* My Hero has 2 OSCs 8 & 20 MHz (Cabbe Info) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)		 /* NMIs are caused by the main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		 /* NMIs are caused by the main CPU */
 
 	MDRV_MACHINE_RESET(system1)
 
@@ -4789,7 +4789,7 @@ static READ8_HANDLER( dakkochn_port_04_r )
 static WRITE8_HANDLER( dakkochn_port_15_w )
 {
 	dakkochn_control = data; // check if any control multiplex bits are in here!
-	chplft_videomode_w(offset,data);
+	chplft_videomode_w(machine,offset,data);
 }
 
 static DRIVER_INIT( dakkochn )

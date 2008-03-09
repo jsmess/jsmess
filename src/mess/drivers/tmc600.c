@@ -114,30 +114,30 @@ static WRITE8_HANDLER( vismac_data_w )
 	case 0x30:
 		// write cdp1869 command on the data bus
 		vismac_bkg_latch = data & 0x07;
-		cdp1869_out3_w(0, data);
+		cdp1869_out3_w(machine, 0, data);
 		break;
 
 	case 0x40:
-		cdp1869_out4_w(0, data);
+		cdp1869_out4_w(machine, 0, data);
 		break;
 
 	case 0x50:
-		cdp1869_out5_w(0, data);
+		cdp1869_out5_w(machine, 0, data);
 		break;
 
 	case 0x60:
-		cdp1869_out6_w(0, data);
+		cdp1869_out6_w(machine, 0, data);
 		break;
 
 	case 0x70:
-		cdp1869_out7_w(0, data);
+		cdp1869_out7_w(machine, 0, data);
 		break;
 	}
 }
 
 static WRITE8_HANDLER( vismac_pageram_w )
 {
-	cdp1869_pageram_w( offset, data );
+	cdp1869_pageram_w( machine, offset, data );
 	vismac_colorram[offset] = vismac_color_latch;
 }
 

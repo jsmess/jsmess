@@ -366,42 +366,42 @@ static WRITE8_HANDLER(serial_w)
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
 {
-	wd17xx_command_w(offset,~data);
+	wd17xx_command_w(machine, offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_track_w)
 {
-	wd17xx_track_w(offset,~data);
+	wd17xx_track_w(machine, offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_sector_w)
 {
-	wd17xx_sector_w(offset,~data);
+	wd17xx_sector_w(machine, offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_data_w)
 {
-	wd17xx_data_w(offset,~data);
+	wd17xx_data_w(machine, offset,~data);
 }
 
 static READ8_HANDLER(apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r(offset);
+	return ~wd17xx_status_r(machine, offset);
 }
 
 static READ8_HANDLER(apf_wd179x_track_r)
 {
-	return ~wd17xx_track_r(offset);
+	return ~wd17xx_track_r(machine, offset);
 }
 
 static READ8_HANDLER(apf_wd179x_sector_r)
 {
-	return ~wd17xx_sector_r(offset);
+	return ~wd17xx_sector_r(machine, offset);
 }
 
 static READ8_HANDLER(apf_wd179x_data_r)
 {
-	return wd17xx_data_r(offset);
+	return wd17xx_data_r(machine, offset);
 }
 
 static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)

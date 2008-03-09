@@ -280,7 +280,7 @@ void neogeo_set_fixed_layer_source(UINT8 data)
 }
 
 
-static void draw_fixed_layer(mame_bitmap *bitmap, int scanline)
+static void draw_fixed_layer(bitmap_t *bitmap, int scanline)
 {
 	int x;
 
@@ -809,7 +809,7 @@ READ16_HANDLER( neogeo_video_register_r )
 
 	/* accessing the LSB only is not mapped */
 	if (mem_mask == 0xff00)
-		ret = neogeo_unmapped_r(0, 0) & 0x00ff;
+		ret = neogeo_unmapped_r(machine, 0, 0) & 0x00ff;
 	else
 	{
 		switch (offset)

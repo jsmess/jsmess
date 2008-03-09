@@ -358,6 +358,7 @@ void freegfx(gfx_element *gfx)
     BLOCKMOVE PRIMITIVES
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 INLINE void blockmove_NtoN_transpen_noremap8(
 		const UINT8 *srcdata,int srcwidth,int srcheight,int srcmodulo,
 		UINT8 *dstdata,int dstmodulo,
@@ -423,7 +424,9 @@ INLINE void blockmove_NtoN_transpen_noremap8(
 		srcheight--;
 	}
 }
+#endif
 
+#ifdef UNUSED_FUNCTION
 INLINE void blockmove_NtoN_transpen_noremap_flipx8(
 		const UINT8 *srcdata,int srcwidth,int srcheight,int srcmodulo,
 		UINT8 *dstdata,int dstmodulo,
@@ -484,7 +487,7 @@ INLINE void blockmove_NtoN_transpen_noremap_flipx8(
 		srcheight--;
 	}
 }
-
+#endif
 
 INLINE void blockmove_NtoN_transpen_noremap16(
 		const UINT16 *srcdata,int srcwidth,int srcheight,int srcmodulo,
@@ -842,10 +845,10 @@ INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c)
 
 ***************************************************************************/
 
-INLINE void common_drawgfx(mame_bitmap *dest,const gfx_element *gfx,
+INLINE void common_drawgfx(bitmap_t *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
-		mame_bitmap *pri_buffer,UINT32 pri_mask)
+		bitmap_t *pri_buffer,UINT32 pri_mask)
 {
 	assert(dest != NULL);
 	assert((dest->bpp == 16) || (dest->bpp == 32));
@@ -890,7 +893,7 @@ INLINE void common_drawgfx(mame_bitmap *dest,const gfx_element *gfx,
 		drawgfx_core32(dest,gfx,code,color,flipx,flipy,sx,sy,clip,transparency,transparent_color,pri_buffer,pri_mask);
 }
 
-void drawgfx(mame_bitmap *dest,const gfx_element *gfx,
+void drawgfx(bitmap_t *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color)
 {
@@ -899,7 +902,7 @@ void drawgfx(mame_bitmap *dest,const gfx_element *gfx,
 	profiler_mark(PROFILER_END);
 }
 
-void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+void pdrawgfx(bitmap_t *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
 {
@@ -908,7 +911,7 @@ void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
 	profiler_mark(PROFILER_END);
 }
 
-void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+void mdrawgfx(bitmap_t *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 priority_mask)
 {
@@ -923,7 +926,7 @@ void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
   Use copybitmap() to copy a bitmap onto another at the given position.
 
 ***************************************************************************/
-static void copybitmap_common(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
+static void copybitmap_common(bitmap_t *dest,bitmap_t *src,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color)
 {
 	assert(dest != NULL);
@@ -941,13 +944,13 @@ static void copybitmap_common(mame_bitmap *dest,mame_bitmap *src,int flipx,int f
 	profiler_mark(PROFILER_END);
 }
 
-void copybitmap(mame_bitmap *dest, mame_bitmap *src, int flipx, int flipy,
+void copybitmap(bitmap_t *dest, bitmap_t *src, int flipx, int flipy,
 				int sx, int sy, const rectangle *clip)
 {
 	copybitmap_common(dest,src,flipx,flipy,sx,sy,clip,TRANSPARENCY_NONE,0);
 }
 
-void copybitmap_trans(mame_bitmap *dest, mame_bitmap *src, int flipx, int flipy,
+void copybitmap_trans(bitmap_t *dest, bitmap_t *src, int flipx, int flipy,
 					  int sx, int sy, const rectangle *clip, pen_t transparent_pen)
 {
 	copybitmap_common(dest,src,flipx,flipy,sx,sy,clip,TRANSPARENCY_PEN,transparent_pen);
@@ -968,7 +971,7 @@ void copybitmap_trans(mame_bitmap *dest, mame_bitmap *src, int flipx, int flipy,
   scrolls as a whole in at least one direction.
 
 ***************************************************************************/
-static void copyscrollbitmap_common(mame_bitmap *dest,mame_bitmap *src,
+static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		int rows,const int *rowscroll,int cols,const int *colscroll,
 		const rectangle *clip,int transparency,int transparent_color)
 {
@@ -1206,14 +1209,14 @@ static void copyscrollbitmap_common(mame_bitmap *dest,mame_bitmap *src,
 }
 
 
-void copyscrollbitmap(mame_bitmap *dest, mame_bitmap *src,
+void copyscrollbitmap(bitmap_t *dest, bitmap_t *src,
 					  int rows, const int *rowscroll, int cols, const int *colscroll,
 					  const rectangle *clip)
 {
 	copyscrollbitmap_common(dest,src,rows,rowscroll,cols,colscroll,clip,TRANSPARENCY_NONE,0);
 }
 
-void copyscrollbitmap_trans(mame_bitmap *dest, mame_bitmap *src,
+void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src,
 					 		int rows, const int *rowscroll, int cols, const int *colscroll,
 					 		const rectangle *clip, pen_t transparent_pen)
 {
@@ -1225,7 +1228,7 @@ void copyscrollbitmap_trans(mame_bitmap *dest, mame_bitmap *src,
    - startx and starty MUST be UINT32 for calculations to work correctly
    - srcbitmap->width and height are assumed to be a power of 2 to speed up wraparound
    */
-void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
+void copyrozbitmap(bitmap_t *dest,bitmap_t *src,
 		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 priority)
 {
@@ -1259,10 +1262,10 @@ void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
 
 
 
-INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
-		int scalex, int scaley,mame_bitmap *pri_buffer,UINT32 pri_mask)
+		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask)
 {
 	/* verify arguments */
 	assert(dest_bmp != NULL);
@@ -2288,7 +2291,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	}
 }
 
-void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+void drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley)
 {
@@ -2298,7 +2301,7 @@ void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	profiler_mark(PROFILER_END);
 }
 
-void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+void pdrawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
 		UINT32 priority_mask)
@@ -2309,7 +2312,7 @@ void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	profiler_mark(PROFILER_END);
 }
 
-void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+void mdrawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
 		UINT32 priority_mask)
@@ -3238,10 +3241,10 @@ DECLARE(blockmove_NtoN_opaque_noremap_flipx,(
 
 
 DECLARE(drawgfx_core,(
-		mame_bitmap *dest,const gfx_element *gfx,
+		bitmap_t *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
-		mame_bitmap *pri_buffer,UINT32 pri_mask),
+		bitmap_t *pri_buffer,UINT32 pri_mask),
 {
 	int ox;
 	int oy;
@@ -3372,7 +3375,7 @@ DECLARE(drawgfx_core,(
 })
 
 DECLARE(copybitmap_core,(
-		mame_bitmap *dest,mame_bitmap *src,
+		bitmap_t *dest,bitmap_t *src,
 		int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color),
 {
@@ -3437,7 +3440,7 @@ DECLARE(copybitmap_core,(
 	}
 })
 
-DECLARE(copyrozbitmap_core,(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
+DECLARE(copyrozbitmap_core,(bitmap_t *bitmap,bitmap_t *srcbitmap,
 		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 priority),
 {
@@ -3719,7 +3722,7 @@ DECLARE(copyrozbitmap_core,(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
 #endif /* (DEPTH != 8) */
 
 DECLAREG(draw_scanline, (
-		mame_bitmap *bitmap,int x,int y,int length,
+		bitmap_t *bitmap,int x,int y,int length,
 		const DATA_TYPE *src,const pen_t *pens,int transparent_pen),
 {
 	assert(bitmap != NULL);
@@ -3821,7 +3824,7 @@ DECLAREG(draw_scanline, (
 })
 
 DECLAREG(pdraw_scanline, (
-		mame_bitmap *bitmap,int x,int y,int length,
+		bitmap_t *bitmap,int x,int y,int length,
 		const DATA_TYPE *src,const pen_t *pens,int transparent_pen,int pri),
 {
 	assert(bitmap != NULL);
@@ -3949,7 +3952,7 @@ DECLAREG(pdraw_scanline, (
 )
 
 DECLAREG(extract_scanline, (
-		mame_bitmap *bitmap,int x,int y,int length,
+		bitmap_t *bitmap,int x,int y,int length,
 		DATA_TYPE *dst),
 {
 	assert(bitmap != NULL);

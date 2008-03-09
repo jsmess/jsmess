@@ -101,7 +101,7 @@ static WRITE32_HANDLER( darkhors_tmapram2_w )
 	tilemap_mark_tile_dirty(darkhors_tmap2, offset);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT32 *s		=	spriteram32;
 	UINT32 *end		=	spriteram32 + 0x02000/4;
@@ -258,19 +258,19 @@ static WRITE32_HANDLER( darkhors_eeprom_w )
 static WRITE32_HANDLER( OKIM6295_data_0_msb32_w )
 {
 	if (ACCESSING_MSB32)
-		OKIM6295_data_0_msb_w(offset, data >> 16, mem_mask >> 16);
+		OKIM6295_data_0_msb_w(machine, offset, data >> 16, mem_mask >> 16);
 }
 
 static READ32_HANDLER( OKIM6295_status_0_msb32_r )
 {
-	return OKIM6295_status_0_msb_r(offset, mem_mask >> 16) << 16;
+	return OKIM6295_status_0_msb_r(machine, offset, mem_mask >> 16) << 16;
 }
 
 static WRITE32_HANDLER( paletteram32_xBBBBBGGGGGRRRRR_dword_w )
 {
 	paletteram16 = (UINT16 *)paletteram32;
-	if (ACCESSING_MSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_LSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset*2+1, data, mem_mask);
+	if (ACCESSING_MSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
+	if (ACCESSING_LSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2+1, data, mem_mask);
 }
 
 static UINT32 input_sel;
@@ -600,7 +600,7 @@ static INTERRUPT_GEN( darkhors )
 static MACHINE_DRIVER_START( darkhors )
 	MDRV_CPU_ADD(M68EC020, 12000000) // 36MHz/3 ??
 	MDRV_CPU_PROGRAM_MAP(darkhors_readmem,darkhors_writemem)
-	MDRV_CPU_VBLANK_INT(darkhors,3)
+	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
 
 	MDRV_NVRAM_HANDLER(darkhors)
 

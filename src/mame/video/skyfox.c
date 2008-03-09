@@ -67,7 +67,7 @@ WRITE8_HANDLER( skyfox_vregs_w )
 	switch (offset)
 	{
 		case 0:	skyfox_bg_ctrl = data;	break;
-		case 1:	soundlatch_w(0,data);	break;
+		case 1:	soundlatch_w(machine,0,data);	break;
 		case 2:	break;
 		case 3:	break;
 		case 4:	break;
@@ -164,7 +164,7 @@ Offset:         Value:
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -243,7 +243,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 ***************************************************************************/
 
-static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 *RAM	=	memory_region(REGION_GFX2);
 	int x,y,i;

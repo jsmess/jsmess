@@ -86,7 +86,7 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 			0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority, int pri_mask)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int pri_mask)
 {
 	int offs;
 
@@ -162,7 +162,7 @@ static VIDEO_START( acommand )
 #define SHOW_LEDS	0
 
 #if SHOW_LEDS
-static void draw_led(mame_bitmap *bitmap, int x, int y,UINT8 value)
+static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 {
 	plot_box(bitmap, x, y, 5, 9, 0x00000000);
 
@@ -281,7 +281,7 @@ static READ16_HANDLER(ac_devices_r)
                 ---- ---- ---- --x- (Activate Test)
                 ---- ---- ---- ---x (Advance Thru Tests)
             */
-			return input_port_0_word_r(0,0);
+			return input_port_0_word_r(machine,0,0);
 		case 0x0014/2:
 			/*
                 write 0x40,read (~0x08)
@@ -291,14 +291,14 @@ static READ16_HANDLER(ac_devices_r)
             */
 			return (ac_devram[offset]);
 		case 0x0016/2:
-			return OKIM6295_status_0_r(0);
+			return OKIM6295_status_0_r(machine,0);
 		case 0x0018/2:
 			/*
                 ---- ---- ---- x--- Astronaut - switch
             */
 			return ac_devram[offset];
 		case 0x001a/2:
-			return OKIM6295_status_1_r(0);
+			return OKIM6295_status_1_r(machine,0);
 		case 0x0040/2:
 			/*
                 x-x- x-x- x-x- xx-- (ACTIVE HIGH?) [eori #$aaac, D0]
@@ -315,7 +315,7 @@ static READ16_HANDLER(ac_devices_r)
                 xxxx xxxx ---- ---- DIPSW4
                 ---- ---- xxxx xxxx DIPSW3
             */
-			return input_port_1_word_r(0,0);
+			return input_port_1_word_r(machine,0,0);
 	}
 	return ac_devram[offset];
 }
@@ -329,14 +329,14 @@ static WRITE16_HANDLER(ac_devices_w)
 			if(ACCESSING_LSB)
 			{
 				logerror("Request to play sample %02x with rom 2\n",data);
-				OKIM6295_data_0_w(0,data);
+				OKIM6295_data_0_w(machine,0,data);
 			}
 			break;
 		case 0x1a/2:
 			if(ACCESSING_LSB)
 			{
 				logerror("Request to play sample %02x with rom 1\n",data);
-				OKIM6295_data_1_w(0,data);
+				OKIM6295_data_1_w(machine,0,data);
 			}
 			break;
 		case 0x1c/2:
@@ -519,7 +519,7 @@ static MACHINE_DRIVER_START( acommand )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(acommand,0)
-	MDRV_CPU_VBLANK_INT(acommand_irq,2)
+	MDRV_CPU_VBLANK_INT_HACK(acommand_irq,2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

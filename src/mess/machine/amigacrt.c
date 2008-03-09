@@ -197,7 +197,7 @@ static READ16_HANDLER( amiga_ar23_cia_r )
 		amiga_ar23_freeze();
 	}
 
-	return amiga_cia_r( offset, mem_mask );
+	return amiga_cia_r( machine, offset, mem_mask );
 }
 
 static WRITE16_HANDLER( amiga_ar23_mode_w )

@@ -177,7 +177,7 @@ WRITE8_HANDLER( hcastle_pf1_control_w )
 	{
 		tilemap_set_flip(fg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
-	K007121_ctrl_0_w(offset,data);
+	K007121_ctrl_0_w(machine,offset,data);
 }
 
 WRITE8_HANDLER( hcastle_pf2_control_w )
@@ -193,12 +193,12 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 	{
 		tilemap_set_flip(bg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
-	K007121_ctrl_1_w(offset,data);
+	K007121_ctrl_1_w(machine,offset,data);
 }
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *sbank, int bank )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *sbank, int bank )
 {
 	int bank_base = (bank == 0) ? 0x4000 * (gfx_bank & 1) : 0;
 	K007121_sprites_draw(bank,bitmap,machine->gfx,machine->colortable,cliprect,sbank,(K007121_ctrlram[bank][6]&0x30)*2,0,bank_base,-1);

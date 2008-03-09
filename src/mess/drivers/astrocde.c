@@ -35,6 +35,7 @@
  ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/astrocde.h"
 #include "includes/astrocde.h"
 #include "devices/cartslot.h"
@@ -46,7 +47,7 @@
 
 static WRITE8_HANDLER( astrocade_soundblock1_w )
 {
-	astrocade_sound1_w(offset + 0x18, data);
+	astrocade_sound1_w(machine, offset + 0x18, data);
 }
 
 static ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -79,8 +80,8 @@ static ADDRESS_MAP_START( astrocade_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1d, 0x1d) AM_MIRROR(0xff00) AM_READ(input_port_9_r)
 	AM_RANGE(0x1e, 0x1e) AM_MIRROR(0xff00) AM_READ(input_port_10_r)
 	AM_RANGE(0x1f, 0x1f) AM_MIRROR(0xff00) AM_READ(input_port_11_r)
-	AM_SPACE(0x18, 0xff) AM_WRITE(astrocade_soundblock1_w)
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_WRITE(astrocade_magic_expand_color_w)
+	AM_RANGE(0x18, 0xff) AM_MIRROR(0xff00) AM_WRITE(astrocade_soundblock1_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( astrocde )
@@ -173,7 +174,7 @@ static MACHINE_DRIVER_START( astrocde )
 	MDRV_CPU_ADD(Z80, 1789000)        /* 1.789 Mhz */
 	MDRV_CPU_PROGRAM_MAP(astrocade_mem, 0)
 	MDRV_CPU_IO_MAP(astrocade_io, 0)
-	MDRV_CPU_VBLANK_INT(astrocade_interrupt,256)
+	MDRV_CPU_VBLANK_INT_HACK(astrocade_interrupt, 256)
 	MDRV_INTERLEAVE(1)
 
     /* video hardware */

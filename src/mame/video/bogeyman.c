@@ -64,7 +64,7 @@ WRITE8_HANDLER( bogeyman_colorram2_w )
 WRITE8_HANDLER( bogeyman_paletteram_w )
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_w(offset, ~data);
+	paletteram_BBGGGRRR_w(machine, offset, ~data);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -98,7 +98,7 @@ VIDEO_START( bogeyman )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

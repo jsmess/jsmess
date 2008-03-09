@@ -51,7 +51,7 @@ static int dreamwld_tilebank[2], dreamwld_tilebankold[2];
 static tilemap *dreamwld_bg_tilemap;
 static tilemap *dreamwld_bg2_tilemap;
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = spriteram32;
@@ -221,14 +221,14 @@ static WRITE32_HANDLER( dreamwld_palette_w )
 
 static READ32_HANDLER(dreamwld_6295_0_r)
 {
-	return OKIM6295_status_0_r(0)<<24;
+	return OKIM6295_status_0_r(machine, 0)<<24;
 }
 
 static WRITE32_HANDLER(dreamwld_6295_0_w)
 {
 	if (!(mem_mask & 0xff000000))
 	{
-		OKIM6295_data_0_w(0, (data>>24) & 0xff);
+		OKIM6295_data_0_w(machine, 0, (data>>24) & 0xff);
 	}
 	else
 	{
@@ -260,14 +260,14 @@ static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 
 static READ32_HANDLER(dreamwld_6295_1_r)
 {
-	return OKIM6295_status_1_r(0)<<24;
+	return OKIM6295_status_1_r(machine, 0)<<24;
 }
 
 static WRITE32_HANDLER(dreamwld_6295_1_w)
 {
 	if (!(mem_mask & 0xff000000))
 	{
-		OKIM6295_data_1_w(0, (data>>24) & 0xff);
+		OKIM6295_data_1_w(machine, 0, (data>>24) & 0xff);
 	}
 	else
 	{
@@ -448,7 +448,7 @@ static MACHINE_DRIVER_START( dreamwld )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(dreamwld_map, 0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1) // 4, 5, or 6, all point to the same place
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold) // 4, 5, or 6, all point to the same place
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

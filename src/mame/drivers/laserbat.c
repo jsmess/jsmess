@@ -516,9 +516,9 @@ static VIDEO_START( laserbat )
 static VIDEO_UPDATE( laserbat )
 {
 	int y;
-	mame_bitmap *s2636_0_bitmap;
-	mame_bitmap *s2636_1_bitmap;
-	mame_bitmap *s2636_2_bitmap;
+	bitmap_t *s2636_0_bitmap;
+	bitmap_t *s2636_1_bitmap;
+	bitmap_t *s2636_2_bitmap;
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -599,9 +599,9 @@ static int active_8910,port0a;
 static READ8_HANDLER( zaccaria_port0a_r )
 {
 	if (active_8910 == 0)
-		return AY8910_read_port_0_r(0);
+		return AY8910_read_port_0_r(machine,0);
 	else
-		return AY8910_read_port_1_r(0);
+		return AY8910_read_port_1_r(machine,0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -619,9 +619,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
 		if (last & 0x01)
-			AY8910_control_port_0_w(0,port0a);
+			AY8910_control_port_0_w(machine,0,port0a);
 		else
-			AY8910_write_port_0_w(0,port0a);
+			AY8910_write_port_0_w(machine,0,port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -634,9 +634,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
 		if (last & 0x04)
-			AY8910_control_port_1_w(0,port0a);
+			AY8910_control_port_1_w(machine,0,port0a);
 		else
-			AY8910_write_port_1_w(0,port0a);
+			AY8910_write_port_1_w(machine,0,port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -683,7 +683,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	static int toggle;
 
-	pia_0_cb1_w(0,toggle & 1);
+	pia_0_cb1_w(machine,0,toggle & 1);
 	toggle ^= 1;
 }
 
@@ -693,7 +693,7 @@ static MACHINE_DRIVER_START( laserbat )
 	MDRV_CPU_ADD(S2650, 14318180/4) // ???
 	MDRV_CPU_PROGRAM_MAP(laserbat_map,0)
 	MDRV_CPU_IO_MAP(laserbat_io_map,0)
-	MDRV_CPU_VBLANK_INT(laserbat_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", laserbat_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -727,7 +727,7 @@ static MACHINE_DRIVER_START( catnmous )
 	MDRV_CPU_ADD(S2650, 14318000/4)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(laserbat_map,0)
 	MDRV_CPU_IO_MAP(catnmous_io_map,0)
-	MDRV_CPU_VBLANK_INT(laserbat_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", laserbat_interrupt)
 
 	MDRV_CPU_ADD(M6802,3580000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(catnmous_sound_map,0)

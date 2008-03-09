@@ -229,9 +229,9 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( wrally )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz */
+	MDRV_CPU_ADD(M68000,XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(wrally_readmem,wrally_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -251,11 +251,10 @@ static MACHINE_DRIVER_START( wrally )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, XTAL_1MHz) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
-
 
 
 ROM_START( wrally )

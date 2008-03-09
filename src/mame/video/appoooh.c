@@ -180,7 +180,7 @@ WRITE8_HANDLER( appoooh_bg_colorram_w )
 WRITE8_HANDLER( appoooh_out_w )
 {
 	/* bit 0 controls NMI */
-	interrupt_enable_w(0,data & 0x01);
+	interrupt_enable_w(machine,0,data & 0x01);
 
 	/* bit 1 flip screen */
 	flip_screen_set(data & 0x02);
@@ -203,7 +203,7 @@ WRITE8_HANDLER( appoooh_out_w )
 	/* bit 7 unknown (used) */
 }
 
-static void appoooh_draw_sprites(mame_bitmap *dest_bmp,
+static void appoooh_draw_sprites(bitmap_t *dest_bmp,
 		const rectangle *cliprect,
         const gfx_element *gfx,
         UINT8 *sprite)
@@ -236,7 +236,7 @@ static void appoooh_draw_sprites(mame_bitmap *dest_bmp,
 	 }
 }
 
-static void robowres_draw_sprites(mame_bitmap *dest_bmp,
+static void robowres_draw_sprites(bitmap_t *dest_bmp,
 		const rectangle *cliprect,
         const gfx_element *gfx,
         UINT8 *sprite)

@@ -174,8 +174,8 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 
 void wardner_restore_bank(void)
 {
-	wardner_ramrom_bank_sw(0,1);	/* Dummy value to ensure restoration */
-	wardner_ramrom_bank_sw(0,wardner_membank);
+	wardner_ramrom_bank_sw(Machine,0,1);	/* Dummy value to ensure restoration */
+	wardner_ramrom_bank_sw(Machine,0,wardner_membank);
 }
 
 
@@ -468,7 +468,7 @@ static MACHINE_DRIVER_START( wardner )
 	MDRV_CPU_ADD(Z80,24000000/4)			/* 6MHz ??? - Real board crystal is 24MHz */
 	MDRV_CPU_PROGRAM_MAP(main_program_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-	MDRV_CPU_VBLANK_INT(wardner_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", wardner_interrupt)
 
 	MDRV_CPU_ADD(Z80,24000000/7)			/* 3.43MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_program_map, 0)

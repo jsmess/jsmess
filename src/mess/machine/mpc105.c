@@ -64,9 +64,9 @@ static void mpc105_update_memory(void)
 					for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 					{
 						memory_install_read64_handler(cpunum, ADDRESS_SPACE_PROGRAM, begin, end,
-							0, 0, (read64_handler) (FPTR)(bank + mpc105->bank_base));
+							0, 0, (read64_machine_func) (FPTR)(bank + mpc105->bank_base));
 						memory_install_write64_handler(cpunum, ADDRESS_SPACE_PROGRAM, begin, end,
-							0, 0, (write64_handler) (FPTR)(bank + mpc105->bank_base));
+							0, 0, (write64_machine_func) (FPTR)(bank + mpc105->bank_base));
 					}
 					memory_set_bankptr(bank + mpc105->bank_base, mess_ram);
 				}

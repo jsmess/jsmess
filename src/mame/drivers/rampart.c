@@ -86,14 +86,14 @@ static MACHINE_RESET( rampart )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return (OKIM6295_status_0_r(offset) << 8) | 0x00ff;
+	return (OKIM6295_status_0_r(machine, offset) << 8) | 0x00ff;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_MSB)
-		OKIM6295_data_0_w(offset, (data >> 8) & 0xff);
+		OKIM6295_data_0_w(machine, offset, (data >> 8) & 0xff);
 }
 
 
@@ -109,9 +109,9 @@ static WRITE16_HANDLER( ym2413_w )
 	if (ACCESSING_MSB)
 	{
 		if (offset & 1)
-			YM2413_data_port_0_w(0, (data >> 8) & 0xff);
+			YM2413_data_port_0_w(machine, 0, (data >> 8) & 0xff);
 		else
-			YM2413_register_port_0_w(0, (data >> 8) & 0xff);
+			YM2413_register_port_0_w(machine, 0, (data >> 8) & 0xff);
 	}
 }
 
@@ -385,7 +385,7 @@ static MACHINE_DRIVER_START( rampart )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
-	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
+	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 
 	MDRV_MACHINE_RESET(rampart)
 	MDRV_NVRAM_HANDLER(atarigen)

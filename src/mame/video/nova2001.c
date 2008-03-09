@@ -55,18 +55,18 @@ WRITE8_HANDLER( ninjakun_paletteram_w )
 {
 	int i;
 
-	paletteram_BBGGRRII_w(offset,data);
+	paletteram_BBGGRRII_w(machine,offset,data);
 
 	// expand the sprite palette to full length
 	if (offset < 16)
 	{
-		paletteram_BBGGRRII_w(0x200 + offset * 16 + 1, data);
+		paletteram_BBGGRRII_w(machine, 0x200 + offset * 16 + 1, data);
 
 		if (offset != 1)
 		{
 			for (i = 0; i < 16; i++)
 			{
-				paletteram_BBGGRRII_w(0x200 + offset + i * 16, data);
+				paletteram_BBGGRRII_w(machine, 0x200 + offset + i * 16, data);
 			}
 		}
 	}
@@ -257,7 +257,7 @@ WRITE8_HANDLER( pkunwar_flipscreen_w )
  *
  *************************************/
 
-static void nova2001_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void nova2001_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const gfx_element *gfx = machine->gfx[0];
 	int offs;
@@ -294,7 +294,7 @@ static void nova2001_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void pkunwar_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void pkunwar_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const gfx_element *gfx = machine->gfx[0];
 	int offs;

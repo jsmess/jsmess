@@ -691,7 +691,7 @@ static DRIVER_INIT( 58_56 )
 static WRITE8_HANDLER( mappy_snd_sharedram_w )
 {
 	if (offset < 0x40)
-		namco_15xx_w(offset,data);
+		namco_15xx_w(machine,offset,data);
 	else
 		namco_soundregs[offset] = data;
 }
@@ -833,7 +833,7 @@ static MACHINE_RESET( superpac )
 
 	/* Reset all latches */
 	for (i = 0;i < 0x10;i += 2)
-		superpac_latch_w(i,0);
+		superpac_latch_w(machine,i,0);
 }
 
 static MACHINE_RESET( phozon )
@@ -842,7 +842,7 @@ static MACHINE_RESET( phozon )
 
 	/* Reset all latches */
 	for (i = 0;i < 0x10;i += 2)
-		phozon_latch_w(i,0);
+		phozon_latch_w(machine,i,0);
 }
 
 static MACHINE_RESET( mappy )
@@ -851,7 +851,7 @@ static MACHINE_RESET( mappy )
 
 	/* Reset all latches */
 	for (i = 0;i < 0x10;i += 2)
-		mappy_latch_w(i,0);
+		mappy_latch_w(machine,i,0);
 }
 
 static INTERRUPT_GEN( mappy_interrupt_1 )
@@ -1573,11 +1573,11 @@ static MACHINE_DRIVER_START( superpac )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(superpac_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(mappy_interrupt_1,1)	// also update the custom I/O chips
+	MDRV_CPU_VBLANK_INT("main", mappy_interrupt_1)	// also update the custom I/O chips
 
 	MDRV_CPU_ADD(M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(superpac_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
@@ -1620,15 +1620,15 @@ static MACHINE_DRIVER_START( phozon )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,	PIXEL_CLOCK/4)	/* MAIN CPU */
 	MDRV_CPU_PROGRAM_MAP(phozon_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(mappy_interrupt_1,1)	// also update the custom I/O chips
+	MDRV_CPU_VBLANK_INT("main", mappy_interrupt_1)	// also update the custom I/O chips
 
 	MDRV_CPU_ADD(M6809,	PIXEL_CLOCK/4)	/* SOUND CPU */
 	MDRV_CPU_PROGRAM_MAP(phozon_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD(M6809,	PIXEL_CLOCK/4)	/* SUB CPU */
 	MDRV_CPU_PROGRAM_MAP(phozon_cpu3_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
@@ -1661,11 +1661,11 @@ static MACHINE_DRIVER_START( mappy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(mappy_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(mappy_interrupt_1,1)	// also update the custom I/O chips
+	MDRV_CPU_VBLANK_INT("main", mappy_interrupt_1)	// also update the custom I/O chips
 
 	MDRV_CPU_ADD(M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(mappy_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */

@@ -110,8 +110,8 @@ static WRITE8_HANDLER( wc90_bankswitch1_w )
 
 static WRITE8_HANDLER( wc90_sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -348,11 +348,11 @@ static MACHINE_DRIVER_START( wc90 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90_readmem1,wc90_writemem1)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90_readmem2,wc90_writemem2)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* 4 MHz ???? */

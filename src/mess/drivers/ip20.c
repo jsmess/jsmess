@@ -17,6 +17,7 @@
 \*********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/mips3.h"
 #include "machine/8530scc.h"
 #include "machine/sgi.h"
@@ -132,7 +133,7 @@ static READ32_HANDLER( hpc_r )
 	case 0x0120:
 		if (!(mem_mask & 0x0000ff00))
 		{
-			return ( wd33c93_r( 0 ) << 8 );
+			return ( wd33c93_r( machine, 0 ) << 8 );
 		}
 		else
 		{
@@ -142,7 +143,7 @@ static READ32_HANDLER( hpc_r )
 	case 0x0124:
 		if (!(mem_mask & 0x0000ff00))
 		{
-			return ( wd33c93_r( 1 ) << 8 );
+			return ( wd33c93_r( machine, 1 ) << 8 );
 		}
 		else
 		{
@@ -176,22 +177,22 @@ static READ32_HANDLER( hpc_r )
 	case 0x0d00:
 		verboselog( 2, "HPC DUART0 Channel B Control Read\n" );
 //      return 0x00000004;
-		return 0x7c; //scc_r(0);
+		return 0x7c; //scc_r(machine, 0);
 		break;
 	case 0x0d04:
 		verboselog( 2, "HPC DUART0 Channel B Data Read\n" );
 //      return 0;
-		return scc_r(2);
+		return scc_r(machine, 2);
 		break;
 	case 0x0d08:
 		verboselog( 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask	 );
 //      return 0x40;
-		return 0x7c; //scc_r(1);
+		return 0x7c; //scc_r(machine, 1);
 		break;
 	case 0x0d0c:
 		verboselog( 2, "HPC DUART0 Channel A Data Read\n" );
 //      return 0;
-		return scc_r(3);
+		return scc_r(machine, 3);
 		break;
 	case 0x0d10:
 //      verboselog( 2, "HPC DUART1 Channel B Control Read\n" );
@@ -308,7 +309,7 @@ static WRITE32_HANDLER( hpc_w )
 		if (!(mem_mask & 0x0000ff00))
 		{
 			verboselog( 2, "HPC SCSI Controller Register Write: %08x\n", ( data >> 8 ) & 0x000000ff );
-			wd33c93_w( 0, ( data >> 8 ) & 0x000000ff );
+			wd33c93_w( machine, 0, ( data >> 8 ) & 0x000000ff );
 		}
 		else
 		{
@@ -319,7 +320,7 @@ static WRITE32_HANDLER( hpc_w )
 		if (!(mem_mask & 0x0000ff00))
 		{
 			verboselog( 2, "HPC SCSI Controller Data Write: %08x\n", ( data >> 8 ) & 0x000000ff );
-			wd33c93_w( 1, ( data >> 8 ) & 0x000000ff );
+			wd33c93_w( machine, 1, ( data >> 8 ) & 0x000000ff );
 		}
 		else
 		{
@@ -382,19 +383,19 @@ static WRITE32_HANDLER( hpc_w )
 		break;
 	case 0x0d00:
 		verboselog( 2, "HPC DUART0 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
-		scc_w(0, data);
+		scc_w(machine, 0, data);
 		break;
 	case 0x0d04:
 		verboselog( 2, "HPC DUART0 Channel B Data Write: %08x (%08x)\n", data, mem_mask );
-		scc_w(2, data);
+		scc_w(machine, 2, data);
 		break;
 	case 0x0d08:
 		verboselog( 2, "HPC DUART0 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
-		scc_w(1, data);
+		scc_w(machine, 1, data);
 		break;
 	case 0x0d0c:
 		verboselog( 2, "HPC DUART0 Channel A Data Write: %08x (%08x)\n", data, mem_mask );
-		scc_w(3, data);
+		scc_w(machine, 3, data);
 		break;
 	case 0x0d10:
 		if( ( data & 0x000000ff ) >= 0x00000020 )
@@ -613,8 +614,7 @@ static MACHINE_DRIVER_START( ip204415 )
 	MDRV_CPU_ADD_TAG( "main", R4600BE, 50000000*3 )
 	MDRV_CPU_CONFIG( config )
 	MDRV_CPU_PROGRAM_MAP( ip204415_map, 0 )
-	MDRV_CPU_VBLANK_INT( ip20_update_chips, 10000 )
-
+	MDRV_CPU_VBLANK_INT_HACK(ip20_update_chips, 10000)
 
 	MDRV_MACHINE_RESET( ip204415 )
 	MDRV_NVRAM_HANDLER(93C56)

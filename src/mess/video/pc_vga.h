@@ -19,10 +19,10 @@ struct pc_vga_interface
 {
 	/* VGA memory mapper */
 	int vga_memory_bank;
-	void (*map_vga_memory)(offs_t begin, offs_t end, read8_handler rh, write8_handler wh);
+	void (*map_vga_memory)(offs_t begin, offs_t end, read8_machine_func rh, write8_machine_func wh);
 
 	/* VGA dipswitch (???) */
-	read8_handler read_dipswitch;
+	read8_machine_func read_dipswitch;
 
 	/* where the ports go */
 	int port_addressspace;

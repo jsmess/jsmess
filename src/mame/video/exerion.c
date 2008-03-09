@@ -93,7 +93,7 @@ PALETTE_INIT( exerion )
 	/* fg chars and sprites */
 	for (i = 0; i < 0x200; i++)
 	{
-		UINT8 ctabentry = 0x10 | (color_prom[(i & 0xc0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f);
+		UINT8 ctabentry = 0x10 | (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f);
 		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
@@ -236,7 +236,7 @@ READ8_HANDLER( exerion_video_timing_r )
  *
  *************************************/
 
-static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x, y;
 

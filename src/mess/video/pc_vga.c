@@ -402,7 +402,7 @@ INLINE WRITE8_HANDLER(vga_dirty_font_w)
 	}
 }
 
-static  READ8_HANDLER(vga_text_r)
+static READ8_HANDLER(vga_text_r)
 {
 	int data;
 	data=vga.memory[((offset&~1)<<1)|(offset&1)];
@@ -412,7 +412,7 @@ static  READ8_HANDLER(vga_text_r)
 
 static WRITE8_HANDLER(vga_text_w)
 {
-	vga_dirty_w(((offset&~1)<<1)|(offset&1),data);
+	vga_dirty_w(machine, ((offset&~1)<<1)|(offset&1),data);
 }
 
 INLINE UINT8 ega_bitplane_to_packed(UINT8 *latch, int number)
@@ -498,13 +498,13 @@ INLINE UINT8 vga_latch_write(int offs, UINT8 data)
 static WRITE8_HANDLER(vga_ega_w)
 {
 	if (vga.sequencer.data[2]&1)
-		vga_dirty_w(offset<<2, vga_latch_write(0,data));
+		vga_dirty_w(machine, offset<<2, vga_latch_write(0,data));
 	if (vga.sequencer.data[2]&2)
-		vga_dirty_w((offset<<2)+1, vga_latch_write(1,data));
+		vga_dirty_w(machine, (offset<<2)+1, vga_latch_write(1,data));
 	if (vga.sequencer.data[2]&4)
-		vga_dirty_font_w((offset<<2)+2, vga_latch_write(2,data));
+		vga_dirty_font_w(machine, (offset<<2)+2, vga_latch_write(2,data));
 	if (vga.sequencer.data[2]&8)
-		vga_dirty_w((offset<<2)+3, vga_latch_write(3,data));
+		vga_dirty_w(machine, (offset<<2)+3, vga_latch_write(3,data));
 	if ((offset==0xffff)&&(data==0)) vga.log=1;
 }
 
@@ -518,21 +518,21 @@ static  READ8_HANDLER(vga_vga_r)
 
 static WRITE8_HANDLER(vga_vga_w)
 {
-	vga_dirty_font_w(((offset&~3)<<2)|(offset&3),data);
+	vga_dirty_font_w(machine, ((offset&~3)<<2)|(offset&3),data);
 }
 
-static READ64_HANDLER( vga_text64_r ) { return read64be_with_read8_handler(vga_text_r, offset, mem_mask); }
-static READ64_HANDLER( vga_vga64_r ) { return read64be_with_read8_handler(vga_vga_r, offset, mem_mask); }
-static WRITE64_HANDLER( vga_text64_w ) { write64be_with_write8_handler(vga_text_w, offset, data, mem_mask); }
-static WRITE64_HANDLER( vga_vga64_w ) { write64be_with_write8_handler(vga_vga_w, offset, data, mem_mask); }
+static READ64_HANDLER( vga_text64_r ) { return read64be_with_read8_handler(vga_text_r, machine, offset, mem_mask); }
+static READ64_HANDLER( vga_vga64_r ) { return read64be_with_read8_handler(vga_vga_r, machine, offset, mem_mask); }
+static WRITE64_HANDLER( vga_text64_w ) { write64be_with_write8_handler(vga_text_w, machine, offset, data, mem_mask); }
+static WRITE64_HANDLER( vga_vga64_w ) { write64be_with_write8_handler(vga_vga_w, machine, offset, data, mem_mask); }
 
 static void vga_cpu_interface(void)
 {
 	static int sequencer, gc;
-	read8_handler read_handler;
-	write8_handler write_handler;
-	read64_handler read_handler64;
-	write64_handler write_handler64;
+	read8_machine_func read_handler;
+	write8_machine_func write_handler;
+	read64_machine_func read_handler64;
+	write64_machine_func write_handler64;
 	UINT8 sel;
 	int buswidth;
 
@@ -573,8 +573,8 @@ static void vga_cpu_interface(void)
 			case 0x00:
 				if (vga.vga_intf.vga_memory_bank != 0)
 				{
-					read_handler = (read8_handler) (FPTR)vga.vga_intf.vga_memory_bank;
-					write_handler = (write8_handler) (FPTR)vga.vga_intf.vga_memory_bank;
+					read_handler = (read8_machine_func) (FPTR)vga.vga_intf.vga_memory_bank;
+					write_handler = (write8_machine_func) (FPTR)vga.vga_intf.vga_memory_bank;
 				}
 				else
 				{
@@ -754,7 +754,7 @@ READ8_HANDLER( vga_port_03b0_r )
 {
 	UINT8 data = 0xff;
 	if (CRTC_PORT_ADDR==0x3b0)
-		data=vga_crtc_r(offset);
+		data=vga_crtc_r(machine, offset);
 	return data;
 }
 
@@ -792,19 +792,19 @@ READ8_HANDLER( vga_port_03c0_r )
 			switch ((vga.miscellaneous_output>>2)&3)
 			{
 				case 3:
-					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(0) & 0x01)
+					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(machine, 0) & 0x01)
 						data |= 0x10;
 					break;
 				case 2:
-					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(0) & 0x02)
+					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(machine, 0) & 0x02)
 						data |= 0x10;
 					break;
 				case 1:
-					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(0) & 0x04)
+					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(machine, 0) & 0x04)
 						data |= 0x10;
 					break;
 				case 0:
-					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(0) & 0x08)
+					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(machine, 0) & 0x08)
 						data |= 0x10;
 					break;
 			}
@@ -886,7 +886,7 @@ READ8_HANDLER(vga_port_03d0_r)
 {
 	UINT8 data = 0xff;
 	if (CRTC_PORT_ADDR == 0x3d0)
-		data = vga_crtc_r(offset);
+		data = vga_crtc_r(machine, offset);
 	return data;
 }
 
@@ -896,7 +896,7 @@ WRITE8_HANDLER( vga_port_03b0_w )
 		logerror("vga_port_03b0_w(): port=0x%04x data=0x%02x\n", offset + 0x3b0, data);
 
 	if (CRTC_PORT_ADDR == 0x3b0)
-		vga_crtc_w(offset, data);
+		vga_crtc_w(machine, offset, data);
 }
 
 WRITE8_HANDLER(vga_port_03c0_w)
@@ -1016,21 +1016,21 @@ WRITE8_HANDLER(vga_port_03d0_w)
 		logerror("vga_port_03d0_w(): port=0x%04x data=0x%02x\n", offset + 0x3d0, data);
 
 	if (CRTC_PORT_ADDR == 0x3d0)
-		vga_crtc_w(offset,data);
+		vga_crtc_w(machine, offset, data);
 }
 
 
 
 READ8_HANDLER( paradise_ega_03c0_r )
 {
-	UINT8 data = vga_port_03c0_r(offset);
+	UINT8 data = vga_port_03c0_r(machine, offset);
 
 	if (offset == 2)
 	{
 		if ( (vga.feature_control&3)==2 ) {
-			data=(data&~0x60)|((vga.vga_intf.read_dipswitch(0)&0xc0)>>1);
+			data=(data&~0x60)|((vga.vga_intf.read_dipswitch(machine, 0)&0xc0)>>1);
 		} else if ((vga.feature_control&3)==1 ) {
-			data=(data&~0x60)|((vga.vga_intf.read_dipswitch(0)&0x30)<<1);
+			data=(data&~0x60)|((vga.vga_intf.read_dipswitch(machine, 0)&0x30)<<1);
 		}
 	}
 	return data;
@@ -1076,13 +1076,13 @@ void pc_vga_reset(void)
 
 
 
-static READ64_HANDLER( vga_port64be_03b0_r ) { return read64be_with_read8_handler(vga_port_03b0_r, offset, mem_mask); }
-static READ64_HANDLER( vga_port64be_03c0_r ) { return read64be_with_read8_handler(vga_port_03c0_r, offset, mem_mask); }
-static READ64_HANDLER( vga_port64be_03d0_r ) { return read64be_with_read8_handler(vga_port_03d0_r, offset, mem_mask); }
+static READ64_HANDLER( vga_port64be_03b0_r ) { return read64be_with_read8_handler(vga_port_03b0_r, machine, offset, mem_mask); }
+static READ64_HANDLER( vga_port64be_03c0_r ) { return read64be_with_read8_handler(vga_port_03c0_r, machine, offset, mem_mask); }
+static READ64_HANDLER( vga_port64be_03d0_r ) { return read64be_with_read8_handler(vga_port_03d0_r, machine, offset, mem_mask); }
 
-static WRITE64_HANDLER( vga_port64be_03b0_w ) { write64be_with_write8_handler(vga_port_03b0_w, offset, data, mem_mask); }
-static WRITE64_HANDLER( vga_port64be_03c0_w ) { write64be_with_write8_handler(vga_port_03c0_w, offset, data, mem_mask); }
-static WRITE64_HANDLER( vga_port64be_03d0_w ) { write64be_with_write8_handler(vga_port_03d0_w, offset, data, mem_mask); }
+static WRITE64_HANDLER( vga_port64be_03b0_w ) { write64be_with_write8_handler(vga_port_03b0_w, machine, offset, data, mem_mask); }
+static WRITE64_HANDLER( vga_port64be_03c0_w ) { write64be_with_write8_handler(vga_port_03c0_w, machine, offset, data, mem_mask); }
+static WRITE64_HANDLER( vga_port64be_03d0_w ) { write64be_with_write8_handler(vga_port_03d0_w, machine, offset, data, mem_mask); }
 
 
 
@@ -1471,11 +1471,11 @@ size_t pc_vga_memory_size(void)
 
 
 
-READ16_HANDLER( vga_port16le_03b0_r ) { return read16le_with_read8_handler(vga_port_03b0_r, offset, mem_mask); }
-READ16_HANDLER( vga_port16le_03c0_r ) { return read16le_with_read8_handler(vga_port_03c0_r, offset, mem_mask); }
-READ16_HANDLER( vga_port16le_03d0_r ) { return read16le_with_read8_handler(vga_port_03d0_r, offset, mem_mask); }
-WRITE16_HANDLER( vga_port16le_03b0_w ) { write16le_with_write8_handler(vga_port_03b0_w, offset, data, mem_mask); }
-WRITE16_HANDLER( vga_port16le_03c0_w ) { write16le_with_write8_handler(vga_port_03c0_w, offset, data, mem_mask); }
-WRITE16_HANDLER( vga_port16le_03d0_w ) { write16le_with_write8_handler(vga_port_03d0_w, offset, data, mem_mask); }
+READ16_HANDLER( vga_port16le_03b0_r ) { return read16le_with_read8_handler(vga_port_03b0_r, machine, offset, mem_mask); }
+READ16_HANDLER( vga_port16le_03c0_r ) { return read16le_with_read8_handler(vga_port_03c0_r, machine, offset, mem_mask); }
+READ16_HANDLER( vga_port16le_03d0_r ) { return read16le_with_read8_handler(vga_port_03d0_r, machine, offset, mem_mask); }
+WRITE16_HANDLER( vga_port16le_03b0_w ) { write16le_with_write8_handler(vga_port_03b0_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER( vga_port16le_03c0_w ) { write16le_with_write8_handler(vga_port_03c0_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER( vga_port16le_03d0_w ) { write16le_with_write8_handler(vga_port_03d0_w, machine, offset, data, mem_mask); }
 
-READ16_HANDLER( paradise_ega16le_03c0_r ) { return read16le_with_read8_handler(paradise_ega_03c0_r, offset, mem_mask); }
+READ16_HANDLER( paradise_ega16le_03c0_r ) { return read16le_with_read8_handler(paradise_ega_03c0_r, machine, offset, mem_mask); }

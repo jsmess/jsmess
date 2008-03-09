@@ -480,11 +480,11 @@ static WRITE8_HANDLER(Dave_sound_w)
 }
 
 
-WRITE8_HANDLER (	Dave_reg_w )
+WRITE8_HANDLER ( Dave_reg_w )
 {
 	logerror("dave w: %04x %02x\n",offset,data);
 
-	Dave_sound_w(offset,data);
+	Dave_sound_w(machine, offset, data);
 
 	dave.Regs[offset & 0x01f] = data;
 

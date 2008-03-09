@@ -546,7 +546,7 @@ static MACHINE_DRIVER_START(exelv)
 	MDRV_CPU_ADD(TMS7000_EXL, 4910000)
 	MDRV_CPU_PROGRAM_MAP(exelv_memmap, 0)
 	MDRV_CPU_IO_MAP(exelv_portmap, 0)
-	MDRV_CPU_VBLANK_INT(exelv_hblank_interrupt, 363)
+	MDRV_CPU_VBLANK_INT_HACK(exelv_hblank_interrupt, 363)
 
 	MDRV_MACHINE_RESET( exelv )
 

@@ -381,7 +381,7 @@ void c16_interrupt (int level)
 	}
 }
 
-static void c16_common_driver_init (void)
+static void c16_common_driver_init (running_machine *machine)
 {
 #ifdef VC1541
 	VC1541_CONFIG vc1541= { 1, 8 };
@@ -392,8 +392,8 @@ static void c16_common_driver_init (void)
 	cpunum_set_info_fct(0, CPUINFO_PTR_M6510_PORTREAD, (genf *) c16_m7501_port_read);
 	cpunum_set_info_fct(0, CPUINFO_PTR_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
 
-	c16_select_roms (0, 0);
-	c16_switch_to_rom (0, 0);
+	c16_select_roms (machine, 0, 0);
+	c16_switch_to_rom (machine, 0, 0);
 
 	if (REAL_C1551) {
 		tpi6525[2].a.read=c1551x_0_read_data;
@@ -441,9 +441,9 @@ static void c16_common_driver_init (void)
 #endif
 }
 
-void c16_driver_init(void)
+void c16_driver_init(running_machine *machine)
 {
-	c16_common_driver_init ();
+	c16_common_driver_init (machine);
 	ted7360_init (C16_PAL);
 	ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 }
@@ -454,13 +454,13 @@ static WRITE8_HANDLER(c16_sidcart_16k)
 	mess_ram[(0x5400 + offset) % mess_ram_size] = data;
 	mess_ram[(0x9400 + offset) % mess_ram_size] = data;
 	mess_ram[(0xd400 + offset) % mess_ram_size] = data;
-	sid6581_0_port_w(offset,data);
+	sid6581_0_port_w(machine, offset,data);
 }
 
 static WRITE8_HANDLER(c16_sidcart_64k)
 {
 	mess_ram[(0xd400 + offset) % mess_ram_size] = data;
-	sid6581_0_port_w(offset,data);
+	sid6581_0_port_w(machine, offset,data);
 }
 
 MACHINE_RESET( c16 )

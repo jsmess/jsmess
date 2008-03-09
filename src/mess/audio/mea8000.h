@@ -9,10 +9,10 @@
 #ifndef MEA8000
 #define MEA8000
 
-extern void mea8000_config ( int channel, write8_handler req_out_func );
+extern void mea8000_config ( running_machine *machine, int channel, write8_machine_func req_out_func );
 
 /* reset by external signal */
-extern void mea8000_reset ( void );
+extern void mea8000_reset ( running_machine *machine );
 
 /* interface to CPU via address/data bus*/
 extern READ8_HANDLER  ( mea8000_r );

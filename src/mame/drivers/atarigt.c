@@ -93,7 +93,7 @@ static void cage_irq_callback(int reason)
 	if (reason)
 		atarigen_sound_int_gen(Machine, 0);
 	else
-		atarigen_sound_int_ack_w(0,0,0);
+		atarigen_sound_int_ack_w(Machine,0,0,0);
 }
 
 
@@ -807,7 +807,7 @@ static MACHINE_DRIVER_START( atarigt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, ATARI_CLOCK_50MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
+	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 	MDRV_CPU_PERIODIC_INT(atarigen_scanline_int_gen, 250)
 
 	MDRV_MACHINE_RESET(atarigt)
@@ -1087,7 +1087,7 @@ static WRITE32_HANDLER( tmek_pf_w )
 	if (pc == 0x25834 || pc == 0x25860)
 		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", activecpu_get_pc(), 0xd72000 + offset*4, data, ~mem_mask, (UINT32)activecpu_get_reg(M68K_A3) - 2);
 
-	atarigen_playfield32_w(offset, data, mem_mask);
+	atarigen_playfield32_w(machine, offset, data, mem_mask);
 }
 
 static DRIVER_INIT( tmek )

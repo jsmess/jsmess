@@ -496,8 +496,8 @@ static int lines;
 static int timer1_active, timer2_active, timer3_active;
 static emu_timer *timer1, *timer2, *timer3;
 static int cursor1 = FALSE;
-static read8_handler vic_dma_read;
-static read8_handler vic_dma_read_rom;
+static read8_machine_func vic_dma_read;
+static read8_machine_func vic_dma_read_rom;
 static int chargenaddr, bitmapaddr, videoaddr;
 
 static int x_begin, x_end;
@@ -540,8 +540,8 @@ void ted7360_init (int pal)
 	timer3 = timer_alloc(ted7360_timer_timeout, NULL);
 }
 
-void ted7360_set_dma (read8_handler dma_read,
-					  read8_handler dma_read_rom)
+void ted7360_set_dma (read8_machine_func dma_read,
+					  read8_machine_func dma_read_rom)
 {
 	vic_dma_read = dma_read;
 	vic_dma_read_rom = dma_read_rom;
@@ -967,9 +967,9 @@ static void ted7360_draw_character (int ybegin, int yend, int ch, int yoff, int 
 	for (y = ybegin; y <= yend; y++)
 	{
 		if (INROM)
-			code = vic_dma_read_rom (chargenaddr + ch * 8 + y);
+			code = vic_dma_read_rom (Machine, chargenaddr + ch * 8 + y);
 		else
-			code = vic_dma_read (chargenaddr + ch * 8 + y);
+			code = vic_dma_read (Machine, chargenaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) = color[code >> 7];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = color[(code >> 6) & 1];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) = color[(code >> 5) & 1];
@@ -989,9 +989,9 @@ static void ted7360_draw_character_multi (int ybegin, int yend, int ch, int yoff
 	for (y = ybegin; y <= yend; y++)
 	{
 		if (INROM)
-			code = vic_dma_read_rom (chargenaddr + ch * 8 + y);
+			code = vic_dma_read_rom (Machine, chargenaddr + ch * 8 + y);
 		else
-			code = vic_dma_read (chargenaddr + ch * 8 + y);
+			code = vic_dma_read (Machine, chargenaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) =
 			*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = multi[code >> 6];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) =
@@ -1010,7 +1010,7 @@ static void ted7360_draw_bitmap (int ybegin, int yend,
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic_dma_read (bitmapaddr + ch * 8 + y);
+		code = vic_dma_read (Machine, bitmapaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) = c16_bitmap[code >> 7];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = c16_bitmap[(code >> 6) & 1];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) = c16_bitmap[(code >> 5) & 1];
@@ -1029,7 +1029,7 @@ static void ted7360_draw_bitmap_multi (int ybegin, int yend,
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic_dma_read (bitmapaddr + ch * 8 + y);
+		code = vic_dma_read (Machine, bitmapaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) =
 			*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = bitmapmulti[code >> 6];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) =
@@ -1118,8 +1118,8 @@ static void ted7360_drawlines (int first, int last)
 		{
 			if (HIRESON)
 			{
-				ch = vic_dma_read ((videoaddr | 0x400) + offs);
-				attr = vic_dma_read (((videoaddr) + offs));
+				ch = vic_dma_read (Machine, (videoaddr | 0x400) + offs);
+				attr = vic_dma_read (Machine, ((videoaddr) + offs));
 				c1 = ((ch >> 4) & 0xf) | (attr << 4);
 				c2 = (ch & 0xf) | (attr & 0x70);
 				bitmapmulti[1] = c16_bitmap[1] = Machine->pens[c1 & 0x7f];
@@ -1135,8 +1135,8 @@ static void ted7360_drawlines (int first, int last)
 			}
 			else
 			{
-				ch = vic_dma_read ((videoaddr | 0x400) + offs);
-				attr = vic_dma_read (((videoaddr) + offs));
+				ch = vic_dma_read (Machine, (videoaddr | 0x400) + offs);
+				attr = vic_dma_read (Machine, ((videoaddr) + offs));
 				// levente harsfalvi's docu says cursor off in ecm and multicolor
 				if (ECMON)
 				{

@@ -186,6 +186,7 @@ $8609 - $860f    High score characters to display to screen for highest score
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 
@@ -340,7 +341,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(tigerh_status_r)
 {
-	return (slapfight_port_00_r(0)&0xf9)| ((tigerh_mcu_status_r(0)));
+	return (slapfight_port_00_r(machine,0)&0xf9)| ((tigerh_mcu_status_r(machine,0)));
 }
 
 static ADDRESS_MAP_START( tigerh_readport, ADDRESS_SPACE_IO, 8 )
@@ -833,7 +834,7 @@ static const struct AY8910interface ay8910_interface_2 =
 
 static VIDEO_EOF( perfrman )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }
 
 static MACHINE_DRIVER_START( perfrman )
@@ -842,11 +843,11 @@ static MACHINE_DRIVER_START( perfrman )
 	MDRV_CPU_ADD(Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(perfrman_readmem,perfrman_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/8)			/* 2MHz ???, 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(perfrman_sound_readmem,perfrman_sound_writemem)
-	MDRV_CPU_VBLANK_INT(getstar_interrupt,4)	/* music speed, verified */
+	MDRV_CPU_VBLANK_INT_HACK(getstar_interrupt,4)	/* music speed, verified */
 
 	MDRV_INTERLEAVE(10)		/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -889,11 +890,11 @@ static MACHINE_DRIVER_START( tigerhb )
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(tigerh_readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,tigerh_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,6)    /* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -935,11 +936,11 @@ static MACHINE_DRIVER_START( tigerh )
 	MDRV_CPU_ADD(Z80, XTAL_36MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tigerh_readmem,writemem)
 	MDRV_CPU_IO_MAP(tigerh_readport,tigerh_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_36MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,6)    /* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
 
 	MDRV_CPU_ADD(M68705,XTAL_36MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
@@ -984,11 +985,11 @@ static MACHINE_DRIVER_START( slapfigh )
 	MDRV_CPU_ADD_TAG("main",Z80, XTAL_36MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_36MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(getstar_interrupt, 3)
+	MDRV_CPU_VBLANK_INT_HACK(getstar_interrupt, 3)
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 

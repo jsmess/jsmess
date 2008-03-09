@@ -69,16 +69,16 @@ VIDEO_UPDATE( funystrp );
 static WRITE16_HANDLER( splash_sh_irqtrigger_w )
 {
 	if (ACCESSING_LSB){
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 
 static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 {
 	if (ACCESSING_LSB){
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 
 	// give the z80 time to see it
@@ -435,12 +435,12 @@ static MACHINE_DRIVER_START( splash )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz (24/2) */
 	MDRV_CPU_PROGRAM_MAP(splash_readmem,splash_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80,30000000/8)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(splash_readmem_sound,splash_writemem_sound)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,64)	/* needed for the msm5205 to play the samples */
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,64)	/* needed for the msm5205 to play the samples */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -482,13 +482,13 @@ static MACHINE_DRIVER_START( roldfrog )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz - verified */
 	MDRV_CPU_PROGRAM_MAP(roldfrog_readmem,roldfrog_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80,3000000)			/* 3 MHz - verified */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(roldf_sound_map,0)
 	MDRV_CPU_IO_MAP(roldf_sound_io_map,0)
-//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,64)  /* needed for the msm5205 to play the samples */
+//  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,64)  /* needed for the msm5205 to play the samples */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -521,12 +521,12 @@ static MACHINE_DRIVER_START( funystrp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz (24/2) */
 	MDRV_CPU_PROGRAM_MAP(funystrp_readmem,funystrp_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 //  MDRV_CPU_ADD(Z80,30000000/8)
 //  /* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(splash_readmem_sound,splash_writemem_sound)
-//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,64)  /* needed for the msm5205 to play the samples */
+//  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,64)  /* needed for the msm5205 to play the samples */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

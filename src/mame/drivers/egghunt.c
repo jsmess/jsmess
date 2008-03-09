@@ -54,7 +54,7 @@ static tilemap *bg_tilemap;
 static UINT8 egghunt_okibanking;
 static UINT8 egghunt_gfx_banking;
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int flipscreen = 0;
 	int offs,sx,sy;
@@ -173,8 +173,8 @@ static WRITE8_HANDLER( egghunt_vidram_bank_w )
 
 static WRITE8_HANDLER( egghunt_soundlatch_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 static READ8_HANDLER( egghunt_okibanking_r )
@@ -389,7 +389,7 @@ static MACHINE_DRIVER_START( egghunt )
 	MDRV_CPU_ADD(Z80,12000000/2)		 /* 6 MHz ?*/
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1) // or 2 like mitchell.c?
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) // or 2 like mitchell.c?
 
 	MDRV_CPU_ADD(Z80,12000000/2)		 /* 6 MHz ?*/
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)

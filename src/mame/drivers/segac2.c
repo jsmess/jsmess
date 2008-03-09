@@ -180,9 +180,9 @@ static READ16_HANDLER( ym3438_r )
 {
 	switch (offset)
 	{
-		case 0: return YM3438_status_port_0_A_r(0);
-		case 1: return YM3438_read_port_0_r(0);
-		case 2: return YM3438_status_port_0_B_r(0);
+		case 0: return YM3438_status_port_0_A_r(machine, 0);
+		case 1: return YM3438_read_port_0_r(machine, 0);
+		case 2: return YM3438_status_port_0_B_r(machine, 0);
 	}
 	return 0xff;
 }
@@ -205,10 +205,10 @@ static WRITE16_HANDLER( ym3438_w )
 
 		switch (offset)
 		{
-			case 0: YM3438_control_port_0_A_w(0, data & 0xff);	last_port = data;	break;
-			case 1: YM3438_data_port_0_A_w(0, data & 0xff);							break;
-			case 2: YM3438_control_port_0_B_w(0, data & 0xff);	last_port = data;	break;
-			case 3: YM3438_data_port_0_B_w(0, data & 0xff);							break;
+			case 0: YM3438_control_port_0_A_w(machine, 0, data & 0xff);	last_port = data;	break;
+			case 1: YM3438_data_port_0_A_w(machine, 0, data & 0xff);							break;
+			case 2: YM3438_control_port_0_B_w(machine, 0, data & 0xff);	last_port = data;	break;
+			case 3: YM3438_data_port_0_B_w(machine, 0, data & 0xff);							break;
 		}
 	}
 }
@@ -372,7 +372,7 @@ static READ16_HANDLER( io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && sound_banks)
-				return (readinputport(offset) & 0xbf) | (upd7759_0_busy_r(0) << 6);
+				return (readinputport(offset) & 0xbf) | (upd7759_0_busy_r(machine,0) << 6);
 			return readinputport(offset);
 
 		/* 'SEGA' protection */
@@ -1365,7 +1365,7 @@ static MACHINE_DRIVER_START( segac )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, XL2_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(genesis_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
 
 	MDRV_MACHINE_START(segac2)
 	MDRV_MACHINE_RESET(segac2)

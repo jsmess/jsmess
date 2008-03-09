@@ -158,6 +158,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 
@@ -186,24 +187,23 @@ VIDEO_UPDATE( kungfut );
 static WRITE8_HANDLER( sound_command_w )
 {
 	static int dsc0=1, dsc1=1;
-
 	switch (offset)
 	{
 		// 0x90 triggers a jump to non-existant address(development system?) and must be filtered
 		case 0x00:
-			if (data != 0x90) soundlatch_w(0, data);
+			if (data != 0x90) soundlatch_w(machine, 0, data);
 		break;
 
 		// explosion sound trigger(analog?)
 		case 0x08:
-			discrete_sound_w(STINGER_BOOM_EN1, dsc1);
-			discrete_sound_w(STINGER_BOOM_EN2, dsc1^=1);
+			discrete_sound_w(machine, STINGER_BOOM_EN1, dsc1);
+			discrete_sound_w(machine, STINGER_BOOM_EN2, dsc1^=1);
 		break;
 
 		// player shot sound trigger(analog?)
 		case 0x0a:
-			discrete_sound_w(STINGER_SHOT_EN1, dsc0);
-			discrete_sound_w(STINGER_SHOT_EN2, dsc0^=1);
+			discrete_sound_w(machine, STINGER_SHOT_EN1, dsc0);
+			discrete_sound_w(machine, STINGER_SHOT_EN2, dsc0^=1);
 		break;
 	}
 }
@@ -706,12 +706,12 @@ static MACHINE_DRIVER_START( wiz )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80, 14318000/8)	/* ? */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)	/* ??? */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

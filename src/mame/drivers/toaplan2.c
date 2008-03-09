@@ -376,10 +376,10 @@ WRITE16_HANDLER( pipibibi_scroll_w );
 
 
 /***************** Sound stuff *****************/
-void dogyuun_okisnd_w(int data);
-void kbash_okisnd_w(int data);
-void fixeight_okisnd_w(int data);
-void batsugun_okisnd_w(int data);
+void dogyuun_okisnd_w(running_machine *machine, int data);
+void kbash_okisnd_w(running_machine *machine, int data);
+void fixeight_okisnd_w(running_machine *machine, int data);
+void batsugun_okisnd_w(running_machine *machine, int data);
 
 
 /***************************************************************************
@@ -655,7 +655,7 @@ static WRITE16_HANDLER( toaplan2_coin_word_w )
 {
 	if (ACCESSING_LSB)
 	{
-		toaplan2_coin_w(offset, data & 0xff);
+		toaplan2_coin_w(machine, offset, data & 0xff);
 	}
 	if (ACCESSING_MSB && (data & 0xff00) )
 	{
@@ -667,7 +667,7 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 {
 	if (ACCESSING_LSB)
 	{
-		toaplan2_coin_w(offset, data & 0xff);
+		toaplan2_coin_w(machine, offset, data & 0xff);
 		OKIM6295_set_bank_base(0, (((data & 0x10) >> 4) * 0x40000));
 	}
 	if (ACCESSING_MSB && (data & 0xff00) )
@@ -721,7 +721,7 @@ static READ16_HANDLER( c2map_port_6_r )
 	}
 	if (mcu_data == 0xff) mcu_data = 0x10;
 	else mcu_data = 0x00;
-	return ( mcu_data | input_port_6_r(0) );
+	return ( mcu_data | input_port_6_r(machine,0) );
 }
 
 static READ16_HANDLER( pipibibi_z80_status_r )
@@ -741,7 +741,7 @@ static READ16_HANDLER( ghox_p1_h_analog_r )
 {
 	INT8 value, new_value;
 
-	new_value = input_port_7_r(0);
+	new_value = input_port_7_r(machine,0);
 	if (new_value == old_p1_paddle_h) return 0;
 	value = new_value - old_p1_paddle_h;
 	old_p1_paddle_h = new_value;
@@ -752,7 +752,7 @@ static READ16_HANDLER( ghox_p2_h_analog_r )
 {
 	INT8 value, new_value;
 
-	new_value = input_port_8_r(0);
+	new_value = input_port_8_r(machine,0);
 	if (new_value == old_p2_paddle_h) return 0;
 	value = new_value - old_p2_paddle_h;
 	old_p2_paddle_h = new_value;
@@ -886,7 +886,7 @@ static WRITE16_HANDLER( dogyuun_snd_cpu_w )
 	if (ACCESSING_LSB)
 	{
 		mcu_data = data;
-		dogyuun_okisnd_w(data);
+		dogyuun_okisnd_w(machine, data);
 	}
 	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),mcu_data);
 }
@@ -905,7 +905,7 @@ static WRITE16_HANDLER( kbash_snd_cpu_w )
 {
 	if (ACCESSING_LSB)
 	{
-		kbash_okisnd_w(data);
+		kbash_okisnd_w(machine, data);
 	}
 	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",activecpu_get_previouspc(),data);
 }
@@ -942,7 +942,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 		if (mcu_data & 0xff00)
 		{
 			mcu_data = (mcu_data & 0xff00) | (data & 0xff);
-			fixeight_okisnd_w(data);
+			fixeight_okisnd_w(machine, data);
 		}
 		else if (mcu_data == 0xff00)
 		{
@@ -986,7 +986,7 @@ static WRITE16_HANDLER( batsugun_snd_cpu_w )
 	if (ACCESSING_LSB)
 	{
 		mcu_data = data;
-		batsugun_okisnd_w(data);
+		batsugun_okisnd_w(machine, data);
 	}
 	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port %02x\n",activecpu_get_previouspc(),mcu_data,(offset*2));
 }
@@ -1050,8 +1050,8 @@ static WRITE16_HANDLER( bgaregga_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(offset, data & 0xff);
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+		soundlatch_w(machine, offset, data & 0xff);
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -1097,26 +1097,26 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 {
-	NMK112_okibank_w(0,  data		& 0x0f);	// chip 0 bank 0
-	NMK112_okibank_w(1, (data >> 4)	& 0x0f);	// chip 0 bank 1
+	NMK112_okibank_w(machine, 0,  data		& 0x0f);	// chip 0 bank 0
+	NMK112_okibank_w(machine, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
 {
-	NMK112_okibank_w(2,  data		& 0x0f);	// chip 0 bank 2
-	NMK112_okibank_w(3, (data >> 4)	& 0x0f);	// chip 0 bank 3
+	NMK112_okibank_w(machine, 2,  data		& 0x0f);	// chip 0 bank 2
+	NMK112_okibank_w(machine, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
 {
-	NMK112_okibank_w(4,  data		& 0x0f);	// chip 1 bank 0
-	NMK112_okibank_w(5, (data >> 4)	& 0x0f);	// chip 1 bank 1
+	NMK112_okibank_w(machine, 4,  data		& 0x0f);	// chip 1 bank 0
+	NMK112_okibank_w(machine, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 {
-	NMK112_okibank_w(6,  data		& 0x0f);	// chip 1 bank 2
-	NMK112_okibank_w(7, (data >> 4)	& 0x0f);	// chip 1 bank 3
+	NMK112_okibank_w(machine, 6,  data		& 0x0f);	// chip 1 bank 2
+	NMK112_okibank_w(machine, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
 }
 
 
@@ -1178,8 +1178,8 @@ static WRITE16_HANDLER( batrider_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(offset, data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+		soundlatch_w(machine, offset, data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1188,8 +1188,8 @@ static WRITE16_HANDLER( batrider_soundlatch2_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch2_w(offset, data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+		soundlatch2_w(machine, offset, data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -3297,7 +3297,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if HD64x180
 	MDRV_CPU_ADD(Z180, 10000000)			/* HD647180 CPU actually */
@@ -3336,7 +3336,7 @@ static MACHINE_DRIVER_START( ghox )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_10MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ghox_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if HD64x180
 	MDRV_CPU_ADD(Z180, XTAL_10MHz)			/* HD647180 CPU actually */
@@ -3374,7 +3374,7 @@ static MACHINE_DRIVER_START( dogyuun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_25MHz/2)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(dogyuun_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if V25
 	MDRV_CPU_ADD(Z180, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
@@ -3417,7 +3417,7 @@ static MACHINE_DRIVER_START( kbash )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)			/* 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(kbash_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if V25
 	MDRV_CPU_ADD(Z180, 16000000)			/* NEC V25+ type Toaplan marked CPU ??? */
@@ -3459,7 +3459,7 @@ static MACHINE_DRIVER_START( kbash2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)			/* 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(kbash2_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3497,7 +3497,7 @@ static MACHINE_DRIVER_START( truxton2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_16MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(truxton2_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq2,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3534,7 +3534,7 @@ static MACHINE_DRIVER_START( pipibibs )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_10MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pipibibs_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	MDRV_CPU_ADD(Z80,XTAL_27MHz/8)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
@@ -3573,7 +3573,7 @@ static MACHINE_DRIVER_START( whoopee )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	MDRV_CPU_ADD(Z80, 27000000/8)			/* This should be a HD647180 */
 											/* Change this to 10MHz when HD647180 gets dumped. 10MHz Oscillator */
@@ -3613,7 +3613,7 @@ static MACHINE_DRIVER_START( pipibibi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(pipibibi_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	MDRV_CPU_ADD(Z80,27000000/8)			/* ??? 3.37MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
@@ -3652,7 +3652,7 @@ static MACHINE_DRIVER_START( fixeight )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_16MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fixeight_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if V25
 	MDRV_CPU_ADD(Z180, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
@@ -3695,7 +3695,7 @@ static MACHINE_DRIVER_START( fixeighb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(fixeighb_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq2,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3729,7 +3729,7 @@ static MACHINE_DRIVER_START( vfive )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(vfive_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if V25
 	MDRV_CPU_ADD(Z180, 10000000)			/* NEC V25+ type Toaplan marked CPU ??? */
@@ -3768,7 +3768,7 @@ static MACHINE_DRIVER_START( batsugun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batsugun_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if V25
 	MDRV_CPU_ADD(Z180, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
@@ -3811,7 +3811,7 @@ static MACHINE_DRIVER_START( snowbro2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(snowbro2_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3848,7 +3848,7 @@ static MACHINE_DRIVER_START( mahoudai )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(mahoudai_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
@@ -3890,7 +3890,7 @@ static MACHINE_DRIVER_START( shippumd )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(shippumd_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
@@ -3932,7 +3932,7 @@ static MACHINE_DRIVER_START( bgaregga )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem, 0)
@@ -3974,7 +3974,7 @@ static MACHINE_DRIVER_START( batrider )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batrider_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq2,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
 
 	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batrider_sound_z80_mem, 0)
@@ -4019,7 +4019,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)
 	MDRV_CPU_PROGRAM_MAP(bbakraid_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq1,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq1)
 
 	MDRV_CPU_ADD(Z80,32000000/4)
 	MDRV_CPU_PROGRAM_MAP(bbakraid_sound_z80_mem, 0)

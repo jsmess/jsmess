@@ -53,27 +53,27 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 		switch (offset)
 		{
 			case 0x000:
-				rv = input_port_10_r(0) & 0x80;
+				rv = readinputport(10) & 0x80;
 				logerror("TAPE: Read %02x from 0x40%02x - XOR Data?\n",rv,offset);
 				break;
 			case 0x001:
-				rv = (input_port_10_r(0) & 0x40) << 1;
+				rv = (readinputport(10) & 0x40) << 1;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 1?\n",rv,offset);
 				break;
 			case 0x002:
-				rv = (input_port_10_r(0) & 0x20) << 2;
+				rv = (readinputport(10) & 0x20) << 2;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
 				break;
 			case 0x003:
-				rv = (input_port_10_r(0) & 0x10) << 3;
+				rv = (readinputport(10) & 0x10) << 3;
 				logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
 				break;
 			case 0x004:
-				rv = (input_port_10_r(0) & 0x08) << 4;
+				rv = (readinputport(10) & 0x08) << 4;
 				logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
 				break;
 			case 0x005:
-				rv = (input_port_10_r(0) & 0x04) << 5;
+				rv = (readinputport(10) & 0x04) << 5;
 				logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
 				break;
 			case 0x006:
@@ -93,25 +93,25 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 			case 0x060:	/* Keyboard Read */
 				rv = 0xff;
 				if (intvkbd_keyboard_col == 0)
-					rv = input_port_0_r(0);
+					rv = readinputport(0);
 				if (intvkbd_keyboard_col == 1)
-					rv = input_port_1_r(0);
+					rv = readinputport(1);
 				if (intvkbd_keyboard_col == 2)
-					rv = input_port_2_r(0);
+					rv = readinputport(2);
 				if (intvkbd_keyboard_col == 3)
-					rv = input_port_3_r(0);
+					rv = readinputport(3);
 				if (intvkbd_keyboard_col == 4)
-					rv = input_port_4_r(0);
+					rv = readinputport(4);
 				if (intvkbd_keyboard_col == 5)
-					rv = input_port_5_r(0);
+					rv = readinputport(5);
 				if (intvkbd_keyboard_col == 6)
-					rv = input_port_6_r(0);
+					rv = readinputport(6);
 				if (intvkbd_keyboard_col == 7)
-					rv = input_port_7_r(0);
+					rv = readinputport(7);
 				if (intvkbd_keyboard_col == 8)
-					rv = input_port_8_r(0);
+					rv = readinputport(8);
 				if (intvkbd_keyboard_col == 9)
-					rv = input_port_9_r(0);
+					rv = readinputport(9);
 				break;
 			case 0x80:
 				rv = 0x00;
@@ -140,7 +140,7 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 			case 0xce:
 			case 0xcf:
 				/* TMS9927 regs */
-				rv = intvkbd_tms9927_r(offset-0xc0);
+				rv = intvkbd_tms9927_r(machine, offset-0xc0);
 				break;
 			default:
 				rv = (intvkbd_dualport_ram[offset]&0x0300)>>8;
@@ -258,7 +258,7 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 			case 0xce:
 			case 0xcf:
 				/* TMS9927 regs */
-				intvkbd_tms9927_w(offset-0xc0, data);
+				intvkbd_tms9927_w(machine, offset-0xc0, data);
 				break;
 			default:
 				logerror("%04X: Unknown write %02x to 0x40%02x\n",activecpu_get_pc(),data,offset);
@@ -459,13 +459,13 @@ static const UINT8 controller_table[] =
 		switch(byte)
 		{
 			case 0:
-				value = input_port_0_r(0);
+				value = readinputport(0);
 				break;
 			case 1:
-				value = input_port_1_r(0);
+				value = readinputport(1);
 				break;
 			case 2:
-				value = input_port_2_r(0);
+				value = readinputport(2);
 				break;
 		}
 		for(bit=7; bit>=0; bit--)

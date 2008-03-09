@@ -89,8 +89,8 @@ static int jpeg_y=0;
 static int tmp_counter;
 static int clr_offset=0;
 
-static mame_bitmap *sliver_bitmap_fg;
-static mame_bitmap *sliver_bitmap_bg;
+static bitmap_t *sliver_bitmap_fg;
+static bitmap_t *sliver_bitmap_bg;
 
 static UINT16 tempbuf[8];
 
@@ -385,8 +385,8 @@ static WRITE16_HANDLER(io_data_w)
 
 static WRITE16_HANDLER(sound_w)
 {
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1, I8051_INT0_LINE, HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1, I8051_INT0_LINE, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( sliver_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -533,7 +533,7 @@ static INTERRUPT_GEN( sliver_int )
 static MACHINE_DRIVER_START( sliver )
 	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(sliver_map,0)
-	MDRV_CPU_VBLANK_INT(sliver_int,3)
+	MDRV_CPU_VBLANK_INT_HACK(sliver_int,3)
 
 	MDRV_CPU_ADD(I8051, 8000000)
 	MDRV_CPU_PROGRAM_MAP(soundmem_prg,0)

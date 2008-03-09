@@ -92,13 +92,13 @@ static READ32_HANDLER( gunbustr_input_r )
 	{
 		case 0x00:
 		{
-			return (input_port_0_word_r(0,0) << 16) | input_port_1_word_r(0,0) |
+			return (input_port_0_word_r(machine,0,0) << 16) | input_port_1_word_r(machine,0,0) |
 				  (EEPROM_read_bit() << 7);
 		}
 
 		case 0x01:
 		{
-			return input_port_2_word_r(0,0) | (coin_word << 16);
+			return input_port_2_word_r(machine,0,0) | (coin_word << 16);
 		}
  	}
 logerror("CPU #0 PC %06x: read input %06x\n",activecpu_get_pc(),offset);
@@ -126,7 +126,7 @@ popmessage(t);
 		{
 			if (ACCESSING_MSB32)	/* $400000 is watchdog */
 			{
-				watchdog_reset_w(0,data >> 24);
+				watchdog_reset(machine);
 			}
 
 			if (ACCESSING_LSB32)
@@ -175,8 +175,8 @@ static WRITE32_HANDLER( motor_control_w )
 
 static READ32_HANDLER( gunbustr_gun_r )
 {
-	return ( input_port_3_word_r(0,0) << 24) | (input_port_4_word_r(0,0) << 16) |
-		 ( input_port_5_word_r(0,0) << 8)  |  input_port_6_word_r(0,0);
+	return ( input_port_3_word_r(machine,0,0) << 24) | (input_port_4_word_r(machine,0,0) << 16) |
+		 ( input_port_5_word_r(machine,0,0) << 8)  |  input_port_6_word_r(machine,0,0);
 }
 
 static WRITE32_HANDLER( gunbustr_gun_w )
@@ -377,7 +377,7 @@ static MACHINE_DRIVER_START( gunbustr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(gunbustr_readmem,gunbustr_writemem)
-	MDRV_CPU_VBLANK_INT(gunbustr_interrupt,1) /* VBL */
+	MDRV_CPU_VBLANK_INT("main", gunbustr_interrupt) /* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 

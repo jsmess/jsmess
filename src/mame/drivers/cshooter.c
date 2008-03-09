@@ -95,7 +95,7 @@ static UINT8 *mainram;
 
 static void ar_coin_hack(void)
 {
-	if(input_port_5_r(0)&1)
+	if(input_port_5_r(Machine,0)&1)
 	{
 		if(coin_stat==0)
 		{
@@ -221,8 +221,7 @@ static READ8_HANDLER ( cshooter_coin_r )
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
        Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
-
-	return ( (cshooter_counter++ & 1) ? 0xff : input_port_5_r(0) );
+	return ( (cshooter_counter++ & 1) ? 0xff : input_port_5_r(machine,0) );
 }
 
 static WRITE8_HANDLER ( cshooter_c500_w )
@@ -473,7 +472,7 @@ static MACHINE_DRIVER_START( cshooter )
 	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(cshooter_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
 	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(s_readmem,s_writemem)
@@ -502,7 +501,7 @@ static MACHINE_DRIVER_START( airraid )
 	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(arreadmem,arwritemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(cshooter_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
 	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(s2_readmem,s2_writemem)

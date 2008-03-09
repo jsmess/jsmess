@@ -87,7 +87,7 @@ static const int f1dream_2450_lookup[32] = {
 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0, 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0,
 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0, 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0 };
 
-static void f1dream_protection_w(void)
+static void f1dream_protection_w(running_machine *machine)
 {
 	int indx;
 	int value = 255;
@@ -146,20 +146,20 @@ static void f1dream_protection_w(void)
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		soundlatch_w(2,ram16[0x3ffc/2]);
+		soundlatch_w(machine,2,ram16[0x3ffc/2]);
 	}
 }
 
 static WRITE16_HANDLER( f1dream_control_w )
 {
 	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",activecpu_get_pc(), ram16[0x3fe0/2]);
-	f1dream_protection_w();
+	f1dream_protection_w(machine);
 }
 
 static WRITE16_HANDLER( tigeroad_soundcmd_w )
 {
 	if (ACCESSING_MSB)
-		soundlatch_w(offset,data >> 8);
+		soundlatch_w(machine,offset,data >> 8);
 }
 
 static WRITE8_HANDLER( msm5205_w )
@@ -549,7 +549,7 @@ static MACHINE_DRIVER_START( tigeroad )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 6000000) /* ? Main clock is 24MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */    /* 4 MHz ??? */
@@ -577,11 +577,11 @@ static MACHINE_DRIVER_START( tigeroad )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3579545)
+	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(YM2203, 3579545)
+	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

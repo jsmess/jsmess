@@ -776,14 +776,14 @@ WRITE8_HANDLER( adam_memory_map_controller_w )
     //logerror("Configurando la memoria, L:%02xh, U:%02xh\n", adam_lower_memory, adam_upper_memory);
 }
 
- READ8_HANDLER(adam_video_r)
+READ8_HANDLER(adam_video_r)
 {
-    return ((offset&0x01) ? TMS9928A_register_r(1) : TMS9928A_vram_r(0));
+    return ((offset&0x01) ? TMS9928A_register_r(machine, 1) : TMS9928A_vram_r(machine, 0));
 }
 
 WRITE8_HANDLER(adam_video_w)
 {
-    (offset&0x01) ? TMS9928A_register_w(1, data) : TMS9928A_vram_w(0, data);
+    (offset&0x01) ? TMS9928A_register_w(machine, 1, data) : TMS9928A_vram_w(machine, 0, data);
 }
 
  READ8_HANDLER( master6801_ram_r )

@@ -72,7 +72,7 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 				ffcount--;
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
-				soundlatch_w(0, latch_data);
+				soundlatch_w(machine, 0, latch_data);
 				cpunum_set_input_line(machine, 2, DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;
@@ -392,11 +392,11 @@ static MACHINE_DRIVER_START( bwing )
 	// basic machine hardware
 	MDRV_CPU_ADD(M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp1_readmem, bwp1_writemem)
-	MDRV_CPU_VBLANK_INT(bwp1_interrupt, 3)
+	MDRV_CPU_VBLANK_INT_HACK(bwp1_interrupt, 3)
 
 	MDRV_CPU_ADD(M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp2_readmem, bwp2_writemem)
-//  MDRV_CPU_VBLANK_INT(irq1_line_assert, 1) // vblank triggers FIRQ on CPU2 by design (unused)
+//  MDRV_CPU_VBLANK_INT("main", irq1_line_assert) // vblank triggers FIRQ on CPU2 by design (unused)
 
 	MDRV_CPU_ADD(DECO16, 2000000)
 	/* audio CPU */

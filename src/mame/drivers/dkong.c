@@ -249,15 +249,63 @@ Changes:
     Jul 27 99 Chad Hendrickson
     * Added cocktail mode flipscreen
 
+Donkey Kong Junior Notes
+========================
+
+    DJR-03  Donkey Kong Modification Kits                 02-23-83
+    --------------------------------------------------------------
+    Nintendo Service Department Bulletin # DJR-03         02-23-83
+    GAME: Donkey Kong Junior
+    SUBJECT: Play Time
+
+    It has come to our attention that play time on Donkey Kong
+    Junior is, in some cases, excessive, while in other cases
+    there is concern over the ability of players to learn the
+    game and thereby retain an interest in playing.
+
+    We are making available, through our Nintendo Distributors,
+    two EPROM change kits, designated DJR1-E and DJR1-P.
+
+    The E kit consists of four (4) chips and is an easier version
+    of the program.  it presents the board sequence in a way which
+    familiarizes the players with the game faster.  The board
+    order is vines, springboard, Mario's hideout and keys.
+
+    The P kit is a more difficult version consisting of two chips.
+    The order remains the same while more and faster
+    obstacles (snapjaws, nitpickers, etc.) are presented.
+    --------------------------------------------------------------
+
+    E-Kit - roms
+    ------------------------------------------------
+    Filename    Label          Type   Loc/PCB  CSum
+    ----------- -------------- ------ -------  ---- --
+    2732.5Ae    DJR1-C-5A e    2732   5A(CPU)  68E9
+    2764.5Be    DJR1-C-5B e    2764   5B(CPU)  B0CF
+    2764.5Ce    DJR1-C-5C e    2764   5C(CPU)  FC64
+    2764.5Ee    DJR1-C-5E e    2764   5E(CPU)  7CC6
+    ------------------------------------------------
+
+    P-Kit roms (Still looking for these, suffix is
+    more than likely P. :)
+    ------------------------------------------------
+    Filename    Label          Type   Loc/PCB  CSum
+    ----------- -------------- ------ -------  ---- --
+    empty       ---------      ----   5A(CPU)  ----
+    2764.5Bp    DJR1-C-5B p    2764   5B(CPU)  1B58
+    2764.5Cp    DJR1-C-5C p    2764   5C(CPU)  F4FE
+    ------------------------------------------------
+
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/dkong.h"
 #include "machine/8257dma.h"
 #include "machine/z80dma.h"
+
+#include "deprecat.h"
 
 /*************************************
  *
@@ -278,8 +326,8 @@ static UINT8 hb_dma_read_byte(int channel, offs_t offset);
 static void hb_dma_write_byte(int channel, offs_t offset, UINT8 data);
 static UINT8 dk_dma_read_byte(int channel, offs_t offset);
 static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data);
-static UINT8 dk3_dma_read_byte(offs_t offset);
-static void dk3_dma_write_byte(offs_t offset, UINT8 data);
+static Z80DMA_READ(dk3_dma_read_byte);
+static Z80DMA_WRITE(dk3_dma_write_byte);
 static UINT8 p8257_ctl_r(void);
 static void p8257_ctl_w(UINT8 data);
 
@@ -289,7 +337,7 @@ static void p8257_ctl_w(UINT8 data);
  *
  *************************************/
 
-static const struct z80dma_interface dk3_dma =
+static z80dma_interface dk3_dma =
 {
 	0,
 	CLOCK_1H,
@@ -395,23 +443,14 @@ static MACHINE_START( radarsc1 )
 
 static MACHINE_START( dkong3 )
 {
-	MACHINE_START_CALL(dkong2b);
-	z80dma_init(1);
-	z80dma_config(0, &dk3_dma);
+	dkong_state *state = machine->driver_data;
+
+	state->hardware_type = HARDWARE_TKG04;
 }
 
 static MACHINE_RESET( dkong )
 {
-
 	dma8257_reset();
-
-}
-
-static MACHINE_RESET( dkong3 )
-{
-
-	z80dma_reset();
-
 }
 
 static MACHINE_RESET( strtheat )
@@ -464,7 +503,7 @@ static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data)
 	cpuintrf_pop_context();
 }
 
-static UINT8 dk3_dma_read_byte(offs_t offset)
+static Z80DMA_READ( dk3_dma_read_byte )
 {
 	UINT8 result;
 
@@ -475,7 +514,7 @@ static UINT8 dk3_dma_read_byte(offs_t offset)
 	return result;
 }
 
-static void dk3_dma_write_byte(offs_t offset, UINT8 data)
+static Z80DMA_WRITE( dk3_dma_write_byte )
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset, data);
@@ -566,7 +605,7 @@ static READ8_HANDLER( dkong_in2_r )
 		dkongjr_snd_w2(ui_snd-8, (readinputportbytag("TST") & 0x02)>>1);
 #endif
 
-	r = (readinputportbytag("IN2") & 0xBF) | (dkong_audio_status_r(0) << 6);
+	r = (readinputportbytag("IN2") & 0xBF) | (dkong_audio_status_r(machine,0) << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coint */
@@ -594,7 +633,7 @@ static WRITE8_HANDLER( hunchbkd_mirror_w )
 
 static READ8_HANDLER( epos_decrypt_rom )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	if (offset & 0x01)
 	{
@@ -623,14 +662,14 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 static WRITE8_HANDLER( hunchbkd_data_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	state->hunchloopback = data;
 }
 
 static READ8_HANDLER( hunchbkd_port0_r )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 #if DEBUG_PROTECTION
 	logerror("port 0 : pc = %4x\n",activecpu_get_pc());
 #endif
@@ -647,7 +686,7 @@ static READ8_HANDLER( hunchbkd_port0_r )
 
 static READ8_HANDLER( hunchbkd_port1_r )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	return state->hunchloopback;
 }
@@ -701,13 +740,13 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
 	{
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -1558,7 +1597,7 @@ static MACHINE_DRIVER_START( dkong_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, CLOCK_1H)
 	MDRV_CPU_PROGRAM_MAP(dkong_map, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong2b)
 	MDRV_MACHINE_RESET(dkong)
@@ -1625,7 +1664,7 @@ static MACHINE_DRIVER_START( hunchbkd )
 	MDRV_CPU_REPLACE("main", S2650, CLOCK_1H / 2)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(hunchbkd_map, 0)
 	MDRV_CPU_IO_MAP(hunchbkd_io_map, 0)
-	MDRV_CPU_VBLANK_INT(hunchbkd_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", hunchbkd_interrupt)
 
 	MDRV_MACHINE_START(hunchbkd)
 
@@ -1640,10 +1679,12 @@ static MACHINE_DRIVER_START( dkong3 )
 	MDRV_CPU_ADD_TAG("main", Z80, XTAL_8MHz / 2)	/* verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(dkong3_map, 0)
 	MDRV_CPU_IO_MAP(0, dkong3_io_map)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong3)
-	MDRV_MACHINE_RESET(dkong3)
+
+	MDRV_DEVICE_ADD(Z80DMA_DEV_0_TAG, Z80DMA)
+	MDRV_DEVICE_CONFIG(dk3_dma)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2113,7 +2154,7 @@ ROM_START( dkongjrb )
 	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )	/* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( dkngjnrb )
+ROM_START( dkongjre )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "djr1-c.5b",    0x0000, 0x1000, CRC(ffe9e1a5) SHA1(715dc79d85169b4c1faf43458592e69b434afefd) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
@@ -2807,7 +2848,7 @@ GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr,        0,  ROT90, "Nintendo o
 GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkngjnrj, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo", "Donkey Kong Junior (Japan?)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrb, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkngjnrb, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjre, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (Easy)", GAME_SUPPORTS_SAVE )
 
 GAME( 1983, dkong3,   0,        dkong3,   dkong3,         0,  ROT90, "Nintendo of America", "Donkey Kong 3 (US)", GAME_SUPPORTS_SAVE )
 GAME( 1983, dkong3j,  dkong3,   dkong3,   dkong3,         0,  ROT90, "Nintendo", "Donkey Kong 3 (Japan)", GAME_SUPPORTS_SAVE )

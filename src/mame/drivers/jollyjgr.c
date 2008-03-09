@@ -279,7 +279,7 @@ static VIDEO_START( jollyjgr )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void draw_bitmap(mame_bitmap *bitmap)
+static void draw_bitmap(bitmap_t *bitmap)
 {
 	int x,y,count;
 	int i, bit0, bit1, bit2;
@@ -400,7 +400,7 @@ static INTERRUPT_GEN( jollyjgr_interrupt )
 static MACHINE_DRIVER_START( jollyjgr )
 	MDRV_CPU_ADD(Z80, 3579545)		 /* 3,579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(jollyjgr_map,0)
-	MDRV_CPU_VBLANK_INT(jollyjgr_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", jollyjgr_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

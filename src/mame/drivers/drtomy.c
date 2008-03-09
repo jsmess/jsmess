@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_tile_info_bg )
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i, x, y, ex, ey;
 	const gfx_element *gfx = machine->gfx[0];
@@ -252,7 +252,7 @@ static MACHINE_DRIVER_START( drtomy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)			/* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(drtomy_map,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -1081,6 +1081,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( taitojc )
 	PORT_START
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN4)
@@ -1114,6 +1115,7 @@ static INPUT_PORTS_START( taitojc )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON8)
 
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( dendeg )
 	PORT_START
@@ -1271,7 +1273,7 @@ static INTERRUPT_GEN( taitojc_int6 )
 static MACHINE_DRIVER_START( taitojc )
 	MDRV_CPU_ADD(M68040, 25000000)
 	MDRV_CPU_PROGRAM_MAP(taitojc_map, 0)
-	MDRV_CPU_VBLANK_INT(taitojc_vblank, 1)
+	MDRV_CPU_VBLANK_INT("main", taitojc_vblank)
 	MDRV_CPU_PERIODIC_INT(taitojc_int6, 1000)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)

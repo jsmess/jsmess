@@ -43,6 +43,7 @@
 #define BLITTER_NASTY_DELAY			16
 
 
+
 /*************************************
  *
  *  Type definitions
@@ -178,6 +179,9 @@ static void amiga_cia_0_irq(int state);
 static void amiga_cia_1_irq(int state);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
+static TIMER_CALLBACK( scanline_callback );
+
+
 
 /*************************************
  *
@@ -245,6 +249,7 @@ static void amiga_chip_ram32_w(offs_t offset, UINT16 data)
 		amiga_chip_ram32[offset / 4] = dat;
 	}
 }
+
 
 
 /*************************************
@@ -315,7 +320,7 @@ static void amiga_m68k_reset(void)
 	}
 	else
 	{
-		amiga_cia_w(0x1001/2, 1, 0);
+		amiga_cia_w(Machine, 0x1001/2, 1, 0);
 	}
 
 	if (activecpu_get_pc() < 0x80000)
@@ -340,12 +345,15 @@ MACHINE_RESET( amiga )
 	}
 	else
 	{
-		amiga_cia_w(0x1001/2, 1, 0);
+		amiga_cia_w(machine, 0x1001/2, 1, 0);
 	}
 
 	/* call the system-specific callback */
 	if (amiga_intf->reset_callback)
 		(*amiga_intf->reset_callback)();
+
+	/* start the scanline timer */
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, scanline_callback);
 }
 
 
@@ -356,15 +364,15 @@ MACHINE_RESET( amiga )
  *
  *************************************/
 
-INTERRUPT_GEN( amiga_scanline_callback )
+static TIMER_CALLBACK( scanline_callback )
 {
-	int scanline = machine->screen[0].height - 1 - cpu_getiloops();
+	int scanline = param;
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)
 	{
 		/* signal VBLANK IRQ */
-		amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_VERTB, 0);
+		amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_VERTB, 0);
 
 		/* clock the first CIA TOD */
 		cia_clock_tod(0);
@@ -377,11 +385,18 @@ INTERRUPT_GEN( amiga_scanline_callback )
 	/* on every scanline, clock the second CIA TOD */
 	cia_clock_tod(1);
 
-	/* render this scanline */
-	amiga_render_scanline(scanline);
+	/* render up to this scanline */
+	if (scanline < machine->screen[0].visarea.min_y)
+		amiga_render_scanline(machine, NULL, scanline);
+	else
+		video_screen_update_partial(0, scanline);
 
 	/* force a sound update */
 	amiga_audio_update();
+
+	/* set timer for next line */
+	scanline = (scanline + 1) % machine->screen[0].height;
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, scanline_callback);
 }
 
 
@@ -432,11 +447,14 @@ static void update_irqs(void)
 		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
 }
 
+
 static TIMER_CALLBACK( amiga_irq_proc )
 {
 	update_irqs();
 	timer_reset( amiga_irq_timer, attotime_never);
 }
+
+
 
 /*************************************
  *
@@ -966,7 +984,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	/* signal an interrupt */
-	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_BLIT, 0);
+	amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_BLIT, 0);
 
 	/* reset the blitter timer */
 	timer_reset( amiga_blitter_timer, attotime_never);
@@ -1119,13 +1137,13 @@ WRITE16_HANDLER( amiga_cia_w )
 
 static void amiga_cia_0_irq(int state)
 {
-	amiga_custom_w(REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0);
+	amiga_custom_w(Machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0);
 }
 
 
 static void amiga_cia_1_irq(int state)
 {
-	amiga_custom_w(REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0);
+	amiga_custom_w(Machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0);
 }
 
 
@@ -1270,7 +1288,7 @@ static TIMER_CALLBACK( finish_serial_write )
 	CUSTOM_REG(REG_SERDATR) |= 0x3000;
 
 	/* signal an interrupt */
-	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_TBE, 0);
+	amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_TBE, 0);
 }
 
 
@@ -1506,7 +1524,7 @@ void amiga_serial_in_w(UINT16 data)
 	}
 
 	/* signal an interrupt */
-	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_RBF, 0);
+	amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_RBF, 0);
 }
 
 

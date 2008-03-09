@@ -26,6 +26,7 @@ Changes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/coupe.h"
 #include "machine/wd17xx.h"
@@ -159,19 +160,19 @@ static READ8_HANDLER( coupe_port_r )
 	case DSK1_PORT+0:	/* This covers the total range of ports for 1 floppy controller */
     case DSK1_PORT+4:
 		wd17xx_set_side((offset >> 2) & 1);
-		return wd17xx_status_r(0);
+		return wd17xx_status_r(machine, 0);
 	case DSK1_PORT+1:
     case DSK1_PORT+5:
 		wd17xx_set_side((offset >> 2) & 1);
-        return wd17xx_track_r(0);
+        return wd17xx_track_r(machine, 0);
 	case DSK1_PORT+2:
     case DSK1_PORT+6:
 		wd17xx_set_side((offset >> 2) & 1);
-        return wd17xx_sector_r(0);
+        return wd17xx_sector_r(machine, 0);
 	case DSK1_PORT+3:
 	case DSK1_PORT+7:
 		wd17xx_set_side((offset >> 2) & 1);
-        return wd17xx_data_r(0);
+        return wd17xx_data_r(machine, 0);
 	case LPEN_PORT:
 		return LPEN;
 	case STAT_PORT:
@@ -200,7 +201,7 @@ static WRITE8_HANDLER( coupe_port_w )
 	if (offset==SSND_ADDR)						// Set sound address
 	{
 		SOUND_ADDR=data&0x1F;					// 32 registers max
-		saa1099_control_port_0_w(0, SOUND_ADDR);
+		saa1099_control_port_0_w(machine, 0, SOUND_ADDR);
         return;
 	}
 
@@ -209,25 +210,25 @@ static WRITE8_HANDLER( coupe_port_w )
 	case DSK1_PORT+0:							// This covers the total range of ports for 1 floppy controller
     case DSK1_PORT+4:
 		wd17xx_set_side((offset >> 2) & 1);
-        wd17xx_command_w(0, data);
+        wd17xx_command_w(machine, 0, data);
 		break;
     case DSK1_PORT+1:
     case DSK1_PORT+5:
 		/* Track byte requested on address line */
 		wd17xx_set_side((offset >> 2) & 1);
-        wd17xx_track_w(0, data);
+        wd17xx_track_w(machine, 0, data);
 		break;
     case DSK1_PORT+2:
     case DSK1_PORT+6:
 		/* Sector byte requested on address line */
 		wd17xx_set_side((offset >> 2) & 1);
-        wd17xx_sector_w(0, data);
+        wd17xx_sector_w(machine, 0, data);
         break;
     case DSK1_PORT+3:
 	case DSK1_PORT+7:
 		/* Data byte requested on address line */
 		wd17xx_set_side((offset >> 2) & 1);
-        wd17xx_data_w(0, data);
+        wd17xx_data_w(machine, 0, data);
 		break;
 	case CLUT_PORT:
 		CLUT[(offset >> 8)&0x0F]=data&0x7F;		// set CLUT data
@@ -252,7 +253,7 @@ static WRITE8_HANDLER( coupe_port_w )
 		speaker_level_w(0,(data>>4) & 0x01);
 		break;
     case SSND_DATA:
-		saa1099_write_port_0_w(0, data);
+		saa1099_write_port_0_w(machine, 0, data);
 		SOUND_REG[SOUND_ADDR] = data;
 		break;
     default:
@@ -407,7 +408,7 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_CPU_ADD(Z80, 6000000)        /* 6 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coupe_mem, 0)
 	MDRV_CPU_IO_MAP(coupe_io, 0)
-	MDRV_CPU_VBLANK_INT(coupe_line_interrupt, 192 + 10)	/* 192 scanlines + 10 lines of vblank (approx).. */
+	MDRV_CPU_VBLANK_INT_HACK(coupe_line_interrupt, 192 + 10)	/* 192 scanlines + 10 lines of vblank (approx).. */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(0)

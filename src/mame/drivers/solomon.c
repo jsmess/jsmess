@@ -24,8 +24,8 @@ extern VIDEO_UPDATE( solomon );
 
 static WRITE8_HANDLER( solomon_sh_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 /* this is checked on the title screen and when you reach certain scores in the game
@@ -206,12 +206,12 @@ static MACHINE_DRIVER_START( solomon )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4.0 MHz (?????) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80, 3072000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? */
 						/* NMIs are caused by the main CPU */
 
 	/* video hardware */

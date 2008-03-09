@@ -36,8 +36,8 @@ would commence ($C00000).
 /***************************************************************************
   Battery Backed-Up Clock (MSM6264)
 ***************************************************************************/
-static READ16_HANDLER( amiga_clock_r ) { return msm6242_r( offset / 2 ); }
-static WRITE16_HANDLER( amiga_clock_w ) { msm6242_w( offset / 2, data ); }
+static READ16_HANDLER( amiga_clock_r ) { return msm6242_r( machine, offset / 2 ); }
+static WRITE16_HANDLER( amiga_clock_w ) { msm6242_w( machine, offset / 2, data ); }
 
 /***************************************************************************
   Address maps
@@ -192,7 +192,6 @@ static MACHINE_DRIVER_START( ntsc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(amiga_mem, 0)
-	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 262)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.997)
@@ -245,7 +244,6 @@ static MACHINE_DRIVER_START( pal )
 
 	/* adjust for PAL specs */
 	MDRV_CPU_REPLACE("main", M68000, AMIGA_68000_PAL_CLOCK)
-	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 312)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(50)

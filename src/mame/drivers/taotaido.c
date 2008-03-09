@@ -94,8 +94,8 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_LSB)
 	{
 		pending_command = 1;
-		soundlatch_w(offset,data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine,offset,data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 static ADDRESS_MAP_START( taotaido_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -360,7 +360,7 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( taotaido )
 	MDRV_CPU_ADD(M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(taotaido_readmem,taotaido_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80,20000000/4) // ??
 	/* audio CPU */

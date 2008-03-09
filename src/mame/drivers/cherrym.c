@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 }
 
 #if 0
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	// THIS IS COMPLETELY WRONG AND ONLY A PLACEHOLDER, IT HAS BEEN DISABLED TO KEEP THE COMPILER HAPPY
 	int offs;
@@ -374,7 +374,7 @@ static MACHINE_DRIVER_START( cmv801 )
 	MDRV_CPU_ADD(Z80, 8000000/2)	// ???
 	MDRV_CPU_PROGRAM_MAP(cm_map, 0)
 	MDRV_CPU_IO_MAP(cm_io_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	//MDRV_NVRAM_HANDLER(cmv801)
 

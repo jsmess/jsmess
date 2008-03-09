@@ -31,9 +31,9 @@
 /* prototypes */
 static void int_callback(int which, int INT);
 static void xmit_callback(int which, int data);
-static int rs232_cru_r(int offset);
-static void rs232_cru_w(int offset, int data);
-static  READ8_HANDLER(rs232_mem_r);
+static int rs232_cru_r(running_machine *machine, int offset);
+static void rs232_cru_w(running_machine *machine, int offset, int data);
+static READ8_HANDLER(rs232_mem_r);
 static WRITE8_HANDLER(rs232_mem_w);
 
 /* pointer to the rs232 ROM data */
@@ -235,7 +235,7 @@ static void xmit_callback(int which, int data)
 	bit 0: always 0
 	...
 */
-static int rs232_cru_r(int offset)
+static int rs232_cru_r(running_machine *machine, int offset)
 {
 	int reply;
 
@@ -291,7 +291,7 @@ static int rs232_cru_r(int offset)
 /*
 	Write rs232 card CRU interface
 */
-static void rs232_cru_w(int offset, int data)
+static void rs232_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset >> 5)
 	{

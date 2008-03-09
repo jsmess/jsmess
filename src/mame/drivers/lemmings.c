@@ -74,8 +74,8 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 
 static WRITE16_HANDLER( lemmings_sound_w )
 {
-	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(Machine, 1,1,HOLD_LINE);
+	soundlatch_w(machine,0,data&0xff);
+	cpunum_set_input_line(machine, 1,1,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( lemmings_sound_ack_w )
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( lemmings )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(lemmings_readmem,lemmings_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(M6809,32220000/8)
 	/* audio CPU */

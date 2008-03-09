@@ -319,25 +319,25 @@ static  READ8_HANDLER(spectrum_port_df_r)
 
 static  READ8_HANDLER ( spectrum_port_r )
 {
-		if ((offset & 1)==0)
-			return spectrum_port_fe_r(offset);
+	if ((offset & 1)==0)
+		return spectrum_port_fe_r(machine, offset);
 
-		if ((offset & 0xff)==0x1f)
-			return spectrum_port_1f_r(offset);
+	if ((offset & 0xff)==0x1f)
+		return spectrum_port_1f_r(machine, offset);
 
-		if ((offset & 0xff)==0x7f)
-			return spectrum_port_7f_r(offset);
+	if ((offset & 0xff)==0x7f)
+		return spectrum_port_7f_r(machine, offset);
 
-		if ((offset & 0xff)==0xdf)
-			return spectrum_port_df_r(offset);
+	if ((offset & 0xff)==0xdf)
+		return spectrum_port_df_r(machine, offset);
 
-		return video_screen_get_vpos(0)<193 ? spectrum_colorram[(video_screen_get_vpos(0)&0xf8)<<2]:0xff;
+	return video_screen_get_vpos(0)<193 ? spectrum_colorram[(video_screen_get_vpos(0)&0xf8)<<2]:0xff;
 }
 
 static WRITE8_HANDLER ( spectrum_port_w )
 {
 	if ((offset & 1)==0)
-		spectrum_port_fe_w(offset,data);
+		spectrum_port_fe_w(machine, offset,data);
 	else
 	{
 		logerror("Write %02x to Port: %04x\n", data, offset);
@@ -370,86 +370,86 @@ unsigned char *spectrum_128_screen_location = NULL;
 
 static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 {
-	   /* D0-D2: RAM page located at 0x0c000-0x0ffff */
-	   /* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
-	   /* D4 - ROM select - which rom paged into 0x0000-0x03fff */
-	   /* D5 - Disable paging */
+   /* D0-D2: RAM page located at 0x0c000-0x0ffff */
+   /* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
+   /* D4 - ROM select - which rom paged into 0x0000-0x03fff */
+   /* D5 - Disable paging */
 
-		/* disable paging? */
-		if (spectrum_128_port_7ffd_data & 0x20)
-				return;
+	/* disable paging? */
+	if (spectrum_128_port_7ffd_data & 0x20)
+			return;
 
-		/* store new state */
-		spectrum_128_port_7ffd_data = data;
+	/* store new state */
+	spectrum_128_port_7ffd_data = data;
 
-		/* update memory */
-		spectrum_128_update_memory();
+	/* update memory */
+	spectrum_128_update_memory();
 }
 
 extern void spectrum_128_update_memory(void)
 {
-		unsigned char *ChosenROM;
-		int ROMSelection;
+	unsigned char *ChosenROM;
+	int ROMSelection;
 
-		if (spectrum_128_port_7ffd_data & 8)
-		{
-				logerror("SCREEN 1: BLOCK 7\n");
-				spectrum_128_screen_location = spectrum_ram + (7<<14);
-		}
-		else
-		{
-				logerror("SCREEN 0: BLOCK 5\n");
-				spectrum_128_screen_location = spectrum_ram + (5<<14);
-		}
+	if (spectrum_128_port_7ffd_data & 8)
+	{
+			logerror("SCREEN 1: BLOCK 7\n");
+			spectrum_128_screen_location = spectrum_ram + (7<<14);
+	}
+	else
+	{
+			logerror("SCREEN 0: BLOCK 5\n");
+			spectrum_128_screen_location = spectrum_ram + (5<<14);
+	}
 
-		/* select ram at 0x0c000-0x0ffff */
-		{
-				int ram_page;
-				unsigned char *ram_data;
+	/* select ram at 0x0c000-0x0ffff */
+	{
+			int ram_page;
+			unsigned char *ram_data;
 
-				ram_page = spectrum_128_port_7ffd_data & 0x07;
-				ram_data = spectrum_ram + (ram_page<<14);
+			ram_page = spectrum_128_port_7ffd_data & 0x07;
+			ram_data = spectrum_ram + (ram_page<<14);
 
-				memory_set_bankptr(4, ram_data);
-				memory_set_bankptr(8, ram_data);
+			memory_set_bankptr(4, ram_data);
+			memory_set_bankptr(8, ram_data);
 
-				logerror("RAM at 0xc000: %02x\n",ram_page);
-		}
+			logerror("RAM at 0xc000: %02x\n",ram_page);
+	}
 
-		/* ROM switching */
-		ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01);
+	/* ROM switching */
+	ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01);
 
-		/* rom 0 is 128K rom, rom 1 is 48 BASIC */
+	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 
-		ChosenROM = memory_region(REGION_CPU1) + 0x010000 + (ROMSelection<<14);
+	ChosenROM = memory_region(REGION_CPU1) + 0x010000 + (ROMSelection<<14);
 
-		memory_set_bankptr(1, ChosenROM);
+	memory_set_bankptr(1, ChosenROM);
 
-		logerror("rom switch: %02x\n", ROMSelection);
+	logerror("rom switch: %02x\n", ROMSelection);
 }
 
 
 
 static WRITE8_HANDLER(spectrum_128_port_bffd_w)
 {
-		AY8910_write_port_0_w(0, data);
+	AY8910_write_port_0_w(machine, 0, data);
 }
 
 static WRITE8_HANDLER(spectrum_128_port_fffd_w)
 {
-		AY8910_control_port_0_w(0, data);
+	AY8910_control_port_0_w(machine, 0, data);
 }
 
 static  READ8_HANDLER(spectrum_128_port_fffd_r)
 {
-		return AY8910_read_port_0_r(0);
+	return AY8910_read_port_0_r(machine, 0);
 }
 
 static  READ8_HANDLER ( spectrum_128_port_r )
 {
 	 if ((offset & 1)==0)
 	 {
-		 return spectrum_port_fe_r(offset);
+		 return spectrum_port_fe_r(machine, offset);
 	 }
 
 	 if ((offset & 2)==0)
@@ -460,19 +460,19 @@ static  READ8_HANDLER ( spectrum_128_port_r )
 				break;
 
 			case 3:
-				return spectrum_128_port_fffd_r(offset);
+				return spectrum_128_port_fffd_r(machine, offset);
 		}
 	 }
 
 	 /* don't think these are correct! */
 	 if ((offset & 0xff)==0x1f)
-		 return spectrum_port_1f_r(offset);
+		 return spectrum_port_1f_r(machine, offset);
 
 	 if ((offset & 0xff)==0x7f)
-		 return spectrum_port_7f_r(offset);
+		 return spectrum_port_7f_r(machine, offset);
 
 	 if ((offset & 0xff)==0xdf)
-		 return spectrum_port_df_r(offset);
+		 return spectrum_port_df_r(machine, offset);
 
 	 return video_screen_get_vpos(0)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(0)&0xf8)<<2]:0xff;
 }
@@ -480,7 +480,7 @@ static  READ8_HANDLER ( spectrum_128_port_r )
 static WRITE8_HANDLER ( spectrum_128_port_w )
 {
 		if ((offset & 1)==0)
-				spectrum_port_fe_w(offset,data);
+				spectrum_port_fe_w(machine, offset,data);
 
 		/* Only decodes on A15, A14 & A1 */
 		else if ((offset & 2)==0)
@@ -488,13 +488,13 @@ static WRITE8_HANDLER ( spectrum_128_port_w )
 				switch ((offset>>8) & 0xc0)
 				{
 						case 0x40:
-								spectrum_128_port_7ffd_w(offset, data);
+								spectrum_128_port_7ffd_w(machine, offset, data);
 								break;
 						case 0x80:
-								spectrum_128_port_bffd_w(offset, data);
+								spectrum_128_port_bffd_w(machine, offset, data);
 								break;
 						case 0xc0:
-								spectrum_128_port_fffd_w(offset, data);
+								spectrum_128_port_fffd_w(machine, offset, data);
 								break;
 						default:
 								logerror("Write %02x to 128 port: %04x\n", data, offset);
@@ -566,7 +566,7 @@ static const int spectrum_plus3_memory_selections[]=
 static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
 		if (~readinputport(16) & 0x20)
-				nec765_data_w(0,data);
+				nec765_data_w(machine, 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
@@ -574,7 +574,7 @@ static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 		if (readinputport(16) & 0x20)
 				return 0xff;
 		else
-				return nec765_data_r(0);
+				return nec765_data_r(machine, 0);
 }
 
 
@@ -583,7 +583,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 		if (readinputport(16) & 0x20)
 				return 0xff;
 		else
-				return nec765_status_r(0);
+				return nec765_status_r(machine, 0);
 }
 
 
@@ -722,7 +722,7 @@ static  READ8_HANDLER ( spectrum_plus3_port_r )
 {
 	 if ((offset & 1)==0)
 	 {
-		 return spectrum_port_fe_r(offset);
+		 return spectrum_port_fe_r(machine, offset);
 	 }
 
 	 if ((offset & 2)==0)
@@ -740,10 +740,10 @@ static  READ8_HANDLER ( spectrum_plus3_port_r )
 
 					/* +3 fdc status */
 					case 2:
-						return spectrum_plus3_port_2ffd_r(offset);
+						return spectrum_plus3_port_2ffd_r(machine, offset);
 					/* +3 fdc data */
 					case 3:
-						return spectrum_plus3_port_3ffd_r(offset);
+						return spectrum_plus3_port_3ffd_r(machine, offset);
 
 					default:
 						break;
@@ -753,7 +753,7 @@ static  READ8_HANDLER ( spectrum_plus3_port_r )
 
 			/* 128k AY data */
 			case 3:
-				return spectrum_128_port_fffd_r(offset);
+				return spectrum_128_port_fffd_r(machine, offset);
 
 			default:
 				break;
@@ -766,7 +766,7 @@ static  READ8_HANDLER ( spectrum_plus3_port_r )
 static WRITE8_HANDLER ( spectrum_plus3_port_w )
 {
 		if ((offset & 1)==0)
-				spectrum_port_fe_w(offset,data);
+				spectrum_port_fe_w(machine, offset, data);
 
 		/* the following is not decoded exactly, need to check
         what is correct! */
@@ -790,12 +790,12 @@ static WRITE8_HANDLER ( spectrum_plus3_port_w )
 
 						/* +3 memory */
 						case 1:
-							spectrum_plus3_port_1ffd_w(offset, data);
+							spectrum_plus3_port_1ffd_w(machine, offset, data);
 							break;
 
 						/* +3 fdc data */
 						case 3:
-							spectrum_plus3_port_3ffd_w(offset,data);
+							spectrum_plus3_port_3ffd_w(machine, offset, data);
 							break;
 
 						default:
@@ -806,17 +806,17 @@ static WRITE8_HANDLER ( spectrum_plus3_port_w )
 
 				/* 128k memory */
 				case 1:
-					spectrum_plus3_port_7ffd_w(offset, data);
+					spectrum_plus3_port_7ffd_w(machine, offset, data);
 					break;
 
 				/* 128k AY data */
 				case 2:
-					spectrum_128_port_bffd_w(offset, data);
+					spectrum_128_port_bffd_w(machine, offset, data);
 					break;
 
 				/* 128K AY register */
 				case 3:
-					spectrum_128_port_fffd_w(offset, data);
+					spectrum_128_port_fffd_w(machine, offset, data);
 
 				default:
 					break;
@@ -870,7 +870,7 @@ static WRITE8_HANDLER(ts2068_port_f4_w)
 
 static WRITE8_HANDLER(ts2068_port_f5_w)
 {
-		AY8910_control_port_0_w(0, data);
+		AY8910_control_port_0_w(machine, 0, data);
 }
 
 static  READ8_HANDLER(ts2068_port_f6_r)
@@ -881,12 +881,12 @@ static  READ8_HANDLER(ts2068_port_f6_r)
            if both bits are set then OR values
            Bit 0 up, 1 down, 2 left, 3 right, 7 fire active low. Other bits 1
         */
-		return AY8910_read_port_0_r(0);
+		return AY8910_read_port_0_r(machine, 0);
 }
 
 static WRITE8_HANDLER(ts2068_port_f6_w)
 {
-		AY8910_write_port_0_w(0, data);
+		AY8910_write_port_0_w(machine, 0, data);
 }
 
 static  READ8_HANDLER(ts2068_port_ff_r)
@@ -908,24 +908,24 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
 }
 
 
-static  READ8_HANDLER ( ts2068_port_r )
+static READ8_HANDLER ( ts2068_port_r )
 {
-		switch (offset & 0xff)
-		{
-				/* Note: keys only decoded on port #fe not all even ports so
-                   ports #f4 & #f6 correctly read */
-				case 0xf4: return ts2068_port_f4_r(offset);
-				case 0xf6: return ts2068_port_f6_r(offset);
-				case 0xff: return ts2068_port_ff_r(offset);
+	switch (offset & 0xff)
+	{
+		/* Note: keys only decoded on port #fe not all even ports so
+           ports #f4 & #f6 correctly read */
+		case 0xf4: return ts2068_port_f4_r(machine, offset);
+		case 0xf6: return ts2068_port_f6_r(machine, offset);
+		case 0xff: return ts2068_port_ff_r(machine, offset);
 
-				case 0xfe: return spectrum_port_fe_r(offset);
-				case 0x1f: return spectrum_port_1f_r(offset);
-				case 0x7f: return spectrum_port_7f_r(offset);
-				case 0xdf: return spectrum_port_df_r(offset);
-		}
-		logerror("Read from port: %04x\n", offset);
+		case 0xfe: return spectrum_port_fe_r(machine, offset);
+		case 0x1f: return spectrum_port_1f_r(machine, offset);
+		case 0x7f: return spectrum_port_7f_r(machine, offset);
+		case 0xdf: return spectrum_port_df_r(machine, offset);
+	}
+	logerror("Read from port: %04x\n", offset);
 
-		return 0xff;
+	return 0xff;
 }
 
 static WRITE8_HANDLER ( ts2068_port_w )
@@ -935,16 +935,16 @@ static WRITE8_HANDLER ( ts2068_port_w )
    Port #fb is the Thermal printer port and works exactly as the Sinclair
    Printer - ie not yet emulated.
 */
-		switch (offset & 0xff)
-		{
-				case 0xfe: spectrum_port_fe_w(offset,data); break;
-				case 0xf4: ts2068_port_f4_w(offset,data); break;
-				case 0xf5: ts2068_port_f5_w(offset,data); break;
-				case 0xf6: ts2068_port_f6_w(offset,data); break;
-				case 0xff: ts2068_port_ff_w(offset,data); break;
-				default:
-						logerror("Write %02x to Port: %04x\n", data, offset);
-		}
+	switch (offset & 0xff)
+	{
+		case 0xfe: spectrum_port_fe_w(machine, offset,data); break;
+		case 0xf4: ts2068_port_f4_w(machine, offset,data); break;
+		case 0xf5: ts2068_port_f5_w(machine, offset,data); break;
+		case 0xf6: ts2068_port_f6_w(machine, offset,data); break;
+		case 0xff: ts2068_port_ff_w(machine, offset,data); break;
+		default:
+				logerror("Write %02x to Port: %04x\n", data, offset);
+	}
 }
 
 
@@ -970,8 +970,8 @@ static WRITE8_HANDLER ( ts2068_port_w )
 void ts2068_update_memory(void)
 {
 	unsigned char *ChosenROM, *ExROM, *DOCK;
-	read8_handler rh;
-	write8_handler wh;
+	read8_machine_func rh;
+	write8_machine_func wh;
 
 	DOCK = timex_cart_data;
 
@@ -1330,13 +1330,13 @@ static void tc2048_port_ff_w(int offset, int data)
 static  READ8_HANDLER ( tc2048_port_r )
 {
 		if ((offset & 1)==0)
-				return spectrum_port_fe_r(offset);
+				return spectrum_port_fe_r(machine, offset);
 		switch (offset & 0xff)
 		{
-				case 0xff: return ts2068_port_ff_r(offset);
-				case 0x1f: return spectrum_port_1f_r(offset);
-				case 0x7f: return spectrum_port_7f_r(offset);
-				case 0xdf: return spectrum_port_df_r(offset);
+				case 0xff: return ts2068_port_ff_r(machine, offset);
+				case 0x1f: return spectrum_port_1f_r(machine, offset);
+				case 0x7f: return spectrum_port_7f_r(machine, offset);
+				case 0xdf: return spectrum_port_df_r(machine, offset);
 		}
 
 		logerror("Read from port: %04x\n", offset);
@@ -1346,9 +1346,9 @@ static  READ8_HANDLER ( tc2048_port_r )
 static WRITE8_HANDLER ( tc2048_port_w )
 {
 		if ((offset & 1)==0)
-				spectrum_port_fe_w(offset,data);
+				spectrum_port_fe_w(machine, offset,data);
 		else if ((offset & 0xff)==0xff)
-				tc2048_port_ff_w(offset,data);
+				tc2048_port_ff_w(offset, data);
 		else
 		{
 				logerror("Write %02x to Port: %04x\n", data, offset);
@@ -1521,8 +1521,8 @@ static void scorpion_update_memory(void)
 {
 	unsigned char *ChosenROM;
 	int ROMSelection;
-	read8_handler rh;
-	write8_handler wh;
+	read8_machine_func rh;
+	write8_machine_func wh;
 
 	if (spectrum_128_port_7ffd_data & 8)
 	{
@@ -1627,7 +1627,7 @@ static  READ8_HANDLER(scorpion_port_r)
 {
 	 if ((offset & 1)==0)
 	 {
-		 return spectrum_port_fe_r(offset);
+		 return spectrum_port_fe_r(machine, offset);
 	 }
 
 	 /* KT: the following is not decoded exactly, need to check what
@@ -1636,23 +1636,23 @@ static  READ8_HANDLER(scorpion_port_r)
 	 {
 		 switch ((offset>>8) & 0xff)
 		 {
-				case 0xff: return spectrum_128_port_fffd_r(offset);
-				case 0x1f: return spectrum_port_1f_r(offset);
-				case 0x7f: return spectrum_port_7f_r(offset);
-				case 0xdf: return spectrum_port_df_r(offset);
+				case 0xff: return spectrum_128_port_fffd_r(machine, offset);
+				case 0x1f: return spectrum_port_1f_r(machine, offset);
+				case 0x7f: return spectrum_port_7f_r(machine, offset);
+				case 0xdf: return spectrum_port_df_r(machine, offset);
 		 }
 	 }
 #if 0
 	 switch (offset & 0x0ff)
 	 {
 		case 0x01f:
-			return wd17xx_status_r(offset);
+			return wd17xx_status_r(machine, offset);
 		case 0x03f:
-			return wd17xx_track_r(offset);
+			return wd17xx_track_r(machine, offset);
 		case 0x05f:
-			return wd17xx_sector_r(offset);
+			return wd17xx_sector_r(machine, offset);
 		case 0x07f:
-			return wd17xx_data_r(offset);
+			return wd17xx_data_r(machine, offset);
 		case 0x0ff:
 			return betadisk_status;
 	 }
@@ -1668,23 +1668,23 @@ static  READ8_HANDLER(scorpion_port_r)
 static WRITE8_HANDLER(scorpion_port_w)
 {
 	if ((offset & 1)==0)
-		spectrum_port_fe_w(offset,data);
+		spectrum_port_fe_w(machine, offset, data);
 
 	else if ((offset & 2)==0)
 	{
 			switch ((offset>>8) & 0xf0)
 			{
 				case 0x70:
-						scorpion_port_7ffd_w(offset, data);
+						scorpion_port_7ffd_w(machine, offset, data);
 						break;
 				case 0xb0:
-						spectrum_128_port_bffd_w(offset, data);
+						spectrum_128_port_bffd_w(machine, offset, data);
 						break;
 				case 0xf0:
-						spectrum_128_port_fffd_w(offset, data);
+						spectrum_128_port_fffd_w(machine, offset, data);
 						break;
 				case 0x10:
-						scorpion_port_1ffd_w(offset, data);
+						scorpion_port_1ffd_w(machine, offset, data);
 						break;
 				default:
 						logerror("Write %02x to scorpion port: %04x\n", data, offset);
@@ -1977,7 +1977,7 @@ static MACHINE_DRIVER_START( spectrum )
 	MDRV_CPU_ADD_TAG("main", Z80, 3500000)        /* 3.5 Mhz */
 	MDRV_CPU_PROGRAM_MAP(spectrum_mem, 0)
 	MDRV_CPU_IO_MAP(spectrum_io, 0)
-	MDRV_CPU_VBLANK_INT(spec_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", spec_interrupt)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( spectrum )

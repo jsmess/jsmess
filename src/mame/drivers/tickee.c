@@ -112,7 +112,7 @@ static VIDEO_START( tickee )
  *
  *************************************/
 
-static void scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+static void scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -159,12 +159,12 @@ static MACHINE_RESET( tickee )
 
 static READ8_HANDLER( port1_r )
 {
-	return input_port_1_r(offset) | (ticket_dispenser_0_r(0) >> 5) | (ticket_dispenser_1_r(0) >> 6);
+	return input_port_1_r(machine, offset) | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
 }
 
 static READ8_HANDLER( port2_r )
 {
-	return input_port_3_r(offset) | (ticket_dispenser_0_r(0) >> 5) | (ticket_dispenser_1_r(0) >> 6);
+	return input_port_3_r(machine, offset) | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
 }
 
 
@@ -190,8 +190,8 @@ static WRITE16_HANDLER( tickee_control_w )
 
 	if (offset == 3)
 	{
-		ticket_dispenser_0_w(0, (data & 8) << 4);
-		ticket_dispenser_1_w(0, (data & 4) << 5);
+		ticket_dispenser_0_w(machine, 0, (data & 8) << 4);
+		ticket_dispenser_1_w(machine, 0, (data & 4) << 5);
 	}
 
 	if (olddata != tickee_control[offset])

@@ -38,6 +38,7 @@ PROMs : NEC B406 (1kx4) x2
 ***********************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
@@ -152,7 +153,7 @@ static WRITE8_HANDLER (system_w)
 	{
 		int offs;
 		for (offs = 0;offs < videoram_size; offs++)
-			sbw_videoram_w(offs, videoram[offs]);
+			sbw_videoram_w(machine, offs, videoram[offs]);
 	}
 	sbw_system = data;
 }
@@ -176,9 +177,9 @@ static WRITE8_HANDLER(graph_control_w)
 static READ8_HANDLER (controls_r)
 {
 	if(sbw_system&2)
-		return input_port_2_r(0);
+		return input_port_2_r(machine,0);
 	else
-		return input_port_3_r(0);
+		return input_port_3_r(machine,0);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -330,7 +331,7 @@ static MACHINE_DRIVER_START( sbowling )
 	MDRV_CPU_ADD(8080, 19968000/10 )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
-	MDRV_CPU_VBLANK_INT(sbw_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(sbw_interrupt, 2)
 	MDRV_GFXDECODE(sbowling)
 
 	/* video hardware */

@@ -34,32 +34,32 @@ static int zoomreadroms,K052109_selected;
 static READ8_HANDLER( bottom9_bankedram1_r )
 {
 	if (K052109_selected)
-		return K052109_051960_r(offset);
+		return K052109_051960_r(machine,offset);
 	else
 	{
 		if (zoomreadroms)
-			return K051316_rom_0_r(offset);
+			return K051316_rom_0_r(machine,offset);
 		else
-			return K051316_0_r(offset);
+			return K051316_0_r(machine,offset);
 	}
 }
 
 static WRITE8_HANDLER( bottom9_bankedram1_w )
 {
-	if (K052109_selected) K052109_051960_w(offset,data);
-	else K051316_0_w(offset,data);
+	if (K052109_selected) K052109_051960_w(machine,offset,data);
+	else K051316_0_w(machine,offset,data);
 }
 
 static READ8_HANDLER( bottom9_bankedram2_r )
 {
-	if (K052109_selected) return K052109_051960_r(offset + 0x2000);
+	if (K052109_selected) return K052109_051960_r(machine,offset + 0x2000);
 	else return paletteram[offset];
 }
 
 static WRITE8_HANDLER( bottom9_bankedram2_w )
 {
-	if (K052109_selected) K052109_051960_w(offset + 0x2000,data);
-	else paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+	if (K052109_selected) K052109_051960_w(machine,offset + 0x2000,data);
+	else paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 }
 
 static WRITE8_HANDLER( bankswitch_w )
@@ -403,12 +403,12 @@ static MACHINE_DRIVER_START( bottom9 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 2000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(bottom9_readmem,bottom9_writemem)
-	MDRV_CPU_VBLANK_INT(bottom9_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", bottom9_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(bottom9_sound_readmem,bottom9_sound_writemem)
-	MDRV_CPU_VBLANK_INT(bottom9_sound_interrupt,8)	/* irq is triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(bottom9_sound_interrupt,8)	/* irq is triggered by the main CPU */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

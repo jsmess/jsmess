@@ -73,7 +73,7 @@ static READ8_HANDLER(input_r)
 	if(inputcnt<0){		return 0;	}
 	if(!inputcnt)
 	{
-		int key=input_port_2_word_r(0,0);
+		int key=input_port_2_word_r(machine,0,0);
 		int keyval=0; //we must return 0 (0x2 in 2nd read) to clear 4 bit at $6600 and allow next read
 
 		if(key)
@@ -104,7 +104,7 @@ static READ8_HANDLER(io_r)
 {
 	if(!offset)
 	{
-			return input_port_1_r(0)^ioram[4]; //coin
+			return input_port_1_r(machine,0)^ioram[4]; //coin
 	}
 	return 0;
 }
@@ -252,7 +252,7 @@ static MACHINE_DRIVER_START( koikoi )
 	MDRV_CPU_ADD(Z80,KOIKOI_CRYSTAL/4)	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem, 0)
 	MDRV_CPU_IO_MAP(readport, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

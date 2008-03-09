@@ -274,7 +274,7 @@ static void pcw_update_read_memory_block(int block, int bank)
 		/* restore bank handler across entire block */
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
 			block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,
-			(read8_handler) (STATIC_BANK1 + (FPTR)block));
+			(read8_machine_func) (STATIC_BANK1 + (FPTR)block));
 	}
 }
 
@@ -646,15 +646,15 @@ static WRITE8_HANDLER(pcw_expansion_w)
 
 }
 
-static  READ8_HANDLER(pcw_fdc_r)
+static READ8_HANDLER(pcw_fdc_r)
 {
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		return nec765_data_r(0);
+		return nec765_data_r(machine, 0);
 	}
 
-	return nec765_status_r(0);
+	return nec765_status_r(machine, 0);
 }
 
 static WRITE8_HANDLER(pcw_fdc_w)
@@ -662,7 +662,7 @@ static WRITE8_HANDLER(pcw_fdc_w)
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		nec765_data_w(0,data);
+		nec765_data_w(machine, 0,data);
 	}
 }
 

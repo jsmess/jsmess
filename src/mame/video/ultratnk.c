@@ -10,7 +10,7 @@ Atari Ultra Tank video emulation
 
 static tilemap* playfield;
 
-static mame_bitmap* helper;
+static bitmap_t* helper;
 
 int ultratnk_collision[4];
 
@@ -140,8 +140,8 @@ VIDEO_EOF( ultratnk )
 
 	/* update sound status */
 
-	discrete_sound_w(ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
-	discrete_sound_w(ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
+	discrete_sound_w(machine, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
+	discrete_sound_w(machine, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
 }
 
 

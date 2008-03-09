@@ -275,25 +275,25 @@ static const struct ide_interface ide_intf =
 
 static READ32_HANDLER( ide_controller_r )
 {
-	return midway_ide_asic_r(offset / 2, mem_mask);
+	return midway_ide_asic_r(machine, offset / 2, mem_mask);
 }
 
 
 static WRITE32_HANDLER( ide_controller_w )
 {
-	midway_ide_asic_w(offset / 2, data, mem_mask);
+	midway_ide_asic_w(machine, offset / 2, data, mem_mask);
 }
 
 
 static READ32_HANDLER( ide_controller_extra_r )
 {
-	return ide_controller32_0_r(0x3f6/4, 0xff00ffff) >> 16;
+	return ide_controller32_0_r(machine, 0x3f6/4, 0xff00ffff) >> 16;
 }
 
 
 static WRITE32_HANDLER( ide_controller_extra_w )
 {
-	ide_controller32_0_w(0x3f6/4, data << 16, 0xff00ffff);
+	ide_controller32_0_w(machine, 0x3f6/4, data << 16, 0xff00ffff);
 }
 
 
@@ -657,7 +657,7 @@ static MACHINE_DRIVER_START( kinst )
 	MDRV_CPU_ADD(R4600LE, MASTER_CLOCK*2)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_start,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_start)
 
 	MDRV_MACHINE_START(kinst)
 	MDRV_MACHINE_RESET(kinst)

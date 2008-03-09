@@ -222,7 +222,6 @@ static int icallback(int line)
 		if(IntPend&(1<<i))
 		{
 			return (IntHigh<<5)|i;
-			break;
 		}
 	}
 	return 0;		//This should never happen
@@ -618,7 +617,7 @@ static VIDEO_START(crystal)
 {
 }
 
-static void plot_pixel_rgb(mame_bitmap *bitmap, int x, int y , int color)
+static void plot_pixel_rgb(bitmap_t *bitmap, int x, int y , int color)
 {
 	//565 to 555
 	color=(color&0x1f)|((color>>1)&0x7fe0);
@@ -824,7 +823,7 @@ static const struct VR0Interface vr0_interface =
 static MACHINE_DRIVER_START( crystal )
 	MDRV_CPU_ADD(SE3208, 43000000)
 	MDRV_CPU_PROGRAM_MAP(crystal_mem,0)
- 	MDRV_CPU_VBLANK_INT(crystal_interrupt,1)
+ 	MDRV_CPU_VBLANK_INT("main", crystal_interrupt)
 
 	MDRV_MACHINE_RESET(crystal)
 

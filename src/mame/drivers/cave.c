@@ -221,7 +221,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 {
 //  sound_flag1 = 1;
 //  sound_flag2 = 1;
-	soundlatch_word_w(offset,data,mem_mask);
+	soundlatch_word_w(machine,offset,data,mem_mask);
 	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
@@ -230,14 +230,14 @@ static WRITE16_HANDLER( sound_cmd_w )
 static READ8_HANDLER( soundlatch_lo_r )
 {
 //  sound_flag1 = 0;
-	return soundlatch_word_r(offset,0) & 0xff;
+	return soundlatch_word_r(machine,offset,0) & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
 static READ8_HANDLER( soundlatch_hi_r )
 {
 //  sound_flag2 = 0;
-	return soundlatch_word_r(offset,0) >> 8;
+	return soundlatch_word_r(machine,offset,0) >> 8;
 }
 
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */
@@ -273,15 +273,15 @@ static WRITE16_HANDLER( cave_sound_w )
 {
 	if (ACCESSING_LSB)
 	{
-		if (offset)	YMZ280B_data_0_w     (offset, data & 0xff);
-		else		YMZ280B_register_0_w (offset, data & 0xff);
+		if (offset)	YMZ280B_data_0_w     (machine, offset, data & 0xff);
+		else		YMZ280B_register_0_w (machine, offset, data & 0xff);
 	}
 }
 
 /* Handles reads from the YMZ280B */
 static READ16_HANDLER( cave_sound_r )
 {
-	return YMZ280B_status_0_r(offset);
+	return YMZ280B_status_0_r(machine,offset);
 }
 
 
@@ -350,7 +350,7 @@ static WRITE16_HANDLER( cave_eeprom_msb_w )
 static WRITE16_HANDLER( sailormn_eeprom_msb_w )
 {
 	sailormn_tilebank_w    ( data &  0x0100 );
-	cave_eeprom_msb_w(offset,data & ~0x0100,mem_mask);
+	cave_eeprom_msb_w(machine,offset,data & ~0x0100,mem_mask);
 }
 
 static WRITE16_HANDLER( hotdogst_eeprom_msb_w )
@@ -578,7 +578,7 @@ static READ16_HANDLER( donpachi_videoregs_r )
 		case 0:
 		case 1:
 		case 2:
-		case 3:	return cave_irq_cause_r(offset,0);
+		case 3:	return cave_irq_cause_r(machine,offset,0);
 
 		default:	return 0x0000;
 	}
@@ -1082,7 +1082,7 @@ static READ16_HANDLER( sailormn_input0_r )
 
 static READ16_HANDLER( agallet_irq_cause_r )
 {
-	UINT16 irq_cause = cave_irq_cause_r(offset,mem_mask);
+	UINT16 irq_cause = cave_irq_cause_r(machine,offset,mem_mask);
 
 	if (offset == 0)
 	{
@@ -2018,7 +2018,7 @@ static MACHINE_DRIVER_START( dfeveron )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(dfeveron_readmem,dfeveron_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2057,7 +2057,7 @@ static MACHINE_DRIVER_START( ddonpach )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(ddonpach_readmem,ddonpach_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2096,7 +2096,7 @@ static MACHINE_DRIVER_START( donpachi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(donpachi_readmem,donpachi_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2140,7 +2140,7 @@ static MACHINE_DRIVER_START( esprade )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(esprade_readmem,esprade_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2178,7 +2178,7 @@ static MACHINE_DRIVER_START( gaia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(gaia_readmem,gaia_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 
@@ -2215,7 +2215,7 @@ static MACHINE_DRIVER_START( guwange )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(guwange_readmem,guwange_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2252,7 +2252,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(hotdogst_readmem,hotdogst_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ? */
@@ -2307,7 +2307,7 @@ static MACHINE_DRIVER_START( korokoro )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(korokoro_readmem,korokoro_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(korokoro)
@@ -2346,7 +2346,7 @@ static MACHINE_DRIVER_START( mazinger )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(mazinger_readmem,mazinger_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 //  /* audio CPU */ // Bidirectional communication
@@ -2403,7 +2403,7 @@ static MACHINE_DRIVER_START( metmqstr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(metmqstr_readmem,metmqstr_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80,32000000 / 4)
 	/* audio CPU */
@@ -2461,7 +2461,7 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(pwrinst2_readmem,pwrinst2_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80,16000000 / 2)
 	/* audio CPU */	/* 8 MHz */
@@ -2521,7 +2521,7 @@ static MACHINE_DRIVER_START( sailormn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(sailormn_readmem,sailormn_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80, 8000000)
 //  /* audio CPU */ // Bidirectional Communication
@@ -2576,7 +2576,7 @@ static MACHINE_DRIVER_START( uopoko )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(uopoko_readmem,uopoko_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_NVRAM_HANDLER(cave)
 

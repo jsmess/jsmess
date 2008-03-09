@@ -45,7 +45,7 @@ struct pit8253_timer
 {
 	double clockin;					/* input clock frequency in Hz */
 
-	void (*output_callback)(int);	/* callback function for when output changes */
+	void (*output_callback_func)(int);	/* callback function for when output changes */
 	void (*freq_callback)(double);	/* callback function for when output frequency changes */
 
 	attotime last_updated;			/* time when last updated */
@@ -272,9 +272,9 @@ static void	set_output(struct pit8253_timer	*timer,int output)
 	if (output != timer->output)
 	{
 		timer->output =	output;
-		if (timer->output_callback != NULL)
+		if (timer->output_callback_func != NULL)
 		{
-			timer->output_callback(output);
+			timer->output_callback_func(output);
 		}
 	}
 }
@@ -602,7 +602,7 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 		break;
 	}
 
-	if (timer->output_callback != NULL)
+	if (timer->output_callback_func != NULL)
 	{
 		timer->cycles_to_output	= cycles_to_output;
 		if (cycles_to_output ==	CYCLES_NEVER ||	timer->clockin == 0)
@@ -766,10 +766,10 @@ int	pit8253_init(int count,	const struct pit8253_config *config)
 			timer =	get_timer(pit,timerno);
 
 			timer->clockin = pit->config->timer[timerno].clockin;
-			timer->output_callback = pit->config->timer[timerno].output_callback;
+			timer->output_callback_func = pit->config->timer[timerno].output_callback_func;
 			timer->freq_callback = pit->config->timer[timerno].clock_callback;
 
-			if (timer->output_callback == NULL)
+			if (timer->output_callback_func == NULL)
 				timer->outputtimer = NULL;
 			else
 			{
@@ -1188,20 +1188,20 @@ READ16_HANDLER ( pit8253_1_lsb_r ) { return pit8253_read(1, offset);	}
 WRITE16_HANDLER ( pit8253_0_lsb_w ) { if (ACCESSING_LSB) pit8253_write(0, offset, data); }
 WRITE16_HANDLER ( pit8253_1_lsb_w ) { if (ACCESSING_LSB) pit8253_write(1, offset, data); }
 
-READ16_HANDLER ( pit8253_16le_0_r ) { return read16le_with_read8_handler(pit8253_0_r, offset, mem_mask); }
-READ16_HANDLER ( pit8253_16le_1_r ) { return read16le_with_read8_handler(pit8253_1_r, offset, mem_mask); }
-WRITE16_HANDLER	( pit8253_16le_0_w ) { write16le_with_write8_handler(pit8253_0_w, offset, data,	mem_mask); }
-WRITE16_HANDLER	( pit8253_16le_1_w ) { write16le_with_write8_handler(pit8253_1_w, offset, data,	mem_mask); }
+READ16_HANDLER ( pit8253_16le_0_r ) { return read16le_with_read8_handler(pit8253_0_r, machine, offset, mem_mask); }
+READ16_HANDLER ( pit8253_16le_1_r ) { return read16le_with_read8_handler(pit8253_1_r, machine, offset, mem_mask); }
+WRITE16_HANDLER	( pit8253_16le_0_w ) { write16le_with_write8_handler(pit8253_0_w, machine, offset, data,	mem_mask); }
+WRITE16_HANDLER	( pit8253_16le_1_w ) { write16le_with_write8_handler(pit8253_1_w, machine, offset, data,	mem_mask); }
 
-READ32_HANDLER ( pit8253_32le_0_r ) { return read32le_with_read8_handler(pit8253_0_r, offset, mem_mask); }
-READ32_HANDLER ( pit8253_32le_1_r ) { return read32le_with_read8_handler(pit8253_1_r, offset, mem_mask); }
-WRITE32_HANDLER	( pit8253_32le_0_w ) { write32le_with_write8_handler(pit8253_0_w, offset, data,	mem_mask); }
-WRITE32_HANDLER	( pit8253_32le_1_w ) { write32le_with_write8_handler(pit8253_1_w, offset, data,	mem_mask); }
+READ32_HANDLER ( pit8253_32le_0_r ) { return read32le_with_read8_handler(pit8253_0_r, machine, offset, mem_mask); }
+READ32_HANDLER ( pit8253_32le_1_r ) { return read32le_with_read8_handler(pit8253_1_r, machine, offset, mem_mask); }
+WRITE32_HANDLER	( pit8253_32le_0_w ) { write32le_with_write8_handler(pit8253_0_w, machine, offset, data,	mem_mask); }
+WRITE32_HANDLER	( pit8253_32le_1_w ) { write32le_with_write8_handler(pit8253_1_w, machine, offset, data,	mem_mask); }
 
-READ64_HANDLER ( pit8253_64be_0_r ) { return read64be_with_read8_handler(pit8253_0_r, offset, mem_mask); }
-READ64_HANDLER ( pit8253_64be_1_r ) { return read64be_with_read8_handler(pit8253_1_r, offset, mem_mask); }
-WRITE64_HANDLER	( pit8253_64be_0_w ) { write64be_with_write8_handler(pit8253_0_w, offset, data,	mem_mask); }
-WRITE64_HANDLER	( pit8253_64be_1_w ) { write64be_with_write8_handler(pit8253_1_w, offset, data,	mem_mask); }
+READ64_HANDLER ( pit8253_64be_0_r ) { return read64be_with_read8_handler(pit8253_0_r, machine, offset, mem_mask); }
+READ64_HANDLER ( pit8253_64be_1_r ) { return read64be_with_read8_handler(pit8253_1_r, machine, offset, mem_mask); }
+WRITE64_HANDLER	( pit8253_64be_0_w ) { write64be_with_write8_handler(pit8253_0_w, machine, offset, data,	mem_mask); }
+WRITE64_HANDLER	( pit8253_64be_1_w ) { write64be_with_write8_handler(pit8253_1_w, machine, offset, data,	mem_mask); }
 
 WRITE8_HANDLER ( pit8253_0_gate_w )	{ pit8253_gate_write(0,	offset,	data); }
 WRITE8_HANDLER ( pit8253_1_gate_w )	{ pit8253_gate_write(1,	offset,	data); }

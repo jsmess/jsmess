@@ -865,19 +865,19 @@ READ32_HANDLER( newport_rex3_r )
 		switch( nREX3_DCBSlvSelect )
 		{
 		case 0x00:
-			return newport_vc2_r( 0, mem_mask );
+			return newport_vc2_r( machine, 0, mem_mask );
 			break;
 		case 0x02:
-			return newport_cmap0_r( 0, mem_mask );
+			return newport_cmap0_r( machine, 0, mem_mask );
 			break;
 		case 0x03:
-			return newport_cmap1_r( 0, mem_mask );
+			return newport_cmap1_r( machine, 0, mem_mask );
 			break;
 		case 0x05:
-			return newport_xmap0_r( 0, mem_mask );
+			return newport_xmap0_r( machine, 0, mem_mask );
 			break;
 		case 0x06:
-			return newport_xmap1_r( 0, mem_mask );
+			return newport_xmap1_r( machine, 0, mem_mask );
 			break;
 		default:
 			verboselog( 2, "REX3 Display Control Bus Data MSW Read: %08x\n", nREX3_DCBDataMSW );
@@ -1660,20 +1660,20 @@ WRITE32_HANDLER( newport_rex3_w )
 		switch( nREX3_DCBSlvSelect )
 		{
 		case 0x00:
-			newport_vc2_w( 0, data, mem_mask );
+			newport_vc2_w( machine, 0, data, mem_mask );
 			break;
 		case 0x01:
- 			newport_cmap0_w( 0, data, mem_mask );
+ 			newport_cmap0_w( machine, 0, data, mem_mask );
  			break;
 		case 0x04:
-			newport_xmap0_w( 0, data, mem_mask );
-			newport_xmap1_w( 0, data, mem_mask );
+			newport_xmap0_w( machine, 0, data, mem_mask );
+			newport_xmap1_w( machine, 0, data, mem_mask );
 			break;
 		case 0x05:
-			newport_xmap0_w( 0, data, mem_mask );
+			newport_xmap0_w( machine, 0, data, mem_mask );
 			break;
 		case 0x06:
-			newport_xmap1_w( 0, data, mem_mask );
+			newport_xmap1_w( machine, 0, data, mem_mask );
 			break;
 		default:
 			verboselog( 2, "REX3 Display Control Bus Data MSW Write: %08x\n", data );

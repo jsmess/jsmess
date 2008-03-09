@@ -129,6 +129,8 @@ UINT8 *cvs_s2636_0_ram;
 UINT8 *cvs_s2636_1_ram;
 UINT8 *cvs_s2636_2_ram;
 
+static emu_timer *cvs_393hz_timer;
+static UINT8 cvs_393hz_clock;
 static UINT8 *cvs_4_bit_dac_data;
 static UINT8 *cvs_tms5110_ctl_data;
 
@@ -277,12 +279,12 @@ static READ8_HANDLER( cvs_input_r )
 	/* the lower 4 (or 3?) bits select the port to read */
 	switch (offset & 0x0f)	/* might be 0x07 */
 	{
-	case 0x00:  ret = input_port_0_r(0); break;
-	case 0x02:  ret = input_port_1_r(0); break;
-	case 0x03:  ret = input_port_2_r(0); break;
-	case 0x04:  ret = input_port_3_r(0); break;
-	case 0x06:  ret = input_port_4_r(0); break;
-	case 0x07:  ret = input_port_5_r(0); break;
+	case 0x00:  ret = input_port_0_r(machine, 0); break;
+	case 0x02:  ret = input_port_1_r(machine, 0); break;
+	case 0x03:  ret = input_port_2_r(machine, 0); break;
+	case 0x04:  ret = input_port_3_r(machine, 0); break;
+	case 0x06:  ret = input_port_4_r(machine, 0); break;
+	case 0x07:  ret = input_port_5_r(machine, 0); break;
 	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", activecpu_get_pc(), offset & 0x0f); break;
 	}
 
@@ -299,8 +301,20 @@ static READ8_HANDLER( cvs_input_r )
 
 static READ8_HANDLER( cvs_393hz_clock_r )
 {
-  	if(cpu_scalebyfcount(6) & 1) return 0x80;
-    else return 0;
+  	return cvs_393hz_clock ? 0x80 : 0;
+}
+
+
+static TIMER_CALLBACK( cvs_393hz_timer_cb )
+{
+	cvs_393hz_clock = !cvs_393hz_clock;
+}
+
+
+static void start_393hz_timer(void)
+{
+	cvs_393hz_timer = timer_alloc(cvs_393hz_timer_cb, NULL);
+	timer_adjust_periodic(cvs_393hz_timer, ATTOTIME_IN_HZ(2*393), 0, ATTOTIME_IN_HZ(2*393));
 }
 
 
@@ -324,7 +338,7 @@ static WRITE8_HANDLER( cvs_4_bit_dac_data_w )
 			    (cvs_4_bit_dac_data[3] << 3);
 
 	/* scale up to a full byte and output */
-	DAC_1_data_w(0, (dac_value << 4) | dac_value);
+	DAC_1_data_w(machine, 0, (dac_value << 4) | dac_value);
 }
 
 
@@ -336,35 +350,35 @@ static WRITE8_HANDLER( cvs_4_bit_dac_data_w )
  *************************************/
 
 /* temporary code begin */
-static void speech_execute_command(UINT8 command)
+static void speech_execute_command(running_machine *machine, UINT8 command)
 {
 	/* reset */
 	if (command == 0x3f)
 	{
-		tms5110_CTL_w(0, TMS5110_CMD_RESET);
+		tms5110_CTL_w(machine, 0, TMS5110_CMD_RESET);
 
-		tms5110_PDC_w(0,0);
-		tms5110_PDC_w(0,1);
-		tms5110_PDC_w(0,0);
+		tms5110_PDC_w(machine, 0,0);
+		tms5110_PDC_w(machine, 0,1);
+		tms5110_PDC_w(machine, 0,0);
 
-		tms5110_PDC_w(0,0);
-		tms5110_PDC_w(0,1);
-		tms5110_PDC_w(0,0);
+		tms5110_PDC_w(machine, 0,0);
+		tms5110_PDC_w(machine, 0,1);
+		tms5110_PDC_w(machine, 0,0);
 
-		tms5110_PDC_w(0,0);
-		tms5110_PDC_w(0,1);
-		tms5110_PDC_w(0,0);
+		tms5110_PDC_w(machine, 0,0);
+		tms5110_PDC_w(machine, 0,1);
+		tms5110_PDC_w(machine, 0,0);
 
 		speech_rom_bit_address = 0;
 	}
 	/* start */
 	else
 	{
-		tms5110_CTL_w(0, TMS5110_CMD_SPEAK);
+		tms5110_CTL_w(machine, 0, TMS5110_CMD_SPEAK);
 
-		tms5110_PDC_w(0, 0);
-		tms5110_PDC_w(0, 1);
-		tms5110_PDC_w(0, 0);
+		tms5110_PDC_w(machine, 0, 0);
+		tms5110_PDC_w(machine, 0, 1);
+		tms5110_PDC_w(machine, 0, 0);
 
 		speech_rom_bit_address = command * 0x80 * 8;
 	}
@@ -385,9 +399,9 @@ static WRITE8_HANDLER( cvs_speech_rom_address_hi_w )
 }
 
 
-static void cvs_set_speech_command_w(UINT8 data)
+static void cvs_set_speech_command_w(running_machine *machine, UINT8 data)
 {
-	soundlatch2_w(0, data & 0x7f);
+	soundlatch2_w(machine, 0, data & 0x7f);
 	if (~data & 0x40) LOG(("%04x : CVS: Speech Command W = %04x\n", activecpu_get_pc(), data & 0x7f));
 }
 
@@ -395,7 +409,7 @@ static void cvs_set_speech_command_w(UINT8 data)
 static READ8_HANDLER( cvs_speech_command_r )
 {
 	/* bit 7 is TMS status (active LO) */
-	return (~tms5110_status_r(0) << 7) | soundlatch2_r(0);
+	return (~tms5110_status_r(machine, 0) << 7) | soundlatch2_r(machine, 0);
 }
 
 
@@ -456,17 +470,17 @@ static WRITE8_HANDLER( audio_command_w )
     /* cause interrupt on audio CPU if bit 7 set */
 	if (data & 0x80)
 	{
-	   	soundlatch_w(0, data);
+	   	soundlatch_w(machine, 0, data);
 		cvs_dac_cpu_interrupt();
 
 		LOG(("%04x : CVS: Audio command = %02x\n", activecpu_get_pc(), data));
 	}
 
-	cvs_set_speech_command_w(data);
+	cvs_set_speech_command_w(machine, data);
 
 	/* temporary code begin */
 	if ((data & 0x40) == 0)
-		speech_execute_command(data & 0x03f);
+		speech_execute_command(machine, data & 0x03f);
 	/* temporary code end */
 }
 
@@ -486,6 +500,8 @@ MACHINE_START( cvs )
 	cvs_character_ram = auto_malloc(3 * 0x800);  /* only half is used, but
                                                     by allocating twice the amount,
                                                     we can use the same gfx_layout */
+	start_393hz_timer();
+
 	/* register state save */
 	state_save_register_global_pointer(cvs_color_ram, 0x400);
 	state_save_register_global_pointer(cvs_palette_ram, 0x10);
@@ -493,6 +509,7 @@ MACHINE_START( cvs )
 	state_save_register_global(character_banking_mode);
 	state_save_register_global(character_ram_page_start);
 	state_save_register_global(speech_rom_bit_address);
+	state_save_register_global(cvs_393hz_clock);
 }
 
 
@@ -998,7 +1015,7 @@ static MACHINE_DRIVER_START( cvs )
 	MDRV_CPU_ADD(S2650, 894886.25)
 	MDRV_CPU_PROGRAM_MAP(cvs_main_cpu_map,0)
 	MDRV_CPU_IO_MAP(cvs_main_cpu_io_map,0)
-	MDRV_CPU_VBLANK_INT(cvs_main_cpu_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", cvs_main_cpu_interrupt)
 
 	MDRV_CPU_ADD(S2650, 894886.25)
 	MDRV_CPU_PROGRAM_MAP(cvs_dac_cpu_map,0)

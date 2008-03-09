@@ -165,7 +165,6 @@ static READ8_HANDLER( custom_cpu_r )
 		/* error cases */
 		default:
 			logerror("Input Port %04X read.  PC=%04X\n", offset+0xd7f0, activecpu_get_pc());
-			return 0;
 	}
 	return 0;
 }
@@ -353,7 +352,7 @@ static MACHINE_DRIVER_START( arabian )
 	MDRV_CPU_ADD(Z80, MAIN_OSC/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

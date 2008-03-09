@@ -75,7 +75,7 @@ void fd1094_machine_init(void);
 void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
 
 /* video/segac2.c */
-extern void update_system18_vdp( mame_bitmap *bitmap, const rectangle *cliprect );
+extern void update_system18_vdp( bitmap_t *bitmap, const rectangle *cliprect );
 extern void start_system18_vdp(void);
 extern READ16_HANDLER( segac2_vdp_r );
 extern WRITE16_HANDLER( segac2_vdp_w );
@@ -195,8 +195,8 @@ static UINT8* shdancbl_soundbank_ptr = NULL;		/* Pointer to currently selected p
 
 static WRITE16_HANDLER( sound_command_irq_w ){
 	if( ACCESSING_LSB ){
-		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
+		soundlatch_w( machine,0,data&0xff );
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
 	}
 }
 
@@ -339,8 +339,8 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sound_command_nmi_w ){
 	if( ACCESSING_LSB ){
-		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w( machine,0,data&0xff );
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1119,7 +1119,7 @@ static MACHINE_DRIVER_START( system18 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
 	/* audio CPU */

@@ -10,8 +10,8 @@
 #define PC1403_H_
 
 
-#define KEY_SMALL input_port_1_r(0)&0x40
-#define RAM32K (input_port_10_r(0)&0x80)==0x80
+#define KEY_SMALL readinputport(1)&0x40
+#define RAM32K (readinputport(10)&0x80)==0x80
 
 
 /*----------- defined in machine/pc1403.c -----------*/

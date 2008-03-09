@@ -5,12 +5,11 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "deco16ic.h"
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, int pf_priority)
+static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pf_priority)
 {
 	int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 	int offs, bank, gfxbank;
@@ -46,7 +45,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 
 			y = spritebase[offs];
 			flash=y&0x1000;
-			if (flash && (cpu_getcurrentframe() & 1)) continue;
+			if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 			colour = (x >> 9) &0x1f;
 			if (y&0x8000) colour+=32;
 

@@ -283,6 +283,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -486,7 +487,7 @@ static WRITE8_HANDLER( dotron_op4_w )
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(offset, data);
+	squawkntalk_data_w(machine, offset, data);
 }
 
 
@@ -567,7 +568,7 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(offset, data);
+	squawkntalk_data_w(machine, offset, data);
 }
 
 
@@ -594,7 +595,7 @@ static WRITE8_HANDLER( demoderb_op4_w )
 {
 	if (data & 0x40) input_mux = 1;
 	if (data & 0x80) input_mux = 0;
-	turbocs_data_w(offset, data);
+	turbocs_data_w(machine, offset, data);
 }
 
 
@@ -1507,7 +1508,7 @@ static MACHINE_DRIVER_START( mcr_90009 )
 	MDRV_CPU_CONFIG(mcr_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(cpu_90009_map,0)
 	MDRV_CPU_IO_MAP(cpu_90009_portmap,0)
-	MDRV_CPU_VBLANK_INT(mcr_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 	MDRV_MACHINE_START(mcr)
@@ -1595,7 +1596,7 @@ static MACHINE_DRIVER_START( mcr_91490_ipu )
 	MDRV_CPU_CONFIG(mcr_ipu_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(ipu_91695_map,0)
 	MDRV_CPU_IO_MAP(ipu_91695_portmap,0)
-	MDRV_CPU_VBLANK_INT(mcr_ipu_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mcr_ipu_interrupt,2)
 MACHINE_DRIVER_END
 
 

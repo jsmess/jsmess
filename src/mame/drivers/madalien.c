@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
+#include "video/mc6845.h"
 #include "madalien.h"
 
 
@@ -19,10 +20,10 @@ static UINT8 *shift_hi;
 static UINT8 *shift_lo;
 
 
-static INTERRUPT_GEN( madalien_interrupt )
+static INPUT_CHANGED( coin_inserted )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI,
-		(readinputportbytag("PLAYER2") & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	/* coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -57,17 +58,15 @@ static WRITE8_HANDLER( madalien_output_w )
 
 static WRITE8_HANDLER( madalien_sound_command_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
-
-	soundlatch_w(offset, data);
+	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	soundlatch_w(machine, offset, data);
 }
 
 
 static READ8_HANDLER(madalien_sound_command_r )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
-
-	return soundlatch_r(offset);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	return soundlatch_r(machine, offset);
 }
 
 
@@ -88,8 +87,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x67ff) AM_RAM
 	AM_RANGE(0x6800, 0x7fff) AM_RAM AM_BASE(&madalien_charram)
 
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_WRITE(madalien_mc6845_address_w)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_READWRITE(madalien_mc6845_register_r, madalien_mc6845_register_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITE(MWA8_RAM) AM_BASE(&madalien_video_control)
 	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x0ff0) AM_WRITE(madalien_output_w)
 	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_READWRITE(soundlatch2_r, madalien_sound_command_w)
@@ -109,7 +108,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_RAM /* unknown device in an epoxy block, might be tilt detection */
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_READ(madalien_sound_command_r)
@@ -159,7 +158,7 @@ static INPUT_PORTS_START( madalien )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) /* or service coin */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -177,11 +176,10 @@ static MACHINE_DRIVER_START( madalien )
 	/* main CPU */
 	MDRV_CPU_ADD(M6502, MADALIEN_MAIN_CLOCK / 8)    /* 1324kHz */
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
-	MDRV_CPU_VBLANK_INT(madalien_interrupt, 1)
 
 	/* audio CPU */
 	MDRV_CPU_ADD(M6502, SOUND_CLOCK / 8)   /* 512kHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(audio_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 800)    /* unknown due to incomplete schematics */
 
 	/* video hardware */

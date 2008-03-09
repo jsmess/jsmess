@@ -346,12 +346,12 @@ void mfp_set_timer(int timer, unsigned char data)
 // 4 channel DMA controller (Hitachi HD63450)
 static WRITE16_HANDLER( x68k_dmac_w )
 {
-	hd63450_w(offset, data, mem_mask);
+	hd63450_w(machine, offset, data, mem_mask);
 }
 
 static READ16_HANDLER( x68k_dmac_r )
 {
-	return hd63450_r(offset, mem_mask);
+	return hd63450_r(machine, offset, mem_mask);
 }
 
 static void x68k_keyboard_ctrl_w(int data)
@@ -566,13 +566,13 @@ static READ16_HANDLER( x68k_scc_r )
 	switch(offset)
 	{
 	case 0:
-		return scc_r(0);
+		return scc_r(machine, 0);
 	case 1:
 		return x68k_read_mouse();
 	case 2:
-		return scc_r(1);
+		return scc_r(machine, 1);
 	case 3:
-		return scc_r(3);
+		return scc_r(machine, 3);
 	default:
 		return 0xff;
 	}
@@ -586,7 +586,7 @@ static WRITE16_HANDLER( x68k_scc_w )
 	switch(offset)
 	{
 	case 0:
-		scc_w(0,(UINT8)data);
+		scc_w(machine, 0,(UINT8)data);
 		if((scc_get_reg_b(5) & 0x02) != prev)
 		{
 			if(scc_get_reg_b(5) & 0x02)  // Request to Send
@@ -599,13 +599,13 @@ static WRITE16_HANDLER( x68k_scc_w )
 		}
 		break;
 	case 1:
-		scc_w(2,(UINT8)data);
+		scc_w(machine, 2,(UINT8)data);
 		break;
 	case 2:
-		scc_w(1,(UINT8)data);
+		scc_w(machine, 1,(UINT8)data);
 		break;
 	case 3:
-		scc_w(3,(UINT8)data);
+		scc_w(machine, 3,(UINT8)data);
 		break;
 	}
 	prev = scc_get_reg_b(5) & 0x02;
@@ -693,7 +693,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 	{
 	case 0x00:
 	case 0x01:
-		nec765_data_w(0,data);
+		nec765_data_w(machine, 0,data);
 		break;
 	case 0x02:  // drive option signal control
 		x = data & 0x0f;
@@ -736,9 +736,9 @@ static READ16_HANDLER( x68k_fdc_r )
 	switch(offset)
 	{
 	case 0x00:
-		return nec765_status_r(0);
+		return nec765_status_r(machine, 0);
 	case 0x01:
-		return nec765_data_r(0);
+		return nec765_data_r(machine, 0);
 	case 0x02:
 		ret = 0x00;
 		for(x=0;x<4;x++)
@@ -782,14 +782,14 @@ static int x68k_fdc_read_byte(int addr)
 	int data = -1;
 
 	if(sys.fdc.drq_state != 0)
-		data = nec765_dack_r(0);
+		data = nec765_dack_r(Machine, 0);
 //  logerror("FDC: DACK reading\n");
 	return data;
 }
 
 static void x68k_fdc_write_byte(int addr, int data)
 {
-	nec765_dack_w(0,data);
+	nec765_dack_w(Machine, 0, data);
 }
 
 static void fdc_drq(int state, int read_write)
@@ -820,11 +820,11 @@ static WRITE16_HANDLER( x68k_fm_w )
 	switch(offset)
 	{
 	case 0x00:
-		YM2151_register_port_0_w(0,data);
+		YM2151_register_port_0_w(machine, 0, data);
 		logerror("YM: Register select 0x%02x\n",data);
 		break;
 	case 0x01:
-		YM2151_data_port_0_w(0,data);
+		YM2151_data_port_0_w(machine, 0, data);
 		logerror("YM: Data write 0x%02x\n",data);
 		break;
 	}
@@ -833,7 +833,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
-		return YM2151_status_port_0_r(0);
+		return YM2151_status_port_0_r(machine, 0);
 
 	return 0xff;
 }
@@ -1145,12 +1145,12 @@ static READ16_HANDLER( x68k_ppi_r )
 
 static READ16_HANDLER( x68k_rtc_r )
 {
-	return rp5c15_r(offset,mem_mask);
+	return rp5c15_r(machine, offset, mem_mask);
 }
 
 static WRITE16_HANDLER( x68k_rtc_w )
 {
-	rp5c15_w(offset,data,mem_mask);
+	rp5c15_w(machine, offset, data, mem_mask);
 }
 
 static void x68k_rtc_alarm_irq(int state)
@@ -1928,17 +1928,17 @@ static MACHINE_START( x68000 )
 {
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(REGION_USER1);
-	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_handler)1);
-	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_handler)1);
+	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_machine_func)1);
+	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_machine_func)1);
 	memory_set_bankptr(1,mess_ram);
-	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0xc00000,0xdfffff,0x1fffff,0,(read16_handler)x68k_gvram_r);
-	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0xc00000,0xdfffff,0x1fffff,0,(write16_handler)x68k_gvram_w);
+	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0xc00000,0xdfffff,0x1fffff,0,(read16_machine_func)x68k_gvram_r);
+	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0xc00000,0xdfffff,0x1fffff,0,(write16_machine_func)x68k_gvram_w);
 	memory_set_bankptr(2,gvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0xe00000,0xe7ffff,0x07ffff,0,(read16_handler)x68k_tvram_r);
-	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0xe00000,0xe7ffff,0x07ffff,0,(write16_handler)x68k_tvram_w);
+	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0xe00000,0xe7ffff,0x07ffff,0,(read16_machine_func)x68k_tvram_r);
+	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0xe00000,0xe7ffff,0x07ffff,0,(write16_machine_func)x68k_tvram_w);
 	memory_set_bankptr(3,tvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0xed0000,0xed3fff,0x003fff,0,(read16_handler)x68k_sram_r);
-	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0xed0000,0xed3fff,0x003fff,0,(write16_handler)x68k_sram_w);
+	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0xed0000,0xed3fff,0x003fff,0,(read16_machine_func)x68k_sram_r);
+	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0xed0000,0xed3fff,0x003fff,0,(write16_machine_func)x68k_sram_w);
 	memory_set_bankptr(4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
@@ -2002,7 +2002,7 @@ static MACHINE_DRIVER_START( x68000 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 10000000)  /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(x68k_map, 0)
-	MDRV_CPU_VBLANK_INT(x68k_vsync_irq,1)
+	MDRV_CPU_VBLANK_INT("main", x68k_vsync_irq)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( x68000 )

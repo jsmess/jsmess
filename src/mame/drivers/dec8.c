@@ -95,7 +95,7 @@ static int msm5205next;
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static VIDEO_EOF( dec8 )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }
 
 static READ8_HANDLER( i8751_h_r )
@@ -426,14 +426,14 @@ static WRITE8_HANDLER( csilver_control_w )
 
 static WRITE8_HANDLER( dec8_sound_w )
 {
- 	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+ 	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_HANDLER( oscar_sound_w )
 {
- 	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
+ 	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static void csilver_adpcm_int(int data)
@@ -2087,7 +2087,7 @@ static MACHINE_DRIVER_START( cobracom )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(cobra_readmem,cobra_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -2129,7 +2129,7 @@ static MACHINE_DRIVER_START( ghostb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309, 3000000*4)
 	MDRV_CPU_PROGRAM_MAP(ghostb_readmem,ghostb_writemem)
-	MDRV_CPU_VBLANK_INT(ghostb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ghostb_interrupt)
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -2173,7 +2173,7 @@ static MACHINE_DRIVER_START( srdarwin )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,2000000)  /* MC68A09EP */
 	MDRV_CPU_PROGRAM_MAP(srdarwin_readmem,srdarwin_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -2215,7 +2215,7 @@ static MACHINE_DRIVER_START( gondo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP */
 	MDRV_CPU_PROGRAM_MAP(gondo_readmem,gondo_writemem)
-	MDRV_CPU_VBLANK_INT(gondo_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", gondo_interrupt)
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -2258,7 +2258,7 @@ static MACHINE_DRIVER_START( oscar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(oscar_readmem,oscar_writemem)
-	MDRV_CPU_VBLANK_INT(oscar_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", oscar_interrupt)
 
 	MDRV_CPU_ADD(HD6309, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(oscar_sub_readmem,oscar_sub_writemem)
@@ -2397,7 +2397,7 @@ static MACHINE_DRIVER_START( csilver )
 
 	MDRV_CPU_ADD(M6809, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(csilver_sub_readmem,csilver_sub_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6502, XTAL_12MHz/8) /* verified on pcb */
 	/* audio CPU */
@@ -2444,7 +2444,7 @@ static MACHINE_DRIVER_START( garyoret )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP */
 	MDRV_CPU_PROGRAM_MAP(garyoret_readmem,garyoret_writemem)
-	MDRV_CPU_VBLANK_INT(gondo_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", gondo_interrupt)
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */

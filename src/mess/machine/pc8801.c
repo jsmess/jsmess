@@ -181,7 +181,7 @@ static void pc8801_init_interrupt(void)
 WRITE8_HANDLER(pc88sr_outport_30)
 {
   /* bit 1-5 not implemented yet */
-  pc88sr_disp_30(offset,data);
+  pc88sr_disp_30(machine, offset,data);
 }
 
 WRITE8_HANDLER(pc88sr_outport_40)
@@ -194,7 +194,7 @@ WRITE8_HANDLER(pc88sr_outport_40)
   if((port_save&0x04) == 0x00 && (data&0x04) != 0x00) calender_shift();
   port_save=data;
 
-  if((input_port_17_r(0)&0x40)==0x00) {
+  if((readinputport(17)&0x40)==0x00) {
     data&=0x7f;
   }
   switch(data&0xa0) {
@@ -241,7 +241,7 @@ WRITE8_HANDLER(pc88sr_outport_40)
   int r;
 
   /* read DIP-SW */
-  r=input_port_17_r(0)<<1;
+  r=readinputport(17)<<1;
   /* change bit 0 according BASIC mode */
   if(is_Nbasic) {
     r&=0xfe;
@@ -268,7 +268,7 @@ WRITE8_HANDLER(pc88sr_outport_40)
   int r;
 
   /* read DIP-SW */
-  r=input_port_18_r(0)<<1;
+  r=readinputport(18)<<1;
   /* change bit 6 according speed switch */
   if(pc88sr_is_highspeed) {
     r|=0x40;
@@ -487,7 +487,7 @@ WRITE8_HANDLER(pc88sr_outport_31)
   RAMmode=((data&0x02)!=0);
   ROMmode=((data&0x04)!=0);
   pc8801_update_bank();
-  pc88sr_disp_31(offset,data);
+  pc88sr_disp_31(machine, offset,data);
 }
 
  READ8_HANDLER(pc88sr_inport_32)
@@ -503,7 +503,7 @@ WRITE8_HANDLER(pc88sr_outport_32)
   no4throm2=(data&3);
   enable_FM_IRQ=((data & 0x80) == 0x00);
   if(FM_IRQ_save && enable_FM_IRQ) pc8801_raise_interrupt(FM_IRQ_LEVEL);
-  pc88sr_disp_32(offset,data);
+  pc88sr_disp_32(machine, offset,data);
   pc8801_update_bank();
 }
 
@@ -572,8 +572,8 @@ static void pc8801_init_bank(int hireso)
 	pc8801_update_bank();
 	pc8801_video_init(hireso);
 
-  if(extmem_mode!=input_port_19_r(0)) {
-    extmem_mode=input_port_19_r(0);
+  if(extmem_mode!=readinputport(19)) {
+    extmem_mode=readinputport(19);
     if(extRAM!=NULL) {
       free(extRAM);
       extRAM=NULL;
@@ -695,7 +695,7 @@ static void pc88sr_ch_reset (int hireso)
 {
   int a;
 
-  a=input_port_16_r(0);
+  a=readinputport(16);
   is_Nbasic = ((a&0x01)==0x00);
   is_V2mode = ((a&0x02)==0x00);
   pc88sr_is_highspeed = ((a&0x04)!=0x00);
@@ -810,7 +810,7 @@ static const struct nec765_interface pc8801_fdc_interface=
 
 static void pc8801_init_5fd(void)
 {
-	use_5FD = (input_port_18_r(0)&0x80)!=0x00;
+	use_5FD = (readinputport(18)&0x80)!=0x00;
 	ppi8255_init(&pc8801_8255_config);
 	if (!use_5FD)
 		cpunum_suspend(1, SUSPEND_REASON_DISABLE, 1);

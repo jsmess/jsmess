@@ -99,8 +99,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(dac_w)
 {
-	DAC_0_data_w(0, data & 0xf0 );	/* left */
-	DAC_1_data_w(0, (data & 0x0f)<<4 );	/* right */
+	DAC_0_data_w(machine, 0, data & 0xf0 );	/* left */
+	DAC_1_data_w(machine, 0, (data & 0x0f)<<4 );	/* right */
 }
 
 
@@ -214,7 +214,7 @@ static MACHINE_DRIVER_START( mogura )
 	MDRV_CPU_ADD(Z80,3000000)		 /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_GFXDECODE(mogura)
 

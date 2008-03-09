@@ -22,7 +22,7 @@ WRITE8_HANDLER( nitedrvr_hvc_w )
 	nitedrvr_hvc[offset & 0x3f] = data;
 
 	if ((offset & 0x30) == 0x30)
-		watchdog_reset_w(0, 0);
+		watchdog_reset_w(machine, 0, 0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -39,7 +39,7 @@ VIDEO_START( nitedrvr )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_box(mame_bitmap *bitmap, int bx, int by, int ex, int ey )
+static void draw_box(bitmap_t *bitmap, int bx, int by, int ex, int ey )
 {
 	int x, y;
 
@@ -53,7 +53,7 @@ static void draw_box(mame_bitmap *bitmap, int bx, int by, int ex, int ey )
 	return;
 }
 
-static void draw_roadway(mame_bitmap *bitmap)
+static void draw_roadway(bitmap_t *bitmap)
 {
 	int roadway;
 

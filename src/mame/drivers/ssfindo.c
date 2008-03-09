@@ -335,7 +335,7 @@ static READ32_HANDLER(PS7500_IO_r)
 			return (PS7500_IO[IRQSTA]&PS7500_IO[IRQMSKA])|0x80;
 
 		case IOCR: //TODO: nINT1, OD[n] p.81
-			return (input_port_0_r(0)&0x80)|0x34|3;
+			return (input_port_0_r(machine,0)&0x80)|0x34|3;
 
 		case VIDCR:
 			return (PS7500_IO[offset]|0x50)&0xfffffff0;
@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( ssfindo )
 	MDRV_CPU_ADD(ARM7, 54000000) // guess...
 	MDRV_CPU_PROGRAM_MAP(ssfindo_map,0)
 
-	MDRV_CPU_VBLANK_INT(ssfindo_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ssfindo_interrupt)
 	MDRV_MACHINE_RESET(ssfindo)
 
 
@@ -636,7 +636,7 @@ static MACHINE_DRIVER_START( ppcar )
 	MDRV_CPU_ADD(ARM7, 54000000) // guess...
 	MDRV_CPU_PROGRAM_MAP(ppcar_map,0)
 
-	MDRV_CPU_VBLANK_INT(ssfindo_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ssfindo_interrupt)
 	MDRV_MACHINE_RESET(ssfindo)
 
 

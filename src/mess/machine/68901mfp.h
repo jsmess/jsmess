@@ -63,8 +63,8 @@ struct _mc68901_interface
 
 	void (*irq_callback)(mc68901_t *chip, int state);
 
-	read8_handler gpio_r;
-	write8_handler gpio_w;
+	read8_machine_func gpio_r;
+	write8_machine_func gpio_w;
 };
 
 /* device interface */

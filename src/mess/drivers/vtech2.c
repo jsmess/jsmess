@@ -447,7 +447,7 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_CPU_ADD_TAG("main", Z80, 3694700)        /* 3.694700 Mhz */
 	MDRV_CPU_PROGRAM_MAP(vtech2_mem, 0)
 	MDRV_CPU_IO_MAP(vtech2_io, 0)
-	MDRV_CPU_VBLANK_INT(vtech2_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", vtech2_interrupt)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(0)

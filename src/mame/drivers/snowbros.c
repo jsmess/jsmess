@@ -111,7 +111,7 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	int status = OKIM6295_status_0_r(0);
+	int status = OKIM6295_status_0_r(machine,0);
 
 	cpunum_set_input_line(machine, 0, cpu_getiloops() + 2, HOLD_LINE);	/* IRQs 4, 3, and 2 */
 
@@ -119,8 +119,8 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x00)
 		{
-			OKIM6295_data_0_w(0,0x80|sb3_music);
-			OKIM6295_data_0_w(0,0x00|0x82);
+			OKIM6295_data_0_w(machine,0,0x80|sb3_music);
+			OKIM6295_data_0_w(machine,0,0x00|0x82);
 		}
 
 	}
@@ -128,7 +128,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x08)
 		{
-			OKIM6295_data_0_w(0,0x40);		/* Stop playing music */
+			OKIM6295_data_0_w(machine,0,0x40);		/* Stop playing music */
 		}
 	}
 
@@ -139,7 +139,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 
 static READ16_HANDLER( snowbros_68000_sound_r )
 {
-	return soundlatch_r(offset);
+	return soundlatch_r(machine,offset);
 }
 
 
@@ -147,14 +147,14 @@ static WRITE16_HANDLER( snowbros_68000_sound_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(offset,data & 0xff);
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(machine,offset,data & 0xff);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
 static WRITE16_HANDLER( semicom_soundcmd_w )
 {
-	if (ACCESSING_LSB) soundlatch_w(0,data & 0xff);
+	if (ACCESSING_LSB) soundlatch_w(machine,0,data & 0xff);
 }
 
 
@@ -289,8 +289,8 @@ static WRITE16_HANDLER( twinadv_68000_sound_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(offset,data & 0xff);
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(machine,offset,data & 0xff);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -453,24 +453,24 @@ static void sb3_play_music(int data)
 	}
 }
 
-static void sb3_play_sound (int data)
+static void sb3_play_sound (running_machine *machine, int data)
 {
-	int status = OKIM6295_status_0_r(0);
+	int status = OKIM6295_status_0_r(machine,0);
 
 	if ((status&0x01)==0x00)
 	{
-		OKIM6295_data_0_w(0,0x80|data);
-		OKIM6295_data_0_w(0,0x00|0x12);
+		OKIM6295_data_0_w(machine,0,0x80|data);
+		OKIM6295_data_0_w(machine,0,0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		OKIM6295_data_0_w(0,0x80|data);
-		OKIM6295_data_0_w(0,0x00|0x22);
+		OKIM6295_data_0_w(machine,0,0x80|data);
+		OKIM6295_data_0_w(machine,0,0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		OKIM6295_data_0_w(0,0x80|data);
-		OKIM6295_data_0_w(0,0x00|0x42);
+		OKIM6295_data_0_w(machine,0,0x80|data);
+		OKIM6295_data_0_w(machine,0,0x00|0x42);
 	}
 
 
@@ -481,7 +481,7 @@ static WRITE16_HANDLER( sb3_sound_w )
 	if (data == 0x00fe)
 	{
 		sb3_music_is_playing = 0;
-		OKIM6295_data_0_w(0,0x78);		/* Stop sounds */
+		OKIM6295_data_0_w(machine,0,0x78);		/* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
 	{
@@ -489,7 +489,7 @@ static WRITE16_HANDLER( sb3_sound_w )
 
 		if (data <= 0x21)
 		{
-			sb3_play_sound(data);
+			sb3_play_sound(machine, data);
 		}
 
 		if (data>=0x22 && data<=0x31)
@@ -499,7 +499,7 @@ static WRITE16_HANDLER( sb3_sound_w )
 
 		if ((data>=0x30) && (data<=0x51))
 		{
-			sb3_play_sound(data-0x30);
+			sb3_play_sound(machine, data-0x30);
 		}
 
 		if (data>=0x52 && data<=0x5f)
@@ -1558,7 +1558,7 @@ static MACHINE_DRIVER_START( snowbros )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 Mhz - confirmed */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(snowbros_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 6000000) /* 6 MHz - confirmed */
 	/* audio CPU */
@@ -1656,7 +1656,7 @@ static MACHINE_DRIVER_START( honeydol )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(honeydol_readmem,honeydol_writemem)
-	MDRV_CPU_VBLANK_INT(snowbros_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
 	/* audio CPU */
@@ -1696,13 +1696,13 @@ static MACHINE_DRIVER_START( twinadv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000) // or 12
 	MDRV_CPU_PROGRAM_MAP(twinadv_readmem,twinadv_writemem)
-	MDRV_CPU_VBLANK_INT(snowbros_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(twinadv_sound_readmem,twinadv_sound_writemem)
 	MDRV_CPU_IO_MAP(twinadv_sound_readport,twinadv_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1777,7 +1777,7 @@ static MACHINE_DRIVER_START( snowbro3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000) /* 16mhz or 12mhz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem3,writemem3)
-	MDRV_CPU_VBLANK_INT(snowbro3_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(snowbro3_interrupt,3)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

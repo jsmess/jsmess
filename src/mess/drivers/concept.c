@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( concept )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8182000)        /* 16.364 Mhz / 2 */
 	MDRV_CPU_PROGRAM_MAP(concept_memmap, 0)
-	MDRV_CPU_VBLANK_INT(concept_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", concept_interrupt)
 
 	MDRV_INTERLEAVE(1)
 	MDRV_MACHINE_START(concept)

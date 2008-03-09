@@ -20,8 +20,8 @@
 /* pal version */
 /* dma_read: videochip fetched 1 byte data from system bus */
 extern void ted7360_init (int pal);
-extern void ted7360_set_dma (read8_handler dma_read,
-							 read8_handler dma_read_rom);
+extern void ted7360_set_dma (read8_machine_func dma_read,
+							 read8_machine_func dma_read_rom);
 
 #define TED7360NTSC_VRETRACERATE 60
 #define TED7360PAL_VRETRACERATE 50

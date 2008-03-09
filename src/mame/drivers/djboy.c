@@ -403,7 +403,7 @@ static WRITE8_HANDLER( beast_data_w )
 
 	logerror( "0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
 
-	watchdog_reset_w(0,0);
+	watchdog_reset_w(machine,0,0);
 
 	if( prot_mode == ePROT_WAIT_DSW1_WRITEBACK )
 	{
@@ -715,8 +715,8 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
@@ -829,17 +829,17 @@ static MACHINE_DRIVER_START( djboy )
 	MDRV_CPU_ADD(Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am,0)
 	MDRV_CPU_IO_MAP(cpu0_port_am,0)
-	MDRV_CPU_VBLANK_INT(djboy_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(djboy_interrupt,2)
 
 	MDRV_CPU_ADD(Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu1_am,0)
 	MDRV_CPU_IO_MAP(cpu1_port_am,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu2_am,0)
 	MDRV_CPU_IO_MAP(cpu2_port_am,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
 

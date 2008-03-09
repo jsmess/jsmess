@@ -238,21 +238,21 @@ static ADDRESS_MAP_START( readport_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mrflea_data0_w ){
-	AY8910_control_port_0_w( offset, mrflea_select0 );
-	AY8910_write_port_0_w( offset, data );
+	AY8910_control_port_0_w( machine, offset, mrflea_select0 );
+	AY8910_write_port_0_w( machine, offset, data );
 }
 
 static WRITE8_HANDLER( mrflea_data1_w ){
 }
 
 static WRITE8_HANDLER( mrflea_data2_w ){
-	AY8910_control_port_1_w( offset, mrflea_select2 );
-	AY8910_write_port_1_w( offset, data );
+	AY8910_control_port_1_w( machine, offset, mrflea_select2 );
+	AY8910_write_port_1_w( machine, offset, data );
 }
 
 static WRITE8_HANDLER( mrflea_data3_w ){
-	AY8910_control_port_2_w( offset, mrflea_select3 );
-	AY8910_write_port_2_w( offset, data );
+	AY8910_control_port_2_w( machine, offset, mrflea_select3 );
+	AY8910_write_port_2_w( machine, offset, data );
 }
 
 static ADDRESS_MAP_START( writeport_io, ADDRESS_SPACE_IO, 8 )
@@ -278,12 +278,12 @@ static MACHINE_DRIVER_START( mrflea )
 	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1) /* NMI resets the game */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* NMI resets the game */
 
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_io,writemem_io)
 	MDRV_CPU_IO_MAP(readport_io,writeport_io)
-	MDRV_CPU_VBLANK_INT(mrflea_io_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mrflea_io_interrupt,2)
 
 	MDRV_INTERLEAVE(100)
 

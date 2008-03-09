@@ -51,8 +51,8 @@ static INTERRUPT_GEN( ssozumo_interrupt )
 
 static WRITE8_HANDLER( ssozumo_sh_command_w )
 {
-	soundlatch_w(offset, data);
-	cpunum_set_input_line(Machine, 1, M6502_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(machine, offset, data);
+	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -235,12 +235,12 @@ static MACHINE_DRIVER_START( ssozumo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 1200000)	/* 1.2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(ssozumo_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ssozumo_interrupt)
 
 	MDRV_CPU_ADD(M6502, 975000)
 	/* audio CPU */ 		/* 975 kHz ?? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,16)	/* IRQs are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

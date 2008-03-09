@@ -19,20 +19,9 @@
  *
  *************************************/
 
-static void qix_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled);
-
-static void *qix_begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect);
-
-static void qix_update_row(running_machine *machine,
-						   mc6845_t *mc6845,
-						   mame_bitmap *bitmap,
-						   const rectangle *cliprect,
-						   UINT16 ma,
-						   UINT8 ra,
-						   UINT16 y,
-						   UINT8 x_count,
-						   INT8 cursor_x,
-						   void *param);
+static MC6845_BEGIN_UPDATE( begin_update );
+static MC6845_UPDATE_ROW( update_row );
+static MC6845_ON_DE_CHANGED( display_enable_changed );
 
 
 
@@ -67,7 +56,7 @@ static VIDEO_START( qix )
  *
  *************************************/
 
-static void qix_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
 	qix_state *state = machine->driver_data;
 
@@ -299,43 +288,12 @@ static void get_pens(qix_state *state, pen_t *pens)
 
 /*************************************
  *
- *  M6845 access
- *
- *************************************/
-
-static WRITE8_HANDLER( qix_mc6845_address_w )
-{
-	qix_state *state = Machine->driver_data;
-
-	mc6845_address_w(state->mc6845, data);
-}
-
-
-static READ8_HANDLER( qix_mc6845_register_r )
-{
-	qix_state *state = Machine->driver_data;
-
-	return mc6845_register_r(state->mc6845);
-}
-
-
-static WRITE8_HANDLER( qix_mc6845_register_w )
-{
-	qix_state *state = Machine->driver_data;
-
-	mc6845_register_w(state->mc6845, data);
-}
-
-
-
-/*************************************
- *
  *  M6845 callbacks for updating
  *  the screen
  *
  *************************************/
 
-static void *qix_begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+static MC6845_BEGIN_UPDATE( begin_update )
 {
 	qix_state *state = machine->driver_data;
 
@@ -353,8 +311,8 @@ static void *qix_begin_update(running_machine *machine, mc6845_t *mc6845, mame_b
 }
 
 
-static void qix_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-						   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+static MC6845_UPDATE_ROW( update_row )
+
 {
 	qix_state *state = machine->driver_data;
 	UINT16 x;
@@ -408,8 +366,8 @@ static ADDRESS_MAP_START( qix_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE(MC6845, "vid-u18", mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE(MC6845, "vid-u18", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -426,8 +384,8 @@ static ADDRESS_MAP_START( zookeep_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE(MC6845, "vid-u18", mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE(MC6845, "vid-u18", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -445,8 +403,8 @@ static ADDRESS_MAP_START( slither_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9401, 0x9401) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_mask)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE(MC6845, "vid-u18", mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE(MC6845, "vid-u18", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -460,13 +418,15 @@ ADDRESS_MAP_END
 
 static const mc6845_interface mc6845_intf =
 {
-	0,							/* screen we are acting on */
-	QIX_CHARACTER_CLOCK, 		/* the clock (pin 21) of the chip */
-	8,							/* number of pixels per video memory address */
-	qix_begin_update,			/* before pixel update callback */
-	qix_update_row,				/* row update callback */
-	0,							/* after pixel update callback */
-	qix_display_enable_changed	/* call back for display state changes */
+	0,						/* screen we are acting on */
+	QIX_CHARACTER_CLOCK, 	/* the clock (pin 21) of the chip */
+	8,						/* number of pixels per video memory address */
+	begin_update,			/* before pixel update callback */
+	update_row,				/* row update callback */
+	NULL,					/* after pixel update callback */
+	display_enable_changed,	/* callback for display state changes */
+	NULL,					/* HSYNC callback */
+	NULL					/* VSYNC callback */
 };
 
 

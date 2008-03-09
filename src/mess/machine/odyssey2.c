@@ -71,7 +71,7 @@ MACHINE_RESET( odyssey2 )
 READ8_HANDLER( odyssey2_bus_r )
 {
     if ((p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
-		return odyssey2_video_r(offset); /* seems to have higher priority than ram??? */
+		return odyssey2_video_r(machine, offset); /* seems to have higher priority than ram??? */
 
     else if (!(p1 & P1_EXT_RAM_ENABLE))
 		return ram[offset];
@@ -86,7 +86,7 @@ WRITE8_HANDLER( odyssey2_bus_w )
 		if ( offset & 0x80 ) {
 			if ( data & 0x20 ) {
 				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, p1 );
-				sp0256_ALD_w( 0, offset & 0x7F );
+				sp0256_ALD_w( machine, 0, offset & 0x7F );
 			} else {
 				/* TODO: Reset sp0256 in this case */
 			}
@@ -94,13 +94,13 @@ WRITE8_HANDLER( odyssey2_bus_w )
 	}
 
     else if (!(p1 & P1_VDC_ENABLE))
-		odyssey2_video_w(offset, data);
+		odyssey2_video_w(machine, offset, data);
 }
 
 READ8_HANDLER( g7400_bus_r )
 {
 	if ((p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0) {
-		return odyssey2_video_r(offset); /* seems to have higher priority than ram??? */
+		return odyssey2_video_r(machine, offset); /* seems to have higher priority than ram??? */
 	}
 	else if (!(p1 & P1_EXT_RAM_ENABLE)) {
 		return ram[offset];
@@ -117,7 +117,7 @@ WRITE8_HANDLER( g7400_bus_w )
 		ram[offset] = data;
 	}
 	else if (!(p1 & P1_VDC_ENABLE)) {
-		odyssey2_video_w(offset, data);
+		odyssey2_video_w(machine, offset, data);
 	} else {
 //		ef9341_w( offset & 0x02, offset & 0x01, data );
 	}
@@ -139,7 +139,7 @@ WRITE8_HANDLER( odyssey2_putp1 )
 
 	odyssey2_switch_banks();
 
-	odyssey2_lum_w ( 0, p1 >> 7 );
+	odyssey2_lum_w ( machine, 0, p1 >> 7 );
 
     logerror("%.6f p1 written %.2x\n", attotime_to_double(timer_get_time()), data);
 }

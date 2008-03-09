@@ -84,12 +84,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( spc_ram_100_r )
 {
-	return spc_ram_r(offset + 0x100);
+	return spc_ram_r(machine, offset + 0x100);
 }
 
 static WRITE8_HANDLER( spc_ram_100_w )
 {
-	spc_ram_w(offset + 0x100, data);
+	spc_ram_w(machine, offset + 0x100, data);
 }
 
 static ADDRESS_MAP_START( spc_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -214,7 +214,6 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_CPU_ADD_TAG("sound", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(spc_mem, 0)
-	MDRV_CPU_VBLANK_INT(NULL, 0)
 
 	MDRV_INTERLEAVE(400)
 

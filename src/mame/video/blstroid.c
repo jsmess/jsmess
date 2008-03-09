@@ -99,7 +99,7 @@ VIDEO_START( blstroid )
 static TIMER_CALLBACK( irq_off )
 {
 	/* clear the interrupt */
-	atarigen_scanline_int_ack_w(0, 0, 0);
+	atarigen_scanline_int_ack_w(machine, 0, 0, 0);
 }
 
 
@@ -122,7 +122,7 @@ void blstroid_scanline_update(running_machine *machine, int scrnum, int scanline
 			attotime period_on;
 			attotime period_off;
 
-			/* fix me - the only thing this IRQ does it tweak the starting MO link */
+			/* FIXME: - the only thing this IRQ does it tweak the starting MO link */
 			/* unfortunately, it does it too early for the given MOs! */
 			/* perhaps it is not actually hooked up on the real PCB... */
 			return;
@@ -148,7 +148,7 @@ void blstroid_scanline_update(running_machine *machine, int scrnum, int scanline
 VIDEO_UPDATE( blstroid )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

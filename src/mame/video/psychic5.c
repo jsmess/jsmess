@@ -171,19 +171,19 @@ READ8_HANDLER( psychic5_paged_ram_r )
 			switch(offset)
 			{
 				case 0x00:
-					val = input_port_0_r(0);
+					val = input_port_0_r(machine,0);
 					break;
 				case 0x01:
-					val = input_port_1_r(0);
+					val = input_port_1_r(machine,0);
 					break;
 				case 0x02:
-					val = input_port_2_r(0);
+					val = input_port_2_r(machine,0);
 					break;
 				case 0x03:
-					val = input_port_3_r(0);
+					val = input_port_3_r(machine,0);
 					break;
 				case 0x04:
-					val = input_port_4_r(0);
+					val = input_port_4_r(machine,0);
 					break;
 				default:
 					val = ps5_io_ram[offset];
@@ -199,7 +199,6 @@ READ8_HANDLER( psychic5_paged_ram_r )
 			return psychic5_fg_videoram[offset & 0xfff];
 		}
 	}
-	return 0;
 }
 
 WRITE8_HANDLER( psychic5_paged_ram_w )
@@ -207,7 +206,7 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 	if (!ps5_vram_page)
 	{
 		if (offset < 0x1000)
-			psychic5_bg_videoram_w(offset,data);
+			psychic5_bg_videoram_w(machine,offset,data);
 		else
 			ps5_dummy_bg_ram[offset & 0xfff] = data;
 	}
@@ -239,7 +238,7 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 		}
 		else
 		{
-			psychic5_fg_videoram_w(offset & 0xfff, data);
+			psychic5_fg_videoram_w(machine, offset & 0xfff, data);
 		}
 	}
 }
@@ -294,7 +293,7 @@ VIDEO_START( psychic5 )
 #define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15);
 /* #define DRAW_SPRITE(code, sx, sy) drawgfx(bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15); */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -362,7 +361,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int bg_scrollx = (ps5_io_ram[BG_SCROLLX_LSB] + ((ps5_io_ram[BG_SCROLLX_MSB] & 0x03) << 8)) & 0x3ff;
 	int bg_scrolly = (ps5_io_ram[BG_SCROLLY_LSB] + ((ps5_io_ram[BG_SCROLLY_MSB] & 0x01) << 8)) & 0x1ff;

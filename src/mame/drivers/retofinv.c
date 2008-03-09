@@ -93,8 +93,8 @@ static READ8_HANDLER( cpu0_mf800_r )
 
 static WRITE8_HANDLER( soundcommand_w )
 {
-      soundlatch_w(0, data);
-      cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
+      soundlatch_w(machine, 0, data);
+      cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( irq0_ack_w )
@@ -367,15 +367,15 @@ static MACHINE_DRIVER_START( retofinv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,2)
 
 	MDRV_CPU_ADD_TAG("68705", M68705,18432000/6)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)

@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/resnet.h"
 #include "includes/dkong.h"
 
@@ -472,7 +471,7 @@ static TILE_GET_INFO( radarsc1_bg_tile_info )
 
 WRITE8_HANDLER( dkong_videoram_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	if (state->video_ram[offset] != data)
 	{
@@ -483,21 +482,21 @@ WRITE8_HANDLER( dkong_videoram_w )
 
 WRITE8_HANDLER( radarscp_snd02_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	state->snd02_enable = data & 0x01;
 }
 
 WRITE8_HANDLER( radarsc1_ansn_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	state->sig_ansn = data & 0x01;
 }
 
 WRITE8_HANDLER( dkongjr_gfxbank_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	if (state->gfx_bank != (data & 0x01))
 	{
@@ -508,7 +507,7 @@ WRITE8_HANDLER( dkongjr_gfxbank_w )
 
 WRITE8_HANDLER( dkong3_gfxbank_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	if (state->gfx_bank != (~data & 0x01))
 	{
@@ -519,7 +518,7 @@ WRITE8_HANDLER( dkong3_gfxbank_w )
 
 WRITE8_HANDLER( dkong_palettebank_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	int newbank;
 
 	newbank = state->palette_bank;
@@ -538,14 +537,14 @@ WRITE8_HANDLER( dkong_palettebank_w )
 
 WRITE8_HANDLER( radarscp_grid_enable_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	state->grid_on = data & 0x01;
 }
 
 WRITE8_HANDLER( radarscp_grid_color_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	state->grid_col = (data & 0x07) ^ 0x07;
 	//popmessage("Gridcol: %d", state->grid_col);
@@ -553,25 +552,25 @@ WRITE8_HANDLER( radarscp_grid_color_w )
 
 WRITE8_HANDLER( dkong_flipscreen_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	state->flip = ~data & 0x01;
 }
 
 WRITE8_HANDLER( dkong_spritebank_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	state->sprite_bank = data & 0x01;
 }
 
 /***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
+  Draw the game screen in the given bitmap_t.
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 mask_bank, UINT32 shift_bits)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 mask_bank, UINT32 shift_bits)
 {
 	dkong_state *state = machine->driver_data;
 	int offs;
@@ -699,7 +698,7 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 	if (line_cnt>=512)
 		line_cnt=512-VTOTAL;
 
-	if ( ( !(line_cnt & 0x40) && ((line_cnt+1) & 0x40) ) && (mame_rand(Machine) > RAND_MAX/2))
+	if ( ( !(line_cnt & 0x40) && ((line_cnt+1) & 0x40) ) && (mame_rand(machine) > RAND_MAX/2))
 		state->sig30Hz = (1-state->sig30Hz);
 
 	state->rflip_sig = state->snd02_enable & state->sig30Hz;
@@ -762,7 +761,7 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 
 }
 
-static void radarscp_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void radarscp_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	dkong_state *state = machine->driver_data;
 	const UINT8 	*htable = NULL;

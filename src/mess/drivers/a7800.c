@@ -13,6 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tiaintf.h"
 #include "devices/cartslot.h"
@@ -264,7 +265,7 @@ static MACHINE_DRIVER_START( a7800_ntsc )
 	MDRV_CPU_ADD_TAG("main", M6502, CLK_NTSC)	/* 1.79Mhz (note: The clock switches to 1.19Mhz
                                                  * when the TIA or RIOT are accessed) */
 	MDRV_CPU_PROGRAM_MAP(a7800_mem, 0)
-	MDRV_CPU_VBLANK_INT(a7800_interrupt,262)
+	MDRV_CPU_VBLANK_INT_HACK(a7800_interrupt, 262)
 
 	MDRV_INTERLEAVE(1)
 
@@ -299,7 +300,7 @@ static MACHINE_DRIVER_START( a7800_pal )
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("main", M6502, CLK_PAL)	/* 1.79Mhz (note: The clock switches to 1.19Mhz
                                                  * when the TIA or RIOT are accessed) */
-	MDRV_CPU_VBLANK_INT(a7800_interrupt,312)
+	MDRV_CPU_VBLANK_INT_HACK(a7800_interrupt, 312)
 
 	MDRV_SCREEN_MODIFY( "main" )
 	MDRV_SCREEN_REFRESH_RATE(50)

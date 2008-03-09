@@ -53,8 +53,8 @@ static READ16_HANDLER( supbtime_controls_r )
 
 static WRITE16_HANDLER( sound_w )
 {
-	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	soundlatch_w(machine,0,data & 0xff);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 /******************************************************************************/
@@ -121,10 +121,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		YM2151_register_port_0_w(0,data);
+		YM2151_register_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2151_data_port_0_w(0,data);
+		YM2151_data_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -376,7 +376,7 @@ static MACHINE_DRIVER_START( supbtime )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(supbtime_readmem,supbtime_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280, 32220000/8)	/* Custom chip 45, audio section crystal is 32.220 MHz */
 	/* audio CPU */
@@ -417,7 +417,7 @@ static MACHINE_DRIVER_START( chinatwn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(chinatwn_readmem,chinatwn_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280, 32220000/8) /* Custom chip 45, audio section crystal is 32.220 MHz */
 	/* audio CPU */

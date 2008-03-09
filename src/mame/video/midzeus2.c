@@ -169,12 +169,13 @@ INLINE void *waveram1_ptr_from_expanded_addr(UINT32 addr)
 	return WAVERAM_BLOCK1(blocknum);
 }
 
+#ifdef UNUSED_FUNCTON
 INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
 {
 	UINT32 blocknum = ((addr & ~1) * width) / 8;
 	return WAVERAM_BLOCK0(blocknum);
 }
-
+#endif
 
 
 /*************************************
@@ -183,11 +184,13 @@ INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
  *
  *************************************/
 
+#ifdef UNUSED_FUNCTON
 INLINE void waveram_plot(int y, int x, UINT32 color)
 {
 	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
 		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 }
+#endif
 
 INLINE void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
 {
@@ -198,6 +201,7 @@ INLINE void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
 	}
 }
 
+#ifdef UNUSED_FUNCTON
 INLINE void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
 {
 	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
@@ -210,7 +214,9 @@ INLINE void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
 		}
 	}
 }
+#endif
 
+#ifdef UNUSED_FUNCTON
 INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT32 color, UINT16 depth)
 {
 	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
@@ -220,7 +226,7 @@ INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT32 color, UINT16 
 			WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 	}
 }
-
+#endif
 
 
 /*************************************
@@ -236,12 +242,13 @@ INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width)
 }
 
 
+#ifdef UNUSED_FUNCTON
 INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
 	return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 }
-
+#endif
 
 
 /*************************************
@@ -1036,7 +1043,7 @@ static void zeus_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 
 static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit)
 {
-	poly_draw_scanline callback;
+	poly_draw_scanline_func callback;
 	poly_extra_data *extra;
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];

@@ -165,35 +165,15 @@ TODO:  - The UPD7810 core is missing analog port emulation
 
 
 /* The ON LINE switch is directly connected to the INT1 input of the CPU */
-static void online_switch(void *param, UINT32 oldvalue, UINT32 newvalue)
+static INPUT_CHANGED( online_switch )
 {
 	static int state = ASSERT_LINE;
 
-	if (newvalue)
+	if (newval)
 	{
 		cpunum_set_input_line(Machine, 0, UPD7810_INTF1, state);
 		state = (state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
-}
-
-
-static void feed_switch(void *param, UINT32 oldvalue, UINT32 newvalue)
-{
-
-}
-
-
-static void selectype_switch(void *param, UINT32 oldvalue, UINT32 newvalue)
-{
-
-}
-
-
-static DRIVER_INIT(ex800)
-{
-	input_port_set_changed_callback(port_tag_to_index("ONLISW"), 0xff, online_switch, NULL);
-	input_port_set_changed_callback(port_tag_to_index("FEED"), 0xff, feed_switch, NULL);
-	input_port_set_changed_callback(port_tag_to_index("SelecType"), 0xff, selectype_switch, NULL);
 }
 
 
@@ -361,7 +341,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ex800 )
 	PORT_START_TAG("ONLISW")
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON LINE")   PORT_CODE(KEYCODE_F9)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON LINE")   PORT_CODE(KEYCODE_F9) PORT_CHANGED(online_switch, NULL)
 
 	PORT_START_TAG("FEED")
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -496,4 +476,4 @@ ROM_END
 
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT  INIT   CONFIG COMPANY  FULLNAME  FLAGS */
-COMP( 1986, ex800,      0,      0, ex800,  ex800, ex800, NULL,  "Epson", "EX-800", GAME_NO_SOUND | GAME_NOT_WORKING)
+COMP( 1986, ex800,      0,      0, ex800,  ex800, 0,     NULL,  "Epson", "EX-800", GAME_NO_SOUND | GAME_NOT_WORKING)

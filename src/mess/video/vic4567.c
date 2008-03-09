@@ -66,7 +66,7 @@ WRITE8_HANDLER ( vic3_port_w )
 	case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 	case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e:
-		vic2_port_w(offset,data);
+		vic2_port_w(machine, offset,data);
 		break;
 	case 0x2f:
 		DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
@@ -118,7 +118,7 @@ WRITE8_HANDLER ( vic3_port_w )
 	}
 }
 
- READ8_HANDLER ( vic3_port_r )
+READ8_HANDLER ( vic3_port_r )
 {
 	int val = 0;
 	offset &= 0x7f;
@@ -130,7 +130,7 @@ WRITE8_HANDLER ( vic3_port_w )
 	case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 	case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e:
-		return vic2_port_r(offset);
+		return vic2_port_r(machine, offset);
 	case 0x2f:
 	case 0x30:
 		val = vic2.reg[offset];

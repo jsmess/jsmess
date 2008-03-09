@@ -107,14 +107,14 @@ static void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom, int bank)
 {
 	offs_t memory_mask;
-	read16_handler rh;
-	write16_handler wh;
+	read16_machine_func rh;
+	write16_machine_func wh;
 
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
 	memory_mask = memory_size - 1;
 
-	rh = (read16_handler) (FPTR)bank;
-	wh = is_rom ? MWA16_UNMAP : (write16_handler) (FPTR)bank;
+	rh = (read16_machine_func) (FPTR)bank;
+	wh = is_rom ? MWA16_UNMAP : (write16_machine_func) (FPTR)bank;
 
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, memory_begin,
 		memory_end, memory_mask, 0, rh);
@@ -693,7 +693,7 @@ READ16_HANDLER ( macplus_scsi_r )
 		reg = R5380_CURDATA_DTACK;
 	}
 
-	return ncr5380_r(reg)<<8;
+	return ncr5380_r(machine, reg)<<8;
 }
 
 WRITE16_HANDLER ( macplus_scsi_w )
@@ -705,7 +705,7 @@ WRITE16_HANDLER ( macplus_scsi_w )
 		reg = R5380_OUTDATA_DTACK;
 	}
 
-	ncr5380_w(reg, data);
+	ncr5380_w(machine, reg, data);
 }
 
 /* *************************************************************************
@@ -751,7 +751,7 @@ void mac_scc_mouse_irq( int x, int y)
 READ16_HANDLER ( mac_scc_r )
 {
 	UINT16 result;
-	result = scc_r(offset);
+	result = scc_r(machine, offset);
 	return (result << 8) | result;
 }
 
@@ -759,7 +759,7 @@ READ16_HANDLER ( mac_scc_r )
 
 WRITE16_HANDLER ( mac_scc_w )
 {
-	scc_w(offset, (UINT8) data);
+	scc_w(machine, offset, (UINT8) data);
 }
 
 
@@ -1118,7 +1118,7 @@ READ16_HANDLER ( mac_iwm_r )
 	if (LOG_MAC_IWM)
 		logerror("mac_iwm_r: offset=0x%08x\n", offset);
 
-	result = applefdc_r(offset >> 8);
+	result = applefdc_r(machine, offset >> 8);
 	return (result << 8) | result;
 }
 
@@ -1128,7 +1128,7 @@ WRITE16_HANDLER ( mac_iwm_w )
 		logerror("mac_iwm_w: offset=0x%08x data=0x%04x\n", offset, data);
 
 	if (ACCESSING_LSB)
-		applefdc_w(offset >> 8, data & 0xff);
+		applefdc_w(machine, offset >> 8, data & 0xff);
 }
 
 /* *************************************************************************
@@ -1261,7 +1261,7 @@ READ16_HANDLER ( mac_via_r )
 
 	if (LOG_VIA)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
-	data = via_0_r(offset);
+	data = via_0_r(machine, offset);
 
 	return (data & 0xff) | (data << 8);
 }
@@ -1275,7 +1275,7 @@ WRITE16_HANDLER ( mac_via_w )
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
 	if (ACCESSING_MSB)
-		via_0_w(offset, (data >> 8) & 0xff);
+		via_0_w(machine, offset, (data >> 8) & 0xff);
 }
 
 

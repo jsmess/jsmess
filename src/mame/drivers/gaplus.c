@@ -264,7 +264,7 @@ static READ8_HANDLER( gaplus_snd_sharedram_r )
 static WRITE8_HANDLER( gaplus_snd_sharedram_w )
 {
 	if (offset < 0x40)
-		namco_15xx_w(offset,data);
+		namco_15xx_w(machine,offset,data);
 	else
 		namco_soundregs[offset] = data;
 }
@@ -758,15 +758,15 @@ static MACHINE_DRIVER_START( gaplus )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,	24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
-	MDRV_CPU_VBLANK_INT(gaplus_interrupt_1,1)
+	MDRV_CPU_VBLANK_INT("main", gaplus_interrupt_1)
 
 	MDRV_CPU_ADD(M6809,	24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD(M6809, 24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu3,writemem_cpu3)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_INTERLEAVE(100)	/* a high value to ensure proper synchronization of the CPUs */
 	MDRV_MACHINE_RESET(gaplus)

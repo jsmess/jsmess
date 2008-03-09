@@ -1174,7 +1174,7 @@ MACHINE_RESET( lisa )
 	via_set_clock(1, lisa_features.has_fast_timers ? 1250000 : 500000);	/* one of these values must be wrong : see note after description of the has_fast_timers field */
 
 	via_reset();
-	COPS_via_out_ca2(0, 0);	/* VIA core forgets to do so */
+	COPS_via_out_ca2(machine, 0, 0);	/* VIA core forgets to do so */
 
 	/* initialize floppy */
 	{
@@ -1358,14 +1358,14 @@ INLINE void lisa_fdc_ttl_glue_access(offs_t offset)
 	}
 }
 
- READ8_HANDLER ( lisa_fdc_io_r )
+READ8_HANDLER ( lisa_fdc_io_r )
 {
 	int answer=0;
 
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0:	/* IWM */
-		answer = /*iwm_lisa_r*/applefdc_r(offset);
+		answer = /*iwm_lisa_r*/applefdc_r(machine, offset);
 		break;
 
 	case 1:	/* TTL glue */
@@ -1390,7 +1390,7 @@ WRITE8_HANDLER ( lisa_fdc_io_w )
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0:	/* IWM */
-		/*iwm_lisa_w*/applefdc_w(offset, data);
+		/*iwm_lisa_w*/applefdc_w(machine, offset, data);
 		break;
 
 	case 1:	/* TTL glue */
@@ -1418,7 +1418,7 @@ READ8_HANDLER ( lisa_fdc_r )
 			if (! (offset & 0x0400))
 				return lisa_fdc_ram[offset & 0x03ff];
 			else
-				return lisa_fdc_io_r(offset & 0x03ff);
+				return lisa_fdc_io_r(machine, offset & 0x03ff);
 		else
 			return 0;	/* ??? */
 	}
@@ -1434,7 +1434,7 @@ READ8_HANDLER ( lisa210_fdc_r )
 			if (! (offset & 0x0800))
 				return lisa_fdc_ram[offset & 0x03ff];
 			else
-				return lisa_fdc_io_r(offset & 0x03ff);
+				return lisa_fdc_io_r(machine, offset & 0x03ff);
 		else
 			return 0;	/* ??? */
 	}
@@ -1451,7 +1451,7 @@ WRITE8_HANDLER ( lisa_fdc_w )
 			if (! (offset & 0x0400))
 				lisa_fdc_ram[offset & 0x03ff] = data;
 			else
-				lisa_fdc_io_w(offset & 0x03ff, data);
+				lisa_fdc_io_w(machine, offset & 0x03ff, data);
 		}
 	}
 }
@@ -1465,7 +1465,7 @@ WRITE8_HANDLER ( lisa210_fdc_w )
 			if (! (offset & 0x0800))
 				lisa_fdc_ram[offset & 0x03ff] = data;
 			else
-				lisa_fdc_io_w(offset & 0x03ff, data);
+				lisa_fdc_io_w(machine, offset & 0x03ff, data);
 		}
 	}
 }
@@ -1568,7 +1568,7 @@ READ16_HANDLER ( lisa_r )
 			break;
 
 		case IO:
-			answer = lisa_IO_r((address & 0x00ffff) >> 1, mem_mask);
+			answer = lisa_IO_r(machine, (address & 0x00ffff) >> 1, mem_mask);
 			break;
 
 		case invalid:		/* unmapped segment */
@@ -1840,7 +1840,7 @@ WRITE16_HANDLER ( lisa_w )
 			break;
 
 		case IO:
-			lisa_IO_w((address & 0x00ffff) >> 1, data, mem_mask);
+			lisa_IO_w(machine, (address & 0x00ffff) >> 1, data, mem_mask);
 			break;
 
 		case RAM_stack_r:	/* read-only */

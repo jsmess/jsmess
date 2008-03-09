@@ -49,14 +49,14 @@ static WRITE16_HANDLER( pkscramble_YM2203_w )
 {
 	switch (offset)
 	{
-		case 0: YM2203_control_port_0_w(0,data & 0xff);break;
-		case 1: YM2203_write_port_0_w(0,data & 0xff);break;
+		case 0: YM2203_control_port_0_w(machine,0,data & 0xff);break;
+		case 1: YM2203_write_port_0_w(machine,0,data & 0xff);break;
 	}
 }
 
 static READ16_HANDLER( pkscramble_YM2203_r )
 {
-	return YM2203_status_port_0_r(0);
+	return YM2203_status_port_0_r(machine,0);
 }
 
 // input bit 0x20 in port1 should stay low until bit 0x20 is written here, then
@@ -285,7 +285,7 @@ static MACHINE_DRIVER_START( pkscramble )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(pkscramble_map,0)
-	//MDRV_CPU_VBLANK_INT(irq1_line_hold,1) /* only valid irq */
+	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold) /* only valid irq */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

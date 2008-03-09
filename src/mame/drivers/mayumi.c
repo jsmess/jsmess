@@ -41,7 +41,7 @@ static WRITE8_HANDLER( bank_sel_w )
 
 static MACHINE_RESET( mayumi )
 {
-	bank_sel_w(0,0);
+	bank_sel_w(machine,0,0);
 }
 
 static WRITE8_HANDLER( input_sel_w )
@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( mayumi )
 	MDRV_CPU_ADD(Z80, MCLK/2) /* 5.000 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(mayumi_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", mayumi_interrupt)
 
 	MDRV_MACHINE_RESET( mayumi )
 

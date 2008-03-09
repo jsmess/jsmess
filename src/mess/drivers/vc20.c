@@ -704,7 +704,7 @@ static MACHINE_DRIVER_START( vic20 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, VIC6560_CLOCK)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(vc20_mem, 0)
-	MDRV_CPU_VBLANK_INT(vc20_frame_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", vc20_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic656x_raster_interrupt, VIC656X_HRETRACERATE)
 	MDRV_INTERLEAVE(0)
 

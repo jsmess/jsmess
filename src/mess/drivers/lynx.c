@@ -215,7 +215,7 @@ static MACHINE_DRIVER_START( lynx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MDRV_CPU_PROGRAM_MAP(lynx_mem, 0)
-	MDRV_CPU_VBLANK_INT(lynx_frame_int, 1)
+	MDRV_CPU_VBLANK_INT("main", lynx_frame_int)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( lynx )

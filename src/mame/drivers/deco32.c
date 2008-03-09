@@ -316,8 +316,8 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 
 static WRITE32_HANDLER( deco32_sound_w )
 {
-	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	soundlatch_w(machine,0,data & 0xff);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 static READ32_HANDLER( deco32_71_r )
@@ -445,12 +445,12 @@ static WRITE32_HANDLER( dragngun_eeprom_w )
 
 static READ32_HANDLER(dragngun_oki_2_r)
 {
-	return OKIM6295_status_2_r(0);
+	return OKIM6295_status_2_r(machine, 0);
 }
 
 static WRITE32_HANDLER(dragngun_oki_2_w)
 {
-	OKIM6295_data_2_w(0,data&0xff);
+	OKIM6295_data_2_w(machine, 0, data&0xff);
 }
 
 /**********************************************************************************/
@@ -477,7 +477,7 @@ static WRITE32_HANDLER( tattass_prot_w )
 		/* 'Swap bits 0 and 3 to correct for design error from BSMT schematic' */
 		int soundcommand = (data>>16)&0xff;
 		soundcommand = BITSWAP8(soundcommand,7,6,5,4,0,2,1,3);
-		soundlatch_w(0,soundcommand);
+		soundlatch_w(machine,0,soundcommand);
 	}
 }
 
@@ -603,7 +603,7 @@ static WRITE32_HANDLER( tattass_control_w )
 	}
 
 	/* Playfield control - Only written in full word memory accesses */
-	deco32_pri_w(0,data&0x3,0); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
+	deco32_pri_w(machine,0,data&0x3,0); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 
 	/* Sound board reset control */
 	if (data&0x80)
@@ -641,7 +641,7 @@ static WRITE32_HANDLER( nslasher_eeprom_w )
 		EEPROM_write_bit(data & 0x10);
 		EEPROM_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
-		deco32_pri_w(0,data&0x3,0); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
+		deco32_pri_w(machine,0,data&0x3,0); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 	}
 }
 
@@ -654,9 +654,9 @@ static WRITE32_HANDLER( nslasher_prot_w )
 	if (offset==0x700/4) {
 
 		/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
-		soundlatch_w(0,(data>>16)&0xff);
+		soundlatch_w(machine,0,(data>>16)&0xff);
 		nslasher_sound_irq |= 0x02;
-		cpunum_set_input_line(Machine, 1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1133,8 +1133,8 @@ static WRITE8_HANDLER(deco32_bsmt0_w)
 
 static WRITE8_HANDLER(deco32_bsmt1_w)
 {
-	BSMT2000_data_0_w(offset^ 0xff, ((bsmt_latch<<8)|data), 0);
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, HOLD_LINE); /* BSMT is ready */
+	BSMT2000_data_0_w(machine, offset^ 0xff, ((bsmt_latch<<8)|data), 0);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE); /* BSMT is ready */
 }
 
 static READ8_HANDLER(deco32_bsmt_status_r)
@@ -1180,8 +1180,8 @@ static READ8_HANDLER(latch_r)
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	nslasher_sound_irq &= ~0x02;
-	cpunum_set_input_line(Machine, 1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
-	return soundlatch_r(0);
+	cpunum_set_input_line(machine, 1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	return soundlatch_r(machine,0);
 }
 
 static ADDRESS_MAP_START( nslasher_sound, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1877,7 +1877,7 @@ static MACHINE_DRIVER_START( captaven )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(captaven_readmem,captaven_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(H6280, 32220000/8)
 	/* audio CPU */
@@ -1925,7 +1925,7 @@ static MACHINE_DRIVER_START( fghthist )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(fghthist_readmem,fghthist_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(H6280, 32220000/8)
 	/* audio CPU */
@@ -1972,7 +1972,7 @@ static MACHINE_DRIVER_START( fghthsta )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(fghthsta_memmap,0)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(H6280, 32220000/8) /* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -2018,7 +2018,7 @@ static MACHINE_DRIVER_START( dragngun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(dragngun_readmem,dragngun_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(H6280, 32220000/8)
 	/* audio CPU */
@@ -2072,7 +2072,7 @@ static MACHINE_DRIVER_START( lockload )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(lockload_readmem,lockload_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,2) // From 2
+	MDRV_CPU_VBLANK_INT_HACK(deco32_vbl_interrupt,2) // From 2
 
 	MDRV_CPU_ADD(H6280, 32220000/8)
 	/* audio CPU */
@@ -2126,7 +2126,7 @@ static MACHINE_DRIVER_START( tattass )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(tattass_readmem,tattass_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(M6809, 2000000)
 	/* audio CPU */
@@ -2164,7 +2164,7 @@ static MACHINE_DRIVER_START( nslasher )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28322000/4)
 	MDRV_CPU_PROGRAM_MAP(nslasher_readmem,nslasher_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(Z80, 32220000/9)
 	MDRV_CPU_PROGRAM_MAP(nslasher_sound,0)

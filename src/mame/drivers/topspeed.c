@@ -330,7 +330,7 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
 
 static READ16_HANDLER( topspeed_input_bypass_r )
 {
-	UINT8 port = TC0220IOC_port_r(0);	/* read port number */
+	UINT8 port = TC0220IOC_port_r(machine,0);	/* read port number */
 	int steer = 0;
 	int analogue_steer = readinputportbytag_safe(STEER_PORT_TAG,0x00);
 	int fake = readinputportbytag_safe(FAKE_PORT_TAG,0x00);
@@ -367,7 +367,7 @@ static READ16_HANDLER( topspeed_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return TC0220IOC_portreg_r(offset);
+			return TC0220IOC_portreg_r(machine,offset);
 	}
 }
 
@@ -695,7 +695,7 @@ static MACHINE_DRIVER_START( topspeed )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(topspeed_readmem,topspeed_writemem)
-	MDRV_CPU_VBLANK_INT(topspeed_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", topspeed_interrupt)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ??? */
@@ -703,7 +703,7 @@ static MACHINE_DRIVER_START( topspeed )
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(topspeed_cpub_readmem,topspeed_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(topspeed_cpub_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", topspeed_cpub_interrupt)
 
 	MDRV_MACHINE_START(topspeed)
 

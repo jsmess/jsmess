@@ -331,18 +331,18 @@ static TIMER_CALLBACK(nc_keyboard_timer_callback)
 }
 
 
-static const read8_handler nc_bankhandler_r[]={
+static const read8_machine_func nc_bankhandler_r[]={
 MRA8_BANK1, MRA8_BANK2, MRA8_BANK3, MRA8_BANK4};
 
-static const write8_handler nc_bankhandler_w[]={
+static const write8_machine_func nc_bankhandler_w[]={
 MWA8_BANK5, MWA8_BANK6, MWA8_BANK7, MWA8_BANK8};
 
 static void nc_refresh_memory_bank_config(int bank)
 {
 	int mem_type;
 	int mem_bank;
-	read8_handler read_handler;
-	write8_handler write_handler = NULL;
+	read8_machine_func read_handler;
+	write8_machine_func write_handler = NULL;
 
 	mem_type = (nc_memory_config[bank]>>6) & 0x03;
 	mem_bank = nc_memory_config[bank] & 0x03f;
@@ -848,7 +848,7 @@ static WRITE8_HANDLER(nc100_display_memory_start_w)
 
 static WRITE8_HANDLER(nc100_uart_control_w)
 {
-	nc_uart_control_w(offset,data);
+	nc_uart_control_w(machine, offset,data);
 
 //  /* is this correct?? */
 //  if (data & (1<<3))
@@ -1472,7 +1472,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 	reset_fdc = (nc_uart_control^data) & (1<<5);
 
-	nc_uart_control_w(offset,data);
+	nc_uart_control_w(machine, offset,data);
 
 	if (data & (1<<3))
 	{

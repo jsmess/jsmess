@@ -58,10 +58,10 @@ static int c64mode = 0, c128_write_io;
 static int c128_ram_bottom, c128_ram_top;
 static UINT8 *c128_ram;
 
-static void c128_set_m8502_read_handler(UINT16 start, UINT16 end, read8_handler rh)
+static void c128_set_m8502_read_handler(running_machine *machine, UINT16 start, UINT16 end, read8_machine_func rh)
 {
 	int cpunum;
-	cpunum = mame_find_cpu_index(Machine, "m8502");
+	cpunum = mame_find_cpu_index(machine, "m8502");
 	memory_install_read8_handler(cpunum, ADDRESS_SPACE_PROGRAM, start, end, 0, 0, rh);
 }
 
@@ -102,16 +102,16 @@ WRITE8_HANDLER( c128_write_d000 )
 		switch ((offset&0xf00)>>8)
 		{
 		case 0:case 1: case 2: case 3:
-			vic2_port_w (offset & 0x3ff, data);
+			vic2_port_w (machine, offset & 0x3ff, data);
 			break;
 		case 4:
-			sid6581_0_port_w (offset & 0x3f, data);
+			sid6581_0_port_w (machine, offset & 0x3f, data);
 			break;
 		case 5:
-			c128_mmu8722_port_w (offset & 0xff, data);
+			c128_mmu8722_port_w (machine, offset & 0xff, data);
 			break;
 		case 6:case 7:
-			vdc8563_port_w (offset & 0xff, data);
+			vdc8563_port_w (machine, offset & 0xff, data);
 			break;
 		case 8: case 9: case 0xa: case 0xb:
 		    if (c64mode)
@@ -120,13 +120,13 @@ WRITE8_HANDLER( c128_write_d000 )
 				c64_colorram[(offset & 0x3ff)|((c64_port6510&3)<<10)] = data | 0xf0; // maybe all 8 bit connected!
 		    break;
 		case 0xc:
-			cia_0_w(offset, data);
+			cia_0_w(machine, offset, data);
 			break;
 		case 0xd:
-			cia_1_w(offset, data);
+			cia_1_w(machine, offset, data);
 			break;
 		case 0xf:
-			c128_dma8726_port_w(offset&0xff,data);
+			c128_dma8726_port_w(machine, offset&0xff,data);
 			break;
 		case 0xe:
 			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
@@ -137,25 +137,25 @@ WRITE8_HANDLER( c128_write_d000 )
 
 
 
-static  READ8_HANDLER( c128_read_io )
+static READ8_HANDLER( c128_read_io )
 {
 	switch ((offset&0xf00)>>8) {
 	case 0:case 1: case 2: case 3:
-		return vic2_port_r (offset & 0x3ff);
+		return vic2_port_r (machine, offset & 0x3ff);
 	case 4:
-		return sid6581_0_port_r (offset & 0xff);
+		return sid6581_0_port_r (machine, offset & 0xff);
 	case 5:
-		return c128_mmu8722_port_r (offset & 0xff);
+		return c128_mmu8722_port_r (machine, offset & 0xff);
 	case 6:case 7:
-		return vdc8563_port_r (offset & 0xff);
+		return vdc8563_port_r (machine, offset & 0xff);
 	case 8: case 9: case 0xa: case 0xb:
 		return c64_colorram[offset & 0x3ff];
 	case 0xc:
-		return cia_0_r(offset);
+		return cia_0_r(machine, offset);
 	case 0xd:
-		return cia_1_r(offset);
+		return cia_1_r(machine, offset);
 	case 0xf:
-		return c128_dma8726_port_r(offset&0xff);
+		return c128_dma8726_port_r(machine, offset&0xff);
 	case 0xe:default:
 		DBG_LOG (1, "io read", ("%.3x\n", offset));
 		return 0xff;
@@ -166,7 +166,7 @@ void c128_bankswitch_64 (int reset)
 {
 	static int old, exrom, game;
 	int data, loram, hiram, charen;
-	read8_handler rh;
+	read8_machine_func rh;
 
 	if (!c64mode)
 		return;
@@ -219,7 +219,7 @@ void c128_bankswitch_64 (int reset)
 		else
 			memory_set_bankptr(13, c64_memory + 0xd000);
 	}
-	c128_set_m8502_read_handler(0xd000, 0xdfff, rh);
+	c128_set_m8502_read_handler(Machine, 0xd000, 0xdfff, rh);
 
 	if (!c64_game && c64_exrom)
 	{
@@ -336,7 +336,7 @@ static int mmu_page0, mmu_page1;
 
 static void c128_bankswitch_128 (int reset)
 {
-	read8_handler rh;
+	read8_machine_func rh;
 
 	c64mode = MMU_64MODE;
 	if (c64mode)
@@ -415,7 +415,7 @@ static void c128_bankswitch_128 (int reset)
 		else
 			c128_ram_top = 0x10000;
 
-		c128_set_m8502_read_handler(0xff00, 0xff04, c128_mmu8722_ff00_r);
+		c128_set_m8502_read_handler(Machine, 0xff00, 0xff04, c128_mmu8722_ff00_r);
 
 		if (MMU_IO_ON)
 		{
@@ -427,7 +427,7 @@ static void c128_bankswitch_128 (int reset)
 			c128_write_io = 0;
 			rh = MRA8_BANK13;
 		}
-		c128_set_m8502_read_handler(0xd000, 0xdfff, rh);
+		c128_set_m8502_read_handler(Machine, 0xd000, 0xdfff, rh);
 
 		if (MMU_RAM_HI)
 		{
@@ -707,7 +707,7 @@ WRITE8_HANDLER( c128_write_e000 )
 WRITE8_HANDLER( c128_write_ff00 )
 {
 	if (!c64mode)
-		c128_mmu8722_ff00_w (offset, data);
+		c128_mmu8722_ff00_w (machine, offset, data);
 	else if (c128_ram!=NULL)
 		c64_memory[0xff00 + offset] = data;
 }

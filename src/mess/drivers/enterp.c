@@ -120,31 +120,33 @@ static void enterprise_dave_reg_write(int RegIndex, int Data)
 
 static void enterprise_dave_reg_read(int RegIndex)
 {
+	running_machine *machine = Machine;
+
 	switch (RegIndex)
 	{
 	case 0x015:
 		{
 		  /* read keyboard line */
-			Dave_setreg(0x015,
+			Dave_setreg(machine, 0x015,
 				readinputport(Enterprise_KeyboardLine));
 		}
 		break;
 
 		case 0x016:
 		{
-				int ExternalJoystickInputs;
-				int ExternalJoystickPortInput = readinputport(10);
+			int ExternalJoystickInputs;
+			int ExternalJoystickPortInput = readinputport(10);
 
-				if (Enterprise_KeyboardLine<=4)
-				{
-						ExternalJoystickInputs = ExternalJoystickPortInput>>(4-Enterprise_KeyboardLine);
-				}
-				else
-				{
-						ExternalJoystickInputs = 1;
-				}
+			if (Enterprise_KeyboardLine<=4)
+			{
+					ExternalJoystickInputs = ExternalJoystickPortInput>>(4-Enterprise_KeyboardLine);
+			}
+			else
+			{
+					ExternalJoystickInputs = 1;
+			}
 
-				Dave_setreg(0x016, (0x0fe | (ExternalJoystickInputs & 0x01)));
+			Dave_setreg(machine, 0x016, (0x0fe | (ExternalJoystickInputs & 0x01)));
 		}
 		break;
 
@@ -222,10 +224,10 @@ static void enterprise_reset(running_machine *machine)
 
 	Dave_SetIFace(&enterprise_dave_interface);
 
-	Dave_reg_w(0x010,0);
-	Dave_reg_w(0x011,0);
-	Dave_reg_w(0x012,0);
-	Dave_reg_w(0x013,0);
+	Dave_reg_w(machine, 0x010,0);
+	Dave_reg_w(machine, 0x011,0);
+	Dave_reg_w(machine, 0x012,0);
+	Dave_reg_w(machine, 0x013,0);
 
 	cpunum_set_input_line_vector(0,0,0x0ff);
 
@@ -243,13 +245,13 @@ static  READ8_HANDLER ( enterprise_wd177x_read )
 	switch (offset & 0x03)
 	{
 	case 0:
-		return wd17xx_status_r(offset);
+		return wd17xx_status_r(machine, offset);
 	case 1:
-		return wd17xx_track_r(offset);
+		return wd17xx_track_r(machine, offset);
 	case 2:
-		return wd17xx_sector_r(offset);
+		return wd17xx_sector_r(machine, offset);
 	case 3:
-		return wd17xx_data_r(offset);
+		return wd17xx_data_r(machine, offset);
 	default:
 		break;
 	}
@@ -262,16 +264,16 @@ static WRITE8_HANDLER (	enterprise_wd177x_write )
 	switch (offset & 0x03)
 	{
 	case 0:
-		wd17xx_command_w(offset, data);
+		wd17xx_command_w(machine, offset, data);
 		return;
 	case 1:
-		wd17xx_track_w(offset, data);
+		wd17xx_track_w(machine, offset, data);
 		return;
 	case 2:
-		wd17xx_sector_w(offset, data);
+		wd17xx_sector_w(machine, offset, data);
 		return;
 	case 3:
-		wd17xx_data_w(offset, data);
+		wd17xx_data_w(machine, offset, data);
 		return;
 	default:
 		break;

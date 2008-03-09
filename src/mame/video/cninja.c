@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "deco16ic.h"
 #include "cninja.h"
 
@@ -105,7 +104,7 @@ VIDEO_EOF( cninja )
 	deco16_raster_display_position=0;
 }
 
-static void raster_pf3_draw(mame_bitmap *bitmap, const rectangle *cliprect, int flags, int pri)
+static void raster_pf3_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, int pri)
 {
 	tilemap *tmap=deco16_get_tilemap(2,0);
 	int ptr=0,start,end=0;
@@ -151,7 +150,7 @@ static void raster_pf3_draw(mame_bitmap *bitmap, const rectangle *cliprect, int 
 
 /******************************************************************************/
 
-static void cninja_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void cninja_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -174,7 +173,7 @@ static void cninja_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 
 		y = buffered_spriteram16[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 		colour = (x >> 9) &0x1f;
 
 		fx = y & 0x2000;
@@ -220,7 +219,7 @@ static void cninja_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 	}
 }
 
-static void robocop2_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void robocop2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -242,7 +241,7 @@ static void robocop2_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 		y = buffered_spriteram16[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 		colour = (x >> 9) &0x1f;
 
 		fx = y & 0x2000;
@@ -288,7 +287,7 @@ static void robocop2_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void mutantf_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
+static void mutantf_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
 {
 	int offs,end,inc;
 
@@ -340,7 +339,7 @@ static void mutantf_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 		w = (spriteptr[offs+2]&0x0f00)>> 8;
 
 		sy = spriteptr[offs];
-		if ((sy&0x2000) && (cpu_getcurrentframe() & 1)) {
+		if ((sy&0x2000) && (video_screen_get_frame_number(0) & 1)) {
 			offs+=inc;
 			continue;
 		}

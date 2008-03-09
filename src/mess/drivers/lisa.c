@@ -37,7 +37,7 @@ static MACHINE_DRIVER_START( lisa )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 5093760)        /* 20.37504 Mhz / 4 */
 	MDRV_CPU_PROGRAM_MAP(lisa_map, 0)
-	MDRV_CPU_VBLANK_INT(lisa_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", lisa_interrupt)
 
 	MDRV_CPU_ADD_TAG("fdc", M6502, 2000000)        /* 16.000 Mhz / 8 in when DIS asserted, 16.000 Mhz / 9 otherwise (?) */
 	MDRV_CPU_PROGRAM_MAP(lisa_fdc_map, 0)

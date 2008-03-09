@@ -134,11 +134,11 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( genesis_base )
 	/*basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK / 7)
-	MDRV_CPU_VBLANK_INT(genesis_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK / 15)
 	MDRV_CPU_PROGRAM_MAP(genesis_z80_readmem, genesis_z80_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1) /* from vdp at scanline 0xe0 */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
 	MDRV_INTERLEAVE(100)
 
@@ -192,10 +192,12 @@ ROM_START( hshavoc )
 	ROM_LOAD( "pic16c57",  0x00, 0x01, NO_DUMP ) // protected
 ROM_END
 
+#ifdef UNUSED_DEFINITION
 ROM_START( hshavoc2 ) /* Genesis Version, for reference */
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )
 	ROM_LOAD( "hsh.rom", 0x000000, 0x100000, CRC(17be551c) SHA1(0dc1969098716ba332978b89356f62961417682b) )
 ROM_END
+#endif
 
 static READ16_HANDLER( vdp_fake_r )
 {

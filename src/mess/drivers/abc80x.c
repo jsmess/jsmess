@@ -98,21 +98,6 @@ static emu_timer *abc800_ctc_timer;
 
 // CRTC
 
-static READ8_HANDLER( crtc_register_r )
-{
-	return mc6845_register_r(abc800_mc6845);
-}
-
-static WRITE8_HANDLER( crtc_register_w )
-{
-	mc6845_register_w(abc800_mc6845, data);
-}
-
-static WRITE8_HANDLER( crtc_address_w )
-{
-	mc6845_address_w(abc800_mc6845, data);
-}
-
 // HR
 
 static WRITE8_HANDLER( hrs_w )
@@ -268,7 +253,7 @@ static WRITE8_HANDLER( abc77_data_w )
 
 	if (abc77_keylatch == 1)
 	{
-		watchdog_reset_w(0, 0);
+		watchdog_reset(machine);
 	}
 
 //  abc77_beep = data & 0x10;
@@ -301,9 +286,9 @@ static ADDRESS_MAP_START( abc800_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_READWRITE(abcbus_reset_r, hrc_w)
 	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
 	AM_RANGE(0x30, 0x32) AM_WRITE(ram_ctrl_w)
-	AM_RANGE(0x31, 0x31) AM_READ(crtc_register_r)
-	AM_RANGE(0x38, 0x38) AM_WRITE(crtc_address_w)
-	AM_RANGE(0x39, 0x39) AM_WRITE(crtc_register_w)
+	AM_RANGE(0x31, 0x31) AM_DEVREAD(MC6845, "crtc", mc6845_register_r)
+	AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x40, 0x43) AM_READWRITE(sio2_r, sio2_w)
 	AM_RANGE(0x50, 0x53) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
@@ -340,10 +325,10 @@ static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(abcbus_reset_r, hrc_w)
 	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
-	AM_RANGE(0x31, 0x31) AM_READ(crtc_register_r)
+	AM_RANGE(0x31, 0x31) AM_DEVREAD(MC6845, "crtc", mc6845_register_r)
 	AM_RANGE(0x32, 0x35) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x38, 0x38) AM_WRITE(crtc_address_w)
-	AM_RANGE(0x39, 0x39) AM_WRITE(crtc_register_w)
+	AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x60, 0x63) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
@@ -365,12 +350,12 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(abcbus_reset_r, hrc_w)
 	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
-	AM_RANGE(0x31, 0x31) AM_READ(crtc_register_r)
+	AM_RANGE(0x31, 0x31) AM_DEVREAD(MC6845, "crtc", mc6845_register_r)
 	AM_RANGE(0x34, 0x34) AM_READWRITE(bankswitch_r, bankswitch_w)
 	AM_RANGE(0x35, 0x35) AM_READWRITE(attribute_r, attribute_w)
 	AM_RANGE(0x37, 0x37) AM_READWRITE(sync_r, fgctlprom_w)
-	AM_RANGE(0x38, 0x38) AM_WRITE(crtc_address_w)
-	AM_RANGE(0x39, 0x39) AM_WRITE(crtc_register_w)
+	AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(sio2_r, sio2_w)
 	AM_RANGE(0x60, 0x63) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
@@ -720,7 +705,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc802_map, 0)
 	MDRV_CPU_IO_MAP(abc802_io_map, 0)
-	MDRV_CPU_VBLANK_INT(abc802_vblank_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", abc802_vblank_interrupt)
 
 	MDRV_CPU_ADD(I8035, 4608000) // 4.608 MHz, keyboard cpu
 	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)

@@ -75,7 +75,7 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 
 /* SPRITE DRAWING (move to video file) */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect ,int pri_mask )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask )
 {
 	const UINT16 *source = spriteram16 + 0x1000/2 - 4;
 	const UINT16 *finish = spriteram16;
@@ -1181,7 +1181,7 @@ static MACHINE_DRIVER_START( raiden2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,XTAL_32MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(raiden2_mem, 0)
-	MDRV_CPU_VBLANK_INT(raiden2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", raiden2_interrupt)
 
 	MDRV_MACHINE_RESET(raiden2)
 
@@ -2097,12 +2097,12 @@ static READ16_HANDLER( r2_playerin_r )
 }
 static READ16_HANDLER( rdx_v33_oki_r )
 {
-	return OKIM6295_status_0_r(0);
+	return OKIM6295_status_0_r(machine,0);
 }
 
 static WRITE16_HANDLER( rdx_v33_oki_w )
 {
-	if (ACCESSING_LSB) OKIM6295_data_0_w(0, data & 0x00ff);
+	if (ACCESSING_LSB) OKIM6295_data_0_w(machine, 0, data & 0x00ff);
 	if (ACCESSING_MSB) logerror("rdx_v33_oki_w MSB %04x\n",data);
 }
 
@@ -2237,7 +2237,7 @@ static MACHINE_DRIVER_START( rdx_v33 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V33, 32000000/2 ) // ?
 	MDRV_CPU_PROGRAM_MAP(rdx_v33_map, 0)
-	MDRV_CPU_VBLANK_INT(rdx_v33_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", rdx_v33_interrupt)
 
 	MDRV_NVRAM_HANDLER(rdx_v33)
 

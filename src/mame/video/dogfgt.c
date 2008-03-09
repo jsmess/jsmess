@@ -6,7 +6,7 @@ UINT8 *dogfgt_bgvideoram;
 
 static UINT8 *bitmapram;
 static int bm_plane;
-static mame_bitmap *pixbitmap;
+static bitmap_t *pixbitmap;
 static int pixcolor;
 static tilemap *bg_tilemap;
 
@@ -143,7 +143,7 @@ WRITE8_HANDLER( dogfgt_bitmapram_w )
 		return;
 	}
 
-	internal_bitmapram_w(offset + BITMAPRAM_SIZE/3 * bm_plane,data);
+	internal_bitmapram_w(machine,offset + BITMAPRAM_SIZE/3 * bm_plane,data);
 }
 
 WRITE8_HANDLER( dogfgt_bgvideoram_w )
@@ -185,7 +185,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -230,7 +230,7 @@ VIDEO_UPDATE( dogfgt )
 		lastpixcolor = pixcolor;
 
 		for (offs = 0;offs < BITMAPRAM_SIZE;offs++)
-			internal_bitmapram_w(offs,bitmapram[offs]);
+			internal_bitmapram_w(machine,offs,bitmapram[offs]);
 	}
 
 

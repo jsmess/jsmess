@@ -112,7 +112,7 @@ WRITE8_HANDLER( srumbler_scroll_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -170,5 +170,5 @@ VIDEO_UPDATE( srumbler )
 
 VIDEO_EOF( srumbler )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }

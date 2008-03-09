@@ -196,8 +196,8 @@ static MACHINE_RESET( trvquest )
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	via_2_ca1_w(0,1);
-	via_2_ca1_w(0,0);
+	via_2_ca1_w(machine,0,1);
+	via_2_ca1_w(machine,0,0);
 }
 
 static MACHINE_DRIVER_START( trvquest )
@@ -206,7 +206,7 @@ static MACHINE_DRIVER_START( trvquest )
 
 	MDRV_CPU_ADD(M6809,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
-	MDRV_CPU_VBLANK_INT(trvquest_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", trvquest_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)
 	MDRV_MACHINE_START(trvquest)

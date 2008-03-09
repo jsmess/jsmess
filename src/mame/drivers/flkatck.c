@@ -78,16 +78,16 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 {
 	switch ((offset & 0x1c) >> 2){
 		case 0x04:	/* bankswitch */
-			flkatck_bankswitch_w(0, data);
+			flkatck_bankswitch_w(machine, 0, data);
 			break;
 		case 0x05:	/* sound code number */
-			soundlatch_w(0, data);
+			soundlatch_w(machine, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+			cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
-			watchdog_reset_w(0, data);
+			watchdog_reset_w(machine, 0, data);
 			break;
 	}
 }
@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( flkatck )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
 	MDRV_CPU_PROGRAM_MAP(flkatck_readmem,flkatck_writemem)
-	MDRV_CPU_VBLANK_INT(flkatck_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", flkatck_interrupt)
 
 	MDRV_CPU_ADD(Z80,3579545)	/* NEC D780C-1, 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(flkatck_readmem_sound,flkatck_writemem_sound)

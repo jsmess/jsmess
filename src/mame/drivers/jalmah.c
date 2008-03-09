@@ -195,21 +195,21 @@ static VIDEO_START( jalmah )
 }
 
 #define MCU_READ(_number_,_bit_,_offset_,_retval_)\
-if((0xffff - input_port_##_number_##_word_r(0,0)) & _bit_) { jm_regs[_offset_] = _retval_; }
+if((0xffff - readinputport(_number_)) & _bit_) { jm_regs[_offset_] = _retval_; }
 
 /*RAM-based protection handlings*/
 static void daireika_mcu_run(running_machine *machine)
 {
 	static UINT16 prg_prot;
 
-	if((0xffff - input_port_0_word_r(0,0)) & 0x0008)//service_mode
+	if((0xffff - input_port_0_word_r(machine,0,0)) & 0x0008)//service_mode
 	{
-		jm_regs[0x000/2] = input_port_2_word_r(0,0);
-		jm_regs[0x002/2] = input_port_3_word_r(0,0);
-		jm_regs[0x004/2] = input_port_4_word_r(0,0);
-		jm_regs[0x006/2] = input_port_5_word_r(0,0);
-		jm_regs[0x008/2] = input_port_6_word_r(0,0);
-		jm_regs[0x00a/2] = input_port_7_word_r(0,0);
+		jm_regs[0x000/2] = input_port_2_word_r(machine,0,0);
+		jm_regs[0x002/2] = input_port_3_word_r(machine,0,0);
+		jm_regs[0x004/2] = input_port_4_word_r(machine,0,0);
+		jm_regs[0x006/2] = input_port_5_word_r(machine,0,0);
+		jm_regs[0x008/2] = input_port_6_word_r(machine,0,0);
+		jm_regs[0x00a/2] = input_port_7_word_r(machine,0,0);
 	}
 	else
 	{
@@ -247,14 +247,14 @@ static void urashima_mcu_run(running_machine *machine)
 {
 	static UINT16 prg_prot;
 
-	if((0xffff - input_port_0_word_r(0,0)) & 0x0008)//service_mode
+	if((0xffff - input_port_0_word_r(machine,0,0)) & 0x0008)//service_mode
 	{
-		jm_regs[0x300/2] = input_port_2_word_r(0,0);
-		jm_regs[0x302/2] = input_port_3_word_r(0,0);
-		jm_regs[0x304/2] = input_port_4_word_r(0,0);
-		jm_regs[0x306/2] = input_port_5_word_r(0,0);
-		jm_regs[0x308/2] = input_port_6_word_r(0,0);
-		jm_regs[0x30a/2] = input_port_7_word_r(0,0);
+		jm_regs[0x300/2] = input_port_2_word_r(machine,0,0);
+		jm_regs[0x302/2] = input_port_3_word_r(machine,0,0);
+		jm_regs[0x304/2] = input_port_4_word_r(machine,0,0);
+		jm_regs[0x306/2] = input_port_5_word_r(machine,0,0);
+		jm_regs[0x308/2] = input_port_6_word_r(machine,0,0);
+		jm_regs[0x30a/2] = input_port_7_word_r(machine,0,0);
 	}
 	else
 	{
@@ -289,11 +289,11 @@ static void urashima_mcu_run(running_machine *machine)
 
 static void second_mcu_run(running_machine *machine)
 {
-	if((0xffff - input_port_1_word_r(0,0)) & 0x0004)//service_mode
+	if((0xffff - input_port_1_word_r(machine,0,0)) & 0x0004)//service_mode
 	{
-		jm_regs[0x200/2] = input_port_2_word_r(0,0);
-		jm_regs[0x202/2] = input_port_3_word_r(0,0);
-		jm_regs[0x204/2] = input_port_4_word_r(0,0);
+		jm_regs[0x200/2] = input_port_2_word_r(machine,0,0);
+		jm_regs[0x202/2] = input_port_3_word_r(machine,0,0);
+		jm_regs[0x204/2] = input_port_4_word_r(machine,0,0);
 	}
 	else
 	{
@@ -1002,7 +1002,7 @@ static MACHINE_RESET (daireika)
 static MACHINE_DRIVER_START( jalmah )
 	MDRV_CPU_ADD_TAG("main" , M68000, 8000000) /* 68000-8 */
 	MDRV_CPU_PROGRAM_MAP(jalmah,0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_GFXDECODE(jalmah)
 

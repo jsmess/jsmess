@@ -41,12 +41,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( spc_ram_100_r )
 {
-	return spc_ram_r(offset + 0x100);
+	return spc_ram_r(machine, offset + 0x100);
 }
 
 static WRITE8_HANDLER( spc_ram_100_w )
 {
-	spc_ram_w(offset + 0x100, data);
+	spc_ram_w(machine, offset + 0x100, data);
 }
 
 static ADDRESS_MAP_START( spc_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -237,6 +237,7 @@ static MACHINE_START( snes_mess )
 static int device_load_snes_cart(mess_image *image)
 {
 	int i;
+	running_machine *machine = Machine;
 	UINT16 totalblocks, readblocks;
 	UINT32 offset;
 	UINT8 header[512], sample[0xffff];
@@ -384,7 +385,7 @@ static int device_load_snes_cart(mess_image *image)
 	}
 
 	/* Find the amount of sram */
-	snes_cart.sram = snes_r_bank1(0x00ffd8);
+	snes_cart.sram = snes_r_bank1(machine, 0x00ffd8);
 	if( snes_cart.sram > 0 )
 	{
 		snes_cart.sram = ((1 << (snes_cart.sram + 3)) / 8);
@@ -400,35 +401,35 @@ static int device_load_snes_cart(mess_image *image)
 		logerror( "\tTotal blocks:  %d (%dmb)\n", totalblocks, totalblocks / (snes_cart.mode == SNES_MODE_20 ? 32 : 16) );
 		logerror( "\tROM bank size: %s (LoROM: %d , HiROM: %d)\n", (snes_cart.mode == SNES_MODE_20) ? "LoROM" : "HiROM", valid_mode20, valid_mode21 );
 		for( i = 0; i < 2; i++ )
-			companyid[i] = snes_r_bank1(0x00ffb0 + i);
+			companyid[i] = snes_r_bank1(machine, 0x00ffb0 + i);
 		logerror( "\tCompany ID:    %s\n", companyid );
 		for( i = 0; i < 4; i++ )
-			romid[i] = snes_r_bank1(0x00ffb2 + i);
+			romid[i] = snes_r_bank1(machine, 0x00ffb2 + i);
 		logerror( "\tROM ID:        %s\n", romid );
 		logerror( "HEADER DETAILS\n" );
 		for( i = 0; i < 21; i++ )
-			title[i] = snes_r_bank1(0x00ffc0 + i);
+			title[i] = snes_r_bank1(machine, 0x00ffc0 + i);
 		logerror( "\tName:          %s\n", title );
-		logerror( "\tSpeed:         %s [%d]\n", ((snes_r_bank1(0x00ffd5) & 0xf0)) ? "FastROM" : "SlowROM", (snes_r_bank1(0x00ffd5) & 0xf0) >> 4 );
-		logerror( "\tBank size:     %s [%d]\n", (snes_r_bank1(0x00ffd5) & 0xf) ? "HiROM" : "LoROM", snes_r_bank1(0x00ffd5) & 0xf );
+		logerror( "\tSpeed:         %s [%d]\n", ((snes_r_bank1(machine, 0x00ffd5) & 0xf0)) ? "FastROM" : "SlowROM", (snes_r_bank1(machine, 0x00ffd5) & 0xf0) >> 4 );
+		logerror( "\tBank size:     %s [%d]\n", (snes_r_bank1(machine, 0x00ffd5) & 0xf) ? "HiROM" : "LoROM", snes_r_bank1(machine, 0x00ffd5) & 0xf );
 		for( i = 0; i < 12; i++ )
 		{
-			if( CartTypes[i].Code == snes_r_bank1(0x00ffd6) )
+			if( CartTypes[i].Code == snes_r_bank1(machine, 0x00ffd6) )
 				break;
 		}
-		logerror( "\tType:          %s [%d]\n", CartTypes[i].Name, snes_r_bank1(0x00ffd6) );
-		logerror( "\tSize:          %d megabits [%d]\n", 1 << (snes_r_bank1(0x00ffd7) - 7), snes_r_bank1(0x00ffd7) );
+		logerror( "\tType:          %s [%d]\n", CartTypes[i].Name, snes_r_bank1(machine, 0x00ffd6) );
+		logerror( "\tSize:          %d megabits [%d]\n", 1 << (snes_r_bank1(machine, 0x00ffd7) - 7), snes_r_bank1(machine, 0x00ffd7) );
 		logerror( "\tSRAM:          %d kilobits [%d]\n", snes_cart.sram * 8, snes_ram[0xffd8] );
-		country = snes_r_bank1(0x00ffd9);
+		country = snes_r_bank1(machine, 0x00ffd9);
 		if( country > 14 )
 			country = 14;
-		logerror( "\tCountry:       %s [%d]\n", countries[country], snes_r_bank1(0x00ffd9) );
-		logerror( "\tLicense:       %s [%X]\n", "", snes_r_bank1(0x00ffda) );
-		logerror( "\tVersion:       1.%d\n", snes_r_bank1(0x00ffdb) );
-		logerror( "\tInv Checksum:  %X %X\n", snes_r_bank1(0x00ffdd), snes_r_bank1(0x00ffdc) );
-		logerror( "\tChecksum:      %X %X\n", snes_r_bank1(0x00ffdf), snes_r_bank1(0x00ffde) );
-		logerror( "\tNMI Address:   %2X%2Xh\n", snes_r_bank1(0x00fffb), snes_r_bank1(0x00fffa) );
-		logerror( "\tStart Address: %2X%2Xh\n", snes_r_bank1(0x00fffd), snes_r_bank1(0x00fffc) );
+		logerror( "\tCountry:       %s [%d]\n", countries[country], snes_r_bank1(machine, 0x00ffd9) );
+		logerror( "\tLicense:       %s [%X]\n", "", snes_r_bank1(machine, 0x00ffda) );
+		logerror( "\tVersion:       1.%d\n", snes_r_bank1(machine, 0x00ffdb) );
+		logerror( "\tInv Checksum:  %X %X\n", snes_r_bank1(machine, 0x00ffdd), snes_r_bank1(machine, 0x00ffdc) );
+		logerror( "\tChecksum:      %X %X\n", snes_r_bank1(machine, 0x00ffdf), snes_r_bank1(machine, 0x00ffde) );
+		logerror( "\tNMI Address:   %2X%2Xh\n", snes_r_bank1(machine, 0x00fffb), snes_r_bank1(machine, 0x00fffa) );
+		logerror( "\tStart Address: %2X%2Xh\n", snes_r_bank1(machine, 0x00fffd), snes_r_bank1(machine, 0x00fffc) );
 	}
 
 	/* Load SRAM */
@@ -446,7 +447,7 @@ static MACHINE_DRIVER_START( snes )
 
 	MDRV_CPU_ADD_TAG("sound", SPC700, 1024000)	/* 1.024 Mhz */
 	MDRV_CPU_PROGRAM_MAP(spc_map, 0)
-	MDRV_CPU_VBLANK_INT(NULL, 0)
+	MDRV_CPU_VBLANK_INT_HACK(NULL, 0)
 
 	MDRV_INTERLEAVE(800)
 

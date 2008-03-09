@@ -471,7 +471,7 @@ static WRITE8_HANDLER ( pmd85_ppi_3_portc_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return ppi8255_0_r(offset & 0x03);
+							return ppi8255_0_r(machine, offset & 0x03);
 				}
 				break;
 		case 0x08:	/* ROM module connector */
@@ -486,7 +486,7 @@ static WRITE8_HANDLER ( pmd85_ppi_3_portc_w )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										return ppi8255_3_r(offset & 0x03);
+										return ppi8255_3_r(machine, offset & 0x03);
 							}
 						}
 						break;
@@ -501,16 +501,16 @@ static WRITE8_HANDLER ( pmd85_ppi_3_portc_w )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: return msm8251_data_r(offset & 0x01);
-											case 0x01: return msm8251_status_r(offset & 0x01);
+											case 0x00: return msm8251_data_r(machine, offset & 0x01);
+											case 0x01: return msm8251_status_r(machine, offset & 0x01);
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
-										return ppi8255_1_r(offset & 0x03);
+										return ppi8255_1_r(machine, offset & 0x03);
 								case 0x50:	/* 8253 */
-										return pit8253_0_r (offset & 0x03);
+										return pit8253_0_r(machine, offset & 0x03);
 								case 0x70:	/* 8255 (IMS-2) */
-										return ppi8255_2_r(offset & 0x03);
+										return ppi8255_2_r(machine, offset & 0x03);
 							}
 							break;
 					case 0x80:	/* external interfaces */
@@ -537,7 +537,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							ppi8255_0_w(offset & 0x03, data);
+							ppi8255_0_w(machine, offset & 0x03, data);
 							/* PMD-85.3 memory banking */
 							if ((offset & 0x03) == 0x03)
 							{
@@ -559,7 +559,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										ppi8255_3_w(offset & 0x03, data);
+										ppi8255_3_w(machine, offset & 0x03, data);
 										break;
 							}
 						}
@@ -575,19 +575,19 @@ WRITE8_HANDLER ( pmd85_io_w )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: msm8251_data_w(offset & 0x01, data); break;
-											case 0x01: msm8251_control_w(offset & 0x01, data); break;
+											case 0x00: msm8251_data_w(machine, offset & 0x01, data); break;
+											case 0x01: msm8251_control_w(machine, offset & 0x01, data); break;
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
-										ppi8255_1_w(offset & 0x03, data);
+										ppi8255_1_w(machine, offset & 0x03, data);
 										break;
 								case 0x50:	/* 8253 */
-										pit8253_0_w (offset & 0x03, data);
+										pit8253_0_w(machine, offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:	/* 8255 (IMS-2) */
-										ppi8255_2_w(offset & 0x03, data);
+										ppi8255_2_w(machine, offset & 0x03, data);
 										break;
 							}
 							break;
@@ -621,7 +621,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return ppi8255_0_r(offset & 0x03);
+							return ppi8255_0_r(machine, offset & 0x03);
 				}
 				break;
 	}
@@ -644,7 +644,7 @@ WRITE8_HANDLER ( mato_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							ppi8255_0_w(offset & 0x03, data);
+							ppi8255_0_w(machine, offset & 0x03, data);
 							break;
 				}
 				break;
@@ -774,14 +774,14 @@ static OPBASE_HANDLER(mato_opbaseoverride)
 	return address;
 }
 
-static void pmd85_common_driver_init (void)
+static void pmd85_common_driver_init (running_machine *machine)
 {
 	memory_set_opbase_handler(0, pmd85_opbaseoverride);
 
 	pit8253_init(1, &pmd85_pit8253_interface);
-	pit8253_0_gate_w(0, 1);
-	pit8253_0_gate_w(1, 1);
-	pit8253_0_gate_w(2, 1);
+	pit8253_0_gate_w(machine, 0, 1);
+	pit8253_0_gate_w(machine, 1, 1);
+	pit8253_0_gate_w(machine, 2, 1);
 
 	msm8251_init(&pmd85_msm8251_interface);
 
@@ -799,7 +799,7 @@ DRIVER_INIT ( pmd851 )
 	pmd85_model = PMD85_1;
 	pmd85_update_memory = pmd851_update_memory;
 	ppi8255_init(&pmd85_ppi8255_interface);
-	pmd85_common_driver_init();
+	pmd85_common_driver_init(machine);
 }
 
 DRIVER_INIT ( pmd852a )
@@ -807,7 +807,7 @@ DRIVER_INIT ( pmd852a )
 	pmd85_model = PMD85_2A;
 	pmd85_update_memory = pmd852a_update_memory;
 	ppi8255_init(&pmd85_ppi8255_interface);
-	pmd85_common_driver_init();
+	pmd85_common_driver_init(machine);
 }
 
 DRIVER_INIT ( pmd853 )
@@ -815,7 +815,7 @@ DRIVER_INIT ( pmd853 )
 	pmd85_model = PMD85_3;
 	pmd85_update_memory = pmd853_update_memory;
 	ppi8255_init(&pmd85_ppi8255_interface);
-	pmd85_common_driver_init();
+	pmd85_common_driver_init(machine);
 }
 
 DRIVER_INIT ( alfa )
@@ -823,7 +823,7 @@ DRIVER_INIT ( alfa )
 	pmd85_model = ALFA;
 	pmd85_update_memory = alfa_update_memory;
 	ppi8255_init(&alfa_ppi8255_interface);
-	pmd85_common_driver_init();
+	pmd85_common_driver_init(machine);
 }
 
 DRIVER_INIT ( mato )

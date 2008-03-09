@@ -94,7 +94,7 @@ static READ8_HANDLER( osi_keyboard_r )
 static WRITE8_HANDLER ( sb2m600b_keyboard_w )
 {
 	key_row_latch = data;
-	discrete_sound_w(NODE_01, (data >> 2) & 0x0f);
+	discrete_sound_w(machine, NODE_01, (data >> 2) & 0x0f);
 }
 
 static WRITE8_HANDLER ( uk101_keyboard_w )

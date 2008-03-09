@@ -227,7 +227,7 @@ static MACHINE_DRIVER_START( primoa32 )
 	MDRV_CPU_ADD_TAG( "main", Z80, 2500000 )
 	MDRV_CPU_PROGRAM_MAP( primo32_mem, 0 )
 	MDRV_CPU_IO_MAP( primoa_port, 0 )
-	MDRV_CPU_VBLANK_INT( primo_vblank_interrupt, 1 )
+	MDRV_CPU_VBLANK_INT("main", primo_vblank_interrupt)
 
 	MDRV_MACHINE_RESET( primoa )
 

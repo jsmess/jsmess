@@ -27,6 +27,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/v9938.h"
 
 #include "machine/ti99_4x.h"
@@ -244,7 +245,7 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_CPU_ADD(TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
-	MDRV_CPU_VBLANK_INT(ti99_4ev_hblank_interrupt, 263)	/* 262.5 in 60Hz, 312.5 in 50Hz */
+	MDRV_CPU_VBLANK_INT_HACK(ti99_4ev_hblank_interrupt, 263)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	MDRV_MACHINE_RESET( ti99 )
 

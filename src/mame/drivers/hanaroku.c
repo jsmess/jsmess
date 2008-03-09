@@ -40,7 +40,7 @@ static VIDEO_START(hanaroku)
 {
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -238,7 +238,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( hanaroku )
 	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

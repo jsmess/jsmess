@@ -69,17 +69,17 @@ READ8_HANDLER ( mc10_bfff_r )
 
 	int val = 0x40;
 
-	if ((input_port_0_r(0) | mc10_keyboard_strobe) == 0xff)
+	if ((readinputport(0) | mc10_keyboard_strobe) == 0xff)
 		val |= 0x01;
-	if ((input_port_1_r(0) | mc10_keyboard_strobe) == 0xff)
+	if ((readinputport(1) | mc10_keyboard_strobe) == 0xff)
 		val |= 0x02;
-	if ((input_port_2_r(0) | mc10_keyboard_strobe) == 0xff)
+	if ((readinputport(2) | mc10_keyboard_strobe) == 0xff)
 		val |= 0x04;
-	if ((input_port_3_r(0) | mc10_keyboard_strobe) == 0xff)
+	if ((readinputport(3) | mc10_keyboard_strobe) == 0xff)
 		val |= 0x08;
-	if ((input_port_4_r(0) | mc10_keyboard_strobe) == 0xff)
+	if ((readinputport(4) | mc10_keyboard_strobe) == 0xff)
 		val |= 0x10;
-	if ((input_port_5_r(0) | mc10_keyboard_strobe) == 0xff)
+	if ((readinputport(5) | mc10_keyboard_strobe) == 0xff)
 		val |= 0x20;
 
 	return val;
@@ -138,7 +138,7 @@ READ8_HANDLER ( mc10_port2_r )
 	mess_image *img = image_from_devtype_and_index(IO_CASSETTE, 0);
 	int val = 0xed;
 
-	if ((input_port_6_r(0) | mc10_keyboard_strobe) == 0xff)
+	if ((readinputport(6) | mc10_keyboard_strobe) == 0xff)
 		val |= 0x02;
 
 	if (cassette_input(img) >= 0)

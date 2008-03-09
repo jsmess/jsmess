@@ -101,21 +101,10 @@ static mc6845_t *mc6845;
 static UINT8 *murogem_videoram;
 
 
-static WRITE8_HANDLER( murogem_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-static WRITE8_HANDLER( murogem_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
-
 static ADDRESS_MAP_START( murogem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(murogem_mc6845_address_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(murogem_mc6845_register_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
 	AM_RANGE(0x5800, 0x5800) AM_READ(input_port_1_r)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(MWA8_NOP) // sound? payout?
@@ -213,7 +202,7 @@ static MACHINE_DRIVER_START( murogem )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6802,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(murogem_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

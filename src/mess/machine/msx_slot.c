@@ -18,6 +18,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
 #include "machine/wd17xx.h"
@@ -340,7 +341,7 @@ static  READ8_HANDLER (konami_scc_bank5)
 		return 0xff;
 	}
 	else {
-		return K051649_waveform_r (offset & 0x7f);
+		return K051649_waveform_r (machine, offset & 0x7f);
 	}
 }
 
@@ -369,6 +370,8 @@ MSX_SLOT_MAP(konami_scc)
 
 MSX_SLOT_WRITE(konami_scc)
 {
+	running_machine *machine = Machine;
+
 	if (addr >= 0x5000 && addr < 0x5800) {
 		state->banks[0] = val & state->bank_mask;
 		slot_konami_scc_map (state, 1);
@@ -395,18 +398,18 @@ MSX_SLOT_WRITE(konami_scc)
 		int offset = addr & 0xff;
 
 		if (offset < 0x80) {
-			K051649_waveform_w (offset, val);
+			K051649_waveform_w (machine, offset, val);
 		}
 		else if (offset < 0xa0) {
 			offset &= 0xf;
 			if (offset < 0xa) {
-				K051649_frequency_w (offset, val);
+				K051649_frequency_w (machine, offset, val);
 			}
 			else if (offset < 0xf) {
-				K051649_volume_w (offset - 0xa, val);
+				K051649_volume_w (machine, offset - 0xa, val);
 			}
 			else {
-				K051649_keyonoff_w (0, val);
+				K051649_keyonoff_w (machine, 0, val);
 			}
 		}
 #if 0
@@ -1132,10 +1135,10 @@ MSX_SLOT_RESET(diskrom)
 static  READ8_HANDLER (msx_diskrom_page1_r)
 {
 	switch (offset) {
-	case 0: return wd17xx_status_r (0);
-	case 1: return wd17xx_track_r (0);
-	case 2: return wd17xx_sector_r (0);
-	case 3: return wd17xx_data_r (0);
+	case 0: return wd17xx_status_r (machine, 0);
+	case 1: return wd17xx_track_r (machine, 0);
+	case 2: return wd17xx_sector_r (machine, 0);
+	case 3: return wd17xx_data_r (machine, 0);
 	case 7: return msx1.dsk_stat;
 	default:
 		return msx1.state[1]->mem[offset + 0x3ff8];
@@ -1147,13 +1150,13 @@ static  READ8_HANDLER (msx_diskrom_page2_r)
 	if (offset >= 0x7f8) {
 		switch (offset) {
 		case 0x7f8:
-			return wd17xx_status_r (0);
+			return wd17xx_status_r (machine, 0);
 		case 0x7f9:
-			return wd17xx_track_r (0);
+			return wd17xx_track_r (machine, 0);
 		case 0x7fa:
-			return wd17xx_sector_r (0);
+			return wd17xx_sector_r (machine, 0);
 		case 0x7fb:
-			return wd17xx_data_r (0);
+			return wd17xx_data_r (machine, 0);
 		case 0x7ff:
 			return msx1.dsk_stat;
 		default:
@@ -1191,21 +1194,23 @@ MSX_SLOT_MAP(diskrom)
 
 MSX_SLOT_WRITE(diskrom)
 {
+	running_machine *machine = Machine;
+
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}
 	switch (addr) {
 	case 0x7ff8:
-		wd17xx_command_w (0, val);
+		wd17xx_command_w (machine, 0, val);
 		break;
 	case 0x7ff9:
-		wd17xx_track_w (0, val);
+		wd17xx_track_w (machine, 0, val);
 		break;
 	case 0x7ffa:
-		wd17xx_sector_w (0, val);
+		wd17xx_sector_w (machine, 0, val);
 		break;
 	case 0x7ffb:
-		wd17xx_data_w (0, val);
+		wd17xx_data_w (machine, 0, val);
 		break;
 	case 0x7ffc:
 		wd17xx_set_side (val & 1);
@@ -1239,13 +1244,13 @@ MSX_SLOT_RESET(diskrom2)
 	wd17xx_reset ();
 }
 
-static  READ8_HANDLER (msx_diskrom2_page1_r)
+static READ8_HANDLER (msx_diskrom2_page1_r)
 {
 	switch (offset) {
-	case 0: return wd17xx_status_r (0);
-	case 1: return wd17xx_track_r (0);
-	case 2: return wd17xx_sector_r (0);
-	case 3: return wd17xx_data_r (0);
+	case 0: return wd17xx_status_r(machine, 0);
+	case 1: return wd17xx_track_r(machine, 0);
+	case 2: return wd17xx_sector_r(machine, 0);
+	case 3: return wd17xx_data_r(machine, 0);
 	case 4: return msx1.dsk_stat;
 	default:
 		return msx1.state[1]->mem[offset + 0x3ff8];
@@ -1257,13 +1262,13 @@ static  READ8_HANDLER (msx_diskrom2_page2_r)
 	if (offset >= 0x7b8) {
 		switch (offset) {
 		case 0x7b8:
-			return wd17xx_status_r (0);
+			return wd17xx_status_r (machine, 0);
 		case 0x7b9:
-			return wd17xx_track_r (0);
+			return wd17xx_track_r (machine, 0);
 		case 0x7ba:
-			return wd17xx_sector_r (0);
+			return wd17xx_sector_r (machine, 0);
 		case 0x7bb:
-			return wd17xx_data_r (0);
+			return wd17xx_data_r (machine, 0);
 		case 0x7bc:
 			return msx1.dsk_stat;
 		default:
@@ -1300,21 +1305,23 @@ MSX_SLOT_MAP(diskrom2)
 
 MSX_SLOT_WRITE(diskrom2)
 {
+	running_machine *machine = Machine;
+
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}
 	switch (addr) {
 	case 0x7fb8:
-		wd17xx_command_w (0, val);
+		wd17xx_command_w (machine, 0, val);
 		break;
 	case 0x7fb9:
-		wd17xx_track_w (0, val);
+		wd17xx_track_w (machine, 0, val);
 		break;
 	case 0x7fba:
-		wd17xx_sector_w (0, val);
+		wd17xx_sector_w (machine, 0, val);
 		break;
 	case 0x7fbb:
-		wd17xx_data_w (0, val);
+		wd17xx_data_w (machine, 0, val);
 		break;
 	case 0x7fbc:
 		wd17xx_set_side (val & 1);
@@ -1521,6 +1528,7 @@ MSX_SLOT_MAP(fmpac)
 
 MSX_SLOT_WRITE(fmpac)
 {
+	running_machine *machine = Machine;
 	int i, data;
 
 	if (addr >= 0x4000 && addr < 0x6000 && state->cart.fmpac.sram_support) {
@@ -1536,12 +1544,12 @@ MSX_SLOT_WRITE(fmpac)
 	switch (addr) {
 	case 0x7ff4:
 		if (state->cart.fmpac.opll_active) {
-			YM2413_register_port_0_w (0, val);
+			YM2413_register_port_0_w (machine, 0, val);
 		}
 		break;
 	case 0x7ff5:
 		if (state->cart.fmpac.opll_active) {
-			YM2413_data_port_0_w (0, val);
+			YM2413_data_port_0_w (machine, 0, val);
 		}
 		break;
 	case 0x7ff6:
@@ -1984,14 +1992,14 @@ static  READ8_HANDLER (soundcartridge_scc)
 	reg = offset & 0xff;
 
 	if (reg < 0x80) {
-		return K051649_waveform_r (reg);
+		return K051649_waveform_r (machine, reg);
 	}
 	else if (reg < 0xa0) {
 		/* nothing */
 	}
 	else if (reg < 0xc0) {
 		/* read wave 5 */
-		return K051649_waveform_r (0x80 + (reg & 0x1f));
+		return K051649_waveform_r (machine, 0x80 + (reg & 0x1f));
 	}
 #if 0
 	else if (reg < 0xe0) {
@@ -2014,7 +2022,7 @@ static  READ8_HANDLER (soundcartridge_sccp)
 	reg = offset & 0xff;
 
 	if (reg < 0xa0) {
-		return K051649_waveform_r (reg);
+		return K051649_waveform_r (machine, reg);
 	}
 #if 0
 	else if (reg >= 0xc0 && reg < 0xe0) {
@@ -2054,6 +2062,7 @@ MSX_SLOT_MAP(soundcartridge)
 MSX_SLOT_WRITE(soundcartridge)
 {
 	int i;
+	running_machine *machine = Machine;
 
 	if (addr < 0x4000) {
 		return;
@@ -2103,19 +2112,19 @@ MSX_SLOT_WRITE(soundcartridge)
 			int offset = addr & 0xff;
 
 			if (offset < 0x80) {
-				K051649_waveform_w (offset, val);
+				K051649_waveform_w (machine, offset, val);
 			}
 			else if (offset < 0xa0) {
 				offset &= 0xf;
 
 				if (offset < 0xa) {
-					K051649_frequency_w (offset, val);
+					K051649_frequency_w (machine, offset, val);
 				}
 				else if (offset < 0x0f) {
-					K051649_volume_w (offset - 0xa, val);
+					K051649_volume_w (machine, offset - 0xa, val);
 				}
 				else if (offset == 0x0f) {
-					K051649_keyonoff_w (0, val);
+					K051649_keyonoff_w (machine, 0, val);
 				}
 			}
 #if 0
@@ -2143,19 +2152,19 @@ MSX_SLOT_WRITE(soundcartridge)
 			int offset = addr & 0xff;
 
 			if (offset < 0xa0) {
-				K052539_waveform_w (offset, val);
+				K052539_waveform_w (machine, offset, val);
 			}
 			else if (offset < 0xc0) {
 				offset &= 0x0f;
 
 				if (offset < 0x0a) {
-					K051649_frequency_w (offset, val);
+					K051649_frequency_w (machine, offset, val);
 				}
 				else if (offset < 0x0f) {
-					K051649_volume_w (offset - 0x0a, val);
+					K051649_volume_w (machine, offset - 0x0a, val);
 				}
 				else if (offset == 0x0f) {
-					K051649_keyonoff_w (0, val);
+					K051649_keyonoff_w (machine, 0, val);
 				}
 			}
 #if 0

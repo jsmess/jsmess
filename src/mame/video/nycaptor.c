@@ -101,9 +101,9 @@ WRITE8_HANDLER( nycaptor_palette_w )
 		return;
 
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_split2_w((offset & 0xff) + (palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_split2_w(machine, (offset & 0xff) + (palette_bank << 8),data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_split1_w((offset & 0xff) + (palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_split1_w(machine, (offset & 0xff) + (palette_bank << 8),data);
 }
 
 READ8_HANDLER( nycaptor_palette_r )
@@ -145,7 +145,7 @@ WRITE8_HANDLER( nycaptor_scrlram_w )
 	tilemap_set_scrolly(bg_tilemap, offset, data );
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int pri)
 {
 	int i;
 	for (i=0;i<0x20;i++)

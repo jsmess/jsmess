@@ -155,8 +155,6 @@ VIDEO_START( amiga )
 
 	/* reset the genlock color */
 	genlock_color = 0xffff;
-
-	VIDEO_START_CALL(generic_bitmapped);
 }
 
 
@@ -212,7 +210,7 @@ void copper_setpc(UINT32 pc)
 }
 
 
-static int copper_execute_next(int xpos)
+static int copper_execute_next(running_machine *machine, int xpos)
 {
 	int word0, word1;
 
@@ -226,7 +224,7 @@ static int copper_execute_next(int xpos)
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", last_scanline, xpos / 2, amiga_custom_names[copper_pending_offset & 0xff], copper_pending_data);
 
-		amiga_custom_w(copper_pending_offset, copper_pending_data, 0);
+		amiga_custom_w(machine, copper_pending_offset, copper_pending_data, 0);
 		copper_pending_offset = 0;
 	}
 
@@ -609,7 +607,7 @@ INLINE int update_ham(int newpix)
  *
  *************************************/
 
-void amiga_render_scanline(int scanline)
+void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline)
 {
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
@@ -620,7 +618,7 @@ void amiga_render_scanline(int scanline)
 	int planes = 0;
 
 	int x;
-	UINT16 *dst;
+	UINT16 *dst = NULL;
 	int ebitoffs = 0, obitoffs = 0;
 	int ecolmask = 0, ocolmask = 0;
 	int edelay = 0, odelay = 0;
@@ -640,7 +638,8 @@ void amiga_render_scanline(int scanline)
 	update_sprite_dma(scanline);
 
 	/* start of a new line, signal we're not done with it and fill up vars */
-	dst = BITMAP_ADDR16(tmpbitmap, scanline, 0);
+	if (bitmap != NULL)
+		dst = BITMAP_ADDR16(bitmap, scanline, 0);
 
 	/* all sprites off at the start of the line */
 	memset(sprite_remain, 0, sizeof(sprite_remain));
@@ -660,7 +659,7 @@ void amiga_render_scanline(int scanline)
 		{
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
-			next_copper_x = copper_execute_next(x);
+			next_copper_x = copper_execute_next(machine, x);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (genlock_color != 0xffff)
 				CUSTOM_REG(REG_COLOR00) = genlock_color;
@@ -697,8 +696,9 @@ void amiga_render_scanline(int scanline)
 		}
 
 		/* clear the target pixels to the background color as a starting point */
-		dst[x*2+0] =
-		dst[x*2+1] = CUSTOM_REG(REG_COLOR00);
+		if (dst != NULL)
+			dst[x*2+0] =
+			dst[x*2+1] = CUSTOM_REG(REG_COLOR00);
 
 		/* if we hit the first fetch pixel, reset the counters and latch the delays */
 		if (x == ddf_start_pixel)
@@ -838,7 +838,7 @@ void amiga_render_scanline(int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* if we are within the display region, render */
-			if (x >= hstart && x < hstop)
+			if (dst != NULL && x >= hstart && x < hstop)
 			{
 				/* hold-and-modify mode -- assume low-res (hi-res not supported by the hardware) */
 				if (ham)
@@ -921,7 +921,7 @@ void amiga_render_scanline(int scanline)
 	}
 
 #if 0
-	if ( cpu_getcurrentframe() % 64 == 0 && scanline == 100 )
+	if ( video_screen_get_frame_number(0) % 64 == 0 && scanline == 100 )
 	{
 		const char *m_lores = "LORES";
 		const char *m_hires = "HIRES";
@@ -960,7 +960,7 @@ void amiga_render_scanline(int scanline)
 	CUSTOM_REG(REG_COLOR00) = save_color0;
 
 #if GUESS_COPPER_OFFSET
-	if (cpu_getcurrentframe() % 64 == 0 && scanline == 0)
+	if (video_screen_get_frame_number(0) % 64 == 0 && scanline == 0)
 	{
 		if (input_code_pressed(KEYCODE_Q))
 			popmessage("%d", wait_offset -= 1);
@@ -968,4 +968,23 @@ void amiga_render_scanline(int scanline)
 			popmessage("%d", wait_offset += 1);
 	}
 #endif
+}
+
+
+
+/*************************************
+ *
+ *  Update
+ *
+ *************************************/
+
+VIDEO_UPDATE( amiga )
+{
+	int y;
+
+	/* render each scanline in the visible region */
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		amiga_render_scanline(machine, bitmap, y);
+
+	return 0;
 }

@@ -240,32 +240,32 @@ static WRITE8_HANDLER( vsnes_coin_counter_1_w )
 
 static READ8_HANDLER( psg_4015_r )
 {
-	return NESPSG_0_r(0x15);
+	return NESPSG_0_r(machine, 0x15);
 }
 
 static WRITE8_HANDLER( psg_4015_w )
 {
-	NESPSG_0_w(0x15, data);
+	NESPSG_0_w(machine, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg_4017_w )
 {
-	NESPSG_0_w(0x17, data);
+	NESPSG_0_w(machine, 0x17, data);
 }
 
 static READ8_HANDLER( psg1_4015_r )
 {
-	return NESPSG_1_r(0x15);
+	return NESPSG_1_r(machine, 0x15);
 }
 
 static WRITE8_HANDLER( psg1_4015_w )
 {
-	NESPSG_1_w(0x15, data);
+	NESPSG_1_w(machine, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg1_4017_w )
 {
-	NESPSG_1_w(0x17, data);
+	NESPSG_1_w(machine, 0x17, data);
 }
 
 static ADDRESS_MAP_START( vsnes_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -513,6 +513,7 @@ PORT_START	/* IN0 */ \
 	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_IMPULSE(1) \
 	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* this bit masks irqs - dont change */ \
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( vsnes )
 	VS_CONTROLS( IPT_START1, IPT_BUTTON3, IPT_START2, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_PLAYER(2)
 
@@ -542,6 +543,7 @@ static INPUT_PORTS_START( vsnes )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( topgun )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )

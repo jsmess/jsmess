@@ -868,7 +868,7 @@ static READ8_HANDLER( gssnd_r )
 			}
 			else
 			{
-				sndglu_dummy_read = ES5503_reg_0_r(sndglu_addr);
+				sndglu_dummy_read = ES5503_reg_0_r(machine, sndglu_addr);
 			}
 
 			if (sndglu_ctrl & 0x20)	// auto-increment
@@ -907,7 +907,7 @@ static WRITE8_HANDLER( gssnd_w )
 			}
 			else
 			{
-				ES5503_reg_0_w(sndglu_addr, data);
+				ES5503_reg_0_w(machine, sndglu_addr, data);
 			}
 
 			if (sndglu_ctrl & 0x20)	// auto-increment
@@ -1047,14 +1047,14 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			result = scc_r(offset & 0x03);
+			result = scc_r(machine, offset & 0x03);
 			break;
 
 		case 0x3C:	/* C03C - SOUNDCTL */
 		case 0x3D:	/* C03D - SOUNDDATA */
 		case 0x3E:	/* C03E - SOUNDADRL */
 		case 0x3F:	/* C03F - SOUNDADRH */
-			result = gssnd_r(offset & 0x03);
+			result = gssnd_r(machine, offset & 0x03);
 			break;
 
 		case 0x41:	/* C041 - INTEN */
@@ -1088,7 +1088,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			result = 0x00;
 
 		default:
-			result = apple2_c0xx_r(offset);
+			result = apple2_c0xx_r(machine, offset);
 			break;
 	}
 
@@ -1177,21 +1177,21 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 
 		case 0x36:	/* C036 - CYAREG */
 			apple2gs_cyareg = data & ~0x20;
-			cpunum_set_clock(Machine, 0, (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
+			cpunum_set_clock(machine, 0, (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
 			break;
 
 		case 0x38:	/* C038 - SCCBREG */
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc_w(offset & 0x03, data);
+			scc_w(machine, offset & 0x03, data);
 			break;
 
 		case 0x3C:	/* C03C - SOUNDCTL */
 		case 0x3D:	/* C03D - SOUNDDATA */
 		case 0x3E:	/* C03E - SOUNDADRL */
 		case 0x3F:	/* C03F - SOUNDADRH */
-			gssnd_w(offset & 0x03, data);
+			gssnd_w(machine, offset & 0x03, data);
 			break;
 
 		case 0x41:	/* C041 - INTEN */
@@ -1221,7 +1221,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			break;
 
 		default:
-			apple2_c0xx_w(offset, data);
+			apple2_c0xx_w(machine, offset, data);
 			break;
 	}
 }
@@ -1308,7 +1308,7 @@ static WRITE8_HANDLER( apple2gs_aux4000_w )
 			{
 				int color = (offset - 0x19e00) >> 1;
 
-				palette_set_color_rgb(Machine, color + 16,
+				palette_set_color_rgb(machine, color + 16,
 					((apple2gs_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
 					((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
 					((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
@@ -1527,7 +1527,7 @@ static UINT8 *apple2gs_getslotmem(offs_t address)
 
 
 
-static UINT8 apple2gs_xxCxxx_r(offs_t address)
+static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 {
 	UINT8 result;
 	int slot;
@@ -1538,7 +1538,7 @@ static UINT8 apple2gs_xxCxxx_r(offs_t address)
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
-		result = apple2gs_c0xx_r(address);
+		result = apple2gs_c0xx_r(machine, address);
 	}
 	else
 	{
@@ -1554,7 +1554,7 @@ static UINT8 apple2gs_xxCxxx_r(offs_t address)
 
 
 
-static void apple2gs_xxCxxx_w(offs_t address, UINT8 data)
+static void apple2gs_xxCxxx_w(running_machine *machine, offs_t address, UINT8 data)
 {
 	int slot;
 
@@ -1564,7 +1564,7 @@ static void apple2gs_xxCxxx_w(offs_t address, UINT8 data)
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
-		apple2gs_c0xx_w(address, data);
+		apple2gs_c0xx_w(machine, address, data);
 	}
 	else
 	{
@@ -1615,25 +1615,25 @@ static OPBASE_HANDLER( apple2gs_opbase )
 
 
 
-static READ8_HANDLER( apple2gs_00Cxxx_r ) { return apple2gs_xxCxxx_r(offset | 0x00C000); }
-static READ8_HANDLER( apple2gs_01Cxxx_r ) { return apple2gs_xxCxxx_r(offset | 0x01C000); }
-static READ8_HANDLER( apple2gs_E0Cxxx_r ) { return apple2gs_xxCxxx_r(offset | 0xE0C000); }
-static READ8_HANDLER( apple2gs_E1Cxxx_r ) { return apple2gs_xxCxxx_r(offset | 0xE1C000); }
+static READ8_HANDLER( apple2gs_00Cxxx_r ) { return apple2gs_xxCxxx_r(machine, offset | 0x00C000); }
+static READ8_HANDLER( apple2gs_01Cxxx_r ) { return apple2gs_xxCxxx_r(machine, offset | 0x01C000); }
+static READ8_HANDLER( apple2gs_E0Cxxx_r ) { return apple2gs_xxCxxx_r(machine, offset | 0xE0C000); }
+static READ8_HANDLER( apple2gs_E1Cxxx_r ) { return apple2gs_xxCxxx_r(machine, offset | 0xE1C000); }
 
-static WRITE8_HANDLER( apple2gs_00Cxxx_w) { apple2gs_xxCxxx_w(offset | 0x00C000, data); }
-static WRITE8_HANDLER( apple2gs_01Cxxx_w) { apple2gs_xxCxxx_w(offset | 0x01C000, data); }
-static WRITE8_HANDLER( apple2gs_E0Cxxx_w) { apple2gs_xxCxxx_w(offset | 0xE0C000, data); }
-static WRITE8_HANDLER( apple2gs_E1Cxxx_w) { apple2gs_xxCxxx_w(offset | 0xE1C000, data); }
+static WRITE8_HANDLER( apple2gs_00Cxxx_w) { apple2gs_xxCxxx_w(machine, offset | 0x00C000, data); }
+static WRITE8_HANDLER( apple2gs_01Cxxx_w) { apple2gs_xxCxxx_w(machine, offset | 0x01C000, data); }
+static WRITE8_HANDLER( apple2gs_E0Cxxx_w) { apple2gs_xxCxxx_w(machine, offset | 0xE0C000, data); }
+static WRITE8_HANDLER( apple2gs_E1Cxxx_w) { apple2gs_xxCxxx_w(machine, offset | 0xE1C000, data); }
 
 static WRITE8_HANDLER( apple2gs_Exxxxx_w )
 {
 	apple2gs_slowmem[offset] = data;
 }
 
-static WRITE8_HANDLER( apple2gs_E004xx_w ) { apple2gs_Exxxxx_w(offset + 0x00400, data); }
-static WRITE8_HANDLER( apple2gs_E02xxx_w ) { apple2gs_Exxxxx_w(offset + 0x02000, data); }
-static WRITE8_HANDLER( apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(offset + 0x10400, data); }
-static WRITE8_HANDLER( apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(offset + 0x12000, data); }
+static WRITE8_HANDLER( apple2gs_E004xx_w ) { apple2gs_Exxxxx_w(machine, offset + 0x00400, data); }
+static WRITE8_HANDLER( apple2gs_E02xxx_w ) { apple2gs_Exxxxx_w(machine, offset + 0x02000, data); }
+static WRITE8_HANDLER( apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(machine, offset + 0x10400, data); }
+static WRITE8_HANDLER( apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(machine, offset + 0x12000, data); }
 
 static WRITE8_HANDLER( apple2gs_slowmem_w )
 {
@@ -1643,7 +1643,7 @@ static WRITE8_HANDLER( apple2gs_slowmem_w )
 	{
 		int color = (offset - 0x19e00) >> 1;
 
-		palette_set_color_rgb(Machine, color + 16,
+		palette_set_color_rgb(machine, color + 16,
 			((apple2gs_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
 			((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
 			((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);

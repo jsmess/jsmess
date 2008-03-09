@@ -92,7 +92,7 @@ static VIDEO_START( olibochu )
 		8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -173,7 +173,7 @@ static WRITE8_HANDLER( sound_command_w )
 	for (c = 15;c >= 0;c--)
 		if (cmd & (1 << c)) break;
 
-	if (c >= 0) soundlatch_w(0,15-c);
+	if (c >= 0) soundlatch_w(machine,0,15-c);
 }
 
 
@@ -368,12 +368,12 @@ static MACHINE_DRIVER_START( olibochu )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(olibochu_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(olibochu_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* 4 MHz ?? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

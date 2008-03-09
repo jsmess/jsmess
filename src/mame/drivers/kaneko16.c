@@ -272,8 +272,8 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 {
 	if (ACCESSING_MSB)
 	{
-		soundlatch_w(0, (data & 0xff00) >> 8 );
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine, 0, (data & 0xff00) >> 8 );
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -282,31 +282,31 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 static READ16_HANDLER( kaneko16_YM2149_0_r )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_0_w(0,offset);
-	return AY8910_read_port_0_r(0);
+	AY8910_control_port_0_w(machine,0,offset);
+	return AY8910_read_port_0_r(machine,0);
 }
 static READ16_HANDLER( kaneko16_YM2149_1_r )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_1_w(0,offset);
-	return AY8910_read_port_1_r(0);
+	AY8910_control_port_1_w(machine,0,offset);
+	return AY8910_read_port_1_r(machine,0);
 }
 
 static WRITE16_HANDLER( kaneko16_YM2149_0_w )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_0_w(0,offset);
+	AY8910_control_port_0_w(machine,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_LSB)	AY8910_write_port_0_w(0, data       & 0xff);
-	else				AY8910_write_port_0_w(0,(data >> 8) & 0xff);
+	if (ACCESSING_LSB)	AY8910_write_port_0_w(machine,0, data       & 0xff);
+	else				AY8910_write_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 static WRITE16_HANDLER( kaneko16_YM2149_1_w )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_1_w(0,offset);
+	AY8910_control_port_1_w(machine,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_LSB)	AY8910_write_port_1_w(0, data       & 0xff);
-	else				AY8910_write_port_1_w(0,(data >> 8) & 0xff);
+	if (ACCESSING_LSB)	AY8910_write_port_1_w(machine,0, data       & 0xff);
+	else				AY8910_write_port_1_w(machine,0,(data >> 8) & 0xff);
 }
 
 
@@ -631,7 +631,7 @@ static WRITE16_HANDLER( gtmr_oki_0_data_w )
 {
 	if (ACCESSING_LSB)
 	{
-		OKIM6295_data_0_w(0,data);
+		OKIM6295_data_0_w(machine,0,data);
 //      logerror("CPU #0 PC %06X : OKI0 <- %08X\n",activecpu_get_pc(),data);
 	}
 }
@@ -640,7 +640,7 @@ static WRITE16_HANDLER( gtmr_oki_1_data_w )
 {
 	if (ACCESSING_LSB)
 	{
-		OKIM6295_data_1_w(0,data);
+		OKIM6295_data_1_w(machine,0,data);
 //      logerror("CPU #0 PC %06X : OKI1 <- %08X\n",activecpu_get_pc(),data);
 	}
 }
@@ -1680,7 +1680,7 @@ static MACHINE_DRIVER_START( berlwall )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12 */
 	MDRV_CPU_PROGRAM_MAP(berlwall,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(berlwall)
 
@@ -1727,7 +1727,7 @@ static MACHINE_DRIVER_START( bakubrkr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bakubrkr,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(bakubrkr)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -1783,7 +1783,7 @@ static MACHINE_DRIVER_START( blazeon )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)	/* TMP68HC000-12 */
 	MDRV_CPU_PROGRAM_MAP(blazeon,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD(Z80,4000000)	/* D780C-2 */
 	MDRV_CPU_PROGRAM_MAP(blazeon_soundmem,0)
@@ -1834,9 +1834,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gtmr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("gtmr", M68000, 16000000)	/* ? Most likely a 68000-HC16 */
+	MDRV_CPU_ADD_TAG("gtmr", M68000, XTAL_16MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gtmr_readmem,gtmr_writemem)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(gtmr)
 
@@ -1859,12 +1859,12 @@ static MACHINE_DRIVER_START( gtmr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1980000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD(OKIM6295, 1980000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -1914,7 +1914,7 @@ static MACHINE_DRIVER_START( bonkadv )
 	MDRV_IMPORT_FROM(gtmr)
 	MDRV_CPU_MODIFY("gtmr")
 	MDRV_CPU_PROGRAM_MAP(bonkadv,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM + 1 ) // comment above
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM + 1 ) // comment above
 
 	MDRV_MACHINE_RESET( bonkadv )
 MACHINE_DRIVER_END
@@ -1928,7 +1928,7 @@ static MACHINE_DRIVER_START( mgcrystl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mgcrystl,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(mgcrystl)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -1998,7 +1998,7 @@ static MACHINE_DRIVER_START( shogwarr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(shogwarr,0)
-	MDRV_CPU_VBLANK_INT(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(shogwarr)
 

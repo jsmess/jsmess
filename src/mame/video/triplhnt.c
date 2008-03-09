@@ -17,7 +17,7 @@ UINT8* triplhnt_orga_ram;
 int triplhnt_sprite_zoom;
 int triplhnt_sprite_bank;
 
-static mame_bitmap* helper;
+static bitmap_t* helper;
 static tilemap* bg_tilemap;
 
 
@@ -43,7 +43,7 @@ static TIMER_CALLBACK( triplhnt_hit_callback )
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -142,7 +142,7 @@ VIDEO_UPDATE( triplhnt )
 
 	draw_sprites(machine, bitmap, cliprect);
 
-	discrete_sound_w(TRIPLHNT_BEAR_ROAR_DATA, triplhnt_playfield_ram[0xfa] & 15);
-	discrete_sound_w(TRIPLHNT_SHOT_DATA, triplhnt_playfield_ram[0xfc] & 15);
+	discrete_sound_w(machine, TRIPLHNT_BEAR_ROAR_DATA, triplhnt_playfield_ram[0xfa] & 15);
+	discrete_sound_w(machine, TRIPLHNT_SHOT_DATA, triplhnt_playfield_ram[0xfc] & 15);
 	return 0;
 }

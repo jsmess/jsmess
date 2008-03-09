@@ -44,13 +44,13 @@ static READ8_HANDLER(mux_r)
         xxxx - input port #2
     xxxx     - dip switches (2x8 bits) (multiplexed)
 */
-	int retval=input_port_2_r(0)&0x0f;
+	int retval=input_port_2_r(machine,0)&0x0f;
 	switch(mux_port&0x30)
 	{
-		case 0x00: retval|=((input_port_4_r(0)&1)<<4)|((input_port_4_r(0)&0x10)<<1)|((input_port_5_r(0)&1)<<6)|((input_port_5_r(0)&0x10)<<3);break;
-		case 0x10: retval|=((input_port_4_r(0)&2)<<3)|((input_port_4_r(0)&0x20)   )|((input_port_5_r(0)&2)<<5)|((input_port_5_r(0)&0x20)<<2);break;
-		case 0x20: retval|=((input_port_4_r(0)&4)<<2)|((input_port_4_r(0)&0x40)>>1)|((input_port_5_r(0)&4)<<4)|((input_port_5_r(0)&0x40)<<1);break;
-		case 0x30: retval|=((input_port_4_r(0)&8)<<1)|((input_port_4_r(0)&0x80)>>2)|((input_port_5_r(0)&8)<<3)|((input_port_5_r(0)&0x80)   );break;
+		case 0x00: retval|=((input_port_4_r(machine,0)&1)<<4)|((input_port_4_r(machine,0)&0x10)<<1)|((input_port_5_r(machine,0)&1)<<6)|((input_port_5_r(machine,0)&0x10)<<3);break;
+		case 0x10: retval|=((input_port_4_r(machine,0)&2)<<3)|((input_port_4_r(machine,0)&0x20)   )|((input_port_5_r(machine,0)&2)<<5)|((input_port_5_r(machine,0)&0x20)<<2);break;
+		case 0x20: retval|=((input_port_4_r(machine,0)&4)<<2)|((input_port_4_r(machine,0)&0x40)>>1)|((input_port_5_r(machine,0)&4)<<4)|((input_port_5_r(machine,0)&0x40)<<1);break;
+		case 0x30: retval|=((input_port_4_r(machine,0)&8)<<1)|((input_port_4_r(machine,0)&0x80)>>2)|((input_port_5_r(machine,0)&8)<<3)|((input_port_5_r(machine,0)&0x80)   );break;
 	}
 	return retval;
 }
@@ -420,7 +420,7 @@ static MACHINE_DRIVER_START( st0016 )
 	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
 	MDRV_CPU_IO_MAP(st0016_io,0)
 
-	MDRV_CPU_VBLANK_INT(st0016_int,5) /*  4*nmi + int0 */
+	MDRV_CPU_VBLANK_INT_HACK(st0016_int,5) /*  4*nmi + int0 */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

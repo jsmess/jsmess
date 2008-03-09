@@ -90,7 +90,7 @@ static VIDEO_START( zerotrgt )
 	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX|TILEMAP_FLIPY);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs;
 
@@ -305,7 +305,7 @@ static WRITE8_HANDLER( cntsteer_int_w )
 
 static WRITE8_HANDLER( cntsteer_sound_w )
 {
- 	soundlatch_w(0,data);
+ 	soundlatch_w(machine,0,data);
 }
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
@@ -564,6 +564,7 @@ static INPUT_PORTS_START( cntsteer )
 INPUT_PORTS_END
 
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( zerotrgt )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "0" )
@@ -637,6 +638,7 @@ static INPUT_PORTS_START( zerotrgt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 )
 INPUT_PORTS_END
+#endif
 
 /***************************************************************************/
 
@@ -716,16 +718,16 @@ static MACHINE_RESET( zerotrgt )
 static MACHINE_DRIVER_START( cntsteer )
 	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1) /* ? */
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
 	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
-//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,1) /* ? */
+//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
 //  MDRV_CPU_ADD(M6502, 1500000)        /* ? */
 //  /* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(sound_map,0)
-//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,16) /* ? */ // should be interrupt, 16?
+//  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16) /* ? */ // should be interrupt, 16?
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -751,16 +753,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( zerotrgt )
 	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1) /* ? */
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
 	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
-//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,1) /* ? */
+//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
 	MDRV_CPU_ADD(M6502, 1500000)		/* ? */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_pulse,16) /* ? */ // should be interrupt, 16?
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_pulse,16) /* ? */ // should be interrupt, 16?
 	MDRV_CPU_PERIODIC_INT(sound_interrupt, 1000)
 
 	/* video hardware */

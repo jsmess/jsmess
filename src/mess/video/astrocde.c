@@ -339,7 +339,7 @@ WRITE8_HANDLER ( astrocade_magicram_w )
 
 	/* else draw in copy mode */
 
-	astrocade_videoram_w(offset,data);
+	astrocade_videoram_w(machine, offset,data);
 
 	magic_expand_flipflop ^= 1;
 }

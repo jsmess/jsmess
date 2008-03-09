@@ -92,7 +92,7 @@ INPUT_PORTS_END
 
 static READ16_HANDLER( puckpkmn_YM3438_r )
 {
-	return	YM3438_status_port_0_A_r(0) << 8;
+	return	YM3438_status_port_0_A_r(machine, 0) << 8;
 }
 
 static WRITE16_HANDLER( puckpkmn_YM3438_w )
@@ -100,12 +100,12 @@ static WRITE16_HANDLER( puckpkmn_YM3438_w )
 	switch (offset)
 	{
 		case 0:
-			if (ACCESSING_MSB)	YM3438_control_port_0_A_w	(0,	(data >> 8) & 0xff);
-			else 				YM3438_data_port_0_A_w		(0,	(data >> 0) & 0xff);
+			if (ACCESSING_MSB)	YM3438_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
+			else 				YM3438_data_port_0_A_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 		case 1:
-			if (ACCESSING_MSB)	YM3438_control_port_0_B_w	(0,	(data >> 8) & 0xff);
-			else 				YM3438_data_port_0_B_w		(0,	(data >> 0) & 0xff);
+			if (ACCESSING_MSB)	YM3438_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
+			else 				YM3438_data_port_0_B_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 	}
 }
@@ -158,7 +158,7 @@ static MACHINE_DRIVER_START( puckpkmn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000, MASTER_CLOCK/7) 		/*???*/
 	MDRV_CPU_PROGRAM_MAP(puckpkmn_readmem,puckpkmn_writemem)
-	MDRV_CPU_VBLANK_INT(genesis_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
 
 	MDRV_MACHINE_START(genesis)
 	MDRV_MACHINE_RESET(genesis)

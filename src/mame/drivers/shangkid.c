@@ -103,7 +103,7 @@ static WRITE8_HANDLER( shangkid_sound_enable_w )
 static WRITE8_HANDLER( shangkid_bbx_AY8910_control_w )
 {
 	bbx_AY8910_control = data;
-	AY8910_control_port_0_w( offset, data );
+	AY8910_control_port_0_w( machine, offset, data );
 }
 
 static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
 		break;
 
 	default:
-		AY8910_write_port_0_w( offset, data );
+		AY8910_write_port_0_w( machine, offset, data );
 		break;
 	}
 }
@@ -149,7 +149,7 @@ static WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
 		break;
 
 	default:
-		AY8910_write_port_0_w( offset, data );
+		AY8910_write_port_0_w( machine, offset, data );
 		break;
 	}
 }
@@ -387,12 +387,12 @@ static MACHINE_DRIVER_START( chinhero )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, XTAL_18_432MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chinhero_main_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("bbx", Z80, XTAL_18_432MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chinhero_bbx_map,0)
 	MDRV_CPU_IO_MAP(chinhero_bbx_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("audio", Z80, XTAL_18_432MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chinhero_sound_map,0)
@@ -478,7 +478,7 @@ static MACHINE_DRIVER_START( dynamski )
 	MDRV_CPU_ADD(Z80, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(dynamski_map,0)
 	MDRV_CPU_IO_MAP(dynamski_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

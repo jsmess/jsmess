@@ -20,6 +20,11 @@ Notes:
   hardware.  The music ends at the perfect time with this clock speed
 - Lasso: fire button auto-repeats on high score entry screen (real behavior?)
 
+***************************************************************************
+
+DIP locations verified for:
+    - lasso
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -31,30 +36,11 @@ Notes:
 #include "sound/ay8910.h"
 
 
-/* IRQ = VBlank, NMI = Coin Insertion */
-
-static UINT8 coins_old;
-
-static INTERRUPT_GEN( lasso_interrupt )
+static INPUT_CHANGED( coin_inserted )
 {
-	// VBlank
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	else
-	{
-		UINT8 coins_new;
-
-		// Coins
-		coins_new = ~readinputport(3) & 0x30;
-
-		if ( ((coins_new & 0x10) && !(coins_old & 0x10)) ||
-			 ((coins_new & 0x20) && !(coins_old & 0x20)) )
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-
-		coins_old = coins_new;
-	}
+	/* coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
-
 
 
 /* Write to the sound latch and generate an IRQ on the sound CPU */
@@ -64,14 +50,14 @@ static UINT8 *lasso_chip_data;
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1, 0, PULSE_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1, 0, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( pinbo_sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -85,16 +71,10 @@ static WRITE8_HANDLER( sound_select_w )
 	UINT8 to_write = BITSWAP8(*lasso_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)	/* chip #0 */
-		SN76496_0_w(0, to_write);
+		SN76496_0_w(machine, 0, to_write);
 
 	if (~data & 0x02)	/* chip #1 */
-		SN76496_1_w(0, to_write);
-}
-
-static MACHINE_START( lasso )
-{
-	/* register for saving */
-	state_save_register_global(coins_old);
+		SN76496_1_w(machine, 0, to_write);
 }
 
 
@@ -253,182 +233,109 @@ static INPUT_PORTS_START( lasso )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED  )
 
 	PORT_START_TAG("1806")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW2:!2,!3,!4")
 	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x0e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(	0x0c, DEF_STR( 1C_6C ) )
-//  PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x0a, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x30, "3" )
+//  PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )        /* Not documented */
+//  PORT_DIPSETTING(    0x0a, DEF_STR( 1C_1C ) )        /* Not documented */
+//  PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )        /* Not documented */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!5,!6")
+	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-//  PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coin_B ) )
+//  PORT_DIPSETTING(    0x30, "3" )                     /* Not documented */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x80, 0x80, "Warm-Up Instructions" )
+	PORT_DIPNAME( 0x80, 0x80, "Warm-Up Instructions" )	PORT_DIPLOCATION("SW1:!4") /* Listed as "Unused" */
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 
 	PORT_START_TAG("1807")
-	PORT_DIPNAME( 0x01, 0x00, "Warm-Up" )
+	PORT_DIPNAME( 0x01, 0x00, "Warm-Up" )				PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, "Warm-Up Language" )
+	PORT_DIPNAME( 0x02, 0x00, "Warm-Up Language" )		PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( German ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	/* used */
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Invulnerability (Cheat)")
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW1:!5" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x08, 0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW1:!6") /* Listed as "Test" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2    )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chameleo )
-	PORT_START_TAG("1804")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_INCLUDE( lasso )
 
-	PORT_START_TAG("1805")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_MODIFY("1804")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("1806")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x0e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( 1C_6C ) )
-//  PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x0a, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_MODIFY("1805")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("1806")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x30, "5" )
 //  PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x20, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!4" )
 
-	PORT_START_TAG("1807")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_MODIFY("1807")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:!3" )		/* Probably unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:!2" )		/* Probably unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!5" )		/* Probably unused */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2    )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1    )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2  )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wwjgtin )
-	PORT_START_TAG("1804")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_INCLUDE( lasso )
 
-	PORT_START_TAG("1805")
+	PORT_MODIFY("1805")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("1806")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	/* used - has to do with the controls */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x0e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( 1C_6C ) )
-//  PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x0a, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("1806")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )		/* used - has to do with the controls */
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )		/* probably unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )		/* probably unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!4" )		/* probably unused */
 
-	PORT_START_TAG("1807")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life) )
+	PORT_MODIFY("1807")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life) )	PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x00, "20k" )
 	PORT_DIPSETTING(    0x01, "50k" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2   )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1   )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!5" )		/* probably unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!6" )		/* probably unused */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pinbo )
-	PORT_START_TAG("1804")
+	PORT_INCLUDE( lasso )
+
+	PORT_MODIFY("1804")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -438,7 +345,7 @@ static INPUT_PORTS_START( pinbo )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("1805")
+	PORT_MODIFY("1805")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -448,48 +355,36 @@ static INPUT_PORTS_START( pinbo )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("1806")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x0e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( 1C_6C ) )
-//  PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x0a, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_MODIFY("1806")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "70 (Cheat)")
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!4" )		/* probably unused */
 
-	PORT_START_TAG("1807")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life) )
-	PORT_DIPSETTING(    0x00, "500000,1000000" )
+	PORT_MODIFY("1807")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life) )	PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPSETTING(    0x00, "500000, 1000000" )
 	PORT_DIPSETTING(    0x01, DEF_STR( None ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Controls ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Controls ) )		PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Reversed" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	/* probably unused */
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW1:!5" )		/* probably unused */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2   )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1   )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pinboa )
+	PORT_INCLUDE( pinbo )
+
+	PORT_MODIFY("1806")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!5,!6")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x30, "70 (Cheat)")
 INPUT_PORTS_END
 
 
@@ -573,14 +468,12 @@ static MACHINE_DRIVER_START( base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, 11289000/16)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lasso_main_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("audio", M6502, 600000)
 	MDRV_CPU_PROGRAM_MAP(lasso_audio_map, 0)
 
-	MDRV_CPU_VBLANK_INT(lasso_interrupt,2)		/* IRQ = VBlank, NMI = Coin Insertion */
 	MDRV_INTERLEAVE(100)
-
-	MDRV_MACHINE_START(lasso)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -958,5 +851,5 @@ GAME( 1983, chameleo, 0,       chameleo, chameleo, 0, ROT0,  "Jaleco",         "
 GAME( 1984, wwjgtin,  0,       wwjgtin,  wwjgtin,  0, ROT0,  "Jaleco / Casio", "Wai Wai Jockey Gate-In!", GAME_SUPPORTS_SAVE )
 GAME( 1991, photof,   wwjgtin, wwjgtin,  wwjgtin,  0, ROT0,  "bootleg?",	   "Photo Finish", GAME_SUPPORTS_SAVE )
 GAME( 1984, pinbo,    0,       pinbo,    pinbo,    0, ROT90, "Jaleco",         "Pinbo (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, pinboa,   pinbo,   pinbo,    pinbo,    0, ROT90, "Jaleco",         "Pinbo (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pinbos,   pinbo,   pinbo,    pinbo,    0, ROT90, "bootleg?",       "Pinbo (Strike)", GAME_SUPPORTS_SAVE )
+GAME( 1984, pinboa,   pinbo,   pinbo,    pinboa,   0, ROT90, "Jaleco",         "Pinbo (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pinbos,   pinbo,   pinbo,    pinboa,   0, ROT90, "bootleg?",       "Pinbo (Strike)", GAME_SUPPORTS_SAVE )

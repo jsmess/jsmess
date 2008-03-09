@@ -10,73 +10,73 @@
 #define PC1251_H_
 
 
-#define PC1251_SWITCH_MODE (input_port_0_r(0)&7)
+#define PC1251_SWITCH_MODE (readinputport(0)&7)
 
-#define PC1251_KEY_DEF input_port_0_r(0)&0x100
-#define PC1251_KEY_SHIFT input_port_0_r(0)&0x80
-#define PC1251_KEY_DOWN input_port_0_r(0)&0x40
-#define PC1251_KEY_UP input_port_0_r(0)&0x20
-#define PC1251_KEY_LEFT input_port_0_r(0)&0x10
-#define PC1251_KEY_RIGHT input_port_0_r(0)&8
+#define PC1251_KEY_DEF readinputport(0)&0x100
+#define PC1251_KEY_SHIFT readinputport(0)&0x80
+#define PC1251_KEY_DOWN readinputport(0)&0x40
+#define PC1251_KEY_UP readinputport(0)&0x20
+#define PC1251_KEY_LEFT readinputport(0)&0x10
+#define PC1251_KEY_RIGHT readinputport(0)&8
 
-#define PC1251_KEY_BRK input_port_1_r(0)&0x80
-#define PC1251_KEY_Q input_port_1_r(0)&0x40
-#define PC1251_KEY_W input_port_1_r(0)&0x20
-#define PC1251_KEY_E input_port_1_r(0)&0x10
-#define PC1251_KEY_R input_port_1_r(0)&8
-#define PC1251_KEY_T input_port_1_r(0)&4
-#define PC1251_KEY_Y input_port_1_r(0)&2
-#define PC1251_KEY_U input_port_1_r(0)&1
+#define PC1251_KEY_BRK readinputport(1)&0x80
+#define PC1251_KEY_Q readinputport(1)&0x40
+#define PC1251_KEY_W readinputport(1)&0x20
+#define PC1251_KEY_E readinputport(1)&0x10
+#define PC1251_KEY_R readinputport(1)&8
+#define PC1251_KEY_T readinputport(1)&4
+#define PC1251_KEY_Y readinputport(1)&2
+#define PC1251_KEY_U readinputport(1)&1
 
-#define PC1251_KEY_I input_port_2_r(0)&0x80
-#define PC1251_KEY_O input_port_2_r(0)&0x40
-#define PC1251_KEY_P input_port_2_r(0)&0x20
-#define PC1251_KEY_A input_port_2_r(0)&0x10
-#define PC1251_KEY_S input_port_2_r(0)&8
-#define PC1251_KEY_D input_port_2_r(0)&4
-#define PC1251_KEY_F input_port_2_r(0)&2
-#define PC1251_KEY_G input_port_2_r(0)&1
+#define PC1251_KEY_I readinputport(2)&0x80
+#define PC1251_KEY_O readinputport(2)&0x40
+#define PC1251_KEY_P readinputport(2)&0x20
+#define PC1251_KEY_A readinputport(2)&0x10
+#define PC1251_KEY_S readinputport(2)&8
+#define PC1251_KEY_D readinputport(2)&4
+#define PC1251_KEY_F readinputport(2)&2
+#define PC1251_KEY_G readinputport(2)&1
 
-#define PC1251_KEY_H input_port_3_r(0)&0x80
-#define PC1251_KEY_J input_port_3_r(0)&0x40
-#define PC1251_KEY_K input_port_3_r(0)&0x20
-#define PC1251_KEY_L input_port_3_r(0)&0x10
-#define PC1251_KEY_EQUALS input_port_3_r(0)&8
-#define PC1251_KEY_Z input_port_3_r(0)&4
-#define PC1251_KEY_X input_port_3_r(0)&2
-#define PC1251_KEY_C input_port_3_r(0)&1
+#define PC1251_KEY_H readinputport(3)&0x80
+#define PC1251_KEY_J readinputport(3)&0x40
+#define PC1251_KEY_K readinputport(3)&0x20
+#define PC1251_KEY_L readinputport(3)&0x10
+#define PC1251_KEY_EQUALS readinputport(3)&8
+#define PC1251_KEY_Z readinputport(3)&4
+#define PC1251_KEY_X readinputport(3)&2
+#define PC1251_KEY_C readinputport(3)&1
 
-#define PC1251_KEY_V input_port_4_r(0)&0x80
-#define PC1251_KEY_B input_port_4_r(0)&0x40
-#define PC1251_KEY_N input_port_4_r(0)&0x20
-#define PC1251_KEY_M input_port_4_r(0)&0x10
-#define PC1251_KEY_SPACE input_port_4_r(0)&8
-#define PC1251_KEY_ENTER input_port_4_r(0)&4
-#define PC1251_KEY_7 input_port_4_r(0)&2
-#define PC1251_KEY_8 input_port_4_r(0)&1
+#define PC1251_KEY_V readinputport(4)&0x80
+#define PC1251_KEY_B readinputport(4)&0x40
+#define PC1251_KEY_N readinputport(4)&0x20
+#define PC1251_KEY_M readinputport(4)&0x10
+#define PC1251_KEY_SPACE readinputport(4)&8
+#define PC1251_KEY_ENTER readinputport(4)&4
+#define PC1251_KEY_7 readinputport(4)&2
+#define PC1251_KEY_8 readinputport(4)&1
 
-#define PC1251_KEY_9 input_port_5_r(0)&0x80
-#define PC1251_KEY_CL input_port_5_r(0)&0x40
-#define PC1251_KEY_4 input_port_5_r(0)&0x20
-#define PC1251_KEY_5 input_port_5_r(0)&0x10
-#define PC1251_KEY_6 input_port_5_r(0)&8
-#define PC1251_KEY_SLASH input_port_5_r(0)&4
-#define PC1251_KEY_1 input_port_5_r(0)&2
-#define PC1251_KEY_2 input_port_5_r(0)&1
+#define PC1251_KEY_9 readinputport(5)&0x80
+#define PC1251_KEY_CL readinputport(5)&0x40
+#define PC1251_KEY_4 readinputport(5)&0x20
+#define PC1251_KEY_5 readinputport(5)&0x10
+#define PC1251_KEY_6 readinputport(5)&8
+#define PC1251_KEY_SLASH readinputport(5)&4
+#define PC1251_KEY_1 readinputport(5)&2
+#define PC1251_KEY_2 readinputport(5)&1
 
-#define PC1251_KEY_3 input_port_6_r(0)&0x80
-#define PC1251_KEY_ASTERIX input_port_6_r(0)&0x40
-#define PC1251_KEY_0 input_port_6_r(0)&0x20
-#define PC1251_KEY_POINT input_port_6_r(0)&0x10
-#define PC1251_KEY_PLUS input_port_6_r(0)&8
-#define PC1251_KEY_MINUS input_port_6_r(0)&4
-#define PC1251_KEY_RESET input_port_6_r(0)&1
+#define PC1251_KEY_3 readinputport(6)&0x80
+#define PC1251_KEY_ASTERIX readinputport(6)&0x40
+#define PC1251_KEY_0 readinputport(6)&0x20
+#define PC1251_KEY_POINT readinputport(6)&0x10
+#define PC1251_KEY_PLUS readinputport(6)&8
+#define PC1251_KEY_MINUS readinputport(6)&4
+#define PC1251_KEY_RESET readinputport(6)&1
 
-#define PC1251_RAM4K (input_port_7_r(0)&0xc0)==0x40
-#define PC1251_RAM6K (input_port_7_r(0)&0xc0)==0x80
-#define PC1251_RAM11K (input_port_7_r(0)&0xc0)==0xc0
+#define PC1251_RAM4K (readinputport(7)&0xc0)==0x40
+#define PC1251_RAM6K (readinputport(7)&0xc0)==0x80
+#define PC1251_RAM11K (readinputport(7)&0xc0)==0xc0
 
-#define PC1251_CONTRAST (input_port_7_r(0)&7)
+#define PC1251_CONTRAST (readinputport(7)&7)
 
 
 /*----------- defined in machine/pc1251.c -----------*/

@@ -204,7 +204,7 @@ static MACHINE_DRIVER_START( p2000t )
 	MDRV_CPU_ADD(Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000t_mem, 0)
 	MDRV_CPU_IO_MAP(p2000t_io, 0)
-	MDRV_CPU_VBLANK_INT(p2000_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", p2000_interrupt)
 
     /* video hardware */
 	MDRV_IMPORT_FROM( vh_saa5050 )
@@ -222,7 +222,7 @@ static MACHINE_DRIVER_START( p2000m )
 	MDRV_CPU_ADD(Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000m_mem, 0)
 	MDRV_CPU_IO_MAP(p2000t_io, 0)
-	MDRV_CPU_VBLANK_INT(p2000_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", p2000_interrupt)
 	MDRV_INTERLEAVE(1)
 
     /* video hardware */

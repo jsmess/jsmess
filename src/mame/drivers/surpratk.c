@@ -39,7 +39,7 @@ static READ8_HANDLER( bankedram_r )
 			return paletteram[offset];
 	}
 	else if (videobank & 0x01)
-		return K053245_r(offset);
+		return K053245_r(machine,offset);
 	else
 		return ram[offset];
 }
@@ -49,12 +49,12 @@ static WRITE8_HANDLER( bankedram_w )
 	if (videobank & 0x02)
 	{
 		if (videobank & 0x04)
-			paletteram_xBBBBBGGGGGRRRRR_be_w(offset + 0x0800,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset + 0x0800,data);
 		else
-			paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 	}
 	else if (videobank & 0x01)
-		K053245_w(offset,data);
+		K053245_w(machine,offset,data);
 	else
 		ram[offset] = data;
 }
@@ -239,7 +239,7 @@ static MACHINE_DRIVER_START( surpratk )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000)	/* 053248 */
 	MDRV_CPU_PROGRAM_MAP(surpratk_readmem,surpratk_writemem)
-	MDRV_CPU_VBLANK_INT(surpratk_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", surpratk_interrupt)
 
 	MDRV_MACHINE_RESET(surpratk)
 

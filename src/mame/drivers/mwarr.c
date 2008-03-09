@@ -326,7 +326,7 @@ static VIDEO_START( mwarr )
 	tilemap_set_scroll_rows(mhigh_tilemap, 256);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const UINT16 *source = sprites_buffer+0x800-4;
 	const UINT16 *finish = sprites_buffer;
@@ -453,7 +453,7 @@ static VIDEO_UPDATE( mwarr )
 static MACHINE_DRIVER_START( mwarr )
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mwarr_map,0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_GFXDECODE(mwarr)
 

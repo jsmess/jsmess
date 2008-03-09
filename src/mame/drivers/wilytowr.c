@@ -166,7 +166,7 @@ static VIDEO_START( wilytowr )
 	fg_flag = 0;
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -229,13 +229,13 @@ static WRITE8_HANDLER( snddata_w )
 {
 	int num_ays = (sndti_exists(SOUND_AY8910, 1)) ? 2 : 1;
 	if ((p2 & 0xf0) == 0xe0)
-		AY8910_control_port_0_w(0,offset);
+		AY8910_control_port_0_w(machine,0,offset);
 	else if ((p2 & 0xf0) == 0xa0)
-		AY8910_write_port_0_w(0,offset);
+		AY8910_write_port_0_w(machine,0,offset);
 	else if (num_ays == 2 && (p1 & 0xe0) == 0x60)
-		AY8910_control_port_1_w(0,offset);
+		AY8910_control_port_1_w(machine,0,offset);
 	else if (num_ays == 2 && (p1 & 0xe0) == 0x40)
-		AY8910_write_port_1_w(0,offset);
+		AY8910_write_port_1_w(machine,0,offset);
 	else // if ((p2 & 0xf0) != 0x70)
 		/* the port address is the data, while the data seems to be control bits */
 		logerror("%04x: snddata_w ctrl = %02x, p1 = %02x, p2 = %02x, data = %02x\n",activecpu_get_pc(),data,p1,p2,offset);
@@ -515,7 +515,7 @@ static MACHINE_DRIVER_START( wilytowr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(I8039,8000000)	/* ????? */
 	/* audio CPU */
@@ -552,7 +552,7 @@ static MACHINE_DRIVER_START( fghtbskt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 12000000/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(fghtbskt_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(I8039,12000000/4)	/* ????? */
 	/* audio CPU */

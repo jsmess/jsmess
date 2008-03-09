@@ -174,7 +174,7 @@ static const pia6821_interface dgnbeta_pia_intf[] =
 // Info for bank switcher
 struct bank_info_entry
 {
-	write8_handler handler;	// Pointer to write handler
+	write8_machine_func handler;	// Pointer to write handler
 	offs_t start;		// Offset of start of block
 	offs_t end;		// offset of end of block
 };
@@ -239,7 +239,7 @@ static void UpdateBanks(int first, int last)
 {
 	int		Page;
 	UINT8 		*readbank;
-	write8_handler 	writebank;
+	write8_machine_func 	writebank;
 	int		bank_start;
 	int		bank_end;
 	int		MapPage;
@@ -562,16 +562,16 @@ static READ8_HANDLER(d_pia0_pb_r)
 		{
 			switch (Idx)
 			{
-				case 0 : Keyboard[Idx]=input_port_0_r(0); break;
-				case 1 : Keyboard[Idx]=input_port_1_r(0); break;
-				case 2 : Keyboard[Idx]=input_port_2_r(0); break;
-				case 3 : Keyboard[Idx]=input_port_3_r(0); break;
-				case 4 : Keyboard[Idx]=input_port_4_r(0); break;
-				case 5 : Keyboard[Idx]=input_port_5_r(0); break;
-				case 6 : Keyboard[Idx]=input_port_6_r(0); break;
-				case 7 : Keyboard[Idx]=input_port_7_r(0); break;
-				case 8 : Keyboard[Idx]=input_port_8_r(0); break;
-				case 9 : Keyboard[Idx]=input_port_9_r(0); break;
+				case 0 : Keyboard[Idx]=readinputport(0); break;
+				case 1 : Keyboard[Idx]=readinputport(1); break;
+				case 2 : Keyboard[Idx]=readinputport(2); break;
+				case 3 : Keyboard[Idx]=readinputport(3); break;
+				case 4 : Keyboard[Idx]=readinputport(4); break;
+				case 5 : Keyboard[Idx]=readinputport(5); break;
+				case 6 : Keyboard[Idx]=readinputport(6); break;
+				case 7 : Keyboard[Idx]=readinputport(7); break;
+				case 8 : Keyboard[Idx]=readinputport(8); break;
+				case 9 : Keyboard[Idx]=readinputport(9); break;
 			}
 
 			if(Keyboard[Idx]!=0x7F)
@@ -903,16 +903,17 @@ static void cpu1_recalc_firq(int state)
 
 static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
 {
+	running_machine *machine = Machine;
 	/* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
 	/* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
 
 	switch(event)
 	{
 		case WD17XX_IRQ_CLR:
-			pia_2_ca1_w(0,CLEAR_LINE);
+			pia_2_ca1_w(machine, 0, CLEAR_LINE);
 			break;
 		case WD17XX_IRQ_SET:
-			pia_2_ca1_w(0,ASSERT_LINE);
+			pia_2_ca1_w(machine, 0, ASSERT_LINE);
 			break;
 		case WD17XX_DRQ_CLR:
 			/*wd2797_drq=CLEAR_LINE;*/
@@ -934,17 +935,17 @@ static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
 	switch(offset & 0x03)
 	{
 		case 0:
-			result = wd17xx_status_r(0);
+			result = wd17xx_status_r(machine, 0);
 			LOG_DISK(("Disk status=%2.2X\n",result));
 			break;
 		case 1:
-			result = wd17xx_track_r(0);
+			result = wd17xx_track_r(machine, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(0);
+			result = wd17xx_sector_r(machine, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(0);
+			result = wd17xx_data_r(machine, 0);
 			break;
 		default:
 			break;
@@ -962,16 +963,16 @@ WRITE8_HANDLER(dgnbeta_wd2797_w)
 			/* But only for Type 3/4 commands */
 			if(data & 0x80)
 				wd17xx_set_side((data & 0x02) ? 1 : 0);
-			wd17xx_command_w(0, data);
+			wd17xx_command_w(machine, 0, data);
 			break;
 		case 1:
-			wd17xx_track_w(0, data);
+			wd17xx_track_w(machine, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(0, data);
+			wd17xx_sector_w(machine, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(0, data);
+			wd17xx_data_w(machine, 0, data);
 			break;
 	};
 }
@@ -991,16 +992,16 @@ static void ScanInKeyboard(void)
 	{
 		switch (Idx)
 		{
-			case 0 : Row=input_port_0_r(0) /*| 0x33*/; break;
-			case 1 : Row=input_port_1_r(0); break;
-			case 2 : Row=input_port_2_r(0); break;
-			case 3 : Row=input_port_3_r(0); break;
-			case 4 : Row=input_port_4_r(0); break;
-			case 5 : Row=input_port_5_r(0); break;
-			case 6 : Row=input_port_6_r(0); break;
-			case 7 : Row=input_port_7_r(0); break;
-			case 8 : Row=input_port_8_r(0); break;
-			case 9 : Row=input_port_9_r(0); break;
+			case 0 : Row=readinputport(0) /*| 0x33*/; break;
+			case 1 : Row=readinputport(1); break;
+			case 2 : Row=readinputport(2); break;
+			case 3 : Row=readinputport(3); break;
+			case 4 : Row=readinputport(4); break;
+			case 5 : Row=readinputport(5); break;
+			case 6 : Row=readinputport(6); break;
+			case 7 : Row=readinputport(7); break;
+			case 8 : Row=readinputport(8); break;
+			case 9 : Row=readinputport(9); break;
 			default : Row=0x7F; break;
 		}
 		Keyboard[Idx]=Row;
@@ -1016,14 +1017,16 @@ static void ScanInKeyboard(void)
 /* VBlank inturrupt */
 void dgn_beta_frame_interrupt (int data)
 {
+	running_machine *machine = Machine;
+
 	/* Set PIA line, so it recognises inturrupt */
 	if (!data)
 	{
-		pia_2_cb2_w(0,ASSERT_LINE);
+		pia_2_cb2_w(machine, 0, ASSERT_LINE);
 	}
 	else
 	{
-		pia_2_cb2_w(0,CLEAR_LINE);
+		pia_2_cb2_w(machine, 0, CLEAR_LINE);
 	}
 	LOG_VIDEO(("Vblank\n"));
 	ScanInKeyboard();
@@ -1034,11 +1037,11 @@ void dgn_beta_line_interrupt (int data)
 //	/* Set PIA line, so it recognises inturrupt */
 //	if (data)
 //	{
-//		pia_0_cb1_w(0,ASSERT_LINE);
+//		pia_0_cb1_w(machine, 0,ASSERT_LINE);
 //	}
 //	else
 //	{
-//		pia_0_cb1_w(0,CLEAR_LINE);
+//		pia_0_cb1_w(machine, 0,CLEAR_LINE);
 //	}
 }
 

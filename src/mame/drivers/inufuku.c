@@ -109,8 +109,8 @@ static WRITE16_HANDLER( inufuku_soundcommand_w )
 		if (data == 0x08) return;
 
 		pending_command = 1;
-		soundlatch_w(0, data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine, 0, data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -141,7 +141,7 @@ static MACHINE_RESET( inufuku )
 static DRIVER_INIT( inufuku )
 {
 	pending_command = 1;
-	inufuku_soundrombank_w(0, 0);
+	inufuku_soundrombank_w(machine, 0, 0);
 }
 
 
@@ -401,7 +401,7 @@ static MACHINE_DRIVER_START( inufuku )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 32000000/2)	/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(inufuku_readmem, inufuku_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 32000000/4)		/* 8.00 MHz */
 	/* audio CPU */

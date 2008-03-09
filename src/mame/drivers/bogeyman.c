@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 extern UINT8 *bogeyman_videoram2, *bogeyman_colorram2;
@@ -46,9 +47,9 @@ static WRITE8_HANDLER( bogeyman_8910_control_w )
 	{
 		// bit 4 goes to the 8910 #0 BC1 pin
 		if (last & 0x10)
-			AY8910_control_port_0_w(0,psg_latch);
+			AY8910_control_port_0_w(machine,0,psg_latch);
 		else
-			AY8910_write_port_0_w(0,psg_latch);
+			AY8910_write_port_0_w(machine,0,psg_latch);
 	}
 
 	// bit 7 goes to 8910 #1 BDIR pin
@@ -56,9 +57,9 @@ static WRITE8_HANDLER( bogeyman_8910_control_w )
 	{
 		// bit 6 goes to the 8910 #1 BC1 pin
 		if (last & 0x40)
-			AY8910_control_port_1_w(0,psg_latch);
+			AY8910_control_port_1_w(machine,0,psg_latch);
 		else
-			AY8910_write_port_1_w(0,psg_latch);
+			AY8910_write_port_1_w(machine,0,psg_latch);
 	}
 
 	last = data;
@@ -227,7 +228,7 @@ static MACHINE_DRIVER_START( bogeyman )
 	// basic machine hardware
 	MDRV_CPU_ADD(M6502, 2000000)	// 12 MHz clock on board
 	MDRV_CPU_PROGRAM_MAP(bogeyman_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 16) // Controls sound
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 16) // Controls sound
 
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

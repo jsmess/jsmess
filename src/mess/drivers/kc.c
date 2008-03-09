@@ -46,28 +46,28 @@ static READ8_HANDLER(kc85_4_port_r)
 	switch (port)
 	{
 //      case 0x080:
-//          return kc85_module_r(offset);
+//          return kc85_module_r(machine, offset);
 
 		case 0x085:
 		case 0x084:
-			return kc85_4_84_r(offset);
+			return kc85_4_84_r(machine, offset);
 
 
 		case 0x086:
 		case 0x087:
-			return kc85_4_86_r(offset);
+			return kc85_4_86_r(machine, offset);
 
 		case 0x088:
 		case 0x089:
-			return kc85_pio_data_r(port-0x088);
+			return kc85_pio_data_r(machine, port-0x088);
 		case 0x08a:
 		case 0x08b:
-			return kc85_pio_control_r(port-0x08a);
+			return kc85_pio_control_r(machine, port-0x08a);
 		case 0x08c:
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			return kc85_ctc_r(port-0x08c);
+			return kc85_ctc_r(machine, port-0x08c);
 
 	}
 
@@ -84,34 +84,34 @@ static WRITE8_HANDLER(kc85_4_port_w)
 	switch (port)
 	{
 //      case 0x080:
-//          kc85_module_w(offset,data);
+//          kc85_module_w(machine, offset,data);
 //          return;
 
 		case 0x085:
 		case 0x084:
-			kc85_4_84_w(offset,data);
+			kc85_4_84_w(machine, offset,data);
 			return;
 
 		case 0x086:
 		case 0x087:
-			kc85_4_86_w(offset,data);
+			kc85_4_86_w(machine, offset,data);
 			return;
 
 		case 0x088:
 		case 0x089:
-			kc85_4_pio_data_w(port-0x088, data);
+			kc85_4_pio_data_w(machine, port-0x088, data);
 			return;
 
 		case 0x08a:
 		case 0x08b:
-			kc85_pio_control_w(port-0x08a, data);
+			kc85_pio_control_w(machine, port-0x08a, data);
 			return;
 
 		case 0x08c:
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			kc85_ctc_w(port-0x08c, data);
+			kc85_ctc_w(machine, port-0x08c, data);
 			return;
 	}
 
@@ -135,33 +135,33 @@ static  READ8_HANDLER(kc85_4d_port_r)
 	switch (port)
 	{
 		case 0x080:
-			return kc85_module_r(offset);
+			return kc85_module_r(machine, offset);
 
 		case 0x085:
 		case 0x084:
-			return kc85_4_84_r(offset);
+			return kc85_4_84_r(machine, offset);
 
 
 		case 0x086:
 		case 0x087:
-			return kc85_4_86_r(offset);
+			return kc85_4_86_r(machine, offset);
 
 		case 0x088:
 		case 0x089:
-			return kc85_pio_data_r(port-0x088);
+			return kc85_pio_data_r(machine, port-0x088);
 		case 0x08a:
 		case 0x08b:
-			return kc85_pio_control_r(port-0x08a);
+			return kc85_pio_control_r(machine, port-0x08a);
 		case 0x08c:
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			return kc85_ctc_r(port-0x08c);
+			return kc85_ctc_r(machine, port-0x08c);
 		case 0x0f0:
 		case 0x0f1:
 		case 0x0f2:
 		case 0x0f3:
-			return kc85_disc_interface_ram_r(offset);
+			return kc85_disc_interface_ram_r(machine, offset);
 
 	}
 
@@ -255,15 +255,15 @@ static READ8_HANDLER(kc85_3_port_r)
 
 		case 0x088:
 		case 0x089:
-			return kc85_pio_data_r(port-0x088);
+			return kc85_pio_data_r(machine, port-0x088);
 		case 0x08a:
 		case 0x08b:
-			return kc85_pio_control_r(port-0x08a);
+			return kc85_pio_control_r(machine, port-0x08a);
 		case 0x08c:
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			return kc85_ctc_r(port-0x08c);
+			return kc85_ctc_r(machine, port-0x08c);
 	}
 
 	logerror("unhandled port r: %04x\n",offset);
@@ -284,19 +284,19 @@ static WRITE8_HANDLER(kc85_3_port_w)
 
 		case 0x088:
 		case 0x089:
-			kc85_3_pio_data_w(port-0x088, data);
+			kc85_3_pio_data_w(machine, port-0x088, data);
 			return;
 
 		case 0x08a:
 		case 0x08b:
-			kc85_pio_control_w(port-0x08a, data);
+			kc85_pio_control_w(machine, port-0x08a, data);
 			return;
 
 		case 0x08c:
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			kc85_ctc_w(port-0x08c, data);
+			kc85_ctc_w(machine, port-0x08c, data);
 			return;
 	}
 

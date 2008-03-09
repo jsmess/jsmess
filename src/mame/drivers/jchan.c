@@ -417,7 +417,7 @@ static VIDEO_START(jchan)
 	skns_spc_regs = auto_malloc (0x40);
 }
 
-extern void skns_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
+extern void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect );
 
 
 static VIDEO_UPDATE(jchan)
@@ -749,7 +749,7 @@ static MACHINE_DRIVER_START( jchan )
 
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_main,0)
-	MDRV_CPU_VBLANK_INT(jchan_vblank, 2)
+	MDRV_CPU_VBLANK_INT_HACK(jchan_vblank, 2)
 
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_sub,0)

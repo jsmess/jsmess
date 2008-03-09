@@ -155,7 +155,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
 	memory_set_bank(1, data & 0x7);
 
 	/* map to the fromance gfx register */
-	fromance_gfxreg_w(offset, ((data >> 6) & 0x01) | 	/* flipscreen */
+	fromance_gfxreg_w(machine, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
 							  ((~data >> 2) & 0x02));	/* videoram select */
 }
 
@@ -559,7 +559,7 @@ static MACHINE_DRIVER_START( pipedrm )
 	MDRV_CPU_ADD(Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,14318000/4)
 	/* audio CPU */
@@ -599,7 +599,7 @@ static MACHINE_DRIVER_START( hatris )
 	MDRV_CPU_ADD(Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,14318000/4)
 	/* audio CPU */

@@ -59,7 +59,7 @@ static void *pc_sh_custom_start(int clock, const struct CustomSound_interface *c
 void pc_sh_speaker(int data)
 {
 	int mode = 0;
-	pit8253_0_gate_w(2, data & 1);
+	pit8253_0_gate_w(Machine, 2, data & 1);
 
 	switch( data )
 	{

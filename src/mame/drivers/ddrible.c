@@ -92,8 +92,11 @@ static WRITE8_HANDLER( ddrible_coin_counter_w )
 static READ8_HANDLER( ddrible_vlm5030_busy_r )
 {
 	return mame_rand(Machine); /* patch */
+	/* FIXME: remove ? */
+#if 0
 	if (VLM5030_BSY()) return 1;
 	else return 0;
+#endif
 }
 
 static WRITE8_HANDLER( ddrible_vlm5030_ctrl_w )
@@ -342,11 +345,11 @@ static MACHINE_DRIVER_START( ddribble )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu0,writemem_cpu0)
-	MDRV_CPU_VBLANK_INT(ddrible_interrupt_0,1)
+	MDRV_CPU_VBLANK_INT("main", ddrible_interrupt_0)
 
 	MDRV_CPU_ADD(M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
-	MDRV_CPU_VBLANK_INT(ddrible_interrupt_1,1)
+	MDRV_CPU_VBLANK_INT("main", ddrible_interrupt_1)
 
 	MDRV_CPU_ADD(M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)

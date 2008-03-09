@@ -164,13 +164,13 @@ static READ32_HANDLER( groundfx_input_r )
 	{
 		case 0x00:
 		{
-			return (input_port_0_word_r(0,0) << 16) | input_port_1_word_r(0,0) |
+			return (input_port_0_word_r(machine,0,0) << 16) | input_port_1_word_r(machine,0,0) |
 				  (EEPROM_read_bit() << 7) | frame_counter;
 		}
 
 		case 0x01:
 		{
-			return input_port_2_word_r(0,0) | (coin_word << 16);
+			return input_port_2_word_r(machine,0,0) | (coin_word << 16);
 		}
  	}
 
@@ -185,7 +185,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 		{
 			if (ACCESSING_MSB32)	/* $500000 is watchdog */
 			{
-				watchdog_reset_w(0,data >> 24);
+				watchdog_reset(machine);
 			}
 
 			if (ACCESSING_LSB32)
@@ -215,7 +215,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 
 static READ32_HANDLER( groundfx_adc_r )
 {
-	return (input_port_3_word_r(0,0) << 8) | input_port_4_word_r(0,0);
+	return (input_port_3_word_r(machine,0,0) << 8) | input_port_4_word_r(machine,0,0);
 }
 
 static WRITE32_HANDLER( groundfx_adc_w )
@@ -409,7 +409,7 @@ static MACHINE_DRIVER_START( groundfx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(groundfx_readmem,groundfx_writemem)
-	MDRV_CPU_VBLANK_INT(groundfx_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", groundfx_interrupt)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 

@@ -183,7 +183,7 @@ VIDEO_START( exedexes )
 	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0xcf);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -243,5 +243,5 @@ VIDEO_UPDATE( exedexes )
 
 VIDEO_EOF( exedexes )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }

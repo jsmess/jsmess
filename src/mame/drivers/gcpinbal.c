@@ -81,17 +81,17 @@ static READ16_HANDLER( ioc_r )
 	switch (offset)
 	{
 		case 0x80/2:
-			return input_port_0_word_r(0,mem_mask);	/* DSW */
+			return input_port_0_word_r(machine,0,mem_mask);	/* DSW */
 
 		case 0x84/2:
-			return input_port_1_word_r(0,mem_mask);	/* IN0 */
+			return input_port_1_word_r(machine,0,mem_mask);	/* IN0 */
 
 		case 0x86/2:
-			return input_port_2_word_r(0,mem_mask);	/* IN1 */
+			return input_port_2_word_r(machine,0,mem_mask);	/* IN1 */
 
 		case 0x50:
 		case 0x51:
-			return OKIM6295_status_0_r(0)<<8;
+			return OKIM6295_status_0_r(machine,0)<<8;
 			break;
 
 	}
@@ -149,7 +149,7 @@ static WRITE16_HANDLER( ioc_w )
 		// OKIM6295
 		case 0x50:
 		case 0x51:
-			OKIM6295_data_0_w(0, data>>8);
+			OKIM6295_data_0_w(machine, 0, data>>8);
 			break;
 
 		// MSM6585 ADPCM - mini emulation
@@ -381,7 +381,7 @@ static MACHINE_DRIVER_START( gcpinbal )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)	/* 16 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(gcpinbal_readmem,gcpinbal_writemem)
-	MDRV_CPU_VBLANK_INT(gcpinbal_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", gcpinbal_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

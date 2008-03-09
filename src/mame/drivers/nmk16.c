@@ -277,8 +277,8 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,0, HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0, HOLD_LINE);
 	}
 }
 
@@ -330,18 +330,18 @@ static READ16_HANDLER( tharrier_mcu_r )
 		return res << 8;
 	}
 	else
-		return ~input_port_1_word_r(0,0);
+		return ~input_port_1_word_r(machine,0,0);
 }
 
 static WRITE16_HANDLER( macross2_sound_command_w )
 {
 	if (ACCESSING_LSB)
-		soundlatch_w(0,data & 0xff);
+		soundlatch_w(machine,0,data & 0xff);
 }
 
 static READ16_HANDLER( macross2_sound_result_r )
 {
-	return soundlatch2_r(0);
+	return soundlatch2_r(machine,0);
 }
 
 static WRITE8_HANDLER( macross2_sound_bank_w )
@@ -373,8 +373,8 @@ static WRITE16_HANDLER( afega_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -3696,7 +3696,7 @@ static MACHINE_DRIVER_START( tharrier )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(tharrier_readmem,tharrier_writemem)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD(Z80, 3000000)
@@ -3746,7 +3746,7 @@ static MACHINE_DRIVER_START( manybloc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10? MHz - check */
 	MDRV_CPU_PROGRAM_MAP(manybloc_readmem,manybloc_writemem)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,56)/* this needs to equal the framerate on this, rather than being double it .. */
 
 	MDRV_CPU_ADD(Z80, 3000000)
@@ -3793,7 +3793,7 @@ static MACHINE_DRIVER_START( mustang )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mustang_map,0)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_MACHINE_RESET(NMK004)
@@ -3838,7 +3838,7 @@ static MACHINE_DRIVER_START( mustangb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mustangb_map,0)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
@@ -3920,7 +3920,7 @@ static MACHINE_DRIVER_START( bioship )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
 	MDRV_CPU_PROGRAM_MAP(bioship_readmem,bioship_writemem)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_MACHINE_RESET(NMK004)
@@ -3964,7 +3964,7 @@ static MACHINE_DRIVER_START( vandyke )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vandyke_readmem,vandyke_writemem)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_MACHINE_RESET(NMK004)
@@ -4008,7 +4008,7 @@ static MACHINE_DRIVER_START( vandykeb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(vandyke_readmem,vandyke_writemem)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
@@ -4044,7 +4044,7 @@ static MACHINE_DRIVER_START( acrobatm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(acrobatm_readmem,acrobatm_writemem)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_MACHINE_RESET(NMK004)
@@ -4090,8 +4090,8 @@ static MACHINE_DRIVER_START( tdragonb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(tdragon_readmem,tdragonb_writemem)
-	//MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	//MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
@@ -4122,8 +4122,8 @@ static MACHINE_DRIVER_START( tdragon )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(tdragon_readmem,tdragon_writemem)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
-	//MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
+	//MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
 	MDRV_MACHINE_RESET(NMK004)
@@ -4167,7 +4167,7 @@ static MACHINE_DRIVER_START( ssmissin )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 Mhz */
 	MDRV_CPU_PROGRAM_MAP(ssmissin_readmem,ssmissin_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112) /* input related */
 
 	MDRV_CPU_ADD(Z80, 8000000/2) /* 4 Mhz */
@@ -4204,7 +4204,7 @@ static MACHINE_DRIVER_START( strahl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000) /* 12 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(strahl_readmem,strahl_writemem)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_MACHINE_RESET(NMK004)
@@ -4249,7 +4249,7 @@ static MACHINE_DRIVER_START( hachamf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(hachamf_map,0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_MACHINE_RESET(NMK004)
@@ -4294,7 +4294,7 @@ static MACHINE_DRIVER_START( macross )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macross_readmem,macross_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_MACHINE_RESET(NMK004)
@@ -4339,7 +4339,7 @@ static MACHINE_DRIVER_START( gunnail )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz? */
 	MDRV_CPU_PROGRAM_MAP(gunnail_readmem,gunnail_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)
 
 	MDRV_MACHINE_RESET(NMK004)
@@ -4384,7 +4384,7 @@ static MACHINE_DRIVER_START( macross2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,macross2_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD(Z80, 4000000)
@@ -4430,7 +4430,7 @@ static MACHINE_DRIVER_START( tdragon2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz  */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,macross2_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD(Z80, 4000000)
@@ -4476,7 +4476,7 @@ static MACHINE_DRIVER_START( raphero )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000) /* 14 MHz measured */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,raphero_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD_TAG("sound",TMP90841, 8000000)
@@ -4520,7 +4520,7 @@ static MACHINE_DRIVER_START( bjtwin )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bjtwin_readmem,bjtwin_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
 	MDRV_MACHINE_RESET(nmk16)
@@ -4780,7 +4780,7 @@ static DRIVER_INIT( bjtwin )
 }
 
 /* NO NMK004, it has a PIC instead */
-static READ16_HANDLER( vandykeb_r ) { return 0x0000; };
+static READ16_HANDLER( vandykeb_r ) { return 0x0000; }
 static DRIVER_INIT (vandykeb)
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x08000e, 0x08000f, 0, 0, vandykeb_r );
@@ -5023,7 +5023,7 @@ static MACHINE_DRIVER_START( stagger1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(afega,0)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ? */
@@ -5047,13 +5047,13 @@ static MACHINE_DRIVER_START( stagger1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD(YM2151, XTAL_4MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(afega_ym2151_intf)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_ADD(OKIM6295, XTAL_4MHz/4) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.70)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.70)
 MACHINE_DRIVER_END
@@ -5091,7 +5091,7 @@ static MACHINE_DRIVER_START( firehawk )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(afega,0)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 
 	MDRV_CPU_ADD(Z80,4000000)
 	/* audio CPU */
@@ -5131,7 +5131,7 @@ static MACHINE_DRIVER_START( twinactn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(twinactn_map,0)
-	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD(Z80, 4000000)

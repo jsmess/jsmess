@@ -225,8 +225,8 @@ static WRITE8_HANDLER( taitosj_sndnmi_msk_w )
 
 static WRITE8_HANDLER( taitosj_soundcommand_w )
 {
-	soundlatch_w(offset,data);
-	if (!sndnmi_disable) cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,offset,data);
+	if (!sndnmi_disable) cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static UINT8 input_port_4_f0;
@@ -1861,7 +1861,7 @@ static MACHINE_DRIVER_START( nomcu )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",Z80,8000000/2)      /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(taitosj_main_nomcu_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* audio CPU */      /* 3 MHz */
 	MDRV_CPU_ADD(Z80,6000000/2)

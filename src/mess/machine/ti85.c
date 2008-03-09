@@ -138,7 +138,7 @@ static void update_ti85_memory (void)
 
 static void update_ti86_memory (void)
 {
-	write8_handler wh;
+	write8_machine_func wh;
 
 	if (ti85_memory_page_0x4000 & 0x40)
 	{

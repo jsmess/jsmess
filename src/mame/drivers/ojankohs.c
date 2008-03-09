@@ -55,7 +55,7 @@ VIDEO_UPDATE( ojankoc );
 VIDEO_START( ojankoc );
 WRITE8_HANDLER( ojankoc_palette_w );
 WRITE8_HANDLER( ojankoc_videoram_w );
-void ojankoc_flipscreen(int data);
+void ojankoc_flipscreen(running_machine *machine, int data);
 
 
 static int ojankohs_portselect;
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 
 	ojankohs_adpcm_reset = ((data & 0x10) >> 4);
 	MSM5205_reset_w(0, (!(data & 0x10) >> 4));
-	ojankoc_flipscreen(data);
+	ojankoc_flipscreen(machine, data);
 }
 
 static WRITE8_HANDLER( ojankohs_portselect_w )
@@ -956,7 +956,7 @@ static MACHINE_DRIVER_START( ojankohs )
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankohs,writemem_ojankohs)
 	MDRV_CPU_IO_MAP(readport_ojankohs,writeport_ojankohs)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(ojankohs)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -993,7 +993,7 @@ static MACHINE_DRIVER_START( ojankoy )
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankoy,writemem_ojankoy)
 	MDRV_CPU_IO_MAP(readport_ojankohs,writeport_ojankoy)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(ojankohs)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1031,7 +1031,7 @@ static MACHINE_DRIVER_START( ccasino )
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankoy,writemem_ojankoy)
 	MDRV_CPU_IO_MAP(readport_ccasino,writeport_ccasino)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(ojankohs)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1068,7 +1068,7 @@ static MACHINE_DRIVER_START( ojankoc )
 	MDRV_CPU_ADD(Z80,8000000/2)			/* 4.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankoc,writemem_ojankoc)
 	MDRV_CPU_IO_MAP(readport_ojankoc,writeport_ojankoc)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(ojankohs)
 	MDRV_NVRAM_HANDLER(generic_0fill)

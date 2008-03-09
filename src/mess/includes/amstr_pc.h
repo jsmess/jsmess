@@ -8,7 +8,7 @@
 #define AMSTR_PC_H_
 
 
-#define PC200_MODE (input_port_1_r(0)&0x30)
+#define PC200_MODE (readinputport(1)&0x30)
 #define PC200_MDA 0x30
 
 

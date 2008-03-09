@@ -186,7 +186,7 @@ WRITE16_HANDLER( madgear_scroll2_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs;
 
@@ -249,5 +249,5 @@ VIDEO_EOF( lastduel )
 	/* Spriteram is always 1 frame ahead, suggesting buffering.  I can't find
         a register to control this so I assume it happens automatically
         every frame at the end of vblank */
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }

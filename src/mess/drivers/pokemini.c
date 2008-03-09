@@ -66,7 +66,7 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_PALETTE_INIT( pokemini )
 	MDRV_SCREEN_REFRESH_RATE( 30 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_CPU_VBLANK_INT( pokemini_int, 1 )
+	MDRV_CPU_VBLANK_INT("main", pokemini_int)
 
 	/* sound hardware */
 #if 0	

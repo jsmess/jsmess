@@ -274,7 +274,7 @@ static MACHINE_RESET( exidy )
 	serial_connection_init(&cassette_serial_connection);
 	serial_connection_set_in_callback(&cassette_serial_connection, cassette_serial_in);
 
-	exidy_fe_port_w(0,0);
+	exidy_fe_port_w(machine, 0, 0);
 
 	timer_set(attotime_zero, NULL, 0, exidy_reset_timer_callback);
 
@@ -303,7 +303,7 @@ static MACHINE_RESET( exidyd )
 	serial_connection_init(&cassette_serial_connection);
 	serial_connection_set_in_callback(&cassette_serial_connection, cassette_serial_in);
 
-	exidy_fe_port_w(0,0);
+	exidy_fe_port_w(machine, 0, 0);
 
 	timer_set(attotime_zero, NULL, 0, exidy_reset_timer_callback);
 
@@ -315,13 +315,13 @@ static  READ8_HANDLER ( exidy_wd179x_r )
 	switch (offset & 0x03)
 	{
 	case 0:
-		return wd17xx_status_r(offset);
+		return wd17xx_status_r(machine, offset);
 	case 1:
-		return wd17xx_track_r(offset);
+		return wd17xx_track_r(machine, offset);
 	case 2:
-		return wd17xx_sector_r(offset);
+		return wd17xx_sector_r(machine, offset);
 	case 3:
-		return wd17xx_data_r(offset);
+		return wd17xx_data_r(machine, offset);
 	default:
 		break;
 	}
@@ -334,16 +334,16 @@ static WRITE8_HANDLER ( exidy_wd179x_w )
 	switch (offset & 0x03)
 	{
 	case 0:
-		wd17xx_command_w(offset, data);
+		wd17xx_command_w(machine, offset, data);
 		return;
 	case 1:
-		wd17xx_track_w(offset, data);
+		wd17xx_track_w(machine, offset, data);
 		return;
 	case 2:
-		wd17xx_sector_w(offset, data);
+		wd17xx_sector_w(machine, offset, data);
 		return;
 	case 3:
-		wd17xx_data_w(offset, data);
+		wd17xx_data_w(machine, offset, data);
 		return;
 	default:
 		break;
@@ -377,7 +377,7 @@ static WRITE8_HANDLER(exidy_fc_port_w)
 	logerror("exidy fc w: %04x %02x\n",offset,data);
 
 	hd6402_set_input(HD6402_INPUT_TBRL, HD6402_INPUT_TBRL);
-	hd6402_data_w(offset,data);
+	hd6402_data_w(machine, offset, data);
 }
 
 
@@ -552,19 +552,19 @@ static WRITE8_HANDLER(exidy_ff_port_w)
 
 }
 
-static  READ8_HANDLER(exidy_fc_port_r)
+static READ8_HANDLER(exidy_fc_port_r)
 {
 	int data;
 
 	hd6402_set_input(HD6402_INPUT_DRR, HD6402_INPUT_DRR);
-	data = hd6402_data_r(offset);
+	data = hd6402_data_r(machine, offset);
 
 	logerror("exidy fc r: %04x %02x\n",offset,data);
 
 	return data;
 }
 
-static  READ8_HANDLER(exidy_fd_port_r)
+static READ8_HANDLER(exidy_fd_port_r)
 {
 	int data;
 	/* set unused bits high */

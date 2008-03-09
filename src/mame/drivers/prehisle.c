@@ -29,8 +29,8 @@ static UINT16 *prehisle_ram16;
 
 static WRITE16_HANDLER( prehisle_sound16_w )
 {
-	soundlatch_w(0, data & 0xff);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, 0, data & 0xff);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*******************************************************************************/
@@ -237,7 +237,7 @@ static MACHINE_DRIVER_START( prehisle )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(prehisle_readmem,prehisle_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */
@@ -261,7 +261,7 @@ static MACHINE_DRIVER_START( prehisle )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 4000000)
+	MDRV_SOUND_ADD(YM3812, XTAL_4MHz)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

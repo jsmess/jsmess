@@ -215,17 +215,17 @@ static WRITE16_HANDLER( scroll_w )
 
 static READ16_HANDLER(via_r)
 {
-	return via_0_r(offset);
+	return via_0_r(machine,offset);
 }
 
 static WRITE16_HANDLER(via_w)
 {
-	via_0_w(offset,data);
+	via_0_w(machine,offset,data);
 }
 
 static READ8_HANDLER(via_b_in)
 {
-	return input_port_3_r(0);
+	return input_port_3_r(machine,0);
 }
 
 
@@ -447,8 +447,8 @@ static READ8_HANDLER(dips1_r)
 {
 	switch(bmc_input)
 	{
-			case 0x00:	return  input_port_1_r(0);
-			case 0x40:	return  input_port_2_r(0);
+			case 0x00:	return  input_port_1_r(machine,0);
+			case 0x40:	return  input_port_2_r(machine,0);
 	}
 	logerror("unknown input - %X (PC=%X)\n",bmc_input,activecpu_get_previouspc());
 	return 0xff;
@@ -495,7 +495,7 @@ static INTERRUPT_GEN( bmc_interrupt )
 static MACHINE_DRIVER_START( bmcbowl )
 	MDRV_CPU_ADD_TAG("main", M68000, 21477270/2 )
 	MDRV_CPU_PROGRAM_MAP(bmcbowl_mem,0)
-	MDRV_CPU_VBLANK_INT(bmc_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(bmc_interrupt,2)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

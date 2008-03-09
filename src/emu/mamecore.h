@@ -77,9 +77,6 @@ typedef UINT32 pen_t;
 /* stream_sample_t is used to represent a single sample in a sound stream */
 typedef INT32 stream_sample_t;
 
-/* mame_bitmap is just a bitmap_t */
-typedef bitmap_t mame_bitmap;
-
 
 
 /***************************************************************************
@@ -182,15 +179,6 @@ typedef union
 #define RADIAN_TO_DEGREE(x)   ((180.0 / M_PI) * (x))
 #define DEGREE_TO_RADIAN(x)   ((M_PI / 180.0) * (x))
 
-
-/* U64 and S64 are used to wrap long integer constants. */
-#ifdef __GNUC__
-#define U64(val) val##ULL
-#define S64(val) val##LL
-#else
-#define U64(val) val
-#define S64(val) val
-#endif
 
 
 /* Useful macros to deal with bit shuffling encryptions */

@@ -47,12 +47,12 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
 	// bit 3 - enable 752 Hz (D-3) square wave output
 
 	logerror( "Writing control latch with %02X\n", data );
-};
+}
 
 static READ8_HANDLER( jamma_if_control_latch_r )
 {
 	return jamma_if_control_latch & 0x08;
-};
+}
 
 static READ8_HANDLER( jamma_if_read_dsw )
 {
@@ -94,7 +94,7 @@ static READ8_HANDLER( jamma_if_read_dsw )
 	}
 
 	return dsw_val & 1;
-};
+}
 
 static UINT8 jamma_if_read_joystick( void )
 {
@@ -106,13 +106,13 @@ static UINT8 jamma_if_read_joystick( void )
 	{
 		return readinputportbytag( "IN" ) | 0x08;
 	}
-};
+}
 
 static MACHINE_RESET( uapce )
 {
 	pce_set_joystick_readinputport_callback( jamma_if_read_joystick );
 	jamma_if_control_latch = 0;
-};
+}
 
 static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x07FF) AM_ROM
@@ -182,7 +182,7 @@ static MACHINE_DRIVER_START( uapce )
 	MDRV_CPU_ADD(H6280, PCE_MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(pce_mem, 0)
 	MDRV_CPU_IO_MAP(pce_io, 0)
-	MDRV_CPU_VBLANK_INT(pce_interrupt, VDC_LPF)
+	MDRV_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
 
 	MDRV_CPU_ADD(Z80, 1400000)
 	MDRV_CPU_PROGRAM_MAP(z80_map, 0)
@@ -224,6 +224,6 @@ ROM_END
 static DRIVER_INIT(uapce)
 {
 	DRIVER_INIT_CALL(pce);
-};
+}
 
 GAME( 1989, blazlaz, 0, uapce, uapce, uapce, ROT0, "Hudson Soft", "Blazing Lazers", GAME_IMPERFECT_SOUND )

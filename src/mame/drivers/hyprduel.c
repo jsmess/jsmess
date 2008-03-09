@@ -299,13 +299,13 @@ INLINE int blt_read(const UINT8 *ROM, const int offs)
 	return ROM[offs] ^ 0xff;
 }
 
-INLINE void blt_write(const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
+INLINE void blt_write(running_machine *machine, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
 {
 	switch( tmap )
 	{
-		case 1:	hyprduel_vram_0_w(offs,data,mask);	break;
-		case 2:	hyprduel_vram_1_w(offs,data,mask);	break;
-		case 3:	hyprduel_vram_2_w(offs,data,mask);	break;
+		case 1:	hyprduel_vram_0_w(machine,offs,data,mask);	break;
+		case 2:	hyprduel_vram_1_w(machine,offs,data,mask);	break;
+		case 3:	hyprduel_vram_2_w(machine,offs,data,mask);	break;
 	}
 //  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",activecpu_get_pc(),tmap,offs,data,mask);
 }
@@ -380,7 +380,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 						src_offs++;
 
 						dst_offs &= 0xffff;
-						blt_write(tmap,dst_offs,b2,mask);
+						blt_write(machine,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -396,7 +396,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(tmap,dst_offs,b2<<shift,mask);
+						blt_write(machine,tmap,dst_offs,b2<<shift,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 						b2++;
 					}
@@ -413,7 +413,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(tmap,dst_offs,b2,mask);
+						blt_write(machine,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -710,7 +710,7 @@ static MACHINE_DRIVER_START( hyprduel )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(hyprduel_readmem,hyprduel_writemem)
-	MDRV_CPU_VBLANK_INT(hyprduel_interrupt,RASTER_LINES)
+	MDRV_CPU_VBLANK_INT_HACK(hyprduel_interrupt,RASTER_LINES)
 
 	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(hyprduel_readmem2,hyprduel_writemem2)
@@ -751,7 +751,7 @@ static MACHINE_DRIVER_START( magerror )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(magerror_readmem,magerror_writemem)
-	MDRV_CPU_VBLANK_INT(hyprduel_interrupt,RASTER_LINES)
+	MDRV_CPU_VBLANK_INT_HACK(hyprduel_interrupt,RASTER_LINES)
 
 	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(magerror_readmem2,magerror_writemem2)

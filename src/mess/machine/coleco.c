@@ -40,9 +40,9 @@ READ8_HANDLER ( coleco_paddle_r )
 		{
 			int inport0,inport1,inport6,data;
 
-			inport0 = input_port_0_r(0);
-			inport1 = input_port_1_r(0);
-			inport6 = input_port_6_r(0);
+			inport0 = readinputport(0);
+			inport1 = readinputport(1);
+			inport6 = readinputport(6);
 
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
@@ -69,8 +69,8 @@ READ8_HANDLER ( coleco_paddle_r )
 		/* Joystick and fire 2 (SAC Red Button) */
 		else
 		{
-			int data = input_port_2_r(0) & 0xCF;
-			int inport6 = input_port_6_r(0);
+			int data = readinputport(2) & 0xCF;
+			int inport6 = readinputport(6);
 
 			if (inport6&0x07) /* If Extra Contollers enabled */
 			{
@@ -88,8 +88,8 @@ READ8_HANDLER ( coleco_paddle_r )
 		{
 			int inport3,inport4,data;
 
-			inport3 = input_port_3_r(0);
-			inport4 = input_port_4_r(0);
+			inport3 = readinputport(3);
+			inport4 = readinputport(4);
 
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
@@ -114,8 +114,8 @@ READ8_HANDLER ( coleco_paddle_r )
 		/* Joystick and fire 2*/
 		else
 		{
-			int data = input_port_5_r(0) & 0xCF;
-			int inport6 = input_port_6_r(0);
+			int data = readinputport(5) & 0xCF;
+			int inport6 = readinputport(6);
 
 			if (inport6&0x02) /* If Roller Controller enabled */
 			{

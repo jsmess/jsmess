@@ -426,7 +426,7 @@ static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG( "MAIN", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
-	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -462,7 +462,7 @@ static MACHINE_DRIVER_START( zn2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG( "MAIN", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
-	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -624,8 +624,8 @@ static INTERRUPT_GEN( qsound_interrupt )
 
 static WRITE32_HANDLER( zn_qsound_w )
 {
-	soundlatch_w(0, data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, 0, data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static DRIVER_INIT( coh1000c )
@@ -691,7 +691,7 @@ static MACHINE_DRIVER_START( coh1000c )
 	/* audio CPU */  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_readmem, qsound_writemem )
 	MDRV_CPU_IO_MAP( qsound_readport, 0 )
-	MDRV_CPU_VBLANK_INT( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
 	MDRV_MACHINE_RESET( coh1000c )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
@@ -709,7 +709,7 @@ static MACHINE_DRIVER_START( coh1002c )
 	/* audio CPU */  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_readmem, qsound_writemem )
 	MDRV_CPU_IO_MAP( qsound_readport, 0 )
-	MDRV_CPU_VBLANK_INT( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
 	MDRV_MACHINE_RESET( coh1000c )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
@@ -893,7 +893,7 @@ static MACHINE_DRIVER_START( coh3002c )
 	MDRV_CPU_ADD( Z80, 8000000 )
 	MDRV_CPU_PROGRAM_MAP( qsound_readmem, qsound_writemem )
 	MDRV_CPU_IO_MAP( qsound_readport, 0 )
-	MDRV_CPU_VBLANK_INT( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
 	MDRV_MACHINE_RESET( coh3002c )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
@@ -1197,18 +1197,18 @@ static WRITE8_HANDLER( fx1a_sound_bankswitch_w )
 
 static READ32_HANDLER( taitofx1a_ymsound_r )
 {
-	return taitosound_comm_r(0)<<16;
+	return taitosound_comm_r(machine, 0)<<16;
 }
 
 static WRITE32_HANDLER( taitofx1a_ymsound_w )
 {
 	if (mem_mask == 0xffff0000)
 	{
-		taitosound_port_w(0, data&0xff);
+		taitosound_port_w(machine, 0, data&0xff);
 	}
 	else
 	{
-		taitosound_comm_w(0, (data>>16)&0xff);
+		taitosound_comm_w(machine, 0, (data>>16)&0xff);
 	}
 }
 
@@ -1306,7 +1306,7 @@ static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_IMPORT_FROM( zn1_1mb_vram )
 
 	MDRV_CPU_MODIFY( "MAIN" )
-	MDRV_CPU_VBLANK_INT( coh1000t_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", coh1000t_vblank)
 
 	MDRV_CPU_ADD( Z80, 16000000 / 4 )
 	/* audio CPU */	/* 4 MHz */
@@ -1390,7 +1390,7 @@ static MACHINE_DRIVER_START( coh1000tb )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	MDRV_CPU_MODIFY( "MAIN" )
-	MDRV_CPU_VBLANK_INT( coh1000t_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", coh1000t_vblank)
 
 	MDRV_MACHINE_RESET( coh1000tb )
 	MDRV_NVRAM_HANDLER( coh1000tb )
@@ -1705,7 +1705,7 @@ static void atpsx_dma_read( UINT32 n_address, INT32 n_size )
 	n_size <<= 2;
 	while( n_size > 0 )
 	{
-		psxwritebyte( n_address, ide_controller32_0_r( 0x1f0 / 4, 0xffffff00 ) );
+		psxwritebyte( n_address, ide_controller32_0_r( Machine, 0x1f0 / 4, 0xffffff00 ) );
 		n_address++;
 		n_size--;
 	}
@@ -1899,7 +1899,7 @@ Notes:
 
 static WRITE32_HANDLER( coh1002e_bank_w )
 {
-	znsecsel_w( offset, data, mem_mask );
+	znsecsel_w( machine, offset, data, mem_mask );
 
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) + ( ( data & 3 ) * 0x800000 ) );
 }
@@ -1907,9 +1907,9 @@ static WRITE32_HANDLER( coh1002e_bank_w )
 static WRITE32_HANDLER( coh1002e_latch_w )
 {
 	if (offset)
-		cpunum_set_input_line(Machine, 1, 2, HOLD_LINE);	// irq 2 on the 68k
+		cpunum_set_input_line(machine, 1, 2, HOLD_LINE);	// irq 2 on the 68k
 	else
-		soundlatch_w(0, data);
+		soundlatch_w(machine, 0, data);
 }
 
 static DRIVER_INIT( coh1002e )
@@ -1929,17 +1929,17 @@ static MACHINE_RESET( coh1002e )
 
 static READ16_HANDLER( psarc_ymf_r )
 {
-	return YMF271_0_r(0);
+	return YMF271_0_r(machine,0);
 }
 
 static WRITE16_HANDLER( psarc_ymf_w )
 {
-	YMF271_0_w(offset, data);
+	YMF271_0_w(machine, offset, data);
 }
 
 static READ16_HANDLER( psarc_latch_r )
 {
-	return soundlatch_r(0);
+	return soundlatch_r(machine,0);
 }
 
 static ADDRESS_MAP_START( psarc_snd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2486,7 +2486,7 @@ static MACHINE_DRIVER_START( coh1002v )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	MDRV_CPU_MODIFY( "MAIN" )
-	MDRV_CPU_VBLANK_INT( coh1002v_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", coh1002v_vblank)
 
 	MDRV_MACHINE_RESET( coh1002v )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
@@ -2664,7 +2664,7 @@ static READ32_HANDLER( cbaj_z80_r )
 
 	cbaj_to_r3k &= ~2;
 
-	return soundlatch2_r(0) | ready<<24;
+	return soundlatch2_r(machine,0) | ready<<24;
 }
 
 static WRITE32_HANDLER( cbaj_z80_w )
@@ -2698,7 +2698,7 @@ static READ8_HANDLER( cbaj_z80_latch_r )
 static WRITE8_HANDLER( cbaj_z80_latch_w )
 {
 	cbaj_to_r3k |= 2;
-	soundlatch2_w(0, data);
+	soundlatch2_w(machine, 0, data);
 }
 
 static READ8_HANDLER( cbaj_z80_ready_r )

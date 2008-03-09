@@ -59,7 +59,7 @@ static laserdisc_info *discinfo;
 
 
 /* VIDEO GOODS */
-static void gpworld_draw_tiles(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void gpworld_draw_tiles(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	UINT8 characterX, characterY;
 
@@ -76,7 +76,7 @@ static void gpworld_draw_tiles(running_machine *machine, mame_bitmap *bitmap,con
 	}
 }
 
-INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y,int color)
+INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int color)
 {
 	if (flip_screen_get())
 	{
@@ -93,7 +93,7 @@ INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y
 	*BITMAP_ADDR32(bitmap, y, x) = color;
 }
 
-static void gpworld_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void gpworld_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const int SPR_Y_TOP     = 0;
 	const int SPR_Y_BOTTOM  = 1;
@@ -434,7 +434,7 @@ static MACHINE_DRIVER_START( gpworld )
 	MDRV_CPU_ADD(Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback_gpworld, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback_gpworld)
 
 	MDRV_MACHINE_START(gpworld)
 

@@ -433,8 +433,8 @@ READ16_HANDLER( cybiko_key_r )
 {
 	UINT16 data = 0;
 	_logerror( 2, ("cybiko_key_r (%08X/%04X)\n", offset, mem_mask));
-	if ACCESSING_MSB16 data = data | (cybiko_key_r_byte( offset * 2 + 0) << 8);
-	if ACCESSING_LSB16 data = data | (cybiko_key_r_byte( offset * 2 + 1) << 0);
+	if ACCESSING_MSB16 data = data | (cybiko_key_r_byte(machine, offset * 2 + 0) << 8);
+	if ACCESSING_LSB16 data = data | (cybiko_key_r_byte(machine, offset * 2 + 1) << 0);
 	_logerror( 2, ("%04X\n", data));
 	return data;
 }
@@ -504,13 +504,13 @@ static WRITE8_HANDLER( cybiko_io_reg_w )
 READ8_HANDLER( cybikov1_io_reg_r )
 {
 	_logerror( 2, ("cybikov1_io_reg_r (%08X)\n", offset));
-	return cybiko_io_reg_r( offset);
+	return cybiko_io_reg_r(machine, offset);
 }
 
 READ8_HANDLER( cybikov2_io_reg_r )
 {
 	_logerror( 2, ("cybikov2_io_reg_r (%08X)\n", offset));
-	return cybiko_io_reg_r( offset);
+	return cybiko_io_reg_r(machine, offset);
 }
 
 READ8_HANDLER( cybikoxt_io_reg_r )
@@ -522,7 +522,7 @@ READ8_HANDLER( cybikoxt_io_reg_r )
 		// rs232
 		case H8S_IO_PORT3 : if (cybiko_rs232_pin_rxd()) data = data | H8S_P3_RXD1; break;
 		// default
-		default : data = cybiko_io_reg_r( offset);
+		default : data = cybiko_io_reg_r(machine, offset);
 	}
 	return data;
 }
@@ -530,13 +530,13 @@ READ8_HANDLER( cybikoxt_io_reg_r )
 WRITE8_HANDLER( cybikov1_io_reg_w )
 {
 	_logerror( 2, ("cybikov1_io_reg_w (%08X/%02X)\n", offset, data));
-	cybiko_io_reg_w( offset, data);
+	cybiko_io_reg_w(machine, offset, data);
 }
 
 WRITE8_HANDLER( cybikov2_io_reg_w )
 {
 	_logerror( 2, ("cybikov2_io_reg_w (%08X/%02X)\n", offset, data));
-	cybiko_io_reg_w( offset, data);
+	cybiko_io_reg_w(machine, offset, data);
 }
 
 WRITE8_HANDLER( cybikoxt_io_reg_w )
@@ -552,7 +552,7 @@ WRITE8_HANDLER( cybikoxt_io_reg_w )
 		}
 		break;
 		// default
-		default : cybiko_io_reg_w( offset, data);
+		default : cybiko_io_reg_w(machine, offset, data);
 	}
 }
 

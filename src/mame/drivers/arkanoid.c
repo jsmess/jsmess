@@ -746,7 +746,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", Z80, 6000000) /* 6 Mhz */
 	MDRV_CPU_PROGRAM_MAP(arkanoid_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("mcu", M68705, 3000000) /* 3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
@@ -774,7 +774,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/4/2) /* YM2149 clock is 3mhz, pin 26 is low so 3mhz/2 */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END

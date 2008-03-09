@@ -111,14 +111,14 @@ static UINT8 *mermaid_AY8910_enable;
 
 static WRITE8_HANDLER( mermaid_AY8910_write_port_w )
 {
-	if (mermaid_AY8910_enable[0]) AY8910_write_port_0_w(offset, data);
-	if (mermaid_AY8910_enable[1]) AY8910_write_port_1_w(offset, data);
+	if (mermaid_AY8910_enable[0]) AY8910_write_port_0_w(machine, offset, data);
+	if (mermaid_AY8910_enable[1]) AY8910_write_port_1_w(machine, offset, data);
 }
 
 static WRITE8_HANDLER( mermaid_AY8910_control_port_w )
 {
-	if (mermaid_AY8910_enable[0]) AY8910_control_port_0_w(offset, data);
-	if (mermaid_AY8910_enable[1]) AY8910_control_port_1_w(offset, data);
+	if (mermaid_AY8910_enable[0]) AY8910_control_port_0_w(machine, offset, data);
+	if (mermaid_AY8910_enable[1]) AY8910_control_port_1_w(machine, offset, data);
 }
 
 /* Memory Map */
@@ -255,7 +255,7 @@ static MACHINE_DRIVER_START( mermaid )
 	// basic machine hardware
 	MDRV_CPU_ADD(Z80, 4000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(mermaid_map, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	// video hardware
 

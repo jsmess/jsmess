@@ -169,7 +169,7 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_CPU_ADD_TAG("main", Z80, 3250000)        /* 3.25 Mhz */
 	MDRV_CPU_PROGRAM_MAP(jupiter_mem, 0)
 	MDRV_CPU_IO_MAP(jupiter_io, 0)
-	MDRV_CPU_VBLANK_INT(jupiter_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", jupiter_interrupt)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( jupiter )

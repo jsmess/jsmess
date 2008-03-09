@@ -6,6 +6,9 @@
     - No FM mode
     - A third sample format (ADPCM) has been added
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
+
+    init:
+
 */
 
 #include "sndintrf.h"
@@ -126,6 +129,7 @@ struct _SLOT
 	int curstep, nxtstep;
 	int cur_lpquant, cur_lpsample, cur_lpstep;
 	UINT8 *adbase, *nxtbase, *adlpbase;
+	UINT8 mslc;			// monitored?
 };
 
 
@@ -139,6 +143,9 @@ struct _SLOT
 #define MIOVF(aica)		((aica->udata.data[4]>>0x0)&0x0400)
 #define MIFULL(aica)		((aica->udata.data[4]>>0x0)&0x0200)
 #define MIEMPTY(aica)		((aica->udata.data[4]>>0x0)&0x0100)
+
+#define AFSEL(aica)		((aica->udata.data[6]>>0x0)&0x4000)
+#define MSLC(aica)		((aica->udata.data[6]>>0x8)&0x3F)
 
 #define SCILV0(aica)    	((aica->udata.data[0xa8/2]>>0x0)&0xff)
 #define SCILV1(aica)    	((aica->udata.data[0xac/2]>>0x0)&0xff)
@@ -425,13 +432,13 @@ static void Compute_LFO(struct _SLOT *slot)
 const int TableQuant[8]={ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(1.19921875),ADFIX(1.59765625),ADFIX(2.0),ADFIX(2.3984375)};
 const int quant_mul[16]= { 1, 3, 5, 7, 9, 11, 13, 15, -1, -3, -5, -7, -9, -11, -13, -15};
 
-void InitADPCM(int *PrevSignal, int *PrevQuant)
+static void InitADPCM(int *PrevSignal, int *PrevQuant)
 {
 	*PrevSignal=0;
 	*PrevQuant=0x7f;
 }
 
-signed short INLINE DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
+INLINE signed short DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
 {
 	*PrevSignal+=(*PrevQuant*quant_mul[Delta&15])>>(3);
 	*PrevSignal=ICLIP16(*PrevSignal);
@@ -634,6 +641,7 @@ static void AICA_Init(struct _AICA *AICA, const struct AICAinterface *intf, int 
 		AICA->Slots[i].active=0;
 		AICA->Slots[i].base=NULL;
 		AICA->Slots[i].EG.state=RELEASE;
+		AICA->Slots[i].mslc=0;
 	}
 
 	AICALFO_Init();
@@ -666,6 +674,7 @@ static void AICA_UpdateSlotReg(struct _AICA *AICA,int s,int r)
 					{
 						if(KEYONB(s2) && s2->EG.state==RELEASE/*&& !s2->active*/)
 						{
+							if(s2->mslc) AICA->udata.data[0x10] &= 0x7FFF; // reset LP at KEY_ON
 							AICA_StartSlot(AICA, s2);
 							#if 0
 							printf("StartSlot[%02X]:   SSCTL %01X SA %06X LSA %04X LEA %04X PCMS %01X LPCTL %01X\n",sl,SSCTL(s2),SA(s2),LSA(s2),LEA(s2),PCMS(s2),LPCTL(s2));
@@ -726,15 +735,15 @@ static void AICA_UpdateReg(struct _AICA *AICA, int reg)
 			break;
 		case 0x8:
 		case 0x9:
-			AICA_MidiIn(0, AICA->udata.data[0x8/2]&0xff, 0);
+			AICA_MidiIn(Machine, 0, AICA->udata.data[0x8/2]&0xff, 0);
 			break;
-/*      case 0x12:
-        case 0x13:
-        case 0x14:
-        case 0x15:
-        case 0x16:
-        case 0x17:
-            break;*/
+		case 0x12:
+		case 0x13:
+		case 0x14:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+			break;
 		case 0x90:
 		case 0x91:
 			if(AICA->Master)
@@ -860,9 +869,7 @@ static void AICA_UpdateRegR(struct _AICA *AICA, int reg)
 		case 0x10:	// LP check
 		case 0x11:
 			{
-//              int MSLC = (AICA->udata.data[0xc/2]>>8) & 0x3f; // which slot are we monitoring?
-
-//              AICA->udata.data[0x10/2] |= 0x8000; // set LP if necessary
+				//int MSLC = (AICA->udata.data[0xc/2]>>8) & 0x3f;   // which slot are we monitoring?
 			}
 			break;
 
@@ -959,6 +966,7 @@ static unsigned short AICA_r16(struct _AICA *AICA, unsigned int addr)
 		{
 			AICA_UpdateRegR(AICA, addr&0xff);
 			v= *((unsigned short *) (AICA->udata.datab+((addr&0xff))));
+			if((addr&0xfe)==0x10) AICA->udata.data[0x10/2] &= 0x7FFF;	// reset LP on read
 		}
 		else if (addr == 0x2d00)
 		{
@@ -977,7 +985,8 @@ static unsigned short AICA_r16(struct _AICA *AICA, unsigned int addr)
 
 #define REVSIGN(v) ((~v)+1)
 
-void AICA_TimersAddTicks(struct _AICA *AICA, int ticks)
+#ifdef UNUSED_FUNCTION
+static void AICA_TimersAddTicks(struct _AICA *AICA, int ticks)
 {
 	if(AICA->TimCnt[0]<=0xff00)
 	{
@@ -1015,6 +1024,7 @@ void AICA_TimersAddTicks(struct _AICA *AICA, int ticks)
 		AICA->udata.data[0x98/2]|=AICA->TimCnt[2]>>8;
 	}
 }
+#endif
 
 INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 {
@@ -1060,11 +1070,11 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	}
 	else if (PCMS(slot) == 0)	//16 bit signed
 	{
-		INT16 *p1=(signed short *) (AICA->AICARAM+((SA(slot)+addr1)&AICA->RAM_MASK));
-		INT16 *p2=(signed short *) (AICA->AICARAM+((SA(slot)+addr2)&AICA->RAM_MASK));
+		UINT8 *p1=(UINT8 *) (AICA->AICARAM+((SA(slot)+addr1)&AICA->RAM_MASK));
+		UINT8 *p2=(UINT8 *) (AICA->AICARAM+((SA(slot)+addr2)&AICA->RAM_MASK));
 		INT32 s;
 		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
-		s=(int) (p1[0])*((1<<SHIFT)-fpart)+(int) (p2[0])*fpart;
+		s=(int) ((INT16)(p1[0] | (p1[1]<<8)))*((1<<SHIFT)-fpart)+(int) ((INT16)(p2[0] | (p2[1]<<8)))*fpart;
 		sample=(s>>SHIFT);
 	}
 	else	// 4-bit ADPCM
@@ -1146,12 +1156,14 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 			if(*addr[addr_select]>=LSA(slot) && *addr[addr_select]>=LEA(slot))
 			{
 			//slot->active=0;
+			if(slot->mslc) AICA->udata.data[8] |= 0x8000;
 			AICA_StopSlot(slot,0);
 			}
 			break;
 		case 1: //normal loop
 			if(*addr[addr_select]>=LEA(slot))
 			{
+				if(slot->mslc) AICA->udata.data[8] |= 0x8000;
 				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
 				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
 
@@ -1194,6 +1206,16 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	else
 		sample=(sample*EG_TABLE[EG_Update(slot)>>(SHIFT-10)])>>SHIFT;
 
+	if(slot->mslc)
+	{
+		AICA->udata.data[0x12/2] = addr1;
+		if (!(AFSEL(AICA)))
+		{
+			AICA->udata.data[0x10/2] |= slot->EG.state<<13;
+			AICA->udata.data[0x10/2] |= 0x3FF - (slot->EG.volume>>EG_SHIFT);
+		}
+	}
+
 	return sample;
 }
 
@@ -1214,10 +1236,11 @@ static void AICA_DoMasterSamples(struct _AICA *AICA, int nsamples)
 		// mix slots' direct output
 		for(sl=0;sl<64;++sl)
 		{
+			struct _SLOT *slot=AICA->Slots+sl;
+			slot->mslc = (MSLC(AICA)==sl);
 			RBUFDST=AICA->RINGBUF+AICA->BUFPTR;
 			if(AICA->Slots[sl].active)
 			{
-				struct _SLOT *slot=AICA->Slots+sl;
 				unsigned int Enc;
 				signed int sample;
 
@@ -1254,11 +1277,13 @@ static void AICA_DoMasterSamples(struct _AICA *AICA, int nsamples)
 	}
 }
 
-int AICA_IRQCB(void *param)
+#ifdef UNUSED_FUNCTION
+static int AICA_IRQCB(void *param)
 {
 	CheckPendingIRQ(param);
 	return -1;
 }
+#endif
 
 static void AICA_Update(void *param, stream_sample_t **inputs, stream_sample_t **buf, int samples)
 {
@@ -1293,9 +1318,11 @@ static void *aica_start(int sndindex, int clock, const void *config)
 	return AICA;
 }
 
-void aica_stop(void)
+#ifdef UNUSED_FUNCTION
+static void aica_stop(void)
 {
 }
+#endif
 
 void AICA_set_ram_base(int which, void *base, int size)
 {

@@ -597,9 +597,9 @@ static  READ8_HANDLER(video_vdp_r)
     it. */
 
 	if (offset & 2)
-		reply = TMS9928A_register_r(0);
+		reply = TMS9928A_register_r(machine, 0);
 	else
-		reply = TMS9928A_vram_r(0);
+		reply = TMS9928A_vram_r(machine, 0);
 
 	if (!(offset & 1))
 		bogus_read_save = reply;
@@ -614,13 +614,13 @@ static WRITE8_HANDLER(video_vdp_w)
 	if (offset & 1)
 	{
 		if (offset & 2)
-			TMS9928A_register_w(0, data);
+			TMS9928A_register_w(machine, 0, data);
 		else
-			TMS9928A_vram_w(0, data);
+			TMS9928A_vram_w(machine, 0, data);
 	}
 }
 
-static  READ8_HANDLER(video_joy_r)
+static READ8_HANDLER(video_joy_r)
 {
 	int reply = readinputport(9);
 

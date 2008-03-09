@@ -41,6 +41,8 @@
 
 /* Components */
 #include "sound/ay8910.h"
+#include "machine/6522via.h"
+#include "machine/6551.h"
 
 /* Devices */
 #include "devices/cassette.h"
@@ -53,9 +55,9 @@ static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbc01, 0xbc01) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0xbc02, 0xbc02) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0xbc03, 0xbc03) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-	AM_RANGE(0xbfc0, 0xbfcf) AM_READWRITE(microtan_via_0_r, microtan_via_0_w)
-	AM_RANGE(0xbfd0, 0xbfd3) AM_READWRITE(microtan_sio_r, microtan_sio_w)
-	AM_RANGE(0xbfe0, 0xbfef) AM_READWRITE(microtan_via_1_r, microtan_via_1_w)
+	AM_RANGE(0xbfc0, 0xbfcf) AM_READWRITE(via_0_r, via_0_w)
+	AM_RANGE(0xbfd0, 0xbfd3) AM_READWRITE(acia_6551_r, acia_6551_w)
+	AM_RANGE(0xbfe0, 0xbfef) AM_READWRITE(via_1_r, via_1_w)
 	AM_RANGE(0xbff0, 0xbfff) AM_READWRITE(microtan_bffx_r, microtan_bffx_w)
 	AM_RANGE(0xc000, 0xe7ff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -211,7 +213,7 @@ static MACHINE_DRIVER_START( microtan )
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M6502, 750000)	// 750 kHz
 	MDRV_CPU_PROGRAM_MAP(microtan_map, 0)
-	MDRV_CPU_VBLANK_INT(microtan_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", microtan_interrupt)
 
 	MDRV_MACHINE_RESET(microtan)
 

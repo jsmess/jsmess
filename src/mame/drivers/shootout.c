@@ -61,8 +61,8 @@ static WRITE8_HANDLER( shootout_bankswitch_w )
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
-	soundlatch_w( offset, data );
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w( machine, offset, data );
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( shootout_flipscreen_w )
@@ -305,7 +305,7 @@ static MACHINE_DRIVER_START( shootout )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 2000000)	/* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(shootout_interrupt,1) /* nmi's are triggered at coin up */
+	MDRV_CPU_VBLANK_INT("main", shootout_interrupt) /* nmi's are triggered at coin up */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -340,7 +340,7 @@ static MACHINE_DRIVER_START( shootouj )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 2000000)	/* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem_alt,writemem_alt)
-	MDRV_CPU_VBLANK_INT(shootout_interrupt,1) /* nmi's are triggered at coin up */
+	MDRV_CPU_VBLANK_INT("main", shootout_interrupt) /* nmi's are triggered at coin up */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

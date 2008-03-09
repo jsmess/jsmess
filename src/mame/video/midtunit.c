@@ -306,7 +306,7 @@ WRITE16_HANDLER( midtunit_paletteram_w )
 WRITE16_HANDLER( midxunit_paletteram_w )
 {
 	if (!(offset & 1))
-		midtunit_paletteram_w(offset / 2, data, mem_mask);
+		midtunit_paletteram_w(machine, offset / 2, data, mem_mask);
 }
 
 
@@ -808,7 +808,7 @@ skipdma:
  *
  *************************************/
 
-void midtunit_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+void midtunit_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &local_videoram[(params->rowaddr << 9) & 0x3fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -820,7 +820,7 @@ void midtunit_scanline_update(running_machine *machine, int screen, mame_bitmap 
 		dest[x] = src[coladdr++ & 0x1ff] & 0x7fff;
 }
 
-void midxunit_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+void midxunit_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 3;
 	UINT16 *src = &local_videoram[fulladdr & 0x3fe00];

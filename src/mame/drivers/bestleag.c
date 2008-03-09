@@ -84,7 +84,7 @@ Note: sprite chip is different than the other Big Striker sets and they
       include several similiarities with other Playmark games (including
       the sprite end code and the data being offset (i.e. spriteram starting from 0x16/2))
 */
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 
 	/*
@@ -315,7 +315,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bestleag )
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bestleag_map,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

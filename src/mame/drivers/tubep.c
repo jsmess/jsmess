@@ -146,10 +146,10 @@ static WRITE8_HANDLER( tubep_LS259_w )
 				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */
 				break;
 		case 6:
-				tubep_background_romselect_w(offset,data);	/* bit0 = 0->select roms: B1,B3,B5; bit0 = 1->select roms: B2,B4,B6 */
+				tubep_background_romselect_w(machine,offset,data);	/* bit0 = 0->select roms: B1,B3,B5; bit0 = 1->select roms: B2,B4,B6 */
 				break;
 		case 7:
-				tubep_colorproms_A4_line_w(offset,data);	/* bit0 = line A4 (color proms address) state */
+				tubep_colorproms_A4_line_w(machine,offset,data);	/* bit0 = line A4 (color proms address) state */
 				break;
 		default:
 				break;
@@ -955,7 +955,7 @@ static MACHINE_DRIVER_START( tubepb )
 
 	MDRV_CPU_ADD(M6802,6000000) /* ? MHz Xtal */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 MACHINE_DRIVER_END
 
 

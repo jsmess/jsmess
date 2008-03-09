@@ -27,12 +27,12 @@ static int vert_scale(int data)
 /* plot a bitmap marker */
 /* hardware has 2 marker sizes 2x2 and 4x2 selected by jumper */
 /* meadows lanes normaly use 2x2 pixels and lazer command uses either */
-static void plot_pattern(running_machine *machine, mame_bitmap *bitmap, int x, int y)
+static void plot_pattern(running_machine *machine, bitmap_t *bitmap, int x, int y)
 {
 	int xbit, ybit, size;
 
     size = 2;
-	if (input_port_2_r(0) & 0x40)
+	if (input_port_2_r(machine,0) & 0x40)
     {
 		size = 4;
     }
@@ -57,7 +57,7 @@ VIDEO_UPDATE( lazercmd )
 {
 	int i,x,y;
 
-	int video_inverted = input_port_2_r(0) & 0x20;
+	int video_inverted = input_port_2_r(machine,0) & 0x20;
 
 	/* The first row of characters are invisible */
 	for (i = 0; i < (VERT_RES - 1) * HORZ_RES; i++)

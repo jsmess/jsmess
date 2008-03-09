@@ -47,8 +47,8 @@ static int control_port_select;
 static WRITE8_HANDLER( battlera_sound_w )
 {
 	if (offset==0) {
-		soundlatch_w(0,data);
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+		soundlatch_w(machine,0,data);
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -104,8 +104,8 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
-	case 0: YM2203_control_port_0_w(0,data); break;
-	case 1: YM2203_write_port_0_w(0,data); break;
+	case 0: YM2203_control_port_0_w(machine,0,data); break;
+	case 1: YM2203_write_port_0_w(machine,0,data); break;
 	}
 }
 
@@ -274,7 +274,7 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_CPU_ADD(H6280,21477200/3)
 	MDRV_CPU_PROGRAM_MAP(battlera_readmem,battlera_writemem)
 	MDRV_CPU_IO_MAP(0,battlera_portwrite)
-	MDRV_CPU_VBLANK_INT(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
+	MDRV_CPU_VBLANK_INT_HACK(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
 
 	MDRV_CPU_ADD(H6280,21477200/3)
 	/* audio CPU */

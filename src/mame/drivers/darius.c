@@ -173,7 +173,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 static WRITE16_HANDLER( darius_watchdog_w )
 {
-	watchdog_reset_w(0,data);
+	watchdog_reset_w(machine,0,data);
 }
 
 
@@ -186,22 +186,22 @@ static READ16_HANDLER( darius_ioc_r )
 	switch (offset)
 	{
 		case 0x01:
-			return (taitosound_comm_r(0) & 0xff);	/* sound interface read */
+			return (taitosound_comm_r(machine,0) & 0xff);	/* sound interface read */
 
 		case 0x04:
-			return input_port_0_word_r(0,mem_mask);	/* IN0 */
+			return input_port_0_word_r(machine,0,mem_mask);	/* IN0 */
 
 		case 0x05:
-			return input_port_1_word_r(0,mem_mask);	/* IN1 */
+			return input_port_1_word_r(machine,0,mem_mask);	/* IN1 */
 
 		case 0x06:
-			return input_port_2_word_r(0,mem_mask);	/* IN2 */
+			return input_port_2_word_r(machine,0,mem_mask);	/* IN2 */
 
 		case 0x07:
 			return coin_word;	/* bits 3&4 coin lockouts, must return zero */
 
 		case 0x08:
-			return input_port_3_word_r(0,mem_mask);	/* DSW */
+			return input_port_3_word_r(machine,0,mem_mask);	/* DSW */
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",activecpu_get_pc(),offset);
@@ -215,12 +215,12 @@ static WRITE16_HANDLER( darius_ioc_w )
 	{
 		case 0x00:	/* sound interface write */
 
-			taitosound_port_w (0, data & 0xff);
+			taitosound_port_w (machine, 0, data & 0xff);
 			return;
 
 		case 0x01:	/* sound interface write */
 
-			taitosound_comm_w (0, data & 0xff);
+			taitosound_comm_w (machine, 0, data & 0xff);
 			return;
 
 		case 0x28:	/* unknown, written by both cpus - always 0? */
@@ -833,7 +833,7 @@ static MACHINE_DRIVER_START( darius )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius_readmem,darius_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */	/* 4 MHz ? */
@@ -841,7 +841,7 @@ static MACHINE_DRIVER_START( darius )
 
 	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius_cpub_readmem,darius_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2) /* 4 MHz ? */
 	/* audio CPU */	/* ADPCM player using MSM5205 */

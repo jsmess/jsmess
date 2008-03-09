@@ -34,7 +34,7 @@ static READ8_HANDLER( ins8154_b1_port_a_r )
 
 static WRITE8_HANDLER( ins8154_b1_port_a_w )
 {
-	ttl74145_0_w(0, data & 0x07);
+	ttl74145_0_w(machine, 0, data & 0x07);
 }
 
 static WRITE8_HANDLER( acrnsys1_led_segment_w )

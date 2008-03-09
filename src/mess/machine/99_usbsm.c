@@ -33,8 +33,8 @@
 
 
 /* prototypes */
-static int usbsm_cru_r(int offset);
-static void usbsm_cru_w(int offset, int data);
+static int usbsm_cru_r(running_machine *machine, int offset);
+static void usbsm_cru_w(running_machine *machine, int offset, int data);
 static  READ8_HANDLER(usbsm_mem_r);
 static WRITE8_HANDLER(usbsm_mem_w);
 static UINT16 usbsm_mem_16_r(offs_t offset);
@@ -100,7 +100,7 @@ int ti99_usbsm_reset(int in_tms9995_mode)
 /*
 	Read USB-SmartMedia CRU interface
 */
-static int usbsm_cru_r(int offset)
+static int usbsm_cru_r(running_machine *machine, int offset)
 {
 	int reply = 0;
 
@@ -138,7 +138,7 @@ static int usbsm_cru_r(int offset)
 /*
 	Write USB-SmartMedia CRU interface
 */
-static void usbsm_cru_w(int offset, int data)
+static void usbsm_cru_w(running_machine *machine, int offset, int data)
 {
 	offset &= 31;
 

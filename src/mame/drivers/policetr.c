@@ -188,7 +188,7 @@ static WRITE32_HANDLER( control_w )
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (control_data & 0x80000000))
 	{
-		BSMT2000_data_0_w(bsmt_data_bank, 0, 0);
+		BSMT2000_data_0_w(machine, bsmt_data_bank, 0, 0);
 		sndti_reset(SOUND_BSMT2000, 0);
 	}
 
@@ -208,7 +208,7 @@ static WRITE32_HANDLER( control_w )
 static WRITE32_HANDLER( bsmt2000_reg_w )
 {
 	if (control_data & 0x80000000)
-		BSMT2000_data_0_w(bsmt_reg, data & 0xffff, mem_mask | 0xffff0000);
+		BSMT2000_data_0_w(machine, bsmt_reg, data & 0xffff, mem_mask | 0xffff0000);
 	else
 		COMBINE_DATA(&bsmt_data_offset);
 }
@@ -466,7 +466,7 @@ static MACHINE_DRIVER_START( policetr )
 	MDRV_CPU_ADD_TAG("main", R3000BE, MASTER_CLOCK/2)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(policetr_map,0)
-	MDRV_CPU_VBLANK_INT(irq4_gen,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_gen)
 
 	MDRV_NVRAM_HANDLER(policetr)
 

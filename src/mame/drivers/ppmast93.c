@@ -190,9 +190,9 @@ static WRITE8_HANDLER(ppmast_sound_w)
 {
 	switch(offset&0xff)
 	{
-		case 0: YM2413_register_port_0_w(0,data); break;
-		case 1: YM2413_data_port_0_w(0,data); break;
-		case 2: DAC_0_data_w(0,data);break;
+		case 0: YM2413_register_port_0_w(machine,0,data); break;
+		case 1: YM2413_data_port_0_w(machine,0,data); break;
+		case 2: DAC_0_data_w(machine,0,data);break;
 		default: logerror("%x %x - %x\n",offset,data,activecpu_get_previouspc());
 	}
 }
@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START( ppmast93 )
 	MDRV_CPU_ADD(Z80,5000000)		 /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(ppmast93_cpu1_map,0)
 	MDRV_CPU_IO_MAP(ppmast93_cpu1_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,5000000)		 /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(ppmast93_cpu2_map,0)

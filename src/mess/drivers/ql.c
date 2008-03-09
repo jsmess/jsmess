@@ -909,7 +909,7 @@ static MACHINE_DRIVER_START( ql )
 	// basic machine hardware
 	MDRV_CPU_ADD(M68008, X1/2)
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
-	MDRV_CPU_VBLANK_INT(zx8302_int, 1)
+	MDRV_CPU_VBLANK_INT("main", zx8302_int)
 
 	MDRV_CPU_ADD(I8749, X4)
 	MDRV_CPU_PROGRAM_MAP(ipc_map, 0)

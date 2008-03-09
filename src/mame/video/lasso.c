@@ -249,7 +249,7 @@ WRITE8_HANDLER( lasso_video_control_w )
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
-	lasso_flip_screen_w(offset, data);
+	lasso_flip_screen_w(machine, offset, data);
 }
 
 WRITE8_HANDLER( wwjgtin_video_control_w )
@@ -263,7 +263,7 @@ WRITE8_HANDLER( wwjgtin_video_control_w )
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
-	lasso_flip_screen_w(offset, data);
+	lasso_flip_screen_w(machine, offset, data);
 }
 
 WRITE8_HANDLER( pinbo_video_control_w )
@@ -271,7 +271,7 @@ WRITE8_HANDLER( pinbo_video_control_w )
 	/* no need to dirty the tilemap -- only the sprites use the global bank */
 	gfxbank = (data & 0x0c) >> 2;
 
-	lasso_flip_screen_w(offset, data);
+	lasso_flip_screen_w(machine, offset, data);
 }
 
 
@@ -281,7 +281,7 @@ WRITE8_HANDLER( pinbo_video_control_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int reverse )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int reverse )
 {
 	const UINT8 *finish, *source;
 	int inc;
@@ -340,7 +340,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_lasso(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_lasso(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	offs_t offs;
 	pen_t pen = 0x3f;

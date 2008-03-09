@@ -295,7 +295,7 @@ static int palbank;
 static WRITE8_HANDLER( hnoridur_palbank_w )
 {
 	palbank = data & 0x0f;
-	dynax_blit_palbank_w(0,data);
+	dynax_blit_palbank_w(machine,0,data);
 }
 
 static WRITE8_HANDLER( hnoridur_palette_w )
@@ -338,7 +338,6 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 static WRITE8_HANDLER( yarunara_palette_w )
 {
 	int addr = 512*palbank + offset;
-
 	switch (hnoridur_bank)
 	{
 		case 0x10:
@@ -346,7 +345,7 @@ static WRITE8_HANDLER( yarunara_palette_w )
 			break;
 
 		case 0x1c:	// RTC
-			msm6242_w(offset,data);
+			msm6242_w(machine,offset,data);
 			return;
 
 		default:
@@ -360,7 +359,7 @@ static WRITE8_HANDLER( yarunara_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0)>>3) | ((br & 0xe0)>>5);
-		palette_set_color_rgb(Machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -444,11 +443,11 @@ static MACHINE_RESET( adpcm )
 
 static WRITE8_HANDLER( yarunara_layer_half_w )
 {
-	hanamai_layer_half_w(0,data >> 1);
+	hanamai_layer_half_w(machine,0,data >> 1);
 }
 static WRITE8_HANDLER( yarunara_layer_half2_w )
 {
-	hnoridur_layer_half2_w(0,data >> 1);
+	hnoridur_layer_half2_w(machine,0,data >> 1);
 }
 
 static ADDRESS_MAP_START( sprtmtch_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -657,18 +656,18 @@ static WRITE8_HANDLER( yarunara_rombank_w )
 
 static WRITE8_HANDLER( yarunara_flipscreen_w )
 {
-	dynax_flipscreen_w(0,(data&2)?1:0);
+	dynax_flipscreen_w(machine,0,(data&2)?1:0);
 }
 
 static WRITE8_HANDLER( yarunara_blit_romregion_w )
 {
 	switch(data)
 	{
-		case 0x00:	dynax_blit_romregion_w(0,0);	return;
-		case 0x01:	dynax_blit_romregion_w(0,1);	return;
-		case 0x80:	dynax_blit_romregion_w(0,2);	return;
-		case 0x81:	dynax_blit_romregion_w(0,3);	return;
-		case 0x82:	dynax_blit_romregion_w(0,4);	return;	// mjcomv1
+		case 0x00:	dynax_blit_romregion_w(machine,0,0);	return;
+		case 0x01:	dynax_blit_romregion_w(machine,0,1);	return;
+		case 0x80:	dynax_blit_romregion_w(machine,0,2);	return;
+		case 0x81:	dynax_blit_romregion_w(machine,0,3);	return;
+		case 0x82:	dynax_blit_romregion_w(machine,0,4);	return;	// mjcomv1
 	}
 	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
 }
@@ -955,7 +954,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mjelctrn_keyboard_1_r )
 {
-	return (hanamai_keyboard_1_r(0) & 0x3f) | (readinputport(15) ? 0x40 : 0);
+	return (hanamai_keyboard_1_r(machine,0) & 0x3f) | (readinputport(15) ? 0x40 : 0);
 }
 
 static READ8_HANDLER( mjelctrn_dsw_r )
@@ -1079,7 +1078,7 @@ static READ8_HANDLER( htengoku_coin_r )
 	{
 		case 0x00:	return readinputport(0);
 		case 0x01:	return 0xff;	//?
-		case 0x02:	return 0xbf | ((htengoku_hopper && !(cpu_getcurrentframe()%10)) ? 0 : (1<<6));;	// bit 7 = blitter busy, bit 6 = hopper
+		case 0x02:	return 0xbf | ((htengoku_hopper && !(video_screen_get_frame_number(0)%10)) ? 0 : (1<<6));;	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:	return htengoku_coins;
 	}
 	logerror("%04x: coin_r with select = %02x\n",activecpu_get_pc(),htengoku_select);
@@ -1098,9 +1097,9 @@ static WRITE8_HANDLER( htengoku_blit_romregion_w )
 {
 	switch(data)
 	{
-		case 0x80:	dynax_blit_romregion_w(0,0);	return;
-		case 0x81:	dynax_blit_romregion_w(0,1);	return;
-		case 0x00:	dynax_blit_romregion_w(0,2);	return;
+		case 0x80:	dynax_blit_romregion_w(machine,0,0);	return;
+		case 0x81:	dynax_blit_romregion_w(machine,0,1);	return;
+		case 0x00:	dynax_blit_romregion_w(machine,0,2);	return;
 	}
 	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
 }
@@ -1328,11 +1327,11 @@ static READ8_HANDLER( tenkai_8000_r )
 	}
 	else if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		return msm6242_r(offset);
+		return msm6242_r(machine,offset);
 	}
 	else if (rombank == 0x12)
 	{
-		return tenkai_palette_r(offset);
+		return tenkai_palette_r(machine,offset);
 	}
 
 	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",activecpu_get_pc(),offset,rombank);
@@ -1343,12 +1342,12 @@ static WRITE8_HANDLER( tenkai_8000_w )
 {
 	if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		msm6242_w(offset,data);
+		msm6242_w(machine,offset,data);
 		return;
 	}
 	else if (rombank == 0x12)
 	{
-		tenkai_palette_w(offset,data);
+		tenkai_palette_w(machine,offset,data);
 		return;
 	}
 
@@ -1375,9 +1374,9 @@ static WRITE8_HANDLER( tenkai_blit_romregion_w )
 {
 	switch(data)
 	{
-		case 0x00:	dynax_blit_romregion_w(0,0);	return;
-		case 0x83:	dynax_blit_romregion_w(0,1);	return;
-		case 0x80:	dynax_blit_romregion_w(0,2);	return;
+		case 0x00:	dynax_blit_romregion_w(machine,0,0);	return;
+		case 0x83:	dynax_blit_romregion_w(machine,0,1);	return;
+		case 0x80:	dynax_blit_romregion_w(machine,0,2);	return;
 	}
 	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
 }
@@ -3605,7 +3604,7 @@ static MACHINE_DRIVER_START( hanamai )
 	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(hanamai_io_map,0)
-	MDRV_CPU_VBLANK_INT(sprtmtch_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
 
@@ -3660,7 +3659,7 @@ static MACHINE_DRIVER_START( hnoridur )
 	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(hnoridur_mem_map,0)
 	MDRV_CPU_IO_MAP(hnoridur_io_map,0)
-	MDRV_CPU_VBLANK_INT(sprtmtch_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
 
@@ -3714,7 +3713,7 @@ static MACHINE_DRIVER_START( sprtmtch )
 	MDRV_CPU_ADD(Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(sprtmtch_io_map,0)
-	MDRV_CPU_VBLANK_INT(sprtmtch_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -3754,7 +3753,7 @@ static MACHINE_DRIVER_START( mjfriday )
 	MDRV_CPU_ADD_TAG("main",Z80,24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(mjfriday_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -3891,12 +3890,12 @@ static MACHINE_DRIVER_START( jantouki )
 	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_io_map,0)
-	MDRV_CPU_VBLANK_INT(jantouki_vblank_interrupt, 1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("top", jantouki_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_CPU_ADD_TAG("sound",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_sound_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_sound_io_map,0)
-	MDRV_CPU_VBLANK_INT(jantouki_sound_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("top", jantouki_sound_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
 
@@ -3970,7 +3969,7 @@ static MACHINE_DRIVER_START( mjelctrn )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map,0)
 	MDRV_CPU_IO_MAP(mjelctrn_io_map,0)
-	MDRV_CPU_VBLANK_INT(mjelctrn_vblank_interrupt,1)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_VBLANK_INT("main", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(mjelctrn)
 MACHINE_DRIVER_END
@@ -4007,7 +4006,7 @@ static MACHINE_DRIVER_START( neruton )
 
 	MDRV_IMPORT_FROM( mjelctrn )
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_VBLANK_INT_HACK(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(neruton)
 MACHINE_DRIVER_END
@@ -4032,7 +4031,7 @@ static MACHINE_DRIVER_START( majxtal7 )
 
 	MDRV_IMPORT_FROM( neruton )
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(majxtal7_vblank_interrupt,1)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_VBLANK_INT("main", majxtal7_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 MACHINE_DRIVER_END
 
@@ -4054,7 +4053,7 @@ static MACHINE_DRIVER_START( htengoku )
 	MDRV_CPU_ADD_TAG("main",Z80,20000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map,0)
 	MDRV_CPU_IO_MAP(htengoku_io_map,0)
-	MDRV_CPU_VBLANK_INT(sprtmtch_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -4112,7 +4111,7 @@ static MACHINE_DRIVER_START( tenkai )
 	MDRV_CPU_ADD_TAG("main",TMP91640, 21472700 / 2)
 	MDRV_CPU_PROGRAM_MAP(tenkai_map,0)
 	MDRV_CPU_IO_MAP(tenkai_io_map,0)
-	MDRV_CPU_VBLANK_INT(tenkai_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

@@ -33,8 +33,8 @@ static int i8751_return;
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
-    soundlatch_w(offset,data);
-    cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+    soundlatch_w(machine,offset,data);
+    cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static READ8_HANDLER( sidepckt_i8751_r )
@@ -295,7 +295,7 @@ static MACHINE_DRIVER_START( sidepckt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */        /* 1.5 MHz */
@@ -334,7 +334,7 @@ static MACHINE_DRIVER_START( sidepctj )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,j_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */        /* 1.5 MHz */

@@ -81,7 +81,7 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 {
 	destroyr_cursor = data;
 
-	watchdog_reset_w(offset, data);
+	watchdog_reset_w(machine, offset, data);
 }
 
 
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( destroyr_output_w )
 		/* bit 0 => low explosion */
 		break;
 	case 8:
-		destroyr_misc_w(offset, data);
+		destroyr_misc_w(machine, offset, data);
 		break;
 	default:
 		logerror("unmapped output port %d\n", offset);
@@ -341,7 +341,7 @@ static MACHINE_DRIVER_START( destroyr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6800, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(destroyr_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert, 4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert, 4)
 
 	MDRV_MACHINE_RESET(destroyr)
 

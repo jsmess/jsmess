@@ -121,13 +121,13 @@ typedef struct ti99_4p_peb_card_handlers_t
 	{
 		struct
 		{
-			read8_handler mem_read;		/* card mem read handler (8 bits) */
-			write8_handler mem_write;	/* card mem write handler (8 bits) */
+			read8_machine_func mem_read;		/* card mem read handler (8 bits) */
+			write8_machine_func mem_write;	/* card mem write handler (8 bits) */
 		} width_8bit;
 		struct
 		{
-			read16_handler mem_read;	/* card mem read handler (16 bits) */
-			write16_handler mem_write;	/* card mem write handler (16 bits) */
+			read16_machine_func mem_read;	/* card mem read handler (16 bits) */
+			write16_machine_func mem_write;	/* card mem write handler (16 bits) */
 		} width_16bit;
 	} w;
 } ti99_4p_peb_card_handlers_t;
@@ -325,7 +325,7 @@ void ti99_peb_set_ilb_bit(int bit, int state)
 /*
 	Read CRU in range >1000->1ffe (>800->fff) (ti-99/4(a))
 */
- READ8_HANDLER ( ti99_4x_peb_cru_r )
+READ8_HANDLER ( ti99_4x_peb_cru_r )
 {
 	int port;
 	cru_read_handler handler;
@@ -334,7 +334,7 @@ void ti99_peb_set_ilb_bit(int bit, int state)
 	port = (offset & 0x00f0) >> 4;
 	handler = expansion_ports[port].cru_read;
 
-	reply = (handler) ? (*handler)(offset & 0xf) : 0;
+	reply = (handler) ? (*handler)(machine, offset & 0xf) : 0;
 
 	return reply;
 }
@@ -351,7 +351,7 @@ WRITE8_HANDLER ( ti99_4x_peb_cru_w )
 	handler = expansion_ports[port].cru_write;
 
 	if (handler)
-		(*handler)(offset & 0x7f, data);
+		(*handler)(machine, offset & 0x7f, data);
 
 	/* expansion card enable? */
 	if ((offset & 0x7f) == 0)
@@ -377,7 +377,7 @@ WRITE8_HANDLER ( ti99_4x_peb_cru_w )
 READ16_HANDLER ( ti99_4x_peb_r )
 {
 	int reply = 0;
-	read8_handler handler;
+	read8_machine_func handler;
 
 	activecpu_adjust_icount(-4);
 
@@ -386,8 +386,8 @@ READ16_HANDLER ( ti99_4x_peb_r )
 		handler = expansion_ports[active_card].mem_read;
 		if (handler)
 		{
-			reply = (*handler)((offset << 1) + 1);
-			reply |= ((unsigned) (*handler)(offset << 1)) << 8;
+			reply = (*handler)(machine, (offset << 1) + 1);
+			reply |= ((unsigned) (*handler)(machine, offset << 1)) << 8;
 		}
 	}
 
@@ -399,7 +399,7 @@ READ16_HANDLER ( ti99_4x_peb_r )
 */
 WRITE16_HANDLER ( ti99_4x_peb_w )
 {
-	write8_handler handler;
+	write8_machine_func handler;
 
 	activecpu_adjust_icount(-4);
 
@@ -411,8 +411,8 @@ WRITE16_HANDLER ( ti99_4x_peb_w )
 		handler = expansion_ports[active_card].mem_write;
 		if (handler)
 		{
-			(*handler)((offset << 1) + 1, data & 0xff);
-			(*handler)(offset << 1, (data >> 8) & 0xff);
+			(*handler)(machine, (offset << 1) + 1, data & 0xff);
+			(*handler)(machine, offset << 1, (data >> 8) & 0xff);
 		}
 	}
 }
@@ -430,7 +430,7 @@ WRITE16_HANDLER ( ti99_4x_peb_w )
 	port = (offset & 0x00f0) >> 4;
 	handler = expansion_ports[port].cru_read;
 
-	reply = (handler) ? (*handler)(offset & 0xf) : 0;
+	reply = (handler) ? (*handler)(machine, offset & 0xf) : 0;
 
 	return reply;
 }
@@ -447,7 +447,7 @@ WRITE8_HANDLER ( geneve_peb_cru_w )
 	handler = expansion_ports[port].cru_write;
 
 	if (handler)
-		(*handler)(offset & 0x7f, data);
+		(*handler)(machine, offset & 0x7f, data);
 
 	/* expansion card enable? */
 	if ((offset & 0x7f) == 0)
@@ -473,7 +473,7 @@ WRITE8_HANDLER ( geneve_peb_cru_w )
  READ8_HANDLER ( geneve_peb_r )
 {
 	int reply = 0;
-	read8_handler handler;
+	read8_machine_func handler;
 
 	activecpu_adjust_icount(-8);
 
@@ -481,7 +481,7 @@ WRITE8_HANDLER ( geneve_peb_cru_w )
 	{
             handler = expansion_ports[active_card].mem_read;
 		if (handler)
-			reply = (*handler)(offset);
+			reply = (*handler)(machine, offset);
 	}
 
 	return reply;
@@ -492,7 +492,7 @@ WRITE8_HANDLER ( geneve_peb_cru_w )
 */
 WRITE8_HANDLER ( geneve_peb_w )
 {
-	write8_handler handler;
+	write8_machine_func handler;
 
 	activecpu_adjust_icount(-8);
 
@@ -500,7 +500,7 @@ WRITE8_HANDLER ( geneve_peb_w )
 	{
 		handler = expansion_ports[active_card].mem_write;
 		if (handler)
-			(*handler)(offset, data);
+			(*handler)(machine, offset, data);
 	}
 }
 
@@ -516,7 +516,7 @@ WRITE8_HANDLER ( geneve_peb_w )
 	port = (offset & 0x01f0) >> 4;
 	handler = expansion_ports[port].cru_read;
 
-	reply = (handler) ? (*handler)(offset & 0xf) : 0;
+	reply = (handler) ? (*handler)(machine, offset & 0xf) : 0;
 
 	return reply;
 }
@@ -533,7 +533,7 @@ WRITE8_HANDLER ( ti99_8_peb_cru_w )
 	handler = expansion_ports[port].cru_write;
 
 	if (handler)
-		(*handler)(offset & 0x7f, data);
+		(*handler)(machine, offset & 0x7f, data);
 
 	/* expansion card enable? */
 	if ((offset & 0x7f) == 0)
@@ -559,7 +559,7 @@ WRITE8_HANDLER ( ti99_8_peb_cru_w )
  READ8_HANDLER ( ti99_8_peb_r )
 {
 	int reply = 0;
-	read8_handler handler;
+	read8_machine_func handler;
 
 	activecpu_adjust_icount(-4);
 
@@ -567,7 +567,7 @@ WRITE8_HANDLER ( ti99_8_peb_cru_w )
 	{
 		handler = expansion_ports[active_card].mem_read;
 		if (handler)
-			reply = (*handler)(offset);
+			reply = (*handler)(machine, offset);
 	}
 
 	return reply;
@@ -578,7 +578,7 @@ WRITE8_HANDLER ( ti99_8_peb_cru_w )
 */
 WRITE8_HANDLER ( ti99_8_peb_w )
 {
-	write8_handler handler;
+	write8_machine_func handler;
 
 	activecpu_adjust_icount(-4);
 
@@ -586,7 +586,7 @@ WRITE8_HANDLER ( ti99_8_peb_w )
 	{
 		handler = expansion_ports[active_card].mem_write;
 		if (handler)
-			(*handler)(offset, data);
+			(*handler)(machine, offset, data);
 	}
 }
 
@@ -602,7 +602,7 @@ WRITE8_HANDLER ( ti99_8_peb_w )
 	port = offset >> 4;
 	handler = ti99_4p_expansion_ports[port].cru_read;
 
-	reply = (handler) ? (*handler)(offset & 0xf) : 0;
+	reply = (handler) ? (*handler)(machine, offset & 0xf) : 0;
 
 	return reply;
 }
@@ -619,7 +619,7 @@ WRITE8_HANDLER ( ti99_4p_peb_cru_w )
 	handler = ti99_4p_expansion_ports[port].cru_write;
 
 	if (handler)
-		(*handler)(offset & 0x7f, data);
+		(*handler)(machine, offset & 0x7f, data);
 
 	/* expansion card enable? */
 	if ((offset & 0x7f) == 0)
@@ -663,8 +663,8 @@ WRITE8_HANDLER ( ti99_4p_peb_cru_w )
 READ16_HANDLER ( ti99_4p_peb_r )
 {
 	int reply = 0;
-	read8_handler handler;
-	read16_handler handler16;
+	read8_machine_func handler;
+	read16_machine_func handler16;
 
 
 	if (active_card == -1)
@@ -679,8 +679,8 @@ READ16_HANDLER ( ti99_4p_peb_r )
 			handler = ti99_4p_expansion_ports[active_card].w.width_8bit.mem_read;
 			if (handler)
 			{
-				reply = (*handler)((offset << 1) + 1);
-				reply |= ((unsigned) (*handler)(offset << 1)) << 8;
+				reply = (*handler)(machine, (offset << 1) + 1);
+				reply |= ((unsigned) (*handler)(machine, offset << 1)) << 8;
 			}
 		}
 		else
@@ -689,7 +689,7 @@ READ16_HANDLER ( ti99_4p_peb_r )
 
 			handler16 = ti99_4p_expansion_ports[active_card].w.width_16bit.mem_read;
 			if (handler16)
-				reply = (*handler16)(offset, /*mem_mask*/0);
+				reply = (*handler16)(machine, offset, /*mem_mask*/0);
 		}
 	}
 
@@ -713,8 +713,8 @@ READ16_HANDLER ( ti99_4p_peb_r )
 */
 WRITE16_HANDLER ( ti99_4p_peb_w )
 {
-	write8_handler handler;
-	write16_handler handler16;
+	write8_machine_func handler;
+	write16_machine_func handler16;
 
 	if (active_card == -1)
 		activecpu_adjust_icount(-4);	/* ??? */
@@ -730,8 +730,8 @@ WRITE16_HANDLER ( ti99_4p_peb_w )
 			handler = ti99_4p_expansion_ports[active_card].w.width_8bit.mem_write;
 			if (handler)
 			{
-				(*handler)((offset << 1) + 1, data & 0xff);
-				(*handler)(offset << 1, (data >> 8) & 0xff);
+				(*handler)(machine, (offset << 1) + 1, data & 0xff);
+				(*handler)(machine, offset << 1, (data >> 8) & 0xff);
 			}
 		}
 		else
@@ -740,7 +740,7 @@ WRITE16_HANDLER ( ti99_4p_peb_w )
 
 			handler16 = ti99_4p_expansion_ports[active_card].w.width_16bit.mem_write;
 			if (handler16)
-				(*handler16)(offset, data, /*mem_mask*/0);
+				(*handler16)(machine, offset, data, /*mem_mask*/0);
 		}
 	}
 }

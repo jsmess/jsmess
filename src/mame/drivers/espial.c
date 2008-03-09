@@ -32,7 +32,7 @@ MACHINE_RESET( espial )
 
 WRITE8_HANDLER( zodiac_master_interrupt_enable_w )
 {
-	interrupt_enable_w(offset,~data & 1);
+	interrupt_enable_w(machine,offset,~data & 1);
 }
 
 
@@ -60,8 +60,8 @@ INTERRUPT_GEN( zodiac_master_interrupt )
 
 WRITE8_HANDLER( zodiac_master_soundlatch_w )
 {
-	soundlatch_w(offset, data);
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	soundlatch_w(machine, offset, data);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 
@@ -315,12 +315,12 @@ static MACHINE_DRIVER_START( espial )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(espial_readmem,espial_writemem)
-	MDRV_CPU_VBLANK_INT(zodiac_master_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 3072000)	/* 2 MHz?????? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(0,sound_writeport)
-	MDRV_CPU_VBLANK_INT(espial_sound_nmi_gen,4)
+	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,4)
 
 	MDRV_MACHINE_RESET(espial)
 

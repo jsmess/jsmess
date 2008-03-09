@@ -62,7 +62,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( lkage_sound_command_w )
 {
-	soundlatch_w(offset,data);
+	soundlatch_w(machine,offset,data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 
@@ -328,7 +328,7 @@ static MACHINE_DRIVER_START( lkage )
 	MDRV_CPU_ADD(Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(lkage,0)
 	MDRV_CPU_IO_MAP(readport,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
@@ -373,7 +373,7 @@ static MACHINE_DRIVER_START( lkageb )
 	MDRV_CPU_ADD(Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(lkage,0)
 	MDRV_CPU_IO_MAP(readport,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)

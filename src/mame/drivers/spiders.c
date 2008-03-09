@@ -273,13 +273,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia_1_ca1_w(0, input_port_0_r(0) & 0x02);
+	pia_1_ca1_w(machine, 0, input_port_0_r(machine, 0) & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia_1_ca2_w(0, input_port_0_r(0) & 0x01);
+	pia_1_ca2_w(machine, 0, input_port_0_r(machine, 0) & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(0, input_port_5_r(0));
+	pia_1_cb1_w(machine, 0, input_port_5_r(machine, 0));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -345,7 +345,7 @@ static const pia6821_interface pia_4_intf =
 
 static void ic60_74123_output_changed(int output)
 {
-	pia_2_ca1_w(0, output);
+	pia_2_ca1_w(Machine, 0, output);
 }
 
 
@@ -410,31 +410,13 @@ static MACHINE_RESET( spiders )
 #define NUM_PENS	(8)
 
 
-static WRITE8_HANDLER( spiders_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-
-static READ8_HANDLER( spiders_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-
-static WRITE8_HANDLER( spiders_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
-
 static WRITE8_HANDLER( flipscreen_w )
 {
 	flipscreen = data;
 }
 
 
-static void *begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+static MC6845_BEGIN_UPDATE( begin_update )
 {
 	/* create the pens */
 	offs_t i;
@@ -449,8 +431,7 @@ static void *begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitma
 }
 
 
-static void update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-					   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+static MC6845_UPDATE_ROW( update_row )
 {
 	UINT8 cx;
 
@@ -509,7 +490,7 @@ static void update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *
 }
 
 
-static void display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
 	TTL74123_A_w(0, display_enabled);
 }
@@ -523,7 +504,9 @@ static const mc6845_interface mc6845_intf =
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
 	0,						/* after pixel update callback */
-	display_enable_changed	/* call back for display state changes */
+	display_enable_changed,	/* callback for display state changes */
+	NULL,					/* HSYNC callback */
+	NULL					/* VSYNC callback */
 };
 
 
@@ -590,8 +573,8 @@ static READ8_HANDLER( gfx_rom_r )
 
 static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&spiders_ram)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(spiders_mc6845_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE(spiders_mc6845_register_r, spiders_mc6845_register_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc044, 0xc047) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc048, 0xc04b) AM_READWRITE(pia_2_alt_r, pia_2_alt_w)

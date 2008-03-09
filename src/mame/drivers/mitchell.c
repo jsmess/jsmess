@@ -193,7 +193,7 @@ static READ8_HANDLER( pang_port5_r )
 		if (pang_port5_kludge)	/* hack... music doesn't work otherwise */
 			bit ^= 0x08;
 
-	return (input_port_0_r(0) & 0x76) | bit;
+	return (input_port_0_r(machine,0) & 0x76) | bit;
 }
 
 static WRITE8_HANDLER( eeprom_cs_w )
@@ -307,11 +307,11 @@ static READ8_HANDLER( input_r )
 			return readinputport(1 + offset);
 			break;
 		case 1:	/* Mahjong games */
-			if (offset) return mahjong_input_r(offset-1);
+			if (offset) return mahjong_input_r(machine,offset-1);
 			else return readinputport(1);
 			break;
 		case 2:	/* Block Block - dial control */
-			if (offset) return block_input_r(offset-1);
+			if (offset) return block_input_r(machine,offset-1);
 			else return readinputport(1);
 			break;
 		case 3:	/* Super Pang - simulate START 1 press to initialize EEPROM */
@@ -335,10 +335,10 @@ static WRITE8_HANDLER( input_w )
 logerror("PC %04x: write %02x to port 01\n",activecpu_get_pc(),data);
 			break;
 		case 1:
-			mahjong_input_select_w(offset,data);
+			mahjong_input_select_w(machine,offset,data);
 			break;
 		case 2:
-			block_dial_control_w(offset,data);
+			block_dial_control_w(machine,offset,data);
 			break;
 	}
 }
@@ -483,8 +483,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(mstworld_sound_w)
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 extern WRITE8_HANDLER( mstworld_gfxctrl_w );
@@ -1331,7 +1331,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	MDRV_CPU_ADD(Z80, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mgakuen_readmem,mgakuen_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1365,7 +1365,7 @@ static MACHINE_DRIVER_START( pang )
 	MDRV_CPU_ADD_TAG("main",Z80, 8000000)	/* (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
 
@@ -1436,13 +1436,13 @@ static MACHINE_DRIVER_START( spangbl )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(spangb_memmap,0)
 	MDRV_CPU_IO_MAP(spangb_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound",Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(spangb_sound_memmap,0 )
 	MDRV_CPU_IO_MAP(spangb_sound_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_GFXDECODE(spangbl)
 
@@ -1464,7 +1464,7 @@ static MACHINE_DRIVER_START( mstworld )
 
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(mstworld_readport,mstworld_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,6000000)		 /* 6 MHz? */
 	/* audio CPU */
@@ -1499,7 +1499,7 @@ static MACHINE_DRIVER_START( marukin )
 	MDRV_CPU_ADD(Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
 

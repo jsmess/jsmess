@@ -79,8 +79,8 @@ static WRITE8_HANDLER( tecmo_bankswitch_w )
 
 static WRITE8_HANDLER( tecmo_sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static int adpcm_pos,adpcm_end;
@@ -568,7 +568,7 @@ static MACHINE_DRIVER_START( rygar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,rygar_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
 	/* audio CPU */

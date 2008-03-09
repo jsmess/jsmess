@@ -136,6 +136,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "memconv.h"
 #include "profiler.h"
 #include "machine/atarigen.h"
 #include "cpu/mips/r3000.h"
@@ -196,7 +197,7 @@ static UINT16 gpu_regs[GPU_REGS];
 static emu_timer *object_timer;
 static UINT8 cpu_irq_state;
 
-static mame_bitmap *screen_bitmap;
+static bitmap_t *screen_bitmap;
 
 static pen_t *pen_table;
 
@@ -706,16 +707,13 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 
 READ32_HANDLER( jaguar_tom_regs32_r )
 {
-	return (jaguar_tom_regs_r(offset * 2, 0) << 16) | jaguar_tom_regs_r(offset * 2 + 1, 0);
+	return read32be_with_16be_handler(jaguar_tom_regs_r, machine, offset, mem_mask);
 }
 
 
 WRITE32_HANDLER( jaguar_tom_regs32_w )
 {
-	if (ACCESSING_MSW32)
-		jaguar_tom_regs_w(offset * 2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_LSW32)
-		jaguar_tom_regs_w(offset * 2 + 1, data, mem_mask);
+	write32be_with_16be_handler(jaguar_tom_regs_w, machine, offset, data, mem_mask);
 }
 
 

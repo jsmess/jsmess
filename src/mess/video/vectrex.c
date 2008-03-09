@@ -103,8 +103,8 @@ static void lightpen_trigger(running_machine *machine)
 {
 	if (vectrex_lightpen_port & 1)
 	{
-		via_0_ca1_w (0, 1);
-		via_0_ca1_w (0, 0);
+		via_0_ca1_w(machine, 0, 1);
+		via_0_ca1_w(machine, 0, 0);
 	}
 	if (vectrex_lightpen_port & 2)
 	{
@@ -365,9 +365,9 @@ static WRITE8_HANDLER ( v_via_pb_w )
 	{
 		/* BDIR active, PSG latches */
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
-			AY8910_control_port_0_w (0, vectrex_via_out[PORTA]);
+			AY8910_control_port_0_w(machine, 0, vectrex_via_out[PORTA]);
 		else
-			AY8910_write_port_0_w (0, vectrex_via_out[PORTA]);
+			AY8910_write_port_0_w(machine, 0, vectrex_via_out[PORTA]);
 	}
 
 	if (!(data & 0x1) && (vectrex_via_out[PORTB] & 0x1))
@@ -470,7 +470,7 @@ VIDEO_START( raaspec )
 	via_reset();
 	z_factor = 2;
 
-	raaspec_led_w (0, 0xff);
+	raaspec_led_w(machine, 0, 0xff);
 
 	VIDEO_START_CALL(vector);
 }

@@ -44,7 +44,7 @@ static READ8_HANDLER( bankedram_r )
 static WRITE8_HANDLER( bankedram_w )
 {
 	if (palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 	else
 		ram[offset] = data;
 }
@@ -73,8 +73,8 @@ static WRITE8_HANDLER( aliens_coin_counter_w )
 
 static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( aliens_snd_bankswitch_w )
@@ -238,7 +238,7 @@ static MACHINE_DRIVER_START( aliens )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(aliens_map,0)
-	MDRV_CPU_VBLANK_INT(aliens_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", aliens_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(aliens_sound_map,0)

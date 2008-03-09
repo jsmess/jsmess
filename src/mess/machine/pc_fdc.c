@@ -11,6 +11,8 @@
 
 **********************************************************************/
 
+#include "driver.h"
+#include "deprecat.h"
 #include "machine/pc_fdc.h"
 #include "machine/nec765.h"
 #include "memconv.h"
@@ -160,7 +162,7 @@ int	pc_fdc_dack_r(void)
 	/* if dma is not enabled, dacks are not acknowledged */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
-		data = nec765_dack_r(0);
+		data = nec765_dack_r(Machine, 0);
 	}
 
 	return data;
@@ -174,7 +176,7 @@ void pc_fdc_dack_w(int data)
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
 		/* dma acknowledge - and send byte to fdc */
-		nec765_dack_w(0,data);
+		nec765_dack_w(Machine, 0,data);
 	}
 }
 
@@ -324,10 +326,10 @@ READ8_HANDLER ( pc_fdc_r )
 		case 3: /* tape drive select? */
 			break;
 		case 4:
-			data = nec765_status_r(0);
+			data = nec765_status_r(machine, 0);
 			break;
 		case 5:
-			data = nec765_data_r(offset);
+			data = nec765_data_r(machine, offset);
 			break;
 		case 6: /* FDC reserved */
 			break;
@@ -363,7 +365,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 			pc_fdc_data_rate_w(data);
 			break;
 		case 5:
-			nec765_data_w(0, data);
+			nec765_data_w(machine, 0, data);
 			break;
 		case 6:
 			/* FDC reserved */
@@ -382,12 +384,12 @@ WRITE8_HANDLER ( pc_fdc_w )
 	}
 }
 
-READ16_HANDLER( pc16le_fdc_r ) { return read16le_with_read8_handler(pc_fdc_r, offset, mem_mask); }
-WRITE16_HANDLER( pc16le_fdc_w ) { write16le_with_write8_handler(pc_fdc_w, offset, data, mem_mask); }
+READ16_HANDLER( pc16le_fdc_r ) { return read16le_with_read8_handler(pc_fdc_r, machine, offset, mem_mask); }
+WRITE16_HANDLER( pc16le_fdc_w ) { write16le_with_write8_handler(pc_fdc_w, machine, offset, data, mem_mask); }
 
-READ32_HANDLER( pc32le_fdc_r ) { return read32le_with_read8_handler(pc_fdc_r, offset, mem_mask); }
-WRITE32_HANDLER( pc32le_fdc_w ) { write32le_with_write8_handler(pc_fdc_w, offset, data, mem_mask); }
+READ32_HANDLER( pc32le_fdc_r ) { return read32le_with_read8_handler(pc_fdc_r, machine, offset, mem_mask); }
+WRITE32_HANDLER( pc32le_fdc_w ) { write32le_with_write8_handler(pc_fdc_w, machine, offset, data, mem_mask); }
 
-READ64_HANDLER( pc64be_fdc_r ) { return read64be_with_read8_handler(pc_fdc_r, offset, mem_mask); }
-WRITE64_HANDLER( pc64be_fdc_w ) { write64be_with_write8_handler(pc_fdc_w, offset, data, mem_mask); }
+READ64_HANDLER( pc64be_fdc_r ) { return read64be_with_read8_handler(pc_fdc_r, machine, offset, mem_mask); }
+WRITE64_HANDLER( pc64be_fdc_w ) { write64be_with_write8_handler(pc_fdc_w,machine,  offset, data, mem_mask); }
 

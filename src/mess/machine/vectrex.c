@@ -107,7 +107,7 @@ DEVICE_LOAD( vectrex_cart )
  *********************************************************************/
 void vectrex_configuration(void)
 {
-	unsigned char cport = input_port_5_r (0);
+	unsigned char cport = readinputport(5);
 
 	/* Vectrex 'dipswitch' configuration */
 
@@ -184,7 +184,7 @@ void vectrex_configuration(void)
 		vectrex_beam_color = RGB_WHITE;
 		imager_colors[0]=imager_colors[1]=imager_colors[2]=imager_colors[3]=imager_colors[4]=imager_colors[5]=RGB_WHITE;
 	}
-	vectrex_lightpen_port = (input_port_6_r (0) & 0x03);
+	vectrex_lightpen_port = (readinputport(6) & 0x03);
 }
 
 /*********************************************************************
@@ -208,21 +208,21 @@ void v_via_irq (int level)
 	return vectrex_via_out[PORTB];
 }
 
- READ8_HANDLER( v_via_pa_r )
+READ8_HANDLER( v_via_pa_r )
 {
 	if ((!(vectrex_via_out[PORTB] & 0x10)) && (vectrex_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		vectrex_via_out[PORTA] = AY8910_read_port_0_r (0)
+		vectrex_via_out[PORTA] = AY8910_read_port_0_r(machine, 0)
 			& ~(vectrex_imager_pinlevel & 0x80);
 		vectrex_imager_pinlevel &= ~0x80;
 	}
 	return vectrex_via_out[PORTA];
 }
 
- READ8_HANDLER( s1_via_pb_r )
+READ8_HANDLER( s1_via_pb_r )
 {
-	return (vectrex_via_out[PORTB] & ~0x40) | ((input_port_1_r(0) & 0x1)<<6);
+	return (vectrex_via_out[PORTB] & ~0x40) | ((readinputport(1) & 0x1)<<6);
 }
 
 /*********************************************************************
@@ -251,8 +251,8 @@ TIMER_CALLBACK(vectrex_imager_right_eye)
 			timer_set (double_to_attotime(rtime * 0.50), NULL, 1, vectrex_imager_right_eye);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
-			via_0_ca1_w (0, 1);
-			via_0_ca1_w (0, 0);
+			via_0_ca1_w(machine, 0, 1);
+			via_0_ca1_w(machine, 0, 0);
 			vectrex_imager_pinlevel |= 0x80;
 		}
 	}

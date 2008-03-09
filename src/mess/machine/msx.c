@@ -426,15 +426,15 @@ INTERRUPT_GEN( msx_interrupt )
 
 READ8_HANDLER ( msx_psg_r )
 {
-	return AY8910_read_port_0_r (offset);
+	return AY8910_read_port_0_r (machine, offset);
 }
 
 WRITE8_HANDLER ( msx_psg_w )
 {
 	if (offset & 0x01)
-		AY8910_write_port_0_w (offset, data);
+		AY8910_write_port_0_w (machine, offset, data);
 	else
-		AY8910_control_port_0_w (offset, data);
+		AY8910_control_port_0_w (machine, offset, data);
 }
 
 static mess_image *cassette_device_image(void)
@@ -453,10 +453,10 @@ READ8_HANDLER ( msx_psg_port_a_r )
 
 	data = (cassette_input(cassette_device_image()) > 0.0038 ? 0x80 : 0);
 
-	if ( (msx1.psg_b ^ readinputport (8) ) & 0x40)
+	if ( (msx1.psg_b ^ readinputport(8) ) & 0x40)
 		{
 		/* game port 2 */
-		inp = input_port_7_r (0) & 0x7f;
+		inp = readinputport(7) & 0x7f;
 #if 0
 		if ( !(inp & 0x80) )
 			{
@@ -481,7 +481,7 @@ READ8_HANDLER ( msx_psg_port_a_r )
 	else
 		{
 		/* game port 1 */
-		inp = input_port_6_r (0) & 0x7f;
+		inp = readinputport(6) & 0x7f;
 #if 0
 		if ( !(inp & 0x80) )
 			{
@@ -573,10 +573,10 @@ WRITE8_HANDLER (msx_fmpac_w)
 	if (msx1.opll_active) {
 
 		if (offset == 1) {
-			YM2413_data_port_0_w (0, data);
+			YM2413_data_port_0_w (machine, 0, data);
 		}
 		else {
-			YM2413_register_port_0_w (0, data);
+			YM2413_register_port_0_w (machine, 0, data);
 		}
 	}
 }
@@ -592,12 +592,12 @@ WRITE8_HANDLER (msx_rtc_latch_w)
 
 WRITE8_HANDLER (msx_rtc_reg_w)
 {
-	tc8521_w (msx1.rtc_latch, data);
+	tc8521_w(machine, msx1.rtc_latch, data);
 }
 
 READ8_HANDLER (msx_rtc_reg_r)
 {
-	return tc8521_r (msx1.rtc_latch);
+	return tc8521_r(machine, msx1.rtc_latch);
 }
 
 NVRAM_HANDLER( msx2 )
@@ -728,7 +728,7 @@ static READ8_HANDLER( msx_ppi_port_b_r )
 	UINT8 result = 0xff;
 	int row, data;
 
-	row = ppi8255_0_r (2) & 0x0f;
+	row = ppi8255_0_r(machine, 2) & 0x0f;
 	if (row <= 10)
 	{
 		data = readinputport (row/2);
@@ -962,7 +962,7 @@ WRITE8_HANDLER (msx_superloadrunner_w)
 	if (msx1.slot[2]->slot_type == SLOT_SUPERLOADRUNNER) {
 		msx1.slot[2]->map (msx1.state[2], 2);
 	}
-	msx_page0_w (-1, data);
+	msx_page0_w(machine, -1, data);
 }
 
 WRITE8_HANDLER (msx_page0_w)
@@ -1023,7 +1023,7 @@ WRITE8_HANDLER (msx_sec_slot_w)
 		msx_memory_map_all ();
 	}
 	else {
-		msx_page3_w (0x3fff, data);
+		msx_page3_w(machine, 0x3fff, data);
 	}
 }
 

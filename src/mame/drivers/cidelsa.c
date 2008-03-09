@@ -89,15 +89,15 @@ static WRITE8_HANDLER ( draco_sound_g_w )
 	switch (data)
 	{
 	case 0x01:
-		AY8910_write_port_0_w(0, draco_ay_latch);
+		AY8910_write_port_0_w(machine, 0, draco_ay_latch);
 		break;
 
 	case 0x02:
-		draco_ay_latch = AY8910_read_port_0_r(0);
+		draco_ay_latch = AY8910_read_port_0_r(machine, 0);
 		break;
 
 	case 0x03:
-		AY8910_control_port_0_w(0, draco_ay_latch);
+		AY8910_control_port_0_w(machine, 0, draco_ay_latch);
 		break;
 	}
 }
@@ -217,14 +217,14 @@ static WRITE8_HANDLER ( cidelsa_charram_w )
 {
 	int addr = cdp1869_get_cma(offset);
 	cidelsa_pcb[addr] = activecpu_get_reg(CDP1802_Q);
-	cdp1869_charram_w(offset, data);
+	cdp1869_charram_w(machine, offset, data);
 }
 
 static READ8_HANDLER ( cidelsa_charram_r )
 {
 	int addr = cdp1869_get_cma(offset);
 	cdp1869_pcb = cidelsa_pcb[addr];
-	return cdp1869_charram_r(offset);
+	return cdp1869_charram_r(machine,offset);
 }
 
 /* Memory Maps */
@@ -517,7 +517,7 @@ static MACHINE_DRIVER_START( destryer )
 	MDRV_CPU_PROGRAM_MAP(destryer_map, 0)
 	MDRV_CPU_IO_MAP(destryer_io_map, 0)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_CPU_VBLANK_INT(altair_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
+	MDRV_CPU_VBLANK_INT_HACK(altair_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_START(destryer)
 	MDRV_MACHINE_RESET(destryer)
@@ -550,7 +550,7 @@ static MACHINE_DRIVER_START( destryea )
 	MDRV_CPU_PROGRAM_MAP(destryea_map, 0)
 	MDRV_CPU_IO_MAP(destryer_io_map, 0)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_CPU_VBLANK_INT(altair_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
+	MDRV_CPU_VBLANK_INT_HACK(altair_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_START(destryer)
 	MDRV_MACHINE_RESET(destryer)
@@ -583,7 +583,7 @@ static MACHINE_DRIVER_START( altair )
 	MDRV_CPU_PROGRAM_MAP(altair_map, 0)
 	MDRV_CPU_IO_MAP(altair_io_map, 0)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_CPU_VBLANK_INT(altair_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
+	MDRV_CPU_VBLANK_INT_HACK(altair_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
 	MDRV_MACHINE_START(destryer)
 	MDRV_MACHINE_RESET(destryer)
 
@@ -615,7 +615,7 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_CPU_PROGRAM_MAP(draco_map, 0)
 	MDRV_CPU_IO_MAP(draco_io_map, 0)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_CPU_VBLANK_INT(draco_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
+	MDRV_CPU_VBLANK_INT_HACK(draco_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_START(draco)
 	MDRV_MACHINE_RESET(destryer)

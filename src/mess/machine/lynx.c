@@ -1063,7 +1063,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 		data |= 4; // no comlynx adapter
 		break;
     case 0x8c: case 0x8d:
-		data = lynx_uart_r( offset );
+		data = lynx_uart_r(machine, offset);
 		break;
     default:
 		data = mikey.data[offset];
@@ -1121,7 +1121,7 @@ WRITE8_HANDLER(mikey_write)
 		break;
 
 	case 0x8c: case 0x8d:
-		lynx_uart_w(offset, data);
+		lynx_uart_w(machine, offset, data);
 		break;
 
 	case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
@@ -1180,7 +1180,7 @@ WRITE8_HANDLER( lynx_memory_config_w )
 static void lynx_reset(running_machine *machine)
 {
 	int i;
-	lynx_memory_config_w(0, 0);
+	lynx_memory_config_w(machine, 0, 0);
 
 	cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, CLEAR_LINE);
 
@@ -1208,7 +1208,7 @@ static void lynx_reset(running_machine *machine)
 
 static void lynx_postload(void)
 {
-	lynx_memory_config_w(0, lynx_memory_config);
+	lynx_memory_config_w(Machine, 0, lynx_memory_config);
 }
 
 MACHINE_START( lynx )

@@ -154,9 +154,9 @@ ROM_END
 static int mk2_read_a(int chip)
 {
 	int data=0xff;
-	int help=input_port_1_r(0)|input_port_2_r(0); // looks like white and black keys are the same!
+	int help=readinputport(1)|readinputport(2); // looks like white and black keys are the same!
 
-	switch (rriot_0_b_r(0)&0x7) {
+	switch (rriot_0_b_r(Machine, 0)&0x7) {
 	case 4:
 		if (help&0x20) data&=~0x1; //F
 		if (help&0x10) data&=~0x2; //E
@@ -165,17 +165,17 @@ static int mk2_read_a(int chip)
 		if (help&2) data&=~0x10; // B
 		if (help&1) data&=~0x20; // A
 #if 0
-		if (input_port_3_r(0)&1) data&=~0x40; //?
+		if (readinputport(3)&1) data&=~0x40; //?
 #endif
 		break;
 	case 5:
 #if 0
-		if (input_port_3_r(0)&2) data&=~0x1; //?
-		if (input_port_3_r(0)&4) data&=~0x2; //?
-		if (input_port_3_r(0)&8) data&=~0x4; //?
+		if (readinputport(3)&2) data&=~0x1; //?
+		if (readinputport(3)&4) data&=~0x2; //?
+		if (readinputport(3)&8) data&=~0x4; //?
 #endif
-		if (input_port_0_r(0)&4) data&=~0x8; // Enter
-		if (input_port_0_r(0)&2) data&=~0x10; // Clear
+		if (readinputport(0)&4) data&=~0x8; // Enter
+		if (readinputport(0)&2) data&=~0x10; // Clear
 		if (help&0x80) data&=~0x20; // H
 		if (help&0x40) data&=~0x40; // G
 		break;
@@ -185,7 +185,7 @@ static int mk2_read_a(int chip)
 
 static void mk2_write_a(int chip, int value)
 {
-	int temp=rriot_0_b_r(0);
+	int temp=rriot_0_b_r(Machine, 0);
 
 
 	switch(temp&0x3) {

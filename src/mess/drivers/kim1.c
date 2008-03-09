@@ -162,7 +162,7 @@ static MACHINE_DRIVER_START( kim1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(kim1_map, 0)
-	MDRV_CPU_VBLANK_INT(kim1_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", kim1_interrupt)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( kim1 )

@@ -428,9 +428,9 @@ WRITE8_HANDLER (atom_8255_portc_w)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			return i8271_r(offset);
+			return i8271_r(machine, offset);
 		case 4:
-			return i8271_data_r(offset);
+			return i8271_data_r(machine, offset);
 		default:
 			break;
 	}
@@ -447,10 +447,10 @@ WRITE8_HANDLER(atom_8271_w)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			i8271_w(offset, data);
+			i8271_w(machine, offset, data);
 			return;
 		case 4:
-			i8271_data_w(offset, data);
+			i8271_data_w(machine, offset, data);
 			return;
 		default:
 			break;

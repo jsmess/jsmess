@@ -61,8 +61,8 @@ static WRITE16_HANDLER( soundcmd_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 
@@ -195,7 +195,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( diverboy )
 	MDRV_CPU_ADD(M68000, 12000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(diverboy_readmem,diverboy_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */

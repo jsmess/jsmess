@@ -1154,7 +1154,7 @@ static TIMER_CALLBACK( gb_video_init_vbl ) {
 	cpunum_set_input_line( machine, 0, VBL_INT, ASSERT_LINE );
 }
 
-void gb_video_init( int mode ) {
+void gb_video_init( running_machine *machine, int mode ) {
 	int	i;
 	int vram_size = 0x2000;
 
@@ -1218,10 +1218,10 @@ void gb_video_init( int mode ) {
 		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
-		gb_video_w( 0x0, 0x91 );    /* LCDCONT */
-		gb_video_w( 0x7, 0xFC );    /* BGRDPAL */
-		gb_video_w( 0x8, 0xFC );    /* SPR0PAL */
-		gb_video_w( 0x9, 0xFC );    /* SPR1PAL */
+		gb_video_w( machine, 0x0, 0x91 );    /* LCDCONT */
+		gb_video_w( machine, 0x7, 0xFC );    /* BGRDPAL */
+		gb_video_w( machine, 0x8, 0xFC );    /* SPR0PAL */
+		gb_video_w( machine, 0x9, 0xFC );    /* SPR1PAL */
 
 		CURLINE = gb_lcd.current_line = 0;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
@@ -1246,10 +1246,10 @@ void gb_video_init( int mode ) {
 		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
-		gb_video_w( 0x0, 0x91 );    /* LCDCONT */
-		gb_video_w( 0x7, 0xFC );    /* BGRDPAL */
-		gb_video_w( 0x8, 0xFC );    /* SPR0PAL */
-		gb_video_w( 0x9, 0xFC );    /* SPR1PAL */
+		gb_video_w( machine, 0x0, 0x91 );    /* LCDCONT */
+		gb_video_w( machine, 0x7, 0xFC );    /* BGRDPAL */
+		gb_video_w( machine, 0x8, 0xFC );    /* SPR0PAL */
+		gb_video_w( machine, 0x9, 0xFC );    /* SPR1PAL */
 
 		CURLINE = gb_lcd.current_line = 0;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
@@ -1278,11 +1278,11 @@ void gb_video_init( int mode ) {
 		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
-		gbc_video_w( 0x0, 0x91 );    /* LCDCONT */
-		gbc_video_w( 0x7, 0xFC );    /* BGRDPAL */
-		gbc_video_w( 0x8, 0xFC );    /* SPR0PAL */
-		gbc_video_w( 0x9, 0xFC );    /* SPR1PAL */
-		gbc_video_w( 0x0F, 0x00 );
+		gbc_video_w( machine, 0x0, 0x91 );    /* LCDCONT */
+		gbc_video_w( machine, 0x7, 0xFC );    /* BGRDPAL */
+		gbc_video_w( machine, 0x8, 0xFC );    /* SPR0PAL */
+		gbc_video_w( machine, 0x9, 0xFC );    /* SPR1PAL */
+		gbc_video_w( machine, 0x0F, 0x00 );
 		CURLINE = gb_lcd.current_line = 0x90;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x01;
 		gb_lcd.mode = 1;
@@ -2185,7 +2185,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 		return;
 	default:
 		/* we didn't handle the write, so pass it to the GB handler */
-		gb_video_w( offset, data );
+		gb_video_w( machine, offset, data );
 		return;
 	}
 

@@ -72,7 +72,7 @@ static VIDEO_START( livequiz )
 	tilemap_set_transparent_pen(tmap, 0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT16 *s		=	livequiz_gfxram + 0x8000;
 	UINT16 *codes	=	livequiz_gfxram;
@@ -442,7 +442,7 @@ static MACHINE_DRIVER_START( livequiz )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 24000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(mem_map,0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)
 

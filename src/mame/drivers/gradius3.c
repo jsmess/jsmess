@@ -35,40 +35,40 @@ VIDEO_UPDATE( gradius3 );
 
 static READ16_HANDLER( K052109_halfword_r )
 {
-	return K052109_r(offset);
+	return K052109_r(machine,offset);
 }
 
 static WRITE16_HANDLER( K052109_halfword_w )
 {
 	if (ACCESSING_LSB)
-		K052109_w(offset,data & 0xff);
+		K052109_w(machine,offset,data & 0xff);
 
 	/* is this a bug in the game or something else? */
 	if (!ACCESSING_LSB)
-		K052109_w(offset,(data >> 8) & 0xff);
+		K052109_w(machine,offset,(data >> 8) & 0xff);
 //      logerror("%06x half %04x = %04x\n",activecpu_get_pc(),offset,data);
 }
 
 static READ16_HANDLER( K051937_halfword_r )
 {
-	return K051937_r(offset);
+	return K051937_r(machine,offset);
 }
 
 static WRITE16_HANDLER( K051937_halfword_w )
 {
 	if (ACCESSING_LSB)
-		K051937_w(offset,data & 0xff);
+		K051937_w(machine,offset,data & 0xff);
 }
 
 static READ16_HANDLER( K051960_halfword_r )
 {
-	return K051960_r(offset);
+	return K051960_r(machine,offset);
 }
 
 static WRITE16_HANDLER( K051960_halfword_w )
 {
 	if (ACCESSING_LSB)
-		K051960_w(offset,data & 0xff);
+		K051960_w(machine,offset,data & 0xff);
 }
 
 
@@ -139,7 +139,7 @@ static WRITE16_HANDLER( cpuB_irqtrigger_w )
 	if (irqBmask & 4)
 	{
 logerror("%04x trigger cpu B irq 4 %02x\n",activecpu_get_pc(),data);
-		cpunum_set_input_line(Machine, 1,4,HOLD_LINE);
+		cpunum_set_input_line(machine, 1,4,HOLD_LINE);
 	}
 	else
 logerror("%04x MISSED cpu B irq 4 %02x\n",activecpu_get_pc(),data);
@@ -148,7 +148,7 @@ logerror("%04x MISSED cpu B irq 4 %02x\n",activecpu_get_pc(),data);
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_MSB)
-		soundlatch_w(0,(data >> 8) & 0xff);
+		soundlatch_w(machine,0,(data >> 8) & 0xff);
 }
 
 static WRITE16_HANDLER( sound_irq_w )
@@ -339,11 +339,11 @@ static MACHINE_DRIVER_START( gradius3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(gradius3_map,0)
-	MDRV_CPU_VBLANK_INT(cpuA_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cpuA_interrupt)
 
 	MDRV_CPU_ADD(M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(gradius3_map2,0)
-	MDRV_CPU_VBLANK_INT(cpuB_interrupt,2)	/* has three interrupt vectors, 1 2 and 4 */
+	MDRV_CPU_VBLANK_INT_HACK(cpuB_interrupt,2)	/* has three interrupt vectors, 1 2 and 4 */
 								/* 4 is triggered by cpu A, the others are unknown but */
 								/* required for the game to run. */
 	MDRV_CPU_ADD(Z80, 3579545)

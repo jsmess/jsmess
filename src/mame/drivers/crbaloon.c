@@ -166,7 +166,7 @@ static WRITE8_HANDLER( port_sound_w )
 	sound_global_enable((data & 0x02) ? TRUE : FALSE);
 
 	/* D2 - unlabeled - music enable */
-	crbaloon_audio_set_music_enable((data & 0x04) ? TRUE : FALSE);
+	crbaloon_audio_set_music_enable(machine, (data & 0x04) ? TRUE : FALSE);
 
 	/* D3 - EXPLOSION */
 	crbaloon_audio_set_explosion_enable((data & 0x08) ? TRUE : FALSE);
@@ -178,7 +178,7 @@ static WRITE8_HANDLER( port_sound_w )
 	crbaloon_audio_set_appear_enable((data & 0x20) ? TRUE : FALSE);
 
 	/* D6 - unlabeled - laugh enable */
-	crbaloon_audio_set_laugh_enable((data & 0x40) ? TRUE : FALSE);
+	crbaloon_audio_set_laugh_enable(machine, (data & 0x40) ? TRUE : FALSE);
 
 	/* D7 - unlabeled - goes to PC3259 pin 16 */
 
@@ -188,7 +188,7 @@ static WRITE8_HANDLER( port_sound_w )
 
 static WRITE8_HANDLER( port_music_w )
 {
-	crbaloon_audio_set_music_freq(data);
+	crbaloon_audio_set_music_freq(machine, data);
 }
 
 
@@ -220,7 +220,8 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(4) )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ(port_tag_to_handler8("DSW0"))
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ(port_tag_to_handler8("IN0"))
-/*  AM_SPACE(0x02, 0x03) AM_READ(pc3259_r) crashes if not at the end */
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_MASK(0x0c) AM_READ(pc3259_r)
+//  AM_SPACE(0x02, 0x03) AM_READ(pc3259_r) crashes if not at the end
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ(port_tag_to_handler8("IN1"))
 
 	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* not connected */
@@ -232,8 +233,6 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(MWA8_NOP) /* MSK - to PC3259 */
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(MWA8_NOP) /* schematics has it in a box marked "NOT USE" */
 	AM_RANGE(0x0e, 0x0f) AM_WRITE(MWA8_NOP)
-
-	AM_SPACE(0x02, 0x03) AM_READ(pc3259_r)
 ADDRESS_MAP_END
 
 
@@ -347,8 +346,8 @@ GFXDECODE_END
 static MACHINE_RESET( crballoon )
 {
 	pc3092_reset();
-	port_sound_w(0, 0);
-	port_music_w(0, 0);
+	port_sound_w(machine, 0, 0);
+	port_music_w(machine, 0, 0);
 }
 
 
@@ -365,7 +364,7 @@ static MACHINE_DRIVER_START( crbaloon )
 	MDRV_CPU_ADD(Z80, CRBALOON_MASTER_XTAL / 3)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(crballoon)
 

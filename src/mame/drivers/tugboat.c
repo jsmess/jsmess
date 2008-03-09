@@ -79,7 +79,7 @@ static WRITE8_HANDLER( tugboat_score_w )
       if (offset<0x8 ) tugboat_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
 }
 
-static void draw_tilemap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,
+static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,
 		int addr,int gfx0,int gfx1,int transparency)
 {
 	int x,y;
@@ -374,7 +374,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tugboat )
 	MDRV_CPU_ADD_TAG("main", M6502, 2000000)	/* 2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(tugboat_readmem,tugboat_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_START(tugboat)
 	MDRV_MACHINE_RESET(tugboat)

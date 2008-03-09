@@ -62,7 +62,7 @@ static  READ8_HANDLER ( mra_bank3) { return mra_bank(2,offset); }
 static  READ8_HANDLER ( mra_bank4) { return mra_bank(3,offset); }
 
 /* read banked memory (handle memory mapped i/o) */
-static const read8_handler mra_bank_soft[4] =
+static const read8_machine_func mra_bank_soft[4] =
 {
     mra_bank1,  /* mapped in 0000-3fff */
     mra_bank2,  /* mapped in 4000-7fff */
@@ -71,7 +71,7 @@ static const read8_handler mra_bank_soft[4] =
 };
 
 /* write banked memory (handle memory mapped i/o and videoram) */
-static const write8_handler mwa_bank_soft[4] =
+static const write8_machine_func mwa_bank_soft[4] =
 {
     mwa_bank1,  /* mapped in 0000-3fff */
     mwa_bank2,  /* mapped in 4000-7fff */
@@ -80,7 +80,7 @@ static const write8_handler mwa_bank_soft[4] =
 };
 
 /* read banked memory (plain ROM/RAM) */
-static const read8_handler mra_bank_hard[4] =
+static const read8_machine_func mra_bank_hard[4] =
 {
     MRA8_BANK1,  /* mapped in 0000-3fff */
     MRA8_BANK2,  /* mapped in 4000-7fff */
@@ -89,7 +89,7 @@ static const read8_handler mra_bank_hard[4] =
 };
 
 /* write banked memory (plain ROM/RAM) */
-static const write8_handler mwa_bank_hard[4] =
+static const write8_machine_func mwa_bank_hard[4] =
 {
     MWA8_BANK1,  /* mapped in 0000-3fff */
     MWA8_BANK2,  /* mapped in 4000-7fff */
@@ -114,7 +114,7 @@ DRIVER_INIT(laser)
 
 
 
-static void laser_machine_init(int bank_mask, int video_mask)
+static void laser_machine_init(running_machine *machine, int bank_mask, int video_mask)
 {
     int i;
 
@@ -124,25 +124,25 @@ static void laser_machine_init(int bank_mask, int video_mask)
 	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", laser_bank_mask, laser_video_bank, laser_video_bank * 0x04000);
 
 	for (i = 0; i < sizeof(laser_bank) / sizeof(laser_bank[0]); i++)
-		laser_bank_select_w(i, 0);
+		laser_bank_select_w(machine, i, 0);
 }
 
 MACHINE_RESET( laser350 )
 {
 	/* banks 0 to 3 only, optional ROM extension */
-	laser_machine_init(0xf00f, 3);
+	laser_machine_init(machine, 0xf00f, 3);
 }
 
 MACHINE_RESET( laser500 )
 {
 	/* banks 0 to 2, and 4-7 only , optional ROM extension */
-	laser_machine_init(0xf0f7, 7);
+	laser_machine_init(machine, 0xf0f7, 7);
 }
 
 MACHINE_RESET( laser700 )
 {
 	/* all banks except #3 */
-	laser_machine_init(0xfff7, 7);
+	laser_machine_init(machine, 0xfff7, 7);
 }
 
 
@@ -153,8 +153,8 @@ WRITE8_HANDLER( laser_bank_select_w )
         "RAM #0","RAM #1","RAM #2","RAM #3",
         "RAM #4","RAM #5","RAM #6","RAM #7/Video RAM hi",
         "ext ROM #0","ext ROM #1","ext ROM #2","ext ROM #3"};
-	read8_handler read_handler;
-	write8_handler write_handler;
+	read8_machine_func read_handler;
+	write8_machine_func write_handler;
 
 	offset %= 4;
     data &= 15;

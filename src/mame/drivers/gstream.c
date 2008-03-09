@@ -166,10 +166,10 @@ static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION(REGION_USER1,0) // boot rom
 ADDRESS_MAP_END
 
-static READ32_HANDLER( gstream_oki_0_r ) { return OKIM6295_status_0_r(0); }
-static READ32_HANDLER( gstream_oki_1_r ) { return OKIM6295_status_1_r(0); }
-static WRITE32_HANDLER( gstream_oki_0_w ) { OKIM6295_data_0_w(0, data & 0xff); }
-static WRITE32_HANDLER( gstream_oki_1_w ) { OKIM6295_data_1_w(0, data & 0xff); }
+static READ32_HANDLER( gstream_oki_0_r ) { return OKIM6295_status_0_r(machine, 0); }
+static READ32_HANDLER( gstream_oki_1_r ) { return OKIM6295_status_1_r(machine, 0); }
+static WRITE32_HANDLER( gstream_oki_0_w ) { OKIM6295_data_0_w(machine, 0, data & 0xff); }
+static WRITE32_HANDLER( gstream_oki_1_w ) { OKIM6295_data_1_w(machine, 0, data & 0xff); }
 
 static WRITE32_HANDLER( gstream_oki_4030_w )
 {
@@ -389,7 +389,7 @@ static MACHINE_DRIVER_START( gstream )
 	MDRV_CPU_ADD_TAG("main", E132XT, 16000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(gstream_32bit_map,0)
 	MDRV_CPU_IO_MAP(gstream_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

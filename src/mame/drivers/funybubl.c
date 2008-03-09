@@ -80,8 +80,8 @@ static WRITE8_HANDLER ( funybubl_cpurombank_w )
 
 static WRITE8_HANDLER( funybubl_soundcommand_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,0, HOLD_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( funybubl_oki_bank_sw )
@@ -248,7 +248,7 @@ static MACHINE_DRIVER_START( funybubl )
 	MDRV_CPU_ADD(Z80,12000000/2)		 /* 6 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)		 /* 4 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(soundreadmem,soundwritemem)

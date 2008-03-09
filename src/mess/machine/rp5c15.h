@@ -50,7 +50,7 @@ struct rp5c15
 	int pulse_count;
 	int pulse1_state;
 	int pulse16_state;
-	void (*timer_callback)(int state);
+	void (*timer_fired_func)(int state);
 	void (*alarm_callback)(int state);
 };  //  Ricoh RP5C15
 

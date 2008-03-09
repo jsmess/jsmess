@@ -94,22 +94,22 @@ WRITE8_HANDLER( dooyong_fg2scroll8_w )
 
 WRITE16_HANDLER( dooyong_bgscroll16_w )
 {
-	if (ACCESSING_LSB) dooyong_bgscroll8_w(offset, data & 0x00ff);
+	if (ACCESSING_LSB) dooyong_bgscroll8_w(machine, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_bg2scroll16_w )
 {
-	if (ACCESSING_LSB) dooyong_bg2scroll8_w(offset, data & 0x00ff);
+	if (ACCESSING_LSB) dooyong_bg2scroll8_w(machine, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_fgscroll16_w )
 {
-	if (ACCESSING_LSB) dooyong_fgscroll8_w(offset, data & 0x00ff);
+	if (ACCESSING_LSB) dooyong_fgscroll8_w(machine, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_fg2scroll16_w )
 {
-	if (ACCESSING_LSB) dooyong_fg2scroll8_w(offset, data & 0x00ff);
+	if (ACCESSING_LSB) dooyong_fg2scroll8_w(machine, offset, data & 0x00ff);
 }
 
 
@@ -344,7 +344,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pollux_extensions)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pollux_extensions)
 {
 	/* Sprites take 32 bytes each in memory:
                      MSB   LSB
@@ -434,7 +434,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-static void rshark_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void rshark_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* Sprites take 8 16-bit words each in memory:
                   MSB             LSB
@@ -866,10 +866,10 @@ VIDEO_START( popbingo )
 
 VIDEO_EOF( dooyong )
 {
-	buffer_spriteram_w(0, 0);
+	buffer_spriteram_w(machine, 0, 0);
 }
 
 VIDEO_EOF( rshark )
 {
-	buffer_spriteram16_w(0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0);
 }

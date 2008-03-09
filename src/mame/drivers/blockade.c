@@ -67,7 +67,7 @@ static INTERRUPT_GEN( blockade_interrupt )
 {
 	cpunum_resume(0, SUSPEND_ANY_REASON);
 
-	if ((input_port_0_r(0) & 0x80) == 0)
+	if ((input_port_0_r(machine,0) & 0x80) == 0)
 	{
 		just_been_reset = 1;
 		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
@@ -78,7 +78,7 @@ static READ8_HANDLER( blockade_input_port_0_r )
 {
     /* coin latch is bit 7 */
 
-    UINT8 temp = (input_port_0_r(0)&0x7f);
+    UINT8 temp = (input_port_0_r(machine,0)&0x7f);
     return (coin_latch<<7) | (temp);
 }
 
@@ -458,7 +458,7 @@ static MACHINE_DRIVER_START( blockade )
 	MDRV_CPU_ADD(8080, 2079000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(blockade_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", blockade_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

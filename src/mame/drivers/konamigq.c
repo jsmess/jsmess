@@ -225,11 +225,11 @@ static READ16_HANDLER( dual539_r )
 	data = 0;
 	if( ACCESSING_LSB16 )
 	{
-		data |= K054539_1_r( offset );
+		data |= K054539_1_r( machine, offset );
 	}
 	if( ACCESSING_MSB16 )
 	{
-		data |= K054539_0_r( offset ) << 8;
+		data |= K054539_0_r( machine, offset ) << 8;
 	}
 	return data;
 }
@@ -238,11 +238,11 @@ static WRITE16_HANDLER( dual539_w )
 {
 	if( ACCESSING_LSB16 )
 	{
-		K054539_1_w( offset, data );
+		K054539_1_w( machine, offset, data );
 	}
 	if( ACCESSING_MSB16 )
 	{
-		K054539_0_w( offset, data >> 8 );
+		K054539_0_w( machine, offset, data >> 8 );
 	}
 }
 
@@ -376,7 +376,7 @@ static MACHINE_DRIVER_START( konamigq )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigq_map, 0 )
-	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
 	MDRV_CPU_ADD_TAG( "sound", M68000, 8000000 )
 	/* audio CPU */

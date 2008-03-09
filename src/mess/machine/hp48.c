@@ -68,7 +68,7 @@ static struct {
 // to do support weired comparator settings
 static void hp48_config(void)
 {
-	static const read8_handler read_handlers[11] = { 0, MRA8_BANK1, MRA8_BANK2, MRA8_BANK3, MRA8_BANK4, MRA8_BANK5, MRA8_BANK6, MRA8_BANK7, MRA8_BANK8, MRA8_BANK9, MRA8_BANK10 };
+	static const read8_machine_func read_handlers[11] = { 0, MRA8_BANK1, MRA8_BANK2, MRA8_BANK3, MRA8_BANK4, MRA8_BANK5, MRA8_BANK6, MRA8_BANK7, MRA8_BANK8, MRA8_BANK9, MRA8_BANK10 };
 	int i, begin_bank, end_bank, begin, end, mem_type, bank;
 
 	/* Determine the current memory map */
@@ -151,7 +151,7 @@ WRITE8_HANDLER( hp48_mem_w ) {
 
 	/* Check for write to HDW */
 	if ( hp48s.mem[HDW].adr != -1 && offset >= hp48s.mem[HDW].adr && offset < hp48s.mem[HDW].adr + 0x40 ) {
-		hp48_write( offset & 0x3F, data );
+		hp48_write( machine, offset & 0x3F, data );
 	} else {
 		switch( hp48_banks[bank].type ) {
 		case HP48_RAM:
@@ -500,15 +500,15 @@ int hp48_in(void)
 		if (KEY_PLUS) data|=1;
 	}
 #else
-	if (out&0x100) data|=input_port_0_r(0);
-	if (out&0x080) data|=input_port_1_r(0);
-	if (out&0x040) data|=input_port_2_r(0);
-	if (out&0x020) data|=input_port_3_r(0);
-	if (out&0x010) data|=input_port_4_r(0);
-	if (out&0x008) data|=input_port_5_r(0);
-	if (out&0x004) data|=input_port_6_r(0);
-	if (out&0x002) data|=input_port_7_r(0);
-	if (out&0x001) data|=input_port_8_r(0);
+	if (out&0x100) data|=readinputport(0);
+	if (out&0x080) data|=readinputport(1);
+	if (out&0x040) data|=readinputport(2);
+	if (out&0x020) data|=readinputport(3);
+	if (out&0x010) data|=readinputport(4);
+	if (out&0x008) data|=readinputport(5);
+	if (out&0x004) data|=readinputport(6);
+	if (out&0x002) data|=readinputport(7);
+	if (out&0x001) data|=readinputport(8);
 #endif
 	return data;
 }

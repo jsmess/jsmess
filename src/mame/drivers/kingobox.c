@@ -61,21 +61,21 @@ static WRITE8_HANDLER( sprite_shared_w ) {
 }
 
 static WRITE8_HANDLER( video_interrupt_w ) {
-	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
 }
 
 static WRITE8_HANDLER( sprite_interrupt_w ) {
-	cpunum_set_input_line_and_vector(Machine, 2, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(machine, 2, 0, HOLD_LINE, 0xff );
 }
 
 static WRITE8_HANDLER( scroll_interrupt_w ) {
-	sprite_interrupt_w( offset, data );
+	sprite_interrupt_w( machine, offset, data );
 	*kingofb_scroll_y = data;
 }
 
 static WRITE8_HANDLER( sound_command_w ) {
-	soundlatch_w( 0, data );
-	cpunum_set_input_line_and_vector(Machine, 3, 0, HOLD_LINE, 0xff );
+	soundlatch_w( machine, 0, data );
+	cpunum_set_input_line_and_vector(machine, 3, 0, HOLD_LINE, 0xff );
 }
 
 
@@ -553,15 +553,15 @@ static MACHINE_DRIVER_START( kingofb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
-	MDRV_CPU_VBLANK_INT(kingofb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(video_readmem,video_writemem)
-	MDRV_CPU_VBLANK_INT(kingofb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sprite_readmem,sprite_writemem)
-	MDRV_CPU_VBLANK_INT(kingofb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */        /* 4.0 MHz */
@@ -604,15 +604,15 @@ static MACHINE_DRIVER_START( ringking )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(rk_main_readmem,rk_main_writemem)
-	MDRV_CPU_VBLANK_INT(kingofb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(rk_video_readmem,rk_video_writemem)
-	MDRV_CPU_VBLANK_INT(kingofb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(rk_sprite_readmem,rk_sprite_writemem)
-	MDRV_CPU_VBLANK_INT(kingofb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */        /* 4.0 MHz */

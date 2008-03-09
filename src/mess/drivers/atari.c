@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "devices/cartslot.h"
@@ -735,7 +736,7 @@ static MACHINE_DRIVER_START( a400 )
 
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(a400_mem, 0)
-	MDRV_CPU_VBLANK_INT(a400_interrupt, TOTAL_LINES_60HZ)
+	MDRV_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_60HZ)
 
 	MDRV_MACHINE_START( a400 )
 
@@ -750,7 +751,7 @@ static MACHINE_DRIVER_START( a400pal )
 
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(a400_mem, 0)
-	MDRV_CPU_VBLANK_INT(a400_interrupt, TOTAL_LINES_50HZ)
+	MDRV_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_50HZ)
 
 	MDRV_MACHINE_START( a400 )
 
@@ -765,7 +766,7 @@ static MACHINE_DRIVER_START( a800 )
 
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(a800_mem, 0)
-	MDRV_CPU_VBLANK_INT(a800_interrupt, TOTAL_LINES_60HZ)
+	MDRV_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_60HZ)
 
 	MDRV_MACHINE_START( a800 )
 
@@ -780,7 +781,7 @@ static MACHINE_DRIVER_START( a800pal )
 
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(a800_mem, 0)
-	MDRV_CPU_VBLANK_INT(a800_interrupt, TOTAL_LINES_50HZ)
+	MDRV_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_50HZ)
 
 	MDRV_MACHINE_START( a800 )
 
@@ -795,7 +796,7 @@ static MACHINE_DRIVER_START( a800xl )
 
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(a800xl_mem, 0)
-	MDRV_CPU_VBLANK_INT(a800xl_interrupt, TOTAL_LINES_60HZ)
+	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
 
 	MDRV_MACHINE_START( a800xl )
 
@@ -810,7 +811,7 @@ static MACHINE_DRIVER_START( a5200 )
 
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(a5200_mem, 0)
-	MDRV_CPU_VBLANK_INT(a5200_interrupt, TOTAL_LINES_60HZ)
+	MDRV_CPU_VBLANK_INT_HACK(a5200_interrupt, TOTAL_LINES_60HZ)
 
 	MDRV_MACHINE_START( a5200 )
 

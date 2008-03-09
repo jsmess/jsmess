@@ -126,6 +126,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "exidy.h"
 #include "targ.h"
 #include "machine/6821pia.h"
@@ -782,7 +783,7 @@ static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, EXIDY_CPU_CLOCK)
-	MDRV_CPU_VBLANK_INT(exidy_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", exidy_vblank_interrupt)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -862,7 +863,7 @@ static MACHINE_DRIVER_START( teetert )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(venture)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(teetert_vblank_interrupt,10)
+	MDRV_CPU_VBLANK_INT_HACK(teetert_vblank_interrupt,10)
 MACHINE_DRIVER_END
 
 
@@ -1412,7 +1413,7 @@ static DRIVER_INIT( fax )
 	exidy_video_config(0x04, 0x04, TRUE);
 
 	/* reset the ROM bank */
-	fax_bank_select_w(0,0);
+	fax_bank_select_w(machine,0,0);
 }
 
 
