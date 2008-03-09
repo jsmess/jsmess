@@ -11,18 +11,6 @@
 
 #define ORAO_VIDEO_MEMORY		0x6000
   
- 
-const rgb_t orao_palette[2] =
-{
-	MAKE_RGB(0x00, 0x00, 0x00),		/* Black */
-	MAKE_RGB(0xff, 0xff, 0xff)		/* White */
-};
-
-PALETTE_INIT( orao )
-{
-	palette_set_colors(machine, 0, orao_palette, ARRAY_LENGTH(orao_palette));
-}
-
 VIDEO_START( orao )
 {
 }

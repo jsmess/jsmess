@@ -19,7 +19,6 @@ extern WRITE8_HANDLER( ut88_sound_w );
 
 /*----------- defined in video/ut88.c -----------*/
 
-extern const rgb_t ut88_palette[2*3];
 extern const gfx_layout ut88_charlayout;
 
 extern PALETTE_INIT( ut88 );

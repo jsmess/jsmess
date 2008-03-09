@@ -12,17 +12,6 @@
   
 #define GALEB_VIDEO_MEMORY		0xB000  
     
-const rgb_t galeb_palette[2] =
-{
-	MAKE_RGB(0x00, 0x00, 0x00),		/* Black */
-	MAKE_RGB(0xff, 0xff, 0xff)		/* White */
-};
-
-PALETTE_INIT( galeb )
-{
-	palette_set_colors(machine, 0, galeb_palette, ARRAY_LENGTH(galeb_palette));
-}
-
 const gfx_layout galeb_charlayout =
 {
 	8, 8,				/* 8x8 characters */

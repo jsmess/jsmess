@@ -11,17 +11,6 @@
   
 #define UT88_VIDEO_MEMORY		0xE800  
     
-const rgb_t ut88_palette[2] =
-{
-	MAKE_RGB(0x00, 0x00, 0x00),		/* Black */
-	MAKE_RGB(0xff, 0xff, 0xff)		/* White */
-};
-
-PALETTE_INIT( ut88 )
-{
-	palette_set_colors(machine, 0, ut88_palette, ARRAY_LENGTH(ut88_palette));
-}
-
 const gfx_layout ut88_charlayout =
 {
 	8, 8,				/* 8x8 characters */

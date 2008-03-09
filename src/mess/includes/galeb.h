@@ -18,7 +18,6 @@ extern WRITE8_HANDLER( galeb_speaker_w );
 
 /*----------- defined in video/galeb.c -----------*/
 
-extern const rgb_t galeb_palette[2*3];
 extern const gfx_layout galeb_charlayout;
 
 extern PALETTE_INIT( galeb );
