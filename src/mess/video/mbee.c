@@ -48,7 +48,6 @@ static int m6545_color_bank = 0;
 static int m6545_video_bank = 0;
 static int mbee_pcg_color_latch = 0;
 
-char mbee_frame_message[128+1];
 int mbee_frame_counter;
 
 
@@ -323,7 +322,7 @@ WRITE8_HANDLER ( m6545_index_w )
 
 WRITE8_HANDLER ( m6545_data_w )
 {
-	int addr;
+	int addr, i;
 
     switch( crt.idx )
 	{
@@ -419,6 +418,10 @@ WRITE8_HANDLER ( m6545_data_w )
 			break;
 		update_all = 1;
 		crt.screen_address_hi = data;
+		addr = 0x17000+((data & 32) << 6);
+		memcpy(memory_region(REGION_CPU1)+0xf000, memory_region(REGION_CPU1)+addr, 0x800);
+		for (i = 0; i < 128; i++)
+				decodechar(Machine->gfx[0],i, pcgram);
 		logerror("6545 screen address hi       $%02X\n", data);
         break;
 	case 13:
@@ -477,22 +480,12 @@ VIDEO_START( mbee )
 {
 	videoram = auto_malloc(0x800);
 	colorram = auto_malloc(0x800);
+	pcgram = memory_region(REGION_CPU1)+0xf000;
 }
 
 VIDEO_UPDATE( mbee )
 {
 	int offs, cursor, screen_;
-	int full_refresh = 1;
-
-	if( mbee_frame_counter > 0 )
-	{
-		if( --mbee_frame_counter == 0 )
-			full_refresh = 1;
-		else
-		{
-			popmessage("%s", mbee_frame_message);
-		}
-    }
 
 	for( offs = 0x000; offs < 0x380; offs += 0x10 )
 		keyboard_matrix_r(offs);
@@ -500,7 +493,7 @@ VIDEO_UPDATE( mbee )
 	framecnt++;
 
 	cursor = crt.cursor_address_hi * 256 + crt.cursor_address_lo;
-	screen_ = crt.screen_address_hi * 256 + crt.screen_address_lo;
+	screen_ = (crt.screen_address_hi & 7) * 256 + crt.screen_address_lo;
 	for( offs = screen_; offs < crt.horizontal_displayed * crt.vertical_displayed + screen_; offs++ )
 	{
 		int sx, sy, code, color;
@@ -524,7 +517,7 @@ VIDEO_UPDATE( mbee )
 						*BITMAP_ADDR16(bitmap, sy+y, sx+x) = machine->pens[5]; //[color];
 				}
 			}
-        }
+		}
 	}
 	return 0;
 }

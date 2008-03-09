@@ -22,9 +22,13 @@ System Driver Changes:
 
 - [GAMEBOY] Added support for Korean MBC1 mapper variant.  [Wilbert Pol]
 
-- [MBEE] Fixed colours and sound. [Robbbert]
+- [MBEE] Fixed colours, sound, Inverse and Underline modes. Enabled alternate
+  characters. [Robbbert]
 
 - [QL] System boots up again. (bug #1495) [Curt Coder]
+
+- [TRS80] Fixed an issue with I/O ports. Fixed 32 character display. Decoded
+  LNW-80 characters. [Robbbert]
 
 - [VC4000] Cleaned up, added quickload and fixed colors.  (bug #1404) [Manfred
   Schneider]
