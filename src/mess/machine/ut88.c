@@ -19,15 +19,9 @@ DRIVER_INIT(ut88)
 {
 }
 
-static TIMER_CALLBACK(ut88_bootstrap_callback)
-{
-	cpunum_set_reg(0, I8080_PC, 0xF800);
-}
-
 MACHINE_RESET( ut88 )
 {
 	ut88_keyboard_line = 0;
-	timer_set(attotime_zero, NULL, 0, ut88_bootstrap_callback);	
 }
 
 

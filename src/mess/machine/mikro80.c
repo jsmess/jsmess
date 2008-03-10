@@ -18,15 +18,9 @@ DRIVER_INIT(mikro80)
 {
 }
 
-static TIMER_CALLBACK(mikro80_bootstrap_callback)
-{
-	cpunum_set_reg(0, I8080_PC, 0xF800);
-}
-
 MACHINE_RESET( mikro80 )
 {
 	mikro80_keyboard_line = 0;
-	timer_set(attotime_zero, NULL, 0, mikro80_bootstrap_callback);	
 }
 
 
