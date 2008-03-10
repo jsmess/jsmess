@@ -62,7 +62,6 @@
     - ABC806 memory banking
     - proper port mirroring
     - COM port DIP switch
-    - HR graphics board
     - floppy controller board
     - Facit DTC (recased ABC-800?)
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
@@ -583,7 +582,7 @@ static WRITE8_HANDLER( abc802_dart_rts_w )
 {
 	if (offset == 1)
 	{
-//		abc802_set_columns(data ? 40 : 80);
+		abc802_mux80_40_w(BIT(data, 0));
 	}
 }
 
@@ -863,12 +862,13 @@ ROM_START( abc806 )
 	ROM_LOAD( "abct6-11.7c",   0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) ) // 6490243-01
 
 	ROM_REGION( 0x400, REGION_PROMS, 0 )
-	ROM_LOAD( "abcp3-11.1b", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
-	ROM_LOAD( "abcp4-11.2d", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
-	ROM_LOAD( "rad.9b",		 0x0000, 0x0400, NO_DUMP ) // 7621/7643 == 82S131/82S137
-	ROM_LOAD( "atthand.11c", 0x0000, 0x0400, NO_DUMP ) // 40033A
-	ROM_LOAD( "hrui.6e",	 0x0000, 0x0400, NO_DUMP ) // 7603 == 82S123
-	ROM_LOAD( "v5o.7e",		 0x0000, 0x0400, NO_DUMP ) // 7621 == 82S131
+	ROM_LOAD( "rad.9b",		 0x0000, 0x0400, NO_DUMP ) // 7621/7643 (82S131/82S137)
+	ROM_LOAD( "atthand.11c", 0x0000, 0x0400, NO_DUMP ) // 40033A (?)
+	ROM_LOAD( "hrui.6e",	 0x0000, 0x0400, NO_DUMP ) // 7603 (82S123)
+	ROM_LOAD( "hru11.12g",	 0x0000, 0x0400, NO_DUMP ) // 7621 (82S131)
+	ROM_LOAD( "v50.7e",		 0x0000, 0x0400, NO_DUMP ) // 7621 (82S131)
+	ROM_LOAD( "abcp3-11.1a", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
+	ROM_LOAD( "abcp4-11.2d", 0x0000, 0x0400, NO_DUMP ) // PAL16L8
 ROM_END
 
 /* System Configuration */
