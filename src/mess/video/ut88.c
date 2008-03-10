@@ -1,6 +1,6 @@
 /***************************************************************************
 
-		Galeb video driver by Miodrag Milanovic
+		UT88 video driver by Miodrag Milanovic
 
 		06/03/2008 Preliminary driver.
 		     

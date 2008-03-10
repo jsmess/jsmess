@@ -21,7 +21,6 @@ extern WRITE8_HANDLER( ut88_sound_w );
 
 extern const gfx_layout ut88_charlayout;
 
-extern PALETTE_INIT( ut88 );
 extern VIDEO_START( ut88 );
 extern VIDEO_UPDATE( ut88 );
 
