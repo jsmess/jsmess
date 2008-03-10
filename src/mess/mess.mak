@@ -427,6 +427,7 @@ DRVLIBS = \
 	$(MESSOBJ)/exeltel.a \
 	$(MESSOBJ)/gmaster.a \
 	$(MESSOBJ)/ut88.a \
+	$(MESSOBJ)/mikro80.a \
 
 
 
@@ -1184,7 +1185,12 @@ $(MESSOBJ)/ut88.a:      \
 	$(MESS_DRIVERS)/ut88.o \
 	$(MESS_MACHINE)/ut88.o \
 	$(MESS_VIDEO)/ut88.o \
- 
+
+$(MESSOBJ)/mikro80.a:      \
+	$(MESS_DRIVERS)/mikro80.o \
+	$(MESS_MACHINE)/mikro80.o \
+	$(MESS_VIDEO)/mikro80.o \
+
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------

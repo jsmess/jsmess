@@ -840,6 +840,9 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	/* UT-88 */
 	DRIVER( ut88 )	
 
+	/* Mikro-80 */
+	DRIVER( mikro80 )	
+	
 /****************Games*******************************************************/
 	/* Computer Electronic */
 	DRIVER( mk1 )		/* Chess Champion MK I								*/
