@@ -7,9 +7,8 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-#include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
+#include "cpu/z80/z80.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -78,6 +77,5 @@ INTERRUPT_GEN( astrocade_interrupt )
 WRITE8_HANDLER( astrocade_interrupt_vector_w )
 {
 	cpunum_set_input_line_vector(0, 0, data);
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
-
