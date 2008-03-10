@@ -19,10 +19,10 @@
 void mess_display_help(void)
 {
 	mame_printf_info(
-		"M.E.S.S. v%s\n"
-		"Multiple Emulation Super System - Copyright (C) 1997-2007 by the MESS Team\n"
-		"M.E.S.S. is based on the ever excellent M.A.M.E. Source code\n"
-		"Copyright (C) 1997-2007 by Nicola Salmoria and the MAME Team\n\n",
+		"MESS v%s\n"
+		"Multi Emulator Super System - Copyright (C) 1997-2008 by the MESS Team\n"
+		"MESS is based on MAME Source code\n"
+		"Copyright (C) 1997-2008 by Nicola Salmoria and the MAME Team\n\n",
 		build_version);
 	mame_printf_info("%s\n", mess_disclaimer);
 	mame_printf_info(
