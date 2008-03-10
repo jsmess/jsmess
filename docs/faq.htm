@@ -35,8 +35,9 @@
 <li><a href="#s04">Okay, I got some BIOSes and images, now where do I put them?</a></li>
 <li><a href="#s05">How do I run the MESS application?</a></li>
 <li><a href="#s06">I did everything just like you said, but it still doesn't work!</a></li>
-<li><a href="#s07">It works, but it is way too slow!</a></li>
-<li><a href="#s08">For some reason, ESC does not quit MESS nor does TAB bring up the menu!</a></li>
+<li><a href="#s07">It works, but why is it slow?</a></li>
+<li><a href="#s08">How can I speed MESS up?<h2></li>
+<li><a href="#s09">For some reason, ESC does not quit MESS nor does TAB bring up the menu!</a></li>
 </ul>
 <h2>How Do I...</h2>
 <ul>
@@ -56,7 +57,7 @@
 <p>This FAQ was written to support <a href="http://www.mess.org/">MESS</a>. If you have any changes, suggestions or additions please contact the <a href="http://www.mess.org/">MESS</a> team. Changes will be made as time is available. If you have a question that is not answered in this FAQ, try the searching the <a href="http://www.mess.org/">MESS</a> message boards. There is a wealth of
 information there already.</p>
 <h2 id="g01">What is MESS?</h2>
-<p><a href="http://www.mess.org/">MESS</a> is an acronym that stands for Multiple Emulator Super System. <a href="http://www.mess.org/">MESS</a> will more or less faithfully reproduce computer and console systems on a PC. <a href="http://www.mess.org/">MESS</a> can currently emulate over 250 systems from the last 5 decades.</p>
+<p><a href="http://www.mess.org/">MESS</a> is an acronym that stands for Multi Emulator Super System. <a href="http://www.mess.org/">MESS</a> will more or less faithfully reproduce computer and console systems on a PC. <a href="http://www.mess.org/">MESS</a> can currently emulate over 250 systems from the last 5 decades.</p>
 <p><a href="http://www.mess.org/">MESS</a> emulates the hardware of the systems and sometimes utilizes ROM images to load programs and games. Therefore, these systems are NOT simulations, but the actual emulations of the hardware.</p>
 <h2 id="g02">What is the purpose of MESS?</h2>
 <p>The primary purpose of <a href="http://www.mess.org/">MESS</a> is to preserve decades of computer and console history. As technology continues to rush forward, <a href="http://www.mess.org/">MESS</a> prevents these important "vintage" systems from being lost and forgotten. <a href="http://www.mess.org/">MESS</a> is based on <a href="http://www.mame.net/">MAME</a> . Additional information about
@@ -103,8 +104,7 @@ process on the various <a href="http://www.mess.org/">MESS</a> drivers.</p>
 <li>The ROM chips within a computer system, that usually contain some form of BASIC or the like</li>
 <li>The ROM chips within a game cartridge for a console system</li>
 </ol>
-<p>
-    In <a href="http://www.mess.org/">MESS</a>, #1 are also termed as "BIOS", after what they are typically called in Intel PC systems. The term "cartridge image" is used to refer to #2, where "image" is a generic term that applies to downloaded images of removable media, whether they be a cartridge, a floppy drive, or a hard
+<p>In <a href="http://www.mess.org/">MESS</a>, #1 are also termed as "BIOS", after what they are typically called in Intel PC systems. The term "cartridge image" is used to refer to #2, where "image" is a generic term that applies to downloaded images of removable media, whether they be a cartridge, a floppy drive, or a hard
 disk.</p>
 <h2 id="s03">Where do I get BIOSes/ROMs?/How do I use my old software with MESS?</h2>
 <p>In most cases, old software is physically incompatible with modern computers. No matter how hard you push, an Atari cartridge just plain won't fit in your computer's floppy drive. Folding up old 5 1/4" diskettes so they fit in a 3 1/2" drive will only break your disks. Obviously there is a problem here - how do I get that software into my PC so an emulator can use it?</p>
@@ -126,16 +126,21 @@ mess nes -cart C:\ROMs\NES\zelda.nes -nosound
 <p>There is a message board you can go to for help at <a href="http://www.mess.org/">http://www.mess.org</a>. But first, make sure you read this FAQ and the rest of the documentation. The answers can often be found there. Also check out the <a href="http://www.mame.net/">MAME</a> FAQ at <a href="http://www.mame.net/">http://www.mame.net</a> --it is a very good resource for things common to
 <a href="http://www.mame.net/">MAME</a> and <a href="http://www.mess.org/">MESS</a>, such as sound and graphics setup. Also search through the message board to see if somebody already had the same problem. And at least put some effort into fixing it yourself. People on message boards can get very annoyed with people who ask questions that have already been answered elsewhere, especially in
 readme.txt and mess.txt.</p>
-<h2 id="s07">It works, but it is way too slow!</h2>
-<p>Because of <a href="http://www.mess.org/">MESS</a>' goal of compatibility over speed, this is often the case. You might think that your computer should be able to emulate such old machines at full speed, but keep in mind that <a href="http://www.mess.org/">MESS</a> is not performing any shortcuts in the emulation such as those performed by HLE emulators. Many other emulators perform shortcuts
-that sacrifice compatibility in favor of performance, which is a valid tradeoff given a different set of design goals. With <a href="http://www.mess.org/">MESS</a>, your CPU is doing the jobs of the CPU(s), graphics chip(s), sound chip(s), as well as any other special hardware present in the original machine, so it can be bogged down fairly easily, especially by the relatively unoptimized
-<a href="http://www.mess.org/">MESS</a> core. <a href="http://www.mess.org/">MESS</a> is written almost entirely in C, not assembly, for compatibility and portability reasons. Additionally, there is a level of overhead required to get the level of modularity that it takes to have the myriad components in the emulation be usable across a broad set of drivers. There are some tweaks you can do to
-speed up the performance a bit (see the <a href="http://www.mame.net/">MAME</a> FAQ), but if you need a big boost, there is not much you can do except buy a faster computer, wait for an update (not likely), or use another emulator.</p>
-<h2 id="s08">For some reason, ESC does not quit MESS nor does TAB bring up the menu!</h2>
+
+<h2 id="s07">It works, but why is it slow?</h2>
+
+<p><a href="http://www.mess.org/">MESS</a>' goal is compatibility over speed. Some computers might not be able to provide the needed power for full speed emulation. Many other emulators perform shortcuts that sacrifice compatibility in favor of performance, which is a valid tradeoff given a different set of design goals. With MESS, your CPU is doing the jobs of the CPU(s), graphics chip(s), sound chip(s), as well as any other special hardware present in the original machine, so it can be bogged down fairly easily, especially by the relatively unoptimized MESS core. MESS is written almost entirely in C, not assembly, for compatibility and portability reasons. Additionally, there is a level of overhead required to get the level of modularity that it takes to have the myriad components in the emulation be usable across a broad set of drivers.</p>
+
+<h2 id="s08">How can I speed MESS up?</h2>
+
+<p>There are some tweaks you can do to speed up the performance a bit (see the <a href="http://www.mame.net/">MAME</a> FAQ), but if you need a big boost, there is not much you can do except buy a faster computer. Some speed issues can be solved by selecting an appropriate display method. Refer to CONFIG.TXT to set MESS to run in the windowed mode and in the lowest resolution available. If it runs at a good speed systematically try different video options (e.g. resolution, yuvmode etc.) for the fullscreen mode until you get a satisfying result. As computers differ a lot in their graphical capabilities, there is no "best" configuration for all systems. You will have to find the best one for your system yourself.</p>
+
+<h2 id="s09">For some reason, ESC does not quit MESS nor does TAB bring up the menu!</h2>
+
 <p>In <a href="http://www.mess.org/">MESS</a> for Win32, there are two UIs use at runtime. There is the "Classic UI" which is derived from <a href="http://www.mame.net/">MAME</a>'s UI, and there is the "New UI" which uses a standard Windows menu bar to operate the emulation. By default, the New UI is enabled. However, some people prefer to use the older UI. This can be done in one of two
 ways.</p>
 <ol>
-<li>When running the <a href="http://www.mess.org/">MESS</a> GUI (messgui.exe), choose "Options --&gt; Default System Options --&gt; Miscellaneous Tab" and uncheck the "Use New UI" checkbox.</li>
+<li>When running the MESS GUI (messui.exe), choose "Options --&gt; Default System Options --&gt; Miscellaneous Tab" and uncheck the "Use New UI" checkbox.</li>
 <li>If it exists, edit mess.ini and change the "newui" setting to "0". For more details on mess.ini, consult <a href="windows/win32cmd.htm">Using MESS at the Command Line</a></li>
 </ol>
 <h2 id="h01">How do I set up the screenshots/snapshots folder for MESS?</h2>
@@ -169,9 +174,8 @@ to&nbsp;<a href="http://www.mess.org/">MESS</a>&nbsp;<strong>should be accompani
 For details on what these mean, it is probably best to ask about them on the <a href="http://www.mess.org/">MESS</a> message board.
 <p>If you do not have programming skills, you can help by documenting emulated systems and software, adding FAQ entries, reporting bugs, submitting artwork and so on - anything to assist those with programming skills and improve the project.</p>
 <h2 id="t01">I have found a bug; what can I do to help the MESS developers fix it?</h2>
-<p>If you are comfortable programming C, you can download the <a href="http://www.mess.org/">MESS</a> source code and attempt to fix it yourself. If you have questions about the <a href="http://www.mess.org/">MESS</a> source, you can ask them on the <a href="http://www.mess.org/">MESS</a> message board.</p>
-<p>If you are not comfortable programming C, the best thing for you to do is to create a reproducible case and report it at <a href="http://bugzilla.mess.org">MESS Bugzilla</a>. When reporting a bug, be sure to keep in mind that <a href="http://www.mess.org/">MESS</a> is a multiple emulation system, and the reader of your bug report might not be intimately familiar with the system that you are
-using. In other words, if you find a bug in the WowieZowie driver, do not expect the reader of the bug report to know the command for loading a file on WowieZowieOS. If a bug report contains a concrete reproducible case that is understandable even to someone not familiar with that system, it is much more likely to be fixed. Alternatively, if a bug was not present in an earlier <a href="http://www.mess.org/">MESS</a> version, it helps greatly to identify which <a href="http://www.mess.org/">MESS</a> version introduced the bug.</p>
+<p>If you are comfortable programming C, you can download the <a href="http://www.mess.org/">MESS</a> source code and attempt to fix it yourself. If you have questions about the MESS source, ask them on the MESS message board.</p>
+<p>If you are not comfortable programming C, the best thing for you to do is to create a bug report at <a href="http://bugzilla.mess.org">MESS Bugzilla</a>. When reporting a bug, make sure to include as much information as possible, including snapshots, links, descriptions, and instructions. Keep in mind that MESS emulates hundreds of systems and the reader may not be familiar with the system or driver you are reporting a bug in. A bug report with simple, clear instructions and a reproducible case is much more likely to get fixed. Also, if you know a previous version of MESS that worked correctly please include that information.</p>
 <h2 id="t02">My English is not good. I do not understand!</h2>
 <p>If you ask for help on the message board, post it in both English and your native language. Many people there speak more than one language and may be able to help you in your native language. Also, visit <a href="http://babelfish.altavista.com">http://babelfish.altavista.com</a>. They have a translation program that can translate between English and most European languages as well as a number
 of other languages. Also look at the <a href="http://www.mame.net/">MAME</a> FAQ at <a href="http://www.mame.net">http://www.mame.net</a>. It is in many different languages, including Greek, Serbian, Romanian, Norwegian, Danish, Hebrew, Czech, Dutch, French, Italian, Korean, Japanese, Chinese, German, Portuguese, Spanish and Finnish.</p>
