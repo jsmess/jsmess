@@ -11,6 +11,8 @@ New System Drivers Supported (in no particular order):
 - UT-88 [Miodrag Milanovic]
 - Hartung/Watara/Virella/Videojet/... Game Master [PeT]
 
+
+
 System Driver Changes:
 ----------------------
 - [ABC80x] Updated to use the new MAME MC6845 code. [Curt Coder]
@@ -18,6 +20,9 @@ System Driver Changes:
 - [APFM1000] Added special APF video mode [PeT]
 
 - [APPLE2] Removed usage of tilemaps.  [Nate Woods]
+
+- [ASTROCDE] Added controls for player 3 and 4 and improved analog controls.
+  [ranger_lennier]
 
 - [GALAXY] Fixed regressions.  [Miodrag Milanovic]
 
@@ -35,6 +40,7 @@ System Driver Changes:
   Schneider]
 
 - [SVISION] Watara TV-Link PAL activated [PeT]
+
 
 
 User Interface Changes:
