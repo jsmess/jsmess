@@ -10,8 +10,6 @@
 
 /*----------- defined in machine/astrocde.c -----------*/
 
-DEVICE_LOAD(astrocade_rom);
-
 extern WRITE8_HANDLER( astrocade_interrupt_enable_w );
 extern WRITE8_HANDLER( astrocade_interrupt_w );
 extern INTERRUPT_GEN( astrocade_interrupt );

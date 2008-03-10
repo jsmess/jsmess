@@ -30,14 +30,6 @@ static int screen_interrupt_mode;
 static int lightpen_interrupts_enabled;
 static int lightpen_interrupt_mode;
 
-DEVICE_LOAD(astrocade_rom)
-{
-	int size = 0;
-
-    /* load a cartidge  */
-	size = image_fread(image, memory_region(REGION_CPU1) + 0x2000, 0x8000);
-	return 0;
-}
 
 WRITE8_HANDLER ( astrocade_interrupt_enable_w )
 {

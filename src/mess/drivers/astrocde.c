@@ -50,11 +50,20 @@ static WRITE8_HANDLER( astrocade_soundblock1_w )
 	astrocade_sound1_w(machine, offset + 0x18, data);
 }
 
+
+
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(MRA8_ROM, astrocade_magicram_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(MRA8_RAM, astrocade_videoram_w) AM_BASE(&astrocade_videoram) AM_SIZE(&videoram_size) /* ASG */
 ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( astrocade_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
@@ -84,6 +93,31 @@ static ADDRESS_MAP_START( astrocade_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("P4_KNOB")
 	AM_RANGE(0x18, 0xff) AM_WRITE(astrocade_soundblock1_w)
 ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *
+ *  The Astrocade has ports for four hand controllers.  Each controller has a
+ *  knob on top that can be simultaneously pushed as an eight-way joystick and
+ *  twisted as a paddle, in addition to a trigger button.  The knob can twist
+ *  through about 270 degrees, registering 256 unique positions.  It does not
+ *  autocenter.  When selecting options on the menu, twisting the knob to the
+ *  right gives lower numbers, and twisting to the left gives larger numbers.
+ *  Paddle games like Clowns have more intuitive behavior -- twisting to the
+ *  right moves the character right.
+ * 
+ *  There is a 24-key keypad on the system itself (6 rows, 4 columns).  It is
+ *  labeled for the built-in calculator, but overlays were released for other
+ *  programs, the most popular being the BASIC cartridges, which allowed a
+ *  large number of inputs by making the bottom row shift buttons.  The labels
+ *  below first list the calculator key, then the BASIC keys in the order of no
+ *  shift, GREEN shift, RED shift, BLUE shift, WORDS shift.
+ *
+ *************************************/
 
 static INPUT_PORTS_START( astrocde )
 	PORT_START_TAG("P1_HANDLE")
@@ -181,6 +215,12 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( astrocde )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 1789000)        /* 1.789 Mhz */
@@ -209,44 +249,45 @@ static MACHINE_DRIVER_START( astrocde )
 MACHINE_DRIVER_END
 
 
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
+
 ROM_START( astrocde )
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "astro.bin",  0x0000, 0x2000, CRC(ebc77f3a) SHA1(b902c941997c9d150a560435bf517c6a28137ecc))
+    ROM_CART_LOAD(0, "bin", 0x2000, 0x8000, ROM_OPTIONAL)
 ROM_END
 
 ROM_START( astrocdw )
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf))
+    ROM_CART_LOAD(0, "bin", 0x2000, 0x8000, ROM_OPTIONAL)
 ROM_END
 
-static void astrocde_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_astrocade_rom; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+/*************************************
+ *
+ *  System configs
+ *
+ *************************************/
 
 SYSTEM_CONFIG_START(astrocde)
-	CONFIG_DEVICE(astrocde_cartslot_getinfo)
+	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
-/***************************************************************************
 
-  Game driver(s)
 
-***************************************************************************/
+/*************************************
+ *
+ *  Driver definitions
+ *
+ *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT  CONFIG      COMPANY         FULLNAME */
-CONS( 1978, astrocde, 0,	0,	  astrocde, astrocde, 0,	astrocde,	"Bally Manufacturing", "Bally Professional Arcade", 0)
-CONS( 1977, astrocdw, astrocde, 0, astrocde, astrocde, 0,        astrocde,       "Bally Manufacturing", "Bally Computer System", 0)
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT  CONFIG    COMPANY                FULLNAME                     FLAGS */
+CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, 0,    astrocde, "Bally Manufacturing", "Bally Professional Arcade", 0)
+CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, 0,    astrocde, "Bally Manufacturing", "Bally Computer System",     0)
