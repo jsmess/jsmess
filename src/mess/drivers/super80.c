@@ -198,7 +198,7 @@ static void mc6845_screen_configure(void)
 	screen_state *state = &Machine->screen[0];
 	rectangle visarea;
 	UINT16 width, height, bytes;	
-	UINT8 dyn = readinputport(9) & 0x10;			// read dipswitch
+	UINT8 dyn = readinputportbytag("CONFIG") & 0x10;			// read dipswitch
 	visarea.min_x = 0;
 	visarea.max_x = SUPER80V_SCREEN_WIDTH-1;
 	visarea.min_y = 0;
@@ -242,7 +242,7 @@ static void mc6845_screen_configure(void)
 static VIDEO_EOF( super80m )
 {
 	/* if we chose another palette or colour mode, enable it */
-	UINT8 chosen_palette = (readinputport(9) & 0x60)>>5;				// read colour dipswitches
+	UINT8 chosen_palette = (readinputportbytag("CONFIG") & 0x60)>>5;				// read colour dipswitches
 
 	if (chosen_palette != current_palette)						// any changes?
 	{
@@ -259,7 +259,7 @@ static VIDEO_UPDATE( super80 )
 	UINT8 x, y, code=32, screen_on=0;
 	UINT8 mask = machine->gfx[0]->total_elements - 1;	/* 0x3F for super80; 0xFF for super80d & super80e */
 
-	if ((super80_mhz == 1) || (!(readinputport(9) & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((super80_mhz == 1) || (!(readinputportbytag("CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	/* display the picture */
@@ -280,7 +280,7 @@ static VIDEO_UPDATE( super80 )
 
 static VIDEO_UPDATE( super80m )
 {
-	UINT8 x, y, code=32, col=0, screen_on=0, options=readinputport(9);
+	UINT8 x, y, code=32, col=0, screen_on=0, options=readinputportbytag("CONFIG");
 
 	/* get selected character generator */
 	UINT8 cgen = current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
@@ -322,7 +322,7 @@ static VIDEO_UPDATE( super80v )
 	UINT8 speed = mc6845[10]&0x20, flash = mc6845[10]&0x40;				// cursor modes
 	UINT16 cursor = (mc6845[14]<<8) | mc6845[15];					// get cursor position
 	UINT16 screen_home = (mc6845[12]<<8) | mc6845[13];				// screen home offset (usually zero)
-	UINT8 options=readinputport(9);
+	UINT8 options=readinputportbytag("CONFIG");
 	framecnt++;
 
 	/* Get the graphics of the character under the cursor, xor with the visible cursor scan lines,
@@ -407,7 +407,7 @@ static void cassette_motor( UINT8 data )
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* does user want to hear the sound? */
-	if (readinputport(9) & 8)
+	if (readinputportbytag("CONFIG") & 8)
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 	else
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
@@ -465,7 +465,7 @@ static READ8_HANDLER( super80v_11_r )
 
 static READ8_HANDLER( super80_f2_r )
 {
-	UINT8 data = readinputport(0) & 0xf0;	// dip switches on pcb
+	UINT8 data = readinputportbytag("DSW") & 0xf0;	// dip switches on pcb
 	data |= cass_out;			// bit 0 = output of U1, bit 1 = current wave_state
 	data |= 0x0c;				// bits 2,3 - not used
 	return data;
@@ -587,7 +587,7 @@ ADDRESS_MAP_END
 /**************************** DIPSWITCHES, KEYBOARD, HARDWARE CONFIGURATION ****************************************/
 
 static INPUT_PORTS_START( super80 )
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xf, 0xf, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x00, "Switch A") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR(Off))
@@ -785,7 +785,7 @@ GFXDECODE_END
 static TIMER_CALLBACK( super80_halfspeed )
 {
 	UINT8 go_fast = 0;
-	if ((super80_mhz == 2) || (!(readinputport(9) & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
+	if ((super80_mhz == 2) || (!(readinputportbytag("CONFIG") & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
 		go_fast++;
 
 	/* code to slow down computer to 1mhz by halting cpu on every second frame */
@@ -987,7 +987,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( super80 )
 {
-	UINT8 sw = readinputport(9) & 1;				/* reading the dipswitch: 1 = autorun */
+	UINT8 sw = readinputportbytag("CONFIG") & 1;				/* reading the dipswitch: 1 = autorun */
 	UINT16 exec_addr;
 	UINT64 return_info = z80bin_load_file( image, file_type );	/* load file */
 
