@@ -33,19 +33,16 @@
 
 ***************************************************************************/
 
-#include <math.h>
 #include "driver.h"
-#include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "cpu/z80/z80daisy.h"
 #include "machine/wd17xx.h"
 #include "includes/mbee.h"
+#include "devices/snapquik.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
-#include "mslegacy.h"
-#include "cpu/z80/z80daisy.h"
 
 static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
@@ -165,6 +162,19 @@ static INPUT_PORTS_START( mbee )
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(Right)") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
     PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(Insert)") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
     PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* Enhanced options not available on real hardware */
+	PORT_START_TAG("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
+	PORT_CONFSETTING(    0x00, DEF_STR(No))
+	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
+	PORT_BIT( 0x6, 0x6, IPT_UNUSED )
+//	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
+//	PORT_CONFSETTING(    0x08, DEF_STR(On))
+//	PORT_CONFSETTING(    0x00, DEF_STR(Off))
+//	PORT_CONFNAME( 0x10, 0x10, "Auto-Resize?")
+//	PORT_CONFSETTING(    0x00, DEF_STR(No))
+//	PORT_CONFSETTING(    0x10, DEF_STR(Yes))
 INPUT_PORTS_END
 
 static const gfx_layout mbee_charlayout =
@@ -342,6 +352,47 @@ ROM_END
 
 ***************************************************************************/
 
+static QUICKLOAD_LOAD( mbee )
+{
+	UINT8 sw = readinputportbytag("CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
+	UINT16 exec_addr;
+	UINT64 return_info = z80bin_load_file( image, file_type );	/* load file */
+
+	if (return_info == INIT_FAIL) return INIT_FAIL;			/* failure */
+
+	exec_addr = (return_info & 0xffff0000) >> 16;			/* get program run address */
+
+	if (exec_addr == 0xffff) return INIT_PASS;			/* data file */
+
+	program_write_word_16le(0xa6,exec_addr);			/* fix the EXEC command */
+
+	if (sw)
+	{
+		program_write_word_16le(0xa2,exec_addr);		/* fix warm-start vector to get around some copy-protections */
+		cpunum_set_reg(0, REG_PC, exec_addr);
+	}
+	else
+		program_write_word_16le(0xa2,0x8517);
+
+	return INIT_PASS;
+}
+
+static void mbee_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* quickload */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_DEV_FILE:		strcpy(info->s = device_temp_str(), __FILE__); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "bin"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:	info->f = (genf *) quickload_load_mbee; break;
+
+		default:				quickload_device_getinfo(devclass, state, info); break;
+	}
+}
+
 static void mbee_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
@@ -391,12 +442,11 @@ static void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 }
 
 
-
 SYSTEM_CONFIG_START(mbee)
 	CONFIG_DEVICE(mbee_cassette_getinfo)
 	CONFIG_DEVICE(mbee_cartslot_getinfo)
 	CONFIG_DEVICE(mbee_floppy_getinfo)
-	CONFIG_DEVICE(z80bin_quickload_getinfo)
+	CONFIG_DEVICE(mbee_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
