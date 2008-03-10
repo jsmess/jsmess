@@ -125,4 +125,4 @@ $(MESS_WINUIOBJ)/messui.res:	$(WINUISRC)/mameui.rc $(MESS_WINUISRC)/messui.rc $(
 
 $(WINUIOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
-	@$(VERINFO) $(SRC)/version.c > $@
+	@$(VERINFO) -b mess $(SRC)/version.c  > $@
