@@ -987,60 +987,14 @@ ROM_END
 
 static QUICKLOAD_LOAD( super80 )
 {
-	int ch;
-	UINT16 args[3];
-	UINT16 start_addr, end_addr, exec_addr, i=0, j, size;
-	UINT8 data, sw=1;
-	char * pgmname;
-	pgmname = (char *) malloc(256);
+	UINT8 sw = readinputport(9) & 1;				/* reading the dipswitch: 1 = autorun */
+	UINT16 exec_addr;
+	UINT64 return_info = z80bin_load_file( image, file_type );	/* load file */
 
-	image_fseek(image, 7, SEEK_SET);
+	if (return_info == INIT_FAIL) return INIT_FAIL;			/* failure */
 
-	while((ch = image_fgetc(image)) != 0x1A)
-	{
-		if (ch == EOF) return INIT_FAIL;
+	exec_addr = (return_info & 0xffff0000) >> 16;			/* get program run address */
 
-		if (ch)
-		{
-			pgmname[i] = ch;	/* build program name */
-			i++;
-		}
-	}
-
-	pgmname[i]=0;	/* terminate string with a null */
-
-	if (image_fread(image, args, sizeof(args)) != sizeof(args))
-	{
-		free(pgmname);
-		return INIT_FAIL;
-	}
-
-	exec_addr	= LITTLE_ENDIANIZE_INT16(args[0]);
-	start_addr	= LITTLE_ENDIANIZE_INT16(args[1]);
-	end_addr	= LITTLE_ENDIANIZE_INT16(args[2]);
-
-	size = (end_addr - start_addr + 1) & 0xffff;
-
-	popmessage("%s\nsize=%04X : start=%04X : end=%04X : exec=%04X",pgmname,size,start_addr,end_addr,exec_addr);
-
-	for (i = 0; i < size; i++)
-	{
-		j = (start_addr + i) & 0xffff;
-		if (image_fread(image, &data, 1) != 1)
-		{
-			printf("\nQUICKLOAD: %s : unexpected EOF while writing byte to %X\n",pgmname,j);
-			free(pgmname);
-			return INIT_FAIL;
-		}
-		program_write_byte(j, data);
-	}
-
-	free(pgmname);
-
-	/* reading the dipswitch: 1 = autorun */
-	sw = readinputport(9) & 1;
-
-	/* exec_addr of 0xffff indicates a non-executable file */
 	if ((exec_addr != 0xffff) && (sw))
 		cpunum_set_reg(0, REG_PC, exec_addr);
 
