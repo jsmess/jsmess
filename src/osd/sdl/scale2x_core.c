@@ -61,7 +61,6 @@
  *
  * J.W.R. de Goede, Rotterdam the Netherlands, 17 december 2004.
  */
-#include "window.h"
 
 INLINE void FUNC_NAME(scale2x_border)(DEST_TYPE *dst, DEST_TYPE *src0,
 	DEST_TYPE *src1, DEST_TYPE *src2, int count,

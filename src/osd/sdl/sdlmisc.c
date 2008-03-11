@@ -26,15 +26,15 @@ Version 0.2, May 2000
 -UCLOCKS_PER_SECOND is now always 1000000, instead of making it depent on
  the system headers. (Hans de Goede)
 */
-/* Todo ?
--rename uclock to sysdep_clock (Hans de Goede)
-*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
 #include <stdlib.h>
+
+#include "osdcore.h"
+
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 #include <sys/mman.h>
 #endif

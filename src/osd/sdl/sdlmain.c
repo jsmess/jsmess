@@ -14,12 +14,13 @@
 #include <stdlib.h>
 
 // MAME headers
-#include "driver.h"
-#include "window.h"
-#include "options.h"
+#include "osdepend.h"
+#include "mame.h"
 #include "clifront.h"
-#include "input.h"
 
+// OSD headers
+#include "video.h"
+#include "input.h"
 #include "osdsdl.h"
 
 // we override SDL's normal startup on Win32

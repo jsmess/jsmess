@@ -57,21 +57,6 @@ osd_event *osd_event_alloc(int manualreset, int initialstate);
 -----------------------------------------------------------------------------*/
 int osd_event_wait(osd_event *event, osd_ticks_t timeout);
 
-//FIXME: description
-/*-----------------------------------------------------------------------------
-    osd_event_wait_multiple: wait for multiple events
-
-    Parameters:
-
-        event - The event to set to non-signalled state
-
-    Return value:
-
-	    None
------------------------------------------------------------------------------*/
-
-int osd_event_wait_multiple(int num, osd_event **events, osd_ticks_t timeout);
-
 /*-----------------------------------------------------------------------------
     osd_event_reset: reset an event to non-signalled state
 
@@ -84,20 +69,6 @@ int osd_event_wait_multiple(int num, osd_event **events, osd_ticks_t timeout);
 	    None
 -----------------------------------------------------------------------------*/
 void osd_event_reset(osd_event *event);
-
-/*-----------------------------------------------------------------------------
-    osd_event_reset: reset an event to non-signalled state
-
-    Parameters:
-
-        event - The event to set to non-signalled state
-
-    Return value:
-
-	    None
------------------------------------------------------------------------------*/
-
-int osd_event_wait_multiple(int num, osd_event *events[], osd_ticks_t timeout);
 
 /*-----------------------------------------------------------------------------
     osd_event_set: set an event to signalled state

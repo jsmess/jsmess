@@ -20,10 +20,8 @@
 #endif
 
 // MAME headers
-#include "driver.h"
+#include "mame.h"
 #include "osdepend.h"
-#include "window.h"
-#include "video.h"
 #include "osdsdl.h"
 
 //============================================================
@@ -220,7 +218,7 @@ static void att_memcpy(void *dest, INT16 *data, int bytes_to_copy)
 	int count = bytes_to_copy/2;
 	while (count>0)
 	{	
-		*d++ = *data++ * level/128;
+		*d++ = (*data++ * level) >> 7; /* / 128 */
 		count--;
 	}
 }
@@ -283,12 +281,16 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 	if (machine->sample_rate != 0 && stream_buffer)
 	{
 		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
-		int play_position, write_position, orig_write, stream_in;
-
+		int play_position, write_position, stream_in;
+#if LOG_SOUND
+		int orig_write;
+#endif
 		play_position = stream_playpos;
 
 		write_position = stream_playpos + ((machine->sample_rate / 50) * sizeof(INT16) * 2);
+#if LOG_SOUND
 		orig_write = write_position;
+#endif
 
 		if (!stream_in_initialized)
 		{
@@ -527,7 +529,7 @@ static void sdl_kill(running_machine *machine)
 
 static int sdl_create_buffers(void)
 {
-	mame_printf_verbose("sdl_create_buffers: creating stream buffer of %d bytes\n", stream_buffer_size);
+	mame_printf_verbose("sdl_create_buffers: creating stream buffer of %u bytes\n", stream_buffer_size);
 
 	stream_buffer = (INT8 *)malloc(stream_buffer_size);
 	memset(stream_buffer, 0, stream_buffer_size);

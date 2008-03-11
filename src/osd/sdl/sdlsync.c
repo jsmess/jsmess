@@ -27,7 +27,6 @@
 // MAME headers
 #include "osdcore.h"
 #include "osinline.h"
-#include "mame.h"
 #include "sdlsync.h"
 
 #include "eminline.h"
@@ -295,19 +294,9 @@ void osd_event_free(osd_event *event)
 //  osd_event_set
 //============================================================
 
+#if 1
 void osd_event_set(osd_event *event)
 {
-#if 0
-	if (osd_compare_exchange32(&event->signalled, FALSE, TRUE) == FALSE)
-	{
-		pthread_mutex_lock(&event->mutex);
-		if (event->autoreset)
-			pthread_cond_signal(&event->cond);
-		else
-			pthread_cond_broadcast(&event->cond);
-		pthread_mutex_unlock(&event->mutex);
-	}
-#endif
 	pthread_mutex_lock(&event->mutex);
 	if (event->signalled == FALSE)
 	{
@@ -348,22 +337,20 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 	}
 	else
 	{
-		struct timespec   ts;
-		struct timeval    tp;
-		UINT64 t;
-		UINT64 msec = timeout * 1000 / osd_ticks_per_second();
-		UINT64 nsec;
-		
-		gettimeofday(&tp, NULL);
-
-		ts.tv_sec  = tp.tv_sec;
-		nsec = (UINT64) tp.tv_usec * (UINT64) 1000 + (msec * (UINT64) 1000000);
-		t = nsec / (UINT64) 1000000000;
-		ts.tv_nsec = t % (UINT64) 1000000000;
-		ts.tv_sec += t;
-
 		if (!event->signalled)
 		{
+			struct timespec   ts;
+			struct timeval    tp;
+			UINT64 msec = timeout * 1000 / osd_ticks_per_second();
+			UINT64 nsec;
+			
+			gettimeofday(&tp, NULL);
+	
+			ts.tv_sec  = tp.tv_sec;
+			nsec = (UINT64) tp.tv_usec * (UINT64) 1000 + (msec * (UINT64) 1000000);
+			ts.tv_nsec = nsec % (UINT64) 1000000000;
+			ts.tv_sec += nsec / (UINT64) 1000000000;
+
 			do {
 				int ret = pthread_cond_timedwait(&event->cond, &event->mutex, &ts);
 				if ( ret == ETIMEDOUT )
@@ -380,7 +367,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 					break;
 				if ( ret != EINTR)
 				{
-					printf("Error %d while waiting for pthread_cond_timedwait: %d - %s\n", ret, (int) t, strerror(ret));
+					printf("Error %d while waiting for pthread_cond_timedwait:  %s\n", ret, strerror(ret));
 				}
 					
 			} while (TRUE);
@@ -394,7 +381,69 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 
 	return TRUE;
 }
- 
+#else
+
+/*
+ * The following code has been added
+ * for demonstration purposes only.
+ * It implements a events without the need
+ * for pthreads. However, it horribly fails, if
+ * threads > num processors as is the case if you 
+ * enable "-mt"
+ */
+
+void osd_event_set(osd_event *event)
+{
+//	while (compare_exchange32(&event->signalled, 0, 1) == 1)
+//		osd_yield_processor();
+	atomic_exchange32(&event->signalled, 1);
+}
+
+void osd_event_reset(osd_event *event)
+{
+	compare_exchange32(&event->signalled, 1, 0);
+}
+
+int osd_event_wait(osd_event *event, osd_ticks_t timeout)
+{
+	osd_ticks_t stopspin;
+	osd_ticks_t gotosleep;
+	//struct timespec sleep = { 0, 100000 }, remaining;
+	
+	if (!timeout && !event->signalled)
+		return FALSE;
+
+	stopspin = osd_ticks() + timeout;
+	gotosleep = osd_ticks() + osd_ticks_per_second()/1000;
+
+	if (event->autoreset)
+	{
+		while (compare_exchange32(&event->signalled, 1, 0) == 1)
+		{
+			if (osd_ticks()>=stopspin)
+				return FALSE;
+			osd_yield_processor();
+			//if (osd_ticks()>=gotosleep)
+				//usleep(100);
+				//nanosleep(&sleep, &remaining); // sleep for 100us
+		}
+	}
+	else
+	{
+		while (!event->signalled)
+		{
+			if (osd_ticks()>=stopspin)
+				return FALSE;
+			osd_yield_processor();
+			//if (osd_ticks()>=gotosleep)
+				//usleep(100);
+				//nanosleep(&sleep, &remaining); // sleep for 100us
+		}
+	}
+	return TRUE;
+}
+#endif
+
 //============================================================
 //  osd_thread_create
 //============================================================

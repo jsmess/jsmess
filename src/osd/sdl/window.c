@@ -22,8 +22,6 @@
 #include <sys/time.h>
 #endif
 
-#include "osd_opengl.h"
-
 // standard C headers
 #include <math.h>
 #include <unistd.h>
@@ -32,15 +30,13 @@
 
 #include "osdcomm.h"
 #include "osdepend.h"
-//#include "driver.h"
+#include "options.h"
+#include "ui.h"
 
 // OSD headers
 
 #include "window.h"
-#include "video.h"
 #include "input.h"
-#include "options.h"
-#include "ui.h"
 #include "osdsdl.h"
 
 #ifdef MESS
@@ -58,9 +54,11 @@
 #define ASSERT_USE(x)	assert(SDL_ThreadID() == x)
 #endif
 
-#define ASSERT_REDRAW_THREAD() ASSERT_USE(window_threadid)
-#define ASSERT_WINDOW_THREAD() ASSERT_USE(window_threadid)
-#define ASSERT_MAIN_THREAD() ASSERT_USE(main_threadid)
+#define ASSERT_REDRAW_THREAD() 	ASSERT_USE(window_threadid)
+#define ASSERT_WINDOW_THREAD() 	ASSERT_USE(window_threadid)
+#define ASSERT_MAIN_THREAD() 	ASSERT_USE(main_threadid)
+
+#define OSDWORK_CALLBACK(name)	void *name(void *param, ATTR_UNUSED int threadid)
 
 // minimum window dimension
 #define MIN_WINDOW_DIM					200
@@ -97,18 +95,10 @@ static int main_threadid;
 static int window_threadid;
 static int dll_loaded;
 
-
-static UINT32 last_update_time;
-
 static const char *yuv_mode_names[] = { "none", "yv12", "yv12x2", "yuy2", "yuy2x2" };
 
 // debugger
 //static int in_background;
-
-//static int ui_temp_pause;
-//static int ui_temp_was_paused;
-
-//static UINT32 last_update_time;
 
 static sdl_draw_callbacks draw;
 
@@ -128,10 +118,10 @@ struct _worker_param {
 
 static void sdlwindow_exit(running_machine *machine);
 static void sdlwindow_video_window_destroy(sdl_window_info *window);
-static void *draw_video_contents_wt(void *param, int threadid);
-static void *sdlwindow_video_window_destroy_wt(void *param, int threadid);
-static void *sdlwindow_resize_wt(void *param, int threadid);
-static void *sdlwindow_toggle_full_screen_wt(void *param, int threadid);
+static OSDWORK_CALLBACK( draw_video_contents_wt );
+static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
+static OSDWORK_CALLBACK( sdlwindow_resize_wt );
+static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt );
 static void sdlwindow_clear_surface(sdl_window_info *window, int times);
 static void sdlwindow_update_cursor_state(void);
 static void sdlwindow_sync(void);
@@ -190,7 +180,7 @@ INLINE void execute_async_wait(osd_work_callback callback, worker_param *wp)
 //  (window thread)
 //============================================================
 
-static void *sdlwindow_thread_id(void *param, int threadid)
+static OSDWORK_CALLBACK(sdlwindow_thread_id)
 {
 	window_threadid = SDL_ThreadID();
 
@@ -279,7 +269,7 @@ static void sdlwindow_sync(void)
 //============================================================
 
 #ifdef SDLMAME_WIN32
-static void *sdlwindow_exit_wt(void *param, int threadid)
+static OSDWORK_CALLBACK( sdlwindow_exit_wt )
 {
 	SDL_Quit();
 	return NULL;
@@ -473,7 +463,7 @@ static void yuv_overlay_init(sdl_window_info *window)
 //  (main thread)
 //============================================================
 
-static void *sdlwindow_resize_wt(void *param, int threadid)
+static OSDWORK_CALLBACK( sdlwindow_resize_wt )
 {
 	sdl_window_info *window = sdl_window_list;
 	worker_param *wp = (worker_param *) param;
@@ -525,7 +515,7 @@ void sdlwindow_resize(sdl_window_info *window, INT32 width, INT32 height)
 //  (window thread)
 //============================================================
 
-static void *sdlwindow_clear_surface_wt(void *param, int threadid)
+static OSDWORK_CALLBACK( sdlwindow_clear_surface_wt )
 {
 	worker_param *wp = (worker_param *) param;
 	//sdl_window_info *window = sdl_window_list;
@@ -570,7 +560,7 @@ static void sdlwindow_clear_surface(sdl_window_info *window, int times)
 //  (main thread)
 //============================================================
 
-static void *sdlwindow_toggle_full_screen_wt(void *param, int threadid)
+static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
 {
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window;
@@ -642,7 +632,7 @@ static void sdlwindow_modify_yuv(int dir)
 	}
 }
 
-static void *destroy_all_textures_wt(void *param, int threadid)
+static OSDWORK_CALLBACK( destroy_all_textures_wt )
 {
 	worker_param *wp = (worker_param *) param;
 
@@ -710,7 +700,6 @@ void sdlwindow_modify_effect(sdl_window_info *window, int dir)
 		if (new_prescale_effect != video_config.prescale_effect)
 		{
 			worker_param wp;
-			sdl_window_info *window = sdl_window_list;
 
 			clear_worker_param(&wp);
 			wp.window = window;
@@ -874,7 +863,7 @@ error:
 //  (main thread)
 //============================================================
 
-static void *sdlwindow_video_window_destroy_wt(void *param, int threadid)
+static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt )
 {
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window;
@@ -975,7 +964,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 		for (i = 0; modes[i]; ++i)
 		{
 			// compute initial score based on difference between target and current
-			size_score = 1.0f / (1.0f + fabs((INT32)modes[i]->w - target_width) + fabs((INT32)modes[i]->h - target_height));
+			size_score = 1.0f / (1.0f + fabsf((INT32)modes[i]->w - target_width) + fabsf((INT32)modes[i]->h - target_height));
 
 			// if the mode is too small, give a big penalty
 			if (modes[i]->w < minimum_width || modes[i]->h < minimum_height)
@@ -1055,7 +1044,7 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 // while rendering is still in progress is all fine ..
 #if 0
 		// only block if we're throttled
-		if (video_config.throttle) // || timeGetTime() - last_update_time > 250)
+		if (video_config.throttle) 
 			osd_lock_acquire(window->render_lock);
 		else
 #endif
@@ -1076,7 +1065,7 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 			primlist = (*draw.window_get_primitives)(window);
 
 			// and redraw now
-			last_update_time = SDL_GetTicks();
+
 			wp.list = primlist;
 			wp.window = window;
 
@@ -1175,7 +1164,7 @@ static void set_starting_view(running_machine *machine, int index, sdl_window_in
 //  (window thread)
 //============================================================
 
-static void *complete_create_wt(void *param, int threadid)
+static OSDWORK_CALLBACK( complete_create_wt )
 {
 	
 	worker_param *wp = (worker_param *) param;
@@ -1323,7 +1312,7 @@ static int64_t getusecs(void)
 }
 #endif
 
-static void *draw_video_contents_wt(void * param, int threadid)
+static OSDWORK_CALLBACK( draw_video_contents_wt )
 {
 	#ifndef SDLMAME_WIN32
 	const unsigned long frames_skip4fps = 100;

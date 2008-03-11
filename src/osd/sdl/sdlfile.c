@@ -438,6 +438,7 @@ static file_error osd_rmdir(const char *dir)
 #endif
 
 // these are MESS specific - DO NOT TOUCH!!@!
+#ifdef MESS
 
 //============================================================
 //	osd_copyfile
@@ -483,4 +484,4 @@ osd_directory_entry *osd_stat(const char *path)
 	
 	return result;
 }
-
+#endif

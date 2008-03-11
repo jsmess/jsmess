@@ -164,7 +164,7 @@ OSDOBJS =  $(SDLOBJ)/sdlmain.o \
 
 
 ifndef NO_OPENGL
-OSDOBJS += $(SDLOBJ)/drawogl.o $(SDLOBJ)/scale2x.o
+OSDOBJS += $(SDLOBJ)/drawogl.o
 endif
 
 # add the debugger includes
@@ -286,13 +286,13 @@ TOOLS += \
 # drawSDL depends on the core software renderer, so make sure it exists
 $(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c
 
+$(SDLOBJ)/drawogl.o : $(SDLSRC)/drawogl.c $(SDLSRC)/texcopy.c $(SDLSRC)/scale2x.c $(SDLSRC)/scale2x_core.c
+
 # due to quirks of using /bin/sh, we need to explicitly specify the current path
 CURPATH = ./
 
 $(LIBOCORE): $(OSDCOREOBJS)
 $(LIBOSD): $(OSDOBJS)
-
-$(SDLOBJ)/scale2x.o: $(SDLSRC)/scale2x.c $(SDLSRC)/effect_func.h $(SDLSRC)/scale2x_core.c $(SDLSRC)/texsrc.h
 
 #-------------------------------------------------
 # testkeys

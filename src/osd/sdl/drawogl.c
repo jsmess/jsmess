@@ -121,7 +121,6 @@ typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuin
 // OSD headers
 #include "osdsdl.h"
 #include "window.h"
-#include "effect.h"
 
 //============================================================
 //  DEBUGGING
@@ -159,7 +158,7 @@ INLINE HashT texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 	return (HashT)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 }
 
-INLINE void set_blendmode(sdl_info *sdl, int blendmode, texture_info *texture)
+INLINE void set_blendmode(sdl_info *sdl, int blendmode)
 {
 	// try to minimize texture state changes
 	if (blendmode != sdl->last_blendmode)
@@ -187,12 +186,14 @@ INLINE void set_blendmode(sdl_info *sdl, int blendmode, texture_info *texture)
 	}
 }
 
+#if 0
 INLINE int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
 {
 	float aspect0 = (float)width0 / (float)height0;
 	float aspect1 = (float)width1 / (float)height1;
 	return (fabs(desired_aspect - aspect0) < fabs(desired_aspect - aspect1)) ? 0 : 1;
 }
+#endif
 
 INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 {
@@ -273,35 +274,58 @@ static PFNGLFRAMEBUFFERTEXTURE2DEXTPROC pfn_glFramebufferTexture2D	= NULL;
 
 static int glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
 
-// texcopy functions
-void texcopy_argb32(texture_info *texture, const render_texinfo *texsource);
-void texcopy_rgb32(texture_info *texture, const render_texinfo *texsource);
-void texcopy_rgb32_paletted(texture_info *texture, const render_texinfo *texsource);
-void texcopy_palette16(texture_info *texture, const render_texinfo *texsource);
-void texcopy_palette16a(texture_info *texture, const render_texinfo *texsource);
-void texcopy_rgb15(texture_info *texture, const render_texinfo *texsource);
-void texcopy_rgb15_paletted(texture_info *texture, const render_texinfo *texsource);
-void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource);
-void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource);
+//============================================================
+//  TEXCOPY FUNCS
+//============================================================
+
+static void texcopy_argb32(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_rgb32(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_rgb32_paletted(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_palette16(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_palette16a(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_rgb15(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_rgb15_paletted(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource);
 #ifdef SDLMAME_MACOSX
-void texcopy_yuv16_apple(texture_info *texture, const render_texinfo *texsource);
-void texcopy_yuv16_paletted_apple(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_yuv16_apple(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_yuv16_paletted_apple(texture_info *texture, const render_texinfo *texsource);
 #endif
 // 16 bpp destination texture texcopy functions
-void texcopy_palette16_argb1555(texture_info *texture, const render_texinfo *texsource);
-void texcopy_rgb15_argb1555(texture_info *texture, const render_texinfo *texsource);
-void texcopy_rgb15_paletted_argb1555(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_palette16_argb1555(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_rgb15_argb1555(texture_info *texture, const render_texinfo *texsource);
+static void texcopy_rgb15_paletted_argb1555(texture_info *texture, const render_texinfo *texsource);
 
-// textures
+//============================================================
+//  SCALE2x FUNCS
+//============================================================
+
+static void scale2x_argb32(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_rgb32(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_rgb32_paletted(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_palette16(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_palette16a(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_rgb15(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_rgb15_paletted(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_yuv16(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_yuv16_paletted(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_palette16_argb1555(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_rgb15_argb1555(texture_info *texture, const render_texinfo *texsource);
+static void scale2x_rgb15_paletted_argb1555(texture_info *texture, const render_texinfo *texsource);
+
+//============================================================
+//  Textures
+//============================================================
+
+static void texture_set_data(texture_info *texture, const render_texinfo *texsource);
 static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, const render_texinfo *texsource, UINT32 flags);
-static void texture_set_data(sdl_info *sdl, texture_info *texture, const render_texinfo *texsource, UINT32 flags);
 static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim);
 static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, const render_primitive *prim, int shaderIdx);
 static void texture_all_disable(sdl_info *sdl);
 static void texture_disable(sdl_info *sdl, texture_info * texture);
 
 //============================================================
-//  STATIC Variables
+//  STAgTIC Variables
 //============================================================
 
 static int shown_video_info = 0;
@@ -343,7 +367,7 @@ static void loadgl_functions(void)
 	 */
 
 	#define OSD_GL(ret,func,params) \
-	if (!(func = SDL_GL_GetProcAddress( #func ) )) \
+	if (!( func = (void *) SDL_GL_GetProcAddress( #func ) )) \
 		{ err++; mame_printf_error("GL function %s not found!\n", #func ); }
 
 	#define OSD_GL_UNUSED(ret,func,params)
@@ -928,72 +952,71 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		blittimer = 2;
 	}
 
-        if ( !window->initialized ||
-             window->sdlsurf->w!= surf_w || window->sdlsurf->h!= surf_h 
-           )
-        {
+	if ( !window->initialized ||
+			window->sdlsurf->w!= surf_w || window->sdlsurf->h!= surf_h )
+	{
 		if ( !window->initialized )
 		{
 			loadGLExtensions(sdl);
 		}
+		
+		surf_w=window->sdlsurf->w;
+		surf_h=window->sdlsurf->h;
 
-                surf_w=window->sdlsurf->w;
-                surf_h=window->sdlsurf->h;
+		// we're doing nothing 3d, so the Z-buffer is currently not interesting
+		glDisable(GL_DEPTH_TEST);
 
-                // we're doing nothing 3d, so the Z-buffer is currently not interesting
-                glDisable(GL_DEPTH_TEST);
-
-                if (options_get_bool(mame_options(), OPTION_ANTIALIAS))
-                {
-                    // enable antialiasing for lines
-                    glEnable(GL_LINE_SMOOTH);
-                    // enable antialiasing for points
-                    glEnable(GL_POINT_SMOOTH);
-
-                    // prefer quality to speed
-                    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-                    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-                }
-                else
-                {
-                    glDisable(GL_LINE_SMOOTH);
-                    glDisable(GL_POINT_SMOOTH);
-                }
-
-                // enable blending
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                sdl->last_blendmode = BLENDMODE_ALPHA;
-
-                // set lines and points just barely above normal size to get proper results
-                glLineWidth(video_config.beamwidth);
-                glPointSize(video_config.beamwidth);
-
-                // set up a nice simple 2D coordinate system, so GL behaves exactly how we'd like.
-                //
-                // (0,0)     (w,0)
-                //   |~~~~~~~~~|
-                //   |	       |
-                //   |	       |
-                //   |	       |
-                //   |_________|
-                // (0,h)     (w,h)
-
-                glViewport(0.0, 0.0, (GLsizei)window->sdlsurf->w, (GLsizei)window->sdlsurf->h);
-                glMatrixMode(GL_PROJECTION);
-                glLoadIdentity();
-                glOrtho(0.0, (GLdouble)window->sdlsurf->w, (GLdouble)window->sdlsurf->h, 0.0, 0.0, -1.0);
-		glMatrixMode(GL_MODELVIEW);
-                glLoadIdentity();
-
-                if ( ! window->initialized )
+		if (options_get_bool(mame_options(), OPTION_ANTIALIAS))
 		{
-                        glEnableClientState(GL_VERTEX_ARRAY);
-                        glVertexPointer(2, GL_FLOAT, 0, texVerticex); // no VBO, since it's too volatile
+			// enable antialiasing for lines
+			glEnable(GL_LINE_SMOOTH);
+			// enable antialiasing for points
+			glEnable(GL_POINT_SMOOTH);
 
+			// prefer quality to speed
+			glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+			glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+		}
+		else
+		{
+			glDisable(GL_LINE_SMOOTH);
+			glDisable(GL_POINT_SMOOTH);
+		}
+		
+		// enable blending
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		sdl->last_blendmode = BLENDMODE_ALPHA;
+		
+		// set lines and points just barely above normal size to get proper results
+		glLineWidth(video_config.beamwidth);
+		glPointSize(video_config.beamwidth);
+		
+		// set up a nice simple 2D coordinate system, so GL behaves exactly how we'd like.
+		//
+		// (0,0)     (w,0)
+		//   |~~~~~~~~~|
+		//   |	       |
+		//   |	       |
+		//   |	       |
+		//   |_________|
+		// (0,h)     (w,h)
+		
+		glViewport(0.0, 0.0, (GLsizei)window->sdlsurf->w, (GLsizei)window->sdlsurf->h);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0.0, (GLdouble)window->sdlsurf->w, (GLdouble)window->sdlsurf->h, 0.0, 0.0, -1.0);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+				
+		if ( ! window->initialized )
+		{
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(2, GL_FLOAT, 0, texVerticex); // no VBO, since it's too volatile
+			
 			window->initialized = 1;
-                }
-        }
+		}
+	}
 
 	// compute centering parameters
 	vofs = hofs = 0.0f;
@@ -1051,40 +1074,40 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 				    pendingPrimitive=GL_NO_PRIMITIVE;
 				}
 
-                                if ( pendingPrimitive==GL_NO_PRIMITIVE )
-                                    set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), 0);
+                if ( pendingPrimitive==GL_NO_PRIMITIVE )
+                	set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
 
 				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
 
-                                if(pendingPrimitive!=curPrimitive)
-                                {
-                                    glBegin(curPrimitive);
-                                    pendingPrimitive=curPrimitive;
-                                }
+				if(pendingPrimitive!=curPrimitive)
+				{
+					glBegin(curPrimitive);
+					pendingPrimitive=curPrimitive;
+				}
 
 				// check if it's really a point
 				if (curPrimitive==GL_POINTS)
 				{
-                                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
+					glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
 				}
 				else
 				{
-                                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
-                                    glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
+					glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
+					glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
 				}
 				break;
 
 			case RENDER_PRIMITIVE_QUAD:
 
-                                if(pendingPrimitive!=GL_NO_PRIMITIVE)
+				if(pendingPrimitive!=GL_NO_PRIMITIVE)
 				{
 				    glEnd();
 				    pendingPrimitive=GL_NO_PRIMITIVE;
 				}
 
-                                glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
 
-				set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), texture);
+				set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
 
 				texture = texture_update(sdl, window, prim, 0);
 
@@ -1134,21 +1157,20 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 					glDrawArrays(GL_QUADS, 0, 4);
 				}
 
-                                if ( texture )
-                                {
-                                        texture_disable(sdl, texture);
-                                        texture=NULL;
-                                }
-                                break;
+				if ( texture )
+				{
+					texture_disable(sdl, texture);
+					texture=NULL;
+				}
+				break;
 		}
 	}
 
-        if(pendingPrimitive!=GL_NO_PRIMITIVE)
-        {
-                glEnd();
-                pendingPrimitive=GL_NO_PRIMITIVE;
-        }
-
+	if(pendingPrimitive!=GL_NO_PRIMITIVE)
+	{
+		glEnd();
+		pendingPrimitive=GL_NO_PRIMITIVE;
+	}
 
 	osd_lock_release(window->primlist->lock);
 
@@ -1603,7 +1625,7 @@ static int gl_checkFramebufferStatus(void)
             return -1;
         default:
             mame_printf_error("GL FBO: incomplete, implementation ERROR\n");
-            return -1;
+            /* fall through */
     }
     return -1;
 }
@@ -2196,7 +2218,7 @@ static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, cons
 //  texture_set_data
 //============================================================
 
-static void texture_set_data(sdl_info *sdl, texture_info *texture, const render_texinfo *texsource, UINT32 flags)
+static void texture_set_data(texture_info *texture, const render_texinfo *texsource)
 {
 	if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
@@ -2204,27 +2226,27 @@ static void texture_set_data(sdl_info *sdl, texture_info *texture, const render_
 		assert(!texture->nocopy);
 
 		texture->data = pfn_glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
-        }
+	}
 
 	// note that nocopy and borderpix are mutually exclusive, IOW
 	// they cannot be both true, thus this cannot lead to the
-        // borderpix code below writing to texsource->base .
-        if (texture->nocopy)
-                texture->data = texsource->base;
+	// borderpix code below writing to texsource->base .
+	if (texture->nocopy)
+		texture->data = texsource->base;
 
 	// always fill non-wrapping textures with an extra pixel on the top
 	if (texture->borderpix)
-        {
+	{
 		memset(texture->data, 0, 
-                       (texsource->width * texture->xprescale + 2) * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
-        }
+				(texsource->width * texture->xprescale + 2) * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
+	}	
 
 	// when nescesarry copy (and convert) the data
 	if (!texture->nocopy)
-        {
-                assert(texture->texCopyFn);
-                texture->texCopyFn(texture, texsource);
-        }
+	{
+		assert(texture->texCopyFn);
+		texture->texCopyFn(texture, texsource);
+	}
 
 	// always fill non-wrapping textures with an extra pixel on the bottom
 	if (texture->borderpix)
@@ -2374,14 +2396,14 @@ static void texture_coord_update(sdl_info *sdl, sdl_window_info *window,
 	{
 		// 1:1 tex coord CCW (0/0) (1/0) (1/1) (0/1)
 		// we must go CW here due to the mame bitmap order
-		texture->texCoord[0]=ustart + du * 0.0;
-		texture->texCoord[1]=vstart + dv * 1.0;
-		texture->texCoord[2]=ustart + du * 1.0;
-		texture->texCoord[3]=vstart + dv * 1.0;
-		texture->texCoord[4]=ustart + du * 1.0;
-		texture->texCoord[5]=vstart + dv * 0.0;
-		texture->texCoord[6]=ustart + du * 0.0;
-		texture->texCoord[7]=vstart + dv * 0.0;
+		texture->texCoord[0]=ustart + du * 0.0f;
+		texture->texCoord[1]=vstart + dv * 1.0f;
+		texture->texCoord[2]=ustart + du * 1.0f;
+		texture->texCoord[3]=vstart + dv * 1.0f;
+		texture->texCoord[4]=ustart + du * 1.0f;
+		texture->texCoord[5]=vstart + dv * 0.0f;
+		texture->texCoord[6]=ustart + du * 0.0f;
+		texture->texCoord[7]=vstart + dv * 0.0f;
 	} else {
 		// transformation: mamebm -> scrn
 		texture->texCoord[0]=ustart + du * prim->texcoords.tl.u;
@@ -2395,7 +2417,7 @@ static void texture_coord_update(sdl_info *sdl, sdl_window_info *window,
 	}
 }
 
-static void texture_mpass_flip(sdl_info *sdl, sdl_window_info *window, texture_info *texture, int shaderIdx)
+static void texture_mpass_flip(sdl_info *sdl, texture_info *texture, int shaderIdx)
 {
 	UINT32 mpass_src_idx = texture->mpass_dest_idx;
 
@@ -2518,7 +2540,7 @@ static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, con
 			texture_shader_update(sdl, window, texture, shaderIdx);
 			if ( sdl->glsl_program_num>1 )
 			{
-				texture_mpass_flip(sdl, window, texture, shaderIdx);
+				texture_mpass_flip(sdl, texture, shaderIdx);
 			}
 		}
 
@@ -2529,7 +2551,7 @@ static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, con
 				texture->texinfo.seqid = prim->texture.seqid;
 
 				// if we found it, but with a different seqid, copy the data
-				texture_set_data(sdl, texture, &prim->texture, prim->flags);
+				texture_set_data(texture, &prim->texture);
 				texBound=1;
 			}
 		} 
@@ -2556,17 +2578,17 @@ static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, con
 
 static void texture_disable(sdl_info *sdl, texture_info * texture)
 {
-        if ( texture->type == TEXTURE_TYPE_SHADER )
-        {
-                assert ( sdl->useglsl );
+	if ( texture->type == TEXTURE_TYPE_SHADER )
+	{
+		assert ( sdl->useglsl );
 		pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
-        } else if ( texture->type == TEXTURE_TYPE_DYNAMIC ) 
-        {
-                pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
-                glDisable(texture->texTarget);
-        } else {
-                glDisable(texture->texTarget);
-        }
+	} else if ( texture->type == TEXTURE_TYPE_DYNAMIC ) 
+	{
+		pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+		glDisable(texture->texTarget);
+	} else {
+		glDisable(texture->texTarget);
+	}
 }
 
 static void texture_all_disable(sdl_info *sdl)
@@ -2698,123 +2720,10 @@ exit:
 //  TEXCOPY FUNCS
 //============================================================
 
-#define SDL_TEXFORMAT SDL_TEXFORMAT_ARGB32
 #include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB32
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB32_PALETTED
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_PALETTE16
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_PALETTE16A
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_PALETTED
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_PALETTE16_ARGB1555
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_ARGB1555
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555
-#include "texcopy.c"
-
-#ifdef SDLMAME_MACOSX /* native MacOS X composite texture format */
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_YUY16
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_YUY16_PALETTED
-#include "texcopy.c"
-
-#endif
 
 //============================================================
-//  MANUAL TEXCOPY FUNCS 
-//  (YUY format is weird and doesn't fit the assumptions of the
-//   standard macros so we handle it here
+//  SCALE2x FUNCS
 //============================================================
 
-void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource)
-{
-	int x, y;
-	UINT32 *dst;
-	UINT16 *src;
-
-	// loop over Y
-	for (y = 0; y < texsource->height; y++)
-	{
-		src = (UINT16 *)texsource->base + y * texsource->rowpixels;
-		dst = (UINT32 *)texture->data + (y * texture->yprescale + texture->borderpix) * texture->rawwidth;
-
-		// always fill non-wrapping textures with an extra pixel on the left
-		if (texture->borderpix)
-			*dst++ = 0;
-
-		// we don't support prescale for YUV textures
-		for (x = 0; x < texsource->width/2; x++)
-		{
-			UINT16 srcpix0 = *src++;
-			UINT16 srcpix1 = *src++;
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
-	
-			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
-			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
-		}
-		break;
-		
-		// always fill non-wrapping textures with an extra pixel on the right
-		#if 0 
-		if (texture->borderpix)
-			*dst++ = 0;
-		#endif
-	}
-}
-
-void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource)
-{
-	int x, y;
-	UINT32 *dst;
-	UINT16 *src;
-
-	// loop over Y
-	for (y = 0; y < texsource->height; y++)
-	{
-		src = (UINT16 *)texsource->base + y * texsource->rowpixels;
-		dst = (UINT32 *)texture->data + (y * texture->yprescale + texture->borderpix) * texture->rawwidth;
-
-		// always fill non-wrapping textures with an extra pixel on the left
-		if (texture->borderpix)
-			*dst++ = 0;
-
-		// we don't support prescale for YUV textures
-		for (x = 0; x < texsource->width/2; x++)
-		{
-			UINT16 srcpix0 = *src++;
-			UINT16 srcpix1 = *src++;
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
-	
-			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix0 >> 8)], cb, cr);
-			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix1 >> 8)], cb, cr);
-		}
-		break;
-		
-		// always fill non-wrapping textures with an extra pixel on the right
-		#if 0
-		if (texture->borderpix)
-			*dst++ = 0;
-		#endif
-	}
-}
-
+#include "scale2x.c"

@@ -85,7 +85,7 @@ osd_gl_dispatch *gl_dispatch;
 static sdl_monitor_info *primary_monitor;
 static sdl_monitor_info *sdl_monitor_list;
 
-static mame_bitmap *effect_bitmap;
+static bitmap_t *effect_bitmap;
 
 //============================================================
 //  PROTOTYPES

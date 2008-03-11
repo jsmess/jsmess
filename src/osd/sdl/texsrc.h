@@ -1,4 +1,3 @@
-#include "palette.h"
 
 #ifdef DEST_TYPE
 #undef DEST_TYPE

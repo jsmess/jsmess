@@ -3,6 +3,22 @@
 
 /* Notes
 
+	- removed  osd_event_wait_multiple from sdlsync.h
+	- removed some includes not needed
+	- reorganized texcopy/scale2x
+	- removed effect.h
+	- removed effect_func.h
+	- indenting
+	- put osd_copyfile, osd_stat into #ifdef MESS
+	- added code which implements events without the need
+ 	  for pthreads. This is commented out, since 
+ 	  owever, it horribly fails, if
+ 	  threads > num processors as is the case if you 
+ 	  enable "-mt"
+ 	- rename mame_bitmap to bitmap_t
+ 	- introduced define OSDWORK_CALLBACK to prototype and
+ 	  define functions to be passed to sdlwork.c
+
 	- fixes from judge for warnings / may reappear (glade)
 	- more warnings fixed / may reappear (glade)
 	- moved osdefs.h into sdlprefix.h

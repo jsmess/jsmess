@@ -332,7 +332,7 @@ static osd_ticks_t unix_ticks(void)
 		gettimeofday(&tp, NULL);
 		if (start_sec==0)
 			start_sec = tp.tv_sec;
-		return (tp.tv_sec - start_sec) * 1000000 + tp.tv_usec;
+		return (tp.tv_sec - start_sec) * (osd_ticks_t) 1000000 + tp.tv_usec;
 }
 
 

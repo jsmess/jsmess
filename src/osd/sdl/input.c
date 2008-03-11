@@ -14,21 +14,15 @@
 
 // standard sdl header
 #include <SDL/SDL.h>
-#include <SDL/SDL_thread.h>
 #include <ctype.h>
 #include <stddef.h>
 
 // MAME headers
 #include "osdepend.h"
-#include "driver.h"
-#include "ui.h"
 
 // MAMEOS headers
 #include "window.h"
 #include "input.h"
-#include "debugwin.h"
-#include "video.h"
-#include "config.h"
 #include "osdsdl.h"
 
 #ifdef MESS
@@ -160,7 +154,7 @@ static struct
 
 static int sixaxis_mode;
 
-static int joy_logical[MAX_JOYSTICKS];
+//static int joy_logical[MAX_JOYSTICKS];
 
 //============================================================
 //  PROTOTYPES
@@ -343,7 +337,6 @@ static key_lookup_table sdl_lookup_table[] =
 	KE8(k,			l,			m,				n,			o,			p,			q,			r			)
 	KE8(s,			t,			u,				v,			w,			x,			y,			z			)
 	{ SDLK_DELETE, "SDLK_DELETE" }, 
-	//FIXME:Proper check for version
 #if (!SDL_VERSION_ATLEAST(1,3,0))
 	KE8(WORLD_0,	WORLD_1,	WORLD_2,	WORLD_3,	WORLD_4,	WORLD_5,	WORLD_6,	WORLD_7		)
 	KE8(WORLD_8,	WORLD_9,	WORLD_10,	WORLD_11,	WORLD_12,	WORLD_13,	WORLD_14,	WORLD_15	)
@@ -605,7 +598,7 @@ static void sdlinput_register_joysticks(running_machine *machine)
 			joy_map[first_free].ismapped = 1;
 		}
 		
-		joy_logical[physical_stick] = stick;
+		//joy_logical[physical_stick] = stick;
 
 		mame_printf_verbose("Joystick: %s\n", joy_name);
 		mame_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy));

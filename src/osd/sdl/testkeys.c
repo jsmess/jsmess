@@ -45,7 +45,6 @@ static key_lookup_table sdl_lookup[] =
 //FIXME: SDL 1.3 Definitions are gone
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	KE8(DELETE,		KP0,		KP1,			KP2,		KP3,		KP4,		KP5,		KP6			)
-
 #else
 	KE8(DELETE,		WORLD_0,	WORLD_1,		WORLD_2,	WORLD_3,	WORLD_4,	WORLD_5,	WORLD_6		)
 	KE8(WORLD_7,	WORLD_8,	WORLD_9,		WORLD_10,	WORLD_11,	WORLD_12,	WORLD_13,	WORLD_14	)
