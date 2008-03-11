@@ -55,7 +55,7 @@ WRITE8_HANDLER(mikey_write);
 READ8_HANDLER(mikey_read);
 WRITE8_HANDLER(suzy_write);
 READ8_HANDLER(suzy_read);
-void lynx_timer_count_down(int nr);
+void lynx_timer_count_down(running_machine *machine, int nr);
 
 
 /*----------- defined in audio/lynx.c -----------*/
@@ -63,7 +63,7 @@ void lynx_timer_count_down(int nr);
 void lynx_audio_reset(void);
 void lynx_audio_write(int offset, UINT8 data);
 UINT8 lynx_audio_read(int offset);
-void lynx_audio_count_down(int nr);
+void lynx_audio_count_down(running_machine *machine, int nr);
 void *lynx_custom_start(int clock, const struct CustomSound_interface *config);
 void *lynx2_custom_start(int clock, const struct CustomSound_interface *config);
 

@@ -3,8 +3,8 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "includes/lynx.h"
 #include "deprecat.h"
+#include "includes/lynx.h"
 #include "cpu/m6502/m6502.h"
 
 
@@ -822,38 +822,38 @@ static void lynx_timer_init(int which)
 	lynx_timer[which].timer = timer_alloc( lynx_timer_shot , NULL);
 }
 
-static void lynx_timer_signal_irq(int which)
+static void lynx_timer_signal_irq(running_machine *machine, int which)
 {
     if ( ( lynx_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) { // irq flag handling later
 		mikey.data[0x81] |= ( 1 << which );
-		cpunum_set_input_line(Machine, 0, M65SC02_IRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, ASSERT_LINE);
     }
     switch ( which ) {
     case 0:
-		lynx_timer_count_down( 2 );
+		lynx_timer_count_down( machine, 2 );
 		lynx_line++;
 		break;
     case 2:
-		lynx_timer_count_down( 4 );
+		lynx_timer_count_down( machine, 4 );
 		lynx_draw_lines( -1 );
 		lynx_line=0;
 		break;
     case 1:
-		lynx_timer_count_down( 3 );
+		lynx_timer_count_down( machine, 3 );
 		break;
     case 3:
-		lynx_timer_count_down( 5 );
+		lynx_timer_count_down( machine, 5 );
 		break;
     case 5:
-		lynx_timer_count_down( 7 );
+		lynx_timer_count_down( machine, 7 );
 		break;
     case 7:
-		lynx_audio_count_down( 0 );
+		lynx_audio_count_down( machine, 0 );
 		break;
     }
 }
 
-void lynx_timer_count_down(int which)
+void lynx_timer_count_down(running_machine *machine, int which)
 {
     if ( ( lynx_timer[which].cntrl1 & 0x0f ) == 0x0f ) {
 		if ( lynx_timer[which].counter > 0 ) {
@@ -862,7 +862,7 @@ void lynx_timer_count_down(int which)
 		}
 		if ( lynx_timer[which].counter == 0 ) {
 			lynx_timer[which].cntrl2 |= 8;
-		    lynx_timer_signal_irq(which);
+		    lynx_timer_signal_irq(machine, which);
 		    if ( lynx_timer[which].cntrl1 & 0x10 ) {
 				lynx_timer[which].counter = lynx_timer[which].bakup;
 		    } else {
@@ -876,7 +876,7 @@ void lynx_timer_count_down(int which)
 static TIMER_CALLBACK(lynx_timer_shot)
 {
 	lynx_timer[param].cntrl2 |= 8;
-    lynx_timer_signal_irq( param );
+    lynx_timer_signal_irq( machine, param );
     if ( ! ( lynx_timer[param].cntrl1 & 0x10 ) )
 		lynx_timer[param].timer_active = 0;
 }
@@ -1098,7 +1098,7 @@ WRITE8_HANDLER(mikey_write)
 		mikey.data[0x81]&=~data; // clear interrupt source
 		logerror("mikey write %.2x %.2x\n",offset,data);
 		if (!mikey.data[0x81])
-			cpunum_set_input_line(Machine, 0, M65SC02_IRQ_LINE, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	case 0x87:
@@ -1136,7 +1136,7 @@ WRITE8_HANDLER(mikey_write)
 					(mikey.data[0xa0+(offset&0xf)]&0xf)<<4,
 					mikey.data[0xb0+(offset&0xf)]&0xf0 );
 #else
-		lynx_palette[offset&0xf]=Machine->pens[((mikey.data[0xb0+(offset&0xf)]&0xf))
+		lynx_palette[offset&0xf]=machine->pens[((mikey.data[0xb0+(offset&0xf)]&0xf))
 			|((mikey.data[0xa0+(offset&0xf)]&0xf)<<4)
 			|((mikey.data[0xb0+(offset&0xf)]&0xf0)<<4)];
 #endif

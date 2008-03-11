@@ -118,7 +118,7 @@ static void lynx_audio_reset_channel(LYNX_AUDIO *This)
     memset(This->reg.data, 0, (char*)(This+1)-(char*)(This->reg.data));
 }
 
-void lynx_audio_count_down(int nr)
+void lynx_audio_count_down(running_machine *machine, int nr)
 {
     LYNX_AUDIO *This=lynx_audio+nr;
     if (This->reg.n.control1&8 && (This->reg.n.control1&7)!=7) return;
@@ -126,7 +126,7 @@ void lynx_audio_count_down(int nr)
     This->count--;
 }
 
-static void lynx_audio_shift(LYNX_AUDIO *channel)
+static void lynx_audio_shift(running_machine *machine, LYNX_AUDIO *channel)
 {
     channel->shifter=((channel->shifter<<1)&0x3ff)
 	|shift_xor[channel->shifter&channel->mask];
@@ -139,21 +139,21 @@ static void lynx_audio_shift(LYNX_AUDIO *channel)
 	}
     }
     switch (channel->nr) {
-    case 0: lynx_audio_count_down(1); break;
-    case 1: lynx_audio_count_down(2); break;
-    case 2: lynx_audio_count_down(3); break;
-    case 3: lynx_timer_count_down(1); break;
+    case 0: lynx_audio_count_down(machine, 1); break;
+    case 1: lynx_audio_count_down(machine, 2); break;
+    case 2: lynx_audio_count_down(machine, 3); break;
+    case 3: lynx_timer_count_down(machine, 1); break;
     }
 }
 
-static void lynx_audio_execute(LYNX_AUDIO *channel)
+static void lynx_audio_execute(running_machine *machine, LYNX_AUDIO *channel)
 {
     if (channel->reg.n.control1&8) { // count_enable
 	channel->ticks+=usec_per_sample;
 	if ((channel->reg.n.control1&7)==7) { // timer input
 	    if (channel->count<0) {
 		channel->count+=channel->reg.n.counter;
-		lynx_audio_shift(channel);
+		lynx_audio_shift(machine, channel);
 	    }
 	} else {
 	    int t=1<<(channel->reg.n.control1&7);
@@ -163,7 +163,7 @@ static void lynx_audio_execute(LYNX_AUDIO *channel)
 		if (channel->ticks<t) break;
 		if (channel->count<0) {
 		    channel->count=channel->reg.n.counter;
-		    lynx_audio_shift(channel);
+		    lynx_audio_shift(machine, channel);
 		}
 	    }
 	}
@@ -270,7 +270,7 @@ static void lynx_update (void *param,stream_sample_t **inputs, stream_sample_t *
 		*buffer = 0;
 		for (channel=lynx_audio, j=0; j<ARRAY_LENGTH(lynx_audio); j++, channel++)
 		{
-			lynx_audio_execute(channel);
+			lynx_audio_execute(Machine, channel);
 			v=channel->reg.n.output;
 			*buffer+=v*15;
 		}
@@ -290,7 +290,7 @@ static void lynx2_update (void *param,stream_sample_t **inputs, stream_sample_t 
 		*right= 0;
 		for (channel=lynx_audio, j=0; j<ARRAY_LENGTH(lynx_audio); j++, channel++)
 		{
-			lynx_audio_execute(channel);
+			lynx_audio_execute(Machine, channel);
 			v=channel->reg.n.output;
 			if (!(master_enable&(0x10<<j)))
 			{
