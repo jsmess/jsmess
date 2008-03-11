@@ -87,7 +87,7 @@ WRITE8_HANDLER ( zx_io_w )
 	}
 	else
 	{
-		zx_ula_bkgnd(1);
+		zx_ula_bkgnd(machine, 1);
 		if (ula_frame_vsync == 2)
 		{
 			cpu_spinuntil_time(video_screen_get_time_until_pos(0, machine->screen[0].height - 1, 0));
@@ -135,7 +135,7 @@ READ8_HANDLER ( zx_io_r )
 
 		if (ula_irq_active)
 		{
-			zx_ula_bkgnd(0);
+			zx_ula_bkgnd(machine, 0);
 			ula_irq_active = 0;
 
 			LOG_ZX81_IOR("ULA IRQs off");
@@ -200,7 +200,7 @@ READ8_HANDLER ( pow3000_io_r )
 
 		if (ula_irq_active)
 		{
-			zx_ula_bkgnd(0);
+			zx_ula_bkgnd(machine, 0);
 			ula_irq_active = 0;
 			LOG_ZX81_IOR("ULA IRQs off");
 		}

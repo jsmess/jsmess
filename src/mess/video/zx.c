@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/zx.h"
 #include "sound/dac.h"
@@ -40,7 +39,7 @@ static int old_c = 0;
  * (during tape IO or sound output) zx_ula_bkgnd() is used to
  * simulate the display of a ZX80/ZX81.
  */
-void zx_ula_bkgnd(int color)
+void zx_ula_bkgnd(running_machine *machine, int color)
 {
 	if (ula_frame_vsync == 0 && color != old_c)
 	{
@@ -59,21 +58,21 @@ void zx_ula_bkgnd(int color)
 				r.min_x = old_x;
 				r.max_x = new_x;
 				r.min_y = r.max_y = y;
-				fillbitmap(bitmap, Machine->pens[color], &r);
+				fillbitmap(bitmap, machine->pens[color], &r);
 				break;
 			}
 			else
 			{
 				r.min_x = old_x;
-				r.max_x = Machine->screen[0].visarea.max_x;
+				r.max_x = machine->screen[0].visarea.max_x;
 				r.min_y = r.max_y = y;
-				fillbitmap(bitmap, Machine->pens[color], &r);
+				fillbitmap(bitmap, machine->pens[color], &r);
 				old_x = 0;
 			}
-			if (++y == Machine->screen[0].height)
+			if (++y == machine->screen[0].height)
 				y = 0;
 		}
-		old_x = (new_x + 1) % Machine->screen[0].width;
+		old_x = (new_x + 1) % machine->screen[0].width;
 		old_y = new_y;
 		old_c = color;
 		DAC_data_w(0, color ? 255 : 0);
