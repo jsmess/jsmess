@@ -134,7 +134,7 @@ static VIDEO_START( ti990_10 )
 
 static VIDEO_UPDATE( ti990_10 )
 {
-	vdt911_refresh(bitmap, 0, 0, 0);
+	vdt911_refresh(machine, bitmap, 0, 0, 0);
 	return 0;
 }
 

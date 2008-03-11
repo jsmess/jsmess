@@ -15,7 +15,6 @@ TODO:
 #include "911_chr.h"
 #include "911_key.h"
 #include "sound/beep.h"
-#include "deprecat.h"
 #include "mslegacy.h"
 
 
@@ -467,9 +466,9 @@ WRITE8_HANDLER(vdt911_0_cru_w)
 /*
 	Video refresh
 */
-void vdt911_refresh(bitmap_t *bitmap, int unit, int x, int y)
+void vdt911_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y)
 {
-	const gfx_element *gfx = Machine->gfx[vdt[unit].model];
+	const gfx_element *gfx = machine->gfx[vdt[unit].model];
 	int height = (vdt[unit].screen_size == char_960) ? 12 : /*25*/24;
 	int use_8bit_charcodes = USES_8BIT_CHARCODES(unit);
 	int address = 0;
@@ -511,7 +510,7 @@ void vdt911_refresh(bitmap_t *bitmap, int unit, int x, int y)
 				address++;
 
 				drawgfx(bitmap, gfx, cur_char, color, 0, 0,
-						x+j*7, y+i*10, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+						x+j*7, y+i*10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 			}
 		}
 }
