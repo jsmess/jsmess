@@ -12,7 +12,6 @@
 #include "devices/cassette.h"
 #include "formats/a26_cas.h"
 #include "video/tia.h"
-#include "deprecat.h"
 
 
 #define CART memory_region(REGION_USER1)
@@ -1430,11 +1429,11 @@ static MACHINE_START( a2600p )
 	current_reset_bank_counter = 0xFF;
 }
 
-static void set_category_value( const char* cat, const char *cat_selection ) {
+static void set_category_value( running_machine *machine, const char* cat, const char *cat_selection ) {
 	input_port_entry	*cat_in = NULL;
 	input_port_entry	*in;
 
-	for( in = Machine->input_ports; in->type != IPT_END; in++ ) {
+	for( in = machine->input_ports; in->type != IPT_END; in++ ) {
 		if ( in->type == IPT_CATEGORY_NAME && ! mame_stricmp( cat, input_port_name(in) ) ) {
 			cat_in = in;
 		}
@@ -1445,24 +1444,24 @@ static void set_category_value( const char* cat, const char *cat_selection ) {
 	}
 }
 
-static void set_controller( const char *controller, unsigned int selection ) {
+static void set_controller( running_machine *machine, const char *controller, unsigned int selection ) {
 	/* Defaulting to only joystick when joysstick and paddle are set for now... */
 	if ( selection == JOYS + PADD )
 		selection = JOYS;
 
 	switch( selection ) {
-	case JOYS:	set_category_value( controller, "Joystick" ); break;
-	case PADD:	set_category_value( controller, STR_PADDLES ); break;
-	case KEYP:	set_category_value( controller, STR_KEYPAD ); break;
-	case LGUN:	set_category_value( controller, STR_LIGHTGUN ); break;
-	case INDY:	set_category_value( controller, STR_DRIVING ); break;
-	case BOOS:	set_category_value( controller, STR_BOOSTERGRIP ); break;
-	case KVID:	set_category_value( controller, STR_KIDVID ); break;
+	case JOYS:	set_category_value( machine, controller, "Joystick" ); break;
+	case PADD:	set_category_value( machine, controller, STR_PADDLES ); break;
+	case KEYP:	set_category_value( machine, controller, STR_KEYPAD ); break;
+	case LGUN:	set_category_value( machine, controller, STR_LIGHTGUN ); break;
+	case INDY:	set_category_value( machine, controller, STR_DRIVING ); break;
+	case BOOS:	set_category_value( machine, controller, STR_BOOSTERGRIP ); break;
+	case KVID:	set_category_value( machine, controller, STR_KIDVID ); break;
 	case CMTE:	break;
 	case MLNK:	break;
-	case AMSE:	set_category_value( controller, STR_AMIGAMOUSE ); break;
-	case CX22:	set_category_value( controller, STR_CX22TRAKBALL ); break;
-	case CX80:	set_category_value( controller, STR_CX80TRAKBALL ); break;
+	case AMSE:	set_category_value( machine, controller, STR_AMIGAMOUSE ); break;
+	case CX22:	set_category_value( machine, controller, STR_CX22TRAKBALL ); break;
+	case CX80:	set_category_value( machine, controller, STR_CX80TRAKBALL ); break;
 	}
 }
 
@@ -1477,8 +1476,8 @@ static MACHINE_RESET( a2600 )
 
 	/* auto-detect special controllers */
 	controltemp = detect_2600controllers();
-	set_controller( STR_LEFT_CONTROLLER, controltemp >> 16 );
-	set_controller( STR_RIGHT_CONTROLLER, controltemp & 0xFFFF );
+	set_controller( machine, STR_LEFT_CONTROLLER, controltemp >> 16 );
+	set_controller( machine, STR_RIGHT_CONTROLLER, controltemp & 0xFFFF );
 
 	/* auto-detect bank mode */
 
