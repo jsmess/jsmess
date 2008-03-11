@@ -190,7 +190,7 @@ READ8_HANDLER( odyssey2_video_r )
         case 0xa1:
 			data = control_status;
 			iff = 0;
-			cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 			control_status &= ~ 0x08;
 			if ( video_screen_get_hpos( 0 ) < I824X_START_ACTIVE_SCAN || video_screen_get_hpos( 0 ) > I824X_END_ACTIVE_SCAN ) {
 				data |= 1;
