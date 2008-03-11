@@ -22,7 +22,6 @@
 
 #include "driver.h"
 #include "mslegacy.h"
-#include "deprecat.h"
 
 #include "733_asr.h"
 
@@ -180,11 +179,11 @@ void asr733_init(void)
 	memcpy(dst, fontdata6x8, asrfontdata_size);
 }
 
-int asr733_init_term(int unit, void (*int_callback)(int state))
+int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(int state))
 {
-	asr[unit].bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	asr[unit].bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
-	fillbitmap(asr[unit].bitmap, Machine->pens[0], &Machine->screen[0].visarea);
+	fillbitmap(asr[unit].bitmap, machine->pens[0], &machine->screen[0].visarea);
 
 	asr[unit].int_callback = int_callback;
 
@@ -218,13 +217,13 @@ void asr733_reset(int unit)
 }
 
 /* write a single char on screen */
-static void asr_draw_char(int unit, int character, int x, int y, int color)
+static void asr_draw_char(running_machine *machine, int unit, int character, int x, int y, int color)
 {
-	drawgfx(asr[unit].bitmap, Machine->gfx[0], character-32, color, 0, 0,
-				x+1, y, &Machine->screen[0].visarea, /*TRANSPARENCY_PEN*/TRANSPARENCY_NONE, 0);
+	drawgfx(asr[unit].bitmap, machine->gfx[0], character-32, color, 0, 0,
+				x+1, y, &machine->screen[0].visarea, /*TRANSPARENCY_PEN*/TRANSPARENCY_NONE, 0);
 }
 
-static void asr_linefeed(int unit)
+static void asr_linefeed(running_machine *machine, int unit)
 {
 	UINT8 buf[asr_window_width];
 	int y;
@@ -232,13 +231,13 @@ static void asr_linefeed(int unit)
 	for (y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
 		extract_scanline8(asr[unit].bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
-		draw_scanline8(asr[unit].bitmap, asr_window_offset_x, y, asr_window_width, buf, Machine->pens, -1);
+		draw_scanline8(asr[unit].bitmap, asr_window_offset_x, y, asr_window_width, buf, machine->pens, -1);
 	}
 
-	fillbitmap(asr[unit].bitmap, Machine->pens[0], &asr_scroll_clear_window);
+	fillbitmap(asr[unit].bitmap, machine->pens[0], &asr_scroll_clear_window);
 }
 
-static void asr_transmit(int unit, UINT8 data)
+static void asr_transmit(running_machine *machine, int unit, UINT8 data)
 {
 	switch (data)
 	{
@@ -277,7 +276,7 @@ static void asr_transmit(int unit, UINT8 data)
 
 	case 0x0A:
 		/* LF: line feed */
-		asr_linefeed(unit);
+		asr_linefeed(machine, unit);
 		break;
 
 	case 0x0D:
@@ -294,9 +293,9 @@ static void asr_transmit(int unit, UINT8 data)
 		if (asr[unit].x == 80)
 		{
 			asr[unit].x = 0;
-			asr_linefeed(unit);
+			asr_linefeed(machine, unit);
 		}
-		asr_draw_char(unit, data, asr_window_offset_x+asr[unit].x*8, asr_window_offset_y+asr_window_height-8, 0);
+		asr_draw_char(machine, unit, data, asr_window_offset_x+asr[unit].x*8, asr_window_offset_y+asr_window_height-8, 0);
 		asr[unit].x++;
 		break;
 	}
@@ -364,7 +363,7 @@ int asr733_cru_r(int offset, int unit)
 	14: enable interrupts, 1 to enable interrupts
 	15: diagnostic mode, 0 for normal mode
 */
-void asr733_cru_w(int offset, int data, int unit)
+void asr733_cru_w(running_machine *machine, int offset, int data, int unit)
 {
 	switch (offset)
 	{
@@ -382,7 +381,7 @@ void asr733_cru_w(int offset, int data, int unit)
 		else
 			asr[unit].xmit_buf &= ~ (1 << offset);
 		if ((offset == 7) && (asr[unit].mode & AM_dtr_mask) && (asr[unit].mode & AM_rts_mask))	/* right??? */
-			asr_transmit(unit, asr[unit].xmit_buf);
+			asr_transmit(machine, unit, asr[unit].xmit_buf);
 		break;
 
 	case 8:		/* not used */
@@ -420,16 +419,16 @@ void asr733_cru_w(int offset, int data, int unit)
 
 WRITE8_HANDLER(asr733_0_cru_w)
 {
-	asr733_cru_w(offset, data, 0);
+	asr733_cru_w(machine, offset, data, 0);
 }
 
 
 /*
 	Video refresh
 */
-void asr733_refresh(bitmap_t *bitmap, int unit, int x, int y)
+void asr733_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y)
 {
-	copybitmap(bitmap, asr[unit].bitmap, 0, 0, x, y, &Machine->screen[0].visarea);
+	copybitmap(bitmap, asr[unit].bitmap, 0, 0, x, y, &machine->screen[0].visarea);
 }
 
 

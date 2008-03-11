@@ -24,17 +24,17 @@ enum
 extern PALETTE_INIT ( asr733 ) ;
 
 void asr733_init(void);
-int asr733_init_term(int unit, void (*int_callback)(int state));
+int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(int state));
 
 void asr733_reset(int unit);
 
 int asr733_cru_r(int offset, int unit);
-void asr733_cru_w(int offset, int data, int unit);
+void asr733_cru_w(running_machine *machine, int offset, int data, int unit);
 
  READ8_HANDLER(asr733_0_cru_r);
 WRITE8_HANDLER(asr733_0_cru_w);
 
-void asr733_refresh(bitmap_t *bitmap, int unit, int x, int y);
+void asr733_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y);
 
 void asr733_keyboard(int unit);
 
