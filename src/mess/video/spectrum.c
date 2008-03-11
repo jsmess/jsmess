@@ -14,7 +14,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/spectrum.h"
 #include "eventlst.h"
 #include "video/border.h"
@@ -342,7 +341,7 @@ VIDEO_UPDATE( spectrum_128 )
  *******************************************************************/
 
 /* Draw a scanline in TS2068/TC2048 hires mode (code modified from COUPE.C) */
-static void ts2068_hires_scanline(bitmap_t *bitmap, int y, int borderlines)
+static void ts2068_hires_scanline(running_machine *machine, bitmap_t *bitmap, int y, int borderlines)
 {
 	int x,b,scrx,scry;
 	unsigned short ink,pap;
@@ -372,13 +371,13 @@ static void ts2068_hires_scanline(bitmap_t *bitmap, int y, int borderlines)
 		{
                         if (*scr&b)
 			{
-                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
-                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[ink]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[ink]);
 			}
 			else
 			{
-                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
-                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[pap]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[pap]);
 			}
 		}
                 scr++;
@@ -387,7 +386,7 @@ static void ts2068_hires_scanline(bitmap_t *bitmap, int y, int borderlines)
 }
 
 /* Draw a scanline in TS2068/TC2048 64-column mode */
-static void ts2068_64col_scanline(bitmap_t *bitmap, int y, int borderlines, unsigned short inkcolor)
+static void ts2068_64col_scanline(running_machine *machine, bitmap_t *bitmap, int y, int borderlines, unsigned short inkcolor)
 {
 	int x,b,scrx,scry;
         unsigned char *scr1, *scr2;
@@ -403,25 +402,25 @@ static void ts2068_64col_scanline(bitmap_t *bitmap, int y, int borderlines, unsi
 		for (b=0x80;b!=0;b>>=1)
 		{
                         if (*scr1&b)
-                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[inkcolor]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[inkcolor]);
 			else
-                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[7-inkcolor]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[7-inkcolor]);
 		}
                 scr1++;
 
 		for (b=0x80;b!=0;b>>=1)
 		{
                         if (*scr2&b)
-                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[inkcolor]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[inkcolor]);
 			else
-                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[7-inkcolor]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[7-inkcolor]);
 		}
                 scr2++;
 	}
 }
 
 /* Draw a scanline in TS2068/TC2048 lores (normal Spectrum) mode */
-static void ts2068_lores_scanline(bitmap_t *bitmap, int y, int borderlines, int screen)
+static void ts2068_lores_scanline(running_machine *machine, bitmap_t *bitmap, int y, int borderlines, int screen)
 {
 	int x,b,scrx,scry;
 	unsigned short ink,pap;
@@ -451,13 +450,13 @@ static void ts2068_lores_scanline(bitmap_t *bitmap, int y, int borderlines, int 
 		{
 			if (*scr&b)
 			{
-				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
-				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
+				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[ink]);
+				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[ink]);
 			}
 			else
 			{
-				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
-				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
+				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[pap]);
+				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,machine->pens[pap]);
 			}
 		}
 		scr++;
@@ -476,25 +475,25 @@ VIDEO_UPDATE( ts2068 )
                 /* 64 Column mode */
                 unsigned short inkcolor = (ts2068_port_ff_data & 0x38) >> 3;
                 for (count = 0; count < 192; count++)
-                        ts2068_64col_scanline(bitmap, count, TS2068_TOP_BORDER, inkcolor);
+                        ts2068_64col_scanline(machine, bitmap, count, TS2068_TOP_BORDER, inkcolor);
 	}
         else if ((ts2068_port_ff_data & 7) == 2)
         {
                 /* Extended Color mode */
                 for (count = 0; count < 192; count++)
-                        ts2068_hires_scanline(bitmap, count, TS2068_TOP_BORDER);
+                        ts2068_hires_scanline(machine, bitmap, count, TS2068_TOP_BORDER);
         }
         else if ((ts2068_port_ff_data & 7) == 1)
         {
                 /* Screen 6000-7aff */
                 for (count = 0; count < 192; count++)
-                        ts2068_lores_scanline(bitmap, count, TS2068_TOP_BORDER, 1);
+                        ts2068_lores_scanline(machine, bitmap, count, TS2068_TOP_BORDER, 1);
         }
         else
         {
                 /* Screen 4000-5aff */
                 for (count = 0; count < 192; count++)
-                        ts2068_lores_scanline(bitmap, count, TS2068_TOP_BORDER, 0);
+                        ts2068_lores_scanline(machine, bitmap, count, TS2068_TOP_BORDER, 0);
         }
 
         draw_border(bitmap, full_refresh,
@@ -516,25 +515,25 @@ VIDEO_UPDATE( tc2048 )
 		/* 64 Column mode */
 		unsigned short inkcolor = (ts2068_port_ff_data & 0x38) >> 3;
 		for (count = 0; count < 192; count++)
-			ts2068_64col_scanline(bitmap, count, SPEC_TOP_BORDER, inkcolor);
+			ts2068_64col_scanline(machine, bitmap, count, SPEC_TOP_BORDER, inkcolor);
 	}
 	else if ((ts2068_port_ff_data & 7) == 2)
 	{
 		/* Extended Color mode */
 		for (count = 0; count < 192; count++)
-			ts2068_hires_scanline(bitmap, count, SPEC_TOP_BORDER);
+			ts2068_hires_scanline(machine, bitmap, count, SPEC_TOP_BORDER);
 	}
 	else if ((ts2068_port_ff_data & 7) == 1)
 	{
 		/* Screen 6000-7aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(bitmap, count, SPEC_TOP_BORDER, 1);
+			ts2068_lores_scanline(machine, bitmap, count, SPEC_TOP_BORDER, 1);
 	}
 	else
 	{
 		/* Screen 4000-5aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(bitmap, count, SPEC_TOP_BORDER, 0);
+			ts2068_lores_scanline(machine, bitmap, count, SPEC_TOP_BORDER, 0);
 	}
 
 	draw_border(bitmap, full_refresh,
