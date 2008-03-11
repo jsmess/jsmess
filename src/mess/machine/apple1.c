@@ -413,7 +413,7 @@ static WRITE8_HANDLER( apple1_pia0_dsp_write_signal )
 	   write.  Thus the write delay depends on the cursor position and
 	   where the display is in the refresh cycle. */
 	if (!data)
-		timer_set(apple1_vh_dsp_time_to_ready(), NULL, 0, apple1_dsp_ready_start);
+		timer_set(apple1_vh_dsp_time_to_ready(machine), NULL, 0, apple1_dsp_ready_start);
 }
 
 static TIMER_CALLBACK(apple1_dsp_ready_start)

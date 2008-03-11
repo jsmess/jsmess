@@ -61,7 +61,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/apple1.h"
 #include "mscommon.h"
 
@@ -176,7 +175,7 @@ void apple1_vh_dsp_clr (void)
    signal in response to a video display write.  This signal indicates
    the display has completed the write and is ready to accept another
    write. */
-attotime apple1_vh_dsp_time_to_ready (void)
+attotime apple1_vh_dsp_time_to_ready (running_machine *machine)
 {
 	int cursor_x, cursor_y;
 	int cursor_scanline;
@@ -206,7 +205,7 @@ attotime apple1_vh_dsp_time_to_ready (void)
 		   still use it to find what fraction of the current scanline
 		   period has elapsed. */
 		double current_hfrac = video_screen_get_hpos(0) /
-							   Machine->screen[0].width;
+							   machine->screen[0].width;
 		if (current_hfrac < cursor_hfrac)
 			return double_to_attotime(scanline_period * (cursor_hfrac - current_hfrac));
 	}

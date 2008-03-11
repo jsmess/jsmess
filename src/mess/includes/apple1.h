@@ -27,7 +27,7 @@ VIDEO_UPDATE( apple1 );
 
 void apple1_vh_dsp_w (int data);
 void apple1_vh_dsp_clr (void);
-attotime apple1_vh_dsp_time_to_ready (void);
+attotime apple1_vh_dsp_time_to_ready (running_machine *machine);
 
 extern int apple1_vh_clrscrn_pressed;
 
