@@ -18,8 +18,6 @@
 #include <math.h>
 
 #include "driver.h"
-#include "deprecat.h"
-
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
 #include "video/crt.h"
@@ -40,8 +38,8 @@ static const rectangle panel_bitmap_bounds =
 	0,	panel_window_height-1,	/* min_y, max_y */
 };
 
-static void pdp1_draw_panel_backdrop(bitmap_t *bitmap);
-static void pdp1_draw_panel(bitmap_t *bitmap);
+static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap);
+static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap);
 
 static lightpen_t lightpen_state, previous_lightpen_state;
 static void pdp1_erase_lightpen(bitmap_t *bitmap);
@@ -62,7 +60,7 @@ VIDEO_START( pdp1 )
 	typewriter_bitmap = auto_bitmap_alloc(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
 
 	/* set up out bitmaps */
-	pdp1_draw_panel_backdrop(panel_bitmap);
+	pdp1_draw_panel_backdrop(machine, panel_bitmap);
 
 	fillbitmap(typewriter_bitmap, machine->pens[pen_typewriter_bg], &typewriter_bitmap_bounds);
 
@@ -92,7 +90,7 @@ VIDEO_UPDATE( pdp1 )
 	VIDEO_UPDATE_CALL(crt);
 	pdp1_draw_lightpen(bitmap);
 
-	pdp1_draw_panel(panel_bitmap);
+	pdp1_draw_panel(machine, panel_bitmap);
 	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
 	copybitmap(bitmap, typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
@@ -150,23 +148,23 @@ enum
 };
 
 /* draw a small 8*8 LED (or is this a lamp? ) */
-static void pdp1_draw_led(bitmap_t *bitmap, int x, int y, int state)
+static void pdp1_draw_led(running_machine *machine, bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
 	for (yy=1; yy<7; yy++)
 		for (xx=1; xx<7; xx++)
-			pdp1_plot_pixel(bitmap, x+xx, y+yy, Machine->pens[state ? pen_lit_lamp : pen_unlit_lamp]);
+			pdp1_plot_pixel(bitmap, x+xx, y+yy, machine->pens[state ? pen_lit_lamp : pen_unlit_lamp]);
 }
 
 /* draw nb_bits leds which represent nb_bits bits in value */
-static void pdp1_draw_multipleled(bitmap_t *bitmap, int x, int y, int value, int nb_bits)
+static void pdp1_draw_multipleled(running_machine *machine, bitmap_t *bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
 		nb_bits--;
 
-		pdp1_draw_led(bitmap, x, y, (value >> nb_bits) & 1);
+		pdp1_draw_led(machine, bitmap, x, y, (value >> nb_bits) & 1);
 
 		x += 8;
 	}
@@ -174,7 +172,7 @@ static void pdp1_draw_multipleled(bitmap_t *bitmap, int x, int y, int value, int
 
 
 /* draw a small 8*8 switch */
-static void pdp1_draw_switch(bitmap_t *bitmap, int x, int y, int state)
+static void pdp1_draw_switch(running_machine *machine, bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 	int i;
@@ -182,46 +180,46 @@ static void pdp1_draw_switch(bitmap_t *bitmap, int x, int y, int state)
 	/* erase area */
 	for (yy=0; yy<8; yy++)
 		for (xx=0; xx<8; xx++)
-			pdp1_plot_pixel(bitmap, x+xx, y+yy, Machine->pens[pen_panel_bg]);
+			pdp1_plot_pixel(bitmap, x+xx, y+yy, machine->pens[pen_panel_bg]);
 
 
 	/* draw nut (-> circle) */
 	for (i=0; i<4;i++)
 	{
-		pdp1_plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_nut]);
-		pdp1_plot_pixel(bitmap, x+2+i, y+6, Machine->pens[pen_switch_nut]);
-		pdp1_plot_pixel(bitmap, x+1, y+2+i, Machine->pens[pen_switch_nut]);
-		pdp1_plot_pixel(bitmap, x+6, y+2+i, Machine->pens[pen_switch_nut]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+1, machine->pens[pen_switch_nut]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+6, machine->pens[pen_switch_nut]);
+		pdp1_plot_pixel(bitmap, x+1, y+2+i, machine->pens[pen_switch_nut]);
+		pdp1_plot_pixel(bitmap, x+6, y+2+i, machine->pens[pen_switch_nut]);
 	}
-	pdp1_plot_pixel(bitmap, x+2, y+2, Machine->pens[pen_switch_nut]);
-	pdp1_plot_pixel(bitmap, x+5, y+2, Machine->pens[pen_switch_nut]);
-	pdp1_plot_pixel(bitmap, x+2, y+5, Machine->pens[pen_switch_nut]);
-	pdp1_plot_pixel(bitmap, x+5, y+5, Machine->pens[pen_switch_nut]);
+	pdp1_plot_pixel(bitmap, x+2, y+2, machine->pens[pen_switch_nut]);
+	pdp1_plot_pixel(bitmap, x+5, y+2, machine->pens[pen_switch_nut]);
+	pdp1_plot_pixel(bitmap, x+2, y+5, machine->pens[pen_switch_nut]);
+	pdp1_plot_pixel(bitmap, x+5, y+5, machine->pens[pen_switch_nut]);
 
 	/* draw button (->disc) */
 	if (! state)
 		y += 4;
 	for (i=0; i<2;i++)
 	{
-		pdp1_plot_pixel(bitmap, x+3+i, y, Machine->pens[pen_switch_button]);
-		pdp1_plot_pixel(bitmap, x+3+i, y+3, Machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+3+i, y, machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+3+i, y+3, machine->pens[pen_switch_button]);
 	}
 	for (i=0; i<4;i++)
 	{
-		pdp1_plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_button]);
-		pdp1_plot_pixel(bitmap, x+2+i, y+2, Machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+1, machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+2, machine->pens[pen_switch_button]);
 	}
 }
 
 
 /* draw nb_bits switches which represent nb_bits bits in value */
-static void pdp1_draw_multipleswitch(bitmap_t *bitmap, int x, int y, int value, int nb_bits)
+static void pdp1_draw_multipleswitch(running_machine *machine, bitmap_t *bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
 		nb_bits--;
 
-		pdp1_draw_switch(bitmap, x, y, (value >> nb_bits) & 1);
+		pdp1_draw_switch(machine, bitmap, x, y, (value >> nb_bits) & 1);
 
 		x += 8;
 	}
@@ -229,18 +227,18 @@ static void pdp1_draw_multipleswitch(bitmap_t *bitmap, int x, int y, int value, 
 
 
 /* write a single char on screen */
-static void pdp1_draw_char(bitmap_t *bitmap, char character, int x, int y, int color)
+static void pdp1_draw_char(running_machine *machine, bitmap_t *bitmap, char character, int x, int y, int color)
 {
-	drawgfx(bitmap, Machine->gfx[0], character-32, color, 0, 0,
-				x+1, y, &Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+	drawgfx(bitmap, machine->gfx[0], character-32, color, 0, 0,
+				x+1, y, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 }
 
 /* write a string on screen */
-static void pdp1_draw_string(bitmap_t *bitmap, const char *buf, int x, int y, int color)
+static void pdp1_draw_string(running_machine *machine, bitmap_t *bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{
-		pdp1_draw_char(bitmap, *buf, x, y, color);
+		pdp1_draw_char(machine, bitmap, *buf, x, y, color);
 
 		x += 8;
 		buf++;
@@ -251,95 +249,95 @@ static void pdp1_draw_string(bitmap_t *bitmap, const char *buf, int x, int y, in
 /*
 	draw the operator control panel (fixed backdrop)
 */
-static void pdp1_draw_panel_backdrop(bitmap_t *bitmap)
+static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 {
 	/* fill with black */
-	fillbitmap(panel_bitmap, Machine->pens[pen_panel_bg], &panel_bitmap_bounds);
+	fillbitmap(panel_bitmap, machine->pens[pen_panel_bg], &panel_bitmap_bounds);
 
 	/* column 1: registers, test word, test address */
-	pdp1_draw_string(bitmap, "program counter", x_panel_col1_offset, y_panel_pc_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "memory address", x_panel_col1_offset, y_panel_ma_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "memory buffer", x_panel_col1_offset, y_panel_mb_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "accumulator", x_panel_col1_offset, y_panel_ac_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "in-out", x_panel_col1_offset, y_panel_io_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "extend  address", x_panel_col1_offset-8, y_panel_ta_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "test word", x_panel_col1_offset, y_panel_tw_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "program counter", x_panel_col1_offset, y_panel_pc_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "memory address", x_panel_col1_offset, y_panel_ma_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "memory buffer", x_panel_col1_offset, y_panel_mb_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "accumulator", x_panel_col1_offset, y_panel_ac_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "in-out", x_panel_col1_offset, y_panel_io_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "extend  address", x_panel_col1_offset-8, y_panel_ta_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "test word", x_panel_col1_offset, y_panel_tw_offset, color_panel_caption);
 
 	/* column separator */
 	plot_box(bitmap, x_panel_col2_offset-4, panel_window_offset_y+8, 1, 96, pen_panel_caption);
 
 	/* column 2: 1-bit indicators */
-	pdp1_draw_string(bitmap, "run", x_panel_col2_offset+8, y_panel_run_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "cycle", x_panel_col2_offset+8, y_panel_cyc_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "defer", x_panel_col2_offset+8, y_panel_defer_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "h. s. cycle", x_panel_col2_offset+8, y_panel_hs_cyc_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "brk. ctr. 1", x_panel_col2_offset+8, y_panel_brk_ctr_1_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "brk. ctr. 2", x_panel_col2_offset+8, y_panel_brk_ctr_2_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "overflow", x_panel_col2_offset+8, y_panel_ov_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "read in", x_panel_col2_offset+8, y_panel_rim_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "seq. break", x_panel_col2_offset+8, y_panel_sbm_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "extend", x_panel_col2_offset+8, y_panel_exd_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "i-o halt", x_panel_col2_offset+8, y_panel_ioh_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "i-o com'ds", x_panel_col2_offset+8, y_panel_ioc_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "i-o sync", x_panel_col2_offset+8, y_panel_ios_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "run", x_panel_col2_offset+8, y_panel_run_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "cycle", x_panel_col2_offset+8, y_panel_cyc_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "defer", x_panel_col2_offset+8, y_panel_defer_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "h. s. cycle", x_panel_col2_offset+8, y_panel_hs_cyc_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "brk. ctr. 1", x_panel_col2_offset+8, y_panel_brk_ctr_1_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "brk. ctr. 2", x_panel_col2_offset+8, y_panel_brk_ctr_2_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "overflow", x_panel_col2_offset+8, y_panel_ov_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "read in", x_panel_col2_offset+8, y_panel_rim_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "seq. break", x_panel_col2_offset+8, y_panel_sbm_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "extend", x_panel_col2_offset+8, y_panel_exd_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "i-o halt", x_panel_col2_offset+8, y_panel_ioh_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "i-o com'ds", x_panel_col2_offset+8, y_panel_ioc_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "i-o sync", x_panel_col2_offset+8, y_panel_ios_offset, color_panel_caption);
 
 	/* column separator */
 	plot_box(bitmap, x_panel_col3_offset-4, panel_window_offset_y+8, 1, 96, pen_panel_caption);
 
 	/* column 3: power, single step, single inst, sense, flags, instr... */
-	pdp1_draw_string(bitmap, "power", x_panel_col3_offset+16, y_panel_power_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "single step", x_panel_col3_offset+16, y_panel_sngl_step_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "single inst.", x_panel_col3_offset+16, y_panel_sngl_inst_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "power", x_panel_col3_offset+16, y_panel_power_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "single step", x_panel_col3_offset+16, y_panel_sngl_step_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "single inst.", x_panel_col3_offset+16, y_panel_sngl_inst_offset, color_panel_caption);
 	/* separator */
 	plot_box(bitmap, x_panel_col3_offset+8, y_panel_sep1_offset+4, 96, 1, pen_panel_caption);
-	pdp1_draw_string(bitmap, "sense switches", x_panel_col3_offset, y_panel_ss_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "sense switches", x_panel_col3_offset, y_panel_ss_offset, color_panel_caption);
 	/* separator */
 	plot_box(bitmap, x_panel_col3_offset+8, y_panel_sep2_offset+4, 96, 1, pen_panel_caption);
-	pdp1_draw_string(bitmap, "program flags", x_panel_col3_offset, y_panel_pf_offset, color_panel_caption);
-	pdp1_draw_string(bitmap, "instruction", x_panel_col3_offset, y_panel_ir_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "program flags", x_panel_col3_offset, y_panel_pf_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "instruction", x_panel_col3_offset, y_panel_ir_offset, color_panel_caption);
 }
 
 /*
 	draw the operator control panel (dynamic elements)
 */
-static void pdp1_draw_panel(bitmap_t *bitmap)
+static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap)
 {
 	/* column 1: registers, test word, test address */
-	pdp1_draw_multipleled(bitmap, x_panel_col1_offset+2*8, y_panel_pc_offset+8, cpunum_get_reg(0, PDP1_PC), 16);
-	pdp1_draw_multipleled(bitmap, x_panel_col1_offset+2*8, y_panel_ma_offset+8, cpunum_get_reg(0, PDP1_MA), 16);
-	pdp1_draw_multipleled(bitmap, x_panel_col1_offset, y_panel_mb_offset+8, cpunum_get_reg(0, PDP1_MB), 18);
-	pdp1_draw_multipleled(bitmap, x_panel_col1_offset, y_panel_ac_offset+8, cpunum_get_reg(0, PDP1_AC), 18);
-	pdp1_draw_multipleled(bitmap, x_panel_col1_offset, y_panel_io_offset+8, cpunum_get_reg(0, PDP1_IO), 18);
-	pdp1_draw_switch(bitmap, x_panel_col1_offset, y_panel_ta_offset+8, cpunum_get_reg(0, PDP1_EXTEND_SW));
-	pdp1_draw_multipleswitch(bitmap, x_panel_col1_offset+2*8, y_panel_ta_offset+8, cpunum_get_reg(0, PDP1_TA), 16);
-	pdp1_draw_multipleswitch(bitmap, x_panel_col1_offset, y_panel_tw_offset+8, cpunum_get_reg(0, PDP1_TW), 18);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+2*8, y_panel_pc_offset+8, cpunum_get_reg(0, PDP1_PC), 16);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+2*8, y_panel_ma_offset+8, cpunum_get_reg(0, PDP1_MA), 16);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_mb_offset+8, cpunum_get_reg(0, PDP1_MB), 18);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_ac_offset+8, cpunum_get_reg(0, PDP1_AC), 18);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_io_offset+8, cpunum_get_reg(0, PDP1_IO), 18);
+	pdp1_draw_switch(machine, bitmap, x_panel_col1_offset, y_panel_ta_offset+8, cpunum_get_reg(0, PDP1_EXTEND_SW));
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset+2*8, y_panel_ta_offset+8, cpunum_get_reg(0, PDP1_TA), 16);
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset, y_panel_tw_offset+8, cpunum_get_reg(0, PDP1_TW), 18);
 
 	/* column 2: 1-bit indicators */
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_run_offset, cpunum_get_reg(0, PDP1_RUN));
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_cyc_offset, cpunum_get_reg(0, PDP1_CYC));
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_defer_offset, cpunum_get_reg(0, PDP1_DEFER));
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_hs_cyc_offset, 0);	/* not emulated */
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_brk_ctr_1_offset, cpunum_get_reg(0, PDP1_BRK_CTR) & 1);
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_brk_ctr_2_offset, cpunum_get_reg(0, PDP1_BRK_CTR) & 2);
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_ov_offset, cpunum_get_reg(0, PDP1_OV));
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_rim_offset, cpunum_get_reg(0, PDP1_RIM));
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_sbm_offset, cpunum_get_reg(0, PDP1_SBM));
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_exd_offset, cpunum_get_reg(0, PDP1_EXD));
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_ioh_offset, cpunum_get_reg(0, PDP1_IOH));
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_ioc_offset, cpunum_get_reg(0, PDP1_IOC));
-	pdp1_draw_led(bitmap, x_panel_col2_offset, y_panel_ios_offset, cpunum_get_reg(0, PDP1_IOS));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_run_offset, cpunum_get_reg(0, PDP1_RUN));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cyc_offset, cpunum_get_reg(0, PDP1_CYC));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_defer_offset, cpunum_get_reg(0, PDP1_DEFER));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_hs_cyc_offset, 0);	/* not emulated */
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_1_offset, cpunum_get_reg(0, PDP1_BRK_CTR) & 1);
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_2_offset, cpunum_get_reg(0, PDP1_BRK_CTR) & 2);
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ov_offset, cpunum_get_reg(0, PDP1_OV));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_rim_offset, cpunum_get_reg(0, PDP1_RIM));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_sbm_offset, cpunum_get_reg(0, PDP1_SBM));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_exd_offset, cpunum_get_reg(0, PDP1_EXD));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioh_offset, cpunum_get_reg(0, PDP1_IOH));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioc_offset, cpunum_get_reg(0, PDP1_IOC));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ios_offset, cpunum_get_reg(0, PDP1_IOS));
 
 	/* column 3: power, single step, single inst, sense, flags, instr... */
-	pdp1_draw_led(bitmap, x_panel_col3_offset, y_panel_power_offset, 1);	/* always on */
-	pdp1_draw_switch(bitmap, x_panel_col3_offset+8, y_panel_power_offset, 1);	/* always on */
-	pdp1_draw_led(bitmap, x_panel_col3_offset, y_panel_sngl_step_offset, cpunum_get_reg(0, PDP1_SNGL_STEP));
-	pdp1_draw_switch(bitmap, x_panel_col3_offset+8, y_panel_sngl_step_offset, cpunum_get_reg(0, PDP1_SNGL_STEP));
-	pdp1_draw_led(bitmap, x_panel_col3_offset, y_panel_sngl_inst_offset, cpunum_get_reg(0, PDP1_SNGL_INST));
-	pdp1_draw_switch(bitmap, x_panel_col3_offset+8, y_panel_sngl_inst_offset, cpunum_get_reg(0, PDP1_SNGL_INST));
-	pdp1_draw_multipleled(bitmap, x_panel_col3_offset, y_panel_ss_offset+8, cpunum_get_reg(0, PDP1_SS), 6);
-	pdp1_draw_multipleswitch(bitmap, x_panel_col3_offset, y_panel_ss_offset+2*8, cpunum_get_reg(0, PDP1_SS), 6);
-	pdp1_draw_multipleled(bitmap, x_panel_col3_offset, y_panel_pf_offset+8, cpunum_get_reg(0, PDP1_PF), 6);
-	pdp1_draw_multipleled(bitmap, x_panel_col3_offset, y_panel_ir_offset+8, cpunum_get_reg(0, PDP1_IR), 5);
+	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_power_offset, 1);	/* always on */
+	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_power_offset, 1);	/* always on */
+	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_step_offset, cpunum_get_reg(0, PDP1_SNGL_STEP));
+	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_step_offset, cpunum_get_reg(0, PDP1_SNGL_STEP));
+	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_inst_offset, cpunum_get_reg(0, PDP1_SNGL_INST));
+	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_inst_offset, cpunum_get_reg(0, PDP1_SNGL_INST));
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+8, cpunum_get_reg(0, PDP1_SS), 6);
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+2*8, cpunum_get_reg(0, PDP1_SS), 6);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_pf_offset+8, cpunum_get_reg(0, PDP1_PF), 6);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ir_offset+8, cpunum_get_reg(0, PDP1_IR), 5);
 }
 
 
@@ -372,7 +370,7 @@ enum
 };
 
 
-static void pdp1_typewriter_linefeed(void)
+static void pdp1_typewriter_linefeed(running_machine *machine)
 {
 	UINT8 buf[typewriter_window_width];
 	int y;
@@ -380,13 +378,13 @@ static void pdp1_typewriter_linefeed(void)
 	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
 	{
 		extract_scanline8(typewriter_bitmap, 0, y+typewriter_scroll_step, typewriter_window_width, buf);
-		draw_scanline8(typewriter_bitmap, 0, y, typewriter_window_width, buf, Machine->pens, -1);
+		draw_scanline8(typewriter_bitmap, 0, y, typewriter_window_width, buf, machine->pens, -1);
 	}
 
-	fillbitmap(typewriter_bitmap, Machine->pens[pen_typewriter_bg], &typewriter_scroll_clear_window);
+	fillbitmap(typewriter_bitmap, machine->pens[pen_typewriter_bg], &typewriter_scroll_clear_window);
 }
 
-void pdp1_typewriter_drawchar(int character)
+void pdp1_typewriter_drawchar(running_machine *machine, int character)
 {
 	static const char ascii_table[2][64] =
 	{	/* n-s = non-spacing */
@@ -468,7 +466,7 @@ void pdp1_typewriter_drawchar(int character)
 	case 077:
 		/* Carriage Return */
 		pos = 0;
-		pdp1_typewriter_linefeed();
+		pdp1_typewriter_linefeed(machine);
 		break;
 
 	default:
@@ -476,12 +474,12 @@ void pdp1_typewriter_drawchar(int character)
 
 		if (pos >= 80)
 		{	/* if past right border, wrap around. (Right???) */
-			pdp1_typewriter_linefeed();	/* next line */
+			pdp1_typewriter_linefeed(machine);	/* next line */
 			pos = 0;					/* return to start of line */
 		}
 
 		/* print character (lookup ASCII equivalent in table) */
-		pdp1_draw_char(typewriter_bitmap, ascii_table[case_shift][character],
+		pdp1_draw_char(machine, typewriter_bitmap, ascii_table[case_shift][character],
 						8*pos, typewriter_write_offset_y,
 						color);	/* print char */
 

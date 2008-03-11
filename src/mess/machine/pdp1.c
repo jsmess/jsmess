@@ -743,7 +743,7 @@ static void typewriter_out(UINT8 data)
 	if (LOG_IOT_EXTRA)
 		logerror("typewriter output %o\n", data);
 
-	pdp1_typewriter_drawchar(data);
+	pdp1_typewriter_drawchar(Machine, data);
 	if (typewriter.fd)
 #if 1
 		image_fwrite(typewriter.fd, & data, 1);
@@ -1277,7 +1277,7 @@ static void pdp1_keyboard(void)
 				cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, 0);	/* interrupt it, baby */
 			#endif
 			cpunum_set_reg(0, PDP1_PF1, 1);
-			pdp1_typewriter_drawchar(typewriter.tb);	/* we want to echo input */
+			pdp1_typewriter_drawchar(Machine, typewriter.tb);	/* we want to echo input */
 			break;
 		}
 	}

@@ -181,7 +181,7 @@ VIDEO_UPDATE( pdp1 );
 
 void pdp1_plot(int x, int y);
 
-void pdp1_typewriter_drawchar(int character);
+void pdp1_typewriter_drawchar(running_machine *machine, int character);
 
 void pdp1_update_lightpen_state(const lightpen_t *new_state);
 
