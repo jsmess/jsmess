@@ -126,10 +126,10 @@ typedef struct NICK_STATE
 /* initialise palette function */
 extern PALETTE_INIT( nick );
 
-extern int Nick_vh_start(void);
-extern void Nick_DoScreen(bitmap_t *bm);
+int Nick_vh_start(void);
+void Nick_DoScreen(running_machine *machine, bitmap_t *bm);
 
-extern int Nick_reg_r(int);
+int Nick_reg_r(int);
 WRITE8_HANDLER ( Nick_reg_w );
 
 

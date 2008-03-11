@@ -24,7 +24,7 @@ VIDEO_START( enterprise )
 ***************************************************************************/
 VIDEO_UPDATE( enterprise )
 {
-	Nick_DoScreen(tmpbitmap);
+	Nick_DoScreen(machine, tmpbitmap);
 	return VIDEO_UPDATE_CALL(generic_bitmapped);
 }
 
