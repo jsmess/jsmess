@@ -44,7 +44,7 @@ INTERRUPT_GEN( tx0_interrupt );
 VIDEO_START( tx0 );
 void tx0_plot(int x, int y);
 VIDEO_UPDATE( tx0 );
-void tx0_typewriter_drawchar(int character);
+void tx0_typewriter_drawchar(running_machine *machine, int character);
 
 enum
 {

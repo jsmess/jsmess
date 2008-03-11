@@ -9,6 +9,7 @@
 #include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
 #include "video/crt.h"
+#include "deprecat.h"
 
 
 static TIMER_CALLBACK(reader_callback);
@@ -444,7 +445,7 @@ DEVICE_UNLOAD(tx0_typewriter)
 */
 static void typewriter_out(UINT8 data)
 {
-	tx0_typewriter_drawchar(data);
+	tx0_typewriter_drawchar(Machine, data);
 	if (typewriter.fd)
 		image_fwrite(typewriter.fd, & data, 1);
 }
@@ -1139,7 +1140,7 @@ static void tx0_keyboard(void)
 			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
 			/* write modified LR */
 			cpunum_set_reg(0, TX0_LR, lr);
-			tx0_typewriter_drawchar(charcode);	/* we want to echo input */
+			tx0_typewriter_drawchar(Machine, charcode);	/* we want to echo input */
 			break;
 		}
 	}
