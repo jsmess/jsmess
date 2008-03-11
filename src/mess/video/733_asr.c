@@ -21,8 +21,6 @@
 */
 
 #include "driver.h"
-#include "mslegacy.h"
-
 #include "733_asr.h"
 
 #define MAX_ASR 1
@@ -112,7 +110,11 @@ GFXDECODE_END
 
 PALETTE_INIT( asr733 )
 {
-	palette_set_colors_rgb(machine, 0, asr_palette, asr733_palette_size);
+	int i;
+
+	for ( i = 0; i < asr733_palette_size; i++ ) {
+		palette_set_color_rgb(machine, i, asr_palette[i*3], asr_palette[i*3+1], asr_palette[i*3+2]);
+	}
 }
 
 /*
