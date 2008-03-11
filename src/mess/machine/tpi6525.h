@@ -40,7 +40,7 @@ typedef struct {
 	} a,b,c;
 
 	struct {
-		void (*output)(int level);
+		void (*output)(running_machine *machine, int level);
 		int level;
 	} ca, cb, interrupt;
 
@@ -60,17 +60,17 @@ void tpi6525_1_reset(void);
 void tpi6525_2_reset(void);
 void tpi6525_3_reset(void);
 
-void tpi6525_0_irq0_level(int level);
-void tpi6525_0_irq1_level(int level);
-void tpi6525_0_irq2_level(int level);
-void tpi6525_0_irq3_level(int level);
-void tpi6525_0_irq4_level(int level);
+void tpi6525_0_irq0_level(running_machine *machine, int level);
+void tpi6525_0_irq1_level(running_machine *machine, int level);
+void tpi6525_0_irq2_level(running_machine *machine, int level);
+void tpi6525_0_irq3_level(running_machine *machine, int level);
+void tpi6525_0_irq4_level(running_machine *machine, int level);
 
-void tpi6525_1_irq0_level(int level);
-void tpi6525_1_irq1_level(int level);
-void tpi6525_1_irq2_level(int level);
-void tpi6525_1_irq3_level(int level);
-void tpi6525_1_irq4_level(int level);
+void tpi6525_1_irq0_level(running_machine *machine, int level);
+void tpi6525_1_irq1_level(running_machine *machine, int level);
+void tpi6525_1_irq2_level(running_machine *machine, int level);
+void tpi6525_1_irq3_level(running_machine *machine, int level);
+void tpi6525_1_irq4_level(running_machine *machine, int level);
 
  READ8_HANDLER  ( tpi6525_0_port_r );
  READ8_HANDLER  ( tpi6525_1_port_r );

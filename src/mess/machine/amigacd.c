@@ -71,7 +71,7 @@ typedef struct
 
 static _dmac_data dmac_data;
 
-static void check_interrupts( void )
+static void check_interrupts( running_machine *machine )
 {
 	/* if interrupts are disabled, bail */
 	if ( (dmac_data.cntr & CNTR_INTEN) == 0 )
@@ -82,7 +82,7 @@ static void check_interrupts( void )
 		return;
 
 	/* otherwise, generate the IRQ */
-	amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
+	amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
 }
 
 static TIMER_CALLBACK(dmac_dma_proc)
@@ -117,7 +117,7 @@ static TIMER_CALLBACK(dmac_dma_proc)
 	else
 	{
 		dmac_data.istr |= ISTR_INT_P | ISTR_E_INT;
-		check_interrupts();
+		check_interrupts( machine );
 	}
 }
 
@@ -264,7 +264,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		{
 			LOG(( "DMAC: PC=%08x - CNTR Write(%04x)\n", activecpu_get_pc(), data ));
 			dmac_data.cntr = data;
-			check_interrupts();
+			check_interrupts( machine );
 		}
 		break;
 
@@ -460,7 +460,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 	}
 }
 
-static void tp6525_irq( int level )
+static void tp6525_irq( running_machine *machine, int level )
 {
 	LOG(( "TPI6525 Interrupt: level = %d\n", level ));
 
@@ -468,7 +468,7 @@ static void tp6525_irq( int level )
 	{
 		if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 		{
-			amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
+			amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
 		}
 		else
 		{
@@ -481,7 +481,7 @@ static void tp6525_irq( int level )
 static void cdrom_status_enabled( int level )
 {
 	/* PC3 on the 6525 */
-	tpi6525_0_irq3_level( level );
+	tpi6525_0_irq3_level( Machine, level );
 }
 
 static void cdrom_status_change( int level )
@@ -490,13 +490,13 @@ static void cdrom_status_change( int level )
 	level = level ? 0 : 1;
 
 	/* PC2 on the 6525 */
-	tpi6525_0_irq2_level( level );
+	tpi6525_0_irq2_level( Machine, level );
 }
 
 static void cdrom_subcode_ready( int level )
 {
 	/* PC1 on the 6525 */
-	tpi6525_0_irq1_level( level );
+	tpi6525_0_irq1_level( Machine, level );
 }
 
 void amigacd_init( void )

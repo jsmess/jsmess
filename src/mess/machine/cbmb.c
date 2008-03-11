@@ -157,14 +157,14 @@ static int cbmb_keyboard_line_c(void)
 	return data^0xff;
 }
 
-static void cbmb_irq (int level)
+static void cbmb_irq (running_machine *machine, int level)
 {
 	static int old_level = 0;
 
 	if (level != old_level)
 	{
 		DBG_LOG (3, "mos6509", ("irq %s\n", level ? "start" : "end"));
-		cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, level);
+		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, level);
 		old_level = level;
 	}
 }
@@ -188,10 +188,14 @@ static void cbmb_cia_port_a_w(UINT8 data)
 	cbm_ieee_data_w(0, data);
 }
 
+static void cbmb_tpi6525_0_irq2_level( int level ) {
+	tpi6525_0_irq2_level( Machine, level );
+}
+
 static const cia6526_interface cbmb_cia =
 {
 	CIA6526,
-	tpi6525_0_irq2_level,
+	cbmb_tpi6525_0_irq2_level,
 	0.0, 60,
 
 	{
@@ -218,7 +222,7 @@ static int cbmb_dma_read_color(int offset)
 	return cbmb_colorram[offset&0x3ff];
 }
 
-static void cbmb_change_font(int level)
+static void cbmb_change_font(running_machine *machine, int level)
 {
 	cbmb_vh_set_font(level);
 }
@@ -309,7 +313,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	static int level = 0;
 
-	tpi6525_0_irq0_level(level);
+	tpi6525_0_irq0_level(machine, level);
 	level=!level;
 	if (level) return ;
 

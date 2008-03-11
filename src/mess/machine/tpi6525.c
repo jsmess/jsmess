@@ -112,60 +112,60 @@ static void tpi6525_reset(TPI6525 *This)
 		This->irq_level[4]=0;
 }
 
-static void tpi6525_set_interrupt(TPI6525 *This)
+static void tpi6525_set_interrupt(running_machine *machine, TPI6525 *This)
 {
 	if (!This->interrupt.level && (This->air!=0)) {
 		This->interrupt.level=1;
 		DBG_LOG (3, "tpi6525",("%d set interrupt\n",This->number));
 		if (This->interrupt.output!=NULL)
-			This->interrupt.output(This->interrupt.level);
+			This->interrupt.output(machine, This->interrupt.level);
 	}
 }
 
-static void tpi6525_clear_interrupt(TPI6525 *This)
+static void tpi6525_clear_interrupt(running_machine *machine, TPI6525 *This)
 {
 	if (This->interrupt.level && (This->air==0)) {
 		This->interrupt.level=0;
 		DBG_LOG (3, "tpi6525",("%d clear interrupt\n",This->number));
 		if (This->interrupt.output!=NULL)
-			This->interrupt.output(This->interrupt.level);
+			This->interrupt.output(machine, This->interrupt.level);
 	}
 }
 
-static void tpi6525_irq0_level(TPI6525 *This, int level)
+static void tpi6525_irq0_level(running_machine *machine, TPI6525 *This, int level)
 {
 	if (INTERRUPT_MODE && (level!=This->irq_level[0]) ) {
 		This->irq_level[0]=level;
 		if ((level==0)&&!(This->air&1)&&(This->c.ddr&1)) {
 			This->air|=1;
-			tpi6525_set_interrupt(This);
+			tpi6525_set_interrupt(machine, This);
 		}
 	}
 }
 
-static void tpi6525_irq1_level(TPI6525 *This, int level)
+static void tpi6525_irq1_level(running_machine *machine, TPI6525 *This, int level)
 {
 	if (INTERRUPT_MODE && (level!=This->irq_level[1]) ) {
 		This->irq_level[1]=level;
 		if ((level==0)&&!(This->air&2)&&(This->c.ddr&2)) {
 			This->air|=2;
-			tpi6525_set_interrupt(This);
+			tpi6525_set_interrupt(machine, This);
 		}
 	}
 }
 
-static void tpi6525_irq2_level(TPI6525 *This, int level)
+static void tpi6525_irq2_level(running_machine *machine, TPI6525 *This, int level)
 {
 	if (INTERRUPT_MODE && (level!=This->irq_level[2]) ) {
 		This->irq_level[2]=level;
 		if ((level==0)&&!(This->air&4)&&(This->c.ddr&4)) {
 			This->air|=4;
-			tpi6525_set_interrupt(This);
+			tpi6525_set_interrupt(machine, This);
 		}
 	}
 }
 
-static void tpi6525_irq3_level(TPI6525 *This, int level)
+static void tpi6525_irq3_level(running_machine *machine, TPI6525 *This, int level)
 {
 	if (INTERRUPT_MODE && (level!=This->irq_level[3]) ) {
 		This->irq_level[3]=level;
@@ -173,12 +173,12 @@ static void tpi6525_irq3_level(TPI6525 *This, int level)
 			  ||(!INTERRUPT3_RISING_EDGE&&(level==0)))
 			 &&!(This->air&8)&&(This->c.ddr&8)) {
 			This->air|=8;
-			tpi6525_set_interrupt(This);
+			tpi6525_set_interrupt(machine, This);
 		}
 	}
 }
 
-static void tpi6525_irq4_level(TPI6525 *This, int level)
+static void tpi6525_irq4_level(running_machine *machine, TPI6525 *This, int level)
 {
 	if (INTERRUPT_MODE &&(level!=This->irq_level[4]) ) {
 		This->irq_level[4]=level;
@@ -186,7 +186,7 @@ static void tpi6525_irq4_level(TPI6525 *This, int level)
 			  ||(!INTERRUPT4_RISING_EDGE&&(level==0)))
 			  &&!(This->air&0x10)&&(This->c.ddr&0x10)) {
 			This->air|=0x10;
-			tpi6525_set_interrupt(This);
+			tpi6525_set_interrupt(machine, This);
 		}
 	}
 }
@@ -236,7 +236,7 @@ static void tpi6525_port_c_w(TPI6525 *This, int offset, int data)
 	This->c.in=data;
 }
 
-static int tpi6525_port_r(TPI6525 *This, int offset)
+static int tpi6525_port_r(running_machine *machine, TPI6525 *This, int offset)
 {
 	int data=0xff;
 	switch (offset&7) {
@@ -303,7 +303,7 @@ static int tpi6525_port_r(TPI6525 *This, int offset)
 			data=This->air;
 			This->air=0;
 		}
-		tpi6525_clear_interrupt(This);
+		tpi6525_clear_interrupt(machine, This);
 		break;
 	}
 	DBG_LOG (3, "tpi6525",
@@ -311,7 +311,7 @@ static int tpi6525_port_r(TPI6525 *This, int offset)
 	return data;
 }
 
-static void tpi6525_port_w(TPI6525 *This, int offset, int data)
+static void tpi6525_port_w(running_machine *machine, TPI6525 *This, int offset, int data)
 {
 	DBG_LOG (2, "tpi6525",
 			 ("%d write %.2x %.2x\n",This->number, offset,data));
@@ -359,13 +359,13 @@ static void tpi6525_port_w(TPI6525 *This, int offset, int data)
 			if (CA_MANUAL_OUT) {
 				if (This->ca.level!=CA_MANUAL_LEVEL) {
 					This->ca.level=CA_MANUAL_LEVEL;
-					if (This->ca.output) This->ca.output(This->ca.level);
+					if (This->ca.output) This->ca.output(machine, This->ca.level);
 				}
 			}
 			if (CB_MANUAL_OUT) {
 				if (This->cb.level!=CB_MANUAL_LEVEL) {
 					This->cb.level=CB_MANUAL_LEVEL;
-					if (This->cb.output) This->cb.output(This->cb.level);
+					if (This->cb.output) This->cb.output(machine, This->cb.level);
 				}
 			}
 		}
@@ -397,94 +397,94 @@ void tpi6525_3_reset(void)
 	tpi6525_reset(tpi6525+3);
 }
 
-void tpi6525_0_irq0_level(int level)
+void tpi6525_0_irq0_level(running_machine *machine, int level)
 {
-	tpi6525_irq0_level(tpi6525, level);
+	tpi6525_irq0_level(machine, tpi6525, level);
 }
 
-void tpi6525_0_irq1_level(int level)
+void tpi6525_0_irq1_level(running_machine *machine, int level)
 {
-	tpi6525_irq1_level(tpi6525, level);
+	tpi6525_irq1_level(machine, tpi6525, level);
 }
 
-void tpi6525_0_irq2_level(int level)
+void tpi6525_0_irq2_level(running_machine *machine, int level)
 {
-	tpi6525_irq2_level(tpi6525, level);
+	tpi6525_irq2_level(machine, tpi6525, level);
 }
 
-void tpi6525_0_irq3_level(int level)
+void tpi6525_0_irq3_level(running_machine *machine, int level)
 {
-	tpi6525_irq3_level(tpi6525, level);
+	tpi6525_irq3_level(machine, tpi6525, level);
 }
 
-void tpi6525_0_irq4_level(int level)
+void tpi6525_0_irq4_level(running_machine *machine, int level)
 {
-	tpi6525_irq4_level(tpi6525, level);
+	tpi6525_irq4_level(machine, tpi6525, level);
 }
 
-void tpi6525_1_irq0_level(int level)
+void tpi6525_1_irq0_level(running_machine *machine, int level)
 {
-	tpi6525_irq0_level(tpi6525+1, level);
+	tpi6525_irq0_level(machine, tpi6525+1, level);
 }
 
-void tpi6525_1_irq1_level(int level)
+void tpi6525_1_irq1_level(running_machine *machine, int level)
 {
-	tpi6525_irq1_level(tpi6525+1, level);
+	tpi6525_irq1_level(machine, tpi6525+1, level);
 }
 
-void tpi6525_1_irq2_level(int level)
+void tpi6525_1_irq2_level(running_machine *machine, int level)
 {
-	tpi6525_irq2_level(tpi6525+1, level);
+	tpi6525_irq2_level(machine, tpi6525+1, level);
 }
 
-void tpi6525_1_irq3_level(int level)
+void tpi6525_1_irq3_level(running_machine *machine, int level)
 {
-	tpi6525_irq3_level(tpi6525+1, level);
+	tpi6525_irq3_level(machine, tpi6525+1, level);
 }
 
-void tpi6525_1_irq4_level(int level)
+void tpi6525_1_irq4_level(running_machine *machine, int level)
 {
-	tpi6525_irq4_level(tpi6525+1, level);
+	tpi6525_irq4_level(machine, tpi6525+1, level);
 }
 
  READ8_HANDLER ( tpi6525_0_port_r )
 {
-	return tpi6525_port_r(tpi6525, offset);
+	return tpi6525_port_r(machine, tpi6525, offset);
 }
 
  READ8_HANDLER ( tpi6525_1_port_r )
 {
-	return tpi6525_port_r(tpi6525+1, offset);
+	return tpi6525_port_r(machine, tpi6525+1, offset);
 }
 
  READ8_HANDLER ( tpi6525_2_port_r )
 {
-	return tpi6525_port_r(tpi6525+2, offset);
+	return tpi6525_port_r(machine, tpi6525+2, offset);
 }
 
  READ8_HANDLER ( tpi6525_3_port_r )
 {
-	return tpi6525_port_r(tpi6525+3, offset);
+	return tpi6525_port_r(machine, tpi6525+3, offset);
 }
 
 WRITE8_HANDLER ( tpi6525_0_port_w )
 {
-	tpi6525_port_w(tpi6525, offset, data);
+	tpi6525_port_w(machine, tpi6525, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_1_port_w )
 {
-	tpi6525_port_w(tpi6525+1, offset, data);
+	tpi6525_port_w(machine, tpi6525+1, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_2_port_w )
 {
-	tpi6525_port_w(tpi6525+2, offset, data);
+	tpi6525_port_w(machine, tpi6525+2, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_3_port_w )
 {
-	tpi6525_port_w(tpi6525+3, offset, data);
+	tpi6525_port_w(machine, tpi6525+3, offset, data);
 }
 
  READ8_HANDLER ( tpi6525_0_port_a_r )
