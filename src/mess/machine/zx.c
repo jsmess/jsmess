@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/zx.h"
 #include "devices/cassette.h"
@@ -91,8 +90,8 @@ WRITE8_HANDLER ( zx_io_w )
 		zx_ula_bkgnd(1);
 		if (ula_frame_vsync == 2)
 		{
-			cpu_spinuntil_time(video_screen_get_time_until_pos(0, Machine->screen[0].height - 1, 0));
-			ula_scanline_count = Machine->screen[0].height - 1;
+			cpu_spinuntil_time(video_screen_get_time_until_pos(0, machine->screen[0].height - 1, 0));
+			ula_scanline_count = machine->screen[0].height - 1;
 			logerror ("S: %d B: %d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 		}
 
@@ -131,7 +130,7 @@ READ8_HANDLER ( zx_io_r )
 			data &= readinputport(7);
 		if ((offset & 0x8000) == 0)
 			data &= readinputport(8);
-		if (Machine->screen[0].refresh > 55)
+		if (machine->screen[0].refresh > 55)
 			data &= ~0x40;
 
 		if (ula_irq_active)
@@ -196,7 +195,7 @@ READ8_HANDLER ( pow3000_io_r )
 			data &= readinputport(7);
 		if ((offset & 0x8000) == 0)
 			data &= readinputport(8);
-		if (Machine->screen[0].refresh > 55)
+		if (machine->screen[0].refresh > 55)
 			data &= ~0x40;
 
 		if (ula_irq_active)
