@@ -24,8 +24,8 @@ enum {
 
 /*----------- defined in drivers/amstrad.c -----------*/
 
-void amstrad_reset_machine(void);
-void amstrad_GateArray_write(int);
+void amstrad_reset_machine(running_machine *);
+void amstrad_GateArray_write(running_machine *,int);
 void amstrad_rethinkMemory(void);
 void amstrad_setLowerRom(void);
 void amstrad_setUpperRom(void);
@@ -36,7 +36,7 @@ void AmstradCPC_PALWrite(int);
 
 /*----------- defined in machine/amstrad.c -----------*/
 
-void amstrad_setup_machine(void);
+void amstrad_setup_machine(running_machine *);
 
 SNAPSHOT_LOAD( amstrad );
 
@@ -46,7 +46,7 @@ DEVICE_LOAD(amstrad_plus_cartridge);
 
 /*----------- defined in video/amstrad.c -----------*/
 
-void amstrad_plus_setspritecolour(unsigned int off, int r, int g, int b);
+void amstrad_plus_setspritecolour(running_machine *machine, unsigned int off, int r, int g, int b);
 void amstrad_plus_setsplitline(unsigned int line, unsigned int address);
 
 /* On the Amstrad, any part of the 64k memory can be access by the video
@@ -81,7 +81,7 @@ extern VIDEO_START( amstrad );
 extern VIDEO_START( aleste );
 extern VIDEO_UPDATE( amstrad );
 void amstrad_vh_execute_crtc_cycles(int);
-void amstrad_vh_update_colour(int, int);
+void amstrad_vh_update_colour(running_machine *machine, int, int);
 void amstrad_vh_update_mode(int);
 
 /* The VSYNC signal of the CRTC */
@@ -105,6 +105,6 @@ extern PALETTE_INIT( amstrad_plus );
 
 /**** ALESTE SPECIFIC ***/
 extern PALETTE_INIT( aleste );
-void aleste_vh_update_colour(int, int);
+void aleste_vh_update_colour(running_machine *machine, int, int);
 
 #endif /* AMSTRAD_H_ */

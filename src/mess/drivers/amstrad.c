@@ -702,7 +702,7 @@ static WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 				b = (amstrad_plus_asic_ram[offset+0x1fff] & 0x0f) << 4;
 				offset--;
 			}
-			amstrad_plus_setspritecolour((offset - 0x422), r, g, b);
+			amstrad_plus_setspritecolour(machine, (offset - 0x422), r, g, b);
 		}
 		if(offset == 0x0800)  // Programmable raster interrupt
 		{
@@ -975,7 +975,7 @@ Bit 7 Bit 6 Function
 
 Note 1 : This function is not available in the Gate-Array, but is performed by a device at the same I/O port address location. In the CPC464,CPC664 and KC compact, this function is performed in a memory-expansion (e.g. Dk'Tronics 64K Ram Expansion), if this expansion is not present then the function is not available. In the CPC6128, this function is performed by a PAL located on the main PCB, or a memory-expansion. In the 464+ and 6128+ this function is performed by the ASIC or a memory expansion. Please read the document on Ram Management for more information.*/
 
-void amstrad_GateArray_write(int dataToGateArray)
+void amstrad_GateArray_write(running_machine *machine, int dataToGateArray)
 {
 /* Get Bit 7 and 6 of the dataToGateArray = Gate Array function selected */
 	switch ((dataToGateArray & 0xc0)>>6) {
@@ -1013,7 +1013,7 @@ Bit Value Function
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
     EventList_AddItemOffset((EVENT_LIST_CODE_GA_COLOUR<<6) | PenIndex, AmstradCPC_PenColours[PenIndex], TIME_TO_CYCLES(0,video_screen_get_vpos(0)*video_screen_get_scan_period(0)));
 #else
-      amstrad_vh_update_colour(amstrad_GateArray_PenSelected, (dataToGateArray & 0x1F));
+      amstrad_vh_update_colour(machine, amstrad_GateArray_PenSelected, (dataToGateArray & 0x1F));
 #endif
     } break;
 /* Select screen mode and rom configuration
@@ -1104,7 +1104,7 @@ In the 464+ and 6128+ this function is performed by the ASIC or a memory expansi
   }
 }
 
-static void aleste_msx_mapper(int offset, int data)
+static void aleste_msx_mapper(running_machine *machine, int offset, int data)
 {
 	int page = (offset & 0x0300) >> 8;
 	int ramptr = (data & 0x1f) * 0x4000;
@@ -1115,13 +1115,13 @@ static void aleste_msx_mapper(int offset, int data)
 	switch(function)
 	{
 	case 0:  // Pen select (same as Gate Array?)
-		amstrad_GateArray_write(data);
+		amstrad_GateArray_write(machine, data);
 		break;
 	case 1:  // Colour select (6-bit palette)
-		aleste_vh_update_colour(amstrad_GateArray_PenSelected,data & 0x3f);
+		aleste_vh_update_colour(machine, amstrad_GateArray_PenSelected,data & 0x3f);
 		break;
 	case 2:  // Screen mode, Upper/Lower ROM select
-		amstrad_GateArray_write(data);
+		amstrad_GateArray_write(machine, data);
 		break;
 	case 3: // RAM banks
 		switch(page)
@@ -1342,13 +1342,13 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 	{
 		if(aleste_mode & 0x04) // Aleste mode
 		{
-			aleste_msx_mapper(offset,data);
+			aleste_msx_mapper(machine, offset,data);
 		}
 		else
 		{
 		/* if b15 = 0 and b14 = 1 : Gate-Array Write Selected*/
 		if ((offset & (1<<14)) != 0) 
-	   			amstrad_GateArray_write(data);
+	   			amstrad_GateArray_write(machine, data);
 		/* if b15 = 0 : RAM Configuration Write Selected*/
 		  AmstradCPC_GA_SetRamConfiguration();
 		}
@@ -1837,13 +1837,13 @@ static VIDEO_EOF( amstrad )
 All hardware is reset and the firmware is completely initialized
 Once all tables and jumpblocks have been set up,
 control is passed to the default entry in rom 0*/
-void amstrad_reset_machine(void)
+void amstrad_reset_machine(running_machine *machine)
 {
 	/* enable lower rom (OS rom) */
-	amstrad_GateArray_write(0x089);
+	amstrad_GateArray_write(machine, 0x089);
 
 	/* set ram config 0 */
-	amstrad_GateArray_write(0x0c0);
+	amstrad_GateArray_write(machine, 0x0c0);
 
   // Get manufacturer name and TV refresh rate from PCB link (dipswitch for mess emulation)
 	ppi_port_inputs[amstrad_ppi_PortB] = (((readinputportbytag("solder_links")&MANUFACTURER_NAME)<<1) | (readinputportbytag("solder_links")&TV_REFRESH_RATE));
@@ -1854,13 +1854,13 @@ void amstrad_reset_machine(void)
 	multiface_reset();
 }
 
-static void kccomp_reset_machine(void)
+static void kccomp_reset_machine(running_machine *machine)
 {
 	/* enable lower rom (OS rom) */
-	amstrad_GateArray_write(0x089);
+	amstrad_GateArray_write(machine, 0x089);
 
 	/* set ram config 0 */
-	amstrad_GateArray_write(0x0c0);
+	amstrad_GateArray_write(machine, 0x0c0);
 }
 
 /* the following timings have been measured! */
@@ -2087,7 +2087,7 @@ static MACHINE_RESET( amstrad )
 
 	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0x018000];
 	amstrad_common_init();
-	amstrad_reset_machine();
+	amstrad_reset_machine(machine);
 
 	multiface_init();
 
@@ -2130,7 +2130,7 @@ static MACHINE_RESET( plus )
 	amstrad_plus_irq_cause = 6;
 
 	amstrad_common_init();
-	amstrad_reset_machine();
+	amstrad_reset_machine(machine);
 	amstrad_plus_asic_ram[0x2805] = 0x01;  // interrupt vector is undefined at startup, except that bit 0 is always 1.
 	AmstradCPC_GA_SetRamConfiguration();
 	amstrad_plus_setsplitline(0,0);
@@ -2179,7 +2179,7 @@ static MACHINE_RESET( gx4000 )
 	amstrad_plus_irq_cause = 6;
 
 	amstrad_common_init();
-	amstrad_reset_machine();
+	amstrad_reset_machine(machine);
 	amstrad_plus_asic_ram[0x2805] = 0x01;  // interrupt vector is undefined at startup, except that bit 0 is always 1.
 	AmstradCPC_GA_SetRamConfiguration();
 	amstrad_plus_setsplitline(0,0);
@@ -2198,7 +2198,7 @@ static MACHINE_RESET( kccomp )
 	}
 
 	amstrad_common_init();
-	kccomp_reset_machine();
+	kccomp_reset_machine(machine);
 
 	/* bit 1 = /TEST. When 0, KC compact will enter data transfer
     sequence, where another system using the expansion port signals
@@ -2228,7 +2228,7 @@ static MACHINE_RESET( aleste )
 	Amstrad_ROM_Table[3] = &memory_region(REGION_CPU1)[0x01c000];  // MSX-DOS / BIOS
 	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0x018000];  // AMSDOS
 	amstrad_common_init();
-	amstrad_reset_machine();
+	amstrad_reset_machine(machine);
 
 	nec765_init(&aleste_8272_interface,NEC765A);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_DS_80);

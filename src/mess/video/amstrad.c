@@ -8,7 +8,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "devices/snapquik.h"
 #include "includes/amstrad.h"
 
@@ -302,9 +301,9 @@ PALETTE_INIT( aleste )
 	}
 }
 
-void amstrad_plus_setspritecolour(unsigned int off, int r, int g, int b)
+void amstrad_plus_setspritecolour(running_machine *machine, unsigned int off, int r, int g, int b)
 {
-	palette_set_color_rgb(Machine, (off/2) + 33, r, g, b);
+	palette_set_color_rgb(machine, (off/2) + 33, r, g, b);
 }
 
 static void amstrad_init_lookups(void)
@@ -336,16 +335,16 @@ static void amstrad_init_lookups(void)
 	}
 }
 /* Set the new colour from the GateArray */
-void amstrad_vh_update_colour(int PenIndex, int hw_colour_index)
+void amstrad_vh_update_colour(running_machine *machine, int PenIndex, int hw_colour_index)
 {
 	int val;
 /*  int cpu_cycles = ((cycles_currently_ran()>>2)-1) & 63;
 
-	logerror("color is changed(%d,%d) = %d\n",PenIndex, cpu_cycles, Machine->pens[hw_colour_index]);
+	logerror("color is changed(%d,%d) = %d\n",PenIndex, cpu_cycles, machine->pens[hw_colour_index]);
   amstrad_GateArray_colours_ischanged++;
-	amstrad_GateArray_changed_colours[cpu_cycles][PenIndex] = Machine->pens[hw_colour_index];
+	amstrad_GateArray_changed_colours[cpu_cycles][PenIndex] = machine->pens[hw_colour_index];
 */
-	amstrad_GateArray_render_colours[PenIndex] = Machine->pens[hw_colour_index];
+	amstrad_GateArray_render_colours[PenIndex] = machine->pens[hw_colour_index];
 	if(amstrad_system_type != 0)
 	{  // CPC+/GX4000 - normal palette changes through the Gate Array also makes the corresponding change in the ASIC palette
 		val = (amstrad_palette[hw_colour_index] & 0xf00000) >> 16; // red
@@ -356,15 +355,15 @@ void amstrad_vh_update_colour(int PenIndex, int hw_colour_index)
 	}
 }
 
-void aleste_vh_update_colour(int PenIndex, int hw_colour_index)
+void aleste_vh_update_colour(running_machine *machine, int PenIndex, int hw_colour_index)
 {
 /*  int cpu_cycles = ((cycles_currently_ran()>>2)-1) & 63;
 
-	logerror("color is changed(%d,%d) = %d\n",PenIndex, cpu_cycles, Machine->pens[hw_colour_index]);
+	logerror("color is changed(%d,%d) = %d\n",PenIndex, cpu_cycles, machine->pens[hw_colour_index]);
   amstrad_GateArray_colours_ischanged++;
-	amstrad_GateArray_changed_colours[cpu_cycles][PenIndex] = Machine->pens[hw_colour_index];
+	amstrad_GateArray_changed_colours[cpu_cycles][PenIndex] = machine->pens[hw_colour_index];
 */
-	amstrad_GateArray_render_colours[PenIndex] = Machine->pens[hw_colour_index+32];
+	amstrad_GateArray_render_colours[PenIndex] = machine->pens[hw_colour_index+32];
 }
 
 /* Set the new screen mode (0,1,2,4) from the GateArray */
@@ -920,7 +919,7 @@ void amstrad_vh_execute_crtc_cycles(int dummy)
 
   &6422 - &643f   Sprite palette, 12-bit, xxxxGGGGRRRRBBBB, sprite pens 1-15 (0 is always transparent)
 */
-static void amstrad_plus_sprite_draw(bitmap_t* scr_bitmap)
+static void amstrad_plus_sprite_draw(running_machine *machine, bitmap_t* scr_bitmap)
 {
 	int spr;  // sprite number
 	int xloc,yloc;
@@ -947,8 +946,8 @@ static void amstrad_plus_sprite_draw(bitmap_t* scr_bitmap)
 			xloc += rect.min_x;
 			yloc = amstrad_plus_asic_ram[sprptr+2] + (amstrad_plus_asic_ram[sprptr+3] << 8);
 			yloc += rect.min_y;
-			decodechar(Machine->gfx[0],spr,amstrad_plus_asic_ram);
-			drawgfxzoom(scr_bitmap,Machine->gfx[0],spr,0,0,0,xloc,yloc,&rect,
+			decodechar(machine->gfx[0],spr,amstrad_plus_asic_ram);
+			drawgfxzoom(scr_bitmap,machine->gfx[0],spr,0,0,0,xloc,yloc,&rect,
 				TRANSPARENCY_PEN,0,xmag,ymag);
 		}
 	}
@@ -979,7 +978,7 @@ DMA commands
 static void amstrad_plus_dma_parse(int channel, int *addr)
 {
 	unsigned short command;
-	running_machine *machine = Machine;
+	running_machine *machine = machine;
 
 	if(*addr & 0x01)
 		(*addr)++;  // align to even address
@@ -1135,7 +1134,7 @@ static void amstrad_Set_DE(int offset, int data)
 /* CRTC - Set new Horizontal Sync Status */
 static void amstrad_Set_HS(int offset, int data)
 {
-	running_machine *machine = Machine;
+	running_machine *machine = machine;
 
 	if (data != 0)
 	{
@@ -1284,7 +1283,7 @@ VIDEO_UPDATE( amstrad )
 	#endif
 		copybitmap(bitmap, amstrad_bitmap, 0,0,0,0,&rect);
 		if(amstrad_plus_asic_enabled != 0)
-			amstrad_plus_sprite_draw(bitmap);
+			amstrad_plus_sprite_draw(machine, bitmap);
 		amstrad_scanline = y_screen_pos - 32;
 		return 0;
 	}
