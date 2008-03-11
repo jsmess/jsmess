@@ -3,9 +3,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-#include "mslegacy.h"
-
 #include "includes/ssystem3.h"
 
 UINT8 ssystem3_led[5]= {0};
@@ -20,7 +17,11 @@ static const unsigned char ssystem3_palette[] =
 
 PALETTE_INIT( ssystem3 )
 {
-	palette_set_colors_rgb(machine, 0, ssystem3_palette, sizeof(ssystem3_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(ssystem3_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, ssystem3_palette[i*3], ssystem3_palette[i*3+1], ssystem3_palette[i*3+2]);
+	}
 }
 
 
@@ -61,7 +62,7 @@ static const char led[]={
     "  dddddddddddd"
 };
 
-static void ssystem3_draw_7segment(bitmap_t *bitmap,int value, int x, int y)
+static void ssystem3_draw_7segment(running_machine *machine, bitmap_t *bitmap,int value, int x, int y)
 {
 	int i, xi, yi, mask, color;
 
@@ -82,7 +83,7 @@ static void ssystem3_draw_7segment(bitmap_t *bitmap,int value, int x, int y)
 		}
 
 		if (mask!=0) {
-			color=Machine->pens[(value&mask)?1:0];
+			color=machine->pens[(value&mask)?1:0];
 			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = color;
 		}
 		if (led[i]!='\r') xi++;
@@ -167,7 +168,7 @@ VIDEO_UPDATE( ssystem3 )
 	int i;
 
 	for (i=0; i<4; i++) {
-		ssystem3_draw_7segment(bitmap, ssystem3_led[i]&0x7f, ssystem3_led_pos[i].x,
+		ssystem3_draw_7segment(machine, bitmap, ssystem3_led[i]&0x7f, ssystem3_led_pos[i].x,
 							   ssystem3_led_pos[i].y);
 	}
 
