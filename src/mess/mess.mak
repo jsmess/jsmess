@@ -330,13 +330,14 @@ SOUNDS += AICA
 
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
+	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apexc.a \
-	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/apf.a \
+	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/aquarius.a \
 	$(MESSOBJ)/arcadia.a \
 	$(MESSOBJ)/ascii.a \
@@ -351,41 +352,45 @@ DRVLIBS = \
 	$(MESSOBJ)/cgenie.a \
 	$(MESSOBJ)/coco.a \
 	$(MESSOBJ)/coleco.a \
-	$(MESSOBJ)/compis.a	\
+	$(MESSOBJ)/compis.a \
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/dgn_beta.a \
-	$(MESSOBJ)/epson.a \
 	$(MESSOBJ)/ep128.a \
 	$(MESSOBJ)/epoch.a \
+	$(MESSOBJ)/epson.a \
+	$(MESSOBJ)/exeltel.a \
 	$(MESSOBJ)/exidy.a \
 	$(MESSOBJ)/fairch.a \
 	$(MESSOBJ)/galaxy.a \
 	$(MESSOBJ)/gce.a \
+	$(MESSOBJ)/glasgow.a \
+	$(MESSOBJ)/gmaster.a \
 	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/jupiter.a \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/kim1.a \
-	$(MESSOBJ)/magnavox.a \
-	$(MESSOBJ)/mbee.a \
-	$(MESSOBJ)/mc10.a \
-	$(MESSOBJ)/mk1.a \
-	$(MESSOBJ)/mk2.a \
-	$(MESSOBJ)/mephisto.a \
-	$(MESSOBJ)/glasgow.a \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/lviv.a \
 	$(MESSOBJ)/lynx.a \
-	$(MESSOBJ)/motorola.a \
+	$(MESSOBJ)/magnavox.a \
+	$(MESSOBJ)/mbee.a \
+	$(MESSOBJ)/mc10.a \
 	$(MESSOBJ)/memotech.a \
+	$(MESSOBJ)/mephisto.a \
+	$(MESSOBJ)/mikro80.a \
+	$(MESSOBJ)/mk1.a \
+	$(MESSOBJ)/mk2.a \
+	$(MESSOBJ)/motorola.a \
 	$(MESSOBJ)/multitch.a \
 	$(MESSOBJ)/nascom1.a \
 	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
 	$(MESSOBJ)/nintendo.a \
+	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/p2000.a \
 	$(MESSOBJ)/pc.a \
 	$(MESSOBJ)/pcshare.a \
@@ -418,16 +423,11 @@ DRVLIBS = \
 	$(MESSOBJ)/trs80.a \
 	$(MESSOBJ)/tutor.a \
 	$(MESSOBJ)/tx0.a \
+	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vc4000.a \
 	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vtech.a \
-	$(MESSOBJ)/3do.a \
-	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/shared.a \
-	$(MESSOBJ)/exeltel.a \
-	$(MESSOBJ)/gmaster.a \
-	$(MESSOBJ)/ut88.a \
-	$(MESSOBJ)/mikro80.a \
 
 
 
