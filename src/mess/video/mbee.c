@@ -8,7 +8,6 @@
 
 #include "driver.h"
 #include "includes/mbee.h"
-#include "deprecat.h"
 
 
 typedef struct {		 // CRTC 6545
@@ -103,7 +102,7 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
             logerror("mbee pcgram  [$%04X] <- $%02X\n", offset, data);
             pcgram[0x0800+offset] = data;
             /* decode character graphics again */
-            decodechar(Machine->gfx[0], chr, pcgram);
+            decodechar(machine->gfx[0], chr, pcgram);
         }
     }
 	else
@@ -229,8 +228,8 @@ static void m6545_update_strobe(int param)
 {
 	int data = 0, y = video_screen_get_vpos(0);
 
-	if( y < Machine->screen[0].visarea.min_y ||
-		y > Machine->screen[0].visarea.max_y )
+	if( y < machine->screen[0].visarea.min_y ||
+		y > machine->screen[0].visarea.max_y )
 		data |= 0x20;	/* vertical blanking */
 	if( crt.lpen_strobe )
 		data |= 0x40;	/* lpen register full */
@@ -421,7 +420,7 @@ WRITE8_HANDLER ( m6545_data_w )
 		addr = 0x17000+((data & 32) << 6);
 		memcpy(memory_region(REGION_CPU1)+0xf000, memory_region(REGION_CPU1)+addr, 0x800);
 		for (i = 0; i < 128; i++)
-				decodechar(Machine->gfx[0],i, pcgram);
+				decodechar(machine->gfx[0],i, pcgram);
 		logerror("6545 screen address hi       $%02X\n", data);
         break;
 	case 13:
