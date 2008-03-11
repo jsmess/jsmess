@@ -35,9 +35,8 @@
  ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-#include "sound/astrocde.h"
 #include "includes/astrocde.h"
+#include "sound/astrocde.h"
 #include "devices/cartslot.h"
 
 
