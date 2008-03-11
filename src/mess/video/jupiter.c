@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/jupiter.h"
 
 
@@ -23,7 +22,7 @@ WRITE8_HANDLER( jupiter_vh_charram_w )
     jupiter_charram[offset] = data;
 
     /* decode character graphics again */
-	decodechar(Machine->gfx[0], offset / 8, jupiter_charram);
+	decodechar(machine->gfx[0], offset / 8, jupiter_charram);
 }
 
 
