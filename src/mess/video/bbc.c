@@ -9,18 +9,17 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/bbc.h"
 #include "video/m6845.h"
 #include "saa505x.h"
 
 
-static void BBC_draw_hi_res(void);
-static void BBC_draw_teletext(void);
+static void BBC_draw_hi_res(running_machine *machine);
+static void BBC_draw_teletext(running_machine *machine);
 
-static void (*draw_function)(void);
+static void (*draw_function)(running_machine *machine);
 
-static void BBC_draw_RGB_in(int offset,int data);
+static void BBC_draw_RGB_in(running_machine *machine, int offset,int data);
 
 /************************************************************************
  * video_refresh flag is used in optimising the screen redrawing
@@ -205,7 +204,7 @@ BBCsaa5050= {
 	BBC_draw_RGB_in,
 };
 
-static void BBC_draw_teletext(void)
+static void BBC_draw_teletext(running_machine *machine)
 {
 
 	//Teletext Latch bits 0 to 5 go to bits 0 to 5 on the Teletext chip
@@ -216,7 +215,7 @@ static void BBC_draw_teletext(void)
 
 	teletext_LOSE_w(0,(Teletext_Latch>>7)&1);
 
-	teletext_F1();
+	teletext_F1(machine);
 
 	teletext_data_w(0,(Teletext_Latch&0x3f)|((Teletext_Latch&0x40)|(BBC_DE?0:0x40)));
 
@@ -360,14 +359,14 @@ static void BBC_Clock_CR(void)
 
 // This is the actual output of the Video ULA this fuction does all the output to the screen in the BBC emulator
 
-static void BBC_ula_drawpixel(int col,int number_of_pixels)
+static void BBC_ula_drawpixel(running_machine *machine, int col,int number_of_pixels)
 {
 	int pixel_count;
 	int pixel_temp;
 	if ((BBC_display>=BBC_display_left) && ((BBC_display+number_of_pixels)<BBC_display_right))
 	{
 
-		pixel_temp=Machine->pens[col^cursor_state];
+		pixel_temp=machine->pens[col^cursor_state];
 		for(pixel_count=0;pixel_count<number_of_pixels;pixel_count++)
 		{
 			*(BBC_display++) = pixel_temp;
@@ -380,7 +379,7 @@ static void BBC_ula_drawpixel(int col,int number_of_pixels)
 
 // the Video ULA hi-res shift registers, pallette lookup and display enabled circuits
 
-static void BBC_draw_hi_res(void)
+static void BBC_draw_hi_res(running_machine *machine)
 {
 	int meml;
 	unsigned char i=0;
@@ -402,7 +401,7 @@ static void BBC_draw_hi_res(void)
 
 			for(sc1=0;sc1<pixels_per_byte;sc1++)
 			{
-				BBC_ula_drawpixel(videoULA_pallet_lookup[pixel_bits[i]],emulation_pixels_per_real_pixel);
+				BBC_ula_drawpixel(machine, videoULA_pallet_lookup[pixel_bits[i]],emulation_pixels_per_real_pixel);
 				i=(i<<1)|1;
 			}
 		} else {
@@ -412,7 +411,7 @@ static void BBC_draw_hi_res(void)
 		if (video_refresh)
 		{
 			// if the display is not enable, just draw a blank area.
-			BBC_ula_drawpixel(0, emulation_pixels_per_byte);
+			BBC_ula_drawpixel(machine, 0, emulation_pixels_per_byte);
 		} else {
 			BBC_display += emulation_pixels_per_byte;
 		}
@@ -422,9 +421,9 @@ static void BBC_draw_hi_res(void)
 
 // RGB input to the Video ULA from the Teletext IC
 // Just pass on the output at the correct pixel size.
-static void BBC_draw_RGB_in(int offset,int data)
+static void BBC_draw_RGB_in(running_machine *machine, int offset,int data)
 {
-	BBC_ula_drawpixel(data,emulation_pixels_per_real_pixel);
+	BBC_ula_drawpixel(machine, data,emulation_pixels_per_real_pixel);
 }
 
 
@@ -625,7 +624,7 @@ VIDEO_UPDATE( bbc )
 	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
 	while((!BBC_VSync)&&(c<60000))
 	{
-		if ((y_screen_pos>=cliprect->min_y) && (y_screen_pos<=cliprect->max_y)) (draw_function)();
+		if ((y_screen_pos>=cliprect->min_y) && (y_screen_pos<=cliprect->max_y)) (draw_function)(machine);
 
 		// and check the cursor
 		if (VideoULA_CR) BBC_Clock_CR();

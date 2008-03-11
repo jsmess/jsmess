@@ -83,6 +83,7 @@ This signal also defails the character display period.
 
 */
 
+#include "driver.h"
 #include "saa505x.h"
 
 
@@ -3440,7 +3441,7 @@ void teletext_LOSE_w(int offset, int data)
 }
 
 
-void teletext_F1(void)
+void teletext_F1(running_machine *machine)
 {
 	int sc1;
 	int code;
@@ -3532,15 +3533,15 @@ void teletext_F1(void)
 		code=(code-0x20)*60+(6*((tt_linecount+tt_start_line)>>tt_double_height));
 		for(sc1=0;sc1<6;sc1++)
 		{
-			(saa505x_calls.out_Pixel_func)(0,tt_lookup[code++]?tt_rcolour:tt_bgcolour);
+			(saa505x_calls.out_Pixel_func)(machine,0,tt_lookup[code++]?tt_rcolour:tt_bgcolour);
 		}
 	} else {
 
-		(saa505x_calls.out_Pixel_func)(0,0);
-		(saa505x_calls.out_Pixel_func)(0,0);
-		(saa505x_calls.out_Pixel_func)(0,0);
-		(saa505x_calls.out_Pixel_func)(0,0);
-		(saa505x_calls.out_Pixel_func)(0,0);
-		(saa505x_calls.out_Pixel_func)(0,0);
+		(saa505x_calls.out_Pixel_func)(machine,0,0);
+		(saa505x_calls.out_Pixel_func)(machine,0,0);
+		(saa505x_calls.out_Pixel_func)(machine,0,0);
+		(saa505x_calls.out_Pixel_func)(machine,0,0);
+		(saa505x_calls.out_Pixel_func)(machine,0,0);
+		(saa505x_calls.out_Pixel_func)(machine,0,0);
 	}
 }
