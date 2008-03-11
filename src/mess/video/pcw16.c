@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/pcw16.h"
 
 int pcw16_colour_palette[16];
@@ -66,7 +65,7 @@ VIDEO_START( pcw16 )
 }
 
 /* 640, 1 bit per pixel */
-static void pcw16_vh_decode_mode0(bitmap_t *bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode0(running_machine *machine, bitmap_t *bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int local_byte;
@@ -75,8 +74,8 @@ static void pcw16_vh_decode_mode0(bitmap_t *bitmap, int x, int y, unsigned char 
 
 	local_byte = byte;
 
-	cols[0] = Machine->pens[pcw16_colour_palette[0]];
-	cols[1] = Machine->pens[pcw16_colour_palette[1]];
+	cols[0] = machine->pens[pcw16_colour_palette[0]];
+	cols[1] = machine->pens[pcw16_colour_palette[1]];
 
 	px = x;
 	for (b=0; b<8; b++)
@@ -89,7 +88,7 @@ static void pcw16_vh_decode_mode0(bitmap_t *bitmap, int x, int y, unsigned char 
 }
 
 /* 320, 2 bits per pixel */
-static void pcw16_vh_decode_mode1(bitmap_t *bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode1(running_machine *machine, bitmap_t *bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int px;
@@ -98,7 +97,7 @@ static void pcw16_vh_decode_mode1(bitmap_t *bitmap, int x, int y, unsigned char 
 
 	for (b=0; b<3; b++)
 	{
-		cols[b] = Machine->pens[pcw16_colour_palette[b]];
+		cols[b] = machine->pens[pcw16_colour_palette[b]];
 	}
 
 	local_byte = byte;
@@ -120,15 +119,15 @@ static void pcw16_vh_decode_mode1(bitmap_t *bitmap, int x, int y, unsigned char 
 }
 
 /* 160, 4 bits per pixel */
-static void pcw16_vh_decode_mode2(bitmap_t *bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode2(running_machine *machine, bitmap_t *bitmap, int x, int y, unsigned char byte)
 {
 	int px;
 	int b;
 	int local_byte;
 	int cols[2];
 
-	cols[0] = Machine->pens[pcw16_colour_palette[0]];
-	cols[1] = Machine->pens[pcw16_colour_palette[1]];
+	cols[0] = machine->pens[pcw16_colour_palette[0]];
+	cols[1] = machine->pens[pcw16_colour_palette[1]];
 	local_byte = byte;
 
 	px = x;
@@ -249,20 +248,20 @@ VIDEO_UPDATE( pcw16 )
 				{
 					case 0:
 					{
-						pcw16_vh_decode_mode0(bitmap,x,y+PCW16_BORDER_HEIGHT,byte);
+						pcw16_vh_decode_mode0(machine, bitmap,x,y+PCW16_BORDER_HEIGHT,byte);
 					}
 					break;
 
 					case 1:
 					{
-						pcw16_vh_decode_mode1(bitmap, x,y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode1(machine, bitmap, x,y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 
 					case 3:
 					case 2:
 					{
-						pcw16_vh_decode_mode2(bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode2(machine, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 				}
