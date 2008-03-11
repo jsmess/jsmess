@@ -6,8 +6,6 @@
 
 #include <assert.h>
 #include "driver.h"
-#include "deprecat.h"
-#include "mslegacy.h"
 #include "cpu/m6502/m6502.h"
 
 #include "includes/svision.h"
@@ -74,19 +72,19 @@ static TIMER_CALLBACK(svision_pet_timer)
 	}
 }
 
-void svision_irq(void)
+void svision_irq(running_machine *machine)
 {
 	int irq = svision.timer_shot && (BANK & 2);
 	irq = irq || (svision_dma.finished && (BANK & 4));
 
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK(svision_timer)
 {
     svision.timer_shot = TRUE;
     timer_enable(svision.timer1, FALSE);
-    svision_irq();
+    svision_irq( machine );
 }
 
 static READ8_HANDLER(svision_r)
@@ -117,11 +115,11 @@ static READ8_HANDLER(svision_r)
 			break;
 		case 0x24:
 			svision.timer_shot = FALSE;
-			svision_irq();
+			svision_irq( machine );
 			break;
 		case 0x25:
 			svision_dma.finished = FALSE;
-			svision_irq();
+			svision_irq( machine );
 			break;
 		default:
 			logerror("%.6f svision read %04x %02x\n", attotime_to_double(timer_get_time()),offset,data);
@@ -146,7 +144,7 @@ static WRITE8_HANDLER(svision_w)
 		case 0x26: /* bits 5,6 memory management for a000? */
 			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time()),offset,data);
 			memory_set_bankptr(1, memory_region(REGION_USER1) + ((svision_reg[0x26] & 0xe0) << 9));
-			svision_irq();
+			svision_irq( machine );
 			break;
 		case 0x23: /* delta hero irq routine write */
 			value = data;
@@ -160,10 +158,10 @@ static WRITE8_HANDLER(svision_w)
 			timer_reset(svision.timer1, ATTOTIME_IN_CYCLES(value * delay, 0));
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
-			svision_soundport_w(svision_channel + 0, offset & 3, data);
+			svision_soundport_w(machine, svision_channel + 0, offset & 3, data);
 			break;
 		case 0x14: case 0x15: case 0x16: case 0x17:
-			svision_soundport_w(svision_channel + 1, offset & 3, data);
+			svision_soundport_w(machine, svision_channel + 1, offset & 3, data);
 			break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
 			svision_sounddma_w(machine, offset - 0x18, data);
@@ -343,15 +341,27 @@ static const unsigned char svisionn_palette[] =
 
 static PALETTE_INIT( svision )
 {
-	palette_set_colors_rgb(machine, 0, svision_palette, sizeof(svision_palette) / 3);
+	int i;
+
+	for( i = 0; i < sizeof(svision_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, svision_palette[i*3], svision_palette[i*3+1], svision_palette[i*3+2] );
+	}
 }
 static PALETTE_INIT( svisionn )
 {
-	palette_set_colors_rgb(machine, 0, svisionn_palette, sizeof(svisionn_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(svisionn_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, svisionn_palette[i*3], svisionn_palette[i*3+1], svisionn_palette[i*3+2] );
+	}
 }
 static PALETTE_INIT( svisionp )
 {
-	palette_set_colors_rgb(machine, 0, svisionp_palette, sizeof(svisionp_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(svisionn_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2] );
+	}
 }
 
 static VIDEO_UPDATE( svision )
