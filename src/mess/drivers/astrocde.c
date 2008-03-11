@@ -226,15 +226,15 @@ static MACHINE_DRIVER_START( astrocde )
 	MDRV_CPU_ADD(Z80, 1789000)        /* 1.789 Mhz */
 	MDRV_CPU_PROGRAM_MAP(astrocade_mem, 0)
 	MDRV_CPU_IO_MAP(astrocade_io, 0)
-	MDRV_CPU_VBLANK_INT_HACK(astrocade_interrupt, 256)
-	MDRV_INTERLEAVE(1)
+
+	MDRV_MACHINE_RESET(astrocde)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 204)
+	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
 	MDRV_PALETTE_LENGTH(8*32)
 	MDRV_PALETTE_INIT( astrocade )
@@ -288,6 +288,6 @@ SYSTEM_CONFIG_END
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT  CONFIG    COMPANY                FULLNAME                     FLAGS */
-CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, 0,    astrocde, "Bally Manufacturing", "Bally Professional Arcade", 0)
-CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, 0,    astrocde, "Bally Manufacturing", "Bally Computer System",     0)
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY                FULLNAME                     FLAGS */
+CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Professional Arcade", 0)
+CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Computer System",     0)

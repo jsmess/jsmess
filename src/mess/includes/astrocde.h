@@ -10,10 +10,11 @@
 
 /*----------- defined in machine/astrocde.c -----------*/
 
-extern WRITE8_HANDLER( astrocade_interrupt_enable_w );
-extern WRITE8_HANDLER( astrocade_interrupt_w );
-extern INTERRUPT_GEN( astrocade_interrupt );
+WRITE8_HANDLER( astrocade_interrupt_enable_w );
+WRITE8_HANDLER( astrocade_interrupt_w );
 WRITE8_HANDLER ( astrocade_interrupt_vector_w );
+MACHINE_RESET( astrocde );
+DRIVER_INIT( astrocde );
 
 
 /*----------- defined in video/astrocde.c -----------*/

@@ -112,16 +112,14 @@ PALETTE_INIT( astrocade )
 			palette_set_color_rgb(machine, i*8+j, floor(R+.5), floor(G+.5),  floor(B+.5));
 		}
 	}
-
-	/* Set the fake colortable for the dip switch menus, etc. */
 }
 
-WRITE8_HANDLER ( astrocade_vertical_blank_w )
+WRITE8_HANDLER( astrocade_vertical_blank_w )
 {
 	VerticalBlank = data;
 }
 
- READ8_HANDLER ( astrocade_intercept_r )
+READ8_HANDLER( astrocade_intercept_r )
 {
 	int res;
 
@@ -132,12 +130,11 @@ WRITE8_HANDLER ( astrocade_vertical_blank_w )
 }
 
 
- READ8_HANDLER ( astrocade_video_retrace_r )
+READ8_HANDLER( astrocade_video_retrace_r )
 {
-	extern int CurrentScan;
-
-    return CurrentScan;
+	 return video_screen_get_vpos(0);
 }
+
 
 /* Switches colour registers at this zone - 40 zones */
 /* Also sets the background colors */

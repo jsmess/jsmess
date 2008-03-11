@@ -22,7 +22,8 @@
  * Scanline Interrupt System
  ****************************************************************************/
 
-int CurrentScan=0;
+static emu_timer *scanline_timer;
+
 static int NextScanInt=0;			/* Normal */
 
 static int screen_interrupts_enabled;
@@ -39,7 +40,7 @@ WRITE8_HANDLER ( astrocade_interrupt_enable_w )
 	lightpen_interrupts_enabled = data & 0x02;
 	lightpen_interrupt_mode = data & 0x01;
 
-    	LOG(("Interrupt Flag set to %02x\n",data & 0x0f));
+	LOG(("Interrupt Flag set to %02x\n",data & 0x0f));
 }
 
 WRITE8_HANDLER ( astrocade_interrupt_w )
@@ -51,23 +52,43 @@ WRITE8_HANDLER ( astrocade_interrupt_w )
     NextScanInt = data;
 }
 
-INTERRUPT_GEN( astrocade_interrupt )
+
+static TIMER_CALLBACK( astrocde_scanline_callback )
 {
-    CurrentScan++;
-
-    if (CurrentScan == machine->config->cpu[0].vblank_interrupts_per_frame)
-		CurrentScan = 0;
-
-    if (CurrentScan < 204) astrocade_copy_line(CurrentScan);
-
-    /* Scanline interrupt enabled ? */
-    if ((screen_interrupts_enabled) && (screen_interrupt_mode == 0)
-	                                && (CurrentScan == NextScanInt))
+	int scanline = video_screen_get_vpos(0);
+	
+	/* draw if we are in the visable area */
+	if (scanline < machine->screen[0].visarea.max_y)
+		astrocade_copy_line(scanline);
+	
+	/* scanline interrupt? */
+	if (screen_interrupts_enabled && (screen_interrupt_mode == 0) && (scanline == NextScanInt))
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+
+	/* are we on the last scanline? */
+	if (++scanline == machine->screen[0].height)
+		scanline = 0;
+
+	/* wait for next scanline */
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), 0);
 }
+
 
 WRITE8_HANDLER( astrocade_interrupt_vector_w )
 {
 	cpunum_set_input_line_vector(0, 0, data);
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+}
+
+
+MACHINE_RESET( astrocde )
+{
+	/* wait for the first scanline */
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+}
+
+
+DRIVER_INIT( astrocde )
+{
+	scanline_timer = timer_alloc(astrocde_scanline_callback, NULL);
 }
