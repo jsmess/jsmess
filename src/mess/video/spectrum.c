@@ -251,7 +251,7 @@ VIDEO_UPDATE( spectrum )
         (synchronised with start of screen data) before the border lines.
         There should be 16 blank lines after an interrupt is called.
     */
-    draw_border(bitmap, full_refresh,
+    draw_border(machine, bitmap, full_refresh,
             SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
             SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
             SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
@@ -310,7 +310,7 @@ VIDEO_UPDATE( spectrum_128 )
                 }
 	}
 
-	draw_border(bitmap, full_refresh,
+	draw_border(machine, bitmap, full_refresh,
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
 		SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
@@ -496,7 +496,7 @@ VIDEO_UPDATE( ts2068 )
                         ts2068_lores_scanline(machine, bitmap, count, TS2068_TOP_BORDER, 0);
         }
 
-        draw_border(bitmap, full_refresh,
+        draw_border(machine, bitmap, full_refresh,
                 TS2068_TOP_BORDER, SPEC_DISPLAY_YSIZE, TS2068_BOTTOM_BORDER,
                 TS2068_LEFT_BORDER, TS2068_DISPLAY_XSIZE, TS2068_RIGHT_BORDER,
                 SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
@@ -536,7 +536,7 @@ VIDEO_UPDATE( tc2048 )
 			ts2068_lores_scanline(machine, bitmap, count, SPEC_TOP_BORDER, 0);
 	}
 
-	draw_border(bitmap, full_refresh,
+	draw_border(machine, bitmap, full_refresh,
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
 		TS2068_LEFT_BORDER, TS2068_DISPLAY_XSIZE, TS2068_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
