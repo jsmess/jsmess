@@ -143,8 +143,8 @@ READ8_HANDLER( cdp1861_dispon_r )
 WRITE8_HANDLER( cdp1861_dispoff_w )
 {
 	cdp1861.disp = 0;
-	cpunum_set_input_line(Machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
-	cpunum_set_input_line(Machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 }
 
 VIDEO_START( cdp1861 )
