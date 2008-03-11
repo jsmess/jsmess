@@ -103,7 +103,7 @@ extern INTERRUPT_GEN(wswan_scanline_interrupt);
 
 /*----------- defined in video/wswan.c -----------*/
 
-extern void wswan_refresh_scanline(void);
+extern void wswan_refresh_scanline( running_machine *machine );
 
 
 /*----------- defined in audio/wswan.c -----------*/

@@ -16,7 +16,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/wswan.h"
 #include "image.h"
 
@@ -125,38 +124,38 @@ static const UINT8 ws_fake_bios_code[] = {
 	0xea, 0xc0, 0xff, 0x00, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static void wswan_handle_irqs( void ) {
+static void wswan_handle_irqs( running_machine *machine ) {
 	if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR ) {
-		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_HBLTMR );
+		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_HBLTMR );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_VBL ) {
-		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBL );
+		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBL );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_VBLTMR ) {
-		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBLTMR );
+		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBLTMR );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_LCMP ) {
-		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_LCMP );
+		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_LCMP );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_SRX ) {
-		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_SRX );
+		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_SRX );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_RTC ) {
-		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_RTC );
+		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_RTC );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_KEY ) {
-		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_KEY );
+		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_KEY );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_STX ) {
-		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_STX );
+		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_STX );
 	} else {
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE );
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE );
 	}
 }
 
-static void wswan_set_irq_line(int irq) {
+static void wswan_set_irq_line( running_machine *machine, int irq) {
 	if ( ws_portram[0xb2] & irq ) {
 		ws_portram[0xb6] |= irq;
-		wswan_handle_irqs();
+		wswan_handle_irqs( machine );
 	}
 }
 
-static void wswan_clear_irq_line(int irq) {
+static void wswan_clear_irq_line( running_machine *machine, int irq) {
 	ws_portram[0xb6] &= ~irq;
-	wswan_handle_irqs();
+	wswan_handle_irqs( machine );
 }
 
 static TIMER_CALLBACK(wswan_rtc_callback)
@@ -963,7 +962,7 @@ WRITE8_HANDLER( wswan_port_w )
 				   Bit 6   - VBlank interrupt acknowledge
 				   Bit 7   - HBlank timer interrupt acknowledge
 				*/
-			wswan_clear_irq_line( data );
+			wswan_clear_irq_line( machine, data );
 			data = ws_portram[0xB6];
 			break;
 		case 0xba:	/* Internal EEPROM data (low)
@@ -1357,7 +1356,7 @@ DEVICE_LOAD(wswan_cart)
 INTERRUPT_GEN(wswan_scanline_interrupt)
 {
 	if( vdp.current_line < 144 ) {
-		wswan_refresh_scanline();
+		wswan_refresh_scanline( machine );
 	}
 
 	/* Decrement 12kHz (HBlank) counter */
@@ -1371,7 +1370,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 				vdp.timer_hblank_reload = 0;
 			}
 			logerror( "trigerring hbltmr interrupt\n" );
-			wswan_set_irq_line( WSWAN_IFLAG_HBLTMR );
+			wswan_set_irq_line( machine, WSWAN_IFLAG_HBLTMR );
 		}
 	}
 
@@ -1389,7 +1388,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 //	vdp.current_line = (vdp.current_line + 1) % 159;
 
 	if( vdp.current_line == 144 ) {
-		wswan_set_irq_line( WSWAN_IFLAG_VBL );
+		wswan_set_irq_line( machine, WSWAN_IFLAG_VBL );
 		/* Decrement 75Hz (VBlank) counter */
 		if ( vdp.timer_vblank_enable && vdp.timer_vblank_reload != 0 ) {
 			vdp.timer_vblank_count--;
@@ -1401,7 +1400,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 					vdp.timer_vblank_reload = 0;
 				}
 				logerror( "triggering vbltmr interrupt\n" );
-				wswan_set_irq_line( WSWAN_IFLAG_VBLTMR );
+				wswan_set_irq_line( machine, WSWAN_IFLAG_VBLTMR );
 			}
 		}
 	}
@@ -1409,7 +1408,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 //	vdp.current_line = (vdp.current_line + 1) % 159;
 
 	if ( vdp.current_line == vdp.line_compare ) {
-		wswan_set_irq_line( WSWAN_IFLAG_LCMP );
+		wswan_set_irq_line( machine, WSWAN_IFLAG_LCMP );
 	}
 
 	vdp.current_line = (vdp.current_line + 1) % 159;
