@@ -15,7 +15,6 @@ TODO:
 #include "911_chr.h"
 #include "911_key.h"
 #include "sound/beep.h"
-#include "mslegacy.h"
 
 
 
@@ -131,8 +130,11 @@ static TIMER_CALLBACK(beep_callback);
 */
 PALETTE_INIT( vdt911 )
 {
-	// memcpy(palette, & vdt911_palette, sizeof(vdt911_palette));
-	palette_set_colors_rgb(machine, 0, vdt911_palette, vdt911_palette_size);
+	int i;
+
+	for ( i = 0; i < vdt911_palette_size; i++ ) {
+		palette_set_color_rgb(machine, i, vdt911_palette[i*3], vdt911_palette[i*3+1], vdt911_palette[i*3+2]);
+	}
 }
 
 /*
