@@ -172,8 +172,8 @@ READ8_HANDLER( cdp1864_dispon_r )
 READ8_HANDLER( cdp1864_dispoff_r )
 {
 	cdp1864.disp = 0;
-	cpunum_set_input_line(Machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
-	cpunum_set_input_line(Machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 
 	return 0xff;
 }
