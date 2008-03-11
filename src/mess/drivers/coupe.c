@@ -65,16 +65,16 @@ static INTERRUPT_GEN( coupe_line_interrupt )
 		switch ((VMPR & 0x60)>>5)
 		{
 		case 0: /* mode 1 */
-			drawMode1_line(bitmap,(CURLINE-1));
+			drawMode1_line(machine, bitmap,(CURLINE-1));
 			break;
 		case 1: /* mode 2 */
-			drawMode2_line(bitmap,(CURLINE-1));
+			drawMode2_line(machine, bitmap,(CURLINE-1));
 			break;
 		case 2: /* mode 3 */
-			drawMode3_line(bitmap,(CURLINE-1));
+			drawMode3_line(machine, bitmap,(CURLINE-1));
 			break;
 		case 3: /* mode 4 */
-			drawMode4_line(bitmap,(CURLINE-1));
+			drawMode4_line(machine, bitmap,(CURLINE-1));
 			break;
 		}
 	}
