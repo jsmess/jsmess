@@ -46,7 +46,7 @@ WRITE8_HANDLER(pc8801_write_extmem);
 
 /*----------- defined in video/pc8801.c -----------*/
 
-void pc8801_video_init (int hireso);
+void pc8801_video_init (running_machine *machine, int hireso);
 int is_pc8801_vram_select(void);
 WRITE8_HANDLER(pc8801_vramsel);
  READ8_HANDLER(pc8801_vramtest);

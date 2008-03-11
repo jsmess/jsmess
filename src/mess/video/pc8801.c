@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/pc8801.h"
 
 /* NPW 23-Oct-2001 - Adding this so that it compiles */
@@ -91,10 +90,10 @@ INLINE void pc8801_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-void pc8801_video_init (int hireso)
+void pc8801_video_init (running_machine *machine, int hireso)
 {
-	wbm1 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	wbm2 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	wbm1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	wbm2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	pc8801_is_24KHz=hireso;
 	crtcON=0;
 	textON=1;
@@ -911,5 +910,5 @@ WRITE8_HANDLER(pc8801_palette_out)
 	r[offset] = (data & 2) ? 0xff : 0x00;
 	g[offset] = (data & 4) ? 0xff : 0x00;
   }
-  palette_set_color_rgb(Machine, palno,r[offset],g[offset],b[offset]);
+  palette_set_color_rgb(machine, palno,r[offset],g[offset],b[offset]);
 }

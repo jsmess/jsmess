@@ -570,7 +570,7 @@ static void pc8801_init_bank(int hireso)
 
 	extmem_ctrl[0]=extmem_ctrl[1]=0;
 	pc8801_update_bank();
-	pc8801_video_init(hireso);
+	pc8801_video_init(Machine, hireso);
 
   if(extmem_mode!=readinputport(19)) {
     extmem_mode=readinputport(19);
