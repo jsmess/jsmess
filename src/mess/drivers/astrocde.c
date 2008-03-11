@@ -40,6 +40,9 @@
 #include "devices/cartslot.h"
 
 
+#define XTAL_Y1  XTAL_14_31818MHz
+
+
 /****************************************************************************
  * Bally Astrocade
  ****************************************************************************/
@@ -222,7 +225,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( astrocde )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1789000)        /* 1.789 Mhz */
+	MDRV_CPU_ADD(Z80, XTAL_Y1/8)        /* 1.789 Mhz */
 	MDRV_CPU_PROGRAM_MAP(astrocade_mem, 0)
 	MDRV_CPU_IO_MAP(astrocade_io, 0)
 
@@ -230,20 +233,17 @@ static MACHINE_DRIVER_START( astrocde )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_RAW_PARAMS(XTAL_Y1/3, 320, 0, 320, 256, 0, 204)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
 	MDRV_PALETTE_LENGTH(8*32)
-	MDRV_PALETTE_INIT( astrocade )
+	MDRV_PALETTE_INIT(astrocade)
 
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
+	MDRV_SOUND_ADD(ASTROCADE, XTAL_Y1/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
