@@ -72,12 +72,12 @@ static void *motor_on_timer;
 	Emulation is faulty because the CPU is actually stopped in the midst of 
 	instruction, at the end of the memory access
 */
-static void fdc_handle_hold(void)
+static void fdc_handle_hold(running_machine *machine)
 {
 	if (DSKhold && (!DRQ_IRQ_status) && DVENA)
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 /*
@@ -86,7 +86,7 @@ static void fdc_handle_hold(void)
 static TIMER_CALLBACK(motor_on_timer_callback)
 {
 	DVENA = 0;
-	fdc_handle_hold();
+	fdc_handle_hold(machine);
 }
 
 typedef struct ti99_geometry
@@ -388,7 +388,7 @@ static void fdc_callback(wd17xx_state_t event, void *param)
 		break;
 	}
 
-	fdc_handle_hold();
+	fdc_handle_hold(Machine);
 }
 
 /*
@@ -507,7 +507,7 @@ static void fdc_cru_w(running_machine *machine, int offset, int data)
 		if (data && !motor_on)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
-			fdc_handle_hold();
+			fdc_handle_hold(machine);
 			timer_adjust_oneshot(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0);
 		}
 		motor_on = data;
@@ -520,7 +520,7 @@ static void fdc_cru_w(running_machine *machine, int offset, int data)
 			  for 4.23s after write to revelant CRU bit, this is not emulated and could cause
 			  the TI99 to lock...) */
 		DSKhold = data;
-		fdc_handle_hold();
+		fdc_handle_hold(machine);
 		break;
 
 	case 3:
@@ -697,7 +697,7 @@ static int ccfdc_cru_r(int offset)
 /*
 	Write disk CRU interface
 */
-static void ccfdc_cru_w(int offset, int data)
+static void ccfdc_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
 	{
@@ -711,7 +711,7 @@ static void ccfdc_cru_w(int offset, int data)
 		if (data && !motor_on)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
-			fdc_handle_hold();
+			fdc_handle_hold(machine);
 			timer_adjust_oneshot(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0);
 		}
 		motor_on = data;
@@ -724,7 +724,7 @@ static void ccfdc_cru_w(int offset, int data)
 			  for 4.23s after write to revelant CRU bit, this is not emulated and could cause
 			  the TI99 to lock...) */
 		DSKhold = data;
-		fdc_handle_hold();
+		fdc_handle_hold(machine);
 		break;
 
 	case 4:
@@ -925,7 +925,7 @@ static void bwg_cru_w(running_machine *machine, int offset, int data)
 		if (data && !motor_on)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
-			fdc_handle_hold();
+			fdc_handle_hold(machine);
 			timer_adjust_oneshot(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0);
 		}
 		motor_on = data;
@@ -938,7 +938,7 @@ static void bwg_cru_w(running_machine *machine, int offset, int data)
 			  for 4.23s after write to revelant CRU bit, this is not emulated and could cause
 			  the TI99 to lock...) */
 		DSKhold = data;
-		fdc_handle_hold();
+		fdc_handle_hold(machine);
 		break;
 
 	case 4:
@@ -1317,7 +1317,7 @@ static void hfdc_cru_w(running_machine *machine, int offset, int data)
 		if (data && !motor_on)
 		{
 			DVENA = 1;
-			fdc_handle_hold();
+			fdc_handle_hold(machine);
 			timer_adjust_oneshot(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0);
 		}
 		motor_on = data;
