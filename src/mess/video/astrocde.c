@@ -11,7 +11,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
 
@@ -341,7 +340,7 @@ WRITE8_HANDLER ( astrocade_magicram_w )
 	magic_expand_flipflop ^= 1;
 }
 
-void astrocade_copy_line(int line)
+void astrocade_copy_line(running_machine *machine, int line)
 {
 	/* Copy one line to bitmap, using current colour register settings */
 
@@ -379,11 +378,11 @@ void astrocade_copy_line(int line)
 
 			if (astrocade_mode == 0)
 			{
-				*BITMAP_ADDR16(tmpbitmap, line, 2*x+0) = Machine->pens[Colour[color]];
-				*BITMAP_ADDR16(tmpbitmap, line, 2*x+1) = Machine->pens[Colour[color]];
+				*BITMAP_ADDR16(tmpbitmap, line, 2*x+0) = machine->pens[Colour[color]];
+				*BITMAP_ADDR16(tmpbitmap, line, 2*x+1) = machine->pens[Colour[color]];
 			}
 			else
-				*BITMAP_ADDR16(tmpbitmap, line, x) = Machine->pens[Colour[color]];
+				*BITMAP_ADDR16(tmpbitmap, line, x) = machine->pens[Colour[color]];
 
 			data >>= 2;
 		}

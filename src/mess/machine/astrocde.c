@@ -59,7 +59,7 @@ static TIMER_CALLBACK( astrocde_scanline_callback )
 	
 	/* draw if we are in the visable area */
 	if (scanline < machine->screen[0].visarea.max_y)
-		astrocade_copy_line(scanline);
+		astrocade_copy_line(machine, scanline);
 	
 	/* scanline interrupt? */
 	if (screen_interrupts_enabled && (screen_interrupt_mode == 0) && (scanline == NextScanInt))
