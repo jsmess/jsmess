@@ -265,6 +265,17 @@ static emu_timer *abc802_flash_timer;
 static int abc802_flshclk;
 static int abc802_mux80_40;
 
+static UINT8 *abc806_colorram;
+
+static UINT8 abc806_v50_addr;
+static UINT8 abc806_hrui_addr;
+static UINT16 abc806_colorram_address_latch;
+
+static int abc806_eme;
+static int abc806_txoff;
+static int abc806_40;
+static int abc806_flshclk;
+
 extern mc6845_t *abc800_mc6845;
 
 /* Palette Initialization */
@@ -292,6 +303,80 @@ static PALETTE_INIT( abc800c )
 void abc802_mux80_40_w(int level)
 {
 	abc802_mux80_40 = level;
+}
+
+READ8_HANDLER( abc806_videoram_r )
+{
+	abc806_colorram_address_latch = offset;
+
+	return videoram[offset];
+}
+
+WRITE8_HANDLER( abc806_videoram_w )
+{
+	abc806_colorram_address_latch = offset;
+
+	videoram[offset] = data;
+}
+
+READ8_HANDLER( abc806_colorram_r )
+{
+	return abc806_colorram[abc806_colorram_address_latch];
+}
+
+WRITE8_HANDLER( abc806_colorram_w )
+{
+	abc806_colorram[abc806_colorram_address_latch] = data;
+}
+
+READ8_HANDLER( abc806_fgctlprom_r )
+{
+	/*
+
+		bit		description
+
+		0		EME
+		1		40
+		2		HRU II A8, PROT A0
+		3		PROT INI
+		4		TXOFF
+		5		E05-16 CS
+		6		E05-16 CLK
+		7		E05-16 DI/O, PROT DIN
+
+	*/
+
+	UINT8 data = 0;
+
+	//data |= e0516_dio_r() << 7;
+
+	return data;
+}
+
+WRITE8_HANDLER( abc806_sync_w )
+{
+	/*
+
+		bit		description
+
+		0		EME
+		1		40
+		2		HRU II A8, PROT A0
+		3		PROT INI
+		4		TXOFF
+		5		E05-16 CS
+		6		E05-16 CLK
+		7		E05-16 DI/O, PROT DIN
+
+	*/
+
+	abc806_eme = BIT(data, 0);
+	abc806_40 = BIT(data, 1);
+	abc806_txoff = BIT(data, 4);
+
+	//e0516_cs_w(BIT(data, 5));
+	//e0516_clk_w(BIT(data, 6));
+	//e0516_dio_w(BIT(data, 7));
 }
 
 /* Timer Callbacks */
@@ -357,7 +442,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			ra_latch = 0x0f;
 		}
 
-		data = charrom[(address + ra_latch) & 0x7ff];
+		data = charrom[(address + ra_latch) & 0x1fff];
 
 		if (data & ABC802_ATE)
 		{
@@ -394,7 +479,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			}
 
 			// reload data and mask out two bottom bits
-			data = charrom[(address + ra_latch) & 0x7ff] & 0xfc;
+			data = charrom[(address + ra_latch) & 0x1fff] & 0xfc;
 		}
 
 		if (abc802_mux80_40)
@@ -425,6 +510,63 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 	}
 }
 
+static MC6845_UPDATE_ROW( abc806_update_row )
+{
+	// DEN+3, CUR+4
+
+	int col;
+
+	for (col = 0; col < x_count; col++)
+	{
+		int bit;
+
+		UINT8 *charrom = memory_region(REGION_GFX1);
+		UINT8 code = videoram[(ma + col) & 0x7ff];
+//		UINT8 attr = abc806_colorram[(ma + col) & 0x7ff];
+		UINT16 address = ((code & 0x80) << 5) | ((code & 0x7f) << 4);
+		UINT8 ra_latch = ra;
+		UINT8 data;
+
+		if (col == cursor_x)
+		{
+			ra_latch = 0x0f;
+		}
+
+		data = charrom[(address + ra_latch) & 0xfff] << 2;
+
+		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
+		{
+			int x = (col * ABC800_CHAR_WIDTH) + bit;
+			int color = BIT(data, 7) ? 1 : 0;
+
+			if (abc806_txoff)
+			{
+				color = 0;
+			}
+
+			*BITMAP_ADDR16(bitmap, y, x) = color;
+
+			data <<= 1;
+		}
+	}
+}
+
+static MC6845_ON_HSYNC_CHANGED(abc806_hsync_changed)
+{
+	if (!hsync)
+	{
+		abc806_v50_addr++;
+	}
+}
+
+static MC6845_ON_VSYNC_CHANGED(abc806_vsync_changed)
+{
+	if (vsync)
+	{
+		abc806_v50_addr = 0;
+	}
+}
+
 /* MC6845 Interfaces */
 
 static const mc6845_interface abc800m_crtc6845_interface = {
@@ -451,6 +593,18 @@ static const mc6845_interface abc802_crtc6845_interface = {
 	NULL
 };
 
+static const mc6845_interface abc806_crtc6845_interface = {
+	0,
+	ABC800_CCLK,
+	ABC800_CHAR_WIDTH,
+	NULL,
+	abc806_update_row,
+	NULL,
+	NULL,
+	abc806_hsync_changed,
+	abc806_vsync_changed
+};
+
 /* Video Start */
 
 static VIDEO_START( abc800 )
@@ -464,6 +618,19 @@ static VIDEO_START( abc802 )
 
 	abc802_flash_timer = timer_alloc(abc802_flash_tick, NULL);
 	timer_adjust_periodic(abc802_flash_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC802_FLSHCLK));
+}
+
+static VIDEO_START(abc806)
+{
+	state_save_register_global(abc806_v50_addr);
+	state_save_register_global(abc806_hrui_addr);
+	state_save_register_global(abc806_colorram_address_latch);
+	state_save_register_global(abc806_txoff);
+	state_save_register_global(abc806_eme);
+	state_save_register_global(abc806_40);
+	state_save_register_global(abc806_flshclk);
+
+	abc806_colorram = auto_malloc(0x800);
 }
 
 /* Video Update */
@@ -525,5 +692,22 @@ MACHINE_DRIVER_START( abc802_video )
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( abc806_video )
-	MDRV_IMPORT_FROM(abc800m_video)
+	// device interface
+	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_CONFIG(abc806_crtc6845_interface)
+
+	// video hardware
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MDRV_SCREEN_SIZE(640, 400)
+	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
+
+	MDRV_PALETTE_LENGTH(8)
+
+	MDRV_PALETTE_INIT(abc800c)
+	MDRV_VIDEO_START(abc806)
+	MDRV_VIDEO_UPDATE(abc800)
 MACHINE_DRIVER_END

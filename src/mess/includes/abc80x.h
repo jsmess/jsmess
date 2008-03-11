@@ -19,4 +19,11 @@ MACHINE_DRIVER_EXTERN(abc806_video);
 
 void abc802_mux80_40_w(int level);
 
+READ8_HANDLER( abc806_videoram_r );
+WRITE8_HANDLER( abc806_videoram_w );
+READ8_HANDLER( abc806_colorram_r );
+WRITE8_HANDLER( abc806_colorram_w );
+READ8_HANDLER( abc806_fgctlprom_r );
+WRITE8_HANDLER( abc806_sync_w );
+
 #endif /* __ABC80X__ */

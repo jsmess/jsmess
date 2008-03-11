@@ -95,8 +95,6 @@ static emu_timer *abc800_ctc_timer;
 
 /* Read/Write Handlers */
 
-// CRTC
-
 // HR
 
 static WRITE8_HANDLER( hrs_w )
@@ -115,24 +113,6 @@ static READ8_HANDLER( bankswitch_r )
 }
 
 static WRITE8_HANDLER( bankswitch_w )
-{
-}
-
-static READ8_HANDLER( attribute_r )
-{
-	return 0;
-}
-
-static WRITE8_HANDLER( attribute_w )
-{
-}
-
-static READ8_HANDLER( sync_r )
-{
-	return 0;
-}
-
-static WRITE8_HANDLER( fgctlprom_w )
 {
 }
 
@@ -256,7 +236,8 @@ static WRITE8_HANDLER( abc77_data_w )
 	}
 
 //  abc77_beep = data & 0x10;
-	z80dart_set_dcd(0, 0, (data & 0x40) ? 0 : 1);
+	z80dart_set_dcd(0, 0, !BIT(data, 6));
+	z80dart_set_dcd(0, 0, BIT(data, 6));
 //  abc77_hys = data & 0x80;
 }
 
@@ -278,19 +259,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc800_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | AMEF_UNMAP(1) )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
-	AM_RANGE(0x02, 0x05) AM_WRITE(abcbus_command_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(hrs_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(abcbus_reset_r, hrc_w)
-	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
+	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(hrs_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, hrc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_READWRITE(dart_r, dart_w)
 	AM_RANGE(0x30, 0x32) AM_WRITE(ram_ctrl_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREAD(MC6845, "crtc", mc6845_register_r)
-	AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
-	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, "crtc", mc6845_register_r)
+	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_READWRITE(sio2_r, sio2_w)
+	AM_RANGE(0x50, 0x53) AM_MIRROR(0x1c) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
 // ABC 77 keyboard
@@ -300,8 +281,9 @@ static ADDRESS_MAP_START( abc77_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc77_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(I8039_p1, I8039_p1) AM_READ(abc77_data_r)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(abc77_data_w)
+	AM_RANGE(0x00, 0x3f) AM_RAM
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(abc77_data_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_READ(abc77_data_r)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(abc77_clock_r)
 	AM_RANGE(I8039_bus, I8039_bus) AM_READ_PORT("DSW")
 	AM_RANGE(I8039_ea, I8039_ea) AM_READ(abc77_ea_r)
@@ -337,27 +319,28 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc806_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x77ff) AM_RAMBANK(1)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(abc806_videoram_r, abc806_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | AMEF_UNMAP(1) )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
-	AM_RANGE(0x02, 0x05) AM_WRITE(abcbus_command_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(hrs_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(abcbus_reset_r, hrc_w)
-	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREAD(MC6845, "crtc", mc6845_register_r)
+//	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
+	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(hrs_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, hrc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, "crtc", mc6845_register_r)
 	AM_RANGE(0x34, 0x34) AM_READWRITE(bankswitch_r, bankswitch_w)
-	AM_RANGE(0x35, 0x35) AM_READWRITE(attribute_r, attribute_w)
-	AM_RANGE(0x37, 0x37) AM_READWRITE(sync_r, fgctlprom_w)
-	AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
-	AM_RANGE(0x40, 0x41) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x60, 0x63) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
-	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
+	AM_RANGE(0x35, 0x35) AM_READWRITE(abc806_colorram_r, abc806_colorram_w)
+	AM_RANGE(0x37, 0x37) AM_READWRITE(abc806_fgctlprom_r, abc806_sync_w)
+	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0x40, 0x41) AM_MIRROR(0x1c) AM_READWRITE(sio2_r, sio2_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -834,7 +817,7 @@ ROM_START( abc802 )
 	ROM_REGION( 0x2000, REGION_GFX1, 0 )
 	ROM_LOAD( "abct2-11.3g",  0x0000, 0x2000, CRC(e21601ee) SHA1(2e838ebd7692e5cb9ba4e80fe2aa47ea2584133a) )
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, REGION_PLDS, 0 )
 	ROM_LOAD( "abcp2-11.2g", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
 ROM_END
 
@@ -861,13 +844,15 @@ ROM_START( abc806 )
 	ROM_REGION( 0x1000, REGION_GFX1, 0 )
 	ROM_LOAD( "abct6-11.7c",   0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) ) // 6490243-01
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
-	ROM_LOAD( "rad.9b",		 0x0000, 0x0400, NO_DUMP ) // 7621/7643 (82S131/82S137)
+	ROM_REGION( 0x620, REGION_PROMS, 0 )
+	ROM_LOAD( "rad.9b",		 0x0000, 0x0200, NO_DUMP ) // 7621/7643 (82S131/82S137)
+	ROM_LOAD( "hrui.6e",	 0x0200, 0x0020, NO_DUMP ) // 7603 (82S123)
+	ROM_LOAD( "hruii.12g",	 0x0220, 0x0200, NO_DUMP ) // 7621 (82S131)
+	ROM_LOAD( "v50.7e",		 0x0420, 0x0200, NO_DUMP ) // 7621 (82S131)
+
+	ROM_REGION( 0x400, REGION_PLDS, 0 )
 	ROM_LOAD( "atthand.11c", 0x0000, 0x0400, NO_DUMP ) // 40033A (?)
-	ROM_LOAD( "hrui.6e",	 0x0000, 0x0400, NO_DUMP ) // 7603 (82S123)
-	ROM_LOAD( "hru11.12g",	 0x0000, 0x0400, NO_DUMP ) // 7621 (82S131)
-	ROM_LOAD( "v50.7e",		 0x0000, 0x0400, NO_DUMP ) // 7621 (82S131)
-	ROM_LOAD( "abcp3-11.1a", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
+	ROM_LOAD( "abcp3-11.1b", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
 	ROM_LOAD( "abcp4-11.2d", 0x0000, 0x0400, NO_DUMP ) // PAL16L8
 ROM_END
 
