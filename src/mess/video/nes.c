@@ -89,15 +89,9 @@ PALETTE_INIT( nes )
 	ppu2c0x_init_palette(machine, 0);
 }
 
-static void draw_sight(bitmap_t *bitmap, int playerNum, int x_center, int y_center)
+static void draw_sight(bitmap_t *bitmap, UINT16 color, int x_center, int y_center)
 {
 	int x,y;
-	UINT16 color;
-
-	if (playerNum == 2)
-		color = Machine->pens[0]; /* grey */
-	else
-		color = Machine->pens[0x30]; /* white */
 
 	if (x_center<2)   x_center=2;
 	if (x_center>253) x_center=253;
@@ -138,9 +132,9 @@ VIDEO_UPDATE( nes )
 	if ((readinputport(PORT_CONFIG1) & 0x00f0) == 0x0030)
 		sights |= 0x0002;
 	if (sights & 0x0001)
-		draw_sight(bitmap, 1, readinputport(PORT_ZAPPER0_X), readinputport(PORT_ZAPPER0_Y));
+		draw_sight(bitmap, machine->pens[0x30], readinputport(PORT_ZAPPER0_X), readinputport(PORT_ZAPPER0_Y));
 	if (sights & 0x0002)
-		draw_sight(bitmap, 2, readinputport(PORT_ZAPPER1_X), readinputport(PORT_ZAPPER1_Y));
+		draw_sight(bitmap, machine->pens[0x00], readinputport(PORT_ZAPPER1_X), readinputport(PORT_ZAPPER1_Y));
 
 	/* if this is a disk system game, check for the flip-disk key */
 	if (nes.mapper == 20)
