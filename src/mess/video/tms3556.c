@@ -12,7 +12,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "tms3556.h"
 
 static struct
@@ -308,7 +307,7 @@ static void tms3556_draw_line_empty(UINT16 *ln)
 	draw a line of text (called by tms3556_draw_line_text and
 	tms3556_draw_line_mixed)
 */
-static void tms3556_draw_line_text_common(UINT16 *ln)
+static void tms3556_draw_line_text_common(running_machine *machine, UINT16 *ln)
 {
 	int pattern, x, xx, i, name_offset;
 	UINT16 fg, bg;
@@ -336,7 +335,7 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 		name_lo = nametbl[name_offset+1];
 		pattern_ix = ((name_hi >> 2) & 2) | ((name_hi >> 4) & 1);
 		alphanumeric_mode = (pattern_ix < 2) || ((pattern_ix == 3) && !(vdp.controlRegs[7] & 0x08));
-		fg = Machine->pens[(name_hi >> 5) & 0x7];
+		fg = machine->pens[(name_hi >> 5) & 0x7];
 		if (alphanumeric_mode)
 		{
 			if (name_hi & 4)
@@ -422,7 +421,7 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 	draw a line of bitmap (called by tms3556_draw_line_bitmap and
 	tms3556_draw_line_mixed)
 */
-static void tms3556_draw_line_bitmap_common(UINT16 *ln)
+static void tms3556_draw_line_bitmap_common(running_machine *machine, UINT16 *ln)
 {
 	int x, xx;
 	UINT8 *nametbl;
@@ -444,7 +443,7 @@ static void tms3556_draw_line_bitmap_common(UINT16 *ln)
 		name_r = nametbl[vdp.name_offset+2];
 		for (xx=0;xx<8;xx++)
 		{
-			UINT16 color = Machine->pens[((name_b >> 5) & 0x4) | ((name_g >> 6) & 0x2) | ((name_r >> 7) & 0x1)];
+			UINT16 color = machine->pens[((name_b >> 5) & 0x4) | ((name_g >> 6) & 0x2) | ((name_r >> 7) & 0x1)];
 #if DOUBLE_WIDTH
 			*ln++ = color;
 #endif
@@ -468,12 +467,12 @@ static void tms3556_draw_line_bitmap_common(UINT16 *ln)
 
 	draw a line in text mode
 */
-static void tms3556_draw_line_text(UINT16 *ln)
+static void tms3556_draw_line_text(running_machine *machine, UINT16 *ln)
 {
 	if (vdp.char_line_counter == 0)
 		vdp.char_line_counter = 10;
 	vdp.char_line_counter--;
-	tms3556_draw_line_text_common(ln);
+	tms3556_draw_line_text_common(machine, ln);
 }
 
 /*
@@ -481,14 +480,14 @@ static void tms3556_draw_line_text(UINT16 *ln)
 
 	draw a line in bitmap mode
 */
-static void tms3556_draw_line_bitmap(UINT16 *ln)
+static void tms3556_draw_line_bitmap(running_machine *machine, UINT16 *ln)
 {
 	UINT8 *nametbl;
 
 
-	tms3556_draw_line_bitmap_common(ln);
+	tms3556_draw_line_bitmap_common(machine, ln);
 	nametbl = vdp.vram + vdp.addressRegs[2];
-	vdp.bg_color = Machine->pens[(nametbl[vdp.name_offset] >> 5) & 0x7];
+	vdp.bg_color = machine->pens[(nametbl[vdp.name_offset] >> 5) & 0x7];
 	vdp.name_offset += 2;
 }
 
@@ -497,16 +496,16 @@ static void tms3556_draw_line_bitmap(UINT16 *ln)
 
 	draw a line in mixed mode
 */
-static void tms3556_draw_line_mixed(UINT16 *ln)
+static void tms3556_draw_line_mixed(running_machine *machine, UINT16 *ln)
 {
 	UINT8 *nametbl;
 
 
 	if (vdp.cg_flag)
 	{	/* bitmap line */
-		tms3556_draw_line_bitmap_common(ln);
+		tms3556_draw_line_bitmap_common(machine, ln);
 		nametbl = vdp.vram + vdp.addressRegs[2];
-		vdp.bg_color = Machine->pens[(nametbl[vdp.name_offset] >> 5) & 0x7];
+		vdp.bg_color = machine->pens[(nametbl[vdp.name_offset] >> 5) & 0x7];
 		vdp.cg_flag = (nametbl[vdp.name_offset] >> 4) & 0x1;
 		vdp.name_offset += 2;
 	}
@@ -515,11 +514,11 @@ static void tms3556_draw_line_mixed(UINT16 *ln)
 		if (vdp.char_line_counter == 0)
 			vdp.char_line_counter = 10;
 		vdp.char_line_counter--;
-		tms3556_draw_line_text_common(ln);
+		tms3556_draw_line_text_common(machine, ln);
 		if (vdp.char_line_counter == 0)
 		{
 			nametbl = vdp.vram + vdp.addressRegs[2];
-			vdp.bg_color = Machine->pens[(nametbl[vdp.name_offset] >> 5) & 0x7];
+			vdp.bg_color = machine->pens[(nametbl[vdp.name_offset] >> 5) & 0x7];
 			vdp.cg_flag = (nametbl[vdp.name_offset] >> 4) & 0x1;
 			vdp.name_offset += 2;
 		}
@@ -531,7 +530,7 @@ static void tms3556_draw_line_mixed(UINT16 *ln)
 
 	draw a line.  If non-interlaced mode, duplicate the line.
 */
-static void tms3556_draw_line(bitmap_t *bmp, int line)
+static void tms3556_draw_line(running_machine *machine, bitmap_t *bmp, int line)
 {
 	int double_lines;
 	UINT16 *ln, *ln2 = NULL;
@@ -561,13 +560,13 @@ static void tms3556_draw_line(bitmap_t *bmp, int line)
 			tms3556_draw_line_empty(ln);
 			break;
 		case TMS3556_MODE_TEXT:
-			tms3556_draw_line_text(ln);
+			tms3556_draw_line_text(machine, ln);
 			break;
 		case TMS3556_MODE_BITMAP:
-			tms3556_draw_line_bitmap(ln);
+			tms3556_draw_line_bitmap(machine, ln);
 			break;
 		case TMS3556_MODE_MIXED:
-			tms3556_draw_line_mixed(ln);
+			tms3556_draw_line_mixed(machine, ln);
 			break;
 		}
 	}
@@ -582,7 +581,7 @@ static void tms3556_draw_line(bitmap_t *bmp, int line)
 
 	Do vblank-time tasks
 */
-static void tms3556_interrupt_start_vblank(void)
+static void tms3556_interrupt_start_vblank(running_machine *machine)
 {
 	int i;
 
@@ -599,7 +598,7 @@ static void tms3556_interrupt_start_vblank(void)
 		vdp.blink_count = 60;	/*no idea what the real value is*/
 	}
 	/* reset background color */
-	vdp.bg_color = Machine->pens[(vdp.controlRegs[7] >> 5) & 0x7];
+	vdp.bg_color = machine->pens[(vdp.controlRegs[7] >> 5) & 0x7];
 	/* reset name offset */
 	vdp.name_offset = 0;
 	/* reset character line counter */
@@ -616,17 +615,17 @@ static void tms3556_interrupt_start_vblank(void)
 
 	scanline handler
 */
-void tms3556_interrupt(void)
+void tms3556_interrupt(running_machine *machine)
 {
 	/* check for start of vblank */
 	if (vdp.scanline == 310)	/*no idea what the real value is*/
-		tms3556_interrupt_start_vblank();
+		tms3556_interrupt_start_vblank( machine );
 
 	/* render the current line */
 	if ((vdp.scanline >= 0) && (vdp.scanline < TOTAL_HEIGHT))
 	{
 		//if (!video_skip_this_frame())
-			tms3556_draw_line(tmpbitmap, vdp.scanline);
+			tms3556_draw_line(machine, tmpbitmap, vdp.scanline);
 	}
 
 	if (++vdp.scanline == 313)
