@@ -9,8 +9,6 @@
 #include "driver.h"
 #include "includes/kc.h"
 #include "eventlst.h"
-#include "deprecat.h"
-#include "mslegacy.h"
 
 /* KC85/4 and KC85/3 common graphics hardware */
 
@@ -96,7 +94,11 @@ static const unsigned char kc85_palette[KC85_PALETTE_SIZE * 3] =
 /* Initialise the palette */
 PALETTE_INIT( kc85 )
 {
-	palette_set_colors_rgb(machine, 0, kc85_palette, sizeof(kc85_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(kc85_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, kc85_palette[i*3], kc85_palette[i*3+1], kc85_palette[i*3+2]);
+	}
 }
 
 static int kc85_blink_state;
@@ -114,7 +116,7 @@ void	kc85_video_set_blink_state(int data)
 
 
 /* draw 8 pixels */
-static void kc85_draw_8_pixels(bitmap_t *bitmap,int x,int y, unsigned char colour_byte, unsigned char gfx_byte)
+static void kc85_draw_8_pixels(running_machine *machine, bitmap_t *bitmap,int x,int y, unsigned char colour_byte, unsigned char gfx_byte)
 {
 	int a;
 	int background_pen;
@@ -142,8 +144,8 @@ static void kc85_draw_8_pixels(bitmap_t *bitmap,int x,int y, unsigned char colou
 		foreground_pen = background_pen;
 	}
 
-    pens[0] = Machine->pens[background_pen];
-	pens[1] = Machine->pens[foreground_pen];
+    pens[0] = machine->pens[background_pen];
+	pens[1] = machine->pens[foreground_pen];
 
 	px = x;
 
@@ -286,7 +288,7 @@ struct video_update_state
 
 /* process visible cycles within a line */
 /* the cycles will never span over the end of a line */
-static void kc85_common_process_cycles(struct video_update_state *video_update, int cycles)
+static void kc85_common_process_cycles(running_machine *machine, struct video_update_state *video_update, int cycles)
 {
 	while (cycles!=0)
 	{
@@ -320,7 +322,7 @@ static void kc85_common_process_cycles(struct video_update_state *video_update, 
 					/* grab colour and pixel information */
 					video_update->pixel_grab_callback(&video_update->grab_data,video_update->x,video_update->y,&colour_byte, &gfx_byte);
 					/* draw to screen */
-					kc85_draw_8_pixels(video_update->bitmap, video_update->render_x, video_update->render_y,colour_byte, gfx_byte);
+					kc85_draw_8_pixels(machine, video_update->bitmap, video_update->render_x, video_update->render_y,colour_byte, gfx_byte);
 					/* update render coordinate */
 					video_update->render_x+=8;
 					video_update->x++;
@@ -371,7 +373,7 @@ static void kc85_common_process_cycles(struct video_update_state *video_update, 
 }
 
 /* process a whole visible line */
-static int kc85_common_vh_process_line(struct video_update_state *video_update, int cycles)
+static int kc85_common_vh_process_line(running_machine *machine, struct video_update_state *video_update, int cycles)
 {
 	int cycles_to_do;
 
@@ -384,7 +386,7 @@ static int kc85_common_vh_process_line(struct video_update_state *video_update, 
 		//logerror("process line: cycles_to_do: %d\n",cycles_to_do);
 
 		/* do the cycles - draw them */
-		kc85_common_process_cycles(video_update, cycles_to_do);
+		kc85_common_process_cycles(machine, video_update, cycles_to_do);
 
 		video_update->horizontal.cycles_remaining -= cycles_to_do;
 		cycles -=cycles_to_do;
@@ -421,7 +423,7 @@ static int kc85_common_vh_process_line(struct video_update_state *video_update, 
 	return cycles;
 }
 
-static void kc85_common_vh_process_lines(struct video_update_state *video_update, int cycles)
+static void kc85_common_vh_process_lines(running_machine *machine, struct video_update_state *video_update, int cycles)
 {
 	while (cycles!=0)
 	{
@@ -449,7 +451,7 @@ static void kc85_common_vh_process_lines(struct video_update_state *video_update
 				int cycles_remaining;
 
 				/* update cycles with number of cycles not processed */
-				cycles_remaining = kc85_common_vh_process_line(video_update, cycles_to_do);
+				cycles_remaining = kc85_common_vh_process_line(machine, video_update, cycles_to_do);
 
 				cycles_done = cycles_to_do - cycles_remaining;
 
@@ -490,7 +492,7 @@ static void kc85_common_vh_process_lines(struct video_update_state *video_update
 
 /* the kc85 screen is 320 pixels wide and 256 pixels tall */
 /* if we assume a 50hz display, there are 312 lines for the complete frame, leaving 56 lines not visible */
-static void kc85_common_process_frame(bitmap_t *bitmap, void (*pixel_grab_callback)(struct grab_info *,int x,int y,unsigned char *, unsigned char *),struct grab_info *grab_data)
+static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap, void (*pixel_grab_callback)(struct grab_info *,int x,int y,unsigned char *, unsigned char *),struct grab_info *grab_data)
 {
 	int cycles_remaining_in_frame = KC85_CYCLES_PER_FRAME;
 
@@ -527,7 +529,7 @@ static void kc85_common_process_frame(bitmap_t *bitmap, void (*pixel_grab_callba
 		delta_cycles = pItem->Event_Time - cycles_offset;
 
 		//logerror("cycles between this event and next: %d\n",delta_cycles);
-		kc85_common_vh_process_lines(&video_update, delta_cycles);
+		kc85_common_vh_process_lines(machine, &video_update, delta_cycles);
 
 		/* update number of cycles remaining in frame */
 		cycles_remaining_in_frame -= delta_cycles;
@@ -544,7 +546,7 @@ static void kc85_common_process_frame(bitmap_t *bitmap, void (*pixel_grab_callba
 
 
 	/* process remainder */
-	kc85_common_vh_process_lines(&video_update, cycles_remaining_in_frame);
+	kc85_common_vh_process_lines(machine, &video_update, cycles_remaining_in_frame);
 	EventList_Reset();
 	EventList_SetOffsetStartTime ( ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
 }
@@ -671,7 +673,7 @@ VIDEO_UPDATE( kc85_4 )
 			colour_byte = colour_ram[offset];
 		    gfx_byte = pixel_ram[offset];
 
-			kc85_draw_8_pixels(bitmap,(x<<3),y, colour_byte, gfx_byte);
+			kc85_draw_8_pixels(machine, bitmap,(x<<3),y, colour_byte, gfx_byte);
 
 		}
 	}
@@ -681,7 +683,7 @@ VIDEO_UPDATE( kc85_4 )
 	grab_data.pixel_ram = kc85_4_display_video_ram;
 	grab_data.colour_ram = kc85_4_display_video_ram + 0x04000;
 
-	kc85_common_process_frame(bitmap, kc85_4_pixel_grab_callback,&grab_data);
+	kc85_common_process_frame(machine, bitmap, kc85_4_pixel_grab_callback,&grab_data);
 
 	return 0;
 }
@@ -768,7 +770,7 @@ VIDEO_UPDATE( kc85_3 )
             colour_byte = colour_ram[colour_offset];
             gfx_byte = pixel_ram[pixel_offset];
 
-			kc85_draw_8_pixels(bitmap,(x<<3),y, colour_byte, gfx_byte);
+			kc85_draw_8_pixels(machine, bitmap,(x<<3),y, colour_byte, gfx_byte);
 		}
 	}
 #endif
@@ -778,7 +780,7 @@ VIDEO_UPDATE( kc85_3 )
 	grab_data.pixel_ram = mess_ram+0x08000;
 	grab_data.colour_ram = mess_ram+0x08000 + 0x02800;
 
-	kc85_common_process_frame(bitmap, kc85_3_pixel_grab_callback,&grab_data);
+	kc85_common_process_frame(machine, bitmap, kc85_3_pixel_grab_callback,&grab_data);
 
 	return 0;
 }
