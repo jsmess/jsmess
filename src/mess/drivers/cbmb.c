@@ -158,7 +158,6 @@ when problems start with -log and look into error.log file
  */
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
@@ -468,7 +467,11 @@ GFXDECODE_END
 
 static PALETTE_INIT( cbm700 )
 {
-	palette_set_colors_rgb(machine, 0, cbm700_palette, sizeof(cbm700_palette) / 3);
+	int i;
+
+	for ( i = 0; i < 2; i++ ) {
+		palette_set_color_rgb(machine, i, cbm700_palette[i*3], cbm700_palette[i*3+1], cbm700_palette[i*3+2]);
+	}
 }
 
 ROM_START (cbm610)
