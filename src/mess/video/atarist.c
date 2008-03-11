@@ -10,7 +10,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68k.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
@@ -38,7 +37,7 @@ static struct SHIFTER
 static emu_timer *atarist_glue_timer;
 static emu_timer *atarist_shifter_timer;
 
-INLINE pen_t atarist_shift_mode_0(void)
+INLINE pen_t atarist_shift_mode_0(running_machine *machine)
 {
 	int color = (BIT(shifter.rr[3], 15) << 3) | (BIT(shifter.rr[2], 15) << 2) | (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
 
@@ -47,10 +46,10 @@ INLINE pen_t atarist_shift_mode_0(void)
 	shifter.rr[2] <<= 1;
 	shifter.rr[3] <<= 1;
 
-	return Machine->pens[color];
+	return machine->pens[color];
 }
 
-INLINE pen_t atarist_shift_mode_1(void)
+INLINE pen_t atarist_shift_mode_1(running_machine *machine)
 {
 	int color = (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
 
@@ -66,10 +65,10 @@ INLINE pen_t atarist_shift_mode_1(void)
 		shifter.shift = 0;
 	}
 
-	return Machine->pens[color];
+	return machine->pens[color];
 }
 
-INLINE pen_t atarist_shift_mode_2(void)
+INLINE pen_t atarist_shift_mode_2(running_machine *machine)
 {
 	int color = BIT(shifter.rr[0], 15);
 
@@ -98,7 +97,7 @@ INLINE pen_t atarist_shift_mode_2(void)
 		break;
 	}
 
-	return Machine->pens[color];
+	return machine->pens[color];
 }
 
 static TIMER_CALLBACK(atarist_shifter_tick)
@@ -111,15 +110,15 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 	switch (shifter.mode)
 	{
 	case 0:
-		pen = atarist_shift_mode_0();
+		pen = atarist_shift_mode_0(machine);
 		break;
 
 	case 1:
-		pen = atarist_shift_mode_1();
+		pen = atarist_shift_mode_1(machine);
 		break;
 
 	case 2:
-		pen = atarist_shift_mode_2();
+		pen = atarist_shift_mode_2(machine);
 		break;
 
 	default:
@@ -284,7 +283,7 @@ WRITE16_HANDLER( atarist_shifter_palette_w )
 	shifter.palette[offset] = data;
 	logerror("SHIFTER Palette[%x] = %x\n", offset, data);
 
-	palette_set_color_rgb(Machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
+	palette_set_color_rgb(machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
 }
 
 /* Atari STe Shifter */
@@ -343,7 +342,7 @@ WRITE16_HANDLER( atariste_shifter_palette_w )
 	shifter.palette[offset] = data;
 	logerror("SHIFTER palette %x = %x\n", offset, data);
 
-	palette_set_color_rgb(Machine, offset, r, g, b);
+	palette_set_color_rgb(machine, offset, r, g, b);
 }
 
 READ16_HANDLER( atariste_shifter_lineofs_r )
