@@ -1,6 +1,5 @@
 #include <math.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/vectrex.h"
 #include "video/vector.h"
 #include "machine/6522via.h"
@@ -431,7 +430,7 @@ static WRITE8_HANDLER ( v_via_cb2_w )
 			start_time = time_now;
 		}
 		if (data & lightpen_check())
-			lightpen_trigger(Machine);
+			lightpen_trigger(machine);
 
 		blank = data;
 	}
