@@ -21,7 +21,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 
 #include "includes/a7800.h"
@@ -476,7 +475,7 @@ WRITE8_HANDLER( a7800_MARIA_w )
 	switch (offset)
 	{
 		case 0x00:
-			maria_backcolor = Machine->pens[data];
+			maria_backcolor = machine->pens[data];
 			// 20030621 ericball added maria_palette[pal][0] to make kanagroo mode easier
 			maria_palette[0][0]=maria_backcolor;
 			maria_palette[1][0]=maria_backcolor;
@@ -488,13 +487,13 @@ WRITE8_HANDLER( a7800_MARIA_w )
 			maria_palette[7][0]=maria_backcolor;
 			break;
 		case 0x01:
-			maria_palette[0][1] = Machine->pens[data];
+			maria_palette[0][1] = machine->pens[data];
 			break;
 		case 0x02:
-			maria_palette[0][2] = Machine->pens[data];
+			maria_palette[0][2] = machine->pens[data];
 			break;
 		case 0x03:
-			maria_palette[0][3] = Machine->pens[data];
+			maria_palette[0][3] = machine->pens[data];
 			break;
 		case 0x04:
 			cpu_spinuntil_trigger(TRIGGER_HSYNC);
@@ -502,65 +501,65 @@ WRITE8_HANDLER( a7800_MARIA_w )
 			break;
 
 		case 0x05:
-			maria_palette[1][1] = Machine->pens[data];
+			maria_palette[1][1] = machine->pens[data];
 			break;
 		case 0x06:
-			maria_palette[1][2] = Machine->pens[data];
+			maria_palette[1][2] = machine->pens[data];
 			break;
 		case 0x07:
-			maria_palette[1][3] = Machine->pens[data];
+			maria_palette[1][3] = machine->pens[data];
 			break;
 
 		case 0x09:
-			maria_palette[2][1] = Machine->pens[data];
+			maria_palette[2][1] = machine->pens[data];
 			break;
 		case 0x0A:
-			maria_palette[2][2] = Machine->pens[data];
+			maria_palette[2][2] = machine->pens[data];
 			break;
 		case 0x0B:
-			maria_palette[2][3] = Machine->pens[data];
+			maria_palette[2][3] = machine->pens[data];
 			break;
 
 		case 0x0D:
-			maria_palette[3][1] = Machine->pens[data];
+			maria_palette[3][1] = machine->pens[data];
 			break;
 		case 0x0E:
-			maria_palette[3][2] = Machine->pens[data];
+			maria_palette[3][2] = machine->pens[data];
 			break;
 		case 0x0F:
-			maria_palette[3][3] = Machine->pens[data];
+			maria_palette[3][3] = machine->pens[data];
 			break;
 
 		case 0x11:
-			maria_palette[4][1] = Machine->pens[data];
+			maria_palette[4][1] = machine->pens[data];
 			break;
 		case 0x12:
-			maria_palette[4][2] = Machine->pens[data];
+			maria_palette[4][2] = machine->pens[data];
 			break;
 		case 0x13:
-			maria_palette[4][3] = Machine->pens[data];
+			maria_palette[4][3] = machine->pens[data];
 			break;
 		case 0x14:
 			maria_charbase = (data << 8);
 			break;
 		case 0x15:
-			maria_palette[5][1] = Machine->pens[data];
+			maria_palette[5][1] = machine->pens[data];
 			break;
 		case 0x16:
-			maria_palette[5][2] = Machine->pens[data];
+			maria_palette[5][2] = machine->pens[data];
 			break;
 		case 0x17:
-			maria_palette[5][3] = Machine->pens[data];
+			maria_palette[5][3] = machine->pens[data];
 			break;
 
 		case 0x19:
-			maria_palette[6][1] = Machine->pens[data];
+			maria_palette[6][1] = machine->pens[data];
 			break;
 		case 0x1A:
-			maria_palette[6][2] = Machine->pens[data];
+			maria_palette[6][2] = machine->pens[data];
 			break;
 		case 0x1B:
-			maria_palette[6][3] = Machine->pens[data];
+			maria_palette[6][3] = machine->pens[data];
 			break;
 
 		case 0x1C:
@@ -586,13 +585,13 @@ WRITE8_HANDLER( a7800_MARIA_w )
 
 			break;
 		case 0x1D:
-			maria_palette[7][1] = Machine->pens[data];
+			maria_palette[7][1] = machine->pens[data];
 			break;
 		case 0x1E:
-			maria_palette[7][2] = Machine->pens[data];
+			maria_palette[7][2] = machine->pens[data];
 			break;
 		case 0x1F:
-			maria_palette[7][3] = Machine->pens[data];
+			maria_palette[7][3] = machine->pens[data];
 			break;
 	}
 	ROM[ 0x20 + offset ] = data;
