@@ -9,13 +9,12 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/primo.h"
 
 UINT16 primo_video_memory_base;
 
 
-static void primo_draw_scanline(bitmap_t *bitmap, int primo_scanline)
+static void primo_draw_scanline(running_machine *machine, bitmap_t *bitmap, int primo_scanline)
 {
 	int x, i;
 	UINT8 data;
@@ -31,7 +30,7 @@ static void primo_draw_scanline(bitmap_t *bitmap, int primo_scanline)
 		data = primo_video_ram_line[x/8];
 
 		for (i=0; i<8; i++)
-			scanline[x+i]=Machine->pens[(data & (0x80>>i)) ? 1 : 0];
+			scanline[x+i]=machine->pens[(data & (0x80>>i)) ? 1 : 0];
 
 	}
 }
@@ -42,6 +41,6 @@ VIDEO_UPDATE( primo )
 	int primo_scanline;
 
 	for (primo_scanline=0; primo_scanline<192; primo_scanline++)
-		primo_draw_scanline(bitmap, primo_scanline);
+		primo_draw_scanline(machine, bitmap, primo_scanline);
 	return 0;
 }
