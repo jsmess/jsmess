@@ -244,10 +244,10 @@ INTERRUPT_GEN( electron_scanline_interrupt ) {
 	}
 	ula.scanline = ( ula.scanline + 1 ) % 312;
 	if ( ula.scanline == 100 ) {
-		electron_interrupt_handler( INT_SET, INT_RTC );
+		electron_interrupt_handler( machine, INT_SET, INT_RTC );
 	}
 	if ( ula.scanline == 256 ) {
-		electron_interrupt_handler( INT_SET, INT_DISPLAY_END );
+		electron_interrupt_handler( machine, INT_SET, INT_DISPLAY_END );
 	}
 	if ( ula.scanline == 0 ) {
 		ula.screen_addr = ula.screen_start - ula.screen_base;

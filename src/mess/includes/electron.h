@@ -63,7 +63,7 @@ READ8_HANDLER( electron_ula_r );
 WRITE8_HANDLER( electron_ula_w );
 MACHINE_START( electron );
 
-void electron_interrupt_handler(int mode, int interrupt);
+void electron_interrupt_handler(running_machine *machine, int mode, int interrupt);
 
 
 /*----------- defined in video/electron.c -----------*/
