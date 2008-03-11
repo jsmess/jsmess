@@ -349,10 +349,10 @@ static void to7_5p14_reset( void )
 
 
 
-static void to7_5p14_init( void )
+static void to7_5p14_init( running_machine *machine )
 {
 	LOG(( "to7_5p14_init: CD 90-640 controller\n" ));
-	wd17xx_init( WD_TYPE_2793, NULL, NULL );
+	wd17xx_init( machine, WD_TYPE_2793, NULL, NULL );
 	state_save_register_global( to7_5p14_select );
 }
 
@@ -1758,13 +1758,13 @@ UINT8 to7_controller_type;
 UINT8 to7_floppy_bank;
 
 
-void to7_floppy_init ( void* base )
+void to7_floppy_init ( running_machine *machine, void* base )
 {
 	memory_configure_bank( THOM_FLOP_BANK, 0, TO7_NB_FLOP_BANK, base, 0x800 );
 	state_save_register_global( to7_controller_type );
 	state_save_register_global( to7_floppy_bank );
 	to7_5p14sd_init();
-	to7_5p14_init();
+	to7_5p14_init(machine);
 	to7_qdd_init();
 	thmfc_floppy_init();
 	to7_network_init();
@@ -1884,9 +1884,9 @@ WRITE8_HANDLER ( to7_floppy_w )
 
 
 
-void to9_floppy_init( void* int_base, void* ext_base )
+void to9_floppy_init( running_machine *machine, void* int_base, void* ext_base )
 {
-	to7_floppy_init( ext_base );
+	to7_floppy_init( machine, ext_base );
 	memory_configure_bank( THOM_FLOP_BANK, TO7_NB_FLOP_BANK, 1, int_base, 0x800 );
 }
 

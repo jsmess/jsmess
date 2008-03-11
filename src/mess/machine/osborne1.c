@@ -456,6 +456,6 @@ DRIVER_INIT( osborne1 ) {
 //	acia6850_config( 0, &osborne1_6850_config );
 
 	/* Configure the floppy disk interface */
-	wd17xx_init( WD_TYPE_MB8877, NULL, NULL );
+	wd17xx_init( machine, WD_TYPE_MB8877, NULL, NULL );
 }
 

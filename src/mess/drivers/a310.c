@@ -178,7 +178,7 @@ static MACHINE_RESET( a310 )
 	a310_memc_reset();
 }
 
-static void a310_wd177x_callback(wd17xx_state_t event, void *param)
+static void a310_wd177x_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{
@@ -204,7 +204,7 @@ static void a310_wd177x_callback(wd17xx_state_t event, void *param)
 static MACHINE_START( a310 )
 {
 	a310_pagesize = 0;
-	wd17xx_init(WD_TYPE_1772, a310_wd177x_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_1772, a310_wd177x_callback, NULL);
 
 	vbl_timer = timer_alloc(a310_vblank, NULL);
 	timer_adjust_oneshot(vbl_timer, attotime_never, 0);

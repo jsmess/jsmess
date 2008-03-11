@@ -174,7 +174,7 @@ static const DAVE_INTERFACE enterprise_dave_interface =
 };
 
 
-static void enterp_wd177x_callback(wd17xx_state_t event, void *param);
+static void enterp_wd177x_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
 static void enterprise_reset(running_machine *machine)
 {
@@ -236,7 +236,7 @@ static void enterprise_reset(running_machine *machine)
 
 static MACHINE_START(enterprise)
 {
-	wd17xx_init(WD_TYPE_177X, enterp_wd177x_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_177X, enterp_wd177x_callback, NULL);
 	add_reset_callback(machine, enterprise_reset);
 }
 
@@ -318,7 +318,7 @@ static int EXDOS_GetDriveSelection(int data)
 
 static char EXDOS_CARD_R = 0;
 
-static void enterp_wd177x_callback(wd17xx_state_t State, void *param)
+static void enterp_wd177x_callback(running_machine *machine, wd17xx_state_t State, void *param)
 {
    if (State==WD17XX_IRQ_CLR)
    {

@@ -125,7 +125,7 @@ static void atarist_fdc_dma_transfer(void)
 	}
 }
 
-static void atarist_fdc_callback(wd17xx_state_t event, void *param)
+static void atarist_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{
@@ -1528,7 +1528,7 @@ static MACHINE_START( atarist )
 	atarist_state_save();
 
 	centronics_config(0, atarist_centronics_config);
-	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_1772, atarist_fdc_callback, NULL);
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 	state->mfp = devtag_get_token(machine, MC68901, "mfp");
@@ -1618,7 +1618,7 @@ static MACHINE_START( atariste )
 	atariste_state_save();
 
 	centronics_config(0, atarist_centronics_config);
-	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_1772, atarist_fdc_callback, NULL);
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 	state->mfp = devtag_get_token(machine, MC68901, "mfp");
@@ -1757,7 +1757,7 @@ static MACHINE_START( stbook )
 	state_save_register_global(ktxd);
 
 	centronics_config(0, atarist_centronics_config);
-	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_1772, atarist_fdc_callback, NULL);
 	acia6850_config(0, &stbook_acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 	state->mfp = devtag_get_token(machine, MC68901, "mfp");

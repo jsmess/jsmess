@@ -1613,7 +1613,7 @@ density disc image
 
 static int bbc_1770_IntEnabled;
 
-static void bbc_wd177x_callback(wd17xx_state_t event, void *param)
+static void bbc_wd177x_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
 	int state;
 	/* wd177x_IRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
@@ -1679,7 +1679,7 @@ static void bbc_wd177x_callback(wd17xx_state_t event, void *param)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI,PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 
@@ -2142,7 +2142,7 @@ MACHINE_START( bbcb )
 	//	break;
 	//case 4: case 5: case 6:
 		previous_wd177x_int_state=1;
-	    wd17xx_init(WD_TYPE_177X,bbc_wd177x_callback, NULL);
+	    wd17xx_init(machine, WD_TYPE_177X,bbc_wd177x_callback, NULL);
 	//	break;
 	//}
 }
@@ -2201,7 +2201,7 @@ MACHINE_START( bbcbp )
 	via_config(1, &bbcb_user_via);
 	via_set_clock(1,1000000);
 
-	wd17xx_init(WD_TYPE_177X,bbc_wd177x_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_177X,bbc_wd177x_callback, NULL);
 }
 
 MACHINE_RESET( bbcbp )
@@ -2238,7 +2238,7 @@ MACHINE_START( bbcm )
 	via_config(1, &bbcb_user_via);
 	via_set_clock(1,1000000);
 
-	wd17xx_init(WD_TYPE_177X,bbc_wd177x_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_177X,bbc_wd177x_callback, NULL);
 }
 
 MACHINE_RESET( bbcm )

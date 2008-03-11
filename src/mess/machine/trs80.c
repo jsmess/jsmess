@@ -281,7 +281,7 @@ DEVICE_LOAD( trs80_floppy )
     return INIT_PASS;
 }
 
-static void trs80_fdc_callback(wd17xx_state_t event, void *param);
+static void trs80_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
 MACHINE_RESET( trs80 )
 {
@@ -353,7 +353,7 @@ DRIVER_INIT( lnw80 )
 
 MACHINE_START( trs80 )
 {
-	wd17xx_init(WD_TYPE_179X,trs80_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X,trs80_fdc_callback, NULL);
 	add_exit_callback(machine, tape_put_close);
 }
 
@@ -651,7 +651,7 @@ INTERRUPT_GEN( trs80_fdc_interrupt )
 	}
 }
 
-void trs80_fdc_callback(wd17xx_state_t event, void *param)
+void trs80_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{
@@ -659,7 +659,7 @@ void trs80_fdc_callback(wd17xx_state_t event, void *param)
 			irq_status &= ~IRQ_FDC;
 			break;
 		case WD17XX_IRQ_SET:
-			trs80_fdc_interrupt(Machine, 0);
+			trs80_fdc_interrupt(machine, 0);
 			break;
 		case WD17XX_DRQ_CLR:
 		case WD17XX_DRQ_SET:

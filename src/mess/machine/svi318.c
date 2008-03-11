@@ -326,7 +326,7 @@ typedef struct
 
 static SVI318_FDC_STRUCT svi318_fdc;
 
-static void svi_fdc_callback(wd17xx_state_t state, void *param)
+static void svi_fdc_callback(running_machine *machine, wd17xx_state_t state, void *param)
 {
 	switch( state )
 	{
@@ -591,7 +591,7 @@ DRIVER_INIT( svi318 )
 	}
 
 	/* floppy */
-	wd17xx_init(WD_TYPE_179X, svi_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X, svi_fdc_callback, NULL);
 
 	/* serial */
 	uart8250_init(0, svi318_uart8250_interface);

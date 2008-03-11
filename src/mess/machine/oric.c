@@ -35,7 +35,7 @@
 
 UINT8 *oric_ram;
 
-static int enable_logging = 0;
+static int enable_logging = 1;
 /* static int save_done = 0; */
 
 
@@ -1060,7 +1060,7 @@ static void oric_install_microdisc_interface(void)
 /*********************************************************/
 
 
-static void oric_wd179x_callback(wd17xx_state_t State, void *param)
+static void oric_wd179x_callback(running_machine *machine, wd17xx_state_t State, void *param)
 {
 	switch (readinputport(9) &  0x07)
 	{
@@ -1131,7 +1131,7 @@ MACHINE_START( oric )
 
 	oric_ram_0x0c000 = auto_malloc(16384);
 
-	wd17xx_init(WD_TYPE_179X,oric_wd179x_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X,oric_wd179x_callback, NULL);
 }
 
 
@@ -1521,5 +1521,5 @@ MACHINE_START( telestrat )
 	via_config(1, &telestrat_via2_interface);
 	via_set_clock(1,1000000);
 
-	wd17xx_init(WD_TYPE_179X,oric_wd179x_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X,oric_wd179x_callback, NULL);
 }

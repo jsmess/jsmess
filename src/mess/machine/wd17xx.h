@@ -51,7 +51,7 @@ typedef enum
 
 ***************************************************************************/
 
-void wd17xx_init(wd17xx_type_t type, void (*callback)(wd17xx_state_t, void *), void *param);
+void wd17xx_init(running_machine *machine, wd17xx_type_t type, void (*callback)(running_machine *, wd17xx_state_t, void *), void *param);
 void wd17xx_reset(void);
 
 /* the following are not strictly part of the wd179x hardware/emulation

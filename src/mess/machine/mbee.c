@@ -31,7 +31,7 @@ static UINT8 fdc_head = 0;
 static UINT8 fdc_den = 0;
 static UINT8 fdc_status = 0;
 static void pio_interrupt(int state);
-static void mbee_fdc_callback(wd17xx_state_t event, void *param);
+static void mbee_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
 UINT8 *mbee_workram;
 
@@ -69,7 +69,7 @@ MACHINE_RESET( mbee )
 
 MACHINE_START( mbee )
 {
-	wd17xx_init(WD_TYPE_179X,mbee_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X,mbee_fdc_callback, NULL);
 }
 
 static mess_image *cassette_device_image(void)
@@ -114,7 +114,7 @@ WRITE8_HANDLER ( mbee_pio_w )
 	}
 }
 
-static void mbee_fdc_callback(wd17xx_state_t state, void *param)
+static void mbee_fdc_callback(running_machine *machine, wd17xx_state_t state, void *param)
 {
 	switch( state )
 	{

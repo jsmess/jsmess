@@ -1293,7 +1293,7 @@ MACHINE_START ( to7 )
 	pia_config( THOM_PIA_SYS, &to7_sys );
 	mc6846_config( &to7_timer );
 	to7_game_init();
-	to7_floppy_init( mem + 0x20000 );
+	to7_floppy_init( machine, mem + 0x20000 );
 	to7_io_init();
 	to7_modem_init();
 	to7_midi_init();
@@ -1526,7 +1526,7 @@ MACHINE_START ( to770 )
 	pia_config( THOM_PIA_SYS, &to770_sys );
 	mc6846_config( &to770_timer );
 	to7_game_init();
-	to7_floppy_init( mem + 0x20000 );
+	to7_floppy_init( machine, mem + 0x20000 );
 	to7_io_init();
 	to7_modem_init();
 	to7_midi_init();
@@ -1873,7 +1873,7 @@ MACHINE_START ( mo5 )
 	thom_irq_init();
 	pia_config( THOM_PIA_SYS, &mo5_sys );
 	to7_game_init();
-	to7_floppy_init( mem + 0x20000 );
+	to7_floppy_init( machine, mem + 0x20000 );
 	to7_io_init();
 	to7_modem_init();
 	to7_midi_init();
@@ -2814,7 +2814,7 @@ MACHINE_START ( to9 )
 	centronics_config( 0, &to9_centronics );
 	mc6846_config( &to9_timer );
 	to7_game_init();
-	to9_floppy_init( mem + 0xe000, mem + 0x40000 );
+	to9_floppy_init( machine, mem + 0xe000, mem + 0x40000 );
 	to9_kbd_init();
 	to9_palette_init();
 	to7_modem_init();
@@ -3343,10 +3343,10 @@ READ8_HANDLER ( to8_cartridge_r )
 
 
 
-static void to8_floppy_init( void )
+static void to8_floppy_init( running_machine *machine )
 {
 	UINT8* mem = memory_region(REGION_CPU1);
-	to7_floppy_init( mem + 0x34000 );
+	to7_floppy_init( machine, mem + 0x34000 );
 }
 
 
@@ -3750,7 +3750,7 @@ MACHINE_START ( to8 )
 	centronics_config( 0, &to9_centronics );
 	mc6846_config( &to8_timer );
 	to7_game_init();
-	to8_floppy_init();
+	to8_floppy_init( machine );
 	to8_kbd_init();
 	to9_palette_init();
 	to7_modem_init();
@@ -3912,7 +3912,7 @@ MACHINE_START ( to9p )
 	centronics_config( 0, &to9_centronics );
 	mc6846_config( &to9p_timer );
 	to7_game_init();
-	to8_floppy_init();
+	to8_floppy_init( machine );
 	to9_kbd_init();
 	to9_palette_init();
 	to7_modem_init();
@@ -4479,7 +4479,7 @@ MACHINE_START ( mo6 )
 	pia_config( THOM_PIA_SYS, &mo6_sys );
 	centronics_config( 0, &to9_centronics );
 	mo6_game_init();
-	to7_floppy_init( mem + 0x30000 );
+	to7_floppy_init( machine, mem + 0x30000 );
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
@@ -4746,7 +4746,7 @@ MACHINE_START ( mo5nr )
 	pia_config( THOM_PIA_SYS, &mo5nr_sys );
 	centronics_config( 0, &to9_centronics );
 	mo5nr_game_init();
-	to7_floppy_init( mem + 0x30000 );
+	to7_floppy_init( machine, mem + 0x30000 );
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();

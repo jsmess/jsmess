@@ -1574,10 +1574,8 @@ static void dragon_page_rom(int	romswitch)
 /* Dragon Alpha onboard FDC */
 /********************************************************************************************/
 
-static void	dgnalpha_fdc_callback(wd17xx_state_t event, void *param)
+static void	dgnalpha_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
-	running_machine *machine = Machine;
-
 	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
 	/* for pia1 cb1 */
@@ -2947,7 +2945,7 @@ MACHINE_START( dgnalpha )
 	/* by the WD2797, it is reset to 0 after the first inurrupt */
 	dgnalpha_just_reset=1;
 
-	wd17xx_init(WD_TYPE_179X, dgnalpha_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X, dgnalpha_fdc_callback, NULL);
 }
 
 /******* Machine Setups CoCos **********/

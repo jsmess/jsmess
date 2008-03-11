@@ -136,6 +136,6 @@ static void coupe_reset(running_machine *machine)
 
 MACHINE_START( coupe )
 {
-    wd17xx_init(WD_TYPE_177X,NULL, NULL);
+    wd17xx_init(machine, WD_TYPE_177X,NULL, NULL);
 	add_reset_callback(machine, coupe_reset);
 }

@@ -1419,7 +1419,7 @@ static OPBASE_HANDLER(betadisk_opbase_handler)
 }
 #endif
 
-static void betadisk_wd179x_callback(wd17xx_state_t state, void *param)
+static void betadisk_wd179x_callback(running_machine *machine, wd17xx_state_t state, void *param)
 {
 	switch (state)
 	{
@@ -1480,11 +1480,11 @@ static  READ8_HANDLER(betadisk_r)
 }
 #endif
 
-static void	 betadisk_init(void)
+static void	 betadisk_init(running_machine *machine)
 {
 	betadisk_active = 0;
 	betadisk_status = 0x03f;
-	wd17xx_init(WD_TYPE_179X, betadisk_wd179x_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X, betadisk_wd179x_callback, NULL);
 }
 
 /****************************************************************************************************/
@@ -1721,7 +1721,7 @@ static MACHINE_RESET( scorpion )
 
 	scorpion_update_memory();
 
-	betadisk_init();
+	betadisk_init(machine);
 }
 
 /****************************************************************************************************/
@@ -1757,7 +1757,7 @@ static MACHINE_RESET( pentagon )
 	memory_set_bankptr(3, spectrum_ram + (2<<14));
 	memory_set_bankptr(7, spectrum_ram + (2<<14));
 
-	betadisk_init();
+	betadisk_init(machine);
 }
 
 /****************************************************************************************************/

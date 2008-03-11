@@ -212,7 +212,7 @@ static OPBASE_HANDLER (opbaseoverride)
 	return address;
 }
 
-static void cgenie_fdc_callback(wd17xx_state_t event, void *param);
+static void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
 MACHINE_RESET( cgenie )
 {
@@ -332,7 +332,7 @@ MACHINE_START( cgenie )
 	memory_set_bankptr(1, mess_ram);
 
 	/* set up FDC */
-	wd17xx_init(WD_TYPE_179X, cgenie_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X, cgenie_fdc_callback, NULL);
 
 	add_exit_callback(machine, tape_put_close);
 }
@@ -984,7 +984,7 @@ static INTERRUPT_GEN( cgenie_fdc_interrupt )
 	}
 }
 
-void cgenie_fdc_callback(wd17xx_state_t event, void *param)
+void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
 	/* if disc hardware is not enabled, do not cause an int */
 	if (!( readinputport(0) & 0x80 ))
@@ -996,7 +996,7 @@ void cgenie_fdc_callback(wd17xx_state_t event, void *param)
 			irq_status &= ~IRQ_FDC;
 			break;
 		case WD17XX_IRQ_SET:
-			cgenie_fdc_interrupt(Machine, 0);
+			cgenie_fdc_interrupt(machine, 0);
 			break;
 		case WD17XX_DRQ_CLR:
 		case WD17XX_DRQ_SET:

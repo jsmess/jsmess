@@ -333,7 +333,7 @@ static MACHINE_START( apf_imagination )
 {
 	pia_config(1,&apf_imagination_pia_interface);
 	apf_common_init();
-	wd17xx_init(WD_TYPE_179X, NULL, NULL);
+	wd17xx_init(machine, WD_TYPE_179X, NULL, NULL);
 }
 
 static MACHINE_START( apf_m1000 )

@@ -901,9 +901,8 @@ static void cpu1_recalc_firq(int state)
 /* Dragon Beta onboard FDC */
 /********************************************************************************************/
 
-static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
+static void dgnbeta_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
-	running_machine *machine = Machine;
 	/* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
 	/* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
 
@@ -1100,7 +1099,7 @@ MACHINE_START( dgnbeta )
 
 	init_video(machine);
 
-	wd17xx_init(WD_TYPE_179X,dgnbeta_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X,dgnbeta_fdc_callback, NULL);
 #ifdef ENABLE_DEBUGGER
 	cpuintrf_set_dasm_override(0,dgnbeta_dasm_override);
 #endif /* ENABLE_DEBUGGER */

@@ -109,7 +109,7 @@ static fdc_info *fdc_get_info(coco_cartridge *cartridge)
     fdc_callback - callback from the FDC
 -------------------------------------------------*/
 
-static void fdc_callback(wd17xx_state_t state, void *param)
+static void fdc_callback(running_machine *machine, wd17xx_state_t state, void *param)
 {
 	coco_cartridge *cartridge = (coco_cartridge *) param;
 	fdc_info *info = fdc_get_info(cartridge);
@@ -155,7 +155,7 @@ static void fdc_init(coco_cartridge *cartridge,
 	info->drq = initial_drq ? 1 : 0;
 
 	/* initialize FDC */
-	wd17xx_init(type, fdc_callback, (void *) cartridge);
+	wd17xx_init(Machine, type, fdc_callback, (void *) cartridge);
 }
 
 

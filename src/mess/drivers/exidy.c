@@ -258,7 +258,7 @@ static MACHINE_START( exidy )
 	serial_timer = timer_alloc(exidy_serial_timer_callback, NULL);
 	cassette_timer = timer_alloc(exidy_cassette_timer_callback, NULL);
 
-	wd17xx_init(WD_TYPE_179X, NULL, NULL);
+	wd17xx_init(machine, WD_TYPE_179X, NULL, NULL);
 }
 
 static MACHINE_RESET( exidy )

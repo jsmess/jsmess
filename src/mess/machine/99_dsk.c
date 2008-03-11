@@ -368,7 +368,7 @@ static void ti99_install_tracktranslate_procs(void)
 /*
 	callback called whenever DRQ/IRQ state change
 */
-static void fdc_callback(wd17xx_state_t event, void *param)
+static void fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{
@@ -399,7 +399,7 @@ static void fdc_callback(wd17xx_state_t event, void *param)
 void ti99_floppy_controllers_init_all(void)
 {
 	/* initialize the controller chip for TI FDC, CC, BwG */
-	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);
+	wd17xx_init(Machine, WD_TYPE_179X, fdc_callback, NULL);
 
 	/* initialize the controller chip for HFDC */
 	smc92x4_init(0, & hfdc_intf);
@@ -418,7 +418,7 @@ void ti99_floppy_controllers_init_all(void)
 */
 
 /* prototypes */
-static void fdc_callback(wd17xx_state_t event, void *param);
+static void fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
 static TIMER_CALLBACK(motor_on_timer_callback);
 static int fdc_cru_r(running_machine *machine, int offset);
 static void fdc_cru_w(running_machine *machine, int offset, int data);

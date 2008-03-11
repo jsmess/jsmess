@@ -568,7 +568,7 @@ enum
 	LC_FMMFM_mask	= (1 << LC_FMMFM_bit)
 };
 
-static void fdc_callback(wd17xx_state_t event, void *param);
+static void fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
 static  READ8_HANDLER(concept_fdc_reg_r);
 static WRITE8_HANDLER(concept_fdc_reg_w);
@@ -579,12 +579,12 @@ static void concept_fdc_init(int slot)
 	fdc_local_status = 0;
 	fdc_local_command = 0;
 
-	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);
+	wd17xx_init(Machine, WD_TYPE_179X, fdc_callback, NULL);
 
 	install_expansion_slot(slot, concept_fdc_reg_r, concept_fdc_reg_w, concept_fdc_rom_r, NULL);
 }
 
-static void fdc_callback(wd17xx_state_t event, void *param)
+static void fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{

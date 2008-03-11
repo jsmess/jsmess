@@ -1422,7 +1422,7 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( einstein )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	wd17xx_init(WD_TYPE_177X, NULL, NULL);
+	wd17xx_init(machine, WD_TYPE_177X, NULL, NULL);
 }
 
 static MACHINE_RESET( einstein )

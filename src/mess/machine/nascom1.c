@@ -55,7 +55,7 @@ static struct
  *
  *************************************/
 
-static void nascom2_fdc_callback(wd17xx_state_t event, void *param)
+static void nascom2_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{
@@ -302,5 +302,5 @@ DRIVER_INIT( nascom1 )
 		break;
 	}
 
-	wd17xx_init(WD_TYPE_1793, nascom2_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_1793, nascom2_fdc_callback, NULL);
 }

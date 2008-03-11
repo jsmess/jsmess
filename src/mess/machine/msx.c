@@ -313,7 +313,7 @@ MACHINE_RESET( msx2 )
 	msx_ch_reset_core ();
 }
 
-static void msx_wd179x_int (wd17xx_state_t state, void *param);
+static void msx_wd179x_int (running_machine *machine, wd17xx_state_t state, void *param);
 
 static WRITE8_HANDLER ( msx_ppi_port_a_w );
 static WRITE8_HANDLER ( msx_ppi_port_c_w );
@@ -349,7 +349,7 @@ static void msx_init(void)
 		msx1.cart_state[i] = cart_state[i];
 	}
 
-	wd17xx_init (WD_TYPE_179X, msx_wd179x_int, NULL);
+	wd17xx_init (Machine, WD_TYPE_179X, msx_wd179x_int, NULL);
 	wd17xx_set_density (DEN_FM_HI);
 	msx1.dsk_stat = 0x7f;
 
@@ -644,7 +644,7 @@ set on 7FFDH bit 2 always to 0 (some use it as disk change reset)
 
 */
 
-static void msx_wd179x_int (wd17xx_state_t state, void *param)
+static void msx_wd179x_int (running_machine *machine, wd17xx_state_t state, void *param)
 {
 	switch (state)
 	{
