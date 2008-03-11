@@ -10,7 +10,6 @@
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"

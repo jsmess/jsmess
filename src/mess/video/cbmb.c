@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/cbmb.h"
 #include "video/mc6845.h"
 
