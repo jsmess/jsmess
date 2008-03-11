@@ -26,13 +26,13 @@
 
 typedef struct smsvdp_configuration {
 	UINT32	model;			/* Select model/features for the emulation */
-	void	(*int_callback)(int);	/* interupt callback function */
+	void	(*int_callback)(running_machine*,int);	/* interupt callback function */
 } smsvdp_configuration;
 
 
 /* prototypes */
 
-int smsvdp_video_init( const smsvdp_configuration *config );
+int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *config );
 VIDEO_UPDATE(sms);
  READ8_HANDLER(sms_vdp_vcount_r);
  READ8_HANDLER(sms_vdp_hcount_r);

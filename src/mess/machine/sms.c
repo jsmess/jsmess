@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "driver.h"
 #include "image.h"
-#include "deprecat.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"
@@ -280,12 +279,12 @@ READ8_HANDLER(sms_count_r) {
 	}
 }
 
-void sms_check_pause_button( void ) {
+void sms_check_pause_button( running_machine *machine ) {
 	if ( ! IS_GAMEGEAR ) {
 		if ( ! (readinputport(2) & 0x80) ) {
 			if ( ! smsPaused ) {
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE );
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE );
+				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE );
+				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE );
 			}
 			smsPaused = 1;
 		} else {
@@ -1003,11 +1002,11 @@ WRITE8_HANDLER(sms_store_control_w) {
 	sms_store_control = data;
 }
 
-void sms_int_callback( int state ) {
-	cpunum_set_input_line(Machine, 0, 0, state );
+void sms_int_callback( running_machine *machine, int state ) {
+	cpunum_set_input_line(machine, 0, 0, state );
 }
 
-void sms_store_int_callback( int state ) {
-	cpunum_set_input_line(Machine, sms_store_control & 0x01 ? 1 : 0, 0, state );
+void sms_store_int_callback( running_machine *machine, int state ) {
+	cpunum_set_input_line(machine, sms_store_control & 0x01 ? 1 : 0, 0, state );
 }
 

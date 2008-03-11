@@ -276,19 +276,19 @@ static const smsvdp_configuration config_315_5378 = { MODEL_315_5378, sms_int_ca
 static const smsvdp_configuration config_store = { MODEL_315_5124, sms_store_int_callback };
 
 static VIDEO_START(sega_315_5124) {
-	smsvdp_video_init( &config_315_5124 );
+	smsvdp_video_init( machine, &config_315_5124 );
 }
 
 static VIDEO_START(sega_315_5246) {
-	smsvdp_video_init( &config_315_5246 );
+	smsvdp_video_init( machine, &config_315_5246 );
 }
 
 static VIDEO_START(sega_315_5378) {
-	smsvdp_video_init( &config_315_5378 );
+	smsvdp_video_init( machine, &config_315_5378 );
 }
 
 static VIDEO_START(sega_store_315_5124) {
-	smsvdp_video_init( &config_store );
+	smsvdp_video_init( machine, &config_store );
 }
 
 static MACHINE_DRIVER_START(sms1ntsc)

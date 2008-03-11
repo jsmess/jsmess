@@ -37,7 +37,6 @@ PAL frame timing
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/smsvdp.h"
 #include "includes/sms.h"
 
@@ -106,7 +105,7 @@ static struct _smsvdp {
 	 */
 	int			*line_buffer;
 	int			current_palette[32];
-	void (*int_callback)(int);
+	void (*int_callback)(running_machine*,int);
 	emu_timer	*smsvdp_display_timer;
 } smsvdp;
 
@@ -114,7 +113,7 @@ static TIMER_CALLBACK(smsvdp_display_callback);
 static void sms_refresh_line(bitmap_t *bitmap, int offsetx, int offsety, int line);
 static void sms_update_palette(void);
 
-static void set_display_settings( void ) {
+static void set_display_settings( running_machine *machine ) {
 	int M1, M2, M3, M4;
 	M1 = smsvdp.reg[0x01] & 0x10;
 	M2 = smsvdp.reg[0x00] & 0x02;
@@ -152,13 +151,13 @@ static void set_display_settings( void ) {
 	}
 	switch( smsvdp.y_pixels ) {
 	case 192:
-		smsvdp.sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_192 : sms_ntsc_192;
+		smsvdp.sms_frame_timing = ( machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_192 : sms_ntsc_192;
 		break;
 	case 224:
-		smsvdp.sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_224 : sms_ntsc_224;
+		smsvdp.sms_frame_timing = ( machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_224 : sms_ntsc_224;
 		break;
 	case 240:
-		smsvdp.sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_240 : sms_ntsc_240;
+		smsvdp.sms_frame_timing = ( machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_240 : sms_ntsc_240;
 		break;
 	}
 	smsvdp.cram_dirty = 1;
@@ -176,7 +175,7 @@ void sms_set_ggsmsmode( int mode ) {
 	smsvdp.gg_sms_mode = mode;
 }
 
-int smsvdp_video_init( const smsvdp_configuration *config ) {
+int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *config ) {
 
 	memset( &smsvdp, 0, sizeof smsvdp );
 
@@ -208,7 +207,7 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 
 	smsvdp.prev_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
-	set_display_settings();
+	set_display_settings( machine );
 
 	smsvdp.smsvdp_display_timer = timer_alloc( smsvdp_display_callback , NULL);
 	timer_adjust_periodic(smsvdp.smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ));
@@ -218,7 +217,7 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 static TIMER_CALLBACK(smsvdp_set_irq) {
 	smsvdp.irq_state = 1;
 	if ( smsvdp.int_callback ) {
-		smsvdp.int_callback( ASSERT_LINE );
+		smsvdp.int_callback( machine, ASSERT_LINE );
 	}
 }
 
@@ -234,7 +233,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 
 	/* Check if we're on the last line of a frame */
 	if ( vpos == vpos_limit - 1 ) {
-		sms_check_pause_button();
+		sms_check_pause_button( machine );
 		return;
 	}
 
@@ -384,7 +383,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 	if (smsvdp.irq_state == 1) {
 		smsvdp.irq_state = 0;
 		if ( smsvdp.int_callback ) {
-			smsvdp.int_callback( CLEAR_LINE );
+			smsvdp.int_callback( machine, CLEAR_LINE );
 		}
 	}
 
@@ -448,11 +447,11 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 				logerror("overscan enabled.\n");
 			}
 			if ( regNum == 0 || regNum == 1 ) {
-				set_display_settings();
+				set_display_settings( machine );
 			}
 			if ( ( regNum == 1 ) && ( smsvdp.reg[0x01] & 0x20 ) && ( smsvdp.status & STATUS_VINT ) ) {
 				smsvdp.irq_state = 1;
-				smsvdp.int_callback( ASSERT_LINE );
+				smsvdp.int_callback( machine, ASSERT_LINE );
 			}
 			smsvdp.addrmode = 0;
 			break;
