@@ -9,9 +9,6 @@
 #include "driver.h"
 #include "saa5050.h"
 
-/* TODO: Remove dependency on this */
-#include "mslegacy.h"
-
 static INT8 frame_count;
 
 #define SAA5050_DBLHI	0x0001
@@ -101,7 +98,11 @@ static const UINT16 saa5050_colortable[64 * 2] =	/* bgnd, fgnd */
 
 static PALETTE_INIT( saa5050 )
 {
-	palette_set_colors_rgb(machine, 0, saa5050_palette, sizeof(saa5050_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(saa5050_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, saa5050_palette[i*3], saa5050_palette[i*3+1], saa5050_palette[i*3+2]);
+	}
 }
 
 static VIDEO_START( saa5050 )
