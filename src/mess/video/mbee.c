@@ -55,24 +55,18 @@ UINT8 *pcgram;
 
 WRITE8_HANDLER ( mbee_pcg_color_latch_w )
 {
-	logerror("mbee pcg_color_latch_w $%02X\n", data);
 	mbee_pcg_color_latch = data;
 }
 
  READ8_HANDLER ( mbee_pcg_color_latch_r )
 {
 	int data = mbee_pcg_color_latch;
-	logerror("mbee pcg_color_latch_r $%02X\n", data);
 	return data;
 }
 
 WRITE8_HANDLER ( mbee_videoram_w )
 {
-    if( videoram[offset] != data )
-	{
-		logerror("mbee videoram [$%04X] <- $%02X\n", offset, data);
-		videoram[offset] = data;
-	}
+	videoram[offset] = data;
 }
 
  READ8_HANDLER ( mbee_videoram_r )
@@ -81,14 +75,12 @@ WRITE8_HANDLER ( mbee_videoram_w )
 	if( m6545_video_bank & 0x01 )
 	{
 		data = pcgram[offset];
-		logerror("mbee pcgram [$%04X] -> $%02X\n", offset, data);
 	}
 	else
 	{
 		data = videoram[offset];
-		logerror("mbee videoram [$%04X] -> $%02X\n", offset, data);
-    }
-    return data;
+	}
+	return data;
 }
 
 WRITE8_HANDLER ( mbee_pcg_color_w )
@@ -96,34 +88,24 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 	if( (m6545_video_bank & 0x01) || (mbee_pcg_color_latch & 0x40) == 0 )
 	{
 		if( pcgram[0x0800+offset] != data )
-        {
-            int chr = 0x80 + offset / 16;
-
-            logerror("mbee pcgram  [$%04X] <- $%02X\n", offset, data);
-            pcgram[0x0800+offset] = data;
-            /* decode character graphics again */
-            decodechar(machine->gfx[0], chr, pcgram);
-        }
-    }
-	else
-	{
-		if( colorram[offset] != data )
-        {
-            logerror("colorram [$%04X] <- $%02X\n", offset, data);
-            colorram[offset] = data;
-        }
+        	{
+			int chr = 0x80 + offset / 16;
+			pcgram[0x0800+offset] = data;
+			/* decode character graphics again */
+			decodechar(machine->gfx[0], chr, pcgram);
+		}
 	}
+	else
+		colorram[offset] = data;
 }
 
  READ8_HANDLER ( mbee_pcg_color_r )
 {
-	int data;
 
-	if( mbee_pcg_color_latch & 0x40 )
-        data = colorram[offset];
+	if ( mbee_pcg_color_latch & 0x40 )
+		return colorram[offset];
 	else
-		data = pcgram[0x0800+offset];
-    return data;
+		return pcgram[0x0800+offset];
 }
 
 static int keyboard_matrix_r(int offs)
@@ -142,35 +124,35 @@ static int keyboard_matrix_r(int offs)
 	{
 		if( port == 7 && bit == 1 ) data = 1;	/* Control */
 		if( port == 3 && bit == 0 ) data = 1;	/* X */
-    }
+	}
 	if( extra & 0x04 )	/* extra: cursor left */
 	{
 		if( port == 7 && bit == 1 ) data = 1;	/* Control */
 		if( port == 2 && bit == 3 ) data = 1;	/* S */
-    }
+	}
 	if( extra & 0x08 )	/* extra: cursor right */
 	{
 		if( port == 7 && bit == 1 ) data = 1;	/* Control */
 		if( port == 0 && bit == 4 ) data = 1;	/* D */
-    }
+	}
 	if( extra & 0x10 )	/* extra: insert */
 	{
 		if( port == 7 && bit == 1 ) data = 1;	/* Control */
 		if( port == 2 && bit == 6 ) data = 1;	/* V */
-    }
-    if( data )
+	}
+	if( data )
 	{
 		crt.lpen_lo = offs & 0xff;
 		crt.lpen_hi = (offs >> 8) & 0x03;
 		crt.lpen_strobe = 1;
-		logerror("mbee keyboard_matrix_r $%03X (port:%d bit:%d) = %d\n", offs, port, bit, data);
+//		logerror("mbee keyboard_matrix_r $%03X (port:%d bit:%d) = %d\n", offs, port, bit, data);
 	}
 	return data;
 }
 
 static void m6545_offset_xy(void)
 {
-    if( crt.horizontal_sync_pos )
+	if( crt.horizontal_sync_pos )
 		off_x = crt.horizontal_total - crt.horizontal_sync_pos - 23;
 	else
 		off_x = -24;
@@ -183,45 +165,35 @@ static void m6545_offset_xy(void)
 
 	if( off_y > 128 )
 		off_y = 128;
-
-	logerror("6545 offset x:%d  y:%d\n", off_x, off_y);
 }
 
  READ8_HANDLER ( mbee_color_bank_r )
 {
-	int data = m6545_color_bank;
-	logerror("6545 color_bank_r $%02X\n", data);
-	return data;
+	return m6545_color_bank;
 }
 
 WRITE8_HANDLER ( mbee_color_bank_w )
 {
-	logerror("6545 color_bank_w $%02X\n", data);
 	m6545_color_bank = data;
 }
 
  READ8_HANDLER ( mbee_video_bank_r )
 {
-	int data = m6545_video_bank;
-	logerror("6545 video_bank_r $%02X\n", data);
-	return data;
+	return m6545_video_bank;
 }
 
 WRITE8_HANDLER ( mbee_video_bank_w )
 {
-	logerror("6545 video_bank_w $%02X\n", data);
-    m6545_video_bank = data;
+	m6545_video_bank = data;
 }
 
 static void m6545_update_strobe(int param)
 {
 	int data;
-    data = keyboard_matrix_r(param);
-    crt.update_strobe = 1;
-	if( data )
-	{
-		logerror("6545 update_strobe_cb $%04X = $%02X\n", param, data);
-	}
+	data = keyboard_matrix_r(param);
+	crt.update_strobe = 1;
+//	if( data )
+//		logerror("6545 update_strobe_cb $%04X = $%02X\n", param, data);
 }
 
  READ8_HANDLER ( m6545_status_r )
@@ -235,15 +207,15 @@ static void m6545_update_strobe(int param)
 		data |= 0x40;	/* lpen register full */
 	if( crt.update_strobe )
 		data |= 0x80;	/* update strobe has occured */
-	logerror("6545 status_r $%02X\n", data);
-    return data;
+//	logerror("6545 status_r $%02X\n", data);
+	return data;
 }
 
  READ8_HANDLER ( m6545_data_r )
 {
 	int addr, data = 0;
 
-    switch( crt.idx )
+	switch( crt.idx )
 	{
 /* These are write only on a Rockwell 6545 */
 #if 0
@@ -276,41 +248,41 @@ static void m6545_update_strobe(int param)
 	case 13:
 		return crt.screen_address_lo;
 #endif
-    case 14:
+	case 14:
 		data = crt.cursor_address_hi;
 		break;
 	case 15:
 		data = crt.cursor_address_lo;
 		break;
 	case 16:
-		logerror("6545 lpen_hi_r $%02X (lpen:%d upd:%d)\n", crt.lpen_hi, crt.lpen_strobe, crt.update_strobe);
+//		logerror("6545 lpen_hi_r $%02X (lpen:%d upd:%d)\n", crt.lpen_hi, crt.lpen_strobe, crt.update_strobe);
 		crt.lpen_strobe = 0;
         crt.update_strobe = 0;
 		data = crt.lpen_hi;
 		break;
 	case 17:
-		logerror("6545 lpen_lo_r $%02X (lpen:%d upd:%d)\n", crt.lpen_lo, crt.lpen_strobe, crt.update_strobe);
+//		logerror("6545 lpen_lo_r $%02X (lpen:%d upd:%d)\n", crt.lpen_lo, crt.lpen_strobe, crt.update_strobe);
         crt.lpen_strobe = 0;
 		crt.update_strobe = 0;
-        data = crt.lpen_lo;
+		data = crt.lpen_lo;
 		break;
 	case 18:
-		logerror("6545 transp_hi_r $%02X\n", crt.transp_hi);
+//		logerror("6545 transp_hi_r $%02X\n", crt.transp_hi);
 		data = crt.transp_hi;
 		break;
 	case 19:
-		logerror("6545 transp_lo_r $%02X\n", crt.transp_lo);
+//		logerror("6545 transp_lo_r $%02X\n", crt.transp_lo);
 		data = crt.transp_lo;
 		break;
 	case 31:
 		/* shared memory latch */
 		addr = crt.transp_hi * 256 + crt.transp_lo;
-		logerror("6545 transp_latch $%04X\n", addr);
+//		logerror("6545 transp_latch $%04X\n", addr);
 		m6545_update_strobe(addr);
-        break;
-    default:
+		break;
+	default:
 		logerror("6545 read unmapped port $%X\n", crt.idx);
-    }
+	}
 	return data;
 }
 
@@ -323,58 +295,50 @@ WRITE8_HANDLER ( m6545_data_w )
 {
 	int addr, i;
 
-    switch( crt.idx )
+	switch( crt.idx )
 	{
 	case 0:
 		if( crt.horizontal_total == data )
 			break;
 		crt.horizontal_total = data;
-        logerror("6545 horizontal total        %d\n", data);
-        m6545_offset_xy();
+		m6545_offset_xy();
 		break;
 	case 1:
 		if( crt.horizontal_displayed == data )
 			break;
 		crt.horizontal_displayed = data;
-		logerror("6545 horizontal displayed    %d\n", data);
-        break;
+		break;
 	case 2:
 		if( crt.horizontal_sync_pos == data )
 			break;
 		crt.horizontal_sync_pos = data;
-		logerror("6545 horizontal sync pos     %d\n", data);
-        m6545_offset_xy();
+		m6545_offset_xy();
 		break;
 	case 3:
 		crt.horizontal_length = data;
-		logerror("6545 horizontal length       %d\n", data);
-        break;
+		break;
 	case 4:
 		if( crt.vertical_total == data )
 			break;
 		crt.vertical_total = data;
-		logerror("6545 vertical total          %d\n", data);
-        m6545_offset_xy();
+		m6545_offset_xy();
 		break;
 	case 5:
 		if( crt.vertical_adjust == data )
 			break;
 		crt.vertical_adjust = data;
-		logerror("6545 vertical adjust         %d\n", data);
-        m6545_offset_xy();
+		m6545_offset_xy();
 		break;
 	case 6:
 		if( crt.vertical_displayed == data )
 			break;
-		logerror("6545 vertical displayed      %d\n", data);
-        crt.vertical_displayed = data;
+		crt.vertical_displayed = data;
 		break;
 	case 7:
 		if( crt.vertical_sync_pos == data )
 			break;
 		crt.vertical_sync_pos = data;
-		logerror("6545 vertical sync pos       %d\n", data);
-        m6545_offset_xy();
+		m6545_offset_xy();
 		break;
 	case 8:
 		crt.crt_mode = data;
@@ -387,28 +351,25 @@ WRITE8_HANDLER ( m6545_data_w )
 			logerror("     disp enb, skew     %d\n", (data >> 4) & 3);
 			logerror("     pin 34             %s\n", ((data >> 6) & 1) ? "update strobe" : "RA4");
 			logerror("     update read mode   %s\n", ((data >> 7) & 1) ? "interleaved" : "during h/v-blank");
-        }
+		}
 		break;
 	case 9:
 		data &= 15;
 		if( crt.scan_lines == data )
 			break;
 		crt.scan_lines = data;
-		logerror("6545 scanlines               %d\n", data);
-        m6545_offset_xy();
+		m6545_offset_xy();
 		break;
 	case 10:
 		if( crt.cursor_top == data )
 			break;
 		crt.cursor_top = data;
-		logerror("6545 cursor top              %d/$%02X\n", data & 31, data);
 		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
 		break;
 	case 11:
 		if( crt.cursor_bottom == data )
 			break;
 		crt.cursor_bottom = data;
-        logerror("6545 cursor bottom           %d/$%02X\n", data & 31, data);
 		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
 		break;
 	case 12:
@@ -421,58 +382,54 @@ WRITE8_HANDLER ( m6545_data_w )
 		memcpy(memory_region(REGION_CPU1)+0xf000, memory_region(REGION_CPU1)+addr, 0x800);
 		for (i = 0; i < 128; i++)
 				decodechar(machine->gfx[0],i, pcgram);
-		logerror("6545 screen address hi       $%02X\n", data);
-        break;
+		break;
 	case 13:
 		if( crt.screen_address_lo == data )
 			break;
 		update_all = 1;
 		crt.screen_address_lo = data;
-		logerror("6545 screen address lo       $%02X\n", data);
-        break;
+		break;
 	case 14:
 		data &= 63;
 		if( crt.cursor_address_hi == data )
 			break;
 		crt.cursor_address_hi = data;
 		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
-		logerror("6545 cursor address hi       $%02X\n", data);
-        break;
+		break;
 	case 15:
 		if( crt.cursor_address_lo == data )
 			break;
 		crt.cursor_address_lo = data;
 		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
-		logerror("6545 cursor address lo       $%02X\n", data);
-        break;
+		break;
 	case 16:
 		/* lpen hi is read only */
 		break;
-    case 17:
+	case 17:
 		/* lpen lo is read only */
-        break;
-    case 18:
+		break;
+	case 18:
 		data &= 63;
 		if( crt.transp_hi == data )
-            break;
+			break;
 		crt.transp_hi = data;
-        logerror("6545 transp_hi_w $%02X\n", data);
+//		logerror("6545 transp_hi_w $%02X\n", data);
 		break;
-    case 19:
+	case 19:
 		if( crt.transp_lo == data )
-            break;
+			break;
 		crt.transp_lo = data;
-        logerror("6545 transp_lo_w $%02X\n", data);
+//		logerror("6545 transp_lo_w $%02X\n", data);
 		break;
 	case 31:
 		/* shared memory latch */
 		addr = crt.transp_hi * 256 + crt.transp_lo;
-        logerror("6545 transp_latch $%04X\n", addr);
+//		logerror("6545 transp_latch $%04X\n", addr);
 		m6545_update_strobe(addr);
-        break;
+		break;
 	default:
 		logerror("6545 write unmapped port $%X <- $%02X\n", crt.idx, data);
-    }
+	}
 }
 
 VIDEO_START( mbee )
@@ -508,12 +465,12 @@ VIDEO_UPDATE( mbee )
 			if( (crt.cursor_top & 0x60) == 0x60 || (framecnt & 16) == 0 )
 			{
 				int x, y;
-                for( y = (crt.cursor_top & 31); y <= (crt.cursor_bottom & 31); y++ )
+		                for( y = (crt.cursor_top & 31); y <= (crt.cursor_bottom & 31); y++ )
 				{
 					if( y > crt.scan_lines )
 						break;
 					for( x = 0; x < 8; x++ )
-						*BITMAP_ADDR16(bitmap, sy+y, sx+x) = machine->pens[5]; //[color];
+						*BITMAP_ADDR16(bitmap, sy+y, sx+x) = ((color&7) << 6);
 				}
 			}
 		}
