@@ -37,7 +37,7 @@ WRITE8_HANDLER ( astrocade_colour_register_w );
 WRITE8_HANDLER ( astrocade_colour_block_w );
 WRITE8_HANDLER ( astrocade_colour_split_w );
 
-void astrocade_copy_line(running_machine *machine, int line);
+VIDEO_UPDATE( astrocde );
 
 
 #endif /* ASTROCDE_H_ */

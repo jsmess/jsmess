@@ -56,11 +56,7 @@ WRITE8_HANDLER ( astrocade_interrupt_w )
 static TIMER_CALLBACK( astrocde_scanline_callback )
 {
 	int scanline = video_screen_get_vpos(0);
-	
-	/* draw if we are in the visable area */
-	if (scanline < machine->screen[0].visarea.max_y)
-		astrocade_copy_line(machine, scanline);
-	
+		
 	/* scanline interrupt? */
 	if (screen_interrupts_enabled && (screen_interrupt_mode == 0) && (scanline == NextScanInt))
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);

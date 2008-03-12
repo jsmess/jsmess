@@ -153,7 +153,7 @@ WRITE8_HANDLER ( astrocade_colour_split_w )
 /* This selects commercial (high res, arcade) or
                   consumer (low res, astrocade) mode */
 
-WRITE8_HANDLER ( astrocade_mode_w )
+WRITE8_HANDLER( astrocade_mode_w )
 {
 	astrocade_mode = data & 0x01;
 }
@@ -340,9 +340,10 @@ WRITE8_HANDLER ( astrocade_magicram_w )
 	magic_expand_flipflop ^= 1;
 }
 
-void astrocade_copy_line(running_machine *machine, int line)
+
+VIDEO_UPDATE( astrocde )
 {
-	/* Copy one line to bitmap, using current colour register settings */
+	int line = video_screen_get_vpos(0);
 
     int memloc;
     int i,x,num_bytes;
@@ -369,7 +370,7 @@ void astrocade_copy_line(running_machine *machine, int line)
 		else
 			data = BackgroundData;
 
-		for(x=i*4+3;x>=i*4;x--)
+		for (x=i*4+3; x>=i*4; x--)
 		{
 			color = data & 03;
 
@@ -378,15 +379,16 @@ void astrocade_copy_line(running_machine *machine, int line)
 
 			if (astrocade_mode == 0)
 			{
-				*BITMAP_ADDR16(tmpbitmap, line, 2*x+0) = machine->pens[Colour[color]];
-				*BITMAP_ADDR16(tmpbitmap, line, 2*x+1) = machine->pens[Colour[color]];
+				*BITMAP_ADDR16(bitmap, line, 2*x+0) = machine->pens[Colour[color]];
+				*BITMAP_ADDR16(bitmap, line, 2*x+1) = machine->pens[Colour[color]];
 			}
 			else
-				*BITMAP_ADDR16(tmpbitmap, line, x) = machine->pens[Colour[color]];
+				*BITMAP_ADDR16(bitmap, line, x) = machine->pens[Colour[color]];
 
 			data >>= 2;
 		}
 
 	}
+	
+	return 0;
 }
-

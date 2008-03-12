@@ -238,8 +238,8 @@ static MACHINE_DRIVER_START( astrocde )
 	MDRV_PALETTE_LENGTH(8*32)
 	MDRV_PALETTE_INIT(astrocade)
 
-	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MDRV_VIDEO_UPDATE(astrocde)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
