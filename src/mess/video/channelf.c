@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "includes/channelf.h"
-#include "mslegacy.h"
 
 UINT8 channelf_val_reg = 0;
 UINT8 channelf_row_reg = 0;
@@ -36,7 +35,11 @@ static const UINT16 colormap[] = {
 /* Initialise the palette */
 PALETTE_INIT( channelf )
 {
-	palette_set_colors_rgb(machine, 0, channelf_palette, sizeof(channelf_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(channelf_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, channelf_palette[i*3], channelf_palette[i*3+1], channelf_palette[i*3+2]);
+	}
 }
 
 VIDEO_START( channelf )

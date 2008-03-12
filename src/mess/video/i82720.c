@@ -15,7 +15,6 @@
 #include "driver.h"
 #include "i82720.h"
 #include "i82720cm.h"
-#include "mslegacy.h"
 #include <math.h>
 
 /*-------------------------------------------------------------------------*/
@@ -1390,7 +1389,11 @@ static const unsigned char COMPIS_palette[16*3] =
 
 PALETTE_INIT( compis_gdc )
 {
-	palette_set_colors_rgb(machine, 0, COMPIS_palette, COMPIS_PALETTE_SIZE);
+	int i;
+
+	for ( i = 0; i < COMPIS_PALETTE_SIZE; i++ ) {
+		palette_set_color_rgb(machine, i, COMPIS_palette[i*3], COMPIS_palette[i*3+1], COMPIS_palette[i*3+2]);
+	}
 }
 
 static compis_gdc_interface sIntf;

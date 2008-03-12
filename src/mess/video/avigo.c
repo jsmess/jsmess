@@ -8,7 +8,6 @@
 
 #include "driver.h"
 #include "includes/avigo.h"
-#include "mslegacy.h"
 
 /***************************************************************************
   Start the video hardware emulation.

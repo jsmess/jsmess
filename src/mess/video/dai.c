@@ -14,7 +14,6 @@
 
 #include "driver.h"
 #include "includes/dai.h"
-#include "mslegacy.h"
 
 #define DEBUG_DAI_VIDEO	0
 
@@ -44,7 +43,11 @@ static unsigned short dai_4_colours_palette[4];
 
 PALETTE_INIT( dai )
 {
-	palette_set_colors_rgb(machine, 0, dai_palette, sizeof(dai_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(dai_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, dai_palette[i*3], dai_palette[i*3+1], dai_palette[i*3+2]);
+	}
 }
 
 

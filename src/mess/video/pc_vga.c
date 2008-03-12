@@ -36,8 +36,6 @@
 #include "includes/crtc6845.h"
 #include "memconv.h"
 
-#include "mslegacy.h"
-
 /***************************************************************************
 
 	Static declarations
@@ -183,7 +181,11 @@ MACHINE_DRIVER_END
 
 static PALETTE_INIT( ega )
 {
-	palette_set_colors_rgb(machine, 0, ega_palette, sizeof(ega_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(ega_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, ega_palette[i*3], ega_palette[i*3+1], ega_palette[i*3+2]);
+	}
 }
 
 static PALETTE_INIT( vga )

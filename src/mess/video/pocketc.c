@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/pocketc.h"
 
 /* PC126x
@@ -32,7 +31,11 @@ const unsigned short pocketc_colortable[8][2] = {
 
 PALETTE_INIT( pocketc )
 {
-	palette_set_colors_rgb(machine, 0, pocketc_palette, sizeof(pocketc_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(pocketc_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, pocketc_palette[i*3], pocketc_palette[i*3+1], pocketc_palette[i*3+2]);
+	}
 }
 
 

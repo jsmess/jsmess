@@ -11,7 +11,6 @@
 #include "driver.h"
 #include "includes/galaxy.h"
 #include "cpu/z80/z80.h"
-#include "mslegacy.h"
 
 static int horizontal_pos = 0x0b;
 
@@ -36,7 +35,11 @@ const unsigned char galaxy_palette[2*3] =
 
 PALETTE_INIT( galaxy )
 {
-	palette_set_colors_rgb(machine, 0, galaxy_palette, sizeof(galaxy_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(galaxy_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, galaxy_palette[i*3], galaxy_palette[i*3+1], galaxy_palette[i*3+2]);
+	}
 }
 
 VIDEO_START( galaxy )

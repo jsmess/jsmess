@@ -10,7 +10,6 @@
 
 #include "driver.h"
 #include "includes/lviv.h"
-#include "mslegacy.h"
 
 const unsigned char lviv_palette[8*3] =
 {
@@ -31,7 +30,11 @@ unsigned short lviv_colortable[1][4] =
 
 PALETTE_INIT( lviv )
 {
-	palette_set_colors_rgb(machine, 0, lviv_palette, sizeof(lviv_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(lviv_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, lviv_palette[i*3], lviv_palette[i*3+1], lviv_palette[i*3+2]);
+	}
 }
 
 
