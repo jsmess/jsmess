@@ -635,7 +635,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0x10:
 	case 0x11:
 	case 0x12:
-		ted7360_soundport_w (offset, data);
+		ted7360_soundport_w (machine, offset, data);
 		break;
 	}
 	switch (offset)

@@ -148,7 +148,7 @@ static TIMER_CALLBACK(dave_1khz_callback)
 
 
 
-void	Dave_Init(void)
+void	Dave_Init(running_machine *machine)
 {
 	int i;
 
@@ -172,8 +172,8 @@ void	Dave_Init(void)
 
 	for (i=0; i<3; i++)
 	{
-		dave.Period[i] = ((STEP  * Machine->sample_rate)/125000);
-		dave.Count[i] = ((STEP  * Machine->sample_rate)/125000);
+		dave.Period[i] = ((STEP  * machine->sample_rate)/125000);
+		dave.Count[i] = ((STEP  * machine->sample_rate)/125000);
 		dave.level[i] = 0;
 	}
 }
@@ -323,7 +323,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 			count++;
 
 
-			dave.Period[channel_index] = ((STEP  * Machine->sample_rate)/125000) * count;
+			dave.Period[channel_index] = ((STEP  * machine->sample_rate)/125000) * count;
 
 		}
 		break;

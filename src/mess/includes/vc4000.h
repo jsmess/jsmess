@@ -31,7 +31,7 @@ extern VIDEO_UPDATE( vc4000 );
 
 extern const struct CustomSound_interface vc4000_sound_interface;
 
-void vc4000_soundport_w (int mode, int data);
+void vc4000_soundport_w (running_machine *machine, int mode, int data);
 
 
 #endif /* VC4000_H_ */

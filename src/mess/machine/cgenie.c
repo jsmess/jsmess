@@ -1112,7 +1112,7 @@ WRITE8_HANDLER( cgenie_fontram_w )
 	cgenie_fontram[offset] = data;
 
 	/* convert eight pixels */
-	dp = &machine->gfx[0]->gfxdata[(256 * 8 + offset) * Machine->gfx[0]->width];
+	dp = &machine->gfx[0]->gfxdata[(256 * 8 + offset) * machine->gfx[0]->width];
 	dp[0] = (data & 0x80) ? 1 : 0;
 	dp[1] = (data & 0x40) ? 1 : 0;
 	dp[2] = (data & 0x20) ? 1 : 0;

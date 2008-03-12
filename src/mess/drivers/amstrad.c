@@ -1069,7 +1069,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
  then the interrupt request is cleared and the 6-bit counter is reset to "0".  */
   			if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<4)) != 0) {
             amstrad_CRTC_HS_Counter = 0;
-  			    cpunum_set_input_line(Machine, 0,0, CLEAR_LINE);
+  			    cpunum_set_input_line(machine, 0,0, CLEAR_LINE);
 
   			}
 /* b3b2 != 0 then change the state of upper or lower rom area and rethink memory */

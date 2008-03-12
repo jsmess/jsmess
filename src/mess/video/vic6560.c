@@ -185,7 +185,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 	case 0xc:
 	case 0xd:
 	case 0xe:
-		vic6560_soundport_w (offset, data);
+		vic6560_soundport_w (machine, offset, data);
 		break;
 	}
 	if (vic6560[offset] != data)

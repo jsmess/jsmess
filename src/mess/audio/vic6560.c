@@ -68,7 +68,7 @@ static INT16 *tone;
 
 static INT8 *noise;
 
-void vic6560_soundport_w (int offset, int data)
+void vic6560_soundport_w (running_machine *machine, int offset, int data)
 {
     int old = vic6560[offset];
 	stream_update(channel);
@@ -80,7 +80,7 @@ void vic6560_soundport_w (int offset, int data)
 		if (!(old & 0x80) && TONE1_ON)
 		{
 			tone1pos = 0;
-			tone1samples = Machine->sample_rate / TONE1_FREQUENCY;
+			tone1samples = machine->sample_rate / TONE1_FREQUENCY;
 			if (tone1samples == 0)
 				tone1samples = 1;
 		}
@@ -91,7 +91,7 @@ void vic6560_soundport_w (int offset, int data)
 		if (!(old & 0x80) && TONE2_ON)
 		{
 			tone2pos = 0;
-			tone2samples = Machine->sample_rate / TONE2_FREQUENCY;
+			tone2samples = machine->sample_rate / TONE2_FREQUENCY;
 			if (tone2samples == 0)
 				tone2samples = 1;
 		}
@@ -102,7 +102,7 @@ void vic6560_soundport_w (int offset, int data)
 		if (!(old & 0x80) && TONE3_ON)
 		{
 			tone3pos = 0;
-			tone3samples = Machine->sample_rate / TONE3_FREQUENCY;
+			tone3samples = machine->sample_rate / TONE3_FREQUENCY;
 			if (tone2samples == 0)
 				tone2samples = 1;
 		}
@@ -112,7 +112,7 @@ void vic6560_soundport_w (int offset, int data)
 		vic6560[offset] = data;
 		if (NOISE_ON)
 		{
-			noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * Machine->sample_rate
+			noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * machine->sample_rate
 								  * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
 			DBG_LOG (1, "vic6560", ("noise %.2x %d sample:%d\n",
 									data, NOISE_FREQUENCY, noisesamples));

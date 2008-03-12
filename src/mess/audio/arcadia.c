@@ -24,7 +24,7 @@ static struct
 
 
 
-void arcadia_soundport_w (int offset, int data)
+void arcadia_soundport_w (running_machine *machine, int offset, int data)
 {
 	stream_update(arcadia_sound.channel);
 	arcadia_sound.reg[offset] = data;
@@ -34,7 +34,7 @@ void arcadia_soundport_w (int offset, int data)
 	    arcadia_sound.pos = 0;
 	    arcadia_sound.level = TRUE;
 	    // frequency 7874/(data+1)
-            arcadia_sound.size=Machine->sample_rate*((data&0x7f)+1)/7874;
+            arcadia_sound.size=machine->sample_rate*((data&0x7f)+1)/7874;
 	    break;
 	}
 }

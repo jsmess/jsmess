@@ -45,7 +45,7 @@ static int noisesize,	/* number of samples */
 static sound_stream *channel;
 static UINT8 *noise;
 
-void ted7360_soundport_w (int offset, int data)
+void ted7360_soundport_w (running_machine *machine, int offset, int data)
 {
 	stream_update(channel);
 	/*    int old=ted7360[offset]; */
@@ -57,7 +57,7 @@ void ted7360_soundport_w (int offset, int data)
 			ted7360[offset] = (ted7360[offset] & ~3) | (data & 3);
 		else
 			ted7360[offset] = data;
-		tone1samples = Machine->sample_rate / TONE_FREQUENCY (TONE1_VALUE);
+		tone1samples = machine->sample_rate / TONE_FREQUENCY (TONE1_VALUE);
 		DBG_LOG (1, "ted7360", ("tone1 %d %d sample:%d\n",
 					TONE1_VALUE, TONE_FREQUENCY(TONE1_VALUE), tone1samples));
 
@@ -65,11 +65,11 @@ void ted7360_soundport_w (int offset, int data)
 	case 0xf:
 	case 0x10:
 		ted7360[offset] = data;
-		tone2samples = Machine->sample_rate / TONE_FREQUENCY (TONE2_VALUE);
+		tone2samples = machine->sample_rate / TONE_FREQUENCY (TONE2_VALUE);
 		DBG_LOG (1, "ted7360", ("tone2 %d %d sample:%d\n",
 					TONE2_VALUE, TONE_FREQUENCY(TONE2_VALUE), tone2samples));
 
-		noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * Machine->sample_rate
+		noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * machine->sample_rate
 							  * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
 		DBG_LOG (1, "ted7360", ("noise %d sample:%d\n",
 					NOISE_FREQUENCY, noisesamples));

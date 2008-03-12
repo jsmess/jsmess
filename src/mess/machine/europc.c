@@ -171,7 +171,7 @@ WRITE8_HANDLER( europc_pio_w )
 		europc_pio.port61=data;
 //		if (data==0x30) pc1640.port62=(pc1640.port65&0x10)>>4;
 //		else if (data==0x34) pc1640.port62=pc1640.port65&0xf;
-		pc_sh_speaker(data&3);
+		pc_sh_speaker(machine, data&3);
 		pc_keyb_set_clock(data&0x40);
 		break;
 	}

@@ -207,7 +207,7 @@ WRITE8_HANDLER(vc4000_video_w)
 		
 	case 0xc7:						// Soundregister
 		vc4000_video.reg.data[offset]=data;
-		vc4000_soundport_w(0, data);
+		vc4000_soundport_w(machine, 0, data);
 		break;
 
 	case 0xca:			// Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)

@@ -34,7 +34,6 @@
 #include "devices/basicdsk.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
-#include "deprecat.h"
 
 
 // interrupt register stuff
@@ -84,33 +83,33 @@ static VIDEO_UPDATE( a310 )
 	return 0;
 }
 
-static void a310_request_irq_a(int mask)
+static void a310_request_irq_a(running_machine *machine, int mask)
 {
 	a310_iocregs[4] |= mask;
 
 	if (a310_iocregs[6] & mask)
 	{
-		cpunum_set_input_line(Machine, 0, ARM_IRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, ASSERT_LINE);
 	}
 }
 
-static void a310_request_irq_b(int mask)
+static void a310_request_irq_b(running_machine *machine, int mask)
 {
 	a310_iocregs[8] |= mask;
 
 	if (a310_iocregs[10] & mask)
 	{
-		cpunum_set_input_line(Machine, 0, ARM_IRQ_LINE, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, PULSE_LINE);
 	}
 }
 
-static void a310_request_fiq(int mask)
+static void a310_request_fiq(running_machine *machine, int mask)
 {
 	a310_iocregs[12] |= mask;
 
 	if (a310_iocregs[14] & mask)
 	{
-		cpunum_set_input_line(Machine, 0, ARM_FIRQ_LINE, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, ARM_FIRQ_LINE, PULSE_LINE);
 	}
 }
 
@@ -120,13 +119,13 @@ static TIMER_CALLBACK( a310_audio_tick )
 
 	if (a310_sndcur >= a310_sndend)
 	{
-		a310_request_irq_b(A310_IRQB_SOUND_EMPTY);
+		a310_request_irq_b(machine, A310_IRQB_SOUND_EMPTY);
 	}
 }
 
 static TIMER_CALLBACK( a310_vblank )
 {
-	a310_request_irq_a(A310_IRQA_VBL);
+	a310_request_irq_a(machine, A310_IRQA_VBL);
 
 	// set up for next vbl
 	timer_adjust_oneshot(vbl_timer, video_screen_get_time_until_pos(0, a310_vidregs[0xb4], 0), 0);
@@ -151,11 +150,11 @@ static TIMER_CALLBACK( a310_timer )
 	switch (param)
 	{
 		case 0:
-			a310_request_irq_a(A310_IRQA_TIMER0);
+			a310_request_irq_a(machine, A310_IRQA_TIMER0);
 			break;
 
 		case 1:
-			a310_request_irq_a(A310_IRQA_TIMER1);
+			a310_request_irq_a(machine, A310_IRQA_TIMER1);
 			break;
 	}
 }
@@ -187,7 +186,7 @@ static void a310_wd177x_callback(running_machine *machine, wd17xx_state_t event,
 			break;
 
 		case WD17XX_IRQ_SET:
-			a310_request_fiq(A310_FIQ_FLOPPY);
+			a310_request_fiq(machine, A310_FIQ_FLOPPY);
 			break;
 
 		case WD17XX_DRQ_CLR:
@@ -195,7 +194,7 @@ static void a310_wd177x_callback(running_machine *machine, wd17xx_state_t event,
 			break;
 
 		case WD17XX_DRQ_SET:
-			a310_request_fiq(A310_FIQ_FLOPPY_DRQ);
+			a310_request_fiq(machine, A310_FIQ_FLOPPY_DRQ);
 			break;
 	}
 }
@@ -373,7 +372,7 @@ static READ32_HANDLER(ioc_r)
 		switch (offset & 0x1f)
 		{
 			case 1:	// keyboard read
-				a310_request_irq_b(A310_IRQB_KBD_XMIT_EMPTY);
+				a310_request_irq_b(machine, A310_IRQB_KBD_XMIT_EMPTY);
 				break;
 
 			case 16:	// timer 0 read

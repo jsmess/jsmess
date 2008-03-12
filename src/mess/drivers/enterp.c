@@ -220,7 +220,7 @@ static void enterprise_reset(running_machine *machine)
 	Enterprise_Pages_Write[MEM_RAM_6] = mess_ram + 0x018000;
 	Enterprise_Pages_Write[MEM_RAM_7] = mess_ram + 0x01c000;
 
-	Dave_Init();
+	Dave_Init(machine);
 
 	Dave_SetIFace(&enterprise_dave_interface);
 

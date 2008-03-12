@@ -183,7 +183,7 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	switch (offset) {
 	case 1:
 		tandy_ppi.portb = data;
-		pc_sh_speaker(data&3);
+		pc_sh_speaker(machine, data&3);
 		pc_keyb_set_clock(data&0x40);
 		break;
 	case 2:

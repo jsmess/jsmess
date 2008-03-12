@@ -173,7 +173,7 @@ WRITE8_HANDLER ( pc_ppi_portb_w )
 	/* KB controller port B */
 	pc_ppi.portc_switch_high = data & 0x08;
 	pc_ppi.keyboard_disabled = data & 0x80;
-	pc_sh_speaker(data & 0x03);
+	pc_sh_speaker(machine, data & 0x03);
 	pc_keyb_set_clock(data & 0x40);
 
 	if (data & 0x80)

@@ -183,7 +183,7 @@ READ8_HANDLER( gb_sound_r )
 	}
 }
 
-static void gb_sound_w_internal(int offset, UINT8 data ) {
+static void gb_sound_w_internal(running_machine *machine, int offset, UINT8 data ) {
 	/* Store the value */
 	snd_regs[offset] = data;
 
@@ -341,28 +341,28 @@ static void gb_sound_w_internal(int offset, UINT8 data ) {
 		snd_control.on = (data & 0x80) >> 7;
 		if( !snd_control.on )
 		{
-			gb_sound_w_internal( NR10, 0x80 );
-			gb_sound_w_internal( NR11, 0x3F );
-			gb_sound_w_internal( NR12, 0x00 );
-			gb_sound_w_internal( NR13, 0xFE );
-			gb_sound_w_internal( NR14, 0xBF );
-//			gb_sound_w_internal( NR20, 0xFF );
-			gb_sound_w_internal( NR21, 0x3F );
-			gb_sound_w_internal( NR22, 0x00 );
-			gb_sound_w_internal( NR23, 0xFF );
-			gb_sound_w_internal( NR24, 0xBF );
-			gb_sound_w_internal( NR30, 0x7F );
-			gb_sound_w_internal( NR31, 0xFF );
-			gb_sound_w_internal( NR32, 0x9F );
-			gb_sound_w_internal( NR33, 0xFF );
-			gb_sound_w_internal( NR34, 0xBF );
-//			gb_sound_w_internal( NR40, 0xFF );
-			gb_sound_w_internal( NR41, 0xFF );
-			gb_sound_w_internal( NR42, 0x00 );
-			gb_sound_w_internal( NR43, 0x00 );
-			gb_sound_w_internal( NR44, 0xBF );
-			gb_sound_w_internal( NR50, 0x00 );
-			gb_sound_w_internal( NR51, 0x00 );
+			gb_sound_w_internal( machine, NR10, 0x80 );
+			gb_sound_w_internal( machine, NR11, 0x3F );
+			gb_sound_w_internal( machine, NR12, 0x00 );
+			gb_sound_w_internal( machine, NR13, 0xFE );
+			gb_sound_w_internal( machine, NR14, 0xBF );
+//			gb_sound_w_internal( machine, NR20, 0xFF );
+			gb_sound_w_internal( machine, NR21, 0x3F );
+			gb_sound_w_internal( machine, NR22, 0x00 );
+			gb_sound_w_internal( machine, NR23, 0xFF );
+			gb_sound_w_internal( machine, NR24, 0xBF );
+			gb_sound_w_internal( machine, NR30, 0x7F );
+			gb_sound_w_internal( machine, NR31, 0xFF );
+			gb_sound_w_internal( machine, NR32, 0x9F );
+			gb_sound_w_internal( machine, NR33, 0xFF );
+			gb_sound_w_internal( machine, NR34, 0xBF );
+//			gb_sound_w_internal( machine, NR40, 0xFF );
+			gb_sound_w_internal( machine, NR41, 0xFF );
+			gb_sound_w_internal( machine, NR42, 0x00 );
+			gb_sound_w_internal( machine, NR43, 0x00 );
+			gb_sound_w_internal( machine, NR44, 0xBF );
+			gb_sound_w_internal( machine, NR50, 0x00 );
+			gb_sound_w_internal( machine, NR51, 0x00 );
 			snd_1.on = 0;
 			snd_2.on = 0;
 			snd_3.on = 0;
@@ -384,7 +384,7 @@ WRITE8_HANDLER( gb_sound_w )
 		return;
 	}
 
-	gb_sound_w_internal( offset, data );
+	gb_sound_w_internal( machine, offset, data );
 }
 
 
@@ -689,7 +689,7 @@ void *gameboy_sh_start(int clock, const struct CustomSound_interface *config)
 		length_mode3_table[I] = ((256 - I) * ((1 << FIXED_POINT)/256) * rate) >> FIXED_POINT;
 	}
 
-	gb_sound_w_internal( NR52, 0x00 );
+	gb_sound_w_internal( Machine, NR52, 0x00 );
 	snd_regs[AUD3W0] = 0xac;
 	snd_regs[AUD3W1] = 0xdd;
 	snd_regs[AUD3W2] = 0xda;

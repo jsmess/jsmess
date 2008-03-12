@@ -21,7 +21,7 @@ static struct
 
 
 
-void vc4000_soundport_w (int offset, int data)
+void vc4000_soundport_w (running_machine *machine, int offset, int data)
 {
 	stream_update(vc4000_sound.channel);
 	vc4000_sound.reg[offset] = data;
@@ -31,7 +31,7 @@ void vc4000_soundport_w (int offset, int data)
 	    vc4000_sound.pos = 0;
 	    vc4000_sound.level = TRUE;
 	    // frequency 7874/(data+1)
-	    vc4000_sound.size=Machine->sample_rate*(data+1)/7874;
+	    vc4000_sound.size=machine->sample_rate*(data+1)/7874;
 	    break;
 	}
 }

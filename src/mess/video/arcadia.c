@@ -597,12 +597,12 @@ WRITE8_HANDLER(arcadia_video_w)
 	break;
     case 0xfd:
 	arcadia_video.reg.data[offset]=data;
-	arcadia_soundport_w(offset&3, data);
+	arcadia_soundport_w(machine, offset&3, data);
 	arcadia_video.multicolor=data&0x80;
 	break;
     case 0xfe:
 	arcadia_video.reg.data[offset]=data;
-	arcadia_soundport_w(offset&3, data);
+	arcadia_soundport_w(machine, offset&3, data);
 	arcadia_video.shift=(data>>5);
 	break;
     case 0xf0: case 0xf2: case 0xf4: case 0xf6:

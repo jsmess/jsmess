@@ -51,37 +51,37 @@ struct SND {
 
 static struct SND snd;
 
-static void wswan_ch_set_freq( struct CHAN *ch, UINT16 freq ) {
+static void wswan_ch_set_freq( running_machine *machine, struct CHAN *ch, UINT16 freq ) {
 	ch->freq = freq;
-	ch->period = Machine->sample_rate / ( 3072000  / ( ( 2048 - freq ) << 5 ) );
+	ch->period = machine->sample_rate / ( 3072000  / ( ( 2048 - freq ) << 5 ) );
 }
 
 WRITE8_HANDLER( wswan_sound_port_w ) {
 	stream_update( channel);
 	switch( offset ) {
 	case 0x80:				/* Audio 1 freq (lo) */
-		wswan_ch_set_freq( &snd.audio1, ( snd.audio1.freq & 0xFF00 ) | data );
+		wswan_ch_set_freq( machine, &snd.audio1, ( snd.audio1.freq & 0xFF00 ) | data );
 		break;
 	case 0x81:				/* Audio 1 freq (hi) */
-		wswan_ch_set_freq( &snd.audio1, ( data << 8 ) | ( snd.audio1.freq & 0x00FF ) );
+		wswan_ch_set_freq( machine, &snd.audio1, ( data << 8 ) | ( snd.audio1.freq & 0x00FF ) );
 		break;
 	case 0x82:				/* Audio 2 freq (lo) */
-		wswan_ch_set_freq( &snd.audio2, ( snd.audio2.freq & 0xFF00 ) | data );
+		wswan_ch_set_freq( machine, &snd.audio2, ( snd.audio2.freq & 0xFF00 ) | data );
 		break;
 	case 0x83:				/* Audio 2 freq (hi) */
-		wswan_ch_set_freq( &snd.audio2, ( data << 8 ) | ( snd.audio2.freq & 0x00FF ) );
+		wswan_ch_set_freq( machine, &snd.audio2, ( data << 8 ) | ( snd.audio2.freq & 0x00FF ) );
 		break;
 	case 0x84:				/* Audio 3 freq (lo) */
-		wswan_ch_set_freq( &snd.audio3, ( snd.audio3.freq & 0xFF00 ) | data );
+		wswan_ch_set_freq( machine, &snd.audio3, ( snd.audio3.freq & 0xFF00 ) | data );
 		break;
 	case 0x85:				/* Audio 3 freq (hi) */
-		wswan_ch_set_freq( &snd.audio3, ( data << 8 ) | ( snd.audio3.freq & 0x00FF ) );
+		wswan_ch_set_freq( machine, &snd.audio3, ( data << 8 ) | ( snd.audio3.freq & 0x00FF ) );
 		break;
 	case 0x86:				/* Audio 4 freq (lo) */
-		wswan_ch_set_freq( &snd.audio4, ( snd.audio4.freq & 0xFF00 ) | data );
+		wswan_ch_set_freq( machine, &snd.audio4, ( snd.audio4.freq & 0xFF00 ) | data );
 		break;
 	case 0x87:				/* Audio 4 freq (hi) */
-		wswan_ch_set_freq( &snd.audio4, ( data << 8 ) | ( snd.audio4.freq & 0x00FF ) );
+		wswan_ch_set_freq( machine, &snd.audio4, ( data << 8 ) | ( snd.audio4.freq & 0x00FF ) );
 		break;
 	case 0x88:				/* Audio 1 volume */
 		snd.audio1.vol_left = ( data & 0xF0 ) >> 4;

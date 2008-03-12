@@ -76,7 +76,7 @@ extern int ted7360_rom;
 /*----------- defined in audio/ted7360.c -----------*/
 
 void *ted7360_custom_start (int clock, const struct CustomSound_interface *config);
-void ted7360_soundport_w (int mode, int data);
+void ted7360_soundport_w (running_machine *machine, int mode, int data);
 
 
 #endif /* TED7360_H_ */

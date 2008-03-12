@@ -90,7 +90,7 @@ enum
 	DAVE_INT2_ID
 };
 
-void	Dave_Init(void);
+void	Dave_Init(running_machine *machine);
 /* set external int state */
 void	Dave_SetExternalIntState(int IntID, int State);
 

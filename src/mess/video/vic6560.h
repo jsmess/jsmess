@@ -129,7 +129,7 @@ extern  READ8_HANDLER ( vic6560_port_r );
 
 /* private area */
 void *vic6560_custom_start(int clock, const struct CustomSound_interface *config);
-void vic6560_soundport_w (int mode, int data);
+void vic6560_soundport_w (running_machine *machine, int mode, int data);
 
 extern UINT8 vic6560[16];
 

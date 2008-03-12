@@ -203,9 +203,9 @@ int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *con
 	smsvdp.collision_buffer = auto_malloc(SMS_X_PIXELS);
 
 	/* Make temp bitmap for rendering */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
-	smsvdp.prev_bitmap = auto_bitmap_alloc(Machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
+	smsvdp.prev_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
 	set_display_settings( machine );
 
