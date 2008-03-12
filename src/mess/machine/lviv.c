@@ -9,9 +9,7 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "cpu/i8085/i8085.h"
@@ -46,7 +44,7 @@ static void lviv_update_memory (void)
 static OPBASE_HANDLER(lviv_opbaseoverride)
 {
 	if (readinputport(12)&0x01)
-		mame_schedule_soft_reset(Machine);
+		mame_schedule_soft_reset(machine);
 	return address;
 }
 

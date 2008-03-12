@@ -237,10 +237,8 @@ BDIR BC1       |
 /* PSG function selected */
 static unsigned char amstrad_Psg_FunctionSelected;
 
-static void update_psg(void)
+static void update_psg(running_machine *machine)
 {
-	running_machine *machine = Machine;
-
 	if(aleste_mode & 0x20)  // RTC selected
 	{
 		switch(aleste_rtc_function)
@@ -286,14 +284,14 @@ static void update_psg(void)
 /* Read/Write 8255 PPI port A (connected to AY-3-8912 databus) */
 static READ8_HANDLER ( amstrad_ppi_porta_r )
 {
-	update_psg();
+	update_psg(machine);
 	return ppi_port_inputs[amstrad_ppi_PortA];
 }
 
 static WRITE8_HANDLER ( amstrad_ppi_porta_w )
 {
 	ppi_port_outputs[amstrad_ppi_PortA] = data;
-	update_psg();
+	update_psg(machine);
 }
 
 /* - Read PPI Port B -
@@ -387,7 +385,7 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 	aleste_rtc_function = data & 0x07;
 
 /* Perform PSG function */
-	update_psg();
+	update_psg(machine);
 
 /* b5 Cassette Write data */
 	if(amstrad_system_type != SYSTEM_GX4000)
@@ -774,21 +772,21 @@ static WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 			if(data & 0x40)
 			{
 				logerror("ASIC: DMA 0 IRQ acknowledge\n");
-				cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
+				cpunum_set_input_line(machine, 0,0,CLEAR_LINE);
 				amstrad_plus_irq_cause = 0x06;
 				amstrad_plus_asic_ram[0x2c0f] &= ~0x40;
 			}
 			if(data & 0x20)
 			{
 				logerror("ASIC: DMA 1 IRQ acknowledge\n");
-				cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
+				cpunum_set_input_line(machine, 0,0,CLEAR_LINE);
 				amstrad_plus_irq_cause = 0x06;
 				amstrad_plus_asic_ram[0x2c0f] &= ~0x20;
 			}
 			if(data & 0x10)
 			{
 				logerror("ASIC: DMA 2 IRQ acknowledge\n");
-				cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
+				cpunum_set_input_line(machine, 0,0,CLEAR_LINE);
 				amstrad_plus_irq_cause = 0x06;
 				amstrad_plus_asic_ram[0x2c0f] &= ~0x10;
 			}

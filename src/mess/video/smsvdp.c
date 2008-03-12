@@ -186,8 +186,8 @@ int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *con
 	   In theory the driver could have a REGION_GFX1 and/or REGION_GFX2 memory region
 	   of it's own. So this code could potentially cause a clash.
 	*/
-	smsvdp.VRAM = new_memory_region( Machine, REGION_GFX1, VRAM_SIZE, ROM_REQUIRED );
-	smsvdp.CRAM = new_memory_region( Machine, REGION_GFX2, MAX_CRAM_SIZE, ROM_REQUIRED );
+	smsvdp.VRAM = new_memory_region( machine, REGION_GFX1, VRAM_SIZE, ROM_REQUIRED );
+	smsvdp.CRAM = new_memory_region( machine, REGION_GFX2, MAX_CRAM_SIZE, ROM_REQUIRED );
 	smsvdp.line_buffer = auto_malloc( 256 * 5 * sizeof(int) );
 	memset( smsvdp.line_buffer, 0, 256 * 5 * sizeof(int) );
 
@@ -203,9 +203,9 @@ int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *con
 	smsvdp.collision_buffer = auto_malloc(SMS_X_PIXELS);
 
 	/* Make temp bitmap for rendering */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
+	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
-	smsvdp.prev_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
+	smsvdp.prev_bitmap = auto_bitmap_alloc(Machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
 	set_display_settings( machine );
 

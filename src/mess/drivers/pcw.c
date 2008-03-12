@@ -481,7 +481,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* clear nmi interrupt */
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 			}
 
 			/* re-issue interrupt */
@@ -503,7 +503,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* Clear NMI */
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 
 			}
 

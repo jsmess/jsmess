@@ -686,7 +686,7 @@ static WRITE8_HANDLER(d_pia1_pa_w)
 			HALT_DMA=CLEAR_LINE;
 
 		LOG_HALT(("DMA_CPU HALT=%d\n",HALT_DMA));
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, HALT_DMA);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, HALT_DMA);
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA==CLEAR_LINE)
@@ -729,7 +729,7 @@ static WRITE8_HANDLER(d_pia1_pb_w)
 		else
 			HALT_CPU=ASSERT_LINE;
 		LOG_HALT(("MAIN_CPU HALT=%d\n",HALT_CPU));
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, HALT_CPU);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, HALT_CPU);
 
 		d_pia1_pb_last=data & 0x02;
 
@@ -780,13 +780,13 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 		LOG_INTS(("cpu1 NMI : %d\n",NMI));
 		if(!NMI)
 		{
-			cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,ASSERT_LINE);
+			cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,ASSERT_LINE);
 			logerror("cpu_yield()\n");
 			cpu_yield();	/* Let DMA CPU run */
 		}
 		else
 		{
-			cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,CLEAR_LINE);
+			cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,CLEAR_LINE);
 		}
 
 		DMA_NMI_LAST=NMI;	/* Save it for next time */

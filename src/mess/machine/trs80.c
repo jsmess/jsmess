@@ -9,7 +9,6 @@
 
 /* Core includes */
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/trs80.h"
 
 /* Components */
@@ -503,7 +502,7 @@ WRITE8_HANDLER( trs80_port_ff_w )
 			if (diff > 4000)
 			{
 				/* reset tape output */
-				tape_put_close(Machine);
+				tape_put_close(machine);
 				put_bit_count = tape_bits = in_sync = 0;
 			}
 			else

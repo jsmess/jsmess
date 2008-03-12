@@ -1441,7 +1441,7 @@ static void *apple2_fdc_init(running_machine *machine, int slot, applefdc_t fdc_
 	intf.read_data = apple2_fdc_read_data;
 	intf.write_data = apple2_fdc_write_data;
 
-	for (dev = Machine->devices; dev->type < IO_COUNT; dev++)
+	for (dev = machine->devices; dev->type < IO_COUNT; dev++)
 	{
 		if (!strcmp(dev->tag, "sonydriv"))
 			apple2_fdc_has_35 = 1;

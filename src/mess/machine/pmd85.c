@@ -9,9 +9,7 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "devices/cassette.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/pmd85.h"
@@ -763,14 +761,14 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 static OPBASE_HANDLER(pmd85_opbaseoverride)
 {
 	if (readinputport(0x10)&0x01)
-		mame_schedule_soft_reset(Machine);
+		mame_schedule_soft_reset(machine);
 	return address;
 }
 
 static OPBASE_HANDLER(mato_opbaseoverride)
 {
 	if (readinputport(0x09)&0x01)
-		mame_schedule_soft_reset(Machine);
+		mame_schedule_soft_reset(machine);
 	return address;
 }
 

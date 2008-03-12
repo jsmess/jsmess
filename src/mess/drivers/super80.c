@@ -151,7 +151,7 @@ static WRITE8_HANDLER( super80v_high_w )
 			pcgram[0x800+offset] = data;
 
 			/* decode character graphics again */
-			decodechar(Machine->gfx[0], chr, pcgram);
+			decodechar(machine->gfx[0], chr, pcgram);
 		}
 	}
 }
@@ -363,8 +363,8 @@ static VIDEO_UPDATE( super80v )
 			(i == cursor))						// displaying at cursor position?
 				chr = 256;					// 256 = cursor character
 
-		drawgfx( bitmap,Machine->gfx[0],chr,col,0,0,sx,sy,
-			&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);	// put character on the screen
+		drawgfx( bitmap,machine->gfx[0],chr,col,0,0,sx,sy,
+			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);	// put character on the screen
 
 	}
 

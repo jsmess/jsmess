@@ -104,7 +104,7 @@ WRITE8_HANDLER( wswan_sound_port_w ) {
 		snd.sweep_step = (INT8)data;
 		break;
 	case 0x8D:				/* Sweep time */
-		snd.sweep_time = Machine->sample_rate / ( 3072000 / ( 8192 * (data + 1) ) );
+		snd.sweep_time = machine->sample_rate / ( 3072000 / ( 8192 * (data + 1) ) );
 		break;
 	case 0x8E:				/* Noise control */
 		snd.noise_type = data & 0x07;

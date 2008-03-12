@@ -820,7 +820,7 @@ static INTERRUPT_GEN( stv_interrupt )
 		if(!(stv_scu[40] & 2))/*VBLANK-OUT*/
 		{
 			if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT at scanline %04x, Vector 0x41 Level 0x0e\n",scanline);
-			cpunum_set_input_line_and_vector(Machine, 0, 0xe, HOLD_LINE , 0x41);
+			cpunum_set_input_line_and_vector(machine, 0, 0xe, HOLD_LINE , 0x41);
 		}
 		stv_vblank = 0;
 	}
@@ -836,14 +836,14 @@ static INTERRUPT_GEN( stv_interrupt )
 			if((!(stv_scu[40] & 0x10)) && (!(stv_scu[38] & 0x80)))
 			{
 				if(LOG_IRQ) logerror ("Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
-				cpunum_set_input_line_and_vector(Machine, 0, 0xb, HOLD_LINE, 0x44 );
+				cpunum_set_input_line_and_vector(machine, 0, 0xb, HOLD_LINE, 0x44 );
 			}
 			else if((!(stv_scu[40] & 0x10)) && (stv_scu[38] & 0x80))
 			{
 				if(timer_1 == (stv_scu[36] & 0x1ff))
 				{
 					if(LOG_IRQ) logerror ("Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
-					cpunum_set_input_line_and_vector(Machine, 0, 0xb, HOLD_LINE, 0x44 );
+					cpunum_set_input_line_and_vector(machine, 0, 0xb, HOLD_LINE, 0x44 );
 				}
 			}
 		}
@@ -852,7 +852,7 @@ static INTERRUPT_GEN( stv_interrupt )
 			if(!(stv_scu[40] & 8))/*Timer 0*/
 			{
 				if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
-				cpunum_set_input_line_and_vector(Machine, 0, 0xc, HOLD_LINE, 0x43 );
+				cpunum_set_input_line_and_vector(machine, 0, 0xc, HOLD_LINE, 0x43 );
 			}
 		}
 
@@ -860,7 +860,7 @@ static INTERRUPT_GEN( stv_interrupt )
 		if(!(stv_scu[40] & 4))/*HBLANK-IN*/
 		{
 			if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);
-			cpunum_set_input_line_and_vector(Machine, 0, 0xd, HOLD_LINE , 0x42);
+			cpunum_set_input_line_and_vector(machine, 0, 0xd, HOLD_LINE , 0x42);
 		}
 	}
 	else if(scanline == 224)
@@ -871,7 +871,7 @@ static INTERRUPT_GEN( stv_interrupt )
 		if(!(stv_scu[40] & 1))/*VBLANK-IN*/
 		{
 			if(LOG_IRQ) logerror ("Interrupt: VBlank IN at scanline %04x, Vector 0x40 Level 0x0f\n",scanline);
-			cpunum_set_input_line_and_vector(Machine, 0, 0xf, HOLD_LINE , 0x40);
+			cpunum_set_input_line_and_vector(machine, 0, 0xf, HOLD_LINE , 0x40);
 		}
 		stv_vblank = 1;
 
@@ -880,11 +880,11 @@ static INTERRUPT_GEN( stv_interrupt )
 			if(!(stv_scu[40] & 8))/*Timer 0*/
 			{
 				if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
-				cpunum_set_input_line_and_vector(Machine, 0, 0xc, HOLD_LINE, 0x43 );
+				cpunum_set_input_line_and_vector(machine, 0, 0xc, HOLD_LINE, 0x43 );
 			}
 		}
 		if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
-			cpunum_set_input_line_and_vector(Machine, 0, 2, HOLD_LINE , 0x4d);
+			cpunum_set_input_line_and_vector(machine, 0, 2, HOLD_LINE , 0x4d);
 	}
 }
 
@@ -1107,14 +1107,14 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
+				//cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 				#if 0
 				if((scu_dst_0 & 0x7ffffff) != 0x05a00000)
 				{
 					if(!(stv_scu[40] & 0x1000))
 					{
-						cpunum_set_input_line_and_vector(Machine, 0, 3, HOLD_LINE, 0x4c);
+						cpunum_set_input_line_and_vector(machine, 0, 3, HOLD_LINE, 0x4c);
 						logerror("SCU: Illegal DMA interrupt\n");
 					}
 				}
@@ -1168,7 +1168,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
+				//cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1218,7 +1218,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
+				//cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1864,7 +1864,7 @@ static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
 	cpu_boost_interleave(double_to_attotime(minit_boost_timeslice), ATTOTIME_IN_USEC(minit_boost));
-	cpu_trigger(Machine, 1000);
+	cpu_trigger(machine, 1000);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
@@ -2166,9 +2166,9 @@ static MACHINE_RESET( saturn )
 	memset(stv_workram_l, 0, 0x100000);
 	memset(stv_workram_h, 0, 0x100000);
 
-	cpunum_set_clock(Machine, 0, MASTER_CLOCK_320/2);
-	cpunum_set_clock(Machine, 1, MASTER_CLOCK_320/2);
-	cpunum_set_clock(Machine, 2, MASTER_CLOCK_320/5);
+	cpunum_set_clock(machine, 0, MASTER_CLOCK_320/2);
+	cpunum_set_clock(machine, 1, MASTER_CLOCK_320/2);
+	cpunum_set_clock(machine, 2, MASTER_CLOCK_320/5);
 
 	stvcd_reset();
 }

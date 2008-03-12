@@ -37,7 +37,6 @@
 #include "driver.h"
 #include "mea8000.h"
 #include "sound/dac.h"
-#include "deprecat.h"
 
 
 #define VERBOSE 0
@@ -233,7 +232,7 @@ static int noise_table[NOISE_LEN];
 
 
 /* precompute tables */
-static void mea8000_init_tables( void )
+static void mea8000_init_tables( running_machine *machine )
 {
 	int i;
 	for (i=0; i<TABLE_LEN; i++)
@@ -244,7 +243,7 @@ static void mea8000_init_tables( void )
 		exp2_table[i] = exp(-2*M_PI*f) * QUANT;
 	}
 	for (i=0; i<NOISE_LEN; i++)
-		noise_table[i] = (mame_rand(Machine) % (2*QUANT)) - QUANT;
+		noise_table[i] = (mame_rand(machine) % (2*QUANT)) - QUANT;
 }
 
 
@@ -655,7 +654,7 @@ void mea8000_reset ( running_machine *machine )
 void mea8000_config ( running_machine *machine, int channel, write8_machine_func req_out_func )
 {
 	int i;
-	mea8000_init_tables();
+	mea8000_init_tables(machine);
 	mea8000.channel = channel;
 	mea8000.req_out_func = req_out_func;
 	mea8000.timer = timer_alloc( mea8000_timer_expire , NULL);

@@ -239,7 +239,7 @@ static WRITE8_HANDLER ( pio_port_c_w )
 	case 8:
 		data = ne556_out[1] ? 0x01 : 0x00;
 		data |= readinputport(12);	/* get joystick ports */
-		if (video_screen_get_hpos(0) >= Machine->screen[0].visarea.max_x - 32)
+		if (video_screen_get_hpos(0) >= machine->screen[0].visarea.max_x - 32)
 			data |= 0x80;
 		LOG(1,"mz700_e008_r",("%02X\n", data));
         break;

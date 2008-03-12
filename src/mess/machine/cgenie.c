@@ -799,7 +799,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 				b = 15;
 			}
 		}
-		palette_set_color_rgb(Machine, 0, r, g, b);
+		palette_set_color_rgb(machine, 0, r, g, b);
 	}
 
 	/* character mode changed ? */
@@ -1112,7 +1112,7 @@ WRITE8_HANDLER( cgenie_fontram_w )
 	cgenie_fontram[offset] = data;
 
 	/* convert eight pixels */
-	dp = &Machine->gfx[0]->gfxdata[(256 * 8 + offset) * Machine->gfx[0]->width];
+	dp = &machine->gfx[0]->gfxdata[(256 * 8 + offset) * Machine->gfx[0]->width];
 	dp[0] = (data & 0x80) ? 1 : 0;
 	dp[1] = (data & 0x40) ? 1 : 0;
 	dp[2] = (data & 0x20) ? 1 : 0;

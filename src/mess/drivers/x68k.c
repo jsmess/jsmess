@@ -1201,7 +1201,7 @@ static WRITE16_HANDLER( x68k_vid_w )
 	{
 		COMBINE_DATA(sys.video.gfx_pal+offset);
 		val = sys.video.gfx_pal[offset];
-		palette_set_color_rgb(Machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1209,7 +1209,7 @@ static WRITE16_HANDLER( x68k_vid_w )
 	{
 		COMBINE_DATA(sys.video.text_pal+(offset-0x100));
 		val = sys.video.text_pal[offset-0x100];
-		palette_set_color_rgb(Machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1332,7 +1332,7 @@ static READ16_HANDLER( x68k_rom0_r )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-	cpunum_set_input_line_and_vector(Machine, 0,2,ASSERT_LINE,current_vector[2]);
+	cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);
 	return 0xff;
 }
 
@@ -1342,7 +1342,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-	cpunum_set_input_line_and_vector(Machine, 0,2,ASSERT_LINE,current_vector[2]);
+	cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);
 }
 
 static READ16_HANDLER( x68k_exp_r )
@@ -1356,7 +1356,7 @@ static READ16_HANDLER( x68k_exp_r )
 		if(ACCESSING_LSB)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//      cpunum_set_input_line_and_vector(Machine, 0,2,ASSERT_LINE,current_vector[2]);
+//      cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);
 	}
 	return 0xffff;
 }
@@ -1372,7 +1372,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		if(ACCESSING_LSB)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//      cpunum_set_input_line_and_vector(Machine, 0,2,ASSERT_LINE,current_vector[2]);
+//      cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);
 	}
 }
 

@@ -173,7 +173,7 @@ MACHINE_START( dai )
 	case 0x00:
 		data = readinputport(8);
 		data |= 0x08;			// serial ready
-		if (mame_rand(Machine)&0x01)
+		if (mame_rand(machine)&0x01)
 			data |= 0x40;		// random number generator
 		if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.01)
 			data |= 0x80;		// tape input

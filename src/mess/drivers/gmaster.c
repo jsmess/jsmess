@@ -173,7 +173,7 @@ static PALETTE_INIT( gmaster )
 static VIDEO_UPDATE( gmaster )
 {
     int x,y;
-//    plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, Machine->pens[0]); //xmess rounds up to 64 pixel
+//    plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, machine->pens[0]); //xmess rounds up to 64 pixel
     for (y=0;y<ARRAY_LENGTH(gmaster_video.pixels); y++) {
 	for (x=0;x<ARRAY_LENGTH(gmaster_video.pixels[0]);x++) {
 	  UINT8 d=gmaster_video.pixels[y][x];

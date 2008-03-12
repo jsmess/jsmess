@@ -51,14 +51,14 @@
 
 static READ16_HANDLER( atarist_mfp_r )
 {
-	atarist_state *state = Machine->driver_data;
+	atarist_state *state = machine->driver_data;
 
 	return mc68901_register_r(state->mfp, offset);
 }
 
 static WRITE16_HANDLER( atarist_mfp_w )
 {
-	atarist_state *state = Machine->driver_data;
+	atarist_state *state = machine->driver_data;
 
 	if (ACCESSING_LSB) mc68901_register_w(state->mfp, offset, data & 0xff);
 }
@@ -783,7 +783,7 @@ static READ16_HANDLER( megaste_cache_r )
 static WRITE16_HANDLER( megaste_cache_w )
 {
 	megaste_cache = data;
-	cpunum_set_clock(Machine, 0, (data & 0x01) ? Y2/2 : Y2/4);
+	cpunum_set_clock(machine, 0, (data & 0x01) ? Y2/2 : Y2/4);
 }
 
 /* ST Book */
@@ -1398,7 +1398,7 @@ static READ8_HANDLER( mfp_gpio_r )
 
     */
 
-	atarist_state *state = Machine->driver_data;
+	atarist_state *state = machine->driver_data;
 
 	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
 

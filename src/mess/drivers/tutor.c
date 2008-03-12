@@ -73,7 +73,6 @@ TODO :
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms9900/tms9900.h"
 #include "video/tms9928a.h"
 #include "devices/cartslot.h"
@@ -294,7 +293,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 				else
 				{
 					timer_adjust_oneshot(tape_interrupt_timer, attotime_never, 0);
-					cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
+					cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 				}
 			}
 			break;

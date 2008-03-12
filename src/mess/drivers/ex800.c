@@ -127,7 +127,6 @@ TODO:  - The UPD7810 core is missing analog port emulation
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/beep.h"
 
@@ -171,7 +170,7 @@ static INPUT_CHANGED( online_switch )
 
 	if (newval)
 	{
-		cpunum_set_input_line(Machine, 0, UPD7810_INTF1, state);
+		cpunum_set_input_line(machine, 0, UPD7810_INTF1, state);
 		state = (state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
 }
@@ -201,19 +200,19 @@ static VIDEO_UPDATE(ex800)
 static READ8_HANDLER(ex800_porta_r)
 {
 	logerror("PA R @%x\n", activecpu_get_pc());
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static READ8_HANDLER(ex800_portb_r)
 {
 	logerror("PB R @%x\n", activecpu_get_pc());
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static READ8_HANDLER(ex800_portc_r)
 {
 	logerror("PC R @%x\n", activecpu_get_pc());
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(ex800_porta_w)
@@ -264,7 +263,7 @@ static WRITE8_HANDLER(ex800_portc_w)
 static READ8_HANDLER(ex800_devsel_r)
 {
 	logerror("DEVSEL R @%x with offset %x\n", activecpu_get_pc(), offset);
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(ex800_devsel_w)
@@ -275,7 +274,7 @@ static WRITE8_HANDLER(ex800_devsel_w)
 static READ8_HANDLER(ex800_gate5a_r)
 {
 	logerror("GATE5A R @%x with offset %x\n", activecpu_get_pc(), offset);
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(ex800_gate5a_w)
@@ -286,7 +285,7 @@ static WRITE8_HANDLER(ex800_gate5a_w)
 static READ8_HANDLER(ex800_iosel_r)
 {
 	logerror("IOSEL R @%x with offset %x\n", activecpu_get_pc(), offset);
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(ex800_iosel_w)
@@ -297,7 +296,7 @@ static WRITE8_HANDLER(ex800_iosel_w)
 static READ8_HANDLER(ex800_gate7a_r)
 {
 	logerror("GATE7A R @%x with offset %x\n", activecpu_get_pc(), offset);
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(ex800_gate7a_w)

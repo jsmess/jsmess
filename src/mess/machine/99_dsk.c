@@ -388,7 +388,7 @@ static void fdc_callback(running_machine *machine, wd17xx_state_t event, void *p
 		break;
 	}
 
-	fdc_handle_hold(Machine);
+	fdc_handle_hold(machine);
 }
 
 /*

@@ -230,7 +230,7 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 					(crossproc_map[i].inputline == PPC_INPUT_LINE_SMI) ? "SMI" : "TLBISYNC");
 			}
 
-			cpunum_set_input_line(Machine, crossproc_map[i].cpunum, crossproc_map[i].inputline, line);
+			cpunum_set_input_line(machine, crossproc_map[i].cpunum, crossproc_map[i].inputline, line);
 		}
 	}
 }
@@ -241,7 +241,7 @@ WRITE64_HANDLER( bebox_processor_resets_w )
 
 	if (b & 0x20)
 	{
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
