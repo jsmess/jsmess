@@ -34,6 +34,16 @@ static int BackgroundData = 0;
 static int LastShifter = 0;
 static int astrocade_mode = 0;
 
+static UINT8 interrupt_vector = 0;
+
+static int screen_interrupt_enabled;
+static int screen_interrupt_mode;
+static int screen_interrupt_line = 0;
+
+static int lightpen_interrupt_enabled;
+static int lightpen_interrupt_mode;
+
+
 /* These are the bits of the Magic Register */
 static const unsigned char SHIFT_MASK  = 0x03;
 static const unsigned char ROTATE_MASK = 0x04;
@@ -42,9 +52,13 @@ static const unsigned char OR_MASK     = 0x10;
 static const unsigned char XOR_MASK    = 0x20;
 static const unsigned char FLOP_MASK   = 0x40;
 
-/* ======================================================================= */
 
-enum { FAKE_BLK,FAKE_YLW,FAKE_BLU,FAKE_RED,FAKE_WHT };
+
+/*************************************
+ *
+ *  Palette
+ *
+ *************************************/
 
 PALETTE_INIT( astrocade )
 {
@@ -112,19 +126,51 @@ PALETTE_INIT( astrocade )
 	}
 }
 
+
+
+/*************************************
+ *
+ *  Interrupts
+ *
+ *************************************/
+
+WRITE8_HANDLER( astrocade_interrupt_enable_w )
+{
+	screen_interrupt_enabled = data & 0x08;
+	screen_interrupt_mode = data & 0x04;
+
+	lightpen_interrupt_enabled = data & 0x02;
+	lightpen_interrupt_mode = data & 0x01;
+
+	LOG(("Interrupt Flag set to %02x\n",data & 0x0f));
+}
+
+
+WRITE8_HANDLER( astrocade_interrupt_w )
+{
+	/* in low res mode, only bits 1-7 are used */
+	screen_interrupt_line = astrocade_mode ? data : data >> 1;
+	
+	LOG(("Scanline interrupt set to %02x\n", screen_interrupt_line));
+}
+
+
+WRITE8_HANDLER( astrocade_interrupt_vector_w )
+{
+	interrupt_vector = data;
+}
+
+
+
+/*************************************
+ *
+ *  VBlank
+ *
+ *************************************/
+
 WRITE8_HANDLER( astrocade_vertical_blank_w )
 {
 	VerticalBlank = data;
-}
-
-READ8_HANDLER( astrocade_intercept_r )
-{
-	int res;
-
-	res = collision;
-	collision = 0;
-
-	return res;
 }
 
 
@@ -134,23 +180,18 @@ READ8_HANDLER( astrocade_video_retrace_r )
 }
 
 
-/* Switches colour registers at this zone - 40 zones */
-/* Also sets the background colors */
 
-WRITE8_HANDLER ( astrocade_colour_split_w )
-{
-	ColourSplit = data&0x3f;
+/*************************************
+ *
+ *  Screen mode
+ *
+ *************************************/
 
-	if (astrocade_mode == 1)
-		ColourSplit <<= 1;
-
-	BackgroundData = ((data&0xc0) >> 6) * 0x55;
-
-	LOG(("Colour split set to %02d\n",ColourSplit));
-}
-
-/* This selects commercial (high res, arcade) or
-                  consumer (low res, astrocade) mode */
+/*-------------------------------------------------
+    astrocade_mode_w - this selects commercial
+    (high res, arcade) or consumer
+    (low res, astrocade) mode
+-------------------------------------------------*/
 
 WRITE8_HANDLER( astrocade_mode_w )
 {
@@ -163,7 +204,7 @@ WRITE8_HANDLER( astrocade_mode_w )
 		visarea.min_x = 0;
 		visarea.max_x = 319;
 		visarea.min_y = 0;
-		visarea.max_y = 203;
+		visarea.max_y = 255;
 
 		video_screen_configure(0, 455, 268, &visarea, HZ_TO_ATTOSECONDS(XTAL_Y1/2) * 268 * 455);
 	}
@@ -173,13 +214,57 @@ WRITE8_HANDLER( astrocade_mode_w )
 		visarea.min_x = 0;
 		visarea.max_x = 159;
 		visarea.min_y = 0;
-		visarea.max_y = 101;
+		visarea.max_y = 127;
 
 		video_screen_configure(0, 455, 134, &visarea, HZ_TO_ATTOSECONDS(XTAL_Y1/4) * 134 * 455);
 	}
 }
 
-WRITE8_HANDLER ( astrocade_colour_register_w )
+
+
+/*************************************
+ *
+ *  Collisions
+ *
+ *************************************/
+
+READ8_HANDLER( astrocade_intercept_r )
+{
+	int res;
+
+	res = collision;
+	collision = 0;
+
+	return res;
+}
+
+
+
+/*************************************
+ *
+ *  Colors
+ *
+ *************************************/
+
+/*-------------------------------------------------
+    astrocade_colour_split_w - switches colour
+    registers at this zone - 40 zones
+    also sets the background colors
+-------------------------------------------------*/
+
+WRITE8_HANDLER ( astrocade_colour_split_w )
+{
+	ColourSplit = data&0x3f;
+
+	if (astrocade_mode == 1)
+		ColourSplit <<= 1;
+
+	BackgroundData = ((data&0xc0) >> 6) * 0x55;
+
+	LOG(("Colour split set to %02d\n", ColourSplit));
+}
+
+WRITE8_HANDLER( astrocade_colour_register_w )
 {
 	if(Colour[offset] != data)
     {
@@ -213,7 +298,14 @@ WRITE8_HANDLER ( astrocade_colour_block_w )
 }
 
 
-WRITE8_HANDLER ( astrocade_magic_expand_color_w )
+
+/*************************************
+ *
+ *  Magic RAM
+ *
+ *************************************/
+
+WRITE8_HANDLER( astrocade_magic_expand_color_w )
 {
 	//LOG(("%04x: magic_expand_color = %02x\n",cpu_getpc(),data));
 
@@ -221,7 +313,7 @@ WRITE8_HANDLER ( astrocade_magic_expand_color_w )
 }
 
 
-WRITE8_HANDLER ( astrocade_magic_control_w )
+WRITE8_HANDLER( astrocade_magic_control_w )
 {
 	//LOG(("%04x: magic_control = %02x\n",cpu_getpc(),data));
 
@@ -231,7 +323,8 @@ WRITE8_HANDLER ( astrocade_magic_control_w )
 	magic_control = data;
 }
 
-WRITE8_HANDLER ( astrocade_magicram_w )
+
+WRITE8_HANDLER( astrocade_magicram_w )
 {
 	unsigned int data1,shift,bits,bibits,stib,k,old_data;
 
@@ -353,6 +446,13 @@ WRITE8_HANDLER ( astrocade_magicram_w )
 }
 
 
+
+/*************************************
+ *
+ *  Video update and interrupts
+ *
+ *************************************/
+
 VIDEO_UPDATE( astrocde )
 {
 	int line = video_screen_get_vpos(0);
@@ -362,9 +462,16 @@ VIDEO_UPDATE( astrocde )
 
     int i;
 
+    /* scanline interrupt? */
+	if (screen_interrupt_enabled && (line == screen_interrupt_line))
+		cpunum_set_input_line_and_vector(machine, 0, 0,
+			screen_interrupt_mode ? ASSERT_LINE : HOLD_LINE, interrupt_vector);
+	else
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+
 	LeftLineColour[line] = LeftColourCheck;
 	RightLineColour[line] = RightColourCheck;
-
+	
 	for (i = 0; i < num_bytes; i++, memloc++)
 	{
 		int data, x;
