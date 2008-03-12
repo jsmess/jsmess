@@ -76,25 +76,8 @@ enum
 };
 
 
-/* palette */
-void palette_set_colors_rgb(running_machine *machine, pen_t color_base, const UINT8 *colors, int color_count);
-
 
 /* uitext */
 const char * ui_getstring (int string_num);
-
-
-/* mc6845 */
-struct _mc6845_t;
-struct _mc6845_interface;
-
-extern struct _mc6845_t *mslegacy_mc6845;
-
-WRITE8_HANDLER(crtc6845_0_address_w);
-READ8_HANDLER(crtc6845_0_register_r);
-WRITE8_HANDLER(crtc6845_0_register_w);
-VIDEO_UPDATE(crtc6845);
-void crtc6845_config(int index, const struct _mc6845_interface *intf);
-
 
 #endif /* MSLEGACY_H */

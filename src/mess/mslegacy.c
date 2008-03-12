@@ -10,7 +10,6 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "mslegacy.h"
-#include "video/mc6845.h"
 
 
 static const char *const mess_default_text[] =
@@ -78,23 +77,6 @@ static const char *const mess_default_text[] =
 
 
 /***************************************************************************
-    PALETTE
-***************************************************************************/
-
-void palette_set_colors_rgb(running_machine *machine, pen_t color_base, const UINT8 *colors, int color_count)
-{
-	while (color_count--)
-	{
-		UINT8 r = *colors++;
-		UINT8 g = *colors++;
-		UINT8 b = *colors++;
-		palette_set_color_rgb(machine, color_base++, r, g, b);
-	}
-}
-
-
-
-/***************************************************************************
     UI TEXT
 ***************************************************************************/
 
@@ -103,49 +85,3 @@ const char * ui_getstring (int string_num)
 	return mess_default_text[string_num];
 }
 
-
-
-/***************************************************************************
-    MC6845
-***************************************************************************/
-
-mc6845_t *mslegacy_mc6845;
-
-void crtc6845_config(int index, const mc6845_interface *intf)
-{
-	/* NPW 23-Feb-2008 - All usage of 6845 devices has probably been broken here */
-	assert(index == 0);
-	mslegacy_mc6845 = devtag_get_token(Machine, MC6845, "crtc");
-}
-
-
-
-WRITE8_HANDLER(crtc6845_0_address_w)
-{
-	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
-	mc6845_address_w(devconf, offset, data);
-}
-
-
-
-READ8_HANDLER(crtc6845_0_register_r)
-{
-	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
-	return mc6845_register_r(devconf, offset);
-}
-
-
-
-WRITE8_HANDLER(crtc6845_0_register_w)
-{
-	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
-	mc6845_register_w(devconf, offset, data);
-}
-
-
-
-VIDEO_UPDATE(crtc6845)
-{
-	mc6845_update(mslegacy_mc6845, bitmap, cliprect);
-	return 0;
-}
