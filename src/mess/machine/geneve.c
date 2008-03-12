@@ -209,7 +209,7 @@ MACHINE_START( geneve )
            how the switches are set. Later we use the configuration switches to
            determine which one to use. */
 	ti99_peb_init();
-        ti99_floppy_controllers_init_all();
+        ti99_floppy_controllers_init_all(machine);
         ti99_ide_init();
         ti99_rs232_init();
 	ti99_usbsm_init();

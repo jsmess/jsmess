@@ -172,7 +172,7 @@ INTERRUPT_GEN( ti99_vblank_interrupt );
 INTERRUPT_GEN( ti99_4ev_hblank_interrupt );
 
 void set_hsgpl_crdena(int data);
-void ti99_common_init(const TMS9928a_interface *gfxparm);
+void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm);
 
 READ16_HANDLER ( ti99_nop_8_r );
 WRITE16_HANDLER ( ti99_nop_8_w );

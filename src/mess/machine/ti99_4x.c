@@ -666,7 +666,7 @@ static const TMS9928a_interface tms9918_interface =
 
 MACHINE_START( ti99_4_60hz )
 {
-    ti99_common_init(&tms9918_interface);
+    ti99_common_init(machine, &tms9918_interface);
 }
 
 static const TMS9928a_interface tms9929_interface =
@@ -679,7 +679,7 @@ static const TMS9928a_interface tms9929_interface =
 
 MACHINE_START( ti99_4_50hz )
 {
-    ti99_common_init(&tms9929_interface);
+    ti99_common_init(machine, &tms9929_interface);
 }
 
 static const TMS9928a_interface tms9918a_interface =
@@ -692,7 +692,7 @@ static const TMS9928a_interface tms9918a_interface =
 
 MACHINE_START( ti99_4a_60hz )
 {
-    ti99_common_init(&tms9918a_interface);
+    ti99_common_init(machine, &tms9918a_interface);
 }
 
 static const TMS9928a_interface tms9929a_interface =
@@ -705,16 +705,16 @@ static const TMS9928a_interface tms9929a_interface =
 
 MACHINE_START( ti99_4a_50hz )
 {
-    ti99_common_init(&tms9929a_interface);
+    ti99_common_init(machine, &tms9929a_interface);
 }
 
 MACHINE_START( ti99_4ev_60hz)
 {
     /* has an own VDP, so skip initing the VDP */
-    ti99_common_init(0);
+    ti99_common_init(machine, 0);
 }
 
-void ti99_common_init(const TMS9928a_interface *gfxparm) 
+void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm) 
 {
     if (ti99_model==model_99_8) {
         tms9901_init(0, &tms9901reset_param_ti99_8);
@@ -728,7 +728,7 @@ void ti99_common_init(const TMS9928a_interface *gfxparm)
            how the switches are set. Later we use the configuration switches to
            determine which one to use. */
 	ti99_peb_init();
-        ti99_floppy_controllers_init_all();
+        ti99_floppy_controllers_init_all(machine);
         ti99_ide_init();
         ti99_rs232_init();
 	ti99_hsgpl_init();

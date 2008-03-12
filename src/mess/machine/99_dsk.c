@@ -24,7 +24,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/wd17xx.h"
 #include "smc92x4.h"
 #include "ti99_4x.h"
@@ -396,10 +395,10 @@ static void fdc_callback(running_machine *machine, wd17xx_state_t event, void *p
 	init state of the emulator. During the normal operation, only the
 	reset routines are used.
 */
-void ti99_floppy_controllers_init_all(void)
+void ti99_floppy_controllers_init_all(running_machine *machine)
 {
 	/* initialize the controller chip for TI FDC, CC, BwG */
-	wd17xx_init(Machine, WD_TYPE_179X, fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X, fdc_callback, NULL);
 
 	/* initialize the controller chip for HFDC */
 	smc92x4_init(0, & hfdc_intf);
