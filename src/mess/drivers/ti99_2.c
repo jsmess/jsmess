@@ -80,7 +80,6 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 #include "driver.h"
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9900.h"
-#include "mslegacy.h"
 
 static int ROM_paged;
 
@@ -136,7 +135,11 @@ static const unsigned char ti99_2_palette[] =
 
 static PALETTE_INIT(ti99_2)
 {
-	palette_set_colors_rgb(machine, 0, ti99_2_palette, TI99_2_PALETTE_SIZE);
+	int i;
+
+	for ( i = 0; i < TI99_2_PALETTE_SIZE; i++ ) {
+		palette_set_color_rgb(machine, i, ti99_2_palette[i*3], ti99_2_palette[i*3+1], ti99_2_palette[i*3+2]);
+	}
 }
 
 

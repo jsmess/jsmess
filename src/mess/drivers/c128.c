@@ -308,9 +308,6 @@ U102 23256 (read compatible 27256?) 32kB 1571 system rom
 #include "includes/vc1541.h"
 #include "includes/vc20tape.h"
 
-/* TODO: Remove dependency on this */
-#include "mslegacy.h"
-
 
 /* shares ram with m8502
  * how to bankswitch ?
@@ -932,8 +929,15 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( c128 )
 {
-	palette_set_colors_rgb(machine, 0, vic2_palette, sizeof(vic2_palette) / 3);
-	palette_set_colors_rgb(machine, sizeof(vic2_palette) / 3, vdc8563_palette, sizeof(vdc8563_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(vic2_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, vic2_palette[i*3], vic2_palette[i*3+1], vic2_palette[i*3+2]);
+	}
+
+	for ( i = 0; i < sizeof(vdc8563_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i + sizeof(vic2_palette) / 3, vdc8563_palette[i*3], vdc8563_palette[i*3+1], vdc8563_palette[i*3+2]);
+	}
 }
 
 static const gfx_layout c128_charlayout =

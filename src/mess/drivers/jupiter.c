@@ -29,7 +29,6 @@ Ports:
 ***************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "cpu/z80/z80.h"
 #include "includes/jupiter.h"
 #include "devices/cartslot.h"
@@ -88,7 +87,11 @@ static const unsigned char jupiter_palette[] =
 
 static PALETTE_INIT( jupiter )
 {
-	palette_set_colors_rgb(machine, 0, jupiter_palette, sizeof(jupiter_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(jupiter_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, jupiter_palette[i*3], jupiter_palette[i*3+1], jupiter_palette[i*3+2]);
+	}
 }
 
 /* keyboard input */

@@ -26,7 +26,6 @@
 #include "includes/zx.h"
 #include "devices/cassette.h"
 #include "formats/zx81_p.h"
-#include "mslegacy.h"
 
 /* Memory Maps */
 
@@ -355,17 +354,29 @@ static const unsigned char ts1000_palette[] =
 
 static PALETTE_INIT( zx80 )
 {
-	palette_set_colors_rgb(machine, 0, zx80_palette, sizeof(zx80_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(zx80_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, zx80_palette[i*3], zx80_palette[i*3+1], zx80_palette[i*3+2]);
+	}
 }
 
 static PALETTE_INIT( zx81 )
 {
-	palette_set_colors_rgb(machine, 0, zx81_palette, sizeof(zx81_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(zx81_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, zx81_palette[i*3], zx81_palette[i*3+1], zx81_palette[i*3+2]);
+	}
 }
 
 static PALETTE_INIT( ts1000 )
 {
-	palette_set_colors_rgb(machine, 0, ts1000_palette, sizeof(ts1000_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(ts1000_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, ts1000_palette[i*3], ts1000_palette[i*3+1], ts1000_palette[i*3+2]);
+	}
 }
 
 

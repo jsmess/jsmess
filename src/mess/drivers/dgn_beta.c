@@ -47,7 +47,6 @@ documentation still exists.
 #include "formats/coco_dsk.h"
 #include "devices/mflopimg.h"
 #include "devices/coco_vhd.h"
-#include "mslegacy.h"
 
 /*
  Colour codes are as below acording to os-9 headers, however the presise values
@@ -318,7 +317,11 @@ static void dgnbeta_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 
 static PALETTE_INIT( dgnbeta )
 {
-	palette_set_colors_rgb(machine, 0, dgnbeta_palette, sizeof(dgnbeta_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(dgnbeta_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, dgnbeta_palette[i*3], dgnbeta_palette[i*3+1], dgnbeta_palette[i*3+2]);
+	}
 }
 
 static MACHINE_DRIVER_START( dgnbeta )

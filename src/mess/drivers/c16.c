@@ -164,7 +164,6 @@ when problems start with -log and look into error.log file
 #include "includes/vc20tape.h"
 #include "video/ted7360.h"
 #include "devices/cartslot.h"
-#include "mslegacy.h"
 
 /*
  * commodore c16/c116/plus 4
@@ -591,7 +590,11 @@ INPUT_PORTS_END
 /* Initialise the c16 palette */
 static PALETTE_INIT( c16 )
 {
-	palette_set_colors_rgb(machine, 0, ted7360_palette, sizeof(ted7360_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(ted7360_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, ted7360_palette[i*3], ted7360_palette[i*3+1], ted7360_palette[i*3+2]);
+	}
 }
 
 #if 0

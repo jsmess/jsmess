@@ -152,7 +152,6 @@ when problems start with -log and look into error.log file
 
 
 #include "driver.h"
-#include "mslegacy.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
@@ -609,7 +608,11 @@ INPUT_PORTS_END
 /* Initialise the vc20 palette */
 static PALETTE_INIT( vc20 )
 {
-	palette_set_colors_rgb(machine, 0, vic6560_palette, sizeof(vic6560_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(vic6560_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, vic6560_palette[i*3], vic6560_palette[i*3+1], vic6560_palette[i*3+2]);
+	}
 }
 
 #if 0

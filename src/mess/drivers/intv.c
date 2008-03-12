@@ -20,7 +20,6 @@
  ************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "video/stic.h"
 #include "includes/intv.h"
 #include "devices/cartslot.h"
@@ -56,9 +55,13 @@ static const unsigned char intv_palette[] =
 
 static PALETTE_INIT( intv )
 {
+	int i;
+
 	/* Two copies of the palette */
-	palette_set_colors_rgb(machine, 0, intv_palette, sizeof(intv_palette) / 3);
-	palette_set_colors_rgb(machine, sizeof(intv_palette) / 3, intv_palette, sizeof(intv_palette) / 3);
+	for ( i = 0; i < sizeof(intv_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, intv_palette[i*3], intv_palette[i*3+1], intv_palette[i*3+2]);
+		palette_set_color_rgb(machine, i + sizeof(intv_palette) / 3, intv_palette[i*3], intv_palette[i*3+1], intv_palette[i*3+2]);
+	}
 }
 
 static const struct AY8910interface ay8910_interface =

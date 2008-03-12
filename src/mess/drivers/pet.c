@@ -84,6 +84,8 @@ crtc 40 columns ( 50 or 60 hz )
 crtc 80 columns ( 60 or 60 hz )
 (board version able to do 40 and 80 columns)
 
+There appears to be a 16MHz clock attached to the 6845-type devices.
+
 3 types of basic roms
 basic 1 (only 40 columns, no crtc, with graphics)
 basic 2 (only 40 columns version, no crtc)
@@ -113,7 +115,6 @@ when problems start with -log and look into error.log file
  */
 
 #include "driver.h"
-#include "mslegacy.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
@@ -551,7 +552,11 @@ static const mc6845_interface crtc_pet80 = {
 
 static PALETTE_INIT( pet )
 {
-	palette_set_colors_rgb(machine, 0, pet_palette, sizeof(pet_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(pet_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, pet_palette[i*3], pet_palette[i*3+1], pet_palette[i*3+2]);
+	}
 }
 
 static VIDEO_START( pet_crtc ) {

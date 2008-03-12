@@ -14,7 +14,6 @@
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
 #include "video/gtia.h"
-#include "mslegacy.h"
 
 /******************************************************************************
     Atari 800 memory map (preliminary)
@@ -665,7 +664,11 @@ static const unsigned short atari_colortable[] =
 /* Initialise the palette */
 static PALETTE_INIT( atari )
 {
-	palette_set_colors_rgb(machine, 0, atari_palette, sizeof(atari_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(atari_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, atari_palette[i*3], atari_palette[i*3+1], atari_palette[i*3+2]);
+	}
 }
 
 

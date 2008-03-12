@@ -31,9 +31,6 @@ Philips P2000 1 Memory map
 #include "cpu/z80/z80.h"
 #include "video/saa5050.h"
 
-/* TODO: Remove dependency on this */
-#include "mslegacy.h"
-
 
 /* port i/o functions */
 static ADDRESS_MAP_START( p2000t_io , ADDRESS_SPACE_IO, 8)
@@ -93,7 +90,11 @@ static const unsigned char p2000m_palette[2 * 3] =
 
 static PALETTE_INIT( p2000m )
 {
-	palette_set_colors_rgb(machine, 0, p2000m_palette, sizeof(p2000m_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(p2000m_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, p2000m_palette[i*3], p2000m_palette[i*3+1], p2000m_palette[i*3+2]);
+	}
 }
 
 /* Keyboard input */

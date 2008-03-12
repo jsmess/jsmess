@@ -16,9 +16,6 @@
 #include "machine/cpm_bios.h"
 #include "devices/basicdsk.h"
 
-/* TODO: Remove dependency on this */
-#include "mslegacy.h"
-
 
 static ADDRESS_MAP_START( kaypro_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0xffff) AM_RAM
@@ -227,7 +224,11 @@ static const unsigned short kaypro_colortable[] =
 /* Initialise the palette */
 static PALETTE_INIT( kaypro )
 {
-	palette_set_colors_rgb(machine, 0, kaypro_palette, sizeof(kaypro_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(kaypro_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, kaypro_palette[i*3], kaypro_palette[i*3+1], kaypro_palette[i*3+2]);
+	}
 }
 
 static MACHINE_DRIVER_START( kaypro )

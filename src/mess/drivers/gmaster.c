@@ -4,7 +4,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 //#include "vidhrdw/generic.h"
 #include "cpu/upd7810/upd7810.h"
 #include "devices/cartslot.h"
@@ -164,7 +163,11 @@ static unsigned char gmaster_palette[2][3] =
 
 static PALETTE_INIT( gmaster )
 {
-  palette_set_colors_rgb(machine, 0, (unsigned char*)gmaster_palette, sizeof(gmaster_palette));
+	int i;
+
+	for ( i = 0; i < 2; i++ ) {
+		palette_set_color_rgb(machine, i, gmaster_palette[i][0], gmaster_palette[i][1], gmaster_palette[i][2]);
+	}
 }
 
 static VIDEO_UPDATE( gmaster )

@@ -6,8 +6,6 @@
 
 #include <math.h>
 #include "driver.h"
-#include "mslegacy.h"
-
 #include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
 #include "video/crt.h"
@@ -302,7 +300,9 @@ static PALETTE_INIT( tx0 )
 	palette_set_color_rgb(machine, 0, 0, 0, 0);
 
 	/* load static palette */
-	palette_set_colors_rgb(machine, pen_crt_num_levels, palette, sizeof(palette) / sizeof(palette[0]) / 3);
+	for ( i = 0; i < sizeof(palette) / sizeof(palette[0]) / 3; i++ ) {
+		palette_set_color_rgb(machine, pen_crt_num_levels + i, palette[i*3], palette[i*3+1], palette[i*3+2]);
+	}
 }
 
 

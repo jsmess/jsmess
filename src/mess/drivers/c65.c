@@ -22,9 +22,6 @@
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 
-/* TODO: Remove dependency on this */
-#include "mslegacy.h"
-
 
 static ADDRESS_MAP_START( c65_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x07fff) AM_RAMBANK(11)
@@ -261,7 +258,11 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( c65 )
 {
-	palette_set_colors_rgb(machine, 0, vic3_palette, sizeof(vic3_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(vic3_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, vic3_palette[i*3], vic3_palette[i*3+1], vic3_palette[i*3+2]);
+	}
 }
 
 #if 0

@@ -17,7 +17,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/oric.h"
 #include "machine/centroni.h"
 #include "devices/printer.h"
@@ -422,7 +421,11 @@ static const unsigned char oric_palette[8*3] =
 /* Initialise the palette */
 static PALETTE_INIT( oric )
 {
-	palette_set_colors_rgb(machine, 0, oric_palette, sizeof(oric_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(oric_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, oric_palette[i*3], oric_palette[i*3+1], oric_palette[i*3+2]);
+	}
 }
 
 

@@ -39,7 +39,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "cpu/tms9900/tms9900.h"
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
@@ -247,7 +246,11 @@ static MACHINE_RESET( tm990_189_v )
 
 static PALETTE_INIT( tm990_189 )
 {
-	palette_set_colors_rgb(machine, 0, tm990_189_palette, tm990_189_palette_size);
+	int i;
+
+	for ( i = 0; i < tm990_189_palette_size; i++ ) {
+		palette_set_color_rgb(machine, i, tm990_189_palette[i*3], tm990_189_palette[i*3+1], tm990_189_palette[i*3+2]);
+	}
 }
 
 static VIDEO_EOF( tm990_189 )

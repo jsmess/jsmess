@@ -27,7 +27,6 @@ NMI
 ***************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/cgenie.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
@@ -353,7 +352,11 @@ static const unsigned short cgenie_colortable[] =
 /* Initialise the palette */
 static PALETTE_INIT( cgenie )
 {
-	palette_set_colors_rgb(machine, 0, cgenie_palette, sizeof(cgenie_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(cgenie_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, cgenie_palette[i*3], cgenie_palette[i*3+1], cgenie_palette[i*3+2]);
+	}
 }
 
 
