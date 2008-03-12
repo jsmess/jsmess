@@ -275,7 +275,6 @@ static void electron_reset(running_machine *machine)
 	ula.screen_mode = 0;
 	ula.cassette_motor_mode = 0;
 	ula.capslock_mode = 0;
-	ula.scanline = 0;
 	ula.screen_mode = 0;
 	ula.screen_start = 0x3000;
 	ula.screen_base = 0x3000;
@@ -283,7 +282,6 @@ static void electron_reset(running_machine *machine)
 	ula.screen_addr = 0;
 	ula.tape_running = 0;
 	ula.vram = memory_get_read_ptr( 0, ADDRESS_SPACE_PROGRAM, ula.screen_base );
-	electron_video_init();
 }
 
 MACHINE_START( electron )

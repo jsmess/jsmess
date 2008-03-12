@@ -38,7 +38,7 @@ typedef struct
 	int screen_mode;
 	int cassette_motor_mode;
 	int capslock_mode;
-	int scanline;
+//	int scanline;
 	/* tape reading related */
 	UINT32 tape_value;
 	int tape_steps;
@@ -68,7 +68,8 @@ void electron_interrupt_handler(running_machine *machine, int mode, int interrup
 
 /*----------- defined in video/electron.c -----------*/
 
-void electron_video_init( void );
+VIDEO_START( electron );
+VIDEO_UPDATE( electron );
 INTERRUPT_GEN( electron_scanline_interrupt );
 
 
