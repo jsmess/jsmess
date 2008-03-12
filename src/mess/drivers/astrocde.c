@@ -40,8 +40,6 @@
 #include "devices/cartslot.h"
 
 
-#define XTAL_Y1  XTAL_14_31818MHz
-
 
 /****************************************************************************
  * Bally Astrocade
@@ -233,7 +231,7 @@ static MACHINE_DRIVER_START( astrocde )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_Y1/3, 320, 0, 320, 256, 0, 204)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_Y1/2, 455, 0, 320, 268, 0, 204)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_PALETTE_LENGTH(8*32)
 	MDRV_PALETTE_INIT(astrocade)

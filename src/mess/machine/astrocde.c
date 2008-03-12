@@ -49,7 +49,8 @@ WRITE8_HANDLER ( astrocade_interrupt_w )
 
 	LOG(("Scanline interrupt set to %02x\n",data));
 
-    NextScanInt = data;
+	/* in low res mode, bits 1-7 are used */
+    NextScanInt = machine->screen[0].height == 134 ? data >> 1 : data;
 }
 
 

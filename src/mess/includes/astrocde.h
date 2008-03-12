@@ -8,6 +8,9 @@
 #define ASTROCDE_H_
 
 
+#define XTAL_Y1  XTAL_14_31818MHz
+
+
 /*----------- defined in machine/astrocde.c -----------*/
 
 WRITE8_HANDLER( astrocade_interrupt_enable_w );

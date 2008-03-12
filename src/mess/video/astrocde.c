@@ -154,7 +154,29 @@ WRITE8_HANDLER ( astrocade_colour_split_w )
 
 WRITE8_HANDLER( astrocade_mode_w )
 {
+	rectangle visarea;
 	astrocade_mode = data & 0x01;
+
+	if (astrocade_mode)
+	{
+		/* high res mode */
+		visarea.min_x = 0;
+		visarea.max_x = 319;
+		visarea.min_y = 0;
+		visarea.max_y = 203;
+
+		video_screen_configure(0, 455, 268, &visarea, HZ_TO_ATTOSECONDS(XTAL_Y1/2) * 268 * 455);
+	}
+	else
+	{
+		/* low res mode */
+		visarea.min_x = 0;
+		visarea.max_x = 159;
+		visarea.min_y = 0;
+		visarea.max_y = 101;
+
+		video_screen_configure(0, 455, 134, &visarea, HZ_TO_ATTOSECONDS(XTAL_Y1/4) * 134 * 455);
+	}
 }
 
 WRITE8_HANDLER ( astrocade_colour_register_w )
@@ -334,46 +356,32 @@ WRITE8_HANDLER ( astrocade_magicram_w )
 VIDEO_UPDATE( astrocde )
 {
 	int line = video_screen_get_vpos(0);
+    int num_bytes = astrocade_mode ? 80 : 40;
+    int memloc = line * num_bytes;
+    int vblank_start = astrocade_mode ? VerticalBlank : VerticalBlank >> 1;
 
-    int memloc;
-    int i,x,num_bytes;
-    int data,color;
+    int i;
 
-	if (astrocade_mode == 0)
+	LeftLineColour[line] = LeftColourCheck;
+	RightLineColour[line] = RightColourCheck;
+
+	for (i = 0; i < num_bytes; i++, memloc++)
 	{
-		memloc = line/2 * 40;
-		num_bytes = 40;
-	}
-	else
-	{
-		num_bytes = 80;
-		memloc = line * 80;
-	}
-
-	LeftLineColour[line]  = LeftColourCheck;
-	RightLineColour[line]  = RightColourCheck;
-
-	for(i=0;i<num_bytes;i++,memloc++)
-	{
-		if (line < VerticalBlank)
+		int data, x;
+		
+		if (line < vblank_start)
 			data = videoram[memloc];
 		else
 			data = BackgroundData;
 
-		for (x=i*4+3; x>=i*4; x--)
+		for (x = i*4+3; x >= i*4; x--)
 		{
-			color = data & 03;
+			int color = data & 03;
 
-			if (i<ColourSplit)
+			if (i < ColourSplit)
 				color += 4;
 
-			if (astrocade_mode == 0)
-			{
-				*BITMAP_ADDR16(bitmap, line, 2*x+0) = machine->pens[Colour[color]];
-				*BITMAP_ADDR16(bitmap, line, 2*x+1) = machine->pens[Colour[color]];
-			}
-			else
-				*BITMAP_ADDR16(bitmap, line, x) = machine->pens[Colour[color]];
+			*BITMAP_ADDR16(bitmap, line, x) = machine->pens[Colour[color]];
 
 			data >>= 2;
 		}
