@@ -80,7 +80,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -113,6 +112,7 @@ static int einstein_ctc_trigger = 0;
 static int einstein_keyboard_line = 0;
 static int einstein_keyboard_data = 0x0ff;
 
+static mc6845_t	*mc6845;
 
 #define EINSTEIN_DUMP_RAM
 
@@ -273,9 +273,6 @@ static void	einstein_80col_init(void)
 	/* 2K RAM */
 	einstein_80col_ram = auto_malloc(2048);
 
-	/* initialise 6845 */
-	crtc6845_config( 0, &einstein_crtc6845_interface );
-
 	einstein_80col_state=(1<<2)|(1<<1);
 }
 
@@ -316,10 +313,10 @@ static WRITE8_HANDLER(einstein_80col_w)
 			einstein_80col_ram_w(machine, offset,data);
 			break;
 		case 8:
-			crtc6845_0_address_w(machine, offset,data);
+			mc6845_address_w( devtag_get_token(machine, MC6845, "crtc"), offset, data );
 			break;
 		case 9:
-			crtc6845_0_register_w(machine, offset,data);
+			mc6845_register_w( devtag_get_token(machine, MC6845, "crtc"), offset, data );
 			break;
 		default:
 			break;
@@ -1471,6 +1468,7 @@ static MACHINE_RESET( einstein )
 static MACHINE_RESET( einstein2 )
 {
 	MACHINE_RESET_CALL(einstein);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	einstein_80col_init();
 }
 
@@ -1707,7 +1705,7 @@ static const struct AY8910interface einstein_ay_interface =
 static VIDEO_UPDATE( einstein2 )
 {
 	VIDEO_UPDATE_CALL(tms9928a);
-	VIDEO_UPDATE_CALL(crtc6845);
+	mc6845_update(mc6845, bitmap, cliprect);
 //  VIDEO_UPDATE_CALL(einstein_80col);
 	return 0;
 }
