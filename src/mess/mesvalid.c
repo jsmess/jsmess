@@ -10,7 +10,6 @@
 
 #include "mess.h"
 #include "device.h"
-#include "mslegacy.h"
 #include "inputx.h"
 
 

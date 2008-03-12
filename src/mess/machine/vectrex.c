@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "video/vector.h"
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"

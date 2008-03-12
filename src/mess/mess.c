@@ -13,7 +13,6 @@
 #include "driver.h"
 #include "devices/flopdrv.h"
 #include "utils.h"
-#include "mslegacy.h"
 #include "image.h"
 #include "hash.h"
 #include "messopts.h"
