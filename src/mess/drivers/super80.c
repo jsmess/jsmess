@@ -30,7 +30,7 @@ static UINT8 mc6845[20];				/* registers */
 static UINT8 mc6845_reg;				/* register index */
 static UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
-#define MASTER_CLOCK			(12e6)		/* 12mhz */
+#define MASTER_CLOCK			(XTAL_12MHz)
 #define HTOTAL				(384)
 #define HBEND				(0)
 #define HBSTART				(256)
@@ -193,9 +193,9 @@ static void mc6845_cursor_configure(void)
 
 /* Resize the screen within the limits of the hardware.
 	If we are using dynamic screen resizing, expand the image to fill the screen area */
-static void mc6845_screen_configure(void)
+static void mc6845_screen_configure(running_machine *machine)
 {
-	screen_state *state = &Machine->screen[0];
+	screen_state *state = &machine->screen[0];
 	rectangle visarea;
 	UINT16 width, height, bytes;	
 	UINT8 dyn = readinputportbytag("CONFIG") & 0x10;			// read dipswitch
@@ -479,7 +479,7 @@ static WRITE8_HANDLER( super80v_10_w )
 static WRITE8_HANDLER( super80v_11_w )
 {
 	if (mc6845_reg < 16) mc6845[mc6845_reg] = data & mc6845_mask[mc6845_reg];	/* save data in register */
-	if (mc6845_reg < 10) mc6845_screen_configure();					/* adjust screen size */
+	if (mc6845_reg < 10) mc6845_screen_configure(machine);				/* adjust screen size */
 	if ((mc6845_reg > 8) && (mc6845_reg < 12)) mc6845_cursor_configure();		/* adjust cursor shape */
 }
 
