@@ -68,8 +68,6 @@
 /* lightpen values */
 #include "includes/c64.h"
 
-#include "mslegacy.h"
-
 /*#define GFX */
 
 #define VREFRESHINLINES 28
@@ -1337,7 +1335,11 @@ VIDEO_UPDATE( vic2 )
 
 static PALETTE_INIT( vic2 )
 {
-	palette_set_colors_rgb(machine, 0, vic2_palette, sizeof(vic2_palette) / 3);
+	int i;
+
+	for ( i = 0; i < sizeof(vic2_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, vic2_palette[i*3], vic2_palette[i*3+1], vic2_palette[i*3+2]);
+	}
 }
 
 MACHINE_DRIVER_START( vh_vic2 )
