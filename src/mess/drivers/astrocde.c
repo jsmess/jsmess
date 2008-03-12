@@ -63,7 +63,7 @@ static WRITE8_HANDLER( astrocade_soundblock1_w )
 static ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(MRA8_ROM, astrocade_magicram_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(MRA8_RAM, astrocade_videoram_w) AM_BASE(&astrocade_videoram) AM_SIZE(&videoram_size) /* ASG */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* ASG */
 ADDRESS_MAP_END
 
 

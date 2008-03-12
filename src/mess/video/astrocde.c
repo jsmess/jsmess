@@ -19,7 +19,6 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-unsigned char *astrocade_videoram;
 static int magic_expand_color, magic_control, magic_expand_flipflop, collision;
 
 static int ColourSplit=0;								/* Colour System vars */
@@ -191,14 +190,6 @@ WRITE8_HANDLER ( astrocade_colour_block_w )
 
 }
 
-WRITE8_HANDLER ( astrocade_videoram_w )
-{
-	if ((offset < 0x1000) && (astrocade_videoram[offset] != data))
-	{
-		astrocade_videoram[offset] = data;
-    }
-}
-
 
 WRITE8_HANDLER ( astrocade_magic_expand_color_w )
 {
@@ -312,7 +303,7 @@ WRITE8_HANDLER ( astrocade_magicram_w )
 
 	if (magic_control & 0x30)
 	{
-		old_data = astrocade_videoram[offset];
+		old_data = videoram[offset];
 		collision &= 0x0f;
 
 		if (data | old_data)
@@ -329,13 +320,12 @@ WRITE8_HANDLER ( astrocade_magicram_w )
 	}
 
 	if (magic_control & XOR_MASK)
-		data ^= astrocade_videoram[offset];	    /* draw in XOR mode */
+		data ^= videoram[offset];	    /* draw in XOR mode */
 	else if (magic_control & OR_MASK)
-		data |= astrocade_videoram[offset];		/* draw in OR mode */
+		data |= videoram[offset];		/* draw in OR mode */
 
 	/* else draw in copy mode */
-
-	astrocade_videoram_w(machine, offset,data);
+	videoram[offset] = data;
 
 	magic_expand_flipflop ^= 1;
 }
@@ -366,7 +356,7 @@ VIDEO_UPDATE( astrocde )
 	for(i=0;i<num_bytes;i++,memloc++)
 	{
 		if (line < VerticalBlank)
-			data = astrocade_videoram[memloc];
+			data = videoram[memloc];
 		else
 			data = BackgroundData;
 
