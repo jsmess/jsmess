@@ -40,7 +40,7 @@ void amstrad_setup_machine(running_machine *);
 
 SNAPSHOT_LOAD( amstrad );
 
-void amstrad_handle_snapshot(unsigned char *);
+void amstrad_handle_snapshot(running_machine *, unsigned char *);
 
 DEVICE_LOAD(amstrad_plus_cartridge);
 

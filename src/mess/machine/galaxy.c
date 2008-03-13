@@ -7,9 +7,7 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/galaxy.h"
 
@@ -139,7 +137,7 @@ SNAPSHOT_LOAD( galaxy )
 
 	image_fread(image, snapshot_data, snapshot_size);
 
-	galaxy_setup_snapshot(Machine, snapshot_data, snapshot_size);
+	galaxy_setup_snapshot(machine, snapshot_data, snapshot_size);
 
 	return INIT_PASS;
 }

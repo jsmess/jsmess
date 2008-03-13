@@ -28,7 +28,6 @@ rom/ram selection
 #include "devices/snapquik.h"
 #include "includes/amstrad.h"
 #include "sound/ay8910.h"
-#include "deprecat.h"
 
 
 void amstrad_setup_machine(running_machine *machine)
@@ -37,9 +36,8 @@ void amstrad_setup_machine(running_machine *machine)
 }
 
 /* load CPCEMU style snapshots */
-void amstrad_handle_snapshot(unsigned char *pSnapshot)
+void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 {
-	running_machine *machine = Machine;
 	int RegData;
 	int i;
 
@@ -195,7 +193,7 @@ SNAPSHOT_LOAD(amstrad)
 		return INIT_FAIL;
 	}
 
-	amstrad_handle_snapshot(snapshot);
+	amstrad_handle_snapshot(machine, snapshot);
 	free(snapshot);
 	return INIT_PASS;
 }

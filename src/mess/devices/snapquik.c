@@ -32,7 +32,7 @@ static TIMER_CALLBACK(snapquick_processsnapshot)
 
 	loadproc = (snapquick_loadproc) mess_device_get_info_fct(&si->dev->devclass, MESS_DEVINFO_PTR_SNAPSHOT_LOAD);
 	file_type = image_filetype(si->img);
-	loadproc(si->img, file_type, si->file_size);
+	loadproc(machine, si->img, file_type, si->file_size);
 	image_unload(si->img);
 }
 

@@ -800,7 +800,7 @@ SNAPSHOT_LOAD( microtan )
 	if (microtan_varify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
 		return INIT_FAIL;
 
-	microtan_snapshot_copy(Machine, snapshot_buff, snapshot_size);
+	microtan_snapshot_copy(machine, snapshot_buff, snapshot_size);
 	return INIT_PASS;
 }
 
@@ -835,7 +835,7 @@ QUICKLOAD_LOAD( microtan_hexfile )
 	else
 		rc = parse_zillion_hex(snapshot_buff, buff);
 	if (rc == INIT_PASS)
-		microtan_snapshot_copy(Machine, snapshot_buff, snapshot_size);
+		microtan_snapshot_copy(machine, snapshot_buff, snapshot_size);
 	free(snapshot_buff);
 	return rc;
 }
