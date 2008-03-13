@@ -12,7 +12,6 @@
 #include "driver.h"
 #include "includes/c128.h"
 #include "includes/c64.h"
-#include "deprecat.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
@@ -162,7 +161,7 @@ static READ8_HANDLER( c128_read_io )
 	}
 }
 
-void c128_bankswitch_64 (int reset)
+void c128_bankswitch_64 (running_machine *machine, int reset)
 {
 	static int old, exrom, game;
 	int data, loram, hiram, charen;
@@ -219,7 +218,7 @@ void c128_bankswitch_64 (int reset)
 		else
 			memory_set_bankptr(13, c64_memory + 0xd000);
 	}
-	c128_set_m8502_read_handler(Machine, 0xd000, 0xdfff, rh);
+	c128_set_m8502_read_handler(machine, 0xd000, 0xdfff, rh);
 
 	if (!c64_game && c64_exrom)
 	{
@@ -334,7 +333,7 @@ static int mmu_page0, mmu_page1;
 #endif
  }
 
-static void c128_bankswitch_128 (int reset)
+static void c128_bankswitch_128 (running_machine *machine, int reset)
 {
 	read8_machine_func rh;
 
@@ -359,7 +358,7 @@ static void c128_bankswitch_128 (int reset)
 
 		memory_set_bankptr(12, c64_memory + 0xc000);
 
-		c128_bankswitch_64 (reset);
+		c128_bankswitch_64 (machine, reset);
 	}
 	else
 	{
@@ -415,7 +414,7 @@ static void c128_bankswitch_128 (int reset)
 		else
 			c128_ram_top = 0x10000;
 
-		c128_set_m8502_read_handler(Machine, 0xff00, 0xff04, c128_mmu8722_ff00_r);
+		c128_set_m8502_read_handler(machine, 0xff00, 0xff04, c128_mmu8722_ff00_r);
 
 		if (MMU_IO_ON)
 		{
@@ -427,7 +426,7 @@ static void c128_bankswitch_128 (int reset)
 			c128_write_io = 0;
 			rh = MRA8_BANK13;
 		}
-		c128_set_m8502_read_handler(Machine, 0xd000, 0xdfff, rh);
+		c128_set_m8502_read_handler(machine, 0xd000, 0xdfff, rh);
 
 		if (MMU_RAM_HI)
 		{
@@ -500,7 +499,7 @@ static void c128_bankswitch_128 (int reset)
 }
 
 
-static void c128_bankswitch (int reset)
+static void c128_bankswitch (running_machine *machine, int reset)
 {
 	if (mmu_cpu != MMU_CPU8502)
 	{
@@ -511,18 +510,18 @@ static void c128_bankswitch (int reset)
 			memory_set_context(0);
 			c128_bankswitch_z80();
 			memory_set_context(1);
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			DBG_LOG (1, "switching to m6502",
 						("active %d\n",cpu_getactivecpu()) );
 			memory_set_context(1);
-			c128_bankswitch_128(reset);
+			c128_bankswitch_128(machine, reset);
 			memory_set_context(0);
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
 
 			/* NPW 19-Nov-2005 - In the C128, CPU #0 starts out and hands over
 			 * control to CPU #1.  CPU #1 seems to execute garbage from 0x0000
@@ -545,10 +544,10 @@ static void c128_bankswitch (int reset)
 	if (!MMU_CPU8502)
 		c128_bankswitch_z80();
 	else
-		c128_bankswitch_128(reset);
+		c128_bankswitch_128(machine, reset);
 }
 
-static void c128_mmu8722_reset (void)
+static void c128_mmu8722_reset (running_machine *machine)
 {
 	memset(c128_mmu, 0, sizeof (c128_mmu));
 	c128_mmu[5] |= 0x38;
@@ -556,7 +555,7 @@ static void c128_mmu8722_reset (void)
 	mmu_cpu = 0;
     mmu_page0 = 0;
     mmu_page1 = 0x0100;
-	c128_bankswitch (1);
+	c128_bankswitch (machine, 1);
 }
 
 WRITE8_HANDLER( c128_mmu8722_port_w )
@@ -576,7 +575,7 @@ WRITE8_HANDLER( c128_mmu8722_port_w )
 	case 5:
 	case 6:
 		c128_mmu[offset] = data;
-		c128_bankswitch (0);
+		c128_bankswitch (machine, 0);
 		break;
 	case 7:
 		c128_mmu[offset] = data;
@@ -585,7 +584,7 @@ WRITE8_HANDLER( c128_mmu8722_port_w )
 	case 9:
 		c128_mmu[offset] = data;
 		mmu_page1=MMU_PAGE1;
-		c128_bankswitch (0);
+		c128_bankswitch (machine, 0);
 		break;
 	case 0xb:
 		break;
@@ -639,7 +638,7 @@ WRITE8_HANDLER( c128_mmu8722_ff00_w )
 	{
 	case 0:
 		c128_mmu[offset] = data;
-		c128_bankswitch (0);
+		c128_bankswitch (machine, 0);
 		break;
 	case 1:
 	case 2:
@@ -650,7 +649,7 @@ WRITE8_HANDLER( c128_mmu8722_ff00_w )
 #else
 		c128_mmu[0]|= c128_mmu[offset];
 #endif
-		c128_bankswitch (0);
+		c128_bankswitch (machine, 0);
 		break;
 	}
 }
@@ -822,7 +821,7 @@ DRIVER_INIT( c128pal )
 
 MACHINE_RESET( c128 )
 {
-	c64_common_init_machine ();
+	c64_common_init_machine(machine);
 	c128_vicaddr = c64_vicaddr = c64_memory;
 
 	sndti_reset(SOUND_SID6581, 0);
@@ -831,7 +830,7 @@ MACHINE_RESET( c128 )
 	c64_rom_load();
 
 	c64mode = 0;
-	c128_mmu8722_reset ();
+	c128_mmu8722_reset (machine);
 	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 }

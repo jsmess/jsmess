@@ -901,7 +901,7 @@ MACHINE_RESET( ti99 )
 		hsgpl_crdena = 0;
 
 	if (has_usb_sm)
-		ti99_usbsm_reset(ti99_model == model_99_8);
+		ti99_usbsm_reset(machine, ti99_model == model_99_8);
 
 	if (has_evpc)
 		ti99_evpc_reset();

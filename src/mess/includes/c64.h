@@ -239,7 +239,7 @@ DRIVER_INIT( c64pal );
 DRIVER_INIT( ultimax );
 DRIVER_INIT( c64gs );
 DRIVER_INIT( sx64 );
-void c64_common_init_machine (void);
+void c64_common_init_machine (running_machine *machine);
 
 MACHINE_START( c64 );
 INTERRUPT_GEN( c64_frame_interrupt );

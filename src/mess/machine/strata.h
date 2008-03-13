@@ -2,7 +2,7 @@
 	strata.h: header file for strata.c
 */
 
-int strataflash_init(int id);
+int strataflash_init(running_machine *machine, int id);
 int strataflash_load(int id, mame_file *f);
 int strataflash_save(int id, mame_file *file);
 UINT8 strataflash_8_r(int id, UINT32 address);

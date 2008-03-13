@@ -482,11 +482,11 @@ static TIMER_CALLBACK(svi318_80col_init_registers) {
 }
 
 /* 80 column card init */
-static void svi318_80col_init(void)
+static void svi318_80col_init(running_machine *machine)
 {
 	/* 2K RAM, but allocating 4KB to make banking easier */
 	/* The upper 2KB will be set to FFs and will never be written to */
-	svi.svi806_ram = new_memory_region( Machine, REGION_GFX2, 0x1000, 0 );
+	svi.svi806_ram = new_memory_region( machine, REGION_GFX2, 0x1000, 0 );
 	memset( svi.svi806_ram, 0x00, 0x800 );
 	memset( svi.svi806_ram + 0x800, 0xFF, 0x800 );
 	svi.svi806_gfx = memory_region(REGION_GFX1);
@@ -519,7 +519,7 @@ MACHINE_RESET( svi328_806 )
 {
 	MACHINE_RESET_CALL(svi318);
 
-	svi318_80col_init();
+	svi318_80col_init(machine);
 	svi.svi806_present = 1;
 	svi318_set_banks();
 

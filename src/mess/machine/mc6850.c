@@ -11,7 +11,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "mc6850.h"
 
 struct acia6850
@@ -36,7 +35,7 @@ void acia6850_reset (void)
 {
 }
 
-int acia6850_read (int which, int offset)
+int acia6850_read (running_machine *machine, int which, int offset)
 {
 	struct acia6850 *currptr = acia + which;
 	int	val = 0;
@@ -45,17 +44,17 @@ int acia6850_read (int which, int offset)
 	{
 		case ACIA_6850_CTRL:
 			if ((*(*currptr).intf).in_status_func)
-							val = (*(*currptr).intf).in_status_func(Machine, 0);
+							val = (*(*currptr).intf).in_status_func(machine, 0);
 			break;
 		case ACIA_6850_DATA:
 			if ((*(*currptr).intf).in_recv_func)
-							val = (*(*currptr).intf).in_recv_func(Machine, 0);
+							val = (*(*currptr).intf).in_recv_func(machine, 0);
 			break;
 	}
 	return (val);
 }
 
-void acia6850_write (int which, int offset, int data)
+void acia6850_write (running_machine *machine, int which, int offset, int data)
 {
 	struct acia6850 *currptr = acia + which;
 
@@ -63,24 +62,24 @@ void acia6850_write (int which, int offset, int data)
 	{
 		case ACIA_6850_CTRL:
 			if ((*(*currptr).intf).out_status_func)
-							(*(*currptr).intf).out_status_func(Machine, 0, data);
+							(*(*currptr).intf).out_status_func(machine, 0, data);
 			break;
 		case ACIA_6850_DATA:
 			if ((*(*currptr).intf).out_tran_func)
-							(*(*currptr).intf).out_tran_func(Machine, 0, data);
+							(*(*currptr).intf).out_tran_func(machine, 0, data);
 			break;
 	}
 }
 
- READ8_HANDLER( acia6850_0_r ) { return acia6850_read (0, offset); }
- READ8_HANDLER( acia6850_1_r ) { return acia6850_read (1, offset); }
- READ8_HANDLER( acia6850_2_r ) { return acia6850_read (2, offset); }
- READ8_HANDLER( acia6850_3_r ) { return acia6850_read (3, offset); }
+ READ8_HANDLER( acia6850_0_r ) { return acia6850_read (machine, 0, offset); }
+ READ8_HANDLER( acia6850_1_r ) { return acia6850_read (machine, 1, offset); }
+ READ8_HANDLER( acia6850_2_r ) { return acia6850_read (machine, 2, offset); }
+ READ8_HANDLER( acia6850_3_r ) { return acia6850_read (machine, 3, offset); }
 
-WRITE8_HANDLER( acia6850_0_w ) { acia6850_write (0, offset, data); }
-WRITE8_HANDLER( acia6850_1_w ) { acia6850_write (1, offset, data); }
-WRITE8_HANDLER( acia6850_2_w ) { acia6850_write (2, offset, data); }
-WRITE8_HANDLER( acia6850_3_w ) { acia6850_write (3, offset, data); }
+WRITE8_HANDLER( acia6850_0_w ) { acia6850_write (machine, 0, offset, data); }
+WRITE8_HANDLER( acia6850_1_w ) { acia6850_write (machine, 1, offset, data); }
+WRITE8_HANDLER( acia6850_2_w ) { acia6850_write (machine, 2, offset, data); }
+WRITE8_HANDLER( acia6850_3_w ) { acia6850_write (machine, 3, offset, data); }
 
 
 

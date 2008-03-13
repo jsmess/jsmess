@@ -10,7 +10,7 @@
 #define _SGIMC_H
 
 
-void mc_init(void);
+void mc_init(running_machine *machine);
 void mc_update(void);
 
 READ32_HANDLER(mc_r);

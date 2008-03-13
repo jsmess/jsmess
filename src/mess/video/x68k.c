@@ -28,7 +28,6 @@
 #include "driver.h"
 #include "includes/x68k.h"
 #include "machine/68901mfp.h"
-#include "deprecat.h"
 
 extern struct x68k_system sys;
 
@@ -779,7 +778,7 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-static void x68k_draw_sprites(bitmap_t* bitmap, int priority, rectangle cliprect)
+static void x68k_draw_sprites(running_machine *machine, bitmap_t* bitmap, int priority, rectangle cliprect)
 {
 	/*
 	   0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
@@ -835,7 +834,7 @@ static void x68k_draw_sprites(bitmap_t* bitmap, int priority, rectangle cliprect
 
 			sx += sprite_shift;
 
-			drawgfx(bitmap,Machine->gfx[1],code,colour+0x10,xflip,yflip,sys.crtc.hbegin+sx,sys.crtc.vbegin+sy,&cliprect,TRANSPARENCY_PEN,0x00);
+			drawgfx(bitmap,machine->gfx[1],code,colour+0x10,xflip,yflip,sys.crtc.hbegin+sx,sys.crtc.vbegin+sy,&cliprect,TRANSPARENCY_PEN,0x00);
 		}
 	}
 }
@@ -1017,7 +1016,7 @@ VIDEO_UPDATE( x68000 )
 		// Sprite / BG Tiles
 		if(priority == sys.video.sprite_pri /*&& (x68k_spritereg[0x404] & 0x0200)*/ && (sys.video.reg[2] & 0x0040))
 		{
-			x68k_draw_sprites(bitmap,1,rect);
+			x68k_draw_sprites(machine, bitmap,1,rect);
 			if((x68k_spritereg[0x404] & 0x0008))
 			{
 				if((x68k_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
@@ -1033,7 +1032,7 @@ VIDEO_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(bitmap,2,rect);
+			x68k_draw_sprites(machine,bitmap,2,rect);
 			if((x68k_spritereg[0x404] & 0x0001))
 			{
 				if((x68k_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
@@ -1049,7 +1048,7 @@ VIDEO_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(bitmap,3,rect);
+			x68k_draw_sprites(machine,bitmap,3,rect);
 		}
 
 		// Text screen

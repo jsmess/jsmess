@@ -170,9 +170,9 @@ static DEVICE_UNLOAD(cbm_rom)
 	cbm_rom[id].chip = 0;
 }
 
-static const struct IODevice *cbm_rom_find_device(void)
+static const struct IODevice *cbm_rom_find_device(running_machine *machine)
 {
-	return device_find(Machine->devices, IO_CARTSLOT);
+	return device_find(machine->devices, IO_CARTSLOT);
 }
 
 static DEVICE_INIT(cbm_rom)
@@ -199,7 +199,7 @@ static DEVICE_LOAD(cbm_rom)
 	if (i >= sizeof(cbm_rom) / sizeof(cbm_rom[0]))
 		return INIT_FAIL;
 
-	dev = cbm_rom_find_device();
+	dev = cbm_rom_find_device(Machine);
 
 	size = image_length(image);
 

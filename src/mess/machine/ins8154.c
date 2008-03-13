@@ -11,7 +11,6 @@
  ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "ins8154.h"
 
 #define MAX_INS8154   2
@@ -49,9 +48,9 @@ static ins8154_state ins8154[MAX_INS8154];
 
 
 /* Config */
-void ins8154_config(int which, const ins8154_interface *intf)
+void ins8154_config(running_machine *machine, int which, const ins8154_interface *intf)
 {
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT,
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT,
 		"Can only call ins8154_config at init time!");
 	assert_always(which < MAX_INS8154,
 		"'which' exceeds maximum number of configured INS8154s!");
@@ -77,7 +76,7 @@ void ins8154_reset(int which)
 }
 
 
-static UINT8 ins8154_read(int which, offs_t offset)
+static UINT8 ins8154_read(running_machine *machine, int which, offs_t offset)
 {
 	ins8154_state *i = &ins8154[which];
 	UINT8 val = 0xff;
@@ -93,13 +92,13 @@ static UINT8 ins8154_read(int which, offs_t offset)
 	{
 	case 0x20:
 		if (i->intf->in_a_func)
-			val = i->intf->in_a_func(Machine, 0);
+			val = i->intf->in_a_func(machine, 0);
 		i->in_a = val;
 		break;
 		
 	case 0x21:
 		if (i->intf->in_b_func)
-			val = i->intf->in_b_func(Machine, 0);
+			val = i->intf->in_b_func(machine, 0);
 		i->in_b = val;
 		break;
 		
@@ -107,13 +106,13 @@ static UINT8 ins8154_read(int which, offs_t offset)
 		if (offset < 0x08)
 		{
 			if (i->intf->in_a_func)
-				val = (i->intf->in_a_func(Machine, 0) << (8 - offset)) & 0x80;
+				val = (i->intf->in_a_func(machine, 0) << (8 - offset)) & 0x80;
 			i->in_a = val;
 		}
 		else
 		{
 			if (i->intf->in_a_func)
-				val = (i->intf->in_a_func(Machine, 0) << (8 - (offset >> 4))) & 0x80;
+				val = (i->intf->in_a_func(machine, 0) << (8 - (offset >> 4))) & 0x80;
 			i->in_b = val;
 		}
 		break;
@@ -123,7 +122,7 @@ static UINT8 ins8154_read(int which, offs_t offset)
 }
 
 
-static void ins8154_write_port_a(int which, int data)
+static void ins8154_write_port_a(running_machine *machine, int which, int data)
 {
 	ins8154_state *i = &ins8154[which];
 	
@@ -133,7 +132,7 @@ static void ins8154_write_port_a(int which, int data)
 	if (i->odra)
 	{
 		if (i->intf->out_a_func)
-			i->intf->out_a_func(Machine, 0, (data & i->odra) | (i->odra ^ 0xff));
+			i->intf->out_a_func(machine, 0, (data & i->odra) | (i->odra ^ 0xff));
 		else
 			logerror("INS8154 chip #%d (%08x): Write to port A but no write handler defined!\n",
 				which, safe_activecpu_get_pc());
@@ -141,7 +140,7 @@ static void ins8154_write_port_a(int which, int data)
 }
 
 
-static void ins8154_write_port_b(int which, int data)
+static void ins8154_write_port_b(running_machine *machine, int which, int data)
 {
 	ins8154_state *i = &ins8154[which];
 	
@@ -151,7 +150,7 @@ static void ins8154_write_port_b(int which, int data)
 	if (i->odrb)
 	{
 		if (i->intf->out_b_func)
-			i->intf->out_b_func(Machine, 0, (data & i->odrb) | (i->odrb ^ 0xff));
+			i->intf->out_b_func(machine, 0, (data & i->odrb) | (i->odrb ^ 0xff));
 		else
 			logerror("INS8154 chip #%d (%08x): Write to port B but no write handler defined!\n",
 				which, safe_activecpu_get_pc());
@@ -159,7 +158,7 @@ static void ins8154_write_port_b(int which, int data)
 }
 
 
-static void ins8154_write(int which, offs_t offset, UINT8 data)
+static void ins8154_write(running_machine *machine, int which, offs_t offset, UINT8 data)
 {
 	ins8154_state *i = &ins8154[which];
 	
@@ -173,11 +172,11 @@ static void ins8154_write(int which, offs_t offset, UINT8 data)
 	switch (offset)
 	{
 	case 0x20:
-		ins8154_write_port_a(which, data);
+		ins8154_write_port_a(machine, which, data);
 		break;
 		
 	case 0x21:
-		ins8154_write_port_b(which, data);
+		ins8154_write_port_b(machine, which, data);
 		break;
 		
 	case 0x22:
@@ -204,11 +203,11 @@ static void ins8154_write(int which, offs_t offset, UINT8 data)
 			/* Set bit */
 			if (offset < 0x08)
 			{
-				ins8154_write_port_a(which, i->out_a |= offset & 0x07);
+				ins8154_write_port_a(machine, which, i->out_a |= offset & 0x07);
 			}
 			else
 			{
-				ins8154_write_port_b(which, i->out_b |= (offset >> 4) & 0x07);
+				ins8154_write_port_b(machine, which, i->out_b |= (offset >> 4) & 0x07);
 			}
 		}
 		else
@@ -216,12 +215,12 @@ static void ins8154_write(int which, offs_t offset, UINT8 data)
 			/* Clear bit */
 			if (offset < 0x08)
 			{
-				ins8154_write_port_a(which, i->out_a & ~(offset & 0x07));
+				ins8154_write_port_a(machine, which, i->out_a & ~(offset & 0x07));
 			}
 			else
 			{
-				ins8154_write_port_b(which, i->out_b & ~((offset >> 4) & 0x07));
-			}			
+				ins8154_write_port_b(machine, which, i->out_b & ~((offset >> 4) & 0x07));
+			}
 		}
 		
 		break;
@@ -232,8 +231,8 @@ static void ins8154_write(int which, offs_t offset, UINT8 data)
 
 /******************* Standard 8-bit CPU interfaces, D0-D7 *******************/
 
-WRITE8_HANDLER( ins8154_0_w ) {	ins8154_write(0, offset, data); }
-WRITE8_HANDLER( ins8154_1_w ) {	ins8154_write(1, offset, data); }
+WRITE8_HANDLER( ins8154_0_w ) {	ins8154_write(machine, 0, offset, data); }
+WRITE8_HANDLER( ins8154_1_w ) {	ins8154_write(machine, 1, offset, data); }
 
-READ8_HANDLER( ins8154_0_r ) { return ins8154_read(0, offset); }
-READ8_HANDLER( ins8154_1_r ) { return ins8154_read(1, offset); }
+READ8_HANDLER( ins8154_0_r ) { return ins8154_read(machine, 0, offset); }
+READ8_HANDLER( ins8154_1_r ) { return ins8154_read(machine, 1, offset); }

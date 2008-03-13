@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "z80dart.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -339,13 +338,12 @@ void z80dart_reset(int which)
     z80dart_c_w - write to a control register
 -------------------------------------------------*/
 
-void z80dart_c_w(int which, int ch, UINT8 data)
+void z80dart_c_w(running_machine *machine, int which, int ch, UINT8 data)
 {
 	z80dart *dart = darts + which;
 	dart_channel *chan = &dart->chan[ch];
 	int reg = chan->regs[0] & 7;
 	UINT8 old = chan->regs[reg];
-	running_machine *machine = Machine;
 
 	if (reg != 0 || (reg & 0xf8))
 		VPRINTF(("%04X:dart_reg_w(%c,%d) = %02X\n", activecpu_get_pc(), 'A' + ch, reg, data));

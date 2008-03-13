@@ -13,7 +13,6 @@
 
 #include "driver.h"
 #include "strata.h"
-#include "deprecat.h"
 
 #define MAX_STRATA	1
 
@@ -68,7 +67,7 @@ static struct
 	Initialize one FEEPROM chip: may be called at driver init or image load
 	time (or machine init time if you don't use MESS image core)
 */
-int strataflash_init(int id)
+int strataflash_init(running_machine *machine, int id)
 {
 	int i;
 
@@ -92,7 +91,7 @@ int strataflash_init(int id)
 	/* set-up factory-programmed protection register segment */
 	strata[id].prot_regs[BYTE_XOR_LE(0)] &= 0xfe;
 	for (i=2; i<10; i++)
-		strata[id].prot_regs[i] = mame_rand(Machine);
+		strata[id].prot_regs[i] = mame_rand(machine);
 
 	return 0;
 }

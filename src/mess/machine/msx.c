@@ -332,7 +332,7 @@ static const ppi8255_interface msx_ppi8255_interface =
 
 static const struct tc8521_interface tc = { NULL };
 
-static void msx_init(void)
+static void msx_init(running_machine *machine)
 {
 	int i, n;
 
@@ -349,14 +349,14 @@ static void msx_init(void)
 		msx1.cart_state[i] = cart_state[i];
 	}
 
-	wd17xx_init (Machine, WD_TYPE_179X, msx_wd179x_int, NULL);
+	wd17xx_init (machine, WD_TYPE_179X, msx_wd179x_int, NULL);
 	wd17xx_set_density (DEN_FM_HI);
 	msx1.dsk_stat = 0x7f;
 
 	cpunum_set_input_line_vector (0, 0, 0xff);
 	ppi8255_init (&msx_ppi8255_interface);
 
-	msx_memory_init ();
+	msx_memory_init (machine);
 
 	/* adjust z80 cycles for the M1 wait state */
 	for (i = 0; i < sizeof(z80_cycle_table) / sizeof(z80_cycle_table[0]); i++)
@@ -390,12 +390,12 @@ static void msx_init(void)
 
 DRIVER_INIT( msx )
 {
-	msx_init();
+	msx_init(machine);
 }
 
 DRIVER_INIT( msx2 )
 {
-	msx_init();
+	msx_init(machine);
 	tc8521_init (&tc);
 }
 
@@ -745,7 +745,7 @@ static READ8_HANDLER( msx_ppi_port_b_r )
  *
  ***********************************************************************/
 
-void msx_memory_init (void)
+void msx_memory_init (running_machine *machine)
 {
 	int	prim, sec, page, extent, option;
 	int size = 0;
@@ -767,7 +767,7 @@ void msx_memory_init (void)
 	}
 
 	for (driver = msx_driver_list; driver->name[0]; driver++) {
-		if (!strcmp (driver->name, Machine->gamedrv->name)) {
+		if (!strcmp (driver->name, machine->gamedrv->name)) {
 			layout = driver->layout;
 		}
 	}

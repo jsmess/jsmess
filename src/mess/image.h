@@ -47,7 +47,7 @@ typedef enum
 ****************************************************************************/
 
 /* not to be called by anything other than core */
-int image_init(void);
+int image_init(running_machine *machine);
 
 
 

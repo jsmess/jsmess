@@ -94,7 +94,7 @@ WRITE8_HANDLER (msx_kanji_w);
 
 void msx_memory_map_all (void);
 void msx_memory_map_page (int page);
-void msx_memory_init (void);
+void msx_memory_init (running_machine *machine);
 void msx_memory_set_carts (void);
 void msx_memory_reset (void);
 

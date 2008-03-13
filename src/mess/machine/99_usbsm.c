@@ -79,9 +79,9 @@ void ti99_usbsm_init() {
 /*
 	Reset USB-SmartMedia card, set up handlers
 */
-int ti99_usbsm_reset(int in_tms9995_mode)
+int ti99_usbsm_reset(running_machine *machine, int in_tms9995_mode)
 {
-	if (strataflash_init(0))
+	if (strataflash_init(machine, 0))
 		return 1;
 	if (smartmedia_machine_init(0))
 		return 1;

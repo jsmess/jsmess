@@ -603,7 +603,7 @@ static int int_callback(int line)
 }
 
 
-static void update_interrupt_state(void)
+static void update_interrupt_state(running_machine *machine)
 {
 	int i, j, new_vector = 0;
 
@@ -682,9 +682,9 @@ generate_int:
 	/* generate the appropriate interrupt */
 	i186.intr.poll_status = 0x8000 | new_vector;
 	if (!i186.intr.pending)
-		cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, 0, ASSERT_LINE);
 	i186.intr.pending = 1;
-	cpu_trigger(Machine, CPU_RESUME_TRIGGER);
+	cpu_trigger(machine, CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
 	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time()), new_vector);
 }
@@ -770,7 +770,7 @@ static TIMER_CALLBACK(internal_timer_int)
 	if (t->control & 0x2000)
 	{
 		i186.intr.status |= 0x01 << which;
-		update_interrupt_state();
+		update_interrupt_state(machine);
 		if (LOG_TIMER) logerror("  Generating timer interrupt\n");
 	}
 
@@ -963,7 +963,7 @@ static TIMER_CALLBACK(dma_timer_callback)
 	{
 		if (LOG_DMA) logerror("DMA%d timer callback - requesting interrupt: count = %04X, source = %04X\n", which, d->count, d->source);
 		i186.intr.request |= 0x04 << which;
-		update_interrupt_state();
+		update_interrupt_state(machine);
 	}
 }
 
@@ -1279,7 +1279,7 @@ WRITE16_HANDLER( i186_internal_port_w )
 			if (LOG_PORTS)
             logerror("%05X:80186 EOI = %04X\n", activecpu_get_pc(), data16);
 			handle_eoi(0x8000);
-			update_interrupt_state();
+			update_interrupt_state(machine);
 			break;
 
 		case 0x24:
@@ -1303,31 +1303,31 @@ WRITE16_HANDLER( i186_internal_port_w )
 			i186.intr.ext[1] = (i186.intr.ext[1] & ~0x08) | ((data16 >> 2) & 0x08);
 			i186.intr.ext[2] = (i186.intr.ext[2] & ~0x08) | ((data16 >> 3) & 0x08);
 			i186.intr.ext[3] = (i186.intr.ext[3] & ~0x08) | ((data16 >> 4) & 0x08);
-			update_interrupt_state();
+			update_interrupt_state(machine);
 			break;
 
 		case 0x2a:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt priority mask = %04X\n", activecpu_get_pc(), data16);
 			i186.intr.priority_mask = data16 & 0x0007;
-			update_interrupt_state();
+			update_interrupt_state(machine);
 			break;
 
 		case 0x2c:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt in-service = %04X\n", activecpu_get_pc(), data16);
 			i186.intr.in_service = data16 & 0x00ff;
-			update_interrupt_state();
+			update_interrupt_state(machine);
 			break;
 
 		case 0x2e:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt request = %04X\n", activecpu_get_pc(), data16);
 			i186.intr.request = (i186.intr.request & ~0x00c0) | (data16 & 0x00c0);
-			update_interrupt_state();
+			update_interrupt_state(machine);
 			break;
 
 		case 0x30:
 			if (LOG_PORTS) logerror("%05X:WARNING - wrote to 80186 interrupt status = %04X\n", activecpu_get_pc(), data16);
 			i186.intr.status = (i186.intr.status & ~0x8007) | (data16 & 0x8007);
-			update_interrupt_state();
+			update_interrupt_state(machine);
 			break;
 
 		case 0x32:
@@ -1592,7 +1592,7 @@ MACHINE_RESET( compis )
 	compis_fdc_reset();
 
 	/* RTC */
-	mm58274c_init(0, 0);
+	mm58274c_init(machine, 0, 0);
 
 	/* Setup the USART */
 	msm8251_init(&compis_usart_interface);

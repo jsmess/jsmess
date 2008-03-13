@@ -71,7 +71,7 @@ offs_t coco3_mmu_translate(int bank, int offset);
 WRITE8_HANDLER( coco_pia_1_w );
 void coco3_horizontal_sync_callback(int data);
 void coco3_field_sync_callback(int data);
-void coco3_gime_field_sync_callback(void);
+void coco3_gime_field_sync_callback(running_machine *machine);
 
 /* Compusense Dragon Plus board */
 READ8_HANDLER ( plus_reg_r );
@@ -87,7 +87,9 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write );
 READ8_HANDLER(wd2797_r);
 WRITE8_HANDLER(wd2797_w);
 
-void coco_set_halt_line(int halt_line);
+#ifdef UNUSED_FUNCTION
+void coco_set_halt_line(running_machine *machine, int halt_line);
+#endif
 
 #define IO_BITBANGER IO_PRINTER
 #define IO_VHD IO_HARDDISK

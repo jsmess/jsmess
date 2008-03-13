@@ -54,7 +54,7 @@ struct rp5c15
 	void (*alarm_callback)(int state);
 };  //  Ricoh RP5C15
 
-void rp5c15_init(const struct rp5c15_interface*);
+void rp5c15_init(running_machine *machine, const struct rp5c15_interface*);
 
 void rtc_add_second(void);
 void rtc_add_minute(void);

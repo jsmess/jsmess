@@ -68,7 +68,6 @@
 */
 
 #include "rp5c15.h"
-#include "deprecat.h"
 
 
 static struct rp5c15 rtc;
@@ -99,14 +98,14 @@ TIMER_CALLBACK(rtc_alarm_pulse)
 	}
 }
 
-void rp5c15_init(const struct rp5c15_interface* intf)
+void rp5c15_init(running_machine *machine, const struct rp5c15_interface* intf)
 {
 	mame_system_time systm;
 	mame_system_tm time;
 
 	rtc.alarm_callback = intf->alarm_irq_callback;
 
-	mame_get_base_datetime(Machine,&systm);
+	mame_get_base_datetime(machine,&systm);
 	time = systm.local_time;
 
 	// date/time is stored as BCD

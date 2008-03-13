@@ -443,9 +443,9 @@ DEVICE_UNLOAD(tx0_typewriter)
 /*
 	Write a character to typewriter
 */
-static void typewriter_out(UINT8 data)
+static void typewriter_out(running_machine *machine, UINT8 data)
 {
-	tx0_typewriter_drawchar(Machine, data);
+	tx0_typewriter_drawchar(machine, data);
 	if (typewriter.fd)
 		image_fwrite(typewriter.fd, & data, 1);
 }
@@ -470,7 +470,7 @@ void tx0_io_prt(void)
 	ac = cpunum_get_reg(0, TX0_AC);
 	/* shuffle and print 6-bit word */
 	ch = ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5);
-	typewriter_out(ch);
+	typewriter_out(Machine, ch);
 
 	timer_adjust_oneshot(typewriter.prt_timer, ATTOTIME_IN_MSEC(100), 0);
 }
@@ -1111,7 +1111,7 @@ void tx0_io_reset_callback(void)
 /*
 	typewriter keyboard handler
 */
-static void tx0_keyboard(void)
+static void tx0_keyboard(running_machine *machine)
 {
 	int i;
 	int j;
@@ -1140,7 +1140,7 @@ static void tx0_keyboard(void)
 			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
 			/* write modified LR */
 			cpunum_set_reg(0, TX0_LR, lr);
-			tx0_typewriter_drawchar(Machine, charcode);	/* we want to echo input */
+			tx0_typewriter_drawchar(machine, charcode);	/* we want to echo input */
 			break;
 		}
 	}
@@ -1252,7 +1252,7 @@ INTERRUPT_GEN( tx0_interrupt )
 		old_control_keys = 0;
 		old_tsr_keys = 0;
 
-		tx0_keyboard();
+		tx0_keyboard(machine);
 	}
 }
 

@@ -120,10 +120,10 @@ static WRITE8_HANDLER(d_pia2_pb_w);
 static void d_pia2_irq_a(int state);
 static void d_pia2_irq_b(int state);
 
-static void cpu0_recalc_irq(int state);
-static void cpu0_recalc_firq(int state);
+static void cpu0_recalc_irq(running_machine *machine, int state);
+static void cpu0_recalc_firq(running_machine *machine, int state);
 
-static void cpu1_recalc_firq(int state);
+static void cpu1_recalc_firq(running_machine *machine, int state);
 
 static	int Keyboard[NoKeyrows];		/* Keyboard bit array */
 static int RowShifter;				/* shift register to select row */
@@ -649,12 +649,12 @@ static WRITE8_HANDLER(d_pia0_cb2_w)
 
 static void d_pia0_irq_a(int state)
 {
-	cpu0_recalc_irq(state);
+	cpu0_recalc_irq(Machine, state);
 }
 
 static void d_pia0_irq_b(int state)
 {
-	cpu0_recalc_firq(state);
+	cpu0_recalc_firq(Machine, state);
 }
 
 /* PIA #1 at $FC24-$FC27 I63
@@ -741,12 +741,12 @@ static WRITE8_HANDLER(d_pia1_pb_w)
 
 static void d_pia1_irq_a(int state)
 {
-	cpu0_recalc_irq(state);
+	cpu0_recalc_irq(Machine, state);
 }
 
 static void d_pia1_irq_b(int state)
 {
-	cpu0_recalc_irq(state);
+	cpu0_recalc_irq(Machine, state);
 }
 
 /* PIA #2 at FCC0-FCC3 I28
@@ -845,18 +845,18 @@ static WRITE8_HANDLER(d_pia2_pb_w)
 static void d_pia2_irq_a(int state)
 {
 	logerror("PIA2 IRQ1 state=%02X\n",state);
-	cpu0_recalc_irq(state);
+	cpu0_recalc_irq(Machine, state);
 }
 
 static void d_pia2_irq_b(int state)
 {
 	logerror("PIA2 IRQ2 state=%02X\n",state);
-	cpu0_recalc_irq(state);
+	cpu0_recalc_irq(Machine, state);
 }
 
 /************************************ Recalculate CPU inturrupts ****************************/
 /* CPU 0 */
-static void cpu0_recalc_irq(int state)
+static void cpu0_recalc_irq(running_machine *machine, int state)
 {
 	UINT8 pia0_irq_a = pia_get_irq_a(0);
 	UINT8 pia1_irq_a = pia_get_irq_a(1);
@@ -870,11 +870,11 @@ static void cpu0_recalc_irq(int state)
 	else
 		IRQ = CLEAR_LINE;
 
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, IRQ);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, IRQ);
 	LOG_INTS(("cpu0 IRQ : %d\n",IRQ));
 }
 
-static void cpu0_recalc_firq(int state)
+static void cpu0_recalc_firq(running_machine *machine, int state)
 {
 	UINT8 pia0_irq_b = pia_get_irq_b(0);
 	UINT8 FIRQ;
@@ -884,16 +884,16 @@ static void cpu0_recalc_firq(int state)
 	else
 		FIRQ = CLEAR_LINE;
 
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, FIRQ);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, FIRQ);
 
 	LOG_INTS(("cpu0 FIRQ : %d\n",FIRQ));
 }
 
 /* CPU 1 */
 
-static void cpu1_recalc_firq(int state)
+static void cpu1_recalc_firq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, state);
+	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, state);
 	LOG_INTS(("cpu1 FIRQ : %d\n",state));
 }
 
@@ -916,11 +916,11 @@ static void dgnbeta_fdc_callback(running_machine *machine, wd17xx_state_t event,
 			break;
 		case WD17XX_DRQ_CLR:
 			/*wd2797_drq=CLEAR_LINE;*/
-			cpu1_recalc_firq(CLEAR_LINE);
+			cpu1_recalc_firq(machine, CLEAR_LINE);
 			break;
 		case WD17XX_DRQ_SET:
 			/*wd2797_drq=ASSERT_LINE;*/
-			cpu1_recalc_firq(ASSERT_LINE);
+			cpu1_recalc_firq(machine, ASSERT_LINE);
 			break;
 	}
 
@@ -1014,10 +1014,8 @@ static void ScanInKeyboard(void)
 }
 
 /* VBlank inturrupt */
-void dgn_beta_frame_interrupt (int data)
+void dgn_beta_frame_interrupt (running_machine *machine, int data)
 {
-	running_machine *machine = Machine;
-
 	/* Set PIA line, so it recognises inturrupt */
 	if (!data)
 	{

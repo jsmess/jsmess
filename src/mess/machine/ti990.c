@@ -18,7 +18,7 @@ void ti990_reset_int(void)
 	intlines = 0;
 }
 
-void ti990_set_int_line(int line, int state)
+void ti990_set_int_line(running_machine *machine, int line, int state)
 {
 	int level;
 
@@ -32,45 +32,45 @@ void ti990_set_int_line(int line, int state)
 	{
 		for (level = 0; ! (intlines & (1 << level)); level++)
 			;
-		cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, level);	/* interrupt it, baby */
+		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, level);	/* interrupt it, baby */
 	}
 	else
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 void ti990_set_int2(int state)
 {
-	ti990_set_int_line(2, state);
+	ti990_set_int_line(Machine, 2, state);
 }
 
 void ti990_set_int3(int state)
 {
-	ti990_set_int_line(3, state);
+	ti990_set_int_line(Machine, 3, state);
 }
 
 void ti990_set_int6(int state)
 {
-	ti990_set_int_line(6, state);
+	ti990_set_int_line(Machine, 6, state);
 }
 
 void ti990_set_int7(int state)
 {
-	ti990_set_int_line(7, state);
+	ti990_set_int_line(Machine, 7, state);
 }
 
 void ti990_set_int9(int state)
 {
-	ti990_set_int_line(9, state);
+	ti990_set_int_line(Machine, 9, state);
 }
 
 void ti990_set_int10(int state)
 {
-	ti990_set_int_line(10, state);
+	ti990_set_int_line(Machine, 10, state);
 }
 
 void ti990_set_int13(int state)
 {
-	ti990_set_int_line(13, state);
+	ti990_set_int_line(Machine, 13, state);
 }
 
 /*
@@ -99,14 +99,14 @@ static char ckon_state;
 void ti990_line_interrupt(void)
 {
 	if (ckon_state)
-		ti990_set_int_line(5, 1);
+		ti990_set_int_line(Machine, 5, 1);
 }
 
 void ti990_ckon_ckof_callback(int state)
 {
 	ckon_state = state;
 	if (! ckon_state)
-		ti990_set_int_line(5, 0);
+		ti990_set_int_line(Machine, 5, 0);
 }
 
 

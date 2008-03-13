@@ -48,9 +48,9 @@ struct hd63450
 void hd63450_init(const struct hd63450_interface* intf);
 int hd63450_read(int offset, UINT16 mem_mask);
 void hd63450_write(int offset, int data, UINT16 mem_mask);
-void hd63450_single_transfer(int x);
+void hd63450_single_transfer(running_machine *machine, int x);
 
-void dma_transfer_start(int channel, int dir);
+void dma_transfer_start(running_machine *machine, int channel, int dir);
 
 int hd63450_get_vector(int channel);
 int hd63450_get_error_vector(int channel);

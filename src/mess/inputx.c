@@ -637,7 +637,7 @@ static void dump_codes(void)
 
 
 
-void inputx_init(void)
+void inputx_init(running_machine *machine)
 {
 	codes = NULL;
 	inputx_timer = NULL;
@@ -647,14 +647,14 @@ void inputx_init(void)
 	keybuffer = NULL;
 
 #ifdef ENABLE_DEBUGGER
-	if (Machine->debug_mode)
+	if (machine->debug_mode)
 		debug_console_register_command("input", CMDFLAG_NONE, 0, 1, 1, execute_input);
 #endif /* ENABLE_DEBUGGER */
 
 	/* posting keys directly only makes sense for a computer */
-	if (Machine->gamedrv->flags & GAME_COMPUTER)
+	if (machine->gamedrv->flags & GAME_COMPUTER)
 	{
-		codes = build_codes(Machine->input_ports);
+		codes = build_codes(machine->input_ports);
 		if (DUMP_CODES)
 			dump_codes();
 		setup_keybuffer();

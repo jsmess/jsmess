@@ -95,7 +95,7 @@ static int joystick_data_select;        /* which nibble of joystick data we want
 
 /* prototypes */
 static void pce_cd_init( void );
-static void pce_cd_set_irq_line( int num, int state );
+static void pce_cd_set_irq_line( running_machine *machine, int num, int state );
 static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback );
 
 
@@ -397,7 +397,7 @@ static void pce_cd_nec_set_audio_start_position( void ) {
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
-	pce_cd_set_irq_line( PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
+	pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
 }
 
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
@@ -442,7 +442,7 @@ static void pce_cd_nec_set_audio_stop_position( void ) {
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
-	pce_cd_set_irq_line( PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
+	pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
 }
 
 /* 0xDA - PAUSE (NEC) */
@@ -648,11 +648,11 @@ static void pce_cd_handle_data_input( void ) {
 
 		if ( ! pce_cd.scsi_REQ && ! pce_cd.scsi_ACK ) {
 			if ( pce_cd.data_buffer_index == pce_cd.data_buffer_size ) {
-				pce_cd_set_irq_line( PCE_CD_IRQ_TRANSFER_READY, CLEAR_LINE );
+				pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_READY, CLEAR_LINE );
 				if ( pce_cd.data_transferred ) {
 					pce_cd.data_transferred = 0;
 					pce_cd_reply_status_byte( SCSI_STATUS_OK );
-					pce_cd_set_irq_line( PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
+					pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
 				}
 			} else {
 				logerror("Transfer byte from offset %d\n", pce_cd.data_buffer_index);
@@ -683,7 +683,7 @@ static void pce_cd_handle_message_input( void ) {
 }
 
 /* Update internal CD statuses */
-static void pce_cd_update( void ) {
+static void pce_cd_update( running_machine *machine ) {
 	/* Check for reset of CD unit */
 	if ( pce_cd.scsi_RST != pce_cd.scsi_last_RST ) {
 		if ( pce_cd.scsi_RST ) {
@@ -702,7 +702,7 @@ static void pce_cd_update( void ) {
 		logerror( "freeing bus\n" );
 		pce_cd.selected = 0;
 		pce_cd.scsi_CD = pce_cd.scsi_MSG = pce_cd.scsi_IO = pce_cd.scsi_REQ = 0;
-		pce_cd_set_irq_line( PCE_CD_IRQ_TRANSFER_DONE, CLEAR_LINE );
+		pce_cd_set_irq_line( machine, PCE_CD_IRQ_TRANSFER_DONE, CLEAR_LINE );
 	}
 
 	/* Select the CD device */
@@ -740,7 +740,7 @@ logerror("Setting CD in device selection\n");
 	}
 }
 
-static void pce_cd_set_irq_line( int num, int state ) {
+static void pce_cd_set_irq_line( running_machine *machine, int num, int state ) {
 	switch( num ) {
 	case PCE_CD_IRQ_TRANSFER_DONE:
 		if ( state == ASSERT_LINE ) {
@@ -761,9 +761,9 @@ static void pce_cd_set_irq_line( int num, int state ) {
 	}
 
 	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & ( PCE_CD_IRQ_TRANSFER_DONE | PCE_CD_IRQ_TRANSFER_READY ) ) {
-		cpunum_set_input_line(Machine, 0, 1, ASSERT_LINE );
+		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE );
 	} else {
-		cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE );
+		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE );
 	}
 }
 
@@ -846,13 +846,13 @@ WRITE8_HANDLER( pce_cd_bram_w ) {
 
 WRITE8_HANDLER( pce_cd_intf_w ) {
 	logerror("%04X: write to CD interface offset %02X, data %02X\n", activecpu_get_pc(), offset, data );
-	pce_cd_update();
+	pce_cd_update(machine);
 
 	switch( offset ) {
 	case 0x00:	/* CDC status */
 		/* select device (which bits??) */
 		pce_cd.scsi_SEL = 1;
-		pce_cd_update();
+		pce_cd_update(machine);
 		pce_cd.scsi_SEL = 0;
 		break;
 	case 0x01:	/* CDC command / status / data */
@@ -865,7 +865,7 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 				/* bit 2 - ?? irq */
 		pce_cd.scsi_ACK = data & 0x80;
 		/* Don't set or reset any irq lines, but just verify the current state */
-		pce_cd_set_irq_line( 0, 0 );
+		pce_cd_set_irq_line( machine, 0, 0 );
 		break;
 	case 0x03:	/* BRAM lock / CD status / IRQ - Read Only register */
 		break;
@@ -925,13 +925,13 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 		return;
 	}
 	pce_cd.regs[offset] = data;
-	pce_cd_update();
+	pce_cd_update(machine);
 }
 
 static TIMER_CALLBACK( pce_cd_clear_ack ) {
-	pce_cd_update();
+	pce_cd_update(machine);
 	pce_cd.scsi_ACK = 0;
-	pce_cd_update();
+	pce_cd_update(machine);
 	if ( pce_cd.scsi_CD ) {
 		pce_cd.regs[0x0B] &= 0xFE;
 	}
@@ -958,7 +958,7 @@ static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback ) {
 READ8_HANDLER( pce_cd_intf_r ) {
 	UINT8 data = pce_cd.regs[offset & 0x0F];
 
-	pce_cd_update();
+	pce_cd_update(machine);
 
 	logerror("%04X: read from CD interface offset %02X\n", activecpu_get_pc(), offset );
 	switch( offset ) {

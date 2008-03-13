@@ -46,7 +46,7 @@ void z80dart_reset(int which);
     CONTROL REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80dart_c_w(int which, int ch, UINT8 data);
+void z80dart_c_w(running_machine *machine, int which, int ch, UINT8 data);
 UINT8 z80dart_c_r(int which, int ch);
 
 

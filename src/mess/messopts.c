@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "mame.h"
-#include "deprecat.h"
 #include "options.h"
 #include "driver.h"
 #include "pool.h"
@@ -276,13 +275,13 @@ done:
 	out of core into the options
 -------------------------------------------------*/
 
-void mess_options_extract(void)
+void mess_options_extract(running_machine *machine)
 {
 	/* only extract the device options if we've added them */
 	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS))
-		mess_enumerate_devices(mame_options(), Machine->gamedrv, extract_device_options_for_device);
+		mess_enumerate_devices(mame_options(), machine->gamedrv, extract_device_options_for_device);
 
 	/* write the config, if appropriate */
 	if (options_get_bool(mame_options(), OPTION_WRITECONFIG))
-		write_config(NULL, Machine->gamedrv);
+		write_config(NULL, machine->gamedrv);
 }

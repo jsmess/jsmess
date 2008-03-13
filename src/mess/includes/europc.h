@@ -145,7 +145,7 @@ extern  READ8_HANDLER( europc_rtc_r );
 extern WRITE8_HANDLER( europc_rtc_w );
 extern NVRAM_HANDLER( europc_rtc );
 
-void europc_rtc_set_time(void);
+void europc_rtc_set_time(running_machine *machine);
 void europc_rtc_init(void);
 
 

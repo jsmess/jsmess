@@ -8,7 +8,6 @@
 
 #include "driver.h"
 #include "sgi.h"
-#include "deprecat.h"
 
 
 #define VERBOSE_LEVEL ( 1 )
@@ -532,7 +531,7 @@ static TIMER_CALLBACK(mc_update_callback)
 	mc_update();
 }
 
-void mc_init()
+void mc_init(running_machine *machine)
 {
 	nMC_CPUControl0 = 0;
 	nMC_CPUControl1 = 0;
@@ -579,7 +578,7 @@ void mc_init()
 	timer_adjust_periodic(tMC_UpdateTimer, ATTOTIME_IN_HZ(10000), 0, ATTOTIME_IN_HZ(10000));
 
 	// if Indigo2, ID appropriately
-	if (!strcmp(Machine->gamedrv->name, "ip244415"))
+	if (!strcmp(machine->gamedrv->name, "ip244415"))
 	{
 		nMC_SysID = 0x11;	// rev. B MC, EISA bus present
 	}

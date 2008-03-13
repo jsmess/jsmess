@@ -8,10 +8,8 @@
 
 ***************************************************************************/
 
-#include <ctype.h>
 #include "driver.h"
 #include "image.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 
@@ -369,14 +367,14 @@ static  READ8_HANDLER(ted7360_dma_read_rom)
 	return mess_ram[offset % mess_ram_size];
 }
 
-void c16_interrupt (int level)
+void c16_interrupt (running_machine *machine, int level)
 {
 	static int old_level;
 
 	if (level != old_level)
 	{
 		DBG_LOG (3, "mos7501", ("irq %s\n", level ? "start" : "end"));
-		cpunum_set_input_line(Machine, 0, M6510_IRQ_LINE, level);
+		cpunum_set_input_line(machine, 0, M6510_IRQ_LINE, level);
 		old_level = level;
 	}
 }

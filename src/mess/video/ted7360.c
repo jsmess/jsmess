@@ -546,7 +546,7 @@ void ted7360_set_dma (read8_machine_func dma_read,
 	vic_dma_read_rom = dma_read_rom;
 }
 
-static void ted7360_set_interrupt (int mask)
+static void ted7360_set_interrupt (running_machine *machine, int mask)
 {
 	/* kernel itself polls for timer 2 shot (interrupt disabled!)
 	 * when cassette loading */
@@ -557,20 +557,20 @@ static void ted7360_set_interrupt (int mask)
 		{
 			DBG_LOG (1, "ted7360", ("irq start %.2x\n", mask));
 			ted7360[9] |= 0x80;
-			c16_interrupt (1);
+			c16_interrupt (machine, 1);
 		}
 	}
 	ted7360[9] |= mask;
 }
 
-static void ted7360_clear_interrupt (int mask)
+static void ted7360_clear_interrupt (running_machine *machine, int mask)
 {
 	ted7360[9] &= ~mask;
 	if ((ted7360[9] & 0x80) && !(ted7360[9] & ted7360[0xa] & 0x5e))
 	{
 		DBG_LOG (1, "ted7360", ("irq end %.2x\n", mask));
 		ted7360[9] &= ~0x80;
-		c16_interrupt (0);
+		c16_interrupt (machine, 0);
 	}
 }
 
@@ -590,17 +590,17 @@ static TIMER_CALLBACK(ted7360_timer_timeout)
 	    // prooved by digisound of several intros like eoroidpro
 		timer_adjust_oneshot(timer1, TEDTIME_IN_CYCLES (TIMER1), 1);
 		timer1_active = 1;
-		ted7360_set_interrupt (8);
+		ted7360_set_interrupt (machine, 8);
 		break;
 	case 2:
 		timer_adjust_oneshot(timer2, TEDTIME_IN_CYCLES (0x10000), 2);
 		timer2_active = 1;
-		ted7360_set_interrupt (0x10);
+		ted7360_set_interrupt (machine, 0x10);
 		break;
 	case 3:
 		timer_adjust_oneshot(timer3, TEDTIME_IN_CYCLES (0x10000), 3);
 		timer3_active = 1;
-		ted7360_set_interrupt (0x40);
+		ted7360_set_interrupt (machine, 0x40);
 		break;
 	}
 }
@@ -725,13 +725,13 @@ WRITE8_HANDLER ( ted7360_port_w )
 		break;
 	case 9:
 		if (data & 8)
-			ted7360_clear_interrupt (8);
+			ted7360_clear_interrupt (machine, 8);
 		if (data & 0x10)
-			ted7360_clear_interrupt (0x10);
+			ted7360_clear_interrupt (machine, 0x10);
 		if (data & 0x40)
-			ted7360_clear_interrupt (0x40);
+			ted7360_clear_interrupt (machine, 0x40);
 		if (data & 2)
-			ted7360_clear_interrupt (2);
+			ted7360_clear_interrupt (machine, 2);
 		break;
 	case 0xa:
 		old = data;
@@ -739,7 +739,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 #if 0
 		ted7360[9] = (ted7360[9] & 0xa1) | (ted7360[9] & data & 0x5e);
 		if (ted7360[9] & 0x80)
-			ted7360_clear_interrupt (0);
+			ted7360_clear_interrupt (machine, 0);
 #endif
 		if ((data ^ old) & 1)
 		{
@@ -1220,7 +1220,7 @@ INTERRUPT_GEN( ted7360_raster_interrupt )
 	if (rasterline == C16_2_RASTERLINE (RASTERLINE))
 	{
 		ted7360_drawlines (machine, lastline, rasterline);
-		ted7360_set_interrupt (2);
+		ted7360_set_interrupt (machine, 2);
 	}
 }
 

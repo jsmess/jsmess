@@ -1544,7 +1544,7 @@ static const struct rp5c15_interface rtc_intf =
 static MACHINE_START( megast )
 {
 	MACHINE_START_CALL(atarist);
-	rp5c15_init(&rtc_intf);
+	rp5c15_init(machine, &rtc_intf);
 }
 
 static READ8_HANDLER( atariste_mfp_gpio_r )
@@ -1633,7 +1633,7 @@ static MACHINE_START( megaste )
 {
 	machine_start_atariste(machine);
 	state_save_register_global(megaste_cache);
-	rp5c15_init(&rtc_intf);
+	rp5c15_init(machine, &rtc_intf);
 }
 
 static void stbook_configure_memory(void)
@@ -1761,7 +1761,7 @@ static MACHINE_START( stbook )
 	acia6850_config(0, &stbook_acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 	state->mfp = devtag_get_token(machine, MC68901, "mfp");
-	rp5c15_init(&rtc_intf);
+	rp5c15_init(machine, &rtc_intf);
 
 	cpunum_set_irq_callback(0, atarist_int_ack);
 }

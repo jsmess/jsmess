@@ -80,6 +80,7 @@ the access to the video memory is unclear to me at the moment.
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/dgn_beta.h"
 #include "video/m6845.h"
 
@@ -307,7 +308,7 @@ static void beta_Set_VSync(int offset, int data)
 #endif
 	}
 
-	dgn_beta_frame_interrupt(data);
+	dgn_beta_frame_interrupt(Machine, data);
 }
 
 static void beta_Set_DE(int offset, int data)

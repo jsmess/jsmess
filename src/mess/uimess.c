@@ -21,7 +21,7 @@ int mess_ui_active(void)
 	return ui_active;
 }
 
-void mess_ui_update(void)
+void mess_ui_update(running_machine *machine)
 {
 	static int ui_toggle_key = 0;
 
@@ -29,7 +29,7 @@ void mess_ui_update(void)
 	const struct IODevice *dev;
 
 	/* traditional MESS interface */
-	if (Machine->gamedrv->flags & GAME_COMPUTER)
+	if (machine->gamedrv->flags & GAME_COMPUTER)
 	{
 		if( input_ui_pressed(IPT_UI_TOGGLE_UI) )
 		{
@@ -78,9 +78,9 @@ void mess_ui_update(void)
 	}
 
 	/* run display routine for device */
-	if (Machine->devices)
+	if (machine->devices)
 	{
-		for (dev = Machine->devices; dev->type < IO_COUNT; dev++)
+		for (dev = machine->devices; dev->type < IO_COUNT; dev++)
 		{
 			if (dev->display)
 			{
@@ -202,7 +202,7 @@ int mess_use_new_ui(void)
 
 
 
-int mess_disable_builtin_ui(void)
+int mess_disable_builtin_ui(running_machine *machine)
 {
-	return mess_use_new_ui() || ((Machine->gamedrv->flags & GAME_COMPUTER) && !mess_ui_active());
+	return mess_use_new_ui() || ((machine->gamedrv->flags & GAME_COMPUTER) && !mess_ui_active());
 }

@@ -63,7 +63,7 @@ static int galaxy_irq_callback (int cpu)
 #define GALAXY_SNAPSHOT_V1_SIZE	8268
 #define GALAXY_SNAPSHOT_V2_SIZE	8244
 
-static void galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
+static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data, UINT32 size)
 {
 	switch (size)
 	{
@@ -119,8 +119,8 @@ static void galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
 			break;
 	}
 
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 SNAPSHOT_LOAD( galaxy )
@@ -139,7 +139,7 @@ SNAPSHOT_LOAD( galaxy )
 
 	image_fread(image, snapshot_data, snapshot_size);
 
-	galaxy_setup_snapshot(snapshot_data, snapshot_size);
+	galaxy_setup_snapshot(Machine, snapshot_data, snapshot_size);
 
 	return INIT_PASS;
 }

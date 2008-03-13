@@ -7,9 +7,7 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/cgenie.h"
 #include "machine/wd17xx.h"
@@ -491,7 +489,7 @@ static void tape_put_close(running_machine *machine)
  * tape_put_bit
  * port FF tape status bit changed. Figure out what to do with it ;-)
  *******************************************************************/
-static void tape_put_bit(void)
+static void tape_put_bit(running_machine *machine)
 {
 	int now_cycles = activecpu_gettotalcycles();
 	int diff = now_cycles - put_cycles;
@@ -502,7 +500,7 @@ static void tape_put_bit(void)
 	if( diff > 4000 )
 	{
 		/* reset tape output */
-		tape_put_close(Machine);
+		tape_put_close(machine);
 		put_bit_count = tape_bits = in_sync = 0;
 	}
 	else
@@ -748,7 +746,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 	{
 		/* virtual tape ? */
 		if( readinputport(0) & 0x08 )
-			tape_put_bit();
+			tape_put_bit(machine);
 		else
 			DAC_data_w(0,(data & FF_CAS) ? 127:0 );
 	}

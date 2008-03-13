@@ -216,42 +216,42 @@ static WRITE16_HANDLER ( lisa_IO_w );
 	Interrupt handling
 */
 
-static void lisa_field_interrupts(void)
+static void lisa_field_interrupts(running_machine *machine)
 {
 	if (parity_error_pending)
 		return;	/* don't touch anything... */
 
 	/*if (RSIR)
 		// serial interrupt
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int0)
 		// external interrupt
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int1)
 		// external interrupt
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int2)
 		// external interrupt
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else*/ if (KBIR)
 		/* COPS VIA interrupt */
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (FDIR || VTIR)
 		/* floppy disk or VBl */
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 		/* clear all interrupts */
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
-static void set_parity_error_pending(int value)
+static void set_parity_error_pending(running_machine *machine, int value)
 {
 #if 0
 	/* does not work well due to bugs in 68k cores */
 	parity_error_pending = value;
 	if (parity_error_pending)
 	{
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else
 	{
@@ -261,23 +261,23 @@ static void set_parity_error_pending(int value)
 	/* work-around... */
 	if ((! parity_error_pending) && value)
 	{
-		parity_error_pending = TRUE;
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
+		parity_error_pending = 1;
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else if (parity_error_pending && (! value))
 	{
-		parity_error_pending = FALSE;
-		lisa_field_interrupts();
+		parity_error_pending = 0;
+		lisa_field_interrupts(machine);
 	}
 #endif
 }
 
-INLINE void set_VTIR(int value)
+INLINE void set_VTIR(running_machine *machine, int value)
 {
 	if (VTIR != value)
 	{
 		VTIR = value;
-		lisa_field_interrupts();
+		lisa_field_interrupts(machine);
 	}
 }
 
@@ -519,7 +519,7 @@ static TIMER_CALLBACK(read_COPS_command)
 {
 	int command;
 
-	COPS_Ready = FALSE;
+	COPS_Ready = 0;
 
 	/*logerror("read_COPS_command : trying to send data to VIA\n");*/
 	COPS_send_data_if_possible();
@@ -687,7 +687,7 @@ static TIMER_CALLBACK(read_COPS_command)
 /* this timer callback raises the COPS Ready line, which tells the COPS is about to read a command */
 static TIMER_CALLBACK(set_COPS_ready)
 {
-	COPS_Ready = TRUE;
+	COPS_Ready = 1;
 
 	/* impulsion width : +/- 20us */
 	timer_set(ATTOTIME_IN_USEC(20), NULL, 0, read_COPS_command);
@@ -751,7 +751,7 @@ static void plug_keyboard(void)
 /* called at power-up */
 static void init_COPS(void)
 {
-	COPS_Ready = FALSE;
+	COPS_Ready = 0;
 
 	/* read command every ms (don't know the real value) */
 	timer_pulse(ATTOTIME_IN_MSEC(1), NULL, 0, set_COPS_ready);
@@ -819,7 +819,7 @@ static WRITE8_HANDLER(COPS_via_out_b)
 	{
 		if (COPS_force_unplug)
 		{
-			COPS_force_unplug = FALSE;
+			COPS_force_unplug = 0;
 			plug_keyboard();
 		}
 	}
@@ -827,7 +827,7 @@ static WRITE8_HANDLER(COPS_via_out_b)
 	{
 		if (! COPS_force_unplug)
 		{
-			COPS_force_unplug = TRUE;
+			COPS_force_unplug = 1;
 			unplug_keyboard();
 			//reset_COPS();
 		}
@@ -844,7 +844,7 @@ static void COPS_via_irq_func(int val)
 	if (KBIR != val)
 	{
 		KBIR = val;
-		lisa_field_interrupts();
+		lisa_field_interrupts(Machine);
 	}
 }
 
@@ -1143,23 +1143,23 @@ MACHINE_RESET( lisa )
 
 	/* init MMU */
 
-	setup = TRUE;
+	setup = 1;
 
 	seg = 0;
 
 	/* init parity */
 
-	diag2 = FALSE;
-	test_parity = FALSE;
-	parity_error_pending = FALSE;
+	diag2 = 0;
+	test_parity = 0;
+	parity_error_pending = 0;
 
 	bad_parity_count = 0;
 	memset(bad_parity_table, 0, 0x40000);	/* Clear */
 
 	/* init video */
 
-	VTMSK = FALSE;
-	set_VTIR(FALSE);
+	VTMSK = 0;
+	set_VTIR(machine, 0);
 
 	video_address_latch = 0;
 	videoram_ptr = (UINT16 *) lisa_ram_ptr;
@@ -1296,7 +1296,7 @@ INTERRUPT_GEN( lisa_interrupt )
 
 	/* set VBI */
 	if (VTMSK)
-		set_VTIR(TRUE);
+		set_VTIR(machine, 1);
 
 	/* do keyboard scan */
 	scan_keyboard();
@@ -1309,7 +1309,7 @@ INTERRUPT_GEN( lisa_interrupt )
 	cannot support 2 floppy drives)...
 */
 
-INLINE void lisa_fdc_ttl_glue_access(offs_t offset)
+INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 {
 	switch ((offset & 0x000E) >> 1)
 	{
@@ -1353,7 +1353,7 @@ INLINE void lisa_fdc_ttl_glue_access(offs_t offset)
 		break;
 	case 7:
 		FDIR = offset & 1;	/* Interrupt request to 68k */
-		lisa_field_interrupts();
+		lisa_field_interrupts(machine);
 		break;
 	}
 }
@@ -1369,7 +1369,7 @@ READ8_HANDLER ( lisa_fdc_io_r )
 		break;
 
 	case 1:	/* TTL glue */
-		lisa_fdc_ttl_glue_access(offset);
+		lisa_fdc_ttl_glue_access(machine, offset);
 		answer = 0;	/* ??? */
 		break;
 
@@ -1394,7 +1394,7 @@ WRITE8_HANDLER ( lisa_fdc_io_w )
 		break;
 
 	case 1:	/* TTL glue */
-		lisa_fdc_ttl_glue_access(offset);
+		lisa_fdc_ttl_glue_access(machine, offset);
 		break;
 
 	case 2:	/* writes the PWM register */
@@ -1546,7 +1546,7 @@ READ16_HANDLER ( lisa_r )
 					&& (bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
 			{
 				mem_err_addr_latch = address >> 5;
-				set_parity_error_pending(TRUE);
+				set_parity_error_pending(machine, 1);
 			}
 			break;
 
@@ -1563,7 +1563,7 @@ READ16_HANDLER ( lisa_r )
 					&& (bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
 			{
 				mem_err_addr_latch = address >> 5;
-				set_parity_error_pending(TRUE);
+				set_parity_error_pending(machine, 1);
 			}
 			break;
 
@@ -1879,7 +1879,7 @@ WRITE16_HANDLER ( lisa_w )
 *                                                                                      *
 \**************************************************************************************/
 
-INLINE void cpu_board_control_access(offs_t offset)
+INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 {
 	switch ((offset & 0x03ff) << 1)
 	{
@@ -1887,10 +1887,10 @@ INLINE void cpu_board_control_access(offs_t offset)
 	case 0x0000:	/* Reset DIAG1 Latch */
 		break;
 	case 0x0006:	/* Set Diag2 Latch */
-		diag2 = TRUE;
+		diag2 = 1;
 		break;
 	case 0x0004:	/* ReSet Diag2 Latch */
-		diag2 = FALSE;
+		diag2 = 0;
 		break;
 	case 0x000A:	/* SEG1 Context Selection bit SET */
 		/*logerror("seg bit 0 set\n");*/
@@ -1909,27 +1909,27 @@ INLINE void cpu_board_control_access(offs_t offset)
 		seg &= ~2;
 		break;
 	case 0x0010:	/* SETUP register SET */
-		setup = TRUE;
+		setup = 1;
 		break;
 	case 0x0012:	/* SETUP register RESET */
-		setup = FALSE;
+		setup = 0;
 		break;
 	case 0x001A:	/* Enable Vertical Retrace Interrupt */
-		VTMSK = TRUE;
+		VTMSK = 1;
 		break;
 	case 0x0018:	/* Disable Vertical Retrace Interrupt */
-		VTMSK = FALSE;
-		set_VTIR(FALSE);
+		VTMSK = 0;
+		set_VTIR(machine, 0);
 		break;
 	case 0x0016:	/* Enable Soft Error Detect. */
 	case 0x0014:	/* Disable Soft Error Detect. */
 		break;
 	case 0x001E:	/* Enable Hard Error Detect */
-		test_parity = TRUE;
+		test_parity = 1;
 		break;
 	case 0x001C:	/* Disable Hard Error Detect */
-		test_parity = FALSE;
-		set_parity_error_pending(FALSE);
+		test_parity = 0;
+		set_parity_error_pending(machine, 0);
 		break;
 	}
 }
@@ -2004,7 +2004,7 @@ static READ16_HANDLER ( lisa_IO_r )
 		switch ((offset & 0x0C00) >> 10)
 		{
 		case 0x0:	/* cpu board control */
-			cpu_board_control_access(offset & 0x03ff);
+			cpu_board_control_access(machine, offset & 0x03ff);
 			break;
 
 		case 0x1:	/* Video Address Latch */
@@ -2094,7 +2094,7 @@ static WRITE16_HANDLER ( lisa_IO_w )
 		switch ((offset & 0x0C00) >> 10)
 		{
 		case 0x0:	/* cpu board control */
-			cpu_board_control_access(offset & 0x03ff);
+			cpu_board_control_access(machine, offset & 0x03ff);
 			break;
 
 		case 0x1:	/* Video Address Latch */

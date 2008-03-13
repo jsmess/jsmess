@@ -93,7 +93,7 @@ DRIVER_INIT( europc )
 	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253);
 
 	europc_rtc_init();
-//	europc_rtc_set_time();
+//	europc_rtc_set_time(machine);
 }
 
 DRIVER_INIT( t1000hx )

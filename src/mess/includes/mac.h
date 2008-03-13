@@ -40,7 +40,7 @@ WRITE16_HANDLER ( mac_scc_w );
 READ16_HANDLER ( macplus_scsi_r );
 WRITE16_HANDLER ( macplus_scsi_w );
 NVRAM_HANDLER( mac );
-void mac_scc_mouse_irq( int x, int y );
+void mac_scc_mouse_irq( running_machine *machine, int x, int y );
 
 
 /*----------- defined in video/mac.c -----------*/

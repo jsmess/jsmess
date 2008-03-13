@@ -126,7 +126,7 @@ static UINT32 bebox_crossproc_interrupts;
  *
  *************************************/
 
-static void bebox_update_interrupts(void);
+static void bebox_update_interrupts(running_machine *machine);
 
 static void bebox_mbreg32_w(UINT32 *target, UINT64 data, UINT64 mem_mask)
 {
@@ -162,7 +162,7 @@ WRITE64_HANDLER( bebox_cpu0_imask_w )
 			logerror("BeBox CPU #0 pc=0x%08X imask=0x%08x\n",
 				(unsigned) activecpu_get_reg(REG_PC), bebox_cpu_imask[0]);
 		}
-		bebox_update_interrupts();
+		bebox_update_interrupts(machine);
 	}
 }
 
@@ -179,7 +179,7 @@ WRITE64_HANDLER( bebox_cpu1_imask_w )
 			logerror("BeBox CPU #1 pc=0x%08X imask=0x%08x\n",
 				(unsigned) activecpu_get_reg(REG_PC), bebox_cpu_imask[1]);
 		}
-		bebox_update_interrupts();
+		bebox_update_interrupts(machine);
 	}
 }
 
@@ -246,7 +246,7 @@ WRITE64_HANDLER( bebox_processor_resets_w )
 }
 
 
-static void bebox_update_interrupts(void)
+static void bebox_update_interrupts(running_machine *machine)
 {
 	int cpunum;
 	UINT32 interrupt;
@@ -261,12 +261,12 @@ static void bebox_update_interrupts(void)
 				bebox_interrupts, bebox_cpu_imask[cpunum], interrupt ? "on" : "off");
 		}
 
-		cpunum_set_input_line(Machine, cpunum, INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, cpunum, INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 
-static void bebox_set_irq_bit(unsigned int interrupt_bit, int val)
+static void bebox_set_irq_bit(running_machine *machine, unsigned int interrupt_bit, int val)
 {
 	static const char *const interrupt_names[32] =
 	{
@@ -325,7 +325,7 @@ static void bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 
 	/* if interrupt values have changed, update the lines */
 	if (bebox_interrupts != old_interrupts)
-		bebox_update_interrupts();
+		bebox_update_interrupts(machine);
 }
 
 
@@ -369,7 +369,7 @@ static const uart8250_interface bebox_uart_inteface =
 
 static void bebox_fdc_interrupt(int state)
 {
-	bebox_set_irq_bit(13, state);
+	bebox_set_irq_bit(Machine, 13, state);
 	pic8259_set_irq_line(0, 6, state);
 }
 
@@ -409,7 +409,7 @@ READ64_HANDLER( bebox_interrupt_ack_r )
 	result = pic8259_acknowledge(0);
 	if (result == 2)
 		result = pic8259_acknowledge(1);
-	bebox_set_irq_bit(5, 0);	/* HACK */
+	bebox_set_irq_bit(machine, 5, 0);	/* HACK */
 	return ((UINT64) result) << 56;
 }
 
@@ -421,7 +421,7 @@ static void bebox_pic_set_int_line(int which, int interrupt)
 	{
 		case 0:
 			/* Master */
-			bebox_set_irq_bit(5, interrupt);
+			bebox_set_irq_bit(Machine, 5, interrupt);
 			break;
 
 		case 1:
@@ -479,7 +479,7 @@ WRITE64_HANDLER( bebox_800003F0_w )
 
 static void bebox_ide_interrupt(int state)
 {
-	bebox_set_irq_bit(7, state);
+	bebox_set_irq_bit(Machine, 7, state);
 	pic8259_set_irq_line(1, 6, state);
 }
 
@@ -766,7 +766,7 @@ WRITE64_HANDLER( bebox_flash_w )
 
 static void bebox_keyboard_interrupt(int state)
 {
-	bebox_set_irq_bit(16, state);
+	bebox_set_irq_bit(Machine, 16, state);
 	pic8259_set_irq_line(0, 1, state);
 }
 
@@ -865,8 +865,8 @@ static UINT32 scsi53c810_fetch(UINT32 dsp)
 
 static void scsi53c810_irq_callback(void)
 {
-	bebox_set_irq_bit(21, 1);
-	bebox_set_irq_bit(21, 0);
+	bebox_set_irq_bit(Machine, 21, 1);
+	bebox_set_irq_bit(Machine, 21, 0);
 }
 
 

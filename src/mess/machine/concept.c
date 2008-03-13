@@ -82,7 +82,7 @@ static struct
 	write8_machine_func rom_write;
 } expansion_slots[4];
 
-static void concept_fdc_init(int slot);
+static void concept_fdc_init(running_machine *machine, int slot);
 static void concept_hdc_init(int slot);
 
 MACHINE_START(concept)
@@ -97,7 +97,7 @@ MACHINE_START(concept)
 
 	/* initialize clock interface */
 	clock_enable = 0/*1*/;
-	mm58274c_init(0, 0);
+	mm58274c_init(machine, 0, 0);
 
 	/* clear keyboard interface state */
 	KeyQueueHead = KeyQueueLen = 0;
@@ -107,7 +107,7 @@ MACHINE_START(concept)
 	memset(expansion_slots, 0, sizeof(expansion_slots));
 
 	concept_hdc_init(1);	/* Flat cable Hard Disk Controller in Slot 2 */
-	concept_fdc_init(2);	/* Floppy Disk Controller in Slot 3 */
+	concept_fdc_init(machine, 2);	/* Floppy Disk Controller in Slot 3 */
 }
 
 static void install_expansion_slot(int slot,
@@ -142,7 +142,7 @@ VIDEO_UPDATE(concept)
 	return 0;
 }
 
-static void concept_set_interrupt(int level, int state)
+static void concept_set_interrupt(running_machine *machine, int level, int state)
 {
 	int interrupt_mask;
 	int final_level;
@@ -157,10 +157,10 @@ static void concept_set_interrupt(int level, int state)
 
 	if (final_level)
 		/* assert interrupt */
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_1+final_level-1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_1+final_level-1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 		/* clear all interrupts */
-		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 INLINE void post_in_KeyQueue(int keycode)
@@ -169,7 +169,7 @@ INLINE void post_in_KeyQueue(int keycode)
 	KeyQueueLen++;
 }
 
-static void poll_keyboard(void)
+static void poll_keyboard(running_machine *machine)
 {
 	UINT32 keystate;
 	UINT32 key_transitions;
@@ -201,7 +201,7 @@ static void poll_keyboard(void)
 						KeyStateSave[i] &= ~ (1 << j);
 
 					post_in_KeyQueue(keycode);
-					concept_set_interrupt(KEYINT_level, 1);
+					concept_set_interrupt(machine, KEYINT_level, 1);
 				}
 			}
 		}
@@ -210,7 +210,7 @@ static void poll_keyboard(void)
 
 INTERRUPT_GEN( concept_interrupt )
 {
-	poll_keyboard();
+	poll_keyboard(machine);
 }
 
 /*
@@ -276,7 +276,7 @@ static WRITE8_HANDLER(via_out_cb2)
 */
 static void via_irq_func(int state)
 {
-	concept_set_interrupt(TIMINT_level, state);
+	concept_set_interrupt(Machine, TIMINT_level, state);
 }
 
 READ16_HANDLER(concept_io_r)
@@ -362,7 +362,7 @@ READ16_HANDLER(concept_io_r)
 				}
 
 				if (!KeyQueueLen)
-					concept_set_interrupt(KEYINT_level, 0);
+					concept_set_interrupt(machine, KEYINT_level, 0);
 
 				return reply;
 
@@ -574,12 +574,12 @@ static  READ8_HANDLER(concept_fdc_reg_r);
 static WRITE8_HANDLER(concept_fdc_reg_w);
 static  READ8_HANDLER(concept_fdc_rom_r);
 
-static void concept_fdc_init(int slot)
+static void concept_fdc_init(running_machine *machine, int slot)
 {
 	fdc_local_status = 0;
 	fdc_local_command = 0;
 
-	wd17xx_init(Machine, WD_TYPE_179X, fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_179X, fdc_callback, NULL);
 
 	install_expansion_slot(slot, concept_fdc_reg_r, concept_fdc_reg_w, concept_fdc_rom_r, NULL);
 }

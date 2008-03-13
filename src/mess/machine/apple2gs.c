@@ -310,7 +310,7 @@ static const char *apple2gs_irq_name(UINT8 irq_mask)
 
 
 
-static void apple2gs_add_irq(UINT8 irq_mask)
+static void apple2gs_add_irq(running_machine *machine, UINT8 irq_mask)
 {
 	if ((apple2gs_pending_irqs & irq_mask) == 0x00)
 	{
@@ -318,13 +318,13 @@ static void apple2gs_add_irq(UINT8 irq_mask)
 			logerror("apple2gs_add_irq(): adding %s\n", apple2gs_irq_name(irq_mask));
 
 		apple2gs_pending_irqs |= irq_mask;
-		cpunum_set_input_line(Machine, 0, G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 
 
-static void apple2gs_remove_irq(UINT8 irq_mask)
+static void apple2gs_remove_irq(running_machine *machine, UINT8 irq_mask)
 {
 	if (apple2gs_pending_irqs & irq_mask)
 	{
@@ -332,7 +332,7 @@ static void apple2gs_remove_irq(UINT8 irq_mask)
 			logerror("apple2gs_remove_irq(): removing %s\n", apple2gs_irq_name(irq_mask));
 
 		apple2gs_pending_irqs &= ~irq_mask;
-		cpunum_set_input_line(Machine, 0, G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -340,11 +340,11 @@ void apple2gs_doc_irq(int state)
 {
 	if (state)
 	{
-		apple2gs_add_irq(IRQ_DOC);
+		apple2gs_add_irq(Machine, IRQ_DOC);
 	}
 	else
 	{
-		apple2gs_remove_irq(IRQ_DOC);
+		apple2gs_remove_irq(Machine, IRQ_DOC);
 	}
 }
 
@@ -355,7 +355,7 @@ static TIMER_CALLBACK( apple2gs_clock_tick )
 	if ((apple2gs_vgcint & 0x04) && !(apple2gs_vgcint & 0x40))
 	{
 		apple2gs_vgcint |= 0xc0;
-		apple2gs_add_irq(IRQ_VGC_SECOND);
+		apple2gs_add_irq(machine, IRQ_VGC_SECOND);
 	}
 }
 
@@ -366,7 +366,7 @@ static TIMER_CALLBACK( apple2gs_qsecond_tick )
 	if ((apple2gs_inten & 0x10) && !(apple2gs_intflag & 0x10))
 	{
 		apple2gs_intflag |= 0x10;
-		apple2gs_add_irq(IRQ_INTEN_QSECOND);
+		apple2gs_add_irq(machine, IRQ_INTEN_QSECOND);
 	}
 }
 
@@ -697,7 +697,7 @@ static void adb_write_kmstatus(UINT8 data)
 
 
 
-static UINT8 adb_read_mousedata(void)
+static UINT8 adb_read_mousedata(running_machine *machine)
 {
 	UINT8 result = 0x00;
 	UINT8 absolute;
@@ -710,7 +710,7 @@ static UINT8 adb_read_mousedata(void)
 			absolute = apple2gs_mouse_y;
 			delta = apple2gs_mouse_dy;
 			adb_kmstatus &= ~0x82;
-			apple2gs_remove_irq(IRQ_ADB_MOUSE);
+			apple2gs_remove_irq(machine, IRQ_ADB_MOUSE);
 		}
 		else
 		{
@@ -743,7 +743,7 @@ static INT8 seven_bit_diff(UINT8 v1, UINT8 v2)
 
 
 
-static void adb_check_mouse(void)
+static void adb_check_mouse(running_machine *machine)
 {
 	UINT8 new_mouse_x, new_mouse_y;
 
@@ -763,26 +763,26 @@ static void adb_check_mouse(void)
 			adb_kmstatus |= 0x80;
 			adb_kmstatus &= ~0x02;
 			if (adb_kmstatus & 0x40)
-				apple2gs_add_irq(IRQ_ADB_MOUSE);
+				apple2gs_add_irq(machine, IRQ_ADB_MOUSE);
 		}
 	}
 }
 
 
 
-static void apple2gs_set_scanint(UINT8 data)
+static void apple2gs_set_scanint(running_machine *machine, UINT8 data)
 {
 	/* second interrupt */
 	if ((apple2gs_vgcint & 0x40) && !(data & 0x40))
 	{
-		apple2gs_remove_irq(IRQ_VGC_SECOND);
+		apple2gs_remove_irq(machine, IRQ_VGC_SECOND);
 		apple2gs_vgcint &= ~0xC0;
 	}
 
 	/* scanline interrupt */
 	if ((apple2gs_vgcint & 0x20) && !(data & 0x20))
 	{
-		apple2gs_remove_irq(IRQ_VGC_SCANLINE);
+		apple2gs_remove_irq(machine, IRQ_VGC_SCANLINE);
 		apple2gs_vgcint &= ~0xA0;
 	}
 
@@ -812,7 +812,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 		if (scb & 0x40)
 		{
 			apple2gs_vgcint |= 0xa0;
-			apple2gs_add_irq(IRQ_VGC_SCANLINE);
+			apple2gs_add_irq(machine, IRQ_VGC_SCANLINE);
 		}
 	}
 
@@ -822,14 +822,14 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 		if ((apple2gs_inten & 0x08) && !(apple2gs_intflag & 0x08))
 		{
 			apple2gs_intflag |= 0x08;
-			apple2gs_add_irq(IRQ_INTEN_VBL);
+			apple2gs_add_irq(machine, IRQ_INTEN_VBL);
 		}
 	}
 
 	/* check the mouse status */
 	if ((scanline % 8) == 0)
 	{
-		adb_check_mouse();
+		adb_check_mouse(machine);
 
 		/* call Apple II interrupt handler */
 		if ((video_screen_get_vpos(0) % 8) == 7)
@@ -979,7 +979,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x24:	/* C024 - MOUSEDATA */
-			result = adb_read_mousedata();
+			result = adb_read_mousedata(machine);
 			break;
 
 		case 0x25:	/* C025 - KEYMODREG */
@@ -1153,7 +1153,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			break;
 
 		case 0x32:	/* C032 - SCANINT */
-			apple2gs_set_scanint(data);
+			apple2gs_set_scanint(machine, data);
 			break;
 
 		case 0x33:	/* C033 - CLOCKDATA */
@@ -1197,15 +1197,15 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 		case 0x41:	/* C041 - INTEN */
 			apple2gs_inten = data & 0x1F;
 			if ((apple2gs_inten & 0x10) == 0x00)
-				apple2gs_remove_irq(IRQ_INTEN_QSECOND);
+				apple2gs_remove_irq(machine, IRQ_INTEN_QSECOND);
 			if ((apple2gs_inten & 0x08) == 0x00)
-				apple2gs_remove_irq(IRQ_INTEN_VBL);
+				apple2gs_remove_irq(machine, IRQ_INTEN_VBL);
 			break;
 
 		case 0x47:	/* C047 - CLRVBLINT */
 			apple2gs_intflag &= ~0x18;
-			apple2gs_remove_irq(IRQ_INTEN_QSECOND);
-			apple2gs_remove_irq(IRQ_INTEN_VBL);
+			apple2gs_remove_irq(machine, IRQ_INTEN_QSECOND);
+			apple2gs_remove_irq(machine, IRQ_INTEN_VBL);
 			break;
 
 		case 0x68:	/* C068 - STATEREG */

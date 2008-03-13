@@ -199,7 +199,7 @@ static void nes_machine_stop(running_machine *machine)
 
 
 
-static int zapper_hit_pixel(const nes_input *input)
+static int zapper_hit_pixel(running_machine *machine, const nes_input *input)
 {
 	UINT16 pix = 0;
 	rgb_t col;
@@ -209,7 +209,7 @@ static int zapper_hit_pixel(const nes_input *input)
 	if (nes_zapper_hack)
 		pix = *BITMAP_ADDR16(nes_zapper_hack, input->i2, input->i1);
 
-	col = palette_get_color(Machine, pix);
+	col = palette_get_color(machine, pix);
 	r = (UINT8) (col >> 16);
 	g = (UINT8) (col >> 8);
 	b = (UINT8) (col >> 0);
@@ -239,7 +239,7 @@ static int zapper_hit_pixel(const nes_input *input)
 		retVal |= ((in_0.i0 & 0x01) << 4);
 
 		/* Look at the screen and see if the cursor is over a bright pixel */
-		if (zapper_hit_pixel(&in_0))
+		if (zapper_hit_pixel(machine, &in_0))
 			retVal &= ~0x08; /* sprite hit */
 		else
 			retVal |= 0x08;  /* no sprite hit */
@@ -274,7 +274,7 @@ static int zapper_hit_pixel(const nes_input *input)
 		retVal |= ((in_1.i0 & 0x01) << 4);
 
 		/* Look at the screen and see if the cursor is over a bright pixel */
-		if (zapper_hit_pixel(&in_1))
+		if (zapper_hit_pixel(machine, &in_1))
 			retVal &= ~0x08; /* sprite hit */
 		else
 			retVal |= 0x08;  /* no sprite hit */

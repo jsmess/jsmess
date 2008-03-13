@@ -148,7 +148,7 @@ typedef struct {
 
 /* these are in cpm_bios.c */
 DEVICE_LOAD( cpm_floppy );
-extern int cpm_init(int n, const char *const ids[]);
+extern int cpm_init(running_machine *machine, int n, const char *const ids[]);
 
 extern READ8_HANDLER ( cpm_bios_command_r );
 extern WRITE8_HANDLER ( cpm_bios_command_w );

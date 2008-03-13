@@ -184,13 +184,13 @@ static WRITE8_HANDLER( dart_w )
 		z80dart_d_w(0, 0, data);
 		break;
 	case 1:
-		z80dart_c_w(0, 0, data);
+		z80dart_c_w(machine, 0, 0, data);
 		break;
 	case 2:
 		z80dart_d_w(0, 1, data);
 		break;
 	case 3:
-		z80dart_c_w(0, 1, data);
+		z80dart_c_w(machine, 0, 1, data);
 		break;
 	}
 }

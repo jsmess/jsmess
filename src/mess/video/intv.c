@@ -446,7 +446,7 @@ static void render_background(running_machine *machine, bitmap_t *bitmap)
 }
 
 /*
-static void draw_background(bitmap_t *bitmap, int transparency)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, int transparency)
 {
 	// First, draw the background
 	int offs = 0;
@@ -487,10 +487,10 @@ static void draw_background(bitmap_t *bitmap, int transparency)
 					if (colorb == 7) colorb = intv_color_stack[3];
 					if (colorc == 7) colorc = intv_color_stack[3];
 					if (colord == 7) colord = intv_color_stack[3];
-					plot_box(bitmap,col*16,row*16,8,8,Machine->pens[colora]);
-					plot_box(bitmap,col*16+8,row*16,8,8,Machine->pens[colorb]);
-					plot_box(bitmap,col*16,row*16+8,8,8,Machine->pens[colorc]);
-					plot_box(bitmap,col*16+8,row*16+8,8,8,Machine->pens[colord]);
+					plot_box(bitmap,col*16,row*16,8,8,machine->pens[colora]);
+					plot_box(bitmap,col*16+8,row*16,8,8,machine->pens[colorb]);
+					plot_box(bitmap,col*16,row*16+8,8,8,machine->pens[colorc]);
+					plot_box(bitmap,col*16+8,row*16+8,8,8,machine->pens[colord]);
 				}
 				else // normal color stack mode
 				{
@@ -513,14 +513,14 @@ static void draw_background(bitmap_t *bitmap, int transparency)
 						code %= 64;  // keep from going outside the array
 						//if (intv_gramdirtybytes[code] == 1)
 						{
-							decodechar(Machine->gfx[1],
+							decodechar(machine->gfx[1],
 								   code,
 								   intv_gram,
-								   Machine->config->gfxdecodeinfo[1].gfxlayout);
+								   machine->config->gfxdecodeinfo[1].gfxlayout);
 							intv_gramdirtybytes[code] = 0;
 						}
 						// Draw GRAM char
-						drawgfx(bitmap,Machine->gfx[1],
+						drawgfx(bitmap,machine->gfx[1],
 							code,
 							bgcolor*16+fgcolor,
 							0,0,col*16,row*16,
@@ -528,14 +528,14 @@ static void draw_background(bitmap_t *bitmap, int transparency)
 
 						for(j=0;j<8;j++)
 						{
-							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, Machine->pens[1]);
-							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, Machine->pens[1]);
+							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, machine->pens[1]);
+							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, machine->pens[1]);
 						}
 
 					}
 					else // read from grom
 					{
-						drawgfx(bitmap,Machine->gfx[0],
+						drawgfx(bitmap,machine->gfx[0],
 							code,
 							bgcolor*16+fgcolor,
 							0,0,col*16,row*16,
@@ -543,8 +543,8 @@ static void draw_background(bitmap_t *bitmap, int transparency)
 
 						for(j=0;j<8;j++)
 						{
-							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, Machine->pens[2]);
-							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, Machine->pens[2]);
+							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, machine->pens[2]);
+							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, machine->pens[2]);
 						}
 					}
 				}
@@ -568,14 +568,14 @@ static void draw_background(bitmap_t *bitmap, int transparency)
 				{
 					//if (intv_gramdirtybytes[code] == 1)
 					{
-						decodechar(Machine->gfx[1],
+						decodechar(machine->gfx[1],
 							   code,
 							   intv_gram,
-							   Machine->config->gfxdecodeinfo[1].gfxlayout);
+							   machine->config->gfxdecodeinfo[1].gfxlayout);
 						intv_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
-					drawgfx(bitmap,Machine->gfx[1],
+					drawgfx(bitmap,machine->gfx[1],
 						code,
 						bgcolor*16+fgcolor,
 						0,0,col*16,row*16,
@@ -583,7 +583,7 @@ static void draw_background(bitmap_t *bitmap, int transparency)
 				}
 				else // read from GROM
 				{
-					drawgfx(bitmap,Machine->gfx[0],
+					drawgfx(bitmap,machine->gfx[0],
 						code,
 						bgcolor*16+fgcolor,
 						0,0,col*16,row*16,
@@ -598,7 +598,7 @@ static void draw_background(bitmap_t *bitmap, int transparency)
 
 /* TBD: need to handle sprites behind foreground? */
 /*
-static void draw_sprites(bitmap_t *bitmap, int behind_foreground)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_foreground)
 {
 	int i;
 	int code;
@@ -616,50 +616,50 @@ static void draw_sprites(bitmap_t *bitmap, int behind_foreground)
 				{
 					//if (intv_gramdirtybytes[code] == 1)
 					{
-						decodechar(Machine->gfx[1],
+						decodechar(machine->gfx[1],
 						   code,
 						   intv_gram,
-						   Machine->config->gfxdecodeinfo[1].gfxlayout);
+						   machine->config->gfxdecodeinfo[1].gfxlayout);
 						intv_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
-					drawgfxzoom(bitmap,Machine->gfx[1],
+					drawgfxzoom(bitmap,machine->gfx[1],
 						code,
 						s->color,
 						s->xflip,s->yflip,
 						s->xpos*2-16,s->ypos*2-16,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0,
+						&machine->screen[0].visarea,TRANSPARENCY_PEN,0,
 						0x8000*s->xsize, 0x8000*s->ysize);
 				}
 				else
 				{
 					//if ((intv_gramdirtybytes[code] == 1) || (intv_gramdirtybytes[code+1] == 1))
 					{
-						decodechar(Machine->gfx[1],
+						decodechar(machine->gfx[1],
 						   code,
 						   intv_gram,
-						   Machine->config->gfxdecodeinfo[1].gfxlayout);
-						decodechar(Machine->gfx[1],
+						   machine->config->gfxdecodeinfo[1].gfxlayout);
+						decodechar(machine->gfx[1],
 						   code+1,
 						   intv_gram,
-						   Machine->config->gfxdecodeinfo[1].gfxlayout);
+						   machine->config->gfxdecodeinfo[1].gfxlayout);
 						intv_gramdirtybytes[code] = 0;
 						intv_gramdirtybytes[code+1] = 0;
 					}
 					// Draw GRAM char
-					drawgfxzoom(bitmap,Machine->gfx[1],
+					drawgfxzoom(bitmap,machine->gfx[1],
 						code,
 						s->color,
 						s->xflip,s->yflip,
 						s->xpos*2-16,s->ypos*2-16+(s->yflip)*s->ysize*8,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0,
+						&machine->screen[0].visarea,TRANSPARENCY_PEN,0,
 						0x8000*s->xsize, 0x8000*s->ysize);
-					drawgfxzoom(bitmap,Machine->gfx[1],
+					drawgfxzoom(bitmap,machine->gfx[1],
 						code+1,
 						s->color,
 						s->xflip,s->yflip,
 						s->xpos*2-16,s->ypos*2-16+(1-s->yflip)*s->ysize*8,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0,
+						&machine->screen[0].visarea,TRANSPARENCY_PEN,0,
 						0x8000*s->xsize, 0x8000*s->ysize);
 				}
 			}
@@ -668,29 +668,29 @@ static void draw_sprites(bitmap_t *bitmap, int behind_foreground)
 				if (s->yres == 1)
 				{
 					// Draw GROM char
-					drawgfxzoom(bitmap,Machine->gfx[0],
+					drawgfxzoom(bitmap,machine->gfx[0],
 						code,
 						s->color,
 						s->xflip,s->yflip,
 						s->xpos*2-16,s->ypos*2-16,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0,
+						&machine->screen[0].visarea,TRANSPARENCY_PEN,0,
 						0x8000*s->xsize, 0x8000*s->ysize);
 				}
 				else
 				{
-					drawgfxzoom(bitmap,Machine->gfx[0],
+					drawgfxzoom(bitmap,machine->gfx[0],
 						code,
 						s->color,
 						s->xflip,s->yflip,
 						s->xpos*2-16,s->ypos*2-16+(s->yflip)*s->ysize*8,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0,
+						&machine->screen[0].visarea,TRANSPARENCY_PEN,0,
 						0x8000*s->xsize, 0x8000*s->ysize);
-					drawgfxzoom(bitmap,Machine->gfx[0],
+					drawgfxzoom(bitmap,machine->gfx[0],
 						code+1,
 						s->color,
 						s->xflip,s->yflip,
 						s->xpos*2-16,s->ypos*2-16+(1-s->yflip)*s->ysize*8,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0,
+						&machine->screen[0].visarea,TRANSPARENCY_PEN,0,
 						0x8000*s->xsize, 0x8000*s->ysize);
 				}
 			}

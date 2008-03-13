@@ -738,12 +738,12 @@ DEVICE_UNLOAD(pdp1_typewriter)
 /*
 	Write a character to typewriter
 */
-static void typewriter_out(UINT8 data)
+static void typewriter_out(running_machine *machine, UINT8 data)
 {
 	if (LOG_IOT_EXTRA)
 		logerror("typewriter output %o\n", data);
 
-	pdp1_typewriter_drawchar(Machine, data);
+	pdp1_typewriter_drawchar(machine, data);
 	if (typewriter.fd)
 #if 1
 		image_fwrite(typewriter.fd, & data, 1);
@@ -868,7 +868,7 @@ void iot_tyo(int op2, int nac, int mb, int *io, int ac)
 
 	ch = (*io) & 077;
 
-	typewriter_out(ch);
+	typewriter_out(Machine, ch);
 	io_status &= ~io_st_tyo;
 
 	/* compute completion delay (source: maintainance manual 9-12, 9-13 and 9-14) */
@@ -1250,7 +1250,7 @@ void pdp1_io_sc_callback(void)
 /*
 	typewriter keyboard handler
 */
-static void pdp1_keyboard(void)
+static void pdp1_keyboard(running_machine *machine)
 {
 	int i;
 	int j;
@@ -1274,10 +1274,10 @@ static void pdp1_keyboard(void)
 			typewriter.tb = (i << 4) + j;
 			io_status |= io_st_tyi;
 			#if USE_SBS
-				cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, 0);	/* interrupt it, baby */
+				cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 0);	/* interrupt it, baby */
 			#endif
 			cpunum_set_reg(0, PDP1_PF1, 1);
-			pdp1_typewriter_drawchar(Machine, typewriter.tb);	/* we want to echo input */
+			pdp1_typewriter_drawchar(machine, typewriter.tb);	/* we want to echo input */
 			break;
 		}
 	}
@@ -1483,7 +1483,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 		old_tw_keys = 0;
 		old_ta_keys = 0;
 
-		pdp1_keyboard();
+		pdp1_keyboard(machine);
 	}
 
 	pdp1_lightpen();

@@ -453,7 +453,7 @@ void ui_update_and_render(running_machine *machine)
 
 #ifdef MESS
 	/* let MESS display its stuff */
-	mess_ui_update();
+	mess_ui_update(machine);
 #endif
 }
 
@@ -1254,7 +1254,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	}
 
 #ifdef MESS
-	if (mess_disable_builtin_ui())
+	if (mess_disable_builtin_ui(machine))
 		return 0;
 #endif
 

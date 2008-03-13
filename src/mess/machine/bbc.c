@@ -46,9 +46,9 @@ static int via_user_irq=0;
 static int MC6850_irq=0;
 static int ACCCON_IRR=0;
 
-static void bbc_setirq(void)
+static void bbc_setirq(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, via_system_irq|via_user_irq|MC6850_irq|ACCCON_IRR);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, via_system_irq|via_user_irq|MC6850_irq|ACCCON_IRR);
 }
 
 /************************
@@ -396,7 +396,7 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 
   	if (tempIRR!=ACCCON_IRR)
   	{
-		bbc_setirq();
+		bbc_setirq(machine);
 	}
 
 	if (ACCCON_Y)
@@ -1167,7 +1167,7 @@ static void bbc_via_system_irq(int level)
 {
 //  logerror("SYSTEM via irq %d %d %d\n",via_system_irq,via_user_irq,level);
   via_system_irq=level;
-  bbc_setirq();
+  bbc_setirq(Machine);
 }
 
 
@@ -1256,7 +1256,7 @@ static WRITE8_HANDLER( bbcb_via_user_write_ca2 )
 static void bbc_via_user_irq(int level)
 {
   via_user_irq=level;
-  bbc_setirq();
+  bbc_setirq(Machine);
 }
 
 
@@ -1359,7 +1359,7 @@ READ8_HANDLER (BBC_6850_r)
 static void Serial_interrupt(int level)
 {
   MC6850_irq=level;
-  bbc_setirq();
+  bbc_setirq(Machine);
   //logerror("Set SIO irq  %01x\n",level);
 }
 

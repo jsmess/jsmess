@@ -35,8 +35,8 @@ struct acia6850_interface
 void acia6850_unconfig(void);
 void acia6850_config_old( int which, const struct acia6850_interface *intf);
 void acia6850_reset(void);
-int acia6850_read( int which, int offset);
-void acia6850_write( int which, int offset, int data);
+int acia6850_read(running_machine *machine, int which, int offset);
+void acia6850_write(running_machine *machine, int which, int offset, int data);
 
  READ8_HANDLER( acia6850_0_r );
  READ8_HANDLER( acia6850_1_r );

@@ -19,7 +19,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "mc6846.h"
 
 #define VERBOSE 0
@@ -501,9 +500,8 @@ void mc6846_set_input_cp2 ( int data )
 
 
 
-UINT8 mc6846_get_output_port ( void )
+UINT8 mc6846_get_output_port ( running_machine *machine )
 {
-	running_machine *machine = Machine;
 	return PORT;
 }
 

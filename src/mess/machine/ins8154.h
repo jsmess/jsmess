@@ -25,7 +25,7 @@ struct _ins8154_interface
 
 /******************* Configuration ******************************************/
 
-void ins8154_config(int which, const ins8154_interface *intf);
+void ins8154_config(running_machine *machine, int which, const ins8154_interface *intf);
 void ins8154_reset(int which);
 
 

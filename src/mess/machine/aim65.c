@@ -79,27 +79,27 @@ static void dl1416_update(dl1416_t *chip, int index)
 	dl1416_write(chip, pia_a & 0x03, pia_b & 0x7f);
 }
 
-static void aim65_pia(void)
+static void aim65_pia(running_machine *machine)
 {
-	dl1416_update(devtag_get_token(Machine, DL1416, "ds1"), 0);
-	dl1416_update(devtag_get_token(Machine, DL1416, "ds2"), 1);
-	dl1416_update(devtag_get_token(Machine, DL1416, "ds3"), 2);
-	dl1416_update(devtag_get_token(Machine, DL1416, "ds4"), 3);
-	dl1416_update(devtag_get_token(Machine, DL1416, "ds5"), 4);
+	dl1416_update(devtag_get_token(machine, DL1416, "ds1"), 0);
+	dl1416_update(devtag_get_token(machine, DL1416, "ds2"), 1);
+	dl1416_update(devtag_get_token(machine, DL1416, "ds3"), 2);
+	dl1416_update(devtag_get_token(machine, DL1416, "ds4"), 3);
+	dl1416_update(devtag_get_token(machine, DL1416, "ds5"), 4);
 }
 
 
 static WRITE8_HANDLER( aim65_pia_a_w )
 {
 	pia_a = data;
-	aim65_pia();
+	aim65_pia(machine);
 }
 
 
 static WRITE8_HANDLER( aim65_pia_b_w )
 {
 	pia_b = data;
-	aim65_pia();
+	aim65_pia(machine);
 }
 
 

@@ -78,7 +78,7 @@ static const ttl74145_interface ic8_7445 =
 
 static DRIVER_INIT( acrnsys1 )
 {
-	ins8154_config(0, &ins8154_b1);
+	ins8154_config(machine, 0, &ins8154_b1);
 	ttl74145_config(0, &ic8_7445);
 }
 

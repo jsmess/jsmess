@@ -1981,7 +1981,7 @@ static DRIVER_INIT( x68000 )
 	nec765_reset(0);
 	mfp_init();
 	scc_init(&scc_interface);
-	rp5c15_init(&rtc_intf);
+	rp5c15_init(machine, &rtc_intf);
 
 	memset(&sys,0,sizeof(sys));
 

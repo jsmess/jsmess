@@ -706,18 +706,18 @@ enum
 	COCO3_INT_ALL	= 0x3f
 };
 
-static void d_recalc_irq(void)
+static void d_recalc_irq(running_machine *machine)
 {
 	UINT8 pia0_irq_a = pia_get_irq_a(0);
 	UINT8 pia0_irq_b = pia_get_irq_b(0);
 
 	if (pia0_irq_a || pia0_irq_b)
-		cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-static void d_recalc_firq(void)
+static void d_recalc_firq(running_machine *machine)
 {
 	UINT8 pia1_firq_a = pia_get_irq_a(1);
 	UINT8 pia1_firq_b = pia_get_irq_b(1);
@@ -725,79 +725,79 @@ static void d_recalc_firq(void)
 	UINT8 pia2_firq_b = pia_get_irq_b(2);
 
 	if (pia1_firq_a || pia1_firq_b || pia2_firq_a || pia2_firq_b)
-		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-static void coco3_recalc_irq(void)
+static void coco3_recalc_irq(running_machine *machine)
 {
 	if ((coco3_gimereg[0] & 0x20) && gime_irq)
-		cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 	else
-		d_recalc_irq();
+		d_recalc_irq(machine);
 }
 
-static void coco3_recalc_firq(void)
+static void coco3_recalc_firq(running_machine *machine)
 {
 	if ((coco3_gimereg[0] & 0x10) && gime_firq)
-		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		d_recalc_firq();
+		d_recalc_firq(machine);
 }
 
 static void d_pia0_irq_a(int state)
 {
-	d_recalc_irq();
+	d_recalc_irq(Machine);
 }
 
 static void d_pia0_irq_b(int state)
 {
-	d_recalc_irq();
+	d_recalc_irq(Machine);
 }
 
 static void d_pia1_firq_a(int state)
 {
-	d_recalc_firq();
+	d_recalc_firq(Machine);
 }
 
 static void d_pia1_firq_b(int state)
 {
-	d_recalc_firq();
+	d_recalc_firq(Machine);
 }
 
 /* Dragon Alpha second PIA IRQ lines also cause FIRQ */
 static void d_pia2_firq_a(int state)
 {
-	d_recalc_firq();
+	d_recalc_firq(Machine);
 }
 
 static void d_pia2_firq_b(int state)
 {
-	d_recalc_firq();
+	d_recalc_firq(Machine);
 }
 
 static void coco3_pia0_irq_a(int state)
 {
-	coco3_recalc_irq();
+	coco3_recalc_irq(Machine);
 }
 
 static void coco3_pia0_irq_b(int state)
 {
-	coco3_recalc_irq();
+	coco3_recalc_irq(Machine);
 }
 
 static void coco3_pia1_firq_a(int state)
 {
-	coco3_recalc_firq();
+	coco3_recalc_firq(Machine);
 }
 
 static void coco3_pia1_firq_b(int state)
 {
-	coco3_recalc_firq();
+	coco3_recalc_firq(Machine);
 }
 
-static void coco3_raise_interrupt(UINT8 mask, int state)
+static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int state)
 {
 	int lowtohigh;
 
@@ -813,7 +813,7 @@ static void coco3_raise_interrupt(UINT8 mask, int state)
 		if ((coco3_gimereg[0] & 0x20) && (coco3_gimereg[2] & mask))
 		{
 			gime_irq |= (coco3_gimereg[2] & mask);
-			coco3_recalc_irq();
+			coco3_recalc_irq(machine);
 
 			if (LOG_INT_COCO3)
 				logerror("CoCo3 Interrupt: Raising IRQ; scanline=%i\n", video_screen_get_vpos(0));
@@ -821,7 +821,7 @@ static void coco3_raise_interrupt(UINT8 mask, int state)
 		if ((coco3_gimereg[0] & 0x10) && (coco3_gimereg[3] & mask))
 		{
 			gime_firq |= (coco3_gimereg[3] & mask);
-			coco3_recalc_firq();
+			coco3_recalc_firq(machine);
 
 			if (LOG_INT_COCO3)
 				logerror("CoCo3 Interrupt: Raising FIRQ; scanline=%i\n", video_screen_get_vpos(0));
@@ -834,7 +834,7 @@ static void coco3_raise_interrupt(UINT8 mask, int state)
 void coco3_horizontal_sync_callback(int data)
 {
 	pia_0_ca1_w(Machine, 0, data);
-	coco3_raise_interrupt(COCO3_INT_HBORD, data);
+	coco3_raise_interrupt(Machine, COCO3_INT_HBORD, data);
 }
 
 
@@ -844,11 +844,11 @@ void coco3_field_sync_callback(int data)
 	pia_0_cb1_w(Machine, 0, data);
 }
 
-void coco3_gime_field_sync_callback(void)
+void coco3_gime_field_sync_callback(running_machine *machine)
 {
 	/* the CoCo 3 VBORD interrupt triggers right after the display */
-	coco3_raise_interrupt(COCO3_INT_VBORD, 1);
-	coco3_raise_interrupt(COCO3_INT_VBORD, 0);
+	coco3_raise_interrupt(machine, COCO3_INT_VBORD, 1);
+	coco3_raise_interrupt(machine, COCO3_INT_VBORD, 0);
 }
 
 
@@ -859,25 +859,26 @@ void coco3_gime_field_sync_callback(void)
 
 static TIMER_CALLBACK(d_recalc_interrupts)
 {
-	d_recalc_firq();
-	d_recalc_irq();
+	d_recalc_firq(machine);
+	d_recalc_irq(machine);
 }
 
 static TIMER_CALLBACK(coco3_recalc_interrupts)
 {
-	coco3_recalc_firq();
-	coco3_recalc_irq();
+	coco3_recalc_firq(machine);
+	coco3_recalc_irq(machine);
 }
 
 static timer_fired_func recalc_interrupts;
 
-void coco_set_halt_line(int halt_line)
+#ifdef UNUSED_FUNCTION
+void coco_set_halt_line(running_machine *machine, int halt_line)
 {
 	cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
 		timer_set(ATTOTIME_IN_CYCLES(1,0), NULL, 0, recalc_interrupts);
 }
-
+#endif
 
 /***************************************************************************
 	Input device abstractions
@@ -1336,7 +1337,7 @@ static UINT8 coco3_update_keyboard(void)
 	/* the CoCo 3 keyboard update routine must also check for the GIME EI1 interrupt */
 	UINT8 porta;
 	porta = coco_update_keyboard();
-	coco3_raise_interrupt(COCO3_INT_EI1, ((porta & 0x7F) == 0x7F) ? CLEAR_LINE : ASSERT_LINE);
+	coco3_raise_interrupt(Machine, COCO3_INT_EI1, ((porta & 0x7F) == 0x7F) ? CLEAR_LINE : ASSERT_LINE);
 	return porta;
 }
 
@@ -2052,8 +2053,8 @@ static TIMER_CALLBACK(coco3_timer_proc)
 {
 	coco3_timer_reset();
 	coco3_vh_blink();
-	coco3_raise_interrupt(COCO3_INT_TMR, 1);
-	coco3_raise_interrupt(COCO3_INT_TMR, 0);
+	coco3_raise_interrupt(machine, COCO3_INT_TMR, 1);
+	coco3_raise_interrupt(machine, COCO3_INT_TMR, 0);
 }
 
 
@@ -2272,7 +2273,7 @@ READ8_HANDLER(coco3_gime_r)
 		result = gime_irq;
 		if (result) {
 			gime_irq = 0;
-			coco3_recalc_irq();
+			coco3_recalc_irq(machine);
 		}
 		break;
 
@@ -2280,7 +2281,7 @@ READ8_HANDLER(coco3_gime_r)
 		result = gime_firq;
 		if (result) {
 			gime_firq = 0;
-			coco3_recalc_firq();
+			coco3_recalc_firq(machine);
 		}
 		break;
 
@@ -2596,7 +2597,7 @@ static TIMER_CALLBACK(coco_cart_timer_proc)
 static TIMER_CALLBACK(coco3_cart_timer_proc)
 {
 	int data = param;
-	coco3_raise_interrupt(COCO3_INT_EI0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	coco3_raise_interrupt(machine, COCO3_INT_EI0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 	coco_cart_timer_w(machine, data);
 }
 

@@ -328,7 +328,7 @@ WRITE8_HANDLER( apple3_00xx_w )
 
 
 
-static void apple3_update_memory(void)
+static void apple3_update_memory(running_machine *machine)
 {
 	UINT16 bank;
 	UINT8 page;
@@ -338,7 +338,7 @@ static void apple3_update_memory(void)
 		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", via_0_b, via_1_a);
 	}
 
-	cpunum_set_clock(Machine, 0, (via_0_a & 0x80) ? 1000000 : 2000000);
+	cpunum_set_clock(machine, 0, (via_0_a & 0x80) ? 1000000 : 2000000);
 
 	/* bank 2 (0100-01FF) */
 	if (!(via_0_a & 0x04))
@@ -459,12 +459,12 @@ static void apple3_update_memory(void)
 
 
 
-static void apple3_via_out(UINT8 *var, UINT8 data)
+static void apple3_via_out(running_machine *machine, UINT8 *var, UINT8 data)
 {
 	if (*var != data)
 	{
 		*var = data;
-		apple3_update_memory();
+		apple3_update_memory(machine);
 	}
 }
 
@@ -473,10 +473,10 @@ static void apple3_via_out(UINT8 *var, UINT8 data)
 static READ8_HANDLER(apple3_via_1_in_a) { return ~0; }
 static READ8_HANDLER(apple3_via_1_in_b) { return ~0; }
 
-static WRITE8_HANDLER(apple3_via_0_out_a) { apple3_via_out(&via_0_a, data); }
-static WRITE8_HANDLER(apple3_via_0_out_b) { apple3_via_out(&via_0_b, data); }
-static WRITE8_HANDLER(apple3_via_1_out_a) { apple3_via_out(&via_1_a, data); }
-static WRITE8_HANDLER(apple3_via_1_out_b) { apple3_via_out(&via_1_b, data); }
+static WRITE8_HANDLER(apple3_via_0_out_a) { apple3_via_out(machine, &via_0_a, data); }
+static WRITE8_HANDLER(apple3_via_0_out_b) { apple3_via_out(machine, &via_0_b, data); }
+static WRITE8_HANDLER(apple3_via_1_out_a) { apple3_via_out(machine, &via_1_a, data); }
+static WRITE8_HANDLER(apple3_via_1_out_b) { apple3_via_out(machine, &via_1_b, data); }
 
 static void apple2_via_1_irq_func(int state)
 {
@@ -723,7 +723,7 @@ DRIVER_INIT( apple3 )
 	via_0_a = ~0;
 	via_1_a = ~0;
 	via_1_irq = 0;
-	apple3_update_memory();
+	apple3_update_memory(machine);
 
 	memory_set_opbase_handler(0, apple3_opbase);
 

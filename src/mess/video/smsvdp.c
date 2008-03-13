@@ -110,7 +110,7 @@ static struct _smsvdp {
 } smsvdp;
 
 static TIMER_CALLBACK(smsvdp_display_callback);
-static void sms_refresh_line(bitmap_t *bitmap, int offsetx, int offsety, int line);
+static void sms_refresh_line(running_machine *machine, bitmap_t *bitmap, int offsetx, int offsety, int line);
 static void sms_update_palette(void);
 
 static void set_display_settings( running_machine *machine ) {
@@ -281,7 +281,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
-		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit - smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V], vpos - ( vpos_limit - smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V] ) );
+		sms_refresh_line( machine, tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit - smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V], vpos - ( vpos_limit - smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V] ) );
 		return;
 	}
 
@@ -323,7 +323,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 			rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
 			fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
-			sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit );
+			sms_refresh_line( machine, tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit );
 		}
 		return;
 	}
@@ -347,7 +347,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
-		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit + smsvdp.sms_frame_timing[TOP_BORDER], vpos - ( vpos_limit + smsvdp.sms_frame_timing[TOP_BORDER] ) );
+		sms_refresh_line( machine, tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit + smsvdp.sms_frame_timing[TOP_BORDER], vpos - ( vpos_limit + smsvdp.sms_frame_timing[TOP_BORDER] ) );
 		return;
 	}
 }
@@ -913,7 +913,7 @@ static void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	sms_refresh_tms9918_sprites( lineBuffer, line );
 }
 
-static void sms_refresh_line( bitmap_t *bitmap, int pixelOffsetX, int pixelPlotY, int line ) {
+static void sms_refresh_line( running_machine *machine, bitmap_t *bitmap, int pixelOffsetX, int pixelPlotY, int line ) {
 	int x;
 	int *blitLineBuffer = smsvdp.line_buffer;
 
@@ -992,10 +992,10 @@ static void sms_refresh_line( bitmap_t *bitmap, int pixelOffsetX, int pixelPlotY
 			line4 = smsvdp.line_buffer + ( ( ( myLine - 0 ) & 0x03 ) + 1 ) * 256;
 
 			for( x = 0+48; x < 160+48; x++ ) {
-				rgb_t	c1 = Machine->pens[line1[x]];
-				rgb_t	c2 = Machine->pens[line2[x]];
-				rgb_t	c3 = Machine->pens[line3[x]];
-				rgb_t	c4 = Machine->pens[line4[x]];
+				rgb_t	c1 = machine->pens[line1[x]];
+				rgb_t	c2 = machine->pens[line2[x]];
+				rgb_t	c3 = machine->pens[line3[x]];
+				rgb_t	c4 = machine->pens[line4[x]];
 				*BITMAP_ADDR32( bitmap, pixelPlotY, pixelOffsetX + x) =
 					MAKE_RGB( ( RGB_RED(c1)/6 + RGB_RED(c2)/3 + RGB_RED(c3)/3 + RGB_RED(c4)/6 ),
 						( RGB_GREEN(c1)/6 + RGB_GREEN(c2)/3 + RGB_GREEN(c3)/3 + RGB_GREEN(c4)/6 ),
@@ -1007,7 +1007,7 @@ static void sms_refresh_line( bitmap_t *bitmap, int pixelOffsetX, int pixelPlotY
 	}
 
 	for( x = 0; x < 256; x++ ) {
-		*BITMAP_ADDR32( bitmap, pixelPlotY + line, pixelOffsetX + x) = Machine->pens[blitLineBuffer[x]];
+		*BITMAP_ADDR32( bitmap, pixelPlotY + line, pixelOffsetX + x) = machine->pens[blitLineBuffer[x]];
 	}
 }
 

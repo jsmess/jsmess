@@ -102,7 +102,7 @@ extern MACHINE_RESET( c128 );
 extern VIDEO_START( c128 );
 extern VIDEO_UPDATE( c128 );
 
-void c128_bankswitch_64 (int reset);
+void c128_bankswitch_64 (running_machine *machine, int reset);
 
 
 #endif /* C128_H_ */

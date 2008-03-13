@@ -135,12 +135,12 @@ static const char keyboard[8][9][8] = {
     },
 };
 
-static void microtan_set_irq_line(void)
+static void microtan_set_irq_line(running_machine *machine)
 {
     /* The 6502 IRQ line is active low and probably driven
        by open collector outputs (guess). Since MAME/MESS use
        a non-0 value for ASSERT_LINE we OR the signals here */
-    cpunum_set_input_line(Machine, 0, 0, via_0_irq_line | via_1_irq_line | kbd_irq_line);
+    cpunum_set_input_line(machine, 0, 0, via_0_irq_line | via_1_irq_line | kbd_irq_line);
 }
 
 static mess_image *cassette_device_image(void)
@@ -219,7 +219,7 @@ static void via_0_irq(int state)
 {
     LOG(("microtan_via_0_irq %d\n", state));
     via_0_irq_line = state;
-    microtan_set_irq_line();
+    microtan_set_irq_line(Machine);
 }
 
 /**************************************************************
@@ -291,7 +291,7 @@ static void via_1_irq(int state)
 {
     LOG(("microtan_via_1_irq %d\n", state));
     via_1_irq_line = state;
-    microtan_set_irq_line();
+    microtan_set_irq_line(Machine);
 }
 
 /**************************************************************
@@ -381,7 +381,7 @@ WRITE8_HANDLER ( microtan_bffx_w )
         LOG(("microtan_bff0_w: %d <- %02x (keyboard IRQ clear )\n", offset, data));
         microtan_keyboard_ascii &= ~0x80;
         kbd_irq_line = CLEAR_LINE;
-        microtan_set_irq_line();
+        microtan_set_irq_line(machine);
         break;
     case 1: /* BFF1: write delayed NMI */
         LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
@@ -580,12 +580,12 @@ static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
     return INIT_PASS;
 }
 
-static void store_key(int key)
+static void store_key(running_machine *machine, int key)
 {
     LOG(("microtan: store key '%c'\n", key));
     microtan_keyboard_ascii = key | 0x80;
     kbd_irq_line = ASSERT_LINE;
-    microtan_set_irq_line();
+    microtan_set_irq_line(machine);
 }
 
 INTERRUPT_GEN( microtan_interrupt )
@@ -657,11 +657,11 @@ INTERRUPT_GEN( microtan_interrupt )
             if( key )   /* normal key */
             {
                 repeater = 30;
-                store_key(key);
+                store_key(machine, key);
             }
             else
             if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-                store_key(0);
+                store_key(machine, 0);
             keyrows[row] |= new;
         }
         else
@@ -673,7 +673,7 @@ INTERRUPT_GEN( microtan_interrupt )
     else
     if ( key && (keyrows[lastrow] & mask) && repeat == 0 )
     {
-        store_key(key);
+        store_key(machine, key);
     }
 }
 
@@ -690,9 +690,8 @@ static void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
     activecpu_set_reg(M6502_S, snapshot_buff[base+6]);
 }
 
-static void microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size)
+static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
 {
-	running_machine *machine = Machine;
     UINT8 *RAM = memory_region(REGION_CPU1);
 
     /* check for .DMP file format */
@@ -801,7 +800,7 @@ SNAPSHOT_LOAD( microtan )
 	if (microtan_varify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
 		return INIT_FAIL;
 
-	microtan_snapshot_copy(snapshot_buff, snapshot_size);
+	microtan_snapshot_copy(Machine, snapshot_buff, snapshot_size);
 	return INIT_PASS;
 }
 
@@ -836,7 +835,7 @@ QUICKLOAD_LOAD( microtan_hexfile )
 	else
 		rc = parse_zillion_hex(snapshot_buff, buff);
 	if (rc == INIT_PASS)
-		microtan_snapshot_copy(snapshot_buff, snapshot_size);
+		microtan_snapshot_copy(Machine, snapshot_buff, snapshot_size);
 	free(snapshot_buff);
 	return rc;
 }

@@ -50,7 +50,7 @@ extern void mc6846_set_input_cp1 ( int data );
 extern void mc6846_set_input_cp2 ( int data );
 
 /* polling from outside world */
-extern UINT8  mc6846_get_output_port ( void );
+extern UINT8  mc6846_get_output_port ( running_machine *machine );
 extern UINT8  mc6846_get_output_cto ( void );
 extern UINT8  mc6846_get_output_cp2 ( void );
 

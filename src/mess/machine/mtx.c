@@ -263,7 +263,7 @@ WRITE8_HANDLER( mtx_dart_data_w )
 
 WRITE8_HANDLER( mtx_dart_control_w )
 {
-	z80dart_c_w(0, offset, data);
+	z80dart_c_w(machine, 0, offset, data);
 }
 
 static const z80dart_interface mtx_dart_intf =

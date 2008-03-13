@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "image.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
@@ -468,7 +468,7 @@ WRITE8_HANDLER(sms_bios_w) {
 
 	logerror("bios write %02x, pc: %04x\n", data, activecpu_get_pc());
 
-	setup_rom();
+	setup_rom(machine);
 }
 
 WRITE8_HANDLER(sms_cartram2_w) {
@@ -585,7 +585,7 @@ static void sms_machine_stop(running_machine *machine) {
 	}
 }
 
-void setup_rom(void)
+void setup_rom(running_machine *machine)
 {
 	/* 1. set up bank pointers to point to nothing */
 	memory_set_bankptr( 1, sms_banking_none[1] );
@@ -737,6 +737,7 @@ static int detect_korean_mapper( UINT8 *rom ) {
 }
 
 DEVICE_INIT( sms_cart ) {
+	running_machine *machine = Machine;
 	int i;
 
 	for ( i = 0; i < MAX_CARTRIDGES; i++ ) {
@@ -765,6 +766,7 @@ DEVICE_INIT( sms_cart ) {
 
 DEVICE_LOAD( sms_cart )
 {
+	running_machine *machine = Machine;
 	int size = image_length(image);
 	int index = image_index_in_device( image );
 	const char *fname = image_filename( image );
@@ -938,7 +940,7 @@ MACHINE_RESET(sms)
 
 	setup_banks();
 
-	setup_rom();
+	setup_rom(machine);
 
 	rapid_fire_state_1 = 0;
 	rapid_fire_state_2 = 0;
@@ -975,7 +977,7 @@ WRITE8_HANDLER(sms_store_cart_select_w) {
 	}
 	setup_cart_banks();
 	memory_set_bankptr( 10, sms_banking_cart[3] + 0x2000 );
-	setup_rom();
+	setup_rom(machine);
 }
 
 READ8_HANDLER(sms_store_select1) {

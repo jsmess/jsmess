@@ -106,7 +106,7 @@ static void memory_error(const char *message)
     image_init - initialize the core image system
 -------------------------------------------------*/
 
-int image_init(void)
+int image_init(running_machine *machine)
 {
 	int err;
 	int count, indx, i, j;
@@ -118,17 +118,17 @@ int image_init(void)
 
 	/* first count all images, and identify multiply defined devices */
 	count = 0;
-	for (i = 0; Machine->devices[i].type < IO_COUNT; i++)
+	for (i = 0; machine->devices[i].type < IO_COUNT; i++)
 	{
 		/* check to see if this device type is used multiple times */
-		mask = 1 << Machine->devices[i].type;
+		mask = 1 << machine->devices[i].type;
 		if (dev_mask & mask)
 			multiple_dev_mask |= mask;
 		else
 			dev_mask |= mask;
 
 		/* increment the count */
-		count += Machine->devices[i].count;
+		count += machine->devices[i].count;
 	}
 
 	/* allocate the array */
@@ -140,28 +140,28 @@ int image_init(void)
 
 	/* initialize the devices */
 	indx = 0;
-	for (i = 0; Machine->devices[i].type < IO_COUNT; i++)
+	for (i = 0; machine->devices[i].type < IO_COUNT; i++)
 	{
-		for (j = 0; j < Machine->devices[i].count; j++)
+		for (j = 0; j < machine->devices[i].count; j++)
 		{
 			images[indx + j].mempool = pool_alloc(memory_error);
 
 			/* setup the device */
 			tagpool_init(&images[indx + j].tagpool);
-			images[indx + j].dev = &Machine->devices[i];
+			images[indx + j].dev = &machine->devices[i];
 
-			if (Machine->devices[i].init)
+			if (machine->devices[i].init)
 			{
-				err = Machine->devices[i].init(&images[indx + j]);
+				err = machine->devices[i].init(&images[indx + j]);
 				if (err != INIT_PASS)
 					return err;
 			}
 
 		}
-		indx += Machine->devices[i].count;
+		indx += machine->devices[i].count;
 	}
 
-	add_exit_callback(Machine, image_exit);
+	add_exit_callback(machine, image_exit);
 	return INIT_PASS;
 }
 
@@ -535,7 +535,7 @@ static void determine_open_plan(mess_image *image, int is_create, UINT32 *open_p
     image_load_internal - core image loading
 -------------------------------------------------*/
 
-static int image_load_internal(mess_image *image, const char *path,
+static int image_load_internal(running_machine *machine, mess_image *image, const char *path,
 	int is_create, int create_format, option_resolution *create_args)
 {
 	image_error_t err;
@@ -563,7 +563,7 @@ static int image_load_internal(mess_image *image, const char *path,
 
 	/* do we need to reset the CPU? */
 	if ((attotime_compare(timer_get_time(), attotime_zero) > 0) && image->dev->reset_on_load)
-		mame_schedule_hard_reset(Machine);
+		mame_schedule_hard_reset(machine);
 
 	/* determine open plan */
 	determine_open_plan(image, is_create, open_plan);
@@ -574,7 +574,7 @@ static int image_load_internal(mess_image *image, const char *path,
 		software_path = software_path_list;
 		do
 		{
-			gamedrv = Machine->gamedrv;
+			gamedrv = machine->gamedrv;
 			while(!is_loaded(image) && gamedrv)
 			{
 				/* open the file */
@@ -662,7 +662,7 @@ done:
 
 int image_load(mess_image *image, const char *path)
 {
-	return image_load_internal(image, path, FALSE, 0, NULL);
+	return image_load_internal(Machine, image, path, FALSE, 0, NULL);
 }
 
 
@@ -673,7 +673,7 @@ int image_load(mess_image *image, const char *path)
 
 int image_create(mess_image *image, const char *path, int create_format, option_resolution *create_args)
 {
-	return image_load_internal(image, path, TRUE, create_format, create_args);
+	return image_load_internal(Machine, image, path, TRUE, create_format, create_args);
 }
 
 
@@ -752,7 +752,7 @@ void image_unload_all(int ispreload)
 	mess_image *image;
 
 	if (!ispreload)
-		mess_options_extract();
+		mess_options_extract(Machine);
 
 	/* normalize ispreload */
 	ispreload = ispreload ? 1 : 0;

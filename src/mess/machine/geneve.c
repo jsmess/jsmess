@@ -213,7 +213,7 @@ MACHINE_START( geneve )
         ti99_ide_init();
         ti99_rs232_init();
 	ti99_usbsm_init();
-	mm58274c_init(0, 1);
+	mm58274c_init(machine, 0, 1);
 	add_exit_callback(machine, machine_stop_geneve);
 }
 
@@ -300,7 +300,7 @@ MACHINE_RESET( geneve )
 		ti99_rs232_reset();
 
 	if (has_usb_sm)
-		ti99_usbsm_reset(TRUE);
+		ti99_usbsm_reset(machine, TRUE);
 }
 
 static void machine_stop_geneve(running_machine *machine)

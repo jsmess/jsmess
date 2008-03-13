@@ -547,7 +547,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ip204415 )
 {
-	mc_init();
+	mc_init(machine);
 
 	nHPC_MiscStatus = 0;
 	nHPC_ParBufPtr = 0;

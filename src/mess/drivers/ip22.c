@@ -1239,7 +1239,7 @@ static TIMER_CALLBACK(ip22_timer)
 
 static MACHINE_RESET( ip225015 )
 {
-	mc_init();
+	mc_init(machine);
 	nHPC3_enetr_nbdp = 0x80000000;
 	nHPC3_enetr_cbp = 0x80000000;
 	nIntCounter = 0;

@@ -6,7 +6,6 @@
 
 #include "driver.h"
 #include "ds1315.h"
-#include "deprecat.h"
 
 
 enum
@@ -15,7 +14,7 @@ enum
 	ds_calendar_io
 };
 
-static void ds1315_fill_raw_data( void );
+static void ds1315_fill_raw_data( running_machine *machine );
 static void ds1315_input_raw_data( void );
 
 static int ds1315_count;
@@ -45,7 +44,7 @@ void ds1315_init( void )
 			/* entire pattern matched */
 			ds1315_count = 0;
 			ds1315_mode = ds_calendar_io;
-			ds1315_fill_raw_data();
+			ds1315_fill_raw_data(machine);
 		}
 
 		return 0;
@@ -109,7 +108,7 @@ WRITE8_HANDLER ( ds1315_w_data )
 	return;
 }
 
-static void ds1315_fill_raw_data( void )
+static void ds1315_fill_raw_data( running_machine *machine )
 {
 	/* This routine will (hopefully) call a standard 'C' library routine to get the current
 	   date and time and then fill in the raw data struct.
@@ -119,7 +118,7 @@ static void ds1315_fill_raw_data( void )
 	int raw[8], i, j;
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(Machine, &systime);
+	mame_get_current_datetime(machine, &systime);
 
 	raw[0] = 0;	/* tenths and hundreths of seconds are always zero */
 	raw[1] = dec_2_bcd(systime.local_time.second);

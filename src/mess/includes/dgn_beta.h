@@ -93,7 +93,7 @@ READ8_HANDLER(dgnbeta_wd2797_r);
 WRITE8_HANDLER(dgnbeta_wd2797_w);
 
 extern int dgnbeta_font;
-void dgn_beta_frame_interrupt (int data);
+void dgn_beta_frame_interrupt (running_machine *machine, int data);
 void dgn_beta_line_interrupt (int data);
 
 

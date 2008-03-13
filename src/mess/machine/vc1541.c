@@ -959,57 +959,57 @@ static ADDRESS_MAP_START( c1551_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static void c1551x_write_data (TPI6525 *This, int data)
+static void c1551x_write_data (running_machine *machine, TPI6525 *This, int data)
 {
 	DBG_LOG(1, "c1551 cpu", ("%d write data %.2x\n",
 						 cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	tpi6525_0_port_a_w(Machine, 0,data);
+	tpi6525_0_port_a_w(machine, 0,data);
 }
 
-static int c1551x_read_data (TPI6525 *This)
+static int c1551x_read_data (running_machine *machine, TPI6525 *This)
 {
 	int data=0xff;
 #ifdef CPU_SYNC
 	cpu_sync ();
 #endif
-	data=tpi6525_0_port_a_r(Machine, 0);
+	data=tpi6525_0_port_a_r(machine, 0);
 	DBG_LOG(2, "c1551 cpu",("%d read data %.2x\n",
 						 cpu_getactivecpu (), data));
 	return data;
 }
 
-static void c1551x_write_handshake (TPI6525 *This, int data)
+static void c1551x_write_handshake (running_machine *machine, TPI6525 *This, int data)
 {
 	DBG_LOG(1, "c1551 cpu",("%d write handshake %.2x\n",
 						 cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	tpi6525_0_port_c_w(Machine, 0,data&0x40?0xff:0x7f);
+	tpi6525_0_port_c_w(machine, 0,data&0x40?0xff:0x7f);
 }
 
-static int c1551x_read_handshake (TPI6525 *This)
+static int c1551x_read_handshake (running_machine *machine, TPI6525 *This)
 {
 	int data=0xff;
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	data=tpi6525_0_port_c_r(Machine, 0)&8?0x80:0;
+	data=tpi6525_0_port_c_r(machine, 0)&8?0x80:0;
 	DBG_LOG(2, "c1551 cpu",("%d read handshake %.2x\n",
 						 cpu_getactivecpu (), data));
 	return data;
 }
 
-static int c1551x_read_status (TPI6525 *This)
+static int c1551x_read_status (running_machine *machine, TPI6525 *This)
 {
 	int data=0xff;
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	data=tpi6525_0_port_c_r(Machine, 0)&3;
+	data=tpi6525_0_port_c_r(machine, 0)&3;
 	DBG_LOG(1, "c1551 cpu",("%d read status %.2x\n",
 						 cpu_getactivecpu (), data));
 	return data;
@@ -1017,27 +1017,27 @@ static int c1551x_read_status (TPI6525 *This)
 
 void c1551x_0_write_data (int data)
 {
-	c1551x_write_data(tpi6525, data);
+	c1551x_write_data(Machine, tpi6525, data);
 }
 
 int c1551x_0_read_data (void)
 {
-	return c1551x_read_data(tpi6525);
+	return c1551x_read_data(Machine, tpi6525);
 }
 
 void c1551x_0_write_handshake (int data)
 {
-	c1551x_write_handshake(tpi6525, data);
+	c1551x_write_handshake(Machine, tpi6525, data);
 }
 
 int c1551x_0_read_handshake (void)
 {
-	return c1551x_read_handshake(tpi6525);
+	return c1551x_read_handshake(Machine, tpi6525);
 }
 
 int c1551x_0_read_status (void)
 {
-	return c1551x_read_status(tpi6525);
+	return c1551x_read_status(Machine, tpi6525);
 }
 
 MACHINE_DRIVER_START( cpu_vc1540 )

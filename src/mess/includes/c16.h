@@ -159,7 +159,7 @@ extern WRITE8_HANDLER(c16_switch_to_ram);
 
 /* ted reads */
 extern int c16_read_keyboard (int databus);
-extern void c16_interrupt (int);
+extern void c16_interrupt (running_machine *machine, int);
 
 extern void c16_driver_init(running_machine *machine);
 extern MACHINE_RESET( c16 );

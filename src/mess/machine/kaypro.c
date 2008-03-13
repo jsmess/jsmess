@@ -133,7 +133,7 @@ DRIVER_INIT( kaypro )
 	for( i = 0; i < 0x2000; i++ )
 		gfx[0x2000 + i] = gfx[i] ^ 0xff;
 
-	cpm_init(4, disk_ids);
+	cpm_init(machine, 4, disk_ids);
 }
 
 MACHINE_RESET( kaypro )

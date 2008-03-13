@@ -67,7 +67,7 @@ enum
 };
 
 /* called when ints are changed - cleared/set */
-static void oric_refresh_ints(void)
+static void oric_refresh_ints(running_machine *machine)
 {
 	/* telestrat has floppy hardware built-in! */
 	if (oric_is_telestrat==0)
@@ -84,11 +84,11 @@ static void oric_refresh_ints(void)
 	/* any irq set? */
 	if ((oric_irqs & 0x0f)!=0)
 	{
-		cpunum_set_input_line(Machine, 0,0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0,0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 0,0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0,0, CLEAR_LINE);
 	}
 }
 
@@ -197,10 +197,8 @@ static  READ8_HANDLER ( oric_via_in_b_func )
 
 
 /* read/write data depending on state of bdir, bc1 pins and data output to psg */
-static void oric_psg_connection_refresh(void)
+static void oric_psg_connection_refresh(running_machine *machine)
 {
-	running_machine *machine = Machine;
-
 	if (oric_psg_control!=0)
 	{
 		switch (oric_psg_control)
@@ -239,7 +237,7 @@ static WRITE8_HANDLER ( oric_via_out_a_func )
 {
 	oric_via_port_a_data = data;
 
-	oric_psg_connection_refresh();
+	oric_psg_connection_refresh(machine);
 
 
 	if (oric_psg_control==0)
@@ -342,7 +340,7 @@ static WRITE8_HANDLER ( oric_via_out_b_func )
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	centronics_write_handshake(0, printer_handshake, CENTRONICS_STROBE);
 
-	oric_psg_connection_refresh();
+	oric_psg_connection_refresh(machine);
 	previous_portb_data = data;
 
 }
@@ -391,7 +389,7 @@ static WRITE8_HANDLER ( oric_via_out_ca2_func )
 		oric_psg_control |=1;
 	}
 
-	oric_psg_connection_refresh();
+	oric_psg_connection_refresh(machine);
 }
 
 static WRITE8_HANDLER ( oric_via_out_cb2_func )
@@ -403,7 +401,7 @@ static WRITE8_HANDLER ( oric_via_out_cb2_func )
 		oric_psg_control |=2;
 	}
 
-	oric_psg_connection_refresh();
+	oric_psg_connection_refresh(machine);
 }
 
 
@@ -421,7 +419,7 @@ static void	oric_via_irq_func(int state)
 		oric_irqs |=(1<<0);
 	}
 
-	oric_refresh_ints();
+	oric_refresh_ints(Machine);
 }
 
 
@@ -585,7 +583,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 
 
 /* APPLE 2 INTERFACE V2 */
-static void oric_install_apple2_v2_interface(void)
+static void oric_install_apple2_v2_interface(running_machine *machine)
 {
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_r);
@@ -595,7 +593,7 @@ static void oric_install_apple2_v2_interface(void)
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0380, 0x0383, 0, 0, apple2_v2_interface_w);
 
-	apple2_v2_interface_w(Machine, 0, 0);
+	apple2_v2_interface_w(machine, 0, 0);
 }
 
 /********************/
@@ -690,7 +688,7 @@ static void oric_jasmin_set_mem_0x0c000(void)
 	}
 }
 
-static void oric_jasmin_wd179x_callback(int State)
+static void oric_jasmin_wd179x_callback(running_machine *machine, int State)
 {
 	switch (State)
 	{
@@ -699,7 +697,7 @@ static void oric_jasmin_wd179x_callback(int State)
 		{
 			oric_irqs &=~(1<<1);
 
-			oric_refresh_ints();
+			oric_refresh_ints(machine);
 		}
 		break;
 
@@ -707,7 +705,7 @@ static void oric_jasmin_wd179x_callback(int State)
 		{
 			oric_irqs |= (1<<1);
 
-			oric_refresh_ints();
+			oric_refresh_ints(machine);
 		}
 		break;
 
@@ -825,7 +823,7 @@ static unsigned char port_318_r;
 static unsigned char port_314_w;
 
 
-static void oric_microdisc_refresh_wd179x_ints(void)
+static void oric_microdisc_refresh_wd179x_ints(running_machine *machine)
 {
 	oric_irqs &=~(1<<1);
 
@@ -836,10 +834,10 @@ static void oric_microdisc_refresh_wd179x_ints(void)
 		oric_irqs |=(1<<1);
 	}
 
-	oric_refresh_ints();
+	oric_refresh_ints(machine);
 }
 
-static void oric_microdisc_wd179x_callback(int State)
+static void oric_microdisc_wd179x_callback(running_machine *machine, int State)
 {
 	switch (State)
 	{
@@ -849,7 +847,7 @@ static void oric_microdisc_wd179x_callback(int State)
 
 			oric_wd179x_int_state = 0;
 
-			oric_microdisc_refresh_wd179x_ints();
+			oric_microdisc_refresh_wd179x_ints(machine);
 		}
 		break;
 
@@ -859,7 +857,7 @@ static void oric_microdisc_wd179x_callback(int State)
 
 			oric_wd179x_int_state = 1;
 
-			oric_microdisc_refresh_wd179x_ints();
+			oric_microdisc_refresh_wd179x_ints(machine);
 		}
 		break;
 
@@ -1028,7 +1026,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 			wd17xx_set_density(density);
 
 			oric_microdisc_set_mem_0x0c000();
-			oric_microdisc_refresh_wd179x_ints();
+			oric_microdisc_refresh_wd179x_ints(machine);
 		}
 		break;
 
@@ -1069,10 +1067,10 @@ static void oric_wd179x_callback(running_machine *machine, wd17xx_state_t State,
 		case ORIC_FLOPPY_INTERFACE_APPLE2:
 			return;
 		case ORIC_FLOPPY_INTERFACE_MICRODISC:
-			oric_microdisc_wd179x_callback(State);
+			oric_microdisc_wd179x_callback(machine, State);
 			return;
 		case ORIC_FLOPPY_INTERFACE_JASMIN:
-			oric_jasmin_wd179x_callback(State);
+			oric_jasmin_wd179x_callback(machine, State);
 			return;
 	}
 }
@@ -1174,7 +1172,7 @@ MACHINE_RESET( oric )
 
 		case ORIC_FLOPPY_INTERFACE_APPLE2_V2:
 		{
-			oric_install_apple2_v2_interface();
+			oric_install_apple2_v2_interface(machine);
 		}
 		break;
 
@@ -1441,7 +1439,7 @@ static void	telestrat_via2_irq_func(int state)
         oric_irqs |=(1<<2);
 	}
 
-    oric_refresh_ints();
+    oric_refresh_ints(Machine);
 }
 static const struct via6522_interface telestrat_via2_interface=
 {
@@ -1471,7 +1469,7 @@ static void telestrat_acia_callback(int irq_state)
 		oric_irqs |= (1<<3);
 	}
 
-	oric_refresh_ints();
+	oric_refresh_ints(Machine);
 }
 #endif
 

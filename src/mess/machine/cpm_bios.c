@@ -11,7 +11,6 @@
 
 #include "driver.h"
 #include "memory.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
 #include "cpm_bios.h"
@@ -131,7 +130,7 @@ DEVICE_LOAD( cpm_floppy )
  *	cpm_init
  *	Initialize the BIOS simulation for 'n' drives of types stored in 'ids'
  *****************************************************************************/
-int cpm_init(int n, const char *const ids[])
+int cpm_init( running_machine *machine, int n, const char *const ids[])
 {
 	UINT8 * RAM = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
 	const dsk_fmt *f;
@@ -261,7 +260,7 @@ int cpm_init(int n, const char *const ids[])
 
 	cpm_jumptable();
 
-	add_exit_callback(Machine, cpm_exit);
+	add_exit_callback(machine, cpm_exit);
 	return 0;
 }
 

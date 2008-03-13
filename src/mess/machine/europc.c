@@ -4,7 +4,6 @@
 #include "machine/pit8253.h"
 #include "video/pc_aga.h"
 #include "audio/pc.h"
-#include "deprecat.h"
 
 
 /*
@@ -229,12 +228,12 @@ static struct {
 	emu_timer *timer;
 } europc_rtc;
 
-void europc_rtc_set_time(void)
+void europc_rtc_set_time(running_machine *machine)
 {
 	mame_system_time systime;
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(Machine, &systime);
+	mame_get_current_datetime(machine, &systime);
 
 	europc_rtc.data[0] = dec_2_bcd(systime.utc_time.second);
 	europc_rtc.data[1] = dec_2_bcd(systime.utc_time.minute);
@@ -333,7 +332,7 @@ NVRAM_HANDLER( europc_rtc )
 	if (file == NULL)
 	{
 		/* init only */
-		/* europc_rtc_set_time(); */
+		/* europc_rtc_set_time(machine); */
 	}
 	else if (read_or_write)
 	{
@@ -342,7 +341,7 @@ NVRAM_HANDLER( europc_rtc )
 	else
 	{
 		europc_rtc_load_stream(file);
-		europc_rtc_set_time();
+		europc_rtc_set_time(machine);
 	}
 }
 

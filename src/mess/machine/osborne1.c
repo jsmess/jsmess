@@ -226,19 +226,19 @@ static int osborne1_z80_irq_ack(int param) {
 static void osborne1_z80_irq_reti(int param) {
 }
 
-static void osborne1_update_irq_state(void) {
+static void osborne1_update_irq_state(running_machine *machine) {
 	//logerror("Changing irq state; pia_0_irq_state = %s, pia_1_irq_state = %s\n", osborne1.pia_0_irq_state ? "SET" : "CLEARED", osborne1.pia_1_irq_state ? "SET" : "CLEARED" );
 
 	if ( osborne1.pia_1_irq_state ) {
-		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE );
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE );
 	} else {
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE );
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE );
 	}
 }
 
 static void ieee_pia_irq_a_func(int state) {
 	osborne1.pia_0_irq_state = state;
-	osborne1_update_irq_state();
+	osborne1_update_irq_state(Machine);
 }
 
 static const pia6821_interface osborne1_ieee_pia_config = {
@@ -279,7 +279,7 @@ static WRITE8_HANDLER( video_pia_port_b_w ) {
 
 static void video_pia_irq_a_func(int state) {
 	osborne1.pia_1_irq_state = state;
-	osborne1_update_irq_state();
+	osborne1_update_irq_state(Machine);
 }
 
 static const pia6821_interface osborne1_video_pia_config = {

@@ -138,29 +138,29 @@ static void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 
 static int scc_interrupt, via_interrupt;
 
-static void mac_field_interrupts(void)
+static void mac_field_interrupts(running_machine *machine)
 {
 	if (scc_interrupt)
 		/* SCC interrupt */
-		cpunum_set_input_line(Machine, 0, 2, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
 	else if (via_interrupt)
 		/* VIA interrupt */
-		cpunum_set_input_line(Machine, 0, 1, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
 	else
 		/* clear all interrupts */
-		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
-static void set_scc_interrupt(int value)
+static void set_scc_interrupt(running_machine *machine, int value)
 {
 	scc_interrupt = value;
-	mac_field_interrupts();
+	mac_field_interrupts(machine);
 }
 
-static void set_via_interrupt(int value)
+static void set_via_interrupt(running_machine *machine, int value)
 {
 	via_interrupt = value;
-	mac_field_interrupts();
+	mac_field_interrupts(machine);
 }
 
 
@@ -557,7 +557,7 @@ static void keyboard_receive(int val)
 
 static int mouse_bit_x = 0, mouse_bit_y = 0;
 
-static void mouse_callback(void)
+static void mouse_callback(running_machine *machine)
 {
 	static int	last_mx = 0, last_my = 0;
 	static int	count_x = 0, count_y = 0;
@@ -631,7 +631,7 @@ static void mouse_callback(void)
 
 	if (x_needs_update || y_needs_update)
 		/* assert Port B External Interrupt on the SCC */
-		mac_scc_mouse_irq( x_needs_update, y_needs_update );
+		mac_scc_mouse_irq( machine, x_needs_update, y_needs_update );
 }
 
 /* *************************************************************************
@@ -716,12 +716,12 @@ WRITE16_HANDLER ( macplus_scsi_w )
 
 static void mac_scc_ack(void)
 {
-	set_scc_interrupt(0);
+	set_scc_interrupt(Machine, 0);
 }
 
 
 
-void mac_scc_mouse_irq( int x, int y)
+void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 {
 	static int last_was_x = 0;
 
@@ -743,7 +743,7 @@ void mac_scc_mouse_irq( int x, int y)
 	}
 
 	//cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
-	set_scc_interrupt(1);
+	set_scc_interrupt(machine, 1);
 }
 
 
@@ -1249,7 +1249,7 @@ static void mac_via_irq(int state)
 {
 	/* interrupt the 68k (level 1) */
 	//cpunum_set_input_line(machine, 0, 1, state);
-	set_via_interrupt(state);
+	set_via_interrupt(Machine, state);
 }
 
 READ16_HANDLER ( mac_via_r )
@@ -1471,7 +1471,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 
 	/* check for mouse changes at 10 irqs per frame */
 	if (!(scanline % 10))
-		mouse_callback();
+		mouse_callback(machine);
 
 	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1) % MAC_V_TOTAL, 0), 0);
 

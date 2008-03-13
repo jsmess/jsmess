@@ -57,7 +57,7 @@ static UINT8 thom_firq;
 
 
 
-static void thom_set_irq ( int line, int state )
+static void thom_set_irq ( running_machine *machine, int line, int state )
 {
 	int old = thom_irq;
 
@@ -71,12 +71,12 @@ static void thom_set_irq ( int line, int state )
 	if ( old && !thom_irq )
 		LOG_IRQ(( "%f thom_set_irq: irq line down %i\n", attotime_to_double(timer_get_time()), line ));
 
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
 
-static void thom_set_firq ( int line, int state )
+static void thom_set_firq ( running_machine *machine, int line, int state )
 {
 	int old = thom_irq;
 
@@ -90,17 +90,17 @@ static void thom_set_firq ( int line, int state )
 	if ( old && !thom_firq )
 		LOG_IRQ(( "%f thom_set_firq: firq line down %i\n", attotime_to_double(timer_get_time()), line ));
 
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
 
-static void thom_irq_reset ( void )
+static void thom_irq_reset ( running_machine *machine )
 {
 	thom_irq = 0;
 	thom_firq = 0;
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, CLEAR_LINE );
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, CLEAR_LINE );
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE );
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE );
 }
 
 
@@ -115,33 +115,33 @@ static void thom_irq_init ( void )
 
 static void thom_irq_0  ( int state )
 {
-	thom_set_irq  ( 0, state );
+	thom_set_irq  ( Machine, 0, state );
 }
 
 static void thom_irq_1  ( int state )
 {
-	thom_set_irq  ( 1, state );
+	thom_set_irq  ( Machine, 1, state );
 }
 
 static void thom_irq_3  ( int state )
 {
-	thom_set_irq  ( 3, state );
+	thom_set_irq  ( Machine, 3, state );
 }
 
 static void thom_firq_1 ( int state )
 {
-	thom_set_firq ( 1, state );
+	thom_set_firq ( Machine, 1, state );
 }
 
 static void thom_firq_2 ( int state )
 {
-	thom_set_firq ( 2, state );
+	thom_set_firq ( Machine, 2, state );
 }
 
 #ifdef CHARDEV
 static void thom_irq_4  ( int state )
 {
-	thom_set_irq  ( 4, state );
+	thom_set_irq  ( Machine, 4, state );
 }
 #endif
 
@@ -1253,7 +1253,7 @@ MACHINE_RESET ( to7 )
 	LOG (( "to7: machine reset called\n" ));
 
 	/* subsystems */
-	thom_irq_reset();
+	thom_irq_reset(machine);
 	pia_reset();
 	mc6846_reset();
 	to7_game_reset();
@@ -1485,7 +1485,7 @@ MACHINE_RESET( to770 )
 	LOG (( "to770: machine reset called\n" ));
 
 	/* subsystems */
-	thom_irq_reset();
+	thom_irq_reset(machine);
 	pia_reset();
 	mc6846_reset();
 	to7_game_reset();
@@ -1833,7 +1833,7 @@ MACHINE_RESET( mo5 )
 	LOG (( "mo5: machine reset called\n" ));
 
 	/* subsystems */
-	thom_irq_reset();
+	thom_irq_reset(machine);
 	pia_reset();
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0x5f );
 	to7_game_reset();
@@ -2107,7 +2107,7 @@ static void to9_update_cart_bank ( void )
 {
 	static int old_bank = -1;
 	int bank = 0;
-	int slot = ( mc6846_get_output_port() >> 4 ) & 3; /* bits 4-5: ROM bank */
+	int slot = ( mc6846_get_output_port(Machine) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
 	/* reset cartridge read handler */
 	memory_install_read8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0003, 0, 0, (read8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
@@ -2153,7 +2153,7 @@ static void to9_update_cart_bank ( void )
 /* write signal to 0000-1fff generates a bank switch */
 WRITE8_HANDLER ( to9_cartridge_w )
 {
-	int slot = ( mc6846_get_output_port() >> 4 ) & 3; /* bits 4-5: ROM bank */
+	int slot = ( mc6846_get_output_port(machine) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
 	if ( offset >= 0x2000 )
 		return;
@@ -2182,7 +2182,7 @@ READ8_HANDLER ( to9_cartridge_r )
 static void to9_update_ram_bank ( void )
 {
 	static int old_bank = -1;
-	UINT8 port = mc6846_get_output_port();
+	UINT8 port = mc6846_get_output_port(Machine);
 	UINT8 portb = pia_get_port_b_z_mask( THOM_PIA_SYS );
 	UINT8 disk = ((port >> 2) & 1) | ((port >> 5) & 2); /* bits 6,2: RAM bank */
 	int bank;
@@ -2770,7 +2770,7 @@ MACHINE_RESET ( to9 )
 	LOG (( "to9: machine reset called\n" ));
 
 	/* subsystems */
-	thom_irq_reset();
+	thom_irq_reset(machine);
 	pia_reset();
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0xfe );
 	mc6846_reset();
@@ -3695,7 +3695,7 @@ MACHINE_RESET ( to8 )
 	LOG (( "to8: machine reset called\n" ));
 
 	/* subsystems */
-	thom_irq_reset();
+	thom_irq_reset(machine);
 	pia_reset();
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0xfe );
 	mc6846_reset();
@@ -3857,7 +3857,7 @@ MACHINE_RESET ( to9p )
 	LOG (( "to9p: machine reset called\n" ));
 
 	/* subsystems */
-	thom_irq_reset();
+	thom_irq_reset(machine);
 	pia_reset();
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0xfe );
 	mc6846_reset();
@@ -4430,7 +4430,7 @@ MACHINE_RESET ( mo6 )
 	LOG (( "mo6: machine reset called\n" ));
 
 	/* subsystems */
-	thom_irq_reset();
+	thom_irq_reset(machine);
 	pia_reset();
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0x75 );
 	mo6_game_reset();
@@ -4697,7 +4697,7 @@ MACHINE_RESET ( mo5nr )
 	LOG (( "mo5nr: machine reset called\n" ));
 
 	/* subsystems */
-	thom_irq_reset();
+	thom_irq_reset(machine);
 	pia_reset();
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0x65 );
 	mo5nr_game_reset();

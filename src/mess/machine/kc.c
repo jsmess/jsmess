@@ -237,7 +237,7 @@ static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 	cpunum_set_reg(0, REG_PC, 0x0f000);
 }
 
-static void kc_disc_interface_init(void)
+static void kc_disc_interface_init(running_machine *machine)
 {
 	timer_set(attotime_zero, NULL, 0, kc85_disk_reset_timer_callback);
 
@@ -247,7 +247,7 @@ static void kc_disc_interface_init(void)
 	z80ctc_reset(1);
 
 	/* hold cpu at reset */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 /*****************/
@@ -1884,7 +1884,7 @@ MACHINE_RESET( kc85_4 )
 MACHINE_RESET( kc85_4d )
 {
 	MACHINE_RESET_CALL(kc85_4);
-	kc_disc_interface_init();
+	kc_disc_interface_init(machine);
 }
 
 MACHINE_RESET( kc85_3 )
