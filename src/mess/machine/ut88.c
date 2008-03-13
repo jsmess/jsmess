@@ -10,6 +10,9 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
+#include "devices/cassette.h"
+#include <stdio.h>
+
 
 static int ut88_keyboard_line;
 
@@ -53,6 +56,15 @@ WRITE8_HANDLER( ut88_keyboard_w )
 WRITE8_HANDLER( ut88_sound_w )
 {
 	DAC_data_w(0,data); //beeper
+	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x01 ? 1 : -1);	
 }
 
 
+READ8_HANDLER( ut88_tape_r )
+{
+	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	if (level <  0) { 
+		 	return 0x00; 
+ 	}
+	return 0xff;	
+}

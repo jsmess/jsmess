@@ -10,6 +10,8 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/mikro80.h"
+#include "devices/cassette.h"
+#include "formats/rk_cas.h"
 
   
 GFXDECODE_START( mikro80 )
@@ -23,6 +25,7 @@ static ADDRESS_MAP_START(mikro80_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mikro80_io , ADDRESS_SPACE_IO, 8)
+	AM_RANGE( 0x01, 0x01) AM_READWRITE ( mikro80_tape_r, mikro80_tape_w )
 	AM_RANGE( 0x04, 0x07) AM_READWRITE ( mikro80_keyboard_r, mikro80_keyboard_w )
 ADDRESS_MAP_END
 
@@ -134,8 +137,31 @@ static MACHINE_DRIVER_START( mikro80 )
 	MDRV_GFXDECODE( mikro80 )
 		    
 	MDRV_VIDEO_START(mikro80)
-    MDRV_VIDEO_UPDATE(mikro80)       
+    MDRV_VIDEO_UPDATE(mikro80)    
+    
+ 	MDRV_SPEAKER_STANDARD_MONO("mono")
+   	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)    
+
 MACHINE_DRIVER_END
+ 
+static void mikro80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rk8_cassette_formats; break;
+
+		default:					cassette_device_getinfo(devclass, state, info); break;
+	}
+}
+
+SYSTEM_CONFIG_START(mikro80)
+	CONFIG_DEVICE(mikro80_cassette_getinfo)
+SYSTEM_CONFIG_END
  
 /* ROM definition */
 
@@ -149,4 +175,4 @@ ROM_END
 /* Driver */
  
 /*    YEAR  NAME   	PARENT  COMPAT  MACHINE 	INPUT   	INIT  	 CONFIG COMPANY 				 FULLNAME   FLAGS */
-COMP( 1983, mikro80, 	 0,  	 0,	mikro80, 	mikro80, 	mikro80, NULL,  "", 					 "Mikro-80",	 0)
+COMP( 1983, mikro80, 	 0,  	 0,	mikro80, 	mikro80, 	mikro80, mikro80,  "", 					 "Mikro-80",	 0)

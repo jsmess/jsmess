@@ -15,6 +15,7 @@ extern MACHINE_RESET( ut88 );
 extern READ8_HANDLER( ut88_keyboard_r );
 extern WRITE8_HANDLER( ut88_keyboard_w );
 extern WRITE8_HANDLER( ut88_sound_w );
+extern READ8_HANDLER( ut88_tape_r );
 
 
 /*----------- defined in video/ut88.c -----------*/

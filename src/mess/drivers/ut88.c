@@ -12,7 +12,8 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/ut88.h"
 #include "sound/dac.h"
-
+#include "devices/cassette.h"
+#include "formats/rk_cas.h"
   
 GFXDECODE_START( ut88 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, ut88_charlayout, 0, 1 )
@@ -26,7 +27,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ut88_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x04, 0x07) AM_READWRITE ( ut88_keyboard_r, ut88_keyboard_w )
-	AM_RANGE( 0xA1, 0xA1) AM_WRITE (ut88_sound_w)
+	AM_RANGE( 0xA1, 0xA1) AM_READWRITE ( ut88_tape_r, 	  ut88_sound_w	  )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -130,8 +131,8 @@ static MACHINE_DRIVER_START( ut88 )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(48*8, 16*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 16*8-1)
+	MDRV_SCREEN_SIZE(48*8, 28*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 28*8-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)	
 	MDRV_GFXDECODE( ut88 )
@@ -143,8 +144,27 @@ static MACHINE_DRIVER_START( ut88 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	        
-    
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)    
 MACHINE_DRIVER_END
+
+static void ut88_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rku_cassette_formats; break;
+
+		default:					cassette_device_getinfo(devclass, state, info); break;
+	}
+}
+
+SYSTEM_CONFIG_START(ut88)
+	CONFIG_DEVICE(ut88_cassette_getinfo)
+SYSTEM_CONFIG_END
  
 /* ROM definition */
 ROM_START( ut88 )
@@ -156,5 +176,5 @@ ROM_END
 
 /* Driver */
  
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE 	INPUT   INIT  CONFIG COMPANY 				 FULLNAME   FLAGS */
-COMP( 1989, ut88,     0,      0, 		ut88, 	ut88, 	ut88, NULL,  "", 						 "UT-88",		 0)
+/*    YEAR  NAME   PARENT  COMPAT 	 MACHINE 	INPUT   INIT  CONFIG COMPANY 				 FULLNAME   FLAGS */
+COMP( 1989, ut88,     0,      0, 		ut88, 	ut88, 	ut88, ut88,  "", 					 "UT-88",		 0)

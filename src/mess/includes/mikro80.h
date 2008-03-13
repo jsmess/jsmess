@@ -14,6 +14,8 @@ extern DRIVER_INIT( mikro80 );
 extern MACHINE_RESET( mikro80 );
 extern READ8_HANDLER( mikro80_keyboard_r );
 extern WRITE8_HANDLER( mikro80_keyboard_w );
+extern READ8_HANDLER( mikro80_tape_r );
+extern WRITE8_HANDLER( mikro80_tape_w );
 
 /*----------- defined in video/mikro80.c -----------*/
 

@@ -1183,6 +1183,7 @@ $(MESSOBJ)/gmaster.a:			\
 $(MESSOBJ)/ut88.a:      \
 	$(MESS_DRIVERS)/ut88.o \
 	$(MESS_MACHINE)/ut88.o \
+	$(MESS_FORMATS)/rk_cas.o		\
 	$(MESS_VIDEO)/ut88.o \
 
 $(MESSOBJ)/mikro80.a:      \

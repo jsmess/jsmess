@@ -9,6 +9,9 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "devices/cassette.h"
+#include <stdio.h>
+
 
 static int mikro80_keyboard_line;
 
@@ -49,3 +52,17 @@ WRITE8_HANDLER( mikro80_keyboard_w )
   	mikro80_keyboard_line = data ^ 0xff;
 }
 
+WRITE8_HANDLER( mikro80_tape_w )
+{
+	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x01 ? 1 : -1);	
+}
+
+
+READ8_HANDLER( mikro80_tape_r )
+{
+	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	if (level <  0) { 
+		 	return 0x00; 
+ 	}
+	return 0xff;	
+}
