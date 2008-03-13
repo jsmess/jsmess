@@ -22,7 +22,7 @@
 static UINT8 key_digit;
 
 
-static READ8_HANDLER( ins8154_b1_port_a_r )
+static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 {
 	char port[11];
 	UINT8 data;
@@ -32,12 +32,12 @@ static READ8_HANDLER( ins8154_b1_port_a_r )
 	return data;
 }
 
-static WRITE8_HANDLER( ins8154_b1_port_a_w )
+static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 {
-	ttl74145_0_w(machine, 0, data & 0x07);
+	ttl74145_0_w(device->machine, 0, data & 0x07);
 }
 
-static WRITE8_HANDLER( acrnsys1_led_segment_w )
+static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )
 {
 	logerror("led %d segment data: %02x\n", key_digit, data);
 	
@@ -78,13 +78,11 @@ static const ttl74145_interface ic8_7445 =
 
 static DRIVER_INIT( acrnsys1 )
 {
-	ins8154_config(machine, 0, &ins8154_b1);
 	ttl74145_config(0, &ic8_7445);
 }
 
 static MACHINE_RESET( acrnsys1 )
 {
-	ins8154_reset(0);
 	ttl74145_reset(0);
 }
 
@@ -96,7 +94,7 @@ static MACHINE_RESET( acrnsys1 )
 
 static ADDRESS_MAP_START( acrnsys1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_READWRITE(ins8154_0_r, ins8154_0_w)
+	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_DEVREADWRITE(INS8154, "b1", ins8154_r, ins8154_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_MIRROR(0x600) AM_ROM
 ADDRESS_MAP_END
@@ -185,6 +183,9 @@ static MACHINE_DRIVER_START( acrnsys1 )
 	MDRV_CPU_PROGRAM_MAP(acrnsys1_map, 0)
 
 	MDRV_MACHINE_RESET(acrnsys1)
+	
+	MDRV_DEVICE_ADD("b1", INS8154)
+	MDRV_DEVICE_CONFIG(ins8154_b1)
 	
 	MDRV_DEFAULT_LAYOUT(layout_acrnsys1)
 MACHINE_DRIVER_END
