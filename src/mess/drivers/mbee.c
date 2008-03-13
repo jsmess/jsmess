@@ -6,12 +6,12 @@
 
     Brett Selwood, Andrew Davies (technical assistance)
 
-    Microbee memory map (preliminary)
+    Microbee Standard / Plus memory map
 
         0000-7FFF RAM
-        8000-BFFF SYSTEM roms (bas510a.rom, bas510b.rom)
+        8000-BFFF SYSTEM roms
         C000-DFFF Edasm or WBee (edasm.rom or wbeee12.rom, optional)
-        E000-EFFF Telcom (tecl321.rom; optional)
+        E000-EFFF Telcom 1.2 (netrom.ic34; optional)
         F000-F7FF Video RAM
         F800-FFFF PCG RAM (graphics)
 
@@ -32,8 +32,7 @@
         F800-FFFF PCG RAM (graphics), Colour RAM (banked)
 
     Microbee 32 came in three versions:
-        IE: features a terminal emulator mapped at $E000
-            (maybe there is a keyword to activate it?)
+        IC: features a terminal emulator mapped at $E000 - type NET to run
 
         PC: features an editor/assembler - type EDASM to run
 
@@ -93,7 +92,7 @@ static ADDRESS_MAP_START(mbeeic_ports, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_READWRITE(mbee_pio_r, mbee_pio_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
-	// AM_RANGE(0x09, 0x09) AM_MIRROR(0x10)  Listed as "Colour Wait Off" but doesn't appear in the schematics
+	// AM_RANGE(0x09, 0x09) AM_MIRROR(0x10)  Listed as "Colour Wait Off or USART 2651" but doesn't appear in the schematics
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
@@ -217,6 +216,10 @@ static const gfx_layout mbee_charlayout =
 };
 
 static GFXDECODE_START( mbee )
+	GFXDECODE_ENTRY( REGION_CPU1, 0xf000, mbee_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( mbeeic )
 	GFXDECODE_ENTRY( REGION_CPU1, 0xf000, mbee_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -324,12 +327,11 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_CPU_IO_MAP(mbeeic_ports, 0)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
 	MDRV_CPU_VBLANK_INT("main", mbee_interrupt)
-	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( mbee )
 	MDRV_MACHINE_START( mbee )
 
-	MDRV_GFXDECODE(mbee)
+	MDRV_GFXDECODE(mbeeic)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250)) /* not accurate */
@@ -371,14 +373,16 @@ static DRIVER_INIT( mbee56 )
 
 ROM_START( mbee )
 	ROM_REGION(0x18000,REGION_CPU1,0)
-	ROM_LOAD("bas510a.ic25",  0x8000, 0x1000, CRC(2ca47c36) SHA1(f36fd0afb3f1df26edc67919e78000b762b6cbcb) )
-	ROM_LOAD("bas510b.ic27",  0x9000, 0x1000, CRC(a07a0c51) SHA1(dcbdd9df78b4b6b2972de2e4050dabb8ae9c3f5a) )
-	ROM_LOAD("bas510c.ic28",  0xa000, 0x1000, CRC(906ac00f) SHA1(9b46458e5755e2c16cdb191a6a70df6de9fe0271) )
-	ROM_LOAD("bas510d.ic30",  0xb000, 0x1000, CRC(61727323) SHA1(c0fea9fd0e25beb9faa7424db8efd07cf8d26c1b) )
-	ROM_LOAD("edasma.ic31",   0xc000, 0x1000, CRC(120c3dea) SHA1(32c9bb6e54dd50d5218bb43cc921885a0307161d) )
-	ROM_LOAD("edasmb.ic33",   0xd000, 0x1000, CRC(a23bf3c8) SHA1(73a57c2800a1c744b527d0440b170b8b03351753) )
-	ROM_LOAD("charrom.ic13",  0xf000, 0x0800, CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
+	ROM_LOAD("bas510a.ic25", 0x8000, 0x1000, CRC(2ca47c36) SHA1(f36fd0afb3f1df26edc67919e78000b762b6cbcb) )
+	ROM_LOAD("bas510b.ic27", 0x9000, 0x1000, CRC(a07a0c51) SHA1(dcbdd9df78b4b6b2972de2e4050dabb8ae9c3f5a) )
+	ROM_LOAD("bas510c.ic28", 0xa000, 0x1000, CRC(906ac00f) SHA1(9b46458e5755e2c16cdb191a6a70df6de9fe0271) )
+	ROM_LOAD("bas510d.ic30", 0xb000, 0x1000, CRC(61727323) SHA1(c0fea9fd0e25beb9faa7424db8efd07cf8d26c1b) )
+	ROM_LOAD("edasma.ic31",  0xc000, 0x1000, CRC(120c3dea) SHA1(32c9bb6e54dd50d5218bb43cc921885a0307161d) )
+	ROM_LOAD("edasmb.ic33",  0xd000, 0x1000, CRC(a23bf3c8) SHA1(73a57c2800a1c744b527d0440b170b8b03351753) )
+	ROM_LOAD("netrom.ic34",  0xe000, 0x1000, CRC(0231bda3) SHA1(be7b32499034f985cc8f7865f2bc2b78c485585c) )
+	ROM_LOAD("charrom.ic13", 0xf000, 0x0800, CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
 	ROM_RELOAD( 0x17000, 0x0800 )
+	ROM_RELOAD( 0x17800, 0x0800 )
 ROM_END
 
 ROM_START( mbeeic )

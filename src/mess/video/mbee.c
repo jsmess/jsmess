@@ -42,7 +42,6 @@ static CRTC6545 crt;
 static int off_x = 0;
 static int off_y = 0;
 static int framecnt = 0;
-static int update_all = 0;
 static int m6545_color_bank = 0;
 static int m6545_video_bank = 0;
 static int mbee_pcg_color_latch = 0;
@@ -372,10 +371,9 @@ WRITE8_HANDLER ( m6545_data_w )
 		crt.cursor_bottom = data;
 		break;
 	case 12:
-		data &= 63;
+		data &= 0x3f;
 		if( crt.screen_address_hi == data )
 			break;
-		update_all = 1;
 		crt.screen_address_hi = data;
 		addr = 0x17000+((data & 32) << 6);
 		memcpy(memory_region(REGION_CPU1)+0xf000, memory_region(REGION_CPU1)+addr, 0x800);
@@ -383,14 +381,10 @@ WRITE8_HANDLER ( m6545_data_w )
 				decodechar(machine->gfx[0],i, pcgram);
 		break;
 	case 13:
-		if( crt.screen_address_lo == data )
-			break;
-		update_all = 1;
 		crt.screen_address_lo = data;
 		break;
 	case 14:
-		data &= 63;
-		crt.cursor_address_hi = data;
+		crt.cursor_address_hi = data & 0x3f;
 		break;
 	case 15:
 		crt.cursor_address_lo = data;
@@ -444,17 +438,18 @@ VIDEO_UPDATE( mbee )
 	framecnt++;
 
 	cursor = (crt.cursor_address_hi << 8) | crt.cursor_address_lo;
-	screen_ = ((crt.screen_address_hi & 7) << 8) | crt.screen_address_lo;
-	for( offs = screen_; offs < crt.horizontal_displayed * crt.vertical_displayed + screen_; offs++ )
+	screen_ = (crt.screen_address_hi << 8) | crt.screen_address_lo;
+
+	for (offs = 0; offs < crt.horizontal_displayed * crt.vertical_displayed; offs++)
 	{
-		int sx, sy, code;
-		sy = off_y - 9 + ((offs - screen_) / crt.horizontal_displayed) * (crt.scan_lines + 1);
-		sx = (off_x + 3 + ((offs - screen_) % crt.horizontal_displayed)) << 3;
-		code = videoram[offs];
+		int mem = ((offs + screen_) & 0x7ff);
+		int sy = off_y - 9 + (offs / crt.horizontal_displayed) * (crt.scan_lines + 1);
+		int sx = (off_x + 3 + (offs % crt.horizontal_displayed)) << 3;
+		int code = videoram[mem];
 		drawgfx( bitmap,machine->gfx[0],code,0,0,0,sx,sy,
 			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
-		if( offs == cursor && (crt.cursor_top & 0x60) != 0x20 )
+		if( mem == cursor && (crt.cursor_top & 0x60) != 0x20 )
 		{
 			if( (crt.cursor_top & 0x60) == 0x60 || (framecnt & 16) == 0 )
 			{
@@ -469,6 +464,7 @@ VIDEO_UPDATE( mbee )
 			}
 		}
 	}
+		
 	return 0;
 }
 
@@ -482,14 +478,15 @@ VIDEO_UPDATE( mbeeic )
 	framecnt++;
 
 	cursor = (crt.cursor_address_hi << 8) | crt.cursor_address_lo;
-	screen_ = ((crt.screen_address_hi & 7) << 8) | crt.screen_address_lo;
-	for( offs = screen_; offs < crt.horizontal_displayed * crt.vertical_displayed + screen_; offs++ )
+	screen_ = (crt.screen_address_hi << 8) | crt.screen_address_lo;
+
+	for (offs = 0; offs < crt.horizontal_displayed * crt.vertical_displayed; offs++)
 	{
-		int sx, sy, code, color;
-		sy = off_y + ((offs - screen_) / crt.horizontal_displayed) * (crt.scan_lines + 1);
-		sx = (off_x + ((offs - screen_) % crt.horizontal_displayed)) << 3;
-		code = videoram[offs];
-		color = colorram[offs];
+		int mem = ((offs + screen_) & 0x7ff);
+		int sy = off_y + (offs / crt.horizontal_displayed) * (crt.scan_lines + 1);
+		int sx = (off_x + (offs % crt.horizontal_displayed)) << 3;
+		int code = videoram[mem];
+		int color = colorram[mem];
 		drawgfx( bitmap,machine->gfx[0],code,color,0,0,sx,sy,
 			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
