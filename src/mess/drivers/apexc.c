@@ -8,12 +8,10 @@
 
 #include "driver.h"
 #include "cpu/apexc/apexc.h"
-#include "deprecat.h"
-
 
 
 static void apexc_teletyper_init(void);
-static void apexc_teletyper_putchar(int character);
+static void apexc_teletyper_putchar(running_machine *machine, int character);
 
 
 static MACHINE_START(apexc)
@@ -209,7 +207,7 @@ static WRITE8_HANDLER(tape_write)
 	if (apexc_tapes[1].fd)
 		image_fwrite(apexc_tapes[1].fd, & data5, 1);
 
-	apexc_teletyper_putchar(data & 0x1f);	/* display on screen */
+	apexc_teletyper_putchar(machine, data & 0x1f);	/* display on screen */
 }
 
 /*
@@ -494,28 +492,28 @@ static VIDEO_START( apexc )
 }
 
 /* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */
-static void apexc_draw_led(bitmap_t *bitmap, int x, int y, int state)
+static void apexc_draw_led(running_machine *machine, bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
 	for (yy=1; yy<7; yy++)
 		for (xx=1; xx<7; xx++)
-			*BITMAP_ADDR16(bitmap, y+yy, x+xx) = Machine->pens[state ? 2 : 3];
+			*BITMAP_ADDR16(bitmap, y+yy, x+xx) = machine->pens[state ? 2 : 3];
 }
 
 /* write a single char on screen */
-static void apexc_draw_char(bitmap_t *bitmap, char character, int x, int y, int color)
+static void apexc_draw_char(running_machine *machine, bitmap_t *bitmap, char character, int x, int y, int color)
 {
-	drawgfx(bitmap, Machine->gfx[0], character-32, color, 0, 0,
-				x+1, y, &Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+	drawgfx(bitmap, machine->gfx[0], character-32, color, 0, 0,
+				x+1, y, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 }
 
 /* write a string on screen */
-static void apexc_draw_string(bitmap_t *bitmap, const char *buf, int x, int y, int color)
+static void apexc_draw_string(running_machine *machine, bitmap_t *bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{
-		apexc_draw_char(bitmap, *buf, x, y, color);
+		apexc_draw_char(machine, bitmap, *buf, x, y, color);
 
 		x += 8;
 		buf++;
@@ -532,27 +530,27 @@ static VIDEO_UPDATE( apexc )
 	/*if (full_refresh)*/
 	{
 		fillbitmap(bitmap, machine->pens[0], &/*machine->visible_area*/panel_window);
-		apexc_draw_string(bitmap, "power", 8, 0, 0);
-		apexc_draw_string(bitmap, "running", 8, 8, 0);
-		apexc_draw_string(bitmap, "data :", 0, 24, 0);
+		apexc_draw_string(machine, bitmap, "power", 8, 0, 0);
+		apexc_draw_string(machine, bitmap, "running", 8, 8, 0);
+		apexc_draw_string(machine, bitmap, "data :", 0, 24, 0);
 	}
 
 	copybitmap(bitmap, apexc_bitmap, 0, 0, 0, 0, &teletyper_window);
 
 
-	apexc_draw_led(bitmap, 0, 0, 1);
+	apexc_draw_led(machine, bitmap, 0, 0, 1);
 
-	apexc_draw_led(bitmap, 0, 8, cpunum_get_reg(0, APEXC_STATE));
+	apexc_draw_led(machine, bitmap, 0, 8, cpunum_get_reg(0, APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{
-		apexc_draw_led(bitmap, i*8, 32, (panel_data_reg << i) & 0x80000000UL);
+		apexc_draw_led(machine, bitmap, i*8, 32, (panel_data_reg << i) & 0x80000000UL);
 		the_char = '0' + ((i + 1) % 10);
-		apexc_draw_char(bitmap, the_char, i*8, 40, 0);
+		apexc_draw_char(machine, bitmap, the_char, i*8, 40, 0);
 		if (((i + 1) % 10) == 0)
 		{
 			the_char = '0' + ((i + 1) / 10);
-			apexc_draw_char(bitmap, the_char, i*8, 48, 0);
+			apexc_draw_char(machine, bitmap, the_char, i*8, 48, 0);
 		}
 	}
 	return 0;
@@ -567,7 +565,7 @@ static void apexc_teletyper_init(void)
 	pos = 0;
 }
 
-static void apexc_teletyper_linefeed(void)
+static void apexc_teletyper_linefeed(running_machine *machine)
 {
 	UINT8 buf[teletyper_window_width];
 	int y;
@@ -575,13 +573,13 @@ static void apexc_teletyper_linefeed(void)
 	for (y=teletyper_window_offset_y; y<teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step; y++)
 	{
 		extract_scanline8(apexc_bitmap, teletyper_window_offset_x, y+teletyper_scroll_step, teletyper_window_width, buf);
-		draw_scanline8(apexc_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, Machine->pens, -1);
+		draw_scanline8(apexc_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, machine->pens, -1);
 	}
 
-	fillbitmap(apexc_bitmap, Machine->pens[0], &teletyper_scroll_clear_window);
+	fillbitmap(apexc_bitmap, machine->pens[0], &teletyper_scroll_clear_window);
 }
 
-static void apexc_teletyper_putchar(int character)
+static void apexc_teletyper_putchar(running_machine *machine, int character)
 {
 	static const char ascii_table[2][32] =
 	{
@@ -615,7 +613,7 @@ static void apexc_teletyper_putchar(int character)
 	{
 	case 19:
 		/* Line Space */
-		apexc_teletyper_linefeed();
+		apexc_teletyper_linefeed(machine);
 		break;
 
 	case 24:
@@ -638,14 +636,14 @@ static void apexc_teletyper_putchar(int character)
 
 		if (pos >= 32)
 		{	/* if past right border, wrap around */
-			apexc_teletyper_linefeed();	/* next line */
+			apexc_teletyper_linefeed(machine);	/* next line */
 			pos = 0;					/* return to start of line */
 		}
 
 		/* print character */
 		buffer[0] = ascii_table[letters][character];	/* lookup ASCII equivalent in table */
 		buffer[1] = '\0';								/* terminate string */
-		apexc_draw_string(apexc_bitmap, buffer, 8*pos, 176, 0);	/* print char */
+		apexc_draw_string(machine, apexc_bitmap, buffer, 8*pos, 176, 0);	/* print char */
 		pos++;											/* step carriage forward */
 
 		break;

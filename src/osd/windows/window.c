@@ -41,6 +41,7 @@
 
 #ifdef MESS
 #include "menu.h"
+#include "deprecat.h"
 #endif /* MESS */
 
 extern int drawnone_init(win_draw_callbacks *callbacks);
@@ -1184,7 +1185,7 @@ static int complete_create(win_window_info *window)
 
 	// create the window menu if needed
 #if HAS_WINDOW_MENU
-	if (win_create_menu(&menu))
+	if (win_create_menu(Machine, &menu))
 		return 1;
 #endif
 

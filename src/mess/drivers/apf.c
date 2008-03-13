@@ -143,9 +143,9 @@ static WRITE8_HANDLER(apf_m1000_pia_out_cb2_func)
 
 unsigned char apf_ints;
 
-void apf_update_ints(void)
+void apf_update_ints(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 0, 0, apf_ints ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, apf_ints ? HOLD_LINE : CLEAR_LINE);
 }
 
 static void	apf_m1000_irq_a_func(int state)
@@ -159,7 +159,7 @@ static void	apf_m1000_irq_a_func(int state)
 		apf_ints&=~1;
 	}
 
-	apf_update_ints();
+	apf_update_ints(Machine);
 }
 
 
@@ -176,7 +176,7 @@ static void	apf_m1000_irq_b_func(int state)
 		apf_ints&=~2;
 	}
 
-	apf_update_ints();
+	apf_update_ints(Machine);
 
 }
 
@@ -284,7 +284,7 @@ static void	apf_imagination_irq_a_func(int state)
 		apf_ints&=~4;
 	}
 
-	apf_update_ints();
+	apf_update_ints(Machine);
 
 }
 
@@ -299,7 +299,7 @@ static void	apf_imagination_irq_b_func(int state)
 		apf_ints&=~8;
 	}
 
-	apf_update_ints();
+	apf_update_ints(Machine);
 
 }
 

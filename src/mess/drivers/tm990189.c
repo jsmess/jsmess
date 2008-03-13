@@ -79,7 +79,7 @@ static int LED_display_window_top;
 static int LED_display_window_width;
 static int LED_display_window_height;
 
-static void hold_load(void);
+static void hold_load(running_machine *machine);
 
 static void usr9901_interrupt_callback(int intreq, int ic);
 static void sys9901_interrupt_callback(int intreq, int ic);
@@ -192,7 +192,7 @@ static MACHINE_RESET( tm990_189 )
 {
 	displayena_timer = timer_alloc(NULL, NULL);
 
-	hold_load();
+	hold_load(machine);
 
 	tms9901_init(0, &usr9901reset_param);
 	tms9901_init(1, &sys9901reset_param);
@@ -224,7 +224,7 @@ static MACHINE_RESET( tm990_189_v )
 	joy2x_timer = timer_alloc(NULL, NULL);
 	joy2y_timer = timer_alloc(NULL, NULL);
 
-	hold_load();
+	hold_load(machine);
 
 	tms9901_init(0, &usr9901reset_param);
 	tms9901_init(1, &sys9901reset_param);
@@ -348,12 +348,12 @@ static VIDEO_UPDATE( tm990_189_v )
     Interrupt handlers
 */
 
-static void field_interrupts(void)
+static void field_interrupts(running_machine *machine)
 {
 	if (load_state)
-		cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, 2);
+		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 2);
 	else
-		cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, ic_state);
+		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, ic_state);
 }
 
 /*
@@ -363,13 +363,13 @@ static void field_interrupts(void)
 static TIMER_CALLBACK(clear_load)
 {
 	load_state = FALSE;
-	field_interrupts();
+	field_interrupts(machine);
 }
 
-static void hold_load(void)
+static void hold_load(running_machine *machine)
 {
 	load_state = TRUE;
-	field_interrupts();
+	field_interrupts(machine);
 	timer_set(ATTOTIME_IN_MSEC(100), NULL, 0, clear_load);
 }
 
@@ -382,7 +382,7 @@ static void usr9901_interrupt_callback(int intreq, int ic)
 	ic_state = ic & 7;
 
 	if (!load_state)
-		field_interrupts();
+		field_interrupts(Machine);
 }
 
 static void usr9901_led_w(int offset, int data)
@@ -563,7 +563,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 		break;
 
 	case 7: /* LREX: trigger LOAD */
-		hold_load();
+		hold_load(machine);
 		break;
 	}
 }

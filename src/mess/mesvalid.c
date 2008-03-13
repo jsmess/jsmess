@@ -286,7 +286,6 @@ int mess_validitychecks(void)
 	iodevice_t devtype;
 	const char *name;
 	input_port_entry *inputports = NULL;
-	extern int device_valididtychecks(void);
 
 	/* make sure that all of the UI_* strings are set for all devices */
 	for (devtype = 0; devtype < IO_COUNT; devtype++)

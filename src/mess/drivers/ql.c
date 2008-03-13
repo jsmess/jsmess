@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/m68000/m68000.h"
 #include "devices/cartslot.h"
@@ -105,10 +104,10 @@ static emu_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer, *zx830
 
 static UINT8 *mdv_image;
 
-static void zx8302_interrupt(UINT8 line)
+static void zx8302_interrupt(running_machine *machine, UINT8 line)
 {
 	zx8302.irq |= line;
-	cpunum_set_input_line(Machine, 0, MC68000_IRQ_2, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);
 }
 
 static void zx8302_txd(int level)
@@ -160,7 +159,7 @@ static TIMER_CALLBACK( zx8302_txd_tick )
 		zx8302_txd(1);
 		zx8302.tx_bits = ZX8302_TXD_START;
 		zx8302.status &= ~ZX8302_STATUS_TX_BUFFER_FULL;
-		zx8302_interrupt(ZX8302_INT_TRANSMIT);
+		zx8302_interrupt(machine, ZX8302_INT_TRANSMIT);
 		break;
 	}
 }
@@ -179,7 +178,7 @@ static TIMER_CALLBACK( zx8302_gap_tick )
 {
 	if (zx8302.mdv_motor)
 	{
-		zx8302_interrupt(ZX8302_INT_GAP);
+		zx8302_interrupt(machine, ZX8302_INT_GAP);
 	}
 }
 
@@ -380,7 +379,7 @@ static WRITE8_HANDLER( zx8302_data_w )
 
 static INTERRUPT_GEN( zx8302_int )
 {
-	zx8302_interrupt(ZX8302_INT_FRAME);
+	zx8302_interrupt(machine, ZX8302_INT_FRAME);
 }
 
 /* Intelligent Peripheral Controller (IPC) */

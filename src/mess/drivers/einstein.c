@@ -349,24 +349,24 @@ static void einstein_scan_keyboard(void)
 	einstein_keyboard_data = data;
 }
 
-static void einstein_update_interrupts(void)
+static void einstein_update_interrupts(running_machine *machine)
 {
 	/* NPW 21-Jul-2005 - Not sure how to update this for MAME 0.98u2 */
 /*
     if (einstein_int & einstein_int_mask & EINSTEIN_KEY_INT)
-        cpunum_set_input_line(Machine, 0, Z80_INT_REQ, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, Z80_INT_REQ, PULSE_LINE);
     else
-        cpunum_set_input_line(Machine, 0, Z80_INT_IEO, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, Z80_INT_IEO, PULSE_LINE);
 
     if (einstein_int & einstein_int_mask & EINSTEIN_ADC_INT)
-        cpunum_set_input_line(Machine, 0, Z80_INT_REQ, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, Z80_INT_REQ, PULSE_LINE);
     else
-        cpunum_set_input_line(Machine, 0, Z80_INT_IEO, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, Z80_INT_IEO, PULSE_LINE);
 
     if (einstein_int & einstein_int_mask & EINSTEIN_FIRE_INT)
-        cpunum_set_input_line(Machine, 0, Z80_INT_REQ, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, Z80_INT_REQ, PULSE_LINE);
     else
-        cpunum_set_input_line(Machine, 0, Z80_INT_IEO, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, Z80_INT_IEO, PULSE_LINE);
 */
 }
 
@@ -395,7 +395,7 @@ static TIMER_CALLBACK(einstein_keyboard_timer_callback)
 		einstein_int &= ~EINSTEIN_KEY_INT;
 	}
 
-	einstein_update_interrupts();
+	einstein_update_interrupts(machine);
 }
 
 
@@ -459,7 +459,7 @@ static void einstein_keyboard_int_reset(int which)
 {
 	einstein_int_mask &= ~EINSTEIN_KEY_INT;
 
-	einstein_update_interrupts();
+	einstein_update_interrupts(Machine);
 }
 
 
@@ -468,7 +468,7 @@ static void einstein_adc_int_reset(int which)
 {
 	einstein_int_mask &= ~EINSTEIN_ADC_INT;
 
-	einstein_update_interrupts();
+	einstein_update_interrupts(Machine);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -477,7 +477,7 @@ static void einstein_fire_int_reset(int which)
 {
 	einstein_int_mask &= ~EINSTEIN_FIRE_INT;
 
-	einstein_update_interrupts();
+	einstein_update_interrupts(Machine);
 }
 #endif
 
@@ -845,7 +845,7 @@ static WRITE8_HANDLER(einstein_rom_w)
 	einstein_page_rom();
 }
 
-static  READ8_HANDLER(einstein_key_int_r)
+static READ8_HANDLER(einstein_key_int_r)
 {
 	int centronics_handshake;
 	int data;
@@ -853,7 +853,7 @@ static  READ8_HANDLER(einstein_key_int_r)
 	/* clear key int. a read of this I/O port will do this or a reset */
 	einstein_int &= ~EINSTEIN_KEY_INT;
 
-	einstein_update_interrupts();
+	einstein_update_interrupts(machine);
 
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	centronics_handshake = centronics_read_handshake(0);
@@ -916,7 +916,7 @@ static WRITE8_HANDLER(einstein_key_int_w)
 		einstein_int_mask |= EINSTEIN_KEY_INT;
 	}
 
-	einstein_update_interrupts();
+	einstein_update_interrupts(machine);
 }
 
 static WRITE8_HANDLER(einstein_adc_int_w)
@@ -936,7 +936,7 @@ static WRITE8_HANDLER(einstein_adc_int_w)
 		einstein_int_mask |= EINSTEIN_ADC_INT;
 	}
 
-	einstein_update_interrupts();
+	einstein_update_interrupts(machine);
 }
 
 static WRITE8_HANDLER(einstein_fire_int_w)
@@ -957,7 +957,7 @@ static WRITE8_HANDLER(einstein_fire_int_w)
 		einstein_int_mask |= EINSTEIN_FIRE_INT;
 	}
 
-	einstein_update_interrupts();
+	einstein_update_interrupts(machine);
 }
 
 

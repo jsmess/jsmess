@@ -210,7 +210,7 @@ extern int amstrad_CRTC_HS_Counter;
 static void multiface_rethink_memory(void);
 static WRITE8_HANDLER(multiface_io_write);
 static void multiface_init(void);
-static void multiface_stop(void);
+static void multiface_stop(running_machine *machine);
 static int multiface_hardware_enabled(void);
 static void multiface_reset(void);
 /* ---------------------------------------
@@ -1613,7 +1613,7 @@ int multiface_hardware_enabled(void)
 }
 
 /* simulate the stop button has been pressed */
-void	multiface_stop(void)
+void multiface_stop(running_machine *machine)
 {
 	/* multiface hardware enabled? */
 		if (!multiface_hardware_enabled())
@@ -1637,7 +1637,7 @@ void	multiface_stop(void)
 		multiface_rethink_memory();
 
 		/* pulse the nmi line */
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
 		/* initialise 0065 override to monitor calls to 0065 */
 		memory_set_opbase_handler(0,amstrad_multiface_opbaseoverride);
@@ -1799,7 +1799,7 @@ static WRITE8_HANDLER(multiface_io_write)
 /* called when cpu acknowledges int */
 /* reset top bit of interrupt line counter */
 /* this ensures that the next interrupt is no closer than 32 lines */
-static int 	amstrad_cpu_acknowledge_int(int cpu)
+static int amstrad_cpu_acknowledge_int(int cpu)
 {
 	// DMA interrupts can be automatically cleared if bit 0 of &6805 is set to 0
 	if(amstrad_plus_asic_enabled != 0 && amstrad_plus_irq_cause != 0x06 && amstrad_plus_dma_clear & 0x01)
@@ -1828,7 +1828,7 @@ static VIDEO_EOF( amstrad )
 {
 	if (readinputportbytag_safe("multiface", 0) & 0x02)
 	{
-		multiface_stop();
+		multiface_stop(machine);
 	}
 }
 /* sets up for a machine reset

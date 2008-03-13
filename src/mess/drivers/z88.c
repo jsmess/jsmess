@@ -13,7 +13,6 @@
 
  ******************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/z88.h"
 #include "sound/speaker.h"
 
@@ -31,7 +30,7 @@ static void blink_reset(void)
 }
 
 
-static void z88_interrupt_refresh(void)
+static void z88_interrupt_refresh(running_machine *machine)
 {
 	/* ints enabled? */
 	if ((blink.ints & INT_GINT)!=0)
@@ -45,13 +44,13 @@ static void z88_interrupt_refresh(void)
 			)
 		{
 			logerror("set int\n");
-			cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 			return;
 		}
 	}
 
 	logerror("clear int\n");
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static void z88_update_rtc_interrupt(void)
@@ -102,7 +101,7 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 
 			cpu_trigger(machine, Z88_SNOOZE_TRIGGER);
 
-			z88_interrupt_refresh();
+			z88_interrupt_refresh(machine);
 		}
 	}
 
@@ -169,7 +168,7 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 		z88_update_rtc_interrupt();
 
 		/* refresh */
-		z88_interrupt_refresh();
+		z88_interrupt_refresh(machine);
 	}
 }
 
@@ -406,7 +405,7 @@ static WRITE8_HANDLER(z88_port_w)
 
 			/* refresh ints */
 			z88_update_rtc_interrupt();
-			z88_interrupt_refresh();
+			z88_interrupt_refresh(machine);
 		}
 		return;
 
@@ -420,7 +419,7 @@ static WRITE8_HANDLER(z88_port_w)
 
 			/* refresh ints */
 			z88_update_rtc_interrupt();
-			z88_interrupt_refresh();
+			z88_interrupt_refresh(machine);
 		}
 		return;
 
@@ -472,7 +471,7 @@ static WRITE8_HANDLER(z88_port_w)
 
 			blink.ints = data;
 			z88_update_rtc_interrupt();
-			z88_interrupt_refresh();
+			z88_interrupt_refresh(machine);
 		}
 		return;
 
@@ -486,7 +485,7 @@ static WRITE8_HANDLER(z88_port_w)
 
 			blink.ints &= ~blink.ack;
 			z88_update_rtc_interrupt();
-			z88_interrupt_refresh();
+			z88_interrupt_refresh(machine);
 		}
 		return;
 

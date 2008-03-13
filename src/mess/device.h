@@ -283,7 +283,7 @@ void devices_free(const struct IODevice *devices);
 const struct IODevice *device_find_tag(const struct IODevice *devices, const char *tag);
 int device_count_tag(const struct IODevice *devices, const char *tag);
 
-/* device lookup; both of these function assume only one of each type of device */
+/* deprecated: device lookup; both of these function assume only one of each type of device */
 const struct IODevice *device_find(const struct IODevice *devices, iodevice_t type);
 int device_count(iodevice_t type);
 

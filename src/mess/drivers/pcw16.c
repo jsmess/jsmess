@@ -128,16 +128,16 @@ static int pcw16_fdc_int_code;
 static int pcw16_system_status;
 
 // debugging - write ram as seen by cpu
-static void pcw16_refresh_ints(void)
+static void pcw16_refresh_ints(running_machine *machine)
 {
 	/* any bits set excluding vsync */
 	if ((pcw16_system_status & (~0x04))!=0)
 	{
-		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	}
 }
 
@@ -154,7 +154,7 @@ static TIMER_CALLBACK(pcw16_timer_callback)
 
 	if (pcw16_interrupt_counter!=0)
 	{
-		pcw16_refresh_ints();
+		pcw16_refresh_ints(machine);
 	}
 }
 
@@ -551,9 +551,9 @@ static int pcw16_keyboard_bits_output = 0;
 static int pcw16_keyboard_state = 0;
 static int pcw16_keyboard_previous_state=0;
 static void pcw16_keyboard_reset(void);
-static void pcw16_keyboard_int(int);
+static void pcw16_keyboard_int(running_machine *, int);
 
-static void pcw16_keyboard_init(void)
+static void pcw16_keyboard_init(running_machine *machine)
 {
 	int i;
 	int b;
@@ -580,7 +580,7 @@ static void pcw16_keyboard_init(void)
 
 
 	/* clear int */
-	pcw16_keyboard_int(0);
+	pcw16_keyboard_int(machine, 0);
 	/* reset state */
 	pcw16_keyboard_state = 0;
 	/* reset ready for transmit */
@@ -611,7 +611,7 @@ static void pcw16_keyboard_set_clock_state(int state)
 	pcw16_keyboard_refresh_outputs();
 }
 
-static void pcw16_keyboard_int(int state)
+static void pcw16_keyboard_int(running_machine *machine, int state)
 {
 	pcw16_system_status &= ~(1<<1);
 
@@ -620,7 +620,7 @@ static void pcw16_keyboard_int(int state)
 		pcw16_system_status |= (1<<1);
 	}
 
-	pcw16_refresh_ints();
+	pcw16_refresh_ints(machine);
 }
 
 static void pcw16_keyboard_reset(void)
@@ -635,7 +635,7 @@ static READ8_HANDLER(pcw16_keyboard_data_shift_r)
 	//logerror("keyboard data shift r: %02x\n", pcw16_keyboard_data_shift);
 	pcw16_keyboard_state &= ~(PCW16_KEYBOARD_BUSY_STATUS);
 
-	pcw16_keyboard_int(0);
+	pcw16_keyboard_int(machine, 0);
 	/* reset for reception */
 	pcw16_keyboard_reset();
 
@@ -659,9 +659,8 @@ static void	pcw16_begin_byte_transfer(void)
 #endif
 
 /* signal a code has been received */
-static void	pcw16_keyboard_signal_byte_received(int data)
+static void	pcw16_keyboard_signal_byte_received(running_machine *machine, int data)
 {
-
 	/* clear clock */
 	pcw16_keyboard_set_clock_state(0);
 
@@ -684,7 +683,7 @@ static void	pcw16_keyboard_signal_byte_received(int data)
 	if ((pcw16_keyboard_parity_table[data])==0)
 		pcw16_keyboard_state |= PCW16_KEYBOARD_PARITY_MASK;
 
-	pcw16_keyboard_int(1);
+	pcw16_keyboard_int(machine, 1);
 }
 
 
@@ -757,7 +756,7 @@ static WRITE8_HANDLER(pcw16_keyboard_control_w)
 				/* set clock low - no furthur transmissions */
 				pcw16_keyboard_set_clock_state(0);
 				/* set int */
-				pcw16_keyboard_int(1);
+				pcw16_keyboard_int(machine, 1);
 			}
 		}
 
@@ -770,7 +769,7 @@ static WRITE8_HANDLER(pcw16_keyboard_control_w)
 		{
 			if ((pcw16_system_status & (1<<1))!=0)
 			{
-				pcw16_keyboard_int(0);
+				pcw16_keyboard_int(machine, 0);
 			}
 		}
 	}
@@ -795,7 +794,7 @@ static TIMER_CALLBACK(pcw16_keyboard_timer_callback)
 //              pcw16_dump_cpu_ram();
 //          }
 
-			pcw16_keyboard_signal_byte_received(data);
+			pcw16_keyboard_signal_byte_received(machine, data);
 		}
 	}
 }
@@ -991,7 +990,7 @@ static WRITE8_HANDLER(rtc_year_w)
 
 static int previous_fdc_int_state;
 
-static void pcw16_trigger_fdc_int(void)
+static void pcw16_trigger_fdc_int(running_machine *machine)
 {
 	int state;
 
@@ -1014,7 +1013,7 @@ static void pcw16_trigger_fdc_int(void)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
                     it would clear - to be checked */
-					cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+					cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
 		}
@@ -1023,7 +1022,7 @@ static void pcw16_trigger_fdc_int(void)
 		/* attach fdc to int */
 		case 1:
 		{
-			pcw16_refresh_ints();
+			pcw16_refresh_ints(machine);
 		}
 		break;
 
@@ -1035,14 +1034,14 @@ static void pcw16_trigger_fdc_int(void)
 	previous_fdc_int_state = state;
 }
 
-static  READ8_HANDLER(pcw16_system_status_r)
+static READ8_HANDLER(pcw16_system_status_r)
 {
 //  logerror("system status r: \n");
 
 	return pcw16_system_status | (readinputport(0) & 0x04);
 }
 
-static  READ8_HANDLER(pcw16_timer_interrupt_counter_r)
+static READ8_HANDLER(pcw16_timer_interrupt_counter_r)
 {
 	int data;
 
@@ -1052,7 +1051,7 @@ static  READ8_HANDLER(pcw16_timer_interrupt_counter_r)
 	/* clear display int */
 	pcw16_system_status &= ~(1<<0);
 
-	pcw16_refresh_ints();
+	pcw16_refresh_ints(machine);
 
 	return data;
 }
@@ -1202,7 +1201,7 @@ static void	pcw16_fdc_interrupt(int state)
 		pcw16_system_status |= (1<<6);
 	}
 
-	pcw16_trigger_fdc_int();
+	pcw16_trigger_fdc_int(Machine);
 }
 
 static const struct pc_fdc_interface pcw16_fdc_interface=
@@ -1222,7 +1221,7 @@ static void pcw16_com_interrupt(int nr, int state)
 		pcw16_system_status |= (1<<irq[nr]);
 	}
 
-	pcw16_refresh_ints();
+	pcw16_refresh_ints(Machine);
 }
 
 static void pcw16_com_refresh_connected(int serial_port_id)
@@ -1303,7 +1302,7 @@ static ADDRESS_MAP_START(pcw16_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
-static void pcw16_reset(void)
+static void pcw16_reset(running_machine *machine)
 {
 	/* initialise defaults */
 	pcw16_fdc_int_code = 2;
@@ -1324,7 +1323,7 @@ static void pcw16_reset(void)
 	rtc_control = 1;
 	rtc_256ths_seconds = 0;
 
-	pcw16_keyboard_init();
+	pcw16_keyboard_init(machine);
 	uart8250_reset(0);
 	uart8250_reset(1);
 }
@@ -1372,7 +1371,7 @@ static MACHINE_RESET( pcw16 )
 	at_keyboard_init(AT_KEYBOARD_TYPE_AT);
 	at_keyboard_set_scan_code_set(3);
 
-	pcw16_reset();
+	pcw16_reset(machine);
 
 	beep_set_state(0,0);
 	beep_set_frequency(0,3750);

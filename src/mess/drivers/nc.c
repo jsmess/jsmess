@@ -295,7 +295,7 @@ nc200 */
 static int nc_irq_latch_mask;
 static int nc_sound_channel_periods[2];
 
-static void nc_update_interrupts(void)
+static void nc_update_interrupts(running_machine *machine)
 {
 	nc_irq_status &= ~nc_irq_latch_mask;
 	nc_irq_status |= nc_irq_latch;
@@ -307,12 +307,12 @@ static void nc_update_interrupts(void)
 	{
 		logerror("int set %02x\n",nc_irq_status & nc_irq_mask);
 		/* set int */
-		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 	else
 	{
 		/* clear int */
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	}
 }
 
@@ -324,7 +324,7 @@ static TIMER_CALLBACK(nc_keyboard_timer_callback)
         nc_irq_status |= (1<<3);
 
         /* update ints */
-        nc_update_interrupts();
+        nc_update_interrupts(machine);
 
         /* don't trigger again, but don't free it */
         timer_reset(nc_keyboard_timer, attotime_never);
@@ -483,20 +483,20 @@ static void nc_common_store_memory_to_stream(void)
 	mame_fwrite(file, mess_ram, mess_ram_size);
 }
 
-static void nc_common_open_stream_for_reading(void)
+static void nc_common_open_stream_for_reading(running_machine *machine)
 {
 	char filename[MAX_DRIVER_NAME_CHARS + 5];
 
-	sprintf(filename,"%s.nv", Machine->gamedrv->name);
+	sprintf(filename,"%s.nv", machine->gamedrv->name);
 
 	mame_fopen(SEARCHPATH_MEMCARD, filename, OPEN_FLAG_READ, &file);
 }
 
-static void nc_common_open_stream_for_writing(void)
+static void nc_common_open_stream_for_writing(running_machine *machine)
 {
     char filename[MAX_DRIVER_NAME_CHARS + 5];
 
-    sprintf(filename,"%s.nv", Machine->gamedrv->name);
+    sprintf(filename,"%s.nv", machine->gamedrv->name);
 
 	mame_fopen(SEARCHPATH_MEMCARD, filename, OPEN_FLAG_WRITE, &file);
 }
@@ -540,7 +540,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
 				case NC_TYPE_200:
 				{
 					nc_irq_status |=(1<<4);
-					nc_update_interrupts();
+					nc_update_interrupts(machine);
 				}
 				break;
 			}
@@ -559,7 +559,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
 
 static TIMER_CALLBACK(nc_serial_timer_callback);
 
-static void nc_common_init_machine(void)
+static void nc_common_init_machine(running_machine *machine)
 {
 	/* setup reset state */
 	nc_display_memory_start = 0;
@@ -588,7 +588,7 @@ static void nc_common_init_machine(void)
     nc_poweroff_control = 1;
 
     nc_refresh_memory_config();
-	nc_update_interrupts();
+	nc_update_interrupts(machine);
 
 	/* keyboard timer */
 	nc_keyboard_timer = timer_alloc(nc_keyboard_timer_callback, NULL);
@@ -633,7 +633,7 @@ static WRITE8_HANDLER(nc_irq_mask_w)
 	/* writing mask clears ints that are to be masked? */
 	nc_irq_mask = data;
 
-	nc_update_interrupts();
+	nc_update_interrupts(machine);
 }
 
 static WRITE8_HANDLER(nc_irq_status_w)
@@ -650,7 +650,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
 			/* set timer to occur again */
 			timer_reset(nc_keyboard_timer, ATTOTIME_IN_MSEC(10));
 
-			nc_update_interrupts();
+			nc_update_interrupts(machine);
 		}
 	}
 
@@ -670,16 +670,16 @@ static WRITE8_HANDLER(nc_irq_status_w)
 #endif
         nc_irq_status &=~data;
 
-        nc_update_interrupts();
+        nc_update_interrupts(machine);
 }
 
-static  READ8_HANDLER(nc_irq_status_r)
+static READ8_HANDLER(nc_irq_status_r)
 {
         return ~((nc_irq_status & (~nc_irq_latch_mask)) | nc_irq_latch);
 }
 
 
-static  READ8_HANDLER(nc_key_data_in_r)
+static READ8_HANDLER(nc_key_data_in_r)
 {
 	if (offset==9)
 	{
@@ -689,7 +689,7 @@ static  READ8_HANDLER(nc_key_data_in_r)
 		/* set timer to occur again */
 		timer_reset(nc_keyboard_timer, ATTOTIME_IN_MSEC(10));
 
-		nc_update_interrupts();
+		nc_update_interrupts(machine);
 	}
 	return readinputport(offset);
 }
@@ -855,7 +855,7 @@ static WRITE8_HANDLER(nc100_uart_control_w)
 //  {
 //      /* clear latched irq's */
 //      nc_irq_latch &= ~3;
-//      nc_update_interrupts();
+//      nc_update_interrupts(machine);
 //  }
 }
 
@@ -895,7 +895,7 @@ static void nc100_txrdy_callback(int state)
 		}
 	}
 
-	nc_update_interrupts();
+	nc_update_interrupts(Machine);
 }
 
 static void nc100_rxrdy_callback(int state)
@@ -911,7 +911,7 @@ static void nc100_rxrdy_callback(int state)
 		}
 	}
 
-	nc_update_interrupts();
+	nc_update_interrupts(Machine);
 }
 
 
@@ -939,7 +939,7 @@ static void nc100_printer_handshake_in(int number, int data, int mask)
 		}
 	}
 	/* trigger an int if the irq is set */
-	nc_update_interrupts();
+	nc_update_interrupts(Machine);
 }
 
 static const CENTRONICS_CONFIG nc100_cent_config[1]={
@@ -958,7 +958,7 @@ static MACHINE_RESET( nc100 )
 
     nc_membank_card_ram_mask = 0x03f;
 
-    nc_common_init_machine();
+    nc_common_init_machine(machine);
 
 	tc8521_init(&nc100_tc8521_interface);
 
@@ -968,7 +968,7 @@ static MACHINE_RESET( nc100 )
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
-	nc_common_open_stream_for_reading();
+	nc_common_open_stream_for_reading(machine);
 	tc8521_load_stream(file);
 
 	nc_common_restore_memory_from_stream();
@@ -981,7 +981,7 @@ static MACHINE_RESET( nc100 )
 
 static void nc100_machine_stop(running_machine *machine)
 {
-	nc_common_open_stream_for_writing();
+	nc_common_open_stream_for_writing(machine);
 	tc8521_save_stream(file);
 	nc_common_store_memory_to_stream();
 	nc_common_close_stream();
@@ -1205,7 +1205,7 @@ void nc150_init_machine(void)
 
         nc_membank_card_ram_mask = 0x03f;
 
-        nc_common_init_machine();
+        nc_common_init_machine(Machine);
 }
 #endif
 
@@ -1239,7 +1239,7 @@ static void nc200_printer_handshake_in(int number, int data, int mask)
 		}
 	}
 	/* trigger an int if the irq is set */
-	nc_update_interrupts();
+	nc_update_interrupts(Machine);
 }
 
 static const CENTRONICS_CONFIG nc200_cent_config[1]={
@@ -1255,7 +1255,7 @@ static const CENTRONICS_CONFIG nc200_cent_config[1]={
 together with a or to generate a single interrupt */
 static UINT8 nc200_uart_interrupt_irq;
 
-static void nc200_refresh_uart_interrupt(void)
+static void nc200_refresh_uart_interrupt(running_machine *machine)
 {
 	nc_irq_latch &=~(1<<2);
 
@@ -1267,7 +1267,7 @@ static void nc200_refresh_uart_interrupt(void)
 			nc_irq_latch |= (1<<2);
 		}
 	}
-	nc_update_interrupts();
+	nc_update_interrupts(machine);
 }
 
 static void nc200_txrdy_callback(int state)
@@ -1279,7 +1279,7 @@ static void nc200_txrdy_callback(int state)
 //      nc200_uart_interrupt_irq |=(1<<0);
 //  }
 //
-//  nc200_refresh_uart_interrupt();
+//  nc200_refresh_uart_interrupt(Machine);
 }
 
 static void nc200_rxrdy_callback(int state)
@@ -1291,7 +1291,7 @@ static void nc200_rxrdy_callback(int state)
 		nc200_uart_interrupt_irq |=(1<<1);
 	}
 
-	nc200_refresh_uart_interrupt();
+	nc200_refresh_uart_interrupt(Machine);
 }
 
 static const struct msm8251_interface nc200_uart_interface=
@@ -1319,7 +1319,7 @@ static void nc200_fdc_interrupt(int state)
             nc_irq_status |=(1<<5);
     }
 
-    nc_update_interrupts();
+    nc_update_interrupts(Machine);
 }
 
 static const struct nec765_interface nc200_nec765_interface=
@@ -1334,7 +1334,7 @@ static void nc200_floppy_drive_index_callback(int drive_id)
 	LOG_DEBUG(("nc200 index pulse\n"));
 //  nc_irq_status |= (1<<4);
 
-//  nc_update_interrupts();
+//  nc_update_interrupts(Machine);
 }
 #endif
 
@@ -1347,7 +1347,7 @@ static MACHINE_RESET( nc200 )
 
     nc_membank_card_ram_mask = 0x03f;
 
-    nc_common_init_machine();
+    nc_common_init_machine(machine);
 
     nec765_init(&nc200_nec765_interface, NEC765A);
     /* double sided, 80 track drive */
@@ -1363,7 +1363,7 @@ static MACHINE_RESET( nc200 )
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
-	nc_common_open_stream_for_reading();
+	nc_common_open_stream_for_reading(machine);
 	if (file)
 	{
 		mc146818_load_stream(file);
@@ -1379,7 +1379,7 @@ static MACHINE_RESET( nc200 )
 
 static void nc200_machine_stop(running_machine *machine)
 {
-	nc_common_open_stream_for_writing();
+	nc_common_open_stream_for_writing(machine);
 	if (file)
 	{
 		mc146818_save_stream(file);
@@ -1478,7 +1478,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 	{
 		nc200_uart_interrupt_irq &=~3;
 
-		nc200_refresh_uart_interrupt();
+		nc200_refresh_uart_interrupt(machine);
 	}
 
 	/* bit 5 is used in disk interface */

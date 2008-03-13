@@ -314,7 +314,7 @@ static void gb_sound_w_internal(running_machine *machine, int offset, UINT8 data
 			snd_4.count = 0;
 			snd_4.env_value = snd_regs[NR42] >> 4;
 			snd_4.env_count = 0;
-			snd_4.signal = mame_rand(Machine);
+			snd_4.signal = mame_rand(machine);
 			snd_4.ply_value = 0x7fff;
 			snd_regs[NR52] |= 0x8;
 		}

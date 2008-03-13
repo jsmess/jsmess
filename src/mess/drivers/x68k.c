@@ -1376,19 +1376,19 @@ static WRITE16_HANDLER( x68k_exp_w )
 	}
 }
 
-static void x68k_dma_irq(int channel)
+static void x68k_dma_irq(running_machine *machine, int channel)
 {
 	current_vector[3] = hd63450_get_vector(channel);
 	current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,current_vector[3]);
-	cpunum_set_input_line_and_vector(Machine, 0,3,ASSERT_LINE,current_vector[3]);
+	cpunum_set_input_line_and_vector(machine, 0,3,ASSERT_LINE,current_vector[3]);
 }
 
 static void x68k_dma_end(int channel,int irq)
 {
 	if(irq != 0)
 	{
-		x68k_dma_irq(channel);
+		x68k_dma_irq(Machine, channel);
 	}
 }
 

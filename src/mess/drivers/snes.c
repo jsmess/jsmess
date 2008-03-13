@@ -285,7 +285,7 @@ static int device_load_snes_cart(mess_image *image)
 		"UNKNOWN"
 	};
 
-	new_memory_region(Machine, REGION_CPU1, 0x1000000,0);
+	new_memory_region(machine, REGION_CPU1, 0x1000000,0);
 
 	snes_ram = memory_region( REGION_CPU1 );
 	memset( snes_ram, 0, 0x1000000 );

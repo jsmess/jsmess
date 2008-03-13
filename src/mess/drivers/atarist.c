@@ -87,9 +87,8 @@ static struct FDC
 	int irq;
 } fdc;
 
-static void atarist_fdc_dma_transfer(void)
+static void atarist_fdc_dma_transfer(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	if ((fdc.mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
@@ -139,7 +138,7 @@ static void atarist_fdc_callback(running_machine *machine, wd17xx_state_t event,
 
 	case WD17XX_DRQ_SET:
 		fdc.status |= ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
-		atarist_fdc_dma_transfer();
+		atarist_fdc_dma_transfer(machine);
 		break;
 
 	case WD17XX_DRQ_CLR:
@@ -488,9 +487,9 @@ static const int DMASOUND_RATE[] = { Y2/640/8, Y2/640/4, Y2/640/2, Y2/640 };
 
 static emu_timer *dmasound_timer;
 
-static void atariste_dmasound_set_state(int level)
+static void atariste_dmasound_set_state(running_machine *machine, int level)
 {
-	atarist_state *state = Machine->driver_data;
+	atarist_state *state = machine->driver_data;
 
 	dmasound.active = level;
 	mc68901_tai_w(state->mfp, level);
@@ -520,7 +519,7 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 
 			if (dmasound.cntr == dmasound.endlatch)
 			{
-				atariste_dmasound_set_state(0);
+				atariste_dmasound_set_state(machine, 0);
 				break;
 			}
 		}
@@ -544,7 +543,7 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 	{
 		if ((dmasound.ctrl & 0x03) == 0x03)
 		{
-			atariste_dmasound_set_state(1);
+			atariste_dmasound_set_state(machine, 1);
 		}
 		else
 		{
@@ -616,13 +615,13 @@ static WRITE16_HANDLER( atariste_sound_dma_control_w )
 	{
 		if (!dmasound.active)
 		{
-			atariste_dmasound_set_state(1);
+			atariste_dmasound_set_state(machine, 1);
 			timer_adjust_periodic(dmasound_timer, attotime_zero, 0, ATTOTIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]));
 		}
 	}
 	else
 	{
-		atariste_dmasound_set_state(0);
+		atariste_dmasound_set_state(machine, 0);
 		timer_enable(dmasound_timer, 0);
 	}
 }

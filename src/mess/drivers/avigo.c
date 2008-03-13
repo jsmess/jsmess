@@ -152,12 +152,12 @@ static WRITE8_HANDLER(avigo_flash_0x8000_write_handler)
 }
 #endif
 
-static void avigo_refresh_ints(void)
+static void avigo_refresh_ints(running_machine *machine)
 {
 	if (avigo_irq!=0)
-		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -266,7 +266,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 	memcpy(previous_input_port_data, current_input_port_data, sizeof(int)*4);
 
 	/* refresh status of interrupts */
-	avigo_refresh_ints();
+	avigo_refresh_ints(machine);
 }
 
 /* does not do anything yet */
@@ -280,7 +280,7 @@ static void avigo_tc8521_alarm_int(int state)
 		avigo_irq |= (1<<5);
 	}
 
-	avigo_refresh_ints();
+	avigo_refresh_ints(Machine);
 //#endif
 }
 
@@ -369,7 +369,7 @@ static void avigo_com_interrupt(int irq_num, int state)
 		avigo_irq |= (1<<3);
 	}
 
-	avigo_refresh_ints();
+	avigo_refresh_ints(Machine);
 }
 
 
@@ -515,7 +515,7 @@ static WRITE8_HANDLER(avigo_irq_w)
 {
 	avigo_irq &= ~data;
 
-	avigo_refresh_ints();
+	avigo_refresh_ints(machine);
 }
 
 static  READ8_HANDLER(avigo_rom_bank_l_r)

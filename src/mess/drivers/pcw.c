@@ -141,18 +141,18 @@ static const nec765_interface pcw_nec765_interface =
 };
 
 /* determines if int line is held or cleared */
-static void pcw_interrupt_handle(void)
+static void pcw_interrupt_handle(running_machine *machine)
 {
 	if (
 		(pcw_interrupt_counter!=0) ||
 		((fdc_interrupt_code==1) && ((pcw_system_status & (1<<5))!=0))
 		)
 	{
-		cpunum_set_input_line(Machine, 0, 0,HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0,HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 0, 0,CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0,CLEAR_LINE);
 	}
 }
 
@@ -163,13 +163,13 @@ static TIMER_CALLBACK(pcw_timer_interrupt)
 {
 	pcw_update_interrupt_counter();
 
-	pcw_interrupt_handle();
+	pcw_interrupt_handle(machine);
 }
 
 static int previous_fdc_int_state;
 
 /* set/clear fdc interrupt */
-static void	pcw_trigger_fdc_int(void)
+static void	pcw_trigger_fdc_int(running_machine *machine)
 {
 	int state;
 
@@ -192,7 +192,7 @@ static void	pcw_trigger_fdc_int(void)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
                     it would clear - to be checked */
-					cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+					cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
 		}
@@ -201,8 +201,7 @@ static void	pcw_trigger_fdc_int(void)
 		/* attach fdc to int */
 		case 1:
 		{
-
-			pcw_interrupt_handle();
+			pcw_interrupt_handle(machine);
 		}
 		break;
 
@@ -225,7 +224,7 @@ static void pcw_fdc_interrupt(int state)
 		pcw_system_status |= (1<<5);
 	}
 
-	pcw_trigger_fdc_int();
+	pcw_trigger_fdc_int(Machine);
 }
 
 
@@ -372,7 +371,7 @@ static int pcw_get_sys_status(void)
 	return pcw_interrupt_counter | (readinputport(16) & (0x040 | 0x010)) | pcw_system_status;
 }
 
-static  READ8_HANDLER(pcw_interrupt_counter_r)
+static READ8_HANDLER(pcw_interrupt_counter_r)
 {
 	int data;
 
@@ -383,7 +382,7 @@ static  READ8_HANDLER(pcw_interrupt_counter_r)
 	/* clear int counter */
 	pcw_interrupt_counter = 0;
 	/* update interrupt */
-	pcw_interrupt_handle();
+	pcw_interrupt_handle(machine);
 	/* return data */
 	return data;
 }
@@ -459,10 +458,10 @@ static WRITE8_HANDLER(pcw_system_control_w)
 			{
 				/* yes */
 
-				pcw_interrupt_handle();
+				pcw_interrupt_handle(machine);
 			}
 
-			pcw_trigger_fdc_int();
+			pcw_trigger_fdc_int(machine);
 		}
 		break;
 
@@ -485,7 +484,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 			}
 
 			/* re-issue interrupt */
-			pcw_interrupt_handle();
+			pcw_interrupt_handle(machine);
 		}
 		break;
 
@@ -507,7 +506,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 
 			}
 
-			pcw_interrupt_handle();
+			pcw_interrupt_handle(machine);
 		}
 		break;
 

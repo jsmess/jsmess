@@ -233,12 +233,12 @@ static INT32  scu_size_0,		/* Transfer DMA size lv 0*/
 			  scu_size_1,		/* lv 1*/
 			  scu_size_2;		/* lv 2*/
 
-static void dma_direct_lv0(void);	/*DMA level 0 direct transfer function*/
-static void dma_direct_lv1(void);   /*DMA level 1 direct transfer function*/
-static void dma_direct_lv2(void);   /*DMA level 2 direct transfer function*/
-static void dma_indirect_lv0(void); /*DMA level 0 indirect transfer function*/
-static void dma_indirect_lv1(void); /*DMA level 1 indirect transfer function*/
-static void dma_indirect_lv2(void); /*DMA level 2 indirect transfer function*/
+static void dma_direct_lv0(running_machine *machine);	/*DMA level 0 direct transfer function*/
+static void dma_direct_lv1(running_machine *machine);   /*DMA level 1 direct transfer function*/
+static void dma_direct_lv2(running_machine *machine);   /*DMA level 2 direct transfer function*/
+static void dma_indirect_lv0(running_machine *machine); /*DMA level 0 indirect transfer function*/
+static void dma_indirect_lv1(running_machine *machine); /*DMA level 1 indirect transfer function*/
+static void dma_indirect_lv2(running_machine *machine); /*DMA level 2 indirect transfer function*/
 
 
 static int minit_boost,sinit_boost;
@@ -246,11 +246,11 @@ static double minit_boost_timeslice, sinit_boost_timeslice;
 
 static int scanline;
 
-
+#if 0
 /*A-Bus IRQ checks,where they could be located these?*/
 #define ABUSIRQ(_irq_,_vector_,_mask_) \
 	if(!(stv_scu[40] & _mask_)) { cpunum_set_input_line_and_vector(Machine, 0, _irq_, HOLD_LINE , _vector_); }
-#if 0
+
 if(stv_scu[42] & 1)//IRQ ACK
 {
 	ABUSIRQ(7,0x50,0x00010000);
@@ -516,13 +516,13 @@ static UINT8 stv_SMPC_r8 (int offset)
 	return return_data;
 }
 
-static void stv_SMPC_w8 (int offset, UINT8 data)
+static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 {
 	mame_system_time systime;
 	UINT8 last;
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(Machine, &systime);
+	mame_get_current_datetime(machine, &systime);
 
 //  if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
 
@@ -538,7 +538,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 			intback_stage = 2;
 		}
 		smpc_intbackhelper();
-		cpunum_set_input_line_and_vector(Machine, 0, 8, HOLD_LINE , 0x47);
+		cpunum_set_input_line_and_vector(machine, 0, 8, HOLD_LINE , 0x47);
 	}
 
 	if ((offset == 1) && (data & 0x40))
@@ -582,7 +582,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 			if(!(stv_scu[40] & 0x0100)) /*Pad irq*/
 			{
 				if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
-				cpunum_set_input_line_and_vector(Machine, 0, 8, HOLD_LINE , 0x48);
+				cpunum_set_input_line_and_vector(machine, 0, 8, HOLD_LINE , 0x48);
 			}
 	}
 
@@ -599,25 +599,25 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Slave ON\n");
 				smpc_ram[0x5f]=0x02;
 				stv_enable_slave_sh2 = 1;
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 				break;
 			case 0x03:
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
-				cpu_trigger(Machine, 1000);
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+				cpu_trigger(machine, 1000);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
 				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
 				/* wrong? */
 				smpc_ram[0x5f]=0x06;
-				cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+				cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
 				en_68k = 1;
 				break;
 			case 0x07:
 				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
-				cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+				cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 				en_68k = 0;
 				smpc_ram[0x5f]=0x07;
 				break;
@@ -627,24 +627,24 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 			case 0x0d:
 				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
 				smpc_ram[0x5f]=0x0d;
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 				system_reset();
 				break;
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
 				smpc_ram[0x5f]=0x0e;
-				cpunum_set_clock(Machine, 0, MASTER_CLOCK_352/2);
-				cpunum_set_clock(Machine, 1, MASTER_CLOCK_352/2);
-				cpunum_set_clock(Machine, 2, MASTER_CLOCK_352/5);
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				cpunum_set_clock(machine, 0, MASTER_CLOCK_352/2);
+				cpunum_set_clock(machine, 1, MASTER_CLOCK_352/2);
+				cpunum_set_clock(machine, 2, MASTER_CLOCK_352/5);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
 				smpc_ram[0x5f]=0x0f;
-				cpunum_set_clock(Machine, 0, MASTER_CLOCK_320/2);
-				cpunum_set_clock(Machine, 1, MASTER_CLOCK_320/2);
-				cpunum_set_clock(Machine, 2, MASTER_CLOCK_320/5);
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				cpunum_set_clock(machine, 0, MASTER_CLOCK_320/2);
+				cpunum_set_clock(machine, 1, MASTER_CLOCK_320/2);
+				cpunum_set_clock(machine, 2, MASTER_CLOCK_320/5);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
@@ -696,7 +696,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				{
 //                  if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
 					smpc_intbackhelper();
-					cpunum_set_input_line_and_vector(Machine, 0, 8, HOLD_LINE , 0x47);
+					cpunum_set_input_line_and_vector(machine, 0, 8, HOLD_LINE , 0x47);
 				}
 			break;
 			/* RTC write*/
@@ -725,7 +725,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
 				smpc_ram[0x5f]=0x18;
 				/*NMI is unconditionally requested?*/
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 				break;
 			case 0x19:
 				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
@@ -783,7 +783,7 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 
 	offset += byte;
 
-	stv_SMPC_w8(offset,writedata);
+	stv_SMPC_w8(machine, offset,writedata);
 }
 
 
@@ -1099,8 +1099,8 @@ static WRITE32_HANDLER( stv_scu_w32 )
 */
 		if(stv_scu[4] & 1 && ((stv_scu[5] & 7) == 7) && stv_scu[4] & 0x100)
 		{
-			if(DIRECT_MODE(0)) { dma_direct_lv0(); }
-			else			   { dma_indirect_lv0(); }
+			if(DIRECT_MODE(0)) { dma_direct_lv0(machine); }
+			else			   { dma_indirect_lv0(machine); }
 
 			stv_scu[4]^=1;//disable starting bit.
 
@@ -1160,8 +1160,8 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 12:
 		if(stv_scu[12] & 1 && ((stv_scu[13] & 7) == 7) && stv_scu[12] & 0x100)
 		{
-			if(DIRECT_MODE(1)) { dma_direct_lv1(); }
-			else			   { dma_indirect_lv1(); }
+			if(DIRECT_MODE(1)) { dma_direct_lv1(machine); }
+			else			   { dma_indirect_lv1(machine); }
 
 			stv_scu[12]^=1;
 
@@ -1210,8 +1210,8 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 20:
 		if(stv_scu[20] & 1 && ((stv_scu[21] & 7) == 7) && stv_scu[20] & 0x100)
 		{
-			if(DIRECT_MODE(2)) { dma_direct_lv2(); }
-			else			   { dma_indirect_lv2(); }
+			if(DIRECT_MODE(2)) { dma_direct_lv2(machine); }
+			else			   { dma_indirect_lv2(machine); }
 
 			stv_scu[20]^=1;
 
@@ -1299,7 +1299,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 	}
 }
 
-static void dma_direct_lv0()
+static void dma_direct_lv0(running_machine *machine)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 0 transfer START\n"
@@ -1397,7 +1397,7 @@ static void dma_direct_lv0()
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 	if(!(stv_scu[40] & 0x800))/*Lv 0 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 5, HOLD_LINE , 0x4b);
+		cpunum_set_input_line_and_vector(machine, 0, 5, HOLD_LINE , 0x4b);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1409,7 +1409,7 @@ static void dma_direct_lv0()
 	D0MV_0;
 }
 
-static void dma_direct_lv1()
+static void dma_direct_lv1(running_machine *machine)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 1 transfer START\n"
@@ -1500,7 +1500,7 @@ static void dma_direct_lv1()
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 	if(!(stv_scu[40] & 0x400))/*Lv 1 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 6, HOLD_LINE , 0x4a);
+		cpunum_set_input_line_and_vector(machine, 0, 6, HOLD_LINE , 0x4a);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1512,7 +1512,7 @@ static void dma_direct_lv1()
 	D1MV_0;
 }
 
-static void dma_direct_lv2()
+static void dma_direct_lv2(running_machine *machine)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 2 transfer START\n"
@@ -1603,7 +1603,7 @@ static void dma_direct_lv2()
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 	if(!(stv_scu[40] & 0x200))/*Lv 2 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 6, HOLD_LINE , 0x49);
+		cpunum_set_input_line_and_vector(machine, 0, 6, HOLD_LINE , 0x49);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1615,7 +1615,7 @@ static void dma_direct_lv2()
 	D2MV_0;
 }
 
-static void dma_indirect_lv0()
+static void dma_indirect_lv0(running_machine *machine)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1681,12 +1681,12 @@ static void dma_indirect_lv0()
 	}while(job_done == 0);
 
 	if(!(stv_scu[40] & 0x800))/*Lv 0 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 5, HOLD_LINE , 0x4b);
+		cpunum_set_input_line_and_vector(machine, 0, 5, HOLD_LINE , 0x4b);
 
 	D0MV_0;
 }
 
-static void dma_indirect_lv1()
+static void dma_indirect_lv1(running_machine *machine)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1753,12 +1753,12 @@ static void dma_indirect_lv1()
 	}while(job_done == 0);
 
 	if(!(stv_scu[40] & 0x400))/*Lv 1 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 6, HOLD_LINE , 0x4a);
+		cpunum_set_input_line_and_vector(machine, 0, 6, HOLD_LINE , 0x4a);
 
 	D1MV_0;
 }
 
-static void dma_indirect_lv2()
+static void dma_indirect_lv2(running_machine *machine)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1824,7 +1824,7 @@ static void dma_indirect_lv2()
 	}while(job_done == 0);
 
 	if(!(stv_scu[40] & 0x200))/*Lv 2 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 6, HOLD_LINE , 0x49);
+		cpunum_set_input_line_and_vector(machine, 0, 6, HOLD_LINE , 0x49);
 
 	D2MV_0;
 }
@@ -2057,14 +2057,14 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P2 R") PORT_PLAYER(2)	// R
 INPUT_PORTS_END
 
-static void saturn_init_driver(int rgn)
+static void saturn_init_driver(running_machine *machine, int rgn)
 {
 	mame_system_time systime;
 
 	saturn_region = rgn;
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(Machine, &systime);
+	mame_get_current_datetime(machine, &systime);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	minit_boost = 400;
@@ -2091,23 +2091,23 @@ static void saturn_init_driver(int rgn)
 #ifdef UNUSED_FUNCTION
 DRIVER_INIT( saturn )
 {
-	saturn_init_driver(0);
+	saturn_init_driver(machine, 0);
 }
 #endif
 
 static DRIVER_INIT( saturnus )
 {
-	saturn_init_driver(4);
+	saturn_init_driver(machine, 4);
 }
 
 static DRIVER_INIT( saturneu )
 {
-	saturn_init_driver(12);
+	saturn_init_driver(machine, 12);
 }
 
 static DRIVER_INIT( saturnjp )
 {
-	saturn_init_driver(1);
+	saturn_init_driver(machine, 1);
 }
 
 

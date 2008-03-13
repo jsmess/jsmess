@@ -3,6 +3,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/m6847.h"
 #include "includes/apf.h"
 
@@ -37,7 +38,7 @@ static void apf_vsync_int(int line)
 		apf_ints |= 0x10;
 	else
 		apf_ints &= ~0x10;
-	apf_update_ints();
+	apf_update_ints(Machine);
 }
 
 
