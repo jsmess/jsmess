@@ -12,7 +12,6 @@
 
 MACHINE_RESET( mbee );
 MACHINE_START( mbee );
-MACHINE_START( mbee56 );
 
 extern UINT8 *mbee_workram;
 READ8_HANDLER( mbee_lowram_r );
@@ -53,8 +52,14 @@ WRITE8_HANDLER ( mbee_videoram_w );
  READ8_HANDLER ( mbee_pcg_color_r );
 WRITE8_HANDLER ( mbee_pcg_color_w );
 
+ READ8_HANDLER ( mbee_pcg_r );
+WRITE8_HANDLER ( mbee_pcg_w );
+
 VIDEO_START( mbee );
 VIDEO_UPDATE( mbee );
+
+VIDEO_START( mbeeic );
+VIDEO_UPDATE( mbeeic );
 
 
 #endif /* MBEE_H_ */

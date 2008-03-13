@@ -50,7 +50,6 @@ static void pio_interrupt(int state)
 /*
   On reset or power on, a circuit forces rom 8000-8FFF to appear at 0000-0FFF, while ram is disabled.
   It gets set back to normal on the first attempt to write to memory. (/WR line goes active).
-  The previous code caused the debugger to show $FF always in RAM, soft reset to hang, and many games to not work.
 */
 
 

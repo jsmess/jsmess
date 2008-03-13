@@ -60,8 +60,7 @@ WRITE8_HANDLER ( mbee_pcg_color_latch_w )
 
  READ8_HANDLER ( mbee_pcg_color_latch_r )
 {
-	int data = mbee_pcg_color_latch;
-	return data;
+	return mbee_pcg_color_latch;
 }
 
 WRITE8_HANDLER ( mbee_videoram_w )
@@ -71,16 +70,26 @@ WRITE8_HANDLER ( mbee_videoram_w )
 
  READ8_HANDLER ( mbee_videoram_r )
 {
-	int data;
 	if( m6545_video_bank & 0x01 )
-	{
-		data = pcgram[offset];
-	}
+		return pcgram[offset];
 	else
-	{
-		data = videoram[offset];
+		return videoram[offset];
+}
+
+WRITE8_HANDLER ( mbee_pcg_w )
+{
+	if( pcgram[0x0800+offset] != data )
+       	{
+		int chr = 0x80 + offset / 16;
+		pcgram[0x0800+offset] = data;
+		/* decode character graphics again */
+		decodechar(machine->gfx[0], chr, pcgram);
 	}
-	return data;
+}
+
+ READ8_HANDLER ( mbee_pcg_r )
+{
+	return pcgram[0x0800+offset];
 }
 
 WRITE8_HANDLER ( mbee_pcg_color_w )
@@ -219,7 +228,7 @@ static void m6545_update_strobe(int param)
 	{
 /* These are write only on a Rockwell 6545 */
 #if 0
-    case 0:
+	case 0:
 		return crt.horizontal_total;
 	case 1:
 		return crt.horizontal_displayed;
@@ -257,12 +266,12 @@ static void m6545_update_strobe(int param)
 	case 16:
 //		logerror("6545 lpen_hi_r $%02X (lpen:%d upd:%d)\n", crt.lpen_hi, crt.lpen_strobe, crt.update_strobe);
 		crt.lpen_strobe = 0;
-        crt.update_strobe = 0;
+		crt.update_strobe = 0;
 		data = crt.lpen_hi;
 		break;
 	case 17:
 //		logerror("6545 lpen_lo_r $%02X (lpen:%d upd:%d)\n", crt.lpen_lo, crt.lpen_strobe, crt.update_strobe);
-        crt.lpen_strobe = 0;
+		crt.lpen_strobe = 0;
 		crt.update_strobe = 0;
 		data = crt.lpen_lo;
 		break;
@@ -276,7 +285,7 @@ static void m6545_update_strobe(int param)
 		break;
 	case 31:
 		/* shared memory latch */
-		addr = crt.transp_hi * 256 + crt.transp_lo;
+		addr = (crt.transp_hi << 8) | crt.transp_lo;
 //		logerror("6545 transp_latch $%04X\n", addr);
 		m6545_update_strobe(addr);
 		break;
@@ -304,8 +313,6 @@ WRITE8_HANDLER ( m6545_data_w )
 		m6545_offset_xy();
 		break;
 	case 1:
-		if( crt.horizontal_displayed == data )
-			break;
 		crt.horizontal_displayed = data;
 		break;
 	case 2:
@@ -330,8 +337,6 @@ WRITE8_HANDLER ( m6545_data_w )
 		m6545_offset_xy();
 		break;
 	case 6:
-		if( crt.vertical_displayed == data )
-			break;
 		crt.vertical_displayed = data;
 		break;
 	case 7:
@@ -361,16 +366,10 @@ WRITE8_HANDLER ( m6545_data_w )
 		m6545_offset_xy();
 		break;
 	case 10:
-		if( crt.cursor_top == data )
-			break;
 		crt.cursor_top = data;
-		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
 		break;
 	case 11:
-		if( crt.cursor_bottom == data )
-			break;
 		crt.cursor_bottom = data;
-		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
 		break;
 	case 12:
 		data &= 63;
@@ -391,16 +390,10 @@ WRITE8_HANDLER ( m6545_data_w )
 		break;
 	case 14:
 		data &= 63;
-		if( crt.cursor_address_hi == data )
-			break;
 		crt.cursor_address_hi = data;
-		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
 		break;
 	case 15:
-		if( crt.cursor_address_lo == data )
-			break;
 		crt.cursor_address_lo = data;
-		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
 		break;
 	case 16:
 		/* lpen hi is read only */
@@ -410,20 +403,16 @@ WRITE8_HANDLER ( m6545_data_w )
 		break;
 	case 18:
 		data &= 63;
-		if( crt.transp_hi == data )
-			break;
 		crt.transp_hi = data;
 //		logerror("6545 transp_hi_w $%02X\n", data);
 		break;
 	case 19:
-		if( crt.transp_lo == data )
-			break;
 		crt.transp_lo = data;
 //		logerror("6545 transp_lo_w $%02X\n", data);
 		break;
 	case 31:
 		/* shared memory latch */
-		addr = crt.transp_hi * 256 + crt.transp_lo;
+		addr = (crt.transp_hi << 8) | crt.transp_lo;
 //		logerror("6545 transp_latch $%04X\n", addr);
 		m6545_update_strobe(addr);
 		break;
@@ -433,6 +422,12 @@ WRITE8_HANDLER ( m6545_data_w )
 }
 
 VIDEO_START( mbee )
+{
+	videoram = auto_malloc(0x800);
+	pcgram = memory_region(REGION_CPU1)+0xf000;
+}
+
+VIDEO_START( mbeeic )
 {
 	videoram = auto_malloc(0x800);
 	colorram = auto_malloc(0x800);
@@ -448,13 +443,51 @@ VIDEO_UPDATE( mbee )
 
 	framecnt++;
 
-	cursor = crt.cursor_address_hi * 256 + crt.cursor_address_lo;
-	screen_ = (crt.screen_address_hi & 7) * 256 + crt.screen_address_lo;
+	cursor = (crt.cursor_address_hi << 8) | crt.cursor_address_lo;
+	screen_ = ((crt.screen_address_hi & 7) << 8) | crt.screen_address_lo;
+	for( offs = screen_; offs < crt.horizontal_displayed * crt.vertical_displayed + screen_; offs++ )
+	{
+		int sx, sy, code;
+		sy = off_y - 9 + ((offs - screen_) / crt.horizontal_displayed) * (crt.scan_lines + 1);
+		sx = (off_x + 3 + ((offs - screen_) % crt.horizontal_displayed)) << 3;
+		code = videoram[offs];
+		drawgfx( bitmap,machine->gfx[0],code,0,0,0,sx,sy,
+			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+
+		if( offs == cursor && (crt.cursor_top & 0x60) != 0x20 )
+		{
+			if( (crt.cursor_top & 0x60) == 0x60 || (framecnt & 16) == 0 )
+			{
+				int x, y;
+		                for( y = (crt.cursor_top & 31); y <= (crt.cursor_bottom & 31); y++ )
+				{
+					if( y > crt.scan_lines )
+						break;
+					for( x = 0; x < 8; x++ )
+						*BITMAP_ADDR16(bitmap, sy+y, sx+x) = 1;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+VIDEO_UPDATE( mbeeic )
+{
+	int offs, cursor, screen_;
+
+	for( offs = 0x000; offs < 0x380; offs += 0x10 )
+		keyboard_matrix_r(offs);
+
+	framecnt++;
+
+	cursor = (crt.cursor_address_hi << 8) | crt.cursor_address_lo;
+	screen_ = ((crt.screen_address_hi & 7) << 8) | crt.screen_address_lo;
 	for( offs = screen_; offs < crt.horizontal_displayed * crt.vertical_displayed + screen_; offs++ )
 	{
 		int sx, sy, code, color;
 		sy = off_y + ((offs - screen_) / crt.horizontal_displayed) * (crt.scan_lines + 1);
-		sx = (off_x + ((offs - screen_) % crt.horizontal_displayed)) * 8;
+		sx = (off_x + ((offs - screen_) % crt.horizontal_displayed)) << 3;
 		code = videoram[offs];
 		color = colorram[offs];
 		drawgfx( bitmap,machine->gfx[0],code,color,0,0,sx,sy,
