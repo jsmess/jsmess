@@ -11,9 +11,11 @@
 	- add proper screen parameters to startup
 	- abc802 delay CUR and DEN by 3 CCLK's
 	- abc800m high resolution (HR)
+	- abc800c basic rom for color needs to be dumped!
 	- abc800c character generator needs to be dumped!
 	- abc800c row update
 	- abc800c palette
+	- abc800c high resolution (HR)
 	- abc806 video proms need to be dumped!
 	- abc806 row update
 	- abc806 palette
@@ -248,11 +250,12 @@
 #include "driver.h"
 #include "includes/abc80x.h"
 #include "video/mc6845.h"
+#include "machine/z80dart.h"
 
-#define ABC800_CCLK			ABC800_X01/6
+#define ABC800_CHAR_WIDTH	6
+
+#define ABC800_CCLK			ABC800_X01/ABC800_CHAR_WIDTH
 #define ABC802_FLSHCLK		2
-
-#define ABC800_CHAR_WIDTH	8
 
 #define ABC802_AT0	0x01
 #define ABC802_AT1	0x02
@@ -299,6 +302,30 @@ static PALETTE_INIT( abc800c )
 }
 
 /* External Interface */
+
+WRITE8_HANDLER( abc800m_hrs_w )
+{
+}
+
+WRITE8_HANDLER( abc800m_hrc_w )
+{
+}
+
+WRITE8_HANDLER( abc800c_hrs_w )
+{
+}
+
+WRITE8_HANDLER( abc800c_hrc_w )
+{
+}
+
+WRITE8_HANDLER( abc806_hrs_w )
+{
+}
+
+WRITE8_HANDLER( abc806_hrc_w )
+{
+}
 
 void abc802_mux80_40_w(int level)
 {
@@ -353,6 +380,10 @@ READ8_HANDLER( abc806_fgctlprom_r )
 	return data;
 }
 
+WRITE8_HANDLER( abc806_fgctlprom_w )
+{
+}
+
 WRITE8_HANDLER( abc806_sync_w )
 {
 	/*
@@ -398,12 +429,14 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 		UINT8 *charrom = memory_region(REGION_GFX1);
 		UINT16 address = (videoram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
-		UINT8 data = charrom[address & 0x7ff] & 0x3f;
+		UINT8 data = (charrom[address & 0x7ff] & 0x3f);
 
 		if (column == cursor_x)
 		{
 			data = 0x3f;
 		}
+
+		data <<= 2;
 
 		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
@@ -417,15 +450,18 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	}
 }
 
+static MC6845_ON_VSYNC_CHANGED(abc800_vsync_changed)
+{
+	z80dart_set_ri(0, vsync);
+}
+
+static MC6845_UPDATE_ROW( abc800c_update_row )
+{
+}
+
 static MC6845_UPDATE_ROW( abc802_update_row )
 {
 	int column;
-
-	if (!abc802_mux80_40)
-	{
-		x_count >>= 1;
-		cursor_x >>= 1;
-	}
 
 	for (column = 0; column < x_count; column++)
 	{
@@ -481,6 +517,8 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			// reload data and mask out two bottom bits
 			data = charrom[(address + ra_latch) & 0x1fff] & 0xfc;
 		}
+		
+		data <<= 2;
 
 		if (abc802_mux80_40)
 		{
@@ -498,7 +536,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 		{
 			for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 			{
-				int x = (column * ABC800_CHAR_WIDTH * 2) + (bit * 2);
+				int x = (column * ABC800_CHAR_WIDTH) + (bit << 1);
 				int color = BIT(data, 7) ^ BIT(code, 7);
 
 				*BITMAP_ADDR16(bitmap, y, x) = color;
@@ -506,47 +544,77 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 
 				data <<= 1;
 			}
+
+			column++;
 		}
 	}
+}
+
+static MC6845_ON_VSYNC_CHANGED(abc802_vsync_changed)
+{
+	z80dart_set_ri(0, vsync);
 }
 
 static MC6845_UPDATE_ROW( abc806_update_row )
 {
 	// DEN+3, CUR+4
 
-	int col;
+	int column;
 
-	for (col = 0; col < x_count; col++)
+	for (column = 0; column < x_count; column++)
 	{
 		int bit;
 
 		UINT8 *charrom = memory_region(REGION_GFX1);
-		UINT8 code = videoram[(ma + col) & 0x7ff];
-//		UINT8 attr = abc806_colorram[(ma + col) & 0x7ff];
+		UINT8 code = videoram[(ma + column) & 0x7ff];
+		UINT8 attr = abc806_colorram[(ma + column) & 0x7ff];
 		UINT16 address = ((code & 0x80) << 5) | ((code & 0x7f) << 4);
 		UINT8 ra_latch = ra;
 		UINT8 data;
 
-		if (col == cursor_x)
+		if (column == cursor_x)
 		{
 			ra_latch = 0x0f;
 		}
 
 		data = charrom[(address + ra_latch) & 0xfff] << 2;
 
-		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
+		if (abc806_40)
 		{
-			int x = (col * ABC800_CHAR_WIDTH) + bit;
-			int color = BIT(data, 7) ? 1 : 0;
-
-			if (abc806_txoff)
+			for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 			{
-				color = 0;
+				int x = (column * ABC800_CHAR_WIDTH) + bit;
+				int color = BIT(data, 7) ? (attr & 0x03) : 0;
+
+				if (abc806_txoff)
+				{
+					color = 0;
+				}
+
+				*BITMAP_ADDR16(bitmap, y, x) = color;
+
+				data <<= 1;
+			}
+		}
+		else
+		{
+			for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
+			{
+				int x = (column * ABC800_CHAR_WIDTH) + (bit << 1);
+				int color = BIT(data, 7) ? 1 : 0;
+
+				if (abc806_txoff)
+				{
+					color = 0;
+				}
+
+				*BITMAP_ADDR16(bitmap, y, x) = color;
+				*BITMAP_ADDR16(bitmap, y, x + 1) = color;
+
+				data <<= 1;
 			}
 
-			*BITMAP_ADDR16(bitmap, y, x) = color;
-
-			data <<= 1;
+			column++;
 		}
 	}
 }
@@ -565,6 +633,8 @@ static MC6845_ON_VSYNC_CHANGED(abc806_vsync_changed)
 	{
 		abc806_v50_addr = 0;
 	}
+
+	z80dart_set_ri(0, vsync);
 }
 
 /* MC6845 Interfaces */
@@ -578,7 +648,19 @@ static const mc6845_interface abc800m_crtc6845_interface = {
 	NULL,
 	NULL,
 	NULL,
-	NULL
+	abc800_vsync_changed
+};
+
+static const mc6845_interface abc800c_crtc6845_interface = {
+	0,
+	ABC800_CCLK,
+	ABC800_CHAR_WIDTH,
+	NULL,
+	abc800c_update_row,
+	NULL,
+	NULL,
+	NULL,
+	abc800_vsync_changed
 };
 
 static const mc6845_interface abc802_crtc6845_interface = {
@@ -590,7 +672,7 @@ static const mc6845_interface abc802_crtc6845_interface = {
 	NULL,
 	NULL,
 	NULL,
-	NULL
+	abc802_vsync_changed
 };
 
 static const mc6845_interface abc806_crtc6845_interface = {
@@ -635,7 +717,28 @@ static VIDEO_START(abc806)
 
 /* Video Update */
 
-static VIDEO_UPDATE( abc800 )
+static VIDEO_UPDATE( abc800m )
+{
+	mc6845_update(abc800_mc6845, bitmap, cliprect);
+
+	return 0;
+}
+
+static VIDEO_UPDATE( abc800c )
+{
+	mc6845_update(abc800_mc6845, bitmap, cliprect);
+
+	return 0;
+}
+
+static VIDEO_UPDATE( abc802 )
+{
+	mc6845_update(abc800_mc6845, bitmap, cliprect);
+
+	return 0;
+}
+
+static VIDEO_UPDATE( abc806 )
 {
 	mc6845_update(abc800_mc6845, bitmap, cliprect);
 
@@ -662,12 +765,28 @@ MACHINE_DRIVER_START( abc800m_video )
 
 	MDRV_PALETTE_INIT(abc800m)
 	MDRV_VIDEO_START(abc800)
-	MDRV_VIDEO_UPDATE(abc800)
+	MDRV_VIDEO_UPDATE(abc800m)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( abc800c_video )
-	MDRV_IMPORT_FROM(abc800m_video)
+	// device interface
+	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_CONFIG(abc800c_crtc6845_interface)
+
+	// video hardware
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MDRV_SCREEN_SIZE(640, 400)
+	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
+
+	MDRV_PALETTE_LENGTH(2)
+
 	MDRV_PALETTE_INIT(abc800c)
+	MDRV_VIDEO_START(abc800)
+	MDRV_VIDEO_UPDATE(abc800c)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( abc802_video )
@@ -688,7 +807,7 @@ MACHINE_DRIVER_START( abc802_video )
 
 	MDRV_PALETTE_INIT(abc800m)
 	MDRV_VIDEO_START(abc802)
-	MDRV_VIDEO_UPDATE(abc800)
+	MDRV_VIDEO_UPDATE(abc802)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( abc806_video )
@@ -709,5 +828,5 @@ MACHINE_DRIVER_START( abc806_video )
 
 	MDRV_PALETTE_INIT(abc800c)
 	MDRV_VIDEO_START(abc806)
-	MDRV_VIDEO_UPDATE(abc800)
+	MDRV_VIDEO_UPDATE(abc806)
 MACHINE_DRIVER_END
