@@ -529,7 +529,8 @@ static WRITE8_HANDLER( super80_fb_w ) { z80pio_c_w(0,1, data); }
 
 /**************************** MEMORY AND I/O MAPPINGS *****************************************************************/
 
-static READ8_HANDLER( super80_read_ff ) { return 0xff; }	/* returns the true state of unmapped memory */
+/* A read_byte or write_byte to unmapped memory crashes MESS, and UNMAP doesnt fix it */
+static READ8_HANDLER( super80_read_ff ) { return 0xff; }
 
 static ADDRESS_MAP_START( super80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
@@ -554,13 +555,10 @@ static ADDRESS_MAP_START( super80v_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super80_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0xdf) AM_READWRITE(super80_read_ff, MWA8_NOP)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_READWRITE(super80_read_ff, super80_f0_w)
-	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x14) AM_READWRITE(super80_read_ff, super80_f1_w)
-	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READWRITE(super80_f2_r, MWA8_NOP)
-	AM_RANGE(0xe3, 0xe3) AM_MIRROR(0x14) AM_READWRITE(super80_read_ff, MWA8_NOP)	/* decoded but not connected to anything */
-	AM_RANGE(0xe8, 0xef) AM_READWRITE(super80_read_ff, MWA8_NOP)
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | ( AMEF_UNMAP(1) ))
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80_f0_w)
+	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x14) AM_WRITE(super80_f1_w)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
 	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x04) AM_READWRITE(super80_f8_r,super80_f8_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_READWRITE(super80_f9_r,super80_f9_w)
 	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0x04) AM_READWRITE(super80_fa_r,super80_fa_w)
@@ -568,16 +566,11 @@ static ADDRESS_MAP_START( super80_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super80v_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(super80_read_ff, MWA8_NOP)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(super80_read_ff, super80v_10_w)
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | ( AMEF_UNMAP(1) ))
+	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(super80v_11_r, super80v_11_w)
-	AM_RANGE(0x12, 0xdf) AM_READWRITE(super80_read_ff, MWA8_NOP)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_READWRITE(super80_read_ff, super80v_f0_w)
-	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x14) AM_READWRITE(super80_read_ff, MWA8_NOP)	/* decoded but not connected to anything */
-	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READWRITE(super80_f2_r, MWA8_NOP)
-	AM_RANGE(0xe3, 0xe3) AM_MIRROR(0x14) AM_READWRITE(super80_read_ff, MWA8_NOP)	/* decoded but not connected to anything */
-	AM_RANGE(0xe8, 0xef) AM_READWRITE(super80_read_ff, MWA8_NOP)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80v_f0_w)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
 	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x04) AM_READWRITE(super80_f8_r,super80_f8_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_READWRITE(super80_f9_r,super80_f9_w)
 	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0x04) AM_READWRITE(super80_fa_r,super80_fa_w)
@@ -989,7 +982,7 @@ static QUICKLOAD_LOAD( super80 )
 {
 	UINT8 sw = readinputportbytag("CONFIG") & 1;				/* reading the dipswitch: 1 = autorun */
 	UINT16 exec_addr;
-	UINT64 return_info = z80bin_load_file( image, file_type );	/* load file */
+	UINT64 return_info = z80bin_load_file( machine, image, file_type );	/* load file */
 
 	if (return_info == INIT_FAIL) return INIT_FAIL;			/* failure */
 
