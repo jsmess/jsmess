@@ -26,12 +26,12 @@ DRIVER_INIT(ut88)
 
 READ8_HANDLER (ut88_8255_portb_r )
 {
-	return readinputport(ut88_keyboard_line) & 0x7f;
+	return readinputport(ut88_keyboard_line);
 }
 
 READ8_HANDLER (ut88_8255_portc_r )
 {
-	return readinputport(8) & 0x07;	
+	return readinputport(8);	
 }
 
 WRITE8_HANDLER (ut88_8255_porta_w )

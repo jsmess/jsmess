@@ -26,7 +26,7 @@ READ8_HANDLER (mikro80_8255_portb_r )
 
 READ8_HANDLER (mikro80_8255_portc_r )
 {
-	return readinputport(8) & 0x07;	
+	return readinputport(8);	
 }
 
 WRITE8_HANDLER (mikro80_8255_porta_w )
