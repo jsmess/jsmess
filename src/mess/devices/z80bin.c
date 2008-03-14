@@ -17,7 +17,7 @@
 #include "z80bin.h"
 #include "snapquik.h"
 
-UINT64 z80bin_load_file( mess_image *image, const char *file_type )
+UINT64 z80bin_load_file( running_machine *machine, mess_image *image, const char *file_type )
 {
 	int ch;
 	UINT16 args[3];
@@ -82,7 +82,7 @@ UINT64 z80bin_load_file( mess_image *image, const char *file_type )
 static QUICKLOAD_LOAD( z80bin )
 {
 	UINT16 exec_addr;
-	UINT64 return_info = z80bin_load_file( image, file_type );	/* load file */
+	UINT64 return_info = z80bin_load_file( machine, image, file_type );	/* load file */
 	if (return_info == INIT_FAIL) return INIT_FAIL;			/* failure */
 	exec_addr = (return_info & 0xffff0000) >> 16;			/* get program run address */
 	if (exec_addr == 0xffff) return INIT_PASS;			/* non-executable data file */
