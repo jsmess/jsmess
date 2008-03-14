@@ -57,7 +57,7 @@ static READ8_HANDLER( mbee_read_ff ) { return 0xff; }	/* returns the true state 
 static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(mbee_read_ff, MWA8_NOP)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(mbee_read_ff, MWA8_NOP)	/* unmap(1) causes a crash during quickload */
 	AM_RANGE(0x8000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_videoram_r, mbee_videoram_w) AM_BASE(&pcgram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbee_pcg_r, mbee_pcg_w)
@@ -81,7 +81,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(mbee_ports, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | ( AMEF_UNMAP(1) ))
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_READWRITE(mbee_pio_r, mbee_pio_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
@@ -89,7 +89,7 @@ static ADDRESS_MAP_START(mbee_ports, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeic_ports, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | ( AMEF_UNMAP(1) ))
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_READWRITE(mbee_pio_r, mbee_pio_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
 	// AM_RANGE(0x09, 0x09) AM_MIRROR(0x10)  Listed as "Colour Wait Off or USART 2651" but doesn't appear in the schematics
@@ -429,7 +429,7 @@ static QUICKLOAD_LOAD( mbee )
 {
 	UINT8 sw = readinputportbytag("CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
 	UINT16 exec_addr;
-	UINT64 return_info = z80bin_load_file( image, file_type );	/* load file */
+	UINT64 return_info = z80bin_load_file( machine, image, file_type );	/* load file */
 
 	if (return_info == INIT_FAIL) return INIT_FAIL;			/* failure */
 
