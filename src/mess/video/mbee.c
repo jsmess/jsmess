@@ -491,7 +491,7 @@ VIDEO_UPDATE( mbeeic )
 		drawgfx( bitmap,machine->gfx[0],code,color,0,0,sx,sy,
 			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
-		if( offs == cursor && (crt.cursor_top & 0x60) != 0x20 )
+		if( mem == cursor && (crt.cursor_top & 0x60) != 0x20 )
 		{
 			if( (crt.cursor_top & 0x60) == 0x60 || (framecnt & 16) == 0 )
 			{
