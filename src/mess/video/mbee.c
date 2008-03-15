@@ -471,6 +471,7 @@ VIDEO_UPDATE( mbee )
 VIDEO_UPDATE( mbeeic )
 {
 	int offs, cursor, screen_;
+	UINT16 colourm = (mbee_pcg_color_latch & 0x0e) << 7;
 
 	for( offs = 0x000; offs < 0x380; offs += 0x10 )
 		keyboard_matrix_r(offs);
@@ -486,7 +487,7 @@ VIDEO_UPDATE( mbeeic )
 		int sy = off_y + (offs / crt.horizontal_displayed) * (crt.scan_lines + 1);
 		int sx = (off_x + (offs % crt.horizontal_displayed)) << 3;
 		int code = videoram[mem];
-		int color = colorram[mem];
+		int color = colorram[mem] | colourm;
 		drawgfx( bitmap,machine->gfx[0],code,color,0,0,sx,sy,
 			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
@@ -500,7 +501,7 @@ VIDEO_UPDATE( mbeeic )
 					if( y > crt.scan_lines )
 						break;
 					for( x = 0; x < 8; x++ )
-						*BITMAP_ADDR16(bitmap, sy+y, sx+x) = ((color&7) << 6);
+						*BITMAP_ADDR16(bitmap, sy+y, sx+x) = ((color<<1)+1); /* convert to palette entry number */
 				}
 			}
 		}

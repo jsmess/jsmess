@@ -39,6 +39,11 @@
         PC85: features the WordBee wordprocessor - type EDASM to run
               (maybe the ROM was patched to use another keyword?)
 
+
+    These early colour computers have a PROM to create the foreground palette.
+	This PROM (82s123.ic7) is undumped, therefore the colours assigned are
+	an educated guess. Some information was obtained from magazines.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -220,64 +225,46 @@ static GFXDECODE_START( mbee )
 GFXDECODE_END
 
 static GFXDECODE_START( mbeeic )
-	GFXDECODE_ENTRY( REGION_CPU1, 0xf000, mbee_charlayout, 0, 256 )
+	GFXDECODE_ENTRY( REGION_CPU1, 0xf000, mbee_charlayout, 0, 4096 )
 GFXDECODE_END
-
-static const UINT8 mbee_palette[] =
-{
-    0x00,0x00,0x00, /* black    */
-    0xf0,0x00,0x00, /* red      */
-    0x00,0xf0,0x00, /* green    */
-    0xf0,0xf0,0x00, /* yellow   */
-    0x00,0x00,0xf0, /* blue     */
-    0xf0,0x00,0xf0, /* magenta  */
-    0x00,0xf0,0xf0, /* cyan     */
-    0xf0,0xf0,0xf0, /* white    */
-    0x08,0x08,0x08, /* black    */
-    0xe0,0x08,0x08, /* red      */
-    0x08,0xe0,0x08, /* green    */
-    0xe0,0xe0,0x08, /* yellow   */
-    0x08,0x08,0xe0, /* blue     */
-    0xe0,0x08,0xe0, /* magenta  */
-    0x08,0xe0,0xe0, /* cyan     */
-    0xe0,0xe0,0xe0, /* white    */
-    0x10,0x10,0x10, /* black    */
-    0xd0,0x10,0x10, /* red      */
-    0x10,0xd0,0x10, /* green    */
-    0xd0,0xd0,0x10, /* yellow   */
-    0x10,0x10,0xd0, /* blue     */
-    0xd0,0x10,0xd0, /* magenta  */
-    0x10,0xd0,0xd0, /* cyan     */
-    0xd0,0xd0,0xd0, /* white    */
-    0x18,0x18,0x18, /* black    */
-    0xe0,0x18,0x18, /* red      */
-    0x18,0xe0,0x18, /* green    */
-    0xe0,0xe0,0x18, /* yellow   */
-    0x18,0x18,0xe0, /* blue     */
-    0xe0,0x18,0xe0, /* magenta  */
-    0x18,0xe0,0xe0, /* cyan     */
-    0xe0,0xe0,0xe0  /* white    */
-};
 
 static PALETTE_INIT( mbee )
 {
-	int i;
+	UINT16 i;
 	UINT8 r, b, g; 
-	machine->colortable = colortable_alloc(machine, 32);
+	UINT8 level[] = { 0, 0x80, 0xff };	/* off, half, full intensity */
 
-	for (i = 0; i < 32; i++)
-	{
-		r = mbee_palette[i*3];
-		g = mbee_palette[i*3+1];
-		b = mbee_palette[i*3+2];
-		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r, g, b));
-	}
+	/* The foreground colours are determined by an undumped PROM, these are a best guess */
+	UINT8 fgt[] = { 0, 18, 6, 24, 2, 20, 8, 26,
+			0, 21, 15, 19, 11, 7, 5, 26,
+			0, 9, 3, 12, 1, 10, 4, 13,
+			0, 25, 23, 22, 17, 16, 14, 26 };
 
-	for( i = 0; i < 256; i++ )
-	{
-		colortable_entry_set_value(machine->colortable, i*2, i>>5);
-		colortable_entry_set_value(machine->colortable, i*2+1, i&31);
-	}
+	UINT8 bgt[] = { 0, 1, 3, 4, 9, 10, 12, 13,	/* low intensity */
+			0, 2, 3, 5, 9, 11, 12, 14,	/* red at full */
+			0, 1, 6, 7, 9, 10, 15, 16,	/* green at full */
+			0, 2, 6, 8, 9, 11, 15, 17,	/* red and green at full */
+			0, 1, 3, 4, 18, 19, 21, 22,	/* blue at full */
+			0, 2, 3, 5, 18, 20, 21, 23,	/* blue and red at full */
+			0, 1, 6, 7, 18, 19, 24, 25,	/* blue and green at full */
+			0, 2, 6, 8, 18, 20, 24, 26 };	/* full intensity */
+
+	/* space for colortable */
+	machine->colortable = colortable_alloc(machine, 27);
+
+	/* create 27 unique colours */
+	for (b = 0; b < 3; b++)
+		for (g = 0; g < 3; g++)
+			for (r = 0; r < 3; r++)
+				colortable_palette_set_color(machine->colortable, b*9+g*3+r, MAKE_RGB(level[r], level[g], level[b]));
+
+	/* set up foreground palette */
+	for (i = 1; i < 8192; i+=2) colortable_entry_set_value(machine->colortable, i, fgt[(i>>1)&0x1f]);
+
+	/* set up background palette */
+	for (i = 0; i < 64; i++)
+		for (r = 0; r < 32; r++)
+			colortable_entry_set_value(machine->colortable, ((i<<5)|r)<<1, bgt[i]);
 }
 
 static const struct z80_irq_daisy_chain mbee_daisy_chain[] =
@@ -338,7 +325,7 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(70*8, 310)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 70*8-1, 0, 19*16-1)
-	MDRV_PALETTE_LENGTH(256*2)
+	MDRV_PALETTE_LENGTH(4096*2)
 	MDRV_PALETTE_INIT(mbee)
 
 	MDRV_VIDEO_START(mbeeic)
@@ -527,6 +514,7 @@ SYSTEM_CONFIG_START(mbeeic)
 	CONFIG_DEVICE(mbee_floppy_getinfo)
 	CONFIG_DEVICE(mbee_quickload_getinfo)
 SYSTEM_CONFIG_END
+
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
 COMP( 1982, mbee,     0,	0,	mbee,     mbee,     mbee,     mbee,		"Applied Technology",  "Microbee 16 Standard" , 0)
