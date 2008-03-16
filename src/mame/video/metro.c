@@ -561,8 +561,8 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 	UINT8 *base_gfx	=	memory_region(region);
 	UINT8 *gfx_max	=	base_gfx + memory_region_length(region);
 
-	int max_x				=	machine->screen[0].width;
-	int max_y				=	machine->screen[0].height;
+	int max_x = video_screen_get_width(machine->primary_screen);
+	int max_y = video_screen_get_height(machine->primary_screen);
 
 	int max_sprites			=	spriteram_size / 8;
 	int sprites				=	metro_videoregs[0x00/2] % max_sprites;
@@ -737,6 +737,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 		tilemap_draw(bitmap,cliprect,tmap, flags, priority);
 #else
 	int x,y,i;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	/* sub tile placement */
 //  sx      =   sx - (wx & ~7) + (wx & 7);
@@ -765,17 +766,17 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 		clip.max_x	=	clip.min_x + (WIN_NX-1)*8 - 1;
 		clip.max_y	=	clip.min_y + (WIN_NY-1)*8 - 1;
 
-		if (clip.min_x > machine->screen[0].visarea.max_x)	continue;
-		if (clip.min_y > machine->screen[0].visarea.max_y)	continue;
+		if (clip.min_x > visarea->max_x)	continue;
+		if (clip.min_y > visarea->max_y)	continue;
 
-		if (clip.max_x < machine->screen[0].visarea.min_x)	continue;
-		if (clip.max_y < machine->screen[0].visarea.min_y)	continue;
+		if (clip.max_x < visarea->min_x)	continue;
+		if (clip.max_y < visarea->min_y)	continue;
 
-		if (clip.min_x < machine->screen[0].visarea.min_x)	clip.min_x = machine->screen[0].visarea.min_x;
-		if (clip.max_x > machine->screen[0].visarea.max_x)	clip.max_x = machine->screen[0].visarea.max_x;
+		if (clip.min_x < visarea->min_x)	clip.min_x = visarea->min_x;
+		if (clip.max_x > visarea->max_x)	clip.max_x = visarea->max_x;
 
-		if (clip.min_y < machine->screen[0].visarea.min_y)	clip.min_y = machine->screen[0].visarea.min_y;
-		if (clip.max_y > machine->screen[0].visarea.max_y)	clip.max_y = machine->screen[0].visarea.max_y;
+		if (clip.min_y < visarea->min_y)	clip.min_y = visarea->min_y;
+		if (clip.max_y > visarea->max_y)	clip.max_y = visarea->max_y;
 
 		/* The clip region's width must be a multiple of 8!
            This fact renderes the function useless, as far as
@@ -868,8 +869,8 @@ VIDEO_UPDATE( metro )
 		}
 	}
 
-	metro_sprite_xoffs	=	metro_videoregs[0x06/2] - machine->screen[0].width  / 2;
-	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - machine->screen[0].height / 2;
+	metro_sprite_xoffs	=	metro_videoregs[0x06/2] - video_screen_get_width(screen)  / 2;
+	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - video_screen_get_height(screen) / 2;
 
 	/* The background color is selected by a register */
 	fillbitmap(priority_bitmap,0,cliprect);
@@ -929,9 +930,9 @@ if (input_code_pressed(KEYCODE_Z))
 
 
 	for (pri=3; pri>=0; pri--)
-		draw_layers(machine, bitmap,cliprect,pri,layers_ctrl);
+		draw_layers(screen->machine, bitmap,cliprect,pri,layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		metro_draw_sprites(machine, bitmap,cliprect);
+		metro_draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

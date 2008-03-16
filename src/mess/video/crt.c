@@ -171,7 +171,7 @@ VIDEO_UPDATE( crt )
 
 				/* draw pixel on screen */
 				//plot_pixel(bitmap, x, y+crt_window_offset_y, machine->pens[node->intensity]);
-				line[x] = machine->pens[node->intensity];
+				line[x] = screen->machine->pens[node->intensity];
 
 				if (node->intensity != 0)
 					p_i = i;	/* current node will be next iteration's previous node */

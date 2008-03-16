@@ -307,8 +307,8 @@ INPUT_PORTS_END
 static VIDEO_START( dgpix )
 {
 	vram = auto_malloc(0x40000*2);
-	bitmaps[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	bitmaps[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	bitmaps[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	bitmaps[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 static VIDEO_UPDATE( dgpix )
@@ -578,7 +578,7 @@ static DRIVER_INIT( xfiles )
 	rom[BYTE4_XOR_BE(0x3aa933)] = 0;
 
 //  protection related ?
-//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xf0c8b440, 0xf0c8b447, 0, 0, MRA32_NOP );
+//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xf0c8b440, 0xf0c8b447, 0, 0, SMH_NOP );
 
 	flash_roms = 2;
 }
@@ -598,7 +598,7 @@ static DRIVER_INIT( kdynastg )
 	rom[BYTE4_XOR_BE(0x3a45c9)] = 0;
 
 //  protection related ?
-//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x12341234, 0x12341243, 0, 0, MRA32_NOP );
+//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x12341234, 0x12341243, 0, 0, SMH_NOP );
 
 	flash_roms = 4;
 }

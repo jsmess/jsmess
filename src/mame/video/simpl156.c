@@ -50,7 +50,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		y = spriteram32[offs]&0xffff;
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		x = spriteram32[offs+2]&0xffff;
 		colour = (x >>9) & 0x1f;
@@ -122,7 +122,7 @@ VIDEO_UPDATE( simpl156 )
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,4);
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }
 

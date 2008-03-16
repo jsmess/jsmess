@@ -583,7 +583,7 @@ static void sound_load(int config_type, xml_data_node *parentnode)
 		{
 			float defvol = xml_get_attribute_float(channelnode, "defvol", -1000.0);
 			float newvol = xml_get_attribute_float(channelnode, "newvol", -1000.0);
-			if (defvol == sound_get_default_gain(mixernum) && newvol != -1000.0)
+			if (fabs(defvol - sound_get_default_gain(mixernum)) < 1e-6 && newvol != -1000.0)
 				sound_set_user_gain(mixernum, newvol);
 		}
 	}
@@ -794,8 +794,8 @@ static DEVICE_START( speaker_output )
 	memset(info, 0, sizeof(*info));
 
 	/* copy in all the relevant info */
-	info->speaker = inline_config;
-	info->tag = tag;
+	info->speaker = device->inline_config;
+	info->tag = device->tag;
 	return info;
 }
 
@@ -808,7 +808,7 @@ static DEVICE_START( speaker_output )
 static DEVICE_STOP( speaker_output )
 {
 #ifdef MAME_DEBUG
-	speaker_info *info = token;
+	speaker_info *info = device->token;
 
 	/* log the maximum sample values for all speakers */
 	if (info->max_sample > 0)

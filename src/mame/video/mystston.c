@@ -57,7 +57,7 @@ static TIMER_CALLBACK( interrupt_callback )
 		scanline = FIRST_INT_VPOS;
 
 	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
-	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(0, scanline - 1, INT_HPOS), scanline);
+	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline - 1, INT_HPOS), scanline);
 }
 
 
@@ -242,7 +242,7 @@ static VIDEO_RESET( mystston )
 {
 	mystston_state *state = machine->driver_data;
 
-	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(0, FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
+	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
 
 
@@ -255,18 +255,18 @@ static VIDEO_RESET( mystston )
 
 static VIDEO_UPDATE( mystston )
 {
-	mystston_state *state = machine->driver_data;
+	mystston_state *state = screen->machine->driver_data;
 
 	int flip = (*state->video_control & 0x80) ^ ((readinputportbytag("DSW1") & 0x20) << 2);
 
-	set_palette(machine, state);
+	set_palette(screen->machine, state);
 
 	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	tilemap_set_scrolly(state->bg_tilemap, 0, *state->scroll);
 	tilemap_set_flip(ALL_TILEMAPS, flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(state, machine->gfx, bitmap, cliprect, flip);
+	draw_sprites(state, screen->machine->gfx, bitmap, cliprect, flip);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	return 0;

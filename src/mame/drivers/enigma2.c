@@ -96,7 +96,7 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
-	int vpos = video_screen_get_vpos(0);
+	int vpos = video_screen_get_vpos(machine->primary_screen);
 	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
 	cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, vector);
@@ -108,8 +108,8 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 		next_counter = INT_TRIGGER_COUNT_1;
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter);
-	timer_adjust_oneshot(interrupt_assert_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0);
-	timer_adjust_oneshot(interrupt_clear_timer, video_screen_get_time_until_pos(0, vpos + 1, 0), 0);
+	timer_adjust_oneshot(interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), 0);
+	timer_adjust_oneshot(interrupt_clear_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos + 1, 0), 0);
 }
 
 
@@ -120,10 +120,10 @@ static void create_interrupt_timers(void)
 }
 
 
-static void start_interrupt_timers(void)
+static void start_interrupt_timers(running_machine *machine)
 {
 	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
-	timer_adjust_oneshot(interrupt_assert_timer, video_screen_get_time_until_pos(0, vpos, 0), 0);
+	timer_adjust_oneshot(interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
 
@@ -141,7 +141,7 @@ static MACHINE_RESET( enigma2 )
 
 	engima2_flip_screen = 0;
 
-	start_interrupt_timers();
+	start_interrupt_timers(machine);
 }
 
 
@@ -169,11 +169,12 @@ static VIDEO_UPDATE( enigma2 )
 
 	pen_t pens[NUM_PENS];
 
+	const rectangle *visarea = video_screen_get_visible_area(screen);
 	UINT8 *color_map_base = engima2_flip_screen ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
 	UINT8 *star_map_base = (blink_count & 0x08) ? &memory_region(REGION_PROMS)[0x0c00] : &memory_region(REGION_PROMS)[0x0800];
 
 	UINT8 x = 0;
-	UINT16 bitmap_y = machine->screen[screen].visarea.min_y;
+	UINT16 bitmap_y = visarea->min_y;
 	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
 	UINT8 video_data = 0;
 	UINT8 fore_color = 0;
@@ -235,10 +236,8 @@ static VIDEO_UPDATE( enigma2 )
 		if (x == 0)
 		{
 			/* end of screen? */
-			if (bitmap_y == machine->screen[screen].visarea.max_y)
-			{
+			if (bitmap_y == visarea->max_y)
 				break;
-			}
 
 			/* next row */
 			y = y + 1;
@@ -255,7 +254,8 @@ static VIDEO_UPDATE( enigma2 )
 static VIDEO_UPDATE( enigma2a )
 {
 	UINT8 x = 0;
-	UINT16 bitmap_y = machine->screen[screen].visarea.min_y;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	UINT16 bitmap_y = visarea->min_y;
 	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
 	UINT8 video_data = 0;
 
@@ -298,10 +298,8 @@ static VIDEO_UPDATE( enigma2a )
 		if (x == 0)
 		{
 			/* end of screen? */
-			if (bitmap_y == machine->screen[screen].visarea.max_y)
-			{
+			if (bitmap_y == visarea->max_y)
 				break;
-			}
 
 			/* next row */
 			y = y + 1;
@@ -402,17 +400,17 @@ static const struct AY8910interface ay8910_interface =
 
 
 static ADDRESS_MAP_START( engima2_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&enigma2_ram)
 	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dip_switch_r, MWA8_NOP)
+	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dip_switch_r, SMH_NOP)
 	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_NOP
-	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_READWRITE(input_port_0_r, MWA8_NOP)
-	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_READWRITE(input_port_1_r, MWA8_NOP)
-	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_READWRITE(MRA8_NOP, sound_data_w)
+	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_READWRITE(input_port_0_r, SMH_NOP)
+	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_READWRITE(input_port_1_r, SMH_NOP)
+	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_READWRITE(SMH_NOP, sound_data_w)
 	AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_NOP
-	AM_RANGE(0x5805, 0x5805) AM_MIRROR(0x07f8) AM_READWRITE(MRA8_NOP, enigma2_flip_screen_w)
+	AM_RANGE(0x5805, 0x5805) AM_MIRROR(0x07f8) AM_READWRITE(SMH_NOP, enigma2_flip_screen_w)
 	AM_RANGE(0x5806, 0x5807) AM_MIRROR(0x07f8) AM_NOP
 ADDRESS_MAP_END
 
@@ -421,19 +419,19 @@ static ADDRESS_MAP_START( engima2a_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&enigma2_ram)
 	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dip_switch_r, MWA8_NOP)
+	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dip_switch_r, SMH_NOP)
 	AM_RANGE(0x5800, 0x5fff) AM_NOP
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( engima2a_main_cpu_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(3) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_NOP
-	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_0_r, MWA8_NOP)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_1_r, MWA8_NOP)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(MRA8_NOP, sound_data_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_0_r, SMH_NOP)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_1_r, SMH_NOP)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(SMH_NOP, sound_data_w)
 	AM_RANGE(0x04, 0x04) AM_NOP
-	AM_RANGE(0x05, 0x05) AM_READWRITE(MRA8_NOP, enigma2_flip_screen_w)
+	AM_RANGE(0x05, 0x05) AM_READWRITE(SMH_NOP, enigma2_flip_screen_w)
 	AM_RANGE(0x06, 0x07) AM_NOP
 ADDRESS_MAP_END
 

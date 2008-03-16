@@ -51,9 +51,9 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( sprint2 )
 {
-	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows,  16, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 }
 
 
@@ -131,7 +131,7 @@ VIDEO_UPDATE( sprint2 )
 
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx(bitmap, screen->machine->gfx[1],
 			get_sprite_code(i),
 			i,
 			0, 0,
@@ -147,6 +147,7 @@ VIDEO_EOF( sprint2 )
 {
 	int i;
 	int j;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	/*
      * Collisions are detected for both player cars:
@@ -165,14 +166,14 @@ VIDEO_EOF( sprint2 )
 		rect.max_x = get_sprite_x(i) + machine->gfx[1]->width - 1;
 		rect.max_y = get_sprite_y(i) + machine->gfx[1]->height - 1;
 
-		if (rect.min_x < machine->screen[0].visarea.min_x)
-			rect.min_x = machine->screen[0].visarea.min_x;
-		if (rect.min_y < machine->screen[0].visarea.min_y)
-			rect.min_y = machine->screen[0].visarea.min_y;
-		if (rect.max_x > machine->screen[0].visarea.max_x)
-			rect.max_x = machine->screen[0].visarea.max_x;
-		if (rect.max_y > machine->screen[0].visarea.max_y)
-			rect.max_y = machine->screen[0].visarea.max_y;
+		if (rect.min_x < visarea->min_x)
+			rect.min_x = visarea->min_x;
+		if (rect.min_y < visarea->min_y)
+			rect.min_y = visarea->min_y;
+		if (rect.max_x > visarea->max_x)
+			rect.max_x = visarea->max_x;
+		if (rect.max_y > visarea->max_y)
+			rect.max_y = visarea->max_y;
 
 		/* check for sprite-tilemap collisions */
 

@@ -97,11 +97,11 @@ static void a7800_driver_init(int ispal, int lines)
 	memory_set_bankptr(7, &ROM[0x2000]);		/* MAINRAM */
 
 	/* Brutal hack put in as a consequence of new memory system; fix this */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, MRA8_BANK10);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, MWA8_BANK10);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
 	memory_set_bankptr(10, memory_region(REGION_CPU1) + 0x0480);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, MRA8_BANK11);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, MWA8_BANK11);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
 	memory_set_bankptr(11, memory_region(REGION_CPU1) + 0x1800);
 }
 

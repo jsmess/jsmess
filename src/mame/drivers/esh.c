@@ -62,7 +62,7 @@ static VIDEO_UPDATE( esh )
 			//int blinkLine = (tile_control_ram[current_screen_character] & 0x40) >> 6;
 			//int blinkChar = (tile_control_ram[current_screen_character] & 0x80) >> 7;
 
-			drawgfx(bitmap, machine->gfx[0],
+			drawgfx(bitmap, screen->machine->gfx[0],
 					tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, cliprect, TRANSPARENCY_PEN, 0);
@@ -154,7 +154,7 @@ ADDRESS_MAP_END
 
 /* IO MAPS */
 static ADDRESS_MAP_START( z80_0_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0,0xf0) AM_READ_PORT("IN0")
 	AM_RANGE(0xf1,0xf1) AM_READ_PORT("IN1")
 	AM_RANGE(0xf2,0xf2) AM_READ_PORT("IN2")

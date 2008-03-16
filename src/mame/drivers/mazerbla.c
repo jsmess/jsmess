@@ -104,10 +104,10 @@ static bitmap_t * tmpbitmaps[4];
 
 static VIDEO_START( mazerbla )
 {
-	tmpbitmaps[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmaps[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmaps[2] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmaps[3] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmaps[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmaps[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmaps[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmaps[3] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 #if 0
@@ -471,13 +471,13 @@ static WRITE8_HANDLER(zpu_coin_counter_w)
 }
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4f) AM_READ(ls670_1_r)
 	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4f) AM_WRITE(ls670_0_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
 	AM_RANGE(0x68, 0x68) AM_WRITE(zpu_coin_counter_w)
@@ -486,18 +486,18 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(sharedram_CFB_ZPU_r)
 	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe800, 0xefff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe800, 0xefff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(sharedram_CFB_ZPU_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe800, 0xefff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 
@@ -513,26 +513,26 @@ static WRITE8_HANDLER( vsb_ls273_audio_control_w )
 
 
 static ADDRESS_MAP_START( readport_cpu2, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_READ(ls670_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_cpu2, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(vsb_ls273_audio_control_w)
 	AM_RANGE(0x80, 0x83) AM_WRITE(ls670_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0x83ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM) /* main RAM (stack) */
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) /* waveform ???*/
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM) /* main RAM (stack) */
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM) /* waveform ???*/
 ADDRESS_MAP_END
 
 
@@ -624,12 +624,12 @@ static READ8_HANDLER( cfb_port_02_r )
 }
 
 static ADDRESS_MAP_START( readport_cpu3, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(cfb_port_02_r)	/* VCU status ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_cpu3_mb, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(cfb_led_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
@@ -639,8 +639,8 @@ ADDRESS_MAP_END
 
 /* Great Guns has a little different banking layout */
 static ADDRESS_MAP_START( writeport_cpu3_gg, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(cfb_led_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
@@ -1043,9 +1043,9 @@ UINT8 * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
 }
 
 static ADDRESS_MAP_START( readmem_cpu3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37ff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x37ff) AM_READ(SMH_ROM)
 	AM_RANGE(0x3800, 0x3fff) AM_READ(sharedram_CFB_ZPU_r)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_BANK1)				/* GFX roms */
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK1)				/* GFX roms */
 	AM_RANGE(0x6000, 0x67ff) AM_READ(cfb_ram_r)				/* RAM for VCU commands and parameters */
 
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(VCU_set_cmd_param_r)	/* VCU command and parameters LOAD */
@@ -1054,7 +1054,7 @@ static ADDRESS_MAP_START( readmem_cpu3, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37ff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x37ff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x3800, 0x3fff) AM_WRITE(sharedram_CFB_ZPU_w) AM_BASE(&cfb_zpu_sharedram)
 	AM_RANGE(0x4000, 0x4003) AM_WRITE(VCU_video_reg_w)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(cfb_ram_w) AM_BASE(&cfb_ram)
@@ -1090,15 +1090,15 @@ static WRITE8_HANDLER( main_sound_w )
 
 
 static ADDRESS_MAP_START( gg_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( gg_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4c) AM_WRITE(main_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
-	AM_RANGE(0x66, 0x66) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x68, 0x68) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x66, 0x66) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x68, 0x68) AM_WRITE(SMH_NOP)
 
 	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
@@ -1128,14 +1128,14 @@ static WRITE8_HANDLER( gg_led_ctrl_w )
 }
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x4000, 0x4000) AM_READ(AY8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(MWA8_RAM) /* main RAM (stack) */
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x27ff) AM_WRITE(SMH_RAM) /* main RAM (stack) */
 
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(AY8910_write_port_0_w)

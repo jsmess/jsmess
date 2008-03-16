@@ -325,7 +325,7 @@ static WRITE8_HANDLER ( exidy_wd179x_w )
 
 
 static ADDRESS_MAP_START( exidy_mem , ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM		/* ram 32k machine */
 	AM_RANGE(0xbc00, 0xbcff) AM_ROM
 	AM_RANGE(0xbe00, 0xbe03) AM_READWRITE(exidy_wd179x_r, exidy_wd179x_w)
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( exidy_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exidyd_mem , ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_RAM		/* ram 48k diskless machine */
 	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */
@@ -564,8 +564,8 @@ static READ8_HANDLER(exidy_ff_port_r)
 
 
 static ADDRESS_MAP_START( exidy_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE( exidy_fc_port_r, exidy_fc_port_w )
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE( exidy_fd_port_r, exidy_fd_port_w )
 	AM_RANGE(0xfe, 0xfe) AM_READWRITE( exidy_fe_port_r, exidy_fe_port_w )

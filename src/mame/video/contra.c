@@ -165,12 +165,12 @@ VIDEO_START( contra )
 	private_spriteram = auto_malloc(0x800);
 	private_spriteram_2 = auto_malloc(0x800);
 
-	bg_clip = machine->screen[0].visarea;
+	bg_clip = *video_screen_get_visible_area(machine->primary_screen);
 	bg_clip.min_x += 40;
 
 	fg_clip = bg_clip;
 
-	tx_clip = machine->screen[0].visarea;
+	tx_clip = *video_screen_get_visible_area(machine->primary_screen);
 	tx_clip.max_x = 39;
 	tx_clip.min_x = 0;
 
@@ -288,7 +288,7 @@ VIDEO_UPDATE( contra )
 	sect_rect(&fg_finalclip, cliprect);
 	sect_rect(&tx_finalclip, cliprect);
 
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	tilemap_set_scrollx( fg_tilemap,0, K007121_ctrlram[0][0x00] - 40 );
 	tilemap_set_scrolly( fg_tilemap,0, K007121_ctrlram[0][0x02] );
@@ -297,8 +297,8 @@ VIDEO_UPDATE( contra )
 
 	tilemap_draw( bitmap,&bg_finalclip, bg_tilemap, 0 ,0);
 	tilemap_draw( bitmap,&fg_finalclip, fg_tilemap, 0 ,0);
-	draw_sprites( machine,bitmap,cliprect, 0 );
-	draw_sprites( machine,bitmap,cliprect, 1 );
+	draw_sprites( screen->machine,bitmap,cliprect, 0 );
+	draw_sprites( screen->machine,bitmap,cliprect, 1 );
 	tilemap_draw( bitmap,&tx_finalclip, tx_tilemap, 0 ,0);
 	return 0;
 }

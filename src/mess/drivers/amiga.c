@@ -44,7 +44,7 @@ static WRITE16_HANDLER( amiga_clock_w ) { msm6242_w( machine, offset / 2, data )
 ***************************************************************************/
 
 static ADDRESS_MAP_START(amiga_mem, ADDRESS_SPACE_PROGRAM, 16)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x80000) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM /* slow-mem */
@@ -284,13 +284,13 @@ static void amiga_cia_0_portA_w( UINT8 data )
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, MWA16_BANK1);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK1);
 
 		amiga_cart_check_overlay();
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, 0, MWA16_UNMAP);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, 0, SMH_UNMAP);
 
 	set_led_status( 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
@@ -347,7 +347,7 @@ static void amiga_reset(void)
 	else
 	{
 		/* No RTC support */
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xdc0000, 0xdc003f, 0, 0, MRA16_UNMAP, MWA16_UNMAP);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xdc0000, 0xdc003f, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	}
 }
 

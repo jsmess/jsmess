@@ -122,7 +122,7 @@ VIDEO_START( system1 )
 	bg_dirtybuffer = auto_malloc(1024);
 	memset(bg_dirtybuffer,1,1024);
 
-	tmp_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	state_save_register_func_postload(system1_postload);
 	state_save_register_global(system1_background_memory);
@@ -141,7 +141,7 @@ VIDEO_START( wbml )
 	wbml_paged_videoram = auto_malloc(0x4000);	/* Allocate 16k for background banked ram */
 	memset(wbml_paged_videoram,0,0x4000);
 
-	tmp_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	system1_sprite_xoffset = 1+7*2;
 
@@ -186,16 +186,16 @@ INLINE int get_sprite_bottom_y(int spr_number)
 }
 #endif
 
-INLINE void draw_pixel(bitmap_t *bitmap,
+INLINE void draw_pixel(running_machine *machine, bitmap_t *bitmap,
 				  	   int x,int y,int x_flipped,int y_flipped,
 				  	   int spr_number,int color)
 {
 	int xr,yr;
 	int sprite_onscreen;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-
-	if (x < 0 || x >= Machine->screen[0].width ||
-		y < 0 || y >= Machine->screen[0].height)
+	if (x < 0 || x >= video_screen_get_width(machine->primary_screen) ||
+		y < 0 || y >= video_screen_get_height(machine->primary_screen))
 		return;
 
 	if (sprite_onscreen_map[256*y+x] != 255)
@@ -206,10 +206,10 @@ INLINE void draw_pixel(bitmap_t *bitmap,
 
 	sprite_onscreen_map[256*y+x] = spr_number;
 
-	if (x_flipped >= Machine->screen[0].visarea.min_x ||
-		x_flipped <= Machine->screen[0].visarea.max_x ||
-		y_flipped >= Machine->screen[0].visarea.min_y ||
-		y_flipped <= Machine->screen[0].visarea.max_y)
+	if (x_flipped >= visarea->min_x ||
+		x_flipped <= visarea->max_x ||
+		y_flipped >= visarea->min_y ||
+		y_flipped <= visarea->max_y)
 	{
 		*BITMAP_ADDR16(bitmap, y_flipped, x_flipped) = color;
 	}
@@ -254,7 +254,7 @@ WRITE8_HANDLER( system1_sprites_collisionram_w )
 	system1_sprites_collisionram[offset] = 0x7e;
 }
 
-static void draw_sprite(bitmap_t *bitmap,int spr_number)
+static void draw_sprite(running_machine *machine, bitmap_t *bitmap,int spr_number)
 {
 	int sy,row,height,src,bank;
 	UINT8 *sprite_base;
@@ -322,13 +322,13 @@ static void draw_sprite(bitmap_t *bitmap,int spr_number)
 
 			if (color1 == 15) break;
 			if (color1)
-				draw_pixel(bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color1);
+				draw_pixel(machine,bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color1);
 			x++;
 			x_flipped += flip_screen_get() ? -1 : 1;
 
 			if (color2 == 15) break;
 			if (color2)
-				draw_pixel(bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color2);
+				draw_pixel(machine,bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color2);
 			x++;
 			x_flipped += flip_screen_get() ? -1 : 1;
 		}
@@ -336,7 +336,7 @@ static void draw_sprite(bitmap_t *bitmap,int spr_number)
 }
 
 
-static void draw_sprites(bitmap_t *bitmap)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
 	int spr_number,sprite_bottom_y,sprite_top_y;
 	UINT8 *sprite_base;
@@ -350,7 +350,7 @@ static void draw_sprites(bitmap_t *bitmap)
 		sprite_top_y = sprite_base[SPR_Y_TOP];
 		sprite_bottom_y = sprite_base[SPR_Y_BOTTOM];
 		if (sprite_bottom_y && (sprite_bottom_y-sprite_top_y > 0))
-			draw_sprite(bitmap,spr_number);
+			draw_sprite(machine, bitmap,spr_number);
 	}
 }
 
@@ -527,13 +527,13 @@ VIDEO_UPDATE( system1 )
 	int drawn;
 
 
-	system1_draw_bg(machine, bitmap, cliprect, -1);
-	drawn = system1_draw_fg(machine, bitmap, cliprect, 0);
+	system1_draw_bg(screen->machine, bitmap, cliprect, -1);
+	drawn = system1_draw_fg(screen->machine, bitmap, cliprect, 0);
 	/* redraw low priority bg tiles if necessary */
-	if (drawn) system1_draw_bg(machine, bitmap, cliprect, 0);
-	draw_sprites(bitmap);
-	system1_draw_bg(machine, bitmap, cliprect, 1);
-	system1_draw_fg(machine, bitmap, cliprect, 1);
+	if (drawn) system1_draw_bg(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap);
+	system1_draw_bg(screen->machine, bitmap, cliprect, 1);
+	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
@@ -668,13 +668,13 @@ VIDEO_UPDATE( choplifter )
 	int drawn;
 
 
-	chplft_draw_bg(machine, bitmap, cliprect, -1);
-	drawn = system1_draw_fg(machine, bitmap, cliprect, 0);
+	chplft_draw_bg(screen->machine, bitmap, cliprect, -1);
+	drawn = system1_draw_fg(screen->machine, bitmap, cliprect, 0);
 	/* redraw low priority bg tiles if necessary */
-	if (drawn) chplft_draw_bg(machine, bitmap, cliprect, 0);
-	draw_sprites(bitmap);
-	chplft_draw_bg(machine, bitmap, cliprect, 1);
-	system1_draw_fg(machine, bitmap, cliprect, 1);
+	if (drawn) chplft_draw_bg(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap);
+	chplft_draw_bg(screen->machine, bitmap, cliprect, 1);
+	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
@@ -802,10 +802,10 @@ static void wbml_draw_fg(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( wbml )
 {
-	wbml_draw_bg(machine, bitmap, cliprect, 0);
-	draw_sprites(bitmap);
-	wbml_draw_bg(machine, bitmap, cliprect, 1);
-	wbml_draw_fg(machine, bitmap, cliprect);
+	wbml_draw_bg(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap);
+	wbml_draw_bg(screen->machine, bitmap, cliprect, 1);
+	wbml_draw_fg(screen->machine, bitmap, cliprect);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
@@ -872,10 +872,10 @@ static void ufosensi_draw_bg(running_machine *machine, bitmap_t *bitmap, const r
 
 VIDEO_UPDATE( ufosensi )
 {
-	ufosensi_draw_bg(machine, bitmap, cliprect, 0);
-	draw_sprites(bitmap);
-	ufosensi_draw_bg(machine, bitmap, cliprect, 1);
-	wbml_draw_fg(machine, bitmap, cliprect);
+	ufosensi_draw_bg(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap);
+	ufosensi_draw_bg(screen->machine, bitmap, cliprect, 1);
+	wbml_draw_fg(screen->machine, bitmap, cliprect);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
@@ -890,13 +890,13 @@ VIDEO_UPDATE( blockgal )
 
 	blockgal_kludgeoffset = -8;
 
-	system1_draw_bg(machine, bitmap, cliprect, -1);
-	drawn = system1_draw_fg(machine, bitmap, cliprect, 0);
+	system1_draw_bg(screen->machine, bitmap, cliprect, -1);
+	drawn = system1_draw_fg(screen->machine, bitmap, cliprect, 0);
 	/* redraw low priority bg tiles if necessary */
-	if (drawn) system1_draw_bg(machine, bitmap, cliprect, 0);
-	draw_sprites(bitmap);
-	system1_draw_bg(machine, bitmap, cliprect, 1);
-	system1_draw_fg(machine, bitmap, cliprect, 1);
+	if (drawn) system1_draw_bg(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap);
+	system1_draw_bg(screen->machine, bitmap, cliprect, 1);
+	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */

@@ -149,12 +149,16 @@ WRITE8_HANDLER( cdp1861_dispoff_w )
 
 VIDEO_START( cdp1861 )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+
 	cdp1861_int_timer = timer_alloc(cdp1861_int_tick, NULL);
 	cdp1861_efx_timer = timer_alloc(cdp1861_efx_tick, NULL);
 	cdp1861_dma_timer = timer_alloc(cdp1861_dma_tick, NULL);
 
 	/* allocate the temporary bitmap */
-	cdptmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	cdptmpbitmap = auto_bitmap_alloc(width, height, video_screen_get_format(screen));
 
 	/* ensure the contents of the bitmap are saved */
 	state_save_register_bitmap("video", 0, "cdptmpbitmap", cdptmpbitmap);
@@ -171,7 +175,7 @@ VIDEO_UPDATE( cdp1861 )
 	}
 	else
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	}
 
 	return 0;

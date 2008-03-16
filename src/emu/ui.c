@@ -26,7 +26,7 @@
 #include "uimess.h"
 #include "inputx.h"
 #include "messopts.h"
-#endif
+#endif /* MESS */
 
 #include <ctype.h>
 
@@ -154,7 +154,7 @@ static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer
 static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer, int arg);
 static INT32 slider_flicker(running_machine *machine, INT32 newval, char *buffer, int arg);
 static INT32 slider_beam(running_machine *machine, INT32 newval, char *buffer, int arg);
-static char *slider_get_screen_desc(int arg);
+static char *slider_get_screen_desc(const device_config *screen);
 #ifdef MAME_DEBUG
 static INT32 slider_crossscale(running_machine *machine, INT32 newval, char *buffer, int arg);
 static INT32 slider_crossoffset(running_machine *machine, INT32 newval, char *buffer, int arg);
@@ -454,7 +454,7 @@ void ui_update_and_render(running_machine *machine)
 #ifdef MESS
 	/* let MESS display its stuff */
 	mess_ui_update(machine);
-#endif
+#endif /* MESS */
 }
 
 
@@ -1051,7 +1051,6 @@ static int sprintf_warnings(char *buffer)
 int sprintf_game_info(char *buffer)
 {
 	int scrcount = video_screen_count(Machine->config);
-	const device_config *device;
 	char *bufptr = buffer;
 	int cpunum, sndnum;
 	int count;
@@ -1119,22 +1118,27 @@ int sprintf_game_info(char *buffer)
 		buffer += sprintf(bufptr, "None\n");
 	else
 	{
-		for (device = video_screen_first(Machine->config); device != NULL; device = video_screen_next(device))
+		const device_config *screen;
+
+		for (screen = video_screen_first(Machine->config); screen != NULL; screen = video_screen_next(screen))
 		{
-			int index = device_list_index(Machine->config->devicelist, VIDEO_SCREEN, device->tag);
-			const screen_config *scrconfig = device->inline_config;
+			const screen_config *scrconfig = screen->inline_config;
 
 			if (scrcount > 1)
-				bufptr += sprintf(bufptr, "Screen %d: ", index + 1);
+				bufptr += sprintf(bufptr, "%s: ", slider_get_screen_desc(screen));
 
 			if (scrconfig->type == SCREEN_TYPE_VECTOR)
 				bufptr += sprintf(bufptr, "Vector\n");
 			else
+			{
+				const rectangle *visarea = video_screen_get_visible_area(screen);
+
 				bufptr += sprintf(bufptr, "%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
-						Machine->screen[index].visarea.max_x - Machine->screen[index].visarea.min_x + 1,
-						Machine->screen[index].visarea.max_y - Machine->screen[index].visarea.min_y + 1,
+						visarea->max_x - visarea->min_x + 1,
+						visarea->max_y - visarea->min_y + 1,
 						(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-						ATTOSECONDS_TO_HZ(Machine->screen[index].refresh));
+						ATTOSECONDS_TO_HZ(video_screen_get_frame_period(screen).attoseconds));
+			}
 		}
 	}
 
@@ -1226,7 +1230,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* first draw the FPS counter */
 	if (showfps || osd_ticks() < showfps_end)
 	{
-		ui_draw_text_full(video_get_speed_text(), 0.0f, 0.0f, 1.0f,
+		ui_draw_text_full(video_get_speed_text(machine), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 	else
@@ -1256,7 +1260,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 #ifdef MESS
 	if (mess_disable_builtin_ui(machine))
 		return 0;
-#endif
+#endif /* MESS */
 
 	/* if the user pressed ESC, stop the emulation */
 	if (input_ui_pressed(IPT_UI_CANCEL))
@@ -1318,14 +1322,14 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* toggle movie recording */
 	if (input_ui_pressed(IPT_UI_RECORD_MOVIE))
 	{
-		if (!video_is_movie_active(Machine, 0))
+		if (!video_is_movie_active(Machine->primary_screen))
 		{
-			video_movie_begin_recording(Machine, 0, NULL);
+			video_movie_begin_recording(Machine->primary_screen, NULL);
 			popmessage("REC START");
 		}
 		else
 		{
-			video_movie_end_recording(Machine, 0);
+			video_movie_end_recording(Machine->primary_screen);
 			popmessage("REC STOP");
 		}
 	}
@@ -1340,7 +1344,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 
 	/* toggle crosshair display */
 	if (input_ui_pressed(IPT_UI_TOGGLE_CROSSHAIR))
-		video_crosshair_toggle();
+		crosshair_toggle(machine);
 
 	/* increment frameskip? */
 	if (input_ui_pressed(IPT_UI_FRAMESKIP_INC))
@@ -1743,16 +1747,20 @@ static INT32 slider_overclock(running_machine *machine, INT32 newval, char *buff
 static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
 	const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, arg)->inline_config;
-	double defrefresh = ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh);
+	double defrefresh = ATTOSECONDS_TO_HZ(scrconfig->refresh);
 	double refresh;
 
 	if (buffer != NULL)
 	{
-		screen_state *state = &Machine->screen[arg];
-		video_screen_configure(arg, state->width, state->height, &state->visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
-		sprintf(buffer, "%s Refresh rate %.3f", slider_get_screen_desc(arg), ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh));
+		const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+		int width = video_screen_get_width(screen);
+		int height = video_screen_get_height(screen);
+		const rectangle *visarea = video_screen_get_visible_area(screen);
+
+		video_screen_configure(screen, width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
+		sprintf(buffer, "%s Refresh Rate %.3ffps", slider_get_screen_desc(screen), ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds));
 	}
-	refresh = ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh);
+	refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds);
 	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
 }
 
@@ -1764,11 +1772,12 @@ static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer
 
 static INT32 slider_brightness(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_brightness(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s Brightness %.3f", slider_get_screen_desc(arg), render_container_get_brightness(container));
+		sprintf(buffer, "%s Brightness %.3f", slider_get_screen_desc(screen), render_container_get_brightness(container));
 	}
 	return floor(render_container_get_brightness(container) * 1000.0f + 0.5f);
 }
@@ -1781,11 +1790,12 @@ static INT32 slider_brightness(running_machine *machine, INT32 newval, char *buf
 
 static INT32 slider_contrast(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_contrast(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s Contrast %.3f", slider_get_screen_desc(arg), render_container_get_contrast(container));
+		sprintf(buffer, "%s Contrast %.3f", slider_get_screen_desc(screen), render_container_get_contrast(container));
 	}
 	return floor(render_container_get_contrast(container) * 1000.0f + 0.5f);
 }
@@ -1797,11 +1807,12 @@ static INT32 slider_contrast(running_machine *machine, INT32 newval, char *buffe
 
 static INT32 slider_gamma(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_gamma(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s Gamma %.3f", slider_get_screen_desc(arg), render_container_get_gamma(container));
+		sprintf(buffer, "%s Gamma %.3f", slider_get_screen_desc(screen), render_container_get_gamma(container));
 	}
 	return floor(render_container_get_gamma(container) * 1000.0f + 0.5f);
 }
@@ -1814,11 +1825,12 @@ static INT32 slider_gamma(running_machine *machine, INT32 newval, char *buffer, 
 
 static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_xscale(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(arg), "Horiz Stretch", render_container_get_xscale(container));
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Horiz Stretch", render_container_get_xscale(container));
 	}
 	return floor(render_container_get_xscale(container) * 1000.0f + 0.5f);
 }
@@ -1831,11 +1843,12 @@ static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer,
 
 static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_yscale(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(arg), "Vert Stretch", render_container_get_yscale(container));
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Vert Stretch", render_container_get_yscale(container));
 	}
 	return floor(render_container_get_yscale(container) * 1000.0f + 0.5f);
 }
@@ -1848,11 +1861,12 @@ static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer,
 
 static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_xoffset(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(arg), "Horiz Position", render_container_get_xoffset(container));
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Horiz Position", render_container_get_xoffset(container));
 	}
 	return floor(render_container_get_xoffset(container) * 1000.0f + 0.5f);
 }
@@ -1865,11 +1879,12 @@ static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer
 
 static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_yoffset(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(arg), "Vert Position", render_container_get_yoffset(container));
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Vert Position", render_container_get_yoffset(container));
 	}
 	return floor(render_container_get_yoffset(container) * 1000.0f + 0.5f);
 }
@@ -1912,13 +1927,13 @@ static INT32 slider_beam(running_machine *machine, INT32 newval, char *buffer, i
     description for a given screen index
 -------------------------------------------------*/
 
-static char *slider_get_screen_desc(int arg)
+static char *slider_get_screen_desc(const device_config *screen)
 {
-	int screen_count = video_screen_count(Machine->config);
+	int screen_count = video_screen_count(screen->machine->config);
 	static char descbuf[256];
 
 	if (screen_count > 1)
-		sprintf(descbuf, "Screen #%d", arg);
+		sprintf(descbuf, "Screen '%s'", screen->tag);
 	else
 		strcpy(descbuf, "Screen");
 

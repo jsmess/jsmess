@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( coleco_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coleco_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x9f) AM_WRITE(coleco_paddle_toggle_off)
 	AM_RANGE(0xa0, 0xbf) AM_READWRITE(coleco_video_r, coleco_video_w)
 	AM_RANGE(0xc0, 0xdf) AM_WRITE(coleco_paddle_toggle_on)

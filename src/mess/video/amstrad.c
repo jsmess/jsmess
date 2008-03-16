@@ -1283,7 +1283,7 @@ VIDEO_UPDATE( amstrad )
 	#endif
 		copybitmap(bitmap, amstrad_bitmap, 0,0,0,0,&rect);
 		if(amstrad_plus_asic_enabled != 0)
-			amstrad_plus_sprite_draw(machine, bitmap);
+			amstrad_plus_sprite_draw(screen->machine, bitmap);
 		amstrad_scanline = y_screen_pos - 32;
 		return 0;
 	}

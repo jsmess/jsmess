@@ -36,7 +36,7 @@ VIDEO_UPDATE( mz700 )
 {
     int offs;
 
-    fillbitmap(bitmap, get_black_pen(machine), cliprect);
+    fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	for(offs = 0; offs < 40*25; offs++)
 	{
@@ -48,7 +48,7 @@ VIDEO_UPDATE( mz700 )
 		color = colorram[offs];
 		code |= (color & 0x80) << 1;
 
-        drawgfx(bitmap, machine->gfx[0], code, color, 0, 0, sx, sy,
+        drawgfx(bitmap, screen->machine->gfx[0], code, color, 0, 0, sx, sy,
 			cliprect, TRANSPARENCY_NONE, 0);
 	}
 

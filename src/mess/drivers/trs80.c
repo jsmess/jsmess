@@ -107,12 +107,12 @@ static READ8_HANDLER (trs80_wd179x_r)
 static ADDRESS_MAP_START( mem_level1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(MRA8_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_level1, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfe, 0xfe) AM_READ(trs80_port_xx_r)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_port_ff_r, trs80_port_ff_w)
 ADDRESS_MAP_END
@@ -130,12 +130,12 @@ static ADDRESS_MAP_START( mem_model1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x37f0, 0x37ff) AM_NOP
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3900, 0x3bff) AM_NOP
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(MRA8_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_model1, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfe, 0xfe) AM_READ(trs80_port_xx_r)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_port_ff_r, trs80_port_ff_w)
 ADDRESS_MAP_END
@@ -143,12 +143,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mem_model3, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(MRA8_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_model3, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80_irq_status_r, trs80_irq_mask_w)
 	AM_RANGE(0xe4, 0xe4)	AM_WRITE(trs80_motor_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE(trs80_wd179x_r, wd17xx_command_w)

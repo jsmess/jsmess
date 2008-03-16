@@ -183,8 +183,8 @@ static void esd16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 {
 	int offs;
 
-	int max_x		=	machine->screen[0].width;
-	int max_y		=	machine->screen[0].height;
+	int max_x = video_screen_get_width(machine->primary_screen);
+	int max_y = video_screen_get_height(machine->primary_screen);
 
 	for ( offs = spriteram_size/2 - 8/2; offs >= 0 ; offs -= 8/2 )
 	{
@@ -239,8 +239,8 @@ static void hedpanic_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 {
 	int offs;
 
-	int max_x		=	machine->screen[0].width;
-	int max_y		=	machine->screen[0].height;
+	int max_x = video_screen_get_width(machine->primary_screen);
+	int max_y = video_screen_get_height(machine->primary_screen);
 
 	for ( offs = spriteram_size/2 - 8/2; offs >= 0 ; offs -= 8/2 )
 	{
@@ -329,7 +329,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,esdtilemap_1,0,1);
 
-	if (layers_ctrl & 4)	esd16_draw_sprites(machine,bitmap,cliprect);
+	if (layers_ctrl & 4)	esd16_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -372,7 +372,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 
 	}
 
-	if (layers_ctrl & 4)	hedpanic_draw_sprites(machine,bitmap,cliprect);
+	if (layers_ctrl & 4)	hedpanic_draw_sprites(screen->machine,bitmap,cliprect);
 
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);

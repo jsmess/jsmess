@@ -125,11 +125,11 @@ WRITE8_HANDLER( sprint8_video_ram_w )
 
 VIDEO_START( sprint8 )
 {
-	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	tilemap1 = tilemap_create(get_tile_info1, tilemap_scan_rows,  16, 8, 32, 32);
-	tilemap2 = tilemap_create(get_tile_info2, tilemap_scan_rows,  16, 8, 32, 32);
+	tilemap1 = tilemap_create(get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
+	tilemap2 = tilemap_create(get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
 
 	tilemap_set_scrolly(tilemap1, 0, +24);
 	tilemap_set_scrolly(tilemap2, 0, +24);
@@ -168,9 +168,9 @@ static TIMER_CALLBACK( sprint8_collision_callback )
 
 VIDEO_UPDATE( sprint8 )
 {
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 	tilemap_draw(bitmap, cliprect, tilemap1, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -179,21 +179,22 @@ VIDEO_EOF( sprint8 )
 {
 	int x;
 	int y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	tilemap_draw(helper2, &machine->screen[0].visarea, tilemap2, 0, 0);
+	tilemap_draw(helper2, visarea, tilemap2, 0, 0);
 
-	fillbitmap(helper1, 0x20, &machine->screen[0].visarea);
+	fillbitmap(helper1, 0x20, visarea);
 
-	draw_sprites(machine, helper1, &machine->screen[0].visarea);
+	draw_sprites(machine, helper1, visarea);
 
-	for (y = machine->screen[0].visarea.min_y; y <= machine->screen[0].visarea.max_y; y++)
+	for (y = visarea->min_y; y <= visarea->max_y; y++)
 	{
 		const UINT16* p1 = BITMAP_ADDR16(helper1, y, 0);
 		const UINT16* p2 = BITMAP_ADDR16(helper2, y, 0);
 
-		for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
+		for (x = visarea->min_x; x <= visarea->max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)
-				timer_set(video_screen_get_time_until_pos(0, y + 24, x), NULL,
+				timer_set(video_screen_get_time_until_pos(machine->primary_screen, y + 24, x), NULL,
 						  colortable_entry_get_value(machine->colortable, p1[x]),
 						  sprint8_collision_callback);
 	}

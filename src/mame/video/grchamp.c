@@ -108,7 +108,7 @@ VIDEO_START( grchamp )
 {
 	grchamp_state *state = machine->driver_data;
 
-	state->work_bitmap = auto_bitmap_alloc(32,32,machine->screen[0].format);
+	state->work_bitmap = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
 
 	/* allocate tilemaps for each of the three sections */
 	state->text_tilemap = tilemap_create(get_text_tile_info, tilemap_scan_rows,  8,8, 32,32);
@@ -122,7 +122,7 @@ static int collision_check(running_machine *machine, grchamp_state *state, bitma
 {
 	int bgcolor = machine->pens[0];
 	int sprite_transp = machine->pens[0x24];
-	const rectangle *clip = &machine->screen[0].visarea;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 	int y0 = 240 - state->cpu0_out[3];
 	int x0 = 256 - state->cpu0_out[2];
 	int x,y,sx,sy;
@@ -150,8 +150,8 @@ static int collision_check(running_machine *machine, grchamp_state *state, bitma
 			if( pixel != sprite_transp ){
 				sx = x+x0;
 				sy = y+y0;
-				if( (sx >= clip->min_x) && (sx <= clip->max_x) &&
-					(sy >= clip->min_y) && (sy <= clip->max_y) )
+				if( (sx >= visarea->min_x) && (sx <= visarea->max_x) &&
+					(sy >= visarea->min_y) && (sy <= visarea->max_y) )
 				{
 					// Collision check uses only 16 pens!
 					pixel = *BITMAP_ADDR16(bitmap, sy, sx) % 16;
@@ -369,7 +369,7 @@ VIDEO_UPDATE( grchamp )
 		MAKE_RGB(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
-	grchamp_state *state = machine->driver_data;
+	grchamp_state *state = screen->machine->driver_data;
 	const UINT8 *amedata = memory_region(REGION_GFX5);
 	const UINT8 *headdata = memory_region(REGION_GFX6);
 	const UINT8 *pldata = memory_region(REGION_GFX7);
@@ -412,7 +412,7 @@ VIDEO_UPDATE( grchamp )
 		UINT8 objdata[256];
 
 		/* draw the objects for this scanline */
-		draw_objects(machine, state, y, objdata);
+		draw_objects(screen->machine, state, y, objdata);
 
 		/* iterate over columns */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)

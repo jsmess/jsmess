@@ -26,7 +26,6 @@ struct _qix_state
 	UINT8  coinctrl;
 
 	/* video state */
-	mc6845_t *mc6845;
 	UINT8 *videoram;
 	UINT8 *videoram_address;
 	UINT8 *videoram_mask;
@@ -66,7 +65,7 @@ WRITE8_HANDLER( qix_68705_portC_w );
 
 WRITE8_HANDLER( qix_pia_0_w );
 
-INTERRUPT_GEN( qix_vblank_start );
+MC6845_ON_VSYNC_CHANGED( qix_vsync_changed );
 
 
 /*----------- defined in video/qix.c -----------*/

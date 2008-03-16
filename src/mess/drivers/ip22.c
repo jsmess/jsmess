@@ -1212,7 +1212,7 @@ static WRITE32_HANDLER( hpc3_pbusdma_w )
 }
 
 static ADDRESS_MAP_START( ip225015_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE( 0x00000000, 0x0007ffff ) AM_READWRITE( MRA32_BANK1, MWA32_BANK1 )	/* mirror of first 512k of main RAM */
+	AM_RANGE( 0x00000000, 0x0007ffff ) AM_READWRITE( SMH_BANK1, SMH_BANK1 )	/* mirror of first 512k of main RAM */
 	AM_RANGE( 0x08000000, 0x0fffffff ) AM_RAM AM_SHARE(1) AM_BASE( &ip22_mainram ) AM_WRITE(ip22_write_ram)		/* 128 MB of main RAM */
 	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE( newport_rex3_r, newport_rex3_w )
 	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE( mc_r, mc_w )

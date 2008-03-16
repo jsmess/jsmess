@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
        this simulator I've expanded the port assignments accordingly. I've also
        tested wether this is true for the actual hardware, and it is.
     */
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// The 16 I/O port combinations for the 8255 (P8255A-5, 8628LLP, (c) 1981 AMD)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(ppi8255_0_r, ppi8255_0_w) AM_MIRROR(0x3C)
@@ -375,6 +375,10 @@ static void mpf1_pio_interrupt( int state )
 static const z80pio_interface pio_intf =
 {
 	mpf1_pio_interrupt,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
 	NULL,
 	NULL
 };

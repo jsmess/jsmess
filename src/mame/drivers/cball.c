@@ -40,7 +40,7 @@ static VIDEO_UPDATE( cball )
 
 	/* draw sprite */
 
-	drawgfx(bitmap, machine->gfx[1],
+	drawgfx(bitmap, screen->machine->gfx[1],
 		cball_video_ram[0x399] >> 4,
 		0,
 		0, 0,
@@ -60,17 +60,15 @@ static TIMER_CALLBACK( interrupt_callback )
 	scanline = scanline + 32;
 
 	if (scanline >= 262)
-	{
 		scanline = 16;
-	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
 }
 
 
 static MACHINE_RESET( cball )
 {
-	timer_set(video_screen_get_time_until_pos(0, 16, 0), NULL, 16, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 16, 0), NULL, 16, interrupt_callback);
 }
 
 
@@ -99,10 +97,10 @@ static WRITE8_HANDLER( cball_wram_w )
 
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 
 	AM_RANGE(0x0000, 0x03ff) AM_READ(cball_wram_r) AM_MASK(0x7f)
-	AM_RANGE(0x0400, 0x07ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0400, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1001, 0x1001) AM_READ(input_port_0_r)
 	AM_RANGE(0x1003, 0x1003) AM_READ(input_port_1_r)
 	AM_RANGE(0x1020, 0x1020) AM_READ(input_port_2_r)

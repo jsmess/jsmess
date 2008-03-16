@@ -201,8 +201,8 @@ static WRITE8_HANDLER( cliff_sound_overlay_w )
 	int overlay = ( data & 0x10 ) ? 1 : 0;
 
 	/* configure pen 0 and 1 as transparent in the renderer and use it as the compositing color */
-	render_container_set_palette_alpha(render_container_get_screen(0), 0, overlay ? 0x00 : 0xff );
-	render_container_set_palette_alpha(render_container_get_screen(0), 1, overlay ? 0x00 : 0xff );
+	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 0, overlay ? 0x00 : 0xff );
+	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 1, overlay ? 0x00 : 0xff );
 
 	/* audio */
 	discrete_sound_w(machine, CLIFF_ENABLE_SND_1, sound&1);
@@ -252,7 +252,7 @@ static TIMER_CALLBACK( cliff_irq_callback )
 	if ( phillips_code & 0x800000 )
 		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, param, 0), param);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 }
 
 static void vdp_interrupt (int state)
@@ -272,7 +272,7 @@ static MACHINE_RESET( cliffhgr )
 {
 	port_bank = 0;
 	phillips_code = 0;
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, 17, 0), 17);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, 17, 0), 17);
 }
 
 /********************************************************/
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mainport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x44, 0x44) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0x45, 0x45) AM_READ(TMS9928A_vram_r)
 	AM_RANGE(0x46, 0x46) AM_WRITE(cliff_sound_overlay_w)

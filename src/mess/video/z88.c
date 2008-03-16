@@ -179,27 +179,27 @@ VIDEO_UPDATE( z88 )
 			/* inverted graphics? */
 				if (byte1 & Z88_SCR_HW_REV)
 				{
-				pen1 = machine->pens[0];
+				pen1 = screen->machine->pens[0];
 
 				if (byte1 & Z88_SCR_HW_GRY)
 				{
-					pen0 = machine->pens[2];
+					pen0 = screen->machine->pens[2];
 				}
 				else
 				{
-					pen0 = machine->pens[1];
+					pen0 = screen->machine->pens[1];
 				}
 				}
 				else
                 {
-				pen0 = machine->pens[0];
+				pen0 = screen->machine->pens[0];
 				if (byte1 & Z88_SCR_HW_GRY)
 				{
-					pen1 = machine->pens[2];
+					pen1 = screen->machine->pens[2];
 				}
 				else
 				{
-					pen1 = machine->pens[1];
+					pen1 = screen->machine->pens[1];
 				}
 			}
 

@@ -5,7 +5,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "profiler.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms34010/34010ops.h"
@@ -267,7 +266,7 @@ WRITE16_HANDLER( midyunit_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	newword = paletteram16[offset];
-	palette_set_color_rgb(Machine, offset & palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
+	palette_set_color_rgb(machine, offset & palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 
 
@@ -454,7 +453,7 @@ WRITE16_HANDLER( midyunit_dma_w )
 
 	/* high bit triggers action */
 	command = dma_register[DMA_COMMAND];
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 
@@ -565,7 +564,7 @@ static TIMER_CALLBACK( autoerase_line )
 }
 
 
-void midyunit_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void midyunit_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &local_videoram[(params->rowaddr << 9) & 0x3fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -577,10 +576,10 @@ void midyunit_scanline_update(running_machine *machine, int screen, bitmap_t *bi
 		dest[x] = pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
-	autoerase_line(machine, NULL, params->rowaddr - 1);
+	autoerase_line(screen->machine, NULL, params->rowaddr - 1);
 
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
-	if (scanline == machine->screen[0].visarea.max_y)
-		timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
+	if (scanline == video_screen_get_visible_area(screen)->max_y)
+		timer_set(video_screen_get_time_until_pos(screen, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
 }

@@ -115,19 +115,19 @@ VIDEO_UPDATE( playch10 )
 	/* Dual monitor version */
 	if(system_bios == 1)
 	{
+		const device_config *top_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
+
 		/* On Playchoice 10 single monitor, this bit toggles    */
 		/* between PPU and BIOS display.                        */
 		/* We support the multi-monitor layout. In this case,   */
 		/* if the bit is not set, then we should display        */
 		/* the PPU portion.                                     */
 
-		if ( screen == 0 )
+		if (screen == top_screen)
 		{
 			if ( !pc10_dispmask )
-			{
 				/* render the ppu */
 				ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
-			}
 			else
 				fillbitmap(bitmap, 0, cliprect);
 		}
@@ -143,7 +143,7 @@ VIDEO_UPDATE( playch10 )
 	}
 	else	/* Single Monitor version */
 	{
-		rectangle top_monitor = machine->screen[0].visarea;
+		rectangle top_monitor = *video_screen_get_visible_area(screen);
 
 		top_monitor.max_y = ( top_monitor.max_y - top_monitor.min_y ) / 2;
 
@@ -155,20 +155,14 @@ VIDEO_UPDATE( playch10 )
 				pc10_game_mode ^= 1;
 		}
 
-
 		if ( pc10_game_mode )
-		{
 			/* render the ppu */
 			ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
-		}
 		else
 		{
 			/* When the bios is accessing vram, the video circuitry can't access it */
-
 			if ( !pc10_sdcs )
-			{
 				tilemap_draw(bitmap, &top_monitor, bg_tilemap, 0, 0);
-			}
 		}
 	}
 	return 0;

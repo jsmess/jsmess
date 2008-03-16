@@ -469,12 +469,16 @@ static int tick = 0;
 static int layer = 0;
 static VIDEO_UPDATE(firebeat)
 {
-	int chip = screen;
-	//int i;
+	int chip;
+
+	if (screen == device_list_find_by_index(screen->machine->config->devicelist, VIDEO_SCREEN, 0))
+		chip = 0;
+	else
+		chip = 1;
 
 	fillbitmap(bitmap, 0, cliprect);
 
-	if (mame_stricmp(machine->gamedrv->name, "popn7") == 0)
+	if (mame_stricmp(screen->machine->gamedrv->name, "popn7") == 0)
 	{
 		gcu_exec_display_list(chip, bitmap, cliprect, 0x1f80000);
 	}
@@ -568,7 +572,7 @@ static UINT32 GCU_r(int chip, UINT32 offset, UINT32 mem_mask)
 	return 0xffffffff;
 }
 
-static void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
+static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
 	int reg = offset * 4;
 
@@ -591,22 +595,21 @@ static void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
 			COMBINE_DATA( &gcu[chip].visible_area );
 			if (ACCESSING_LSW32)
 			{
-				int numscreens = video_screen_count(Machine->config);
-				int screen = chip;
-				int width, height;
-				screen_state *state = &Machine->screen[screen];
-				rectangle visarea = state->visarea;
+				const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, chip);
 
-				width = (gcu[chip].visible_area & 0xffff);
-				height = (gcu[chip].visible_area >> 16) & 0xffff;
-				//set_visible_area(0, width, 0, height);
+				if (screen != NULL)
+				{
+					rectangle visarea = *video_screen_get_visible_area(screen);
+					int width, height;
 
-				visarea.max_x = width-1;
-				visarea.max_y = height-1;
+					width = (gcu[chip].visible_area & 0xffff);
+					height = (gcu[chip].visible_area >> 16) & 0xffff;
 
-				// only try and update the screen if the driver says we have one
-				if (screen < numscreens)
-					video_screen_configure(screen, visarea.max_x + 1, visarea.max_y + 1, &visarea, Machine->screen[screen].refresh);
+					visarea.max_x = width-1;
+					visarea.max_y = height-1;
+
+					video_screen_configure(screen, visarea.max_x + 1, visarea.max_y + 1, &visarea, video_screen_get_frame_period(screen).attoseconds);
+				}
 			}
 			break;
 		}
@@ -650,7 +653,7 @@ static READ32_HANDLER(gcu0_r)
 
 static WRITE32_HANDLER(gcu0_w)
 {
-	GCU_w(0, offset, data, mem_mask);
+	GCU_w(machine, 0, offset, data, mem_mask);
 }
 
 static READ32_HANDLER(gcu1_r)
@@ -660,7 +663,7 @@ static READ32_HANDLER(gcu1_r)
 
 static WRITE32_HANDLER(gcu1_w)
 {
-	GCU_w(1, offset, data, mem_mask);
+	GCU_w(machine, 1, offset, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -2256,8 +2259,8 @@ static void init_firebeat(running_machine *machine)
 
 	rtc65271_init(xram, NULL);
 
-	pc16552d_init(0, 19660800, comm_uart_irq_callback);		// Network UART
-	pc16552d_init(1, 24000000, midi_uart_irq_callback);		// MIDI UART
+	pc16552d_init(0, 19660800, comm_uart_irq_callback, 0);		// Network UART
+	pc16552d_init(1, 24000000, midi_uart_irq_callback, 0);		// MIDI UART
 
 	extend_board_irq_enable = 0x3f;
 	extend_board_irq_active = 0x00;

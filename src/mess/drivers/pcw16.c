@@ -159,10 +159,10 @@ static TIMER_CALLBACK(pcw16_timer_callback)
 }
 
 static ADDRESS_MAP_START(pcw16_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(MRA8_BANK1, MWA8_BANK5)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(MRA8_BANK2, MWA8_BANK6)
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK3, MWA8_BANK7)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(MRA8_BANK4, MWA8_BANK8)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK1, SMH_BANK5)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK2, SMH_BANK6)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK3, SMH_BANK7)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK8)
 ADDRESS_MAP_END
 
 
@@ -177,18 +177,18 @@ static char *pcw16_mem_ptr[4];
 
 static const write8_machine_func pcw16_write_handler_dram[4] =
 {
-	MWA8_BANK5,
-	MWA8_BANK6,
-	MWA8_BANK7,
-	MWA8_BANK8
+	SMH_BANK5,
+	SMH_BANK6,
+	SMH_BANK7,
+	SMH_BANK8
 };
 
 static const read8_machine_func pcw16_read_handler_dram[4] =
 {
-	MRA8_BANK1,
-	MRA8_BANK2,
-	MRA8_BANK3,
-	MRA8_BANK4
+	SMH_BANK1,
+	SMH_BANK2,
+	SMH_BANK3,
+	SMH_BANK4
 };
 /*******************************************/
 
@@ -381,7 +381,7 @@ static void pcw16_set_bank_handlers(int bank, PCW16_RAM_TYPE type)
 	case PCW16_MEM_ROM:
 		/* rom */
 		read_handler = pcw16_read_handler_dram[bank];
-		write_handler = MWA8_NOP;
+		write_handler = SMH_NOP;
 		break;
 
 	case PCW16_MEM_FLASH_1:
@@ -397,7 +397,7 @@ static void pcw16_set_bank_handlers(int bank, PCW16_RAM_TYPE type)
 
 	case PCW16_MEM_NONE:
 		read_handler = pcw16_no_mem_r;
-		write_handler = MWA8_NOP;
+		write_handler = SMH_NOP;
 		break;
 
 	default:

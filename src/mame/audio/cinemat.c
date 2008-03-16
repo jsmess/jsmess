@@ -871,14 +871,14 @@ static void starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (video_screen_get_frame_number(0) > last_frame)
+        if (video_screen_get_frame_number(Machine->primary_screen) > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(4, current_pitch);
-            last_frame = video_screen_get_frame_number(0);
+            last_frame = video_screen_get_frame_number(Machine->primary_screen);
         }
 
 		/* remember the previous value */
@@ -974,7 +974,7 @@ static void solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
 			target_volume = 0;
 
 		/* ramp the thrust volume */
-        if (sample_playing(2) && video_screen_get_frame_number(0) > last_frame)
+        if (sample_playing(2) && video_screen_get_frame_number(Machine->primary_screen) > last_frame)
         {
             if (current_volume > target_volume)
                 current_volume -= 0.078f;
@@ -984,7 +984,7 @@ static void solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
                 sample_set_volume(2, current_volume);
             else
                 sample_stop(2);
-            last_frame = video_screen_get_frame_number(0);
+            last_frame = video_screen_get_frame_number(Machine->primary_screen);
         }
 
 		/* fire - falling edge */
@@ -1251,14 +1251,14 @@ static void wotw_sound_w(UINT8 sound_val, UINT8 bits_changed)
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (video_screen_get_frame_number(0) > last_frame)
+        if (video_screen_get_frame_number(Machine->primary_screen) > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(4, current_pitch);
-            last_frame = video_screen_get_frame_number(0);
+            last_frame = video_screen_get_frame_number(Machine->primary_screen);
         }
 
 		/* remember the previous value */
@@ -1363,14 +1363,14 @@ static void wotwc_sound_w(UINT8 sound_val, UINT8 bits_changed)
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (video_screen_get_frame_number(0) > last_frame)
+        if (video_screen_get_frame_number(Machine->primary_screen) > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(4, current_pitch);
-            last_frame = video_screen_get_frame_number(0);
+            last_frame = video_screen_get_frame_number(Machine->primary_screen);
         }
 
 		/* remember the previous value */
@@ -1533,12 +1533,12 @@ static ADDRESS_MAP_START( demon_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6001, 0x6001) AM_READ(AY8910_read_port_2_r)
 	AM_RANGE(0x6002, 0x6002) AM_WRITE(AY8910_write_port_2_w)
 	AM_RANGE(0x6003, 0x6003) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(MWA8_NOP)  /* watchdog? */
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(SMH_NOP)  /* watchdog? */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( demon_sound_ports, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_WRITE(z80ctc_0_w)
 	AM_RANGE(0x1c, 0x1f) AM_WRITE(z80ctc_0_w)
 ADDRESS_MAP_END

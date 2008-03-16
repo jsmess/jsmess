@@ -116,7 +116,7 @@ VIDEO_START( naughtyb )
 	palreg = bankreg = 0;
 
 	/* Naughty Boy has a virtual screen twice as large as the visible screen */
-	tmpbitmap = auto_bitmap_alloc(68*8,28*8,machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(68*8,28*8,video_screen_get_format(machine->primary_screen));
 }
 
 
@@ -229,14 +229,14 @@ VIDEO_UPDATE( naughtyb )
 			}
 		}
 
-		drawgfx(tmpbitmap,machine->gfx[0],
+		drawgfx(tmpbitmap,screen->machine->gfx[0],
 				naughtyb_videoram2[offs] + 256 * bankreg,
 				(naughtyb_videoram2[offs] >> 5) + 8 * palreg,
 				naughtyb_cocktail,naughtyb_cocktail,
 				8*sx,8*sy,
 				0,TRANSPARENCY_NONE,0);
 
-		drawgfx(tmpbitmap,machine->gfx[1],
+		drawgfx(tmpbitmap,screen->machine->gfx[1],
 				videoram[offs] + 256*bankreg,
 				(videoram[offs] >> 5) + 8 * palreg,
 				naughtyb_cocktail,naughtyb_cocktail,

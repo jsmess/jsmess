@@ -36,14 +36,14 @@ static emu_timer *acefruit_refresh_timer;
 
 static TIMER_CALLBACK( acefruit_refresh )
 {
-	int vpos = video_screen_get_vpos( 0 );
+	int vpos = video_screen_get_vpos(machine->primary_screen);
 
-	video_screen_update_partial( 0, vpos );
+	video_screen_update_partial(machine->primary_screen, vpos );
 	acefruit_update_irq(machine, vpos );
 
 	vpos = ( ( vpos / 8 ) + 1 ) * 8;
 
-	timer_adjust_oneshot( acefruit_refresh_timer, video_screen_get_time_until_pos( 0, vpos, 0 ), 0 );
+	timer_adjust_oneshot( acefruit_refresh_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0 ), 0 );
 }
 
 static VIDEO_START( acefruit )
@@ -78,7 +78,7 @@ static VIDEO_UPDATE( acefruit )
 
 			if( color < 0x4 )
 			{
-				drawgfx( bitmap, machine->gfx[ 1 ], code, color, 0, 0, col * 16, row * 8, cliprect, TRANSPARENCY_NONE, 0 );
+				drawgfx( bitmap, screen->machine->gfx[ 1 ], code, color, 0, 0, col * 16, row * 8, cliprect, TRANSPARENCY_NONE, 0 );
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{
@@ -86,7 +86,7 @@ static VIDEO_UPDATE( acefruit )
 				int x;
 				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
-				const gfx_element *gfx = machine->gfx[ 0 ];
+				const gfx_element *gfx = screen->machine->gfx[ 0 ];
 
 				for( x = 0; x < 16; x++ )
 				{
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( acefruit_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(MRA8_RAM, acefruit_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(SMH_RAM, acefruit_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_0_r)
 	AM_RANGE(0x8001, 0x8001) AM_READ(input_port_1_r)
 	AM_RANGE(0x8002, 0x8002) AM_READ(input_port_2_r)
@@ -274,7 +274,7 @@ static ADDRESS_MAP_START( acefruit_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( acefruit_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS(AMEF_ABITS(8))
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_NOP /* ? */
 ADDRESS_MAP_END
 

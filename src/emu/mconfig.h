@@ -117,36 +117,36 @@ enum
 /* In mamecore.h: typedef struct _machine_config machine_config; */
 struct _machine_config
 {
-	UINT32				driver_data_size;			/* amount of memory needed for driver_data */
+	UINT32					driver_data_size;		/* amount of memory needed for driver_data */
 
-	cpu_config			cpu[MAX_CPU];				/* array of CPUs in the system */
-	UINT32				cpu_slices_per_frame;		/* number of times to interleave execution per frame */
-	INT32				watchdog_vblank_count;		/* number of VBLANKs until the watchdog kills us */
-	attotime			watchdog_time;				/* length of time until the watchdog kills us */
+	cpu_config				cpu[MAX_CPU];			/* array of CPUs in the system */
+	UINT32					cpu_slices_per_frame;	/* number of times to interleave execution per frame */
+	INT32					watchdog_vblank_count;	/* number of VBLANKs until the watchdog kills us */
+	attotime				watchdog_time;			/* length of time until the watchdog kills us */
 
-	void 				(*machine_start)(running_machine *machine);		/* one-time machine start callback */
-	void 				(*machine_reset)(running_machine *machine);		/* machine reset callback */
+	machine_start_func		machine_start;			/* one-time machine start callback */
+	machine_reset_func		machine_reset;			/* machine reset callback */
 
-	void 				(*nvram_handler)(running_machine *machine, mame_file *file, int read_or_write); /* NVRAM save/load callback  */
-	void 				(*memcard_handler)(running_machine *machine, mame_file *file, int action); /* memory card save/load callback  */
+	nvram_handler_func		nvram_handler;			/* NVRAM save/load callback  */
+	memcard_handler_func	memcard_handler;		/* memory card save/load callback  */
 
-	UINT32				video_attributes;			/* flags describing the video system */
+	UINT32					video_attributes;		/* flags describing the video system */
 	const gfx_decode_entry *gfxdecodeinfo;			/* pointer to array of graphics decoding information */
-	UINT32				total_colors;				/* total number of colors in the palette */
-	const char *		default_layout;				/* default layout for this machine */
+	UINT32					total_colors;			/* total number of colors in the palette */
+	const char *			default_layout;			/* default layout for this machine */
 
-	void 				(*init_palette)(running_machine *machine, const UINT8 *color_prom); /* one-time palette init callback  */
-	void				(*video_start)(running_machine *machine);		/* one-time video start callback */
-	void				(*video_reset)(running_machine *machine);		/* video reset callback */
-	void				(*video_eof)(running_machine *machine);			/* end-of-frame video callback */
-	UINT32				(*video_update)(running_machine *machine, int screen, bitmap_t *bitmap, const rectangle *cliprect); /* video update callback */
+	palette_init_func		init_palette;			/* one-time palette init callback  */
+	video_start_func		video_start;			/* one-time video start callback */
+	sound_reset_func		video_reset;			/* video reset callback */
+	video_eof_func			video_eof;				/* end-of-frame video callback */
+	video_update_func 		video_update; 			/* video update callback */
 
-	sound_config		sound[MAX_SOUND];			/* array of sound chips in the system */
+	sound_config			sound[MAX_SOUND];		/* array of sound chips in the system */
 
-	void				(*sound_start)(running_machine *machine);		/* one-time sound start callback */
-	void				(*sound_reset)(running_machine *machine);		/* sound reset callback */
+	sound_start_func		sound_start;			/* one-time sound start callback */
+	sound_reset_func		sound_reset;			/* sound reset callback */
 
-	device_config *		devicelist;					/* list head for devices */
+	device_config *			devicelist;				/* list head for devices */
 };
 
 
@@ -162,6 +162,7 @@ union _machine_config_token
 	TOKEN_COMMON_FIELDS
 	const machine_config_token *tokenptr;
 	const gfx_decode_entry *gfxdecode;
+	const addrmap_token *addrmap;
 	device_type devtype;
 	void (*interrupt)(running_machine *machine, int cpunum);
 	driver_init_func driver_init;
@@ -272,18 +273,18 @@ union _machine_config_token
 
 #define MDRV_CPU_PROGRAM_MAP(_map1, _map2) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_PROGRAM_MAP, 8), \
-	TOKEN_PTR(voidptr, construct_map_##_map1), \
-	TOKEN_PTR(voidptr, construct_map_##_map2), \
+	TOKEN_PTR(voidptr, address_map_##_map1), \
+	TOKEN_PTR(voidptr, address_map_##_map2), \
 
 #define MDRV_CPU_DATA_MAP(_map1, _map2)	\
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_DATA_MAP, 8), \
-	TOKEN_PTR(voidptr, construct_map_##_map1), \
-	TOKEN_PTR(voidptr, construct_map_##_map2), \
+	TOKEN_PTR(voidptr, address_map_##_map1), \
+	TOKEN_PTR(voidptr, address_map_##_map2), \
 
 #define MDRV_CPU_IO_MAP(_map1, _map2) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_IO_MAP, 8), \
-	TOKEN_PTR(voidptr, construct_map_##_map1), \
-	TOKEN_PTR(voidptr, construct_map_##_map2), \
+	TOKEN_PTR(voidptr, address_map_##_map1), \
+	TOKEN_PTR(voidptr, address_map_##_map2), \
 
 #define MDRV_CPU_VBLANK_INT(_tag, _func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_VBLANK_INT, 8), \
@@ -378,37 +379,37 @@ union _machine_config_token
 	MDRV_DEVICE_MODIFY(_tag, VIDEO_SCREEN)
 
 #define MDRV_SCREEN_FORMAT(_format) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.format, _format)
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, format, _format)
 
 #define MDRV_SCREEN_TYPE(_type) \
 	MDRV_DEVICE_CONFIG_DATA32(screen_config, type, SCREEN_TYPE_##_type)
 
 #define MDRV_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.vblank, ((HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) / (_vtotal)) * ((_vtotal) - ((_vbstart) - (_vbend)))) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.width, _htotal)	\
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.height, _vtotal)	\
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_x, _hbend) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_x, (_hbstart) - 1) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_y, _vbend) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_y, (_vbstart) - 1)
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, refresh, HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) \
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, vblank, ((HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) / (_vtotal)) * ((_vtotal) - ((_vbstart) - (_vbend)))) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, width, _htotal)	\
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, height, _vtotal)	\
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_x, _hbend) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_x, (_hbstart) - 1) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_y, _vbend) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_y, (_vbstart) - 1)
 
 #define MDRV_SCREEN_REFRESH_RATE(_rate) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(_rate))
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, refresh, HZ_TO_ATTOSECONDS(_rate))
 
 #define MDRV_SCREEN_VBLANK_TIME(_time) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.vblank, _time) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.oldstyle_vblank_supplied, TRUE)
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, vblank, _time) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, oldstyle_vblank_supplied, TRUE)
 
 #define MDRV_SCREEN_SIZE(_width, _height) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.width, _width) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.height, _height)
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, width, _width) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, height, _height)
 
 #define MDRV_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_x, _minx) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_x, _maxx) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_y, _miny) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_y, _maxy)
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_x, _minx) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_x, _maxx) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_y, _miny) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_y, _maxy)
 
 #define MDRV_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
 	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, xoffset, _xoffs, 24) \

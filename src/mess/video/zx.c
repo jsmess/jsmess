@@ -41,6 +41,11 @@ static int old_c = 0;
  */
 void zx_ula_bkgnd(running_machine *machine, int color)
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+
 	if (ula_frame_vsync == 0 && color != old_c)
 	{
 		int y, new_x, new_y;
@@ -64,15 +69,15 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 			else
 			{
 				r.min_x = old_x;
-				r.max_x = machine->screen[0].visarea.max_x;
+				r.max_x = visarea->max_x;
 				r.min_y = r.max_y = y;
 				fillbitmap(bitmap, machine->pens[color], &r);
 				old_x = 0;
 			}
-			if (++y == machine->screen[0].height)
+			if (++y == height)
 				y = 0;
 		}
-		old_x = (new_x + 1) % machine->screen[0].width;
+		old_x = (new_x + 1) % width;
 		old_y = new_y;
 		old_c = color;
 		DAC_data_w(0, color ? 255 : 0);
@@ -96,19 +101,24 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	 * An NMI is issued on the ZX81 every 64us for the blanked
 	 * scanlines at the top and bottom of the display.
 	 */
-	rectangle r = machine->screen[0].visarea;
+	const device_config *screen = video_screen_first(machine->config);
+	int height = video_screen_get_height(screen);
+	rectangle r = *video_screen_get_visible_area(screen);
 	bitmap_t *bitmap = tmpbitmap;
 
 	r.min_y = r.max_y = video_screen_get_vpos(0);
 	fillbitmap(bitmap, machine->pens[1], &r);
 	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(0), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-	if (++ula_scanline_count == machine->screen[0].height)
+	if (++ula_scanline_count == height)
 		ula_scanline_count = 0;
 }
 
 static TIMER_CALLBACK(zx_ula_irq)
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int height = video_screen_get_height(screen);
+
 	/*
 	 * An IRQ is issued on the ZX80/81 whenever the R registers
 	 * bit 6 goes low. In MESS this IRQ timed from the first read
@@ -122,7 +132,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 		if (++ula_scancode_count == 8)
 			ula_scancode_count = 0;
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-		if (++ula_scanline_count == machine->screen[0].height)
+		if (++ula_scanline_count == height)
 			ula_scanline_count = 0;
 	}
 }

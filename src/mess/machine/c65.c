@@ -447,9 +447,9 @@ static WRITE8_HANDLER(c65_ram_expansion_w)
 		expansion_ram_end = 0x80000 + (mess_ram_size - 128*1024) - 1;
 
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, expansion_ram_begin, expansion_ram_end,
-			0, 0, (data == 0x00) ? MRA8_BANK16 : MRA8_NOP);
+			0, 0, (data == 0x00) ? SMH_BANK16 : SMH_NOP);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, expansion_ram_begin, expansion_ram_end,
-			0, 0, (data == 0x00) ? MWA8_BANK16 : MWA8_NOP);
+			0, 0, (data == 0x00) ? SMH_BANK16 : SMH_NOP);
 
 		if (data == 0x00)
 			memory_set_bankptr(16, mess_ram + 128*1024);
@@ -583,8 +583,8 @@ static void c65_bankswitch_interface(int value)
 		{
 			memory_set_bankptr (8, c64_colorram + 0x400);
 			memory_set_bankptr (9, c64_colorram + 0x400);
-			rh = MRA8_BANK8;
-			wh = MWA8_BANK9;
+			rh = SMH_BANK8;
+			wh = SMH_BANK9;
 		}
 		else
 		{
@@ -672,8 +672,8 @@ void c65_bankswitch (void)
 		}
 		else
 		{
-			rh8 = MRA8_BANK8;
-			wh9 = MWA8_BANK9;
+			rh8 = SMH_BANK8;
+			wh9 = SMH_BANK9;
 			memory_set_bankptr (8, c64_colorram+0x400);
 			memory_set_bankptr (9, c64_colorram+0x400);
 		}
@@ -683,8 +683,8 @@ void c65_bankswitch (void)
 	else
 	{
 		c65_io_on = 0;
-		rh4 = MRA8_BANK4;
-		wh5 = MWA8_BANK5;
+		rh4 = SMH_BANK4;
+		wh5 = SMH_BANK5;
 		memory_set_bankptr(5, c64_memory+0xd000);
 		memory_set_bankptr(7, c64_memory+0xd800);
 		memory_set_bankptr(9, c64_memory+0xdc00);

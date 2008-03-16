@@ -176,7 +176,7 @@ VIDEO_UPDATE( pcw16 )
 		border_colour = pcw16_colour_palette[1];
 	}
 
-	border_colour = machine->pens[border_colour];
+	border_colour = screen->machine->pens[border_colour];
 
 	if ((pcw16_video_control & (1<<6))==0)
 	{
@@ -248,20 +248,20 @@ VIDEO_UPDATE( pcw16 )
 				{
 					case 0:
 					{
-						pcw16_vh_decode_mode0(machine, bitmap,x,y+PCW16_BORDER_HEIGHT,byte);
+						pcw16_vh_decode_mode0(screen->machine, bitmap,x,y+PCW16_BORDER_HEIGHT,byte);
 					}
 					break;
 
 					case 1:
 					{
-						pcw16_vh_decode_mode1(machine, bitmap, x,y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode1(screen->machine, bitmap, x,y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 
 					case 3:
 					case 2:
 					{
-						pcw16_vh_decode_mode2(machine, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode2(screen->machine, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 				}

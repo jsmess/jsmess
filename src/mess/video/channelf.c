@@ -59,7 +59,8 @@ static int recalc_palette_offset(int reg1, int reg2)
 VIDEO_UPDATE( channelf )
 {
 	int x,y,offset, palette_offset;
-	int pen, color;
+	int color;
+	UINT16 pen;
 
 	for(y=0;y<64;y++)
 	{
@@ -68,7 +69,7 @@ VIDEO_UPDATE( channelf )
 		{
 			offset = y*128+x;
 			color = palette_offset+(videoram[offset]&3);
-			pen = machine->pens[colormap[color]];
+			pen = screen->machine->pens[colormap[color]];
 			*BITMAP_ADDR16(bitmap, y, x) = pen;
 		}
 	}

@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_READWRITE(midyunit_vram_r, midyunit_vram_w)
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM
 	AM_RANGE(0x01400000, 0x0140ffff) AM_READWRITE(midyunit_cmos_r, midyunit_cmos_w)
-	AM_RANGE(0x01800000, 0x0181ffff) AM_READWRITE(MRA16_RAM, midyunit_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x01800000, 0x0181ffff) AM_READWRITE(SMH_RAM, midyunit_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x01a80000, 0x01a8009f) AM_MIRROR(0x00080000) AM_READWRITE(midyunit_dma_r, midyunit_dma_w)
 	AM_RANGE(0x01c00000, 0x01c0005f) AM_READ(midyunit_input_r)
 	AM_RANGE(0x01c00060, 0x01c0007f) AM_READWRITE(midyunit_protection_r, midyunit_cmos_enable_w)
@@ -977,7 +977,7 @@ INPUT_PORTS_END
 static const tms34010_config zunit_tms_config =
 {
 	FALSE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	MEDRES_PIXEL_CLOCK,				/* pixel clock */
 	2,								/* pixels per clock */
 	midyunit_scanline_update,		/* scanline updater */
@@ -989,7 +989,7 @@ static const tms34010_config zunit_tms_config =
 static const tms34010_config yunit_tms_config =
 {
 	FALSE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	STDRES_PIXEL_CLOCK,				/* pixel clock */
 	2,								/* pixels per clock */
 	midyunit_scanline_update,		/* scanline updater */

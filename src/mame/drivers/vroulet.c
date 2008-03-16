@@ -94,7 +94,7 @@ static VIDEO_START(vroulet)
 static VIDEO_UPDATE(vroulet)
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	drawgfx(bitmap, machine->gfx[0], 0x320, 1, 0, 0,
+	drawgfx(bitmap, screen->machine->gfx[0], 0x320, 1, 0, 0,
 		vroulet_ball[1], vroulet_ball[0] - 12, cliprect, TRANSPARENCY_PEN, 0);
 	return 0;
 }
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( vroulet_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vroulet_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)

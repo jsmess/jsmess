@@ -113,7 +113,10 @@ static TIMER_CALLBACK(smsvdp_display_callback);
 static void sms_refresh_line(running_machine *machine, bitmap_t *bitmap, int offsetx, int offsety, int line);
 static void sms_update_palette(void);
 
-static void set_display_settings( running_machine *machine ) {
+static void set_display_settings( running_machine *machine )
+{
+	const device_config *screen = video_screen_first(machine->config);
+	int height = video_screen_get_height(screen);
 	int M1, M2, M3, M4;
 	M1 = smsvdp.reg[0x01] & 0x10;
 	M2 = smsvdp.reg[0x00] & 0x02;
@@ -151,13 +154,13 @@ static void set_display_settings( running_machine *machine ) {
 	}
 	switch( smsvdp.y_pixels ) {
 	case 192:
-		smsvdp.sms_frame_timing = ( machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_192 : sms_ntsc_192;
+		smsvdp.sms_frame_timing = ( height == PAL_Y_PIXELS ) ? sms_pal_192 : sms_ntsc_192;
 		break;
 	case 224:
-		smsvdp.sms_frame_timing = ( machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_224 : sms_ntsc_224;
+		smsvdp.sms_frame_timing = ( height == PAL_Y_PIXELS ) ? sms_pal_224 : sms_ntsc_224;
 		break;
 	case 240:
-		smsvdp.sms_frame_timing = ( machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_240 : sms_ntsc_240;
+		smsvdp.sms_frame_timing = ( height == PAL_Y_PIXELS ) ? sms_pal_240 : sms_ntsc_240;
 		break;
 	}
 	smsvdp.cram_dirty = 1;
@@ -175,7 +178,11 @@ void sms_set_ggsmsmode( int mode ) {
 	smsvdp.gg_sms_mode = mode;
 }
 
-int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *config ) {
+int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *config )
+{
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
 
 	memset( &smsvdp, 0, sizeof smsvdp );
 
@@ -203,9 +210,9 @@ int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *con
 	smsvdp.collision_buffer = auto_malloc(SMS_X_PIXELS);
 
 	/* Make temp bitmap for rendering */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
+	tmpbitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
 
-	smsvdp.prev_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
+	smsvdp.prev_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
 
 	set_display_settings( machine );
 
@@ -1044,12 +1051,15 @@ static void sms_update_palette(void) {
 	}
 }
 
-VIDEO_UPDATE(sms) {
+VIDEO_UPDATE(sms)
+{
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
 	int x, y;
 
 	if (smsvdp.prev_bitmap_saved) {
-	for (y = 0; y < machine->screen[0].height; y++) {
-		for (x = 0; x < machine->screen[0].width; x++) {
+	for (y = 0; y < height; y++) {
+		for (x = 0; x < width; x++) {
 			*BITMAP_ADDR32(bitmap, y, x) = (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(smsvdp.prev_bitmap, y, x)) >> 2;
 			logerror("%x %x %x\n", *BITMAP_ADDR32(tmpbitmap, y, x), *BITMAP_ADDR32(smsvdp.prev_bitmap, y, x), (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(smsvdp.prev_bitmap, y, x)) >> 2);
 		}

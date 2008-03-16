@@ -141,11 +141,12 @@ INLINE int scanline_to_vcount(int scanline)
 static TIMER_CALLBACK( ddragon_scanline_callback )
 {
 	int scanline = param;
-	int vcount_old = scanline_to_vcount((scanline == 0) ? machine->screen[0].height - 1 : scanline - 1);
+	int screen_height = video_screen_get_height(machine->primary_screen);
+	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
-	video_screen_update_partial(0, scanline - 1);
+	video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
@@ -156,9 +157,9 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* adjust for next scanline */
-	if (++scanline >= machine->screen[0].height)
+	if (++scanline >= screen_height)
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -192,7 +193,7 @@ static MACHINE_RESET( ddragon )
 {
 	dd_sub_cpu_busy = 1;
 	adpcm_idle[0] = adpcm_idle[1] = 1;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 
@@ -295,7 +296,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	if (newbank == 4 && oldbank != 4)
 		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, darktowr_mcu_bank_r, darktowr_mcu_bank_w);
 	else if (newbank != 4 && oldbank == 4)
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_BANK1);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
 }
 
 
@@ -495,20 +496,20 @@ static READ8_HANDLER( dd_adpcm_status_r )
 
 static ADDRESS_MAP_START( ddragon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&rambase)
-	AM_RANGE(0x1000, 0x11ff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1200, 0x13ff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x1000, 0x11ff) AM_READWRITE(SMH_RAM, paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
+	AM_RANGE(0x1200, 0x13ff) AM_READWRITE(SMH_RAM, paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(MRA8_RAM, ddragon_fgvideoram_w) AM_BASE(&ddragon_fgvideoram)
+	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(SMH_RAM, ddragon_fgvideoram_w) AM_BASE(&ddragon_fgvideoram)
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w) AM_BASE(&ddragon_spriteram)
-	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(MRA8_RAM, ddragon_bgvideoram_w) AM_BASE(&ddragon_bgvideoram)
+	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(SMH_RAM, ddragon_bgvideoram_w) AM_BASE(&ddragon_bgvideoram)
 	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_0_r)
 	AM_RANGE(0x3801, 0x3801) AM_READ(input_port_1_r)
 	AM_RANGE(0x3802, 0x3802) AM_READ(input_port_4_r)
 	AM_RANGE(0x3803, 0x3803) AM_READ(input_port_2_r)
 	AM_RANGE(0x3804, 0x3804) AM_READ(input_port_3_r)
 	AM_RANGE(0x3808, 0x3808) AM_WRITE(ddragon_bankswitch_w)
-	AM_RANGE(0x3809, 0x3809) AM_WRITE(MWA8_RAM) AM_BASE(&ddragon_scrollx_lo)
-	AM_RANGE(0x380a, 0x380a) AM_WRITE(MWA8_RAM) AM_BASE(&ddragon_scrolly_lo)
+	AM_RANGE(0x3809, 0x3809) AM_WRITE(SMH_RAM) AM_BASE(&ddragon_scrollx_lo)
+	AM_RANGE(0x380a, 0x380a) AM_WRITE(SMH_RAM) AM_BASE(&ddragon_scrolly_lo)
 	AM_RANGE(0x380b, 0x380f) AM_WRITE(ddragon_interrupt_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -517,20 +518,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dd2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(MRA8_RAM, ddragon_fgvideoram_w) AM_BASE(&ddragon_fgvideoram)
+	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(SMH_RAM, ddragon_fgvideoram_w) AM_BASE(&ddragon_fgvideoram)
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w) AM_BASE(&ddragon_spriteram)
-	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(MRA8_RAM, ddragon_bgvideoram_w) AM_BASE(&ddragon_bgvideoram)
+	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(SMH_RAM, ddragon_bgvideoram_w) AM_BASE(&ddragon_bgvideoram)
 	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_0_r)
 	AM_RANGE(0x3801, 0x3801) AM_READ(input_port_1_r)
 	AM_RANGE(0x3802, 0x3802) AM_READ(input_port_4_r)
 	AM_RANGE(0x3803, 0x3803) AM_READ(input_port_2_r)
 	AM_RANGE(0x3804, 0x3804) AM_READ(input_port_3_r)
 	AM_RANGE(0x3808, 0x3808) AM_WRITE(ddragon_bankswitch_w)
-	AM_RANGE(0x3809, 0x3809) AM_WRITE(MWA8_RAM) AM_BASE(&ddragon_scrollx_lo)
-	AM_RANGE(0x380a, 0x380a) AM_WRITE(MWA8_RAM) AM_BASE(&ddragon_scrolly_lo)
+	AM_RANGE(0x3809, 0x3809) AM_WRITE(SMH_RAM) AM_BASE(&ddragon_scrollx_lo)
+	AM_RANGE(0x380a, 0x380a) AM_WRITE(SMH_RAM) AM_BASE(&ddragon_scrolly_lo)
 	AM_RANGE(0x380b, 0x380f) AM_WRITE(ddragon_interrupt_w)
-	AM_RANGE(0x3c00, 0x3dff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x3e00, 0x3fff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x3c00, 0x3dff) AM_READWRITE(SMH_RAM, paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
+	AM_RANGE(0x3e00, 0x3fff) AM_READWRITE(SMH_RAM, paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -613,8 +614,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(11) )
-	AM_RANGE(0x0000, 0x0007) AM_READWRITE(MRA8_RAM, darktowr_mcu_w) AM_BASE(&darktowr_mcu_ports)
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE(0x0000, 0x0007) AM_READWRITE(SMH_RAM, darktowr_mcu_w) AM_BASE(&darktowr_mcu_ports)
 	AM_RANGE(0x0008, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

@@ -58,17 +58,15 @@ static TIMER_CALLBACK( interrupt_callback )
 	scanline = scanline + 32;
 
 	if (scanline >= 263)
-	{
 		scanline = 32;
-	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
 }
 
 
 static MACHINE_RESET( videopin )
 {
-	timer_set(video_screen_get_time_until_pos(0, 32, 0), NULL, 32, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, interrupt_callback);
 
 	/* both output latches are cleared on reset */
 
@@ -113,7 +111,7 @@ static READ8_HANDLER( videopin_misc_r )
 
 static WRITE8_HANDLER( videopin_led_w )
 {
-	int i = (video_screen_get_vpos(0) >> 5) & 7;
+	int i = (video_screen_get_vpos(machine->primary_screen) >> 5) & 7;
 	static const char *const matrix[8][4] =
 	{
 		{ "LED26", "LED18", "LED11", "LED13" },
@@ -195,17 +193,17 @@ static WRITE8_HANDLER( videopin_note_dvsr_w )
  *************************************/
 
 static ADDRESS_MAP_START( videopin_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r)
 	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_0_r)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_1_r)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)   /* mirror for 6502 vectors */
+	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)   /* mirror for 6502 vectors */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( videopin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0200, 0x07ff) AM_WRITE(videopin_video_ram_w) AM_BASE(&videopin_video_ram)
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(videopin_note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
@@ -213,7 +211,7 @@ static ADDRESS_MAP_START( videopin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0804, 0x0804) AM_WRITE(videopin_ball_w)
 	AM_RANGE(0x0805, 0x0805) AM_WRITE(videopin_out1_w)
 	AM_RANGE(0x0806, 0x0806) AM_WRITE(videopin_out2_w)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

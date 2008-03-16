@@ -4,7 +4,7 @@
     Bally Astrocade Driver
 
     09/23/98 - Added sound, added player 2 pot                  FMP
-               Added MWA8_ROM to fix Star Fortress problem
+               Added SMH_ROM to fix Star Fortress problem
                Added cartridge support
 
     08/02/98 - First release based on original wow.c in MAME    FMP
@@ -59,14 +59,14 @@ static WRITE8_HANDLER( astrocade_soundblock1_w )
  *************************************/
 
 static ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(MRA8_ROM, astrocade_magicram_w)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_ROM, astrocade_magicram_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* ASG */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( astrocade_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_WRITE(astrocade_colour_register_w)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(astrocade_intercept_r, astrocade_mode_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(astrocade_colour_split_w)

@@ -67,7 +67,7 @@ static VIDEO_UPDATE( superdq )
 	if (!video_skip_this_frame() && discinfo != NULL)
 	{
 		bitmap_t *vidbitmap;
-		rectangle fixedvis = machine->screen[screen].visarea;
+		rectangle fixedvis = *video_screen_get_visible_area(screen);
 		fixedvis.max_x++;
 		fixedvis.max_y++;
 
@@ -187,9 +187,7 @@ static WRITE8_HANDLER( superdq_io_w )
 	superdq_color_bank = ( data & 2 ) ? 1 : 0;
 
 	for( i = 0; i < sizeof( black_color_entries ); i++ )
-	{
-		render_container_set_palette_alpha(render_container_get_screen(0), black_color_entries[i], (data&0x80) ? 0x00 : 0xff );
-	}
+		render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), black_color_entries[i], (data&0x80) ? 0x00 : 0xff );
 
 	/*
         bit 5 = DISP1?
@@ -223,7 +221,7 @@ static ADDRESS_MAP_START( superdq_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superdq_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(superdq_ld_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")

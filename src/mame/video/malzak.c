@@ -56,13 +56,16 @@ static struct playfield
 
 VIDEO_START( malzak )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	saa5050_vidram = auto_malloc(0x800);
 
 	/* configure the S2636 chips */
-//  s2636_0 = s2636_config(malzak_s2636_0_ram, machine->screen[0].height, machine->screen[0].width, -8, -16);
-//  s2636_1 = s2636_config(malzak_s2636_1_ram, machine->screen[0].height, machine->screen[0].width, -9, -16);
-	s2636_0 = s2636_config(malzak_s2636_0_ram, machine->screen[0].height, machine->screen[0].width, 0, -16);
-	s2636_1 = s2636_config(malzak_s2636_1_ram, machine->screen[0].height, machine->screen[0].width, 0, -16);
+//  s2636_0 = s2636_config(malzak_s2636_0_ram, height, width, -8, -16);
+//  s2636_1 = s2636_config(malzak_s2636_1_ram, height, width, -9, -16);
+	s2636_0 = s2636_config(malzak_s2636_0_ram, height, width,  0, -16);
+	s2636_1 = s2636_config(malzak_s2636_1_ram, height, width,  0, -16);
 }
 
 VIDEO_UPDATE( malzak )
@@ -177,15 +180,15 @@ VIDEO_UPDATE( malzak )
 			{
 				if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
 				{
-					drawgfx (bitmap, machine->gfx[2], code, colour, 0, 0,
-						sx * 6, sy * 10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-					drawgfx (bitmap, machine->gfx[3], code, colour, 0, 0,
-						sx * 6, (sy + 1) * 10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+					drawgfx (bitmap, screen->machine->gfx[2], code, colour, 0, 0,
+						sx * 6, sy * 10, cliprect, TRANSPARENCY_NONE, 0);
+					drawgfx (bitmap, screen->machine->gfx[3], code, colour, 0, 0,
+						sx * 6, (sy + 1) * 10, cliprect, TRANSPARENCY_NONE, 0);
 				}
 				else
 				{
-					drawgfx (bitmap, machine->gfx[1], code, colour, 0, 0,
-						sx * 6, sy * 10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+					drawgfx (bitmap, screen->machine->gfx[1], code, colour, 0, 0,
+						sx * 6, sy * 10, cliprect, TRANSPARENCY_NONE, 0);
 				}
 			}
 		}
@@ -212,8 +215,8 @@ VIDEO_UPDATE( malzak )
 			if(sx < -15)
 				sx+=256;
 
-			drawgfx(bitmap,machine->gfx[0],field[x*16 + y].code,7,0,0,
-				sx, sy, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+			drawgfx(bitmap,screen->machine->gfx[0],field[x*16 + y].code,7,0,0,
+				sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 		}
 
     /* update the S2636 chips */

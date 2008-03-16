@@ -351,7 +351,7 @@ WRITE8_HANDLER( segag80r_video_port_w )
 READ8_HANDLER( spaceod_back_port_r )
 {
 	/* force an update to get the current detection value */
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	return 0xfe | spaceod_bg_detect;
 }
 
@@ -404,7 +404,7 @@ WRITE8_HANDLER( spaceod_back_port_w )
 
 		/* port 3: clears the background detection flag */
 		case 3:
-			video_screen_update_partial(0, video_screen_get_vpos(0));
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 			spaceod_bg_detect = 0;
 			break;
 
@@ -826,7 +826,7 @@ VIDEO_UPDATE( segag80r )
 		/* background: none */
 		case G80_BACKGROUND_NONE:
 			memset(transparent_pens, 0, 16);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except where black */
@@ -834,7 +834,7 @@ VIDEO_UPDATE( segag80r )
 		/* we draw the foreground first, then the background to do collision detection */
 		case G80_BACKGROUND_SPACEOD:
 			memset(transparent_pens, 0, 16);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			draw_background_spaceod(bitmap, cliprect);
 			break;
 
@@ -843,7 +843,7 @@ VIDEO_UPDATE( segag80r )
 		case G80_BACKGROUND_MONSTERB:
 			memset(transparent_pens, 1, 16);
 			draw_background_page_scroll(bitmap, cliprect);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except for pen 0 */
@@ -851,7 +851,7 @@ VIDEO_UPDATE( segag80r )
 		case G80_BACKGROUND_PIGNEWT:
 			memset(transparent_pens, 1, 16);
 			draw_background_full_scroll(bitmap, cliprect);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except for pen 0 */
@@ -859,7 +859,7 @@ VIDEO_UPDATE( segag80r )
 		case G80_BACKGROUND_SINDBADM:
 			memset(transparent_pens, 1, 16);
 			draw_background_page_scroll(bitmap, cliprect);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 	}
 	return 0;

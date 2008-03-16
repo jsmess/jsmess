@@ -295,7 +295,7 @@ static void draw_bglayerscroll(running_machine *machine, int layer, bitmap_t *bi
 /* Looks better with blending and one scroll value than with 1D linescroll and no zoom */
 #if 0
 		int bg_scrollx[256], bg_scrolly[512];
-		fillbitmap(zoom_bitmap, get_black_pen(machine), NULL);
+		fillbitmap(zoom_bitmap, get_black_pen(screen->machine), NULL);
 		for (offs=0; offs<(0x400/4); offs++) /* 224 values for each */
 		{
 			bg_scrollx[offs] = (psikyosh_bgram[(scrollbank*0x800)/4 + offs - 0x4000/4] & 0x000001ff) >> 0;
@@ -1034,7 +1034,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					sprintf(buf, "%X",xdim/16); /* Display Zoom in 16.16 */
 					if (machine->gamedrv->flags & ORIENTATION_SWAP_XY) {
 						x = ypos;
-						y = machine->screen[0].visarea.max_x - xpos; /* ORIENTATION_FLIP_Y */
+						y = video_screen_get_visible_area(machine->primary_screen)->max_x - xpos; /* ORIENTATION_FLIP_Y */
 					}
 					else {
 						x = xpos;
@@ -1054,10 +1054,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( psikyosh )
 {
-	zoom_bitmap = auto_bitmap_alloc(16*16, 16*16, BITMAP_FORMAT_INDEXED8);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+	z_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 
 	/* Need 16-bit z-buffer */
-	z_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	zoom_bitmap = auto_bitmap_alloc(16*16, 16*16, BITMAP_FORMAT_INDEXED8);
 
 	machine->gfx[1]->color_granularity=16; /* 256 colour sprites with palette selectable on 16 colour boundaries */
 
@@ -1128,14 +1130,14 @@ static void psikyosh_postlineblend( bitmap_t *bitmap, const rectangle *cliprect 
 VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
 {
 		int i;
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 	fillbitmap(z_bitmap,0,cliprect); /* z-buffer */
 
 		psikyosh_prelineblend(bitmap, cliprect);
 
 		for (i=0; i<=7; i++) {
-		draw_sprites(machine, bitmap, cliprect, i); // When same priority bg's have higher pri
-		draw_background(machine, bitmap, cliprect, i);
+		draw_sprites(screen->machine, bitmap, cliprect, i); // When same priority bg's have higher pri
+		draw_background(screen->machine, bitmap, cliprect, i);
 			if((psikyosh_vidregs[2]&0xf) == i) psikyosh_postlineblend(bitmap, cliprect);
 		}
 	return 0;

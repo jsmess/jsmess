@@ -576,10 +576,10 @@ static void AmstradCPC_SetLowerRom(int Data)
 		}
 		else
 		{
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MRA8_BANK3);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK4);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MWA8_BANK11);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_BANK12);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK3);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK4);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK11);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK12);
 			amstrad_plus_asic_regpage = 0;  // disable ASIC registers
 		}
 //      logerror("SYS: Secondary ROM select (lower ROM) - data = %02x - cart bank %i, addr %i\n",Data,amstrad_plus_lower,amstrad_plus_lower_addr);
@@ -1478,7 +1478,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			rect.min_x = rect.min_y = 0;
 			rect.max_x = (ALESTE_SCREEN_WIDTH-32) - 1;
 			rect.max_y = (AMSTRAD_SCREEN_HEIGHT-40) - 1;
-			video_screen_configure(0,800,312,&rect,HZ_TO_ATTOSECONDS(AMSTRAD_FPS));
+			video_screen_configure(machine->primary_screen,800,312,&rect,HZ_TO_ATTOSECONDS(AMSTRAD_FPS));
 		}
 		else
 		{
@@ -1486,7 +1486,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			rect.min_x = rect.min_y = 0;
 			rect.max_x = (AMSTRAD_SCREEN_WIDTH-32) - 1;
 			rect.max_y = (AMSTRAD_SCREEN_HEIGHT-40) - 1;
-			video_screen_configure(0,800,312,&rect,HZ_TO_ATTOSECONDS(AMSTRAD_FPS));
+			video_screen_configure(machine->primary_screen,800,312,&rect,HZ_TO_ATTOSECONDS(AMSTRAD_FPS));
 		}
 	}
 	multiface_io_write(machine, offset,data);
@@ -2005,29 +2005,29 @@ static void amstrad_common_init(void)
 	amstrad_CRTC_HS_Counter = 2;
 	previous_amstrad_UpperRom_data = 0xff;
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MRA8_BANK1);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MRA8_BANK2);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK2);
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MRA8_BANK3);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK4);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK3);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK4);
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK5);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, MRA8_BANK6);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK5);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_BANK6);
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MRA8_BANK7);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MRA8_BANK8);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK7);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK8);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MWA8_BANK9);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MWA8_BANK10);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK9);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK10);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MWA8_BANK11);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_BANK12);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK11);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK12);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_BANK13);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, MWA8_BANK14);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK13);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_BANK14);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MWA8_BANK15);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MWA8_BANK16);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK15);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK16);
 
 	cpunum_reset(0);
 	if(amstrad_system_type == SYSTEM_CPC)
@@ -2237,14 +2237,14 @@ static MACHINE_RESET( aleste )
 pages the memory in 8k blocks! The ROM can
 be paged into bank 0 and bank 3. */
 static ADDRESS_MAP_START(amstrad_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00000, 0x01fff) AM_READWRITE(MRA8_BANK1, MWA8_BANK9)
-	AM_RANGE(0x02000, 0x03fff) AM_READWRITE(MRA8_BANK2, MWA8_BANK10)
-	AM_RANGE(0x04000, 0x05fff) AM_READWRITE(MRA8_BANK3, MWA8_BANK11)
-	AM_RANGE(0x06000, 0x07fff) AM_READWRITE(MRA8_BANK4, MWA8_BANK12)
-	AM_RANGE(0x08000, 0x09fff) AM_READWRITE(MRA8_BANK5, MWA8_BANK13)
-	AM_RANGE(0x0a000, 0x0bfff) AM_READWRITE(MRA8_BANK6, MWA8_BANK14)
-	AM_RANGE(0x0c000, 0x0dfff) AM_READWRITE(MRA8_BANK7, MWA8_BANK15)
-	AM_RANGE(0x0e000, 0x0ffff) AM_READWRITE(MRA8_BANK8, MWA8_BANK16)
+	AM_RANGE(0x00000, 0x01fff) AM_READWRITE(SMH_BANK1, SMH_BANK9)
+	AM_RANGE(0x02000, 0x03fff) AM_READWRITE(SMH_BANK2, SMH_BANK10)
+	AM_RANGE(0x04000, 0x05fff) AM_READWRITE(SMH_BANK3, SMH_BANK11)
+	AM_RANGE(0x06000, 0x07fff) AM_READWRITE(SMH_BANK4, SMH_BANK12)
+	AM_RANGE(0x08000, 0x09fff) AM_READWRITE(SMH_BANK5, SMH_BANK13)
+	AM_RANGE(0x0a000, 0x0bfff) AM_READWRITE(SMH_BANK6, SMH_BANK14)
+	AM_RANGE(0x0c000, 0x0dfff) AM_READWRITE(SMH_BANK7, SMH_BANK15)
+	AM_RANGE(0x0e000, 0x0ffff) AM_READWRITE(SMH_BANK8, SMH_BANK16)
 ADDRESS_MAP_END
 
 /* I've handled the I/O ports in this way, because the ports

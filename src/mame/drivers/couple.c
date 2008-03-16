@@ -39,7 +39,6 @@ Provided to you by Thierry (ShinobiZ) & Gerald (COY)
 #include "video/mc6845.h"
 
 static tilemap *bg_tilemap;
-static mc6845_t *mc6845;
 static UINT8 *vram_lo,*vram_hi;
 static UINT8 *backup_ram;
 
@@ -66,7 +65,6 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( couple )
 {
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
@@ -150,13 +148,13 @@ static ADDRESS_MAP_START( merit_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE( 0xc00a, 0xc00a ) AM_READ(input_port_1_r)
   	AM_RANGE( 0xe000, 0xe000 ) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
   	AM_RANGE( 0xe001, 0xe001 ) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
-	AM_RANGE( 0xe800, 0xefff ) AM_READWRITE(MRA8_RAM, couple_vram_hi_w) AM_BASE(&vram_hi)
-	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(MRA8_RAM, couple_vram_lo_w) AM_BASE(&vram_lo)
+	AM_RANGE( 0xe800, 0xefff ) AM_READWRITE(SMH_RAM, couple_vram_hi_w) AM_BASE(&vram_hi)
+	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(SMH_RAM, couple_vram_lo_w) AM_BASE(&vram_lo)
 	AM_RANGE( 0xf800, 0xfbff ) AM_RAM /*extra VRAM?*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( merit_io, ADDRESS_SPACE_IO, 8 )
-//  ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+//  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xc10c, 0xc10c) AM_WRITE(AY8910_write_port_0_w)
 ADDRESS_MAP_END

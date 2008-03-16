@@ -200,11 +200,11 @@ when problems start with -log and look into error.log file
  */
 
 static ADDRESS_MAP_START( c16_readmem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_READ( MRA8_BANK9)
-	AM_RANGE(0x4000, 0x7fff) AM_READ( MRA8_BANK1)	   /* only ram memory configuration */
-	AM_RANGE(0x8000, 0xbfff) AM_READ( MRA8_BANK2)
-	AM_RANGE(0xc000, 0xfbff) AM_READ( MRA8_BANK3)
-	AM_RANGE(0xfc00, 0xfcff) AM_READ( MRA8_BANK4)
+	AM_RANGE(0x0000, 0x3fff) AM_READ( SMH_BANK9)
+	AM_RANGE(0x4000, 0x7fff) AM_READ( SMH_BANK1)	   /* only ram memory configuration */
+	AM_RANGE(0x8000, 0xbfff) AM_READ( SMH_BANK2)
+	AM_RANGE(0xc000, 0xfbff) AM_READ( SMH_BANK3)
+	AM_RANGE(0xfc00, 0xfcff) AM_READ( SMH_BANK4)
 	AM_RANGE(0xfd10, 0xfd1f) AM_READ( c16_fd1x_r)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READ( c16_6529_port_r) /* 6529 keyboard matrix */
 #if 0
@@ -213,15 +213,15 @@ static ADDRESS_MAP_START( c16_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfee0, 0xfeff) AM_READ( c16_iec8_port_r) /* configured in c16_common_init */
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READ( ted7360_port_r)
-	AM_RANGE(0xff20, 0xffff) AM_READ( MRA8_BANK8)
-/*  { 0x10000, 0x3ffff, MRA8_ROM }, */
+	AM_RANGE(0xff20, 0xffff) AM_READ( SMH_BANK8)
+/*  { 0x10000, 0x3ffff, SMH_ROM }, */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c16_writemem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE( MWA8_BANK9)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE( MWA8_BANK5)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE( MWA8_BANK6)
-	AM_RANGE(0xc000, 0xfcff) AM_WRITE( MWA8_BANK7)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE( SMH_BANK9)
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE( SMH_BANK5)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE( SMH_BANK6)
+	AM_RANGE(0xc000, 0xfcff) AM_WRITE( SMH_BANK7)
 #if 0
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE( c16_write_4000)  /*configured in c16_common_init */
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE( c16_write_8000)  /*configured in c16_common_init */
@@ -244,15 +244,15 @@ static ADDRESS_MAP_START( c16_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE( c16_switch_to_ram)
 #if 0
 	AM_RANGE(0xff40, 0xffff) AM_WRITE( c16_write_ff40)  /*configure in c16_common_init */
-//  {0x10000, 0x3ffff, MWA8_ROM},
+//  {0x10000, 0x3ffff, SMH_ROM},
 #endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( plus4_readmem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_READ( MRA8_BANK9)
-	AM_RANGE(0x8000, 0xbfff) AM_READ( MRA8_BANK2)
-	AM_RANGE(0xc000, 0xfbff) AM_READ( MRA8_BANK3)
-	AM_RANGE(0xfc00, 0xfcff) AM_READ( MRA8_BANK4)
+	AM_RANGE(0x0000, 0x7fff) AM_READ( SMH_BANK9)
+	AM_RANGE(0x8000, 0xbfff) AM_READ( SMH_BANK2)
+	AM_RANGE(0xc000, 0xfbff) AM_READ( SMH_BANK3)
+	AM_RANGE(0xfc00, 0xfcff) AM_READ( SMH_BANK4)
 	AM_RANGE(0xfd00, 0xfd0f) AM_READ( c16_6551_port_r)
 	AM_RANGE(0xfd10, 0xfd1f) AM_READ( plus4_6529_port_r)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READ( c16_6529_port_r) /* 6529 keyboard matrix */
@@ -262,12 +262,12 @@ static ADDRESS_MAP_START( plus4_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfee0, 0xfeff) AM_READ( c16_iec8_port_r) /* configured in c16_common_init */
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READ( ted7360_port_r)
-	AM_RANGE(0xff20, 0xffff) AM_READ( MRA8_BANK8)
-/*  { 0x10000, 0x3ffff, MRA8_ROM }, */
+	AM_RANGE(0xff20, 0xffff) AM_READ( SMH_BANK8)
+/*  { 0x10000, 0x3ffff, SMH_ROM }, */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( plus4_writemem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xfcff) AM_WRITE( MWA8_BANK9)
+	AM_RANGE(0x0000, 0xfcff) AM_WRITE( SMH_BANK9)
 	AM_RANGE(0xfd00, 0xfd0f) AM_WRITE( c16_6551_port_w)
 	AM_RANGE(0xfd10, 0xfd1f) AM_WRITE( plus4_6529_port_w)
 	AM_RANGE(0xfd30, 0xfd3f) AM_WRITE( c16_6529_port_w) /* 6529 keyboard matrix */
@@ -280,18 +280,18 @@ static ADDRESS_MAP_START( plus4_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfee0, 0xfeff) AM_WRITE( c16_iec8_port_w) /*configured in c16_common_init */
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_WRITE( ted7360_port_w)
-	AM_RANGE(0xff20, 0xff3d) AM_WRITE( MWA8_RAM)
+	AM_RANGE(0xff20, 0xff3d) AM_WRITE( SMH_RAM)
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE( c16_switch_to_rom)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE( c16_switch_to_ram)
-	AM_RANGE(0xff40, 0xffff) AM_WRITE( MWA8_RAM)
-//  {0x10000, 0x3ffff, MWA8_ROM},
+	AM_RANGE(0xff40, 0xffff) AM_WRITE( SMH_RAM)
+//  {0x10000, 0x3ffff, SMH_ROM},
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c364_readmem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_READ( MRA8_BANK9)
-	AM_RANGE(0x8000, 0xbfff) AM_READ( MRA8_BANK2)
-	AM_RANGE(0xc000, 0xfbff) AM_READ( MRA8_BANK3)
-	AM_RANGE(0xfc00, 0xfcff) AM_READ( MRA8_BANK4)
+	AM_RANGE(0x0000, 0x7fff) AM_READ( SMH_BANK9)
+	AM_RANGE(0x8000, 0xbfff) AM_READ( SMH_BANK2)
+	AM_RANGE(0xc000, 0xfbff) AM_READ( SMH_BANK3)
+	AM_RANGE(0xfc00, 0xfcff) AM_READ( SMH_BANK4)
 	AM_RANGE(0xfd00, 0xfd0f) AM_READ( c16_6551_port_r)
 	AM_RANGE(0xfd10, 0xfd1f) AM_READ( plus4_6529_port_r)
 	AM_RANGE(0xfd20, 0xfd2f) AM_READ( c364_speech_r )
@@ -302,12 +302,12 @@ static ADDRESS_MAP_START( c364_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfee0, 0xfeff) AM_READ( c16_iec8_port_r) /* configured in c16_common_init */
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READ( ted7360_port_r)
-	AM_RANGE(0xff20, 0xffff) AM_READ( MRA8_BANK8)
-/*  { 0x10000, 0x3ffff, MRA8_ROM }, */
+	AM_RANGE(0xff20, 0xffff) AM_READ( SMH_BANK8)
+/*  { 0x10000, 0x3ffff, SMH_ROM }, */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c364_writemem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xfcff) AM_WRITE( MWA8_BANK9)
+	AM_RANGE(0x0000, 0xfcff) AM_WRITE( SMH_BANK9)
 	AM_RANGE(0xfd00, 0xfd0f) AM_WRITE( c16_6551_port_w)
 	AM_RANGE(0xfd10, 0xfd1f) AM_WRITE( plus4_6529_port_w)
 	AM_RANGE(0xfd20, 0xfd2f) AM_WRITE( c364_speech_w )
@@ -321,11 +321,11 @@ static ADDRESS_MAP_START( c364_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfee0, 0xfeff) AM_WRITE( c16_iec8_port_w) /*configured in c16_common_init */
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_WRITE( ted7360_port_w)
-	AM_RANGE(0xff20, 0xff3d) AM_WRITE( MWA8_RAM)
+	AM_RANGE(0xff20, 0xff3d) AM_WRITE( SMH_RAM)
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE( c16_switch_to_rom)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE( c16_switch_to_ram)
-	AM_RANGE(0xff40, 0xffff) AM_WRITE( MWA8_RAM)
-//  {0x10000, 0x3ffff, MWA8_ROM},
+	AM_RANGE(0xff40, 0xffff) AM_WRITE( SMH_RAM)
+//  {0x10000, 0x3ffff, SMH_ROM},
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ports_both )

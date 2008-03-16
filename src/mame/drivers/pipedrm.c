@@ -228,13 +228,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(MRA8_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(input_port_0_r, sound_command_w)
@@ -262,7 +262,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x16, 0x16) AM_READ(sound_command_r)
 	AM_RANGE(0x17, 0x17) AM_WRITE(pending_command_clear_w)
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hatris_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_WRITE(YM2608_control_port_0_B_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(YM2608_data_port_0_B_w)
 	AM_RANGE(0x04, 0x04) AM_READ(sound_command_r)
@@ -744,8 +744,8 @@ static DRIVER_INIT( pipedrm )
 	/* sprite RAM lives at the end of palette RAM */
 	spriteram = &paletteram[0xc00];
 	spriteram_size = 0x400;
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcfff, 0, 0, MRA8_BANK3);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcfff, 0, 0, MWA8_BANK3);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcfff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcfff, 0, 0, SMH_BANK3);
 	memory_set_bankptr(3, spriteram);
 }
 

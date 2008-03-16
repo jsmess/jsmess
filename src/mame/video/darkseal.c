@@ -179,7 +179,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 		x = buffered_spriteram16[offs+2];
 
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		colour = (x >> 9) &0x1f;
 
@@ -304,7 +304,7 @@ VIDEO_UPDATE( darkseal )
 
 	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;
 }

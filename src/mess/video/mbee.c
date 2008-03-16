@@ -204,12 +204,15 @@ static void m6545_update_strobe(int param)
 //		logerror("6545 update_strobe_cb $%04X = $%02X\n", param, data);
 }
 
- READ8_HANDLER ( m6545_status_r )
+READ8_HANDLER ( m6545_status_r )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+
 	int data = 0, y = video_screen_get_vpos(0);
 
-	if( y < machine->screen[0].visarea.min_y ||
-		y > machine->screen[0].visarea.max_y )
+	if( y < visarea->min_y ||
+		y > visarea->max_y )
 		data |= 0x20;	/* vertical blanking */
 	if( crt.lpen_strobe )
 		data |= 0x40;	/* lpen register full */
@@ -446,8 +449,8 @@ VIDEO_UPDATE( mbee )
 		int sy = off_y - 9 + (offs / crt.horizontal_displayed) * (crt.scan_lines + 1);
 		int sx = (off_x + 3 + (offs % crt.horizontal_displayed)) << 3;
 		int code = videoram[mem];
-		drawgfx( bitmap,machine->gfx[0],code,0,0,0,sx,sy,
-			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		drawgfx( bitmap, screen->machine->gfx[0],code,0,0,0,sx,sy,
+			NULL,TRANSPARENCY_NONE,0);
 
 		if( mem == cursor && (crt.cursor_top & 0x60) != 0x20 )
 		{
@@ -488,8 +491,8 @@ VIDEO_UPDATE( mbeeic )
 		int sx = (off_x + (offs % crt.horizontal_displayed)) << 3;
 		int code = videoram[mem];
 		int color = colorram[mem] | colourm;
-		drawgfx( bitmap,machine->gfx[0],code,color,0,0,sx,sy,
-			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		drawgfx( bitmap, screen->machine->gfx[0],code,color,0,0,sx,sy,
+			NULL, TRANSPARENCY_NONE, 0);
 
 		if( mem == cursor && (crt.cursor_top & 0x60) != 0x20 )
 		{

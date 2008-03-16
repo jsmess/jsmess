@@ -29,8 +29,8 @@ PALETTE_INIT( buggychl )
 VIDEO_START( buggychl )
 {
 	dirtychar = auto_malloc(256 * sizeof(*dirtychar));
-	tmpbitmap1 = auto_bitmap_alloc(256,256,machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(256,256,machine->screen[0].format);
+	tmpbitmap1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmap2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	memset(dirtychar,0xff,256 * sizeof(*dirtychar));
 }
@@ -247,14 +247,14 @@ VIDEO_UPDATE( buggychl )
 	/* decode modified characters */
 	for (code = 0;code < 256;code++)
 		if (dirtychar[code])
-			decodechar(machine->gfx[0],code,buggychl_character_ram);
+			decodechar(screen->machine->gfx[0],code,buggychl_character_ram);
 
 	if (bg_on)
-		draw_bg(machine, bitmap, cliprect);
+		draw_bg(screen->machine, bitmap, cliprect);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
-	draw_fg(machine, bitmap, cliprect);
+	draw_fg(screen->machine, bitmap, cliprect);
 
 	for (code = 0;code < 256;code++)
 		dirtychar[code] = 0;

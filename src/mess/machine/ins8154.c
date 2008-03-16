@@ -48,19 +48,19 @@ static DEVICE_START( ins8154 )
 	char unique_tag[30];
 
 	/* validate arguments */
-	assert(machine != NULL);
-	assert(tag != NULL);
-	assert(strlen(tag) < 20);
+	assert(device->machine != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
 
 	/* allocate the object that holds the state */
 	ins8154 = auto_malloc(sizeof(*ins8154));
 	memset(ins8154, 0, sizeof(*ins8154));
 
 	/* assign interface */
-	ins8154->intf = static_config;
+	ins8154->intf = device->static_config;
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "ins8154", tag);
+	state_save_combine_module_and_tag(unique_tag, "ins8154", device->tag);
 	state_save_register_item(unique_tag, 0, ins8154->in_a);
 	state_save_register_item(unique_tag, 0, ins8154->in_b);
 	state_save_register_item(unique_tag, 0, ins8154->out_a);
@@ -75,7 +75,7 @@ static DEVICE_START( ins8154 )
 
 static DEVICE_RESET( ins8154 )
 {
-	ins8154_t *ins8154 = token;
+	ins8154_t *ins8154 = device->token;
 	
 	ins8154->in_a = 0;
 	ins8154->in_b = 0;

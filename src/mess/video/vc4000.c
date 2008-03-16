@@ -78,6 +78,9 @@ static struct
 
 VIDEO_START(vc4000)
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
 	int i;
 
 	for (i=0;i<0x20; i++)
@@ -96,7 +99,7 @@ VIDEO_START(vc4000)
 		if ((i&0x18)==0x18) background_collision[i]|=0x10;
 	}
 
-	vc4000_video.bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	vc4000_video.bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 READ8_HANDLER(vc4000_video_r)
@@ -390,12 +393,15 @@ static void vc4000_sprite_update(running_machine *machine, bitmap_t *bitmap, UIN
 
 INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
 	int i, j, m, x, line=vc4000_video.line-20;
 	int w, k;
 
-	if (vc4000_video.line>=machine->screen[0].height) return;
+	if (vc4000_video.line>=height) return;
 
-	plot_box(vc4000_video.bitmap, 0, vc4000_video.line, machine->screen[0].width, 1, machine->pens[(vc4000_video.reg.d.background)&7]);
+	plot_box(vc4000_video.bitmap, 0, vc4000_video.line, width, 1, machine->pens[(vc4000_video.reg.d.background)&7]);
 
 	if (line<0 || line>=200) return;
 	if (!vc4000_video.reg.d.background&8) return;
@@ -445,7 +451,7 @@ INTERRUPT_GEN( vc4000_video_line )
 {
 	int x,y,i;
 	UINT8 collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
-	assert(sizeof(collision)>=machine->screen[0].width);
+	assert(ARRAY_LENGTH(collision) >= video_screen_get_width(machine->primary_screen));
 
 	vc4000_video.line++;
 	vc4000_video.line%=312;

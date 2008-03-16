@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "leland.h"
 
 
@@ -85,22 +86,22 @@ WRITE8_HANDLER( leland_scroll_w )
 	switch (offset)
 	{
 		case 0:
-			video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 			xscroll = (xscroll & 0xff00) | (data & 0x00ff);
 			break;
 
 		case 1:
-			video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 			xscroll = (xscroll & 0x00ff) | ((data << 8) & 0xff00);
 			break;
 
 		case 2:
-			video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 			yscroll = (yscroll & 0xff00) | (data & 0x00ff);
 			break;
 
 		case 3:
-			video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 			yscroll = (yscroll & 0x00ff) | ((data << 8) & 0xff00);
 			break;
 
@@ -113,7 +114,7 @@ WRITE8_HANDLER( leland_scroll_w )
 
 WRITE8_HANDLER( leland_gfx_port_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	gfxbank = data;
 }
 
@@ -199,7 +200,7 @@ static void leland_vram_port_w(int offset, int data, int num)
 
 	/* don't fully understand why this is needed.  Isn't the
        video RAM just one big RAM? */
-	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+	video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen) - 1);
 
 	if (LOG_COMM && addr >= 0xf000)
 		logerror("%04X:%s comm write %04X = %02X\n", activecpu_get_previouspc(), num ? "slave" : "master", addr, data);
@@ -449,8 +450,8 @@ static VIDEO_UPDATE( leland )
 	}
 
 	/* set a timer to go off at the top of the frame */
-	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
-		timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, dac_reset);
+	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
+		timer_set(video_screen_get_time_until_pos(screen, 0, 0), NULL, 0, dac_reset);
 
 	return 0;
 }
@@ -525,8 +526,8 @@ static VIDEO_UPDATE( ataxx )
 	}
 
 	/* set a timer to go off at the top of the frame */
-	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
-		timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, dac_reset);
+	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
+		timer_set(video_screen_get_time_until_pos(screen, 0, 0), NULL, 0, dac_reset);
 
 	return 0;
 }

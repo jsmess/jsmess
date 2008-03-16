@@ -248,13 +248,8 @@ static void MB60553_draw(running_machine *machine, int numchip, bitmap_t* screen
 	rectangle clip;
 	MB60553_cur_chip = &MB60553[numchip];
 
-
-
-
-	clip.min_x = machine->screen[0].visarea.min_x;
-	clip.max_x = machine->screen[0].visarea.max_x;
-	clip.min_y = machine->screen[0].visarea.min_y;
-	clip.max_y = machine->screen[0].visarea.max_y;
+	clip.min_x = video_screen_get_visible_area(machine->primary_screen)->min_x;
+	clip.max_x = video_screen_get_visible_area(machine->primary_screen)->max_x;
 
 	for (line = 0; line < 224;line++)
 	{
@@ -535,17 +530,17 @@ WRITE16_HANDLER( gsx_videoram3_w )
 
 VIDEO_UPDATE(gstriker)
 {
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality
-	MB60553_draw(machine, 0, bitmap,cliprect, 0);
+	MB60553_draw(screen->machine, 0, bitmap,cliprect, 0);
 
-	CG10103_draw(machine, 0, bitmap, cliprect, 0);
+	CG10103_draw(screen->machine, 0, bitmap, cliprect, 0);
 
 	VS920A_draw(0, bitmap, cliprect, 0);
 
-	CG10103_draw(machine, 0, bitmap, cliprect, 1);
+	CG10103_draw(screen->machine, 0, bitmap, cliprect, 1);
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",

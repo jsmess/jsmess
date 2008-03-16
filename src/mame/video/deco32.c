@@ -232,7 +232,7 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		sx = spritedata[offs+1];
 
-		if ((sy&0x2000) && (video_screen_get_frame_number(0) & 1)) continue;
+		if ((sy&0x2000) && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		colour = (spritedata[offs+2] >>0) & 0x1f;
 
@@ -291,7 +291,7 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		y = spritedata[offs];
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		trans=TRANSPARENCY_PEN;
 		x = spritedata[offs+2];
@@ -407,7 +407,7 @@ static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		y = spritedata[offs];
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		trans=TRANSPARENCY_PEN;
 		x = spritedata[offs+2];
@@ -1035,6 +1035,8 @@ VIDEO_START( lockload )
 
 VIDEO_START( nslasher )
 {
+	int width, height;
+
 	pf1_tilemap = tilemap_create(get_pf1_tile_info, tilemap_scan_rows, 8, 8,64,32);
 	pf2_tilemap = tilemap_create(get_pf2_tile_info, deco16_scan_rows,16,16,64,32);
 	pf3_tilemap = tilemap_create(get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
@@ -1042,9 +1044,11 @@ VIDEO_START( nslasher )
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 
-	sprite0_mix_bitmap=auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
-	sprite1_mix_bitmap=auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
-	tilemap_alpha_bitmap=auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
+	sprite0_mix_bitmap=auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	sprite1_mix_bitmap=auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	tilemap_alpha_bitmap=auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);
@@ -1243,7 +1247,7 @@ VIDEO_UPDATE( captaven )
 		if (pf3_enable)
 			tilemap_draw(bitmap,cliprect,pf3_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		else
-			fillbitmap(bitmap,get_black_pen(machine),cliprect);
+			fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 		if (deco32_raster_display_position)
 			tilemap_raster_draw(bitmap,cliprect,0,1);
@@ -1257,12 +1261,12 @@ VIDEO_UPDATE( captaven )
 				tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
 		}
 		else
-			fillbitmap(bitmap,get_black_pen(machine),cliprect);
+			fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 		tilemap_draw(bitmap,cliprect,pf3_tilemap,0,1);
 	}
 
-	captaven_draw_sprites(machine,bitmap,cliprect,buffered_spriteram32,3);
+	captaven_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram32,3);
 
 	/* PF1 can be in 8x8 mode or 16x16 mode */
 	if (deco32_pf12_control[6]&0x80)
@@ -1308,7 +1312,7 @@ VIDEO_UPDATE( dragngun )
 	tilemap_set_enable(pf4_tilemap, deco32_pf34_control[5]&0x8000);
 
 	if ((deco32_pf34_control[5]&0x8000)==0)
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,0);
@@ -1347,7 +1351,7 @@ VIDEO_UPDATE( dragngun )
 		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
 	}
 
-	dragngun_draw_sprites(machine,bitmap,cliprect,buffered_spriteram32);
+	dragngun_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram32);
 
 	/* PF1 can be in 8x8 mode or 16x16 mode */
 	if (deco32_pf12_control[6]&0x80)
@@ -1395,11 +1399,11 @@ VIDEO_UPDATE( fghthist )
 	/* Draw screen */
 	deco16_clear_sprite_priority_bitmap();
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[0x000],cliprect); // Palette index not confirmed
+	fillbitmap(bitmap,screen->machine->pens[0x000],cliprect); // Palette index not confirmed
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,4);
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,16);
-	fghthist_draw_sprites(machine, bitmap, cliprect, buffered_spriteram32,3,0, 0xf);
+	fghthist_draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram32,3,0, 0xf);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;
 }
@@ -1583,18 +1587,18 @@ VIDEO_UPDATE( nslasher )
 		alphaTilemap=1;
 
 	if (deco32_ace_ram_dirty)
-		updateAceRam(machine);
+		updateAceRam(screen->machine);
 
 	fillbitmap(sprite0_mix_bitmap,0,cliprect);
 	fillbitmap(sprite1_mix_bitmap,0,cliprect);
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(tilemap_alpha_bitmap,0,cliprect);
 	if ((deco32_pf34_control[5]&0x8000)==0)
-		fillbitmap(bitmap,machine->pens[0x200],cliprect);
+		fillbitmap(bitmap,screen->machine->pens[0x200],cliprect);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
-	nslasher_draw_sprites(machine,sprite0_mix_bitmap,cliprect,buffered_spriteram32,3);
-	nslasher_draw_sprites(machine,sprite1_mix_bitmap,cliprect,buffered_spriteram32_2,4);
+	nslasher_draw_sprites(screen->machine,sprite0_mix_bitmap,cliprect,buffered_spriteram32,3);
+	nslasher_draw_sprites(screen->machine,sprite1_mix_bitmap,cliprect,buffered_spriteram32_2,4);
 
 	/* Render alpha-blended tilemap to seperate buffer for proper mixing */
 	if (alphaTilemap)
@@ -1603,7 +1607,7 @@ VIDEO_UPDATE( nslasher )
 	/* Draw playfields & sprites */
 	if (deco32_pri&2)
 	{
-		combined_tilemap_draw(machine,bitmap,cliprect);
+		combined_tilemap_draw(screen->machine,bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,4);
 	}
 	else
@@ -1627,7 +1631,7 @@ VIDEO_UPDATE( nslasher )
 		}
 	}
 
-	mixDualAlphaSprites(machine, bitmap, cliprect, machine->gfx[3], machine->gfx[4], alphaTilemap);
+	mixDualAlphaSprites(screen->machine, bitmap, cliprect, screen->machine->gfx[3], screen->machine->gfx[4], alphaTilemap);
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;

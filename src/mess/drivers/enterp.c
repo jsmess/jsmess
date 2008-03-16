@@ -285,10 +285,10 @@ static WRITE8_HANDLER (	enterprise_wd177x_write )
 /* I've done this because the ram is banked in 16k blocks, and
 the rom can be paged into bank 0 and bank 3. */
 static ADDRESS_MAP_START( enterprise_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x00000, 0x03fff) AM_READWRITE( MRA8_BANK1, MWA8_BANK5 )
-	AM_RANGE( 0x04000, 0x07fff) AM_READWRITE( MRA8_BANK2, MWA8_BANK6 )
-	AM_RANGE( 0x08000, 0x0bfff) AM_READWRITE( MRA8_BANK3, MWA8_BANK7 )
-	AM_RANGE( 0x0c000, 0x0ffff) AM_READWRITE( MRA8_BANK4, MWA8_BANK8 )
+	AM_RANGE( 0x00000, 0x03fff) AM_READWRITE( SMH_BANK1, SMH_BANK5 )
+	AM_RANGE( 0x04000, 0x07fff) AM_READWRITE( SMH_BANK2, SMH_BANK6 )
+	AM_RANGE( 0x08000, 0x0bfff) AM_READWRITE( SMH_BANK3, SMH_BANK7 )
+	AM_RANGE( 0x0c000, 0x0ffff) AM_READWRITE( SMH_BANK4, SMH_BANK8 )
 ADDRESS_MAP_END
 
 
@@ -371,7 +371,7 @@ static  READ8_HANDLER ( exdos_card_r )
 }
 
 static ADDRESS_MAP_START( enterprise_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x010, 0x017) AM_READWRITE( enterprise_wd177x_read, enterprise_wd177x_write )
 	AM_RANGE( 0x018, 0x018) AM_READWRITE( exdos_card_r, exdos_card_w )
 	AM_RANGE( 0x01c, 0x01c) AM_READWRITE( exdos_card_r, exdos_card_w )

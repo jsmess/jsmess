@@ -369,16 +369,18 @@ static void K037122_tile_update(running_machine *machine, int chip)
 
 static void K037122_tile_draw(int chip, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	const rectangle *visarea = video_screen_get_visible_area(Machine->primary_screen);
+
 	if (K037122_reg[chip][0xc] & 0x10000)
 	{
-		tilemap_set_scrolldx(K037122_layer[chip][1], Machine->screen[0].visarea.min_x, Machine->screen[0].visarea.min_x);
-		tilemap_set_scrolldy(K037122_layer[chip][1], Machine->screen[0].visarea.min_y, Machine->screen[0].visarea.min_y);
+		tilemap_set_scrolldx(K037122_layer[chip][1], visarea->min_x, visarea->min_x);
+		tilemap_set_scrolldy(K037122_layer[chip][1], visarea->min_y, visarea->min_y);
 		tilemap_draw(bitmap, cliprect, K037122_layer[chip][1], 0,0);
 	}
 	else
 	{
-		tilemap_set_scrolldx(K037122_layer[chip][0], Machine->screen[0].visarea.min_x, Machine->screen[0].visarea.min_x);
-		tilemap_set_scrolldy(K037122_layer[chip][0], Machine->screen[0].visarea.min_y, Machine->screen[0].visarea.min_y);
+		tilemap_set_scrolldx(K037122_layer[chip][0], visarea->min_x, visarea->min_x);
+		tilemap_set_scrolldy(K037122_layer[chip][0], visarea->min_y, visarea->min_y);
 		tilemap_draw(bitmap, cliprect, K037122_layer[chip][0], 0,0);
 	}
 }
@@ -510,9 +512,9 @@ static VIDEO_START( hornet )
 	add_exit_callback(machine, hornet_exit);
 
 	if (voodoo_version == 0)
-		voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
+		voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 4, 0);
 	else
-		voodoo_start(0, 0, VOODOO_2, 2, 4, 0);
+		voodoo_start(0, machine->primary_screen, VOODOO_2, 2, 4, 0);
 
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
@@ -521,17 +523,20 @@ static VIDEO_START( hornet )
 
 static VIDEO_START( hornet_2board )
 {
+	const device_config *left_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "right");
+
 	add_exit_callback(machine, hornet_2board_exit);
 
 	if (voodoo_version == 0)
 	{
-		voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
-		voodoo_start(1, 1, VOODOO_1, 2, 4, 0);
+		voodoo_start(0, left_screen,  VOODOO_1, 2, 4, 0);
+		voodoo_start(1, right_screen, VOODOO_1, 2, 4, 0);
 	}
 	else
 	{
-		voodoo_start(0, 0, VOODOO_2, 2, 4, 0);
-		voodoo_start(1, 1, VOODOO_2, 2, 4, 0);
+		voodoo_start(0, left_screen,  VOODOO_2, 2, 4, 0);
+		voodoo_start(1, right_screen, VOODOO_2, 2, 4, 0);
 	}
 
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
@@ -546,7 +551,7 @@ static VIDEO_UPDATE( hornet )
 {
 	voodoo_update(0, bitmap, cliprect);
 
-	K037122_tile_update(machine, 0);
+	K037122_tile_update(screen->machine, 0);
 	K037122_tile_draw(0, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
@@ -556,11 +561,25 @@ static VIDEO_UPDATE( hornet )
 
 static VIDEO_UPDATE( hornet_2board )
 {
-	voodoo_update(screen, bitmap, cliprect);
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
 
-	/* TODO: tilemaps per screen */
-	K037122_tile_update(machine, screen);
-	K037122_tile_draw(screen, bitmap, cliprect);
+	if (screen == left_screen)
+	{
+		voodoo_update(0, bitmap, cliprect);
+
+		/* TODO: tilemaps per screen */
+		K037122_tile_update(screen->machine, 0);
+		K037122_tile_draw(0, bitmap, cliprect);
+	}
+	else if (screen == right_screen)
+	{
+		voodoo_update(1, bitmap, cliprect);
+
+		/* TODO: tilemaps per screen */
+		K037122_tile_update(screen->machine, 1);
+		K037122_tile_draw(1, bitmap, cliprect);
+	}
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
@@ -945,6 +964,8 @@ static MACHINE_DRIVER_START( hornet_2board )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)
+
+	MDRV_SCREEN_REMOVE("main")
 
 	MDRV_SCREEN_ADD("left", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

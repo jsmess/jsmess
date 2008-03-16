@@ -99,12 +99,12 @@ INTERRUPT_GEN( spdodgeb_interrupt )
 	if (iloop > 1 && iloop < 32)
 	{
 		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);
-		video_screen_update_partial(0, scanline+7);
+		video_screen_update_partial(machine->primary_screen, scanline+7);
 	}
 	else if (!iloop)
 	{
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-		video_screen_update_partial(0, 256);
+		video_screen_update_partial(machine->primary_screen, 256);
 	}
 }
 
@@ -213,10 +213,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( spdodgeb )
 {
-
 	tilemap_set_scrollx(bg_tilemap,0,lastscroll+5);
-
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

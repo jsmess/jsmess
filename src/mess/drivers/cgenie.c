@@ -53,7 +53,7 @@ static ADDRESS_MAP_START (cgenie_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (cgenie_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE( cgenie_sh_control_port_r, cgenie_sh_control_port_w )
 	AM_RANGE(0xf9, 0xf9) AM_READWRITE( cgenie_sh_data_port_r, cgenie_sh_data_port_w )
 	AM_RANGE(0xfa, 0xfa) AM_READWRITE( cgenie_index_r, cgenie_index_w )

@@ -6241,6 +6241,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rdftj )		/* (c) 1996 Seibu Kaihatsu */
 	DRIVER( rdftdi )	/* (c) 1996 Seibu Kaihatsu (Dream Island license) */
 	DRIVER( rdftit )	/* (c) 1996 Seibu Kaihatsu */
+	DRIVER( rdfta )		/* (c) 1996 Seibu Kaihatsu */
 
 	DRIVER( rdft2 )		/* (c) 1997 Seibu Kaihatsu (Tuning License) */
 	DRIVER( rdft2a )	/* (c) 1997 Seibu Kaihatsu (Metrotainment license) */
@@ -7578,21 +7579,22 @@ Other Sun games
 	DRIVER( findout )	/* (c) 1987 [Elettronolo] */
 	DRIVER( quiz )		/* (c) 1986 Italian bootleg */
 	DRIVER( quiz211 )	/* (c) 1986 Italian bootleg */
-	DRIVER( m075 )		/* (c) 1982 Greyhound Electronics */
+	DRIVER( jokpoker )	/* (c) 1982 Greyhound Electronics */
 	DRIVER( superbwl )	/* (c) 1982 Greyhound Electronics */
+	DRIVER( amuse )		/* (c) 1982 Greyhound Electronics */
 	DRIVER( gs4002 )	/* (c) 1982 G.E.I. */
 	DRIVER( gs4002a )	/* (c) 1982 G.E.I. */
 	DRIVER( gepoker )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gepoker1 )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gepoker2 )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gepoker3 )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt102c )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt102b )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt101c )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt101c1 )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt102c1 )	/* (c) 1985 Greyhound Electronics */
-	DRIVER( gt102c2 )	/* (c) 1985 Greyhound Electronics */
-	DRIVER( gt102c3 )	/* (c) 1985 Greyhound Electronics */
+	DRIVER( gtsers1 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers2 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers3 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers4 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers5 )	/* (c) 1985 Greyhound Electronics */
+	DRIVER( gtsers7 )	/* (c) 1985 Greyhound Electronics */
+	DRIVER( gtsersa )	/* (c) 1985 Greyhound Electronics */
+	DRIVER( gtsersb )	/* (c) 1985 Greyhound Electronics */
 	DRIVER( sextriv1 )	/* (c) 1985 Kinky Kit and Game Co. */
 	DRIVER( sextriv2 )	/* (c) 1985 Kinky Kit and Game Co. */
 	DRIVER( dribling )	/* (c) 1983 Model Racing */
@@ -7766,6 +7768,8 @@ Other Sun games
 	DRIVER( spitboss )	/* (c) 198? Merit */
 	DRIVER( pitbossm )	/* (c) 1994 Merit */
 	DRIVER( megat3 )	/* (c) 1995 Merit */
+	DRIVER( megat4 )	/* (c) 1996 Merit */
+	DRIVER( megat4te )	/* (c) 1996 Merit */
 	DRIVER( megat5 )	/* (c) 1997 Merit */
 	DRIVER( megat6 )	/* (c) 1998 Merit */
 	DRIVER( suprgolf )	/* (c) 19?? Nasco */

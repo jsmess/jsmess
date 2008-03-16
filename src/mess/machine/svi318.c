@@ -59,7 +59,6 @@ typedef struct {
 static SVI_318 svi;
 static UINT8 *pcart;
 static UINT32 pcart_rom_size;
-static mc6845_t	*mc6845;
 
 static void svi318_set_banks (void);
 
@@ -500,17 +499,25 @@ WRITE8_HANDLER( svi806_ram_enable_w )
 	svi318_set_banks();
 }
 
-VIDEO_START( svi328_806 ) {
+VIDEO_START( svi328_806 )
+{
 	VIDEO_START_CALL(tms9928a);
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 }
 
 VIDEO_UPDATE( svi328_806 )
 {
-	if ( screen == 0 )
+	if (!strcmp(screen->tag, "main"))
+	{
 		VIDEO_UPDATE_CALL(tms9928a);
-	if ( screen == 1 ) {
+	}
+	else if (!strcmp(screen->tag, "svi806"))
+	{
+		const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
 		mc6845_update(mc6845, bitmap, cliprect);
+	}
+	else
+	{
+		fatalerror("Unknown screen %s\n", screen->tag);
 	}
 	return 0;
 }

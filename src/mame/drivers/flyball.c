@@ -47,17 +47,13 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 	potsense[readinputport(4)] |= 8;
 
 	for (i = 0; i < 64; i++)
-	{
 		if (potsense[i] != 0)
-		{
-			timer_set(video_screen_get_time_until_pos(0, scanline + i, 0), NULL, potsense[i], flyball_joystick_callback);
-		}
-	}
+			timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline + i, 0), NULL, potsense[i], flyball_joystick_callback);
 
 	scanline += 0x40;
 	scanline &= 0xff;
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, flyball_quarter_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, flyball_quarter_callback);
 
 	flyball_potsense = 0;
 	flyball_potmask = 0;
@@ -75,7 +71,7 @@ static MACHINE_RESET( flyball )
 	for (i = 0; i < 0x1000; i++)
 		rombase[i] = ROM[i ^ 0x1ff];
 
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, flyball_quarter_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, flyball_quarter_callback);
 }
 
 
@@ -88,7 +84,7 @@ static READ8_HANDLER( flyball_input_r )
 
 static READ8_HANDLER( flyball_scanline_r )
 {
-	return video_screen_get_vpos(0) & 0x3f;
+	return video_screen_get_vpos(machine->primary_screen) & 0x3f;
 }
 
 static READ8_HANDLER( flyball_potsense_r )
@@ -155,7 +151,7 @@ static WRITE8_HANDLER( flyball_misc_w )
 
 
 static ADDRESS_MAP_START( flyball_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(13) )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_NOP
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(flyball_pitcher_pic_w)
@@ -168,7 +164,7 @@ static ADDRESS_MAP_START( flyball_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0900, 0x0900) AM_WRITE(flyball_potmask_w)
 	AM_RANGE(0x0a00, 0x0a07) AM_WRITE(flyball_misc_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(flyball_input_r)
-	AM_RANGE(0x0d00, 0x0eff) AM_WRITE(MWA8_RAM) AM_BASE(&flyball_playfield_ram)
+	AM_RANGE(0x0d00, 0x0eff) AM_WRITE(SMH_RAM) AM_BASE(&flyball_playfield_ram)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE(&rombase) /* program */
 ADDRESS_MAP_END
 

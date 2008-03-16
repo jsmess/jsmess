@@ -14,6 +14,7 @@
 
 #include "mamecore.h"
 #include "video.h"
+#include "crsshair.h"
 #include "restrack.h"
 #include "options.h"
 #include <stdarg.h>
@@ -162,7 +163,6 @@ typedef void (*output_callback_func)(void *param, const char *format, va_list ar
 
 /* forward type declarations */
 typedef struct _mame_private mame_private;
-typedef struct _video_private video_private;
 typedef struct _palette_private palette_private;
 typedef struct _streams_private streams_private;
 typedef struct _devices_private devices_private;
@@ -179,7 +179,7 @@ struct _running_machine
 
 	/* video-related information */
 	gfx_element *			gfx[MAX_GFX_ELEMENTS];/* array of pointers to graphic sets (chars, sprites) */
-	screen_state			screen[MAX_SCREENS];/* current screen state */
+	const device_config *	primary_screen;		/* the primary screen device, or NULL if screenless */
 	palette_t *				palette;			/* global palette object */
 
 	/* palette-related information */
@@ -205,7 +205,6 @@ struct _running_machine
 
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */
-	video_private *			video_data;			/* internal data from video.c */
 	palette_private *		palette_data;		/* internal data from palette.c */
 	streams_private *		streams_data;		/* internal data from streams.c */
 	devices_private *		devices_data;		/* internal data from devices.c */

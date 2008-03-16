@@ -1164,10 +1164,10 @@ WRITE8_HANDLER( lynx_memory_config_w )
      * when these are safe in the cpu */
     lynx_memory_config = data;
 
-	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfcff, 0, 0, (data & 1) ? MRA8_BANK1 : suzy_read);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfcff, 0, 0, (data & 1) ? MWA8_BANK1 : suzy_write);
-	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xfd00, 0xfdff, 0, 0, (data & 2) ? MRA8_BANK2 : mikey_read);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfd00, 0xfdff, 0, 0, (data & 2) ? MWA8_BANK2 : mikey_write);
+	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfcff, 0, 0, (data & 1) ? SMH_BANK1 : suzy_read);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfcff, 0, 0, (data & 1) ? SMH_BANK1 : suzy_write);
+	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xfd00, 0xfdff, 0, 0, (data & 2) ? SMH_BANK2 : mikey_read);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfd00, 0xfdff, 0, 0, (data & 2) ? SMH_BANK2 : mikey_write);
 
 	if (data & 1)
 		memory_set_bankptr(1, lynx_mem_fc00);

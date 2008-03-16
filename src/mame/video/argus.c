@@ -327,13 +327,13 @@ VIDEO_START( argus )
 
 VIDEO_START( valtric )
 {
-	/*                           info                       offset             type                 w   h  col  row */
-	bg1_tilemap = tilemap_create(valtric_get_bg_tile_info,  tilemap_scan_cols,       16, 16, 32, 32);
-	tx_tilemap  = tilemap_create(valtric_get_tx_tile_info,  tilemap_scan_cols,   8,  8, 32, 32);
+	/*                           info                       offset             w   h   col  row */
+	bg1_tilemap = tilemap_create(valtric_get_bg_tile_info,  tilemap_scan_cols, 16, 16, 32, 32);
+	tx_tilemap  = tilemap_create(valtric_get_tx_tile_info,  tilemap_scan_cols, 8,  8,  32, 32);
 
 	tilemap_set_transparent_pen( bg1_tilemap, 15 );
 	tilemap_set_transparent_pen( tx_tilemap,  15 );
-	mosaicbitmap=auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	mosaicbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	jal_blend_table = auto_malloc(0xc00);
 	memset(jal_blend_table,0,0xc00) ;
 }
@@ -1532,24 +1532,22 @@ VIDEO_UPDATE( argus )
 	/* scroll BG0 and render tile at proper position */
 	argus_bg0_scroll_handle();
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
-	argus_draw_sprites(machine, bitmap, cliprect, 0);
+	argus_draw_sprites(screen->machine, bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
-	argus_draw_sprites(machine, bitmap, cliprect, 1);
+	argus_draw_sprites(screen->machine, bitmap, cliprect, 1);
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( valtric )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
 	if(valtric_mosaic==0)
-	{
 		tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
-	}
 	else
 	{
 		tilemap_draw(mosaicbitmap, cliprect, bg1_tilemap, 0, 0);
@@ -1557,28 +1555,27 @@ VIDEO_UPDATE( valtric )
 			int step=valtric_mosaic;
 			UINT32 *dest;
 			int x,y,xx,yy;
+			int width = video_screen_get_width(screen);
+			int height = video_screen_get_height(screen);
+
 			if(valtric_mosaic<0)step*=-1;
-			for(y=0;y<machine->screen[0].width+step;y+=step)
-				for(x=0;x<machine->screen[0].height+step;x+=step)
+
+			for(y=0;y<width+step;y+=step)
+				for(x=0;x<height+step;x+=step)
 				{
 					static int c=0;
 
-					if(y<machine->screen[0].height && x< machine->screen[0].width)
-					{
+					if(y<height && x< width)
 						c=*BITMAP_ADDR32(mosaicbitmap, y, x);
-					}
 
 					if(valtric_mosaic<0)
-					{
-						if(y+step-1<machine->screen[0].height && x+step-1< machine->screen[0].width)
-						{
+						if(y+step-1<height && x+step-1< width)
 							c = *BITMAP_ADDR32(mosaicbitmap, y+step-1, x+step-1);
-						}
-					}
+
 					for(yy=0;yy<step;yy++)
 					 for(xx=0;xx<step;xx++)
 					 {
-							if(xx+x < machine->screen[0].width && yy+y<machine->screen[0].height)
+							if(xx+x < width && yy+y<height)
 							{
 					 			dest=BITMAP_ADDR32(bitmap, y+yy, x+xx);
 								*dest=c;
@@ -1588,18 +1585,18 @@ VIDEO_UPDATE( valtric )
 		 }
 	}
 
-	valtric_draw_sprites(machine, bitmap, cliprect);
+	valtric_draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( butasan )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
-	butasan_draw_sprites(machine, bitmap, cliprect);
+	butasan_draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
 
 #ifdef MAME_DEBUG
@@ -1611,16 +1608,16 @@ VIDEO_UPDATE( butasan )
 
 VIDEO_UPDATE( bombsa )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
 //  tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
-//  valtric_draw_sprites(bitmap, cliprect);
+//  valtric_draw_sprites(screen->bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bombsa_bg_tilemap,  0, 0);
 
 #if 0
 	tilemap_draw(bitmap, cliprect, tx_alt_tilemap,  0, 0);
 #endif
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
-	bombsa_draw_sprites(machine, bitmap,cliprect);
+	bombsa_draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

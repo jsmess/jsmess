@@ -179,8 +179,8 @@ static void z88_install_memory_handler_pair(offs_t start, offs_t size, int bank_
 	read8_machine_func read_handler;
 	write8_machine_func write_handler;
 
-	read_handler  = read_addr  ? (read8_machine_func)  (STATIC_BANK1 + (FPTR)(bank_base - 1 + 0)) : MRA8_ROM;
-	write_handler = write_addr ? (write8_machine_func) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : MWA8_UNMAP;
+	read_handler  = read_addr  ? (read8_machine_func)  (STATIC_BANK1 + (FPTR)(bank_base - 1 + 0)) : SMH_ROM;
+	write_handler = write_addr ? (write8_machine_func) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : SMH_UNMAP;
 
 	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, read_handler);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, write_handler);
@@ -289,11 +289,11 @@ static MACHINE_RESET( z88 )
 }
 
 static ADDRESS_MAP_START(z88_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(MRA8_BANK1, MWA8_BANK6)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(MRA8_BANK2, MWA8_BANK7)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(MRA8_BANK3, MWA8_BANK8)
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK4, MWA8_BANK9)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(MRA8_BANK5, MWA8_BANK10)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(SMH_BANK1, SMH_BANK6)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(SMH_BANK2, SMH_BANK7)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK3, SMH_BANK8)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK4, SMH_BANK9)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK5, SMH_BANK10)
 ADDRESS_MAP_END
 
 static void blink_pb_w(int offset, int data, int reg_index)
@@ -602,7 +602,7 @@ static  READ8_HANDLER(z88_port_r)
 
 
 static ADDRESS_MAP_START( z88_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(16) )
+	ADDRESS_MAP_GLOBAL_MASK(0xFFFF)
 	AM_RANGE(0x0000, 0x0ffff) AM_READWRITE(z88_port_r, z88_port_w)
 ADDRESS_MAP_END
 

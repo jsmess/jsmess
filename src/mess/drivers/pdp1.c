@@ -70,8 +70,8 @@ and the java source).
  * This gives sometimes IO warnings!
  */
 #ifdef SUPPORT_ODD_WORD_SIZES
-#define pdp1_read_mem MRA32_RAM
-#define pdp1_write_mem MWA32_RAM
+#define pdp1_read_mem SMH_RAM
+#define pdp1_write_mem SMH_RAM
 #endif
 static ADDRESS_MAP_START(pdp1_map, ADDRESS_SPACE_PROGRAM, 32)
 #if 0

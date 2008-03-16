@@ -166,14 +166,14 @@ static ADDRESS_MAP_START( polyplay_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x8fff) AM_ROM
 	AM_RANGE(0xe800, 0xebff) AM_ROM
-	AM_RANGE(0xec00, 0xf7ff) AM_READWRITE(MRA8_RAM, polyplay_characterram_w) AM_BASE(&polyplay_characterram)
+	AM_RANGE(0xec00, 0xf7ff) AM_READWRITE(SMH_RAM, polyplay_characterram_w) AM_BASE(&polyplay_characterram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
 /* port mapping */
 static ADDRESS_MAP_START( polyplay_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(polyplay_sound_channel)
 	AM_RANGE(0x82, 0x82) AM_WRITE(polyplay_start_timer2)
 	AM_RANGE(0x83, 0x83) AM_READ(polyplay_random_read)

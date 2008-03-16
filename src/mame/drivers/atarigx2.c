@@ -20,7 +20,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
@@ -68,7 +67,7 @@ static MACHINE_RESET( atarigx2 )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, atarigx2_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, atarigx2_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -145,7 +144,7 @@ static WRITE32_HANDLER( latch_w )
 
 	/* lower byte */
 	if (!(mem_mask & 0x00ff0000))
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -1147,7 +1146,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 		if (lookup_table[i][0] == 0xffffffff)
 		{
 			if (last_write_offset*2 >= 0x700 && last_write_offset*2 < 0x720)
-				result = mame_rand(Machine) << 16;
+				result = mame_rand(machine) << 16;
 			else
 				result = 0xffff << 16;
 			logerror("%06X:Unhandled protection R@%04X = %04X\n", activecpu_get_previouspc(), offset, result);
@@ -1182,13 +1181,13 @@ static READ32_HANDLER( inputs_01_r )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
 	AM_RANGE(0xca0000, 0xca0fff) AM_READWRITE(atarigx2_protection_r, atarigx2_protection_w) AM_BASE(&protection_base)
 	AM_RANGE(0xd00000, 0xd1ffff) AM_READ(a2d_data_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE(atarigen_eeprom_upper32_r, atarigen_eeprom32_w) AM_BASE((UINT32 **)&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0xd40000, 0xd40fff) AM_READWRITE(MRA32_RAM, atarigen_666_paletteram32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0xd40000, 0xd40fff) AM_READWRITE(SMH_RAM, atarigen_666_paletteram32_w) AM_BASE(&paletteram32)
 	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE(atarigen_playfield32_w) AM_BASE(&atarigen_playfield32)
 	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE(atarigen_alpha32_w) AM_BASE(&atarigen_alpha32)
 	AM_RANGE(0xd78000, 0xd78fff) AM_WRITE(atarirle_0_spriteram32_w) AM_BASE(&atarirle_0_spriteram32)
@@ -1198,7 +1197,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xe06000, 0xe06003) AM_WRITE(atarigen_sound_upper32_w)
 	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
 	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE(atarigen_video_int_ack32_w)
-	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITE(MWA32_NOP)//watchdog_reset_w },
+	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITE(SMH_NOP)//watchdog_reset_w },
 	AM_RANGE(0xe80000, 0xe80003) AM_READ(inputs_01_r)
 	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
 	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)

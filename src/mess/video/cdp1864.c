@@ -198,12 +198,16 @@ MACHINE_RESET( cdp1864 )
 
 VIDEO_START( cdp1864 )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+
 	cdp1864_int_timer = timer_alloc(cdp1864_int_tick, NULL);
 	cdp1864_efx_timer = timer_alloc(cdp1864_efx_tick, NULL);
 	cdp1864_dma_timer = timer_alloc(cdp1864_dma_tick, NULL);
 
 	/* allocate the temporary bitmap */
-	cdptmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	cdptmpbitmap = auto_bitmap_alloc(width, height, video_screen_get_format(screen));
 
 	/* ensure the contents of the bitmap are saved */
 	state_save_register_bitmap("video", 0, "cdptmpbitmap", cdptmpbitmap);
@@ -220,12 +224,12 @@ VIDEO_UPDATE( cdp1864 )
 {
 	if (cdp1864.disp)
 	{
-		fillbitmap(bitmap, machine->pens[cdp1864_bgcolseq[cdp1864.bgcolor]], cliprect);
+		fillbitmap(bitmap, screen->machine->pens[cdp1864_bgcolseq[cdp1864.bgcolor]], cliprect);
 		copybitmap_trans(bitmap, cdptmpbitmap, 0, 0, 0, 0, cliprect, cdp1864.bgcolor);
 	}
 	else
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	}
 
 	return 0;

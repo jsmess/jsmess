@@ -69,7 +69,7 @@ static UINT16 *textram;
 	 				{ \
 	 					UINT16 data0=map[y*128+x*2]; \
 	 					UINT16 data1=map[y*128+x*2+1]; \
-	 					drawgfx(bitmap,machine->gfx[0], data1, \
+	 					drawgfx(bitmap,screen->machine->gfx[0], data1, \
 		 					data0&0xff, \
 							data0&0x4000, data0&0x8000, \
 							x*16-512/*+(((INT16)(unkram[0x60000/2+num]))/32)*/, y*16/*+(((INT16)(unkram[0x60008/2+num]))/32)*/, \
@@ -84,7 +84,7 @@ static VIDEO_UPDATE( drill )
 
 	for (i=0; i<256; i++)
 	{
-		decodechar(machine->gfx[1],i,(UINT8*)&charram[0]);
+		decodechar(screen->machine->gfx[1],i,(UINT8*)&charram[0]);
 	}
 
 	DRAW_MAP(map1ram,0)
@@ -99,7 +99,7 @@ static VIDEO_UPDATE( drill )
 	 		for(x=0;x<64;x++)
 	 		{
 	 			drawgfx(	bitmap,
-						machine->gfx[1],
+						screen->machine->gfx[1],
 						textram[y*64+x]&0xff, //1ff ??
 						((textram[y*64+x]>>9)&0xf),
 						0, 0,
@@ -135,13 +135,13 @@ static ADDRESS_MAP_START( drill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE(&unkram)// video stuff, 460000 - video regs ?
 	AM_RANGE(0x500000, 0x501fff) AM_RAM AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x502000, 0x503fff) AM_RAM
-	AM_RANGE(0x700000, 0x70000f) AM_READ(drill_unk_r) AM_WRITE(MWA16_NOP) // i/o
+	AM_RANGE(0x700000, 0x70000f) AM_READ(drill_unk_r) AM_WRITE(SMH_NOP) // i/o
 	AM_RANGE(0x600000, 0x600001) AM_READ(YM2610_status_port_0_A_lsb_r) AM_WRITE(YM2610_control_port_0_A_lsb_w)
 	AM_RANGE(0x600002, 0x600003) AM_READ(YM2610_read_port_0_lsb_r) AM_WRITE(YM2610_data_port_0_A_lsb_w)
 	AM_RANGE(0x600004, 0x600005) AM_READ(YM2610_status_port_0_B_lsb_r) AM_WRITE(YM2610_control_port_0_B_lsb_w)
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(YM2610_data_port_0_B_lsb_w)
-	AM_RANGE(0x60000c, 0x60000d) AM_READ(MRA16_NOP) AM_WRITE(MWA16_NOP)
-	AM_RANGE(0x60000e, 0x60000f) AM_READ(MRA16_NOP) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x60000c, 0x60000d) AM_READ(SMH_NOP) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x60000e, 0x60000f) AM_READ(SMH_NOP) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( drill )

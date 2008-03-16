@@ -410,9 +410,9 @@ static ADDRESS_MAP_START(tutor_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)	/*VDP data*/
 	AM_RANGE(0xe002, 0xe002) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)/*VDP status*/
 	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)	/*cartridge mapper*/
-	AM_RANGE(0xe200, 0xe200) AM_READWRITE(MRA8_NOP, SN76496_0_w)			/*sound chip*/
+	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, SN76496_0_w)			/*sound chip*/
 	AM_RANGE(0xe800, 0xe8ff) AM_READWRITE(tutor_printer_r, tutor_printer_w)	/*printer*/
-	AM_RANGE(0xee00, 0xeeff) AM_READWRITE(MRA8_NOP, tutor_cassette_w)		/*cassette interface*/
+	AM_RANGE(0xee00, 0xeeff) AM_READWRITE(SMH_NOP, tutor_cassette_w)		/*cassette interface*/
 
 	AM_RANGE(0xf000, 0xffff) AM_NOP	/*free for expansion (and internal processor RAM)*/
 

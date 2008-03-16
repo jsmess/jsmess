@@ -134,7 +134,7 @@ VIDEO_START( cbmb_crtc );
 VIDEO_UPDATE( cbmb_crtc );
 MC6845_UPDATE_ROW( cbm600_update_row );
 MC6845_UPDATE_ROW( cbm700_update_row );
-void cbmb_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled);
+MC6845_ON_DE_CHANGED( cbmb_display_enable_changed );
 
 void cbm600_vh_init(void);
 void cbm700_vh_init(void);

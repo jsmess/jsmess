@@ -58,10 +58,10 @@ WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM, kyugo_bgvideoram_w) AM_BASE(&kyugo_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(MRA8_RAM, kyugo_bgattribram_w) AM_BASE(&kyugo_bgattribram)
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(MRA8_RAM, kyugo_fgvideoram_w) AM_BASE(&kyugo_fgvideoram)
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(kyugo_spriteram_2_r, MWA8_RAM) AM_BASE(&kyugo_spriteram_2)
+	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(SMH_RAM, kyugo_bgvideoram_w) AM_BASE(&kyugo_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(SMH_RAM, kyugo_bgattribram_w) AM_BASE(&kyugo_bgattribram)
+	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(SMH_RAM, kyugo_fgvideoram_w) AM_BASE(&kyugo_fgvideoram)
+	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(kyugo_spriteram_2_r, SMH_RAM) AM_BASE(&kyugo_spriteram_2)
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(&kyugo_spriteram_1)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(kyugo_scroll_x_lo_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 
 #define Main_PortMap( name, base )										\
 static ADDRESS_MAP_START( name##_portmap, ADDRESS_SPACE_IO, 8 )			\
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )									\
+	ADDRESS_MAP_GLOBAL_MASK(0xff)									\
 	AM_RANGE(base+0, base+0) AM_WRITE(interrupt_enable_w)				\
 	AM_RANGE(base+1, base+1) AM_WRITE(kyugo_flipscreen_w)				\
 	AM_RANGE(base+2, base+2) AM_WRITE(kyugo_sub_cpu_control_w)			\
@@ -123,7 +123,7 @@ Sub_MemMap( flashgla, 0x7fff, 0xe000, 0xc040, 0xc080, 0xc0c0 )
 
 #define Sub_PortMap( name, ay0_base, ay1_base )								\
 static ADDRESS_MAP_START( name##_sub_portmap, ADDRESS_SPACE_IO, 8 )			\
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )										\
+	ADDRESS_MAP_GLOBAL_MASK(0xff)										\
 	AM_RANGE(ay0_base+0, ay0_base+0) AM_WRITE(AY8910_control_port_0_w)		\
 	AM_RANGE(ay0_base+1, ay0_base+1) AM_WRITE(AY8910_write_port_0_w)		\
 	AM_RANGE(ay0_base+2, ay0_base+2) AM_READ(AY8910_read_port_0_r)			\
@@ -1243,13 +1243,13 @@ static DRIVER_INIT( gyrodine )
 static DRIVER_INIT( srdmissn )
 {
 	/* shared RAM is mapped at 0xe000 as well  */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, MRA8_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, MWA8_BANK1);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, shared_ram);
 
 	/* extra RAM on sub CPU  */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8800, 0x8fff, 0, 0, MRA8_BANK2);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8800, 0x8fff, 0, 0, MWA8_BANK2);
+	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8800, 0x8fff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8800, 0x8fff, 0, 0, SMH_BANK2);
 	memory_set_bankptr(2, auto_malloc(0x800));
 }
 

@@ -487,7 +487,10 @@ static PALETTE_INIT( apexc )
 
 static VIDEO_START( apexc )
 {
-	apexc_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+	apexc_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	fillbitmap(apexc_bitmap, machine->pens[0], &/*machine->visible_area*/teletyper_window);
 }
 
@@ -505,7 +508,7 @@ static void apexc_draw_led(running_machine *machine, bitmap_t *bitmap, int x, in
 static void apexc_draw_char(running_machine *machine, bitmap_t *bitmap, char character, int x, int y, int color)
 {
 	drawgfx(bitmap, machine->gfx[0], character-32, color, 0, 0,
-				x+1, y, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+				x+1, y, NULL, TRANSPARENCY_PEN, 0);
 }
 
 /* write a string on screen */
@@ -526,31 +529,27 @@ static VIDEO_UPDATE( apexc )
 	int i;
 	char the_char;
 
-
-	/*if (full_refresh)*/
-	{
-		fillbitmap(bitmap, machine->pens[0], &/*machine->visible_area*/panel_window);
-		apexc_draw_string(machine, bitmap, "power", 8, 0, 0);
-		apexc_draw_string(machine, bitmap, "running", 8, 8, 0);
-		apexc_draw_string(machine, bitmap, "data :", 0, 24, 0);
-	}
+	fillbitmap(bitmap, screen->machine->pens[0], &/*machine->visible_area*/panel_window);
+	apexc_draw_string(screen->machine, bitmap, "power", 8, 0, 0);
+	apexc_draw_string(screen->machine, bitmap, "running", 8, 8, 0);
+	apexc_draw_string(screen->machine, bitmap, "data :", 0, 24, 0);
 
 	copybitmap(bitmap, apexc_bitmap, 0, 0, 0, 0, &teletyper_window);
 
 
-	apexc_draw_led(machine, bitmap, 0, 0, 1);
+	apexc_draw_led(screen->machine, bitmap, 0, 0, 1);
 
-	apexc_draw_led(machine, bitmap, 0, 8, cpunum_get_reg(0, APEXC_STATE));
+	apexc_draw_led(screen->machine, bitmap, 0, 8, cpunum_get_reg(0, APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{
-		apexc_draw_led(machine, bitmap, i*8, 32, (panel_data_reg << i) & 0x80000000UL);
+		apexc_draw_led(screen->machine, bitmap, i*8, 32, (panel_data_reg << i) & 0x80000000UL);
 		the_char = '0' + ((i + 1) % 10);
-		apexc_draw_char(machine, bitmap, the_char, i*8, 40, 0);
+		apexc_draw_char(screen->machine, bitmap, the_char, i*8, 40, 0);
 		if (((i + 1) % 10) == 0)
 		{
 			the_char = '0' + ((i + 1) / 10);
-			apexc_draw_char(machine, bitmap, the_char, i*8, 48, 0);
+			apexc_draw_char(screen->machine, bitmap, the_char, i*8, 48, 0);
 		}
 	}
 	return 0;

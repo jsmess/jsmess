@@ -45,9 +45,9 @@
     covered by the roms for these interfaces, can be accessed
     if it is enabled.
 
-    MRA8_BANK1,MRA8_BANK2 and MRA8_BANK3 are used for a 16k rom.
-    MRA8_BANK2 and MRA8_BANK3 are used for a 8k rom.
-    MRA8_BANK3 is used for a 2k rom.
+    SMH_BANK1,SMH_BANK2 and SMH_BANK3 are used for a 16k rom.
+    SMH_BANK2 and SMH_BANK3 are used for a 8k rom.
+    SMH_BANK3 is used for a 2k rom.
 
     0x0300-0x03ff is I/O access. It is not defined below because the
     memory is setup dynamically depending on hardware that has been selected (microdisc, jasmin, apple2) etc.
@@ -57,9 +57,9 @@
 
 static ADDRESS_MAP_START(oric_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0xbfff) AM_RAM AM_BASE( &oric_ram )
-    AM_RANGE( 0xc000, 0xdfff) AM_READWRITE( MRA8_BANK1, MWA8_BANK5 )
-	AM_RANGE( 0xe000, 0xf7ff) AM_READWRITE( MRA8_BANK2, MWA8_BANK6 )
-	AM_RANGE( 0xf800, 0xffff) AM_READWRITE( MRA8_BANK3, MWA8_BANK7 )
+    AM_RANGE( 0xc000, 0xdfff) AM_READWRITE( SMH_BANK1, SMH_BANK5 )
+	AM_RANGE( 0xe000, 0xf7ff) AM_READWRITE( SMH_BANK2, SMH_BANK6 )
+	AM_RANGE( 0xf800, 0xffff) AM_READWRITE( SMH_BANK3, SMH_BANK7 )
 ADDRESS_MAP_END
 
 /*
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START(telestrat_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x031c, 0x031f) AM_READWRITE( acia_6551_r, acia_6551_w )
 	AM_RANGE( 0x0320, 0x032f) AM_READWRITE( via_1_r, via_1_w )
 	AM_RANGE( 0x0400, 0xbfff) AM_RAM
-	AM_RANGE( 0xc000, 0xffff) AM_READWRITE( MRA8_BANK1, MWA8_BANK2 )
+	AM_RANGE( 0xc000, 0xffff) AM_READWRITE( SMH_BANK1, SMH_BANK2 )
 ADDRESS_MAP_END
 
 

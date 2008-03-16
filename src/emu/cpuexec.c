@@ -742,29 +742,6 @@ void cpu_triggerint(running_machine *machine, int cpunum)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_scalebyfcount - scale by time between
-    refresh timers
--------------------------------------------------*/
-
-int cpu_scalebyfcount(int value)
-{
-//  attotime refresh_elapsed = timer_timeelapsed(refresh_timer);
-//  int result;
-
-	/* shift off some bits to ensure no overflow */
-//  if (value < 65536)
-//      result = value * (refresh_elapsed.attoseconds >> 16) / (refresh_period.attoseconds >> 16);
-//  else
-//      result = value * (refresh_elapsed.attoseconds >> 32) / (refresh_period.attoseconds >> 32);
-//  if (value >= 0)
-//      return (result < value) ? result : value;
-//  else
-//      return (result > value) ? result : value;
-	return 0;
-}
-
-
-/*-------------------------------------------------
     cpu_getiloops - return the cheesy VBLANK
     interrupt counter (deprecated)
 -------------------------------------------------*/
@@ -785,27 +762,18 @@ int cpu_getiloops(void)
     for this screen
 -------------------------------------------------*/
 
-static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
+static void on_vblank(const device_config *device, int vblank_state)
 {
 	/* VBLANK starting */
 	if (vblank_state)
 	{
 		int cpunum;
-		const char *screen_tag = NULL;
-		const device_config *device;
-
-		/* get the screen's tag */
-		for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
-			if (device->token == screen)
-				screen_tag = device->tag;
-
-		assert(screen_tag != NULL);
 
 		/* find any CPUs that have this screen as their VBLANK interrupt source */
 		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 		{
 			int cpu_interested;
-			const cpu_config *config = machine->config->cpu + cpunum;
+			const cpu_config *config = device->machine->config->cpu + cpunum;
 
 			/* start the interrupt counter */
 			if (!(cpu[cpunum].suspend & SUSPEND_REASON_DISABLE))
@@ -813,13 +781,13 @@ static void on_vblank(running_machine *machine, screen_state *screen, int vblank
 			else
 				cpu[cpunum].iloops = -1;
 
-			/* the hack style VBLANK decleration uses the first screen always */
+			/* the hack style VBLANK decleration always uses the first screen */
 			if (config->vblank_interrupts_per_frame > 1)
 				cpu_interested = TRUE;
 
 			/* for new style decleration, we need to compare the tags */
 			else if (config->vblank_interrupts_per_frame == 1)
-				cpu_interested = (strcmp(config->vblank_interrupt_screen, screen_tag) == 0);
+				cpu_interested = (strcmp(config->vblank_interrupt_screen, device->tag) == 0);
 
 			/* no VBLANK interrupt, not interested */
 			else
@@ -831,7 +799,7 @@ static void on_vblank(running_machine *machine, screen_state *screen, int vblank
 				if (!cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 				{
 					cpuintrf_push_context(cpunum);
-					(*machine->config->cpu[cpunum].vblank_interrupt)(machine, cpunum);
+					(*device->machine->config->cpu[cpunum].vblank_interrupt)(device->machine, cpunum);
 					cpuintrf_pop_context();
 				}
 
@@ -839,7 +807,7 @@ static void on_vblank(running_machine *machine, screen_state *screen, int vblank
 				if ((config->vblank_interrupts_per_frame > 1) &&
 					!(cpu[cpunum].suspend & SUSPEND_REASON_DISABLE))
 				{
-					cpu[cpunum].partial_frame_period = attotime_div(video_screen_get_frame_period(0), config->vblank_interrupts_per_frame);
+					cpu[cpunum].partial_frame_period = attotime_div(video_screen_get_frame_period(device->machine->primary_screen), config->vblank_interrupts_per_frame);
 					timer_adjust_oneshot(cpu[cpunum].partial_frame_timer, cpu[cpunum].partial_frame_period, cpunum);
 				}
 			}
@@ -960,7 +928,7 @@ static void cpu_inittimers(running_machine *machine)
 	ipf = machine->config->cpu_slices_per_frame;
 	if (ipf <= 0)
 		ipf = 1;
-	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : machine->screen[0].refresh;
+	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : video_screen_get_frame_period(machine->primary_screen).attoseconds;
 	timeslice_period = attotime_make(0, refresh_attosecs / ipf);
 	timeslice_timer = timer_alloc(cpu_timeslicecallback, NULL);
 	timer_adjust_periodic(timeslice_timer, timeslice_period, 0, timeslice_period);
@@ -977,27 +945,26 @@ static void cpu_inittimers(running_machine *machine)
 		/* VBLANK interrupts */
 		if (config->vblank_interrupts_per_frame > 0)
 		{
-			const char *screen_tag;
-			screen_state *screen;
+			const device_config *screen;
 
 			/* get the screen that will trigger the VBLANK */
 
 			/* new style - use screen tag directly */
 			if (config->vblank_interrupts_per_frame == 1)
-				screen_tag = config->vblank_interrupt_screen;
+				screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, config->vblank_interrupt_screen);
 
 			/* old style 'hack' setup - use screen #0 */
 			else
 			{
-				const device_config *config = device_list_first(machine->config->devicelist, VIDEO_SCREEN);
-				screen_tag = config->tag;
+				screen = device_list_first(machine->config->devicelist, VIDEO_SCREEN);
 
 				/* allocate timer that will trigger the partial frame updates */
 				cpu[cpunum].partial_frame_timer = timer_alloc(trigger_partial_frame_interrupt, 0);
 			}
 
-			screen = devtag_get_token(machine, VIDEO_SCREEN, screen_tag);
-			video_screen_register_vbl_cb(machine, screen, on_vblank);
+			assert(screen != NULL);
+
+			video_screen_register_vbl_cb(screen, on_vblank);
 		}
 
 		/* periodic interrupts */

@@ -20,7 +20,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "rendlay.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
@@ -39,7 +38,6 @@ static void update_interrupts(running_machine *machine)
 {
 	int newstate1 = 0;
 	int newstate2 = 0;
-	int temp;
 
 	if (atarigen_sound_int_state)
 		newstate1 |= 1;
@@ -55,11 +53,6 @@ static void update_interrupts(running_machine *machine)
 		cpunum_set_input_line(machine, 2, newstate2, ASSERT_LINE);
 	else
 		cpunum_set_input_line(machine, 2, 7, CLEAR_LINE);
-
-	/* check for screen swapping */
-	temp = readinputport(2);
-	if (temp & 1) cyberbal_set_screen(0);
-	else if (temp & 2) cyberbal_set_screen(1);
 }
 
 
@@ -68,16 +61,13 @@ static MACHINE_RESET( cyberbal )
 	atarigen_eeprom_reset();
 	atarigen_slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, cyberbal_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, cyberbal_scanline_update, 8);
 	atarigen_sound_io_reset(1);
 
 	cyberbal_sound_reset();
 
 	/* CPU 2 doesn't run until reset */
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
-
-	/* make sure we're pointing to the right screen by default */
-	cyberbal_set_screen(0);
 }
 
 
@@ -101,11 +91,8 @@ static MACHINE_RESET( cyberb2p )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(cyberb2p_update_interrupts);
-	atarigen_scanline_timer_reset(0, cyberbal_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, cyberbal_scanline_update, 8);
 	atarijsa_reset();
-
-	/* make sure we're pointing to the only screen */
-	cyberbal_set_screen(0);
 }
 
 
@@ -149,7 +136,7 @@ static READ16_HANDLER( sound_state_r )
 
 static WRITE16_HANDLER( p2_reset_w )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -171,17 +158,17 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfd8000, 0xfd9fff) AM_WRITE(atarigen_sound_upper_w)
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ(special_port0_r)
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfe8000, 0xfe8fff) AM_READWRITE(MRA16_RAM, cyberbal_paletteram_1_w) AM_SHARE(1) AM_BASE(&cyberbal_paletteram_1)
-	AM_RANGE(0xfec000, 0xfecfff) AM_READWRITE(MRA16_RAM, cyberbal_paletteram_0_w) AM_SHARE(2) AM_BASE(&cyberbal_paletteram_0)
-	AM_RANGE(0xff0000, 0xff1fff) AM_READWRITE(MRA16_RAM, atarigen_playfield2_w)   AM_SHARE(3) AM_BASE(&atarigen_playfield2)
-	AM_RANGE(0xff2000, 0xff2fff) AM_READWRITE(MRA16_RAM, atarigen_alpha2_w)       AM_SHARE(4) AM_BASE(&atarigen_alpha2)
-	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE(MRA16_RAM, atarimo_1_spriteram_w)   AM_SHARE(5) AM_BASE(&atarimo_1_spriteram)
+	AM_RANGE(0xfe8000, 0xfe8fff) AM_READWRITE(SMH_RAM, cyberbal_paletteram_1_w) AM_SHARE(1) AM_BASE(&cyberbal_paletteram_1)
+	AM_RANGE(0xfec000, 0xfecfff) AM_READWRITE(SMH_RAM, cyberbal_paletteram_0_w) AM_SHARE(2) AM_BASE(&cyberbal_paletteram_0)
+	AM_RANGE(0xff0000, 0xff1fff) AM_READWRITE(SMH_RAM, atarigen_playfield2_w)   AM_SHARE(3) AM_BASE(&atarigen_playfield2)
+	AM_RANGE(0xff2000, 0xff2fff) AM_READWRITE(SMH_RAM, atarigen_alpha2_w)       AM_SHARE(4) AM_BASE(&atarigen_alpha2)
+	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE(SMH_RAM, atarimo_1_spriteram_w)   AM_SHARE(5) AM_BASE(&atarimo_1_spriteram)
 	AM_RANGE(0xff3800, 0xff3fff) AM_RAM                                           AM_SHARE(6)
-	AM_RANGE(0xff4000, 0xff5fff) AM_READWRITE(MRA16_RAM, atarigen_playfield_w)    AM_SHARE(7) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0xff6000, 0xff6fff) AM_READWRITE(MRA16_RAM, atarigen_alpha_w)        AM_SHARE(8) AM_BASE(&atarigen_alpha)
-	AM_RANGE(0xff7000, 0xff77ff) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_w)   AM_SHARE(9) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xff4000, 0xff5fff) AM_READWRITE(SMH_RAM, atarigen_playfield_w)    AM_SHARE(7) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0xff6000, 0xff6fff) AM_READWRITE(SMH_RAM, atarigen_alpha_w)        AM_SHARE(8) AM_BASE(&atarigen_alpha)
+	AM_RANGE(0xff7000, 0xff77ff) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_w)   AM_SHARE(9) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xff7800, 0xff9fff) AM_RAM                                           AM_SHARE(10)
-	AM_RANGE(0xffa000, 0xffbfff) AM_READWRITE(MRA16_RAM, MWA16_NOP)               AM_SHARE(11)
+	AM_RANGE(0xffa000, 0xffbfff) AM_READWRITE(SMH_RAM, SMH_NOP)               AM_SHARE(11)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                                           AM_SHARE(12)
 ADDRESS_MAP_END
 
@@ -198,18 +185,18 @@ static ADDRESS_MAP_START( extra_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xfdffff) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ(special_port0_r)
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfe8000, 0xfe8fff) AM_READWRITE(MRA16_RAM, cyberbal_paletteram_1_w) AM_SHARE(1)
-	AM_RANGE(0xfec000, 0xfecfff) AM_READWRITE(MRA16_RAM, cyberbal_paletteram_0_w) AM_SHARE(2)
-	AM_RANGE(0xff0000, 0xff1fff) AM_READWRITE(MRA16_RAM, atarigen_playfield2_w)   AM_SHARE(3)
-	AM_RANGE(0xff2000, 0xff2fff) AM_READWRITE(MRA16_RAM, atarigen_alpha2_w)       AM_SHARE(4)
-	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE(MRA16_RAM, atarimo_1_spriteram_w)   AM_SHARE(5)
+	AM_RANGE(0xfe8000, 0xfe8fff) AM_READWRITE(SMH_RAM, cyberbal_paletteram_1_w) AM_SHARE(1)
+	AM_RANGE(0xfec000, 0xfecfff) AM_READWRITE(SMH_RAM, cyberbal_paletteram_0_w) AM_SHARE(2)
+	AM_RANGE(0xff0000, 0xff1fff) AM_READWRITE(SMH_RAM, atarigen_playfield2_w)   AM_SHARE(3)
+	AM_RANGE(0xff2000, 0xff2fff) AM_READWRITE(SMH_RAM, atarigen_alpha2_w)       AM_SHARE(4)
+	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE(SMH_RAM, atarimo_1_spriteram_w)   AM_SHARE(5)
 	AM_RANGE(0xff3800, 0xff3fff) AM_RAM                                           AM_SHARE(6)
-	AM_RANGE(0xff4000, 0xff5fff) AM_READWRITE(MRA16_RAM, atarigen_playfield_w)    AM_SHARE(7)
-	AM_RANGE(0xff6000, 0xff6fff) AM_READWRITE(MRA16_RAM, atarigen_alpha_w)        AM_SHARE(8)
-	AM_RANGE(0xff7000, 0xff77ff) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_w)   AM_SHARE(9)
+	AM_RANGE(0xff4000, 0xff5fff) AM_READWRITE(SMH_RAM, atarigen_playfield_w)    AM_SHARE(7)
+	AM_RANGE(0xff6000, 0xff6fff) AM_READWRITE(SMH_RAM, atarigen_alpha_w)        AM_SHARE(8)
+	AM_RANGE(0xff7000, 0xff77ff) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_w)   AM_SHARE(9)
 	AM_RANGE(0xff7800, 0xff9fff) AM_RAM                                           AM_SHARE(10)
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM                                           AM_SHARE(11)
-	AM_RANGE(0xffc000, 0xffffff) AM_READWRITE(MRA16_RAM, MWA16_NOP)               AM_SHARE(12)
+	AM_RANGE(0xffc000, 0xffffff) AM_READWRITE(SMH_RAM, SMH_NOP)               AM_SHARE(12)
 ADDRESS_MAP_END
 
 
@@ -268,16 +255,16 @@ static ADDRESS_MAP_START( cyberb2p_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc4000, 0xfc4003) AM_READ(special_port2_r)
 	AM_RANGE(0xfc6000, 0xfc6003) AM_READ(atarigen_sound_upper_r)
 	AM_RANGE(0xfc8000, 0xfc8fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0xfca000, 0xfcafff) AM_READWRITE(MRA16_RAM, atarigen_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfca000, 0xfcafff) AM_READWRITE(SMH_RAM, atarigen_666_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xfd0000, 0xfd0003) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0xfd2000, 0xfd2003) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0xfd4000, 0xfd4003) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfd6000, 0xfd6003) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0xfd8000, 0xfd8003) AM_WRITE(atarigen_sound_upper_w)
 	AM_RANGE(0xfe0000, 0xfe0003) AM_READ(sound_state_r)
-	AM_RANGE(0xff0000, 0xff1fff) AM_READWRITE(MRA16_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0xff2000, 0xff2fff) AM_READWRITE(MRA16_RAM, atarigen_alpha_w) AM_BASE(&atarigen_alpha)
-	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xff0000, 0xff1fff) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0xff2000, 0xff2fff) AM_READWRITE(SMH_RAM, atarigen_alpha_w) AM_BASE(&atarigen_alpha)
+	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xff3800, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1032,15 +1019,15 @@ static DRIVER_INIT( cyberb2p )
  *
  *************************************/
 
-GAMEL( 1988, cyberbal, 0,        cyberbal, cyberbal, cyberbal, ROT0, "Atari Games", "Cyberball (rev 4)", 0, layout_dualhsxs )
-GAMEL( 1988, cyberba2, cyberbal, cyberbal, cyberbal, cyberbal, ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
-GAMEL( 1988, cyberbap, cyberbal, cyberbal, cyberbal, cyberbal, ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbal, 0,        cyberbal, cyberbal, cyberbal, ROT0, "Atari Games", "Cyberball (rev 4)", 0, layout_dualhsxs )
+GAMEL(1988, cyberba2, cyberbal, cyberbal, cyberbal, cyberbal, ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbap, cyberbal, cyberbal, cyberbal, cyberbal, ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
 
 GAME( 1989, cyberb2p, cyberbal, cyberb2p, cyberb2p, cyberb2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )
 GAME( 1989, cyberb23, cyberbal, cyberb2p, cyberb2p, cyberb2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 3)", 0 )
 GAME( 1989, cyberb22, cyberbal, cyberb2p, cyberb2p, cyberb2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 2)", 0 )
 GAME( 1989, cyberb21, cyberbal, cyberb2p, cyberb2p, cyberb2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 1)", 0 )
 
-GAMEL( 1989, cyberbt,  cyberbal, cyberbal, cyberbal, cyberbt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
-GAMEL( 1989, cyberbt1, cyberbal, cyberbal, cyberbal, cyberbt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )
+GAMEL(1989, cyberbt,  cyberbal, cyberbal, cyberbal, cyberbt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
+GAMEL(1989, cyberbt1, cyberbal, cyberbal, cyberbal, cyberbt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )
 

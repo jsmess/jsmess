@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITENOP
 	AM_RANGE(0x1d0002, 0x1d0003) AM_NOP //sound reset ??
 
-	AM_RANGE(0x2d0000, 0x2d0001) AM_READ(MRA16_NOP) AM_WRITE(taitosound_port16_lsb_w)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_READ(SMH_NOP) AM_WRITE(taitosound_port16_lsb_w)
 	AM_RANGE(0x2d0002, 0x2d0003) AM_READ(taitosound_comm16_msb_r) AM_WRITE(taitosound_comm16_lsb_w)
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&ml_unk)//AM_SHARE(2)
@@ -169,11 +169,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x9001, 0x9001) AM_READ(YM2151_status_port_0_r) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x9002, 0x9100) AM_READ(MRA8_RAM)
+	AM_RANGE(0x9002, 0x9100) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r) AM_WRITE(taitosound_slave_comm_w)
 
@@ -205,14 +205,14 @@ static VIDEO_START(mlanding)
 	}
 
 	for	(i=0;i<8;i++)
-		ml_bitmap[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+		ml_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 static VIDEO_UPDATE(mlanding)
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
-	updateChars(machine);
+	updateChars(screen->machine);
 
 	{
 		int i,dx,dy,j,k,num;
@@ -245,7 +245,7 @@ static VIDEO_UPDATE(mlanding)
 				//test
 					if(code)
 					{
-						drawgfx(ml_bitmap[num],machine->gfx[0],
+						drawgfx(ml_bitmap[num],screen->machine->gfx[0],
 							code++,
 							0,
 							0,0,

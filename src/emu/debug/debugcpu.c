@@ -144,7 +144,7 @@ int mame_debug_is_active(void)
     on_vblank - called when a VBLANK hits
 -------------------------------------------------*/
 
-static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
+static void on_vblank(const device_config *device, int vblank_state)
 {
 	/* if we're configured to stop on VBLANK, break */
 	if (vblank_state && break_on_vblank)
@@ -296,7 +296,8 @@ void debug_cpu_init(running_machine *machine)
 	}
 
 	/* add callback for breaking on VBLANK */
-	video_screen_register_vbl_cb(machine, NULL, on_vblank);
+	if (machine->primary_screen != NULL)
+		video_screen_register_vbl_cb(machine->primary_screen, on_vblank);
 
 	add_exit_callback(machine, debug_cpu_exit);
 }
@@ -657,7 +658,13 @@ static UINT64 get_logunmap(UINT32 ref)
 
 static UINT64 get_beamx(UINT32 ref)
 {
-	return video_screen_get_hpos(ref);
+	UINT64 ret = 0;
+	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, ref);
+
+	if (screen != NULL)
+		ret = video_screen_get_hpos(screen);
+
+	return ret;
 }
 
 
@@ -667,7 +674,13 @@ static UINT64 get_beamx(UINT32 ref)
 
 static UINT64 get_beamy(UINT32 ref)
 {
-	return video_screen_get_vpos(ref);
+	UINT64 ret = 0;
+	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, ref);
+
+	if (screen != NULL)
+		ret = video_screen_get_vpos(screen);
+
+	return ret;
 }
 
 

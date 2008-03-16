@@ -74,9 +74,9 @@ VIDEO_UPDATE( pet )
 	{
 		for (x=0;x<40;x++, i++)
 		{
-			drawgfx(bitmap,machine->gfx[pet_font],
+			drawgfx(bitmap, screen->machine->gfx[pet_font],
 					videoram[i], 0, 0, 0, 8*x,8*y,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					NULL,TRANSPARENCY_NONE,0);
 		}
 	}
 	return 0;
@@ -88,7 +88,7 @@ MC6845_UPDATE_ROW( pet40_update_row )
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
-		drawgfx( bitmap, machine->gfx[pet_font], videoram[(ma+i)&0x3ff], 0, 0, 0, 8 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+		drawgfx( bitmap, device->machine->gfx[pet_font], videoram[(ma+i)&0x3ff], 0, 0, 0, 8 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 	}
 }
 
@@ -97,12 +97,12 @@ MC6845_UPDATE_ROW( pet80_update_row )
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
-		drawgfx( bitmap, machine->gfx[pet_font], videoram[((ma+i)<<1)&0x7ff], 0, 0, 0, 16 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
-		drawgfx( bitmap, machine->gfx[pet_font], videoram[(((ma+i)<<1)+1)&0x7ff], 0, 0, 0, 16 * i + 8, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+		drawgfx( bitmap, device->machine->gfx[pet_font], videoram[((ma+i)<<1)&0x7ff], 0, 0, 0, 16 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+		drawgfx( bitmap, device->machine->gfx[pet_font], videoram[(((ma+i)<<1)+1)&0x7ff], 0, 0, 0, 16 * i + 8, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 	}
 }
 
-void pet_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+MC6845_ON_DE_CHANGED( pet_display_enable_changed )
 {
 }
 

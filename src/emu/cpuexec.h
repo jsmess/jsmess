@@ -239,7 +239,7 @@ enum _cpu_type
 	CPU_MB8843,
 	CPU_MB8844,
 	CPU_MB86233,
-	CPU_SSP1610,
+	CPU_SSP1601,
 	CPU_MINX,
     CPU_COUNT
 };
@@ -258,7 +258,7 @@ struct _cpu_config
 	cpu_type		type;						/* index for the CPU type */
 	int				flags;						/* flags; see #defines below */
 	int				clock;						/* in Hertz */
-	construct_map_t construct_map[ADDRESS_SPACES][2]; /* 2 memory maps per address space */
+	const addrmap_token *address_map[ADDRESS_SPACES][2]; /* 2 memory maps per address space */
 	void 			(*vblank_interrupt)(running_machine *machine, int cpunum);	/* for interrupts tied to VBLANK */
 	int 			vblank_interrupts_per_frame;/* usually 1 */
 	const char *	vblank_interrupt_screen;	/* the screen that causes the VBLANK interrupt */

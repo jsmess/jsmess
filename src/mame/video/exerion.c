@@ -209,9 +209,8 @@ WRITE8_HANDLER( exerion_videoreg_w )
 
 WRITE8_HANDLER( exerion_video_latch_w )
 {
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 	background_latches[offset] = data;
-
-	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 }
 
 
@@ -220,13 +219,13 @@ READ8_HANDLER( exerion_video_timing_r )
 	/* bit 0 is the SNMI signal, which is the negated value of H6, if H7=1 & H8=1 & VBLANK=0, otherwise 1 */
 	/* bit 1 is VBLANK */
 
-	UINT16 hcounter = video_screen_get_hpos(0) + EXERION_HCOUNT_START;
+	UINT16 hcounter = video_screen_get_hpos(machine->primary_screen) + EXERION_HCOUNT_START;
 	UINT8 snmi = 1;
 
-	if (((hcounter & 0x180) == 0x180) && !video_screen_get_vblank(0))
+	if (((hcounter & 0x180) == 0x180) && !video_screen_get_vblank(machine->primary_screen))
 		snmi = !((hcounter >> 6) & 0x01);
 
-	return (video_screen_get_vblank(0) << 1) | snmi;
+	return (video_screen_get_vblank(machine->primary_screen) << 1) | snmi;
 }
 
 
@@ -373,7 +372,7 @@ VIDEO_UPDATE( exerion )
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (sprite_palette * 16);
-		const gfx_element *gfx = doubled ? machine->gfx[2] : machine->gfx[1];
+		const gfx_element *gfx = doubled ? screen->machine->gfx[2] : screen->machine->gfx[1];
 
 		if (exerion_cocktail_flip)
 		{
@@ -393,12 +392,12 @@ VIDEO_UPDATE( exerion )
 
 			drawgfx(bitmap, gfx, code2, color, xflip, yflip, x, y + gfx->height,
 			        cliprect, TRANSPARENCY_PENS,
-			        colortable_get_transpen_mask(machine->colortable, gfx, color, 0x10));
+			        colortable_get_transpen_mask(screen->machine->colortable, gfx, color, 0x10));
 		}
 
 		drawgfx(bitmap, gfx, code, color, xflip, yflip, x, y,
 			    cliprect, TRANSPARENCY_PENS,
-			    colortable_get_transpen_mask(machine->colortable, gfx, color, 0x10));
+			    colortable_get_transpen_mask(screen->machine->colortable, gfx, color, 0x10));
 
 		if (doubled) i += 4;
 	}
@@ -411,7 +410,7 @@ VIDEO_UPDATE( exerion )
 			int y = exerion_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
-			drawgfx(bitmap, machine->gfx[0],
+			drawgfx(bitmap, screen->machine->gfx[0],
 				videoram[offs] + 256 * char_bank,
 				((videoram[offs] & 0xf0) >> 4) + char_palette * 16,
 				exerion_cocktail_flip, exerion_cocktail_flip, x, y,

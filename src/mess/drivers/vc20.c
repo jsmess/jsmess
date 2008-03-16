@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( vc20_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x9110, 0x911f) AM_READWRITE( via_0_r, via_0_w )
 	AM_RANGE(0x9120, 0x912f) AM_READWRITE( via_1_r, via_1_w )
 	AM_RANGE(0x9130, 0x93ff) AM_NOP
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(MRA8_RAM, vc20_write_9400) AM_BASE(&vc20_memory_9400)	/*color ram 4 bit */
+	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(SMH_RAM, vc20_write_9400) AM_BASE(&vc20_memory_9400)	/*color ram 4 bit */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(5)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( vc20i_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x9010, 0x910f) AM_NOP
 	AM_RANGE(0x9110, 0x911f) AM_READWRITE( via_0_r, via_0_w )
 	AM_RANGE(0x9120, 0x912f) AM_READWRITE( via_1_r, via_1_w )
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE( MRA8_RAM, vc20_write_9400) AM_BASE(&vc20_memory_9400)	/* color ram 4 bit */
+	AM_RANGE(0x9400, 0x97ff) AM_READWRITE( SMH_RAM, vc20_write_9400) AM_BASE(&vc20_memory_9400)	/* color ram 4 bit */
 	AM_RANGE(0x9800, 0x980f) AM_READWRITE( via_4_r, via_4_w )
 	AM_RANGE(0x9810, 0x981f) AM_READWRITE( via_5_r, via_5_w )
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(5)

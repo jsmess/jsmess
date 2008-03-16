@@ -342,7 +342,7 @@ INLINE UINT8 get_pc3259_bits(grchamp_state *state, int offs)
 	int bits;
 
 	/* force a partial update to the current position */
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 
 	/* get the relevant 4 bits */
 	bits = (state->collide >> (offs*4)) & 0x0f;
@@ -523,7 +523,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("ACCEL")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ(sub_to_main_comm_r)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x78) AM_READ_PORT("WHEEL")
@@ -543,16 +543,16 @@ ADDRESS_MAP_END
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(MRA8_RAM, grchamp_left_w) AM_BASE_MEMBER(grchamp_state, leftram)
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(MRA8_RAM, grchamp_right_w) AM_BASE_MEMBER(grchamp_state, rightram)
-	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(MRA8_RAM, grchamp_center_w) AM_BASE_MEMBER(grchamp_state, centerram)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(SMH_RAM, grchamp_left_w) AM_BASE_MEMBER(grchamp_state, leftram)
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(SMH_RAM, grchamp_right_w) AM_BASE_MEMBER(grchamp_state, rightram)
+	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(SMH_RAM, grchamp_center_w) AM_BASE_MEMBER(grchamp_state, centerram)
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x5000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sub_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_READ(main_to_sub_comm_r)
 	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x70) AM_WRITE(cpu1_outputs_w)
 ADDRESS_MAP_END

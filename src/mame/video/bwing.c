@@ -118,7 +118,7 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 			}
 
 			#if BW_DEBUG
-				logerror("(%1d)%04x: w=%02x a=%04x f=%d\n",cpu_getactivecpu(),activecpu_get_pc(),data,0x1b00+offset,video_screen_get_frame_number(0));
+				logerror("(%1d)%04x: w=%02x a=%04x f=%d\n",cpu_getactivecpu(),activecpu_get_pc(),data,0x1b00+offset,video_screen_get_frame_number(machine->primary_screen));
 			#endif
 		break;
 	}
@@ -274,10 +274,10 @@ VIDEO_UPDATE( bwing )
 		tilemap_draw(bitmap, cliprect, bgmap, 0, 0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	// draw low priority sprites
-	draw_sprites(machine, bitmap, cliprect, buffered_spriteram, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram, 0);
 
 	// draw foreground
 	if (!(mapmask & 2))
@@ -291,7 +291,7 @@ VIDEO_UPDATE( bwing )
 	}
 
 	// draw high priority sprites
-	draw_sprites(machine, bitmap, cliprect, buffered_spriteram, 1);
+	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram, 1);
 
 	// draw text layer
 //  if (mapmask & 4)

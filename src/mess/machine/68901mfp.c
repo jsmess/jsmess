@@ -1305,9 +1305,9 @@ static DEVICE_START( mc68901 )
 	mc68901_t *mc68901;
 	char unique_tag[30];
 
-	assert(machine != NULL);
-	assert(tag != NULL);
-	assert(strlen(tag) < 20);
+	assert(device->machine != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
 
 	// allocate the object that holds the state
 
@@ -1315,7 +1315,7 @@ static DEVICE_START( mc68901 )
 	memset(mc68901, 0, sizeof(*mc68901));
 
 	//mc68901->device_type = device_type;
-	mc68901->intf = static_config;
+	mc68901->intf = device->static_config;
 
 	// initial settings
 
@@ -1351,7 +1351,7 @@ static DEVICE_START( mc68901 )
 
 	// register save state support
 
-	state_save_combine_module_and_tag(unique_tag, "MC68901", tag);
+	state_save_combine_module_and_tag(unique_tag, "MC68901", device->tag);
 
 	state_save_register_item(unique_tag, 0, mc68901->gpip);
 	state_save_register_item(unique_tag, 0, mc68901->aer);
@@ -1393,7 +1393,7 @@ static DEVICE_START( mc68901 )
 
 static DEVICE_RESET( mc68901 )
 {
-	mc68901_t *mc68901 = token;
+	mc68901_t *mc68901 = device->token;
 
 	mc68901_register_w(mc68901, MC68901_REGISTER_GPIP, 0);
 	mc68901_register_w(mc68901, MC68901_REGISTER_AER, 0);

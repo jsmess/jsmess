@@ -430,7 +430,7 @@ VIDEO_START( toaplan1 )
 
 READ16_HANDLER( toaplan1_frame_done_r )
 {
-	return video_screen_get_vblank(0);
+	return video_screen_get_vblank(machine->primary_screen);
 }
 
 WRITE16_HANDLER( toaplan1_tile_offsets_w )
@@ -1163,7 +1163,7 @@ VIDEO_UPDATE( rallybik )
 		tilemap_draw(bitmap,cliprect,pf3_tilemap,priority,0);
 		tilemap_draw(bitmap,cliprect,pf2_tilemap,priority,0);
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,priority,0);
-		rallybik_draw_sprites(machine, bitmap,cliprect,priority << 8);
+		rallybik_draw_sprites(screen->machine, bitmap,cliprect,priority << 8);
 	}
 	return 0;
 }
@@ -1191,7 +1191,7 @@ VIDEO_UPDATE( toaplan1 )
 		tilemap_draw_primask(bitmap,cliprect,pf1_tilemap,priority,priority,0);
 	}
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }
 
@@ -1217,7 +1217,7 @@ VIDEO_UPDATE( demonwld )
 		tilemap_draw_primask(bitmap,cliprect,pf1_tilemap,priority,priority,0);
 	}
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }
 

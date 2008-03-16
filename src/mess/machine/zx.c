@@ -11,6 +11,7 @@
 #include "includes/zx.h"
 #include "devices/cassette.h"
 
+#define video_screen_get_refresh(screen)	(((screen_config *)(screen)->inline_config)->refresh)
 
 #define	DEBUG_ZX81_PORTS	1
 #define DEBUG_ZX81_VSYNC	1
@@ -23,8 +24,8 @@ static UINT8 zx_tape_bit = 0x80;
 
 DRIVER_INIT ( zx )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0x8000, MRA8_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0x8000, MWA8_BANK1);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0x8000, SMH_BANK1);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0x8000, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x4000);
 }
 
@@ -70,6 +71,9 @@ static TIMER_CALLBACK(zx_tape_pulse)
 
 WRITE8_HANDLER ( zx_io_w )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int height = video_screen_get_height(screen);
+
 	if ((offset & 2) == 0)
 	{
 		timer_reset(ula_nmi, attotime_never);
@@ -90,8 +94,8 @@ WRITE8_HANDLER ( zx_io_w )
 		zx_ula_bkgnd(machine, 1);
 		if (ula_frame_vsync == 2)
 		{
-			cpu_spinuntil_time(video_screen_get_time_until_pos(0, machine->screen[0].height - 1, 0));
-			ula_scanline_count = machine->screen[0].height - 1;
+			cpu_spinuntil_time(video_screen_get_time_until_pos(0, height - 1, 0));
+			ula_scanline_count = height - 1;
 			logerror ("S: %d B: %d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 		}
 
@@ -101,6 +105,7 @@ WRITE8_HANDLER ( zx_io_w )
 
 READ8_HANDLER ( zx_io_r )
 {
+	const device_config *screen = video_screen_first(machine->config);
 	int data = 0xff;
 
 	if ((offset & 1) == 0)
@@ -130,7 +135,7 @@ READ8_HANDLER ( zx_io_r )
 			data &= readinputport(7);
 		if ((offset & 0x8000) == 0)
 			data &= readinputport(8);
-		if (machine->screen[0].refresh > 55)
+		if (video_screen_get_refresh(screen) > 55)
 			data &= ~0x40;
 
 		if (ula_irq_active)
@@ -166,6 +171,7 @@ READ8_HANDLER ( zx_io_r )
 
 READ8_HANDLER ( pow3000_io_r )
 {
+	const device_config *screen = video_screen_first(machine->config);
 	int data = 0xff;
 
 	if ((offset & 1) == 0)
@@ -195,7 +201,7 @@ READ8_HANDLER ( pow3000_io_r )
 			data &= readinputport(7);
 		if ((offset & 0x8000) == 0)
 			data &= readinputport(8);
-		if (machine->screen[0].refresh > 55)
+		if (video_screen_get_refresh(screen) > 55)
 			data &= ~0x40;
 
 		if (ula_irq_active)

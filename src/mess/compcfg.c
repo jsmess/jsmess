@@ -144,8 +144,8 @@ UINT8 *memory_install_ram8_handler(int cpunum, int spacenum, offs_t start, offs_
 
 	if (bank_size > (mess_ram_size - ram_offset))
 	{
-		memory_install_read8_handler(cpunum, spacenum, start - ram_offset + mess_ram_size, end, 0, 0, MRA8_ROM);
-		memory_install_write8_handler(cpunum, spacenum, start - ram_offset + mess_ram_size, end, 0, 0, MWA8_ROM);
+		memory_install_read8_handler(cpunum, spacenum, start - ram_offset + mess_ram_size, end, 0, 0, SMH_ROM);
+		memory_install_write8_handler(cpunum, spacenum, start - ram_offset + mess_ram_size, end, 0, 0, SMH_ROM);
 	}
 	return mess_ram + ram_offset;
 }

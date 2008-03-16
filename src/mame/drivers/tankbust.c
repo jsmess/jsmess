@@ -192,13 +192,13 @@ static READ8_HANDLER( some_changing_input )
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x6000, 0x9fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(MRA8_BANK2)
+	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x6000, 0x9fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_BANK2)
 
 	AM_RANGE(0xe000, 0xe007) AM_READ(debug_output_area_r)
 
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 
 //AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */
 
@@ -210,38 +210,38 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(tankbust_background_videoram_r)
 	AM_RANGE(0xc800, 0xcfff) AM_READ(tankbust_background_colorram_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(tankbust_txtram_r)
-	AM_RANGE(0xd800, 0xd8ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xd800, 0xd8ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x9fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x6000, 0x9fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_ROM)
 
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 
 	AM_RANGE(0xe000, 0xe007) AM_WRITE(tankbust_e0xx_w)
 
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(tankbust_yscroll_w)
 	AM_RANGE(0xe801, 0xe802) AM_WRITE(tankbust_xscroll_w)
 	AM_RANGE(0xe803, 0xe803) AM_WRITE(tankbust_soundlatch_w)
-	AM_RANGE(0xe804, 0xe804) AM_WRITE(MWA8_NOP)	/* watchdog ? ; written in long-lasting loops */
+	AM_RANGE(0xe804, 0xe804) AM_WRITE(SMH_NOP)	/* watchdog ? ; written in long-lasting loops */
 
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tankbust_background_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(tankbust_background_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(tankbust_txtram_w) AM_BASE(&tankbust_txtram)
-	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( readport2, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc0, 0xc0) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x30, 0x30) AM_READ(AY8910_read_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport2, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(AY8910_control_port_1_w)
@@ -250,17 +250,17 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_NOP)	/* garbage, written in initialization loop */
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_NOP)	/* garbage, written in initialization loop */
 //0x4000 and 0x4040-0x4045 seem to be used (referenced in the code)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(MWA8_NOP)	/* garbage, written in initialization loop */
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_NOP)	/* garbage, written in initialization loop */
 ADDRESS_MAP_END
 
 

@@ -103,7 +103,7 @@ static void set_current_bitmap_videoram_pointer(void)
 
 WRITE8_HANDLER( cloak_clearbmp_w )
 {
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 	bitmap_videoram_selected = data & 0x01;
 	set_current_bitmap_videoram_pointer();
 
@@ -224,9 +224,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( cloak )
 {
-	set_pens(machine);
+	set_pens(screen->machine);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_bitmap(bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

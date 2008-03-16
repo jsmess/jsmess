@@ -175,8 +175,6 @@ static void dump_screenshot(running_machine *machine, int write_file)
 	mame_file *fp;
 	char buf[128];
 	int is_blank = 0;
-	int scrnum;
-	UINT32 screenmask;
 
 	if (write_file)
 	{
@@ -187,18 +185,17 @@ static void dump_screenshot(running_machine *machine, int write_file)
 		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, buf, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &fp);
 		if (filerr == FILERR_NONE)
 		{
-			screenmask = render_get_live_screens_mask();
-
-			if (screenmask != 0)
+			/* choose a screen */
+			const device_config *screen = video_screen_first(machine->config);
+			while((screen != NULL) && !render_is_live_screen(screen))
 			{
-				/* choose a screen */
-				for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-				{
-					if (screenmask & (1 << scrnum))
-						break;
-				}
+				screen = video_screen_next(screen);
+			}
 
-				video_screen_save_snapshot(machine, fp, scrnum);
+			/* did we find a live screen? */
+			if (screen != NULL)
+			{
+				video_screen_save_snapshot(screen, fp);
 				report_message(MSG_INFO, "Saved screenshot as %s", buf);
 			}
 			else

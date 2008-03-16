@@ -683,7 +683,7 @@ VIDEO_UPDATE( kc85_4 )
 	grab_data.pixel_ram = kc85_4_display_video_ram;
 	grab_data.colour_ram = kc85_4_display_video_ram + 0x04000;
 
-	kc85_common_process_frame(machine, bitmap, kc85_4_pixel_grab_callback,&grab_data);
+	kc85_common_process_frame(screen->machine, bitmap, kc85_4_pixel_grab_callback,&grab_data);
 
 	return 0;
 }
@@ -780,7 +780,7 @@ VIDEO_UPDATE( kc85_3 )
 	grab_data.pixel_ram = mess_ram+0x08000;
 	grab_data.colour_ram = mess_ram+0x08000 + 0x02800;
 
-	kc85_common_process_frame(machine, bitmap, kc85_3_pixel_grab_callback,&grab_data);
+	kc85_common_process_frame(screen->machine, bitmap, kc85_3_pixel_grab_callback,&grab_data);
 
 	return 0;
 }

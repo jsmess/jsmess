@@ -59,7 +59,7 @@
 
 
 static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP	/* Needed because quickload to here will crash MESS otherwise */
@@ -86,7 +86,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(mbee_ports, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | ( AMEF_UNMAP(1) ))
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_READWRITE(mbee_pio_r, mbee_pio_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
@@ -94,7 +95,8 @@ static ADDRESS_MAP_START(mbee_ports, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeic_ports, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | ( AMEF_UNMAP(1) ))
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_READWRITE(mbee_pio_r, mbee_pio_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
 	// AM_RANGE(0x09, 0x09) AM_MIRROR(0x10)  Listed as "Colour Wait Off or USART 2651" but doesn't appear in the schematics

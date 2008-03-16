@@ -510,17 +510,17 @@ static WRITE8_HANDLER(exelv_portb_w)
 static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
 
 	//AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7020 internal RAM */
-	AM_RANGE(0x0080, 0x00ff) AM_READWRITE(MRA8_NOP, MWA8_NOP)		/* reserved */
+	AM_RANGE(0x0080, 0x00ff) AM_READWRITE(SMH_NOP, SMH_NOP)		/* reserved */
 	//AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
-	//AM_RANGE(0x010c, 0x01ff) AM_READWRITE(MRA8_NOP, MWA8_NOP)     /* external I/O ports */
+	//AM_RANGE(0x010c, 0x01ff) AM_READWRITE(SMH_NOP, SMH_NOP)     /* external I/O ports */
 	AM_RANGE(0x012d, 0x0012d) AM_READWRITE(tms3556_reg_r/*right???*/, tms3556_reg_w)
 	AM_RANGE(0x012e, 0x0012e) AM_READWRITE(tms3556_vram_r/*right???*/, tms3556_vram_w)
 	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_r, mailbox_w)
-	AM_RANGE(0x0200, 0x7fff) AM_READWRITE(MRA8_ROM, MWA8_ROM)		/* system ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_NOP, MWA8_NOP)
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(MRA8_RAM, MWA8_RAM)		/* CPU RAM */
-	AM_RANGE(0xc800, /*0xf7ff*/0xefff) AM_READWRITE(MRA8_NOP, MWA8_NOP)
-	AM_RANGE(/*0xf800*/0xf000, 0xffff) AM_READWRITE(MRA8_ROM, MWA8_ROM)/* tms7020 internal ROM */
+	AM_RANGE(0x0200, 0x7fff) AM_READWRITE(SMH_ROM, SMH_ROM)		/* system ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_NOP, SMH_NOP)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(SMH_RAM, SMH_RAM)		/* CPU RAM */
+	AM_RANGE(0xc800, /*0xf7ff*/0xefff) AM_READWRITE(SMH_NOP, SMH_NOP)
+	AM_RANGE(/*0xf800*/0xf000, 0xffff) AM_READWRITE(SMH_ROM, SMH_ROM)/* tms7020 internal ROM */
 
 ADDRESS_MAP_END
 

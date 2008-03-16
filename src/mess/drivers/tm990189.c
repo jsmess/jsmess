@@ -316,17 +316,20 @@ static void update_common(bitmap_t *bitmap,
 
 static VIDEO_UPDATE( tm990_189 )
 {
-	update_common(bitmap, 580, 150, 110, 508, 387, 456, 507, 478, machine->pens[1], machine->pens[0]);
+	update_common(bitmap, 580, 150, 110, 508, 387, 456, 507, 478, screen->machine->pens[1], screen->machine->pens[0]);
 	return 0;
 }
 
 static VIDEO_START( tm990_189_v )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+
 	/* NPW 27-Feb-2006 - ewwww gross!!! maybe this can be fixed when
      * multimonitor support is added?*/
-	LED_display_window_left = machine->screen[0].visarea.min_x;
-	LED_display_window_top = machine->screen[0].visarea.max_y - 32;
-	LED_display_window_width = machine->screen[0].visarea.max_x - machine->screen[0].visarea.min_x;
+	LED_display_window_left = visarea->min_x;
+	LED_display_window_top = visarea->max_y - 32;
+	LED_display_window_width = visarea->max_x - visarea->min_x;
 	LED_display_window_height = 32;
 }
 
@@ -334,13 +337,13 @@ static VIDEO_UPDATE( tm990_189_v )
 {
 	VIDEO_UPDATE_CALL(tms9928a);
 
-	plot_box(bitmap, LED_display_window_left, LED_display_window_top, LED_display_window_width, LED_display_window_height, machine->pens[1]);
+	plot_box(bitmap, LED_display_window_left, LED_display_window_top, LED_display_window_width, LED_display_window_height, screen->machine->pens[1]);
 	update_common(bitmap,
 					LED_display_window_left, LED_display_window_top,
 					LED_display_window_left, LED_display_window_top+16,
 					LED_display_window_left+80, LED_display_window_top+16,
 					LED_display_window_left+128, LED_display_window_top+16,
-					machine->pens[6], machine->pens[1]);
+					screen->machine->pens[6], screen->machine->pens[1]);
 	return 0;
 }
 
@@ -693,9 +696,9 @@ static ADDRESS_MAP_START(tm990_189_v_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM									/* RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_ROM									/* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
 
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(MRA8_ROM, MWA8_NOP)		/* video board ROM 1 */
-	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(MRA8_ROM, video_joy_w)	/* video board ROM 2 and joystick write port*/
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(video_vdp_r, MWA8_NOP)	/* video board tms9918 read ports (bogus) */
+	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(SMH_ROM, SMH_NOP)		/* video board ROM 1 */
+	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(SMH_ROM, video_joy_w)	/* video board ROM 2 and joystick write port*/
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(video_vdp_r, SMH_NOP)	/* video board tms9918 read ports (bogus) */
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(video_joy_r, video_vdp_w)	/* video board joystick read port and tms9918 write ports */
 
 	AM_RANGE(0x3000, 0x3fff) AM_ROM									/* main ROM - unibug or university basic */

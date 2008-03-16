@@ -126,8 +126,6 @@ when problems start with -log and look into error.log file
 #include "includes/cbmieeeb.h"
 /*#include "includes/vc1541.h" */
 
-static mc6845_t	*mc6845;
-
 static ADDRESS_MAP_START(pet_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size )
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
@@ -164,9 +162,9 @@ static ADDRESS_MAP_START( pet80_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 #endif
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_BANK8)
-	AM_RANGE(0xf000, 0xffef) AM_WRITE(MWA8_BANK8)
-	AM_RANGE(0xfff1, 0xffff) AM_WRITE(MWA8_BANK9)
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_BANK8)
+	AM_RANGE(0xf000, 0xffef) AM_WRITE(SMH_BANK8)
+	AM_RANGE(0xfff1, 0xffff) AM_WRITE(SMH_BANK9)
 ADDRESS_MAP_END
 
 
@@ -559,11 +557,13 @@ static PALETTE_INIT( pet )
 	}
 }
 
-static VIDEO_START( pet_crtc ) {
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
+static VIDEO_START( pet_crtc )
+{
 }
 
-static VIDEO_UPDATE( pet_crtc ) {
+static VIDEO_UPDATE( pet_crtc )
+{
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }

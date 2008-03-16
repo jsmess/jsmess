@@ -279,8 +279,6 @@ static int abc806_txoff;
 static int abc806_40;
 static int abc806_flshclk;
 
-extern mc6845_t *abc800_mc6845;
-
 /* Palette Initialization */
 
 static PALETTE_INIT( abc800m )
@@ -719,29 +717,29 @@ static VIDEO_START(abc806)
 
 static VIDEO_UPDATE( abc800m )
 {
+	const device_config *abc800_mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(abc800_mc6845, bitmap, cliprect);
-
 	return 0;
 }
 
 static VIDEO_UPDATE( abc800c )
 {
+	const device_config *abc800_mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(abc800_mc6845, bitmap, cliprect);
-
 	return 0;
 }
 
 static VIDEO_UPDATE( abc802 )
 {
+	const device_config *abc800_mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(abc800_mc6845, bitmap, cliprect);
-
 	return 0;
 }
 
 static VIDEO_UPDATE( abc806 )
 {
+	const device_config *abc800_mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(abc800_mc6845, bitmap, cliprect);
-
 	return 0;
 }
 

@@ -60,7 +60,7 @@ extern unsigned int x68k_scanline;
 static int sprite_shift;
 
 static void x68k_render_video_word(int offset);
-static void x68k_crtc_refresh_mode(void);
+static void x68k_crtc_refresh_mode(running_machine *machine);
 void x68k_scanline_check(int);
 
 INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
@@ -141,7 +141,7 @@ static TIMER_CALLBACK(x68k_crtc_operation_end)
 	sys.crtc.operation &= ~bit;
 }
 
-static void x68k_crtc_refresh_mode()
+static void x68k_crtc_refresh_mode(running_machine *machine)
 {
 //	rectangle rect;
 //	double scantime;
@@ -196,8 +196,8 @@ static void x68k_crtc_refresh_mode()
 	if(visiblescr.max_y >= scr.max_y)
 		visiblescr.max_y = scr.max_y - 1;
 
-	logerror("video_screen_configure(0,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
-	video_screen_configure(0,scr.max_x,scr.max_y,&visiblescr,HZ_TO_ATTOSECONDS(55.45));
+	logerror("video_screen_configure(machine->primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
+	video_screen_configure(machine->primary_screen,scr.max_x,scr.max_y,&visiblescr,HZ_TO_ATTOSECONDS(55.45));
 /*
 	rect.min_x = rect.min_y = 0;
 	sys.crtc.visible_width = (sys.crtc.reg[3] - sys.crtc.reg[2]) * 8;
@@ -227,8 +227,8 @@ static void x68k_crtc_refresh_mode()
 	sys.crtc.hshift = (sys.crtc.width - sys.crtc.visible_width) / 2;
 	sys.crtc.vshift = (sys.crtc.height - sys.crtc.visible_height) / 2;
 
-	video_screen_configure(0,sys.crtc.video_width,sys.crtc.video_height,&rect,HZ_TO_ATTOSECONDS(55.45));
-	logerror("video_screen_configure(0,%i,%i,[%i,%i,%i,%i],55.45)\n",sys.crtc.video_width,sys.crtc.video_height,rect.min_x,rect.min_y,rect.max_x,rect.max_y);
+	video_screen_configure(machine->primary_screen,sys.crtc.video_width,sys.crtc.video_height,&rect,HZ_TO_ATTOSECONDS(55.45));
+	logerror("video_screen_configure(machine->primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",sys.crtc.video_width,sys.crtc.video_height,rect.min_x,rect.min_y,rect.max_x,rect.max_y);
 //	x68k_scanline = video_screen_get_vpos(0);
 	if(sys.crtc.reg[4] != 0)
 	{
@@ -375,7 +375,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 	case 6:
 	case 7:
 	case 8:
-		x68k_crtc_refresh_mode();
+		x68k_crtc_refresh_mode(machine);
 		break;
 	case 9:  // CRTC raster IRQ (GPIP6)
 		if(data != 0)
@@ -429,7 +429,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 			if(data & 0x0400)  // real size 1024x1024
 				sys.crtc.interlace = 1;
 		}
-		x68k_crtc_refresh_mode();
+		x68k_crtc_refresh_mode(machine);
 		break;
 	case 576:  // operation register
 		sys.crtc.operation = data;
@@ -997,12 +997,12 @@ VIDEO_UPDATE( x68000 )
 	{
 		if(sys.video.tile16_dirty[x] != 0)
 		{
-			decodechar(machine->gfx[1], x,memory_region(REGION_USER1));
+			decodechar(screen->machine->gfx[1], x,memory_region(REGION_USER1));
 			sys.video.tile16_dirty[x] = 0;
 		}
 		if(sys.video.tile8_dirty[x] != 0)
 		{
-			decodechar(machine->gfx[0], x,memory_region(REGION_USER1));
+			decodechar(screen->machine->gfx[0], x,memory_region(REGION_USER1));
 			sys.video.tile8_dirty[x] = 0;
 		}
 	}
@@ -1016,7 +1016,7 @@ VIDEO_UPDATE( x68000 )
 		// Sprite / BG Tiles
 		if(priority == sys.video.sprite_pri /*&& (x68k_spritereg[0x404] & 0x0200)*/ && (sys.video.reg[2] & 0x0040))
 		{
-			x68k_draw_sprites(machine, bitmap,1,rect);
+			x68k_draw_sprites(screen->machine, bitmap,1,rect);
 			if((x68k_spritereg[0x404] & 0x0008))
 			{
 				if((x68k_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
@@ -1032,7 +1032,7 @@ VIDEO_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(machine,bitmap,2,rect);
+			x68k_draw_sprites(screen->machine,bitmap,2,rect);
 			if((x68k_spritereg[0x404] & 0x0001))
 			{
 				if((x68k_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
@@ -1048,7 +1048,7 @@ VIDEO_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(machine,bitmap,3,rect);
+			x68k_draw_sprites(screen->machine,bitmap,3,rect);
 		}
 
 		// Text screen

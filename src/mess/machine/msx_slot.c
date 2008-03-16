@@ -39,17 +39,17 @@ static void msx_cpu_setbank (int page, UINT8 *mem)
 	case 4:
 		memory_set_bankptr (4, mem);
 		memory_set_bankptr (5, mem + 0x1ff8);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x7ff8, 0x7fff, 0, 0, MRA8_BANK5);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x7ff8, 0x7fff, 0, 0, SMH_BANK5);
 		break;
 	case 5:
 		memory_set_bankptr (6, mem);
 		memory_set_bankptr (7, mem + 0x1800);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9fff, 0, 0, MRA8_BANK7);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9fff, 0, 0, SMH_BANK7);
 		break;
 	case 6:
 		memory_set_bankptr (8, mem);
 		memory_set_bankptr (9, mem + 0x1800);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xbfff, 0, 0, MRA8_BANK9);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xbfff, 0, 0, SMH_BANK9);
 		break;
 	case 7:
 		memory_set_bankptr (10, mem);
@@ -360,7 +360,7 @@ MSX_SLOT_MAP(konami_scc)
 		msx_cpu_setbank (5, state->mem + state->banks[2] * 0x2000);
 		msx_cpu_setbank (6, state->mem + state->banks[3] * 0x2000);
 		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9fff, 0, 0,
-				state->cart.scc.active ? konami_scc_bank5 : MRA8_BANK7);
+				state->cart.scc.active ? konami_scc_bank5 : SMH_BANK7);
 		break;
 	case 3:
 		msx_cpu_setbank (7, state->mem + state->banks[0] * 0x2000);
@@ -2048,9 +2048,9 @@ MSX_SLOT_MAP(soundcartridge)
 		msx_cpu_setbank (5, state->mem + state->banks[2] * 0x2000);
 		msx_cpu_setbank (6, state->mem + state->banks[3] * 0x2000);
 		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9fff, 0, 0,
-			state->cart.sccp.scc_active ? soundcartridge_scc : MRA8_BANK7);
+			state->cart.sccp.scc_active ? soundcartridge_scc : SMH_BANK7);
 		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xbfff, 0, 0,
-			state->cart.sccp.sccp_active ? soundcartridge_sccp : MRA8_BANK9);
+			state->cart.sccp.sccp_active ? soundcartridge_sccp : SMH_BANK9);
 		break;
 	case 3:
 		msx_cpu_setbank (7, state->mem + state->banks[0] * 0x2000);

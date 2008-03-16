@@ -12,7 +12,7 @@ UINT8 *homerun_videoram;
 
 WRITE8_HANDLER(homerun_banking_w)
 {
-	if(video_screen_get_vpos(0)>half_screen)
+	if(video_screen_get_vpos(machine->primary_screen)>half_screen)
 		homerun_gc_down=data&3;
 	else
 		homerun_gc_up=data&3;
@@ -98,7 +98,7 @@ VIDEO_UPDATE(homerun)
 	myclip.max_y/=2;
 	homerun_gfx_ctrl=homerun_gc_up;
 	tilemap_draw(bitmap,&myclip,homerun_tilemap,0,0);
-	draw_sprites(machine, bitmap,&myclip);
+	draw_sprites(screen->machine, bitmap,&myclip);
 
 	/* lower part */
 
@@ -106,7 +106,7 @@ VIDEO_UPDATE(homerun)
 	myclip.max_y*=2;
 	homerun_gfx_ctrl=homerun_gc_down;
 	tilemap_draw(bitmap,&myclip,homerun_tilemap,0,0);
-	draw_sprites(machine, bitmap,&myclip);
+	draw_sprites(screen->machine, bitmap,&myclip);
 
 	homerun_gc_down=homerun_gc_up;
 	return 0;

@@ -82,7 +82,7 @@ static VIDEO_UPDATE( astron )
 {
 	fillbitmap(bitmap, 0, cliprect);
 
-	astron_draw_characters(machine, bitmap, cliprect);
+	astron_draw_characters(screen->machine, bitmap, cliprect);
 	astron_draw_sprites(bitmap, cliprect);
 
 	/* display disc information */
@@ -235,7 +235,7 @@ ADDRESS_MAP_END
 
 /* I/O MAP */
 static ADDRESS_MAP_START( mainport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(astron_io_bankswitch_w)
 ADDRESS_MAP_END
 

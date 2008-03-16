@@ -237,7 +237,7 @@ MACHINE_RESET( geneve )
 	/* init tms9901 */
         tms9901_reset(0);
 
-	v9938_reset();
+	v9938_reset(0);
 
 	/* clear keyboard interface state (probably overkill, but can't harm) */
 	JoySel = 0;
@@ -320,7 +320,7 @@ static void machine_stop_geneve(running_machine *machine)
 */
 VIDEO_START(geneve)
 {
-	v9938_init(machine, MODEL_V9938, /*0x20000*/0x30000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
+	v9938_init(machine, 0, tmpbitmap, MODEL_V9938, /*0x20000*/0x30000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
 }
 
 /*
@@ -329,7 +329,7 @@ VIDEO_START(geneve)
 INTERRUPT_GEN( geneve_hblank_interrupt )
 {
 	static int line_count;
-	v9938_interrupt();
+	v9938_interrupt(0);
 	if (++line_count == 262)
 	{
 		line_count = 0;
@@ -437,11 +437,11 @@ READ8_HANDLER ( geneve_r )
 			{
 			case 0xf100:
 			case 0xf108:		/* mirror? */
-				return v9938_vram_r(machine, 0);
+				return v9938_0_vram_r(machine, 0);
 
 			case 0xf102:
 			case 0xf10a:		/* mirror? */
-				return v9938_status_r(machine, 0);
+				return v9938_0_status_r(machine, 0);
 
 			case 0xf110:
 			case 0xf111:
@@ -537,11 +537,11 @@ READ8_HANDLER ( geneve_r )
 				{
 					if (offset & 2)
 					{	/* read VDP status */
-						return v9938_status_r(machine, 0);
+						return v9938_0_status_r(machine, 0);
 					}
 					else
 					{	/* read VDP RAM */
-						return v9938_vram_r(machine, 0);
+						return v9938_0_vram_r(machine, 0);
 					}
 				}
 				return 0;
@@ -681,22 +681,22 @@ WRITE8_HANDLER ( geneve_w )
 			{
 			case 0xf100:
 			case 0xf108:		/* mirror? */
-				v9938_vram_w(machine, 0, data);
+				v9938_0_vram_w(machine, 0, data);
 				return;
 
 			case 0xf102:
 			case 0xf10a:		/* mirror? */
-				v9938_command_w(machine, 0, data);
+				v9938_0_command_w(machine, 0, data);
 				return;
 
 			case 0xf104:
 			case 0xf10c:		/* mirror? */
-				v9938_palette_w(machine, 0, data);
+				v9938_0_palette_w(machine, 0, data);
 				return;
 
 			case 0xf106:
 			case 0xf10e:		/* mirror? */
-				v9938_register_w(machine, 0, data);
+				v9938_0_register_w(machine, 0, data);
 				return;
 
 			case 0xf110:
@@ -811,19 +811,19 @@ WRITE8_HANDLER ( geneve_w )
 					{
 					case 0:
 						/* write VDP RAM */
-						v9938_vram_w(machine, 0, data);
+						v9938_0_vram_w(machine, 0, data);
 						break;
 					case 1:
 						/* write VDP address */
-						v9938_command_w(machine, 0, data);
+						v9938_0_command_w(machine, 0, data);
 						break;
 					case 2:
 						/* write palette */
-						v9938_palette_w(machine, 0, data);
+						v9938_0_palette_w(machine, 0, data);
 						break;
 					case 3:
 						/* write register */
-						v9938_register_w(machine, 0, data);
+						v9938_0_register_w(machine, 0, data);
 						break;
 					}
 				}
@@ -1300,7 +1300,7 @@ static void poll_mouse(void)
 
 	last_my = new_my;
 
-	v9938_update_mouse_state(delta_x, delta_y, buttons & 3);
+	v9938_update_mouse_state(0, delta_x, delta_y, buttons & 3);
 }
 
 

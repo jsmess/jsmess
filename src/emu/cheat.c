@@ -410,7 +410,7 @@ struct SearchRegion
 	UINT8	flags;
 
 	UINT8	* cachedPointer;
-	const address_map
+	const address_map_entry
 			* writeHandler;
 
 	UINT8	* first;
@@ -1500,7 +1500,7 @@ void cheat_init(running_machine *machine)
 	InitStringTable();
 
 	periodic_timer = timer_alloc(cheat_periodic, NULL);
-	timer_adjust_periodic(periodic_timer, attotime_make(0, machine->screen[0].refresh), 0, attotime_make(0, machine->screen[0].refresh));
+	timer_adjust_periodic(periodic_timer, video_screen_get_frame_period(machine->primary_screen), 0, video_screen_get_frame_period(machine->primary_screen));
 
 	add_exit_callback(machine, cheat_exit);
 }
@@ -8922,7 +8922,7 @@ static void RestoreRegionBackup(SearchRegion * region)
 
 static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region, SearchInfo * info)
 {
-	write8_machine_func		handler = region->writeHandler->write.handler8;
+	write8_machine_func	handler = region->writeHandler->write.mhandler8;
 	FPTR				handlerAddress = (FPTR)handler;
 
 	switch(info->searchSpeed)
@@ -8939,7 +8939,7 @@ static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region
 			}
 #endif
 
-			if(	(handler == MWA8_RAM) && (!region->writeHandler->base))
+			if(	(handler == SMH_RAM) && (!region->writeHandler->baseptr))
 				return 1;
 
 #ifndef MESS
@@ -8947,7 +8947,7 @@ static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region
 			{
 				/* ----- for neogeo, search bank one ----- */
 				if(	(!strcmp(machine->gamedrv->parent, "neogeo")) && (info->targetType == kRegionType_CPU) &&
-					(info->targetIdx == 0) && (handler == MWA8_BANK1))
+					(info->targetIdx == 0) && (handler == SMH_BANK1))
 					return 1;
 			}
 
@@ -8957,37 +8957,37 @@ static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region
 
 			/* ----- for exterminator, search bank one ----- */
 			if(	(machine->config->cpu[1].type == CPU_TMS34010) && (info->targetType == kRegionType_CPU) &&
-				(info->targetIdx == 1) && (handler == MWA8_BANK1))
+				(info->targetIdx == 1) && (handler == SMH_BANK1))
 				return 1;
 
 			/* ----- for smashtv, search bank two ----- */
 			if(	(machine->config->cpu[0].type == CPU_TMS34010) && (info->targetType == kRegionType_CPU) &&
-				(info->targetIdx == 0) && (handler == MWA8_BANK2))
+				(info->targetIdx == 0) && (handler == SMH_BANK2))
 				return 1;
 
 #endif
 			return 0;
 
 		case kSearchSpeed_Medium:
-			if(	(handlerAddress >= ((FPTR)MWA8_BANK1)) && (handlerAddress <= ((FPTR)MWA8_BANK24)))
+			if(	(handlerAddress >= ((FPTR)SMH_BANK1)) && (handlerAddress <= ((FPTR)SMH_BANK24)))
 				return 1;
 
-			if(handler == MWA8_RAM)
+			if(handler == SMH_RAM)
 				return 1;
 
 			return 0;
 
 		case kSearchSpeed_Slow:
-			if(	(handler == MWA8_NOP) || (handler == MWA8_ROM))
+			if(	(handler == SMH_NOP) || (handler == SMH_ROM))
 				return 0;
 
-			if(	(handlerAddress > STATIC_COUNT) && (!region->writeHandler->base))
+			if(	(handlerAddress > STATIC_COUNT) && (!region->writeHandler->baseptr))
 				return 0;
 
 			return 1;
 
 		case kSearchSpeed_VerySlow:
-			if(	(handler == MWA8_NOP) || (handler == MWA8_ROM))
+			if(	(handler == SMH_NOP) || (handler == SMH_ROM))
 				return 0;
 
 			return 1;
@@ -9010,18 +9010,18 @@ static void SetSearchRegionDefaultName(SearchRegion * region)
 
 			if(region->writeHandler)
 			{
-				genf *				handler = region->writeHandler->write.handler;
+				genf *				handler = region->writeHandler->write.generic;
 				FPTR				handlerAddress = (FPTR)handler;
 
-				if(	(handlerAddress >= ((FPTR)MWA8_BANK1)) && (handlerAddress <= ((FPTR)MWA8_BANK24)))
-					sprintf(desc, "BANK%.2d", (int)(handlerAddress - (FPTR)MWA8_BANK1) + 1);
+				if(	(handlerAddress >= ((FPTR)SMH_BANK1)) && (handlerAddress <= ((FPTR)SMH_BANK24)))
+					sprintf(desc, "BANK%.2d", (int)(handlerAddress - (FPTR)SMH_BANK1) + 1);
 				else
 				{
 					switch(handlerAddress)
 					{
-						case (FPTR)MWA8_NOP:		strcpy(desc, "NOP   ");	break;
-						case (FPTR)MWA8_RAM:		strcpy(desc, "RAM   ");	break;
-						case (FPTR)MWA8_ROM:		strcpy(desc, "ROM   ");	break;
+						case (FPTR)SMH_NOP:		strcpy(desc, "NOP   ");	break;
+						case (FPTR)SMH_RAM:		strcpy(desc, "RAM   ");	break;
+						case (FPTR)SMH_ROM:		strcpy(desc, "ROM   ");	break;
 						default:					strcpy(desc, "CUSTOM");	break;
 					}
 				}
@@ -9155,37 +9155,31 @@ static void BuildSearchRegions(running_machine *machine, SearchInfo * info)
 				if(info->targetIdx < cpu_gettotalcpu())
 				{
 					const address_map			* map = NULL;
+					const address_map_entry			* entry;
 					SearchRegion						* traverse;
 					int									count = 0;
 
-					map = memory_get_map(info->targetIdx, ADDRESS_SPACE_PROGRAM);
-
-					while(!IS_AMENTRY_END(map))
-					{
-						if(!IS_AMENTRY_EXTENDED(map) && map->write.handler)
+					map = memory_get_address_map(info->targetIdx, ADDRESS_SPACE_PROGRAM);
+					for (entry = map->entrylist; entry != NULL; entry = entry->next)
+						if (entry->write.generic)
 							count++;
-
-						map++;
-					}
 
 					info->regionList = calloc(sizeof(SearchRegion), count);
 					info->regionListLength = count;
 					traverse = info->regionList;
 
-					map = memory_get_map(info->targetIdx, ADDRESS_SPACE_PROGRAM);
-
-					while(!IS_AMENTRY_END(map))
+					for (entry = map->entrylist; entry != NULL; entry = entry->next)
 					{
-						if(!IS_AMENTRY_EXTENDED(map) && map->write.handler)
+						if (entry->write.generic)
 						{
-							UINT32	length = (map->end - map->start) + 1;
+							UINT32	length = (entry->addrend - entry->addrstart) + 1;
 
-							traverse->address = map->start;
+							traverse->address = entry->addrstart;
 							traverse->length = length;
 
 							traverse->targetIdx = info->targetIdx;
 							traverse->targetType = info->targetType;
-							traverse->writeHandler = map;
+							traverse->writeHandler = entry;
 
 							traverse->first = NULL;
 							traverse->last = NULL;
@@ -9200,8 +9194,6 @@ static void BuildSearchRegions(running_machine *machine, SearchInfo * info)
 
 							traverse++;
 						}
-
-						map++;
 					}
 				}
 			}
@@ -9422,12 +9414,12 @@ static void HandleLocalCommandCheat(running_machine *machine, UINT32 type, UINT3
 				/* ----- refresh rate ----- */
 				case kCustomLocation_RefreshRate:
 				{
-					screen_state	*state = &machine->screen[0];
-					double			refresh = data;
+					int width  = video_screen_get_width(machine->primary_screen);
+					int height = video_screen_get_height(machine->primary_screen);
+					const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+					double refresh = data / 65536.0;
 
-					refresh /= 65536.0;
-
-					video_screen_configure(0, state->width, state->height, &state->visarea, HZ_TO_ATTOSECONDS(refresh));
+					video_screen_configure(machine->primary_screen, width, height, visarea, HZ_TO_ATTOSECONDS(refresh));
 				}
 				break;
 			}
@@ -10474,23 +10466,17 @@ static void DoSearch(SearchInfo * search)
 
 static UINT8 ** LookupHandlerMemory(UINT8 cpu, UINT32 address, UINT32 * outRelativeAddress)
 {
-	const address_map	* map = memory_get_map(cpu, ADDRESS_SPACE_PROGRAM);
+	const address_map	* map = memory_get_address_map(cpu, ADDRESS_SPACE_PROGRAM);
+	const address_map_entry *entry;
 
-	while(!IS_AMENTRY_END(map))
-	{
-		if(!IS_AMENTRY_EXTENDED(map) && map->write.handler)
+	for (entry = map->entrylist; entry != NULL; entry = entry->next)
+		if (entry->write.generic != NULL && (address >= entry->addrstart) && (address <= entry->addrend))
 		{
-			if((address >= map->start) && (address <= map->end))
-			{
-				if(outRelativeAddress)
-					*outRelativeAddress = address - map->start;
+			if(outRelativeAddress)
+				*outRelativeAddress = address - entry->addrstart;
 
-				return (UINT8 **)map->base;
-			}
+			return (UINT8 **)entry->baseptr;
 		}
-
-		map++;
-	}
 
 	return NULL;
 }
@@ -11403,7 +11389,7 @@ static void cheat_periodicAction(running_machine *machine, CheatAction * action)
 				/* ----- keep if one shot + restore prevous value + delay !=0 ----- */
 				cheat_periodicOperation(action);
 
-				if(action->frameTimer >= (parameter * ATTOSECONDS_TO_HZ(machine->screen[0].refresh)))
+				if(action->frameTimer >= (parameter * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds)))
 				{
 					action->frameTimer = 0;
 
@@ -11415,7 +11401,7 @@ static void cheat_periodicAction(running_machine *machine, CheatAction * action)
 			else
 			{
 				/* ----- otherwise, delay ----- */
-				if(action->frameTimer >= (parameter * ATTOSECONDS_TO_HZ(machine->screen[0].refresh)))
+				if(action->frameTimer >= (parameter * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds)))
 				{
 					action->frameTimer = 0;
 
@@ -11454,7 +11440,7 @@ static void cheat_periodicAction(running_machine *machine, CheatAction * action)
 
 				if(currentValue != action->lastValue)
 				{
-					action->frameTimer = parameter * ATTOSECONDS_TO_HZ(machine->screen[0].refresh);
+					action->frameTimer = parameter * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds);
 
 					action->flags |= kActionFlag_WasModified;
 				}

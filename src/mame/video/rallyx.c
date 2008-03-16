@@ -551,7 +551,7 @@ static void locomotn_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		int flip = spriteram[offs] & 2;
 
 		/* handle reduced visible area in some games */
-		if (flip_screen_get() && machine->screen[0].visarea.max_x == 32*8-1) sx += 32;
+		if (flip_screen_get() && (video_screen_get_visible_area(machine->primary_screen)->max_x == 32*8-1)) sx += 32;
 
 		pdrawgfx(bitmap,machine->gfx[1],
 				((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1),
@@ -625,7 +625,7 @@ static void locomotn_draw_bullets(running_machine *machine, bitmap_t *bitmap, co
 		y = 252 - rallyx_radary[offs];
 
 		/* handle reduced visible area in some games */
-		if (flip_screen_get() && machine->screen[0].visarea.max_x == 32*8-1) x += 32;
+		if (flip_screen_get() && (video_screen_get_visible_area(machine->primary_screen)->max_x == 32*8-1)) x += 32;
 
 		drawgfx(bitmap,machine->gfx[2],
 				(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
@@ -661,9 +661,9 @@ VIDEO_UPDATE( rallyx )
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,1);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,1);
 
-	rallyx_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
-	rallyx_draw_sprites(machine, bitmap,cliprect,1);
-	rallyx_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+	rallyx_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN);
+	rallyx_draw_sprites(screen->machine, bitmap,cliprect,1);
+	rallyx_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
 
 	return 0;
 }
@@ -694,12 +694,12 @@ VIDEO_UPDATE( jungler )
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,0);
 
-	jungler_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
-	rallyx_draw_sprites(machine, bitmap,cliprect,0);
-	jungler_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+	jungler_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN);
+	rallyx_draw_sprites(screen->machine, bitmap,cliprect,0);
+	jungler_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
 
 	if (stars_enable)
-		draw_stars(machine, bitmap, cliprect);
+		draw_stars(screen->machine, bitmap, cliprect);
 
 	return 0;
 }
@@ -729,12 +729,12 @@ VIDEO_UPDATE( locomotn )
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,1);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,1);
 
-	locomotn_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
-	locomotn_draw_sprites(machine, bitmap,cliprect,0);
-	locomotn_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+	locomotn_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN);
+	locomotn_draw_sprites(screen->machine, bitmap,cliprect,0);
+	locomotn_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
 
 	if (stars_enable)
-		draw_stars(machine, bitmap, cliprect);
+		draw_stars(screen->machine, bitmap, cliprect);
 
 	return 0;
 }

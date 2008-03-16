@@ -36,7 +36,7 @@ VIDEO_UPDATE( galeb )
 		for(x = 0; x < 48; x++ )
 		{
 			int code = program_read_byte(GALEB_VIDEO_MEMORY + 15 + x + y*64);		
-			drawgfx(bitmap, machine->gfx[0],  code , 0, 0,0, x*8,y*8,
+			drawgfx(bitmap, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8,
 				NULL, TRANSPARENCY_NONE, 0);
 		}
 	}

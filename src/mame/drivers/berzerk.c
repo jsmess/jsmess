@@ -167,7 +167,7 @@ static TIMER_CALLBACK( irq_callback )
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_irq_number);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_irq_number);
 }
 
 
@@ -177,10 +177,10 @@ static void create_irq_timer(void)
 }
 
 
-static void start_irq_timer(void)
+static void start_irq_timer(running_machine *machine)
 {
 	int vpos = vysnc_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, vpos, 0), 0);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
 
@@ -244,7 +244,7 @@ static TIMER_CALLBACK( nmi_callback )
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
-	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_nmi_number);
+	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_nmi_number);
 }
 
 
@@ -254,10 +254,10 @@ static void create_nmi_timer(void)
 }
 
 
-static void start_nmi_timer(void)
+static void start_nmi_timer(running_machine *machine)
 {
 	int vpos = vysnc_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
-	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(0, vpos, 0), 0);
+	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
 
@@ -296,8 +296,8 @@ static MACHINE_RESET( berzerk )
 	set_led_status(0, 0);
 	magicram_control = 0;
 
-	start_irq_timer();
-	start_nmi_timer();
+	start_irq_timer(machine);
+	start_nmi_timer(machine);
 }
 
 
@@ -377,7 +377,7 @@ static READ8_HANDLER( intercept_v256_r )
 	UINT8 counter;
 	UINT8 v256;
 
-	vpos_to_vysnc_chain_counter(video_screen_get_vpos(0), &counter, &v256);
+	vpos_to_vysnc_chain_counter(video_screen_get_vpos(machine->primary_screen), &counter, &v256);
 
 	return (!intercept << 7) | v256;
 }
@@ -559,7 +559,7 @@ static ADDRESS_MAP_START( berzerk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&berzerk_videoram) AM_SIZE(&berzerk_videoram_size) AM_SHARE(1)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(MRA8_RAM, magicram_w) AM_SHARE(1)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_RAM, magicram_w) AM_SHARE(1)
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE(&berzerk_colorram)
 	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END
@@ -568,7 +568,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( frenzy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&berzerk_videoram) AM_SIZE(&berzerk_videoram_size) AM_SHARE(1)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(MRA8_RAM, magicram_w) AM_SHARE(1)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_RAM, magicram_w) AM_SHARE(1)
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE(&berzerk_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xf800, 0xfbff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
@@ -583,25 +583,25 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( berzerk_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP
 	AM_RANGE(0x40, 0x47) AM_READWRITE(berzerk_audio_r, berzerk_audio_w)
-	AM_RANGE(0x48, 0x48) AM_READWRITE(input_port_0_r, MWA8_NOP)
-	AM_RANGE(0x49, 0x49) AM_READWRITE(input_port_1_r, MWA8_NOP)
-	AM_RANGE(0x4a, 0x4a) AM_READWRITE(input_port_2_r, MWA8_NOP)
-	AM_RANGE(0x4b, 0x4b) AM_READWRITE(MRA8_NOP, magicram_control_w)
+	AM_RANGE(0x48, 0x48) AM_READWRITE(input_port_0_r, SMH_NOP)
+	AM_RANGE(0x49, 0x49) AM_READWRITE(input_port_1_r, SMH_NOP)
+	AM_RANGE(0x4a, 0x4a) AM_READWRITE(input_port_2_r, SMH_NOP)
+	AM_RANGE(0x4b, 0x4b) AM_READWRITE(SMH_NOP, magicram_control_w)
 	AM_RANGE(0x4c, 0x4c) AM_READWRITE(nmi_enable_r, nmi_enable_w)
 	AM_RANGE(0x4d, 0x4d) AM_READWRITE(nmi_disable_r, nmi_disable_w)
-	AM_RANGE(0x4e, 0x4e) AM_READWRITE(intercept_v256_r, MWA8_NOP)
-	AM_RANGE(0x4f, 0x4f) AM_READWRITE(MRA8_NOP, irq_enable_w)
+	AM_RANGE(0x4e, 0x4e) AM_READWRITE(intercept_v256_r, SMH_NOP)
+	AM_RANGE(0x4f, 0x4f) AM_READWRITE(SMH_NOP, irq_enable_w)
 	AM_RANGE(0x50, 0x57) AM_NOP /* second sound board, but not used */
 	AM_RANGE(0x58, 0x5f) AM_NOP
-	AM_RANGE(0x60, 0x60) AM_MIRROR(0x18) AM_READWRITE(input_port_3_r, MWA8_NOP)
-	AM_RANGE(0x61, 0x61) AM_MIRROR(0x18) AM_READWRITE(input_port_4_r, MWA8_NOP)
-	AM_RANGE(0x62, 0x62) AM_MIRROR(0x18) AM_READWRITE(input_port_5_r, MWA8_NOP)
-	AM_RANGE(0x63, 0x63) AM_MIRROR(0x18) AM_READWRITE(input_port_6_r, MWA8_NOP)
-	AM_RANGE(0x64, 0x64) AM_MIRROR(0x18) AM_READWRITE(input_port_7_r, MWA8_NOP)
-	AM_RANGE(0x65, 0x65) AM_MIRROR(0x18) AM_READWRITE(input_port_8_r, MWA8_NOP)
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x18) AM_READWRITE(input_port_3_r, SMH_NOP)
+	AM_RANGE(0x61, 0x61) AM_MIRROR(0x18) AM_READWRITE(input_port_4_r, SMH_NOP)
+	AM_RANGE(0x62, 0x62) AM_MIRROR(0x18) AM_READWRITE(input_port_5_r, SMH_NOP)
+	AM_RANGE(0x63, 0x63) AM_MIRROR(0x18) AM_READWRITE(input_port_6_r, SMH_NOP)
+	AM_RANGE(0x64, 0x64) AM_MIRROR(0x18) AM_READWRITE(input_port_7_r, SMH_NOP)
+	AM_RANGE(0x65, 0x65) AM_MIRROR(0x18) AM_READWRITE(input_port_8_r, SMH_NOP)
 	AM_RANGE(0x66, 0x66) AM_MIRROR(0x18) AM_READWRITE(led_off_r, led_off_w)
 	AM_RANGE(0x67, 0x67) AM_MIRROR(0x18) AM_READWRITE(led_on_r, led_on_w)
 	AM_RANGE(0x80, 0xff) AM_NOP

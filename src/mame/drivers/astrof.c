@@ -100,7 +100,7 @@ static TIMER_CALLBACK( irq_callback )
 {
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
 }
 
 
@@ -110,9 +110,9 @@ static void create_irq_timer(void)
 }
 
 
-static void start_irq_timer(void)
+static void start_irq_timer(running_machine *machine)
 {
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
 }
 
 
@@ -248,7 +248,7 @@ static WRITE8_HANDLER( video_control_1_w )
 	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1 */
 	/* D3-D7 - not connected */
 
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -269,7 +269,7 @@ static void astrof_set_video_control_2(UINT8 data)
 static WRITE8_HANDLER( astrof_video_control_2_w )
 {
 	astrof_set_video_control_2(data);
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -287,7 +287,7 @@ static void spfghmk2_set_video_control_2(UINT8 data)
 static WRITE8_HANDLER( spfghmk2_video_control_2_w )
 {
 	spfghmk2_set_video_control_2(data);
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -304,7 +304,7 @@ static void tomahawk_set_video_control_2(UINT8 data)
 static WRITE8_HANDLER( tomahawk_video_control_2_w )
 {
 	tomahawk_set_video_control_2(data);
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -486,7 +486,7 @@ static MACHINE_START( tomahawk )
 
 static MACHINE_RESET( astrof )
 {
-	start_irq_timer();
+	start_irq_timer(machine);
 }
 
 
@@ -511,14 +511,14 @@ static ADDRESS_MAP_START( astrof_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(astrof_videoram_w) AM_BASE(&astrof_videoram) AM_SIZE(&astrof_videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&astrof_color)
-	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, video_control_1_w)
-	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, astrof_video_control_2_w)
-	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, astrof_audio_1_w)
-	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, astrof_audio_2_w)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READWRITE(port_tag_to_handler("IN"), MWA8_NOP)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READWRITE(port_tag_to_handler("DSW"), MWA8_NOP)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, MWA8_NOP)
+	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&astrof_color)
+	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, video_control_1_w)
+	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, astrof_video_control_2_w)
+	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, astrof_audio_1_w)
+	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, astrof_audio_2_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITENOP
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITENOP
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, SMH_NOP)
 	AM_RANGE(0xa003, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -530,14 +530,14 @@ static ADDRESS_MAP_START( spfghmk2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(astrof_videoram_w) AM_BASE(&astrof_videoram) AM_SIZE(&astrof_videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&astrof_color)
-	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, video_control_1_w)
-	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, spfghmk2_video_control_2_w)
-	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, spfghmk2_audio_w)
+	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&astrof_color)
+	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, video_control_1_w)
+	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, spfghmk2_video_control_2_w)
+	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, spfghmk2_audio_w)
 	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READWRITE(port_tag_to_handler("IN"), MWA8_NOP)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READWRITE(port_tag_to_handler("DSW"), MWA8_NOP)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, MWA8_NOP)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITENOP
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITENOP
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, SMH_NOP)
 	AM_RANGE(0xa003, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -549,15 +549,15 @@ static ADDRESS_MAP_START( tomahawk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(tomahawk_videoram_w) AM_BASE(&astrof_videoram) AM_SIZE(&astrof_videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&astrof_color)
-	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, video_control_1_w)
-	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, tomahawk_video_control_2_w)
-	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, tomahawk_audio_w)
-	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&tomahawk_protection)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITE(MWA8_NOP)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITE(MWA8_NOP)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, MWA8_NOP)
-	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ff8) AM_READWRITE(tomahawk_protection_r, MWA8_NOP)
+	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&astrof_color)
+	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, video_control_1_w)
+	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, tomahawk_video_control_2_w)
+	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, tomahawk_audio_w)
+	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&tomahawk_protection)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, SMH_NOP)
+	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ff8) AM_READWRITE(tomahawk_protection_r, SMH_NOP)
 	AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END

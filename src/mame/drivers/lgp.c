@@ -99,7 +99,7 @@ static VIDEO_UPDATE( lgp )
 
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
-			drawgfx(bitmap, machine->gfx[0],
+			drawgfx(bitmap, screen->machine->gfx[0],
 					tile_ram[current_screen_character],
 					0,
 					0, 0, charx*8, chary*8, cliprect, TRANSPARENCY_PEN, 0);
@@ -153,13 +153,13 @@ ADDRESS_MAP_END
 
 /* IO MAPS */
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0xfd,0xfd) AM_READ_PORT("IN_TEST")
 //  AM_RANGE(0xfe,0xfe) AM_READ_PORT("IN_TEST")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 

@@ -145,6 +145,9 @@ static UINT8 tms5220_in_data;
 static UINT8 tms5220_ctl;
 
 
+static TIMER_CALLBACK( delayed_joystick_int );
+
+
 
 /*************************************
  *
@@ -174,8 +177,6 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static TIMER_CALLBACK( delayed_joystick_int );
-
 static MACHINE_RESET( atarisy1 )
 {
 	/* initialize the system */
@@ -203,7 +204,7 @@ static TIMER_CALLBACK( delayed_joystick_int )
 {
 	joystick_value = param;
 	joystick_int = 1;
-	atarigen_update_interrupts();
+	atarigen_update_interrupts(machine);
 }
 
 
@@ -229,7 +230,7 @@ static READ16_HANDLER( joystick_r )
 	/* clear any existing interrupt and set a timer for a new one */
 	joystick_int = 0;
 	timer_adjust_oneshot(joystick_timer, ATTOTIME_IN_USEC(50), newval);
-	atarigen_update_interrupts();
+	atarigen_update_interrupts(machine);
 
 	return joystick_value;
 }
@@ -410,49 +411,13 @@ static WRITE8_HANDLER( led_w )
 
 /*************************************
  *
- *  Opcode memory catcher.
- *
- *************************************/
-
-static OPBASE_HANDLER( indytemp_setopbase )
-{
-	int prevpc = activecpu_get_previouspc();
-	/*
-     *  This is a slightly ugly kludge for Indiana Jones & the Temple of Doom because it jumps
-     *  directly to code in the slapstic.  The general order of things is this:
-     *
-     *      jump to $3A, which turns off interrupts and jumps to $00 (the reset address)
-     *      look up the request in a table and jump there
-     *      (under some circumstances, tweak the special addresses)
-     *      return via an RTS at the real bankswitch address
-     *
-     *  To simulate this, we tweak the slapstic reset address on entry into slapstic code; then
-     *  we let the system tweak whatever other addresses it wishes.  On exit, we tweak the
-     *  address of the previous PC, which is the RTS instruction, thereby completing the
-     *  bankswitch sequence.
-     *
-     *  Fortunately for us, all 4 banks have exactly the same code at this point in their
-     *  ROM, so it doesn't matter which version we're actually executing.
-     */
-
-	if (address & 0x80000)
-		atarigen_slapstic_r(machine,0,0);
-	else if (prevpc & 0x80000)
-		atarigen_slapstic_r(machine,(prevpc >> 1) & 0x3fff,0);
-
-	return address;
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x087fff) AM_ROM
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x087fff) AM_ROM	/* slapstic maps here */
 	AM_RANGE(0x2e0000, 0x2e0001) AM_READ(atarisy1_int3state_r)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(atarisy1_xscroll_w) AM_BASE(&atarigen_xscroll)
@@ -463,10 +428,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(MRA16_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(MRA16_RAM, atarisy1_spriteram_w) AM_BASE(&atarimo_0_spriteram)
-	AM_RANGE(0xa03000, 0xa03fff) AM_READWRITE(MRA16_RAM, atarigen_alpha_w) AM_BASE(&atarigen_alpha)
-	AM_RANGE(0xb00000, 0xb007ff) AM_READWRITE(MRA16_RAM, paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(SMH_RAM, atarisy1_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xa03000, 0xa03fff) AM_READWRITE(SMH_RAM, atarigen_alpha_w) AM_BASE(&atarigen_alpha)
+	AM_RANGE(0xb00000, 0xb007ff) AM_READWRITE(SMH_RAM, paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xf00000, 0xf00fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
 	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
@@ -2163,9 +2128,6 @@ static DRIVER_INIT( indytemp )
 
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(0, 0x080000, 0, 105);
-
-	/* special case for the Indiana Jones slapstic */
-	memory_set_opbase_handler(0,indytemp_setopbase);
 
 	joystick_type = 1;	/* digital */
 	trackball_type = 0;	/* none */

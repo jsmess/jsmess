@@ -23,9 +23,6 @@
     CONSTANTS
 ***************************************************************************/
 
-/* maximum number of screens for one game */
-#define MAX_SCREENS					8
-
 /* number of levels of frameskipping supported */
 #define FRAMESKIP_LEVELS			12
 #define MAX_FRAMESKIP				(FRAMESKIP_LEVELS - 2)
@@ -51,27 +48,17 @@ enum
 #define video_screen_first(config)		device_list_first((config)->devicelist, VIDEO_SCREEN)
 #define video_screen_next(previous)		device_list_next((previous), VIDEO_SCREEN)
 
+#define video_screen_get_format(screen)	(((screen_config *)(screen)->inline_config)->format)
+
+/* allocates a bitmap that has the same dimensions and format as the passed in screen */
+#define video_screen_auto_bitmap_alloc(screen)	auto_bitmap_alloc(video_screen_get_width(screen), video_screen_get_height(screen), video_screen_get_format(screen))
+
+
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    screen_state - current live state of a screen
--------------------------------------------------*/
-
-typedef struct _screen_state screen_state;
-struct _screen_state
-{
-	int				width, height;				/* total width/height (HTOTAL, VTOTAL) */
-	rectangle		visarea;					/* visible area (HBLANK end/start, VBLANK end/start) */
-	UINT8			oldstyle_vblank_supplied;	/* MDRV_SCREEN_VBLANK_TIME macro used */
-	attoseconds_t	refresh;					/* refresh period */
-	attoseconds_t	vblank;						/* duration of a VBLANK */
-	bitmap_format	format;						/* bitmap format */
-};
-
 
 /*-------------------------------------------------
     screen_config - configuration of a single
@@ -82,19 +69,24 @@ typedef struct _screen_config screen_config;
 struct _screen_config
 {
 	int				type;						/* type of screen */
-	screen_state	defstate;					/* default state */
+	int				width, height;				/* default total width/height (HTOTAL, VTOTAL) */
+	rectangle		visarea;					/* default visible area (HBLANK end/start, VBLANK end/start) */
+	UINT8			oldstyle_vblank_supplied;	/* MDRV_SCREEN_VBLANK_TIME macro used */
+	attoseconds_t	refresh;					/* default refresh period */
+	attoseconds_t	vblank;						/* duration of a VBLANK */
+	bitmap_format	format;						/* bitmap format */
 	float			xoffset, yoffset;			/* default X/Y offsets */
 	float			xscale, yscale;				/* default X/Y scale factor */
 };
 
 
 /*-------------------------------------------------
-    vblank_state_changed_func - callback that a
-    screen calls to notify of a change of
-    the VBLANK state
+    vblank_state_changed_func -
+    callback that is called to notify of a change
+    in the VBLANK state
 -------------------------------------------------*/
 
-typedef void (*vblank_state_changed_func)(running_machine *machine, screen_state *screen, int vblank_state);
+typedef void (*vblank_state_changed_func)(const device_config *device, int vblank_state);
 
 
 
@@ -111,51 +103,57 @@ void video_init(running_machine *machine);
 /* ----- screen management ----- */
 
 /* set the resolution of a screen */
-void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t refresh);
+void video_screen_configure(const device_config *screen, int width, int height, const rectangle *visarea, attoseconds_t refresh);
 
 /* set the visible area of a screen; this is a subset of video_screen_configure */
-void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int max_y);
+void video_screen_set_visarea(const device_config *screen, int min_x, int max_x, int min_y, int max_y);
 
 /* force a partial update of the screen up to and including the requested scanline */
-void video_screen_update_partial(int scrnum, int scanline);
+void video_screen_update_partial(const device_config *screen, int scanline);
 
 /* force an update from the last beam position up to the current beam position */
-void video_screen_update_now(int scrnum);
+void video_screen_update_now(const device_config *screen);
 
 /* return the current vertical or horizontal position of the beam for a screen */
-int video_screen_get_vpos(int scrnum);
-int video_screen_get_hpos(int scrnum);
+int video_screen_get_vpos(const device_config *screen);
+int video_screen_get_hpos(const device_config *screen);
 
 /* return the current vertical or horizontal blanking state for a screen */
-int video_screen_get_vblank(int scrnum);
-int video_screen_get_hblank(int scrnum);
+int video_screen_get_vblank(const device_config *screen);
+int video_screen_get_hblank(const device_config *screen);
+
+/* return the current width for a screen */
+int video_screen_get_width(const device_config *screen);
+
+/* return the current height for a screen */
+int video_screen_get_height(const device_config *screen);
+
+/* return the current visible area for a screen */
+const rectangle *video_screen_get_visible_area(const device_config *screen);
 
 /* return the time when the beam will reach a particular H,V position */
-attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
+attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, int hpos);
 
 /* return the time when the beam will reach the start of VBLANK */
-attotime video_screen_get_time_until_vblank_start(int scrnum);
+attotime video_screen_get_time_until_vblank_start(const device_config *screen);
 
 /* return the time when the beam will reach the end of VBLANK */
-attotime video_screen_get_time_until_vblank_end(int scrnum);
+attotime video_screen_get_time_until_vblank_end(const device_config *screen);
 
 /* return the time when the VIDEO_UPDATE function will be called */
-attotime video_screen_get_time_until_update(int scrnum);
+attotime video_screen_get_time_until_update(const device_config *screen);
 
 /* return the amount of time the beam takes to draw one scan line */
-attotime video_screen_get_scan_period(int scrnum);
+attotime video_screen_get_scan_period(const device_config *screen);
 
 /* return the amount of time the beam takes to draw one complete frame */
-attotime video_screen_get_frame_period(int scrnum);
+attotime video_screen_get_frame_period(const device_config *screen);
 
 /* return the current frame number -- this is always increasing */
-UINT64 video_screen_get_frame_number(int scrnum);
+UINT64 video_screen_get_frame_number(const device_config *screen);
 
-/* returns whether a given screen exists */
-int video_screen_exists(int scrnum);
-
-/* registers a VBLANK callback for the given screen*/
-void video_screen_register_vbl_cb(running_machine *machine, void *screen, vblank_state_changed_func vbl_cb);
+/* registers a VBLANK callback for the given screen */
+void video_screen_register_vbl_cb(const device_config *screen, vblank_state_changed_func vbl_cb);
 
 
 /* ----- video screen device interface ----- */
@@ -163,7 +161,6 @@ void video_screen_register_vbl_cb(running_machine *machine, void *screen, vblank
 /* device get info callback */
 #define VIDEO_SCREEN DEVICE_GET_INFO_NAME(video_screen)
 DEVICE_GET_INFO( video_screen );
-
 
 
 /* ----- global rendering ----- */
@@ -182,7 +179,7 @@ int video_get_speed_factor(void);
 void video_set_speed_factor(int speed);
 
 /* return text to display about the current speed */
-const char *video_get_speed_text(void);
+const char *video_get_speed_text(running_machine *machine);
 
 /* get/set the current frameskip (-1 means auto) */
 int video_get_frameskip(void);
@@ -200,7 +197,7 @@ void video_set_fastforward(int fastforward);
 /* ----- snapshots ----- */
 
 /* save a snapshot of a given screen */
-void video_screen_save_snapshot(running_machine *machine, mame_file *fp, int scrnum);
+void video_screen_save_snapshot(const device_config *screen, mame_file *fp);
 
 /* save a snapshot of all the active screens */
 void video_save_active_screen_snapshots(running_machine *machine);
@@ -208,16 +205,9 @@ void video_save_active_screen_snapshots(running_machine *machine);
 
 /* ----- movie recording ----- */
 
-/* Movie recording */
-int video_is_movie_active(running_machine *machine, int scrnum);
-void video_movie_begin_recording(running_machine *machine, int scrnum, const char *name);
-void video_movie_end_recording(running_machine *machine, int scrnum);
-
-
-/* ----- crosshair rendering ----- */
-
-void video_crosshair_toggle(void);
-void video_crosshair_set_screenmask_callback(running_machine *machine, UINT32 (*get_screen_mask)(int player));
+int video_is_movie_active(const device_config *screen);
+void video_movie_begin_recording(const device_config *screen, const char *name);
+void video_movie_end_recording(const device_config *screen);
 
 
 #endif	/* __VIDEO_H__ */

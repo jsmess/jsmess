@@ -317,38 +317,38 @@ static struct sms_vdp *md_sms_vdp;
 
 #ifdef UNUSED_FUNCTION
 static ADDRESS_MAP_START( sms_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000 , 0xbfff) AM_READ(MRA8_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_READ(MRA8_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_READ(SMH_ROM)
+//  AM_RANGE(0xc000 , 0xdfff) AM_READ(SMH_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(MWA8_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(MWA8_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(SMH_ROM)
+//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(SMH_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 #endif
 
 /* we have to fill in the ROM addresses for systeme due to the encrypted games */
 static ADDRESS_MAP_START( systeme_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)				/* Fixed ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)				/* Banked ROM */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* Fixed ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)				/* Banked ROM */
 
-//  AM_RANGE(0x0000 , 0xbfff) AM_READ(MRA8_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_READ(MRA8_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_READ(SMH_ROM)
+//  AM_RANGE(0xc000 , 0xdfff) AM_READ(SMH_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( systeme_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)				/* Fixed ROM */
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)				/* Fixed ROM */
 
-//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(MWA8_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(MWA8_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(SMH_ROM)
+//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(SMH_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 /* Precalculated tables for H/V counters.  Note the position the counter 'jumps' is marked with with
@@ -716,7 +716,7 @@ static void *start_vdp(running_machine *machine, int type)
 	memset(chip->sprite_renderline,0x00,256+32);
 
 	chip->writemode = 0;
-	chip->r_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	chip->r_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	chip->sms_scanline_timer = timer_alloc(sms_scanline_timer_callback, chip);
 
@@ -1440,7 +1440,7 @@ static void end_of_frame(struct sms_vdp *chip)
 		visarea.min_y = 0;
 		visarea.max_y = sms_mode_table[chip->screen_mode].sms2_height-1;
 
-		if (chip->chip_id==3) video_screen_configure(0, 256, 256, &visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+		if (chip->chip_id==3) video_screen_configure(Machine->primary_screen, 256, 256, &visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 
 	}
 	else /* 160x144 */
@@ -2203,8 +2203,8 @@ static void init_systeme_map(void)
 
 	/* fixed rom bank area */
 //  sms_rom = auto_malloc(0xc000);
-//  memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK1);
-//  memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, MWA8_UNMAP);
+//  memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK1);
+//  memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
 //  memory_set_bankptr( 1, sms_rom );
 
 	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
@@ -2217,8 +2217,8 @@ static void init_systeme_map(void)
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x4000);
-	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MRA8_BANK2);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MWA8_BANK2);
+	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2);
 	memory_set_bankptr( 2, sms_mainram );
 	memset(sms_mainram,0x00,0x4000);
 

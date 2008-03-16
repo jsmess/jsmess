@@ -192,13 +192,13 @@ VIDEO_UPDATE( kaypro )
 	{
 		if (blink_count & 16)
 		{
-			palette_set_color_rgb(machine, 3, 0,240,	0);
-			palette_set_color_rgb(machine, 4, 0,120,	0);
+			palette_set_color_rgb(screen->machine, 3, 0,240,	0);
+			palette_set_color_rgb(screen->machine, 4, 0,120,	0);
 		}
 		else
 		{
-			palette_set_color_rgb(machine, 3, 0,	0,	0);
-			palette_set_color_rgb(machine, 4, 0,	0,	0);
+			palette_set_color_rgb(screen->machine, 3, 0,	0,	0);
+			palette_set_color_rgb(screen->machine, 4, 0,	0,	0);
 		}
 	}
 

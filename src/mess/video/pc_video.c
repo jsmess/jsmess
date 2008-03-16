@@ -89,14 +89,17 @@ VIDEO_UPDATE( pc_video )
 	{
 		if ((pc_current_width != w) || (pc_current_height != h))
 		{
+			int width = video_screen_get_width(screen);
+			int height = video_screen_get_height(screen);
+
 			pc_current_width = w;
 			pc_current_height = h;
 			pc_anythingdirty = 1;
 
-			if (pc_current_width > machine->screen[0].width)
-				pc_current_width = machine->screen[0].width;
-			if (pc_current_height > machine->screen[0].height)
-				pc_current_height = machine->screen[0].height;
+			if (pc_current_width > width)
+				pc_current_width = width;
+			if (pc_current_height > height)
+				pc_current_height = height;
 
 			if ((pc_current_width > 100) && (pc_current_height > 100))
 				video_screen_set_visarea(0, 0, pc_current_width-1, 0, pc_current_height-1);

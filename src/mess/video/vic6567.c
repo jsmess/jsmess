@@ -648,8 +648,11 @@ READ8_HANDLER ( vic2_port_r )
 VIDEO_START( vic2 )
 {
 	int i;
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
 
-	vic2.bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	vic2.bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 
 	if (vic2.vic3) {
 		vic2.screen[0] = (UINT8*)auto_malloc (sizeof (UINT8) * 216 * 656 / 8);

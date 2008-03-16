@@ -44,7 +44,7 @@ MOS MPS 6332 005 2179
  */
 // only lower 12 address bits on bus!
 static ADDRESS_MAP_START(mk2_mem , ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(13) ) // m6504
+	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) // m6504
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
 	AM_RANGE( 0x0b00, 0x0b0f) AM_READWRITE( rriot_0_r, rriot_0_w )
 	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram

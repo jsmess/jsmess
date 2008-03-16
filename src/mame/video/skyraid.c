@@ -17,7 +17,7 @@ static bitmap_t *helper;
 
 VIDEO_START( skyraid )
 {
-	helper = auto_bitmap_alloc(128, 240, machine->screen[0].format);
+	helper = auto_bitmap_alloc(128, 240, video_screen_get_format(machine->primary_screen));
 }
 
 
@@ -144,9 +144,9 @@ VIDEO_UPDATE( skyraid )
 	fillbitmap(bitmap, 0, cliprect);
 
 	draw_terrain(helper, cliprect);
-	draw_sprites(machine, helper, cliprect);
-	draw_missiles(machine, helper, cliprect);
+	draw_sprites(screen->machine, helper, cliprect);
+	draw_missiles(screen->machine, helper, cliprect);
 	draw_trapezoid(bitmap, helper);
-	draw_text(machine, bitmap, cliprect);
+	draw_text(screen->machine, bitmap, cliprect);
 	return 0;
 }

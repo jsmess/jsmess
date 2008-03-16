@@ -128,7 +128,7 @@ VIDEO_UPDATE( laser )
 
     if( full_refresh )
 	{
-		fillbitmap(bitmap, machine->pens[(laser_bg_mode >> 4) & 15], &machine->screen[0].visarea);
+		fillbitmap(bitmap, screen->machine->pens[(laser_bg_mode >> 4) & 15], cliprect);
     }
 
 	if (laser_latch & 0x08)
@@ -151,8 +151,8 @@ VIDEO_UPDATE( laser )
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 8;
                     code = videoram[offs];
-					drawgfx(bitmap,machine->gfx[2],code,color,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					drawgfx(bitmap,screen->machine->gfx[2],code,color,0,0,sx,sy,
+                        cliprect,TRANSPARENCY_NONE,0);
                 }
             }
             break;
@@ -172,8 +172,8 @@ VIDEO_UPDATE( laser )
 					sx = BORDER_H/2 + x * 16;
                     code = videoram[offs];
 					color = videoram[offs+1];
-					drawgfx(bitmap,machine->gfx[3],code,color,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					drawgfx(bitmap,screen->machine->gfx[3],code,color,0,0,sx,sy,
+                        cliprect,TRANSPARENCY_NONE,0);
                 }
             }
             break;
@@ -192,8 +192,8 @@ VIDEO_UPDATE( laser )
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 8;
                     code = videoram[offs];
-					drawgfx(bitmap,machine->gfx[5],code,0,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					drawgfx(bitmap,screen->machine->gfx[5],code,0,0,0,sx,sy,
+                        cliprect,TRANSPARENCY_NONE,0);
                 }
             }
             break;
@@ -213,8 +213,8 @@ VIDEO_UPDATE( laser )
 					sy = BORDER_V/2 + y * 2;
 					sx = BORDER_H/2 + x * 8;
                     code = videoram[offs];
-					drawgfx(bitmap,machine->gfx[6],code,0,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					drawgfx(bitmap,screen->machine->gfx[6],code,0,0,0,sx,sy,
+                        cliprect,TRANSPARENCY_NONE,0);
                 }
             }
             break;
@@ -233,8 +233,8 @@ VIDEO_UPDATE( laser )
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 16;
                     code = videoram[offs];
-					drawgfx(bitmap,machine->gfx[3],code,color,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					drawgfx(bitmap,screen->machine->gfx[3],code,color,0,0,sx,sy,
+                        cliprect,TRANSPARENCY_NONE,0);
                 }
             }
             break;
@@ -254,8 +254,8 @@ VIDEO_UPDATE( laser )
 					sx = BORDER_H/2 + x * 32;
                     code = videoram[offs];
 					color = videoram[offs+1];
-					drawgfx(bitmap,machine->gfx[4],code,color,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					drawgfx(bitmap,screen->machine->gfx[4],code,color,0,0,sx,sy,
+                        cliprect,TRANSPARENCY_NONE,0);
                 }
             }
             break;
@@ -276,8 +276,8 @@ VIDEO_UPDATE( laser )
 					sy = BORDER_V/2 + y * 8;
 					sx = BORDER_H/2 + x * 8;
                     code = videoram[0x3800+offs];
-					drawgfx(bitmap,machine->gfx[0],code,color,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,screen->machine->gfx[0],code,color,0,0,sx,sy,
+                        cliprect,TRANSPARENCY_PEN,0);
                 }
             }
         }
@@ -294,8 +294,8 @@ VIDEO_UPDATE( laser )
 					sx = BORDER_H/2 + x * 16;
                     code = videoram[0x3800+offs];
                     color = videoram[0x3801+offs];
-					drawgfx(bitmap,machine->gfx[1],code,color,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,screen->machine->gfx[1],code,color,0,0,sx,sy,
+                        cliprect,TRANSPARENCY_PEN,0);
                 }
             }
         }

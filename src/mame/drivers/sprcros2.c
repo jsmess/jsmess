@@ -121,25 +121,25 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 }
 
 static ADDRESS_MAP_START( sprcros2_m_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xe000, 0xf7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_RAM)						//shared with slave cpu
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xe000, 0xf7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)						//shared with slave cpu
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_m_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_BANK1)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_BANK1)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(sprcros2_fgvideoram_w) AM_BASE(&sprcros2_fgvideoram)
-	AM_RANGE(0xe800, 0xe817) AM_WRITE(MWA8_RAM)						//always zero
-	AM_RANGE(0xe818, 0xe83f) AM_WRITE(MWA8_RAM) AM_BASE(&sprcros2_spriteram) AM_SIZE(&sprcros2_spriteram_size)
-	AM_RANGE(0xe840, 0xefff) AM_WRITE(MWA8_RAM)						//always zero
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&sprcros2_sharedram)	//shared with slave cpu
+	AM_RANGE(0xe800, 0xe817) AM_WRITE(SMH_RAM)						//always zero
+	AM_RANGE(0xe818, 0xe83f) AM_WRITE(SMH_RAM) AM_BASE(&sprcros2_spriteram) AM_SIZE(&sprcros2_spriteram_size)
+	AM_RANGE(0xe840, 0xefff) AM_WRITE(SMH_RAM)						//always zero
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&sprcros2_sharedram)	//shared with slave cpu
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_m_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( sprcros2_m_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_m_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(SN76496_1_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(SN76496_2_w)
@@ -156,25 +156,25 @@ static ADDRESS_MAP_START( sprcros2_m_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_BANK2)
-	AM_RANGE(0xe000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK2)
+	AM_RANGE(0xe000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xffff) AM_READ(sprcros2_sharedram_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_BANK2)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_BANK2)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(sprcros2_bgvideoram_w) AM_BASE(&sprcros2_bgvideoram)
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(MWA8_RAM)						//always zero
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe800, 0xefff) AM_WRITE(SMH_RAM)						//always zero
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(sprcros2_sharedram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_s_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sprcros2_bgscrollx_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(sprcros2_bgscrolly_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(sprcros2_s_port3_w)

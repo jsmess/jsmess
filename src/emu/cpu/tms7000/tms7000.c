@@ -156,7 +156,7 @@ static WRITE8_HANDLER( tms70x0_pf_w );
 
 static ADDRESS_MAP_START(tms7000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x007f)	AM_READWRITE(tms7000_internal_r, tms7000_internal_w)	/* tms7000 internal RAM */
-	AM_RANGE(0x0080, 0x00ff)	AM_READWRITE(MRA8_NOP, MWA8_NOP)						/* reserved */
+	AM_RANGE(0x0080, 0x00ff)	AM_READWRITE(SMH_NOP, SMH_NOP)						/* reserved */
 	AM_RANGE(0x0100, 0x01ff)	AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)				/* tms7000 internal I/O ports */
 ADDRESS_MAP_END
 
@@ -337,7 +337,7 @@ void tms7000_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_PTR_DISASSEMBLE:	info->disassemble = tms7000_dasm;	break;
 #endif
         case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &tms7000_icount;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:	info->internal_map = construct_map_tms7000_mem; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:	info->internal_map8 = address_map_tms7000_mem; break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
         case CPUINFO_STR_NAME:	strcpy(info->s = cpuintrf_temp_str(), "TMS7000"); break;

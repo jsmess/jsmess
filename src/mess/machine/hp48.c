@@ -68,7 +68,7 @@ static struct {
 // to do support weired comparator settings
 static void hp48_config(void)
 {
-	static const read8_machine_func read_handlers[11] = { 0, MRA8_BANK1, MRA8_BANK2, MRA8_BANK3, MRA8_BANK4, MRA8_BANK5, MRA8_BANK6, MRA8_BANK7, MRA8_BANK8, MRA8_BANK9, MRA8_BANK10 };
+	static const read8_machine_func read_handlers[11] = { 0, SMH_BANK1, SMH_BANK2, SMH_BANK3, SMH_BANK4, SMH_BANK5, SMH_BANK6, SMH_BANK7, SMH_BANK8, SMH_BANK9, SMH_BANK10 };
 	int i, begin_bank, end_bank, begin, end, mem_type, bank;
 
 	/* Determine the current memory map */

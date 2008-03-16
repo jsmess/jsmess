@@ -120,7 +120,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( ikki )
 {
-	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	sprite_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 
@@ -177,7 +177,7 @@ VIDEO_UPDATE( ikki )
 		bank = (color & 0xe0) << 3;
 		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 			videoram[offs*2+1] + bank,
 			color,
 			ikki_flipscreen,ikki_flipscreen,
@@ -185,7 +185,7 @@ VIDEO_UPDATE( ikki )
 			cliprect,TRANSPARENCY_NONE,0);
 	}
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	/* mask sprites */
 
@@ -213,7 +213,7 @@ VIDEO_UPDATE( ikki )
 			bank = (color & 0xe0) << 3;
 			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,screen->machine->gfx[0],
 				videoram[offs*2+1] + bank,
 				color,
 				ikki_flipscreen,ikki_flipscreen,

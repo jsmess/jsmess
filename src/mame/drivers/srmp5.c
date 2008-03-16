@@ -67,8 +67,9 @@ static VIDEO_UPDATE( srmp5 )
 	UINT16 *sprite_list=sprram;
 	UINT16 *sprite_list_end=&sprram[0x1000]; //guess
 	UINT8 *pixels=(UINT8 *)tileram;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-	fillbitmap(bitmap,0,&machine->screen[0].visarea);
+	fillbitmap(bitmap,0,cliprect);
 
 	while((sprite_list[SUBLIST_OFFSET]&SPRITE_LIST_END_MARKER)==0 && sprite_list<sprite_list_end)
 	{
@@ -105,7 +106,7 @@ static VIDEO_UPDATE( srmp5 )
 
 		 						if(pen)
 		 						{
-		 							if(xb+xs<=machine->screen[0].visarea.max_x && xb+xs>=machine->screen[0].visarea.min_x && yb+ys<=machine->screen[0].visarea.max_y && yb+ys>=machine->screen[0].visarea.min_y )
+		 							if(xb+xs<=visarea->max_x && xb+xs>=visarea->min_x && yb+ys<=visarea->max_y && yb+ys>=visarea->min_y )
 		 							{
 		 								UINT32 pixdata=paletteram32[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
 		 								*BITMAP_ADDR32(bitmap, yb+ys, xb+xs) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);
@@ -164,13 +165,13 @@ static READ32_HANDLER(data_r)
 static ADDRESS_MAP_START( srmp5_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM //maybe 0 - 2fffff ?
 	AM_RANGE(0x002f0000, 0x002f7fff) AM_RAM
-	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(MWA32_RAM)  // 0xaa .. watchdog ?
+	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(SMH_RAM)  // 0xaa .. watchdog ?
 	AM_RANGE(0x01800004, 0x01800007) AM_READ(input_port_0_dword_r)
 	AM_RANGE(0x01800008, 0x0180000b) AM_READ(input_port_1_dword_r)
 	AM_RANGE(0x0180000c, 0x0180000f) AM_WRITE(bank_w)
 	AM_RANGE(0x01800010, 0x01800013) AM_READ(input_port_2_dword_r) //multiplexed controls (selected by writes to 1c)
 	AM_RANGE(0x01800014, 0x01800017) AM_READ(input_port_3_dword_r)
-	AM_RANGE(0x0180001c, 0x0180001f) AM_WRITE(MWA32_RAM)//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
+	AM_RANGE(0x0180001c, 0x0180001f) AM_WRITE(SMH_RAM)//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
 	AM_RANGE(0x01800200, 0x0180020f) AM_RAM  //sound related ? only few writes after boot
 	AM_RANGE(0x01a00000, 0x01bfffff) AM_READ(data_r)
 
@@ -178,10 +179,10 @@ static ADDRESS_MAP_START( srmp5_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0a100000, 0x0a1fffff) AM_RAM AM_BASE(&paletteram32)
 	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE(tileram_r, tileram_w) AM_BASE(&videoram32)
 
-	AM_RANGE(0x1eff0000, 0x1eff001f) AM_WRITE(MWA32_RAM)
+	AM_RANGE(0x1eff0000, 0x1eff001f) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READNOP
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_READ(MRA32_ROM) AM_WRITE(MWA32_ROM) AM_REGION(REGION_USER1, 0)
-	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_READ(MRA32_ROM) AM_WRITE(MWA32_ROM) AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM) AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM) AM_REGION(REGION_USER1, 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st0016_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -200,7 +201,7 @@ ADDRESS_MAP_END
 READ8_HANDLER(st0016_dma_r);
 
 static ADDRESS_MAP_START( st0016_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xc0, 0xc3) AM_NOP // data from other cpu ?
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP

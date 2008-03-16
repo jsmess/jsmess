@@ -42,7 +42,7 @@ static ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2400, 0x26ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x2700, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_NOP
-	AM_RANGE(0x2c00, 0x2fff) AM_READWRITE(MRA8_RAM, jupiter_vh_charram_w) AM_BASE(&jupiter_charram) AM_SIZE(&jupiter_charram_size)
+	AM_RANGE(0x2c00, 0x2fff) AM_READWRITE(SMH_RAM, jupiter_vh_charram_w) AM_BASE(&jupiter_charram) AM_SIZE(&jupiter_charram_size)
 	AM_RANGE(0x3000, 0x3bff) AM_NOP
 	AM_RANGE(0x3c00, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x87ff) AM_RAM

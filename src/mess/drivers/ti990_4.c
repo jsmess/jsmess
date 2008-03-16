@@ -133,7 +133,7 @@ static VIDEO_START( ti990_4 )
 
 static VIDEO_UPDATE( ti990_4 )
 {
-	asr733_refresh(machine, bitmap, 0, 0, 0);
+	asr733_refresh(screen->machine, bitmap, 0, 0, 0);
 	return 0;
 }
 
@@ -145,10 +145,10 @@ static VIDEO_UPDATE( ti990_4 )
 
 static ADDRESS_MAP_START(ti990_4_memmap, ADDRESS_SPACE_PROGRAM, 16)
 
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(MRA16_RAM, MWA16_RAM)	/* dynamic RAM */
-	AM_RANGE(0x8000, 0xf7ff) AM_READWRITE(MRA16_NOP, MWA16_NOP)	/* reserved for expansion */
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(MRA16_RAM, MWA16_RAM)	/* static RAM? */
-	AM_RANGE(0xfc00, 0xffff) AM_READWRITE(MRA16_ROM, MWA16_ROM)	/* LOAD ROM */
+	AM_RANGE(0x0000, 0x7fff) AM_RAM	/* dynamic RAM */
+	AM_RANGE(0x8000, 0xf7ff) AM_NOP	/* reserved for expansion */
+	AM_RANGE(0xf800, 0xfbff) AM_RAM	/* static RAM? */
+	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* LOAD ROM */
 
 ADDRESS_MAP_END
 

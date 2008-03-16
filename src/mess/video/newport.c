@@ -189,7 +189,7 @@ VIDEO_UPDATE( newport )
 {
 	int y;
 
-	fillbitmap( bitmap, get_black_pen(machine), cliprect );
+	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 
 	/* loop over rows and copy to the destination */
 	for( y = cliprect->min_y; y <= cliprect->max_y; y++ )

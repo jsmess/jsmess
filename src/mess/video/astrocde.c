@@ -464,10 +464,10 @@ VIDEO_UPDATE( astrocde )
 
     /* scanline interrupt? */
 	if (screen_interrupt_enabled && (line == screen_interrupt_line))
-		cpunum_set_input_line_and_vector(machine, 0, 0,
+		cpunum_set_input_line_and_vector(screen->machine, 0, 0,
 			screen_interrupt_mode ? ASSERT_LINE : HOLD_LINE, interrupt_vector);
 	else
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(screen->machine, 0, 0, CLEAR_LINE);
 
 	LeftLineColour[line] = LeftColourCheck;
 	RightLineColour[line] = RightColourCheck;
@@ -488,7 +488,7 @@ VIDEO_UPDATE( astrocde )
 			if (i < ColourSplit)
 				color += 4;
 
-			*BITMAP_ADDR16(bitmap, line, x) = machine->pens[Colour[color]];
+			*BITMAP_ADDR16(bitmap, line, x) = screen->machine->pens[Colour[color]];
 
 			data >>= 2;
 		}

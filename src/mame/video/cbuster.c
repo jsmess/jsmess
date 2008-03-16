@@ -87,7 +87,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (x&0x2000) colour+=64;
 
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		fx = y & 0x2000;
 		fy = y & 0x4000;
@@ -145,7 +145,7 @@ VIDEO_UPDATE( twocrude )
 
 	/* Draw playfields & sprites */
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine,bitmap,cliprect,0);
 
 	if (twocrude_pri) {
 		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
@@ -156,7 +156,7 @@ VIDEO_UPDATE( twocrude )
 		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
 	}
 
-	draw_sprites(machine,bitmap,cliprect,1);
+	draw_sprites(screen->machine,bitmap,cliprect,1);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }

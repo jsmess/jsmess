@@ -89,8 +89,11 @@ static void voodoo_vblank_1(int param)
 
 static VIDEO_START( hangplt )
 {
-	voodoo_start(0, 0, VOODOO_1, 2, 4, 4);
-	voodoo_start(1, 1, VOODOO_1, 2, 4, 4);
+	const device_config *left_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	voodoo_start(0, left_screen,  VOODOO_1, 2, 4, 4);
+	voodoo_start(1, right_screen, VOODOO_1, 2, 4, 4);
 
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 	voodoo_set_vblank_callback(1, voodoo_vblank_1);
@@ -102,14 +105,29 @@ static VIDEO_START( hangplt )
 
 static VIDEO_UPDATE( hangplt )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
 
-	K001604_tile_update(screen);
-//  K001604_draw_back_layer(bitmap, cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
-	voodoo_update(screen, bitmap, cliprect);
+	if (screen == left_screen)
+	{
+		K001604_tile_update(0);
+	//  K001604_draw_back_layer(bitmap, cliprect);
 
-	K001604_draw_front_layer(screen, bitmap, cliprect);
+		voodoo_update(0, bitmap, cliprect);
+
+		K001604_draw_front_layer(0, bitmap, cliprect);
+	}
+	else if (screen == right_screen)
+	{
+		K001604_tile_update(1);
+	//  K001604_draw_back_layer(bitmap, cliprect);
+
+		voodoo_update(1, bitmap, cliprect);
+
+		K001604_draw_front_layer(1, bitmap, cliprect);
+	}
 
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);
@@ -456,7 +474,7 @@ WRITE32_HANDLER( lanc_ram_w )
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_reg_r, K001604_reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_READWRITE(MRA32_RAM, paletteram32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_READWRITE(SMH_RAM, paletteram32_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_tile_r, K001604_tile_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_char_r, K001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)

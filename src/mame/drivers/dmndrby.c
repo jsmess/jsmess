@@ -51,7 +51,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xC000, 0xC007) AM_READ(dderby_random_reader)
 	AM_RANGE(0xC802, 0xC802) AM_READ(dderby_random_reader)
 	AM_RANGE(0xC803, 0xC803) AM_READ(dderby_random_reader)
-	AM_RANGE(0xCA01, 0xCA01) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0xCA01, 0xCA01) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xD000, 0xD7ff) AM_RAM AM_BASE(&dderby_vid)
 ADDRESS_MAP_END
 
@@ -140,9 +140,9 @@ static VIDEO_START(dderby)
 static VIDEO_UPDATE(dderby)
 {
 	int x,y,count;
-	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *gfx = screen->machine->gfx[0];
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	count=0;
 	for (y=0;y<32;y++)

@@ -211,7 +211,7 @@ void c128_bankswitch_64 (running_machine *machine, int reset)
 	}
 	else
 	{
-		rh = MRA8_BANK5;
+		rh = SMH_BANK5;
 		c128_write_io = 0;
 		if ((!charen && (loram || hiram)))
 			memory_set_bankptr(13, c64_chargen);
@@ -424,7 +424,7 @@ static void c128_bankswitch_128 (running_machine *machine, int reset)
 		else
 		{
 			c128_write_io = 0;
-			rh = MRA8_BANK13;
+			rh = SMH_BANK13;
 		}
 		c128_set_m8502_read_handler(machine, 0xd000, 0xdfff, rh);
 

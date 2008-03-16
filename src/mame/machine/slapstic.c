@@ -186,6 +186,16 @@
 
 /*************************************
  *
+ *  Debugging
+ *
+ *************************************/
+
+#define LOG_SLAPSTIC	(0)
+
+
+
+/*************************************
+ *
  *  Structure of slapstic params
  *
  *************************************/
@@ -247,6 +257,7 @@ struct slapstic_data
 #define MATCHES_MASK_VALUE(val, maskval)	(((val) & (maskval).mask) == (maskval).value)
 
 
+
 /*************************************
  *
  *  Constants
@@ -268,8 +279,6 @@ enum
 	ADDITIVE3
 };
 
-#define LOG_SLAPSTIC	0
-
 
 
 /*************************************
@@ -287,7 +296,7 @@ static const struct slapstic_data slapstic101 =
 
 	/* alternate banking */
 	{ 0x007f,UNKNOWN },				/* 1st mask/value in sequence */
-	{ 0x1fff,0x1dfe },				/* 2nd mask/value in sequence */
+	{ 0x1fff,0x1dff },				/* 2nd mask/value in sequence */
 	{ 0x1ffc,0x1b5c },				/* 3rd mask/value in sequence */
 	{ 0x1fcf,0x0080 },				/* 4th mask/value in sequence */
 	0,								/* shift to get bank from 3rd */
@@ -816,8 +825,8 @@ void slapstic_init(int chip)
 	slapstic_reset();
 
 	/* see if we're 68k or 6502/6809 based */
-	access_68k = (Machine->config->cpu[0].type != CPU_M6809 &&
-				  Machine->config->cpu[0].type != CPU_M6502);
+	access_68k = (Machine->config->cpu[0].type == CPU_M68000 ||
+				  Machine->config->cpu[0].type == CPU_M68010);
 
 	/* save state */
 	state_save_register_item("slapstic", 0, state);
@@ -861,16 +870,20 @@ int slapstic_bank(void)
 
 static int alt2_kludge(offs_t offset)
 {
-	/* 68k case is fairly complex: we need to look for special triplets */
+	/* Of the 3 alternate addresses, only the middle one needs to actually hit
+       in the slapstic region; the first and third ones can be anywhere in the
+       address space. For this reason, the read/write handlers usually only
+       see the 2nd access. For the 68000-based games, we do the following
+       kludge to examine the opcode that is executing and look for the 1st
+       and 3rd accesses. */
+
 	if (access_68k)
 	{
-		UINT32 pc = activecpu_get_previouspc();
-
 		/* first verify that the prefetched PC matches the first alternate */
-		if (MATCHES_MASK_VALUE((pc + 2) >> 1, slapstic.alt1))
+		if (MATCHES_MASK_VALUE(activecpu_get_pc() >> 1, slapstic.alt1))
 		{
 			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			UINT16 opcode = cpu_readop16(pc & 0xffffff);
+			UINT16 opcode = cpu_readop16(activecpu_get_previouspc() & 0xffffff);
 			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
 			{
 				/* fetch the value of the register for the second operand, and see */

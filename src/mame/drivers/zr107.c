@@ -91,9 +91,9 @@ static VIDEO_START( jetwave )
 
 static VIDEO_UPDATE( jetwave )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
-	K001604_tile_update(machine, 0);
+	K001604_tile_update(screen->machine, 0);
 	K001005_draw(bitmap, cliprect);
 
 	K001604_draw_front_layer(0, bitmap, cliprect);
@@ -138,7 +138,7 @@ static VIDEO_START( zr107 )
 
 static VIDEO_UPDATE( zr107 )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
 	K056832_set_LayerOffset(0, -29, -27);
 	K056832_set_LayerOffset(1, -29, -27);
@@ -149,9 +149,9 @@ static VIDEO_UPDATE( zr107 )
 	K056832_set_LayerOffset(6, -29, -27);
 	K056832_set_LayerOffset(7, -29, -27);
 
-	K056832_tilemap_draw(machine, bitmap, cliprect, 1, 0, 0);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 1, 0, 0);
 	K001005_draw(bitmap, cliprect);
-	K056832_tilemap_draw(machine, bitmap, cliprect, 0, 0, 0);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 0, 0, 0);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
@@ -305,7 +305,7 @@ static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x74000000, 0x74003fff) AM_MIRROR(0x80000000) AM_READWRITE(K056832_ram_long_r, K056832_ram_long_w)
 	AM_RANGE(0x74020000, 0x7402003f) AM_MIRROR(0x80000000) AM_READWRITE(K056832_long_r, K056832_long_w)
 	AM_RANGE(0x74060000, 0x7406003f) AM_MIRROR(0x80000000) AM_READWRITE(ccu_r, ccu_w)
-	AM_RANGE(0x74080000, 0x74081fff) AM_MIRROR(0x80000000) AM_READWRITE(MRA32_RAM, paletteram32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x74080000, 0x74081fff) AM_MIRROR(0x80000000) AM_READWRITE(SMH_RAM, paletteram32_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x740a0000, 0x740a3fff) AM_MIRROR(0x80000000) AM_READ(K056832_rom_long_r)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)		/* 21N 21K 23N 23K */
 	AM_RANGE(0x78010000, 0x7801ffff) AM_MIRROR(0x80000000) AM_WRITE(cgboard_dsp_shared_w_ppc)
@@ -331,7 +331,7 @@ static WRITE32_HANDLER( jetwave_palette_w )
 static ADDRESS_MAP_START( jetwave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_reg_r, K001604_reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_READWRITE(MRA32_RAM, jetwave_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_READWRITE(SMH_RAM, jetwave_palette_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_tile_r, K001604_tile_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_char_r, K001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)		/* 21N 21K 23N 23K */

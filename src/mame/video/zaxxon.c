@@ -141,8 +141,8 @@ static void video_start_common(running_machine *machine, tile_get_info_func fg_t
 
 	/* configure the foreground tilemap */
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-	tilemap_set_scrolldx(fg_tilemap, 0, machine->screen[0].width - 256);
-	tilemap_set_scrolldy(fg_tilemap, 0, machine->screen[0].height - 256);
+	tilemap_set_scrolldx(fg_tilemap, 0, video_screen_get_width(machine->primary_screen) - 256);
+	tilemap_set_scrolldy(fg_tilemap, 0, video_screen_get_height(machine->primary_screen) - 256);
 
 	/* register for save states */
 	state_save_register_global(bg_enable);
@@ -453,8 +453,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( zaxxon )
 {
-	draw_background(machine, bitmap, cliprect, TRUE);
-	draw_sprites(machine, bitmap, cliprect, 0x140, 0x180);
+	draw_background(screen->machine, bitmap, cliprect, TRUE);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x140, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -462,8 +462,8 @@ VIDEO_UPDATE( zaxxon )
 
 VIDEO_UPDATE( futspy )
 {
-	draw_background(machine, bitmap, cliprect, TRUE);
-	draw_sprites(machine, bitmap, cliprect, 0x180, 0x180);
+	draw_background(screen->machine, bitmap, cliprect, TRUE);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x180, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -471,8 +471,8 @@ VIDEO_UPDATE( futspy )
 
 VIDEO_UPDATE( razmataz )
 {
-	draw_background(machine, bitmap, cliprect, FALSE);
-	draw_sprites(machine, bitmap, cliprect, 0x140, 0x180);
+	draw_background(screen->machine, bitmap, cliprect, FALSE);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x140, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -480,8 +480,8 @@ VIDEO_UPDATE( razmataz )
 
 VIDEO_UPDATE( congo )
 {
-	draw_background(machine, bitmap, cliprect, TRUE);
-	draw_sprites(machine, bitmap, cliprect, 0x280, 0x180);
+	draw_background(screen->machine, bitmap, cliprect, TRUE);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x280, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

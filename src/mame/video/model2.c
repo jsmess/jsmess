@@ -2703,8 +2703,9 @@ static void model2_exit(running_machine *machine)
 
 VIDEO_START(model2)
 {
-	int	width = machine->screen[0].visarea.max_x - machine->screen[0].visarea.min_x;
-	int	height = machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	int	width = visarea->max_x - visarea->min_x;
+	int	height = visarea->max_y - visarea->min_y;
 
 	sys24_tile_vh_start(machine, 0x3fff);
 	sys24_bitmap = bitmap_alloc(width, height+4, BITMAP_FORMAT_INDEXED16);
@@ -2740,16 +2741,16 @@ VIDEO_UPDATE(model2)
 {
 	logerror("--- frame ---\n");
 
-	sys24_tile_update(machine);
-	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
-	fillbitmap(sys24_bitmap, 0, &machine->screen[0].visarea);
+	sys24_tile_update(screen->machine);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
+	fillbitmap(sys24_bitmap, 0, cliprect);
 
-	sys24_tile_draw(machine, sys24_bitmap, cliprect, 7, 0, 0);
-	sys24_tile_draw(machine, sys24_bitmap, cliprect, 6, 0, 0);
-	sys24_tile_draw(machine, sys24_bitmap, cliprect, 5, 0, 0);
-	sys24_tile_draw(machine, sys24_bitmap, cliprect, 4, 0, 0);
+	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 7, 0, 0);
+	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 6, 0, 0);
+	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 5, 0, 0);
+	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 4, 0, 0);
 
-	convert_bitmap(machine, bitmap, sys24_bitmap, cliprect);
+	convert_bitmap(screen->machine, bitmap, sys24_bitmap, cliprect);
 
 	/* tell the rasterizer we're starting a frame */
 	model2_3d_frame_start();
@@ -2760,13 +2761,13 @@ VIDEO_UPDATE(model2)
 	/* have the rasterizer output the frame */
 	model2_3d_frame_end( bitmap, cliprect );
 
-	fillbitmap(sys24_bitmap, 0, &machine->screen[0].visarea);
-	sys24_tile_draw(machine, sys24_bitmap, cliprect, 3, 0, 0);
-	sys24_tile_draw(machine, sys24_bitmap, cliprect, 2, 0, 0);
-	sys24_tile_draw(machine, sys24_bitmap, cliprect, 1, 0, 0);
-	sys24_tile_draw(machine, sys24_bitmap, cliprect, 0, 0, 0);
+	fillbitmap(sys24_bitmap, 0, cliprect);
+	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 3, 0, 0);
+	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 2, 0, 0);
+	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 1, 0, 0);
+	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 0, 0, 0);
 
-	convert_bitmap(machine, bitmap, sys24_bitmap, cliprect);
+	convert_bitmap(screen->machine, bitmap, sys24_bitmap, cliprect);
 
 	return 0;
 }

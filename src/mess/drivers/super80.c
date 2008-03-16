@@ -11,6 +11,8 @@
 #include "sound/speaker.h"
 #include "deprecat.h"		/* "Machine" needed for z80pio interrupt */
 
+#define video_screen_get_refresh(screen)	(((screen_config *)(screen)->inline_config)->refresh)
+
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
 static UINT8 int_sw;		/* internal 1 mhz flipflop */
@@ -195,7 +197,6 @@ static void mc6845_cursor_configure(void)
 	If we are using dynamic screen resizing, expand the image to fill the screen area */
 static void mc6845_screen_configure(running_machine *machine)
 {
-	screen_state *state = &machine->screen[0];
 	rectangle visarea;
 	UINT16 width, height, bytes;	
 	UINT8 dyn = readinputportbytag("CONFIG") & 0x10;			// read dipswitch
@@ -233,10 +234,10 @@ static void mc6845_screen_configure(running_machine *machine)
 		if ((width < 610)
 		&& (height < 460)			/* bounds checking to prevent an assert or violation */
 		&& (bytes < 0x1000))
-			video_screen_configure(0, width+1, height+1, &visarea, state->refresh); 
+			video_screen_configure(machine->primary_screen, width+1, height+1, &visarea, video_screen_get_refresh(machine->primary_screen)); 
 	}
 	else
-			video_screen_configure(0, SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT, &visarea, state->refresh);	// in case dipswitch was just turned to NO
+			video_screen_configure(machine->primary_screen, SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT, &visarea, video_screen_get_refresh(machine->primary_screen));	// in case dipswitch was just turned to NO
 }
 
 static VIDEO_EOF( super80m )
@@ -257,7 +258,7 @@ static VIDEO_EOF( super80m )
 static VIDEO_UPDATE( super80 )
 {
 	UINT8 x, y, code=32, screen_on=0;
-	UINT8 mask = machine->gfx[0]->total_elements - 1;	/* 0x3F for super80; 0xFF for super80d & super80e */
+	UINT8 mask = screen->machine->gfx[0]->total_elements - 1;	/* 0x3F for super80; 0xFF for super80d & super80e */
 
 	if ((super80_mhz == 1) || (!(readinputportbytag("CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
@@ -270,8 +271,8 @@ static VIDEO_UPDATE( super80 )
 			if (screen_on)
 				code = program_read_byte(vidpg + x + (y<<5));
 
-			drawgfx(bitmap, machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10,
-				&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+			drawgfx(bitmap, screen->machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10,
+				cliprect, TRANSPARENCY_NONE, 0);
 		}
 	}
 
@@ -308,8 +309,8 @@ static VIDEO_UPDATE( super80m )
 				if (!(options & 0x40)) col = program_read_byte(0xfe00 + x + (y<<5));	/* byte of colour to display */
 			}
 
-			drawgfx(bitmap, machine->gfx[cgen], code, col, 0, 0, x*8, y*10,
-				&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+			drawgfx(bitmap, screen->machine->gfx[cgen], code, col, 0, 0, x*8, y*10,
+				cliprect, TRANSPARENCY_NONE, 0);
 		}
 	}
 
@@ -334,7 +335,7 @@ static VIDEO_UPDATE( super80v )
 		for ( i = 0; i < 16; i++)
 			pcgram[0x1000+i] = pcgram[(videoram[cursor])*16 + i] ^ mc6845_cursor[i];
 
-	decodechar(machine->gfx[0],256, pcgram);			// and into machine graphics
+	decodechar(screen->machine->gfx[0],256, pcgram);			// and into machine graphics
 
 	for( i = screen_home; (i < (bytes + screen_home)) & (i < 0x1000); i++ )
 	{
@@ -363,8 +364,8 @@ static VIDEO_UPDATE( super80v )
 			(i == cursor))						// displaying at cursor position?
 				chr = 256;					// 256 = cursor character
 
-		drawgfx( bitmap,machine->gfx[0],chr,col,0,0,sx,sy,
-			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);	// put character on the screen
+		drawgfx( bitmap, screen->machine->gfx[0],chr,col,0,0,sx,sy,
+			cliprect,TRANSPARENCY_NONE,0);	// put character on the screen
 
 	}
 
@@ -381,6 +382,10 @@ static void pio_interrupt(int state)
 static const z80pio_interface pio_intf =
 {
 	pio_interrupt,		/* callback when change interrupt status */
+	NULL,
+	NULL,
+	NULL,
+	NULL,
 	NULL,			/* portA ready active callback (not used in super80) */
 	NULL			/* portB ready active callback (not used in super80) */
 };
@@ -536,7 +541,7 @@ static ADDRESS_MAP_START( super80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(super80_read_ff, MWA8_NOP)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(super80_read_ff, SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super80m_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -555,7 +560,8 @@ static ADDRESS_MAP_START( super80v_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super80_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | ( AMEF_UNMAP(1) ))
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80_f0_w)
 	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x14) AM_WRITE(super80_f1_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
@@ -566,7 +572,8 @@ static ADDRESS_MAP_START( super80_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super80v_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | ( AMEF_UNMAP(1) ))
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(super80v_11_r, super80v_11_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80v_f0_w)

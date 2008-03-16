@@ -82,19 +82,19 @@ static const write8_machine_func mwa_bank_soft[4] =
 /* read banked memory (plain ROM/RAM) */
 static const read8_machine_func mra_bank_hard[4] =
 {
-    MRA8_BANK1,  /* mapped in 0000-3fff */
-    MRA8_BANK2,  /* mapped in 4000-7fff */
-    MRA8_BANK3,  /* mapped in 8000-bfff */
-    MRA8_BANK4   /* mapped in c000-ffff */
+    SMH_BANK1,  /* mapped in 0000-3fff */
+    SMH_BANK2,  /* mapped in 4000-7fff */
+    SMH_BANK3,  /* mapped in 8000-bfff */
+    SMH_BANK4   /* mapped in c000-ffff */
 };
 
 /* write banked memory (plain ROM/RAM) */
 static const write8_machine_func mwa_bank_hard[4] =
 {
-    MWA8_BANK1,  /* mapped in 0000-3fff */
-    MWA8_BANK2,  /* mapped in 4000-7fff */
-    MWA8_BANK3,  /* mapped in 8000-bfff */
-    MWA8_BANK4   /* mapped in c000-ffff */
+    SMH_BANK1,  /* mapped in 0000-3fff */
+    SMH_BANK2,  /* mapped in 4000-7fff */
+    SMH_BANK3,  /* mapped in 8000-bfff */
+    SMH_BANK4   /* mapped in c000-ffff */
 };
 
 DRIVER_INIT(laser)
@@ -188,7 +188,7 @@ WRITE8_HANDLER( laser_bank_select_w )
 			{
 				logerror("select bank #%d MASKED!\n", offset+1);
 				read_handler = return8_FF;
-				write_handler = MWA8_NOP;
+				write_handler = SMH_NOP;
 			}
 		}
 		memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, read_handler);

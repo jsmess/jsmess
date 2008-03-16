@@ -529,14 +529,14 @@ static WRITE64_HANDLER( bebox_vga_memory_w )
 
 static void bebox_map_vga_memory(offs_t begin, offs_t end, read8_machine_func rh, write8_machine_func wh)
 {
-	read64_machine_func rh64 = (rh == MRA8_BANK4) ? MRA64_BANK4 : bebox_vga_memory_r;
-	write64_machine_func wh64 = (wh == MWA8_BANK4) ? MWA64_BANK4 : bebox_vga_memory_w;
+	read64_machine_func rh64 = (rh == SMH_BANK4) ? SMH_BANK4 : bebox_vga_memory_r;
+	write64_machine_func wh64 = (wh == SMH_BANK4) ? SMH_BANK4 : bebox_vga_memory_w;
 
 	bebox_vga_memory_rh = rh;
 	bebox_vga_memory_wh = wh;
 
-	memory_install_read64_handler(0, ADDRESS_SPACE_PROGRAM, 0xC00A0000, 0xC00BFFFF, 0, 0, MRA64_NOP);
-	memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xC00A0000, 0xC00BFFFF, 0, 0, MWA64_NOP);
+	memory_install_read64_handler(0, ADDRESS_SPACE_PROGRAM, 0xC00A0000, 0xC00BFFFF, 0, 0, SMH_NOP);
+	memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xC00A0000, 0xC00BFFFF, 0, 0, SMH_NOP);
 
 	memory_install_read64_handler(0, ADDRESS_SPACE_PROGRAM, 0xC0000000 + begin, 0xC0000000 + end, 0, 0, rh64);
 	memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xC0000000 + begin, 0xC0000000 + end, 0, 0, wh64);
@@ -1001,8 +1001,8 @@ DRIVER_INIT( bebox )
 	/* install MESS managed RAM */
 	for (cpu = 0; cpu < 2; cpu++)
 	{
-		memory_install_read64_handler(cpu, ADDRESS_SPACE_PROGRAM, 0, mess_ram_size - 1, 0, 0x02000000, MRA64_BANK3);
-		memory_install_write64_handler(cpu, ADDRESS_SPACE_PROGRAM, 0, mess_ram_size - 1, 0, 0x02000000, MWA64_BANK3);
+		memory_install_read64_handler(cpu, ADDRESS_SPACE_PROGRAM, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK3);
+		memory_install_write64_handler(cpu, ADDRESS_SPACE_PROGRAM, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK3);
 	}
 	memory_set_bankptr(3, mess_ram);
 
@@ -1054,7 +1054,7 @@ DRIVER_INIT( bebox )
 			/* bcctr 0x14, 0 */
 			U64(0x4E80042000000000)
 		};
-		memory_install_read64_handler(1, ADDRESS_SPACE_PROGRAM, 0x9421FFF0, 0x9421FFFF, 0, 0, MRA64_BANK1);
+		memory_install_read64_handler(1, ADDRESS_SPACE_PROGRAM, 0x9421FFF0, 0x9421FFFF, 0, 0, SMH_BANK1);
 		memory_set_bankptr(1, ops);
 	}
 }

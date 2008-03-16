@@ -3045,7 +3045,10 @@ MACHINE_START( coco3 )
 	state_save_register_global(gime_firq);
 	state_save_register_func_postload(coco3_state_postload);
 
-	video_crosshair_set_screenmask_callback(machine, crosshairs_get_screen);
+	/* NPW 15-Mar-2008 - FIX THIS */
+	if (0)
+		crosshairs_get_screen(0);
+	//video_crosshair_set_screenmask_callback(machine, crosshairs_get_screen);
 }
 
 /***************************************************************************

@@ -134,13 +134,13 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(running_machine *machine, int scrnum, int scanline)
+static void scanline_update(const device_config *screen, int scanline)
 {
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_ack_r(machine, 0);
+		atarigen_6502_irq_ack_r(screen->machine, 0);
 	else if (!(readinputport(0) & 0x40))
-		atarigen_6502_irq_gen(machine, 0);
+		atarigen_6502_irq_gen(screen->machine, 0);
 }
 
 
@@ -150,7 +150,7 @@ static MACHINE_RESET( badlands )
 
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, scanline_update, 32);
+	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 
 	atarigen_sound_io_reset(1);
 	memcpy(bank_base, &bank_source_data[0x0000], 0x1000);
@@ -325,9 +325,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfea000, 0xfebfff) AM_READ(atarigen_sound_upper_r)
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE(badlands_pf_bank_w)
 	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0xffc000, 0xffc3ff) AM_READWRITE(MRA16_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xffe000, 0xffefff) AM_READWRITE(MRA16_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0xfff000, 0xfff1ff) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_expanded_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xffc000, 0xffc3ff) AM_READWRITE(SMH_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffe000, 0xffefff) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0xfff000, 0xfff1ff) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_expanded_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

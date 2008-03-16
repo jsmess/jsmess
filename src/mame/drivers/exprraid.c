@@ -20,7 +20,7 @@ Main CPU: ( 6502 )
 2100-2100 Sound latch write
 2800-2801 Protection
 3800-3800 VBblank ( bootleg 1 only )
-4000-ffff MRA8_ROM
+4000-ffff SMH_ROM
 
 Sound Cpu: ( 6809 )
 0000-1fff RAM
@@ -105,12 +105,7 @@ static WRITE8_HANDLER( sound_cpu_command_w )
 
 static READ8_HANDLER( vblank_r )
 {
-	int val = readinputport( 0 );
-
-	if ( ( val & 0x02 ) )
-		cpu_spin();
-
-	return val;
+	return readinputport( 0 );
 }
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )

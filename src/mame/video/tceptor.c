@@ -425,7 +425,7 @@ VIDEO_START( tceptor )
 	decode_sprite32(machine, REGION_GFX4);
 
 	/* allocate temp bitmaps */
-	temp_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	temp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	namco_road_init(machine, gfx_index);
 
@@ -559,13 +559,17 @@ VIDEO_UPDATE( tceptor )
 	int pri;
 	int bg_center = 144 - ((((bg1_scroll_x + bg2_scroll_x ) & 0x1ff) - 288) / 2);
 
-	if (screen)
+	const device_config *_2d_screen       = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "2D");
+	const device_config *_3d_left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "3D Left");
+	const device_config *_3d_right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "3D Right");
+
+	if (screen != _2d_screen)
 	{
 		int frame = video_screen_get_frame_number(screen);
 
-		if ((frame & 1) == 1 && screen == 1)
+		if ((frame & 1) == 1 && screen == _3d_left_screen)
 			return UPDATE_HAS_NOT_CHANGED;
-		if ((frame & 1) == 0 && screen == 2)
+		if ((frame & 1) == 0 && screen == _3d_right_screen)
 			return UPDATE_HAS_NOT_CHANGED;
 	}
 
@@ -585,9 +589,9 @@ VIDEO_UPDATE( tceptor )
 
 	for (pri = 0; pri < 8; pri++)
 	{
-		namco_road_draw(machine, bitmap, cliprect, pri * 2);
-		namco_road_draw(machine, bitmap, cliprect, pri * 2 + 1);
-		draw_sprites(machine, bitmap, cliprect, pri);
+		namco_road_draw(screen->machine, bitmap, cliprect, pri * 2);
+		namco_road_draw(screen->machine, bitmap, cliprect, pri * 2 + 1);
+		draw_sprites(screen->machine, bitmap, cliprect, pri);
 	}
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);

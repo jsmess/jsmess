@@ -307,11 +307,11 @@ static ADDRESS_MAP_START( intvkbd_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )	/* GRAM,     8-bits wide */
 	AM_RANGE(0x4800, 0x6fff) AM_ROM		/* Cartridges? */
 	AM_RANGE(0x7000, 0x7fff) AM_ROM	AM_REGION(REGION_CPU1, 0x7000<<1)	/* Keyboard ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( MRA16_RAM, intvkbd_dualport16_w ) AM_BASE(&intvkbd_dualport_ram)	/* Dual-port RAM */
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( SMH_RAM, intvkbd_dualport16_w ) AM_BASE(&intvkbd_dualport_ram)	/* Dual-port RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intv2_mem , ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(0xff) )  /* Required because of probing */
+	ADDRESS_MAP_UNMAP_HIGH  /* Required because of probing */
 	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE( intvkbd_dualport8_lsb_r, intvkbd_dualport8_lsb_w )	/* Dual-port RAM */
 	AM_RANGE( 0x4000, 0x7fff) AM_READWRITE( intvkbd_dualport8_msb_r, intvkbd_dualport8_msb_w )	/* Dual-port RAM */
 	AM_RANGE( 0xb7f8, 0xb7ff) AM_RAM	/* ??? */

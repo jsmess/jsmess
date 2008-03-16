@@ -177,7 +177,7 @@ static VIDEO_UPDATE(srmp6)
 		UINT16 b;
 	} temp;
 
-	fillbitmap(bitmap,0,&machine->screen[0].visarea);
+	fillbitmap(bitmap,0,cliprect);
 
 #if 0
 	/* debug */
@@ -273,11 +273,11 @@ static VIDEO_UPDATE(srmp6)
 
 						if (dirty_tileram[tileno])
 						{
-							decodechar(machine->gfx[0], tileno, (UINT8*)tileram);
+							decodechar(screen->machine->gfx[0], tileno, (UINT8*)tileram);
 							dirty_tileram[tileno] = 0;
 						}
 
-						drawgfx(bitmap,machine->gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,cliprect,trans,0);
+						drawgfx(bitmap,screen->machine->gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,cliprect,trans,0);
 						tileno++;
 		 			}
 				}
@@ -576,11 +576,11 @@ static WRITE16_HANDLER(paletteram_w)
 static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM					// work RAM
-	AM_RANGE(0x600000, 0x7fffff) AM_READ(MRA16_BANK1)	// banked ROM (used by ROM check)
+	AM_RANGE(0x600000, 0x7fffff) AM_READ(SMH_BANK1)	// banked ROM (used by ROM check)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION(REGION_USER1, 0)
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)		// inputs
-	AM_RANGE(0x480000, 0x480fff) AM_READWRITE(MRA16_RAM, paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x480000, 0x480fff) AM_READWRITE(SMH_RAM, paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x4d0000, 0x4d0001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 
 	// OBJ RAM: checked [$400000-$47dfff]

@@ -283,21 +283,21 @@ static VIDEO_START( pc_cga )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, MRA8_BANK11 );
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK11 );
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram_w );
 			memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga8_r );
 			memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga8_w );
 			break;
 
 		case 16:
-			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, MRA16_BANK11 );
+			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK11 );
 			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram16le_w );
 			memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga16le_r );
 			memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga16le_w );
 			break;
 
 		case 32:
-			memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, MRA32_BANK11 );
+			memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK11 );
 			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram32_w );
 			memory_install_read32_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga32le_r );
 			memory_install_write32_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga32le_w );
@@ -506,6 +506,8 @@ static void cga_text_inten(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
 	struct mscrtc6845_cursor cursor;
+	const device_config *screen = video_screen_first(Machine->config);
+	int screen_height = video_screen_get_height(screen);
 
 	mscrtc6845_time(crtc);
 	mscrtc6845_get_cursor(crtc, &cursor);
@@ -513,7 +515,7 @@ static void cga_text_inten(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
 	{
-		if (r.min_y >= Machine->screen[0].height)
+		if (r.min_y >= screen_height)
 			break;
 		for (sx=0, r.min_x=0, r.max_x=7; sx<columns;
 			 sx++, offs=(offs+2)&0x3fff, r.min_x+=8, r.max_x+=8)
@@ -609,6 +611,8 @@ static void cga_text_blink(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
 	struct mscrtc6845_cursor cursor;
+	const device_config *screen = video_screen_first(Machine->config);
+	int screen_height = video_screen_get_height(screen);
 
 	mscrtc6845_time(crtc);
 	mscrtc6845_get_cursor(crtc, &cursor);
@@ -616,7 +620,7 @@ static void cga_text_blink(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
 	{
-		if (r.min_y >= Machine->screen[0].height)
+		if (r.min_y >= screen_height)
 			break;
 
 		for (sx=0, r.min_x=0, r.max_x=7; sx<columns;
@@ -674,6 +678,8 @@ static void cga_text_blink_alt(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
 	struct mscrtc6845_cursor cursor;
+	const device_config *screen = video_screen_first(Machine->config);
+	int screen_height = video_screen_get_height(screen);
 
 	if (CGA_CHIPSET != CGA_CHIPSET_PC200)
 	{
@@ -687,7 +693,7 @@ static void cga_text_blink_alt(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
 	{
-		if (r.min_y >= Machine->screen[0].height)
+		if (r.min_y >= screen_height)
 			break;
 
 		for (sx=0, r.min_x=0, r.max_x=7; sx<columns;

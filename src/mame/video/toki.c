@@ -32,9 +32,8 @@ remove all the code writing the $a0000 area.)
 
 WRITE16_HANDLER( toki_control_w )
 {
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 	COMBINE_DATA(&toki_scrollram16[offset]);
-
-	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 }
 
 VIDEO_EOF( toki )
@@ -293,7 +292,7 @@ VIDEO_UPDATE( toki )
 		tilemap_draw(bitmap,cliprect,foreground_layer,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	}
-	toki_draw_sprites(machine, bitmap,cliprect);
+	toki_draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }
@@ -315,7 +314,7 @@ VIDEO_UPDATE( tokib )
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	}
 
-	tokib_draw_sprites(machine, bitmap,cliprect);
+	tokib_draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }

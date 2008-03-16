@@ -98,15 +98,18 @@ PALETTE_INIT( quasar )
 
 VIDEO_START( quasar )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	quasar_effectram = auto_malloc(0x400);
 
 	/* configure the S2636 chips */
-	s2636_0 = s2636_config(cvs_s2636_0_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_1 = s2636_config(cvs_s2636_1_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_2 = s2636_config(cvs_s2636_2_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_0 = s2636_config(cvs_s2636_0_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_1 = s2636_config(cvs_s2636_1_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_2 = s2636_config(cvs_s2636_2_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
 	/* create helper bitmaps */
-	cvs_collision_background = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	cvs_collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 VIDEO_UPDATE( quasar )
@@ -136,7 +139,7 @@ VIDEO_UPDATE( quasar )
 
 		/* Main Screen */
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 				code,
 				cvs_color_ram[offs] & 0x3f,
 				0,0,
@@ -148,7 +151,7 @@ VIDEO_UPDATE( quasar )
 
 		if((cvs_color_ram[offs] & 7) == 0)
 		{
-			drawgfx(cvs_collision_background,machine->gfx[0],
+			drawgfx(cvs_collision_background,screen->machine->gfx[0],
 					code,
 					64,
 					0,0,
@@ -203,7 +206,7 @@ VIDEO_UPDATE( quasar )
 					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(cvs_collision_background, y, x)))
+					if (colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(cvs_collision_background, y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) cvs_collision_register |= 0x01;
 						if (S2636_IS_PIXEL_DRAWN(pixel2)) cvs_collision_register |= 0x02;

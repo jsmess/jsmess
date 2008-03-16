@@ -80,9 +80,9 @@ static ADDRESS_MAP_START( mz700_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0e000, 0x0ffff) AM_RAMBANK(8)
 #if 0 //mame37b9 traps
 	AM_RANGE( 0x10000, 0x10fff) AM_ROM
-	AM_RANGE( 0x12000, 0x127ff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size )
-	AM_RANGE( 0x12800, 0x12fff) AM_READWRITE(MRA8_RAM, colorram_w) AM_BASE( &colorram )
-	AM_RANGE( 0x16000, 0x16fff) AM_READWRITE(MRA8_RAM, pcgram_w)
+	AM_RANGE( 0x12000, 0x127ff) AM_READWRITE(SMH_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size )
+	AM_RANGE( 0x12800, 0x12fff) AM_READWRITE(SMH_RAM, colorram_w) AM_BASE( &colorram )
+	AM_RANGE( 0x16000, 0x16fff) AM_READWRITE(SMH_RAM, pcgram_w)
 #endif
 ADDRESS_MAP_END
 
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START(mz800_mem, ADDRESS_SPACE_PROGRAM, 8)
 #if 0
 	AM_RANGE( 0x10000, 0x10fff) AM_ROM
 	AM_RANGE( 0x11000, 0x11fff) AM_ROM
-	AM_RANGE( 0x12000, 0x16fff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE( &videoram) AM_SIZE( &videoram_size )
+	AM_RANGE( 0x12000, 0x16fff) AM_READWRITE(SMH_RAM, videoram_w) AM_BASE( &videoram) AM_SIZE( &videoram_size )
 	AM_RANGE( 0x12800, 0x12fff) AM_WRITE( colorram_w) AM_BASE( &colorram )
 #endif
 	ADDRESS_MAP_END

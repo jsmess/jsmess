@@ -502,7 +502,7 @@ DEVICE_LOAD( ti99_cart )
 	if (! has_evpc)
 		TMS9928A_reset();
 	if (has_evpc)
-		v9938_reset();*/
+		v9938_reset(0);*/
 
 	ch = strrchr(name, '.');
 	ch2 = (ch-1 >= name) ? ch-1 : "";
@@ -599,7 +599,7 @@ DEVICE_UNLOAD( ti99_cart )
 	if (! has_evpc)
 		TMS9928A_reset();
 	if (has_evpc)
-		v9938_reset();*/
+		v9938_reset(0);*/
 
 	switch (slot_type[id])
 	{
@@ -774,7 +774,7 @@ MACHINE_RESET( ti99 )
         tms9901_reset(0);
 
 	if (!has_evpc) TMS9928A_reset();
-        else v9938_reset();
+        else v9938_reset(0);
 
 	/* clear keyboard interface state (probably overkill, but can't harm) */
 	KeyCol = 0;
@@ -935,7 +935,7 @@ void machine_stop_ti99(void)
 */
 VIDEO_START( ti99_4ev )
 {
-	v9938_init(machine, MODEL_V9938, 0x20000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
+	v9938_init(machine, 0, tmpbitmap, MODEL_V9938, 0x20000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
 }
 
 /*
@@ -955,7 +955,7 @@ INTERRUPT_GEN( ti99_vblank_interrupt )
 INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 {
 	static int line_count;
-	v9938_interrupt();
+	v9938_interrupt(0);
 	if (++line_count == 262)
 	{
 		line_count = 0;
@@ -1169,11 +1169,11 @@ READ16_HANDLER ( ti99_rv38_r )
 
 	if (offset & 1)
 	{	/* read VDP status */
-		return ((int) v9938_status_r(machine, 0)) << 8;
+		return ((int) v9938_0_status_r(machine, 0)) << 8;
 	}
 	else
 	{	/* read VDP RAM */
-		return ((int) v9938_vram_r(machine, 0)) << 8;
+		return ((int) v9938_0_vram_r(machine, 0)) << 8;
 	}
 }
 
@@ -1188,19 +1188,19 @@ WRITE16_HANDLER ( ti99_wv38_w )
 	{
 	case 0:
 		/* write VDP data */
-		v9938_vram_w(machine, 0, (data >> 8) & 0xff);
+		v9938_0_vram_w(machine, 0, (data >> 8) & 0xff);
 		break;
 	case 1:
 		/* write VDP address */
-		v9938_command_w(machine, 0, (data >> 8) & 0xff);
+		v9938_0_command_w(machine, 0, (data >> 8) & 0xff);
 		break;
 	case 2:
 		/* write VDP palette */
-		v9938_palette_w(machine, 0, (data >> 8) & 0xff);
+		v9938_0_palette_w(machine, 0, (data >> 8) & 0xff);
 		break;
 	case 3:
 		/* write VDP register */
-		v9938_register_w(machine, 0, (data >> 8) & 0xff);
+		v9938_0_register_w(machine, 0, (data >> 8) & 0xff);
 		break;
 	}
 }
@@ -2794,22 +2794,22 @@ static void ti99_4p_mapper_init(void)
 	int i;
 
 	/* Not required at run-time */
-	/*memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, MRA16_BANK3);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, MWA16_BANK3);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, MRA16_BANK4);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, MWA16_BANK4);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, MRA16_BANK5);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, MWA16_BANK5);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, MRA16_BANK6);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, MWA16_BANK6);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, MRA16_BANK7);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, MWA16_BANK7);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, MRA16_BANK8);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, MWA16_BANK8);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, MRA16_BANK9);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, MWA16_BANK9);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, MRA16_BANK10);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, MWA16_BANK10);*/
+	/*memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, SMH_BANK3);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, SMH_BANK3);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, SMH_BANK4);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, SMH_BANK4);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, SMH_BANK5);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, SMH_BANK5);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, SMH_BANK6);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, SMH_BANK6);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, SMH_BANK7);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, SMH_BANK7);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, SMH_BANK8);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, SMH_BANK8);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, SMH_BANK9);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, SMH_BANK9);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, SMH_BANK10);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, SMH_BANK10);*/
 
 	ti99_peb_set_16bit_card_handlers(0x1e00, & ti99_4p_mapper_handlers);
 

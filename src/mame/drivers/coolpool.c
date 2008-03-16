@@ -76,7 +76,7 @@ static TIMER_CALLBACK( nvram_write_timeout );
  *
  *************************************/
 
-static void amerdart_scanline(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void amerdart_scanline(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -103,7 +103,7 @@ static void amerdart_scanline(running_machine *machine, int screen, bitmap_t *bi
 }
 
 
-static void coolpool_scanline(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void coolpool_scanline(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( amerdart_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(&vram_base)
 	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(amerdart_misc_w)
 	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(coolpool_iop_r, amerdart_iop_w)
-	AM_RANGE(0x06000000, 0x06007fff) AM_READWRITE(MRA16_RAM, nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x06000000, 0x06007fff) AM_READWRITE(SMH_RAM, nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffb00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
 ADDRESS_MAP_END
@@ -502,7 +502,7 @@ static ADDRESS_MAP_START( coolpool_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x03000000, 0x03ffffff) AM_ROM AM_REGION(REGION_GFX1, 0)
-	AM_RANGE(0x06000000, 0x06007fff) AM_READWRITE(MRA16_RAM, nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x06000000, 0x06007fff) AM_READWRITE(SMH_RAM, nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
 ADDRESS_MAP_END
@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( nballsht_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x04000000, 0x040000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)	// IMSG176P-40
-	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_READWRITE(MRA16_RAM, nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_READWRITE(SMH_RAM, nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff000000, 0xff7fffff) AM_ROM AM_REGION(REGION_GFX1, 0)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
@@ -652,7 +652,7 @@ INPUT_PORTS_END
 static const tms34010_config tms_config_amerdart =
 {
 	FALSE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	40000000/12,					/* pixel clock */
 	2,								/* pixels per clock */
 	amerdart_scanline,				/* scanline callback */
@@ -665,7 +665,7 @@ static const tms34010_config tms_config_amerdart =
 static const tms34010_config tms_config_coolpool =
 {
 	FALSE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	40000000/6,						/* pixel clock */
 	1,								/* pixels per clock */
 	coolpool_scanline,				/* scanline callback */

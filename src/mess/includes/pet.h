@@ -18,7 +18,7 @@ void superpet_vh_init (void);
 VIDEO_UPDATE( pet );
 MC6845_UPDATE_ROW( pet40_update_row );
 MC6845_UPDATE_ROW( pet80_update_row );
-void pet_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled);
+MC6845_ON_DE_CHANGED( pet_display_enable_changed );
 
 extern int pet_font;
 

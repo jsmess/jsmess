@@ -210,10 +210,11 @@ VIDEO_UPDATE(taotaido)
 	int line;
 	rectangle clip;
 
-	clip.min_x = machine->screen[0].visarea.min_x;
-	clip.max_x = machine->screen[0].visarea.max_x;
-	clip.min_y = machine->screen[0].visarea.min_y;
-	clip.max_y = machine->screen[0].visarea.max_y;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	clip.min_x = visarea->min_x;
+	clip.max_x = visarea->max_x;
+	clip.min_y = visarea->min_y;
+	clip.max_y = visarea->max_y;
 
 	for (line = 0; line < 224;line++)
 	{
@@ -225,7 +226,7 @@ VIDEO_UPDATE(taotaido)
 		tilemap_draw(bitmap,&clip,bg_tilemap,0,0);
 	}
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }
 

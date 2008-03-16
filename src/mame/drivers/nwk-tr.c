@@ -528,7 +528,7 @@ static void voodoo_vblank_0(int param)
 
 static VIDEO_START( nwktr )
 {
-	voodoo_start(0, 0, VOODOO_1, 2, 2, 2);
+	voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 2, 2);
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
 	K001604_vh_start(machine, 0);
@@ -537,11 +537,11 @@ static VIDEO_START( nwktr )
 
 static VIDEO_UPDATE( nwktr )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
 	voodoo_update(0, bitmap, cliprect);
 
-	K001604_tile_update(machine, 0);
+	K001604_tile_update(screen->machine, 0);
 	K001604_draw_front_layer(0, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
@@ -758,7 +758,7 @@ static WRITE32_HANDLER( lanc2_w )
 static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_reg_r, K001604_reg_w)
-	AM_RANGE(0x74010000, 0x74017fff) AM_MIRROR(0x80000000) AM_READWRITE(MRA32_RAM, paletteram32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x74010000, 0x74017fff) AM_MIRROR(0x80000000) AM_READWRITE(SMH_RAM, paletteram32_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_tile_r, K001604_tile_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_char_r, K001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)

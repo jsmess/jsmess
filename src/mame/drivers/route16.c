@@ -226,7 +226,7 @@ static WRITE8_HANDLER ( speakres_out2_w )
 
 static ADDRESS_MAP_START( route16_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-  /*AM_RANGE(0x3000, 0x3001) AM_READWRITE(MRA8_NOP, MWA8_NOP)   protection device */
+  /*AM_RANGE(0x3000, 0x3001) AM_READWRITE(SMH_NOP, SMH_NOP)   protection device */
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w) AM_BASE(&sharedram)
 	AM_RANGE(0x4800, 0x4800) AM_READWRITE(input_port_0_r, route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READWRITE(input_port_1_r, route16_out1_w)
@@ -295,7 +295,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cpu1_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(9) )
+	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
 	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x00ff) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x00ff) AM_WRITE(AY8910_control_port_0_w)
 ADDRESS_MAP_END

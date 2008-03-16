@@ -586,7 +586,7 @@ static WRITE32_HANDLER(vidc_w)
 				a310_vidregs[0x80], a310_vidregs[0xa0],
 				visarea.max_x, visarea.max_y);
 
-			video_screen_configure(0, a310_vidregs[0x80], a310_vidregs[0xa0], &visarea, machine->screen[0].refresh);
+			video_screen_configure(machine->primary_screen, a310_vidregs[0x80], a310_vidregs[0xa0], &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
 
 			// slightly hacky: fire off a VBL right now.  the BIOS doesn't wait long enough otherwise.
 			timer_adjust_oneshot(vbl_timer, attotime_zero, 0);

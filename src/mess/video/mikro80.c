@@ -36,7 +36,7 @@ VIDEO_UPDATE( mikro80 )
 		for(x = 0; x < 64; x++ )
 		{
 			int code = program_read_byte(MIKRO80_VIDEO_MEMORY + x + y*64);		
-			drawgfx(bitmap, machine->gfx[0],  code , 0, 0,0, x*8,y*8,
+			drawgfx(bitmap, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8,
 				NULL, TRANSPARENCY_NONE, 0);
 		}
 	}
@@ -47,7 +47,7 @@ VIDEO_UPDATE( mikro80 )
 		{
 			int code = program_read_byte(MIKRO80_CURSOR_MEMORY + x + y*64);		
 			if (code == 0x80 ) {
-				drawgfx(bitmap, machine->gfx[0],  0xff , 0, 0,0, x*8,y*8,
+				drawgfx(bitmap, screen->machine->gfx[0],  0xff , 0, 0,0, x*8,y*8,
 					NULL, TRANSPARENCY_NONE, 0);
 			}
 		}

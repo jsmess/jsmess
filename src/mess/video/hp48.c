@@ -125,9 +125,8 @@ VIDEO_UPDATE( hp48 )
 //	int contrast=(hp48_hardware.data[1]|((hp48_hardware.data[2]&1)<<4));
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
-    color[0] = machine->pens[0];
-//    color[0] = machine->pens[1];
-	color[1] = machine->pens[1];
+    color[0] = screen->machine->pens[0];
+	color[1] = screen->machine->pens[1];
 
 	i = LCD_MAIN_BASE_ADDRESS;
 	max_y = MIN(64, LCD_MAIN_SIZE + 1 );

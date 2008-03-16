@@ -194,8 +194,9 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
 	tms.visarea.max_y = tms.top_border + 24*8 - 1 + MIN(intf->bordery, tms.bottom_border);
 
 	/* configure the screen if we weren't overridden */
-	if (machine->screen[0].width == LEFT_BORDER+32*8+RIGHT_BORDER && machine->screen[0].height == TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
-		video_screen_configure(0, LEFT_BORDER + 32*8 + RIGHT_BORDER, tms.top_border + 24*8 + tms.bottom_border, &tms.visarea, machine->screen[0].refresh);
+	if (video_screen_get_width(machine->primary_screen) == LEFT_BORDER+32*8+RIGHT_BORDER &&
+	    video_screen_get_height(machine->primary_screen) == TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
+		video_screen_configure(machine->primary_screen, LEFT_BORDER + 32*8 + RIGHT_BORDER, tms.top_border + 24*8 + tms.bottom_border, &tms.visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
 
     /* Video RAM */
     tms.vramsize = intf->vram;
@@ -206,7 +207,7 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
     tms.dBackMem = (UINT8*)auto_malloc (IMAGE_SIZE);
 
     /* back bitmap */
-    tms.tmpbmp = auto_bitmap_alloc (256, 192, machine->screen[0].format);
+    tms.tmpbmp = auto_bitmap_alloc (256, 192, video_screen_get_format(machine->primary_screen));
 
     TMS9928A_reset ();
     tms.LimitSprites = 1;
@@ -390,13 +391,13 @@ void TMS9928A_set_spriteslimit (int limit) {
 VIDEO_UPDATE( tms9928a )
 {
     INT32 BackColour = tms.Regs[7] & 15; if (!BackColour) BackColour=1;
-    palette_set_color(machine, 0, TMS9928A_palette[BackColour]);
+    palette_set_color(screen->machine, 0, TMS9928A_palette[BackColour]);
 
 	if (! (tms.Regs[1] & 0x40))
-		fillbitmap(bitmap, machine->pens[BackColour], cliprect);
+		fillbitmap(bitmap, screen->machine->pens[BackColour], cliprect);
 	else
 	{
-		(*ModeHandlers[TMS_MODE])(machine, tms.tmpbmp, cliprect);
+		(*ModeHandlers[TMS_MODE])(screen->machine, tms.tmpbmp, cliprect);
 
 		copybitmap(bitmap, tms.tmpbmp, 0, 0, LEFT_BORDER, TOP_BORDER, cliprect);
 		{
@@ -416,7 +417,7 @@ VIDEO_UPDATE( tms9928a )
 			fillbitmap (bitmap, BackColour, &rt);
 	    }
 		if (TMS_SPRITES_ENABLED)
-			draw_sprites(machine, bitmap, cliprect);
+			draw_sprites(screen->machine, bitmap, cliprect);
 	}
 
 	return 0;

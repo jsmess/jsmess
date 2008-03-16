@@ -1040,7 +1040,6 @@ static void modeFE_switch(UINT16 offset, UINT8 data)
     */
 	FETimer = 1;
 	FE_old_opbase_handler = memory_set_opbase_handler(0, modeFE_opbase_handler);
-	catch_nextBranch();
 }
 
 static READ8_HANDLER(modeFE_switch_r)
@@ -1061,7 +1060,7 @@ static  READ8_HANDLER(current_bank_r)
 }
 
 static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(13) )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_BASE(&riot_ram)
 	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_READWRITE(r6532_0_r, r6532_0_w)
@@ -1160,10 +1159,10 @@ static void install_banks(int count, unsigned init)
 	{
 		static const read8_machine_func handler[] =
 		{
-			MRA8_BANK1,
-			MRA8_BANK2,
-			MRA8_BANK3,
-			MRA8_BANK4,
+			SMH_BANK1,
+			SMH_BANK2,
+			SMH_BANK3,
+			SMH_BANK4,
 		};
 
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
@@ -1407,7 +1406,8 @@ static const struct tia_interface tia_interface_pal =
 
 static MACHINE_START( a2600 )
 {
-	current_screen_height = machine->screen[0].height;
+	const device_config *screen = video_screen_first(machine->config);
+	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( &tia_interface );
 	r6532_config( 0, &r6532_interface );
@@ -1419,7 +1419,8 @@ static MACHINE_START( a2600 )
 
 static MACHINE_START( a2600p )
 {
-	current_screen_height = machine->screen[0].height;
+	const device_config *screen = video_screen_first(machine->config);
+	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( &tia_interface_pal );
 	r6532_config( 0, &r6532_interface );
@@ -1688,8 +1689,8 @@ static MACHINE_RESET( a2600 )
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_r);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x18ff, 0, 0, MWA8_BANK9);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1900, 0x19ff, 0, 0, MRA8_BANK9);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x18ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1900, 0x19ff, 0, 0, SMH_BANK9);
 		memory_set_bankptr( 9, extra_RAM + 4 * 256 );
 		break;
 
@@ -1760,24 +1761,24 @@ static MACHINE_RESET( a2600 )
 
 	if (banking_mode == modeFA)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x10ff, 0, 0, MWA8_BANK9);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1100, 0x11ff, 0, 0, MRA8_BANK9);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x10ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1100, 0x11ff, 0, 0, SMH_BANK9);
 
 		memory_set_bankptr(9, extra_RAM);
 	}
 
 	if (banking_mode == modeCV)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x17ff, 0, 0, MWA8_BANK9);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x13ff, 0, 0, MRA8_BANK9);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x17ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x13ff, 0, 0, SMH_BANK9);
 
 		memory_set_bankptr(9, extra_RAM);
 	}
 
 	if (chip)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x107f, 0, 0, MWA8_BANK9);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1080, 0x10ff, 0, 0, MRA8_BANK9);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x107f, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1080, 0x10ff, 0, 0, SMH_BANK9);
 
 		memory_set_bankptr(9, extra_RAM);
 	}

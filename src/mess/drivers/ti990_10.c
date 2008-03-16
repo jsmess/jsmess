@@ -134,7 +134,7 @@ static VIDEO_START( ti990_10 )
 
 static VIDEO_UPDATE( ti990_10 )
 {
-	vdt911_refresh(machine, bitmap, 0, 0, 0);
+	vdt911_refresh(screen->machine, bitmap, 0, 0, 0);
 	return 0;
 }
 
@@ -144,13 +144,13 @@ static VIDEO_UPDATE( ti990_10 )
 
 static ADDRESS_MAP_START(ti990_10_memmap, ADDRESS_SPACE_PROGRAM, 16)
 
-	AM_RANGE(0x000000, 0x0fffff) AM_READWRITE(MRA16_RAM, MWA16_RAM)		/* let's say we have 1MB of RAM */
-	AM_RANGE(0x100000, 0x1ff7ff) AM_READWRITE(MRA16_NOP, MWA16_NOP)		/* free TILINE space */
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM		/* let's say we have 1MB of RAM */
+	AM_RANGE(0x100000, 0x1ff7ff) AM_NOP		/* free TILINE space */
 	AM_RANGE(0x1ff800, 0x1ff81f) AM_READWRITE(ti990_hdc_r, ti990_hdc_w)	/* disk controller TPCS */
-	AM_RANGE(0x1ff820, 0x1ff87f) AM_READWRITE(MRA16_NOP, MWA16_NOP)		/* free TPCS */
+	AM_RANGE(0x1ff820, 0x1ff87f) AM_NOP		/* free TPCS */
 	AM_RANGE(0x1ff880, 0x1ff89f) AM_READWRITE(ti990_tpc_r, ti990_tpc_w)	/* tape controller TPCS */
-	AM_RANGE(0x1ff8a0, 0x1ffbff) AM_READWRITE(MRA16_NOP, MWA16_NOP)		/* free TPCS */
-	AM_RANGE(0x1ffc00, 0x1fffff) AM_READWRITE(MRA16_ROM, MWA16_ROM)		/* LOAD ROM */
+	AM_RANGE(0x1ff8a0, 0x1ffbff) AM_NOP		/* free TPCS */
+	AM_RANGE(0x1ffc00, 0x1fffff) AM_ROM		/* LOAD ROM */
 
 ADDRESS_MAP_END
 

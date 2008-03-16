@@ -164,7 +164,7 @@ static TIMER_CALLBACK( scanline_callback )
 	update_main_irqs();
 
 	/* come back at the next appropriate scanline */
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
@@ -186,7 +186,7 @@ static TIMER_CALLBACK( scanline_callback )
 static MACHINE_RESET( yboard )
 {
     interrupt_timer = timer_alloc(scanline_callback, NULL);
-    timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, 223, 0), 223);
+    timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), 223);
 
 	state_save_register_global_array(misc_io_data);
 	state_save_register_global_array(analog_data);
@@ -386,7 +386,8 @@ static NVRAM_HANDLER( yboard )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(21) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_READWRITE(segaic16_multiply_0_r, segaic16_multiply_0_w)
 	AM_RANGE(0x082000, 0x083fff) AM_WRITE(sound_data_w)
@@ -407,7 +408,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( subx_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(21) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_READWRITE(segaic16_multiply_1_r, segaic16_multiply_1_w)
 	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_READWRITE(segaic16_divide_1_r, segaic16_divide_1_w)
@@ -419,14 +421,15 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( suby_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(21) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_READWRITE(segaic16_multiply_2_r, segaic16_multiply_2_w)
 	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_READWRITE(segaic16_divide_2_r, segaic16_divide_2_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x180000, 0x1807ff) AM_MIRROR(0x007800) AM_RAM AM_BASE(&segaic16_rotateram_0)
 	AM_RANGE(0x188000, 0x188fff) AM_MIRROR(0x007000) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x190000, 0x193fff) AM_MIRROR(0x004000) AM_READWRITE(MRA16_RAM, segaic16_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x190000, 0x193fff) AM_MIRROR(0x004000) AM_READWRITE(SMH_RAM, segaic16_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x198000, 0x19ffff) AM_READ(segaic16_rotate_control_0_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
@@ -440,14 +443,15 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_READWRITE(SegaPCM_r, SegaPCM_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(8) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)

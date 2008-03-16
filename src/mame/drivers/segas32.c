@@ -572,7 +572,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
 {
 	signal_v60_irq(MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, end_of_vblank_int);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, end_of_vblank_int);
 	if (system32_prot_vblank)
 		(*system32_prot_vblank)();
 }
@@ -1183,7 +1183,7 @@ static NVRAM_HANDLER( system32 )
  *************************************/
 
 static ADDRESS_MAP_START( system32_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x0f0000) AM_RAM	AM_BASE(&system32_workram)
 	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_videoram_r, system32_videoram_w) AM_BASE(&system32_videoram)
@@ -1201,7 +1201,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( multi32_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(24) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_MIRROR(0x0e0000) AM_RAM
 	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE(multi32_videoram_r, multi32_videoram_w) AM_BASE((UINT32 **)&system32_videoram)
@@ -1238,7 +1239,8 @@ static ADDRESS_MAP_START( system32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( system32_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(8) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0c) AM_READWRITE(YM3438_status_port_0_A_r, YM3438_control_port_0_A_w)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x0c) AM_WRITE(YM3438_data_port_0_A_w)
 	AM_RANGE(0x82, 0x82) AM_MIRROR(0x0c) AM_WRITE(YM3438_control_port_0_B_w)
@@ -1263,7 +1265,8 @@ static ADDRESS_MAP_START( multi32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( multi32_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(8) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0c) AM_READWRITE(YM3438_status_port_0_A_r, YM3438_control_port_0_A_w)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x0c) AM_WRITE(YM3438_data_port_0_A_w)
 	AM_RANGE(0x82, 0x82) AM_MIRROR(0x0c) AM_WRITE(YM3438_control_port_0_B_w)

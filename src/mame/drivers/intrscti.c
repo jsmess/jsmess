@@ -22,21 +22,21 @@ static READ8_HANDLER( unk_r )
 static UINT8 *intrscti_ram;
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x6000, 0x67ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x7000, 0x77ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x7000, 0x77ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7000, 0x77ff) AM_WRITE(MWA8_RAM) AM_BASE(&intrscti_ram) // video ram
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x7000, 0x77ff) AM_WRITE(SMH_RAM) AM_BASE(&intrscti_ram) // video ram
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ( unk_r )
 	AM_RANGE(0x01, 0x01) AM_READ( unk_r )
 ADDRESS_MAP_END
@@ -69,7 +69,7 @@ static VIDEO_UPDATE(intrscti)
 	int y,x;
 	int count;
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	count = 0;
 	for (y=0;y<64;y++)
@@ -78,7 +78,7 @@ static VIDEO_UPDATE(intrscti)
 		{
 			int dat;
 			dat = intrscti_ram[count];
-			drawgfx(bitmap,machine->gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
 			count++;
 		}
 	}

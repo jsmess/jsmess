@@ -15,8 +15,8 @@ VIDEO_UPDATE( nascom1 )
 
 	for (sx = 0; sx < 48; sx++)
 	{
-		drawgfx (bitmap, machine->gfx[0], videoram[0x03ca + sx],
-			1, 0, 0, sx * 8, 0, &machine->screen[0].visarea,
+		drawgfx (bitmap, screen->machine->gfx[0], videoram[0x03ca + sx],
+			1, 0, 0, sx * 8, 0, NULL,
 			TRANSPARENCY_NONE, 0);
 	}
 
@@ -24,8 +24,8 @@ VIDEO_UPDATE( nascom1 )
 	{
 		for (sx = 0; sx < 48; sx++)
 		{
-			drawgfx (bitmap, machine->gfx[0], videoram[0x000a + (sy * 64) + sx],
-				1, 0, 0, sx * 8, (sy + 1) * 16, &machine->screen[0].visarea,
+			drawgfx (bitmap, screen->machine->gfx[0], videoram[0x000a + (sy * 64) + sx],
+				1, 0, 0, sx * 8, (sy + 1) * 16, NULL,
 				TRANSPARENCY_NONE, 0);
 		}
 	}
@@ -38,8 +38,8 @@ VIDEO_UPDATE( nascom2 )
 
 	for (sx = 0; sx < 48; sx++)
 	{
-		drawgfx (bitmap, machine->gfx[0], videoram[0x03ca + sx],
-			1, 0, 0, sx * 8, 0, &machine->screen[0].visarea,
+		drawgfx (bitmap, screen->machine->gfx[0], videoram[0x03ca + sx],
+			1, 0, 0, sx * 8, 0, NULL,
 			TRANSPARENCY_NONE, 0);
 	}
 
@@ -47,8 +47,8 @@ VIDEO_UPDATE( nascom2 )
 	{
 		for (sx = 0; sx < 48; sx++)
 		{
-			drawgfx (bitmap, machine->gfx[0], videoram[0x000a + (sy * 64) + sx],
-				1, 0, 0, sx * 8, (sy + 1) * 14, &machine->screen[0].visarea,
+			drawgfx (bitmap, screen->machine->gfx[0], videoram[0x000a + (sy * 64) + sx],
+				1, 0, 0, sx * 8, (sy + 1) * 14, NULL,
 				TRANSPARENCY_NONE, 0);
 		}
 	}

@@ -87,7 +87,7 @@ WRITE16_HANDLER( btoads_display_control_w )
 	if (ACCESSING_MSB)
 	{
 		/* allow multiple changes during display */
-		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 
 		/* bit 15 controls which page is rendered and which page is displayed */
 		if (data & 0x8000)
@@ -117,7 +117,7 @@ WRITE16_HANDLER( btoads_display_control_w )
 WRITE16_HANDLER( btoads_scroll0_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_MSB)
@@ -130,7 +130,7 @@ WRITE16_HANDLER( btoads_scroll0_w )
 WRITE16_HANDLER( btoads_scroll1_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_MSB)
@@ -342,7 +342,7 @@ void btoads_from_shiftreg(UINT32 address, UINT16 *shiftreg)
  *
  *************************************/
 
-void btoads_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void btoads_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 4;
 	UINT16 *bg0_base = &btoads_vram_bg0[(fulladdr + (yscroll0 << 10)) & 0x3fc00];

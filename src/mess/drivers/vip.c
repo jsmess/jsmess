@@ -43,7 +43,7 @@ static WRITE8_HANDLER( bankswitch_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( vip_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
 	AM_RANGE(0x8000, 0x81ff) AM_ROM
 ADDRESS_MAP_END
@@ -150,13 +150,13 @@ static MACHINE_START( vip )
 	state_save_register_global(vip_reset);
 	state_save_register_global(vip_run);
 
-	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, MRA8_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, MWA8_BANK1);
+	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
 
 	if (mess_ram_size < 0x8000)
 	{
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MRA8_UNMAP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MWA8_UNMAP);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, SMH_UNMAP);
 	}
 
 	for (addr = 0; addr < mess_ram_size; addr++)

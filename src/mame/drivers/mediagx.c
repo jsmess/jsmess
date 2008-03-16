@@ -219,7 +219,7 @@ static void draw_framebuffer(running_machine *machine, bitmap_t *bitmap, const r
 		visarea.min_x = visarea.min_y = 0;
 		visarea.max_x = width - 1;
 		visarea.max_y = height - 1;
-		video_screen_configure(0, width, height * 262 / 240, &visarea, machine->screen[0].refresh);
+		video_screen_configure(machine->primary_screen, width, height * 262 / 240, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
 	}
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)		// 8-bit mode
@@ -311,11 +311,11 @@ static VIDEO_UPDATE(mediagx)
 {
 	fillbitmap(bitmap, 0, cliprect);
 
-	draw_framebuffer(machine, bitmap, cliprect);
+	draw_framebuffer(screen->machine, bitmap, cliprect);
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
-		draw_cga(machine, bitmap, cliprect);
+		draw_cga(screen->machine, bitmap, cliprect);
 	}
 	return 0;
 }
@@ -329,10 +329,8 @@ static READ32_HANDLER( disp_ctrl_r )
 		case DC_TIMING_CFG:
 			r |= 0x40000000;
 
-			if (video_screen_get_vpos(0) >= frame_height)
-			{
+			if (video_screen_get_vpos(machine->primary_screen) >= frame_height)
 				r &= ~0x40000000;
-			}
 
 #if SPEEDUP_HACKS
 			// wait for vblank speedup

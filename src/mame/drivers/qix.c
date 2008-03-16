@@ -222,9 +222,11 @@ Interrupts:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
+#include "rendlay.h"
 #include "machine/6821pia.h"
 #include "qix.h"
+
+#include "elecyoyo.lh"
 
 
 
@@ -237,7 +239,7 @@ Interrupts:
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_READ(MRA8_NOP)   /* 6850 ACIA */
+	AM_RANGE(0x8800, 0x8bff) AM_READ(SMH_NOP)   /* 6850 ACIA */
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(pia_3_r, pia_3_w)
@@ -251,7 +253,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( zoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_READ(MRA8_NOP)   /* ACIA */
+	AM_RANGE(0x0800, 0x0bff) AM_READ(SMH_NOP)   /* ACIA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(pia_3_r, pia_3_w)
@@ -270,11 +272,11 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(11) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(qix_68705_portA_r, qix_68705_portA_w) AM_BASE_MEMBER(qix_state, _68705_port_out)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(qix_68705_portB_r, qix_68705_portB_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(qix_68705_portC_r, qix_68705_portC_w)
-	AM_RANGE(0x0004, 0x0007) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, _68705_ddr)
+	AM_RANGE(0x0004, 0x0007) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(qix_state, _68705_ddr)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -547,7 +549,6 @@ static MACHINE_DRIVER_START( qix )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", qix_vblank_start)
 
 	/* high interleave needed to ensure correct text in service mode */
 	/* Zookeeper settings and high score table seem especially sensitive to this */
@@ -1117,8 +1118,8 @@ GAME( 1981, qixa,     qix,      qix,      qix,      0,       ROT270, "Taito Amer
 GAME( 1981, qixb,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, qix2,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix II (Tournament)", GAME_SUPPORTS_SAVE )
 GAME( 1981, sdungeon, 0,        mcu,      sdungeon, 0,       ROT270, "Taito America Corporation", "Space Dungeon", GAME_SUPPORTS_SAVE )
-GAME( 1982, elecyoyo, 0,        mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, elecyoy2, elecyoyo, mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE )
+GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoy2, elecyoyo, mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
 GAME( 1982, kram,     0,        mcu,      kram,     0,       ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram2,    kram,     mcu,      kram,     0,       ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram3,    kram,     qix,      kram,     kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_SUPPORTS_SAVE )

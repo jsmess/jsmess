@@ -740,7 +740,7 @@ void stic_screenrefresh(running_machine *machine)
 	else
 	{
 		/* STIC disabled, just fill with border color */
-		fillbitmap(tmpbitmap, machine->pens[intv_border_color], &machine->screen[0].visarea);
+		fillbitmap(tmpbitmap, machine->pens[intv_border_color], NULL);
 	}
 	col_delay = intv_col_delay;
 	row_delay = intv_row_delay;
@@ -818,23 +818,25 @@ VIDEO_UPDATE( intvkbd )
 			for(x=0;x<40;x++)
 			{
 				offs = current_row*64+x;
-				drawgfx(bitmap,machine->gfx[2],
+				drawgfx(bitmap, screen->machine->gfx[2],
 					videoram[offs],
 					7, /* white */
 					0,0,
 					x*8,y*8,
-					&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+					NULL,
+					TRANSPARENCY_PEN, 0);
 			}
 			if (current_row == tms9927_cursor_row)
 			{
 				/* draw the cursor as a solid white block */
 				/* (should use a filled rect here!) */
-				drawgfx(bitmap,machine->gfx[2],
+				drawgfx(bitmap, screen->machine->gfx[2],
 					191, /* a block */
 					7,   /* white   */
 					0,0,
 					(tms9927_cursor_col-1)*8,y*8,
-					&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+					NULL,
+					TRANSPARENCY_PEN, 0);
 			}
 			current_row = (current_row + 1) % tms9927_num_rows;
 		}

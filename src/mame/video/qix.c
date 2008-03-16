@@ -7,9 +7,18 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/mc6845.h"
 #include "qix.h"
+
+
+
+/*************************************
+ *
+ *  Device tag
+ *
+ *************************************/
+
+#define MC6845_TAG		("vid-u18")
 
 
 
@@ -35,9 +44,6 @@ static VIDEO_START( qix )
 {
 	qix_state *state = machine->driver_data;
 
-	/* get the pointer to the mc6845 object */
-	state->mc6845 = devtag_get_token(machine, MC6845, "vid-u18");
-
 	/* allocate memory for the full video RAM */
 	state->videoram = auto_malloc(256 * 256);
 
@@ -58,13 +64,13 @@ static VIDEO_START( qix )
 
 static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = device->machine->driver_data;
 
 	/* on the rising edge, latch the scanline */
 	if (display_enabled)
 	{
-		UINT16 ma = mc6845_get_ma(mc6845);
-		UINT8 ra = mc6845_get_ra(mc6845);
+		UINT16 ma = mc6845_get_ma(device);
+		UINT8 ra = mc6845_get_ra(device);
 
 		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
 		*state->scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
@@ -81,7 +87,7 @@ static MC6845_ON_DE_CHANGED( display_enable_changed )
 
 WRITE8_HANDLER( qix_flip_screen_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	state->flip = data;
 }
@@ -105,7 +111,7 @@ WRITE8_HANDLER( qix_flip_screen_w )
 
 static READ8_HANDLER( qix_videoram_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -115,11 +121,11 @@ static READ8_HANDLER( qix_videoram_r )
 
 static WRITE8_HANDLER( qix_videoram_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -131,11 +137,11 @@ static WRITE8_HANDLER( qix_videoram_w )
 
 static WRITE8_HANDLER( slither_videoram_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -163,7 +169,7 @@ static WRITE8_HANDLER( slither_videoram_w )
 
 static READ8_HANDLER( qix_addresslatch_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -173,7 +179,10 @@ static READ8_HANDLER( qix_addresslatch_r )
 
 static WRITE8_HANDLER( qix_addresslatch_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
+
+	/* update the screen in case the game is writing "behind" the beam */
+	video_screen_update_now(machine->primary_screen);
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -185,7 +194,10 @@ static WRITE8_HANDLER( qix_addresslatch_w )
 
 static WRITE8_HANDLER( slither_addresslatch_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
+
+	/* update the screen in case the game is writing "behind" the beam */
+	video_screen_update_now(machine->primary_screen);
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -207,7 +219,7 @@ static WRITE8_HANDLER( slither_addresslatch_w )
 
 static WRITE8_HANDLER( qix_paletteram_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	UINT8 old_data = state->paletteram[offset];
 
@@ -217,18 +229,18 @@ static WRITE8_HANDLER( qix_paletteram_w )
 	/* trigger an update if a currently visible pen has changed */
 	if (((offset >> 8) == state->palette_bank) &&
 	    (old_data != data))
-		video_screen_update_now(0);
+		video_screen_update_now(machine->primary_screen);
 }
 
 
 WRITE8_HANDLER( qix_palettebank_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* set the bank value */
 	if (state->palette_bank != (data & 3))
 	{
-		video_screen_update_now(0);
+		video_screen_update_now(machine->primary_screen);
 		state->palette_bank = data & 3;
 	}
 
@@ -295,7 +307,7 @@ static void get_pens(qix_state *state, pen_t *pens)
 
 static MC6845_BEGIN_UPDATE( begin_update )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = device->machine->driver_data;
 
 #if 0
 	// note the confusing bit order!
@@ -312,9 +324,8 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 
 static MC6845_UPDATE_ROW( update_row )
-
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = device->machine->driver_data;
 	UINT16 x;
 	UINT8 scanline[256];
 
@@ -340,9 +351,8 @@ static MC6845_UPDATE_ROW( update_row )
 
 static VIDEO_UPDATE( qix )
 {
-	qix_state *state = machine->driver_data;
-
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MC6845_TAG);
+	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
 }
@@ -362,10 +372,10 @@ static ADDRESS_MAP_START( qix_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, qix_paletteram_w) AM_BASE_MEMBER(qix_state, paletteram)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(SMH_RAM, qix_paletteram_w) AM_BASE_MEMBER(qix_state, paletteram)
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(SMH_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
 	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE(MC6845, "vid-u18", mc6845_address_w)
 	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE(MC6845, "vid-u18", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -380,10 +390,10 @@ static ADDRESS_MAP_START( zookeep_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x03fe) AM_WRITE(zookeep_bankswitch_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, qix_paletteram_w) AM_BASE_MEMBER(qix_state, paletteram)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(SMH_RAM, qix_paletteram_w) AM_BASE_MEMBER(qix_state, paletteram)
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(SMH_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
 	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE(MC6845, "vid-u18", mc6845_address_w)
 	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE(MC6845, "vid-u18", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
@@ -398,11 +408,11 @@ static ADDRESS_MAP_START( slither_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, qix_paletteram_w) AM_BASE_MEMBER(qix_state, paletteram)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(SMH_RAM, qix_paletteram_w) AM_BASE_MEMBER(qix_state, paletteram)
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, slither_addresslatch_w)
-	AM_RANGE(0x9401, 0x9401) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_mask)
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
+	AM_RANGE(0x9401, 0x9401) AM_MIRROR(0x03fc) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(qix_state, videoram_mask)
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(SMH_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
 	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE(MC6845, "vid-u18", mc6845_address_w)
 	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE(MC6845, "vid-u18", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -418,7 +428,7 @@ ADDRESS_MAP_END
 
 static const mc6845_interface mc6845_intf =
 {
-	0,						/* screen we are acting on */
+	"main",					/* screen we are acting on */
 	QIX_CHARACTER_CLOCK, 	/* the clock (pin 21) of the chip */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
@@ -426,7 +436,7 @@ static const mc6845_interface mc6845_intf =
 	NULL,					/* after pixel update callback */
 	display_enable_changed,	/* callback for display state changes */
 	NULL,					/* HSYNC callback */
-	NULL					/* VSYNC callback */
+	qix_vsync_changed		/* VSYNC callback */
 };
 
 
@@ -437,7 +447,7 @@ MACHINE_DRIVER_START( qix_video )
 	MDRV_VIDEO_START(qix)
 	MDRV_VIDEO_UPDATE(qix)
 
-	MDRV_DEVICE_ADD("vid-u18", MC6845)
+	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
 	MDRV_DEVICE_CONFIG(mc6845_intf)
 
 	MDRV_SCREEN_ADD("main", RASTER)

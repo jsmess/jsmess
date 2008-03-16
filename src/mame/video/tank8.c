@@ -115,9 +115,9 @@ static TILE_GET_INFO( tank8_get_tile_info )
 
 VIDEO_START( tank8 )
 {
-	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	helper3 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper3 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	tank8_tilemap = tilemap_create(tank8_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
@@ -202,10 +202,10 @@ static TIMER_CALLBACK( tank8_collision_callback )
 
 VIDEO_UPDATE( tank8 )
 {
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 	tilemap_draw(bitmap, cliprect, tank8_tilemap, 0, 0);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	draw_bullets(bitmap, cliprect);
 	return 0;
 }
@@ -213,20 +213,19 @@ VIDEO_UPDATE( tank8 )
 
 VIDEO_EOF( tank8 )
 {
-	const rectangle *clip = &machine->screen[0].visarea;
-
 	int x;
 	int y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	tilemap_draw(helper1, clip, tank8_tilemap, 0, 0);
+	tilemap_draw(helper1, visarea, tank8_tilemap, 0, 0);
 
-	fillbitmap(helper2, 8, clip);
-	fillbitmap(helper3, 8, clip);
+	fillbitmap(helper2, 8, visarea);
+	fillbitmap(helper3, 8, visarea);
 
-	draw_sprites(machine, helper2, clip);
-	draw_bullets(helper3, clip);
+	draw_sprites(machine, helper2, visarea);
+	draw_bullets(helper3, visarea);
 
-	for (y = clip->min_y; y <= clip->max_y; y++)
+	for (y = visarea->min_y; y <= visarea->max_y; y++)
 	{
 		int state = 0;
 
@@ -234,10 +233,10 @@ VIDEO_EOF( tank8 )
 		const UINT16* p2 = BITMAP_ADDR16(helper2, y, 0);
 		const UINT16* p3 = BITMAP_ADDR16(helper3, y, 0);
 
-		if (y % 2 != video_screen_get_frame_number(0) % 2)
+		if (y % 2 != video_screen_get_frame_number(machine->primary_screen) % 2)
 			continue; /* video display is interlaced */
 
-		for (x = clip->min_x; x <= clip->max_x; x++)
+		for (x = visarea->min_x; x <= visarea->max_x; x++)
 		{
 			UINT8 index;
 
@@ -293,7 +292,7 @@ VIDEO_EOF( tank8 )
 					index |= 0x80; /* collision on right side */
 			}
 
-			timer_set(video_screen_get_time_until_pos(0, y, x), NULL, index, tank8_collision_callback);
+			timer_set(video_screen_get_time_until_pos(machine->primary_screen, y, x), NULL, index, tank8_collision_callback);
 
 			state = 1;
 		}

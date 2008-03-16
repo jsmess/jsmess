@@ -172,7 +172,7 @@ static VIDEO_UPDATE( livequiz )
 
 	fillbitmap(bitmap,4095,cliprect);
 
-	if (layers_ctrl & 2)	draw_sprites(machine, bitmap,cliprect);
+	if (layers_ctrl & 2)	draw_sprites(screen->machine, bitmap,cliprect);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 
 	return 0;
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE( livequiz_gfxregs_w ) AM_BASE( &livequiz_gfxregs )
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_READWRITE( MRA16_RAM, paletteram16_xrgb_word_be_w ) AM_BASE( &paletteram16 )
+	AM_RANGE(0xa00000, 0xa3ffff) AM_READWRITE( SMH_RAM, paletteram16_xrgb_word_be_w ) AM_BASE( &paletteram16 )
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ( ret_ffff )

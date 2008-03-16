@@ -203,16 +203,16 @@ VIDEO_START( taitosj )
 {
 	int i;
 
-	sprite_layer_collbitmap1 = auto_bitmap_alloc(16,16,machine->screen[0].format);
+	sprite_layer_collbitmap1 = auto_bitmap_alloc(16,16,video_screen_get_format(machine->primary_screen));
 
 	for (i = 0; i < 3; i++)
 	{
-		taitosj_layer_bitmap[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-		sprite_layer_collbitmap2[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+		taitosj_layer_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+		sprite_layer_collbitmap2[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	}
 
-	sprite_sprite_collbitmap1 = auto_bitmap_alloc(32,32,machine->screen[0].format);
-	sprite_sprite_collbitmap2 = auto_bitmap_alloc(32,32,machine->screen[0].format);
+	sprite_sprite_collbitmap1 = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
+	sprite_sprite_collbitmap2 = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
 
 	memset(dirtycharacter1, 1, sizeof(dirtycharacter1));
 	memset(dirtycharacter2, 1, sizeof(dirtycharacter2));
@@ -427,6 +427,8 @@ static void check_sprite_sprite_collision(running_machine *machine)
 static void calculate_sprite_areas(running_machine *machine, int *sprites_on, rectangle *sprite_areas)
 {
 	int which;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	for (which = 0; which < 0x20; which++)
 	{
@@ -453,10 +455,10 @@ static void calculate_sprite_areas(running_machine *machine, int *sprites_on, re
 			/* check for bitmap bounds to avoid illegal memory access */
 			if (minx < 0) minx = 0;
 			if (miny < 0) miny = 0;
-			if (maxx >= machine->screen[0].width - 1)
-				maxx = machine->screen[0].width - 1;
-			if (maxy >= machine->screen[0].height - 1)
-				maxy = machine->screen[0].height - 1;
+			if (maxx >= width - 1)
+				maxx = width - 1;
+			if (maxy >= height - 1)
+				maxy = height - 1;
 
 			sprite_areas[which].min_x = minx;
 			sprite_areas[which].max_x = maxx;
@@ -817,11 +819,11 @@ static int video_update_common(running_machine *machine, bitmap_t *bitmap,
 
 VIDEO_UPDATE( taitosj )
 {
-	return video_update_common(machine, bitmap, cliprect, taitosj_copy_layer);
+	return video_update_common(screen->machine, bitmap, cliprect, taitosj_copy_layer);
 }
 
 
 VIDEO_UPDATE( kikstart )
 {
-	return video_update_common(machine, bitmap, cliprect, kikstart_copy_layer);
+	return video_update_common(screen->machine, bitmap, cliprect, kikstart_copy_layer);
 }

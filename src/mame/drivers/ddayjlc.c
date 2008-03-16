@@ -208,8 +208,8 @@ static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&mainram)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(MRA8_RAM, ddayjlc_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(MRA8_RAM, ddayjlc_bgram_w) AM_BASE(&bgram) /* 9800-981f - videoregs */
+	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(SMH_RAM, ddayjlc_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(SMH_RAM, ddayjlc_bgram_w) AM_BASE(&bgram) /* 9800-981f - videoregs */
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK(1) AM_WRITENOP
 	AM_RANGE(0xe000, 0xe003) AM_WRITE(i8257_CH0_w)
 	AM_RANGE(0xe008, 0xe008) AM_WRITENOP
@@ -361,7 +361,7 @@ static VIDEO_UPDATE( ddayjlc )
 
 		code=(code&0x7f)|((flags&0x30)<<3);
 
-		drawgfx(bitmap, machine->gfx[0], code, 1, xflip, yflip, x, y, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx(bitmap, screen->machine->gfx[0], code, 1, xflip, yflip, x, y, cliprect, TRANSPARENCY_PEN, 0);
 	}
 
 	{
@@ -371,9 +371,9 @@ static VIDEO_UPDATE( ddayjlc )
 			{
 				c=videoram[y*32+x];
 				if(x>1&&x<30)
-					drawgfx(bitmap, machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8, cliprect, TRANSPARENCY_PEN, 0);
+					drawgfx(bitmap, screen->machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8, cliprect, TRANSPARENCY_PEN, 0);
 				else
-					drawgfx(bitmap, machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8, cliprect, TRANSPARENCY_NONE, 0);
+					drawgfx(bitmap, screen->machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8, cliprect, TRANSPARENCY_NONE, 0);
 		}
 	}
 	return 0;

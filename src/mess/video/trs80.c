@@ -36,8 +36,8 @@ VIDEO_UPDATE( trs80 )
 			i = (y << 6) + x;
 			chr=videoram[i];
 			if ((adj) && (chr < 32)) chr+=64;			// 7-bit video handler
-			drawgfx( bitmap,machine->gfx[0],chr,0,0,0,x/skip*FW,y*FH,
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			drawgfx( bitmap,screen->machine->gfx[0],chr,0,0,0,x/skip*FW,y*FH,
+				NULL,TRANSPARENCY_NONE,0);
 		}
 	}
 	return 0;

@@ -534,7 +534,12 @@ VIDEO_START( arcadia )
 		arcadia_rectangle[i][5]=arcadia_rectangle[i][6]=arcadia_rectangle[i][7]=arcadia_rectangle[i][4];
 	}
 
-	arcadia_video.bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	{
+		const device_config *screen = video_screen_first(machine->config);
+		int width = video_screen_get_width(screen);
+		int height = video_screen_get_height(screen);
+		arcadia_video.bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	}
 }
 
 READ8_HANDLER(arcadia_video_r)
@@ -808,6 +813,9 @@ static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 
 INTERRUPT_GEN( arcadia_video_line )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+
 	if (arcadia_video.ad_delay<=0)
 	arcadia_video.ad_select=arcadia_video.reg.d.pal[1]&0x40;
 	else arcadia_video.ad_delay--;
@@ -824,7 +832,7 @@ INTERRUPT_GEN( arcadia_video_line )
 
 	if (arcadia_video.line<arcadia_video.ypos)
 	{
-		plot_box(arcadia_video.bitmap, 0, arcadia_video.line, machine->screen[0].width, 1, 0);
+		plot_box(arcadia_video.bitmap, 0, arcadia_video.line, width, 1, 0);
 		memset(arcadia_video.bg[arcadia_video.line], 0, sizeof(arcadia_video.bg[0]));
 	}
 	else
@@ -852,7 +860,7 @@ INTERRUPT_GEN( arcadia_video_line )
 		else
 		{
 			arcadia_video.charline=0xd;
-			plot_box(arcadia_video.bitmap, 0, arcadia_video.line, machine->screen[0].width, 1, 0);
+			plot_box(arcadia_video.bitmap, 0, arcadia_video.line, width, 1, 0);
 			memset(arcadia_video.bg[arcadia_video.line], 0, sizeof(arcadia_video.bg[0]));
 		}
 	}

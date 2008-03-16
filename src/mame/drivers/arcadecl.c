@@ -67,7 +67,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "arcadecl.h"
 #include "sound/okim6295.h"
@@ -96,11 +95,11 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(running_machine *machine, int scrnum, int scanline)
+static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(machine, 0);
+		atarigen_scanline_int_gen(screen->machine, 0);
 }
 
 
@@ -115,7 +114,7 @@ static MACHINE_RESET( arcadecl )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, scanline_update, 32);
+	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 }
 
 
@@ -158,7 +157,7 @@ static WRITE16_HANDLER( latch_w )
 	if (ACCESSING_LSB)
 	{
 		OKIM6295_set_bank_base(0, (data & 0x80) ? 0x40000 : 0x00000);
-		atarigen_set_oki6295_vol(Machine, (data & 0x001f) * 100 / 0x1f);
+		atarigen_set_oki6295_vol(machine, (data & 0x001f) * 100 / 0x1f);
 	}
 }
 
@@ -173,10 +172,10 @@ static WRITE16_HANDLER( latch_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&rampart_bitmap)
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_READWRITE(MRA16_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x3c0000, 0x3c07ff) AM_READWRITE(SMH_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3e0000, 0x3e07ff) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(MRA16_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(SMH_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0x640000, 0x640001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x640002, 0x640003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x640010, 0x640011) AM_READ(input_port_2_word_r)

@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(11) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(arkanoid_68705_portA_r, arkanoid_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READ(arkanoid_input_2_r)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(arkanoid_68705_portC_r, arkanoid_68705_portC_w)
@@ -744,11 +744,11 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( arkanoid )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000) /* 6 Mhz */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(arkanoid_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("mcu", M68705, 3000000) /* 3 Mhz */
+	MDRV_CPU_ADD_TAG("mcu", M68705, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 
 	MDRV_INTERLEAVE(100)					// 100 CPU slices per second to synchronize between the MCU and the main CPU

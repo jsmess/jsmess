@@ -199,16 +199,16 @@ static WRITE8_HANDLER( sym1_via2_a_w )
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa600, 0xa67f, 0, 0,
-		((readinputportbytag("WP") & 0x01) && !(data & 0x01)) ? MWA8_NOP : MWA8_BANK5);
+		((readinputportbytag("WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK5);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0400, 0x07ff, 0, 0,
-		((readinputportbytag("WP") & 0x02) && !(data & 0x02)) ? MWA8_NOP : MWA8_BANK2);
+		((readinputportbytag("WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK2);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0800, 0x0bff, 0, 0,
-		((readinputportbytag("WP") & 0x04) && !(data & 0x04)) ? MWA8_NOP : MWA8_BANK3);
+		((readinputportbytag("WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK3);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0c00, 0x0fff, 0, 0,
-		((readinputportbytag("WP") & 0x08) && !(data & 0x08)) ? MWA8_NOP : MWA8_BANK4);
+		((readinputportbytag("WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK4);
 }
 
 
@@ -278,7 +278,7 @@ DRIVER_INIT( sym1 )
 	if (mess_ram_size < 4*1024)
 	{
 		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
-			mess_ram_size, 0x0fff, 0, 0, MRA8_NOP, MWA8_NOP);
+			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 	}
 
 	/* configure vias and riot */
@@ -306,6 +306,6 @@ MACHINE_RESET( sym1 )
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
 	   so that the CPU can find its reset vectors */
 	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
-			0xf800, 0xffff, 0, 0, MRA8_BANK1, MWA8_NOP);
+			0xf800, 0xffff, 0, 0, SMH_BANK1, SMH_NOP);
 	memory_set_bankptr(1, sym1_monitor + 0x800);
 }

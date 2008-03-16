@@ -24,8 +24,6 @@ UINT8 *madalien_edge1_pos;
 UINT8 *madalien_edge2_pos;
 UINT8 *madalien_headlight_pos;
 
-static mc6845_t *mc6845;
-
 static tilemap *tilemap_fg;
 
 static tilemap *tilemap_edge1[4];
@@ -144,8 +142,6 @@ static VIDEO_START( madalien )
 		16, 16, 32, 32
 	};
 
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-
 	tilemap_fg = tilemap_create(get_tile_info_FG, tilemap_scan_cols_flip_x, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(tilemap_fg, 0);
 	tilemap_set_scrolldx(tilemap_fg, 0, 0x50);
@@ -159,7 +155,7 @@ static VIDEO_START( madalien )
 
 		tilemap_edge2[i] = tilemap_create(get_tile_info_BG_2, scan_functions[i], 16, 16, tilemap_cols[i], 8);
 		tilemap_set_scrolldx(tilemap_edge2[i], 0, 0x50);
-		tilemap_set_scrolldy(tilemap_edge2[i], 0, machine->screen[0].height - 256);
+		tilemap_set_scrolldy(tilemap_edge2[i], 0, video_screen_get_height(machine->primary_screen) - 256);
 	}
 
 	headlight_bitmap = auto_bitmap_alloc(128, 128, BITMAP_FORMAT_INDEXED16);
@@ -270,7 +266,7 @@ static VIDEO_UPDATE( madalien )
 
 	fillbitmap(bitmap, 0, cliprect);
 	draw_edges(bitmap, cliprect, flip, scroll_mode);
-	draw_foreground(machine, bitmap, cliprect, flip);
+	draw_foreground(screen->machine, bitmap, cliprect, flip);
 
 	/* highlight section A (outside of tunnels) */
 
@@ -382,7 +378,7 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	0,                /* screen we are acting on */
+	"main",				/* screen we are acting on */
 	PIXEL_CLOCK / 8,  /* the clock of the chip  */
 	8,                /* number of pixels per video memory address */
 	NULL,             /* before pixel update callback */
@@ -395,8 +391,6 @@ static const mc6845_interface mc6845_intf =
 
 
 MACHINE_DRIVER_START( madalien_video )
-
-
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

@@ -147,12 +147,12 @@ static void amiga_ar1_init( void )
 	memset(ar_ram, 0, 0x4000);
 
 	/* Install ROM */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf00000, 0xf7ffff, 0, 0, MRA16_BANK2);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf00000, 0xf7ffff, 0, 0, MWA16_ROM);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf00000, 0xf7ffff, 0, 0, SMH_BANK2);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf00000, 0xf7ffff, 0, 0, SMH_ROM);
 
 	/* Install RAM */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x9fc000, 0x9fffff, 0, 0, MRA16_BANK3);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x9fc000, 0x9fffff, 0, 0, MWA16_BANK3);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x9fc000, 0x9fffff, 0, 0, SMH_BANK3);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x9fc000, 0x9fffff, 0, 0, SMH_BANK3);
 
 	/* Configure Banks */
 	memory_set_bankptr(2, memory_region(REGION_USER2));
@@ -237,7 +237,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 			}
 
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, MWA16_BANK1);
+			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK1);
 		}
 	}
 
@@ -362,12 +362,12 @@ static void amiga_ar23_init( int ar3 )
 	}
 
 	/* Install ROM */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400000+size, 0, mirror, MRA16_BANK2);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400000+size, 0, mirror, MWA16_ROM);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400000+size, 0, mirror, SMH_BANK2);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400000+size, 0, mirror, SMH_ROM);
 
 	/* Install RAM */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x440000, 0x44ffff, 0, 0, MRA16_BANK3);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x440000, 0x44ffff, 0, 0, MWA16_BANK3);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x440000, 0x44ffff, 0, 0, SMH_BANK3);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x440000, 0x44ffff, 0, 0, SMH_BANK3);
 
 	/* Install Custom chip monitor */
 //	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_r);

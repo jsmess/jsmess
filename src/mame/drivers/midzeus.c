@@ -517,7 +517,7 @@ static void update_gun_irq(running_machine *machine)
 static TIMER_CALLBACK( invasn_gun_callback )
 {
 	int player = param;
-	int beamy = video_screen_get_vpos(0);
+	int beamy = video_screen_get_vpos(machine->primary_screen);
 
 	/* set the appropriate IRQ in the internal gun control and update */
 	gun_irq_state |= 0x01 << player;
@@ -525,8 +525,8 @@ static TIMER_CALLBACK( invasn_gun_callback )
 
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
-	if (beamy <= machine->screen[0].visarea.max_y && beamy <= gun_y[player] + BEAM_DY)
-		timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(0, beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
+	if (beamy <= video_screen_get_visible_area(machine->primary_screen)->max_y && beamy <= gun_y[player] + BEAM_DY)
+		timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(machine->primary_screen, beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
 }
 
 
@@ -547,7 +547,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 		UINT8 pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
-			const rectangle *visarea = &Machine->screen[0].visarea;
+			const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 			static const char *const names[2][2] =
 			{
 				{ "GUNX1", "GUNY1" },
@@ -555,7 +555,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 			};
 			gun_x[player] = readinputportbytag(names[player][0]) * (visarea->max_x + 1 - visarea->min_x) / 255 + visarea->min_x + BEAM_XOFFS;
 			gun_y[player] = readinputportbytag(names[player][1]) * (visarea->max_y + 1 - visarea->min_y) / 255 + visarea->min_y;
-			timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(0, MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
+			timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(machine->primary_screen, MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }
@@ -563,8 +563,8 @@ static WRITE32_HANDLER( invasn_gun_w )
 
 static READ32_HANDLER( invasn_gun_r )
 {
-	int beamx = video_screen_get_hpos(0);
-	int beamy = video_screen_get_vpos(0);
+	int beamx = video_screen_get_hpos(machine->primary_screen);
+	int beamy = video_screen_get_vpos(machine->primary_screen);
 	UINT32 result = 0xffff;
 	int player;
 
@@ -587,7 +587,7 @@ static READ32_HANDLER( invasn_gun_r )
  *************************************/
 
 static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
@@ -602,7 +602,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)

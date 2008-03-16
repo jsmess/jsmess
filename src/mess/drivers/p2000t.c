@@ -34,7 +34,7 @@ Philips P2000 1 Memory map
 
 /* port i/o functions */
 static ADDRESS_MAP_START( p2000t_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READ( p2000t_port_000f_r)
 	AM_RANGE(0x10, 0x1f) AM_WRITE( p2000t_port_101f_w)
 	AM_RANGE(0x20, 0x2f) AM_READ( p2000t_port_202f_r)

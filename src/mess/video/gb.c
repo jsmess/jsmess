@@ -446,9 +446,10 @@ static void gb_update_scanline( running_machine *machine ) {
 			/* Draw an empty line when LCD is disabled */
 			if ( gb_lcd.previous_line != gb_lcd.current_line ) {
 				if ( gb_lcd.current_line < 144 ) {
-					rectangle r = machine->screen[0].visarea;
+					const device_config *screen = video_screen_first(machine->config);
+					rectangle r = *video_screen_get_visible_area(screen);
 					r.min_y = r.max_y = gb_lcd.current_line;
-					fillbitmap( bitmap, machine->pens[0], &r );
+					fillbitmap( bitmap, screen->machine->pens[0], &r );
 				}
 				gb_lcd.previous_line = gb_lcd.current_line;
 			}
@@ -675,7 +676,8 @@ static void sgb_update_scanline( running_machine *machine ) {
 				return;
 			case 2: /* Blank screen (black) */
 				{
-					rectangle r = machine->screen[0].visarea;
+					const device_config *screen = video_screen_first(machine->config);
+					rectangle r = *video_screen_get_visible_area(screen);
 					r.min_x = SGB_XOFFSET;
 					r.max_x -= SGB_XOFFSET;
 					r.min_y = SGB_YOFFSET;
@@ -684,7 +686,8 @@ static void sgb_update_scanline( running_machine *machine ) {
 				} return;
 			case 3: /* Blank screen (white - or should it be color 0?) */
 				{
-					rectangle r = machine->screen[0].visarea;
+					const device_config *screen = video_screen_first(machine->config);
+					rectangle r = *video_screen_get_visible_area(screen);
 					r.min_x = SGB_XOFFSET;
 					r.max_x -= SGB_XOFFSET;
 					r.min_y = SGB_YOFFSET;
@@ -703,7 +706,8 @@ static void sgb_update_scanline( running_machine *machine ) {
 
 			/* if background or screen disabled clear line */
 			if ( ! ( LCDCONT & 0x01 ) ) {
-				rectangle r = machine->screen[0].visarea;
+				const device_config *screen = video_screen_first(machine->config);
+				rectangle r = *video_screen_get_visible_area(screen);
 				r.min_x = SGB_XOFFSET;
 				r.max_x -= SGB_XOFFSET;
 				r.min_y = r.max_y = gb_lcd.current_line + SGB_YOFFSET;
@@ -773,7 +777,8 @@ static void sgb_update_scanline( running_machine *machine ) {
 			if ( gb_lcd.previous_line != gb_lcd.current_line ) {
 				/* Also refresh border here??? */
 				if ( gb_lcd.current_line < 144 ) {
-					rectangle r = machine->screen[0].visarea;
+					const device_config *screen = video_screen_first(machine->config);
+					rectangle r = *video_screen_get_visible_area(screen);
 					r.min_x = SGB_XOFFSET;
 					r.max_x -= SGB_XOFFSET;
 					r.min_y = r.max_y = gb_lcd.current_line + SGB_YOFFSET;
@@ -937,7 +942,8 @@ static void cgb_update_scanline ( running_machine *machine ) {
 			gb_lcd.end_x = MIN(160 - cycles_to_go,160);
 			/* Draw empty line when the background is disabled */
 			if ( ! ( LCDCONT & 0x01 ) ) {
-				rectangle r = machine->screen[0].visarea;
+				const device_config *screen = video_screen_first(machine->config);
+				rectangle r = *video_screen_get_visible_area(screen);
 				r.min_y = r.max_y = gb_lcd.current_line;
 				r.min_x = gb_lcd.start_x;
 				r.max_x = gb_lcd.end_x - 1;
@@ -1030,7 +1036,8 @@ static void cgb_update_scanline ( running_machine *machine ) {
 			/* Draw an empty line when LCD is disabled */
 			if ( gb_lcd.previous_line != gb_lcd.current_line ) {
 				if ( gb_lcd.current_line < 144 ) {
-					rectangle r = machine->screen[0].visarea;
+					const device_config *screen = video_screen_first(machine->config);
+					rectangle r = *video_screen_get_visible_area(screen);
 					r.min_y = r.max_y = gb_lcd.current_line;
 					fillbitmap( bitmap, machine->pens[ ( gbc_mode == GBC_MODE_MONO ) ? 0 : 32767 ], &r );
 				}

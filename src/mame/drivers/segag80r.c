@@ -340,14 +340,14 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0x7fff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM		/* PROM board ROM area */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(MRA8_RAM, mainram_w) AM_BASE(&mainram)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(MRA8_RAM, vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(SMH_RAM, mainram_w) AM_BASE(&mainram)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(SMH_RAM, vidram_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
 	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sindbadm_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x42, 0x43) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
 ADDRESS_MAP_END

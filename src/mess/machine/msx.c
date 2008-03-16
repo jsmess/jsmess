@@ -309,7 +309,7 @@ MACHINE_RESET( msx )
 
 MACHINE_RESET( msx2 )
 {
-	v9938_reset ();
+	v9938_reset (0);
 	msx_ch_reset_core ();
 }
 
@@ -401,9 +401,9 @@ DRIVER_INIT( msx2 )
 
 INTERRUPT_GEN( msx2_interrupt )
 {
-	v9938_set_sprite_limit(readinputport (8) & 0x20);
-	v9938_set_resolution(readinputport (8) & 0x03);
-	v9938_interrupt();
+	v9938_set_sprite_limit(0, readinputport (8) & 0x20);
+	v9938_set_resolution(0, readinputport (8) & 0x03);
+	v9938_interrupt(0);
 }
 
 INTERRUPT_GEN( msx_interrupt )

@@ -50,14 +50,14 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 
 	/* PCB supports two dials, but cab has only got one */
 
-	timer_set(video_screen_get_time_until_pos(0, readinputport(3), 0), NULL, 0, destroyr_dial_callback);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, destroyr_frame_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, readinputport(3), 0), NULL, 0, destroyr_dial_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, destroyr_frame_callback);
 }
 
 
 static MACHINE_RESET( destroyr )
 {
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, destroyr_frame_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, destroyr_frame_callback);
 }
 
 
@@ -160,20 +160,20 @@ static READ8_HANDLER( destroyr_input_r )
 
 static READ8_HANDLER( destroyr_scanline_r )
 {
-	return video_screen_get_vpos(0);
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 
 static ADDRESS_MAP_START( destroyr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(destroyr_input_r, destroyr_output_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(input_port_2_r)
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE(MWA8_RAM) AM_BASE(&destroyr_alpha_num_ram)
-	AM_RANGE(0x4000, 0x401f) AM_WRITE(MWA8_RAM) AM_BASE(&destroyr_major_obj_ram)
+	AM_RANGE(0x3000, 0x30ff) AM_WRITE(SMH_RAM) AM_BASE(&destroyr_alpha_num_ram)
+	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE(&destroyr_major_obj_ram)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(destroyr_cursor_load_w)
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(destroyr_interrupt_ack_w)
-	AM_RANGE(0x5002, 0x5007) AM_WRITE(MWA8_RAM) AM_BASE(&destroyr_minor_obj_ram)
+	AM_RANGE(0x5002, 0x5007) AM_WRITE(SMH_RAM) AM_BASE(&destroyr_minor_obj_ram)
 	AM_RANGE(0x6000, 0x6fff) AM_READ(destroyr_scanline_r)
 	AM_RANGE(0x7000, 0x77ff) AM_NOP				/* missing translation ROMs */
 	AM_RANGE(0x7800, 0x7fff) AM_ROM				/* program */

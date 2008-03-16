@@ -119,7 +119,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "sound/5220intf.h"
 #include "sound/2151intf.h"
@@ -162,13 +161,13 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(running_machine *machine, int scrnum, int scanline)
+static void scanline_update(const device_config *screen, int scanline)
 {
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen(machine, 0);
+		atarigen_6502_irq_gen(screen->machine, 0);
 	else
-		atarigen_6502_irq_ack_r(machine, 0);
+		atarigen_6502_irq_ack_r(screen->machine, 0);
 }
 
 
@@ -180,7 +179,7 @@ static MACHINE_RESET( gauntlet )
 	atarigen_eeprom_reset();
 	atarigen_slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, scanline_update, 32);
+	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 	atarigen_sound_io_reset(1);
 }
 
@@ -217,7 +216,7 @@ static WRITE16_HANDLER( sound_reset_w )
 
 		if ((oldword ^ sound_reset_val) & 1)
 		{
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
 			atarigen_sound_reset();
 		}
 	}
@@ -299,9 +298,9 @@ static WRITE8_HANDLER( sound_ctl_w )
 
 static WRITE8_HANDLER( mixer_w )
 {
-	atarigen_set_ym2151_vol(Machine, (data & 7) * 100 / 7);
-	atarigen_set_pokey_vol(Machine, ((data >> 3) & 3) * 100 / 3);
-	atarigen_set_tms5220_vol(Machine, ((data >> 5) & 7) * 100 / 7);
+	atarigen_set_ym2151_vol(machine, (data & 7) * 100 / 7);
+	atarigen_set_pokey_vol(machine, ((data >> 3) & 3) * 100 / 3);
+	atarigen_set_tms5220_vol(machine, ((data >> 5) & 7) * 100 / 7);
 }
 
 
@@ -314,8 +313,10 @@ static WRITE8_HANDLER( mixer_w )
 
 /* full map verified from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
-	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x280000) AM_ROM
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x037fff) AM_MIRROR(0x280000) AM_ROM
+	AM_RANGE(0x038000, 0x03ffff) AM_MIRROR(0x280000) AM_ROM	/* slapstic maps here */
+	AM_RANGE(0x040000, 0x07ffff) AM_MIRROR(0x280000) AM_ROM
 
 	/* MBUS */
 	AM_RANGE(0x800000, 0x801fff) AM_MIRROR(0x2fc000) AM_RAM
@@ -333,13 +334,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_WRITE(atarigen_sound_w)
 
 	/* VBUS */
-	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_READWRITE(MRA16_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x904000, 0x904fff) AM_MIRROR(0x2c8000) AM_RAM
-	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_READWRITE(MRA16_RAM, gauntlet_yscroll_w) AM_BASE(&atarigen_yscroll)
-	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_READWRITE(MRA16_RAM, atarigen_alpha_w) AM_BASE(&atarigen_alpha)
-	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_READWRITE(MRA16_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
-	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_READWRITE(MRA16_RAM, paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_READWRITE(SMH_RAM, gauntlet_yscroll_w) AM_BASE(&atarigen_yscroll)
+	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_READWRITE(SMH_RAM, atarigen_alpha_w) AM_BASE(&atarigen_alpha)
+	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_READWRITE(SMH_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_READWRITE(SMH_RAM, paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_BASE(&atarigen_xscroll)
 ADDRESS_MAP_END
 
@@ -353,7 +354,7 @@ ADDRESS_MAP_END
 
 /* full map verified from schematics */
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_WRITE(atarigen_6502_sound_w)
 	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_READ(atarigen_6502_sound_r)

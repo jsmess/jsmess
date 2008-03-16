@@ -18,7 +18,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "blstroid.h"
@@ -49,11 +48,17 @@ static void update_interrupts(running_machine *machine)
 }
 
 
+static WRITE16_HANDLER( blstroid_halt_until_hblank_0_w )
+{
+	atarigen_halt_until_hblank_0(machine->primary_screen);
+}
+
+
 static MACHINE_RESET( blstroid )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, blstroid_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, blstroid_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -69,7 +74,7 @@ static READ16_HANDLER( inputs_r )
 {
 	int temp = readinputport(2 + (offset & 1));
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(Machine, 0)) temp ^= 0x0010;
+	if (atarigen_get_hblank(machine->primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 
@@ -83,24 +88,24 @@ static READ16_HANDLER( inputs_r )
 
 /* full map verified from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x7f81fe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff8200, 0xff8201) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_scanline_int_ack_w)
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0xff8800, 0xff89ff) AM_MIRROR(0x7f8000) AM_WRITE(MWA16_RAM) AM_BASE(&blstroid_priorityram)
+	AM_RANGE(0xff8800, 0xff89ff) AM_MIRROR(0x7f8000) AM_WRITE(SMH_RAM) AM_BASE(&blstroid_priorityram)
 	AM_RANGE(0xff8a00, 0xff8a01) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_sound_reset_w)
-	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_halt_until_hblank_0_w)
+	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE(blstroid_halt_until_hblank_0_w)
 	AM_RANGE(0xff9400, 0xff9401) AM_MIRROR(0x7f83fe) AM_READ(atarigen_sound_r)
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x7f83f8) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xff9804, 0xff9805) AM_MIRROR(0x7f83f8) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xff9c00, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ(inputs_r)
-	AM_RANGE(0xffa000, 0xffa3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffa000, 0xffa3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(SMH_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0xffc000, 0xffcfff) AM_MIRROR(0x7f8000) AM_READWRITE(MRA16_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xffc000, 0xffcfff) AM_MIRROR(0x7f8000) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xffe000, 0xffffff) AM_MIRROR(0x7f8000) AM_RAM
 ADDRESS_MAP_END
 

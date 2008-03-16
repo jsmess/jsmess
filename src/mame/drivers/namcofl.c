@@ -183,21 +183,21 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = paletteram32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(0, triggerscanline, 0), 0);
+		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, triggerscanline, 0), 0);
 	}
 }
 
 
 static ADDRESS_MAP_START( namcofl_mem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_READWRITE(MRA32_BANK1, MWA32_BANK1)
-	AM_RANGE(0x10000000, 0x100fffff) AM_READWRITE(MRA32_BANK2, MWA32_BANK2)
+	AM_RANGE(0x00000000, 0x000fffff) AM_READWRITE(SMH_BANK1, SMH_BANK1)
+	AM_RANGE(0x10000000, 0x100fffff) AM_READWRITE(SMH_BANK2, SMH_BANK2)
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* data */
 	AM_RANGE(0x30000000, 0x30001fff) AM_RAM	AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) /* nvram */
 	AM_RANGE(0x30100000, 0x30100003) AM_WRITE(namcofl_spritebank_w)
 	AM_RANGE(0x30284000, 0x3028bfff) AM_RAM	AM_BASE(&namcofl_mcuram) /* shared RAM with C75 MCU */
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
 	AM_RANGE(0x30380000, 0x303800ff) AM_READ( fl_network_r )	/* network registers */
-	AM_RANGE(0x30400000, 0x3040ffff) AM_READWRITE(MRA32_RAM, namcofl_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x30400000, 0x3040ffff) AM_READWRITE(SMH_RAM, namcofl_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE(namco_tilemapvideoram32_le_r, namco_tilemapvideoram32_le_w )
 	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE(namco_tilemapcontrol32_le_r, namco_tilemapcontrol32_le_w )
 	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE(namco_rozvideoram32_le_r,namco_rozvideoram32_le_w)
@@ -315,22 +315,22 @@ GFXDECODE_END
 static TIMER_CALLBACK( network_interrupt_callback )
 {
 	cpunum_set_input_line(machine, 0, I960_IRQ0, ASSERT_LINE);
-	timer_set(video_screen_get_frame_period(0), NULL, 0, network_interrupt_callback);
+	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, network_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpunum_set_input_line(machine, 0, I960_IRQ2, ASSERT_LINE);
-	timer_set(video_screen_get_frame_period(0), NULL, 0, vblank_interrupt_callback);
+	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	cpunum_set_input_line(machine, 0, I960_IRQ1, ASSERT_LINE);
-	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(0), 0);
+	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(machine->primary_screen), 0);
 }
 
 
@@ -342,8 +342,8 @@ static MACHINE_START( namcofl )
 
 static MACHINE_RESET( namcofl )
 {
-	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 3, 0), NULL, 0, network_interrupt_callback);
-	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 3, 0), NULL, 0, network_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
 }
 
 

@@ -15,7 +15,7 @@
 #define DL1416_H_
 
 
-#define DL1416 dl1416_get_info
+#define DL1416 DEVICE_GET_INFO_NAME(dl1416)
 
 
 typedef enum
@@ -34,7 +34,7 @@ struct _dl1416_interface
 };
 
 /* Device interface */
-void dl1416_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
+DEVICE_GET_INFO( dl1416 );
 
 /* Inputs */
 void dl1416_set_input_w(dl1416_t *chip, int data); /* Write enable */

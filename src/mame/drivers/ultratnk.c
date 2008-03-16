@@ -48,26 +48,22 @@ static TIMER_CALLBACK( nmi_callback	)
 	int scanline = param + 64;
 
 	if (scanline >= VTOTAL)
-	{
 		scanline = 32;
-	}
 
 	/* NMI and watchdog are disabled during service mode */
 
 	watchdog_enable(machine, readinputport(0) & 0x40);
 
 	if (readinputport(0) & 0x40)
-	{
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, nmi_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, nmi_callback);
 }
 
 
 static MACHINE_RESET( ultratnk )
 {
-	timer_set(video_screen_get_time_until_pos(0, 32, 0), NULL, 32, nmi_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, nmi_callback);
 }
 
 
@@ -151,11 +147,11 @@ static WRITE8_HANDLER( ultratnk_explosion_w )
 
 static ADDRESS_MAP_START( ultratnk_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x700) AM_RAM
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(ultratnk_wram_r, ultratnk_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_READWRITE(MRA8_RAM, ultratnk_video_ram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_READWRITE(SMH_RAM, ultratnk_video_ram_w) AM_BASE(&videoram)
 
 	AM_RANGE(0x1000, 0x17ff) AM_READ(input_port_0_r)
 	AM_RANGE(0x1800, 0x1fff) AM_READ(input_port_1_r)

@@ -199,20 +199,20 @@ static READ32_HANDLER( decomlc_vbl_r )
 
 static READ32_HANDLER( mlc_scanline_r )
 {
-//  logerror("read scanline counter (%d)\n", video_screen_get_vpos(0));
-	return video_screen_get_vpos(0);
+//  logerror("read scanline counter (%d)\n", video_screen_get_vpos(machine->primary_screen));
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 static TIMER_CALLBACK( interrupt_gen )
 {
-//  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(0), info.i);
+//  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(machine->primary_screen), info.i);
 	cpunum_set_input_line(machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
 {
 	static int lastScanline[9]={ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	int scanline=video_screen_get_vpos(0);
+	int scanline=video_screen_get_vpos(machine->primary_screen);
 	irq_ram[offset]=data&0xffff;
 
 	switch (offset*4)
@@ -222,8 +222,8 @@ static WRITE32_HANDLER( mlc_irq_w )
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */
-		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(0, irq_ram[0x14/4], 0),0);
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(0));
+		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(machine->primary_screen, irq_ram[0x14/4], 0),0);
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(machine->primary_screen));
 		return;
 		break;
 	case 0x18:
@@ -296,18 +296,18 @@ static READ32_HANDLER(stadhr96_prot_146_r)
 /******************************************************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(24) )
-	AM_RANGE(0x0000000, 0x00fffff) AM_READ(MRA32_ROM)
-	AM_RANGE(0x0100000, 0x011ffff) AM_READ(MRA32_RAM)
-	AM_RANGE(0x0200000, 0x020000f) AM_READ(MRA32_NOP) /* IRQ control? */
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_RANGE(0x0000000, 0x00fffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x0100000, 0x011ffff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0200000, 0x020000f) AM_READ(SMH_NOP) /* IRQ control? */
 	AM_RANGE(0x0200070, 0x0200073) AM_READ(decomlc_vbl_r)
 	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r)
 	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r)
-	AM_RANGE(0x0200080, 0x02000ff) AM_READ(MRA32_RAM)
+	AM_RANGE(0x0200080, 0x02000ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0204000, 0x0206fff) AM_READ(mlc_spriteram_r)
-	AM_RANGE(0x0200080, 0x02000ff) AM_READ(MRA32_RAM)
+	AM_RANGE(0x0200080, 0x02000ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0280000, 0x029ffff) AM_READ(mlc_vram_r)
-	AM_RANGE(0x0300000, 0x0307fff) AM_READ(MRA32_RAM)
+	AM_RANGE(0x0300000, 0x0307fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ(avengrs_control_r)
 	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)
 	AM_RANGE(0x0600004, 0x0600007) AM_READ(avengrs_sound_r)
@@ -315,15 +315,15 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(24) )
-	AM_RANGE(0x0000000, 0x00fffff) AM_WRITE(MWA32_ROM)
-	AM_RANGE(0x0100000, 0x011ffff) AM_WRITE(MWA32_RAM) AM_BASE(&mlc_ram)
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_RANGE(0x0000000, 0x00fffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0100000, 0x011ffff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_ram)
 	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE(&irq_ram)
-	AM_RANGE(0x0200080, 0x02000ff) AM_WRITE(MWA32_RAM) AM_BASE(&mlc_clip_ram)
-	AM_RANGE(0x0204000, 0x0206fff) AM_WRITE(MWA32_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0280000, 0x029ffff) AM_WRITE(MWA32_RAM) AM_BASE(&mlc_vram)
+	AM_RANGE(0x0200080, 0x02000ff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_clip_ram)
+	AM_RANGE(0x0204000, 0x0206fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0280000, 0x029ffff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_vram)
 	AM_RANGE(0x0300000, 0x0307fff) AM_WRITE(avengrs_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x044001c, 0x044001f) AM_WRITE(MWA32_NOP)
+	AM_RANGE(0x044001c, 0x044001f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w)
 	AM_RANGE(0x0600000, 0x0600007) AM_WRITE(avengrs_sound_w)
 //  AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_w) AM_BASE(&deco32_prot_ram)

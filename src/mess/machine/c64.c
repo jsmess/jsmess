@@ -665,8 +665,8 @@ static void c64_bankswitch (int reset)
 		} else {
 			c64_io_ram_r_ptr = c64_memory + 0xd000;
 		}
-//		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MRA8_BANK5);
-//		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MWA8_BANK6);
+//		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK5);
+//		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK6);
 //		memory_set_bankptr (6, c64_memory + 0xd000);
 //		if (!charen && (loram || hiram))
 //		{
@@ -681,7 +681,7 @@ static void c64_bankswitch (int reset)
 	if (!c64_game && c64_exrom)
 	{
 		memory_set_bankptr (7, romh);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MWA8_NOP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_NOP);
 	}
 	else
 	{
@@ -867,12 +867,12 @@ static void c64_common_driver_init (running_machine *machine)
 		c64_roml=memory_region(REGION_CPU1)+0x15400;
 		c64_romh=memory_region(REGION_CPU1)+0x17400;
 #if 0
-	{0x10000, 0x11fff, MWA8_ROM, &c64_basic},	/* basic at 0xa000 */
-	{0x12000, 0x13fff, MWA8_ROM, &c64_kernal},	/* kernal at 0xe000 */
-	{0x14000, 0x14fff, MWA8_ROM, &c64_chargen},	/* charrom at 0xd000 */
-	{0x15000, 0x153ff, MWA8_RAM, &c64_colorram},		/* colorram at 0xd800 */
-	{0x15400, 0x173ff, MWA8_ROM, &c64_roml},	/* basic at 0xa000 */
-	{0x17400, 0x193ff, MWA8_ROM, &c64_romh},	/* kernal at 0xe000 */
+	{0x10000, 0x11fff, SMH_ROM, &c64_basic},	/* basic at 0xa000 */
+	{0x12000, 0x13fff, SMH_ROM, &c64_kernal},	/* kernal at 0xe000 */
+	{0x14000, 0x14fff, SMH_ROM, &c64_chargen},	/* charrom at 0xd000 */
+	{0x15000, 0x153ff, SMH_RAM, &c64_colorram},		/* colorram at 0xd800 */
+	{0x15400, 0x173ff, SMH_ROM, &c64_roml},	/* basic at 0xa000 */
+	{0x17400, 0x193ff, SMH_ROM, &c64_romh},	/* kernal at 0xe000 */
 #endif
 	}
 	if (c64_tape_on)

@@ -456,7 +456,7 @@ static const Z80GB_CONFIG cgb_cpu_reset = { cgb_cpu_regs, 0, gb_timer_callback }
 static const Z80GB_CONFIG megaduck_cpu_reset = { megaduck_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
 
 static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* BIOS or ROM */
 	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
 	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
@@ -494,7 +494,7 @@ static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
 	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
@@ -515,7 +515,7 @@ static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(megaduck_map, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(10)						/* 16k switched ROM bank */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* 16k switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w )		/* 8k VRAM */

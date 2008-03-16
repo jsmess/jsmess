@@ -16,7 +16,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		y = spriteram_base[offs];
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		x = spriteram_base[offs+2];
 		colour = (x >>9) & 0x1f;
@@ -163,7 +163,7 @@ VIDEO_UPDATE(boogwing)
 
 	/* Draw playfields */
 	deco16_clear_sprite_priority_bitmap();
-	fillbitmap(bitmap,machine->pens[0x400],cliprect); /* pen not confirmed */
+	fillbitmap(bitmap,screen->machine->pens[0x400],cliprect); /* pen not confirmed */
 	fillbitmap(priority_bitmap,0,NULL);
 
 	// bit&0x8 is definitely some kind of palette effect
@@ -195,8 +195,8 @@ VIDEO_UPDATE(boogwing)
 		deco16_tilemap_2_draw(bitmap,cliprect,0,32);
 	}
 
-	draw_sprites(machine, bitmap, cliprect, buffered_spriteram16, 3);
-	draw_sprites(machine, bitmap, cliprect, buffered_spriteram16_2, 4);
+	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram16, 3);
+	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram16_2, 4);
 
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;

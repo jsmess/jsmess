@@ -26,11 +26,15 @@ static int off_y = 0;
 ***************************************************************************/
 VIDEO_START( cgenie )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+
 	videoram_size = 0x4000;
 
 	VIDEO_START_CALL(generic_bitmapped);
 
-    dlybitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+    dlybitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 /***************************************************************************
@@ -410,8 +414,8 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 VIDEO_UPDATE( cgenie )
 {
     if( cgenie_tv_mode )
-		cgenie_refresh_tv_set(machine, bitmap, cliprect);
+		cgenie_refresh_tv_set(screen->machine, bitmap, cliprect);
 	else
-		cgenie_refresh_monitor(machine, bitmap, cliprect);
+		cgenie_refresh_monitor(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -146,7 +146,7 @@ static TIMER_CALLBACK( scanline_update )
 		scanline = 0;
 
 	/* set a timer for it */
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -160,7 +160,7 @@ static MACHINE_START( foodf )
 static MACHINE_RESET( foodf )
 {
 	atarigen_interrupt_reset(update_interrupts);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 
@@ -240,8 +240,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x014000, 0x014fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x018000, 0x018fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x01c000, 0x01c0ff) AM_MIRROR(0x3e3f00) AM_RAM AM_BASE(&spriteram16)
-	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_READWRITE(MRA16_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_READWRITE(nvram_r, MWA16_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_READWRITE(nvram_r, SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x940000, 0x940007) AM_MIRROR(0x023ff8) AM_READ(analog_r)
 	AM_RANGE(0x944000, 0x944007) AM_MIRROR(0x023ff8) AM_WRITE(analog_w)
 	AM_RANGE(0x948000, 0x948001) AM_MIRROR(0x023ffe) AM_READWRITE(input_port_4_word_r, digital_w)

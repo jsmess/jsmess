@@ -51,7 +51,7 @@ static VIDEO_UPDATE( mgolf )
 
 	for (i = 0; i < 2; i++)
 	{
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx(bitmap, screen->machine->gfx[1],
 			mgolf_video_ram[0x399 + 4 * i],
 			i,
 			0, 0,
@@ -59,7 +59,7 @@ static VIDEO_UPDATE( mgolf )
 			mgolf_video_ram[0x398 + 4 * i] - 16,
 			cliprect, TRANSPARENCY_PEN, 0);
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx(bitmap, screen->machine->gfx[1],
 			mgolf_video_ram[0x39b + 4 * i],
 			i,
 			0, 0,
@@ -103,11 +103,9 @@ static TIMER_CALLBACK( interrupt_callback )
 	scanline = scanline + 32;
 
 	if (scanline >= 262)
-	{
 		scanline = 16;
-	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
 }
 
 
@@ -119,7 +117,7 @@ static double calc_plunger_pos(void)
 
 static MACHINE_RESET( mgolf )
 {
-	timer_set(video_screen_get_time_until_pos(0, 16, 0), NULL, 16, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 16, 0), NULL, 16, interrupt_callback);
 }
 
 
@@ -182,7 +180,7 @@ static WRITE8_HANDLER( mgolf_wram_w )
 
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0040, 0x0040) AM_READ(input_port_0_r)
 	AM_RANGE(0x0041, 0x0041) AM_READ(mgolf_dial_r)
@@ -190,19 +188,19 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0061, 0x0061) AM_READ(mgolf_misc_r)
 	AM_RANGE(0x0080, 0x00ff) AM_READ(mgolf_wram_r)
 	AM_RANGE(0x0180, 0x01ff) AM_READ(mgolf_wram_r)
-	AM_RANGE(0x0800, 0x0bff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0800, 0x0bff) AM_READ(SMH_RAM)
 
-	AM_RANGE(0x0000, 0x0009) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x0024, 0x0024) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x0028, 0x0028) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x0042, 0x0042) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x0044, 0x0044) AM_WRITE(MWA8_NOP) /* watchdog? */
-	AM_RANGE(0x0046, 0x0046) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x0060, 0x0060) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x0061, 0x0061) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x006a, 0x006a) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x006c, 0x006c) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x006d, 0x006d) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x0000, 0x0009) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0024, 0x0024) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0028, 0x0028) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0042, 0x0042) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0044, 0x0044) AM_WRITE(SMH_NOP) /* watchdog? */
+	AM_RANGE(0x0046, 0x0046) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0060, 0x0060) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0061, 0x0061) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x006a, 0x006a) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x006c, 0x006c) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x006d, 0x006d) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x0080, 0x00ff) AM_WRITE(mgolf_wram_w)
 	AM_RANGE(0x0180, 0x01ff) AM_WRITE(mgolf_wram_w)
 	AM_RANGE(0x0800, 0x0bff) AM_WRITE(mgolf_vram_w) AM_BASE(&mgolf_video_ram)

@@ -177,8 +177,11 @@ static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 VIDEO_START( spbactn )
 {
 	/* allocate bitmaps */
-	tile_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	tile_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
+	tile_bitmap_bg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_fg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 VIDEO_UPDATE( spbactn )
@@ -197,7 +200,7 @@ VIDEO_UPDATE( spbactn )
 
 		colour = ((attr & 0x00f0) >> 4) | 0x80;
 
-		drawgfx(tile_bitmap_bg, machine->gfx[1],
+		drawgfx(tile_bitmap_bg, screen->machine->gfx[1],
 					code,
 					colour,
 					0, 0,
@@ -212,7 +215,7 @@ VIDEO_UPDATE( spbactn )
 		}
 	}
 
-	if (draw_sprites(machine, tile_bitmap_bg, cliprect, 0))
+	if (draw_sprites(screen->machine, tile_bitmap_bg, cliprect, 0))
 	{
 		/* kludge: draw table bg gfx again if priority 0 sprites are enabled */
 		for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -224,7 +227,7 @@ VIDEO_UPDATE( spbactn )
 
 			colour = ((attr & 0x00f0) >> 4) | 0x80;
 
-			drawgfx(tile_bitmap_bg, machine->gfx[1],
+			drawgfx(tile_bitmap_bg, screen->machine->gfx[1],
 					code,
 					colour,
 					0, 0,
@@ -240,7 +243,7 @@ VIDEO_UPDATE( spbactn )
 		}
 	}
 
-	draw_sprites(machine, tile_bitmap_bg, cliprect, 1);
+	draw_sprites(screen->machine, tile_bitmap_bg, cliprect, 1);
 
 	/* draw table fg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -258,7 +261,7 @@ VIDEO_UPDATE( spbactn )
 		else
 			colour |= 0x0080;
 
-		drawgfx(tile_bitmap_fg, machine->gfx[0],
+		drawgfx(tile_bitmap_fg, screen->machine->gfx[0],
 					code,
 					colour,
 					0, 0,
@@ -272,10 +275,10 @@ VIDEO_UPDATE( spbactn )
 			sx = 0;
 		}
 	}
-	draw_sprites(machine, tile_bitmap_fg, cliprect, 2);
-	draw_sprites(machine, tile_bitmap_fg, cliprect, 3);
+	draw_sprites(screen->machine, tile_bitmap_fg, cliprect, 2);
+	draw_sprites(screen->machine, tile_bitmap_fg, cliprect, 3);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, 0, 0, cliprect);
+	blendbitmaps(screen->machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, 0, 0, cliprect);
 	return 0;
 }

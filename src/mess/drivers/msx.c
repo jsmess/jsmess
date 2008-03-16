@@ -20,17 +20,17 @@
 #include "sound/ay8910.h"
 
 static ADDRESS_MAP_START (readmem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_READ( MRA8_BANK1 )
-	AM_RANGE( 0x2000, 0x3fff) AM_READ( MRA8_BANK2 )
-	AM_RANGE( 0x4000, 0x5fff) AM_READ( MRA8_BANK3 )
-	AM_RANGE( 0x6000, 0x7ff7) AM_READ( MRA8_BANK4 )
-	AM_RANGE( 0x7ff8, 0x7fff) AM_READ( MRA8_BANK5 )
-	AM_RANGE( 0x8000, 0x97ff) AM_READ( MRA8_BANK6 )
-	AM_RANGE( 0x9800, 0x9fff) AM_READ( MRA8_BANK7 )
-	AM_RANGE( 0xa000, 0xb7ff) AM_READ( MRA8_BANK8 )
-	AM_RANGE( 0xb800, 0xbfff) AM_READ( MRA8_BANK9 )
-	AM_RANGE( 0xc000, 0xdfff) AM_READ( MRA8_BANK10 )
-	AM_RANGE( 0xe000, 0xfffe) AM_READ( MRA8_BANK11 )
+	AM_RANGE( 0x0000, 0x1fff) AM_READ( SMH_BANK1 )
+	AM_RANGE( 0x2000, 0x3fff) AM_READ( SMH_BANK2 )
+	AM_RANGE( 0x4000, 0x5fff) AM_READ( SMH_BANK3 )
+	AM_RANGE( 0x6000, 0x7ff7) AM_READ( SMH_BANK4 )
+	AM_RANGE( 0x7ff8, 0x7fff) AM_READ( SMH_BANK5 )
+	AM_RANGE( 0x8000, 0x97ff) AM_READ( SMH_BANK6 )
+	AM_RANGE( 0x9800, 0x9fff) AM_READ( SMH_BANK7 )
+	AM_RANGE( 0xa000, 0xb7ff) AM_READ( SMH_BANK8 )
+	AM_RANGE( 0xb800, 0xbfff) AM_READ( SMH_BANK9 )
+	AM_RANGE( 0xc000, 0xdfff) AM_READ( SMH_BANK10 )
+	AM_RANGE( 0xe000, 0xfffe) AM_READ( SMH_BANK11 )
 	AM_RANGE( 0xffff, 0xffff) AM_READ( msx_sec_slot_r )
 ADDRESS_MAP_END
 
@@ -45,8 +45,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START (readport, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(0xff) )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x90, 0x91) AM_READ( msx_printer_r )
 	AM_RANGE( 0xa0, 0xa7) AM_READ( msx_psg_r )
 	AM_RANGE( 0xa8, 0xab) AM_READ( ppi8255_0_r )
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START (readport, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (writeport, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE( msx_fmpac_w )
 	AM_RANGE( 0x90, 0x91) AM_WRITE( msx_printer_w )
@@ -68,29 +68,29 @@ static ADDRESS_MAP_START (writeport, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (readport2, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(0xff) )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x90, 0x91) AM_READ( msx_printer_r )
 	AM_RANGE( 0xa0, 0xa7) AM_READ( msx_psg_r )
 	AM_RANGE( 0xa8, 0xab) AM_READ( ppi8255_0_r )
-	AM_RANGE( 0x98, 0x98) AM_READ( v9938_vram_r )
-	AM_RANGE( 0x99, 0x99) AM_READ( v9938_status_r )
+	AM_RANGE( 0x98, 0x98) AM_READ( v9938_0_vram_r )
+	AM_RANGE( 0x99, 0x99) AM_READ( v9938_0_status_r )
 	AM_RANGE( 0xb5, 0xb5) AM_READ( msx_rtc_reg_r )
 	AM_RANGE( 0xd9, 0xd9) AM_READ( msx_kanji_r )
 	AM_RANGE( 0xfc, 0xff) AM_READ( msx_ram_mapper_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (writeport2, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE( msx_fmpac_w )
 	AM_RANGE( 0x90, 0x91) AM_WRITE( msx_printer_w )
 	AM_RANGE( 0xa0, 0xa7) AM_WRITE( msx_psg_w )
 	AM_RANGE( 0xa8, 0xab) AM_WRITE( ppi8255_0_w )
-	AM_RANGE( 0x98, 0x98) AM_WRITE( v9938_vram_w )
-	AM_RANGE( 0x99, 0x99) AM_WRITE( v9938_command_w )
-	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_palette_w )
-	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_register_w )
+	AM_RANGE( 0x98, 0x98) AM_WRITE( v9938_0_vram_w )
+	AM_RANGE( 0x99, 0x99) AM_WRITE( v9938_0_command_w )
+	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_0_palette_w )
+	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_0_register_w )
 	AM_RANGE( 0xb4, 0xb4) AM_WRITE( msx_rtc_latch_w )
 	AM_RANGE( 0xb5, 0xb5) AM_WRITE( msx_rtc_reg_w )
 	AM_RANGE( 0xd8, 0xd9) AM_WRITE( msx_kanji_w )
@@ -712,7 +712,7 @@ static const struct AY8910interface ay8910_interface =
 
 static VIDEO_START( msx2 )
 {
-	v9938_init(machine, MODEL_V9938, 0x20000, msx_vdp_interrupt);
+	v9938_init(machine, 0, tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
 }
 
 #define MSX_XBORDER_PIXELS		15

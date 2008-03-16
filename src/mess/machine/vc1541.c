@@ -320,9 +320,9 @@ static void vc1541_sector_to_gcr(int track, int sector)
 static ADDRESS_MAP_START( vc1541_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_READWRITE(via_2_r, via_2_w)  /* 0 and 1 used in vc20 */
-	AM_RANGE(0x1810, 0x189f) AM_READ( MRA8_NOP) /* for debugger */
+	AM_RANGE(0x1810, 0x189f) AM_READ( SMH_NOP) /* for debugger */
 	AM_RANGE(0x1c00, 0x1c0f) AM_READWRITE(via_3_r, via_3_w)
-	AM_RANGE(0x1c10, 0x1c9f) AM_READ( MRA8_NOP) /* for debugger */
+	AM_RANGE(0x1c10, 0x1c9f) AM_READ( SMH_NOP) /* for debugger */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

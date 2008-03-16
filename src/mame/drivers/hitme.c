@@ -15,7 +15,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "hitme.h"
 #include "sound/discrete.h"
 
@@ -136,10 +135,10 @@ static UINT8 read_port_and_t0(int port)
 }
 
 
-static UINT8 read_port_and_t0_and_hblank(int port)
+static UINT8 read_port_and_t0_and_hblank(running_machine *machine, int port)
 {
 	UINT8 val = read_port_and_t0(port);
-	if (video_screen_get_hpos(0) < (Machine->screen[0].width * 9 / 10))
+	if (video_screen_get_hpos(machine->primary_screen) < (video_screen_get_width(machine->primary_screen) * 9 / 10))
 		val ^= 0x04;
 	return val;
 }
@@ -147,7 +146,7 @@ static UINT8 read_port_and_t0_and_hblank(int port)
 
 static READ8_HANDLER( hitme_port_0_r )
 {
-	return read_port_and_t0_and_hblank(0);
+	return read_port_and_t0_and_hblank(machine, 0);
 }
 
 
@@ -159,7 +158,7 @@ static READ8_HANDLER( hitme_port_1_r )
 
 static READ8_HANDLER( hitme_port_2_r )
 {
-	return read_port_and_t0_and_hblank(2);
+	return read_port_and_t0_and_hblank(machine, 2);
 }
 
 
@@ -216,9 +215,9 @@ static WRITE8_HANDLER( output_port_1_w )
 */
 
 static ADDRESS_MAP_START( hitme_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS(AMEF_ABITS(13))
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_READWRITE(MRA8_RAM, hitme_vidram_w) AM_BASE(&hitme_vidram)
+	AM_RANGE(0x0c00, 0x0eff) AM_READWRITE(SMH_RAM, hitme_vidram_w) AM_BASE(&hitme_vidram)
 	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x1400, 0x14ff) AM_READ(hitme_port_0_r)
 	AM_RANGE(0x1500, 0x15ff) AM_READ(hitme_port_1_r)

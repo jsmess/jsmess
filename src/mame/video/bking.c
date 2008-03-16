@@ -247,8 +247,8 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( bking )
 {
 	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	helper0 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper0 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 
@@ -258,14 +258,14 @@ VIDEO_UPDATE( bking )
 
 	/* draw the balls */
 
-	drawgfx(bitmap, machine->gfx[2],
+	drawgfx(bitmap, screen->machine->gfx[2],
 		ball1_pic,
 		palette_bank,
 		0, 0,
 		xld1, yld1,
 		cliprect, TRANSPARENCY_PEN, 0);
 
-	drawgfx(bitmap, machine->gfx[3],
+	drawgfx(bitmap, screen->machine->gfx[3],
 		ball2_pic,
 		palette_bank,
 		0, 0,
@@ -274,7 +274,7 @@ VIDEO_UPDATE( bking )
 
 	/* draw the crow */
 
-	drawgfx(bitmap, machine->gfx[1],
+	drawgfx(bitmap, screen->machine->gfx[1],
 		crow_pic,
 		palette_bank,
 		crow_flip, crow_flip,

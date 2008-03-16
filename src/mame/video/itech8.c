@@ -167,13 +167,13 @@ static void generate_interrupt(running_machine *machine, int state)
 {
 	itech8_update_interrupts(machine, -1, state, -1);
 
-	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", video_screen_get_vpos(0));
+	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
 }
 
 
 static const struct tms34061_interface tms34061intf =
 {
-	0,						/* the screen we are acting on */
+	"main",					/* the screen we are acting on */
 	8,						/* VRAM address is (row << rowshift) | col */
 	0x40000,				/* size of video RAM */
 	generate_interrupt		/* interrupt gen callback */
@@ -226,8 +226,8 @@ WRITE8_HANDLER( itech8_palette_w )
 
 WRITE8_HANDLER( itech8_page_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
-	logerror("%04x:display_page = %02X (%d)\n", activecpu_get_pc(), data, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	logerror("%04x:display_page = %02X (%d)\n", activecpu_get_pc(), data, video_screen_get_vpos(machine->primary_screen));
 	page_select = data;
 }
 
@@ -325,7 +325,7 @@ static void perform_blit(running_machine *machine)
 	/* debugging */
 	if (FULL_LOGGING)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
-				video_screen_get_vpos(0),
+				video_screen_get_vpos(machine->primary_screen),
 				(*itech8_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
@@ -446,7 +446,7 @@ static TIMER_CALLBACK( blitter_done )
 	blit_in_progress = 0;
 	itech8_update_interrupts(machine, -1, -1, 1);
 
-	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", video_screen_get_vpos(0));
+	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -544,7 +544,7 @@ WRITE8_HANDLER( itech8_tms34061_w )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(machine, col, 0xff, func, data);
+	tms34061_w(col, 0xff, func, data);
 }
 
 
@@ -559,7 +559,7 @@ READ8_HANDLER( itech8_tms34061_r )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(machine, col, 0xff, func);
+	return tms34061_r(col, 0xff, func);
 }
 
 
@@ -582,7 +582,7 @@ VIDEO_UPDATE( itech8_2layer )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 		return 0;
 	}
 
@@ -618,7 +618,7 @@ VIDEO_UPDATE( itech8_2page )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 		return 0;
 	}
 
@@ -649,7 +649,7 @@ VIDEO_UPDATE( itech8_2page_large )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 		return 0;
 	}
 

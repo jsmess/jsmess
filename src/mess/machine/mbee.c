@@ -38,6 +38,10 @@ UINT8 *mbee_workram;
 static const z80pio_interface pio_intf =
 {
 	pio_interrupt,	/* callback when change interrupt status */
+	NULL,
+	NULL,
+	NULL,
+	NULL,
 	0,				/* portA ready active callback (do not support yet)*/
 	0				/* portB ready active callback (do not support yet)*/
 };

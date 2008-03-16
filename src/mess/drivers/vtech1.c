@@ -149,7 +149,7 @@ static ADDRESS_MAP_START(laser310_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vtech1_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(vtech1_printer_r, vtech1_printer_w)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(vtech1_fdc_r, vtech1_fdc_w)
 	AM_RANGE(0x20, 0x2f) AM_READ(vtech1_joystick_r)

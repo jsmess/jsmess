@@ -74,7 +74,7 @@ VIDEO_UPDATE( tx0 )
 {
 	VIDEO_UPDATE_CALL(crt);
 
-	tx0_draw_panel(machine, panel_bitmap);
+	tx0_draw_panel(screen->machine, panel_bitmap);
 	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
 	copybitmap(bitmap, typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
@@ -204,7 +204,7 @@ static void tx0_draw_multipleswitch(running_machine *machine, bitmap_t *bitmap, 
 static void tx0_draw_char(running_machine *machine, bitmap_t *bitmap, char character, int x, int y, int color)
 {
 	drawgfx(bitmap, machine->gfx[0], character-32, color, 0, 0,
-				x+1, y, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+				x+1, y, NULL, TRANSPARENCY_PEN, 0);
 }
 
 /* write a string on screen */

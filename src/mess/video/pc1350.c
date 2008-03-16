@@ -138,8 +138,8 @@ VIDEO_UPDATE( pc1350 )
 	bitmap_fill(bitmap, cliprect, 5);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
-    color[0] = machine->pens[pocketc_colortable[PC1350_CONTRAST][0]];
-	color[1] = machine->pens[pocketc_colortable[PC1350_CONTRAST][1]];
+    color[0] = screen->machine->pens[pocketc_colortable[PC1350_CONTRAST][0]];
+	color[1] = screen->machine->pens[pocketc_colortable[PC1350_CONTRAST][1]];
 
 	for (k=0, y=DOWN; k<4; y+=16,k++)
 	{

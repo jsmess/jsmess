@@ -402,8 +402,19 @@ VIDEO_UPDATE( coco3 )
 	UINT32 *line;
 	UINT32 rc = 0;
 
-	/* choose video type */
-	video->video_type = screen ? 1 : 0;
+	/* bad screen */
+	if (!strcmp(screen->tag, "composite"))
+	{
+		video->video_type = 0;
+	}
+	else if (!strcmp(screen->tag, "rgb"))
+	{
+		video->video_type = 1;
+	}
+	else
+	{
+		fatalerror("Bad screen");
+	}
 
 	/* set all of the palette colors */
 	for (i = 0; i < 16; i++)
@@ -428,11 +439,11 @@ VIDEO_UPDATE( coco3 )
 	else
 	{
 		/* CoCo 3 graphics */
-		if (video->dirty[screen])
+		if (video->dirty[video->video_type])
 		{
 			for (row = cliprect->min_y; row <= cliprect->max_y; row++)
 				coco3_render_scanline(bitmap, row);
-			video->dirty[screen] = FALSE;
+			video->dirty[video->video_type] = FALSE;
 		}
 		else
 		{

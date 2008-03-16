@@ -40,14 +40,15 @@ VIDEO_START( mekd2 )
 
 VIDEO_UPDATE( mekd2 )
 {
+	int width = video_screen_get_width(screen);
     int x, y;
 
     for (x = 0; x < 6; x++)
     {
         int sy = 408;
-        int sx = machine->screen[0].width - 212 + x * 30 + ((x >= 4) ? 6 : 0);
+        int sx = width - 212 + x * 30 + ((x >= 4) ? 6 : 0);
 
-        drawgfx (bitmap, machine->gfx[0],
+        drawgfx (bitmap, screen->machine->gfx[0],
                  videoram[2 * x + 0], videoram[2 * x + 1],
                  0, 0, sx, sy, NULL, TRANSPARENCY_PEN, 0);
     }
@@ -67,13 +68,13 @@ VIDEO_UPDATE( mekd2 )
 				{ 4,  5,  6,  7},
 				{ 0,  1,  2,  3}
             };
-            int sx = machine->screen[0].width - 182 + x * 37;
+            int sx = width - 182 + x * 37;
             int color, code = layout[y][x];
 
             color = (readinputport (code / 7) & (0x40 >> (code % 7))) ? 0 : 1;
 
             videoram[6 * 2 + code] = color;
-            drawgfx (bitmap, machine->gfx[1],
+            drawgfx (bitmap, screen->machine->gfx[1],
                      layout[y][x], color,
                      0, 0, sx, sy, NULL,
                      TRANSPARENCY_NONE, 0);

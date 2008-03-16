@@ -89,12 +89,12 @@ AM_RANGE(0x38c2, 0x38c2) AM_READWRITE( ret_ff, cowrace_38c2_w )
 
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE( MRA8_RAM, cowrace_videoram_w ) AM_BASE( &videoram )
-	AM_RANGE(0x5000, 0x53ff) AM_READWRITE( MRA8_RAM, cowrace_colorram_w ) AM_BASE( &colorram )
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE( SMH_RAM, cowrace_videoram_w ) AM_BASE( &videoram )
+	AM_RANGE(0x5000, 0x53ff) AM_READWRITE( SMH_RAM, cowrace_colorram_w ) AM_BASE( &colorram )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map_cowrace, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_NOP
 ADDRESS_MAP_END
 
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( mem_map_sound_cowrace, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map_sound_cowrace, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(YM2203_read_port_0_r,YM2203_write_port_0_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(YM2203_control_port_0_w)
 ADDRESS_MAP_END

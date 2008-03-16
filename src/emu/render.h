@@ -308,8 +308,8 @@ void render_init(running_machine *machine);
 /* set a notifier that we call before doing long scaling operations */
 void render_set_rescale_notify(running_machine *machine, int (*notifier)(running_machine *, int, int));
 
-/* return a bitmask indicating the live screens */
-UINT32 render_get_live_screens_mask(void);
+/* return a boolean indicating if the screen is live */
+int render_is_live_screen(const device_config *screen);
 
 /* return the smallest maximum update rate across all targets */
 float render_get_max_update_rate(void);
@@ -465,8 +465,8 @@ void render_container_set_overlay(render_container *container, bitmap_t *bitmap)
 /* return a pointer to the UI container */
 render_container *render_container_get_ui(void);
 
-/* return a pointer to the indexed screen container */
-render_container *render_container_get_screen(int screen);
+/* return a pointer to the container for the given screen */
+render_container *render_container_get_screen(const device_config *screen);
 
 /* set the opacity of a given palette entry */
 void render_container_set_palette_alpha(render_container *container, UINT32 entry, UINT8 alpha);

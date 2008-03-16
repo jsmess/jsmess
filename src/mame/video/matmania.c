@@ -125,11 +125,13 @@ WRITE8_HANDLER( matmania_paletteram_w )
 ***************************************************************************/
 VIDEO_START( matmania )
 {
-	/* Mat Mania has a virtual screen twice as large as the visible screen */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,2* machine->screen[0].height,machine->screen[0].format);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+	bitmap_format format = video_screen_get_format(machine->primary_screen);
 
 	/* Mat Mania has a virtual screen twice as large as the visible screen */
-	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,2 * machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap  = auto_bitmap_alloc(width, 2*height, format);
+	tmpbitmap2 = auto_bitmap_alloc(width, 2*height, format);
 }
 
 
@@ -148,7 +150,7 @@ VIDEO_UPDATE( matmania )
 		sx = 15 - offs / 32;
 		sy = offs % 32;
 
-		drawgfx(tmpbitmap,machine->gfx[1],
+		drawgfx(tmpbitmap,screen->machine->gfx[1],
 				videoram[offs] + ((colorram[offs] & 0x08) << 5),
 				(colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -165,7 +167,7 @@ VIDEO_UPDATE( matmania )
 		sx = 15 - offs / 32;
 		sy = offs % 32;
 
-		drawgfx(tmpbitmap2,machine->gfx[1],
+		drawgfx(tmpbitmap2,screen->machine->gfx[1],
 				matmania_videoram3[offs] + ((matmania_colorram3[offs] & 0x08) << 5),
 				(matmania_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -192,7 +194,7 @@ VIDEO_UPDATE( matmania )
 	{
 		if (spriteram[offs] & 0x01)
 		{
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx(bitmap,screen->machine->gfx[2],
 					spriteram[offs+1] + ((spriteram[offs] & 0xf0) << 4),
 					(spriteram[offs] & 0x08) >> 3,
 					spriteram[offs] & 0x04,spriteram[offs] & 0x02,
@@ -211,7 +213,7 @@ VIDEO_UPDATE( matmania )
 		sx = 31 - offs / 32;
 		sy = offs % 32;
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 				matmania_videoram2[offs] + 256 * (matmania_colorram2[offs] & 0x07),
 				(matmania_colorram2[offs] & 0x30) >> 4,
 				0,0,
@@ -235,7 +237,7 @@ VIDEO_UPDATE( maniach )
 		sx = 15 - offs / 32;
 		sy = offs % 32;
 
-		drawgfx(tmpbitmap,machine->gfx[1],
+		drawgfx(tmpbitmap,screen->machine->gfx[1],
 				videoram[offs] + ((colorram[offs] & 0x03) << 8),
 				(colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -252,7 +254,7 @@ VIDEO_UPDATE( maniach )
 		sx = 15 - offs / 32;
 		sy = offs % 32;
 
-		drawgfx(tmpbitmap2,machine->gfx[1],
+		drawgfx(tmpbitmap2,screen->machine->gfx[1],
 				matmania_videoram3[offs] + ((matmania_colorram3[offs] & 0x03) << 8),
 				(matmania_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -280,7 +282,7 @@ VIDEO_UPDATE( maniach )
 	{
 		if (spriteram[offs] & 0x01)
 		{
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx(bitmap,screen->machine->gfx[2],
 					spriteram[offs+1] + ((spriteram[offs] & 0xf0) << 4),
 					(spriteram[offs] & 0x08) >> 3,
 					spriteram[offs] & 0x04,spriteram[offs] & 0x02,
@@ -299,7 +301,7 @@ VIDEO_UPDATE( maniach )
 		sx = 31 - offs / 32;
 		sy = offs % 32;
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 				matmania_videoram2[offs] + 256 * (matmania_colorram2[offs] & 0x07),
 				(matmania_colorram2[offs] & 0x30) >> 4,
 				0,0,

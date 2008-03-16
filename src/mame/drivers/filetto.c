@@ -69,13 +69,12 @@ AH
 
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
-	screen_state *state = &machine->screen[0]; \
-	rectangle visarea = state->visarea; \
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen); \
 	visarea.min_x = 0; \
 	visarea.max_x = _x_-1; \
 	visarea.min_y = 0; \
 	visarea.max_y = _y_-1; \
-	video_screen_configure(0, _x_, _y_, &visarea, state->refresh ); \
+	video_screen_configure(machine->primary_screen, _x_, _y_, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds ); \
 	} \
 
 
@@ -250,16 +249,16 @@ static VIDEO_UPDATE( filetto )
 	if(vga_mode[0] & 8)
 	{
 		if(vga_mode[0] & 2)
-			cga_graphic_bitmap(machine,bitmap,cliprect,0,0x18000);
+			cga_graphic_bitmap(screen->machine,bitmap,cliprect,0,0x18000);
 		else
 		{
 			switch(vga_mode[0] & 1)
 			{
 				case 0x00:
-					cga_alphanumeric_tilemap(machine,bitmap,cliprect,RES_320x200,0x18000);
+					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_320x200,0x18000);
 					break;
 				case 0x01:
-					cga_alphanumeric_tilemap(machine,bitmap,cliprect,RES_640x200,0x18000);
+					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_640x200,0x18000);
 					break;
 			}
 		}
@@ -538,8 +537,8 @@ static ADDRESS_MAP_START( filetto_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00400, 0x007ff) AM_RAM AM_BASE(&work_ram)
 	AM_RANGE(0x00800, 0x9ffff) AM_RAM //work RAM 640KB
 //  AM_RANGE(0xa0000, 0xb7fff) AM_RAM //VGA RAM
-	AM_RANGE(0xa0000, 0xbffff) AM_READWRITE(MRA8_RAM,vga_vram_w) AM_BASE(&vga_vram)//VGA RAM
-	AM_RANGE(0xc0000, 0xcffff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0xa0000, 0xbffff) AM_READWRITE(SMH_RAM,vga_vram_w) AM_BASE(&vga_vram)//VGA RAM
+	AM_RANGE(0xc0000, 0xcffff) AM_READ(SMH_BANK1)
 
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END

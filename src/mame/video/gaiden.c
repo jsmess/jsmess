@@ -88,9 +88,12 @@ VIDEO_START( gaiden )
 
 VIDEO_START( raiga )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	/* set up tile layers */
-	tile_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	tile_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_bg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_fg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 
 	background = tilemap_create(get_bg_tile_info,	   tilemap_scan_rows,16,16,64,32);
 	foreground = tilemap_create(get_fg_tile_info_raiga,tilemap_scan_rows,16,16,64,32);
@@ -101,7 +104,7 @@ VIDEO_START( raiga )
 	tilemap_set_transparent_pen(text_layer,0);
 
 	/* set up sprites */
-	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 VIDEO_START( drgnbowl )
@@ -316,7 +319,7 @@ static void gaiden_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 			int ypos = source[3] & 0x01ff;
 			int xpos = source[4] & 0x01ff;
 
-			if ((attributes & 0x20) && (video_screen_get_frame_number(0) & 1))
+			if ((attributes & 0x20) && (video_screen_get_frame_number(machine->primary_screen) & 1))
 				goto skip_sprite;
 
 			color = (color >> 4) & 0x0f;
@@ -565,7 +568,7 @@ VIDEO_UPDATE( gaiden )
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);
 	tilemap_draw(bitmap, cliprect, text_layer, 0, 4);
 
-	gaiden_draw_sprites(machine, bitmap, cliprect);
+	gaiden_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -586,10 +589,10 @@ VIDEO_UPDATE( raiga )
 	tilemap_draw(tile_bitmap_fg, cliprect,text_layer, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	raiga_draw_sprites(machine, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
+	raiga_draw_sprites(screen->machine, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(screen->machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }
 
@@ -600,6 +603,6 @@ VIDEO_UPDATE( drgnbowl )
 	tilemap_draw(bitmap, cliprect, background, 0, 1);
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);
 	tilemap_draw(bitmap, cliprect, text_layer, 0, 4);
-	drgnbowl_draw_sprites(machine, bitmap, cliprect);
+	drgnbowl_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

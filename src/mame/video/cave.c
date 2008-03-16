@@ -566,8 +566,8 @@ static void get_sprite_info_cave(running_machine *machine)
 	int	glob_flipx	=	cave_videoregs[ 0 ] & 0x8000;
 	int	glob_flipy	=	cave_videoregs[ 1 ] & 0x8000;
 
-	int max_x		=	machine->screen[0].width;
-	int max_y		=	machine->screen[0].height;
+	int max_x		=	video_screen_get_width(machine->primary_screen);
+	int max_y		=	video_screen_get_height(machine->primary_screen);
 
 	for (; source < finish; source+=8 )
 	{
@@ -687,8 +687,8 @@ static void get_sprite_info_donpachi(running_machine *machine)
 	int	glob_flipx	=	cave_videoregs[ 0 ] & 0x8000;
 	int	glob_flipy	=	cave_videoregs[ 1 ] & 0x8000;
 
-	int max_x		=	machine->screen[0].width;
-	int max_y		=	machine->screen[0].height;
+	int max_x		=	video_screen_get_width(machine->primary_screen);
+	int max_y		=	video_screen_get_height(machine->primary_screen);
 
 	for (; source < finish; source+=8 )
 	{
@@ -753,8 +753,8 @@ static void get_sprite_info_donpachi(running_machine *machine)
 
 static void sprite_init_cave(running_machine *machine)
 {
-	screen_width = machine->screen[0].width;
-	screen_height = machine->screen[0].height;
+	screen_width = video_screen_get_width(machine->primary_screen);
+	screen_height = video_screen_get_height(machine->primary_screen);
 
 	if (cave_spritetype == 0 || cave_spritetype == 2)	// most of the games
 	{
@@ -767,7 +767,7 @@ static void sprite_init_cave(running_machine *machine)
 		cave_spritetype2 = 0;
 	}
 
-	sprite_zbuf = auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
+	sprite_zbuf = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED16 );
 	blit.baseaddr_zbuf = sprite_zbuf->base;
 	blit.line_offset_zbuf = sprite_zbuf->rowpixels * sprite_zbuf->bpp / 8;
 
@@ -780,7 +780,7 @@ static void sprite_init_cave(running_machine *machine)
 }
 
 
-static void cave_sprite_check(running_machine *machine, const rectangle *clip )
+static void cave_sprite_check(const device_config *screen, const rectangle *clip )
 {
 	{	/* set clip */
 		int left = clip->min_x;
@@ -800,6 +800,8 @@ static void cave_sprite_check(running_machine *machine, const rectangle *clip )
 		int i[4]={0,0,0,0};
 		int priority_check = 0;
 		int spritetype = cave_spritetype2;
+		const rectangle *visarea = video_screen_get_visible_area(screen);
+
 		while( sprite<finish )
 		{
 			if( sprite->x + sprite->total_width  > blit.clip_left && sprite->x < blit.clip_right  &&
@@ -831,19 +833,19 @@ static void cave_sprite_check(running_machine *machine, const rectangle *clip )
 
 			case CAVE_SPRITETYPE_ZOOM | CAVE_SPRITETYPE_ZBUF:
 				cave_sprite_draw = sprite_draw_cave_zbuf;
-				if (clip->min_y == machine->screen[0].visarea.min_y)
+				if (clip->min_y == visarea->min_y)
 				{
 					if(!(sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						fillbitmap(sprite_zbuf,0,&machine->screen[0].visarea);
+						fillbitmap(sprite_zbuf,0,visarea);
 				}
 				break;
 
 			case CAVE_SPRITETYPE_ZBUF:
 				cave_sprite_draw = sprite_draw_donpachi_zbuf;
-				if (clip->min_y == machine->screen[0].visarea.min_y)
+				if (clip->min_y == visarea->min_y)
 				{
 					if(!(sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						fillbitmap(sprite_zbuf,0,&machine->screen[0].visarea);
+						fillbitmap(sprite_zbuf,0,visarea);
 				}
 				break;
 
@@ -1439,7 +1441,7 @@ VIDEO_UPDATE( cave )
 	int pri, pri2;
 	int layers_ctrl = -1;
 
-	set_pens(machine);
+	set_pens(screen->machine);
 
 	blit.baseaddr = bitmap->base;
 	blit.line_offset = bitmap->rowpixels * bitmap->bpp / 8;
@@ -1523,7 +1525,7 @@ VIDEO_UPDATE( cave )
 }
 #endif
 
-	cave_sprite_check(machine, cliprect);
+	cave_sprite_check(screen, cliprect);
 
 	fillbitmap(bitmap,background_color,cliprect);
 

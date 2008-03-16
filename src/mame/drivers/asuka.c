@@ -195,7 +195,8 @@ Earthjkr: Wrong screen size? Left edge of green blueprints in
 attract looks like it's incorrectly off screen.
 
 Cadash: Hooks for twin arcade machine setup: will involve emulating an extra
-microcontroller, the 07 rom might be the program for it.
+microcontroller, the 07 rom might be the program for it. Cadash background
+colors don't reinitialize properly with save states.
 
 Galmedes: Test mode has select1/2 stuck at on.
 
@@ -302,6 +303,17 @@ static WRITE8_HANDLER( asuka_msm5205_stop_w )
 
 
 
+static MACHINE_START( asuka )
+{
+	/* configure the banks */
+    memory_configure_bank(1, 0, 1, memory_region(REGION_CPU2), 0);
+	memory_configure_bank(1, 1, 3, memory_region(REGION_CPU2) + 0x10000, 0x04000);
+
+	state_save_register_global(adpcm_pos);
+}
+
+
+
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
@@ -332,7 +344,7 @@ static ADDRESS_MAP_START( asuka_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1076f0, 0x1076f1) AM_READNOP	/* Mofflott init does dummy reads here */
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)
 	AM_RANGE(0x3a0000, 0x3a0003) AM_WRITE(asuka_spritectrl_w)
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READWRITE(MRA16_NOP, taitosound_port16_lsb_w)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READWRITE(SMH_NOP, taitosound_port16_lsb_w)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
 	AM_RANGE(0x400000, 0x40000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
@@ -344,7 +356,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cadash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080003) AM_WRITE(asuka_spritectrl_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READWRITE(MRA16_NOP, taitosound_port16_lsb_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READWRITE(SMH_NOP, taitosound_port16_lsb_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM	/* network ram */
@@ -362,7 +374,7 @@ static ADDRESS_MAP_START( eto_map, ADDRESS_SPACE_PROGRAM, 16 )	/* N.B. tc100scn 
 	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
 	AM_RANGE(0x400000, 0x40000f) AM_READ(TC0220IOC_halfword_r)	/* service mode mirror */
 	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(asuka_spritectrl_w)
-	AM_RANGE(0x4e0000, 0x4e0001) AM_READWRITE(MRA16_NOP, taitosound_port16_lsb_w)
+	AM_RANGE(0x4e0000, 0x4e0001) AM_READWRITE(SMH_NOP, taitosound_port16_lsb_w)
 	AM_RANGE(0x4e0002, 0x4e0003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(PC090OJ_word_0_r, PC090OJ_word_0_w)	/* sprite ram */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(TC0100SCN_word_0_w)	/* service mode mirror */
@@ -396,7 +408,7 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x9001, 0x9001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-//  AM_RANGE(0x9002, 0x9100) AM_READ(MRA8_RAM)
+//  AM_RANGE(0x9002, 0x9100) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(asuka_msm5205_address_w)
@@ -800,6 +812,8 @@ static MACHINE_DRIVER_START( bonzeadv )
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)
 
+	MDRV_MACHINE_START(asuka)
+
 	MDRV_VIDEO_START(asuka)
 	MDRV_VIDEO_EOF(asuka)
 	MDRV_VIDEO_UPDATE(bonzeadv)
@@ -835,6 +849,8 @@ static MACHINE_DRIVER_START( asuka )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)
+
+	MDRV_MACHINE_START(asuka)
 
 	MDRV_VIDEO_START(asuka)
 	MDRV_VIDEO_EOF(asuka)
@@ -875,6 +891,8 @@ static MACHINE_DRIVER_START( cadash )
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)
 
+	MDRV_MACHINE_START(asuka)
+
 	MDRV_VIDEO_START(cadash)
 	MDRV_VIDEO_EOF(asuka)
 	MDRV_VIDEO_UPDATE(bonzeadv)
@@ -909,6 +927,8 @@ static MACHINE_DRIVER_START( mofflott )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
+
+	MDRV_MACHINE_START(asuka)
 
 	MDRV_VIDEO_START(galmedes)
 	MDRV_VIDEO_EOF(asuka)
@@ -949,6 +969,8 @@ static MACHINE_DRIVER_START( galmedes )
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
 
+	MDRV_MACHINE_START(asuka)
+
 	MDRV_VIDEO_START(galmedes)
 	MDRV_VIDEO_EOF(asuka)
 	MDRV_VIDEO_UPDATE(asuka)
@@ -983,6 +1005,8 @@ static MACHINE_DRIVER_START( eto )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)
+
+	MDRV_MACHINE_START(asuka)
 
 	MDRV_VIDEO_START(galmedes)
 	MDRV_VIDEO_EOF(asuka)
@@ -1341,18 +1365,18 @@ ROM_START( eto )
 ROM_END
 
 
-GAME( 1988, bonzeadv, 0,        bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporation Japan", "Bonze Adventure (World, Newer)", 0 )
-GAME( 1988, bonzeado, bonzeadv, bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporation Japan", "Bonze Adventure (World, Older)", 0 )
-GAME( 1988, bonzeadu, bonzeadv, bonzeadv, jigkmgri, 0, ROT0,   "Taito America Corporation", "Bonze Adventure (US)", 0 )
-GAME( 1988, jigkmgri, bonzeadv, bonzeadv, jigkmgri, 0, ROT0,   "Taito Corporation", "Jigoku Meguri (Japan)", 0 )
-GAME( 1988, asuka,    0,        asuka,    asuka,    0, ROT270, "Taito Corporation", "Asuka & Asuka (World)", 0 )
-GAME( 1988, asukaj,   asuka,    asuka,    asuka,    0, ROT270, "Taito Corporation", "Asuka & Asuka (Japan)", 0 )
-GAME( 1989, mofflott, 0,        mofflott, mofflott, 0, ROT270, "Taito Corporation", "Maze of Flott (Japan)", 0 )
+GAME( 1988, bonzeadv, 0,        bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporation Japan", "Bonze Adventure (World, Newer)", GAME_SUPPORTS_SAVE )
+GAME( 1988, bonzeado, bonzeadv, bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporation Japan", "Bonze Adventure (World, Older)", GAME_SUPPORTS_SAVE )
+GAME( 1988, bonzeadu, bonzeadv, bonzeadv, jigkmgri, 0, ROT0,   "Taito America Corporation", "Bonze Adventure (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, jigkmgri, bonzeadv, bonzeadv, jigkmgri, 0, ROT0,   "Taito Corporation", "Jigoku Meguri (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, asuka,    0,        asuka,    asuka,    0, ROT270, "Taito Corporation", "Asuka & Asuka (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, asukaj,   asuka,    asuka,    asuka,    0, ROT270, "Taito Corporation", "Asuka & Asuka (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mofflott, 0,        mofflott, mofflott, 0, ROT270, "Taito Corporation", "Maze of Flott (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, cadash,   0,        cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (World)", 0 )
 GAME( 1989, cadashj,  cadash,   cadash,   cadashj,  0, ROT0,   "Taito Corporation", "Cadash (Japan)", 0 )
 GAME( 1989, cadashu,  cadash,   cadash,   cadashu,  0, ROT0,   "Taito America Corporation", "Cadash (US)", 0 )
 GAME( 1989, cadashi,  cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (Italy)", 0 )
 GAME( 1989, cadashf,  cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (France)", 0 )
-GAME( 1992, galmedes, 0,        galmedes, galmedes, 0, ROT270, "Visco", "Galmedes (Japan)", 0 )
-GAME( 1993, earthjkr, 0,        galmedes, earthjkr, 0, ROT270, "Visco", "U.N. Defense Force: Earth Joker", 0 )
-GAME( 1994, eto,      0,        eto,      eto,      0, ROT0,   "Visco", "Kokontouzai Eto Monogatari (Japan)", 0 )
+GAME( 1992, galmedes, 0,        galmedes, galmedes, 0, ROT270, "Visco", "Galmedes (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, earthjkr, 0,        galmedes, earthjkr, 0, ROT270, "Visco", "U.N. Defense Force: Earth Joker", GAME_SUPPORTS_SAVE )
+GAME( 1994, eto,      0,        eto,      eto,      0, ROT0,   "Visco", "Kokontouzai Eto Monogatari (Japan)", GAME_SUPPORTS_SAVE )

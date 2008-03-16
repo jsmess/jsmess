@@ -510,7 +510,7 @@ static VIDEO_UPDATE(bnstars)
 		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap[0],0,4);
 
 
-		draw_sprites(machine,bitmap,cliprect, ms32_spram, 0x20000, 0);
+		draw_sprites(screen->machine,bitmap,cliprect, ms32_spram, 0x20000, 0);
 	}
 	else
 	{
@@ -527,7 +527,7 @@ static VIDEO_UPDATE(bnstars)
 		tilemap_set_scrolly(ms32_tx_tilemap[1], 0, ms32_tx1_scroll[0x0c/4] + ms32_tx1_scroll[0x14/4]);
 		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap[1],0,4);
 
-		draw_sprites(machine,bitmap,cliprect, ms32_spram+(0x20000/4), 0x20000, 4);
+		draw_sprites(screen->machine,bitmap,cliprect, ms32_spram+(0x20000/4), 0x20000, 4);
 	}
 
 	return 0;
@@ -1239,18 +1239,18 @@ static ADDRESS_MAP_START( bnstars_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ( bnstars2_r )
 	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ( bnstars3_r )
 
-	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITE(MWA32_NOP)
+	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITE(SMH_NOP)
 
-	AM_RANGE(0xfce00050, 0xfce00053) AM_WRITE(MWA32_NOP)
-	AM_RANGE(0xfce00058, 0xfce0005b) AM_WRITE(MWA32_NOP)
-	AM_RANGE(0xfce0005c, 0xfce0005f) AM_WRITE(MWA32_NOP)
+	AM_RANGE(0xfce00050, 0xfce00053) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xfce00058, 0xfce0005b) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xfce0005c, 0xfce0005f) AM_WRITE(SMH_NOP)
 
-	AM_RANGE(0xfce00400, 0xfce0045f) AM_WRITE(MWA32_RAM) AM_BASE(&ms32_roz_ctrl[0])
-	AM_RANGE(0xfce00700, 0xfce0075f) AM_WRITE(MWA32_RAM) AM_BASE(&ms32_roz_ctrl[1]) // guess
-	AM_RANGE(0xfce00a00, 0xfce00a17) AM_WRITE(MWA32_RAM) AM_BASE(&ms32_tx0_scroll)
-	AM_RANGE(0xfce00a20, 0xfce00a37) AM_WRITE(MWA32_RAM) AM_BASE(&ms32_bg0_scroll)
-	AM_RANGE(0xfce00c00, 0xfce00c17) AM_WRITE(MWA32_RAM) AM_BASE(&ms32_tx1_scroll)
-	AM_RANGE(0xfce00c20, 0xfce00c37) AM_WRITE(MWA32_RAM) AM_BASE(&ms32_bg1_scroll)
+	AM_RANGE(0xfce00400, 0xfce0045f) AM_WRITE(SMH_RAM) AM_BASE(&ms32_roz_ctrl[0])
+	AM_RANGE(0xfce00700, 0xfce0075f) AM_WRITE(SMH_RAM) AM_BASE(&ms32_roz_ctrl[1]) // guess
+	AM_RANGE(0xfce00a00, 0xfce00a17) AM_WRITE(SMH_RAM) AM_BASE(&ms32_tx0_scroll)
+	AM_RANGE(0xfce00a20, 0xfce00a37) AM_WRITE(SMH_RAM) AM_BASE(&ms32_bg0_scroll)
+	AM_RANGE(0xfce00c00, 0xfce00c17) AM_WRITE(SMH_RAM) AM_BASE(&ms32_tx1_scroll)
+	AM_RANGE(0xfce00c20, 0xfce00c37) AM_WRITE(SMH_RAM) AM_BASE(&ms32_bg1_scroll)
 
 	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(bnstars1_mahjong_select_w) // ?
 
@@ -1268,7 +1268,7 @@ static ADDRESS_MAP_START( bnstars_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM AM_WRITE(ms32_bg0_ram_w) AM_BASE(&ms32_bg0_ram)
 
 	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM
-	AM_RANGE(0xffe00000, 0xffffffff) AM_READWRITE(MRA32_BANK1, MWA32_ROM)
+	AM_RANGE(0xffe00000, 0xffffffff) AM_READWRITE(SMH_BANK1, SMH_ROM)
 ADDRESS_MAP_END
 
 #if 0

@@ -257,7 +257,7 @@ static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (1)
 	{
@@ -282,7 +282,7 @@ static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectang
 				{
 					if (flip_screen_get()) x += 64;
 
-					if (y >= machine->screen[0].visarea.min_y && y <= machine->screen[0].visarea.max_y)
+					if (y >= cliprect->min_y && y <= cliprect->max_y)
 						*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
 				 }
 			}
@@ -308,19 +308,19 @@ VIDEO_UPDATE( bosco )
 		fg_clip.min_x = 28*8;
 	}
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
-	draw_stars(machine, bitmap,cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	draw_stars(bitmap,cliprect);
 
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,0,0);
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 
 	/* draw the high priority characters */
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,0);
 
-	draw_bullets(machine, bitmap,cliprect);
+	draw_bullets(screen->machine, bitmap,cliprect);
 
 	return 0;
 }

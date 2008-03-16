@@ -144,11 +144,11 @@ VIDEO_UPDATE( hd66421 )
 		if (temp <  0) temp =  0;
 		if (temp > 31) temp = 31;
 		bright = 1.0 * temp / 31;
-		pen[i] = machine->pens[i];
+		pen[i] = screen->machine->pens[i];
 		#ifdef BRIGHTNESS_DOES_NOT_WORK
-		palette_set_color( machine, pen[i], 255 * bright, 255 * bright, 255 * bright);
+		palette_set_color( screen->machine, pen[i], 255 * bright, 255 * bright, 255 * bright);
 		#else
-		palette_set_brightness( machine, pen[i], bright);
+		palette_set_brightness( screen->machine, pen[i], bright);
 		#endif
 	}
 	// draw bitmap (bottom to top)
@@ -177,7 +177,7 @@ VIDEO_UPDATE( hd66421 )
 		rect.max_x = HD66421_WIDTH - 1;
 		rect.min_y = 0;
 		rect.max_y = HD66421_HEIGHT - 1;
-		fillbitmap( bitmap, get_white_pen( machine), &rect);
+		fillbitmap( bitmap, get_white_pen(screen->machine), &rect);
 	}
 	// flags
 	return 0;

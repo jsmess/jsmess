@@ -761,7 +761,7 @@ VIDEO_START( atari )
 	LOG(("atari prio_init\n"));
     prio_init();
 
-	for( i = 0; i < machine->screen[0].height; i++ )
+	for( i = 0; i < video_screen_get_height(machine->primary_screen); i++ )
     {
 		antic.video[i] = auto_malloc(sizeof(VIDEO));
 		memset(antic.video[i], 0, sizeof(VIDEO));
@@ -955,7 +955,7 @@ static void antic_linerefresh(void)
 	UINT32 scanline[4 + (HCHARS * 2) + 4];
 
 	/* increment the scanline */
-    if( ++antic.scanline == Machine->screen[0].height )
+    if( ++antic.scanline == video_screen_get_height(Machine->primary_screen) )
     {
         /* and return to the top if the frame was complete */
         antic.scanline = 0;
@@ -1057,12 +1057,12 @@ static void antic_linerefresh(void)
 
 static int cycle(void)
 {
-	return video_screen_get_hpos(0) * CYCLES_PER_LINE / Machine->screen[0].width;
+	return video_screen_get_hpos(Machine->primary_screen) * CYCLES_PER_LINE / video_screen_get_width(Machine->primary_screen);
 }
 
 static void after(int cycles, timer_fired_func function, const char *funcname)
 {
-    attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(0)) * cycles / CYCLES_PER_LINE);
+    attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(Machine->primary_screen)) * cycles / CYCLES_PER_LINE);
     (void)funcname;
 	LOG(("           after %3d (%5.1f us) %s\n", cycles, attotime_to_double(duration) * 1.0e6, funcname));
 	timer_set(duration, NULL, 0, function);
@@ -1359,7 +1359,7 @@ static void antic_scanline_dma(int param)
                         /* produce empty scanlines until vblank start */
 						antic.modelines = VBL_START + 1 - antic.scanline;
 						if( antic.modelines < 0 )
-							antic.modelines = Machine->screen[0].height - antic.scanline;
+							antic.modelines = video_screen_get_height(Machine->primary_screen) - antic.scanline;
 						LOG(("           JVB $%04x\n", antic.dpage|antic.doffs));
 					}
 					else
@@ -1523,7 +1523,7 @@ static void generic_atari_interrupt(void (*handle_keyboard)(void), int button_co
 		handle_keyboard();
 
 		/* do nothing new for the rest of the frame */
-		antic.modelines = Machine->screen[0].height - VBL_START;
+		antic.modelines = video_screen_get_height(Machine->primary_screen) - VBL_START;
 		antic_renderer = antic_mode_0_xx;
 
 		/* if the CPU want's to be interrupted at vertical blank... */

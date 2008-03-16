@@ -35,8 +35,8 @@ VIDEO_START( battlera )
 	memset(sprite_dirty,1,0x400);
 	memset(vram_dirty,1,0x1000);
 
-	tile_bitmap=auto_bitmap_alloc(512,512,machine->screen[0].format);
-	front_bitmap=auto_bitmap_alloc(512,512,machine->screen[0].format);
+	tile_bitmap=auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
+	front_bitmap=auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
 
 	vram_ptr=0;
 	inc_value=1;
@@ -307,19 +307,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 }
 
-static void screenrefresh(running_machine *machine, bitmap_t *bitmap,const rectangle *clip)
+/******************************************************************************/
+
+VIDEO_UPDATE( battlera )
 {
 	int offs,code,scrollx,scrolly,mx,my;
 
 	/* Dynamically decode chars if dirty */
 	for (code = 0x0000;code < 0x1000;code++)
 		if (tile_dirty[code])
-			decodechar(machine->gfx[0],code,HuC6270_vram);
+			decodechar(screen->machine->gfx[0],code,HuC6270_vram);
 
 	/* Dynamically decode sprites if dirty */
 	for (code = 0x0000;code < 0x400;code++)
 		if (sprite_dirty[code])
-			decodechar(machine->gfx[1],code,HuC6270_vram);
+			decodechar(screen->machine->gfx[1],code,HuC6270_vram);
 
 	/* NB: If first 0x1000 byte is always tilemap, no need to decode the first batch of tiles/sprites */
 
@@ -334,19 +336,19 @@ static void screenrefresh(running_machine *machine, bitmap_t *bitmap,const recta
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (tile_dirty[code] || vram_dirty[offs/2]) {
 			vram_dirty[offs/2]=0;
-	        drawgfx(tile_bitmap,machine->gfx[0],
+	        drawgfx(tile_bitmap,screen->machine->gfx[0],
 					code,
 					HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my,
 					0,TRANSPARENCY_NONE,0);
-			drawgfx(front_bitmap,machine->gfx[2],
+			drawgfx(front_bitmap,screen->machine->gfx[2],
 					0,
 					0,	/* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my,
 					0,TRANSPARENCY_NONE,0);
-	        drawgfx(front_bitmap,machine->gfx[0],
+	        drawgfx(front_bitmap,screen->machine->gfx[0],
 					code,
 					HuC6270_vram[offs] >> 4,
 					0,0,
@@ -363,27 +365,21 @@ static void screenrefresh(running_machine *machine, bitmap_t *bitmap,const recta
 
 	/* Render bitmap */
 	scrollx=-HuC6270_registers[7];
-	scrolly=-HuC6270_registers[8]+clip->min_y-1;
+	scrolly=-HuC6270_registers[8]+cliprect->min_y-1;
 
-	copyscrollbitmap(bitmap,tile_bitmap,1,&scrollx,1,&scrolly,clip);
+	copyscrollbitmap(bitmap,tile_bitmap,1,&scrollx,1,&scrolly,cliprect);
 
 	/* Todo:  Background enable (not used anyway) */
 
 	/* Render low priority sprites, if enabled */
-	if (sb_enable) draw_sprites(machine,bitmap,clip,0);
+	if (sb_enable) draw_sprites(screen->machine,bitmap,cliprect,0);
 
 	/* Render background over sprites */
-	copyscrollbitmap_trans(bitmap,front_bitmap,1,&scrollx,1,&scrolly,clip,256);
+	copyscrollbitmap_trans(bitmap,front_bitmap,1,&scrollx,1,&scrolly,cliprect,256);
 
 	/* Render high priority sprites, if enabled */
-	if (sb_enable) draw_sprites(machine,bitmap,clip,1);
-}
+	if (sb_enable) draw_sprites(screen->machine,bitmap,cliprect,1);
 
-/******************************************************************************/
-
-VIDEO_UPDATE( battlera )
-{
-	screenrefresh(machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -395,14 +391,14 @@ INTERRUPT_GEN( battlera_interrupt )
 
 	/* If raster interrupt occurs, refresh screen _up_ to this point */
 	if (rcr_enable && (current_scanline+56)==HuC6270_registers[6]) {
-		video_screen_update_partial(0, current_scanline);
+		video_screen_update_partial(machine->primary_screen, current_scanline);
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE); /* RCR interrupt */
 	}
 
 	/* Start of vblank */
 	else if (current_scanline==240) {
 		bldwolf_vblank=1;
-		video_screen_update_partial(0, 240);
+		video_screen_update_partial(machine->primary_screen, 240);
 		if (irq_enable)
 			cpunum_set_input_line(machine, 0, 0, HOLD_LINE); /* VBL */
 	}

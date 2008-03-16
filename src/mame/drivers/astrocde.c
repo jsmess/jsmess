@@ -421,7 +421,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 	profpac_bank = data;
 
 	/* set the main banking */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, MRA8_BANK1);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_USER1) + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
@@ -437,11 +437,11 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		/* if the bank is in range, map the appropriate bank */
 		if (bank < 0x28)
 		{
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_BANK2);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
 			memory_set_bankptr(2, memory_region(REGION_USER2) + 0x4000 * bank);
 		}
 		else
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_UNMAP);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
 	}
 }
 
@@ -708,7 +708,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( tenpin_sub_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x90, 0x93) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)
 	AM_RANGE(0x98, 0x98) AM_WRITE(AY8910_control_port_0_w)

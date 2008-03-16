@@ -534,6 +534,10 @@ static TIMER_CALLBACK( i824x_hblank_callback ) {
 
 VIDEO_START( odyssey2 )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+
 	o2_snd_shift[0] = machine->sample_rate / 983;
 	o2_snd_shift[1] = machine->sample_rate / 3933;
 
@@ -542,7 +546,7 @@ VIDEO_START( odyssey2 )
 	control_status = 0;
 	iff = 0;
 
-	tmp_bitmap = auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, machine->screen[0].format );
+	tmp_bitmap = auto_bitmap_alloc( width, height, video_screen_get_format(screen) );
 
 	i824x_line_timer = timer_alloc( i824x_scanline_callback, NULL );
 	timer_adjust_periodic( i824x_line_timer, video_screen_get_time_until_pos( 0, 1, I824X_START_ACTIVE_SCAN ), 0, video_screen_get_scan_period( 0 ) );

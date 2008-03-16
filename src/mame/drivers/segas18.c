@@ -93,42 +93,42 @@ static WRITE16_HANDLER( rom_5987_bank_w );
 static const struct segaic16_memory_map_entry rom_171_shad_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x02000, 0xffe000,      ~0, MRA16_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
-	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
-	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
-	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, MRA16_BANK13,          MWA16_BANK13,          &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, MRA16_BANK14,          MWA16_BANK14,          &workram,              "work RAM" },
+	{ 0x39/2, 0x00000, 0x02000, 0xffe000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, SMH_BANK13,          SMH_BANK13,          &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, SMH_BANK14,          SMH_BANK14,          &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, NULL,                  NULL,                  NULL,                  "????" },
 	{ 0x25/2, 0x00000, 0x00010, 0xfffff0,      ~0, genesis_vdp_r,         genesis_vdp_w,         NULL,                  "VDP" },
-	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, MRA16_BANK17,          MWA16_UNMAP,           NULL,                  "ROM 0" },
+	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, SMH_BANK17,          SMH_UNMAP,           NULL,                  "ROM 0" },
 	{ 0 }
 };
 
 static const struct segaic16_memory_map_entry rom_171_5874_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x02000, 0xffe000,      ~0, MRA16_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
-	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
-	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
-	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, MRA16_BANK13,          MWA16_BANK13,          &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, MRA16_BANK14,          MWA16_BANK14,          &workram,              "work RAM" },
+	{ 0x39/2, 0x00000, 0x02000, 0xffe000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, SMH_BANK13,          SMH_BANK13,          &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, SMH_BANK14,          SMH_BANK14,          &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x00010, 0xfffff0,      ~0, genesis_vdp_r,         genesis_vdp_w,         NULL,                  "VDP" },
-	{ 0x25/2, 0x00000, 0x80000, 0xf80000, 0x80000, MRA16_BANK16,          MWA16_UNMAP,           NULL,                  "ROM 1" },
-	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, MRA16_BANK17,          MWA16_UNMAP,           NULL,                  "ROM 0" },
+	{ 0x25/2, 0x00000, 0x80000, 0xf80000, 0x80000, SMH_BANK16,          SMH_UNMAP,           NULL,                  "ROM 1" },
+	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, SMH_BANK17,          SMH_UNMAP,           NULL,                  "ROM 0" },
 	{ 0 }
 };
 
 static const struct segaic16_memory_map_entry rom_171_5987_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x02000, 0xffe000,      ~0, MRA16_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
-	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
-	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
-	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, MRA16_BANK13,          MWA16_BANK13,          &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, MRA16_BANK14,          MWA16_BANK14,          &workram,              "work RAM" },
+	{ 0x39/2, 0x00000, 0x02000, 0xffe000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, SMH_BANK13,          SMH_BANK13,          &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, SMH_BANK14,          SMH_BANK14,          &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x00010, 0xfffff0,      ~0, genesis_vdp_r,         genesis_vdp_w,         NULL,                  "VDP" },
-	{ 0x25/2, 0x00000, 0x80000, 0xf80000, 0x80000, MRA16_BANK16,          rom_5987_bank_w,       NULL,                  "ROM 1/banking" },
-	{ 0x21/2, 0x00000, 0x100000,0xf00000, 0x00000, MRA16_BANK17,          MWA16_UNMAP,           NULL,                  "ROM 0" },
+	{ 0x25/2, 0x00000, 0x80000, 0xf80000, 0x80000, SMH_BANK16,          rom_5987_bank_w,       NULL,                  "ROM 1/banking" },
+	{ 0x21/2, 0x00000, 0x100000,0xf00000, 0x00000, SMH_BANK17,          SMH_UNMAP,           NULL,                  "ROM 0" },
 	{ 0 }
 };
 
@@ -584,7 +584,7 @@ static NVRAM_HANDLER( system18 )
  *************************************/
 
 static ADDRESS_MAP_START( system18_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w)
 ADDRESS_MAP_END
 
@@ -597,7 +597,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION(REGION_CPU2, 0x10000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_READWRITE(RF5C68_r, RF5C68_reg_w)
@@ -606,7 +606,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(8) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0c) AM_READWRITE(YM3438_status_port_0_A_r, YM3438_control_port_0_A_w)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x0c) AM_WRITE(YM3438_data_port_0_A_w)
 	AM_RANGE(0x82, 0x82) AM_MIRROR(0x0c) AM_WRITE(YM3438_control_port_0_B_w)
@@ -628,12 +629,12 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_data_map, ADDRESS_SPACE_DATA, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(segaic16_memory_mapper_r, segaic16_memory_mapper_w)
 ADDRESS_MAP_END
 

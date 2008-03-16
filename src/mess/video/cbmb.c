@@ -10,13 +10,14 @@
 
 
 static int cbmb_font=0;
-static mc6845_t *mc6845;
 
-VIDEO_START( cbmb_crtc ) {
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
+VIDEO_START( cbmb_crtc )
+{
 }
 
-VIDEO_UPDATE( cbmb_crtc ) {
+VIDEO_UPDATE( cbmb_crtc )
+{
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -49,8 +50,6 @@ VIDEO_START( cbm700 )
 {
 	int i;
 
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-
     /* remove pixel column 9 for character codes 0 - 175 and 224 - 255 */
 	for( i = 0; i < 256; i++)
 	{
@@ -76,9 +75,9 @@ MC6845_UPDATE_ROW( cbm600_update_row )
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
-			plot_box( bitmap, machine->gfx[cbmb_font]->width * i, y, machine->gfx[cbmb_font]->width, 1, machine->pens[1] );
+			plot_box( bitmap, device->machine->gfx[cbmb_font]->width * i, y, device->machine->gfx[cbmb_font]->width, 1, device->machine->pens[1] );
 		} else {
-			drawgfx( bitmap, machine->gfx[cbmb_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+			drawgfx( bitmap, device->machine->gfx[cbmb_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, device->machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 		}
 	}
 }
@@ -89,14 +88,14 @@ MC6845_UPDATE_ROW( cbm700_update_row )
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
-			plot_box( bitmap, machine->gfx[cbmb_font]->width * i, y, machine->gfx[cbmb_font]->width, 1, machine->pens[1] );
+			plot_box( bitmap, device->machine->gfx[cbmb_font]->width * i, y, device->machine->gfx[cbmb_font]->width, 1, device->machine->pens[1] );
 		} else {
-			drawgfx( bitmap, machine->gfx[cbmb_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+			drawgfx( bitmap, device->machine->gfx[cbmb_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, device->machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 		}
 	}
 }
 
-void cbmb_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+MC6845_ON_DE_CHANGED( cbmb_display_enable_changed )
 {
 }
 

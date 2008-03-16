@@ -390,7 +390,7 @@ static VIDEO_UPDATE( svision )
 	}
 	else
 	{
-		plot_box(bitmap, 3, 0, 162, 159, machine->pens[PALETTE_START]);
+		plot_box(bitmap, 3, 0, 162, 159, screen->machine->pens[PALETTE_START]);
 	}
 	return 0;
 }
@@ -421,7 +421,7 @@ static VIDEO_UPDATE( tvlink )
 	}
 	else
 	{
-		plot_box(bitmap, 3, 0, 162, 159, machine->pens[PALETTE_START]);
+		plot_box(bitmap, 3, 0, 162, 159, screen->machine->pens[PALETTE_START]);
 	}
 	return 0;
 }

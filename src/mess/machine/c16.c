@@ -480,10 +480,10 @@ MACHINE_RESET( c16 )
 	}
 	else
 	{
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xfd40, 0xfd5f, 0, 0, MRA8_NOP);
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM,  0xfd40, 0xfd5f, 0, 0, MWA8_NOP);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xfe80, 0xfe9f, 0, 0, MRA8_NOP);
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM,  0xfe80, 0xfe9f, 0, 0, MWA8_NOP);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xfd40, 0xfd5f, 0, 0, SMH_NOP);
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM,  0xfd40, 0xfd5f, 0, 0, SMH_NOP);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xfe80, 0xfe9f, 0, 0, SMH_NOP);
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM,  0xfe80, 0xfe9f, 0, 0, SMH_NOP);
 	}
 
 #if 0
@@ -498,8 +498,8 @@ MACHINE_RESET( c16 )
 		memory_set_bankptr(6, mess_ram + (0x8000 % mess_ram_size));
 		memory_set_bankptr(7, mess_ram + (0xc000 % mess_ram_size));
 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0xff20, 0xff3d, 0, 0, MWA8_BANK10);
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0xff40, 0xffff, 0, 0, MWA8_BANK11);
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0xff20, 0xff3d, 0, 0, SMH_BANK10);
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0xff40, 0xffff, 0, 0, SMH_BANK11);
 		memory_set_bankptr(10, mess_ram + (0xff20 % mess_ram_size));
 		memory_set_bankptr(11, mess_ram + (0xff40 % mess_ram_size));
 
@@ -510,7 +510,7 @@ MACHINE_RESET( c16 )
 	}
 	else
 	{
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xfcff, 0, 0, MWA8_BANK10);
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xfcff, 0, 0, SMH_BANK10);
 		memory_set_bankptr(10, mess_ram + (0x4000 % mess_ram_size));
 
 		if (SIDCARD_HACK)
@@ -526,8 +526,8 @@ MACHINE_RESET( c16 )
 	}
 	else
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,  0xfee0, 0xfeff, 0, 0, MWA8_NOP);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfee0, 0xfeff, 0, 0, MRA8_NOP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,  0xfee0, 0xfeff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfee0, 0xfeff, 0, 0, SMH_NOP);
 	}
 	if (IEC9ON)
 	{
@@ -536,8 +536,8 @@ MACHINE_RESET( c16 )
 	}
 	else
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,  0xfec0, 0xfedf, 0, 0, MWA8_NOP);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfec0, 0xfedf, 0, 0, MRA8_NOP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,  0xfec0, 0xfedf, 0, 0, SMH_NOP);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfec0, 0xfedf, 0, 0, SMH_NOP);
 	}
 
 	cbm_drive_0_config (SERIAL, 8);

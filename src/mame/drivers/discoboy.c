@@ -120,7 +120,7 @@ static VIDEO_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(machine, i/2, MAKE_RGB(r, g, b));
+		palette_set_color(screen->machine, i/2, MAKE_RGB(r, g, b));
 	}
 
 	for (i=0;i<0x800;i+=2)
@@ -133,7 +133,7 @@ static VIDEO_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(machine, (i/2)+0x400, MAKE_RGB(r, g, b));
+		palette_set_color(screen->machine, (i/2)+0x400, MAKE_RGB(r, g, b));
 	}
 
 	fillbitmap(bitmap, 0x3ff, cliprect);
@@ -154,12 +154,12 @@ static VIDEO_UPDATE( discoboy )
 
 			}
 
-			drawgfx(bitmap,machine->gfx[1], tileno ,discoboy_ram_att[count/2],0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,screen->machine->gfx[1], tileno ,discoboy_ram_att[count/2],0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count+=2;
 		}
 	}
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 
 	return 0;
 }
@@ -284,22 +284,22 @@ static WRITE8_HANDLER( discoboy_ram_att_w )
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(rambank_r)
 	AM_RANGE(0xc800, 0xcfff) AM_READ(discoboy_ram_att_r)
 	AM_RANGE(0xd000, 0xdfff) AM_READ(rambank2_r)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(rambank_w)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(discoboy_ram_att_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(rambank2_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( discoboy_port_06_r )
@@ -308,7 +308,7 @@ static READ8_HANDLER( discoboy_port_06_r )
 }
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r) // DSWA
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r) // Coins
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r) // P1
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(discoboy_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(discoboy_port_01_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(discoboy_port_03_w)
@@ -345,24 +345,24 @@ static void splash_msm5205_int(int data)
 
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0xec01, 0xec01) AM_WRITE(YM3812_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 

@@ -306,7 +306,7 @@ VIDEO_UPDATE( oric )
 				oric_vh_update_attribute(c);
 
 				/* display background colour when attribute has been found */
-				oric_vh_render_6pixels(machine, bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, 0,(c & 0x080));
+				oric_vh_render_6pixels(screen->machine, bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, 0,(c & 0x080));
 
 				if (y<200)
 				{
@@ -330,7 +330,7 @@ VIDEO_UPDATE( oric )
 				{
 					int pixel_data = c & 0x03f;
 					/* plot hires pixels */
-					oric_vh_render_6pixels(machine, bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, pixel_data,(c & 0x080));
+					oric_vh_render_6pixels(screen->machine, bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, pixel_data,(c & 0x080));
 				}
 				else
 				{
@@ -357,7 +357,7 @@ VIDEO_UPDATE( oric )
 					char_data = vh_state.char_data[(char_index<<3) | ch_line] & 0x03f;
 
 					/* draw! */
-					oric_vh_render_6pixels(machine, bitmap,x,y,
+					oric_vh_render_6pixels(screen->machine, bitmap,x,y,
 						vh_state.active_foreground_colour,
 						vh_state.active_background_colour, char_data, (c & 0x080));
 				}

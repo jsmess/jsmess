@@ -555,7 +555,7 @@ static void mbmj8688_gfxdraw(int gfxtype)
 
 static void common_video_start(running_machine *machine)
 {
-	mjsikaku_tmpbitmap = auto_bitmap_alloc(512, 256, machine->screen[0].format);
+	mjsikaku_tmpbitmap = auto_bitmap_alloc(512, 256, video_screen_get_format(machine->primary_screen));
 	mjsikaku_videoram = auto_malloc(512 * 256 * sizeof(UINT16));
 	nbmj8688_clut = auto_malloc(0x20 * sizeof(UINT8));
 	memset(mjsikaku_videoram, 0, (512 * 256 * sizeof(UINT16)));
@@ -712,12 +712,14 @@ VIDEO_UPDATE( mbmj8688_LCD )
 {
 	int x, y, b;
 
-	if(screen==0) VIDEO_UPDATE_CALL(mbmj8688);
+	const device_config *main_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "main");
+	const device_config *lcd0_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "LCD0");
+	const device_config *lcd1_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "LCD1");
 
-	if (screen==1)
-	{
+	if (screen == main_screen) VIDEO_UPDATE_CALL(mbmj8688);
+
+	if (screen == lcd0_screen)
 		for (y = 0;y < 64;y++)
-		{
 			for (x = 0;x < 60;x++)
 			{
 				int data = HD61830B_ram[0][y * 60 + x];
@@ -725,13 +727,9 @@ VIDEO_UPDATE( mbmj8688_LCD )
 				for (b = 0;b < 8;b++)
 					*BITMAP_ADDR16(bitmap, y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
 			}
-		}
-	}
 
-	if (screen==2)
-	{
+	if (screen == lcd1_screen)
 		for (y = 0;y < 64;y++)
-		{
 			for (x = 0;x < 60;x++)
 			{
 				int data = HD61830B_ram[1][y * 60 + x];
@@ -739,8 +737,6 @@ VIDEO_UPDATE( mbmj8688_LCD )
 				for (b = 0;b < 8;b++)
 					*BITMAP_ADDR16(bitmap, y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
 			}
-		}
-	}
 
 	return 0;
 }

@@ -512,7 +512,7 @@ void vdt911_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x,
 				address++;
 
 				drawgfx(bitmap, gfx, cur_char, color, 0, 0,
-						x+j*7, y+i*10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+						x+j*7, y+i*10, NULL, TRANSPARENCY_NONE, 0);
 			}
 		}
 }

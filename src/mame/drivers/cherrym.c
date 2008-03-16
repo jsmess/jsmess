@@ -104,7 +104,7 @@ static VIDEO_START(cm)
 static VIDEO_UPDATE(cm)
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-//  draw_sprites(machine, bitmap, cliprect);
+//  draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cm_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)

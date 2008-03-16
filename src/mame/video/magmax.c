@@ -78,7 +78,7 @@ VIDEO_START( magmax )
 	prom_tab = auto_malloc(256 * sizeof(UINT32));
 
 	/* Allocate temporary bitmap */
- 	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
+ 	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	for (i=0; i<256; i++)
 	{
@@ -107,7 +107,7 @@ VIDEO_UPDATE( magmax )
 		UINT32 scroll_v = (*magmax_scroll_y) & 0xff;
 
 		/*clear background-over-sprites bitmap*/
-		fillbitmap(tmpbitmap, 0, &machine->screen[0].visarea);
+		fillbitmap(tmpbitmap, 0, NULL);
 
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{
@@ -203,13 +203,13 @@ VIDEO_UPDATE( magmax )
 			if (code & 0x80)	/* sprite bankswitch */
 				code += (*magmax_vreg & 0x30) * 0x8;
 
-			drawgfx(bitmap, machine->gfx[1],
+			drawgfx(bitmap, screen->machine->gfx[1],
 					code,
 					color,
 					flipx, flipy,
 					sx, sy,
 					cliprect, TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x1f));
+					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color, 0x1f));
 		}
 	}
 
@@ -234,7 +234,7 @@ VIDEO_UPDATE( magmax )
 				sy = 31 - sy;
 			}
 
-			drawgfx(bitmap, machine->gfx[0],
+			drawgfx(bitmap, screen->machine->gfx[0],
 					code,
 					0,
 					flipscreen, flipscreen,

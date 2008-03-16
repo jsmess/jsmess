@@ -580,9 +580,10 @@ INLINE void taitoic_drawscanline(
 
 static int has_write_handler(int cpunum, write16_machine_func handler)
 {
-	const address_map *map;
-	for (map = memory_get_map(cpunum, ADDRESS_SPACE_PROGRAM); map && !IS_AMENTRY_END(map); map++)
-		if (map->write.handler16 == handler)
+	const address_map *map = memory_get_address_map(cpunum, ADDRESS_SPACE_PROGRAM);
+	const address_map_entry *entry;
+	for (entry = map->entrylist; entry != NULL; entry = entry->next)
+		if (entry->write.mhandler16 == handler)
 			return 1;
 
 	return 0;
@@ -1984,7 +1985,7 @@ static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, bitmap_t *bitma
 			sx, sy,
 			zx, 0, 0, zy,
 			0,					/* why no wraparound ?? */
-			&machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_PEN, 0, priority);
 	}
 }
@@ -2288,9 +2289,13 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 
 	for (i = 0;i < chips;i++)
 	{
-		int has_separate_screen = (device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, i) != NULL);
+		const device_config *screen;
 		int xd,yd;
 		TC0100SCN_dblwidth[i]=0;
+
+		screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, i);
+		if (screen == NULL)
+			screen = machine->primary_screen;
 
 		/* Single width versions */
 		TC0100SCN_tilemap[i][0][0] = tilemap_create(TC0100SCN_get_tile_info[i][0],tilemap_scan_rows,8,8,64,64);
@@ -2307,7 +2312,7 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
            Thundfox is the only one of those with two chips, and
            we're safe as it uses single width tilemaps. */
 
-		myclip = machine->screen[has_separate_screen ? i : 0].visarea;
+		myclip = *video_screen_get_visible_area(screen);
 
 		TC0100SCN_cliprect[i] = myclip;
 

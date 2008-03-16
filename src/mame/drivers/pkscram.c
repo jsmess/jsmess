@@ -95,7 +95,7 @@ static WRITE16_HANDLER( pkscramble_output_w )
 }
 
 static ADDRESS_MAP_START( pkscramble_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(19) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x041000, 0x043fff) AM_RAM // main ram
@@ -212,14 +212,14 @@ static TIMER_CALLBACK( scanline_callback )
 	{
     	if (out&0x2000)
     		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
-		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, param+1, 0), param+1);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, param+1, 0), param+1);
 		interrupt_line_active = 1;
 	}
 	else
 	{
 		if (interrupt_line_active)
 	    	cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
-		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
 		interrupt_line_active = 0;
 	}
 }
@@ -275,7 +275,7 @@ static MACHINE_RESET( pkscramble)
 	out = 0;
 	interrupt_line_active=0;
 	scanline_timer = timer_alloc(scanline_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
 
 	state_save_register_global(out);
 	state_save_register_global(interrupt_line_active);

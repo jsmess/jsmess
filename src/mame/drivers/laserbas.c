@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( laserbas_memory, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laserbas_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_WRITE(vrambank_w)
 	AM_RANGE(0x20, 0x20) AM_READ(read_unk) AM_WRITENOP//write = ram/rom bank ? at fc00-f800 ?
 	AM_RANGE(0x21, 0x21) AM_READ(input_port_0_r)
@@ -121,7 +121,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( laserbas_interrupt )
 {
-	if(video_screen_get_vblank(0))
+	if(video_screen_get_vblank(machine->primary_screen))
 		 cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	else
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);

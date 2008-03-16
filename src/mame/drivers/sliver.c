@@ -394,7 +394,7 @@ static ADDRESS_MAP_START( sliver_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(sliver_RAMDAC_offset_w)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(sliver_RAMDAC_color_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(MWA16_NOP)//RAMDAC
+	AM_RANGE(0x100004, 0x100005) AM_WRITE(SMH_NOP)//RAMDAC
 
 	AM_RANGE(0x300002, 0x300003) AM_NOP // bit 0 tested, writes 0xe0 and 0xc0 - both r and w at the end of interrupt code
 
@@ -441,8 +441,8 @@ ADDRESS_MAP_END
 
 static VIDEO_START(sliver)
 {
-	sliver_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	sliver_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	sliver_bitmap_bg = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	sliver_bitmap_fg = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 static VIDEO_UPDATE(sliver)

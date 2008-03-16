@@ -83,7 +83,6 @@
 #define AUDIO_CPU_2_CLOCK		(AUDIO_2_MASTER_CLOCK)
 
 
-static mc6845_t *mc6845;
 static UINT8 *nyny_videoram_1;
 static UINT8 *nyny_videoram_2;
 static UINT8 *nyny_colorram_1;
@@ -404,7 +403,7 @@ static MC6845_ON_DE_CHANGED( display_enable_changed )
 
 static const mc6845_interface mc6845_intf =
 {
-	0,						/* screen we are acting on */
+	"main",					/* screen we are acting on */
 	CRTC_CLOCK, 			/* the clock (pin 21) of the chip */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
@@ -416,14 +415,9 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static VIDEO_START( nyny )
-{
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-}
-
-
 static VIDEO_UPDATE( nyny )
 {
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -455,7 +449,7 @@ static WRITE8_HANDLER( nyny_ay8910_37_port_a_w )
 {
 	/* not sure what this does */
 
-	/*logerror("%x PORT A write %x at  Y=%x X=%x\n", safe_activecpu_get_pc(), data, video_screen_get_vpos(0),  video_screen_get_hpos(0));*/
+	/*logerror("%x PORT A write %x at  Y=%x X=%x\n", safe_activecpu_get_pc(), data, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));*/
 }
 
 
@@ -541,7 +535,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nyny_audio_1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READWRITE(soundlatch_r, audio_1_answer_w)
@@ -558,7 +552,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nyny_audio_2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_r)
@@ -680,7 +674,6 @@ static MACHINE_DRIVER_START( nyny )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_VIDEO_START(nyny)
 	MDRV_VIDEO_UPDATE(nyny)
 
 	MDRV_SCREEN_ADD("main", RASTER)

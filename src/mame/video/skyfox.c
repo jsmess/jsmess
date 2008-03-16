@@ -168,8 +168,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	int offs;
 
-	int width	=	machine->screen[0].width;
-	int height	=	machine->screen[0].height;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
 	int shift	=	(skyfox_bg_ctrl & 0x80) ? (4-1) : 4;
@@ -289,6 +289,6 @@ VIDEO_UPDATE( skyfox )
 {
 	fillbitmap(bitmap,255,cliprect);	// the bg is black
 	draw_background(bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

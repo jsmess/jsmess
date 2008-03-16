@@ -41,7 +41,6 @@
 
 #ifdef MESS
 #include "menu.h"
-#include "deprecat.h"
 #endif /* MESS */
 
 extern int drawnone_init(win_draw_callbacks *callbacks);

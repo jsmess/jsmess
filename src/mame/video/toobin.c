@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "toobin.h"
 
@@ -128,11 +127,11 @@ WRITE16_HANDLER( toobin_paletteram_w )
 		if (green) green += 38;
 		if (blue) blue += 38;
 
-		palette_set_color(Machine, offset & 0x3ff, MAKE_RGB(red, green, blue));
+		palette_set_color(machine, offset & 0x3ff, MAKE_RGB(red, green, blue));
 		if (!(newword & 0x8000))
-			palette_set_brightness(Machine, offset & 0x3ff, brightness);
+			palette_set_brightness(machine, offset & 0x3ff, brightness);
 		else
-			palette_set_brightness(Machine, offset & 0x3ff, 1.0);
+			palette_set_brightness(machine, offset & 0x3ff, 1.0);
 	}
 }
 
@@ -147,7 +146,7 @@ WRITE16_HANDLER( toobin_intensity_w )
 
 		for (i = 0; i < 0x400; i++)
 			if (!(paletteram16[i] & 0x8000))
-				palette_set_brightness(Machine, i, brightness);
+				palette_set_brightness(machine, i, brightness);
 	}
 }
 
@@ -167,7 +166,7 @@ WRITE16_HANDLER( toobin_xscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	tilemap_set_scrollx(atarigen_playfield_tilemap, 0, newscroll >> 6);
@@ -186,7 +185,7 @@ WRITE16_HANDLER( toobin_yscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	tilemap_set_scrolly(atarigen_playfield_tilemap, 0, newscroll >> 6);
@@ -212,7 +211,7 @@ WRITE16_HANDLER( toobin_slip_w )
 
 	/* if the SLIP is changing, force a partial update first */
 	if (oldslip != newslip)
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* update the data */
 	atarimo_0_slipram_w(machine, offset, data, mem_mask);
@@ -240,7 +239,7 @@ VIDEO_UPDATE( toobin )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 3, 3);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
+	mobitmap = atarimo_render(screen->machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{

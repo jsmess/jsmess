@@ -62,7 +62,7 @@ static VIDEO_UPDATE(chinsan)
 			int tileno,colour;
 			tileno = chinsan_video[count] | (chinsan_video[count+0x800]<<8);
 			colour = chinsan_video[count+0x1000]>>3;
-			drawgfx(bitmap,machine->gfx[0],tileno,colour,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tileno,colour,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count++;
 		}
 	}
@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( chinsan_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinsan_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(chinsan_port00_w)
 	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)

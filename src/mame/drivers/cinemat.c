@@ -268,8 +268,8 @@ static READ8_HANDLER( boxingb_dial_r )
 
 static READ8_HANDLER( qb3_frame_r )
 {
-	attotime next_update = video_screen_get_time_until_update(0);
-	attotime frame_period = video_screen_get_frame_period(0);
+	attotime next_update = video_screen_get_time_until_update(machine->primary_screen);
+	attotime frame_period = video_screen_get_frame_period(machine->primary_screen);
 	int percent = next_update.attoseconds / (frame_period.attoseconds / 100);
 
 	/* note this is just an approximation... */
@@ -291,23 +291,23 @@ static WRITE8_HANDLER( qb3_ram_bank_w )
  *************************************/
 
 static ADDRESS_MAP_START( program_map_4k, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS(AMEF_ABITS(12))
+	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( program_map_8k, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS(AMEF_ABITS(14))
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x1000) AM_ROM AM_REGION(REGION_CPU1, 0x1000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( program_map_16k, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS(AMEF_ABITS(14))
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( program_map_32k, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS(AMEF_ABITS(15))
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -962,15 +962,13 @@ INPUT_PORTS_END
 static const struct CCPUConfig config_nojmi =
 {
 	joystick_read,
-	cinemat_vector_callback,
-	0
+	cinemat_vector_callback
 };
 
 static const struct CCPUConfig config_jmi =
 {
 	NULL,
-	cinemat_vector_callback,
-	0
+	cinemat_vector_callback
 };
 
 

@@ -111,13 +111,13 @@ Interrupts:
 
 
 static ADDRESS_MAP_START( primoa_port, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x3f ) AM_READWRITE( primo_be_1_r, primo_ki_1_w )
 	AM_RANGE( 0xfd, 0xfd ) AM_WRITE( primo_FD_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( primob_port, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x3f ) AM_READWRITE( primo_be_1_r, primo_ki_1_w )
 	AM_RANGE( 0x40, 0x7f ) AM_READWRITE( primo_be_2_r, primo_ki_2_w )
 	AM_RANGE( 0xfd, 0xfd ) AM_WRITE( primo_FD_w )

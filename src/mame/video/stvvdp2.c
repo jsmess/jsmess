@@ -4819,9 +4819,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine *machine, bitmap_t *bi
 	else
 	{
 		if ( stv_vdp2_roz_bitmap[iRP-1] == NULL )
-		{
-			stv_vdp2_roz_bitmap[iRP-1] = auto_bitmap_alloc( 4096, 4096, machine->screen[0].format );
-		}
+			stv_vdp2_roz_bitmap[iRP-1] = auto_bitmap_alloc(4096, 4096, video_screen_get_format(machine->primary_screen));
 
 		roz_clip_rect.min_x = roz_clip_rect.min_y = 0;
 		if ( (iRP == 1 && STV_VDP2_RAOVR == 3) ||
@@ -5232,7 +5230,7 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 		case 0x8/4:
 		/*H/V Counter Register*/
 								     /*H-Counter                               V-Counter                                         */
-			stv_vdp2_regs[offset] = (((Machine->screen[0].visarea.max_x - 1)<<16)&0x3ff0000)|(((Machine->screen[0].visarea.max_y - 1)<<0)& ((STV_VDP2_LSMD == 3) ? 0x7ff : 0x3ff));
+			stv_vdp2_regs[offset] = (((video_screen_get_visible_area(machine->primary_screen)->max_x - 1)<<16)&0x3ff0000)|(((video_screen_get_visible_area(machine->primary_screen)->max_y - 1)<<0)& ((STV_VDP2_LSMD == 3) ? 0x7ff : 0x3ff));
 			if(LOG_VDP2) logerror("CPU #%d PC(%08x) = VDP2: H/V counter read : %08x\n",cpu_getactivecpu(),activecpu_get_pc(),stv_vdp2_regs[offset]);
 			stv_vdp2_regs[offset] = 0;
 		break;
@@ -5338,7 +5336,7 @@ static void stv_vdp2_dynamic_res_change()
 		case 7: horz = 704; vert = 480; break;
 	}
 
-	video_screen_set_visarea(0, 0*8, horz-1,0*8, vert-1);
+	video_screen_set_visarea(Machine->primary_screen, 0*8, horz-1,0*8, vert-1);
 	//if(LOG_VDP2) popmessage("%04d %04d",horz-1,vert-1);
 }
 
@@ -6074,11 +6072,11 @@ VIDEO_UPDATE( stv_vdp2 )
 
 	stv_vdp2_dynamic_res_change();
 
-	video_update_vdp1(machine);
+	video_update_vdp1(screen->machine);
 
-	stv_vdp2_fade_effects(machine);
+	stv_vdp2_fade_effects(screen->machine);
 
-	stv_vdp2_draw_back(machine, bitmap,cliprect);
+	stv_vdp2_draw_back(screen->machine, bitmap,cliprect);
 
 	#ifdef MAME_DEBUG
 	if(input_code_pressed_once(KEYCODE_T))
@@ -6122,12 +6120,12 @@ VIDEO_UPDATE( stv_vdp2 )
 		/*If a plane has a priority value of zero it isn't shown at all.*/
 		for(pri=1;pri<8;pri++)
 		{
-			if (debug.l_en & 1)    {if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(machine, bitmap,cliprect);}
-			if (debug.l_en & 2)    {if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(machine, bitmap,cliprect);}
-			if (debug.l_en & 4)    {if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(machine, bitmap,cliprect);}
-			if (debug.l_en & 8)    {if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(machine, bitmap,cliprect);}
-			if (debug.l_en & 0x10) {if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(machine, bitmap,cliprect);}
-			if (debug.l_en & 0x20) {draw_sprites(machine,bitmap,cliprect,pri);}
+			if (debug.l_en & 1)    {if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 2)    {if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 4)    {if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 8)    {if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 0x10) {if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 0x20) {draw_sprites(screen->machine,bitmap,cliprect,pri);}
 		}
 	}
 
@@ -6155,41 +6153,41 @@ VIDEO_UPDATE( stv_vdp2 )
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			decodechar(machine->gfx[0], tilecode,  stv_vdp2_gfx_decode);
+			decodechar(screen->machine->gfx[0], tilecode,  stv_vdp2_gfx_decode);
 		}
 
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			decodechar(machine->gfx[1], tilecode,  stv_vdp2_gfx_decode);
+			decodechar(screen->machine->gfx[1], tilecode,  stv_vdp2_gfx_decode);
 		}
 
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			decodechar(machine->gfx[2], tilecode,  stv_vdp2_gfx_decode);
+			decodechar(screen->machine->gfx[2], tilecode,  stv_vdp2_gfx_decode);
 		}
 
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			decodechar(machine->gfx[3], tilecode, stv_vdp2_gfx_decode);
+			decodechar(screen->machine->gfx[3], tilecode, stv_vdp2_gfx_decode);
 		}
 
 		/* vdp 1 ... doesn't have to be tile based */
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			decodechar(machine->gfx[4], tilecode,  stv_vdp1_gfx_decode);
+			decodechar(screen->machine->gfx[4], tilecode,  stv_vdp1_gfx_decode);
 		}
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			decodechar(machine->gfx[5], tilecode,  stv_vdp1_gfx_decode);
+			decodechar(screen->machine->gfx[5], tilecode,  stv_vdp1_gfx_decode);
 		}
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			decodechar(machine->gfx[6], tilecode,  stv_vdp1_gfx_decode);
+			decodechar(screen->machine->gfx[6], tilecode,  stv_vdp1_gfx_decode);
 		}
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			decodechar(machine->gfx[7], tilecode,  stv_vdp1_gfx_decode);
+			decodechar(screen->machine->gfx[7], tilecode,  stv_vdp1_gfx_decode);
 		}
 	}
 

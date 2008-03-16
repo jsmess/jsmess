@@ -119,15 +119,15 @@ static TIMER_CALLBACK( irq_timer )
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		timer_set(video_screen_get_time_until_pos(0, 64, 0), NULL, 64, irq_timer);
+		timer_set(video_screen_get_time_until_pos(machine->primary_screen, 64, 0), NULL, 64, irq_timer);
 	else
-		timer_set(video_screen_get_time_until_pos(0, param + 64, 0), NULL, param + 64, irq_timer);
+		timer_set(video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), NULL, param + 64, irq_timer);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(video_screen_get_time_until_pos(0, param, BALSENTE_HBSTART), NULL, 0, irq_off);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
 }
 
 
@@ -140,21 +140,21 @@ static TIMER_CALLBACK( firq_off )
 static TIMER_CALLBACK( firq_timer )
 {
 	/* same time next frame */
-	timer_set(video_screen_get_time_until_pos(0, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
 	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(video_screen_get_time_until_pos(0, FIRQ_SCANLINE, BALSENTE_HBSTART), NULL, 0, firq_off);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, BALSENTE_HBSTART), NULL, 0, firq_off);
 }
 
 
 static MACHINE_RESET( gridlee )
 {
 	/* start timers to generate interrupts */
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, irq_timer);
-	timer_set(video_screen_get_time_until_pos(0, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, irq_timer);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
 
 	/* create the polynomial tables */
 	poly17_init();
@@ -298,20 +298,20 @@ static WRITE8_HANDLER( gridlee_coin_counter_w )
 
 /* CPU 1 read addresses */
 static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
 	AM_RANGE(0x9502, 0x9502) AM_READ(input_port_4_r)
 	AM_RANGE(0x9503, 0x9503) AM_READ(input_port_5_r)
 	AM_RANGE(0x9600, 0x9600) AM_READ(input_port_6_r)
 	AM_RANGE(0x9700, 0x9700) AM_READ(input_port_7_r)
 	AM_RANGE(0x9820, 0x9820) AM_READ(random_num_r)
-	AM_RANGE(0x9c00, 0x9cff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x9c00, 0x9cff) AM_READ(SMH_RAM)
+	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
+	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
 	AM_RANGE(0x0800, 0x7fff) AM_WRITE(gridlee_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(led_0_w)
 	AM_RANGE(0x9010, 0x9010) AM_WRITE(led_1_w)
@@ -320,10 +320,10 @@ static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9070, 0x9070) AM_WRITE(gridlee_cocktail_flip_w)
 	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
 	AM_RANGE(0x9380, 0x9380) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x9700, 0x9700) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x9700, 0x9700) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x9828, 0x993f) AM_WRITE(gridlee_sound_w)
-	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xa000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

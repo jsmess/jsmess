@@ -466,6 +466,7 @@ VIDEO_UPDATE( apple2 )
 {
 	int page;
 	UINT32 new_a2;
+	running_machine *machine = screen->machine;
 
 	/* calculate the flash value */
 	flash = (attotime_mul(timer_get_time(), 4).seconds & 1) ? 1 : 0;

@@ -682,7 +682,7 @@ VIDEO_UPDATE( mrokumei )
 	/* blank screen */
 	if (homedata_vreg[0x3] == 0xc1 && homedata_vreg[0x4] == 0xc0 && homedata_vreg[0x5] == 0xff)
 	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 		return 0;
 	}
 
@@ -709,7 +709,7 @@ VIDEO_UPDATE( mrokumei )
 			width = 54;
 			break;
 	}
-	video_screen_set_visarea(0, 0*8, width*8-1, 2*8, 30*8-1);
+	video_screen_set_visarea(screen, 0*8, width*8-1, 2*8, 30*8-1);
 
 	tilemap_set_scrollx(bg_tilemap[homedata_visible_page][0],0,homedata_vreg[0xc] << 1);
 
@@ -744,7 +744,7 @@ VIDEO_UPDATE( reikaids )
     }
 
 
-    fillbitmap(bitmap,get_black_pen(machine),cliprect);
+    fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
     pri = (blitter_bank & 0x70) >> 4;
     for (i = 0;i < 4;i++)
@@ -790,7 +790,7 @@ VIDEO_UPDATE( reikaids )
 	}
 
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	pri = (blitter_bank & 0x70) >> 4;
 	for (i = 0;i < 4;i++)
@@ -807,7 +807,7 @@ VIDEO_UPDATE( pteacher )
 	/* blank screen */
 	if (homedata_vreg[0x3] == 0xc1 && homedata_vreg[0x4] == 0xc0 && homedata_vreg[0x5] == 0xff)
 	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 		return 0;
 	}
 
@@ -847,24 +847,24 @@ VIDEO_UPDATE( pteacher )
 		if (homedata_vreg[0x4] == 0xae || homedata_vreg[0x4] == 0xb8)
 		{
 			/* kludge for mjkinjas */
-			video_screen_set_visarea(0, 0*8, 42*8-1, 2*8, 30*8-1);
+			video_screen_set_visarea(screen, 0*8, 42*8-1, 2*8, 30*8-1);
 			scroll_low = 0;
 		}
 		else
 		{
 			if (homedata_vreg[0x3] == 0xa6)
-				video_screen_set_visarea(0, 0*8, 33*8-1, 2*8, 30*8-1);
+				video_screen_set_visarea(screen, 0*8, 33*8-1, 2*8, 30*8-1);
 			else
-				video_screen_set_visarea(0, 0*8, 35*8-1, 2*8, 30*8-1);
+				video_screen_set_visarea(screen, 0*8, 35*8-1, 2*8, 30*8-1);
 			scroll_low = (11 - (homedata_vreg[0x4] & 0x0f)) * 8 / 12;
 		}
 	}
 	else
 	{
 		if (homedata_vreg[0x3] == 0xa6)
-			video_screen_set_visarea(0, 0*8, 51*8-1, 2*8, 30*8-1);
+			video_screen_set_visarea(screen, 0*8, 51*8-1, 2*8, 30*8-1);
 		else
-			video_screen_set_visarea(0, 0*8, 54*8-1, 2*8, 30*8-1);
+			video_screen_set_visarea(screen, 0*8, 54*8-1, 2*8, 30*8-1);
 		scroll_low = 7 - (homedata_vreg[0x4] & 0x0f);
 	}
 	scroll_high = homedata_vreg[0xb] >> 2;

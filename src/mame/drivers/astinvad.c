@@ -186,7 +186,7 @@ static TIMER_CALLBACK( kamizake_int_gen )
 	/* interrupts are asserted on every state change of the 128V line */
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	param ^= 128;
-	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(0, param, 0), param);
+	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
 	timer_set(double_to_attotime(300 * 0.1e-6), NULL, 0, kamikaze_int_off);
@@ -197,7 +197,7 @@ static MACHINE_START( kamikaze )
 {
 	ppi8255_init(&ppi8255_intf);
 	int_timer = timer_alloc(kamizake_int_gen, NULL);
-	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(0, 128, 0), 128);
+	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, 128, 0), 128);
 }
 
 
@@ -315,7 +315,7 @@ static WRITE8_HANDLER( spaceint_sound2_w )
  *************************************/
 
 static ADDRESS_MAP_START( kamikaze_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
@@ -325,18 +325,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spaceint_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(MRA8_RAM, spaceint_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(SMH_RAM, spaceint_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( kamikaze_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(kamikaze_ppi_r, kamikaze_ppi_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spaceint_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(spaceint_sound1_w)

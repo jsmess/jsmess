@@ -207,13 +207,13 @@ static ADDRESS_MAP_START( sandscrp, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM		// RAM
 	AM_RANGE(0x200000, 0x20001f) AM_READWRITE(galpanib_calc_r,galpanib_calc_w)	// Protection
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(MRA16_RAM, kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)	// Layers 0 Regs
-	AM_RANGE(0x400000, 0x400fff) AM_READWRITE(MRA16_RAM, kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
-	AM_RANGE(0x401000, 0x401fff) AM_READWRITE(MRA16_RAM, kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
+	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(SMH_RAM, kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)	// Layers 0 Regs
+	AM_RANGE(0x400000, 0x400fff) AM_READWRITE(SMH_RAM, kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
+	AM_RANGE(0x401000, 0x401fff) AM_READWRITE(SMH_RAM, kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
 	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
 	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
 	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
-	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(MRA16_RAM, paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(SMH_RAM, paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(sandscrp_coin_counter_w)	// Coin Counters (Lockout unused)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(input_port_0_word_r)	// Inputs
 	AM_RANGE(0xb00002, 0xb00003) AM_READ(input_port_1_word_r)	//
@@ -264,12 +264,12 @@ static WRITE8_HANDLER( sandscrp_soundlatch_w )
 
 static ADDRESS_MAP_START( sandscrp_soundmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK1, MWA8_ROM)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)	// Banked ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM		// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sandscrp_soundport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sandscrp_bankswitch_w)	// ROM Bank
 	AM_RANGE(0x02, 0x02) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)	// YM2203
 	AM_RANGE(0x03, 0x03) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)		// PORTA/B read

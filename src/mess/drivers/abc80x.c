@@ -90,8 +90,6 @@
 #include "devices/cassette.h"
 #include "devices/printer.h"
 
-mc6845_t *abc800_mc6845;
-
 static emu_timer *abc800_ctc_timer;
 
 /* Read/Write Handlers */
@@ -161,7 +159,7 @@ static WRITE8_HANDLER( abc806_bankswitch_w )
 
 			if (bank < 7)
 			{
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end, 0, 0, MWA8_UNMAP);
+				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end, 0, 0, SMH_UNMAP);
 				logerror("ABC806 deallocating %04x-%04x back to ROM\n", bank_start, bank_end);
 			}
 			else
@@ -324,14 +322,15 @@ ADDRESS_MAP_END
 // ABC 800M
 
 static ADDRESS_MAP_START( abc800m_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
@@ -350,14 +349,16 @@ ADDRESS_MAP_END
 // ABC 800C
 
 static ADDRESS_MAP_START( abc800c_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x7800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc800c_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
@@ -376,14 +377,15 @@ ADDRESS_MAP_END
 // ABC 802
 
 static ADDRESS_MAP_START( abc802_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x77ff) AM_RAMBANK(1)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_WRITE(abcbus_command_w)
@@ -400,7 +402,7 @@ ADDRESS_MAP_END
 // ABC 806
 
 static ADDRESS_MAP_START( abc806_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK(2)
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK(3)
@@ -423,7 +425,7 @@ static ADDRESS_MAP_START( abc806_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff1f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
@@ -709,8 +711,6 @@ static MACHINE_START( abc800 )
 	z80ctc_init(0, &abc800_ctc_intf);
 	z80sio_init(0, &abc800_sio_intf);
 	z80dart_init(0, &abc800_dart_intf);
-
-	abc800_mc6845 = devtag_get_token(machine, MC6845, "crtc");
 }
 
 static MACHINE_START( abc802 )
@@ -734,24 +734,24 @@ static MACHINE_START( abc806 )
 
 	MACHINE_START_CALL(abc800);
 
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MRA8_BANK1, MWA8_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, MRA8_BANK2, MWA8_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, MRA8_BANK3, MWA8_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, MRA8_BANK4, MWA8_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4fff, 0, 0, MRA8_BANK5, MWA8_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5fff, 0, 0, MRA8_BANK6, MWA8_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_BANK7, MWA8_UNMAP);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK3, SMH_UNMAP);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK4, SMH_UNMAP);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4fff, 0, 0, SMH_BANK5, SMH_UNMAP);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5fff, 0, 0, SMH_BANK6, SMH_UNMAP);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, SMH_BANK7, SMH_UNMAP);
 
-//	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7fff, 0, 0, MRA8_BANK8, MWA8_BANK8);
+//	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7fff, 0, 0, SMH_BANK8, SMH_BANK8);
 
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, MRA8_BANK9, MWA8_BANK9);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9fff, 0, 0, MRA8_BANK10, MWA8_BANK10);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, MRA8_BANK11, MWA8_BANK11);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, 0, 0, MRA8_BANK12, MWA8_BANK12);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, MRA8_BANK13, MWA8_BANK13);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MRA8_BANK14, MWA8_BANK14);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, MRA8_BANK15, MWA8_BANK15);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, MRA8_BANK16, MWA8_BANK16);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, SMH_BANK9, SMH_BANK9);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9fff, 0, 0, SMH_BANK10, SMH_BANK10);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, SMH_BANK11, SMH_BANK11);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, 0, 0, SMH_BANK12, SMH_BANK12);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK13, SMH_BANK13);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK14, SMH_BANK14);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_BANK15, SMH_BANK15);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, SMH_BANK16, SMH_BANK16);
 
 	for (bank = 1; bank < 17; bank++)
 	{

@@ -408,12 +408,13 @@ static void vdc8563_monotext_screenrefresh (running_machine *machine, bitmap_t *
 	int w=CRTC6845_CHAR_COLUMNS;
 	int h=CRTC6845_CHAR_LINES;
 	int height=CRTC6845_CHAR_HEIGHT;
+	const device_config *screen = video_screen_first(machine->config);
 
-	rect.min_x=machine->screen[0].visarea.min_x;
-	rect.max_x=machine->screen[0].visarea.max_x;
-	if (full_refresh) {
+	rect.min_x = video_screen_get_visible_area(screen)->min_x;
+	rect.max_x = video_screen_get_visible_area(screen)->max_x;
+
+	if (full_refresh)
 		memset(vdc.dirty+vdc.videoram_start, 1, vdc.videoram_size);
-	}
 
 	for (y=0, rect.min_y=height, rect.max_y=rect.min_y+height-1,
 			 i=vdc.videoram_start&vdc.mask; y<h;
@@ -448,12 +449,13 @@ static void vdc8563_text_screenrefresh (running_machine *machine, bitmap_t *bitm
 	int w=CRTC6845_CHAR_COLUMNS;
 	int h=CRTC6845_CHAR_LINES;
 	int height=CRTC6845_CHAR_HEIGHT;
+	const device_config *screen = video_screen_first(machine->config);
 
-	rect.min_x=machine->screen[0].visarea.min_x;
-	rect.max_x=machine->screen[0].visarea.max_x;
-	if (full_refresh) {
+	rect.min_x = video_screen_get_visible_area(screen)->min_x;
+	rect.max_x = video_screen_get_visible_area(screen)->max_x;
+
+	if (full_refresh)
 		memset(vdc.dirty+vdc.videoram_start, 1, vdc.videoram_size);
-	}
 
 	for (y=0, rect.min_y=height, rect.max_y=rect.min_y+height-1,
 			 i=vdc.videoram_start&vdc.mask, j=vdc.colorram_start&vdc.mask; y<h;
@@ -508,12 +510,13 @@ static void vdc8563_graphic_screenrefresh (running_machine *machine, bitmap_t *b
 	int w=CRTC6845_CHAR_COLUMNS;
 	int h=CRTC6845_CHAR_LINES;
 	int height=CRTC6845_CHAR_HEIGHT;
+	const device_config *screen = video_screen_first(machine->config);
 
-	rect.min_x=machine->screen[0].visarea.min_x;
-	rect.max_x=machine->screen[0].visarea.max_x;
-	if (full_refresh) {
+	rect.min_x = video_screen_get_visible_area(screen)->min_x;
+	rect.max_x = video_screen_get_visible_area(screen)->max_x;
+
+	if (full_refresh)
 		memset(vdc.dirty, 1, vdc.mask+1);
-	}
 
 	for (y=0, rect.min_y=height, rect.max_y=rect.min_y+height-1,
 			 i=vdc.videoram_start&vdc.mask; y<h;
@@ -543,32 +546,39 @@ VIDEO_UPDATE( vdc8563 )
 	vdc8563_time();
 
 	full_refresh|=vdc.changed;
-	if (GRAPHIC) { vdc8563_graphic_screenrefresh(machine, bitmap, full_refresh);
-	} else {
-		for (i=0; i<512; i++) {
-			if (full_refresh||vdc.fontdirty[i]) {
-				decodechar(machine->gfx[0],i,vdc.ram+(vdc.fontram_start&vdc.mask));
+	if (GRAPHIC)
+	{
+		vdc8563_graphic_screenrefresh(screen->machine, bitmap, full_refresh);
+	}
+	else
+	{
+		for (i=0; i<512; i++)
+		{
+			if (full_refresh||vdc.fontdirty[i])
+			{
+				decodechar(screen->machine->gfx[0],i,vdc.ram+(vdc.fontram_start&vdc.mask));
 				vdc.fontdirty[i]=0;
 			}
 		}
-		if (TEXT) vdc8563_text_screenrefresh(machine, bitmap, full_refresh);
-		else vdc8563_monotext_screenrefresh(machine, bitmap, full_refresh);
+		if (TEXT) vdc8563_text_screenrefresh(screen->machine, bitmap, full_refresh);
+		else vdc8563_monotext_screenrefresh(screen->machine, bitmap, full_refresh);
 	}
 
-	if (full_refresh) {
+	if (full_refresh)
+	{
 		int w=CRTC6845_CHAR_COLUMNS;
 		int h=CRTC6845_CHAR_LINES;
 		int height=CRTC6845_CHAR_HEIGHT;
 
-		plot_box(bitmap, 0, 0, machine->gfx[0]->width*(w+2), height, machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, 0, 0, screen->machine->gfx[0]->width*(w+2), height, screen->machine->pens[FRAMECOLOR]);
 
-		plot_box(bitmap, 0, height, machine->gfx[0]->width, height*h, machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, 0, height, screen->machine->gfx[0]->width, height*h, screen->machine->pens[FRAMECOLOR]);
 
-		plot_box(bitmap, machine->gfx[0]->width*(w+1), height, machine->gfx[0]->width, height*h,
-				 machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, screen->machine->gfx[0]->width*(w+1), height, screen->machine->gfx[0]->width, height*h,
+				 screen->machine->pens[FRAMECOLOR]);
 
-		plot_box(bitmap, 0, height*(h+1), machine->gfx[0]->width*(w+2), height,
-				 machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, 0, height*(h+1), screen->machine->gfx[0]->width*(w+2), height,
+				 screen->machine->pens[FRAMECOLOR]);
 	}
 
 	vdc.changed=0;

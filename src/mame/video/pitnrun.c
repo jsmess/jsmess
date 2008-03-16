@@ -180,10 +180,10 @@ VIDEO_START(pitnrun)
 	fg = tilemap_create( get_tile_info1,tilemap_scan_rows,8,8,32,32 );
 	bg = tilemap_create( get_tile_info2,tilemap_scan_rows,8,8,32*4,32 );
 	tilemap_set_transparent_pen( fg, 0 );
-	tmp_bitmap[0] = auto_bitmap_alloc(128,128,machine->screen[0].format);
-	tmp_bitmap[1] = auto_bitmap_alloc(128,128,machine->screen[0].format);
-	tmp_bitmap[2] = auto_bitmap_alloc(128,128,machine->screen[0].format);
-	tmp_bitmap[3] = auto_bitmap_alloc(128,128,machine->screen[0].format);
+	tmp_bitmap[0] = auto_bitmap_alloc(128,128,video_screen_get_format(machine->primary_screen));
+	tmp_bitmap[1] = auto_bitmap_alloc(128,128,video_screen_get_format(machine->primary_screen));
+	tmp_bitmap[2] = auto_bitmap_alloc(128,128,video_screen_get_format(machine->primary_screen));
+	tmp_bitmap[3] = auto_bitmap_alloc(128,128,video_screen_get_format(machine->primary_screen));
 	pitnrun_spotlights();
 }
 
@@ -277,7 +277,7 @@ VIDEO_UPDATE( pitnrun )
 		tilemap_draw(bitmap,&myclip,bg, 0,0);
 	}
 
-	draw_sprites(machine,bitmap,&myclip);
+	draw_sprites(screen->machine,bitmap,&myclip);
 
 	if(pitnrun_ha&4)
 		copybitmap_trans(bitmap,tmp_bitmap[pitnrun_ha&3],flip_screen_x_get(),flip_screen_y_get(),dx,dy,&myclip, 1);

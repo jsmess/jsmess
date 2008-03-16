@@ -208,8 +208,8 @@ static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const
 	int i;
 	int mx = 0;	// multisprite x counter
 
-	int max_x	=	machine->screen[0].width	- 8;
-	int max_y	=	machine->screen[0].height - 8;
+	int max_x = video_screen_get_width(machine->primary_screen) - 8;
+	int max_y = video_screen_get_height(machine->primary_screen) - 8;
 
 	for (i = 0x1d00; i < 0x2000; i += 4)
 	{
@@ -338,8 +338,8 @@ static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const r
 {
 	int i;
 
-	int max_x	=	machine->screen[0].width	- 8;
-	int max_y	=	machine->screen[0].height - 8;
+	int max_x = video_screen_get_width(machine->primary_screen) - 8;
+	int max_y = video_screen_get_height(machine->primary_screen) - 8;
 
 	/* Earlier games only */
 	if (!(suna8_text_dim > 0))	return;
@@ -443,8 +443,8 @@ VIDEO_UPDATE( suna8 )
 #endif
 #endif
 	{
-		draw_normal_sprites(machine ,bitmap,cliprect);
-		draw_text_sprites(machine, bitmap,cliprect);
+		draw_normal_sprites(screen->machine ,bitmap,cliprect);
+		draw_text_sprites(screen->machine, bitmap,cliprect);
 	}
 	return 0;
 }

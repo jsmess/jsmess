@@ -25,22 +25,22 @@ static UINT16* go2000_video2;
 
 
 static ADDRESS_MAP_START( go2000_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x200000, 0x203fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x600000, 0x60ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x610000, 0x61ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x800000, 0x800fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x200000, 0x203fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x600000, 0x60ffff) AM_READ(SMH_RAM)
+	AM_RANGE(0x610000, 0x61ffff) AM_READ(SMH_RAM)
+	AM_RANGE(0x800000, 0x800fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(input_port_1_word_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( go2000_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x200000, 0x203fff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x600000, 0x603fff) AM_WRITE(MWA16_RAM) AM_BASE(&go2000_video)
-	AM_RANGE(0x604000, 0x60ffff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x610000, 0x613fff) AM_WRITE(MWA16_RAM) AM_BASE(&go2000_video2)
-	AM_RANGE(0x614000, 0x61ffff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x200000, 0x203fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x600000, 0x603fff) AM_WRITE(SMH_RAM) AM_BASE(&go2000_video)
+	AM_RANGE(0x604000, 0x60ffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x610000, 0x613fff) AM_WRITE(SMH_RAM) AM_BASE(&go2000_video2)
+	AM_RANGE(0x614000, 0x61ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x800000, 0x800fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 ADDRESS_MAP_END
 
@@ -143,7 +143,7 @@ static VIDEO_UPDATE(go2000)
 		{
 			int tile = go2000_video[count];
 			int attr = go2000_video2[count];
-			drawgfx(bitmap,machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count++;
 		}
 	}
@@ -155,7 +155,7 @@ static VIDEO_UPDATE(go2000)
 		{
 			int tile = go2000_video[count];
 			int attr = go2000_video2[count];
-			drawgfx(bitmap,machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
 			count++;
 		}
 	}

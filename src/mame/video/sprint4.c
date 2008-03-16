@@ -53,9 +53,9 @@ static TILE_GET_INFO( sprint4_tile_info )
 
 VIDEO_START( sprint4 )
 {
-	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	playfield = tilemap_create(sprint4_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	playfield = tilemap_create(sprint4_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -77,7 +77,7 @@ VIDEO_UPDATE( sprint4 )
 		if (i & 1)
 			bank = 32;
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx(bitmap, screen->machine->gfx[1],
 			(code >> 3) | bank,
 			(attr & 0x80) ? 4 : i,
 			0, 0,
@@ -113,7 +113,7 @@ VIDEO_EOF( sprint4 )
 		rect.max_x = horz - 15 + machine->gfx[1]->width - 1;
 		rect.max_y = vert - 15 + machine->gfx[1]->height - 1;
 
-		sect_rect(&rect, &machine->screen[0].visarea);
+		sect_rect(&rect, video_screen_get_visible_area(machine->primary_screen));
 
 		tilemap_draw(helper, &rect, playfield, 0, 0);
 

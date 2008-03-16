@@ -52,9 +52,9 @@ static TILE_GET_INFO( ultratnk_tile_info )
 
 VIDEO_START( ultratnk )
 {
-	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	playfield = tilemap_create(ultratnk_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	playfield = tilemap_create(ultratnk_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -78,7 +78,7 @@ VIDEO_UPDATE( ultratnk )
 
 		if (!(attr & 0x80))
 		{
-			drawgfx(bitmap, machine->gfx[1],
+			drawgfx(bitmap, screen->machine->gfx[1],
 				(code >> 3) | bank,
 				i,
 				0, 0,
@@ -117,7 +117,7 @@ VIDEO_EOF( ultratnk )
 		rect.max_x = horz - 15 + machine->gfx[1]->width - 1;
 		rect.max_y = vert - 15 + machine->gfx[1]->height - 1;
 
-		sect_rect(&rect, &machine->screen[0].visarea);
+		sect_rect(&rect, video_screen_get_visible_area(machine->primary_screen));
 
 		tilemap_draw(helper, &rect, playfield, 0, 0);
 

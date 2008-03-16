@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&clayshoo_videoram) AM_SIZE(&clayshoo_videoram_size)	/* 6k of video ram according to readme */
-	AM_RANGE(0x9800, 0xa800) AM_WRITE(MWA8_NOP)	  /* not really mapped, but cleared */
+	AM_RANGE(0x9800, 0xa800) AM_WRITE(SMH_NOP)	  /* not really mapped, but cleared */
 	AM_RANGE(0xc800, 0xc800) AM_READWRITE(analog_r, analog_reset_w)
 ADDRESS_MAP_END
 
@@ -214,7 +214,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x20, 0x23) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
 	AM_RANGE(0x30, 0x33) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)

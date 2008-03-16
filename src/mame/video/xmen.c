@@ -124,7 +124,7 @@ VIDEO_UPDATE( xmen )
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);
 
 	pdrawgfx_shadow_lowpri = 1;	/* fix shadows of boulders in front of feet */
-	K053247_sprites_draw(machine, bitmap,cliprect);
+	K053247_sprites_draw(screen->machine, bitmap,cliprect);
 	return 0;
 }
 
@@ -140,25 +140,29 @@ extern WRITE8_HANDLER( K052109_w );
 VIDEO_UPDATE( xmen6p )
 {
 	int x,y;
- /* update every other frame ...help prevent screens lagging (although it still does..)..
-     but maybe the hw has its own buffering hence the extra ram */
-//  if (xmen_current_frame&0x8000) /* actually don't bother */
-	{
 
+ 	const device_config *left_screen   = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	if (screen == left_screen)
 		for(y=0;y<32*8;y++)
 		{
 			UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
-			UINT16* line_src;
-
-			if (screen==0) line_src = BITMAP_ADDR16(screen_left, y, 0);
-			else line_src = BITMAP_ADDR16(screen_right, y, 0);
+			UINT16* line_src = BITMAP_ADDR16(screen_left, y, 0);
 
 			for (x=12*8;x<52*8;x++)
-			{
 				line_dest[x] = line_src[x];
-			}
 		}
-	}
+	else if (screen == right_screen)
+		for(y=0;y<32*8;y++)
+		{
+			UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
+			UINT16* line_src = BITMAP_ADDR16(screen_right, y, 0);
+
+			for (x=12*8;x<52*8;x++)
+				line_dest[x] = line_src[x];
+		}
+
 	return 0;
 }
 
@@ -172,10 +176,11 @@ VIDEO_EOF( xmen6p )
 
 	xmen_current_frame ^=0x8000;
 
-//  cliprect.min_x = machine->screen[0].visarea.min_x;
-//  cliprect.max_x = machine->screen[0].visarea.max_x;
-//  cliprect.min_y = machine->screen[0].visarea.min_y;
-//  cliprect.max_y = machine->screen[0].visarea.max_y;
+//  const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+//  cliprect.min_x = visarea->min_x;
+//  cliprect.max_x = visarea->max_x;
+//  cliprect.min_y = visarea->min_y;
+//  cliprect.max_y = visarea->max_y;
 
 	cliprect.min_x = 0;
 	cliprect.max_x = 64*8-1;

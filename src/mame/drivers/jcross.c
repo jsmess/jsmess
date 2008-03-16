@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP
 ADDRESS_MAP_END
 
@@ -116,8 +116,8 @@ static ADDRESS_MAP_START( cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd600, 0xd600) AM_WRITE(jcross_vregs3_w)
 	AM_RANGE(0xd700, 0xd700) AM_WRITE(jcross_vregs4_w)
  	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(MRA8_RAM, jcross_background_ram_w) AM_SHARE(2) AM_BASE(&videoram)
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(MRA8_RAM, jcross_text_ram_w) AM_BASE(&jcr_textram)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(SMH_RAM, jcross_background_ram_w) AM_SHARE(2) AM_BASE(&videoram)
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(SMH_RAM, jcross_text_ram_w) AM_BASE(&jcr_textram)
 	AM_RANGE(0xf400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

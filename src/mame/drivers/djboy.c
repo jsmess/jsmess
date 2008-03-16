@@ -737,33 +737,33 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 /******************************************************************************/
 
 static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xafff) AM_READ(MRA8_BANK4)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xafff) AM_READ(SMH_BANK4)
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM) AM_BASE(&sharedram)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&sharedram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_port_am, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu0_bankswitch_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK2)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_RAM) AM_WRITE(djboy_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_READ(MRA8_RAM) AM_WRITE(djboy_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd400, 0xd8ff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
+	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM) AM_WRITE(djboy_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_READ(SMH_RAM) AM_WRITE(djboy_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xd400, 0xd8ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xffff) AM_READ(sharedram_r) AM_WRITE(sharedram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_port_am, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
 	AM_RANGE(0x04, 0x04) AM_READ(beast_data_r) AM_WRITE(beast_data_w)
@@ -777,13 +777,13 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static ADDRESS_MAP_START( cpu2_am, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK3)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK3)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_port_am, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu2_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READ(YM2203_status_port_0_r) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_READ(YM2203_read_port_0_r) AM_WRITE(YM2203_write_port_0_w)

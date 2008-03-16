@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( atomeb_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* VDG 6847 */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_READ(MRA8_BANK1)	/* eprom data from eprom box */
+	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_BANK1)	/* eprom data from eprom box */
 	AM_RANGE(0xb000, 0xb003) AM_READWRITE(ppi8255_0_r, ppi8255_0_w) /* PPIA 8255 */
 	AM_RANGE(0xb800, 0xbbff) AM_READWRITE(via_0_r, via_0_w)			/* VIA 6522 */
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(atom_eprom_box_r, atom_eprom_box_w)

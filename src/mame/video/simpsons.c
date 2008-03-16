@@ -103,7 +103,7 @@ void simpsons_video_banking(int bank)
 {
 	if (bank & 1)
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MRA8_BANK5, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK5, paletteram_xBBBBBGGGGGRRRRR_be_w);
 		memory_set_bankptr(5, paletteram);
 	}
 	else
@@ -167,6 +167,6 @@ VIDEO_UPDATE( simpsons )
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);
 
-	K053247_sprites_draw(machine, bitmap,cliprect);
+	K053247_sprites_draw(screen->machine, bitmap,cliprect);
 	return 0;
 }

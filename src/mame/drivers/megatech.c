@@ -286,8 +286,8 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 	{
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
-			memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK5);
-			memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_UNMAP);
+			memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK5);
+			memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_UNMAP);
 
 			//printf("bank ram??\n");
 			break;
@@ -353,19 +353,19 @@ static void megatech_set_genz80_as_sms_standard_map(void)
 
 	/* fixed rom bank area */
 	sms_rom = auto_malloc(0x400000);
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK5);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_UNMAP);
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK5);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_UNMAP);
 	memory_set_bankptr( 5, sms_rom );
 
 	memcpy(sms_rom, memory_region(REGION_CPU1), 0x400000);
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x2000); // 8kb of main ram
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MRA8_BANK6);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MWA8_BANK6);
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK6);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK6);
 	memory_set_bankptr( 6, sms_mainram );
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MRA8_BANK7);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MWA8_BANK7);
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK7);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK7);
 	memory_set_bankptr( 7, sms_mainram );
 	memset(sms_mainram,0x00,0x2000);
 
@@ -583,7 +583,7 @@ static WRITE8_HANDLER (megatech_bios_port_7f_w)
 
 
 static ADDRESS_MAP_START( megatech_bios_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x3f, 0x3f) AM_WRITE(megatech_bios_port_ctrl_w)
 
 	AM_RANGE(0x7f, 0x7f) AM_READWRITE(sms_vcounter_r, megatech_bios_port_7f_w)
@@ -610,13 +610,16 @@ static VIDEO_START(mtnew)
 //attotime_never
 static VIDEO_UPDATE(mtnew)
 {
-	if (screen ==0)
+	const device_config *main_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "main");
+	const device_config *menu_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "menu");
+
+	if (screen == main_screen)
 	{
 		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
 		if (!current_game_is_sms) VIDEO_UPDATE_CALL(megadriv);
 		else VIDEO_UPDATE_CALL(megatech_md_sms);
 	}
-	else if (screen ==1) VIDEO_UPDATE_CALL(megatech_bios);
+	else if (screen == menu_screen) VIDEO_UPDATE_CALL(megatech_bios);
 	return 0;
 }
 

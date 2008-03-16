@@ -492,7 +492,7 @@ static VIDEO_START( seattle )
 {
 	add_exit_callback(machine, seattle_exit);
 
-	voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
+	voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 4, 0);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
 	voodoo_set_stall_callback(0, voodoo_stall);
@@ -503,7 +503,7 @@ static VIDEO_START( flagstaff )
 {
 	add_exit_callback(machine, seattle_exit);
 
-	voodoo_start(0, 0, VOODOO_1, 2, 4, 4);
+	voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 4, 4);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
 	voodoo_set_stall_callback(0, voodoo_stall);
@@ -1725,7 +1725,7 @@ PCI Mem  = 08000000-09FFFFFF
 */
 
 static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_READWRITE(voodoo_0_r, seattle_voodoo_w)
 	AM_RANGE(0x0a000000, 0x0a0003ff) AM_READWRITE(ide_controller32_0_r, ide_controller32_0_w)
@@ -1737,14 +1737,14 @@ static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x16100000, 0x1611ffff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x17000000, 0x17000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
 	AM_RANGE(0x17100000, 0x17100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x17300000, 0x17300003) AM_READWRITE(MRA32_RAM, seattle_interrupt_enable_w) AM_BASE(&interrupt_enable)
-	AM_RANGE(0x17400000, 0x17400003) AM_READWRITE(MRA32_RAM, interrupt_config_w) AM_BASE(&interrupt_config)
+	AM_RANGE(0x17300000, 0x17300003) AM_READWRITE(SMH_RAM, seattle_interrupt_enable_w) AM_BASE(&interrupt_enable)
+	AM_RANGE(0x17400000, 0x17400003) AM_READWRITE(SMH_RAM, interrupt_config_w) AM_BASE(&interrupt_config)
 	AM_RANGE(0x17500000, 0x17500003) AM_READ(interrupt_state_r)
 	AM_RANGE(0x17600000, 0x17600003) AM_READ(interrupt_state2_r)
 	AM_RANGE(0x17700000, 0x17700003) AM_WRITE(vblank_clear_w)
 	AM_RANGE(0x17800000, 0x17800003) AM_NOP
 	AM_RANGE(0x17900000, 0x17900003) AM_READWRITE(status_leds_r, status_leds_w)
-	AM_RANGE(0x17f00000, 0x17f00003) AM_READWRITE(MRA32_RAM, asic_reset_w) AM_BASE(&asic_reset)
+	AM_RANGE(0x17f00000, 0x17f00003) AM_READWRITE(SMH_RAM, asic_reset_w) AM_BASE(&asic_reset)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_BASE(&rombase)
 ADDRESS_MAP_END
 
@@ -2738,8 +2738,8 @@ static void init_common(int ioasic, int serialnum, int yearoffs, int config)
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, MRA32_NOP);
-			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, MWA32_NOP);
+			memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_NOP);
+			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_NOP);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:

@@ -131,11 +131,11 @@ VIDEO_UPDATE( zx8301 )
 {
 	if (!zx8301.dispoff)
 	{
-		zx8301_draw_screen(machine, bitmap);
+		zx8301_draw_screen(screen->machine, bitmap);
 	}
 	else
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	}
 
 	return 0;

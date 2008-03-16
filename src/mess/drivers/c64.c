@@ -208,31 +208,31 @@ static ADDRESS_MAP_START(ultimax_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE(&c64_roml)
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(sid6581_0_port_r, sid6581_0_port_w)
-	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_RAM, c64_colorram_write) AM_BASE(&c64_colorram) /* colorram  */
+	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_RAM, c64_colorram_write) AM_BASE(&c64_colorram) /* colorram  */
 	AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(cia_0_r, cia_0_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE( &c64_romh)	   /* ram or kernel rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c64_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(&c64_memory)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(MRA8_BANK1, MWA8_BANK2)	   /* ram or external roml */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(MRA8_BANK3, MWA8_RAM)	   /* ram or basic rom or external romh */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK1, SMH_BANK2)	   /* ram or external roml */
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK3, SMH_RAM)	   /* ram or basic rom or external romh */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(c64_ioarea_r, c64_ioarea_w)
 //#if 1
-//  AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_BANK5, MWA8_BANK6)
+//  AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_BANK5, SMH_BANK6)
 //#else
 ///* dram */
 ///* or character rom */
-//  AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(MRA8_BANK9, vic2_port_w)
-//  AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(MRA8_BANK10, sid6581_0_port_w)
-//  AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_BANK11, c64_colorram_write)         /* colorram  */
-//  AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(MRA8_BANK12, cia_0_w)
-//  AM_RANGE(0xdd00, 0xddff) AM_READWRITE(MRA8_BANK13, cia_1_w)
-//  AM_RANGE(0xde00, 0xdeff) AM_READ(MRA8_BANK14)          /* csline expansion port */
-//  AM_RANGE(0xdf00, 0xdfff) AM_READ(MRA8_BANK15)          /* csline expansion port */
+//  AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(SMH_BANK9, vic2_port_w)
+//  AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(SMH_BANK10, sid6581_0_port_w)
+//  AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_BANK11, c64_colorram_write)         /* colorram  */
+//  AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(SMH_BANK12, cia_0_w)
+//  AM_RANGE(0xdd00, 0xddff) AM_READWRITE(SMH_BANK13, cia_1_w)
+//  AM_RANGE(0xde00, 0xdeff) AM_READ(SMH_BANK14)          /* csline expansion port */
+//  AM_RANGE(0xdf00, 0xdfff) AM_READ(SMH_BANK15)          /* csline expansion port */
 //#endif
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(MRA8_BANK7, MWA8_BANK8)	   /* ram or kernel rom or external romh */
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(SMH_BANK7, SMH_BANK8)	   /* ram or kernel rom or external romh */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(c64_keyboard)

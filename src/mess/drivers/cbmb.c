@@ -174,17 +174,17 @@ when problems start with -log and look into error.log file
 #include "includes/cbmb.h"
 
 static ADDRESS_MAP_START( cbmb_readmem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00000, 0xf07ff) AM_READ( MRA8_RAM )
+	AM_RANGE(0x00000, 0xf07ff) AM_READ( SMH_RAM )
 #if 0
-	AM_RANGE(0xf0800, 0xf0fff) AM_READ( MRA8_ROM )
+	AM_RANGE(0xf0800, 0xf0fff) AM_READ( SMH_ROM )
 #endif
-	AM_RANGE(0xf1000, 0xf1fff) AM_READ( MRA8_ROM ) /* cartridges or ram */
-	AM_RANGE(0xf2000, 0xf3fff) AM_READ( MRA8_ROM ) /* cartridges or ram */
-	AM_RANGE(0xf4000, 0xf5fff) AM_READ( MRA8_ROM )
-	AM_RANGE(0xf6000, 0xf7fff) AM_READ( MRA8_ROM )
-	AM_RANGE(0xf8000, 0xfbfff) AM_READ( MRA8_ROM )
-	/*  {0xfc000, 0xfcfff, MRA8_ROM }, */
-	AM_RANGE(0xfd000, 0xfd7ff) AM_READ( MRA8_ROM )
+	AM_RANGE(0xf1000, 0xf1fff) AM_READ( SMH_ROM ) /* cartridges or ram */
+	AM_RANGE(0xf2000, 0xf3fff) AM_READ( SMH_ROM ) /* cartridges or ram */
+	AM_RANGE(0xf4000, 0xf5fff) AM_READ( SMH_ROM )
+	AM_RANGE(0xf6000, 0xf7fff) AM_READ( SMH_ROM )
+	AM_RANGE(0xf8000, 0xfbfff) AM_READ( SMH_ROM )
+	/*  {0xfc000, 0xfcfff, SMH_ROM }, */
+	AM_RANGE(0xfd000, 0xfd7ff) AM_READ( SMH_ROM )
 //  AM_RANGE(0xfd800, 0xfd8ff)
 	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_DEVREAD(MC6845, "crtc", mc6845_register_r)
 	/* disk units */
@@ -194,20 +194,20 @@ static ADDRESS_MAP_START( cbmb_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_READ( tpi6525_0_port_r)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_READ( tpi6525_1_port_r)
-	AM_RANGE(0xfe000, 0xfffff) AM_READ( MRA8_ROM )
+	AM_RANGE(0xfe000, 0xfffff) AM_READ( SMH_ROM )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbmb_writemem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00000, 0x0ffff) AM_WRITE( MWA8_NOP )
-	AM_RANGE(0x10000, 0x4ffff) AM_WRITE( MWA8_RAM )
-	AM_RANGE(0x50002, 0x5ffff) AM_WRITE( MWA8_NOP )
-	AM_RANGE(0x60000, 0xf07ff) AM_WRITE( MWA8_RAM )
-	AM_RANGE(0xf1000, 0xf1fff) AM_WRITE( MWA8_ROM ) /* cartridges */
-	AM_RANGE(0xf2000, 0xf3fff) AM_WRITE( MWA8_ROM ) /* cartridges */
-	AM_RANGE(0xf4000, 0xf5fff) AM_WRITE( MWA8_ROM )
-	AM_RANGE(0xf6000, 0xf7fff) AM_WRITE( MWA8_ROM )
-	AM_RANGE(0xf8000, 0xfbfff) AM_WRITE( MWA8_ROM) AM_BASE( &cbmb_basic )
-	AM_RANGE(0xfd000, 0xfd7ff) AM_WRITE( MWA8_RAM) AM_BASE( &videoram) AM_SIZE(&videoram_size ) /* VIDEORAM */
+	AM_RANGE(0x00000, 0x0ffff) AM_WRITE( SMH_NOP )
+	AM_RANGE(0x10000, 0x4ffff) AM_WRITE( SMH_RAM )
+	AM_RANGE(0x50002, 0x5ffff) AM_WRITE( SMH_NOP )
+	AM_RANGE(0x60000, 0xf07ff) AM_WRITE( SMH_RAM )
+	AM_RANGE(0xf1000, 0xf1fff) AM_WRITE( SMH_ROM ) /* cartridges */
+	AM_RANGE(0xf2000, 0xf3fff) AM_WRITE( SMH_ROM ) /* cartridges */
+	AM_RANGE(0xf4000, 0xf5fff) AM_WRITE( SMH_ROM )
+	AM_RANGE(0xf6000, 0xf7fff) AM_WRITE( SMH_ROM )
+	AM_RANGE(0xf8000, 0xfbfff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_basic )
+	AM_RANGE(0xfd000, 0xfd7ff) AM_WRITE( SMH_RAM) AM_BASE( &videoram) AM_SIZE(&videoram_size ) /* VIDEORAM */
 	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR( 0xfe ) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	/* disk units */
@@ -217,22 +217,22 @@ static ADDRESS_MAP_START( cbmb_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_WRITE( tpi6525_0_port_w)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_WRITE( tpi6525_1_port_w)
-	AM_RANGE(0xfe000, 0xfffff) AM_WRITE( MWA8_ROM) AM_BASE( &cbmb_kernal )
+	AM_RANGE(0xfe000, 0xfffff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_kernal )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbm500_readmem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00000, 0xf07ff) AM_READ( MRA8_RAM )
+	AM_RANGE(0x00000, 0xf07ff) AM_READ( SMH_RAM )
 #if 0
-	AM_RANGE(0xf0800, 0xf0fff) AM_READ( MRA8_ROM )
+	AM_RANGE(0xf0800, 0xf0fff) AM_READ( SMH_ROM )
 #endif
-	AM_RANGE(0xf1000, 0xf1fff) AM_READ( MRA8_ROM ) /* cartridges or ram */
-	AM_RANGE(0xf2000, 0xf3fff) AM_READ( MRA8_ROM ) /* cartridges or ram */
-	AM_RANGE(0xf4000, 0xf5fff) AM_READ( MRA8_ROM )
-	AM_RANGE(0xf6000, 0xf7fff) AM_READ( MRA8_ROM )
-	AM_RANGE(0xf8000, 0xfbfff) AM_READ( MRA8_ROM )
-	/*  {0xfc000, 0xfcfff, MRA8_ROM }, */
-	AM_RANGE(0xfd000, 0xfd3ff) AM_READ( MRA8_RAM ) /* videoram */
-	AM_RANGE(0xfd400, 0xfd7ff) AM_READ( MRA8_RAM ) /* colorram */
+	AM_RANGE(0xf1000, 0xf1fff) AM_READ( SMH_ROM ) /* cartridges or ram */
+	AM_RANGE(0xf2000, 0xf3fff) AM_READ( SMH_ROM ) /* cartridges or ram */
+	AM_RANGE(0xf4000, 0xf5fff) AM_READ( SMH_ROM )
+	AM_RANGE(0xf6000, 0xf7fff) AM_READ( SMH_ROM )
+	AM_RANGE(0xf8000, 0xfbfff) AM_READ( SMH_ROM )
+	/*  {0xfc000, 0xfcfff, SMH_ROM }, */
+	AM_RANGE(0xfd000, 0xfd3ff) AM_READ( SMH_RAM ) /* videoram */
+	AM_RANGE(0xfd400, 0xfd7ff) AM_READ( SMH_RAM ) /* colorram */
 	AM_RANGE(0xfd800, 0xfd8ff) AM_READ( vic2_port_r )
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_READ( sid6581_0_port_r )
@@ -241,21 +241,21 @@ static ADDRESS_MAP_START( cbm500_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_READ( tpi6525_0_port_r)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_READ( tpi6525_1_port_r)
-	AM_RANGE(0xfe000, 0xfffff) AM_READ( MRA8_ROM )
+	AM_RANGE(0xfe000, 0xfffff) AM_READ( SMH_ROM )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbm500_writemem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00000, 0x1ffff) AM_WRITE( MWA8_RAM )
-	AM_RANGE(0x20000, 0x2ffff) AM_WRITE( MWA8_NOP )
-	AM_RANGE(0x30000, 0x7ffff) AM_WRITE( MWA8_RAM )
-	AM_RANGE(0x80000, 0x8ffff) AM_WRITE( MWA8_NOP )
-	AM_RANGE(0x90000, 0xf07ff) AM_WRITE( MWA8_RAM )
-	AM_RANGE(0xf1000, 0xf1fff) AM_WRITE( MWA8_ROM ) /* cartridges */
-	AM_RANGE(0xf2000, 0xf3fff) AM_WRITE( MWA8_ROM ) /* cartridges */
-	AM_RANGE(0xf4000, 0xf5fff) AM_WRITE( MWA8_ROM )
-	AM_RANGE(0xf6000, 0xf7fff) AM_WRITE( MWA8_ROM )
-	AM_RANGE(0xf8000, 0xfbfff) AM_WRITE( MWA8_ROM) AM_BASE( &cbmb_basic )
-	AM_RANGE(0xfd000, 0xfd3ff) AM_WRITE( MWA8_RAM) AM_BASE( &cbmb_videoram )
+	AM_RANGE(0x00000, 0x1ffff) AM_WRITE( SMH_RAM )
+	AM_RANGE(0x20000, 0x2ffff) AM_WRITE( SMH_NOP )
+	AM_RANGE(0x30000, 0x7ffff) AM_WRITE( SMH_RAM )
+	AM_RANGE(0x80000, 0x8ffff) AM_WRITE( SMH_NOP )
+	AM_RANGE(0x90000, 0xf07ff) AM_WRITE( SMH_RAM )
+	AM_RANGE(0xf1000, 0xf1fff) AM_WRITE( SMH_ROM ) /* cartridges */
+	AM_RANGE(0xf2000, 0xf3fff) AM_WRITE( SMH_ROM ) /* cartridges */
+	AM_RANGE(0xf4000, 0xf5fff) AM_WRITE( SMH_ROM )
+	AM_RANGE(0xf6000, 0xf7fff) AM_WRITE( SMH_ROM )
+	AM_RANGE(0xf8000, 0xfbfff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_basic )
+	AM_RANGE(0xfd000, 0xfd3ff) AM_WRITE( SMH_RAM) AM_BASE( &cbmb_videoram )
 	AM_RANGE(0xfd400, 0xfd7ff) AM_WRITE( cbmb_colorram_w) AM_BASE( &cbmb_colorram )
 	AM_RANGE(0xfd800, 0xfd8ff) AM_WRITE( vic2_port_w )
 	/* disk units */
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( cbm500_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_WRITE( tpi6525_0_port_w)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_WRITE( tpi6525_1_port_w)
-	AM_RANGE(0xfe000, 0xfffff) AM_WRITE( MWA8_ROM) AM_BASE( &cbmb_kernal )
+	AM_RANGE(0xfe000, 0xfffff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_kernal )
 ADDRESS_MAP_END
 
 #define CBMB_KEYBOARD \

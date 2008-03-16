@@ -47,26 +47,25 @@ Emulation Notes:
 #include "video/mc6845.h"
 
 static UINT8* carrera_tileram;
-static mc6845_t *mc6845;
 
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x4fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x4fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&carrera_tileram)
+	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&carrera_tileram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
@@ -76,8 +75,8 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x06, 0x06) AM_WRITE(MWA8_NOP) // ?
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP) // ?
 
 	AM_RANGE(0x08, 0x08) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(AY8910_write_port_0_w)
@@ -246,11 +245,6 @@ static GFXDECODE_START( carrera )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static VIDEO_START(carrera)
-{
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-}
-
 static VIDEO_UPDATE(carrera)
 {
 
@@ -263,7 +257,7 @@ static VIDEO_UPDATE(carrera)
 		{
 			int tile = carrera_tileram[count&0x7ff] | carrera_tileram[(count&0x7ff)+0x800]<<8;
 
-			drawgfx(bitmap,machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count++;
 		}
 	}
@@ -309,7 +303,7 @@ static MACHINE_DRIVER_START( carrera )
 	MDRV_GFXDECODE(carrera)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT(carrera)
-	MDRV_VIDEO_START(carrera)
+
 	MDRV_VIDEO_UPDATE(carrera)
 
 	MDRV_DEVICE_ADD("crtc", MC6845)

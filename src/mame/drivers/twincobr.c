@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x030000, 0x033fff) AM_RAM		/* 68K and DSP shared RAM */
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x050000, 0x050dff) AM_READWRITE(MRA16_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x050000, 0x050dff) AM_READWRITE(SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(twincobr_crtc_reg_sel_w)	/* 6845 CRT controller */
 	AM_RANGE(0x060002, 0x060003) AM_WRITE(twincobr_crtc_data_w)		/* 6845 CRT controller */
 	AM_RANGE(0x070000, 0x070003) AM_WRITE(twincobr_txscroll_w)	/* text layer scroll */
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( sound_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0x10, 0x10) AM_READ(input_port_5_r)		/* Twin Cobra - Coin/Start */

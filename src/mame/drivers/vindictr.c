@@ -50,7 +50,7 @@ static MACHINE_RESET( vindictr )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, vindictr_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, vindictr_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -80,7 +80,8 @@ static READ16_HANDLER( port1_r )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(22) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
@@ -90,14 +91,14 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260030, 0x260031) AM_READ(atarigen_sound_r)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(atarigen_scanline_int_ack_w)
-	AM_RANGE(0x360010, 0x360011) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x360010, 0x360011) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x360020, 0x360021) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE(atarigen_sound_w)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_READWRITE(MRA16_RAM, vindictr_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_READWRITE(MRA16_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x8000) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
-	AM_RANGE(0x3f4000, 0x3f4f7f) AM_MIRROR(0x8000) AM_READWRITE(MRA16_RAM, atarigen_alpha_w) AM_BASE(&atarigen_alpha)
-	AM_RANGE(0x3f4f80, 0x3f4fff) AM_MIRROR(0x8000) AM_READWRITE(MRA16_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x3e0000, 0x3e0fff) AM_READWRITE(SMH_RAM, vindictr_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x8000) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x3f4000, 0x3f4f7f) AM_MIRROR(0x8000) AM_READWRITE(SMH_RAM, atarigen_alpha_w) AM_BASE(&atarigen_alpha)
+	AM_RANGE(0x3f4f80, 0x3f4fff) AM_MIRROR(0x8000) AM_READWRITE(SMH_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0x3f5000, 0x3f7fff) AM_MIRROR(0x8000) AM_RAM
 ADDRESS_MAP_END
 

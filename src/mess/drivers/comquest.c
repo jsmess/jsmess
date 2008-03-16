@@ -58,10 +58,10 @@ static WRITE8_HANDLER(comquest_write)
 #endif
 
 static ADDRESS_MAP_START( comquest_mem , ADDRESS_SPACE_PROGRAM, 8)
-//  { 0x0000, 0x7fff, MRA8_BANK1 },
+//  { 0x0000, 0x7fff, SMH_BANK1 },
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(MRA8_ROM, MWA8_RAM)
-//  { 0x8000, 0xffff, MRA8_RAM }, // batterie buffered
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(SMH_ROM, SMH_RAM)
+//  { 0x8000, 0xffff, SMH_RAM }, // batterie buffered
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( comquest )

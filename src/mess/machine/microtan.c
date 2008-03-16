@@ -884,18 +884,18 @@ DRIVER_INIT( microtan )
     switch (readinputport(0) & 3)
     {
         case 0:  // 1K only :)
-            memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, MRA8_NOP);
-            memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, MWA8_NOP);
+            memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_NOP);
+            memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_NOP);
             break;
         case 1:  // +7K TANEX
-            memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0x1fff, 0, 0, MRA8_RAM);
-            memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0x1fff, 0, 0, MWA8_RAM);
-            memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0xbbff, 0, 0, MRA8_NOP);
-            memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0xbbff, 0, 0, MWA8_NOP);
+            memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0x1fff, 0, 0, SMH_RAM);
+            memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0x1fff, 0, 0, SMH_RAM);
+            memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0xbbff, 0, 0, SMH_NOP);
+            memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0xbbff, 0, 0, SMH_NOP);
             break;
         default: // +7K TANEX + 40K TANRAM
-            memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, MRA8_RAM);
-            memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, MWA8_RAM);
+            memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_RAM);
+            memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_RAM);
             break;
     }
 

@@ -22,7 +22,6 @@
 
 #include "driver.h"
 #include "render.h"
-#include "deprecat.h"
 #include "includes/amiga.h"
 #include "machine/laserdsc.h"
 
@@ -47,16 +46,18 @@ static TIMER_CALLBACK( response_timer );
  *
  *************************************/
 
-static int get_lightgun_pos(int player, int *x, int *y)
+static int get_lightgun_pos(const device_config *screen, int player, int *x, int *y)
 {
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+
 	int xpos = readinputportbytag_safe((player == 0) ? "GUN1X" : "GUN2X", -1);
 	int ypos = readinputportbytag_safe((player == 0) ? "GUN1Y" : "GUN2Y", -1);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
 
-	*x = Machine->screen[0].visarea.min_x + xpos * (Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1) / 255;
-	*y = Machine->screen[0].visarea.min_y + ypos * (Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1) / 255;
+	*x = visarea->min_x + xpos * (visarea->max_x - visarea->min_x + 1) / 255;
+	*y = visarea->min_y + ypos * (visarea->max_y - visarea->min_y + 1) / 255;
 	return TRUE;
 }
 
@@ -78,13 +79,13 @@ static VIDEO_START( alg )
 	add_exit_callback(machine, video_cleanup);
 
 	/* allocate Amiga bitmap */
-	amiga_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	amiga_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* standard video start */
 	VIDEO_START_CALL(amiga);
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
-	render_container_set_palette_alpha(render_container_get_screen(0), 4096, 0x00);
+	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 4096, 0x00);
 	amiga_set_genlock_color(4096);
 }
 
@@ -111,13 +112,13 @@ static VIDEO_UPDATE( alg )
 
 	/* update the Amiga video */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		amiga_render_scanline(machine, amiga_bitmap, y);
+		amiga_render_scanline(screen->machine, amiga_bitmap, y);
 
 	/* at the end of the frame, composite the video */
-	if (!video_skip_this_frame() && (cliprect->max_y == machine->screen[screen].visarea.max_y))
+	if (!video_skip_this_frame() && (cliprect->max_y == video_screen_get_visible_area(screen)->max_y))
 	{
 		bitmap_t *vidbitmap;
-		rectangle fixedvis = machine->screen[screen].visarea;
+		rectangle fixedvis = *video_screen_get_visible_area(screen);
 		fixedvis.max_x++;
 		fixedvis.max_y++;
 
@@ -242,7 +243,7 @@ static CUSTOM_INPUT( lightgun_pos_r )
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(input_select, &x, &y);
+	get_lightgun_pos(machine->primary_screen, input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 
@@ -276,11 +277,11 @@ static void alg_cia_0_porta_w(UINT8 data)
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, MWA16_BANK1);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, MWA16_UNMAP);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
 }
 
 
@@ -325,7 +326,7 @@ static void alg_cia_1_porta_w(UINT8 data)
  *************************************/
 
 static ADDRESS_MAP_START( main_map_r1, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram)	AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
@@ -338,7 +339,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_map_r2, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram)	AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
@@ -351,7 +352,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_map_picmatic, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram)	AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)

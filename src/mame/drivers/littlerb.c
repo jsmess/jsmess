@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( littlerb_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x700000, 0x700007) AM_READ(littlerb_vdp_r) AM_WRITE(littlerb_vdp_w)
-	AM_RANGE(0x780000, 0x780001) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x780000, 0x780001) AM_WRITE(SMH_NOP)
 
 	/* below are fake.. just to see the data */
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_BASE(&littlerb_region1)
@@ -339,7 +339,7 @@ static VIDEO_UPDATE(littlerb)
 	int x,y,offs, code;
 	int xsize,ysize;
 	UINT16* spriteregion = &littlerb_region4[0x400];
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	/* the spriteram format is something like this .. */
 	for (offs=0x26/2;offs<0xc00;offs+=6) // start at 00x26?

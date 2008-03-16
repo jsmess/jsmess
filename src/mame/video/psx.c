@@ -286,19 +286,24 @@ static int m_n_debugcoordy[ DEBUG_COORDS ];
 
 static void DebugMeshInit( void )
 {
+	int width = video_screen_get_width(Machine->primary_screen);
+	int height = video_screen_get_height(Machine->primary_screen);
+
 	m_b_debugmesh = 0;
 	m_b_debugtexture = 0;
 	m_n_debuginterleave = -1;
 	m_b_debugclear = 1;
 	m_n_debugcoord = 0;
 	m_n_debugskip = 0;
-	debugmesh = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
+	debugmesh = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
 }
 
 static void DebugMesh( int n_coordx, int n_coordy )
 {
 	int n_coord;
 	int n_colour;
+	int width = video_screen_get_width(Machine->primary_screen);
+	int height = video_screen_get_height(Machine->primary_screen);
 
 	if( m_b_debugclear )
 	{
@@ -395,13 +400,11 @@ static void DebugMesh( int n_coordx, int n_coordy )
 		{
 			if( (INT16)n_x.w.h >= 0 &&
 				(INT16)n_y.w.h >= 0 &&
-				(INT16)n_x.w.h <= Machine->screen[0].width - 1 &&
-				(INT16)n_y.w.h <= Machine->screen[0].height - 1 )
+				(INT16)n_x.w.h <= width - 1 &&
+				(INT16)n_y.w.h <= height - 1 )
 			{
 				if( *BITMAP_ADDR16(debugmesh, n_y.w.h, n_x.w.h) != 0xffff )
-				{
 					*BITMAP_ADDR16(debugmesh, n_y.w.h, n_x.w.h) = n_colour;
-				}
 			}
 			n_x.d += n_dx;
 			n_y.d += n_dy;
@@ -418,51 +421,43 @@ static void DebugMeshEnd( void )
 static void DebugCheckKeys( void )
 {
 	if( input_code_pressed_once( KEYCODE_M ) )
-	{
 		m_b_debugmesh = !m_b_debugmesh;
-	}
+
 	if( input_code_pressed_once( KEYCODE_V ) )
-	{
 		m_b_debugtexture = !m_b_debugtexture;
-	}
+
 	if( m_b_debugmesh || m_b_debugtexture )
 	{
-		video_screen_set_visarea(0,  0, Machine->screen[0].width - 1, 0, Machine->screen[0].height - 1 );
+		int width = video_screen_get_width(Machine->primary_screen);
+		int height = video_screen_get_height(Machine->primary_screen);
+		video_screen_set_visarea(Machine->primary_screen, 0, width - 1, 0, height - 1 );
 	}
 	else
-	{
-		video_screen_set_visarea(0,  0, m_n_screenwidth - 1, 0, m_n_screenheight - 1 );
-	}
+		video_screen_set_visarea(Machine->primary_screen, 0, m_n_screenwidth - 1, 0, m_n_screenheight - 1 );
 
 	if( input_code_pressed_once( KEYCODE_I ) )
 	{
 		if( m_b_debugtexture )
 		{
 			m_n_debuginterleave++;
+
 			if( m_n_debuginterleave == 2 )
-			{
 				m_n_debuginterleave = -1;
-			}
+
 			if( m_n_debuginterleave == -1 )
-			{
 				popmessage( "interleave off" );
-			}
 			else if( m_n_debuginterleave == 0 )
-			{
 				popmessage( "4 bit interleave" );
-			}
 			else if( m_n_debuginterleave == 1 )
-			{
 				popmessage( "8 bit interleave" );
-			}
 		}
 		else
 		{
 			m_n_debugskip++;
+
 			if( m_n_debugskip > 15 )
-			{
 				m_n_debugskip = 0;
-			}
+
 			popmessage( "debug skip %d", m_n_debugskip );
 		}
 	}
@@ -474,12 +469,8 @@ static void DebugCheckKeys( void )
 		int n_x;
 		f = fopen( "dump.txt", "w" );
 		for( n_y = 256; n_y < 512; n_y++ )
-		{
 			for( n_x = 640; n_x < 1024; n_x++ )
-			{
 				fprintf( f, "%04u,%04u = %04x\n", n_y, n_x, m_p_p_vram[ n_y ][ n_x ] );
-			}
-		}
 		fclose( f );
 	}
 	if( input_code_pressed_once( KEYCODE_S ) )
@@ -488,9 +479,7 @@ static void DebugCheckKeys( void )
 		popmessage( "saving..." );
 		f = fopen( "VRAM.BIN", "wb" );
 		for( n_y = 0; n_y < 1024; n_y++ )
-		{
 			fwrite( m_p_p_vram[ n_y ], 1024 * 2, 1, f );
-		}
 		fclose( f );
 	}
 	if( input_code_pressed_once( KEYCODE_L ) )
@@ -499,9 +488,7 @@ static void DebugCheckKeys( void )
 		popmessage( "loading..." );
 		f = fopen( "VRAM.BIN", "rb" );
 		for( n_y = 0; n_y < 1024; n_y++ )
-		{
 			fread( m_p_p_vram[ n_y ], 1024 * 2, 1, f );
-		}
 		fclose( f );
 	}
 #endif
@@ -523,14 +510,17 @@ static int DebugTextureDisplay( bitmap_t *bitmap )
 
 	if( m_b_debugtexture )
 	{
-		for( n_y = 0; n_y < Machine->screen[0].height; n_y++ )
+		int width = video_screen_get_width(Machine->primary_screen);
+		int height = video_screen_get_height(Machine->primary_screen);
+
+		for( n_y = 0; n_y < height; n_y++ )
 		{
 			int n_x;
 			int n_xi;
 			int n_yi;
 			UINT16 p_n_interleave[ 1024 ];
 
-			for( n_x = 0; n_x < Machine->screen[0].width; n_x++ )
+			for( n_x = 0; n_x < width; n_x++ )
 			{
 				if( m_n_debuginterleave == 0 )
 				{
@@ -549,7 +539,7 @@ static int DebugTextureDisplay( bitmap_t *bitmap )
 				}
 				p_n_interleave[ n_x ] = m_p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, Machine->screen[0].width, p_n_interleave, Machine->pens, -1 );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, Machine->pens, -1 );
 		}
 	}
 	return m_b_debugtexture;
@@ -624,7 +614,7 @@ static void updatevisiblearea( void )
 	visarea.min_x = visarea.min_y = 0;
 	visarea.max_x = m_n_screenwidth - 1;
 	visarea.max_y = m_n_screenheight - 1;
-	video_screen_configure(0, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
+	video_screen_configure(Machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 static void psx_gpu_init( void )
@@ -634,6 +624,8 @@ static void psx_gpu_init( void )
 	int n_level2;
 	int n_shade;
 	int n_shaded;
+	int width = video_screen_get_width(Machine->primary_screen);
+	int height = video_screen_get_height(Machine->primary_screen);
 
 #if defined( MAME_DEBUG )
 	DebugMeshInit();
@@ -645,13 +637,13 @@ static void psx_gpu_init( void )
 	m_n_lightgun_x = 0;
 	m_n_lightgun_y = 0;
 
-	m_n_vram_size = Machine->screen[0].width * Machine->screen[0].height;
+	m_n_vram_size = width * height;
 	m_p_vram = auto_malloc( m_n_vram_size * 2 );
 	memset( m_p_vram, 0x00, m_n_vram_size * 2 );
 
 	for( n_line = 0; n_line < 1024; n_line++ )
 	{
-		m_p_p_vram[ n_line ] = &m_p_vram[ ( n_line % Machine->screen[0].height ) * Machine->screen[0].width ];
+		m_p_p_vram[ n_line ] = &m_p_vram[ ( n_line % height ) * width ];
 	}
 
 	for( n_level = 0; n_level < MAX_LEVEL; n_level++ )

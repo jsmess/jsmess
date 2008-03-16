@@ -86,13 +86,13 @@ static WRITE8_HANDLER(vc4000_sound_ctl)
 
 
 static ADDRESS_MAP_START( vc4000_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE( MRA8_BANK1, MWA8_BANK5 )
-	AM_RANGE(0x0800, 0x0fff) AM_READWRITE( MRA8_BANK2, MWA8_BANK6 )
-	AM_RANGE(0x1000, 0x15ff) AM_READWRITE( MRA8_BANK3, MWA8_BANK7 )
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE( SMH_BANK1, SMH_BANK5 )
+	AM_RANGE(0x0800, 0x0fff) AM_READWRITE( SMH_BANK2, SMH_BANK6 )
+	AM_RANGE(0x1000, 0x15ff) AM_READWRITE( SMH_BANK3, SMH_BANK7 )
 	AM_RANGE(0x1600, 0x167f) AM_NOP
 	AM_RANGE(0x1680, 0x16ff) AM_READWRITE( vc4000_key_r, vc4000_sound_ctl ) AM_MIRROR(0x0800)
 	AM_RANGE(0x1700, 0x17ff) AM_READWRITE( vc4000_video_r, vc4000_video_w ) AM_MIRROR(0x0800)
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE( MRA8_BANK4, MWA8_BANK8 )
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE( SMH_BANK4, SMH_BANK8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vc4000_io , ADDRESS_SPACE_IO, 8)
@@ -226,42 +226,42 @@ static DEVICE_LOAD( vc4000_cart )
 	{
 	case 0x0800: // 2K
 		image_fread(image, memory_region(REGION_CPU1) + 0x0000, 0x0800);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, MRA8_BANK1); 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, MWA8_BANK5);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x0000);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, MRA8_BANK2); 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, MWA8_BANK6);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
 		memory_set_bankptr(2, mess_ram);
 		memory_set_bankptr(6, mess_ram);
 		break;
 
 	case 0x1000: // 4K
 		image_fread(image, memory_region(REGION_CPU1) + 0x0000, 0x1000);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, MRA8_BANK1); 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, MWA8_BANK5);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x0000);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, MRA8_BANK2); 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, MWA8_BANK6);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
 		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x0800);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, MRA8_BANK3); 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, MWA8_BANK7);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, SMH_BANK7);
 		memory_set_bankptr(3, mess_ram);
 		memory_set_bankptr(7, mess_ram);
 		break;
 
 	case 0x1800: // 6K
 		image_fread(image, memory_region(REGION_CPU1) + 0x0000, 0x15FF);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, MRA8_BANK1); 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, MWA8_BANK5);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x0000);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, MRA8_BANK2); 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, MWA8_BANK6);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
 		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x0800);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, MRA8_BANK3); 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x15FF, 0, 0, MWA8_BANK7);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x15FF, 0, 0, SMH_BANK7);
 		memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x1000);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1BFF, 0, 0, MRA8_BANK4); 
-		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1BFF, 0, 0, MWA8_BANK8);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1BFF, 0, 0, SMH_BANK4); 
+		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1BFF, 0, 0, SMH_BANK8);
 		memory_set_bankptr(4, mess_ram);
 		memory_set_bankptr(8, mess_ram);
 		break;

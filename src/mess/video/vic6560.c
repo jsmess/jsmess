@@ -162,6 +162,10 @@ static void vic6560_video_stop(running_machine *machine)
 
 VIDEO_START( vic6560 )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+
 	black = machine->pens[0];
 	white = machine->pens[1];
 	pointerelement = allocgfx(&pointerlayout);
@@ -171,7 +175,7 @@ VIDEO_START( vic6560 )
 	pointercolortable[1] = machine->pens[1];
 	pointercolortable[2] = machine->pens[0];
 	pointerelement->total_colors = 3;
-	vic6560_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	vic6560_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	add_exit_callback(machine, vic6560_video_stop);
 }
 
@@ -485,7 +489,7 @@ INTERRUPT_GEN( vic656x_raster_interrupt )
 			r.min_y = LIGHTPEN_Y_VALUE - 1 + VIC656X_MAME_YPOS;
 			r.max_y = r.min_y + 8 - 1;
 
-			if (DOCLIP (&r, &machine->screen[0].visarea))
+			if (DOCLIP (&r, video_screen_get_visible_area(video_screen_first(machine->config))))
 			{
 #ifndef GFX
 				vic6560_draw_pointer (vic6560_bitmap, &r,

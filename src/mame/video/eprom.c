@@ -163,7 +163,7 @@ VIDEO_START( guts )
  *
  *************************************/
 
-void eprom_scanline_update(running_machine *machine, int scrnum, int scanline)
+void eprom_scanline_update(const device_config *screen, int scanline)
 {
 	/* update the playfield */
 	if (scanline == 0)
@@ -195,7 +195,7 @@ VIDEO_UPDATE( eprom )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
+	mobitmap = atarimo_render(screen->machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
@@ -341,7 +341,7 @@ VIDEO_UPDATE( guts )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
+	mobitmap = atarimo_render(screen->machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{

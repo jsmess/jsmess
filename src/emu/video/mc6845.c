@@ -10,7 +10,7 @@
         * Motorola 6845, 6845-1
         * Hitachi 46505
         * Rockwell 6545, 6545-1 (= Synertek SY6545-1)
-        * Commodore 6545-1
+        * MOS Technology 6545-1
 
     (1) as per the document at
     http://www.6502.org/users/andre/hwinfo/crtc/diffs.html
@@ -33,27 +33,33 @@
 enum
 {
 	TYPE_MC6845,
+	TYPE_MC6845_1,
 	TYPE_C6545_1,
 	TYPE_R6545_1,
+	TYPE_H46505,
+	TYPE_HD6845,
+	TYPE_SY6545_1,
 
 	NUM_TYPES
 };
 
+
 /* tags for state saving */
-const char * const device_tags[NUM_TYPES] = { "mc6845", "c6545-1", "r6545-1" };
+const char * const device_tags[NUM_TYPES] = {           "mc6845", "mc6845-1", "c6545-1", "r6545-1", "h46505", "hd6845", "sy6545-1" };
 
 /* capabilities */
-static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE, FALSE, FALSE };
-static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,  TRUE,  TRUE };
-static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,  TRUE,  TRUE };
-static const int supports_status_reg_d6[NUM_TYPES]     = { FALSE,  TRUE,  TRUE };
+static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE,       TRUE,     FALSE,     FALSE,    FALSE,    FALSE,      FALSE };
+static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,       TRUE,      TRUE,      TRUE,    FALSE,     TRUE,       TRUE };
+static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
+static const int supports_status_reg_d6[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
 
 
+typedef struct _mc6845_t mc6845_t;
 struct _mc6845_t
 {
 	int device_type;
-	running_machine *machine;
 	const mc6845_interface *intf;
+	const device_config *screen;
 
 	/* register file */
 	UINT8	horiz_char_total;	/* 0x00 */
@@ -107,6 +113,19 @@ static void update_hsync_changed_timers(mc6845_t *mc6845);
 static void update_vsync_changed_timers(mc6845_t *mc6845);
 
 
+/* makes sure that the passed in device is the right type */
+INLINE mc6845_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert((device->type == DEVICE_GET_INFO_NAME(mc6845)) ||
+		   (device->type == DEVICE_GET_INFO_NAME(c6545_1)) ||
+		   (device->type == DEVICE_GET_INFO_NAME(r6545_1)));
+
+	return (mc6845_t *)device->token;
+}
+
+
 static void mc6845_state_save_postload(void *param)
 {
 	recompute_parameters(param, TRUE);
@@ -115,9 +134,7 @@ static void mc6845_state_save_postload(void *param)
 
 WRITE8_DEVICE_HANDLER( mc6845_address_w )
 {
-	mc6845_t *mc6845 = device->token;
-
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845->register_address_latch = data & 0x1f;
 }
@@ -125,14 +142,11 @@ WRITE8_DEVICE_HANDLER( mc6845_address_w )
 
 READ8_DEVICE_HANDLER( mc6845_status_r )
 {
-	mc6845_t *mc6845 = device->token;
+	mc6845_t *mc6845 = get_safe_token(device);
 	UINT8 ret = 0;
 
-	assert(mc6845 != NULL);
-
 	/* VBLANK bit */
-	if (supports_status_reg_d5[mc6845->device_type] &&
-	   (video_screen_get_vpos(mc6845->intf->scrnum) > mc6845->max_visible_y))
+	if (supports_status_reg_d5[mc6845->device_type] && video_screen_get_vblank(mc6845->screen))
 	   ret = ret | 0x20;
 
 	/* light pen latched */
@@ -145,10 +159,8 @@ READ8_DEVICE_HANDLER( mc6845_status_r )
 
 READ8_DEVICE_HANDLER( mc6845_register_r )
 {
-	mc6845_t *mc6845 = device->token;
+	mc6845_t *mc6845 = get_safe_token(device);
 	UINT8 ret = 0;
-
-	assert(mc6845 != NULL);
 
 	switch (mc6845->register_address_latch)
 	{
@@ -169,9 +181,7 @@ READ8_DEVICE_HANDLER( mc6845_register_r )
 
 WRITE8_DEVICE_HANDLER( mc6845_register_w )
 {
-	mc6845_t *mc6845 = device->token;
-
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (LOG)  logerror("M6845 PC %04x: reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->register_address_latch, data);
 
@@ -208,7 +218,7 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 
 static void recompute_parameters(mc6845_t *mc6845, int postload)
 {
-	if (mc6845->intf)
+	if (mc6845->intf != NULL)
 	{
 		UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
 
@@ -268,7 +278,7 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 				if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-				video_screen_configure(mc6845->intf->scrnum, horiz_pix_total, vert_pix_total, &visarea, refresh);
+				video_screen_configure(mc6845->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
 
 				mc6845->has_valid_parameters = TRUE;
 			}
@@ -292,12 +302,9 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 }
 
 
-static int is_display_enabled(mc6845_t *mc6845)
+INLINE int is_display_enabled(mc6845_t *mc6845)
 {
-	UINT16 y = video_screen_get_vpos(mc6845->intf->scrnum);
-	UINT16 x = video_screen_get_hpos(mc6845->intf->scrnum);
-
-	return (y <= mc6845->max_visible_y) && (x <= mc6845->max_visible_x);
+	return !video_screen_get_vblank(mc6845->screen) && !video_screen_get_hblank(mc6845->screen);
 }
 
 
@@ -313,7 +320,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 		if (is_display_enabled(mc6845))
 		{
 			/* normally, it's at end the current raster line */
-			next_y = video_screen_get_vpos(mc6845->intf->scrnum);
+			next_y = video_screen_get_vpos(mc6845->screen);
 			next_x = mc6845->max_visible_x + 1;
 
 			/* but if visible width = horiz_pix_total, then we need
@@ -333,7 +340,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 		else
 		{
 			next_x = 0;
-			next_y = (video_screen_get_vpos(mc6845->intf->scrnum) + 1) % mc6845->vert_pix_total;
+			next_y = (video_screen_get_vpos(mc6845->screen) + 1) % mc6845->vert_pix_total;
 
 			/* if we would now fall in the vertical blanking, we need
                to go to the top of the screen */
@@ -342,7 +349,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 		}
 
 		if (next_y != -1)
-			duration = video_screen_get_time_until_pos(mc6845->intf->scrnum, next_y, next_x);
+			duration = video_screen_get_time_until_pos(mc6845->screen, next_y, next_x);
 		else
 			duration = attotime_never;
 
@@ -358,19 +365,19 @@ static void update_hsync_changed_timers(mc6845_t *mc6845)
 		UINT16 next_y;
 
 		/* we are before the HSYNC position, we trigger on the current line */
-		if (video_screen_get_hpos(mc6845->intf->scrnum) < mc6845->hsync_on_pos)
-			next_y = video_screen_get_vpos(mc6845->intf->scrnum);
+		if (video_screen_get_hpos(mc6845->screen) < mc6845->hsync_on_pos)
+			next_y = video_screen_get_vpos(mc6845->screen);
 
 		/* trigger on the next line */
 		else
-			next_y = (video_screen_get_vpos(mc6845->intf->scrnum) + 1) % mc6845->vert_pix_total;
+			next_y = (video_screen_get_vpos(mc6845->screen) + 1) % mc6845->vert_pix_total;
 
 		/* if the next line is not in the visible region, go to the beginning of the screen */
 		if (next_y > mc6845->max_visible_y)
 			next_y = 0;
 
-		timer_adjust_oneshot(mc6845->hsync_on_timer,  video_screen_get_time_until_pos(mc6845->intf->scrnum, next_y, mc6845->hsync_on_pos) , 0);
-		timer_adjust_oneshot(mc6845->hsync_off_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, next_y, mc6845->hsync_off_pos), 0);
+		timer_adjust_oneshot(mc6845->hsync_on_timer,  video_screen_get_time_until_pos(mc6845->screen, next_y, mc6845->hsync_on_pos) , 0);
+		timer_adjust_oneshot(mc6845->hsync_off_timer, video_screen_get_time_until_pos(mc6845->screen, next_y, mc6845->hsync_off_pos), 0);
 	}
 }
 
@@ -379,18 +386,19 @@ static void update_vsync_changed_timers(mc6845_t *mc6845)
 {
 	if (mc6845->has_valid_parameters && (mc6845->vsync_on_timer != NULL))
 	{
-		timer_adjust_oneshot(mc6845->vsync_on_timer,  video_screen_get_time_until_pos(mc6845->intf->scrnum, mc6845->vsync_on_pos,  0), 0);
-		timer_adjust_oneshot(mc6845->vsync_off_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, mc6845->vsync_off_pos, 0), 0);
+		timer_adjust_oneshot(mc6845->vsync_on_timer,  video_screen_get_time_until_pos(mc6845->screen, mc6845->vsync_on_pos,  0), 0);
+		timer_adjust_oneshot(mc6845->vsync_off_timer, video_screen_get_time_until_pos(mc6845->screen, mc6845->vsync_off_pos, 0), 0);
 	}
 }
 
 
 static TIMER_CALLBACK( de_changed_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_de_changed(mc6845->machine, mc6845, is_display_enabled(mc6845));
+	mc6845->intf->on_de_changed(device, is_display_enabled(mc6845));
 
 	update_de_changed_timer(mc6845);
 }
@@ -398,19 +406,21 @@ static TIMER_CALLBACK( de_changed_timer_cb )
 
 static TIMER_CALLBACK( vsync_on_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_vsync_changed(mc6845->machine, mc6845, TRUE);
+	mc6845->intf->on_vsync_changed(device, TRUE);
 }
 
 
 static TIMER_CALLBACK( vsync_off_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_vsync_changed(mc6845->machine, mc6845, FALSE);
+	mc6845->intf->on_vsync_changed(device, FALSE);
 
 	update_vsync_changed_timers(mc6845);
 }
@@ -418,36 +428,37 @@ static TIMER_CALLBACK( vsync_off_timer_cb )
 
 static TIMER_CALLBACK( hsync_on_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_hsync_changed(mc6845->machine, mc6845, TRUE);
+	mc6845->intf->on_hsync_changed(device, TRUE);
 }
 
 
 static TIMER_CALLBACK( hsync_off_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_hsync_changed(mc6845->machine, mc6845, FALSE);
+	mc6845->intf->on_hsync_changed(device, FALSE);
 
 	update_hsync_changed_timers(mc6845);
 }
 
 
 
-UINT16 mc6845_get_ma(mc6845_t *mc6845)
+UINT16 mc6845_get_ma(const device_config *device)
 {
 	UINT16 ret;
-
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (mc6845->has_valid_parameters)
 	{
 		/* clamp Y/X to the visible region */
-		int y = video_screen_get_vpos(mc6845->intf->scrnum);
-		int x = video_screen_get_hpos(mc6845->intf->scrnum);
+		int y = video_screen_get_vpos(mc6845->screen);
+		int x = video_screen_get_hpos(mc6845->screen);
 
 		/* since the MA counter stops in the blanking regions, if we are in a
            VBLANK, both X and Y are at their max */
@@ -468,16 +479,15 @@ UINT16 mc6845_get_ma(mc6845_t *mc6845)
 }
 
 
-UINT8 mc6845_get_ra(mc6845_t *mc6845)
+UINT8 mc6845_get_ra(const device_config *device)
 {
 	UINT8 ret;
-
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (mc6845->has_valid_parameters)
 	{
 		/* get the current vertical raster position and clamp it to the visible region */
-		int y = video_screen_get_vpos(mc6845->intf->scrnum);
+		int y = video_screen_get_vpos(mc6845->screen);
 
 		if (y > mc6845->max_visible_y)
 			y = mc6845->max_visible_y;
@@ -493,25 +503,26 @@ UINT8 mc6845_get_ra(mc6845_t *mc6845)
 
 static TIMER_CALLBACK( light_pen_latch_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
-	mc6845->light_pen_addr = mc6845_get_ma(mc6845);
+	mc6845->light_pen_addr = mc6845_get_ma(device);
 	mc6845->light_pen_latched = TRUE;
 }
 
 
-void mc6845_assert_light_pen_input(mc6845_t *mc6845)
+void mc6845_assert_light_pen_input(const device_config *device)
 {
 	int y, x;
 	int char_x;
 
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (mc6845->has_valid_parameters)
 	{
 		/* get the current pixel coordinates */
-		y = video_screen_get_vpos(mc6845->intf->scrnum);
-		x = video_screen_get_hpos(mc6845->intf->scrnum);
+		y = video_screen_get_vpos(mc6845->screen);
+		x = video_screen_get_hpos(mc6845->screen);
 
 		/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
 		char_x = x / mc6845->intf->hpixels_per_column;
@@ -528,7 +539,7 @@ void mc6845_assert_light_pen_input(mc6845_t *mc6845)
 		}
 
 		/* set the timer that will latch the display address into the light pen registers */
-		timer_adjust_oneshot(mc6845->light_pen_latch_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, y, x), 0);
+		timer_adjust_oneshot(mc6845->light_pen_latch_timer, video_screen_get_time_until_pos(mc6845->screen, y, x), 0);
 	}
 }
 
@@ -564,9 +575,9 @@ static void update_cursor_state(mc6845_t *mc6845)
 }
 
 
-void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect)
+void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 	assert(bitmap != NULL);
 	assert(cliprect != NULL);
 
@@ -581,7 +592,7 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 
 		/* call the set up function if any */
 		if (mc6845->intf->begin_update != NULL)
-			param = mc6845->intf->begin_update(mc6845->machine, mc6845, bitmap, cliprect);
+			param = mc6845->intf->begin_update(device, bitmap, cliprect);
 
 		if (cliprect->min_y == 0)
 		{
@@ -609,7 +620,7 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 			INT8 cursor_x = cursor_visible ? (mc6845->cursor_addr - mc6845->current_disp_addr) : -1;
 
 			/* call the external system to draw it */
-			mc6845->intf->update_row(mc6845->machine, mc6845, bitmap, cliprect, mc6845->current_disp_addr, ra, y, mc6845->horiz_disp, cursor_x, param);
+			mc6845->intf->update_row(device, bitmap, cliprect, mc6845->current_disp_addr, ra, y, mc6845->horiz_disp, cursor_x, param);
 
 			/* update MA if the last raster address */
 			if (ra == mc6845->max_ras_addr)
@@ -618,7 +629,7 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 
 		/* call the tear down function if any */
 		if (mc6845->intf->end_update != NULL)
-			mc6845->intf->end_update(mc6845->machine, mc6845, bitmap, cliprect, param);
+			mc6845->intf->end_update(device, bitmap, cliprect, param);
 
 		popmessage(NULL);
 	}
@@ -628,47 +639,53 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 
 
 /* device interface */
-static void *common_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config, int device_type)
+static void *common_start(const device_config *device, int device_type)
 {
 	mc6845_t *mc6845;
 	char unique_tag[30];
 
 	/* validate arguments */
-	assert(machine != NULL);
-	assert(tag != NULL);
-	assert(strlen(tag) < 20);
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
 
 	/* allocate the object that holds the state */
 	mc6845 = auto_malloc(sizeof(*mc6845));
 	memset(mc6845, 0, sizeof(*mc6845));
 
+	mc6845->intf = device->static_config;
 	mc6845->device_type = device_type;
-	mc6845->machine = machine;
-	mc6845->intf = static_config;
 
-	/* create the timers */
 	if (mc6845->intf != NULL)
 	{
+		assert(mc6845->intf->clock > 0);
+		assert(mc6845->intf->hpixels_per_column > 0);
+
+		/* get the screen device */
+		mc6845->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, mc6845->intf->screen_tag);
+		assert(mc6845->screen != NULL);
+
+		/* create the timers */
 		if (mc6845->intf->on_de_changed != NULL)
-			mc6845->de_changed_timer = timer_alloc(de_changed_timer_cb, mc6845);
+			mc6845->de_changed_timer = timer_alloc(de_changed_timer_cb, (void *)device);
 
 		if (mc6845->intf->on_hsync_changed != NULL)
 		{
-			mc6845->hsync_on_timer = timer_alloc(hsync_on_timer_cb, mc6845);
-			mc6845->hsync_off_timer = timer_alloc(hsync_off_timer_cb, mc6845);
+			mc6845->hsync_on_timer = timer_alloc(hsync_on_timer_cb, (void *)device);
+			mc6845->hsync_off_timer = timer_alloc(hsync_off_timer_cb, (void *)device);
 		}
 
 		if (mc6845->intf->on_vsync_changed != NULL)
 		{
-			mc6845->vsync_on_timer = timer_alloc(vsync_on_timer_cb, mc6845);
-			mc6845->vsync_off_timer = timer_alloc(vsync_off_timer_cb, mc6845);
+			mc6845->vsync_on_timer = timer_alloc(vsync_on_timer_cb, (void *)device);
+			mc6845->vsync_off_timer = timer_alloc(vsync_off_timer_cb, (void *)device);
 		}
 	}
 
-	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, mc6845);
+	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, (void *)device);
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], tag);
+	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], device->tag);
 
 	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
 
@@ -697,35 +714,55 @@ static void *common_start(running_machine *machine, const char *tag, const void 
 
 static DEVICE_START( mc6845 )
 {
-	return common_start(machine, tag, static_config, inline_config, TYPE_MC6845);
+	return common_start(device, TYPE_MC6845);
+}
+
+static DEVICE_START( mc6845_1 )
+{
+	return common_start(device, TYPE_MC6845_1);
 }
 
 static DEVICE_START( c6545_1 )
 {
-	return common_start(machine, tag, static_config, inline_config, TYPE_C6545_1);
+	return common_start(device, TYPE_C6545_1);
 }
 
 static DEVICE_START( r6545_1 )
 {
-	return common_start(machine, tag, static_config, inline_config, TYPE_R6545_1);
+	return common_start(device, TYPE_R6545_1);
+}
+
+static DEVICE_START( h46505 )
+{
+	return common_start(device, TYPE_H46505);
+}
+
+static DEVICE_START( hd6845 )
+{
+	return common_start(device, TYPE_HD6845);
+}
+
+static DEVICE_START( sy6545_1 )
+{
+	return common_start(device, TYPE_SY6545_1);
 }
 
 
 static DEVICE_RESET( mc6845 )
 {
-	mc6845_t *mc6845 = token;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* internal registers other than status remain unchanged, all outputs go low */
 	if (mc6845->intf != NULL)
 	{
 		if (mc6845->intf->on_de_changed != NULL)
-			mc6845->intf->on_de_changed(machine, mc6845, FALSE);
+			mc6845->intf->on_de_changed(device, FALSE);
 
 		if (mc6845->intf->on_hsync_changed != NULL)
-			mc6845->intf->on_hsync_changed(machine, mc6845, FALSE);
+			mc6845->intf->on_hsync_changed(device, FALSE);
 
 		if (mc6845->intf->on_vsync_changed != NULL)
-			mc6845->intf->on_vsync_changed(machine, mc6845, FALSE);
+			mc6845->intf->on_vsync_changed(device, FALSE);
 	}
 
 	mc6845->light_pen_latched = FALSE;
@@ -758,9 +795,24 @@ DEVICE_GET_INFO( mc6845 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "Motorola 6845";					break;
 		case DEVINFO_STR_FAMILY:						info->s = "MC6845 CRTC";					break;
-		case DEVINFO_STR_VERSION:						info->s = "1.6";							break;
+		case DEVINFO_STR_VERSION:						info->s = "1.61";							break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
+}
+
+
+DEVICE_GET_INFO( mc6845_1 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Motorla 6845-1";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845_1);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
 }
 
@@ -770,7 +822,7 @@ DEVICE_GET_INFO( c6545_1 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Commodore 6545-1";				break;
+		case DEVINFO_STR_NAME:							info->s = "MOS Technology 6545-1";			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c6545_1);	break;
@@ -789,6 +841,51 @@ DEVICE_GET_INFO( r6545_1 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(r6545_1);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( h46505 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Hitachi 46505";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(h46505);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( hd6845 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Hitachi 6845";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(hd6845);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( sy6545_1 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Synertek 6545-1";				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sy6545_1);	break;
 
 		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}

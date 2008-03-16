@@ -173,7 +173,7 @@ VIDEO_START( pc_mda )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, MRA8_BANK11 );
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, SMH_BANK11 );
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, pc_video_videoram_w );
 			memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_MDA_r );
 			memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_MDA_w );
@@ -287,8 +287,10 @@ static void mda_text_inten(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	rectangle r;
 	struct mscrtc6845_cursor cursor;
 	UINT8 attr;
+	const device_config *screen = video_screen_first(Machine->config);
+	int screen_width = video_screen_get_width(screen);
 
-	char_width = Machine->screen[0].width / 80;
+	char_width = screen_width / 80;
 
 	mscrtc6845_time(crtc);
 	mscrtc6845_get_cursor(crtc, &cursor);
@@ -337,8 +339,10 @@ static void mda_text_blink(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	rectangle r;
 	struct mscrtc6845_cursor cursor;
 	int char_width;
+	const device_config *screen = video_screen_first(Machine->config);
+	int screen_width = video_screen_get_width(screen);
 
-	char_width = Machine->screen[0].width / 80;
+	char_width = screen_width / 80;
 
 	mscrtc6845_time(crtc);
 	mscrtc6845_get_cursor(crtc, &cursor);
@@ -404,15 +408,17 @@ static void hercules_gfx(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 pc_video_update_proc pc_mda_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc)
 {
 	pc_video_update_proc proc = NULL;
+	const device_config *screen = video_screen_first(Machine->config);
+	int screen_width = video_screen_get_width(screen);
 
 	switch (mda.mode_control & 0x2a) { /* text and gfx modes */
 	case 0x08:
 		proc = mda_text_inten;
-		*width *= Machine->screen[0].width / 80;
+		*width *= screen_width / 80;
 		break;
 	case 0x28:
 		proc = mda_text_blink;
-		*width *= Machine->screen[0].width / 80;
+		*width *= screen_width / 80;
 		break;
 	case 0x0a:
 	case 0x2a:

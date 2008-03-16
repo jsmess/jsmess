@@ -36,8 +36,8 @@ WRITE8_HANDLER( fgoal_xpos_w )
 
 VIDEO_START( fgoal )
 {
-	fgbitmap = auto_bitmap_alloc(256, 256, machine->screen[0].format);
-	bgbitmap = auto_bitmap_alloc(256, 256, machine->screen[0].format);
+	fgbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	bgbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 
@@ -53,7 +53,7 @@ VIDEO_UPDATE( fgoal )
 
 	if (fgoal_player == 1 && (readinputport(1) & 0x40))
 	{
-		drawgfxzoom(fgbitmap, machine->gfx[0],
+		drawgfxzoom(fgbitmap, screen->machine->gfx[0],
 			0, (fgoal_player << 2) | current_color,
 			1, 1,
 			0, 16,
@@ -61,7 +61,7 @@ VIDEO_UPDATE( fgoal )
 			0x40000,
 			0x40000);
 
-		drawgfxzoom(bgbitmap, machine->gfx[1],
+		drawgfxzoom(bgbitmap, screen->machine->gfx[1],
 			0, 0,
 			1, 1,
 			0, 16,
@@ -71,7 +71,7 @@ VIDEO_UPDATE( fgoal )
 	}
 	else
 	{
-		drawgfxzoom(fgbitmap, machine->gfx[0],
+		drawgfxzoom(fgbitmap, screen->machine->gfx[0],
 			0, (fgoal_player << 2) | current_color,
 			0, 0,
 			0, 0,
@@ -79,7 +79,7 @@ VIDEO_UPDATE( fgoal )
 			0x40000,
 			0x40000);
 
-		drawgfxzoom(bgbitmap, machine->gfx[1],
+		drawgfxzoom(bgbitmap, screen->machine->gfx[1],
 			0, 0,
 			0, 0,
 			0, 0,

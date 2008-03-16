@@ -36,8 +36,8 @@ static void mpc105_update_memory(void)
 		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 		{
 			/* first clear everything out */
-			memory_install_read64_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, MRA64_NOP);
-			memory_install_write64_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, MWA64_NOP);
+			memory_install_read64_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
+			memory_install_write64_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
 		}
 	}
 

@@ -2328,8 +2328,8 @@ void genesis_common_init( void )
 	memset( genesis_mainram, 0x00, 0x10000);
 
 	/* Another brutal hack to work around 0.101u1 memory changes */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MRA8_BANK10);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MWA8_BANK10);
+	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK10);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK10);
 	memory_set_bankptr(10, memory_region(REGION_CPU2));
 
 //	memory_set_bankptr(1,memory_region(REGION_USER1)); /* cartridge at BANK1 */

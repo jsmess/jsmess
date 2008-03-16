@@ -218,15 +218,15 @@ static VIDEO_UPDATE( saa5050 )
 				colour = saa5050_state.saa5050_forecol | (saa5050_state.saa5050_backcol << 3);
 			if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
 			{
-				drawgfx (bitmap, machine->gfx[1], code, colour, 0, 0,
-					sx * 6, sy * 10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-				drawgfx (bitmap, machine->gfx[2], code, colour, 0, 0,
-					sx * 6, (sy + 1) * 10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+				drawgfx (bitmap, screen->machine->gfx[1], code, colour, 0, 0,
+					sx * 6, sy * 10, NULL, TRANSPARENCY_NONE, 0);
+				drawgfx (bitmap, screen->machine->gfx[2], code, colour, 0, 0,
+					sx * 6, (sy + 1) * 10, NULL, TRANSPARENCY_NONE, 0);
 			}
 			else
 			{
-				drawgfx (bitmap, machine->gfx[0], code, colour, 0, 0,
-					sx * 6, sy * 10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+				drawgfx (bitmap, screen->machine->gfx[0], code, colour, 0, 0,
+					sx * 6, sy * 10, NULL, TRANSPARENCY_NONE, 0);
 			}
 		}
 		if (saa5050_state.saa5050_flags & SAA5050_DBLHI)

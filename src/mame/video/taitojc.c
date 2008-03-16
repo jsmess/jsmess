@@ -195,6 +195,8 @@ static void taitojc_exit(running_machine *machine)
 
 VIDEO_START( taitojc )
 {
+	int width, height;
+
 	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, taitojc_exit);
 
@@ -224,9 +226,11 @@ VIDEO_START( taitojc )
 
 	taitojc_texture = auto_malloc(0x400000);
 
-	framebuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	framebuffer = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	zbuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
+	zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 //static int tick = 0;
@@ -275,7 +279,7 @@ VIDEO_UPDATE( taitojc )
 		}
 	}
 
-	taitojc_tile_update(machine);
+	taitojc_tile_update(screen->machine);
 	tilemap_draw(bitmap, cliprect, taitojc_tilemap, 0,0);
 
 	/*
@@ -492,7 +496,7 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 
 				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
 				{
-					poly_render_triangle(poly, framebuffer, &Machine->screen[0].visarea, render_texture_scan, 4, &vert[0], &vert[1], &vert[2]);
+					poly_render_triangle(poly, framebuffer, video_screen_get_visible_area(Machine->primary_screen), render_texture_scan, 4, &vert[0], &vert[1], &vert[2]);
 				}
 				break;
 			}
@@ -540,11 +544,11 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 						vert[2].p[1] == vert[3].p[1])
 					{
 						// optimization: all colours the same -> render solid
-						poly_render_quad(poly, framebuffer, &Machine->screen[0].visarea, render_solid_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
+						poly_render_quad(poly, framebuffer, video_screen_get_visible_area(Machine->primary_screen), render_solid_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
 					}
 					else
 					{
-						poly_render_quad(poly, framebuffer, &Machine->screen[0].visarea, render_shade_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
+						poly_render_quad(poly, framebuffer, video_screen_get_visible_area(Machine->primary_screen), render_shade_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
 					}
 				}
 				break;
@@ -610,7 +614,7 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 
 				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
 				{
-					poly_render_quad(poly, framebuffer, &Machine->screen[0].visarea, render_texture_scan, 4, &vert[0], &vert[1], &vert[2], &vert[3]);
+					poly_render_quad(poly, framebuffer, video_screen_get_visible_area(Machine->primary_screen), render_texture_scan, 4, &vert[0], &vert[1], &vert[2], &vert[3]);
 				}
 				break;
 			}
@@ -634,8 +638,8 @@ void taitojc_clear_frame(void)
 
 	cliprect.min_x = 0;
 	cliprect.min_y = 0;
-	cliprect.max_x = Machine->screen[0].width-1;
-	cliprect.max_y = Machine->screen[0].height-1;
+	cliprect.max_x = video_screen_get_width(Machine->primary_screen) - 1;
+	cliprect.max_y = video_screen_get_height(Machine->primary_screen) - 1;
 
 	fillbitmap(framebuffer, 0, &cliprect);
 	fillbitmap(zbuffer, 0xffff, &cliprect);

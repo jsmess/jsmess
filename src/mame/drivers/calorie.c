@@ -156,12 +156,12 @@ static VIDEO_UPDATE( calorie )
 		if( calorie_sprites[x+1] & 0x10 )
 		{
 			 /* 32x32 sprites */
-			drawgfx(bitmap,machine->gfx[3],tileno | 0x40,color,flipx,flipy,xpos,ypos - 31,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[3],tileno | 0x40,color,flipx,flipy,xpos,ypos - 31,cliprect,TRANSPARENCY_PEN,0);
 		}
 		else
 		{
 			/* 16x16 sprites */
-			drawgfx(bitmap,machine->gfx[2],tileno,color,flipx,flipy,xpos,ypos - 15,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[2],tileno,color,flipx,flipy,xpos,ypos - 15,cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 	return 0;
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( calorie_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( calorie_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_1_w)

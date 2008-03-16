@@ -60,19 +60,21 @@ static VIDEO_START( mogura )
 
 static VIDEO_UPDATE( mogura )
 {
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+
 	/* tilemap layout is a bit strange ... */
 	rectangle clip;
-	clip.min_x = machine->screen[0].visarea.min_x;
+	clip.min_x = visarea->min_x;
 	clip.max_x = 256-1;
-	clip.min_y = machine->screen[0].visarea.min_y;
-	clip.max_y = machine->screen[0].visarea.max_y;
+	clip.min_y = visarea->min_y;
+	clip.max_y = visarea->max_y;
 	tilemap_set_scrollx(mogura_tilemap,0, 256);
 	tilemap_draw(bitmap,&clip,mogura_tilemap,0,0);
 
 	clip.min_x = 256;
 	clip.max_x = 512-1;
-	clip.min_y = machine->screen[0].visarea.min_y;
-	clip.max_y = machine->screen[0].visarea.max_y;
+	clip.min_y = visarea->min_y;
+	clip.max_y = visarea->max_y;
 	tilemap_set_scrollx(mogura_tilemap,0, -128);
 	tilemap_draw(bitmap,&clip,mogura_tilemap,0,0);
 
@@ -87,7 +89,7 @@ static WRITE8_HANDLER( mogura_tileram_w )
 
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READ(input_port_0_r)
 	AM_RANGE(0x0c, 0x0c) AM_READ(input_port_1_r)
 	AM_RANGE(0x0d, 0x0d) AM_READ(input_port_2_r)
@@ -105,8 +107,8 @@ static WRITE8_HANDLER(dac_w)
 
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP) // ??
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) // ??
 	AM_RANGE(0x14, 0x14) AM_WRITE(dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
 ADDRESS_MAP_END
 
@@ -122,15 +124,15 @@ static WRITE8_HANDLER ( mogura_gfxram_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM) // main ram
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM) // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM) // tilemap
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM) // main ram
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) // ram based characters
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM) // tilemap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(mogura_gfxram_w) AM_BASE(&mogura_gfxram)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(mogura_tileram_w) AM_BASE(&mogura_tileram)
 ADDRESS_MAP_END

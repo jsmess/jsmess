@@ -468,7 +468,7 @@ DrawPoly( bitmap_t *bitmap, const UINT32 *pSource, int n, int bNew )
 
 static VIDEO_UPDATE( ss23 )
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
 
 	tilemap_mark_all_tiles_dirty(bgtilemap);
@@ -653,7 +653,7 @@ static READ16_HANDLER( sharedram_sub_r )
 
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( s23h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_READWRITE( c352_0_r, c352_0_w )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP //( input_port_1_word_r )

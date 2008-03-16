@@ -99,16 +99,16 @@ static const ppi8255_interface single_ppi_intf =
 static const struct segaic16_memory_map_entry outrun_info[] =
 {
 	{ 0x35/2, 0x90000, 0x10000, 0xf00000,      ~0, segaic16_road_control_0_r, segaic16_road_control_0_w, NULL,                  "road control" },
-	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, MRA16_BANK10,              MWA16_BANK10,              &segaic16_roadram_0,   "road RAM" },
-	{ 0x35/2, 0x60000, 0x08000, 0xf18000,      ~0, MRA16_BANK11,              MWA16_BANK11,              &cpu1ram,              "CPU 1 RAM" },
-	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, MRA16_BANK12,              MWA16_UNMAP,               &cpu1rom,              "CPU 1 ROM" },
+	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, SMH_BANK10,              SMH_BANK10,              &segaic16_roadram_0,   "road RAM" },
+	{ 0x35/2, 0x60000, 0x08000, 0xf18000,      ~0, SMH_BANK11,              SMH_BANK11,              &cpu1ram,              "CPU 1 RAM" },
+	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, SMH_BANK12,              SMH_UNMAP,               &cpu1rom,              "CPU 1 ROM" },
 	{ 0x31/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                 misc_io_w,                 NULL,                  "I/O space" },
-	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK13,              MWA16_BANK13,              &segaic16_spriteram_0, "object RAM" },
-	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, MRA16_BANK14,              segaic16_paletteram_w,     &paletteram16,         "color RAM" },
-	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK15,              segaic16_tileram_0_w,      &segaic16_tileram_0,   "tile RAM" },
-	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK16,              segaic16_textram_0_w,      &segaic16_textram_0,   "text RAM" },
-	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, MRA16_BANK17,              MWA16_BANK17,              &workram,              "CPU 0 RAM" },
-	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, MRA16_BANK18,              MWA16_UNMAP,               NULL,                  "CPU 0 ROM" },
+	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK13,              SMH_BANK13,              &segaic16_spriteram_0, "object RAM" },
+	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, SMH_BANK14,              segaic16_paletteram_w,     &paletteram16,         "color RAM" },
+	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK15,              segaic16_tileram_0_w,      &segaic16_tileram_0,   "tile RAM" },
+	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK16,              segaic16_textram_0_w,      &segaic16_textram_0,   "text RAM" },
+	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, SMH_BANK17,              SMH_BANK17,              &workram,              "CPU 0 RAM" },
+	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, SMH_BANK18,              SMH_UNMAP,               NULL,                  "CPU 0 ROM" },
 	{ 0 }
 };
 
@@ -214,7 +214,7 @@ static TIMER_CALLBACK( scanline_callback )
 		case 65:
 		case 129:
 		case 193:
-			timer_set(video_screen_get_time_until_pos(0, scanline, machine->screen[0].visarea.max_x + 1), NULL, 0, irq2_gen);
+			timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, video_screen_get_visible_area(machine->primary_screen)->max_x + 1), NULL, 0, irq2_gen);
 			next_scanline = scanline + 1;
 			break;
 
@@ -245,7 +245,7 @@ static TIMER_CALLBACK( scanline_callback )
 	update_main_irqs(machine);
 
 	/* come back at the next targeted scanline */
-	timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), NULL, next_scanline, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, next_scanline, 0), NULL, next_scanline, scanline_callback);
 }
 
 
@@ -276,7 +276,7 @@ static MACHINE_RESET( outrun )
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);
 
 	/* start timers to track interrupts */
-	timer_set(video_screen_get_time_until_pos(0, 223, 0), NULL, 223, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 223, 0), NULL, 223, scanline_callback);
 }
 
 
@@ -521,7 +521,7 @@ static NVRAM_HANDLER( outrun )
  *************************************/
 
 static ADDRESS_MAP_START( outrun_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w)
 ADDRESS_MAP_END
 
@@ -534,7 +534,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(20) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM AM_BASE(&cpu1rom)
 	AM_RANGE(0x060000, 0x067fff) AM_MIRROR(0x018000) AM_RAM AM_BASE(&cpu1ram)
 	AM_RANGE(0x080000, 0x080fff) AM_MIRROR(0x00f000) AM_RAM AM_BASE(&segaic16_roadram_0)
@@ -550,14 +551,15 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_READWRITE(SegaPCM_r, SegaPCM_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(8) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)

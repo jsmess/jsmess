@@ -119,8 +119,8 @@ static VIDEO_UPDATE( tugboat )
 	int startaddr1 = hd46505_1_reg[0x0c]*256 + hd46505_1_reg[0x0d];
 
 
-	draw_tilemap(machine, bitmap,cliprect,startaddr0,0,1,TRANSPARENCY_NONE);
-	draw_tilemap(machine, bitmap,cliprect,startaddr1,2,3,TRANSPARENCY_PEN);
+	draw_tilemap(screen->machine, bitmap,cliprect,startaddr0,0,1,TRANSPARENCY_NONE);
+	draw_tilemap(screen->machine, bitmap,cliprect,startaddr1,2,3,TRANSPARENCY_PEN);
 	return 0;
 }
 
@@ -168,7 +168,7 @@ static const pia6821_interface pia1_intf =
 static TIMER_CALLBACK( interrupt_gen )
 {
 	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	timer_set(video_screen_get_frame_period(0), NULL, 0, interrupt_gen);
+	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, interrupt_gen);
 }
 
 static MACHINE_START( tugboat )
@@ -180,32 +180,32 @@ static MACHINE_START( tugboat )
 static MACHINE_RESET( tugboat )
 {
 	pia_reset();
-	timer_set(video_screen_get_time_until_pos(0, 30*8+4, 0), NULL, 0, interrupt_gen);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 30*8+4, 0), NULL, 0, interrupt_gen);
 }
 
 
 static ADDRESS_MAP_START( tugboat_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x11e4, 0x11e7) AM_READ(pia_0_r)
 	AM_RANGE(0x11e8, 0x11eb) AM_READ(pia_1_r)
-	//AM_RANGE(0x1700, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xfff0, 0xffff) AM_READ(MRA8_ROM)	/* vectors */
+	//AM_RANGE(0x1700, 0x1fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xfff0, 0xffff) AM_READ(SMH_ROM)	/* vectors */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tugboat_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(MWA8_RAM) AM_BASE(&tugboat_ram)
+	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM) AM_BASE(&tugboat_ram)
 	AM_RANGE(0x1060, 0x1060) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x1061, 0x1061) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(tugboat_hd46505_0_w)	// scrolling is performed changing the start_addr register (0C/0D)
 	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(tugboat_hd46505_1_w)
 	AM_RANGE(0x11e4, 0x11e7) AM_WRITE(pia_0_w)
 	AM_RANGE(0x11e8, 0x11eb) AM_WRITE(pia_1_w)
-	//AM_RANGE(0x1700, 0x1fff) AM_WRITE(MWA8_RAM)
+	//AM_RANGE(0x1700, 0x1fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x18e0, 0x18ef) AM_WRITE(tugboat_score_w)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(MWA8_RAM)	/* tilemap RAM */
-    AM_RANGE(0x5000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_RAM)	/* tilemap RAM */
+    AM_RANGE(0x5000, 0x7fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

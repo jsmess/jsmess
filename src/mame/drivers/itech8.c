@@ -586,7 +586,7 @@ static INTERRUPT_GEN( generate_nmi )
 	itech8_update_interrupts(machine, 1, -1, -1);
 	itech8_update_interrupts(machine, 0, -1, -1);
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(0));
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -623,7 +623,7 @@ static MACHINE_START( sstrike )
 	MACHINE_START_CALL(itech8);
 
 	/* we need to update behind the beam as well */
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 32, behind_the_beam_update);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 32, behind_the_beam_update);
 }
 
 static MACHINE_RESET( itech8 )
@@ -649,7 +649,7 @@ static MACHINE_RESET( itech8 )
 	/* set the visible area */
 	if (visarea)
 	{
-		video_screen_set_visarea(0, visarea->min_x, visarea->max_x, visarea->min_y, visarea->max_y);
+		video_screen_set_visarea(machine->primary_screen, visarea->min_x, visarea->max_x, visarea->min_y, visarea->max_y);
 		visarea = NULL;
 	}
 }
@@ -668,14 +668,14 @@ static TIMER_CALLBACK( behind_the_beam_update )
 	int interval = param & 0xff;
 
 	/* force a partial update to the current scanline */
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* advance by the interval, and wrap to 0 */
 	scanline += interval;
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, (scanline << 8) + interval, behind_the_beam_update);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, (scanline << 8) + interval, behind_the_beam_update);
 }
 
 
@@ -933,7 +933,7 @@ static ADDRESS_MAP_START( tmslo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITENOP
 	AM_RANGE(0x1120, 0x1120) AM_WRITE(sound_data_w)
-	AM_RANGE(0x1140, 0x1140) AM_READWRITE(special_port0_r, MWA8_RAM) AM_BASE(&itech8_grom_bank)
+	AM_RANGE(0x1140, 0x1140) AM_READWRITE(special_port0_r, SMH_RAM) AM_BASE(&itech8_grom_bank)
 	AM_RANGE(0x1160, 0x1160) AM_READWRITE(input_port_1_r, itech8_page_w)
 	AM_RANGE(0x1180, 0x1180) AM_READWRITE(input_port_2_r, tms34061_latch_w)
 	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(itech8_nmi_ack_w)
@@ -949,7 +949,7 @@ static ADDRESS_MAP_START( tmshi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x0100, 0x0100) AM_WRITENOP
 	AM_RANGE(0x0120, 0x0120) AM_WRITE(sound_data_w)
-	AM_RANGE(0x0140, 0x0140) AM_READWRITE(special_port0_r, MWA8_RAM) AM_BASE(&itech8_grom_bank)
+	AM_RANGE(0x0140, 0x0140) AM_READWRITE(special_port0_r, SMH_RAM) AM_BASE(&itech8_grom_bank)
 	AM_RANGE(0x0160, 0x0160) AM_READWRITE(input_port_1_r, itech8_page_w)
 	AM_RANGE(0x0180, 0x0180) AM_READWRITE(input_port_2_r, tms34061_latch_w)
 	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(itech8_nmi_ack_w)
@@ -966,7 +966,7 @@ static ADDRESS_MAP_START( gtg2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0120, 0x0120) AM_READWRITE(input_port_1_r, itech8_page_w)
 	AM_RANGE(0x0140, 0x015f) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x0140, 0x0140) AM_READ(input_port_2_r)
-	AM_RANGE(0x0160, 0x0160) AM_WRITE(MWA8_RAM) AM_BASE(&itech8_grom_bank)
+	AM_RANGE(0x0160, 0x0160) AM_WRITE(SMH_RAM) AM_BASE(&itech8_grom_bank)
 	AM_RANGE(0x0180, 0x019f) AM_READWRITE(itech8_blitter_r, blitter_w)
 	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
 	AM_RANGE(0x01e0, 0x01e0) AM_WRITE(tms34061_latch_w)
@@ -985,7 +985,7 @@ static ADDRESS_MAP_START( ninclown_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100100, 0x100101) AM_READWRITE(input_port_0_word_r, grom_bank16_w) AM_BASE((void *)&itech8_grom_bank)
 	AM_RANGE(0x100180, 0x100181) AM_READWRITE(input_port_1_word_r, display_page16_w)
 	AM_RANGE(0x100240, 0x100241) AM_WRITE(tms34061_latch16_w)
-	AM_RANGE(0x100280, 0x100281) AM_READWRITE(input_port_2_word_r, MWA16_NOP)
+	AM_RANGE(0x100280, 0x100281) AM_READWRITE(input_port_2_word_r, SMH_NOP)
 	AM_RANGE(0x100300, 0x10031f) AM_READWRITE(blitter16_r, blitter16_w)
 	AM_RANGE(0x100380, 0x1003ff) AM_WRITE(palette16_w)
 	AM_RANGE(0x110000, 0x110fff) AM_READWRITE(tms34061_16_r, tms34061_16_w)
@@ -1050,7 +1050,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( slikz80_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(slikz80_port_r, slikz80_port_w)
 ADDRESS_MAP_END
 

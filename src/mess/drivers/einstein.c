@@ -112,8 +112,6 @@ static int einstein_ctc_trigger = 0;
 static int einstein_keyboard_line = 0;
 static int einstein_keyboard_data = 0x0ff;
 
-static mc6845_t	*mc6845;
-
 #define EINSTEIN_DUMP_RAM
 
 #ifdef EINSTEIN_DUMP_RAM
@@ -249,7 +247,7 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 	}
 }
 
-static void einstein_6845_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+static MC6845_ON_DE_CHANGED( einstein_6845_display_enable_changed )
 {
 	/* TODO: Implement me properly */
 	if ( display_enabled ) {
@@ -450,6 +448,10 @@ static void einstein_pio_ardy(int data)
 static const z80pio_interface einstein_pio_intf =
 {
 	einstein_pio_interrupt,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
 	einstein_pio_ardy,
 	NULL
 };
@@ -785,8 +787,8 @@ static  READ8_HANDLER(einstein_psg_r)
 
 
 static ADDRESS_MAP_START( einstein_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x01fff) AM_READWRITE(MRA8_BANK1, MWA8_BANK3)
-	AM_RANGE(0x2000, 0x0ffff) AM_READWRITE(MRA8_BANK2, MWA8_BANK4)
+	AM_RANGE(0x0000, 0x01fff) AM_READWRITE(SMH_BANK1, SMH_BANK3)
+	AM_RANGE(0x2000, 0x0ffff) AM_READWRITE(SMH_BANK2, SMH_BANK4)
 ADDRESS_MAP_END
 
 
@@ -1468,7 +1470,6 @@ static MACHINE_RESET( einstein )
 static MACHINE_RESET( einstein2 )
 {
 	MACHINE_RESET_CALL(einstein);
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	einstein_80col_init();
 }
 
@@ -1704,6 +1705,8 @@ static const struct AY8910interface einstein_ay_interface =
 
 static VIDEO_UPDATE( einstein2 )
 {
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
+
 	VIDEO_UPDATE_CALL(tms9928a);
 	mc6845_update(mc6845, bitmap, cliprect);
 //  VIDEO_UPDATE_CALL(einstein_80col);

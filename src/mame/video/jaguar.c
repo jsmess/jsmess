@@ -237,10 +237,12 @@ static void blitter_x1800x01_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT3
 
 INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
-	int width = machine->screen[0].visarea.max_x + 1 - machine->screen[0].visarea.min_x;
-	int height = machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y;
-	*x = machine->screen[0].visarea.min_x + (((readinputport(3 + player * 2) & 0xff) * width) >> 8);
-	*y = machine->screen[0].visarea.min_y + (((readinputport(4 + player * 2) & 0xff) * height) >> 8);
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+
+	int width = visarea->max_x + 1 - visarea->min_x;
+	int height = visarea->max_y + 1 - visarea->min_y;
+	*x = visarea->min_x + (((readinputport(3 + player * 2) & 0xff) * width) >> 8);
+	*y = visarea->min_y + (((readinputport(4 + player * 2) & 0xff) * height) >> 8);
 }
 
 
@@ -288,11 +290,11 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 	hdb = hdbpix[vc % 2];
 
 	/* if setting the second one in a line, make sure we will ever actually hit it */
-	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= machine->screen[0].width))
+	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= video_screen_get_width(machine->primary_screen)))
 		return FALSE;
 
 	/* adjust the timer */
-	timer_adjust_oneshot(object_timer, video_screen_get_time_until_pos(0, vc / 2, hdb), vc | (hdb << 16));
+	timer_adjust_oneshot(object_timer, video_screen_get_time_until_pos(machine->primary_screen, vc / 2, hdb), vc | (hdb << 16));
 	return TRUE;
 }
 
@@ -631,10 +633,10 @@ READ16_HANDLER( jaguar_tom_regs_r )
 			return cpu_irq_state;
 
 		case HC:
-			return video_screen_get_hpos(0) % (Machine->screen[0].width / 2);
+			return video_screen_get_hpos(machine->primary_screen) % (video_screen_get_width(machine->primary_screen) / 2);
 
 		case VC:
-			return video_screen_get_vpos(0) * 2 + gpu_regs[VBE];
+			return video_screen_get_vpos(machine->primary_screen) * 2 + gpu_regs[VBE];
 
 	}
 
@@ -686,7 +688,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 					visarea.max_x = hbstart / 2 - 1;
 					visarea.min_y = vbend / 2;
 					visarea.max_y = vbstart / 2 - 1;
-					video_screen_configure(0, hperiod / 2, vperiod / 2, &visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
+					video_screen_configure(machine->primary_screen, hperiod / 2, vperiod / 2, &visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
 				}
 				break;
 			}
@@ -756,12 +758,13 @@ static TIMER_CALLBACK( cojag_scanline_update )
 {
 	int vc = param & 0xffff;
 	int hdb = param >> 16;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	/* only run if video is enabled and we are past the "display begin" */
 	if ((gpu_regs[VMODE] & 1) && vc >= (gpu_regs[VDB] & 0x7ff))
 	{
 		UINT32 *dest = BITMAP_ADDR32(screen_bitmap, vc / 2, 0);
-		int maxx = machine->screen[0].visarea.max_x;
+		int maxx = visarea->max_x;
 		int hde = effective_hvalue(gpu_regs[HDE]) / 2;
 		UINT16 scanline[360];
 		int x;
@@ -770,7 +773,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		if (ENABLE_BORDERS && vc % 2 == 0)
 		{
 			rgb_t border = MAKE_RGB(gpu_regs[BORD1] & 0xff, gpu_regs[BORD1] >> 8, gpu_regs[BORD2] & 0xff);
-			for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
+			for (x = visarea->min_x; x <= visarea->max_x; x++)
 				dest[x] = border;
 		}
 
@@ -793,7 +796,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		}
 
 		/* point to the next counter value */
-		if (++vc / 2 >= machine->screen[0].height)
+		if (++vc / 2 >= video_screen_get_height(machine->primary_screen))
 			vc = 0;
 
 	} while (!adjust_object_timer(machine, vc));

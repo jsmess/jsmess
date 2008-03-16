@@ -1203,8 +1203,10 @@ VIDEO_UPDATE( sprtmtch )
 
 VIDEO_UPDATE( jantouki )
 {
-
 	int layers_ctrl = dynax_layer_enable;
+
+	const device_config *top_screen    = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
+	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
 
 	if (debug_viewer(bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
@@ -1214,14 +1216,14 @@ VIDEO_UPDATE( jantouki )
 		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
 		cliprect);
 
-	if (screen==0)
+	if (screen == top_screen)
 	{
 	//  if (layers_ctrl & 0x01) jantouki_copylayer( bitmap, cliprect, 3, 0 );
 		if (layers_ctrl & 0x02)	jantouki_copylayer( bitmap, cliprect, 2, 0 );
 		if (layers_ctrl & 0x04)	jantouki_copylayer( bitmap, cliprect, 1, 0 );
 		if (layers_ctrl & 0x08)	jantouki_copylayer( bitmap, cliprect, 0, 0 );
 	}
-	else if (screen==1)
+	else if (screen == bottom_screen)
 	{
 		if (layers_ctrl & 0x01)	jantouki_copylayer( bitmap, cliprect, 3, 0 );
 		if (layers_ctrl & 0x10)	jantouki_copylayer( bitmap, cliprect, 7, 0 );
@@ -1252,29 +1254,26 @@ VIDEO_UPDATE( mjdialq2 )
 
 // htengoku uses the mixer chip from ddenlovr
 
-static bitmap_t *framebuffer;
-
 VIDEO_START(htengoku)
 {
 	VIDEO_START_CALL(ddenlovr);
 	VIDEO_START_CALL(hnoridur);
-	framebuffer = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
-VIDEO_EOF(htengoku)
+VIDEO_UPDATE(htengoku)
 {
 	int layer,x,y;
 
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
-	// format and let VIDEO_EOF(ddenlovr) do the final compositing (priorities + palettes)
+	// format and let VIDEO_UPDATE(ddenlovr) do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
-		fillbitmap(framebuffer,0,&machine->screen[0].visarea);
-		hanamai_copylayer( framebuffer, &machine->screen[0].visarea, layer );
+		fillbitmap(bitmap,0,cliprect);
+		hanamai_copylayer( bitmap, cliprect, layer );
 
 		for (y=0; y < 256; y++)
 			for (x=0; x < 512; x++)
-				ddenlovr_pixmap[3-layer][y*512+x] = (UINT8)(*BITMAP_ADDR16(framebuffer, y,x));
+				ddenlovr_pixmap[3-layer][y*512+x] = (UINT8)(*BITMAP_ADDR16(bitmap, y,x));
 	}
-	VIDEO_EOF_CALL(ddenlovr);
+	return VIDEO_UPDATE_CALL(ddenlovr);
 }

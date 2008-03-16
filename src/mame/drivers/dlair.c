@@ -192,7 +192,7 @@ static VIDEO_START( dleuro )
 {
 	VIDEO_START_CALL(dlair);
 
-	overlay_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	overlay_bitmap = auto_bitmap_alloc(video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
 	fillbitmap(overlay_bitmap, 8, NULL);
 	overlay_texture = render_texture_alloc(NULL, NULL);
 }
@@ -238,11 +238,11 @@ static VIDEO_UPDATE( dleuro )
 		for (x = 0; x < 32; x++)
 		{
 			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
-			drawgfx(overlay_bitmap, machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y, cliprect, TRANSPARENCY_NONE, 0);
+			drawgfx(overlay_bitmap, screen->machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y, cliprect, TRANSPARENCY_NONE, 0);
 		}
 
 	/* update the overlay */
-	render_texture_set_bitmap(overlay_texture, overlay_bitmap, &machine->screen[0].visarea, 0, TEXFORMAT_PALETTE16);
+	render_texture_set_bitmap(overlay_texture, overlay_bitmap, video_screen_get_visible_area(screen), 0, TEXFORMAT_PALETTE16);
 
 	/* get the current video and update the bitmap if different */
 	seqid = laserdisc_get_video(discinfo, &vidbitmap);
@@ -527,7 +527,7 @@ ADDRESS_MAP_END
 
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( dleuro_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_READWRITE(sio_r, sio_w)
 ADDRESS_MAP_END

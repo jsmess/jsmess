@@ -331,7 +331,7 @@ static void avigo_refresh_memory(void)
 		/* ram */
 		case 0x01:
 			addr = mess_ram + ((avigo_ram_bank_l & 0x07)<<14);
-			avigo_setbank(2, addr, MRA8_BANK3, MWA8_BANK7);
+			avigo_setbank(2, addr, SMH_BANK3, SMH_BANK7);
 			break;
 
 		/* %111 */
@@ -342,7 +342,7 @@ static void avigo_refresh_memory(void)
 			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
 			addr = addr + (avigo_ram_bank_l<<14);
 			avigo_setbank(2, addr, avigo_flash_0x8000_read_handler,
-				MWA8_NOP /* avigo_flash_0x8000_write_handler */);
+				SMH_NOP /* avigo_flash_0x8000_write_handler */);
 			break;
 
 		case 0x07:
@@ -351,7 +351,7 @@ static void avigo_refresh_memory(void)
 			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
 			addr = addr + (avigo_ram_bank_l<<14);
 			avigo_setbank(2, addr, avigo_flash_0x8000_read_handler,
-				MWA8_NOP /* avigo_flash_0x8000_write_handler */);
+				SMH_NOP /* avigo_flash_0x8000_write_handler */);
 			break;
 	}
 }
@@ -461,10 +461,10 @@ static MACHINE_START( avigo )
 
 
 static ADDRESS_MAP_START( avigo_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE( MRA8_BANK1, MWA8_BANK5 )
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE( MRA8_BANK2, MWA8_BANK6 )
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( MRA8_BANK3, MWA8_BANK7 )
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE( MRA8_BANK4, MWA8_BANK8 )
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE( SMH_BANK1, SMH_BANK5 )
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE( SMH_BANK2, SMH_BANK6 )
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( SMH_BANK3, SMH_BANK7 )
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE( SMH_BANK4, SMH_BANK8 )
 ADDRESS_MAP_END
 
 
@@ -804,7 +804,7 @@ static  READ8_HANDLER(avigo_04_r)
 
 
 static ADDRESS_MAP_START( avigo_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x000, 0x000) AM_READ( avigo_unmapped_r)
     AM_RANGE(0x001, 0x001) AM_READWRITE( avigo_key_data_read_r, avigo_set_key_line_w )

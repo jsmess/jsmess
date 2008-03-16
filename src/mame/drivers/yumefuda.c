@@ -200,18 +200,18 @@ static WRITE8_HANDLER( mux_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(MRA8_BANK1, MWA8_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE(eeprom_w)
 	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_BASE(&cus_ram) /*260d - 2626*/
-	AM_RANGE(0xb000, 0xb0ff) AM_READWRITE(MRA8_RAM, paletteram_RRRGGGBB_w) AM_BASE(&paletteram) /*Wrong format*/
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(MRA8_RAM, yumefuda_vram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(MRA8_RAM, yumefuda_cram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb000, 0xb0ff) AM_READWRITE(SMH_RAM, paletteram_RRRGGGBB_w) AM_BASE(&paletteram) /*Wrong format*/
+	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(SMH_RAM, yumefuda_vram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(SMH_RAM, yumefuda_cram_w) AM_BASE(&colorram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(mux_w)

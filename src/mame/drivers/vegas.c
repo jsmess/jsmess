@@ -522,7 +522,7 @@ static VIDEO_START( vegas_voodoo2 )
 {
 	add_exit_callback(machine, vegas_exit);
 
-	voodoo_start(0, 0, VOODOO_2, 2, 4, 4);
+	voodoo_start(0, machine->primary_screen, VOODOO_2, 2, 4, 4);
 	voodoo_set_vblank_callback(0, vblank_assert);
 }
 
@@ -531,7 +531,7 @@ static VIDEO_START( vegas_voodoo_banshee )
 {
 	add_exit_callback(machine, vegas_exit);
 
-	voodoo_start(0, 0, VOODOO_BANSHEE, 16, 16, 0);
+	voodoo_start(0, machine->primary_screen, VOODOO_BANSHEE, 16, 16, 0);
 	voodoo_set_vblank_callback(0, vblank_assert);
 }
 
@@ -540,7 +540,7 @@ static VIDEO_START( vegas_voodoo3 )
 {
 	add_exit_callback(machine, vegas_exit);
 
-	voodoo_start(0, 0, VOODOO_3, 16, 16, 16);
+	voodoo_start(0, machine->primary_screen, VOODOO_3, 16, 16, 16);
 	voodoo_set_vblank_callback(0, vblank_assert);
 }
 
@@ -1559,8 +1559,8 @@ static void remap_dynamic_addresses(void)
 	/* unmap everything we know about */
 	for (addr = 0; addr < dynamic_count; addr++)
 	{
-		memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, MRA32_NOP);
-		memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, MWA32_NOP);
+		memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_NOP);
+		memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_NOP);
 	}
 
 	/* the build the list of stuff */
@@ -1575,7 +1575,7 @@ static void remap_dynamic_addresses(void)
 		add_dynamic_address(base + 0x2000, base + 0x2003, sio_irq_cause_r, NULL);
 		add_dynamic_address(base + 0x3000, base + 0x3003, sio_irq_status_r, NULL);
 		add_dynamic_address(base + 0x4000, base + 0x4003, sio_led_r, sio_led_w);
-		add_dynamic_address(base + 0x5000, base + 0x5007, MRA32_NOP, NULL);
+		add_dynamic_address(base + 0x5000, base + 0x5007, SMH_NOP, NULL);
 		add_dynamic_address(base + 0x6000, base + 0x6003, NULL, cmos_unlock_w);
 		add_dynamic_address(base + 0x7000, base + 0x7003, NULL, vegas_watchdog_w);
 	}
@@ -1703,7 +1703,7 @@ static void remap_dynamic_addresses(void)
  *************************************/
 
 static ADDRESS_MAP_START( vegas_map_8mb, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&rambase) AM_SIZE(&ramsize)
 	AM_RANGE(0x1fa00000, 0x1fa00fff) AM_READWRITE(nile_r, nile_w) AM_BASE(&nile_regs)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_BASE(&rombase)
@@ -1711,7 +1711,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( vegas_map_32mb, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE(&rambase) AM_SIZE(&ramsize)
 	AM_RANGE(0x1fa00000, 0x1fa00fff) AM_READWRITE(nile_r, nile_w) AM_BASE(&nile_regs)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_BASE(&rombase)

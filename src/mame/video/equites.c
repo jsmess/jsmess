@@ -46,10 +46,11 @@ UINT16 *splndrbt_scrollx, *splndrbt_scrolly;
 static void video_init_common(running_machine *machine)
 {
 	int i;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	// set defaults
 	maskwidth = 8;
-	maskheight = machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1;
+	maskheight = visarea->max_y - visarea->min_y + 1;
 	maskcolor = get_black_pen(machine);
 	scrollx = scrolly = 0;
 	for (i=0; i<4; i++) bgcolor[i] = 0;
@@ -224,13 +225,13 @@ VIDEO_START( splndrbt )
 	UINT8 *buf8ptr;
 	int i;
 
-	assert(machine->screen[0].format == BITMAP_FORMAT_INDEXED16);
+	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_INDEXED16);
 
-	halfclip = machine->screen[0].visarea;
+	halfclip = *video_screen_get_visible_area(machine->primary_screen);
 	i = halfclip.max_y - halfclip.min_y + 1;
 	halfclip.max_y = halfclip.min_y + (i >> 1) - 1;
 
-	tmpbitmap = auto_bitmap_alloc(BMW, BMW, machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(BMW, BMW, video_screen_get_format(machine->primary_screen));
 
 	charmap0 = tilemap_create(splndrbt_char0info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(charmap0, 0);
@@ -250,7 +251,7 @@ VIDEO_START( splndrbt )
 	memset(dirtybuf, 1, 0x800);
 
 	prestep = auto_malloc(i * sizeof(struct PRESTEP_TYPE));
-	splndrbt_prestep(prestep, &machine->screen[0].visarea, BMW, 434, 96, 480);
+	splndrbt_prestep(prestep, video_screen_get_visible_area(machine->primary_screen), BMW, 434, 96, 480);
 
 	defcharram = videoram16 + videoram_size / 2;
 
@@ -377,9 +378,9 @@ static void equites_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 VIDEO_UPDATE( equites )
 {
-	equites_update_clut(machine);
-	equites_draw_scroll(machine, bitmap, cliprect);
-	equites_draw_sprites(machine, bitmap, cliprect);
+	equites_update_clut(screen->machine);
+	equites_draw_scroll(screen->machine, bitmap, cliprect);
+	equites_draw_sprites(screen->machine, bitmap, cliprect);
 	plot_box(bitmap, cliprect->min_x, cliprect->min_y, maskwidth, maskheight, maskcolor);
 	plot_box(bitmap, cliprect->max_x-maskwidth+1, cliprect->min_y, maskwidth, maskheight, maskcolor);
 	tilemap_draw(bitmap, cliprect, charmap0, 0, 0);
@@ -538,9 +539,9 @@ static void splndrbt_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 VIDEO_UPDATE( splndrbt )
 {
-	splndrbt_update_clut(machine);
+	splndrbt_update_clut(screen->machine);
 	fillbitmap(bitmap, *bgcolor, &halfclip);
-	splndrbt_draw_scroll(machine, tmpbitmap);
+	splndrbt_draw_scroll(screen->machine, tmpbitmap);
 
 	splndrbt_slantcopy(
 		tmpbitmap, bitmap, cliprect,
@@ -548,7 +549,7 @@ VIDEO_UPDATE( splndrbt )
 		BMW, 434, 96, 480, prestep);
 
 	tilemap_draw(bitmap, cliprect, charmap1, 0, 0);
-	splndrbt_draw_sprites(machine, bitmap, cliprect);
+	splndrbt_draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, charmap0, 0, 0);
 	return 0;
 }

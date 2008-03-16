@@ -97,7 +97,6 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "driver.h"
 #include "video/mc6845.h"
 
-static mc6845_t *mc6845;
 static UINT8 *murogem_videoram;
 
 
@@ -107,7 +106,7 @@ static ADDRESS_MAP_START( murogem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
 	AM_RANGE(0x5800, 0x5800) AM_READ(input_port_1_r)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(MWA8_NOP) // sound? payout?
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(SMH_NOP) // sound? payout?
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&murogem_videoram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -167,11 +166,6 @@ GFXDECODE_END
 static PALETTE_INIT(murogem)
 {}
 
-static VIDEO_START(murogem)
-{
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-}
-
 static VIDEO_UPDATE(murogem)
 {
 	int xx,yy,count;
@@ -186,7 +180,7 @@ static VIDEO_UPDATE(murogem)
 			int tileno = murogem_videoram[count]&0x3f;
 			int attr = murogem_videoram[count+0x400]&0x0f;
 
-			drawgfx(bitmap,machine->gfx[0],tileno,attr,0,0,xx*8,yy*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tileno,attr,0,0,xx*8,yy*8,cliprect,TRANSPARENCY_PEN,0);
 
 			count++;
 
@@ -216,7 +210,6 @@ static MACHINE_DRIVER_START( murogem )
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_PALETTE_INIT(murogem)
-	MDRV_VIDEO_START(murogem)
 	MDRV_VIDEO_UPDATE(murogem)
 
 	MDRV_DEVICE_ADD("crtc", MC6845)

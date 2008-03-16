@@ -62,21 +62,18 @@ WRITE16_HANDLER( blockout_frontcolor_w )
 VIDEO_START( blockout )
 {
 	/* Allocate temporary bitmaps */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 
 
-static void updatepixels(int x,int y)
+static void update_pixels(const device_config *screen, int x, int y)
 {
 	UINT16 front,back;
 	int color;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-
-	if (x < Machine->screen[0].visarea.min_x ||
-			x > Machine->screen[0].visarea.max_x ||
-			y < Machine->screen[0].visarea.min_y ||
-			y > Machine->screen[0].visarea.max_y)
+	if (x < visarea->min_x || x > visarea->max_x || y < visarea->min_y || y > visarea->max_y)
 		return;
 
 	front = blockout_videoram[y*256+x/2];
@@ -99,9 +96,7 @@ WRITE16_HANDLER( blockout_videoram_w )
 	COMBINE_DATA(&blockout_videoram[offset]);
 
 	if (oldword != blockout_videoram[offset])
-	{
-		updatepixels((offset % 256)*2,(offset / 256) % 256);
-	}
+		update_pixels(machine->primary_screen, (offset % 256)*2, (offset / 256) % 256);
 }
 
 

@@ -545,7 +545,7 @@ VIDEO_EOF( f3 )
 VIDEO_START( f3 )
 {
 	const struct F3config *pCFG=&f3_config_table[0];
-	int tile;
+	int tile, width, height;
 
 	spritelist=0;
 	spriteram32_buffered=0;
@@ -605,7 +605,9 @@ VIDEO_START( f3 )
 	pivot_dirty = (UINT8 *)auto_malloc(2048);
 	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
 	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));
-	pri_alp_bitmap = auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8 );
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
+	pri_alp_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED8 );
 	tile_opaque_sp = (UINT8 *)auto_malloc(machine->gfx[2]->total_elements);
 	tile_opaque_pf = (UINT8 *)auto_malloc(machine->gfx[1]->total_elements);
 
@@ -2937,8 +2939,9 @@ INLINE void f3_drawgfxzoom(bitmap_t *dest_bmp,const gfx_element *gfx,
 
 static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_ptr)
 {
-	const int min_x=machine->screen[0].visarea.min_x,max_x=machine->screen[0].visarea.max_x;
-	const int min_y=machine->screen[0].visarea.min_y,max_y=machine->screen[0].visarea.max_y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const int min_x=visarea->min_x,max_x=visarea->max_x;
+	const int min_y=visarea->min_y,max_y=visarea->max_y;
 	int offs,spritecont,flipx,flipy,old_x,old_y,color,x,y;
 	int sprite,global_x=0,global_y=0,subglobal_x=0,subglobal_y=0;
 	int block_x=0, block_y=0;
@@ -3247,7 +3250,7 @@ VIDEO_UPDATE( f3 )
 	if (vram_changed)
 		for (tile = 0;tile < 256;tile++)
 			if (vram_dirty[tile]) {
-				decodechar(machine->gfx[0],tile,(UINT8 *)f3_vram);
+				decodechar(screen->machine->gfx[0],tile,(UINT8 *)f3_vram);
 				tilemap_mark_all_tiles_dirty(vram_layer); // TODO
 				//tilemap_mark_tile_dirty(vram_layer,tile);
 				vram_dirty[tile]=0;
@@ -3257,7 +3260,7 @@ VIDEO_UPDATE( f3 )
 	if (pivot_changed)
 		for (tile = 0;tile < 2048;tile++)
 			if (pivot_dirty[tile]) {
-				decodechar(machine->gfx[3],tile,(UINT8 *)f3_pivot_ram);
+				decodechar(screen->machine->gfx[3],tile,(UINT8 *)f3_pivot_ram);
 				tilemap_mark_tile_dirty(pixel_layer,tile);
 				pivot_dirty[tile]=0;
 			}
@@ -3298,23 +3301,23 @@ VIDEO_UPDATE( f3 )
 
 	/* sprites */
 	if (sprite_lag==0)
-		get_sprite_info(machine, spriteram32);
+		get_sprite_info(screen->machine, spriteram32);
 
 	/* Update sprite buffer */
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 
 	/* Parse sprite, alpha & clipping parts of lineram */
 	get_spritealphaclip_info();
 
 	/* Parse playfield effects */
-	get_line_ram_info(machine, pf1_tilemap,sx_fix[0],sy_fix[0],0,f3_pf_data_1);
-	get_line_ram_info(machine, pf2_tilemap,sx_fix[1],sy_fix[1],1,f3_pf_data_2);
-	get_line_ram_info(machine, pf3_tilemap,sx_fix[2],sy_fix[2],2,f3_pf_data_3);
-	get_line_ram_info(machine, pf4_tilemap,sx_fix[3],sy_fix[3],3,f3_pf_data_4);
+	get_line_ram_info(screen->machine, pf1_tilemap,sx_fix[0],sy_fix[0],0,f3_pf_data_1);
+	get_line_ram_info(screen->machine, pf2_tilemap,sx_fix[1],sy_fix[1],1,f3_pf_data_2);
+	get_line_ram_info(screen->machine, pf3_tilemap,sx_fix[2],sy_fix[2],2,f3_pf_data_3);
+	get_line_ram_info(screen->machine, pf4_tilemap,sx_fix[3],sy_fix[3],3,f3_pf_data_4);
 	get_vram_info(vram_layer,pixel_layer,sx_fix[4],sy_fix[4]);
 
 	/* Draw final framebuffer */
-	scanline_draw(machine, bitmap,cliprect);
+	scanline_draw(screen->machine, bitmap,cliprect);
 
 	if (VERBOSE)
 		print_debug_info(bitmap);

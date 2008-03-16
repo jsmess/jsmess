@@ -121,24 +121,23 @@ static const int dl1416t_segments[128] = {
  Device interface
 *****************************************************************************/
 
-static void *dl1416_start(running_machine *machine, const char *tag,
-	const void *static_config, const void *inline_config)
+static DEVICE_START( dl1416 )
 {
 	dl1416_t *dl1416;
 	char unique_tag[30];
 
 	/* validate arguments */
-	assert(tag != NULL);
-	assert(strlen(tag) < 20);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
 
 	/* allocate the object that holds the state */
 	dl1416 = auto_malloc(sizeof(*dl1416));
 	memset(dl1416, 0, sizeof(*dl1416));
 
-	dl1416->intf = static_config;
+	dl1416->intf = device->static_config;
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "dl1416", tag);
+	state_save_combine_module_and_tag(unique_tag, "dl1416", device->tag);
 
 	state_save_register_item(unique_tag, 0, dl1416->chip_enable);
 	state_save_register_item(unique_tag, 0, dl1416->cursor_enable);
@@ -149,10 +148,10 @@ static void *dl1416_start(running_machine *machine, const char *tag,
 }
 
 
-static void dl1416_reset(running_machine *machine, void *token)
+static DEVICE_RESET( dl1416 )
 {
 	int i;
-	dl1416_t *chip = token;
+	dl1416_t *chip = device->token;
 
 	/* Disable all lines */
 	chip->chip_enable = FALSE;
@@ -161,11 +160,11 @@ static void dl1416_reset(running_machine *machine, void *token)
 
 	/* Randomize cursor memory */
 	for (i = 0; i < 4; i++)
-		chip->cursor_ram[i] = mame_rand(machine);
+		chip->cursor_ram[i] = mame_rand(device->machine);
 }
 
 
-static void dl1416_set_info(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+static DEVICE_SET_INFO( dl1416 )
 {
 	switch (state)
 	{
@@ -174,7 +173,7 @@ static void dl1416_set_info(running_machine *machine, void *token, UINT32 state,
 }
 
 
-void dl1416_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+DEVICE_GET_INFO( dl1416 )
 {
 	switch (state)
 	{
@@ -182,10 +181,10 @@ void dl1416_get_info(running_machine *machine, void *token, UINT32 state, device
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = dl1416_set_info;		break;
-		case DEVINFO_FCT_START:							info->start = dl1416_start;				break;
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME( dl1416 );		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( dl1416 );				break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;
-		case DEVINFO_FCT_RESET:							info->reset = dl1416_reset;				break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( dl1416 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "DL1416";						break;

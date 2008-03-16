@@ -75,7 +75,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetriunk_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0xb0000, 0xbffff) AM_READ(MRA8_RAM) AM_WRITE(txtram_w)
+	AM_RANGE(0xb0000, 0xbffff) AM_READ(SMH_RAM) AM_WRITE(txtram_w)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -119,9 +119,9 @@ static VIDEO_UPDATE(tetriunk)
 			int color2 = (tetriunk_attribram[count<<1]>>4)&7;
 			if(color2!=0)
 			{
-				drawgfx(bitmap,machine->gfx[0],0x100,color2,0,0,x<<3,y<<3,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx(bitmap,screen->machine->gfx[0],0x100,color2,0,0,x<<3,y<<3,cliprect,TRANSPARENCY_NONE,0);
 			}
-			drawgfx(bitmap,machine->gfx[0],tile&0xff,color,0,0,x<<3,y<<3,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tile&0xff,color,0,0,x<<3,y<<3,cliprect,TRANSPARENCY_PEN,0);
 			count++;
 		}
 	}

@@ -101,7 +101,7 @@ PALETTE_INIT( gyruss )
 
 WRITE8_HANDLER( gyruss_spriteram_w )
 {
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 	gyruss_spriteram[offset] = data;
 }
 
@@ -130,7 +130,7 @@ VIDEO_START( gyruss )
 READ8_HANDLER( gyruss_scanline_r )
 {
 	/* reads 1V - 128V */
-	return video_screen_get_vpos(0);
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 
@@ -156,14 +156,14 @@ static void draw_sprites(gfx_element **gfx, bitmap_t *bitmap, const rectangle *c
 
 VIDEO_UPDATE( gyruss )
 {
-	if (cliprect->min_y == machine->screen[screen].visarea.min_y)
+	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
 	{
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 		tilemap_set_flip(ALL_TILEMAPS, (*gyruss_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	tilemap_draw(bitmap, cliprect, gyruss_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(machine->gfx, bitmap, cliprect);
+	draw_sprites(screen->machine->gfx, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, gyruss_tilemap, 0, 0);
 
 	return 0;

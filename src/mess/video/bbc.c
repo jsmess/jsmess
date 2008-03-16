@@ -624,7 +624,7 @@ VIDEO_UPDATE( bbc )
 	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
 	while((!BBC_VSync)&&(c<60000))
 	{
-		if ((y_screen_pos>=cliprect->min_y) && (y_screen_pos<=cliprect->max_y)) (draw_function)(machine);
+		if ((y_screen_pos>=cliprect->min_y) && (y_screen_pos<=cliprect->max_y)) (draw_function)(screen->machine);
 
 		// and check the cursor
 		if (VideoULA_CR) BBC_Clock_CR();

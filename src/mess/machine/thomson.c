@@ -1392,7 +1392,7 @@ static void to770_update_ram_bank( void )
 	memory_set_bank( THOM_RAM_BANK, bank );
 	memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0,
 				       (mess_ram_size == 128*1024 || bank < 2) ?
-				       (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) : MWA8_UNMAP );
+				       (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) : SMH_UNMAP );
 	old_bank = bank;
 }
 
@@ -1758,7 +1758,7 @@ static void mo5_update_cart_bank ( void )
 	if ( rom_is_ram && thom_cart_nb_banks == 4 )
 	{
 		/* 64 KB ROM from "JANE" cartridge */
-		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, MWA8_NOP );
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, SMH_NOP );
 		bank = mo5_reg_cart & 3;
 		if ( bank != old_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is cartridge bank %i (A7CB style)\n", bank ));
@@ -1769,7 +1769,7 @@ static void mo5_update_cart_bank ( void )
 		int write_enable = mo5_reg_cart & 8;
 		bank = 4 + ( mo5_reg_cart & 3 );
 		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, write_enable ?
-					       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  MWA8_NOP );
+					       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  SMH_NOP );
 		if ( bank != old_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (write-enable=%i)\n", mo5_reg_cart & 3, write_enable ? 1 : 0 ));
 	}
@@ -2214,7 +2214,7 @@ static void to9_update_ram_bank ( void )
 	memory_set_bank( THOM_RAM_BANK, bank );
 	memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0,
 				       (mess_ram_size == 192*1024 || bank < 6) ?
-				       (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) : MWA8_NOP );
+				       (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) : SMH_NOP );
 	old_bank = bank;
 }
 
@@ -3250,12 +3250,12 @@ static void to8_update_ram_bank ( void )
 				       (mess_ram_size == 512*1024 || to8_data_vpage < 16) ?
 				       to8_data_vpage <= 4 ? to8_data_lo_w :
 				       (write8_machine_func)(STATIC_BANK1 + TO8_DATA_LO - 1) :
-				       MWA8_NOP );
+				       SMH_NOP );
 	memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0,
 				       (mess_ram_size == 512*1024 || to8_data_vpage < 16) ?
 				       to8_data_vpage <= 4 ? to8_data_hi_w :
 				       (write8_machine_func)(STATIC_BANK1 + TO8_DATA_HI - 1) :
-				       MWA8_NOP );
+				       SMH_NOP );
 }
 
 
@@ -3277,7 +3277,7 @@ static void to8_update_cart_bank ( void )
 					       ((to8_cart_vpage < 8 || mess_ram_size == 512*1024) && (to8_reg_cart & 0x40)) ?
 					       (to8_cart_vpage <= 4) ? to8_vcart_w :
 					       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :
-					       MWA8_NOP );
+					       SMH_NOP );
 		if ( bank != old_bank )
 			LOG_BANK(( "to8_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 ));
 	}
@@ -4000,14 +4000,14 @@ static void mo6_update_cart_bank ( void )
 			bank = 8 + to8_cart_vpage;
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0,
 						       (to8_reg_cart & 0x40) ? (to8_cart_vpage <= 4) ? to8_vcart_w :
-						       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) : MWA8_NOP );
+						       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) : SMH_NOP );
 			if ( bank != old_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 ));
 		}
 		else if ( thom_cart_nb_banks == 4 )
 		{
 			/* "JANE"-style cartridge bank switching */
-			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, MWA8_NOP );
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, SMH_NOP );
 			bank = mo5_reg_cart & 3;
 			if ( bank != old_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank ));
@@ -4019,7 +4019,7 @@ static void mo6_update_cart_bank ( void )
 			to8_cart_vpage = (mo5_reg_cart & 3) | 4;
 			bank = 8 + to8_cart_vpage;
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, write_enable ?
-						       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  MWA8_NOP );
+						       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  SMH_NOP );
 			if ( bank != old_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i) (MO5 compat.)\n", to8_cart_vpage, write_enable ? 1 : 0 ));
 		}
@@ -4027,7 +4027,7 @@ static void mo6_update_cart_bank ( void )
 	else
 	{
 		/* ROM space */
-		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, MWA8_NOP );
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, SMH_NOP );
 		if ( to8_reg_sys2 & 0x20 )
 		{
 			/* internal ROM */

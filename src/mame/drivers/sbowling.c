@@ -102,7 +102,7 @@ static VIDEO_UPDATE(sbowling)
 
 static VIDEO_START(sbowling)
 {
-	tmpbitmap = auto_bitmap_alloc(32*8,32*8,machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(32*8,32*8,video_screen_get_format(machine->primary_screen));
 	sb_tilemap = tilemap_create(get_sb_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
@@ -133,7 +133,7 @@ static READ8_HANDLER( pix_data_r )
 
 static INTERRUPT_GEN( sbw_interrupt )
 {
-	int vector = video_screen_get_vblank(0) ? 0xcf : 0xd7;	/* RST 08h/10h */
+	int vector = video_screen_get_vblank(machine->primary_screen) ? 0xcf : 0xd7;	/* RST 08h/10h */
 
 	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, vector);
 }
@@ -184,7 +184,7 @@ static READ8_HANDLER (controls_r)
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_RAM, sbw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_RAM, sbw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xf801, 0xf801) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, watchdog_reset_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_1_r, MWA8_NOP)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_1_r, SMH_NOP)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, system_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(input_port_5_r, graph_control_w)
 ADDRESS_MAP_END

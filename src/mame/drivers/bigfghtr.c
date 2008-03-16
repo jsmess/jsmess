@@ -256,14 +256,14 @@ static VIDEO_UPDATE( bigfghtr )
 	}
 	else
 	{
-		fillbitmap( bitmap, get_black_pen(machine), cliprect );
+		fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	}
 
-	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 2 );
+	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 2 );
 	tilemap_draw( bitmap, cliprect, fg_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 1 );
+	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 1 );
 	tilemap_draw( bitmap, cliprect, tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 0 );
+	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 0 );
 
 	return 0;
 }
@@ -329,10 +329,10 @@ static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x080600, 0x080fff) AM_READ(sharedram_r) AM_WRITE(sharedram_w) AM_BASE(&sharedram16)
 	AM_RANGE(0x081000, 0x085fff) AM_RAM //??
-	AM_RANGE(0x086000, 0x086fff) AM_READ(MRA16_RAM) AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x087000, 0x087fff) AM_READ(MRA16_RAM) AM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
-	AM_RANGE(0x088000, 0x089fff) AM_READ(MRA16_RAM) AM_WRITE(text_videoram_w) AM_BASE(&text_videoram)
-	AM_RANGE(0x08a000, 0x08afff) AM_READ(MRA16_RAM) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x086000, 0x086fff) AM_READ(SMH_RAM) AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0x087000, 0x087fff) AM_READ(SMH_RAM) AM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
+	AM_RANGE(0x088000, 0x089fff) AM_READ(SMH_RAM) AM_WRITE(text_videoram_w) AM_BASE(&text_videoram)
+	AM_RANGE(0x08a000, 0x08afff) AM_READ(SMH_RAM) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM //??
 	AM_RANGE(0x08c000, 0x08c001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x08c002, 0x08c003) AM_READ(input_port_1_word_r)
@@ -362,7 +362,7 @@ static READ8_HANDLER( soundlatch_clear_r )
 }
 
 static ADDRESS_MAP_START( soundport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0, 0x0) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0x1, 0x1) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0x2, 0x2) AM_WRITE(DAC_0_signed_data_w)

@@ -761,9 +761,8 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 
 }
 
-static void radarscp_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void radarscp_draw_background(dkong_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	dkong_state *state = machine->driver_data;
 	const UINT8 	*htable = NULL;
 	int 			x,y;
 	UINT8 			draw_ok;
@@ -772,11 +771,11 @@ static void radarscp_draw_background(running_machine *machine, bitmap_t *bitmap,
 	if (state->hardware_type == HARDWARE_TRS01)
 		htable = memory_region(REGION_GFX4);
 
-	y = machine->screen[0].visarea.min_y;
-	while (y <= machine->screen[0].visarea.max_y)
+	y = cliprect->min_y;
+	while (y <= cliprect->max_y)
 	{
-		x = machine->screen[0].visarea.min_x;
-		while (x <= machine->screen[0].visarea.max_x)
+		x = cliprect->min_x;
+		while (x <= cliprect->max_x)
 		{
 			pixel = BITMAP_ADDR16(bitmap, y, x);
 			draw_ok = !(*pixel & 0x01) && !(*pixel & 0x02);
@@ -800,14 +799,15 @@ static TIMER_CALLBACK( scanline_callback )
 	UINT16 			*pixel;
 	static int		counter=0;
 	int scanline = param;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	y = scanline;
 	radarscp_step(machine, y);
-	if (y <= machine->screen[0].visarea.min_y || y > machine->screen[0].visarea.max_y)
+	if (y <= visarea->min_y || y > visarea->max_y)
 		counter = 0;
 	offset = (state->flip ^ state->rflip_sig) ? 0x000 : 0x400;
 	x = 0;
-	while (x < machine->screen[0].width)
+	while (x < video_screen_get_width(machine->primary_screen))
 	{
 		pixel = BITMAP_ADDR16(state->bg_bits, y, x);
 		if ((counter < table_len) && (x == 4 * (table[counter|offset] & 0x7f)))
@@ -828,7 +828,7 @@ static TIMER_CALLBACK( scanline_callback )
 		counter++;
 	scanline = (scanline+1) % VTOTAL;
 	/* come back at the next appropriate scanline */
-	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 static void check_palette(running_machine *machine)
@@ -894,9 +894,9 @@ VIDEO_START( dkong )
 	switch (state->hardware_type)
 	{
 		case HARDWARE_TRS02:
-			state->bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
 			state->scanline_timer = timer_alloc(scanline_callback, NULL);
-			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 		    /* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
@@ -907,10 +907,10 @@ VIDEO_START( dkong )
 			state->bg_tilemap = tilemap_create(radarsc1_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 			tilemap_set_scrolldx(state->bg_tilemap, 0, 128);
 
-			state->bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 			state->scanline_timer = timer_alloc(scanline_callback, NULL);
-			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_start");
@@ -919,7 +919,7 @@ VIDEO_START( dkong )
 
 VIDEO_UPDATE( dkong )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = screen->machine->driver_data;
 
 	tilemap_set_flip(ALL_TILEMAPS, state->flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->flip ?  0 : 0);
@@ -929,15 +929,15 @@ VIDEO_UPDATE( dkong )
 	{
 		case HARDWARE_TKG02:
 		case HARDWARE_TKG04:
-			check_palette(machine);
+			check_palette(screen->machine);
 			tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-			draw_sprites(machine, bitmap, cliprect, 0x40, 1);
+			draw_sprites(screen->machine, bitmap, cliprect, 0x40, 1);
 			break;
 		case HARDWARE_TRS01:
 		case HARDWARE_TRS02:
 			tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-			draw_sprites(machine, bitmap, cliprect, 0x40, 1);
-			radarscp_draw_background(machine, bitmap, cliprect);
+			draw_sprites(screen->machine, bitmap, cliprect, 0x40, 1);
+			radarscp_draw_background(state, bitmap, cliprect);
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_update");
@@ -947,7 +947,7 @@ VIDEO_UPDATE( dkong )
 
 VIDEO_UPDATE( pestplce )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = screen->machine->driver_data;
 	int offs;
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -957,7 +957,7 @@ VIDEO_UPDATE( pestplce )
 	{
 		if (state->sprite_ram[offs])
 		{
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx(bitmap,screen->machine->gfx[1],
 					state->sprite_ram[offs + 2],
 					(state->sprite_ram[offs + 1] & 0x0f) + 16 * state->palette_bank,
 					state->sprite_ram[offs + 1] & 0x80,state->sprite_ram[offs + 1] & 0x40,
@@ -970,11 +970,11 @@ VIDEO_UPDATE( pestplce )
 
 VIDEO_UPDATE( spclforc )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = screen->machine->driver_data;
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* it uses sprite_ram[offs + 2] & 0x10 for sprite bank */
-	draw_sprites(machine, bitmap, cliprect, 0x10, 3);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x10, 3);
 	return 0;
 }

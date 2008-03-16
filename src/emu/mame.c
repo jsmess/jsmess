@@ -49,7 +49,10 @@
                 - calls watchdog_init() [watchdog.c] to initialize the watchdog system
                 - calls cpuint_init() [cpuint.c] to initialize the CPU interrupts
                 - calls the driver's DRIVER_INIT callback
+                - calls device_list_start() [devintrf.c] to start any devices
                 - calls video_init() [video.c] to start the video system
+                - calls tilemap_init() [tilemap.c] to start the tilemap system
+                - calls crosshair_init() [crsshair.c] to configure the crosshairs
                 - calls sound_init() [sound.c] to start the audio system
                 - calls mame_debug_init() [debugcpu.c] to set up the debugger
                 - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
@@ -578,7 +581,7 @@ void mame_frame_update(running_machine *machine)
 {
 	callback_item *cb;
 
-	/* call all registered reset callbacks */
+	/* call all registered frame callbacks */
 	for (cb = machine->mame_data->frame_callback_list; cb; cb = cb->next)
 		(*cb->func.frame)(machine);
 }
@@ -1451,18 +1454,10 @@ error:
 
 static void prepare_machine(running_machine *machine)
 {
-	const device_config *device;
-
 	/* reset most portions of the machine */
 
-	/* video-related information */
+	/* graphics layout */
 	memset(machine->gfx, 0, sizeof(machine->gfx));
-	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
-	{
-		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
-		const screen_config *scrconfig = device->inline_config;
-		machine->screen[scrnum] = scrconfig->defstate;
-	}
 
 	/* palette-related information */
 	machine->pens = NULL;
@@ -1485,7 +1480,6 @@ static void prepare_machine(running_machine *machine)
 
 	/* reset the global MAME data and clear the other privates */
 	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
-	machine->video_data = NULL;
 	machine->palette_data = NULL;
 	machine->streams_data = NULL;
 
@@ -1582,14 +1576,15 @@ static void init_machine(running_machine *machine)
 	if (machine->gamedrv->driver_init != NULL)
 		(*machine->gamedrv->driver_init)(machine);
 
-	/* start the video and audio hardware */
-	video_init(machine);
-
 	/* start up the devices */
 	device_list_start(machine);
 
+	/* start the video and audio hardware */
+	video_init(machine);
+	tilemap_init(machine);
+	crosshair_init(machine);
+
 	sound_init(machine);
-	input_port_post_init(machine);
 
 #ifdef ENABLE_DEBUGGER
 	/* initialize the debugger */

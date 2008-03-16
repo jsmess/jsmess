@@ -119,7 +119,7 @@ static CUSTOM_INPUT( dorachan_v128_r )
 {
 	/* to avoid resetting (when player 2 starts) bit 0 need to be
        inverted when screen is flipped */
-	return ((video_screen_get_vpos(0) >> 7) & 0x01) ^ dorachan_flip_screen;
+	return ((video_screen_get_vpos(machine->primary_screen) >> 7) & 0x01) ^ dorachan_flip_screen;
 }
 
 
@@ -151,9 +151,9 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( dorachan_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x02, 0x02) AM_WRITE(MWA8_NOP)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x01, 0x01) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x02, 0x02) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x03, 0x03) AM_WRITE(dorachan_ctrl_w)
 ADDRESS_MAP_END
 

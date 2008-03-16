@@ -287,7 +287,7 @@ static void UpdateBanks(int first, int last)
 			else
 				readbank=system_rom;
 
-			writebank = MWA8_UNMAP;
+			writebank = SMH_UNMAP;
 		}
 
 		PageRegs[TaskReg][Page].memory=readbank;

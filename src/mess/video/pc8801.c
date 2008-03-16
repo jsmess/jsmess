@@ -92,8 +92,12 @@ INLINE void pc8801_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 
 void pc8801_video_init (running_machine *machine, int hireso)
 {
-	wbm1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	wbm2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+
+	wbm1 = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	wbm2 = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	pc8801_is_24KHz=hireso;
 	crtcON=0;
 	textON=1;
@@ -271,8 +275,8 @@ int is_pc8801_vram_select(void)
     switch(selected_vram) {
 #define XXX(n) \
     case (n+1): \
-      rh5 = MRA8_BANK5; \
-      rh6 = MRA8_BANK6; \
+      rh5 = SMH_BANK5; \
+      rh6 = SMH_BANK6; \
       wh5 = write_gvram##n##_bank5; \
       wh6 = write_gvram##n##_bank6; \
       memory_set_bankptr(5, gVRAM + 0x4000*n ); \
@@ -461,7 +465,7 @@ VIDEO_UPDATE( pc8801 )
 	 GRP_DIRTY(x,y) ||
 	 full_refresh) {
 	plot_box(wbm2,x*8,y*BLOCK_YSIZE,8,BLOCK_YSIZE,palette_transparent_pen);
-	ct=machine->pens[((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8];
+	ct=screen->machine->pens[((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8];
 	TEXT_OLD(x,y)=text_new;
 	ATTR_OLD(x,y)=attr_new;
 	if(attr_new&TX_GL) {
@@ -484,14 +488,14 @@ VIDEO_UPDATE( pc8801 )
 	  }
 	} else {
 	  /* normal text */
-	  drawgfx(wbm2,machine->gfx
+	  drawgfx(wbm2,screen->machine->gfx
 		  [((attr_new&TX_WID_MASK)>>TX_WID_SHIFT)+
 		  (pc8801_is_24KHz ? 3 : 0)],
 		  text_new,
 		  ((attr_new&TX_REV) ? 8 : 0)
 		  + ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT),
 		  0,0,x*8,y*BLOCK_YSIZE,
-		  &machine->screen[0].visarea,TRANSPARENCY_PEN,
+		  NULL,TRANSPARENCY_PEN,
 		  (attr_new&TX_REV) ? 1 : 0);
 	}
 	if(attr_new&TX_UL) {
@@ -514,8 +518,8 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x0000+x+y*2*80+gy*80] << gx) & 0x80) >> 7) |
 		  (((gVRAM[0x4000+x+y*2*80+gy*80] << gx) & 0x80) >> 6) |
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) >> 5);
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,machine->pens[cg]);
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,machine->pens[17]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,screen->machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,screen->machine->pens[17]);
 	      }
 	    }
 	    break;
@@ -530,8 +534,8 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) &&
 		   disp_plane[2]) ?
 		  ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8 : 16;
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,machine->pens[cg]);
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,machine->pens[17]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,screen->machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,screen->machine->pens[17]);
 	      }
 	    }
 	    break;
@@ -543,13 +547,13 @@ VIDEO_UPDATE( pc8801 )
 		   & 0x80) &&
 		  disp_plane[y<200 ? 0 : 1] ?
 		  ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8 : 16;
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy,machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy,screen->machine->pens[cg]);
 	      }
 	    }
 	    break;
 	  case GRAPH_NO:
 	  default:
-	    plot_box(wbm1,x*8,y*4,8,4,machine->pens[16]);
+	    plot_box(wbm1,x*8,y*4,8,4,screen->machine->pens[16]);
 	    break;
 	  }
 	} else {
@@ -561,7 +565,7 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x0000+x+y*2*80+gy*80] << gx) & 0x80) >> 7) |
 		  (((gVRAM[0x4000+x+y*2*80+gy*80] << gx) & 0x80) >> 6) |
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) >> 5);
-		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,screen->machine->pens[cg]);
 	      }
 	    }
 	    break;
@@ -576,13 +580,13 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) &&
 		   disp_plane[2]) ?
 		  ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8 : 16;
-		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,screen->machine->pens[cg]);
 	      }
 	    }
 	    break;
 	  case GRAPH_NO:
 	  default:
-	    plot_box(wbm1,x*8,y*2,8,2,machine->pens[16]);
+	    plot_box(wbm1,x*8,y*2,8,2,screen->machine->pens[16]);
 	    break;
 	  }
 	}
@@ -591,9 +595,9 @@ VIDEO_UPDATE( pc8801 )
   }
 
 	copyscrollbitmap_trans(wbm1,wbm2,0,0,0,0,
-		&machine->screen[0].visarea,palette_transparent_pen);
+		NULL,palette_transparent_pen);
 	copybitmap(bitmap,wbm1,0,0,0,0,
-		&machine->screen[0].visarea);
+		NULL);
 	return 0;
 }
 

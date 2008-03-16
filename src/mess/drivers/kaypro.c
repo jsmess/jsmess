@@ -22,7 +22,7 @@ static ADDRESS_MAP_START( kaypro_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kaypro_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( BIOS_CONST,  BIOS_CONST)  AM_READWRITE( kaypro_const_r, kaypro_const_w )
 	AM_RANGE( BIOS_CONIN,  BIOS_CONIN)  AM_READWRITE( kaypro_conin_r, kaypro_conin_w )
 	AM_RANGE( BIOS_CONOUT, BIOS_CONOUT) AM_READWRITE( kaypro_conout_r, kaypro_conout_w )

@@ -167,14 +167,14 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc014, 0xc014) AM_WRITE(gundealr_flipscreen_w)
 	AM_RANGE(0xc016, 0xc016) AM_WRITE(yamyam_bankswitch_w)
 	AM_RANGE(0xc020, 0xc023) AM_WRITE(gundealr_fg_scroll_w)	/* Gun Dealer only */
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(MRA8_RAM, gundealr_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(MRA8_RAM, gundealr_bg_videoram_w) AM_BASE(&gundealr_bg_videoram)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_RAM, gundealr_fg_videoram_w) AM_BASE(&gundealr_fg_videoram)
+	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(SMH_RAM, gundealr_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(SMH_RAM, gundealr_bg_videoram_w) AM_BASE(&gundealr_bg_videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, gundealr_fg_videoram_w) AM_BASE(&gundealr_fg_videoram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&rambase)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
 ADDRESS_MAP_END

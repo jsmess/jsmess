@@ -948,13 +948,17 @@ static void ted7360_video_stop(running_machine *machine)
 
 VIDEO_START( ted7360 )
 {
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+
 	cursorelement = allocgfx(&cursorlayout);
 	decodegfx(cursorelement, cursormask, 0, 1);
 	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
 	/* cursorelement->colortable = cursorcolortable; */
 	cursorcolortable[1] = machine->pens[1];
 	cursorelement->total_colors = 2;
-	ted7360_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	ted7360_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	add_exit_callback(machine, ted7360_video_stop);
 }
 

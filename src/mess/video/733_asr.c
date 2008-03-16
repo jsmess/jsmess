@@ -183,9 +183,14 @@ void asr733_init(void)
 
 int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(int state))
 {
-	asr[unit].bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	const device_config *screen = video_screen_first(machine->config);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-	fillbitmap(asr[unit].bitmap, machine->pens[0], &machine->screen[0].visarea);
+	asr[unit].bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+
+	fillbitmap(asr[unit].bitmap, machine->pens[0], visarea);
 
 	asr[unit].int_callback = int_callback;
 
@@ -222,7 +227,7 @@ void asr733_reset(int unit)
 static void asr_draw_char(running_machine *machine, int unit, int character, int x, int y, int color)
 {
 	drawgfx(asr[unit].bitmap, machine->gfx[0], character-32, color, 0, 0,
-				x+1, y, &machine->screen[0].visarea, /*TRANSPARENCY_PEN*/TRANSPARENCY_NONE, 0);
+				x+1, y, NULL, /*TRANSPARENCY_PEN*/TRANSPARENCY_NONE, 0);
 }
 
 static void asr_linefeed(running_machine *machine, int unit)
@@ -430,7 +435,7 @@ WRITE8_HANDLER(asr733_0_cru_w)
 */
 void asr733_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y)
 {
-	copybitmap(bitmap, asr[unit].bitmap, 0, 0, x, y, &machine->screen[0].visarea);
+	copybitmap(bitmap, asr[unit].bitmap, 0, 0, x, y, NULL);
 }
 
 

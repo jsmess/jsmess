@@ -453,7 +453,7 @@ static WRITE16_HANDLER( io_chip_w )
 			newbank = data & 3;
 			if (newbank != palbank)
 			{
-				video_screen_update_partial(0, video_screen_get_vpos(0) + 1);
+				video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) + 1);
 				palbank = newbank;
 				recompute_palette_tables();
 			}
@@ -551,11 +551,11 @@ static WRITE16_HANDLER( prot_w )
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != sp_palbase || new_bg_palbase != bg_palbase)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0) + 1);
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) + 1);
 		sp_palbase = new_sp_palbase;
 		bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", bg_palbase, sp_palbase, video_screen_get_vpos(0));
+		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", bg_palbase, sp_palbase, video_screen_get_vpos(machine->primary_screen));
 	}
 }
 
@@ -2088,7 +2088,7 @@ static DRIVER_INIT( tfrceacb )
 {
 	/* disable the palette bank switching from the protection chip */
 	segac2_common_init(NULL);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x800001, 0, 0, MWA16_NOP);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x800001, 0, 0, SMH_NOP);
 }
 
 static DRIVER_INIT( borench )

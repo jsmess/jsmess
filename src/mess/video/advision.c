@@ -105,7 +105,7 @@ VIDEO_UPDATE( advision )
 			for( bit = 0; bit < 8; bit++ )
 			{
 				if( *led > 0 )
-					*BITMAP_ADDR16(bitmap, 30 + 2 *( y * 8 + bit), 85 + x) = machine->pens[--(*led)];
+					*BITMAP_ADDR16(bitmap, 30 + 2 *( y * 8 + bit), 85 + x) = screen->machine->pens[--(*led)];
 				led += 256;
 			}
 		}

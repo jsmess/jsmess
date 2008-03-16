@@ -20,7 +20,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "eprom.h"
@@ -69,7 +68,7 @@ static MACHINE_RESET( klaxp )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, eprom_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, eprom_scanline_update, 8);
 	atarijsa_reset();
 	atarigen_init_save_state();
 }
@@ -123,9 +122,9 @@ static WRITE16_HANDLER( eprom_latch_w )
 	if (ACCESSING_LSB)
 	{
 		if (data & 1)
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -177,7 +176,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360010, 0x360011) AM_WRITE(eprom_latch_w)
 	AM_RANGE(0x360020, 0x360021) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE(atarigen_sound_w)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_READWRITE(MRA16_RAM, paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3e0000, 0x3e0fff) AM_READWRITE(SMH_RAM, paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3f4000, 0x3f4f7f) AM_WRITE(atarigen_alpha_w) AM_BASE(&atarigen_alpha)
@@ -202,7 +201,7 @@ static ADDRESS_MAP_START( guts_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x360010, 0x360011) AM_WRITE(eprom_latch_w)
 	AM_RANGE(0x360020, 0x360021) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE(atarigen_sound_w)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_READWRITE(MRA16_RAM, paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3e0000, 0x3e0fff) AM_READWRITE(SMH_RAM, paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xff0000, 0xff1fff) AM_WRITE(atarigen_playfield_upper_w) AM_BASE(&atarigen_playfield_upper)
 	AM_RANGE(0xff8000, 0xff9fff) AM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0xffa000, 0xffbfff) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)

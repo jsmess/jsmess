@@ -200,7 +200,7 @@ void apple2_update_memory(void)
 
 			/* did we 'go past the end?' */
 			if (end_r < apple2_mem_config.memmap[i].end)
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, end_r + 1, apple2_mem_config.memmap[i].end, 0, 0, MRA8_NOP);
+				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, end_r + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
 
 			/* set the memory bank */
 			if (rbase)
@@ -251,12 +251,12 @@ void apple2_update_memory(void)
 				if (slot_ram)
 					wbase = &slot_ram[meminfo.write_mem & APPLE2_MEM_MASK];
 				else
-					wh = MWA8_NOP;
+					wh = SMH_NOP;
 			}
 			else if ((meminfo.write_mem & 0xC0000000) == APPLE2_MEM_ROM)
 			{
 				/* ROM */
-				wh = MWA8_NOP;
+				wh = SMH_NOP;
 			}
 			else
 			{
@@ -275,7 +275,7 @@ void apple2_update_memory(void)
 
 			/* did we 'go past the end?' */
 			if (end_w < apple2_mem_config.memmap[i].end)
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, end_w + 1, apple2_mem_config.memmap[i].end, 0, 0, MWA8_NOP);
+				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, end_w + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
 
 			/* set the memory bank */
 			if (wbase)

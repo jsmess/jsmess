@@ -137,7 +137,7 @@ static WRITE16_HANDLER( paletteram16_BBBBBRRRRRGGGGGG_word_w )
 }
 
 
-static void micro3d_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void micro3d_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -749,7 +749,7 @@ static ADDRESS_MAP_START( hostmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x980000, 0x980001) AM_RAM                           /* ADC0844 */
 	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(tms_host_r, tms_host_w)  /* TMS34010 Interface */
 	AM_RANGE(0x9c0000, 0x9c0001) AM_RAM                            /* ????? Write: 80, A0 and 00 (8-bit high byte) */
-	AM_RANGE(0x9e0000, 0x9e00cf) AM_READWRITE(MRA16_RAM, m68901_w) AM_BASE(&m68901_base)  /* 68901 Multifunction Peripheral */
+	AM_RANGE(0x9e0000, 0x9e00cf) AM_READWRITE(SMH_RAM, m68901_w) AM_BASE(&m68901_base)  /* 68901 Multifunction Peripheral */
 	AM_RANGE(0xa00000, 0xa000cf) AM_READWRITE(m68681_r, m68681_w) AM_BASE(&m68681_base)   /* 68681 UART */
 	AM_RANGE(0xa20000, 0xa20001) AM_RAM                           /* XY joystick input - sign? */
 	AM_RANGE(0xa40002, 0xa40003) AM_RAM                           /* XY joystick input - actual values */
@@ -762,7 +762,7 @@ static ADDRESS_MAP_START( vgbmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM                         /* 512kB Main DRAM */
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ(input_port_2_word_r)   /* TI Monitor Mode switch */
 	AM_RANGE(0x00e00000, 0x00e0000f) AM_RAM //WRITE(mystery2_w)                        /* CREGCLK ??? byte write here. */
-	AM_RANGE(0x02000000, 0x0200ffff) AM_READWRITE(MRA16_RAM, paletteram16_BBBBBRRRRRGGGGGG_word_w) AM_BASE(&paletteram16) //      AM_RANGE(0x02010000, 0x027fffff) AM_RAM                         // ??????????? Mirror of VRAM???
+	AM_RANGE(0x02000000, 0x0200ffff) AM_READWRITE(SMH_RAM, paletteram16_BBBBBRRRRRGGGGGG_word_w) AM_BASE(&paletteram16) //      AM_RANGE(0x02010000, 0x027fffff) AM_RAM                         // ??????????? Mirror of VRAM???
 	AM_RANGE(0x02600000, 0x0260000f) AM_RAM                         // XFER3dk???? 16-bit write
 	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(ti_uart_r)            /* SCN UART */
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(ti_uart_w)
@@ -848,7 +848,7 @@ static const struct upd7759_interface upd7759_interface =
 static const tms34010_config vgb_config =
 {
 	FALSE,							/* halt on reset ????? - check this */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	40000000/8,						/* pixel clock */
 	4,								/* pixels per clock */
 	micro3d_scanline_update,		/* scanline updater */

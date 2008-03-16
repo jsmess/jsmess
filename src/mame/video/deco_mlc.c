@@ -252,7 +252,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 	{
 		if ((mlc_spriteram[offs+0]&0x8000)==0)
 			continue;
-		if ((mlc_spriteram[offs+1]&0x2000) && (video_screen_get_frame_number(0) & 1))
+		if ((mlc_spriteram[offs+1]&0x2000) && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		/*
@@ -527,7 +527,7 @@ VIDEO_EOF( mlc )
 VIDEO_UPDATE( mlc )
 {
 //  fillbitmap(temp_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[0],cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
-	draw_sprites(machine,bitmap,cliprect);
+	fillbitmap(bitmap,screen->machine->pens[0],cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

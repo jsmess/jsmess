@@ -53,7 +53,7 @@ VIDEO_START( ccastles )
 			3,	resistances, bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	spritebitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	spritebitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* register for savestates */
 	state_save_register_global_array(video_control);
@@ -72,7 +72,7 @@ VIDEO_START( ccastles )
 
 WRITE8_HANDLER( ccastles_hscroll_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	hscroll = data;
 }
 
@@ -277,7 +277,7 @@ VIDEO_UPDATE( ccastles )
 {
 	UINT8 *spriteaddr = &spriteram[video_control[7] * 0x100];	/* BUF1/BUF2 */
 	int flip = video_control[4] ? 0xff : 0x00;	/* PLAYER2 */
-	pen_t black = get_black_pen(machine);
+	pen_t black = get_black_pen(screen->machine);
 	int x, y, offs;
 
 	/* draw the sprites */
@@ -289,7 +289,7 @@ VIDEO_UPDATE( ccastles )
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs+2] >> 7;
 
-		drawgfx(spritebitmap, machine->gfx[0], which, color, flip, flip, x, y, cliprect, TRANSPARENCY_PEN, 7);
+		drawgfx(spritebitmap, screen->machine->gfx[0], which, color, flip, flip, x, y, cliprect, TRANSPARENCY_PEN, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */

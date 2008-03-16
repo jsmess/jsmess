@@ -644,123 +644,100 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 		{
 #define SPACE_SHIFT(a)		((addr_shift < 0) ? ((a) << -addr_shift) : ((a) >> addr_shift))
 #define SPACE_SHIFT_END(a)	((addr_shift < 0) ? (((a) << -addr_shift) | ((1 << -addr_shift) - 1)) : ((a) >> addr_shift))
-			static const char *const spacename[] = { "program", "data", "I/O" };
 			int databus_width = cputype_databus_width(cpu->type, spacenum);
 			int addr_shift = cputype_addrbus_shift(cpu->type, spacenum);
 			int alignunit = databus_width/8;
-			address_map addrmap[MAX_ADDRESS_MAP_SIZE*2];
+			address_map_entry *entry;
 			address_map *map;
-			UINT32 flags;
 
 			/* check to see that the same map is not used twice */
-			if (cpu->construct_map[spacenum][0] && cpu->construct_map[spacenum][0] == cpu->construct_map[spacenum][1])
+			if (cpu->address_map[spacenum][0] != NULL && cpu->address_map[spacenum][0] == cpu->address_map[spacenum][1])
 			{
 				mame_printf_error("%s: %s uses identical memory maps for CPU #%d spacenum %d\n", driver->source_file, driver->name, cpunum, spacenum);
 				error = TRUE;
 			}
 
-			/* reset the address map, resetting the base address to a non-NULL value */
-			/* because the AM_REGION macro will query non-existant memory regions and */
-			/* product valid NULL results */
-			memset(addrmap, 0, sizeof(addrmap));
-
 			/* construct the maps */
-			map = addrmap;
-			construct_address_map(map, config, cpunum, spacenum);
+			map = address_map_alloc(config, cpunum, spacenum);
 
 			/* if this is an empty map, just skip it */
-			if (IS_AMENTRY_END(map))
-				continue;
-
-			/* make sure we start with a proper entry */
-			if (!IS_AMENTRY_EXTENDED(map))
+			if (map->entrylist == NULL)
 			{
-				mame_printf_error("%s: %s wrong MEMORY_READ_START for %s space\n", driver->source_file, driver->name, spacename[spacenum]);
+				address_map_free(map);
+				continue;
+			}
+
+			/* validate the global map parameters */
+			if (map->spacenum != spacenum)
+			{
+				mame_printf_error("%s: %s CPU #%d space %d has address space %d handlers!", driver->source_file, driver->name, cpunum, spacenum, map->spacenum);
+				error = TRUE;
+			}
+			if (map->databits != databus_width)
+			{
+				mame_printf_error("%s: %s cpu #%d uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, cpunum, address_space_names[spacenum], databus_width, map->databits);
 				error = TRUE;
 			}
 
 			/* loop over entries and look for errors */
-			for ( ; !IS_AMENTRY_END(map); map++)
-				if (!IS_AMENTRY_EXTENDED(map))
+			for (entry = map->entrylist; entry != NULL; entry = entry->next)
+			{
+				UINT32 bytestart = SPACE_SHIFT(entry->addrstart);
+				UINT32 byteend = SPACE_SHIFT_END(entry->addrend);
+
+				/* look for inverted start/end pairs */
+				if (byteend < bytestart)
 				{
-					UINT32 start = SPACE_SHIFT(map->start);
-					UINT32 end = SPACE_SHIFT_END(map->end);
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, address_space_names[spacenum], entry->addrstart, entry->addrend);
+					error = TRUE;
+				}
 
-					/* look for inverted start/end pairs */
-					if (end < start)
+				/* look for misaligned entries */
+				if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
+				{
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, address_space_names[spacenum], entry->addrstart, entry->addrend, alignunit);
+					error = TRUE;
+				}
+
+				/* if this is a program space, auto-assign implicit ROM entries */
+				if ((FPTR)entry->read.generic == STATIC_ROM && !entry->region)
+				{
+					entry->region = REGION_CPU1 + cpunum;
+					entry->region_offs = entry->addrstart;
+				}
+
+				/* if this entry references a memory region, validate it */
+				if (entry->region && entry->share == 0)
+				{
+					offs_t length = region_length[entry->region];
+
+					if (length == 0)
 					{
-						mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end);
+						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
 						error = TRUE;
 					}
-
-					/* look for misaligned entries */
-					if ((start & (alignunit-1)) != 0 || (end & (alignunit-1)) != (alignunit-1))
+					else if (entry->region_offs + (byteend - bytestart + 1) > length)
 					{
-						mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end, alignunit);
-						error = TRUE;
-					}
-
-					/* if this is a program space, auto-assign implicit ROM entries */
-					if ((FPTR)map->read.handler == STATIC_ROM && !map->region)
-					{
-						map->region = REGION_CPU1 + cpunum;
-						map->region_offs = map->start;
-					}
-
-					/* if this entry references a memory region, validate it */
-					if (map->region && map->share == 0)
-					{
-						offs_t length = region_length[map->region];
-
-						if (length == 0)
-						{
-							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
-							error = TRUE;
-						}
-						else if (map->region_offs + (end - start + 1) > length)
-						{
-							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region, length);
-							error = TRUE;
-						}
-					}
-
-					/* make sure all devices exist */
-					if (map->read_devtype != NULL && device_list_find_by_tag(config->devicelist, map->read_devtype, map->read_devtag) == NULL)
-					{
-						mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(map->read_devtype), map->read_devtag);
-						error = TRUE;
-					}
-					if (map->write_devtype != NULL && device_list_find_by_tag(config->devicelist, map->write_devtype, map->write_devtag) == NULL)
-					{
-						mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(map->write_devtype), map->write_devtag);
+						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
 						error = TRUE;
 					}
 				}
-				else
-				{
-					flags = AM_EXTENDED_FLAGS(map);
-					if (flags & AMEF_SPECIFIES_SPACE)
-					{
-						int val = (flags & AMEF_SPACE_MASK) >> AMEF_SPACE_SHIFT;
-						if (val != spacenum)
-						{
-							mame_printf_error("%s: %s CPU #%d space %d has address space %d handlers!", driver->source_file, driver->name, cpunum, spacenum, val);
-							error = TRUE;
-						}
-					}
 
-					/* verify the type of memory handlers */
-					if (flags & AMEF_SPECIFIES_DBITS)
-					{
-						int val = (flags & AMEF_DBITS_MASK) >> AMEF_DBITS_SHIFT;
-						val = (val + 1) * 8;
-						if (val != databus_width)
-						{
-							mame_printf_error("%s: %s cpu #%d uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, cpunum, spacename[spacenum], databus_width, val);
-							error = TRUE;
-						}
-					}
+				/* make sure all devices exist */
+				if (entry->read_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->read_devtype, entry->read_devtag) == NULL)
+				{
+					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(entry->read_devtype), entry->read_devtag);
+					error = TRUE;
 				}
+				if (entry->write_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtype, entry->write_devtag) == NULL)
+				{
+					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(entry->write_devtype), entry->write_devtag);
+					error = TRUE;
+				}
+			}
+
+			/* release the address map */
+			address_map_free(map);
 
 			/* validate the interrupts */
 			if (cpu->vblank_interrupt != NULL)
@@ -830,7 +807,7 @@ static int validate_display(int drivnum, const machine_config *config)
 		const screen_config *scrconfig = device->inline_config;
 
 		/* sanity check dimensions */
-		if ((scrconfig->defstate.width <= 0) || (scrconfig->defstate.height <= 0))
+		if ((scrconfig->width <= 0) || (scrconfig->height <= 0))
 		{
 			mame_printf_error("%s: %s screen \"%s\" has invalid display dimensions\n", driver->source_file, driver->name, device->tag);
 			error = TRUE;
@@ -839,29 +816,29 @@ static int validate_display(int drivnum, const machine_config *config)
 		/* sanity check display area */
 		if (scrconfig->type != SCREEN_TYPE_VECTOR)
 		{
-			if ((scrconfig->defstate.visarea.max_x < scrconfig->defstate.visarea.min_x)
-				|| (scrconfig->defstate.visarea.max_y < scrconfig->defstate.visarea.min_y)
-				|| (scrconfig->defstate.visarea.max_x >= scrconfig->defstate.width)
-				|| (scrconfig->defstate.visarea.max_y >= scrconfig->defstate.height))
+			if ((scrconfig->visarea.max_x < scrconfig->visarea.min_x) ||
+				(scrconfig->visarea.max_y < scrconfig->visarea.min_y) ||
+				(scrconfig->visarea.max_x >= scrconfig->width) ||
+				(scrconfig->visarea.max_y >= scrconfig->height))
 			{
 				mame_printf_error("%s: %s screen \"%s\" has an invalid display area\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
 
 			/* sanity check screen formats */
-			if (scrconfig->defstate.format != BITMAP_FORMAT_INDEXED16 &&
-				scrconfig->defstate.format != BITMAP_FORMAT_RGB15 &&
-				scrconfig->defstate.format != BITMAP_FORMAT_RGB32)
+			if (scrconfig->format != BITMAP_FORMAT_INDEXED16 &&
+				scrconfig->format != BITMAP_FORMAT_RGB15 &&
+				scrconfig->format != BITMAP_FORMAT_RGB32)
 			{
 				mame_printf_error("%s: %s screen \"%s\" has unsupported format\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
-			if (scrconfig->defstate.format == BITMAP_FORMAT_INDEXED16)
+			if (scrconfig->format == BITMAP_FORMAT_INDEXED16)
 				palette_modes = TRUE;
 		}
 
 		/* check for zero frame rate */
-		if (scrconfig->defstate.refresh == 0)
+		if (scrconfig->refresh == 0)
 		{
 			mame_printf_error("%s: %s screen \"%s\" has a zero refresh rate\n", driver->source_file, driver->name, device->tag);
 			error = TRUE;

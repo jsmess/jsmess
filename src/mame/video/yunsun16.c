@@ -147,9 +147,10 @@ VIDEO_START( yunsun16 )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	int max_x		=	machine->screen[0].visarea.max_x+1;
-	int max_y		=	machine->screen[0].visarea.max_y+1;
+	int max_x		=	visarea->max_x+1;
+	int max_y		=	visarea->max_y+1;
 
 	int pri			=	*yunsun16_priority & 3;
 	int pri_mask;
@@ -217,21 +218,17 @@ VIDEO_UPDATE( yunsun16 )
 	{
 		/* The color of the this layer's transparent pen goes below everything */
 		tilemap_draw(bitmap,cliprect,tilemap_0, TILEMAP_DRAW_OPAQUE, 0);
-
 		tilemap_draw(bitmap,cliprect,tilemap_0, 0, 1);
-
 		tilemap_draw(bitmap,cliprect,tilemap_1, 0, 2);
 	}
 	else if((*yunsun16_priority & 0x0c) == 8)
 	{
 		/* The color of the this layer's transparent pen goes below everything */
 		tilemap_draw(bitmap,cliprect,tilemap_1, TILEMAP_DRAW_OPAQUE, 0);
-
 		tilemap_draw(bitmap,cliprect,tilemap_1, 0, 1);
-
 		tilemap_draw(bitmap,cliprect,tilemap_0, 0, 2);
 	}
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

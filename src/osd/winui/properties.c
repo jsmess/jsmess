@@ -216,6 +216,12 @@ static HBRUSH hBkBrush;
  * Local private variables
  **************************************************************/
 
+/* No longer used by the core, but we need it to predefine configurable screens for all games. */
+#ifndef MAX_SCREENS
+/* maximum number of screens for one game */
+#define MAX_SCREENS					8
+#endif
+
 static core_options *pOrigOpts, *pDefaultOpts;
 static BOOL orig_uses_defaults;
 static core_options *pCurrentOpts = NULL;
@@ -239,6 +245,7 @@ static HBRUSH background_brush = NULL;
 #define FOLDER_COLOR RGB( 0, 128, 0 ) // DARK GREEN
 #define PARENT_COLOR RGB( 190, 128, 192 ) // PURPLE
 #define GAME_COLOR RGB( 0, 128, 192 ) // DARK BLUE
+
 
 BOOL PropSheetFilter_Vector(const machine_config *drv, const game_driver *gamedrv)
 {
@@ -687,14 +694,14 @@ static char *GameInfoScreen(UINT nIndex)
 		if (drivers[nIndex]->flags & ORIENTATION_SWAP_XY)
 		{
 			sprintf(buf,"%d x %d (V) %f Hz",
-			scrconfig->defstate.visarea.max_y - scrconfig->defstate.visarea.min_y + 1,
-					scrconfig->defstate.visarea.max_x - scrconfig->defstate.visarea.min_x + 1,
-					ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh));
+			scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1,
+					scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1,
+					ATTOSECONDS_TO_HZ(scrconfig->refresh));
 		} else {
 			sprintf(buf,"%d x %d (H) %f Hz",
-					scrconfig->defstate.visarea.max_x - scrconfig->defstate.visarea.min_x + 1,
-					scrconfig->defstate.visarea.max_y - scrconfig->defstate.visarea.min_y + 1,
-					ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh));
+					scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1,
+					scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1,
+					ATTOSECONDS_TO_HZ(scrconfig->refresh));
 		}
 	}
 	/* Free the structure */
