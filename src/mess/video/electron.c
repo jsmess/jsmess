@@ -61,7 +61,7 @@ VIDEO_UPDATE( electron )
 	int i;
 	int x = 0;
 	int pal[16];
-	int scanline = video_screen_get_vpos(0);
+	int scanline = video_screen_get_vpos(screen);
 	rectangle r = *cliprect;
 	r.min_y = r.max_y = scanline;
 
@@ -245,7 +245,7 @@ VIDEO_UPDATE( electron )
 
 INTERRUPT_GEN( electron_scanline_interrupt )
 {
-	switch (video_screen_get_vpos(0))
+	switch (video_screen_get_vpos(machine->primary_screen))
 	{
 	case 43:
 		electron_interrupt_handler( machine, INT_SET, INT_RTC );

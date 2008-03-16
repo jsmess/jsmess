@@ -128,7 +128,7 @@ static TIMER_CALLBACK( a310_vblank )
 	a310_request_irq_a(machine, A310_IRQA_VBL);
 
 	// set up for next vbl
-	timer_adjust_oneshot(vbl_timer, video_screen_get_time_until_pos(0, a310_vidregs[0xb4], 0), 0);
+	timer_adjust_oneshot(vbl_timer, video_screen_get_time_until_pos(machine->primary_screen, a310_vidregs[0xb4], 0), 0);
 }
 
 static void a310_set_timer(int tmr)

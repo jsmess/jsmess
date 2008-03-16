@@ -1620,7 +1620,7 @@ READ16_HANDLER ( lisa_r )
 					videoROM_address |= 0x80;
 				}
 #else
-				int time_in_frame = video_screen_get_vpos(0);
+				int time_in_frame = video_screen_get_vpos(machine->primary_screen);
 				static int videoROM_address = 0;
 
 				videoROM_address = (videoROM_address + 1) & 0x7f;

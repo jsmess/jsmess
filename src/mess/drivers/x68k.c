@@ -952,13 +952,13 @@ READ16_HANDLER( x68k_mfp_r )
     {
     case 0x00:  // GPIP - General purpose I/O register (read-only)
         ret = 0x23;
-        if(video_screen_get_vpos(0) == sys.crtc.reg[9])
+        if(video_screen_get_vpos(machine->primary_screen) == sys.crtc.reg[9])
             ret |= 0x40;
         if(sys.crtc.vblank == 0)
             ret |= 0x10;  // Vsync signal (low if in vertical retrace)
 //      if(sys.mfp.isrb & 0x08)
 //          ret |= 0x08;  // FM IRQ signal
-        if(video_screen_get_hpos(0) > sys.crtc.width - 32)
+        if(video_screen_get_hpos(machine->primary_screen) > sys.crtc.width - 32)
             ret |= 0x80;  // Hsync signal
 //      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",activecpu_get_pc(),offset,ret);
         return ret;  // bit 5 is always 1
@@ -1911,15 +1911,15 @@ static MACHINE_RESET( x68000 )
 	nec765_reset(0);
 	mfp_init();
 
-	x68k_scanline = video_screen_get_vpos(0);// = sys.crtc.reg[6];  // Vertical start
+	x68k_scanline = video_screen_get_vpos(machine->primary_screen);// = sys.crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
 	sys.crtc.vblank = 1;
-	irq_time = video_screen_get_time_until_pos(0,sys.crtc.reg[6],2);
+	irq_time = video_screen_get_time_until_pos(machine->primary_screen,sys.crtc.reg[6],2);
 	timer_adjust_oneshot(vblank_irq, irq_time, 0);
 
 	// start HBlank timer
-	timer_adjust_oneshot(scanline_timer, video_screen_get_scan_period(0), 1);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_scan_period(machine->primary_screen), 1);
 
 	sys.mfp.gpio = 0xfb;
 }

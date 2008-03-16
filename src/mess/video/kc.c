@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/kc.h"
 #include "eventlst.h"
 
@@ -111,7 +112,7 @@ enum
 /* set new blink state - record blink state in event list */
 void	kc85_video_set_blink_state(int data)
 {
-	EventList_AddItemOffset(KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))));
+	EventList_AddItemOffset(KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(Machine->primary_screen), video_screen_get_vpos(Machine->primary_screen))));
 }
 
 
@@ -548,7 +549,7 @@ static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap
 	/* process remainder */
 	kc85_common_vh_process_lines(machine, &video_update, cycles_remaining_in_frame);
 	EventList_Reset();
-	EventList_SetOffsetStartTime ( ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
+	EventList_SetOffsetStartTime ( ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))) );
 }
 
 
@@ -571,7 +572,7 @@ static void kc85_common_vh_eof_callback(void)
 		{
 			pItem = EventList_GetFirstItem();
 			EventList_Reset();
-			EventList_SetOffsetStartTime ( ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
+			EventList_SetOffsetStartTime ( ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))) );
 			logerror ("Event log reset in callback fn.\n");
 		}
 }

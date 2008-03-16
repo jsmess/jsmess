@@ -798,7 +798,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 	// make sure we're in the 65816's context
 	cpuintrf_push_context(0);
 
-	scanline = video_screen_get_vpos(0);
+	scanline = video_screen_get_vpos(machine->primary_screen);
 
 	video_screen_update_partial(0, scanline);
 
@@ -832,11 +832,11 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 		adb_check_mouse(machine);
 
 		/* call Apple II interrupt handler */
-		if ((video_screen_get_vpos(0) % 8) == 7)
+		if ((video_screen_get_vpos(machine->primary_screen) % 8) == 7)
 			apple2_interrupt(machine, 0);
 	}
 
-	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1)%262, 0), 0);
+	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (scanline+1)%262, 0), 0);
 
 	cpuintrf_pop_context();
 }
@@ -933,7 +933,7 @@ static WRITE8_HANDLER( gssnd_w )
 // apple2gs_get_vpos - return the correct vertical counter value for the current scanline,
 // keeping borders in mind.
 
-static int apple2gs_get_vpos(void)
+static int apple2gs_get_vpos(running_machine *machine)
 {
 	int result, scan;
 	static const UINT8 top_border_vert[BORDER_TOP] =
@@ -943,7 +943,7 @@ static int apple2gs_get_vpos(void)
 
 	};
 
-	scan = video_screen_get_vpos(0);
+	scan = video_screen_get_vpos(machine->primary_screen);
 
 	if (scan < BORDER_TOP)
 	{
@@ -966,7 +966,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 	switch(offset)
 	{
 		case 0x19:	/* C019 - RDVBLBAR */
-			result = (video_screen_get_vpos(0) >= (192+BORDER_TOP)) ? 0x80 : 0x00;
+			result = (video_screen_get_vpos(machine->primary_screen) >= (192+BORDER_TOP)) ? 0x80 : 0x00;
 			break;
 
 		case 0x22:	/* C022 - TBCOLOR */
@@ -1007,17 +1007,17 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x2E:	/* C02E - VERTCNT */
-			result = apple2gs_get_vpos() >> 1;
+			result = apple2gs_get_vpos(machine) >> 1;
 			break;
 
 		case 0x2F:	/* C02F - HORIZCNT */
-			result = video_screen_get_hpos(0) / 11;
+			result = video_screen_get_hpos(machine->primary_screen) / 11;
 			if (result > 0)
 			{
 				result += 0x40;
 			}
 
-			if (apple2gs_get_vpos() & 1)
+			if (apple2gs_get_vpos(machine) & 1)
 			{
 				result |= 0x80;
 			}
@@ -1728,7 +1728,7 @@ MACHINE_RESET( apple2gs )
 	timer_adjust_oneshot(apple2gs_scanline_timer, attotime_never, 0);
 
 	// fire on scanline zero
-	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 MACHINE_START( apple2gs )

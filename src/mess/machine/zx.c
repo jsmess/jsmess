@@ -16,9 +16,9 @@
 #define	DEBUG_ZX81_PORTS	1
 #define DEBUG_ZX81_VSYNC	1
 
-#define LOG_ZX81_IOR(_comment) { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(0), _comment); }
-#define LOG_ZX81_IOW(_comment) { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(0), _comment); }
-#define LOG_ZX81_VSYNC { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", video_screen_get_vpos(0)); }
+#define LOG_ZX81_IOR(_comment) { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(machine->primary_screen), _comment); }
+#define LOG_ZX81_IOW(_comment) { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(machine->primary_screen), _comment); }
+#define LOG_ZX81_VSYNC { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", video_screen_get_vpos(machine->primary_screen)); }
 
 static UINT8 zx_tape_bit = 0x80;
 
@@ -94,9 +94,9 @@ WRITE8_HANDLER ( zx_io_w )
 		zx_ula_bkgnd(machine, 1);
 		if (ula_frame_vsync == 2)
 		{
-			cpu_spinuntil_time(video_screen_get_time_until_pos(0, height - 1, 0));
+			cpu_spinuntil_time(video_screen_get_time_until_pos(machine->primary_screen, height - 1, 0));
 			ula_scanline_count = height - 1;
-			logerror ("S: %d B: %d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
+			logerror ("S: %d B: %d\n", video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
 		}
 
 		LOG_ZX81_IOW("ULA IRQs on");

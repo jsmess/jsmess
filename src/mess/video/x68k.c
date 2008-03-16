@@ -229,7 +229,7 @@ static void x68k_crtc_refresh_mode(running_machine *machine)
 
 	video_screen_configure(machine->primary_screen,sys.crtc.video_width,sys.crtc.video_height,&rect,HZ_TO_ATTOSECONDS(55.45));
 	logerror("video_screen_configure(machine->primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",sys.crtc.video_width,sys.crtc.video_height,rect.min_x,rect.min_y,rect.max_x,rect.max_y);
-//	x68k_scanline = video_screen_get_vpos(0);
+//	x68k_scanline = video_screen_get_vpos(machine->primary_screen);
 	if(sys.crtc.reg[4] != 0)
 	{
 //		scantime = ATTOTIME_IN_HZ(55.45) / sys.crtc.reg[4];
@@ -245,15 +245,15 @@ TIMER_CALLBACK(x68k_hsync)
 	sys.crtc.hblank = state;
 	if(state == 1)
 	{
-		int scan = video_screen_get_vpos(0);
+		int scan = video_screen_get_vpos(machine->primary_screen);
 		if(scan > sys.crtc.vend)
 			scan = 0;
-		hsync_time = video_screen_get_time_until_pos(0,scan+1,sys.crtc.hsync_end);
+		hsync_time = video_screen_get_time_until_pos(machine->primary_screen,scan+1,sys.crtc.hsync_end);
 		timer_adjust_oneshot(scanline_timer, hsync_time, 0);
 	}
 	if(state == 0)
 	{
-		hsync_time = video_screen_get_time_until_pos(0,video_screen_get_vpos(0),sys.crtc.hend);
+		hsync_time = video_screen_get_time_until_pos(machine->primary_screen,video_screen_get_vpos(machine->primary_screen),sys.crtc.hend);
 		timer_adjust_oneshot(scanline_timer, hsync_time, 1);
 //		if(!(sys.mfp.gpio & 0x40))  // if GPIP6 is active, clear it
 //			sys.mfp.gpio |= 0x40;
@@ -277,12 +277,12 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 		video_screen_update_partial(0,scan);
 	}
 
-	irq_time = video_screen_get_time_until_pos(0,scan,2);
+	irq_time = video_screen_get_time_until_pos(machine->primary_screen,scan,2);
 	// end of HBlank period clears GPIP6 also?
-	end_time = video_screen_get_time_until_pos(0,scan,sys.crtc.hbegin);
+	end_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hbegin);
 	timer_adjust_oneshot(raster_irq, irq_time, scan);
 	timer_set(end_time,NULL,0,x68k_crtc_raster_end);
-	logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(0));
+	logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(machine->primary_screen));
 }
 
 TIMER_CALLBACK(x68k_crtc_vblank_irq)
@@ -297,7 +297,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		vblank_line = sys.crtc.vend;
 		if(vblank_line > sys.crtc.vtotal)
 			vblank_line = sys.crtc.vtotal;
-		irq_time = video_screen_get_time_until_pos(0,vblank_line,2);
+		irq_time = video_screen_get_time_until_pos(machine->primary_screen,vblank_line,2);
 		timer_adjust_oneshot(vblank_irq, irq_time, 0);
 		logerror("CRTC: VBlank on\n");
 	}
@@ -305,7 +305,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	{
 		sys.crtc.vblank = 0;
 		vblank_line = sys.crtc.vbegin;
-		irq_time = video_screen_get_time_until_pos(0,vblank_line,2);
+		irq_time = video_screen_get_time_until_pos(machine->primary_screen,vblank_line,2);
 		timer_adjust_oneshot(vblank_irq, irq_time, 1);
 		logerror("CRTC: VBlank off\n");
 	}
@@ -381,7 +381,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		if(data != 0)
 		{
 			attotime irq_time;
-			irq_time = video_screen_get_time_until_pos(0,(data - 1) / sys.crtc.vmultiple,2);
+			irq_time = video_screen_get_time_until_pos(machine->primary_screen,(data - 1) / sys.crtc.vmultiple,2);
 
 			if(attotime_to_double(irq_time) > 0)
 				timer_adjust_oneshot(raster_irq, irq_time, (data - 1) / sys.crtc.vmultiple);

@@ -103,7 +103,7 @@ easier to manage.
 /*common vars/calls */
 static UINT8 *coco_rom;
 static int dclg_state, dclg_output_h, dclg_output_v, dclg_timer;
-static UINT8 (*update_keyboard)(void);
+static UINT8 (*update_keyboard)(running_machine *machine);
 static emu_timer *update_keyboard_timer;
 static emu_timer *mux_sel1_timer;
 static emu_timer *mux_sel2_timer;
@@ -816,7 +816,7 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 			coco3_recalc_irq(machine);
 
 			if (LOG_INT_COCO3)
-				logerror("CoCo3 Interrupt: Raising IRQ; scanline=%i\n", video_screen_get_vpos(0));
+				logerror("CoCo3 Interrupt: Raising IRQ; scanline=%i\n", video_screen_get_vpos(machine->primary_screen));
 		}
 		if ((coco3_gimereg[0] & 0x10) && (coco3_gimereg[3] & mask))
 		{
@@ -824,7 +824,7 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 			coco3_recalc_firq(machine);
 
 			if (LOG_INT_COCO3)
-				logerror("CoCo3 Interrupt: Raising FIRQ; scanline=%i\n", video_screen_get_vpos(0));
+				logerror("CoCo3 Interrupt: Raising FIRQ; scanline=%i\n", video_screen_get_vpos(machine->primary_screen));
 		}
 	}
 }
@@ -1021,7 +1021,7 @@ static void coco_hiresjoy_w(int data)
 		coco_hiresjoy_ytransitiontime = attotime_zero;
 	}
 	coco_hiresjoy_ca = data;
-	(*update_keyboard)();
+	(*update_keyboard)(Machine);
 }
 
 static int coco_hiresjoy_readone(attotime transitiontime)
@@ -1195,7 +1195,7 @@ static WRITE8_HANDLER ( d_pia0_ca2_w )
 static TIMER_CALLBACK(coco_update_sel1_timerproc)
 {
 	mux_sel1 = param;;
-	(*update_keyboard)();
+	(*update_keyboard)(machine);
 	soundmux_update();
 }
 
@@ -1207,7 +1207,7 @@ static WRITE8_HANDLER ( d_pia0_cb2_w )
 static TIMER_CALLBACK(coco_update_sel2_timerproc)
 {
 	mux_sel2 = param;
-	(*update_keyboard)();
+	(*update_keyboard)(machine);
 	soundmux_update();
 }
 
@@ -1226,7 +1226,7 @@ static attotime get_relative_time(attotime absolute_time)
 
 
 
-static UINT8 coco_update_keyboard(void)
+static UINT8 coco_update_keyboard(running_machine *machine)
 {
 	UINT8 porta = 0x7F, port_za = 0x7f;
 	int joyval;
@@ -1284,7 +1284,7 @@ static UINT8 coco_update_keyboard(void)
 			break;
 
 		case INPUTDEVICE_DIECOM_LIGHTGUN:
-			if( (video_screen_get_vpos(0) == readinputportbytag_safe("dclg_y", 0)) )
+			if( (video_screen_get_vpos(machine->primary_screen) == readinputportbytag_safe("dclg_y", 0)) )
 			{
 				/* If gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
 				dclg_output_h |= 0x02;
@@ -1297,7 +1297,7 @@ static UINT8 coco_update_keyboard(void)
 			if( (dclg_state == 7) )
 			{
 				/* While in state 7, prepare to chech next video frame for a hit */
-				dclg_time = video_screen_get_time_until_pos(0, readinputportbytag_safe("dclg_y", 0), 0);
+				dclg_time = video_screen_get_time_until_pos(machine->primary_screen, readinputportbytag_safe("dclg_y", 0), 0);
 			}
 
 			break;
@@ -1332,21 +1332,21 @@ static UINT8 coco_update_keyboard(void)
 
 
 
-static UINT8 coco3_update_keyboard(void)
+static UINT8 coco3_update_keyboard(running_machine *machine)
 {
 	/* the CoCo 3 keyboard update routine must also check for the GIME EI1 interrupt */
 	UINT8 porta;
-	porta = coco_update_keyboard();
-	coco3_raise_interrupt(Machine, COCO3_INT_EI1, ((porta & 0x7F) == 0x7F) ? CLEAR_LINE : ASSERT_LINE);
+	porta = coco_update_keyboard(machine);
+	coco3_raise_interrupt(machine, COCO3_INT_EI1, ((porta & 0x7F) == 0x7F) ? CLEAR_LINE : ASSERT_LINE);
 	return porta;
 }
 
 
 
 /* three functions that update the keyboard in varying ways */
-static WRITE8_HANDLER ( d_pia0_pb_w )					{ (*update_keyboard)(); }
-INPUT_CHANGED(coco_keyboard_changed)					{ (*update_keyboard)(); }
-static TIMER_CALLBACK(coco_update_keyboard_timerproc)	{ (*update_keyboard)(); }
+static WRITE8_HANDLER ( d_pia0_pb_w )					{ (*update_keyboard)(machine); }
+INPUT_CHANGED(coco_keyboard_changed)					{ (*update_keyboard)(machine); }
+static TIMER_CALLBACK(coco_update_keyboard_timerproc)	{ (*update_keyboard)(machine); }
 
 static WRITE8_HANDLER ( d_pia0_pa_w )
 {
@@ -1460,7 +1460,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 		cassette_output(cassette_device_image(), ((int) dac - 0x80) / 128.0);
 	}
 
-	(*update_keyboard)();
+	(*update_keyboard)(machine);
 
 	if (get_input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
 		coco_hiresjoy_w(dac >= 0x80);

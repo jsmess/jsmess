@@ -102,8 +102,8 @@ INLINE pen_t atarist_shift_mode_2(running_machine *machine)
 
 static TIMER_CALLBACK(atarist_shifter_tick)
 {
-	int y = video_screen_get_vpos(0);
-	int x = video_screen_get_hpos(0);
+	int y = video_screen_get_vpos(machine->primary_screen);
+	int x = video_screen_get_hpos(machine->primary_screen);
 
 	pen_t pen;
 
@@ -150,8 +150,8 @@ INLINE void atarist_shifter_load(void)
 
 static TIMER_CALLBACK(atarist_glue_tick)
 {
-	int y = video_screen_get_vpos(0);
-	int x = video_screen_get_hpos(0);
+	int y = video_screen_get_vpos(machine->primary_screen);
+	int x = video_screen_get_hpos(machine->primary_screen);
 
 	int v = (y >= shifter.y_start) && (y < shifter.y_end);
 	int h = (x >= shifter.x_start) && (x < shifter.x_end);
@@ -721,8 +721,8 @@ VIDEO_START( atarist )
 	atarist_shifter_timer = timer_alloc(atarist_shifter_tick, NULL);
 	atarist_glue_timer = timer_alloc(atarist_glue_tick, NULL);
 
-	timer_adjust_periodic(atarist_shifter_timer, video_screen_get_time_until_pos(0,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
-	timer_adjust_periodic(atarist_glue_timer, video_screen_get_time_until_pos(0,0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
+	timer_adjust_periodic(atarist_shifter_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
+	timer_adjust_periodic(atarist_glue_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
 
 	memset(&shifter, 0, sizeof(shifter));
 

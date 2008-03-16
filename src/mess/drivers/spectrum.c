@@ -190,7 +190,7 @@ static WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & 0x07)!=0)
 	{
 		/* yes - send event */
-		EventList_AddItemOffset(0x0fe, data & 0x07, ATTOTIME_TO_CYCLES(0,attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))));
+		EventList_AddItemOffset(0x0fe, data & 0x07, ATTOTIME_TO_CYCLES(0,attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))));
 	}
 
 	if ((Changed & (1<<4))!=0)
@@ -330,7 +330,7 @@ static  READ8_HANDLER ( spectrum_port_r )
 	if ((offset & 0xff)==0xdf)
 		return spectrum_port_df_r(machine, offset);
 
-	return video_screen_get_vpos(0)<193 ? spectrum_colorram[(video_screen_get_vpos(0)&0xf8)<<2]:0xff;
+	return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_colorram[(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
 }
 
 static WRITE8_HANDLER ( spectrum_port_w )
@@ -473,7 +473,7 @@ static  READ8_HANDLER ( spectrum_128_port_r )
 	 if ((offset & 0xff)==0xdf)
 		 return spectrum_port_df_r(machine, offset);
 
-	 return video_screen_get_vpos(0)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(0)&0xf8)<<2]:0xff;
+	 return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
 }
 
 static WRITE8_HANDLER ( spectrum_128_port_w )
@@ -759,7 +759,7 @@ static  READ8_HANDLER ( spectrum_plus3_port_r )
 		 }
 	 }
 
-	 return video_screen_get_vpos(0)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(0)&0xf8)<<2]:0xff;
+	 return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
 }
 
 static WRITE8_HANDLER ( spectrum_plus3_port_w )

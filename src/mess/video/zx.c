@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/zx.h"
 #include "sound/dac.h"
@@ -52,8 +53,8 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 		rectangle r;
 		bitmap_t *bitmap = tmpbitmap;
 
-		new_y = video_screen_get_vpos(0);
-		new_x = video_screen_get_hpos(0);
+		new_y = video_screen_get_vpos(machine->primary_screen);
+		new_x = video_screen_get_hpos(machine->primary_screen);
 /*		logerror("zx_ula_bkgnd: %3d,%3d - %3d,%3d\n", old_x, old_y, new_x, new_y);*/
 		y = old_y;
 		for (;;)
@@ -106,9 +107,9 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	rectangle r = *video_screen_get_visible_area(screen);
 	bitmap_t *bitmap = tmpbitmap;
 
-	r.min_y = r.max_y = video_screen_get_vpos(0);
+	r.min_y = r.max_y = video_screen_get_vpos(machine->primary_screen);
 	fillbitmap(bitmap, machine->pens[1], &r);
-	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(0), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
+	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	if (++ula_scanline_count == height)
 		ula_scanline_count = 0;
@@ -126,7 +127,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 	 */
 	if (ula_irq_active)
 	{
-		logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(0), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
+		logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
 
 		ula_irq_active = 0;
 		if (++ula_scancode_count == 8)
@@ -151,7 +152,7 @@ int zx_ula_r(int offs, int region)
 		chrgen = memory_region(region);
 		ireg = cpunum_get_reg(0, Z80_I) << 8;
 		rreg = cpunum_get_reg(0, Z80_R);
-		y = video_screen_get_vpos(0);
+		y = video_screen_get_vpos(Machine->primary_screen);
 
 		cycles = 4 * (64 - (rreg & 63));
 		timer_set(ATTOTIME_IN_CYCLES(cycles, 0), NULL, 0, zx_ula_irq);

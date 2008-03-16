@@ -209,7 +209,7 @@ READ8_HANDLER ( m6545_status_r )
 	const device_config *screen = video_screen_first(machine->config);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-	int data = 0, y = video_screen_get_vpos(0);
+	int data = 0, y = video_screen_get_vpos(machine->primary_screen);
 
 	if( y < visarea->min_y ||
 		y > visarea->max_y )

@@ -632,7 +632,7 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen));
 			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 //			timer_adjust_oneshot(nes_irq_timer, ATTOTIME_IN_CYCLES(4, 0), 0);
 		}
@@ -4324,7 +4324,7 @@ static void mapper182_irq( int num, int scanline, int vblank, int blanked )
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen));
 			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
@@ -4830,7 +4830,7 @@ static void mapper248_irq( int num, int scanline, int vblank, int blanked )
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen));
 			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}

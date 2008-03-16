@@ -167,11 +167,11 @@ static void set_display_settings( running_machine *machine )
 }
 
  READ8_HANDLER(sms_vdp_vcount_r) {
-	return ( smsvdp.sms_frame_timing[ INIT_VCOUNT ] + video_screen_get_vpos(0) ) & 0xFF;
+	return ( smsvdp.sms_frame_timing[ INIT_VCOUNT ] + video_screen_get_vpos(machine->primary_screen) ) & 0xFF;
 }
 
 READ8_HANDLER(sms_vdp_hcount_r) {
-	return video_screen_get_hpos(0) >> 1;
+	return video_screen_get_hpos(machine->primary_screen) >> 1;
 }
 
 void sms_set_ggsmsmode( int mode ) {
@@ -217,7 +217,7 @@ int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *con
 	set_display_settings( machine );
 
 	smsvdp.smsvdp_display_timer = timer_alloc( smsvdp_display_callback , NULL);
-	timer_adjust_periodic(smsvdp.smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ));
+	timer_adjust_periodic(smsvdp.smsvdp_display_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0 ), 0, video_screen_get_scan_period( 0 ));
 	return 0;
 }
 
@@ -231,7 +231,7 @@ static TIMER_CALLBACK(smsvdp_set_irq) {
 static TIMER_CALLBACK(smsvdp_display_callback)
 {
 	rectangle rec;
-	int vpos = video_screen_get_vpos(0);
+	int vpos = video_screen_get_vpos(machine->primary_screen);
 	int vpos_limit = smsvdp.sms_frame_timing[VERTICAL_BLANKING] + smsvdp.sms_frame_timing[TOP_BLANKING]
 	               + smsvdp.sms_frame_timing[TOP_BORDER] + smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V]
 	               + smsvdp.sms_frame_timing[BOTTOM_BORDER] + smsvdp.sms_frame_timing[BOTTOM_BLANKING];
@@ -261,7 +261,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 				smsvdp.status |= STATUS_HINT;
 				if ( smsvdp.reg[0x00] & 0x10 ) {
 					/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-					timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), NULL, 0, smsvdp_set_irq );
+					timer_set( video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen) + 1 ), NULL, 0, smsvdp_set_irq );
 				}
 			}
 
@@ -270,7 +270,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			smsvdp.status |= STATUS_VINT;
 			if ( smsvdp.reg[0x01] & 0x20 ) {
 				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-				timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), NULL, 0, smsvdp_set_irq );
+				timer_set( video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen) + 1 ), NULL, 0, smsvdp_set_irq );
 			}
 		}
 		if ( video_skip_this_frame() ) {
@@ -305,7 +305,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			smsvdp.status |= STATUS_HINT;
 			if ( smsvdp.reg[0x00] & 0x10 ) {
 				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-				timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), NULL, 0, smsvdp_set_irq );
+				timer_set( video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen) + 1 ), NULL, 0, smsvdp_set_irq );
 			}
 		} else {
 			smsvdp.line_counter -= 1;

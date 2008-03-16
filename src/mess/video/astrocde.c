@@ -176,7 +176,7 @@ WRITE8_HANDLER( astrocade_vertical_blank_w )
 
 READ8_HANDLER( astrocade_video_retrace_r )
 {
-	 return video_screen_get_vpos(0);
+	 return video_screen_get_vpos(machine->primary_screen);
 }
 
 
@@ -455,7 +455,7 @@ WRITE8_HANDLER( astrocade_magicram_w )
 
 VIDEO_UPDATE( astrocde )
 {
-	int line = video_screen_get_vpos(0);
+	int line = video_screen_get_vpos(screen);
     int num_bytes = astrocade_mode ? 80 : 40;
     int memloc = line * num_bytes;
     int vblank_start = astrocade_mode ? VerticalBlank : VerticalBlank >> 1;

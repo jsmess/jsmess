@@ -1192,7 +1192,7 @@ static READ8_HANDLER(mac_via_in_b)
 	int val = 0;
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (video_screen_get_vpos(0) >= MAC_V_VIS)
+	if (video_screen_get_vpos(machine->primary_screen) >= MAC_V_VIS)
 		val |= 0x40;
 
 	if (has_adb())
@@ -1329,7 +1329,7 @@ MACHINE_RESET(mac)
 		timer_set(attotime_zero, NULL, 0, set_memory_overlay_callback);
 
 	mac_scanline_timer = timer_alloc(mac_scanline_tick, NULL);
-	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 
@@ -1465,7 +1465,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 
 	mac_sh_updatebuffer();
 
-	scanline = video_screen_get_vpos(0);
+	scanline = video_screen_get_vpos(machine->primary_screen);
 	if (scanline == MAC_V_VIS)
 		mac_vblank_irq();
 
@@ -1473,7 +1473,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 	if (!(scanline % 10))
 		mouse_callback(machine);
 
-	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1) % MAC_V_TOTAL, 0), 0);
+	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (scanline+1) % MAC_V_TOTAL, 0), 0);
 
 	cpuintrf_pop_context();
 }
