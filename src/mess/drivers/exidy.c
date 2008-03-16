@@ -79,7 +79,6 @@
 
     The driver "exidyd" emulates the most common form, a cassette-based system with 48k of ram.
 
-    - Robert
 
 ********************************************************************************/
 #include "driver.h"
@@ -90,6 +89,7 @@
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
+#include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "devices/printer.h"
 #include "devices/z80bin.h"
@@ -109,12 +109,7 @@ static int device_load_exidy_floppy(mess_image *image)
 }
 
 
-//static unsigned char exidy_fc;
-//static unsigned char exidy_fd;
 static unsigned char exidy_fe;
-//static unsigned char exidy_ff;
-
-//static int exidy_parallel_control;
 static int exidy_keyboard_line;
 static unsigned long exidy_hd6402_state;
 
@@ -253,41 +248,16 @@ static void cassette_serial_in(int id, unsigned long state)
 	cassette_serial_connection.input_state = state;
 }
 
-static MACHINE_START( exidy )
+static MACHINE_START( exidyd )
 {
 	serial_timer = timer_alloc(exidy_serial_timer_callback, NULL);
 	cassette_timer = timer_alloc(exidy_cassette_timer_callback, NULL);
-
-	wd17xx_init(machine, WD_TYPE_179X, NULL, NULL);
 }
 
-static MACHINE_RESET( exidy )
+static MACHINE_START( exidy )
 {
-	hd6402_init();
-	hd6402_set_callback(exidy_hd6402_callback);
-	hd6402_reset();
-
-	centronics_config(0, exidy_cent_config);
-	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-
-	serial_connection_init(&cassette_serial_connection);
-	serial_connection_set_in_callback(&cassette_serial_connection, cassette_serial_in);
-
-	exidy_fe_port_w(machine, 0, 0);
-
-	timer_set(attotime_zero, NULL, 0, exidy_reset_timer_callback);
-
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
-
-	/* this is temporary. Normally when a Z80 is reset, it will
-    execute address 0. The exidy starts executing from 0x0e000 */
-//  memory_set_opbase_handler(0, exidy_opbaseoverride);
-
-//  cpunum_write_byte(0,0,0x0c3);
-//  cpunum_write_byte(0,1,0x000);
-//  cpunum_write_byte(0,2,0x0e0);
-
+	MACHINE_START_CALL( exidyd );
+	wd17xx_init(machine, WD_TYPE_179X, NULL, NULL);
 }
 
 static MACHINE_RESET( exidyd )
@@ -306,9 +276,14 @@ static MACHINE_RESET( exidyd )
 	exidy_fe_port_w(machine, 0, 0);
 
 	timer_set(attotime_zero, NULL, 0, exidy_reset_timer_callback);
+}
 
+static MACHINE_RESET( exidy )
+{
+	MACHINE_RESET_CALL( exidyd );
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
+
 
 static  READ8_HANDLER ( exidy_wd179x_r )
 {
@@ -323,10 +298,8 @@ static  READ8_HANDLER ( exidy_wd179x_r )
 	case 3:
 		return wd17xx_data_r(machine, offset);
 	default:
-		break;
+		return 0xff;
 	}
-
-	return 0x0ff;
 }
 
 static WRITE8_HANDLER ( exidy_wd179x_w )
@@ -386,53 +359,33 @@ static WRITE8_HANDLER(exidy_fd_port_w)
 	logerror("exidy fd w: %04x %02x\n",offset,data);
 
 	/* bit 0,1: char length select */
-	if (data & (1<<0))
-	{
+	if (data & 1)
 		hd6402_set_input(HD6402_INPUT_CLS1, HD6402_INPUT_CLS1);
-	}
 	else
-	{
 		hd6402_set_input(HD6402_INPUT_CLS1, 0);
-	}
 
-	if (data & (1<<1))
-	{
+	if (data & 2)
 		hd6402_set_input(HD6402_INPUT_CLS2, HD6402_INPUT_CLS2);
-	}
 	else
-	{
 		hd6402_set_input(HD6402_INPUT_CLS2, 0);
-	}
 
 	/* bit 2: stop bit count */
-	if (data & (1<<2))
-	{
+	if (data & 4)
 		hd6402_set_input(HD6402_INPUT_SBS, HD6402_INPUT_SBS);
-	}
 	else
-	{
 		hd6402_set_input(HD6402_INPUT_SBS, 0);
-	}
 
 	/* bit 3: parity type select */
-	if (data & (1<<3))
-	{
+	if (data & 8)
 		hd6402_set_input(HD6402_INPUT_EPE, HD6402_INPUT_EPE);
-	}
 	else
-	{
 		hd6402_set_input(HD6402_INPUT_EPE, 0);
-	}
 
 	/* bit 4: inhibit parity (no parity) */
-	if (data & (1<<4))
-	{
+	if (data & 16)
 		hd6402_set_input(HD6402_INPUT_PI, HD6402_INPUT_PI);
-	}
 	else
-	{
 		hd6402_set_input(HD6402_INPUT_PI, 0);
-	}
 }
 
 #define EXIDY_CASSETTE_MOTOR_MASK ((1<<4)|(1<<5))
@@ -468,8 +421,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 		}
 		else
 		{
-			/* if both motors were off previously, at least one motor
-            has been switched on */
+			/* if both motors were off previously, at least one motor has been switched on */
 			if ((exidy_fe & EXIDY_CASSETTE_MOTOR_MASK)==0)
 			{
 				cassette_clock_counter = 0;
@@ -484,18 +436,17 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 	if (data & 0x080)
 	{
 		/* connect to serial device (not yet emulated) */
-		/* Notes by Robert
-        Due to bugs in the hardware and software of a real Sorcerer, the serial
-        interface misbehaves.
-        1. Sorcerer I had a hardware problem causing rs232 idle to be a space (+9v)
-        instead of mark (-9v). Fixed in Sorcerer II.
-        2. When you select a different baud for rs232, it was "remembered" but not
-        sent to port fe. It only gets sent when motor on was requested. Motor on is
-        only meaningful in a cassette operation.
-        3. The monitor software always resets the device to cassette whenever the
-        keyboard is scanned, motors altered, or an error occurred.
-        4. The above problems make rs232 communication impractical unless you write
-        your own routines or create a corrected monitor rom. */
+	/* Due to bugs in the hardware and software of a real Sorcerer, the serial
+	interface misbehaves.
+	1. Sorcerer I had a hardware problem causing rs232 idle to be a space (+9v)
+	instead of mark (-9v). Fixed in Sorcerer II.
+	2. When you select a different baud for rs232, it was "remembered" but not
+	sent to port fe. It only gets sent when motor on was requested. Motor on is
+	only meaningful in a cassette operation.
+	3. The monitor software always resets the device to cassette whenever the
+	keyboard is scanned, motors altered, or an error occurred.
+	4. The above problems make rs232 communication impractical unless you write
+	your own routines or create a corrected monitor rom. */
 	}
 	else
 	{
@@ -521,40 +472,25 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 
 static WRITE8_HANDLER(exidy_ff_port_w)
 {
-	logerror("exidy ff w: %04x %02x\n",offset,data);
-	/* reading the dipswitch */
-	switch ((readinputport(0)>>1) & 0x01)
+	/* reading the config switch */
+	switch ((readinputportbytag("CONFIG")>>1) & 0x01)
 	{
 		case 0: /* speaker */
-		{
-			int level;
-
-			level = 0; /* speaker muted */
-			if (data)
-			{
-				level = 0x0ff; /* speaker on */
-			}
-
-			speaker_level_w(0, level);
-		}
-		break;
+			speaker_level_w(0, (data) ? 1 : 0);
+			break;
 
 		case 1: /* printer */
-		{
 			/* bit 7 = strobe, bit 6..0 = data */
 			centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 			centronics_write_handshake(0, (data>>7) & 0x01, CENTRONICS_STROBE);
-			centronics_write_data(0,data & 0x07f);
-
-		}
-		break;
+			centronics_write_data(0, data & 0x7f);
+			break;
 	}
-
 }
 
 static READ8_HANDLER(exidy_fc_port_r)
 {
-	int data;
+	UINT8 data;
 
 	hd6402_set_input(HD6402_INPUT_DRR, HD6402_INPUT_DRR);
 	data = hd6402_data_r(machine, offset);
@@ -566,41 +502,24 @@ static READ8_HANDLER(exidy_fc_port_r)
 
 static READ8_HANDLER(exidy_fd_port_r)
 {
-	int data;
 	/* set unused bits high */
-	data = 0xe0;
+	UINT8 data = 0xe0;
 
 	/* bit 4: parity error */
-	if (exidy_hd6402_state & HD6402_OUTPUT_PE)
-	{
-		data |= (1<<4);
-	}
+	if (exidy_hd6402_state & HD6402_OUTPUT_PE) data |= (1<<4);
 
 	/* bit 3: framing error */
-	if (exidy_hd6402_state & HD6402_OUTPUT_FE)
-	{
-		data |= (1<<3);
-	}
+	if (exidy_hd6402_state & HD6402_OUTPUT_FE) data |= (1<<3);
 
 	/* bit 2: over-run error */
-	if (exidy_hd6402_state & HD6402_OUTPUT_OE)
-	{
-		data |= (1<<2);
-	}
+	if (exidy_hd6402_state & HD6402_OUTPUT_OE) data |= (1<<2);
 
 	/* bit 1: data receive ready - data ready in receive reg */
-	if (exidy_hd6402_state & HD6402_OUTPUT_DR)
-	{
-		data |= (1<<1);
-	}
+	if (exidy_hd6402_state & HD6402_OUTPUT_DR) data |= (1<<1);
 
 	/* bit 0: transmitter buffer receive empty */
 	/* if this BIT is forced high, then the cassette save routine does not hang */
-	if (exidy_hd6402_state & HD6402_OUTPUT_TBRE)
-	{
-		data |= (1<<0);
-	}
-
+	if (exidy_hd6402_state & HD6402_OUTPUT_TBRE) data |= (1<<0);
 
 	logerror("exidy fd r: %04x %02x\n",offset,data);
 
@@ -614,36 +533,31 @@ static  READ8_HANDLER(exidy_fe_port_r)
      - not emulated
      - tied high, allowing PARIN and PAROUT bios routines to run */
 
-	unsigned int data=0xc0;
+	UINT8 data=0xc0;
 
 	/* bit 5 - vsync (inverted) */
-	data |= (((~readinputport(0)) & 0x01)<<5);
+	data |= (((~readinputportbytag("VS")) & 0x01)<<5);
 
 	/* bits 4..0 - keyboard data */
 	data |= (readinputport(exidy_keyboard_line+1) & 0x01f);
-
-	logerror("exidy fe r: %04x %02x\n",offset,data);
 
 	return data;
 }
 
 static READ8_HANDLER(exidy_ff_port_r)
 {
-	/* Notes added by Robert
-    The use of the parallel port as a general purpose port is not emulated.
-    Currently the only use is to read the printer status in the Centronics CENDRV bios routine.
-    This uses bit 7. The other bits have been set high (=nothing plugged in).
-    This fixes those games that use a joystick. */
+	/* The use of the parallel port as a general purpose port is not emulated.
+	Currently the only use is to read the printer status in the Centronics CENDRV bios routine.
+	This uses bit 7. The other bits have been set high (=nothing plugged in).
+	This fixes those games that use a joystick. */
 
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
-    0 = printer is not busy */
+	0 = printer is not busy */
 
 	if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0)==0 )
 		data |= 0x080;
-
-	logerror("exidy ff r: %04x %02x\n",offset,data);
 
 	return data;
 }
@@ -659,13 +573,10 @@ static ADDRESS_MAP_START( exidy_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(exidy)
-	PORT_START
+	PORT_START_TAG("VS")
 	/* vblank */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK)
-	/* hardware connected to printer port */
-	PORT_DIPNAME( 0x02, 0x02, "Parallel port" )
-	PORT_DIPSETTING(    0x00, "Speaker" )
-	PORT_DIPSETTING(    0x02, "Printer" )
+
 	/* line 0 */
 	PORT_START
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -780,6 +691,19 @@ static INPUT_PORTS_START(exidy)
 	PORT_BIT (0x04, 0x04, IPT_UNUSED)
 	PORT_BIT (0x02, 0x02, IPT_UNUSED)
 	PORT_BIT (0x01, 0x01, IPT_UNUSED)
+
+	/* Enhanced options not available on real hardware */
+	PORT_START_TAG("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
+	PORT_CONFSETTING(    0x00, DEF_STR(No))
+	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
+	/* hardware connected to printer port */
+	PORT_CONFNAME( 0x02, 0x00, "Parallel port" )
+	PORT_CONFSETTING(    0x00, "Speaker" )
+	PORT_CONFSETTING(    0x02, "Printer" )
+//	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
+//	PORT_CONFSETTING(    0x08, DEF_STR(On))
+//	PORT_CONFSETTING(    0x00, DEF_STR(Off))
 INPUT_PORTS_END
 
 /**********************************************************************************************************/
@@ -789,15 +713,14 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_CPU_ADD_TAG("main", Z80, 12638000/6)
 	MDRV_CPU_PROGRAM_MAP(exidy_mem, 0)
 	MDRV_CPU_IO_MAP(exidy_io, 0)
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(200))
-	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( exidy )
 	MDRV_MACHINE_RESET( exidy )
 
-    /* video hardware */
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(200))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(EXIDY_SCREEN_WIDTH, EXIDY_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, EXIDY_SCREEN_WIDTH-1, 0, EXIDY_SCREEN_HEIGHT-1)
@@ -818,6 +741,7 @@ static MACHINE_DRIVER_START( exidyd )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(exidyd_mem, 0)
 
+	MDRV_MACHINE_START( exidyd )
 	MDRV_MACHINE_RESET( exidyd )
 MACHINE_DRIVER_END
 
@@ -828,45 +752,99 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(exidy)
-	/* these are common to all because they are inside the machine */
-	ROM_REGION(64*1024+32, REGION_CPU1,0)
-
-	ROM_LOAD_OPTIONAL("diskboot.dat",0x0bc00, 0x0100, BAD_DUMP CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
-
-	/* char rom */
-	ROM_LOAD("exchr-1.dat",0x0f800, 1024, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced))
-
-	/* video prom */
-	ROM_LOAD("bruce.dat", 0x010000, 32, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1))
-
-	ROM_LOAD("exmo1-1.dat", 0x0e000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1))
-	ROM_LOAD("exmo1-2.dat", 0x0e800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be))
-
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
+	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
+	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
+	ROM_LOAD_OPTIONAL("diskboot.dat",0xbc00, 0x0100, BAD_DUMP CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
 	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
 
-//  ROM_LOAD_OPTIONAL("exsb1-1.dat", 0x0c000, 0x0800, CRC(1dd20d80) SHA1(dd34364ca1a35caa7255b18e6c953f6df664cc74))
-//  ROM_LOAD_OPTIONAL("exsb1-2.dat", 0x0c800, 0x0800, CRC(1068a3f8) SHA1(6395f2c9829d537d68b75a750acbf27145f1bbad))
-//  ROM_LOAD_OPTIONAL("exsb1-3.dat", 0x0d000, 0x0800, CRC(e6332518) SHA1(fe27fccc82f86b90453c4fae55371f3a050dd6dc))
-//  ROM_LOAD_OPTIONAL("exsb1-4.dat", 0x0d800, 0x0800, CRC(a370cb19) SHA1(75fffd897aec8c3dbe1a918f5a29485e603004cb))
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
 ROM_END
 
 ROM_START(exidyd)
-	/* these are common to all because they are inside the machine */
-	ROM_REGION(64*1024+32, REGION_CPU1,0)
-
-	/* char rom */
-	ROM_LOAD("exchr-1.dat",0x0f800, 1024, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced))
-
-	/* video prom */
-	ROM_LOAD("bruce.dat", 0x010000, 32, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1))
-
-	/* Monitor roms */
-	ROM_LOAD("exmo1-1.dat", 0x0e000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1))
-	ROM_LOAD("exmo1-2.dat", 0x0e800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be))
-
-	/* cart */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
+	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
+	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
 	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
 ROM_END
+
+static QUICKLOAD_LOAD( exidy )
+{
+	UINT8 sw = readinputportbytag("CONFIG") & 1;				/* reading the dipswitch: 1 = autorun */
+	UINT16 exec_addr, start_addr, end_addr;
+
+	if (z80bin_load_file( machine, image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
+		return INIT_FAIL;	/* load file */
+
+	/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
+	1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
+	2. An exec address of C858 indicates a basic program.
+	   	This address is unsuitable, so the routine at F020 is used instead.
+	3. If the start address is 1D5 and the exec address is NOT C858,
+		the pointers still need fixing, but then jump to the exec address.
+	4. If autorun is turned off, the pointers still need fixing, but then display READY.
+	Important addresses:
+		01D5 = start (load) address of a conventional basic program
+		C858 = an autorun basic program will have this exec address on the tape
+		C3DD = part of basic that displays READY and lets user enter input
+		F020 = custom routine to fix basic pointers
+		F030 = exec address to jump to after fixing the pointers */
+
+	if ((start_addr == 0x1d5) || (exec_addr == 0xc858))
+	{
+		UINT8 i, sec[18]={
+			0x2a, 2, 0xf0,		// LD HL,(F002)	;get saved end_addr+1
+			0x22, 0xb7, 1,		// LD (01B7),HL	;move it to correct place
+			0xcd, 0x26, 0xc4,	// CALL C426	;set up other pointers
+			0x21, 0xd4, 1,		// LD HL,01D4	;dummy-start address
+			0x36, 0,		// LD (HL),00	;make sure it is end-of-line
+			0,			// NOP		;line up jump address to an even byte
+			0xc3, 0x89, 0xc6,};	// JP C689	;run program - f030 = adjustable jump
+
+		for (i = 0; i < 18; i++) program_write_byte(0xf020 + i, sec[i]);
+
+		if (!sw) program_write_word_16le(0xf030,0xc3dd);
+
+		if (start_addr == 0x1d5)
+		{
+			program_write_word_16le(0xf002,end_addr+1);
+			if ((exec_addr != 0xc858) && (sw == 1)) program_write_word_16le(0xf030,exec_addr);
+			exec_addr=0xf020;
+		}
+		else
+			exec_addr=0xf02f;		// skip fixing pointers, just jump into bios
+		
+		sw = 1;
+
+		if (program_read_byte(0xdffa) != 0xc3) exec_addr=0xffff;	// can't run if cart not in
+	}	
+
+	if ((exec_addr != 0xffff) && (sw)) cpunum_set_reg(0, REG_PC, exec_addr);
+
+	return INIT_PASS;
+}
+
+static void exidy_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* quickload */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_DEV_FILE:		strcpy(info->s = device_temp_str(), __FILE__); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "bin"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:	info->f = (genf *) quickload_load_exidy; break;
+
+		default:				quickload_device_getinfo(devclass, state, info); break;
+	}
+}
 
 static void exidy_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -915,11 +893,18 @@ SYSTEM_CONFIG_START(exidy)
 	CONFIG_DEVICE(exidy_floppy_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(exidy_cassette_getinfo)		// use of cassette causes a hang
-	CONFIG_DEVICE(z80bin_quickload_getinfo)
+	CONFIG_DEVICE(exidy_quickload_getinfo)
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START(exidyd)
+	CONFIG_DEVICE(exidy_printer_getinfo)
+	CONFIG_DEVICE(cartslot_device_getinfo)
+	CONFIG_DEVICE(exidy_cassette_getinfo)		// use of cassette causes a hang
+	CONFIG_DEVICE(exidy_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY        FULLNAME */
-COMP(1979, exidy,	0,	0,	exidy,	exidy,	0,	exidy,	"Exidy Inc", "Sorcerer", GAME_NOT_WORKING )
-COMP(1979, exidyd,	exidy,	0,	exidyd,	exidy,	0,	exidy,	"Exidy Inc", "Sorcerer (diskless)", GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT      MACHINE INPUT   INIT    CONFIG  COMPANY        FULLNAME */
+COMP(1979, exidy,   0,		0,	exidy,	exidy,	0,	exidy,	"Exidy Inc", "Sorcerer", 0 )
+COMP(1979, exidyd,  exidy,	0,	exidyd,	exidy,	0,	exidyd,	"Exidy Inc", "Sorcerer (Cassette only)", 0 )
 
