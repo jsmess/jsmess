@@ -7,8 +7,7 @@
 
 	NOTE: INIT_FAIL == 1, INIT_PASS == 0, EOF == 0xffffffff
 
-	The return_code consists of start_addr | end_addr | exec_addr | status.
-	Status: 0 = good data, 1 = corrupted quickload file.
+	Return status: 0 = good data, 1 = corrupted quickload file.
 
 *********************************************************************/
 
@@ -17,12 +16,12 @@
 #include "z80bin.h"
 #include "snapquik.h"
 
-UINT64 z80bin_load_file( running_machine *machine, mess_image *image, const char *file_type )
+
+int z80bin_load_file( running_machine *machine, mess_image *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
 {
 	int ch;
 	UINT16 args[3];
 	UINT16 i=0, j, size;
-	UINT64 start_addr, exec_addr, end_addr;	/* need to be this size for return at end */
 	UINT8 data;
 	char * pgmname;
 	pgmname = (char *) malloc(256);
@@ -54,17 +53,17 @@ UINT64 z80bin_load_file( running_machine *machine, mess_image *image, const char
 		return INIT_FAIL;
 	}
 
-	exec_addr	= LITTLE_ENDIANIZE_INT16(args[0]);
-	start_addr	= LITTLE_ENDIANIZE_INT16(args[1]);
-	end_addr	= LITTLE_ENDIANIZE_INT16(args[2]);
+	exec_addr[0]	= LITTLE_ENDIANIZE_INT16(args[0]);
+	start_addr[0]	= LITTLE_ENDIANIZE_INT16(args[1]);
+	end_addr[0]	= LITTLE_ENDIANIZE_INT16(args[2]);
 
-	size = (end_addr - start_addr + 1) & 0xffff;
+	size = (end_addr[0] - start_addr[0] + 1) & 0xffff;
 
-	popmessage("%s\nsize=%04X : start=%04X : end=%04X : exec=%04X",pgmname,size,(int)start_addr,(int)end_addr,(int)exec_addr);
+	popmessage("%s\nsize=%04X : start=%04X : end=%04X : exec=%04X",pgmname,size,start_addr[0],end_addr[0],exec_addr[0]);
 
 	for (i = 0; i < size; i++)
 	{
-		j = (start_addr + i) & 0xffff;
+		j = (start_addr[0] + i) & 0xffff;
 		if (image_fread(image, &data, 1) != 1)
 		{
 			ui_popup_time(10,"QUICKLOAD: %s\nUnexpected EOF while writing byte to %04X",pgmname,j);
@@ -76,20 +75,21 @@ UINT64 z80bin_load_file( running_machine *machine, mess_image *image, const char
 
 	free(pgmname);
 
-	return (start_addr << 48) | (end_addr << 32) | (exec_addr << 16);
+	return INIT_PASS;
 }
+
 
 static QUICKLOAD_LOAD( z80bin )
 {
-	UINT16 exec_addr;
-	UINT64 return_info = z80bin_load_file( machine, image, file_type );	/* load file */
-	if (return_info == INIT_FAIL) return INIT_FAIL;			/* failure */
-	exec_addr = (return_info & 0xffff0000) >> 16;			/* get program run address */
+	UINT16 exec_addr, start_addr, end_addr;
+
+	if (z80bin_load_file( machine, image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
+		return INIT_FAIL;
+
 	if (exec_addr == 0xffff) return INIT_PASS;			/* non-executable data file */
 	cpunum_set_reg(0, REG_PC, exec_addr);				/* start program */
 	return INIT_PASS;
 }
-
 
 
 void z80bin_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

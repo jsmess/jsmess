@@ -981,12 +981,10 @@ ROM_END
 static QUICKLOAD_LOAD( super80 )
 {
 	UINT8 sw = readinputportbytag("CONFIG") & 1;				/* reading the dipswitch: 1 = autorun */
-	UINT16 exec_addr;
-	UINT64 return_info = z80bin_load_file( machine, image, file_type );	/* load file */
+	UINT16 exec_addr, start_addr, end_addr;
 
-	if (return_info == INIT_FAIL) return INIT_FAIL;			/* failure */
-
-	exec_addr = (return_info & 0xffff0000) >> 16;			/* get program run address */
+	if (z80bin_load_file( machine, image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
+		return INIT_FAIL;
 
 	if ((exec_addr != 0xffff) && (sw))
 		cpunum_set_reg(0, REG_PC, exec_addr);
