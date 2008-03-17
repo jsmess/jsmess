@@ -308,6 +308,11 @@ ROM_START(genesis)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
+ROM_START(gensvp)
+	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
+ROM_END
+
 ROM_START(megadriv)
 	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
@@ -424,5 +429,6 @@ static DRIVER_INIT( genjpn )
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     INIT   CONFIG   COMPANY   FULLNAME */
 CONS( 1989, genesis,  0,		0,	megadriv,  megadri6, genusa,	genesis, "Sega",   "Genesis (USA, NTSC)", 0)
+CONS( 1993, gensvp,   genesis,	0,	megdsvp,   megdsvp, megadsvp,	genesis, "Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
 CONS( 1990, megadriv, genesis,	0,	megadriv,  megadri6, geneur,	genesis, "Sega",   "Mega Drive (Europe, PAL)", 0)
 CONS( 1988, megadrij, genesis,	0,	megadriv,  megadri6, genjpn,	genesis, "Sega",   "Mega Drive (Japan, NTSC)", 0)

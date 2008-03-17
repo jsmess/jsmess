@@ -112,6 +112,7 @@ TESTDRIVER( 3do_pal )
 
 	DRIVER( megadrij )	/* 1988 Sega Mega Drive (Japan)						*/
 	DRIVER( genesis )	/* 1989 Sega Genesis (USA)							*/
+	DRIVER( gensvp )	/* 1993 Sega Genesis (USA w/SVP chip)					*/
 	DRIVER( megadriv )	/* 1990 Sega Mega Drive (Europe)					*/
 
 	DRIVER( saturnjp )	/* 1994 Sega Saturn (Japan)							*/
