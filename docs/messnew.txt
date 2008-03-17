@@ -9,7 +9,8 @@ New System Drivers Supported (in no particular order):
 - Mikro-80 [Miodrag Milanovic]
 - Orao [Miodrag Milanovic]
 - Philips Videopac G7000/C52 [Wilbert Pol]
-- UT-88 [Miodrag Milanovic]
+- Specialist / Lik [Miodrag Milanovic]
+- UT-88 and UT-88 mini [Miodrag Milanovic]
 - Hartung/Watara/Virella/Videojet/... Game Master [PeT]
 
 

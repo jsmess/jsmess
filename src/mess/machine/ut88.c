@@ -14,7 +14,7 @@
 #include "machine/8255ppi.h"
 
 
-static int ut88_keyboard_line;
+static int ut88_8255_porta;
 
 
 /* Driver initialization */
@@ -26,7 +26,17 @@ DRIVER_INIT(ut88)
 
 READ8_HANDLER (ut88_8255_portb_r )
 {
-	return readinputport(ut88_keyboard_line);
+	switch (ut88_8255_porta ^ 0xff) {
+	  	case 0x01 : return readinputport(0);break;
+	  	case 0x02 : return readinputport(1);break;
+	  	case 0x04 : return readinputport(2);break;
+	  	case 0x08 : return readinputport(3);break;
+	  	case 0x10 : return readinputport(4);break;
+	  	case 0x20 : return readinputport(5);break;
+	  	case 0x40 : return readinputport(6);break;
+	  	case 0x80 : return readinputport(7);break;
+	}	
+	return 0xff;
 }
 
 READ8_HANDLER (ut88_8255_portc_r )
@@ -35,17 +45,8 @@ READ8_HANDLER (ut88_8255_portc_r )
 }
 
 WRITE8_HANDLER (ut88_8255_porta_w )
-{	
-	switch (data ^ 0xff) {
-	  	case 0x01 : ut88_keyboard_line = 0;break;
-	  	case 0x02 : ut88_keyboard_line = 1;break;
-	  	case 0x04 : ut88_keyboard_line = 2;break;
-	  	case 0x08 : ut88_keyboard_line = 3;break;
-	  	case 0x10 : ut88_keyboard_line = 4;break;
-	  	case 0x20 : ut88_keyboard_line = 5;break;
-	  	case 0x40 : ut88_keyboard_line = 6;break;
-	  	case 0x80 : ut88_keyboard_line = 7;break;
-	}	
+{
+	ut88_8255_porta = data;	
 }
 
 static const ppi8255_interface ut88_ppi8255_interface =
@@ -62,7 +63,7 @@ static const ppi8255_interface ut88_ppi8255_interface =
 MACHINE_RESET( ut88 )
 {
 	ppi8255_init(&ut88_ppi8255_interface);
-	ut88_keyboard_line = 0;
+	ut88_8255_porta = 0;
 }
 
 
@@ -70,6 +71,7 @@ READ8_HANDLER( ut88_keyboard_r )
 {
 	return ppi8255_0_r(machine, offset^0x03);	
 }
+
 
 WRITE8_HANDLER( ut88_keyboard_w )
 {
@@ -91,3 +93,52 @@ READ8_HANDLER( ut88_tape_r )
  	}
 	return 0xff;	
 }
+
+READ8_HANDLER( ut88mini_keyboard_r )
+{
+	return readinputport(0);	
+}
+
+static int lcd_digit[6];
+
+WRITE8_HANDLER( ut88mini_write_led )
+{
+		switch(offset) {
+			case 0  : lcd_digit[4] = (data >> 4) & 0x0f; 
+								lcd_digit[5] = data & 0x0f; 
+								break;
+			case 1  : lcd_digit[2] = (data >> 4) & 0x0f; 
+								lcd_digit[3] = data & 0x0f; 
+								break;
+			case 2  : lcd_digit[0] = (data >> 4) & 0x0f; 
+								lcd_digit[1] = data & 0x0f; 
+								break;
+		}
+}
+
+static int bcd_to_7seg[16] = 
+	{0x3F, 0x06, 0x5B, 0x4F, 
+	 0x66, 0x6D, 0x7D, 0x07, 
+	 0x7F, 0x6F, 0x77, 0x7c, 
+	 0x39, 0x5e, 0x79, 0x71 };
+
+static TIMER_CALLBACK( update_display )
+{	
+	int i;
+	for (i=0;i<6;i++) {
+		output_set_digit_value(i, bcd_to_7seg[lcd_digit[i]]);
+	}			
+}
+
+
+MACHINE_START( ut88mini )
+{
+	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, update_display);
+}
+
+MACHINE_RESET( ut88mini )
+{
+	lcd_digit[0] = lcd_digit[1] = lcd_digit[2] = 0;
+	lcd_digit[3] = lcd_digit[4] = lcd_digit[5] = 0;
+}
+

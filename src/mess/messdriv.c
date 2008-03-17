@@ -841,9 +841,14 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 		
 	/* UT-88 */
 	DRIVER( ut88 )	
+	DRIVER( ut88mini )			
 
 	/* Mikro-80 */
 	DRIVER( mikro80 )	
+
+	/* Specialist */	
+	DRIVER( special )	
+	DRIVER( lik )	
 	
 /****************Games*******************************************************/
 	/* Computer Electronic */

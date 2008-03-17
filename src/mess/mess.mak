@@ -406,6 +406,7 @@ DRVLIBS = \
 	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/sinclair.a \
+	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
 	$(MESSOBJ)/ssystem3.a \
@@ -1192,6 +1193,11 @@ $(MESSOBJ)/mikro80.a:      \
 	$(MESS_MACHINE)/mikro80.o \
 	$(MESS_VIDEO)/mikro80.o \
 
+$(MESSOBJ)/special.a:      \
+	$(MESS_DRIVERS)/special.o \
+	$(MESS_MACHINE)/special.o \
+	$(MESS_VIDEO)/special.o \
+
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
@@ -1212,6 +1218,7 @@ $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
 $(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
+$(MESS_DRIVERS)/ut88.o:		$(MESS_LAYOUT)/ut88mini.lh
 
 
 
