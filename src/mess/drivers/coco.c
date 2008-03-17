@@ -538,6 +538,7 @@ static INPUT_PORTS_START( coco3 )
 
 	PORT_START_TAG("joystick_mode")
 	PORT_CONFNAME( 0x70, 0x00, "Joystick Type" )
+	PORT_CHANGED( coco_joystick_mode_changed, 0 )
 	PORT_CONFSETTING(	0x00, DEF_STR( Normal ) )
 	PORT_CONFSETTING(	0x10, "Hi-Res Interface" )
 	PORT_CONFSETTING(	0x30, "Hi-Res Interface (CoCoMax 3 Style)" )

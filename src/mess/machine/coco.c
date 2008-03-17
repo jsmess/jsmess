@@ -3006,9 +3006,10 @@ static void coco3_state_postload(void)
 	coco3_mmu_update(0, 8);
 }
 
-static UINT32 crosshairs_get_screen(int player)
+INPUT_CHANGED( coco_joystick_mode_changed )
 {
-	return readinputportbytag_safe("joystick_mode", 0x00) == 0x40 ? 0x03 : 0x00;
+	int is_lightgun = readinputportbytag_safe("joystick_mode", 0x00) == 0x40;
+	crosshair_set_screen(machine, 0, is_lightgun ? CROSSHAIR_SCREEN_ALL : CROSSHAIR_SCREEN_NONE);
 }
 
 MACHINE_START( coco3 )
@@ -3044,12 +3045,9 @@ MACHINE_START( coco3 )
 	state_save_register_global(gime_irq);
 	state_save_register_global(gime_firq);
 	state_save_register_func_postload(coco3_state_postload);
-
-	/* NPW 15-Mar-2008 - FIX THIS */
-	if (0)
-		crosshairs_get_screen(0);
-	//video_crosshair_set_screenmask_callback(machine, crosshairs_get_screen);
 }
+
+
 
 /***************************************************************************
   OS9 Syscalls for disassembly
