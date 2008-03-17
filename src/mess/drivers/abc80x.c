@@ -163,7 +163,7 @@ static WRITE8_HANDLER( abc806_bankswitch_w )
 			}
 			else
 			{
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end, 0, 0, (write8_machine_func)(STATIC_BANK1 + bank));
+				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end, 0, 0, (write8_machine_func)(FPTR)(STATIC_BANK1 + bank));
 				logerror("ABC806 deallocating %04x-%04x back to RAM\n", bank_start, bank_end);
 			}
 		}
