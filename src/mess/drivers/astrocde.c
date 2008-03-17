@@ -1,54 +1,15 @@
-
 /****************************************************************************
 
-    Bally Astrocade Driver
+    Bally Astrocade consumer hardware
+    driver by Nicola Salmoria, Mike Coates, Frank Palazzolo, Aaron Giles,
+    Dirk Best
 
-    09/23/98 - Added sound, added player 2 pot                  FMP
-               Added SMH_ROM to fix Star Fortress problem
-               Added cartridge support
-
-    08/02/98 - First release based on original wow.c in MAME    FMP
-               Added palette generation based on a function
-               Fixed collision detection
-                           Fixed shifter operation
-                           Fixed clock speed
-                           Fixed Interrupt Rate and handling
-                           (No Light pen support yet)
-                           (No sound yet)
-
-        Original header follows, some comments don't apply      FMP
-
- ****************************************************************************/
-
- /****************************************************************************
-
-   Bally Astrocade style games
-
-   02.02.98 - New IO port definitions               MJC
-              Dirty Rectangle handling
-              Sparkle Circuit for Gorf
-              errorlog output conditional on MAME_DEBUG
-
-   03/04 98 - Extra Bases driver                ATJ
-              Wow word driver
-
- ****************************************************************************/
+****************************************************************************/
 
 #include "driver.h"
 #include "includes/astrocde.h"
 #include "sound/astrocde.h"
 #include "devices/cartslot.h"
-
-
-
-/****************************************************************************
- * Bally Astrocade
- ****************************************************************************/
-
-static WRITE8_HANDLER( astrocade_soundblock1_w )
-{
-	astrocade_sound1_w(machine, offset + 0x18, data);
-}
 
 
 
@@ -59,7 +20,7 @@ static WRITE8_HANDLER( astrocade_soundblock1_w )
  *************************************/
 
 static ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_ROM, astrocade_magicram_w)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_ROM, astrocade_funcgen_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* ASG */
 ADDRESS_MAP_END
@@ -67,31 +28,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( astrocade_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_WRITE(astrocade_colour_register_w)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(astrocade_intercept_r, astrocade_mode_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(astrocade_colour_split_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(astrocade_vertical_blank_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(astrocade_colour_block_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(astrocade_magic_control_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(astrocade_interrupt_vector_w)
-	AM_RANGE(0x0e, 0x0e) AM_READWRITE(astrocade_video_retrace_r, astrocade_interrupt_enable_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(astrocade_interrupt_w)
-/*	AM_RANGE(0x0f, 0x0f) AM_READ(astrocade_horiz_r) */
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("P1_HANDLE")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("P2_HANDLE")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("P3_HANDLE")
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("P4_HANDLE")
-	AM_RANGE(0x14, 0x14) AM_READ_PORT("KEYPAD_COL0")
-	AM_RANGE(0x15, 0x15) AM_READ_PORT("KEYPAD_COL1")
-	AM_RANGE(0x16, 0x16) AM_READ_PORT("KEYPAD_COL2")
-	AM_RANGE(0x17, 0x17) AM_READ_PORT("KEYPAD_COL3")
-	AM_RANGE(0x10, 0x17) AM_WRITE(astrocade_sound1_w) /* Sound Stuff */
-	AM_RANGE(0x19, 0x19) AM_WRITE(astrocade_magic_expand_color_w)
-	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("P1_KNOB")
-	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("P2_KNOB")
-	AM_RANGE(0x1e, 0x1e) AM_READ_PORT("P3_KNOB")
-	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("P4_KNOB")
-	AM_RANGE(0x18, 0xff) AM_WRITE(astrocade_soundblock1_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 
 
@@ -120,85 +57,73 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( astrocde )
-	PORT_START_TAG("P1_HANDLE")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_8WAY
+	PORT_START_TAG("P1HANDLE")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
-    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(1)
+    PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START_TAG("P2_HANDLE")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_8WAY
+	PORT_START_TAG("P2HANDLE")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
-    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(2)
+    PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START_TAG("P3_HANDLE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(3) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(3) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(3) PORT_8WAY
+	PORT_START_TAG("P3HANDLE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(3) PORT_8WAY
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(3) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(3)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(3)
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START_TAG("P4_HANDLE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(4) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(4) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(4) PORT_8WAY
+	PORT_START_TAG("P4HANDLE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(4) PORT_8WAY
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(4) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(4)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(4)
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START_TAG("KEYPAD_COL0")
+	PORT_START_TAG("KEYPAD0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("%   \xC3\xB7         [   ]   LIST") PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/   x     J   K   L   NEXT") PORT_CODE(KEYCODE_SLASH_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("x   -     V   W   X   IF") PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-   +     &   @   *   GOTO") PORT_CODE(KEYCODE_MINUS_PAD)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+   =     #   %   :   PRINT") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("=   WORDS Shift") PORT_CODE(KEYCODE_ENTER_PAD)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+    PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("KEYPAD_COL1")
+	PORT_START_TAG("KEYPAD1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x93   HALT              RUN") PORT_CODE(KEYCODE_PGDN)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CH  9     G   H   I   STEP") PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9   6     S   T   U   RND") PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6   3     \xE2\x86\x91   .   \xE2\x86\x93   BOX") PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3   ERASE (   ;   )") PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".   BLUE Shift") PORT_CODE(KEYCODE_STOP)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START_TAG("KEYPAD_COL2")
+	PORT_START_TAG("KEYPAD2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x91   PAUSE     /   \\") PORT_CODE(KEYCODE_PGUP)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MS  8     D   E   F   TO") PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8   5     P   Q   R   RETN") PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5   2     \xE2\x86\x90   '   \xE2\x86\x92   LINE") PORT_CODE(KEYCODE_5)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2   0     <   \"   >   INPUT") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0   RED Shift") PORT_CODE(KEYCODE_0)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START_TAG("KEYPAD_COL3")
+	PORT_START_TAG("KEYPAD3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C   GO                +10") PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MR  7     A   B   C   FOR") PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7   4     M   N   O   GOSB") PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4   1     Y   Z   !   CLEAR") PORT_CODE(KEYCODE_4)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1   SPACE $   ,   ?") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CE  GREEN Shift") PORT_CODE(KEYCODE_E)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START_TAG("P1_KNOB")
 	PORT_BIT(0xff, 0x00, IPT_PADDLE) PORT_INVERT PORT_SENSITIVITY(85) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
@@ -223,24 +148,24 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( astrocde )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_Y1/8)        /* 1.789 Mhz */
+	MDRV_CPU_ADD(Z80, ASTROCADE_CLOCK/4)        /* 1.789 Mhz */
 	MDRV_CPU_PROGRAM_MAP(astrocade_mem, 0)
 	MDRV_CPU_IO_MAP(astrocade_io, 0)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_Y1/2, 455, 0, 320, 268, 0, 204)
+	MDRV_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_PALETTE_LENGTH(8*32)
-	MDRV_PALETTE_INIT(astrocade)
+	MDRV_PALETTE_LENGTH(512)
+	MDRV_PALETTE_INIT(astrocde)
 
+	MDRV_VIDEO_START(astrocde)
 	MDRV_VIDEO_UPDATE(astrocde)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(ASTROCADE, XTAL_Y1/8)
+	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
@@ -255,13 +180,13 @@ MACHINE_DRIVER_END
 ROM_START( astrocde )
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "astro.bin",  0x0000, 0x2000, CRC(ebc77f3a) SHA1(b902c941997c9d150a560435bf517c6a28137ecc))
-    ROM_CART_LOAD(0, "bin", 0x2000, 0x8000, ROM_OPTIONAL)
+    ROM_CART_LOAD(0, "bin", 0x2000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 ROM_START( astrocdw )
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf))
-    ROM_CART_LOAD(0, "bin", 0x2000, 0x8000, ROM_OPTIONAL)
+    ROM_CART_LOAD(0, "bin", 0x2000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 
@@ -280,10 +205,23 @@ SYSTEM_CONFIG_END
 
 /*************************************
  *
+ *  Driver initialization
+ *
+ *************************************/
+
+DRIVER_INIT( astrocde )
+{
+	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
+}
+
+
+
+/*************************************
+ *
  *  Driver definitions
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT  CONFIG    COMPANY                FULLNAME                     FLAGS */
-CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, 0,    astrocde, "Bally Manufacturing", "Bally Professional Arcade", 0)
-CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, 0,    astrocde, "Bally Manufacturing", "Bally Computer System",     0)
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY                FULLNAME                     FLAGS */
+CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Professional Arcade", GAME_SUPPORTS_SAVE )
+CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Computer System",     GAME_SUPPORTS_SAVE )

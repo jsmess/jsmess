@@ -757,7 +757,7 @@ $(MESSOBJ)/tutor.a:	\
 	$(MESS_DRIVERS)/tutor.o
 
 $(MESSOBJ)/bally.a:    \
-	$(MESS_VIDEO)/astrocde.o \
+	$(MAME_VIDEO)/astrocde.o \
 	$(MESS_DRIVERS)/astrocde.o
 
 $(MESSOBJ)/pcshare.a:					\
