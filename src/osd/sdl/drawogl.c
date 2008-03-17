@@ -21,6 +21,7 @@
 #include "osdcomm.h"
 #include "render.h"
 #include "options.h"
+#include "deprecat.h"
 
 // standard SDL headers
 #include <SDL/SDL.h>
@@ -285,8 +286,10 @@ static void texcopy_palette16(texture_info *texture, const render_texinfo *texso
 static void texcopy_palette16a(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_rgb15(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_rgb15_paletted(texture_info *texture, const render_texinfo *texsource);
+#ifndef SDLMAME_MACOSX
 static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource);
+#endif
 #ifdef SDLMAME_MACOSX
 static void texcopy_yuv16_apple(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_yuv16_paletted_apple(texture_info *texture, const render_texinfo *texsource);
@@ -2485,11 +2488,24 @@ static void texture_shader_update(sdl_info *sdl, sdl_window_info *window, textur
 {
 	if ( !texture->lut_texture )
 	{
-		int uniform_location;
-		render_container *container = render_container_get_screen(window->start_viewscreen);
+		int uniform_location, scrnum;
+		render_container *container;
 		GLfloat vid_attributes[4]; // gamma, contrast, brightness, effect
+		const device_config *screen;
 
 		assert ( sdl->glsl_vid_attributes && texture->format!=SDL_TEXFORMAT_PALETTE16 );
+
+		scrnum = 0;
+		container = (render_container *)NULL;
+		for (screen = video_screen_first(Machine->config); screen != NULL; screen = video_screen_next(screen))
+		{
+			if (scrnum == window->start_viewscreen)
+			{
+				container = render_container_get_screen(screen); 
+			}
+
+			scrnum++;
+		}
 
 		if (container!=NULL)
 		{

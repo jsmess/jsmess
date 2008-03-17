@@ -46,7 +46,7 @@
 //  (YUY format is weird and doesn't fit the assumptions of the
 //   standard macros so we handle it here
 //============================================================
-
+#ifndef SDLMAME_MACOSX
 static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource)
 {
 	int x, y;
@@ -120,6 +120,7 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 		#endif
 	}
 }
+#endif
 
 #else // recursive include
 
