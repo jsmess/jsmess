@@ -70,7 +70,6 @@
 
 /* Core includes */
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/abc80x.h"
 
 /* Components */
