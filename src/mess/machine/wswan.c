@@ -1417,9 +1417,9 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 		if ( vdp.display_vertical != vdp.new_display_vertical ) {
 			vdp.display_vertical = vdp.new_display_vertical;
 			if ( vdp.display_vertical ) {
-				video_screen_set_visarea( 0, 5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
+				video_screen_set_visarea( machine->primary_screen, 5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
 			} else {
-				video_screen_set_visarea( 0, 0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
+				video_screen_set_visarea( machine->primary_screen, 0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
 			}
 		}
 	}

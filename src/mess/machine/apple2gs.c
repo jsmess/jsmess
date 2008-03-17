@@ -800,7 +800,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 
 	scanline = video_screen_get_vpos(machine->primary_screen);
 
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* scanline interrupt */
 	if ((apple2gs_newvideo & 0x80) && (apple2gs_vgcint & 0x02) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))

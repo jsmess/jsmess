@@ -1371,7 +1371,7 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback ) {
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 ) {
 			if ( supported_screen_heights[i] != current_screen_height ) {
 				current_screen_height = supported_screen_heights[i];
-//              video_screen_configure( 0, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * current_screen_height );
+//              video_screen_configure( machine->primary_screen, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * current_screen_height );
 			}
 		}
 	}
@@ -1384,7 +1384,7 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback_pal ) {
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 ) {
 			if ( supported_screen_heights[i] != current_screen_height ) {
 				current_screen_height = supported_screen_heights[i];
-//              video_screen_configure( 0, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * current_screen_height );
+//              video_screen_configure( machine->primary_screen, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * current_screen_height );
 			}
 		}
 	}

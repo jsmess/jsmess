@@ -6,8 +6,6 @@
 
 ******************************************************************************/
 
-#include <zlib.h>
-
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/snapquik.h"
@@ -83,7 +81,7 @@ DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 ; B1    1 EQU flip screen
 ; B0    1 EQU video DMA enabled
 */
-void lynx_draw_lines(int newline)
+void lynx_draw_lines(running_machine *machine, int newline)
 {
 	static int height=-1, width=-1;
 	int h,w;
@@ -182,7 +180,7 @@ void lynx_draw_lines(int newline)
 		{
 			width=w;
 			height=h;
-			video_screen_set_visarea(0, 0, width-1, 0, height-1);
+			video_screen_set_visarea(machine->primary_screen, 0, width-1, 0, height-1);
 		}
 	}
 }

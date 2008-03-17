@@ -776,7 +776,7 @@ INTERRUPT_GEN( apple2_interrupt )
 			cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, PULSE_LINE);
 	}
 
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(machine->primary_screen, scanline);
 
 	profiler_mark(PROFILER_END);
 }

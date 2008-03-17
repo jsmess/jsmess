@@ -898,7 +898,7 @@ static WRITE16_HANDLER( x68k_sysport_w )
 	{
 	case 0x00:
 		sys.sysport.contrast = data & 0x0f;  // often used for screen fades / blanking
-		container = render_container_get_screen(0);
+		container = render_container_get_screen(machine->primary_screen);
 		render_container_set_brightness(container,(float)(sys.sysport.contrast) / 14.0);
 		break;
 	case 0x01:
@@ -1450,9 +1450,9 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 //  mfp_trigger_irq(MFP_IRQ_GPIP4);
 //  }
 //  if(sys.crtc.height == 256)
-//      video_screen_update_partial(0,256);//sys.crtc.reg[4]/2);
+//      video_screen_update_partial(machine->primary_screen,256);//sys.crtc.reg[4]/2);
 //  else
-//      video_screen_update_partial(0,512);//sys.crtc.reg[4]);
+//      video_screen_update_partial(machine->primary_screen,512);//sys.crtc.reg[4]);
 }
 
 static int x68k_int_ack(int line)

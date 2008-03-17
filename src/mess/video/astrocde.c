@@ -206,7 +206,7 @@ WRITE8_HANDLER( astrocade_mode_w )
 		visarea.min_y = 0;
 		visarea.max_y = 255;
 
-		video_screen_configure(0, 455, 268, &visarea, HZ_TO_ATTOSECONDS(XTAL_Y1/2) * 268 * 455);
+		video_screen_configure(machine->primary_screen, 455, 268, &visarea, HZ_TO_ATTOSECONDS(XTAL_Y1/2) * 268 * 455);
 	}
 	else
 	{
@@ -216,7 +216,7 @@ WRITE8_HANDLER( astrocade_mode_w )
 		visarea.min_y = 0;
 		visarea.max_y = 127;
 
-		video_screen_configure(0, 455, 134, &visarea, HZ_TO_ATTOSECONDS(XTAL_Y1/4) * 134 * 455);
+		video_screen_configure(machine->primary_screen, 455, 134, &visarea, HZ_TO_ATTOSECONDS(XTAL_Y1/4) * 134 * 455);
 	}
 }
 

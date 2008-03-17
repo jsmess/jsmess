@@ -26,7 +26,7 @@ VIDEO_UPDATE( trs80 )
 	if (width != width_store)
 	{
 		width_store = width;
-		video_screen_set_visarea(0, 0, width*FW-1, 0, 16*FH-1);
+		video_screen_set_visarea(screen, 0, width*FW-1, 0, 16*FH-1);
 	}
 
 	for (y = 0; y < 16; y++)

@@ -835,7 +835,7 @@ static void lynx_timer_signal_irq(running_machine *machine, int which)
 		break;
     case 2:
 		lynx_timer_count_down( machine, 4 );
-		lynx_draw_lines( -1 );
+		lynx_draw_lines( machine, -1 );
 		lynx_line=0;
 		break;
     case 1:
@@ -1129,7 +1129,7 @@ WRITE8_HANDLER(mikey_write)
 	case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 	case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 		mikey.data[offset]=data;
-		lynx_draw_lines(lynx_line);
+		lynx_draw_lines(machine, lynx_line);
 #if 0
 		palette_set_color_rgb(offset&0xf,
 					(mikey.data[0xb0+(offset&0xf)]&0xf)<<4,

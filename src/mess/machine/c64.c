@@ -1146,13 +1146,13 @@ INTERRUPT_GEN( c64_frame_interrupt )
 			{
 				vic2_set_rastering(0);
 				vdc8563_set_rastering(1);
-				video_screen_set_visarea(0, 0, 655, 0, 215);
+				video_screen_set_visarea(machine->primary_screen, 0, 655, 0, 215);
 			}
 			else
 			{
 				vic2_set_rastering(1);
 				vdc8563_set_rastering(0);
-				video_screen_set_visarea(0, 0, 335, 0, 215);
+				video_screen_set_visarea(machine->primary_screen, 0, 335, 0, 215);
 			}
 			monitor=MONITOR_TV;
 		}

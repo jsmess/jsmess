@@ -22,7 +22,7 @@ extern int lynx_rotate;
 
 extern UINT32 lynx_palette[0x10];
 
-void lynx_draw_lines(int newline);
+void lynx_draw_lines(running_machine *machine, int newline);
 
 
 #define PAD_UP 0x80

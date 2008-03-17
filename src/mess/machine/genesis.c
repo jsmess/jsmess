@@ -2223,12 +2223,12 @@ static void genesis_init_frame(running_machine *machine)
 		switch (genesis_vdp.genesis_vdp_regs[0x0c]&0x81)
 		{
 			case 0x00: // 32 cell
-				video_screen_set_visarea(0, 0, 32*8-1, 0, 224-1);
+				video_screen_set_visarea(machine->primary_screen, 0, 32*8-1, 0, 224-1);
 				break;
 			case 0x01: // 40 cell corrupted
 			case 0x80: // illegal!
 			case 0x81: // 40 cell
-				video_screen_set_visarea(0, 0, 40*8-1, 0, 224-1);
+				video_screen_set_visarea(machine->primary_screen, 0, 40*8-1, 0, 224-1);
 			break;
 		}
 	}

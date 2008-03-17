@@ -80,7 +80,7 @@ static int thom_update_screen_size( running_machine *machine )
 	if ( ( visarea->max_x != new_w ) || ( visarea->max_y != new_h ) )
 	{
 		changed = 1;
-		video_screen_set_visarea( 0, 0, new_w, 0, new_h );
+		video_screen_set_visarea( machine->primary_screen, 0, new_w, 0, new_h );
 	}
 
 	return changed;

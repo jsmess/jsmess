@@ -778,7 +778,7 @@ INTERRUPT_GEN( vic3_raster_irq )
 		if ((new_columns!=columns)||(new_raws!=raws)) {
 			raws=new_raws;
 			columns=new_columns;
-			video_screen_set_visarea(0, 0,columns+16-1,0, raws+16-1);
+			video_screen_set_visarea(machine->primary_screen, 0,columns+16-1,0, raws+16-1);
 		}
 		if (VIC3_BITPLANES) {
 			if (!video_skip_this_frame ()) vic3_draw_bitplanes(machine);

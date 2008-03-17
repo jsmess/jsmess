@@ -274,7 +274,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	sys.mfp.gpio &= ~0x40;  // GPIP6
 	if((readinputportbytag("options") & 0x01))
 	{
-		video_screen_update_partial(0,scan);
+		video_screen_update_partial(machine->primary_screen,scan);
 	}
 
 	irq_time = video_screen_get_time_until_pos(machine->primary_screen,scan,2);
