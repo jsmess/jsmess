@@ -604,7 +604,7 @@ ROM_END
 #endif
 
 static const mc6845_interface cbm600_crtc = {
-	0,
+	"main",
 	XTAL_18MHz / 8 /*?*/,	/*  I do not know if this is correct, please verify */
 	8 /*?*/,
 	NULL,
@@ -616,7 +616,7 @@ static const mc6845_interface cbm600_crtc = {
 };
 
 static const mc6845_interface cbm700_crtc = {
-	0,
+	"main",
 	XTAL_18MHz / 8 /*?*/,	/* I do not know if this is correct, please verify */
 	9 /*?*/,
 	NULL,

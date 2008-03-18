@@ -638,7 +638,7 @@ static MC6845_ON_VSYNC_CHANGED(abc806_vsync_changed)
 /* MC6845 Interfaces */
 
 static const mc6845_interface abc800m_crtc6845_interface = {
-	0,
+	"main",
 	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -650,7 +650,7 @@ static const mc6845_interface abc800m_crtc6845_interface = {
 };
 
 static const mc6845_interface abc800c_crtc6845_interface = {
-	0,
+	"main",
 	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -662,7 +662,7 @@ static const mc6845_interface abc800c_crtc6845_interface = {
 };
 
 static const mc6845_interface abc802_crtc6845_interface = {
-	0,
+	"main",
 	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -674,7 +674,7 @@ static const mc6845_interface abc802_crtc6845_interface = {
 };
 
 static const mc6845_interface abc806_crtc6845_interface = {
-	0,
+	"main",
 	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,

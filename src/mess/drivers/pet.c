@@ -525,7 +525,7 @@ static GFXDECODE_START( superpet )
 GFXDECODE_END
 
 static const mc6845_interface crtc_pet40 = {
-	0,
+	"main",
 	XTAL_17_73447MHz/3,			/* This is a wild guess and mostly likely incorrect */
 	8,
 	NULL,
@@ -537,7 +537,7 @@ static const mc6845_interface crtc_pet40 = {
 };
 
 static const mc6845_interface crtc_pet80 = {
-	0,
+	"main",
 	XTAL_12MHz / 2,			/* This is a wild guess and mostly likely incorrect */
 	16,
 	NULL,
