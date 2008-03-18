@@ -1,14 +1,13 @@
 /*****************************************************************************
  *
- * includes/svi328.h
+ * includes/svi318.h
  *
  * Spectravideo SVI-318 and SVI-328
  *
  ****************************************************************************/
 
-#ifndef SVI328_H_
-#define SVI328_H_
-
+#ifndef SVI318_H_
+#define SVI318_H_
 
 /*----------- defined in machine/svi318.c -----------*/
 
@@ -29,8 +28,8 @@ WRITE8_HANDLER( svi318_writemem2 );
 WRITE8_HANDLER( svi318_writemem3 );
 WRITE8_HANDLER( svi318_writemem4 );
 
-READ8_HANDLER( svi318_printer_r );
-WRITE8_HANDLER( svi318_printer_w );
+READ8_HANDLER( svi318_io_ext_r );
+WRITE8_HANDLER( svi318_io_ext_w );
 
 READ8_HANDLER( svi318_ppi_r );
 WRITE8_HANDLER( svi318_ppi_w );
@@ -40,16 +39,11 @@ READ8_HANDLER( svi318_psg_port_a_r );
 
 int svi318_cassette_present(int id);
 
-READ8_HANDLER( svi318_fdc_irqdrq_r );
-WRITE8_HANDLER( svi318_fdc_drive_motor_w );
-WRITE8_HANDLER( svi318_fdc_density_side_w );
 DEVICE_LOAD( svi318_floppy );
 
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row );
-WRITE8_HANDLER( svi806_ram_enable_w );
 VIDEO_START( svi328_806 );
 VIDEO_UPDATE( svi328_806 );
 MACHINE_RESET( svi328_806 );
 
-
-#endif /* SVI328_H_ */
+#endif /* SVI318_H_ */

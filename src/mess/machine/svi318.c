@@ -24,7 +24,6 @@
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 
-
 enum {
 	SVI_INTERNAL	= 0,
 	SVI_CART		= 1,
@@ -34,18 +33,18 @@ enum {
 
 typedef struct {
 	/* general */
-	UINT8	svi318;					/* Are we dealing with an SVI-318 or a SVI-328 model. 0 = 328, 1 = 318 */
+	UINT8	svi318;		/* Are we dealing with an SVI-318 or a SVI-328 model. 0 = 328, 1 = 318 */
 	/* memory */
 	UINT8	*empty_bank;
 	UINT8	bank_switch;
-	UINT8	bank1;
-	UINT8	bank2;
-	UINT8	*bank1_ptr;
-	UINT8	bank1_read_only;
-	UINT8	*bank2_ptr;
-	UINT8	bank2_read_only;
-	UINT8	*bank3_ptr;
-	UINT8	bank3_read_only;
+	UINT8	bankLow;
+	UINT8	bankHigh1;
+	UINT8	*bankLow_ptr;
+	UINT8	bankLow_read_only;
+	UINT8	*bankHigh1_ptr;
+	UINT8	bankHigh1_read_only;
+	UINT8	*bankHigh2_ptr;
+	UINT8	bankHigh2_read_only;
 	/* printer */
 	UINT8	prn_data;
 	UINT8	prn_strobe;
@@ -66,11 +65,31 @@ static void svi318_set_banks (void);
 
 static void svi318_uart8250_interrupt(int nr, int state)
 {
-	cpunum_set_input_line(Machine, 0, 0, (state ? HOLD_LINE : CLEAR_LINE));
+	if (svi.bankLow != SVI_CART) {
+		cpunum_set_input_line(Machine, 0, 0, (state ? HOLD_LINE : CLEAR_LINE));
+	}
 }
 
-static const uart8250_interface svi318_uart8250_interface[1] =
+static void svi318_com_refresh_connected(int serial_port_id)
 {
+	switch (serial_port_id)
+	{
+	case 0:	/* Motorola MC14412 modem */
+		uart8250_handshake_in(0, UART8250_HANDSHAKE_IN_CTS|UART8250_HANDSHAKE_IN_DSR|UART8250_INPUTS_RING_INDICATOR|UART8250_INPUTS_DATA_CARRIER_DETECT);
+		break;
+	}
+}
+
+static const uart8250_interface svi318_uart8250_interface[2]=
+{
+	{
+		TYPE8250,
+		1000000,
+		svi318_uart8250_interrupt,
+		NULL,
+		NULL,
+		svi318_com_refresh_connected
+	},
 	{
 		TYPE8250,
 		3072000,
@@ -78,7 +97,7 @@ static const uart8250_interface svi318_uart8250_interface[1] =
 		NULL,
 		NULL,
 		NULL
-	},
+	}
 };
 
 /* Cartridge */
@@ -92,7 +111,8 @@ static int svi318_verify_cart (UINT8 magic[2])
 		return IMAGE_VERIFY_FAIL;
 }
 
-DEVICE_INIT( svi318_cart ) {
+DEVICE_INIT( svi318_cart )
+{
 	pcart = NULL;
 	pcart_rom_size = 0;
 
@@ -247,7 +267,7 @@ WRITE8_HANDLER( svi318_ppi_w )
 
 /* Printer port */
 
-WRITE8_HANDLER( svi318_printer_w )
+static WRITE8_HANDLER( svi318_printer_w )
 {
 	if (!offset)
 		svi.prn_data = data;
@@ -260,7 +280,7 @@ WRITE8_HANDLER( svi318_printer_w )
 	}
 }
 
-READ8_HANDLER( svi318_printer_r )
+static READ8_HANDLER( svi318_printer_r )
 {
 	if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0) )
 		return 0xfe;
@@ -343,7 +363,7 @@ static void svi_fdc_callback(running_machine *machine, wd17xx_state_t state, voi
 	}
 }
 
-WRITE8_HANDLER( svi318_fdc_drive_motor_w )
+static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 {
 	switch (data & 3)
 	{
@@ -358,7 +378,7 @@ WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 	}
 }
 
-WRITE8_HANDLER( svi318_fdc_density_side_w )
+static WRITE8_HANDLER( svi318_fdc_density_side_w )
 {
 	mess_image *image;
 
@@ -377,7 +397,7 @@ WRITE8_HANDLER( svi318_fdc_density_side_w )
 	}
 }
 
-READ8_HANDLER( svi318_fdc_irqdrq_r )
+static READ8_HANDLER( svi318_fdc_irqdrq_r )
 {
 	return svi318_fdc.irq_drq;
 }
@@ -398,6 +418,7 @@ static unsigned long svi318_calcoffset(UINT8 t, UINT8 h, UINT8 s,
 DEVICE_LOAD( svi318_floppy )
 {
 	int size;
+	int dsktype;
 	int id = image_index_in_device(image);
 
 	if (!image_has_been_created(image))
@@ -406,11 +427,17 @@ DEVICE_LOAD( svi318_floppy )
 
 		switch (size)
 		{
-		case 172032: /* Single sided */
+		case 172032:	/* SVI-328 SSDD */
 			svi318_fdc.heads[id] = 1;
+			dsktype = 0;
 			break;
-		case 346112: /* Double sided */
+		case 346112:	/* SVI-328 DSDD */
 			svi318_fdc.heads[id] = 2;
+			dsktype = 0;
+			break;
+		case 348160:	/* SVI-728 DSDD CP/M */
+			svi318_fdc.heads[id] = 2;
+			dsktype = 1;
 			break;
 		default:
 			return INIT_FAIL;
@@ -423,7 +450,9 @@ DEVICE_LOAD( svi318_floppy )
 		return INIT_FAIL;
 
 	basicdsk_set_geometry(image, 40, svi318_fdc.heads[id], 17, 256, 1, 0, FALSE);
-	basicdsk_set_calcoffset(image, svi318_calcoffset);
+	if (dsktype == 0) {
+		basicdsk_set_calcoffset(image, svi318_calcoffset);
+	}
 
 	return INIT_PASS;
 }
@@ -493,7 +522,7 @@ static void svi318_80col_init(running_machine *machine)
 	timer_set( attotime_zero, NULL, 0, svi318_80col_init_registers );
 }
 
-WRITE8_HANDLER( svi806_ram_enable_w )
+static WRITE8_HANDLER( svi806_ram_enable_w )
 {
 	svi.svi806_ram_enabled = ( data & 0x01 );
 	svi318_set_banks();
@@ -601,6 +630,7 @@ DRIVER_INIT( svi318 )
 
 	/* serial */
 	uart8250_init(0, svi318_uart8250_interface);
+	uart8250_init(1, svi318_uart8250_interface+1);
 }
 
 static const TMS9928a_interface svi318_tms9928a_interface =
@@ -645,6 +675,7 @@ MACHINE_RESET( svi318 )
 	wd17xx_reset();
 
 	uart8250_reset(0);
+	uart8250_reset(1);
 }
 
 INTERRUPT_GEN( svi318_interrupt )
@@ -660,26 +691,26 @@ INTERRUPT_GEN( svi318_interrupt )
 
 WRITE8_HANDLER( svi318_writemem1 )
 {
-	if ( svi.bank1_read_only )
+	if ( svi.bankLow_read_only )
 		return;
 
-	svi.bank1_ptr[offset] = data;
+	svi.bankLow_ptr[offset] = data;
 }
 
 WRITE8_HANDLER( svi318_writemem2 )
 {
-	if ( svi.bank2_read_only)
+	if ( svi.bankHigh1_read_only)
 		return;
 
-	svi.bank2_ptr[offset] = data;
+	svi.bankHigh1_ptr[offset] = data;
 }
 
 WRITE8_HANDLER( svi318_writemem3 )
 {
-	if ( svi.bank3_read_only)
+	if ( svi.bankHigh2_read_only)
 		return;
 
-	svi.bank3_ptr[offset] = data;
+	svi.bankHigh2_ptr[offset] = data;
 }
 
 WRITE8_HANDLER( svi318_writemem4 )
@@ -689,10 +720,10 @@ WRITE8_HANDLER( svi318_writemem4 )
 			svi.svi806_ram[ offset ] = data;
 		}
 	} else {
-		if ( svi.bank3_read_only )
+		if ( svi.bankHigh2_read_only )
 			return;
 
-		svi.bank3_ptr[ 0x3000 + offset] = data;
+		svi.bankHigh2_ptr[ 0x3000 + offset] = data;
 	}
 }
 
@@ -700,92 +731,92 @@ static void svi318_set_banks ()
 {
 	const UINT8 v = svi.bank_switch;
 
-	svi.bank1 = ( v & 1 ) ? ( ( v & 2 ) ? ( ( v & 8 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2 ) : SVI_CART;
-	svi.bank2 = ( v & 4 ) ? ( ( v & 16 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2;
+	svi.bankLow = ( v & 1 ) ? ( ( v & 2 ) ? ( ( v & 8 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2 ) : SVI_CART;
+	svi.bankHigh1 = ( v & 4 ) ? ( ( v & 16 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2;
 
-	svi.bank1_ptr = svi.empty_bank;
-	svi.bank1_read_only = 1;
+	svi.bankLow_ptr = svi.empty_bank;
+	svi.bankLow_read_only = 1;
 
-	switch( svi.bank1 ) {
+	switch( svi.bankLow ) {
 	case SVI_INTERNAL:
-		svi.bank1_ptr = memory_region(REGION_CPU1);
+		svi.bankLow_ptr = memory_region(REGION_CPU1);
 		break;
 	case SVI_CART:
 		if ( pcart ) {
-			svi.bank1_ptr = pcart;
+			svi.bankLow_ptr = pcart;
 		}
 		break;
 	case SVI_EXPRAM2:
 		if ( mess_ram_size >= 64 * 1024 ) {
-			svi.bank1_ptr = mess_ram + mess_ram_size - 64 * 1024;
-			svi.bank1_read_only = 0;
+			svi.bankLow_ptr = mess_ram + mess_ram_size - 64 * 1024;
+			svi.bankLow_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM3:
 		if ( mess_ram_size > 128 * 1024 ) {
-			svi.bank1_ptr = mess_ram + mess_ram_size - 128 * 1024;
-			svi.bank1_read_only = 0;
+			svi.bankLow_ptr = mess_ram + mess_ram_size - 128 * 1024;
+			svi.bankLow_read_only = 0;
 		}
 		break;
 	}
 
-	svi.bank2_ptr = svi.bank3_ptr = svi.empty_bank;
-	svi.bank2_read_only = svi.bank3_read_only = 1;
+	svi.bankHigh1_ptr = svi.bankHigh2_ptr = svi.empty_bank;
+	svi.bankHigh1_read_only = svi.bankHigh2_read_only = 1;
 
-	switch( svi.bank2 ) {
+	switch( svi.bankHigh1 ) {
 	case SVI_INTERNAL:
 		if ( mess_ram_size == 16 * 1024 ) {
-			svi.bank3_ptr = mess_ram;
-			svi.bank3_read_only = 0;
+			svi.bankHigh2_ptr = mess_ram;
+			svi.bankHigh2_read_only = 0;
 		} else {
-			svi.bank2_ptr = mess_ram;
-			svi.bank2_read_only = 0;
-			svi.bank3_ptr = mess_ram + 0x4000;
-			svi.bank3_read_only = 0;
+			svi.bankHigh1_ptr = mess_ram;
+			svi.bankHigh1_read_only = 0;
+			svi.bankHigh2_ptr = mess_ram + 0x4000;
+			svi.bankHigh2_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM2:
 		if ( mess_ram_size > 64 * 1024 ) {
-			svi.bank2_ptr = mess_ram + mess_ram_size - 64 * 1024 + 32 * 1024;
-			svi.bank2_read_only = 0;
-			svi.bank3_ptr = mess_ram + mess_ram_size - 64 * 1024 + 48 * 1024;
-			svi.bank3_read_only = 0;
+			svi.bankHigh1_ptr = mess_ram + mess_ram_size - 64 * 1024 + 32 * 1024;
+			svi.bankHigh1_read_only = 0;
+			svi.bankHigh2_ptr = mess_ram + mess_ram_size - 64 * 1024 + 48 * 1024;
+			svi.bankHigh2_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM3:
 		if ( mess_ram_size > 128 * 1024 ) {
-			svi.bank2_ptr = mess_ram + mess_ram_size - 128 * 1024 + 32 * 1024;
-			svi.bank2_read_only = 0;
-			svi.bank3_ptr = mess_ram + mess_ram_size - 128 * 1024 + 48 * 1024;
-			svi.bank3_read_only = 0;
+			svi.bankHigh1_ptr = mess_ram + mess_ram_size - 128 * 1024 + 32 * 1024;
+			svi.bankHigh1_read_only = 0;
+			svi.bankHigh2_ptr = mess_ram + mess_ram_size - 128 * 1024 + 48 * 1024;
+			svi.bankHigh2_read_only = 0;
 		}
 		break;
 	}
 
 	/* Check for special CART based banking */
-	if ( svi.bank1 == SVI_CART && ( v & 0xc0 ) != 0xc0 ) {
-		svi.bank2_ptr = svi.empty_bank;
-		svi.bank2_read_only = 1;
-		svi.bank3_ptr = svi.empty_bank;
-		svi.bank3_read_only = 1;
+	if ( svi.bankLow == SVI_CART && ( v & 0xc0 ) != 0xc0 ) {
+		svi.bankHigh1_ptr = svi.empty_bank;
+		svi.bankHigh1_read_only = 1;
+		svi.bankHigh2_ptr = svi.empty_bank;
+		svi.bankHigh2_read_only = 1;
 		if ( pcart && ! ( v & 0x80 ) ) {
-			svi.bank3_ptr = pcart + 0x4000;
+			svi.bankHigh2_ptr = pcart + 0x4000;
 		}
 		if ( pcart && ! ( v & 0x40 ) ) {
-			svi.bank2_ptr = pcart;
+			svi.bankHigh1_ptr = pcart;
 		}
 	}
 
-	memory_set_bankptr( 1, svi.bank1_ptr );
-	memory_set_bankptr( 2, svi.bank2_ptr );
-	memory_set_bankptr( 3, svi.bank3_ptr );
+	memory_set_bankptr( 1, svi.bankLow_ptr );
+	memory_set_bankptr( 2, svi.bankHigh1_ptr );
+	memory_set_bankptr( 3, svi.bankHigh2_ptr );
 
 	/* SVI-806 80 column card specific banking */
 	if ( svi.svi806_present ) {
 		if ( svi.svi806_ram_enabled ) {
 			memory_set_bankptr( 4, svi.svi806_ram );
 		} else {
-			memory_set_bankptr( 4, svi.bank3_ptr + 0x3000 );
+			memory_set_bankptr( 4, svi.bankHigh2_ptr + 0x3000 );
 		}
 	}
 }
@@ -795,4 +826,130 @@ static void svi318_set_banks ()
 int svi318_cassette_present(int id)
 {
 	return image_exists(image_from_devtype_and_index(IO_CASSETTE, id));
+}
+
+/* External I/O */
+
+READ8_HANDLER( svi318_io_ext_r )
+{
+	UINT8 data = 0xff;
+
+	if (svi.bankLow == SVI_CART) {
+		return 0xff;
+	}
+
+	switch( offset ) {
+	case 0x12:
+		data = svi318_printer_r(machine, 0);
+		break;
+/* some UART status is not working
+	case 0x20:
+	case 0x21:
+	case 0x22:
+	case 0x23:
+	case 0x24:
+	case 0x25:
+	case 0x26:
+	case 0x27:
+		data = uart8250_0_r(machine, offset & 7);
+		break;
+*/
+	case 0x28:
+	case 0x29:
+	case 0x2A:
+	case 0x2B:
+	case 0x2C:
+	case 0x2D:
+	case 0x2E:
+	case 0x2F:
+		data = uart8250_1_r(machine, offset & 7);
+		break;
+	case 0x30:
+		data = wd17xx_status_r(machine, 0);
+		break;
+	case 0x31:
+		data = wd17xx_track_r(machine, 0);
+		break;
+	case 0x32:
+		data = wd17xx_sector_r(machine, 0);
+		break;
+	case 0x33:
+		data = wd17xx_data_r(machine, 0);
+		break;
+	case 0x34:
+		data = svi318_fdc_irqdrq_r(machine, 0);
+		break;
+	case 0x51: {
+		device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+		data = mc6845_register_r(devconf, 0);
+		}
+		break;
+	}
+
+	return data;
+}
+
+WRITE8_HANDLER( svi318_io_ext_w )
+{
+	if (svi.bankLow == SVI_CART) {
+		return;
+	}
+
+	switch( offset ) {
+	case 0x10:
+	case 0x11:
+		svi318_printer_w(machine, offset & 1, data);
+		break;
+	case 0x20:
+	case 0x21:
+	case 0x22:
+	case 0x23:
+	case 0x24:
+	case 0x25:
+	case 0x26:
+	case 0x27:
+		uart8250_0_w(machine, offset & 7, data);
+		break;
+	case 0x28:
+	case 0x29:
+	case 0x2A:
+	case 0x2B:
+	case 0x2C:
+	case 0x2D:
+	case 0x2E:
+	case 0x2F:
+		uart8250_1_w(machine, offset & 7, data);
+		break;
+	case 0x30:
+		wd17xx_command_w(machine, 0, data);
+		break;
+	case 0x31:
+		wd17xx_track_w(machine, 0, data);
+		break;
+	case 0x32:
+		wd17xx_sector_w(machine, 0, data);
+		break;
+	case 0x33:
+		wd17xx_data_w(machine, 0, data);
+		break;
+	case 0x34:
+		svi318_fdc_drive_motor_w(machine, 0, data);
+		break;
+	case 0x38:
+		svi318_fdc_density_side_w(machine, 0, data);
+		break;
+	case 0x50: {
+		device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+		mc6845_address_w(devconf, 0, data);
+		}
+		break;
+	case 0x51: {
+		device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+		mc6845_register_w(devconf, 0, data);
+		}
+		break;
+	case 0x58:
+		svi806_ram_enable_w(machine, 0, data);
+		break;
+	}
 }

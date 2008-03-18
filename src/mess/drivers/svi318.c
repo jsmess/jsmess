@@ -14,8 +14,6 @@
 #include "includes/svi318.h"
 #include "video/tms9928a.h"
 #include "machine/8255ppi.h"
-#include "machine/uart8250.h"
-#include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
 #include "devices/cartslot.h"
@@ -41,15 +39,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( svi318_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x10, 0x11) AM_WRITE( svi318_printer_w )
-	AM_RANGE( 0x12, 0x12) AM_READ( svi318_printer_r )
-	AM_RANGE( 0x28, 0x2f) AM_READWRITE( uart8250_0_r, uart8250_0_w )
-	AM_RANGE( 0x30, 0x30) AM_READWRITE( wd17xx_status_r, wd17xx_command_w )
-	AM_RANGE( 0x31, 0x31) AM_READWRITE( wd17xx_track_r, wd17xx_track_w )
-	AM_RANGE( 0x32, 0x32) AM_READWRITE( wd17xx_sector_r, wd17xx_sector_w )
-	AM_RANGE( 0x33, 0x33) AM_READWRITE( wd17xx_data_r, wd17xx_data_w )
-	AM_RANGE( 0x34, 0x34) AM_READWRITE( svi318_fdc_irqdrq_r, svi318_fdc_drive_motor_w )
-	AM_RANGE( 0x38, 0x38) AM_WRITE( svi318_fdc_density_side_w )
+	AM_RANGE( 0x00, 0x38) AM_READWRITE( svi318_io_ext_r, svi318_io_ext_w )
 	AM_RANGE( 0x80, 0x80) AM_WRITE( TMS9928A_vram_w )
 	AM_RANGE( 0x81, 0x81) AM_WRITE( TMS9928A_register_w )
 	AM_RANGE( 0x84, 0x84) AM_READ( TMS9928A_vram_r )
@@ -61,20 +51,10 @@ static ADDRESS_MAP_START( svi318_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x98, 0x9a) AM_READ( svi318_ppi_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( svi318_io2, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( svi328_806_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x10, 0x11) AM_WRITE( svi318_printer_w )
-	AM_RANGE( 0x12, 0x12) AM_READ( svi318_printer_r )
-	AM_RANGE( 0x30, 0x30) AM_READWRITE( wd17xx_status_r, wd17xx_command_w )
-	AM_RANGE( 0x31, 0x31) AM_READWRITE( wd17xx_track_r, wd17xx_track_w )
-	AM_RANGE( 0x32, 0x32) AM_READWRITE( wd17xx_sector_r, wd17xx_sector_w )
-	AM_RANGE( 0x33, 0x33) AM_READWRITE( wd17xx_data_r, wd17xx_data_w )
-	AM_RANGE( 0x34, 0x34) AM_READWRITE( svi318_fdc_irqdrq_r, svi318_fdc_drive_motor_w )
-	AM_RANGE( 0x38, 0x38) AM_WRITE( svi318_fdc_density_side_w )
-	AM_RANGE( 0x50, 0x50) AM_DEVREADWRITE( MC6845, "crtc", mc6845_register_r, mc6845_address_w )
-	AM_RANGE( 0x51, 0x51) AM_DEVREADWRITE( MC6845, "crtc", mc6845_register_r, mc6845_register_w )
-	AM_RANGE( 0x58, 0x58) AM_WRITE( svi806_ram_enable_w )
+	AM_RANGE( 0x00, 0x58) AM_READWRITE( svi318_io_ext_r, svi318_io_ext_w )
 	AM_RANGE( 0x80, 0x80) AM_WRITE( TMS9928A_vram_w )
 	AM_RANGE( 0x81, 0x81) AM_WRITE( TMS9928A_register_w )
 	AM_RANGE( 0x84, 0x84) AM_READ( TMS9928A_vram_r )
@@ -88,7 +68,6 @@ ADDRESS_MAP_END
 
 /*
   Keyboard status table
-
        Bit#:|  7  |  6  |  5  |  4  |  3  |  2  |  1  |  0  |
             |     |     |     |     |     |     |     |     |
   Line:     |     |     |     |     |     |     |     |     |
@@ -357,7 +336,7 @@ MACHINE_DRIVER_END
 static const mc6845_interface svi806_crtc6845_interface =
 {
 	"svi806",
-	XTAL_12MHz / 4,
+	XTAL_12MHz / 8,
 	8 /*?*/,
 	NULL,
 	svi806_crtc6845_update_row,
@@ -371,7 +350,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD_TAG( "main", Z80, 3579545 )	/* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP( svi328_806_mem, 0 )
-	MDRV_CPU_IO_MAP( svi318_io2, 0 )
+	MDRV_CPU_IO_MAP( svi328_806_io, 0 )
 	MDRV_CPU_VBLANK_INT("main", svi318_interrupt)
 	MDRV_INTERLEAVE(1)
 
@@ -389,10 +368,10 @@ static MACHINE_DRIVER_START( svi328_806 )
 
 	MDRV_SCREEN_ADD("svi806", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MDRV_SCREEN_SIZE(640, 400)
-	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MDRV_DEVICE_ADD("crtc", MC6845)
 	MDRV_DEVICE_CONFIG( svi806_crtc6845_interface )
@@ -470,9 +449,9 @@ ROM_START( sv328p80 )
 	ROM_REGION (0x10000, REGION_CPU1,0)
 	ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
 	ROM_REGION( 0x1000, REGION_GFX1, 0)
-	ROM_SYSTEM_BIOS(0, "english", "English Character Cartridge")
+	ROM_SYSTEM_BIOS(0, "english", "English Character Set")
 	ROMX_LOAD ("svi806.rom",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Cartridge")
+	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Set")
 	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
 
@@ -480,9 +459,9 @@ ROM_START( sv328n80 )
 	ROM_REGION (0x10000, REGION_CPU1,0)
 	ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
 	ROM_REGION( 0x1000, REGION_GFX1, 0)
-	ROM_SYSTEM_BIOS(0, "english", "English Character Cartridge")
+	ROM_SYSTEM_BIOS(0, "english", "English Character Set")
 	ROMX_LOAD ("svi806.rom",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Cartridge")
+	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Set")
 	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
 
@@ -591,15 +570,16 @@ SYSTEM_CONFIG_END
 SYSTEM_CONFIG_START( svi318 )
 	CONFIG_IMPORT_FROM(svi318_common)
 	CONFIG_RAM_DEFAULT(16 * 1024)
-	CONFIG_RAM( 80 * 1024 )
-	CONFIG_RAM( 144 * 1024 )
+	CONFIG_RAM( 32 * 1024 )
+	CONFIG_RAM( 96 * 1024 )
+	CONFIG_RAM( 160 * 1024 )
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( svi328 )
 	CONFIG_IMPORT_FROM(svi318_common)
 	CONFIG_RAM_DEFAULT(64 * 1024)
-	CONFIG_RAM( 128 * 1024 )
-	CONFIG_RAM( 192 * 1024 )
+	CONFIG_RAM( 96 * 1024 )
+	CONFIG_RAM( 160 * 1024 )
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY         FULLNAME                    FLAGS */
@@ -608,5 +588,4 @@ COMP( 1983, svi318n,    svi318, 0,      svi318n,    svi318, svi318, svi318, "Spe
 COMP( 1983, svi328,     svi318, 0,      svi318,     svi328, svi318, svi328, "Spectravideo", "SVI-328 (PAL)",            0 )
 COMP( 1983, svi328n,    svi318, 0,      svi318n,    svi328, svi318, svi328, "Spectravideo", "SVI-328 (NTSC)",           0 )
 COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318, svi328, "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card", 0 )
-COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,    svi328, svi318, svi328, "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", 0 )
-
+COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318, svi328, "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", 0 )

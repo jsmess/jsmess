@@ -35,6 +35,8 @@ System Driver Changes:
 
 - [QL] System boots up again. (bug #1495) [Curt Coder]
 
+- [SVI318] Cleaned up driver.  [Tomas Karlsson]
+
 - [TRS80] Fixed an issue with I/O ports. Fixed 32 character display. Decoded
   LNW-80 characters. [Robbbert]
 
