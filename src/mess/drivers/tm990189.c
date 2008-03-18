@@ -316,7 +316,7 @@ static void update_common(bitmap_t *bitmap,
 
 static VIDEO_UPDATE( tm990_189 )
 {
-	update_common(bitmap, 580, 150, 110, 508, 387, 456, 507, 478, screen->machine->pens[1], screen->machine->pens[0]);
+	update_common(bitmap, 580, 150, 110, 508, 387, 456, 507, 478, 1, 0);
 	return 0;
 }
 
@@ -343,7 +343,7 @@ static VIDEO_UPDATE( tm990_189_v )
 					LED_display_window_left, LED_display_window_top+16,
 					LED_display_window_left+80, LED_display_window_top+16,
 					LED_display_window_left+128, LED_display_window_top+16,
-					screen->machine->pens[6], screen->machine->pens[1]);
+					6, 1);
 	return 0;
 }
 
@@ -817,7 +817,8 @@ static MACHINE_DRIVER_START(tm990_189)
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(SPEAKER, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)MACHINE_DRIVER_END
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
 
 #define LEFT_BORDER		15
 #define RIGHT_BORDER		15

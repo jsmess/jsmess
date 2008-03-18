@@ -491,17 +491,17 @@ static VIDEO_START( apexc )
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 	apexc_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-	fillbitmap(apexc_bitmap, machine->pens[0], &/*machine->visible_area*/teletyper_window);
+	fillbitmap(apexc_bitmap, 0, &/*machine->visible_area*/teletyper_window);
 }
 
 /* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */
-static void apexc_draw_led(running_machine *machine, bitmap_t *bitmap, int x, int y, int state)
+static void apexc_draw_led(bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
 	for (yy=1; yy<7; yy++)
 		for (xx=1; xx<7; xx++)
-			*BITMAP_ADDR16(bitmap, y+yy, x+xx) = machine->pens[state ? 2 : 3];
+			*BITMAP_ADDR16(bitmap, y+yy, x+xx) = state ? 2 : 3;
 }
 
 /* write a single char on screen */
@@ -529,7 +529,7 @@ static VIDEO_UPDATE( apexc )
 	int i;
 	char the_char;
 
-	fillbitmap(bitmap, screen->machine->pens[0], &/*machine->visible_area*/panel_window);
+	fillbitmap(bitmap, 0, &/*machine->visible_area*/panel_window);
 	apexc_draw_string(screen->machine, bitmap, "power", 8, 0, 0);
 	apexc_draw_string(screen->machine, bitmap, "running", 8, 8, 0);
 	apexc_draw_string(screen->machine, bitmap, "data :", 0, 24, 0);
@@ -537,13 +537,13 @@ static VIDEO_UPDATE( apexc )
 	copybitmap(bitmap, apexc_bitmap, 0, 0, 0, 0, &teletyper_window);
 
 
-	apexc_draw_led(screen->machine, bitmap, 0, 0, 1);
+	apexc_draw_led(bitmap, 0, 0, 1);
 
-	apexc_draw_led(screen->machine, bitmap, 0, 8, cpunum_get_reg(0, APEXC_STATE));
+	apexc_draw_led(bitmap, 0, 8, cpunum_get_reg(0, APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{
-		apexc_draw_led(screen->machine, bitmap, i*8, 32, (panel_data_reg << i) & 0x80000000UL);
+		apexc_draw_led(bitmap, i*8, 32, (panel_data_reg << i) & 0x80000000UL);
 		the_char = '0' + ((i + 1) % 10);
 		apexc_draw_char(screen->machine, bitmap, the_char, i*8, 40, 0);
 		if (((i + 1) % 10) == 0)
@@ -575,7 +575,7 @@ static void apexc_teletyper_linefeed(running_machine *machine)
 		draw_scanline8(apexc_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, machine->pens, -1);
 	}
 
-	fillbitmap(apexc_bitmap, machine->pens[0], &teletyper_scroll_clear_window);
+	fillbitmap(apexc_bitmap, 0, &teletyper_scroll_clear_window);
 }
 
 static void apexc_teletyper_putchar(running_machine *machine, int character)
