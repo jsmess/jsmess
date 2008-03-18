@@ -256,13 +256,15 @@ static MC6845_ON_DE_CHANGED( einstein_6845_display_enable_changed )
 }
 
 static const mc6845_interface einstein_crtc6845_interface = {
-	0,
+	"main",
 	EINSTEIN_SYSTEM_CLOCK /*?*/,
 	8 /*?*/,
 	NULL,
 	einstein_6845_update_row,
 	NULL,
-	einstein_6845_display_enable_changed
+	einstein_6845_display_enable_changed,
+	NULL,
+	NULL
 };
 
 /* 80 column card init */
@@ -1746,8 +1748,13 @@ static MACHINE_DRIVER_START( einstei2 )
 	MDRV_MACHINE_RESET( einstein2 )
 
     /* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(640, 400)
 	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
+
+	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_CONFIG( einstein_crtc6845_interface )
+
 	MDRV_VIDEO_UPDATE( einstein2 )
 MACHINE_DRIVER_END
 
@@ -1801,5 +1808,5 @@ SYSTEM_CONFIG_END
 
 /*     YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     INIT  CONFIG,   COMPANY   FULLNAME */
 COMP( 1984, einstein,	0,      0,		einstein,  einstein, 0,    einstein, "Tatung", "Tatung Einstein TC-01", 0)
-COMP( 1984, einstei2,	0,      0,		einstei2,  einstein, 0,    einstein, "Tatung", "Tatung Einstein TC-01 + 80 column device", 0)
+COMP( 1984, einstei2,	0,      0,		einstei2,  einstein, 0,    einstein, "Tatung", "Tatung Einstein TC-01 + 80 column device", GAME_NOT_WORKING)
 
