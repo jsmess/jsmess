@@ -26,6 +26,10 @@ System Driver Changes:
 - [ASTROCDE] Added controls for player 3 and 4 and improved analog controls.
   [ranger_lennier]
 
+- [ASTROCDE] Removed the MESS specific implementation of the video hardware
+  in favor of the more accurate MAME version. Also fixed the I/O ports
+  defintion which improves the sound a lot.  [Dirk Best]
+
 - [COCO] Fixed bug that could cause joystick button presses to not be
   registered.  (bug #1532) [Nate Woods]
 
