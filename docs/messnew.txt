@@ -26,6 +26,9 @@ System Driver Changes:
 - [ASTROCDE] Added controls for player 3 and 4 and improved analog controls.
   [ranger_lennier]
 
+- [COCO] Fixed bug that could cause joystick button presses to not be
+  registered.  (bug #1532) [Nate Woods]
+
 - [GALAXY] Fixed regressions.  [Miodrag Milanovic]
 
 - [GAMEBOY] Added support for Korean MBC1 mapper variant.  [Wilbert Pol]
@@ -37,13 +40,13 @@ System Driver Changes:
 
 - [SVI318] Cleaned up driver.  [Tomas Karlsson]
 
+- [SVISION] Watara TV-Link PAL activated [PeT]
+
 - [TRS80] Fixed an issue with I/O ports. Fixed 32 character display. Decoded
   LNW-80 characters. [Robbbert]
 
 - [VC4000] Cleaned up, added quickload and fixed colors.  (bug #1404) [Manfred
   Schneider]
-
-- [SVISION] Watara TV-Link PAL activated [PeT]
 
 
 
