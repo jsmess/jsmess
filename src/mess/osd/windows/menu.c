@@ -1345,7 +1345,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	remove_menu_items(device_menu);
 
 	// then set up the actual devices
-	for (dev = machine->devices; dev->type < IO_COUNT; dev++)
+	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
 		for (i = 0; i < dev->count; i++)
 		{

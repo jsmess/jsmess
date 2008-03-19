@@ -172,7 +172,7 @@ static DEVICE_UNLOAD(cbm_rom)
 
 static const struct IODevice *cbm_rom_find_device(running_machine *machine)
 {
-	return device_find(machine->devices, IO_CARTSLOT);
+	return device_find_from_machine(machine, IO_CARTSLOT);
 }
 
 static DEVICE_INIT(cbm_rom)

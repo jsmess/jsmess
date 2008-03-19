@@ -352,6 +352,27 @@ void devices_free(const struct IODevice *devices)
 
 /*************************************
  *
+ *	Device enumeration
+ *
+ *************************************/
+
+const struct IODevice *mess_device_first_from_machine(const running_machine *machine)
+{
+	return machine->devices;
+}
+
+
+
+const struct IODevice *mess_device_next(const struct IODevice *dev)
+{
+	dev++;
+	return (dev->type < IO_COUNT) ? dev : NULL;
+}
+
+
+
+/*************************************
+ *
  *	Device lookup
  *
  *************************************/
@@ -378,6 +399,13 @@ int device_count_tag(const struct IODevice *devices, const char *tag)
 
 
 
+int device_count_tag_from_machine(const running_machine *machine, const char *tag)
+{
+	return device_count_tag(machine->devices, tag);
+}
+
+
+
 /* this function is deprecated */
 const struct IODevice *device_find(const struct IODevice *devices, iodevice_t type)
 {
@@ -388,6 +416,14 @@ const struct IODevice *device_find(const struct IODevice *devices, iodevice_t ty
 			return &devices[i];
 	}
 	return NULL;
+}
+
+
+
+/* this function is deprecated */
+const struct IODevice *device_find_from_machine(const running_machine *machine, iodevice_t type)
+{
+	return device_find(machine->devices, type);
 }
 
 

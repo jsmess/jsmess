@@ -279,12 +279,18 @@ int device_typeid(const char *name);
 const struct IODevice *devices_allocate(const game_driver *gamedrv);
 void devices_free(const struct IODevice *devices);
 
+/* device enumeration */
+const struct IODevice *mess_device_first_from_machine(const running_machine *machine);
+const struct IODevice *mess_device_next(const struct IODevice *dev);
+
 /* device lookup */
 const struct IODevice *device_find_tag(const struct IODevice *devices, const char *tag);
 int device_count_tag(const struct IODevice *devices, const char *tag);
+int device_count_tag_from_machine(const running_machine *machine, const char *tag);
 
 /* deprecated: device lookup; both of these function assume only one of each type of device */
 const struct IODevice *device_find(const struct IODevice *devices, iodevice_t type);
+const struct IODevice *device_find_from_machine(const running_machine *machine, iodevice_t type);
 int device_count(iodevice_t type);
 
 /* diagnostics */

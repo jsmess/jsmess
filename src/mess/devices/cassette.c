@@ -237,7 +237,7 @@ static int device_init_cassette(mess_image *image)
 		return INIT_FAIL;
 
 	/* set to default state */
-	dev = device_find(Machine->devices, IO_CASSETTE);
+	dev = device_find_from_machine(Machine, IO_CASSETTE);
 	get_cassimg(image)->state = get_default_state(dev);
 
 	return INIT_PASS;
@@ -259,7 +259,7 @@ static int device_load_cassette(mess_image *image)
 	tag = get_cassimg(image);
 
 	/* figure out the cassette format */
-	dev = device_find(Machine->devices, IO_CASSETTE);
+	dev = device_find_from_machine(Machine, IO_CASSETTE);
 	formats = mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_CASSETTE_FORMATS);
 
 	if (image_has_been_created(image))

@@ -150,7 +150,7 @@ void apple525_set_lines(UINT8 lines)
 	int i, count;
 	mess_image *image;
 
-	count = device_count_tag(Machine->devices, APPLE525TAG);
+	count = device_count_tag_from_machine(Machine, APPLE525TAG);
 
 	for (i = 0; i < count; i++)
 	{
@@ -222,7 +222,7 @@ static mess_image *apple525_selected_image(void)
 {
 	int i, count;
 
-	count = device_count_tag(Machine->devices, APPLE525TAG);
+	count = device_count_tag_from_machine(Machine, APPLE525TAG);
 
 	for (i = 0; i < count; i++)
 	{
@@ -258,7 +258,7 @@ int apple525_read_status(void)
 	int i, count, result = 0;
 	mess_image *image;
 
-	count = device_count_tag(Machine->devices, APPLE525TAG);
+	count = device_count_tag_from_machine(Machine, APPLE525TAG);
 
 	for (i = 0; i < count; i++)
 	{
