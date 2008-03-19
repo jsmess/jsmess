@@ -31,8 +31,8 @@
 
 /* these functions are macros primarily due to include file ordering */
 /* plus, they are very simple */
-#define speaker_output_count(config)		((config)->devicelist ? device_list_items((config)->devicelist, SPEAKER_OUTPUT) : 0)
-#define speaker_output_first(config)		((config)->devicelist ? device_list_first((config)->devicelist, SPEAKER_OUTPUT) : NULL)
+#define speaker_output_count(config)		device_list_items((config)->devicelist, SPEAKER_OUTPUT)
+#define speaker_output_first(config)		device_list_first((config)->devicelist, SPEAKER_OUTPUT)
 #define speaker_output_next(previous)		device_list_next((previous), SPEAKER_OUTPUT)
 
 

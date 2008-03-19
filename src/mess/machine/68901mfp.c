@@ -1302,17 +1302,12 @@ int mc68901_get_vector(mc68901_t *chip)
 
 static DEVICE_START( mc68901 )
 {
-	mc68901_t *mc68901;
+	mc68901_t *mc68901 = device->token;
 	char unique_tag[30];
 
 	assert(device->machine != NULL);
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
-
-	// allocate the object that holds the state
-
-	mc68901 = auto_malloc(sizeof(*mc68901));
-	memset(mc68901, 0, sizeof(*mc68901));
 
 	//mc68901->device_type = device_type;
 	mc68901->intf = device->static_config;
@@ -1387,8 +1382,6 @@ static DEVICE_START( mc68901 )
 	state_save_register_item(unique_tag, 0, mc68901->rxtx_stop);
 	state_save_register_item(unique_tag, 0, mc68901->rsr_read);
 	state_save_register_item(unique_tag, 0, mc68901->next_rsr);
-
-	return mc68901;
 }
 
 static DEVICE_RESET( mc68901 )
@@ -1430,6 +1423,7 @@ DEVICE_GET_INFO( mc68901 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mc68901_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mc68901); break;

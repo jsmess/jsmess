@@ -36,8 +36,8 @@
 
 #define SUBSECONDS_PER_SPEED_UPDATE	(ATTOSECONDS_PER_SECOND / 4)
 #define PAUSED_REFRESH_RATE			(30)
-#define MAX_VBL_CB					(10)
-#define DEFAULT_FRAME_PEIOD			ATTOTIME_IN_HZ(60)
+#define MAX_VBLANK_CALLBACKS		(10)
+#define DEFAULT_FRAME_PERIOD		ATTOTIME_IN_HZ(60)
 
 
 
@@ -76,7 +76,7 @@ struct _screen_state
 	UINT64					frame_number;			/* the current frame number */
 
 	/* screen specific VBLANK callbacks */
-	vblank_state_changed_func vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
+	vblank_state_changed_func vblank_callback[MAX_VBLANK_CALLBACKS]; /* the array of callbacks */
 
 	/* movie recording */
 	mame_file *				movie_file;				/* handle to the open movie file */
@@ -87,46 +87,49 @@ struct _screen_state
 typedef struct _video_global video_global;
 struct _video_global
 {
+	/* screenless systems */
+	emu_timer *				screenless_frame_timer;	/* timer to signal VBLANK start */
+
 	/* throttling calculations */
-	osd_ticks_t				throttle_last_ticks;/* osd_ticks the last call to throttle */
-	attotime 				throttle_realtime;	/* real time the last call to throttle */
-	attotime 				throttle_emutime;	/* emulated time the last call to throttle */
-	UINT32 					throttle_history;	/* history of frames where we were fast enough */
+	osd_ticks_t				throttle_last_ticks;	/* osd_ticks the last call to throttle */
+	attotime 				throttle_realtime;		/* real time the last call to throttle */
+	attotime 				throttle_emutime;		/* emulated time the last call to throttle */
+	UINT32 					throttle_history;		/* history of frames where we were fast enough */
 
 	/* dynamic speed computation */
-	osd_ticks_t 			speed_last_realtime;/* real time at the last speed calculation */
-	attotime 				speed_last_emutime;	/* emulated time at the last speed calculation */
-	double 					speed_percent;		/* most recent speed percentage */
+	osd_ticks_t 			speed_last_realtime;	/* real time at the last speed calculation */
+	attotime 				speed_last_emutime;		/* emulated time at the last speed calculation */
+	double 					speed_percent;			/* most recent speed percentage */
 	UINT32 					partial_updates_this_frame;/* partial update counter this frame */
 
 	/* overall speed computation */
-	UINT32					overall_real_seconds;/* accumulated real seconds at normal speed */
-	osd_ticks_t				overall_real_ticks;	/* accumulated real ticks at normal speed */
-	attotime				overall_emutime;	/* accumulated emulated time at normal speed */
-	UINT32					overall_valid_counter;/* number of consecutive valid time periods */
+	UINT32					overall_real_seconds;	/* accumulated real seconds at normal speed */
+	osd_ticks_t				overall_real_ticks;		/* accumulated real ticks at normal speed */
+	attotime				overall_emutime;		/* accumulated emulated time at normal speed */
+	UINT32					overall_valid_counter;	/* number of consecutive valid time periods */
 
 	/* configuration */
-	UINT8					sleep;				/* flag: TRUE if we're allowed to sleep */
-	UINT8					throttle;			/* flag: TRUE if we're currently throttled */
-	UINT8					fastforward;		/* flag: TRUE if we're currently fast-forwarding */
-	UINT32					seconds_to_run;		/* number of seconds to run before quitting */
-	UINT8					auto_frameskip;		/* flag: TRUE if we're automatically frameskipping */
-	UINT32					speed;				/* overall speed (*100) */
-	UINT32					original_speed;		/* originally-specified speed */
-	UINT8					refresh_speed;		/* flag: TRUE if we max out our speed according to the refresh */
-	UINT8					update_in_pause;	/* flag: TRUE if video is updated while in pause */
+	UINT8					sleep;					/* flag: TRUE if we're allowed to sleep */
+	UINT8					throttle;				/* flag: TRUE if we're currently throttled */
+	UINT8					fastforward;			/* flag: TRUE if we're currently fast-forwarding */
+	UINT32					seconds_to_run;			/* number of seconds to run before quitting */
+	UINT8					auto_frameskip;			/* flag: TRUE if we're automatically frameskipping */
+	UINT32					speed;					/* overall speed (*100) */
+	UINT32					original_speed;			/* originally-specified speed */
+	UINT8					refresh_speed;			/* flag: TRUE if we max out our speed according to the refresh */
+	UINT8					update_in_pause;		/* flag: TRUE if video is updated while in pause */
 
 	/* frameskipping */
-	UINT8					empty_skip_count;	/* number of empty frames we have skipped */
-	UINT8					frameskip_level;	/* current frameskip level */
-	UINT8					frameskip_counter;	/* counter that counts through the frameskip steps */
+	UINT8					empty_skip_count;		/* number of empty frames we have skipped */
+	UINT8					frameskip_level;		/* current frameskip level */
+	UINT8					frameskip_counter;		/* counter that counts through the frameskip steps */
 	INT8					frameskip_adjust;
-	UINT8					skipping_this_frame;/* flag: TRUE if we are skipping the current frame */
-	osd_ticks_t				average_oversleep;	/* average number of ticks the OSD oversleeps */
+	UINT8					skipping_this_frame;	/* flag: TRUE if we are skipping the current frame */
+	osd_ticks_t				average_oversleep;		/* average number of ticks the OSD oversleeps */
 
 	/* snapshot stuff */
-	render_target *			snap_target;		/* screen shapshot target */
-	bitmap_t *				snap_bitmap;		/* screen snapshot bitmap */
+	render_target *			snap_target;			/* screen shapshot target */
+	bitmap_t *				snap_bitmap;			/* screen snapshot bitmap */
 };
 
 
@@ -172,6 +175,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 /* global rendering */
 static TIMER_CALLBACK( vblank_begin_callback );
 static TIMER_CALLBACK( vblank_end_callback );
+static TIMER_CALLBACK( screenless_update_callback );
 static TIMER_CALLBACK( scanline0_callback );
 static TIMER_CALLBACK( scanline_update_callback );
 static int finish_screen_updates(running_machine *machine);
@@ -280,7 +284,6 @@ INLINE int effective_throttle(running_machine *machine)
 void video_init(running_machine *machine)
 {
 	const char *filename;
-	const device_config *screen;
 
 	/* validate */
 	assert(machine != NULL);
@@ -339,97 +342,12 @@ void video_init(running_machine *machine)
 	if ((filename[0] != 0) && (machine->primary_screen != NULL))
 		video_movie_begin_recording(machine->primary_screen, filename);
 
-	/* for each screen */
-	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+	/* if no screens, create a periodic timer to drive updates */
+	if (machine->primary_screen == NULL)
 	{
-		screen_state *state = get_safe_token(screen);
-		screen_config *config = screen->inline_config;
-
-		/* configure the screen with the default parameters */
-		video_screen_configure(screen, config->width, config->height, &config->visarea, config->refresh);
-
-		/* reset VBLANK timing */
-		state->vblank_start_time = attotime_zero;
-		state->vblank_end_time = attotime_make(0, state->vblank_period);
-
-		/* start the timer to generate per-scanline updates */
-		if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
-			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
+		global.screenless_frame_timer = timer_alloc(screenless_update_callback, NULL);
+		timer_adjust_periodic(global.screenless_frame_timer, DEFAULT_FRAME_PERIOD, 0, DEFAULT_FRAME_PERIOD);
 	}
-}
-
-
-/*-------------------------------------------------
-    screen_init - initializes the state of a
-    single screen device
--------------------------------------------------*/
-
-static screen_state *screen_init(const device_config *screen)
-{
-	char unique_tag[40];
-	screen_state *state;
-	render_container *container;
-	screen_config *config;
-
-	/* validate some basic stuff */
-	assert(screen != NULL);
-	assert(screen->static_config == NULL);
-	assert(screen->inline_config != NULL);
-	assert(screen->machine != NULL);
-	assert(screen->machine->config != NULL);
-
-	/* get and validate that the container for this screen exists */
-	container = render_container_get_screen(screen);
-	assert(container != NULL);
-
-	/* get and validate the configuration */
-	config = screen->inline_config;
-	assert(config->width > 0);
-	assert(config->height > 0);
-	assert(config->refresh > 0);
-	assert(config->visarea.min_x >= 0);
-	assert(config->visarea.max_x < config->width);
-	assert(config->visarea.max_x > config->visarea.min_x);
-	assert(config->visarea.min_y >= 0);
-	assert(config->visarea.max_y < config->height);
-	assert(config->visarea.max_y > config->visarea.min_y);
-
-	/* everything checks out, allocate the state object */
-	state = auto_malloc(sizeof(*state));
-	memset(state, 0, sizeof(*state));
-
-	/* allocate the VBLANK timers */
-	state->vblank_begin_timer = timer_alloc(vblank_begin_callback, (void *)screen);
-	state->vblank_end_timer = timer_alloc(vblank_end_callback, (void *)screen);
-
-	/* allocate a timer to reset partial updates */
-	state->scanline0_timer = timer_alloc(scanline0_callback, (void *)screen);
-
-	/* configure the default cliparea */
-	if (config->xoffset != 0)
-		render_container_set_xoffset(container, config->xoffset);
-	if (config->yoffset != 0)
-		render_container_set_yoffset(container, config->yoffset);
-	if (config->xscale != 0)
-		render_container_set_xscale(container, config->xscale);
-	if (config->yscale != 0)
-		render_container_set_yscale(container, config->yscale);
-
-	/* allocate a timer to generate per-scanline updates */
-	if (screen->machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
-		state->scanline_timer = timer_alloc(scanline_update_callback, (void *)screen);
-
-	/* register for save states */
-	assert(strlen(screen->tag) < 30);
-	state_save_combine_module_and_tag(unique_tag, "video_screen", screen->tag);
-
-	state_save_register_item(unique_tag, 0, state->vblank_start_time.seconds);
-	state_save_register_item(unique_tag, 0, state->vblank_start_time.attoseconds);
-	state_save_register_item(unique_tag, 0, state->vblank_end_time.seconds);
-	state_save_register_item(unique_tag, 0, state->vblank_end_time.attoseconds);
-	state_save_register_item(unique_tag, 0, state->frame_number);
-
-	return state;
 }
 
 
@@ -439,7 +357,6 @@ static screen_state *screen_init(const device_config *screen)
 
 static void video_exit(running_machine *machine)
 {
-	const device_config *screen;
 	int i;
 
 	/* validate */
@@ -453,21 +370,6 @@ static void video_exit(running_machine *machine)
 	/* free all the graphics elements */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
 		freegfx(machine->gfx[i]);
-
-	/* free all the textures and bitmaps */
-	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
-	{
-		screen_state *state = get_safe_token(screen);
-
-		if (state->texture[0] != NULL)
-			render_texture_free(state->texture[0]);
-		if (state->texture[1] != NULL)
-			render_texture_free(state->texture[1]);
-		if (state->bitmap[0] != NULL)
-			bitmap_free(state->bitmap[0]);
-		if (state->bitmap[1] != NULL)
-			bitmap_free(state->bitmap[1]);
-	}
 
 	/* free the snapshot target */
 	if (global.snap_target != NULL)
@@ -852,10 +754,11 @@ void video_screen_set_visarea(const device_config *screen, int min_x, int max_x,
     including the specified scanline
 -------------------------------------------------*/
 
-void video_screen_update_partial(const device_config *screen, int scanline)
+int video_screen_update_partial(const device_config *screen, int scanline)
 {
 	screen_state *state = get_safe_token(screen);
 	rectangle clip = state->visarea;
+	int result = FALSE;
 
 	/* validate arguments */
 	assert(scanline >= 0);
@@ -869,14 +772,14 @@ void video_screen_update_partial(const device_config *screen, int scanline)
 		if (global.skipping_this_frame)
 		{
 			LOG_PARTIAL_UPDATES(("skipped due to frameskipping\n"));
-			return;
+			return FALSE;
 		}
 
 		/* skip if this screen is not visible anywhere */
 		if (!render_is_live_screen(screen))
 		{
 			LOG_PARTIAL_UPDATES(("skipped because screen not live\n"));
-			return;
+			return FALSE;
 		}
 	}
 
@@ -884,7 +787,7 @@ void video_screen_update_partial(const device_config *screen, int scanline)
 	if (scanline < state->last_partial_scan)
 	{
 		LOG_PARTIAL_UPDATES(("skipped because less than previous\n"));
-		return;
+		return FALSE;
 	}
 
 	/* set the start/end scanlines */
@@ -908,10 +811,12 @@ void video_screen_update_partial(const device_config *screen, int scanline)
 
 		/* if we modified the bitmap, we have to commit */
 		state->changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
+		result = TRUE;
 	}
 
 	/* remember where we left off */
 	state->last_partial_scan = scanline + 1;
+	return result;
 }
 
 
@@ -1168,7 +1073,7 @@ attotime video_screen_get_frame_period(const device_config *screen)
     if (video_screen_count(screen->machine->config) == 0)
     {
     	assert(screen == NULL);
-    	ret = DEFAULT_FRAME_PEIOD;
+    	ret = DEFAULT_FRAME_PERIOD;
 	}
     else
     {
@@ -1194,35 +1099,35 @@ UINT64 video_screen_get_frame_number(const device_config *screen)
 
 
 /*-------------------------------------------------
-    video_screen_register_vbl_cb - registers a
+    video_screen_register_vblank_callback - registers a
     VBLANK callback for a specific screen
 -------------------------------------------------*/
 
-void video_screen_register_vbl_cb(const device_config *screen, vblank_state_changed_func vbl_cb)
+void video_screen_register_vblank_callback(const device_config *screen, vblank_state_changed_func vblank_callback)
 {
 	int i, found;
 	screen_state *state = get_safe_token(screen);
 
 	/* validate arguments */
-	assert(vbl_cb != NULL);
+	assert(vblank_callback != NULL);
 
 	/* check if we already have this callback registered */
 	found = FALSE;
-	for (i = 0; i < MAX_VBL_CB; i++)
+	for (i = 0; i < MAX_VBLANK_CALLBACKS; i++)
 	{
-		if (state->vbl_cbs[i] == NULL)
+		if (state->vblank_callback[i] == NULL)
 			break;
 
-		if (state->vbl_cbs[i] == vbl_cb)
+		if (state->vblank_callback[i] == vblank_callback)
 			found = TRUE;
 	}
 
 	/* check that there is room */
-	assert(i != MAX_VBL_CB);
+	assert(i != MAX_VBLANK_CALLBACKS);
 
 	/* if not found, register and increment count */
 	if (!found)
-		state->vbl_cbs[i] = vbl_cb;
+		state->vblank_callback[i] = vblank_callback;
 }
 
 
@@ -1231,13 +1136,103 @@ void video_screen_register_vbl_cb(const device_config *screen, vblank_state_chan
 ***************************************************************************/
 
 /*-------------------------------------------------
-    video_screen_start - device start callback
-    for a video screen
+    device_start_video_screen - device start
+    callback for a video screen
 -------------------------------------------------*/
 
 static DEVICE_START( video_screen )
 {
-	return screen_init(device);
+	const device_config *screen = device;
+	char unique_tag[40];
+	screen_state *state = get_safe_token(screen);
+	render_container *container;
+	screen_config *config;
+
+	/* validate some basic stuff */
+	assert(screen != NULL);
+	assert(screen->static_config == NULL);
+	assert(screen->inline_config != NULL);
+	assert(screen->machine != NULL);
+	assert(screen->machine->config != NULL);
+
+	/* get and validate that the container for this screen exists */
+	container = render_container_get_screen(screen);
+	assert(container != NULL);
+
+	/* get and validate the configuration */
+	config = screen->inline_config;
+	assert(config->width > 0);
+	assert(config->height > 0);
+	assert(config->refresh > 0);
+	assert(config->visarea.min_x >= 0);
+	assert((config->visarea.max_x < config->width) || (config->type == SCREEN_TYPE_VECTOR));
+	assert(config->visarea.max_x > config->visarea.min_x);
+	assert(config->visarea.min_y >= 0);
+	assert((config->visarea.max_y < config->height) || (config->type == SCREEN_TYPE_VECTOR));
+	assert(config->visarea.max_y > config->visarea.min_y);
+
+	/* allocate the VBLANK timers */
+	state->vblank_begin_timer = timer_alloc(vblank_begin_callback, (void *)screen);
+	state->vblank_end_timer = timer_alloc(vblank_end_callback, (void *)screen);
+
+	/* allocate a timer to reset partial updates */
+	state->scanline0_timer = timer_alloc(scanline0_callback, (void *)screen);
+
+	/* configure the default cliparea */
+	if (config->xoffset != 0)
+		render_container_set_xoffset(container, config->xoffset);
+	if (config->yoffset != 0)
+		render_container_set_yoffset(container, config->yoffset);
+	if (config->xscale != 0)
+		render_container_set_xscale(container, config->xscale);
+	if (config->yscale != 0)
+		render_container_set_yscale(container, config->yscale);
+
+	/* allocate a timer to generate per-scanline updates */
+	if (screen->machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
+		state->scanline_timer = timer_alloc(scanline_update_callback, (void *)screen);
+
+	/* configure the screen with the default parameters */
+	video_screen_configure(screen, config->width, config->height, &config->visarea, config->refresh);
+
+	/* reset VBLANK timing */
+	state->vblank_start_time = attotime_zero;
+	state->vblank_end_time = attotime_make(0, state->vblank_period);
+
+	/* start the timer to generate per-scanline updates */
+	if (screen->machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
+		timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
+
+	/* register for save states */
+	assert(strlen(screen->tag) < 30);
+	state_save_combine_module_and_tag(unique_tag, "video_screen", screen->tag);
+
+	state_save_register_item(unique_tag, 0, state->vblank_start_time.seconds);
+	state_save_register_item(unique_tag, 0, state->vblank_start_time.attoseconds);
+	state_save_register_item(unique_tag, 0, state->vblank_end_time.seconds);
+	state_save_register_item(unique_tag, 0, state->vblank_end_time.attoseconds);
+	state_save_register_item(unique_tag, 0, state->frame_number);
+}
+
+
+/*-------------------------------------------------
+    device_stop_video_screen - device stop
+    callback for a video screen
+-------------------------------------------------*/
+
+static DEVICE_STOP( video_screen )
+{
+	const device_config *screen = device;
+	screen_state *state = get_safe_token(screen);
+
+	if (state->texture[0] != NULL)
+		render_texture_free(state->texture[0]);
+	if (state->texture[1] != NULL)
+		render_texture_free(state->texture[1]);
+	if (state->bitmap[0] != NULL)
+		bitmap_free(state->bitmap[0]);
+	if (state->bitmap[1] != NULL)
+		bitmap_free(state->bitmap[1]);
 }
 
 
@@ -1265,13 +1260,14 @@ DEVICE_GET_INFO( video_screen )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(screen_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(screen_config);		break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(video_screen); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(video_screen); break;
-		case DEVINFO_FCT_STOP:					/* Nothing */							break;
+		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(video_screen); break;
 		case DEVINFO_FCT_RESET:					/* Nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1305,8 +1301,8 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	state->vblank_end_time = attotime_add_attoseconds(state->vblank_start_time, state->vblank_period);
 
 	/* call the screen specific callbacks */
-	for (i = 0; state->vbl_cbs[i] != NULL; i++)
-		state->vbl_cbs[i](screen, TRUE);
+	for (i = 0; state->vblank_callback[i] != NULL; i++)
+		(*state->vblank_callback[i])(screen, TRUE);
 
 	/* if this is the primary screen and we need to update now */
 	if ((screen == machine->primary_screen) && !(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
@@ -1335,8 +1331,8 @@ static TIMER_CALLBACK( vblank_end_callback )
 	screen_state *state = get_safe_token(screen);
 
 	/* call the screen specific callbacks */
-	for (i = 0; state->vbl_cbs[i] != NULL; i++)
-		state->vbl_cbs[i](screen, FALSE);
+	for (i = 0; state->vblank_callback[i] != NULL; i++)
+		(*state->vblank_callback[i])(screen, FALSE);
 
 	/* if this is the primary screen and we need to update now */
 	if ((screen == machine->primary_screen) && (machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
@@ -1344,6 +1340,18 @@ static TIMER_CALLBACK( vblank_end_callback )
 
 	/* increment the frame number counter */
 	state->frame_number++;
+}
+
+
+/*-------------------------------------------------
+    screenless_update_callback - update generator
+    when there are no screens to drive it
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( screenless_update_callback )
+{
+	/* force an update */
+	video_frame_update(machine, FALSE);
 }
 
 

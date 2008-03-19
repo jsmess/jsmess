@@ -406,9 +406,9 @@ DRVLIBS = \
 	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/sinclair.a \
-	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
+	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/ssystem3.a \
 	$(MESSOBJ)/super80.a \
 	$(MESSOBJ)/svi.a \

@@ -438,11 +438,10 @@ $(MAMEOBJ)/alliedl.a: \
 $(MAMEOBJ)/alpha.a: \
 	$(DRIVERS)/alpha68k.o $(VIDEO)/alpha68k.o \
 	$(DRIVERS)/champbas.o $(VIDEO)/champbas.o \
-	$(DRIVERS)/equites.o $(MACHINE)/equites.o $(VIDEO)/equites.o \
-	$(DRIVERS)/exctsccr.o $(MACHINE)/exctsccr.o $(VIDEO)/exctsccr.o \
+	$(DRIVERS)/equites.o $(VIDEO)/equites.o \
+	$(DRIVERS)/exctsccr.o $(VIDEO)/exctsccr.o \
 	$(DRIVERS)/meijinsn.o \
 	$(DRIVERS)/shougi.o \
-	$(DRIVERS)/talbot.o \
 
 $(MAMEOBJ)/amiga.a: \
 	$(DRIVERS)/alg.o \
@@ -1642,7 +1641,8 @@ $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 $(DRIVERS)/ampoker2.o:	$(LAYOUT)/ampoker2.lh \
 						$(LAYOUT)/sigmapkr.lh \
 
-$(DRIVERS)/astrocde.o:	$(LAYOUT)/tenpindx.lh
+$(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
+						$(LAYOUT)/tenpindx.lh
 
 $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
 						$(LAYOUT)/atarifb4.lh \

@@ -44,17 +44,13 @@ struct _ins8154_t
 
 static DEVICE_START( ins8154 )
 {
-	ins8154_t *ins8154;
+	ins8154_t *ins8154 = device->token;
 	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device->machine != NULL);
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
-
-	/* allocate the object that holds the state */
-	ins8154 = auto_malloc(sizeof(*ins8154));
-	memset(ins8154, 0, sizeof(*ins8154));
 
 	/* assign interface */
 	ins8154->intf = device->static_config;
@@ -68,8 +64,6 @@ static DEVICE_START( ins8154 )
 	state_save_register_item(unique_tag, 0, ins8154->mdr);
 	state_save_register_item(unique_tag, 0, ins8154->odra);
 	state_save_register_item(unique_tag, 0, ins8154->odrb);
-	
-	return ins8154;
 }
 
 
@@ -254,6 +248,7 @@ DEVICE_GET_INFO( ins8154 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;									break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ins8154_t);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(ins8154);	break;

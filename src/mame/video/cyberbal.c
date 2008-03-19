@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_playfield2_tile_info )
 
 static void video_start_cyberbal_common(running_machine* machine, int screens)
 {
-	static const struct atarimo_desc mo0desc =
+	static const atarimo_desc mo0desc =
 	{
 		1,					/* index to which gfx system */
 		1,					/* number of motion object banks */
@@ -125,7 +125,7 @@ static void video_start_cyberbal_common(running_machine* machine, int screens)
 		0					/* callback routine for special entries */
 	};
 
-	static const struct atarimo_desc mo1desc =
+	static const atarimo_desc mo1desc =
 	{
 		1,					/* index to which gfx system */
 		1,					/* number of motion object banks */
@@ -296,7 +296,8 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 		{
 			if (((base[3] >> 1) & 7) != playfield_palette_bank[i])
 			{
-				video_screen_update_partial(update_screen, scanline - 1);
+				if (scanline > 0)
+					video_screen_update_partial(update_screen, scanline - 1);
 				playfield_palette_bank[i] = (base[3] >> 1) & 7;
 				tilemap_set_palette_offset(i ? atarigen_playfield2_tilemap : atarigen_playfield_tilemap, playfield_palette_bank[i] << 8);
 			}
@@ -306,7 +307,8 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 			int newscroll = 2 * (((base[4] >> 7) + 4) & 0x1ff);
 			if (newscroll != playfield_xscroll[i])
 			{
-				video_screen_update_partial(update_screen, scanline - 1);
+				if (scanline > 0)
+					video_screen_update_partial(update_screen, scanline - 1);
 				tilemap_set_scrollx(i ? atarigen_playfield2_tilemap : atarigen_playfield_tilemap, 0, newscroll);
 				playfield_xscroll[i] = newscroll;
 			}
@@ -317,7 +319,8 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 			int newscroll = ((base[5] >> 7) - (scanline)) & 0x1ff;
 			if (newscroll != playfield_yscroll[i])
 			{
-				video_screen_update_partial(update_screen, scanline - 1);
+				if (scanline > 0)
+					video_screen_update_partial(update_screen, scanline - 1);
 				tilemap_set_scrolly(i ? atarigen_playfield2_tilemap : atarigen_playfield_tilemap, 0, newscroll);
 				playfield_yscroll[i] = newscroll;
 			}
@@ -326,7 +329,8 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 		{
 			if (current_slip[i] != base[7])
 			{
-				video_screen_update_partial(update_screen, scanline - 1);
+				if (scanline > 0)
+					video_screen_update_partial(update_screen, scanline - 1);
 				current_slip[i] = base[7];
 			}
 		}
@@ -343,7 +347,7 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 
 static void update_one_screen(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	struct atarimo_rect_list rectlist;
+	atarimo_rect_list rectlist;
 	rectangle tempclip = *cliprect;
 	bitmap_t *mobitmap;
 	int x, y, r, mooffset, temp;
@@ -364,7 +368,7 @@ static void update_one_screen(const device_config *screen, bitmap_t *bitmap, con
 	temp = visarea->max_x;
 	if (temp > SCREEN_WIDTH)
 		visarea->max_x /= 2;
-	mobitmap = atarimo_render(screen->machine, (screen == left_screen) ? 0 : 1, cliprect, &rectlist);
+	mobitmap = atarimo_render((screen == left_screen) ? 0 : 1, cliprect, &rectlist);
 	tempclip.min_x += mooffset;
 	tempclip.max_x += mooffset;
 	visarea->max_x = temp;

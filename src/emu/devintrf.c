@@ -183,7 +183,6 @@ int device_list_items(const device_config *listhead, device_type type)
 	const device_config *curdev;
 	int count = 0;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 
 	/* locate all devices */
@@ -204,7 +203,6 @@ const device_config *device_list_first(const device_config *listhead, device_typ
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 
 	/* scan forward starting with the list head */
@@ -247,7 +245,6 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 	assert(tag != NULL);
 
@@ -272,7 +269,6 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 	const device_config *curdev;
 	int index = 0;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 	assert(tag != NULL);
 
@@ -298,7 +294,6 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 	assert(index >= 0);
 
@@ -327,8 +322,6 @@ int device_list_class_items(const device_config *listhead, device_class class)
 	const device_config *curdev;
 	int count = 0;
 
-	assert(listhead != NULL);
-
 	/* locate all devices */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		count += (curdev->class == class);
@@ -345,8 +338,6 @@ int device_list_class_items(const device_config *listhead, device_class class)
 const device_config *device_list_class_first(const device_config *listhead, device_class class)
 {
 	const device_config *curdev;
-
-	assert(listhead != NULL);
 
 	/* scan forward starting with the list head */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
@@ -386,7 +377,6 @@ const device_config *device_list_class_find_by_tag(const device_config *listhead
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(tag != NULL);
 
 	/* find the device in the list */
@@ -409,7 +399,6 @@ int device_list_class_index(const device_config *listhead, device_class class, c
 	const device_config *curdev;
 	int index = 0;
 
-	assert(listhead != NULL);
 	assert(tag != NULL);
 
 	/* locate all devices */
@@ -435,7 +424,6 @@ const device_config *device_list_class_find_by_index(const device_config *listhe
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(index >= 0);
 
 	/* find the device in the list */
@@ -471,18 +459,24 @@ void device_list_start(running_machine *machine)
 	/* iterate over devices and start them */
 	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 	{
+		UINT32 tokenlen;
+
 		assert(device->token == NULL);
 		assert(device->type != NULL);
 		assert(device->start != NULL);
 
+		/* get the size of the token data */
+		tokenlen = (UINT32)devtype_get_info_int(device->type, DEVINFO_INT_TOKEN_BYTES);
+		if (tokenlen == 0)
+			fatalerror("Device %s specifies a 0 token length!\n", devtype_name(device->type));
+
+		/* allocate memory for the token */
+		device->token = malloc_or_die(tokenlen);
+		memset(device->token, 0, tokenlen);
+
 		/* call the start function */
 		device->machine = machine;
-		device->token = (*device->start)(device);
-		assert(device->token != NULL);
-
-		/* fatal error if this fails */
-		if (device->token == NULL)
-			fatalerror("Error starting device: type=%s tag=%s\n", devtype_name(device->type), device->tag);
+		(*device->start)(device);
 	}
 }
 
@@ -508,7 +502,9 @@ static void device_list_stop(running_machine *machine)
 		if (device->stop != NULL)
 			(*device->stop)(device);
 
-		/* clear the token to indicate we are finished */
+		/* free allocated memory for the token */
+		if (device->token != NULL)
+			free(device->token);
 		device->token = NULL;
 		device->machine = NULL;
 	}

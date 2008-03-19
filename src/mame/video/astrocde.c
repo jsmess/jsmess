@@ -452,10 +452,6 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		vertical_feedback = vfeedback;
 		horizontal_feedback = hfeedback;
 	}
-	
-	/* nothing to do, clear the interrupt */
-	else
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -472,7 +468,8 @@ static TIMER_CALLBACK( scanline_callback )
 	int astrocade_scanline = mame_vpos_to_astrocade_vpos(scanline);
 
 	/* force an update against the current scanline */
-	video_screen_update_partial(machine->primary_screen, scanline ? scanline - 1 : video_screen_get_height(machine->primary_screen));
+	if (scanline > 0)
+		video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	/* generate a scanline interrupt if it's time */
 	if (astrocade_scanline == interrupt_scanline && (interrupt_enable & 0x08) != 0)
@@ -492,10 +489,6 @@ static TIMER_CALLBACK( scanline_callback )
 	/* on some games, the horizontal drive line is conected to the lightpen interrupt */
 	else if (astrocade_video_config & AC_LIGHTPEN_INTS)
 		astrocade_trigger_lightpen(machine, astrocade_scanline, 8);
-
-	/* nothing to do, clear the interrupt */
-	else
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 	/* advance to the next scanline */
 	scanline++;
@@ -563,22 +556,6 @@ READ8_HANDLER( astrocade_data_chip_register_r )
 		case 0x17:	/* keypad column 3 */
 			result = readinputportbytag_safe("KEYPAD3", 0xff);
 			break;
-
-		case 0x1c:	/* player 1 knob */
-			result = readinputportbytag_safe("P1_KNOB", 0xff);
-			break;
-
-		case 0x1d:	/* player 2 knob */
-			result = readinputportbytag_safe("P2_KNOB", 0xff);
-			break;
-
-		case 0x1e:	/* player 3 knob */
-			result = readinputportbytag_safe("P3_KNOB", 0xff);
-			break;
-
-		case 0x1f:	/* player 4 knob */
-			result = readinputportbytag_safe("P4_KNOB", 0xff);
-			break;
 	}
 
 	return result;
@@ -587,8 +564,6 @@ READ8_HANDLER( astrocade_data_chip_register_r )
 
 WRITE8_HANDLER( astrocade_data_chip_register_w )
 {
-	static int color_index = 7;
-	
 	/* these are the core registers */
 	switch (offset & 0xff)
 	{
@@ -617,8 +592,7 @@ WRITE8_HANDLER( astrocade_data_chip_register_w )
 			break;
 
 		case 0x0b:	/* color block transfer */
-			colors[color_index] = data;
-			if (color_index-- == 0) color_index = 7;
+			colors[(offset >> 8) & 7] = data;
 			break;
 
 		case 0x0c:	/* function generator */

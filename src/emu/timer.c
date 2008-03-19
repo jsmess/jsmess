@@ -57,6 +57,26 @@ struct _emu_timer
 };
 
 
+/*-------------------------------------------------
+    timer_state - configuration of a single
+    timer device
+-------------------------------------------------*/
+
+typedef struct _timer_state timer_state;
+struct _timer_state
+{
+	emu_timer				*timer;			/* the backing timer */
+	void 					*ptr;			/* the pointer parameter passed to the timer callback */
+
+	/* periodic timers only */
+	attotime				start_delay;	/* delay before the timer fires for the first time */
+	attotime				period;			/* period of repeated timer firings */
+	INT32					param;			/* the integer parameter passed to the timer callback */
+
+	/* scanline timers only */
+	UINT32 					first_time;		/* indicates that the system is starting */
+};
+
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -191,6 +211,21 @@ INLINE void timer_list_insert(emu_timer *timer)
 		timer_head = timer;
 	timer->prev = lt;
 	timer->next = NULL;
+}
+
+
+/*-------------------------------------------------
+    get_safe_token - makes sure that the passed
+    in device is, in fact, a timer
+-------------------------------------------------*/
+
+INLINE timer_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == TIMER);
+
+	return (timer_state *)device->token;
 }
 
 
@@ -479,7 +514,7 @@ INLINE emu_timer *_timer_alloc_common(timer_fired_func callback, void *ptr, cons
 	timer->expire = attotime_never;
 	timer_list_insert(timer);
 
-	/* if we're not temporary, register ourselve with the save state system */
+	/* if we're not temporary, register ourselves with the save state system */
 	if (!temp)
 	{
 		timer_register_save(timer);
@@ -536,13 +571,26 @@ void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
 }
 
 
+void timer_device_adjust_oneshot(const device_config *timer, attotime duration, INT32 param)
+{
+#ifndef NDEBUG
+	timer_config *config = timer->inline_config;
+
+	/* only makes sense for periodic timers */
+	assert(config->type == TIMER_TYPE_PERIODIC);
+#endif
+
+	timer_device_adjust_periodic(timer, duration, param, attotime_never);
+}
+
+
 /*-------------------------------------------------
     timer_adjust_periodic - adjust the time when
     this timer will fire and specify a period for
     subsequent firings
 -------------------------------------------------*/
 
-void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, attotime period)
+void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, attotime period)
 {
 	attotime time = get_current_time();
 
@@ -555,12 +603,12 @@ void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, att
 	which->enabled = TRUE;
 
 	/* clamp negative times to 0 */
-	if (duration.seconds < 0)
-		duration = attotime_zero;
+	if (start_delay.seconds < 0)
+		start_delay = attotime_zero;
 
 	/* set the start and expire times */
 	which->start = time;
-	which->expire = attotime_add(time, duration);
+	which->expire = attotime_add(time, start_delay);
 	which->period = period;
 
 	/* remove and re-insert the timer in its new order */
@@ -571,6 +619,25 @@ void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, att
 	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
 	if (which == timer_head && cpu_getexecutingcpu() >= 0)
 		activecpu_abort_timeslice();
+}
+
+
+void timer_device_adjust_periodic(const device_config *timer, attotime start_delay, INT32 param, attotime period)
+{
+	timer_state *state = get_safe_token(timer);
+#ifndef NDEBUG
+	timer_config *config = timer->inline_config;
+
+	/* only makes sense for periodic timers */
+	assert(config->type == TIMER_TYPE_PERIODIC);
+#endif
+
+	state->start_delay = start_delay;
+	state->period = period;
+	state->param = param;
+
+	/* adjust the timer */
+	timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
 }
 
 
@@ -619,6 +686,20 @@ void timer_reset(emu_timer *which, attotime duration)
 }
 
 
+void timer_device_reset(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+#ifndef NDEBUG
+	timer_config *config = timer->inline_config;
+
+	/* only makes sense for periodic timers */
+	assert(config->type == TIMER_TYPE_PERIODIC);
+#endif
+
+	timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
+}
+
+
 /*-------------------------------------------------
     timer_enable - enable/disable a timer
 -------------------------------------------------*/
@@ -639,6 +720,13 @@ int timer_enable(emu_timer *which, int enable)
 }
 
 
+int timer_device_enable(const device_config *timer, int enable)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_enable(state->timer, enable);
+}
+
+
 /*-------------------------------------------------
     timer_enabled - determine if a timer is
     enabled
@@ -647,6 +735,13 @@ int timer_enable(emu_timer *which, int enable)
 int timer_enabled(emu_timer *which)
 {
 	return which->enabled;
+}
+
+
+int timer_device_enabled(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_enabled(state->timer);
 }
 
 
@@ -662,11 +757,31 @@ int timer_get_param(emu_timer *which)
 }
 
 
+int timer_device_get_param(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+#ifndef NDEBUG
+	timer_config *config = timer->inline_config;
+
+	/* only makes sense for periodic timers */
+	assert(config->type == TIMER_TYPE_PERIODIC);
+#endif
+
+	return state->param;
+}
+
+
 void *timer_get_param_ptr(emu_timer *which)
 {
 	return which->ptr;
 }
 
+
+void *timer_device_get_param_ptr(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return state->ptr;
+}
 
 
 /***************************************************************************
@@ -684,6 +799,13 @@ attotime timer_timeelapsed(emu_timer *which)
 }
 
 
+attotime timer_device_timeelapsed(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_timeelapsed(state->timer);
+}
+
+
 /*-------------------------------------------------
     timer_timeleft - return the time until the
     next trigger
@@ -692,6 +814,13 @@ attotime timer_timeelapsed(emu_timer *which)
 attotime timer_timeleft(emu_timer *which)
 {
 	return attotime_sub(which->expire, get_current_time());
+}
+
+
+attotime timer_device_timeleft(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_timeleft(state->timer);
 }
 
 
@@ -716,6 +845,13 @@ attotime timer_starttime(emu_timer *which)
 }
 
 
+attotime timer_device_starttime(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_starttime(state->timer);
+}
+
+
 /*-------------------------------------------------
     timer_firetime - return the time when this
     timer will fire next
@@ -724,6 +860,79 @@ attotime timer_starttime(emu_timer *which)
 attotime timer_firetime(emu_timer *which)
 {
 	return which->expire;
+}
+
+
+attotime timer_device_firetime(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_firetime(state->timer);
+}
+
+
+/*-------------------------------------------------
+    periodic_timer_device_timer_callback - calls
+    the timer device specific callback
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( periodic_timer_device_timer_callback )
+{
+	const device_config *timer = ptr;
+	timer_state *state = get_safe_token(timer);
+	timer_config *config = timer->inline_config;
+
+	/* call the real callback */
+	config->callback(timer, state->ptr, state->param);
+}
+
+
+
+/*-------------------------------------------------
+    scanline_timer_device_timer_callback -
+    manages the scanline based timer's state
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( scanline_timer_device_timer_callback )
+{
+	int next_vpos;
+	const device_config *timer = ptr;
+	timer_state *state = get_safe_token(timer);
+	timer_config *config = timer->inline_config;
+
+	/* get the screen device and verify it */
+	const device_config *screen = device_list_find_by_tag(timer->machine->config->devicelist, VIDEO_SCREEN, config->screen);
+	assert(screen != NULL);
+
+	/* first time, start with the first scanline, but do not call the callback */
+	if (state->first_time)
+	{
+		next_vpos = config->first_vpos;
+
+		/* indicate that we are done with the first call */
+		state->first_time = FALSE;
+	}
+
+	/* not the first time */
+	else
+	{
+		int vpos = video_screen_get_vpos(screen);
+
+		/* call the real callback */
+		config->callback(timer, state->ptr, vpos);
+
+		/* if the increment is 0 or the next scanline is larger than the screen size,
+           go back to the first one */
+        if ((config->increment == 0) ||
+            ((vpos + config->increment) >= video_screen_get_height(screen)))
+			next_vpos = config->first_vpos;
+
+		/* otherwise, increment */
+		else
+			next_vpos = vpos + config->increment;
+	}
+
+	/* adjust the timer */
+	timer_adjust_oneshot(state->timer, video_screen_get_time_until_pos(screen, next_vpos, 0), 0);
 }
 
 
@@ -757,4 +966,151 @@ static void timer_logtimers(void)
 	logerror("==============\n");
 	logerror("TIMER LOG STOP\n");
 	logerror("==============\n");
+}
+
+
+
+/***************************************************************************
+    TIMER DEVICE INTERFACE
+***************************************************************************/
+
+/*-------------------------------------------------
+    timer_start - device start callback
+    for a timer device
+-------------------------------------------------*/
+
+static DEVICE_START( timer )
+{
+	timer_state *state = get_safe_token(device);
+	char unique_tag[50];
+	timer_config *config;
+	void *param;
+
+	/* validate some basic stuff */
+	assert(device != NULL);
+	assert(device->static_config == NULL);
+	assert(device->inline_config != NULL);
+	assert(device->machine != NULL);
+	assert(device->machine->config != NULL);
+
+	/* get and validate the configuration */
+	config = device->inline_config;
+	assert((config->type == TIMER_TYPE_PERIODIC) || (config->type == TIMER_TYPE_SCANLINE));
+	assert(config->callback != NULL);
+
+	/* copy the pointer parameter */
+	state->ptr = config->ptr;
+
+	/* create the name for save states */
+	assert(strlen(device->tag) < 30);
+	state_save_combine_module_and_tag(unique_tag, "timer_device", device->tag);
+
+	/* type based configuration */
+	switch (config->type)
+	{
+		case TIMER_TYPE_PERIODIC:
+			/* make sure that only the applicable parameters are filled in */
+			assert(config->screen == NULL);
+			assert(config->first_vpos == 0);
+			assert(config->increment == 0);
+
+			/* validate that we have at least a start_delay or period */
+			assert(config->period > 0);
+
+			/* copy the optional integer parameter */
+			state->param = config->param;
+
+			/* convert the start_delay and period into attotime */
+			state->period = UINT64_ATTOTIME_TO_ATTOTIME(config->period);
+
+			if (config->start_delay > 0)
+				state->start_delay = UINT64_ATTOTIME_TO_ATTOTIME(config->start_delay);
+			else
+				state->start_delay = attotime_zero;
+
+			/* register for state saves */
+			state_save_register_item(unique_tag, 0, state->start_delay.seconds);
+			state_save_register_item(unique_tag, 0, state->start_delay.attoseconds);
+			state_save_register_item(unique_tag, 0, state->period.seconds);
+			state_save_register_item(unique_tag, 0, state->period.attoseconds);
+			state_save_register_item(unique_tag, 0, state->param);
+
+			/* allocate the backing timer */
+			param = (void *)device;
+			state->timer = timer_alloc(periodic_timer_device_timer_callback, param);
+
+			/* finally, start the timer */
+			timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
+			break;
+
+		case TIMER_TYPE_SCANLINE:
+			/* make sure that only the applicable parameters are filled in */
+			assert(config->start_delay == 0);
+			assert(config->period == 0);
+			assert(config->param == 0);
+
+			assert(config->first_vpos >= 0);
+			assert(config->increment >= 0);
+
+			/* allocate the backing timer */
+			param = (void *)device;
+			state->timer = timer_alloc(scanline_timer_device_timer_callback, param);
+
+			/* indicate that this will be the first call */
+			state->first_time = TRUE;
+
+			/* register for state saves */
+			state_save_register_item(unique_tag, 0, state->first_time);
+
+			/* fire it as soon as the emulation starts */
+			timer_adjust_oneshot(state->timer, attotime_zero, 0);
+			break;
+
+		default:
+			/* we will never get here */
+			fatalerror("Unknown timer device type");
+			break;
+	}
+}
+
+
+/*-------------------------------------------------
+    timer_set_info - device set info callback
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( timer )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+/*-------------------------------------------------
+    timer_get_info - device get info callback
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( timer )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(timer_state);			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(timer_config);			break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_TIMER;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(timer); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(timer); break;
+		case DEVINFO_FCT_STOP:					/* Nothing */							break;
+		case DEVINFO_FCT_RESET:					/* Nothing */							break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					info->s = "Generic";					break;
+		case DEVINFO_STR_FAMILY:				info->s = "Timer";						break;
+		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
 }

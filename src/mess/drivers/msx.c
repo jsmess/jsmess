@@ -712,7 +712,7 @@ static const struct AY8910interface ay8910_interface =
 
 static VIDEO_START( msx2 )
 {
-	v9938_init(machine, 0, tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
+	v9938_init(machine, 0, machine->primary_screen, tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
 }
 
 #define MSX_XBORDER_PIXELS		15

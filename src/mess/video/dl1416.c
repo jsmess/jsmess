@@ -123,16 +123,12 @@ static const int dl1416t_segments[128] = {
 
 static DEVICE_START( dl1416 )
 {
-	dl1416_t *dl1416;
+	dl1416_t *dl1416 = device->token;
 	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
-
-	/* allocate the object that holds the state */
-	dl1416 = auto_malloc(sizeof(*dl1416));
-	memset(dl1416, 0, sizeof(*dl1416));
 
 	dl1416->intf = device->static_config;
 
@@ -143,8 +139,6 @@ static DEVICE_START( dl1416 )
 	state_save_register_item(unique_tag, 0, dl1416->cursor_enable);
 	state_save_register_item(unique_tag, 0, dl1416->write_enable);
 	state_save_register_item_array(unique_tag, 0, dl1416->cursor_ram);
-
-	return dl1416;
 }
 
 
@@ -179,6 +173,7 @@ DEVICE_GET_INFO( dl1416 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dl1416_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME( dl1416 );		break;

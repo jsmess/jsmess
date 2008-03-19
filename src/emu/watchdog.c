@@ -73,7 +73,11 @@ static void watchdog_internal_reset(running_machine *machine)
 static TIMER_CALLBACK( watchdog_callback )
 {
 	logerror("Reset caused by the watchdog!!!\n");
+
+#ifdef MAME_DEBUG
 	popmessage("Reset caused by the watchdog!!!\n");
+#endif
+
 	mame_schedule_soft_reset(machine);
 }
 
@@ -117,7 +121,7 @@ void watchdog_reset(running_machine *machine)
 
 		/* register a VBLANK callback for the primary screen */
 		if (machine->primary_screen != NULL)
-			video_screen_register_vbl_cb(machine->primary_screen, on_vblank);
+			video_screen_register_vblank_callback(machine->primary_screen, on_vblank);
 	}
 
 	/* timer-based watchdog? */
