@@ -7,7 +7,6 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
-#include "inputx.h"
 #include "sound/speaker.h"
 #include "deprecat.h"		/* "Machine" needed for z80pio interrupt */
 
