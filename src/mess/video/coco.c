@@ -16,9 +16,6 @@
 
 ***************************************************************************/
 
-#include <assert.h>
-#include <math.h>
-
 #include "driver.h"
 #include "deprecat.h"
 #include "machine/6821pia.h"
@@ -64,7 +61,7 @@ static void coco_field_sync_callback(int data)
 
 
 
-static void internal_video_start_coco(m6847_type type)
+static void internal_video_start_coco(running_machine *machine, m6847_type type)
 {
 	m6847_config cfg;
 
@@ -73,7 +70,7 @@ static void internal_video_start_coco(m6847_type type)
 
 	/* NPW 14-May-2006 - Ugly hack; using CPU timing factor seems to break some
 	 * Dragon games */
-	if (Machine->gamedrv->name[0] == 'c')
+	if (machine->gamedrv->name[0] == 'c')
 		cfg.cpu0_timing_factor = 4;
 
 	cfg.get_attributes = coco_get_attributes;
@@ -88,16 +85,16 @@ static void internal_video_start_coco(m6847_type type)
 
 VIDEO_START( dragon )
 {
-	internal_video_start_coco(M6847_VERSION_ORIGINAL_PAL);
+	internal_video_start_coco(machine, M6847_VERSION_ORIGINAL_PAL);
 }
 
 VIDEO_START( coco )
 {
-	internal_video_start_coco(M6847_VERSION_ORIGINAL_NTSC);
+	internal_video_start_coco(machine, M6847_VERSION_ORIGINAL_NTSC);
 }
 
 VIDEO_START( coco2b )
 {
-	internal_video_start_coco(M6847_VERSION_M6847T1_NTSC);
+	internal_video_start_coco(machine, M6847_VERSION_M6847T1_NTSC);
 }
 

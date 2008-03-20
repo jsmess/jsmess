@@ -25,7 +25,7 @@
 
 extern PALETTE_INIT( kc85 );
 
-void kc85_video_set_blink_state(int data);
+void kc85_video_set_blink_state(running_machine *machine, int data);
 
 VIDEO_START( kc85_3 );
 VIDEO_START( kc85_4 );

@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/kc.h"
 #include "eventlst.h"
 
@@ -110,9 +109,9 @@ enum
 };
 
 /* set new blink state - record blink state in event list */
-void	kc85_video_set_blink_state(int data)
+void kc85_video_set_blink_state(running_machine *machine, int data)
 {
-	EventList_AddItemOffset(KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(Machine->primary_screen), video_screen_get_vpos(Machine->primary_screen))));
+	EventList_AddItemOffset(KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))));
 }
 
 

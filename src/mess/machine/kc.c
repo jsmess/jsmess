@@ -1817,7 +1817,7 @@ static WRITE8_HANDLER(kc85_zc2_callback)
 	{
 		/* yes */
 		/* toggle state of blink to video hardware */
-		kc85_video_set_blink_state(data);
+		kc85_video_set_blink_state(machine, data);
 	}
 }
 
