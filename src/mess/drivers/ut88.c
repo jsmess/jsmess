@@ -22,10 +22,10 @@ GFXDECODE_END
 
 /* Address maps */
 static ADDRESS_MAP_START(ut88mini_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // System ROM
-    AM_RANGE( 0x1000, 0x8fff ) AM_RAM  // RAM
-    AM_RANGE( 0x9000, 0x9fff ) AM_WRITE(ut88mini_write_led) // 7seg LED
-    AM_RANGE( 0xA000, 0xffff ) AM_RAM  // RAM
+		ADDRESS_MAP_UNMAP_HIGH
+    AM_RANGE( 0x0000, 0x03ff ) AM_ROM  // System ROM
+    AM_RANGE( 0xc000, 0xc3ff ) AM_RAM  // RAM
+    AM_RANGE( 0x9000, 0x9fff ) AM_WRITE(ut88mini_write_led) // 7seg LED    
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ut88_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -190,15 +190,7 @@ static MACHINE_DRIVER_START( ut88mini )
    	MDRV_MACHINE_START(ut88mini)
    	MDRV_MACHINE_RESET( ut88mini )
    	
-		/* video hardware */
-    MDRV_SCREEN_ADD("main", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-    MDRV_PALETTE_LENGTH(4)
-		
+		/* video hardware */		
 		MDRV_DEFAULT_LAYOUT(layout_ut88mini)		    
 MACHINE_DRIVER_END
 
