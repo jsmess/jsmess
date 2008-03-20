@@ -602,11 +602,21 @@ static void execute_input(int ref, int params, const char *param[])
 
 
 
-static void setup_keybuffer(void)
+static void clear_keybuffer(running_machine *machine)
+{
+	keybuffer = NULL;
+	queue_chars = NULL;
+	codes = NULL;
+}
+
+
+
+static void setup_keybuffer(running_machine *machine)
 {
 	inputx_timer = timer_alloc(inputx_timerproc, NULL);
 	keybuffer = auto_malloc(sizeof(key_buffer));
 	memset(keybuffer, 0, sizeof(*keybuffer));
+	add_exit_callback(machine, clear_keybuffer);
 }
 
 
@@ -657,7 +667,7 @@ void inputx_init(running_machine *machine)
 		codes = build_codes(machine->input_ports);
 		if (DUMP_CODES)
 			dump_codes();
-		setup_keybuffer();
+		setup_keybuffer(machine);
 	}
 }
 
@@ -668,7 +678,6 @@ void inputx_setup_natural_keyboard(
 	int (*accept_char_)(unicode_char ch),
 	int (*charqueue_empty_)(void))
 {
-	setup_keybuffer();
 	queue_chars = queue_chars_;
 	accept_char = accept_char_;
 	charqueue_empty = charqueue_empty_;
