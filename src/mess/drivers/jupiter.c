@@ -75,24 +75,18 @@ static const gfx_layout jupiter_charlayout =
 	8*8 	/* each character takes 8 consecutive bytes */
 };
 
+PALETTE_INIT( jupiter )
+{
+	palette_set_color(machine,0,RGB_BLACK); /* black */
+	palette_set_color(machine,1,RGB_WHITE); /* white */
+	palette_set_color(machine,2,RGB_WHITE); /* white */
+	palette_set_color(machine,3,RGB_BLACK); /* black */
+}
+
 static GFXDECODE_START( jupiter )
 	GFXDECODE_ENTRY( REGION_CPU1, 0x2c00, jupiter_charlayout, 0, 2 )
 GFXDECODE_END
 
-static const unsigned char jupiter_palette[] =
-{
-	0x00, 0x00, 0x00,	/* Black */
-	0xff, 0xff, 0xff	/* White */
-};
-
-static PALETTE_INIT( jupiter )
-{
-	int i;
-
-	for ( i = 0; i < sizeof(jupiter_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, jupiter_palette[i*3], jupiter_palette[i*3+1], jupiter_palette[i*3+2]);
-	}
-}
 
 /* keyboard input */
 
@@ -185,8 +179,8 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_SCREEN_SIZE(32 * 8, 24 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32 * 8 - 1, 0, 24 * 8 - 1)
 	MDRV_GFXDECODE( jupiter )
-	MDRV_PALETTE_LENGTH(sizeof(jupiter_palette) / 3)
-	MDRV_PALETTE_INIT( jupiter )
+	MDRV_PALETTE_LENGTH(4)
+	MDRV_PALETTE_INIT(jupiter)
 
 	MDRV_VIDEO_UPDATE( jupiter )
 
