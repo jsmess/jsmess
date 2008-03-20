@@ -190,7 +190,7 @@ int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(in
 
 	asr[unit].bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 
-	fillbitmap(asr[unit].bitmap, machine->pens[0], visarea);
+	fillbitmap(asr[unit].bitmap, 0, visarea);
 
 	asr[unit].int_callback = int_callback;
 
@@ -241,7 +241,7 @@ static void asr_linefeed(running_machine *machine, int unit)
 		draw_scanline8(asr[unit].bitmap, asr_window_offset_x, y, asr_window_width, buf, machine->pens, -1);
 	}
 
-	fillbitmap(asr[unit].bitmap, machine->pens[0], &asr_scroll_clear_window);
+	fillbitmap(asr[unit].bitmap, 0, &asr_scroll_clear_window);
 }
 
 static void asr_transmit(running_machine *machine, int unit, UINT8 data)

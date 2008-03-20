@@ -14,7 +14,7 @@
 
 unsigned char *sam_screen;
 
-void drawMode4_line(running_machine *machine, bitmap_t *bitmap,int y)
+void drawMode4_line(bitmap_t *bitmap,int y)
 {
 	int x;
 	unsigned char tmp=0;
@@ -25,38 +25,38 @@ void drawMode4_line(running_machine *machine, bitmap_t *bitmap,int y)
 #ifdef MONO
 		if (tmp>>4)
 		{
-			plot_pixel(bitmap, x*2, y, machine->pens[127]);
-			plot_pixel(bitmap, x*2+1, y, machine->pens[127]);
+			plot_pixel(bitmap, x*2, y, 127);
+			plot_pixel(bitmap, x*2+1, y, 127);
 		}
 		else
 		{
-			plot_pixel(bitmap, x*2, y, machine->pens[0]);
-			plot_pixel(bitmap, x*2+1, y, machine->pens[0]);
+			plot_pixel(bitmap, x*2, y, 0);
+			plot_pixel(bitmap, x*2+1, y, 0);
 		}
 		x++;
 		if (tmp&0x0F)
 		{
-			plot_pixel(bitmap, x*2, y, machine->pens[127]);
-			plot_pixel(bitmap, x*2+1, y, machine->pens[127]);
+			plot_pixel(bitmap, x*2, y, 127);
+			plot_pixel(bitmap, x*2+1, y, 127);
 		}
 		else
 		{
-			plot_pixel(bitmap, x*2, y, machine->pens[0]);
-			plot_pixel(bitmap, x*2+1, y, machine->pens[0]);
+			plot_pixel(bitmap, x*2, y, 0);
+			plot_pixel(bitmap, x*2+1, y, 0);
 		}
 		x++;
 #else
-		*BITMAP_ADDR16(bitmap, y, x*2+0) = machine->pens[CLUT[tmp>>4]];
-		*BITMAP_ADDR16(bitmap, y, x*2+1) = machine->pens[CLUT[tmp>>4]];
+		*BITMAP_ADDR16(bitmap, y, x*2+0) = CLUT[tmp>>4];
+		*BITMAP_ADDR16(bitmap, y, x*2+1) = CLUT[tmp>>4];
 		x++;
-		*BITMAP_ADDR16(bitmap, y, x*2+0) = machine->pens[CLUT[tmp&0x0F]];
-		*BITMAP_ADDR16(bitmap, y, x*2+1) = machine->pens[CLUT[tmp&0x0F]];
+		*BITMAP_ADDR16(bitmap, y, x*2+0) = CLUT[tmp&0x0F];
+		*BITMAP_ADDR16(bitmap, y, x*2+1) = CLUT[tmp&0x0F];
 		x++;
 #endif
 	}
 }
 
-void drawMode3_line(running_machine *machine, bitmap_t *bitmap,int y)
+void drawMode3_line(bitmap_t *bitmap,int y)
 {
 	int x;
 	unsigned char tmp=0;
@@ -66,39 +66,39 @@ void drawMode3_line(running_machine *machine, bitmap_t *bitmap,int y)
 		tmp=*(sam_screen + (x/4) + (y*128));
 #ifdef MONO
 		if (tmp>>6)
-			plot_pixel(bitmap,x,y,machine->pens[127]);
+			plot_pixel(bitmap,x,y,127);
 		else
-			plot_pixel(bitmap,x,y,machine->pens[0]);
+			plot_pixel(bitmap,x,y,0);
 		x++;
 		if ((tmp>>4)&0x03)
-			plot_pixel(bitmap,x,y,machine->pens[127]);
+			plot_pixel(bitmap,x,y,127);
 		else
-			plot_pixel(bitmap,x,y,machine->pens[0]);
+			plot_pixel(bitmap,x,y,0);
 		x++;
 		if ((tmp>>2)&0x03)
-			plot_pixel(bitmap,x,y,machine->pens[127]);
+			plot_pixel(bitmap,x,y,127);
 		else
-			plot_pixel(bitmap,x,y,machine->pens[0]);
+			plot_pixel(bitmap,x,y,0);
 		x++;
 		if (tmp&0x03)
-			plot_pixel(bitmap,x,y,machine->pens[127]);
+			plot_pixel(bitmap,x,y,127);
 		else
-			plot_pixel(bitmap,x,y,machine->pens[0]);
+			plot_pixel(bitmap,x,y,0);
 		x++;
 #else
-		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[CLUT[tmp>>6]];
+		*BITMAP_ADDR16(bitmap, y, x) = CLUT[tmp>>6];
 		x++;
-		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[CLUT[(tmp>>4)&0x03]];
+		*BITMAP_ADDR16(bitmap, y, x) = CLUT[(tmp>>4)&0x03];
 		x++;
-		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[CLUT[(tmp>>2)&0x03]];
+		*BITMAP_ADDR16(bitmap, y, x) = CLUT[(tmp>>2)&0x03];
 		x++;
-		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[CLUT[tmp&0x03]];
+		*BITMAP_ADDR16(bitmap, y, x) = CLUT[tmp&0x03];
 		x++;
 #endif
 	}
 }
 
-void drawMode2_line(running_machine *machine, bitmap_t *bitmap,int y)
+void drawMode2_line(bitmap_t *bitmap,int y)
 {
 	int x,b,scrx;
 	unsigned char tmp=0;
@@ -122,13 +122,13 @@ void drawMode2_line(running_machine *machine, bitmap_t *bitmap,int y)
 
 		for (b=0x80;b!=0;b>>=1)
 		{
-			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp&b) ? machine->pens[ink] : machine->pens[pap];
-			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp&b) ? machine->pens[ink] : machine->pens[pap];
+			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp&b) ? ink : pap;
+			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp&b) ? ink : pap;
 		}
 	}
 }
 
-void drawMode1_line(running_machine *machine, bitmap_t *bitmap,int y)
+void drawMode1_line(bitmap_t *bitmap,int y)
 {
 	int x,b,scrx,scry;
 	unsigned char tmp=0;
@@ -152,8 +152,8 @@ void drawMode1_line(running_machine *machine, bitmap_t *bitmap,int y)
 		attr++;
 		for (b=0x80;b!=0;b>>=1)
 		{
-			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp&b) ? machine->pens[ink] : machine->pens[pap];
-			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp&b) ? machine->pens[ink] : machine->pens[pap];
+			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp&b) ? ink : pap;
+			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp&b) ? ink : pap;
 		}
 	}
 }

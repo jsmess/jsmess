@@ -75,7 +75,7 @@ MC6845_UPDATE_ROW( cbm600_update_row )
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
-			plot_box( bitmap, device->machine->gfx[cbmb_font]->width * i, y, device->machine->gfx[cbmb_font]->width, 1, device->machine->pens[1] );
+			plot_box( bitmap, device->machine->gfx[cbmb_font]->width * i, y, device->machine->gfx[cbmb_font]->width, 1, 1 );
 		} else {
 			drawgfx( bitmap, device->machine->gfx[cbmb_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, device->machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 		}
@@ -88,7 +88,7 @@ MC6845_UPDATE_ROW( cbm700_update_row )
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
-			plot_box( bitmap, device->machine->gfx[cbmb_font]->width * i, y, device->machine->gfx[cbmb_font]->width, 1, device->machine->pens[1] );
+			plot_box( bitmap, device->machine->gfx[cbmb_font]->width * i, y, device->machine->gfx[cbmb_font]->width, 1, 1 );
 		} else {
 			drawgfx( bitmap, device->machine->gfx[cbmb_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, device->machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 		}

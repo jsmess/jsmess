@@ -81,7 +81,7 @@ extern VIDEO_START( amstrad );
 extern VIDEO_START( aleste );
 extern VIDEO_UPDATE( amstrad );
 void amstrad_vh_execute_crtc_cycles(int);
-void amstrad_vh_update_colour(running_machine *machine, int, int);
+void amstrad_vh_update_colour(int, int);
 void amstrad_vh_update_mode(int);
 
 /* The VSYNC signal of the CRTC */
@@ -105,6 +105,6 @@ extern PALETTE_INIT( amstrad_plus );
 
 /**** ALESTE SPECIFIC ***/
 extern PALETTE_INIT( aleste );
-void aleste_vh_update_colour(running_machine *machine, int, int);
+void aleste_vh_update_colour(int, int);
 
 #endif /* AMSTRAD_H_ */

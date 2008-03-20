@@ -655,15 +655,15 @@ INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 
 	int c;
 	if (color&0x40) c=arcadia_video.reg.d.pal[1];
 	else c=arcadia_video.reg.d.pal[0];
-	/*imachine->gfx[0]->colortable[1]=machine->pens[(c>>3)&7];*/
+	/*imachine->gfx[0]->colortable[1]=(c>>3)&7;*/
 
 	if (color&0x80) c=arcadia_video.reg.d.pal[1];
 	else c=arcadia_video.reg.d.pal[0];
-	/*machine->gfx[0]->colortable[0]=machine->pens[c&7];*/
+	/*machine->gfx[0]->colortable[0]=c&7;*/
 
     } else {
 	/*machine->gfx[0]->colortable[1]=
-	    machine->pens[((arcadia_video.reg.d.pal[1]>>3)&1)|((color>>5)&6)];*/
+	    ((arcadia_video.reg.d.pal[1]>>3)&1)|((color>>5)&6);*/
     }
 
     if (arcadia_video.doublescan) {
@@ -763,19 +763,19 @@ static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 	 * to survive the 0.118u5 transition */
 	switch (i) {
 	case 0:
-	    /*machine->gfx[0]->colortable[1]=machine->pens[(arcadia_video.reg.d.pal[3]>>3)&7];*/
+	    /*machine->gfx[0]->colortable[1]=(arcadia_video.reg.d.pal[3]>>3)&7;*/
 	    doublescan=arcadia_video.reg.d.pal[3]&0x80?FALSE:TRUE;
 	    break;
 	case 1:
-	    /*machine->gfx[0]->colortable[1]=machine->pens[arcadia_video.reg.d.pal[3]&7];*/
+	    /*machine->gfx[0]->colortable[1]=arcadia_video.reg.d.pal[3]&7;*/
 	    doublescan=arcadia_video.reg.d.pal[3]&0x40?FALSE:TRUE;
 	    break;
 	case 2:
-	    /*machine->gfx[0]->colortable[1]=machine->pens[(arcadia_video.reg.d.pal[2]>>3)&7];*/
+	    /*machine->gfx[0]->colortable[1]=(arcadia_video.reg.d.pal[2]>>3)&7;*/
 	    doublescan=arcadia_video.reg.d.pal[2]&0x80?FALSE:TRUE;
 	    break;
 	case 3:
-	    /*machine->gfx[0]->colortable[1]=machine->pens[arcadia_video.reg.d.pal[2]&7];*/
+	    /*machine->gfx[0]->colortable[1]=arcadia_video.reg.d.pal[2]&7;*/
 	    doublescan=arcadia_video.reg.d.pal[2]&0x40?FALSE:TRUE;
 	    break;
 	}
@@ -828,7 +828,7 @@ INTERRUPT_GEN( arcadia_video_line )
 	/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
 	 * the color table, a vile gross hack.  Doesn't look like this is going
 	 * to survive the 0.118u5 transition */
-	/*machine->gfx[0]->colortable[0]=machine->pens[arcadia_video.reg.d.pal[1]&7];*/
+	/*machine->gfx[0]->colortable[0]=arcadia_video.reg.d.pal[1]&7;*/
 
 	if (arcadia_video.line<arcadia_video.ypos)
 	{

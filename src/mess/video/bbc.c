@@ -14,10 +14,10 @@
 #include "saa505x.h"
 
 
-static void BBC_draw_hi_res(running_machine *machine);
+static void BBC_draw_hi_res(running_machine* machine);
 static void BBC_draw_teletext(running_machine *machine);
 
-static void (*draw_function)(running_machine *machine);
+static void (*draw_function)(running_machine* machine);
 
 static void BBC_draw_RGB_in(running_machine *machine, int offset,int data);
 
@@ -359,14 +359,14 @@ static void BBC_Clock_CR(void)
 
 // This is the actual output of the Video ULA this fuction does all the output to the screen in the BBC emulator
 
-static void BBC_ula_drawpixel(running_machine *machine, int col,int number_of_pixels)
+static void BBC_ula_drawpixel(int col,int number_of_pixels)
 {
 	int pixel_count;
 	int pixel_temp;
 	if ((BBC_display>=BBC_display_left) && ((BBC_display+number_of_pixels)<BBC_display_right))
 	{
 
-		pixel_temp=machine->pens[col^cursor_state];
+		pixel_temp=col^cursor_state;
 		for(pixel_count=0;pixel_count<number_of_pixels;pixel_count++)
 		{
 			*(BBC_display++) = pixel_temp;
@@ -401,7 +401,7 @@ static void BBC_draw_hi_res(running_machine *machine)
 
 			for(sc1=0;sc1<pixels_per_byte;sc1++)
 			{
-				BBC_ula_drawpixel(machine, videoULA_pallet_lookup[pixel_bits[i]],emulation_pixels_per_real_pixel);
+				BBC_ula_drawpixel(videoULA_pallet_lookup[pixel_bits[i]],emulation_pixels_per_real_pixel);
 				i=(i<<1)|1;
 			}
 		} else {
@@ -411,7 +411,7 @@ static void BBC_draw_hi_res(running_machine *machine)
 		if (video_refresh)
 		{
 			// if the display is not enable, just draw a blank area.
-			BBC_ula_drawpixel(machine, 0, emulation_pixels_per_byte);
+			BBC_ula_drawpixel(0, emulation_pixels_per_byte);
 		} else {
 			BBC_display += emulation_pixels_per_byte;
 		}
@@ -423,7 +423,7 @@ static void BBC_draw_hi_res(running_machine *machine)
 // Just pass on the output at the correct pixel size.
 static void BBC_draw_RGB_in(running_machine *machine, int offset,int data)
 {
-	BBC_ula_drawpixel(machine, data,emulation_pixels_per_real_pixel);
+	BBC_ula_drawpixel(data,emulation_pixels_per_real_pixel);
 }
 
 

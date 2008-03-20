@@ -76,7 +76,7 @@ static int display_x;
 static int display_y;
 static int display_update;  // flag to get location at first DE
 
-/* this contains the colours in Machine->pens form.*/
+/* this contains the colours in machine->pens form.*/
 /* this is updated from the eventlist and reflects the current state
 of the render colours - these may be different to the current colour palette values */
 /* colours can be changed at any time and will take effect immediatly */
@@ -335,16 +335,16 @@ static void amstrad_init_lookups(void)
 	}
 }
 /* Set the new colour from the GateArray */
-void amstrad_vh_update_colour(running_machine *machine, int PenIndex, int hw_colour_index)
+void amstrad_vh_update_colour(int PenIndex, int hw_colour_index)
 {
 	int val;
 /*  int cpu_cycles = ((cycles_currently_ran()>>2)-1) & 63;
 
-	logerror("color is changed(%d,%d) = %d\n",PenIndex, cpu_cycles, machine->pens[hw_colour_index]);
+	logerror("color is changed(%d,%d) = %d\n",PenIndex, cpu_cycles, hw_colour_index);
   amstrad_GateArray_colours_ischanged++;
-	amstrad_GateArray_changed_colours[cpu_cycles][PenIndex] = machine->pens[hw_colour_index];
+	amstrad_GateArray_changed_colours[cpu_cycles][PenIndex] = hw_colour_index;
 */
-	amstrad_GateArray_render_colours[PenIndex] = machine->pens[hw_colour_index];
+	amstrad_GateArray_render_colours[PenIndex] = hw_colour_index;
 	if(amstrad_system_type != 0)
 	{  // CPC+/GX4000 - normal palette changes through the Gate Array also makes the corresponding change in the ASIC palette
 		val = (amstrad_palette[hw_colour_index] & 0xf00000) >> 16; // red
@@ -355,15 +355,15 @@ void amstrad_vh_update_colour(running_machine *machine, int PenIndex, int hw_col
 	}
 }
 
-void aleste_vh_update_colour(running_machine *machine, int PenIndex, int hw_colour_index)
+void aleste_vh_update_colour(int PenIndex, int hw_colour_index)
 {
 /*  int cpu_cycles = ((cycles_currently_ran()>>2)-1) & 63;
 
-	logerror("color is changed(%d,%d) = %d\n",PenIndex, cpu_cycles, machine->pens[hw_colour_index]);
+	logerror("color is changed(%d,%d) = %d\n",PenIndex, cpu_cycles, hw_colour_index);
   amstrad_GateArray_colours_ischanged++;
-	amstrad_GateArray_changed_colours[cpu_cycles][PenIndex] = machine->pens[hw_colour_index];
+	amstrad_GateArray_changed_colours[cpu_cycles][PenIndex] = hw_colour_index;
 */
-	amstrad_GateArray_render_colours[PenIndex] = machine->pens[hw_colour_index+32];
+	amstrad_GateArray_render_colours[PenIndex] = hw_colour_index+32;
 }
 
 /* Set the new screen mode (0,1,2,4) from the GateArray */

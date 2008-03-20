@@ -1011,7 +1011,7 @@ Bit Value Function
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
     EventList_AddItemOffset((EVENT_LIST_CODE_GA_COLOUR<<6) | PenIndex, AmstradCPC_PenColours[PenIndex], TIME_TO_CYCLES(0,video_screen_get_vpos(machine->primary_screen)*video_screen_get_scan_period(machine->primary_screen)));
 #else
-      amstrad_vh_update_colour(machine, amstrad_GateArray_PenSelected, (dataToGateArray & 0x1F));
+      amstrad_vh_update_colour(amstrad_GateArray_PenSelected, (dataToGateArray & 0x1F));
 #endif
     } break;
 /* Select screen mode and rom configuration
@@ -1116,7 +1116,7 @@ static void aleste_msx_mapper(running_machine *machine, int offset, int data)
 		amstrad_GateArray_write(machine, data);
 		break;
 	case 1:  // Colour select (6-bit palette)
-		aleste_vh_update_colour(machine, amstrad_GateArray_PenSelected,data & 0x3f);
+		aleste_vh_update_colour(amstrad_GateArray_PenSelected,data & 0x3f);
 		break;
 	case 2:  // Screen mode, Upper/Lower ROM select
 		amstrad_GateArray_write(machine, data);
