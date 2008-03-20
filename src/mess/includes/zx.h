@@ -27,7 +27,7 @@ VIDEO_START( zx );
 VIDEO_EOF( zx );
 
 void zx_ula_bkgnd(running_machine *machine, int color);
-int zx_ula_r(int offs, int region);
+int zx_ula_r(running_machine *machine, int offs, int region);
 
 extern emu_timer *ula_nmi;
 extern int ula_irq_active;

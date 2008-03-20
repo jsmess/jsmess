@@ -32,14 +32,14 @@ DRIVER_INIT ( zx )
 static OPBASE_HANDLER ( zx_setopbase )
 {
 	if (address & 0x8000)
-		return zx_ula_r(address, REGION_CPU1);
+		return zx_ula_r(machine, address, REGION_CPU1);
 	return address;
 }
 
 static OPBASE_HANDLER ( pc8300_setopbase )
 {
 	if (address & 0x8000)
-		return zx_ula_r(address, REGION_GFX1);
+		return zx_ula_r(machine, address, REGION_GFX1);
 	return address;
 }
 

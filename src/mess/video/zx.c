@@ -138,7 +138,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 	}
 }
 
-int zx_ula_r(int offs, int region)
+int zx_ula_r(running_machine *machine, int offs, int region)
 {
 	bitmap_t *bitmap = tmpbitmap;
 	int x, y, chr, data, ireg, rreg, cycles, offs0 = offs, halted = 0;
@@ -152,7 +152,7 @@ int zx_ula_r(int offs, int region)
 		chrgen = memory_region(region);
 		ireg = cpunum_get_reg(0, Z80_I) << 8;
 		rreg = cpunum_get_reg(0, Z80_R);
-		y = video_screen_get_vpos(Machine->primary_screen);
+		y = video_screen_get_vpos(machine->primary_screen);
 
 		cycles = 4 * (64 - (rreg & 63));
 		timer_set(ATTOTIME_IN_CYCLES(cycles, 0), NULL, 0, zx_ula_irq);
