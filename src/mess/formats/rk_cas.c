@@ -12,8 +12,9 @@
 #define WAVE_LOW		-32768
 
 #define RK_HEADER_LEN	256
-#define RKU_SIZE 20
-#define RK8_SIZE 60
+
+#define RK_SIZE_20 20
+#define RK_SIZE_60 60
 
 static int  	data_size;
 
@@ -54,55 +55,55 @@ static INT16* rk_output_byte(INT16 *p, UINT8 byte,int bitsize)
 }
 
 
-static int rku_cas_to_wav_size( const UINT8 *casdata, int caslen ) {	
+static int rk20_cas_to_wav_size( const UINT8 *casdata, int caslen ) {	
 	data_size = caslen;
-	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RKU_SIZE;	
+	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_20;	
 }
 
-static int rk8_cas_to_wav_size( const UINT8 *casdata, int caslen ) {	
+static int rk60_cas_to_wav_size( const UINT8 *casdata, int caslen ) {	
 	data_size = caslen;
-	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK8_SIZE;	
+	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_60;	
 }
 
-static int rku_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
+static int rk20_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
 	int i;
 	INT16 * p = buffer;
 	
 	for (i=0; i<RK_HEADER_LEN; i++) {
-		p = rk_output_byte (p, 0x00, RKU_SIZE );	
+		p = rk_output_byte (p, 0x00, RK_SIZE_20 );	
 	}
 
-	p = rk_output_byte (p, 0xE6, RKU_SIZE);	
+	p = rk_output_byte (p, 0xE6, RK_SIZE_20);	
 	
 	for (i=0; i<data_size; i++)
-		p = rk_output_byte (p, bytes[i], RKU_SIZE);
+		p = rk_output_byte (p, bytes[i], RK_SIZE_20);
 
 	return p - buffer;
 }
 
-static int rk8_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
+static int rk60_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
 	int i;
 	INT16 * p = buffer;
 	
 	for (i=0; i<RK_HEADER_LEN; i++) {
-		p = rk_output_byte (p, 0x00, RK8_SIZE );	
+		p = rk_output_byte (p, 0x00, RK_SIZE_60 );	
 	}
 
-	p = rk_output_byte (p, 0xE6, RK8_SIZE);	
+	p = rk_output_byte (p, 0xE6, RK_SIZE_60);	
 	
 	for (i=0; i<data_size; i++)
-		p = rk_output_byte (p, bytes[i], RK8_SIZE);
+		p = rk_output_byte (p, bytes[i], RK_SIZE_60);
 
 	return p - buffer;
 }
 
 
 
-static const struct CassetteLegacyWaveFiller rku_legacy_fill_wave = {
-	rku_cas_fill_wave,			/* fill_wave */
+static const struct CassetteLegacyWaveFiller rk20_legacy_fill_wave = {
+	rk20_cas_fill_wave,			/* fill_wave */
 	-1,					/* chunk_size */
 	0,					/* chunk_samples */
-	rku_cas_to_wav_size,			/* chunk_sample_calc */
+	rk20_cas_to_wav_size,			/* chunk_sample_calc */
 	RK_WAV_FREQUENCY,			/* sample_frequency */
 	0,					/* header_samples */
 	0					/* trailer_samples */
@@ -110,50 +111,56 @@ static const struct CassetteLegacyWaveFiller rku_legacy_fill_wave = {
 
 
 
-static casserr_t rku_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &rku_legacy_fill_wave );
+static casserr_t rk20_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+	return cassette_legacy_identify( cassette, opts, &rk20_legacy_fill_wave );
 }
 
 
 
-static casserr_t rku_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &rku_legacy_fill_wave );
+static casserr_t rk20_cassette_load( cassette_image *cassette ) {
+	return cassette_legacy_construct( cassette, &rk20_legacy_fill_wave );
 }
 
-static const struct CassetteLegacyWaveFiller rk8_legacy_fill_wave = {
-	rk8_cas_fill_wave,			/* fill_wave */
+static const struct CassetteLegacyWaveFiller rk60_legacy_fill_wave = {
+	rk60_cas_fill_wave,			/* fill_wave */
 	-1,					/* chunk_size */
 	0,					/* chunk_samples */
-	rk8_cas_to_wav_size,			/* chunk_sample_calc */
+	rk60_cas_to_wav_size,			/* chunk_sample_calc */
 	RK_WAV_FREQUENCY,			/* sample_frequency */
 	0,					/* header_samples */
 	0					/* trailer_samples */
 };
 
 
-static casserr_t rk8_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &rk8_legacy_fill_wave );
+static casserr_t rk60_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+	return cassette_legacy_identify( cassette, opts, &rk60_legacy_fill_wave );
 }
 
 
 
-static casserr_t rk8_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &rk8_legacy_fill_wave );
+static casserr_t rk60_cassette_load( cassette_image *cassette ) {
+	return cassette_legacy_construct( cassette, &rk60_legacy_fill_wave );
 }
-
 
 
 static const struct CassetteFormat rku_cassette_format = {
 	"rku",
-	rku_cassette_identify,
-	rku_cassette_load,
+	rk20_cassette_identify,
+	rk20_cassette_load,
 	NULL
 };
 
 static const struct CassetteFormat rk8_cassette_format = {
 	"rk8",
-	rk8_cassette_identify,
-	rk8_cassette_load,
+	rk60_cassette_identify,
+	rk60_cassette_load,
+	NULL
+};
+
+static const struct CassetteFormat rks_cassette_format = {
+	"rks",
+	rk20_cassette_identify,
+	rk20_cassette_load,
 	NULL
 };
 
@@ -166,3 +173,6 @@ CASSETTE_FORMATLIST_START(rk8_cassette_formats)
 	CASSETTE_FORMAT(rk8_cassette_format)
 CASSETTE_FORMATLIST_END
 
+CASSETTE_FORMATLIST_START(rks_cassette_formats)
+	CASSETTE_FORMAT(rks_cassette_format)
+CASSETTE_FORMATLIST_END

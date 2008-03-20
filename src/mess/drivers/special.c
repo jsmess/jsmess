@@ -2,6 +2,7 @@
 
 		Specialist driver by Miodrag Milanovic
 
+		20/03/2008 Cassette support
 		15/03/2008 Preliminary driver.
 		     
 ****************************************************************************/
@@ -11,7 +12,9 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/special.h"
 #include "machine/8255ppi.h"
-    
+#include "devices/cassette.h"
+#include "formats/rk_cas.h"
+
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x8fff ) AM_RAM  // RAM
@@ -183,8 +186,26 @@ ROM_START( lik )
     ROMX_LOAD( "lik2.rom",	0xc000, 0x3000, CRC(71820E43) , ROM_BIOS(2))
 ROM_END
 
+static void special_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rks_cassette_formats; break;
+
+		default:					cassette_device_getinfo(devclass, state, info); break;
+	}
+}
+
+SYSTEM_CONFIG_START(special)
+	CONFIG_DEVICE(special_cassette_getinfo)
+SYSTEM_CONFIG_END
+ 
 /* Driver */
  
 /*    YEAR  NAME   PARENT  COMPAT 	 MACHINE 	INPUT   INIT  CONFIG COMPANY 				 FULLNAME   FLAGS */
-COMP( 1985, special,     0,      0, 		special, 	special, 	special, NULL,  "", 					 "Special",	 0)
-COMP( 1985, lik,    special,      0, 		special, 	special, 	special, NULL,  "", 					 "Lik",		 0)
+COMP( 1985, special,     0,      0, 		special, 	special, 	special, special,  "", 					 "Special",	 0)
+COMP( 1985, lik,    special,      0, 		special, 	special, 	special, special,  "", 					 "Lik",		 0)

@@ -2,6 +2,7 @@
 
 		Specialist machine driver by Miodrag Milanovic
 
+		20/03/2008 Cassette support
 		15/03/2008 Preliminary driver.
 		     
 ****************************************************************************/
@@ -40,7 +41,8 @@ READ8_HANDLER (specialist_8255_porta_r )
 READ8_HANDLER (specialist_8255_portb_r )
 {
 	
-	int dat = 0;	
+	int dat = 0;
+	double level;	
 	
 	if ((specialist_8255_porta & 0x01)==0) dat ^= (readinputport(0) ^ 0xff);
 	if ((specialist_8255_porta & 0x02)==0) dat ^= (readinputport(1) ^ 0xff);
@@ -57,6 +59,11 @@ READ8_HANDLER (specialist_8255_portb_r )
   	
 	dat = (dat  << 2) ^0xff;	
 	if (readinputport(12)!=0xff) dat ^= 0x02;
+		
+	level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	if (level >=  0) { 
+			dat ^= 0x01;
+ 	}		
 	return dat & 0xff;
 }
 
