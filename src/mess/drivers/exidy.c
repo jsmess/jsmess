@@ -221,9 +221,10 @@ static void exidy_hd6402_callback(int mask, int data)
 	logerror("hd6402 state: %04x %04x\n",mask,data);
 }
 
-static TIMER_CALLBACK(exidy_reset_timer_callback)
+/* after the first 4 bytes have been read from ROM, switch the ram back in */
+static TIMER_CALLBACK( exidy_reset )
 {
-	cpunum_set_reg(0, REG_PC, 0x0e000);
+	memory_set_bank(1, 0);
 }
 
 static void exidy_printer_handshake_in(int number, int data, int mask)
@@ -275,13 +276,14 @@ static MACHINE_RESET( exidyd )
 
 	exidy_fe_port_w(machine, 0, 0);
 
-	timer_set(attotime_zero, NULL, 0, exidy_reset_timer_callback);
+	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
+	memory_set_bank(1, 1);
 }
 
 static MACHINE_RESET( exidy )
 {
-	MACHINE_RESET_CALL( exidyd );
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+	MACHINE_RESET_CALL( exidyd );
 }
 
 
@@ -323,27 +325,6 @@ static WRITE8_HANDLER ( exidy_wd179x_w )
 	}
 }
 
-
-static ADDRESS_MAP_START( exidy_mem , ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM		/* ram 32k machine */
-	AM_RANGE(0xbc00, 0xbcff) AM_ROM
-	AM_RANGE(0xbe00, 0xbe03) AM_READWRITE(exidy_wd179x_r, exidy_wd179x_w)
-
-	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */
-	AM_RANGE(0xf800, 0xfbff) AM_ROM		/* char rom */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM		/* programmable chars */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( exidyd_mem , ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xbfff) AM_RAM		/* ram 48k diskless machine */
-	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */
-	AM_RANGE(0xf800, 0xfbff) AM_ROM		/* char rom */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM		/* programmable chars */
-ADDRESS_MAP_END
 
 static WRITE8_HANDLER(exidy_fc_port_w)
 {
@@ -506,20 +487,20 @@ static READ8_HANDLER(exidy_fd_port_r)
 	UINT8 data = 0xe0;
 
 	/* bit 4: parity error */
-	if (exidy_hd6402_state & HD6402_OUTPUT_PE) data |= (1<<4);
+	if (exidy_hd6402_state & HD6402_OUTPUT_PE) data |= 16;
 
 	/* bit 3: framing error */
-	if (exidy_hd6402_state & HD6402_OUTPUT_FE) data |= (1<<3);
+	if (exidy_hd6402_state & HD6402_OUTPUT_FE) data |= 8;
 
 	/* bit 2: over-run error */
-	if (exidy_hd6402_state & HD6402_OUTPUT_OE) data |= (1<<2);
+	if (exidy_hd6402_state & HD6402_OUTPUT_OE) data |= 4;
 
 	/* bit 1: data receive ready - data ready in receive reg */
-	if (exidy_hd6402_state & HD6402_OUTPUT_DR) data |= (1<<1);
+	if (exidy_hd6402_state & HD6402_OUTPUT_DR) data |= 2;
 
 	/* bit 0: transmitter buffer receive empty */
 	/* if this BIT is forced high, then the cassette save routine does not hang */
-	if (exidy_hd6402_state & HD6402_OUTPUT_TBRE) data |= (1<<0);
+	if (exidy_hd6402_state & HD6402_OUTPUT_TBRE) data |= 1;
 
 	logerror("exidy fd r: %04x %02x\n",offset,data);
 
@@ -562,6 +543,33 @@ static READ8_HANDLER(exidy_ff_port_r)
 	return data;
 }
 
+
+static READ8_HANDLER( exidy_read_ff ) { return 0xff; }
+
+static ADDRESS_MAP_START( exidy_mem , ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK(1)
+	AM_RANGE(0x0800, 0x7fff) AM_RAM		/* ram 32k machine */
+	AM_RANGE(0x8000, 0xbbff) AM_READWRITE(exidy_read_ff, SMH_NOP)
+	AM_RANGE(0xbc00, 0xbcff) AM_ROM		/* disk bios */
+	AM_RANGE(0xbd00, 0xbdff) AM_READWRITE(exidy_read_ff, SMH_NOP)
+	AM_RANGE(0xbe00, 0xbe03) AM_READWRITE(exidy_wd179x_r, exidy_wd179x_w)
+	AM_RANGE(0xbe04, 0xbfff) AM_READWRITE(exidy_read_ff, SMH_NOP)
+	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac and bios */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */
+	AM_RANGE(0xf800, 0xfbff) AM_ROM		/* char rom */
+	AM_RANGE(0xfc00, 0xffff) AM_RAM		/* programmable chars */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( exidyd_mem , ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK(1)
+	AM_RANGE(0x0800, 0xbfff) AM_RAM		/* ram 48k diskless machine */
+	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac and bios */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */
+	AM_RANGE(0xf800, 0xfbff) AM_ROM		/* char rom */
+	AM_RANGE(0xfc00, 0xffff) AM_RAM		/* programmable chars */
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exidy_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -745,6 +753,13 @@ static MACHINE_DRIVER_START( exidyd )
 	MDRV_MACHINE_RESET( exidyd )
 MACHINE_DRIVER_END
 
+static DRIVER_INIT( exidy )
+{
+	UINT8 *RAM = memory_region(REGION_CPU1);
+	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xe000);
+//	timer_pulse(ATTOTIME_IN_HZ(200000),NULL,0,exidy_timer);		/* timer for cassette */
+}
+
 /***************************************************************************
 
   Game driver(s)
@@ -757,7 +772,7 @@ ROM_START(exidy)
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
 	ROM_LOAD_OPTIONAL("diskboot.dat",0xbc00, 0x0100, BAD_DUMP CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
-	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_FILL_FF | ROM_OPTIONAL)
 
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
@@ -768,7 +783,7 @@ ROM_START(exidyd)
 	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
-	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_FILL_FF | ROM_OPTIONAL)
 
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
@@ -776,56 +791,42 @@ ROM_END
 
 static QUICKLOAD_LOAD( exidy )
 {
-	UINT8 sw = readinputportbytag("CONFIG") & 1;				/* reading the dipswitch: 1 = autorun */
+	UINT8 sw = readinputportbytag("CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
 	UINT16 exec_addr, start_addr, end_addr;
 
 	if (z80bin_load_file( machine, image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
-		return INIT_FAIL;	/* load file */
+		return INIT_FAIL;
+
+	if (exec_addr == 0xffff) return INIT_PASS;			/* data file */
+
+	if ((exec_addr >= 0xc000) && (exec_addr <= 0xdfff) && (program_read_byte(0xdffa) != 0xc3))
+		return INIT_PASS;					/* can't run a program if the cartridge isn't in */
 
 	/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
 	1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
-	2. An exec address of C858 indicates a basic program.
-	   	This address is unsuitable, so the routine at F020 is used instead.
-	3. If the start address is 1D5 and the exec address is NOT C858,
-		the pointers still need fixing, but then jump to the exec address.
-	4. If autorun is turned off, the pointers still need fixing, but then display READY.
+	2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
 	Important addresses:
 		01D5 = start (load) address of a conventional basic program
 		C858 = an autorun basic program will have this exec address on the tape
-		C3DD = part of basic that displays READY and lets user enter input
-		F020 = custom routine to fix basic pointers
-		F030 = exec address to jump to after fixing the pointers */
+		C3DD = part of basic that displays READY and lets user enter input */
 
 	if ((start_addr == 0x1d5) || (exec_addr == 0xc858))
 	{
-		UINT8 i, sec[18]={
-			0x2a, 2, 0xf0,		// LD HL,(F002)	;get saved end_addr+1
-			0x22, 0xb7, 1,		// LD (01B7),HL	;move it to correct place
+		UINT8 i, data[]={
 			0xcd, 0x26, 0xc4,	// CALL C426	;set up other pointers
-			0x21, 0xd4, 1,		// LD HL,01D4	;dummy-start address
-			0x36, 0,		// LD (HL),00	;make sure it is end-of-line
-			0,			// NOP		;line up jump address to an even byte
-			0xc3, 0x89, 0xc6,};	// JP C689	;run program - f030 = adjustable jump
+			0x21, 0xd4, 1,		// LD HL,01D4	;start of program address (used by C689)
+			0x36, 0,		// LD (HL),00	;make sure dummy end-of-line is there
+			0xc3, 0x89, 0xc6,};	// JP C689	;run program
 
-		for (i = 0; i < 18; i++) program_write_byte(0xf020 + i, sec[i]);
-
-		if (!sw) program_write_word_16le(0xf030,0xc3dd);
-
-		if (start_addr == 0x1d5)
-		{
-			program_write_word_16le(0xf002,end_addr+1);
-			if ((exec_addr != 0xc858) && (sw == 1)) program_write_word_16le(0xf030,exec_addr);
-			exec_addr=0xf020;
-		}
-		else
-			exec_addr=0xf02f;		// skip fixing pointers, just jump into bios
-		
-		sw = 1;
-
-		if (program_read_byte(0xdffa) != 0xc3) exec_addr=0xffff;	// can't run if cart not in
-	}	
-
-	if ((exec_addr != 0xffff) && (sw)) cpunum_set_reg(0, REG_PC, exec_addr);
+		for (i = 0; i < 11; i++) program_write_byte(0xf01f + i, data[i]);
+		if (!sw) program_write_word_16le(0xf028,0xc3dd);
+		program_write_byte(0x1b7, end_addr&0xff);		/* Tell BASIC where program ends */
+		program_write_byte(0x1b8, end_addr>>8);
+		if ((exec_addr != 0xc858) && (sw)) program_write_word_16le(0xf028,exec_addr);
+		cpunum_set_reg(0, REG_PC, 0xf01f);
+	}
+	else
+	if (sw) cpunum_set_reg(0, REG_PC, exec_addr);
 
 	return INIT_PASS;
 }
@@ -905,6 +906,6 @@ SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE INPUT   INIT    CONFIG  COMPANY        FULLNAME */
-COMP(1979, exidy,   0,		0,	exidy,	exidy,	0,	exidy,	"Exidy Inc", "Sorcerer", 0 )
-COMP(1979, exidyd,  exidy,	0,	exidyd,	exidy,	0,	exidyd,	"Exidy Inc", "Sorcerer (Cassette only)", 0 )
+COMP(1979, exidy,   0,		0,	exidy,	exidy,	exidy,	exidy,	"Exidy Inc", "Sorcerer", 0 )
+COMP(1979, exidyd,  exidy,	0,	exidyd,	exidy,	exidy,	exidyd,	"Exidy Inc", "Sorcerer (Cassette only)", 0 )
 
