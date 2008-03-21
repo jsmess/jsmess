@@ -31,10 +31,20 @@ const unsigned short pocketc_colortable[8][2] = {
 
 PALETTE_INIT( pocketc )
 {
-	int i;
+	UINT8 i=0, r, b, g, color_count = 6; 
 
-	for ( i = 0; i < sizeof(pocketc_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, pocketc_palette[i*3], pocketc_palette[i*3+1], pocketc_palette[i*3+2]);
+	machine->colortable = colortable_alloc(machine, color_count);
+
+	while (color_count--)
+	{
+		r = pocketc_palette[i++]; g = pocketc_palette[i++]; b = pocketc_palette[i++];
+		colortable_palette_set_color(machine->colortable, 5 - color_count, MAKE_RGB(r, g, b));
+	}
+
+	for( i = 0; i < 8; i++ )
+	{
+		colortable_entry_set_value(machine->colortable, i*2, pocketc_colortable[i][0]);
+		colortable_entry_set_value(machine->colortable, i*2+1, pocketc_colortable[i][1]);
 	}
 }
 
@@ -46,17 +56,20 @@ VIDEO_START( pocketc )
 }
 
 
-void pocketc_draw_special(bitmap_t *bitmap,
-						  int x, int y, const POCKETC_FIGURE fig, int color)
+void pocketc_draw_special(bitmap_t *bitmap, int x, int y, const POCKETC_FIGURE fig, int color)
 {
 	int i,j;
-	for (i=0;fig[i];i++,y++) {
-		for (j=0;fig[i][j]!=0;j++) {
-			switch(fig[i][j]) {
+	for (i=0; fig[i]; i++, y++)
+	{
+		for (j=0; fig[i][j]!=0; j++)
+		{
+			switch(fig[i][j])
+			{
 			case '1':
-				*BITMAP_ADDR16(bitmap, y, x+j) = color;
+				*BITMAP_ADDR16(bitmap, y, x+j) = color<<2;
 				break;
-			case 'e': return;
+			case 'e':
+				return;
 			}
 		}
 	}
