@@ -40,6 +40,8 @@ System Driver Changes:
 - [MBEE] Fixed colours, sound, Inverse and Underline modes. Enabled alternate
   characters. [Robbbert]
 
+- [PDP1] Fixed text display regression. (bug #883)  [Robbbert]
+
 - [QL] System boots up again. (bug #1495) [Curt Coder]
 
 - [SVI318] Cleaned up driver.  [Tomas Karlsson]
