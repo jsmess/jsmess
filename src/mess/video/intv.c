@@ -2,9 +2,6 @@
 #include "includes/intv.h"
 #include "video/stic.h"
 
-/* Due to palette changes in the 0.123 to 0.124 cycle, it is likely that most colours will
-	be incorrect. You may need to change "color" to "(color<<1)+1" in various places. */
-
 #define FOREGROUND_BIT 0x0010
 
 INLINE void intv_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
@@ -261,10 +258,10 @@ static void render_line(running_machine *machine, bitmap_t *bitmap,
 static void render_colored_squares(running_machine *machine, bitmap_t *bitmap,
 	UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3)
 {
-    plot_box(bitmap, x, y, 8, 8, color0);
-    plot_box(bitmap, x+8, y, 8, 8, color1);
-    plot_box(bitmap, x, y+8, 8, 8, color2);
-    plot_box(bitmap, x+8, y+8, 8, 8, color3);
+    plot_box(bitmap, x, y, 8, 8, (color0<<1)+1);
+    plot_box(bitmap, x+8, y, 8, 8, (color1<<1)+1);
+    plot_box(bitmap, x, y+8, 8, 8, (color2<<1)+1);
+    plot_box(bitmap, x+8, y+8, 8, 8, (color3<<1)+1);
 }
 
 static void render_color_stack_mode(running_machine *machine, bitmap_t *bitmap)
@@ -479,10 +476,10 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 					if (colorb == 7) colorb = intv_color_stack[3];
 					if (colorc == 7) colorc = intv_color_stack[3];
 					if (colord == 7) colord = intv_color_stack[3];
-					plot_box(bitmap,col*16,row*16,8,8,colora);
-					plot_box(bitmap,col*16+8,row*16,8,8,colorb);
-					plot_box(bitmap,col*16,row*16+8,8,8,colorc);
-					plot_box(bitmap,col*16+8,row*16+8,8,8,colord);
+					plot_box(bitmap,col*16,row*16,8,8,(colora<<1)+1);
+					plot_box(bitmap,col*16+8,row*16,8,8,(colorb<<1)+1);
+					plot_box(bitmap,col*16,row*16+8,8,8,(colorc<<1)+1);
+					plot_box(bitmap,col*16+8,row*16+8,8,8,(colord<<1)+1);
 				}
 				else // normal color stack mode
 				{
@@ -694,10 +691,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
 static void draw_borders(running_machine *machine, bitmap_t *bm)
 {
 	if (intv_left_edge_inhibit)
-		plot_box(bm, 0, 0, 16-intv_col_delay*2, 16*12, intv_border_color);
+		plot_box(bm, 0, 0, 16-intv_col_delay*2, 16*12, (intv_border_color<<1)+1);
 
 	if (intv_top_edge_inhibit)
-		plot_box(bm, 0, 0, 16*20, 16-intv_row_delay*2, intv_border_color);
+		plot_box(bm, 0, 0, 16*20, 16-intv_row_delay*2, (intv_border_color<<1)+1);
 }
 
 static int col_delay = 0;
