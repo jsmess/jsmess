@@ -14,7 +14,6 @@
 /* pointer to TX-0 RAM */
 static UINT32 *tx0_memory;
 
-
 /*
     driver init function
 
@@ -227,8 +226,9 @@ GFXDECODE_END
     black.  Grey levels follow an exponential law, so that decrementing the
     color index periodically will simulate the remanence of a cathode ray tube.
 */
-static const unsigned char palette[] =
+static const UINT8 tx0_colors[] =
 {
+	0x00,0x00,0x00,	/* black */
 	0xFF,0xFF,0xFF,	/* white */
 	0x00,0xFF,0x00,	/* green */
 	0x00,0x40,0x00,	/* dark green */
@@ -236,12 +236,14 @@ static const unsigned char palette[] =
 	0x80,0x80,0x80	/* light gray */
 };
 
-static const unsigned short tx0_colortable[] =
+static const UINT8 tx0_palette[] =
 {
-	pen_panel_bg, pen_panel_caption,
-	pen_typewriter_bg, pen_black,
-	pen_typewriter_bg, pen_red
+	pen_panel_bg, pen_panel_caption,	/* captions */
+	pen_typewriter_bg, pen_black,		/* black typing in typewriter */
+	pen_typewriter_bg, pen_red		/* red typing in typewriter */
 };
+
+static UINT8 total_colors_needed = pen_crt_num_levels + sizeof(tx0_colors) / 3;
 
 /* Initialise the palette */
 static PALETTE_INIT( tx0 )
@@ -254,13 +256,15 @@ static PALETTE_INIT( tx0 )
 	const double update_period = 1./refresh_rate;
 	double decay_1, decay_2;
 	double cur_level_1, cur_level_2;
+#if 0
 #ifdef MAME_DEBUG
 	/* level at which we stop emulating the decay and say the pixel is black */
 	double cut_level = .02;
 #endif
-	int i;
-	int r, g, b;
+#endif
+	UINT8 i, r, g, b;
 
+	machine->colortable = colortable_alloc(machine, total_colors_needed);
 
 	/* initialize CRT palette */
 
@@ -277,12 +281,12 @@ static PALETTE_INIT( tx0 )
 		g = (int) ((g1*cur_level_1 + g2*cur_level_2) + .5);
 		b = (int) ((b1*cur_level_1 + b2*cur_level_2) + .5);
 		/* write color in palette */
-		palette_set_color_rgb(machine, i, r, g, b);
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 		/* apply decay for next iteration */
 		cur_level_1 *= decay_1;
 		cur_level_2 *= decay_2;
 	}
-
+#if 0
 #ifdef MAME_DEBUG
 	{
 		int recommended_pen_crt_num_levels;
@@ -296,13 +300,23 @@ static PALETTE_INIT( tx0 )
 	/*if ((cur_level_1 > 255.*cut_level) || (cur_level_2 > 255.*cut_level))
         mame_printf_debug("File %s line %d: Please take higher value for pen_crt_num_levels or smaller value for decay\n", __FILE__, __LINE__);*/
 #endif
-
-	palette_set_color_rgb(machine, 0, 0, 0, 0);
+#endif
+	colortable_palette_set_color(machine->colortable, 0, MAKE_RGB(0, 0, 0));
 
 	/* load static palette */
-	for ( i = 0; i < sizeof(palette) / sizeof(palette[0]) / 3; i++ ) {
-		palette_set_color_rgb(machine, pen_crt_num_levels + i, palette[i*3], palette[i*3+1], palette[i*3+2]);
+	for ( i = 0; i < 6; i++ )
+	{
+		r = tx0_colors[i*3]; g = tx0_colors[i*3+1]; b = tx0_colors[i*3+2];
+		colortable_palette_set_color(machine->colortable, pen_crt_num_levels + i, MAKE_RGB(r, g, b));
 	}
+
+	/* copy colortable to palette */
+	for( i = 0; i < total_colors_needed; i++ )
+		colortable_entry_set_value(machine->colortable, i, i);
+
+	/* overwrite unneeded lowest palette entries with text values */
+	for( i = 0; i < 6; i++ )
+		colortable_entry_set_value(machine->colortable, i, tx0_palette[i]);
 }
 
 
@@ -325,8 +339,7 @@ static const tx0_reset_param_t tx0_reset_param =
 
 static MACHINE_DRIVER_START(tx0_64kw)
 	/* basic machine hardware */
-	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
-    approximately 6usec) */
+	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
 	MDRV_CPU_ADD_TAG("main", TX0_64KW, 166667)
 	MDRV_CPU_CONFIG(tx0_reset_param)
 	MDRV_CPU_PROGRAM_MAP(tx0_64kw_map, 0)
@@ -345,7 +358,7 @@ static MACHINE_DRIVER_START(tx0_64kw)
 	MDRV_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 
 	MDRV_GFXDECODE(tx0)
-	MDRV_PALETTE_LENGTH(pen_crt_num_levels + (sizeof(palette) / sizeof(palette[0]) / 3))
+	MDRV_PALETTE_LENGTH(pen_crt_num_levels + sizeof(tx0_colors) / 3)
 
 	MDRV_PALETTE_INIT(tx0)
 	MDRV_VIDEO_START(tx0)
