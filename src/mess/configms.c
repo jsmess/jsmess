@@ -38,7 +38,7 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 
 			if (dev_instance != NULL)
 			{
-				for (dev = Machine->devices; !image && (dev->type < IO_COUNT); dev++)
+				for (dev = mess_device_first_from_machine(Machine); (image == NULL) && (dev != NULL); dev = mess_device_next(dev))
 				{
 					for (i = 0; !image && (i < dev->count); i++)
 					{
@@ -76,7 +76,7 @@ static void device_dirs_save(int config_type, xml_data_node *parentnode)
 	/* only care about game-specific data */
 	if (config_type == CONFIG_TYPE_GAME)
 	{
-		for (dev = Machine->devices; dev->type < IO_COUNT; dev++)
+		for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
 		{
 			for (i = 0; i < dev->count; i++)
 			{

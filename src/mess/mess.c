@@ -143,7 +143,7 @@ void devices_init(running_machine *machine)
 	image_init(machine);
 
 	/* make sure that any required devices have been allocated */
-	for (dev = machine->devices; dev->type < IO_COUNT; dev++)
+	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
 		for (id = 0; id < dev->count; id++)
 		{
