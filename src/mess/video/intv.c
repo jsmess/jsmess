@@ -2,12 +2,14 @@
 #include "includes/intv.h"
 #include "video/stic.h"
 
+/* Due to palette changes in the 0.123 to 0.124 cycle, it is likely that most colours will
+	be incorrect. You may need to change "color" to "(color<<1)+1" in various places. */
 
 #define FOREGROUND_BIT 0x0010
 
 INLINE void intv_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+	*BITMAP_ADDR16(bitmap, y, x) = color;
 }
 
 VIDEO_START( intv )
@@ -207,57 +209,49 @@ static void render_sprites(void)
 static void render_line(running_machine *machine, bitmap_t *bitmap,
 	UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor)
 {
-    UINT32 color = (nextByte & 0x80 ? machine->pens[fgcolor]
-            : machine->pens[bgcolor]);
+    UINT32 color = (nextByte & 0x80 ? fgcolor : bgcolor);
     intv_plot_pixel(bitmap, x, y, color);
     intv_plot_pixel(bitmap, x+1, y, color);
     intv_plot_pixel(bitmap, x, y+1, color);
     intv_plot_pixel(bitmap, x+1, y+1, color);
 
-    color = (nextByte & 0x40 ? machine->pens[fgcolor]
-            : machine->pens[bgcolor]);
+    color = (nextByte & 0x40 ? fgcolor : bgcolor);
     intv_plot_pixel(bitmap, x+2, y, color);
     intv_plot_pixel(bitmap, x+3, y, color);
     intv_plot_pixel(bitmap, x+2, y+1, color);
     intv_plot_pixel(bitmap, x+3, y+1, color);
 
-    color = (nextByte & 0x20 ? machine->pens[fgcolor]
-            : machine->pens[bgcolor]);
+    color = (nextByte & 0x20 ? fgcolor : bgcolor);
     intv_plot_pixel(bitmap, x+4, y, color);
     intv_plot_pixel(bitmap, x+5, y, color);
     intv_plot_pixel(bitmap, x+4, y+1, color);
     intv_plot_pixel(bitmap, x+5, y+1, color);
 
-    color = (nextByte & 0x10 ? machine->pens[fgcolor]
-            : machine->pens[bgcolor]);
+    color = (nextByte & 0x10 ? fgcolor : bgcolor);
     intv_plot_pixel(bitmap, x+6, y, color);
     intv_plot_pixel(bitmap, x+7, y, color);
     intv_plot_pixel(bitmap, x+6, y+1, color);
     intv_plot_pixel(bitmap, x+7, y+1, color);
 
-    color = (nextByte & 0x08 ? machine->pens[fgcolor]
-            : machine->pens[bgcolor]);
+    color = (nextByte & 0x08 ? fgcolor : bgcolor);
     intv_plot_pixel(bitmap, x+8, y, color);
     intv_plot_pixel(bitmap, x+9, y, color);
     intv_plot_pixel(bitmap, x+8, y+1, color);
     intv_plot_pixel(bitmap, x+9, y+1, color);
 
-    color = (nextByte & 0x04 ? machine->pens[fgcolor]
-            : machine->pens[bgcolor]);
+    color = (nextByte & 0x04 ? fgcolor : bgcolor);
     intv_plot_pixel(bitmap, x+10, y, color);
     intv_plot_pixel(bitmap, x+11, y, color);
     intv_plot_pixel(bitmap, x+10, y+1, color);
     intv_plot_pixel(bitmap, x+11, y+1, color);
 
-    color = (nextByte & 0x02 ? machine->pens[fgcolor]
-            : machine->pens[bgcolor]);
+    color = (nextByte & 0x02 ? fgcolor : bgcolor);
     intv_plot_pixel(bitmap, x+12, y, color);
     intv_plot_pixel(bitmap, x+13, y, color);
     intv_plot_pixel(bitmap, x+12, y+1, color);
     intv_plot_pixel(bitmap, x+13, y+1, color);
 
-    color = (nextByte & 0x01 ? machine->pens[fgcolor]
-            : machine->pens[bgcolor]);
+    color = (nextByte & 0x01 ? fgcolor : bgcolor);
     intv_plot_pixel(bitmap, x+14, y, color);
     intv_plot_pixel(bitmap, x+15, y, color);
     intv_plot_pixel(bitmap, x+14, y+1, color);
@@ -267,10 +261,10 @@ static void render_line(running_machine *machine, bitmap_t *bitmap,
 static void render_colored_squares(running_machine *machine, bitmap_t *bitmap,
 	UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3)
 {
-    plot_box(bitmap, x, y, 8, 8, machine->pens[color0]);
-    plot_box(bitmap, x+8, y, 8, 8, machine->pens[color1]);
-    plot_box(bitmap, x, y+8, 8, 8, machine->pens[color2]);
-    plot_box(bitmap, x+8, y+8, 8, 8, machine->pens[color3]);
+    plot_box(bitmap, x, y, 8, 8, color0);
+    plot_box(bitmap, x+8, y, 8, 8, color1);
+    plot_box(bitmap, x, y+8, 8, 8, color2);
+    plot_box(bitmap, x+8, y+8, 8, 8, color3);
 }
 
 static void render_color_stack_mode(running_machine *machine, bitmap_t *bitmap)
@@ -418,10 +412,8 @@ static void copy_sprites_to_background(running_machine *machine, bitmap_t *bitma
                 }
 
                 if (s->visible) {
-                    intv_plot_pixel(bitmap, nextX, nextY, machine->pens[s->color] |
-                            (currentPixel & FOREGROUND_BIT));
-                    intv_plot_pixel(bitmap, nextX+1, nextY, machine->pens[s->color] |
-                            (currentPixel & FOREGROUND_BIT));
+                    intv_plot_pixel(bitmap, nextX, nextY, s->color | (currentPixel & FOREGROUND_BIT));
+                    intv_plot_pixel(bitmap, nextX+1, nextY, s->color | (currentPixel & FOREGROUND_BIT));
                 }
             }
             nextY++;
@@ -487,10 +479,10 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 					if (colorb == 7) colorb = intv_color_stack[3];
 					if (colorc == 7) colorc = intv_color_stack[3];
 					if (colord == 7) colord = intv_color_stack[3];
-					plot_box(bitmap,col*16,row*16,8,8,machine->pens[colora]);
-					plot_box(bitmap,col*16+8,row*16,8,8,machine->pens[colorb]);
-					plot_box(bitmap,col*16,row*16+8,8,8,machine->pens[colorc]);
-					plot_box(bitmap,col*16+8,row*16+8,8,8,machine->pens[colord]);
+					plot_box(bitmap,col*16,row*16,8,8,colora);
+					plot_box(bitmap,col*16+8,row*16,8,8,colorb);
+					plot_box(bitmap,col*16,row*16+8,8,8,colorc);
+					plot_box(bitmap,col*16+8,row*16+8,8,8,colord);
 				}
 				else // normal color stack mode
 				{
@@ -528,8 +520,8 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 
 						for(j=0;j<8;j++)
 						{
-							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, machine->pens[1]);
-							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, machine->pens[1]);
+							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, 1);
+							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, 1);
 						}
 
 					}
@@ -543,8 +535,8 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 
 						for(j=0;j<8;j++)
 						{
-							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, machine->pens[2]);
-							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, machine->pens[2]);
+							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, 2);
+							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, 2);
 						}
 					}
 				}
@@ -702,15 +694,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
 static void draw_borders(running_machine *machine, bitmap_t *bm)
 {
 	if (intv_left_edge_inhibit)
-	{
-		plot_box(bm, 0, 0, 16-intv_col_delay*2, 16*12,
-				machine->pens[intv_border_color]);
-	}
+		plot_box(bm, 0, 0, 16-intv_col_delay*2, 16*12, intv_border_color);
+
 	if (intv_top_edge_inhibit)
-	{
-		plot_box(bm, 0, 0, 16*20, 16-intv_row_delay*2,
-				machine->pens[intv_border_color]);
-	}
+		plot_box(bm, 0, 0, 16*20, 16-intv_row_delay*2, intv_border_color);
 }
 
 static int col_delay = 0;
@@ -718,7 +705,7 @@ static int row_delay = 0;
 
 void stic_screenrefresh(running_machine *machine)
 {
-    int i;
+	int i;
 
 	if (intv_stic_handshake != 0)
 	{
@@ -726,21 +713,19 @@ void stic_screenrefresh(running_machine *machine)
 		// Render the background
 		render_background(machine, tmpbitmap);
 		// Render the sprites into their buffers
-        render_sprites();
-        for (i = 0; i < 8; i++)
-            intv_sprite[i].collision = 0;
-        // Copy the sprites to the background
-        copy_sprites_to_background(machine, tmpbitmap);
-        determine_sprite_collisions();
-        for (i = 0; i < 8; i++)
-            intv_collision_registers[i] |= intv_sprite[i].collision;
+		render_sprites();
+		for (i = 0; i < 8; i++) intv_sprite[i].collision = 0;
+		// Copy the sprites to the background
+		copy_sprites_to_background(machine, tmpbitmap);
+		determine_sprite_collisions();
+		for (i = 0; i < 8; i++) intv_collision_registers[i] |= intv_sprite[i].collision;
 		/* draw the screen borders if enabled */
 		draw_borders(machine, tmpbitmap);
 	}
 	else
 	{
 		/* STIC disabled, just fill with border color */
-		fillbitmap(tmpbitmap, machine->pens[intv_border_color], NULL);
+		fillbitmap(tmpbitmap, (intv_border_color<<1)+1, NULL);
 	}
 	col_delay = intv_col_delay;
 	row_delay = intv_row_delay;

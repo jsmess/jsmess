@@ -33,7 +33,7 @@
 #endif
 #endif
 
-static const unsigned char intv_palette[] =
+static const unsigned char intv_colors[] =
 {
 	0x00, 0x00, 0x00, /* BLACK */
 	0x00, 0x2D, 0xFF, /* BLUE */
@@ -55,12 +55,36 @@ static const unsigned char intv_palette[] =
 
 static PALETTE_INIT( intv )
 {
-	int i;
+	int k = 0;
 
-	/* Two copies of the palette */
-	for ( i = 0; i < sizeof(intv_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, intv_palette[i*3], intv_palette[i*3+1], intv_palette[i*3+2]);
-		palette_set_color_rgb(machine, i + sizeof(intv_palette) / 3, intv_palette[i*3], intv_palette[i*3+1], intv_palette[i*3+2]);
+	UINT8 i, j, r, g, b;
+	/* Two copies of everything (why?) */
+
+	machine->colortable = colortable_alloc(machine, 32);
+
+	for ( i = 0; i < 16; i++ )
+	{
+		r = intv_colors[i*3]; g = intv_colors[i*3+1]; b = intv_colors[i*3+2];
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i + 16, MAKE_RGB(r, g, b));
+	}
+
+	for(i=0;i<16;i++)
+	{
+		for(j=0;j<16;j++)
+		{
+		colortable_entry_set_value(machine->colortable, k++, i);
+		colortable_entry_set_value(machine->colortable, k++, j);
+		}
+	}
+
+	for(i=0;i<16;i++)
+	{
+		for(j=16;j<32;j++)
+		{
+		colortable_entry_set_value(machine->colortable, k++, i);
+		colortable_entry_set_value(machine->colortable, k++, j);
+		}
 	}
 }
 
@@ -341,7 +365,7 @@ static MACHINE_DRIVER_START( intv )
 	MDRV_SCREEN_SIZE(40*8, 24*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
 	MDRV_GFXDECODE( intv )
-	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_LENGTH(0x400)
 	MDRV_PALETTE_INIT( intv )
 
 	MDRV_VIDEO_START( intv )
@@ -477,6 +501,6 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY      FULLNAME */
-CONS( 1979, intv,		0,		0,		intv,     intv, 	0,			intv,		"Mattel",    "Intellivision", GAME_NOT_WORKING )
-CONS( 1981, intvsrs,	0,		0,		intv,     intv, 	0,			intv,		"Mattel",    "Intellivision (Sears)", GAME_NOT_WORKING )
-COMP( 1981, intvkbd,	0,		0,		intvkbd,  intvkbd, 	0,			intvkbd,	"Mattel",    "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
+CONS( 1979, intv,	0,	0,	intv,     intv, 	0,	intv,		"Mattel",    "Intellivision", GAME_NOT_WORKING )
+CONS( 1981, intvsrs,	0,	0,	intv,     intv, 	0,	intv,		"Mattel",    "Intellivision (Sears)", GAME_NOT_WORKING )
+COMP( 1981, intvkbd,	0,	0,	intvkbd,  intvkbd, 	0,	intvkbd,	"Mattel",    "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
