@@ -288,8 +288,19 @@ static void pc_t1t_mode_switch( void ) {
 		switch( pcjr.bank & 0xc0 ) {
 		case 0x00:
 		case 0x40:
-			//logerror("t1t_gfx_2bpp\n");
+			//logerror("t1t_gfx_2bpp - 1\n");
 			pcjr.update_row = t1000_gfx_2bpp_update_row;
+			if ( pcjr.color_select ) {
+				pcjr.reg.data[0x10] = 0x00;
+				pcjr.reg.data[0x11] = 0x0B;
+				pcjr.reg.data[0x12] = 0x0D;
+				pcjr.reg.data[0x13] = 0x0F;
+			} else {
+				pcjr.reg.data[0x10] = 0x00;
+				pcjr.reg.data[0x11] = 0x0A;
+				pcjr.reg.data[0x12] = 0x0C;
+				pcjr.reg.data[0x13] = 0x0E;
+			}
 			break;
 		case 0x80:
 		case 0xc0:
@@ -308,7 +319,7 @@ static void pc_t1t_mode_switch( void ) {
 			break;
 		case 0x80:
 		case 0xc0:
-			//logerror("t1t_gfx_2bpp\n");
+			//logerror("t1t_gfx_2bpp - 2\n");
 			pcjr.update_row = t1000_gfx_2bpp_update_row;
 			break;
 		}
