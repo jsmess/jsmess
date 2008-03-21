@@ -67,12 +67,12 @@ static const gfx_layout saa5050_lolayout =
 };
 
 static GFXDECODE_START( saa5050 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_charlayout, 0, 128 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_hilayout, 0, 128 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_lolayout, 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_charlayout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_hilayout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_lolayout, 0, 64 )
 GFXDECODE_END
 
-static const UINT8 saa5050_palette[8 * 3] =
+static const UINT8 saa5050_colors[8 * 3] =
 {
 	0x00, 0x00, 0x00,	/* black */
 	0xff, 0x00, 0x00,	/* red */
@@ -84,7 +84,7 @@ static const UINT8 saa5050_palette[8 * 3] =
 	0xff, 0xff, 0xff	/* white */
 };
 
-static const UINT16 saa5050_colortable[64 * 2] =	/* bgnd, fgnd */
+static const UINT16 saa5050_palette[64 * 2] =	/* bgnd, fgnd */
 {
 	0,1, 0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7,
 	1,0, 1,1, 1,2, 1,3, 1,4, 1,5, 1,6, 1,7,
@@ -98,11 +98,18 @@ static const UINT16 saa5050_colortable[64 * 2] =	/* bgnd, fgnd */
 
 static PALETTE_INIT( saa5050 )
 {
-	int i;
+	UINT8 i, r, g, b;
 
-	for ( i = 0; i < sizeof(saa5050_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, saa5050_palette[i*3], saa5050_palette[i*3+1], saa5050_palette[i*3+2]);
+	machine->colortable = colortable_alloc(machine, 8);
+
+	for ( i = 0; i < 8; i++ )
+	{
+		r = saa5050_colors[i*3]; g = saa5050_colors[i*3+1]; b = saa5050_colors[i*3+2];
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
+
+	for(i=0; i<128; i++)
+		colortable_entry_set_value(machine->colortable, i, saa5050_palette[i]);
 }
 
 static VIDEO_START( saa5050 )
@@ -248,7 +255,7 @@ MACHINE_DRIVER_START( vh_saa5050 )
 	MDRV_SCREEN_SIZE(40 * 6, 24 * 10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 6 - 1, 0, 24 * 10 - 1)
 	MDRV_GFXDECODE( saa5050 )
-	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(saa5050)
 
 	MDRV_VIDEO_START(saa5050)

@@ -50,7 +50,7 @@ VIDEO_UPDATE( p2000m )
 		{
 			for (loop = 0; loop < 6; loop++)
 			{
-				*BITMAP_ADDR16(bitmap, sy + 9, sx + loop) = 1;
+				*BITMAP_ADDR16(bitmap, sy + 9, sx + loop) = 0;	/* cursor */
 			}
 		}
 	}

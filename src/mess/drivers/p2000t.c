@@ -78,24 +78,17 @@ static const gfx_layout p2000m_charlayout =
 	8 * 10
 };
 
-static GFXDECODE_START( p2000m )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, p2000m_charlayout, 0, 128 )
-GFXDECODE_END
-
-static const unsigned char p2000m_palette[2 * 3] =
+PALETTE_INIT( p2000m )
 {
-	0x00, 0x00, 0x00,
-	0xff, 0xff, 0xff
-};
-
-static PALETTE_INIT( p2000m )
-{
-	int i;
-
-	for ( i = 0; i < sizeof(p2000m_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, p2000m_palette[i*3], p2000m_palette[i*3+1], p2000m_palette[i*3+2]);
-	}
+	palette_set_color(machine,0,RGB_WHITE); /* white */
+	palette_set_color(machine,1,RGB_BLACK); /* black */
+	palette_set_color(machine,2,RGB_BLACK); /* black */
+	palette_set_color(machine,3,RGB_WHITE); /* white */
 }
+
+static GFXDECODE_START( p2000m )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, p2000m_charlayout, 0, 2 )
+GFXDECODE_END
 
 /* Keyboard input */
 
@@ -234,7 +227,7 @@ static MACHINE_DRIVER_START( p2000m )
 	MDRV_SCREEN_SIZE(80 * 6, 24 * 10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 80 * 6 - 1, 0, 24 * 10 - 1)
 	MDRV_GFXDECODE( p2000m )
-	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(p2000m)
 
 	MDRV_VIDEO_START(p2000m)
@@ -263,7 +256,7 @@ ROM_START(p2000m)
 	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc))
 ROM_END
 
-/*      YEAR    NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY     FULLNAME */
-COMP (	1980,	p2000t,		0,		0,		p2000t,		p2000t,		0,		NULL,	"Philips",	"Philips P2000T" , 0)
-COMP (	1980,	p2000m,		p2000t,	0,		p2000m,		p2000t,		0,		NULL,	"Philips",	"Philips P2000M" , 0)
+/*      YEAR    NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY     FULLNAME */
+COMP (	1980,	p2000t,	0,	0,	p2000t,	p2000t,		0,	NULL,	"Philips",	"Philips P2000T" , 0)
+COMP (	1980,	p2000m,	p2000t,	0,	p2000m,	p2000t,		0,	NULL,	"Philips",	"Philips P2000M" , 0)
 
