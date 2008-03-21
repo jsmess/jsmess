@@ -9,7 +9,7 @@
 
 INLINE void intv_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = color;
+	*BITMAP_ADDR16(bitmap, y, x) = (color<<1)+1;
 }
 
 VIDEO_START( intv )
