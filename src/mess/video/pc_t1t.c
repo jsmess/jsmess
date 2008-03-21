@@ -104,11 +104,9 @@ static VIDEO_START( pc_t1t )
 {
 	pcjr.chr_gen = memory_region(REGION_GFX1);
 	pcjr.update_row = NULL;
-	pcjr.bank = 0x3F;
+	pcjr.bank = 0;
 
-	videoram = &memory_region(REGION_CPU1)[0x80000 + ((pcjr.bank & 0x07) << 14)];
-	videoram_size = 0x20000;
-	pcjr.displayram = &memory_region(REGION_CPU1)[0x80000 + ((pcjr.bank & 0x38) << (14-3))];
+	videoram_size = 0x8000;
 }
 
 
