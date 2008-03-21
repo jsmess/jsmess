@@ -231,8 +231,8 @@ enum
 	pen_crt_max_intensity = pen_crt_num_levels-1,
 
 	/* next colors used for control panel and typewriter */
-	pen_black = 0,
-	pen_white = pen_crt_num_levels,
+	pen_black = pen_crt_num_levels,
+	pen_white,
 	pen_green,
 	pen_dk_green,
 	pen_red,

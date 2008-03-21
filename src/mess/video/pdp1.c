@@ -47,7 +47,7 @@ static void pdp1_draw_lightpen(bitmap_t *bitmap);
 
 INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+	*BITMAP_ADDR16(bitmap, y, x) = color;
 }
 
 /*
@@ -62,7 +62,7 @@ VIDEO_START( pdp1 )
 	/* set up out bitmaps */
 	pdp1_draw_panel_backdrop(machine, panel_bitmap);
 
-	fillbitmap(typewriter_bitmap, machine->pens[pen_typewriter_bg], &typewriter_bitmap_bounds);
+	fillbitmap(typewriter_bitmap, pen_typewriter_bg, &typewriter_bitmap_bounds);
 
 	/* initialize CRT */
 	video_start_crt(pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
@@ -154,7 +154,7 @@ static void pdp1_draw_led(running_machine *machine, bitmap_t *bitmap, int x, int
 
 	for (yy=1; yy<7; yy++)
 		for (xx=1; xx<7; xx++)
-			pdp1_plot_pixel(bitmap, x+xx, y+yy, machine->pens[state ? pen_lit_lamp : pen_unlit_lamp]);
+			pdp1_plot_pixel(bitmap, x+xx, y+yy, state ? pen_lit_lamp : pen_unlit_lamp);
 }
 
 /* draw nb_bits leds which represent nb_bits bits in value */
@@ -180,34 +180,34 @@ static void pdp1_draw_switch(running_machine *machine, bitmap_t *bitmap, int x, 
 	/* erase area */
 	for (yy=0; yy<8; yy++)
 		for (xx=0; xx<8; xx++)
-			pdp1_plot_pixel(bitmap, x+xx, y+yy, machine->pens[pen_panel_bg]);
+			pdp1_plot_pixel(bitmap, x+xx, y+yy, pen_panel_bg);
 
 
 	/* draw nut (-> circle) */
 	for (i=0; i<4;i++)
 	{
-		pdp1_plot_pixel(bitmap, x+2+i, y+1, machine->pens[pen_switch_nut]);
-		pdp1_plot_pixel(bitmap, x+2+i, y+6, machine->pens[pen_switch_nut]);
-		pdp1_plot_pixel(bitmap, x+1, y+2+i, machine->pens[pen_switch_nut]);
-		pdp1_plot_pixel(bitmap, x+6, y+2+i, machine->pens[pen_switch_nut]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+1, pen_switch_nut);
+		pdp1_plot_pixel(bitmap, x+2+i, y+6, pen_switch_nut);
+		pdp1_plot_pixel(bitmap, x+1, y+2+i, pen_switch_nut);
+		pdp1_plot_pixel(bitmap, x+6, y+2+i, pen_switch_nut);
 	}
-	pdp1_plot_pixel(bitmap, x+2, y+2, machine->pens[pen_switch_nut]);
-	pdp1_plot_pixel(bitmap, x+5, y+2, machine->pens[pen_switch_nut]);
-	pdp1_plot_pixel(bitmap, x+2, y+5, machine->pens[pen_switch_nut]);
-	pdp1_plot_pixel(bitmap, x+5, y+5, machine->pens[pen_switch_nut]);
+	pdp1_plot_pixel(bitmap, x+2, y+2, pen_switch_nut);
+	pdp1_plot_pixel(bitmap, x+5, y+2, pen_switch_nut);
+	pdp1_plot_pixel(bitmap, x+2, y+5, pen_switch_nut);
+	pdp1_plot_pixel(bitmap, x+5, y+5, pen_switch_nut);
 
 	/* draw button (->disc) */
 	if (! state)
 		y += 4;
 	for (i=0; i<2;i++)
 	{
-		pdp1_plot_pixel(bitmap, x+3+i, y, machine->pens[pen_switch_button]);
-		pdp1_plot_pixel(bitmap, x+3+i, y+3, machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+3+i, y, pen_switch_button);
+		pdp1_plot_pixel(bitmap, x+3+i, y+3, pen_switch_button);
 	}
 	for (i=0; i<4;i++)
 	{
-		pdp1_plot_pixel(bitmap, x+2+i, y+1, machine->pens[pen_switch_button]);
-		pdp1_plot_pixel(bitmap, x+2+i, y+2, machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+1, pen_switch_button);
+		pdp1_plot_pixel(bitmap, x+2+i, y+2, pen_switch_button);
 	}
 }
 
@@ -252,7 +252,7 @@ static void pdp1_draw_string(running_machine *machine, bitmap_t *bitmap, const c
 static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 {
 	/* fill with black */
-	fillbitmap(panel_bitmap, machine->pens[pen_panel_bg], &panel_bitmap_bounds);
+	fillbitmap(panel_bitmap, pen_panel_bg, &panel_bitmap_bounds);
 
 	/* column 1: registers, test word, test address */
 	pdp1_draw_string(machine, bitmap, "program counter", x_panel_col1_offset, y_panel_pc_offset, color_panel_caption);
@@ -260,7 +260,7 @@ static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 	pdp1_draw_string(machine, bitmap, "memory buffer", x_panel_col1_offset, y_panel_mb_offset, color_panel_caption);
 	pdp1_draw_string(machine, bitmap, "accumulator", x_panel_col1_offset, y_panel_ac_offset, color_panel_caption);
 	pdp1_draw_string(machine, bitmap, "in-out", x_panel_col1_offset, y_panel_io_offset, color_panel_caption);
-	pdp1_draw_string(machine, bitmap, "extend  address", x_panel_col1_offset-8, y_panel_ta_offset, color_panel_caption);
+	pdp1_draw_string(machine, bitmap, "extend address", x_panel_col1_offset, y_panel_ta_offset, color_panel_caption);
 	pdp1_draw_string(machine, bitmap, "test word", x_panel_col1_offset, y_panel_tw_offset, color_panel_caption);
 
 	/* column separator */
@@ -381,7 +381,7 @@ static void pdp1_typewriter_linefeed(running_machine *machine)
 		draw_scanline8(typewriter_bitmap, 0, y, typewriter_window_width, buf, machine->pens, -1);
 	}
 
-	fillbitmap(typewriter_bitmap, machine->pens[pen_typewriter_bg], &typewriter_scroll_clear_window);
+	fillbitmap(typewriter_bitmap, pen_typewriter_bg, &typewriter_scroll_clear_window);
 }
 
 void pdp1_typewriter_drawchar(running_machine *machine, int character)
