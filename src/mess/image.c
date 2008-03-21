@@ -1600,7 +1600,7 @@ mess_image *image_from_device_and_index(const struct IODevice *device, int id)
 	mess_image *image = NULL;
 	const struct IODevice *dev;
 
-	assert(id < dev->count);
+	assert(id < device->count);
 	assert(images);
 
 	indx = 0;
