@@ -213,10 +213,6 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( tx0 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, 0, 3 )
-GFXDECODE_END
-
 
 /*
     The static palette only includes the pens for the control panel and
@@ -244,6 +240,10 @@ static const UINT8 tx0_palette[] =
 };
 
 static UINT8 total_colors_needed = pen_crt_num_levels + sizeof(tx0_colors) / 3;
+
+static GFXDECODE_START( tx0 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, pen_crt_num_levels + sizeof(tx0_colors) / 3, 3 )
+GFXDECODE_END
 
 /* Initialise the palette */
 static PALETTE_INIT( tx0 )
@@ -314,9 +314,9 @@ static PALETTE_INIT( tx0 )
 	for( i = 0; i < total_colors_needed; i++ )
 		colortable_entry_set_value(machine->colortable, i, i);
 
-	/* overwrite unneeded lowest palette entries with text values */
+	/* set up palette for text */
 	for( i = 0; i < 6; i++ )
-		colortable_entry_set_value(machine->colortable, i, tx0_palette[i]);
+		colortable_entry_set_value(machine->colortable, total_colors_needed + i, tx0_palette[i]);
 }
 
 
@@ -358,7 +358,7 @@ static MACHINE_DRIVER_START(tx0_64kw)
 	MDRV_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 
 	MDRV_GFXDECODE(tx0)
-	MDRV_PALETTE_LENGTH(pen_crt_num_levels + sizeof(tx0_colors) / 3)
+	MDRV_PALETTE_LENGTH(pen_crt_num_levels + sizeof(tx0_colors) / 3 + sizeof(tx0_palette))
 
 	MDRV_PALETTE_INIT(tx0)
 	MDRV_VIDEO_START(tx0)

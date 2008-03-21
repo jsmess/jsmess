@@ -137,9 +137,6 @@ static DRIVER_INIT( pdp1 )
 		0x00,0x68,0xb0,0x00,0x00,0x00,0x00,0x00,0x20,0x50,0x20,0x50,0xa8,0x50,0x00,0x00,
 	};
 
-	/* set up memory regions */
-//	pdp1_memory = (UINT32 *) memory_region(REGION_CPU1);
-
 	/* set up our font */
 	dst = memory_region(REGION_GFX1);
 
@@ -346,10 +343,6 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( pdp1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, 0, 3 )
-GFXDECODE_END
-
 
 /*
     The static palette only includes the pens for the control panel and
@@ -377,6 +370,10 @@ static const UINT8 pdp1_palette[] =
 };
 
 static UINT8 total_colors_needed = pen_crt_num_levels + sizeof(pdp1_colors) / 3;
+
+static GFXDECODE_START( pdp1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, pen_crt_num_levels + sizeof(pdp1_colors) / 3, 3 )
+GFXDECODE_END
 
 /* Initialise the palette */
 static PALETTE_INIT( pdp1 )
@@ -427,9 +424,9 @@ static PALETTE_INIT( pdp1 )
 	for( i = 0; i < total_colors_needed; i++ )
 		colortable_entry_set_value(machine->colortable, i, i);
 
-	/* overwrite unneeded lowest palette entries with text values */
+	/* set up palette for text */
 	for( i = 0; i < 6; i++ )
-		colortable_entry_set_value(machine->colortable, i, pdp1_palette[i]);
+		colortable_entry_set_value(machine->colortable, total_colors_needed + i, pdp1_palette[i]);
 }
 
 
@@ -489,7 +486,7 @@ static MACHINE_DRIVER_START(pdp1)
 	MDRV_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 
 	MDRV_GFXDECODE(pdp1)
-	MDRV_PALETTE_LENGTH(pen_crt_num_levels + sizeof(pdp1_colors) / 3)
+	MDRV_PALETTE_LENGTH(pen_crt_num_levels + sizeof(pdp1_colors) / 3 + sizeof(pdp1_palette))
 
 	MDRV_PALETTE_INIT(pdp1)
 	MDRV_VIDEO_START(pdp1)
