@@ -15,6 +15,28 @@
     F0000-FDFFF   NOP       or ROM Basic + other Extensions
     FE000-FFFFF   ROM
 
+
+Tandy 1000 (8086/8088) variations:
+1000				128KB-640KB RAM		4.77 MHz		v01.00.00, v01.01.00
+1000A/1000HD		128KB-640KB RAM		4.77 MHz		v01.01.00
+1000SX/1000AX		384KB-640KB RAM		7.16/4.77 MHz	v01.02.00
+1000EX				256KB-640KB RAM		7.16/4.77 MHz	v01.02.00
+1000HX				256KB-640KB RAM		7.16/4.77 MHz	v02.00.00
+1000SL/1000PC		384KB-640KB RAM		8.0/4.77 MHz	v01.04.00, v01.04.01, v01.04.02, v02.00.01
+1000SL/2			512KB-640KB RAM		8.0/4.77 MHz	v01.04.04
+1000RL/1000RL-HD	512KB-768KB RAM		9.44/4.77 MHz	v02.00.00, v02.00.01
+
+Tandy 1000 (80286) variations:
+1000TX				640KB-768KB RAM		8.0/4.77 MHz	v01.03.00
+1000TL				640KB-768KB RAM		8.0/4.77 MHz	v01.04.00, v01.04.01, v01.04.02
+1000TL/2			640KB-768KB RAM		8.0/4.77 MHz	v02.00.00
+1000TL/3			640KB-768KB RAM		10.0/5.0 MHz	v02.00.00
+1000RLX				512KB-1024KB RAM	10.0/5.0 MHz	v02.00.00
+1000RLX-HD			1024MB RAM			10.0/5.0 MHz	v02.00.00
+
+Tandy 1000 (80386) variations:
+1000RSX/1000RSX-HD	1M-9M RAM			25.0/8.0 MHz	v01.10.00
+
 ***************************************************************************/
 
 
@@ -236,7 +258,7 @@ static ADDRESS_MAP_START(tandy1000_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK(10)
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
-	AM_RANGE(0xb8000, 0xbffff) AM_READWRITE(pc_t1t_videoram_r, pc_video_videoram_w) AM_SIZE(&videoram_size)
+	AM_RANGE(0xb8000, 0xbffff) AM_READWRITE(pc_t1t_videoram_r, pc_video_videoram_w)
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
@@ -1402,10 +1424,7 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_MACHINE_RESET(pc_t1t)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_t1000hx )
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_IMPORT_FROM( pcvideo_t1000 )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1418,10 +1437,6 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_NVRAM_HANDLER( tandy1000 )
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( t1000sx )
-	MDRV_IMPORT_FROM( t1000hx )
-	MDRV_IMPORT_FROM( pcvideo_t1000sx )
-MACHINE_DRIVER_END
 
 #if 0
 	//pcjr roms? (incomplete dump, most likely 64 kbyte)
@@ -1552,12 +1567,77 @@ ROM_START( ibmpcjr )
     ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END
 
+ROM_START( t1000 )
+	ROM_REGION(0x100000,REGION_CPU1, 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
+	// partlist says it has 1 128kbyte rom
+	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
+	ROM_SYSTEM_BIOS( 0, "v010000", "v010000" )
+	ROMX_LOAD("v010000.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "v010100", "v010100" )
+	ROMX_LOAD("v010100.f0", 0xf0000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9), ROM_BIOS(2))
+	ROM_REGION(0x08000,REGION_GFX1, 0)
+	// expects 8x9 charset!
+	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+ROM_END
+
+ROM_START( t1000a )
+	ROM_REGION(0x100000,REGION_CPU1, 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
+	// partlist says it has 1 128kbyte rom
+	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
+	ROM_LOAD("v010100.f0", 0xf0000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9))
+	ROM_REGION(0x08000,REGION_GFX1, 0)
+	// expects 8x9 charset!
+	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+ROM_END
+
+ROM_START( t1000ex )
+	ROM_REGION(0x100000,REGION_CPU1, 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
+	// partlist says it has 1 128kbyte rom
+	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
+	ROM_LOAD("v010200.f0", 0xf0000, 0x10000, CRC(0e016ecf) SHA1(2f5ac8921b7cba56b02122ef772f5f11bbf6d8a2))
+	ROM_REGION(0x08000,REGION_GFX1, 0)
+	// expects 8x9 charset!
+	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+ROM_END
+
 ROM_START( t1000hx )
 	ROM_REGION(0x100000,REGION_CPU1, 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))
-	ROM_LOAD("tandy1t.rom", 0xf0000, 0x10000, CRC(d37a1d5f) SHA1(5ec031c31a7967cc3fd53a535d81833e4a1c385e))
+	ROM_LOAD("v020000.f0", 0xf0000, 0x10000, CRC(d37a1d5f) SHA1(5ec031c31a7967cc3fd53a535d81833e4a1c385e))
+	ROM_REGION(0x08000,REGION_GFX1, 0)
+	// expects 8x9 charset!
+	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+ROM_END
+
+ROM_START( t1000sl )
+	ROM_REGION(0x100000,REGION_CPU1, 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
+	// partlist says it has 1 128kbyte rom
+	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
+	ROM_SYSTEM_BIOS( 0, "v010400", "v010400" )
+	ROMX_LOAD("v010400.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v010401", "v010401" )
+	ROMX_LOAD("v010401.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "v010402", "v010402" )
+	ROMX_LOAD("v010402.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "v020001", "v020001" )
+	ROMX_LOAD("v020001.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(4) )
+	ROM_REGION(0x08000,REGION_GFX1, 0)
+	// expects 8x9 charset!
+	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+ROM_END
+
+ROM_START( t1000sl2 )
+	ROM_REGION(0x100000,REGION_CPU1, 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
+	// partlist says it has 1 128kbyte rom
+	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
+	ROM_LOAD("v010404.f0", 0xf0000, 0x10000, NO_DUMP )
 	ROM_REGION(0x08000,REGION_GFX1, 0)
 	// expects 8x9 charset!
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
@@ -1565,10 +1645,24 @@ ROM_END
 
 ROM_START( t1000sx )
 	ROM_REGION(0x100000,REGION_CPU1, 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
 	// partlist says it has 1 128kbyte rom
-	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))
-	ROM_LOAD("t1000sx.f0", 0xf0000, 0x10000, CRC(0e016ecf) SHA1(2f5ac8921b7cba56b02122ef772f5f11bbf6d8a2))
+	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
+	ROM_LOAD("v010200.f0", 0xf0000, 0x10000, CRC(0e016ecf) SHA1(2f5ac8921b7cba56b02122ef772f5f11bbf6d8a2))
+	ROM_REGION(0x08000,REGION_GFX1, 0)
+	// expects 8x9 charset!
+	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+ROM_END
+
+ROM_START( t1000rl )
+	ROM_REGION(0x100000,REGION_CPU1, 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
+	// partlist says it has 1 128kbyte rom
+	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
+	ROM_SYSTEM_BIOS( 0, "v020000", "v020000" )
+	ROMX_LOAD("v020000.f0", 0xf0000, 0x10000, CRC(d37a1d5f) SHA1(5ec031c31a7967cc3fd53a535d81833e4a1c385e), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v020001", "v020001" )
+	ROMX_LOAD("v020001.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(2) )
 	ROM_REGION(0x08000,REGION_GFX1, 0)
 	// expects 8x9 charset!
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
@@ -1735,7 +1829,7 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
-COMP(  1982,	ibmpc,		0,		0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 10/27/82" , 0)
+COMP(  1981,	ibmpc,		0,		0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 5150" , 0)
 COMP(  1982,	ibmpca,		ibmpc,	0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 08/16/82" , 0)
 COMP(  1984,	dgone,		ibmpc,		0,		pccga,      pccga,	    pccga,	    ibmpc,   "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
 COMP(  1987,	pc,		ibmpc,	0,		pccga,      pccga,		pccga,	    ibmpc,   "",  "PC (CGA)" , 0)
@@ -1745,7 +1839,7 @@ COMP(  1988,	europc,		ibmpc,	0,		europc,     europc,		europc,     ibmpc,   "Schn
 // pcjr (better graphics, better sound)
 COMP( 1983,	ibmpcjr,	ibmpc,	0,		t1000hx,    tandy1t,	t1000hx,    ibmpc,   "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
 COMP(  1987,	t1000hx,	ibmpc,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000HX", 0)
-COMP(  1987,	t1000sx,	ibmpc,	0,		t1000sx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
+COMP(  1987,	t1000sx,	ibmpc,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
 
 // xt class (pc but 8086)
 COMP(  1986,	ibmxt,		ibmpc,	0,		xtcga,      xtcga,		pccga,		ibmpc,   "International Business Machines",  "IBM PC/XT (CGA)" , 0)

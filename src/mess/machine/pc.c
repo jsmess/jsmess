@@ -238,7 +238,6 @@ MACHINE_RESET( pc_cga )
 
 MACHINE_RESET( pc_t1t )
 {
-	pc_t1t_reset();
 	dma8237_reset();
 	cpunum_set_irq_callback(0, pc_irq_callback);
 }
@@ -270,7 +269,7 @@ static void pc_generic_frame_interrupt(void (*pc_timer)(void))
 
 INTERRUPT_GEN( pc_mda_frame_interrupt )
 {
-	pc_generic_frame_interrupt(pc_mda_timer);
+	pc_generic_frame_interrupt(NULL);
 }
 
 INTERRUPT_GEN( pc_cga_frame_interrupt )
@@ -280,7 +279,7 @@ INTERRUPT_GEN( pc_cga_frame_interrupt )
 
 INTERRUPT_GEN( tandy1000_frame_interrupt )
 {
-	pc_generic_frame_interrupt(pc_t1t_timer);
+	pc_generic_frame_interrupt(NULL);
 }
 
 INTERRUPT_GEN( pc_aga_frame_interrupt )
