@@ -284,28 +284,33 @@ const struct IODevice *devices_allocate(const game_driver *gamedrv)
 			createimage_optcount = (int) mess_device_get_info_int(&devices[i].devclass, MESS_DEVINFO_INT_CREATE_OPTCOUNT);
 			if (createimage_optcount > 0)
 			{
+				struct CreateImageOptions *createimage_options;
+
 				if (createimage_optcount > MESS_DEVINFO_CREATE_OPTMAX)
 					fatalerror("MESS_DEVINFO_INT_CREATE_OPTCOUNT: Too many options");
 
-				devices[i].createimage_options = pool_malloc(pool, (createimage_optcount + 1) *
-					sizeof(*devices[i].createimage_options));
-				if (!devices[i].createimage_options)
+				/* allocate the options */
+				createimage_options = pool_malloc(pool, (createimage_optcount + 1) * sizeof(*createimage_options));
+				if (!createimage_options)
 					goto error;
 
+				/* set up each option in the list */
 				for (j = 0; j < createimage_optcount; j++)
 				{
 					info_string = mess_device_get_info_string(&devices[i].devclass, MESS_DEVINFO_STR_CREATE_OPTNAME + j);
-					devices[i].createimage_options[j].name			= info_string ? pool_strdup(pool, info_string) : NULL;
+					createimage_options[j].name			= info_string ? pool_strdup(pool, info_string) : NULL;
 					info_string = mess_device_get_info_string(&devices[i].devclass, MESS_DEVINFO_STR_CREATE_OPTDESC + j);
-					devices[i].createimage_options[j].description	= info_string ? pool_strdup(pool, info_string) : NULL;
+					createimage_options[j].description	= info_string ? pool_strdup(pool, info_string) : NULL;
 					info_string = mess_device_get_info_string(&devices[i].devclass, MESS_DEVINFO_STR_CREATE_OPTEXTS + j);
-					devices[i].createimage_options[j].extensions	= info_string ? pool_strdup(pool, info_string) : NULL;
-					devices[i].createimage_options[j].optspec		= mess_device_get_info_ptr(&devices[i].devclass, MESS_DEVINFO_PTR_CREATE_OPTSPEC + j);
+					createimage_options[j].extensions	= info_string ? pool_strdup(pool, info_string) : NULL;
+					createimage_options[j].optspec		= mess_device_get_info_ptr(&devices[i].devclass, MESS_DEVINFO_PTR_CREATE_OPTSPEC + j);
 				}
 
 				/* terminate the list */
-				memset(&devices[i].createimage_options[createimage_optcount], 0,
-					sizeof(devices[i].createimage_options[createimage_optcount]));
+				memset(&createimage_options[createimage_optcount], 0, sizeof(createimage_options[createimage_optcount]));
+
+				/* place this list in the structure */
+				devices[i].createimage_options = createimage_options;
 			}
 
 			position += devices[i].count;

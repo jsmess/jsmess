@@ -265,7 +265,7 @@ struct IODevice
 
 	/* image creation options */
 	const struct OptionGuide *createimage_optguide;
-	struct CreateImageOptions *createimage_options;
+	const struct CreateImageOptions *createimage_options;
 };
 
 
