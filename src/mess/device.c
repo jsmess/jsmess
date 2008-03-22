@@ -361,17 +361,23 @@ void devices_free(const struct IODevice *devices)
  *
  *************************************/
 
+static const struct IODevice *filter_device_array_termination(const struct IODevice *dev)
+{
+	return (dev->type < IO_COUNT) ? dev : NULL;
+}
+
+
+
 const struct IODevice *mess_device_first_from_machine(const running_machine *machine)
 {
-	return machine->devices;
+	return filter_device_array_termination(machine->devices);
 }
 
 
 
 const struct IODevice *mess_device_next(const struct IODevice *dev)
 {
-	dev++;
-	return (dev->type < IO_COUNT) ? dev : NULL;
+	return filter_device_array_termination(dev + 1);
 }
 
 
