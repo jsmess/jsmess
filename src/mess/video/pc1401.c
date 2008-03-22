@@ -138,11 +138,11 @@ VIDEO_UPDATE( pc1401 )
 	int x, y, i, j;
 	int color[2];
 
-	bitmap_fill(bitmap, cliprect, 5);
+	bitmap_fill(bitmap, cliprect, 11);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
-    color[0] = screen->machine->pens[pocketc_colortable[CONTRAST][0]];
-	color[1] = screen->machine->pens[pocketc_colortable[CONTRAST][1]];
+	color[0] = pocketc_colortable[CONTRAST][0];
+	color[1] = pocketc_colortable[CONTRAST][1];
 
     if (pc1401_portc&1) {
 		for (x=RIGHT,y=DOWN,i=0; i<0x28;x+=2) {

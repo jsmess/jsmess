@@ -58,6 +58,7 @@ VIDEO_START( pocketc )
 
 void pocketc_draw_special(bitmap_t *bitmap, int x, int y, const POCKETC_FIGURE fig, int color)
 {
+	UINT8 color_pen[] = { 8,8,8,8,7,7,7,7 };
 	int i,j;
 	for (i=0; fig[i]; i++, y++)
 	{
@@ -66,7 +67,7 @@ void pocketc_draw_special(bitmap_t *bitmap, int x, int y, const POCKETC_FIGURE f
 			switch(fig[i][j])
 			{
 			case '1':
-				*BITMAP_ADDR16(bitmap, y, x+j) = color<<2;
+				*BITMAP_ADDR16(bitmap, y, x+j) = color_pen[color];
 				break;
 			case 'e':
 				return;

@@ -135,11 +135,11 @@ VIDEO_UPDATE( pc1350 )
 	int x, y, i, j, k, b;
 	int color[2];
 
-	bitmap_fill(bitmap, cliprect, 5);
+	bitmap_fill(bitmap, cliprect, 11);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
-    color[0] = screen->machine->pens[pocketc_colortable[PC1350_CONTRAST][0]];
-	color[1] = screen->machine->pens[pocketc_colortable[PC1350_CONTRAST][1]];
+	color[0] = pocketc_colortable[PC1350_CONTRAST][0];
+	color[1] = pocketc_colortable[PC1350_CONTRAST][1];
 
 	for (k=0, y=DOWN; k<4; y+=16,k++)
 	{
@@ -149,8 +149,7 @@ VIDEO_UPDATE( pc1350 )
 			{
 				for (b = 0; b < 8; b++)
 				{
-					plot_box(bitmap, x, y + b * 2, 2, 2,
-						color[(pc1350_lcd.reg[j+i] >> b) & 1]);
+					plot_box(bitmap, x, y + b * 2, 2, 2, color[(pc1350_lcd.reg[j+i] >> b) & 1]<<3);
 				}
 			}
 		}
