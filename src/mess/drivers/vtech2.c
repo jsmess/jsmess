@@ -410,7 +410,7 @@ static GFXDECODE_START( vtech2 )
 GFXDECODE_END
 
 
-static const rgb_t vt_palette[] =
+static const rgb_t vt_colors[] =
 {
 	RGB_BLACK,
 	MAKE_RGB(0x00, 0x00, 0x7f),  /* blue */
@@ -434,7 +434,21 @@ static const rgb_t vt_palette[] =
 /* Initialise the palette */
 static PALETTE_INIT( vtech2 )
 {
-	palette_set_colors(machine, 0, vt_palette, ARRAY_LENGTH(vt_palette));
+	int i;
+
+	machine->colortable = colortable_alloc(machine, 16);
+
+	for ( i = 0; i < 16; i++ )
+		colortable_palette_set_color(machine->colortable, i, vt_colors[i]);
+
+	for (i = 0; i < 256; i++)
+	{
+		colortable_entry_set_value(machine->colortable, 2*i, i&15);
+		colortable_entry_set_value(machine->colortable, 2*i+1, i>>4);
+	}
+
+	for (i = 0; i < 16; i++)
+		colortable_entry_set_value(machine->colortable, 512+i, i);
 }
 
 static INTERRUPT_GEN( vtech2_interrupt )
@@ -460,7 +474,7 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_SCREEN_SIZE(88*8, 24*8+32)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 88*8-1, 0*8, 24*8+32-1)
 	MDRV_GFXDECODE( vtech2 )
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(vt_palette))
+	MDRV_PALETTE_LENGTH(528)
 	MDRV_PALETTE_INIT(vtech2)
 
 	MDRV_VIDEO_START(laser)
