@@ -16,11 +16,9 @@
 
 
 
-/*************************************
- *
- *	Names and shortnames
- *
- *************************************/
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 struct Devices
 {
@@ -28,6 +26,21 @@ struct Devices
 	const char *name;
 	const char *shortname;
 };
+
+
+
+typedef struct _device_list device_list;
+struct _device_list
+{
+	object_pool *pool;
+	struct IODevice devices[1];
+};
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
 
 /* The List of Devices, with Associated Names - Be careful to ensure that   *
  * this list matches the ENUM from device.h, so searches can use IO_COUNT	*/
@@ -49,14 +62,11 @@ static const struct Devices device_info_array[] =
 	{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
 };
 
-typedef struct _device_list device_list;
-struct _device_list
-{
-	object_pool *pool;
-	struct IODevice devices[1];
-};
 
 
+/***************************************************************************
+    CORE IMPLEMENTATION
+***************************************************************************/
 
 const char *device_typename(iodevice_t type)
 {
