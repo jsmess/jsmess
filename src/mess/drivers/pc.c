@@ -1185,18 +1185,7 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_MACHINE_RESET(pc_mda)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*9, 25*14)
-	MDRV_SCREEN_VISIBLE_AREA(0,80*9-1, 0,25*14-1)
-	MDRV_GFXDECODE(pc_mda)
-	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / sizeof(cga_palette[0]))
-	MDRV_PALETTE_INIT(pc_mda)
-
-	MDRV_VIDEO_START(pc_mda)
-	MDRV_VIDEO_UPDATE(pc_video)
+	MDRV_IMPORT_FROM( pcvideo_mda )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1216,6 +1205,36 @@ static MACHINE_DRIVER_START( pcmda )
 #endif
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( pcherc )
+	/* basic machine hardware */
+	MDRV_CPU_ADD_TAG("main", V20, 4772720)
+	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
+	MDRV_CPU_IO_MAP(pc8_io, 0)
+	MDRV_CPU_VBLANK_INT_HACK(pc_mda_frame_interrupt, 4)
+
+	MDRV_MACHINE_RESET(pc_mda)
+
+	/* video hardware */
+	MDRV_IMPORT_FROM( pcvideo_hercules )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#ifdef ADLIB
+	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
+	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#endif
+#ifdef GAMEBLASTER
+	MDRV_SOUND_ADD(SAA1099, 4772720)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ADD(SAA1099, 4772720)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+#endif
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pccga )
 	/* basic machine hardware */
@@ -1537,6 +1556,15 @@ ROM_START( pcmda )
     ROM_LOAD("mda.rom",     0x00000, 0x02000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) // taken from original IBM MDA
 ROM_END
 
+ROM_START( pcherc )
+	ROM_REGION(0x100000,REGION_CPU1, 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
+	ROM_REGION(0x1000,REGION_GFX1, 0)
+	ROM_LOAD("um2301.bin",  0x00000, 0x1000, CRC(0827bdac) SHA1(15f1aceeee8b31f0d860ff420643e3c7f29b5ffc))
+ROM_END
+
+
 ROM_START( pc )
     ROM_REGION(0x100000,REGION_CPU1, 0)
     ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
@@ -1852,5 +1880,6 @@ COMP(  198?,	pc1512v2,	ibmpc,	0,		pc1512,     pc1512,		pc1512,		ibmpc,   "Amstra
 COMP( 1987,	pc1640,		ibmpc,	0,		pc1640,     pc1640,		pc1640,		ibmpc,   "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
 COMP ( 1987,	pcmda,		ibmpc,	0,		pcmda,      pcmda,		pcmda,	    ibmpc,   "",  "PC (MDA)" , 0)
+COMP ( 1987,    pcherc,     ibmpc,  0,      pcherc,     pcmda,      pcmda,      ibmpc,   "MESS",  "PC (Hercules)" , 0)
 COMP ( 1987,	xtvga,		ibmpc,	0,		xtvga,      xtvga,		pc_vga,     ibmpc,   "",  "PC/XT (VGA, MF2 Keyboard)" , 0)
 
