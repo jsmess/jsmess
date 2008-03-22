@@ -648,7 +648,7 @@ int filemanager(int selected)
 	total = 0;
 
 	/* Cycle through all devices for this system */
-	for (dev = Machine->devices; dev->type < IO_COUNT; dev++)
+	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
 	{
 		for (id = 0; id < dev->count; id++)
 		{

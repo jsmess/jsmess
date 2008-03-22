@@ -452,10 +452,8 @@ const struct IODevice *device_find_from_machine(const running_machine *machine, 
 /* this function is deprecated */
 int device_count(iodevice_t type)
 {
-	const struct IODevice *dev = NULL;
-	if (Machine->devices)
-		dev = device_find(Machine->devices, type);
-	return dev ? dev->count : 0;
+	const struct IODevice *iodev = device_find_from_machine(Machine, type);
+	return (iodev != NULL) ? iodev->count : 0;
 }
 
 
