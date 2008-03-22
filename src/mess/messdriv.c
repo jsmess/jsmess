@@ -371,7 +371,8 @@ TESTDRIVER( c128dita )	/* Commodore 128D - PAL (italian) cost reduced set	*/
 	DRIVER( ibmpc )		/* 1982	IBM PC										*/
 	DRIVER( ibmpca )	/* 1982 IBM PC										*/
 	DRIVER( dgone )		/* 1984 Data General/One */
-	DRIVER( pcmda )		/* 1987 PC with MDA (MGA aka Hercules)				*/
+	DRIVER( pcmda )		/* 1987 PC with MDA									*/
+	DRIVER( pcherc )    /* 1987 PC with Hercules (for testing hercules)		*/
 	DRIVER( pc )		/* 1987 PC with CGA									*/
 TESTDRIVER( bondwell )	/* 1985	Bondwell (CGA)								*/
 	DRIVER( europc )	/* 1988	Schneider Euro PC (CGA or Hercules)			*/
