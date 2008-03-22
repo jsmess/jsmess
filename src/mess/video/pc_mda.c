@@ -11,6 +11,8 @@
 
 #define VERBOSE_MDA	0		/* MDA (Monochrome Display Adapter) */
 
+#define MDA_CLOCK	16257000
+
 #define MDA_LOG(N,M,A) \
 	if(VERBOSE_MDA>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 
@@ -54,7 +56,7 @@ static MC6845_ON_VSYNC_CHANGED( mda_vsync_changed );
 
 static const mc6845_interface mc6845_mda_intf = {
 	MDA_SCREEN_NAME,	/* screen number */
-	16257000/9 /*?*/,	/* clock */
+	MDA_CLOCK/9 /*?*/,	/* clock */
 	9,					/* number of pixels per video memory address */
 	NULL,				/* begin_update */
 	mda_update_row,		/* update_row */
@@ -67,7 +69,7 @@ static const mc6845_interface mc6845_mda_intf = {
 MACHINE_DRIVER_START( pcvideo_mda )
 	MDRV_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(16257000, 882, 0, 720, 370, 0, 350 )
+	MDRV_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MDRV_PALETTE_LENGTH( sizeof(mda_palette) / 3 )
 
 	MDRV_PALETTE_INIT(pc_mda)
@@ -376,9 +378,9 @@ allow this.
 The divder/pixels per 6845 clock is 9 for text mode and 16 for graphics mode.
 */
 
-static const mc6845_interface mc6845_hercules_intf = {
+static mc6845_interface mc6845_hercules_intf = {
 	HERCULES_SCREEN_NAME,	/* screen number */
-	16257000/9 /*?*/,		/* clock */
+	MDA_CLOCK/9 /*?*/,		/* clock */
 	9,						/* number of pixels per video memory address */
 	NULL,					/* begin_update */
 	mda_update_row,			/* update_row */
@@ -391,7 +393,7 @@ static const mc6845_interface mc6845_hercules_intf = {
 MACHINE_DRIVER_START( pcvideo_hercules )
 	MDRV_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(16257000, 882, 0, 720, 370, 0, 350 )
+	MDRV_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MDRV_PALETTE_LENGTH( sizeof(mda_palette) / 3 )
 
 	MDRV_PALETTE_INIT(pc_mda)
@@ -478,7 +480,9 @@ static VIDEO_UPDATE( mc6845_hercules ) {
 }
 
 
-static void hercules_mode_control_w(int data) {
+static void hercules_mode_control_w(running_machine *machine, int data) {
+	device_config	*devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, HERCULES_MC6845_NAME);
+
 	MDA_LOG(1,"hercules_mode_control_w",("$%02x: colums %d, gfx %d, enable %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
 	mda.mode_control = data;
@@ -497,6 +501,9 @@ static void hercules_mode_control_w(int data) {
 	default:
 		mda.update_row = NULL;
 	}
+
+	mc6845_hercules_intf.hpixels_per_column = mda.mode_control & 0x02 ? 16 : 9;
+	mc6845_set_clock( devconf, mda.mode_control & 0x02 ? MDA_CLOCK / 16 : MDA_CLOCK / 9 );
 }
 
 
@@ -518,7 +525,7 @@ static WRITE8_HANDLER ( pc_hercules_w ) {
 		mc6845_register_w( devconf, offset, data );
 		break;
 	case 8:
-		hercules_mode_control_w(data);
+		hercules_mode_control_w(machine, data);
 		break;
 	case 15:
 		hercules_config_w(data);
