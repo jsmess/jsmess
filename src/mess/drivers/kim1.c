@@ -154,7 +154,7 @@ static const gfx_layout key_layout =
 
 static GFXDECODE_START( kim1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, led_layout, 0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, key_layout, 16*2, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, key_layout, 34, 2 )
 GFXDECODE_END
 
 
@@ -175,7 +175,7 @@ static MACHINE_DRIVER_START( kim1 )
 	MDRV_SCREEN_SIZE(600, 768)
 	MDRV_SCREEN_VISIBLE_AREA(0, 600 - 1, 0, 768 - 1)
 	MDRV_GFXDECODE( kim1 )
-	MDRV_PALETTE_LENGTH(32768+21)
+	MDRV_PALETTE_LENGTH(40)
 	MDRV_PALETTE_INIT( kim1 )
 
 	MDRV_VIDEO_START( kim1 )
@@ -195,7 +195,7 @@ ROM_START(kim1)
 		ROM_LOAD("6530-002.bin",    0x1c00, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
 	ROM_REGION(128 * 24 * 3,REGION_GFX1,ROMREGION_ERASEFF)
 		/* space filled with 7segement graphics by kim1_init_driver */
-	ROM_REGION( 24 * 18 * 3 * 2,REGION_GFX2,ROMREGION_ERASEFF)
+	ROM_REGION( 24 * 18 * 3 * 2,REGION_GFX2, ROMREGION_ERASEFF)
 		/* space filled with key icons by kim1_init_driver */
 ROM_END
 

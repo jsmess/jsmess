@@ -567,8 +567,8 @@ DRIVER_INIT( kim1 )
 		}
 	}
 
-	dst = memory_region(2);
-	memset(dst, 0, 24 * 18 * 24 / 8);
+	dst = memory_region(REGION_GFX2);
+	memset(dst, 0, memory_region_length(REGION_GFX2));
 	for (i = 0; i < 24; i++)
 	{
 		for (y = 0; y < 18; y++)
