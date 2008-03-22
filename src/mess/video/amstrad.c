@@ -8,6 +8,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "devices/snapquik.h"
 #include "includes/amstrad.h"
 
@@ -978,7 +979,7 @@ DMA commands
 static void amstrad_plus_dma_parse(int channel, int *addr)
 {
 	unsigned short command;
-	running_machine *machine = machine;
+	running_machine *machine = Machine;
 
 	if(*addr & 0x01)
 		(*addr)++;  // align to even address
@@ -1134,7 +1135,7 @@ static void amstrad_Set_DE(int offset, int data)
 /* CRTC - Set new Horizontal Sync Status */
 static void amstrad_Set_HS(int offset, int data)
 {
-	running_machine *machine = machine;
+	running_machine *machine = Machine;
 
 	if (data != 0)
 	{
