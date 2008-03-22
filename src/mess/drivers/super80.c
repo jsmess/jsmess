@@ -169,7 +169,7 @@ static void mc6845_cursor_configure(void)
 		2 = full cursor
 		3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
-	for ( i = 0; i < 16; i++) mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
+	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++) mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
 
 	r9  = mc6845[9];					// number of scan lines - 1
 	r10 = mc6845[10] & 0x1f;				// cursor start line = last 5 bits
@@ -186,7 +186,7 @@ static void mc6845_cursor_configure(void)
 	if (r11 > 16) r11=16;					// truncate 5-bit register to fit our 4-bit hardware
 
 	/* create the new cursor */
-	if (curs_type > 1) for (i = 0;i < 16;i++) mc6845_cursor[i]=0xff; // turn on full cursor
+	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(mc6845_cursor);i++) mc6845_cursor[i]=0xff; // turn on full cursor
 
 	if (curs_type == 1) for (i = r10;i < r11;i++) mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
 		
