@@ -130,15 +130,15 @@ static struct {
 
 static READ8_HANDLER ( pc_aga_mda_r )
 {
-	if (aga.mode==AGA_MONO)
-		return pc_MDA_r(machine, offset);
+//	if (aga.mode==AGA_MONO)
+//		return pc_MDA_r(machine, offset);
 	return 0xff;
 }
 
 static WRITE8_HANDLER ( pc_aga_mda_w )
 {
-	if (aga.mode==AGA_MONO)
-		pc_MDA_w(machine, offset, data);
+//	if (aga.mode==AGA_MONO)
+//		pc_MDA_w(machine, offset, data);
 }
 
 static READ8_HANDLER ( pc_aga_cga_r )
@@ -183,7 +183,7 @@ extern void pc_aga_timer(void)
 {
 	switch (aga.mode) {
 	case AGA_COLOR: ;break;
-	case AGA_MONO: pc_mda_timer();break;
+	case AGA_MONO: /*pc_mda_timer();*/ break;
 	case AGA_OFF: break;
 	}
 }
@@ -196,7 +196,7 @@ static void pc_aga_cursor(struct mscrtc6845_cursor *cursor)
 		break;
 
 	case AGA_MONO:
-		pc_mda_cursor(cursor);
+//		pc_mda_cursor(cursor);
 		break;
 
 	case AGA_OFF:
@@ -211,7 +211,7 @@ VIDEO_START( pc_aga )
 {
 	int buswidth;
 
-	pc_mda_europc_init();
+//	pc_mda_europc_init();
 
 	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
@@ -277,7 +277,7 @@ static pc_video_update_proc pc_aga_choosevideomode(int *width, int *height, stru
 		proc =  pc_cga_choosevideomode(width, height, crtc);
 		break;
 	case AGA_MONO:
-		proc =  pc_mda_choosevideomode(width, height, crtc);
+//		proc =  pc_mda_choosevideomode(width, height, crtc);
 		break;
 	case AGA_OFF:
 		break;
