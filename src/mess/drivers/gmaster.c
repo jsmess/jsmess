@@ -10,6 +10,7 @@
 
 #include "includes/gmaster.h"
 
+#define MAIN_XTAL 	12000000
 
 static struct {
     UINT8 data[8];
@@ -205,7 +206,7 @@ static INTERRUPT_GEN( gmaster_interrupt )
 }
 
 static UPD7810_CONFIG config={
-  //    TYPE_7810,
+  //    TYPE_78C10, // 78c11 in handheld
     TYPE_7801, // temporarily until 7810 core fixes synchronized
     gmaster_io_callback
 };
@@ -216,7 +217,7 @@ static const struct CustomSound_interface gmaster_sound_interface =
 };
 
 static MACHINE_DRIVER_START( gmaster )
-     MDRV_CPU_ADD_TAG("main", UPD7810, 5000000)
+     MDRV_CPU_ADD_TAG("main", UPD7810, MAIN_XTAL/2/*?*/)
 MDRV_CPU_PROGRAM_MAP(gmaster_mem, 0)
 MDRV_CPU_IO_MAP( gmaster_io, 0 )
 MDRV_CPU_CONFIG( config )
