@@ -78,17 +78,14 @@ void mess_ui_update(running_machine *machine)
 	}
 
 	/* run display routine for device */
-	if (machine->devices)
+	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		for (dev = machine->devices; dev->type < IO_COUNT; dev++)
+		if (dev->display != NULL)
 		{
-			if (dev->display)
+			for (id = 0; id < device_count(dev->type); id++)
 			{
-				for (id = 0; id < device_count(dev->type); id++)
-				{
-					mess_image *img = image_from_devtype_and_index(dev->type, id);
-					dev->display(img);
-				}
+				mess_image *img = image_from_devtype_and_index(dev->type, id);
+				dev->display(img);
 			}
 		}
 	}
@@ -116,7 +113,7 @@ int ui_sprintf_image_info(char *buf)
 		dst += sprintf(dst, "RAM: %s\n\n", ram_string(buf2, mess_ram_size));
 	}
 
-	for (dev = Machine->devices; dev->type < IO_COUNT; dev++)
+	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
 	{
 		for (id = 0; id < dev->count; id++)
 		{
