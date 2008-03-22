@@ -10,7 +10,6 @@
 
 #include "driver.h"
 #include "pc_t1t.h"
-#include "pc_cga.h" // cga monitor palette
 #include "video/mc6845.h"
 
 
@@ -43,7 +42,7 @@ MACHINE_DRIVER_START( pcvideo_t1000 )
 	MDRV_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MDRV_PALETTE_LENGTH( CGA_PALETTE_SETS * 16 )
+	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT(pcjr)
 
 	MDRV_DEVICE_ADD(T1000_MC6845_NAME, MC6845)
@@ -63,9 +62,16 @@ MACHINE_DRIVER_END
 /* Initialise the cga palette */
 static PALETTE_INIT( pcjr )
 {
+	const static unsigned char tga_palette[16][3] = {
+		{ 0x00, 0x00, 0x00 }, { 0x00, 0x00, 0xaa }, { 0x00, 0xaa, 0x00 }, { 0x00, 0xaa, 0xaa },
+		{ 0xaa, 0x00, 0x00 }, { 0xaa, 0x00, 0xaa }, { 0xaa, 0x55, 0x00 }, { 0xaa, 0xaa, 0xaa },
+		{ 0x55, 0x55, 0x55 }, { 0x55, 0x55, 0xff }, { 0x55, 0xff, 0x55 }, { 0x55, 0xff, 0xff },
+		{ 0xff, 0x55, 0x55 }, { 0xff, 0x55, 0xff }, { 0xff, 0xff, 0x55 }, { 0xff, 0xff, 0xff }
+	};
 	int i;
-	for(i = 0; i < CGA_PALETTE_SETS * 16; i++)
-		palette_set_color_rgb(machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
+
+	for(i = 0; i < 16; i++)
+		palette_set_color_rgb(machine, i, tga_palette[i][0], tga_palette[i][1], tga_palette[i][2]);
 }
 
 static struct {
