@@ -22,7 +22,11 @@ static int specialist_8255_portc;
 /* Driver initialization */
 DRIVER_INIT(special)
 {
-
+	/* set initialy ROM to be visible on first bank */
+	UINT8 *RAM = memory_region(REGION_CPU1);	
+	memset(RAM,0x0000,0x3000); // make frist page empty by default
+  memory_configure_bank(1, 1, 2, RAM, 0x0000);
+	memory_configure_bank(1, 0, 2, RAM, 0xc000);	
 }
 
 READ8_HANDLER (specialist_8255_porta_r )
@@ -86,8 +90,13 @@ WRITE8_HANDLER (specialist_8255_portb_w )
 	specialist_8255_portb = data;
 }
 WRITE8_HANDLER (specialist_8255_portc_w )
-{	
+{		
 	specialist_8255_portc = data;
+	
+	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x80 ? 1 : -1);	
+
+	DAC_data_w(0,data & 0x20); //beeper
+	
 }
 
 static const ppi8255_interface specialist_ppi8255_interface =
@@ -101,8 +110,17 @@ static const ppi8255_interface specialist_ppi8255_interface =
 	{specialist_8255_portc_w}
 };
 
+static TIMER_CALLBACK( special_reset )
+{
+	memory_set_bank(1, 0);
+}
+
+
 MACHINE_RESET( special )
 {
+	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, special_reset);
+	memory_set_bank(1, 1);	
+
 	ppi8255_init(&specialist_ppi8255_interface);
 }
 

@@ -9,7 +9,6 @@
 
 
 /*----------- defined in machine/ut88.c -----------*/
-
 extern DRIVER_INIT( ut88 );
 extern MACHINE_RESET( ut88 );
 extern READ8_HANDLER( ut88_keyboard_r );
@@ -24,6 +23,7 @@ extern WRITE8_HANDLER( ut88mini_write_led );
 
 /*----------- defined in video/ut88.c -----------*/
 
+extern UINT8 *ut88_video_ram;
 extern const gfx_layout ut88_charlayout;
 
 extern VIDEO_START( ut88 );

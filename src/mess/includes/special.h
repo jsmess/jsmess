@@ -19,6 +19,8 @@ extern WRITE8_HANDLER( specialist_keyboard_w );
 
 /*----------- defined in video/special.c -----------*/
 
+extern UINT8 *specialist_video_ram;
+
 extern VIDEO_START( special );
 extern VIDEO_UPDATE( special );
 

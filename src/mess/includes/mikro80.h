@@ -18,6 +18,8 @@ extern READ8_HANDLER( mikro80_tape_r );
 extern WRITE8_HANDLER( mikro80_tape_w );
 
 /*----------- defined in video/mikro80.c -----------*/
+extern UINT8 *mikro80_video_ram;
+extern UINT8 *mikro80_cursor_ram;
 
 extern const gfx_layout mikro80_charlayout;
 

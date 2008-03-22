@@ -12,13 +12,15 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/special.h"
 #include "machine/8255ppi.h"
+#include "sound/dac.h"
 #include "devices/cassette.h"
 #include "formats/rk_cas.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x8fff ) AM_RAM  // RAM
-    AM_RANGE( 0x9000, 0xbfff ) AM_RAM  // Video RAM
+	  AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM    
+    AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE(&specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
     AM_RANGE( 0xf000, 0xf700 ) AM_NOP
     AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard
@@ -161,7 +163,14 @@ static MACHINE_DRIVER_START( special )
 		
     MDRV_VIDEO_START(special)
     MDRV_VIDEO_UPDATE(special)
-    MACHINE_DRIVER_END
+
+    /* audio hardware */
+		MDRV_SPEAKER_STANDARD_MONO("mono")
+		MDRV_SOUND_ADD(DAC, 0)
+		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	        
+		MDRV_SOUND_ADD(WAVE, 0)
+		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)        
+MACHINE_DRIVER_END
 
  
 /* ROM definition */

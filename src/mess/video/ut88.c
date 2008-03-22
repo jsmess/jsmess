@@ -9,7 +9,7 @@
 
 #include "driver.h"
   
-#define UT88_VIDEO_MEMORY		0xE800  
+UINT8 *ut88_video_ram;
     
 const gfx_layout ut88_charlayout =
 {
@@ -34,7 +34,7 @@ VIDEO_UPDATE( ut88 )
 	{
 		for(x = 0; x < 64; x++ )
 		{
-			int code = program_read_byte(UT88_VIDEO_MEMORY + x + y*64);		
+			int code = ut88_video_ram[ x + y*64 ];		
 			drawgfx(bitmap, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8,
 				NULL, TRANSPARENCY_NONE, 0);
 		}

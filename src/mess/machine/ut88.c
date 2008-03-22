@@ -13,16 +13,17 @@
 #include "devices/cassette.h"
 #include "machine/8255ppi.h"
 
-
 static int ut88_8255_porta;
-
 
 /* Driver initialization */
 DRIVER_INIT(ut88)
 {
-
+	/* set initialy ROM to be visible on first bank */
+	UINT8 *RAM = memory_region(REGION_CPU1);	
+	memset(RAM,0x0000,0x0800); // make frist page empty by default
+  memory_configure_bank(1, 1, 2, RAM, 0x0000);
+	memory_configure_bank(1, 0, 2, RAM, 0xf800);
 }
-
 
 READ8_HANDLER (ut88_8255_portb_r )
 {
@@ -60,8 +61,15 @@ static const ppi8255_interface ut88_ppi8255_interface =
 	{NULL},
 };
 
+static TIMER_CALLBACK( ut88_reset )
+{
+	memory_set_bank(1, 0);
+}
+
 MACHINE_RESET( ut88 )
 {
+	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, ut88_reset);
+	memory_set_bank(1, 1);	
 	ppi8255_init(&ut88_ppi8255_interface);
 	ut88_8255_porta = 0;
 }
@@ -116,7 +124,7 @@ WRITE8_HANDLER( ut88mini_write_led )
 		}
 }
 
-static int bcd_to_7seg[16] = 
+static int hex_to_7seg[16] = 
 	{0x3F, 0x06, 0x5B, 0x4F, 
 	 0x66, 0x6D, 0x7D, 0x07, 
 	 0x7F, 0x6F, 0x77, 0x7c, 
@@ -126,7 +134,7 @@ static TIMER_CALLBACK( update_display )
 {	
 	int i;
 	for (i=0;i<6;i++) {
-		output_set_digit_value(i, bcd_to_7seg[lcd_digit[i]]);
+		output_set_digit_value(i, hex_to_7seg[lcd_digit[i]]);
 	}			
 }
 

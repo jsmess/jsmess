@@ -9,8 +9,7 @@
 
 #include "driver.h"
   
-#define SPECIALIST_VIDEO_MEMORY		0x9000  
-    
+UINT8 *specialist_video_ram;
 
 VIDEO_START( special )
 {
@@ -25,7 +24,7 @@ VIDEO_UPDATE( special )
 	{			
 		for (y = 0; y < 256; y++)
 		{
-			code = program_read_byte(SPECIALIST_VIDEO_MEMORY + y + x*256);
+			code = specialist_video_ram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{								
 				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  (code >> b) & 0x01;
