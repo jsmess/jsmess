@@ -363,7 +363,7 @@ void devices_free(const struct IODevice *devices)
 
 static const struct IODevice *filter_device_array_termination(const struct IODevice *dev)
 {
-	return (dev->type < IO_COUNT) ? dev : NULL;
+	return ((dev != NULL) && (dev->type < IO_COUNT)) ? dev : NULL;
 }
 
 
