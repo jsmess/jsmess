@@ -50,11 +50,11 @@ static void SetupSoftwareTabView(void);
 
 static const LPCTSTR mess_column_names[] =
 {
-    TEXT("Software"),
+	TEXT("Software"),
 	TEXT("Goodname"),
-    TEXT("Manufacturer"),
-    TEXT("Year"),
-    TEXT("Playable"),
+	TEXT("Manufacturer"),
+	TEXT("Year"),
+	TEXT("Playable"),
 	TEXT("CRC"),
 	TEXT("SHA-1"),
 	TEXT("MD5")
@@ -64,7 +64,7 @@ static int *mess_icon_index;
 
 static void MessOpenOtherSoftware(int iDevice);
 static void MessCreateDevice(int iDevice);
-static void MessRefreshPicker(int nGame);
+static void MessRefreshPicker(int drvindex);
 
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem);
 static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem);
@@ -249,7 +249,7 @@ BOOL CreateMessIcons(void)
 
 
 
-static int GetMessIcon(int nGame, int nSoftwareType)
+static int GetMessIcon(int drvindex, int nSoftwareType)
 {
     int the_index;
     int nIconPos = 0;
@@ -258,18 +258,18 @@ static int GetMessIcon(int nGame, int nSoftwareType)
     char buffer[32];
 	const char *iconname;
 
-	assert(nGame >= 0);
-	assert(nGame < driver_list_get_count(drivers));
+	assert(drvindex >= 0);
+	assert(drvindex < driver_list_get_count(drivers));
 
     if ((nSoftwareType >= 0) && (nSoftwareType < IO_COUNT))
 	{
 		iconname = device_brieftypename(nSoftwareType);
-        the_index = (nGame * IO_COUNT) + nSoftwareType;
+        the_index = (drvindex * IO_COUNT) + nSoftwareType;
 
         nIconPos = mess_icon_index[the_index];
         if (nIconPos >= 0)
 		{
-			for (drv = drivers[nGame]; drv; drv = driver_get_clone(drv))
+			for (drv = drivers[drvindex]; drv; drv = driver_get_clone(drv))
 			{
 				_snprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), "%s/%s", drv->name, iconname);
 				hIcon = LoadIconFromFile(buffer);
@@ -335,7 +335,7 @@ static BOOL AddSoftwarePickerDirs(HWND hwndPicker, LPCSTR pszDirectories, LPCSTR
 
 
 
-void MyFillSoftwareList(int nGame, BOOL bForce)
+void MyFillSoftwareList(int drvindex, BOOL bForce)
 {
 	const game_driver *drv;
 	HWND hwndSoftwarePicker;
@@ -345,22 +345,22 @@ void MyFillSoftwareList(int nGame, BOOL bForce)
 	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
 
 	// Set up the device view
-	DevView_SetDriver(hwndSoftwareDevView, nGame);
+	DevView_SetDriver(hwndSoftwareDevView, drvindex);
 
-	if (!bForce && (s_nGame == nGame))
+	if (!bForce && (s_nGame == drvindex))
 		return;
-	s_nGame = nGame;
+	s_nGame = drvindex;
 
 	// Set up the software picker
 	SoftwarePicker_Clear(hwndSoftwarePicker);
-	drv = drivers[nGame];
+	drv = drivers[drvindex];
 	SoftwarePicker_SetDriver(hwndSoftwarePicker, drv);
 	while(drv)
 	{
 		AddSoftwarePickerDirs(hwndSoftwarePicker, GetSoftwareDirs(), drv->name);
 		drv = mess_next_compatible_driver(drv);
 	}
-	AddSoftwarePickerDirs(hwndSoftwarePicker, GetExtraSoftwarePaths(nGame), NULL);
+	AddSoftwarePickerDirs(hwndSoftwarePicker, GetExtraSoftwarePaths(drvindex), NULL);
 }
 
 
@@ -373,7 +373,7 @@ void MessUpdateSoftwareList(void)
 
 
 
-BOOL MessApproveImageList(HWND hParent, int nGame)
+BOOL MessApproveImageList(HWND hParent, int drvindex)
 {
 	int i, nPos, devindex;
 	const struct IODevice *devices;
@@ -384,7 +384,7 @@ BOOL MessApproveImageList(HWND hParent, int nGame)
 
 	begin_resource_tracking();
 
-	pDriver = drivers[nGame];
+	pDriver = drivers[drvindex];
 	devices = devices_allocate(pDriver);
 
 	nPos = 0;
@@ -395,7 +395,7 @@ BOOL MessApproveImageList(HWND hParent, int nGame)
 		{
 			for (i = 0; i < devices[devindex].count; i++)
 			{
-				pszSoftware = GetSelectedSoftware(nGame, &devices[devindex].devclass, i);
+				pszSoftware = GetSelectedSoftware(drvindex, &devices[devindex].devclass, i);
 				if (!pszSoftware || !*pszSoftware)
 				{
 					snprintf(szMessage, sizeof(szMessage) / sizeof(szMessage[0]),
@@ -424,22 +424,22 @@ done:
 
 
 // this is a wrapper call to wrap the idiosycracies of SetSelectedSoftware()
-static void InternalSetSelectedSoftware(int nGame, const mess_device_class *devclass, int device_inst, const char *pszSoftware)
+static void InternalSetSelectedSoftware(int drvindex, const mess_device_class *devclass, int device_inst, const char *pszSoftware)
 {
 	if (!pszSoftware)
 		pszSoftware = "";
 
 	// only call SetSelectedSoftware() if this value is different
-	if (strcmp(GetSelectedSoftware(nGame, devclass, device_inst), pszSoftware))
+	if (strcmp(GetSelectedSoftware(drvindex, devclass, device_inst), pszSoftware))
 	{
-		SetSelectedSoftware(nGame, devclass, device_inst, pszSoftware);
+		SetSelectedSoftware(drvindex, devclass, device_inst, pszSoftware);
 	}
 }
 
 
 
 // Places the specified image in the specified slot; nID = -1 means don't matter
-static void MessSpecifyImage(int nGame, const mess_device_class *devclass, int nID, LPCSTR pszFilename)
+static void MessSpecifyImage(int drvindex, const mess_device_class *devclass, int nID, LPCSTR pszFilename)
 {
 	const struct IODevice *devices;
 	const struct IODevice *dev;
@@ -464,7 +464,7 @@ static void MessSpecifyImage(int nGame, const mess_device_class *devclass, int n
 		// special case; first try to find existing image
 		for (i = 0; i < dev->count; i++)
 		{
-			s = GetSelectedSoftware(nGame, &dev->devclass, i);
+			s = GetSelectedSoftware(drvindex, &dev->devclass, i);
 			if (s && !mame_stricmp(s, pszFilename))
 			{
 				nID = i;
@@ -478,7 +478,7 @@ static void MessSpecifyImage(int nGame, const mess_device_class *devclass, int n
 		// still not found?  locate an empty slot
 		for (i = 0; i < dev->count; i++)
 		{
-			s = GetSelectedSoftware(nGame, &dev->devclass, i);
+			s = GetSelectedSoftware(drvindex, &dev->devclass, i);
 			if (!s || !*s || !mame_stricmp(s, pszFilename))
 			{
 				nID = i;
@@ -488,7 +488,7 @@ static void MessSpecifyImage(int nGame, const mess_device_class *devclass, int n
 	}
 
 	if (nID >= 0)
-		InternalSetSelectedSoftware(nGame, &dev->devclass, nID, pszFilename);
+		InternalSetSelectedSoftware(drvindex, &dev->devclass, nID, pszFilename);
 	else if (LOG_SOFTWARE)
 		dprintf("MessSpecifyImage(): Failed to place image '%s'\n", pszFilename);
 
@@ -497,7 +497,7 @@ static void MessSpecifyImage(int nGame, const mess_device_class *devclass, int n
 
 
 
-static void MessRemoveImage(int nGame, mess_device_class devclass, LPCSTR pszFilename)
+static void MessRemoveImage(int drvindex, mess_device_class devclass, LPCSTR pszFilename)
 {
 	int i, nPos;
 	const struct IODevice *devices;
@@ -519,9 +519,9 @@ static void MessRemoveImage(int nGame, mess_device_class devclass, LPCSTR pszFil
 		{
 			for (i = 0; i < dev->count; i++)
 			{
-				if (!mame_stricmp(pszFilename, GetSelectedSoftware(nGame, &dev->devclass, i)))
+				if (!mame_stricmp(pszFilename, GetSelectedSoftware(drvindex, &dev->devclass, i)))
 				{
-					MessSpecifyImage(nGame, &devclass, i, NULL);
+					MessSpecifyImage(drvindex, &devclass, i, NULL);
 					break;
 				}
 			}
@@ -533,18 +533,18 @@ static void MessRemoveImage(int nGame, mess_device_class devclass, LPCSTR pszFil
 
 
 
-void MessReadMountedSoftware(int nGame)
+void MessReadMountedSoftware(int drvindex)
 {
 	// First read stuff into device view
 	DevView_Refresh(GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW));
 
 	// Now read stuff into picker
-	MessRefreshPicker(nGame);
+	MessRefreshPicker(drvindex);
 }
 
 
 
-static void MessRefreshPicker(int nGame)
+static void MessRefreshPicker(int drvindex)
 {
 	HWND hwndSoftware;
 	int i, id;
@@ -555,7 +555,7 @@ static void MessRefreshPicker(int nGame)
 	LPCSTR pszSoftware;
 
 	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
-	pDriver = drivers[nGame];
+	pDriver = drivers[drvindex];
 	pDeviceList = devices_allocate(pDriver);
 	if (!pDeviceList)
 		goto done;
@@ -570,7 +570,7 @@ static void MessRefreshPicker(int nGame)
 	{
 		for (id = 0; id < pDevice->count; id++)
 		{
-			pszSoftware = GetSelectedSoftware(nGame, &pDevice->devclass, id);
+			pszSoftware = GetSelectedSoftware(drvindex, &pDevice->devclass, id);
 			if (pszSoftware && *pszSoftware)
 			{
 				i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
@@ -796,7 +796,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, int iDevice)
 {
 	TCHAR filename[MAX_PATH];
 	mess_image_type imagetypes[64];
-	int nGame;
+	int drvindex;
 	HWND hwndList;
 	char* utf8_filename;
 	const struct IODevice *devices;
@@ -804,8 +804,8 @@ static void MessSetupDevice(common_file_dialog_proc cfd, int iDevice)
 	begin_resource_tracking();
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
-	nGame = Picker_GetSelectedItem(hwndList);
-	devices = devices_allocate(drivers[nGame]);
+	drvindex = Picker_GetSelectedItem(hwndList);
+	devices = devices_allocate(drivers[drvindex]);
 	SetupImageTypes(devices, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, iDevice);
 
 	if (CommonFileImageDialog(last_directory, cfd, filename, imagetypes))
@@ -880,14 +880,14 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const struct IODevice *d
 
 
 
-static void DevView_SetSelectedSoftware(HWND hwndDevView, int nGame,
+static void DevView_SetSelectedSoftware(HWND hwndDevView, int drvindex,
 	const struct IODevice *dev, int nID, LPCTSTR pszFilename)
 {
 	char* utf8_filename = utf8_from_tstring(pszFilename);
 	if( !utf8_filename )
 		return;
-	MessSpecifyImage(nGame, &dev->devclass, nID, utf8_filename);
-	MessRefreshPicker(nGame);
+	MessSpecifyImage(drvindex, &dev->devclass, nID, utf8_filename);
+	MessRefreshPicker(drvindex);
 	free(utf8_filename);
 }
 
@@ -919,19 +919,19 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 {
-    int nType;
-    int nIcon;
-	int nGame;
+	int nType;
+	int nIcon;
+	int drvindex;
 	const char *icon_name;
 	HWND hwndGamePicker;
 	HWND hwndSoftwarePicker;
 
 	hwndGamePicker = GetDlgItem(GetMainWindow(), IDC_LIST);
 	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
-	nGame = Picker_GetSelectedItem(hwndGamePicker);
-    nType = SoftwarePicker_GetImageType(hwndSoftwarePicker, nItem);
-    nIcon = GetMessIcon(nGame, nType);
-    if (!nIcon)
+	drvindex = Picker_GetSelectedItem(hwndGamePicker);
+	nType = SoftwarePicker_GetImageType(hwndSoftwarePicker, nItem);
+	nIcon = GetMessIcon(drvindex, nType);
+	if (!nIcon)
 	{
 		if (nType < 0)
 			nType = IO_BAD;
@@ -965,7 +965,7 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 
 static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem)
 {
-	int nGame;
+	int drvindex;
 	mess_device_class devclass;
 	LPCSTR pszFullName;
 	HWND hwndList;
@@ -973,11 +973,11 @@ static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem)
 	if (!s_bIgnoreSoftwarePickerNotifies)
 	{
 		hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
-		nGame = Picker_GetSelectedItem(hwndList);
+		drvindex = Picker_GetSelectedItem(hwndList);
 		devclass = SoftwarePicker_LookupDevice(hwndSoftwarePicker, nItem);
 		pszFullName = SoftwarePicker_LookupFilename(hwndSoftwarePicker, nItem);
 
-		MessRemoveImage(nGame, devclass, pszFullName);
+		MessRemoveImage(drvindex, devclass, pszFullName);
 	}
 }
 
@@ -988,7 +988,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 	LPCSTR pszFullName;
 	LPCSTR pszName;
 	LPSTR s;
-	int nGame;
+	int drvindex;
 	mess_device_class devclass;
 	HWND hwndList;
 
@@ -996,7 +996,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 
 	if (!s_bIgnoreSoftwarePickerNotifies)
 	{
-		nGame = Picker_GetSelectedItem(hwndList);
+		drvindex = Picker_GetSelectedItem(hwndList);
 
 		// Get the fullname and partialname for this file
 		pszFullName = SoftwarePicker_LookupFilename(hwndSoftwarePicker, nItem);
@@ -1007,7 +1007,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 		devclass = SoftwarePicker_LookupDevice(hwndSoftwarePicker, nItem);
 		if (!devclass.gamedrv)
 			return;
-		MessSpecifyImage(nGame, &devclass, -1, pszFullName);
+		MessSpecifyImage(drvindex, &devclass, -1, pszFullName);
 
 		// Set up s_szSelecteItem, for the benefit of UpdateScreenShot()
 		strncpyz(g_szSelectedItem, pszName, sizeof(g_szSelectedItem) / sizeof(g_szSelectedItem[0]));
