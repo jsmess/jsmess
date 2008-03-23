@@ -190,13 +190,17 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *pDriver)
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
+	// did the driver change?
 	if (pPickerInfo->pDriver != pDriver)
 	{
-		if (pPickerInfo->pHashFile)
+		// is there a hash file loaded?
+		if (pPickerInfo->pHashFile != NULL)
 		{
+			// close down the file
 			hashfile_close(pPickerInfo->pHashFile);
 			pPickerInfo->pHashFile = NULL;
 
+			// invalidate the hash "realization"
 			for (i = 0; i < pPickerInfo->nIndexLength; i++)
 			{
 				pPickerInfo->ppIndex[i]->pHashInfo = NULL;
@@ -206,11 +210,14 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *pDriver)
 		}
 
 
+		// change the driver value
 		pPickerInfo->pDriver = pDriver;
 
-		if (pDriver)
+		// if we have a driver, we have to load some stuff
+		if (pDriver != NULL)
 		{
-			while(pDriver && !pPickerInfo->pHashFile)
+			// find a hash file
+			while((pDriver != NULL) && !pPickerInfo->pHashFile)
 			{
 				pPickerInfo->pHashFile = hashfile_open_options(MameUIGlobal(), pDriver->name, TRUE, pPickerInfo->pfnErrorProc);
 				pDriver = mess_next_compatible_driver(pDriver);
