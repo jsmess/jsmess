@@ -4,6 +4,9 @@
 
 ***************************************************************************/
 
+/* NOTE: The palette and colortable have been fixed after the changes in the 0.123-0.124 cycle,
+	but the pen colours may be wrong. This needs to be tested. */
+
 #include "driver.h"
 #include "includes/pc8801.h"
 
@@ -465,7 +468,7 @@ VIDEO_UPDATE( pc8801 )
 	 GRP_DIRTY(x,y) ||
 	 full_refresh) {
 	plot_box(wbm2,x*8,y*BLOCK_YSIZE,8,BLOCK_YSIZE,palette_transparent_pen);
-	ct=screen->machine->pens[((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8];
+	ct=((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8;
 	TEXT_OLD(x,y)=text_new;
 	ATTR_OLD(x,y)=attr_new;
 	if(attr_new&TX_GL) {
@@ -518,8 +521,8 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x0000+x+y*2*80+gy*80] << gx) & 0x80) >> 7) |
 		  (((gVRAM[0x4000+x+y*2*80+gy*80] << gx) & 0x80) >> 6) |
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) >> 5);
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,screen->machine->pens[cg]);
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,screen->machine->pens[17]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,cg);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,17);
 	      }
 	    }
 	    break;
@@ -534,8 +537,8 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) &&
 		   disp_plane[2]) ?
 		  ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8 : 16;
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,screen->machine->pens[cg]);
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,screen->machine->pens[17]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,cg);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,17);
 	      }
 	    }
 	    break;
@@ -547,13 +550,13 @@ VIDEO_UPDATE( pc8801 )
 		   & 0x80) &&
 		  disp_plane[y<200 ? 0 : 1] ?
 		  ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8 : 16;
-		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy,screen->machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy,cg);
 	      }
 	    }
 	    break;
 	  case GRAPH_NO:
 	  default:
-	    plot_box(wbm1,x*8,y*4,8,4,screen->machine->pens[16]);
+	    plot_box(wbm1,x*8,y*4,8,4,16);
 	    break;
 	  }
 	} else {
@@ -565,7 +568,7 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x0000+x+y*2*80+gy*80] << gx) & 0x80) >> 7) |
 		  (((gVRAM[0x4000+x+y*2*80+gy*80] << gx) & 0x80) >> 6) |
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) >> 5);
-		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,screen->machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,cg);
 	      }
 	    }
 	    break;
@@ -580,13 +583,13 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) &&
 		   disp_plane[2]) ?
 		  ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8 : 16;
-		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,screen->machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,cg);
 	      }
 	    }
 	    break;
 	  case GRAPH_NO:
 	  default:
-	    plot_box(wbm1,x*8,y*2,8,2,screen->machine->pens[16]);
+	    plot_box(wbm1,x*8,y*2,8,2,16);
 	    break;
 	  }
 	}
@@ -603,23 +606,30 @@ VIDEO_UPDATE( pc8801 )
 
 PALETTE_INIT( pc8801 )
 {
-	int i;
+	UINT8 i;
 
-	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine, i, 0, 0, 0);	/* for graphics */
+	machine->colortable = colortable_alloc(machine, 18);
 
-	/* for text */
-	for (i = 0; i < 8; i++)
-	{
-		palette_set_color_rgb(machine, i+8,
-			(i & 2) ? 0xff : 0x00,
-			(i & 4) ? 0xff : 0x00,
-			(i & 1) ? 0xff : 0x00);
-	}
+	for ( i = 0; i < 8; i++ )	/* for graphics */
+		colortable_palette_set_color(machine->colortable, i, RGB_BLACK);
+
+
+	for (i = 0; i < 8; i++)		/* standard colours */
+		colortable_palette_set_color(machine->colortable, i+8, 
+			MAKE_RGB((i & 2) ? 0xff : 0, (i & 4) ? 0xff : 0, (i & 1) ? 0xff : 0));
 
 	/* for background and scanline */
-	palette_set_color_rgb(machine, 16, 0, 0, 0);
-	palette_set_color_rgb(machine, 17, 0, 0, 0);
+	colortable_palette_set_color(machine->colortable, 16, RGB_BLACK);
+	colortable_palette_set_color(machine->colortable, 17, RGB_BLACK);
+
+
+	for ( i = 0; i < 8; i++ )
+	{
+		colortable_entry_set_value(machine->colortable, i*2, 0);
+		colortable_entry_set_value(machine->colortable, i*2+1, i+8);
+		colortable_entry_set_value(machine->colortable, i*2+16, i+8);
+		colortable_entry_set_value(machine->colortable, i*2+17, 0);
+	}
 }
 
 WRITE8_HANDLER(pc8801_crtc_write)
@@ -644,8 +654,7 @@ WRITE8_HANDLER(pc8801_crtc_write)
     case 0x60:
       /* get light pen point */
       crtc_state=lpenx;
-      return;
-    case 0x80:
+      return;    case 0x80:
       /* set cursor */
       crtc_state=cursorx;
       text_cursor=((data&1)!=0x00);
@@ -914,5 +923,5 @@ WRITE8_HANDLER(pc8801_palette_out)
 	r[offset] = (data & 2) ? 0xff : 0x00;
 	g[offset] = (data & 4) ? 0xff : 0x00;
   }
-  palette_set_color_rgb(machine, palno,r[offset],g[offset],b[offset]);
+  colortable_palette_set_color(machine->colortable, palno, MAKE_RGB(r[offset],g[offset],b[offset]));
 }
