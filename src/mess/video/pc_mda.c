@@ -378,7 +378,7 @@ allow this.
 The divder/pixels per 6845 clock is 9 for text mode and 16 for graphics mode.
 */
 
-static mc6845_interface mc6845_hercules_intf = {
+static const mc6845_interface mc6845_hercules_intf = {
 	HERCULES_SCREEN_NAME,	/* screen number */
 	MDA_CLOCK/9 /*?*/,		/* clock */
 	9,						/* number of pixels per video memory address */
@@ -502,8 +502,8 @@ static void hercules_mode_control_w(running_machine *machine, int data) {
 		mda.update_row = NULL;
 	}
 
-	mc6845_hercules_intf.hpixels_per_column = mda.mode_control & 0x02 ? 16 : 9;
 	mc6845_set_clock( devconf, mda.mode_control & 0x02 ? MDA_CLOCK / 16 : MDA_CLOCK / 9 );
+	mc6845_set_hpixels_per_column( devconf, mda.mode_control & 0x02 ? 16 : 9 );
 }
 
 
