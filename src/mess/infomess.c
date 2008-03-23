@@ -21,7 +21,12 @@
  *************************************/
 
 
-void print_game_device(FILE* out, const game_driver* game)
+/*-------------------------------------------------
+    print_game_device - prints out all info on
+	MESS-specific devices
+-------------------------------------------------*/
+
+void print_game_device(FILE *out, const game_driver *game, const machine_config *config)
 {
 	const struct IODevice* devices;
 	const char *name;
@@ -78,7 +83,12 @@ void print_game_device(FILE* out, const game_driver* game)
 
 
 
-void print_game_ramoptions(FILE* out, const game_driver* game)
+/*-------------------------------------------------
+    print_game_ramoptions - prints out all RAM
+	options for this system
+-------------------------------------------------*/
+
+void print_game_ramoptions(FILE *out, const game_driver *game, const machine_config *config)
 {
 	int i, count;
 	UINT32 ram;
