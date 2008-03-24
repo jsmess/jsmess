@@ -16,6 +16,7 @@ extern WRITE8_HANDLER( ut88_keyboard_w );
 extern WRITE8_HANDLER( ut88_sound_w );
 extern READ8_HANDLER( ut88_tape_r );
 
+extern DRIVER_INIT( ut88mini );
 extern MACHINE_START( ut88mini );
 extern MACHINE_RESET( ut88mini );
 extern READ8_HANDLER( ut88mini_keyboard_r );

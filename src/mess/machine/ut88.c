@@ -139,6 +139,10 @@ static TIMER_CALLBACK( update_display )
 }
 
 
+DRIVER_INIT(ut88mini)
+{
+	
+}
 MACHINE_START( ut88mini )
 {
 	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, update_display);
