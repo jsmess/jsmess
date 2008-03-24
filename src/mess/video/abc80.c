@@ -18,6 +18,8 @@ PALETTE_INIT( abc80 )
 {
 	palette_set_color(machine, 0, RGB_BLACK);
 	palette_set_color(machine, 1, RGB_WHITE);
+	palette_set_color(machine, 2, RGB_WHITE);
+	palette_set_color(machine, 3, RGB_BLACK);
 }
 
 static TILE_GET_INFO(abc80_get_tile_info)
