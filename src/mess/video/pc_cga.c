@@ -510,7 +510,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
 
 	if ( y == 0 ) logerror("cga_gfx_1bpp_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
+		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
 		*p = ( data & 0x80 ) ? fg : 0; p++;
@@ -583,9 +583,27 @@ static void pc_cga_set_palette_luts(void) {
 
 /*
  *	rW	CGA mode control register (see #P138)
+ *
+ *  x x x 0 1 0 0 0 - 320x200, 40x25 text. Colour on RGB and composite monitors.
+ *  x x x 0 1 0 0 1 - 640x200, 80x25 text. Colour on RGB and composite monitors.
+ *  x x x 0 1 0 1 0 - 320x200 graphics. Colour on RGB and composite monitors.
+ *  x x x 0 1 0 1 1 - unknown/invalid.
+ *  x x x 0 1 1 0 0 - 320x200, 40x25 text. Colour on RGB, greyscale on composite monitors.
+ *  x x x 0 1 1 0 1 - 640x200, 80x25 text. Colour on RGB, greyscale on composite monitors.
+ *  x x x 0 1 1 1 0 - 320x200 graphics. Alternative palette on RGB, greyscale on composite monitors.
+ *  x x x 0 1 1 1 1 - unknown/invalid.
+ *  x x x 1 1 0 0 0 - unknown/invalid.
+ *  x x x 1 1 0 0 1 - unknown/invalid.
+ *  x x x 1 1 0 1 0 - 160x200/640x200 graphics. 640x200 on RGB monitor, 160x200 on composite monitor.
+ *  x x x 1 1 0 1 1 - unknown/invalid.
+ *  x x x 1 1 1 0 0 - unknown/invalid.
+ *  x x x 1 1 1 0 1 - unknown/invalid.
+ *  x x x 1 1 1 1 0 - 640x200 graphics. Colour on black on RGB monitor, monochrome on composite monitor.
+ *  x x x 1 1 1 1 1 - unknown/invalid.
  */
-static void pc_cga_mode_control_w(int data)
+static void pc_cga_mode_control_w(running_machine *machine, int data)
 {
+	device_config	*devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 	unsigned char mask = 0x3B;
 
 	CGA_LOG(1,"CGA_mode_control_w",("$%02x: columns %d, gfx %d, hires %d, blink %d\n",
@@ -599,9 +617,11 @@ static void pc_cga_mode_control_w(int data)
 	//logerror("mode set to %02X\n", cga.mode_control & 0x3F );
 	switch ( cga.mode_control & 0x3F ) {
 	case 0x08: case 0x09: case 0x0C: case 0x0D:
+		mc6845_set_hpixels_per_column( devconf, 8 );
 		cga.update_row = cga_text_inten_update_row;
 		break;
 	case 0x0A: case 0x0B: case 0x2A: case 0x2B:
+		mc6845_set_hpixels_per_column( devconf, 8 );
 		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
 			cga.update_row = cga_gfx_4bppl_update_row;
 		} else {
@@ -609,12 +629,15 @@ static void pc_cga_mode_control_w(int data)
 		}
 		break;
 	case 0x0E: case 0x0F: case 0x2E: case 0x2F:
+		mc6845_set_hpixels_per_column( devconf, 8 );
 		cga.update_row = cga_gfx_2bpp_update_row;
 		break;
 	case 0x18: case 0x19: case 0x1C: case 0x1D:
+		mc6845_set_hpixels_per_column( devconf, 8 );
 		cga.update_row = cga_text_inten_alt_update_row;
 		break;
 	case 0x1A: case 0x1B: case 0x3A: case 0x3B:
+		mc6845_set_hpixels_per_column( devconf, 8 );
 		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
 			cga.update_row = cga_gfx_4bpph_update_row;
 		} else {
@@ -622,12 +645,15 @@ static void pc_cga_mode_control_w(int data)
 		}
 		break;
 	case 0x1E: case 0x1F: case 0x3E: case 0x3F:
+		mc6845_set_hpixels_per_column( devconf, 16 );
 		cga.update_row = cga_gfx_1bpp_update_row;
 		break;
 	case 0x28: case 0x29: case 0x2C: case 0x2D:
+		mc6845_set_hpixels_per_column( devconf, 8 );
 		cga.update_row = cga_text_blink_update_row;
 		break;
 	case 0x38: case 0x39: case 0x3C: case 0x3D:
+		mc6845_set_hpixels_per_column( devconf, 8 );
 		cga.update_row = cga_text_blink_alt_update_row;
 		break;
 	default:
@@ -711,7 +737,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 		mc6845_register_w( devconf, offset, data );
 		break;
 	case 8:
-		pc_cga_mode_control_w(data);
+		pc_cga_mode_control_w(machine, data);
 		break;
 	case 9:
 		pc_cga_color_select_w(data);
