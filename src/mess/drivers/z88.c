@@ -179,15 +179,22 @@ static void z88_install_memory_handler_pair(offs_t start, offs_t size, int bank_
 	read8_machine_func read_handler;
 	write8_machine_func write_handler;
 
-	read_handler  = read_addr  ? (read8_machine_func)  (STATIC_BANK1 + (FPTR)(bank_base - 1 + 0)) : SMH_ROM;
-	write_handler = write_addr ? (write8_machine_func) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : SMH_UNMAP;
+	/* special case */
+	if (read_addr == NULL)
+		read_addr = &memory_region(REGION_CPU1)[start];
 
+	/* determine the proper pointers to use */
+	read_handler  = (read_addr != NULL)  ? (read8_machine_func)  (STATIC_BANK1 + (FPTR)(bank_base - 1 + 0)) : SMH_UNMAP;
+	write_handler = (write_addr != NULL) ? (write8_machine_func) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : SMH_UNMAP;
+
+	/* install the handlers */
 	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, read_handler);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, write_handler);
 
-	if (read_addr)
+	/* and set the banks */
+	if (read_addr != NULL)
 		memory_set_bankptr(bank_base + 0, read_addr);
-	if (write_addr)
+	if (write_addr != NULL)
 		memory_set_bankptr(bank_base + 1, write_addr);
 }
 

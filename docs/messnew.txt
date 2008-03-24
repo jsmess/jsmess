@@ -54,6 +54,8 @@ System Driver Changes:
 - [VC4000] Cleaned up, added quickload and fixed colors.  (bug #1404) [Manfred
   Schneider]
 
+- [Z88] Fixed regression introduced in 0.123.  (bug #1553) [Nate Woods]
+
 
 
 User Interface Changes:
