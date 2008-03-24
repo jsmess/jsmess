@@ -5,6 +5,9 @@
 //============================================================
 
 // Needed for better file dialog
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif // _WIN32_WINNT
 #define _WIN32_WINNT 0x500
 
 // standard windows headers

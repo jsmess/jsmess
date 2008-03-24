@@ -452,10 +452,6 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		vertical_feedback = vfeedback;
 		horizontal_feedback = hfeedback;
 	}
-
-	/* nothing to do, clear the interrupt */	
-	else
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);	
 }
 
 
@@ -493,10 +489,6 @@ static TIMER_CALLBACK( scanline_callback )
 	/* on some games, the horizontal drive line is conected to the lightpen interrupt */
 	else if (astrocade_video_config & AC_LIGHTPEN_INTS)
 		astrocade_trigger_lightpen(machine, astrocade_scanline, 8);
-
-	/* nothing to do, clear the interrupt */	
-	else
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 	/* advance to the next scanline */
 	scanline++;
@@ -563,22 +555,6 @@ READ8_HANDLER( astrocade_data_chip_register_r )
 
 		case 0x17:	/* keypad column 3 */
 			result = readinputportbytag_safe("KEYPAD3", 0xff);
-			break;
-
-		case 0x1c:	/* player 1 knob */
-			result = readinputportbytag_safe("P1_KNOB", 0xff);
-			break;
-
-		case 0x1d:	/* player 2 knob */
-			result = readinputportbytag_safe("P2_KNOB", 0xff);
-			break;
-
-		case 0x1e:	/* player 3 knob */
-			result = readinputportbytag_safe("P3_KNOB", 0xff);
-			break;
-
-		case 0x1f:	/* player 4 knob */
-			result = readinputportbytag_safe("P4_KNOB", 0xff);
 			break;
 	}
 

@@ -822,7 +822,7 @@ do { \
 
 #if HAS_WAVE
   	/* add tape control menu */
-	if (device_find(Machine->devices, IO_CASSETTE))
+	if (device_find_from_machine(Machine, IO_CASSETTE))
 		ADD_MENU("Tape Control", menu_tape_control, 1);
 #endif /* HAS_WAVE */
 #endif /* MESS */
@@ -1248,7 +1248,7 @@ static UINT32 menu_game_info(UINT32 state)
 	UINT32 selected = 0;
 
 	/* add the game info */
-	bufptr += sprintf_game_info(bufptr);
+	bufptr += sprintf_game_info(Machine, bufptr);
 
 	/* draw the text */
 	ui_menu_draw_text_box(buf);

@@ -1460,6 +1460,10 @@ static void memory_init_cpudata(const machine_config *config)
 				space->write.handlers[entrynum].handler.generic = get_static_handler(space->dbits, 1, spacenum, entrynum);
 			}
 
+			/* make sure we fix up the mask for the unmap handler */
+			space->read.handlers[STATIC_UNMAP].bytemask = ~0;
+			space->write.handlers[STATIC_UNMAP].bytemask = ~0;
+
 			/* allocate memory */
 			space->read.table = malloc_or_die(1 << LEVEL1_BITS);
 			space->write.table = malloc_or_die(1 << LEVEL1_BITS);
