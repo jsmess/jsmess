@@ -525,13 +525,13 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
 		data = videoram[ offset + 1 ];
 
 		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x80 ) ? fg : 0; p++;
+		*p = ( data & 0x40 ) ? fg : 0; p++;
+		*p = ( data & 0x20 ) ? fg : 0; p++;
+		*p = ( data & 0x10 ) ? fg : 0; p++;
+		*p = ( data & 0x08 ) ? fg : 0; p++;
+		*p = ( data & 0x04 ) ? fg : 0; p++;
+		*p = ( data & 0x02 ) ? fg : 0; p++;
+		*p = ( data & 0x01 ) ? fg : 0; p++;
 	}
 }
 
