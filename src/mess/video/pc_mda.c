@@ -308,8 +308,7 @@ static void mda_mode_control_w(int data)
  */
 static int pc_mda_status_r(void)
 {
-    int data = (readinputport(0) & 0x80) | 0x08 | mda.status;
-	mda.status ^= 0x01;
+    int data = 0x08 | mda.hsync;
 	return data;
 }
 
