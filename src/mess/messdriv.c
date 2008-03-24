@@ -850,6 +850,7 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	/* Specialist */	
 	DRIVER( special )	
 	DRIVER( lik )	
+	DRIVER( specimx )	
 	
 /****************Games*******************************************************/
 	/* Computer Electronic */
