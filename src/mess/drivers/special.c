@@ -38,7 +38,7 @@ static ADDRESS_MAP_START(specimx_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xffe0, 0xffe3 ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard   
     AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
     AM_RANGE( 0xffe8, 0xffeb ) AM_READWRITE(specimx_disk_data_r,specimx_disk_data_w) 
-    AM_RANGE( 0xffec, 0xffef ) AM_READWRITE(pit8253_0_r, pit8253_0_w)
+    AM_RANGE( 0xffec, 0xffef ) AM_READWRITE(pit8253_0_r, specimx_sound_w)
     AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
     AM_RANGE( 0xfff8, 0xfff8 ) AM_READWRITE(specimx_video_color_r,specimx_video_color_w) 
     AM_RANGE( 0xfffc, 0xfffe ) AM_WRITE(specimx_select_bank)     
@@ -335,6 +335,9 @@ static MACHINE_DRIVER_START( specimx )
 		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	        
 		MDRV_SOUND_ADD(WAVE, 0)
 		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)        
+		MDRV_SOUND_ADD(CUSTOM, 0)
+		MDRV_SOUND_CONFIG(specimx_sound_interface)
+		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)        		
 MACHINE_DRIVER_END
  
 /* ROM definition */

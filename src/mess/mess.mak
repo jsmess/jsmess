@@ -1194,6 +1194,7 @@ $(MESSOBJ)/mikro80.a:      \
 	$(MESS_VIDEO)/mikro80.o \
 
 $(MESSOBJ)/special.a:      \
+	$(MESS_AUDIO)/special.o \
 	$(MESS_DRIVERS)/special.o \
 	$(MESS_MACHINE)/special.o \
 	$(MESS_VIDEO)/special.o \

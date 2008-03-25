@@ -31,6 +31,8 @@ extern WRITE8_HANDLER( specimx_disk_data_w );
 extern READ8_HANDLER ( specimx_disk_ctrl_r );
 extern WRITE8_HANDLER( specimx_disk_ctrl_w );
 
+extern WRITE8_HANDLER( specimx_sound_w );
+
 /*----------- defined in video/special.c -----------*/
 
 extern UINT8 *specialist_video_ram;
@@ -44,5 +46,10 @@ extern VIDEO_UPDATE( specimx );
 
 extern PALETTE_INIT( specimx );
 extern rgb_t specimx_palette;
+
+/*----------- defined in audio/special.c -----------*/
+
+extern const struct CustomSound_interface specimx_sound_interface;
+extern void specimx_sh_change_clock(double);
 
 #endif /* SPECIAL_H_ */

@@ -251,6 +251,10 @@ MACHINE_RESET( specimx )
 	specimx_color = 0x70;	
 	wd17xx_reset();
 	wd17xx_set_side(0);
+	pit8253_reset(0);
+	pit8253_0_gate_w(machine, 0, 0);
+	pit8253_0_gate_w(machine, 1, 0);
+	pit8253_0_gate_w(machine, 2, 0);
 }
 
 READ8_HANDLER ( specimx_disk_data_r )
@@ -333,4 +337,10 @@ DEVICE_LOAD( specimx_floppy )
 	basicdsk_set_geometry (image, 80, 2, 6, 1024, 1, 0, FALSE);
 	basicdsk_set_calcoffset(image, specimx_calcoffset);
 	return INIT_PASS;
+}
+
+WRITE8_HANDLER( specimx_sound_w)
+{
+	
+		pit8253_0_w(machine,offset,data);		
 }
