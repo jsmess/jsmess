@@ -1,4 +1,4 @@
-﻿0.123.1
+﻿0.124
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -89,7 +89,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.123u6.  This incorporates all features of the
+- The core is based on MAME 0.124.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Updated the Motorola MC68901 Multi Function Peripheral to use the new
