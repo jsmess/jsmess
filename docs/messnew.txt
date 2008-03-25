@@ -38,9 +38,16 @@ System Driver Changes:
   
 - [COCO] Added a quickload for .BIN files.  [Nate Woods]
 
+- [EP128] Fixed 0.119 regression in graphics display. (bug #1478)
+  [Wilbert Pol]
+
 - [GALAXY] Fixed regressions.  [Miodrag Milanovic]
 
 - [GAMEBOY] Added support for Korean MBC1 mapper variant.  [Wilbert Pol]
+
+- [LYNX] Always recompute timer settings when a timer register is being
+  written. Fixes 0.118 regression in Gates of Zendocon (bug #1435).
+  [Wilbert Pol]
 
 - [MBEE] Fixed colours, sound, Inverse and Underline modes. Enabled alternate
   characters. [Robbbert]
@@ -89,7 +96,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.124.  This incorporates all features of the
+- The core is based on MAME 0.124a.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Updated the Motorola MC68901 Multi Function Peripheral to use the new
