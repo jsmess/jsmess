@@ -23,6 +23,33 @@ Changes:
  KT 26-Aug-2000 - Changed to use wd179x code. This is the same as the 1772.
                 - Coupe supports the basic disk image format, but can be changed in
                   the future to support others
+
+Note on the bioses:
+ SAM Coupé ROM Images
+ --------------------
+
+ This archive contains many versions of the SAM Coupé 32K ROM image, released
+ with kind permission from the ROM author, Dr Andy Wright.
+
+ Thanks to Simon N Goodwin for supplying the files, which include two dumped
+ from pre-production hardware (and which only work with the early hardware!).
+	
+ Beware - the early ROMs are very buggy, and tend to go mad once BASIC starts
+ paging.  ROM 10 (version 1.0) requires the CALL after F9 or BOOT because the
+ ROM loads the bootstrap but fails to execute it. The address depends on the
+ RAM size:
+
+ On a 256K SAM:
+
+    CALL 229385
+
+ Or on a 512K (or larger) machine:
+
+    CALL 491529
+
+ --
+ Uploaded by Simon Owen <simon.owen@simcoupe.org>
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -443,8 +470,39 @@ MACHINE_DRIVER_END
 
 ROM_START(coupe)
 	ROM_REGION(0x8000,REGION_CPU1,0)
-	ROM_LOAD("sam_rom0.rom", 0x0000, 0x4000, CRC(9954CF1A) SHA1(d92e3fd2a65dbf439d7050d9cea732a63640d567))
-	ROM_LOAD("sam_rom1.rom", 0x4000, 0x4000, CRC(F031AED4) SHA1(a7f06facc6f0a3713215f4befc307914836706a4))
+	/* 
+		The bios is actually 32K. This is the combined version of the two old 16K MESS roms.
+		It does match the 3.0 one the most, but the first half differs in one byte 
+		and in the second half, the case of the "plc" in the company string differs.
+	*/
+	ROM_SYSTEM_BIOS( 0, "unknown", "unknown" )
+	ROMX_LOAD("sam_rom.rom", 0x0000, 0x8000, CRC(0b7e3585) SHA1(c86601633fb61a8c517f7657aad9af4e6870f2ee), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "01", "v0.1" )
+	ROMX_LOAD("rom01", 0x0000, 0x8000, CRC(c04acfdf) SHA1(8976ed005c14905eec1215f0a5c28aa686a7dda2), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "04", "v0.4" )
+	ROMX_LOAD("rom04", 0x0000, 0x8000, CRC(f439e84e) SHA1(8bc457a5c764b0bb0aa7008c57f28c30248fc6a4), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 3, "10", "v1.0" )
+	ROMX_LOAD("rom10", 0x0000, 0x8000, CRC(3659d31f) SHA1(d3de7bb74e04d5b4dc7477f70de54d540b1bcc07), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS( 4, "12", "v1.2" )
+	ROMX_LOAD("rom12", 0x0000, 0x8000, CRC(7fe37dd8) SHA1(9339a0c1f72e8512c6f32dec15ab7d6c3bb04151), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS( 5, "13", "v1.3" )
+	ROMX_LOAD("rom13", 0x0000, 0x8000, CRC(2093768c) SHA1(af8d348fd080b18a4cbe9ed69d254be7be330146), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS( 6, "14", "v1.4" )
+	ROMX_LOAD("rom14", 0x0000, 0x8000, CRC(08799596) SHA1(b4e596051f2748dee9481ea4af7d15ccddc1e1b5), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS( 7, "18", "v1.8" )
+	ROMX_LOAD("rom18", 0x0000, 0x8000, CRC(f626063f) SHA1(485e7d9e9a4f8a70c0f93cd6e69ff12269438829), ROM_BIOS(8))
+	ROM_SYSTEM_BIOS( 8, "181", "v1.81" )
+	ROMX_LOAD("rom181", 0x0000, 0x8000, CRC(d25e1de1) SHA1(cb0fa79e4d5f7df0b57ede08ea7ecc9ae152f534), ROM_BIOS(9))
+	ROM_SYSTEM_BIOS( 9, "20", "v2.0" )
+	ROMX_LOAD("rom20", 0x0000, 0x8000, CRC(eaf32054) SHA1(41736323f0236649f2d5fe111f900def8db93a13), ROM_BIOS(10))
+	ROM_SYSTEM_BIOS( 10, "21", "v2.1" )
+	ROMX_LOAD("rom21", 0x0000, 0x8000, CRC(f6804b46) SHA1(11dcac5fdea782cdac03b4d0d7ac25d88547eefe), ROM_BIOS(11))
+	ROM_SYSTEM_BIOS( 11, "24", "v2.4" )
+	ROMX_LOAD("rom24", 0x0000, 0x8000, CRC(bb23fee4) SHA1(10cd911ba237dd2cf0c2637be1ad6745b7cc89b9), ROM_BIOS(12))
+	ROM_SYSTEM_BIOS( 12, "25", "v2.5" )
+	ROMX_LOAD("rom25", 0x0000, 0x8000, CRC(ddadd358) SHA1(a25ed85a0f1134ac3a481a3225f24a8bd3a790cf), ROM_BIOS(13))
+	ROM_SYSTEM_BIOS( 13, "30", "v3.0" )
+	ROMX_LOAD("rom30", 0x0000, 0x8000, CRC(e535c25d) SHA1(d390f0be420dfb12b1e54a4f528b5055d7d97e2a), ROM_BIOS(14))
 ROM_END
 
 static void coupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
