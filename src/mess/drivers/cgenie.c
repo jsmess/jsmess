@@ -268,7 +268,7 @@ static GFXDECODE_START( cgenie )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, cgenie_gfxlayout, 3*16*2, 3*4 )
 GFXDECODE_END
 
-static const unsigned char cgenie_palette[] = {
+static const unsigned char cgenie_colors[] = {
 	 0*4,  0*4,  0*4,  /* background   */
 
 /* this is the 'RGB monitor' version, strong and clean */
@@ -327,7 +327,7 @@ static const unsigned char cgenie_palette[] = {
 
 };
 
-static const unsigned short cgenie_colortable[] =
+static const unsigned short cgenie_palette[] =
 {
 	0, 1, 0, 2, 0, 3, 0, 4, /* RGB monitor set of text colors */
 	0, 5, 0, 6, 0, 7, 0, 8,
@@ -352,11 +352,18 @@ static const unsigned short cgenie_colortable[] =
 /* Initialise the palette */
 static PALETTE_INIT( cgenie )
 {
-	int i;
+	UINT8 i, r, g, b;
 
-	for ( i = 0; i < sizeof(cgenie_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, cgenie_palette[i*3], cgenie_palette[i*3+1], cgenie_palette[i*3+2]);
+	machine->colortable = colortable_alloc(machine, 49);
+
+	for ( i = 0; i < 49; i++ )
+	{
+		r = cgenie_colors[i*3]; g = cgenie_colors[i*3+1]; b = cgenie_colors[i*3+2];
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
+
+	for(i=0; i<108; i++)
+		colortable_entry_set_value(machine->colortable, i, cgenie_palette[i]);
 }
 
 
@@ -390,7 +397,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_SCREEN_SIZE(48*8, (32)*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1,0*8,32*8-1)
 	MDRV_GFXDECODE( cgenie )
-	MDRV_PALETTE_LENGTH(sizeof(cgenie_palette) / sizeof(cgenie_palette[0]) / 3)
+	MDRV_PALETTE_LENGTH(108)
 	MDRV_PALETTE_INIT( cgenie )
 
 	MDRV_VIDEO_START( cgenie )
