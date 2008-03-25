@@ -23,6 +23,8 @@ System Driver Changes:
 
 - [APPLE2] Removed usage of tilemaps.  [Nate Woods]
 
+- [APPLE3] Fixed buffer overrun in 80 column text mode.  [Nate Woods]
+
 - [ASTROCDE] Added controls for player 3 and 4 and improved analog controls.
   [ranger_lennier]
 

@@ -167,8 +167,7 @@ static void apple3_video_text80(bitmap_t *bitmap)
 				for (col = 0; col < 7; col++)
 				{
 					dest = BITMAP_ADDR16(bitmap, y * 8 + row, x * 14 + col + 0);
-					dest[0] = (char_data[row] & (1 << col)) ? fg : bg;
-					dest[1] = (char_data[row] & (1 << col)) ? fg : bg;
+					*dest = (char_data[row] & (1 << col)) ? fg : bg;
 				}
 			}
 
@@ -183,8 +182,7 @@ static void apple3_video_text80(bitmap_t *bitmap)
 				for (col = 0; col < 7; col++)
 				{
 					dest = BITMAP_ADDR16(bitmap, y * 8 + row, x * 14 + col + 7);
-					dest[0] = (char_data[row] & (1 << col)) ? fg : bg;
-					dest[1] = (char_data[row] & (1 << col)) ? fg : bg;
+					*dest = (char_data[row] & (1 << col)) ? fg : bg;
 				}
 			}
 		}
