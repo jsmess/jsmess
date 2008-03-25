@@ -1,3 +1,19 @@
+0.124a
+------
+
+Fixed major regression in 0.124 which caused many sound routes
+to be applied incorrectly. [Aaron Giles]
+
+Reverted gnga back to its previous state. [David Haywood]
+
+
+
+New clones added
+----------------
+Ghosts'n Goblins (bootleg with Cross) [David Haywood]
+
+
+
 0.124
 -----
 
