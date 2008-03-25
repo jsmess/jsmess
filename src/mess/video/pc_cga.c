@@ -541,13 +541,14 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
+	if ( y == 0 ) logerror("cga_text_blink_update_row\n" );
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
 		UINT8 data = cga.chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
-		UINT16 bg = ( attr >> 4 ) & 0x07;
+		UINT16 bg = attr >> 4;
 
 		if ( i == cursor_x ) {
 			data = 0xFF;
