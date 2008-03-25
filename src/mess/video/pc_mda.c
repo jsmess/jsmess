@@ -442,7 +442,7 @@ static VIDEO_START( pc_hercules ) {
 
 static MC6845_UPDATE_ROW( hercules_gfx_update_row ) {
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
-	UINT16	gfx_base = ( ( mda.mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( y & 0x03 ) << 13 );
+	UINT16	gfx_base = ( ( mda.mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;
 
 	if ( y == 0 ) logerror("hercules_gfx_update_row\n");
