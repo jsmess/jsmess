@@ -25,10 +25,10 @@ Changes:
                   the future to support others
 
 Note on the bioses:
- SAM Coupé ROM Images
+ SAM CoupÃ© ROM Images
  --------------------
 
- This archive contains many versions of the SAM Coupé 32K ROM image, released
+ This archive contains many versions of the SAM CoupÃ© 32K ROM image, released
  with kind permission from the ROM author, Dr Andy Wright.
 
  Thanks to Simon N Goodwin for supplying the files, which include two dumped

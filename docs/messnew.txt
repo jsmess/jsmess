@@ -5,6 +5,7 @@ New System Drivers Supported (in no particular order):
 - Dick Smith Super-80 [Robbbert]
 - Epoch Game Pocket Computer [Wilbert Pol]
 - Galeb [Miodrag Milanovic]
+- Genesis (USA, NTSC, w/SVP) [notaz, R. Belmont]
 - Microbee 16k Standard [Robbbert]
 - Mikro-80 [Miodrag Milanovic]
 - Orao [Miodrag Milanovic]
@@ -43,6 +44,17 @@ System Driver Changes:
 
 - [MBEE] Fixed colours, sound, Inverse and Underline modes. Enabled alternate
   characters. [Robbbert]
+
+- [ODYSSEY2] Rewrote video code to use scanline-based rendering (fixes Killer
+  Bees intro). Made sound pitch depend on system clock instead of -samplerate
+  (bug #1519). Added support for The Voice! add-on. Added support for larger
+  ROM format used by Kill The Attacking Aliens. Added PAL support for Videopac
+  and C52. [Wilbert Pol]
+
+- [PC] Converted MDA, Hercules, CGA, and Tandy 1000 video code to use the MAME
+  MC6845 code. EURO PC and PC200 drivers are temporarily broken as a result.
+  Split off PC (Hercules) from the PC (MDA) driver. Replaced MDA and CGA
+  character ROMs with a proper dump from an original IBM card. [Wilbert Pol]
 
 - [PDP1] Fixed text display regression. (bug #883)  [Robbbert]
 
