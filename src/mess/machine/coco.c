@@ -3057,10 +3057,20 @@ static void coco3_state_postload(void)
 	coco3_mmu_update(0, 8);
 }
 
-INPUT_CHANGED( coco_joystick_mode_changed )
+static void update_lightgun(running_machine *machine)
 {
 	int is_lightgun = readinputportbytag_safe("joystick_mode", 0x00) == 0x40;
 	crosshair_set_screen(machine, 0, is_lightgun ? CROSSHAIR_SCREEN_ALL : CROSSHAIR_SCREEN_NONE);
+}
+
+INPUT_CHANGED( coco_joystick_mode_changed )
+{
+	update_lightgun(machine);
+}
+
+static TIMER_CALLBACK( update_lightgun_timer_callback )
+{
+	update_lightgun(machine);
 }
 
 MACHINE_START( coco3 )
@@ -3096,6 +3106,9 @@ MACHINE_START( coco3 )
 	state_save_register_global(gime_irq);
 	state_save_register_global(gime_firq);
 	state_save_register_func_postload(coco3_state_postload);
+
+	/* need to specify lightgun crosshairs */
+	timer_set(attotime_zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 
