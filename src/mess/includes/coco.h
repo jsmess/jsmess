@@ -60,6 +60,7 @@ INPUT_CHANGED(coco_joystick_mode_changed);
 
 SNAPSHOT_LOAD ( coco_pak );
 SNAPSHOT_LOAD ( coco3_pak );
+QUICKLOAD_LOAD ( coco );
 READ8_HANDLER ( coco3_mmu_r );
 WRITE8_HANDLER ( coco3_mmu_w );
 READ8_HANDLER ( coco3_gime_r );

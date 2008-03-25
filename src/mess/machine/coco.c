@@ -583,6 +583,57 @@ SNAPSHOT_LOAD ( coco3_pak )
 }
 
 /***************************************************************************
+  Quickloads
+***************************************************************************/
+
+QUICKLOAD_LOAD ( coco )
+{
+	UINT8 preamble;
+	UINT16 block_length;
+	UINT16 block_address;
+	const UINT8 *ptr;
+	UINT32 length;
+	UINT32 position = 0;
+	UINT32 i;
+	int done = FALSE;
+
+	/* access the pointer and the length */
+	ptr = image_ptr(image);
+	length = image_length(image);
+
+	while(!done && (position + 5 <= length))
+	{
+		/* read this block */
+		preamble		= ptr[position + 0];
+		block_length	= ((UINT16) ptr[position + 1]) << 8 | ((UINT16) ptr[position + 2]) << 0;
+		block_address	= ((UINT16) ptr[position + 3]) << 8 | ((UINT16) ptr[position + 4]) << 0;
+		position += 5;
+
+		if (preamble != 0)
+		{
+			/* start address - just set the address and return */
+			cpunum_set_reg(0, REG_PC, block_address);
+			done = TRUE;
+		}
+		else
+		{
+			/* data block - need to cap the maximum length of the block */
+			block_length = MIN(block_length, length - position);
+
+			/* read the block into memory */
+			for (i = 0; i < block_length; i++)
+			{
+				program_write_byte(block_address + i, ptr[position + i]);
+			}
+
+			/* and advance */
+			position += block_length;
+		}
+	}
+	return INIT_PASS;
+}
+
+/***************************************************************************
   ROM files
 
   ROM files are simply raw dumps of cartridges.  I believe that they should

@@ -34,6 +34,8 @@ System Driver Changes:
 
 - [COCO] Fixed bug that could cause joystick button presses to not be
   registered.  (bug #1532) [Nate Woods]
+  
+- [COCO] Added a quickload for .BIN files.  [Nate Woods]
 
 - [GALAXY] Fixed regressions.  [Miodrag Milanovic]
 
