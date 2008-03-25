@@ -12,8 +12,10 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
 #include "devices/cassette.h"
+#include "devices/basicdsk.h"
 #include "machine/8255ppi.h"
-
+#include "machine/pit8253.h"
+#include "machine/wd17xx.h"
 
 UINT8 specimx_color;
 UINT8 *specimx_colorram;
@@ -30,11 +32,6 @@ DRIVER_INIT(special)
 	memset(RAM,0x0000,0x3000); // make frist page empty by default
 	memory_configure_bank(1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(1, 0, 2, RAM, 0xc000);	
-}
-
-DRIVER_INIT(specimx)
-{
-	memset(mess_ram,0,256*1024);
 }
 
 READ8_HANDLER (specialist_8255_porta_r )
@@ -200,11 +197,140 @@ WRITE8_HANDLER( specimx_select_bank )
 	specimx_set_bank(offset);	
 }
 
+void specimx_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
+{
+	switch (event)
+	{
+		case WD17XX_IRQ_CLR:
+		case WD17XX_IRQ_SET:
+		case WD17XX_DRQ_CLR:
+		case WD17XX_DRQ_SET:
+			/* do nothing */
+			break;
+	}
+}
+
+DRIVER_INIT(specimx)
+{
+	memset(mess_ram,0,256*1024);
+}
+
+static const struct pit8253_config specimx_pit8253_intf =
+{
+	TYPE8253,
+	{
+		{
+			2000000,
+			NULL,
+			NULL
+		},
+		{
+			2000000,
+			NULL,
+			NULL
+		},
+		{
+			2000000,
+			NULL,
+			NULL
+		}
+	}
+};
+
+MACHINE_START( specimx )
+{
+	wd17xx_init(machine, WD_TYPE_1793, specimx_fdc_callback, NULL);
+	wd17xx_set_density (DEN_FM_HI);
+	pit8253_init(1, &specimx_pit8253_intf);
+}
+
 MACHINE_RESET( specimx )
 {
 	ppi8255_init(&specialist_ppi8255_interface);
 	specimx_set_bank(2); // Initiali load ROM disk
 	specimx_color = 0x70;	
+	wd17xx_reset();
+	wd17xx_set_side(0);
 }
 
+READ8_HANDLER ( specimx_disk_data_r )
+{
+ switch(offset) {  		
+	case 0 :
+			return wd17xx_status_r(machine, offset);
+	case 1 : 
+			return wd17xx_track_r(machine, offset);
+    case 2 : 
+			return wd17xx_sector_r(machine, offset);
+	case 3 : 
+			return wd17xx_data_r(machine, offset);
+  }  
+  return 0;
+}
+WRITE8_HANDLER( specimx_disk_data_w )
+{		
+  switch(offset) {  		
+		case 0 : 
+			wd17xx_command_w(machine, offset, data);break;
+		case 1 : 
+			wd17xx_track_w (machine, offset, data);break;
+		case 2 : 
+			wd17xx_sector_w (machine, offset, data);break;
+		case 3 : 
+			wd17xx_data_w (machine, offset, data);break;
+  }  
+}
 
+READ8_HANDLER ( specimx_disk_ctrl_r )
+{
+  return 0xff;
+}
+
+WRITE8_HANDLER( specimx_disk_ctrl_w )
+{	
+
+	switch(offset) {  				
+		case 2 :						
+		 		wd17xx_set_side(data & 1);							
+				break;			
+		case 3 :				
+		 		wd17xx_set_drive(data & 1);				
+		 		break;
+			
+  }  
+}
+
+static unsigned long specimx_calcoffset(UINT8 t, UINT8 h, UINT8 s,
+	UINT8 tracks, UINT8 heads, UINT8 sec_per_track, UINT16 sector_length, UINT8 first_sector_id, UINT16 offset_track_zero)
+{
+	unsigned long o;	
+    o = (t * 1024 * 5 * 2) + (h * 1024 * 5) + 1024 * (s-1);
+	return o;
+}
+
+DEVICE_LOAD( specimx_floppy )
+{
+	int size;
+
+	if (! image_has_been_created(image))
+		{
+		size = image_length(image);
+
+		switch (size)
+			{
+			case 800*1024:
+				break;
+			default:
+				return INIT_FAIL;
+			}
+		}
+	else
+		return INIT_FAIL;
+
+	if (device_load_basicdsk_floppy (image) != INIT_PASS)
+		return INIT_FAIL;
+
+	basicdsk_set_geometry (image, 80, 2, 6, 1024, 1, 0, FALSE);
+	basicdsk_set_calcoffset(image, specimx_calcoffset);
+	return INIT_PASS;
+}

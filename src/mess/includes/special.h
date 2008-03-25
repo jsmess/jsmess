@@ -18,12 +18,18 @@ extern WRITE8_HANDLER( specialist_keyboard_w );
 
 extern DRIVER_INIT( specimx );
 extern MACHINE_RESET( specimx );
+extern MACHINE_START ( specimx );
+extern DEVICE_LOAD( specimx_floppy );
 
 extern WRITE8_HANDLER( specimx_select_bank );
 
 extern READ8_HANDLER ( specimx_video_color_r );
 extern WRITE8_HANDLER( specimx_video_color_w );
 
+extern READ8_HANDLER ( specimx_disk_data_r );
+extern WRITE8_HANDLER( specimx_disk_data_w );
+extern READ8_HANDLER ( specimx_disk_ctrl_r );
+extern WRITE8_HANDLER( specimx_disk_ctrl_w );
 
 /*----------- defined in video/special.c -----------*/
 

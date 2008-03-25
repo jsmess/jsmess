@@ -12,13 +12,16 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/special.h"
 #include "machine/8255ppi.h"
+#include "machine/pit8253.h"
 #include "sound/dac.h"
 #include "devices/cassette.h"
+#include "devices/basicdsk.h"
 #include "formats/rk_cas.h"
+#include "machine/wd17xx.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK(1) // First bank
+	  AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK(1) // First bank
     AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM    
     AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE(&specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
@@ -28,12 +31,15 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(specimx_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x8fff ) AM_READWRITE(SMH_BANK1, SMH_BANK1)
-	AM_RANGE( 0x9000, 0xbfff ) AM_READWRITE(SMH_BANK2, SMH_BANK2)
-    AM_RANGE( 0xc000, 0xffbf ) AM_READWRITE(SMH_BANK3, SMH_BANK3)
+    AM_RANGE( 0x0000, 0x8fff ) AM_READWRITE(SMH_BANK1, SMH_BANK1)
+		AM_RANGE( 0x9000, 0xbfff ) AM_READWRITE(SMH_BANK2, SMH_BANK2)
+  	AM_RANGE( 0xc000, 0xffbf ) AM_READWRITE(SMH_BANK3, SMH_BANK3)
     AM_RANGE( 0xffc0, 0xffdf ) AM_READWRITE(SMH_BANK4, SMH_BANK4)
     AM_RANGE( 0xffe0, 0xffe3 ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard   
     AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
+    AM_RANGE( 0xffe8, 0xffeb ) AM_READWRITE(specimx_disk_data_r,specimx_disk_data_w) 
+    AM_RANGE( 0xffec, 0xffef ) AM_READWRITE(pit8253_0_r, pit8253_0_w)
+    AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
     AM_RANGE( 0xfff8, 0xfff8 ) AM_READWRITE(specimx_video_color_r,specimx_video_color_w) 
     AM_RANGE( 0xfffc, 0xfffe ) AM_WRITE(specimx_select_bank)     
 ADDRESS_MAP_END
@@ -305,7 +311,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( specimx )
 		MDRV_CPU_ADD(8080, 2000000)
 	  	MDRV_CPU_PROGRAM_MAP(specimx_mem, 0) 	 
-	    MDRV_MACHINE_RESET( specimx )
+	    
+	  	MDRV_MACHINE_START ( specimx )
+	  	MDRV_MACHINE_RESET ( specimx )
+	    
  		
     /* video hardware */    	
 		MDRV_SCREEN_ADD("main", RASTER)      	
@@ -368,6 +377,23 @@ static void special_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
+static void specimx_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_specimx_floppy; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "odi,img"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}	
+}
 SYSTEM_CONFIG_START(special)	
 	CONFIG_DEVICE(special_cassette_getinfo)
 SYSTEM_CONFIG_END
@@ -375,6 +401,7 @@ SYSTEM_CONFIG_END
 SYSTEM_CONFIG_START(specimx)	
  	CONFIG_RAM_DEFAULT(256 * 1024)
 	CONFIG_DEVICE(special_cassette_getinfo)
+	CONFIG_DEVICE(specimx_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 /* Driver */
