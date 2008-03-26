@@ -29,7 +29,7 @@ struct DevViewInfo
 	int nGame;
 	int nWidth;
 	BOOL bSurpressFilenameChanged;
-	const struct IODevice *pDevices;
+	machine_config *config;
 	const struct DevViewCallbacks *pCallbacks;
 	struct DevViewEntry *pEntries;
 };
@@ -76,10 +76,10 @@ static void DevView_Clear(HWND hwndDevView)
 		pDevViewInfo->pEntries = NULL;
 	}
 
-	if (pDevViewInfo->pDevices != NULL)
+	if (pDevViewInfo->config != NULL)
 	{
-		devices_free(pDevViewInfo->pDevices);
-		pDevViewInfo->pDevices = NULL;
+		machine_config_free(pDevViewInfo->config);
+		pDevViewInfo->config = NULL;
 	}
 }
 
@@ -187,9 +187,8 @@ static LRESULT CALLBACK DevView_EditWndProc(HWND hwndEdit, UINT nMessage, WPARAM
 BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 {
 	struct DevViewInfo *pDevViewInfo;
-	const game_driver *drv;
-	const struct IODevice *devices;
-	const struct IODevice *dev;
+	const device_config *dev;
+	const struct IODevice *iodev;
 	struct DevViewEntry *pEnt;
 	int i, id;
 	int y, nHeight, nDevCount;
@@ -209,24 +208,31 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 		return TRUE;
 
 	DevView_Clear(hwndDevView);
-	drv = drivers[nGame];
-	devices = pDevViewInfo->pDevices = devices_allocate(drv);
 
-	// Count total amount of devices
+	// allocate the machine config
+	pDevViewInfo->config = machine_config_alloc_with_mess_devices(drivers[nGame]);
+
+	// count total amount of devices
 	nDevCount = 0;
-	for (dev = devices; dev->type < IO_COUNT; dev++)
-		nDevCount += dev->count;
+	for (dev = device_list_first(pDevViewInfo->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	{
+		iodev = mess_device_from_core_device(dev);
+		nDevCount += iodev->count;
+	}
 
 	if (nDevCount > 0)
 	{
-		// Get the names of all of the devices
+		// get the names of all of the devices
 		ppszDevices = (LPTSTR *) alloca(nDevCount * sizeof(*ppszDevices));
 		i = 0;
-		for (dev = devices; dev->type < IO_COUNT; dev++)
+
+		for (dev = device_list_first(pDevViewInfo->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
 		{
-			for (id = 0; id < dev->count; id++)
+			iodev = mess_device_from_core_device(dev);
+
+			for (id = 0; id < iodev->count; id++)
 			{
-				utf8_s = dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0]));
+				utf8_s = iodev->name(iodev, id, buf, sizeof(buf) / sizeof(buf[0]));
 				s = tstring_from_utf8(utf8_s);
 				ppszDevices[i] = alloca((_tcslen(s) + 1) * sizeof(TCHAR));
 				_tcscpy(ppszDevices[i], s);
@@ -260,14 +266,16 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 		DevView_GetColumns(hwndDevView, &nStaticPos, &nStaticWidth,
 			&nEditPos, &nEditWidth, &nButtonPos, &nButtonWidth);
 
-		for (dev = devices; dev->type < IO_COUNT; dev++)
+		for (dev = device_list_first(pDevViewInfo->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
 		{
-			for (id = 0; id < dev->count; id++)
+			iodev = mess_device_from_core_device(dev);
+
+			for (id = 0; id < iodev->count; id++)
 			{
-				pEnt->dev = dev;
+				pEnt->dev = iodev;
 				pEnt->id = id;
 
-				pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0])),
+				pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", iodev->name(iodev, id, buf, sizeof(buf) / sizeof(buf[0])),
 					WS_VISIBLE | WS_CHILD, nStaticPos, y, nStaticWidth, nHeight,
 					hwndDevView, NULL, NULL, NULL);
 

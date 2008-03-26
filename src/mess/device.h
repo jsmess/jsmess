@@ -9,15 +9,22 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
+// MAME headers
 #include "mamecore.h"
+#include "devintrf.h"
+
+// MESS headers
 #include "osdmess.h"
 #include "opresolv.h"
+
 
 /*************************************
  *
  *  Device information constants
  *
  *************************************/
+
+#define MESS_DEVICE		DEVICE_GET_INFO_NAME(mess_device)
 
 #define MAX_DEV_INSTANCES	5
 
@@ -97,6 +104,7 @@ typedef void (*device_display_handler)(mess_image *image);
 typedef const char *(*device_getname_handler)(const struct IODevice *dev, int id, char *buf, size_t bufsize);
 
 struct _mess_device_class;
+struct _machine_config;
 
 union devinfo
 {
@@ -230,6 +238,7 @@ struct CreateImageOptions
 struct IODevice
 {
 	mess_device_class devclass;
+	const device_config *devconfig;
 
 	/* the basics */
 	const char *tag;
@@ -268,6 +277,10 @@ struct IODevice
 	const struct CreateImageOptions *createimage_options;
 };
 
+/* interoperability with MAME devices */
+DEVICE_GET_INFO(mess_device);
+struct _machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedrv);
+const struct IODevice *mess_device_from_core_device(const device_config *device);
 
 /* device naming */
 const char *device_uiname(iodevice_t devtype);
@@ -276,20 +289,16 @@ const char *device_brieftypename(iodevice_t type);
 int device_typeid(const char *name);
 
 /* device allocation */
-const struct IODevice *devices_allocate(const game_driver *gamedrv);
-void devices_free(const struct IODevice *devices);
+void mess_devices_setup(machine_config *config, const game_driver *gamedrv);
 
 /* device enumeration */
 const struct IODevice *mess_device_first_from_machine(const running_machine *machine);
 const struct IODevice *mess_device_next(const struct IODevice *dev);
 
 /* device lookup */
-const struct IODevice *device_find_tag(const struct IODevice *devices, const char *tag);
-int device_count_tag(const struct IODevice *devices, const char *tag);
 int device_count_tag_from_machine(const running_machine *machine, const char *tag);
 
 /* deprecated: device lookup; both of these function assume only one of each type of device */
-const struct IODevice *device_find(const struct IODevice *devices, iodevice_t type);
 const struct IODevice *device_find_from_machine(const running_machine *machine, iodevice_t type);
 int device_count(iodevice_t type);
 

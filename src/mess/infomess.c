@@ -28,56 +28,54 @@
 
 void print_game_device(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const struct IODevice* devices;
+	const device_config *dev;
+	const struct IODevice *iodev;
 	const char *name;
 	const char *shortname;
-	int id, devindex;
+	int id;
 
-	devices = devices_allocate(game);
-	if (devices)
+	for (dev = device_list_first(config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
 	{
-		for (devindex = 0; devices[devindex].type < IO_COUNT; devindex++)
+		iodev = mess_device_from_core_device(dev);
+
+		/* print out device type */
+		fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(device_typename(iodev->type)));
+
+		/* does this device have a tag? */
+		if (iodev->tag)
+			fprintf(out, " tag=\"%s\"", xml_normalize_string(iodev->tag));
+
+		/* is this device mandatory? */
+		if (iodev->must_be_loaded)
+			fprintf(out, " mandatory=\"1\"");
+
+		/* close the XML tag */
+		fprintf(out, ">\n");
+
+		for (id = 0; id < iodev->count; id++)
 		{
-			/* print out device type */
-			fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(device_typename(devices[devindex].type)));
+			name = device_instancename(&iodev->devclass, id);
+			shortname = device_briefinstancename(&iodev->devclass, id);
 
-			/* does this device have a tag? */
-			if (devices[devindex].tag)
-				fprintf(out, " tag=\"%s\"", xml_normalize_string(devices[devindex].tag));
-
-			/* is this device mandatory? */
-			if (devices[devindex].must_be_loaded)
-				fprintf(out, " mandatory=\"1\"");
-
-			/* close the XML tag */
-			fprintf(out, ">\n");
-
-			for (id = 0; id < devices[devindex].count; id++)
-			{
-				name = device_instancename(&devices[devindex].devclass, id);
-				shortname = device_briefinstancename(&devices[devindex].devclass, id);
-
-				fprintf(out, "\t\t\t<instance");
-				fprintf(out, " name=\"%s\"", xml_normalize_string(name));
-				fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
-				fprintf(out, "/>\n");
-			}
-
-			if (devices[devindex].file_extensions)
-			{
-				const char* ext = devices[devindex].file_extensions;
-				while (*ext)
-				{
-					fprintf(out, "\t\t\t<extension");
-					fprintf(out, " name=\"%s\"", xml_normalize_string(ext));
-					fprintf(out, "/>\n");
-					ext += strlen(ext) + 1;
-				}
-			}
-
-			fprintf(out, "\t\t</device>\n");
+			fprintf(out, "\t\t\t<instance");
+			fprintf(out, " name=\"%s\"", xml_normalize_string(name));
+			fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
+			fprintf(out, "/>\n");
 		}
-		devices_free(devices);
+
+		if (iodev->file_extensions)
+		{
+			const char* ext = iodev->file_extensions;
+			while (*ext)
+			{
+				fprintf(out, "\t\t\t<extension");
+				fprintf(out, " name=\"%s\"", xml_normalize_string(ext));
+				fprintf(out, "/>\n");
+				ext += strlen(ext) + 1;
+			}
+		}
+
+		fprintf(out, "\t\t</device>\n");
 	}
 }
 

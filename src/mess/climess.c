@@ -43,13 +43,18 @@ void mess_display_help(void)
 
 int info_listdevices(core_options *opts, const char *gamename)
 {
-	int i, dev, id;
-	const struct IODevice *devices;
+	int i, id;
+	machine_config *config;
+	const device_config *dev;
+	const struct IODevice *iodev;
 	const char *src;
 	const char *driver_name;
 	const char *name;
 	const char *shortname;
 	char paren_shortname[16];
+
+	/* since we expand the machine driver, we need to set things up */
+	init_resource_tracking();
 
 	i = 0;
 
@@ -60,18 +65,21 @@ int info_listdevices(core_options *opts, const char *gamename)
 	{
 		if (!core_strwildcmp(gamename, drivers[i]->name))
 		{
-			devices = devices_allocate(drivers[i]);
+			/* allocate the machine config */
+			config = machine_config_alloc_with_mess_devices(drivers[i]);
 
 			driver_name = drivers[i]->name;
 
-			for (dev = 0; devices[dev].type < IO_COUNT; dev++)
+			for (dev = device_list_first(config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
 			{
-				src = devices[dev].file_extensions;
+				iodev = mess_device_from_core_device(dev);
 
-				for (id = 0; id < devices[dev].count; id++)
+				src = iodev->file_extensions;
+
+				for (id = 0; id < iodev->count; id++)
 				{
-					name = device_instancename(&devices[dev].devclass, id);
-					shortname = device_briefinstancename(&devices[dev].devclass, id);
+					name = device_instancename(&iodev->devclass, id);
+					shortname = device_briefinstancename(&iodev->devclass, id);
 
 					sprintf(paren_shortname, "(%s)", shortname);
 
@@ -89,10 +97,14 @@ int info_listdevices(core_options *opts, const char *gamename)
 					mame_printf_info("\n");
 				}
 			}
-			devices_free(devices);
+			machine_config_free(config);
 		}
 		i++;
 	}
+
+	/* clean up our tracked resources */
+	exit_resource_tracking();
+
 	return 0;
 }
 

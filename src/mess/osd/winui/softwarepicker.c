@@ -63,6 +63,7 @@ struct SoftwarePickerInfo
 	struct DirectorySearchInfo *pFirstSearchInfo;
 	struct DirectorySearchInfo *pLastSearchInfo;
 	const game_driver *pDriver;
+	machine_config *pConfig;
 	hash_file *pHashFile;
 	void (*pfnErrorProc)(const char *message);
 };
@@ -209,6 +210,13 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *pDriver)
 			pPickerInfo->nHashesRealized = 0;
 		}
 
+		// is there a machine_config loaded?
+		if (pPickerInfo->pConfig != NULL)
+		{
+			// free the machine_config
+			machine_config_free(pPickerInfo->pConfig);
+			pPickerInfo->pConfig = NULL;
+		}
 
 		// change the driver value
 		pPickerInfo->pDriver = pDriver;
@@ -216,6 +224,9 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *pDriver)
 		// if we have a driver, we have to load some stuff
 		if (pDriver != NULL)
 		{
+			// get the configuration
+			pPickerInfo->pConfig = machine_config_alloc_with_mess_devices(pDriver);
+
 			// find a hash file
 			while((pDriver != NULL) && !pPickerInfo->pHashFile)
 			{
@@ -399,10 +410,10 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	struct SoftwarePickerInfo *pPickerInfo;
 	struct FileInfo **ppNewIndex;
 	struct FileInfo *pInfo;
-	int nIndex, nSize, devindex;
+	int nIndex, nSize;
 	LPCSTR pszExtension = NULL, s;
-	const struct IODevice *devices = NULL;
 	mess_device_class devclass = {0,};
+	const device_config *device;
 
 	// first check to see if it is already here
 	if (SoftwarePicker_LookupIndex(hwndPicker, pszFilename) >= 0)
@@ -413,28 +424,26 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	// look up the device
 	if (strrchr(pszFilename, '.'))
 		pszExtension = strrchr(pszFilename, '.');
-	if (pszExtension && pPickerInfo->pDriver)
+	if ((pszExtension != NULL) && (pPickerInfo->pDriver != NULL))
 	{
+		// skip the initial '.' in the file extension
 		pszExtension++;
 
-		devices = devices_allocate(pPickerInfo->pDriver);
-		if (devices != NULL)
+		for (device = device_list_first(pPickerInfo->pConfig->devicelist, MESS_DEVICE); device != NULL; device = device_list_next(device, MESS_DEVICE))
 		{
-			for (devindex = 0; devices[devindex].type < IO_COUNT; devindex++)
+			const struct IODevice *iodev = mess_device_from_core_device(device);
+
+			s = iodev->file_extensions;
+			if (s != NULL)
 			{
-				s = devices[devindex].file_extensions;
-				if (s)
+				while(*s && mame_stricmp(pszExtension, s))
+					s += strlen(s) + 1;
+				if (*s)
 				{
-					while(*s && mame_stricmp(pszExtension, s))
-						s += strlen(s) + 1;
-					if (*s)
-					{
-						devclass = devices[devindex].devclass;
-						break;
-					}
+					devclass = iodev->devclass;
+					break;
 				}
 			}
-			devices_free(devices);
 		}
 	}
 

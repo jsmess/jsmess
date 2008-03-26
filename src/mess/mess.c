@@ -102,19 +102,6 @@ static void ram_init(const game_driver *gamedrv)
 
 
 /*-------------------------------------------------
-    devices_exit - tear down devices for a specific
-	running_machine
--------------------------------------------------*/
-
-static void devices_exit(running_machine *machine)
-{
-	devices_free(machine->devices);
-	machine->devices = NULL;
-}
-
-
-
-/*-------------------------------------------------
     devices_init - initialize devices for a specific
 	running_machine
 -------------------------------------------------*/
@@ -131,10 +118,7 @@ void devices_init(running_machine *machine)
 	inputx_init(machine);
 
 	/* allocate the IODevice struct */
-	machine->devices = (struct IODevice *) devices_allocate(machine->gamedrv);
-	if (!machine->devices)
-		fatalerror_exitcode(MAMERR_DEVICE, "devices_allocate() failed");
-	add_exit_callback(machine, devices_exit);
+	mess_devices_setup((machine_config *) machine->config, machine->gamedrv);
 
 	/* initialize RAM code */
 	ram_init(machine->gamedrv);
