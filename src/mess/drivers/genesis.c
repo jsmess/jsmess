@@ -380,6 +380,11 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	}
 }
 
+static WRITE16_HANDLER( genesis_TMSS_bank_w )
+{
+	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
+}
+
 static void genesis_machine_stop(running_machine *machine)
 {
 	/* Write out the battery file if necessary */
@@ -401,6 +406,10 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, genesis_ssf2_bank_w);
 	}
+	/* install NOP handler for TMSS */
+
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
+
 }
 
 static DRIVER_INIT( genusa )
