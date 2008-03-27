@@ -233,6 +233,30 @@ static MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row ) {
 }
 
 
+static MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row ) {
+	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0); 
+	UINT8	*vid = pcjr.displayram + ( ra << 13 );
+	int i; 
+
+	if ( y == 0 ) logerror("t1000_gfx_2bpp_tga_update_row\n");
+	for ( i = 0; i < x_count; i++ ) {
+		UINT16 offset = ( ( ma + i ) << 1 ) & 0x1fff;
+		UINT8 data = vid[ offset ]; 
+		UINT16 data2 = ( vid[ offset + 1 ] ) << 1;
+        
+		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x100 ) | ( data & 0x80 ) ) >> 7 ) ]; p++;
+		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x80 ) | ( data & 0x40 ) ) >> 6 ) ]; p++;
+		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x40 ) | ( data & 0x20 ) ) >> 5 ) ]; p++;
+		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x20 ) | ( data & 0x10 ) ) >> 4 ) ]; p++;
+
+		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x10 ) | ( data & 0x08 ) ) >> 3 ) ]; p++;
+		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x08 ) | ( data & 0x04 ) ) >> 2 ) ]; p++;
+		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x04 ) | ( data & 0x02 ) ) >> 1 ) ]; p++;
+		*p = pcjr.reg.data[ 0x10 + (   ( data2 & 0x02 ) | ( data & 0x01 )        ) ]; p++;
+	}
+}
+
+
 static MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row ) {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
@@ -326,7 +350,7 @@ static void pc_t1t_mode_switch( void ) {
 		case 0x80:
 		case 0xc0:
 			//logerror("t1t_gfx_2bpp - 2\n");
-			pcjr.update_row = t1000_gfx_2bpp_update_row;
+			pcjr.update_row = t1000_gfx_2bpp_tga_update_row;
 			break;
 		}
 		break;
