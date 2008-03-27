@@ -284,7 +284,7 @@ INTERRUPT_GEN( tandy1000_frame_interrupt )
 
 INTERRUPT_GEN( pc_aga_frame_interrupt )
 {
-	pc_generic_frame_interrupt(pc_aga_timer);
+	pc_generic_frame_interrupt(NULL);
 }
 
 INTERRUPT_GEN( pc_vga_frame_interrupt )

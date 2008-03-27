@@ -111,7 +111,7 @@ extern WRITE8_HANDLER ( europc_jim_w )
 		}
 //		mode= data&0x10?AGA_COLOR:AGA_MONO;
 //		mode= data&0x10?AGA_COLOR:AGA_OFF;
-		pc_aga_set_mode(europc_jim.mode);
+		pc_aga_set_mode(machine,europc_jim.mode);
 		if (data&0x80) europc_jim.state=0;
 		break;
 	case 4:

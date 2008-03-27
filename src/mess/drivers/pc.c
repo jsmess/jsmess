@@ -1271,18 +1271,7 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_MACHINE_RESET(pc_aga)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*9, 25*14)
-	MDRV_SCREEN_VISIBLE_AREA(0,80*9-1, 0,25*14-1)
-	MDRV_GFXDECODE(europc)
-	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / sizeof(cga_palette[0]))
-	MDRV_PALETTE_INIT(pc_aga)
-
-	MDRV_VIDEO_START(pc_aga)
-	MDRV_VIDEO_UPDATE(pc_video)
+	MDRV_IMPORT_FROM( pcvideo_aga )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1334,18 +1323,7 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_MACHINE_RESET(pc_aga)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*8, 25*14)
-	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1, 0,25*14-1)
-	MDRV_GFXDECODE(aga)
-	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / sizeof(cga_palette[0]))
-	MDRV_PALETTE_INIT(pc_aga)
-
-	MDRV_VIDEO_START(pc200)	/* PC200 needs its own video init */
-	MDRV_VIDEO_UPDATE(pc_video)
+	MDRV_IMPORT_FROM( pcvideo_pc200 )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

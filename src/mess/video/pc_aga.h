@@ -18,22 +18,15 @@
 
 */
 
+#define AGA_SCREEN_NAME "aga_screen"
+#define AGA_MC6845_NAME "mc6845_aga"
 
-extern const gfx_layout europc_cga_charlayout;
-extern const gfx_layout europc_mda_charlayout;
-GFXDECODE_EXTERN( europc );
-GFXDECODE_EXTERN( aga );
-
-extern PALETTE_INIT( pc_aga );
+MACHINE_DRIVER_EXTERN( pcvideo_aga );
+MACHINE_DRIVER_EXTERN( pcvideo_pc200 );
 
 
 typedef enum AGA_MODE { AGA_OFF, AGA_COLOR, AGA_MONO } AGA_MODE;
-void pc_aga_set_mode(AGA_MODE mode);
-
-extern VIDEO_START( pc_aga );
-extern VIDEO_START( pc200 );
-
-extern void pc_aga_timer(void);
+void pc_aga_set_mode(running_machine *machine, AGA_MODE mode);
 
 READ8_HANDLER( pc_aga_videoram_r );
 WRITE8_HANDLER( pc_aga_videoram_w );
