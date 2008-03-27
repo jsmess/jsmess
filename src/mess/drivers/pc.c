@@ -78,6 +78,7 @@ Tandy 1000 (80386) variations:
 #include "devices/printer.h"
 #include "devices/mflopimg.h"
 #include "devices/harddriv.h"
+#include "devices/cassette.h"
 #include "formats/pc_dsk.h"
 
 #include "machine/8237dma.h"
@@ -155,7 +156,6 @@ static ADDRESS_MAP_START( pc16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd0000, 0xeffff) AM_NOP
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
-
 
 
 static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
@@ -1803,6 +1803,17 @@ ROM_START( dgone )
 	ROM_LOAD("cga.chr", 0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END
 
+
+static void ibmpc_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
+	switch( state ) {
+	case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
+	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED; break;
+
+	default:											cassette_device_getinfo(devclass, state, info); break;
+	}
+}
+
+
 static void ibmpc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -1845,6 +1856,7 @@ static void ibmpc_harddisk_getinfo(const mess_device_class *devclass, UINT32 sta
 SYSTEM_CONFIG_START(ibmpc)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
 	CONFIG_DEVICE(ibmpc_printer_getinfo)
+	CONFIG_DEVICE(ibmpc_cassette_getinfo)
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
 	CONFIG_DEVICE(ibmpc_harddisk_getinfo)
 SYSTEM_CONFIG_END

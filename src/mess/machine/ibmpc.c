@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "memconv.h"
 #include "includes/ibmpc.h"
+#include "devices/cassette.h"
 
 #include "machine/pcshare.h"
 #include "audio/pc.h"
@@ -159,6 +160,15 @@ static struct {
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
+	{
+		double tap_val = cassette_input( image_from_devtype_and_index( IO_CASSETTE, 0 ) );
+
+		if ( tap_val < 0 ) {
+			data &= ~0x10;
+		} else {
+			data |= 0x10;
+		}
+	}
 	return data;
 }
 
