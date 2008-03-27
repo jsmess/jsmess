@@ -26,7 +26,7 @@ static int off_y = 0;
 static UINT8 framecnt = 0;
 static UINT8 super80v_vid_col=1;			// 0 = color ram ; 1 = video ram
 static UINT8 super80v_rom_pcg=1;			// 0 = prom ; 1 = pcg
-static UINT8 mc6845_cursor[15];				// cursor shape
+static UINT8 mc6845_cursor[16];				// cursor shape
 static UINT8 mc6845[20];				/* registers */
 static UINT8 mc6845_reg;				/* register index */
 static UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
@@ -329,10 +329,10 @@ static VIDEO_UPDATE( super80v )
 	/* Get the graphics of the character under the cursor, xor with the visible cursor scan lines,
 	   and store as character number 256. If inverse mode, drop bit 7 of character before xoring */
 	if (!super80v_rom_pcg)
-		for ( i = 0; i < 16; i++)
+		for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
 			pcgram[0x1000+i] = pcgram[(videoram[cursor]&0x7f)*16+i] ^ mc6845_cursor[i];
 	else
-		for ( i = 0; i < 16; i++)
+		for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
 			pcgram[0x1000+i] = pcgram[(videoram[cursor])*16 + i] ^ mc6845_cursor[i];
 
 	decodechar(screen->machine->gfx[0],256, pcgram);			// and into machine graphics
