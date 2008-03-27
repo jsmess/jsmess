@@ -8,6 +8,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [T1000HX] Fixed bug #1130.  [Wilbert Pol]
+
 - [TUTOR] Changed joystick to use keypad instead of arrow keys by default.
   [Fabio Priuli]
 
