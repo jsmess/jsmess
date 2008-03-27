@@ -785,42 +785,6 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 }
 
 
-/***************************************************************************
-  Draw graphics mode with 320x200 pixels (default) with 2 bits/pixel.
-  Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
-  cga fetches 2 byte per mscrtc6845 access.
-***************************************************************************/
-
-static MC6845_UPDATE_ROW( cga_gfx_2bpph_update_row ) {
-		UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
-		int i;
-
-//  if ( y == 0 ) logerror("cga_gfx_2bpph_update_row\n");
-	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-		UINT8 data = videoram[ offset ];
-
-		*p = cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[   data        & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[   data        & 0x03 ]; p++;
-
-		data = videoram[ offset+1 ];
-
-		*p = cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[   data        & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[   data        & 0x03 ]; p++;
-	}
-}
 
 /***************************************************************************
   Draw graphics mode with 640x200 pixels (default).
@@ -973,7 +937,7 @@ static void pc_cga_mode_control_w(running_machine *machine, int data)
 		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
 			cga.update_row = cga_gfx_4bpph_update_row;
 		} else {
-			cga.update_row = cga_gfx_2bpph_update_row;
+			cga.update_row = cga_gfx_1bpp_update_row;
 		}
 		break;
 	case 0x1E: case 0x1F: case 0x3E: case 0x3F:
