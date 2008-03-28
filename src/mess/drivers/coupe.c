@@ -383,48 +383,53 @@ static INPUT_PORTS_START( coupe )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT)
-
 INPUT_PORTS_END
 
-/* Initialise the palette */
+
+
+/*************************************
+ *
+ *  Palette
+ *
+ *************************************/
+
+/*
+    Decode colours for the palette as follows:
+
+    bit     7       6       5       4       3       2       1       0
+         nothing   G+4     R+4     B+4    ALL+1    G+2     R+2     B+2
+
+    These values scaled up to 0-255 range would give modifiers of:
+
+      +4 = +(4*36), +2 = +(2*36), +1 = *(1*36)
+
+    Not quite max of 255 but close enough for me!
+ */
 static PALETTE_INIT( coupe )
 {
-	unsigned char red,green,blue;
-	int a;
-	unsigned short coupe_colortable[128];		// 1-1 relationship to palette!
+	int i;
 
-	for (a=0;a<128;a++)
+	for (i = 0; i < 128; i++)
 	{
-		/* decode colours for palette as follows :
-         * bit number       7       6       5       4       3       2       1       0
-         *                      |       |       |       |       |       |       |
-         *               nothing   G+4     R+4     B+4    ALL+1    G+2     R+2     B+2
-         *
-         * these values scaled up to 0-255 range would give modifiers of :  +4 = +(4*36), +2 = +(2*36), +1 = *(1*36)
-         * not quite max of 255 but close enough for me!
-         */
-		red=green=blue=0;
-		if (a&0x01)
-			blue+=2*36;
-		if (a&0x02)
-			red+=2*36;
-		if (a&0x04)
-			green+=2*36;
-		if (a&0x08)
-		{
-			red+=1*36;
-			green+=1*36;
-			blue+=1*36;
-		}
-		if (a&0x10)
-			blue+=4*36;
-		if (a&0x20)
-			red+=4*36;
-		if (a&0x40)
-			green+=4*36;
+		UINT8 r = 0, g = 0, b = 0;
 
-		palette_set_color_rgb(machine, a, red, green, blue);
-		coupe_colortable[a]=a;
+		/* colors */
+		if (i & 0x01) b += 2*36;
+		if (i & 0x02) r += 2*36;
+		if (i & 0x04) g += 2*36;
+		if (i & 0x10) b += 4*36;
+		if (i & 0x20) r += 4*36;
+		if (i & 0x40) g += 4*36;
+
+		/* intensity bit */
+		if (i & 0x08)
+		{
+			r += 1*36;
+			g += 1*36;
+			b += 1*36;
+		}
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
