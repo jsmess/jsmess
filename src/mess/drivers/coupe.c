@@ -66,6 +66,9 @@ Note on the bioses:
 #include "devices/basicdsk.h"
 
 
+#define COUPE_XTAL_X1  XTAL_24MHz
+#define COUPE_XTAL_X2  XTAL_4_433619MHz
+
 
 static unsigned char getSamKey1(unsigned char hi);
 static unsigned char getSamKey2(unsigned char hi);
@@ -447,7 +450,7 @@ static PALETTE_INIT( coupe )
 
 static MACHINE_DRIVER_START( coupe )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)        /* 6 Mhz */
+	MDRV_CPU_ADD(Z80, COUPE_XTAL_X1/4) /* 6 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coupe_mem, 0)
 	MDRV_CPU_IO_MAP(coupe_io, 0)
 	MDRV_CPU_VBLANK_INT("main", coupe_frame_interrupt)
@@ -455,11 +458,8 @@ static MACHINE_DRIVER_START( coupe )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MDRV_SCREEN_RAW_PARAMS(COUPE_XTAL_X1/2, 768, 0, 512, 312, 0, 192) /* border area? */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 24*8 + 10)
-	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 24*8-1)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(coupe)
 
@@ -470,7 +470,7 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD(SAA1099, 8000000 /* guess */)
+	MDRV_SOUND_ADD(SAA1099, COUPE_XTAL_X1/3) /* 8 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
