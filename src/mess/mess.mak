@@ -369,6 +369,7 @@ DRVLIBS = \
 	$(MESSOBJ)/gce.a \
 	$(MESSOBJ)/glasgow.a \
 	$(MESSOBJ)/gmaster.a \
+	$(MESSOBJ)/pasogo.a \
 	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/jupiter.a \
@@ -1181,6 +1182,9 @@ $(MESSOBJ)/pel.a:      \
 $(MESSOBJ)/gmaster.a:			\
 	$(MESS_DRIVERS)/gmaster.o	\
 	$(MESS_AUDIO)/gmaster.o
+
+$(MESSOBJ)/pasogo.a:			\
+	$(MESS_DRIVERS)/pasogo.o	\
 
 $(MESSOBJ)/ut88.a:      \
 	$(MESS_DRIVERS)/ut88.o \

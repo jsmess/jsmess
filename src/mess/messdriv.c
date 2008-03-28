@@ -191,6 +191,9 @@ TESTDRIVER( svisionn )
 	/* EPOCH */
 	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
 
+	/* KOEI */
+	DRIVER( pasogo )	/* KOEI PasoGo */
+
 
 /****************COMPUTERS***************************************************/
     /* ACORN */
