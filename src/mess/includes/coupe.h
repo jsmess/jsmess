@@ -31,6 +31,10 @@
 #define LMPR_RAM0	0x20	/* If bit set ram is paged into bank 0, else its rom0 */
 #define LMPR_ROM1	0x40	/* If bit set rom1 is paged into bank 3, else its ram */
 
+/*----------- defined in drivers/coupe.c -----------*/
+
+void coupe_irq(running_machine *machine, UINT8 src);
+
 
 /*----------- defined in machine/coupe.c -----------*/
 
@@ -40,7 +44,6 @@ extern UINT8 SOUND_ADDR;	/* Current Address in sound registers */
 extern UINT8 SOUND_REG[32]; /* 32 sound registers */
 extern UINT8 LINE_INT;		/* Line interrupt register */
 extern UINT8 LPEN,HPEN; 	/* ??? */
-extern UINT8 CURLINE;		/* Current scanline */
 extern UINT8 STAT;			/* returned when port 249 read */
 
 void coupe_update_memory(void);

@@ -52,105 +52,23 @@ Note on the bioses:
 
 ***************************************************************************/
 
+/* core includes */
 #include "driver.h"
-#include "deprecat.h"
-#include "cpu/z80/z80.h"
 #include "includes/coupe.h"
+
+/* components */
+#include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
 #include "sound/saa1099.h"
 #include "sound/speaker.h"
 
-static ADDRESS_MAP_START( coupe_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x3FFF) AM_RAMBANK(1)
-	AM_RANGE( 0x4000, 0x7FFF) AM_RAMBANK(2)
-	AM_RANGE( 0x8000, 0xBFFF) AM_RAMBANK(3)
-	AM_RANGE( 0xC000, 0xFFFF) AM_RAMBANK(4)
-ADDRESS_MAP_END
+/* devices */
+#include "devices/basicdsk.h"
 
-static INTERRUPT_GEN( coupe_line_interrupt )
-{
-	int interrupted=0;	/* This is used to allow me to clear the STAT flag (easiest way I can do it!) */
 
-	HPEN = CURLINE;
 
-	if (LINE_INT<192)
-	{
-		if (CURLINE == LINE_INT)
-		{
-			/* No other interrupts can occur - NOT CORRECT!!! */
-            STAT=0x1E;
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-			interrupted=1;
-		}
-	}
-
-	CURLINE = (CURLINE + 1) % (192+10);
-
-	if (CURLINE == 193)
-	{
-		if (interrupted)
-			STAT&=~0x08;
-		else
-			STAT=0x17;
-
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-		interrupted=1;
-	}
-
-	if (!interrupted)
-		STAT=0x1F;
-}
-
-static unsigned char getSamKey1(unsigned char hi)
-{
-	unsigned char result;
-
-	hi=~hi;
-	result=0xFF;
-
-	if (hi==0x00)
-		result &=readinputport(8) & 0x1F;
-	else
-	{
-		if (hi&0x80) result &= readinputport(7) & 0x1F;
-		if (hi&0x40) result &= readinputport(6) & 0x1F;
-		if (hi&0x20) result &= readinputport(5) & 0x1F;
-		if (hi&0x10) result &= readinputport(4) & 0x1F;
-		if (hi&0x08) result &= readinputport(3) & 0x1F;
-		if (hi&0x04) result &= readinputport(2) & 0x1F;
-		if (hi&0x02) result &= readinputport(1) & 0x1F;
-		if (hi&0x01) result &= readinputport(0) & 0x1F;
-	}
-
-	return result;
-}
-
-static unsigned char getSamKey2(unsigned char hi)
-{
-	unsigned char result;
-
-	hi=~hi;
-	result=0xFF;
-
-	if (hi==0x00)
-	{
-		/* does not map to any keys? */
-	}
-	else
-	{
-		if (hi&0x80) result &= readinputport(7) & 0xE0;
-		if (hi&0x40) result &= readinputport(6) & 0xE0;
-		if (hi&0x20) result &= readinputport(5) & 0xE0;
-		if (hi&0x10) result &= readinputport(4) & 0xE0;
-		if (hi&0x08) result &= readinputport(3) & 0xE0;
-		if (hi&0x04) result &= readinputport(2) & 0xE0;
-		if (hi&0x02) result &= readinputport(1) & 0xE0;
-		if (hi&0x01) result &= readinputport(0) & 0xE0;
-	}
-
-	return result;
-}
+static unsigned char getSamKey1(unsigned char hi);
+static unsigned char getSamKey2(unsigned char hi);
 
 
 static READ8_HANDLER( coupe_port_r )
@@ -181,7 +99,7 @@ static READ8_HANDLER( coupe_port_r )
         return wd17xx_data_r(machine, 0);
 	case LPEN_PORT:
 		return LPEN;
-	case STAT_PORT:
+	case STAT_PORT:		
 		return ((getSamKey2((offset >> 8)&0xFF))&0xE0) | STAT;
 	case LMPR_PORT:
 		return LMPR;
@@ -268,12 +186,119 @@ static WRITE8_HANDLER( coupe_port_w )
 	}
 }
 
-static ADDRESS_MAP_START( coupe_io , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x0000, 0x0ffff) AM_READWRITE( coupe_port_r, coupe_port_w )
+
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( coupe_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(4)
 ADDRESS_MAP_END
 
-static GFXDECODE_START( coupe_gfxdecodeinfo )
-GFXDECODE_END
+static ADDRESS_MAP_START( coupe_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0x0ffff) AM_READWRITE(coupe_port_r, coupe_port_w)
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Interrupts
+ *
+ *************************************/
+
+static TIMER_CALLBACK( irq_off )
+{
+	/* clear interrupt */
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	
+	/* adjust STATUS register */
+	STAT |= param;
+}
+
+
+void coupe_irq(running_machine *machine, UINT8 src)
+{
+	/* set irq and a timer to set it off again */
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	timer_set(ATTOTIME_IN_USEC(20), NULL, src, irq_off);
+	
+	/* adjust STATUS register */
+	STAT &= ~src;
+}
+
+
+static INTERRUPT_GEN( coupe_frame_interrupt )
+{
+	/* signal frame interrupt */
+	coupe_irq(machine, 0x08);
+}
+
+
+
+/*************************************
+ *
+ *  Inputs
+ *
+ *************************************/
+
+static unsigned char getSamKey1(unsigned char hi)
+{
+	unsigned char result;
+
+	hi=~hi;
+	result=0xFF;
+
+	if (hi==0x00)
+		result &=readinputport(8) & 0x1F;
+	else
+	{
+		if (hi&0x80) result &= readinputport(7) & 0x1F;
+		if (hi&0x40) result &= readinputport(6) & 0x1F;
+		if (hi&0x20) result &= readinputport(5) & 0x1F;
+		if (hi&0x10) result &= readinputport(4) & 0x1F;
+		if (hi&0x08) result &= readinputport(3) & 0x1F;
+		if (hi&0x04) result &= readinputport(2) & 0x1F;
+		if (hi&0x02) result &= readinputport(1) & 0x1F;
+		if (hi&0x01) result &= readinputport(0) & 0x1F;
+	}
+
+	return result;
+}
+
+
+static unsigned char getSamKey2(unsigned char hi)
+{
+	unsigned char result;
+
+	hi=~hi;
+	result=0xFF;
+
+	if (hi==0x00)
+	{
+		/* does not map to any keys? */
+	}
+	else
+	{
+		if (hi&0x80) result &= readinputport(7) & 0xE0;
+		if (hi&0x40) result &= readinputport(6) & 0xE0;
+		if (hi&0x20) result &= readinputport(5) & 0xE0;
+		if (hi&0x10) result &= readinputport(4) & 0xE0;
+		if (hi&0x08) result &= readinputport(3) & 0xE0;
+		if (hi&0x04) result &= readinputport(2) & 0xE0;
+		if (hi&0x02) result &= readinputport(1) & 0xE0;
+		if (hi&0x01) result &= readinputport(0) & 0xE0;
+	}
+
+	return result;
+}
+
 
 static INPUT_PORTS_START( coupe )
 	PORT_START // FE  0
@@ -414,24 +439,27 @@ static PALETTE_INIT( coupe )
 
 
 
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( coupe )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 6000000)        /* 6 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coupe_mem, 0)
 	MDRV_CPU_IO_MAP(coupe_io, 0)
-	MDRV_CPU_VBLANK_INT_HACK(coupe_line_interrupt, 192 + 10)	/* 192 scanlines + 10 lines of vblank (approx).. */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(0)
-	MDRV_INTERLEAVE(1)
-
+	MDRV_CPU_VBLANK_INT("main", coupe_frame_interrupt)
 	MDRV_MACHINE_START( coupe )
 
     /* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 24*8)
+	MDRV_SCREEN_SIZE(64*8, 24*8 + 10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 24*8-1)
-	MDRV_GFXDECODE( coupe_gfxdecodeinfo )
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(coupe)
 
@@ -446,11 +474,13 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
-/***************************************************************************
 
-  Game driver(s)
 
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START(coupe)
 	ROM_REGION(0x8000,REGION_CPU1,0)
@@ -489,23 +519,32 @@ ROM_START(coupe)
 	ROMX_LOAD("rom30", 0x0000, 0x8000, CRC(e535c25d) SHA1(d390f0be420dfb12b1e54a4f528b5055d7d97e2a), ROM_BIOS(14))
 ROM_END
 
+
+
+/*************************************
+ *
+ *  Devices
+ *
+ *************************************/
+
 static void coupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_coupe_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_coupe_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk"); break;
 
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:								legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
 }
+
 
 SYSTEM_CONFIG_START(coupe)
 	CONFIG_RAM_DEFAULT(256 * 1024)
@@ -514,5 +553,13 @@ SYSTEM_CONFIG_START(coupe)
 	CONFIG_DEVICE(coupe_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT     INIT  CONFIG  COMPANY                           FULLNAME */
-COMP( 1989, coupe,	  0,		0,		coupe,			coupe,	  0,	coupe,	"Miles Gordon Technology plc",    "Sam Coupe" , 0)
+
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY                        FULLNAME     FLAGS */
+COMP( 1989, coupe, 0,      0,      coupe,   coupe, 0,    coupe,  "Miles Gordon Technology plc", "Sam Coupe", 0 )

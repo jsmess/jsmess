@@ -20,7 +20,6 @@ UINT8 SOUND_ADDR;		/* Current Address in sound registers */
 UINT8 SOUND_REG[32];	/* 32 sound registers */
 UINT8 LINE_INT; 		/* Line interrupt */
 UINT8 LPEN,HPEN;		/* ??? */
-UINT8 CURLINE;			/* Current scanline */
 UINT8 STAT; 			/* returned when port 249 read */
 
 extern UINT8 *sam_screen;
@@ -128,8 +127,6 @@ static void coupe_reset(running_machine *machine)
     HPEN = 0x00;
 
     STAT = 0x1F;
-
-    CURLINE = 0x00;
 
     coupe_update_memory();
 }

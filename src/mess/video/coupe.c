@@ -160,19 +160,26 @@ static void drawMode1_line(bitmap_t *bitmap,int y)
 
 VIDEO_UPDATE( coupe )
 {
+	int scanline = video_screen_get_vpos(screen);
+
+	HPEN = scanline;
+
+	/* line interrupt? */
+	if (LINE_INT == scanline) coupe_irq(screen->machine, 0x01);
+
 	switch ((VMPR & 0x60) >> 5)
 	{
 	case 0: /* mode 1 */
-		drawMode1_line(bitmap, video_screen_get_vpos(screen));
+		drawMode1_line(bitmap, scanline);
 		break;
 	case 1: /* mode 2 */
-		drawMode2_line(bitmap, video_screen_get_vpos(screen));
+		drawMode2_line(bitmap, scanline);
 		break;
 	case 2: /* mode 3 */
-		drawMode3_line(bitmap, video_screen_get_vpos(screen));
+		drawMode3_line(bitmap, scanline);
 		break;
 	case 3: /* mode 4 */
-		drawMode4_line(bitmap, video_screen_get_vpos(screen));
+		drawMode4_line(bitmap, scanline);
 		break;
 	}
 
