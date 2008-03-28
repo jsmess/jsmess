@@ -14,7 +14,7 @@
 
 unsigned char *sam_screen;
 
-void drawMode4_line(bitmap_t *bitmap,int y)
+static void drawMode4_line(bitmap_t *bitmap,int y)
 {
 	int x;
 	unsigned char tmp=0;
@@ -56,7 +56,7 @@ void drawMode4_line(bitmap_t *bitmap,int y)
 	}
 }
 
-void drawMode3_line(bitmap_t *bitmap,int y)
+static void drawMode3_line(bitmap_t *bitmap,int y)
 {
 	int x;
 	unsigned char tmp=0;
@@ -98,7 +98,7 @@ void drawMode3_line(bitmap_t *bitmap,int y)
 	}
 }
 
-void drawMode2_line(bitmap_t *bitmap,int y)
+static void drawMode2_line(bitmap_t *bitmap,int y)
 {
 	int x,b,scrx;
 	unsigned char tmp=0;
@@ -128,7 +128,7 @@ void drawMode2_line(bitmap_t *bitmap,int y)
 	}
 }
 
-void drawMode1_line(bitmap_t *bitmap,int y)
+static void drawMode1_line(bitmap_t *bitmap,int y)
 {
 	int x,b,scrx,scry;
 	unsigned char tmp=0;
@@ -158,6 +158,23 @@ void drawMode1_line(bitmap_t *bitmap,int y)
 	}
 }
 
+VIDEO_UPDATE( coupe )
+{
+	switch ((VMPR & 0x60) >> 5)
+	{
+	case 0: /* mode 1 */
+		drawMode1_line(bitmap, video_screen_get_vpos(screen));
+		break;
+	case 1: /* mode 2 */
+		drawMode2_line(bitmap, video_screen_get_vpos(screen));
+		break;
+	case 2: /* mode 3 */
+		drawMode3_line(bitmap, video_screen_get_vpos(screen));
+		break;
+	case 3: /* mode 4 */
+		drawMode4_line(bitmap, video_screen_get_vpos(screen));
+		break;
+	}
 
-
-
+	return 0;
+}
