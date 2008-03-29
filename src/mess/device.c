@@ -306,8 +306,10 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 	/* create one MAME device for each of these */
 	for (i = 0; i < count; i++)
 	{
-		/* determine the tag */
+		/* determine the legacy MESS device tag */
 		mess_tag = mess_device_get_info_string(&mess_devclass, MESS_DEVINFO_STR_DEV_TAG);
+
+		/* create a MAME device tag based on it */
 		if (mess_tag != NULL)
 		{
 			snprintf(dynamic_tag, ARRAY_LENGTH(dynamic_tag), "%s_%d", mess_tag, i);
@@ -323,6 +325,10 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		/* create a bonafide MAME device */
 		device = device_list_add(listheadptr, MESS_DEVICE, mame_tag);
 		mess_device = (mess_device_config *) device->inline_config;
+
+		/* we need to copy the mess_tag into the structure */
+		info_string = mess_tag;
+		mess_tag = string_buffer_putstr(mess_device->string_buffer, ARRAY_LENGTH(mess_device->string_buffer), &string_buffer_pos, info_string);
 
 		/* convert file extensions from comma delimited to null delimited */
 		file_extensions = mess_device_get_info_string(&mess_devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS);
