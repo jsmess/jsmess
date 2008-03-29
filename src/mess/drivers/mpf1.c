@@ -146,15 +146,15 @@ static VIDEO_UPDATE( mpf1 )
 	//fillbitmap(bitmap, get_black_pen(), NULL);
 
 	for(x = 0; x < 6; x++)
-		draw_led(bitmap, leddisplay, leddigit[x], xpositions[x], 377);
+		draw_led(screen->machine, bitmap, leddisplay, leddigit[x], xpositions[x], 377);
 
 	// tone-LED; the green one
-	draw_led(bitmap, radius_7_led, led_tone * 2, 277, 375);
+	draw_led(screen->machine, bitmap, radius_7_led, led_tone * 2, 277, 375);
 
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
 	led_halt = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_REGISTER + Z80_HALT);
-	draw_led(bitmap, radius_7_led, led_halt, 277, 394);
+	draw_led(screen->machine, bitmap, radius_7_led, led_halt, 277, 394);
 	return 0;
 }
 

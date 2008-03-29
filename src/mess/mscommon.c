@@ -176,7 +176,7 @@ void terminal_clear(struct terminal *terminal)
 
 ***************************************************************************/
 
-void draw_led(bitmap_t *bitmap, const char *led, int valueorcolor, int x, int y)
+void draw_led(running_machine *machine, bitmap_t *bitmap, const char *led, int valueorcolor, int x, int y)
 {
 	char c;
 	int i, xi, yi, mask, color;
@@ -191,7 +191,7 @@ void draw_led(bitmap_t *bitmap, const char *led, int valueorcolor, int x, int y)
 		else if (c >= 'a')
 		{
 			mask = 1 << (c - 'a');
-			color = Machine->pens[(valueorcolor & mask) ? 1 : 0];
+			color = machine->pens[(valueorcolor & mask) ? 1 : 0];
 			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = color;
 		}
 		if (c != '\r')
