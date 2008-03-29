@@ -57,9 +57,11 @@
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
 
+static size_t mbee_size;
 
 static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_SIZE(&mbee_size)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP	/* Needed because quickload to here will crash MESS otherwise */
@@ -69,6 +71,7 @@ static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeic_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x0000, 0x7fff) AM_SIZE(&mbee_size)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xefff) AM_ROM
@@ -77,6 +80,7 @@ static ADDRESS_MAP_START(mbeeic_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x0000, 0xdfff) AM_SIZE(&mbee_size)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
@@ -474,15 +478,58 @@ static void mbee_quickload_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
+static SNAPSHOT_LOAD( mbee )
+{
+	UINT16 i, j;
+	UINT8 data, sw = readinputportbytag("CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */
+
+	for (i = 0; i < snapshot_size; i++)
+	{
+		j = (0x8c0 + i) & 0xffff;
+
+		if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
+
+		if ((j < mbee_size) || (j > 0xefff)) program_write_byte(j, data);
+	}
+
+	if (sw)
+	{
+		program_write_word_16le(0xa2,0x801e);		/* fix warm-start vector to get around some copy-protections */
+		cpunum_set_reg(0, REG_PC, 0x801e);
+	}
+	else
+		program_write_word_16le(0xa2,0x8517);
+
+	return INIT_PASS;
+}
+
+static void mbee_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* snapshot */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "mwb"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:	info->f = (genf *) snapshot_load_mbee; break;
+
+		/* --- the following bits of info are returned as doubles --- */
+		case MESS_DEVINFO_FLOAT_SNAPSHOT_DELAY:	info->d = 0.5; break;
+
+		default:				snapshot_device_getinfo(devclass, state, info); break;
+	}
+}
+
 static void mbee_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:		info->i = 1; break;
 
-		default:										cassette_device_getinfo(devclass, state, info); break;
+		default:				cassette_device_getinfo(devclass, state, info); break;
 	}
 }
 
@@ -492,15 +539,15 @@ static void mbee_cartslot_getinfo(const mess_device_class *devclass, UINT32 stat
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:		info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_mbee_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:		info->load = device_load_mbee_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "rom"); break;
 
-		default:										cartslot_device_getinfo(devclass, state, info); break;
+		default:				cartslot_device_getinfo(devclass, state, info); break;
 	}
 }
 
@@ -510,15 +557,15 @@ static void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:		info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_basicdsk_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:		info->load = device_load_basicdsk_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk"); break;
 
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:				legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
 }
 
@@ -527,6 +574,7 @@ SYSTEM_CONFIG_START(mbee)
 	CONFIG_DEVICE(mbee_cassette_getinfo)
 	CONFIG_DEVICE(mbee_cartslot_getinfo)
 	CONFIG_DEVICE(mbee_quickload_getinfo)
+	CONFIG_DEVICE(mbee_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(mbeeic)
@@ -534,6 +582,7 @@ SYSTEM_CONFIG_START(mbeeic)
 	CONFIG_DEVICE(mbee_cartslot_getinfo)
 	CONFIG_DEVICE(mbee_floppy_getinfo)
 	CONFIG_DEVICE(mbee_quickload_getinfo)
+	CONFIG_DEVICE(mbee_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
 
