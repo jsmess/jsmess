@@ -110,6 +110,7 @@ struct _sdl_window_info
 	int					refresh;
 	int					windowed_width;
 	int					windowed_height;
+	int					startmaximized;
 
 	// rendering info
 	osd_lock *			render_lock;

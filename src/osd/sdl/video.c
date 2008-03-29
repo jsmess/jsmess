@@ -814,14 +814,21 @@ static float get_aspect(const char *name, int report_error)
 
 static void get_resolution(const char *name, sdl_window_config *config, int report_error)
 {
+	const char *defdata = options_get_string(mame_options(), SDLOPTION_RESOLUTION(""));
 	const char *data = options_get_string(mame_options(), name);
 
 	config->width = config->height = config->depth = config->refresh = 0;
 	if (strcmp(data, SDLOPTVAL_AUTO) == 0)
 	{
-		return;
+		if (strcmp(defdata, SDLOPTVAL_AUTO) == 0)
+		{
+			return;
+		}
+
+		data = defdata;
 	}
-	else if (sscanf(data, "%dx%dx%d@%d", &config->width, &config->height, &config->depth, &config->refresh) < 2 && report_error)
+	
+	if (sscanf(data, "%dx%dx%d@%d", &config->width, &config->height, &config->depth, &config->refresh) < 2 && report_error)
 		mame_printf_error("Illegal resolution value for %s = %s\n", name, data);
 }
 

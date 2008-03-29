@@ -47,6 +47,10 @@
 //  PARAMETERS
 //============================================================
 
+// these are arbitrary values since AFAIK there's no way to make X/SDL tell you
+#define WINDOW_DECORATION_WIDTH	(8)	// should be more than plenty
+#define WINDOW_DECORATION_HEIGHT (48)	// title bar + bottom drag region
+
 #if 1
 #define ASSERT_USE(x)	assert_always(SDL_ThreadID() == x, "Wrong Thread")
 //#define ASSERT_USE(x)
@@ -128,6 +132,7 @@ static void sdlwindow_sync(void);
 
 
 static void get_min_bounds(sdl_window_info *window, int *window_width, int *window_height, int constrain);
+static void get_max_bounds(sdl_window_info *window, int *window_width, int *window_height, int constrain);
 
 static void *complete_create_wt(void *param, int threadid);
 static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view);
@@ -805,6 +810,10 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->refresh = config->refresh;
 	window->monitor = monitor;
 	window->fullscreen = !video_config.windowed;
+
+	// set the initial maximized state
+	window->startmaximized = options_get_bool(mame_options(), SDLOPTION_MAXIMIZE);
+
 	if (!window->fullscreen)
 	{
 		window->windowed_width = config->width;
@@ -1166,17 +1175,13 @@ static void set_starting_view(running_machine *machine, int index, sdl_window_in
 
 static OSDWORK_CALLBACK( complete_create_wt )
 {
-	
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window;
 	int tempwidth, tempheight;
-	//sdl_info *sdl;
 	static int result[2] = {0,1};
 
 	ASSERT_WINDOW_THREAD();
 	free(wp);
-
-	//sdl = window->dxdata;
 
 	if (window->fullscreen)
 	{
@@ -1201,14 +1206,22 @@ static OSDWORK_CALLBACK( complete_create_wt )
 	{
 		window->extra_flags = SDL_RESIZABLE;
 
-		/* Create the window directly with the correct aspect
-		   instead of letting sdlwindow_blit_surface_size() resize it
-		   this stops the window from "flashing" from the wrong aspect
-		   size to the right one at startup. */
-		tempwidth = (window->maxwidth != 0) ? window->maxwidth : 640;
-		tempheight = (window->maxheight != 0) ? window->maxheight : 480;
+		if (window->startmaximized)
+		{
+			tempwidth = tempheight = 0;
+			get_max_bounds(window, &tempwidth, &tempheight, video_config.keepaspect );
+		}
+		else
+		{
+			/* Create the window directly with the correct aspect
+			   instead of letting sdlwindow_blit_surface_size() resize it
+			   this stops the window from "flashing" from the wrong aspect
+			   size to the right one at startup. */
+			tempwidth = (window->maxwidth != 0) ? window->maxwidth : 640;
+			tempheight = (window->maxheight != 0) ? window->maxheight : 480;
 
-		get_min_bounds(window, &tempwidth, &tempheight, video_config.keepaspect );
+			get_min_bounds(window, &tempwidth, &tempheight, video_config.keepaspect );
+		}
 	}
 
 #ifndef NO_OPENGL
@@ -1519,3 +1532,45 @@ static void get_min_bounds(sdl_window_info *window, int *window_width, int *wind
 	*window_width = minwidth;
 	*window_height = minheight;
 }
+
+//============================================================
+//  get_max_bounds
+//  (window thread)
+//============================================================
+
+static void get_max_bounds(sdl_window_info *window, int *window_width, int *window_height, int constrain)
+{
+	INT32 maxwidth, maxheight;
+
+	assert(GetCurrentThreadId() == window_threadid);
+
+	// compute the maximum client area
+	maxwidth = window->monitor->center_width;
+	maxheight = window->monitor->center_height;
+
+	// clamp to the window's max
+	if (window->maxwidth != 0)
+	{
+		int temp = window->maxwidth + WINDOW_DECORATION_WIDTH;
+		if (temp < maxwidth)
+			maxwidth = temp;
+	}
+	if (window->maxheight != 0)
+	{
+		int temp = window->maxheight + WINDOW_DECORATION_HEIGHT;
+		if (temp < maxheight)
+			maxheight = temp;
+	}
+
+	// constrain to fit
+	if (constrain)
+		constrain_to_aspect_ratio(window, &maxwidth, &maxheight, WMSZ_BOTTOMRIGHT);
+	else
+	{
+		maxwidth -= WINDOW_DECORATION_WIDTH;
+		maxheight -= WINDOW_DECORATION_HEIGHT;
+		*window_width = maxwidth;
+		*window_height = maxheight;	
+	}
+}
+

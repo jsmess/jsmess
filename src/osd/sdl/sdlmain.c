@@ -100,6 +100,7 @@ static const options_entry mame_sdl_options[] =
 	{ SDLOPTION_VIDEO,                   SDLOPTVAL_SOFT,  0,                 "video output method: soft or opengl" },
 	{ SDLOPTION_NUMSCREENS,                   "1",        0,                 "number of screens to create; SDLMAME only supports 1 at this time" },
 	{ SDLOPTION_WINDOW ";w",                  "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
+	{ SDLOPTION_MAXIMIZE ";max",              "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
 	{ SDLOPTION_KEEPASPECT ";ka",             "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
 	{ SDLOPTION_UNEVENSTRETCH ";ues",         "1",        OPTION_BOOLEAN,    "allow non-integer stretch factors" },
 	{ SDLOPTION_EFFECT,                  SDLOPTVAL_NONE,  0,                 "name of a PNG file to use for visual effects, or 'none'" },
