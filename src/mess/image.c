@@ -1596,7 +1596,7 @@ mess_image *image_from_device(const struct IODevice *device)
 	mess_image *image = NULL;
 	const struct IODevice *dev;
 
-	assert(images);
+	assert(Machine->images_data->images);
 
 	indx = 0;
 	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
@@ -1647,7 +1647,7 @@ mess_image *image_from_devtype_and_index(iodevice_t type, int id)
 	const struct IODevice *dev;
 	int device_index;
 
-	assert((multiple_dev_mask & (1 << type)) == 0);
+	assert((Machine->images_data->multiple_dev_mask & (1 << type)) == 0);
 	assert(id < device_count(type));
 
 	indx = 0;
