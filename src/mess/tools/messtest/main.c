@@ -12,6 +12,9 @@
 #include "hashfile.h"
 #include "emuopts.h"
 #include "../imgtool/imgtool.h"
+#ifdef WIN32
+#include "winutils.h"
+#endif
 
 extern int mame_validitychecks(int game);
 
@@ -82,7 +85,7 @@ int CLIB_DECL main(int argc, char *argv[])
 
 #ifdef WIN32
 	/* expand wildcards so '*' can be used */
-	expand_wildcards(&argc, &argv);
+	win_expand_wildcards(&argc, &argv);
 #endif
 
 	test_count = 0;

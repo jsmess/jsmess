@@ -19,6 +19,7 @@
 // MESS headers
 #include "winutils.h"
 #include "strconv.h"
+#include "glob.h"
 
 
 //============================================================
@@ -231,4 +232,18 @@ DWORD win_get_file_attributes_utf8(const char *filename)
 		free(t_filename);
 	}
 	return result;
+}
+
+void win_expand_wildcards(int *argc, char **argv[])
+{
+	int i;
+	glob_t g;
+
+	memset(&g, 0, sizeof(g));
+
+	for (i = 0; i < *argc; i++)
+		glob((*argv)[i], (g.gl_pathc > 0) ? GLOB_APPEND|GLOB_NOCHECK : GLOB_NOCHECK, NULL, &g);
+
+	*argc = g.gl_pathc;
+	*argv = g.gl_pathv;
 }

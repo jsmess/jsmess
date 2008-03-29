@@ -13,11 +13,13 @@
 #include <time.h>
 #include <assert.h>
 #include "imgtool.h"
-#include "utils.h"
 #include "mess.h"
 #include "main.h"
 #include "fileio.h"
 #include "modules.h"
+#ifdef WIN32
+#include "winutils.h"
+#endif
 
 /* ---------------------------------------------------------------------- */
 
@@ -906,7 +908,7 @@ int CLIB_DECL main(int argc, char *argv[])
 #endif /* MAME_DEBUG */
 
 #ifdef WIN32
-	expand_wildcards(&argc, &argv);
+	win_expand_wildcards(&argc, &argv);
 #endif /* WIN32 */
 
 	putchar('\n');
