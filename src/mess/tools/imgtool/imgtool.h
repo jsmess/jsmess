@@ -11,8 +11,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "osdepend.h"
-#include "mess.h"
+#include "mame.h"
 #include "formats/flopimg.h"
 #include "opresolv.h"
 #include "library.h"

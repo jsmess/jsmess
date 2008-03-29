@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "mame.h"
 #include "cassette.h"
 #include "formats/cassimg.h"
 #include "ui.h"

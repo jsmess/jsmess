@@ -7,6 +7,9 @@
 #ifndef ZX8301_H_
 #define ZX8301_H_
 
+#include "mame.h"
+#include "driver.h"
+
 
 /*----------- defined in video/zx8301.c -----------*/
 

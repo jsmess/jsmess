@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-#include "utils.h"
+#include "mame.h"
 #include "mflopimg.h"
 #include "flopdrv.h"
 #include "formats/flopimg.h"

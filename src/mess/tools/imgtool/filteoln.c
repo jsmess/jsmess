@@ -7,6 +7,7 @@
 *****************************************************************************/
 
 #include <string.h>
+
 #include "imgtool.h"
 
 #define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : NULL)))

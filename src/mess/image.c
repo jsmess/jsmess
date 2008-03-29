@@ -12,6 +12,7 @@
 
 #include <ctype.h>
 
+#include "mame.h"
 #include "image.h"
 #include "mess.h"
 #include "deprecat.h"
@@ -68,12 +69,11 @@ struct _mess_image
 
 
 
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-static mess_image *images;
-static UINT32 multiple_dev_mask;
+struct _images_private
+{
+	UINT32 multiple_dev_mask;
+	mess_image images[1];
+};
 
 
 
@@ -110,12 +110,9 @@ int image_init(running_machine *machine)
 {
 	int err;
 	int count, indx;
-	UINT32 mask, dev_mask = 0;
+	UINT32 mask, dev_mask = 0, multiple_dev_mask = 0;
 	const struct IODevice *dev;
-
-	/* setup the globals */
-	images = NULL;
-	multiple_dev_mask = 0;
+	size_t private_size;
 
 	/* first count all images, and identify multiply defined devices */
 	count = 0;
@@ -136,26 +133,28 @@ int image_init(running_machine *machine)
 		count++;
 	}
 
-	/* allocate the array */
-	if (count > 0)
-	{
-		images = auto_malloc(count * sizeof(*images));
-		memset(images, 0, count * sizeof(*images));
-	}
+	/* allocate the private structure */
+	private_size = sizeof(*machine->images_data) + ((count - 1)
+		* sizeof(machine->images_data->images[0]));
+	machine->images_data = (images_private *) auto_malloc(private_size);
+	memset(machine->images_data, '\0', private_size);
+
+	/* some setup */
+	machine->images_data->multiple_dev_mask = multiple_dev_mask;
 
 	/* initialize the devices */
 	indx = 0;
 	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		images[indx].mempool = pool_alloc(memory_error);
+		machine->images_data->images[indx].mempool = pool_alloc(memory_error);
 
 		/* setup the device */
-		tagpool_init(&images[indx].tagpool);
-		images[indx].dev = dev;
+		tagpool_init(&machine->images_data->images[indx].tagpool);
+		machine->images_data->images[indx].dev = dev;
 
 		if (dev->init != NULL)
 		{
-			err = dev->init(&images[indx]);
+			err = dev->init(&machine->images_data->images[indx]);
 			if (err != INIT_PASS)
 				return err;
 		}
@@ -178,35 +177,40 @@ static void image_exit(running_machine *machine)
 	mess_image *image;
 	const struct IODevice *dev;
 
-	/* unload all devices */
-	image_unload_all(FALSE);
-	image_unload_all(TRUE);
-
-	indx = 0;
-
-	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
+	if (machine->images_data != NULL)
 	{
-		/* identify the image */
-		image = &images[indx];
+		/* unload all devices */
+		image_unload_all(FALSE);
+		image_unload_all(TRUE);
 
-		/* call the exit handler if appropriate */
-		if (dev->exit != NULL)
-			dev->exit(image);
+		indx = 0;
 
-		/* free the tagpool */
-		tagpool_exit(&images[indx].tagpool);
-
-		/* free the working directory */
-		if (image->working_directory != NULL)
+		for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 		{
-			free(image->working_directory);
-			image->working_directory = NULL;
+			/* identify the image */
+			image = &machine->images_data->images[indx];
+
+			/* call the exit handler if appropriate */
+			if (dev->exit != NULL)
+				dev->exit(image);
+
+			/* free the tagpool */
+			tagpool_exit(&image->tagpool);
+
+			/* free the working directory */
+			if (image->working_directory != NULL)
+			{
+				free(image->working_directory);
+				image->working_directory = NULL;
+			}
+
+			/* free the memory pool */
+			pool_free(image->mempool);
+			image->mempool = NULL;
+			indx++;
 		}
 
-		/* free the memory pool */
-		pool_free(image->mempool);
-		image->mempool = NULL;
-		indx++;
+		machine->images_data = NULL;
 	}
 }
 
@@ -1566,14 +1570,14 @@ void image_battery_save(mess_image *image, const void *buffer, int length)
 
 int image_absolute_index(mess_image *image)
 {
-	return image - images;
+	return image - Machine->images_data->images;
 }
 
 
 
 mess_image *image_from_absolute_index(int absolute_index)
 {
-	return &images[absolute_index];
+	return &Machine->images_data->images[absolute_index];
 }
 
 
@@ -1599,7 +1603,7 @@ mess_image *image_from_device(const struct IODevice *device)
 	{
 		if (device == dev)
 		{
-			image = &images[indx];
+			image = &Machine->images_data->images[indx];
 			break;
 		}
 		indx++;
@@ -1624,7 +1628,7 @@ mess_image *image_from_devtag_and_index(const char *devtag, int id)
 	{
 		if (dev->tag && !strcmp(dev->tag, devtag) && (device_index++ == id))
 		{
-			image = &images[indx];
+			image = &Machine->images_data->images[indx];
 			break;
 		}
 		indx++;
@@ -1652,7 +1656,7 @@ mess_image *image_from_devtype_and_index(iodevice_t type, int id)
 	{
 		if ((type == dev->type) && (device_index++ == id))
 		{
-			image = &images[indx];
+			image = &Machine->images_data->images[indx];
 			break;
 		}
 		indx++;

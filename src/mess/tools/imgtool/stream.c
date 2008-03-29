@@ -11,6 +11,7 @@
 #include <zlib.h>
 #include <assert.h>
 
+#include "mame.h"
 #include "unzip.h"
 #include "osdcore.h"
 #include "imgtool.h"

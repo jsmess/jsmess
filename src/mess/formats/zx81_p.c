@@ -29,7 +29,7 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 
 *****************************************************************************/
 
-#include "image.h"
+#include "mame.h"
 #include "zx81_p.h"
 #include "osdepend.h"
 #include "devices/cassette.h"

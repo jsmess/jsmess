@@ -13,6 +13,8 @@
 #include "fileio.h"
 #include "utils.h"
 #include "opresolv.h"
+#include "device.h"
+#include "osdmess.h"
 
 typedef enum
 {
@@ -25,6 +27,9 @@ typedef enum
 	IMAGE_ERROR_ALREADYOPEN,
 	IMAGE_ERROR_UNSPECIFIED
 } image_error_t;
+
+struct _images_private;
+typedef struct _images_private images_private;
 
 
 

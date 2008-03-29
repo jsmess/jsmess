@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
+
+#include "mame.h"
 #include "imgtool.h"
 #include "mess.h"
 #include "main.h"

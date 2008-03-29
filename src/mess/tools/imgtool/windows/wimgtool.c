@@ -20,6 +20,7 @@
 #include "winutf8.h"
 #include "winutil.h"
 #include "winutils.h"
+#include "mame.h"
 
 const TCHAR wimgtool_class[] = TEXT("wimgtool_class");
 const char wimgtool_producttext[] = "MESS Image Tool";

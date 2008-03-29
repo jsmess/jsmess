@@ -15,6 +15,7 @@
 
 *********************************************************************/
 
+#include "mame.h"
 #include "harddisk.h"
 #include "harddriv.h"
 

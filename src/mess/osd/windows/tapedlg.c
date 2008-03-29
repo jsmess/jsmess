@@ -10,6 +10,7 @@
 #include <commctrl.h>
 
 // MAME/MESS headers
+#include "mame.h"
 #include "tapedlg.h"
 #include "mess.h"
 #include "messres.h"

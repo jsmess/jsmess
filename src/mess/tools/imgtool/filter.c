@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <string.h>
+
 #include "imgtool.h"
 #include "utils.h"
 
