@@ -105,6 +105,7 @@
 #include "formats/pc_dsk.h"		/* for NC200 disk image */
 #include "devices/cartslot.h"
 #include "sound/beep.h"
+#include "nc200.lh"
 
 
 #define VERBOSE 0
@@ -1702,6 +1703,7 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_SCREEN_SIZE(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
 	MDRV_PALETTE_LENGTH(NC200_NUM_COLOURS)
+	MDRV_DEFAULT_LAYOUT(layout_nc200)
 MACHINE_DRIVER_END
 
 
