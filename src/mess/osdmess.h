@@ -12,9 +12,10 @@
 #include "osdcore.h"
 #include "mamecore.h"
 #include "options.h"
+#include "devintrf.h"
 
 struct _mame_file;
-typedef struct _mess_image mess_image;
+typedef const device_config mess_image;
 
 
 

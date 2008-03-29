@@ -287,7 +287,7 @@ static int internal_floppy_device_load(mess_image *image, int create_format, opt
 	{
 		/* creating an image */
 		assert(create_format >= 0);
-		err = floppy_create(image, &mess_ioprocs, &floppy_options[create_format], create_args, &flopimg->floppy);
+		err = floppy_create((void *) image, &mess_ioprocs, &floppy_options[create_format], create_args, &flopimg->floppy);
 		if (err)
 			goto error;
 	}
@@ -296,7 +296,7 @@ static int internal_floppy_device_load(mess_image *image, int create_format, opt
 		/* opening an image */
 		floppy_flags = image_is_writable(image) ? FLOPPY_FLAGS_READWRITE : FLOPPY_FLAGS_READONLY;
 		extension = image_filetype(image);
-		err = floppy_open_choices(image, &mess_ioprocs, extension, floppy_options, floppy_flags, &flopimg->floppy);
+		err = floppy_open_choices((void *) image, &mess_ioprocs, extension, floppy_options, floppy_flags, &flopimg->floppy);
 		if (err)
 			goto error;
 	}

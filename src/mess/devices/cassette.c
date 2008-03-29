@@ -267,7 +267,7 @@ static int device_load_cassette(mess_image *image)
 	{
 		/* creating an image */
 		create_opts = (const struct CassetteOptions *) mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_CASSETTE_OPTIONS);
-		err = cassette_create(image, &mess_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &tag->cassette);
+		err = cassette_create((void *) image, &mess_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &tag->cassette);
 		if (err)
 			goto error;
 	}
@@ -279,7 +279,7 @@ static int device_load_cassette(mess_image *image)
 			is_writable = image_is_writable(image);
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
 			extension = image_filetype(image);
-			err = cassette_open_choices(image, &mess_ioprocs, extension, formats, cassette_flags, &tag->cassette);
+			err = cassette_open_choices((void *) image, &mess_ioprocs, extension, formats, cassette_flags, &tag->cassette);
 
 			/* this is kind of a hack */
 			if (err && is_writable)

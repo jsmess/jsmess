@@ -34,8 +34,8 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- MESS device changes:  Piggybacked MESS's device system on MAME's device
-  system.  Removed machine->devices[] array.  [Nate Woods]
+- Major changes to transition MESS's device system onto MAME's device system.
+  [Nate Woods]
 
 
 
