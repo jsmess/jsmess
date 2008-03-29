@@ -8,6 +8,11 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [ABC80] Fixed so that it boots and keyboard works. [Robbbert]
+
+- [MBEE] Added snapload support for MWB filetype. Added LOCK key to keyboard.
+  [Robbbert]
+
 - [T1000HX] Fixed bug #1130.  [Wilbert Pol]
 
 - [TUTOR] Changed joystick to use keypad instead of arrow keys by default.
