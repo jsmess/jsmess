@@ -378,7 +378,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	machine_config *config;
 	const device_config *dev;
 	const struct IODevice *iodev;
-	int i, nPos;
+	int nPos;
 	char szMessage[256];
 	LPCSTR pszSoftware;
 	BOOL bResult = FALSE;
@@ -396,21 +396,18 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 		// confirm any mandatory devices are loaded
 		if (iodev->must_be_loaded)
 		{
-			for (i = 0; i < iodev->count; i++)
+			pszSoftware = GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device);
+			if (!pszSoftware || !*pszSoftware)
 			{
-				pszSoftware = GetSelectedSoftware(drvindex, &iodev->devclass, i);
-				if (!pszSoftware || !*pszSoftware)
-				{
-					snprintf(szMessage, sizeof(szMessage) / sizeof(szMessage[0]),
-						"System '%s' requires that device %s must have an image to load\n",
-						drivers[drvindex]->description,
-						device_typename(iodev->type));
-					goto done;
-				}
+				snprintf(szMessage, sizeof(szMessage) / sizeof(szMessage[0]),
+					"System '%s' requires that device %s must have an image to load\n",
+					drivers[drvindex]->description,
+					device_typename(iodev->type));
+				goto done;
 			}
 		}
 
-		nPos += iodev->count;
+		nPos++;
 	}
 	bResult = TRUE;
 
@@ -448,7 +445,6 @@ static void MessSpecifyImage(int drvindex, const mess_device_class *devclass, in
 	const device_config *dev;
 	const struct IODevice *iodev = NULL;
 	const char *s;
-	int i;
 
 	// allocate the machine config
 	config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
@@ -469,28 +465,20 @@ static void MessSpecifyImage(int drvindex, const mess_device_class *devclass, in
 	if (nID < 0)
 	{
 		// special case; first try to find existing image
-		for (i = 0; i < iodev->count; i++)
+		s = GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device);
+		if (s && !mame_stricmp(s, pszFilename))
 		{
-			s = GetSelectedSoftware(drvindex, &iodev->devclass, i);
-			if (s && !mame_stricmp(s, pszFilename))
-			{
-				nID = i;
-				break;
-			}
+			nID = iodev->index_in_device;
 		}
 	}
 
 	if (nID < 0)
 	{
 		// still not found?  locate an empty slot
-		for (i = 0; i < iodev->count; i++)
+		s = GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device);
+		if (!s || !*s || !mame_stricmp(s, pszFilename))
 		{
-			s = GetSelectedSoftware(drvindex, &iodev->devclass, i);
-			if (!s || !*s || !mame_stricmp(s, pszFilename))
-			{
-				nID = i;
-				break;
-			}
+			nID = iodev->index_in_device;
 		}
 	}
 
@@ -506,7 +494,7 @@ static void MessSpecifyImage(int drvindex, const mess_device_class *devclass, in
 
 static void MessRemoveImage(int drvindex, mess_device_class devclass, LPCSTR pszFilename)
 {
-	int i, nPos;
+	int nPos;
 	machine_config *config;
 	const device_config *dev;
 	const struct IODevice *iodev = NULL;
@@ -523,18 +511,14 @@ static void MessRemoveImage(int drvindex, mess_device_class devclass, LPCSTR psz
 
 			if (iodev->devclass.get_info == devclass.get_info)
 				break;
-			nPos += iodev->count;
+			nPos++;
 		}
 
 		if (iodev != NULL)
 		{
-			for (i = 0; i < iodev->count; i++)
+			if (!mame_stricmp(pszFilename, GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device)))
 			{
-				if (!mame_stricmp(pszFilename, GetSelectedSoftware(drvindex, &iodev->devclass, i)))
-				{
-					MessSpecifyImage(drvindex, &devclass, i, NULL);
-					break;
-				}
+				MessSpecifyImage(drvindex, &devclass, iodev->index_in_device, NULL);
 			}
 		}
 
@@ -558,7 +542,7 @@ void MessReadMountedSoftware(int drvindex)
 static void MessRefreshPicker(int drvindex)
 {
 	HWND hwndSoftware;
-	int i, id;
+	int i;
 	LVFINDINFO lvfi;
 	machine_config *config;
 	const device_config *dev;
@@ -580,25 +564,22 @@ static void MessRefreshPicker(int drvindex)
 	{
 		iodev = mess_device_from_core_device(dev);
 
-		for (id = 0; id < iodev->count; id++)
+		pszSoftware = GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device);
+		if (pszSoftware && *pszSoftware)
 		{
-			pszSoftware = GetSelectedSoftware(drvindex, &iodev->devclass, id);
-			if (pszSoftware && *pszSoftware)
+			i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
+			if (i < 0)
 			{
+				SoftwarePicker_AddFile(hwndSoftware, pszSoftware);
 				i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
-				if (i < 0)
-				{
-					SoftwarePicker_AddFile(hwndSoftware, pszSoftware);
-					i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
-				}
-				if (i >= 0)
-				{
-					memset(&lvfi, 0, sizeof(lvfi));
-					lvfi.flags = LVFI_PARAM;
-					lvfi.lParam = i;
-					i = ListView_FindItem(hwndSoftware, -1, &lvfi);
-					ListView_SetItemState(hwndSoftware, i, LVIS_SELECTED, LVIS_SELECTED);
-				}
+			}
+			if (i >= 0)
+			{
+				memset(&lvfi, 0, sizeof(lvfi));
+				lvfi.flags = LVFI_PARAM;
+				lvfi.lParam = i;
+				i = ListView_FindItem(hwndSoftware, -1, &lvfi);
+				ListView_SetItemState(hwndSoftware, i, LVIS_SELECTED, LVIS_SELECTED);
 			}
 		}
 	}

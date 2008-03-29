@@ -25,7 +25,7 @@ void mess_ui_update(running_machine *machine)
 {
 	static int ui_toggle_key = 0;
 
-	int id, toggled = 0;
+	int toggled = 0;
 	const struct IODevice *dev;
 
 	/* traditional MESS interface */
@@ -82,11 +82,8 @@ void mess_ui_update(running_machine *machine)
 	{
 		if (dev->display != NULL)
 		{
-			for (id = 0; id < device_count(dev->type); id++)
-			{
-				mess_image *img = image_from_devtype_and_index(dev->type, id);
-				dev->display(img);
-			}
+			mess_image *img = image_from_device(dev);
+			dev->display(img);
 		}
 	}
 }
@@ -103,7 +100,6 @@ int ui_sprintf_image_info(char *buf)
 {
 	char *dst = buf;
 	const struct IODevice *dev;
-	int id;
 
 	dst += sprintf(dst, "%s\n\n", Machine->gamedrv->description);
 
@@ -115,50 +111,47 @@ int ui_sprintf_image_info(char *buf)
 
 	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		for (id = 0; id < dev->count; id++)
+			mess_image *img = image_from_device(dev);
+		const char *name = image_filename(img);
+		if( name )
 		{
-			mess_image *img = image_from_device_and_index(dev, id);
-			const char *name = image_filename(img);
-			if( name )
+			const char *base_filename;
+			const char *info;
+			char *base_filename_noextension;
+
+			base_filename = image_basename(img);
+			base_filename_noextension = strip_extension(base_filename);
+
+			/* display device type and filename */
+			dst += sprintf(dst,"%s: %s\n", image_typename_id(img), base_filename);
+
+			/* display long filename, if present and doesn't correspond to name */
+			info = image_longname(img);
+			if (info && (!base_filename_noextension || mame_stricmp(info, base_filename_noextension)))
+				dst += sprintf(dst,"%s\n", info);
+
+			/* display manufacturer, if available */
+			info = image_manufacturer(img);
+			if (info)
 			{
-				const char *base_filename;
-				const char *info;
-				char *base_filename_noextension;
-
-				base_filename = image_basename(img);
-				base_filename_noextension = strip_extension(base_filename);
-
-				/* display device type and filename */
-				dst += sprintf(dst,"%s: %s\n", image_typename_id(img), base_filename);
-
-				/* display long filename, if present and doesn't correspond to name */
-				info = image_longname(img);
-				if (info && (!base_filename_noextension || mame_stricmp(info, base_filename_noextension)))
-					dst += sprintf(dst,"%s\n", info);
-
-				/* display manufacturer, if available */
-				info = image_manufacturer(img);
-				if (info)
-				{
-					dst += sprintf(dst,"%s", info);
-					info = stripspace(image_year(img));
-					if (info && *info)
-						dst += sprintf(dst,", %s", info);
-					dst += sprintf(dst,"\n");
-				}
-
-				/* display playable information, if available */
-				info = image_playable(img);
-				if (info)
-					dst += sprintf(dst,"%s\n", info);
-
-				if (base_filename_noextension)
-					free(base_filename_noextension);
+				dst += sprintf(dst,"%s", info);
+				info = stripspace(image_year(img));
+				if (info && *info)
+					dst += sprintf(dst,", %s", info);
+				dst += sprintf(dst,"\n");
 			}
-			else
-			{
-				dst += sprintf(dst,"%s: ---\n", image_typename_id(img));
-			}
+
+			/* display playable information, if available */
+			info = image_playable(img);
+			if (info)
+				dst += sprintf(dst,"%s\n", info);
+
+			if (base_filename_noextension)
+				free(base_filename_noextension);
+		}
+		else
+		{
+			dst += sprintf(dst,"%s: ---\n", image_typename_id(img));
 		}
 	}
 	return dst - buf;

@@ -43,7 +43,7 @@ void mess_display_help(void)
 
 int info_listdevices(core_options *opts, const char *gamename)
 {
-	int i, id;
+	int i;
 	machine_config *config;
 	const device_config *dev;
 	const struct IODevice *iodev;
@@ -76,26 +76,20 @@ int info_listdevices(core_options *opts, const char *gamename)
 
 				src = iodev->file_extensions;
 
-				for (id = 0; id < iodev->count; id++)
+				name = device_instancename(&iodev->devclass, iodev->index_in_device);
+				shortname = device_briefinstancename(&iodev->devclass, iodev->index_in_device);
+
+				sprintf(paren_shortname, "(%s)", shortname);
+
+				mame_printf_info("%-13s%-12s%-8s   ", driver_name, name, paren_shortname);
+				driver_name = " ";
+
+				while (src && *src)
 				{
-					name = device_instancename(&iodev->devclass, id);
-					shortname = device_briefinstancename(&iodev->devclass, id);
-
-					sprintf(paren_shortname, "(%s)", shortname);
-
-					mame_printf_info("%-13s%-12s%-8s   ", driver_name, name, paren_shortname);
-					driver_name = " ";
-
-					if (id == 0)
-					{
-						while (src && *src)
-						{
-							mame_printf_info(".%-5s", src);
-							src += strlen(src) + 1;
-						}
-					}
-					mame_printf_info("\n");
+					mame_printf_info(".%-5s", src);
+					src += strlen(src) + 1;
 				}
+				mame_printf_info("\n");
 			}
 			machine_config_free(config);
 		}

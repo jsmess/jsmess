@@ -109,7 +109,7 @@ static void memory_error(const char *message)
 int image_init(running_machine *machine)
 {
 	int err;
-	int count, indx, j;
+	int count, indx;
 	UINT32 mask, dev_mask = 0;
 	const struct IODevice *dev;
 
@@ -121,15 +121,19 @@ int image_init(running_machine *machine)
 	count = 0;
 	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		/* check to see if this device type is used multiple times */
-		mask = 1 << dev->type;
-		if (dev_mask & mask)
-			multiple_dev_mask |= mask;
-		else
-			dev_mask |= mask;
+		/* weird check only relevant on the first device */
+		if (dev->index_in_device == 0)
+		{
+			/* check to see if this device type is used multiple times */
+			mask = 1 << dev->type;
+			if (dev_mask & mask)
+				multiple_dev_mask |= mask;
+			else
+				dev_mask |= mask;
+		}
 
 		/* increment the count */
-		count += dev->count;
+		count++;
 	}
 
 	/* allocate the array */
@@ -143,23 +147,19 @@ int image_init(running_machine *machine)
 	indx = 0;
 	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		for (j = 0; j < dev->count; j++)
+		images[indx].mempool = pool_alloc(memory_error);
+
+		/* setup the device */
+		tagpool_init(&images[indx].tagpool);
+		images[indx].dev = dev;
+
+		if (dev->init != NULL)
 		{
-			images[indx + j].mempool = pool_alloc(memory_error);
-
-			/* setup the device */
-			tagpool_init(&images[indx + j].tagpool);
-			images[indx + j].dev = dev;
-
-			if (dev->init != NULL)
-			{
-				err = dev->init(&images[indx + j]);
-				if (err != INIT_PASS)
-					return err;
-			}
-
+			err = dev->init(&images[indx]);
+			if (err != INIT_PASS)
+				return err;
 		}
-		indx += dev->count;
+		indx++;
 	}
 
 	add_exit_callback(machine, image_exit);
@@ -174,7 +174,7 @@ int image_init(running_machine *machine)
 
 static void image_exit(running_machine *machine)
 {
-	int j, indx;
+	int indx;
 	mess_image *image;
 	const struct IODevice *dev;
 
@@ -186,30 +186,27 @@ static void image_exit(running_machine *machine)
 
 	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		for (j = 0; j < dev->count; j++)
+		/* identify the image */
+		image = &images[indx];
+
+		/* call the exit handler if appropriate */
+		if (dev->exit != NULL)
+			dev->exit(image);
+
+		/* free the tagpool */
+		tagpool_exit(&images[indx].tagpool);
+
+		/* free the working directory */
+		if (image->working_directory != NULL)
 		{
-			/* identify the image */
-			image = &images[indx + j];
-
-			/* call the exit handler if appropriate */
-			if (dev->exit != NULL)
-				dev->exit(image);
-
-			/* free the tagpool */
-			tagpool_exit(&images[indx + j].tagpool);
-
-			/* free the working directory */
-			if (image->working_directory != NULL)
-			{
-				free(image->working_directory);
-				image->working_directory = NULL;
-			}
-
-			/* free the memory pool */
-			pool_free(image->mempool);
-			image->mempool = NULL;
+			free(image->working_directory);
+			image->working_directory = NULL;
 		}
-		indx += dev->count;
+
+		/* free the memory pool */
+		pool_free(image->mempool);
+		image->mempool = NULL;
+		indx++;
 	}
 }
 
@@ -746,7 +743,6 @@ void image_unload(mess_image *image)
 
 void image_unload_all(int ispreload)
 {
-	int id;
 	const struct IODevice *dev;
 	mess_image *image;
 
@@ -761,14 +757,10 @@ void image_unload_all(int ispreload)
 	{
 		if (dev->load_at_init == ispreload)
 		{
-			/* all instances */
-			for (id = 0; id < dev->count; id++)
-			{
-				image = image_from_device_and_index(dev, id);
+			image = image_from_device(dev);
 
-				/* unload this image */
-				image_unload_internal(image, TRUE);
-			}
+			/* unload this image */
+			image_unload_internal(image, TRUE);
 		}
 	}
 }
@@ -1002,7 +994,7 @@ int image_exists(mess_image *img)
 
 int image_slotexists(mess_image *img)
 {
-	return image_index_in_device(img) < image_device(img)->count;
+	return TRUE;
 }
 
 
@@ -1594,13 +1586,12 @@ mess_image *image_from_absolute_index(int absolute_index)
   type/id.
 ****************************************************************************/
 
-mess_image *image_from_device_and_index(const struct IODevice *device, int id)
+mess_image *image_from_device(const struct IODevice *device)
 {
 	int indx;
 	mess_image *image = NULL;
 	const struct IODevice *dev;
 
-	assert(id < device->count);
 	assert(images);
 
 	indx = 0;
@@ -1608,10 +1599,10 @@ mess_image *image_from_device_and_index(const struct IODevice *device, int id)
 	{
 		if (device == dev)
 		{
-			image = &images[indx + id];
+			image = &images[indx];
 			break;
 		}
-		indx += dev->count;
+		indx++;
 	}
 
 	assert(image != NULL);
@@ -1625,19 +1616,21 @@ mess_image *image_from_devtag_and_index(const char *devtag, int id)
 	int indx;
 	mess_image *image = NULL;
 	const struct IODevice *dev;
+	int device_index;
 
 	indx = 0;
+	device_index = 0;
 	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		if (dev->tag && !strcmp(dev->tag, devtag))
+		if (dev->tag && !strcmp(dev->tag, devtag) && (device_index++ == id))
 		{
-			image = &images[indx + id];
+			image = &images[indx];
 			break;
 		}
-		indx += dev->count;
+		indx++;
 	}
 
-	assert(image);
+	assert(image != NULL);
 	return image;
 }
 
@@ -1648,19 +1641,21 @@ mess_image *image_from_devtype_and_index(iodevice_t type, int id)
 	int indx;
 	mess_image *image = NULL;
 	const struct IODevice *dev;
+	int device_index;
 
 	assert((multiple_dev_mask & (1 << type)) == 0);
 	assert(id < device_count(type));
 
 	indx = 0;
+	device_index = 0;
 	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		if (type == dev->type)
+		if ((type == dev->type) && (device_index++ == id))
 		{
-			image = &images[indx + id];
+			image = &images[indx];
 			break;
 		}
-		indx += dev->count;
+		indx++;
 	}
 
 	assert(image);
@@ -1678,12 +1673,6 @@ iodevice_t image_devtype(mess_image *img)
 
 int image_index_in_device(mess_image *img)
 {
-	int indx;
-
 	assert(img);
-	indx = img - image_from_device_and_index(img->dev, 0);
-
-	assert(indx >= 0);
-	assert(indx < img->dev->count);
-	return indx;
+	return img->dev->index_in_device;
 }

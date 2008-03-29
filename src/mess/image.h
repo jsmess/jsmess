@@ -194,7 +194,7 @@ mess_image *image_from_absolute_index(int absolute_index);
 ****************************************************************************/
 
 int image_index_in_device(mess_image *img);
-mess_image *image_from_device_and_index(const struct IODevice *dev, int id);
+mess_image *image_from_device(const struct IODevice *dev);
 mess_image *image_from_devtag_and_index(const char *devtag, int id);
 
 /* deprecated; as there can be multiple devices of a certain type */

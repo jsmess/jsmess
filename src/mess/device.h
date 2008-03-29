@@ -244,7 +244,7 @@ struct IODevice
 	const char *tag;
 	iodevice_t type;
 	int position;
-	int count;
+	int index_in_device;
 	const char *file_extensions;
 
 	/* open dispositions */
@@ -256,6 +256,7 @@ struct IODevice
 	unsigned int reset_on_load : 1;
 	unsigned int must_be_loaded : 1;
 	unsigned int load_at_init : 1;
+	unsigned int multiple : 1;
 
 	/* image handling callbacks */
 	device_init_handler init;

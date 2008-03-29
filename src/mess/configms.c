@@ -24,7 +24,6 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 	const struct IODevice *dev;
-	int i;
 	mess_image *image;
 	const char *dev_instance;
 	const char *working_directory;
@@ -40,11 +39,8 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 			{
 				for (dev = mess_device_first_from_machine(Machine); (image == NULL) && (dev != NULL); dev = mess_device_next(dev))
 				{
-					for (i = 0; !image && (i < dev->count); i++)
-					{
-						if (!strcmp(dev_instance, device_instancename(&dev->devclass, i)))
-							image = image_from_device_and_index(dev, i);
-					}
+					if (!strcmp(dev_instance, device_instancename(&dev->devclass, dev->index_in_device)))
+						image = image_from_device(dev);
 				}
 
 				if (image != NULL)
@@ -69,7 +65,6 @@ static void device_dirs_save(int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 	const struct IODevice *dev;
-	int i;
 	mess_image *image;
 	const char *dev_instance;
 
@@ -78,17 +73,14 @@ static void device_dirs_save(int config_type, xml_data_node *parentnode)
 	{
 		for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
 		{
-			for (i = 0; i < dev->count; i++)
-			{
-				image = image_from_device_and_index(dev, i);
-				dev_instance = device_instancename(&dev->devclass, i);
+			image = image_from_device(dev);
+			dev_instance = device_instancename(&dev->devclass, dev->index_in_device);
 
-				node = xml_add_child(parentnode, "device", NULL);
-				if (node)
-				{
-					xml_set_attribute(node, "instance", dev_instance);
-					xml_set_attribute(node, "directory", image_working_directory(image));
-				}
+			node = xml_add_child(parentnode, "device", NULL);
+			if (node != NULL)
+			{
+				xml_set_attribute(node, "instance", dev_instance);
+				xml_set_attribute(node, "directory", image_working_directory(image));
 			}
 		}
 	}

@@ -32,7 +32,6 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
 	const struct IODevice *iodev;
 	const char *name;
 	const char *shortname;
-	int id;
 
 	for (dev = device_list_first(config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
 	{
@@ -52,16 +51,13 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
 		/* close the XML tag */
 		fprintf(out, ">\n");
 
-		for (id = 0; id < iodev->count; id++)
-		{
-			name = device_instancename(&iodev->devclass, id);
-			shortname = device_briefinstancename(&iodev->devclass, id);
+		name = device_instancename(&iodev->devclass, iodev->index_in_device);
+		shortname = device_briefinstancename(&iodev->devclass, iodev->index_in_device);
 
-			fprintf(out, "\t\t\t<instance");
-			fprintf(out, " name=\"%s\"", xml_normalize_string(name));
-			fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
-			fprintf(out, "/>\n");
-		}
+		fprintf(out, "\t\t\t<instance");
+		fprintf(out, " name=\"%s\"", xml_normalize_string(name));
+		fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
+		fprintf(out, "/>\n");
 
 		if (iodev->file_extensions)
 		{

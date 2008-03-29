@@ -109,7 +109,6 @@ static void ram_init(const game_driver *gamedrv)
 void devices_init(running_machine *machine)
 {
 	const struct IODevice *dev;
-	int id;
 	int result = INIT_FAIL;
 	const char *image_name;
 	mess_image *image;
@@ -129,34 +128,31 @@ void devices_init(running_machine *machine)
 	/* make sure that any required devices have been allocated */
 	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		for (id = 0; id < dev->count; id++)
+		/* identify the image */
+		image = image_from_device(dev);
+
+		/* is an image specified for this image */
+		image_name = mess_get_device_option(&dev->devclass, dev->index_in_device);
+		if ((image_name != NULL) && (image_name[0] != '\0'))
 		{
-			/* identify the image */
-			image = image_from_device_and_index(dev, id);
+			/* try to load this image */
+			result = image_load(image, image_name);
 
-			/* is an image specified for this image */
-			image_name = mess_get_device_option(&dev->devclass, id);
-			if ((image_name != NULL) && (image_name[0] != '\0'))
+			/* did the image load fail? */
+			if (result)
 			{
-				/* try to load this image */
-				result = image_load(image, image_name);
-
-				/* did the image load fail? */
-				if (result)
-				{
-					fatalerror_exitcode(MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
-						device_typename(dev->type),
-						osd_basename((char *) image_name),
-						image_error(image));
-				}
+				fatalerror_exitcode(MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
+					device_typename(dev->type),
+					osd_basename((char *) image_name),
+					image_error(image));
 			}
-			else
+		}
+		else
+		{
+			/* no image... must this device be loaded? */
+			if (dev->must_be_loaded)
 			{
-				/* no image... must this device be loaded? */
-				if (dev->must_be_loaded)
-				{
-					fatalerror_exitcode(MAMERR_DEVICE, "Driver requires that device %s must have an image to load\n", device_typename(dev->type));
-				}
+				fatalerror_exitcode(MAMERR_DEVICE, "Driver requires that device %s must have an image to load\n", device_typename(dev->type));
 			}
 		}
 	}
