@@ -96,12 +96,12 @@ void mess_ui_update(running_machine *machine)
  *
  *************************************/
 
-int ui_sprintf_image_info(char *buf)
+int ui_sprintf_image_info(running_machine *machine, char *buf)
 {
 	char *dst = buf;
 	const struct IODevice *dev;
 
-	dst += sprintf(dst, "%s\n\n", Machine->gamedrv->description);
+	dst += sprintf(dst, "%s\n\n", machine->gamedrv->description);
 
 	if (mess_ram_size > 0)
 	{
@@ -109,7 +109,7 @@ int ui_sprintf_image_info(char *buf)
 		dst += sprintf(dst, "RAM: %s\n\n", ram_string(buf2, mess_ram_size));
 	}
 
-	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
+	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
 			mess_image *img = image_from_device(dev);
 		const char *name = image_filename(img);
@@ -166,7 +166,7 @@ UINT32 ui_menu_image_info(UINT32 state)
 	UINT32 selected = 0;
 
 	/* add the game info */
-	bufptr += ui_sprintf_image_info(bufptr);
+	bufptr += ui_sprintf_image_info(Machine, bufptr);
 
 	/* make it look like a menu */
 	bufptr += sprintf(bufptr, "\n\t%s %s %s", ui_getstring(UI_lefthilight), ui_getstring(UI_returntomain), ui_getstring(UI_righthilight));

@@ -17,7 +17,7 @@ int mess_use_new_ui(void);
 int mess_disable_builtin_ui(running_machine *machine);
 
 /* image info screen */
-int ui_sprintf_image_info(char *buf);
+int ui_sprintf_image_info(running_machine *machine, char *buf);
 UINT32 ui_menu_image_info(UINT32 state);
 
 /* file manager */
