@@ -500,8 +500,7 @@ static int fileselect(int selected, const char *default_selection, const char *w
 
 		ui_menu_draw(fs_item, fs_total, sel, NULL);
 
-		/* borrowed from usrintrf.c */
-		visible = 0; //Machine->uiheight / (3 * Machine->uifontheight /2) -1;
+		visible = 0;
 
 		if (input_ui_pressed_repeat(IPT_UI_DOWN, 8))
 		{
