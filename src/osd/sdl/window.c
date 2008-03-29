@@ -214,7 +214,7 @@ int sdlwindow_init(running_machine *machine)
 	{
 		// create a thread to run the windows from
 #ifndef SDLMAME_OS2
-		work_queue = osd_work_queue_alloc(0);
+		work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_IO);
 #else
 		work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_IO);
 #endif

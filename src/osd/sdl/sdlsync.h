@@ -16,6 +16,8 @@
 
 #ifndef SDLMAME_OS2
 
+#define THREAD_COOPERATIVE		(1)
+
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events
 ***************************************************************************/
@@ -142,6 +144,21 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam);
 -----------------------------------------------------------------------------*/
 int osd_thread_adjust_priority(osd_thread *thread, int adjust);
 
+/*-----------------------------------------------------------------------------
+    osd_thread_cpu_affinity: change cpu affinity of a thread
+
+    Parameters:
+
+        thread - A pointer to a previously created thread 
+                 or NULL for main thread
+        mask   - bitmask to which cpus to bind
+        		 i.e. 0x01 1st cpu, 0x02, 2nd cpu, 0x04 3rd cpu
+
+    Return value:
+
+        TRUE on success, FALSE on failure
+-----------------------------------------------------------------------------*/
+int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask);
 
 /*-----------------------------------------------------------------------------
     osd_thread_wait_free: wait for thread to finish and free resources

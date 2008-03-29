@@ -40,9 +40,14 @@
 //  PARAMETERS
 //============================================================
 
-#define INFINITE				(osd_ticks_per_second()*10000)
+#define INFINITE				(osd_ticks_per_second() *  (osd_ticks_t) 10000)
+#if THREAD_COOPERATIVE
+//FIXME: depends on <THREADS>/<PHYS PROCESSORS>
+#define SPIN_LOOP_TIME			(osd_ticks_per_second() / 10000)
+//#define SPIN_LOOP_TIME			((osd_ticks_t) 0)
+#else
 #define SPIN_LOOP_TIME			(osd_ticks_per_second() / 1000)
-
+#endif
 
 
 //============================================================
@@ -68,12 +73,16 @@
 typedef struct _scalable_lock scalable_lock;
 struct _scalable_lock
 {
-   struct
-   {
-      volatile INT32 	haslock;		// do we have the lock?
-      INT32 			filler[64/4-1];	// assumes a 64-byte cache line
-   } slot[WORK_MAX_THREADS];			// one slot per thread
-   volatile INT32 		nextindex;		// index of next slot to use
+#if THREAD_COOPERATIVE
+	osd_lock			*lock;
+#else
+	struct
+	{
+		volatile INT32 	haslock;		// do we have the lock?
+		INT32 			filler[64/4-1];	// assumes a 64-byte cache line
+	} slot[WORK_MAX_THREADS];			// one slot per thread
+	volatile INT32 		nextindex;		// index of next slot to use
+#endif
 };
 
 
@@ -138,6 +147,9 @@ typedef void *PVOID;
 //============================================================
 
 static int effective_num_processors(void);
+#if THREAD_COOPERATIVE
+static UINT32 effective_cpu_mask(int index);
+#endif
 static void * worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 
@@ -175,13 +187,21 @@ INLINE INT32 interlocked_add(INT32 volatile *ptr, INT32 add)
 
 INLINE void scalable_lock_init(scalable_lock *lock)
 {
+#if THREAD_COOPERATIVE
+	lock->lock = osd_lock_alloc();
+#else
 	memset(lock, 0, sizeof(*lock));
 	lock->slot[0].haslock = TRUE;
+#endif
 }
 
 
 INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 {
+#if THREAD_COOPERATIVE
+	osd_lock_acquire(lock->lock);
+	return 0;
+#else
 	INT32 myslot = (atomic_increment32(&lock->nextindex) - 1) & (WORK_MAX_THREADS - 1);
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -234,11 +254,16 @@ INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 	}
 #endif
 	return myslot;
+#endif
 }
 
 
 INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
 {
+#if THREAD_COOPERATIVE
+	osd_lock_release(lock->lock);
+	return;
+#else
 #if defined(__i386__) || defined(__x86_64__)
 	register INT32 tmp = TRUE;
 	__asm__ __volatile__ (
@@ -253,7 +278,16 @@ INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
 #else
 	osd_exchange32(&lock->slot[(myslot + 1) & (WORK_MAX_THREADS - 1)].haslock, TRUE);
 #endif
+#endif
 }
+
+INLINE void scalable_lock_free(scalable_lock *lock)
+{
+#if THREAD_COOPERATIVE
+	osd_lock_free(lock->lock);
+#endif
+}
+
 
 
 //============================================================
@@ -326,6 +360,16 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 			osd_thread_adjust_priority(thread->handle, 0);	// TODO: specify appropriate priority
 		else
 			osd_thread_adjust_priority(thread->handle, 0);	// TODO: specify appropriate priority
+
+#if THREAD_COOPERATIVE
+		// Bind main thread to cpu 0
+		osd_thread_cpu_affinity(NULL, effective_cpu_mask(0));
+		
+		if (flags & WORK_QUEUE_FLAG_IO)
+			osd_thread_cpu_affinity(thread->handle, effective_cpu_mask(1));
+		else
+			osd_thread_cpu_affinity(thread->handle, effective_cpu_mask(2+threadnum) );
+#endif
 	}
 
 	// start a timer going for "waittime" on the main thread
@@ -380,7 +424,11 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 			// spin until we're done
 			begin_timing(thread->spintime);
 			while (queue->items != 0 && osd_ticks() < stopspin)
-				osd_yield_processor();
+			{
+				int spin = 10000;
+				while (--spin && queue->items != 0)
+					osd_yield_processor();
+			}
 			end_timing(thread->spintime);
 
 			begin_timing(thread->waittime);
@@ -491,6 +539,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	printf("Spin loops     = %9d\n", queue->spinloops);
 #endif
 
+	scalable_lock_free(&queue->lock);
 	// free the queue itself
 	free(queue);
 }
@@ -668,6 +717,45 @@ static int effective_num_processors(void)
 	return osd_num_processors();
 }
 
+//============================================================
+//  effective_cpu_mask
+//============================================================
+
+#if THREAD_COOPERATIVE
+static UINT32 effective_cpu_mask(int index)
+{
+	char 	*s;
+	char	buf[5];
+	UINT32	mask = 0xFFFF;
+
+	s = getenv("OSDCPUMASKS");
+	if (s != NULL && strcmp(s,"none"))
+	{
+		if (!strcmp(s,"auto"))
+		{
+			if (index<2)
+				mask = 0x01; /* main thread and io threads on cpu #0 */
+			else
+				mask = (1 << (((index - 1) % (osd_num_processors() - 1)) + 1));
+		}
+		else
+		{
+			if (strlen(s) % 4 != 0 || strlen(s) < (index+1)*4)
+			{
+				fprintf(stderr,"Invalid cpu mask: %s\n", s);
+			}
+			else
+			{
+				memcpy(buf,s+4*index,4);
+				buf[4] = 0;
+				if (sscanf(buf, "%x", &mask) != 1)
+					fprintf(stderr,"Invalid cpu mask element %d: %s\n", index, buf);
+			}
+		}
+	}
+	return mask;
+}
+#endif
 
 //============================================================
 //  worker_thread_entry
@@ -711,7 +799,11 @@ static void *worker_thread_entry(void *param)
 				begin_timing(thread->spintime);
 				stopspin = osd_ticks() + SPIN_LOOP_TIME;
 				while (queue->list == NULL && osd_ticks() < stopspin)
-					osd_yield_processor();
+				{
+					int spin = 10000;
+					while (--spin && queue->list == NULL)
+						osd_yield_processor();
+				}
 				end_timing(thread->spintime);
 			}
 

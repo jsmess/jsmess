@@ -41,6 +41,12 @@
 #define pthread_self    _gettid
 #endif
 
+#if THREAD_COOPERATIVE
+typedef struct _hidden_mutex_t hidden_mutex_t;
+struct _hidden_mutex_t {
+	pthread_mutex_t id;
+};
+#else
 struct _osd_lock {
  	volatile pthread_t	holder;
 	INT32				count;
@@ -50,6 +56,7 @@ struct _osd_lock {
 	INT8				padding[56];	// A bit more padding
 #endif
 };
+#endif
  
 #ifndef SDLMAME_OS2
 struct _osd_event {
@@ -69,6 +76,84 @@ struct _osd_thread {
 	pthread_t			thread;
 };
 
+
+#if THREAD_COOPERATIVE
+
+//============================================================
+//  osd_lock_alloc
+//============================================================
+
+osd_lock *osd_lock_alloc(void)
+{
+	hidden_mutex_t *mutex;
+	pthread_mutexattr_t mtxattr;
+
+	mutex = (hidden_mutex_t *)calloc(1, sizeof(hidden_mutex_t));
+
+	pthread_mutexattr_init(&mtxattr);
+	pthread_mutexattr_settype(&mtxattr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutex_init(&mutex->id, &mtxattr);
+
+	return (osd_lock *)mutex;
+}
+
+//============================================================
+//  osd_lock_acquire
+//============================================================
+
+void osd_lock_acquire(osd_lock *lock)
+{
+	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
+	int r;
+	
+	r =	pthread_mutex_lock(&mutex->id);
+	if (r==0)
+		return;
+	//mame_printf_error("Error on lock: %d: %s\n", r, strerror(r));
+}
+
+//============================================================
+//  osd_lock_try
+//============================================================
+
+int osd_lock_try(osd_lock *lock)
+{
+	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
+	int r;
+	
+	r = pthread_mutex_trylock(&mutex->id);
+	if (r==0)
+		return 1;
+	//if (r!=EBUSY)
+    //	mame_printf_error("Error on trylock: %d: %s\n", r, strerror(r));
+	return 0;
+}
+
+//============================================================
+//  osd_lock_release
+//============================================================
+
+void osd_lock_release(osd_lock *lock)
+{
+	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
+
+	pthread_mutex_unlock(&mutex->id);
+}
+
+//============================================================
+//  osd_lock_free
+//============================================================
+
+void osd_lock_free(osd_lock *lock)
+{
+	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
+
+	pthread_mutex_unlock(&mutex->id);
+	pthread_mutex_destroy(&mutex->id);
+	free(mutex);
+}
+#else
+ 
 INLINE pthread_t osd_compare_exchange_pthread_t(pthread_t volatile *ptr, pthread_t compare, pthread_t exchange)
 {
 #ifdef PTR64
@@ -227,7 +312,7 @@ void osd_lock_free(osd_lock *lock)
 {
 	free(lock);
 }
-
+#endif
 
 //============================================================
 //  osd_num_processors
@@ -483,6 +568,35 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 	}
 	else
 		return FALSE;
+}
+
+//============================================================
+//  osd_thread_cpu_affinity
+//============================================================
+
+int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
+{
+	cpu_set_t	cmask;
+	pthread_t	lthread;
+	int			bitnum;
+
+	CPU_ZERO(&cmask);
+	for (bitnum=0; bitnum<32; bitnum++)
+		if (mask & (1<<bitnum))
+			CPU_SET(bitnum, &cmask);
+	
+	if (thread == NULL)
+		lthread = pthread_self();
+	else
+		lthread = thread->thread;
+    
+	if (pthread_setaffinity_np(lthread, sizeof(cmask), &cmask) <0)
+	{
+		fprintf(stderr, "error %d setting cpu affinity to mask %08x", errno, mask);
+		return FALSE;
+	}
+	else
+		return TRUE;
 }
 
 //============================================================
