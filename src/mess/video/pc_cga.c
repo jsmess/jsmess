@@ -758,7 +758,7 @@ if (NTSC_FILTER) {
 /***************************************************************************
   Draw graphics mode with 320x200 pixels (default) with 2 bits/pixel.
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
-  cga fetches 2 byte per mscrtc6845 access.
+  cga fetches 2 byte per mc6845 access.
 ***************************************************************************/
 
 static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
