@@ -2,7 +2,6 @@
 #include <stdarg.h>
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/cbm.h"
 #include "devices/cartslot.h"
 
@@ -199,7 +198,7 @@ static DEVICE_LOAD(cbm_rom)
 	if (i >= sizeof(cbm_rom) / sizeof(cbm_rom[0]))
 		return INIT_FAIL;
 
-	dev = cbm_rom_find_device(Machine);
+	dev = cbm_rom_find_device(image->machine);
 
 	size = image_length(image);
 

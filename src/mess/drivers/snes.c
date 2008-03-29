@@ -237,7 +237,7 @@ static MACHINE_START( snes_mess )
 static int device_load_snes_cart(mess_image *image)
 {
 	int i;
-	running_machine *machine = Machine;
+	running_machine *machine = image->machine;
 	UINT16 totalblocks, readblocks;
 	UINT32 offset;
 	UINT8 header[512], sample[0xffff];

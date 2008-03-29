@@ -8,7 +8,6 @@
 
 #include <stdarg.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/ti85.h"
 #include "formats/ti85_ser.h"
@@ -651,7 +650,7 @@ SNAPSHOT_LOAD( ti8x )
 
 DEVICE_INIT( ti85_serial )
 {
-	ti85_free_serial_data_memory(Machine);
+	ti85_free_serial_data_memory(image->machine);
 	ti85_receive_serial (NULL,0);
 	return INIT_PASS;
 }
@@ -670,7 +669,7 @@ DEVICE_LOAD( ti85_serial )
 		file_data = (UINT8*) auto_malloc(file_size);
 		image_fread(image, file_data, file_size);
 
-		if(!ti85_convert_file_data_to_serial_stream(file_data, file_size, &ti85_serial_stream, (char*)Machine->gamedrv->name))
+		if(!ti85_convert_file_data_to_serial_stream(file_data, file_size, &ti85_serial_stream, (char*)image->machine->gamedrv->name))
 		{
 			ti85_free_serial_stream (&ti85_serial_stream);
 			return INIT_FAIL;
@@ -687,7 +686,7 @@ DEVICE_LOAD( ti85_serial )
 
 DEVICE_UNLOAD( ti85_serial )
 {
-	ti85_free_serial_data_memory(Machine);
+	ti85_free_serial_data_memory(image->machine);
 	ti85_serial_status = TI85_SEND_STOP;
 	ti85_free_serial_stream (&ti85_serial_stream);
 }

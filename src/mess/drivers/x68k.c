@@ -1827,7 +1827,7 @@ static DEVICE_LOAD( x68k_floppy )
 			current_vector[1] = 0x61;
 			sys.ioc.irqstatus |= 0x40;
 			current_irq_line = 1;
-			cpunum_set_input_line_and_vector(Machine, 0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+			cpunum_set_input_line_and_vector(image->machine, 0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 			logerror("IOC: Disk image inserted\n");
 		}
 		sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
@@ -1844,7 +1844,7 @@ static DEVICE_UNLOAD( x68k_floppy )
 		current_vector[1] = 0x61;
 		sys.ioc.irqstatus |= 0x40;
 		current_irq_line = 1;
-		cpunum_set_input_line_and_vector(Machine, 0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+		cpunum_set_input_line_and_vector(image->machine, 0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 	}
 	sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
 }

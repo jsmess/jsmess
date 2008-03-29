@@ -1,7 +1,6 @@
 #include <ctype.h>
 #include "driver.h"
 #include "cartslot.h"
-#include "deprecat.h"
 
 
 static int is_cart_roment(const rom_entry *roment)
@@ -76,7 +75,7 @@ static int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, mess
 		/* if the region is inverted, do that now */
 		if (type >= REGION_CPU1 && type < REGION_CPU1 + MAX_CPU)
 		{
-			int cputype = Machine->config->cpu[type - REGION_CPU1].type;
+			int cputype = image->machine->config->cpu[type - REGION_CPU1].type;
 			if (cputype != 0)
 			{
 				datawidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM) / 8;
@@ -117,7 +116,7 @@ static int process_cartridge(mess_image *image, mess_image *file)
 	const rom_entry *romrgn, *roment;
 	int position = 0, result;
 
-	romrgn = rom_first_region(Machine->gamedrv);
+	romrgn = rom_first_region(image->machine->gamedrv);
 	while(romrgn)
 	{
 		roment = romrgn + 1;

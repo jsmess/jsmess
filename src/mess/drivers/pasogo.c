@@ -64,7 +64,7 @@ static TIMER_CALLBACK( vg230_timer )
   }
 }
 
-void vg230_reset(void)
+void vg230_reset(running_machine *machine)
 {
   mame_system_time systime;
 
@@ -73,7 +73,7 @@ void vg230_reset(void)
   timer_pulse(ATTOTIME_IN_HZ(1), NULL, 0, vg230_timer);
 
 
-  mame_get_base_datetime(Machine, &systime);
+  mame_get_base_datetime(machine, &systime);
   
   vg230.rtc.seconds= systime.local_time.second;
   vg230.rtc.minutes= systime.local_time.minute;
@@ -83,9 +83,9 @@ void vg230_reset(void)
   vg230.bios_timer.data=0x7200; // HACK
 }
 
-void vg230_init(void)
+void vg230_init(running_machine *machine)
 {
-  vg230_reset();
+  vg230_reset(machine);
 }
 
 
@@ -470,7 +470,7 @@ static void pasogo_pic_set_int_line(int which, int interrupt)
 
 static DRIVER_INIT( pasogo )
 {
-  vg230_init();
+  vg230_init(machine);
   memset(&ems, 0, sizeof(ems));
   memory_set_bankptr( 27, memory_region(REGION_USER1) + 0x00000 );
   memory_set_bankptr( 28, memory_region(REGION_CPU1) + 0xb8000/*?*/ );

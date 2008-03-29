@@ -1420,7 +1420,7 @@ static void setup_working_directory(image_slot_data *image)
 	if (try_change_working_directory(image, "software"))
 	{
 		/* now down to a directory for this computer */
-		gamedrv = Machine->gamedrv;
+		gamedrv = image->dev->machine->gamedrv;
 		while(gamedrv && !try_change_working_directory(image, gamedrv->name))
 		{
 			gamedrv = mess_next_compatible_driver(gamedrv);
@@ -1586,7 +1586,7 @@ static file_error open_battery_file(mess_image *image, UINT32 openflags, mame_fi
 	basename_noext = strip_extension(image_basename(image));
 	if (!basename_noext)
 		return FILERR_OUT_OF_MEMORY;
-	fname = astring_assemble_4(astring_alloc(), Machine->gamedrv->name, PATH_SEPARATOR, basename_noext, ".nv");
+	fname = astring_assemble_4(astring_alloc(), image->machine->gamedrv->name, PATH_SEPARATOR, basename_noext, ".nv");
 	filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(fname), openflags, file);
 	astring_free(fname);
 	free(basename_noext);
@@ -1654,7 +1654,7 @@ void image_battery_save(mess_image *image, const void *buffer, int length)
 int image_absolute_index(mess_image *image)
 {
 	image_slot_data *slot = find_image_slot(image);
-	return slot - Machine->images_data->slots;
+	return slot - image->machine->images_data->slots;
 }
 
 
