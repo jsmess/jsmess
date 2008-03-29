@@ -229,7 +229,7 @@ TESTDRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
 TESTDRIVER( pcw10 ) 	/* 198? PCW10										*/
 TESTDRIVER( pcw16 )		/* 1995 PCW16										*/
 	DRIVER( nc100 )		/* 19?? NC100										*/
-TESTDRIVER( nc200 )		/* 19?? NC200										*/
+	DRIVER( nc200 )		/* 19?? NC200										*/
 
 	/* APPLE */
 	DRIVER( apple1 )	/* Jul 1976 Apple 1									*/

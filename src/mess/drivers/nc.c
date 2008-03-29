@@ -1501,9 +1501,10 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
 	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n",activecpu_get_pc(),data));
+#if 0
 	floppy_drive_set_motor_state(0,1);
 	floppy_drive_set_ready_state(0,1,1);
-
+#endif
 	nec765_set_tc_state((data & 0x01));
 }
 
@@ -1697,6 +1698,7 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_MACHINE_RESET( nc200 )
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
 	MDRV_PALETTE_LENGTH(NC200_NUM_COLOURS)
