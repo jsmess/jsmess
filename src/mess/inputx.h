@@ -101,9 +101,9 @@ void inputx_postn_coded_rate(const char *text, size_t text_len, attotime rate);
 
 /* miscellaneous functions */
 int input_classify_port(const input_port_entry *in);
-int input_has_input_class(int inputclass);
+int input_has_input_class(running_machine *machine, int inputclass);
 int input_player_number(const input_port_entry *in);
-int input_count_players(void);
-int input_category_active(int category);
+int input_count_players(running_machine *machine);
+int input_category_active(running_machine *machine, int category);
 
 #endif /* INPUTX_H */

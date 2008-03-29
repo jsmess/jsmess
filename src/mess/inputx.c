@@ -1394,10 +1394,10 @@ int input_player_number(const input_port_entry *port)
 
 
 
-int input_has_input_class(int inputclass)
+int input_has_input_class(running_machine *machine, int inputclass)
 {
 	input_port_entry *in;
-	for (in = Machine->input_ports; in->type != IPT_END; in++)
+	for (in = machine->input_ports; in->type != IPT_END; in++)
 	{
 		if (input_classify_port(in) == inputclass)
 			return TRUE;
@@ -1407,13 +1407,13 @@ int input_has_input_class(int inputclass)
 
 
 
-int input_count_players(void)
+int input_count_players(running_machine *machine)
 {
 	const input_port_entry *in;
 	int joystick_count;
 
 	joystick_count = 0;
-	for (in = Machine->input_ports; in->type != IPT_END; in++)
+	for (in = machine->input_ports; in->type != IPT_END; in++)
 	{
 		if (input_classify_port(in) == INPUT_CLASS_CONTROLLER)
 		{
@@ -1426,14 +1426,14 @@ int input_count_players(void)
 
 
 
-int input_category_active(int category)
+int input_category_active(running_machine *machine, int category)
 {
 	const input_port_entry *in;
 	const input_port_entry *in_base = NULL;
 
 	assert(category >= 1);
 
-	for (in = Machine->input_ports; in->type != IPT_END; in++)
+	for (in = machine->input_ports; in->type != IPT_END; in++)
 	{
 		switch(in->type) {
 		case IPT_CATEGORY_NAME:

@@ -1149,7 +1149,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	{
 		// set up joystick menu
 #ifndef UNDER_CE
-		joystick_count = input_count_players();
+		joystick_count = input_count_players(machine);
 #endif
 		if (joystick_count > 0)
 		{
@@ -1246,10 +1246,10 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 
 	speed = video_get_throttle() ? video_get_speed_factor() : 0;
 
-	has_config		= input_has_input_class(INPUT_CLASS_CONFIG);
-	has_dipswitch	= input_has_input_class(INPUT_CLASS_DIPSWITCH);
-	has_keyboard	= input_has_input_class(INPUT_CLASS_KEYBOARD);
-	has_misc		= input_has_input_class(INPUT_CLASS_MISC);
+	has_config		= input_has_input_class(machine, INPUT_CLASS_CONFIG);
+	has_dipswitch	= input_has_input_class(machine, INPUT_CLASS_DIPSWITCH);
+	has_keyboard	= input_has_input_class(machine, INPUT_CLASS_KEYBOARD);
+	has_misc		= input_has_input_class(machine, INPUT_CLASS_MISC);
 
 	has_analog = 0;
 	for (in = machine->input_ports; in->type != IPT_END; in++)
