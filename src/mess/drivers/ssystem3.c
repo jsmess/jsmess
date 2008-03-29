@@ -4,7 +4,7 @@
 
 Driver file to handle emulation of the Chess Champion Super System III / Chess
 Champion MK III
-by PeT mess@utanet.at November 2000
+by PeT mess@utanet.at November 2000, march 2008
 
 Hardware descriptions:
 - A 6502 CPU
@@ -19,6 +19,18 @@ optional printer (special serial connection)
 optional board display (special serial connection)
 internal expansion/cartridge port
  (special power saving pack)
+
+
+todo:
+not sure about lcd signs and their assignments
+not sure about all buttons and switches
+playfield displayment currently based on simulation and on screen
+not check for audio yet
+convert to new artwork system
+
+needed:
+artwork for board display
+backup of playfield rom and picture/description of its board
 */
 
 #include "driver.h"
@@ -26,31 +38,205 @@ internal expansion/cartridge port
 #include "includes/ssystem3.h"
 #include "machine/6522via.h"
 #include "cpu/m6502/m6502.h"
+//#include "attotime.h"
 
+struct {
+  UINT8 porta;
+} ssystem3;
+
+
+// in my opinion own cpu to display lcd field and to handle own buttons
+static struct {
+  int signal;
+  //  int on;
+
+  int count, bit, started;
+  UINT8 data;
+  attotime time, high_time, low_time;
+  union {
+    struct {
+      UINT8 header[7];
+      UINT8 field[8][8/2];
+      UINT8 unknown[5];
+    } s;
+    UINT8 data[7+8*8/2+5];
+  } u;
+} playfield;
+
+void ssystem3_playfield_getfigure(int x, int y, int *figure, int *black)
+{
+  int d;
+  if (x&1)
+    d=playfield.u.s.field[y][x/2]&0xf;
+  else
+    d=playfield.u.s.field[y][x/2]>>4;
+
+  *figure=d&7;
+  *black=d&8;
+}
+
+static void ssystem3_playfield_reset(void)
+{
+  memset(&playfield, 0, sizeof(playfield));
+  playfield.signal=FALSE;
+  //  playfield.on=TRUE; //readinputportbytag("Configuration")&1;
+}
+
+static void ssystem3_playfield_write(int reset, int signal)
+{
+  int d=FALSE;
+
+  if (!reset) {
+    playfield.count=0;
+    playfield.bit=0;
+    playfield.started=FALSE;
+    playfield.signal=signal;
+    playfield.time=timer_get_time();
+  }
+  if (!signal && playfield.signal) {
+    attotime t=timer_get_time();
+    playfield.high_time=attotime_sub(t, playfield.time);
+    playfield.time=t;
+
+    //    logerror("%.4x playfield %d lowtime %s hightime %s\n",(int)activecpu_get_pc(), playfield.count,
+    //	     attotime_string(playfield.low_time, 7), attotime_string(playfield.high_time,7) );
+
+    if (playfield.started) {
+      // 0 twice as long low
+      // 1 twice as long high
+      if (attotime_compare(playfield.low_time,playfield.high_time)>0) d=TRUE;
+      
+      playfield.data&=~(1<<(playfield.bit^7));
+      if (d) playfield.data|=1<<(playfield.bit^7);
+      playfield.bit++;
+      if (playfield.bit==8) {
+	logerror("%.4x playfield wrote %d %02x\n",(int)activecpu_get_pc(), playfield.count, playfield.data);
+	playfield.u.data[playfield.count]=playfield.data;
+	playfield.bit=0;
+	playfield.count=(playfield.count+1)%ARRAY_LENGTH(playfield.u.data);
+	if (playfield.count==0) playfield.started=FALSE;
+      }
+    }
+
+  } else if (signal && !playfield.signal) {
+    attotime t=timer_get_time();
+    playfield.low_time=attotime_sub(t, playfield.time);
+    playfield.time=t;
+    playfield.started=TRUE;
+  }
+  playfield.signal=signal;
+}
+
+static void ssystem3_playfield_read(int *on, int *ready)
+{
+  *on=!(readinputportbytag("Configuration")&1);
+  //  *on=!playfield.on;
+  *ready=FALSE;
+}
+
+void ssystem3_via_write_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+{
+  ssystem3.porta=data;
+  //  logerror("%.4x via port a write %02x\n",(int)activecpu_get_pc(), data);
+}
+
+UINT8 ssystem3_via_read_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset)
+{
+  UINT8 data=0xff;
+#if 1 // time switch
+  if (!(ssystem3.porta&0x10)) data&=readinputport(1)|0xf1;
+  if (!(ssystem3.porta&0x20)) data&=readinputport(2)|0xf1;
+  if (!(ssystem3.porta&0x40)) data&=readinputport(3)|0xf1;
+  if (!(ssystem3.porta&0x80)) data&=readinputport(4)|0xf1;
+#else
+  if (!(ssystem3.porta&0x10)) data&=readinputport(1)|0xf0;
+  if (!(ssystem3.porta&0x20)) data&=readinputport(2)|0xf0;
+  if (!(ssystem3.porta&0x40)) data&=readinputport(3)|0xf0;
+  if (!(ssystem3.porta&0x80)) data&=readinputport(4)|0xf0;
+#endif
+  if (!(ssystem3.porta&1)) {
+    if (!(readinputport(1)&1)) data&=~0x10;
+    if (!(readinputport(2)&1)) data&=~0x20;
+    if (!(readinputport(3)&1)) data&=~0x40;
+    if (!(readinputport(4)&1)) data&=~0x80;
+  }
+  if (!(ssystem3.porta&2)) {
+    if (!(readinputport(1)&2)) data&=~0x10;
+    if (!(readinputport(2)&2)) data&=~0x20;
+    if (!(readinputport(3)&2)) data&=~0x40;
+    if (!(readinputport(4)&2)) data&=~0x80;
+  }
+  if (!(ssystem3.porta&4)) {
+    if (!(readinputport(1)&4)) data&=~0x10;
+    if (!(readinputport(2)&4)) data&=~0x20;
+    if (!(readinputport(3)&4)) data&=~0x40;
+    if (!(readinputport(4)&4)) data&=~0x80;
+  }
+  if (!(ssystem3.porta&8)) {
+    if (!(readinputport(1)&8)) data&=~0x10;
+    if (!(readinputport(2)&8)) data&=~0x20;
+    if (!(readinputport(3)&8)) data&=~0x40;
+    if (!(readinputport(4)&8)) data&=~0x80;
+  }
+  //  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
+  return data;
+}
 
 
 /*
   port b
-   bit 0: ??
+   bit 0: output opt device reset?
 
-    hi speed serial 1
+    hi speed serial 1 (d7d7 transfers 40 bit $2e)
    bit 1: output data
    bit 2: output clock (hi data is taken)
 
+   bit 3: output opt data read
+   bit 4: input low opt data available
+   bit 5: input low opt device available
+
+
     bit 6: input clocks!?
 
+  port a:
+   bit 7: input low x/$37 2  
+   bit 6: input low x/$37 3
+   bit 5: input low x/$37 4 (else 1)
+
  */
+UINT8 ssystem3_via_read_b(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset)
+{
+  UINT8 data=0xff;
+  int on, ready;
+  ssystem3_playfield_read(&on, &ready);
+  if (!on) data&=~0x20;
+  if (!ready) data&=~0x10;
+  return data;
+}
+
+void ssystem3_via_write_b(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+{
+  UINT8 d;
+  ssystem3_playfield_write(data&1, data&8);
+  ssystem3_lcd_write(data&4, data&2);
+
+  d=ssystem3_via_read_b(machine, 0)&~0x40;
+  if (data&0x80) d|=0x40;
+  //  d&=~0x8f;
+  via_set_input_b( 0, d );
+
+}
 
 static const struct via6522_interface config=
 {
-	0,//read8_machine_func in_a_func;
-	0,//read8_machine_func in_b_func;
+	ssystem3_via_read_a,//read8_machine_func in_a_func;
+	ssystem3_via_read_b,//read8_machine_func in_b_func;
 	0,//read8_machine_func in_ca1_func;
 	0,//read8_machine_func in_cb1_func;
 	0,//read8_machine_func in_ca2_func;
 	0,//read8_machine_func in_cb2_func;
-	0,//write8_machine_func out_a_func;
-	0,//write8_machine_func out_b_func;
+	ssystem3_via_write_a,//write8_machine_func out_a_func;
+	ssystem3_via_write_b,//write8_machine_func out_b_func;
 	0,//write8_machine_func out_ca2_func;
 	0,//write8_machine_func out_cb2_func;
 	0,//void (*irq_func)(int state);
@@ -59,60 +245,77 @@ static const struct via6522_interface config=
 static DRIVER_INIT( ssystem3 )
 {
 	via_config(0,&config);
-}
-
-static TIMER_CALLBACK( ssystem3_pb6_toggle ) {
-	static int toggle = 0;
-	via_set_input_b( 0, toggle ? 0x40 : 0 );
-	toggle ^= 1;
+	ssystem3_playfield_reset();
+	ssystem3_lcd_reset();
 }
 
 static MACHINE_RESET( ssystem3 )
 {
-	via_reset();
-	timer_pulse( ATTOTIME_IN_HZ(4000000), NULL, 0, ssystem3_pb6_toggle );
+  via_reset();
 }
 
 static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x03ff) AM_RAM
-//  AM_RANGE( 0x4000, 0x40ff) AM_NOP    /* lcd chip!? */
+				  /*
+67-de playfield ($40 means white, $80 black)
+				   */
+//  AM_RANGE( 0x4000, 0x40ff) AM_NOP
+/*
+  probably zusatzgerät memory (battery powered ram 256x4? at 0x4000)
+  $40ff low nibble ram if playfield module (else init with normal playfield)
+ */
 	AM_RANGE( 0x6000, 0x600f) AM_READWRITE( via_0_r, via_0_w )
+#if 1
+	AM_RANGE( 0xc000, 0xdfff) AM_ROM
+	AM_RANGE( 0xf000, 0xffff) AM_ROM
+#else
 	AM_RANGE( 0xc000, 0xffff) AM_ROM
+#endif
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssystem3 )
-	PORT_START
-PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seams to be direct wired to reset
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
-	PORT_START
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black A    Black") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black B    Field") PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black C    Time?") PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black D    Time?") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black E    Time off?") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black F    LEVEL") PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black G    Swap") PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black H    White") PORT_CODE(KEYCODE_H)
-	PORT_START
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 1") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 2") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 3") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 4") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 5") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 6") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 7") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 8") PORT_CODE(KEYCODE_8)
+/*
+  switches: light(hardware?) sound time power(hardware!)
+
+  new game (hardware?)
+*/
+
+
+	PORT_START_TAG( "Switches" )
+//PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seams to be direct wired to reset
+//	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?CLEAR") PORT_CODE(KEYCODE_F1)
+//	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?ENTER") PORT_CODE(KEYCODE_ENTER)
+  PORT_START_TAG( "matrix1" )
+     PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?1") PORT_CODE(KEYCODE_1_PAD)
+     PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   C SQ     EP") PORT_CODE(KEYCODE_9)
+     PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER?") PORT_CODE(KEYCODE_ENTER)
+     PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   C BOARD  MD") PORT_CODE(KEYCODE_0)
+  PORT_START_TAG( "matrix2" )
+     PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?2") PORT_CODE(KEYCODE_2_PAD)
+     PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 F springer zeitvorgabe") PORT_CODE(KEYCODE_6)  PORT_CODE(KEYCODE_F)
+     PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 E laeufer ruecknahme") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_E)
+     PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CE  interrupt") PORT_CODE(KEYCODE_BACKSPACE)
+  PORT_START_TAG( "matrix3" )
+     PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?3") PORT_CODE(KEYCODE_3_PAD)
+     PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 G bauer zugvorschlaege") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_G)
+     PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 D turm #") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
+     PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 A white") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_A)
+  PORT_START_TAG( "matrix4" )
+	PORT_DIPNAME( 0x01, 0, "Time") PORT_CODE(KEYCODE_T) PORT_TOGGLE PORT_DIPSETTING( 0, DEF_STR(Off) ) PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+     PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 H black") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
+     PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 C dame #50") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_C)
+     PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 B koenig FP") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_B)
+  PORT_START_TAG( "Configuration" )
+	PORT_DIPNAME( 0x0001, 0, "Schachbrett") PORT_TOGGLE
+	PORT_DIPSETTING( 0, DEF_STR( Off ) )
+	PORT_DIPSETTING( 1, "angeschlossen" )
 #if 0
-	PORT_START
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test 1") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test 2") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test 3") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test 4") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test 5") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test 6") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test 7") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test 8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_DIPNAME( 0x0002, 0, "Memory") PORT_TOGGLE
+	PORT_DIPSETTING( 0, DEF_STR( Off ) )
+	PORT_DIPSETTING( 2, "angeschlossen" )
+	PORT_DIPNAME( 0x0004, 0, "Drucker") PORT_TOGGLE
+	PORT_DIPSETTING( 0, DEF_STR( Off ) )
+	PORT_DIPSETTING( 4, "angeschlossen" )
 #endif
 INPUT_PORTS_END
 
@@ -150,13 +353,9 @@ MACHINE_DRIVER_END
 ROM_START(ssystem3)
 	ROM_REGION(0x10000,REGION_CPU1,0)
 	ROM_LOAD("ss3lrom", 0xc000, 0x1000, CRC(9ea46ed3) SHA1(34eef85b356efbea6ddac1d1705b104fc8e2731a) )
+//	ROM_RELOAD(0xe000, 0x1000)
 	ROM_LOAD("ss3hrom", 0xf000, 0x1000, CRC(52741e0b) SHA1(2a7b950f9810c5a14a1b9d5e6b2bd93da621662e) )
 	ROM_RELOAD(0xd000, 0x1000)
-/* 0xd450 reset,irq,nmi
-
-   d7c7 outputs 2e..32 to serial port 1
- */
-
 ROM_END
 
 /***************************************************************************
@@ -166,5 +365,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY     FULLNAME */
-CONS( 1979,	ssystem3, 0, 		0,		ssystem3, ssystem3,	ssystem3,	NULL,		"NOVAG Industries Ltd.",  "Chess Champion Super System III", 0)
+CONS( 1979,	ssystem3, 0, 		0,		ssystem3, ssystem3,	ssystem3,	NULL,		"NOVAG Industries Ltd.",  "Chess Champion Super System III", GAME_NO_SOUND)
 //chess champion MK III in germany

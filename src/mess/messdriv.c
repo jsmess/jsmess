@@ -860,6 +860,9 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( mk1 )		/* Chess Champion MK I								*/
 	/* Quelle International */
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
+	/* Novag */
+        DRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
+
 	/* Hegener & Glaser Munich */
 	DRIVER( mm4 )		/* Mephisto 4								*/
 	/* Hegener & Glaser Munich */
@@ -873,8 +876,6 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( dallas16 )		/* Dallas							*/
 	DRIVER( dallas32 )		/* Dallas							*/
 	DRIVER( roma32 )		/* Roma							*/
-	/* Novag */
-TESTDRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
 
 #endif /* DRIVER_RECURSIVE */

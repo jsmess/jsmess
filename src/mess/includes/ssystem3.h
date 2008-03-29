@@ -8,13 +8,15 @@
 #define SSYSTEM3_H_
 
 
-/*----------- defined in video/ssystem3.c -----------*/
+void ssystem3_playfield_getfigure(int x, int y, int *figure, int *black);
 
-extern UINT8 ssystem3_led[5];
+/*----------- defined in video/ssystem3.c -----------*/
 
 extern PALETTE_INIT( ssystem3 );
 extern VIDEO_START( ssystem3 );
 extern VIDEO_UPDATE( ssystem3 );
 
+void ssystem3_lcd_reset(void) ;
+void ssystem3_lcd_write(int clock, int data);
 
 #endif /* SSYSTEM3_H_ */
