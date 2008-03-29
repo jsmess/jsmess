@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "eventlst.h"
 
 /* current item */
@@ -63,11 +62,11 @@ void    EventList_SetOffsetStartTime(int StartTime)
 }
 
 /* add an event to the buffer with a time index offset from a specified time */
-void    EventList_AddItemOffset(int ID, int Data, int Time)
+void    EventList_AddItemOffset(running_machine *machine, int ID, int Data, int Time)
 {
 
         if (!CyclesPerFrame)
-                CyclesPerFrame = (int)(cpunum_get_clock(0) / video_screen_get_frame_period(Machine->primary_screen).attoseconds);	//totalcycles();	//_(int)(cpunum_get_clock(0) / Machine->config->frames_per_second);
+                CyclesPerFrame = (int)(cpunum_get_clock(0) / video_screen_get_frame_period(machine->primary_screen).attoseconds);	//totalcycles();	//_(int)(cpunum_get_clock(0) / machine->config->frames_per_second);
 
         if (NumEvents < TotalEvents)
         {

@@ -12,6 +12,6 @@ void	EventList_Initialise(int NumEntries);
 void    EventList_Reset(void);
 void    EventList_AddItem(int ID, int Data,int Time);
 void    EventList_SetOffsetStartTime(int StartTime);
-void    EventList_AddItemOffset(int ID, int Data,int Time);
+void    EventList_AddItemOffset(running_machine *machine, int ID, int Data,int Time);
 int     EventList_NumEvents(void);
 EVENT_LIST_ITEM *EventList_GetFirstItem(void);

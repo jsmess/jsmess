@@ -69,7 +69,7 @@ WRITE8_HANDLER (spectrum_colorram_w)
            doing it now as contented memory is not emulated so timings will
            be way off. (eg Zynaps taking 212 cycles not 224 per scanline)
         */
-/*        EventList_AddItemOffset(offset+0x5800, data, cpu_getcurrentcycles()); */
+/*        EventList_AddItemOffset(machine, offset+0x5800, data, cpu_getcurrentcycles()); */
 
 	spectrum_colorram[offset] = data;
 	charsdirty[offset] = 1;
