@@ -191,16 +191,6 @@ static const char *default_device_name(const struct IODevice *dev, int id,
 
 
 
-static void default_device_getdispositions(const struct IODevice *dev, int id,
-	unsigned int *readable, unsigned int *writeable, unsigned int *creatable)
-{
-	*readable = dev->readable;
-	*writeable = dev->writeable;
-	*creatable = dev->creatable;
-}
-
-
-
 /*-------------------------------------------------
     DEVICE_START(mess_device) - device start
     callback
@@ -303,6 +293,8 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 	int i, j, count;
 	size_t string_buffer_pos = 0;
 	int createimage_optcount;
+	device_getdispositions_handler getdispositions;
+	unsigned int readable, writeable, creatable;
 
 	/* set up MESS's device class */
 	mess_devclass.get_info = handler;
@@ -327,7 +319,7 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 			snprintf(dynamic_tag, ARRAY_LENGTH(dynamic_tag), "mess_device_%d", *position);
 			mame_tag = dynamic_tag;
 		}
-		
+
 		/* create a bonafide MAME device */
 		device = device_list_add(listheadptr, MESS_DEVICE, mame_tag);
 		mess_device = (mess_device_config *) device->inline_config;
@@ -359,9 +351,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		mess_device->io_device.index_in_device		= i;
 		mess_device->io_device.file_extensions		= file_extensions;
 
-		mess_device->io_device.readable				= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_READABLE) ? 1 : 0;
-		mess_device->io_device.writeable			= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_WRITEABLE) ? 1 : 0;
-		mess_device->io_device.creatable			= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_CREATABLE) ? 1 : 0;
 		mess_device->io_device.reset_on_load		= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_RESET_ON_LOAD) ? 1 : 0;
 		mess_device->io_device.must_be_loaded		= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_MUST_BE_LOADED) ? 1 : 0;
 		mess_device->io_device.load_at_init			= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_LOAD_AT_INIT) ? 1 : 0;
@@ -373,7 +362,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		mess_device->io_device.unload				= (device_unload_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_UNLOAD);
 		mess_device->io_device.imgverify			= (device_verify_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_VERIFY);
 		mess_device->io_device.partialhash			= (device_partialhash_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_PARTIAL_HASH);
-		mess_device->io_device.getdispositions		= (device_getdispositions_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_GET_DISPOSITIONS);
 
 		mess_device->io_device.display				= (device_display_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_DISPLAY);
 		mess_device->io_device.name					= default_device_name;
@@ -405,6 +393,23 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 			memset(&mess_device->createimage_options[createimage_optcount], 0, sizeof(mess_device->createimage_options[createimage_optcount]));
 		}
 
+		/* determine the dispositions */
+		getdispositions = (device_getdispositions_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_GET_DISPOSITIONS);
+		if (getdispositions != NULL)
+		{
+			getdispositions(&mess_device->io_device, i, &readable, &writeable, &creatable);
+		}
+		else
+		{
+			readable = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_READABLE) ? 1 : 0;
+			writeable = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_WRITEABLE) ? 1 : 0;
+			creatable = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_CREATABLE) ? 1 : 0;
+		}
+		mess_device->io_device.readable = readable;
+		mess_device->io_device.writeable = writeable;
+		mess_device->io_device.creatable = creatable;
+
+		/* bump the position */
 		(*position)++;
 
 		/* overriding the count? */
@@ -413,10 +418,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 
 		/* any problems? */
 		assert((mess_device->io_device.type >= 0) && (mess_device->io_device.type < IO_COUNT));
-
-		/* fill in defaults */
-		if (!mess_device->io_device.getdispositions)
-			mess_device->io_device.getdispositions = default_device_getdispositions;
 	}
 }
 

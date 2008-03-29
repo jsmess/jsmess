@@ -266,8 +266,6 @@ struct IODevice
 	device_unload_handler unload;
 	int (*imgverify)(const UINT8 *buf, size_t size);
 	device_partialhash_handler partialhash;
-	void (*getdispositions)(const struct IODevice *dev, int id,
-		unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
 
 	/* cosmetic/UI callbacks */
 	void (*display)(mess_image *img);

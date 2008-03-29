@@ -528,18 +528,10 @@ static void determine_open_plan(image_slot_data *image, int is_create, UINT32 *o
 	/* access legacy MESS device */
 	iodev = mess_device_from_core_device(image->dev);
 
-	/* TODO - getdispositions is silly now that devices don't have counts */
-	if (iodev->getdispositions)
-	{
-		iodev->getdispositions(iodev, image_index_in_device(image->dev),
-			&readable, &writeable, &creatable);
-	}
-	else
-	{
-		readable = iodev->readable;
-		writeable = iodev->writeable;
-		creatable = iodev->creatable;
-	}
+	/* determine disposition */
+	readable = iodev->readable;
+	writeable = iodev->writeable;
+	creatable = iodev->creatable;
 
 	/* emit flags */
 	if (!is_create && readable && writeable)
