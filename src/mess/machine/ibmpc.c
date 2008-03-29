@@ -2,6 +2,7 @@
 #include "memconv.h"
 #include "includes/ibmpc.h"
 #include "devices/cassette.h"
+#include "machine/pit8253.h"
 
 #include "machine/pcshare.h"
 #include "audio/pc.h"
@@ -102,6 +103,7 @@ static struct {
 	int portc_switch_high;
 	int speaker;
 	int keyboard_disabled;
+	UINT8	portb;
 } pc_ppi={ 0 };
 
  READ8_HANDLER (pc_ppi_porta_r)
@@ -160,13 +162,17 @@ static struct {
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
-	{
+	if ( ! ( pc_ppi.portb & 0x08 ) ) {
 		double tap_val = cassette_input( image_from_devtype_and_index( IO_CASSETTE, 0 ) );
 
 		if ( tap_val < 0 ) {
 			data &= ~0x10;
 		} else {
 			data |= 0x10;
+		}
+	} else {
+		if ( pc_ppi.portb & 0x01 ) {
+			data = ( data & 0x10 ) | ( pit8253_get_output( 0, 2 ) ? 0x10 : 0x00 );
 		}
 	}
 	return data;
@@ -181,10 +187,13 @@ WRITE8_HANDLER ( pc_ppi_porta_w )
 WRITE8_HANDLER ( pc_ppi_portb_w )
 {
 	/* KB controller port B */
+	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
 	pc_ppi.keyboard_disabled = data & 0x80;
 	pc_sh_speaker(machine, data & 0x03);
 	pc_keyb_set_clock(data & 0x40);
+
+	cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	if (data & 0x80)
 		pc_keyb_clear();

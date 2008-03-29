@@ -1499,7 +1499,7 @@ ROM_START( ibmpc )
 
 	/* IBM PC 5150 (rev 0: 04/24/81) 2-screw case w/MDA Card, ROM Basic 1.0 */
 	/* ROM Basic 1.0 had a bug: Doing ".1 / 10" would result in the wrong answer. May have been fixed in 1.1 */
-	ROM_SYSTEM_BIOS( 1, "rev0", "IBM PC 5150 ??????? 02/24/81" )
+	ROM_SYSTEM_BIOS( 1, "rev1", "IBM PC 5150 ??????? 02/24/81" )
 	ROMX_LOAD("basicc10.f6", 0xf6000, 0x2000, NO_DUMP, ROM_BIOS(2))
 	ROMX_LOAD("basicc10.f8", 0xf8000, 0x2000, NO_DUMP, ROM_BIOS(2))
 	ROMX_LOAD("basicc10.fa", 0xfa000, 0x2000, NO_DUMP, ROM_BIOS(2))
@@ -1807,7 +1807,7 @@ ROM_END
 static void ibmpc_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
 	switch( state ) {
 	case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
-	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED; break;
+	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
 
 	default:											cassette_device_getinfo(devclass, state, info); break;
 	}
