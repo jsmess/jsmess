@@ -336,8 +336,6 @@ static int internal_pc_cga_video_start(int personality)
 	memset(&cga, 0, sizeof(cga));
 	cga.update_row = NULL;
 
-	cga.chr_gen = memory_region(REGION_GFX1) + 0x1000;
-
 	state_save_register_item("pccga", 0, cga.mode_control);
 	state_save_register_item("pccga", 0, cga.color_select);
 	state_save_register_item("pccga", 0, cga.status);
@@ -401,16 +399,6 @@ static VIDEO_START( pc_cga )
 static VIDEO_UPDATE( mc6845_cga ) {
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
-
-	/* Check for changes in font dipsetting */
-	switch ( CGA_FONT & 0x01 ) {
-	case 0:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x1800;
-		break;
-	case 1:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x1000;
-		break;
-	}
 	return 0;
 }
 
@@ -1430,22 +1418,6 @@ static VIDEO_START( pc1512 )
 static VIDEO_UPDATE( mc6845_pc1512 ) {
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
-
-	/* Check for changes in font dipsetting */
-	switch ( CGA_FONT & 0x03 ) {
-	case 0:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x0000;
-		break;
-	case 1:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x0800;
-		break;
-	case 2:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x1000;
-		break;
-	case 3:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x1800;
-		break;
-	}
 	return 0;
 }
 

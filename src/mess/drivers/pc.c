@@ -1335,9 +1335,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc1512 )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc1640, pc1640, I8086, 8000000, pc_cga_frame_interrupt)
+	MDRV_CPU_PC(pc1640, pc1640, I8086, 8000000, pc_pc1512_frame_interrupt)
 
-	MDRV_MACHINE_RESET(pc_aga)
+	MDRV_MACHINE_RESET(pc_pc1512)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc1512 )

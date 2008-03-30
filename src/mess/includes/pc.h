@@ -7,6 +7,8 @@
 #ifndef PC_H_
 #define PC_H_
 
+/* Dipswitch for font selection */
+#define CGA_FONT        (readinputport(20)&3)
 
 /*----------- defined in machine/pc.c -----------*/
 
@@ -24,9 +26,11 @@ MACHINE_RESET( pc_mda );
 MACHINE_RESET( pc_cga );
 MACHINE_RESET( pc_t1t );
 MACHINE_RESET( pc_aga );
+MACHINE_RESET( pc_pc1512 );
 MACHINE_RESET( pc_vga );
 
 INTERRUPT_GEN( pc_cga_frame_interrupt );
+INTERRUPT_GEN( pc_pc1512_frame_interrupt );
 INTERRUPT_GEN( pc_mda_frame_interrupt );
 INTERRUPT_GEN( tandy1000_frame_interrupt );
 INTERRUPT_GEN( pc_aga_frame_interrupt );

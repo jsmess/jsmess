@@ -25,9 +25,6 @@ WRITE16_HANDLER( pc1512_16le_w );
 WRITE16_HANDLER( pc1512_videoram16le_w );
 
 
-/* Dipswitch for font selection */
-#define CGA_FONT		(readinputport(20)&3)
-
 /* Dipswitch for monitor selection */
 #define CGA_MONITOR     (readinputport(20)&0x1C)
 #define CGA_MONITOR_RGB         0x00    /* Colour RGB */
