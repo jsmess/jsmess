@@ -55,6 +55,7 @@ MESS adaptation by R. Belmont
 #include "../../mame/drivers/megadriv.h"
 
 static int is_ssf2 = 0;
+static int is_redcliff = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -181,7 +182,7 @@ static DEVICE_LOAD( genesis_cart )
 	unsigned char *ROM;
 
 	genesis_sram = NULL;
-	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = is_ssf2 = 0;
+	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = is_ssf2 = is_redcliff = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -241,6 +242,13 @@ static DEVICE_LOAD( genesis_cart )
 		if (!strncmp((char *)&ROM[0x2120], "SUPER STREET FIGHTER2", 20))
 		{
 			is_ssf2 = 1;
+		}
+		// detect the 'Romance of the Three Kingdoms - Red Cliff' rom, already decoded from useless .mdx format
+		if (length == 0x200000) {
+		 	static unsigned char redcliffsig[] = { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04}; // move.b  ($400004).l,d0
+		 	if (!memcmp(&ROM[0xce560+relocate],&redcliffsig[0],sizeof(redcliffsig))) {
+				is_redcliff = 1;
+			}
 		}
 	}
 
@@ -380,6 +388,18 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	}
 }
 
+// Red Cliff handler borrowed from HazeMD
+
+READ16_HANDLER( redclif_prot_r )
+{
+	return -0x56 << 8;
+}
+
+READ16_HANDLER( redclif_prot2_r )
+{
+	return 0x55 << 8;
+}
+
 static WRITE16_HANDLER( genesis_TMSS_bank_w )
 {
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
@@ -406,6 +426,11 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, genesis_ssf2_bank_w);
 	}
+	if (is_redcliff) {
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, redclif_prot2_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r );
+	}
+
 	/* install NOP handler for TMSS */
 
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
