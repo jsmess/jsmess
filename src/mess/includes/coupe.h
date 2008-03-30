@@ -43,7 +43,6 @@ extern UINT8 CLUT[16];		/* 16 entries in a palette (no line affects supported ye
 extern UINT8 SOUND_ADDR;	/* Current Address in sound registers */
 extern UINT8 SOUND_REG[32]; /* 32 sound registers */
 extern UINT8 LINE_INT;		/* Line interrupt register */
-extern UINT8 LPEN,HPEN; 	/* ??? */
 extern UINT8 STAT;			/* returned when port 249 read */
 
 void coupe_update_memory(void);

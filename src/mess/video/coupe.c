@@ -162,8 +162,6 @@ VIDEO_UPDATE( coupe )
 {
 	int scanline = video_screen_get_vpos(screen);
 
-	HPEN = scanline;
-
 	/* line interrupt? */
 	if (LINE_INT == scanline) coupe_irq(screen->machine, 0x01);
 

@@ -80,7 +80,11 @@ static READ8_HANDLER( coupe_port_r )
 		return SOUND_ADDR;
 
 	if (offset==HPEN_PORT)
-		return HPEN;
+	{
+		/* return either the current line or 192 for the vblank area */
+		int line = video_screen_get_vpos(machine->primary_screen); 
+		return video_screen_get_vblank(machine->primary_screen) ? 192 : line;
+	}
 
 	switch (offset & 0xFF)
 	{
@@ -101,7 +105,7 @@ static READ8_HANDLER( coupe_port_r )
 		wd17xx_set_side((offset >> 2) & 1);
         return wd17xx_data_r(machine, 0);
 	case LPEN_PORT:
-		return LPEN;
+		return video_screen_get_hpos(machine->primary_screen) & 0xfc;
 	case STAT_PORT:		
 		return ((getSamKey2((offset >> 8)&0xFF))&0xE0) | STAT;
 	case LMPR_PORT:
