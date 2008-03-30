@@ -84,13 +84,13 @@ static basicdsk *get_basicdsk(mess_image *img)
 	return &basicdsk_drives[drive];
 }
 
-int device_init_basicdsk_floppy(mess_image *image)
+DEVICE_INIT( basicdsk_floppy )
 {
 	return floppy_drive_init(image, &basicdsk_floppy_interface);
 }
 
 /* attempt to insert a disk into the drive specified with id */
-int device_load_basicdsk_floppy(mess_image *image)
+DEVICE_LOAD( basicdsk_floppy )
 {
 	basicdsk *w = get_basicdsk(image);
 
@@ -109,7 +109,7 @@ int device_load_basicdsk_floppy(mess_image *image)
 	return INIT_PASS;
 }
 
-void device_unload_basicdsk_floppy(mess_image *image)
+DEVICE_UNLOAD( basicdsk_floppy )
 {
 	basicdsk *w = get_basicdsk(image);
 	w->image_file = NULL;

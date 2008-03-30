@@ -257,7 +257,7 @@ const struct io_procs mess_ioprocs =
 /* ----------------------------------------------------------------------- */
 
 
-static int device_init_floppy(mess_image *image)
+static DEVICE_INIT( floppy )
 {
     if (!image_alloctag(image, FLOPPY_TAG, sizeof(mess_flopimg)))
 		return INIT_FAIL;
@@ -332,21 +332,21 @@ error:
 
 
 
-static int device_load_floppy(mess_image *image)
+static DEVICE_LOAD( floppy )
 {
 	return internal_floppy_device_load(image, -1, NULL);
 }
 
 
 
-static int device_create_floppy(mess_image *image, int create_format, option_resolution *create_args)
+static DEVICE_CREATE( floppy )
 {
 	return internal_floppy_device_load(image, create_format, create_args);
 }
 
 
 
-static void device_unload_floppy(mess_image *image)
+static DEVICE_UNLOAD( floppy )
 {
 	mess_flopimg *flopimg;
 	flopimg = image_lookuptag(image, FLOPPY_TAG);

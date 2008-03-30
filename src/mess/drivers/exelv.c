@@ -82,7 +82,7 @@ static INTERRUPT_GEN( exelv_hblank_interrupt )
     return INIT_PASS;
 }
 
-static void device_unload_exelv_cart(mess_image *image)
+static DEVICE_UNLOAD( exelv_cart )
 {
 }*/
 

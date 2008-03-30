@@ -276,7 +276,7 @@ int apple525_read_status(void)
 
 /* ----------------------------------------------------------------------- */
 
-static int device_init_apple525_floppy(mess_image *image)
+static DEVICE_INIT( apple525_floppy )
 {
 	device_init_handler parent_init;
 
@@ -289,7 +289,7 @@ static int device_init_apple525_floppy(mess_image *image)
 
 
 
-static int device_load_apple525_floppy(mess_image *image)
+static DEVICE_LOAD( apple525_floppy )
 {
 	int result;
 	device_load_handler parent_load;
@@ -304,7 +304,7 @@ static int device_load_apple525_floppy(mess_image *image)
 
 
 
-static void device_unload_apple525_floppy(mess_image *image)
+static DEVICE_UNLOAD( apple525_floppy )
 {
 	device_unload_handler parent_unload;
 

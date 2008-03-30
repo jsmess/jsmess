@@ -96,7 +96,7 @@
 #include "sound/speaker.h"
 
 
-static int device_load_exidy_floppy(mess_image *image)
+static DEVICE_LOAD( exidy_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{

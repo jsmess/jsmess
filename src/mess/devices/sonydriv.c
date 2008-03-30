@@ -488,7 +488,7 @@ void sony_set_speed(int speed)
 
 
 
-static void device_unload_sonydriv_floppy(mess_image *image)
+static DEVICE_UNLOAD( sonydriv_floppy )
 {
 	int id;
 	device_unload_handler parent_unload;

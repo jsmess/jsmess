@@ -67,7 +67,7 @@ static mess_image *vhd_image(void)
 
 
 
-static int device_init_coco_vhd(mess_image *image)
+static DEVICE_INIT( coco_vhd )
 {
 	vhd_status = VHDSTATUS_NO_VHD_ATTACHED;
 	return INIT_PASS;
@@ -75,7 +75,7 @@ static int device_init_coco_vhd(mess_image *image)
 
 
 
-static int device_load_coco_vhd(mess_image *image)
+static DEVICE_LOAD( coco_vhd )
 {
 	vhd_status = VHDSTATUS_POWER_ON_STATE;
 	logical_record_number = 0;

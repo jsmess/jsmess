@@ -234,7 +234,7 @@ static MACHINE_START( snes_mess )
 	MACHINE_START_CALL(snes);
 }
 
-static int device_load_snes_cart(mess_image *image)
+static DEVICE_LOAD( snes_cart )
 {
 	int i;
 	running_machine *machine = image->machine;

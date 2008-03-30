@@ -479,7 +479,7 @@ static DRIVER_INIT( pasogo )
 }
 
 
-static int device_load_pasogo_cart(mess_image *image)
+static DEVICE_LOAD( pasogo_cart )
 {
 	UINT8 *user = memory_region(REGION_USER1);
 	int size;

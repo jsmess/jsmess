@@ -141,18 +141,18 @@ static int process_cartridge(mess_image *image, mess_image *file)
 
 
 
-static int device_init_cartslot_specified(mess_image *image)
+static DEVICE_INIT( cartslot_specified )
 {
 	process_cartridge(image, NULL);
 	return 0;
 }
 
-static int device_load_cartslot_specified(mess_image *image)
+static DEVICE_LOAD( cartslot_specified )
 {
 	return process_cartridge(image, image);
 }
 
-static void device_unload_cartslot_specified(mess_image *image)
+static DEVICE_UNLOAD( cartslot_specified )
 {
 	process_cartridge(image, NULL);
 }

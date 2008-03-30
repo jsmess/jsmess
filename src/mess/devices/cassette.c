@@ -229,7 +229,7 @@ void cassette_seek(mess_image *cassette, double time, int origin)
 	cassette device init/load/unload/specify
 *********************************************************************/
 
-static int device_init_cassette(mess_image *image)
+static DEVICE_INIT( cassette )
 {
 	const struct IODevice *dev;
 
@@ -245,7 +245,7 @@ static int device_init_cassette(mess_image *image)
 
 
 
-static int device_load_cassette(mess_image *image)
+static DEVICE_LOAD( cassette )
 {
 	casserr_t err;
 	int cassette_flags;
@@ -305,7 +305,7 @@ error:
 
 
 
-static void device_unload_cassette(mess_image *image)
+static DEVICE_UNLOAD( cassette )
 {
 	struct mess_cassetteimg *tag;
 

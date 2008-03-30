@@ -322,7 +322,7 @@ static void lynx_crc_keyword(mess_image *image)
     }
 }
 
-static int device_load_lynx_cart(mess_image *image)
+static DEVICE_LOAD( lynx_cart )
 {
 	UINT8 *rom = memory_region(REGION_USER1);
 	int size;

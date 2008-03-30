@@ -170,7 +170,7 @@ static int genesis_isSMD(unsigned char *buf,unsigned int len)
 }
 
 
-static int device_load_genesis_cart(mess_image *image)
+static DEVICE_LOAD( genesis_cart )
 {
 	unsigned char *tmpROMnew, *tmpROM;
 	unsigned char *secondhalf;

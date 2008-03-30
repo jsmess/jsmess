@@ -71,7 +71,7 @@ static int dsk_floppy_verify(UINT8 *diskimage_data)
 
 
 
-static int device_init_dsk_floppy(mess_image *image)
+static DEVICE_INIT( dsk_floppy )
 {
 	return floppy_drive_init(image, NULL);
 }
@@ -79,7 +79,7 @@ static int device_init_dsk_floppy(mess_image *image)
 
 
 /* load floppy */
-static int device_load_dsk_floppy(mess_image *image)
+static DEVICE_LOAD( dsk_floppy )
 {
 	int id = image_index_in_device(image);
 	dsk_drive *thedrive = &drives[id];
@@ -122,7 +122,7 @@ static int dsk_save(mess_image *img, unsigned char **ptr)
 }
 
 
-static void device_unload_dsk_floppy(mess_image *image)
+static DEVICE_UNLOAD( dsk_floppy )
 {
 	int id = image_index_in_device(image);
 	dsk_drive *thedrive = &drives[id];

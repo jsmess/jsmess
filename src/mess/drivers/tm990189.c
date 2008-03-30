@@ -483,7 +483,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 /*
     Initialize rs232 unit and open image
 */
-static int device_load_tm990_189_rs232(mess_image *image)
+static DEVICE_LOAD( tm990_189_rs232 )
 {
 	int id = image_index_in_device(image);
 
@@ -502,7 +502,7 @@ static int device_load_tm990_189_rs232(mess_image *image)
 /*
     close a rs232 image
 */
-static void device_unload_tm990_189_rs232(mess_image *image)
+static DEVICE_UNLOAD( tm990_189_rs232 )
 {
 	int id = image_index_in_device(image);
 

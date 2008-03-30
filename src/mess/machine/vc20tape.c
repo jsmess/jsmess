@@ -912,7 +912,7 @@ void c16_tape_open (void)
 	prg.c16 = 1;
 }
 
-static int device_load_vc20_tape(mess_image *image)
+static DEVICE_LOAD( vc20_tape )
 {
 	const char *cp;
 
@@ -937,7 +937,7 @@ static int device_load_vc20_tape(mess_image *image)
 	return INIT_PASS;
 }
 
-static void device_unload_vc20_tape(mess_image *image)
+static DEVICE_UNLOAD( vc20_tape )
 {
 	vc20_tape_close();
 }

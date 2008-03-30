@@ -42,7 +42,7 @@ static cylinder apexc_cylinder;
 /*
     Open cylinder image and read RAM
 */
-static int device_load_apexc_cylinder(mess_image *image)
+static DEVICE_LOAD( apexc_cylinder )
 {
 	/* open file */
 	apexc_cylinder.fd = image;
@@ -72,7 +72,7 @@ static int device_load_apexc_cylinder(mess_image *image)
 /*
     Save RAM to cylinder image and close it
 */
-static void device_unload_apexc_cylinder(mess_image *image)
+static DEVICE_UNLOAD( apexc_cylinder )
 {
 	if (apexc_cylinder.fd && apexc_cylinder.writable)
 	{	/* save RAM contents */
@@ -169,7 +169,7 @@ static void apexc_get_open_mode(const struct IODevice *dev, int id,
 
 
 
-static int device_init_apexc_tape(mess_image *image)
+static DEVICE_INIT( apexc_tape )
 {
 	return INIT_PASS;
 }
@@ -179,7 +179,7 @@ static int device_init_apexc_tape(mess_image *image)
 /*
     Open a tape image
 */
-static int device_load_apexc_tape(mess_image *image)
+static DEVICE_LOAD( apexc_tape )
 {
 	int id = image_index_in_device(image);
 	tape *t = &apexc_tapes[id];

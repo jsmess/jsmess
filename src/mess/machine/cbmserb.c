@@ -103,7 +103,7 @@ void cbm_drive_1_config (int interface, int serialnr)
 
 
 
-static int device_init_cbm_drive(mess_image *image)
+static DEVICE_INIT( cbm_drive )
 {
 	int id = image_index_in_device(image);
 	if (id == 0)
@@ -111,7 +111,7 @@ static int device_init_cbm_drive(mess_image *image)
 	return INIT_PASS;
 }
 
-static void device_exit_cbm_drive(mess_image *image)
+static DEVICE_EXIT( cbm_drive )
 {
 	int id = image_index_in_device(image);
 	if (id == 0)
@@ -121,7 +121,7 @@ static void device_exit_cbm_drive(mess_image *image)
 
 
 /* open an d64 image */
-static int device_load_cbm_drive(mess_image *image)
+static DEVICE_LOAD( cbm_drive )
 {
 	int id = image_index_in_device(image);
 

@@ -94,7 +94,7 @@ static struct mess_hd *get_drive(mess_image *img)
  *
  *************************************/
 
-int device_init_mess_hd(mess_image *image)
+DEVICE_INIT( mess_hd )
 {
 	struct mess_hd *hd;
 
@@ -172,14 +172,14 @@ done:
 
 
 
-int device_load_mess_hd(mess_image *image)
+DEVICE_LOAD( mess_hd )
 {
 	return internal_load_mess_hd(image, NULL);
 }
 
 
 #ifdef UNUSED_FUNCTION
-static int device_create_mess_hd(mess_image *image, int create_format, option_resolution *create_args)
+static DEVICE_CREATE( mess_hd )
 {
 	int err;
 	char metadata[256];
@@ -216,7 +216,7 @@ error:
  *
  *************************************/
 
-void device_unload_mess_hd(mess_image *image)
+DEVICE_UNLOAD( mess_hd )
 {
 	struct mess_hd *hd = get_drive(image);
 	assert(hd->hard_disk_handle);
