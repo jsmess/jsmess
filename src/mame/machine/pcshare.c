@@ -399,6 +399,15 @@ static void pc_fdc_dma_drq(int state, int read_)
 static const struct pc_fdc_interface fdc_interface =
 {
 	NEC765A,
+	NEC765_RDY_PIN_CONNECTED,
+	pc_fdc_interrupt,
+	pc_fdc_dma_drq,
+};
+
+static const struct pc_fdc_interface fdc_interface_nc =
+{
+	NEC765A,
+	NEC765_RDY_PIN_NOT_CONNECTED,
 	pc_fdc_interrupt,
 	pc_fdc_dma_drq,
 };
@@ -442,7 +451,7 @@ void init_pc_common(UINT32 flags)
 
 #ifdef MESS
 	/* FDC/HDC hardware */
-	pc_fdc_init(&fdc_interface);
+	pc_fdc_init( ( flags & PCCOMMON_NEC765_RDY_NC ) ? &fdc_interface_nc : &fdc_interface);
 	pc_hdc_setup();
 
 	/* com hardware */
@@ -506,6 +515,7 @@ void init_pc_common(UINT32 flags)
 static struct {
 	UINT8 data;
 	int on;
+	int self_test;
 } pc_keyb= { 0 };
 
 UINT8 pc_keyb_read(void)
@@ -517,8 +527,14 @@ UINT8 pc_keyb_read(void)
 
 static TIMER_CALLBACK( pc_keyb_timer )
 {
-	at_keyboard_reset();
-	pc_keyboard();
+	if ( pc_keyb.on ) {
+		pc_keyb.self_test = ( pc_keyb.self_test == 1 ) ? 2 : 0;
+		pc_keyboard();
+	} else {
+		/* Clock has been low for more than 5 msec, start diagnostic test */
+		at_keyboard_reset();
+		pc_keyb.self_test = 1;
+	}
 }
 
 
@@ -529,10 +545,18 @@ void pc_keyb_set_clock(int on)
 
 	if (pc_keyb.on != on)
 	{
-		if (on)
+		if (!on)
 			timer_adjust_oneshot(pc_keyboard_timer, ATTOTIME_IN_MSEC(5), 0);
-		else
-			timer_reset(pc_keyboard_timer, attotime_never);
+		else {
+			if ( pc_keyb.self_test == 1 ) {
+				/* The self test of the keyboard takes some time. 2 msec seems to work. */
+				/* This still needs to verified against a real keyboard. */
+				timer_adjust_oneshot(pc_keyboard_timer, ATTOTIME_IN_MSEC( 2 ), 0);
+			} else {
+				timer_reset(pc_keyboard_timer, attotime_never);
+				pc_keyb.self_test = 0;
+			}
+		}
 
 		pc_keyb.on = on;
 	}
@@ -541,6 +565,7 @@ void pc_keyb_set_clock(int on)
 void pc_keyb_clear(void)
 {
 	pc_keyb.data = 0;
+	pic8259_set_irq_line(0, 1, 0);
 }
 
 void pc_keyboard(void)
@@ -554,8 +579,12 @@ void pc_keyboard(void)
 		if ( (data=at_keyboard_read())!=-1) {
 			pc_keyb.data = data;
 			DBG_LOG(1,"KB_scancode",("$%02x\n", pc_keyb.data));
-			pic8259_set_irq_line(0, 1, 1);
-			pic8259_set_irq_line(0, 1, 0);
+			if ( ! ( data & 0x80 ) || pc_keyb.self_test == 2 ) {
+				pic8259_set_irq_line(0, 1, 1);
+				if ( pc_keyb.self_test == 2 ) {
+					pc_keyb.self_test = 0;
+				}
+			}
 		}
 	}
 }

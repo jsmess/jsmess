@@ -391,6 +391,7 @@ static const device_config *bebox_fdc_get_image(int floppy_index)
 static const struct pc_fdc_interface bebox_fdc_interface =
 {
 	SMC37C78,
+	NEC765_RDY_PIN_CONNECTED,
 	bebox_fdc_interrupt,
 	bebox_fdc_dma_drq,
 	bebox_fdc_get_image

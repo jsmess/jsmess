@@ -92,7 +92,7 @@ void pc_fdc_init(const struct pc_fdc_interface *iface)
 		memcpy(&fdc->fdc_interface, iface, sizeof(fdc->fdc_interface));
 
 	/* setup nec765 interface */
-	nec765_init(&pc_fdc_nec765_interface, iface->nec765_type);
+	nec765_init(&pc_fdc_nec765_interface, iface->nec765_type, iface->nec765_rdy_pin);
 
 	pc_fdc_reset();
 

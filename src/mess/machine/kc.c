@@ -241,7 +241,7 @@ static void kc_disc_interface_init(running_machine *machine)
 {
 	timer_set(attotime_zero, NULL, 0, kc85_disk_reset_timer_callback);
 
-	nec765_init(&kc_fdc_interface,NEC765A);
+	nec765_init(&kc_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 
 	/* reset ctc */
 	z80ctc_reset(1);

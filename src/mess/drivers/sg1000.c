@@ -534,7 +534,7 @@ static MACHINE_START( sf7000 )
 {
 	TMS9928A_configure(&tms9928a_interface);
 	ppi8255_init(&sf7000_ppi8255_intf);
-	nec765_init(&sf7000_nec765_interface, NEC765A);
+	nec765_init(&sf7000_nec765_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
 	msm8251_init(&sf7000_uart_interface);
 	centronics_config(1, sf7000_centronics_config);

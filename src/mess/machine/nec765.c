@@ -68,6 +68,8 @@ typedef struct nec765
 	unsigned long	sector_counter;
 	/* version of fdc to emulate */
 	NEC765_VERSION version;
+	/* is the RDY pin connected or not */
+	NEC765_RDY_PIN	rdy_pin;
 	/* main status register */
 	unsigned char    FDC_main;
 	/* data register */
@@ -664,7 +666,7 @@ static void nec765_set_ready_change_callback(const device_config *img, int state
 	fdc.nec765_status[0] = 0x0c0 | drive;
 
 	/* not ready */
-	if (state==0)
+	if (state==0 && fdc.rdy_pin == NEC765_RDY_PIN_CONNECTED )
 		fdc.nec765_status[0] |= 8;
 
 	/* trigger an int */
@@ -674,11 +676,12 @@ static void nec765_set_ready_change_callback(const device_config *img, int state
 
 
 
-void nec765_init(const nec765_interface *iface, NEC765_VERSION version)
+void nec765_init(const nec765_interface *iface, NEC765_VERSION version, NEC765_RDY_PIN rdy_pin)
 {
 	int i;
 
 	fdc.version = version;
+	fdc.rdy_pin = rdy_pin;
 	fdc.timer = timer_alloc(nec765_timer_callback, NULL);
 	fdc.seek_timer = timer_alloc(nec765_seek_timer_callback, NULL);
 	fdc.command_timer = timer_alloc(nec765_continue_command, NULL);
@@ -2146,7 +2149,7 @@ void nec765_reset(int offset)
 
 		}
 
-		if (!a_drive_is_ready)
+		if (!a_drive_is_ready && fdc.rdy_pin == NEC765_RDY_PIN_CONNECTED )
 		{
 			fdc.nec765_status[0] |= 0x08;
 		}

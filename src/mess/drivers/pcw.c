@@ -746,7 +746,7 @@ static DRIVER_INIT(pcw)
 
 	cpunum_set_input_line_vector(0, 0,0x0ff);
 
-    nec765_init(&pcw_nec765_interface,NEC765A);
+    nec765_init(&pcw_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 
 	/* ram paging is actually undefined at power-on */
 	pcw_banks[0] = 0;

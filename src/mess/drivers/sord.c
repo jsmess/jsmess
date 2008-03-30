@@ -178,7 +178,7 @@ static const struct nec765_interface sord_fd5_nec765_interface=
 
 static void sord_fd5_init(void)
 {
-	nec765_init(&sord_fd5_nec765_interface,NEC765A);
+	nec765_init(&sord_fd5_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 }
 
 static MACHINE_RESET( sord_m5_fd5 )

@@ -1976,7 +1976,7 @@ static DRIVER_INIT( x68000 )
 	memcpy(user2,(rom+0xff0000),0x10000);
 
 	ppi8255_init(&ppi_interface);
-	nec765_init(&fdc_interface,NEC72065);
+	nec765_init(&fdc_interface,NEC72065,NEC765_RDY_PIN_CONNECTED);
 	hd63450_init(&dmac_interface);
 	nec765_reset(0);
 	mfp_init();

@@ -1350,7 +1350,7 @@ static MACHINE_RESET( nc200 )
 
     nc_common_init_machine(machine);
 
-    nec765_init(&nc200_nec765_interface, NEC765A);
+    nec765_init(&nc200_nec765_interface, NEC765A,NEC765_RDY_PIN_CONNECTED);
     /* double sided, 80 track drive */
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 	//floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), nc200_floppy_drive_index_callback);

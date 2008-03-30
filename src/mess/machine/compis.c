@@ -1588,7 +1588,7 @@ MACHINE_RESET( compis )
 	ppi8255_init(&compis_ppi_interface);
 
 	/* FDC */
-	nec765_init(&compis_fdc_interface, NEC765A);
+	nec765_init(&compis_fdc_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
 	compis_fdc_reset();
 
 	/* RTC */

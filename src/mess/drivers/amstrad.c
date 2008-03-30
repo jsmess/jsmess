@@ -2039,7 +2039,7 @@ static void amstrad_common_init(void)
 
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		nec765_init(&amstrad_nec765_interface,NEC765A/*?*/);
+		nec765_init(&amstrad_nec765_interface,NEC765A/*?*/,NEC765_RDY_PIN_CONNECTED);
 		floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_SS_40);
 		floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_SS_40);
 	}
@@ -2228,7 +2228,7 @@ static MACHINE_RESET( aleste )
 	amstrad_common_init();
 	amstrad_reset_machine(machine);
 
-	nec765_init(&aleste_8272_interface,NEC765A);
+	nec765_init(&aleste_8272_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_DS_80);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_DS_80);
 }

@@ -816,7 +816,7 @@ static void pc8801_init_5fd(void)
 		cpunum_suspend(1, SUSPEND_REASON_DISABLE, 1);
 	else
 		cpunum_resume(1, SUSPEND_REASON_DISABLE);
-	nec765_init(&pc8801_fdc_interface,NEC765A);
+	nec765_init(&pc8801_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 	cpunum_set_input_line_vector(1,0,0);
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1);
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1);
