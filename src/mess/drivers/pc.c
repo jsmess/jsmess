@@ -1485,7 +1485,7 @@ MACHINE_DRIVER_END
     ROM_LOAD("xthdd.rom",  0xc8000, 0x02000, CRC(a96317da))
 #endif
 
-ROM_START( ibmpc )
+ROM_START( ibm5150 )
 	ROM_REGION(0x100000,REGION_CPU1, 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))		/* WDC Expansion ROM C8000-C9FFF */
 
@@ -1868,29 +1868,29 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
-COMP(  1981,	ibmpc,		0,		0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1982,	ibmpca,		ibmpc,	0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 08/16/82" , 0)
-COMP(  1984,	dgone,		ibmpc,		0,		pccga,      pccga,	    pccga,	    ibmpc,   "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1987,	pc,		ibmpc,	0,		pccga,      pccga,		pccga,	    ibmpc,   "",  "PC (CGA)" , 0)
-COMP( 1985,	bondwell,	ibmpc,	0,		pccga,		bondwell,   bondwell,	ibmpc,   "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
-COMP(  1988,	europc,		ibmpc,	0,		europc,     europc,		europc,     ibmpc,   "Schneider Rdf. AG",  "EURO PC", 0)
+COMP(  1981,	ibm5150,	0,			0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 5150" , 0)
+COMP(  1982,	ibmpca,		ibm5150,	0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 08/16/82" , 0)
+COMP(  1984,	dgone,		ibm5150,	0,		pccga,      pccga,	    pccga,	    ibmpc,   "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
+COMP(  1987,	pc,			ibm5150,	0,		pccga,      pccga,		pccga,	    ibmpc,   "",  "PC (CGA)" , 0)
+COMP(  1985,	bondwell,	ibm5150,	0,		pccga,		bondwell,   bondwell,	ibmpc,   "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
+COMP(  1988,	europc,		ibm5150,	0,		europc,     europc,		europc,     ibmpc,   "Schneider Rdf. AG",  "EURO PC", 0)
 
 // pcjr (better graphics, better sound)
-COMP( 1983,	ibmpcjr,	ibmpc,	0,		t1000hx,    tandy1t,	t1000hx,    ibmpc,   "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
-COMP(  1987,	t1000hx,	ibmpc,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000HX", 0)
-COMP(  1987,	t1000sx,	ibmpc,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
+COMP(  1983,	ibmpcjr,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,    ibmpc,   "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
+COMP(  1987,	t1000hx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000HX", 0)
+COMP(  1987,	t1000sx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
 
 // xt class (pc but 8086)
-COMP(  1986,	ibmxt,		ibmpc,	0,		xtcga,      xtcga,		pccga,		ibmpc,   "International Business Machines",  "IBM PC/XT (CGA)" , 0)
-COMP(  1988,	pc200,		ibmpc,	0,		pc200,		pc200,		pc200,		ibmpc,   "Sinclair Research",  "PC200 Professional Series", 0)
-COMP(  1988,	pc20,		ibmpc,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PC20" , 0)
-COMP(  1987,	ppc512,		ibmpc,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PPC512", 0)
-COMP(  1987,	ppc640,		ibmpc,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PPC640", 0)
-COMP(  1986,	pc1512,		ibmpc,	0,		pc1512,     pc1512,		pc1512,		ibmpc,   "Amstrad plc",  "Amstrad PC1512 (version 1)", 0)
-COMP(  198?,	pc1512v2,	ibmpc,	0,		pc1512,     pc1512,		pc1512,		ibmpc,   "Amstrad plc",  "Amstrad PC1512 (version 2)", 0)
-COMP( 1987,	pc1640,		ibmpc,	0,		pc1640,     pc1640,		pc1640,		ibmpc,   "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
+COMP(  1986,	ibmxt,		ibm5150,	0,		xtcga,      xtcga,		pccga,		ibmpc,   "International Business Machines",  "IBM PC/XT (CGA)" , 0)
+COMP(  1988,	pc200,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Sinclair Research",  "PC200 Professional Series", 0)
+COMP(  1988,	pc20,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PC20" , 0)
+COMP(  1987,	ppc512,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PPC512", 0)
+COMP(  1987,	ppc640,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PPC640", 0)
+COMP(  1986,	pc1512,		ibm5150,	0,		pc1512,     pc1512,		pc1512,		ibmpc,   "Amstrad plc",  "Amstrad PC1512 (version 1)", 0)
+COMP(  198?,	pc1512v2,	ibm5150,	0,		pc1512,     pc1512,		pc1512,		ibmpc,   "Amstrad plc",  "Amstrad PC1512 (version 2)", 0)
+COMP(  1987,	pc1640,		ibm5150,	0,		pc1640,     pc1640,		pc1640,		ibmpc,   "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
-COMP ( 1987,	pcmda,		ibmpc,	0,		pcmda,      pcmda,		pcmda,	    ibmpc,   "",  "PC (MDA)" , 0)
-COMP ( 1987,    pcherc,     ibmpc,  0,      pcherc,     pcmda,      pcmda,      ibmpc,   "MESS",  "PC (Hercules)" , 0)
-COMP ( 1987,	xtvga,		ibmpc,	0,		xtvga,      xtvga,		pc_vga,     ibmpc,   "",  "PC/XT (VGA, MF2 Keyboard)" , 0)
+COMP ( 1987,	pcmda,		ibm5150,	0,		pcmda,      pcmda,		pcmda,	    ibmpc,   "",  "PC (MDA)" , 0)
+COMP ( 1987,    pcherc,     ibm5150,	0,      pcherc,     pcmda,      pcmda,      ibmpc,   "MESS",  "PC (Hercules)" , 0)
+COMP ( 1987,	xtvga,		ibm5150,	0,		xtvga,      xtvga,		pc_vga,     ibmpc,   "",  "PC/XT (VGA, MF2 Keyboard)" , 0)
 

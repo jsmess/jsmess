@@ -10,6 +10,8 @@ System Driver Changes:
 ----------------------
 - [ABC80] Fixed so that it boots and keyboard works. [Robbbert]
 
+- [IBMPC,IBM5150] Renamed ibmpc driver to ibm5150.  [Wilbert Pol]
+
 - [MBEE] Added snapload support for MWB filetype. Added LOCK key to keyboard.
   [Robbbert]
 

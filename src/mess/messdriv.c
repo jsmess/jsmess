@@ -371,7 +371,7 @@ TESTDRIVER( c128dita )	/* Commodore 128D - PAL (italian) cost reduced set	*/
 	DRIVER( c64dx )		/* 1991 C65 / C64DX (Prototype, German PAL)			*/
 
 	/* IBM PC & Clones */
-	DRIVER( ibmpc )		/* 1982	IBM PC										*/
+	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/
 	DRIVER( ibmpca )	/* 1982 IBM PC										*/
 	DRIVER( dgone )		/* 1984 Data General/One */
 	DRIVER( pcmda )		/* 1987 PC with MDA									*/
