@@ -172,7 +172,7 @@ static struct {
 		}
 	} else {
 		if ( pc_ppi.portb & 0x01 ) {
-			data = ( data & 0x10 ) | ( pit8253_get_output( 0, 2 ) ? 0x10 : 0x00 );
+			data = ( data & ~0x10 ) | ( pit8253_get_output( 0, 2 ) ? 0x10 : 0x00 );
 		}
 	}
 	return data;
