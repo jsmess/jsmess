@@ -397,6 +397,9 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 
 			/* terminate the list */
 			memset(&mess_device->createimage_options[createimage_optcount], 0, sizeof(mess_device->createimage_options[createimage_optcount]));
+
+			/* assign the options */
+			mess_device->io_device.createimage_options = mess_device->createimage_options;
 		}
 
 		/* determine the dispositions */
