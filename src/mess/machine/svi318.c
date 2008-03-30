@@ -111,12 +111,10 @@ static int svi318_verify_cart (UINT8 magic[2])
 		return IMAGE_VERIFY_FAIL;
 }
 
-DEVICE_INIT( svi318_cart )
+DEVICE_START( svi318_cart )
 {
 	pcart = NULL;
 	pcart_rom_size = 0;
-
-	return INIT_PASS;
 }
 
 DEVICE_LOAD( svi318_cart )

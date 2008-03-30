@@ -16,7 +16,7 @@
 
 static void ide_get_params(const device_config *image, int *which_bus, int *which_address,
 	struct ide_interface **intf,
-	device_init_handler *parent_init,
+	device_start_func *parent_init,
 	device_load_handler *parent_load,
 	device_unload_handler *parent_unload)
 {
@@ -31,7 +31,7 @@ static void ide_get_params(const device_config *image, int *which_bus, int *whic
 	parent_devclass.get_info = harddisk_device_getinfo;
 
 	if (parent_init)
-		*parent_init = (device_init_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_INIT);
+		*parent_init = (device_start_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_INIT);
 	if (parent_load)
 		*parent_load = (device_load_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_LOAD);
 	if (parent_unload)
@@ -44,26 +44,23 @@ static void ide_get_params(const device_config *image, int *which_bus, int *whic
 
 
 /*-------------------------------------------------
-	ide_hd_init - Init an IDE hard disk device
+	DEVICE_START(ide_hd) - Init an IDE hard disk device
 -------------------------------------------------*/
 
-static int ide_hd_init(const device_config *image)
+static DEVICE_START(ide_hd)
 {
-	int result, which_bus, which_address;
+	int which_bus, which_address;
 	struct ide_interface *intf;
-	device_init_handler parent_init;
+	device_start_func parent_init;
 
 	/* get the basics */
-	ide_get_params(image, &which_bus, &which_address, &intf, &parent_init, NULL, NULL);
+	ide_get_params(device, &which_bus, &which_address, &intf, &parent_init, NULL, NULL);
 
 	/* call the parent init function */
-	result = parent_init(image);
-	if (result != INIT_PASS)
-		return result;
+	parent_init(device);
 
 	/* configure IDE */
 	ide_controller_init_custom(which_bus, intf, NULL);
-	return INIT_PASS;
 }
 
 
@@ -164,7 +161,7 @@ void ide_harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state
 	switch(state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:					info->init = ide_hd_init; break;
+		case MESS_DEVINFO_PTR_INIT:					info->init = DEVICE_START_NAME(ide_hd); break;
 		case MESS_DEVINFO_PTR_LOAD:					info->load = ide_hd_load; break;
 		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = ide_hd_unload; break;
 		case MESS_DEVINFO_PTR_VALIDITY_CHECK:		info->validity_check = ide_hd_validity_check; break;

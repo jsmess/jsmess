@@ -174,15 +174,14 @@ static const struct IODevice *cbm_rom_find_device(running_machine *machine)
 	return device_find_from_machine(machine, IO_CARTSLOT);
 }
 
-static DEVICE_INIT(cbm_rom)
+static DEVICE_START(cbm_rom)
 {
-	int id = image_index_in_device(image);
+	int id = image_index_in_device(device);
 	if (id == 0)
 	{
 		cbm_c64_game = -1;
 		cbm_c64_exrom = -1;
 	}
-	return INIT_PASS;
 }
 
 static DEVICE_LOAD(cbm_rom)
@@ -334,7 +333,7 @@ void cbmcartslot_device_getinfo(const mess_device_class *devclass, UINT32 state,
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:					info->init = device_init_cbm_rom; break;
+		case MESS_DEVINFO_PTR_INIT:					info->init = DEVICE_START_NAME(cbm_rom); break;
 		case MESS_DEVINFO_PTR_LOAD:					info->load = device_load_cbm_rom; break;
 		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = device_unload_cbm_rom; break;
 

@@ -375,7 +375,7 @@ static int intv_load_rom_file(const device_config *image, int required)
 	return INIT_PASS;
 }
 
-DEVICE_INIT( intv_cart )
+DEVICE_START( intv_cart )
 {
 	/* First, initialize these as empty so that the intellivision
 	 * will think that the playcable and keyboard are not attached */
@@ -388,7 +388,6 @@ DEVICE_INIT( intv_cart )
 	/* assume keyboard is absent */
 	memory[0x7000<<1] = 0xff;
 	memory[(0x7000<<1)+1] = 0xff;
-	return INIT_PASS;
 }
 
 DEVICE_LOAD( intv_cart )

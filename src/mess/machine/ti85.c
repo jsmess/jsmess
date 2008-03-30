@@ -648,11 +648,10 @@ SNAPSHOT_LOAD( ti8x )
   TI calculators serial link transmission
 ***************************************************************************/
 
-DEVICE_INIT( ti85_serial )
+DEVICE_START( ti85_serial )
 {
-	ti85_free_serial_data_memory(image->machine);
+	ti85_free_serial_data_memory(device->machine);
 	ti85_receive_serial (NULL,0);
-	return INIT_PASS;
 }
 
 DEVICE_LOAD( ti85_serial )

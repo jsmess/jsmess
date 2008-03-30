@@ -31,15 +31,13 @@ static struct floppy_drive *get_drive(const device_config *img)
 static TIMER_CALLBACK(floppy_drive_index_callback);
 
 /* this is called on device init */
-int floppy_drive_init(const device_config *img, const floppy_interface *iface)
+void floppy_drive_init(const device_config *img, const floppy_interface *iface)
 {
 	struct floppy_drive *pDrive;
 
 	assert(image_slotexists(img));
 
 	pDrive = image_alloctag(img, FLOPDRVTAG, sizeof(struct floppy_drive));
-	if (!pDrive)
-		return INIT_FAIL;
 
 	/* initialise flags */
 	pDrive->flags = 0;
@@ -60,7 +58,6 @@ int floppy_drive_init(const device_config *img, const floppy_interface *iface)
 	pDrive->rpm = 300;
 
 	floppy_drive_set_disk_image_interface(img, iface);
-	return INIT_PASS;
 }
 
 

@@ -80,7 +80,7 @@ static void pokemini_cartslot_getinfo( const mess_device_class *devclass, UINT32
 	switch( state ) {
 	case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
 	case MESS_DEVINFO_INT_MUST_BE_LOADED:	info->i = 0; break;
-	case MESS_DEVINFO_PTR_INIT:			info->init = device_init_pokemini_cart; break;
+	case MESS_DEVINFO_PTR_INIT:			info->init = DEVICE_START_NAME(pokemini_cart); break;
 	case MESS_DEVINFO_PTR_LOAD:			info->load = device_load_pokemini_cart; break;
 	case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy( info->s = device_temp_str(), "min"); break;
 	default:				cartslot_device_getinfo( devclass, state, info ); break;

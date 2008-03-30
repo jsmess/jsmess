@@ -46,7 +46,7 @@
 
 
 /* serial */
-extern int  thom_serial_init   ( const device_config* image );
+extern DEVICE_START( thom_serial );
 extern int  thom_serial_load   ( const device_config* image );
 extern void thom_serial_unload ( const device_config* image );
 

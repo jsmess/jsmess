@@ -177,23 +177,22 @@ static struct serial_connection to7_io_line;
 
 
 
-int thom_serial_init ( const device_config *image )
+DEVICE_START( thom_serial )
 {
-	int idx = image_index_in_device(image);
+	int idx = image_index_in_device(device);
 
-	if ( serial_device_init( image ) != INIT_PASS )
-		return INIT_FAIL;
+	DEVICE_START_CALL(serial_device);
 
 	switch ( idx ) {
 
 	case THOM_SERIAL_CC90323:
 		LOG(( "thom_serial_init: init CD 90-320 RS232 device\n" ));
-		serial_device_connect( image , &to7_io_line );
+		serial_device_connect( device , &to7_io_line );
 		break;
 
 	case THOM_SERIAL_RF57232:
 		LOG(( "thom_serial_init: init RF 57-232 RS232 device\n" ));
-		acia_6551_connect_to_serial_device( image );
+		acia_6551_connect_to_serial_device( device );
 		break;
 
 	case THOM_SERIAL_MODEM:
@@ -201,15 +200,13 @@ int thom_serial_init ( const device_config *image )
 		break;
 
 	default:
-		logerror( "thom_serial_init: unknown serial device index %i\n", idx );
-		return INIT_FAIL;
+		fatalerror( "thom_serial_init: unknown serial device index %i\n", idx );
+		break;
 	}
 
-	serial_device_setup( image, 2400, 7, 2, SERIAL_PARITY_NONE ); /* default */
-	serial_device_set_protocol( image, SERIAL_PROTOCOL_NONE );
-	serial_device_set_transmit_state( image, 1 );
-
-	return INIT_PASS;
+	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE ); /* default */
+	serial_device_set_protocol( device, SERIAL_PROTOCOL_NONE );
+	serial_device_set_transmit_state( device, 1 );
 }
 
 

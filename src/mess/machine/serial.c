@@ -635,11 +635,10 @@ static void data_stream_init(struct data_stream *stream, unsigned char *pData, u
 	data_stream_reset(stream);
 }
 
-int serial_device_init(const device_config *image)
+DEVICE_START(serial_device)
 {
-	int id = image_index_in_device(image);
+	int id = image_index_in_device(device);
 	memset(&serial_devices[id], 0, sizeof(serial_devices[id]));
-	return INIT_PASS;
 }
 
 int serial_device_load(const device_config *image)

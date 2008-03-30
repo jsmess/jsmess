@@ -67,10 +67,9 @@ static const device_config *vhd_image(void)
 
 
 
-static DEVICE_INIT( coco_vhd )
+static DEVICE_START( coco_vhd )
 {
 	vhd_status = VHDSTATUS_NO_VHD_ATTACHED;
-	return INIT_PASS;
 }
 
 
@@ -247,7 +246,7 @@ void coco_vhd_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_coco_vhd; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(coco_vhd); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_coco_vhd; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

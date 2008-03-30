@@ -29,14 +29,14 @@ struct bitbanger_info
 
 static struct bitbanger_info *bitbangers[MAX_PRINTER];
 
-static int bitbanger_init(const device_config *img)
+static DEVICE_START(bitbanger)
 {
-	int id = image_index_in_device(img);
+	int id = image_index_in_device(device);
 	struct bitbanger_info *bi;
 	const struct bitbanger_config *config;
 	const struct IODevice *dev;
 
-	dev = image_device(img);
+	dev = mess_device_from_core_device(device);
 	config = (const struct bitbanger_config *) mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_BITBANGER_CONFIG);
 
 	bi = (struct bitbanger_info *) auto_malloc(sizeof(struct bitbanger_info));
@@ -50,7 +50,6 @@ static int bitbanger_init(const device_config *img)
 	bi->over_threshhold = 1;
 
 	bitbangers[id] = bi;
-	return INIT_PASS;
 }
 
 
@@ -168,7 +167,7 @@ void bitbanger_device_getinfo(const mess_device_class *devclass, UINT32 state, u
 		case MESS_DEVINFO_INT_CREATABLE:					info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:						info->init = bitbanger_init; break;
+		case MESS_DEVINFO_PTR_INIT:						info->init = DEVICE_START_NAME(bitbanger); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;

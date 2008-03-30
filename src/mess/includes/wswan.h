@@ -96,7 +96,7 @@ extern READ8_HANDLER( wswan_port_r );
 extern WRITE8_HANDLER( wswan_port_w );
 extern READ8_HANDLER( wswan_sram_r );
 extern WRITE8_HANDLER( wswan_sram_w );
-extern DEVICE_INIT(wswan_cart);
+extern DEVICE_START(wswan_cart);
 extern DEVICE_LOAD(wswan_cart);
 extern INTERRUPT_GEN(wswan_scanline_interrupt);
 

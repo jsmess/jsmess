@@ -208,7 +208,7 @@ static int a7800_verify_cart(char header[128])
 	return IMAGE_VERIFY_PASS;
 }
 
-DEVICE_INIT( a7800_cart )
+DEVICE_START( a7800_cart )
 {
 	UINT8	*memory;
 
@@ -218,18 +218,7 @@ DEVICE_INIT( a7800_cart )
 
 	/* Allocate memory for BIOS bank switching */
 	a7800_bios_bkup = (UINT8*) auto_malloc(0x4000);
-	if (!a7800_bios_bkup)
-	{
-		logerror("Could not allocate ROM memory\n");
-		return INIT_FAIL;
-	}
-
 	a7800_cart_bkup = (UINT8*) auto_malloc(0x4000);
-	if (!a7800_cart_bkup)
-	{
-		logerror("Could not allocate ROM memory\n");
-		return INIT_FAIL;
-	}
 
 	/* save the BIOS so we can switch it in and out */
 	memcpy( a7800_bios_bkup, memory + 0xC000, 0x4000 );
@@ -237,8 +226,6 @@ DEVICE_INIT( a7800_cart )
 	/* defaults for PAL bios without cart */
 	a7800_cart_type = 0;
 	a7800_stick_type = 1;
-
-	return INIT_PASS;
 }
 
 DEVICE_LOAD( a7800_cart )

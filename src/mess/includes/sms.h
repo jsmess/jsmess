@@ -58,7 +58,7 @@ void setup_rom(running_machine *machine);
 
 void sms_check_pause_button( running_machine *machine );
 
-DEVICE_INIT( sms_cart );
+DEVICE_START( sms_cart );
 DEVICE_LOAD( sms_cart );
 
 MACHINE_START(sms);

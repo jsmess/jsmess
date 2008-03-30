@@ -27,7 +27,7 @@ NVRAM_HANDLER( ti86 );
 
 SNAPSHOT_LOAD( ti8x );
 
-DEVICE_INIT( ti85_serial );
+DEVICE_START( ti85_serial );
 DEVICE_LOAD( ti85_serial );
 DEVICE_UNLOAD( ti85_serial );
 

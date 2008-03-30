@@ -1747,7 +1747,7 @@ static void nc_common_cartslot_getinfo(const mess_device_class *devclass, UINT32
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_nc_pcmcia_card; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(nc_pcmcia_card); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_nc_pcmcia_card; break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_nc_pcmcia_card; break;
 
@@ -1771,7 +1771,7 @@ static void nc_common_serial_getinfo(const mess_device_class *devclass, UINT32 s
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = serial_device_init; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(serial_device); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_nc_serial; break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
 

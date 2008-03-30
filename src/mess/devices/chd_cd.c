@@ -96,17 +96,11 @@ static struct mess_cd *get_drive(const device_config *img)
  *
  *************************************/
 
-static DEVICE_INIT( mess_cd )
+static DEVICE_START( mess_cd )
 {
 	struct mess_cd *cd;
-
-	cd = image_alloctag(image, MESSCDTAG, sizeof(struct mess_cd));
-	if (!cd)
-		return INIT_FAIL;
-
-        cd->cdrom_handle = NULL;
-
-	return INIT_PASS;
+	cd = image_alloctag(device, MESSCDTAG, sizeof(struct mess_cd));
+	cd->cdrom_handle = NULL;
 }
 
 
@@ -223,7 +217,7 @@ void cdrom_device_getinfo(const mess_device_class *devclass, UINT32 state, union
 		case MESS_DEVINFO_INT_CREATE_OPTCOUNT:			info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:						info->init = device_init_mess_cd; break;
+		case MESS_DEVINFO_PTR_INIT:						info->init = DEVICE_START_NAME(mess_cd); break;
 		case MESS_DEVINFO_PTR_LOAD:						info->load = device_load_mess_cd; break;
 		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_mess_cd; break;
 		case MESS_DEVINFO_PTR_CREATE_OPTGUIDE:			info->p = (void *) mess_cd_option_guide; break;

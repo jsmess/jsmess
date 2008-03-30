@@ -199,9 +199,8 @@ void tx0_tape_get_open_mode(const struct IODevice *dev, int id,
 }
 
 
-DEVICE_INIT( tx0_tape )
+DEVICE_START( tx0_tape )
 {
-	return INIT_PASS;
 }
 
 
@@ -556,11 +555,9 @@ static void schedule_unselect(void)
 	timer_adjust_oneshot(magtape.timer, delay, 0);
 }
 
-DEVICE_INIT( tx0_magtape )
+DEVICE_START( tx0_magtape )
 {
-	magtape.img = image;
-
-	return INIT_PASS;
+	magtape.img = device;
 }
 
 /*

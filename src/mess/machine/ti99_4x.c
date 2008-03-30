@@ -466,11 +466,10 @@ DRIVER_INIT( ti99_4p )
 	/*console_GROMs.data_ptr = memory_region(region_grom);*/
 }
 
-DEVICE_INIT( ti99_cart )
+DEVICE_START( ti99_cart )
 {
-	int id = image_index_in_device(image);
+	int id = image_index_in_device(device);
 	cartridge_pages[id] = (UINT16 *) (memory_region(REGION_CPU1) + offset_cart + (id * 0x2000));
-	return INIT_PASS;
 }
 
 /*

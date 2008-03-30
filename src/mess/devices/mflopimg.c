@@ -257,11 +257,10 @@ const struct io_procs mess_ioprocs =
 /* ----------------------------------------------------------------------- */
 
 
-static DEVICE_INIT( floppy )
+static DEVICE_START( floppy )
 {
-    if (!image_alloctag(image, FLOPPY_TAG, sizeof(mess_flopimg)))
-		return INIT_FAIL;
-	return floppy_drive_init(image, &mess_floppy_interface);
+    image_alloctag(device, FLOPPY_TAG, sizeof(mess_flopimg));
+	floppy_drive_init(device, &mess_floppy_interface);
 }
 
 
@@ -434,7 +433,7 @@ void floppy_device_getinfo(const mess_device_class *devclass, UINT32 state, unio
 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:				info->init = device_init_floppy; break;
+		case MESS_DEVINFO_PTR_INIT:				info->init = DEVICE_START_NAME(floppy); break;
 		case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_floppy; break;
 		case MESS_DEVINFO_PTR_CREATE:			info->create = device_create_floppy; break;
 		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = device_unload_floppy; break;

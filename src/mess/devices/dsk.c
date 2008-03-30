@@ -71,9 +71,9 @@ static int dsk_floppy_verify(UINT8 *diskimage_data)
 
 
 
-static DEVICE_INIT( dsk_floppy )
+static DEVICE_START( dsk_floppy )
 {
-	return floppy_drive_init(image, NULL);
+	floppy_drive_init(device, NULL);
 }
 
 
@@ -544,7 +544,7 @@ void legacydsk_device_getinfo(const mess_device_class *devclass, UINT32 state, u
 		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_dsk_floppy; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(dsk_floppy); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_dsk_floppy; break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_dsk_floppy; break;
 

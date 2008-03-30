@@ -1382,7 +1382,7 @@ READ8_HANDLER ( gb_io_r )
 	}
 }
 
-DEVICE_INIT(gb_cart)
+DEVICE_START(gb_cart)
 {
 	int I;
 
@@ -1405,7 +1405,6 @@ DEVICE_INIT(gb_cart)
 	CartType = 0;
 	ROMMask = 0;
 	RAMMask = 0;
-	return INIT_PASS;
 }
 
 DEVICE_LOAD(gb_cart)

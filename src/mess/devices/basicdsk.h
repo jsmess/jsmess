@@ -15,7 +15,7 @@ extern "C" {
 extern const floppy_interface basicdsk_floppy_interface;
 
 /* init */
-DEVICE_INIT(basicdsk_floppy);
+DEVICE_START(basicdsk_floppy);
 DEVICE_LOAD(basicdsk_floppy);
 DEVICE_UNLOAD(basicdsk_floppy);
 
@@ -54,16 +54,6 @@ have a deleted data mark, if ddam==0, the sector will have a data mark */
 void basicdsk_set_ddam(const device_config *img, UINT8 physical_track, UINT8 physical_side, UINT8 sector_id,UINT8 ddam);
 
 void legacybasicdsk_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-
-#define CONFIG_DEVICE_FLOPPY_BASICDSK(count, file_extensions, load)		\
-	CONFIG_DEVICE_BASE(IO_FLOPPY, (count), (file_extensions), DEVICE_LOAD_RESETS_NONE,	\
-		OSD_FOPEN_RW_CREATE_OR_READ, device_init_basicdsk_floppy, NULL, (load), device_unload_basicdsk_floppy, NULL, NULL,\
-		NULL, NULL, floppy_status, NULL, NULL, NULL, NULL, NULL, NULL)	\
-
-#define CONFIG_DEVICE_FLOPPY_BASICDSK_RO(count, file_extensions, load)		\
-	CONFIG_DEVICE_BASE(IO_FLOPPY, (count), (file_extensions), DEVICE_LOAD_RESETS_NONE,	\
-		OSD_FOPEN_READ, device_init_basicdsk_floppy, NULL, (load), device_unload_basicdsk_floppy, NULL, NULL,\
-		NULL, NULL, floppy_status, NULL, NULL, NULL, NULL, NULL, NULL)	\
 
 
 #ifdef __cplusplus

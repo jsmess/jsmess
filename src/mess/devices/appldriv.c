@@ -276,15 +276,14 @@ int apple525_read_status(void)
 
 /* ----------------------------------------------------------------------- */
 
-static DEVICE_INIT( apple525_floppy )
+static DEVICE_START( apple525_floppy )
 {
-	device_init_handler parent_init;
+	device_start_func parent_init;
 
-	if (!image_alloctag(image, APPLE525TAG, sizeof(struct apple525_disk)))
-		return INIT_FAIL;
+	image_alloctag(device, APPLE525TAG, sizeof(struct apple525_disk));
 
-	parent_init = (device_init_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_INIT);
-	return parent_init(image);
+	parent_init = (device_start_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_INIT);
+	parent_init(device);
 }
 
 
@@ -327,7 +326,7 @@ void apple525_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 		case MESS_DEVINFO_STR_DEV_TAG:			strcpy(info->s = device_temp_str(), APPLE525TAG); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:				info->init = device_init_apple525_floppy; break;
+		case MESS_DEVINFO_PTR_INIT:				info->init = DEVICE_START_NAME(apple525_floppy); break;
 		case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_apple525_floppy; break;
 		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = device_unload_apple525_floppy; break;
 		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_apple2; break;

@@ -68,9 +68,9 @@ static TIMER_CALLBACK(fdc_rev_proc);
 static TIMER_CALLBACK(fdc_dma_proc);
 static TIMER_CALLBACK(fdc_sync_proc);
 
-static DEVICE_INIT(amiga_fdc)
+static DEVICE_START(amiga_fdc)
 {
-	int id = image_index_in_device(image);
+	int id = image_index_in_device(device);
 	fdc_status[id].motor_on = 0;
 	fdc_status[id].side = 0;
 	fdc_status[id].dir = 0;
@@ -96,8 +96,6 @@ static DEVICE_INIT(amiga_fdc)
 	fdc_side = 1;
 	fdc_step = 1;
 	fdc_rdy = 0;
-
-	return INIT_PASS;
 }
 
 static void check_extended_image( int id )
@@ -760,7 +758,7 @@ void amiga_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union
 		case MESS_DEVINFO_INT_CREATABLE:				info->i = 0; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:					info->init = device_init_amiga_fdc; break;
+		case MESS_DEVINFO_PTR_INIT:					info->init = DEVICE_START_NAME(amiga_fdc); break;
 		case MESS_DEVINFO_PTR_LOAD:					info->load = device_load_amiga_fdc; break;
 		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = device_unload_amiga_fdc; break;
 

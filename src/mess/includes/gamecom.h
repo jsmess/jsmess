@@ -149,7 +149,7 @@ enum
 /*----------- defined in machine/gamecom.c -----------*/
 
 extern MACHINE_RESET( gamecom );
-extern DEVICE_INIT( gamecom_cart );
+extern DEVICE_START( gamecom_cart );
 extern DEVICE_LOAD( gamecom_cart );
 
 extern WRITE8_HANDLER( gamecom_internal_w );

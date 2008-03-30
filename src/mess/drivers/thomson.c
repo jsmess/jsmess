@@ -288,7 +288,7 @@ static void thom_serial_getinfo ( const mess_device_class *devclass, UINT32 stat
 		break;
 
 	case MESS_DEVINFO_PTR_INIT:
-		info->init = thom_serial_init;
+		info->init = DEVICE_START_NAME(thom_serial);
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
 		info->load = thom_serial_load;

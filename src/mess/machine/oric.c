@@ -1075,10 +1075,10 @@ static void oric_wd179x_callback(running_machine *machine, wd17xx_state_t State,
 	}
 }
 
-DEVICE_INIT( oric_floppy )
+DEVICE_START( oric_floppy )
 {
 	/* TODO - THIS DOES NOT MULTITASK BETWEEN ORIC BASICDSKs AND MFM DISKS */
-	return floppy_drive_init(image, NULL);
+	floppy_drive_init(device, NULL);
 }
 
 

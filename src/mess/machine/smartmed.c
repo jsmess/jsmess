@@ -101,15 +101,10 @@ static struct
 /*
 	Init a SmartMedia image
 */
-DEVICE_INIT( smartmedia )
+DEVICE_START( smartmedia )
 {
-	int id = image_index_in_device(image);
-
-	if (id >= MAX_SMARTMEDIA)
-	{
-		logerror("smartmedia: invalid chip %d\n", id);
-		return INIT_FAIL;
-	}
+	int id = image_index_in_device(device);
+	assert((id >= 0) && (id < MAX_SMARTMEDIA));
 
 	smartmedia[id].page_data_size = 0;
 	smartmedia[id].page_total_size = 0;
@@ -125,8 +120,6 @@ DEVICE_INIT( smartmedia )
 	smartmedia[id].pagereg = NULL;
 	smartmedia[id].id[0] = smartmedia[id].id[1] = 0;
 	smartmedia[id].mp_opcode = 0;
-
-	return INIT_PASS;
 }
 
 /*

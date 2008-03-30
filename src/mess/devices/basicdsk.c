@@ -84,9 +84,9 @@ static basicdsk *get_basicdsk(const device_config *img)
 	return &basicdsk_drives[drive];
 }
 
-DEVICE_INIT( basicdsk_floppy )
+DEVICE_START( basicdsk_floppy )
 {
-	return floppy_drive_init(image, &basicdsk_floppy_interface);
+	floppy_drive_init(device, &basicdsk_floppy_interface);
 }
 
 /* attempt to insert a disk into the drive specified with id */
@@ -586,7 +586,7 @@ void legacybasicdsk_device_getinfo(const mess_device_class *devclass, UINT32 sta
 		case MESS_DEVINFO_INT_CREATABLE:					info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:						info->init = device_init_basicdsk_floppy; break;
+		case MESS_DEVINFO_PTR_INIT:						info->init = DEVICE_START_NAME(basicdsk_floppy); break;
 		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_basicdsk_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

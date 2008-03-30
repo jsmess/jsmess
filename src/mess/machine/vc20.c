@@ -616,14 +616,13 @@ static int vc20_rom_id(const device_config *image)
 	return retval;
 }
 
-DEVICE_INIT(vc20_rom)
+DEVICE_START(vc20_rom)
 {
 	vc20_memory_init();
 	vc20_rom_2000 = NULL;
 	vc20_rom_4000 = NULL;
 	vc20_rom_6000 = NULL;
 	vc20_rom_a000 = NULL;
-	return INIT_PASS;
 }
 
 DEVICE_LOAD(vc20_rom)

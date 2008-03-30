@@ -736,7 +736,7 @@ static int detect_korean_mapper( UINT8 *rom ) {
 	return 0;
 }
 
-DEVICE_INIT( sms_cart ) {
+DEVICE_START( sms_cart ) {
 	running_machine *machine = Machine;
 	int i;
 
@@ -760,8 +760,6 @@ DEVICE_INIT( sms_cart ) {
 
 	/* Initially set the vdp to not use sms compatibility mode for GG */
 	sms_set_ggsmsmode( 0 );
-
-	return INIT_PASS;
 }
 
 DEVICE_LOAD( sms_cart )

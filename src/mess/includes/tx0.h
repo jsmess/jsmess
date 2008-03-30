@@ -19,7 +19,7 @@ MACHINE_RESET( tx0 );
 
 void tx0_tape_get_open_mode(const struct IODevice *dev, int id,
 	unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
-DEVICE_INIT( tx0_tape );
+DEVICE_START( tx0_tape );
 DEVICE_LOAD( tx0_tape );
 DEVICE_UNLOAD( tx0_tape );
 void tx0_io_r1l(void);
@@ -30,7 +30,7 @@ DEVICE_LOAD(tx0_typewriter);
 DEVICE_UNLOAD(tx0_typewriter);
 void tx0_io_prt(void);
 void tx0_io_dis(void);
-DEVICE_INIT( tx0_magtape );
+DEVICE_START( tx0_magtape );
 DEVICE_LOAD( tx0_magtape );
 DEVICE_UNLOAD( tx0_magtape );
 void tx0_sel(void);

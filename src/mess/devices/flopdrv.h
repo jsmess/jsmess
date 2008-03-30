@@ -134,7 +134,7 @@ void floppy_drive_set_geometry(const device_config *img, floppy_type type);
 void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides);
 
 /* called in device init/exit functions */
-int floppy_drive_init(const device_config *img, const floppy_interface *iface);
+void floppy_drive_init(const device_config *img, const floppy_interface *iface);
 
 /* get next id from track, 1 if got a id, 0 if no id was got */
 int floppy_drive_get_next_id(const device_config *img, int side, chrn_id *);

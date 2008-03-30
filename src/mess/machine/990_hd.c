@@ -162,19 +162,17 @@ static hdc_t hdc;
 /*
 	Initialize hard disk unit
 */
-DEVICE_INIT( ti990_hd )
+DEVICE_START( ti990_hd )
 {
 	hd_unit_t *d;
-	int id = image_index_in_device(image);
+	int id = image_index_in_device(device);
 
-
-	if ((id < 0) || (id >= MAX_DISK_UNIT))
-		return INIT_FAIL;
+	assert ((id >= 0) && (id < MAX_DISK_UNIT));
 
 	d = &hdc.d[id];
 	memset(d, 0, sizeof(*d));
 
-	d->img = image;
+	d->img = device;
 	d->format = format_mame;	/* don't care */
 	d->hd_handle = NULL;
 	d->wp = 1;
@@ -183,10 +181,10 @@ DEVICE_INIT( ti990_hd )
 	/* clear attention line */
 	/*hdc.w[0] &= ~ (0x80 >> id);*/
 
-	return device_init_mess_hd(image);
+	DEVICE_START_CALL(mess_hd);
 }
 
-/*DEVICE_EXIT( ti990_hd )
+/*DEVICE_STOP( ti990_hd )
 {
 	d->img = NULL;
 }*/

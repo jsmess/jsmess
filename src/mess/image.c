@@ -110,7 +110,6 @@ static void memory_error(const char *message)
 
 int image_init(running_machine *machine)
 {
-	int err;
 	int count, indx;
 	UINT32 mask, dev_mask = 0, multiple_dev_mask = 0;
 	const struct IODevice *dev;
@@ -161,9 +160,7 @@ int image_init(running_machine *machine)
 
 		if (dev->init != NULL)
 		{
-			err = dev->init(machine->images_data->slots[indx].dev);
-			if (err != INIT_PASS)
-				return err;
+			dev->init(machine->images_data->slots[indx].dev);
 		}
 		indx++;
 	}
@@ -899,7 +896,12 @@ void image_seterror(const device_config *image, image_error_t err, const char *m
 void *image_alloctag(const device_config *image, const char *tag, size_t size)
 {
 	image_slot_data *slot = find_image_slot(image);
-	return tagpool_alloc(&slot->tagpool, tag, size);
+	void *ptr = tagpool_alloc(&slot->tagpool, tag, size);
+	if (ptr == NULL)
+	{
+		memory_error("Out of memory");
+	}
+	return ptr;
 }
 
 

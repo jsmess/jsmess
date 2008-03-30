@@ -14,7 +14,7 @@
 #include "harddisk.h"
 
 
-DEVICE_INIT( mess_hd );
+DEVICE_START( mess_hd );
 DEVICE_LOAD( mess_hd );
 DEVICE_UNLOAD( mess_hd );
 

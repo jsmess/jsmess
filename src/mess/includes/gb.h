@@ -51,7 +51,7 @@ READ8_HANDLER ( gb_io_r );
 WRITE8_HANDLER( gb_io2_w );
 READ8_HANDLER( gb_ie_r );
 WRITE8_HANDLER( gb_ie_w );
-DEVICE_INIT(gb_cart);
+DEVICE_START(gb_cart);
 DEVICE_LOAD(gb_cart);
 INTERRUPT_GEN( gb_scanline_interrupt );
 void gb_timer_callback(int cycles);

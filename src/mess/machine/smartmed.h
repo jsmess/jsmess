@@ -2,7 +2,7 @@
 	smartmed.h: header file for smartmed.c
 */
 
-DEVICE_INIT( smartmedia );
+DEVICE_START( smartmedia );
 DEVICE_LOAD( smartmedia );
 DEVICE_UNLOAD( smartmedia );
 

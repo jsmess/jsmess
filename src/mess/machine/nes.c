@@ -551,7 +551,7 @@ void nes_partialhash(char *dest, const unsigned char *data,
 }
 
 
-DEVICE_INIT(nes_disk)
+DEVICE_START(nes_disk)
 {
 	/* clear some of the cart variables we don't use */
 	nes.trainer = 0;
@@ -564,8 +564,6 @@ DEVICE_INIT(nes_disk)
 
 	nes_fds.sides = 0;
 	nes_fds.data = NULL;
-
-	return INIT_PASS;
 }
 
 

@@ -106,27 +106,23 @@ static const UINT16 w_mask[8] =
 static tpc_t tpc;
 
 
-DEVICE_INIT( ti990_tape )
+DEVICE_START( ti990_tape )
 {
 	tape_unit_t *t;
-	int id = image_index_in_device(image);
+	int id = image_index_in_device(device);
 
-
-	if ((id < 0) || (id >= MAX_TAPE_UNIT))
-		return INIT_FAIL;
+	assert ((id >= 0) && (id < MAX_TAPE_UNIT));
 
 	t = &tpc.t[id];
 	memset(t, 0, sizeof(*t));
 
-	t->img = image;
+	t->img = device;
 	t->wp = 1;
 	t->bot = 0;
 	t->eot = 0;
-
-	return INIT_PASS;
 }
 
-/*DEVICE_EXIT( ti990_tape )
+/*DEVICE_STOP( ti990_tape )
 {
 	d->img = NULL;
 }*/

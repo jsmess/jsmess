@@ -1,4 +1,4 @@
-/*DEVICE_INIT( ti99_sm );
+/*DEVICE_START( ti99_sm );
 DEVICE_LOAD( ti99_sm );
 DEVICE_UNLOAD( ti99_sm );*/
 

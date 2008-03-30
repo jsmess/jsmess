@@ -213,8 +213,6 @@ const device_config *image_from_devtype_and_index(iodevice_t type, int id);
   Macros for declaring device callbacks
 ****************************************************************************/
 
-#define	DEVICE_INIT(name)	int device_init_##name(const device_config *image)
-#define DEVICE_EXIT(name)	void device_exit_##name(const device_config *image)
 #define DEVICE_LOAD(name)	int device_load_##name(const device_config *image)
 #define DEVICE_CREATE(name)	int device_create_##name(const device_config *image, int create_format, option_resolution *create_args)
 #define DEVICE_UNLOAD(name)	void device_unload_##name(const device_config *image)

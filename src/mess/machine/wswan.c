@@ -1262,7 +1262,7 @@ static const char* wswan_determine_romsize( UINT8 data ) {
 }
 #endif
 
-DEVICE_INIT(wswan_cart)
+DEVICE_START(wswan_cart)
 {
 	/* Initialize EEPROM structure */
 	memset( &eeprom, 0, sizeof( eeprom ) );
@@ -1280,8 +1280,6 @@ DEVICE_INIT(wswan_cart)
 	rtc.minute = 0;
 	rtc.second = 0;
 	rtc.setting = 0xFF;
-
-	return INIT_PASS;
 }
 
 DEVICE_LOAD(wswan_cart)

@@ -91,8 +91,6 @@ enum
 
 struct IODevice;
 
-typedef int (*device_init_handler)(const device_config *image);
-typedef void (*device_exit_handler)(const device_config *image);
 typedef int (*device_load_handler)(const device_config *image);
 typedef int (*device_create_handler)(const device_config *image, int format_type, option_resolution *format_options);
 typedef void (*device_unload_handler)(const device_config *image);
@@ -114,8 +112,8 @@ union devinfo
 	char *s;											/* generic strings */
 	double	d;											/* generic floating points */
 
-	device_init_handler init;
-	device_exit_handler exit;
+	device_start_func init;
+	device_stop_func exit;
 	device_load_handler load;
 	device_create_handler create;
 	device_unload_handler unload;
@@ -259,8 +257,8 @@ struct IODevice
 	unsigned int multiple : 1;
 
 	/* image handling callbacks */
-	device_init_handler init;
-	device_exit_handler exit;
+	device_start_func init;
+	device_stop_func exit;
 	device_load_handler load;
 	device_create_handler create;
 	device_unload_handler unload;

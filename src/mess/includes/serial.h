@@ -299,7 +299,7 @@ unsigned long serial_device_get_state(int id);
 void serial_device_connect(const device_config *image, struct serial_connection *connection);
 
 /* init this device */
-int serial_device_init(const device_config *image);
+DEVICE_START(serial_device);
 int serial_device_load(const device_config *image);
 void serial_device_unload(const device_config *image);
 

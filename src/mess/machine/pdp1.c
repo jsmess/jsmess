@@ -372,9 +372,8 @@ void pdp1_get_open_mode(const struct IODevice *dev, int id,
 
 
 
-DEVICE_INIT( pdp1_tape )
+DEVICE_START( pdp1_tape )
 {
-	return INIT_PASS;
 }
 
 

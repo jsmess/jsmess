@@ -16,7 +16,7 @@ MACHINE_START( svi318_pal );
 MACHINE_START( svi318_ntsc );
 MACHINE_RESET( svi318 );
 
-DEVICE_INIT( svi318_cart );
+DEVICE_START( svi318_cart );
 DEVICE_LOAD( svi318_cart );
 DEVICE_UNLOAD( svi318_cart );
 

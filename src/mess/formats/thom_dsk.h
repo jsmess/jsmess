@@ -25,7 +25,7 @@ typedef enum {
   THOM_FLOPPY_QDD,     /* 2"8 */
 } thom_floppy_type;
 
-extern int  thom_floppy_init   ( const device_config *image );
+extern DEVICE_START( thom_floppy );
 extern int  thom_floppy_load   ( const device_config* image );
 extern void thom_floppy_unload ( const device_config *image);
 extern int  thom_floppy_create ( const device_config *image,

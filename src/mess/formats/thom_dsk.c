@@ -782,11 +782,11 @@ static void thom_floppy_reset ( thom_floppy_drive* d )
 
 
 
-int thom_floppy_init ( const device_config *image )
+DEVICE_START( thom_floppy )
 {
 	thom_qdd_compute_map();
-	thom_floppy_reset( thom_floppy_drive_of_image( image  ) );
-	return floppy_drive_init( image, &thom_floppy_interface );
+	thom_floppy_reset( thom_floppy_drive_of_image( device  ) );
+	floppy_drive_init( device, &thom_floppy_interface );
 }
 
 
@@ -928,7 +928,7 @@ void thom_floppy_getinfo( const mess_device_class *devclass, UINT32 state, union
 		info->i = 1;
 		break;
 	case MESS_DEVINFO_PTR_INIT:
-		info->init = thom_floppy_init;
+		info->init = DEVICE_START_NAME(thom_floppy);
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
 		info->load = thom_floppy_load;

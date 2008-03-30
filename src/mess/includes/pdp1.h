@@ -130,7 +130,7 @@ MACHINE_RESET( pdp1 );
 READ18_HANDLER ( pdp1_read_mem );
 WRITE18_HANDLER ( pdp1_write_mem );
 
-DEVICE_INIT( pdp1_tape );
+DEVICE_START( pdp1_tape );
 DEVICE_LOAD( pdp1_tape );
 DEVICE_UNLOAD( pdp1_tape );
 

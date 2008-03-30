@@ -141,10 +141,9 @@ static int process_cartridge(const device_config *image, const device_config *fi
 
 
 
-static DEVICE_INIT( cartslot_specified )
+static DEVICE_START( cartslot_specified )
 {
-	process_cartridge(image, NULL);
-	return 0;
+	process_cartridge(device, NULL);
 }
 
 static DEVICE_LOAD( cartslot_specified )
@@ -206,7 +205,7 @@ void cartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 		case MESS_DEVINFO_INT_MUST_BE_LOADED:			info->i = must_be_loaded; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:						info->init = (count > 0) ? device_init_cartslot_specified : NULL; break;
+		case MESS_DEVINFO_PTR_INIT:						info->init = (count > 0) ? DEVICE_START_NAME(cartslot_specified) : NULL; break;
 		case MESS_DEVINFO_PTR_LOAD:						info->load = (count > 0) ? device_load_cartslot_specified : NULL; break;
 		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = (count > 0) ? device_unload_cartslot_specified : NULL; break;
 

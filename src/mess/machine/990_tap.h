@@ -2,7 +2,7 @@
 	990_tap.h: include file for 990_tap.c
 */
 
-DEVICE_INIT( ti990_tape );
+DEVICE_START( ti990_tape );
 DEVICE_LOAD( ti990_tape );
 DEVICE_UNLOAD( ti990_tape );
 

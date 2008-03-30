@@ -28,7 +28,7 @@ extern UINT8 intv_gram[];
 extern UINT8 intv_gramdirtybytes[];
 extern UINT16 intv_ram16[];
 
-DEVICE_INIT( intv_cart );
+DEVICE_START( intv_cart );
 DEVICE_LOAD( intv_cart );
 
 extern MACHINE_RESET( intv );

@@ -94,14 +94,13 @@ static int nc_card_load(const device_config *image, unsigned char **ptr)
 	return 0;
 }
 
-DEVICE_INIT( nc_pcmcia_card )
+DEVICE_START( nc_pcmcia_card )
 {
 	/* card not present */
 	nc_set_card_present_state(0);
 	/* card ram NULL */
 	nc_card_ram = NULL;
 	nc_card_size = 0;
-	return INIT_PASS;
 }
 
 /* load pcmcia card */

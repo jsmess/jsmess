@@ -649,8 +649,7 @@ READ8_HANDLER( pokemini_hwreg_r ) {
 	return pokemini_hwreg[offset];
 }
 
-DEVICE_INIT( pokemini_cart ) {
-	return INIT_PASS;
+DEVICE_START( pokemini_cart ) {
 }
 
 DEVICE_LOAD( pokemini_cart ) {
