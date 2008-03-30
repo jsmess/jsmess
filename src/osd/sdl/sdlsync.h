@@ -16,9 +16,11 @@
 
 #ifndef SDLMAME_OS2
 
-#ifndef SDLMAME_MACOSX
-
+#ifdef SDLMAME_MACOSX
+#define THREAD_COOPERATIVE              (0)
+#else
 #define THREAD_COOPERATIVE		(1)
+#endif
 
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events
@@ -188,8 +190,6 @@ void osd_thread_wait_free(osd_thread *thread);
         Number of processors
 -----------------------------------------------------------------------------*/
 int osd_num_processors(void);
-
-#endif	/* SDLMAME_MACOSX */
 
 #endif  /* SDLMAME_OS2 */
 

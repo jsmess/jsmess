@@ -576,6 +576,7 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 
 int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 {
+#if THREAD_COOPERATIVE
 	cpu_set_t	cmask;
 	pthread_t	lthread;
 	int			bitnum;
@@ -597,6 +598,9 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 	}
 	else
 		return TRUE;
+#else
+	return TRUE;
+#endif
 }
 
 //============================================================
