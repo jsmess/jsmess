@@ -277,7 +277,7 @@ void harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 		case MESS_DEVINFO_INT_CREATE_OPTCOUNT:			info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:						info->init = DEVICE_START_NAME(mess_hd); break;
+		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(mess_hd); break;
 		case MESS_DEVINFO_PTR_LOAD:						info->load = device_load_mess_hd; break;
 		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_mess_hd; break;
 		case MESS_DEVINFO_PTR_CREATE_OPTGUIDE:			info->p = (void *) mess_hd_option_guide; break;

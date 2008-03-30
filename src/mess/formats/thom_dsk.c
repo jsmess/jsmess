@@ -927,8 +927,8 @@ void thom_floppy_getinfo( const mess_device_class *devclass, UINT32 state, union
 	case MESS_DEVINFO_INT_CREATABLE:
 		info->i = 1;
 		break;
-	case MESS_DEVINFO_PTR_INIT:
-		info->init = DEVICE_START_NAME(thom_floppy);
+	case MESS_DEVINFO_PTR_START:
+		info->start = DEVICE_START_NAME(thom_floppy);
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
 		info->load = thom_floppy_load;

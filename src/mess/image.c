@@ -158,9 +158,9 @@ int image_init(running_machine *machine)
 		tagpool_init(&machine->images_data->slots[indx].tagpool);
 		machine->images_data->slots[indx].dev = dev->devconfig;
 
-		if (dev->init != NULL)
+		if (dev->start != NULL)
 		{
-			dev->init(machine->images_data->slots[indx].dev);
+			dev->start(machine->images_data->slots[indx].dev);
 		}
 		indx++;
 	}
@@ -200,9 +200,9 @@ static void image_exit(running_machine *machine)
 			/* identify the image */
 			image = &machine->images_data->slots[indx];
 
-			/* call the exit handler if appropriate */
-			if (dev->exit != NULL)
-				dev->exit(image->dev);
+			/* call the stop handler if appropriate */
+			if (dev->stop != NULL)
+				dev->stop(image->dev);
 
 			/* free the tagpool */
 			tagpool_exit(&image->tagpool);

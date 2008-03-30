@@ -861,7 +861,7 @@ static void apexc_punchtape_getinfo(const mess_device_class *devclass, UINT32 st
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(apexc_tape); break;
+		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(apexc_tape); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_apexc_tape; break;
 		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = apexc_get_open_mode; break;
 

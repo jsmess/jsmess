@@ -297,7 +297,7 @@ static void ti990_10_harddisk_getinfo(const mess_device_class *devclass, UINT32 
 		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(ti990_hd); break;
+		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(ti990_hd); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_ti990_hd; break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_ti990_hd; break;
 
@@ -319,7 +319,7 @@ static void ti990_10_cassette_getinfo(const mess_device_class *devclass, UINT32 
 		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(ti990_tape); break;
+		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(ti990_tape); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_ti990_tape; break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_ti990_tape; break;
 

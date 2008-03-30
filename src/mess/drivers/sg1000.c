@@ -855,7 +855,7 @@ static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(serial_device); break;
+		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(serial_device); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sf7000_serial; break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
 

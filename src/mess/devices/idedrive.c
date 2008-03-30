@@ -31,7 +31,7 @@ static void ide_get_params(const device_config *image, int *which_bus, int *whic
 	parent_devclass.get_info = harddisk_device_getinfo;
 
 	if (parent_init)
-		*parent_init = (device_start_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_INIT);
+		*parent_init = (device_start_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_START);
 	if (parent_load)
 		*parent_load = (device_load_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_LOAD);
 	if (parent_unload)
@@ -161,7 +161,7 @@ void ide_harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state
 	switch(state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:					info->init = DEVICE_START_NAME(ide_hd); break;
+		case MESS_DEVINFO_PTR_START:					info->start = DEVICE_START_NAME(ide_hd); break;
 		case MESS_DEVINFO_PTR_LOAD:					info->load = ide_hd_load; break;
 		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = ide_hd_unload; break;
 		case MESS_DEVINFO_PTR_VALIDITY_CHECK:		info->validity_check = ide_hd_validity_check; break;

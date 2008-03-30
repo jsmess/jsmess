@@ -50,8 +50,8 @@ enum
 	/* --- the following bits of info are returned as pointers to data or functions --- */
 	MESS_DEVINFO_PTR_FIRST = 0x10000,
 
-	MESS_DEVINFO_PTR_INIT,
-	MESS_DEVINFO_PTR_EXIT,
+	MESS_DEVINFO_PTR_START,
+	MESS_DEVINFO_PTR_STOP,
 	MESS_DEVINFO_PTR_LOAD,
 	MESS_DEVINFO_PTR_UNLOAD,
 	MESS_DEVINFO_PTR_CREATE,
@@ -112,8 +112,8 @@ union devinfo
 	char *s;											/* generic strings */
 	double	d;											/* generic floating points */
 
-	device_start_func init;
-	device_stop_func exit;
+	device_start_func start;
+	device_stop_func stop;
 	device_load_handler load;
 	device_create_handler create;
 	device_unload_handler unload;
@@ -257,8 +257,8 @@ struct IODevice
 	unsigned int multiple : 1;
 
 	/* image handling callbacks */
-	device_start_func init;
-	device_stop_func exit;
+	device_start_func start;
+	device_stop_func stop;
 	device_load_handler load;
 	device_create_handler create;
 	device_unload_handler unload;

@@ -513,8 +513,8 @@ static void svi318_cartslot_getinfo(const mess_device_class *devclass, UINT32 st
 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:
-			info->init = DEVICE_START_NAME(svi318_cart);
+		case MESS_DEVINFO_PTR_START:
+			info->start = DEVICE_START_NAME(svi318_cart);
 			break;
 		case MESS_DEVINFO_PTR_LOAD:
 			info->load = device_load_svi318_cart;

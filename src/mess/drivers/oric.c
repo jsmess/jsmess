@@ -570,7 +570,7 @@ static void oric1_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(oric_floppy); break;
+		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(oric_floppy); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_oric_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

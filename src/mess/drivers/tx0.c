@@ -406,7 +406,7 @@ static void tx0_punchtape_getinfo(const mess_device_class *devclass, UINT32 stat
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(tx0_tape); break;
+		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(tx0_tape); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_tx0_tape; break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_tx0_tape; break;
 		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = tx0_tape_get_open_mode; break;
@@ -450,7 +450,7 @@ static void tx0_magtape_getinfo(const mess_device_class *devclass, UINT32 state,
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:							info->init = DEVICE_START_NAME(tx0_magtape); break;
+		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(tx0_magtape); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_tx0_magtape; break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_tx0_magtape; break;
 

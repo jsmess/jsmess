@@ -167,7 +167,7 @@ void bitbanger_device_getinfo(const mess_device_class *devclass, UINT32 state, u
 		case MESS_DEVINFO_INT_CREATABLE:					info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:						info->init = DEVICE_START_NAME(bitbanger); break;
+		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(bitbanger); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;

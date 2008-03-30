@@ -385,7 +385,7 @@ void cassette_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_PLAY; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_INIT:						info->init = DEVICE_START_NAME(cassette); break;
+		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(cassette); break;
 		case MESS_DEVINFO_PTR_LOAD:						info->load = device_load_cassette; break;
 		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_cassette; break;
 		case MESS_DEVINFO_PTR_DISPLAY:					info->display = device_display_cassette; break;
