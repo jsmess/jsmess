@@ -37,7 +37,7 @@ static struct
 
 	struct
 	{
-		mess_image *img;
+		const device_config *img;
 		int phys_cylinder;
 		int log_cylinder[2];
 		int seclen;
@@ -91,7 +91,7 @@ static void fd800_field_interrupt(void)
 		(*fd800.interrupt_callback)((fd800.stat_reg & status_interrupt) && ! fd800.interrupt_f_f);
 }
 
-static void fd800_unload_proc(mess_image *image)
+static void fd800_unload_proc(const device_config *image)
 {
 	int unit = image_index_in_device(image);
 

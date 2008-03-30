@@ -791,7 +791,7 @@ static READ8_HANDLER(modeSS_r)
 
 		/* Check if we should stop the tape */
 		if ( cpu_getactivecpu() >= 0 && activecpu_get_pc() == 0x00FD ) {
-			mess_image *img = image_from_devtype_and_index(IO_CASSETTE, 0);
+			const device_config *img = image_from_devtype_and_index(IO_CASSETTE, 0);
 			if ( img ) {
 				cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 			}

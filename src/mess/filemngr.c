@@ -640,7 +640,7 @@ int filemanager(int selected)
 	char names[40][64];
 	int sel, total, arrowize;
 	const struct IODevice *dev;
-	mess_image *image;
+	const device_config *image;
 
 	sel = selected - 1;
 	total = 0;

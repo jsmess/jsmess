@@ -40,7 +40,7 @@ void apple525_set_enable_lines(int enable_mask)
 
 /* ----------------------------------------------------------------------- */
 
-static void apple525_load_current_track(mess_image *image)
+static void apple525_load_current_track(const device_config *image)
 {
 	int len;
 	struct apple525_disk *disk;
@@ -55,7 +55,7 @@ static void apple525_load_current_track(mess_image *image)
 
 
 
-static void apple525_save_current_track(mess_image *image, int unload)
+static void apple525_save_current_track(const device_config *image, int unload)
 {
 	int len;
 	struct apple525_disk *disk;
@@ -74,7 +74,7 @@ static void apple525_save_current_track(mess_image *image, int unload)
 
 
 
-static void apple525_seek_disk(mess_image *img, struct apple525_disk *disk, signed int step)
+static void apple525_seek_disk(const device_config *img, struct apple525_disk *disk, signed int step)
 {
 	int track;
 	int pseudo_track;
@@ -104,7 +104,7 @@ static void apple525_seek_disk(mess_image *img, struct apple525_disk *disk, sign
 
 
 
-static void apple525_disk_set_lines(mess_image *image, UINT8 new_state)
+static void apple525_disk_set_lines(const device_config *image, UINT8 new_state)
 {
 	struct apple525_disk *cur_disk;
 	UINT8 old_state;
@@ -148,7 +148,7 @@ static void apple525_disk_set_lines(mess_image *image, UINT8 new_state)
 void apple525_set_lines(UINT8 lines)
 {
 	int i, count;
-	mess_image *image;
+	const device_config *image;
 
 	count = device_count_tag_from_machine(Machine, APPLE525TAG);
 
@@ -166,7 +166,7 @@ void apple525_set_lines(UINT8 lines)
 
 
 /* reads/writes a byte; write_value is -1 for read only */
-static UINT8 apple525_process_byte(mess_image *img, int write_value)
+static UINT8 apple525_process_byte(const device_config *img, int write_value)
 {
 	UINT8 read_value;
 	struct apple525_disk *disk;
@@ -218,7 +218,7 @@ static UINT8 apple525_process_byte(mess_image *img, int write_value)
 
 
 
-static mess_image *apple525_selected_image(void)
+static const device_config *apple525_selected_image(void)
 {
 	int i, count;
 
@@ -236,7 +236,7 @@ static mess_image *apple525_selected_image(void)
 
 UINT8 apple525_read_data(void)
 {
-	mess_image *image;
+	const device_config *image;
 	image = apple525_selected_image();
 	return image ? apple525_process_byte(image, -1) : 0xFF;
 }
@@ -245,7 +245,7 @@ UINT8 apple525_read_data(void)
 
 void apple525_write_data(UINT8 data)
 {
-	mess_image *image;
+	const device_config *image;
 	image = apple525_selected_image();
 	if (image)
 		apple525_process_byte(image, data);
@@ -256,7 +256,7 @@ void apple525_write_data(UINT8 data)
 int apple525_read_status(void)
 {
 	int i, count, result = 0;
-	mess_image *image;
+	const device_config *image;
 
 	count = device_count_tag_from_machine(Machine, APPLE525TAG);
 

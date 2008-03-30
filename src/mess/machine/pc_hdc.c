@@ -188,7 +188,7 @@ int pc_hdc_setup(void)
 
 static hard_disk_file *pc_hdc_file(int id)
 {
-	mess_image *img;
+	const device_config *img;
 
 	img = image_from_devtype_and_index(IO_HARDDISK, id);
 	if (!image_exists(img))

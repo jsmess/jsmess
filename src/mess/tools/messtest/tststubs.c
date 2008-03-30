@@ -119,7 +119,7 @@ void osd_begin_final_unloading(void)
 {
 }
 
-void osd_image_load_status_changed(mess_image *img, int is_final_unload)
+void osd_image_load_status_changed(const device_config *img, int is_final_unload)
 {
 }
 #endif

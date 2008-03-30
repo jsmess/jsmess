@@ -15,7 +15,6 @@
 #include "devintrf.h"
 
 struct _mame_file;
-typedef const device_config mess_image;
 
 
 

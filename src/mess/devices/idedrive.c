@@ -14,7 +14,7 @@
 #include "machine/idectrl.h"
 
 
-static void ide_get_params(mess_image *image, int *which_bus, int *which_address,
+static void ide_get_params(const device_config *image, int *which_bus, int *which_address,
 	struct ide_interface **intf,
 	device_init_handler *parent_init,
 	device_load_handler *parent_load,
@@ -47,7 +47,7 @@ static void ide_get_params(mess_image *image, int *which_bus, int *which_address
 	ide_hd_init - Init an IDE hard disk device
 -------------------------------------------------*/
 
-static int ide_hd_init(mess_image *image)
+static int ide_hd_init(const device_config *image)
 {
 	int result, which_bus, which_address;
 	struct ide_interface *intf;
@@ -72,7 +72,7 @@ static int ide_hd_init(mess_image *image)
 	ide_hd_load - Load an IDE hard disk image
 -------------------------------------------------*/
 
-static int ide_hd_load(mess_image *image)
+static int ide_hd_load(const device_config *image)
 {
 	int result, which_bus, which_address;
 	struct ide_interface *intf;
@@ -98,7 +98,7 @@ static int ide_hd_load(mess_image *image)
 	ide_hd_unload - Unload an IDE hard disk image
 -------------------------------------------------*/
 
-static void ide_hd_unload(mess_image *image)
+static void ide_hd_unload(const device_config *image)
 {
 	int which_bus, which_address;
 	struct ide_interface *intf;

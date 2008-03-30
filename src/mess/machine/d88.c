@@ -10,11 +10,11 @@
 
 static d88image     d88image_drives[d88image_MAX_DRIVES];
 
-static void d88image_seek_callback(mess_image *img,int);
-static int d88image_get_sectors_per_track(mess_image *img,int);
-static void d88image_get_id_callback(mess_image *img, chrn_id *, int, int);
-static void d88image_read_sector_data_into_buffer(mess_image *img, int side, int index1, char *ptr, int length);
-static void d88image_write_sector_data_from_buffer(mess_image *img, int side, int index1, const char *ptr, int length,int ddam);
+static void d88image_seek_callback(const device_config *img,int);
+static int d88image_get_sectors_per_track(const device_config *img,int);
+static void d88image_get_id_callback(const device_config *img, chrn_id *, int, int);
+static void d88image_read_sector_data_into_buffer(const device_config *img, int side, int index1, char *ptr, int length);
+static void d88image_write_sector_data_from_buffer(const device_config *img, int side, int index1, const char *ptr, int length,int ddam);
 
 static const floppy_interface d88image_floppy_interface=
 {
@@ -27,7 +27,7 @@ static const floppy_interface d88image_floppy_interface=
 	NULL
 };
 
-static d88image *get_d88image(mess_image *img)
+static d88image *get_d88image(const device_config *img)
 {
 	return &d88image_drives[image_index_in_device(img)];
 }
@@ -164,7 +164,7 @@ static int d88image_seek(d88image * w, UINT8 t, UINT8 h, UINT8 s)
 	return 1;
 }
 
-static void d88image_get_id_callback(mess_image *img, chrn_id *id, int id_index, int side)
+static void d88image_get_id_callback(const device_config *img, chrn_id *id, int id_index, int side)
 {
 	d88image *w = get_d88image(img);
 	d88sect *s = &(w->sects[w->track*2+side][id_index]);
@@ -178,7 +178,7 @@ static void d88image_get_id_callback(mess_image *img, chrn_id *id, int id_index,
 	id->flags = s->flags;
 }
 
-static int d88image_get_sectors_per_track(mess_image *img, int side)
+static int d88image_get_sectors_per_track(const device_config *img, int side)
 {
 	d88image *w = get_d88image(img);
 
@@ -192,13 +192,13 @@ static int d88image_get_sectors_per_track(mess_image *img, int side)
 	return w->num_sects[w->track*2+side];
 }
 
-static void d88image_seek_callback(mess_image *img, int physical_track)
+static void d88image_seek_callback(const device_config *img, int physical_track)
 {
 	d88image *w = get_d88image(img);
 	w->track = physical_track;
 }
 
-static void d88image_write_sector_data_from_buffer(mess_image *img, int side, int index1, const char *ptr, int length, int ddam)
+static void d88image_write_sector_data_from_buffer(const device_config *img, int side, int index1, const char *ptr, int length, int ddam)
 {
 	d88image *w = get_d88image(img);
 	d88sect *s = &(w->sects[w->track*2+side][index1]);
@@ -211,7 +211,7 @@ static void d88image_write_sector_data_from_buffer(mess_image *img, int side, in
 	s->flags = ddam ? ID_FLAG_DELETED_DATA : 0;
 }
 
-static void d88image_read_sector_data_into_buffer(mess_image *img, int side, int index1, char *ptr, int length)
+static void d88image_read_sector_data_into_buffer(const device_config *img, int side, int index1, char *ptr, int length)
 {
 	d88image *w = get_d88image(img);
 

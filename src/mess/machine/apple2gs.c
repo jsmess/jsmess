@@ -147,7 +147,7 @@ static UINT8 apple2gs_mouse_x;
 static UINT8 apple2gs_mouse_y;
 static INT8 apple2gs_mouse_dx;
 static INT8 apple2gs_mouse_dy;
-static mess_image *apple2gs_cur_slot6_image;
+static const device_config *apple2gs_cur_slot6_image;
 static emu_timer *apple2gs_scanline_timer;
 static emu_timer *apple2gs_clock_timer;
 static emu_timer *apple2gs_qsecond_timer;

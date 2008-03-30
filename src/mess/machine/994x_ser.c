@@ -51,12 +51,12 @@ static int led;		// a.k.a. flag3
 static int pio_out_buffer;
 static int pio_in_buffer;
 
-static mess_image *pio_fp;
+static const device_config *pio_fp;
 static int pio_readable;
 static int pio_writable;
 static int pio_write = 1/*0*/;	// 1 if image is to be written to
 
-static mess_image *rs232_fp;
+static const device_config *rs232_fp;
 
 static const ti99_peb_card_handlers_t rs232_handlers =
 {

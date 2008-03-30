@@ -24,7 +24,7 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 	const struct IODevice *dev;
-	mess_image *image;
+	const device_config *image;
 	const char *dev_instance;
 	const char *working_directory;
 
@@ -65,7 +65,7 @@ static void device_dirs_save(int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 	const struct IODevice *dev;
-	mess_image *image;
+	const device_config *image;
 	const char *dev_instance;
 
 	/* only care about game-specific data */

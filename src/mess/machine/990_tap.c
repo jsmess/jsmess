@@ -39,7 +39,7 @@ static void update_interrupt(void);
 
 typedef struct tape_unit_t
 {
-	mess_image *img;		/* image descriptor */
+	const device_config *img;		/* image descriptor */
 	unsigned int bot : 1;	/* TRUE if we are at the beginning of tape */
 	unsigned int eot : 1;	/* TRUE if we are at the end of tape */
 	unsigned int wp : 1;	/* TRUE if tape is write-protected */

@@ -54,7 +54,7 @@ static UINT8 *c16_memory_24000;
 static UINT8 *c16_memory_28000;
 static UINT8 *c16_memory_2c000;
 
-static int c16_rom_load(mess_image *img);
+static int c16_rom_load(const device_config *img);
 
 /**
   ddr bit 1 port line is output
@@ -555,13 +555,13 @@ MACHINE_RESET( c16 )
 
 	for (i = 0; i < 2; i++)
 	{
-		mess_image *image = image_from_devtype_and_index(IO_CARTSLOT, i);
+		const device_config *image = image_from_devtype_and_index(IO_CARTSLOT, i);
 		if (image_exists(image))
 			c16_rom_load(image);
 	}
 }
 
-static int c16_rom_id(mess_image *image)
+static int c16_rom_id(const device_config *image)
 {
     /* magic lowrom at offset 7: $43 $42 $4d */
 	/* if at offset 6 stands 1 it will immediatly jumped to offset 0 (0x8000) */
@@ -600,7 +600,7 @@ DEVICE_LOAD(c16_rom)
 	return (!c16_rom_id(image)) ? INIT_FAIL : INIT_PASS;
 }
 
-static int c16_rom_load(mess_image *image)
+static int c16_rom_load(const device_config *image)
 {
 	UINT8 *mem = memory_region (REGION_CPU1);
 	int size, read_;

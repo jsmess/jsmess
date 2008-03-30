@@ -13,7 +13,7 @@
 #include "mslegacy.h"
 #include "devices/cassette.h"
 
-void tapecontrol_gettime(char *timepos, size_t timepos_size, mess_image *img, int *curpos, int *endpos)
+void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config *img, int *curpos, int *endpos)
 {
 	double t0, t1;
 
@@ -37,7 +37,7 @@ int tapecontrol(int selected)
 	char timepos[32];
 	ui_menu_item menu_item[40];
 	char name[64];
-	mess_image *img;
+	const device_config *img;
 
 	int sel;
 	int total;

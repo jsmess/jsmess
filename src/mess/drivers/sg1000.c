@@ -505,7 +505,7 @@ static void sf7000_fdc_interrupt(int state)
 	sf7000_fdc_int = state;
 }
 
-static void sf7000_fdc_index_callback(mess_image *img, int state)
+static void sf7000_fdc_index_callback(const device_config *img, int state)
 {
 	sf7000_fdc_index = state;
 }

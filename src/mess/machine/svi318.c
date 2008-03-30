@@ -380,7 +380,7 @@ static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 
 static WRITE8_HANDLER( svi318_fdc_density_side_w )
 {
-	mess_image *image;
+	const device_config *image;
 
 	wd17xx_set_density(data & 0x01 ? DEN_FM_LO:DEN_MFM_LO);
 

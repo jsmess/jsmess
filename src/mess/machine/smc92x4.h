@@ -41,8 +41,8 @@ typedef struct smc92x4_intf
 	void (*int_callback)(int which, int state);
 } smc92x4_intf;
 
-int smc92x4_hd_load(mess_image *image, int disk_unit);
-void smc92x4_hd_unload(mess_image *image, int disk_unit);
+int smc92x4_hd_load(const device_config *image, int disk_unit);
+void smc92x4_hd_unload(const device_config *image, int disk_unit);
 
 void smc92x4_init(int which, const smc92x4_intf *intf);
 void smc92x4_reset(int which);

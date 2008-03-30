@@ -31,8 +31,8 @@ struct _mess_flopimg
 {
 	floppy_image *floppy;
 	int track;
-	void (*unload_proc)(mess_image *image);
-	int (*tracktranslate_proc)(mess_image *image, floppy_image *floppy, int physical_track);
+	void (*unload_proc)(const device_config *image);
+	int (*tracktranslate_proc)(const device_config *image, floppy_image *floppy, int physical_track);
 };
 
 
@@ -64,21 +64,21 @@ static const floppy_error_map errmap[] =
     IMPLEMENTATION
 ***************************************************************************/
 
-static mess_flopimg *get_flopimg(mess_image *image)
+static mess_flopimg *get_flopimg(const device_config *image)
 {
 	return (mess_flopimg *) image_lookuptag(image, FLOPPY_TAG);
 }
 
 
 
-floppy_image *flopimg_get_image(mess_image *image)
+floppy_image *flopimg_get_image(const device_config *image)
 {
 	return get_flopimg(image)->floppy;
 }
 
 
 
-static void flopimg_seek_callback(mess_image *image, int physical_track)
+static void flopimg_seek_callback(const device_config *image, int physical_track)
 {
 	mess_flopimg *flopimg;
 
@@ -95,7 +95,7 @@ static void flopimg_seek_callback(mess_image *image, int physical_track)
 
 
 
-static int flopimg_get_sectors_per_track(mess_image *image, int side)
+static int flopimg_get_sectors_per_track(const device_config *image, int side)
 {
 	mess_flopimg *flopimg;
 	floperr_t err;
@@ -113,7 +113,7 @@ static int flopimg_get_sectors_per_track(mess_image *image, int side)
 
 
 
-static void flopimg_get_id_callback(mess_image *image, chrn_id *id, int id_index, int side)
+static void flopimg_get_id_callback(const device_config *image, chrn_id *id, int id_index, int side)
 {
 	mess_flopimg *flopimg;
 	int cylinder, sector, N;
@@ -148,7 +148,7 @@ static void log_readwrite(const char *name, int head, int track, int sector, con
 
 
 
-static void flopimg_read_sector_data_into_buffer(mess_image *image, int side, int index1, char *ptr, int length)
+static void flopimg_read_sector_data_into_buffer(const device_config *image, int side, int index1, char *ptr, int length)
 {
 	mess_flopimg *flopimg;
 
@@ -164,7 +164,7 @@ static void flopimg_read_sector_data_into_buffer(mess_image *image, int side, in
 
 
 
-static void flopimg_write_sector_data_from_buffer(mess_image *image, int side, int index1, const char *ptr, int length,int ddam)
+static void flopimg_write_sector_data_from_buffer(const device_config *image, int side, int index1, const char *ptr, int length,int ddam)
 {
 	mess_flopimg *flopimg;
 
@@ -180,7 +180,7 @@ static void flopimg_write_sector_data_from_buffer(mess_image *image, int side, i
 
 
 
-static void flopimg_read_track_data_info_buffer(mess_image *image, int side, void *ptr, int *length)
+static void flopimg_read_track_data_info_buffer(const device_config *image, int side, void *ptr, int *length)
 {
 	mess_flopimg *flopimg;
 
@@ -193,7 +193,7 @@ static void flopimg_read_track_data_info_buffer(mess_image *image, int side, voi
 
 
 
-static void flopimg_write_track_data_info_buffer(mess_image *image, int side, const void *ptr, int *length)
+static void flopimg_write_track_data_info_buffer(const device_config *image, int side, const void *ptr, int *length)
 {
 	mess_flopimg *flopimg;
 
@@ -222,22 +222,22 @@ static const floppy_interface mess_floppy_interface =
 
 static int image_fseek_thunk(void *file, INT64 offset, int whence)
 {
-	return image_fseek((mess_image *) file, offset, whence);
+	return image_fseek((const device_config *) file, offset, whence);
 }
 
 static size_t image_fread_thunk(void *file, void *buffer, size_t length)
 {
-	return image_fread((mess_image *) file, buffer, length);
+	return image_fread((const device_config *) file, buffer, length);
 }
 
 static size_t image_fwrite_thunk(void *file, const void *buffer, size_t length)
 {
-	return image_fwrite((mess_image *) file, buffer, length);
+	return image_fwrite((const device_config *) file, buffer, length);
 }
 
 static UINT64 image_fsize_thunk(void *file)
 {
-	return image_length((mess_image *) file);
+	return image_length((const device_config *) file);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -266,7 +266,7 @@ static DEVICE_INIT( floppy )
 
 
 
-static int internal_floppy_device_load(mess_image *image, int create_format, option_resolution *create_args)
+static int internal_floppy_device_load(const device_config *image, int create_format, option_resolution *create_args)
 {
 	floperr_t err;
 	mess_flopimg *flopimg;
@@ -367,7 +367,7 @@ static DEVICE_UNLOAD( floppy )
  *
  *************************************/
 
-void floppy_install_unload_proc(mess_image *image, void (*proc)(mess_image *image))
+void floppy_install_unload_proc(const device_config *image, void (*proc)(const device_config *image))
 {
 	mess_flopimg *flopimg;
 	flopimg = image_lookuptag(image, FLOPPY_TAG);
@@ -376,7 +376,7 @@ void floppy_install_unload_proc(mess_image *image, void (*proc)(mess_image *imag
 
 
 
-void floppy_install_tracktranslate_proc(mess_image *image, int (*proc)(mess_image *image, floppy_image *floppy, int physical_track))
+void floppy_install_tracktranslate_proc(const device_config *image, int (*proc)(const device_config *image, floppy_image *floppy, int physical_track))
 {
 	mess_flopimg *flopimg;
 	flopimg = image_lookuptag(image, FLOPPY_TAG);

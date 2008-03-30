@@ -1183,7 +1183,7 @@ static UINT8 corvus_format_drive(UINT8 *pattern, UINT16 len) {
 //
 static hard_disk_file *corvus_hdc_file(int id) {
 
-	mess_image *img;
+	const device_config *img;
 
 	img = image_from_devtype_and_index(IO_HARDDISK, id);
 	if (!image_exists(img))

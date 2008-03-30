@@ -19,8 +19,8 @@ extern "C" {
 #define MAX_PRINTER	(4)
 
 
-int printer_status(mess_image *img, int newstatus);
-void printer_output(mess_image *img, int data);
+int printer_status(const device_config *img, int newstatus);
+void printer_output(const device_config *img, int data);
 
 void printer_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 

@@ -29,7 +29,7 @@ struct pc_fdc_interface
 	NEC765_VERSION nec765_type;
 	void (*pc_fdc_interrupt)(int);
 	void (*pc_fdc_dma_drq)(int,int);
-	mess_image *(*get_image)(int floppy_index);
+	const device_config *(*get_image)(int floppy_index);
 };
 
 

@@ -41,7 +41,7 @@ static void BuildCRCTable(void)
 	{
 		for(deviceID = 0; deviceID < device_count(deviceType); deviceID++)
 		{
-			mess_image *img = image_from_devtype_and_index(deviceType, deviceID);
+			const device_config *img = image_from_devtype_and_index(deviceType, deviceID);
 			if (image_exists(img))
 			{
 				UINT32	crc = image_crc(img);

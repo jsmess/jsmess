@@ -586,7 +586,7 @@ static void msm8251_receive_character(UINT8 ch)
 
 /* initialise transfer using serial device - set the callback which will
 be called when serial device has updated it's state */
-void msm8251_connect_to_serial_device(mess_image *image)
+void msm8251_connect_to_serial_device(const device_config *image)
 {
 	serial_device_connect(image, &uart.connection);
 }

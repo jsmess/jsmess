@@ -128,7 +128,7 @@ WRITE8_HANDLER( mtx_cst_w )
  *
  *************************************/
 
-static mess_image *mtx_printer_image(void)
+static const device_config *mtx_printer_image(void)
 {
 	return image_from_devtype_and_index(IO_PRINTER, 0);
 }

@@ -30,7 +30,7 @@ static int parse_rom_name(const rom_entry *roment, int *position, const char **e
 
 
 
-static int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, mess_image *image)
+static int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, const device_config *image)
 {
 	UINT32 region, flags;
 	offs_t offset, length, read_length, pos = 0, len;
@@ -111,7 +111,7 @@ static int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, mess
 
 
 
-static int process_cartridge(mess_image *image, mess_image *file)
+static int process_cartridge(const device_config *image, const device_config *file)
 {
 	const rom_entry *romrgn, *roment;
 	int position = 0, result;

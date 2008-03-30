@@ -38,11 +38,11 @@ static int fmt[NDSK] = {0,};		/* index of disk formats */
 static int mode[NDSK] = {0,};		/* 0 read only, !0 read/write */
 static int bdos_trk[NDSK] = {0,};	/* BDOS track number */
 static int bdos_sec[NDSK] = {0,};	/* BDOS sector number */
-static mess_image *fp[NDSK] = {NULL, };	/* image file pointer */
+static const device_config *fp[NDSK] = {NULL, };	/* image file pointer */
 static int ff[NDSK] = {0, };            /* image filenames specified flags */
 static mame_file *lp = NULL; 			/* list file handle (ie. PIP LST:=X:FILE.EXT) */
-//static mess_image *pp = NULL;			/* punch file handle (ie. PIP PUN:=X:FILE.EXT) */
-//static mess_image *rp = NULL;			/* reader file handle (ie. PIP X:FILE.EXE=RDR:) */
+//static const device_config *pp = NULL;			/* punch file handle (ie. PIP PUN:=X:FILE.EXT) */
+//static const device_config *rp = NULL;			/* reader file handle (ie. PIP X:FILE.EXE=RDR:) */
 static int dma = 0; 				/* DMA transfer address */
 
 static UINT8 zeropage0[8] =

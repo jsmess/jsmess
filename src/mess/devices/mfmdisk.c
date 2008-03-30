@@ -13,11 +13,11 @@
 #include "flopdrv.h"
 
 
-static void mfm_disk_seek_callback(mess_image *image, int);
-static int mfm_disk_get_sectors_per_track(mess_image *image, int);
-static void mfm_disk_get_id_callback(mess_image *image, chrn_id *, int, int);
-static void mfm_disk_read_sector_data_into_buffer(mess_image *image, int side, int index1, char *ptr, int length);
-static void mfm_disk_write_sector_data_from_buffer(mess_image *image, int side, int index1, const char *ptr, int length,int ddam);
+static void mfm_disk_seek_callback(const device_config *image, int);
+static int mfm_disk_get_sectors_per_track(const device_config *image, int);
+static void mfm_disk_get_id_callback(const device_config *image, chrn_id *, int, int);
+static void mfm_disk_read_sector_data_into_buffer(const device_config *image, int side, int index1, char *ptr, int length);
+static void mfm_disk_write_sector_data_from_buffer(const device_config *image, int side, int index1, const char *ptr, int length,int ddam);
 
 const floppy_interface mfm_disk_floppy_interface =
 {
@@ -102,7 +102,7 @@ static struct mfm_disk_info	mfm_disks[MAX_MFM_DISK];
   deleted data mark and data in the sector field!
 */
 
-static struct mfm_disk_info *get_disk(mess_image *image)
+static struct mfm_disk_info *get_disk(const device_config *image)
 {
 	int disk = image_index_in_device(image);
 	return &mfm_disks[disk];
@@ -110,7 +110,7 @@ static struct mfm_disk_info *get_disk(mess_image *image)
 
 /* TODO: Error checking if a id is found at very end of track, or a sector which
 goes over end of track */
-static void mfm_info_cache_sector_info(mess_image *image,unsigned char *pTrackPtr, unsigned long Length)
+static void mfm_info_cache_sector_info(const device_config *image,unsigned char *pTrackPtr, unsigned long Length)
 {
 	/* initialise these with single density values if single density */
 	unsigned char IdMark = 0x0fe;
@@ -190,7 +190,7 @@ static void mfm_info_cache_sector_info(mess_image *image,unsigned char *pTrackPt
 
 }
 
-static unsigned long mfm_disk_get_track_size(mess_image *image)
+static unsigned long mfm_disk_get_track_size(const device_config *image)
 {
 	struct mfm_disk_info *pDisk = get_disk(image);
 	switch (pDisk->Density)
@@ -206,7 +206,7 @@ static unsigned long mfm_disk_get_track_size(mess_image *image)
 }
 
 
-static unsigned char *mfm_disk_get_track_ptr(mess_image *image, int track, int side)
+static unsigned char *mfm_disk_get_track_ptr(const device_config *image, int track, int side)
 {
 	struct mfm_disk_info *pDisk = get_disk(image);
 
@@ -327,7 +327,7 @@ DEVICE_LOAD( mfm_disk )
 }
 
 /* cache info about track */
-static void mfm_disk_cache_data(mess_image *image, int track, int side)
+static void mfm_disk_cache_data(const device_config *image, int track, int side)
 {
 	struct mfm_disk_info *mfm_disk = get_disk(image);
 
@@ -345,7 +345,7 @@ static void mfm_disk_cache_data(mess_image *image, int track, int side)
 
 
 
-static void mfm_disk_get_id_callback(mess_image *image, chrn_id *id, int id_index, int side)
+static void mfm_disk_get_id_callback(const device_config *image, chrn_id *id, int id_index, int side)
 {
 	struct mfm_disk_info *mfm_disk = get_disk(image);
 
@@ -369,7 +369,7 @@ static void mfm_disk_get_id_callback(mess_image *image, chrn_id *id, int id_inde
 	}
 }
 
-static int mfm_disk_get_sectors_per_track(mess_image *image, int side)
+static int mfm_disk_get_sectors_per_track(const device_config *image, int side)
 {
 	struct mfm_disk_info *mfm_disk = get_disk(image);
 
@@ -385,7 +385,7 @@ static int mfm_disk_get_sectors_per_track(mess_image *image, int side)
 	return mfm_disk->NumSectors;
 }
 
-static void mfm_disk_seek_callback(mess_image *image, int physical_track)
+static void mfm_disk_seek_callback(const device_config *image, int physical_track)
 {
 	struct mfm_disk_info *mfm_disk = get_disk(image);
 	mfm_disk->CurrentTrack = physical_track;
@@ -393,7 +393,7 @@ static void mfm_disk_seek_callback(mess_image *image, int physical_track)
 
 /* reading and writing are not clever, they need to be so that the data is correctly written back
 to the image */
-static void mfm_disk_write_sector_data_from_buffer(mess_image *image, int side, int index1, const char *ptr, int length, int ddam)
+static void mfm_disk_write_sector_data_from_buffer(const device_config *image, int side, int index1, const char *ptr, int length, int ddam)
 {
 	struct mfm_disk_info *mfm_disk = get_disk(image);
 	unsigned char *pSectorPtr;
@@ -405,7 +405,7 @@ static void mfm_disk_write_sector_data_from_buffer(mess_image *image, int side, 
 	memcpy(pSectorPtr, ptr, length);
 }
 
-static void mfm_disk_read_sector_data_into_buffer(mess_image *image, int side, int index1, char *ptr, int length)
+static void mfm_disk_read_sector_data_into_buffer(const device_config *image, int side, int index1, char *ptr, int length)
 {
 	struct mfm_disk_info *mfm_disk = get_disk(image);
 	unsigned char *pSectorPtr;

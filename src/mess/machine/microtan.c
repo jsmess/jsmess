@@ -143,7 +143,7 @@ static void microtan_set_irq_line(running_machine *machine)
     cpunum_set_input_line(machine, 0, 0, via_0_irq_line | via_1_irq_line | kbd_irq_line);
 }
 
-static mess_image *cassette_device_image(void)
+static const device_config *cassette_device_image(void)
 {
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }

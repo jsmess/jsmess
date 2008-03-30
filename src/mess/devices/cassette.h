@@ -43,17 +43,17 @@ typedef enum
 } cassette_state;
 
 /* cassette prototypes */
-cassette_state cassette_get_state(mess_image *cassette);
-void cassette_set_state(mess_image *cassette, cassette_state state);
-void cassette_change_state(mess_image *cassette, cassette_state state, cassette_state mask);
+cassette_state cassette_get_state(const device_config *cassette);
+void cassette_set_state(const device_config *cassette, cassette_state state);
+void cassette_change_state(const device_config *cassette, cassette_state state, cassette_state mask);
 
-double cassette_input(mess_image *cassette);
-void cassette_output(mess_image *cassette, double value);
+double cassette_input(const device_config *cassette);
+void cassette_output(const device_config *cassette, double value);
 
-cassette_image *cassette_get_image(mess_image *cassette);
-double cassette_get_position(mess_image *cassette);
-double cassette_get_length(mess_image *cassette);
-void cassette_seek(mess_image *cassette, double time, int origin);
+cassette_image *cassette_get_image(const device_config *cassette);
+double cassette_get_position(const device_config *cassette);
+double cassette_get_length(const device_config *cassette);
+void cassette_seek(const device_config *cassette, double time, int origin);
 
 /* device specification */
 void cassette_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);

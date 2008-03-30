@@ -44,7 +44,7 @@ typedef struct
 	UINT8  cur_track;
 
 	/* for write-back */
-	mess_image* image;
+	const device_config* image;
 	UINT8       has_changed;
 
 } thom_floppy_drive;
@@ -200,14 +200,14 @@ static void thom_floppy_show ( thom_floppy_drive* d )
 
 
 
-static thom_floppy_drive* thom_floppy_drive_of_image ( mess_image *image )
+static thom_floppy_drive* thom_floppy_drive_of_image ( const device_config *image )
 {
 	return thom_floppy_drives + image_index_in_device( image );
 }
 
 
 
-static void thom_floppy_seek ( mess_image *image, int physical_track )
+static void thom_floppy_seek ( const device_config *image, int physical_track )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	thom_floppy_active( 0 );
@@ -221,7 +221,7 @@ static void thom_floppy_seek ( mess_image *image, int physical_track )
 
 
 
-static int thom_floppy_get_sectors_per_track( mess_image *image, int side )
+static int thom_floppy_get_sectors_per_track( const device_config *image, int side )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	VLOG(( "thom_floppy_get_sectors_per_track: track=%i/%i dens=%s/%s\n", d->cur_track, d->tracks,
@@ -232,7 +232,7 @@ static int thom_floppy_get_sectors_per_track( mess_image *image, int side )
 
 
 
-static void thom_floppy_get_id ( mess_image* image, chrn_id* id,
+static void thom_floppy_get_id ( const device_config* image, chrn_id* id,
 				 int id_index, int physical_side )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
@@ -278,7 +278,7 @@ static void thom_floppy_get_id ( mess_image* image, chrn_id* id,
 
 
 
-static void thom_floppy_read_sector_data_into_buffer ( mess_image* image, int side, int index1, char *ptr, int length )
+static void thom_floppy_read_sector_data_into_buffer ( const device_config* image, int side, int index1, char *ptr, int length )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	UINT8* src = thom_floppy_sector_ptr( d, index1, d->cur_track, 0 );
@@ -295,7 +295,7 @@ static void thom_floppy_read_sector_data_into_buffer ( mess_image* image, int si
 
 
 
-static void thom_floppy_write_sector_data_from_buffer ( mess_image *image, int side, int data_id,  const char *ptr, int length, int ddam )
+static void thom_floppy_write_sector_data_from_buffer ( const device_config *image, int side, int data_id,  const char *ptr, int length, int ddam )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	UINT8* dst = thom_floppy_sector_ptr( d, data_id, d->cur_track, 0 );
@@ -315,7 +315,7 @@ static void thom_floppy_write_sector_data_from_buffer ( mess_image *image, int s
 
 
 
-static void thom_floppy_format_sector ( mess_image *image, int side, int sector_index, int c, int h, int r, int n, int filler )
+static void thom_floppy_format_sector ( const device_config *image, int side, int sector_index, int c, int h, int r, int n, int filler )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	int sector_size = 128 << n;
@@ -371,7 +371,7 @@ static const floppy_interface thom_floppy_interface =
 /*********************** .fd format ************************/
 
 
-static int thom_floppy_fd_load ( mess_image* image )
+static int thom_floppy_fd_load ( const device_config* image )
 {
 	thom_floppy_drive* d = thom_floppy_drives + image_index_in_device( image );
 	int size = image_length( image );
@@ -462,7 +462,7 @@ error:
 
 
 
-static void thom_floppy_fd_save ( mess_image* image )
+static void thom_floppy_fd_save ( const device_config* image )
 {
 	thom_floppy_drive* d = thom_floppy_drives + image_index_in_device( image );
 	unsigned size = d->sides * d->tracks * d->sectors * d->sector_size;
@@ -489,7 +489,7 @@ static void thom_floppy_fd_save ( mess_image* image )
 */
 
 
-static int thom_floppy_qd_load ( mess_image* image )
+static int thom_floppy_qd_load ( const device_config* image )
 {
 	thom_floppy_drive* d = thom_floppy_drives + image_index_in_device( image );
 	int size = image_length( image );
@@ -542,7 +542,7 @@ error:
 
 
 
-static void thom_floppy_qd_save ( mess_image* image )
+static void thom_floppy_qd_save ( const device_config* image )
 {
 	thom_floppy_drive* d = thom_floppy_drives + image_index_in_device( image );
 	unsigned size = d->sides * d->tracks * d->sectors * d->sector_size;
@@ -593,7 +593,7 @@ static UINT16 thom_sap_crc( UINT8* data, int size )
 
 
 /* TODO: protection */
-static int thom_floppy_sap_load ( mess_image* image )
+static int thom_floppy_sap_load ( const device_config* image )
 {
 	int drive = image_index_in_device( image );
 	thom_floppy_drive* d = thom_floppy_drives + drive;
@@ -712,7 +712,7 @@ error:
 
 
 
-static void thom_floppy_sap_save ( mess_image* image )
+static void thom_floppy_sap_save ( const device_config* image )
 {
 	thom_floppy_drive* d = thom_floppy_drives + image_index_in_device( image );
 	unsigned size = d->sides * d->tracks * d->sectors * d->sector_size;
@@ -782,7 +782,7 @@ static void thom_floppy_reset ( thom_floppy_drive* d )
 
 
 
-int thom_floppy_init ( mess_image *image )
+int thom_floppy_init ( const device_config *image )
 {
 	thom_qdd_compute_map();
 	thom_floppy_reset( thom_floppy_drive_of_image( image  ) );
@@ -791,7 +791,7 @@ int thom_floppy_init ( mess_image *image )
 
 
 
-int thom_floppy_load ( mess_image* image )
+int thom_floppy_load ( const device_config* image )
 {
 	const char* typ = image_filetype( image );
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
@@ -817,7 +817,7 @@ int thom_floppy_load ( mess_image* image )
 
 
 
-void thom_floppy_unload ( mess_image *image )
+void thom_floppy_unload ( const device_config *image )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	const char* typ = image_filetype( image );
@@ -835,7 +835,7 @@ void thom_floppy_unload ( mess_image *image )
 
 
 
-int  thom_floppy_create ( mess_image *image, int create_format, option_resolution *args )
+int  thom_floppy_create ( const device_config *image, int create_format, option_resolution *args )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	const char* typ = image_filetype( image );

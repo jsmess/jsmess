@@ -306,7 +306,7 @@ static int lynx_verify_cart (char *header)
 	return IMAGE_VERIFY_PASS;
 }
 
-static void lynx_crc_keyword(mess_image *image)
+static void lynx_crc_keyword(const device_config *image)
 {
     const char *info;
 

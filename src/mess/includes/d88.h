@@ -30,7 +30,7 @@ typedef struct {
 
 typedef struct
 {
-	mess_image	*image_file;			/* file handle for disc image */
+	const device_config	*image_file;			/* file handle for disc image */
 	int 	mode;				/* open mode == 0 read only, != 0 read/write */
 	unsigned long image_size;		/* size of image file */
 

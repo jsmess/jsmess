@@ -75,7 +75,7 @@ enum
 /* disk drive unit descriptor */
 typedef struct hd_unit_t
 {
-	mess_image *img;						/* image descriptor */
+	const device_config *img;						/* image descriptor */
 	enum { format_mame, format_old } format;
 	hard_disk_file *hd_handle;		/* mame hard disk descriptor - only if format == format_mame */
 	unsigned int wp : 1;					/* TRUE if disk is write-protected */

@@ -39,7 +39,7 @@ typedef struct {
 	int dir;
 	int wprot;
 	int disk_changed;
-	mess_image *f;
+	const device_config *f;
 	UINT32 extinfo[MAX_TRACKS];
 	UINT32 extoffs[MAX_TRACKS];
 	int is_ext_image;

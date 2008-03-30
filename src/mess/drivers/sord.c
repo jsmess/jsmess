@@ -191,7 +191,7 @@ static MACHINE_RESET( sord_m5_fd5 )
 }
 
 
-static mess_image *cassette_device_image(void)
+static const device_config *cassette_device_image(void)
 {
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }

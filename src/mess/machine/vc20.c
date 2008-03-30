@@ -577,7 +577,7 @@ MACHINE_RESET( vc20 )
 	via_0_ca1_w(machine, 0, vc20_via0_read_ca1(machine, 0) );
 }
 
-static int vc20_rom_id(mess_image *image)
+static int vc20_rom_id(const device_config *image)
 {
 	static const unsigned char magic[] =
 	{0x41, 0x30, 0x20, 0xc3, 0xc2, 0xcd};	/* A0 CBM at 0xa004 (module offset 4) */

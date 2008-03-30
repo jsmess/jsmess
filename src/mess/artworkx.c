@@ -27,7 +27,7 @@ static char *override_artfile;
 
 /**************************************************************************/
 
-void artwork_use_device_art(mess_image *img, const char *defaultartfile)
+void artwork_use_device_art(const device_config *img, const char *defaultartfile)
 {
 	const char *strs[3];
 	int len, pos, i;

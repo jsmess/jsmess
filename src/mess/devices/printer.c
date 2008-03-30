@@ -7,7 +7,7 @@
 #include "printer.h"
 
 
-int printer_status(mess_image *img, int newstatus)
+int printer_status(const device_config *img, int newstatus)
 {
 	/* if there is a file attached to it, it's online */
 	return image_exists(img) != 0;
@@ -15,7 +15,7 @@ int printer_status(mess_image *img, int newstatus)
 
 
 
-void printer_output(mess_image *img, int data)
+void printer_output(const device_config *img, int data)
 {
 	if (image_exists(img))
 	{

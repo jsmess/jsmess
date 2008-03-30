@@ -79,7 +79,7 @@ struct mess_hd
 	hard_disk_file *hard_disk_handle;
 };
 
-static struct mess_hd *get_drive(mess_image *img)
+static struct mess_hd *get_drive(const device_config *img)
 {
 	return image_lookuptag(img, MESSHDTAG);
 }
@@ -118,7 +118,7 @@ DEVICE_INIT( mess_hd )
  *
  *************************************/
 
-static int internal_load_mess_hd(mess_image *image, const char *metadata)
+static int internal_load_mess_hd(const device_config *image, const char *metadata)
 {
 	chd_error err = 0;
 	struct mess_hd *hd;
@@ -234,7 +234,7 @@ DEVICE_UNLOAD( mess_hd )
  *
  *************************************/
 
-hard_disk_file *mess_hd_get_hard_disk_file(mess_image *image)
+hard_disk_file *mess_hd_get_hard_disk_file(const device_config *image)
 {
 	struct mess_hd *hd = get_drive(image);
 	return hd->hard_disk_handle;
@@ -249,7 +249,7 @@ hard_disk_file *mess_hd_get_hard_disk_file(mess_image *image)
  *
  *************************************/
 
-chd_file *mess_hd_get_chd_file(mess_image *image)
+chd_file *mess_hd_get_chd_file(const device_config *image)
 {
 	chd_file *result = NULL;
 	hard_disk_file *hd_file;

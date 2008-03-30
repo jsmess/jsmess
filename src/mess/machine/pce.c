@@ -99,7 +99,7 @@ static void pce_cd_set_irq_line( running_machine *machine, int num, int state );
 static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback );
 
 
-static mess_image *cdrom_device_image( void ) {
+static const device_config *cdrom_device_image( void ) {
 	return image_from_devtype_and_index( IO_CDROM, 0 );
 }
 
@@ -517,7 +517,7 @@ static void pce_cd_nec_get_subq( void ) {
 /* 0xDE - GET DIR INFO (NEC) */
 static void pce_cd_nec_get_dir_info( void ) {
 	UINT32 frame, msf, track = 0;
-	mess_image *img = cdrom_device_image();
+	const device_config *img = cdrom_device_image();
 	const cdrom_toc	*toc;
 	logerror("nec get dir info\n");
 

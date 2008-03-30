@@ -184,7 +184,7 @@ static const tms9902reset_param tms9902_params =
 	xmit_callback			/* called when a character is transmitted */
 };
 
-static mess_image *rs232_fp;
+static const device_config *rs232_fp;
 static UINT8 rs232_rts;
 static emu_timer *rs232_input_timer;
 
@@ -552,7 +552,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 5: /* CKON: set DECKCONTROL */
 		LED_state |= 0x20;
 		{
-			mess_image *img = image_from_devtype_and_index(IO_CASSETTE, 0);
+			const device_config *img = image_from_devtype_and_index(IO_CASSETTE, 0);
 			cassette_change_state(img, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
@@ -560,7 +560,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 6: /* CKOF: clear DECKCONTROL */
 		LED_state &= ~0x20;
 		{
-			mess_image *img = image_from_devtype_and_index(IO_CASSETTE, 0);
+			const device_config *img = image_from_devtype_and_index(IO_CASSETTE, 0);
 			cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;

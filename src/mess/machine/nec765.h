@@ -33,7 +33,7 @@ typedef struct nec765_interface
 	void	(*dma_drq)(int state,int read_write);
 
 	/* image lookup */
-	mess_image *(*get_image)(int floppy_index);
+	const device_config *(*get_image)(int floppy_index);
 } nec765_interface;
 
 /* init nec765 interface */

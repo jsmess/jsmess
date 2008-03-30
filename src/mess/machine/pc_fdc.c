@@ -52,7 +52,7 @@ static struct pc_fdc *fdc;
 
 static void pc_fdc_hw_interrupt(int state);
 static void pc_fdc_hw_dma_drq(int,int);
-static mess_image *pc_fdc_get_image(int floppy_index);
+static const device_config *pc_fdc_get_image(int floppy_index);
 
 static const nec765_interface pc_fdc_nec765_interface =
 {
@@ -81,7 +81,7 @@ static void pc_fdc_reset(void)
 void pc_fdc_init(const struct pc_fdc_interface *iface)
 {
 	int i;
-	mess_image *img;
+	const device_config *img;
 
 	/* initialize fdc structure */
 	fdc = auto_malloc(sizeof(*fdc));
@@ -105,9 +105,9 @@ void pc_fdc_init(const struct pc_fdc_interface *iface)
 
 
 
-static mess_image *pc_fdc_get_image(int floppy_index)
+static const device_config *pc_fdc_get_image(int floppy_index)
 {
-	mess_image *image = NULL;
+	const device_config *image = NULL;
 
 	if (!fdc->fdc_interface.get_image)
 	{

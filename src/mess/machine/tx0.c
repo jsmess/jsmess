@@ -21,7 +21,7 @@ static TIMER_CALLBACK(dis_callback);
 /* tape reader registers */
 typedef struct tape_reader_t
 {
-	mess_image *fd;	/* file descriptor of tape image */
+	const device_config *fd;	/* file descriptor of tape image */
 
 	int motor_on;	/* 1-bit reader motor on */
 
@@ -37,7 +37,7 @@ static tape_reader_t tape_reader;
 /* tape puncher registers */
 typedef struct tape_puncher_t
 {
-	mess_image *fd;	/* file descriptor of tape image */
+	const device_config *fd;	/* file descriptor of tape image */
 
 	emu_timer *timer;	/* timer to generate completion pulses */
 } tape_puncher_t;
@@ -48,7 +48,7 @@ static tape_puncher_t tape_puncher;
 /* typewriter registers */
 typedef struct typewriter_t
 {
-	mess_image *fd;	/* file descriptor of output image */
+	const device_config *fd;	/* file descriptor of output image */
 
 	emu_timer *prt_timer;/* timer to generate completion pulses */
 } typewriter_t;
@@ -63,7 +63,7 @@ static emu_timer *dis_timer;
 /* magnetic tape unit registers */
 typedef struct magtape_t
 {
-	mess_image *img;		/* image descriptor */
+	const device_config *img;		/* image descriptor */
 
 	enum
 	{

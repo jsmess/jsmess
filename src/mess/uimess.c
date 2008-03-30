@@ -82,7 +82,7 @@ void mess_ui_update(running_machine *machine)
 	{
 		if (dev->display != NULL)
 		{
-			mess_image *img = image_from_device(dev);
+			const device_config *img = image_from_device(dev);
 			dev->display(img);
 		}
 	}
@@ -111,7 +111,7 @@ int ui_sprintf_image_info(running_machine *machine, char *buf)
 
 	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
-			mess_image *img = image_from_device(dev);
+			const device_config *img = image_from_device(dev);
 		const char *name = image_filename(img);
 		if( name )
 		{

@@ -16,7 +16,7 @@
 struct bitbanger_config
 {
 	/* filter function; returns non-zero if input accepted */
-	int (*filter)(mess_image *img, const int *pulses, int total_pulses, int total_duration);
+	int (*filter)(const device_config *img, const int *pulses, int total_pulses, int total_duration);
 	double pulse_threshhold;			/* the maximum duration pulse that we will consider */
 	double pulse_tolerance;				/* deviation tolerance for pulses */
 	int minimum_pulses;					/* the minimum amount of pulses before we start analyzing */
@@ -33,7 +33,7 @@ enum
 };
 
 void bitbanger_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-void bitbanger_output(mess_image *img, int value);
+void bitbanger_output(const device_config *img, int value);
 
 
 #endif /* BITBNGR_H */

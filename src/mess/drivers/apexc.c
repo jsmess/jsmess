@@ -33,7 +33,7 @@ static MACHINE_START(apexc)
 
 typedef struct cylinder
 {
-	mess_image *fd;
+	const device_config *fd;
 	int writable;
 } cylinder;
 
@@ -142,7 +142,7 @@ static DEVICE_UNLOAD( apexc_cylinder )
 
 typedef struct tape
 {
-	mess_image *fd;
+	const device_config *fd;
 } tape;
 
 static tape apexc_tapes[2];

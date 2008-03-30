@@ -131,7 +131,7 @@ static hfdc_t hfdc[MAX_HFDC];
 */
 static int floppy_read_id(int which, int disk_unit, int head)
 {
-	mess_image *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
+	const device_config *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
 	UINT8 revolution_count;
 	chrn_id id;
 
@@ -163,7 +163,7 @@ static int floppy_read_id(int which, int disk_unit, int head)
 */
 static int floppy_find_sector(int which, int disk_unit, int cylinder, int head, int check_secnum, int sector, int *sector_data_id, int *sector_len)
 {
-	mess_image *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
+	const device_config *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
 	UINT8 revolution_count;
 	chrn_id id;
 
@@ -207,7 +207,7 @@ static int smc92x4_floppy_read_sector(int which, int disk_unit, int cylinder, in
 	int sector_data_id, sector_len;
 	UINT8 buf[MAX_SECTOR_LEN];
 	int i;
-	mess_image *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
+	const device_config *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
 
 	if (! floppy_find_sector(which, disk_unit, cylinder, head, check_secnum, sector, & sector_data_id, & sector_len))
 	{
@@ -229,7 +229,7 @@ static int smc92x4_floppy_write_sector(int which, int disk_unit, int cylinder, i
 	int sector_data_id, sector_len;
 	UINT8 buf[MAX_SECTOR_LEN];
 	int i;
-	mess_image *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
+	const device_config *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
 
 	if (! floppy_find_sector(which, disk_unit, cylinder, head, check_secnum, sector, & sector_data_id, & sector_len))
 	{
@@ -248,13 +248,13 @@ static int smc92x4_floppy_write_sector(int which, int disk_unit, int cylinder, i
 
 static void floppy_step(int which, int disk_unit, int direction)
 {
-	mess_image *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
+	const device_config *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
 	floppy_drive_seek(disk_img, direction);
 }
 
 static UINT8 floppy_get_disk_status(int which, int disk_unit)
 {
-	mess_image *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
+	const device_config *disk_img = image_from_devtype_and_index(IO_FLOPPY, disk_unit);
 	int status = floppy_status(disk_img, -1);
 	int reply;
 
@@ -285,7 +285,7 @@ static struct
 	unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;
 } hd[10];
 
-int smc92x4_hd_load(mess_image *image, int disk_unit)
+int smc92x4_hd_load(const device_config *image, int disk_unit)
 {
 	const hard_disk_info *info;
 
@@ -318,7 +318,7 @@ int smc92x4_hd_load(mess_image *image, int disk_unit)
 	return INIT_FAIL;
 }
 
-void smc92x4_hd_unload(mess_image *image, int disk_unit)
+void smc92x4_hd_unload(const device_config *image, int disk_unit)
 {
 	device_unload_mess_hd(image);
 	hd[disk_unit].hd_handle = NULL;

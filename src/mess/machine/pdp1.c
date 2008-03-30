@@ -79,7 +79,7 @@ enum
 /* tape reader registers */
 typedef struct tape_reader_t
 {
-	mess_image *fd;	/* file descriptor of tape image */
+	const device_config *fd;	/* file descriptor of tape image */
 
 	int motor_on;	/* 1-bit reader motor on */
 
@@ -98,7 +98,7 @@ static tape_reader_t tape_reader;
 /* tape puncher registers */
 typedef struct tape_puncher_t
 {
-	mess_image *fd;	/* file descriptor of tape image */
+	const device_config *fd;	/* file descriptor of tape image */
 
 	emu_timer *timer;	/* timer to generate completion pulses */
 } tape_puncher_t;
@@ -109,7 +109,7 @@ static tape_puncher_t tape_puncher;
 /* typewriter registers */
 typedef struct typewriter_t
 {
-	mess_image *fd;	/* file descriptor of output image */
+	const device_config *fd;	/* file descriptor of output image */
 
 	int tb;			/* typewriter buffer */
 
@@ -129,7 +129,7 @@ static lightpen_t lightpen;
 /* MIT parallel drum (mostly similar to type 23) */
 typedef struct parallel_drum_t
 {
-	mess_image *fd;	/* file descriptor of drum image */
+	const device_config *fd;	/* file descriptor of drum image */
 
 	int il;			/* initial location (12-bit) */
 	int wc;			/* word counter (12-bit) */

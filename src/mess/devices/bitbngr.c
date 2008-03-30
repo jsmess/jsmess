@@ -29,7 +29,7 @@ struct bitbanger_info
 
 static struct bitbanger_info *bitbangers[MAX_PRINTER];
 
-static int bitbanger_init(mess_image *img)
+static int bitbanger_init(const device_config *img)
 {
 	int id = image_index_in_device(img);
 	struct bitbanger_info *bi;
@@ -124,7 +124,7 @@ static TIMER_CALLBACK(bitbanger_overthreshhold)
 
 
 
-void bitbanger_output(mess_image *img, int value)
+void bitbanger_output(const device_config *img, int value)
 {
 	int id = image_index_in_device(img);
 	struct bitbanger_info *bi = bitbangers[id];

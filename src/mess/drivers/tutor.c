@@ -138,7 +138,7 @@ static INTERRUPT_GEN( tutor_vblank_interrupt )
 	TMS9928A_interrupt();
 }
 
-static mess_image *printer_fp(void)
+static const device_config *printer_fp(void)
 {
 	return image_from_devtype_and_index(IO_PARALLEL, 0);
 }

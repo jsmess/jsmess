@@ -42,7 +42,7 @@
 /*************************** I / O **************************/
 
 
-INLINE mess_image* thom_cassette_img( void )
+INLINE const device_config* thom_cassette_img( void )
 { return image_from_devtype_and_index(IO_CASSETTE, 0); }
 
 
@@ -89,7 +89,7 @@ static UINT8* to7_k7_bits;
 */
 int to7_get_cassette ( void )
 {
-	mess_image* img = thom_cassette_img();
+	const device_config* img = thom_cassette_img();
 
 	if ( image_exists( img ) )
 	{
@@ -143,7 +143,7 @@ int to7_get_cassette ( void )
 /* 1-bit cassette output */
 void to7_set_cassette ( int data )
 {
-	mess_image* img = thom_cassette_img();
+	const device_config* img = thom_cassette_img();
 	cassette_output( img, data ? 1. : -1. );
 }
 
@@ -151,7 +151,7 @@ void to7_set_cassette ( int data )
 
 WRITE8_HANDLER ( to7_set_cassette_motor )
 {
-	mess_image* img = thom_cassette_img();
+	const device_config* img = thom_cassette_img();
 	cassette_state state = cassette_get_state( img );
 	double pos = cassette_get_position(img);
 
@@ -190,7 +190,7 @@ WRITE8_HANDLER ( to7_set_cassette_motor )
 
 int mo5_get_cassette ( void )
 {
-	mess_image* img = thom_cassette_img();
+	const device_config* img = thom_cassette_img();
 
 	if ( image_exists( img ) )
 	{
@@ -218,7 +218,7 @@ int mo5_get_cassette ( void )
 
 void mo5_set_cassette ( int data )
 {
-	mess_image* img = thom_cassette_img();
+	const device_config* img = thom_cassette_img();
 	cassette_output( img, data ? 1. : -1. );
 }
 
@@ -226,7 +226,7 @@ void mo5_set_cassette ( int data )
 
 WRITE8_HANDLER ( mo5_set_cassette_motor )
 {
-	mess_image* img = thom_cassette_img();
+	const device_config* img = thom_cassette_img();
 	cassette_state state = cassette_get_state( img );
 	double pos = cassette_get_position(img);
 

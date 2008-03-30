@@ -44,14 +44,14 @@ DEVICE_UNLOAD(basicdsk_floppy);
   80-track drive, FALSE otherwise
 */
 
-void basicdsk_set_geometry(mess_image *img, UINT8 tracks, UINT8 sides, UINT8 sec_per_track, UINT16 sector_length/*, UINT16 dir_sector, UINT16 dir_length*/, UINT8 first_sector_id, UINT16 offset_track_zero, int track_skipping);
+void basicdsk_set_geometry(const device_config *img, UINT8 tracks, UINT8 sides, UINT8 sec_per_track, UINT16 sector_length/*, UINT16 dir_sector, UINT16 dir_length*/, UINT8 first_sector_id, UINT16 offset_track_zero, int track_skipping);
 
-void basicdsk_set_calcoffset(mess_image *img, unsigned long (*calcoffset)(UINT8 t, UINT8 h, UINT8 s,
+void basicdsk_set_calcoffset(const device_config *img, unsigned long (*calcoffset)(UINT8 t, UINT8 h, UINT8 s,
 	UINT8 tracks, UINT8 heads, UINT8 sec_per_track, UINT16 sector_length, UINT8 first_sector_id, UINT16 offset_track_zero));
 
 /* set data mark/deleted data mark for the sector specified. If ddam!=0, the sector will
 have a deleted data mark, if ddam==0, the sector will have a data mark */
-void basicdsk_set_ddam(mess_image *img, UINT8 physical_track, UINT8 physical_side, UINT8 sector_id,UINT8 ddam);
+void basicdsk_set_ddam(const device_config *img, UINT8 physical_track, UINT8 physical_side, UINT8 sector_id,UINT8 ddam);
 
 void legacybasicdsk_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 

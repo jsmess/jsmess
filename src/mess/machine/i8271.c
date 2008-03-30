@@ -46,7 +46,7 @@ static I8271 i8271;
 #define FDC_LOG(x) do { if (VERBOSE) logerror("I8271: %s\n",x); } while (0)
 #define FDC_LOG_COMMAND(x) do { if (VERBOSE) logerror("I8271: COMMAND %s\n",x); } while (0)
 
-static mess_image *current_image(void)
+static const device_config *current_image(void)
 {
 	return image_from_devtype_and_index(IO_FLOPPY, i8271.drive);
 }
@@ -70,7 +70,7 @@ void i8271_init(const i8271_interface *iface)
 
 static void i8271_seek_to_track(int track)
 {
-	mess_image *img = current_image();
+	const device_config *img = current_image();
 
 	if (track==0)
 	{
@@ -550,7 +550,7 @@ static void i8271_do_write(void)
 
 static int i8271_find_sector(void)
 {
-	mess_image *img = current_image();
+	const device_config *img = current_image();
 //	int track_count_attempt;
 
 //	track_count_attempt
@@ -605,7 +605,7 @@ static int i8271_find_sector(void)
 
 static void i8271_command_execute(void)
 {
-	mess_image *img = current_image();
+	const device_config *img = current_image();
 
 	/* clear it = good completion status */
 	/* this will be changed if anything bad happens! */

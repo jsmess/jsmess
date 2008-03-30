@@ -65,7 +65,7 @@ struct mess_cd
 	cdrom_file *cdrom_handle;
 };
 
-static struct mess_cd *get_drive(mess_image *img)
+static struct mess_cd *get_drive(const device_config *img)
 {
 	return image_lookuptag(img, MESSCDTAG);
 }
@@ -119,7 +119,7 @@ static DEVICE_INIT( mess_cd )
  *
  *************************************/
 
-static int internal_load_mess_cd(mess_image *image, const char *metadata)
+static int internal_load_mess_cd(const device_config *image, const char *metadata)
 {
 	chd_error err = 0;
 	struct mess_cd *cd;
@@ -183,7 +183,7 @@ static DEVICE_UNLOAD( mess_cd )
  *
  *************************************/
 
-cdrom_file *mess_cd_get_cdrom_file(mess_image *image)
+cdrom_file *mess_cd_get_cdrom_file(const device_config *image)
 {
 	struct mess_cd *cd = get_drive(image);
 	return cd->cdrom_handle;
@@ -198,7 +198,7 @@ cdrom_file *mess_cd_get_cdrom_file(mess_image *image)
  *
  *************************************/
 
-chd_file *mess_cd_get_chd_file(mess_image *image)
+chd_file *mess_cd_get_chd_file(const device_config *image)
 {
 	return NULL;	// not supported by the src/cdrom.c core at this time
 }

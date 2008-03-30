@@ -483,7 +483,7 @@ WRITE8_HANDLER(acia_6551_w)
 }
 
 
-void acia_6551_connect_to_serial_device(mess_image *image)
+void acia_6551_connect_to_serial_device(const device_config *image)
 {
 	serial_device_connect(image, &acia.connection);
 }

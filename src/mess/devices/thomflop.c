@@ -119,7 +119,7 @@ static int thom_floppy_make_addr( chrn_id id, UINT8* dst, int sector_size )
 
 
 /* build a sector, with header & space */
-static int thom_floppy_make_sector( mess_image* img, chrn_id id, UINT8* dst, int sector_size )
+static int thom_floppy_make_sector( const device_config* img, chrn_id id, UINT8* dst, int sector_size )
 {
 	if ( sector_size == 128 )
 	{
@@ -150,7 +150,7 @@ static int thom_floppy_make_sector( mess_image* img, chrn_id id, UINT8* dst, int
 
 
 /* build a whole track */
-static int thom_floppy_make_track( mess_image* img, UINT8* dst, int sector_size, int side )
+static int thom_floppy_make_track( const device_config* img, UINT8* dst, int sector_size, int side )
 {
 	UINT8 space = ( sector_size == 128 ) ? 0xff : 0;
 	UINT8* org = dst;
@@ -226,7 +226,7 @@ static int thom_qdd_make_addr( int sector, UINT8* dst )
 
 
 /* build a sector, with header */
-static int thom_qdd_make_sector( mess_image* img, int sector, UINT8* dst )
+static int thom_qdd_make_sector( const device_config* img, int sector, UINT8* dst )
 {
 	int i;
 	dst[ 0 ] = 0x5a;
@@ -240,7 +240,7 @@ static int thom_qdd_make_sector( mess_image* img, int sector, UINT8* dst )
 
 
 /* build a whole disk */
-static int thom_qdd_make_disk ( mess_image* img, UINT8* dst )
+static int thom_qdd_make_disk ( const device_config* img, UINT8* dst )
 {
 	UINT8* org = dst;
 	int i;
@@ -340,7 +340,7 @@ static void to7_5p14_reset( void )
 	wd17xx_reset();
 	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
 	{
-		mess_image * img = image_from_devtype_and_index( IO_FLOPPY, i );
+		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_rpm( img, 300. );
 		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
@@ -441,7 +441,7 @@ static void to7_5p14sd_reset( void )
 	mc6843_reset();
 	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
 	{
-		mess_image * img = image_from_devtype_and_index( IO_FLOPPY, i );
+		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_rpm( img, 300. );
 		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
@@ -529,7 +529,7 @@ static struct
 
 
 
-static void to7_qdd_index_pulse_cb ( mess_image* img, int state )
+static void to7_qdd_index_pulse_cb ( const device_config* img, int state )
 {
 	to7qdd->index_pulse = state;
 
@@ -546,7 +546,7 @@ static void to7_qdd_index_pulse_cb ( mess_image* img, int state )
 
 
 
-static mess_image * to7_qdd_image ( void )
+static const device_config * to7_qdd_image ( void )
 {
 	return image_from_devtype_and_index( IO_FLOPPY, 0 );
 }
@@ -729,7 +729,7 @@ static READ8_HANDLER ( to7_qdd_r )
 	case 8: /* floppy status */
 	{
 		UINT8 data = 0;
-		mess_image* img = to7_qdd_image();
+		const device_config* img = to7_qdd_image();
 		if ( ! image_exists( img ) )
 			data |= 0x40; /* disk present */
 		if ( to7qdd->index_pulse )
@@ -847,7 +847,7 @@ static void to7_qdd_reset( void )
 
 	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
 	{
-		mess_image * img = image_from_devtype_and_index( IO_FLOPPY, i );
+		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, to7_qdd_index_pulse_cb );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_motor_state( img, 1 );
@@ -944,7 +944,7 @@ static emu_timer* thmfc_floppy_cmd;
 
 
 
-static mess_image * thmfc_floppy_image ( void )
+static const device_config * thmfc_floppy_image ( void )
 {
 	return image_from_devtype_and_index( IO_FLOPPY, thmfc1->drive );
 }
@@ -958,7 +958,7 @@ static int thmfc_floppy_is_qdd ( void )
 
 
 
-static void thmfc_floppy_index_pulse_cb ( mess_image *img, int state )
+static void thmfc_floppy_index_pulse_cb ( const device_config *img, int state )
 {
 	if ( img != thmfc_floppy_image() )
 		return;
@@ -990,7 +990,7 @@ static void thmfc_floppy_index_pulse_cb ( mess_image *img, int state )
 
 static int thmfc_floppy_find_sector ( chrn_id* dst )
 {
-	mess_image* img = thmfc_floppy_image();
+	const device_config* img = thmfc_floppy_image();
 	chrn_id id;
 	int r = 0;
 
@@ -1034,7 +1034,7 @@ static void thmfc_floppy_cmd_complete(void)
 	if ( thmfc1->op == THMFC1_OP_WRITE_SECT )
 	{
 		/* TODO: detect ddam (?) */
-		mess_image * img = thmfc_floppy_image();
+		const device_config * img = thmfc_floppy_image();
 		floppy_drive_write_sector_data( img, thmfc1->side, thmfc1->sector, thmfc1->data + 3, thmfc1->data_size - 3, 0 );
 	}
 	thmfc1->op = THMFC1_OP_RESET;
@@ -1176,7 +1176,7 @@ static void thmfc_floppy_qdd_write_byte ( UINT8 data )
 			if ( i >= 0 )
 			{
 				/* got an id & a data field => write */
-				mess_image * img = thmfc_floppy_image();
+				const device_config * img = thmfc_floppy_image();
 				int sector = (int) thmfc1->data[ i + 1 ] * 256 +
 					(int) thmfc1->data[ i + 2 ];
 
@@ -1236,7 +1236,7 @@ static void thmfc_floppy_format_byte ( UINT8 data )
 			if ( !memcmp ( thmfc1->data, header, sizeof( header ) ) )
 			{
 				/* got id field => format */
-				mess_image * img = thmfc_floppy_image();
+				const device_config * img = thmfc_floppy_image();
 				UINT8 track  = thmfc1->data[4];
 				UINT8 side   = thmfc1->data[5];
 				UINT8 sector = thmfc1->data[6];
@@ -1266,7 +1266,7 @@ READ8_HANDLER ( thmfc_floppy_r )
 	case 1: /* STAT1 */
 	{
 		UINT8 data = 0;
-		mess_image * img = thmfc_floppy_image();
+		const device_config * img = thmfc_floppy_image();
 		int flags = floppy_drive_get_flag_state( img, -1 );
 		if ( thmfc_floppy_is_qdd() )
 		{
@@ -1431,7 +1431,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 
 	case 2: /* CMD2 */
 	{
-		mess_image * img;
+		const device_config * img;
 		int seek = 0, motor;
 		thmfc1->drive = data & 2;
 
@@ -1528,7 +1528,7 @@ void thmfc_floppy_reset( void )
 
 	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
 	{
-		mess_image * img = image_from_devtype_and_index( IO_FLOPPY, i );
+		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, thmfc_floppy_index_pulse_cb );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );

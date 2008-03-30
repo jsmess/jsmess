@@ -2426,7 +2426,7 @@ static void ti99_8_PTGEN(int offset, int data)
 */
 static void ti99_CS_motor(int offset, int data)
 {
-	mess_image *img = image_from_devtype_and_index(IO_CASSETTE, offset-6);
+	const device_config *img = image_from_devtype_and_index(IO_CASSETTE, offset-6);
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 

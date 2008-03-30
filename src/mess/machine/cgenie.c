@@ -118,7 +118,7 @@ static UINT8 *image_buff;
 static OPBASE_HANDLER (opbaseoverride)
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
-	mess_image *img;
+	const device_config *img;
 	UINT8 *buff, *s, data;
 	UINT16 size, entry = 0, block_len, block_ofs = 0;
 

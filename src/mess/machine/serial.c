@@ -110,7 +110,7 @@ static const struct serial_protocol_interface serial_protocol_xmodem_interface=
 /**********************************************************/
 
 /***** SERIAL DEVICE ******/
-void serial_device_setup(mess_image *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code)
+void serial_device_setup(const device_config *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code)
 {
 	int id = image_index_in_device(image);
 
@@ -165,7 +165,7 @@ const char *serial_device_get_protocol_name(int protocol_id)
 	return protocol_names[protocol_id];
 }
 
-void serial_device_set_protocol(mess_image *image, int protocol_id)
+void serial_device_set_protocol(const device_config *image, int protocol_id)
 {
 	int id = image_index_in_device(image);
 
@@ -192,7 +192,7 @@ void serial_device_set_protocol(mess_image *image, int protocol_id)
 	}
 }
 
-void serial_device_set_transmit_state(mess_image *image, int state)
+void serial_device_set_transmit_state(const device_config *image, int state)
 {
 	int previous_state;
 	int id = image_index_in_device(image);
@@ -564,7 +564,7 @@ static TIMER_CALLBACK(serial_device_baud_rate_callback)
 }
 
 /* connect the specified connection to this serial device */
-void serial_device_connect(mess_image *image, struct serial_connection *connection)
+void serial_device_connect(const device_config *image, struct serial_connection *connection)
 {
 	int id = image_index_in_device(image);
 
@@ -577,7 +577,7 @@ void serial_device_connect(mess_image *image, struct serial_connection *connecti
 
 
 /* load image */
-static int serial_device_load_internal(mess_image *image, unsigned char **ptr, int *pDataSize)
+static int serial_device_load_internal(const device_config *image, unsigned char **ptr, int *pDataSize)
 {
 	int datasize;
 	unsigned char *data;
@@ -635,14 +635,14 @@ static void data_stream_init(struct data_stream *stream, unsigned char *pData, u
 	data_stream_reset(stream);
 }
 
-int serial_device_init(mess_image *image)
+int serial_device_init(const device_config *image)
 {
 	int id = image_index_in_device(image);
 	memset(&serial_devices[id], 0, sizeof(serial_devices[id]));
 	return INIT_PASS;
 }
 
-int serial_device_load(mess_image *image)
+int serial_device_load(const device_config *image)
 {
 	int id = image_index_in_device(image);
 	int data_length;
@@ -663,7 +663,7 @@ int serial_device_load(mess_image *image)
 }
 
 
-void serial_device_unload(mess_image *image)
+void serial_device_unload(const device_config *image)
 {
 	int id = image_index_in_device(image);
 

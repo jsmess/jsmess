@@ -141,9 +141,9 @@ static const INT8 nec765_cmd_size[32] =
 
 
 
-static mess_image *current_image(void)
+static const device_config *current_image(void)
 {
-	mess_image *image = NULL;
+	const device_config *image = NULL;
 
 	if (!nec765_iface.get_image)
 	{
@@ -257,7 +257,7 @@ static void nec765_seek_complete(void)
 		This indicates it is always ready!!!!!
 	*/
 
-	mess_image *img = current_image();
+	const device_config *img = current_image();
 
 	if (!img)
 		return;
@@ -434,7 +434,7 @@ static void nec765_setup_timed_int(int signed_tracks)
 
 static void nec765_seek_setup(int is_recalibrate)
 {
-	mess_image *img;
+	const device_config *img;
 	int signed_tracks;
 
 	fdc.nec765_flags |= NEC765_SEEK_ACTIVE;
@@ -654,7 +654,7 @@ is not ready.
 /* done when ready state of drive changes */
 /* this ignores if command is active, in which case command should terminate immediatly
 with error */
-static void nec765_set_ready_change_callback(mess_image *img, int state)
+static void nec765_set_ready_change_callback(const device_config *img, int state)
 {
 	int drive = image_index_in_device(img);
 
@@ -800,7 +800,7 @@ static int nec765_read_skip_sector(void)
 
 static void nec765_get_next_id(chrn_id *id)
 {
-	mess_image *img = current_image();
+	const device_config *img = current_image();
 
 	/* get next id from disc */
 	floppy_drive_get_next_id(img, fdc.side,id);
@@ -817,7 +817,7 @@ static void nec765_get_next_id(chrn_id *id)
 
 static int nec765_get_matching_sector(void)
 {
-	mess_image *img = current_image();
+	const device_config *img = current_image();
 	chrn_id id;
 
 	/* number of times we have seen index hole */
@@ -928,7 +928,7 @@ static void nec765_read_complete(void)
 
 static void nec765_read_data(void)
 {
-	mess_image *img = current_image();
+	const device_config *img = current_image();
 
 	if (!(floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY)))
 	{
@@ -1010,7 +1010,7 @@ static void nec765_read_data(void)
 
 static void nec765_format_track(void)
 {
-	mess_image *img = current_image();
+	const device_config *img = current_image();
 
 	/* write protected? */
 	if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
@@ -1771,7 +1771,7 @@ static void nec765_setup_command(void)
 		"Lock"						/* [14] */
 	};
 
-	mess_image *img = current_image();
+	const device_config *img = current_image();
 	const char *cmd = NULL;
 	chrn_id id;
 

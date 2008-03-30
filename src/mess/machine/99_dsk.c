@@ -134,7 +134,7 @@ static UINT64 ti99_translate_offset(floppy_image *floppy, const struct basicdsk_
 /*
 	support for 48TPI disks in 96TPI drives
 */
-static int ti99_tracktranslate(mess_image *image, floppy_image *floppy, int physical_track)
+static int ti99_tracktranslate(const device_config *image, floppy_image *floppy, int physical_track)
 {
 	struct ti99_geometry *geometry;
 	geometry = floppy_tag(floppy, TI99DSK_TAG);
@@ -355,7 +355,7 @@ FLOPPY_OPTIONS_END
 static void ti99_install_tracktranslate_procs(void)
 {
 	int id;
-	mess_image *image;
+	const device_config *image;
 
 	for (id=0; id<MAX_FLOPPIES; id++)
 	{

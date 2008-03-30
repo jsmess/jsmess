@@ -34,12 +34,12 @@ typedef struct
 
 static void dsk_disk_image_init(dsk_drive *);
 
-static void dsk_seek_callback(mess_image *img, int physical_track);
-static void dsk_get_id_callback(mess_image *img, struct chrn_id *id, int id_index, int side);
-static int dsk_get_sectors_per_track(mess_image *img, int side);
+static void dsk_seek_callback(const device_config *img, int physical_track);
+static void dsk_get_id_callback(const device_config *img, struct chrn_id *id, int id_index, int side);
+static int dsk_get_sectors_per_track(const device_config *img, int side);
 
-static void dsk_write_sector_data_from_buffer(mess_image *img, int sector_index, int side, const char *ptr, int length, int ddam);
-static void dsk_read_sector_data_into_buffer(mess_image *img, int sector_index, int side, char *ptr, int length);
+static void dsk_write_sector_data_from_buffer(const device_config *img, int sector_index, int side, const char *ptr, int length, int ddam);
+static void dsk_read_sector_data_into_buffer(const device_config *img, int sector_index, int side, char *ptr, int length);
 
 static const floppy_interface dsk_floppy_interface =
 {
@@ -54,7 +54,7 @@ static const floppy_interface dsk_floppy_interface =
 
 static dsk_drive drives[dsk_NUM_DRIVES]; /* the drives */
 
-static dsk_drive *get_drive(mess_image *img)
+static dsk_drive *get_drive(const device_config *img)
 {
 	return &drives[image_index_in_device(img)];
 }
@@ -98,7 +98,7 @@ static DEVICE_LOAD( dsk_floppy )
 	return INIT_PASS;
 }
 
-static int dsk_save(mess_image *img, unsigned char **ptr)
+static int dsk_save(const device_config *img, unsigned char **ptr)
 {
 	int datasize;
 	unsigned char *data;
@@ -333,24 +333,24 @@ static void dsk_disk_image_init(dsk_drive *thedrive)
 }
 
 
-static void dsk_seek_callback(mess_image *img, int physical_track)
+static void dsk_seek_callback(const device_config *img, int physical_track)
 {
 	get_drive(img)->current_track = physical_track;
 }
 
-static int get_track_offset(mess_image *img, int side)
+static int get_track_offset(const device_config *img, int side)
 {
 	dsk_drive *thedrive = get_drive(img);
 	side = side & 0x01;
 	return thedrive->track_offsets[(thedrive->current_track<<1) + side];
 }
 
-static unsigned char *get_floppy_data(mess_image *img)
+static unsigned char *get_floppy_data(const device_config *img)
 {
 	return get_drive(img)->data;
 }
 
-static void dsk_get_id_callback(mess_image *img, chrn_id *id, int id_index, int side)
+static void dsk_get_id_callback(const device_config *img, chrn_id *id, int id_index, int side)
 {
 	int id_offset;
 	int track_offset;
@@ -397,7 +397,7 @@ static void dsk_get_id_callback(mess_image *img, chrn_id *id, int id_index, int 
 }
 
 
-static void dsk_set_ddam(mess_image *img, int id_index, int side, int ddam)
+static void dsk_set_ddam(const device_config *img, int id_index, int side, int ddam)
 {
 	int id_offset;
 	int track_offset;
@@ -432,7 +432,7 @@ static void dsk_set_ddam(mess_image *img, int id_index, int side, int ddam)
 }
 
 
-static char * dsk_get_sector_ptr_callback(mess_image *img, int sector_index, int side)
+static char * dsk_get_sector_ptr_callback(const device_config *img, int sector_index, int side)
 {
 	int track_offset;
 	int sector_offset;
@@ -480,7 +480,7 @@ static char * dsk_get_sector_ptr_callback(mess_image *img, int sector_index, int
 	return (char *)(data + track_offset + sector_offset);
 }
 
-static void dsk_write_sector_data_from_buffer(mess_image *img, int side, int index1, const char *ptr, int length, int ddam)
+static void dsk_write_sector_data_from_buffer(const device_config *img, int side, int index1, const char *ptr, int length, int ddam)
 {
 	char * pSectorData;
 
@@ -495,7 +495,7 @@ static void dsk_write_sector_data_from_buffer(mess_image *img, int side, int ind
 	dsk_set_ddam(img, index1, side,ddam);
 }
 
-static void dsk_read_sector_data_into_buffer(mess_image *img, int side, int index1, char *ptr, int length)
+static void dsk_read_sector_data_into_buffer(const device_config *img, int side, int index1, char *ptr, int length)
 {
 	char *pSectorData;
 
@@ -505,7 +505,7 @@ static void dsk_read_sector_data_into_buffer(mess_image *img, int side, int inde
 		memcpy(ptr, pSectorData, length);
 }
 
-static int dsk_get_sectors_per_track(mess_image *img, int side)
+static int dsk_get_sectors_per_track(const device_config *img, int side)
 {
 	int track_offset;
 	unsigned char *track_header;

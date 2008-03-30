@@ -258,7 +258,7 @@ static UINT8 hd = 0;
 
 /**************************************************************************/
 
-static mess_image *wd17xx_current_image(void)
+static const device_config *wd17xx_current_image(void)
 {
 	return image_from_devtype_and_index(IO_FLOPPY, current_drive);
 }
@@ -369,14 +369,14 @@ static void wd17xx_restore(wd17xx_info *w)
 static TIMER_CALLBACK(wd17xx_misc_timer_callback);
 static TIMER_CALLBACK(wd17xx_read_sector_callback);
 static TIMER_CALLBACK(wd17xx_write_sector_callback);
-static void wd17xx_index_pulse_callback(mess_image *img, int state);
+static void wd17xx_index_pulse_callback(const device_config *img, int state);
 
 void wd17xx_reset(void)
 {
 	int i;
 	for (i = 0; i < device_count(IO_FLOPPY); i++)
 	{
-		mess_image *img = image_from_devtype_and_index(IO_FLOPPY, i);
+		const device_config *img = image_from_devtype_and_index(IO_FLOPPY, i);
 		floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
 		floppy_drive_set_rpm( img, 300.);
 	}
@@ -650,7 +650,7 @@ static void wd17xx_read_id(running_machine *machine, wd17xx_info * w)
 
 
 
-static void wd17xx_index_pulse_callback(mess_image *img, int state)
+static void wd17xx_index_pulse_callback(const device_config *img, int state)
 {
 	wd17xx_info *w = &wd;
 	if ( img != wd17xx_current_image() )

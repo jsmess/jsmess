@@ -14,8 +14,8 @@
 #include "cdrom.h"
 
 
-cdrom_file *mess_cd_get_cdrom_file(mess_image *image);
-chd_file *mess_cd_get_chd_file(mess_image *image);
+cdrom_file *mess_cd_get_cdrom_file(const device_config *image);
+chd_file *mess_cd_get_chd_file(const device_config *image);
 
 void cdrom_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 

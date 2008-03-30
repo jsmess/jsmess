@@ -64,7 +64,7 @@ static void nes_machine_stop(running_machine *machine);
     FUNCTIONS
 ***************************************************************************/
 
-static mess_image *cartslot_image(void)
+static const device_config *cartslot_image(void)
 {
 	return image_from_devtype_and_index(IO_CARTSLOT, 0);
 }

@@ -177,7 +177,7 @@ static struct serial_connection to7_io_line;
 
 
 
-int thom_serial_init ( mess_image *image )
+int thom_serial_init ( const device_config *image )
 {
 	int idx = image_index_in_device(image);
 
@@ -214,14 +214,14 @@ int thom_serial_init ( mess_image *image )
 
 
 
-void thom_serial_unload ( mess_image *image )
+void thom_serial_unload ( const device_config *image )
 {
 	serial_device_unload( image );
 }
 
 
 
-int thom_serial_load ( mess_image* image )
+int thom_serial_load ( const device_config* image )
 {
 	int idx = image_index_in_device( image );
 
@@ -260,7 +260,7 @@ static UINT8 thom_cart_nb_banks; /* number of 16 KB banks (up to 4) */
 static UINT8 thom_cart_bank;     /* current bank */
 
 
-int to7_cartridge_load ( mess_image* image )
+int to7_cartridge_load ( const device_config* image )
 {
 	int i,j;
 	UINT8* pos = memory_region( REGION_CPU1 ) + 0x10000;
@@ -1700,7 +1700,7 @@ static UINT8 mo5_reg_cart; /* 0xa7cb bank switch */
 
 
 
-int mo5_cartridge_load ( mess_image* image )
+int mo5_cartridge_load ( const device_config* image )
 {
 	UINT8* pos = memory_region(REGION_CPU1) + 0x10000;
 	UINT64 size = image_length ( image );

@@ -316,7 +316,7 @@ WRITE16_HANDLER( intv_ram16_w )
 	intv_ram16[offset] = data&0xffff;
 }
 
-static int intv_load_rom_file(mess_image *image, int required)
+static int intv_load_rom_file(const device_config *image, int required)
 {
     int i;
 

@@ -394,7 +394,7 @@ static emu_timer *halt_timer;
   changing to make it worthy of Microsoft.
 ***************************************************************************/
 
-static int load_pak_into_region(mess_image *image, int *pakbase, int *paklen, UINT8 *mem, int segaddr, int seglen)
+static int load_pak_into_region(const device_config *image, int *pakbase, int *paklen, UINT8 *mem, int segaddr, int seglen)
 {
 	if (*paklen)
 	{
@@ -482,7 +482,7 @@ static void pak_load_trailer(const pak_decodedtrailer *trailer)
 	sam_set_state(trailer->sam, 0x7fff);
 }
 
-static int generic_pak_load(mess_image *image, int rambase_index, int rombase_index, int pakbase_index)
+static int generic_pak_load(const device_config *image, int rambase_index, int rombase_index, int pakbase_index)
 {
 	UINT8 *ROM;
 	UINT8 *rambase;
@@ -640,7 +640,7 @@ QUICKLOAD_LOAD ( coco )
   be used in place of PAK files, when possible
 ***************************************************************************/
 
-static int generic_rom_load(mess_image *image, UINT8 *dest, UINT16 destlength)
+static int generic_rom_load(const device_config *image, UINT8 *dest, UINT16 destlength)
 {
 	UINT8 *rombase;
 	int   romsize;
@@ -1110,22 +1110,22 @@ static int coco_hiresjoy_ry(void)
 #define SOUNDMUX_STATUS_SEL2	2
 #define SOUNDMUX_STATUS_SEL1	1
 
-static mess_image *cartslot_image(void)
+static const device_config *cartslot_image(void)
 {
 	return image_from_devtype_and_index(IO_CARTSLOT, 0);
 }
 
-static mess_image *cassette_device_image(void)
+static const device_config *cassette_device_image(void)
 {
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }
 
-static mess_image *bitbanger_image(void)
+static const device_config *bitbanger_image(void)
 {
 	return image_from_devtype_and_index(IO_BITBANGER, 0);
 }
 
-static mess_image *printer_image(void)
+static const device_config *printer_image(void)
 {
 	return image_from_devtype_and_index(IO_PRINTER, 0);
 }
@@ -2710,7 +2710,7 @@ static void coco_setcartline(coco_cartridge *cartridge, cococart_line line, coco
 
 static void generic_mapmemory(coco_cartridge *cartridge, UINT32 offset, UINT32 mask, UINT8 *cartmem, UINT32 cartmem_size)
 {
-	mess_image *image = cartslot_image();
+	const device_config *image = cartslot_image();
 	const UINT8 *cart_ptr;
 	UINT32 cart_size, i;
 
@@ -2801,7 +2801,7 @@ struct _machine_init_interface
 static void generic_init_machine(running_machine *machine, const machine_init_interface *init)
 {
 	coco_cartridge_config cart_config;
-	mess_image *cart_image;
+	const device_config *cart_image;
 	const char *extrainfo;
 	const char *cart_hardware;
 	int i;

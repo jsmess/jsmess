@@ -23,7 +23,7 @@ extern unsigned char *nc_card_ram;
 extern int nc_membank_card_ram_mask;
 
 /* save card data back */
-static void	nc_card_save(mess_image *image)
+static void	nc_card_save(const device_config *image)
 {
 	/* if there is no data to write, quit */
 	if (!nc_card_ram || !nc_card_size)
@@ -58,7 +58,7 @@ static int nc_card_calculate_mask(int size)
 
 
 /* load card image */
-static int nc_card_load(mess_image *image, unsigned char **ptr)
+static int nc_card_load(const device_config *image, unsigned char **ptr)
 {
 	int datasize;
 	unsigned char *data;

@@ -1752,7 +1752,7 @@ static INPUT_PORTS_START( x68000 )
 
 INPUT_PORTS_END
 
-static void dimdsk_set_geometry(mess_image* image)
+static void dimdsk_set_geometry(const device_config* image)
 {
 	// DIM disk image header, most of this is guesswork
 	int tracks = 77;

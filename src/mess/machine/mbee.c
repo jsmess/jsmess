@@ -75,7 +75,7 @@ MACHINE_START( mbee )
 	wd17xx_init(machine, WD_TYPE_179X,mbee_fdc_callback, NULL);
 }
 
-static mess_image *cassette_device_image(void)
+static const device_config *cassette_device_image(void)
 {
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }

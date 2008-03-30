@@ -15,7 +15,7 @@
 struct snapquick_info
 {
 	const struct IODevice *dev;
-	mess_image *img;
+	const device_config *img;
 	int file_size;
 	struct snapquick_info *next;
 };

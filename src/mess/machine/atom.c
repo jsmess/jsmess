@@ -52,12 +52,12 @@ static void atom_via_irq_func(int state)
 	}
 }
 
-static mess_image *cassette_device_image(void)
+static const device_config *cassette_device_image(void)
 {
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }
 
-static mess_image *printer_image(void)
+static const device_config *printer_image(void)
 {
 	return image_from_devtype_and_index(IO_PRINTER, 0);
 }

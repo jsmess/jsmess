@@ -380,7 +380,7 @@ static void bebox_fdc_dma_drq(int state, int read_)
 }
 
 
-static mess_image *bebox_fdc_get_image(int floppy_index)
+static const device_config *bebox_fdc_get_image(int floppy_index)
 {
 	/* the BeBox boot ROM seems to query for floppy #1 when it should be
 	 * querying for floppy #0 */

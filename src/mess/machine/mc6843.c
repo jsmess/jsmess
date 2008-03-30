@@ -110,7 +110,7 @@ static const char *const mc6843_cmd[16] =
 
 
 
-static mess_image* mc6843_floppy_image ( void )
+static const device_config* mc6843_floppy_image ( void )
 {
 	return image_from_devtype_and_index( IO_FLOPPY, mc6843->drive );
 }
@@ -161,7 +161,7 @@ static void mc6843_status_update( void )
 
 
 
-static void mc6843_index_pulse_callback(mess_image *img, int state)
+static void mc6843_index_pulse_callback(const device_config *img, int state)
 {
 	mc6843->index_pulse = state;
 }
@@ -190,7 +190,7 @@ static void mc6843_cmd_end( void )
 /* Seek Track Zero bottom half */
 static void mc6843_finish_STZ( void )
 {
-	mess_image* img = mc6843_floppy_image();
+	const device_config* img = mc6843_floppy_image();
 	int i;
 
 	/* seek to track zero */
@@ -219,7 +219,7 @@ static void mc6843_finish_STZ( void )
 /* Seek bottom half */
 static void mc6843_finish_SEK( void )
 {
-	mess_image* img = mc6843_floppy_image();
+	const device_config* img = mc6843_floppy_image();
 
 	/* seek to track */
 	floppy_drive_seek( img, mc6843->GCR - mc6843->CTAR );
@@ -237,7 +237,7 @@ static void mc6843_finish_SEK( void )
 /* preamble to all sector read / write commands, returns 1 if found */
 static int mc6843_address_search( chrn_id* id )
 {
-	mess_image* img = mc6843_floppy_image();
+	const device_config* img = mc6843_floppy_image();
 	int r = 0;
 
 	while ( 1 )
@@ -333,7 +333,7 @@ static void mc6843_finish_RCR( void )
 static void mc6843_cont_SR( void )
 {
 	chrn_id id;
-	mess_image* img = mc6843_floppy_image();
+	const device_config* img = mc6843_floppy_image();
 
 	/* sector seek */
 	if ( ! mc6843_address_search_read( &id ) )
@@ -490,7 +490,7 @@ READ8_HANDLER ( mc6843_r )
 	case 3: /* Status Register A (STRA) */
 	{
 		/* update */
-		mess_image* img = mc6843_floppy_image();
+		const device_config* img = mc6843_floppy_image();
 		int flag = floppy_drive_get_flag_state( img, FLOPPY_DRIVE_READY | FLOPPY_DRIVE_HEAD_AT_TRACK_0 | FLOPPY_DRIVE_DISK_WRITE_PROTECTED );
 		mc6843->STRA &= 0xa3;
 		if ( flag & FLOPPY_DRIVE_READY )
@@ -561,7 +561,7 @@ WRITE8_HANDLER ( mc6843_w )
 			if ( mc6843->data_idx >= mc6843->data_size )
 			{
 				/* end of sector write */
-				mess_image* img = mc6843_floppy_image();
+				const device_config* img = mc6843_floppy_image();
 
 				LOG(( "%f $%04x mc6843_w: write sector %i\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6843->data_id ));
 
@@ -623,7 +623,7 @@ WRITE8_HANDLER ( mc6843_w )
 				if ( (mc6843->data[2] == 0) && (mc6843->data[4] == 0) )
 				{
 					/* valid address id field */
-					mess_image* img = mc6843_floppy_image();
+					const device_config* img = mc6843_floppy_image();
 					UINT8 track  = mc6843->data[1];
 					UINT8 sector = mc6843->data[3];
 					UINT8 filler = 0xe5; /* standard Thomson filler */
@@ -760,7 +760,7 @@ void mc6843_reset ( void )
 	/* setup/reset floppy drive */
 	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
 	{
-		mess_image * img = image_from_devtype_and_index( IO_FLOPPY, i );
+		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, mc6843_index_pulse_callback );
 		floppy_drive_set_motor_state( img, 1 );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );

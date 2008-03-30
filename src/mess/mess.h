@@ -57,7 +57,7 @@ UINT32 hash_data_extract_crc32(const char *d);
 
 #if HAS_WAVE
 int tapecontrol(int selected);
-void tapecontrol_gettime(char *timepos, size_t timepos_size, mess_image *img, int *curpos, int *endpos);
+void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config *img, int *curpos, int *endpos);
 #endif
 
 /* IODevice Initialisation return values.  Use these to determine if */

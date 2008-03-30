@@ -135,7 +135,7 @@ READ8_HANDLER ( mc10_port2_r )
      *   BIT 4 CASSETTE TAPE INPUT
      */
 
-	mess_image *img = image_from_devtype_and_index(IO_CASSETTE, 0);
+	const device_config *img = image_from_devtype_and_index(IO_CASSETTE, 0);
 	int val = 0xed;
 
 	if ((readinputport(6) | mc10_keyboard_strobe) == 0xff)
@@ -150,7 +150,7 @@ READ8_HANDLER ( mc10_port2_r )
 
 WRITE8_HANDLER ( mc10_port2_w )
 {
-	mess_image *img = image_from_devtype_and_index(IO_CASSETTE, 0);
+	const device_config *img = image_from_devtype_and_index(IO_CASSETTE, 0);
 
 	/*   BIT 0 PRINTER OUTFUT & CASS OUTPUT
      */

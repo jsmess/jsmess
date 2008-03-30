@@ -660,7 +660,7 @@ static void command_image_preload(running_machine *machine)
 
 static void command_image_loadcreate(running_machine *machine)
 {
-	mess_image *image;
+	const device_config *image;
 	int device_type;
 	int device_slot;
 	const char *device_tag;
@@ -695,7 +695,7 @@ static void command_image_loadcreate(running_machine *machine)
 
 	/* is an image format specified? */
 	format = current_command->u.image_args.format;
-	if (format)
+	if (format != NULL)
 	{
 		if (current_command->command_type != MESSTEST_COMMAND_IMAGE_CREATE)
 		{
@@ -844,7 +844,7 @@ static void command_verify_image(running_machine *machine)
 	size_t verify_data_size;
 	size_t offset, offset_start, offset_end;
 	const char *filename;
-	mess_image *image;
+	const device_config *image;
 	FILE *f;
 	UINT8 c;
 	char filename_buf[512];

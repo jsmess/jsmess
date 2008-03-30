@@ -111,7 +111,7 @@ void devices_init(running_machine *machine)
 	const struct IODevice *dev;
 	int result = INIT_FAIL;
 	const char *image_name;
-	mess_image *image;
+	const device_config *image;
 
 	/* initialize natural keyboard support */
 	inputx_init(machine);

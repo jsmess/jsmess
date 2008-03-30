@@ -165,7 +165,7 @@ WRITE8_HANDLER (vtech1_memory_bank_w)
  Cassette Handling
 ******************************************************************************/
 
-static mess_image *cassette_device_image(void)
+static const device_config *cassette_device_image(void)
 {
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }
@@ -227,7 +227,7 @@ SNAPSHOT_LOAD(vtech1)
  Floppy Handling
 ******************************************************************************/
 
-static mess_image *vtech1_file(void)
+static const device_config *vtech1_file(void)
 {
 	if (vtech1_drive < 0)
 		return NULL;

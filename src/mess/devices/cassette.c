@@ -34,7 +34,7 @@ struct mess_cassetteimg
 };
 
 
-static struct mess_cassetteimg *get_cassimg(mess_image *image)
+static struct mess_cassetteimg *get_cassimg(const device_config *image)
 {
 	return image_lookuptag(image, CASSETTE_TAG);
 }
@@ -53,7 +53,7 @@ static cassette_state get_default_state(const struct IODevice *dev)
 	cassette IO
 *********************************************************************/
 
-static int cassette_is_motor_on(mess_image *cassette)
+static int cassette_is_motor_on(const device_config *cassette)
 {
 	cassette_state state;
 	state = cassette_get_state(cassette);
@@ -66,7 +66,7 @@ static int cassette_is_motor_on(mess_image *cassette)
 
 
 
-static void cassette_update(mess_image *cassette)
+static void cassette_update(const device_config *cassette)
 {
 	struct mess_cassetteimg *tag;
 	double cur_time;
@@ -95,14 +95,14 @@ static void cassette_update(mess_image *cassette)
 
 
 
-cassette_state cassette_get_state(mess_image *cassette)
+cassette_state cassette_get_state(const device_config *cassette)
 {
 	return get_cassimg(cassette)->state;
 }
 
 
 
-void cassette_change_state(mess_image *cassette, cassette_state state, cassette_state mask)
+void cassette_change_state(const device_config *cassette, cassette_state state, cassette_state mask)
 {
 	struct mess_cassetteimg *tag;
 	cassette_state new_state;
@@ -121,14 +121,14 @@ void cassette_change_state(mess_image *cassette, cassette_state state, cassette_
 
 
 
-void cassette_set_state(mess_image *cassette, cassette_state state)
+void cassette_set_state(const device_config *cassette, cassette_state state)
 {
 	cassette_change_state(cassette, state, ~0);
 }
 
 
 
-double cassette_input(mess_image *cassette)
+double cassette_input(const device_config *cassette)
 {
 	INT32 sample;
 	double double_value;
@@ -146,7 +146,7 @@ double cassette_input(mess_image *cassette)
 
 
 
-void cassette_output(mess_image *cassette, double value)
+void cassette_output(const device_config *cassette, double value)
 {
 	struct mess_cassetteimg *tag;
 	tag = get_cassimg(cassette);
@@ -163,7 +163,7 @@ void cassette_output(mess_image *cassette, double value)
 
 
 
-cassette_image *cassette_get_image(mess_image *cassette)
+cassette_image *cassette_get_image(const device_config *cassette)
 {
 	struct mess_cassetteimg *tag;
 	tag = get_cassimg(cassette);
@@ -172,7 +172,7 @@ cassette_image *cassette_get_image(mess_image *cassette)
 
 
 
-double cassette_get_position(mess_image *cassette)
+double cassette_get_position(const device_config *cassette)
 {
 	double position;
 	struct mess_cassetteimg *tag;
@@ -187,7 +187,7 @@ double cassette_get_position(mess_image *cassette)
 
 
 
-double cassette_get_length(mess_image *cassette)
+double cassette_get_length(const device_config *cassette)
 {
 	struct mess_cassetteimg *tag;
 	struct CassetteInfo info;
@@ -199,7 +199,7 @@ double cassette_get_length(mess_image *cassette)
 
 
 
-void cassette_seek(mess_image *cassette, double time, int origin)
+void cassette_seek(const device_config *cassette, double time, int origin)
 {
 	struct mess_cassetteimg *tag;
 
@@ -328,7 +328,7 @@ static DEVICE_UNLOAD( cassette )
 /*
 	display a small tape icon, with the current position in the tape image
 */
-static void device_display_cassette(mess_image *image)
+static void device_display_cassette(const device_config *image)
 {
 	char buf[65];
 	float x, y;

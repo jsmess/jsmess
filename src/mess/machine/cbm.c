@@ -6,7 +6,7 @@
 #include "devices/cartslot.h"
 
 
-static int general_cbm_loadsnap(mess_image *image, const char *file_type, int snapshot_size,
+static int general_cbm_loadsnap(const device_config *image, const char *file_type, int snapshot_size,
 	offs_t offset, void (*cbm_sethiaddress)(UINT16 hiaddress))
 {
 	char buffer[7];

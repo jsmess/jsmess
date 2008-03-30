@@ -24,7 +24,7 @@ typedef struct
 typedef struct
 {
 	const char *image_name; 		/* file name for disc image */
-	mess_image	*image_file;			/* file handle for disc image */
+	const device_config	*image_file;			/* file handle for disc image */
 	int 	mode;					/* open mode == 0 read only, != 0 read/write */
 	unsigned long image_size;		/* size of image file */
 
@@ -59,11 +59,11 @@ typedef struct
 
 static basicdsk basicdsk_drives[basicdsk_MAX_DRIVES];
 
-static void basicdsk_seek_callback(mess_image *img, int);
-static int basicdsk_get_sectors_per_track(mess_image *img, int);
-static void basicdsk_get_id_callback(mess_image *img,  chrn_id *, int, int);
-static void basicdsk_read_sector_data_into_buffer(mess_image *img, int side, int index1, char *ptr, int length);
-static void basicdsk_write_sector_data_from_buffer(mess_image *img, int side, int index1, const char *ptr, int length,int ddam);
+static void basicdsk_seek_callback(const device_config *img, int);
+static int basicdsk_get_sectors_per_track(const device_config *img, int);
+static void basicdsk_get_id_callback(const device_config *img,  chrn_id *, int, int);
+static void basicdsk_read_sector_data_into_buffer(const device_config *img, int side, int index1, char *ptr, int length);
+static void basicdsk_write_sector_data_from_buffer(const device_config *img, int side, int index1, const char *ptr, int length,int ddam);
 
 const floppy_interface basicdsk_floppy_interface =
 {
@@ -76,7 +76,7 @@ const floppy_interface basicdsk_floppy_interface =
 	NULL
 };
 
-static basicdsk *get_basicdsk(mess_image *img)
+static basicdsk *get_basicdsk(const device_config *img)
 {
 	int drive = image_index_in_device(img);
 	assert(drive >= 0);
@@ -118,7 +118,7 @@ DEVICE_UNLOAD( basicdsk_floppy )
 
 /* set data mark/deleted data mark for the sector specified. If ddam!=0, the sector will
 have a deleted data mark, if ddam==0, the sector will have a data mark */
-void basicdsk_set_ddam(mess_image *img, UINT8 physical_track, UINT8 physical_side, UINT8 sector_id,UINT8 ddam)
+void basicdsk_set_ddam(const device_config *img, UINT8 physical_track, UINT8 physical_side, UINT8 sector_id,UINT8 ddam)
 {
 	unsigned long ddam_bit_offset, ddam_bit_index, ddam_byte_offset;
 	basicdsk *pDisk = get_basicdsk(img);
@@ -153,7 +153,7 @@ void basicdsk_set_ddam(mess_image *img, UINT8 physical_track, UINT8 physical_sid
 }
 
 /* get dam state for specified sector */
-static int basicdsk_get_ddam(mess_image *img, UINT8 physical_track, UINT8 physical_side, UINT8 sector_id)
+static int basicdsk_get_ddam(const device_config *img, UINT8 physical_track, UINT8 physical_side, UINT8 sector_id)
 {
 	unsigned long ddam_bit_offset, ddam_bit_index, ddam_byte_offset;
 	basicdsk *pDisk = get_basicdsk(img);
@@ -179,7 +179,7 @@ static int basicdsk_get_ddam(mess_image *img, UINT8 physical_track, UINT8 physic
 }
 
 
-void basicdsk_set_calcoffset(mess_image *img, unsigned long (*calcoffset)(UINT8 t, UINT8 h, UINT8 s,
+void basicdsk_set_calcoffset(const device_config *img, unsigned long (*calcoffset)(UINT8 t, UINT8 h, UINT8 s,
 	UINT8 tracks, UINT8 heads, UINT8 sec_per_track, UINT16 sector_length, UINT8 first_sector_id, UINT16 offset_track_zero))
 {
 	basicdsk *pDisk = get_basicdsk(img);
@@ -188,7 +188,7 @@ void basicdsk_set_calcoffset(mess_image *img, unsigned long (*calcoffset)(UINT8 
 
 /* dir_sector is a relative offset from the start of the disc,
 dir_length is a relative offset from the start of the disc */
-void basicdsk_set_geometry(mess_image *img, UINT8 tracks, UINT8 heads, UINT8 sec_per_track, UINT16 sector_length, UINT8 first_sector_id, UINT16 offset_track_zero, int track_skipping)
+void basicdsk_set_geometry(const device_config *img, UINT8 tracks, UINT8 heads, UINT8 sec_per_track, UINT16 sector_length, UINT8 first_sector_id, UINT16 offset_track_zero, int track_skipping)
 {
 	unsigned long N;
 	unsigned long ShiftCount;
@@ -510,7 +510,7 @@ int cnt;
 #endif
 
 
-static void basicdsk_get_id_callback(mess_image *img, chrn_id *id, int id_index, int side)
+static void basicdsk_get_id_callback(const device_config *img, chrn_id *id, int id_index, int side)
 {
 	basicdsk *w = get_basicdsk(img);
 
@@ -530,7 +530,7 @@ static void basicdsk_get_id_callback(mess_image *img, chrn_id *id, int id_index,
 
 }
 
-static int basicdsk_get_sectors_per_track(mess_image *img, int side)
+static int basicdsk_get_sectors_per_track(const device_config *img, int side)
 {
 	basicdsk *w = get_basicdsk(img);
 
@@ -544,14 +544,14 @@ static int basicdsk_get_sectors_per_track(mess_image *img, int side)
 	return w->sec_per_track;
 }
 
-static void basicdsk_seek_callback(mess_image *img, int physical_track)
+static void basicdsk_seek_callback(const device_config *img, int physical_track)
 {
 	basicdsk *w = get_basicdsk(img);
 	assert(w->track_divider);
 	w->track = physical_track / w->track_divider;
 }
 
-static void basicdsk_write_sector_data_from_buffer(mess_image *img, int side, int index1, const char *ptr, int length, int ddam)
+static void basicdsk_write_sector_data_from_buffer(const device_config *img, int side, int index1, const char *ptr, int length, int ddam)
 {
 	basicdsk *w = get_basicdsk(img);
 
@@ -563,7 +563,7 @@ static void basicdsk_write_sector_data_from_buffer(mess_image *img, int side, in
 	basicdsk_set_ddam(img, w->track, side, index1, ddam);
 }
 
-static void basicdsk_read_sector_data_into_buffer(mess_image *img, int side, int index1, char *ptr, int length)
+static void basicdsk_read_sector_data_into_buffer(const device_config *img, int side, int index1, char *ptr, int length)
 {
 	basicdsk *w = get_basicdsk(img);
 

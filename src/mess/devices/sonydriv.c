@@ -78,7 +78,7 @@ static unsigned int rotation_speed;		/* drive rotation speed - ignored if ext_sp
 */
 typedef struct
 {
-	mess_image *img;
+	const device_config *img;
 	mame_file *fd;
 
 	unsigned int ext_speed_control : 1;	/* is motor rotation controlled by external device ? */
@@ -105,7 +105,7 @@ static int sony_enable2(void)
 }
 
 #ifdef UNUSED_FUNCTION
-static floppy *get_sony_floppy(mess_image *img)
+static floppy *get_sony_floppy(const device_config *img)
 {
 	int id = image_index_in_device(img);
 	return &sony_floppy[id];
@@ -116,7 +116,7 @@ static floppy *get_sony_floppy(mess_image *img)
 static void load_track_data(int floppy_select)
 {
 	int track_size;
-	mess_image *cur_image;
+	const device_config *cur_image;
 	UINT8 *new_data;
 	floppy *f;
 
@@ -140,7 +140,7 @@ static void load_track_data(int floppy_select)
 
 static void save_track_data(int floppy_select)
 {
-	mess_image *cur_image;
+	const device_config *cur_image;
 	floppy *f;
 	int len;
 
@@ -160,7 +160,7 @@ static void save_track_data(int floppy_select)
 UINT8 sony_read_data(void)
 {
 	UINT8 result = 0;
-	mess_image *cur_image;
+	const device_config *cur_image;
 	floppy *f;
 
 	if (sony_enable2() || (! sony_floppy_enable))
@@ -182,7 +182,7 @@ UINT8 sony_read_data(void)
 
 void sony_write_data(UINT8 data)
 {
-	mess_image *cur_image;
+	const device_config *cur_image;
 	floppy *f;
 
 	f = &sony_floppy[sony_floppy_select];
@@ -198,7 +198,7 @@ void sony_write_data(UINT8 data)
 
 
 
-static int sony_rpm(floppy *f, mess_image *cur_image)
+static int sony_rpm(floppy *f, const device_config *cur_image)
 {
 	int result = 0;
 
@@ -256,7 +256,7 @@ int sony_read_status(void)
 	int result = 1;
 	int action;
 	floppy *f;
-	mess_image *cur_image;
+	const device_config *cur_image;
 
 	action = ((sony_lines & (SONY_CA1 | SONY_CA0)) << 2) | (sony_sel_line << 1) | ((sony_lines & SONY_CA2) >> 2);
 
@@ -367,7 +367,7 @@ static void sony_doaction(void)
 {
 	int action;
 	floppy *f;
-	mess_image *cur_image;
+	const device_config *cur_image;
 
 	action = ((sony_lines & (SONY_CA1 | SONY_CA0)) << 2) | ((sony_lines & SONY_CA2) >> 2) | (sony_sel_line << 1);
 

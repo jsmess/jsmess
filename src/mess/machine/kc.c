@@ -50,7 +50,7 @@ bit 0: TRUCK */
 
 
 /* load image */
-static int kc_load(mess_image *image, unsigned char **ptr)
+static int kc_load(const device_config *image, unsigned char **ptr)
 {
 	int datasize;
 	unsigned char *data;

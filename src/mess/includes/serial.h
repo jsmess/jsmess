@@ -296,22 +296,22 @@ unsigned long serial_device_get_state(int id);
 /* connect this device to the emulated serial chip */
 /* id is the serial device to connect to */
 /* connection is the serial connection to connect to the serial device */
-void serial_device_connect(mess_image *image, struct serial_connection *connection);
+void serial_device_connect(const device_config *image, struct serial_connection *connection);
 
 /* init this device */
-int serial_device_init(mess_image *image);
-int serial_device_load(mess_image *image);
-void serial_device_unload(mess_image *image);
+int serial_device_init(const device_config *image);
+int serial_device_load(const device_config *image);
+void serial_device_unload(const device_config *image);
 
-void serial_device_setup(mess_image *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code);
+void serial_device_setup(const device_config *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code);
 
 /* get name of protocol identified by specified id */
 const char *serial_device_get_protocol_name(int protocol_id);
 
 /* set the protocol to be used by the serial device */
-void serial_device_set_protocol(mess_image *image, int protocol_id);
+void serial_device_set_protocol(const device_config *image, int protocol_id);
 /* set the transmit state of the serial device */
-void serial_device_set_transmit_state(mess_image *image, int state);
+void serial_device_set_transmit_state(const device_config *image, int state);
 
 /***********************************************************************************************/
 /* XModem protocol */

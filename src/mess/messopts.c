@@ -205,7 +205,7 @@ void mess_options_init(core_options *opts)
 static void extract_device_options_for_device(core_options *opts, const game_driver *gamedrv,
 	const mess_device_class *devclass, int device_index, int global_index)
 {
-	mess_image *image;
+	const device_config *image;
 	iodevice_t dev_type;
 	const char *dev_tag;
 	const char *dev_name;

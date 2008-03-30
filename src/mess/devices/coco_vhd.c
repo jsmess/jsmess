@@ -58,9 +58,9 @@ static UINT32 buffer_address;
 static UINT8 vhd_status;
 
 
-static mess_image *vhd_image(void)
+static const device_config *vhd_image(void)
 {
-	mess_image *image;
+	const device_config *image;
 	image = image_from_devtype_and_index(IO_VHD, 0);
 	return image_exists(image) ? image : NULL;
 }
@@ -87,7 +87,7 @@ static DEVICE_LOAD( coco_vhd )
 
 static void coco_vhd_readwrite(UINT8 data)
 {
-	mess_image *vhdfile;
+	const device_config *vhdfile;
 	int result;
 	int phyOffset;
 	UINT32 nBA = buffer_address;

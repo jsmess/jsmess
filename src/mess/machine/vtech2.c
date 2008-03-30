@@ -196,7 +196,7 @@ WRITE8_HANDLER( laser_bank_select_w )
     }
 }
 
-static mess_image *vtech2_cassette_image(void)
+static const device_config *vtech2_cassette_image(void)
 {
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }
@@ -372,7 +372,7 @@ DEVICE_LOAD( laser_floppy )
 	return INIT_PASS;
 }
 
-static mess_image *laser_file(void)
+static const device_config *laser_file(void)
 {
 	return image_from_devtype_and_index(IO_FLOPPY, laser_drive);
 }

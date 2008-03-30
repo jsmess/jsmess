@@ -818,7 +818,7 @@ static void build_generic_filter(const struct IODevice *dev, int is_save, char *
 //	change_device
 //============================================================
 
-static void change_device(HWND wnd, mess_image *img, int is_save)
+static void change_device(HWND wnd, const device_config *img, int is_save)
 {
 	dialog_box *dialog = NULL;
 	char filter[2048];
@@ -1218,7 +1218,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	UINT flags;
 	UINT flags_for_exists;
 	UINT flags_for_writing;
-	mess_image *img;
+	const device_config *img;
 	int has_config, has_dipswitch, has_keyboard, has_analog, has_misc;
 	const input_port_entry *in;
 	UINT16 in_cat_value = 0;
@@ -1472,7 +1472,7 @@ void win_toggle_menubar(void)
 //	device_command
 //============================================================
 
-static void device_command(HWND wnd, mess_image *img, int devoption)
+static void device_command(HWND wnd, const device_config *img, int devoption)
 {
 	switch(devoption)
 	{
@@ -1596,7 +1596,7 @@ static void help_about_thissystem(running_machine *machine, HWND wnd)
 //	decode_deviceoption
 //============================================================
 
-static mess_image *decode_deviceoption(int command, int *devoption)
+static const device_config *decode_deviceoption(int command, int *devoption)
 {
 	int absolute_index;
 
@@ -1646,7 +1646,7 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 {
 	int handled = 1;
 	int dev_command, i;
-	mess_image *img;
+	const device_config *img;
 	int port_count;
 	UINT16 setting, category;
 	input_port_entry *in;

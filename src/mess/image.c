@@ -701,7 +701,7 @@ done:
     image_load - load an image into MESS
 -------------------------------------------------*/
 
-int image_load(mess_image *image, const char *path)
+int image_load(const device_config *image, const char *path)
 {
 	return image_load_internal(image, path, FALSE, 0, NULL);
 }
@@ -712,7 +712,7 @@ int image_load(mess_image *image, const char *path)
     image_create - create a MESS image
 -------------------------------------------------*/
 
-int image_create(mess_image *image, const char *path, int create_format, option_resolution *create_args)
+int image_create(const device_config *image, const char *path, int create_format, option_resolution *create_args)
 {
 	return image_load_internal(image, path, TRUE, create_format, create_args);
 }
@@ -778,7 +778,7 @@ static void image_unload_internal(image_slot_data *image, int is_final_unload)
     image_unload - main call to unload an image
 -------------------------------------------------*/
 
-void image_unload(mess_image *image)
+void image_unload(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	image_unload_internal(slot, FALSE);
@@ -844,7 +844,7 @@ static void image_clear_error(image_slot_data *image)
 	error
 -------------------------------------------------*/
 
-const char *image_error(mess_image *image)
+const char *image_error(const device_config *image)
 {
 	static const char *const messages[] =
 	{
@@ -868,7 +868,7 @@ const char *image_error(mess_image *image)
     image_seterror - specifies an error on an image
 -------------------------------------------------*/
 
-void image_seterror(mess_image *image, image_error_t err, const char *message)
+void image_seterror(const device_config *image, image_error_t err, const char *message)
 {
 	image_slot_data *slot = find_image_slot(image);
 
@@ -896,7 +896,7 @@ void image_seterror(mess_image *image, image_error_t err, const char *message)
   raised if this happens
 ****************************************************************************/
 
-void *image_alloctag(mess_image *image, const char *tag, size_t size)
+void *image_alloctag(const device_config *image, const char *tag, size_t size)
 {
 	image_slot_data *slot = find_image_slot(image);
 	return tagpool_alloc(&slot->tagpool, tag, size);
@@ -904,7 +904,7 @@ void *image_alloctag(mess_image *image, const char *tag, size_t size)
 
 
 
-void *image_lookuptag(mess_image *image, const char *tag)
+void *image_lookuptag(const device_config *image, const char *tag)
 {
 	image_slot_data *slot = find_image_slot(image);
 	return tagpool_lookup(&slot->tagpool, tag);
@@ -949,7 +949,7 @@ done:
 
 
 
-static void run_hash(mess_image *image,
+static void run_hash(const device_config *image,
 	void (*partialhash)(char *, const unsigned char *, unsigned long, unsigned int),
 	char *dest, unsigned int hash_functions)
 {
@@ -1026,7 +1026,7 @@ static int image_checkhash(image_slot_data *image)
     image_device
 -------------------------------------------------*/
 
-const struct IODevice *image_device(mess_image *image)
+const struct IODevice *image_device(const device_config *image)
 {
 	return mess_device_from_core_device(image);
 }
@@ -1037,7 +1037,7 @@ const struct IODevice *image_device(mess_image *image)
     image_exists
 -------------------------------------------------*/
 
-int image_exists(mess_image *image)
+int image_exists(const device_config *image)
 {
 	return image_filename(image) != NULL;
 }
@@ -1048,7 +1048,7 @@ int image_exists(mess_image *image)
     image_slotexists
 -------------------------------------------------*/
 
-int image_slotexists(mess_image *image)
+int image_slotexists(const device_config *image)
 {
 	return TRUE;
 }
@@ -1059,7 +1059,7 @@ int image_slotexists(mess_image *image)
     image_filename
 -------------------------------------------------*/
 
-const char *image_filename(mess_image *image)
+const char *image_filename(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	return slot->name;
@@ -1071,7 +1071,7 @@ const char *image_filename(mess_image *image)
     image_basename
 -------------------------------------------------*/
 
-const char *image_basename(mess_image *image)
+const char *image_basename(const device_config *image)
 {
 	return osd_basename((char *) image_filename(image));
 }
@@ -1082,7 +1082,7 @@ const char *image_basename(mess_image *image)
     image_basename_noext
 -------------------------------------------------*/
 
-const char *image_basename_noext(mess_image *image)
+const char *image_basename_noext(const device_config *image)
 {
 	const char *s;
 	char *ext;
@@ -1108,7 +1108,7 @@ const char *image_basename_noext(mess_image *image)
     image_filetype
 -------------------------------------------------*/
 
-const char *image_filetype(mess_image *image)
+const char *image_filetype(const device_config *image)
 {
 	const char *s;
 	s = image_filename(image);
@@ -1123,7 +1123,7 @@ const char *image_filetype(mess_image *image)
     image_filedir
 -------------------------------------------------*/
 
-const char *image_filedir(mess_image *image)
+const char *image_filedir(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	return slot->dir;
@@ -1135,7 +1135,7 @@ const char *image_filedir(mess_image *image)
     image_core_file
 -------------------------------------------------*/
 
-core_file *image_core_file(mess_image *image)
+core_file *image_core_file(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	return slot->file;
@@ -1147,7 +1147,7 @@ core_file *image_core_file(mess_image *image)
     image_typename_id
 -------------------------------------------------*/
 
-const char *image_typename_id(mess_image *image)
+const char *image_typename_id(const device_config *image)
 {
 	const struct IODevice *dev;
 	int id;
@@ -1175,7 +1175,7 @@ static void check_for_file(image_slot_data *image)
     image_length
 -------------------------------------------------*/
 
-UINT64 image_length(mess_image *image)
+UINT64 image_length(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	check_for_file(slot);
@@ -1188,7 +1188,7 @@ UINT64 image_length(mess_image *image)
     image_hash
 -------------------------------------------------*/
 
-const char *image_hash(mess_image *image)
+const char *image_hash(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	image_checkhash(slot);
@@ -1201,7 +1201,7 @@ const char *image_hash(mess_image *image)
     image_crc
 -------------------------------------------------*/
 
-UINT32 image_crc(mess_image *image)
+UINT32 image_crc(const device_config *image)
 {
 	const char *hash_string;
 	UINT32 crc = 0;
@@ -1219,7 +1219,7 @@ UINT32 image_crc(mess_image *image)
     image_is_writable
 -------------------------------------------------*/
 
-int image_is_writable(mess_image *image)
+int image_is_writable(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	return slot->writeable;
@@ -1231,7 +1231,7 @@ int image_is_writable(mess_image *image)
     image_has_been_created
 -------------------------------------------------*/
 
-int image_has_been_created(mess_image *image)
+int image_has_been_created(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	return slot->created;
@@ -1243,7 +1243,7 @@ int image_has_been_created(mess_image *image)
     image_make_readonly
 -------------------------------------------------*/
 
-void image_make_readonly(mess_image *image)
+void image_make_readonly(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	slot->writeable = 0;
@@ -1255,7 +1255,7 @@ void image_make_readonly(mess_image *image)
     image_fread
 -------------------------------------------------*/
 
-UINT32 image_fread(mess_image *image, void *buffer, UINT32 length)
+UINT32 image_fread(const device_config *image, void *buffer, UINT32 length)
 {
 	image_slot_data *slot = find_image_slot(image);
 	check_for_file(slot);
@@ -1268,7 +1268,7 @@ UINT32 image_fread(mess_image *image, void *buffer, UINT32 length)
     image_fwrite
 -------------------------------------------------*/
 
-UINT32 image_fwrite(mess_image *image, const void *buffer, UINT32 length)
+UINT32 image_fwrite(const device_config *image, const void *buffer, UINT32 length)
 {
 	image_slot_data *slot = find_image_slot(image);
 	check_for_file(slot);
@@ -1281,7 +1281,7 @@ UINT32 image_fwrite(mess_image *image, const void *buffer, UINT32 length)
     image_fseek
 -------------------------------------------------*/
 
-int image_fseek(mess_image *image, INT64 offset, int whence)
+int image_fseek(const device_config *image, INT64 offset, int whence)
 {
 	image_slot_data *slot = find_image_slot(image);
 	check_for_file(slot);
@@ -1294,7 +1294,7 @@ int image_fseek(mess_image *image, INT64 offset, int whence)
     image_ftell
 -------------------------------------------------*/
 
-UINT64 image_ftell(mess_image *image)
+UINT64 image_ftell(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	check_for_file(slot);
@@ -1307,7 +1307,7 @@ UINT64 image_ftell(mess_image *image)
     image_fgetc
 -------------------------------------------------*/
 
-int image_fgetc(mess_image *image)
+int image_fgetc(const device_config *image)
 {
 	char ch;
 	if (image_fread(image, &ch, 1) != 1)
@@ -1321,7 +1321,7 @@ int image_fgetc(mess_image *image)
     image_feof
 -------------------------------------------------*/
 
-int image_feof(mess_image *image)
+int image_feof(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	check_for_file(slot);
@@ -1334,7 +1334,7 @@ int image_feof(mess_image *image)
     image_ptr
 -------------------------------------------------*/
 
-void *image_ptr(mess_image *image)
+void *image_ptr(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	check_for_file(slot);
@@ -1436,7 +1436,7 @@ static void setup_working_directory(image_slot_data *image)
 	valid even if not mounted
 -------------------------------------------------*/
 
-const char *image_working_directory(mess_image *image)
+const char *image_working_directory(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 
@@ -1454,7 +1454,7 @@ const char *image_working_directory(mess_image *image)
 	directory to use for this image
 -------------------------------------------------*/
 
-void image_set_working_directory(mess_image *image, const char *working_directory)
+void image_set_working_directory(const device_config *image, const char *working_directory)
 {
 	image_slot_data *slot = find_image_slot(image);
 
@@ -1474,14 +1474,14 @@ void image_set_working_directory(mess_image *image, const char *working_director
   able to eliminate the need for a unload function.
 ****************************************************************************/
 
-void *image_malloc(mess_image *image, size_t size)
+void *image_malloc(const device_config *image, size_t size)
 {
 	return image_realloc(image, NULL, size);
 }
 
 
 
-void *image_realloc(mess_image *image, void *ptr, size_t size)
+void *image_realloc(const device_config *image, void *ptr, size_t size)
 {
 	image_slot_data *slot = find_image_slot(image);
 
@@ -1493,7 +1493,7 @@ void *image_realloc(mess_image *image, void *ptr, size_t size)
 
 
 
-char *image_strdup(mess_image *image, const char *src)
+char *image_strdup(const device_config *image, const char *src)
 {
 	image_slot_data *slot = find_image_slot(image);
 
@@ -1505,7 +1505,7 @@ char *image_strdup(mess_image *image, const char *src)
 
 
 
-void image_freeptr(mess_image *image, void *ptr)
+void image_freeptr(const device_config *image, void *ptr)
 {
 	/* should really do something better here */
 	image_realloc(image, ptr, 0);
@@ -1520,7 +1520,7 @@ void image_freeptr(mess_image *image, void *ptr)
   pertaining to that image in the CRC database
 ****************************************************************************/
 
-const char *image_longname(mess_image *image)
+const char *image_longname(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	image_checkhash(slot);
@@ -1529,7 +1529,7 @@ const char *image_longname(mess_image *image)
 
 
 
-const char *image_manufacturer(mess_image *image)
+const char *image_manufacturer(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	image_checkhash(slot);
@@ -1538,7 +1538,7 @@ const char *image_manufacturer(mess_image *image)
 
 
 
-const char *image_year(mess_image *image)
+const char *image_year(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	image_checkhash(slot);
@@ -1547,7 +1547,7 @@ const char *image_year(mess_image *image)
 
 
 
-const char *image_playable(mess_image *image)
+const char *image_playable(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	image_checkhash(slot);
@@ -1556,7 +1556,7 @@ const char *image_playable(mess_image *image)
 
 
 
-const char *image_extrainfo(mess_image *image)
+const char *image_extrainfo(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	image_checkhash(slot);
@@ -1577,7 +1577,7 @@ const char *image_extrainfo(mess_image *image)
 	NVRAM file for an image
 -------------------------------------------------*/
 
-static file_error open_battery_file(mess_image *image, UINT32 openflags, mame_file **file)
+static file_error open_battery_file(const device_config *image, UINT32 openflags, mame_file **file)
 {
 	file_error filerr;
 	char *basename_noext;
@@ -1600,7 +1600,7 @@ static file_error open_battery_file(mess_image *image, UINT32 openflags, mame_fi
 	backed RAM for an image
 -------------------------------------------------*/
 
-void image_battery_load(mess_image *image, void *buffer, int length)
+void image_battery_load(const device_config *image, void *buffer, int length)
 {
 	file_error filerr;
 	mame_file *file;
@@ -1627,7 +1627,7 @@ void image_battery_load(mess_image *image, void *buffer, int length)
 	backed RAM for an image
 -------------------------------------------------*/
 
-void image_battery_save(mess_image *image, const void *buffer, int length)
+void image_battery_save(const device_config *image, const void *buffer, int length)
 {
 	file_error filerr;
 	mame_file *file;
@@ -1651,7 +1651,7 @@ void image_battery_save(mess_image *image, const void *buffer, int length)
   These provide various ways of indexing images
 ****************************************************************************/
 
-int image_absolute_index(mess_image *image)
+int image_absolute_index(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 	return slot - image->machine->images_data->slots;
@@ -1659,7 +1659,7 @@ int image_absolute_index(mess_image *image)
 
 
 
-mess_image *image_from_absolute_index(int absolute_index)
+const device_config *image_from_absolute_index(int absolute_index)
 {
 	return Machine->images_data->slots[absolute_index].dev;
 }
@@ -1674,17 +1674,17 @@ mess_image *image_from_absolute_index(int absolute_index)
   type/id.
 ****************************************************************************/
 
-mess_image *image_from_device(const struct IODevice *device)
+const device_config *image_from_device(const struct IODevice *device)
 {
 	return device->devconfig;
 }
 
 
 
-mess_image *image_from_devtag_and_index(const char *devtag, int id)
+const device_config *image_from_devtag_and_index(const char *devtag, int id)
 {
 	int indx;
-	mess_image *image = NULL;
+	const device_config *image = NULL;
 	const struct IODevice *dev;
 	int device_index;
 
@@ -1706,10 +1706,10 @@ mess_image *image_from_devtag_and_index(const char *devtag, int id)
 
 
 
-mess_image *image_from_devtype_and_index(iodevice_t type, int id)
+const device_config *image_from_devtype_and_index(iodevice_t type, int id)
 {
 	int indx;
-	mess_image *image = NULL;
+	const device_config *image = NULL;
 	const struct IODevice *dev;
 	int device_index;
 
@@ -1734,7 +1734,7 @@ mess_image *image_from_devtype_and_index(iodevice_t type, int id)
 
 
 
-iodevice_t image_devtype(mess_image *image)
+iodevice_t image_devtype(const device_config *image)
 {
 	const struct IODevice *iodev = mess_device_from_core_device(image);
 	assert(iodev != NULL);
@@ -1743,7 +1743,7 @@ iodevice_t image_devtype(mess_image *image)
 
 
 
-int image_index_in_device(mess_image *image)
+int image_index_in_device(const device_config *image)
 {
 	const struct IODevice *iodev = mess_device_from_core_device(image);
 	assert(iodev != NULL);

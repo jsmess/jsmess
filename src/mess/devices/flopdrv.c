@@ -23,7 +23,7 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 #define FLOPDRVTAG	"flopdrv"
 
-static struct floppy_drive *get_drive(mess_image *img)
+static struct floppy_drive *get_drive(const device_config *img)
 {
 	return image_lookuptag(img, FLOPDRVTAG);
 }
@@ -31,7 +31,7 @@ static struct floppy_drive *get_drive(mess_image *img)
 static TIMER_CALLBACK(floppy_drive_index_callback);
 
 /* this is called on device init */
-int floppy_drive_init(mess_image *img, const floppy_interface *iface)
+int floppy_drive_init(const device_config *img, const floppy_interface *iface)
 {
 	struct floppy_drive *pDrive;
 
@@ -66,7 +66,7 @@ int floppy_drive_init(mess_image *img, const floppy_interface *iface)
 
 
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
-static void floppy_drive_index_func(mess_image *img)
+static void floppy_drive_index_func(const device_config *img)
 {
 	struct floppy_drive *pDrive = get_drive(img);
 
@@ -91,21 +91,21 @@ static void floppy_drive_index_func(mess_image *img)
 
 static TIMER_CALLBACK(floppy_drive_index_callback)
 {
-	mess_image *image = (mess_image *) ptr;
+	const device_config *image = (const device_config *) ptr;
 	floppy_drive_index_func(image);
 }
 
 
 
 /* set the callback for the index pulse */
-void floppy_drive_set_index_pulse_callback(mess_image *img, void (*callback)(mess_image *image, int state))
+void floppy_drive_set_index_pulse_callback(const device_config *img, void (*callback)(const device_config *image, int state))
 {
 	struct floppy_drive *pDrive = get_drive(img);
 	pDrive->index_pulse_callback = callback;
 }
 
 
-void floppy_drive_set_ready_state_change_callback(mess_image *img, void (*callback)(mess_image *img, int state))
+void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *img, int state))
 {
 	struct floppy_drive *pDrive = get_drive(img);
 	pDrive->ready_state_change_callback = callback;
@@ -120,7 +120,7 @@ void floppy_drive_set_ready_state_change_callback(mess_image *img, void (*callba
   2) drive present/missing
 */
 
-int	floppy_status(mess_image *img, int new_status)
+int	floppy_status(const device_config *img, int new_status)
 {
 	/* return current status only? */
 	if (new_status!=-1)
@@ -138,7 +138,7 @@ int	floppy_status(mess_image *img, int new_status)
 }
 
 /* set interface for image interface */
-void floppy_drive_set_disk_image_interface(mess_image *img, const floppy_interface *iface)
+void floppy_drive_set_disk_image_interface(const device_config *img, const floppy_interface *iface)
 {
 	struct floppy_drive *pDrive = get_drive(img);
 	if (iface)
@@ -148,7 +148,7 @@ void floppy_drive_set_disk_image_interface(mess_image *img, const floppy_interfa
 }
 
 /* set flag state */
-void floppy_drive_set_flag_state(mess_image *img, int flag, int state)
+void floppy_drive_set_flag_state(const device_config *img, int flag, int state)
 {
 	struct floppy_drive *drv = get_drive(img);
 	int prev_state;
@@ -177,7 +177,7 @@ void floppy_drive_set_flag_state(mess_image *img, int flag, int state)
 	}
 }
 
-void floppy_drive_set_motor_state(mess_image *img, int state)
+void floppy_drive_set_motor_state(const device_config *img, int state)
 {
 	int new_motor_state = 0;
 	int previous_state = 0;
@@ -235,7 +235,7 @@ void floppy_drive_set_motor_state(mess_image *img, int state)
 /* for pc, drive is always ready, for amstrad,pcw,spectrum it is only ready under
 a fixed set of circumstances */
 /* use this to set ready state of drive */
-void floppy_drive_set_ready_state(mess_image *img, int state, int flag)
+void floppy_drive_set_ready_state(const device_config *img, int state, int flag)
 {
 	if (flag)
 	{
@@ -270,7 +270,7 @@ void floppy_drive_set_ready_state(mess_image *img, int state, int flag)
 
 
 /* get flag state */
-int	floppy_drive_get_flag_state(mess_image *img, int flag)
+int	floppy_drive_get_flag_state(const device_config *img, int flag)
 {
 	struct floppy_drive *drv = get_drive(img);
 	int drive_flags;
@@ -310,7 +310,7 @@ int	floppy_drive_get_flag_state(mess_image *img, int flag)
 }
 
 
-void floppy_drive_set_geometry(mess_image *img, floppy_type type)
+void floppy_drive_set_geometry(const device_config *img, floppy_type type)
 {
 	int max_track, num_sides;
 
@@ -332,14 +332,14 @@ void floppy_drive_set_geometry(mess_image *img, floppy_type type)
 	floppy_drive_set_geometry_absolute(img, max_track, num_sides);
 }
 
-void floppy_drive_set_geometry_absolute(mess_image *img, int tracks, int sides)
+void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides)
 {
 	struct floppy_drive *pDrive = get_drive(img);
 	pDrive->max_track = tracks;
 	pDrive->num_sides = sides;
 }
 
-void floppy_drive_seek(mess_image *img, signed int signed_tracks)
+void floppy_drive_seek(const device_config *img, signed int signed_tracks)
 {
 	struct floppy_drive *pDrive;
 
@@ -377,7 +377,7 @@ void floppy_drive_seek(mess_image *img, signed int signed_tracks)
 
 
 /* this is not accurate. But it will do for now */
-int	floppy_drive_get_next_id(mess_image *img, int side, chrn_id *id)
+int	floppy_drive_get_next_id(const device_config *img, int side, chrn_id *id)
 {
 	struct floppy_drive *pDrive;
 	int spt;
@@ -415,13 +415,13 @@ int	floppy_drive_get_next_id(mess_image *img, int side, chrn_id *id)
 	return (spt == 0) ? 0 : 1;
 }
 
-int	floppy_drive_get_current_track(mess_image *img)
+int	floppy_drive_get_current_track(const device_config *img)
 {
 	struct floppy_drive *drv = get_drive(img);
 	return drv->current_track;
 }
 
-void floppy_drive_read_track_data_info_buffer(mess_image *img, int side, void *ptr, int *length )
+void floppy_drive_read_track_data_info_buffer(const device_config *img, int side, void *ptr, int *length )
 {
 	if (image_exists(img))
 	{
@@ -431,7 +431,7 @@ void floppy_drive_read_track_data_info_buffer(mess_image *img, int side, void *p
 	}
 }
 
-void floppy_drive_write_track_data_info_buffer(mess_image *img, int side, const void *ptr, int *length )
+void floppy_drive_write_track_data_info_buffer(const device_config *img, int side, const void *ptr, int *length )
 {
 	if (image_exists(img))
 	{
@@ -441,7 +441,7 @@ void floppy_drive_write_track_data_info_buffer(mess_image *img, int side, const 
 	}
 }
 
-void floppy_drive_format_sector(mess_image *img, int side, int sector_index,int c,int h, int r, int n, int filler)
+void floppy_drive_format_sector(const device_config *img, int side, int sector_index,int c,int h, int r, int n, int filler)
 {
 	if (image_exists(img))
 	{
@@ -451,7 +451,7 @@ void floppy_drive_format_sector(mess_image *img, int side, int sector_index,int 
 	}
 }
 
-void floppy_drive_read_sector_data(mess_image *img, int side, int index1, void *pBuffer, int length)
+void floppy_drive_read_sector_data(const device_config *img, int side, int index1, void *pBuffer, int length)
 {
 	if (image_exists(img))
 	{
@@ -461,7 +461,7 @@ void floppy_drive_read_sector_data(mess_image *img, int side, int index1, void *
 	}
 }
 
-void floppy_drive_write_sector_data(mess_image *img, int side, int index1, const void *pBuffer,int length, int ddam)
+void floppy_drive_write_sector_data(const device_config *img, int side, int index1, const void *pBuffer,int length, int ddam)
 {
 	if (image_exists(img))
 	{
@@ -508,7 +508,7 @@ int floppy_drive_get_datarate_in_us(DENSITY density)
 
 
 
-void floppy_drive_set_rpm(mess_image *img, float rpm)
+void floppy_drive_set_rpm(const device_config *img, float rpm)
 {
 	struct floppy_drive *drv = get_drive(img);
 	drv->rpm = rpm;
