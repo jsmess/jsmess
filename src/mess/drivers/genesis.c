@@ -244,9 +244,11 @@ static DEVICE_LOAD( genesis_cart )
 			is_ssf2 = 1;
 		}
 		// detect the 'Romance of the Three Kingdoms - Red Cliff' rom, already decoded from useless .mdx format
-		if (length == 0x200000) {
+		if (length == 0x200000) 
+		{
 		 	static unsigned char redcliffsig[] = { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04}; // move.b  ($400004).l,d0
-		 	if (!memcmp(&ROM[0xce560+relocate],&redcliffsig[0],sizeof(redcliffsig))) {
+		 	if (!memcmp(&ROM[0xce560+relocate],&redcliffsig[0],sizeof(redcliffsig))) 
+			{
 				is_redcliff = 1;
 			}
 		}
@@ -276,6 +278,8 @@ static DEVICE_LOAD( genesis_cart )
 	}
 
         /* check if cart has battery save */
+	genesis_sram_len = 0;
+	genesis_sram = NULL;
 	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
 	{
 		genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
@@ -291,11 +295,12 @@ static DEVICE_LOAD( genesis_cart )
 		genesis_sram_len -= (genesis_sram_start - 1);
 		genesis_sram = auto_malloc (genesis_sram_len);
 		memset(genesis_sram, 0, genesis_sram_len);
-		printf("Attempting to load SRM . . .\n");
-		image_battery_load(image, genesis_sram, genesis_sram_len);
+		image_battery_load(image_from_devtype_and_index(IO_CARTSLOT,0), genesis_sram, genesis_sram_len);
 
                 if (length - 0x200 < genesis_sram_start)
+		{
                         genesis_sram_active = 1;
+		}
 
                 memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, (genesis_sram_start + genesis_sram_len - 1) & 0x3fffff, 0, 0, genesis_sram_read);
 
@@ -331,6 +336,15 @@ ROM_START(megadrij)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
+static DEVICE_UNLOAD( genesis_cart )
+{
+	/* Write out the battery file if necessary */
+	if ((genesis_sram != NULL) && (genesis_sram_len > 0))
+	{
+		image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_len);
+	}
+}
+
 static void genesis_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
@@ -342,7 +356,8 @@ static void genesis_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_genesis_cart; break;
-		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = NULL;	/*genesis_partialhash*/ break;
+		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = NULL;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_genesis_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "smd,bin,md,gen"); break;
@@ -407,16 +422,11 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
 
 static void genesis_machine_stop(running_machine *machine)
 {
-	/* Write out the battery file if necessary */
-	if ((genesis_sram != NULL) && (genesis_sram_len > 0))
-		image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_len);
 }
 
 
 static DRIVER_INIT( gencommon )
 {
-	genesis_sram_len = 0;
-
         if (genesis_sram)
 	{
                 add_exit_callback(machine, genesis_machine_stop);
@@ -426,13 +436,14 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, genesis_ssf2_bank_w);
 	}
-	if (is_redcliff) {
+
+	if (is_redcliff) 
+	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, redclif_prot2_r );
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r );
 	}
 
 	/* install NOP handler for TMSS */
-
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
 
 }
