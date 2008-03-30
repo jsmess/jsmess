@@ -493,23 +493,7 @@ static INPUT_PORTS_START( pccga )
 	PORT_INCLUDE( pc_keyboard )		/* IN4 - IN11 */
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
-
-    PORT_START /* IN20 */
-	PORT_CONFNAME( 0x03, 0x00, "CGA character set")
-	PORT_CONFSETTING(0x00, DEF_STR( Normal ))
-    PORT_CONFSETTING(0x01, "Alternative")
-	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
-	PORT_CONFSETTING(0x00, "Colour RGB")
-	PORT_CONFSETTING(0x04, "Mono RGB")
-	PORT_CONFSETTING(0x08, "Colour composite")
-	PORT_CONFSETTING(0x0C, "Television")
-    PORT_CONFSETTING(0x10, "LCD")
-	PORT_CONFNAME( 0xE0, 0x00, "CGA chipset")
-	PORT_CONFSETTING(0x00, "IBM")
-	PORT_CONFSETTING(0x20, "Amstrad PC1512")
-	PORT_CONFSETTING(0x40, "Amstrad PPC512")
-	PORT_CONFSETTING(0x60, "ATI")
-    PORT_CONFSETTING(0x80, "Paradise")
+	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( europc )
@@ -720,23 +704,7 @@ static INPUT_PORTS_START( xtcga )
 	PORT_INCLUDE( pc_keyboard )		/* IN4 - IN11 */
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
-
-    PORT_START /* IN20 */
-	PORT_CONFNAME( 0x03, 0x00, "CGA character set")
-	PORT_CONFSETTING(0x00, DEF_STR( Normal ))
-    PORT_CONFSETTING(0x01, "Alternative")
-	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
-	PORT_CONFSETTING(0x00, "Colour RGB")
-	PORT_CONFSETTING(0x04, "Mono RGB")
-	PORT_CONFSETTING(0x08, "Colour composite")
-	PORT_CONFSETTING(0x0C, "Television")
-    PORT_CONFSETTING(0x10, "LCD")
-	PORT_CONFNAME( 0xE0, 0x00, "CGA chipset")
-	PORT_CONFSETTING(0x00, "IBM")
-	PORT_CONFSETTING(0x20, "Amstrad PC1512")
-	PORT_CONFSETTING(0x40, "Amstrad PPC512")
-	PORT_CONFSETTING(0x60, "ATI")
-    PORT_CONFSETTING(0x80, "Paradise")
+	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tandy1t )
@@ -935,16 +903,7 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 
 	PORT_INCLUDE( pc_joystick_none )
 
-    PORT_START /* IN20 */
-	PORT_CONFNAME( 0x03, 0x03, "CGA character set")
-	PORT_CONFSETTING(0x00, "Greek")
-	PORT_CONFSETTING(0x01, "Danish 2")
-	PORT_CONFSETTING(0x02, "Danish 1")
-    PORT_CONFSETTING(0x03, "Default")
-	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
-	PORT_CONFSETTING(0x00, "Colour RGB")
-    PORT_CONFSETTING(0x04, "Mono RGB")
-    PORT_BIT ( 0xE0, 0x20, IPT_UNUSED )	/* Chipset is always PC1512 */
+	PORT_INCLUDE( pcvideo_pc1512 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc1640 )

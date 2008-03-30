@@ -73,6 +73,78 @@ static PALETTE_INIT( pc_cga );
 extern const unsigned char cga_palette[16 * CGA_PALETTE_SETS][3];
 
 
+INPUT_PORTS_START( pcvideo_cga )
+	PORT_START_TAG( "pcvideo_cga_config" )
+	PORT_CONFNAME( 0x03, 0x00, "CGA character set")
+	PORT_CONFSETTING(0x00, DEF_STR( Normal ))
+	PORT_CONFSETTING(0x01, "Alternative")
+	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
+	PORT_CONFSETTING(0x00, "Colour RGB")
+	PORT_CONFSETTING(0x04, "Mono RGB")
+	PORT_CONFSETTING(0x08, "Colour composite")
+	PORT_CONFSETTING(0x0C, "Television")
+	PORT_CONFSETTING(0x10, "LCD")
+	PORT_CONFNAME( 0xE0, 0x00, "CGA chipset")
+	PORT_CONFSETTING(0x00, "IBM")
+	PORT_CONFSETTING(0x20, "Amstrad PC1512")
+	PORT_CONFSETTING(0x40, "Amstrad PPC512")
+	PORT_CONFSETTING(0x60, "ATI")
+	PORT_CONFSETTING(0x80, "Paradise")
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( pcvideo_cga_at )
+	PORT_START_TAG( "pcvideo_cga_config" )
+	PORT_BIT( 0x03, 0x01, IPT_UNUSED )	/* Always use fat characters */
+	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
+	PORT_CONFSETTING(0x00, "Colour RGB")
+	PORT_CONFSETTING(0x04, "Mono RGB")
+	PORT_CONFSETTING(0x08, "Colour composite")
+	PORT_CONFSETTING(0x0C, "Television")
+	PORT_CONFSETTING(0x10, "LCD")
+	PORT_CONFNAME( 0xE0, 0x00, "CGA chipset")
+	PORT_CONFSETTING(0x00, "IBM")
+	PORT_CONFSETTING(0x20, "Amstrad PC1512")
+	PORT_CONFSETTING(0x40, "Amstrad PPC512")
+	PORT_CONFSETTING(0x60, "ATI")
+	PORT_CONFSETTING(0x80, "Paradise")
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( pcvideo_pc1512 )
+	PORT_START_TAG( "pcvideo_cga_config" )
+	PORT_CONFNAME( 0x03, 0x03, "CGA character set")
+	PORT_CONFSETTING(0x00, "Greek")
+	PORT_CONFSETTING(0x01, "Danish 2")
+	PORT_CONFSETTING(0x02, "Danish 1")
+	PORT_CONFSETTING(0x03, "Default")
+	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
+	PORT_CONFSETTING(0x00, "Colour RGB")
+	PORT_CONFSETTING(0x04, "Mono RGB")
+	PORT_BIT ( 0xE0, 0x20, IPT_UNUSED ) /* Chipset is always PC1512 */
+INPUT_PORTS_END
+
+/* Dipswitch for font selection */
+#define CGA_FONT        (readinputport(cga.config_input_port)&3)
+
+/* Dipswitch for monitor selection */
+#define CGA_MONITOR     (readinputport(cga.config_input_port)&0x1C)
+#define CGA_MONITOR_RGB         0x00    /* Colour RGB */
+#define CGA_MONITOR_MONO        0x04    /* Greyscale RGB */
+#define CGA_MONITOR_COMPOSITE   0x08    /* Colour composite */
+#define CGA_MONITOR_TELEVISION  0x0C    /* Television */
+#define CGA_MONITOR_LCD         0x10    /* LCD, eg PPC512 */
+
+
+/* Dipswitch for chipset selection */
+#define CGA_CHIPSET     (readinputport(cga.config_input_port)&0xE0)
+#define CGA_CHIPSET_IBM         0x00    /* Original IBM CGA */
+#define CGA_CHIPSET_PC1512      0x20    /* PC1512 CGA subset */
+#define CGA_CHIPSET_PC200       0x40    /* PC200 in CGA mode */
+#define CGA_CHIPSET_ATI         0x60    /* ATI (supports Plantronics) */
+#define CGA_CHIPSET_PARADISE    0x80    /* Paradise (used in PC1640) */
+
+
 static VIDEO_UPDATE( mc6845_cga );
 static READ8_HANDLER( pc_cga8_r );
 static WRITE8_HANDLER( pc_cga8_w );
@@ -139,6 +211,8 @@ static struct
 	UINT8 frame;
 
 	UINT8	*chr_gen;
+
+	int		config_input_port;
 
 	mc6845_update_row_func	update_row;
 	UINT8	palette_lut_2bpp[4];
@@ -326,20 +400,19 @@ static PALETTE_INIT( pc_cga )
 }
 
 
-void pcvideo_cga_set_character_base( UINT8 *character_base ) {
-	cga.chr_gen = character_base;
-}
-
-
 static int internal_pc_cga_video_start(int personality)
 {
 	memset(&cga, 0, sizeof(cga));
 	cga.update_row = NULL;
 
+	cga.chr_gen = memory_region( REGION_GFX1 ) + 0x1000;
+
 	state_save_register_item("pccga", 0, cga.mode_control);
 	state_save_register_item("pccga", 0, cga.color_select);
 	state_save_register_item("pccga", 0, cga.status);
 	state_save_register_item("pccga", 0, cga.plantronics);
+
+	cga.config_input_port = port_tag_to_index( "pcvideo_cga_config" );
 
 	return 0;
 }
@@ -399,6 +472,16 @@ static VIDEO_START( pc_cga )
 static VIDEO_UPDATE( mc6845_cga ) {
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
+
+	/* Check for changes in font dipsetting */
+	switch ( CGA_FONT & 0x01 ) {
+	case 0:
+		cga.chr_gen = memory_region(REGION_GFX1) + 0x1800;
+		break;
+	case 1:
+		cga.chr_gen = memory_region(REGION_GFX1) + 0x1000;
+		break;
+	}
 	return 0;
 }
 
@@ -1418,6 +1501,23 @@ static VIDEO_START( pc1512 )
 static VIDEO_UPDATE( mc6845_pc1512 ) {
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
+
+	/* Check for changes in font dipsetting */
+	switch ( CGA_FONT & 0x03 ) {
+	case 0:
+		cga.chr_gen = memory_region(REGION_GFX1) + 0x0000;
+		break;
+	case 1:
+		cga.chr_gen = memory_region(REGION_GFX1) + 0x0800;
+		break;
+	case 2:
+		cga.chr_gen = memory_region(REGION_GFX1) + 0x1000;
+		break;
+	case 3:
+		cga.chr_gen = memory_region(REGION_GFX1) + 0x1800;
+		break;
+	}
+
 	return 0;
 }
 

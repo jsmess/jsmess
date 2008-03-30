@@ -167,5 +167,4 @@ MACHINE_START( at )
 MACHINE_RESET( at )
 {
 	dma8237_reset();
-	pcvideo_cga_set_character_base( memory_region(REGION_GFX1) + 0x1000 );
 }

@@ -225,45 +225,6 @@ static int pc_irq_callback(int irqline)
 }
 
 
-static void ibmpc_set_cga_font( void ) {
-	UINT8	*chr_gen;
-
-	/* Check for changes in font dipsetting */
-	switch ( CGA_FONT & 0x01 ) {
-	case 0:
-		chr_gen = memory_region(REGION_GFX1) + 0x1800;
-		break;
-	case 1:
-		chr_gen = memory_region(REGION_GFX1) + 0x1000;
-		break;
-	}
-
-	pcvideo_cga_set_character_base( chr_gen );
-}
-
-
-static void pc1512_set_cga_font( void ) {
-	UINT8	*chr_gen;
-
-	/* Check for changes in font dipsetting */
-	switch ( CGA_FONT & 0x03 ) {
-	case 0:
-		chr_gen = memory_region(REGION_GFX1) + 0x0000;
-		break;
-	case 1:
-		chr_gen = memory_region(REGION_GFX1) + 0x0800;
-		break;
-	case 2:
-		chr_gen = memory_region(REGION_GFX1) + 0x1000;
-		break;
-	case 3:
-		chr_gen = memory_region(REGION_GFX1) + 0x1800;
-		break;
-	}
-
-	pcvideo_cga_set_character_base( chr_gen );
-}
-
 MACHINE_RESET( pc_mda )
 {
 	dma8237_reset();
@@ -274,7 +235,6 @@ MACHINE_RESET( pc_cga )
 {
 	dma8237_reset();
 	cpunum_set_irq_callback(0, pc_irq_callback);
-	ibmpc_set_cga_font();
 }
 
 MACHINE_RESET( pc_t1t )
@@ -286,7 +246,6 @@ MACHINE_RESET( pc_t1t )
 MACHINE_RESET( pc_pc1512 ) {
 	dma8237_reset();
 	cpunum_set_irq_callback(0, pc_irq_callback);
-	pc1512_set_cga_font();
 }
 
 MACHINE_RESET( pc_aga )
@@ -322,13 +281,11 @@ INTERRUPT_GEN( pc_mda_frame_interrupt )
 INTERRUPT_GEN( pc_cga_frame_interrupt )
 {
 	pc_generic_frame_interrupt(NULL);
-	ibmpc_set_cga_font();
 }
 
 INTERRUPT_GEN( pc_pc1512_frame_interrupt )
 {
 	pc_generic_frame_interrupt(NULL);
-	pc1512_set_cga_font();
 }
 
 INTERRUPT_GEN( tandy1000_frame_interrupt )

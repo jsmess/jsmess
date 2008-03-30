@@ -7,9 +7,6 @@
 #ifndef PC_H_
 #define PC_H_
 
-/* Dipswitch for font selection */
-#define CGA_FONT        (readinputport(20)&3)
-
 /*----------- defined in machine/pc.c -----------*/
 
 DRIVER_INIT( pccga );
