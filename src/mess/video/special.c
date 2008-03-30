@@ -10,6 +10,10 @@
 #include "driver.h"
   
 UINT8 *specialist_video_ram;
+UINT8 erik_page_active;
+UINT8 *erik_video_ram_page_1;
+UINT8 *erik_video_ram_page_2;
+
 
 VIDEO_START( special )
 {
@@ -21,6 +25,28 @@ VIDEO_UPDATE( special )
 	int y, x, b;
 	
 	for (x = 0; x < 48; x++)
+	{			
+		for (y = 0; y < 256; y++)
+		{
+			code = specialist_video_ram[y + x*256];
+			for (b = 7; b >= 0; b--)
+			{								
+				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  (code >> b) & 0x01;
+			}
+		}				
+	}
+	return 0;
+}
+VIDEO_START( specialp )
+{
+}
+ 
+VIDEO_UPDATE( specialp )
+{
+  UINT8 code;
+	int y, x, b;
+	
+	for (x = 0; x < 64; x++)
 	{			
 		for (y = 0; y < 256; y++)
 		{
@@ -88,4 +114,59 @@ VIDEO_UPDATE( specimx )
 	}
 	return 0;
 }
+
+const rgb_t erik_palette[8] = {
+	MAKE_RGB(0x00, 0x00, 0x00), // 0
+	MAKE_RGB(0x00, 0x00, 0xff), // 1
+	MAKE_RGB(0xff, 0x00, 0x00), // 2 
+	MAKE_RGB(0xff, 0x00, 0xff), // 3  
+	MAKE_RGB(0x00, 0xff, 0x00), // 4  
+	MAKE_RGB(0x00, 0xff, 0xff), // 5  
+	MAKE_RGB(0xff, 0xff, 0x00), // 6  
+	MAKE_RGB(0xff, 0xff, 0xff)  // 7  
+};
+
+PALETTE_INIT( erik )
+{
+	palette_set_colors(machine, 0, erik_palette, ARRAY_LENGTH(erik_palette));
+}
+
+UINT8 erik_color_1;
+UINT8 erik_color_2;
+UINT8 erik_background;
+
+VIDEO_START( erik )
+{	
+} 
+
+VIDEO_UPDATE( erik )
+{
+  UINT8 code1;
+  UINT8 code2;
+  UINT8 color1,color2;
+	int y, x, b;
+	UINT8 *erik_video_ram_p1;
+	UINT8 *erik_video_ram_p2;
+	
+	erik_video_ram_p1 =  mess_ram + 0x9000;
+	erik_video_ram_p2 =  mess_ram + 0xd000;
+		
+	for (x = 0; x < 48; x++)
+	{			
+		for (y = 0; y < 256; y++)
+		{
+			code1  = erik_video_ram_p1[y + x*256];
+			code2  = erik_video_ram_p2[y + x*256];
+			
+			for (b = 7; b >= 0; b--)
+			{								
+				color1 = ((code1 >> b) & 0x01)==0 ? erik_background : erik_color_1;
+				color2 = ((code2 >> b) & 0x01)==0 ? erik_background : erik_color_2;
+				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  color1 | color2;
+			}
+		}				
+	}	  
+	return 0;
+}
+
 

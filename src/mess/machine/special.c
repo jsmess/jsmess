@@ -53,18 +53,18 @@ READ8_HANDLER (specialist_8255_portb_r )
 	int dat = 0;
 	double level;	
 	
-    if ((specialist_8255_porta & 0x01)==0) dat ^= (readinputport(0) ^ 0xff);
-	if ((specialist_8255_porta & 0x02)==0) dat ^= (readinputport(1) ^ 0xff);
-    if ((specialist_8255_porta & 0x04)==0) dat ^= (readinputport(2) ^ 0xff);
-    if ((specialist_8255_porta & 0x08)==0) dat ^= (readinputport(3) ^ 0xff);
-	if ((specialist_8255_porta & 0x10)==0) dat ^= (readinputport(4) ^ 0xff);
-	if ((specialist_8255_porta & 0x20)==0) dat ^= (readinputport(5) ^ 0xff);
-    if ((specialist_8255_porta & 0x40)==0) dat ^= (readinputport(6) ^ 0xff);
-    if ((specialist_8255_porta & 0x80)==0) dat ^= (readinputport(7) ^ 0xff);
-	if ((specialist_8255_portc & 0x01)==0) dat ^= (readinputport(8) ^ 0xff);
-	if ((specialist_8255_portc & 0x02)==0) dat ^= (readinputport(9) ^ 0xff);
-    if ((specialist_8255_portc & 0x04)==0) dat ^= (readinputport(10) ^ 0xff);
-    if ((specialist_8255_portc & 0x08)==0) dat ^= (readinputport(11) ^ 0xff);
+  if ((specialist_8255_porta & 0x01)==0) dat ^= (readinputport(0) ^ 0xff);
+  if ((specialist_8255_porta & 0x02)==0) dat ^= (readinputport(1) ^ 0xff);
+  if ((specialist_8255_porta & 0x04)==0) dat ^= (readinputport(2) ^ 0xff);
+  if ((specialist_8255_porta & 0x08)==0) dat ^= (readinputport(3) ^ 0xff);
+  if ((specialist_8255_porta & 0x10)==0) dat ^= (readinputport(4) ^ 0xff);
+  if ((specialist_8255_porta & 0x20)==0) dat ^= (readinputport(5) ^ 0xff);
+  if ((specialist_8255_porta & 0x40)==0) dat ^= (readinputport(6) ^ 0xff);
+  if ((specialist_8255_porta & 0x80)==0) dat ^= (readinputport(7) ^ 0xff);
+  if ((specialist_8255_portc & 0x01)==0) dat ^= (readinputport(8) ^ 0xff);
+  if ((specialist_8255_portc & 0x02)==0) dat ^= (readinputport(9) ^ 0xff);
+  if ((specialist_8255_portc & 0x04)==0) dat ^= (readinputport(10) ^ 0xff);
+  if ((specialist_8255_portc & 0x08)==0) dat ^= (readinputport(11) ^ 0xff);
   	
 	dat = (dat  << 2) ^0xff;	
 	if (readinputport(12)!=0xff) dat ^= 0x02;
@@ -132,11 +132,12 @@ MACHINE_RESET( special )
 READ8_HANDLER( specialist_keyboard_r )
 {	
 	return ppi8255_0_r(machine, (offset & 3));	
+	return 0;
 }
 
 WRITE8_HANDLER( specialist_keyboard_w )
-{
-	ppi8255_0_w(machine, (offset & 3) , data );
+{	
+	ppi8255_0_w(machine, (offset & 3) , data );	
 }
 
 
@@ -160,13 +161,12 @@ READ8_HANDLER (specimx_video_color_r )
 	return specimx_color;
 }
 
-
-void specimx_set_bank(int i) {	
+void specimx_set_bank(int i,int data) {		
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffbf, 0, 0, SMH_BANK3);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xffc0, 0xffdf, 0, 0, SMH_BANK4);
 	memory_set_bankptr(4, mess_ram + 0xffc0);
 	switch(i) {
-		case 0 :
+		case 0 :			  
 				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
 				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, video_memory_w);
 			
@@ -188,31 +188,22 @@ void specimx_set_bank(int i) {
 			
 				memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000);
 				memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x19000);
-				memory_set_bankptr(3, mess_ram + 0xc000);
+			  if (data & 0x80) {
+					memory_set_bankptr(3, mess_ram + 0x1c000);					
+				} else {
+					memory_set_bankptr(3, mess_ram + 0xc000);					
+				}
 				break;
 	}
 }
 WRITE8_HANDLER( specimx_select_bank )
 {	
-	specimx_set_bank(offset);	
-}
-
-void specimx_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
-{
-	switch (event)
-	{
-		case WD17XX_IRQ_CLR:
-		case WD17XX_IRQ_SET:
-		case WD17XX_DRQ_CLR:
-		case WD17XX_DRQ_SET:
-			/* do nothing */
-			break;
-	}
+	specimx_set_bank(offset, data);	
 }
 
 DRIVER_INIT(specimx)
 {
-	memset(mess_ram,0,256*1024);
+	memset(mess_ram,0,128*1024);
 }
 
 static const struct pit8253_config specimx_pit8253_intf =
@@ -239,7 +230,7 @@ static const struct pit8253_config specimx_pit8253_intf =
 
 MACHINE_START( specimx )
 {
-	wd17xx_init(machine, WD_TYPE_1793, specimx_fdc_callback, NULL);
+	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
 	wd17xx_set_density (DEN_FM_HI);
 	pit8253_init(1, &specimx_pit8253_intf);
 }
@@ -247,7 +238,7 @@ MACHINE_START( specimx )
 MACHINE_RESET( specimx )
 {
 	ppi8255_init(&specialist_ppi8255_interface);
-	specimx_set_bank(2); // Initiali load ROM disk
+	specimx_set_bank(2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;	
 	wd17xx_reset();
 	wd17xx_set_side(0);
@@ -255,34 +246,6 @@ MACHINE_RESET( specimx )
 	pit8253_0_gate_w(machine, 0, 0);
 	pit8253_0_gate_w(machine, 1, 0);
 	pit8253_0_gate_w(machine, 2, 0);
-}
-
-READ8_HANDLER ( specimx_disk_data_r )
-{
- switch(offset) {  		
-	case 0 :
-			return wd17xx_status_r(machine, offset);
-	case 1 : 
-			return wd17xx_track_r(machine, offset);
-    case 2 : 
-			return wd17xx_sector_r(machine, offset);
-	case 3 : 
-			return wd17xx_data_r(machine, offset);
-  }  
-  return 0;
-}
-WRITE8_HANDLER( specimx_disk_data_w )
-{		
-  switch(offset) {  		
-		case 0 : 
-			wd17xx_command_w(machine, offset, data);break;
-		case 1 : 
-			wd17xx_track_w (machine, offset, data);break;
-		case 2 : 
-			wd17xx_sector_w (machine, offset, data);break;
-		case 3 : 
-			wd17xx_data_w (machine, offset, data);break;
-  }  
 }
 
 READ8_HANDLER ( specimx_disk_ctrl_r )
@@ -343,4 +306,141 @@ WRITE8_HANDLER( specimx_sound_w)
 {
 	
 		pit8253_0_w(machine,offset,data);		
+}
+
+
+/*
+	Erik
+*/
+static UINT8 RR_register;
+static UINT8 RC_register;
+
+void erik_set_bank(void) {		
+	UINT8 bank1 = (RR_register & 3);
+	UINT8 bank2 = ((RR_register >> 2) & 3);
+	UINT8 bank3 = ((RR_register >> 4) & 3);
+	UINT8 bank4 = ((RR_register >> 6) & 3);
+	
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_BANK4);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_BANK5);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK6);
+	
+	switch(bank1) {
+		case 	1: 						
+		case 	2:
+		case 	3: 			
+						memory_set_bankptr(1, mess_ram + 0x10000*(bank1-1));			 
+						break;		
+		case 	0: 
+						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+						memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000);	
+						break;
+	}
+	switch(bank2) {
+		case 	1: 						
+		case 	2:
+		case 	3: 			
+						memory_set_bankptr(2, mess_ram + 0x10000*(bank2-1) + 0x4000);			 
+						break;		
+		case 	0: 
+						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_UNMAP);
+						memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x14000);	
+						break;
+	}
+	switch(bank3) {
+		case 	1: 												
+		case 	2:
+		case 	3: 			
+						memory_set_bankptr(3, mess_ram + 0x10000*(bank3-1) + 0x9000);			 
+						break;		
+		case 	0: 
+						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
+						memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x19000);	
+						break;
+	}
+	switch(bank4) {
+		case 	1: 						
+		case 	2:
+		case 	3: 			
+						memory_set_bankptr(4, mess_ram + 0x10000*(bank4-1) + 0x0c000);			 
+						memory_set_bankptr(5, mess_ram + 0x10000*(bank4-1) + 0x0f000);			 
+						memory_set_bankptr(6, mess_ram + 0x10000*(bank4-1) + 0x0f800);			 
+						break;		
+		case 	0: 
+						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_UNMAP);
+						memory_set_bankptr(4, memory_region(REGION_CPU1) + 0x1c000);	
+						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_UNMAP);
+						memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_NOP);
+						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_w);
+						memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_r);
+						break;
+	}
+}
+
+extern UINT8 erik_color_1;
+extern UINT8 erik_color_2;
+extern UINT8 erik_background;
+
+DRIVER_INIT(erik)
+{	
+	memset(mess_ram,0,192*1024);	
+	erik_color_1 = 0;
+	erik_color_2 = 0;
+	erik_background = 0;
+}
+
+MACHINE_START( erik )
+{
+	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
+}
+
+MACHINE_RESET( erik )
+{
+	ppi8255_init(&specialist_ppi8255_interface);
+	wd17xx_reset();		
+	
+	RR_register = 0x00;	
+	RC_register = 0x00;
+	erik_set_bank();				
+}
+
+READ8_HANDLER ( erik_rr_reg_r )
+{
+	return RR_register;
+}
+WRITE8_HANDLER( erik_rr_reg_w ) 
+{
+	RR_register = data;
+	erik_set_bank();
+}
+
+READ8_HANDLER ( erik_rc_reg_r ) 
+{
+	return RC_register;
+}
+
+
+WRITE8_HANDLER( erik_rc_reg_w ) 
+{
+	RC_register = data;
+	erik_color_1 =  RC_register & 7;
+	erik_color_2 =  (RC_register >> 3) & 7;
+	erik_background = ((RC_register  >> 6 ) & 1) + ((RC_register  >> 7 ) & 1) * 4;
+}
+
+READ8_HANDLER ( erik_disk_reg_r ) {
+	return 0xff;	
+}
+
+WRITE8_HANDLER( erik_disk_reg_w ) {
+	wd17xx_set_side (data & 1);	
+	wd17xx_set_drive((data >> 1) & 1);
+	if((data >>2) & 1) {
+		wd17xx_set_density (DEN_FM_LO);
+	} else {
+		wd17xx_set_density (DEN_FM_HI);
+  }	
 }
