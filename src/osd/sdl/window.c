@@ -1542,8 +1542,6 @@ static void get_max_bounds(sdl_window_info *window, int *window_width, int *wind
 {
 	INT32 maxwidth, maxheight;
 
-	assert(GetCurrentThreadId() == window_threadid);
-
 	// compute the maximum client area
 	maxwidth = window->monitor->center_width;
 	maxheight = window->monitor->center_height;
