@@ -146,12 +146,12 @@ static DEVICE_START( cartslot_specified )
 	process_cartridge(device, NULL);
 }
 
-static DEVICE_LOAD( cartslot_specified )
+static DEVICE_IMAGE_LOAD( cartslot_specified )
 {
 	return process_cartridge(image, image);
 }
 
-static DEVICE_UNLOAD( cartslot_specified )
+static DEVICE_IMAGE_UNLOAD( cartslot_specified )
 {
 	process_cartridge(image, NULL);
 }

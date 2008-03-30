@@ -25,7 +25,7 @@ WRITE8_HANDLER (atom_8255_portc_w );
  READ8_HANDLER (atom_8271_r);
 WRITE8_HANDLER (atom_8271_w);
 
-DEVICE_LOAD( atom_floppy );
+DEVICE_IMAGE_LOAD( atom_floppy );
 
  READ8_HANDLER(atom_eprom_box_r);
 WRITE8_HANDLER(atom_eprom_box_w);

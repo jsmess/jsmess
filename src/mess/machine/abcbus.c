@@ -47,7 +47,7 @@ WRITE8_HANDLER( abcbus_strobe_w )
 	abcbus_strobe = ASSERT_LINE;
 }
 
-DEVICE_LOAD( abc_floppy )
+DEVICE_IMAGE_LOAD( abc_floppy )
 {
 	int size, tracks, heads, sectors;
 

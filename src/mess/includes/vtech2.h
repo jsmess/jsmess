@@ -17,10 +17,10 @@ MACHINE_RESET( laser350 );
 MACHINE_RESET( laser500 );
 MACHINE_RESET( laser700 );
 
-DEVICE_LOAD( laser_cart );
-DEVICE_UNLOAD( laser_cart );
+DEVICE_IMAGE_LOAD( laser_cart );
+DEVICE_IMAGE_UNLOAD( laser_cart );
 
-DEVICE_LOAD( laser_floppy );
+DEVICE_IMAGE_LOAD( laser_floppy );
 
 extern  READ8_HANDLER ( laser_fdc_r );
 extern WRITE8_HANDLER ( laser_fdc_w );

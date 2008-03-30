@@ -18,7 +18,7 @@
 
 void Enterprise_SetupPalette(void);
 
-DEVICE_LOAD( enterprise_floppy )
+DEVICE_IMAGE_LOAD( enterprise_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{

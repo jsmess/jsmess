@@ -145,7 +145,7 @@ static void jupiter_machine_stop(running_machine *machine)
    <byt>		: <byt>
 */
 
-DEVICE_LOAD( jupiter_ace )
+DEVICE_IMAGE_LOAD( jupiter_ace )
 {
 	unsigned char jupiter_repeat, jupiter_byte, loop;
 	int done, jupiter_index;
@@ -202,7 +202,7 @@ DEVICE_LOAD( jupiter_ace )
 	return (0);
 }
 
-DEVICE_LOAD( jupiter_tap )
+DEVICE_IMAGE_LOAD( jupiter_tap )
 {
 	UINT8 inpbyt;
 	int loop;
@@ -261,7 +261,7 @@ DEVICE_LOAD( jupiter_tap )
 
 }
 
-DEVICE_UNLOAD( jupiter_tap )
+DEVICE_IMAGE_UNLOAD( jupiter_tap )
 {
 	logerror("jupiter_tap_unload\n");
 	if (jupiter_data)

@@ -88,7 +88,7 @@ int vic6560_dma_read_color (int offset);
 int vic6560_dma_read (int offset);
 
 DEVICE_START(vc20_rom);
-DEVICE_LOAD(vc20_rom);
+DEVICE_IMAGE_LOAD(vc20_rom);
 
 DRIVER_INIT( vc20 );
 DRIVER_INIT( vic20 );

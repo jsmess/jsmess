@@ -13,9 +13,9 @@
 OPBASE_HANDLER( jupiter_opbaseoverride );
 MACHINE_START( jupiter );
 
-DEVICE_LOAD( jupiter_ace );
-DEVICE_LOAD( jupiter_tap );
-DEVICE_UNLOAD( jupiter_tap );
+DEVICE_IMAGE_LOAD( jupiter_ace );
+DEVICE_IMAGE_LOAD( jupiter_tap );
+DEVICE_IMAGE_UNLOAD( jupiter_tap );
 
 READ8_HANDLER( jupiter_port_fefe_r);
 READ8_HANDLER( jupiter_port_fdfe_r);

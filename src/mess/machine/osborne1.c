@@ -369,7 +369,7 @@ static TIMER_CALLBACK(osborne1_video_callback) {
  * - DEC 1820 double density: 40 tracks, 9 sectors per track, 512-byte sectors (180 KByte)
  *
  */
-DEVICE_LOAD( osborne1_floppy ) {
+DEVICE_IMAGE_LOAD( osborne1_floppy ) {
 	int size, sectors, sectorsize;
 
 	if ( ! image_has_been_created( image ) ) {

@@ -1064,7 +1064,7 @@ ROM_END
 
 /* System Configuration */
 
-static DEVICE_LOAD( ql_microdrive )
+static DEVICE_IMAGE_LOAD( ql_microdrive )
 {
 	int	filesize = image_length(image);
 
@@ -1099,7 +1099,7 @@ static void ql_microdrive_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static DEVICE_LOAD( ql_serial )
+static DEVICE_IMAGE_LOAD( ql_serial )
 {
 	/* filename specified */
 	if (serial_device_load(image)==INIT_PASS)
@@ -1137,7 +1137,7 @@ static void ql_serial_getinfo(const mess_device_class *devclass, UINT32 state, u
 	}
 }
 
-static DEVICE_LOAD( ql_cart )
+static DEVICE_IMAGE_LOAD( ql_cart )
 {
 	UINT8 *ptr = memory_region(REGION_CPU1) + 0x00c000;
 	int	filesize = image_length(image);

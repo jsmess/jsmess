@@ -163,13 +163,13 @@ static READ8_HANDLER(read_keyboard)
 	return readinputport(offset);
 }
 
-static DEVICE_LOAD( tutor_cart )
+static DEVICE_IMAGE_LOAD( tutor_cart )
 {
 	image_fread(image, memory_region(REGION_CPU1) + cartridge_base, 0x6000);
 	return INIT_PASS;
 }
 
-static DEVICE_UNLOAD( tutor_cart )
+static DEVICE_IMAGE_UNLOAD( tutor_cart )
 {
 	memset(memory_region(REGION_CPU1) + cartridge_base, 0, 0x6000);
 }

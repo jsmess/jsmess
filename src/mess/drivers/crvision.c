@@ -448,7 +448,7 @@ ROM_END
 
 /* System Configuration */
 
-static DEVICE_LOAD( crvision_cart )
+static DEVICE_IMAGE_LOAD( crvision_cart )
 {
 	int size = image_length(image);
 

@@ -66,10 +66,10 @@ static DEVICE_START(ide_hd)
 
 
 /*-------------------------------------------------
-	ide_hd_load - Load an IDE hard disk image
+	DEVICE_IMAGE_LOAD(ide_hd) - Load an IDE hard disk image
 -------------------------------------------------*/
 
-static int ide_hd_load(const device_config *image)
+static DEVICE_IMAGE_LOAD(ide_hd)
 {
 	int result, which_bus, which_address;
 	struct ide_interface *intf;
@@ -92,10 +92,10 @@ static int ide_hd_load(const device_config *image)
 
 
 /*-------------------------------------------------
-	ide_hd_unload - Unload an IDE hard disk image
+	DEVICE_IMAGE_UNLOAD(ide_hd) - Unload an IDE hard disk image
 -------------------------------------------------*/
 
-static void ide_hd_unload(const device_config *image)
+static DEVICE_IMAGE_UNLOAD(ide_hd)
 {
 	int which_bus, which_address;
 	struct ide_interface *intf;
@@ -161,9 +161,9 @@ void ide_harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state
 	switch(state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:					info->start = DEVICE_START_NAME(ide_hd); break;
-		case MESS_DEVINFO_PTR_LOAD:					info->load = ide_hd_load; break;
-		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = ide_hd_unload; break;
+		case MESS_DEVINFO_PTR_START:				info->start = DEVICE_START_NAME(ide_hd); break;
+		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(ide_hd); break;
+		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = DEVICE_IMAGE_UNLOAD_NAME(ide_hd); break;
 		case MESS_DEVINFO_PTR_VALIDITY_CHECK:		info->validity_check = ide_hd_validity_check; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

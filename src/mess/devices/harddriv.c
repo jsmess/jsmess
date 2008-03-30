@@ -166,14 +166,14 @@ done:
 
 
 
-DEVICE_LOAD( mess_hd )
+DEVICE_IMAGE_LOAD( mess_hd )
 {
 	return internal_load_mess_hd(image, NULL);
 }
 
 
 #ifdef UNUSED_FUNCTION
-static DEVICE_CREATE( mess_hd )
+static DEVICE_IMAGE_CREATE( mess_hd )
 {
 	int err;
 	char metadata[256];
@@ -210,7 +210,7 @@ error:
  *
  *************************************/
 
-DEVICE_UNLOAD( mess_hd )
+DEVICE_IMAGE_UNLOAD( mess_hd )
 {
 	struct mess_hd *hd = get_drive(image);
 	assert(hd->hard_disk_handle);

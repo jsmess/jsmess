@@ -228,7 +228,7 @@ DEVICE_START( a7800_cart )
 	a7800_stick_type = 1;
 }
 
-DEVICE_LOAD( a7800_cart )
+DEVICE_IMAGE_LOAD( a7800_cart )
 {
 	long len,start;
 	unsigned char header[128];

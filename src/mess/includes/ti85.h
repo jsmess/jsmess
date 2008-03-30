@@ -28,8 +28,8 @@ NVRAM_HANDLER( ti86 );
 SNAPSHOT_LOAD( ti8x );
 
 DEVICE_START( ti85_serial );
-DEVICE_LOAD( ti85_serial );
-DEVICE_UNLOAD( ti85_serial );
+DEVICE_IMAGE_LOAD( ti85_serial );
+DEVICE_IMAGE_UNLOAD( ti85_serial );
 
 WRITE8_HANDLER( ti81_port_0007_w);
  READ8_HANDLER( ti85_port_0000_r);

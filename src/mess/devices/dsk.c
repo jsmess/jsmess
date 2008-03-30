@@ -79,7 +79,7 @@ static DEVICE_START( dsk_floppy )
 
 
 /* load floppy */
-static DEVICE_LOAD( dsk_floppy )
+static DEVICE_IMAGE_LOAD( dsk_floppy )
 {
 	int id = image_index_in_device(image);
 	dsk_drive *thedrive = &drives[id];
@@ -122,7 +122,7 @@ static int dsk_save(const device_config *img, unsigned char **ptr)
 }
 
 
-static DEVICE_UNLOAD( dsk_floppy )
+static DEVICE_IMAGE_UNLOAD( dsk_floppy )
 {
 	int id = image_index_in_device(image);
 	dsk_drive *thedrive = &drives[id];

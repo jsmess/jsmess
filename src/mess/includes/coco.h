@@ -50,10 +50,10 @@ MACHINE_START( coco2 );
 MACHINE_START( coco3 );
 MACHINE_RESET( coco3 );
 
-DEVICE_LOAD(coco_rom);
-DEVICE_LOAD(coco3_rom);
-DEVICE_UNLOAD(coco_rom);
-DEVICE_UNLOAD(coco3_rom);
+DEVICE_IMAGE_LOAD(coco_rom);
+DEVICE_IMAGE_LOAD(coco3_rom);
+DEVICE_IMAGE_UNLOAD(coco_rom);
+DEVICE_IMAGE_UNLOAD(coco3_rom);
 
 INPUT_CHANGED(coco_keyboard_changed);
 INPUT_CHANGED(coco_joystick_mode_changed);

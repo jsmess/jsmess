@@ -121,7 +121,7 @@ static TIMER_CALLBACK(cas_copy_callback)
 	activecpu_set_reg(Z80_PC, entry);
 }
 
-DEVICE_LOAD( trs80_cas )
+DEVICE_IMAGE_LOAD( trs80_cas )
 {
 	cas_size = image_length(image);
 	cas_buff = image_ptr(image);
@@ -142,7 +142,7 @@ DEVICE_LOAD( trs80_cas )
 	return 0;
 }
 
-DEVICE_UNLOAD( trs80_cas )
+DEVICE_IMAGE_UNLOAD( trs80_cas )
 {
 	cas_buff = NULL;
 	cas_size = 0;
@@ -213,7 +213,7 @@ extern QUICKLOAD_LOAD( trs80_cmd )
 	return INIT_PASS;
 }
 
-DEVICE_LOAD( trs80_floppy )
+DEVICE_IMAGE_LOAD( trs80_floppy )
 {
 	static UINT8 pdrive[4*16];
 	int i;

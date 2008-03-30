@@ -77,12 +77,12 @@ static INTERRUPT_GEN( exelv_hblank_interrupt )
 	tms3556_interrupt( machine );
 }
 
-/*static DEVICE_LOAD(exelv_cart)
+/*static DEVICE_IMAGE_LOAD(exelv_cart)
 {
     return INIT_PASS;
 }
 
-static DEVICE_UNLOAD( exelv_cart )
+static DEVICE_IMAGE_UNLOAD( exelv_cart )
 {
 }*/
 

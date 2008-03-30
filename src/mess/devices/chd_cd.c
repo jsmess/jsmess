@@ -145,7 +145,7 @@ error:
 
 
 
-static DEVICE_LOAD( mess_cd )
+static DEVICE_IMAGE_LOAD( mess_cd )
 {
 	return internal_load_mess_cd(image, NULL);
 }
@@ -160,7 +160,7 @@ static DEVICE_LOAD( mess_cd )
  *
  *************************************/
 
-static DEVICE_UNLOAD( mess_cd )
+static DEVICE_IMAGE_UNLOAD( mess_cd )
 {
 	struct mess_cd *cd = get_drive(image);
 	assert(cd->cdrom_handle);

@@ -40,7 +40,7 @@ int adam_cart_verify(const UINT8 *cartdata, size_t size)
 	return retval;
 }
 
-DEVICE_LOAD( adam_floppy )
+DEVICE_IMAGE_LOAD( adam_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{
@@ -56,7 +56,7 @@ DEVICE_LOAD( adam_floppy )
 
 
 
-DEVICE_UNLOAD( adam_floppy )
+DEVICE_IMAGE_UNLOAD( adam_floppy )
 {
     device_unload_basicdsk_floppy(image);
 }

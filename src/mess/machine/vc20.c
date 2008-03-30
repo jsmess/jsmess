@@ -625,7 +625,7 @@ DEVICE_START(vc20_rom)
 	vc20_rom_a000 = NULL;
 }
 
-DEVICE_LOAD(vc20_rom)
+DEVICE_IMAGE_LOAD(vc20_rom)
 {
 	int size, read_;
 	const char *cp;

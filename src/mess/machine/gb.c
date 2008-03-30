@@ -1407,7 +1407,7 @@ DEVICE_START(gb_cart)
 	RAMMask = 0;
 }
 
-DEVICE_LOAD(gb_cart)
+DEVICE_IMAGE_LOAD(gb_cart)
 {
 	static const char *const CartTypes[] =
 	{
@@ -2034,7 +2034,7 @@ WRITE8_HANDLER( megaduck_rom_bank_select_type2 )
 	}
 }
 
-DEVICE_LOAD(megaduck_cart)
+DEVICE_IMAGE_LOAD(megaduck_cart)
 {
 	int I, filesize;
 

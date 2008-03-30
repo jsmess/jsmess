@@ -336,7 +336,7 @@ static void mwa_bank(int bank, int offs, int data)
     }
 }
 
-DEVICE_LOAD( laser_cart )
+DEVICE_IMAGE_LOAD( laser_cart )
 {
 	int size = 0;
 
@@ -354,14 +354,14 @@ DEVICE_LOAD( laser_cart )
 	return size > 0 ? INIT_PASS : INIT_FAIL;
 }
 
-DEVICE_UNLOAD( laser_cart )
+DEVICE_IMAGE_UNLOAD( laser_cart )
 {
 	laser_bank_mask &= ~0xf000;
 	/* wipe out the memory contents to be 100% sure */
 	memset(&mem[0x30000], 0xff, 0x10000);
 }
 
-DEVICE_LOAD( laser_floppy )
+DEVICE_IMAGE_LOAD( laser_floppy )
 {
 	UINT8 buff[32];
 

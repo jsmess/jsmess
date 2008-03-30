@@ -38,7 +38,7 @@ DEVICE_START(d88image_floppy)
 }
 
 /* attempt to insert a disk into the drive specified with id */
-DEVICE_LOAD(d88image_floppy)
+DEVICE_IMAGE_LOAD(d88image_floppy)
 {
 	UINT8 tmp8;
 	UINT16 tmp16;

@@ -11,7 +11,7 @@
 /*----------- defined in machine/mekd2.c -----------*/
 
 DRIVER_INIT( mekd2 );
-DEVICE_LOAD( mekd2_cart );
+DEVICE_IMAGE_LOAD( mekd2_cart );
 
 
 /*----------- defined in video/mekd2.c -----------*/

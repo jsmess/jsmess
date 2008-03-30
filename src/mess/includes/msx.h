@@ -56,8 +56,8 @@ extern INTERRUPT_GEN( msx_interrupt );
 extern INTERRUPT_GEN( msx2_interrupt );
 extern NVRAM_HANDLER( msx2 );
 
-DEVICE_LOAD( msx_cart );
-DEVICE_UNLOAD( msx_cart );
+DEVICE_IMAGE_LOAD( msx_cart );
+DEVICE_IMAGE_UNLOAD( msx_cart );
 
 void msx_vdp_interrupt (int);
 
@@ -77,7 +77,7 @@ WRITE8_HANDLER ( msx_rtc_latch_w );
 WRITE8_HANDLER ( msx_90in1_w );
 
 /* disk functions */
-DEVICE_LOAD( msx_floppy );
+DEVICE_IMAGE_LOAD( msx_floppy );
 
 /* new memory emulation */
 WRITE8_HANDLER (msx_superloadrunner_w);

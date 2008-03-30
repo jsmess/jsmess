@@ -3,8 +3,8 @@
 */
 
 DEVICE_START( ti990_hd );
-DEVICE_LOAD( ti990_hd );
-DEVICE_UNLOAD( ti990_hd );
+DEVICE_IMAGE_LOAD( ti990_hd );
+DEVICE_IMAGE_UNLOAD( ti990_hd );
 
 void ti990_hdc_init(void (*interrupt_callback)(int state));
 

@@ -322,7 +322,7 @@ static void lynx_crc_keyword(const device_config *image)
     }
 }
 
-static DEVICE_LOAD( lynx_cart )
+static DEVICE_IMAGE_LOAD( lynx_cart )
 {
 	UINT8 *rom = memory_region(REGION_USER1);
 	int size;

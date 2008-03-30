@@ -383,7 +383,7 @@ DEVICE_START( pdp1_tape )
 
 	unit 0 is reader (read-only), unit 1 is puncher (write-only)
 */
-DEVICE_LOAD( pdp1_tape )
+DEVICE_IMAGE_LOAD( pdp1_tape )
 {
 	int id = image_index_in_device(image);
 
@@ -423,7 +423,7 @@ DEVICE_LOAD( pdp1_tape )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( pdp1_tape )
+DEVICE_IMAGE_UNLOAD( pdp1_tape )
 {
 	int id = image_index_in_device(image);
 
@@ -719,7 +719,7 @@ void iot_ppb(int op2, int nac, int mb, int *io, int ac)
 /*
 	Open a file for typewriter output
 */
-DEVICE_LOAD(pdp1_typewriter)
+DEVICE_IMAGE_LOAD(pdp1_typewriter)
 {
 	/* open file */
 	typewriter.fd = image;
@@ -729,7 +729,7 @@ DEVICE_LOAD(pdp1_typewriter)
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD(pdp1_typewriter)
+DEVICE_IMAGE_UNLOAD(pdp1_typewriter)
 {
 	typewriter.fd = NULL;
 }
@@ -1051,7 +1051,7 @@ static void parallel_drum_init(void)
 /*
 	Open a file for drum
 */
-DEVICE_LOAD(pdp1_drum)
+DEVICE_IMAGE_LOAD(pdp1_drum)
 {
 	/* open file */
 	parallel_drum.fd = image;
@@ -1059,7 +1059,7 @@ DEVICE_LOAD(pdp1_drum)
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD(pdp1_drum)
+DEVICE_IMAGE_UNLOAD(pdp1_drum)
 {
 	parallel_drum.fd = NULL;
 }

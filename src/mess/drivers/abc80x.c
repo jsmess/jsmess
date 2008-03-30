@@ -1039,7 +1039,7 @@ static void abc800_printer_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static DEVICE_LOAD( abc800_serial )
+static DEVICE_IMAGE_LOAD( abc800_serial )
 {
 	/* filename specified */
 	if (serial_device_load(image)==INIT_PASS)

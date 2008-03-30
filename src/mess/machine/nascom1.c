@@ -100,7 +100,7 @@ READ8_HANDLER( nascom2_fdc_status_r )
 }
 
 
-DEVICE_LOAD( nascom2_floppy )
+DEVICE_IMAGE_LOAD( nascom2_floppy )
 {
 	int sides, sectors;
 
@@ -209,7 +209,7 @@ READ8_HANDLER( nascom1_port_02_r )
 }
 
 
-DEVICE_LOAD( nascom1_cassette )
+DEVICE_IMAGE_LOAD( nascom1_cassette )
 {
 	nascom1_tape_size = image_length(image);
 	nascom1_tape_image = image_ptr(image);
@@ -221,7 +221,7 @@ DEVICE_LOAD( nascom1_cassette )
 }
 
 
-DEVICE_UNLOAD( nascom1_cassette )
+DEVICE_IMAGE_UNLOAD( nascom1_cassette )
 {
 	nascom1_tape_image = NULL;
 	nascom1_tape_size = nascom1_tape_index = 0;

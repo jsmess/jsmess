@@ -446,7 +446,7 @@ static UINT8 *sb2m600_tape_image;
 static int sb2m600_tape_size;
 static int sb2m600_tape_index;
 
-static DEVICE_LOAD( sb2m600_cassette )
+static DEVICE_IMAGE_LOAD( sb2m600_cassette )
 {
 	sb2m600_tape_image = (UINT8 *)image_malloc(image, sb2m600_tape_size);
 	sb2m600_tape_size = image_length(image);
@@ -461,7 +461,7 @@ static DEVICE_LOAD( sb2m600_cassette )
 	return INIT_PASS;
 }
 
-static DEVICE_UNLOAD( sb2m600_cassette )
+static DEVICE_IMAGE_UNLOAD( sb2m600_cassette )
 {
 	sb2m600_tape_image = NULL;
 	sb2m600_tape_size = 0;

@@ -140,7 +140,7 @@ static void check_extended_image( int id )
 	}
 }
 
-static DEVICE_LOAD(amiga_fdc)
+static DEVICE_IMAGE_LOAD(amiga_fdc)
 {
 	int id = image_index_in_device(image);
 
@@ -159,7 +159,7 @@ static DEVICE_LOAD(amiga_fdc)
 	return INIT_PASS;
 }
 
-static DEVICE_UNLOAD(amiga_fdc)
+static DEVICE_IMAGE_UNLOAD(amiga_fdc)
 {
 	int id = image_index_in_device(image);
 

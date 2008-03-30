@@ -595,7 +595,7 @@ static int c16_rom_id(const device_config *image)
 	return retval;
 }
 
-DEVICE_LOAD(c16_rom)
+DEVICE_IMAGE_LOAD(c16_rom)
 {
 	return (!c16_rom_id(image)) ? INIT_FAIL : INIT_PASS;
 }

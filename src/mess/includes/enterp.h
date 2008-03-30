@@ -10,7 +10,7 @@
 
 /*----------- defined in machine/enterp.c -----------*/
 
-DEVICE_LOAD( enterprise_floppy );
+DEVICE_IMAGE_LOAD( enterprise_floppy );
 
 
 /*----------- defined in video/enterp.c -----------*/

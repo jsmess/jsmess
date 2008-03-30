@@ -42,7 +42,7 @@ static cylinder apexc_cylinder;
 /*
     Open cylinder image and read RAM
 */
-static DEVICE_LOAD( apexc_cylinder )
+static DEVICE_IMAGE_LOAD( apexc_cylinder )
 {
 	/* open file */
 	apexc_cylinder.fd = image;
@@ -72,7 +72,7 @@ static DEVICE_LOAD( apexc_cylinder )
 /*
     Save RAM to cylinder image and close it
 */
-static DEVICE_UNLOAD( apexc_cylinder )
+static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
 {
 	if (apexc_cylinder.fd && apexc_cylinder.writable)
 	{	/* save RAM contents */
@@ -178,7 +178,7 @@ static DEVICE_START( apexc_tape )
 /*
     Open a tape image
 */
-static DEVICE_LOAD( apexc_tape )
+static DEVICE_IMAGE_LOAD( apexc_tape )
 {
 	int id = image_index_in_device(image);
 	tape *t = &apexc_tapes[id];

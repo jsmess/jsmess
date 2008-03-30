@@ -8,7 +8,7 @@
 
 extern const floppy_interface mfm_disk_floppy_interface;
 
-DEVICE_LOAD( mfm_disk );
+DEVICE_IMAGE_LOAD( mfm_disk );
 
 
 #endif /* MFMDISK_H */

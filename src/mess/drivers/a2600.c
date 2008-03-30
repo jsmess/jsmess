@@ -529,7 +529,7 @@ static DEVICE_START( a2600_cart )
 }
 
 
-static DEVICE_LOAD( a2600_cart )
+static DEVICE_IMAGE_LOAD( a2600_cart )
 {
 	const struct _extrainfo_banking_def *eibd;
 	const char	*extrainfo;

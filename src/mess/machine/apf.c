@@ -14,7 +14,7 @@
 
 
 /* 256 bytes per sector, single sided, single density, 40 track  */
-DEVICE_LOAD( apfimag_floppy )
+DEVICE_IMAGE_LOAD( apfimag_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{

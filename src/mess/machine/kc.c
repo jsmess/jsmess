@@ -137,7 +137,7 @@ QUICKLOAD_LOAD(kc)
 /* bit 4: Index pulse from disc */
 static unsigned char kc85_disc_hw_input_gate;
 
-DEVICE_LOAD( kc85_floppy )
+DEVICE_IMAGE_LOAD( kc85_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{

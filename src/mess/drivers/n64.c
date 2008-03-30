@@ -126,7 +126,7 @@ ROM_START( n64)
     ROM_REGION32_BE( 0x4000000, REGION_USER2, ROMREGION_ERASEFF)
 ROM_END
 
-static DEVICE_LOAD(n64_cart)
+static DEVICE_IMAGE_LOAD(n64_cart)
 {
 	int i, length;
 	UINT8 *cart = memory_region(REGION_USER2);

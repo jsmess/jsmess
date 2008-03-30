@@ -52,7 +52,7 @@ WRITE8_HANDLER( gb_io2_w );
 READ8_HANDLER( gb_ie_r );
 WRITE8_HANDLER( gb_ie_w );
 DEVICE_START(gb_cart);
-DEVICE_LOAD(gb_cart);
+DEVICE_IMAGE_LOAD(gb_cart);
 INTERRUPT_GEN( gb_scanline_interrupt );
 void gb_timer_callback(int cycles);
 WRITE8_HANDLER( gbc_io2_w );
@@ -87,7 +87,7 @@ MACHINE_RESET( gbc );
 
 
 /* -- Megaduck specific -- */
-extern DEVICE_LOAD(megaduck_cart);
+extern DEVICE_IMAGE_LOAD(megaduck_cart);
 extern MACHINE_RESET( megaduck );
 extern  READ8_HANDLER( megaduck_video_r );
 extern WRITE8_HANDLER( megaduck_video_w );

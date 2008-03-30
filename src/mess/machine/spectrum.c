@@ -1078,7 +1078,7 @@ QUICKLOAD_LOAD(spectrum)
 	return INIT_PASS;
 }
 
-DEVICE_LOAD( timex_cart )
+DEVICE_IMAGE_LOAD( timex_cart )
 {
 	int file_size;
 	UINT8 * file_data;
@@ -1159,7 +1159,7 @@ DEVICE_LOAD( timex_cart )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( timex_cart )
+DEVICE_IMAGE_UNLOAD( timex_cart )
 {
 	if (timex_cart_data)
 	{

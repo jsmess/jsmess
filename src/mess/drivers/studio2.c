@@ -333,7 +333,7 @@ ROM_END
 
 #define ST2_HEADER_SIZE		256
 
-static DEVICE_LOAD( studio2_cart )
+static DEVICE_IMAGE_LOAD( studio2_cart )
 {
 	UINT8	*ptr = NULL;
 	UINT8	header[ST2_HEADER_SIZE];

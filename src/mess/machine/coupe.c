@@ -24,7 +24,7 @@ UINT8 STAT; 			/* returned when port 249 read */
 
 extern UINT8 *sam_screen;
 
-DEVICE_LOAD( coupe_floppy )
+DEVICE_IMAGE_LOAD( coupe_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{

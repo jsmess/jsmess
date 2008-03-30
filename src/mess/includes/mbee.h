@@ -18,7 +18,7 @@ READ8_HANDLER( mbee_lowram_r );
 
 INTERRUPT_GEN( mbee_interrupt );
 
-DEVICE_LOAD( mbee_cart );
+DEVICE_IMAGE_LOAD( mbee_cart );
 
  READ8_HANDLER ( mbee_pio_r );
 WRITE8_HANDLER ( mbee_pio_w );

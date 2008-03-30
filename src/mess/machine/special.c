@@ -275,7 +275,7 @@ static unsigned long specimx_calcoffset(UINT8 t, UINT8 h, UINT8 s,
 	return o;
 }
 
-DEVICE_LOAD( specimx_floppy )
+DEVICE_IMAGE_LOAD( specimx_floppy )
 {
 	int size;
 

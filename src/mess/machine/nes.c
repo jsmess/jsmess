@@ -377,7 +377,7 @@ WRITE8_HANDLER ( nes_IN1_w )
 
 
 
-DEVICE_LOAD(nes_cart)
+DEVICE_IMAGE_LOAD(nes_cart)
 {
 	const char *mapinfo;
 	int mapint1=0,mapint2=0,mapint3=0,mapint4=0,goodcrcinfo = 0;
@@ -567,7 +567,7 @@ DEVICE_START(nes_disk)
 }
 
 
-DEVICE_LOAD(nes_disk)
+DEVICE_IMAGE_LOAD(nes_disk)
 {
 	unsigned char magic[4];
 
@@ -599,7 +599,7 @@ DEVICE_LOAD(nes_disk)
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD(nes_disk)
+DEVICE_IMAGE_UNLOAD(nes_disk)
 {
 	/* TODO: should write out changes here as well */
 	nes_fds.data = NULL;

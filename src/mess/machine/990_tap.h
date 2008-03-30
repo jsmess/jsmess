@@ -3,8 +3,8 @@
 */
 
 DEVICE_START( ti990_tape );
-DEVICE_LOAD( ti990_tape );
-DEVICE_UNLOAD( ti990_tape );
+DEVICE_IMAGE_LOAD( ti990_tape );
+DEVICE_IMAGE_UNLOAD( ti990_tape );
 
 void ti990_tpc_init(void (*interrupt_callback)(int state));
 void ti990_tpc_exit(void);

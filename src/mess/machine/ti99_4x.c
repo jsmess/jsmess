@@ -480,7 +480,7 @@ DEVICE_START( ti99_cart )
 
 	We don't need to support 99/4p, as it has no cartridge port.
 */
-DEVICE_LOAD( ti99_cart )
+DEVICE_IMAGE_LOAD( ti99_cart )
 {
 	/* Trick - we identify file types according to their extension */
 	/* Note that if we do not recognize the extension, we revert to the slot location <-> type
@@ -586,7 +586,7 @@ DEVICE_LOAD( ti99_cart )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( ti99_cart )
+DEVICE_IMAGE_UNLOAD( ti99_cart )
 {
 	int id = image_index_in_device(image);
 
@@ -643,13 +643,13 @@ DEVICE_UNLOAD( ti99_cart )
 	slot_type[id] = SLOT_EMPTY;
 }
 
-DEVICE_LOAD( ti99_hd )
+DEVICE_IMAGE_LOAD( ti99_hd )
 {
 	int id = image_index_in_device(image);
 	return smc92x4_hd_load(image, id);
 }
 
-DEVICE_UNLOAD( ti99_hd )
+DEVICE_IMAGE_UNLOAD( ti99_hd )
 {
 	int id = image_index_in_device(image);
 	smc92x4_hd_unload(image, id);

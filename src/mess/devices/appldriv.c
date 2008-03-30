@@ -288,7 +288,7 @@ static DEVICE_START( apple525_floppy )
 
 
 
-static DEVICE_LOAD( apple525_floppy )
+static DEVICE_IMAGE_LOAD( apple525_floppy )
 {
 	int result;
 	device_load_handler parent_load;
@@ -303,7 +303,7 @@ static DEVICE_LOAD( apple525_floppy )
 
 
 
-static DEVICE_UNLOAD( apple525_floppy )
+static DEVICE_IMAGE_UNLOAD( apple525_floppy )
 {
 	device_unload_handler parent_unload;
 

@@ -63,8 +63,8 @@ WRITE8_HANDLER ( bbcm_ACCCON_write );
 
 /* disc support */
 
-DEVICE_LOAD ( bbcb_cart );
-DEVICE_LOAD( bbc_floppy );
+DEVICE_IMAGE_LOAD ( bbcb_cart );
+DEVICE_IMAGE_LOAD( bbc_floppy );
 
 READ8_HANDLER  ( bbc_disc_r );
 WRITE8_HANDLER ( bbc_disc_w );

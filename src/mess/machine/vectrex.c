@@ -66,7 +66,7 @@ static int vectrex_verify_cart (char *data)
 /*********************************************************************
   ROM load and id functions
  *********************************************************************/
-DEVICE_LOAD( vectrex_cart )
+DEVICE_IMAGE_LOAD( vectrex_cart )
 {
 	image_fread(image, memory_region(REGION_CPU1), 0x8000);
 

@@ -198,7 +198,7 @@ SNAPSHOT_LOAD(amstrad)
 	return INIT_PASS;
 }
 
-DEVICE_LOAD(amstrad_plus_cartridge)
+DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 {
 	// load CPC Plus / GX4000 cartridge image
 	// Format is RIFF: RIFF header chunk contains "AMS!"
@@ -314,7 +314,7 @@ DEVICE_LOAD(amstrad_plus_cartridge)
 }
 
 
-/*static DEVICE_LOAD( aleste )
+/*static DEVICE_IMAGE_LOAD( aleste )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{

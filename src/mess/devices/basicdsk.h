@@ -16,8 +16,8 @@ extern const floppy_interface basicdsk_floppy_interface;
 
 /* init */
 DEVICE_START(basicdsk_floppy);
-DEVICE_LOAD(basicdsk_floppy);
-DEVICE_UNLOAD(basicdsk_floppy);
+DEVICE_IMAGE_LOAD(basicdsk_floppy);
+DEVICE_IMAGE_UNLOAD(basicdsk_floppy);
 
 /* set the disk image geometry for the specified drive */
 /* this is required to read the disc image correct */

@@ -113,13 +113,13 @@ static WRITE8_HANDLER( pce_cartridge_ram_w ) {
 	cartridge_ram[ offset ] = data;
 }
 
-DEVICE_LOAD(pce_cart)
+DEVICE_IMAGE_LOAD(pce_cart)
 {
 	int size;
 	int split_rom = 0;
 	const char *extrainfo;
 	unsigned char *ROM;
-	logerror("*** DEVICE_LOAD(pce_cart) : %s\n", image_filename(image));
+	logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : %s\n", image_filename(image));
 
 	/* open file to get size */
 	ROM = memory_region(REGION_USER1);
@@ -129,7 +129,7 @@ DEVICE_LOAD(pce_cart)
 	/* handle header accordingly */
 	if((size/512)&1)
 	{
-		logerror("*** DEVICE_LOAD(pce_cart) : Header present\n");
+		logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : Header present\n");
 		size -= 512;
 		image_fseek(image, 512, SEEK_SET);
 	}
@@ -151,7 +151,7 @@ DEVICE_LOAD(pce_cart)
 		int i;
 		UINT8 decrypted[256];
 
-		logerror( "*** DEVICE_LOAD(pce_cart) : ROM image seems encrypted, decrypting...\n" );
+		logerror( "*** DEVICE_IMAGE_LOAD(pce_cart) : ROM image seems encrypted, decrypting...\n" );
 
 		/* Initialize decryption table */
 		for( i = 0; i < 256; i++ )

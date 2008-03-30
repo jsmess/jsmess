@@ -2032,7 +2032,7 @@ ROM_END
 
 /* System Configuration */
 
-static DEVICE_LOAD( atarist_floppy )
+static DEVICE_IMAGE_LOAD( atarist_floppy )
 {
 	if (image_has_been_created(image))
 		return INIT_FAIL;
@@ -2088,7 +2088,7 @@ static void atarist_printer_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-static DEVICE_LOAD( atarist_serial )
+static DEVICE_IMAGE_LOAD( atarist_serial )
 {
 	/* filename specified */
 	if (serial_device_load(image)==INIT_PASS)
@@ -2145,7 +2145,7 @@ static void megaste_serial_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static DEVICE_LOAD( atarist_cart )
+static DEVICE_IMAGE_LOAD( atarist_cart )
 {
 	UINT8 *ptr = ((UINT8 *)memory_region(REGION_CPU1)) + 0xfa0000;
 	int	filesize = image_length(image);

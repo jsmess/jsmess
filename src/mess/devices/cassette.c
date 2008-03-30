@@ -242,7 +242,7 @@ static DEVICE_START( cassette )
 
 
 
-static DEVICE_LOAD( cassette )
+static DEVICE_IMAGE_LOAD( cassette )
 {
 	casserr_t err;
 	int cassette_flags;
@@ -302,7 +302,7 @@ error:
 
 
 
-static DEVICE_UNLOAD( cassette )
+static DEVICE_IMAGE_UNLOAD( cassette )
 {
 	struct mess_cassetteimg *tag;
 

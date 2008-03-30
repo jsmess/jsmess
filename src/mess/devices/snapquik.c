@@ -38,7 +38,7 @@ static TIMER_CALLBACK(snapquick_processsnapshot)
 
 
 
-static DEVICE_LOAD( snapquick )
+static DEVICE_IMAGE_LOAD( snapquick )
 {
 	const struct IODevice *dev;
 	struct snapquick_info *si;
@@ -70,7 +70,7 @@ static DEVICE_LOAD( snapquick )
 
 
 
-static DEVICE_UNLOAD( snapquick )
+static DEVICE_IMAGE_UNLOAD( snapquick )
 {
 	struct snapquick_info **si = &snapquick_infolist;
 

@@ -390,7 +390,7 @@ DEVICE_START( intv_cart )
 	memory[(0x7000<<1)+1] = 0xff;
 }
 
-DEVICE_LOAD( intv_cart )
+DEVICE_IMAGE_LOAD( intv_cart )
 {
 	/* First, initialize these as empty so that the intellivision
 	 * will think that the playcable and keyboard are not attached */
@@ -485,7 +485,7 @@ static const UINT8 controller_table[] =
 
 /* Intellivision console + keyboard component */
 
-DEVICE_LOAD( intvkbd_cart )
+DEVICE_IMAGE_LOAD( intvkbd_cart )
 {
 	int id = image_index_in_device(image);
 	if (id == 0) /* Legacy cartridge slot */

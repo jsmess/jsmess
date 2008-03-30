@@ -29,7 +29,7 @@ extern UINT8 intv_gramdirtybytes[];
 extern UINT16 intv_ram16[];
 
 DEVICE_START( intv_cart );
-DEVICE_LOAD( intv_cart );
+DEVICE_IMAGE_LOAD( intv_cart );
 
 extern MACHINE_RESET( intv );
 extern INTERRUPT_GEN( intv_interrupt );
@@ -47,7 +47,7 @@ READ8_HANDLER( intv_left_control_r );
 /* for the console + keyboard component... */
 extern int intvkbd_text_blanked;
 
-DEVICE_LOAD( intvkbd_cart );
+DEVICE_IMAGE_LOAD( intvkbd_cart );
 
 extern UINT16 *intvkbd_dualport_ram;
 WRITE16_HANDLER ( intvkbd_dualport16_w );

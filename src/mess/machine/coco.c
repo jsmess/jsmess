@@ -685,25 +685,25 @@ static int generic_rom_load(const device_config *image, UINT8 *dest, UINT16 dest
 	return INIT_PASS;
 }
 
-DEVICE_LOAD(coco_rom)
+DEVICE_IMAGE_LOAD(coco_rom)
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	return generic_rom_load(image, &ROM[0x4000], 0x4000);
 }
 
-DEVICE_UNLOAD(coco_rom)
+DEVICE_IMAGE_UNLOAD(coco_rom)
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	memset(&ROM[0x4000], 0, 0x4000);
 }
 
-DEVICE_LOAD(coco3_rom)
+DEVICE_IMAGE_LOAD(coco3_rom)
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	return generic_rom_load(image, &ROM[0x8000], 0x8000);
 }
 
-DEVICE_UNLOAD(coco3_rom)
+DEVICE_IMAGE_UNLOAD(coco3_rom)
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	memset(&ROM[0x8000], 0, 0x8000);

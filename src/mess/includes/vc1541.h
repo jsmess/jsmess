@@ -25,8 +25,8 @@ typedef struct {
 
 /*----------- defined in machine/vc1541.c -----------*/
 
-DEVICE_LOAD(vc1541);
-DEVICE_UNLOAD(vc1541);
+DEVICE_IMAGE_LOAD(vc1541);
+DEVICE_IMAGE_UNLOAD(vc1541);
 
 int vc1541_config(int id, int mode, VC1541_CONFIG*config);
 void vc1541_reset(void);

@@ -615,7 +615,7 @@ static const struct via6522_interface via2 =
 	vc1541_via1_irq
 };
 
-DEVICE_LOAD(vc1541)
+DEVICE_IMAGE_LOAD(vc1541)
 {
 	vc1541->d64.data = image_ptr(image);
 	if (!vc1541->d64.data)
@@ -627,7 +627,7 @@ DEVICE_LOAD(vc1541)
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD(vc1541)
+DEVICE_IMAGE_UNLOAD(vc1541)
 {
 	/* writeback of image data */
 	vc1541->d64.data = NULL;

@@ -130,7 +130,7 @@ DEVICE_START( ti990_tape )
 /*
 	Open a tape image
 */
-DEVICE_LOAD( ti990_tape )
+DEVICE_IMAGE_LOAD( ti990_tape )
 {
 	tape_unit_t *t;
 	int id = image_index_in_device(image);
@@ -153,7 +153,7 @@ DEVICE_LOAD( ti990_tape )
 /*
 	Close a tape image
 */
-DEVICE_UNLOAD( ti990_tape )
+DEVICE_IMAGE_UNLOAD( ti990_tape )
 {
 	tape_unit_t *t;
 	int id = image_index_in_device(image);

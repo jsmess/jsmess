@@ -218,7 +218,7 @@ ROM_START(vc4000)
 
 ROM_END
 
-static DEVICE_LOAD( vc4000_cart )
+static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
 	int size = image_length(image);
 

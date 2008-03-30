@@ -652,7 +652,7 @@ READ8_HANDLER( pokemini_hwreg_r ) {
 DEVICE_START( pokemini_cart ) {
 }
 
-DEVICE_LOAD( pokemini_cart ) {
+DEVICE_IMAGE_LOAD( pokemini_cart ) {
 	int	size = image_length( image );
 
 	/* Verify that the image is big enough */

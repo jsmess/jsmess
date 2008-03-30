@@ -336,7 +336,7 @@ MACHINE_START( cgenie )
 }
 
 
-DEVICE_LOAD( cgenie_cassette )
+DEVICE_IMAGE_LOAD( cgenie_cassette )
 {
 	return INIT_PASS;
 }
@@ -346,7 +346,7 @@ DEVICE_LOAD( cgenie_cassette )
  * of tracks, number of sides, number of sectors etc, so we need to
  * set that up here
  */
-DEVICE_LOAD( cgenie_floppy )
+DEVICE_IMAGE_LOAD( cgenie_floppy )
 {
 	int i, j, dir_offset;
 	UINT8 buff[16];

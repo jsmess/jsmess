@@ -66,7 +66,7 @@ static DEVICE_START(gamepock_cart) {
 	memory_set_bankptr( 1, memory_region( REGION_USER1 ) );
 }
 
-static DEVICE_LOAD(gamepock_cart) {
+static DEVICE_IMAGE_LOAD(gamepock_cart) {
 	UINT8 *cart = memory_region( REGION_USER1 );
 	int size = image_length( image );
 

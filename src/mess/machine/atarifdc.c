@@ -121,7 +121,7 @@ static const xfd_format xfd_formats[] =
  *****************************************************************************/
 
 #define MAXSIZE 5760 * 256 + 80
-DEVICE_LOAD( a800_floppy )
+DEVICE_IMAGE_LOAD( a800_floppy )
 {
 	int size, i;
 	const char *ext;

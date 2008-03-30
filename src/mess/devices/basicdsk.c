@@ -90,7 +90,7 @@ DEVICE_START( basicdsk_floppy )
 }
 
 /* attempt to insert a disk into the drive specified with id */
-DEVICE_LOAD( basicdsk_floppy )
+DEVICE_IMAGE_LOAD( basicdsk_floppy )
 {
 	basicdsk *w = get_basicdsk(image);
 
@@ -109,7 +109,7 @@ DEVICE_LOAD( basicdsk_floppy )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( basicdsk_floppy )
+DEVICE_IMAGE_UNLOAD( basicdsk_floppy )
 {
 	basicdsk *w = get_basicdsk(image);
 	w->image_file = NULL;

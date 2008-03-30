@@ -17,7 +17,7 @@ extern READ8_HANDLER( pokemini_hwreg_r );
 extern INTERRUPT_GEN( pokemini_int );
 
 DEVICE_START( pokemini_cart );
-DEVICE_LOAD( pokemini_cart );
+DEVICE_IMAGE_LOAD( pokemini_cart );
 
 
 #endif /* POKEMINI_H */

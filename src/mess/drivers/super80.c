@@ -1015,7 +1015,7 @@ static void super80_quickload_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-static DEVICE_LOAD( super80_cart )
+static DEVICE_IMAGE_LOAD( super80_cart )
 {
 /*	int size = mame_fsize(fp);
 	UINT8 *mem = malloc(size);

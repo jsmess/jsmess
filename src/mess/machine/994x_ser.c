@@ -80,7 +80,7 @@ static const tms9902reset_param tms9902_params =
 /*
 	Initialize pio unit and open image
 */
-DEVICE_LOAD( ti99_4_pio )
+DEVICE_IMAGE_LOAD( ti99_4_pio )
 {
 	int id = image_index_in_device(image);
 	if ((id < 0) || (id >= MAX_RS232_CARDS))
@@ -102,7 +102,7 @@ DEVICE_LOAD( ti99_4_pio )
 /*
 	close a pio image
 */
-DEVICE_UNLOAD( ti99_4_pio )
+DEVICE_IMAGE_UNLOAD( ti99_4_pio )
 {
 	int id = image_index_in_device(image);
 	if ((id < 0) || (id >= MAX_RS232_CARDS))
@@ -117,7 +117,7 @@ DEVICE_UNLOAD( ti99_4_pio )
 /*
 	Initialize rs232 unit and open image
 */
-DEVICE_LOAD( ti99_4_rs232 )
+DEVICE_IMAGE_LOAD( ti99_4_rs232 )
 {
 	int id = image_index_in_device(image);
 
@@ -145,7 +145,7 @@ DEVICE_LOAD( ti99_4_rs232 )
 /*
 	close a rs232 image
 */
-DEVICE_UNLOAD( ti99_4_rs232 )
+DEVICE_IMAGE_UNLOAD( ti99_4_rs232 )
 {
 	/*int id = image_index_in_device(image);*/
 

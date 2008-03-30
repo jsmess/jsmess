@@ -27,8 +27,8 @@ int adam_cart_verify(const UINT8 *buf, size_t size);
 void clear_keyboard_buffer(void);
 void exploreKeyboard(void);
 
-DEVICE_LOAD( adam_floppy );
-DEVICE_UNLOAD( adam_floppy );
+DEVICE_IMAGE_LOAD( adam_floppy );
+DEVICE_IMAGE_UNLOAD( adam_floppy );
 
  READ8_HANDLER  ( adamnet_r );
 WRITE8_HANDLER ( adamnet_w );

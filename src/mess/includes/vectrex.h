@@ -10,7 +10,7 @@
 
 /*----------- defined in machine/vectrex.c -----------*/
 
-DEVICE_LOAD( vectrex_cart );
+DEVICE_IMAGE_LOAD( vectrex_cart );
 
 extern int vectrex_imager_status;
 extern UINT32 vectrex_beam_color;

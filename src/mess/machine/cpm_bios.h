@@ -147,7 +147,7 @@ typedef struct {
 } dsk_fmt;
 
 /* these are in cpm_bios.c */
-DEVICE_LOAD( cpm_floppy );
+DEVICE_IMAGE_LOAD( cpm_floppy );
 extern int cpm_init(running_machine *machine, int n, const char *const ids[]);
 
 extern READ8_HANDLER ( cpm_bios_command_r );

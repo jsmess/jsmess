@@ -48,7 +48,7 @@ typedef struct
 /*----------- defined in machine/d88.c -----------*/
 
 DEVICE_START(d88image_floppy);
-DEVICE_LOAD(d88image_floppy);
+DEVICE_IMAGE_LOAD(d88image_floppy);
 
 
 #ifdef __cplusplus

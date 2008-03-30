@@ -331,21 +331,21 @@ error:
 
 
 
-static DEVICE_LOAD( floppy )
+static DEVICE_IMAGE_LOAD( floppy )
 {
 	return internal_floppy_device_load(image, -1, NULL);
 }
 
 
 
-static DEVICE_CREATE( floppy )
+static DEVICE_IMAGE_CREATE( floppy )
 {
 	return internal_floppy_device_load(image, create_format, create_args);
 }
 
 
 
-static DEVICE_UNLOAD( floppy )
+static DEVICE_IMAGE_UNLOAD( floppy )
 {
 	mess_flopimg *flopimg;
 	flopimg = image_lookuptag(image, FLOPPY_TAG);

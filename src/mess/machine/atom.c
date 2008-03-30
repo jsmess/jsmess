@@ -334,7 +334,7 @@ QUICKLOAD_LOAD(atom)
 
 
 /* load floppy */
-DEVICE_LOAD( atom_floppy )
+DEVICE_IMAGE_LOAD( atom_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{

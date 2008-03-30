@@ -117,7 +117,7 @@ DEVICE_START( svi318_cart )
 	pcart_rom_size = 0;
 }
 
-DEVICE_LOAD( svi318_cart )
+DEVICE_IMAGE_LOAD( svi318_cart )
 {
 	UINT8 *p;
 	UINT32 size;
@@ -145,7 +145,7 @@ DEVICE_LOAD( svi318_cart )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( svi318_cart )
+DEVICE_IMAGE_UNLOAD( svi318_cart )
 {
 	pcart = NULL;
 	pcart_rom_size = 0;
@@ -413,7 +413,7 @@ static unsigned long svi318_calcoffset(UINT8 t, UINT8 h, UINT8 s,
 	return o;
 }
 
-DEVICE_LOAD( svi318_floppy )
+DEVICE_IMAGE_LOAD( svi318_floppy )
 {
 	int size;
 	int dsktype;

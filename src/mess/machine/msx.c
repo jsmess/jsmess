@@ -83,7 +83,7 @@ static int msx_probe_type (UINT8* pmem, int size)
 		return (asc8 > asc16) ? 4 : 5;
 }
 
-DEVICE_LOAD (msx_cart)
+DEVICE_IMAGE_LOAD (msx_cart)
 {
 	int size;
 	int size_aligned;
@@ -266,7 +266,7 @@ DEVICE_LOAD (msx_cart)
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD (msx_cart)
+DEVICE_IMAGE_UNLOAD (msx_cart)
 {
 	int id;
 
@@ -656,7 +656,7 @@ static void msx_wd179x_int (running_machine *machine, wd17xx_state_t state, void
 }
 
 
-DEVICE_LOAD( msx_floppy )
+DEVICE_IMAGE_LOAD( msx_floppy )
 {
 	int size, heads = 2;
 

@@ -209,7 +209,7 @@ DEVICE_START( tx0_tape )
 
 	unit 0 is reader (read-only), unit 1 is puncher (write-only)
 */
-DEVICE_LOAD( tx0_tape )
+DEVICE_IMAGE_LOAD( tx0_tape )
 {
 	int id = image_index_in_device(image);
 
@@ -249,7 +249,7 @@ DEVICE_LOAD( tx0_tape )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( tx0_tape )
+DEVICE_IMAGE_UNLOAD( tx0_tape )
 {
 	int id = image_index_in_device(image);
 
@@ -426,7 +426,7 @@ void tx0_io_p7h(void)
 /*
 	Open a file for typewriter output
 */
-DEVICE_LOAD(tx0_typewriter)
+DEVICE_IMAGE_LOAD(tx0_typewriter)
 {
 	/* open file */
 	typewriter.fd = image;
@@ -434,7 +434,7 @@ DEVICE_LOAD(tx0_typewriter)
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD(tx0_typewriter)
+DEVICE_IMAGE_UNLOAD(tx0_typewriter)
 {
 	typewriter.fd = NULL;
 }
@@ -563,7 +563,7 @@ DEVICE_START( tx0_magtape )
 /*
 	Open a magnetic tape image
 */
-DEVICE_LOAD( tx0_magtape )
+DEVICE_IMAGE_LOAD( tx0_magtape )
 {
 	magtape.img = image;
 
@@ -582,7 +582,7 @@ DEVICE_LOAD( tx0_magtape )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( tx0_magtape )
+DEVICE_IMAGE_UNLOAD( tx0_magtape )
 {
 	magtape.img = NULL;
 

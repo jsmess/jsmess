@@ -42,7 +42,7 @@ SNAPSHOT_LOAD( amstrad );
 
 void amstrad_handle_snapshot(running_machine *, unsigned char *);
 
-DEVICE_LOAD(amstrad_plus_cartridge);
+DEVICE_IMAGE_LOAD(amstrad_plus_cartridge);
 
 /*----------- defined in video/amstrad.c -----------*/
 

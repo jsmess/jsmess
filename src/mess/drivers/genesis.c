@@ -171,7 +171,7 @@ static int genesis_isSMD(unsigned char *buf,unsigned int len)
 }
 
 
-static DEVICE_LOAD( genesis_cart )
+static DEVICE_IMAGE_LOAD( genesis_cart )
 {
 	unsigned char *tmpROMnew, *tmpROM;
 	unsigned char *secondhalf;
@@ -336,7 +336,7 @@ ROM_START(megadrij)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
-static DEVICE_UNLOAD( genesis_cart )
+static DEVICE_IMAGE_UNLOAD( genesis_cart )
 {
 	/* Write out the battery file if necessary */
 	if ((genesis_sram != NULL) && (genesis_sram_len > 0))

@@ -633,7 +633,7 @@ MACHINE_RESET( kim1 )
 	set_chip_clock(1, 255);
 }
 
-static DEVICE_LOAD( kim1_cassette )
+static DEVICE_IMAGE_LOAD( kim1_cassette )
 {
 	const char magic[] = "KIM1";
 	char buff[4];

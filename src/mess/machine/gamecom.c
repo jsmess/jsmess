@@ -594,7 +594,7 @@ DEVICE_START( gamecom_cart )
 	internal_ram = sm8500_internal_ram();
 }
 
-DEVICE_LOAD( gamecom_cart )
+DEVICE_IMAGE_LOAD( gamecom_cart )
 {
 	int filesize;
 	int load_offset = 0;

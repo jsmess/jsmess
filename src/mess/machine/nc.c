@@ -104,7 +104,7 @@ DEVICE_START( nc_pcmcia_card )
 }
 
 /* load pcmcia card */
-DEVICE_LOAD( nc_pcmcia_card )
+DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 {
 	/* filename specified */
 
@@ -126,7 +126,7 @@ DEVICE_LOAD( nc_pcmcia_card )
 	return INIT_FAIL;
 }
 
-DEVICE_UNLOAD( nc_pcmcia_card )
+DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 {
 	/* save card data if there is any */
 	nc_card_save(image);
@@ -147,7 +147,7 @@ DEVICE_UNLOAD( nc_pcmcia_card )
 /*************************************************************************************************/
 /* Serial */
 
-DEVICE_LOAD( nc_serial )
+DEVICE_IMAGE_LOAD( nc_serial )
 {
 	/* filename specified */
 	if (serial_device_load(image)==INIT_PASS)

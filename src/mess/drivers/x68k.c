@@ -1812,7 +1812,7 @@ static void dimdsk_set_geometry(const device_config* image)
 	basicdsk_set_geometry(image, tracks+1, heads, sectors, sectorlen, firstsector, 0x100, FALSE);
 }
 
-static DEVICE_LOAD( x68k_floppy )
+static DEVICE_IMAGE_LOAD( x68k_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{
@@ -1837,7 +1837,7 @@ static DEVICE_LOAD( x68k_floppy )
 	return INIT_FAIL;
 }
 
-static DEVICE_UNLOAD( x68k_floppy )
+static DEVICE_IMAGE_UNLOAD( x68k_floppy )
 {
 	if(sys.ioc.irqstatus & 0x02)
 	{

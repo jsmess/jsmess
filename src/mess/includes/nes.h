@@ -84,10 +84,10 @@ extern struct fds_struct nes_fds;
 
 /* protos */
 
-DEVICE_LOAD(nes_cart);
+DEVICE_IMAGE_LOAD(nes_cart);
 DEVICE_START(nes_disk);
-DEVICE_LOAD(nes_disk);
-DEVICE_UNLOAD(nes_disk);
+DEVICE_IMAGE_LOAD(nes_disk);
+DEVICE_IMAGE_UNLOAD(nes_disk);
 
 MACHINE_START( nes );
 MACHINE_RESET( nes );

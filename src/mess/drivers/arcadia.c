@@ -371,7 +371,7 @@ ROM_START(vcg)
 	ROM_REGION(0x100,REGION_GFX1, ROMREGION_ERASEFF)
 ROM_END
 
-static DEVICE_LOAD( arcadia_cart )
+static DEVICE_IMAGE_LOAD( arcadia_cart )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 	int size;

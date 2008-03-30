@@ -1083,7 +1083,7 @@ DEVICE_START( oric_floppy )
 
 
 
-DEVICE_LOAD( oric_floppy )
+DEVICE_IMAGE_LOAD( oric_floppy )
 {
 	/* attempt to open mfm disk */
 	if (device_load_mfm_disk(image) == INIT_PASS)

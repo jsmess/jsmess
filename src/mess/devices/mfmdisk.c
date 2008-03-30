@@ -305,7 +305,7 @@ int	mfm_disk_id(int id)
 
 
 /* load image */
-DEVICE_LOAD( mfm_disk )
+DEVICE_IMAGE_LOAD( mfm_disk )
 {
 	struct mfm_disk_info *pDisk = get_disk(image);
 

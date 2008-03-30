@@ -1282,7 +1282,7 @@ DEVICE_START(wswan_cart)
 	rtc.setting = 0xFF;
 }
 
-DEVICE_LOAD(wswan_cart)
+DEVICE_IMAGE_LOAD(wswan_cart)
 {
 	UINT32 ii;
 	const char *sram_str;

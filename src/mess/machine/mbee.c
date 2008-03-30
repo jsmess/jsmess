@@ -176,7 +176,7 @@ INTERRUPT_GEN( mbee_interrupt )
 	z80pio_p_w(0, 1, 0x00);
 }
 
-DEVICE_LOAD( mbee_cart )
+DEVICE_IMAGE_LOAD( mbee_cart )
 {
 	int size = image_length(image);
 	UINT8 *mem = malloc(size);

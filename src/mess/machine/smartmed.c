@@ -125,7 +125,7 @@ DEVICE_START( smartmedia )
 /*
 	Load a SmartMedia image
 */
-DEVICE_LOAD( smartmedia )
+DEVICE_IMAGE_LOAD( smartmedia )
 {
 	int id = image_index_in_device(image);
 	disk_image_header custom_header;
@@ -179,7 +179,7 @@ DEVICE_LOAD( smartmedia )
 /*
 	Unload a SmartMedia image
 */
-DEVICE_UNLOAD( smartmedia )
+DEVICE_IMAGE_UNLOAD( smartmedia )
 {
 	int id = image_index_in_device(image);
 

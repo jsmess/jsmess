@@ -654,7 +654,7 @@ DEVICE_START( ti85_serial )
 	ti85_receive_serial (NULL,0);
 }
 
-DEVICE_LOAD( ti85_serial )
+DEVICE_IMAGE_LOAD( ti85_serial )
 {
 	UINT8* file_data;
 	UINT16 file_size;
@@ -683,7 +683,7 @@ DEVICE_LOAD( ti85_serial )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( ti85_serial )
+DEVICE_IMAGE_UNLOAD( ti85_serial )
 {
 	ti85_free_serial_data_memory(image->machine);
 	ti85_serial_status = TI85_SEND_STOP;

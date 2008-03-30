@@ -671,7 +671,7 @@ static void sg1000_map_cartridge_memory(UINT8 *ptr, int size)
 	}
 }
 
-static DEVICE_LOAD( sg1000_cart )
+static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
 	int size = image_length(image);
 	UINT8 *ptr = memory_region(REGION_CPU1);
@@ -733,7 +733,7 @@ static void sc3000_map_cartridge_memory(UINT8 *ptr)
 	}
 }
 
-static DEVICE_LOAD( sc3000_cart )
+static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
 	int size = image_length(image);
 	UINT8 *ptr = memory_region(REGION_CPU1);
@@ -792,7 +792,7 @@ static void sf7000_printer_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static DEVICE_LOAD( sf7000_floppy )
+static DEVICE_IMAGE_LOAD( sf7000_floppy )
 {
 	if (image_has_been_created(image))
 		return INIT_FAIL;
@@ -823,7 +823,7 @@ static void sf7000_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static DEVICE_LOAD( sf7000_serial )
+static DEVICE_IMAGE_LOAD( sf7000_serial )
 {
 	/* filename specified */
 	if (serial_device_load(image)==INIT_PASS)

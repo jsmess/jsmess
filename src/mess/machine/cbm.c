@@ -162,7 +162,7 @@ INT8 cbm_c64_game;
 INT8 cbm_c64_exrom;
 CBM_ROM cbm_rom[0x20]= { {0} };
 
-static DEVICE_UNLOAD(cbm_rom)
+static DEVICE_IMAGE_UNLOAD(cbm_rom)
 {
 	int id = image_index_in_device(image);
 	cbm_rom[id].size = 0;
@@ -184,7 +184,7 @@ static DEVICE_START(cbm_rom)
 	}
 }
 
-static DEVICE_LOAD(cbm_rom)
+static DEVICE_IMAGE_LOAD(cbm_rom)
 {
 	int i;
 	int size, j, read_;

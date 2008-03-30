@@ -762,7 +762,7 @@ DEVICE_START( sms_cart ) {
 	sms_set_ggsmsmode( 0 );
 }
 
-DEVICE_LOAD( sms_cart )
+DEVICE_IMAGE_LOAD( sms_cart )
 {
 	running_machine *machine = Machine;
 	int size = image_length(image);

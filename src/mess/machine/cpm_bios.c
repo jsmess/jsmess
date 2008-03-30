@@ -111,7 +111,7 @@ static void cpm_jumptable(void)
 	RAM[BIOS_EXEC + 2] = 0xc9;			/* RET */
 }
 
-DEVICE_LOAD( cpm_floppy )
+DEVICE_IMAGE_LOAD( cpm_floppy )
 {
 	int id = image_index_in_device(image);
 
@@ -124,7 +124,7 @@ DEVICE_LOAD( cpm_floppy )
 	return INIT_PASS;
 }
 
-/*TODO: implement DEVICE_UNLOAD that clears ff[id]*/
+/*TODO: implement DEVICE_IMAGE_UNLOAD that clears ff[id]*/
 
 /*****************************************************************************
  *	cpm_init

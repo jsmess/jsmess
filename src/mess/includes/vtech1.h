@@ -25,7 +25,7 @@ MACHINE_START( laser110 );
 MACHINE_START( laser210 );
 MACHINE_START( laser310 );
 
-DEVICE_LOAD( vtech1_floppy );
+DEVICE_IMAGE_LOAD( vtech1_floppy );
 SNAPSHOT_LOAD( vtech1 );
 
 READ8_HANDLER ( vtech1_printer_r );

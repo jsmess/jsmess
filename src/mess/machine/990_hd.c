@@ -192,7 +192,7 @@ DEVICE_START( ti990_hd )
 /*
 	Initialize hard disk unit and open a hard disk image
 */
-DEVICE_LOAD( ti990_hd )
+DEVICE_IMAGE_LOAD( ti990_hd )
 {
 	int id = image_index_in_device(image);
 	hd_unit_t *d;
@@ -283,7 +283,7 @@ DEVICE_LOAD( ti990_hd )
 /*
 	close a hard disk image
 */
-DEVICE_UNLOAD( ti990_hd )
+DEVICE_IMAGE_UNLOAD( ti990_hd )
 {
 	int id = image_index_in_device(image);
 	hd_unit_t *d;

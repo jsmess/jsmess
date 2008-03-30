@@ -253,7 +253,7 @@ int vtech1_floppy_id(int id)
 }
 */
 
-DEVICE_LOAD(vtech1_floppy)
+DEVICE_IMAGE_LOAD(vtech1_floppy)
 {
 	int id = image_index_in_device(image);
 

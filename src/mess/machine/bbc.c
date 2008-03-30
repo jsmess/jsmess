@@ -1479,7 +1479,7 @@ WRITE8_HANDLER ( BBC_SerialULA_w )
    load floppy disc
 ***************************************/
 
-DEVICE_LOAD( bbc_floppy )
+DEVICE_IMAGE_LOAD( bbc_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{
@@ -2047,7 +2047,7 @@ WRITE8_HANDLER ( bbc_disc_w )
 /**************************************
    BBC B Rom loading functions
 ***************************************/
-DEVICE_LOAD( bbcb_cart )
+DEVICE_IMAGE_LOAD( bbcb_cart )
 {
 	UINT8 *mem = memory_region (REGION_USER1);
 	int size, read_;

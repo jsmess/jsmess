@@ -120,7 +120,7 @@ static DEVICE_STOP( cbm_drive )
 
 
 /* open an d64 image */
-static DEVICE_LOAD( cbm_drive )
+static DEVICE_IMAGE_LOAD( cbm_drive )
 {
 	int id = image_index_in_device(image);
 
