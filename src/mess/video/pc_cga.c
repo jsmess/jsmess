@@ -495,7 +495,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-	if ( y == 0 ) logerror("cga_text_inten_update_row\n");
+	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
@@ -529,7 +529,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row ) {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-	if ( y == 0 ) logerror("cga_text_inten_update_row\n");
+	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
@@ -562,7 +562,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-	if ( y == 0 ) logerror("cga_text_inten_alt_update_row\n");
+	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_alt_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
@@ -595,7 +595,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-	if ( y == 0 ) logerror("cga_text_blink_update_row\n" );
+	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
@@ -633,7 +633,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-	if ( y == 0 ) logerror("cga_text_blink_alt_update_row\n");
+	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_alt_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
@@ -669,7 +669,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-	if ( y == 0 ) logerror("cga_gfx_4bppl_update_row\n");
+	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bppl_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
@@ -724,7 +724,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-	if ( y == 0 ) logerror("cga_gfx_4bpph_update_row\n");
+	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bpph_update_row",("\n"));
 if ( NTSC_FILTER ) {
 	ntsc_clear( &ntsc );
 	memset( ntsc_decoded, 0, sizeof(ntsc_decoded));
@@ -819,7 +819,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-//	if ( y == 0 ) logerror("cga_gfx_2bpp_update_row\n");
+	if ( y == 0 ) CGA_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
@@ -851,7 +851,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
 	UINT8	fg = cga.color_select & 0x0F;
 	int i;
 
-	if ( y == 0 ) logerror("cga_gfx_1bpp_update_row\n");
+	if ( y == 0 ) CGA_LOG(1,"cga_gfx_1bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
@@ -1330,7 +1330,7 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row ) {
 	UINT16	offset_base = ra << 13;
 	int i;
 
-	if ( y == 0 ) logerror("pc1512_gfx_4bpp_update_row\n");
+	if ( y == 0 ) CGA_LOG(1,"pc1512_gfx_4bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = offset_base | ( ( ma + i ) & 0x1FFF );
 		UINT16 i = ( cga.color_select & 8 ) ? videoram[ videoram_offset[3] | offset ] << 3 : 0;
