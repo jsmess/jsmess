@@ -53,6 +53,7 @@ Todo:
 #include "devices/printer.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
+#include "ui.h"
 
 
 #define LOG_VTECH1_LATCH 0
@@ -177,27 +178,36 @@ static const device_config *cassette_device_image(void)
 
 SNAPSHOT_LOAD(vtech1)
 {
-	UINT8 header[24];
-	UINT16 start, end;
+	UINT8 i, header[24];
+	UINT16 start, end, size;
+	char * pgmname;
+	pgmname = (char *) malloc(18);
 
 	/* get the header */
 	image_fread(image, &header, sizeof(header));
+	for (i = 0; i < 16; i++) pgmname[i] = header[i+4];
+	pgmname[16] = 0;
 
 	/* get start and end addresses */
 	start = pick_integer_le(header, 22, 2);
 	end = start + snapshot_size - sizeof(header);
+	size = end - start;
 
 	/* check if we have enough ram */
-	if (mess_ram_size < end - start)
+	if (mess_ram_size < size)
+	{
+		ui_popup_time(10,"SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
+		free(pgmname);
 		return INIT_FAIL;
+	}
 
 	/* write it to ram */
-	image_fread(image, &mess_ram[start - 0x7800], end - start);
+	image_fread(image, &mess_ram[start - 0x7800], size);
 
 	/* patch variables depending on snapshot type */
 	switch (header[21])
 	{
-	case VZ_BASIC:
+	case VZ_BASIC:		/* 0xF0 */
 		program_write_byte_8(0x78a4, start % 256); /* start of basic program */
 		program_write_byte_8(0x78a5, start / 256);
 		program_write_byte_8(0x78f9, end % 256); /* end of basic program */
@@ -206,15 +216,21 @@ SNAPSHOT_LOAD(vtech1)
 		program_write_byte_8(0x78fc, end / 256);
 		program_write_byte_8(0x78fd, end % 256); /* start free mem, end variable table */
 		program_write_byte_8(0x78fe, end / 256);
+		popmessage("%s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
+		free(pgmname);
 		break;
 
-	case VZ_MCODE:
+	case VZ_MCODE:		/* 0xF1 */
 		program_write_byte_8(0x788e, start % 256); /* usr subroutine address */
 		program_write_byte_8(0x788f, start / 256);
+		popmessage("%s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
+		free(pgmname);
+		cpunum_set_reg(0, REG_PC, start);				/* start program */
 		break;
 
 	default:
 		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
+		free(pgmname);
 		return INIT_FAIL;
 		break;
 	}

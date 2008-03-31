@@ -575,7 +575,7 @@ COMP( 1983, laser110,   0,          0,      laser110,   vtech1, 0,   laser110,  
 COMP( 1983, las110de,   laser110,   0,      laser110,   vtech1, 0,   laser110,   "Sanyo",                    "Laser 110 (Germany)",              0 )
 
 COMP( 1983, laser200,   0,          0,      laser200,   vtech1, 0,   laser110,   "Video Technology",         "Laser 200",                        0 )
-COMP( 1983, vz200de,    laser200,   0,      laser200,   vtech1, 0,   laser110,   "Video Technology",         "VZ-200 (Germany & Netherlands)",   0 )
+COMP( 1983, vz200de,    laser200,   0,      laser200,   vtech1, 0,   laser110,   "Video Technology",         "VZ-200 (Germany & Netherlands)",   GAME_NOT_WORKING )
 COMP( 1983, fellow,     laser200,   0,      laser200,   vtech1, 0,   laser110,   "Salora",                   "Fellow (Finland)",                 0 )
 COMP( 1983, tx8000,     laser200,   0,      laser200,   vtech1, 0,   laser110,   "Texet",                    "TX-8000 (UK)",                     0 )
 
