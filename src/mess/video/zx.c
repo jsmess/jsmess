@@ -63,7 +63,7 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 				r.min_x = old_x;
 				r.max_x = new_x;
 				r.min_y = r.max_y = y;
-				fillbitmap(bitmap, machine->pens[color], &r);
+				fillbitmap(bitmap, color, &r);
 				break;
 			}
 			else
@@ -71,7 +71,7 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 				r.min_x = old_x;
 				r.max_x = visarea->max_x;
 				r.min_y = r.max_y = y;
-				fillbitmap(bitmap, machine->pens[color], &r);
+				fillbitmap(bitmap, color, &r);
 				old_x = 0;
 			}
 			if (++y == height)
@@ -107,7 +107,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	bitmap_t *bitmap = tmpbitmap;
 
 	r.min_y = r.max_y = video_screen_get_vpos(machine->primary_screen);
-	fillbitmap(bitmap, machine->pens[1], &r);
+	fillbitmap(bitmap, 1, &r);
 	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	if (++ula_scanline_count == height)

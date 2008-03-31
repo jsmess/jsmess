@@ -19,6 +19,10 @@
     hi-res and hi-res modes.
     Some memory packs are unemulated.
 
+Current issues: 4th and tree4th need their address maps worked out (eg, the stack is set to FD80)
+		All drivers: Broken screen
+
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -334,51 +338,22 @@ GFXDECODE_END
 
 /* Palette Initialization */
 
-static const unsigned char zx80_palette[] =
-{
-	255,255,255,	/* white */
-	  0,  0,  0,	/* black */
-};
-
-static const unsigned char zx81_palette[] =
-{
-	255,255,255,	/* white */
-	  0,  0,  0,	/* black */
-};
-
-static const unsigned char ts1000_palette[] =
-{
-	 64,244,244,	/* cyan */
-	  0,  0,  0,	/* black */
-};
 
 static PALETTE_INIT( zx80 )
 {
-	int i;
-
-	for ( i = 0; i < sizeof(zx80_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, zx80_palette[i*3], zx80_palette[i*3+1], zx80_palette[i*3+2]);
-	}
-}
-
-static PALETTE_INIT( zx81 )
-{
-	int i;
-
-	for ( i = 0; i < sizeof(zx81_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, zx81_palette[i*3], zx81_palette[i*3+1], zx81_palette[i*3+2]);
-	}
+	palette_set_color(machine,0,RGB_WHITE); /* white */
+	palette_set_color(machine,1,RGB_BLACK); /* black */
+	palette_set_color(machine,2,RGB_BLACK); /* black */
+	palette_set_color(machine,3,RGB_WHITE); /* white */
 }
 
 static PALETTE_INIT( ts1000 )
 {
-	int i;
-
-	for ( i = 0; i < sizeof(ts1000_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, ts1000_palette[i*3], ts1000_palette[i*3+1], ts1000_palette[i*3+2]);
-	}
+	palette_set_color(machine,0,MAKE_RGB(64, 244, 244)); /* cyan */	
+	palette_set_color(machine,1,RGB_BLACK); /* black */
+	palette_set_color(machine,2,RGB_BLACK); /* black */
+	palette_set_color(machine,3,MAKE_RGB(64, 244, 244)); /* cyan */
 }
-
 
 
 #define ZX81_CPU_CLOCK			3250000
@@ -434,7 +409,6 @@ static MACHINE_DRIVER_START( zx81 )
 	MDRV_MACHINE_RESET(zx81)
 
 	MDRV_GFXDECODE(zx81)
-	MDRV_PALETTE_INIT(zx81)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ts1000 )
@@ -456,7 +430,7 @@ static MACHINE_DRIVER_START( pc8300 )
 
 	MDRV_MACHINE_RESET(pc8300)
 	MDRV_GFXDECODE(pc8300)
-	MDRV_PALETTE_INIT(zx81)
+	MDRV_PALETTE_INIT(zx80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pow3000 )
@@ -467,7 +441,7 @@ static MACHINE_DRIVER_START( pow3000 )
 
 	MDRV_MACHINE_RESET(pc8300)
 	MDRV_GFXDECODE(pow3000)
-	MDRV_PALETTE_INIT(zx81)
+	MDRV_PALETTE_INIT(zx80)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -597,12 +571,12 @@ SYSTEM_CONFIG_END
 /* Game Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,   "Sinclair Research",        "ZX-80",                                        0 )
-COMP( 1981, aszmic,     zx80,   0,      zx80,       zx80,       zx,     zx80,   "Sinclair Research",        "ZX.Aszmic",                                    0 )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "ZX-81",                                        0 )
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,   "Sinclair Research",        "ZX-80",                                        GAME_NOT_WORKING )
+COMP( 1981, aszmic,     zx80,   0,      zx80,       zx80,       zx,     zx80,   "Sinclair Research",        "ZX.Aszmic",                                    GAME_NOT_WORKING )
+COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "ZX-81",                                        GAME_NOT_WORKING )
 COMP( 198?, h4th,       zx81,   0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "Sinclair ZX-81 Forth by David Husband",        GAME_NOT_WORKING )
 COMP( 198?, tree4th,    zx81,   0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "Sinclair ZX-81 Tree-Forth by Tree Systems",    GAME_NOT_WORKING )
-COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,   "Timex Sinclair",           "Timex Sinclair 1000",                          0 )
-COMP( 1984, pc8300,     zx81,   0,      pc8300,     pow3000,    zx,     pc8300, "Your Computer",            "PC8300",                                       0 )
-COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pc8300, "Creon Enterprises",        "Power 3000",                                   0 )
-COMP( 1982, lambda,     zx81,   0,      pc8300,     pow3000,    zx,     zx81,   "Lambda Electronics Ltd",   "Lambda 8300",                                  0 )
+COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,   "Timex Sinclair",           "Timex Sinclair 1000",                          GAME_NOT_WORKING )
+COMP( 1984, pc8300,     zx81,   0,      pc8300,     pow3000,    zx,     pc8300, "Your Computer",            "PC8300",                                       GAME_NOT_WORKING )
+COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pc8300, "Creon Enterprises",        "Power 3000",                                   GAME_NOT_WORKING )
+COMP( 1982, lambda,     zx81,   0,      pc8300,     pow3000,    zx,     zx81,   "Lambda Electronics Ltd",   "Lambda 8300",                                  GAME_NOT_WORKING )

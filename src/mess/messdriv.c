@@ -418,8 +418,8 @@ TESTDRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
 	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
 	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
 	DRIVER( lambda )	/* Lambda 8300										*/
-TESTDRIVER( h4th )		/* Sinclair ZX-81 Forth by David Husband			*/
-TESTDRIVER( tree4th )	/* Sinclair ZX-81 Tree-Forth by Tree Systems		*/
+	DRIVER( h4th )		/* Sinclair ZX-81 Forth by David Husband			*/
+	DRIVER( tree4th )	/* Sinclair ZX-81 Tree-Forth by Tree Systems		*/
 
 	DRIVER( spectrum )	/* 1982 ZX Spectrum									*/
 	DRIVER( specpls4 )	/* 2000 ZX Spectrum +4								*/
