@@ -116,26 +116,26 @@ static WRITE8_HANDLER( coupe_disk_w )
 static READ8_HANDLER( coupe_pen_r )
 {
 	UINT8 data;
-	
+
 	if (offset & 0x100)
 	{
 		/* return either the current line or 192 for the vblank area */
 		int line = video_screen_get_vpos(machine->primary_screen); 
-		data = video_screen_get_vblank(machine->primary_screen) ? 192 : line;		
+		data = video_screen_get_vblank(machine->primary_screen) ? 192 : line;
 	}
 	else
 	{
 		/* horizontal position is encoded into bits 3 to 8 */
 		data = video_screen_get_hpos(machine->primary_screen) & 0xfc;
 	}
-	
+
 	return data;
 }
 
 
 static WRITE8_HANDLER( coupe_clut_w )
 {	
-	CLUT[(offset >> 8) & 0x0f] = data & 0x7f;	
+	CLUT[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 
@@ -143,7 +143,7 @@ static READ8_HANDLER( coupe_status_r )
 {
 	UINT8 data = 0xe0;
 	UINT8 row = ~(offset >> 8);
-	
+
 	if (row & 0x80) data &= readinputport(7) & 0xe0;
 	if (row & 0x40) data &= readinputport(6) & 0xe0;
 	if (row & 0x20) data &= readinputport(5) & 0xe0;
@@ -577,7 +577,7 @@ static void coupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_coupe_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(coupe_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk"); break;
