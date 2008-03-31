@@ -528,7 +528,6 @@ UINT8 pc_keyb_read(void)
 static TIMER_CALLBACK( pc_keyb_timer )
 {
 	if ( pc_keyb.on ) {
-		pc_keyb.self_test = ( pc_keyb.self_test == 1 ) ? 2 : 0;
 		pc_keyboard();
 	} else {
 		/* Clock has been low for more than 5 msec, start diagnostic test */
@@ -548,7 +547,7 @@ void pc_keyb_set_clock(int on)
 		if (!on)
 			timer_adjust_oneshot(pc_keyboard_timer, ATTOTIME_IN_MSEC(5), 0);
 		else {
-			if ( pc_keyb.self_test == 1 ) {
+			if ( pc_keyb.self_test ) {
 				/* The self test of the keyboard takes some time. 2 msec seems to work. */
 				/* This still needs to verified against a real keyboard. */
 				timer_adjust_oneshot(pc_keyboard_timer, ATTOTIME_IN_MSEC( 2 ), 0);
@@ -579,12 +578,8 @@ void pc_keyboard(void)
 		if ( (data=at_keyboard_read())!=-1) {
 			pc_keyb.data = data;
 			DBG_LOG(1,"KB_scancode",("$%02x\n", pc_keyb.data));
-			if ( ! ( data & 0x80 ) || pc_keyb.self_test == 2 ) {
-				pic8259_set_irq_line(0, 1, 1);
-				if ( pc_keyb.self_test == 2 ) {
-					pc_keyb.self_test = 0;
-				}
-			}
+			pic8259_set_irq_line(0, 1, 1);
+			pc_keyb.self_test = 0;
 		}
 	}
 }
