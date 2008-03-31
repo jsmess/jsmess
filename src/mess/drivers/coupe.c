@@ -57,7 +57,6 @@ Note on the bioses:
 #include "includes/coupe.h"
 
 /* components */
-#include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
 #include "sound/saa1099.h"
 #include "sound/speaker.h"
@@ -135,7 +134,7 @@ static READ8_HANDLER( coupe_pen_r )
 
 static WRITE8_HANDLER( coupe_clut_w )
 {	
-	CLUT[(offset >> 8) & 0x0f] = data & 0x7f;
+	coupe_regs.clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 
@@ -153,51 +152,51 @@ static READ8_HANDLER( coupe_status_r )
 	if (row & 0x02) data &= readinputport(1) & 0xe0;
 	if (row & 0x01) data &= readinputport(0) & 0xe0;
 
-	return data | STAT;
+	return data | coupe_regs.status;
 }
 
 
 static WRITE8_HANDLER( coupe_line_int_w )
 {
-	LINE_INT = data;
+	coupe_regs.line_int = data;
 }
 
 
 static READ8_HANDLER( coupe_lmpr_r )
 {
-	return LMPR;
+	return coupe_regs.lmpr;
 }
 
 
 static WRITE8_HANDLER( coupe_lmpr_w )
 {
-	LMPR = data;
+	coupe_regs.lmpr = data;
 	coupe_update_memory();
 }
 
 
 static READ8_HANDLER( coupe_hmpr_r )
 {
-	return HMPR;
+	return coupe_regs.hmpr;
 }
 
 
 static WRITE8_HANDLER( coupe_hmpr_w )
 {
-	HMPR = data;
+	coupe_regs.hmpr = data;
 	coupe_update_memory();
 }
 
 
 static READ8_HANDLER( coupe_vmpr_r )
 {
-	return VMPR;
+	return coupe_regs.vmpr;
 }
 
 
 static WRITE8_HANDLER( coupe_vmpr_w )
 {
-	VMPR = data;
+	coupe_regs.vmpr = data;
 	coupe_update_memory();
 }
 
@@ -313,7 +312,7 @@ static TIMER_CALLBACK( irq_off )
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	
 	/* adjust STATUS register */
-	STAT |= param;
+	coupe_regs.status |= param;
 }
 
 
@@ -324,7 +323,7 @@ void coupe_irq(running_machine *machine, UINT8 src)
 	timer_set(ATTOTIME_IN_USEC(20), NULL, src, irq_off);
 	
 	/* adjust STATUS register */
-	STAT &= ~src;
+	coupe_regs.status &= ~src;
 }
 
 

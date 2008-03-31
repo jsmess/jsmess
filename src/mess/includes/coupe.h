@@ -12,6 +12,15 @@
 #define COUPE_H_
 
 
+struct coupe_asic
+{
+	UINT8 lmpr, hmpr, vmpr; /* memory pages */	
+	UINT8 clut[16];         /* color lookup table, 16 entries */
+	UINT8 line_int;         /* line interrupt */
+	UINT8 status;           /* status register */
+};
+
+
 /*----------- defined in drivers/coupe.c -----------*/
 
 void coupe_irq(running_machine *machine, UINT8 src);
@@ -19,10 +28,7 @@ void coupe_irq(running_machine *machine, UINT8 src);
 
 /*----------- defined in machine/coupe.c -----------*/
 
-extern UINT8 LMPR,HMPR,VMPR;/* Bank Select Registers (Low Page p250, Hi Page p251, Video Page p252) */
-extern UINT8 CLUT[16];		/* 16 entries in a palette (no line affects supported yet!) */
-extern UINT8 LINE_INT;		/* Line interrupt register */
-extern UINT8 STAT;			/* returned when port 249 read */
+extern struct coupe_asic coupe_regs; 
 
 void coupe_update_memory(void);
 
