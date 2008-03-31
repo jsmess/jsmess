@@ -446,10 +446,11 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	/* basic machine hardware */
 	MDRV_CPU_ATPC(at, at, I80286, 12000000)
 
+	MDRV_IMPORT_FROM( pcvideo_vga )
+
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
-	MDRV_IMPORT_FROM( pcvideo_vga )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
