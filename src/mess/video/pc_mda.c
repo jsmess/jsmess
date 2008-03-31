@@ -135,7 +135,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
-	if ( y == 0 ) logerror("mda_text_inten_update_row\n");
+	if ( y == 0 ) MDA_LOG(1,"mda_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
 		UINT8 chr = videoram[ offset ];
@@ -199,7 +199,7 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
-	if ( y == 0 ) logerror("mda_text_blink_update_row\n");
+	if ( y == 0 ) MDA_LOG(1,"mda_text_blink_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
 		UINT8 chr = videoram[ offset ];
@@ -445,7 +445,7 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row ) {
 	UINT16	gfx_base = ( ( mda.mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;
 
-	if ( y == 0 ) logerror("hercules_gfx_update_row\n");
+	if ( y == 0 ) MDA_LOG(1,"hercules_gfx_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ ) {
 		UINT8	data = videoram[ gfx_base + ( ( ma + i ) << 1 ) ];
 
