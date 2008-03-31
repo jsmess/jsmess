@@ -7,19 +7,20 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/coupe.h"
 #include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
 
+
+#define LMPR_RAM0	0x20	/* If bit set ram is paged into bank 0, else its rom0 */
+#define LMPR_ROM1	0x40	/* If bit set rom1 is paged into bank 3, else its ram */
+
+
 UINT8 LMPR,HMPR,VMPR;	/* Bank Select Registers (Low Page p250, Hi Page p251, Video Page p252) */
 UINT8 CLUT[16]; 		/* 16 entries in a palette (no line affects supported yet!) */
-UINT8 SOUND_ADDR;		/* Current Address in sound registers */
-UINT8 SOUND_REG[32];	/* 32 sound registers */
 UINT8 LINE_INT; 		/* Line interrupt */
-UINT8 LPEN,HPEN;		/* ??? */
 UINT8 STAT; 			/* returned when port 249 read */
 
 extern UINT8 *sam_screen;
@@ -116,23 +117,22 @@ void coupe_update_memory(void)
 		sam_screen = &mess_ram[((VMPR&0x1F) & PAGE_MASK) * 0x4000];
 }
 
-static void coupe_reset(running_machine *machine)
+
+MACHINE_RESET( coupe )
 {
     LMPR = 0x0F;            /* ROM0 paged in, ROM1 paged out RAM Banks */
     HMPR = 0x01;
     VMPR = 0x81;
 
     LINE_INT = 0xFF;
-    LPEN = 0x00;
-    HPEN = 0x00;
 
     STAT = 0x1F;
 
     coupe_update_memory();
 }
 
+
 MACHINE_START( coupe )
 {
-    wd17xx_init(machine, WD_TYPE_177X,NULL, NULL);
-	add_reset_callback(machine, coupe_reset);
+    wd17xx_init(machine, WD_TYPE_1772, NULL, NULL);
 }

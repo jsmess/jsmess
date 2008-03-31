@@ -70,127 +70,205 @@ Note on the bioses:
 #define COUPE_XTAL_X2  XTAL_4_433619MHz
 
 
-static unsigned char getSamKey1(unsigned char hi);
-static unsigned char getSamKey2(unsigned char hi);
 
+/*************************************
+ *
+ *  I/O port handling
+ *
+ *************************************/
 
-static READ8_HANDLER( coupe_port_r )
+static READ8_HANDLER( coupe_disk_r )
 {
-    if (offset==SSND_ADDR)  /* Sound address request */
-		return SOUND_ADDR;
+	/* drive and side is encoded into bit 5 and 3 */
+	wd17xx_set_drive((offset >> 4) & 1);
+	wd17xx_set_side((offset >> 2) & 1);
 
-	if (offset==HPEN_PORT)
+	/* bit 1 and 2 select the controller register */
+	switch (offset & 0x03)
 	{
-		/* return either the current line or 192 for the vblank area */
-		int line = video_screen_get_vpos(machine->primary_screen); 
-		return video_screen_get_vblank(machine->primary_screen) ? 192 : line;
+	case 0: return wd17xx_status_r(machine, 0);
+	case 1: return wd17xx_track_r(machine, 0);
+	case 2: return wd17xx_sector_r(machine, 0);
+	case 3: return wd17xx_data_r(machine, 0);
 	}
 
-	switch (offset & 0xFF)
-	{
-	case DSK1_PORT+0:	/* This covers the total range of ports for 1 floppy controller */
-    case DSK1_PORT+4:
-		wd17xx_set_side((offset >> 2) & 1);
-		return wd17xx_status_r(machine, 0);
-	case DSK1_PORT+1:
-    case DSK1_PORT+5:
-		wd17xx_set_side((offset >> 2) & 1);
-        return wd17xx_track_r(machine, 0);
-	case DSK1_PORT+2:
-    case DSK1_PORT+6:
-		wd17xx_set_side((offset >> 2) & 1);
-        return wd17xx_sector_r(machine, 0);
-	case DSK1_PORT+3:
-	case DSK1_PORT+7:
-		wd17xx_set_side((offset >> 2) & 1);
-        return wd17xx_data_r(machine, 0);
-	case LPEN_PORT:
-		return video_screen_get_hpos(machine->primary_screen) & 0xfc;
-	case STAT_PORT:		
-		return ((getSamKey2((offset >> 8)&0xFF))&0xE0) | STAT;
-	case LMPR_PORT:
-		return LMPR;
-	case HMPR_PORT:
-		return HMPR;
-	case VMPR_PORT:
-		return VMPR;
-	case KEYB_PORT:
-		return (getSamKey1((offset >> 8)&0xFF)&0x1F) | 0xE0;
-	case SSND_DATA:
-		return SOUND_REG[SOUND_ADDR];
-	default:
-		logerror("Read Unsupported Port: %04x\n", offset);
-		break;
-	}
-
-	return 0x0ff;
+	return 0xff;
 }
 
 
-static WRITE8_HANDLER( coupe_port_w )
+static WRITE8_HANDLER( coupe_disk_w )
 {
-	if (offset==SSND_ADDR)						// Set sound address
+	/* drive and side is encoded into bit 5 and 3 */
+	wd17xx_set_drive((offset >> 4) & 1);
+	wd17xx_set_side((offset >> 2) & 1);
+
+	/* bit 1 and 2 select the controller register */
+	switch (offset & 0x03)
 	{
-		SOUND_ADDR=data&0x1F;					// 32 registers max
-		saa1099_control_port_0_w(machine, 0, SOUND_ADDR);
-        return;
+	case 0: wd17xx_command_w(machine, 0, data); break;
+	case 1: wd17xx_track_w(machine, 0, data);   break;
+	case 2: wd17xx_sector_w(machine, 0, data);  break;
+	case 3: wd17xx_data_w(machine, 0, data);    break;
+	}
+}
+
+
+static READ8_HANDLER( coupe_pen_r )
+{
+	UINT8 data;
+	
+	if (offset & 0x100)
+	{
+		/* return either the current line or 192 for the vblank area */
+		int line = video_screen_get_vpos(machine->primary_screen); 
+		data = video_screen_get_vblank(machine->primary_screen) ? 192 : line;		
+	}
+	else
+	{
+		/* horizontal position is encoded into bits 3 to 8 */
+		data = video_screen_get_hpos(machine->primary_screen) & 0xfc;
+	}
+	
+	return data;
+}
+
+
+static WRITE8_HANDLER( coupe_clut_w )
+{	
+	CLUT[(offset >> 8) & 0x0f] = data & 0x7f;	
+}
+
+
+static READ8_HANDLER( coupe_status_r )
+{
+	UINT8 data = 0xe0;
+	UINT8 row = ~(offset >> 8);
+	
+	if (row & 0x80) data &= readinputport(7) & 0xe0;
+	if (row & 0x40) data &= readinputport(6) & 0xe0;
+	if (row & 0x20) data &= readinputport(5) & 0xe0;
+	if (row & 0x10) data &= readinputport(4) & 0xe0;
+	if (row & 0x08) data &= readinputport(3) & 0xe0;
+	if (row & 0x04) data &= readinputport(2) & 0xe0;
+	if (row & 0x02) data &= readinputport(1) & 0xe0;
+	if (row & 0x01) data &= readinputport(0) & 0xe0;
+
+	return data | STAT;
+}
+
+
+static WRITE8_HANDLER( coupe_line_int_w )
+{
+	LINE_INT = data;
+}
+
+
+static READ8_HANDLER( coupe_lmpr_r )
+{
+	return LMPR;
+}
+
+
+static WRITE8_HANDLER( coupe_lmpr_w )
+{
+	LMPR = data;
+	coupe_update_memory();
+}
+
+
+static READ8_HANDLER( coupe_hmpr_r )
+{
+	return HMPR;
+}
+
+
+static WRITE8_HANDLER( coupe_hmpr_w )
+{
+	HMPR = data;
+	coupe_update_memory();
+}
+
+
+static READ8_HANDLER( coupe_vmpr_r )
+{
+	return VMPR;
+}
+
+
+static WRITE8_HANDLER( coupe_vmpr_w )
+{
+	VMPR = data;
+	coupe_update_memory();
+}
+
+
+static READ8_HANDLER( coupe_midi_r )
+{
+	logerror("Read from midi port\n");
+	return 0xff;
+}
+
+
+static WRITE8_HANDLER( coupe_midi_w )
+{
+	logerror("Write to midi port: 0x%02x\n", data);
+}
+
+
+static READ8_HANDLER( coupe_keyboard_r )
+{
+	UINT8 data = 0xff;
+	UINT8 row = ~(offset >> 8);
+
+	if (row == 0)
+	{
+		data &= readinputport(8) & 0x1f;
+	}
+	else
+	{
+		if (row & 0x80) data &= readinputport(7) & 0x1f;
+		if (row & 0x40) data &= readinputport(6) & 0x1f;
+		if (row & 0x20) data &= readinputport(5) & 0x1f;
+		if (row & 0x10) data &= readinputport(4) & 0x1f;
+		if (row & 0x08) data &= readinputport(3) & 0x1f;
+		if (row & 0x04) data &= readinputport(2) & 0x1f;
+		if (row & 0x02) data &= readinputport(1) & 0x1f;
+		if (row & 0x01) data &= readinputport(0) & 0x1f;
 	}
 
-	switch (offset & 0xFF)
+	return data | 0xe0;
+}
+
+
+static WRITE8_HANDLER( coupe_border_w )
+{
+	/* DAC output state */
+	speaker_level_w(0,(data >> 4) & 0x01);
+}
+
+
+static READ8_HANDLER( coupe_attributes_r )
+{
+	if (video_screen_get_vblank(machine->primary_screen))
 	{
-	case DSK1_PORT+0:							// This covers the total range of ports for 1 floppy controller
-    case DSK1_PORT+4:
-		wd17xx_set_side((offset >> 2) & 1);
-        wd17xx_command_w(machine, 0, data);
-		break;
-    case DSK1_PORT+1:
-    case DSK1_PORT+5:
-		/* Track byte requested on address line */
-		wd17xx_set_side((offset >> 2) & 1);
-        wd17xx_track_w(machine, 0, data);
-		break;
-    case DSK1_PORT+2:
-    case DSK1_PORT+6:
-		/* Sector byte requested on address line */
-		wd17xx_set_side((offset >> 2) & 1);
-        wd17xx_sector_w(machine, 0, data);
-        break;
-    case DSK1_PORT+3:
-	case DSK1_PORT+7:
-		/* Data byte requested on address line */
-		wd17xx_set_side((offset >> 2) & 1);
-        wd17xx_data_w(machine, 0, data);
-		break;
-	case CLUT_PORT:
-		CLUT[(offset >> 8)&0x0F]=data&0x7F;		// set CLUT data
-		break;
-	case LINE_PORT:
-		LINE_INT=data;						// Line to generate interrupt on
-		break;
-    case LMPR_PORT:
-		LMPR=data;
-		coupe_update_memory();
-		break;
-    case HMPR_PORT:
-		HMPR=data;
-		coupe_update_memory();
-		break;
-    case VMPR_PORT:
-		VMPR=data;
-		coupe_update_memory();
-		break;
-    case BORD_PORT:
-		/* DAC output state */
-		speaker_level_w(0,(data>>4) & 0x01);
-		break;
-    case SSND_DATA:
-		saa1099_write_port_0_w(machine, 0, data);
-		SOUND_REG[SOUND_ADDR] = data;
-		break;
-    default:
-		logerror("Write Unsupported Port: %04x,%02x\n", offset,data);
-		break;
+		/* Border areas return 0xff */
+		return 0xff;
 	}
+	else
+	{
+		/* TODO: This actually needs to return various attributes
+		 * of the currently displayed screen data */
+		return 0x00;
+	}
+}
+
+
+static WRITE8_HANDLER( coupe_sound_w )
+{
+	if (offset & 0x100)
+		saa1099_control_port_0_w(machine, 0, data);
+	else
+		saa1099_write_port_0_w(machine, 0, data);
 }
 
 
@@ -208,8 +286,17 @@ static ADDRESS_MAP_START( coupe_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(4)
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( coupe_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x0ffff) AM_READWRITE(coupe_port_r, coupe_port_w)
+	AM_RANGE(0xe0, 0xe7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(coupe_disk_r, coupe_disk_w)
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_pen_r, coupe_clut_w)
+	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_status_r, coupe_line_int_w)
+	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_lmpr_r, coupe_lmpr_w)
+	AM_RANGE(0xfb, 0xfb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_hmpr_r, coupe_hmpr_w)
+	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_vmpr_r, coupe_vmpr_w)
+	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_midi_r, coupe_midi_w)
+	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_keyboard_r, coupe_border_w)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_attributes_r, coupe_sound_w)
 ADDRESS_MAP_END
 
 
@@ -251,61 +338,9 @@ static INTERRUPT_GEN( coupe_frame_interrupt )
 
 /*************************************
  *
- *  Inputs
+ *  Input ports
  *
  *************************************/
-
-static unsigned char getSamKey1(unsigned char hi)
-{
-	unsigned char result;
-
-	hi=~hi;
-	result=0xFF;
-
-	if (hi==0x00)
-		result &=readinputport(8) & 0x1F;
-	else
-	{
-		if (hi&0x80) result &= readinputport(7) & 0x1F;
-		if (hi&0x40) result &= readinputport(6) & 0x1F;
-		if (hi&0x20) result &= readinputport(5) & 0x1F;
-		if (hi&0x10) result &= readinputport(4) & 0x1F;
-		if (hi&0x08) result &= readinputport(3) & 0x1F;
-		if (hi&0x04) result &= readinputport(2) & 0x1F;
-		if (hi&0x02) result &= readinputport(1) & 0x1F;
-		if (hi&0x01) result &= readinputport(0) & 0x1F;
-	}
-
-	return result;
-}
-
-
-static unsigned char getSamKey2(unsigned char hi)
-{
-	unsigned char result;
-
-	hi=~hi;
-	result=0xFF;
-
-	if (hi==0x00)
-	{
-		/* does not map to any keys? */
-	}
-	else
-	{
-		if (hi&0x80) result &= readinputport(7) & 0xE0;
-		if (hi&0x40) result &= readinputport(6) & 0xE0;
-		if (hi&0x20) result &= readinputport(5) & 0xE0;
-		if (hi&0x10) result &= readinputport(4) & 0xE0;
-		if (hi&0x08) result &= readinputport(3) & 0xE0;
-		if (hi&0x04) result &= readinputport(2) & 0xE0;
-		if (hi&0x02) result &= readinputport(1) & 0xE0;
-		if (hi&0x01) result &= readinputport(0) & 0xE0;
-	}
-
-	return result;
-}
-
 
 static INPUT_PORTS_START( coupe )
 	PORT_START // FE  0
@@ -458,7 +493,9 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_CPU_PROGRAM_MAP(coupe_mem, 0)
 	MDRV_CPU_IO_MAP(coupe_io, 0)
 	MDRV_CPU_VBLANK_INT("main", coupe_frame_interrupt)
-	MDRV_MACHINE_START( coupe )
+
+	MDRV_MACHINE_START(coupe)
+	MDRV_MACHINE_RESET(coupe)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
