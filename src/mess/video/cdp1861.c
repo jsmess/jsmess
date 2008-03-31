@@ -114,7 +114,7 @@ void cdp1861_dma_w(UINT8 data)
 	for (x = 0; x < 8; x++)
 	{
 		int color = (data & 0x80) >> 7;
-		*BITMAP_ADDR16(cdptmpbitmap, y, sx + x) = Machine->pens[color];
+		*BITMAP_ADDR16(cdptmpbitmap, y, sx + x) = color;
 		data <<= 1;
 	}
 }

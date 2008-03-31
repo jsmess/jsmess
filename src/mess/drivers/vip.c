@@ -139,6 +139,14 @@ static const CDP1802_CONFIG vip_config =
 	cdp1861_dma_w
 };
 
+PALETTE_INIT( vip )
+{
+	palette_set_color(machine,0,RGB_BLACK); /* black */
+	palette_set_color(machine,1,RGB_WHITE); /* white */
+	palette_set_color(machine,2,RGB_WHITE); /* white */
+	palette_set_color(machine,3,RGB_BLACK); /* black */
+}
+
 /* Machine Initialization */
 
 static MACHINE_START( vip )
@@ -190,8 +198,8 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(4)
+	MDRV_PALETTE_INIT(vip)
 	MDRV_VIDEO_START(cdp1861)
 	MDRV_VIDEO_UPDATE(cdp1861)
 
