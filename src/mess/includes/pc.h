@@ -9,6 +9,8 @@
 
 /*----------- defined in machine/pc.c -----------*/
 
+void mess_init_pc_common(UINT32 flags);
+
 DRIVER_INIT( pccga );
 DRIVER_INIT( pcmda );
 DRIVER_INIT( europc );

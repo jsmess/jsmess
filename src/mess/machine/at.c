@@ -20,6 +20,7 @@
 #include "machine/pit8253.h"
 #include "machine/pcshare.h"
 #include "machine/8042kbdc.h"
+#include "includes/pc.h"
 #include "includes/at.h"
 #include "machine/pckeybrd.h"
 #include "audio/sblaster.h"
@@ -39,7 +40,7 @@ static void at_set_gate_a20(int a20)
 
 static void init_at_common(const struct kbdc8042_interface *at8042)
 {
-	init_pc_common(PCCOMMON_KEYBOARD_AT | PCCOMMON_DMA8237_AT | PCCOMMON_TIMER_8254);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_AT | PCCOMMON_DMA8237_AT | PCCOMMON_TIMER_8254);
 	mc146818_init(MC146818_STANDARD);
 	soundblaster_config(&soundblaster);
 	kbdc8042_init(at8042);

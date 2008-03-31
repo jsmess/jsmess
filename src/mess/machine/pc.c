@@ -36,6 +36,7 @@
 #include "includes/pclpt.h"
 #include "machine/centroni.h"
 
+#include "machine/pc_fdc.h"
 #include "machine/pc_hdc.h"
 #include "machine/nec765.h"
 #include "includes/amstr_pc.h"
@@ -47,9 +48,180 @@
 #include "machine/8237dma.h"
 
 
+/**********************************************************
+ *
+ * COM hardware
+ *
+ **********************************************************/
+
+/* called when a interrupt is set/cleared from com hardware */
+static void pc_com_interrupt(int nr, int state)
+{
+	static const int irq[4] = {4, 3, 4, 3};
+
+	/* issue COM1/3 IRQ4, COM2/4 IRQ3 */
+	pic8259_set_irq_line(0, irq[nr], state);
+}
+
+/* called when com registers read/written - used to update peripherals that
+are connected */
+static void pc_com_refresh_connected(int n, int data)
+{
+	/* mouse connected to this port? */
+	if (readinputport(3) & (0x80>>n))
+		pc_mouse_handshake_in(n,data);
+}
+
+/* PC interface to PC-com hardware. Done this way because PCW16 also
+uses PC-com hardware and doesn't have the same setup! */
+static const uart8250_interface com_interface[4]=
+{
+	{
+		TYPE8250,
+		1843200,
+		pc_com_interrupt,
+		NULL,
+		pc_com_refresh_connected
+	},
+	{
+		TYPE8250,
+		1843200,
+		pc_com_interrupt,
+		NULL,
+		pc_com_refresh_connected
+	},
+	{
+		TYPE8250,
+		1843200,
+		pc_com_interrupt,
+		NULL,
+		pc_com_refresh_connected
+	},
+	{
+		TYPE8250,
+		1843200,
+		pc_com_interrupt,
+		NULL,
+		pc_com_refresh_connected
+	}
+};
+
+
+/**********************************************************
+ *
+ * LPT interface
+ *
+ **********************************************************/
+
+static const PC_LPT_CONFIG lpt_config[3]={
+	{
+		1,
+		LPT_UNIDIRECTIONAL,
+		NULL
+	},
+	{
+		1,
+		LPT_UNIDIRECTIONAL,
+		NULL
+	},
+	{
+		1,
+		LPT_UNIDIRECTIONAL,
+		NULL
+	}
+};
+
+static const CENTRONICS_CONFIG cent_config[3]={
+	{
+		PRINTER_IBM,
+		pc_lpt_handshake_in
+	},
+	{
+		PRINTER_IBM,
+		pc_lpt_handshake_in
+	},
+	{
+		PRINTER_IBM,
+		pc_lpt_handshake_in
+	}
+};
+
+
+
+/**********************************************************
+ *
+ * NEC uPD765 floppy interface
+ *
+ **********************************************************/
+
+#define FDC_DMA 2
+
+static void pc_fdc_interrupt(int state)
+{
+	pic8259_set_irq_line(0, 6, state);
+}
+
+static void pc_fdc_dma_drq(int state, int read_)
+{
+	dma8237_drq_write(0, FDC_DMA, state);
+}
+
+static const struct pc_fdc_interface fdc_interface =
+{
+	NEC765A,
+	NEC765_RDY_PIN_CONNECTED,
+	pc_fdc_interrupt,
+	pc_fdc_dma_drq,
+};
+
+static const struct pc_fdc_interface fdc_interface_nc =
+{
+	NEC765A,
+	NEC765_RDY_PIN_NOT_CONNECTED,
+	pc_fdc_interrupt,
+	pc_fdc_dma_drq,
+};
+
+
+void mess_init_pc_common(UINT32 flags) {
+	init_pc_common(flags);
+
+	/* MESS managed RAM */
+	if ( mess_ram )
+		memory_set_bankptr( 10, mess_ram );
+
+	/* FDC/HDC hardware */
+	pc_fdc_init( ( flags & PCCOMMON_NEC765_RDY_NC ) ? &fdc_interface_nc : &fdc_interface);
+	pc_hdc_setup();
+
+	/* com hardware */
+	uart8250_init(0, com_interface);
+	uart8250_reset(0);
+	uart8250_init(1, com_interface+1);
+	uart8250_reset(1);
+	uart8250_init(2, com_interface+2);
+	uart8250_reset(2);
+	uart8250_init(3, com_interface+3);
+	uart8250_reset(3);
+
+	pc_lpt_config(0, lpt_config);
+	centronics_config(0, cent_config);
+	pc_lpt_set_device(0, &CENTRONICS_PRINTER_DEVICE);
+	pc_lpt_config(1, lpt_config+1);
+	centronics_config(1, cent_config+1);
+	pc_lpt_set_device(1, &CENTRONICS_PRINTER_DEVICE);
+	pc_lpt_config(2, lpt_config+2);
+	centronics_config(2, cent_config+2);
+	pc_lpt_set_device(2, &CENTRONICS_PRINTER_DEVICE);
+
+	/* serial mouse */
+	pc_mouse_set_serial_port(0);
+	pc_mouse_initialise();
+}
+
 DRIVER_INIT( pccga )
 {
-	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
 	ppi8255_init(&pc_ppi8255_interface);
 	pc_rtc_init();
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
@@ -57,14 +229,14 @@ DRIVER_INIT( pccga )
 
 DRIVER_INIT( bondwell )
 {
-	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
 	ppi8255_init(&pc_ppi8255_interface);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pcmda )
 {
-	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
 	ppi8255_init(&pc_ppi8255_interface);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
@@ -90,7 +262,7 @@ DRIVER_INIT( europc )
 		rom[0xfffff]=256-a;
 	}
 
-	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
 
 	europc_rtc_init();
 //	europc_rtc_set_time(machine);
@@ -103,7 +275,7 @@ DRIVER_INIT( t1000hx )
     /* just a plain bit pattern for graphics data generation */
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
-	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
@@ -122,7 +294,7 @@ DRIVER_INIT( pc200 )
 	videoram=memory_region(REGION_CPU1)+0xb0000;
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc200_16le_port378_r );
 
-	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
 }
 
 DRIVER_INIT( pc1512 )
@@ -143,7 +315,7 @@ DRIVER_INIT( pc1512 )
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc16le_parallelport2_r );
 
 
-	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
 	mc146818_init(MC146818_IGNORE_CENTURY);
 }
 
@@ -206,14 +378,14 @@ DRIVER_INIT( pc1640 )
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );
 
-	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
 
 	mc146818_init(MC146818_IGNORE_CENTURY);
 }
 
 DRIVER_INIT( pc_vga )
 {
-	init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_TIMER_8253 | PCCOMMON_NEC765_RDY_NC);
 	ppi8255_init(&pc_ppi8255_interface);
 
 	pc_vga_init(&vga_interface, NULL);
