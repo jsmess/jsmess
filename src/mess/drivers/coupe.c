@@ -579,7 +579,7 @@ static void coupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 		case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(coupe_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk,sad"); break;
 
 		default:								legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
