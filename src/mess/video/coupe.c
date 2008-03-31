@@ -164,20 +164,28 @@ VIDEO_UPDATE( coupe )
 	/* line interrupt? */
 	if (coupe_regs.line_int == scanline) coupe_irq(screen->machine, 0x01);
 
-	switch ((coupe_regs.vmpr & 0x60) >> 5)
+	/* display disabled? (only in mode 3 or 4) */
+	if ((coupe_regs.vmpr & 0x40) && (coupe_regs.border & 0x80))
 	{
-	case 0: /* mode 1 */
-		drawMode1_line(bitmap, scanline);
-		break;
-	case 1: /* mode 2 */
-		drawMode2_line(bitmap, scanline);
-		break;
-	case 2: /* mode 3 */
-		drawMode3_line(bitmap, scanline);
-		break;
-	case 3: /* mode 4 */
-		drawMode4_line(bitmap, scanline);
-		break;
+		fillbitmap(bitmap, 0, cliprect);
+	}
+	else
+	{
+		switch ((coupe_regs.vmpr & 0x60) >> 5)
+		{
+		case 0: /* mode 1 */
+			drawMode1_line(bitmap, scanline);
+			break;
+		case 1: /* mode 2 */
+			drawMode2_line(bitmap, scanline);
+			break;
+		case 2: /* mode 3 */
+			drawMode3_line(bitmap, scanline);
+			break;
+		case 3: /* mode 4 */
+			drawMode4_line(bitmap, scanline);
+			break;
+		}
 	}
 
 	return 0;

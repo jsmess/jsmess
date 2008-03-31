@@ -241,6 +241,8 @@ static READ8_HANDLER( coupe_keyboard_r )
 
 static WRITE8_HANDLER( coupe_border_w )
 {
+	coupe_regs.border = data;
+
 	/* DAC output state */
 	speaker_level_w(0,(data >> 4) & 0x01);
 }
