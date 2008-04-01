@@ -559,8 +559,8 @@ TESTDRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 	DRIVER( trs80l2a )	/* TRS-80 Model I	- R/S L2 BASIC					*/
 	DRIVER( sys80 )		/* EACA System 80									*/
 	DRIVER( lnw80 )		/* LNW Research LNW-80								*/
-TESTDRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
-TESTDRIVER( trs80m4 )
+	DRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
+	DRIVER( trs80m4 )
 
 	DRIVER( coco )		/* Color Computer									*/
 	DRIVER( cocoe )		/* Color Computer (Extended BASIC 1.0)				*/

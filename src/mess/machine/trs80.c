@@ -672,9 +672,9 @@ INTERRUPT_GEN( trs80_frame_interrupt )
 }
 
 /*************************************
- *									 *
- *		Memory handlers 			 *
- *									 *
+ *				     *
+ *		Memory handlers      *
+ *				     *
  *************************************/
 
  READ8_HANDLER ( trs80_printer_r )

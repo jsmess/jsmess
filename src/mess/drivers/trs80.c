@@ -149,12 +149,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_model3, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80_irq_status_r, trs80_irq_mask_w)
-	AM_RANGE(0xe4, 0xe4)	AM_WRITE(trs80_motor_w)
+	/* the ports marked NOP are not emulated yet */
+//	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80_irq_status_r, trs80_irq_mask_w)	// needs to be fixed because it breaks the keyboard
+	AM_RANGE(0xe4, 0xe4) AM_READWRITE(SMH_NOP,trs80_motor_w)
+	AM_RANGE(0xe8, 0xe8) AM_NOP
+	AM_RANGE(0xe9, 0xe9) AM_WRITENOP
+	AM_RANGE(0xea, 0xea) AM_NOP
+	AM_RANGE(0xeb, 0xeb) AM_NOP
+	AM_RANGE(0xec, 0xec) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE(trs80_wd179x_r, wd17xx_command_w)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0xf2, 0xf2) AM_READWRITE(wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0xf3, 0xf3) AM_READWRITE(wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
+	AM_RANGE(0xf8, 0xf8) AM_WRITENOP
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_port_ff_r, trs80_port_ff_w)
 ADDRESS_MAP_END
 
@@ -515,6 +523,6 @@ COMP( 1978, trs80l2,  trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Rad
 COMP( 1978, trs80l2a, trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (R/S L2 Basic)" , 0)
 COMP( 1980, sys80,    trs80,	 0,		model1,   trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
 COMP( 1981, lnw80,    trs80,	 0,		model1,   trs80, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
-COMP( 1980, trs80m3,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", GAME_NOT_WORKING )
-COMP( 1980, trs80m4,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", GAME_NOT_WORKING )
+COMP( 1980, trs80m3,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
+COMP( 1980, trs80m4,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
 
