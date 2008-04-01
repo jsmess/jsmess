@@ -20,7 +20,7 @@ static void ide_get_params(const device_config *image, int *which_bus, int *whic
 	device_image_load_func *parent_load,
 	device_image_unload_func *parent_unload)
 {
-	const mess_device_class *devclass = &image_device(image)->devclass;
+	const mess_device_class *devclass = &mess_device_from_core_device(image)->devclass;
 	mess_device_class parent_devclass;
 
 	*which_bus = image_index_in_device(image);

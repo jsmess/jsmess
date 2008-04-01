@@ -690,7 +690,7 @@ static void command_image_loadcreate(running_machine *machine)
 			device_typename(device_type), device_slot);
 		return;
 	}
-	dev = image_device(image);
+	dev = mess_device_from_core_device(image);
 	file_extensions = dev->file_extensions;
 
 	/* is an image format specified? */

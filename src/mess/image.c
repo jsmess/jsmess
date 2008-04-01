@@ -1047,17 +1047,6 @@ static int image_checkhash(image_slot_data *image)
 ****************************************************************************/
 
 /*-------------------------------------------------
-    image_device
--------------------------------------------------*/
-
-const struct IODevice *image_device(const device_config *image)
-{
-	return mess_device_from_core_device(image);
-}
-
-
-
-/*-------------------------------------------------
     image_exists
 -------------------------------------------------*/
 

@@ -53,7 +53,7 @@ static DEVICE_IMAGE_LOAD( snapquick )
 	if (!si)
 		return INIT_FAIL;
 
-	dev = image_device(image);
+	dev = mess_device_from_core_device(image);
 	assert(dev);
 
 	si->dev = dev;

@@ -175,7 +175,7 @@ static UINT8 apple525_process_byte(const device_config *img, int write_value)
 	const struct IODevice *dev;
 
 	disk = (struct apple525_disk *) image_lookuptag(img, APPLE525TAG);
-	dev = image_device(img);
+	dev = mess_device_from_core_device(img);
 	spinfract_dividend = (int) mess_device_get_info_int(&dev->devclass, MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND);
 	spinfract_divisor = (int) mess_device_get_info_int(&dev->devclass, MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR);
 

@@ -824,7 +824,7 @@ static void change_device(HWND wnd, const device_config *img, int is_save)
 	char filter[2048];
 	char filename[MAX_PATH];
 	char buffer[512];
-	const struct IODevice *dev = image_device(img);
+	const struct IODevice *dev = mess_device_from_core_device(img);
 	const char *initial_dir;
 	BOOL result;
 	int create_format = 0;

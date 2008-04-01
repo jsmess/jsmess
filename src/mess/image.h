@@ -125,7 +125,6 @@ void *image_lookuptag(const device_config *img, const char *tag);
   These provide information about the device; and about the mounted image
 ****************************************************************************/
 
-const struct IODevice *image_device(const device_config *image);
 int image_exists(const device_config *image);
 int image_slotexists(const device_config *image);
 
