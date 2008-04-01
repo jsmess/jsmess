@@ -31,6 +31,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "mc6843.h"
 #include "devices/flopdrv.h"
 
@@ -758,7 +759,7 @@ void mc6843_reset ( void )
 	LOG (( "mc6843 reset\n" ));
 
 	/* setup/reset floppy drive */
-	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, mc6843_index_pulse_callback );

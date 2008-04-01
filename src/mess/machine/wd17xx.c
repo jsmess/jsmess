@@ -36,6 +36,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 
@@ -323,7 +324,7 @@ static void wd17xx_restore(wd17xx_info *w)
 {
 	UINT8 step_counter;
 
-	if (current_drive >= device_count(IO_FLOPPY))
+	if (current_drive >= device_count(Machine, IO_FLOPPY))
 		return;
 
 	step_counter = 255;
@@ -374,7 +375,7 @@ static void wd17xx_index_pulse_callback(const device_config *img, int state);
 void wd17xx_reset(void)
 {
 	int i;
-	for (i = 0; i < device_count(IO_FLOPPY); i++)
+	for (i = 0; i < device_count(Machine, IO_FLOPPY); i++)
 	{
 		const device_config *img = image_from_devtype_and_index(IO_FLOPPY, i);
 		floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);

@@ -420,7 +420,7 @@ static UINT8 fdc_coco3plus_r(coco_cartridge *cartridge, UINT16 addr)
 		case 0x43:
 		case 0x44:
 		case 0x45:
-			if (device_count(IO_VHD) > 0)
+			if (device_count(Machine, IO_VHD) > 0)
 				result = coco_vhd_io_r(machine, addr);
 			break;
 	}
@@ -457,7 +457,7 @@ static void fdc_coco3plus_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 		case 0x43:
 		case 0x44:
 		case 0x45:
-			if (device_count(IO_VHD) > 0)
+			if (device_count(Machine, IO_VHD) > 0)
 				coco_vhd_io_w(machine, addr, data);
 			break;
 	}

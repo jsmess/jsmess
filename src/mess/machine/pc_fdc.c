@@ -96,7 +96,7 @@ void pc_fdc_init(const struct pc_fdc_interface *iface)
 
 	pc_fdc_reset();
 
-	for (i = 0; i < device_count(IO_FLOPPY); i++)
+	for (i = 0; i < device_count(Machine, IO_FLOPPY); i++)
 	{
 		img = image_from_devtype_and_index(IO_FLOPPY, i);
 		floppy_drive_set_geometry(img, FLOPPY_DRIVE_DS_80);
@@ -111,7 +111,7 @@ static const device_config *pc_fdc_get_image(int floppy_index)
 
 	if (!fdc->fdc_interface.get_image)
 	{
-		if (floppy_index < device_count(IO_FLOPPY))
+		if (floppy_index < device_count(Machine, IO_FLOPPY))
 			image = image_from_devtype_and_index(IO_FLOPPY, floppy_index);
 	}
 	else
@@ -234,7 +234,7 @@ static void pc_fdc_dor_w(UINT8 data)
 	int selected_drive;
 	int floppy_count;
 
-	floppy_count = device_count(IO_FLOPPY);
+	floppy_count = device_count(Machine, IO_FLOPPY);
 
 	if (floppy_count > (fdc->digital_output_register & 0x03))
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, fdc->digital_output_register & 0x03), 1, 0);

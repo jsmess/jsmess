@@ -7,6 +7,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/thomson.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
@@ -338,7 +339,7 @@ static void to7_5p14_reset( void )
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	thom_floppy_set_density( DEN_MFM_LO );
 	wd17xx_reset();
-	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
@@ -439,7 +440,7 @@ static void to7_5p14sd_reset( void )
 	LOG(( "to7_5p14sd_reset: CD 90-015 controller\n" ));
 	thom_floppy_set_density( DEN_FM_LO );
 	mc6843_reset();
-	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
@@ -845,7 +846,7 @@ static void to7_qdd_reset( void )
 
 	thom_floppy_set_density( DEN_MFM_LO );
 
-	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, to7_qdd_index_pulse_cb );
@@ -1526,7 +1527,7 @@ void thmfc_floppy_reset( void )
 	int i;
 	LOG(( "thmfc_floppy_reset: THMFC1 controller\n" ));
 
-	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, thmfc_floppy_index_pulse_cb );

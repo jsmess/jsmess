@@ -1798,7 +1798,7 @@ const device_config *image_from_devtype_and_index(iodevice_t type, int id)
 	int device_index;
 
 	assert((Machine->images_data->multiple_dev_mask & (1 << type)) == 0);
-	assert(id < device_count(type));
+	assert(id < device_count(Machine, type));
 
 	indx = 0;
 	device_index = 0;

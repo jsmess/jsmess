@@ -294,7 +294,7 @@ int device_count_tag_from_machine(const running_machine *machine, const char *ta
 
 /* deprecated: device lookup; both of these function assume only one of each type of device */
 const struct IODevice *device_find_from_machine(const running_machine *machine, iodevice_t type);
-int device_count(iodevice_t type);
+int device_count(running_machine *machine, iodevice_t type);
 
 /* diagnostics */
 int device_valididtychecks(void);

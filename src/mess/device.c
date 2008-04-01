@@ -9,7 +9,6 @@
 #include <stddef.h>
 
 #include "device.h"
-#include "deprecat.h"
 #include "mslegacy.h"
 #include "driver.h"
 #include "pool.h"
@@ -557,12 +556,12 @@ const struct IODevice *device_find_from_machine(const running_machine *machine, 
 
 
 /* this function is deprecated */
-int device_count(iodevice_t type)
+int device_count(running_machine *machine, iodevice_t type)
 {
 	int count = 0;
 	const device_config *device;
 
-	for (device = device_list_first(Machine->config->devicelist, MESS_DEVICE); device != NULL; device = device_list_next(device, MESS_DEVICE))
+	for (device = device_list_first(machine->config->devicelist, MESS_DEVICE); device != NULL; device = device_list_next(device, MESS_DEVICE))
 	{
 		const struct IODevice *iodev = mess_device_from_core_device(device);
 		if (iodev->type == type)

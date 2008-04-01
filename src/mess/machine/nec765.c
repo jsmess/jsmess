@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/nec765.h"
 
 
@@ -149,7 +150,7 @@ static const device_config *current_image(void)
 
 	if (!nec765_iface.get_image)
 	{
-		if (fdc.drive < device_count(IO_FLOPPY))
+		if (fdc.drive < device_count(Machine, IO_FLOPPY))
 			image = image_from_devtype_and_index(IO_FLOPPY, fdc.drive);
 	}
 	else
@@ -696,7 +697,7 @@ void nec765_init(const nec765_interface *iface, NEC765_VERSION version, NEC765_R
 
 	nec765_reset(0);
 
-	for (i = 0; i < device_count(IO_FLOPPY); i++)
+	for (i = 0; i < device_count(Machine, IO_FLOPPY); i++)
 		floppy_drive_set_ready_state_change_callback(image_from_devtype_and_index(IO_FLOPPY, i), nec765_set_ready_change_callback);
 }
 
@@ -2139,7 +2140,7 @@ void nec765_reset(int offset)
 		are checked or only the drive selected with the drive select bits?? */
 
 		a_drive_is_ready = 0;
-		for (i = 0; i < device_count(IO_FLOPPY); i++)
+		for (i = 0; i < device_count(Machine, IO_FLOPPY); i++)
 		{
 			if (image_exists(image_from_devtype_and_index(IO_FLOPPY, i)))
 			{

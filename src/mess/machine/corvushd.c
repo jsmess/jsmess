@@ -64,6 +64,7 @@
 //
 
 #include "driver.h"
+#include "deprecat.h"
 #include "devices/harddriv.h"
 #include "includes/corvushd.h"
 #include <ctype.h>
@@ -554,7 +555,7 @@ static UINT8 corvus_write_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int le
 
 	LOG(("corvus_write_sector: Write Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
 
-	if(drv >= device_count(IO_HARDDISK)) {
+	if(drv >= device_count(Machine, IO_HARDDISK)) {
 		logerror("corvus_write_sector: Attempt to write to non-existant drive: %d\n", drv);
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
 	}
@@ -670,7 +671,7 @@ static UINT8 corvus_read_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int len
 
 	LOG(("corvus_read_sector: Read Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
 
-	if(drv >= device_count(IO_HARDDISK)) {
+	if(drv >= device_count(Machine, IO_HARDDISK)) {
 		logerror("corvus_read_sector: Attempt to read from non-existant drive: %d\n", drv);
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
 	}
@@ -966,7 +967,7 @@ static UINT8 corvus_get_drive_parameters(UINT8 drv) {
 	//
 	drv -= 1;									// Internally, drives start at 0
 
-	if(drv >= device_count(IO_HARDDISK)) {
+	if(drv >= device_count(Machine, IO_HARDDISK)) {
 		logerror("corvus_get_drive_parameters: Attempt to retrieve parameters from non-existant drive: %d\n", drv);
 		c->xmit_bytes = 1;
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
