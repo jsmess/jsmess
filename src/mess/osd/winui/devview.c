@@ -212,12 +212,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 	pDevViewInfo->config = machine_config_alloc_with_mess_devices(drivers[nGame]);
 
 	// count total amount of devices
-	nDevCount = 0;
-	for (dev = device_list_first(pDevViewInfo->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
-	{
-		iodev = mess_device_from_core_device(dev);
-		nDevCount += 1;
-	}
+	nDevCount = image_device_count(pDevViewInfo->config);
 
 	if (nDevCount > 0)
 	{
@@ -225,7 +220,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 		ppszDevices = (LPTSTR *) alloca(nDevCount * sizeof(*ppszDevices));
 		i = 0;
 
-		for (dev = device_list_first(pDevViewInfo->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
 		{
 			iodev = mess_device_from_core_device(dev);
 
@@ -262,7 +257,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 		DevView_GetColumns(hwndDevView, &nStaticPos, &nStaticWidth,
 			&nEditPos, &nEditWidth, &nButtonPos, &nButtonWidth);
 
-		for (dev = device_list_first(pDevViewInfo->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
 		{
 			iodev = mess_device_from_core_device(dev);
 

@@ -389,7 +389,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
 
 	nPos = 0;
-	for (dev = device_list_first(config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
 		iodev = mess_device_from_core_device(dev);
 
@@ -449,7 +449,7 @@ static void MessSpecifyImage(int drvindex, const mess_device_class *devclass, in
 	// allocate the machine config
 	config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
 
-	for (dev = device_list_first(config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
 		iodev = mess_device_from_core_device(dev);
 
@@ -505,7 +505,7 @@ static void MessRemoveImage(int drvindex, mess_device_class devclass, LPCSTR psz
 		config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
 
 		nPos = 0;
-		for (dev = device_list_first(config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+		for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 		{
 			iodev = mess_device_from_core_device(dev);
 
@@ -560,7 +560,7 @@ static void MessRefreshPicker(int drvindex)
 	// be problematic
 	ListView_SetItemState(hwndSoftware, -1, 0, LVIS_SELECTED);
 
-	for (dev = device_list_first(config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
 		iodev = mess_device_from_core_device(dev);
 
@@ -754,7 +754,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 		num_extensions++;
     }
 
-	for (dev = device_list_first(config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
 		iodev = mess_device_from_core_device(dev);
 

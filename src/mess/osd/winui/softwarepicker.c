@@ -429,7 +429,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 		// skip the initial '.' in the file extension
 		pszExtension++;
 
-		for (device = device_list_first(pPickerInfo->pConfig->devicelist, MESS_DEVICE); device != NULL; device = device_list_next(device, MESS_DEVICE))
+		for (device = image_device_first(pPickerInfo->pConfig); device != NULL; device = image_device_next(device))
 		{
 			const struct IODevice *iodev = mess_device_from_core_device(device);
 

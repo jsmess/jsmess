@@ -95,7 +95,7 @@ static void image_clear_error(image_slot_data *image);
 
 
 /***************************************************************************
-    IMAGE SYSTEM INITIALIZATION
+    CORE IMPLEMENTATION
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -250,6 +250,77 @@ static void image_exit(running_machine *machine)
 
 		machine->images_data = NULL;
 	}
+}
+
+
+
+/****************************************************************************
+    IMAGE DEVICE ENUMERATION
+****************************************************************************/
+
+/*-------------------------------------------------
+    is_image_device - determines if a particular
+	device supports images or not
+-------------------------------------------------*/
+
+static int is_image_device(const device_config *device)
+{
+	return (device->type == MESS_DEVICE)
+		|| (device_get_info_fct(device, DEVINFO_FCT_IMAGE_LOAD) != NULL)
+		|| (device_get_info_fct(device, DEVINFO_FCT_IMAGE_CREATE) != NULL)
+		|| (device_get_info_fct(device, DEVINFO_FCT_IMAGE_UNLOAD) != NULL);
+}
+
+
+
+/*-------------------------------------------------
+    image_device_first - return the first device in
+	the list that supports images
+-------------------------------------------------*/
+
+const device_config *image_device_first(const machine_config *config)
+{
+	const device_config *device = device_list_first(config->devicelist, DEVICE_TYPE_WILDCARD);
+	while((device != NULL) && !is_image_device(device))
+	{
+		device = device_list_next(device, DEVICE_TYPE_WILDCARD);
+	}
+	return device;	
+}
+
+
+
+/*-------------------------------------------------
+    image_device_next - return the next device in
+	the list that supports images
+-------------------------------------------------*/
+
+const device_config *image_device_next(const device_config *prevdevice)
+{
+	const device_config *device = device_list_next(prevdevice, DEVICE_TYPE_WILDCARD);
+	while((device != NULL) && !is_image_device(device))
+	{
+		device = device_list_next(device, DEVICE_TYPE_WILDCARD);
+	}
+	return device;	
+}
+
+
+
+/*-------------------------------------------------
+    image_device_count - counts the number of
+	devices that support images
+-------------------------------------------------*/
+
+int image_device_count(const machine_config *config)
+{
+	int count = 0;
+	const device_config *device;
+	for (device = image_device_first(config); device != NULL; device = image_device_next(device))
+	{
+		count++;
+	}
+	return count;
 }
 
 

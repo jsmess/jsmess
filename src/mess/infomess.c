@@ -33,7 +33,7 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
 	const char *name;
 	const char *shortname;
 
-	for (dev = device_list_first(config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
 		iodev = mess_device_from_core_device(dev);
 

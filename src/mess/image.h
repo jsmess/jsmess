@@ -43,36 +43,36 @@ typedef struct _images_private images_private;
 enum
 {
 	/* --- the following bits of info are returned as pointers to functions --- */
-	DEVINFO_FCT_IMAGE_FIRST		= DEVINFO_FCT_FIRST + 0x7000,
+	DEVINFO_FCT_IMAGE_FIRST = DEVINFO_FCT_FIRST + 0x7000,
 	DEVINFO_FCT_IMAGE_LOAD,										/* R/O: device_load_handler */
 	DEVINFO_FCT_IMAGE_CREATE,									/* R/O: device_create_handler */
 	DEVINFO_FCT_IMAGE_UNLOAD,									/* R/O: device_unload_handler */
-	DEVINFO_FCT_IMAGE_LAST		= DEVINFO_FCT_FIRST + 0x0fff
+	DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff
 };
 
 
 
 
-/****************************************************************************
-  A const device_config pointer represents one device entry; this could be an instance
-  of a floppy drive or a printer.  The defining property is that either at
-  startup or at runtime, it can become associated with a file on the hosting
-  machine (for the examples above, a disk image or printer output file
-  repsectively).  In fact, const device_config might be better renamed mess_device.
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
-  MESS drivers declare what device types each system had and how many.  For
-  each of these, a const device_config is allocated.  Devices can have init functions
-  that allow the devices to set up any relevant internal data structures.
-  It is recommended that devices use the tag allocation system described
-  below.
+/* ----- core implementation ----- */
 
-  There are also various other accessors for other information about a
-  device, from whether it is mounted or not, or information stored in a CRC
-  file.
-****************************************************************************/
-
-/* not to be called by anything other than core */
+/* core initialization */
 int image_init(running_machine *machine);
+
+
+/* ----- image device enumeration ----- */
+
+/* return the first device in the list that supports images */
+const device_config *image_device_first(const machine_config *config);
+
+/* return the next device in the list that supports images */
+const device_config *image_device_next(const device_config *prevdevice);
+
+/* counts the number of devices that support images */
+int image_device_count(const machine_config *config);
 
 
 
