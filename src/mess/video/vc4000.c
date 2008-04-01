@@ -257,7 +257,7 @@ static const char led[20][12+1] =
 	"iiiihhhhgggg"
 };
 
-static void vc4000_draw_digit(running_machine *machine, bitmap_t *bitmap, int x, int y, int d, int line)
+static void vc4000_draw_digit(bitmap_t *bitmap, int x, int y, int d, int line)
 {
 	static const int digit_to_segment[0x10]={
 	0x0fff, 0x007c, 0x17df, 0x15ff, 0x1c7d, 0x1df7, 0x1ff7, 0x007f, 0x1fff, 0x1dff
@@ -266,7 +266,7 @@ static void vc4000_draw_digit(running_machine *machine, bitmap_t *bitmap, int x,
 	i=line;
 	for (j=0; j<sizeof(led[0]); j++) {
 	if (digit_to_segment[d]&(1<<(led[i][j]-'a')) ) {
-	    *BITMAP_ADDR16(bitmap, y+i, x+j) = machine->pens[((vc4000_video.reg.d.background>>4)&7)^7];
+	    *BITMAP_ADDR16(bitmap, y+i, x+j) = ((vc4000_video.reg.d.background>>4)&7)^7;
 	}
 	}
 }
@@ -284,7 +284,7 @@ INLINE void vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int
 }
 
 
-static void vc4000_sprite_update(running_machine *machine, bitmap_t *bitmap, UINT8 *collision, SPRITE *This)
+static void vc4000_sprite_update(bitmap_t *bitmap, UINT8 *collision, SPRITE *This)
 {
 
 	int i,j,m;
@@ -317,7 +317,7 @@ static void vc4000_sprite_update(running_machine *machine, bitmap_t *bitmap, UIN
 					for (i=0; i<This->size; i++)
 					{
  						*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x1 + i + j*This->size) =
-							machine->pens[This->scolor];
+							This->scolor;
 					} 
 				}
 			}
@@ -373,7 +373,7 @@ static void vc4000_sprite_update(running_machine *machine, bitmap_t *bitmap, UIN
 					for (i=0; i<This->size; i++)
 					{
  						*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x2 + i + j*This->size) =
-							machine->pens[This->scolor];
+							This->scolor;
 					} 
 				}
 			}
@@ -401,7 +401,7 @@ INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 
 	if (vc4000_video.line>=height) return;
 
-	plot_box(vc4000_video.bitmap, 0, vc4000_video.line, width, 1, machine->pens[(vc4000_video.reg.d.background)&7]);
+	plot_box(vc4000_video.bitmap, 0, vc4000_video.line, width, 1, (vc4000_video.reg.d.background)&7);
 
 	if (line<0 || line>=200) return;
 	if (!vc4000_video.reg.d.background&8) return;
@@ -441,7 +441,7 @@ INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 			for (l=0; l<w; l++) {
 			collision[x+l]|=0x10;
 			}
-			plot_box(vc4000_video.bitmap, x, vc4000_video.line, w, 1, machine->pens[(vc4000_video.reg.d.background>>4)&7]);
+			plot_box(vc4000_video.bitmap, x, vc4000_video.line, w, 1, (vc4000_video.reg.d.background>>4)&7);
 		}
 		if (j==7) m=0x100;
 	}
@@ -468,10 +468,10 @@ INTERRUPT_GEN( vc4000_video_line )
 	{
 		vc4000_draw_grid(machine, collision);
 
-		vc4000_sprite_update(machine, vc4000_video.bitmap, collision, &vc4000_video.sprites[0]);
-		vc4000_sprite_update(machine, vc4000_video.bitmap, collision, &vc4000_video.sprites[1]);
-		vc4000_sprite_update(machine, vc4000_video.bitmap, collision, &vc4000_video.sprites[2]);
-		vc4000_sprite_update(machine, vc4000_video.bitmap, collision, &vc4000_video.sprites[3]);
+		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[0]);
+		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[1]);
+		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[2]);
+		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[3]);
 
 		for (i=0; i<256; i++)
 		{
@@ -484,13 +484,13 @@ INTERRUPT_GEN( vc4000_video_line )
 		if ((vc4000_video.line>=y)&&(vc4000_video.line<y+20))
 		{
 			x = 58;
-			vc4000_draw_digit(machine, vc4000_video.bitmap, x, y, vc4000_video.reg.d.bcd[0]>>4, vc4000_video.line-y);
-			vc4000_draw_digit(machine, vc4000_video.bitmap, x+16, y, vc4000_video.reg.d.bcd[0]&0xf, vc4000_video.line-y);
+			vc4000_draw_digit(vc4000_video.bitmap, x, y, vc4000_video.reg.d.bcd[0]>>4, vc4000_video.line-y);
+			vc4000_draw_digit(vc4000_video.bitmap, x+16, y, vc4000_video.reg.d.bcd[0]&0xf, vc4000_video.line-y);
 			x = 106;
 			if (vc4000_video.reg.d.score_control&2)
 				x += 16;
-			vc4000_draw_digit(machine, vc4000_video.bitmap, x, y, vc4000_video.reg.d.bcd[1]>>4, vc4000_video.line-y);
-			vc4000_draw_digit(machine, vc4000_video.bitmap, x+16, y, vc4000_video.reg.d.bcd[1]&0xf, vc4000_video.line-y);
+			vc4000_draw_digit(vc4000_video.bitmap, x, y, vc4000_video.reg.d.bcd[1]>>4, vc4000_video.line-y);
+			vc4000_draw_digit(vc4000_video.bitmap, x+16, y, vc4000_video.reg.d.bcd[1]&0xf, vc4000_video.line-y);
 		}
 	}
 	if (vc4000_video.line==269) vc4000_video.reg.d.sprite_collision |=0x40;

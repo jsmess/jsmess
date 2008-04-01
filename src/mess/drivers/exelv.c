@@ -74,7 +74,7 @@ static MACHINE_RESET( exelv )
 
 static INTERRUPT_GEN( exelv_hblank_interrupt )
 {
-	tms3556_interrupt( machine );
+	tms3556_interrupt();
 }
 
 /*static DEVICE_IMAGE_LOAD(exelv_cart)

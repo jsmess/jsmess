@@ -156,7 +156,7 @@ VIDEO_UPDATE( ti85 )
         	for (y=0; y<ti_screen_y_size; y++)
 			for (x=0; x<ti_screen_x_size; x++)
 				for (b=0; b<8; b++)
-					*BITMAP_ADDR16(bitmap, y, x*8+b) = screen->machine->pens[ti85_colortable[ti85_LCD_contrast&0x1f][6]];
+					*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_colortable[ti85_LCD_contrast&0x1f][6];
 		return 0;
 	}
 
@@ -179,7 +179,7 @@ VIDEO_UPDATE( ti85 )
 					  + ((*(ti85_frames+4*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
 					  + ((*(ti85_frames+5*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01);
 
-				*BITMAP_ADDR16(bitmap, y, x*8+b) = screen->machine->pens[ti85_colortable[ti85_LCD_contrast&0x1f][brightnes]];
+				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_colortable[ti85_LCD_contrast&0x1f][brightnes];
 	                }
 	return 0;
 }

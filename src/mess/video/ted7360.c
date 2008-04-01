@@ -800,7 +800,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 			ted7360_drawlines (machine, lastline, rasterline);
 			ted7360[offset] = data;
 			monoinversed[1] = mono[0] = bitmapmulti[0] = multi[0] = colors[0] =
-				machine->pens[BACKGROUNDCOLOR];
+				BACKGROUNDCOLOR;
 		}
 		break;
 	case 0x16:						   /* foregroundcolor */
@@ -808,7 +808,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		{
 			ted7360_drawlines (machine, lastline, rasterline);
 			ted7360[offset] = data;
-			bitmapmulti[3] = multi[1] = colors[1] = machine->pens[FOREGROUNDCOLOR];
+			bitmapmulti[3] = multi[1] = colors[1] = FOREGROUNDCOLOR;
 		}
 		break;
 	case 0x17:						   /* multicolor 1 */
@@ -816,7 +816,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		{
 			ted7360_drawlines (machine, lastline, rasterline);
 			ted7360[offset] = data;
-			multi[2] = colors[2] = machine->pens[MULTICOLOR1];
+			multi[2] = colors[2] = MULTICOLOR1;
 		}
 		break;
 	case 0x18:						   /* multicolor 2 */
@@ -824,7 +824,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		{
 			ted7360_drawlines (machine, lastline, rasterline);
 			ted7360[offset] = data;
-			colors[3] = machine->pens[MULTICOLOR2];
+			colors[3] = MULTICOLOR2;
 		}
 		break;
 	case 0x19:						   /* framecolor */
@@ -832,7 +832,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		{
 			ted7360_drawlines (machine, lastline, rasterline);
 			ted7360[offset] = data;
-			colors[4] = machine->pens[FRAMECOLOR];
+			colors[4] = FRAMECOLOR;
 		}
 		break;
 	case 0x1c:
@@ -956,7 +956,7 @@ VIDEO_START( ted7360 )
 	decodegfx(cursorelement, cursormask, 0, 1);
 	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
 	/* cursorelement->colortable = cursorcolortable; */
-	cursorcolortable[1] = machine->pens[1];
+	cursorcolortable[1] = 1;
 	cursorelement->total_colors = 2;
 	ted7360_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	add_exit_callback(machine, ted7360_video_stop);
@@ -1078,7 +1078,7 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 	if (!SCREENON)
 	{
 		for (line = first; (line < last) && (line < ted7360_bitmap->height); line++)
-			memset16 (BITMAP_ADDR16(ted7360_bitmap, line, 0), machine->pens[0], ted7360_bitmap->width);
+			memset16 (BITMAP_ADDR16(ted7360_bitmap, line, 0), 0, ted7360_bitmap->width);
 		return;
 	}
 
@@ -1093,7 +1093,7 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 		end = y_begin + YPOS;
 	{
 		for (line = first; line < end; line++)
-			memset16 (BITMAP_ADDR16(ted7360_bitmap, line, 0), machine->pens[FRAMECOLOR],
+			memset16 (BITMAP_ADDR16(ted7360_bitmap, line, 0), FRAMECOLOR,
 				ted7360_bitmap->width);
 	}
 	if (LINES25)
@@ -1125,8 +1125,8 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 				attr = vic_dma_read (machine, ((videoaddr) + offs));
 				c1 = ((ch >> 4) & 0xf) | (attr << 4);
 				c2 = (ch & 0xf) | (attr & 0x70);
-				bitmapmulti[1] = c16_bitmap[1] = machine->pens[c1 & 0x7f];
-				bitmapmulti[2] = c16_bitmap[0] = machine->pens[c2 & 0x7f];
+				bitmapmulti[1] = c16_bitmap[1] = c1 & 0x7f;
+				bitmapmulti[2] = c16_bitmap[0] = c2 & 0x7f;
 				if (MULTICOLORON)
 				{
 					ted7360_draw_bitmap_multi (machine, ybegin, yend, offs, yoff, xoff);
@@ -1146,7 +1146,7 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 					// hardware reverse off
 					ecm = ch >> 6;
 					ecmcolor[0] = colors[ecm];
-					ecmcolor[1] = machine->pens[attr & 0x7f];
+					ecmcolor[1] = attr & 0x7f;
 					ted7360_draw_character (machine, ybegin, yend, ch & ~0xC0, yoff, xoff, ecmcolor);
 				}
 				else if (MULTICOLORON)
@@ -1154,12 +1154,12 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 					// hardware reverse off
 					if (attr & 8)
 					{
-						multi[3] = machine->pens[attr & 0x77];
+						multi[3] = attr & 0x77;
 						ted7360_draw_character_multi (machine, ybegin, yend, ch, yoff, xoff);
 					}
 					else
 					{
-						mono[1] = machine->pens[attr & 0x7f];
+						mono[1] = attr & 0x7f;
 						ted7360_draw_character (machine, ybegin, yend, ch, yoff, xoff, mono);
 					}
 				}
@@ -1167,15 +1167,15 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 				{
 #ifndef GFX
 					ted7360_draw_cursor (ybegin, yend, yoff, xoff,
-							machine->pens[attr & 0x7f]);
+							attr & 0x7f);
 #else
-					drawgfx (ted7360_bitmap, cursorelement, 0, machine->pens[attr & 0x7f], 0, 0,
+					drawgfx (ted7360_bitmap, cursorelement, 0, attr & 0x7f, 0, 0,
 						xoff, yoff, 0, TRANSPARENCY_NONE, 0);
 #endif
 				}
 				else if (REVERSEON && (ch & 0x80))
 				{
-					monoinversed[0] = machine->pens[attr & 0x7f];
+					monoinversed[0] = attr & 0x7f;
 					if (cursor1 && (attr & 0x80))
 						ted7360_draw_cursor (ybegin, yend, yoff, xoff, monoinversed[0]);
 					else
@@ -1184,7 +1184,7 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 				}
 				else
 				{
-					mono[1] = machine->pens[attr & 0x7f];
+					mono[1] = attr & 0x7f;
 					if (cursor1 && (attr & 0x80))
 						ted7360_draw_cursor (ybegin, yend, yoff, xoff, mono[0]);
 					else
@@ -1195,8 +1195,8 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 
 		for (i = ybegin; i <= yend; i++)
 		{
-			memset16 (BITMAP_ADDR16(ted7360_bitmap, yoff + i, 0), machine->pens[FRAMECOLOR], xbegin);
-			memset16 (BITMAP_ADDR16(ted7360_bitmap, yoff + i, xend), machine->pens[FRAMECOLOR], ted7360_bitmap->width - xend);
+			memset16 (BITMAP_ADDR16(ted7360_bitmap, yoff + i, 0), FRAMECOLOR, xbegin);
+			memset16 (BITMAP_ADDR16(ted7360_bitmap, yoff + i, xend), FRAMECOLOR, ted7360_bitmap->width - xend);
 		}
 	}
 
@@ -1207,7 +1207,7 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 
 	for (; line < end; line++)
 	{
-		memset16 (BITMAP_ADDR16(ted7360_bitmap, line, 0), machine->pens[FRAMECOLOR], ted7360_bitmap->width);
+		memset16 (BITMAP_ADDR16(ted7360_bitmap, line, 0), FRAMECOLOR, ted7360_bitmap->width);
 	}
 }
 

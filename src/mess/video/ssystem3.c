@@ -87,7 +87,7 @@ static const char led[]={
         "  dddddddddddd"
 };
 
-static void ssystem3_draw_7segment(running_machine *machine, bitmap_t *bitmap,int value, int x, int y)
+static void ssystem3_draw_7segment(bitmap_t *bitmap,int value, int x, int y)
 {
 	int i, xi, yi, mask, color;
 
@@ -108,7 +108,7 @@ static void ssystem3_draw_7segment(running_machine *machine, bitmap_t *bitmap,in
 		}
 
 		if (mask!=0) {
-			color=machine->pens[(value&mask)?1:0];
+			color=(value&mask)?1:0;
 			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = color;
 		}
 		if (led[i]!='\r') xi++;
@@ -193,21 +193,21 @@ VIDEO_UPDATE( ssystem3 )
 	int i;
 
 	for (i=0; i<4; i++) {
-		ssystem3_draw_7segment(screen->machine, bitmap, ssystem3_lcd.data[1+i], ssystem3_led_pos[i].x, ssystem3_led_pos[i].y);
+		ssystem3_draw_7segment(bitmap, ssystem3_lcd.data[1+i], ssystem3_led_pos[i].x, ssystem3_led_pos[i].y);
 	}
 
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[0]&1?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '0'); //?
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[0]&2?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '5');
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[0]&4?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '7');
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[0]&8?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, 'b');
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[0]&0x10?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '9');
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[0]&0x20?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '8');
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[0]&0x40?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, 'c');
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[0]&0x80?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '6');
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[1]&1?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '2');
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[2]&1?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '1'); //?
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[3]&1?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
-	ssystem3_draw_led(bitmap, screen->machine->pens[ssystem3_lcd.data[4]&1?1:0], ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[0]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '0'); //?
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[0]&2?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '5');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[0]&4?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '7');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[0]&8?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, 'b');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[0]&0x10?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '9');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[0]&0x20?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '8');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[0]&0x40?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, 'c');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[0]&0x80?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '6');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[1]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '2');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[2]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '1'); //?
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[3]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
+	ssystem3_draw_led(bitmap, ssystem3_lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
 
 	if (readinputportbytag("Configuration")&1) { // playfield(optional device)
 	  const int lcd_signs_on[]={
@@ -227,12 +227,12 @@ VIDEO_UPDATE( ssystem3 )
 	      int xp=263+x*22;
 	      int yp=55+(y^7)*28;
 	      ssystem3_playfield_getfigure(x, y, &figure, &black);	    
-	      ssystem3_draw_led(bitmap, screen->machine->pens[lcd_signs_on[figure]&1?1:0], xp, yp, '6');
-	      ssystem3_draw_led(bitmap, screen->machine->pens[lcd_signs_on[figure]&2?1:0], xp, yp, '8');
-	      ssystem3_draw_led(bitmap, screen->machine->pens[lcd_signs_on[figure]&4?1:0], xp, yp, '9');
-	      ssystem3_draw_led(bitmap, screen->machine->pens[lcd_signs_on[figure]&8?1:0], xp, yp, 'b');
-	      ssystem3_draw_led(bitmap, screen->machine->pens[lcd_signs_on[figure]&0x10?1:0], xp, yp, 'c');
-	      ssystem3_draw_led(bitmap, screen->machine->pens[figure!=0 && black?1:0], xp, yp, '7');
+	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&1?1:0, xp, yp, '6');
+	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&2?1:0, xp, yp, '8');
+	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&4?1:0, xp, yp, '9');
+	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&8?1:0, xp, yp, 'b');
+	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&0x10?1:0, xp, yp, 'c');
+	      ssystem3_draw_led(bitmap, figure!=0 && black?1:0, xp, yp, '7');
 	      
 	    }
 	  }

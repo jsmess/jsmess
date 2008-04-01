@@ -416,13 +416,13 @@ void thom_set_video_page ( unsigned page )
 
 
 
-typedef void ( *thom_scandraw ) ( running_machine *machine, UINT8* vram, UINT16* dst, UINT16* pal,
+typedef void ( *thom_scandraw ) ( UINT8* vram, UINT16* dst, UINT16* pal,
 				  int org, int len );
 
 
 
 #define UPDATE( name, res )						\
-	static void name##_scandraw_##res ( running_machine *machine, UINT8* vram, UINT16* dst,	UINT16* pal, \
+	static void name##_scandraw_##res ( UINT8* vram, UINT16* dst,	UINT16* pal, \
 					    int org, int len )		\
 	{								\
 		unsigned gpl;						\
@@ -446,8 +446,8 @@ UPDATE_HI( to770 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ ((ramb & 7) | ((ramb>>4) & 8)) ^ 8 ] ];
-	c[1] = machine->pens[ pal[ ((ramb >> 3) & 15) ^ 8 ] ];
+	c[0] = pal[ ((ramb & 7) | ((ramb>>4) & 8)) ^ 8 ];
+	c[1] = pal[ ((ramb >> 3) & 15) ^ 8 ];
 	for ( i = 0; i < 16; i += 2, rama >>= 1 )
 		dst[ 15 - i ] = dst[ 14 - i ] = c[ rama & 1 ];
 }
@@ -457,8 +457,8 @@ UPDATE_LOW( to770 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ ((ramb & 7) | ((ramb>>4) & 8)) ^ 8 ] ];
-	c[1] = machine->pens[ pal[ ((ramb >> 3) & 15) ^ 8 ] ];
+	c[0] = pal[ ((ramb & 7) | ((ramb>>4) & 8)) ^ 8 ];
+	c[1] = pal[ ((ramb >> 3) & 15) ^ 8 ];
 	for ( i = 0; i < 8; i++, rama >>= 1 )
 		dst[ 7 - i ] = c[ rama & 1 ];
 }
@@ -472,8 +472,8 @@ UPDATE_HI( mo5 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ ramb & 15 ] ];
-	c[1] = machine->pens[ pal[ ramb >> 4 ] ];
+	c[0] = pal[ ramb & 15 ];
+	c[1] = pal[ ramb >> 4 ];
 	for ( i = 0; i < 16; i += 2, rama >>= 1 )
 		dst[ 15 - i ] = dst[ 14 - i ] = c[ rama & 1 ];
 }
@@ -483,8 +483,8 @@ UPDATE_LOW( mo5 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ ramb & 15 ] ];
-	c[1] = machine->pens[ pal[ ramb >> 4 ] ];
+	c[0] = pal[ ramb & 15 ];
+	c[1] = pal[ ramb >> 4 ];
 	for ( i = 0; i < 8; i++, rama >>= 1 )
 		dst[ 7 - i ] = c[ rama & 1 ];
 }
@@ -498,8 +498,8 @@ UPDATE_HI( to9 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ (ramb & 7) | ((ramb>>4) & 8) ] ];
-	c[1] = machine->pens[ pal[ (ramb >> 3) & 15 ] ];
+	c[0] = pal[ (ramb & 7) | ((ramb>>4) & 8) ];
+	c[1] = pal[ (ramb >> 3) & 15 ];
 	for ( i = 0; i < 16; i += 2, rama >>= 1 )
 		dst[ 15 - i ] = dst[ 14 - i ] = c[ rama & 1 ];
 }
@@ -509,8 +509,8 @@ UPDATE_LOW( to9 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ (ramb & 7) | ((ramb>>4) & 8) ] ];
-	c[1] = machine->pens[ pal[ (ramb >> 3) & 15 ] ];
+	c[0] = pal[ (ramb & 7) | ((ramb>>4) & 8) ];
+	c[1] = pal[ (ramb >> 3) & 15 ];
 	for ( i = 0; i < 8; i++, rama >>= 1 )
 		dst[ 7 - i ] = c[ rama & 1 ];
 }
@@ -524,10 +524,10 @@ UPDATE_HI( bitmap4 )
 {
 	int i;
 	pen_t c[2][2];
-	c[0][0] = machine->pens[ pal[ 0 ] ];
-	c[0][1] = machine->pens[ pal[ 1 ] ];
-	c[1][0] = machine->pens[ pal[ 2 ] ];
-	c[1][1] = machine->pens[ pal[ 3 ] ];
+	c[0][0] = pal[ 0 ];
+	c[0][1] = pal[ 1 ];
+	c[1][0] = pal[ 2 ];
+	c[1][1] = pal[ 3 ];
 	for ( i = 0; i < 16; i += 2, rama >>= 1, ramb >>= 1 )
 		dst[ 15 - i ] =  dst[ 14 - i ] = c[ rama & 1 ] [ ramb & 1 ];
 }
@@ -537,10 +537,10 @@ UPDATE_LOW( bitmap4 )
 {
 	int i;
 	pen_t c[2][2];
-	c[0][0] = machine->pens[ pal[ 0 ] ];
-	c[0][1] = machine->pens[ pal[ 1 ] ];
-	c[1][0] = machine->pens[ pal[ 2 ] ];
-	c[1][1] = machine->pens[ pal[ 3 ] ];
+	c[0][0] = pal[ 0 ];
+	c[0][1] = pal[ 1 ];
+	c[1][0] = pal[ 2 ];
+	c[1][1] = pal[ 3 ];
 	for ( i = 0; i < 8; i++, rama >>= 1, ramb >>= 1 )
 		dst[ 7 - i ] = c[ rama & 1 ] [ ramb & 1 ];
 }
@@ -554,10 +554,10 @@ UPDATE_HI( bitmap4alt )
 {
 	int i;
 	pen_t c[4];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = machine->pens[ pal[ 1 ] ];
-	c[2] = machine->pens[ pal[ 2 ] ];
-	c[3] = machine->pens[ pal[ 3 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = pal[ 1 ];
+	c[2] = pal[ 2 ];
+	c[3] = pal[ 3 ];
 	for ( i = 0; i < 8; i += 2, ramb >>= 2 )
 		dst[ 15 - i ] = dst[ 14 - i ] = c[ ramb & 3 ];
 	for ( i = 0; i < 8; i += 2, rama >>= 2 )
@@ -569,10 +569,10 @@ UPDATE_LOW( bitmap4alt )
 {
 	int i;
 	pen_t c[4];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = machine->pens[ pal[ 1 ] ];
-	c[2] = machine->pens[ pal[ 2 ] ];
-	c[3] = machine->pens[ pal[ 3 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = pal[ 1 ];
+	c[2] = pal[ 2 ];
+	c[3] = pal[ 3 ];
 	for ( i = 0; i < 4; i++, ramb >>= 2 )
 		dst[ 7 - i ] = c[ ramb & 3 ];
 	for ( i = 0; i < 4; i++, rama >>= 2 )
@@ -586,19 +586,19 @@ END_UPDATE
 
 UPDATE_HI( bitmap16 )
 {
-	dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = machine->pens[ pal[ rama >> 4 ] ];
-	dst[ 4] = dst[ 5] = dst[ 6] = dst[ 7] = machine->pens[ pal[ rama & 15 ] ];
-	dst[ 8] = dst[ 9] = dst[10] = dst[11] = machine->pens[ pal[ ramb >> 4 ] ];
-	dst[12] = dst[13] = dst[14] = dst[15] = machine->pens[ pal[ ramb & 15 ] ];
+	dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = pal[ rama >> 4 ];
+	dst[ 4] = dst[ 5] = dst[ 6] = dst[ 7] = pal[ rama & 15 ];
+	dst[ 8] = dst[ 9] = dst[10] = dst[11] = pal[ ramb >> 4 ];
+	dst[12] = dst[13] = dst[14] = dst[15] = pal[ ramb & 15 ];
 }
 END_UPDATE
 
 UPDATE_LOW( bitmap16 )
 {
-	dst[0] = dst[1] = machine->pens[ pal[ rama >> 4 ] ];
-	dst[2] = dst[3] = machine->pens[ pal[ rama & 15 ] ];
-	dst[4] = dst[5] = machine->pens[ pal[ ramb >> 4 ] ];
-	dst[6] = dst[7] = machine->pens[ pal[ ramb & 15 ] ];
+	dst[0] = dst[1] = pal[ rama >> 4 ];
+	dst[2] = dst[3] = pal[ rama & 15 ];
+	dst[4] = dst[5] = pal[ ramb >> 4 ];
+	dst[6] = dst[7] = pal[ ramb & 15 ];
 }
 END_UPDATE
 
@@ -610,8 +610,8 @@ UPDATE_HI( mode80 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = machine->pens[ pal[ 1 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = pal[ 1 ];
 	for ( i = 0; i < 8; i++, ramb >>= 1 )
 		dst[ 15 - i ] = c[ ramb & 1 ];
 	for ( i = 0; i < 8; i++, rama >>= 1 )
@@ -624,8 +624,8 @@ UPDATE_LOW( mode80 )
 	/* 640-pixel mode but 320 pixels emulated => we merge pixels */
 	int i;
 	pen_t c[4];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = c[2] = c[3] = machine->pens[ pal[ 1 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = c[2] = c[3] = pal[ 1 ];
 	for ( i = 0; i < 4; i++, ramb >>= 2 )
 		dst[ 7 - i ] = c[ ramb & 3 ];
 	for ( i = 0; i < 4; i++, rama >>= 2 )
@@ -641,8 +641,8 @@ UPDATE_HI( mode80_to9 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = machine->pens[ pal[ 6 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = pal[ 6 ];
 	for ( i = 0; i < 8; i++, ramb >>= 1 )
 		dst[ 15 - i ] = c[ ramb & 1 ];
 	for ( i = 0; i < 8; i++, rama >>= 1 )
@@ -654,8 +654,8 @@ UPDATE_LOW( mode80_to9 )
 {
 	int i;
 	pen_t c[4];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = c[2] = c[3] = machine->pens[ pal[ 6 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = c[2] = c[3] = pal[ 6 ];
 	for ( i = 0; i < 4; i++, ramb >>= 2 )
 		dst[ 7 - i ] = c[ ramb & 3 ];
 	for ( i = 0; i < 4; i++, rama >>= 2 )
@@ -671,8 +671,8 @@ UPDATE_HI( page1 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = machine->pens[ pal[ 1 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = pal[ 1 ];
 	for ( i = 0; i < 16; i += 2, rama >>= 1 )
 		dst[ 15 - i ] = dst[ 14 - i ] = c[ rama & 1 ];
 	(void)ramb;
@@ -683,8 +683,8 @@ UPDATE_LOW( page1 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = machine->pens[ pal[ 1 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = pal[ 1 ];
 	for ( i = 0; i < 8; i++, rama >>= 1 )
 		dst[ 7 - i ] = c[ rama & 1 ];
 	(void)ramb;
@@ -695,8 +695,8 @@ UPDATE_HI( page2 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = machine->pens[ pal[ 2 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = pal[ 2 ];
 	for ( i = 0; i < 16; i += 2, ramb >>= 1 )
 		dst[ 15 - i ] = dst[ 14 - i ] = c[ ramb & 1 ];
 	(void)rama;
@@ -707,8 +707,8 @@ UPDATE_LOW( page2 )
 {
 	int i;
 	pen_t c[2];
-	c[0] = machine->pens[ pal[ 0 ] ];
-	c[1] = machine->pens[ pal[ 2 ] ];
+	c[0] = pal[ 0 ];
+	c[1] = pal[ 2 ];
 	for ( i = 0; i < 8; i++, ramb >>= 1 )
 		dst[ 7 - i ] = c[ ramb & 1 ];
 	(void)rama;
@@ -723,9 +723,9 @@ UPDATE_HI( overlay )
 {
 	int i;
 	pen_t c[2][2];
-	c[0][0] = machine->pens[ pal[ 0 ] ];
-	c[0][1] = c[1][1] = machine->pens[ pal[ 1 ] ];
-	c[1][0] = machine->pens[ pal[ 2 ] ];
+	c[0][0] = pal[ 0 ];
+	c[0][1] = c[1][1] = pal[ 1 ];
+	c[1][0] = pal[ 2 ];
 	for ( i = 0; i < 16; i += 2, rama >>= 1, ramb >>= 1 )
 		dst[ 15 - i ] =  dst[ 14 - i ] = c[ ramb & 1 ] [ rama & 1 ];
 }
@@ -735,9 +735,9 @@ UPDATE_LOW( overlay )
 {
 	int i;
 	pen_t c[2][2];
-	c[0][0] = machine->pens[ pal[ 0 ] ];
-	c[0][1] = c[1][1] = machine->pens[ pal[ 1 ] ];
-	c[1][0] = machine->pens[ pal[ 2 ] ];
+	c[0][0] = pal[ 0 ];
+	c[0][1] = c[1][1] = pal[ 1 ];
+	c[1][0] = pal[ 2 ];
 	for ( i = 0; i < 8; i++, rama >>= 1, ramb >>= 1 )
 		dst[ 7 - i ] = c[ ramb & 1 ] [ rama & 1 ];
 }
@@ -755,8 +755,8 @@ UPDATE_HI( overlay3 )
 	int i;
 	for ( i = 0; i < 16; i += 4, rama >>= 1, ramb >>= 1 )
 		dst[ 15 - i ] = dst[ 14 - i ] = dst[ 13 - i ] = dst[ 12 - i ] =
-			machine->pens[ pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ]
-					    [ rama & 1 ] [ (rama >> 4) & 1 ] ] ];
+			pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ]
+					    [ rama & 1 ] [ (rama >> 4) & 1 ] ];
 }
 END_UPDATE
 
@@ -768,8 +768,8 @@ UPDATE_LOW( overlay3 )
 	int i;
 	for ( i = 0; i < 8; i += 2, rama >>= 1, ramb >>= 1 )
 		dst[ 7 - i ] = dst[ 6 - i ] =
-			machine->pens[ pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ]
-					    [ rama & 1 ] [ (rama >> 4) & 1 ] ] ];
+			pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ]
+					    [ rama & 1 ] [ (rama >> 4) & 1 ] ];
 }
 END_UPDATE
 
@@ -810,7 +810,7 @@ static TIMER_CALLBACK( thom_scanline_start )
 				xx++;
 			} while ( xx < 40 && thom_vmodepage[xx] == -1 );
 			thom_scandraw_funcs[ mode ][ thom_hires ]
-				( machine, thom_vram + y * 40 + page * 0x4000,
+				( thom_vram + y * 40 + page * 0x4000,
 				  thom_vbody + y * 320 * (thom_hires+1),
 				  thom_last_pal, x, xx-x );
 			x = xx;
@@ -906,7 +906,7 @@ VIDEO_UPDATE ( thom )
 	const int yup = THOM_BORDER_HEIGHT + THOM_ACTIVE_HEIGHT;
 	const int ybot = THOM_BORDER_HEIGHT + thom_bheight + 200;
 	UINT16* v = thom_vbody;
-	pen_t border = screen->machine->pens[ 0 ];
+	pen_t border = 0;
 	rectangle wrect = { 0, xright - 1, 0, 0 };
 	rectangle lrect = { 0, xbleft - 1, 0, 0 };
 	rectangle rrect = { xbright, xright - 1, 0, 0 };
@@ -917,13 +917,13 @@ VIDEO_UPDATE ( thom )
 	for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
 	{
 		if ( thom_border_l[ y ] != -1 )
-			border = screen->machine->pens[ thom_border_l[ y ] ];
+			border = thom_border_l[ y ];
 	}
 	ypos = 0;
 	while ( y < THOM_BORDER_HEIGHT )
 	{
 		if ( thom_border_l[ y ] != -1 )
-			border = screen->machine->pens[ thom_border_l[ y ] ];
+			border = thom_border_l[ y ];
 		wrect.min_y = ypos;
 		do
 		{
@@ -939,7 +939,7 @@ VIDEO_UPDATE ( thom )
 	while ( y < yup )
 	{
 		if ( thom_border_l[ y ] != -1 )
-			border = screen->machine->pens[ thom_border_l[ y ] ];
+			border = thom_border_l[ y ];
 		lrect.min_y = ypos;
 		do
 		{
@@ -955,7 +955,7 @@ VIDEO_UPDATE ( thom )
 	while (y < ybot )
 	{
 		if ( thom_border_l[ y ] != -1 )
-			border = screen->machine->pens[ thom_border_l[ y ] ];
+			border = thom_border_l[ y ];
 		wrect.min_y = ypos;
 		do
 		{
@@ -969,13 +969,13 @@ VIDEO_UPDATE ( thom )
 	/* right border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT; y++ ) {
 		if ( thom_border_r[ y ] != -1 )
-			border = screen->machine->pens[ thom_border_r[ y ] ];
+			border = thom_border_r[ y ];
 	}
 	ypos = thom_bheight /* * scale */;
 	while ( y < yup )
 	{
 		if ( thom_border_r[ y ] != -1 )
-			border = screen->machine->pens[ thom_border_r[ y ] ];
+			border = thom_border_r[ y ];
 		rrect.min_y = ypos;
 		do
 		{

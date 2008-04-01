@@ -432,7 +432,7 @@ static void vdc8563_monotext_screenrefresh (running_machine *machine, bitmap_t *
 					if (k>0)
 						plot_box(bitmap, machine->gfx[0]->width*x+8,
 								 height*y+height+CRTC6845_CURSOR_TOP,
-								 machine->gfx[0]->width, k, machine->pens[FRAMECOLOR]);
+								 machine->gfx[0]->width, k, FRAMECOLOR);
 				}
 
 				vdc.dirty[i]=0;
@@ -491,7 +491,7 @@ static void vdc8563_text_screenrefresh (running_machine *machine, bitmap_t *bitm
 					if (k>0)
 						plot_box(bitmap, machine->gfx[0]->width*x+8,
 								 height*y+height+CRTC6845_CURSOR_TOP,
-								 machine->gfx[0]->width, k, machine->pens[0x10|(vdc.ram[j]&0xf)]);
+								 machine->gfx[0]->width, k, 0x10|(vdc.ram[j]&0xf));
 				}
 
 				vdc.dirty[i]=0;
@@ -570,15 +570,15 @@ VIDEO_UPDATE( vdc8563 )
 		int h=CRTC6845_CHAR_LINES;
 		int height=CRTC6845_CHAR_HEIGHT;
 
-		plot_box(bitmap, 0, 0, screen->machine->gfx[0]->width*(w+2), height, screen->machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, 0, 0, screen->machine->gfx[0]->width*(w+2), height, FRAMECOLOR);
 
-		plot_box(bitmap, 0, height, screen->machine->gfx[0]->width, height*h, screen->machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, 0, height, screen->machine->gfx[0]->width, height*h, FRAMECOLOR);
 
 		plot_box(bitmap, screen->machine->gfx[0]->width*(w+1), height, screen->machine->gfx[0]->width, height*h,
-				 screen->machine->pens[FRAMECOLOR]);
+				 FRAMECOLOR);
 
 		plot_box(bitmap, 0, height*(h+1), screen->machine->gfx[0]->width*(w+2), height,
-				 screen->machine->pens[FRAMECOLOR]);
+				 FRAMECOLOR);
 	}
 
 	vdc.changed=0;
