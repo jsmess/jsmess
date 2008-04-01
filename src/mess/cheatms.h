@@ -11,7 +11,7 @@
 
 extern UINT32				thisGameCRC;
 
-void InitMessCheats(void);
+void InitMessCheats(running_machine *machine);
 void StopMessCheats(void);
 int MatchesCRCTable(UINT32 crc);
 

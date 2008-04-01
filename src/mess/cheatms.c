@@ -11,7 +11,6 @@
 #include "mess.h"
 #include "image.h"
 #include "cheatms.h"
-#include "deprecat.h"
 
 
 /***************************************************************************
@@ -28,7 +27,7 @@ UINT32				thisGameCRC = 0;
     CODE
 ***************************************************************************/
 
-static void BuildCRCTable(void)
+static void BuildCRCTable(running_machine *machine)
 {
 	int	listIdx;
 	const device_config *img;
@@ -39,7 +38,7 @@ static void BuildCRCTable(void)
 	deviceCRCList = calloc(1, sizeof(UINT32));
 	deviceCRCListLength = 1;
 
-	for (img = image_device_first(Machine->config); img != NULL; img = image_device_next(img))
+	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
 	{
 		if (image_exists(img))
 		{
@@ -71,13 +70,13 @@ static void BuildCRCTable(void)
 }
 
 
-void InitMessCheats(void)
+void InitMessCheats(running_machine *machine)
 {
 	deviceCRCList =			NULL;
 	deviceCRCListLength =	0;
 	thisGameCRC =			0;
 
-	BuildCRCTable();
+	BuildCRCTable(machine);
 }
 
 
