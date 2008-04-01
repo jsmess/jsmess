@@ -293,7 +293,7 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 	int i, j, count;
 	size_t string_buffer_pos = 0;
 	int createimage_optcount;
-	device_getdispositions_handler getdispositions;
+	device_getdispositions_func getdispositions;
 	unsigned int readable, writeable, creatable;
 
 	/* set up MESS's device class */
@@ -363,13 +363,13 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 
 		mess_device->io_device.start				= (device_start_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_START);
 		mess_device->io_device.stop					= (device_stop_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_STOP);
-		mess_device->io_device.load					= (device_load_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_LOAD);
-		mess_device->io_device.create				= (device_create_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE);
-		mess_device->io_device.unload				= (device_unload_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_UNLOAD);
-		mess_device->io_device.imgverify			= (device_verify_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_VERIFY);
-		mess_device->io_device.partialhash			= (device_partialhash_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_PARTIAL_HASH);
+		mess_device->io_device.load					= (device_image_load_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_LOAD);
+		mess_device->io_device.create				= (device_image_create_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE);
+		mess_device->io_device.unload				= (device_image_unload_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_UNLOAD);
+		mess_device->io_device.imgverify			= (device_image_verify_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_VERIFY);
+		mess_device->io_device.partialhash			= (device_image_partialhash_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_PARTIAL_HASH);
 
-		mess_device->io_device.display				= (device_display_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_DISPLAY);
+		mess_device->io_device.display				= (device_display_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_DISPLAY);
 		mess_device->io_device.name					= default_device_name;
 
 		mess_device->io_device.createimage_optguide	= (const struct OptionGuide *) mess_device_get_info_ptr(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE_OPTGUIDE);
@@ -403,7 +403,7 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		}
 
 		/* determine the dispositions */
-		getdispositions = (device_getdispositions_handler) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_GET_DISPOSITIONS);
+		getdispositions = (device_getdispositions_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_GET_DISPOSITIONS);
 		if (getdispositions != NULL)
 		{
 			getdispositions(&mess_device->io_device, i, &readable, &writeable, &creatable);

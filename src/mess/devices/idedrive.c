@@ -17,8 +17,8 @@
 static void ide_get_params(const device_config *image, int *which_bus, int *which_address,
 	struct ide_interface **intf,
 	device_start_func *parent_init,
-	device_load_handler *parent_load,
-	device_unload_handler *parent_unload)
+	device_image_load_func *parent_load,
+	device_image_unload_func *parent_unload)
 {
 	const mess_device_class *devclass = &image_device(image)->devclass;
 	mess_device_class parent_devclass;
@@ -33,9 +33,9 @@ static void ide_get_params(const device_config *image, int *which_bus, int *whic
 	if (parent_init)
 		*parent_init = (device_start_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_START);
 	if (parent_load)
-		*parent_load = (device_load_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_LOAD);
+		*parent_load = (device_image_load_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_LOAD);
 	if (parent_unload)
-		*parent_unload = (device_unload_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
+		*parent_unload = (device_image_unload_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
 
 	assert(*which_address == 0);
 	assert(*intf);
@@ -73,7 +73,7 @@ static DEVICE_IMAGE_LOAD(ide_hd)
 {
 	int result, which_bus, which_address;
 	struct ide_interface *intf;
-	device_load_handler parent_load;
+	device_image_load_func parent_load;
 
 	/* get the basics */
 	ide_get_params(image, &which_bus, &which_address, &intf, NULL, &parent_load, NULL);
@@ -99,7 +99,7 @@ static DEVICE_IMAGE_UNLOAD(ide_hd)
 {
 	int which_bus, which_address;
 	struct ide_interface *intf;
-	device_unload_handler parent_unload;
+	device_image_unload_func parent_unload;
 
 	/* get the basics */
 	ide_get_params(image, &which_bus, &which_address, &intf, NULL, NULL, &parent_unload);

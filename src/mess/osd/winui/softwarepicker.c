@@ -253,10 +253,10 @@ static void ComputeFileHash(struct SoftwarePickerInfo *pPickerInfo,
 {
 	unsigned int nFunctions;
 	iodevice_t type;
-	device_partialhash_handler partialhash;
+	device_image_partialhash_func partialhash;
 
 	type = (iodevice_t) (int) mess_device_get_info_int(&pFileInfo->devclass, MESS_DEVINFO_INT_TYPE);
-	partialhash = (device_partialhash_handler) mess_device_get_info_fct(&pFileInfo->devclass, MESS_DEVINFO_PTR_PARTIAL_HASH);
+	partialhash = (device_image_partialhash_func) mess_device_get_info_fct(&pFileInfo->devclass, MESS_DEVINFO_PTR_PARTIAL_HASH);
 
 	nFunctions = hashfile_functions_used(pPickerInfo->pHashFile, type);
 

@@ -491,13 +491,13 @@ void sony_set_speed(int speed)
 static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 {
 	int id;
-	device_unload_handler parent_unload;
+	device_image_unload_func parent_unload;
 
 	id = image_index_in_device(image);
 	save_track_data(id);
 	memset(&sony_floppy[id], 0, sizeof(sony_floppy[id]));
 
-	parent_unload = (device_unload_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
+	parent_unload = (device_image_unload_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
 	parent_unload(image);
 }
 

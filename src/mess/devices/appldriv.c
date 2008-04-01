@@ -291,9 +291,9 @@ static DEVICE_START( apple525_floppy )
 static DEVICE_IMAGE_LOAD( apple525_floppy )
 {
 	int result;
-	device_load_handler parent_load;
+	device_image_load_func parent_load;
 
-	parent_load = (device_load_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_LOAD);
+	parent_load = (device_image_load_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_LOAD);
 	result = parent_load(image);
 
 	floppy_drive_seek(image, -999);
@@ -305,11 +305,11 @@ static DEVICE_IMAGE_LOAD( apple525_floppy )
 
 static DEVICE_IMAGE_UNLOAD( apple525_floppy )
 {
-	device_unload_handler parent_unload;
+	device_image_unload_func parent_unload;
 
 	apple525_save_current_track(image, TRUE);
 
-	parent_unload = (device_unload_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
+	parent_unload = (device_image_unload_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
 	parent_unload(image);
 }
 

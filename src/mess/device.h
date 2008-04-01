@@ -91,15 +91,15 @@ enum
 
 struct IODevice;
 
-typedef int (*device_load_handler)(const device_config *image);
-typedef int (*device_create_handler)(const device_config *image, int format_type, option_resolution *format_options);
-typedef void (*device_unload_handler)(const device_config *image);
-typedef int (*device_verify_handler)(const UINT8 *buf, size_t size);
-typedef void (*device_partialhash_handler)(char *, const unsigned char *, unsigned long, unsigned int);
-typedef void (*device_getdispositions_handler)(const struct IODevice *dev, int id,
+typedef int (*device_image_load_func)(const device_config *image);
+typedef int (*device_image_create_func)(const device_config *image, int format_type, option_resolution *format_options);
+typedef void (*device_image_unload_func)(const device_config *image);
+typedef int (*device_image_verify_func)(const UINT8 *buf, size_t size);
+typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
+typedef void (*device_getdispositions_func)(const struct IODevice *dev, int id,
 	unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
-typedef void (*device_display_handler)(const device_config *image);
-typedef const char *(*device_getname_handler)(const struct IODevice *dev, int id, char *buf, size_t bufsize);
+typedef void (*device_display_func)(const device_config *image);
+typedef const char *(*device_getname_func)(const struct IODevice *dev, int id, char *buf, size_t bufsize);
 
 struct _mess_device_class;
 struct _machine_config;
@@ -114,16 +114,16 @@ union devinfo
 
 	device_start_func start;
 	device_stop_func stop;
-	device_load_handler load;
-	device_create_handler create;
-	device_unload_handler unload;
+	device_image_load_func load;
+	device_image_create_func create;
+	device_image_unload_func unload;
 
-	device_partialhash_handler partialhash;
-	device_verify_handler imgverify;
-	device_getdispositions_handler getdispositions;
+	device_image_partialhash_func partialhash;
+	device_image_verify_func imgverify;
+	device_getdispositions_func getdispositions;
 
-	device_display_handler display;
-	device_getname_handler name;
+	device_display_func display;
+	device_getname_func name;
 
 	int (*validity_check)(const struct _mess_device_class *devclass);
 };
@@ -259,11 +259,11 @@ struct IODevice
 	/* image handling callbacks */
 	device_start_func start;
 	device_stop_func stop;
-	device_load_handler load;
-	device_create_handler create;
-	device_unload_handler unload;
+	device_image_load_func load;
+	device_image_create_func create;
+	device_image_unload_func unload;
 	int (*imgverify)(const UINT8 *buf, size_t size);
-	device_partialhash_handler partialhash;
+	device_image_partialhash_func partialhash;
 
 	/* cosmetic/UI callbacks */
 	void (*display)(const device_config *img);
