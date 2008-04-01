@@ -61,7 +61,7 @@ VIDEO_UPDATE( galaxy )
 		black_area.max_x = 32*8-1;
 		black_area.min_y = 0;
 		black_area.max_y = 16*13-1;
-		fillbitmap(bitmap, screen->machine->pens[1], &black_area);
+		fillbitmap(bitmap, 1, &black_area);
 		fast_mode = TRUE;
 		return 0;
 	}
@@ -82,7 +82,7 @@ VIDEO_UPDATE( galaxy )
 		}
 		if (horizontal_pos == 0x0b)
 			black_area.min_x =  black_area.max_x = 0;
-		fillbitmap(bitmap, screen->machine->pens[1], &black_area);
+		fillbitmap(bitmap, 1, &black_area);
 	}
 
 	for( offs = 0; offs < 512; offs++ )

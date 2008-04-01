@@ -70,21 +70,21 @@ VIDEO_UPDATE( nc )
 
 		if (nc200_backlight)
 		{
-			pens[0] = screen->machine->pens[2];
-			pens[1] = screen->machine->pens[3];
+			pens[0] = 2;
+			pens[1] = 3;
 		}
 		else
 		{
-			pens[0] = screen->machine->pens[0];
-			pens[1] = screen->machine->pens[1];
+			pens[0] = 0;
+			pens[1] = 1;
 		}
     }
     else
     {
 		height = NC_SCREEN_HEIGHT;
 		width = NC_SCREEN_WIDTH;
-		pens[0] = screen->machine->pens[2];
-		pens[1] = screen->machine->pens[3];
+		pens[0] = 2;
+		pens[1] = 3;
 	}
 
 

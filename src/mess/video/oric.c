@@ -197,7 +197,7 @@ static void oric_vh_update_attribute(int c)
 
 /* render 6-pixels using foreground and background colours specified */
 /* used in hires and text mode */
-static void oric_vh_render_6pixels(running_machine *machine, bitmap_t *bitmap,int x,int y, int fg, int bg,int data, int invert_flag)
+static void oric_vh_render_6pixels(bitmap_t *bitmap,int x,int y, int fg, int bg,int data, int invert_flag)
 {
 	int i;
 	int pens[2];
@@ -210,8 +210,8 @@ static void oric_vh_render_6pixels(running_machine *machine, bitmap_t *bitmap,in
 		bg ^=0x07;
 	}
 
-	pens[1] = machine->pens[fg];
-	pens[0] = machine->pens[bg];
+	pens[1] = fg;
+	pens[0] = bg;
 
 	px = x;
 	for (i=0; i<6; i++)
@@ -306,7 +306,7 @@ VIDEO_UPDATE( oric )
 				oric_vh_update_attribute(c);
 
 				/* display background colour when attribute has been found */
-				oric_vh_render_6pixels(screen->machine, bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, 0,(c & 0x080));
+				oric_vh_render_6pixels(bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, 0,(c & 0x080));
 
 				if (y<200)
 				{
@@ -330,7 +330,7 @@ VIDEO_UPDATE( oric )
 				{
 					int pixel_data = c & 0x03f;
 					/* plot hires pixels */
-					oric_vh_render_6pixels(screen->machine, bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, pixel_data,(c & 0x080));
+					oric_vh_render_6pixels(bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, pixel_data,(c & 0x080));
 				}
 				else
 				{
@@ -357,7 +357,7 @@ VIDEO_UPDATE( oric )
 					char_data = vh_state.char_data[(char_index<<3) | ch_line] & 0x03f;
 
 					/* draw! */
-					oric_vh_render_6pixels(screen->machine, bitmap,x,y,
+					oric_vh_render_6pixels(bitmap,x,y,
 						vh_state.active_foreground_colour,
 						vh_state.active_background_colour, char_data, (c & 0x080));
 				}

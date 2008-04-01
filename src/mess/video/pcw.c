@@ -69,9 +69,6 @@ VIDEO_UPDATE( pcw )
 		pen0^=1;
 	}
 
-	pen0 = screen->machine->pens[pen0];
-	pen1 = screen->machine->pens[pen1];
-
 	/* video enable? */
 	if ((pcw_vdu_video_control_register & (1<<6))!=0)
 	{

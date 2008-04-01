@@ -31,7 +31,7 @@ VIDEO_START( pmd85 )
 {
 }
 
-static void pmd85_draw_scanline(running_machine *machine, bitmap_t *bitmap, int pmd85_scanline)
+static void pmd85_draw_scanline(bitmap_t *bitmap, int pmd85_scanline)
 {
 	int x, i;
 	int pen0, pen1;
@@ -50,7 +50,7 @@ static void pmd85_draw_scanline(running_machine *machine, bitmap_t *bitmap, int 
 		pen1 = data & 0x80 ? 1 : 2;
 
 		for (i=0; i<6; i++)
-			scanline[x+i] = machine->pens[(data & (0x01<<i)) ? pen1 : pen0];
+			scanline[x+i] = (data & (0x01<<i)) ? pen1 : pen0;
 
 	}
 }
@@ -60,6 +60,6 @@ VIDEO_UPDATE( pmd85 )
 	int pmd85_scanline;
 
 	for (pmd85_scanline=0; pmd85_scanline<256; pmd85_scanline++)
-		pmd85_draw_scanline (screen->machine, bitmap, pmd85_scanline);
+		pmd85_draw_scanline (bitmap, pmd85_scanline);
 	return 0;
 }

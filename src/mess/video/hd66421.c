@@ -144,7 +144,7 @@ VIDEO_UPDATE( hd66421 )
 		if (temp <  0) temp =  0;
 		if (temp > 31) temp = 31;
 		bright = 1.0 * temp / 31;
-		pen[i] = screen->machine->pens[i];
+		pen[i] = i;
 		#ifdef BRIGHTNESS_DOES_NOT_WORK
 		palette_set_color( screen->machine, pen[i], 255 * bright, 255 * bright, 255 * bright);
 		#else

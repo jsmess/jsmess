@@ -121,12 +121,7 @@ static const HP48_FIGURE hp48_orange={
 VIDEO_UPDATE( hp48 )
 {
 	int x, y, i, p, data, max_y;
-	int color[2];
 //	int contrast=(hp48_hardware.data[1]|((hp48_hardware.data[2]&1)<<4));
-
-	/* HJB: we cannot initialize array with values from other arrays, thus... */
-    color[0] = screen->machine->pens[0];
-	color[1] = screen->machine->pens[1];
 
 	i = LCD_MAIN_BASE_ADDRESS;
 	max_y = MIN(64, LCD_MAIN_SIZE + 1 );
@@ -169,16 +164,16 @@ VIDEO_UPDATE( hp48 )
 	}
 
 	hp48_draw_special(bitmap,RIGHT+12,DOWN-13,hp48_orange,
-					  hp48_hardware.data[0xb]&1?color[1]:color[1]);
+					  hp48_hardware.data[0xb]&1?1:1);
 	hp48_draw_special(bitmap,RIGHT+57,DOWN-13,hp48_blue,
-					  hp48_hardware.data[0xb]&2?color[1]:color[0]);
+					  hp48_hardware.data[0xb]&2?1:0);
 	hp48_draw_special(bitmap,RIGHT+102,DOWN-13,hp48_alpha,
-					  hp48_hardware.data[0xb]&4?color[1]:color[0]);
+					  hp48_hardware.data[0xb]&4?1:0);
 	hp48_draw_special(bitmap,RIGHT+147,DOWN-13,hp48_alarm,
-					  hp48_hardware.data[0xb]&8?color[1]:color[0]);
+					  hp48_hardware.data[0xb]&8?1:0);
 	hp48_draw_special(bitmap,RIGHT+192,DOWN-13,hp48_busy,
-					  hp48_hardware.data[0xc]&1?color[1]:color[0]);
+					  hp48_hardware.data[0xc]&1?1:0);
 	hp48_draw_special(bitmap,RIGHT+237,DOWN-13,hp48_transmit,
-					  hp48_hardware.data[0xc]&2?color[1]:color[0]);
+					  hp48_hardware.data[0xc]&2?1:0);
 	return 0;
 }

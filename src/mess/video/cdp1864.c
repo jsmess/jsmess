@@ -130,7 +130,7 @@ void cdp1864_dma_w(UINT8 data)
 			color = cdp1864.colorram_r(cdp1864.dmaptr);
 		}
 
-		*BITMAP_ADDR16(cdptmpbitmap, y, sx + x) = Machine->pens[color];
+		*BITMAP_ADDR16(cdptmpbitmap, y, sx + x) = color;
 
 		data <<= 1;
 	}
@@ -224,7 +224,7 @@ VIDEO_UPDATE( cdp1864 )
 {
 	if (cdp1864.disp)
 	{
-		fillbitmap(bitmap, screen->machine->pens[cdp1864_bgcolseq[cdp1864.bgcolor]], cliprect);
+		fillbitmap(bitmap, cdp1864_bgcolseq[cdp1864.bgcolor], cliprect);
 		copybitmap_trans(bitmap, cdptmpbitmap, 0, 0, 0, 0, cliprect, cdp1864.bgcolor);
 	}
 	else

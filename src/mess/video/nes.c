@@ -132,9 +132,9 @@ VIDEO_UPDATE( nes )
 	if ((readinputport(PORT_CONFIG1) & 0x00f0) == 0x0030)
 		sights |= 0x0002;
 	if (sights & 0x0001)
-		draw_sight(bitmap, screen->machine->pens[0x30], readinputport(PORT_ZAPPER0_X), readinputport(PORT_ZAPPER0_Y));
+		draw_sight(bitmap, 0x30, readinputport(PORT_ZAPPER0_X), readinputport(PORT_ZAPPER0_Y));
 	if (sights & 0x0002)
-		draw_sight(bitmap, screen->machine->pens[0x00], readinputport(PORT_ZAPPER1_X), readinputport(PORT_ZAPPER1_Y));
+		draw_sight(bitmap, 0x00, readinputport(PORT_ZAPPER1_X), readinputport(PORT_ZAPPER1_Y));
 
 	/* if this is a disk system game, check for the flip-disk key */
 	if (nes.mapper == 20)

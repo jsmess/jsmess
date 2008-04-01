@@ -22,7 +22,7 @@ INTERRUPT_GEN( gamecom_scanline ) {
 		rec.min_x = 0;
 		rec.max_x = Y_PIXELS - 1;
 		rec.min_y = rec.max_y = scanline;
-		fillbitmap( tmpbitmap, machine->pens[ 0 ], &rec );
+		fillbitmap( tmpbitmap, 0, &rec );
 		return;
 	} else {
 		UINT8 *line = &gamecom_vram[ base_address + 40 * scanline ];
@@ -57,10 +57,10 @@ INTERRUPT_GEN( gamecom_scanline ) {
 		}
 		for( i = 0; i < 40; i++ ) {
 			UINT8 p = line[i];
-			*BITMAP_ADDR16(tmpbitmap, i * 4 + 0, scanline) = machine->pens[ pal[ ( p >> 6 ) & 3 ] ];
-			*BITMAP_ADDR16(tmpbitmap, i * 4 + 1, scanline) = machine->pens[ pal[ ( p >> 4 ) & 3 ] ];
-			*BITMAP_ADDR16(tmpbitmap, i * 4 + 2, scanline) = machine->pens[ pal[ ( p >> 2 ) & 3 ] ];
-			*BITMAP_ADDR16(tmpbitmap, i * 4 + 3, scanline) = machine->pens[ pal[ ( p      ) & 3 ] ];
+			*BITMAP_ADDR16(tmpbitmap, i * 4 + 0, scanline) = pal[ ( p >> 6 ) & 3 ];
+			*BITMAP_ADDR16(tmpbitmap, i * 4 + 1, scanline) = pal[ ( p >> 4 ) & 3 ];
+			*BITMAP_ADDR16(tmpbitmap, i * 4 + 2, scanline) = pal[ ( p >> 2 ) & 3 ];
+			*BITMAP_ADDR16(tmpbitmap, i * 4 + 3, scanline) = pal[ ( p      ) & 3 ];
 		}
 	}
 
