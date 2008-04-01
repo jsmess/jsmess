@@ -211,7 +211,7 @@ static MACHINE_DRIVER_START(ti990_10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 
 	MDRV_GFXDECODE(vdt911)
-	MDRV_PALETTE_LENGTH(vdt911_palette_size)
+	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(vdt911)
 	MDRV_VIDEO_START(ti990_10)
@@ -334,4 +334,4 @@ SYSTEM_CONFIG_START(ti990_10)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY                 FULLNAME */
-COMP( 1975,	ti990_10,	0,		0,		ti990_10,	ti990_10,	ti990_10,	ti990_10,	"Texas Instruments",	"TI Model 990/10 Minicomputer System" , 0)
+COMP( 1975,	ti990_10,	0,		0,		ti990_10,	ti990_10,	ti990_10,	ti990_10,	"Texas Instruments",	"TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )

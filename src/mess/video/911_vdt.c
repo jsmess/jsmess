@@ -64,14 +64,14 @@ GFXDECODE_START( vdt911 )
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_frenchWP_chr_offset, fontlayout_7bit, 0, 4 )
 GFXDECODE_END
 
-const unsigned char vdt911_palette[vdt911_palette_size*3] =
+const unsigned char vdt911_colors[] =
 {
 	0x00,0x00,0x00,	/* black */
 	0xC0,0xC0,0xC0,	/* low intensity */
 	0xFF,0xFF,0xFF	/* high intensity */
 };
 
-const unsigned short vdt911_colortable[vdt911_colortable_size] =
+const unsigned short vdt911_palette[] =
 {
 	0, 2,	/* high intensity */
 	0, 1,	/* low intensity */
@@ -130,11 +130,18 @@ static TIMER_CALLBACK(beep_callback);
 */
 PALETTE_INIT( vdt911 )
 {
-	int i;
+	UINT8 i, r, g, b;
 
-	for ( i = 0; i < vdt911_palette_size; i++ ) {
-		palette_set_color_rgb(machine, i, vdt911_palette[i*3], vdt911_palette[i*3+1], vdt911_palette[i*3+2]);
+	machine->colortable = colortable_alloc(machine, 3);
+
+	for ( i = 0; i < 3; i++ )
+	{
+		r = vdt911_colors[i*3]; g = vdt911_colors[i*3+1]; b = vdt911_colors[i*3+2];
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
+
+	for(i=0;i<8;i++)
+		colortable_entry_set_value(machine->colortable, i, vdt911_palette[i]);
 }
 
 /*
