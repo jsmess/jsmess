@@ -38,6 +38,11 @@ struct _image_slot_data
 	object_pool *mempool;
 	const device_config *dev;
 
+	/* callbacks */
+	device_image_load_func load;
+	device_image_create_func create;
+	device_image_unload_func unload;
+
 	/* error related info */
 	image_error_t err;
 	char *err_message;
@@ -114,6 +119,11 @@ int image_init(running_machine *machine)
 	UINT32 mask, dev_mask = 0, multiple_dev_mask = 0;
 	const struct IODevice *dev;
 	size_t private_size;
+	image_slot_data *slot;
+
+	/* sanity checks */
+	assert(DEVINFO_FCT_IMAGE_FIRST > DEVINFO_FCT_FIRST);
+	assert(DEVINFO_FCT_IMAGE_LAST < DEVINFO_FCT_DEVICE_SPECIFIC);
 
 	/* first count all images, and identify multiply defined devices */
 	count = 0;
@@ -148,8 +158,11 @@ int image_init(running_machine *machine)
 	indx = 0;
 	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
 	{
-		/* interim change until we use the normal device->start */
+		slot = &machine->images_data->slots[indx];
+
+		/* interim changes until we use the normal device->start */
 		((device_config *) dev->devconfig)->machine = machine;
+		((device_config *) dev->devconfig)->token = (void *) ~0;
 
 		/* create a memory pool */
 		machine->images_data->slots[indx].mempool = pool_alloc(memory_error);
@@ -158,11 +171,20 @@ int image_init(running_machine *machine)
 		tagpool_init(&machine->images_data->slots[indx].tagpool);
 		machine->images_data->slots[indx].dev = dev->devconfig;
 
+		/* callbacks */
+		slot->load = (device_image_load_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_LOAD);
+		slot->create = (device_image_create_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_CREATE);
+		slot->unload = (device_image_unload_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_UNLOAD);
+
+		/* invoke start, if present */
 		if (dev->start != NULL)
 		{
-			dev->start(machine->images_data->slots[indx].dev);
+			dev->start(slot->dev);
 		}
 		indx++;
+
+		/* interim changes until we use the normal device->start */
+		((device_config *) dev->devconfig)->token = NULL;
 	}
 
 	add_exit_callback(machine, image_exit);
@@ -659,9 +681,9 @@ static int image_load_internal(const device_config *image, const char *path,
 	}
 
 	/* call device load or create */
-	if (image_has_been_created(image) && (iodev->create != NULL))
+	if (image_has_been_created(image) && (slot->create != NULL))
 	{
-		err = iodev->create(image, create_format, create_args);
+		err = slot->create(image, create_format, create_args);
 		if (err)
 		{
 			if (!slot->err)
@@ -669,10 +691,10 @@ static int image_load_internal(const device_config *image, const char *path,
 			goto done;
 		}
 	}
-	else if (iodev->load != NULL)
+	else if (slot->load != NULL)
 	{
 		/* using device load */
-		err = iodev->load(image);
+		err = slot->load(image);
 		if (err)
 		{
 			if (!slot->err)
@@ -762,8 +784,8 @@ static void image_unload_internal(image_slot_data *image, int is_final_unload)
 
 	/* call the unload function */
 	iodev = mess_device_from_core_device(image->dev);
-	if (iodev->unload != NULL)
-		iodev->unload(image->dev);
+	if (image->unload != NULL)
+		image->unload(image->dev);
 
 	image_clear(image);
 	image_clear_error(image);

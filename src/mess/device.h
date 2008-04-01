@@ -259,9 +259,6 @@ struct IODevice
 	/* image handling callbacks */
 	device_start_func start;
 	device_stop_func stop;
-	device_image_load_func load;
-	device_image_create_func create;
-	device_image_unload_func unload;
 	int (*imgverify)(const UINT8 *buf, size_t size);
 	device_image_partialhash_func partialhash;
 

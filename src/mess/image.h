@@ -6,15 +6,22 @@
 
 ****************************************************************************/
 
-#ifndef IMAGE_H
-#define IMAGE_H
+#ifndef __IMAGE_H__
+#define __IMAGE_H__
 
 #include <stdlib.h>
+
 #include "fileio.h"
 #include "utils.h"
 #include "opresolv.h"
 #include "device.h"
 #include "osdmess.h"
+
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
 typedef enum
 {
@@ -30,6 +37,19 @@ typedef enum
 
 struct _images_private;
 typedef struct _images_private images_private;
+
+
+/* state constants specific for mountable images */
+enum
+{
+	/* --- the following bits of info are returned as pointers to functions --- */
+	DEVINFO_FCT_IMAGE_FIRST		= DEVINFO_FCT_FIRST + 0x7000,
+	DEVINFO_FCT_IMAGE_LOAD,										/* R/O: device_load_handler */
+	DEVINFO_FCT_IMAGE_CREATE,									/* R/O: device_create_handler */
+	DEVINFO_FCT_IMAGE_UNLOAD,									/* R/O: device_unload_handler */
+	DEVINFO_FCT_IMAGE_LAST		= DEVINFO_FCT_FIRST + 0x0fff
+};
+
 
 
 
@@ -222,4 +242,4 @@ const device_config *image_from_devtype_and_index(iodevice_t type, int id);
 #define DEVICE_IMAGE_UNLOAD_NAME(name)	device_unload_##name
 #define DEVICE_IMAGE_UNLOAD(name)		void DEVICE_IMAGE_UNLOAD_NAME(name)(const device_config *image)
 
-#endif /* IMAGE_H */
+#endif /* __IMAGE_H__ */
