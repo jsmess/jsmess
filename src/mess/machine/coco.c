@@ -925,7 +925,7 @@ static timer_fired_func recalc_interrupts;
 #ifdef UNUSED_FUNCTION
 void coco_set_halt_line(running_machine *machine, int halt_line)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, halt_line);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
 		timer_set(ATTOTIME_IN_CYCLES(1,0), NULL, 0, recalc_interrupts);
 }
@@ -1057,7 +1057,7 @@ static attotime coco_hiresjoy_computetransitiontime(const char *inputport)
 	return attotime_add(timer_get_time(), attotime_mul(COCO_CPU_SPEED, val));
 }
 
-static void coco_hiresjoy_w(int data)
+static void coco_hiresjoy_w(running_machine *machine, int data)
 {
 	if (!data && coco_hiresjoy_ca)
 	{
@@ -1072,7 +1072,7 @@ static void coco_hiresjoy_w(int data)
 		coco_hiresjoy_ytransitiontime = attotime_zero;
 	}
 	coco_hiresjoy_ca = data;
-	(*update_keyboard)(Machine);
+	(*update_keyboard)(machine);
 }
 
 static int coco_hiresjoy_readone(attotime transitiontime)
@@ -1402,7 +1402,7 @@ static TIMER_CALLBACK(coco_update_keyboard_timerproc)	{ (*update_keyboard)(machi
 static WRITE8_HANDLER ( d_pia0_pa_w )
 {
 	if (get_input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
-		coco_hiresjoy_w(data & 0x04);
+		coco_hiresjoy_w(machine, data & 0x04);
 }
 
 
@@ -1514,7 +1514,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 	(*update_keyboard)(machine);
 
 	if (get_input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
-		coco_hiresjoy_w(dac >= 0x80);
+		coco_hiresjoy_w(machine, dac >= 0x80);
 
 	/* Handle printer output, serial for CoCos, Paralell for Dragons */
 
@@ -2865,7 +2865,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	memset(&cart_config, 0, sizeof(cart_config));
 	cart_config.set_line = coco_setcartline;
 	cart_config.map_memory = init->map_memory;
-	coco_cart = cococart_init(cart_hardware, &cart_config);
+	coco_cart = cococart_init(machine, cart_hardware, &cart_config);
 
 #ifdef MAME_DEBUG
 	cpuintrf_set_dasm_override(0, coco_dasm_override);

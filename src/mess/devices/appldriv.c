@@ -218,11 +218,11 @@ static UINT8 apple525_process_byte(const device_config *img, int write_value)
 
 
 
-static const device_config *apple525_selected_image(void)
+static const device_config *apple525_selected_image(running_machine *machine)
 {
 	int i, count;
 
-	count = device_count_tag_from_machine(Machine, APPLE525TAG);
+	count = device_count_tag_from_machine(machine, APPLE525TAG);
 
 	for (i = 0; i < count; i++)
 	{
@@ -237,7 +237,7 @@ static const device_config *apple525_selected_image(void)
 UINT8 apple525_read_data(void)
 {
 	const device_config *image;
-	image = apple525_selected_image();
+	image = apple525_selected_image(Machine);
 	return image ? apple525_process_byte(image, -1) : 0xFF;
 }
 
@@ -246,7 +246,7 @@ UINT8 apple525_read_data(void)
 void apple525_write_data(UINT8 data)
 {
 	const device_config *image;
-	image = apple525_selected_image();
+	image = apple525_selected_image(Machine);
 	if (image)
 		apple525_process_byte(image, data);
 }

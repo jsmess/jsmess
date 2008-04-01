@@ -24,6 +24,7 @@ extern "C" {
 struct terminal;
 
 struct terminal *terminal_create(
+	running_machine *machine,
 	int gfx, int blank_char, int char_bits,
 	int (*getcursorcode)(int original_code),
 	int num_cols, int num_rows);

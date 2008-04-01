@@ -139,7 +139,7 @@ VIDEO_START( kaypro )
 	scroll_lines = KAYPRO_SCREEN_H;
 	videoram_size = KAYPRO_SCREEN_W * KAYPRO_SCREEN_H;
 
-	kaypro_terminal = terminal_create(0, ' ', 10, kaypro_getcursorcode, KAYPRO_SCREEN_W, KAYPRO_SCREEN_H);
+	kaypro_terminal = terminal_create(machine, 0, ' ', 10, kaypro_getcursorcode, KAYPRO_SCREEN_W, KAYPRO_SCREEN_H);
 
 	kaypro_putstr(machine,
 	/* a test of GB1/GB2 video mode graphics */ \

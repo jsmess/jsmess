@@ -1254,7 +1254,7 @@ MACHINE_RESET ( to7 )
 	pia_reset();
 	mc6846_reset();
 	to7_game_reset();
-	to7_floppy_reset();
+	to7_floppy_reset(machine);
 	to7_io_reset();
 	to7_modem_reset();
 	to7_midi_reset();
@@ -1486,7 +1486,7 @@ MACHINE_RESET( to770 )
 	pia_reset();
 	mc6846_reset();
 	to7_game_reset();
-	to7_floppy_reset();
+	to7_floppy_reset(machine);
 	to7_io_reset();
 	to7_modem_reset();
 	to7_midi_reset();
@@ -1834,7 +1834,7 @@ MACHINE_RESET( mo5 )
 	pia_reset();
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0x5f );
 	to7_game_reset();
-	to7_floppy_reset();
+	to7_floppy_reset(machine);
 	to7_io_reset();
 	to7_modem_reset();
 	to7_midi_reset();
@@ -2772,7 +2772,7 @@ MACHINE_RESET ( to9 )
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0xfe );
 	mc6846_reset();
 	to7_game_reset();
-	to9_floppy_reset();
+	to9_floppy_reset(machine);
 	to9_kbd_reset();
 	thom_centronics_reset();
 	to7_modem_reset();
@@ -3348,12 +3348,12 @@ static void to8_floppy_init( running_machine *machine )
 
 
 
-static void to8_floppy_reset( void )
+static void to8_floppy_reset( running_machine *machine )
 {
 	UINT8* mem = memory_region(REGION_CPU1);
-	to7_floppy_reset();
+	to7_floppy_reset(machine);
 	if ( THOM_FLOPPY_INT )
-		thmfc_floppy_reset();
+		thmfc_floppy_reset(machine);
 	memory_configure_bank( THOM_FLOP_BANK, TO7_NB_FLOP_BANK, 2, mem + 0x30000, 0x2000 );
 }
 
@@ -3697,7 +3697,7 @@ MACHINE_RESET ( to8 )
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0xfe );
 	mc6846_reset();
 	to7_game_reset();
-	to8_floppy_reset();
+	to8_floppy_reset(machine);
 	to8_kbd_reset();
 	thom_centronics_reset();
 	to7_modem_reset();
@@ -3859,7 +3859,7 @@ MACHINE_RESET ( to9p )
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0xfe );
 	mc6846_reset();
 	to7_game_reset();
-	to8_floppy_reset();
+	to8_floppy_reset(machine);
 	to9_kbd_reset();
 	thom_centronics_reset();
 	to7_modem_reset();
@@ -4431,7 +4431,7 @@ MACHINE_RESET ( mo6 )
 	pia_reset();
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0x75 );
 	mo6_game_reset();
-	to7_floppy_reset();
+	to7_floppy_reset(machine);
 	thom_centronics_reset();
 	to7_modem_reset();
 	to7_midi_reset();
@@ -4698,7 +4698,7 @@ MACHINE_RESET ( mo5nr )
 	pia_reset();
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0x65 );
 	mo5nr_game_reset();
-	to7_floppy_reset();
+	to7_floppy_reset(machine);
 	thom_centronics_reset();
 	to7_modem_reset();
 	to7_midi_reset();

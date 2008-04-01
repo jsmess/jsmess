@@ -8,7 +8,6 @@
 
 #include <assert.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "mscommon.h"
 
 /***************************************************************************
@@ -55,6 +54,7 @@ static TILE_GET_INFO(terminal_gettileinfo)
 }
 
 struct terminal *terminal_create(
+	running_machine *machine,
 	int gfx, int blank_char, int char_bits,
 	int (*getcursorcode)(int original_code),
 	int num_cols, int num_rows)
@@ -62,8 +62,8 @@ struct terminal *terminal_create(
 	struct terminal *term;
 	int char_width, char_height;
 
-	char_width = Machine->gfx[gfx]->width;
-	char_height = Machine->gfx[gfx]->height;
+	char_width = machine->gfx[gfx]->width;
+	char_height = machine->gfx[gfx]->height;
 
 	term = (struct terminal *) auto_malloc(sizeof(struct terminal) - sizeof(term->mem)
 		+ (num_cols * num_rows * sizeof(termchar_t)));

@@ -86,6 +86,7 @@ static int apple1_getcursorcode(int original_code)
 VIDEO_START( apple1 )
 {
 	apple1_terminal = terminal_create(
+		machine,
 		0,			/* graphics font 0 (the only one we have) */
 		32,			/* Blank character is symbol 32 in the ROM */
 		8,			/* use 8 bits for the character code */

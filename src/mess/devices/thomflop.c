@@ -7,7 +7,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/thomson.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
@@ -333,13 +332,13 @@ static WRITE8_HANDLER( to7_5p14_w )
 
 
 
-static void to7_5p14_reset( void )
+static void to7_5p14_reset( running_machine *machine )
 {
 	int i;
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	thom_floppy_set_density( DEN_MFM_LO );
 	wd17xx_reset();
-	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
@@ -434,13 +433,13 @@ static WRITE8_HANDLER( to7_5p14sd_w )
 
 
 
-static void to7_5p14sd_reset( void )
+static void to7_5p14sd_reset( running_machine *machine )
 {
 	int i;
 	LOG(( "to7_5p14sd_reset: CD 90-015 controller\n" ));
 	thom_floppy_set_density( DEN_FM_LO );
 	mc6843_reset();
-	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
@@ -839,14 +838,14 @@ static WRITE8_HANDLER( to7_qdd_w )
 
 
 
-static void to7_qdd_reset( void )
+static void to7_qdd_reset( running_machine *machine )
 {
 	int i;
 	LOG(( "to7_qdd_reset: CQ 90-028 controller\n" ));
 
 	thom_floppy_set_density( DEN_MFM_LO );
 
-	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, to7_qdd_index_pulse_cb );
@@ -1522,12 +1521,12 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 
 
 
-void thmfc_floppy_reset( void )
+void thmfc_floppy_reset( running_machine *machine )
 {
 	int i;
 	LOG(( "thmfc_floppy_reset: THMFC1 controller\n" ));
 
-	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, thmfc_floppy_index_pulse_cb );
@@ -1773,7 +1772,7 @@ void to7_floppy_init ( running_machine *machine, void* base )
 
 
 
-void to7_floppy_reset ( void )
+void to7_floppy_reset ( running_machine *machine )
 {
 	to7_controller_type = (readinputport( THOM_INPUT_FCONFIG ) ) & 7;
 
@@ -1782,22 +1781,22 @@ void to7_floppy_reset ( void )
 
 	case 1:
 		to7_floppy_bank = 1;
-		to7_5p14sd_reset();
+		to7_5p14sd_reset(machine);
 		break;
 
 	case 2:
 		to7_floppy_bank = 2;
-		to7_5p14_reset();
+		to7_5p14_reset(machine);
 		break;
 
 	case 3:
 		to7_floppy_bank = 3;
-		thmfc_floppy_reset();
+		thmfc_floppy_reset(machine);
 		break;
 
 	case 4:
 		to7_floppy_bank = 7;
-		to7_qdd_reset();
+		to7_qdd_reset(machine);
 		break;
 
 	case 5:
@@ -1893,9 +1892,9 @@ void to9_floppy_init( running_machine *machine, void* int_base, void* ext_base )
 
 
 
-void to9_floppy_reset( void )
+void to9_floppy_reset( running_machine *machine )
 {
-	to7_floppy_reset();
+	to7_floppy_reset(machine);
 	if ( THOM_FLOPPY_EXT )
 	{
 		LOG(( "to9_floppy_reset: external controller\n" ));
@@ -1903,7 +1902,7 @@ void to9_floppy_reset( void )
 	else
 	{
 		LOG(( "to9_floppy_reset: internal controller\n" ));
-		to7_5p14_reset();
+		to7_5p14_reset(machine);
 		memory_set_bank( THOM_FLOP_BANK, TO7_NB_FLOP_BANK );
 	}
 }

@@ -98,7 +98,7 @@ void cococart_set_line(coco_cartridge *cartridge, cococart_line line, cococart_l
 cococart_line_value cococart_get_line(coco_cartridge *cartridge, cococart_line line);
 void cococart_map_memory(coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
 
-coco_cartridge *cococart_init(const char *carttype, const coco_cartridge_config *callbacks);
+coco_cartridge *cococart_init(running_machine *machine, const char *carttype, const coco_cartridge_config *callbacks);
 UINT8 cococart_read(coco_cartridge *cartridge, UINT16 address);
 void cococart_write(coco_cartridge *cartridge, UINT16 address, UINT8 data);
 void cococart_enable_sound(coco_cartridge *cartridge, int enable);

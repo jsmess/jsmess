@@ -28,19 +28,19 @@ extern UINT8 to7_floppy_bank;
 
 /* external controllers */
 extern void to7_floppy_init  ( running_machine *machine, void* base );
-extern void to7_floppy_reset ( void );
+extern void to7_floppy_reset ( running_machine *machine );
 extern READ8_HANDLER  ( to7_floppy_r );
 extern WRITE8_HANDLER ( to7_floppy_w );
 
 /* TO9 internal (WD2793) & external controllers */
 extern void to9_floppy_init  ( running_machine *machine, void* int_base, void* ext_base );
-extern void to9_floppy_reset ( void );
+extern void to9_floppy_reset ( running_machine *machine );
 extern READ8_HANDLER  ( to9_floppy_r );
 extern WRITE8_HANDLER ( to9_floppy_w );
 
 /* TO8 internal (THMFC1) controller */
 extern void thmfc_floppy_init  ( void );
-extern void thmfc_floppy_reset ( void );
+extern void thmfc_floppy_reset ( running_machine *machine );
 extern READ8_HANDLER  ( thmfc_floppy_r );
 extern WRITE8_HANDLER ( thmfc_floppy_w );
 

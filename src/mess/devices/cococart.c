@@ -8,7 +8,6 @@
 
 #include "driver.h"
 #include "cococart.h"
-#include "deprecat.h"
 
 
 struct _coco_cartridge
@@ -58,7 +57,7 @@ static cococart_getinfo find_cart(const char *carttype)
     cococart_init
 -------------------------------------------------*/
 
-coco_cartridge *cococart_init(const char *carttype, const coco_cartridge_config *callbacks)
+coco_cartridge *cococart_init(running_machine *machine, const char *carttype, const coco_cartridge_config *callbacks)
 {
 	coco_cartridge *cartridge;
 	cococart_getinfo cart_proc;
@@ -66,7 +65,7 @@ coco_cartridge *cococart_init(const char *carttype, const coco_cartridge_config 
 	void (*init)(coco_cartridge *cartridge);
 
 	/* sanity check */
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call cococart_init at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call cococart_init at init time!");
 
 	/* identify the cartridge type */
 	cart_proc = find_cart(carttype);
