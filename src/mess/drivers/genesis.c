@@ -56,6 +56,7 @@ MESS adaptation by R. Belmont
 
 static int is_ssf2 = 0;
 static int is_redcliff = 0;
+static int is_radica = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -182,7 +183,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	unsigned char *ROM;
 
 	genesis_sram = NULL;
-	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = is_ssf2 = is_redcliff = 0;
+	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = is_ssf2 = is_redcliff = is_radica = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -239,19 +240,35 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	{
 		relocate = 0x2000;
 
-		if (!strncmp((char *)&ROM[0x2120], "SUPER STREET FIGHTER2", 20))
+		if (!strncmp((char *)&ROM[0x0120+relocate], "SUPER STREET FIGHTER2", 20))
 		{
 			is_ssf2 = 1;
 		}
 		// detect the 'Romance of the Three Kingdoms - Red Cliff' rom, already decoded from useless .mdx format
-		if (length == 0x200000) 
+		if (length == 0x200000)
 		{
 		 	static unsigned char redcliffsig[] = { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04}; // move.b  ($400004).l,d0
-		 	if (!memcmp(&ROM[0xce560+relocate],&redcliffsig[0],sizeof(redcliffsig))) 
+		 	if (!memcmp(&ROM[0xce560+relocate],&redcliffsig[0],sizeof(redcliffsig)))
 			{
 				is_redcliff = 1;
 			}
 		}
+		// detect the Radica TV games.. these probably should be a seperate driver since they are a seperate 'console'
+		if (length == 0x400000)
+		{
+		 	static unsigned char radicasig[] = { 0xd0, 0x30, 0x39, 0x00, 0xa1, 0x30}; // jmp (a0) move.w ($a130xx),d0
+
+		 	if (!memcmp(&ROM[0x3c031d+relocate],&radicasig[0],sizeof(radicasig))) // ssf+gng
+			{
+				is_radica = 1;
+			}
+		 	if (!memcmp(&ROM[0x3f031d+relocate],&radicasig[0],sizeof(radicasig))) // 6in1 vol 1
+			{
+				is_radica = 1;
+			}
+
+		}
+
 	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
@@ -276,6 +293,13 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		memcpy(&ROM[0x400000], tmpROM, 0x500000);
 		free(tmpROM);
 	}
+
+	if (is_radica)
+	{
+		memcpy(&ROM[0x400000], &ROM[0], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
+		memcpy(&ROM[0x800000], &ROM[0], 0x400000); // wraparound banking (from hazemd code)
+	}
+
 
         /* check if cart has battery save */
 	genesis_sram_len = 0;
@@ -403,6 +427,18 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	}
 }
 
+// Radica handler borrowed from HazeMD
+
+READ16_HANDLER( radica_bank_select )
+{
+	int bank = offset&0x3f;
+	UINT8 *ROM = memory_region(REGION_CPU1);
+	memcpy(ROM, ROM +  (bank*0x10000)+0x400000, 0x400000);
+
+//	printf("bank %02x\n",offset);
+	return 0;
+}
+
 // Red Cliff handler borrowed from HazeMD
 
 READ16_HANDLER( redclif_prot_r )
@@ -424,7 +460,6 @@ static void genesis_machine_stop(running_machine *machine)
 {
 }
 
-
 static DRIVER_INIT( gencommon )
 {
         if (genesis_sram)
@@ -437,11 +472,18 @@ static DRIVER_INIT( gencommon )
 		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, genesis_ssf2_bank_w);
 	}
 
-	if (is_redcliff) 
+	if (is_radica)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa1307f, 0, 0, radica_bank_select );
+	}
+
+
+	if (is_redcliff)
 	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, redclif_prot2_r );
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r );
 	}
+
 
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
