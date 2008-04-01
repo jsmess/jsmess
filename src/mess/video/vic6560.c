@@ -92,7 +92,7 @@ int vic6560_pal;
 
 static bitmap_t *vic6560_bitmap;
 static int rasterline = 0, lastline = 0;
-static void vic6560_drawlines (running_machine *machine, int start, int last);
+static void vic6560_drawlines (int start, int last);
 
 static int (*vic_dma_read) (int);
 static int (*vic_dma_read_color) (int);
@@ -166,14 +166,14 @@ VIDEO_START( vic6560 )
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 
-	black = machine->pens[0];
-	white = machine->pens[1];
+	black = 0;
+	white = 1;
 	pointerelement = allocgfx(&pointerlayout);
 	decodegfx(pointerelement, pointermask, 0, 1);
 	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
 	/* pointerelement->colortable = pointercolortable; */
-	pointercolortable[1] = machine->pens[1];
-	pointercolortable[2] = machine->pens[0];
+	pointercolortable[1] = 1;
+	pointercolortable[2] = 0;
 	pointerelement->total_colors = 3;
 	vic6560_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	add_exit_callback(machine, vic6560_video_stop);
@@ -203,7 +203,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 		case 5:
 		case 0xe:
 		case 0xf:
-			vic6560_drawlines (machine, lastline, rasterline);
+			vic6560_drawlines (lastline, rasterline);
 			break;
 		}
 		vic6560[offset] = data;
@@ -233,13 +233,13 @@ WRITE8_HANDLER ( vic6560_port_w )
 			videoaddr = VIDEOADDR;
 			break;
 		case 0xe:
-			multi[3] = multiinverted[3] = helpercolor = machine->pens[HELPERCOLOR];
+			multi[3] = multiinverted[3] = helpercolor = HELPERCOLOR;
 			break;
 		case 0xf:
 			inverted = INVERTED;
-			multi[1] = multiinverted[1] = framecolor = machine->pens[FRAMECOLOR];
+			multi[1] = multiinverted[1] = framecolor = FRAMECOLOR;
 			mono[0] = monoinverted[1] =
-				multi[0] = multiinverted[2] = backgroundcolor = machine->pens[BACKGROUNDCOLOR];
+				multi[0] = multiinverted[2] = backgroundcolor = BACKGROUNDCOLOR;
 			break;
 		}
 	}
@@ -256,7 +256,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 		val = ((rasterline & 1) << 7) | (vic6560[offset] & 0x7f);
 		break;
 	case 4:						   /*rasterline */
-		vic6560_drawlines (machine, lastline, rasterline);
+		vic6560_drawlines (lastline, rasterline);
 		val = (rasterline / 2) & 0xff;
 		break;
 	case 6:						   /*lightpen horicontal */
@@ -375,7 +375,7 @@ INLINE void vic6560_draw_pointer (bitmap_t *bitmap,
 }
 #endif
 
-static void vic6560_drawlines (running_machine *machine, int first, int last)
+static void vic6560_drawlines (int first, int last)
 {
 	int line, vline;
 	int offs, yoff, xoff, ybegin, yend, i;
@@ -420,13 +420,13 @@ static void vic6560_drawlines (running_machine *machine, int first, int last)
 			{
 				if (attr & 8)
 				{
-					multiinverted[0] = machine->pens[attr & 7];
+					multiinverted[0] = attr & 7;
 					vic6560_draw_character_multi (ybegin, yend, ch, yoff, xoff,
 												  multiinverted);
 				}
 				else
 				{
-					monoinverted[0] = machine->pens[attr];
+					monoinverted[0] = attr;
 					vic6560_draw_character (ybegin, yend, ch, yoff, xoff, monoinverted);
 				}
 			}
@@ -434,12 +434,12 @@ static void vic6560_drawlines (running_machine *machine, int first, int last)
 			{
 				if (attr & 8)
 				{
-					multi[2] = machine->pens[attr & 7];
+					multi[2] = attr & 7;
 					vic6560_draw_character_multi (ybegin, yend, ch, yoff, xoff, multi);
 				}
 				else
 				{
-					mono[1] = machine->pens[attr];
+					mono[1] = attr;
 					vic6560_draw_character (ybegin, yend, ch, yoff, xoff, mono);
 				}
 			}
@@ -478,7 +478,7 @@ INTERRUPT_GEN( vic656x_raster_interrupt )
 	if (rasterline >= vic656x_lines)
 	{
 		rasterline = 0;
-		vic6560_drawlines (machine, lastline, vic656x_lines);
+		vic6560_drawlines (lastline, vic656x_lines);
 		lastline = 0;
 
 		if (LIGHTPEN_POINTER)

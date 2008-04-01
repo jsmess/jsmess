@@ -1354,7 +1354,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 INTERRUPT_GEN(wswan_scanline_interrupt)
 {
 	if( vdp.current_line < 144 ) {
-		wswan_refresh_scanline( machine );
+		wswan_refresh_scanline();
 	}
 
 	/* Decrement 12kHz (HBlank) counter */
