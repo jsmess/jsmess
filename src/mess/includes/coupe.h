@@ -34,7 +34,7 @@ extern struct coupe_asic coupe_regs;
 void coupe_update_memory(void);
 
 DEVICE_IMAGE_LOAD( coupe_floppy );
-MACHINE_START( coupe );
+DRIVER_INIT( coupe );
 MACHINE_RESET( coupe );
 
 

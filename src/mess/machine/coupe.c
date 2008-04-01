@@ -11,6 +11,7 @@
 #include "includes/coupe.h"
 #include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
+#include "machine/msm6242.h"
 
 
 #define LMPR_RAM0	0x20	/* If bit set ram is paged into bank 0, else its rom0 */
@@ -113,6 +114,18 @@ void coupe_update_memory(void)
 }
 
 
+static READ8_HANDLER( coupe_rtc_r )
+{
+	return msm6242_r(machine, offset >> 12);
+}
+
+
+static WRITE8_HANDLER( coupe_rtc_w )
+{
+	msm6242_w(machine, offset >> 12, data);
+}
+
+
 MACHINE_RESET( coupe )
 {
 	memset(&coupe_regs, 0, sizeof(coupe_regs));
@@ -123,11 +136,22 @@ MACHINE_RESET( coupe )
     coupe_regs.line_int = 0xff;  /* line interrupts disabled */
     coupe_regs.status = 0x1f;    /* no interrupts active */
 
+	if (readinputportbytag("config") & 0x01)
+	{
+		/* install RTC */
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, coupe_rtc_r, coupe_rtc_w);
+	}
+	else
+	{
+		/* no RTC support */
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, SMH_UNMAP, SMH_UNMAP);
+	}
+
     coupe_update_memory();
 }
 
 
-MACHINE_START( coupe )
+DRIVER_INIT( coupe )
 {
     wd17xx_init(machine, WD_TYPE_1772, NULL, NULL);
 }

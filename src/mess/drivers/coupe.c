@@ -430,6 +430,11 @@ static INPUT_PORTS_START( coupe )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT)
+
+	PORT_START_TAG("config")
+	PORT_CONFNAME(0x01, 0x00, "Real Time Clock")
+	PORT_CONFSETTING(   0x00, DEF_STR(None))
+	PORT_CONFSETTING(   0x01, "SAMBUS")
 INPUT_PORTS_END
 
 
@@ -495,7 +500,6 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_CPU_IO_MAP(coupe_io, 0)
 	MDRV_CPU_VBLANK_INT("main", coupe_frame_interrupt)
 
-	MDRV_MACHINE_START(coupe)
 	MDRV_MACHINE_RESET(coupe)
 
     /* video hardware */
@@ -603,5 +607,5 @@ SYSTEM_CONFIG_END
  *
  *************************************/
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY                        FULLNAME     FLAGS */
-COMP( 1989, coupe, 0,      0,      coupe,   coupe, 0,    coupe,  "Miles Gordon Technology plc", "Sam Coupe", 0 )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT   CONFIG  COMPANY                        FULLNAME     FLAGS */
+COMP( 1989, coupe, 0,      0,      coupe,   coupe, coupe, coupe,  "Miles Gordon Technology plc", "Sam Coupe", 0 )

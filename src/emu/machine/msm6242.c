@@ -5,11 +5,18 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/msm6242.h"
+
 
 static UINT8 msm6264_reg[3] = { 0, 0, 0 };
 static mame_system_time msm6264_hold_time = { 0 };
+
+/* temporary buffer to hold values written to the device */
+static UINT8 time_buffer[13];
+
+/* TRUE if the time was just written */
+static int time_just_written = FALSE;
+
 
 enum
 {
@@ -31,9 +38,22 @@ enum
 	MSM6264_REG_CF
 };
 
+
+static TIMER_CALLBACK( reset_time )
+{
+	time_just_written = FALSE;
+}
+
+
 READ8_HANDLER( msm6242_r )
 {
 	mame_system_time curtime, *systime = &curtime;
+
+	/* return the buffered time if it has recently been written */
+	if (time_just_written && offset < MSM6264_REG_CD)
+	{
+		return time_buffer[offset]; 
+	}
 
 	if ( msm6264_reg[0] & 1 ) /* if HOLD is set, use the hold time */
 	{
@@ -41,7 +61,7 @@ READ8_HANDLER( msm6242_r )
 	}
 	else /* otherwise, use the current time */
 	{
-		mame_get_current_datetime(Machine, &curtime);
+		mame_get_current_datetime(machine, &curtime);
 	}
 
 	switch(offset)
@@ -90,8 +110,18 @@ READ8_HANDLER( msm6242_r )
 	return 0;
 }
 
+
 WRITE8_HANDLER( msm6242_w )
 {
+	/* mark as just written and start a timer to reset it again */
+	if (offset < MSM6264_REG_CD)
+	{
+		time_buffer[offset] = data;
+		time_just_written = TRUE;
+		timer_set(ATTOTIME_IN_MSEC(500), NULL, 0, reset_time);
+		return;
+	}
+
 	switch(offset)
 	{
 		case MSM6264_REG_CD:
@@ -100,7 +130,7 @@ WRITE8_HANDLER( msm6242_w )
 
 			 if ( data & 1 )	/* was Hold set? */
 			 {
-			 	mame_get_current_datetime(Machine, &msm6264_hold_time);
+			 	mame_get_current_datetime(machine, &msm6264_hold_time);
 			 }
 
 			 return;
@@ -132,6 +162,7 @@ READ16_HANDLER( msm6242_lsb_r )
 {
 	return msm6242_r(machine, offset);
 }
+
 
 WRITE16_HANDLER( msm6242_lsb_w )
 {
