@@ -32,6 +32,7 @@
 #include "window.h"
 #include "video.h"
 #include "config.h"
+#include "deprecat.h"
 
 #define OSX_POPUP_COMMAND		'popu'
 #define OSX_BASE_ID				'cmd0'
