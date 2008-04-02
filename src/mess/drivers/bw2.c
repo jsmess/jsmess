@@ -10,12 +10,12 @@
 	- MSM6255 LCD controller, 640x200 pixels
 	- 16KB Video RAM
 	- TMS2797 FDC controller
-	- 8251 USART serial interface 
+	- 8251 USART serial interface
 	- 8253 PIT timer
 	- 8255 PPI
 
   http://www.thebattles.net/bondwell/
-	
+
   http://www.vintage-computer.com/bondwell2.shtml
 
   TODO:
@@ -41,13 +41,14 @@
 static void bw2_set_banks(UINT8 data)
 {
 	/*
-	Y0  /RAM1  Memory bank 1
-	Y1  /VRAM  Video memory
-	Y2  /RAM2  Memory bank 2
-	Y3  /RAM3  Memory bank 3
-	Y4  /RAM4  Memory bank 4
-	Y5  /RAM5  Memory bank 5
-	Y6  /RAM6  Memory bank 6
+	Y0  /RAM1  	Memory bank 1
+	Y1  /VRAM  	Video memory
+	Y2  /RAM2  	Memory bank 2
+	Y3  /RAM3  	Memory bank 3
+	Y4  /RAM4  	Memory bank 4
+	Y5  /RAM5  	Memory bank 5
+	Y6  /RAM6  	Memory bank 6
+	Y7	/RAM7	ROM
 	*/
 
 	memory_set_bank(1, data);
@@ -148,7 +149,7 @@ static WRITE8_HANDLER( bw2_wd2797_w )
 	{
 		case 0:
 			wd17xx_command_w(machine, 0, data);
-	
+
 			/* disk head is encoded in the command byte */
 			wd17xx_set_side((data & 0x02) ? 1 : 0);
 			break;
@@ -207,7 +208,7 @@ static READ8_HANDLER( bw2_ppi8255_b_r )
 	PB6     Keyboard column status of selected line
 	PB7     Keyboard column status of selected line
 	*/
-	
+
 	UINT8 row;
 
 	row = ppi8255_peek(0, 0) & 0x0f;
@@ -271,7 +272,7 @@ static void bw2_timer0_w(int state)
 
 static void bw2_timer2_w(int state)
 {
-	
+
 }
 
 static const struct pit8253_config bw2_pit8253_interface =
@@ -331,6 +332,26 @@ static VIDEO_START( bw2 )
 
 static VIDEO_UPDATE( bw2 )
 {
+	UINT16 ma = 0;
+	int sx, x, y;
+
+	for (y = 0; y < 200; y++)
+	{
+		for (sx = 0; sx < 80; sx++)
+		{
+			UINT8 data = videoram[ma];
+
+			for (x = 0; x < 8; x++)
+			{
+				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = BIT(data, 7);
+
+				data <<= 1;
+			}
+
+			ma++;
+		}
+	}
+
 	return 0;
 }
 
@@ -355,7 +376,7 @@ static DRIVER_INIT( bw2 )
 
 static MACHINE_RESET( bw2 )
 {
-	memory_set_bank(1, 0);
+	memory_set_bank(1, 7);
 }
 
 static MACHINE_START( bw2 )
@@ -363,16 +384,21 @@ static MACHINE_START( bw2 )
 	centronics_config(0, bw2_centronics_config);
 
 	msm8251_init(&bw2_msm8251_interface);
-	pit8253_init(0, &bw2_pit8253_interface);
+	pit8253_init(1, &bw2_pit8253_interface);
 
 	ppi8255_init(&bw2_ppi8255_interface);
 
 	wd17xx_init(machine, WD_TYPE_2793, bw2_wd17xx_callback, NULL);
 	wd17xx_set_density(DEN_FM_HI);
 
-	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
+	memory_configure_bank(1, 0, 1, mess_ram, 0);
 	memory_configure_bank(1, 1, 1, videoram, 0);
-	memory_configure_bank(1, 2, 6, mess_ram, 0);
+	memory_configure_bank(1, 2, 1, mess_ram, 0);
+	memory_configure_bank(1, 3, 1, mess_ram, 0);
+	memory_configure_bank(1, 4, 1, mess_ram, 0);
+	memory_configure_bank(1, 5, 1, mess_ram, 0);
+	memory_configure_bank(1, 6, 1, mess_ram, 0);
+	memory_configure_bank(1, 7, 1, memory_region(REGION_CPU1), 0);
 }
 
 static ADDRESS_MAP_START( bw2_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -385,7 +411,7 @@ static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_READWRITE( ppi8255_0_r, ppi8255_0_w )
-//	AM_RANGE( 0x10, 0x13 ) AM_READWRITE( pit8253_0_r, pit8253_0_w )
+	AM_RANGE( 0x10, 0x13 ) AM_READWRITE( pit8253_0_r, pit8253_0_w )
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE( bw2_msm6255_lcd_data_w )
 	AM_RANGE( 0x21, 0x21 ) AM_WRITE( bw2_msm6255_lcd_instr_w )
 	AM_RANGE( 0x40, 0x40 ) AM_READWRITE( msm8251_data_r, msm8251_data_w )
@@ -396,7 +422,7 @@ ADDRESS_MAP_END
 
 /*
   Keyboard matrix
-        X0    X1    X2    X3    X4    X5    X6    X7   
+        X0    X1    X2    X3    X4    X5    X6    X7
      +-----+-----+-----+-----+-----+-----+-----+-----+
   Y9 |CAPS |     |     |     |     |     |     |     |
      +-----+-----+-----+-----+-----+-----+-----+-----+
@@ -550,7 +576,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( bw2 )
-	ROM_REGION(0x1000, REGION_CPU1, 0)
+	ROM_REGION(0x10000, REGION_CPU1, 0)
 	ROM_SYSTEM_BIOS(0, "20", "BW 2 v2.0")
 	ROMX_LOAD("bw2-20.bin", 0x0000, 0x1000, CRC(86f36471) SHA1(a3e2ba4edd50ff8424bb0675bdbb3b9f13c04c9d), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "12", "BW 2 v1.2")
@@ -566,7 +592,7 @@ static void bw2_printer_getinfo(const mess_device_class *devclass, UINT32 state,
 		case MESS_DEVINFO_INT_COUNT:
 			info->i = 1;
 			break;
-	
+
 		default:
 			printer_device_getinfo(devclass, state, info);
 			break;
@@ -582,17 +608,17 @@ static void bw2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, 
 		case MESS_DEVINFO_INT_COUNT:
 			info->i = 2;
 			break;
-	
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:
 			info->load = DEVICE_IMAGE_LOAD_NAME(bw2_floppy);
 			break;
-	
+
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 			strcpy(info->s = device_temp_str(), "dsk");
 			break;
-	
+
 		default:
 			legacybasicdsk_device_getinfo(devclass, state, info);
 			break;
