@@ -14,13 +14,6 @@ enum
 
 GFXDECODE_EXTERN( asr733 );
 
-enum
-{
-	asr733_palette_size = 2 /** 3*/,
-	asr733_colortable_size = 1 * 2
-};
-
-
 extern PALETTE_INIT ( asr733 ) ;
 
 void asr733_init(void);
