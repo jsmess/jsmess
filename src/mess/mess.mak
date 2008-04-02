@@ -348,6 +348,7 @@ DRVLIBS = \
 	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
 	$(MESSOBJ)/be.a \
+	$(MESSOBJ)/bondwell.a \
 	$(MESSOBJ)/cbm.a \
 	$(MESSOBJ)/cbmshare.a \
 	$(MESSOBJ)/cgenie.a \
@@ -1202,6 +1203,9 @@ $(MESSOBJ)/special.a:      \
 	$(MESS_DRIVERS)/special.o \
 	$(MESS_MACHINE)/special.o \
 	$(MESS_VIDEO)/special.o \
+
+$(MESSOBJ)/bondwell.a: \
+	$(MESS_DRIVERS)/bw2.o
 
 #-------------------------------------------------
 # layout dependencies

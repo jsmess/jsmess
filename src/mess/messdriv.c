@@ -857,6 +857,9 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( erik )	
 	DRIVER( specimx )	
 	
+	/* Bondwell */
+	DRIVER( bw2 )
+	
 /****************Games*******************************************************/
 	/* Computer Electronic */
 	DRIVER( mk1 )		/* Chess Champion MK I								*/

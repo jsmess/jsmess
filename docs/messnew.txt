@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- Bondwell 2 (not working)  [Tomas Karlsson]
 
 
 
