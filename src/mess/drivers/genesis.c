@@ -5,7 +5,7 @@ Megadrive / Genesis Rewrite, Take 65498465432356345250432.3  August 06
 Thanks to:
 Charles Macdonald for much useful information (cgfm2.emuviews.com)
 
-Long Description names mostly taken from the Good Gen database
+Long Description names mostly taken from the GoodGen database
 
 ToDo:
 
@@ -58,6 +58,7 @@ static int is_ssf2 = 0;
 static int is_redcliff = 0;
 static int is_radica = 0;
 static int is_kof99 = 0;
+static int is_soulb = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -184,7 +185,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	unsigned char *ROM;
 
 	genesis_sram = NULL;
-	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = is_ssf2 = is_redcliff = is_radica = is_kof99 = 0;
+	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -269,7 +270,6 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			}
 
 		}
-		is_kof99 = 1;
 
 		// detect the King of Fighters '99 unlicensed game
 		if (length == 0x300000)
@@ -279,6 +279,17 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		 	if (!memcmp(&ROM[0x1fd0d2+relocate],&kof99sig[0],sizeof(kof99sig)))
 			{
 				is_kof99 = 1;
+			}
+		}
+
+		// detect the Soul Blade unlicensed game
+		if (length == 0x400000)
+		{
+		 	static unsigned char soulbsig[] = { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff}; // move.w  #$C,($FF020A).l (what happens if check fails)
+
+		 	if (!memcmp(&ROM[0x028460+relocate],&soulbsig[0],sizeof(soulbsig)))
+			{
+				is_soulb = 1;
 			}
 		}
 
@@ -440,6 +451,22 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	}
 }
 
+// Soulblade handler from HazeMD
+READ16_HANDLER( soulb_0x400006_r )
+{
+	return 0xf000;
+}
+
+READ16_HANDLER( soulb_0x400002_r )
+{
+	return 0x9800;
+}
+
+READ16_HANDLER( soulb_0x400004_r )
+{
+	return 0xc900;
+}
+
 // KOF99 handler from HazeMD
 READ16_HANDLER( kof99_0xA13002_r )
 {
@@ -513,6 +540,12 @@ static DRIVER_INIT( gencommon )
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, kof99_0xA13000_r );
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13002, 0xA13003, 0, 0, kof99_0xA13002_r );
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA1303e, 0xA1303f, 0, 0, kof99_00A1303E_r );
+	}
+
+	if (is_soulb) {
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, soulb_0x400006_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, soulb_0x400002_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, soulb_0x400004_r );
 	}
 
 	if (is_redcliff)
