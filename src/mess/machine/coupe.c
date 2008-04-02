@@ -23,10 +23,27 @@ struct coupe_asic coupe_regs;
 
 DEVICE_IMAGE_LOAD( coupe_floppy )
 {
-	if (device_load_basicdsk_floppy(image) == INIT_PASS)
+	UINT64 size = image_length(image); 
+
+	switch (size)
 	{
-		basicdsk_set_geometry(image, 80, 2, 10, 512, 1, 0, FALSE);
-		return INIT_PASS;
+	case 737280:  /* CP/M Pro-DOS image */
+	case 819200:  /* Standard image */
+		if (device_load_basicdsk_floppy(image) == INIT_PASS)
+		{
+			basicdsk_set_geometry(image, 80, 2, size/81920, 512, 1, 0, FALSE);
+			return INIT_PASS;
+		}
+		break;
+
+	case 819222:   /* SAD format */
+		return INIT_FAIL;
+		break;
+
+	case 983040:   /* SDF - Sam Disk Format (80 tracks) */
+	case 1019904:  /* SDF - Sam Disk Format (83 tracks) */
+		return INIT_FAIL;
+		break;
 	}
 
 	return INIT_FAIL;
