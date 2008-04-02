@@ -23,7 +23,8 @@
 static void device_dirs_load(int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
-	const struct IODevice *dev;
+	const device_config *dev;
+	const struct IODevice *iodev;
 	const device_config *image;
 	const char *dev_instance;
 	const char *working_directory;
@@ -37,10 +38,14 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 
 			if (dev_instance != NULL)
 			{
-				for (dev = mess_device_first_from_machine(Machine); (image == NULL) && (dev != NULL); dev = mess_device_next(dev))
+				for (dev = image_device_first(Machine->config); (image == NULL) && (dev != NULL); dev = image_device_next(dev))
 				{
-					if (!strcmp(dev_instance, device_instancename(&dev->devclass, dev->index_in_device)))
-						image = image_from_device(dev);
+					iodev = mess_device_from_core_device(dev);
+					if (iodev != NULL)
+					{
+						if (!strcmp(dev_instance, device_instancename(&iodev->devclass, iodev->index_in_device)))
+							image = dev;
+					}
 				}
 
 				if (image != NULL)
@@ -71,9 +76,9 @@ static void device_dirs_save(int config_type, xml_data_node *parentnode)
 	/* only care about game-specific data */
 	if (config_type == CONFIG_TYPE_GAME)
 	{
-		for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
+		for (image = image_device_first(Machine->config); image != NULL; image = image_device_next(image))
 		{
-			image = image_from_device(dev);
+			dev = mess_device_from_core_device(image);
 			dev_instance = device_instancename(&dev->devclass, dev->index_in_device);
 
 			node = xml_add_child(parentnode, "device", NULL);

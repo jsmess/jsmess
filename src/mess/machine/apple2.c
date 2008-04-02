@@ -1425,7 +1425,8 @@ UINT8 apple2_iwm_getdiskreg(void)
 
 static void *apple2_fdc_init(running_machine *machine, int slot, applefdc_t fdc_type)
 {
-	const struct IODevice *dev;
+	const device_config *dev;
+	const struct IODevice *iodev;
 	applefdc_interface intf;
 
 	apple2_fdc_has_35 = FALSE;
@@ -1441,12 +1442,16 @@ static void *apple2_fdc_init(running_machine *machine, int slot, applefdc_t fdc_
 	intf.read_data = apple2_fdc_read_data;
 	intf.write_data = apple2_fdc_write_data;
 
-	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
+	for (dev = image_device_first(machine->config); dev != NULL; dev = image_device_next(dev))
 	{
-		if (!strcmp(dev->tag, "sonydriv"))
-			apple2_fdc_has_35 = 1;
-		else if (!strcmp(dev->tag, "apple525driv"))
-			apple2_fdc_has_525 = 1;
+		iodev = mess_device_from_core_device(dev);
+		if (iodev != NULL)
+		{
+			if (!strcmp(iodev->tag, "sonydriv"))
+				apple2_fdc_has_35 = 1;
+			else if (!strcmp(iodev->tag, "apple525driv"))
+				apple2_fdc_has_525 = 1;
+		}
 	}
 
 	applefdc_init(&intf);

@@ -126,10 +126,10 @@ void devices_init(running_machine *machine)
 	image_init(machine);
 
 	/* make sure that any required devices have been allocated */
-	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
+	for (image = image_device_first(machine->config); image != NULL; image = image_device_next(image))
 	{
-		/* identify the image */
-		image = image_from_device(dev);
+		/* identify the legacy device */
+		dev = mess_device_from_core_device(image);
 
 		/* is an image specified for this image */
 		image_name = mess_get_device_option(&dev->devclass, dev->index_in_device);

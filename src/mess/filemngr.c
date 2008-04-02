@@ -639,16 +639,14 @@ int filemanager(int selected)
 	const struct IODevice *devices[40];
 	char names[40][64];
 	int sel, total, arrowize;
-	const struct IODevice *dev;
 	const device_config *image;
 
 	sel = selected - 1;
 	total = 0;
 
 	/* Cycle through all devices for this system */
-	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
+	for (image = image_device_first(Machine->config); image != NULL; image = image_device_next(image))
 	{
-		image = image_from_device(dev);
 		strcpy( names[total], image_typename_id(image) );
 		name = image_filename(image);
 
@@ -656,7 +654,7 @@ int filemanager(int selected)
 		menu_items[total].text = (names[total]) ? names[total] : "---";
 		menu_items[total].subtext = (name) ? name : "---";
 
-		devices[total] = dev;
+		devices[total] = mess_device_from_core_device(image);
 		
 		total++;
 	}

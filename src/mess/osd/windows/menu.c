@@ -1345,9 +1345,9 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	remove_menu_items(device_menu);
 
 	// then set up the actual devices
-	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
+	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
 	{
-		img = image_from_device(dev);
+		dev = mess_device_from_core_device(img);
 
 		new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
 		flags_for_exists = MF_STRING;

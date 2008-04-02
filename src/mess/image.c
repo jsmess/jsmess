@@ -117,7 +117,8 @@ int image_init(running_machine *machine)
 {
 	int count, indx;
 	UINT32 mask, dev_mask = 0, multiple_dev_mask = 0;
-	const struct IODevice *dev;
+	const device_config *dev;
+	const struct IODevice *iodev;
 	size_t private_size;
 	image_slot_data *slot;
 
@@ -127,13 +128,14 @@ int image_init(running_machine *machine)
 
 	/* first count all images, and identify multiply defined devices */
 	count = 0;
-	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
+	for (dev = image_device_first(machine->config); dev != NULL; dev = image_device_next(dev))
 	{
-		/* weird check only relevant on the first device */
-		if (dev->index_in_device == 0)
+		/* weird check only relevant on the first legacy MESS device */
+		iodev = mess_device_from_core_device(dev);
+		if ((iodev != NULL) && (iodev->index_in_device == 0))
 		{
 			/* check to see if this device type is used multiple times */
-			mask = 1 << dev->type;
+			mask = 1 << iodev->type;
 			if (dev_mask & mask)
 				multiple_dev_mask |= mask;
 			else
@@ -156,20 +158,20 @@ int image_init(running_machine *machine)
 
 	/* initialize the devices */
 	indx = 0;
-	for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
+	for (dev = image_device_first(machine->config); dev != NULL; dev = image_device_next(dev))
 	{
 		slot = &machine->images_data->slots[indx];
 
 		/* interim changes until we use the normal device->start */
-		((device_config *) dev->devconfig)->machine = machine;
-		((device_config *) dev->devconfig)->token = (void *) ~0;
+		((device_config *) dev)->machine = machine;
+		((device_config *) dev)->token = (void *) ~0;
 
 		/* create a memory pool */
 		machine->images_data->slots[indx].mempool = pool_alloc(memory_error);
 
 		/* setup the device */
-		tagpool_init(&machine->images_data->slots[indx].tagpool);
-		machine->images_data->slots[indx].dev = dev->devconfig;
+		tagpool_init(&slot->tagpool);
+		machine->images_data->slots[indx].dev = dev;
 
 		/* callbacks */
 		slot->load = (device_image_load_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_LOAD);
@@ -184,7 +186,7 @@ int image_init(running_machine *machine)
 		indx++;
 
 		/* interim changes until we use the normal device->start */
-		((device_config *) dev->devconfig)->token = NULL;
+		((device_config *) dev)->token = NULL;
 	}
 
 	add_exit_callback(machine, image_exit);
@@ -199,9 +201,8 @@ int image_init(running_machine *machine)
 
 static void image_exit(running_machine *machine)
 {
-	int indx, i;
-	image_slot_data *image;
-	const struct IODevice *dev;
+	int i;
+	image_slot_data *slot;
 
 	if (machine->images_data != NULL)
 	{
@@ -215,31 +216,24 @@ static void image_exit(running_machine *machine)
 		image_unload_all(FALSE);
 		image_unload_all(TRUE);
 
-		indx = 0;
-
-		for (dev = mess_device_first_from_machine(machine); dev != NULL; dev = mess_device_next(dev))
+		for (i = 0; i < machine->images_data->slot_count; i++)
 		{
-			/* identify the image */
-			image = &machine->images_data->slots[indx];
-
-			/* call the stop handler if appropriate */
-			if (dev->stop != NULL)
-				dev->stop(image->dev);
+			/* identify the image slot */
+			slot = &machine->images_data->slots[i];
 
 			/* free the tagpool */
-			tagpool_exit(&image->tagpool);
+			tagpool_exit(&slot->tagpool);
 
 			/* free the working directory */
-			if (image->working_directory != NULL)
+			if (slot->working_directory != NULL)
 			{
-				free(image->working_directory);
-				image->working_directory = NULL;
+				free(slot->working_directory);
+				slot->working_directory = NULL;
 			}
 
 			/* free the memory pool */
-			pool_free(image->mempool);
-			image->mempool = NULL;
-			indx++;
+			pool_free(slot->mempool);
+			slot->mempool = NULL;
 		}
 
 		/* interim hack until we use normal device startup/shutdown */
@@ -265,10 +259,7 @@ static void image_exit(running_machine *machine)
 
 static int is_image_device(const device_config *device)
 {
-	return (device->type == MESS_DEVICE)
-		|| (device_get_info_fct(device, DEVINFO_FCT_IMAGE_LOAD) != NULL)
-		|| (device_get_info_fct(device, DEVINFO_FCT_IMAGE_CREATE) != NULL)
-		|| (device_get_info_fct(device, DEVINFO_FCT_IMAGE_UNLOAD) != NULL);
+	return (device->type == MESS_DEVICE);
 }
 
 
@@ -1767,21 +1758,18 @@ const device_config *image_from_device(const struct IODevice *device)
 
 const device_config *image_from_devtag_and_index(const char *devtag, int id)
 {
-	int indx;
 	const device_config *image = NULL;
-	const struct IODevice *dev;
-	int device_index;
+	const device_config *dev;
+	const struct IODevice *iodev;
 
-	indx = 0;
-	device_index = 0;
-	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
+	for (dev = image_device_first(Machine->config); dev != NULL; dev = image_device_next(dev))
 	{
-		if (dev->tag && !strcmp(dev->tag, devtag) && (device_index++ == id))
+		iodev = mess_device_from_core_device(dev);
+		if ((iodev != NULL) && (iodev->tag != NULL) && !strcmp(iodev->tag, devtag) && (iodev->index_in_device == id))
 		{
-			image = dev->devconfig;
+			image = dev;
 			break;
 		}
-		indx++;
 	}
 
 	assert(image != NULL);
@@ -1792,24 +1780,21 @@ const device_config *image_from_devtag_and_index(const char *devtag, int id)
 
 const device_config *image_from_devtype_and_index(iodevice_t type, int id)
 {
-	int indx;
 	const device_config *image = NULL;
-	const struct IODevice *dev;
-	int device_index;
+	const device_config *dev;
+	const struct IODevice *iodev;
 
 	assert((Machine->images_data->multiple_dev_mask & (1 << type)) == 0);
 	assert(id < device_count(Machine, type));
 
-	indx = 0;
-	device_index = 0;
-	for (dev = mess_device_first_from_machine(Machine); dev != NULL; dev = mess_device_next(dev))
+	for (dev = image_device_first(Machine->config); dev != NULL; dev = image_device_next(dev))
 	{
-		if ((type == dev->type) && (device_index++ == id))
+		iodev = mess_device_from_core_device(dev);
+		if ((iodev != NULL) && (type == iodev->type) && (iodev->index_in_device == id))
 		{
-			image = dev->devconfig;
+			image = dev;
 			break;
 		}
-		indx++;
 	}
 
 	assert(image);

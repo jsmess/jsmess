@@ -263,7 +263,6 @@ struct IODevice
 	device_image_partialhash_func partialhash;
 
 	/* cosmetic/UI callbacks */
-	void (*display)(const device_config *img);
 	const char *(*name)(const struct IODevice *dev, int id, char *buf, size_t bufsize);
 
 	/* image creation options */
@@ -284,10 +283,6 @@ int device_typeid(const char *name);
 
 /* device allocation */
 void mess_devices_setup(machine_config *config, const game_driver *gamedrv);
-
-/* device enumeration */
-const struct IODevice *mess_device_first_from_machine(const running_machine *machine);
-const struct IODevice *mess_device_next(const struct IODevice *dev);
 
 /* device lookup */
 int device_count_tag_from_machine(const running_machine *machine, const char *tag);

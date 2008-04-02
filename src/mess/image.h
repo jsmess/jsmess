@@ -47,6 +47,7 @@ enum
 	DEVINFO_FCT_IMAGE_LOAD,										/* R/O: device_load_handler */
 	DEVINFO_FCT_IMAGE_CREATE,									/* R/O: device_create_handler */
 	DEVINFO_FCT_IMAGE_UNLOAD,									/* R/O: device_unload_handler */
+	DEVINFO_FCT_DISPLAY,										/* R/O: device_display_func */
 	DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff
 };
 

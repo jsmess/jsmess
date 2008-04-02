@@ -197,6 +197,11 @@ static const char *default_device_name(const struct IODevice *dev, int id,
 
 static DEVICE_START(mess_device)
 {
+	mess_device_config *mess_device = (mess_device_config *) device->inline_config;
+
+	/* if present, invoke the start handler */
+	if (mess_device->io_device.start != NULL)
+		(*mess_device->io_device.start)(device);
 }
 
 
@@ -225,6 +230,7 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_FCT_IMAGE_LOAD:			info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_LOAD); break;
 		case DEVINFO_FCT_IMAGE_CREATE:			info->f	= mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_UNLOAD); break;
+		case DEVINFO_FCT_DISPLAY:				info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_DISPLAY); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					info->s = "Legacy MESS Device";					break;
@@ -370,7 +376,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		mess_device->io_device.imgverify			= (device_image_verify_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_VERIFY);
 		mess_device->io_device.partialhash			= (device_image_partialhash_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_PARTIAL_HASH);
 
-		mess_device->io_device.display				= (device_display_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_DISPLAY);
 		mess_device->io_device.name					= default_device_name;
 
 		mess_device->io_device.createimage_optguide	= (const struct OptionGuide *) mess_device_get_info_ptr(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE_OPTGUIDE);
@@ -477,30 +482,6 @@ machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedr
 	machine_config *config = machine_config_alloc(gamedrv->machine_config);
 	mess_devices_setup(config, gamedrv);
 	return config;
-}
-
-
-
-/*************************************
- *
- *	Device enumeration
- *
- *************************************/
-
-const struct IODevice *mess_device_first_from_machine(const running_machine *machine)
-{
-	const device_config *devconfig;
-	devconfig = device_list_first(machine->config->devicelist, MESS_DEVICE);
-	return (devconfig != NULL) ? devconfig->inline_config : NULL;
-}
-
-
-
-const struct IODevice *mess_device_next(const struct IODevice *dev)
-{
-	const device_config *devconfig;
-	devconfig = device_list_next(dev->devconfig, MESS_DEVICE);
-	return (devconfig != NULL) ? devconfig->inline_config : NULL;
 }
 
 
