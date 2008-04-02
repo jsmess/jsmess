@@ -61,7 +61,7 @@ enum
 /* ----- core implementation ----- */
 
 /* core initialization */
-int image_init(running_machine *machine);
+void image_init(running_machine *machine);
 
 
 /* ----- image device enumeration ----- */
@@ -92,9 +92,6 @@ void image_unload(const device_config *img);
 
 /* used to retrieve error information during image loading */
 const char *image_error(const device_config *img);
-
-/* used for driver init and machine init */
-void image_unload_all(int ispreload);
 
 /* used to set the error that occured during image loading */
 void image_seterror(const device_config *img, image_error_t err, const char *message);

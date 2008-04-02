@@ -89,6 +89,7 @@ struct _images_private
 static void image_exit(running_machine *machine);
 static void image_clear(image_slot_data *image);
 static void image_clear_error(image_slot_data *image);
+static void image_unload_internal(image_slot_data *slot);
 
 
 
@@ -111,7 +112,7 @@ static void memory_error(const char *message)
     image_init - initialize the core image system
 -------------------------------------------------*/
 
-int image_init(running_machine *machine)
+void image_init(running_machine *machine)
 {
 	int count, indx;
 	UINT32 mask, dev_mask = 0, multiple_dev_mask = 0;
@@ -174,8 +175,8 @@ int image_init(running_machine *machine)
 		indx++;
 	}
 
+	/* add a callback for when we shut down */
 	add_exit_callback(machine, image_exit);
-	return INIT_PASS;
 }
 
 
@@ -191,14 +192,16 @@ static void image_exit(running_machine *machine)
 
 	if (machine->images_data != NULL)
 	{
-		/* unload all devices */
-		image_unload_all(FALSE);
-		image_unload_all(TRUE);
+		/* extract the options */
+		mess_options_extract(machine);
 
 		for (i = 0; i < machine->images_data->slot_count; i++)
 		{
 			/* identify the image slot */
 			slot = &machine->images_data->slots[i];
+
+			/* unload this image */
+			image_unload_internal(slot);
 
 			/* free the working directory */
 			if (slot->working_directory != NULL)
@@ -806,21 +809,18 @@ static void image_clear(image_slot_data *image)
 	images
 -------------------------------------------------*/
 
-static void image_unload_internal(image_slot_data *image, int is_final_unload)
+static void image_unload_internal(image_slot_data *slot)
 {
-	const struct IODevice *iodev;
-
 	/* is there an actual image loaded? */
-	if (!is_loaded(image))
-		return;
+	if (is_loaded(slot))
+	{
+		/* call the unload function */
+		if (slot->unload != NULL)
+			slot->unload(slot->dev);
 
-	/* call the unload function */
-	iodev = mess_device_from_core_device(image->dev);
-	if (image->unload != NULL)
-		image->unload(image->dev);
-
-	image_clear(image);
-	image_clear_error(image);
+		image_clear(slot);
+		image_clear_error(slot);
+	}
 }
 
 
@@ -832,39 +832,7 @@ static void image_unload_internal(image_slot_data *image, int is_final_unload)
 void image_unload(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
-	image_unload_internal(slot, FALSE);
-}
-
-
-
-/*-------------------------------------------------
-    image_unload_all - unload all images
--------------------------------------------------*/
-
-void image_unload_all(int ispreload)
-{
-	int i;
-	image_slot_data *slot;
-	const struct IODevice *iodev;
-
-	if (!ispreload)
-		mess_options_extract(Machine);
-
-	/* normalize ispreload */
-	ispreload = ispreload ? 1 : 0;
-
-	/* unload all devices with matching preload */
-	for (i = 0; i < Machine->images_data->slot_count; i++)
-	{
-		slot = &Machine->images_data->slots[i];
-		iodev = mess_device_from_core_device(slot->dev);
-
-		if (iodev->load_at_init == ispreload)
-		{
-			/* unload this image */
-			image_unload_internal(slot, TRUE);
-		}
-	}
+	image_unload_internal(slot);
 }
 
 
