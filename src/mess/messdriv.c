@@ -175,10 +175,9 @@ TESTDRIVER( vcg )		/* Palladium Video-Computer-Game					*/
 
 	/* WATARA */
 	DRIVER( svision )	/* Supervision Handheld								*/
-TESTDRIVER( svisions )
-
-TESTDRIVER( svisionp )
-TESTDRIVER( svisionn )
+	DRIVER( svisions )
+	DRIVER( svisionp )
+	DRIVER( svisionn )
 	DRIVER( tvlinkp )
 
 	/* INTERTON */
