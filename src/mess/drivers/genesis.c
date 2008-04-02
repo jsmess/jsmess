@@ -57,6 +57,7 @@ MESS adaptation by R. Belmont
 static int is_ssf2 = 0;
 static int is_redcliff = 0;
 static int is_radica = 0;
+static int is_kof99 = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -183,7 +184,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	unsigned char *ROM;
 
 	genesis_sram = NULL;
-	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = is_ssf2 = is_redcliff = is_radica = 0;
+	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = is_ssf2 = is_redcliff = is_radica = is_kof99 = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -244,7 +245,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		{
 			is_ssf2 = 1;
 		}
-		// detect the 'Romance of the Three Kingdoms - Red Cliff' rom, already decoded from useless .mdx format
+		// detect the 'Romance of the Three Kingdoms - Red Cliff' rom, already decoded from .mdx format
 		if (length == 0x200000)
 		{
 		 	static unsigned char redcliffsig[] = { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04}; // move.b  ($400004).l,d0
@@ -267,6 +268,18 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 				is_radica = 1;
 			}
 
+		}
+		is_kof99 = 1;
+
+		// detect the King of Fighters '99 unlicensed game
+		if (length == 0x300000)
+		{
+		 	static unsigned char kof99sig[] = { 0x20, 0x3c, 0x30, 0x00, 0x00, 0xa1}; // move.l  #$300000A1,d0
+
+		 	if (!memcmp(&ROM[0x1fd0d2+relocate],&kof99sig[0],sizeof(kof99sig)))
+			{
+				is_kof99 = 1;
+			}
 		}
 
 	}
@@ -427,7 +440,26 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	}
 }
 
-// Radica handler borrowed from HazeMD
+// KOF99 handler from HazeMD
+READ16_HANDLER( kof99_0xA13002_r )
+{
+	// write 02 to a13002.. shift right 1?
+	return 0x01;
+}
+
+READ16_HANDLER( kof99_00A1303E_r )
+{
+	// write 3e to a1303e.. shift right 1?
+	return 0x1f;
+}
+
+READ16_HANDLER( kof99_0xA13000_r )
+{
+	// no write, startup check, chinese message if != 0
+	return 0x0;
+}
+
+// Radica handler from HazeMD
 
 READ16_HANDLER( radica_bank_select )
 {
@@ -477,6 +509,11 @@ static DRIVER_INIT( gencommon )
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa1307f, 0, 0, radica_bank_select );
 	}
 
+	if (is_kof99) {
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, kof99_0xA13000_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13002, 0xA13003, 0, 0, kof99_0xA13002_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA1303e, 0xA1303f, 0, 0, kof99_00A1303E_r );
+	}
 
 	if (is_redcliff)
 	{
