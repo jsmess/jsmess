@@ -300,8 +300,8 @@ void serial_device_connect(const device_config *image, struct serial_connection 
 
 /* init this device */
 DEVICE_START(serial_device);
-int serial_device_load(const device_config *image);
-void serial_device_unload(const device_config *image);
+DEVICE_IMAGE_LOAD(serial_device);
+DEVICE_IMAGE_UNLOAD(serial_device);
 
 void serial_device_setup(const device_config *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code);
 

@@ -211,18 +211,18 @@ DEVICE_START( thom_serial )
 
 
 
-void thom_serial_unload ( const device_config *image )
+DEVICE_IMAGE_UNLOAD( thom_serial )
 {
-	serial_device_unload( image );
+	device_unload_serial_device( image );
 }
 
 
 
-int thom_serial_load ( const device_config* image )
+DEVICE_IMAGE_LOAD( thom_serial )
 {
 	int idx = image_index_in_device( image );
 
-	if ( serial_device_load( image ) != INIT_PASS )
+	if ( device_load_serial_device( image ) != INIT_PASS )
 	{
 		logerror( "thom_serial_load: could not load serial image in device %i\n", idx );
 		return INIT_FAIL;
@@ -257,7 +257,7 @@ static UINT8 thom_cart_nb_banks; /* number of 16 KB banks (up to 4) */
 static UINT8 thom_cart_bank;     /* current bank */
 
 
-int to7_cartridge_load ( const device_config* image )
+DEVICE_IMAGE_LOAD( to7_cartridge )
 {
 	int i,j;
 	UINT8* pos = memory_region( REGION_CPU1 ) + 0x10000;
@@ -1697,7 +1697,7 @@ static UINT8 mo5_reg_cart; /* 0xa7cb bank switch */
 
 
 
-int mo5_cartridge_load ( const device_config* image )
+DEVICE_IMAGE_LOAD( mo5_cartridge )
 {
 	UINT8* pos = memory_region(REGION_CPU1) + 0x10000;
 	UINT64 size = image_length ( image );

@@ -791,7 +791,7 @@ DEVICE_START( thom_floppy )
 
 
 
-int thom_floppy_load ( const device_config* image )
+DEVICE_IMAGE_LOAD( thom_floppy )
 {
 	const char* typ = image_filetype( image );
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
@@ -817,7 +817,7 @@ int thom_floppy_load ( const device_config* image )
 
 
 
-void thom_floppy_unload ( const device_config *image )
+DEVICE_IMAGE_UNLOAD(thom_floppy)
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	const char* typ = image_filetype( image );
@@ -835,7 +835,7 @@ void thom_floppy_unload ( const device_config *image )
 
 
 
-int  thom_floppy_create ( const device_config *image, int create_format, option_resolution *args )
+DEVICE_IMAGE_CREATE( thom_floppy )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	const char* typ = image_filetype( image );
@@ -931,13 +931,13 @@ void thom_floppy_getinfo( const mess_device_class *devclass, UINT32 state, union
 		info->start = DEVICE_START_NAME(thom_floppy);
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
-		info->load = thom_floppy_load;
+		info->load = DEVICE_IMAGE_LOAD_NAME(thom_floppy);
 		break;
 	case MESS_DEVINFO_PTR_UNLOAD:
-		info->unload = thom_floppy_unload;
+		info->unload = DEVICE_IMAGE_UNLOAD_NAME(thom_floppy);
 		break;
 	case MESS_DEVINFO_PTR_CREATE:
-		info->create = thom_floppy_create;
+		info->create = DEVICE_IMAGE_CREATE_NAME(thom_floppy);
 		break;
 	case MESS_DEVINFO_INT_COUNT:
 		info->i = 4;

@@ -826,7 +826,7 @@ static void sf7000_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 static DEVICE_IMAGE_LOAD( sf7000_serial )
 {
 	/* filename specified */
-	if (serial_device_load(image)==INIT_PASS)
+	if (device_load_serial_device(image)==INIT_PASS)
 	{
 		/* setup transmit parameters */
 		serial_device_setup(image, 9600 >> readinputportbytag("BAUD"), 8, 1, SERIAL_PARITY_NONE);
@@ -857,7 +857,7 @@ static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(serial_device); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sf7000_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;

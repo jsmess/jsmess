@@ -26,10 +26,9 @@ typedef enum {
 } thom_floppy_type;
 
 extern DEVICE_START( thom_floppy );
-extern int  thom_floppy_load   ( const device_config* image );
-extern void thom_floppy_unload ( const device_config *image);
-extern int  thom_floppy_create ( const device_config *image,
-				 int create_format, option_resolution *args );
+extern DEVICE_IMAGE_LOAD( thom_floppy );
+extern DEVICE_IMAGE_UNLOAD( thom_floppy );
+extern DEVICE_IMAGE_CREATE( thom_floppy );
 
 extern void    thom_floppy_set_density( DENSITY density );
 extern DENSITY thom_floppy_get_density( void );

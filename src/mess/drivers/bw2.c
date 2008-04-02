@@ -59,7 +59,7 @@ static void bw2_set_banks(UINT8 data)
 static DEVICE_IMAGE_LOAD( bw2_serial )
 {
 	/* filename specified */
-	if (serial_device_load(image) == INIT_PASS)
+	if (device_load_serial_device(image) == INIT_PASS)
 	{
 		/* setup transmit parameters */
 		serial_device_setup(image, 9600 >> readinputportbytag("BAUD"), 8, 1, SERIAL_PARITY_NONE);
@@ -629,7 +629,7 @@ static void bw2_serial_getinfo(const mess_device_class *devclass, UINT32 state, 
 			info->load = DEVICE_IMAGE_LOAD_NAME(bw2_serial);
 			break;
 		case MESS_DEVINFO_PTR_UNLOAD:
-			info->unload = serial_device_unload;
+			info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device);
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

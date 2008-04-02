@@ -217,7 +217,7 @@ static void to7_cartridge_getinfo( const mess_device_class *devclass,  UINT32 st
 		info->i = 1;
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
-		info->load = to7_cartridge_load;
+		info->load = DEVICE_IMAGE_LOAD_NAME(to7_cartridge);
 		break;
 	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy( info->s = device_temp_str(), "m7,rom" );
@@ -234,7 +234,7 @@ static void mo5_cartridge_getinfo( const mess_device_class *devclass, UINT32 sta
 		info->i = 1;
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
-		info->load = mo5_cartridge_load;
+		info->load = DEVICE_IMAGE_LOAD_NAME(mo5_cartridge);
 		break;
 	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy( info->s = device_temp_str(), "m5,rom" );
@@ -291,10 +291,10 @@ static void thom_serial_getinfo ( const mess_device_class *devclass, UINT32 stat
 		info->start = DEVICE_START_NAME(thom_serial);
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
-		info->load = thom_serial_load;
+		info->load = DEVICE_IMAGE_LOAD_NAME(thom_serial);
 		break;
 	case MESS_DEVINFO_PTR_UNLOAD:
-		info->unload = thom_serial_unload;
+		info->unload = DEVICE_IMAGE_UNLOAD_NAME(thom_serial);
 		break;
 
 	case MESS_DEVINFO_STR_NAME+0:

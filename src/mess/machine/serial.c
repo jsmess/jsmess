@@ -641,7 +641,7 @@ DEVICE_START(serial_device)
 	memset(&serial_devices[id], 0, sizeof(serial_devices[id]));
 }
 
-int serial_device_load(const device_config *image)
+DEVICE_IMAGE_LOAD(serial_device)
 {
 	int id = image_index_in_device(image);
 	int data_length;
@@ -662,7 +662,7 @@ int serial_device_load(const device_config *image)
 }
 
 
-void serial_device_unload(const device_config *image)
+DEVICE_IMAGE_UNLOAD(serial_device)
 {
 	int id = image_index_in_device(image);
 

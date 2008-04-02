@@ -150,7 +150,7 @@ DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 DEVICE_IMAGE_LOAD( nc_serial )
 {
 	/* filename specified */
-	if (serial_device_load(image)==INIT_PASS)
+	if (device_load_serial_device(image)==INIT_PASS)
 	{
 		/* setup transmit parameters */
 		serial_device_setup(image, 9600, 8, 1,SERIAL_PARITY_NONE);

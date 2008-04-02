@@ -47,14 +47,14 @@
 
 /* serial */
 extern DEVICE_START( thom_serial );
-extern int  thom_serial_load   ( const device_config* image );
-extern void thom_serial_unload ( const device_config* image );
+extern DEVICE_IMAGE_LOAD( thom_serial );
+extern DEVICE_IMAGE_UNLOAD( thom_serial );
 
 
 /***************************** TO7 / T9000 *************************/
 
 /* cartridge bank-switching */
-extern int to7_cartridge_load ( const device_config* image );
+extern DEVICE_IMAGE_LOAD( to7_cartridge );
 extern WRITE8_HANDLER ( to7_cartridge_w );
 extern READ8_HANDLER  ( to7_cartridge_r );
 
@@ -87,7 +87,7 @@ extern READ8_HANDLER  ( mo5_gatearray_r );
 extern WRITE8_HANDLER ( mo5_gatearray_w );
 
 /* cartridge / extended RAM bank-switching */
-extern int mo5_cartridge_load ( const device_config* image );
+extern DEVICE_IMAGE_LOAD( mo5_cartridge );
 extern WRITE8_HANDLER ( mo5_ext_w );
 extern WRITE8_HANDLER ( mo5_cartridge_w );
 extern READ8_HANDLER  ( mo5_cartridge_r );

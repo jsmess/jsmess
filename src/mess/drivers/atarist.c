@@ -2091,7 +2091,7 @@ static void atarist_printer_getinfo(const mess_device_class *devclass, UINT32 st
 static DEVICE_IMAGE_LOAD( atarist_serial )
 {
 	/* filename specified */
-	if (serial_device_load(image)==INIT_PASS)
+	if (device_load_serial_device(image)==INIT_PASS)
 	{
 		/* setup transmit parameters */
 		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
@@ -2119,7 +2119,7 @@ static void atarist_serial_getinfo(const mess_device_class *devclass, UINT32 sta
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(serial_device); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(atarist_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
@@ -2138,7 +2138,7 @@ static void megaste_serial_getinfo(const mess_device_class *devclass, UINT32 sta
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(serial_device); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(atarist_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
