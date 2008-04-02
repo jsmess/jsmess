@@ -125,21 +125,11 @@ static INTERRUPT_GEN( ti99_2_vblank_interrupt )
     the CPU can get more bus time.
 */
 
-static const unsigned char ti99_2_palette[] =
-{
-	255, 255, 255,
-	0, 0, 0
-};
-
-#define TI99_2_PALETTE_SIZE sizeof(ti99_2_palette)/3
 
 static PALETTE_INIT(ti99_2)
 {
-	int i;
-
-	for ( i = 0; i < TI99_2_PALETTE_SIZE; i++ ) {
-		palette_set_color_rgb(machine, i, ti99_2_palette[i*3], ti99_2_palette[i*3+1], ti99_2_palette[i*3+2]);
-	}
+	palette_set_color(machine,0,RGB_WHITE); /* white */
+	palette_set_color(machine,1,RGB_BLACK); /* black */
 }
 
 
@@ -181,7 +171,7 @@ static const gfx_layout ti99_2_charlayout =
 };
 
 static GFXDECODE_START( ti99_2 )
-	GFXDECODE_ENTRY( REGION_CPU1, 0x1c00,  ti99_2_charlayout, 0, 0 )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x1c00,  ti99_2_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -383,7 +373,7 @@ static MACHINE_DRIVER_START(ti99_2)
 	MDRV_SCREEN_SIZE(256, 192)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MDRV_GFXDECODE(ti99_2)
-	MDRV_PALETTE_LENGTH(TI99_2_PALETTE_SIZE)
+	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(ti99_2)
 
 	MDRV_VIDEO_UPDATE(ti99_2)
@@ -415,5 +405,5 @@ SYSTEM_CONFIG_START(ti99_2)
 SYSTEM_CONFIG_END
 
 /*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY                 FULLNAME */
-COMP(	1983,	ti99_224,	0,			0,		ti99_2,		ti99_2,	ti99_2_24,	ti99_2,		"Texas Instruments",	"TI-99/2 BASIC Computer (24kb ROMs)" , 0)
-COMP(	1983,	ti99_232,	ti99_224,	0,		ti99_2,		ti99_2,	ti99_2_32,	ti99_2,		"Texas Instruments",	"TI-99/2 BASIC Computer (32kb ROMs)" , 0)
+COMP(	1983,	ti99_224,	0,		0,	ti99_2,	ti99_2,	ti99_2_24,	ti99_2,		"Texas Instruments",	"TI-99/2 BASIC Computer (24kb ROMs)" , GAME_NOT_WORKING )
+COMP(	1983,	ti99_232,	ti99_224,	0,	ti99_2,	ti99_2,	ti99_2_32,	ti99_2,		"Texas Instruments",	"TI-99/2 BASIC Computer (32kb ROMs)" , GAME_NOT_WORKING )
