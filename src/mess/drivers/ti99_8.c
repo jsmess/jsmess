@@ -659,7 +659,7 @@ SYSTEM_CONFIG_START(ti99_8)
 #if 1
 	CONFIG_DEVICE(ti99_8_floppy_getinfo)
 	CONFIG_DEVICE(ti99_8_harddisk_getinfo)
-	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)
+//	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)	/* save state error if both hard drives enabled */
 	CONFIG_DEVICE(ti99_8_parallel_getinfo)
 	CONFIG_DEVICE(ti99_8_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_8_quickload_getinfo)*/
@@ -669,5 +669,5 @@ SYSTEM_CONFIG_START(ti99_8)
 SYSTEM_CONFIG_END
 
 /*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY                 FULLNAME */
-COMP(	1983,	ti99_8,		0,			0,		ti99_8_60hz,ti99_8,	ti99_8,		ti99_8,		"Texas Instruments",	"TI-99/8 Computer (US)" , 0)
-COMP(	1983,	ti99_8e,	ti99_8,		0,		ti99_8_50hz,ti99_8,	ti99_8,		ti99_8,		"Texas Instruments",	"TI-99/8 Computer (Europe)" , 0)
+COMP(	1983,	ti99_8,		0,	0,	ti99_8_60hz,ti99_8,	ti99_8,	ti99_8,	"Texas Instruments",	"TI-99/8 Computer (US)" , GAME_NOT_WORKING )
+COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8,	ti99_8,	ti99_8,	"Texas Instruments",	"TI-99/8 Computer (Europe)" , GAME_NOT_WORKING )
