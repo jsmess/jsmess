@@ -514,7 +514,7 @@ void sonydriv_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 		case MESS_DEVINFO_STR_DEV_TAG:			strcpy(info->s = device_temp_str(), "sonydriv"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = device_unload_sonydriv_floppy; break;
+		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = DEVICE_IMAGE_UNLOAD_NAME(sonydriv_floppy); break;
 		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:
 			if (mess_device_get_info_int(devclass, MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES) & SONY_FLOPPY_SUPPORT2IMG)
 				info->p = (void *) floppyoptions_apple35_iigs;

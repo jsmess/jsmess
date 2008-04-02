@@ -513,8 +513,8 @@ static void pdp1_punchtape_getinfo(const mess_device_class *devclass, UINT32 sta
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(pdp1_tape); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pdp1_tape; break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_pdp1_tape; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_tape); break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_tape); break;
 		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = pdp1_get_open_mode; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -535,8 +535,8 @@ static void pdp1_printer_getinfo(const mess_device_class *devclass, UINT32 state
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pdp1_typewriter; break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_pdp1_typewriter; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_typewriter); break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_typewriter); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "typ"); break;
@@ -556,8 +556,8 @@ static void pdp1_cylinder_getinfo(const mess_device_class *devclass, UINT32 stat
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pdp1_drum; break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_pdp1_drum; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_drum); break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_drum); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "drm"); break;

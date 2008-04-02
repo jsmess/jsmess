@@ -587,7 +587,7 @@ void legacybasicdsk_device_getinfo(const mess_device_class *devclass, UINT32 sta
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(basicdsk_floppy); break;
-		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_basicdsk_floppy; break;
+		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = DEVICE_IMAGE_UNLOAD_NAME(basicdsk_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;

@@ -95,8 +95,8 @@ static void snapquick_device_getinfo(const mess_device_class *devclass, UINT32 s
 		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = device_load_snapquick; break;
-		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_snapquick; break;
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(snapquick); break;
+		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = DEVICE_IMAGE_UNLOAD_NAME(snapquick); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;

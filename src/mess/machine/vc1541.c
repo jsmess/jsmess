@@ -1081,8 +1081,8 @@ void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, unio
 		case MESS_DEVINFO_INT_RESET_ON_LOAD:			info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:					info->load = device_load_vc1541; break;
-		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = device_unload_vc1541; break;
+		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(vc1541); break;
+		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = DEVICE_IMAGE_UNLOAD_NAME(vc1541); break;
 		case DEVINFO_PTR_VC1541_CONFIG:			info->f = (genf *) vc1541_config; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

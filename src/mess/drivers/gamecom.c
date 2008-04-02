@@ -132,7 +132,7 @@ static void gamecom_cartslot_getinfo( const mess_device_class *devclass, UINT32 
 		info->start = DEVICE_START_NAME(gamecom_cart);
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
-		info->load = device_load_gamecom_cart;
+		info->load = DEVICE_IMAGE_LOAD_NAME(gamecom_cart);
 		break;
 	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy(info->s = device_temp_str(), "bin,tgc");

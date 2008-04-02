@@ -1092,7 +1092,7 @@ static void ql_microdrive_getinfo(const mess_device_class *devclass, UINT32 stat
 		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_ql_microdrive; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ql_microdrive); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "mdv"); break;
@@ -1129,7 +1129,7 @@ static void ql_serial_getinfo(const mess_device_class *devclass, UINT32 state, u
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_ql_serial; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ql_serial); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1161,7 +1161,7 @@ static void ql_cartslot_getinfo( const mess_device_class *devclass, UINT32 state
 		info->i = 1;
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
-		info->load = device_load_ql_cart;
+		info->load = DEVICE_IMAGE_LOAD_NAME(ql_cart);
 		break;
 	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy(info->s = device_temp_str(), "bin");

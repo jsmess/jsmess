@@ -334,8 +334,8 @@ void cbmcartslot_device_getinfo(const mess_device_class *devclass, UINT32 state,
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:					info->start = DEVICE_START_NAME(cbm_rom); break;
-		case MESS_DEVINFO_PTR_LOAD:					info->load = device_load_cbm_rom; break;
-		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = device_unload_cbm_rom; break;
+		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(cbm_rom); break;
+		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = DEVICE_IMAGE_UNLOAD_NAME(cbm_rom); break;
 
 		default: cartslot_device_getinfo(devclass, state, info);
 	}

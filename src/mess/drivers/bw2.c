@@ -585,7 +585,7 @@ static void bw2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, 
 	
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:
-			info->load = device_load_bw2_floppy;
+			info->load = DEVICE_IMAGE_LOAD_NAME(bw2_floppy);
 			break;
 	
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -626,7 +626,7 @@ static void bw2_serial_getinfo(const mess_device_class *devclass, UINT32 state, 
 			info->start = DEVICE_START_NAME(serial_device);
 			break;
 		case MESS_DEVINFO_PTR_LOAD:
-			info->load = device_load_bw2_serial;
+			info->load = DEVICE_IMAGE_LOAD_NAME(bw2_serial);
 			break;
 		case MESS_DEVINFO_PTR_UNLOAD:
 			info->unload = serial_device_unload;

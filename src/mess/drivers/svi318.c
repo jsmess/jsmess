@@ -517,10 +517,10 @@ static void svi318_cartslot_getinfo(const mess_device_class *devclass, UINT32 st
 			info->start = DEVICE_START_NAME(svi318_cart);
 			break;
 		case MESS_DEVINFO_PTR_LOAD:
-			info->load = device_load_svi318_cart;
+			info->load = DEVICE_IMAGE_LOAD_NAME(svi318_cart);
 			break;
 		case MESS_DEVINFO_PTR_UNLOAD:
-			info->unload = device_unload_svi318_cart;
+			info->unload = DEVICE_IMAGE_UNLOAD_NAME(svi318_cart);
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -546,7 +546,7 @@ static void svi318_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:
-			info->load = device_load_svi318_floppy;
+			info->load = DEVICE_IMAGE_LOAD_NAME(svi318_floppy);
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

@@ -90,7 +90,7 @@ static struct mess_cd *get_drive(const device_config *img)
 
 /*************************************
  *
- *	device_init_mess_cd()
+ *	DEVICE_START_NAME(mess_cd)
  *
  *	Device init
  *
@@ -107,7 +107,7 @@ static DEVICE_START( mess_cd )
 
 /*************************************
  *
- *	device_load_mess_cd()
+ *	DEVICE_IMAGE_LOAD_NAME(mess_cd)
  *
  *	Device load
  *
@@ -154,7 +154,7 @@ static DEVICE_IMAGE_LOAD( mess_cd )
 
 /*************************************
  *
- *	device_unload_mess_cd()
+ *	DEVICE_IMAGE_UNLOAD_NAME(mess_cd)
  *
  *	Device unload
  *
@@ -218,8 +218,8 @@ void cdrom_device_getinfo(const mess_device_class *devclass, UINT32 state, union
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(mess_cd); break;
-		case MESS_DEVINFO_PTR_LOAD:						info->load = device_load_mess_cd; break;
-		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_mess_cd; break;
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(mess_cd); break;
+		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = DEVICE_IMAGE_UNLOAD_NAME(mess_cd); break;
 		case MESS_DEVINFO_PTR_CREATE_OPTGUIDE:			info->p = (void *) mess_cd_option_guide; break;
 		case MESS_DEVINFO_PTR_CREATE_OPTSPEC+0:			info->p = (void *) mess_cd_option_spec;
 

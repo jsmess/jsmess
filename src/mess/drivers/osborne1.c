@@ -184,7 +184,7 @@ ROM_END
 static void osborne1_floppy_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
 	case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
-	case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_osborne1_floppy; break;
+	case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(osborne1_floppy); break;
 	case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy( info->s = device_temp_str(), "img" ); break;
 	default:							legacybasicdsk_device_getinfo( devclass, state, info ); break;
 	}

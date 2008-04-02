@@ -695,7 +695,7 @@ static void sg1000_cartslot_getinfo( const mess_device_class *devclass, UINT32 s
 	{
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sg1000_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sg1000_cart); break;
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
@@ -755,7 +755,7 @@ static void sc3000_cartslot_getinfo( const mess_device_class *devclass, UINT32 s
 	{
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sc3000_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sc3000_cart); break;
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg,sc"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
@@ -799,7 +799,7 @@ static DEVICE_IMAGE_LOAD( sf7000_floppy )
 
 	if (image_length(image) == 256*16*40)
 	{
-		if (device_load_basicdsk_floppy(image) == INIT_PASS)
+		if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
 		{
 			/* image, tracks, sides, sectors per track, sector length, first sector id, offset of track 0, track skipping */
 			basicdsk_set_geometry(image, 40, 1, 16, 256, 1, 0, FALSE);
@@ -816,7 +816,7 @@ static void sf7000_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	switch(state)
 	{
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sf7000_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sf7000_floppy); break;
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sf7"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
@@ -856,7 +856,7 @@ static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sf7000_serial; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sf7000_serial); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

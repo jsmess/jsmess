@@ -236,7 +236,7 @@ static void pce_cartslot_getinfo(const mess_device_class *devclass, UINT32 state
 		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pce_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pce_cart); break;
 		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = pce_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

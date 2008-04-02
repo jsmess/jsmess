@@ -1857,10 +1857,10 @@ static void x68k_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 		info->i = 4;
 		break;
 	case MESS_DEVINFO_PTR_LOAD:
-		info->load = device_load_x68k_floppy;
+		info->load = DEVICE_IMAGE_LOAD_NAME(x68k_floppy);
 		break;
 	case MESS_DEVINFO_PTR_UNLOAD:
-		info->unload = device_unload_x68k_floppy;
+		info->unload = DEVICE_IMAGE_UNLOAD_NAME(x68k_floppy);
 		break;
 	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy(info->s = device_temp_str(), "xdf,hdm,2hd,dim");

@@ -843,8 +843,8 @@ static void apexc_cylinder_getinfo(const mess_device_class *devclass, UINT32 sta
 		case MESS_DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_apexc_cylinder; break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_apexc_cylinder; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(apexc_cylinder); break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(apexc_cylinder); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "apc"); break;
@@ -862,7 +862,7 @@ static void apexc_punchtape_getinfo(const mess_device_class *devclass, UINT32 st
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(apexc_tape); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_apexc_tape; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(apexc_tape); break;
 		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = apexc_get_open_mode; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

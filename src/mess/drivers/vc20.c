@@ -793,7 +793,7 @@ static void cbmvc20_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(vc20_rom); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_vc20_rom; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(vc20_rom); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "a0,20,40,60,rom,bin"); break;

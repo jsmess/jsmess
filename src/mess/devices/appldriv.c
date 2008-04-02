@@ -327,8 +327,8 @@ void apple525_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:				info->start = DEVICE_START_NAME(apple525_floppy); break;
-		case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_apple525_floppy; break;
-		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = device_unload_apple525_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(apple525_floppy); break;
+		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = DEVICE_IMAGE_UNLOAD_NAME(apple525_floppy); break;
 		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_apple2; break;
 
 		default: floppy_device_getinfo(devclass, state, info); break;

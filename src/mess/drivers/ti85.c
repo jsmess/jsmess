@@ -492,8 +492,8 @@ static void ti85_serial_getinfo(const mess_device_class *devclass, UINT32 state,
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(ti85_serial); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_ti85_serial; break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_ti85_serial; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti85_serial); break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti85_serial); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "85p,85s,85i,85n,85c,85l,85k,85m,85v,85d,85e,85r,85g,85b"); break;
@@ -534,8 +534,8 @@ static void ti86_serial_getinfo(const mess_device_class *devclass, UINT32 state,
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(ti85_serial); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_ti85_serial; break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_ti85_serial; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti85_serial); break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti85_serial); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "86p,86s,86i,86n,86c,86l,86k,86m,86v,86d,86e,86r,86g"); break;

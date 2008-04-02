@@ -349,7 +349,7 @@ static void nes_cartslot_getinfo(const mess_device_class *devclass, UINT32 state
 		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_nes_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nes_cart); break;
 		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = nes_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -372,7 +372,7 @@ static void famicom_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_nes_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nes_cart); break;
 		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = nes_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -396,8 +396,8 @@ static void famicom_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(nes_disk); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_nes_disk; break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_nes_disk; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nes_disk); break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(nes_disk); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk,fds"); break;
