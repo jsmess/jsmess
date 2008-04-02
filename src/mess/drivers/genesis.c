@@ -59,6 +59,7 @@ static int is_redcliff = 0;
 static int is_radica = 0;
 static int is_kof99 = 0;
 static int is_soulb = 0;
+static int is_mjlovr = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -185,7 +186,8 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	unsigned char *ROM;
 
 	genesis_sram = NULL;
-	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = 0;
+	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -290,6 +292,17 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		 	if (!memcmp(&ROM[0x028460+relocate],&soulbsig[0],sizeof(soulbsig)))
 			{
 				is_soulb = 1;
+			}
+		}
+
+		// detect Mahjong Lover unlicensed game
+		if (length == 0x100000)
+		{
+		 	static unsigned char mjlovrsig[] = { 0x13, 0xf9, 0x00, 0x40, 0x00, 0x00}; // move.b  ($400000).l,($FFFF0C).l (partial)
+
+		 	if (!memcmp(&ROM[0x01b24+relocate],&mjlovrsig[0],sizeof(mjlovrsig)))
+			{
+				is_mjlovr = 1;
 			}
 		}
 
@@ -467,6 +480,17 @@ READ16_HANDLER( soulb_0x400004_r )
 	return 0xc900;
 }
 
+// Mahjong Lover handler from HazeMD
+READ16_HANDLER( mjlovr_prot_1_r )
+{
+	return 0x9000;
+}
+
+READ16_HANDLER( mjlovr_prot_2_r )
+{
+	return 0xd300;
+}
+
 // KOF99 handler from HazeMD
 READ16_HANDLER( kof99_0xA13002_r )
 {
@@ -554,6 +578,11 @@ static DRIVER_INIT( gencommon )
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r );
 	}
 
+	if (is_mjlovr)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, mjlovr_prot_1_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x401000, 0x401001, 0, 0, mjlovr_prot_2_r );
+	}
 
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
