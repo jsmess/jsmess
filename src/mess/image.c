@@ -19,7 +19,6 @@
 #include "unzip.h"
 #include "devices/flopdrv.h"
 #include "utils.h"
-#include "tagpool.h"
 #include "hashfile.h"
 #include "mamecore.h"
 #include "messopts.h"
@@ -34,7 +33,6 @@ typedef struct _image_slot_data image_slot_data;
 struct _image_slot_data
 {
 	/* variables that persist across image mounts */
-	tag_pool tagpool;
 	object_pool *mempool;
 	const device_config *dev;
 
@@ -162,15 +160,10 @@ int image_init(running_machine *machine)
 	{
 		slot = &machine->images_data->slots[indx];
 
-		/* interim changes until we use the normal device->start */
-		((device_config *) dev)->machine = machine;
-		((device_config *) dev)->token = (void *) ~0;
-
 		/* create a memory pool */
-		machine->images_data->slots[indx].mempool = pool_alloc(memory_error);
+		slot->mempool = pool_alloc(memory_error);
 
 		/* setup the device */
-		tagpool_init(&slot->tagpool);
 		machine->images_data->slots[indx].dev = dev;
 
 		/* callbacks */
@@ -178,15 +171,7 @@ int image_init(running_machine *machine)
 		slot->create = (device_image_create_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_CREATE);
 		slot->unload = (device_image_unload_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_UNLOAD);
 
-		/* invoke start, if present */
-		if (dev->start != NULL)
-		{
-			dev->start(slot->dev);
-		}
 		indx++;
-
-		/* interim changes until we use the normal device->start */
-		((device_config *) dev)->token = NULL;
 	}
 
 	add_exit_callback(machine, image_exit);
@@ -206,12 +191,6 @@ static void image_exit(running_machine *machine)
 
 	if (machine->images_data != NULL)
 	{
-		/* interim hack until we use normal device startup/shutdown */
-		for (i = 0; i < machine->images_data->slot_count; i++)
-		{
-			((device_config *) machine->images_data->slots[i].dev)->machine = machine;
-		}
-
 		/* unload all devices */
 		image_unload_all(FALSE);
 		image_unload_all(TRUE);
@@ -220,9 +199,6 @@ static void image_exit(running_machine *machine)
 		{
 			/* identify the image slot */
 			slot = &machine->images_data->slots[i];
-
-			/* free the tagpool */
-			tagpool_exit(&slot->tagpool);
 
 			/* free the working directory */
 			if (slot->working_directory != NULL)
@@ -234,12 +210,6 @@ static void image_exit(running_machine *machine)
 			/* free the memory pool */
 			pool_free(slot->mempool);
 			slot->mempool = NULL;
-		}
-
-		/* interim hack until we use normal device startup/shutdown */
-		for (i = 0; i < machine->images_data->slot_count; i++)
-		{
-			((device_config *) machine->images_data->slots[i].dev)->machine = NULL;
 		}
 
 		machine->images_data = NULL;
@@ -959,41 +929,6 @@ void image_seterror(const device_config *image, image_error_t err, const char *m
 	{
 		slot->err_message = image_strdup(image, message);
 	}
-}
-
-
-
-/****************************************************************************
-  Tag management functions.
-
-  When devices have private data structures that need to be associated with a
-  device, it is recommended that image_alloctag() be called in the device
-  init function.  If the allocation succeeds, then a pointer will be returned
-  to a block of memory of the specified size that will last for the lifetime
-  of the emulation.  This pointer can be retrieved with image_lookuptag().
-
-  Note that since image_lookuptag() is used to index preallocated blocks of
-  memory, image_lookuptag() cannot fail legally.  In fact, an assert will be
-  raised if this happens
-****************************************************************************/
-
-void *image_alloctag(const device_config *image, const char *tag, size_t size)
-{
-	image_slot_data *slot = find_image_slot(image);
-	void *ptr = tagpool_alloc(&slot->tagpool, tag, size);
-	if (ptr == NULL)
-	{
-		memory_error("Out of memory");
-	}
-	return ptr;
-}
-
-
-
-void *image_lookuptag(const device_config *image, const char *tag)
-{
-	image_slot_data *slot = find_image_slot(image);
-	return tagpool_lookup(&slot->tagpool, tag);
 }
 
 

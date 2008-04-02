@@ -71,7 +71,8 @@ void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config
 int mess_validitychecks(void);
 
 /* these are called from mame.c */
-void devices_init(running_machine *machine);
+void mess_predevice_init(running_machine *machine);
+void mess_postdevice_init(running_machine *machine);
 
 void mess_config_init(running_machine *machine);
 

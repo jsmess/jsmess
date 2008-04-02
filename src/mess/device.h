@@ -291,6 +291,10 @@ int device_count_tag_from_machine(const running_machine *machine, const char *ta
 const struct IODevice *device_find_from_machine(const running_machine *machine, iodevice_t type);
 int device_count(running_machine *machine, iodevice_t type);
 
+/* deprecated tag management functions; only works on legacy devices */
+void *image_alloctag(const device_config *device, const char *tag, size_t size);
+void *image_lookuptag(const device_config *device, const char *tag);
+
 /* diagnostics */
 int device_valididtychecks(void);
 

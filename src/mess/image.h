@@ -102,25 +102,6 @@ void image_seterror(const device_config *img, image_error_t err, const char *mes
 
 
 /****************************************************************************
-  Tag management functions.
-
-  When devices have private data structures that need to be associated with a
-  device, it is recommended that image_alloctag() be called in the device
-  init function.  If the allocation succeeds, then a pointer will be returned
-  to a block of memory of the specified size that will last for the lifetime
-  of the emulation.  This pointer can be retrieved with image_lookuptag().
-
-  Note that since image_lookuptag() is used to index preallocated blocks of
-  memory, image_lookuptag() cannot fail legally.  In fact, an assert will be
-  raised if this happens
-****************************************************************************/
-
-void *image_alloctag(const device_config *img, const char *tag, size_t size);
-void *image_lookuptag(const device_config *img, const char *tag);
-
-
-
-/****************************************************************************
   Accessor functions
 
   These provide information about the device; and about the mounted image

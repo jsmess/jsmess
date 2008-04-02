@@ -12,6 +12,7 @@
 #include "mslegacy.h"
 #include "driver.h"
 #include "pool.h"
+#include "tagpool.h"
 
 
 
@@ -34,6 +35,14 @@ struct _mess_device_config
 	struct IODevice io_device;
 	char string_buffer[1024];
 	struct CreateImageOptions createimage_options[MESS_DEVINFO_CREATE_OPTMAX + 1];
+};
+
+
+
+typedef struct _mess_device_token mess_device_token;
+struct _mess_device_token
+{
+	tag_pool tagpool;
 };
 
 
@@ -198,10 +207,34 @@ static const char *default_device_name(const struct IODevice *dev, int id,
 static DEVICE_START(mess_device)
 {
 	mess_device_config *mess_device = (mess_device_config *) device->inline_config;
+	mess_device_token *token = (mess_device_token *) device->token;
+
+	/* initialize the tag pool */
+	tagpool_init(&token->tagpool);
 
 	/* if present, invoke the start handler */
 	if (mess_device->io_device.start != NULL)
 		(*mess_device->io_device.start)(device);
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_STOP(mess_device) - device stop
+    callback
+-------------------------------------------------*/
+
+static DEVICE_STOP(mess_device)
+{
+	mess_device_config *mess_device = (mess_device_config *) device->inline_config;
+	mess_device_token *token = (mess_device_token *) device->token;
+
+	/* if present, invoke the stop handler */
+	if (mess_device->io_device.stop != NULL)
+		(*mess_device->io_device.stop)(device);
+
+	/* tear down the tag pool */
+	tagpool_exit(&token->tagpool);
 }
 
 
@@ -219,13 +252,13 @@ DEVICE_GET_INFO(mess_device)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(mess_device_config);			break;
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = 1;									break;
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mess_device_token);			break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_OTHER;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:				/* Nothing */									break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(mess_device);	break;
-		case DEVINFO_FCT_STOP:					/* Nothing */									break;
+		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(mess_device);		break;
 		case DEVINFO_FCT_RESET:					/* Nothing */									break;
 		case DEVINFO_FCT_IMAGE_LOAD:			info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_LOAD); break;
 		case DEVINFO_FCT_IMAGE_CREATE:			info->f	= mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE); break;
@@ -551,6 +584,39 @@ int device_count(running_machine *machine, iodevice_t type)
 		}
 	}
 	return count;
+}
+
+
+
+/*************************************
+ *
+ *	Tag management
+ *
+ *************************************/
+
+static mess_device_token *get_token(const device_config *device)
+{
+	assert(device->type == MESS_DEVICE);
+	return (mess_device_token *) device->token;
+}
+
+
+
+void *image_alloctag(const device_config *device, const char *tag, size_t size)
+{
+	void *ptr = tagpool_alloc(&get_token(device)->tagpool, tag, size);
+	if (ptr == NULL)
+	{
+		fatalerror("Out of memory");
+	}
+	return ptr;
+}
+
+
+
+void *image_lookuptag(const device_config *device, const char *tag)
+{
+	return tagpool_lookup(&get_token(device)->tagpool, tag);
 }
 
 

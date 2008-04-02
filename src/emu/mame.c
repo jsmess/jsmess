@@ -1565,8 +1565,8 @@ static void init_machine(running_machine *machine)
 	cpuint_init(machine);
 
 #ifdef MESS
-	/* initialize the devices */
-	devices_init(machine);
+	/* first MESS initialization */
+	mess_predevice_init(machine);
 #endif
 
 	/* call the game driver's init function */
@@ -1578,6 +1578,11 @@ static void init_machine(running_machine *machine)
 
 	/* start up the devices */
 	device_list_start(machine);
+
+#ifdef MESS
+	/* second MESS initialization */
+	mess_postdevice_init(machine);
+#endif
 
 	/* start the video and audio hardware */
 	video_init(machine);

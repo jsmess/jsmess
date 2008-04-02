@@ -102,17 +102,12 @@ static void ram_init(const game_driver *gamedrv)
 
 
 /*-------------------------------------------------
-    devices_init - initialize devices for a specific
+    mess_predevice_init - initialize devices for a specific
 	running_machine
 -------------------------------------------------*/
 
-void devices_init(running_machine *machine)
+void mess_predevice_init(running_machine *machine)
 {
-	const struct IODevice *dev;
-	int result = INIT_FAIL;
-	const char *image_name;
-	const device_config *image;
-
 	/* initialize natural keyboard support */
 	inputx_init(machine);
 
@@ -121,6 +116,21 @@ void devices_init(running_machine *machine)
 
 	/* initialize RAM code */
 	ram_init(machine->gamedrv);
+}
+
+
+
+/*-------------------------------------------------
+    mess_postdevice_init - initialize devices for a specific
+	running_machine
+-------------------------------------------------*/
+
+void mess_postdevice_init(running_machine *machine)
+{
+	const struct IODevice *dev;
+	int result = INIT_FAIL;
+	const char *image_name;
+	const device_config *image;
 
 	/* init all devices */
 	image_init(machine);
