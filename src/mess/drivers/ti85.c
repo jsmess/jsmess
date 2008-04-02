@@ -343,7 +343,7 @@ static MACHINE_DRIVER_START( ti81 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(96, 64)
 	MDRV_SCREEN_VISIBLE_AREA(0, 96-1, 0, 64-1)
-	MDRV_PALETTE_LENGTH(32*7 + 32768)
+	MDRV_PALETTE_LENGTH(224)
 	MDRV_PALETTE_INIT( ti85 )
 
 	MDRV_VIDEO_START( ti85 )
@@ -548,14 +548,14 @@ SYSTEM_CONFIG_START(ti86)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                        FLAGS */
-COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      NULL,   "Texas Instruments",    "TI-81",                        0 )
-COMP( 1992, ti85,       0,      0,      ti85,   ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        0 )
+COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      NULL,   "Texas Instruments",    "TI-81",                        GAME_NOT_WORKING )
+COMP( 1992, ti85,       0,      0,      ti85,   ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        GAME_NOT_WORKING )
 COMP( 1993, ti82,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-82",                        GAME_NOT_WORKING )
 COMP( 1996, ti83,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83",                        GAME_NOT_WORKING )
-COMP( 1997, ti86,       0,      0,      ti86,   ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        0 )
+COMP( 1997, ti86,       0,      0,      ti86,   ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        GAME_NOT_WORKING )
 COMP( 1999, ti83p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus",                   GAME_NOT_WORKING )
 /*
-COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus Silver Edition",    0 )
-COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus",                   0 )
-COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus Silver Edition",    0 )
+COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
+COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus",                   GAME_NOT_WORKING )
+COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus Silver Edition",    GAME_NOT_WORKING )
 */

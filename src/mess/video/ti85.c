@@ -30,7 +30,7 @@ static int ti_number_of_frames;
 
 static UINT8 * ti85_frames;
 
-const unsigned char ti85_palette[32*7][3] =
+const unsigned char ti85_colors[32*7][3] =
 {
 	{ 0xae, 0xcd, 0xb0 },  	{ 0xaa, 0xc9, 0xae },  	{ 0xa6, 0xc5, 0xad },  	{ 0xa3, 0xc1, 0xab },  	{ 0x9f, 0xbd, 0xaa },  	{ 0x9b, 0xb9, 0xa8 },  	{ 0x98, 0xb5, 0xa7 },  //0x00
 	{ 0xae, 0xcd, 0xb0 },  	{ 0xa9, 0xc8, 0xae },  	{ 0xa4, 0xc3, 0xac },  	{ 0xa0, 0xbe, 0xaa },  	{ 0x9b, 0xb9, 0xa8 },  	{ 0x96, 0xb4, 0xa6 },  	{ 0x92, 0xaf, 0xa4 },  //0x01
@@ -66,7 +66,7 @@ const unsigned char ti85_palette[32*7][3] =
 	{ 0x57, 0x74, 0x8c },  	{ 0x56, 0x73, 0x8b },  	{ 0x55, 0x72, 0x8b },  	{ 0x55, 0x71, 0x8b },  	{ 0x54, 0x70, 0x8a },  	{ 0x53, 0x6f, 0x8a },  	{ 0x53, 0x6f, 0x8a }  //0x1f
 };
 
-const unsigned short ti85_colortable[32][7] =
+const unsigned short ti85_palette[32][7] =
 {
 	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 },
 	{ 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d },
@@ -104,11 +104,19 @@ const unsigned short ti85_colortable[32][7] =
 
 PALETTE_INIT( ti85 )
 {
-	int used = sizeof (ti85_palette) / 3;
-	int i;
+	UINT8 i, j, r, g, b;
 
-	for (i = 0; i < used; i++)
-		palette_set_color_rgb(machine, i, ti85_palette[i][0], ti85_palette[i][1], ti85_palette[i][2]);
+	machine->colortable = colortable_alloc(machine, 224);
+
+	for ( i = 0; i < 224; i++ )
+	{
+		r = ti85_colors[i][0]; g = ti85_colors[i][1]; b = ti85_colors[i][2];
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+
+	for (i=0; i < 32; i++)
+		for (j=0; j < 7; j++)
+			colortable_entry_set_value(machine->colortable, i*7+j, ti85_palette[i][j]);
 
 	if (!strncmp(machine->gamedrv->name, "ti81", 4))
 	{
@@ -153,10 +161,10 @@ VIDEO_UPDATE( ti85 )
 
 	if (!ti85_LCD_status || !ti85_timer_interrupt_mask)
 	{
-        	for (y=0; y<ti_screen_y_size; y++)
+		for (y=0; y<ti_screen_y_size; y++)
 			for (x=0; x<ti_screen_x_size; x++)
 				for (b=0; b<8; b++)
-					*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_colortable[ti85_LCD_contrast&0x1f][6];
+					*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][6];
 		return 0;
 	}
 
@@ -179,7 +187,7 @@ VIDEO_UPDATE( ti85 )
 					  + ((*(ti85_frames+4*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
 					  + ((*(ti85_frames+5*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01);
 
-				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_colortable[ti85_LCD_contrast&0x1f][brightnes];
+				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][brightnes];
 	                }
 	return 0;
 }
