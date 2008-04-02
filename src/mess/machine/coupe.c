@@ -168,7 +168,7 @@ MACHINE_RESET( coupe )
 }
 
 
-DRIVER_INIT( coupe )
+MACHINE_START( coupe )
 {
     wd17xx_init(machine, WD_TYPE_1772, NULL, NULL);
 }
