@@ -2268,6 +2268,8 @@ static READ8_HANDLER ( amstrad_psg_porta_read )
    If keyboard matrix line 11-14 are selected, the byte is always &ff.
    After testing on a real CPC, it is found that these never change, they always return &FF. */
 
+	char port[16];
+
 	if (amstrad_keyboard_line > 10) 
 	{
 		return 0xFF;
@@ -2278,7 +2280,10 @@ static READ8_HANDLER ( amstrad_psg_porta_read )
 		if(aleste_mode == 0x08 && amstrad_keyboard_line == 10)
 			return 0xff;
 		amstrad_keyboard_line = 0xFF;
-		return (readinputport(amstrad_read_keyboard_line) & 0xFF);
+
+		sprintf(port, "keyboard_row_%d", amstrad_read_keyboard_line);
+
+		return (readinputportbytag(port) & 0xFF);
 	}
 }
 

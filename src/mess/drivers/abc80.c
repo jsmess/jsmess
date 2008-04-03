@@ -169,20 +169,23 @@ static void abc80_keyboard_scan(void)
 	int table = 0, row, col;
 
 	// shift, upper case
-	if (readinputport(7) & 0x07)
+	if (readinputportbytag("ROW7") & 0x07)
 	{
 		table |= 0x01;
 	}
 
 	// ctrl
-	if (readinputport(7) & 0x08)
+	if (readinputportbytag("ROW7") & 0x08)
 	{
 		table |= 0x02;
 	}
 
 	for (row = 0; row < 7; row++)
 	{
-		data = readinputport(row);
+		char port[5];
+		sprintf(port, "ROW%d", row);
+
+		data = readinputportbytag(port);
 
 		if (data != 0)
 		{

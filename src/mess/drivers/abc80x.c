@@ -273,7 +273,10 @@ static READ8_HANDLER( abc77_clock_r )
 
 static READ8_HANDLER( abc77_data_r )
 {
-	return readinputport(abc77_keylatch);
+	char port[4];
+	sprintf(port, "X%d", abc77_keylatch);
+
+	return readinputportbytag(port);
 }
 
 static WRITE8_HANDLER( abc77_data_w )

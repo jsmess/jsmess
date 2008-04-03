@@ -249,11 +249,12 @@ static WRITE8_HANDLER(apf_imagination_pia_out_b_func)
 	/* bit 7 = ??? */
 
 	int keyboard_line;
+	char port[5];
 
 	keyboard_line = data & 0x07;
 
-// TODO: convert to readinputbytag
-	keyboard_data = readinputport(keyboard_line+4);
+	sprintf(port, "key%d", keyboard_line);
+	keyboard_data = readinputportbytag(port);
 
 	/* bit 4: cassette motor control */
 	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),

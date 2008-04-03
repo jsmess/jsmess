@@ -178,11 +178,13 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 	int changed;
 	static int ox = 0, oy = 0;
 	int nx,ny;
-    int dx, dy;
+	int dx, dy;
+	char port[6];
 
 	for (i=0; i<4; i++)
 	{
-		current_input_port_data[i] = readinputport(i);
+		sprintf(port, "LINE%d", i);
+		current_input_port_data[i] = readinputportbytag(port);
 	}
 
 	changed = current_input_port_data[3]^previous_input_port_data[3];
@@ -220,14 +222,14 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 		previous_input_port_data[i] = current_input_port_data[i];
 	}
 
-	nx = readinputport(4);
+	nx = readinputportbytag("POSX");
 	if (nx>=0x800) nx-=0x1000;
 	else if (nx<=-0x800) nx+=0x1000;
 
 	dx = nx - ox;
 	ox = nx;
 
-	ny = readinputport(5);
+	ny = readinputportbytag("POSY");
 	if (ny>=0x800) ny-=0x1000;
 	else if (ny<=-0x800) ny+=0x1000;
 
@@ -403,6 +405,7 @@ static MACHINE_RESET( avigo )
 {
 	int i;
 	unsigned char *addr;
+	char port[6];
 
 	memset(avigo_banked_opbase, 0, sizeof(avigo_banked_opbase));
 
@@ -420,7 +423,8 @@ static MACHINE_RESET( avigo )
 	/* initialise settings for port data */
 	for (i=0; i<4; i++)
 	{
-		previous_input_port_data[i] = readinputport(i);
+		sprintf(port, "LINE%d", i);
+		previous_input_port_data[i] = readinputportbytag(port);
 	}
 
 	avigo_irq = 0;
@@ -476,17 +480,17 @@ static  READ8_HANDLER(avigo_key_data_read_r)
 
 	if (avigo_key_line & 0x01)
 	{
-		data &= readinputport(0);
+		data &= readinputportbytag("LINE0");
 	}
 
 	if (avigo_key_line & 0x02)
 	{
-		data &= readinputport(1);
+		data &= readinputportbytag("LINE1");
 	}
 
 	if (avigo_key_line & 0x04)
 	{
-		data &= readinputport(2);
+		data &= readinputportbytag("LINE2");
 
 	}
 
@@ -807,7 +811,7 @@ static ADDRESS_MAP_START( avigo_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x000, 0x000) AM_READ( avigo_unmapped_r)
-    AM_RANGE(0x001, 0x001) AM_READWRITE( avigo_key_data_read_r, avigo_set_key_line_w )
+	AM_RANGE(0x001, 0x001) AM_READWRITE( avigo_key_data_read_r, avigo_set_key_line_w )
 	AM_RANGE(0x002, 0x002) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x003, 0x003) AM_READWRITE( avigo_irq_r, avigo_irq_w )
 	AM_RANGE(0x004, 0x004) AM_READ( avigo_04_r)
@@ -815,12 +819,12 @@ static ADDRESS_MAP_START( avigo_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x006, 0x006) AM_READWRITE( avigo_rom_bank_h_r, avigo_rom_bank_h_w )
 	AM_RANGE(0x007, 0x007) AM_READWRITE( avigo_ram_bank_l_r, avigo_ram_bank_l_w )
 	AM_RANGE(0x008, 0x008) AM_READWRITE( avigo_ram_bank_h_r, avigo_ram_bank_h_w )
-    AM_RANGE(0x009, 0x009) AM_READWRITE( avigo_ad_control_status_r, avigo_ad_control_status_w )
+	AM_RANGE(0x009, 0x009) AM_READWRITE( avigo_ad_control_status_r, avigo_ad_control_status_w )
 	AM_RANGE(0x00a, 0x00f) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x010, 0x01f) AM_READWRITE( tc8521_r, tc8521_w )
 	AM_RANGE(0x020, 0x02c) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x028, 0x028) AM_WRITE( avigo_speaker_w)
-    AM_RANGE(0x02d, 0x02d) AM_READ( avigo_ad_data_r)
+	AM_RANGE(0x02d, 0x02d) AM_READ( avigo_ad_data_r)
 	AM_RANGE(0x02e, 0x02f) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x030, 0x037) AM_READWRITE( uart8250_0_r, uart8250_0_w )
 	AM_RANGE(0x038, 0x0ff) AM_READ( avigo_unmapped_r)
@@ -829,34 +833,34 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START(avigo)
-	PORT_START
+	PORT_START_TAG("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PAGE UP") PORT_CODE(KEYCODE_PGUP)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PAGE DOWN") PORT_CODE(KEYCODE_PGDN)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LIGHT") PORT_CODE(KEYCODE_L)
-	PORT_BIT (0x0f7, 0xf7, IPT_UNUSED)
+	PORT_BIT(0x0f7, 0xf7, IPT_UNUSED)
 
-	PORT_START
+	PORT_START_TAG("LINE1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TO DO") PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ADDRESS") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SCHEDULE") PORT_CODE(KEYCODE_S)
-	PORT_BIT (0x0f7, 0xf7, IPT_UNUSED)
+	PORT_BIT(0x0f7, 0xf7, IPT_UNUSED)
 
-	PORT_START
-    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEMO") PORT_CODE(KEYCODE_M)
-    PORT_BIT (0x0fe, 0xfe, IPT_UNUSED)
+	PORT_START_TAG("LINE2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEMO") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x0fe, 0xfe, IPT_UNUSED)
 
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_Q) PORT_CODE(JOYCODE_BUTTON1)
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2)
+	PORT_START_TAG("LINE3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_Q) PORT_CODE(JOYCODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2)
 
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
 	/* a cursor is drawn to indicate the position, so when a click is done, it will occur in the correct place */
-	PORT_START /* Mouse - X AXIS */
-	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	/* To be converted to crosshair code? */
+	PORT_START_TAG("POSX") /* Mouse - X AXIS */
+	PORT_BIT(0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
-	PORT_START /* Mouse - Y AXIS */
-	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
+	PORT_START_TAG("POSY") /* Mouse - Y AXIS */
+	PORT_BIT(0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 

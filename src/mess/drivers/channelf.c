@@ -47,7 +47,7 @@ static UINT8 port_read_with_latch(UINT8 ext, UINT8 latch_state)
 
 static  READ8_HANDLER( channelf_port_0_r )
 {
-	return port_read_with_latch(readinputport(0),latch[0]);
+	return port_read_with_latch(readinputportbytag("PANEL"),latch[0]);
 }
 
 static  READ8_HANDLER( channelf_port_1_r )
@@ -56,11 +56,11 @@ static  READ8_HANDLER( channelf_port_1_r )
 
 	if ((latch[0] & 0x40) == 0)
 	{
-		ext_value = readinputport(1);
+		ext_value = readinputportbytag("RIGHT_C");
 	}
 	else
 	{
-		ext_value = 0xc0 | readinputport(1);
+		ext_value = 0xc0 | readinputportbytag("RIGHT_C");
 	}
 	return port_read_with_latch(ext_value,latch[1]);
 }
@@ -71,7 +71,7 @@ static  READ8_HANDLER( channelf_port_4_r )
 
 	if ((latch[0] & 0x40) == 0)
 	{
-		ext_value = readinputport(2);
+		ext_value = readinputportbytag("LEFT_C");
 	}
 	else
 	{
@@ -196,14 +196,14 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( channelf )
-	PORT_START /* Front panel buttons */
+	PORT_START_TAG("PANEL") /* Front panel buttons */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_START )	/* TIME  (1) */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )	/* HOLD  (2) */
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 )	/* MODE  (3) */
 	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 )	/* START (4) */
 	PORT_BIT ( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START /* Right controller */
+	PORT_START_TAG("RIGHT_C") /* Right controller */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
@@ -213,7 +213,7 @@ static INPUT_PORTS_START( channelf )
 	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) /* PULL UP     */ PORT_PLAYER(1)
 	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1) /* PUSH DOWN   */ PORT_PLAYER(1)
 
-	PORT_START /* Left controller */
+	PORT_START_TAG("LEFT_C") /* Left controller */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
