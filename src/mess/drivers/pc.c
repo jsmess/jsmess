@@ -43,6 +43,7 @@ Tandy 1000 (80386) variations:
 #include "driver.h"
 #include "deprecat.h"
 #include "memconv.h"
+#include "devconv.h"
 
 #include "machine/8255ppi.h"
 #include "machine/uart8250.h"
@@ -161,7 +162,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE(dma8237_0_r,			dma8237_0_w)
 	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_0_r,			pic8259_0_w)
-	AM_RANGE(0x0040, 0x0043) AM_READWRITE(pit8253_0_r,			pit8253_0_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(ppi8255_0_r,			ppi8255_0_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,				pc_JOY_w)
@@ -186,11 +187,12 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
+DEV_READWRITE8TO16LE_LSB( pc_pit8253_16le, pit8253_r, pit8253_w )
 
 static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE(dma8237_16le_0_r,			dma8237_16le_0_w)
 	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_16le_0_r,			pic8259_16le_0_w)
-	AM_RANGE(0x0040, 0x0043) AM_READWRITE(pit8253_16le_0_r,			pit8253_16le_0_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(ppi8255_16le_0_r,			ppi8255_16le_0_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,			pc_page16le_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
@@ -231,7 +233,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE(dma8237_0_r,			dma8237_0_w)
 	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_0_r,			pic8259_0_w)
-	AM_RANGE(0x0040, 0x0043) AM_READWRITE(pit8253_0_r,			pit8253_0_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r,			europc_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,				pc_JOY_w)
@@ -271,7 +273,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(tandy1000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE(dma8237_0_r,				dma8237_0_w)
 	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_0_r,				pic8259_0_w)
-	AM_RANGE(0x0040, 0x0043) AM_READWRITE(pit8253_0_r,				pit8253_0_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r,			tandy1000_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
 	AM_RANGE(0x00c0, 0x00c0) AM_WRITE(								SN76496_0_w)
@@ -291,7 +293,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pc200_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE(dma8237_16le_0_r,				dma8237_16le_0_w)
 	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_16le_0_r,				pic8259_16le_0_w)
-	AM_RANGE(0x0040, 0x0043) AM_READWRITE(pit8253_16le_0_r,				pit8253_16le_0_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE(pc1640_16le_mouse_x_r,			pc1640_16le_mouse_x_w)
 	AM_RANGE(0x007a, 0x007b) AM_READWRITE(pc1640_16le_mouse_y_r,			pc1640_16le_mouse_y_w)
@@ -324,7 +326,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pc1640_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE(dma8237_16le_0_r,			dma8237_16le_0_w)
 	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_16le_0_r,			pic8259_16le_0_w)
-	AM_RANGE(0x0040, 0x0043) AM_READWRITE(pit8253_16le_0_r,			pit8253_16le_0_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
 	AM_RANGE(0x0070, 0x0071) AM_READWRITE(mc146818_port16le_r,		mc146818_port16le_w)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE(pc1640_16le_mouse_x_r,	pc1640_16le_mouse_x_w)
@@ -1126,6 +1128,32 @@ static const struct YM3812interface ym3812_interface =
 };
 #endif
 
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+{
+	pic8259_set_irq_line(0, 0, state);
+}
+ 
+
+static const struct pit8253_config pc_pit8253_config =
+{
+	{
+		{
+			4772720/4,				/* heartbeat IRQ */
+			pc_timer0_w,
+			NULL
+		}, {
+			4772720/4,				/* dram refresh */
+			NULL,
+			NULL
+		}, {
+			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			NULL,
+			pc_sh_speaker_change_clock
+		}
+	}
+};
+
+
 #define MDRV_CPU_PC(mem, port, type, clock, vblankfunc)	\
 	MDRV_CPU_ADD_TAG("main", type, clock)				\
 	MDRV_CPU_PROGRAM_MAP(mem##_map, 0)			\
@@ -1142,6 +1170,9 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_CPU_VBLANK_INT_HACK(pc_mda_frame_interrupt, 4)
 
 	MDRV_MACHINE_RESET(pc_mda)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_mda )
@@ -1174,6 +1205,9 @@ static MACHINE_DRIVER_START( pcherc )
 
 	MDRV_MACHINE_RESET(pc_mda)
 
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_hercules )
 
@@ -1200,6 +1234,9 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_CPU_PC(pc8, pc8, I8088, 4772720, pc_cga_frame_interrupt)	/* 4,77 Mhz */
 
 	MDRV_MACHINE_RESET(pc_cga)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1229,6 +1266,9 @@ static MACHINE_DRIVER_START( europc )
 
 	MDRV_MACHINE_RESET(pc_aga)
 
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_aga )
 
@@ -1252,6 +1292,9 @@ static MACHINE_DRIVER_START( xtcga )
 	MDRV_CPU_PC(pc16, pc16, I8086, 12000000, pc_cga_frame_interrupt)
 
 	MDRV_MACHINE_RESET(pc_cga)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1281,6 +1324,9 @@ static MACHINE_DRIVER_START( pc200 )
 
 	MDRV_MACHINE_RESET(pc_aga)
 
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc200 )
 
@@ -1297,6 +1343,9 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_CPU_PC(pc1640, pc1640, I8086, 8000000, pc_pc1512_frame_interrupt)
 
 	MDRV_MACHINE_RESET(pc_pc1512)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc1512 )
@@ -1316,6 +1365,9 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_CPU_PC(pc1640, pc1640, I8086, 8000000, pc_vga_frame_interrupt)
 
 	MDRV_MACHINE_RESET(pc_vga)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(pcvideo_pc1640)
@@ -1338,6 +1390,9 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_CPU_PC(pc16, pc16, I8086, 12000000, pc_vga_frame_interrupt)
 
 	MDRV_MACHINE_RESET(pc_vga)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )
@@ -1369,6 +1424,9 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_CPU_PC(tandy1000, tandy1000, I8088, 8000000, tandy1000_frame_interrupt)
 
 	MDRV_MACHINE_RESET(pc_t1t)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000 )

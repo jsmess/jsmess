@@ -9,6 +9,7 @@
 /* Core includes */
 #include "driver.h"
 #include "memconv.h"
+#include "devconv.h"
 #include "includes/bebox.h"
 
 /* Components */
@@ -45,6 +46,8 @@ static WRITE64_HANDLER( bebox_dma8237_1_w )
 	write64be_with_write8_handler(at_dma8237_1_w, machine, offset, data, mem_mask);
 }
 
+DEV_READWRITE8TO64BE( bebox_pit8254_64be, pit8253_r, pit8253_w )
+
 static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE( bebox_cpu0_imask_r, bebox_cpu0_imask_w )
 	AM_RANGE(0x7FFFF1F0, 0x7FFFF1F7) AM_READWRITE( bebox_cpu1_imask_r, bebox_cpu1_imask_w )
@@ -54,7 +57,7 @@ static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
 
 	AM_RANGE(0x80000000, 0x8000001F) AM_READWRITE( dma8237_64be_0_r, dma8237_64be_0_w )
 	AM_RANGE(0x80000020, 0x8000003F) AM_READWRITE( pic8259_64be_0_r, pic8259_64be_0_w )
-	AM_RANGE(0x80000040, 0x8000005f) AM_READWRITE( pit8253_64be_0_r, pit8253_64be_0_w )
+	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE(PIT8254, "pit8254", bebox_pit8254_64be_r, bebox_pit8254_64be_w)
 	AM_RANGE(0x80000060, 0x8000006F) AM_READWRITE( kbdc8042_64be_r, kbdc8042_64be_w )
 	AM_RANGE(0x80000070, 0x8000007F) AM_READWRITE( mc146818_port64be_r, mc146818_port64be_w )
 	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE( bebox_page_r, bebox_page_w)
@@ -103,6 +106,9 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_CPU_PROGRAM_MAP(bebox_mem, 0)
 
 	MDRV_INTERLEAVE(1)
+
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
+	MDRV_DEVICE_CONFIG( bebox_pit8254_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )

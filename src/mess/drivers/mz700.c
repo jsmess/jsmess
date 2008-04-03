@@ -66,6 +66,7 @@
 /* Core includes */
 #include "driver.h"
 #include "includes/mz700.h"
+#include "machine/pit8253.h"
 
 /* Devices */
 #include "devices/cassette.h"
@@ -255,6 +256,9 @@ static MACHINE_DRIVER_START(mz700)
 
 	MDRV_MACHINE_RESET( mz700 )
 
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( mz700_pit8253_config )
+
 	/* video hardware - include overscan */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -283,6 +287,9 @@ static MACHINE_DRIVER_START(mz800)
 	MDRV_CPU_IO_MAP(mz800_io, 0)
 
 	MDRV_MACHINE_RESET( mz700 )
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( mz700_pit8253_config )
 
 	/* video hardware - include overscan */
 	MDRV_SCREEN_ADD("main", RASTER)

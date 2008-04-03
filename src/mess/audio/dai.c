@@ -119,7 +119,7 @@ static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t 
 	}
 }
 
-void dai_sh_change_clock(double clock)
+void dai_sh_change_clock(const device_config *device, double clock)
 {
 	stream_update(mixer_channel);
 }

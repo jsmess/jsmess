@@ -84,7 +84,6 @@ static UINT32 nHPC_SCSI0Descriptor, nHPC_SCSI0DMACtrl;
 
 static const struct pit8253_config ip22_pit8254_config =
 {
-	TYPE8254,
 	{
 		{
 			1000000,				/* Timer 0: 1MHz */
@@ -254,22 +253,22 @@ static READ32_HANDLER( hpc3_pbus6_r )
 		return int3_regs[offset-0x80/4];
 		break;
 	case 0xb0/4:
-		ret8 = pit8253_0_r(machine, 0);
+		ret8 = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 0);
 		verboselog( 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 		break;
 	case 0xb4/4:
-		ret8 = pit8253_0_r(machine, 1);
+		ret8 = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 1);
 		verboselog( 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 		break;
 	case 0xb8/4:
-		ret8 = pit8253_0_r(machine, 2);
+		ret8 = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2);
 		verboselog( 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 		break;
 	case 0xbc/4:
-		ret8 = pit8253_0_r(machine, 3);
+		ret8 = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 3);
 		verboselog( 0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 		break;
@@ -362,22 +361,22 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 		break;
 	case 0xb0/4:
 		verboselog( 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_0_w(machine, 0, data & 0x000000ff);
+		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 0, data & 0x000000ff);
 		return;
 		break;
 	case 0xb4/4:
 		verboselog( 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_0_w(machine, 1, data & 0x000000ff);
+		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 1, data & 0x000000ff);
 		return;
 		break;
 	case 0xb8/4:
 		verboselog( 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_0_w(machine, 2, data & 0x000000ff);
+		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2, data & 0x000000ff);
 		return;
 		break;
 	case 0xbc/4:
 		verboselog( 0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_0_w(machine, 3, data & 0x000000ff);
+		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 3, data & 0x000000ff);
 		return;
 		break;
 	default:
@@ -1453,9 +1452,8 @@ static DRIVER_INIT( ip225015 )
 
 	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
 	// interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.
-	init_pc_common(PCCOMMON_KEYBOARD_AT | PCCOMMON_TIMER_NONE );
+	init_pc_common(PCCOMMON_KEYBOARD_AT);
 	kbdc8042_init(&at8042);
-	pit8253_init(1, &ip22_pit8254_config);
 
 	// SCSI init
 	wd33c93_init(&scsi_intf);
@@ -1587,6 +1585,9 @@ static MACHINE_DRIVER_START( ip225015 )
 
 	MDRV_MACHINE_RESET( ip225015 )
 	MDRV_NVRAM_HANDLER( ip22 )
+
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
+	MDRV_DEVICE_CONFIG( ip22_pit8254_config )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

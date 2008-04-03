@@ -173,6 +173,7 @@ I/O ports
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
 #include "includes/pmd85.h"
+#include "machine/pit8253.h"
 #include "formats/pmd_pmd.h"
 
 /* I/O ports */
@@ -531,6 +532,9 @@ static MACHINE_DRIVER_START( pmd85 )
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( pmd85 )
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pmd85_pit8253_interface )
 
 	/* video hardware */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

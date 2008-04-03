@@ -375,9 +375,8 @@ static const struct msm8251_interface pmd85_msm8251_interface =
 
 *******************************************************************************/
 
-static const struct pit8253_config pmd85_pit8253_interface =
+const struct pit8253_config pmd85_pit8253_interface =
 {
-	TYPE8253,
 	{
 		{ 0,		NULL,	NULL },
 		{ 2000000,	NULL,	NULL },
@@ -506,7 +505,7 @@ static WRITE8_HANDLER ( pmd85_ppi_3_portc_w )
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
 										return ppi8255_1_r(machine, offset & 0x03);
 								case 0x50:	/* 8253 */
-										return pit8253_0_r(machine, offset & 0x03);
+										return pit8253_r( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 0x03);
 								case 0x70:	/* 8255 (IMS-2) */
 										return ppi8255_2_r(machine, offset & 0x03);
 							}
@@ -581,7 +580,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 										ppi8255_1_w(machine, offset & 0x03, data);
 										break;
 								case 0x50:	/* 8253 */
-										pit8253_0_w(machine, offset & 0x03, data);
+										pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:	/* 8255 (IMS-2) */
@@ -774,12 +773,12 @@ static OPBASE_HANDLER(mato_opbaseoverride)
 
 static void pmd85_common_driver_init (running_machine *machine)
 {
+	device_config *pit8253 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
 	memory_set_opbase_handler(0, pmd85_opbaseoverride);
 
-	pit8253_init(1, &pmd85_pit8253_interface);
-	pit8253_0_gate_w(machine, 0, 1);
-	pit8253_0_gate_w(machine, 1, 1);
-	pit8253_0_gate_w(machine, 2, 1);
+	pit8253_gate_w(pit8253, 0, 1);
+	pit8253_gate_w(pit8253, 1, 1);
+	pit8253_gate_w(pit8253, 2, 1);
 
 	msm8251_init(&pmd85_msm8251_interface);
 
@@ -860,7 +859,6 @@ MACHINE_RESET( pmd85 )
 		case PMD85_3:
 		case ALFA:
 			msm8251_reset();
-			pit8253_reset(0);
 			break;
 		case MATO:
 			break;

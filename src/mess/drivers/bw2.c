@@ -299,21 +299,20 @@ static const ppi8255_interface bw2_ppi8255_interface =
 
 
 /* PIT */
-
-static void bw2_timer0_w(int state)
+static PIT8253_OUTPUT_CHANGED( bw2_timer0_w )
 {
 	msm8251_transmit_clock();
 	msm8251_receive_clock();
 }
 
-static void bw2_timer2_w(int state)
+
+static PIT8253_OUTPUT_CHANGED( bw2_timer2_w )
 {
 
 }
 
 static const struct pit8253_config bw2_pit8253_interface =
 {
-	TYPE8253,
 	{
 		{
 			XTAL_4MHz,	/* 8251 USART TXC, RXC */
@@ -394,7 +393,6 @@ static MACHINE_START( bw2 )
 	centronics_config(0, bw2_centronics_config);
 
 	msm8251_init(&bw2_msm8251_interface);
-	pit8253_init(1, &bw2_pit8253_interface);
 
 	ppi8255_init(&bw2_ppi8255_interface);
 
@@ -417,7 +415,7 @@ static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_READWRITE( ppi8255_0_r, ppi8255_0_w )
-	AM_RANGE( 0x10, 0x13 ) AM_READWRITE( pit8253_0_r, pit8253_0_w )
+	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE( PIT8253, "pit8253", pit8253_r, pit8253_w )
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE( MSM6255, MSM6255_TAG, msm6255_register_r, msm6255_register_w )
 
 	AM_RANGE( 0x40, 0x40 ) AM_READWRITE( msm8251_data_r, msm8251_data_w )
@@ -574,6 +572,9 @@ static MACHINE_DRIVER_START( bw2 )
 
 	MDRV_MACHINE_START( bw2 )
 	MDRV_MACHINE_RESET( bw2 )
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( bw2_pit8253_interface )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD( SCREEN_TAG, LCD )

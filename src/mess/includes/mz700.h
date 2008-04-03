@@ -15,6 +15,8 @@
 
 /*----------- defined in machine/mz700.c -----------*/
 
+const struct pit8253_config mz700_pit8253_config;
+
 DRIVER_INIT( mz700 );
 MACHINE_RESET( mz700 );
 

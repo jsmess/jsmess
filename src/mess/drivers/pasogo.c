@@ -296,7 +296,7 @@ static ADDRESS_MAP_START(pasogo_io, ADDRESS_SPACE_IO, 8)
 //	ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
 	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_0_r,			pic8259_0_w)
      AM_RANGE(0x26, 0x27) AM_READWRITE(vg230_io_r, vg230_io_w )
-	AM_RANGE(0x0040, 0x0043) AM_READWRITE(pit8253_0_r,			pit8253_0_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8254, "pit8254", pit8253_r, pit8253_w)
      AM_RANGE(0x6c, 0x6f) AM_READWRITE(ems_r, ems_w )
 ADDRESS_MAP_END
 
@@ -399,11 +399,34 @@ static int pasogo_irq_callback(int irqline)
 
 static MACHINE_RESET( pasogo )
 {
-  pit8253_reset(0);
   cpunum_set_irq_callback(0, pasogo_irq_callback);
 }
 
 //static const unsigned i86_address_mask = 0x000fffff;
+
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+{
+	pic8259_set_irq_line(0, 0, state);
+}
+
+static const struct pit8253_config pc_pit8254_config =
+{
+	{
+		{
+			4772720/4,				/* heartbeat IRQ */
+			pc_timer0_w,
+			NULL
+		}, {
+			4772720/4,				/* dram refresh */
+			NULL,
+			NULL
+		}, {
+			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			NULL,
+			//		pc_sh_speaker_change_clock
+		}
+	}
+};
 
 static MACHINE_DRIVER_START( pasogo )
      MDRV_CPU_ADD_TAG("main", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
@@ -413,6 +436,8 @@ MDRV_CPU_VBLANK_INT("main", pasogo_interrupt)
 //	MDRV_CPU_CONFIG(i86_address_mask)
 	MDRV_MACHINE_RESET( pasogo )
 
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
+	MDRV_DEVICE_CONFIG( pc_pit8254_config )
 
      MDRV_SCREEN_ADD("main", LCD)
      MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -438,31 +463,6 @@ ROM_START(pasogo)
 	ROM_REGION(0x80000,REGION_USER1, 0)
 ROM_END
 
-static void pc_timer0_w(int state)
-{
-	pic8259_set_irq_line(0, 0, state);
-}
-
-static const struct pit8253_config pc_pit8254_config =
-{
-	TYPE8254,
-	{
-		{
-			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
-		}, {
-			4772720/4,				/* dram refresh */
-			NULL,
-			NULL
-		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL,
-			//			pc_sh_speaker_change_clock
-		}
-	}
-};
-
 static void pasogo_pic_set_int_line(int which, int interrupt)
 {
   cpunum_set_input_line(Machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
@@ -474,7 +474,6 @@ static DRIVER_INIT( pasogo )
   memset(&ems, 0, sizeof(ems));
   memory_set_bankptr( 27, memory_region(REGION_USER1) + 0x00000 );
   memory_set_bankptr( 28, memory_region(REGION_CPU1) + 0xb8000/*?*/ );
-  pit8253_init(1, &pc_pit8254_config);
   pic8259_init(1, pasogo_pic_set_int_line);
 }
 

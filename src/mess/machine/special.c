@@ -206,9 +206,8 @@ DRIVER_INIT(specimx)
 	memset(mess_ram,0,128*1024);
 }
 
-static const struct pit8253_config specimx_pit8253_intf =
+const struct pit8253_config specimx_pit8253_intf =
 {
-	TYPE8253,
 	{
 		{
 			2000000,
@@ -232,20 +231,20 @@ MACHINE_START( specimx )
 {
 	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
 	wd17xx_set_density (DEN_FM_HI);
-	pit8253_init(1, &specimx_pit8253_intf);
 }
 
 MACHINE_RESET( specimx )
 {
+	device_config *pit8253 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
+
 	ppi8255_init(&specialist_ppi8255_interface);
 	specimx_set_bank(2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;	
 	wd17xx_reset();
 	wd17xx_set_side(0);
-	pit8253_reset(0);
-	pit8253_0_gate_w(machine, 0, 0);
-	pit8253_0_gate_w(machine, 1, 0);
-	pit8253_0_gate_w(machine, 2, 0);
+	pit8253_gate_w(pit8253, 0, 0);
+	pit8253_gate_w(pit8253, 1, 0);
+	pit8253_gate_w(pit8253, 2, 0);
 }
 
 READ8_HANDLER ( specimx_disk_ctrl_r )
@@ -305,7 +304,7 @@ DEVICE_IMAGE_LOAD( specimx_floppy )
 WRITE8_HANDLER( specimx_sound_w)
 {
 	
-		pit8253_0_w(machine,offset,data);		
+		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ),offset,data);		
 }
 
 

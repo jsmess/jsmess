@@ -10,6 +10,8 @@
 
 /*----------- defined in machine/pmd85.c -----------*/
 
+extern const struct pit8253_config pmd85_pit8253_interface;
+
  READ8_HANDLER ( pmd85_io_r );
 WRITE8_HANDLER ( pmd85_io_w );
  READ8_HANDLER ( mato_io_r );

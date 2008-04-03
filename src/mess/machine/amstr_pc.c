@@ -154,6 +154,7 @@ WRITE8_HANDLER( pc1640_port60_w )
 		pc1640.port61=data;
 		if (data==0x30) pc1640.port62=(pc1640.port65&0x10)>>4;
 		else if (data==0x34) pc1640.port62=pc1640.port65&0xf;
+		pit8253_gate_w( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
 		pc_sh_speaker(machine, data&3);
 		pc_keyb_set_clock(data&0x40);
 		break;

@@ -30,6 +30,7 @@ const struct CustomSound_interface pc_sound_interface =
 
 static sound_stream *channel;
 static int speaker_gate = 0;
+static int baseclock;
 
 
 
@@ -43,6 +44,7 @@ static int pc_sh_start(void)
 {
 	logerror("pc_sh_start\n");
 	channel = stream_create(0, 1, Machine->sample_rate, 0, pc_sh_update);
+	baseclock = 4772720/4;
     return 0;
 }
 
@@ -59,7 +61,6 @@ static void *pc_sh_custom_start(int clock, const struct CustomSound_interface *c
 void pc_sh_speaker(running_machine *machine, int data)
 {
 	int mode = 0;
-	pit8253_0_gate_w(machine, 2, data & 1);
 
 	switch( data )
 	{
@@ -90,9 +91,10 @@ void pc_sh_speaker(running_machine *machine, int data)
     }
 }
 
-void pc_sh_speaker_change_clock(double pc_clock)
+void pc_sh_speaker_change_clock(const device_config *device, double pc_clock)
 {
     stream_update(channel);
+	baseclock = pit8253_get_frequency( device, 2 );
 }
 
 
@@ -109,9 +111,7 @@ void pc_sh_update(void *param, stream_sample_t **inputs, stream_sample_t **outpu
 	stream_sample_t *buffer = outputs[0];
 	static int incr = 0;
 	stream_sample_t *sample = buffer;
-	int baseclock, rate = Machine->sample_rate / 2;
-
-	baseclock = pit8253_get_frequency(0, 2);
+	int rate = Machine->sample_rate / 2;
 
 	switch( speaker_gate ) {
 	case 0:

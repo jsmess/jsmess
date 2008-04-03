@@ -12,6 +12,8 @@
 
 /*----------- defined in machine/bebox.c -----------*/
 
+extern const struct pit8253_config bebox_pit8254_config;
+
 MACHINE_RESET( bebox );
 DRIVER_INIT( bebox );
 NVRAM_HANDLER( bebox );

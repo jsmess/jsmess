@@ -698,15 +698,14 @@ static const struct dma8237_interface bebox_dma =
  *
  *************************************/
 
-static void bebox_timer0_w(int state)
+static void bebox_timer0_w(const device_config *device, int state)
 {
 	pic8259_set_irq_line(0, 0, state);
 }
 
 
-static const struct pit8253_config bebox_pit8254_config =
+const struct pit8253_config bebox_pit8254_config =
 {
-	TYPE8254,
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
@@ -1018,7 +1017,6 @@ DRIVER_INIT( bebox )
 	pic8259_init(2, bebox_pic_set_int_line);
 	ide_controller_init_custom(0, &bebox_ide_interface, NULL);
 	pc_vga_init(&bebox_vga_interface, &cirrus_svga_interface);
-	pit8253_init(1, &bebox_pit8254_config);
 	kbdc8042_init(&bebox_8042_interface);
 
 	dma8237_init(2);

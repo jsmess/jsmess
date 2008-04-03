@@ -10,6 +10,7 @@
  ***************************************************************************/
 
 #include "driver.h"
+#include "machine/pit8253.h"
 #include "includes/mz700.h"
 
 

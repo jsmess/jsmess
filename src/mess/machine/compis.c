@@ -460,10 +460,8 @@ WRITE16_HANDLER ( compis_ppi_w )
 /*  PIT 8253                                                               */
 /*-------------------------------------------------------------------------*/
 
-static const struct pit8253_config compis_pit_config[2] =
+const struct pit8253_config compis_pit8253_config =
 {
-{
-	TYPE8253,
 	{
 		/* Timer0 */
 		{4770000/4, NULL, NULL },
@@ -472,42 +470,42 @@ static const struct pit8253_config compis_pit_config[2] =
 		/* Timer2 */
 		{4770000/4, NULL, NULL }
 	}
-},
-{
-	TYPE8254,
-	{
-		/* Timer0 */
-		{4770000/4, NULL, NULL },
-		/* Timer1 */
-		{4770000/4, NULL, NULL },
-		/* Timer2 */
-		{4770000/4, NULL, NULL }
-	}
-}
 };
 
-READ16_HANDLER ( compis_pit_r )
+const struct pit8253_config compis_pit8254_config =
 {
-	return pit8253_0_r(machine, offset);
+	{
+		/* Timer0 */
+		{4770000/4, NULL, NULL },
+		/* Timer1 */
+		{4770000/4, NULL, NULL },
+		/* Timer2 */
+		{4770000/4, NULL, NULL }
+	}
+};
+
+READ16_DEVICE_HANDLER ( compis_pit_r )
+{
+	return pit8253_r(device, offset);
 }
 
-WRITE16_HANDLER ( compis_pit_w )
+WRITE16_DEVICE_HANDLER ( compis_pit_w )
 {
-	pit8253_0_w(machine, offset , data);
+	pit8253_w(device, offset , data);
 }
 
 /*-------------------------------------------------------------------------*/
 /*  OSP PIT 8254                                                           */
 /*-------------------------------------------------------------------------*/
 
-READ16_HANDLER ( compis_osp_pit_r )
+READ16_DEVICE_HANDLER ( compis_osp_pit_r )
 {
-	return pit8253_1_r(machine, offset);
+	return pit8253_r(device, offset);
 }
 
-WRITE16_HANDLER ( compis_osp_pit_w )
+WRITE16_DEVICE_HANDLER ( compis_osp_pit_w )
 {
-	pit8253_1_w(machine, offset, data);
+	pit8253_w(device, offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1580,9 +1578,6 @@ MACHINE_RESET( compis )
 {
 	/* CPU */
 	compis_cpu_init();
-
-	/* OSP PIT 8254 */
-	pit8253_init(2, compis_pit_config);
 
 	/* PPI */
 	ppi8255_init(&compis_ppi_interface);

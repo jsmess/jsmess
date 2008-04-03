@@ -70,7 +70,7 @@ static ADDRESS_MAP_START(specimx_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xffe9, 0xffe9 ) AM_READWRITE(wd17xx_track_r,wd17xx_track_w) 
     AM_RANGE( 0xffea, 0xffea ) AM_READWRITE(wd17xx_sector_r,wd17xx_sector_w) 
     AM_RANGE( 0xffea, 0xffeb ) AM_READWRITE(wd17xx_data_r,wd17xx_data_w) 
-    AM_RANGE( 0xffec, 0xffef ) AM_READWRITE(pit8253_0_r, specimx_sound_w)
+    AM_RANGE( 0xffec, 0xffef ) AM_DEVREAD(PIT8253, "pit8253", pit8253_r) AM_WRITE(specimx_sound_w)
     AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
     AM_RANGE( 0xfff8, 0xfff8 ) AM_READWRITE(specimx_video_color_r,specimx_video_color_w) 
     AM_RANGE( 0xfffc, 0xfffe ) AM_WRITE(specimx_select_bank)     
@@ -317,7 +317,10 @@ static MACHINE_DRIVER_START( special )
     MDRV_CPU_ADD_TAG("main", 8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(specialist_mem, 0) 
     MDRV_MACHINE_RESET( special )
- 		
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( specimx_pit8253_intf )
+
     /* video hardware */    	
 		MDRV_SCREEN_ADD("main", RASTER)      	
 		MDRV_SCREEN_REFRESH_RATE(50)

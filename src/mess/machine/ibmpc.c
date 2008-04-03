@@ -172,7 +172,7 @@ static struct {
 		}
 	} else {
 		if ( pc_ppi.portb & 0x01 ) {
-			data = ( data & ~0x10 ) | ( pit8253_get_output( 0, 2 ) ? 0x10 : 0x00 );
+			data = ( data & ~0x10 ) | ( pit8253_get_output( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2 ) ? 0x10 : 0x00 );
 		}
 	}
 	return data;
@@ -190,6 +190,7 @@ WRITE8_HANDLER ( pc_ppi_portb_w )
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
 	pc_ppi.keyboard_disabled = data & 0x80;
+	pit8253_gate_w( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
 	pc_sh_speaker(machine, data & 0x03);
 	pc_keyb_set_clock(data & 0x40);
 

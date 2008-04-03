@@ -58,13 +58,12 @@ static const ppi8255_interface ppi8255 = {
 static int pio_port_a_output;
 static int pio_port_c_output;
 
-static void pit_clk_0(double clock);
-static void pit_clk_1(double clock);
-static void pit_irq_2(int which);
+static PIT8253_FREQUENCY_CHANGED( pit_clk_0 );
+static PIT8253_FREQUENCY_CHANGED( pit_clk_1 );
+static PIT8253_OUTPUT_CHANGED( pit_irq_2 );
 
-static const struct pit8253_config pit8253 =
+const struct pit8253_config mz700_pit8253_config =
 {
-	TYPE8253,
 	{
 		/* clockin	  irq callback	 clock change callback */
 		{ 1108800.0,  NULL, 		 pit_clk_0	 },
@@ -84,7 +83,6 @@ static TIMER_CALLBACK(ne556_callback)
 DRIVER_INIT( mz700 )
 {
 	ppi8255_init(&ppi8255);
-	pit8253_init(1, &pit8253);
 
 	videoram_size = 0x5000;
 	videoram = auto_malloc(videoram_size);
@@ -109,20 +107,20 @@ MACHINE_RESET( mz700 )
 /************************ PIT ************************************************/
 
 /* timer 0 is the clock for the speaker output */
-static void pit_clk_0(double clockout)
+static PIT8253_FREQUENCY_CHANGED( pit_clk_0 )
 {
 	beep_set_state(0, 1);
-    beep_set_frequency(0, clockout);
+    beep_set_frequency(0, frequency);
 }
 
 /* timer 1 is the clock for timer 2 clock input */
-static void pit_clk_1(double clockout)
+static PIT8253_FREQUENCY_CHANGED( pit_clk_1 )
 {
-	pit8253_set_clockin(0, 2, clockout);
+	pit8253_set_clockin(0, 2, frequency);
 }
 
 /* timer 2 is the AM/PM (12 hour) interrupt */
-static void pit_irq_2(int which)
+static PIT8253_OUTPUT_CHANGED( pit_irq_2 )
 {
 	/* INTMSK: interrupt enabled? */
     if (pio_port_c_output & 0x04)
@@ -235,7 +233,7 @@ READ8_HANDLER ( mz700_mmio_r )
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = pit8253_0_r(machine, offset & 3);
+		data = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 3);
         break;
 
 	case 8:
@@ -260,12 +258,12 @@ WRITE8_HANDLER ( mz700_mmio_w )
 
 	/* the next four ports are connected to a 8253 PIT */
     case 4: case 5: case 6: case 7:
-		pit8253_0_w(machine, offset & 3, data);
+		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 3, data);
 		break;
 
 	case 8:
 		LOG(1,"mz700_e008_w",("%02X\n", data));
-		pit8253_0_gate_w(machine, 0, data & 1);
+		pit8253_gate_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 0, data & 1);
         break;
 	}
 }
@@ -517,7 +515,7 @@ static UINT8 mz800_palette_bank;
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = pit8253_0_r(machine, offset & 3);
+		data = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 3);
         break;
 
 	default:

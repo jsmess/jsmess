@@ -100,9 +100,8 @@ static const ppi8255_interface dai_ppi82555_intf =
 	{ NULL, NULL },		/* Port C read */
 };
 
-static const struct pit8253_config dai_pit8253_intf =
+const struct pit8253_config dai_pit8253_intf =
 {
-	TYPE8253,
 	{
 		{
 			2000000,
@@ -131,7 +130,6 @@ MACHINE_START( dai )
 
 	tms5501_init(0, &dai_tms5501_init_param);
 	ppi8255_init(&dai_ppi82555_intf);
-	pit8253_init(1, &dai_pit8253_intf);
 
 	timer_set(attotime_zero, NULL, 0, dai_bootstrap_callback);
 }
