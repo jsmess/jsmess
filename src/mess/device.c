@@ -681,7 +681,6 @@ const device_config *image_from_devtype_and_index(iodevice_t type, int id)
 	const device_config *dev;
 	const struct IODevice *iodev;
 
-	assert((Machine->images_data->multiple_dev_mask & (1 << type)) == 0);
 	assert(id < device_count(Machine, type));
 
 	for (dev = device_list_first(Machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
@@ -689,12 +688,16 @@ const device_config *image_from_devtype_and_index(iodevice_t type, int id)
 		iodev = mess_device_from_core_device(dev);
 		if ((type == iodev->type) && (iodev->index_in_device == id))
 		{
+			/* if 'image' is not null, that means that there are multiple devices of this iodevice_t type */
+			assert(image == NULL);
+
 			image = dev;
 			break;
 		}
 	}
 
-	assert(image);
+	/* by calling this function, the caller assumes that there will be a matching device */
+	assert(image != NULL);
 	return image;
 }
 

@@ -74,7 +74,6 @@ struct _image_slot_data
 
 struct _images_private
 {
-	UINT32 multiple_dev_mask;
 	int slot_count;
 	image_slot_data slots[1];
 };
@@ -114,9 +113,7 @@ static void memory_error(const char *message)
 void image_init(running_machine *machine)
 {
 	int count, indx;
-	UINT32 mask, dev_mask = 0, multiple_dev_mask = 0;
 	const device_config *dev;
-	const struct IODevice *iodev;
 	size_t private_size;
 	image_slot_data *slot;
 
@@ -125,24 +122,7 @@ void image_init(running_machine *machine)
 	assert(DEVINFO_FCT_IMAGE_LAST < DEVINFO_FCT_DEVICE_SPECIFIC);
 
 	/* first count all images, and identify multiply defined devices */
-	count = 0;
-	for (dev = image_device_first(machine->config); dev != NULL; dev = image_device_next(dev))
-	{
-		/* weird check only relevant on the first legacy MESS device */
-		iodev = mess_device_from_core_device(dev);
-		if ((iodev != NULL) && (iodev->index_in_device == 0))
-		{
-			/* check to see if this device type is used multiple times */
-			mask = 1 << iodev->type;
-			if (dev_mask & mask)
-				multiple_dev_mask |= mask;
-			else
-				dev_mask |= mask;
-		}
-
-		/* increment the count */
-		count++;
-	}
+	count = image_device_count(machine->config);
 
 	/* allocate the private structure */
 	private_size = sizeof(*machine->images_data) + ((count - 1)
@@ -151,7 +131,6 @@ void image_init(running_machine *machine)
 	memset(machine->images_data, '\0', private_size);
 
 	/* some setup */
-	machine->images_data->multiple_dev_mask = multiple_dev_mask;
 	machine->images_data->slot_count = count;
 
 	/* initialize the devices */
