@@ -14,13 +14,12 @@
 #include "fileio.h"
 #include "utils.h"
 #include "opresolv.h"
-#include "device.h"
 #include "osdmess.h"
 
 
 
 /***************************************************************************
-    CONSTANTS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef enum
@@ -185,25 +184,6 @@ void image_battery_save(const device_config *img, const void *buffer, int length
 
 int image_absolute_index(const device_config *image);
 const device_config *image_from_absolute_index(int absolute_index);
-
-
-
-/****************************************************************************
-  Deprecated functions
-
-  The usage of these functions is to be phased out.  The first group because
-  they reflect the outdated fixed relationship between devices and their
-  type/id.
-****************************************************************************/
-
-int image_index_in_device(const device_config *img);
-const device_config *image_from_device(const struct IODevice *dev);
-const device_config *image_from_devtag_and_index(const char *devtag, int id);
-
-/* deprecated; as there can be multiple devices of a certain type */
-iodevice_t image_devtype(const device_config *img);
-const device_config *image_from_devtype_and_index(iodevice_t type, int id);
-
 
 
 

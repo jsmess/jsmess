@@ -13,7 +13,6 @@
 
 struct SystemConfigurationParamBlock;
 
-#include "device.h"
 #include "image.h"
 #include "artworkx.h"
 #include "memory.h"

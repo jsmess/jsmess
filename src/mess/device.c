@@ -8,9 +8,10 @@
 
 #include <stddef.h>
 
-#include "device.h"
-#include "mslegacy.h"
 #include "driver.h"
+#include "device.h"
+#include "deprecat.h"
+#include "mslegacy.h"
 #include "pool.h"
 #include "tagpool.h"
 
@@ -617,6 +618,84 @@ void *image_alloctag(const device_config *device, const char *tag, size_t size)
 void *image_lookuptag(const device_config *device, const char *tag)
 {
 	return tagpool_lookup(&get_token(device)->tagpool, tag);
+}
+
+
+
+/*************************************
+ *
+ *	Deprecated device access functions
+ *
+ *************************************/
+
+int image_index_in_device(const device_config *image)
+{
+	const struct IODevice *iodev = mess_device_from_core_device(image);
+	assert(iodev != NULL);
+	return iodev->index_in_device;
+}
+
+
+
+const device_config *image_from_device(const struct IODevice *device)
+{
+	return device->devconfig;
+}
+
+
+
+const device_config *image_from_devtag_and_index(const char *devtag, int id)
+{
+	const device_config *image = NULL;
+	const device_config *dev;
+	const struct IODevice *iodev;
+
+	for (dev = device_list_first(Machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	{
+		iodev = mess_device_from_core_device(dev);
+		if ((iodev->tag != NULL) && !strcmp(iodev->tag, devtag) && (iodev->index_in_device == id))
+		{
+			image = dev;
+			break;
+		}
+	}
+
+	assert(image != NULL);
+	return image;
+}
+
+
+
+iodevice_t image_devtype(const device_config *image)
+{
+	const struct IODevice *iodev = mess_device_from_core_device(image);
+	assert(iodev != NULL);
+	return iodev->type;
+}
+
+
+
+const device_config *image_from_devtype_and_index(iodevice_t type, int id)
+{
+	const device_config *image = NULL;
+	const device_config *dev;
+	const struct IODevice *iodev;
+
+	assert((Machine->images_data->multiple_dev_mask & (1 << type)) == 0);
+	assert(id < device_count(Machine, type));
+
+	for (dev = device_list_first(Machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	{
+		iodev = mess_device_from_core_device(dev);
+		if ((type == iodev->type) && (iodev->index_in_device == id))
+		{
+			image = dev;
+			break;
+		}
+	}
+
+	assert(image);
+	return image;
 }
 
 

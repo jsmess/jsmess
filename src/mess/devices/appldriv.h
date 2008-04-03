@@ -10,6 +10,7 @@
 #define APPLDRIV_H
 
 #include "mame.h"
+#include "device.h"
 
 
 enum
