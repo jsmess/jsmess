@@ -1,4 +1,8 @@
 /***************************************************************************
+
+	NOTE: ****** Specbusy: press N, R, or E to boot *************
+
+
         Spectrum/Inves/TK90X etc. memory map:
 
     CPU:
@@ -1479,7 +1483,7 @@ static  READ8_HANDLER(betadisk_r)
 }
 #endif
 
-static void	 betadisk_init(running_machine *machine)
+MACHINE_START( scorpion )
 {
 	betadisk_active = 0;
 	betadisk_status = 0x03f;
@@ -1719,8 +1723,6 @@ static MACHINE_RESET( scorpion )
 	scorpion_256_port_1ffd_data = 0;
 
 	scorpion_update_memory();
-
-	betadisk_init(machine);
 }
 
 /****************************************************************************************************/
@@ -1755,8 +1757,6 @@ static MACHINE_RESET( pentagon )
 	/* Bank 2 is always in 0x8000 - 0xbfff */
 	memory_set_bankptr(3, spectrum_ram + (2<<14));
 	memory_set_bankptr(7, spectrum_ram + (2<<14));
-
-	betadisk_init(machine);
 }
 
 /****************************************************************************************************/
@@ -2092,6 +2092,7 @@ static MACHINE_DRIVER_START( scorpion )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(scorpion_io, 0)
+	MDRV_MACHINE_START( scorpion )
 	MDRV_MACHINE_RESET( scorpion )
 MACHINE_DRIVER_END
 
@@ -2100,6 +2101,7 @@ static MACHINE_DRIVER_START( pentagon )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(pentagon_io, 0)
+	MDRV_MACHINE_START( scorpion )
 	MDRV_MACHINE_RESET( pentagon )
 MACHINE_DRIVER_END
 
@@ -2394,17 +2396,17 @@ COMP( 1984, tc2048,   spectrum, 0,		tc2048,			spectrum,	0,		tc2048,		"Timex of P
 COMP( 1983, ts2068,   spectrum, 0,		ts2068,			spectrum,	0,		ts2068,		"Timex Sinclair",	"TS-2068" , 0)
 COMP( 1986, uk2086,   spectrum, 0,		uk2086,			spectrum,	0,		ts2068,		"Unipolbrit",	"UK-2086 ver. 1.2" , 0)
 
-COMP( 1986, spec128,  0,		 0,		spectrum_128,	spectrum,	0,		spectrum,	"Sinclair Research",    "ZX Spectrum 128" ,GAME_NOT_WORKING)
-COMP( 1985, spec128s, spec128,  0,		spectrum_128,	spectrum,	0,		spectrum,	"Sinclair Research",    "ZX Spectrum 128 (Spain)" ,GAME_NOT_WORKING)
-COMP( 1986, specpls2, spec128,  0,		spectrum_128,	spectrum,	0,		spectrum,	"Amstrad plc",          "ZX Spectrum +2" ,GAME_NOT_WORKING)
-COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +2a" ,GAME_NOT_WORKING)
-COMP( 1987, specpls3, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3" ,GAME_NOT_WORKING)
+COMP( 1986, spec128,  0,		 0,		spectrum_128,	spectrum,	0,		spectrum,	"Sinclair Research",    "ZX Spectrum 128" , 0 )
+COMP( 1985, spec128s, spec128,  0,		spectrum_128,	spectrum,	0,		spectrum,	"Sinclair Research",    "ZX Spectrum 128 (Spain)" , 0 )
+COMP( 1986, specpls2, spec128,  0,		spectrum_128,	spectrum,	0,		spectrum,	"Amstrad plc",          "ZX Spectrum +2" , 0 )
+COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +2a" , 0 )
+COMP( 1987, specpls3, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3" , 0 )
 
-COMP( 1986, specp2fr, spec128,  0,		spectrum_128,	spectrum,	0,		spectrum,	"Amstrad plc",          "ZX Spectrum +2 (France)" ,GAME_NOT_WORKING)
-COMP( 1986, specp2sp, spec128,  0,		spectrum_128,	spectrum,	0,		spectrum,	"Amstrad plc",          "ZX Spectrum +2 (Spain)" ,GAME_NOT_WORKING)
-COMP( 1987, specp3sp, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3 (Spain)" ,GAME_NOT_WORKING)
-COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e" , GAME_NOT_WORKING|GAME_COMPUTER_MODIFIED )
-COMP( 2000, specp3es, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e (Spain)" , GAME_NOT_WORKING|GAME_COMPUTER_MODIFIED )
+COMP( 1986, specp2fr, spec128,  0,		spectrum_128,	spectrum,	0,		spectrum,	"Amstrad plc",          "ZX Spectrum +2 (France)" , 0 )
+COMP( 1986, specp2sp, spec128,  0,		spectrum_128,	spectrum,	0,		spectrum,	"Amstrad plc",          "ZX Spectrum +2 (Spain)" , 0 )
+COMP( 1987, specp3sp, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3 (Spain)" , 0 )
+COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )
+COMP( 2000, specp3es, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e (Spain)" , GAME_COMPUTER_MODIFIED )
 
-COMP( ????, scorpion, 0,		 0,		scorpion,		spectrum,	0,		specpls3,	"Zonov and Co.",		"Zs Scorpion 256", GAME_NOT_WORKING)
+COMP( ????, scorpion, 0,		 0,		scorpion,		spectrum,	0,		specpls3,	"Zonov and Co.",		"Zs Scorpion 256", 0 )
 COMP( ????, pentagon, spectrum, 0,		pentagon,		spectrum,	0,		specpls3,	"???",		"Pentagon", GAME_NOT_WORKING)

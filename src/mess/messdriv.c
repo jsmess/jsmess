@@ -444,8 +444,7 @@ TESTDRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
 	DRIVER( specp3sp )	/* 1987 ZX Spectrum +3 (Spain)						*/
 	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
 	DRIVER( specp3es )	/* 2000 ZX Spectrum +3e (Spain)						*/
-
-TESTDRIVER( scorpion )
+	DRIVER( scorpion )
 TESTDRIVER( pentagon )
 
 	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
