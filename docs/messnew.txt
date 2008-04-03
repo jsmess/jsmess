@@ -1,4 +1,4 @@
-﻿0.124.1
+0.124.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -9,6 +9,8 @@ New System Drivers Supported (in no particular order):
 System Driver Changes:
 ----------------------
 - [ABC80] Fixed so that it boots and keyboard works. [Robbbert]
+
+- [BW2] Added MSM6255 LCD controller emulation. [Curt Coder]
 
 - [IBMPC,IBM5150] Renamed ibmpc driver to ibm5150.  [Wilbert Pol]
 

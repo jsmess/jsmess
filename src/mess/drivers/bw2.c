@@ -34,7 +34,10 @@
 #include "machine/pit8253.h"
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
+#include "video/msm6255.h"
 
+#define SCREEN_TAG	"main"
+#define MSM6255_TAG	"ic49"
 
 /* Memory */
 
@@ -51,7 +54,40 @@ static void bw2_set_banks(UINT8 data)
 	Y7	/RAM7	ROM
 	*/
 
-	memory_set_bank(1, data);
+	int bank = data & 0x07;
+
+	switch(bank)
+	{
+	case 0:
+	case 1:
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		break;
+
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+		if (mess_ram_size < ((bank + 1) * 32 * 1024))
+		{
+			memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
+		}
+		else
+		{
+			memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		}
+		break;
+
+	case 7:
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
+		break;
+	}
+
+	memory_set_bank(1, bank);
 }
 
 
@@ -332,37 +368,11 @@ static VIDEO_START( bw2 )
 
 static VIDEO_UPDATE( bw2 )
 {
-	UINT16 ma = 0;
-	int sx, x, y;
+	const device_config *msm6255 = device_list_find_by_tag(screen->machine->config->devicelist, MSM6255, MSM6255_TAG);
 
-	for (y = 0; y < 200; y++)
-	{
-		for (sx = 0; sx < 80; sx++)
-		{
-			UINT8 data = videoram[ma];
-
-			for (x = 0; x < 8; x++)
-			{
-				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = BIT(data, 7);
-
-				data <<= 1;
-			}
-
-			ma++;
-		}
-	}
+	msm6255_update(msm6255, bitmap, cliprect);
 
 	return 0;
-}
-
-static WRITE8_HANDLER( bw2_msm6255_lcd_data_w )
-{
-	logerror("MSM6255 LCD - data write = %02x\n", data);
-}
-
-static WRITE8_HANDLER( bw2_msm6255_lcd_instr_w )
-{
-	logerror("MSM6255 LCD - instr write = %02x\n", data);
 }
 
 
@@ -393,11 +403,7 @@ static MACHINE_START( bw2 )
 
 	memory_configure_bank(1, 0, 1, mess_ram, 0);
 	memory_configure_bank(1, 1, 1, videoram, 0);
-	memory_configure_bank(1, 2, 1, mess_ram, 0);
-	memory_configure_bank(1, 3, 1, mess_ram, 0);
-	memory_configure_bank(1, 4, 1, mess_ram, 0);
-	memory_configure_bank(1, 5, 1, mess_ram, 0);
-	memory_configure_bank(1, 6, 1, mess_ram, 0);
+	memory_configure_bank(1, 2, 5, mess_ram + 0x4000, 0x4000);
 	memory_configure_bank(1, 7, 1, memory_region(REGION_CPU1), 0);
 }
 
@@ -412,8 +418,8 @@ static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_READWRITE( ppi8255_0_r, ppi8255_0_w )
 	AM_RANGE( 0x10, 0x13 ) AM_READWRITE( pit8253_0_r, pit8253_0_w )
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE( bw2_msm6255_lcd_data_w )
-	AM_RANGE( 0x21, 0x21 ) AM_WRITE( bw2_msm6255_lcd_instr_w )
+	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE( MSM6255, MSM6255_TAG, msm6255_register_r, msm6255_register_w )
+
 	AM_RANGE( 0x40, 0x40 ) AM_READWRITE( msm8251_data_r, msm8251_data_w )
 	AM_RANGE( 0x41, 0x41 ) AM_READWRITE( msm8251_status_r, msm8251_control_w )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE( bw2_centronics_data_w )
@@ -547,6 +553,19 @@ static INPUT_PORTS_START( bw2 )
   PORT_CONFSETTING( 0x05, "300 baud" )
 INPUT_PORTS_END
 
+static MSM6255_CHAR_RAM_READ( bw2_charram_r )
+{
+	return videoram[ma & 0x3fff];
+}
+
+static const msm6255_interface bw2_msm6255_intf =
+{
+	SCREEN_TAG,
+	0,
+	0,
+	bw2_charram_r,
+};
+
 static MACHINE_DRIVER_START( bw2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG( "main", Z80, XTAL_16MHz/4 )
@@ -557,7 +576,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_MACHINE_RESET( bw2 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD( "main", LCD )
+	MDRV_SCREEN_ADD( SCREEN_TAG, LCD )
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_SIZE( 640, 200 )
@@ -567,6 +586,9 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_PALETTE_INIT( black_and_white )
 	MDRV_VIDEO_START( bw2 )
 	MDRV_VIDEO_UPDATE( bw2 )
+
+	MDRV_DEVICE_ADD(MSM6255_TAG, MSM6255)
+	MDRV_DEVICE_CONFIG(bw2_msm6255_intf)
 MACHINE_DRIVER_END
 
 /***************************************************************************

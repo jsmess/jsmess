@@ -483,7 +483,8 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/coco_dsk.o	\
 	$(MESS_MACHINE)/mm58274c.o \
 	$(MESS_MACHINE)/z80dart.o	\
-	$(MESS_MACHINE)/68901mfp.o
+	$(MESS_MACHINE)/68901mfp.o \
+	$(MESS_VIDEO)/msm6255.o	\
 
 
 
