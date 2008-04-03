@@ -316,8 +316,6 @@ DRIVER_INIT( vectrex )
 		memset (memory_region(REGION_CPU1), 1, 0x8000);
 	}
 
-	artwork_use_device_art(image_from_devtype_and_index(IO_CARTSLOT, 0), "mine");
-
 	for (i = 0; i < vectrex_ram_size; i++)
 		vectrex_ram_base[i] = mame_rand(machine);
 }
