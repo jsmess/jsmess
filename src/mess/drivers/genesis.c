@@ -187,7 +187,6 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	int ptr, x;
 	unsigned char *ROM;
 
-	printf("Entering DEVICE_IMAGE_LOAD()\n");
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
 	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = 0;
@@ -203,7 +202,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		tmpROMnew = ROM;
 		tmpROM = ROM + 0x2000 + 512;
 
-		for (ptr = 0; ptr < (0x400000) / (8192); ptr += 2)
+		for (ptr = 0; ptr < (0x500000) / (8192); ptr += 2)
 		{
 			for (x = 0; x < 8192; x++)
 			{
@@ -251,7 +250,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		{
 			is_ssf2 = 1;
 		}
-		// detect the 'Romance of the Three Kingdoms - Red Cliff' rom, already decoded from .mdx format
+		// detect the 'Romance of the Three Kingdoms - Battle of Red Cliffs' rom, already decoded from .mdx format
 		if (length == 0x200000)
 		{
 		 	static unsigned char redcliffsig[] = { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04}; // move.b  ($400004).l,d0
@@ -338,10 +337,8 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	if (is_ssf2)
 	{
-		tmpROM = malloc(0x500000);
-		memcpy(tmpROM, &ROM[0], 0x500000);
-		memcpy(&ROM[0x400000], tmpROM, 0x500000);
-		free(tmpROM);
+		memcpy(&ROM[0x800000],&ROM[0x400000],0x100000);
+		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000);
 	}
 
 	if (is_radica)
@@ -446,34 +443,40 @@ SYSTEM_CONFIG_END
 
 static WRITE16_HANDLER( genesis_ssf2_bank_w )
 {
+	static int lastoffset = -1,lastdata = -1;
 	UINT8 *ROM = memory_region(REGION_CPU1);
 
-	switch (offset<<1)
-	{
-		case 0x00: // write protect register
-			break;
-		case 0x02: /* 0x080000 - 0x0FFFFF */
-			memcpy(ROM + 0x080000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
-			break;
-		case 0x04: /* 0x100000 - 0x17FFFF */
-			memcpy(ROM + 0x100000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
-			break;
-		case 0x06: /* 0x180000 - 0x1FFFFF */
-			memcpy(ROM + 0x180000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
-			break;
-		case 0x08: /* 0x200000 - 0x27FFFF */
-			memcpy(ROM + 0x200000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
-			break;
-		case 0x0a: /* 0x280000 - 0x2FFFFF */
-			memcpy(ROM + 0x280000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
-			break;
-		case 0x0c: /* 0x300000 - 0x37FFFF */
-			memcpy(ROM + 0x300000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
-			break;
-		case 0x0e: /* 0x380000 - 0x3FFFFF */
-			memcpy(ROM + 0x380000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
-			break;
-
+	if ((lastoffset != offset) || (lastdata != data)) {
+		lastoffset = offset; lastdata = data;
+		switch (offset<<1)
+		{
+			case 0x00: // write protect register // this is not a write protect, but seems to do nothing useful but reset bank0 after the checksum test (red screen otherwise)
+				if (data == 2) {
+					memcpy(ROM + 0x000000, ROM + 0x400000+(((data&0xf)-2)*0x080000), 0x080000);
+				}
+				break;
+			case 0x02: /* 0x080000 - 0x0FFFFF */
+				memcpy(ROM + 0x080000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				break;
+			case 0x04: /* 0x100000 - 0x17FFFF */
+				memcpy(ROM + 0x100000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				break;
+			case 0x06: /* 0x180000 - 0x1FFFFF */
+				memcpy(ROM + 0x180000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				break;
+			case 0x08: /* 0x200000 - 0x27FFFF */
+				memcpy(ROM + 0x200000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				break;
+			case 0x0a: /* 0x280000 - 0x2FFFFF */
+				memcpy(ROM + 0x280000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				break;
+			case 0x0c: /* 0x300000 - 0x37FFFF */
+				memcpy(ROM + 0x300000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				break;
+			case 0x0e: /* 0x380000 - 0x3FFFFF */
+				memcpy(ROM + 0x380000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				break;
+		}
 	}
 }
 
@@ -570,8 +573,7 @@ static void genesis_machine_stop(running_machine *machine)
 
 static DRIVER_INIT( gencommon )
 {
-	printf("Entering DRIVER_INIT()\n");
-if (genesis_sram)
+	if (genesis_sram)
 	{
                 add_exit_callback(machine, genesis_machine_stop);
 	}
