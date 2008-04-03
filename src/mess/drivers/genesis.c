@@ -60,6 +60,8 @@ static int is_radica = 0;
 static int is_kof99 = 0;
 static int is_soulb = 0;
 static int is_mjlovr = 0;
+static int is_squir = 0;
+static int squirrel_king_extra = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -185,9 +187,10 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	int ptr, x;
 	unsigned char *ROM;
 
+	printf("Entering DEVICE_IMAGE_LOAD()\n");
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -244,7 +247,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	{
 		relocate = 0x2000;
 
-		if (!strncmp((char *)&ROM[0x0120+relocate], "SUPER STREET FIGHTER2", 20))
+		if (!strncmp((char *)&ROM[0x0120+relocate], "SUPER STREET FIGHTER2", 21))
 		{
 			is_ssf2 = 1;
 		}
@@ -303,6 +306,16 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		 	if (!memcmp(&ROM[0x01b24+relocate],&mjlovrsig[0],sizeof(mjlovrsig)))
 			{
 				is_mjlovr = 1;
+			}
+		}
+		// detect Squirrel King unlicensed game
+		if (length == 0x100000)
+		{
+		 	static unsigned char squirsig[] = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xfa};
+
+		 	if (!memcmp(&ROM[0x03b4+relocate],&squirsig[0],sizeof(squirsig)))
+			{
+				is_squir = 1;
 			}
 		}
 
@@ -522,7 +535,7 @@ READ16_HANDLER( radica_bank_select )
 	return 0;
 }
 
-// Red Cliff handler borrowed from HazeMD
+// Red Cliff handler from HazeMD
 
 READ16_HANDLER( redclif_prot_r )
 {
@@ -533,6 +546,18 @@ READ16_HANDLER( redclif_prot2_r )
 {
 	return 0x55 << 8;
 }
+
+// Squirrel King handler from HazeMD, this does not give screen garbage like HazeMD compile If you reset it twice
+READ16_HANDLER( squirrel_king_extra_r )
+{
+	return squirrel_king_extra;
+
+}
+WRITE16_HANDLER( squirrel_king_extra_w )
+{
+	squirrel_king_extra = data;
+}
+
 
 static WRITE16_HANDLER( genesis_TMSS_bank_w )
 {
@@ -545,7 +570,8 @@ static void genesis_machine_stop(running_machine *machine)
 
 static DRIVER_INIT( gencommon )
 {
-        if (genesis_sram)
+	printf("Entering DRIVER_INIT()\n");
+if (genesis_sram)
 	{
                 add_exit_callback(machine, genesis_machine_stop);
 	}
@@ -582,6 +608,12 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, mjlovr_prot_1_r );
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x401000, 0x401001, 0, 0, mjlovr_prot_2_r );
+	}
+
+	if (is_squir)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
 	}
 
 	/* install NOP handler for TMSS */
