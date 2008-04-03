@@ -3,7 +3,7 @@ TI-85 and TI-86 drivers by Krzysztof Strzecha
 
 Notes:
 1. After start TI-85 waits for ON key interrupt, so press ON key to start
-   calculator.
+   calculator. ************* PRESS THE "Q" KEY TO TURN IT ON. ********************
 2. Only difference between all TI-85 drivers is ROM version.
 3. TI-86 is TI-85 with more RAM and ROM.
 4. Only difference between all TI-86 drivers is ROM version.
@@ -548,11 +548,11 @@ SYSTEM_CONFIG_START(ti86)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                        FLAGS */
-COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      NULL,   "Texas Instruments",    "TI-81",                        GAME_NOT_WORKING )
-COMP( 1992, ti85,       0,      0,      ti85,   ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        GAME_NOT_WORKING )
+COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      NULL,   "Texas Instruments",    "TI-81",                        0 )
+COMP( 1992, ti85,       0,      0,      ti85,   ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        0 )
 COMP( 1993, ti82,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-82",                        GAME_NOT_WORKING )
 COMP( 1996, ti83,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83",                        GAME_NOT_WORKING )
-COMP( 1997, ti86,       0,      0,      ti86,   ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        GAME_NOT_WORKING )
+COMP( 1997, ti86,       0,      0,      ti86,   ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        0 )
 COMP( 1999, ti83p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus",                   GAME_NOT_WORKING )
 /*
 COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
