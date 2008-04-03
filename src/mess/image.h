@@ -183,7 +183,7 @@ void image_battery_save(const device_config *img, const void *buffer, int length
 ****************************************************************************/
 
 int image_absolute_index(const device_config *image);
-const device_config *image_from_absolute_index(int absolute_index);
+const device_config *image_from_absolute_index(running_machine *machine, int absolute_index);
 
 
 

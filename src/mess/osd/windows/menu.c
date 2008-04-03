@@ -1596,7 +1596,7 @@ static void help_about_thissystem(running_machine *machine, HWND wnd)
 //	decode_deviceoption
 //============================================================
 
-static const device_config *decode_deviceoption(int command, int *devoption)
+static const device_config *decode_deviceoption(running_machine *machine, int command, int *devoption)
 {
 	int absolute_index;
 
@@ -1606,7 +1606,7 @@ static const device_config *decode_deviceoption(int command, int *devoption)
 	if (devoption)
 		*devoption = command % DEVOPTION_MAX;
 
-	return image_from_absolute_index(absolute_index);
+	return image_from_absolute_index(machine, absolute_index);
 }
 
 
@@ -1827,7 +1827,7 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			else if ((command >= ID_DEVICE_0) && (command < ID_DEVICE_0 + (MAX_DEV_INSTANCES*IO_COUNT*DEVOPTION_MAX)))
 			{
 				// change device
-				img = decode_deviceoption(command, &dev_command);
+				img = decode_deviceoption(machine, command, &dev_command);
 				device_command(wnd, img, dev_command);
 			}
 			else if ((command >= ID_JOYSTICK_0) && (command < ID_JOYSTICK_0 + MAX_JOYSTICKS))

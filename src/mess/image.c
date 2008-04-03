@@ -15,7 +15,6 @@
 #include "mame.h"
 #include "image.h"
 #include "mess.h"
-#include "deprecat.h"
 #include "unzip.h"
 #include "devices/flopdrv.h"
 #include "utils.h"
@@ -1637,7 +1636,7 @@ int image_absolute_index(const device_config *image)
 
 
 
-const device_config *image_from_absolute_index(int absolute_index)
+const device_config *image_from_absolute_index(running_machine *machine, int absolute_index)
 {
-	return Machine->images_data->slots[absolute_index].dev;
+	return machine->images_data->slots[absolute_index].dev;
 }
