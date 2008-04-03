@@ -680,6 +680,7 @@ ROM_START(srdm5fd5)
 	ROM_REGION(0x10000, REGION_CPU2, 0)
 	ROM_LOAD("sordfd5.rom",0x0000, 0x04000, NO_DUMP)
 	ROM_REGION(0x5000, REGION_USER1, 0)
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x5000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 static FLOPPY_OPTIONS_START( sordm5 )
@@ -747,4 +748,4 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE         INPUT       INIT    CONFIG      COMPANY     FULLNAME */
 COMP( 1983, sordm5,		0,		0,		sord_m5,		sord_m5,	0,		sordm5,		"Sord",		"Sord M5", 0)
-COMP(1983, srdm5fd5,	0,		0,		sord_m5_fd5,	sord_m5,	0,		srdm5fd5,	"Sord",		"Sord M5 + PI5 + FD5", GAME_NOT_WORKING)
+COMP(1983, srdm5fd5,	sordm5,		0,		sord_m5_fd5,	sord_m5,	0,		srdm5fd5,	"Sord",		"Sord M5 + PI5 + FD5", 0 )

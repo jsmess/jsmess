@@ -521,7 +521,7 @@ TESTDRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 
 	/* SORD */
 	DRIVER( sordm5 )
-TESTDRIVER( srdm5fd5 )
+	DRIVER( srdm5fd5 )
 
 	/* APF Electronics Inc. */
 	DRIVER( apfm1000 )
