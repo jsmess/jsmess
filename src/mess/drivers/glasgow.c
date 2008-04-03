@@ -318,8 +318,8 @@ static READ16_HANDLER(read_keys) // Glasgow, Dallas
 {
   UINT16 data;
   data=0x0300;
-  key_low=readinputport(0x00);
-  key_hi=readinputport(0x01);
+  key_low = readinputportbytag("LINE0");
+  key_hi =  readinputportbytag("LINE1");
 //logerror("Keyboard Offset = %x Data = %x\n  ",offset,data);
   if (key_select==key_low){data=data&0x100;}
   if (key_select==key_hi){data=data&0x200;}
@@ -330,7 +330,7 @@ static READ16_HANDLER(read_newkeys16)  //Amsterdam, Roma
 {
  UINT16 data;
 
- if (key_selector==0) data=readinputport(0x00);else data=readinputport(0x01);
+ if (key_selector==0) data=readinputportbytag("LINE0");else data=readinputportbytag("LINE1");
  logerror("read Keyboard Offset = %x Data = %x   Select = %x \n  ",offset,data,key_selector);
  data=data<<8;
  return data ;
@@ -493,8 +493,8 @@ static WRITE32_HANDLER ( write_keys32 )
 static READ32_HANDLER(read_newkeys32) // Dallas 32, Roma 32
 {
  UINT32 data;
- if (key_selector==0) data=readinputport(0x00);else data=readinputport(0x01);
- //if (key_selector==1) data=readinputport(0x00);else data=0;
+ if (key_selector==0) data=readinputportbytag("LINE0");else data=readinputportbytag("LINE1");
+ //if (key_selector==1) data=readinputportbytag("LINE0");else data=0;
  logerror("read Keyboard Offset = %x Data = %x\n  ",offset,data);
  data=data<<24;
  return data ;
@@ -605,8 +605,8 @@ static VIDEO_UPDATE( glasgow )
 	if (my_cursor != NULL)
 		set_cursor (my_cursor);
 
-	m_button1=readinputport(0x04);
-    m_button2=readinputport(0x05);
+    m_button1=readinputportbytag("BUTTON_L");
+    m_button2=readinputportbytag("BUTTON_R");
 
     if ( m_button1) MOUSE_BUTTON1_WAIT = 0;
 
@@ -780,7 +780,7 @@ static ADDRESS_MAP_START(dallas32_mem, ADDRESS_SPACE_PROGRAM, 32)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( new_keyboard ) //Amsterdam, Dallas 32, Roma, Roma 32
-  PORT_START
+  PORT_START_TAG("LINE0")
   PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A1")  PORT_CODE(KEYCODE_A )
   PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B2")  PORT_CODE(KEYCODE_B )
   PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C3")  PORT_CODE(KEYCODE_C )
@@ -795,7 +795,7 @@ static INPUT_PORTS_START( new_keyboard ) //Amsterdam, Dallas 32, Roma, Roma 32
   PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6")  PORT_CODE(KEYCODE_6 )
   PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0")   PORT_CODE(KEYCODE_9 )
   PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9")   PORT_CODE(KEYCODE_0 )
-  PORT_START
+  PORT_START_TAG("LINE1")
   PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INF") PORT_CODE(KEYCODE_F1 )
   PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("POS") PORT_CODE(KEYCODE_F2 )
   PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LEV") PORT_CODE(KEYCODE_F3 )
@@ -807,23 +807,23 @@ static INPUT_PORTS_START( new_keyboard ) //Amsterdam, Dallas 32, Roma, Roma 32
   PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G7")  PORT_CODE(KEYCODE_7 )
   PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H8")  PORT_CODE(KEYCODE_8 )
 
-  PORT_START
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X)  PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
+  PORT_START_TAG("MOUSE_X")
+  PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X)  PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
 
-    PORT_START
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
+  PORT_START_TAG("MOUSE_Y")
+  PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
 
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("left button")
+  PORT_START_TAG("BUTTON_L")
+  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("left button")
 
-   	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("right button")
+  PORT_START_TAG("BUTTON_R")
+  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("right button")
 INPUT_PORTS_END
 
 
 
 static INPUT_PORTS_START( old_keyboard )   //Glasgow,Dallas
-  PORT_START
+  PORT_START_TAG("LINE0")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")   PORT_CODE(KEYCODE_9 )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CL")  PORT_CODE(KEYCODE_F5 )
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C3")  PORT_CODE(KEYCODE_C )
@@ -837,7 +837,7 @@ static INPUT_PORTS_START( old_keyboard )   //Glasgow,Dallas
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")  PORT_CODE(KEYCODE_6 )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B2")  PORT_CODE(KEYCODE_B )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B2")  PORT_CODE(KEYCODE_2 )
-  PORT_START
+  PORT_START_TAG("LINE1")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E5")  PORT_CODE(KEYCODE_E )
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E5")  PORT_CODE(KEYCODE_5 )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INF") PORT_CODE(KEYCODE_F1 )
@@ -850,19 +850,17 @@ static INPUT_PORTS_START( old_keyboard )   //Glasgow,Dallas
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G7")  PORT_CODE(KEYCODE_7 )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEM") PORT_CODE(KEYCODE_F4)
 
-   	PORT_START
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X)  PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
+  PORT_START_TAG("MOUSE_X")
+    PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X)  PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
 
-    PORT_START
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
+  PORT_START_TAG("MOUSE_Y")
+    PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
 
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("left button")
+  PORT_START_TAG("BUTTON_L")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("left button")
 
-   	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("right button")
-
-
+  PORT_START_TAG("BUTTON_R")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("right button")
 INPUT_PORTS_END
 
 
@@ -991,10 +989,10 @@ static void set_cursor (view_item *view_cursor)
    static float diff_x, diff_y, del_x, del_y;
 
     save_x = m_x;
-	save_y = m_y;
+    save_y = m_y;
 
-    m_x=readinputport(0x02);
-    m_y=readinputport(0x03);
+    m_x=readinputportbytag("MOUSE_X");
+    m_y=readinputportbytag("MOUSE_Y");
 
 //    logerror("m_x   = %d \n  ",m_x);
 //    logerror("m_y   = %d \n  ",m_y);
