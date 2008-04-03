@@ -937,6 +937,7 @@ $(MESSOBJ)/acorn.a:    \
 	$(MESS_DRIVERS)/electron.o
 
 $(MESSOBJ)/samcoupe.a: \
+	$(MESS_FORMATS)/coupedsk.o \
 	$(MESS_VIDEO)/coupe.o	 \
 	$(MESS_DRIVERS)/coupe.o	\
 	$(MESS_MACHINE)/coupe.o	 \

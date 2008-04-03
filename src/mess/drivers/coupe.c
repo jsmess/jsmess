@@ -62,7 +62,8 @@ Note on the bioses:
 #include "sound/speaker.h"
 
 /* devices */
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/coupedsk.h"
 
 
 #define COUPE_XTAL_X1  XTAL_24MHz
@@ -583,12 +584,17 @@ static void coupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(coupe_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_coupe; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk,sad"); break;
+		case MESS_DEVINFO_STR_NAME+0:			strcpy(info->s = device_temp_str(), "floppydisk0"); break;
+		case MESS_DEVINFO_STR_NAME+1:			strcpy(info->s = device_temp_str(), "floppydisk1"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+0:		strcpy(info->s = device_temp_str(), "flop0"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+1:		strcpy(info->s = device_temp_str(), "flop1"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+0:	strcpy(info->s = device_temp_str(), "Floppy #0"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+1:	strcpy(info->s = device_temp_str(), "Floppy #1"); break;
 
-		default:								legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:								floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 
