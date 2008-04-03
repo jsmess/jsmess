@@ -1,6 +1,6 @@
 /*
 
-RCA Studio II
+RCA Studio II ******* PRESS Q for a car racing game *********** X to accelerate, left & right arrow to steer.
 
 PCB Layout
 ----------
