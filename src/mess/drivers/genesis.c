@@ -63,6 +63,7 @@ static int is_mjlovr = 0;
 static int is_squir = 0;
 static int squirrel_king_extra = 0;
 static int is_smous = 0;
+static int is_smb = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -327,6 +328,16 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 				is_smous = 1;
 			}
 		}
+		if (length == 0x200000)
+		{
+			static unsigned char smbsig[] = { 0x0c, 0x39, 0x00, 0x0c, 0x00, 0xff}; // cmpi.b  #$C,($FF1130).l
+
+			if (!memcmp(&ROM[0xc8786+relocate],&smbsig[0],sizeof(smbsig)))
+			{
+				is_smb = 1;
+			}
+		}
+
 	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
@@ -516,6 +527,13 @@ READ16_HANDLER( mjlovr_prot_2_r )
 	return 0xd300;
 }
 
+// Super Mario Bros handler from HazeMD
+READ16_HANDLER( smbro_prot_r )
+{
+	return 0xc;
+}
+
+
 // Smart Mouse handler from HazeMD
 READ16_HANDLER( smous_prot_r )
 {
@@ -644,6 +662,11 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, smous_prot_r );
 	}
+	if (is_smb)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13001, 0, 0, smbro_prot_r );
+	}
+
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
 
