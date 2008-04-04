@@ -13,6 +13,16 @@
 #define SAD_HEADER_LEN  22
 #define SAD_SIGNATURE   "Aley's disk backup"
 
+#define SDF_TAG         "sdftag"
+#define SDF_TRACKSIZE   (512 * 12)
+
+
+struct sdf_tag
+{
+	UINT8 heads;
+	UINT8 tracks;
+};
+
 
 
 /*************************************
@@ -196,18 +206,283 @@ FLOPPY_IDENTIFY( coupe_sad_identify )
 /*************************************
  *
  *  SDF disk image format
+ * 
+ *  TODO: wd17xx status codes are
+ *        currently ignored
  *
  *************************************/
 
+static int coupe_sdf_get_heads_per_disk(floppy_image *floppy)
+{
+	struct sdf_tag *tag = floppy_tag(floppy, SDF_TAG);
+	return tag->heads;
+}
+
+
+static int coupe_sdf_get_tracks_per_disk(floppy_image *floppy)
+{
+	struct sdf_tag *tag = floppy_tag(floppy, SDF_TAG);
+	return tag->tracks;	
+}
+
+
+static UINT32 coupe_sdf_get_track_size(floppy_image *floppy, int head, int track)
+{
+	return SDF_TRACKSIZE;
+}
+
+
+static floperr_t coupe_sdf_get_offset(floppy_image *floppy,
+	int head, int track, UINT64 *offset)
+{
+	struct sdf_tag *tag = floppy_tag(floppy, SDF_TAG);
+
+	if (head > tag->heads || track > tag->tracks)
+		return FLOPPY_ERROR_SEEKERROR;
+
+	*offset = (head * tag->tracks + track) * SDF_TRACKSIZE;
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+
+static floperr_t coupe_sdf_read_track(floppy_image *floppy,
+	int head, int track, UINT64 offset, void *buffer, size_t buflen)
+{
+	floperr_t err;
+	UINT64 track_offset;
+
+	/* get the offset to this track */
+	err = coupe_sdf_get_offset(floppy, head, track, &track_offset);
+	if (err) return err;
+
+	/* read track data into buffer */
+	floppy_image_read(floppy, buffer, offset + track_offset, buflen);
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+
+static floperr_t coupe_sdf_write_track(floppy_image *floppy,
+	int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+{
+	floperr_t err;
+	UINT64 track_offset;
+
+	/* get the offset to this track */
+	err = coupe_sdf_get_offset(floppy, head, track, &track_offset);
+	if (err) return err;
+
+	/* write buffer to image */
+	floppy_image_write(floppy, buffer, offset + track_offset, buflen);
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+
+static floperr_t coupe_sdf_get_sector_offset(floppy_image *floppy,
+	int head, int track, int sector, UINT64 *offset)
+{
+	floperr_t err;
+	UINT8 buffer[SDF_TRACKSIZE];
+	int i, buffer_pos = 1;
+
+	/* get track data */
+	err = coupe_sdf_read_track(floppy, head, track, 0, &buffer, SDF_TRACKSIZE);
+	if (err) return err;
+
+	/* check if the sector is available in this track */
+	if (sector >= buffer[0])
+		return FLOPPY_ERROR_SEEKERROR;
+
+	/* find the right sector in this track */
+	for (i = 0; i < buffer[0]; i++)
+	{
+		int sector_number = buffer[buffer_pos + 4];
+
+		if (sector_number - 1 == sector)
+		{
+			*offset = buffer_pos;
+			return FLOPPY_ERROR_SUCCESS;
+		}
+
+		buffer_pos += (128 << buffer[buffer_pos + 5]) + 8;
+	}
+
+	return FLOPPY_ERROR_INVALIDIMAGE;
+}
+
+
+static floperr_t coupe_sdf_get_total_sector_offset(floppy_image *floppy,
+	int head, int track, int sector, UINT64 *offset)
+{
+	floperr_t err;
+	UINT64 track_offset, sector_offset;
+
+	/* get offset to the track start */
+	err = coupe_sdf_get_offset(floppy, head, track, &track_offset);
+	if (err) return err;
+
+	/* get offset to the start of the sector */
+	err = coupe_sdf_get_sector_offset(floppy, head, track, sector, &sector_offset);
+	if (err) return err;
+
+	*offset = track_offset + sector_offset;
+	
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+
+static floperr_t coupe_sdf_get_sector_length(floppy_image *floppy,
+	int head, int track, int sector, UINT32 *sector_length)
+{
+	floperr_t err;
+	UINT8 buffer[SDF_TRACKSIZE];
+	UINT64 offset;
+
+	/* get track data */
+	err = coupe_sdf_read_track(floppy, head, track, 0, &buffer, SDF_TRACKSIZE);
+	if (err) return err;
+
+	/* get offset to the start of the sector */
+	err = coupe_sdf_get_sector_offset(floppy, head, track, sector, &offset);
+	if (err) return err;
+
+	/* get size */
+	*sector_length = 128 << buffer[offset + 5];
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+
+static floperr_t coupe_sdf_get_indexed_sector_info(floppy_image *floppy,
+	int head, int track, int sector_index,
+	int *cylinder, int *side, int *sector, UINT32 *sector_length)
+{
+	floperr_t err;
+	UINT8 buffer[SDF_TRACKSIZE];
+	UINT64 offset;
+
+	/* get track data */
+	err = coupe_sdf_read_track(floppy, head, track, 0, &buffer, SDF_TRACKSIZE);
+	if (err) return err;
+
+	/* get offset to the start of the sector */
+	err = coupe_sdf_get_sector_offset(floppy, head, track, sector_index, &offset);
+	if (err) return err;
+
+	/* extract data */
+	if (cylinder)      *cylinder      = buffer[offset + 2];
+	if (side)          *side          = buffer[offset + 3];
+	if (sector)        *sector        = buffer[offset + 4];
+	if (sector_length) *sector_length = 128 << buffer[offset + 5];
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+
+static floperr_t coupe_sdf_read_indexed_sector(floppy_image *floppy,
+	int head, int track, int sector, void *buffer, size_t buflen)
+{
+	floperr_t err;
+	UINT64 offset;
+
+	err = coupe_sdf_get_total_sector_offset(floppy, head, track, sector, &offset);
+	if (err) return err;
+	
+	/* read sector data into buffer */
+	floppy_image_read(floppy, buffer, offset + 8, buflen);
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+
+static floperr_t coupe_sdf_write_indexed_sector(floppy_image *floppy,
+	int head, int track, int sector, const void *buffer, size_t buflen)
+{
+	floperr_t err;
+	UINT64 offset;
+
+	err = coupe_sdf_get_total_sector_offset(floppy, head, track, sector, &offset);
+	if (err) return err;
+
+	/* write buffer into image */
+	floppy_image_write(floppy, buffer, offset + 8, buflen);
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+
+static void coupe_sdf_interpret_header(floppy_image *floppy, int *heads, int *tracks)
+{
+	UINT64 size = floppy_image_size(floppy);
+
+	if (size % SDF_TRACKSIZE == 0)
+	{
+		*heads = 2;
+		*tracks = size / (SDF_TRACKSIZE * 2);
+	}
+	else
+	{
+		*heads = 0;
+		*tracks = 0;
+	}
+}
+
+
 FLOPPY_CONSTRUCT( coupe_sdf_construct )
 {
-	return FLOPPY_ERROR_INVALIDIMAGE;
+	struct FloppyCallbacks *callbacks;
+	struct sdf_tag *tag;
+	int heads, tracks;
+
+	if (params)
+	{
+		/* create */
+		return FLOPPY_ERROR_UNSUPPORTED;
+	}
+	else
+	{
+		/* load */
+		coupe_sdf_interpret_header(floppy, &heads, &tracks);
+	}
+
+	tag = floppy_create_tag(floppy, SDF_TAG, sizeof(struct sdf_tag));
+
+	if (!tag)
+		return FLOPPY_ERROR_OUTOFMEMORY;
+
+	tag->heads = heads;
+	tag->tracks = tracks;
+
+	callbacks = floppy_callbacks(floppy);
+	callbacks->read_track = coupe_sdf_read_track;
+	callbacks->write_track = coupe_sdf_write_track;
+	callbacks->get_heads_per_disk = coupe_sdf_get_heads_per_disk;
+	callbacks->get_tracks_per_disk = coupe_sdf_get_tracks_per_disk;
+	callbacks->get_track_size = coupe_sdf_get_track_size;
+	callbacks->get_sector_length = coupe_sdf_get_sector_length;
+	callbacks->read_indexed_sector = coupe_sdf_read_indexed_sector;
+	callbacks->write_indexed_sector = coupe_sdf_write_indexed_sector;
+	callbacks->get_indexed_sector_info = coupe_sdf_get_indexed_sector_info;
+
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 
 FLOPPY_IDENTIFY( coupe_sdf_identify )
 {
-	*vote = 0;
+	int heads, tracks;
+
+	/* read header values */
+	coupe_sdf_interpret_header(floppy, &heads, &tracks);
+
+	/* check for sensible values */
+	if (heads > 0 && heads < 3 && tracks > 0 && tracks < 84)
+		*vote = 100;
+	else
+		*vote = 0;
+
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -231,7 +506,7 @@ FLOPPY_OPTIONS_START(coupe)
 	)
 	FLOPPY_OPTION
 	(
-		coupe_sad, "sad", "SAM Coupe SAD disk image", coupe_sad_identify, coupe_sad_construct,
+		coupe_sad, "sad,dsk", "SAM Coupe SAD disk image", coupe_sad_identify, coupe_sad_construct,
 		HEADS(1-[2]-255)
 		TRACKS(1-[80]-255)
 		SECTORS(1-[10]-255)
@@ -240,11 +515,11 @@ FLOPPY_OPTIONS_START(coupe)
 	)
 	FLOPPY_OPTION
 	(
-		coupe_sdf, "sdf", "SAM Coupe SDF disk image", coupe_sdf_identify, coupe_sdf_construct,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
+		coupe_sdf, "sdf,dsk,sad", "SAM Coupe SDF disk image", coupe_sdf_identify, coupe_sdf_construct,
+		HEADS(1-[2])
+		TRACKS(1-[80]-83)
+		SECTORS(1-[10]-12)
+		SECTOR_LENGTH(128/256/[512]/1024)
 		FIRST_SECTOR_ID([1])
 	)
 FLOPPY_OPTIONS_END
