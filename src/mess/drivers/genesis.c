@@ -62,6 +62,7 @@ static int is_soulb = 0;
 static int is_mjlovr = 0;
 static int is_squir = 0;
 static int squirrel_king_extra = 0;
+static int is_smous = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -189,7 +190,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -317,7 +318,15 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 				is_squir = 1;
 			}
 		}
+		if (length == 0x80000)
+		{
+		 	static unsigned char smoussig[] = { 0x4d, 0xf9, 0x00, 0x40, 0x00, 0x02};
 
+		 	if (!memcmp(&ROM[0x08c8+relocate],&smoussig[0],sizeof(smoussig)))
+			{
+				is_smous = 1;
+			}
+		}
 	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
@@ -507,6 +516,20 @@ READ16_HANDLER( mjlovr_prot_2_r )
 	return 0xd300;
 }
 
+// Smart Mouse handler from HazeMD
+READ16_HANDLER( smous_prot_r )
+{
+	switch (offset)
+	{
+		case 0: return 0x5500;
+		case 1: return 0x0f00;
+		case 2: return 0xaa00;
+		case 3: return 0xf000;
+	}
+
+	return -1;
+}
+
 // KOF99 handler from HazeMD
 READ16_HANDLER( kof99_0xA13002_r )
 {
@@ -617,7 +640,10 @@ static DRIVER_INIT( gencommon )
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
 		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
 	}
-
+	if (is_smous)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, smous_prot_r );
+	}
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
 
