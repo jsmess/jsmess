@@ -35,6 +35,7 @@
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
 #include "video/msm6255.h"
+#include "bw2.lh"
 
 #define SCREEN_TAG	"main"
 #define MSM6255_TAG	"ic49"
@@ -584,6 +585,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_SIZE( 640, 200 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 200-1 )
+	MDRV_DEFAULT_LAYOUT( layout_bw2 )
 
 	MDRV_PALETTE_LENGTH( 2 )
 	MDRV_PALETTE_INIT( black_and_white )

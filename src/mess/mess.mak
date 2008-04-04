@@ -1218,6 +1218,7 @@ $(OBJ)/render.o:	$(MESS_LAYOUT)/horizont.lh \
 
 $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
+$(MESS_DRIVERS)/bw2.o:		$(MESS_LAYOUT)/bw2.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
 $(MESS_DRIVERS)/gamepock.o:	$(MESS_LAYOUT)/gamepock.lh
