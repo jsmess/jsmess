@@ -396,7 +396,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 		// confirm any mandatory devices are loaded
 		if (iodev->must_be_loaded)
 		{
-			pszSoftware = GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device);
+			pszSoftware = GetSelectedSoftware(drvindex, dev);
 			if (!pszSoftware || !*pszSoftware)
 			{
 				snprintf(szMessage, sizeof(szMessage) / sizeof(szMessage[0]),
@@ -424,15 +424,15 @@ done:
 
 
 // this is a wrapper call to wrap the idiosycracies of SetSelectedSoftware()
-static void InternalSetSelectedSoftware(int drvindex, const mess_device_class *devclass, int device_inst, const char *pszSoftware)
+static void InternalSetSelectedSoftware(int drvindex, const device_config *device, const char *pszSoftware)
 {
 	if (!pszSoftware)
 		pszSoftware = "";
 
 	// only call SetSelectedSoftware() if this value is different
-	if (strcmp(GetSelectedSoftware(drvindex, devclass, device_inst), pszSoftware))
+	if (strcmp(GetSelectedSoftware(drvindex, device), pszSoftware))
 	{
-		SetSelectedSoftware(drvindex, devclass, device_inst, pszSoftware);
+		SetSelectedSoftware(drvindex, device, pszSoftware);
 	}
 }
 
@@ -465,7 +465,7 @@ static void MessSpecifyImage(int drvindex, const mess_device_class *devclass, in
 	if (nID < 0)
 	{
 		// special case; first try to find existing image
-		s = GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device);
+		s = GetSelectedSoftware(drvindex, dev);
 		if (s && !mame_stricmp(s, pszFilename))
 		{
 			nID = iodev->index_in_device;
@@ -475,7 +475,7 @@ static void MessSpecifyImage(int drvindex, const mess_device_class *devclass, in
 	if (nID < 0)
 	{
 		// still not found?  locate an empty slot
-		s = GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device);
+		s = GetSelectedSoftware(drvindex, dev);
 		if (!s || !*s || !mame_stricmp(s, pszFilename))
 		{
 			nID = iodev->index_in_device;
@@ -483,7 +483,7 @@ static void MessSpecifyImage(int drvindex, const mess_device_class *devclass, in
 	}
 
 	if (nID >= 0)
-		InternalSetSelectedSoftware(drvindex, &iodev->devclass, nID, pszFilename);
+		InternalSetSelectedSoftware(drvindex, dev, pszFilename);
 	else if (LOG_SOFTWARE)
 		dprintf("MessSpecifyImage(): Failed to place image '%s'\n", pszFilename);
 
@@ -516,7 +516,7 @@ static void MessRemoveImage(int drvindex, mess_device_class devclass, LPCSTR psz
 
 		if (iodev != NULL)
 		{
-			if (!mame_stricmp(pszFilename, GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device)))
+			if (!mame_stricmp(pszFilename, GetSelectedSoftware(drvindex, dev)))
 			{
 				MessSpecifyImage(drvindex, &devclass, iodev->index_in_device, NULL);
 			}
@@ -564,7 +564,7 @@ static void MessRefreshPicker(int drvindex)
 	{
 		iodev = mess_device_from_core_device(dev);
 
-		pszSoftware = GetSelectedSoftware(drvindex, &iodev->devclass, iodev->index_in_device);
+		pszSoftware = GetSelectedSoftware(drvindex, dev);
 		if (pszSoftware && *pszSoftware)
 		{
 			i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
@@ -895,7 +895,7 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 {
 	LPCTSTR t_buffer = NULL;
 	TCHAR* t_s;
-	LPCSTR s = GetSelectedSoftware(nDriverIndex, &dev->devclass, nID);
+	LPCSTR s = GetSelectedSoftware(nDriverIndex, dev->devconfig);
 
 	t_s = tstring_from_utf8(s);
 	if( !t_s )

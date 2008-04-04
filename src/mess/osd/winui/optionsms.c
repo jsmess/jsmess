@@ -140,32 +140,32 @@ void SetHashDirs(const char *paths)
 	options_set_string(MameUIGlobal(), OPTION_HASHPATH, paths, OPTION_PRIORITY_CMDLINE);
 }
 
-void SetSelectedSoftware(int driver_index, const mess_device_class *devclass, int device_inst, const char *software)
+void SetSelectedSoftware(int driver_index, const device_config *dev, const char *software)
 {
-	const char *opt_name = device_instancename(devclass, device_inst);
+	const struct IODevice *iodev = mess_device_from_core_device(dev);
+	const char *opt_name = device_instancename(&iodev->devclass, iodev->index_in_device);
 	core_options *o;
 
 	if (LOG_SOFTWARE)
 	{
-		dprintf("SetSelectedSoftware(): driver_index=%d (\'%s\') devclass=%p device_inst=%d software='%s'\n",
-			driver_index, drivers[driver_index]->name, devclass, device_inst, software);
+		dprintf("SetSelectedSoftware(): dev=%p (\'%s\') software='%s'\n",
+			dev, drivers[driver_index]->name, software);
 	}
 
 	o = load_options(OPTIONS_GAME, driver_index);
-	opt_name = device_instancename(devclass, device_inst);
 	options_set_string(o, opt_name, software, OPTION_PRIORITY_CMDLINE);
 	save_options(OPTIONS_GAME, o, driver_index);
 	options_free(o);
 }
 
-const char *GetSelectedSoftware(int driver_index, const mess_device_class *devclass, int device_inst)
+const char *GetSelectedSoftware(int driver_index, const device_config *dev)
 {
-	const char *opt_name = device_instancename(devclass, device_inst);
+	const struct IODevice *iodev = mess_device_from_core_device(dev);
+	const char *opt_name = device_instancename(&iodev->devclass, iodev->index_in_device);
 	const char *software;
 	core_options *o;
 
 	o = load_options(OPTIONS_GAME, driver_index);
-	opt_name = device_instancename(devclass, device_inst);
 	software = options_get_string(o, opt_name);
 	return software ? software : "";
 }
