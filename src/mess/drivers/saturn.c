@@ -466,6 +466,7 @@ static void system_reset()
 static void smpc_intbackhelper(void)
 {
 	int pad;
+	char port[5];
 
 	if (intback_stage == 1)
 	{
@@ -473,7 +474,8 @@ static void smpc_intbackhelper(void)
 		return;
 	}
 
-	pad = readinputport(intback_stage); 	// will be 2 or 3, port 2 = player 1, port 3 = player 2
+	sprintf(port, "JOY%d", intback_stage-1);	// intback_stage will be 2 or 3, 2 = player 1, 3 = player 2
+	pad = readinputportbytag(port);
 
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	smpc_ram[33] = 0xf1;	// no tap, direct connect
@@ -503,7 +505,7 @@ static UINT8 stv_SMPC_r8 (int offset)
 		return_data = smpcSR;
 
 	if (offset == 0x75)//PDR1 read
-		return_data = 0xff; //readinputport(0);
+		return_data = 0xff; //readinputportbytag("PDR1");
 
 	if (offset == 0x77)//PDR2 read
 		return_data=  0xff; // | EEPROM_read_bit());
@@ -1974,7 +1976,7 @@ static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( saturn )
-	PORT_START
+	PORT_START_TAG("PDR1")
 	PORT_DIPNAME( 0x01, 0x01, "PDR1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2000,7 +2002,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("PDR2")
 	PORT_DIPNAME( 0x01, 0x01, "PDR2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2026,7 +2028,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("JOY1")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -2041,7 +2043,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1)	// L
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 R") PORT_PLAYER(1)	// R
 
-	PORT_START
+	PORT_START_TAG("JOY2")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)

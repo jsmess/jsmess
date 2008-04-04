@@ -24,7 +24,7 @@ Hardware descriptions:
 - 16 keys placed in a 4 x 4 matrix
 - Power on switch
 - L/S switch. This switch is directly tied to the RESET pin of the F8 CPU.
-  This allows the user to reset the CPU without destroying  he RAM contents.
+  This allows the user to reset the CPU without destroying the RAM contents.
 - A 4 character 11 segment digit display using a 15 pin interface. Of the 15
   pins 3 pins are not connected, so three segments are never used and this
   leaves a standard 7 segments display with a dot in the lower right.
@@ -55,33 +55,33 @@ static READ8_HANDLER( mk1_f8_r ) {
     UINT8 data = mk1_f8[offset];
 
     if ( offset == 0 ) {
-		if ( data & 1 ) data |= readinputport(1);
-		if ( data & 2 ) data |= readinputport(2);
-		if ( data & 4 ) data |= readinputport(3);
-		if ( data & 8 ) data |= readinputport(4);
+		if ( data & 1 ) data |= readinputportbytag("LINE1");
+		if ( data & 2 ) data |= readinputportbytag("LINE2");
+		if ( data & 4 ) data |= readinputportbytag("LINE3");
+		if ( data & 8 ) data |= readinputportbytag("LINE4");
 		if ( data & 0x10 ) {
-			if ( readinputport(1) & 0x10 ) data |= 1;
-			if ( readinputport(2) & 0x10 ) data |= 2;
-			if ( readinputport(3) & 0x10 ) data |= 4;
-			if ( readinputport(4) & 0x10 ) data |= 8;
+			if ( readinputportbytag("LINE1") & 0x10 ) data |= 1;
+			if ( readinputportbytag("LINE2") & 0x10 ) data |= 2;
+			if ( readinputportbytag("LINE3") & 0x10 ) data |= 4;
+			if ( readinputportbytag("LINE4") & 0x10 ) data |= 8;
 		}
 		if ( data & 0x20 ) {
-			if ( readinputport(1) & 0x20 ) data |= 1;
-			if ( readinputport(2) & 0x20 ) data |= 2;
-			if ( readinputport(3) & 0x20 ) data |= 4;
-			if ( readinputport(4) & 0x20 ) data |= 8;
+			if ( readinputportbytag("LINE1") & 0x20 ) data |= 1;
+			if ( readinputportbytag("LINE2") & 0x20 ) data |= 2;
+			if ( readinputportbytag("LINE3") & 0x20 ) data |= 4;
+			if ( readinputportbytag("LINE4") & 0x20 ) data |= 8;
 		}
 		if ( data & 0x40 ) {
-			if ( readinputport(1) & 0x40 ) data |= 1;
-			if ( readinputport(2) & 0x40 ) data |= 2;
-			if ( readinputport(3) & 0x40 ) data |= 4;
-			if ( readinputport(4) & 0x40 ) data |= 8;
+			if ( readinputportbytag("LINE1") & 0x40 ) data |= 1;
+			if ( readinputportbytag("LINE2") & 0x40 ) data |= 2;
+			if ( readinputportbytag("LINE3") & 0x40 ) data |= 4;
+			if ( readinputportbytag("LINE4") & 0x40 ) data |= 8;
 		}
 		if ( data & 0x80 ) {
-			if ( readinputport(1) & 0x80 ) data |= 1;
-			if ( readinputport(2) & 0x80 ) data |= 2;
-			if ( readinputport(3) & 0x80 ) data |= 4;
-			if ( readinputport(4) & 0x80 ) data |= 8;
+			if ( readinputportbytag("LINE1") & 0x80 ) data |= 1;
+			if ( readinputportbytag("LINE2") & 0x80 ) data |= 2;
+			if ( readinputportbytag("LINE3") & 0x80 ) data |= 4;
+			if ( readinputportbytag("LINE4") & 0x80 ) data |= 8;
 		}
     }
     return data;
@@ -109,33 +109,33 @@ static ADDRESS_MAP_START( mk1_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mk1 )
-	PORT_START	/* 0 */
+	PORT_START_TAG("RESET")	/* 0 */
 	PORT_DIPNAME ( 0x01, 0x01, "Switch")
 	PORT_DIPSETTING(  0, "L" )
 	PORT_DIPSETTING(  1, "S" )
 
-	PORT_START	/* 1 */
+	PORT_START_TAG("LINE1")	/* 1 */
 	PORT_BIT ( 0x0f, 0x0,	 IPT_UNUSED )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White A    King") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White B    Queen") PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White C    Bishop") PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White D    PLAY") PORT_CODE(KEYCODE_D)
 
-	PORT_START	/* 2 */
+	PORT_START_TAG("LINE2")	/* 2 */
 	PORT_BIT ( 0x0f, 0x0,	 IPT_UNUSED )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White E    Knight") PORT_CODE(KEYCODE_E)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White F    Castle") PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White G    Pawn") PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White H    md") PORT_CODE(KEYCODE_H)
 
-	PORT_START	/* 3 */
+	PORT_START_TAG("LINE3")	/* 3 */
 	PORT_BIT ( 0x0f, 0x0,	 IPT_UNUSED )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black 1    King") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black 2    Queen") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black 3    Bishop") PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black 4    fp") PORT_CODE(KEYCODE_4)
 
-	PORT_START	/* 4 */
+	PORT_START_TAG("LINE4")	/* 4 */
 	PORT_BIT ( 0x0f, 0x0,	 IPT_UNUSED )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black 5    Knight") PORT_CODE(KEYCODE_5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black 6    Castle") PORT_CODE(KEYCODE_6)

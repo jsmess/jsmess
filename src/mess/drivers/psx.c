@@ -195,6 +195,7 @@ static void psx_pad( int n_port, int n_data )
 	int b_data;
 	int b_ack;
 	int b_ready;
+	char port[4];
 
 	b_sel = ( n_data & PSX_SIO_OUT_DTR ) / PSX_SIO_OUT_DTR;
 	b_clock = ( n_data & PSX_SIO_OUT_CLOCK ) / PSX_SIO_OUT_CLOCK;
@@ -281,7 +282,8 @@ static void psx_pad( int n_port, int n_data )
 		{
 			if( m_pad[ n_port ].n_byte < PAD_BYTES_STANDARD )
 			{
-				m_pad[ n_port ].n_shiftout = readinputport( m_pad[ n_port ].n_byte + ( n_port * PAD_BYTES_STANDARD ) );
+				sprintf(port, "IN%d", m_pad[ n_port ].n_byte + ( n_port * PAD_BYTES_STANDARD ) );
+				m_pad[ n_port ].n_shiftout = readinputportbytag(port);
 				m_pad[ n_port ].n_byte++;
 				b_ack = 1;
 			}

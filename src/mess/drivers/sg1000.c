@@ -340,6 +340,8 @@ static int keylatch;
 
 static READ8_HANDLER( sc3000_ppi8255_a_r )
 {
+	char port[4];
+
 	/*
         Signal  Description
 
@@ -353,11 +355,14 @@ static READ8_HANDLER( sc3000_ppi8255_a_r )
         PA7     Keyboard input
     */
 
-	return readinputport(keylatch);
+	sprintf(port, "PA%d", keylatch);
+	return readinputportbytag(port);
 }
 
 static READ8_HANDLER( sc3000_ppi8255_b_r )
 {
+	char port[4];
+
 	/*
         Signal  Description
 
@@ -371,7 +376,8 @@ static READ8_HANDLER( sc3000_ppi8255_b_r )
         PB7     Cassette tape input
     */
 
-	return readinputport(keylatch + 8) | 0x70;
+	sprintf(port, "PB%d", keylatch);
+	return ( readinputportbytag(port) | 0x70 );
 }
 
 static WRITE8_HANDLER( sc3000_ppi8255_c_w )

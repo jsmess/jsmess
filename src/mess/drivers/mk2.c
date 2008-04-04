@@ -53,11 +53,11 @@ static ADDRESS_MAP_START(mk2_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mk2 )
-	PORT_START
-PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seams to be direct wired to reset
+	PORT_START_TAG("EXTRA")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seems to be direct wired to reset
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
-	PORT_START
+	PORT_START_TAG("BLACK")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black A    Black") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black B    Field") PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black C    Time?") PORT_CODE(KEYCODE_C)
@@ -66,7 +66,7 @@ PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KE
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black F    LEVEL") PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black G    Swap") PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black H    White") PORT_CODE(KEYCODE_H)
-	PORT_START
+	PORT_START_TAG("WHITE")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 1") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 2") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 3") PORT_CODE(KEYCODE_3)
@@ -154,7 +154,7 @@ ROM_END
 static int mk2_read_a(int chip)
 {
 	int data=0xff;
-	int help=readinputport(1)|readinputport(2); // looks like white and black keys are the same!
+	int help=readinputportbytag("BLACK")|readinputportbytag("WHITE"); // looks like white and black keys are the same!
 
 	switch (rriot_0_b_r(Machine, 0)&0x7) {
 	case 4:
@@ -174,8 +174,8 @@ static int mk2_read_a(int chip)
 		if (readinputport(3)&4) data&=~0x2; //?
 		if (readinputport(3)&8) data&=~0x4; //?
 #endif
-		if (readinputport(0)&4) data&=~0x8; // Enter
-		if (readinputport(0)&2) data&=~0x10; // Clear
+		if (readinputportbytag("EXTRA")&4) data&=~0x8; // Enter
+		if (readinputportbytag("EXTRA")&2) data&=~0x10; // Clear
 		if (help&0x80) data&=~0x20; // H
 		if (help&0x40) data&=~0x40; // G
 		break;

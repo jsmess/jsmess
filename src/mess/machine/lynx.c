@@ -686,7 +686,7 @@ static void lynx_multiply(void)
 		if (suzy.accumulate_overflow) data|=0x40;
 		break;
 	case 0xb0:
-		input=readinputport(0);
+		input=readinputportbytag("JOY");
 		switch (lynx_rotate) {
 		case 1:
 			data=input;
@@ -715,7 +715,7 @@ static void lynx_multiply(void)
 			data=input;
 		}
 		break;
-	case 0xb1: data=readinputport(1);break;
+	case 0xb1: data=readinputportbytag("PAUSE");break;
 	case 0xb2:
 		data=*(memory_region(REGION_USER1)+(suzy.high*lynx_granularity)+suzy.low);
 		suzy.low=(suzy.low+1)&(lynx_granularity-1);
