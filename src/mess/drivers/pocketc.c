@@ -707,13 +707,13 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG      COMPANY     FULLNAME */
 /* cpu sc61860 */
-COMP( 1982, pc1251,		0, 		0,		pc1251,	pc1251,	pc1251,	pocketc,	"Sharp",	"Pocket Computer 1251", GAME_NOT_WORKING)
-COMP( 198?, trs80pc3,	pc1251,	0,		pc1251,	pc1251,	pc1251,	pocketc,	"Tandy",	"TRS80 PC-3", GAME_NOT_WORKING)
+COMP( 1982, pc1251,		0, 		0,		pc1251,	pc1251,	pc1251,	pocketc,	"Sharp",	"Pocket Computer 1251", 0 )
+COMP( 198?, trs80pc3,	pc1251,	0,		pc1251,	pc1251,	pc1251,	pocketc,	"Tandy",	"TRS80 PC-3", 0 )
 
 /* pc1261/pc1262 */
-COMP( 1984, pc1350,		0, 		0,		pc1350,	pc1350,	0,		pc1350,		"Sharp",	"Pocket Computer 1350", GAME_NOT_WORKING)
-COMP( 1983, pc1401,		0, 		0,		pc1401,	pc1401,	pc1401,	pocketc,	"Sharp",	"Pocket Computer 1401", GAME_NOT_WORKING)
-COMP( 1984, pc1402,		pc1401,	0,		pc1401,	pc1401,	pc1401,	pocketc,	"Sharp",	"Pocket Computer 1402", GAME_NOT_WORKING)
+COMP( 1984, pc1350,		0, 		0,		pc1350,	pc1350,	0,		pc1350,		"Sharp",	"Pocket Computer 1350", 0 )
+COMP( 1983, pc1401,		0, 		0,		pc1401,	pc1401,	pc1401,	pocketc,	"Sharp",	"Pocket Computer 1401", 0 )
+COMP( 1984, pc1402,		pc1401,	0,		pc1401,	pc1401,	pc1401,	pocketc,	"Sharp",	"Pocket Computer 1402", 0 )
 
 /* 72kb rom, 32kb ram, cpu? pc1360 */
 COMP( 198?, pc1403,		0,		0,		pc1403,	pc1403,	pc1403,	pocketc,	"Sharp",	"Pocket Computer 1403", GAME_NOT_WORKING)

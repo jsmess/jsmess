@@ -459,13 +459,10 @@ TESTDRIVER( pentagon )
 
 	/* SHARP */
 	DRIVER( pc1251 )	/* Pocket Computer 1251								*/
-TESTDRIVER( trs80pc3 )	/* Tandy TRS80 PC-3									*/
-
+	DRIVER( trs80pc3 )	/* Tandy TRS80 PC-3									*/
 	DRIVER( pc1401 )	/* Pocket Computer 1401								*/
 	DRIVER( pc1402 )	/* Pocket Computer 1402								*/
-
 	DRIVER( pc1350 )	/* Pocket Computer 1350								*/
-
 	DRIVER( pc1403 )	/* Pocket Computer 1403								*/
 	DRIVER( pc1403h )	/* Pocket Computer 1403H							*/
 
