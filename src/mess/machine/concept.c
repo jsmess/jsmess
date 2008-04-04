@@ -281,7 +281,7 @@ static void via_irq_func(int state)
 
 READ16_HANDLER(concept_io_r)
 {
-	if (! ACCESSING_LSB)
+	if (! ACCESSING_BITS_0_7)
 		return 0;
 
 	switch ((offset >> 8) & 7)
@@ -416,7 +416,7 @@ READ16_HANDLER(concept_io_r)
 
 WRITE16_HANDLER(concept_io_w)
 {
-	if (! ACCESSING_LSB)
+	if (! ACCESSING_BITS_0_7)
 		return;
 
 	data &= 0xff;

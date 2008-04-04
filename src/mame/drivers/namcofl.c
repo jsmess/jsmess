@@ -159,7 +159,7 @@ static READ32_HANDLER( namcofl_sysreg_r )
 
 static WRITE32_HANDLER( namcofl_sysreg_w )
 {
-	if ((offset == 2) && !(mem_mask & 0xff))  // address space configuration
+	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
@@ -178,7 +178,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 
-	if ((offset == 0x1808/4) && ACCESSING_MSW32)
+	if ((offset == 0x1808/4) && ACCESSING_BITS_16_31)
 	{
 		UINT16 v = paletteram32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
@@ -363,7 +363,7 @@ static MACHINE_DRIVER_START( namcofl )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
 	MDRV_SCREEN_VISIBLE_AREA(0, NAMCONB1_HBSTART-1, 0, NAMCONB1_VBSTART-1)
 

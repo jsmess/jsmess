@@ -594,7 +594,7 @@ WRITE16_HANDLER ( ti99_hsgpl_rom6_w )
 		return;		/* right??? */
 	}
 
-	if ((hsgpl.cru_reg & cr_mbxena) && (offset == 0x07ff) && ACCESSING_MSB16)
+	if ((hsgpl.cru_reg & cr_mbxena) && (offset == 0x07ff) && ACCESSING_BITS_8_15)
 	{	/* MBX: mapper at 0x6ffe */
 		hsgpl.cur_bank = (data >> 8) & 0x3;
 		return;
@@ -611,9 +611,9 @@ WRITE16_HANDLER ( ti99_hsgpl_rom6_w )
 		case 1:
 			if (hsgpl.cru_reg & cr_ramena)
 			{
-				if (ACCESSING_LSB16)
+				if (ACCESSING_BITS_0_7)
 					hsgpl.RAM6_ptr[1 + 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port] = data;
-				if (ACCESSING_MSB16)
+				if (ACCESSING_BITS_8_15)
 					hsgpl.RAM6_ptr[2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port] = data >> 8;
 				break;
 			}
@@ -639,9 +639,9 @@ WRITE16_HANDLER ( ti99_hsgpl_rom6_w )
 
 		case 32:
 		case 33:
-			if (ACCESSING_LSB16)
+			if (ACCESSING_BITS_0_7)
 				hsgpl.RAM6_ptr[1 + 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*(port-32)] = data;
-			if (ACCESSING_MSB16)
+			if (ACCESSING_BITS_8_15)
 				hsgpl.RAM6_ptr[2*offset + 0x2000*hsgpl.cur_bank + 0x8000*(port-32)] = data >> 8;
 			break;
 

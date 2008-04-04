@@ -538,7 +538,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 {
 	mame_system_time systime;
 
-	mame_get_base_datetime(Machine, &systime);
+	mame_get_base_datetime(machine, &systime);
 
 //  if(LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
 	smpc_ram[offset] = data;
@@ -630,7 +630,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
-				cpu_trigger(Machine, 1000);
+				cpu_trigger(machine, 1000);
 				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
@@ -769,10 +769,10 @@ static READ32_HANDLER ( stv_SMPC_r32 )
 	/* registers are all byte accesses, convert here */
 	offset = offset << 2; // multiply offset by 4
 
-	if (!(mem_mask & 0xff000000))	{ byte = 0; readdata = stv_SMPC_r8(offset+byte) << 24; }
-	if (!(mem_mask & 0x00ff0000))	{ byte = 1; readdata = stv_SMPC_r8(offset+byte) << 16; }
-	if (!(mem_mask & 0x0000ff00))	{ byte = 2; readdata = stv_SMPC_r8(offset+byte) << 8;  }
-	if (!(mem_mask & 0x000000ff))	{ byte = 3; readdata = stv_SMPC_r8(offset+byte) << 0;  }
+	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = stv_SMPC_r8(offset+byte) << 24; }
+	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = stv_SMPC_r8(offset+byte) << 16; }
+	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = stv_SMPC_r8(offset+byte) << 8;  }
+	if (ACCESSING_BITS_0_7)	{ byte = 3; readdata = stv_SMPC_r8(offset+byte) << 0;  }
 
 	return readdata;
 }
@@ -785,16 +785,16 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 	/* registers are all byte accesses, convert here so we can use the data more easily later */
 	offset = offset << 2; // multiply offset by 4
 
-	if (!(mem_mask & 0xff000000))	{ byte = 0; writedata = data >> 24; }
-	if (!(mem_mask & 0x00ff0000))	{ byte = 1; writedata = data >> 16; }
-	if (!(mem_mask & 0x0000ff00))	{ byte = 2; writedata = data >> 8;  }
-	if (!(mem_mask & 0x000000ff))	{ byte = 3; writedata = data >> 0;  }
+	if (ACCESSING_BITS_24_31)	{ byte = 0; writedata = data >> 24; }
+	if (ACCESSING_BITS_16_23)	{ byte = 1; writedata = data >> 16; }
+	if (ACCESSING_BITS_8_15)	{ byte = 2; writedata = data >> 8;  }
+	if (ACCESSING_BITS_0_7)	{ byte = 3; writedata = data >> 0;  }
 
 	writedata &= 0xff;
 
 	offset += byte;
 
-	stv_SMPC_w8(Machine, offset,writedata);
+	stv_SMPC_w8(machine, offset,writedata);
 }
 
 
@@ -942,9 +942,6 @@ static const UINT8 port_ad[] =
 
 static UINT8 port_sel,mux_data;
 
-#define HI_WORD_ACCESS (mem_mask & 0x00ff0000) == 0
-#define LO_WORD_ACCESS (mem_mask & 0x000000ff) == 0
-
 static READ32_HANDLER ( stv_io_r32 )
 {
 	static int i= -1;
@@ -974,7 +971,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			}
 			case 0x47:
 			{
-				if ( strcmp(Machine->gamedrv->name,"critcrsh") == 0 )
+				if ( strcmp(machine->gamedrv->name,"critcrsh") == 0 )
 				{
 					int data1 = 0, data2 = 0;
 
@@ -995,7 +992,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			return (readinputport(2) << 16) | (readinputport(3));
 		}
 		case 1:
-		if ( strcmp(Machine->gamedrv->name,"critcrsh") == 0 )
+		if ( strcmp(machine->gamedrv->name,"critcrsh") == 0 )
 		{
 			return ((readinputport(4) << 16) & ((readinputport(2) & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
 		}
@@ -1051,7 +1048,7 @@ static WRITE32_HANDLER ( stv_io_w32 )
 	switch(offset)
 	{
 		case 1:
-			if(LO_WORD_ACCESS)
+			if(ACCESSING_BITS_0_7)
 			{
 				/*Why does the BIOS tests these as ACTIVE HIGH?A program bug?*/
 				ioga[1] = (data) & 0xff;
@@ -1065,24 +1062,24 @@ static WRITE32_HANDLER ( stv_io_w32 )
 			}
 		break;
 		case 2:
-			if(HI_WORD_ACCESS)
+			if(ACCESSING_BITS_16_23)
 			{
 				ioga[2] = data >> 16;
 				mux_data = ioga[2];
 			}
-			else if(LO_WORD_ACCESS)
+			else if(ACCESSING_BITS_0_7)
 				ioga[2] = data;
 		break;
 		case 3:
-			if(HI_WORD_ACCESS)
+			if(ACCESSING_BITS_16_23)
 				ioga[3] = data;
 		break;
 		case 4:
-			if(HI_WORD_ACCESS)
+			if(ACCESSING_BITS_16_23)
 				port_sel = (data & 0xffff0000) >> 16;
 		break;
 		case 5:
-			if(HI_WORD_ACCESS)
+			if(ACCESSING_BITS_16_23)
 				ioga[5] = data;
 		break;
 	}
@@ -1295,14 +1292,14 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
+				//cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 				#if 0
 				if((scu_dst_0 & 0x7ffffff) != 0x05a00000)
 				{
 					if(!(stv_scu[40] & 0x1000))
 					{
-						cpunum_set_input_line_and_vector(Machine, 0, 3, HOLD_LINE, 0x4c);
+						cpunum_set_input_line_and_vector(machine, 0, 3, HOLD_LINE, 0x4c);
 						logerror("SCU: Illegal DMA interrupt\n");
 					}
 				}
@@ -1356,7 +1353,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
+				//cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1406,7 +1403,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
+				//cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -2052,7 +2049,7 @@ static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
 	cpu_boost_interleave(minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
-	cpu_trigger(Machine, 1000);
+	cpu_trigger(machine, 1000);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 

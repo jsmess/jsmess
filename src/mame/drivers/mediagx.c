@@ -66,6 +66,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "memconv.h"
+#include "devconv.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -465,17 +466,17 @@ static READ32_HANDLER( io20_r )
 {
 	UINT32 r = 0;
 	// 0x20 - 0x21, PIC
-	if ((mem_mask & 0x0000ffff) != 0xffff)
+	if (ACCESSING_BITS_0_15)
 	{
 		r |= pic8259_32le_0_r(machine, offset, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BITS_16_23)
 	{
 
 	}
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BITS_24_31)
 	{
 		r |= mediagx_config_reg_r() << 24;
 	}
@@ -485,17 +486,17 @@ static READ32_HANDLER( io20_r )
 static WRITE32_HANDLER( io20_w )
 {
 	// 0x20 - 0x21, PIC
-	if ((mem_mask & 0x0000ffff) != 0xffff)
+	if (ACCESSING_BITS_0_15)
 	{
 		pic8259_32le_0_w(machine, offset, data, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BITS_16_23)
 	{
 		mediagx_config_reg_sel = (data >> 16) & 0xff;
 	}
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BITS_24_31)
 	{
 		mediagx_config_reg_w((data >> 24) & 0xff);
 	}
@@ -505,7 +506,7 @@ static READ32_HANDLER( parallel_port_r )
 {
 	UINT32 r = 0;
 
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BITS_8_15)
 	{
 		UINT8 nibble = parallel_latched;//(readinputport(parallel_pointer / 3) >> (4 * (parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
@@ -525,7 +526,7 @@ static READ32_HANDLER( parallel_port_r )
 
         //r |= control_read << 8;*/
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BITS_16_23)
 	{
 		r |= parport & 0xff0000;
 	}
@@ -537,7 +538,7 @@ static WRITE32_HANDLER( parallel_port_w )
 {
 	COMBINE_DATA( &parport );
 
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BITS_0_7)
 	{
 		/*
             Controls:
@@ -698,12 +699,12 @@ static WRITE32_HANDLER( ad1847_w )
 {
 	if (offset == 0)
 	{
-		if (!(mem_mask & 0xffff0000))
+		if (ACCESSING_BITS_16_31)
 		{
 			UINT16 ldata = (data >> 16) & 0xffff;
 			dacl[dacl_ptr++] = ldata;
 		}
-		if (!(mem_mask & 0x0000ffff))
+		if (ACCESSING_BITS_0_15)
 		{
 			UINT16 rdata = data & 0xffff;
 			dacr[dacr_ptr++] = rdata;
@@ -717,6 +718,9 @@ static WRITE32_HANDLER( ad1847_w )
 		ad1847_reg_write(reg, data & 0xff);
 	}
 }
+
+DEV_READWRITE8TO32LE( mediagx_pit8254_32le, pit8253_r, pit8253_w )
+
 
 /*****************************************************************************/
 
@@ -736,7 +740,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mediagx_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(dma8237_32le_0_r,			dma8237_32le_0_w)
 	AM_RANGE(0x0020, 0x0023) AM_READWRITE(io20_r, io20_w)
-	AM_RANGE(0x0040, 0x005f) AM_READWRITE(pit8253_32le_0_r,			pit8253_32le_0_w)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, "pit8254", mediagx_pit8254_32le_r, mediagx_pit8254_32le_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
@@ -860,6 +864,32 @@ static MACHINE_RESET(mediagx)
 	ide_controller_reset(0);
 }
 
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+{
+	pic8259_set_irq_line(0, 0, state);
+}
+
+
+static const struct pit8253_config mediagx_pit8254_config =
+{
+	{
+		{
+			4772720/4,				/* heartbeat IRQ */
+			pc_timer0_w,
+			NULL
+		}, {
+			4772720/4,				/* dram refresh */
+			NULL,
+			NULL
+		}, {
+			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			NULL,
+			NULL
+		}
+	}
+};
+
+
 static MACHINE_DRIVER_START(mediagx)
 
 	/* basic machine hardware */
@@ -868,6 +898,9 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_CPU_IO_MAP(mediagx_io, 0)
 
 	MDRV_MACHINE_RESET(mediagx)
+
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
+	MDRV_DEVICE_CONFIG( mediagx_pit8254_config )
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -927,7 +960,7 @@ static const struct pci_device_info cx5510 =
 
 static void init_mediagx(running_machine *machine)
 {
-	init_pc_common(PCCOMMON_KEYBOARD_AT | PCCOMMON_DMA8237_AT | PCCOMMON_TIMER_8254);
+	init_pc_common(PCCOMMON_KEYBOARD_AT | PCCOMMON_DMA8237_AT);
 	mc146818_init(MC146818_STANDARD);
 
 	pci_init();

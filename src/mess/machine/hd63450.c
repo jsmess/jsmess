@@ -87,7 +87,7 @@ void hd63450_write(int offset, int data, UINT16 mem_mask)
 	switch(reg)
 	{
 	case 0x00:  // CSR / CER
-		if(ACCESSING_MSB)
+		if(ACCESSING_BITS_8_15)
 		{
 //			dmac.reg[channel].csr = (data & 0xff00) >> 8;
 //			logerror("DMA#%i: Channel status write : %02x\n",channel,dmac.reg[channel].csr);
@@ -95,24 +95,24 @@ void hd63450_write(int offset, int data, UINT16 mem_mask)
 		// CER is read-only, so no action needed there.
 		break;
 	case 0x02:  // DCR / OCR
-		if(ACCESSING_MSB)
+		if(ACCESSING_BITS_8_15)
 		{
 			dmac.reg[channel].dcr = (data & 0xff00) >> 8;
 			logerror("DMA#%i: Device Control write : %02x\n",channel,dmac.reg[channel].dcr);
 		}
-		if(ACCESSING_LSB)
+		if(ACCESSING_BITS_0_7)
 		{
 			dmac.reg[channel].ocr = data & 0x00ff;
 			logerror("DMA#%i: Operation Control write : %02x\n",channel,dmac.reg[channel].ocr);
 		}
 		break;
 	case 0x03:  // SCR / CCR
-		if(ACCESSING_MSB)
+		if(ACCESSING_BITS_8_15)
 		{
 			dmac.reg[channel].scr = (data & 0xff00) >> 8;
 			logerror("DMA#%i: Sequence Control write : %02x\n",channel,dmac.reg[channel].scr);
 		}
-		if(ACCESSING_LSB)
+		if(ACCESSING_BITS_0_7)
 		{
 			dmac.reg[channel].ccr = data & 0x00ff;
 			if((data & 0x0080))// && !dmac.intf->dma_read[channel] && !dmac.intf->dma_write[channel])

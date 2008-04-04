@@ -403,15 +403,15 @@ static int cybiko_rs232_rx_queue( void)
 READ16_HANDLER( cybiko_lcd_r )
 {
 	UINT16 data = 0;
-	if ACCESSING_MSB16 data = data | (hd66421_reg_idx_r() << 8);
-	if ACCESSING_LSB16 data = data | (hd66421_reg_dat_r() << 0);
+	if ACCESSING_BITS_8_15 data = data | (hd66421_reg_idx_r() << 8);
+	if ACCESSING_BITS_0_7 data = data | (hd66421_reg_dat_r() << 0);
 	return data;
 }
 
 WRITE16_HANDLER( cybiko_lcd_w )
 {
-	if ACCESSING_MSB16 hd66421_reg_idx_w( (data >> 8) & 0xFF);
-	if ACCESSING_LSB16 hd66421_reg_dat_w( (data >> 0) & 0xFF);
+	if ACCESSING_BITS_8_15 hd66421_reg_idx_w( (data >> 8) & 0xFF);
+	if ACCESSING_BITS_0_7 hd66421_reg_dat_w( (data >> 0) & 0xFF);
 }
 
 static READ8_HANDLER( cybiko_key_r_byte )
@@ -433,8 +433,8 @@ READ16_HANDLER( cybiko_key_r )
 {
 	UINT16 data = 0;
 	_logerror( 2, ("cybiko_key_r (%08X/%04X)\n", offset, mem_mask));
-	if ACCESSING_MSB16 data = data | (cybiko_key_r_byte(machine, offset * 2 + 0) << 8);
-	if ACCESSING_LSB16 data = data | (cybiko_key_r_byte(machine, offset * 2 + 1) << 0);
+	if ACCESSING_BITS_8_15 data = data | (cybiko_key_r_byte(machine, offset * 2 + 0) << 8);
+	if ACCESSING_BITS_0_7 data = data | (cybiko_key_r_byte(machine, offset * 2 + 1) << 0);
 	_logerror( 2, ("%04X\n", data));
 	return data;
 }
@@ -562,8 +562,8 @@ WRITE8_HANDLER( cybikoxt_io_reg_w )
 // 20/00, 23/08, 27/01, 2F/08, 2C/02, 2B/08, 28/01, 37/08, 34/04, 33/08, 30/03, 04/80, 05/02, 1B/6C, 00/C8
 WRITE16_HANDLER( cybiko_unk1_w )
 {
-	if ACCESSING_MSB16 logerror( "[%08X] <- %02X\n", 0x200000 + offset * 2 + 0, (data >> 8) & 0xFF);
-	if ACCESSING_LSB16 logerror( "[%08X] <- %02X\n", 0x200000 + offset * 2 + 1, (data >> 0) & 0xFF);
+	if ACCESSING_BITS_8_15 logerror( "[%08X] <- %02X\n", 0x200000 + offset * 2 + 0, (data >> 8) & 0xFF);
+	if ACCESSING_BITS_0_7 logerror( "[%08X] <- %02X\n", 0x200000 + offset * 2 + 1, (data >> 0) & 0xFF);
 }
 
 READ16_HANDLER( cybiko_unk2_r )

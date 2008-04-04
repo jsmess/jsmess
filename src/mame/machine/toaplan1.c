@@ -36,7 +36,7 @@ INTERRUPT_GEN( toaplan1_interrupt )
 
 WRITE16_HANDLER( toaplan1_intenable_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		toaplan1_intenable = data & 0xff;
 	}
@@ -99,7 +99,7 @@ WRITE16_HANDLER( demonwld_dsp_bio_w )
 	if (data == 0) {
 		if (dsp_execute) {
 			logerror("Turning 68000 on\n");
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 			dsp_execute = 0;
 		}
 		demonwld_dsp_BIO = ASSERT_LINE;
@@ -140,7 +140,7 @@ WRITE16_HANDLER( demonwld_dsp_ctrl_w )
 	logerror("68000:%08x  Writing %08x to %08x.\n",activecpu_get_pc() ,data ,0xe0000a + offset);
 #endif
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		switch (data)
 		{
@@ -201,7 +201,7 @@ WRITE16_HANDLER( vimana_mcu_w )
 	{
 		case 0:  break;
 		case 1:  break;
-		case 2:  if (ACCESSING_LSB) vimana_credits = data & 0xff; break;
+		case 2:  if (ACCESSING_BITS_0_7) vimana_credits = data & 0xff; break;
 	}
 }
 
@@ -212,7 +212,7 @@ READ16_HANDLER( toaplan1_shared_r )
 
 WRITE16_HANDLER( toaplan1_shared_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		toaplan1_sharedram[offset] = data & 0xff;
 	}
@@ -223,13 +223,13 @@ WRITE16_HANDLER( toaplan1_reset_sound )
 {
 	/* Reset the secondary CPU and sound chip during soft resets */
 
-	if (ACCESSING_LSB && (data == 0))
+	if (ACCESSING_BITS_0_7 && (data == 0))
 	{
 		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n",activecpu_get_previouspc(),data);
-		if (Machine->config->sound[0].type == SOUND_YM3812)
+		if (machine->config->sound[0].type == SOUND_YM3812)
 			sndti_reset(SOUND_YM3812, 0);
-		if (Machine->config->cpu[1].type == CPU_Z80)
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		if (machine->config->cpu[1].type == CPU_Z80)
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -281,11 +281,11 @@ WRITE8_HANDLER( toaplan1_coin_w )
 
 WRITE16_HANDLER( samesame_coin_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		toaplan1_coin_w(machine, offset, data & 0xff);
 	}
-	if (ACCESSING_MSB && (data&0xff00))
+	if (ACCESSING_BITS_8_15 && (data&0xff00))
 	{
 		logerror("PC:%04x  Writing unknown MSB data (%04x) to coin count/lockout port\n",activecpu_get_previouspc(),data);
 	}

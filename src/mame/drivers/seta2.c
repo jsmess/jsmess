@@ -423,7 +423,7 @@ U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pi
 
 static WRITE16_HANDLER( seta2_sound_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *ROM = memory_region( REGION_SOUND1 );
 		int banks = (memory_region_length( REGION_SOUND1 ) - 0x100000) / 0x20000;
@@ -443,7 +443,7 @@ static WRITE16_HANDLER( seta2_sound_bank_w )
 
 static WRITE16_HANDLER( grdians_lockout_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		// initially 0, then either $25 (coin 1) or $2a (coin 2)
 		coin_counter_w(0,data & 0x01);	// or 0x04
@@ -575,7 +575,7 @@ static READ16_HANDLER( mj4simai_p1_r )
 
 static WRITE16_HANDLER( mj4simai_keyboard_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 		keyboard_row = data & 0xff;
 }
 
@@ -691,7 +691,7 @@ static READ16_HANDLER( pzlbowl_coins_r )
 
 static WRITE16_HANDLER( pzlbowl_coin_counter_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0,data & 0x10);
 		coin_counter_w(1,data & 0x20);
@@ -780,7 +780,7 @@ static READ16_HANDLER( samshoot_lightgun2_r )
 
 static WRITE16_HANDLER( samshoot_coin_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0, data & 0x10);
 		coin_counter_w(1, data & 0x20);
@@ -2096,10 +2096,10 @@ ROM_START( penbros )
 	ROM_LOAD( "u18.bin", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
-ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) */
+ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) - The "E05" breaks version label conventions but is correct & verified */
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )		/* TMP68301 Code */
-	ROM_LOAD16_BYTE( "as0906e01-v4_3.u06", 0x000000, 0x100000, CRC(20c81f17) SHA1(d41d93d6ee88738cec55f7bf3ce6be1dbec68e09) )
-	ROM_LOAD16_BYTE( "as0907e01-v4_3.u07", 0x000001, 0x100000, CRC(1731aa2a) SHA1(cffae7a99a7f960a62ef0c4454884df17a93c1a6) )
+	ROM_LOAD16_BYTE( "as0906e05.u06", 0x000000, 0x100000, CRC(20c81f17) SHA1(d41d93d6ee88738cec55f7bf3ce6be1dbec68e09) ) /* CRC16 694E printed on label */
+	ROM_LOAD16_BYTE( "as0907e05.u07", 0x000001, 0x100000, CRC(1731aa2a) SHA1(cffae7a99a7f960a62ef0c4454884df17a93c1a6) ) /* CRC16 5D89 printed on label */
 
 	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -2114,8 +2114,8 @@ ROM_END
 
 ROM_START( deerhuna ) /* Deer Hunting USA V4.2 (xx/x/2000) */
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )		/* TMP68301 Code */
-	ROM_LOAD16_BYTE( "as0906e01-v4_2.u06", 0x000000, 0x100000, CRC(bb3af36f) SHA1(f04071347e8ad361bf666fcb6c0136e522f19d47) )
-	ROM_LOAD16_BYTE( "as0907e01-v4_2.u07", 0x000001, 0x100000, CRC(83f02117) SHA1(70fc2291bc93af3902aae88688be6a8078f7a07e) )
+	ROM_LOAD16_BYTE( "as0906e04-v4_2.u06", 0x000000, 0x100000, CRC(bb3af36f) SHA1(f04071347e8ad361bf666fcb6c0136e522f19d47) ) /* CRC16 6640 printed on label */
+	ROM_LOAD16_BYTE( "as0907e04-v4_2.u07", 0x000001, 0x100000, CRC(83f02117) SHA1(70fc2291bc93af3902aae88688be6a8078f7a07e) ) /* CRC16 595A printed on label */
 
 	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -2130,8 +2130,26 @@ ROM_END
 
 ROM_START( deerhunb ) /* Deer Hunting USA V4.0 (6/15/2000) */
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )		/* TMP68301 Code */
-	ROM_LOAD16_BYTE( "as0906e01-v4.u06", 0x000000, 0x100000, CRC(07d9b64a) SHA1(f9aac644aab920bbac84b14836ee589ccd51f6db) )
-	ROM_LOAD16_BYTE( "as0907e01-v4.u07", 0x000001, 0x100000, CRC(19973d08) SHA1(da1cc02ce480a62ccaf94d0af1246a340f054b43) )
+	ROM_LOAD16_BYTE( "as0906e04.u06", 0x000000, 0x100000, CRC(07d9b64a) SHA1(f9aac644aab920bbac84b14836ee589ccd51f6db) ) /* CRC16 7BBB printed on label */
+	ROM_LOAD16_BYTE( "as0907e04.u07", 0x000001, 0x100000, CRC(19973d08) SHA1(da1cc02ce480a62ccaf94d0af1246a340f054b43) ) /* CRC16 4C78 printed on label */
+
+	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
+	ROM_LOAD( "as0902m01.u39", 0x0800000, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
+	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
+	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
+
+	ROM_REGION( 0x500000, REGION_SOUND1, 0 )	/* Samples */
+	/* Leave 1MB empty (addressable by the chip) */
+	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+ROM_END
+
+	/* There are known versions 3.x of Deer Hunting USA.... just none are currently dumped.  roms should be "AS0906 E03 U06" & "AS0907 E03 U07" */
+
+ROM_START( deerhunc ) /* Deer Hunting USA V2.x - No version number is printed to screen but "E02" in EPROM label signifies V2 */
+	ROM_REGION( 0x200000, REGION_CPU1, 0 )		/* TMP68301 Code */
+	ROM_LOAD16_BYTE( "as0906e02.u06", 0x000000, 0x100000, CRC(190cca42) SHA1(aef63f5e8c71ed0156b8b0104c5d23872c119167) ) /* Version in program code is listed as 0.00 */
+	ROM_LOAD16_BYTE( "as0907e02.u07", 0x000001, 0x100000, CRC(9de2b901) SHA1(d271bc54c41e30c0d9962eedd22f3ef2b7b8c9e5) ) /* Verified with two different sets of chips */
 
 	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -2218,6 +2236,7 @@ GAME( 2000, penbros,  0,        penbros,  penbros,  0, ROT0, "Subsino",         
 GAME( 2000, deerhunt, 0,        samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.3",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhuna, deerhunt, samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.2",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunb, deerhunt, samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.0",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhunc, deerhunt, samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V2",                          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, turkhunt, 0,        samshoot, turkhunt, 0, ROT0, "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, wschamp,  0,        samshoot, wschamp,  0, ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.0",              GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0, ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )

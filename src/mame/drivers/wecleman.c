@@ -366,7 +366,7 @@ static WRITE16_HANDLER( wecleman_protection_w )
 */
 static WRITE16_HANDLER( irqctrl_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",activecpu_get_pc(), data&0xFF, old_data&0xFF);
 
@@ -400,7 +400,7 @@ static WRITE16_HANDLER( irqctrl_w )
 */
 static WRITE16_HANDLER( selected_ip_w )
 {
-	if (ACCESSING_LSB) wecleman_selected_ip = data & 0xff;	// latch the value
+	if (ACCESSING_BITS_0_7) wecleman_selected_ip = data & 0xff;	// latch the value
 }
 
 /* $140021.b - Return the previously selected input port's value */
@@ -456,7 +456,7 @@ static WRITE16_HANDLER( blitter_w )
 	COMBINE_DATA(&blitter_regs[offset]);
 
 	/* do a blit if $80010.b has been written */
-	if ( (offset == 0x10/2) && (ACCESSING_MSB) )
+	if ( (offset == 0x10/2) && (ACCESSING_BITS_8_15) )
 	{
 		/* 80000.b = ?? usually 0 - other values: 02 ; 00 - ? logic function ? */
 		/* 80001.b = ?? usually 0 - other values: 3f ; 01 - ? height ? */
@@ -573,22 +573,22 @@ static READ16_HANDLER( hotchase_K051316_1_r )
 
 static WRITE16_HANDLER( hotchase_K051316_0_w )
 {
-	if (ACCESSING_LSB)      K051316_0_w(machine, offset, data & 0xff);
+	if (ACCESSING_BITS_0_7)      K051316_0_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_K051316_1_w )
 {
-	if (ACCESSING_LSB)      K051316_1_w(machine, offset, data & 0xff);
+	if (ACCESSING_BITS_0_7)      K051316_1_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_K051316_ctrl_0_w )
 {
-	if (ACCESSING_LSB)      K051316_ctrl_0_w(machine, offset, data & 0xff);
+	if (ACCESSING_BITS_0_7)      K051316_ctrl_0_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_K051316_ctrl_1_w )
 {
-	if (ACCESSING_LSB)      K051316_ctrl_1_w(machine, offset, data & 0xff);
+	if (ACCESSING_BITS_0_7)      K051316_ctrl_1_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_soundlatch_w );
@@ -649,7 +649,7 @@ ADDRESS_MAP_END
 /* 140001.b */
 WRITE16_HANDLER( wecleman_soundlatch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data & 0xFF);
 		cpunum_set_input_line(machine, 2,0, HOLD_LINE);
@@ -717,7 +717,7 @@ ADDRESS_MAP_END
 /* 140001.b */
 static WRITE16_HANDLER( hotchase_soundlatch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data & 0xFF);
 		cpunum_set_input_line(machine, 2,M6809_IRQ_LINE, HOLD_LINE);
@@ -1133,7 +1133,7 @@ static MACHINE_DRIVER_START( wecleman )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320 +16, 224 +16)
 	MDRV_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
 

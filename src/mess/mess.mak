@@ -370,7 +370,6 @@ DRVLIBS = \
 	$(MESSOBJ)/gce.a \
 	$(MESSOBJ)/glasgow.a \
 	$(MESSOBJ)/gmaster.a \
-	$(MESSOBJ)/pasogo.a \
 	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/jupiter.a \
@@ -395,6 +394,7 @@ DRVLIBS = \
 	$(MESSOBJ)/nintendo.a \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/p2000.a \
+	$(MESSOBJ)/pasogo.a \
 	$(MESSOBJ)/pc.a \
 	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pdp1.a \

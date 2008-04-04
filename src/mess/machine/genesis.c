@@ -1102,11 +1102,11 @@ READ16_HANDLER( genesis_68000_z80_read )
 		switch (offset & 3)
 		{
 			case 0:
-				if (ACCESSING_MSB)	 return YM2612_status_port_0_A_r(0) << 8;
+				if (ACCESSING_BITS_8_15)	 return YM2612_status_port_0_A_r(0) << 8;
 				else 				 return YM2612_read_port_0_r(0);
 				break;
 			case 2:
-				if (ACCESSING_MSB)	return YM2612_status_port_0_B_r(0) << 8;
+				if (ACCESSING_BITS_8_15)	return YM2612_status_port_0_B_r(0) << 8;
 				else 				return 0;
 				break;
 		}
@@ -1137,7 +1137,7 @@ WRITE16_HANDLER( genesis_68000_z80_write )
 
 //		logerror("Write Data %04x Mask %04x to Z80 offset %04x\n", data, mem_mask, offset);
 
-		if ((ACCESSING_LSB) && (ACCESSING_MSB))
+		if ((ACCESSING_BITS_0_7) && (ACCESSING_BITS_8_15))
 		{
 		//	logerror("word access wrote to z80!\n");
 			// ignore LSB
@@ -1146,10 +1146,10 @@ WRITE16_HANDLER( genesis_68000_z80_write )
 			return;
 		}
 
-		if (ACCESSING_LSB)
+		if (ACCESSING_BITS_0_7)
 			memory_region(REGION_CPU2)[offset^1] = data & 0x00ff;
 
-		if (ACCESSING_MSB)
+		if (ACCESSING_BITS_8_15)
 			memory_region(REGION_CPU2)[offset] = (data & 0xff00)>>8;
 	}
 	else if ((offset>=0x4000) && (offset<=0x5fff))
@@ -1157,11 +1157,11 @@ WRITE16_HANDLER( genesis_68000_z80_write )
 		switch (offset & 3)
 		{
 			case 0:
-				if (ACCESSING_MSB)	YM2612_control_port_0_A_w	(0,	(data >> 8) & 0xff);
+				if (ACCESSING_BITS_8_15)	YM2612_control_port_0_A_w	(0,	(data >> 8) & 0xff);
 				else 				YM2612_data_port_0_A_w		(0,	(data >> 0) & 0xff);
 				break;
 			case 2:
-				if (ACCESSING_MSB)	YM2612_control_port_0_B_w	(0,	(data >> 8) & 0xff);
+				if (ACCESSING_BITS_8_15)	YM2612_control_port_0_B_w	(0,	(data >> 8) & 0xff);
 				else 				YM2612_data_port_0_B_w		(0,	(data >> 0) & 0xff);
 				break;
 		}
@@ -2000,16 +2000,16 @@ void genesis_vdp_write ( genvdp *current_vdp, offs_t offset, UINT16 data, UINT16
 		case 0x00: // Data Port
 		case 0x02: // Data Port (mirror)
 			/* for 8-bit writes data gets duplicated in each half */
-			if (!ACCESSING_LSB)	data = (data & 0xff00) | ((data >>8 )& 0x00ff);
-			if (!ACCESSING_MSB)	data = (data & 0x00ff) | ((data <<8 )& 0xff00);
+			if (!ACCESSING_BITS_0_7)	data = (data & 0xff00) | ((data >>8 )& 0x00ff);
+			if (!ACCESSING_BITS_8_15)	data = (data & 0x00ff) | ((data <<8 )& 0xff00);
 			genesis_vdp_data_write(current_vdp,data);
 			break;
 
 		case 0x04: // Control Port
 		case 0x06: // Control Port (mirror)
 			/* for 8-bit writes data gets duplicated in each half */
-			if (!ACCESSING_LSB)	data = (data & 0xff00) | ((data >>8 )& 0x00ff);
-			if (!ACCESSING_MSB)	data = (data & 0x00ff) | ((data <<8 )& 0xff00);
+			if (!ACCESSING_BITS_0_7)	data = (data & 0xff00) | ((data >>8 )& 0x00ff);
+			if (!ACCESSING_BITS_8_15)	data = (data & 0x00ff) | ((data <<8 )& 0xff00);
 			genesis_vdp_control_write(current_vdp,data);
 			break;
 
@@ -2029,7 +2029,7 @@ void genesis_vdp_write ( genvdp *current_vdp, offs_t offset, UINT16 data, UINT16
 		case 0x16: // SN76489 PSG (mirror)
 						SN76496_1_w(0, (data) & 0xff); break;
 
-		//	if (ACCESSING_MSB) SN76496_0_w(0, (data >>8) & 0xff);
+		//	if (ACCESSING_BITS_8_15) SN76496_0_w(0, (data >>8) & 0xff);
 
 	//		break;
 

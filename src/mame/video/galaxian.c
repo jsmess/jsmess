@@ -1,1079 +1,709 @@
 /***************************************************************************
 
-  Galaxian hardware family
+    Galaxian-derived video hardware
+
+****************************************************************************
+
+    Video timing:
+
+        The master clock is an 18.432MHz crystal. It is divided by 3 by
+        a pair of J/K flip-flops to 6.144MHz. This 6MHz signal is used to
+        drive most of the video logic. Note that due to the way the
+        divide-by-3 circuit is implemented, the duty cycle of the 6MHz
+        signal is 66% (i.e., it is high for 2 18MHz clocks and low for 1).
+        This is important for accurate stars rendering.
+
+
+    Horizontal timing:
+
+        H counts from 010000000 (128) to 111111111 (511), giving 384
+        total H clocks per scanline
+
+        However, the top bit is inverted to become 256H, so when reading
+        the schematics it's really counting from:
+            110000000 -> 111111111 (blanking period)
+        and then from:
+            000000000 -> 011111111 (main portion of screen = 256 pixels)
+
+        HBLANK is a flip-flop clocked by 2H:
+          * It is held clear when 256H = 0 (main portion of screen)
+          * The D input is connected to !(64H & 32H & 16H & 8H)
+          * It is clocked to 1 when H=130
+          * It is clocked to 0 when H=250
+          * This gives 264 total non-blanked pixels:
+              6 additional pixels on the left (H=250..255)
+              256 main area pixels (H=256..511)
+              2 additional pixels on the right (H=128..129)
+
+        HSYNC is a flip-flop clocked by 16H:
+          * It is held clear when 256H = 0 (main portion of screen)
+          * The D input is connected to !(!64H & 32H)
+          * HSYNC is the /Q output
+          * It is clocked to 1 when H=176
+          * It is clocked to 0 when H=208
+
+
+    Vertical timing:
+
+        V counts from 011111000 (248) to 111111111 (511), giving 264
+        total V clocks per frame
+
+        IMPORTANT: the V sync chain is clocked by HSYNC. This means
+        that for the first 48 H clocks of the blanking period, the
+        V counter is one behind. This is important to take into account
+        for sprite and missile positioning.
+
+        VBLANK is a flip-flop clocked by 16V:
+          * The D input is connected to !(128V & 64V & 32V)
+          * It is clocked to 1 when V=496
+          * It is clocked to 0 when V=272
+          * This gives 224 total non-blanked pixels
+
+        VSYNC is set to !256V:
+          * It is set to 1 when V=248
+          * It is cleared to 0 when V=256
+
+
+    Sprites and missiles:
+
+        During the HBLANK period, sprites and missiles are processed.
+        Sprites are rendered into the line buffer, which was cleared
+        during the visible portion of the previous scanline.
+
+        It takes 8 H clocks to set up a sprite, and 16 to render it
+        to the line buffer. The setup clocks are overlapped with the
+        rendering clocks. In theory this would result in enough time
+        to render 128/16 = 8 sprites. However, the setup does not
+        begin until after HBLANK, so there is only enough time to
+        render the first 7 1/2 entries.
+
+        Interleaved with the setup for sprites is setup for the
+        shell and missile rendering. Shells and missiles are rendered
+        realtime during the visible portion of the frame, and are
+        effectively color-ORed directly into the final RGB output.
+        During the HBLANK setup period, each shell/missile entry is
+        compared against the current V position; if an exact match
+        is found, the H position is loaded into a dedicated 8-bit
+        counter. The counter clocks each pixel during the active video
+        period; when it reaches $FC it enables the output until it
+        hits zero, at which point it shuts itself off. Because there
+        is only one counter for shells and one for missiles, only one
+        shell and one missile can be specified per scanline. The last
+        matching entry found will always win.
+
+        The difference between shell and missile is that shells
+        populate the first 7 entries and are rendered as white,
+        whereas missiles populate the final entry and are rendered
+        as yellow.
+
+        Here is the detailed sequence of events for sprite and
+        missile/shell rendering during the first 24 H clocks of
+        HBLANK:
+
+            H=080: HPOSI=objram[40], /VPL latches V+objram[40]
+            H=081: HPOSI=objram[40]
+            H=082: HPOSI=objram[41], /OBJ DATA L latches picture number, H/V flip
+            H=083: HPOSI=objram[41]
+            H=084: HPOSI=objram[42], /COL L latches low 3 bits as color
+            H=085: HPOSI=objram[42]
+            H=086: HPOSI=objram[43]
+            H=087: HPOSI=objram[43], /CNTR LD latches X position
+            <sprite 0 begins rendering>
+            H=088: HPOSI=objram[40], /VPL latches V+objram[40]
+            H=089: HPOSI=objram[40]
+            H=08A: HPOSI=objram[61]
+            H=08B: HPOSI=objram[61], MSLD is latched if Y position matches shell
+            H=08C: HPOSI=objram[42]
+            H=08D: HPOSI=objram[42]
+            H=08E: HPOSI=objram[63]
+            H=08F: HPOSI=objram[63], /SLD fires to latch down shell counter value
+            H=090: HPOSI=objram[44], /VPL latches V+objram[44]
+            H=091: HPOSI=objram[44]
+            H=092: HPOSI=objram[45], /OBJ DATA L latches picture number, H/V flip
+            H=093: HPOSI=objram[45]
+            H=094: HPOSI=objram[46], /COL L latches low 3 bits as color
+            H=095: HPOSI=objram[46]
+            H=096: HPOSI=objram[47]
+            H=097: HPOSI=objram[47], /CNTR LD latches X position
+            <sprite 1 begins rendering>
+
+        From this, you can see the object RAM layout looks like:
+
+            objram[40] = vertical position of sprite 0
+            objram[41] = picture number and H/V flip of sprite 0
+            objram[42] = color of sprite 0
+            objram[43] = horizontal position of sprite 0
+
+            objram[61] = vertical position of shell 0
+            objram[63] = horizontal count until shell 0 starts rendering
+
+        A vertical match for a sprite is true if ((V + vpos) & 0xf0) == 0xf0.
+        A vertical match for a shell/missile is if ((V + vpos) & 0xff) == 0xff.
+
+        Overall, the process for sprites and missiles during HBLANK looks
+        like this:
+
+            H=080: begin setup sprite 0
+            H=082: begin HBLANK
+            H=088: begin render sprite 0; begin setup shell 0
+            H=090: begin setup sprite 1
+            H=098: begin render sprite 1; begin setup shell 1
+            H=0A0: begin setup sprite 2
+            H=0A8: begin render sprite 2; begin setup shell 2
+            H=0B0: VSYNC increments V counter; subsequent sprites match V+1
+            H=0B0: begin setup sprite 3
+            H=0B8: begin render sprite 3; begin setup shell 3
+            H=0C0: begin setup sprite 4
+            H=0C8: begin render sprite 4; begin setup shell 4
+            H=0D0: begin setup sprite 5
+            H=0D8: begin render sprite 5; begin setup shell 5
+            H=0E0: begin setup sprite 6
+            H=0E8: begin render sprite 6; begin setup shell 6
+            H=0F0: begin setup sprite 7
+            H=0F8: begin render sprite 7; begin setup missile
+            H=0FA: end HBLANK
+            H=100: finish render sprite 7 (only 1/2 way through)
+
+
+
+       /VPL: H=xxxxxx000 -> latches sum of V+HPOSI for vertical positioning
+     /COL L: H=xxxxxx100 -> latches HPOSI into color register (low 3 bits)
+        /LD: H=xxxxxx111 -> shift register load from ROM
+  /CNTR CLR: H=0xxxx0111 -> resets line buffer counter to 0
+/OBJ DATA L: H=1xxxx0010 -> latches HPOSI into picture number latch
+   /CNTR LD: H=1xxxx0111 -> latches HPOSI into line buffer counter (sprite X position)
+       /SLD: H=1xxxx1111 -> latches down counter until shell (except when /MLD)
+       /MLD: H=1x1111111 -> latches down counter until missile
+
+
+
+VRAM addresses:
+         addr  video
+  VRA7 =  A9   SUM7
+  VRA8 =  A8   SUM6
+  VRA6 =  A7   SUM5
+  VRA5 =  A6   SUM4
+  VRA4 =  A5   SUM3
+  VRA3 =  A4   128HB
+  VRA0 =  A3    64HB
+  VRA1 =  A2    32HB
+  VRA2 =  A1    16HB
+  VRA9 =  A0     8HB
+
+OBJRAM addresses:
+         addr 256H=0 256H=1
+   RA4 =  A0    4H     2H
+   RA7 =  A1    8HB    4H
+   RA1 =  A2   16HB   16HB
+   RA0 =  A3   32HB   32HB
+   RA5 =  A4   64HB   64HB
+   RA6 =  A5  128HB  (2H & 8HB)
+   RA3 =  A6  256H   256H
+   RA2 =  A7    0      0
+
+H=80: 00,00,01,01,02,02,03,03 00,00,21,21,02,02,23,23
+H=90: 04,04,05,05,06,06,07,07 04,04,25,25,06,06,27,27
+H=A0: 08,08,09,09,0A,0A,0B,0B 08,08,29,29,0A,0A,2B,2B
+H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
+
+
 
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
 #include "includes/galaxian.h"
 
-static const rectangle _spritevisiblearea =
-{
-	2*8+1, 32*8-1,
-	2*8,   30*8-1
-};
-static const rectangle _spritevisibleareaflipx =
-{
-	0*8, 30*8-2,
-	2*8, 30*8-1
-};
-
-static const rectangle* spritevisiblearea;
-static const rectangle* spritevisibleareaflipx;
 
 
-#define STARS_COLOR_BASE 		(memory_region_length(REGION_PROMS))
-#define BULLETS_COLOR_BASE		(STARS_COLOR_BASE + 64)
-#define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
+
+/*************************************
+ *
+ *  Constants
+ *
+ *************************************/
+
+#define STAR_RNG_PERIOD		((1 << 17) - 1)
+#define RGB_MAXIMUM			224
 
 
-UINT8 *galaxian_videoram;
-UINT8 *galaxian_spriteram;
-UINT8 *galaxian_spriteram2;
-UINT8 *galaxian_attributesram;
-UINT8 *galaxian_bulletsram;
-UINT8 *rockclim_videoram;
-size_t galaxian_spriteram_size;
-size_t galaxian_spriteram2_size;
-size_t galaxian_bulletsram_size;
+
+/*************************************
+ *
+ *  Global variables
+ *
+ *************************************/
+
+/* rendering callbacks */
+galaxian_draw_bullet_func galaxian_draw_bullet_ptr;
+galaxian_draw_background_func galaxian_draw_background_ptr;
+
+/* tile/sprite modification callbacks */
+galaxian_extend_tile_info_func galaxian_extend_tile_info_ptr;
+galaxian_extend_sprite_info_func galaxian_extend_sprite_info_ptr;
+
+/* global tweaks */
+UINT8 galaxian_frogger_adjust;
+UINT8 galaxian_sfx_tilemap;
+UINT8 galaxian_sprite_clip_start;
+UINT8 galaxian_sprite_clip_end;
 
 
-static TILE_GET_INFO( get_tile_info );
-static TILE_GET_INFO( rockclim_get_tile_info );
+
+/*************************************
+ *
+ *  Local variables
+ *
+ *************************************/
+
 static tilemap *bg_tilemap;
-static tilemap *rockclim_tilemap;
-static int mooncrst_gfxextend;
-static int spriteram2_present;
-static UINT8 gfxbank[5];
+
 static UINT8 flipscreen_x;
 static UINT8 flipscreen_y;
-static UINT8 color_mask;
-static tilemap *dambustr_tilemap2;
-static UINT8 *dambustr_videoram2;
-static void (*modify_charcode)(UINT16 *code,UINT8 x);		/* function to call to do character banking */
-static void  gmgalax_modify_charcode(UINT16 *code,UINT8 x);
-static void mooncrst_modify_charcode(UINT16 *code,UINT8 x);
-static void mooncrgx_modify_charcode(UINT16 *code,UINT8 x);
-static void  moonqsr_modify_charcode(UINT16 *code,UINT8 x);
-static void mshuttle_modify_charcode(UINT16 *code,UINT8 x);
-static void   pisces_modify_charcode(UINT16 *code,UINT8 x);
-static void mimonkey_modify_charcode(UINT16 *code,UINT8 x);
-static void  batman2_modify_charcode(UINT16 *code,UINT8 x);
-static void  mariner_modify_charcode(UINT16 *code,UINT8 x);
-static void  jumpbug_modify_charcode(UINT16 *code,UINT8 x);
-static void dambustr_modify_charcode(UINT16 *code,UINT8 x);
 
-static void (*modify_spritecode)(UINT8 *spriteram,int*,int*,int*,int);	/* function to call to do sprite banking */
-static void  gmgalax_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void mooncrst_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void mooncrgx_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void  moonqsr_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void mshuttle_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void  calipso_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void   pisces_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void mimonkey_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void  batman2_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void  jumpbug_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void dkongjrm_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void   ad2083_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void dambustr_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-
-static void (*modify_color)(UINT8 *color);	/* function to call to do modify how the color codes map to the PROM */
-static void frogger_modify_color(UINT8 *color);
-static void gmgalax_modify_color(UINT8 *color);
-static void drivfrcg_modify_color(UINT8 *color);
-
-static void (*modify_ypos)(UINT8*);	/* function to call to do modify how vertical positioning bits are connected */
-static void frogger_modify_ypos(UINT8 *sy);
-
-static TIMER_CALLBACK( stars_blink_callback );
-static TIMER_CALLBACK( stars_scroll_callback );
-
-static void (*tilemap_set_scroll)( tilemap *, int col, int value );
-
-/* star circuit */
-#define STAR_COUNT  252
-struct star
-{
-	int x,y,color;
-};
-static struct star stars[STAR_COUNT];
-static int stars_colors_start;
-       UINT8 galaxian_stars_on;
-static INT32 stars_scrollpos;
-static UINT8 stars_blink_state;
-static emu_timer *stars_blink_timer;
-static emu_timer *stars_scroll_timer;
-static UINT8 timer_adjusted;
-       void galaxian_init_stars(running_machine *machine, int colors_offset);
-static void (*draw_stars)(running_machine *machine, bitmap_t *, const rectangle *);		/* function to call to draw the star layer */
-static void     noop_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-       void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void   rescue_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void  mariner_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void  jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void start_stars_blink_timer(double ra, double rb, double c);
-static void start_stars_scroll_timer(running_machine *machine);
-
-/* bullets circuit */
-static UINT8 darkplnt_bullet_color;
-static void (*draw_bullets)(bitmap_t *,int,int,int,const rectangle *);	/* function to call to draw a bullet */
-static void galaxian_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
-static void gteikob2_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
-static void scramble_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
-static void   theend_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
-static void darkplnt_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
-static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
-
-/* background circuit */
 static UINT8 background_enable;
-static UINT8 background_red, background_green, background_blue;
-static void (*draw_background)(bitmap_t *, const rectangle *cliprect);	/* function to call to draw the background */
-static void galaxian_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
-static void scramble_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
-static void  turtles_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
-static void  mariner_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
-static void  frogger_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
-static void stratgyx_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
-static void  minefld_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
-static void   rescue_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
-static void dambustr_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static UINT8 background_red;
+static UINT8 background_green;
+static UINT8 background_blue;
 
-static UINT16 rockclim_v;
-static UINT16 rockclim_h;
-static int dambustr_bg_split_line;
-static int dambustr_bg_color_1;
-static int dambustr_bg_color_2;
-static int dambustr_bg_priority;
-static int dambustr_char_bank;
-static bitmap_t *dambustr_tmpbitmap;
+static UINT32 star_rng_origin;
+static UINT32 star_rng_origin_frame;
+static rgb_t star_color[64];
+static UINT8 *stars;
+static UINT8 stars_enabled;
+static UINT8 stars_blink_state;
+
+static rgb_t bullet_color[8];
+
+static UINT8 gfxbank[5];
 
 
 
-/***************************************************************************
+/*************************************
+ *
+ *  Function prototypes
+ *
+ *************************************/
 
-  Convert the color PROMs into a more useable format.
+static void state_save_register(void);
+static TILE_GET_INFO( bg_get_tile_info );
 
-  Galaxian has one 32 bytes palette PROM, connected to the RGB output this way:
+static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *spritebase);
 
-  bit 7 -- 220 ohm resistor  -- BLUE
-        -- 470 ohm resistor  -- BLUE
-        -- 220 ohm resistor  -- GREEN
-        -- 470 ohm resistor  -- GREEN
-        -- 1  kohm resistor  -- GREEN
-        -- 220 ohm resistor  -- RED
-        -- 470 ohm resistor  -- RED
-  bit 0 -- 1  kohm resistor  -- RED
+static void stars_init(void);
+static void stars_update_origin(running_machine *machine);
+static void stars_draw_row(bitmap_t *bitmap, int maxx, int y, UINT32 star_offs, UINT8 starmask);
 
-  The output of the background star generator is connected this way:
+static void bullets_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *base);
 
-  bit 5 -- 100 ohm resistor  -- BLUE
-        -- 150 ohm resistor  -- BLUE
-        -- 100 ohm resistor  -- GREEN
-        -- 150 ohm resistor  -- GREEN
-        -- 100 ohm resistor  -- RED
-  bit 0 -- 150 ohm resistor  -- RED
 
-  The blue background in Scramble and other games goes through a 390 ohm
-  resistor.
 
-  The bullet RGB outputs go through 100 ohm resistors.
+/*************************************
+ *
+ *  Palette setup
+ *
+ *************************************/
 
-  The RGB outputs have a 470 ohm pull-down each.
-
-***************************************************************************/
 PALETTE_INIT( galaxian )
 {
-	int i;
-
-
-	/* first, the character/sprite palette */
-
-	for (i = 0;i < memory_region_length(REGION_PROMS);i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
-
-		/* red component */
-		bit0 = BIT(*color_prom,0);
-		bit1 = BIT(*color_prom,1);
-		bit2 = BIT(*color_prom,2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = BIT(*color_prom,3);
-		bit1 = BIT(*color_prom,4);
-		bit2 = BIT(*color_prom,5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = BIT(*color_prom,6);
-		bit1 = BIT(*color_prom,7);
-		b = 0x4f * bit0 + 0xa8 * bit1;
-
-		palette_set_color_rgb(machine,i,r,g,b);
-		color_prom++;
-	}
-
-
-	galaxian_init_stars(machine, STARS_COLOR_BASE);
-
-
-	/* bullets - yellow and white */
-	palette_set_color(machine,BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x00));
-	palette_set_color(machine,BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
-}
-
-PALETTE_INIT( scramble )
-{
-	PALETTE_INIT_CALL(galaxian);
-
-
-	/* blue background - 390 ohm resistor */
-	palette_set_color(machine,BACKGROUND_COLOR_BASE,MAKE_RGB(0,0,0x56));
-}
-
-PALETTE_INIT( moonwar )
-{
-	PALETTE_INIT_CALL(scramble);
-
-
-	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
-	palette_set_color(machine,BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x97));
-}
-
-PALETTE_INIT( turtles )
-{
-	int i;
-
-
-	PALETTE_INIT_CALL(galaxian);
-
-
-	/*  The background color generator is connected this way:
-
-        RED   - 390 ohm resistor
-        GREEN - 470 ohm resistor
-        BLUE  - 390 ohm resistor */
-
-	for (i = 0; i < 8; i++)
-	{
-		int r = BIT(i,0) * 0x55;
-		int g = BIT(i,1) * 0x47;
-		int b = BIT(i,2) * 0x55;
-
-		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+i,r,g,b);
-	}
-}
-
-PALETTE_INIT( stratgyx )
-{
-	int i;
-
-
-	PALETTE_INIT_CALL(galaxian);
-
-
-	/*  The background color generator is connected this way:
-
-        RED   - 270 ohm resistor
-        GREEN - 560 ohm resistor
-        BLUE  - 470 ohm resistor */
-
-	for (i = 0; i < 8; i++)
-	{
-		int r = BIT(i,0) * 0x7c;
-		int g = BIT(i,1) * 0x3c;
-		int b = BIT(i,2) * 0x47;
-
-		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+i,r,g,b);
-	}
-}
-
-PALETTE_INIT( frogger )
-{
-	PALETTE_INIT_CALL(galaxian);
-
-
-	/* blue background - 470 ohm resistor */
-	palette_set_color(machine,BACKGROUND_COLOR_BASE,MAKE_RGB(0,0,0x47));
-}
-
-PALETTE_INIT( rockclim )
-{
-	int i;
-
-
-	/* first, the character/sprite palette */
-
-	for (i = 0;i < memory_region_length(REGION_PROMS);i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
-
-		/* red component */
-		bit0 = BIT(*color_prom,0);
-		bit1 = BIT(*color_prom,1);
-		bit2 = BIT(*color_prom,2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = BIT(*color_prom,3);
-		bit1 = BIT(*color_prom,4);
-		bit2 = BIT(*color_prom,5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = BIT(*color_prom,6);
-		bit1 = BIT(*color_prom,7);
-		b = 0x4f * bit0 + 0xa8 * bit1;
-
-		palette_set_color_rgb(machine,i,r,g,b);
-		color_prom++;
-	}
-}
-/***************************************************************************
-
-  Convert the color PROMs into a more useable format.
-
-  Dark Planet has one 32 bytes palette PROM, connected to the RGB output this way:
-
-  bit 5 -- 220 ohm resistor  -- BLUE
-        -- 470 ohm resistor  -- BLUE
-        -- 1  kohm resistor  -- BLUE
-        -- 220 ohm resistor  -- RED
-        -- 470 ohm resistor  -- RED
-  bit 0 -- 1  kohm resistor  -- RED
-
-  The bullet RGB outputs go through 100 ohm resistors.
-
-  The RGB outputs have a 470 ohm pull-down each.
-
-***************************************************************************/
-PALETTE_INIT( darkplnt )
-{
-	int i;
-
-
-	/* first, the character/sprite palette */
-
-	for (i = 0;i < 32;i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
-
-		/* red component */
-		bit0 = BIT(*color_prom,0);
-		bit1 = BIT(*color_prom,1);
-		bit2 = BIT(*color_prom,2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		g = 0x00;
-		/* blue component */
-		bit0 = BIT(*color_prom,3);
-		bit1 = BIT(*color_prom,4);
-		bit2 = BIT(*color_prom,5);
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		palette_set_color_rgb(machine,i,r,g,b);
-		color_prom++;
-	}
-
-
-	/* bullets - red and blue */
-	palette_set_color(machine,BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0x00,0x00));
-	palette_set_color(machine,BULLETS_COLOR_BASE+1,MAKE_RGB(0x00,0x00,0xef));
-}
-
-PALETTE_INIT( minefld )
-{
-	int i;
-
-
-	PALETTE_INIT_CALL(galaxian);
-
-
-	/* set up background colors */
-
-	/* graduated blue */
-
-	for (i = 0; i < 128; i++)
-	{
-		int r = 0;
-		int g = i;
-		int b = i * 2;
-		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+i,r,g,b);
-	}
-
-	/* graduated brown */
-
-	for (i = 0; i < 128; i++)
-	{
-		int r = i * 1.5;
-		int g = i * 0.75;
-		int b = i / 2;
-		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+128+i,r,g,b);
-	}
-}
-
-PALETTE_INIT( rescue )
-{
-	int i;
-
-
-	PALETTE_INIT_CALL(galaxian);
-
-
-	/* set up background colors */
-
-	/* graduated blue */
-
-	for (i = 0; i < 128; i++)
-	{
-		int r = 0;
-		int g = i;
-		int b = i * 2;
-		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+i,r,g,b);
-	}
-}
-
-PALETTE_INIT( mariner )
-{
-	int i;
-
-
-	PALETTE_INIT_CALL(galaxian);
-
-
-	/* set up background colors */
-
-	/* 16 shades of blue - the 4 bits are connected to the following resistors:
-
-        bit 0 -- 4.7 kohm resistor
-              -- 2.2 kohm resistor
-              -- 1   kohm resistor
-        bit 0 -- .47 kohm resistor */
-
-	for (i = 0; i < 16; i++)
-	{
-		int r,g,b;
-
-		r = 0;
-		g = 0;
-		b = 0x0e * BIT(i,0) + 0x1f * BIT(i,1) + 0x43 * BIT(i,2) + 0x8f * BIT(i,3);
-
-		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+i,r,g,b);
-	}
-}
-
-
-PALETTE_INIT( dambustr )
-{
-	int i;
-
-	PALETTE_INIT_CALL(galaxian);
-
+	static const int rgb_resistances[3] = { 1000, 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
+	int i, minval, midval, maxval;
+	UINT8 starmap[4];
 
 	/*
-    Assumption (not clear from the schematics):
-    The background color generator is connected this way:
+        Sprite/tilemap colors are mapped through a color PROM as follows:
 
-        RED   - 470 ohm resistor
-        GREEN - 470 ohm resistor
-        BLUE  - 470 ohm resistor */
+          bit 7 -- 220 ohm resistor  -- BLUE
+                -- 470 ohm resistor  -- BLUE
+                -- 220 ohm resistor  -- GREEN
+                -- 470 ohm resistor  -- GREEN
+                -- 1  kohm resistor  -- GREEN
+                -- 220 ohm resistor  -- RED
+                -- 470 ohm resistor  -- RED
+          bit 0 -- 1  kohm resistor  -- RED
 
+        In parallel with these resistors are a pair of 150 ohm and 100 ohm
+        resistors on each R,G,B component that are connected to the star
+        generator.
 
-	for (i = 0; i < 8; i++)
+        And in parallel with the whole mess are a set of 100 ohm resistors
+        on each R,G,B component that are enabled when a shell/missile is
+        enabled.
+
+        When computing weights, we use RGB_MAXIMUM as the maximum to give
+        headroom for stars and shells/missiles. This is not fully accurate,
+        but if we included all possible sources in parallel, the brightness
+        of the main game would be very low to allow for all the oversaturation
+        of the stars and shells/missiles.
+    */
+	compute_resistor_weights(0,	RGB_MAXIMUM, -1.0,
+			3, &rgb_resistances[0], rweights, 470, 0,
+			3, &rgb_resistances[0], gweights, 470, 0,
+			2, &rgb_resistances[1], bweights, 470, 0);
+
+	/* decode the palette first */
+	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
 	{
-		int r = BIT(i,0) * 0x47;
-		int g = BIT(i,1) * 0x47;
-		int b = BIT(i,2) * 0x4f;
-		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+i,r,g,b);
+		UINT8 bit0, bit1, bit2, r, g, b;
+
+		/* red component */
+		bit0 = BIT(color_prom[i],0);
+		bit1 = BIT(color_prom[i],1);
+		bit2 = BIT(color_prom[i],2);
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
+
+		/* green component */
+		bit0 = BIT(color_prom[i],3);
+		bit1 = BIT(color_prom[i],4);
+		bit2 = BIT(color_prom[i],5);
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = BIT(color_prom[i],6);
+		bit1 = BIT(color_prom[i],7);
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
 	}
+
+	/*
+        The maximum sprite/tilemap resistance is ~130 Ohms with all RGB
+        outputs enabled (1/(1/1000 + 1/470 + 1/220)). Since we normalized
+        to RGB_MAXIMUM, this maps RGB_MAXIMUM -> 130 Ohms.
+
+        The stars are at 150 Ohms for the LSB, and 100 Ohms for the MSB.
+        This means the 3 potential values are:
+
+            150 Ohms -> RGB_MAXIMUM * 130 / 150
+            100 Ohms -> RGB_MAXIMUM * 130 / 100
+             60 Ohms -> RGB_MAXIMUM * 130 / 60
+
+        Since we can't saturate that high, we instead approximate this
+        by compressing the values proportionally into the 194->255 range.
+    */
+	minval = RGB_MAXIMUM * 130 / 150;
+	midval = RGB_MAXIMUM * 130 / 100;
+	maxval = RGB_MAXIMUM * 130 / 60;
+
+	/* compute the values for each of 4 possible star values */
+	starmap[0] = 0;
+	starmap[1] = minval;
+	starmap[2] = minval + (255 - minval) * (midval - minval) / (maxval - minval);
+	starmap[3] = 255;
+
+	/* generate the colors for the stars */
+	for (i = 0; i < 64; i++)
+	{
+		UINT8 bit0, bit1, r, g, b;
+
+		/* bit 5 = red @ 150 Ohm, bit 4 = red @ 100 Ohm */
+		bit0 = BIT(i,5);
+		bit1 = BIT(i,4);
+		r = starmap[(bit1 << 1) | bit0];
+
+		/* bit 3 = green @ 150 Ohm, bit 2 = green @ 100 Ohm */
+		bit0 = BIT(i,3);
+		bit1 = BIT(i,2);
+		g = starmap[(bit1 << 1) | bit0];
+
+		/* bit 1 = blue @ 150 Ohm, bit 0 = blue @ 100 Ohm */
+		bit0 = BIT(i,1);
+		bit1 = BIT(i,0);
+		b = starmap[(bit1 << 1) | bit0];
+
+		/* set the RGB color */
+		star_color[i] = MAKE_RGB(r, g, b);
+	}
+
+	/* default bullet colors are white for the first 7, and yellow for the last one */
+	for (i = 0; i < 7; i++)
+		bullet_color[i] = MAKE_RGB(0xff,0xff,0xff);
+	bullet_color[7] = MAKE_RGB(0xff,0xff,0x00);
 }
 
 
 
-/***************************************************************************
+/*************************************
+ *
+ *  Common video init
+ *
+ *************************************/
 
-  Start the video hardware emulation.
+VIDEO_START( galaxian )
+{
+	/* create a tilemap for the background */
+	if (!galaxian_sfx_tilemap)
+	{
+		/* normal galaxian hardware is row-based and individually scrolling columns */
+		bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows, GALAXIAN_XSCALE*8,8, 32,32);
+		tilemap_set_scroll_cols(bg_tilemap, 32);
+		tilemap_set_scrolldx(bg_tilemap, 0, -GALAXIAN_XSCALE * 128);
+		tilemap_set_scrolldy(bg_tilemap, 0, 8);
+	}
+	else
+	{
+		/* sfx hardware is column-based and individually scrolling rows */
+		bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_cols, GALAXIAN_XSCALE*8,8, 32,32);
+		tilemap_set_scroll_rows(bg_tilemap, 32);
+		tilemap_set_scrolldx(bg_tilemap, 0, -GALAXIAN_XSCALE * 128);
+		tilemap_set_scrolldy(bg_tilemap, 0, 8);
+	}
+	tilemap_set_transparent_pen(bg_tilemap, 0);
 
-***************************************************************************/
+	/* initialize globals */
+	flipscreen_x = 0;
+	flipscreen_y = 0;
+	background_enable = 0;
+	background_blue = 0;
+	background_red = 0;
+	background_green = 0;
+
+	/* initialize stars */
+	stars_init();
+
+	/* register for save states */
+	state_save_register();
+}
+
 
 static void state_save_register(void)
 {
-	state_save_register_global_array(gfxbank);
 	state_save_register_global(flipscreen_x);
 	state_save_register_global(flipscreen_y);
-
-	state_save_register_global(galaxian_stars_on);
-	state_save_register_global(stars_scrollpos);
-	state_save_register_global(stars_blink_state);
-
-	state_save_register_global(darkplnt_bullet_color);
-
 	state_save_register_global(background_enable);
 	state_save_register_global(background_red);
 	state_save_register_global(background_green);
 	state_save_register_global(background_blue);
+
+	state_save_register_global_array(gfxbank);
+
+	state_save_register_global(stars_enabled);
+	state_save_register_global(star_rng_origin);
+	state_save_register_global(star_rng_origin_frame);
+	state_save_register_global(stars_blink_state);
 }
 
-static void video_start_common(running_machine *machine, tilemap_mapper_func get_memory_offset)
+
+
+/*************************************
+ *
+ *  Common video update
+ *
+ *************************************/
+
+VIDEO_UPDATE( galaxian )
 {
-	bg_tilemap = tilemap_create(get_tile_info,get_memory_offset,8,8,32,32);
+	/* draw the background layer (including stars) */
+	(*galaxian_draw_background_ptr)(screen->machine, bitmap, cliprect);
 
-	tilemap_set_transparent_pen(bg_tilemap,0);
+	/* draw the tilemap characters over top */
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
+	/* render the sprites next */
+	sprites_draw(screen->machine, bitmap, cliprect, &spriteram[0x40]);
 
-	modify_charcode = 0;
-	modify_spritecode = 0;
-	modify_color = 0;
-	modify_ypos = 0;
+	/* if we have bullets to draw, render them following */
+	if (galaxian_draw_bullet_ptr != NULL)
+		bullets_draw(screen->machine, bitmap, cliprect, &spriteram[0x60]);
 
-	mooncrst_gfxextend = 0;
-
-	draw_bullets = 0;
-
-	draw_background = galaxian_draw_background;
-	background_enable = 0;
-	background_blue = 0;
-	background_red = 0;
-	background_green = 0;
-
-	draw_stars = noop_draw_stars;
-
-	flipscreen_x = 0;
-	flipscreen_y = 0;
-
-	spriteram2_present = 0;
-
-	spritevisiblearea      = &_spritevisiblearea;
-	spritevisibleareaflipx = &_spritevisibleareaflipx;
-
-	color_mask = (machine->gfx[0]->color_granularity == 4) ? 7 : 3;
-
-	state_save_register();
+	return 0;
 }
 
-VIDEO_START( galaxian_plain )
-{
-	video_start_common(machine,tilemap_scan_rows);
 
-	tilemap_set_scroll_cols(bg_tilemap, 32);
-	tilemap_set_scroll = tilemap_set_scrolly;
-}
 
-VIDEO_START( galaxian )
-{
-	VIDEO_START_CALL(galaxian_plain);
+/*************************************
+ *
+ *  Background tilemap
+ *
+ *************************************/
 
-	draw_stars = galaxian_draw_stars;
-
-	draw_bullets = galaxian_draw_bullets;
-}
-
-VIDEO_START( gmgalax )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = gmgalax_modify_charcode;
-	modify_spritecode = gmgalax_modify_spritecode;
-	modify_color      = gmgalax_modify_color;
-}
-
-VIDEO_START( mooncrst )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = mooncrst_modify_charcode;
-	modify_spritecode = mooncrst_modify_spritecode;
-}
-
-VIDEO_START( mooncrgx )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = mooncrgx_modify_charcode;
-	modify_spritecode = mooncrgx_modify_spritecode;
-}
-
-VIDEO_START( moonqsr )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = moonqsr_modify_charcode;
-	modify_spritecode = moonqsr_modify_spritecode;
-}
-
-VIDEO_START( mshuttle )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = mshuttle_modify_charcode;
-	modify_spritecode = mshuttle_modify_spritecode;
-}
-
-VIDEO_START( pisces )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = pisces_modify_charcode;
-	modify_spritecode = pisces_modify_spritecode;
-}
-
-VIDEO_START( gteikob2 )
-{
-	VIDEO_START_CALL(pisces);
-
-	draw_bullets = gteikob2_draw_bullets;
-}
-
-VIDEO_START( batman2 )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = batman2_modify_charcode;
-	modify_spritecode = batman2_modify_spritecode;
-
-}
-
-VIDEO_START( scramble )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	/* FIXME: This most probably needs to be adjusted
-     * again when RAW video params are added to scramble
-     */
-	tilemap_set_scrolldx(bg_tilemap, 0, 0);
-
-	draw_stars = scramble_draw_stars;
-
-	draw_bullets = scramble_draw_bullets;
-
-	draw_background = scramble_draw_background;
-}
-
-VIDEO_START( sfx )
-{
-	video_start_common(machine,tilemap_scan_cols);
-
-	tilemap_set_scroll_rows(bg_tilemap, 32);
-	tilemap_set_scroll = tilemap_set_scrollx;
-
-	draw_stars = scramble_draw_stars;
-
-	draw_bullets = scramble_draw_bullets;
-
-	draw_background = turtles_draw_background;
-}
-
-VIDEO_START( turtles )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	draw_background = turtles_draw_background;
-}
-
-VIDEO_START( theend )
-{
-	VIDEO_START_CALL(galaxian);
-
-	draw_bullets = theend_draw_bullets;
-}
-
-VIDEO_START( darkplnt )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	tilemap_set_scrolldx(bg_tilemap, 0, 0);
-	draw_bullets = darkplnt_draw_bullets;
-}
-
-VIDEO_START( rescue )
-{
-	VIDEO_START_CALL(scramble);
-
-	draw_stars = rescue_draw_stars;
-
-	draw_background = rescue_draw_background;
-}
-
-VIDEO_START( minefld )
-{
-	VIDEO_START_CALL(scramble);
-
-	draw_stars = rescue_draw_stars;
-
-	draw_background = minefld_draw_background;
-}
-
-VIDEO_START( stratgyx )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	draw_background = stratgyx_draw_background;
-}
-
-VIDEO_START( ckongs )
-{
-	VIDEO_START_CALL(scramble);
-
-	modify_spritecode = mshuttle_modify_spritecode;
-}
-
-VIDEO_START( calipso )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	draw_bullets = scramble_draw_bullets;
-
-	draw_background = scramble_draw_background;
-
-	modify_spritecode = calipso_modify_spritecode;
-}
-
-VIDEO_START( mariner )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	draw_stars = mariner_draw_stars;
-
-	draw_bullets = scramble_draw_bullets;
-
-	draw_background = mariner_draw_background;
-
-	modify_charcode = mariner_modify_charcode;
-}
-
-VIDEO_START( froggers )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	draw_background = frogger_draw_background;
-	modify_color = frogger_modify_color;
-}
-
-VIDEO_START( frogger )
-{
-	VIDEO_START_CALL(froggers);
-
-	modify_ypos = frogger_modify_ypos;
-}
-
-VIDEO_START( jumpbug )
-{
-	VIDEO_START_CALL(scramble);
-
-	draw_stars = jumpbug_draw_stars;
-
-	modify_charcode   = jumpbug_modify_charcode;
-	modify_spritecode = jumpbug_modify_spritecode;
-}
-
-VIDEO_START( azurian )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	draw_stars = galaxian_draw_stars;
-	draw_bullets = scramble_draw_bullets; /* Shots are yellow like in Scramble */
-}
-
-VIDEO_START( mimonkey )
-{
-	VIDEO_START_CALL(scramble);
-
-	modify_charcode   = mimonkey_modify_charcode;
-	modify_spritecode = mimonkey_modify_spritecode;
-}
-
-VIDEO_START( dkongjrm )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	modify_charcode   = pisces_modify_charcode;
-	modify_spritecode = dkongjrm_modify_spritecode;
-
-	spriteram2_present= 1;
-}
-
-VIDEO_START( newsin7 )
-{
-	VIDEO_START_CALL(scramble);
-
-	spritevisiblearea      = &_spritevisibleareaflipx;
-	spritevisibleareaflipx = &_spritevisiblearea;
-}
-
-VIDEO_START( scorpion )
-{
-	VIDEO_START_CALL(scramble);
-
-	modify_spritecode = batman2_modify_spritecode;
-}
-
-static void rockclim_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	tilemap_draw(bitmap,cliprect,rockclim_tilemap, 0,0);
-}
-
-static void rockclim_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	if (gfxbank[2])	*code|=0x40;
-}
-
-VIDEO_START( rockclim )
-{
-	VIDEO_START_CALL(galaxian);
-	rockclim_tilemap = tilemap_create(rockclim_get_tile_info,tilemap_scan_rows,8,8,64,32);
-	draw_background = rockclim_draw_background;
-	modify_charcode = mooncrst_modify_charcode;
-	modify_spritecode = rockclim_modify_spritecode;
-	rockclim_v = rockclim_h = 0;
-	state_save_register_global(rockclim_v);
-	state_save_register_global(rockclim_h);
-}
-
-static TILE_GET_INFO( drivfrcg_get_tile_info )
-{
-	int code = galaxian_videoram[tile_index];
-	UINT8 x = tile_index & 0x1f;
-	UINT8 color = galaxian_attributesram[(x << 1) | 1] & 7;
-	UINT8 bank = galaxian_attributesram[(x << 1) | 1] & 0x30;
-
-	code |= (bank << 4);
-	color |= ((galaxian_attributesram[(x << 1) | 1] & 0x40) >> 3);
-
-	SET_TILE_INFO(0, code, color, 0);
-}
-
-VIDEO_START( drivfrcg )
-{
-	bg_tilemap = tilemap_create(drivfrcg_get_tile_info,tilemap_scan_rows,8,8,32,32);
-
-	tilemap_set_transparent_pen(bg_tilemap,0);
-	tilemap_set_scroll_cols(bg_tilemap, 32);
-	tilemap_set_scroll = tilemap_set_scrolly;
-
-	modify_charcode = 0;
-	modify_spritecode = mshuttle_modify_spritecode;
-	modify_color = drivfrcg_modify_color;
-	modify_ypos = 0;
-
-	mooncrst_gfxextend = 0;
-
-	draw_bullets = 0;
-
-	draw_background = galaxian_draw_background;
-	background_enable = 0;
-	background_blue = 0;
-	background_red = 0;
-	background_green = 0;
-
-	draw_stars = noop_draw_stars;
-
-	flipscreen_x = 0;
-	flipscreen_y = 0;
-
-	spriteram2_present = 0;
-
-	spritevisiblearea      = &_spritevisiblearea;
-	spritevisibleareaflipx = &_spritevisibleareaflipx;
-
-	color_mask = 0xff;
-
-	state_save_register();
-}
-
-VIDEO_START( ad2083 )
-{
-	bg_tilemap = tilemap_create(drivfrcg_get_tile_info,tilemap_scan_rows,8,8,32,32);
-
-	tilemap_set_transparent_pen(bg_tilemap,0);
-	tilemap_set_scroll_cols(bg_tilemap, 32);
-	tilemap_set_scroll = tilemap_set_scrolly;
-
-	modify_charcode = 0;
-	modify_spritecode = ad2083_modify_spritecode;
-	modify_color = 0;
-	modify_ypos = 0;
-
-	mooncrst_gfxextend = 0;
-
-	draw_bullets = scramble_draw_bullets;
-
-	draw_background = turtles_draw_background;
-	background_enable = 0;
-	background_blue = 0;
-	background_red = 0;
-	background_green = 0;
-
-	draw_stars = noop_draw_stars;
-
-	flipscreen_x = 0;
-	flipscreen_y = 0;
-
-	spriteram2_present = 0;
-
-	spritevisiblearea      = &_spritevisiblearea;
-	spritevisibleareaflipx = &_spritevisibleareaflipx;
-
-	color_mask = 7;
-
-	state_save_register();
-}
-
-UINT8 *racknrol_tiles_bank;
-
-WRITE8_HANDLER( racknrol_tiles_bank_w )
-{
-	racknrol_tiles_bank[offset] = data;
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
-}
-
-static TILE_GET_INFO( racknrol_get_tile_info )
-{
-	int code = galaxian_videoram[tile_index];
-	UINT8 x = tile_index & 0x1f;
-	UINT8 color = galaxian_attributesram[(x << 1) | 1] & 7;
-	UINT8 bank = racknrol_tiles_bank[x] & 7;
-
-	code |= (bank << 8);
-
-	SET_TILE_INFO(0, code, color, 0);
-}
-
-VIDEO_START( racknrol )
-{
-	bg_tilemap = tilemap_create(racknrol_get_tile_info,tilemap_scan_rows,8,8,32,32);
-
-	tilemap_set_transparent_pen(bg_tilemap,0);
-	tilemap_set_scroll_cols(bg_tilemap, 32);
-	tilemap_set_scroll = tilemap_set_scrolly;
-
-	modify_charcode = 0;
-	modify_spritecode = 0;
-	modify_color = 0;
-	modify_ypos = 0;
-
-	mooncrst_gfxextend = 0;
-
-	draw_bullets = 0;
-
-	draw_background = galaxian_draw_background;
-	background_enable = 0;
-	background_blue = 0;
-	background_red = 0;
-	background_green = 0;
-
-	draw_stars = noop_draw_stars;
-
-	flipscreen_x = 0;
-	flipscreen_y = 0;
-
-	spriteram2_present = 0;
-
-	spritevisiblearea      = &_spritevisiblearea;
-	spritevisibleareaflipx = &_spritevisibleareaflipx;
-
-	color_mask = 0xff;
-
-	state_save_register();
-}
-
-VIDEO_START( bongo )
-{
-	VIDEO_START_CALL(galaxian_plain);
-
-	modify_spritecode = batman2_modify_spritecode;
-}
-
-static TILE_GET_INFO( dambustr_get_tile_info2 )
+static TILE_GET_INFO( bg_get_tile_info )
 {
 	UINT8 x = tile_index & 0x1f;
 
-	UINT16 code = dambustr_videoram2[tile_index];
-	UINT8 color = galaxian_attributesram[(x << 1) | 1] & color_mask;
+	UINT16 code = videoram[tile_index];
+	UINT8 attrib = spriteram[x*2+1];
+	UINT8 color = attrib & 7;
 
-	if (modify_charcode)
-	{
-		modify_charcode(&code, x);
-	}
-
-	if (modify_color)
-	{
-		modify_color(&color);
-	}
+	if (galaxian_extend_tile_info_ptr != NULL)
+		(*galaxian_extend_tile_info_ptr)(&code, &color, attrib, x);
 
 	SET_TILE_INFO(0, code, color, 0);
-}
-
-VIDEO_START( dambustr )
-{
-	VIDEO_START_CALL(galaxian);
-
-	dambustr_bg_split_line = 0;
-	dambustr_bg_color_1 = 0;
-	dambustr_bg_color_2 = 0;
-	dambustr_bg_priority = 0;
-	dambustr_char_bank = 0;
-
-	draw_background = dambustr_draw_background;
-
-	modify_charcode   = dambustr_modify_charcode;
-	modify_spritecode = dambustr_modify_spritecode;
-
-	draw_bullets = dambustr_draw_bullets;
-
-	/* allocate the temporary bitmap for the background priority */
-	dambustr_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-
-	/* make a copy of the tilemap to emulate background priority */
-	dambustr_videoram2 = auto_malloc(0x0400);
-	dambustr_tilemap2 = tilemap_create(dambustr_get_tile_info2,tilemap_scan_rows,8,8,32,32);
-
-	tilemap_set_transparent_pen(dambustr_tilemap2,0);
 }
 
 
 WRITE8_HANDLER( galaxian_videoram_w )
 {
-	galaxian_videoram[offset] = data;
+	/* update any video up to the current scanline */
+	video_screen_update_now(machine->primary_screen);
+
+	/* store the data and mark the corresponding tile dirty */
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-READ8_HANDLER( galaxian_videoram_r )
-{
-	return galaxian_videoram[offset];
-}
 
-
-WRITE8_HANDLER( galaxian_attributesram_w )
+WRITE8_HANDLER( galaxian_objram_w )
 {
-	if (galaxian_attributesram[offset] != data)
+	/* update any video up to the current scanline */
+	video_screen_update_now(machine->primary_screen);
+
+	/* store the data */
+	spriteram[offset] = data;
+
+	/* the first $40 bytes affect the tilemap */
+	if (offset < 0x40)
 	{
-		if (offset & 0x01)
+		/* even entries control the scroll position */
+		if ((offset & 0x01) == 0)
 		{
-			/* color change */
-			int i;
-
-			for (i = offset >> 1; i < 0x0400; i += 32)
-				tilemap_mark_tile_dirty(bg_tilemap, i);
+			/* Frogger: top and bottom 4 bits swapped entering the adder */
+			if (galaxian_frogger_adjust)
+				data = (data >> 4) | (data << 4);
+			if (!galaxian_sfx_tilemap)
+				tilemap_set_scrolly(bg_tilemap, offset >> 1, data);
+			else
+				tilemap_set_scrollx(bg_tilemap, offset >> 1, GALAXIAN_XSCALE*data);
 		}
+
+		/* odd entries control the color base for the row */
 		else
 		{
-			if (modify_ypos)
-			{
-				modify_ypos(&data);
-			}
-
-			tilemap_set_scroll(bg_tilemap, offset >> 1, data);
+			for (offset >>= 1; offset < 0x0400; offset += 32)
+				tilemap_mark_tile_dirty(bg_tilemap, offset);
 		}
-
-		galaxian_attributesram[offset] = data;
 	}
 }
 
+
+
+/*************************************
+ *
+ *  Sprite rendering
+ *
+ *************************************/
+
+static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *spritebase)
+{
+	rectangle clip = *cliprect;
+	int sprnum;
+
+	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
+	/* according to the schematics, it should be the first 16 pixels; however, */
+	/* some bootlegs demonstrate that this can be shifted to other positions. */
+	clip.min_x = MAX(clip.min_x, galaxian_sprite_clip_start * GALAXIAN_XSCALE);
+	clip.max_x = MIN(clip.max_x, (galaxian_sprite_clip_end + 1) * GALAXIAN_XSCALE - 1);
+
+	/* The line buffer is only written if it contains a '0' currently; */
+	/* it is cleared during the visible area, and populated during HBLANK */
+	/* To simulate this, we render backwards so that lower numbered sprites */
+	/* have priority over higher numbered sprites. */
+	for (sprnum = 7; sprnum >= 0; sprnum--)
+	{
+		const UINT8 *base = &spritebase[sprnum * 4];
+		/* Frogger: top and bottom 4 bits swapped entering the adder */
+		UINT8 base0 = galaxian_frogger_adjust ? ((base[0] >> 4) | (base[0] << 4)) : base[0];
+		/* the first three sprites match against y-1 */
+		UINT8 sy = 240 - (base0 - (sprnum < 3));
+		UINT16 code = base[1] & 0x3f;
+		UINT8 flipx = base[1] & 0x40;
+		UINT8 flipy = base[1] & 0x80;
+		UINT8 color = base[2] & 7;
+		UINT8 sx = base[3];
+
+		/* extend the sprite information */
+		if (galaxian_extend_sprite_info_ptr != NULL)
+			(*galaxian_extend_sprite_info_ptr)(base, &sx, &sy, &flipx, &flipy, &code, &color);
+
+		/* apply flipscreen in X direction */
+		if (flipscreen_x)
+		{
+			sx = 240 - sx;
+			flipx = !flipx;
+		}
+
+		/* apply flipscreen in Y direction */
+		if (flipscreen_y)
+		{
+			sy = 240 - sy;
+			flipy = !flipy;
+		}
+
+		/* draw */
+		drawgfx(bitmap, machine->gfx[1],
+				code, color,
+				flipx, flipy,
+				GALAXIAN_H0START + GALAXIAN_XSCALE * sx, sy,
+				&clip,
+				TRANSPARENCY_PEN, 0);
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Bullets rendering
+ *
+ *************************************/
+
+static void bullets_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *base)
+{
+	int y;
+
+	/* iterate over scanlines */
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		UINT8 shell = 0xff, missile = 0xff;
+		UINT8 effy;
+		int which;
+
+		/* the first 3 entries match Y-1 */
+		effy = flipscreen_y ? ((y - 1) ^ 255) : (y - 1);
+		for (which = 0; which < 3; which++)
+			if ((UINT8)(base[which*4+1] + effy) == 0xff)
+				shell = which;
+
+		/* remaining entries match Y */
+		effy = flipscreen_y ? (y ^ 255) : y;
+		for (which = 3; which < 8; which++)
+			if ((UINT8)(base[which*4+1] + effy) == 0xff)
+			{
+				if (which != 7)
+					shell = which;
+				else
+					missile = which;
+			}
+
+		/* draw the shell */
+		if (shell != 0xff)
+			(*galaxian_draw_bullet_ptr)(machine, bitmap, cliprect, shell, 255 - base[shell*4+3], y);
+		if (missile != 0xff)
+			(*galaxian_draw_bullet_ptr)(machine, bitmap, cliprect, missile, 255 - base[missile*4+3], y);
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Screen orientation
+ *
+ *************************************/
 
 WRITE8_HANDLER( galaxian_flip_screen_x_w )
 {
 	if (flipscreen_x != (data & 0x01))
 	{
-		flipscreen_x = data & 0x01;
+		video_screen_update_now(machine->primary_screen);
 
+		/* when the direction changes, we count a different number of clocks */
+		/* per frame, so we need to reset the origin of the stars to the current */
+		/* frame before we flip */
+		stars_update_origin(machine);
+
+		flipscreen_x = data & 0x01;
 		tilemap_set_flip(bg_tilemap, (flipscreen_x ? TILEMAP_FLIPX : 0) | (flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
@@ -1082,1118 +712,660 @@ WRITE8_HANDLER( galaxian_flip_screen_y_w )
 {
 	if (flipscreen_y != (data & 0x01))
 	{
+		video_screen_update_now(machine->primary_screen);
 		flipscreen_y = data & 0x01;
-
 		tilemap_set_flip(bg_tilemap, (flipscreen_x ? TILEMAP_FLIPX : 0) | (flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
-
-WRITE8_HANDLER( gteikob2_flip_screen_x_w )
-{
-	galaxian_flip_screen_x_w(machine, offset, ~data);
-}
-
-WRITE8_HANDLER( gteikob2_flip_screen_y_w )
-{
-	galaxian_flip_screen_y_w(machine, offset, ~data);
-}
-
-
-WRITE8_HANDLER( hotshock_flip_screen_w )
+WRITE8_HANDLER( galaxian_flip_screen_xy_w )
 {
 	galaxian_flip_screen_x_w(machine, offset, data);
 	galaxian_flip_screen_y_w(machine, offset, data);
 }
 
 
+
+/*************************************
+ *
+ *  Background controls
+ *
+ *************************************/
+
+WRITE8_HANDLER( galaxian_stars_enable_w )
+{
+	if ((stars_enabled ^ data) & 0x01)
+	video_screen_update_now(machine->primary_screen);
+	if (!stars_enabled && (data & 0x01))
+	{
+		/* on the rising edge of this, the CLR on the shift registers is released */
+		/* this resets the "origin" of this frame to 0 minus the number of clocks */
+		/* we have counted so far */
+		star_rng_origin = STAR_RNG_PERIOD - (video_screen_get_vpos(machine->primary_screen) * 512 + video_screen_get_hpos(machine->primary_screen));
+		star_rng_origin_frame = video_screen_get_frame_number(machine->primary_screen);
+	}
+	stars_enabled = data & 0x01;
+}
+
+
 WRITE8_HANDLER( scramble_background_enable_w )
 {
+	video_screen_update_now(machine->primary_screen);
 	background_enable = data & 0x01;
 }
 
+
 WRITE8_HANDLER( scramble_background_red_w )
 {
+	video_screen_update_now(machine->primary_screen);
 	background_red = data & 0x01;
 }
 
+
 WRITE8_HANDLER( scramble_background_green_w )
 {
+	video_screen_update_now(machine->primary_screen);
 	background_green = data & 0x01;
 }
 
+
 WRITE8_HANDLER( scramble_background_blue_w )
 {
+	video_screen_update_now(machine->primary_screen);
 	background_blue = data & 0x01;
 }
 
 
-WRITE8_HANDLER( galaxian_stars_enable_w )
-{
-	galaxian_stars_on = data & 0x01;
 
-	if (!galaxian_stars_on)
-	{
-		stars_scrollpos = 0;
-	}
-}
-
-
-WRITE8_HANDLER( darkplnt_bullet_color_w )
-{
-	darkplnt_bullet_color = data & 0x01;
-}
-
-
+/*************************************
+ *
+ *  Graphics banking
+ *
+ *************************************/
 
 WRITE8_HANDLER( galaxian_gfxbank_w )
 {
 	if (gfxbank[offset] != data)
 	{
+		video_screen_update_now(machine->primary_screen);
 		gfxbank[offset] = data;
-
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 }
 
-WRITE8_HANDLER( rockclim_videoram_w )
-{
-	rockclim_videoram[offset] = data;
-	tilemap_mark_tile_dirty(rockclim_tilemap, offset);
-}
 
-WRITE8_HANDLER( rockclim_scroll_w )
+
+/*************************************
+ *
+ *  Star initialization
+ *
+ *************************************/
+
+static void stars_init(void)
 {
-	switch(offset&3)
+	UINT32 shiftreg;
+	int i;
+
+	/* reset the blink and enabled states */
+	stars_enabled = FALSE;
+	stars_blink_state = 0;
+
+	/* precalculate the RNG */
+	stars = auto_malloc(STAR_RNG_PERIOD);
+	shiftreg = 0;
+	for (i = 0; i < STAR_RNG_PERIOD; i++)
 	{
-		case 0: rockclim_h=(rockclim_h&0xff00)|data;tilemap_set_scrollx(rockclim_tilemap , 0, rockclim_h );break;
-		case 1:	rockclim_h=(rockclim_h&0xff)|(data<<8);tilemap_set_scrollx(rockclim_tilemap , 0, rockclim_h );break;
-		case 2:	rockclim_v=(rockclim_v&0xff00)|data;tilemap_set_scrolly(rockclim_tilemap , 0, rockclim_v );break;
-		case 3:	rockclim_v=(rockclim_v&0xff)|(data<<8);tilemap_set_scrolly(rockclim_tilemap , 0, rockclim_v );break;
-	}
+		/* stars are enabled if the upper 8 bits are 1 and the low bit is 0 */
+		int enabled = ((shiftreg & 0x1fe01) == 0x1fe00);
 
-}
+		/* color comes from the 6 bits below the top 8 bits */
+		int color = (~shiftreg & 0x1f8) >> 3;
 
+		/* store the color value in the low 6 bits and the enable in the upper bit */
+		stars[i] = color | (enabled << 7);
 
-READ8_HANDLER( rockclim_videoram_r )
-{
-	return rockclim_videoram[offset];
-}
-
-
-WRITE8_HANDLER( dambustr_bg_split_line_w )
-{
-	dambustr_bg_split_line = data;
-}
-
-
-WRITE8_HANDLER( dambustr_bg_color_w )
-{
-	dambustr_bg_color_1 = (BIT(data,2)<<2) | (BIT(data,1)<<1) | BIT(data,0);
-	dambustr_bg_color_2 = (BIT(data,6)<<2) | (BIT(data,5)<<1) | BIT(data,4);
-	dambustr_bg_priority = BIT(data,3);
-	dambustr_char_bank = BIT(data,7);
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
-}
-
-
-
-/* character banking functions */
-
-static void gmgalax_modify_charcode(UINT16 *code,UINT8 x)
-{
-	*code |= (gfxbank[0] << 9);
-}
-
-static void mooncrst_modify_charcode(UINT16 *code,UINT8 x)
-{
-	if (gfxbank[2] && ((*code & 0xc0) == 0x80))
-	{
-		*code = (*code & 0x3f) | (gfxbank[0] << 6) | (gfxbank[1] << 7) | 0x0100;
+		/* the LFSR is fed based on the XOR of bit 12 and the inverse of bit 0 */
+		shiftreg = (shiftreg >> 1) | ((((shiftreg >> 12) ^ ~shiftreg) & 1) << 16);
 	}
 }
 
-static void mooncrgx_modify_charcode(UINT16 *code,UINT8 x)
+
+
+/*************************************
+ *
+ *  Adjust the origin of stars
+ *
+ *************************************/
+
+static void stars_update_origin(running_machine *machine)
 {
-	if (gfxbank[2] && ((*code & 0xc0) == 0x80))
+	int curframe = video_screen_get_frame_number(machine->primary_screen);
+
+	/* only update on a different frame */
+	if (curframe != star_rng_origin_frame)
 	{
-		*code = (*code & 0x3f) | (gfxbank[1] << 6) | (gfxbank[0] << 7) | 0x0100;
+		/* The RNG period is 2^17-1; each frame, the shift register is clocked */
+		/* 512*256 = 2^17 times. This means that we clock one extra time each */
+		/* frame. However, if we are NOT flipped, there is a pair of D flip-flops */
+		/* at 6B which delay the count so that we count 512*256-2 = 2^17-2 times. */
+		/* In this case, we only one time less than the period each frame. Both */
+		/* of these off-by-one countings produce the horizontal star scrolling. */
+		int per_frame_delta = flipscreen_x ? 1 : -1;
+		int total_delta = per_frame_delta * (curframe - star_rng_origin_frame);
+
+		/* we can't just use % here because mod of a negative number is undefined */
+		while (total_delta < 0)
+			total_delta += STAR_RNG_PERIOD;
+
+		/* now that everything is positive, do the mod */
+		star_rng_origin = (star_rng_origin + total_delta) % STAR_RNG_PERIOD;
+		star_rng_origin_frame = curframe;
 	}
 }
 
-static void moonqsr_modify_charcode(UINT16 *code,UINT8 x)
+
+
+/*************************************
+ *
+ *  Star blinking
+ *
+ *************************************/
+
+TIMER_CALLBACK( galaxian_stars_blink_timer )
 {
-	*code |= ((galaxian_attributesram[(x << 1) | 1] & 0x20) << 3);
+	stars_blink_state++;
 }
 
-static void mshuttle_modify_charcode(UINT16 *code,UINT8 x)
+
+
+/*************************************
+ *
+ *  Draw a row of stars
+ *
+ *************************************/
+
+static void stars_draw_row(bitmap_t *bitmap, int maxx, int y, UINT32 star_offs, UINT8 starmask)
 {
-	*code |= ((galaxian_attributesram[(x << 1) | 1] & 0x30) << 4);
+	int x;
+
+	/* ensure our star offset is valid */
+	star_offs %= STAR_RNG_PERIOD;
+
+	/* iterate over the specified number of 6MHz pixels */
+	for (x = 0; x < maxx; x++)
+	{
+		/* stars are suppressed unless V1 ^ H8 == 1 */
+		int enable_star = (y ^ (x >> 3)) & 1;
+		UINT8 star;
+
+		/*
+            The RNG clock is the master clock (18MHz) ANDed with the pixel clock (6MHz).
+            The divide-by-3 circuit that produces the pixel clock generates a square wave
+            with a 2/3 duty cycle, so the result of the AND generates a clock like this:
+                        _   _   _   _   _   _   _   _
+              MASTER: _| |_| |_| |_| |_| |_| |_| |_| |
+                        _______     _______     ______
+              PIXEL:  _|       |___|       |___|
+                        _   _       _   _       _   _
+              RNG:    _| |_| |_____| |_| |_____| |_| |
+
+            Thus for each pixel, there are 3 master clocks and 2 RNG clocks, and the RNG
+            is clocked asymmetrically. To simulate this, we expand the horizontal screen
+            size by 3 and handle the first RNG clock with one pixel and the second RNG
+            clock with two pixels.
+        */
+
+		/* first RNG clock: one pixel */
+		star = stars[star_offs++];
+		if (star_offs >= STAR_RNG_PERIOD)
+			star_offs = 0;
+		if (enable_star && (star & 0x80) != 0 && (star & starmask) != 0)
+			*BITMAP_ADDR32(bitmap, y, GALAXIAN_XSCALE*x + 0) = star_color[star & 0x3f];
+
+		/* second RNG clock: two pixels */
+		star = stars[star_offs++];
+		if (star_offs >= STAR_RNG_PERIOD)
+			star_offs = 0;
+		if (enable_star && (star & 0x80) != 0 && (star & starmask) != 0)
+		{
+			*BITMAP_ADDR32(bitmap, y, GALAXIAN_XSCALE*x + 1) = star_color[star & 0x3f];
+			*BITMAP_ADDR32(bitmap, y, GALAXIAN_XSCALE*x + 2) = star_color[star & 0x3f];
+		}
+	}
 }
 
-static void pisces_modify_charcode(UINT16 *code,UINT8 x)
+
+
+/*************************************
+ *
+ *  Background rendering
+ *
+ *************************************/
+
+static int flip_and_clip(rectangle *draw, int xstart, int xend, const rectangle *cliprect)
 {
-	*code |= (gfxbank[0] << 8);
+	*draw = *cliprect;
+	if (!flipscreen_x)
+	{
+		draw->min_x = xstart * GALAXIAN_XSCALE;
+		draw->max_x = xend * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
+	}
+	else
+	{
+		draw->min_x = (xend ^ 255) * GALAXIAN_XSCALE;
+		draw->max_x = (xstart ^ 255) * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
+	}
+	sect_rect(draw, cliprect);
+	return (draw->min_x <= draw->max_x);
 }
 
-static void mimonkey_modify_charcode(UINT16 *code,UINT8 x)
+
+void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	*code |= (gfxbank[0] << 8) | (gfxbank[2] << 9);
+	/* erase the background to black first */
+	fillbitmap(bitmap, RGB_BLACK, cliprect);
+
+	/* update the star origin to the current frame */
+	stars_update_origin(machine);
+
+	/* render stars if enabled */
+	if (stars_enabled)
+	{
+		int y;
+
+		/* iterate over scanlines */
+		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		{
+			UINT32 star_offs = star_rng_origin + y * 512;
+			stars_draw_row(bitmap, 256, y, star_offs, 0xff);
+		}
+	}
 }
 
-static void batman2_modify_charcode(UINT16 *code,UINT8 x)
+
+void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	rectangle draw;
+
+	/* color split point verified on real machine */
+	/* hmmm, according to schematics it is at 128+8; which is right? */
+	draw = *cliprect;
+	draw.max_x = MIN(draw.max_x, (128+8) * GALAXIAN_XSCALE - 1);
+	if (draw.min_x <= draw.max_x)
+		fillbitmap(bitmap, MAKE_RGB(0,0,0x47), &draw);
+
+	draw = *cliprect;
+	draw.min_x = MAX(draw.min_x, (128+8) * GALAXIAN_XSCALE);
+	if (draw.min_x <= draw.max_x)
+		fillbitmap(bitmap, RGB_BLACK, &draw);
+}
+
+
+void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	const UINT8 *prom = memory_region(REGION_USER1);
+	rectangle draw;
+	int x;
+
+	for (x = 0; x < 32; x++)
+		if (flip_and_clip(&draw, x * 8, x * 8 + 7, cliprect))
+		{
+			/*
+                The background PROM is connected the following way:
+
+                   bit 0 = 0 enables the blue gun if BCB is asserted
+                   bit 1 = 0 enables the red gun if BCR is asserted and
+                             the green gun if BCG is asserted
+                   bits 2-7 are unconnected
+
+                The background color generator is connected this way:
+
+                    RED   - 270 ohm resistor
+                    GREEN - 560 ohm resistor
+                    BLUE  - 470 ohm resistor
+            */
+			UINT8 red = ((~prom[x] & 0x02) && background_red) ? 0x7c : 0x00;
+			UINT8 green = ((~prom[x] & 0x02) && background_green) ? 0x3c : 0x00;
+			UINT8 blue = ((~prom[x] & 0x01) && background_blue) ? 0x47 : 0x00;
+			fillbitmap(bitmap, MAKE_RGB(red, green, blue), &draw);
+		}
+}
+
+
+void turtles_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	/*
+        The background color generator is connected this way:
+
+            RED   - 390 ohm resistor
+            GREEN - 470 ohm resistor
+            BLUE  - 390 ohm resistor
+    */
+	fillbitmap(bitmap, MAKE_RGB(background_red * 0x55, background_green * 0x47, background_blue * 0x55), cliprect);
+}
+
+
+void scramble_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	/* blue background - 390 ohm resistor */
+	fillbitmap(bitmap, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, cliprect);
+
+	/* update the star origin to the current frame */
+	stars_update_origin(machine);
+
+	/* render stars if enabled */
+	if (stars_enabled)
+	{
+		int blink_state = stars_blink_state & 3;
+		int y;
+
+		/* iterate over scanlines */
+		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		{
+			/* blink state 2 suppressed stars when 2V == 0 */
+			if (blink_state != 2 || (y & 2) != 0)
+			{
+				/* blink states 0 and 1 suppress stars when certain bits of the color == 0 */
+				static const UINT8 colormask_table[4] = { 0x20, 0x08, 0xff, 0xff };
+				stars_draw_row(bitmap, 256, y, y * 512, colormask_table[blink_state]);
+			}
+		}
+	}
+}
+
+
+void jumpbug_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	/* blue background - 390 ohm resistor */
+	fillbitmap(bitmap, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, cliprect);
+
+	/* update the star origin to the current frame */
+	stars_update_origin(machine);
+
+	/* render stars if enabled -- same as scramble but nothing in the status area */
+	if (stars_enabled)
+	{
+		int blink_state = stars_blink_state & 3;
+		int y;
+
+		/* iterate over scanlines */
+		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		{
+			/* blink state 2 suppressed stars when 2V == 0 */
+			if (blink_state != 2 || (y & 2) != 0)
+			{
+				/* blink states 0 and 1 suppress stars when certain bits of the color == 0 */
+				static const UINT8 colormask_table[4] = { 0x20, 0x08, 0xff, 0xff };
+				stars_draw_row(bitmap, 240, y, y * 512, colormask_table[blink_state]);
+			}
+		}
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Bullet rendering
+ *
+ *************************************/
+
+INLINE void galaxian_draw_pixel(bitmap_t *bitmap, const rectangle *cliprect, int y, int x, rgb_t color)
+{
+	if (y >= cliprect->min_y && y <= cliprect->max_y)
+	{
+		x *= GALAXIAN_XSCALE;
+		x += GALAXIAN_H0START;
+		if (x >= cliprect->min_x && x <= cliprect->max_x)
+			*BITMAP_ADDR32(bitmap, y, x) = color;
+
+		x++;
+		if (x >= cliprect->min_x && x <= cliprect->max_x)
+			*BITMAP_ADDR32(bitmap, y, x) = color;
+
+		x++;
+		if (x >= cliprect->min_x && x <= cliprect->max_x)
+			*BITMAP_ADDR32(bitmap, y, x) = color;
+	}
+}
+
+
+void galaxian_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
+{
+	/*
+        Both "shells" and "missiles" begin displaying when the horizontal counter
+        reaches $FC, and they stop displaying when it reaches $00, resulting in
+        4-pixel-long shots. The first 7 entries are called "shells" and render as
+        white; the final entry is called a "missile" and renders as yellow.
+    */
+	x -= 4;
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, bullet_color[offs]);
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, bullet_color[offs]);
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, bullet_color[offs]);
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, bullet_color[offs]);
+}
+
+
+void mshuttle_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
+{
+	/* verified by schematics:
+        * both "W" and "Y" bullets are 4 pixels long
+        * "W" bullets are enabled when H6 == 0, and are always purple
+        * "Y" bullets are enabled when H6 == 1, and vary in color based on H4,H3,H2
+    */
+	static const rgb_t colors[8] =
+	{
+		MAKE_RGB(0xff,0xff,0xff),
+		MAKE_RGB(0xff,0xff,0x00),
+		MAKE_RGB(0x00,0xff,0xff),
+		MAKE_RGB(0x00,0xff,0x00),
+		MAKE_RGB(0xff,0x00,0xff),
+		MAKE_RGB(0xff,0x00,0x00),
+		MAKE_RGB(0x00,0x00,0xff),
+		MAKE_RGB(0x00,0x00,0x00)
+	};
+	--x;
+	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : MAKE_RGB(0xff,0x00,0xff));
+	--x;
+	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : MAKE_RGB(0xff,0x00,0xff));
+	--x;
+	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : MAKE_RGB(0xff,0x00,0xff));
+	--x;
+	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : MAKE_RGB(0xff,0x00,0xff));
+}
+
+
+void scramble_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
+{
+	/*
+        Scramble only has "shells", which begin displaying when the counter
+        reaches $FA, and stop displaying one pixel clock layer. All shells are
+        rendered as yellow.
+    */
+	x -= 6;
+	galaxian_draw_pixel(bitmap, cliprect, y, x, MAKE_RGB(0xff,0xff,0x00));
+}
+
+
+void theend_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
+{
+	/* Same as galaxian except blue/green are swapped */
+	x -= 4;
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, MAKE_RGB(RGB_RED(bullet_color[offs]), RGB_BLUE(bullet_color[offs]), RGB_GREEN(bullet_color[offs])));
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, MAKE_RGB(RGB_RED(bullet_color[offs]), RGB_BLUE(bullet_color[offs]), RGB_GREEN(bullet_color[offs])));
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, MAKE_RGB(RGB_RED(bullet_color[offs]), RGB_BLUE(bullet_color[offs]), RGB_GREEN(bullet_color[offs])));
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, MAKE_RGB(RGB_RED(bullet_color[offs]), RGB_BLUE(bullet_color[offs]), RGB_GREEN(bullet_color[offs])));
+}
+
+
+
+/*************************************
+ *
+ *  Generic extensions
+ *
+ *************************************/
+
+void upper_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
+{
+	/* tiles are in the upper half of a larger ROM */
+	*code += 0x100;
+}
+
+
+void upper_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
+{
+	/* sprites are in the upper half of a larger ROM */
+	*code += 0x40;
+}
+
+
+
+/*************************************
+ *
+ *  Frogger extensions
+ *
+ *************************************/
+
+void frogger_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
+{
+	*color = ((*color >> 1) & 0x03) | ((*color << 2) & 0x04);
+}
+
+void frogger_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
+{
+	*color = ((*color >> 1) & 0x03) | ((*color << 2) & 0x04);
+}
+
+
+
+/*************************************
+ *
+ *  Ghostmuncher Galaxian extensions
+ *
+ *************************************/
+
+void gmgalax_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
+{
+	*code |= gfxbank[0] << 9;
+//  *color |= gfxbank[0] << 3;
+}
+
+void gmgalax_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
+{
+	*code |= (gfxbank[0] << 7) | 0x40;
+	*color |= gfxbank[0] << 3;
+}
+
+
+
+/*************************************
+ *
+ *  Pisces extensions
+ *
+ *************************************/
+
+void pisces_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
+{
+	*code |= gfxbank[0] << 8;
+}
+
+void pisces_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
+{
+	*code |= gfxbank[0] << 6;
+}
+
+
+
+/*************************************
+ *
+ *  Batman Part 2 extensions
+ *
+ *************************************/
+
+void batman2_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	if (*code & 0x80)
-	{
-		*code |= (gfxbank[0] << 8);
-	}
+		*code |= gfxbank[0] << 8;
 }
 
-static void mariner_modify_charcode(UINT16 *code,UINT8 x)
+
+
+/*************************************
+ *
+ *  Moon Cresta extensions
+ *
+ *************************************/
+
+void mooncrst_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
-	UINT8 *prom;
-
-
-	/* bit 0 of the PROM controls character banking */
-
-	prom = memory_region(REGION_USER2);
-
-	*code |= ((prom[x] & 0x01) << 8);
+	if (gfxbank[2] && (*code & 0xc0) == 0x80)
+		*code = (*code & 0x3f) | (gfxbank[0] << 6) | (gfxbank[1] << 7) | 0x0100;
 }
 
-static void jumpbug_modify_charcode(UINT16 *code,UINT8 x)
+void mooncrst_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
 {
-	if (((*code & 0xc0) == 0x80) &&
-		 (gfxbank[2] & 0x01))
-	{
+	if (gfxbank[2] && (*code & 0x30) == 0x20)
+		*code = (*code & 0x0f) | (gfxbank[1] << 4) | (gfxbank[0] << 5) | 0x40;
+}
+
+
+
+/*************************************
+ *
+ *  Moon Quasar extensions
+ *
+ *************************************/
+
+void moonqsr_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
+{
+	*code |= (attrib & 0x20) << 3;
+}
+
+void moonqsr_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
+{
+	*code |= (base[2] & 0x20) << 1;
+}
+
+
+
+/*************************************
+ *
+ *  Moon Shuttle extensions
+ *
+ *************************************/
+
+void mshuttle_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
+{
+	*code |= (attrib & 0x30) << 4;
+}
+
+void mshuttle_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
+{
+	*code |= (base[2] & 0x30) << 2;
+}
+
+
+
+/*************************************
+ *
+ *  Jumpbug extensions
+ *
+ *************************************/
+
+void jumpbug_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
+{
+	if ((*code & 0xc0) == 0x80 && (gfxbank[2] & 0x01))
 		*code += 128 + (( gfxbank[0] & 0x01) << 6) +
 					   (( gfxbank[1] & 0x01) << 7) +
 					   ((~gfxbank[4] & 0x01) << 8);
-	}
 }
 
-
-static void dambustr_modify_charcode(UINT16 *code,UINT8 x)
+void jumpbug_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
 {
-	if (dambustr_char_bank == 0) {	// text mode
-		*code |= 0x0300;
-	}
-	else {				// graphics mode
-		if (x == 28)		// only line #28 stays in text mode
-			*code |= 0x0300;
-		else
-			*code &= 0x00ff;
-	};
-}
-
-
-
-/* sprite banking functions */
-
-static void gmgalax_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	*code |= (gfxbank[0] << 7) | 0x40;
-}
-
-static void mooncrst_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	if (gfxbank[2] && ((*code & 0x30) == 0x20))
-	{
-		*code = (*code & 0x0f) | (gfxbank[0] << 4) | (gfxbank[1] << 5) | 0x40;
-	}
-}
-
-static void mooncrgx_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	if (gfxbank[2] && ((*code & 0x30) == 0x20))
-	{
-		*code = (*code & 0x0f) | (gfxbank[1] << 4) | (gfxbank[0] << 5) | 0x40;
-	}
-}
-
-static void moonqsr_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	*code |= ((spriteram[offs + 2] & 0x20) << 1);
-}
-
-static void mshuttle_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	*code |= ((spriteram[offs + 2] & 0x30) << 2);
-}
-
-static void calipso_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	/* No flips */
-	*code = spriteram[offs + 1];
-	*flipx = 0;
-	*flipy = 0;
-}
-
-static void pisces_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	*code |= (gfxbank[0] << 6);
-}
-
-static void mimonkey_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	*code |= (gfxbank[0] << 6) | (gfxbank[2] << 7);
-}
-
-static void batman2_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	/* only the upper 64 sprites are used */
-	*code |= 0x40;
-}
-
-static void jumpbug_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	if (((*code & 0x30) == 0x20) &&
-		 (gfxbank[2] & 0x01) != 0)
+	if ((*code & 0x30) == 0x20 && (gfxbank[2] & 0x01) != 0)
 	{
 		*code += 32 + (( gfxbank[0] & 0x01) << 4) +
 					  (( gfxbank[1] & 0x01) << 5) +
 					  ((~gfxbank[4] & 0x01) << 6);
 	}
 }
-
-static void dkongjrm_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	/* No x flip */
-	*code = (spriteram[offs + 1] & 0x7f) | 0x80;
-	*flipx = 0;
-}
-
-static void ad2083_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	/* No x flip */
-	*code = (spriteram[offs + 1] & 0x7f) | ((spriteram[offs + 2] & 0x30) << 2);
-	*flipx = 0;
-}
-
-static void dambustr_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	*code += 0x40;
-}
-
-
-/* color PROM mapping functions */
-
-static void frogger_modify_color(UINT8 *color)
-{
-	*color = ((*color >> 1) & 0x03) | ((*color << 2) & 0x04);
-}
-
-static void gmgalax_modify_color(UINT8 *color)
-{
-	*color |= (gfxbank[0] << 3);
-}
-
-static void drivfrcg_modify_color(UINT8 *color)
-{
-	*color = ((*color & 0x40) >> 3) | (*color & 7);
-}
-
-/* y position mapping functions */
-
-static void frogger_modify_ypos(UINT8 *sy)
-{
-	*sy = (*sy << 4) | (*sy >> 4);
-}
-
-
-/* bullet drawing functions */
-
-static void galaxian_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
-{
-	int i;
-
-
-	for (i = 0; i < 4; i++)
-	{
-		x--;
-
-		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-		{
-			int color;
-
-
-			/* yellow missile, white shells (this is the terminology on the schematics) */
-			color = ((offs == 7*4) ? BULLETS_COLOR_BASE : BULLETS_COLOR_BASE + 1);
-
-			*BITMAP_ADDR16(bitmap, y, x) = color;
-		}
-	}
-}
-
-static void gteikob2_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
-{
-	galaxian_draw_bullets(bitmap, offs, 260 - x, y, cliprect);
-}
-
-static void scramble_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
-{
-	if (flipscreen_x)  x++;
-
-	x = x - 6;
-
-	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-		/* yellow bullets */
-		*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
-}
-
-static void darkplnt_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
-{
-	if (flipscreen_x)  x++;
-
-	x = x - 6;
-
-	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-		*BITMAP_ADDR16(bitmap, y, x) = 32 + darkplnt_bullet_color;
-}
-
-static void theend_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
-{
-	int i;
-
-
-	/* same as Galaxian, but all bullets are yellow */
-	for (i = 0; i < 4; i++)
-	{
-		x--;
-
-		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-			*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
-	}
-}
-
-static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
-{
-	int i, color;
-
-	if (flip_screen_x_get())  x++;
-
-	x = x - 6;
-
-	/* bullets are 2 pixels wide */
-	for (i = 0; i < 2; i++)
-	{
-		if (offs < 4*4)
-		{
-			color = BULLETS_COLOR_BASE;
-			y--;
-		}
-		else {
-			color = BULLETS_COLOR_BASE + 1;
-			x--;
-		}
-
-		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-			*BITMAP_ADDR16(bitmap, y, x) = color;
-	}
-}
-
-
-
-/* background drawing functions */
-
-static void galaxian_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	/* plain black background */
-	fillbitmap(bitmap,0,cliprect);
-}
-
-static void scramble_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	if (background_enable)
-		fillbitmap(bitmap,BACKGROUND_COLOR_BASE,cliprect);
-	else
-		fillbitmap(bitmap,0,cliprect);
-}
-
-static void turtles_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int color = (background_blue << 2) | (background_green << 1) | background_red;
-
-	fillbitmap(bitmap,BACKGROUND_COLOR_BASE + color,cliprect);
-}
-
-static void frogger_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	/* color split point verified on real machine */
-	if (flipscreen_x)
-	{
-		plot_box(bitmap,   0, 0, 128, 256, 0);
-		plot_box(bitmap, 128, 0, 128, 256, BACKGROUND_COLOR_BASE);
-	}
-	else
-	{
-		plot_box(bitmap,   0, 0, 128, 256, BACKGROUND_COLOR_BASE);
-		plot_box(bitmap, 128, 0, 128, 256, 0);
-	}
-}
-
-static void stratgyx_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	UINT8 x;
-	UINT8 *prom;
-
-
-	/* the background PROM is connected the following way:
-
-       bit 0 = 0 enables the blue gun if BCB is asserted
-       bit 1 = 0 enables the red gun if BCR is asserted and
-                 the green gun if BCG is asserted
-       bits 2-7 are unconnected */
-
-	prom = memory_region(REGION_USER1);
-
-	for (x = 0; x < 32; x++)
-	{
-		int sx,color;
-
-
-		color = 0;
-
-		if ((~prom[x] & 0x02) && background_red)   color |= 0x01;
-		if ((~prom[x] & 0x02) && background_green) color |= 0x02;
-		if ((~prom[x] & 0x01) && background_blue)  color |= 0x04;
-
-		if (flipscreen_x)
-			sx = 8 * (31 - x);
-		else
-			sx = 8 * x;
-
-		plot_box(bitmap, sx, 0, 8, 256, BACKGROUND_COLOR_BASE + color);
-	}
-}
-
-static void minefld_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	if (background_enable)
-	{
-		int x;
-
-
-		for (x = 0; x < 128; x++)
-			plot_box(bitmap, x,       0, 1, 256, BACKGROUND_COLOR_BASE + x);
-
-		for (x = 0; x < 120; x++)
-			plot_box(bitmap, x + 128, 0, 1, 256, BACKGROUND_COLOR_BASE + x + 128);
-
-		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
-	}
-	else
-		fillbitmap(bitmap,0,cliprect);
-}
-
-static void rescue_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	if (background_enable)
-	{
-		int x;
-
-		for (x = 0; x < 128; x++)
-			plot_box(bitmap, x,       0, 1, 256, BACKGROUND_COLOR_BASE + x);
-
-		for (x = 0; x < 120; x++)
-			plot_box(bitmap, x + 128, 0, 1, 256, BACKGROUND_COLOR_BASE + x + 8);
-
-		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
-	}
-	else
-		fillbitmap(bitmap,0,cliprect);
-}
-
-static void mariner_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	UINT8 x;
-	UINT8 *prom;
-
-
-	/* the background PROM contains the color codes for each 8 pixel
-       line (column) of the screen.  The first 0x20 bytes for unflipped,
-       and the 2nd 0x20 bytes for flipped screen. */
-
-	prom = memory_region(REGION_USER1);
-
-	if (flipscreen_x)
-	{
-		for (x = 0; x < 32; x++)
-		{
-			int color;
-
-			if (x == 0)
-				color = 0;
-			else
-				color = prom[0x20 + x - 1];
-
-			plot_box(bitmap, 8 * (31 - x), 0, 8, 256, BACKGROUND_COLOR_BASE + color);
-		}
-	}
-	else
-	{
-		for (x = 0; x < 32; x++)
-		{
-			int color;
-
-			if (x == 31)
-				color = 0;
-			else
-				color = prom[x + 1];
-
-			plot_box(bitmap, 8 * x, 0, 8, 256, BACKGROUND_COLOR_BASE + color);
-		}
-	}
-}
-
-static void dambustr_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int col1 = BACKGROUND_COLOR_BASE + dambustr_bg_color_1;
-	int col2 = BACKGROUND_COLOR_BASE + dambustr_bg_color_2;
-
-	if (flip_screen_x_get())
-	{
-		plot_box(bitmap,   0, 0, 256-dambustr_bg_split_line, 256, col2);
-		plot_box(bitmap, 256-dambustr_bg_split_line, 0, dambustr_bg_split_line, 256, col1);
-	}
-	else
-	{
-		plot_box(bitmap,   0, 0, 256-dambustr_bg_split_line, 256, col1);
-		plot_box(bitmap, 256-dambustr_bg_split_line, 0, dambustr_bg_split_line, 256, col2);
-	}
-
-}
-
-static void dambustr_draw_upper_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	static rectangle clip = { 0, 0, 0, 0 };
-
-	if (flip_screen_x_get())
-	{
-		clip.min_x = 254 - dambustr_bg_split_line;
-		clip.max_x = dambustr_bg_split_line;
-		clip.min_y = 0;
-		clip.max_y = 255;
-		copybitmap(bitmap, dambustr_tmpbitmap, 0, 0, 0, 0, &clip);
-	}
-	else
-	{
-		clip.min_x = 0;
-		clip.max_x = 254 - dambustr_bg_split_line;
-		clip.min_y = 0;
-		clip.max_y = 255;
-		copybitmap(bitmap, dambustr_tmpbitmap, 0, 0, 0, 0, &clip);
-	}
-}
-
-
-
-/* star drawing functions */
-
-void galaxian_init_stars(running_machine *machine, int colors_offset)
-{
-	int i;
-	int total_stars;
-	UINT32 generator;
-	int x,y;
-
-
-	galaxian_stars_on = 0;
-	stars_blink_state = 0;
-	stars_blink_timer = timer_alloc(stars_blink_callback, NULL);
-	stars_scroll_timer = timer_alloc(stars_scroll_callback, NULL);
-	timer_adjusted = 0;
-	stars_colors_start = colors_offset;
-
-	for (i = 0;i < 64;i++)
-	{
-		int bits,r,g,b;
-		static const int map[4] = { 0x00, 0x88, 0xcc, 0xff };
-
-
-		bits = (i >> 0) & 0x03;
-		r = map[bits];
-		bits = (i >> 2) & 0x03;
-		g = map[bits];
-		bits = (i >> 4) & 0x03;
-		b = map[bits];
-		palette_set_color_rgb(machine,colors_offset+i,r,g,b);
-	}
-
-
-	/* precalculate the star background */
-
-	total_stars = 0;
-	generator = 0;
-
-	for (y = 0;y < 256;y++)
-	{
-		for (x = 0;x < 512;x++)
-		{
-			UINT32 bit0;
-
-
-			bit0 = ((~generator >> 16) & 0x01) ^ ((generator >> 4) & 0x01);
-
-			generator = (generator << 1) | bit0;
-
-			if (((~generator >> 16) & 0x01) && (generator & 0xff) == 0xff)
-			{
-				int color;
-
-
-				color = (~(generator >> 8)) & 0x3f;
-				if (color)
-				{
-					stars[total_stars].x = x;
-					stars[total_stars].y = y;
-					stars[total_stars].color = color;
-
-					total_stars++;
-				}
-			}
-		}
-	}
-
-	if (total_stars != STAR_COUNT)
-	{
-		fatalerror("total_stars = %d, STAR_COUNT = %d",total_stars,STAR_COUNT);
-	}
-}
-
-static void plot_star(bitmap_t *bitmap, int x, int y, int color, const rectangle *cliprect)
-{
-	if (flipscreen_x)
-		x = 255 - x;
-
-	if (flipscreen_y)
-		y = 255 - y;
-
-	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-		*BITMAP_ADDR16(bitmap, y, x) = stars_colors_start + color;
-}
-
-static void noop_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-}
-
-void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int offs;
-
-
-	if (!timer_adjusted)
-	{
-		start_stars_scroll_timer(machine);
-		timer_adjusted = 1;
-	}
-
-
-	for (offs = 0;offs < STAR_COUNT;offs++)
-	{
-		int x,y;
-
-
-		x = ((stars[offs].x +   stars_scrollpos) & 0x01ff) >> 1;
-		y = ( stars[offs].y + ((stars_scrollpos + stars[offs].x) >> 9)) & 0xff;
-
-		if ((y & 0x01) ^ ((x >> 3) & 0x01))
-		{
-			plot_star(bitmap, x, y, stars[offs].color, cliprect);
-		}
-	}
-}
-
-static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int offs;
-
-
-	if (!timer_adjusted)
-	{
-		start_stars_blink_timer(100000, 10000, 0.00001);
-		timer_adjusted = 1;
-	}
-
-
-	for (offs = 0;offs < STAR_COUNT;offs++)
-	{
-		int x,y;
-
-
-		x = stars[offs].x >> 1;
-		y = stars[offs].y;
-
-		if ((y & 0x01) ^ ((x >> 3) & 0x01))
-		{
-			/* determine when to skip plotting */
-			switch (stars_blink_state & 0x03)
-			{
-			case 0:
-				if (!(stars[offs].color & 0x01))  continue;
-				break;
-			case 1:
-				if (!(stars[offs].color & 0x04))  continue;
-				break;
-			case 2:
-				if (!(stars[offs].y & 0x02))  continue;
-				break;
-			case 3:
-				/* always plot */
-				break;
-			}
-
-			plot_star(bitmap, x, y, stars[offs].color, cliprect);
-		}
-	}
-}
-
-static void rescue_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int offs;
-
-
-	/* same as Scramble, but only top (left) half of screen */
-
-	if (!timer_adjusted)
-	{
-		start_stars_blink_timer(100000, 10000, 0.00001);
-		timer_adjusted = 1;
-	}
-
-
-	for (offs = 0;offs < STAR_COUNT;offs++)
-	{
-		int x,y;
-
-
-		x = stars[offs].x >> 1;
-		y = stars[offs].y;
-
-		if ((x < 128) && ((y & 0x01) ^ ((x >> 3) & 0x01)))
-		{
-			/* determine when to skip plotting */
-			switch (stars_blink_state & 0x03)
-			{
-			case 0:
-				if (!(stars[offs].color & 0x01))  continue;
-				break;
-			case 1:
-				if (!(stars[offs].color & 0x04))  continue;
-				break;
-			case 2:
-				if (!(stars[offs].y & 0x02))  continue;
-				break;
-			case 3:
-				/* always plot */
-				break;
-			}
-
-			plot_star(bitmap, x, y, stars[offs].color, cliprect);
-		}
-	}
-}
-
-static void mariner_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int offs;
-	UINT8 *prom;
-
-
-	if (!timer_adjusted)
-	{
-		start_stars_scroll_timer(machine);
-		timer_adjusted = 1;
-	}
-
-
-	/* bit 2 of the PROM controls star visibility */
-
-	prom = memory_region(REGION_USER2);
-
-	for (offs = 0;offs < STAR_COUNT;offs++)
-	{
-		int x,y;
-
-
-		x = ((stars[offs].x +   -stars_scrollpos) & 0x01ff) >> 1;
-		y = ( stars[offs].y + ((-stars_scrollpos + stars[offs].x) >> 9)) & 0xff;
-
-		if ((y & 0x01) ^ ((x >> 3) & 0x01))
-		{
-			if (prom[(x/8 + 1) & 0x1f] & 0x04)
-			{
-				plot_star(bitmap, x, y, stars[offs].color, cliprect);
-			}
-		}
-	}
-}
-
-static void jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int offs;
-
-
-	if (!timer_adjusted)
-	{
-		start_stars_blink_timer(100000, 10000, 0.00001);
-		start_stars_scroll_timer(machine);
-		timer_adjusted = 1;
-	}
-
-
-	for (offs = 0;offs < STAR_COUNT;offs++)
-	{
-		int x,y;
-
-
-		x = stars[offs].x >> 1;
-		y = stars[offs].y;
-
-		/* determine when to skip plotting */
-		if ((y & 0x01) ^ ((x >> 3) & 0x01))
-		{
-			switch (stars_blink_state & 0x03)
-			{
-			case 0:
-				if (!(stars[offs].color & 0x01))  continue;
-				break;
-			case 1:
-				if (!(stars[offs].color & 0x04))  continue;
-				break;
-			case 2:
-				if (!(stars[offs].y & 0x02))  continue;
-				break;
-			case 3:
-				/* always plot */
-				break;
-			}
-
-			x = ((stars[offs].x +   stars_scrollpos) & 0x01ff) >> 1;
-			y = ( stars[offs].y + ((stars_scrollpos + stars[offs].x) >> 9)) & 0xff;
-
-			/* no stars in the status area */
-			if (x >= 240)  continue;
-
-			plot_star(bitmap, x, y, stars[offs].color, cliprect);
-		}
-	}
-}
-
-
-static TIMER_CALLBACK( stars_blink_callback )
-{
-	stars_blink_state++;
-}
-
-static void start_stars_blink_timer(double ra, double rb, double c)
-{
-	/* calculate the period using the formula given in the 555 datasheet */
-
-	int period_in_ms = 693 * (ra + 2.0 * rb) * c;
-
-	timer_adjust_periodic(stars_blink_timer, ATTOTIME_IN_MSEC(period_in_ms), 0, ATTOTIME_IN_MSEC(period_in_ms));
-}
-
-
-static TIMER_CALLBACK( stars_scroll_callback )
-{
-	if (galaxian_stars_on)
-	{
-		stars_scrollpos++;
-	}
-}
-
-static void start_stars_scroll_timer(running_machine *machine)
-{
-	timer_adjust_periodic(stars_scroll_timer, video_screen_get_frame_period(machine->primary_screen), 0, video_screen_get_frame_period(machine->primary_screen));
-}
-
-
-
-static TILE_GET_INFO( get_tile_info )
-{
-	UINT8 x = tile_index & 0x1f;
-
-	UINT16 code = galaxian_videoram[tile_index];
-	UINT8 color = galaxian_attributesram[(x << 1) | 1] & color_mask;
-
-	if (modify_charcode)
-	{
-		modify_charcode(&code, x);
-	}
-
-	if (modify_color)
-	{
-		modify_color(&color);
-	}
-
-	SET_TILE_INFO(0, code, color, 0);
-}
-
-static TILE_GET_INFO( rockclim_get_tile_info )
-{
-	UINT16 code = rockclim_videoram[tile_index];
-	SET_TILE_INFO(2, code, 0, 0);
-}
-
-static void draw_bullets_common(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int offs;
-
-
-	for (offs = 0;offs < galaxian_bulletsram_size;offs += 4)
-	{
-		UINT8 sx,sy;
-
-		sy = 255 - galaxian_bulletsram[offs + 1];
-		sx = 255 - galaxian_bulletsram[offs + 3];
-
-		if (flipscreen_y)  sy = 255 - sy;
-
-		draw_bullets(bitmap, offs, sx, sy, cliprect);
-	}
-}
-
-
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, UINT8 *spriteram, size_t spriteram_size)
-{
-	int offs;
-
-
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
-	{
-		UINT8 sx,sy,color;
-		int flipx,flipy,code;
-
-
-		sx = spriteram[offs + 3] + 1;	/* the existence of +1 is supported by a LOT of games */
-		sy = spriteram[offs];			/* Anteater, Mariner, for example */
-		flipx = spriteram[offs + 1] & 0x40;
-		flipy = spriteram[offs + 1] & 0x80;
-		code = spriteram[offs + 1] & 0x3f;
-		color = spriteram[offs + 2] & color_mask;
-
-		if (modify_spritecode)
-		{
-			modify_spritecode(spriteram, &code, &flipx, &flipy, offs);
-		}
-
-		if (modify_color)
-		{
-			modify_color(&color);
-		}
-
-		if (modify_ypos)
-		{
-			modify_ypos(&sy);
-		}
-
-		if (flipscreen_x)
-		{
-			sx = 240 - sx;
-			flipx = !flipx;
-		}
-
-		if (flipscreen_y)
-		{
-			flipy = !flipy;
-		}
-		else
-		{
-			sy = 240 - sy;
-		}
-
-
-		/* In at least Amidar Turtles, sprites #0, #1 and #2 need to be moved */
-		/* down (left) one pixel to be positioned correctly. */
-		/* Note that the adjustment must be done AFTER handling flipscreen, thus */
-		/* proving that this is a hardware related "feature" */
-
-		if (offs < 3*4)  sy++;
-
-
-		drawgfx(bitmap,machine->gfx[1],
-				code,color,
-				flipx,flipy,
-				sx,sy,
-				flipscreen_x ? spritevisibleareaflipx : spritevisiblearea,TRANSPARENCY_PEN,0);
-	}
-}
-
-
-VIDEO_UPDATE( galaxian )
-{
-	draw_background(bitmap, cliprect);
-
-
-	if (galaxian_stars_on)
-	{
-		draw_stars(screen->machine, bitmap, cliprect);
-	}
-
-
-	tilemap_draw(bitmap, 0, bg_tilemap, 0, 0);
-
-
-	if (draw_bullets)
-	{
-		draw_bullets_common(bitmap, cliprect);
-	}
-
-
-	draw_sprites(screen->machine, bitmap, galaxian_spriteram, galaxian_spriteram_size);
-
-	if (spriteram2_present)
-	{
-		draw_sprites(screen->machine, bitmap, galaxian_spriteram2, galaxian_spriteram2_size);
-	}
-	return 0;
-}
-
-
-VIDEO_UPDATE( dambustr )
-{
-	int i, j;
-	UINT8 color;
-
-	draw_background(bitmap, cliprect);
-
-	if (galaxian_stars_on)
-	{
-		draw_stars(screen->machine, bitmap, cliprect);
-	}
-
-	/* save the background for drawing it again later, if background has priority over characters */
-	copybitmap(dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, NULL);
-
-	tilemap_draw(bitmap, 0, bg_tilemap, 0, 0);
-
-	if (draw_bullets)
-	{
-		draw_bullets_common(bitmap, cliprect);
-	}
-
-	draw_sprites(screen->machine, bitmap, galaxian_spriteram, galaxian_spriteram_size);
-
-	if (dambustr_bg_priority)
-	{
-		/* draw the upper part of the background, as it has priority */
-		dambustr_draw_upper_background(bitmap, cliprect);
-
-		/* only rows with color code > 3 are stronger than the background */
-		memset(dambustr_videoram2, 0x20, 0x0400);
-		for (i=0; i<32; i++) {
-			color = galaxian_attributesram[(i << 1) | 1] & color_mask;
-			if (color > 3) {
-				for (j=0; j<32; j++)
-					dambustr_videoram2[32*j+i] = galaxian_videoram[32*j+i];
-			};
-		};
-		tilemap_mark_all_tiles_dirty(dambustr_tilemap2);
-		tilemap_draw(bitmap, 0, dambustr_tilemap2, 0, 0);
-	};
-
-	return 0;
-}
-

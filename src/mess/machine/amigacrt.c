@@ -191,7 +191,7 @@ static READ16_HANDLER( amiga_ar23_cia_r )
 {
 	int pc = safe_activecpu_get_pc();
 
-	if ( ACCESSING_LSB && offset == 2048 && pc >= 0x40 && pc < 0x120 )
+	if ( ACCESSING_BITS_0_7 && offset == 2048 && pc >= 0x40 && pc < 0x120 )
 	{
 		amiga_ar23_freeze(machine);
 	}
@@ -220,7 +220,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 {
 	UINT16 *mem = (UINT16 *)memory_region( REGION_USER2 );
 
-	if ( ACCESSING_LSB )
+	if ( ACCESSING_BITS_0_7 )
 	{
 		if ( offset < 2 )
 			return (mem[offset] | (amiga_ar23_mode&3));

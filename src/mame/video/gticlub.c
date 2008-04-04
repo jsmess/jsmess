@@ -117,7 +117,7 @@ static void K001006_w(int chip, int offset, UINT32 data, UINT32 mem_mask)
 	}
 	else if (offset == 2)
 	{
-		if (!(mem_mask & 0xffff0000))
+		if (ACCESSING_BITS_16_31)
 		{
 			K001006_device_sel[chip] = (data >> 16) & 0xf;
 		}

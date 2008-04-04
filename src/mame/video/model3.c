@@ -659,20 +659,20 @@ static cached_texture *get_texture(int page, int texx, int texy, int texwidth, i
 
 WRITE64_HANDLER( real3d_display_list_w )
 {
-	if(!(mem_mask & U64(0xffffffff00000000))) {
+	if(ACCESSING_BITS_32_63) {
 		display_list_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
 	}
-	if(!(mem_mask & U64(0x00000000ffffffff))) {
+	if(ACCESSING_BITS_0_31) {
 		display_list_ram[(offset*2)+1] = BYTE_REVERSE32((UINT32)(data));
 	}
 }
 
 WRITE64_HANDLER( real3d_polygon_ram_w )
 {
-	if(!(mem_mask & U64(0xffffffff00000000))) {
+	if(ACCESSING_BITS_32_63) {
 		polygon_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
 	}
-	if(!(mem_mask & U64(0x00000000ffffffff))) {
+	if(ACCESSING_BITS_0_31) {
 		polygon_ram[(offset*2)+1] = BYTE_REVERSE32((UINT32)(data));
 	}
 }

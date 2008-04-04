@@ -301,7 +301,7 @@ static WRITE16_HANDLER( int0_ack_w )
 static WRITE16_HANDLER( int1_ack_w )
 {
 	/* reset sound CPU */
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -314,7 +314,7 @@ static TIMER_CALLBACK( delayed_int_enable_w )
 
 static WRITE16_HANDLER( int_enable_w )
 {
-	if (offset == 0 && ACCESSING_LSB)
+	if (offset == 0 && ACCESSING_BITS_0_7)
 		timer_call_after_resynch(NULL, data, delayed_int_enable_w);
 }
 
@@ -906,6 +906,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ssprint )
 	PORT_INCLUDE( paperboy )
 
+	PORT_MODIFY("1840")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
+
 	PORT_MODIFY("1800")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )
@@ -965,6 +970,8 @@ static INPUT_PORTS_START( csprint )
 
 	PORT_MODIFY("1840")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_MODIFY("1800")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -987,6 +994,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apb )
 	PORT_INCLUDE( paperboy )
+
+	PORT_MODIFY("1840")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 
 	PORT_MODIFY("1800")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)

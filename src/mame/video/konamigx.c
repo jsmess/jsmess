@@ -446,9 +446,9 @@ WRITE32_HANDLER( konamigx_555_palette_w )
 	COMBINE_DATA(&paletteram32[offset]);
 
 	paletteram16 = (UINT16 *)paletteram32;
-	if (ACCESSING_MSW32)
+	if (ACCESSING_BITS_16_31)
 		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_LSW32)
+	if (ACCESSING_BITS_0_15)
 		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2+1, data, mem_mask);
 }
 
@@ -462,21 +462,21 @@ WRITE32_HANDLER( konamigx_555_palette2_w )
 	COMBINE_DATA(&paletteram32[offset]);
 
 	paletteram16 = (UINT16 *)paletteram32;
-	if (ACCESSING_MSW32)
+	if (ACCESSING_BITS_16_31)
 		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_LSW32)
+	if (ACCESSING_BITS_0_15)
 		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2+1, data, mem_mask);
 }
 
 WRITE32_HANDLER( konamigx_tilebank_w )
 {
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BITS_24_31)
 		gx_tilebanks[offset*4] = (data>>24)&0xff;
-	if (!(mem_mask & 0xff0000))
+	if (ACCESSING_BITS_16_23)
 		gx_tilebanks[offset*4+1] = (data>>16)&0xff;
-	if (!(mem_mask & 0xff00))
+	if (ACCESSING_BITS_8_15)
 		gx_tilebanks[offset*4+2] = (data>>8)&0xff;
-	if (!(mem_mask & 0xff))
+	if (ACCESSING_BITS_0_7)
 		gx_tilebanks[offset*4+3] = data&0xff;
 }
 

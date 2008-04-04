@@ -394,7 +394,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		logerror("CRTC: Write to raster IRQ register - %i\n",data);
 		break;
 	case 20:
-		if(ACCESSING_LSB)
+		if(ACCESSING_BITS_0_7)
 		{
 			switch(data & 0x0c)
 			{
@@ -423,7 +423,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 				break;
 			}
 		}
-		if(ACCESSING_MSB)
+		if(ACCESSING_BITS_8_15)
 		{
 			sys.crtc.interlace = 0;
 			if(data & 0x0400)  // real size 1024x1024

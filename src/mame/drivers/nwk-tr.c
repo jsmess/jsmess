@@ -50,7 +50,7 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color_rgb(Machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 
@@ -511,8 +511,8 @@ READ32_HANDLER(K001604_reg_r)
 
 	switch (offset)
 	{
-		case 0x54/4:	return mame_rand(Machine) << 16; break;
-		case 0x5c/4:	return mame_rand(Machine) << 16 | mame_rand(Machine); break;
+		case 0x54/4:	return mame_rand(machine) << 16; break;
+		case 0x5c/4:	return mame_rand(machine) << 16 | mame_rand(machine); break;
 	}
 
 	return K001604_reg[chip][offset];
@@ -571,26 +571,26 @@ static READ32_HANDLER( sysreg_r )
 	UINT32 r = 0;
 	if (offset == 0)
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BITS_24_31)
 		{
 			r |= readinputport(0) << 24;
 		}
-		if (!(mem_mask & 0x00ff0000))
+		if (ACCESSING_BITS_16_23)
 		{
 			r |= readinputport(1) << 16;
 		}
-		if (!(mem_mask & 0x0000ff00))
+		if (ACCESSING_BITS_8_15)
 		{
 			r |= readinputport(2) << 8;
 		}
-		if (!(mem_mask & 0x000000ff))
+		if (ACCESSING_BITS_0_7)
 		{
 			r |= (adc1213x_do_r(0)) | (adc1213x_eoc_r(0) << 2);
 		}
 	}
 	else if (offset == 1)
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BITS_24_31)
 		{
 			r |= readinputport(3) << 24;
 		}
@@ -602,11 +602,11 @@ static WRITE32_HANDLER( sysreg_w )
 {
 	if( offset == 0 )
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BITS_24_31)
 		{
 			led_reg0 = (data >> 24) & 0xff;
 		}
-		if (!(mem_mask & 0x00ff0000))
+		if (ACCESSING_BITS_16_23)
 		{
 			led_reg1 = (data >> 16) & 0xff;
 		}
@@ -614,7 +614,7 @@ static WRITE32_HANDLER( sysreg_w )
 	}
 	if( offset == 1 )
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BITS_24_31)
 		{
 			int cs = (data >> 27) & 0x1;
 			int conv = (data >> 26) & 0x1;
@@ -626,15 +626,15 @@ static WRITE32_HANDLER( sysreg_w )
 			adc1213x_di_w(0, di);
 			adc1213x_sclk_w(0, sclk);
 		}
-		if (!(mem_mask & 0x000000ff))
+		if (ACCESSING_BITS_0_7)
 		{
 			if (data & 0x80)	// CG Board 1 IRQ Ack
 			{
-				//cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if (data & 0x40)	// CG Board 0 IRQ Ack
 			{
-				//cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 		}
 		return;
@@ -679,7 +679,7 @@ static READ32_HANDLER( lanc2_r )
 
 	if (offset == 0)
 	{
-		if (!(mem_mask & 0x000000ff))
+		if (ACCESSING_BITS_0_7)
 		{
 			r |= lanc2_ram[lanc2_ram_r & 0x7fff];
 			lanc2_ram_r++;
@@ -692,7 +692,7 @@ static READ32_HANDLER( lanc2_r )
 
 	if (offset == 4)
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BITS_24_31)
 		{
 			r |= 0x00000000;
 		}
@@ -707,7 +707,7 @@ static WRITE32_HANDLER( lanc2_w )
 {
 	if (offset == 0)
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BITS_24_31)
 		{
 			UINT8 value = data >> 24;
 
@@ -724,7 +724,7 @@ static WRITE32_HANDLER( lanc2_w )
 
 			//printf("lanc2_fpga_w: %02X at %08X\n", value, activecpu_get_pc());
 		}
-		else if (!(mem_mask & 0x000000ff))
+		else if (ACCESSING_BITS_0_7)
 		{
 			lanc2_ram[lanc2_ram_w & 0x7fff] = data & 0xff;
 			lanc2_ram_w++;
@@ -736,7 +736,7 @@ static WRITE32_HANDLER( lanc2_w )
 	}
 	if (offset == 4)
 	{
-		if (mame_stricmp(Machine->gamedrv->name, "thrilld") == 0)
+		if (mame_stricmp(machine->gamedrv->name, "thrilld") == 0)
 		{
 			work_ram[(0x3ffed0/4) + 0] = 0x472a3731;
 			work_ram[(0x3ffed0/4) + 1] = 0x33202020;

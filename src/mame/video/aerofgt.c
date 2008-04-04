@@ -193,7 +193,7 @@ static void setbank(tilemap *tmap,int num,int bank)
 
 WRITE16_HANDLER( pspikes_gfxbank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		setbank(bg1_tilemap,0,(data & 0xf0) >> 4);
 		setbank(bg1_tilemap,1,data & 0x0f);
@@ -210,7 +210,7 @@ WRITE16_HANDLER( pspikesb_gfxbank_w )
 
 WRITE16_HANDLER( karatblz_gfxbank_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BITS_8_15)
 	{
 		setbank(bg1_tilemap,0,(data & 0x0100) >> 8);
 		setbank(bg2_tilemap,1,(data & 0x0800) >> 11);
@@ -219,7 +219,7 @@ WRITE16_HANDLER( karatblz_gfxbank_w )
 
 WRITE16_HANDLER( spinlbrk_gfxbank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		setbank(bg1_tilemap,0,(data & 0x07));
 		setbank(bg2_tilemap,1,(data & 0x38) >> 3);
@@ -272,7 +272,7 @@ WRITE16_HANDLER( aerofgt_bg2scrolly_w )
 
 WRITE16_HANDLER( pspikes_palette_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		spritepalettebank = data & 0x03;
 		if (charpalettebank != (data & 0x1c) >> 2)
@@ -479,15 +479,15 @@ static void pspikesb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int attr_start;//,base,first;
-
+//  int notdraw = 0;
 
 //  base = chip * 0x0200;
 //  first = 4 * aerofgt_spriteram3[0x1fe + base];
 
-	for (attr_start = aerofgt_spriteram3_size/2 - 4;attr_start >= 0;attr_start -= 4)
+	for (attr_start = aerofgt_spriteram3_size/2 - 4 /* - 16 */;attr_start >= 0;attr_start -= 4)
 	{
 		int code;
-		int ox,oy,x,y,xsize,ysize,zoomx,zoomy,flipx,flipy,color,pri;
+		int ox,oy,sx,sy,zoomx,zoomy,flipx,flipy,color,pri;
 // some other drivers still use this wrong table, they have to be upgraded
 //      int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
@@ -497,52 +497,35 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		flipy = aerofgt_spriteram3[attr_start + 2] & 0x8000;
 		color = aerofgt_spriteram3[attr_start + 2] & 0x000f;
 
-//      xsize = (aerofgt_spriteram3[attr_start + 2] & 0x0700) >> 8;
-		xsize = (aerofgt_spriteram3[attr_start + 1] & 0x0e00) >> 9;
 		zoomx = (aerofgt_spriteram3[attr_start + 1] & 0xf000) >> 12;
-//      ysize = (aerofgt_spriteram3[attr_start + 2] & 0x7000) >> 12;
-		ysize = (aerofgt_spriteram3[attr_start + 0] & 0x0e00) >> 9;
 		zoomy = (aerofgt_spriteram3[attr_start + 0] & 0xf000) >> 12;
-
 		pri = aerofgt_spriteram3[attr_start + 2] & 0x0010;
-		code = aerofgt_spriteram3[attr_start + 3] & 0x3fff;
+//      code = aerofgt_spriteram3[attr_start + 3] & 0x3fff;
+		code = aerofgt_spriteram3[attr_start + 3] & 0x1fff;
 
+//      if ((!(aerofgt_spriteram3[attr_start + 0])) & (!(aerofgt_spriteram3[attr_start + 1])) &
+//          (!(aerofgt_spriteram3[attr_start + 2])) & (!(aerofgt_spriteram3[attr_start + 3]))) notdraw = 1;
 
-// aerofgt has this adjustment, but doing it here would break turbo force title screen
-//      ox += (xsize*zoomx+2)/4;
-//      oy += (ysize*zoomy+2)/4;
+//      if (notdraw) continue;
 
-		zoomx = 32 - zoomx;
-		zoomy = 32 - zoomy;
+		if (!(aerofgt_spriteram3[attr_start + 2] & 0x0040)) code |= 0x2000;
 
-		for (y = 0;y <= ysize;y++)
-		{
-			int sx,sy;
+		zoomx = 32 + zoomx;
+		zoomy = 32 + zoomy;
 
-			if (flipy) sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
-			else sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
+		sy = ((oy + 16) & 0x1ff) - 16;
 
-			for (x = 0;x <= xsize;x++)
-			{
-				if (flipx) sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
-				else sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
+		sx = ((ox + 16) & 0x1ff) - 16;
 
-				pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
-						code,
-						color,
-						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,15,
-						zoomx << 11,zoomy << 11,
-						pri ? 0 : 0x2);
-				code++;
-			}
+		pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
+				code,
+				color,
+				flipx,flipy,
+				sx,sy,
+				cliprect,TRANSPARENCY_PEN,15,
+				zoomx << 11,zoomy << 11,
+				pri ? 0 : 0x2);
 
-//          if (xsize == 2) code += 1;
-//          if (xsize == 4) code += 3;
-//          if (xsize == 5) code += 2;
-//          if (xsize == 6) code += 1;
-		}
 	}
 }
 

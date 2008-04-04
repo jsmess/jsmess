@@ -1127,7 +1127,7 @@ WRITE16_HANDLER ( mac_iwm_w )
 	if (LOG_MAC_IWM)
 		logerror("mac_iwm_w: offset=0x%08x data=0x%04x\n", offset, data);
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 		applefdc_w(machine, offset >> 8, data & 0xff);
 }
 
@@ -1274,7 +1274,7 @@ WRITE16_HANDLER ( mac_via_w )
 	if (LOG_VIA)
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BITS_8_15)
 		via_0_w(machine, offset, (data >> 8) & 0xff);
 }
 

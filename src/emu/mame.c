@@ -1567,7 +1567,7 @@ static void init_machine(running_machine *machine)
 #ifdef MESS
 	/* first MESS initialization */
 	mess_predevice_init(machine);
-#endif
+#endif /* MESS */
 
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */
@@ -1582,7 +1582,7 @@ static void init_machine(running_machine *machine)
 #ifdef MESS
 	/* second MESS initialization */
 	mess_postdevice_init(machine);
-#endif
+#endif /* MESS */
 
 	/* start the video and audio hardware */
 	video_init(machine);

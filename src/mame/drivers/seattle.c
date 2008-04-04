@@ -1641,7 +1641,7 @@ static READ32_HANDLER( status_leds_r )
 
 static WRITE32_HANDLER( status_leds_w )
 {
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BITS_0_7)
 		status_leds = data;
 }
 

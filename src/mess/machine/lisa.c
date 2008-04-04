@@ -1770,13 +1770,13 @@ WRITE16_HANDLER ( lisa_w )
 			COMBINE_DATA((UINT16 *) (lisa_ram_ptr + address));
 			if (diag2)
 			{
-				if ((ACCESSING_LSB)
+				if ((ACCESSING_BITS_0_7)
 					&& ! (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x1 << (address & 0x7);
 					bad_parity_count++;
 				}
-				if ((ACCESSING_MSB)
+				if ((ACCESSING_BITS_8_15)
 					&& ! (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x2 << (address & 0x7);
@@ -1785,13 +1785,13 @@ WRITE16_HANDLER ( lisa_w )
 			}
 			else if (bad_parity_table[address >> 3] & (0x3 << (address & 0x7)))
 			{
-				if ((ACCESSING_LSB)
+				if ((ACCESSING_BITS_0_7)
 					&& (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x1 << (address & 0x7));
 					bad_parity_count--;
 				}
-				if ((ACCESSING_MSB)
+				if ((ACCESSING_BITS_8_15)
 					&& (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x2 << (address & 0x7));
@@ -1809,13 +1809,13 @@ WRITE16_HANDLER ( lisa_w )
 			COMBINE_DATA((UINT16 *) (lisa_ram_ptr + address));
 			if (diag2)
 			{
-				if ((ACCESSING_LSB)
+				if ((ACCESSING_BITS_0_7)
 					&& ! (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x1 << (address & 0x7);
 					bad_parity_count++;
 				}
-				if ((ACCESSING_MSB)
+				if ((ACCESSING_BITS_8_15)
 					&& ! (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x2 << (address & 0x7);
@@ -1824,13 +1824,13 @@ WRITE16_HANDLER ( lisa_w )
 			}
 			else if (bad_parity_table[address >> 3] & (0x3 << (address & 0x7)))
 			{
-				if ((ACCESSING_LSB)
+				if ((ACCESSING_BITS_0_7)
 					&& (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x1 << (address & 0x7));
 					bad_parity_count--;
 				}
-				if ((ACCESSING_MSB)
+				if ((ACCESSING_BITS_8_15)
 					&& (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x2 << (address & 0x7));
@@ -1969,7 +1969,7 @@ static READ16_HANDLER ( lisa_IO_r )
 		{
 			if (! (offset & 0x400))
 			{
-				/*if (ACCESSING_LSB)*/	/* Geez, who cares ? */
+				/*if (ACCESSING_BITS_0_7)*/	/* Geez, who cares ? */
 					answer = lisa_fdc_ram[offset & 0x03ff] & 0xff;	/* right ??? */
 			}
 		}
@@ -1986,13 +1986,13 @@ static READ16_HANDLER ( lisa_IO_r )
 
 			case 2:	/* parallel port */
 				/* 1 VIA located at 0xD901 */
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					return via_read(1, (offset >> 2) & 0xf);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				/* 1 VIA located at 0xDD81 */
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					return via_read(0, offset & 0xf);
 				break;
 			}
@@ -2064,7 +2064,7 @@ static WRITE16_HANDLER ( lisa_IO_w )
 			/* Floppy Disk Controller shared RAM */
 			if (! (offset & 0x0400))
 			{
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					lisa_fdc_ram[offset & 0x03ff] = data & 0xff;
 			}
 		}
@@ -2077,12 +2077,12 @@ static WRITE16_HANDLER ( lisa_IO_w )
 				break;
 
 			case 2:	/* paralel port */
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					via_write(1, (offset >> 2) & 0xf, data & 0xff);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					via_write(0, offset & 0xf, data & 0xff);
 				break;
 			}

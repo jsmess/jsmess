@@ -1046,7 +1046,7 @@ WRITE16_HANDLER ( ti99_cart_w )
 		/* mapper at 0x6ffe */
 		if ((offset >= 0x0600) && (offset <= 0x07fe))
 			COMBINE_DATA(cartridge_pages[0]+offset);
-		else if ((offset == 0x07ff) && ACCESSING_MSB16)
+		else if ((offset == 0x07ff) && ACCESSING_BITS_8_15)
 			current_page_ptr = cartridge_pages[cartridge_paged ? ((data >> 8) & 1) : 0];
 	}
 	else if (cartridge_paged)

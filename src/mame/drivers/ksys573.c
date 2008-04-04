@@ -987,7 +987,7 @@ static WRITE32_HANDLER( security_w )
 
 	verboselog( 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	if( ACCESSING_LSW32 )
+	if( ACCESSING_BITS_0_15 )
 	{
 		switch( chiptype[ security_cart_number ] )
 		{
@@ -1054,19 +1054,19 @@ static READ32_HANDLER( flash_r )
 	{
 		int adr = offset * 2;
 
-		if( ACCESSING_LSB32 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			data |= ( intelflash_read( flash_bank + 0, adr + 0 ) & 0xff ) << 0; // 31m/31l/31j/31h
 		}
-		if( ( mem_mask & 0x0000ff00 ) == 0 )
+		if( ACCESSING_BITS_8_15 )
 		{
 			data |= ( intelflash_read( flash_bank + 1, adr + 0 ) & 0xff ) << 8; // 27m/27l/27j/27h
 		}
-		if( ( mem_mask & 0x00ff0000 ) == 0 )
+		if( ACCESSING_BITS_16_23 )
 		{
 			data |= ( intelflash_read( flash_bank + 0, adr + 1 ) & 0xff ) << 16; // 31m/31l/31j/31h
 		}
-		if( ACCESSING_MSB32 )
+		if( ACCESSING_BITS_24_31 )
 		{
 			data |= ( intelflash_read( flash_bank + 1, adr + 1 ) & 0xff ) << 24; // 27m/27l/27j/27h
 		}
@@ -1089,19 +1089,19 @@ static WRITE32_HANDLER( flash_w )
 	{
 		int adr = offset * 2;
 
-		if( ( mem_mask & 0x000000ff ) == 0 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			intelflash_write( flash_bank + 0, adr + 0, ( data >> 0 ) & 0xff );
 		}
-		if( ( mem_mask & 0x0000ff00 ) == 0 )
+		if( ACCESSING_BITS_8_15 )
 		{
 			intelflash_write( flash_bank + 1, adr + 0, ( data >> 8 ) & 0xff );
 		}
-		if( ( mem_mask & 0x00ff0000 ) == 0 )
+		if( ACCESSING_BITS_16_23 )
 		{
 			intelflash_write( flash_bank + 0, adr + 1, ( data >> 16 ) & 0xff );
 		}
-		if( ( mem_mask & 0xff000000 ) == 0 )
+		if( ACCESSING_BITS_24_31 )
 		{
 			intelflash_write( flash_bank + 1, adr + 1, ( data >> 24 ) & 0xff );
 		}
@@ -1539,12 +1539,13 @@ static const struct PSXSPUinterface konami573_psxspu_interface =
 
 static void update_mode( void )
 {
-	int mode = readinputportbytag( "MODE" );
+	int cart = readinputportbytag( "CART" );
+	int cd = readinputportbytag( "CD" );
 	static SCSIInstance *new_cdrom;
 
 	if( chiptype[ 1 ] != 0 )
 	{
-		security_cart_number = mode;
+		security_cart_number = cart;
 	}
 	else
 	{
@@ -1553,7 +1554,7 @@ static void update_mode( void )
 
 	if( available_cdroms[ 1 ] != NULL )
 	{
-		new_cdrom = available_cdroms[ mode ];
+		new_cdrom = available_cdroms[ cd ];
 	}
 	else
 	{
@@ -1609,13 +1610,13 @@ static READ32_HANDLER( ge765pwbba_r )
 		uPD4701_cs_w( 0, 0 );
 		uPD4701_xy_w( 0, 1 );
 
-		if( ( mem_mask & 0x000000ff ) != 0x000000ff )
+		if( ACCESSING_BITS_0_7 )
 		{
 			uPD4701_ul_w( 0, 0 );
 			data |= uPD4701_d_r( 0 ) << 0;
 		}
 
-		if( ( mem_mask & 0x00ff0000 ) != 0x00ff0000 )
+		if( ACCESSING_BITS_16_23 )
 		{
 			uPD4701_ul_w( 0, 1 );
 			data |= uPD4701_d_r( 0 ) << 16;
@@ -1641,21 +1642,21 @@ static WRITE32_HANDLER( ge765pwbba_w )
 		break;
 
 	case 0x20:
-		if( ( mem_mask & 0x000000ff ) != 0x000000ff )
+		if( ACCESSING_BITS_0_7 )
 		{
 			output_set_value( "motor", data & 0xff );
 		}
 		break;
 
 	case 0x22:
-		if( ( mem_mask & 0x000000ff ) != 0x000000ff )
+		if( ACCESSING_BITS_0_7 )
 		{
 			output_set_value( "brake", data & 0xff );
 		}
 		break;
 
 	case 0x28:
-		if( ( mem_mask & 0x000000ff ) != 0x000000ff )
+		if( ACCESSING_BITS_0_7 )
 		{
 			uPD4701_resety_w( 0, 1 );
 			uPD4701_resety_w( 0, 0 );
@@ -1749,28 +1750,28 @@ static WRITE32_HANDLER( gx700pwbf_io_w )
 	{
 	case 0x20:
 
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx700pwbf_output( 0, data & 0xff );
 		}
 		break;
 
 	case 0x22:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx700pwbf_output( 1, data & 0xff );
 		}
 		break;
 
 	case 0x24:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx700pwbf_output( 2, data & 0xff );
 		}
 		break;
 
 	case 0x26:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx700pwbf_output( 3, data & 0xff );
 		}
@@ -2056,42 +2057,42 @@ static READ32_HANDLER( gx894pwbba_r )
 		data |= 0x10000;
 		break;
 	case 0x20:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			data |= 0x00001234;
 		}
 		break;
 	case 0x2b:
 		/* sound? */
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 //          data |= 0x00001000; /* ? */
 			data |= 0x00002000; /* ? */
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 //          data |= 0x10000000; /* rdy??? */
 		}
 		break;
 	case 0x2d:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			data |= gx894_ram[ gx894_ram_read_offset / 2 ];
 //          printf( "reading %08x %04x\r", gx894_ram_read_offset, gx894_ram[ gx894_ram_read_offset / 2 ] );
 			gx894_ram_read_offset += 2;
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 //          printf( "read offset 2d msw32\n" );
 		}
 		break;
 	case 0x30:
 		/* mp3? */
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			/* unknown data word */
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			/* 0x000-0x1ff */
 			data |= 0x1ff0000;
@@ -2099,38 +2100,38 @@ static READ32_HANDLER( gx894pwbba_r )
 		break;
 	case 0x31:
 		/* mp3? */
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			/* unknown data word count */
 			data |= 0x0000;
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 //          printf( "read offset 31 msw32\n" );
 		}
 		break;
 	case 0x32:
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			data |= 0 & 0xffff0000;
 		}
 		/* todo */
 		break;
 	case 0x33:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			data |= 0 & 0x0000ffff;
 		}
 		/* todo */
 		break;
 	case 0x3b:
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			data |= ds2401_read( 2 ) << 28;
 		}
 		break;
 	case 0x3d:
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			/* fails if !8000 */
 			/* fails if  4000 */
@@ -2204,71 +2205,71 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		/* sound? */
 		break;
 	case 0x2c:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894_ram_write_offset &= 0x0000ffff;
 			gx894_ram_write_offset |= ( data & 0x0000ffff ) << 16;
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894_ram_write_offset &= 0xffff0000;
 			gx894_ram_write_offset |= ( data & 0xffff0000 ) >> 16;
 		}
 		break;
 	case 0x2d:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894_ram[ gx894_ram_write_offset / 2 ] = data & 0xffff;
 //          printf( "writing %08x %04x\r", gx894_ram_write_offset, gx894_ram[ gx894_ram_write_offset / 2 ] );
 			gx894_ram_write_offset += 2;
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894_ram_read_offset &= 0x0000ffff;
 			gx894_ram_read_offset |= ( data & 0xffff0000 ) << 0;
 		}
 		break;
 	case 0x2e:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894_ram_read_offset &= 0xffff0000;
 			gx894_ram_read_offset |= ( data & 0x0000ffff ) >> 0;
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 //          printf( "write offset 2e msw32\n" );
 		}
 		break;
 	case 0x38:
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894pwbba_output( 0, ( data >> 28 ) & 0xf );
 		}
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894pwbba_output( 1, ( data >> 12 ) & 0xf );
 		}
 		COMBINE_DATA( &a );
 		break;
 	case 0x39:
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894pwbba_output( 7, ( data >> 28 ) & 0xf );
 		}
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894pwbba_output( 3, ( data >> 12 ) & 0xf );
 		}
 		COMBINE_DATA( &b );
 		break;
 	case 0x3b:
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			ds2401_write( 2, !( ( data >> 28 ) & 1 ) );
 		}
 		break;
 	case 0x3e:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			/* 12 */
 			/* 13 */
@@ -2290,18 +2291,18 @@ static WRITE32_HANDLER( gx894pwbba_w )
 			}
 		}
 
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894pwbba_output( 4, ( data >> 28 ) & 0xf );
 		}
 		COMBINE_DATA( &c );
 		break;
 	case 0x3f:
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894pwbba_output( 2, ( data >> 28 ) & 0xf );
 		}
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894pwbba_output( 5, ( data >> 12 ) & 0xf );
 		}
@@ -2834,10 +2835,15 @@ static INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 //  PORT_BIT( 0xf0fff0ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("MODE")
-	PORT_CONFNAME( 1, 0, "Mode" )
+	PORT_START_TAG("CART")
+	PORT_CONFNAME( 1, 0, "Security Cart" )
 	PORT_CONFSETTING( 0, "Install" )
 	PORT_CONFSETTING( 1, "Game" )
+
+	PORT_START_TAG("CD")
+	PORT_CONFNAME( 1, 0, "CD" )
+	PORT_CONFSETTING( 0, "1" )
+	PORT_CONFSETTING( 1, "2" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fbaitbc )
@@ -3725,6 +3731,30 @@ ROM_START( drmn2m )
 	DISK_IMAGE_READONLY( "912jab", 0, BAD_DUMP MD5(60dadc836f00f22d50b5b634250aa624) SHA1(5316b2e2e89af7bc038a3febc91525edac91fe7e) )
 ROM_END
 
+ROM_START( drmn2mpu )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, REGION_USER2, 0 ) /* install security cart eeprom */
+	ROM_LOAD( "ge912ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(1246fe5b) SHA1(b58d4f4c95e13abf639d645223565544bd79a58a) )
+
+	ROM_REGION( 0x0001014, REGION_USER8, 0 ) /* game security cart eeprom */
+	ROM_LOAD( "gn912ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(34deea99) SHA1(f179e22eaf30453bb94177ed9c25d7996f020c99) )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	ROM_REGION( 0x000008, REGION_USER9, 0 ) /* install security cart id */
+	ROM_LOAD( "ge912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
+
+	ROM_REGION( 0x000008, REGION_USER10, 0 ) /* game security cart id */
+	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "912jab",  0, BAD_DUMP MD5(60dadc836f00f22d50b5b634250aa624) SHA1(5316b2e2e89af7bc038a3febc91525edac91fe7e) )
+	DISK_IMAGE_READONLY( "912za01", 1, BAD_DUMP MD5(1d3fa130a3a6c8433c276e609b373e4f) SHA1(121ca6df16084a01c88ef26167b13053c9adc7ce) )
+ROM_END
+
 ROM_START( drmn3m )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
 	SYS573_BIOS_A
@@ -4434,7 +4464,8 @@ GAME( 1999, ddrs2k,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami"
 GAME( 1999, ddrs2kj,  ddrs2k,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.2 */
 GAME( 1999, dsfdct,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, dsfdcta,  dsfdct,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
+GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
+GAME( 1999, drmn2mpu, drmn2m,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 2000, dncfrks,  sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,      dncfrks,  konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, gtrfrk3m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */

@@ -10,7 +10,7 @@
 
 /*----------- defined in machine/special.c -----------*/
 
-const struct pit8253_config specimx_pit8253_intf;
+extern const struct pit8253_config specimx_pit8253_intf;
 
 extern DRIVER_INIT( special );
 extern MACHINE_RESET( special );

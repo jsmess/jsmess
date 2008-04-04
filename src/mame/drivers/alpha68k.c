@@ -257,7 +257,7 @@ static WRITE16_HANDLER( alpha_microcontroller_w )
 {
 	logerror("%04x:  Alpha write trigger at %04x (%04x)\n",activecpu_get_pc(),offset,data);
 	/* 0x44 = coin clear signal to microcontroller? */
-	if (offset==0x2d && ACCESSING_LSB)
+	if (offset==0x2d && ACCESSING_BITS_0_7)
 		alpha68k_flipscreen_w(data & 1);
 }
 
@@ -322,40 +322,40 @@ static READ16_HANDLER( jongbou_inputs_r )
 
 static WRITE16_HANDLER( kyros_sound_w )
 {
-	if(ACCESSING_MSB)
+	if(ACCESSING_BITS_8_15)
 		soundlatch_w(machine, 0, (data>>8)&0xff);
 }
 
 static WRITE16_HANDLER( alpha68k_II_sound_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BITS_0_7)
 		soundlatch_w(machine, 0, data&0xff);
 }
 
 static WRITE16_HANDLER( alpha68k_V_sound_w )
 {
 	/* Sound & fix bank select are in the same word */
-	if(ACCESSING_LSB)
+	if(ACCESSING_BITS_0_7)
 		soundlatch_w(machine,0,data&0xff);
-	if(ACCESSING_MSB)
+	if(ACCESSING_BITS_8_15)
 		alpha68k_V_video_bank_w((data>>8)&0xff);
 }
 //AT
 static WRITE16_HANDLER( paddlema_soundlatch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine, 0, data);
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	}
 }
 
 static WRITE16_HANDLER( tnexspce_soundlatch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine, 0, data);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 //ZT
@@ -418,7 +418,7 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 			{
 				if (microcontroller_id == 0x00ff)		/* Super Stingry */
 				{
-					if (trigstate >= 12 || !strcmp(Machine->gamedrv->name, "jongbou"))	/* arbitrary value ! */
+					if (trigstate >= 12 || !strcmp(machine->gamedrv->name, "jongbou"))	/* arbitrary value ! */
 					{
 						trigstate = 0;
 						microcontroller_data = 0x21;			// timer
@@ -477,7 +477,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id&0xff) == 0x22)
 				{
-					if(!strcmp(Machine->gamedrv->name, "btlfildb"))
+					if(!strcmp(machine->gamedrv->name, "btlfildb"))
 						coinvalue = (readinputportbytag("IN4")>>0) & 7;
 					else
 						coinvalue = (~readinputportbytag("IN4")>>0) & 7;
@@ -500,7 +500,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id>>8) == 0x22)
 				{
-					if(!strcmp(Machine->gamedrv->name, "btlfildb"))
+					if(!strcmp(machine->gamedrv->name, "btlfildb"))
 						coinvalue = (readinputportbytag("IN4")>>0) & 7;
 					else
 						coinvalue = (~readinputportbytag("IN4")>>0) & 7;

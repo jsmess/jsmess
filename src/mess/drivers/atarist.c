@@ -60,7 +60,7 @@ static WRITE16_HANDLER( atarist_mfp_w )
 {
 	atarist_state *state = machine->driver_data;
 
-	if (ACCESSING_LSB) mc68901_register_w(state->mfp, offset, data & 0xff);
+	if (ACCESSING_BITS_0_7) mc68901_register_w(state->mfp, offset, data & 0xff);
 }
 
 /* Floppy Disk Controller */
@@ -752,7 +752,7 @@ static WRITE16_HANDLER( atariste_microwire_mask_w )
 
 static READ16_HANDLER( megaste_scc8530_r )
 {
-	if (ACCESSING_MSB16)
+	if (ACCESSING_BITS_8_15)
 	{
 		return scc_r(machine, offset);
 	}
@@ -764,7 +764,7 @@ static READ16_HANDLER( megaste_scc8530_r )
 
 static WRITE16_HANDLER( megaste_scc8530_w )
 {
-	if (ACCESSING_MSB16)
+	if (ACCESSING_BITS_8_15)
 	{
 		scc_w(machine, offset, data);
 	}

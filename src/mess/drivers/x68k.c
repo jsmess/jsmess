@@ -1127,7 +1127,7 @@ static WRITE16_HANDLER( x68k_mfp_w )
 		}
 		break;
 	default:
-		if (ACCESSING_LSB) mc68901_register_w(x68k_mfp, offset, data & 0xff);
+		if (ACCESSING_BITS_0_7) mc68901_register_w(x68k_mfp, offset, data & 0xff);
 		return;
 	}
 }
@@ -1220,14 +1220,14 @@ static WRITE16_HANDLER( x68k_vid_w )
 		break;
 	case 0x280:  // priority levels
 		COMBINE_DATA(sys.video.reg+1);
-		if(ACCESSING_LSB)
+		if(ACCESSING_BITS_0_7)
 		{
 			sys.video.gfxlayer_pri[0] = data & 0x0003;
 			sys.video.gfxlayer_pri[1] = (data & 0x000c) >> 2;
 			sys.video.gfxlayer_pri[2] = (data & 0x0030) >> 4;
 			sys.video.gfxlayer_pri[3] = (data & 0x00c0) >> 6;
 		}
-		if(ACCESSING_MSB)
+		if(ACCESSING_BITS_8_15)
 		{
 			sys.video.gfx_pri = (data & 0x0300) >> 8;
 			sys.video.text_pri = (data & 0x0c00) >> 10;
@@ -1353,7 +1353,7 @@ static READ16_HANDLER( x68k_exp_r )
 		current_vector[2] = 0x02;  // bus error
 		current_irq_line = 2;
 		offset *= 2;
-		if(ACCESSING_LSB)
+		if(ACCESSING_BITS_0_7)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
 //      cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);
@@ -1369,7 +1369,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		current_vector[2] = 0x02;  // bus error
 		current_irq_line = 2;
 		offset *= 2;
-		if(ACCESSING_LSB)
+		if(ACCESSING_BITS_0_7)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
 //      cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);

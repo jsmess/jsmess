@@ -347,7 +347,7 @@ static WRITE16_HANDLER( misc_io_w )
 		/* I/O chip */
 		case 0x0000/2:
 		case 0x1000/2:
-			if (ACCESSING_LSB)
+			if (ACCESSING_BITS_0_7)
 			{
 				io_chip_w(machine, offset, data, mem_mask);
 				return;
@@ -356,7 +356,7 @@ static WRITE16_HANDLER( misc_io_w )
 
 		/* video control latch */
 		case 0x2000/2:
-			if (ACCESSING_LSB)
+			if (ACCESSING_BITS_0_7)
 			{
 				system18_set_vdp_mixing(data & 0xff);
 				return;
@@ -381,7 +381,7 @@ static WRITE16_HANDLER( misc_io_w )
 
 static WRITE16_HANDLER( rom_5987_bank_w )
 {
-	if (!ACCESSING_LSB)
+	if (!ACCESSING_BITS_0_7)
 		return;
 	offset &= 0xf;
 	data &= 0xff;
@@ -389,7 +389,7 @@ static WRITE16_HANDLER( rom_5987_bank_w )
 	/* tile banking */
 	if (offset < 8)
 	{
-		int maxbanks = Machine->gfx[0]->total_elements / 1024;
+		int maxbanks = machine->gfx[0]->total_elements / 1024;
 		if (data >= maxbanks)
 			data %= maxbanks;
 		segaic16_tilemap_set_bank(0, offset, data);
@@ -556,7 +556,7 @@ static WRITE8_HANDLER( soundbank_w )
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpunum_set_input_line(Machine, 2, 1, PULSE_LINE);
+	cpunum_set_input_line(machine, 2, 1, PULSE_LINE);
 }
 
 

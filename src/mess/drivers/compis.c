@@ -51,7 +51,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE( 0x0000, 0x0007) AM_READWRITE( compis_ppi_r, compis_ppi_w )	/* PPI 8255         */
-	AM_RANGE( 0x0080, 0x0087) AM_READWRITE( compis_pit_r, compis_pit_w )	/* PIT 8253         */
+//	AM_RANGE( 0x0080, 0x0087) AM_READWRITE( compis_pit_r, compis_pit_w )	/* PIT 8253         */
 	AM_RANGE( 0x0100, 0x011b) AM_READWRITE( compis_rtc_r, compis_rtc_w ) 	/* RTC 58174            */
 	AM_RANGE( 0x0280, 0x0283) AM_READWRITE( compis_osp_pic_r, compis_osp_pic_w ) /* PIC 8259 (80150/80130)  */
 //  AM_RANGE( 0x0288, 0x028e) AM_READWRITE( compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */

@@ -10,10 +10,10 @@
     TODO:
 
     - connect to sound system when possible
-	- white noise
-	- scanline based update
-	- fix flashing spaceship in destryer/altair
-	- fix flashing player in draco
+    - white noise
+    - scanline based update
+    - fix flashing spaceship in destryer/altair
+    - fix flashing player in draco
 
 */
 
@@ -308,14 +308,13 @@ static void cdp1869_draw_char(const device_config *device, bitmap_t *bitmap, int
 
 	UINT8 cma = 0;
 
-	int pcb = cdp1869->intf->pcb_r(device, pma, cma);
-
 	for (cma = 0; cma < cdp1869_get_lines(device); cma++)
 	{
 		UINT8 data = cdp1869->intf->char_ram_r(device, pma, cma);
 
 		int ccb0 = BIT(data, CCB0);
 		int ccb1 = BIT(data, CCB1);
+		int pcb = cdp1869->intf->pcb_r(device, pma, cma);
 
 		int color = cdp1869_get_pen(device, ccb0, ccb1, pcb);
 
