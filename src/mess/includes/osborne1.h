@@ -24,6 +24,7 @@ WRITE8_HANDLER( osborne1_bankswitch_w );
 DEVICE_IMAGE_LOAD( osborne1_floppy );
 
 DRIVER_INIT( osborne1 );
+MACHINE_START( osborne1 );
 MACHINE_RESET( osborne1 );
 
 

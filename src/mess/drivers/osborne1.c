@@ -146,6 +146,7 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_CPU_IO_MAP( osborne1_io, 0 )
 	MDRV_CPU_CONFIG( osborne1_daisy_chain )
 
+	MDRV_MACHINE_START( osborne1 )
 	MDRV_MACHINE_RESET( osborne1 )
 
 	MDRV_SCREEN_ADD("main", RASTER)

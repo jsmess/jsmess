@@ -422,6 +422,12 @@ static TIMER_CALLBACK( setup_beep ) {
 	beep_set_frequency( 0, 300 /* 60 * 240 / 2 */ );
 }
 
+MACHINE_START( osborne1 )
+{
+	/* Configure the floppy disk interface */
+	wd17xx_init( machine, WD_TYPE_MB8877, NULL, NULL );
+}	
+
 MACHINE_RESET( osborne1 ) {
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( machine, 0x00, 0 );
@@ -454,8 +460,5 @@ DRIVER_INIT( osborne1 ) {
 
 	/* Configure the 6850 ACIA */
 //	acia6850_config( 0, &osborne1_6850_config );
-
-	/* Configure the floppy disk interface */
-	wd17xx_init( machine, WD_TYPE_MB8877, NULL, NULL );
 }
 
