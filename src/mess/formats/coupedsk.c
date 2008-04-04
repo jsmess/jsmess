@@ -11,6 +11,7 @@
 
 
 #define SAD_HEADER_LEN  22
+#define SAD_SIGNATURE   "Aley's disk backup"
 
 
 
@@ -135,10 +136,24 @@ FLOPPY_CONSTRUCT( coupe_sad_construct )
 	if (params)
 	{
 		/* create */
+		UINT8 header[SAD_HEADER_LEN];
+
+		/* get format options */
 		heads = option_resolution_lookup_int(params, PARAM_HEADS);
 		tracks = option_resolution_lookup_int(params, PARAM_TRACKS);
 		sectors = option_resolution_lookup_int(params, PARAM_SECTORS);
 		sector_length = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+
+		/* build the header */
+		memset(header, 0, SAD_HEADER_LEN);
+		memcpy(header, SAD_SIGNATURE, 18);
+		header[18] = heads;
+		header[19] = tracks;
+		header[20] = sectors;
+		header[21] = sector_length >> 6;
+
+		/* and write it to disk */
+		floppy_image_write(floppy, header, 0, sizeof(header));
 	}
 	else
 	{
