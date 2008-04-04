@@ -448,9 +448,8 @@ DEVICE_IMAGE_LOAD( svi318_floppy )
 		return INIT_FAIL;
 
 	basicdsk_set_geometry(image, 40, svi318_fdc.heads[id], 17, 256, 1, 0, FALSE);
-	if (dsktype == 0) {
-		basicdsk_set_calcoffset(image, svi318_calcoffset);
-	}
+
+	if (dsktype == 0) basicdsk_set_calcoffset(image, svi318_calcoffset);
 
 	return INIT_PASS;
 }
@@ -623,9 +622,6 @@ DRIVER_INIT( svi318 )
 		cpunum_set_info_ptr(0, CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i], (void*)table);
 	}
 
-	/* floppy */
-	wd17xx_init(machine, WD_TYPE_179X, svi_fdc_callback, NULL);
-
 	/* serial */
 	uart8250_init(0, svi318_uart8250_interface);
 	uart8250_init(1, svi318_uart8250_interface+1);
@@ -652,11 +648,13 @@ static const TMS9928a_interface svi318_tms9929a_interface =
 MACHINE_START( svi318_ntsc )
 {
 	TMS9928A_configure(&svi318_tms9928a_interface);
+	wd17xx_init(machine, WD_TYPE_179X, svi_fdc_callback, NULL);
 }
 
 MACHINE_START( svi318_pal )
 {
 	TMS9928A_configure(&svi318_tms9929a_interface);
+	wd17xx_init(machine, WD_TYPE_179X, svi_fdc_callback, NULL);
 }
 
 MACHINE_RESET( svi318 )
