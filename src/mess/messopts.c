@@ -7,6 +7,7 @@
 #include "mame.h"
 #include "options.h"
 #include "driver.h"
+#include "deprecat.h"
 #include "pool.h"
 #include "config.h"
 #include "xmlfile.h"
@@ -217,7 +218,7 @@ static void extract_device_options_for_device(core_options *opts, const game_dri
 	dev_tag = mess_device_get_info_string(devclass, MESS_DEVINFO_STR_DEV_TAG);
 	if (dev_tag != NULL)
 	{
-		image = image_from_devtag_and_index(dev_tag, device_index);
+		image = image_from_devtag_and_index(Machine, dev_tag, device_index);
 	}
 	else
 	{

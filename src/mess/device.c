@@ -644,13 +644,13 @@ const device_config *image_from_device(const struct IODevice *device)
 
 
 
-const device_config *image_from_devtag_and_index(const char *devtag, int id)
+const device_config *image_from_devtag_and_index(running_machine *machine, const char *devtag, int id)
 {
 	const device_config *image = NULL;
 	const device_config *dev;
 	const struct IODevice *iodev;
 
-	for (dev = device_list_first(Machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	for (dev = device_list_first(machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
 	{
 		iodev = mess_device_from_core_device(dev);
 		if ((iodev->tag != NULL) && !strcmp(iodev->tag, devtag) && (iodev->index_in_device == id))

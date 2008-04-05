@@ -680,7 +680,7 @@ static void command_image_loadcreate(running_machine *machine)
 
 	/* look up the image slot */
 	if (device_tag)
-		image = image_from_devtag_and_index(device_tag, device_slot);
+		image = image_from_devtag_and_index(machine, device_tag, device_slot);
 	else
 		image = image_from_devtype_and_index(device_type, device_slot);
 	if (!image)

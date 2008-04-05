@@ -156,7 +156,7 @@ void apple525_set_lines(UINT8 lines)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = image_from_devtag_and_index(APPLE525TAG, i);
+			image = image_from_devtag_and_index(Machine, APPLE525TAG, i);
 			if (image)
 				apple525_disk_set_lines(image, lines);
 		}
@@ -227,7 +227,7 @@ static const device_config *apple525_selected_image(running_machine *machine)
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
-			return image_from_devtag_and_index(APPLE525TAG, i);
+			return image_from_devtag_and_index(machine, APPLE525TAG, i);
 	}
 	return NULL;
 }
@@ -264,7 +264,7 @@ int apple525_read_status(void)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = image_from_devtag_and_index(APPLE525TAG, i);
+			image = image_from_devtag_and_index(Machine, APPLE525TAG, i);
 			if (image && !image_is_writable(image))
 				result = 1;
 		}

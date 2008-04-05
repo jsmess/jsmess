@@ -298,7 +298,7 @@ void *image_lookuptag(const device_config *device, const char *tag);
 /* deprecated device access functions */
 int image_index_in_device(const device_config *device);
 const device_config *image_from_device(const struct IODevice *iodev);
-const device_config *image_from_devtag_and_index(const char *devtag, int id);
+const device_config *image_from_devtag_and_index(running_machine *machine, const char *devtag, int id);
 
 /* deprecated device access functions that assume one device of any given type */
 iodevice_t image_devtype(const device_config *device);

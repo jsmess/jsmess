@@ -37,6 +37,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sonydriv.h"
 #include "formats/ap_dsk35.h"
 #include "flopdrv.h"
@@ -121,7 +122,7 @@ static void load_track_data(int floppy_select)
 	floppy *f;
 
 	f = &sony_floppy[floppy_select];
-	cur_image = image_from_devtag_and_index("sonydriv", floppy_select);
+	cur_image = image_from_devtag_and_index(Machine, "sonydriv", floppy_select);
 
 	track_size = floppy_get_track_size(flopimg_get_image(cur_image), f->head, floppy_drive_get_current_track(cur_image));
 	new_data = image_realloc(cur_image, f->loadedtrack_data, track_size);
@@ -145,7 +146,7 @@ static void save_track_data(int floppy_select)
 	int len;
 
 	f = &sony_floppy[floppy_select];
-	cur_image = image_from_devtag_and_index("sonydriv", floppy_select);
+	cur_image = image_from_devtag_and_index(Machine, "sonydriv", floppy_select);
 
 	if (f->loadedtrack_dirty)
 	{
@@ -167,7 +168,7 @@ UINT8 sony_read_data(void)
 		return 0xFF;			/* right ??? */
 
 	f = &sony_floppy[sony_floppy_select];
-	cur_image = image_from_devtag_and_index("sonydriv", sony_floppy_select);
+	cur_image = image_from_devtag_and_index(Machine, "sonydriv", sony_floppy_select);
 	if (!image_exists(cur_image))
 		return 0xFF;
 
@@ -186,7 +187,7 @@ void sony_write_data(UINT8 data)
 	floppy *f;
 
 	f = &sony_floppy[sony_floppy_select];
-	cur_image = image_from_devtag_and_index("sonydriv", sony_floppy_select);
+	cur_image = image_from_devtag_and_index(Machine, "sonydriv", sony_floppy_select);
 	if (!image_exists(cur_image))
 		return;
 
@@ -269,7 +270,7 @@ int sony_read_status(void)
 	if ((! sony_enable2()) && sony_floppy_enable)
 	{
 		f = &sony_floppy[sony_floppy_select];
-		cur_image = image_from_devtag_and_index("sonydriv", sony_floppy_select);
+		cur_image = image_from_devtag_and_index(Machine, "sonydriv", sony_floppy_select);
 		if (!image_exists(cur_image))
 			cur_image = NULL;
 
@@ -380,7 +381,7 @@ static void sony_doaction(void)
 	if (sony_floppy_enable)
 	{
 		f = &sony_floppy[sony_floppy_select];
-		cur_image = image_from_devtag_and_index("sonydriv", sony_floppy_select);
+		cur_image = image_from_devtag_and_index(Machine, "sonydriv", sony_floppy_select);
 		if (!image_exists(cur_image))
 			cur_image = NULL;
 
