@@ -533,7 +533,7 @@ static void state_save(running_machine *machine)
 
 struct file_dialog_params
 {
-	const struct IODevice *dev;
+	const device_config *dev;
 	int *create_format;
 	option_resolution **create_args;
 };
@@ -542,7 +542,8 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 {
 	HWND wnd;
 	int format_combo_val;
-	const struct IODevice *dev;
+	const device_config *dev;
+	const struct IODevice *iodev;
 	const struct OptionGuide *guide;
 	const char *optspec;
 	struct file_dialog_params *params;
@@ -560,12 +561,13 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 
 	// compute our parameters
 	dev = params->dev;
-	guide = dev->createimage_optguide;
-	optspec = dev->createimage_options[format_combo_val].optspec;
+	iodev = mess_device_from_core_device(dev);
+	guide = iodev->createimage_optguide;
+	optspec = iodev->createimage_options[format_combo_val].optspec;
 
 	// set the default extension
 	CommDlg_OpenSave_SetDefExt(GetParent(dlgwnd),
-		dev->createimage_options[format_combo_val].extensions);
+		iodev->createimage_options[format_combo_val].extensions);
 
 	// enumerate through all of the child windows
 	wnd = NULL;
@@ -614,17 +616,19 @@ static void storeval_option_resolution(void *storeval_param, int val)
 {
 	option_resolution *resolution;
 	struct storeval_optres_params *params;
-	const struct IODevice *dev;
+	const device_config *dev;
+	const struct IODevice *iodev;
 	char buf[16];
 
 	params = (struct storeval_optres_params *) storeval_param;
 	dev = params->fdparams->dev;
+	iodev = mess_device_from_core_device(dev);
 
 	// create the resolution, if necessary
 	resolution = *(params->fdparams->create_args);
 	if (!resolution)
 	{
-		resolution = option_resolution_create(dev->createimage_optguide, dev->createimage_options[*(params->fdparams->create_format)].optspec);
+		resolution = option_resolution_create(iodev->createimage_optguide, iodev->createimage_options[*(params->fdparams->create_format)].optspec);
 		if (!resolution)
 			return;
 		*(params->fdparams->create_args) = resolution;
@@ -640,7 +644,7 @@ static void storeval_option_resolution(void *storeval_param, int val)
 //	build_option_dialog
 //============================================================
 
-static dialog_box *build_option_dialog(const struct IODevice *dev, char *filter, size_t filter_len, int *create_format, option_resolution **create_args)
+static dialog_box *build_option_dialog(const device_config *dev, char *filter, size_t filter_len, int *create_format, option_resolution **create_args)
 {
 	dialog_box *dialog;
 	const struct OptionGuide *guide_entry;
@@ -649,14 +653,15 @@ static dialog_box *build_option_dialog(const struct IODevice *dev, char *filter,
 	struct file_dialog_params *params;
 	struct storeval_optres_params *storeval_params;
 	static const struct dialog_layout filedialog_layout = { 44, 220 };
+	const struct IODevice *iodev = mess_device_from_core_device(dev);
 
 	// make the filter
 	pos = 0;
-	for (i = 0; dev->createimage_options[i].optspec; i++)
+	for (i = 0; iodev->createimage_options[i].optspec; i++)
 	{
 		pos += add_filter_entry(filter + pos, filter_len - pos,
-			dev->createimage_options[i].description,
-			dev->createimage_options[i].extensions);
+			iodev->createimage_options[i].description,
+			iodev->createimage_options[i].extensions);
 	}
 
 	// create the dialog
@@ -677,13 +682,13 @@ static dialog_box *build_option_dialog(const struct IODevice *dev, char *filter,
 		goto error;
 
 	// loop through the entries
-	for (guide_entry = dev->createimage_optguide; guide_entry->option_type != OPTIONTYPE_END; guide_entry++)
+	for (guide_entry = iodev->createimage_optguide; guide_entry->option_type != OPTIONTYPE_END; guide_entry++)
 	{
 		// make sure that this entry is present on at least one option specification
 		found = FALSE;
-		for (i = 0; dev->createimage_options[i].optspec; i++)
+		for (i = 0; iodev->createimage_options[i].optspec; i++)
 		{
-			if (option_resolution_contains(dev->createimage_options[i].optspec, guide_entry->parameter))
+			if (option_resolution_contains(iodev->createimage_options[i].optspec, guide_entry->parameter))
 			{
 				found = TRUE;
 				break;
@@ -699,15 +704,16 @@ static dialog_box *build_option_dialog(const struct IODevice *dev, char *filter,
 			storeval_params->guide_entry = guide_entry;
 
 			// this option is present on at least one of the specs
-			switch(guide_entry->option_type) {
-			case OPTIONTYPE_INT:
-				snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%s:", guide_entry->display_name);
-				if (win_dialog_add_combobox(dialog, buf, 0, storeval_option_resolution, storeval_params))
-					goto error;
-				break;
+			switch(guide_entry->option_type)
+			{
+				case OPTIONTYPE_INT:
+					snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%s:", guide_entry->display_name);
+					if (win_dialog_add_combobox(dialog, buf, 0, storeval_option_resolution, storeval_params))
+						goto error;
+					break;
 
-			default:
-				break;
+				default:
+					break;
 			}
 		}
 	}
@@ -791,15 +797,16 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 //	build_generic_filter
 //============================================================
 
-static void build_generic_filter(const struct IODevice *dev, int is_save, char *filter, size_t filter_len)
+static void build_generic_filter(const device_config *dev, int is_save, char *filter, size_t filter_len)
 {
 	char *s;
 	const char *file_extensions;
+	image_device_info info = image_device_getinfo(dev);
 
 	s = filter;
 
 	// common image types
-	file_extensions = mess_device_get_info_string(&dev->devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS);
+	file_extensions = info.file_extensions;
 	s += add_filter_entry(filter, filter_len, "Common image types", file_extensions);
 
 	// all files
@@ -852,14 +859,14 @@ static void change_device(HWND wnd, const device_config *img, int is_save)
 	// add custom dialog elements, if appropriate
 	if (is_save && dev->createimage_optguide && dev->createimage_options[0].optspec)
 	{
-		dialog = build_option_dialog(dev, filter, sizeof(filter) / sizeof(filter[0]), &create_format, &create_args);
+		dialog = build_option_dialog(img, filter, sizeof(filter) / sizeof(filter[0]), &create_format, &create_args);
 		if (!dialog)
 			goto done;
 	}
 	else
 	{
 		// build a normal filter
-		build_generic_filter(dev, is_save, filter, sizeof(filter) / sizeof(filter[0]));
+		build_generic_filter(img, is_save, filter, sizeof(filter) / sizeof(filter[0]));
 	}
 
 	// display the dialog
@@ -1206,7 +1213,6 @@ static int frameskip_level_count(void)
 static void prepare_menus(running_machine *machine, HWND wnd)
 {
 	int i;
-	const struct IODevice *dev;
 	char buf[MAX_PATH];
 	TCHAR t_buf[MAX_PATH];
 	const char *s;
@@ -1347,7 +1353,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	// then set up the actual devices
 	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
 	{
-		dev = mess_device_from_core_device(img);
+		const struct IODevice *dev = mess_device_from_core_device(img);
 
 		new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
 		flags_for_exists = MF_STRING;
