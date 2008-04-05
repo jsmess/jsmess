@@ -28,6 +28,10 @@ System Driver Changes:
 
 - [VECTREX] Fixed bug #1569 [Mathis Rosenhauer]
 
+- [GENESIS] Clean and speed up SSF2 banking [Cowering]
+
+- [GENESIS] Add automatic support for many 'pirate' carts (thanks to Haze for them) [Cowering]
+
 User Interface Changes:
 -----------------------
 (none)
