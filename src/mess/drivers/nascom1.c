@@ -274,6 +274,8 @@ static MACHINE_DRIVER_START( nascom2 )
 	MDRV_CPU_REPLACE("main", Z80, 2000000)
 	MDRV_CPU_IO_MAP(nascom2_io, 0)
 
+	MDRV_MACHINE_START(nascom2)
+
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(48 * 8, 16 * 14)

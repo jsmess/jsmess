@@ -270,6 +270,11 @@ SNAPSHOT_LOAD( nascom1 )
  *
  *************************************/
 
+MACHINE_START( nascom2 )
+{
+	wd17xx_init(machine, WD_TYPE_1793, nascom2_fdc_callback, NULL);
+}
+
 DRIVER_INIT( nascom1 )
 {
 	switch (mess_ram_size)
@@ -301,6 +306,4 @@ DRIVER_INIT( nascom1 )
 		memory_set_bankptr(1, mess_ram);
 		break;
 	}
-
-	wd17xx_init(machine, WD_TYPE_1793, nascom2_fdc_callback, NULL);
 }
