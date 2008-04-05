@@ -144,39 +144,39 @@ UINT8 ssystem3_via_read_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs
 {
   UINT8 data=0xff;
 #if 1 // time switch
-  if (!(ssystem3.porta&0x10)) data&=readinputport(1)|0xf1;
-  if (!(ssystem3.porta&0x20)) data&=readinputport(2)|0xf1;
-  if (!(ssystem3.porta&0x40)) data&=readinputport(3)|0xf1;
-  if (!(ssystem3.porta&0x80)) data&=readinputport(4)|0xf1;
+  if (!(ssystem3.porta&0x10)) data&=readinputportbytag("matrix1")|0xf1;
+  if (!(ssystem3.porta&0x20)) data&=readinputportbytag("matrix2")|0xf1;
+  if (!(ssystem3.porta&0x40)) data&=readinputportbytag("matrix3")|0xf1;
+  if (!(ssystem3.porta&0x80)) data&=readinputportbytag("matrix4")|0xf1;
 #else
-  if (!(ssystem3.porta&0x10)) data&=readinputport(1)|0xf0;
-  if (!(ssystem3.porta&0x20)) data&=readinputport(2)|0xf0;
-  if (!(ssystem3.porta&0x40)) data&=readinputport(3)|0xf0;
-  if (!(ssystem3.porta&0x80)) data&=readinputport(4)|0xf0;
+  if (!(ssystem3.porta&0x10)) data&=readinputportbytag("matrix1")|0xf0;
+  if (!(ssystem3.porta&0x20)) data&=readinputportbytag("matrix2")|0xf0;
+  if (!(ssystem3.porta&0x40)) data&=readinputportbytag("matrix3")|0xf0;
+  if (!(ssystem3.porta&0x80)) data&=readinputportbytag("matrix4")|0xf0;
 #endif
   if (!(ssystem3.porta&1)) {
-    if (!(readinputport(1)&1)) data&=~0x10;
-    if (!(readinputport(2)&1)) data&=~0x20;
-    if (!(readinputport(3)&1)) data&=~0x40;
-    if (!(readinputport(4)&1)) data&=~0x80;
+    if (!(readinputportbytag("matrix1")&1)) data&=~0x10;
+    if (!(readinputportbytag("matrix2")&1)) data&=~0x20;
+    if (!(readinputportbytag("matrix3")&1)) data&=~0x40;
+    if (!(readinputportbytag("matrix4")&1)) data&=~0x80;
   }
   if (!(ssystem3.porta&2)) {
-    if (!(readinputport(1)&2)) data&=~0x10;
-    if (!(readinputport(2)&2)) data&=~0x20;
-    if (!(readinputport(3)&2)) data&=~0x40;
-    if (!(readinputport(4)&2)) data&=~0x80;
+    if (!(readinputportbytag("matrix1")&2)) data&=~0x10;
+    if (!(readinputportbytag("matrix2")&2)) data&=~0x20;
+    if (!(readinputportbytag("matrix3")&2)) data&=~0x40;
+    if (!(readinputportbytag("matrix4")&2)) data&=~0x80;
   }
   if (!(ssystem3.porta&4)) {
-    if (!(readinputport(1)&4)) data&=~0x10;
-    if (!(readinputport(2)&4)) data&=~0x20;
-    if (!(readinputport(3)&4)) data&=~0x40;
-    if (!(readinputport(4)&4)) data&=~0x80;
+    if (!(readinputportbytag("matrix1")&4)) data&=~0x10;
+    if (!(readinputportbytag("matrix2")&4)) data&=~0x20;
+    if (!(readinputportbytag("matrix3")&4)) data&=~0x40;
+    if (!(readinputportbytag("matrix4")&4)) data&=~0x80;
   }
   if (!(ssystem3.porta&8)) {
-    if (!(readinputport(1)&8)) data&=~0x10;
-    if (!(readinputport(2)&8)) data&=~0x20;
-    if (!(readinputport(3)&8)) data&=~0x40;
-    if (!(readinputport(4)&8)) data&=~0x80;
+    if (!(readinputportbytag("matrix1")&8)) data&=~0x10;
+    if (!(readinputportbytag("matrix2")&8)) data&=~0x20;
+    if (!(readinputportbytag("matrix3")&8)) data&=~0x40;
+    if (!(readinputportbytag("matrix4")&8)) data&=~0x80;
   }
   //  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
   return data;
@@ -261,7 +261,7 @@ static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
 				   */
 //  AM_RANGE( 0x4000, 0x40ff) AM_NOP
 /*
-  probably zusatzgerät memory (battery powered ram 256x4? at 0x4000)
+  probably zusatzgerï¿½t memory (battery powered ram 256x4? at 0x4000)
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
 	AM_RANGE( 0x6000, 0x600f) AM_READWRITE( via_0_r, via_0_w )
@@ -281,7 +281,7 @@ static INPUT_PORTS_START( ssystem3 )
 */
 
 
-	PORT_START_TAG( "Switches" )
+  PORT_START_TAG( "Switches" )
 //PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seams to be direct wired to reset
 //	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?CLEAR") PORT_CODE(KEYCODE_F1)
 //	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?ENTER") PORT_CODE(KEYCODE_ENTER)
@@ -301,14 +301,14 @@ static INPUT_PORTS_START( ssystem3 )
      PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 D turm #") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
      PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 A white") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_A)
   PORT_START_TAG( "matrix4" )
-	PORT_DIPNAME( 0x01, 0, "Time") PORT_CODE(KEYCODE_T) PORT_TOGGLE PORT_DIPSETTING( 0, DEF_STR(Off) ) PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+     PORT_DIPNAME( 0x01, 0, "Time") PORT_CODE(KEYCODE_T) PORT_TOGGLE PORT_DIPSETTING( 0, DEF_STR(Off) ) PORT_DIPSETTING( 0x01, DEF_STR( On ) )
      PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 H black") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
      PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 C dame #50") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_C)
      PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 B koenig FP") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_B)
   PORT_START_TAG( "Configuration" )
-	PORT_DIPNAME( 0x0001, 0, "Schachbrett") PORT_TOGGLE
-	PORT_DIPSETTING( 0, DEF_STR( Off ) )
-	PORT_DIPSETTING( 1, "angeschlossen" )
+     PORT_DIPNAME( 0x0001, 0, "Schachbrett") PORT_TOGGLE
+     PORT_DIPSETTING( 0, DEF_STR( Off ) )
+     PORT_DIPSETTING( 1, "angeschlossen" )
 #if 0
 	PORT_DIPNAME( 0x0002, 0, "Memory") PORT_TOGGLE
 	PORT_DIPSETTING( 0, DEF_STR( Off ) )

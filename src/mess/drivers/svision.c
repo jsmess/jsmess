@@ -51,7 +51,7 @@ static TIMER_CALLBACK(svision_pet_timer)
 	switch (svision_pet.state)
 	{
 		case 0:
-			svision_pet.input = readinputport(1);
+			svision_pet.input = readinputportbytag("JOY2");
 			/* fall through */
 
 		case 2: case 4: case 6: case 8:
@@ -93,7 +93,7 @@ static READ8_HANDLER(svision_r)
 	switch (offset)
 	{
 		case 0x20:
-			data = readinputport(0);
+			data = readinputportbytag("JOY");
 			break;
 		case 0x21:
 			data &= ~0xf;
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( tvlink_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( svision )
-	PORT_START
+	PORT_START_TAG("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -275,7 +275,7 @@ static INPUT_PORTS_START( svision )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( svisions )
-	PORT_START
+	PORT_START_TAG("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -284,7 +284,7 @@ static INPUT_PORTS_START( svisions )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A") PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start/Pause") PORT_PLAYER(1)
-	PORT_START
+	PORT_START_TAG("JOY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)

@@ -229,13 +229,13 @@ static  READ8_HANDLER(spectrum_port_fe_r)
    int lines = offset>>8;
    int data = 0xff;
 
-   int cs_extra1 = readinputport(8)  & 0x1f;
-   int cs_extra2 = readinputport(9)  & 0x1f;
-   int cs_extra3 = readinputport(10) & 0x1f;
-   int ss_extra1 = readinputport(11) & 0x1f;
-   int ss_extra2 = readinputport(12) & 0x1f;
+   int cs_extra1 = readinputportbytag("PLUS0")  & 0x1f;
+   int cs_extra2 = readinputportbytag("PLUS1")  & 0x1f;
+   int cs_extra3 = readinputportbytag("PLUS2") & 0x1f;
+   int ss_extra1 = readinputportbytag("PLUS3") & 0x1f;
+   int ss_extra2 = readinputportbytag("PLUS4") & 0x1f;
 
-	if ( readinputport(17) & 0x01 ) {
+	if ( readinputportbytag("MOTOR") & 0x01 ) {
 		if ( motor_toggle_previous == 0 ) {
 			cassette_motor_mode = cassette_motor_mode ^ 0x01;
 			cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
@@ -248,7 +248,7 @@ static  READ8_HANDLER(spectrum_port_fe_r)
    /* Caps - V */
    if ((lines & 1)==0)
    {
-		data &= readinputport(0);
+		data &= readinputportbytag("LINE0");
 		/* CAPS for extra keys */
 		if (cs_extra1 != 0x1f || cs_extra2 != 0x1f || cs_extra3 != 0x1f)
 			data &= ~0x01;
@@ -256,32 +256,32 @@ static  READ8_HANDLER(spectrum_port_fe_r)
 
    /* A - G */
    if ((lines & 2)==0)
-		data &= readinputport(1);
+		data &= readinputportbytag("LINE1");
 
    /* Q - T */
    if ((lines & 4)==0)
-		data &= readinputport(2);
+		data &= readinputportbytag("LINE2");
 
    /* 1 - 5 */
    if ((lines & 8)==0)
-		data &= readinputport(3) & cs_extra1;
+		data &= readinputportbytag("LINE3") & cs_extra1;
 
    /* 6 - 0 */
    if ((lines & 16)==0)
-		data &= readinputport(4) & cs_extra2;
+		data &= readinputportbytag("LINE4") & cs_extra2;
 
    /* Y - P */
    if ((lines & 32)==0)
-		data &= readinputport(5) & ss_extra1;
+		data &= readinputportbytag("LINE5") & ss_extra1;
 
    /* H - Enter */
    if ((lines & 64)==0)
-		data &= readinputport(6);
+		data &= readinputportbytag("LINE6");
 
 	/* B - Space */
 	if ((lines & 128)==0)
 	{
-		data &= readinputport(7) & cs_extra3 & ss_extra2;
+		data &= readinputportbytag("LINE7") & cs_extra3 & ss_extra2;
 		/* SYMBOL SHIFT for extra keys */
 		if (ss_extra1 != 0x1f || ss_extra2 != 0x1f)
 			data &= ~0x02;
@@ -297,7 +297,7 @@ static  READ8_HANDLER(spectrum_port_fe_r)
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
     Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
-	if (readinputport(16) & 0x80)
+	if (readinputportbytag("CONFIG") & 0x80)
 		data ^= (0x40);
 	return data;
 }
@@ -305,19 +305,19 @@ static  READ8_HANDLER(spectrum_port_fe_r)
 /* kempston joystick interface */
 static  READ8_HANDLER(spectrum_port_1f_r)
 {
-  return readinputport(13) & 0x1f;
+  return readinputportbytag("KEMPSTON") & 0x1f;
 }
 
 /* fuller joystick interface */
 static  READ8_HANDLER(spectrum_port_7f_r)
 {
-  return readinputport(14) | (0xff^0x8f);
+  return readinputportbytag("FULLER") | (0xff^0x8f);
 }
 
 /* mikrogen joystick interface */
 static  READ8_HANDLER(spectrum_port_df_r)
 {
-  return readinputport(15) | (0xff^0x1f);
+  return readinputportbytag("MIKROGEN") | (0xff^0x1f);
 }
 
 static  READ8_HANDLER ( spectrum_port_r )
@@ -568,13 +568,13 @@ static const int spectrum_plus3_memory_selections[]=
 
 static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
-		if (~readinputport(16) & 0x20)
+		if (~readinputportbytag("CONFIG") & 0x20)
 				nec765_data_w(machine, 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 {
-		if (readinputport(16) & 0x20)
+		if (readinputportbytag("CONFIG") & 0x20)
 				return 0xff;
 		else
 				return nec765_data_r(machine, 0);
@@ -583,7 +583,7 @@ static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 
 static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 {
-		if (readinputport(16) & 0x20)
+		if (readinputportbytag("CONFIG") & 0x20)
 				return 0xff;
 		else
 				return nec765_status_r(machine, 0);
@@ -1782,21 +1782,21 @@ static GFXDECODE_START( spectrum )
 GFXDECODE_END
 
 static INPUT_PORTS_START( spectrum )
-	PORT_START /* [0] 0xFEFE */
+	PORT_START_TAG("LINE0") /* [0] 0xFEFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z  COPY    :      LN       BEEP") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X  CLEAR   Pound  EXP      INK") PORT_CODE(KEYCODE_X)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C  CONT    ?      LPRINT   PAPER") PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V  CLS     /      LLIST    FLASH") PORT_CODE(KEYCODE_V)
 
-	PORT_START /* [1] 0xFDFE */
+	PORT_START_TAG("LINE1") /* [1] 0xFDFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A  NEW     STOP   READ     ~") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S  SAVE    NOT    RESTORE  |") PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D  DIM     STEP   DATA     \\") PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F  FOR     TO     SGN      {") PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G  GOTO    THEN   ABS      }") PORT_CODE(KEYCODE_G)
 
-	PORT_START /* [2] 0xFBFE */
+	PORT_START_TAG("LINE2") /* [2] 0xFBFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q  PLOT    <=     SIN      ASN") PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W  DRAW    <>     COS      ACS") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E  REM     >=     TAN      ATN") PORT_CODE(KEYCODE_E)
@@ -1804,7 +1804,7 @@ static INPUT_PORTS_START( spectrum )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T  RAND    >      RND      MERGE") PORT_CODE(KEYCODE_T)
 
 	/* interface II uses this port for joystick */
-	PORT_START /* [3] 0xF7FE */
+	PORT_START_TAG("LINE3") /* [3] 0xF7FE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1          !      BLUE     DEF FN") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2          @      RED      FN") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3          #      MAGENTA  LINE") PORT_CODE(KEYCODE_3)
@@ -1812,35 +1812,35 @@ static INPUT_PORTS_START( spectrum )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5          %      CYAN     CLOSE#") PORT_CODE(KEYCODE_5)
 
 	/* protek clashes with interface II! uses 5 = left, 6 = down, 7 = up, 8 = right, 0 = fire */
-	PORT_START /* [4] 0xEFFE */
+	PORT_START_TAG("LINE4") /* [4] 0xEFFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0          _      BLACK    FORMAT") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9          )               POINT") PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8          (               CAT") PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7          '      WHITE    ERASE") PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6          &      YELLOW   MOVE") PORT_CODE(KEYCODE_6)
 
-	PORT_START /* [5] 0xDFFE */
+	PORT_START_TAG("LINE5") /* [5] 0xDFFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P  PRINT   \"      TAB      (c)") PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O  POKE    ;      PEEK     OUT") PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I  INPUT   AT     CODE     IN") PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U  IF      OR     CHR$     ]") PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y  RETURN  AND    STR$     [") PORT_CODE(KEYCODE_Y)
 
-	PORT_START /* [6] 0xBFFE */
+	PORT_START_TAG("LINE6") /* [6] 0xBFFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L  LET     =      USR      ATTR") PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K  LIST    +      LEN      SCREEN$") PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J  LOAD    -      VAL      VAL$") PORT_CODE(KEYCODE_J)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H  GOSUB   ^      SQR      CIRCLE") PORT_CODE(KEYCODE_H)
 
-	PORT_START /* [7] 0x7FFE */
+	PORT_START_TAG("LINE7") /* [7] 0x7FFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SYMBOL SHIFT") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M  PAUSE   .      PI       INVERSE") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N  NEXT    ,      INKEY$   OVER") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B  BORDER  *      BIN      BRIGHT") PORT_CODE(KEYCODE_B)
 
-	PORT_START /* [8] Spectrum+ Keys (set CAPS + 1-5) */
+	PORT_START_TAG("PLUS0") /* [8] Spectrum+ Keys (set CAPS + 1-5) */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EDIT          (CAPS + 1)") PORT_CODE(KEYCODE_INSERT)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS LOCK     (CAPS + 2)") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TRUE VID      (CAPS + 3)") PORT_CODE(KEYCODE_HOME)
@@ -1848,7 +1848,7 @@ static INPUT_PORTS_START( spectrum )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor left   (CAPS + 5)") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START /* [9] Spectrum+ Keys (set CAPS + 6-0) */
+	PORT_START_TAG("PLUS1") /* [9] Spectrum+ Keys (set CAPS + 6-0) */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL           (CAPS + 0)") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH         (CAPS + 9)") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor right  (CAPS + 8)") PORT_CODE(KEYCODE_RIGHT)
@@ -1856,37 +1856,37 @@ static INPUT_PORTS_START( spectrum )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor down   (CAPS + 6)") PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START /* [10] Spectrum+ Keys (set CAPS + SPACE and CAPS + SYMBOL */
+	PORT_START_TAG("PLUS2") /* [10] Spectrum+ Keys (set CAPS + SPACE and CAPS + SYMBOL */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_PAUSE)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXT MODE") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START /* [11] Spectrum+ Keys (set SYMBOL SHIFT + O/P */
+	PORT_START_TAG("PLUS3") /* [11] Spectrum+ Keys (set SYMBOL SHIFT + O/P */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\"") PORT_CODE(KEYCODE_F4)
 	/*        PORT_BITX(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD, "\"", KEYCODE_QUOTE,  CODE_NONE ) */
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START /* [12] Spectrum+ Keys (set SYMBOL SHIFT + N/M */
+	PORT_START_TAG("PLUS4") /* [12] Spectrum+ Keys (set SYMBOL SHIFT + N/M */
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0xf3, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START /* [13] Kempston joystick interface */
+	PORT_START_TAG("KEMPSTON") /* [13] Kempston joystick interface */
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KEMPSTON JOYSTICK RIGHT") PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KEMPSTON JOYSTICK LEFT") PORT_CODE(JOYCODE_X_LEFT_SWITCH)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KEMPSTON JOYSTICK DOWN") PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KEMPSTON JOYSTICK UP") PORT_CODE(JOYCODE_Y_UP_SWITCH)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KEMPSTON JOYSTICK FIRE") PORT_CODE(JOYCODE_BUTTON1)
 
-	PORT_START /* [14] Fuller joystick interface */
+	PORT_START_TAG("FULLER") /* [14] Fuller joystick interface */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FULLER JOYSTICK UP") PORT_CODE(JOYCODE_Y_UP_SWITCH)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FULLER JOYSTICK DOWN") PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FULLER JOYSTICK LEFT") PORT_CODE(JOYCODE_X_LEFT_SWITCH)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FULLER JOYSTICK RIGHT") PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FULLER JOYSTICK FIRE") PORT_CODE(JOYCODE_BUTTON1)
 
-	PORT_START /* [15] Mikrogen joystick interface */
+	PORT_START_TAG("MIKROGEN") /* [15] Mikrogen joystick interface */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIKROGEN JOYSTICK UP") PORT_CODE(JOYCODE_Y_UP_SWITCH)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIKROGEN JOYSTICK DOWN") PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIKROGEN JOYSTICK RIGHT") PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
@@ -1894,7 +1894,7 @@ static INPUT_PORTS_START( spectrum )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIKROGEN JOYSTICK FIRE") PORT_CODE(JOYCODE_BUTTON1)
 
 
-	PORT_START /* [16] */
+	PORT_START_TAG("CONFIG") /* [16] */
 	PORT_DIPNAME(0x80, 0x00, "Hardware Version")
 	PORT_DIPSETTING(0x00, "Issue 2" )
 	PORT_DIPSETTING(0x80, "Issue 3" )
@@ -1906,7 +1906,7 @@ static INPUT_PORTS_START( spectrum )
 	PORT_DIPSETTING(0x20, "Disabled" )
 	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START /* [17] Toggle cassette motor */
+	PORT_START_TAG("MOTOR") /* [17] Toggle cassette motor */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Motor") PORT_CODE(KEYCODE_F1)
 
 INPUT_PORTS_END

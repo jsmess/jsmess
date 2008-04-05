@@ -270,7 +270,7 @@ static int spectrum_setup_tap(offs_t address, UINT8 *snapshot_data, int snapshot
 	if (TapePosition >= snapshot_length)
 	{
 		/* End of tape - either rewind or disable op base override */
-		if (readinputport(16) & 0x40)
+		if (readinputportbytag("CONFIG") & 0x40)
 		{
 			if (data_loaded)
 			{

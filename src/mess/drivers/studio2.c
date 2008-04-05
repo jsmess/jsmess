@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( studio2 )
-	PORT_START
+	PORT_START_TAG("KEYPAD_L")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 1/Left 0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 1/Left 1") PORT_CODE(KEYCODE_1)
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 1/Left 2") PORT_CODE(KEYCODE_2)
@@ -161,7 +161,7 @@ static INPUT_PORTS_START( studio2 )
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 1/Left 8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 1/Left 9") PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_D)
 
-	PORT_START
+	PORT_START_TAG("KEYPAD_R")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 2/Right 0") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 2/Right 1") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 2/Right 2") PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_UP)
@@ -189,8 +189,8 @@ static UINT8 studio2_ef_r(void)
 
 	if (cdp1861_efx) ef -= EF1;
 
-	if (readinputport(0) & (1 << keylatch)) ef -= EF3;
-	if (readinputport(1) & (1 << keylatch)) ef -= EF4;
+	if (readinputportbytag("KEYPAD_L") & (1 << keylatch)) ef -= EF3;
+	if (readinputportbytag("KEYPAD_R") & (1 << keylatch)) ef -= EF4;
 
 	return ef;
 }
@@ -216,8 +216,8 @@ static UINT8 mpt02_ef_r(void)
 
 	if (cdp1864_efx) ef -= EF1;
 
-	if (readinputport(0) & (1 << keylatch)) ef -= EF3;
-	if (readinputport(1) & (1 << keylatch)) ef -= EF4;
+	if (readinputportbytag("KEYPAD_L") & (1 << keylatch)) ef -= EF3;
+	if (readinputportbytag("KEYPAD_R") & (1 << keylatch)) ef -= EF4;
 
 	return ef;
 }
