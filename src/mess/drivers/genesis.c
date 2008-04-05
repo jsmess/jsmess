@@ -69,6 +69,7 @@ static int is_lionk2 = 0;
 static UINT16 lion2_prot1_data, lion2_prot2_data;
 static int is_rx3 = 0;
 static int is_bugsl = 0;
+static int is_sbub = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -196,7 +197,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -374,6 +375,14 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 				is_rx3 = 1;
 			}
 		}
+		if (length == 0x100000)
+		{
+			static unsigned char sbubsig[] = { 0x0c, 0x39, 0x00, 0x55, 0x00, 0x40}; // 	cmpi.b  #$55,($400000).l
+			if (!memcmp(&ROM[0x123e4+relocate],&sbubsig[0],sizeof(sbubsig)))
+			{
+				is_sbub = 1;
+			}
+		}
 
 	}
 
@@ -445,22 +454,26 @@ bad:
 /* we don't use the bios rom (its not needed and only provides security on early models) */
 
 ROM_START(genesis)
-	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
+//	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION(0x0a00000, REGION_CPU1, ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(gensvp)
-	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
+//	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION(0x0a00000, REGION_CPU1, ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(megadriv)
-	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
+//	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION(0x0a00000, REGION_CPU1, ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(megadrij)
-	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
+//	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION(0x0a00000, REGION_CPU1, ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
@@ -585,6 +598,17 @@ READ16_HANDLER( smous_prot_r )
 	return -1;
 }
 
+// Super Bubble Bobble MD handler from HazeMD
+READ16_HANDLER( sbub_extra1_r )
+{
+	return 0x5500;
+}
+
+READ16_HANDLER( sbub_extra2_r )
+{
+	return 0x0f00;
+}
+
 // KOF99 handler from HazeMD
 READ16_HANDLER( kof99_0xA13002_r )
 {
@@ -671,7 +695,7 @@ READ16_HANDLER( bugl_extra_r )
 	return 0x28;
 }
 
-// Elf Wor handler from HazeMD (DFJustin says the title is 'Spirit Taoist')
+// Elf Wor handler from HazeMD (DFJustin says the title is 'Linghuan Daoshi Super Magician')
 READ16_HANDLER( elfwor_0x400000_r )
 {
 	return 0x5500;
@@ -786,6 +810,12 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, bugl_extra_r);
 	}
+
+	if (is_sbub)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, sbub_extra1_r);
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, sbub_extra2_r);
+}
 
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
