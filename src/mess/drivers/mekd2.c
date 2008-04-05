@@ -136,8 +136,8 @@ static const gfx_layout key_layout =
 };
 
 static GFXDECODE_START( mekd2 )
-	GFXDECODE_ENTRY( 1, 0, led_layout, 0, 16 )
-	GFXDECODE_ENTRY( 2, 0, key_layout, 16*2, 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, led_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, key_layout, 16*2, 2 )
 GFXDECODE_END
 
 
@@ -156,7 +156,7 @@ static MACHINE_DRIVER_START( mekd2 )
 	MDRV_SCREEN_SIZE(600, 768)
 	MDRV_SCREEN_VISIBLE_AREA(0, 600-1, 0, 768-1)
 	MDRV_GFXDECODE( mekd2 )
-	MDRV_PALETTE_LENGTH(21 + 32768)
+	MDRV_PALETTE_LENGTH(40)
 	MDRV_PALETTE_INIT( mekd2 )
 
 	MDRV_VIDEO_START( mekd2 )
@@ -173,9 +173,9 @@ MACHINE_DRIVER_END
 ROM_START(mekd2)
 	ROM_REGION(0x10000,REGION_CPU1,0)
 		ROM_LOAD("jbug.rom",    0xe000, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
-	ROM_REGION(128 * 24 * 3,REGION_GFX1,0)
+	ROM_REGION(128 * 24 * 3,REGION_GFX1,ROMREGION_ERASEFF)
 		/* space filled with 7segement graphics by mekd2_init_driver */
-	ROM_REGION( 24 * 18 * 3 * 2,REGION_GFX2,0)
+	ROM_REGION( 24 * 18 * 3 * 2,REGION_GFX2,ROMREGION_ERASEFF)
 		/* space filled with key icons by mekd2_init_driver */
 ROM_END
 

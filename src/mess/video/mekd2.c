@@ -14,20 +14,31 @@ PALETTE_INIT( mekd2 )
 {
 	int i;
 
-	/* initialize 16 colors with shades of red (orange) */
+	machine->colortable = colortable_alloc(machine, 21);
+
+	for (i = 0; i < 16; i++)
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(24 + (i + 1) * (i + 1) - 1, (i + 1) * (i + 1) / 4, 0));
+	
+	colortable_palette_set_color(machine->colortable, 16, MAKE_RGB(0, 0, 0));
+	colortable_palette_set_color(machine->colortable, 17, MAKE_RGB(30, 30, 30));
+	colortable_palette_set_color(machine->colortable, 18, MAKE_RGB(90, 90, 90));
+	colortable_palette_set_color(machine->colortable, 19, MAKE_RGB(50, 50, 50));
+	colortable_palette_set_color(machine->colortable, 20, MAKE_RGB(255, 255, 255));
+
 	for (i = 0; i < 16; i++)
 	{
-		palette_set_color_rgb(machine, i,
-			24 + (i + 1) * (i + 1) - 1,
-			(i + 1) * (i + 1) / 4,
-			0);
+		colortable_entry_set_value(machine->colortable, i*2, 1);
+		colortable_entry_set_value(machine->colortable, i*2+1, i);
 	}
 
-	palette_set_color_rgb(machine, 16, 0, 0, 0);
-	palette_set_color_rgb(machine, 17, 30, 30, 30);
-	palette_set_color_rgb(machine, 18, 90, 90, 90);
-	palette_set_color_rgb(machine, 19, 50, 50, 50);
-	palette_set_color_rgb(machine, 20, 255, 255, 255);
+	colortable_entry_set_value(machine->colortable, 32, 17);
+	colortable_entry_set_value(machine->colortable, 33, 18);
+	colortable_entry_set_value(machine->colortable, 34, 19);
+	colortable_entry_set_value(machine->colortable, 35, 20);
+	colortable_entry_set_value(machine->colortable, 36, 17);
+	colortable_entry_set_value(machine->colortable, 37, 17);
+	colortable_entry_set_value(machine->colortable, 38, 19);
+	colortable_entry_set_value(machine->colortable, 39, 15);
 }
 
 
