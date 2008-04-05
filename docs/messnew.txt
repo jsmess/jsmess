@@ -3,7 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Bondwell 2 (not working)  [Tomas Karlsson]
-
+- Orion 128	[Miodrag Milanovic]
 
 
 System Driver Changes:
@@ -18,6 +18,8 @@ System Driver Changes:
 
 - [MBEE] Added snapload support for MWB filetype. Added LOCK key to keyboard.
   [Robbbert]
+
+- [SPECIAL] Added Erik clone, and fixed bank switch problem [Miodrag Milanovic]
 
 - [T1000HX] Fixed bug #1130.  [Wilbert Pol]
 
