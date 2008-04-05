@@ -65,6 +65,9 @@ static int squirrel_king_extra = 0;
 static int is_smous = 0;
 static int is_smb = 0;
 static int is_elfwor = 0;
+static int is_lionk2 = 0;
+static UINT16 lion2_prot1_data, lion2_prot2_data;
+static int is_rx3 = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -192,7 +195,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -338,9 +341,27 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 				is_smb = 1;
 			}
 		}
+		if (length == 0x200000)
+		{
+			static unsigned char lionk2sig[] = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xf4};
+
+			if (!memcmp(&ROM[0x03c2+relocate],&lionk2sig[0],sizeof(lionk2sig)))
+			{
+				is_lionk2 = 1;
+			}
+		}
+
 		if (length == 0x100000 && !strncmp((char *)&ROM[0x0172+relocate], "GAME : ELF WOR", 14))
 		{
 			is_elfwor = 1;
+		}
+		if (length == 0x200000)
+		{
+			static unsigned char rx3sig[] = { 0x66, 0x00, 0x00, 0x0e, 0x30, 0x3c};
+			if (!memcmp(&ROM[0xc8b90+relocate],&rx3sig[0],sizeof(rx3sig)))
+			{
+				is_rx3 = 1;
+			}
 		}
 
 	}
@@ -579,12 +600,10 @@ READ16_HANDLER( radica_bank_select )
 	int bank = offset&0x3f;
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	memcpy(ROM, ROM +  (bank*0x10000)+0x400000, 0x400000);
-
-//	printf("bank %02x\n",offset);
 	return 0;
 }
 
-// Red Cliff handler from HazeMD
+// ROTK Red Cliff handler from HazeMD
 
 READ16_HANDLER( redclif_prot_r )
 {
@@ -607,8 +626,34 @@ WRITE16_HANDLER( squirrel_king_extra_w )
 	squirrel_king_extra = data;
 }
 
+// Lion King 2 handler from HazeMD
+READ16_HANDLER( lion2_prot1_r )
+{
+	return lion2_prot1_data;
+}
 
-// Elf Wor handler from HazeMD
+READ16_HANDLER( lion2_prot2_r )
+{
+	return lion2_prot2_data;
+}
+
+WRITE16_HANDLER ( lion2_prot1_w )
+{
+	lion2_prot1_data = data;
+}
+
+WRITE16_HANDLER ( lion2_prot2_w )
+{
+	lion2_prot2_data = data;
+}
+
+// Rockman X3 handler from HazeMD
+READ16_HANDLER( rx3_extra_r )
+{
+	return 0xc;
+}
+
+// Elf Wor handler from HazeMD (DFJustin says the title is 'Spirit Taoist')
 READ16_HANDLER( elfwor_0x400000_r )
 {
 	return 0x5500;
@@ -705,6 +750,20 @@ static DRIVER_INIT( gencommon )
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, elfwor_0x400002_r );
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, elfwor_0x400006_r );
 	}
+
+	if (is_lionk2)
+	{
+		memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, lion2_prot1_w );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, lion2_prot1_r );
+		memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, lion2_prot2_w );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, lion2_prot2_r );
+	}
+
+	if (is_rx3)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, rx3_extra_r);
+	}
+
 
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
