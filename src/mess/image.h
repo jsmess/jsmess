@@ -57,6 +57,21 @@ typedef enum
 	IMAGE_ERROR_UNSPECIFIED
 } image_error_t;
 
+typedef struct _image_device_info image_device_info;
+struct _image_device_info
+{
+	iodevice_t type : 8;
+	unsigned int readable : 1;
+	unsigned int writeable : 1;
+	unsigned int creatable : 1;
+	unsigned int must_be_loaded : 1;
+	unsigned int uses_partial_hash : 1;
+	char name[62];
+	char file_extensions[32];
+	char instance_name[32];
+	char brief_instance_name[16];
+};
+
 struct _images_private;
 typedef struct _images_private images_private;
 
@@ -98,6 +113,9 @@ const device_config *image_device_next(const device_config *prevdevice);
 int image_device_count(const machine_config *config);
 
 /* ----- analysis ----- */
+
+/* returns info on a device - can be called by front end code */
+image_device_info image_device_getinfo(const device_config *device);
 
 /* checks to see if a particular devices uses a certain file extension */
 int image_device_uses_file_extension(const device_config *device, const char *file_extension);

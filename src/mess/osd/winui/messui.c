@@ -377,7 +377,6 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 {
 	machine_config *config;
 	const device_config *dev;
-	const struct IODevice *iodev;
 	int nPos;
 	char szMessage[256];
 	LPCSTR pszSoftware;
@@ -391,10 +390,10 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	nPos = 0;
 	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
-		iodev = mess_device_from_core_device(dev);
+		image_device_info info = image_device_getinfo(dev);
 
 		// confirm any mandatory devices are loaded
-		if (iodev->must_be_loaded)
+		if (info.must_be_loaded)
 		{
 			pszSoftware = GetSelectedSoftware(drvindex, dev);
 			if (!pszSoftware || !*pszSoftware)
@@ -402,7 +401,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 				snprintf(szMessage, sizeof(szMessage) / sizeof(szMessage[0]),
 					"System '%s' requires that device %s must have an image to load\n",
 					drivers[drvindex]->description,
-					device_typename(iodev->type));
+					device_typename(info.type));
 				goto done;
 			}
 		}
@@ -523,7 +522,6 @@ static void MessRefreshPicker(int drvindex)
 	LVFINDINFO lvfi;
 	machine_config *config;
 	const device_config *dev;
-	const struct IODevice *iodev;
 	LPCSTR pszSoftware;
 
 	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
@@ -539,8 +537,6 @@ static void MessRefreshPicker(int drvindex)
 
 	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
-		iodev = mess_device_from_core_device(dev);
-
 		pszSoftware = GetSelectedSoftware(drvindex, dev);
 		if (pszSoftware && *pszSoftware)
 		{
@@ -606,7 +602,7 @@ void InitMessPicker(void)
 
 typedef struct
 {
-	const struct IODevice *dev;
+	const device_config *dev;
     const char *ext;
 } mess_image_type;
 
@@ -652,7 +648,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 		if (!imagetypes[i].dev)
 			typname = "Compressed images";
 		else
-			typname = lookupdevice(imagetypes[i].dev->type)->dlgname;
+			typname = lookupdevice(image_device_getinfo(imagetypes[i].dev).type)->dlgname;
 
         strcpy(s, typname);
         s += strlen(s);
@@ -736,17 +732,17 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 		/* special case; all non-printer devices */
 		for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 		{
-			const struct IODevice *iodev = mess_device_from_core_device(dev);
+			image_device_info info = image_device_getinfo(dev);
 
-			if (iodev->type != IO_PRINTER)
+			if (info.type != IO_PRINTER)
 				SetupImageTypes(config, &types[num_extensions], count - num_extensions, FALSE, dev);
 		}
 
 	}
 	else
 	{
-		const struct IODevice *iodev = mess_device_from_core_device(dev);
-		const char *ext = iodev->file_extensions;
+		image_device_info info = image_device_getinfo(dev);
+		const char *ext = info.file_extensions;
 
 		if (ext != NULL)
 		{
@@ -754,7 +750,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 			{
 				if (num_extensions < count)
 				{
-					types[num_extensions].dev = iodev;
+					types[num_extensions].dev = dev;
 					types[num_extensions].ext = ext;
 					num_extensions++;
 				}
@@ -913,7 +909,7 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 	nIcon = GetMessIcon(drvindex, nType);
 	if (!nIcon)
 	{
-		if (nType < 0)
+		if (nType == 0)
 			nType = IO_BAD;
 		switch(nType)
 		{

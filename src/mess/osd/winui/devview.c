@@ -193,9 +193,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 	LPTSTR *ppszDevices;
 	LPTSTR s;
 	SIZE sz;
-	char buf[128];
 	LONG_PTR l;
-	const char* utf8_s;
 
 	pDevViewInfo = GetDevViewInfo(hwndDevView);
 
@@ -219,10 +217,9 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 
 		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
 		{
-			const struct IODevice *iodev = mess_device_from_core_device(dev);
+			image_device_info info = image_device_getinfo(dev);
 
-			utf8_s = iodev->name(iodev, iodev->index_in_device, buf, sizeof(buf) / sizeof(buf[0]));
-			s = tstring_from_utf8(utf8_s);
+			s = tstring_from_utf8(info.name);
 			ppszDevices[i] = alloca((_tcslen(s) + 1) * sizeof(TCHAR));
 			_tcscpy(ppszDevices[i], s);
 			free(s);
@@ -256,11 +253,11 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 
 		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
 		{
-			const struct IODevice *iodev = mess_device_from_core_device(dev);
+			image_device_info info = image_device_getinfo(dev);
 
 			pEnt->dev = dev;
 
-			pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", iodev->name(iodev, iodev->index_in_device, buf, sizeof(buf) / sizeof(buf[0])),
+			pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", info.name,
 				WS_VISIBLE | WS_CHILD, nStaticPos, y, nStaticWidth, nHeight,
 				hwndDevView, NULL, NULL, NULL);
 

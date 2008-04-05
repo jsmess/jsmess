@@ -185,12 +185,11 @@ iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 
 	if (device != NULL)
 	{
-		const struct IODevice *iodev = mess_device_from_core_device(device);
-		type = iodev->type;
+		type = image_device_getinfo(device).type;
 	}
 	else
 	{
-		type = (iodevice_t) -1;
+		type = IO_UNKNOWN;
 	}
 	return type;
 }

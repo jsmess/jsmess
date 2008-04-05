@@ -3,7 +3,6 @@
 
 #include "mame.h"
 #include "image.h"
-#include "device.h"
 #include "options.h"
 
 enum

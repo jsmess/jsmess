@@ -272,6 +272,57 @@ int image_device_count(const machine_config *config)
 ****************************************************************************/
 
 /*-------------------------------------------------
+    image_device_getinfo - returns info on a device;
+	can be called by front end code
+-------------------------------------------------*/
+
+image_device_info image_device_getinfo(const device_config *device)
+{
+	const struct IODevice *iodev;
+	const char *s;
+	image_device_info info;
+	int i;
+	
+	memset(&info, 0, sizeof(info));
+
+	iodev = mess_device_from_core_device(device);
+	if (iodev != NULL)
+	{
+		/* retrieve type */
+		info.type = iodev->type;
+
+		/* retrieve flags */
+		info.readable = iodev->readable;
+		info.writeable = iodev->writeable;
+		info.creatable = iodev->creatable;
+		info.must_be_loaded = iodev->must_be_loaded;
+		info.uses_partial_hash = iodev->partialhash != NULL;
+
+		/* retrieve name */
+		s = (*iodev->name)(iodev, iodev->index_in_device, info.name, ARRAY_LENGTH(info.name));
+		if (s != info.name)
+			snprintf(info.name, ARRAY_LENGTH(info.name), "%s", s);
+
+		/* retrieve file extensions */
+		for(i = 0; iodev->file_extensions[i] != '\0'; i += strlen(&iodev->file_extensions[i]) + 1)
+			;
+		memcpy(info.file_extensions, iodev->file_extensions, i * sizeof(info.file_extensions[0]));
+
+		/* retrieve instance name */
+		s = device_instancename(&iodev->devclass, iodev->index_in_device);
+		snprintf(info.instance_name, ARRAY_LENGTH(info.instance_name), "%s", s);
+
+		/* retrieve brief instance name */
+		s = device_briefinstancename(&iodev->devclass, iodev->index_in_device);
+		snprintf(info.brief_instance_name, ARRAY_LENGTH(info.brief_instance_name), "%s", s);
+	}
+
+	return info;
+}
+
+
+
+/*-------------------------------------------------
     image_device_uses_file_extension - checks to
 	see if a particular devices uses a certain
 	file extension

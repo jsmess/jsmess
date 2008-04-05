@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "image.h"
-#include "device.h"
 #include "msuiutil.h"
 
 BOOL DriverIsComputer(int driver_index)
@@ -50,8 +49,7 @@ BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 
 	for (device = image_device_first(config); device != NULL; device = image_device_next(device))
 	{
-		const struct IODevice *iodev = mess_device_from_core_device(device);
-		if (iodev->type == type)
+		if (image_device_getinfo(device).type == type)
 		{
 			b = TRUE;
 			break;

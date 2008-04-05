@@ -142,8 +142,8 @@ void SetHashDirs(const char *paths)
 
 void SetSelectedSoftware(int driver_index, const device_config *dev, const char *software)
 {
-	const struct IODevice *iodev = mess_device_from_core_device(dev);
-	const char *opt_name = device_instancename(&iodev->devclass, iodev->index_in_device);
+	image_device_info info = image_device_getinfo(dev);
+	const char *opt_name = info.instance_name;
 	core_options *o;
 
 	if (LOG_SOFTWARE)
@@ -160,8 +160,8 @@ void SetSelectedSoftware(int driver_index, const device_config *dev, const char 
 
 const char *GetSelectedSoftware(int driver_index, const device_config *dev)
 {
-	const struct IODevice *iodev = mess_device_from_core_device(dev);
-	const char *opt_name = device_instancename(&iodev->devclass, iodev->index_in_device);
+	image_device_info info = image_device_getinfo(dev);
+	const char *opt_name = info.instance_name;
 	const char *software;
 	core_options *o;
 
