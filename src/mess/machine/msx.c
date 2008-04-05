@@ -301,6 +301,11 @@ static void msx_wd179x_int (running_machine *machine, wd17xx_state_t state, void
 MACHINE_START( msx )
 {
 	TMS9928A_configure(&tms9928a_interface);
+	MACHINE_START_CALL( msx2 );
+}
+
+MACHINE_START( msx2 )
+{
 	wd17xx_init (machine, WD_TYPE_179X, msx_wd179x_int, NULL);
 	wd17xx_set_density (DEN_FM_HI);
 	msx1.dsk_stat = 0x7f;
