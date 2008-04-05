@@ -392,6 +392,7 @@ DRVLIBS = \
 	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
 	$(MESSOBJ)/nintendo.a \
+	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/p2000.a \
 	$(MESSOBJ)/pasogo.a \
@@ -1205,6 +1206,11 @@ $(MESSOBJ)/special.a:      \
 	$(MESS_DRIVERS)/special.o \
 	$(MESS_MACHINE)/special.o \
 	$(MESS_VIDEO)/special.o \
+
+$(MESSOBJ)/orion.a:      \
+	$(MESS_DRIVERS)/orion.o \
+	$(MESS_MACHINE)/orion.o \
+	$(MESS_VIDEO)/orion.o \
 
 $(MESSOBJ)/bondwell.a: \
 	$(MESS_DRIVERS)/bw2.o

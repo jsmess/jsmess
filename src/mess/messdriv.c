@@ -851,6 +851,9 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( lik )	
 	DRIVER( erik )	
 	DRIVER( specimx )	
+
+	/* Orion */
+	DRIVER ( orion128 )
 	
 	/* Bondwell */
 	DRIVER( bw2 )
