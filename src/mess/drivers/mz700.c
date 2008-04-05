@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START(mz800)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8 - 1, 0*8, 25*8 - 1)
 
 	MDRV_GFXDECODE(mz700)
-	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_LENGTH(256*2)
 
 	MDRV_PALETTE_INIT(mz700)
 	MDRV_VIDEO_UPDATE(mz700)
@@ -359,6 +359,6 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY      FULLNAME */
 COMP( 1982, mz700,	  0,		0,		mz700,	  mz700,	mz700,	mz700,	"Sharp",     "MZ-700" , 0)
 COMP( 1982, mz700j,   mz700,	0,		mz700,	  mz700,	mz700,	mz700,	"Sharp",     "MZ-700 (Japan)" , 0)
-COMP( 1982, mz800,	  mz700,	0,		mz800,	  mz700,	mz800,	mz700,	"Sharp",     "MZ-800" , 0)
+COMP( 1982, mz800,	  mz700,	0,		mz800,	  mz700,	mz800,	mz700,	"Sharp",     "MZ-800" , GAME_NOT_WORKING )
 
 
