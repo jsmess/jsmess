@@ -24,7 +24,7 @@ System Driver Changes:
 - [TUTOR] Changed joystick to use keypad instead of arrow keys by default.
   [Fabio Priuli]
 
-
+- [VECTREX] Fixed bug #1569
 
 User Interface Changes:
 -----------------------
