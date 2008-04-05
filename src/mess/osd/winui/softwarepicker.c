@@ -31,7 +31,12 @@
 
 
 
-struct FileInfo
+//============================================================
+//  TYPE DEFINITIONS
+//============================================================
+
+typedef struct _file_info file_info;
+struct _file_info
 {
 	mess_device_class devclass;
 
@@ -45,23 +50,25 @@ struct FileInfo
 	char szFilename[1];
 };
 
-struct DirectorySearchInfo
+typedef struct _directory_search_info directory_search_info;
+struct _directory_search_info
 {
-	struct DirectorySearchInfo *pNext;
+	directory_search_info *pNext;
 	HANDLE hFind;
 	WIN32_FIND_DATA fd;
 	char szDirectory[1];
 };
 
-struct SoftwarePickerInfo
+typedef struct _software_picker_info software_picker_info;
+struct _software_picker_info
 {
 	WNDPROC pfnOldWndProc;
-	struct FileInfo **ppIndex;
+	file_info **ppIndex;
 	int nIndexLength;
 	int nHashesRealized;
 	int nCurrentPosition;
-	struct DirectorySearchInfo *pFirstSearchInfo;
-	struct DirectorySearchInfo *pLastSearchInfo;
+	directory_search_info *pFirstSearchInfo;
+	directory_search_info *pLastSearchInfo;
 	const game_driver *pDriver;
 	machine_config *pConfig;
 	hash_file *pHashFile;
@@ -70,9 +77,15 @@ struct SoftwarePickerInfo
 
 
 
+//============================================================
+//  CONSTANTS
+//============================================================
+
 static const TCHAR s_szSoftwarePickerProp[] = TEXT("SWPICKER");
 
 
+
+//============================================================
 
 static LPCSTR NormalizePath(LPCSTR pszPath, LPSTR pszBuffer, size_t nBufferSize)
 {
@@ -115,19 +128,19 @@ static LPCSTR NormalizePath(LPCSTR pszPath, LPSTR pszBuffer, size_t nBufferSize)
 
 
 
-static struct SoftwarePickerInfo *GetSoftwarePickerInfo(HWND hwndPicker)
+static software_picker_info *GetSoftwarePickerInfo(HWND hwndPicker)
 {
 	HANDLE h;
 	h = GetProp(hwndPicker, s_szSoftwarePickerProp);
 	assert(h);
-	return (struct SoftwarePickerInfo *) h;
+	return (software_picker_info *) h;
 }
 
 
 
 LPCSTR SoftwarePicker_LookupFilename(HWND hwndPicker, int nIndex)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
+	software_picker_info *pPickerInfo;
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	if ((nIndex < 0) || (nIndex >= pPickerInfo->nIndexLength))
 		return NULL;
@@ -138,7 +151,7 @@ LPCSTR SoftwarePicker_LookupFilename(HWND hwndPicker, int nIndex)
 
 mess_device_class SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
+	software_picker_info *pPickerInfo;
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	if ((nIndex < 0) || (nIndex >= pPickerInfo->nIndexLength))
 	{
@@ -153,7 +166,7 @@ mess_device_class SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex)
 
 int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCSTR pszFilename)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
+	software_picker_info *pPickerInfo;
 	int i;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
@@ -169,7 +182,7 @@ int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCSTR pszFilename)
 
 iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
+	software_picker_info *pPickerInfo;
 	const mess_device_class *devclass;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
@@ -186,7 +199,7 @@ iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 
 void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *pDriver)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
+	software_picker_info *pPickerInfo;
 	int i;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
@@ -241,15 +254,15 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *pDriver)
 
 void SoftwarePicker_SetErrorProc(HWND hwndPicker, void (*pfnErrorProc)(const char *message))
 {
-	struct SoftwarePickerInfo *pPickerInfo;
+	software_picker_info *pPickerInfo;
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	pPickerInfo->pfnErrorProc = pfnErrorProc;
 }
 
 
 
-static void ComputeFileHash(struct SoftwarePickerInfo *pPickerInfo,
-	struct FileInfo *pFileInfo, const unsigned char *pBuffer, unsigned int nLength)
+static void ComputeFileHash(software_picker_info *pPickerInfo,
+	file_info *pFileInfo, const unsigned char *pBuffer, unsigned int nLength)
 {
 	unsigned int nFunctions;
 	iodevice_t type;
@@ -274,8 +287,8 @@ static void ComputeFileHash(struct SoftwarePickerInfo *pPickerInfo,
 
 static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
-	struct FileInfo *pFileInfo;
+	software_picker_info *pPickerInfo;
+	file_info *pFileInfo;
 	LPSTR pszZipName;
 	BOOL rc = FALSE;
 	unsigned char *pBuffer;
@@ -367,8 +380,8 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 
 static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
-	struct FileInfo *pFileInfo;
+	software_picker_info *pPickerInfo;
+	file_info *pFileInfo;
 	unsigned int nHashFunctionsUsed = 0;
 	unsigned int nCalculatedHashes = 0;
 	iodevice_t type;
@@ -407,9 +420,9 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	UINT nZipEntryNameLength, UINT32 nCrc, BOOL bForce)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
-	struct FileInfo **ppNewIndex;
-	struct FileInfo *pInfo;
+	software_picker_info *pPickerInfo;
+	file_info **ppNewIndex;
+	file_info *pInfo;
 	int nIndex, nSize;
 	LPCSTR pszExtension = NULL, s;
 	mess_device_class devclass = {0,};
@@ -452,8 +465,8 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 		return TRUE;
 
 	// create the FileInfo structure
-	nSize = sizeof(struct FileInfo) + strlen(pszFilename);
-	pInfo = (struct FileInfo *) malloc(nSize);
+	nSize = sizeof(file_info) + strlen(pszFilename);
+	pInfo = (file_info *) malloc(nSize);
 	if (!pInfo)
 		goto error;
 	memset(pInfo, 0, nSize);
@@ -575,9 +588,9 @@ BOOL SoftwarePicker_AddFile(HWND hwndPicker, LPCSTR pszFilename)
 
 BOOL SoftwarePicker_AddDirectory(HWND hwndPicker, LPCSTR pszDirectory)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
-	struct DirectorySearchInfo *pSearchInfo;
-	struct DirectorySearchInfo **ppLast;
+	software_picker_info *pPickerInfo;
+	directory_search_info *pSearchInfo;
+	directory_search_info **ppLast;
 	size_t nSearchInfoSize;
 	char szBuffer[MAX_PATH];
 
@@ -587,7 +600,7 @@ BOOL SoftwarePicker_AddDirectory(HWND hwndPicker, LPCSTR pszDirectory)
 	Picker_ResetIdle(hwndPicker);
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
-	nSearchInfoSize = sizeof(struct DirectorySearchInfo) + strlen(pszDirectory);
+	nSearchInfoSize = sizeof(directory_search_info) + strlen(pszDirectory);
 	pSearchInfo = malloc(nSearchInfoSize);
 	if (!pSearchInfo)
 		return FALSE;
@@ -608,7 +621,7 @@ BOOL SoftwarePicker_AddDirectory(HWND hwndPicker, LPCSTR pszDirectory)
 
 
 
-static void SoftwarePicker_FreeSearchInfo(struct DirectorySearchInfo *pSearchInfo)
+static void SoftwarePicker_FreeSearchInfo(directory_search_info *pSearchInfo)
 {
 	if (pSearchInfo->hFind != INVALID_HANDLE_VALUE)
 		FindClose(pSearchInfo->hFind);
@@ -617,9 +630,9 @@ static void SoftwarePicker_FreeSearchInfo(struct DirectorySearchInfo *pSearchInf
 
 
 
-static void SoftwarePicker_InternalClear(struct SoftwarePickerInfo *pPickerInfo)
+static void SoftwarePicker_InternalClear(software_picker_info *pPickerInfo)
 {
-	struct DirectorySearchInfo *p;
+	directory_search_info *p;
 	int i;
 
 	for (i = 0; i < pPickerInfo->nIndexLength; i++)
@@ -642,7 +655,7 @@ static void SoftwarePicker_InternalClear(struct SoftwarePickerInfo *pPickerInfo)
 
 void SoftwarePicker_Clear(HWND hwndPicker)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
+	software_picker_info *pPickerInfo;
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	SoftwarePicker_InternalClear(pPickerInfo);
 	ListView_DeleteAllItems(hwndPicker);
@@ -651,9 +664,9 @@ void SoftwarePicker_Clear(HWND hwndPicker)
 
 
 static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
-	struct DirectorySearchInfo *pSearchInfo)
+	directory_search_info *pSearchInfo)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
+	software_picker_info *pPickerInfo;
 	LPSTR pszFilename;
 	BOOL rc;
 	char* utf8_FileName;
@@ -687,10 +700,10 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 
 BOOL SoftwarePicker_Idle(HWND hwndPicker)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
-	struct FileInfo *pFileInfo;
+	software_picker_info *pPickerInfo;
+	file_info *pFileInfo;
 	static const char szWildcards[] = "\\*.*";
-	struct DirectorySearchInfo *pSearchInfo;
+	directory_search_info *pSearchInfo;
 	LPSTR pszFilter;
 	BOOL bSuccess;
 	int nCount;
@@ -777,8 +790,8 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 	TCHAR *pszBuffer, UINT nBufferLength)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
-	const struct FileInfo *pFileInfo;
+	software_picker_info *pPickerInfo;
+	const file_info *pFileInfo;
 	LPCTSTR s = NULL;
 	const char *pszUtf8 = NULL;
 	unsigned int nHashFunction = 0;
@@ -863,7 +876,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 static LRESULT CALLBACK SoftwarePicker_WndProc(HWND hwndPicker, UINT nMessage,
 	WPARAM wParam, LPARAM lParam)
 {
-	struct SoftwarePickerInfo *pPickerInfo;
+	software_picker_info *pPickerInfo;
 	LRESULT rc;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
@@ -883,7 +896,7 @@ static LRESULT CALLBACK SoftwarePicker_WndProc(HWND hwndPicker, UINT nMessage,
 
 BOOL SetupSoftwarePicker(HWND hwndPicker, const struct PickerOptions *pOptions)
 {
-	struct SoftwarePickerInfo *pPickerInfo = NULL;
+	software_picker_info *pPickerInfo = NULL;
 	LONG_PTR l;
 
 	if (!SetupPicker(hwndPicker, pOptions))
