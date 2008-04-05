@@ -6,7 +6,6 @@
 
 #include "mame.h"
 #include "deprecat.h"
-#include "device.h"
 #include "configms.h"
 #include "config.h"
 #include "xmlfile.h"
@@ -25,7 +24,7 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 	const device_config *dev;
-	const struct IODevice *iodev;
+	image_device_info info;
 	const device_config *image;
 	const char *dev_instance;
 	const char *working_directory;
@@ -37,16 +36,13 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 			image = NULL;
 			dev_instance = xml_get_attribute_string(node, "instance", NULL);
 
-			if (dev_instance != NULL)
+			if ((dev_instance != NULL) && (dev_instance[0] != '\0'))
 			{
 				for (dev = image_device_first(Machine->config); (image == NULL) && (dev != NULL); dev = image_device_next(dev))
 				{
-					iodev = mess_device_from_core_device(dev);
-					if (iodev != NULL)
-					{
-						if (!strcmp(dev_instance, device_instancename(&iodev->devclass, iodev->index_in_device)))
-							image = dev;
-					}
+					info = image_device_getinfo(dev);
+					if (!strcmp(dev_instance, info.instance_name))
+						image = dev;
 				}
 
 				if (image != NULL)
@@ -70,7 +66,7 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 static void device_dirs_save(int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
-	const struct IODevice *dev;
+	image_device_info info;
 	const device_config *image;
 	const char *dev_instance;
 
@@ -79,8 +75,8 @@ static void device_dirs_save(int config_type, xml_data_node *parentnode)
 	{
 		for (image = image_device_first(Machine->config); image != NULL; image = image_device_next(image))
 		{
-			dev = mess_device_from_core_device(image);
-			dev_instance = device_instancename(&dev->devclass, dev->index_in_device);
+			info = image_device_getinfo(image);
+			dev_instance = info.instance_name;
 
 			node = xml_add_child(parentnode, "device", NULL);
 			if (node != NULL)

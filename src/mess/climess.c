@@ -46,7 +46,7 @@ int info_listdevices(core_options *opts, const char *gamename)
 	int i;
 	machine_config *config;
 	const device_config *dev;
-	const struct IODevice *iodev;
+	image_device_info info;
 	const char *src;
 	const char *driver_name;
 	const char *name;
@@ -72,12 +72,11 @@ int info_listdevices(core_options *opts, const char *gamename)
 
 			for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 			{
-				iodev = mess_device_from_core_device(dev);
+				info = image_device_getinfo(dev);
 
-				src = iodev->file_extensions;
-
-				name = device_instancename(&iodev->devclass, iodev->index_in_device);
-				shortname = device_briefinstancename(&iodev->devclass, iodev->index_in_device);
+				src = info.file_extensions;
+				name = info.instance_name;
+				shortname = info.brief_instance_name;
 
 				sprintf(paren_shortname, "(%s)", shortname);
 

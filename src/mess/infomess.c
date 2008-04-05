@@ -29,46 +29,44 @@
 void print_game_device(FILE *out, const game_driver *game, const machine_config *config)
 {
 	const device_config *dev;
-	const struct IODevice *iodev;
+	image_device_info info;
 	const char *name;
 	const char *shortname;
+	const char *ext;
 
 	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
-		iodev = mess_device_from_core_device(dev);
+		info = image_device_getinfo(dev);
 
 		/* print out device type */
-		fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(device_typename(iodev->type)));
+		fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(device_typename(info.type)));
 
 		/* does this device have a tag? */
-		if (iodev->tag)
-			fprintf(out, " tag=\"%s\"", xml_normalize_string(iodev->tag));
+		if (dev->tag)
+			fprintf(out, " tag=\"%s\"", xml_normalize_string(dev->tag));
 
 		/* is this device mandatory? */
-		if (iodev->must_be_loaded)
+		if (info.must_be_loaded)
 			fprintf(out, " mandatory=\"1\"");
 
 		/* close the XML tag */
 		fprintf(out, ">\n");
 
-		name = device_instancename(&iodev->devclass, iodev->index_in_device);
-		shortname = device_briefinstancename(&iodev->devclass, iodev->index_in_device);
+		name = info.instance_name;
+		shortname = info.brief_instance_name;
 
 		fprintf(out, "\t\t\t<instance");
 		fprintf(out, " name=\"%s\"", xml_normalize_string(name));
 		fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
 		fprintf(out, "/>\n");
 
-		if (iodev->file_extensions)
+		ext = info.file_extensions;
+		while (*ext)
 		{
-			const char* ext = iodev->file_extensions;
-			while (*ext)
-			{
-				fprintf(out, "\t\t\t<extension");
-				fprintf(out, " name=\"%s\"", xml_normalize_string(ext));
-				fprintf(out, "/>\n");
-				ext += strlen(ext) + 1;
-			}
+			fprintf(out, "\t\t\t<extension");
+			fprintf(out, " name=\"%s\"", xml_normalize_string(ext));
+			fprintf(out, "/>\n");
+			ext += strlen(ext) + 1;
 		}
 
 		fprintf(out, "\t\t</device>\n");
