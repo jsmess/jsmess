@@ -438,6 +438,31 @@ static void InternalSetSelectedSoftware(int drvindex, const device_config *devic
 
 
 
+static int device_uses_file_extension(const device_config *device, const char *file_extension)
+{
+	int result = FALSE;
+	const struct IODevice *iodev = mess_device_from_core_device(device);
+	if (iodev != NULL)
+	{
+		const char *s = iodev->file_extensions;
+		if (s != NULL)
+		{
+			while(!result && (*s != '\0'))
+			{
+				if (!mame_stricmp(s, file_extension))
+				{
+					result = TRUE;
+					break;
+				}
+				s += strlen(s) + 1;
+			}
+		}
+	}
+	return result;
+}
+
+
+
 // Places the specified image in the specified slot; nID = -1 means don't matter
 static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR pszFilename)
 {
@@ -474,19 +499,8 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 		{
 			for (device = image_device_first(config); device != NULL; device = image_device_next(device))
 			{
-				const struct IODevice *iodev = mess_device_from_core_device(device);
-				const char *s = iodev->file_extensions;
-				if (s != NULL)
-				{
-					while(*s != '\0')
-					{
-						if (!mame_stricmp(s, file_extension))
-							break;
-					}
-
-					if (*s != '\0')
-						break;
-				}
+				if (device_uses_file_extension(device, file_extension))
+					break;
 			}
 		}
 	}
@@ -508,38 +522,10 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 
 
 
-static void MessRemoveImage(int drvindex, mess_device_class devclass, LPCSTR pszFilename)
+static void MessRemoveImage(int drvindex, const device_config *device, LPCSTR pszFilename)
 {
-	int nPos;
-	machine_config *config;
-	const device_config *dev;
-	const struct IODevice *iodev = NULL;
-
-	if (devclass.gamedrv != NULL)
-	{
-		// allocate the machine config
-		config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
-
-		nPos = 0;
-		for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
-		{
-			iodev = mess_device_from_core_device(dev);
-
-			if (iodev->devclass.get_info == devclass.get_info)
-				break;
-			nPos++;
-		}
-
-		if (iodev != NULL)
-		{
-			if (!mame_stricmp(pszFilename, GetSelectedSoftware(drvindex, dev)))
-			{
-				MessSpecifyImage(drvindex, dev, NULL);
-			}
-		}
-
-		machine_config_free(config);
-	}
+	if (device != NULL)
+		MessSpecifyImage(drvindex, device, NULL);
 }
 
 
@@ -985,7 +971,7 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem)
 {
 	int drvindex;
-	mess_device_class devclass;
+	const device_config *device;
 	LPCSTR pszFullName;
 	HWND hwndList;
 
@@ -993,10 +979,10 @@ static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem)
 	{
 		hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 		drvindex = Picker_GetSelectedItem(hwndList);
-		devclass = SoftwarePicker_LookupDevice(hwndSoftwarePicker, nItem);
+		device = SoftwarePicker_LookupDevice(hwndSoftwarePicker, nItem);
 		pszFullName = SoftwarePicker_LookupFilename(hwndSoftwarePicker, nItem);
 
-		MessRemoveImage(drvindex, devclass, pszFullName);
+		MessRemoveImage(drvindex, device, pszFullName);
 	}
 }
 
@@ -1008,7 +994,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 	LPCSTR pszName;
 	LPSTR s;
 	int drvindex;
-	mess_device_class devclass;
+	const device_config *device;
 	HWND hwndList;
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
@@ -1023,8 +1009,8 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 		pszName = s ? s + 1 : pszFullName;
 
 		// Do the dirty work
-		devclass = SoftwarePicker_LookupDevice(hwndSoftwarePicker, nItem);
-		if (!devclass.gamedrv)
+		device = SoftwarePicker_LookupDevice(hwndSoftwarePicker, nItem);
+		if (device == NULL)
 			return;
 		MessSpecifyImage(drvindex, NULL, pszFullName);
 
