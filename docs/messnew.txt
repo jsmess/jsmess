@@ -12,6 +12,8 @@ System Driver Changes:
 
 - [BW2] Added MSM6255 LCD controller emulation. [Curt Coder]
 
+- [CBM] Simplified keyboard and interrupt handling code.  [Fabio Priuli]
+
 - [IBMPC,IBM5150] Renamed ibmpc driver to ibm5150.  [Wilbert Pol]
 
 - [MBEE] Added snapload support for MWB filetype. Added LOCK key to keyboard.

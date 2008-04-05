@@ -15,56 +15,16 @@
 #define C128_H_
 
 
-#define C128_MAIN_MEMORY		(readinputport(8)&0x300)
-#define RAM128KB (0)
-#define RAM256KB (0x100)
-#define RAM1MB (0x200)
+#define C128_MAIN_MEMORY	( readinputportbytag("Config") & 0x300 )
+#define RAM128KB			( 0x00 )
+#define RAM256KB			( 0x100 )
+#define RAM1MB				( 0x200 )
 
-#define VDC_RAM_64KBYTE		(readinputport(8)&0x40) /* else 16KB */
-#define MONITOR_TV		(readinputport(8)&0x20) /* else RGBI */
+#define VDC_RAM_64KBYTE		( readinputportbytag("Config") & 0x40 ) /* else 16KB */
+#define MONITOR_TV			( readinputportbytag("Config") & 0x20 ) /* else RGBI */
 
-#define C128_KEY_RIGHT_SHIFT ((readinputport(12)&0x20)\
-			 ||C128_KEY_CURSOR_UP||C128_KEY_CURSOR_LEFT)
-
-#define C128_KEY_CURSOR_DOWN ((readinputport(12)&0x10)||C128_KEY_CURSOR_UP)
-#define C128_KEY_CURSOR_RIGHT ((readinputport(12)&8)||C128_KEY_CURSOR_LEFT)
-
-#define KEY_ESCAPE (readinputport(13)&0x8000)
-#define KEY_TAB (readinputport(13)&0x4000)
-#define KEY_ALT (readinputport(13)&0x2000)
-#define KEY_DIN (readinputport(13)&0x1000)
-
-#define KEY_HELP (readinputport(13)&0x0800)
-#define KEY_LINEFEED (readinputport(13)&0x0400)
-#define KEY_4080 (readinputport(13)&0x0200)
-#define KEY_NOSCRL (readinputport(13)&0x0100)
-
-#define KEY_UP (readinputport(13)&0x0080)
-#define KEY_DOWN (readinputport(13)&0x0040)
-#define KEY_LEFT (readinputport(13)&0x0020)
-#define KEY_RIGHT (readinputport(13)&0x0010)
-
-#define C128_KEY_F1 (readinputport(13)&0x0008)
-#define C128_KEY_F3 (readinputport(13)&0x0004)
-#define C128_KEY_F5 (readinputport(13)&0x0002)
-#define C128_KEY_F7 (readinputport(13)&0x0001)
-
-#define KEY_NUM7 (readinputport(14)&0x8000)
-#define KEY_NUM8 (readinputport(14)&0x4000)
-#define KEY_NUM9 (readinputport(14)&0x2000)
-#define KEY_NUMPLUS (readinputport(14)&0x1000)
-#define KEY_NUM4 (readinputport(14)&0x800)
-#define KEY_NUM5 (readinputport(14)&0x400)
-#define KEY_NUM6 (readinputport(14)&0x200)
-#define KEY_NUMMINUS (readinputport(14)&0x100)
-#define KEY_NUM1 (readinputport(14)&0x80)
-#define KEY_NUM2 (readinputport(14)&0x40)
-#define KEY_NUM3 (readinputport(14)&0x20)
-#define KEY_NUM0 (readinputport(14)&0x10)
-#define KEY_NUMPOINT (readinputport(14)&8)
-#define KEY_NUMENTER (readinputport(14)&4)
-#define C128_KEY_CURSOR_UP (readinputport(14)&2)
-#define C128_KEY_CURSOR_LEFT (readinputport(14)&1)
+#define KEY_DIN				( readinputportbytag( "Special" ) & 0x20 )
+#define KEY_4080			( readinputportbytag( "Special" ) & 0x10 )
 
 
 /*----------- defined in machine/c128.c -----------*/
