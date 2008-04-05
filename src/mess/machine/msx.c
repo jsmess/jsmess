@@ -296,9 +296,14 @@ static const TMS9928a_interface tms9928a_interface =
 	msx_vdp_interrupt
 };
 
+static void msx_wd179x_int (running_machine *machine, wd17xx_state_t state, void *param);
+
 MACHINE_START( msx )
 {
 	TMS9928A_configure(&tms9928a_interface);
+	wd17xx_init (machine, WD_TYPE_179X, msx_wd179x_int, NULL);
+	wd17xx_set_density (DEN_FM_HI);
+	msx1.dsk_stat = 0x7f;
 }
 
 MACHINE_RESET( msx )
@@ -312,8 +317,6 @@ MACHINE_RESET( msx2 )
 	v9938_reset (0);
 	msx_ch_reset_core ();
 }
-
-static void msx_wd179x_int (running_machine *machine, wd17xx_state_t state, void *param);
 
 static WRITE8_HANDLER ( msx_ppi_port_a_w );
 static WRITE8_HANDLER ( msx_ppi_port_c_w );
@@ -348,10 +351,6 @@ static void msx_init(running_machine *machine)
 	for (i=0; i<MSX_MAX_CARTS; i++) {
 		msx1.cart_state[i] = cart_state[i];
 	}
-
-	wd17xx_init (machine, WD_TYPE_179X, msx_wd179x_int, NULL);
-	wd17xx_set_density (DEN_FM_HI);
-	msx1.dsk_stat = 0x7f;
 
 	cpunum_set_input_line_vector (0, 0, 0xff);
 	ppi8255_init (&msx_ppi8255_interface);
