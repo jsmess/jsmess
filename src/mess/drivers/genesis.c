@@ -68,6 +68,7 @@ static int is_elfwor = 0;
 static int is_lionk2 = 0;
 static UINT16 lion2_prot1_data, lion2_prot2_data;
 static int is_rx3 = 0;
+static int is_bugsl = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -195,7 +196,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -348,6 +349,16 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			if (!memcmp(&ROM[0x03c2+relocate],&lionk2sig[0],sizeof(lionk2sig)))
 			{
 				is_lionk2 = 1;
+			}
+		}
+
+		if (length == 0x100000)
+		{
+			static unsigned char bugslsig[] = { 0x20, 0x12, 0x13, 0xc0, 0x00, 0xff};
+
+			if (!memcmp(&ROM[0xee0d0+relocate],&bugslsig[0],sizeof(bugslsig)))
+			{
+				is_bugsl = 1;
 			}
 		}
 
@@ -653,6 +664,13 @@ READ16_HANDLER( rx3_extra_r )
 	return 0xc;
 }
 
+
+// Bug's Life handler from HazeMD
+READ16_HANDLER( bugl_extra_r )
+{
+	return 0x28;
+}
+
 // Elf Wor handler from HazeMD (DFJustin says the title is 'Spirit Taoist')
 READ16_HANDLER( elfwor_0x400000_r )
 {
@@ -764,6 +782,10 @@ static DRIVER_INIT( gencommon )
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, rx3_extra_r);
 	}
 
+	if (is_bugsl)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, bugl_extra_r);
+	}
 
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
