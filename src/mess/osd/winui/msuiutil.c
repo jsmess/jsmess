@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "image.h"
 #include "device.h"
 #include "msuiutil.h"
 

@@ -1,6 +1,8 @@
 #ifndef OPTIONSMS_H
 #define OPTIONSMS_H
 
+#include "mame.h"
+#include "image.h"
 #include "device.h"
 #include "options.h"
 
