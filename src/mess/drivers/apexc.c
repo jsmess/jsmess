@@ -149,7 +149,7 @@ static tape apexc_tapes[2];
 
 
 
-static void apexc_get_open_mode(const struct IODevice *dev, int id,
+static void apexc_get_open_mode(int id,
 	unsigned int *readable, unsigned int *writeable, unsigned int *creatable)
 {
 	/* unit 0 is read-only, unit 1 is write-only */

@@ -162,8 +162,7 @@ void pdp1_io_sc_callback(void);
 
 INTERRUPT_GEN( pdp1_interrupt );
 
-void pdp1_get_open_mode(const struct IODevice *dev, int id,
-	unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
+void pdp1_get_open_mode(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
 
 typedef struct lightpen_t
 {

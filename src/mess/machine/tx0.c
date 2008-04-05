@@ -180,8 +180,7 @@ MACHINE_START( tx0 )
 	perforated tape handling
 */
 
-void tx0_tape_get_open_mode(const struct IODevice *dev, int id,
-	unsigned int *readable, unsigned int *writeable, unsigned int *creatable)
+void tx0_tape_get_open_mode(int id,	unsigned int *readable, unsigned int *writeable, unsigned int *creatable)
 {
 	/* unit 0 is read-only, unit 1 is write-only */
 	if (id)

@@ -458,7 +458,7 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		getdispositions = (device_getdispositions_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_GET_DISPOSITIONS);
 		if (getdispositions != NULL)
 		{
-			getdispositions(&mess_device->io_device, i, &readable, &writeable, &creatable);
+			getdispositions(i, &readable, &writeable, &creatable);
 		}
 		else
 		{

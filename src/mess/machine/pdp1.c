@@ -352,8 +352,7 @@ WRITE18_HANDLER(pdp1_write_mem)
 	perforated tape handling
 */
 
-void pdp1_get_open_mode(const struct IODevice *dev, int id,
-	unsigned int *readable, unsigned int *writeable, unsigned int *creatable)
+void pdp1_get_open_mode(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable)
 {
 	/* unit 0 is read-only, unit 1 is write-only */
 	if (id)
