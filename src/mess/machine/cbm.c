@@ -169,11 +169,6 @@ static DEVICE_IMAGE_UNLOAD(cbm_rom)
 	cbm_rom[id].chip = 0;
 }
 
-static const struct IODevice *cbm_rom_find_device(running_machine *machine)
-{
-	return device_find_from_machine(machine, IO_CARTSLOT);
-}
-
 static DEVICE_START(cbm_rom)
 {
 	int id = image_index_in_device(device);
@@ -190,14 +185,11 @@ static DEVICE_IMAGE_LOAD(cbm_rom)
 	int size, j, read_;
 	const char *filetype;
 	int adr = 0;
-	const struct IODevice *dev;
 
 	for (i=0; (i<sizeof(cbm_rom) / sizeof(cbm_rom[0])) && (cbm_rom[i].size!=0); i++)
 		;
 	if (i >= sizeof(cbm_rom) / sizeof(cbm_rom[0]))
 		return INIT_FAIL;
-
-	dev = cbm_rom_find_device(image->machine);
 
 	size = image_length(image);
 

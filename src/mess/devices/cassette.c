@@ -256,7 +256,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 	tag = get_cassimg(image);
 
 	/* figure out the cassette format */
-	dev = device_find_from_machine(image->machine, IO_CASSETTE);
+	dev = mess_device_from_core_device(image);
 	formats = mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_CASSETTE_FORMATS);
 
 	if (image_has_been_created(image))

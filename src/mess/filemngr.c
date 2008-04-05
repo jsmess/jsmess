@@ -636,7 +636,7 @@ int filemanager(int selected)
 	static int previous_sel;
 	const char *name;
 	ui_menu_item menu_items[40];
-	const struct IODevice *devices[40];
+	const device_config *devices[40];
 	char names[40][64];
 	int sel, total, arrowize;
 	const device_config *image;
@@ -654,7 +654,7 @@ int filemanager(int selected)
 		menu_items[total].text = (names[total]) ? names[total] : "---";
 		menu_items[total].subtext = (name) ? name : "---";
 
-		devices[total] = mess_device_from_core_device(image);
+		devices[total] = image;
 		
 		total++;
 	}
@@ -663,7 +663,7 @@ int filemanager(int selected)
 	/* if the fileselect() mode is active */
 	if (sel & (2 << SEL_BITS))
 	{
-		image = image_from_device(devices[previous_sel & SEL_MASK]);
+		image = devices[previous_sel & SEL_MASK];
 		sel = fileselect(selected & ~(2 << SEL_BITS), image_filename(image), image_working_directory(image));
 		if (sel != 0 && sel != -1 && sel!=-2)
 			return sel | (2 << SEL_BITS);
@@ -676,7 +676,7 @@ int filemanager(int selected)
 			previous_sel = previous_sel & SEL_MASK;
 
 			/* attempt a filename change */
-			image = image_from_device(devices[previous_sel]);
+			image = devices[previous_sel];
 			if (entered_filename[0])
 				image_load(image, entered_filename);
 			else
@@ -713,7 +713,7 @@ int filemanager(int selected)
 		{
 			/* yes */
 			sel &= SEL_MASK;
-			image = image_from_device(devices[sel]);
+			image = devices[sel];
 			image_load(image, NULL);
 		}
 
@@ -743,7 +743,7 @@ int filemanager(int selected)
 		/* no, let the osd code have a crack at changing files */
 		else
 		{
-			image = image_from_device(devices[sel]);
+			image = devices[sel];
 			os_sel = 0;
 		}
 

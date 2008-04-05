@@ -14,7 +14,6 @@
 
 struct snapquick_info
 {
-	const struct IODevice *dev;
 	const device_config *img;
 	int file_size;
 	struct snapquick_info *next;
@@ -29,8 +28,10 @@ static TIMER_CALLBACK(snapquick_processsnapshot)
 	struct snapquick_info *si = (struct snapquick_info *) ptr;
 	snapquick_loadproc loadproc;
 	const char *file_type;
+	const struct IODevice *dev;
 
-	loadproc = (snapquick_loadproc) mess_device_get_info_fct(&si->dev->devclass, MESS_DEVINFO_PTR_SNAPSHOT_LOAD);
+	dev = mess_device_from_core_device(si->img);
+	loadproc = (snapquick_loadproc) mess_device_get_info_fct(&dev->devclass, MESS_DEVINFO_PTR_SNAPSHOT_LOAD);
 	file_type = image_filetype(si->img);
 	loadproc(machine, si->img, file_type, si->file_size);
 	image_unload(si->img);
@@ -56,13 +57,12 @@ static DEVICE_IMAGE_LOAD( snapquick )
 	dev = mess_device_from_core_device(image);
 	assert(dev);
 
-	si->dev = dev;
 	si->img = image;
 	si->file_size = file_size;
 	si->next = snapquick_infolist;
 	snapquick_infolist = si;
 
-	delay = mess_device_get_info_double(&si->dev->devclass, MESS_DEVINFO_FLOAT_SNAPSHOT_DELAY);
+	delay = mess_device_get_info_double(&dev->devclass, MESS_DEVINFO_FLOAT_SNAPSHOT_DELAY);
 
 	timer_set(double_to_attotime(delay), si, 0, snapquick_processsnapshot);
 	return INIT_PASS;
