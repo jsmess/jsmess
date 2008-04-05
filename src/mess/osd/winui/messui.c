@@ -438,31 +438,6 @@ static void InternalSetSelectedSoftware(int drvindex, const device_config *devic
 
 
 
-static int device_uses_file_extension(const device_config *device, const char *file_extension)
-{
-	int result = FALSE;
-	const struct IODevice *iodev = mess_device_from_core_device(device);
-	if (iodev != NULL)
-	{
-		const char *s = iodev->file_extensions;
-		if (s != NULL)
-		{
-			while(!result && (*s != '\0'))
-			{
-				if (!mame_stricmp(s, file_extension))
-				{
-					result = TRUE;
-					break;
-				}
-				s += strlen(s) + 1;
-			}
-		}
-	}
-	return result;
-}
-
-
-
 // Places the specified image in the specified slot; nID = -1 means don't matter
 static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR pszFilename)
 {
@@ -499,7 +474,7 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 		{
 			for (device = image_device_first(config); device != NULL; device = image_device_next(device))
 			{
-				if (device_uses_file_extension(device, file_extension))
+				if (image_device_uses_file_extension(device, file_extension))
 					break;
 			}
 		}

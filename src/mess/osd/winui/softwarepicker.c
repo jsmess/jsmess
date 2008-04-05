@@ -427,7 +427,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	file_info **ppNewIndex;
 	file_info *pInfo;
 	int nIndex, nSize;
-	LPCSTR pszExtension = NULL, s;
+	LPCSTR pszExtension = NULL;
 	const device_config *device = NULL;
 
 	// first check to see if it is already here
@@ -441,21 +441,10 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 		pszExtension = strrchr(pszFilename, '.');
 	if ((pszExtension != NULL) && (pPickerInfo->pDriver != NULL))
 	{
-		// skip the initial '.' in the file extension
-		pszExtension++;
-
 		for (device = image_device_first(pPickerInfo->pConfig); device != NULL; device = image_device_next(device))
 		{
-			const struct IODevice *iodev = mess_device_from_core_device(device);
-
-			s = iodev->file_extensions;
-			if (s != NULL)
-			{
-				while(*s && mame_stricmp(pszExtension, s))
-					s += strlen(s) + 1;
-				if (*s)
-					break;
-			}
+			if (image_device_uses_file_extension(device, pszExtension))
+				break;
 		}
 	}
 

@@ -97,6 +97,11 @@ const device_config *image_device_next(const device_config *prevdevice);
 /* counts the number of devices that support images */
 int image_device_count(const machine_config *config);
 
+/* ----- analysis ----- */
+
+/* checks to see if a particular devices uses a certain file extension */
+int image_device_uses_file_extension(const device_config *device, const char *file_extension);
+
 
 
 /****************************************************************************

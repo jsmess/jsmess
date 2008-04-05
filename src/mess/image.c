@@ -268,6 +268,44 @@ int image_device_count(const machine_config *config)
 
 
 /****************************************************************************
+    ANALYSIS
+****************************************************************************/
+
+/*-------------------------------------------------
+    image_device_uses_file_extension - checks to
+	see if a particular devices uses a certain
+	file extension
+-------------------------------------------------*/
+
+int image_device_uses_file_extension(const device_config *device, const char *file_extension)
+{
+	int result = FALSE;
+	const struct IODevice *iodev;
+	
+	/* skip initial period, if present */
+	if (file_extension[0] == '.')
+		file_extension++;
+
+	iodev = mess_device_from_core_device(device);
+	if (iodev != NULL)
+	{
+		const char *s = iodev->file_extensions;
+		while(!result && (*s != '\0'))
+		{
+			if (!mame_stricmp(s, file_extension))
+			{
+				result = TRUE;
+				break;
+			}
+			s += strlen(s) + 1;
+		}
+	}
+	return result;
+}
+
+
+
+/****************************************************************************
     IMAGE LOADING
 ****************************************************************************/
 
