@@ -64,6 +64,7 @@ static int is_squir = 0;
 static int squirrel_king_extra = 0;
 static int is_smous = 0;
 static int is_smb = 0;
+static int is_elfwor = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -248,7 +249,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	{
 		relocate = 0x2000;
 
-		if (!strncmp((char *)&ROM[0x0120+relocate], "SUPER STREET FIGHTER2", 21))
+		if (length == 0x500000 && !strncmp((char *)&ROM[0x0120+relocate], "SUPER STREET FIGHTER2", 21))
 		{
 			is_ssf2 = 1;
 		}
@@ -336,6 +337,10 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			{
 				is_smb = 1;
 			}
+		}
+		if (length == 0x100000 && !strncmp((char *)&ROM[0x0172+relocate], "GAME : ELF WOR", 14))
+		{
+			is_elfwor = 1;
 		}
 
 	}
@@ -603,6 +608,27 @@ WRITE16_HANDLER( squirrel_king_extra_w )
 }
 
 
+// Elf Wor handler from HazeMD
+READ16_HANDLER( elfwor_0x400000_r )
+{
+	return 0x5500;
+}
+
+READ16_HANDLER( elfwor_0x400002_r )
+{
+	return 0x0f00;
+}
+
+READ16_HANDLER( elfwor_0x400004_r )
+{
+	return 0xc900;
+}
+
+READ16_HANDLER( elfwor_0x400006_r )
+{
+	return 0x1800;
+}
+
 static WRITE16_HANDLER( genesis_TMSS_bank_w )
 {
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
@@ -665,6 +691,19 @@ static DRIVER_INIT( gencommon )
 	if (is_smb)
 	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13001, 0, 0, smbro_prot_r );
+	}
+
+
+	if (is_elfwor)
+	{
+	/* is there more to this, i can't seem to get off the first level? */
+	/*
+	Elf Wor (Unl) - return (0×55@0×400000 OR 0xc9@0×400004) AND (0×0f@0×400002 OR 0×18@0×400006). It is probably best to add handlers for all 4 addresses.
+	*/
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, elfwor_0x400000_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, elfwor_0x400004_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, elfwor_0x400002_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, elfwor_0x400006_r );
 	}
 
 	/* install NOP handler for TMSS */
