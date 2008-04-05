@@ -38,7 +38,7 @@ struct DevViewInfo
 
 struct DevViewEntry
 {
-	const struct IODevice *dev;
+	const device_config *dev;
 	HWND hwndStatic;
 	HWND hwndEdit;
 	HWND hwndBrowseButton;
@@ -125,7 +125,6 @@ void DevView_Refresh(HWND hwndDevView)
 				hwndDevView,
 				pDevViewInfo->nGame,
 				pDevViewInfo->pEntries[i].dev,
-				pDevViewInfo->pEntries[i].dev->index_in_device,
 				szBuffer, sizeof(szBuffer) / sizeof(szBuffer[0]));
 
 			if (!pszSelection)
@@ -150,7 +149,6 @@ static void DevView_TextChanged(HWND hwndDevView, int nChangedEntry, LPCTSTR psz
 		pDevViewInfo->pCallbacks->pfnSetSelectedSoftware(hwndDevView,
 			pDevViewInfo->nGame,
 			pDevViewInfo->pEntries[nChangedEntry].dev,
-			pDevViewInfo->pEntries[nChangedEntry].dev->index_in_device,
 			pszFilename);
 	}
 }
@@ -187,7 +185,6 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 {
 	struct DevViewInfo *pDevViewInfo;
 	const device_config *dev;
-	const struct IODevice *iodev;
 	struct DevViewEntry *pEnt;
 	int i;
 	int y, nHeight, nDevCount;
@@ -222,7 +219,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 
 		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
 		{
-			iodev = mess_device_from_core_device(dev);
+			const struct IODevice *iodev = mess_device_from_core_device(dev);
 
 			utf8_s = iodev->name(iodev, iodev->index_in_device, buf, sizeof(buf) / sizeof(buf[0]));
 			s = tstring_from_utf8(utf8_s);
@@ -259,9 +256,9 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 
 		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
 		{
-			iodev = mess_device_from_core_device(dev);
+			const struct IODevice *iodev = mess_device_from_core_device(dev);
 
-			pEnt->dev = iodev;
+			pEnt->dev = dev;
 
 			pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", iodev->name(iodev, iodev->index_in_device, buf, sizeof(buf) / sizeof(buf[0])),
 				WS_VISIBLE | WS_CHILD, nStaticPos, y, nStaticWidth, nHeight,
@@ -320,7 +317,7 @@ static void DevView_ButtonClick(HWND hwndDevView, struct DevViewEntry *pEnt, HWN
 	if (pDevViewInfo->pCallbacks->pfnGetOpenFileName)
 		AppendMenu(hMenu, MF_STRING, 1, TEXT("Mount..."));
 
-	if (pEnt->dev->creatable)
+	if (mess_device_from_core_device(pEnt->dev)->creatable)
 	{
 		if (pDevViewInfo->pCallbacks->pfnGetCreateFileName)
 			AppendMenu(hMenu, MF_STRING, 2, TEXT("Create..."));
