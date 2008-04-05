@@ -48,7 +48,8 @@ struct _mess_device_token
 
 
 
-struct Devices
+typedef struct _mess_device_type_info mess_device_type_info;
+struct _mess_device_type_info
 {
 	iodevice_t type;
 	const char *name;
@@ -63,7 +64,7 @@ struct Devices
 
 /* The List of Devices, with Associated Names - Be careful to ensure that   *
  * this list matches the ENUM from device.h, so searches can use IO_COUNT	*/
-static const struct Devices device_info_array[] =
+static const mess_device_type_info device_info_array[] =
 {
 	{ IO_CARTSLOT,	"cartridge",	"cart" }, /*  0 */
 	{ IO_FLOPPY,	"floppydisk",	"flop" }, /*  1 */
@@ -87,31 +88,42 @@ static const struct Devices device_info_array[] =
     CORE IMPLEMENTATION
 ***************************************************************************/
 
+static const mess_device_type_info *find_device_type(iodevice_t type)
+{
+	int i;
+	for (i = 0; i < ARRAY_LENGTH(device_info_array); i++)
+	{
+		if (device_info_array[i].type == type)
+			return &device_info_array[i];
+	}
+	return NULL;
+}
+
+
+
 const char *device_typename(iodevice_t type)
 {
-	assert(type >= 0);
-	assert(type < IO_COUNT);
-	return device_info_array[type].name;
+	const mess_device_type_info *info = find_device_type(type);
+	return (info != NULL) ? info->name : NULL;
 }
 
 
 
 const char *device_brieftypename(iodevice_t type)
 {
-	assert(type >= 0);
-	assert(type < IO_COUNT);
-	return device_info_array[type].shortname;
+	const mess_device_type_info *info = find_device_type(type);
+	return (info != NULL) ? info->shortname : NULL;
 }
 
 
 
-int device_typeid(const char *name)
+iodevice_t device_typeid(const char *name)
 {
 	int i;
 	for (i = 0; i < sizeof(device_info_array) / sizeof(device_info_array[0]); i++)
 	{
 		if (!mame_stricmp(name, device_info_array[i].name) || !mame_stricmp(name, device_info_array[i].shortname))
-			return i;
+			return device_info_array[i].type;
 	}
 	return -1;
 }
@@ -714,22 +726,9 @@ int device_valididtychecks(void)
 	int error = 0;
 	int i;
 
-	if ((sizeof(device_info_array) / sizeof(device_info_array[0])) != IO_COUNT)
-	{
-		mame_printf_error("device_info_array array should match size of IO_* enum\n");
-		error = 1;
-	}
-
 	/* Check the device struct array */
 	for (i = 0; i < sizeof(device_info_array) / sizeof(device_info_array[0]); i++)
 	{
-		if (device_info_array[i].type != i)
-		{
-			mame_printf_error("Device struct array order mismatch\n");
-			error = 1;
-			break;
-		}
-
 		if (!device_info_array[i].name)
 		{
 			mame_printf_error("device_info_array[%d].name appears to be NULL\n", i);

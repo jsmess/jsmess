@@ -258,7 +258,7 @@ const struct IODevice *mess_device_from_core_device(const device_config *device)
 const char *device_uiname(iodevice_t devtype);
 const char *device_typename(iodevice_t type);
 const char *device_brieftypename(iodevice_t type);
-int device_typeid(const char *name);
+iodevice_t device_typeid(const char *name);
 
 /* device allocation */
 void mess_devices_setup(machine_config *config, const game_driver *gamedrv);
