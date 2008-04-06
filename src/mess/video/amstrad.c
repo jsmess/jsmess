@@ -44,7 +44,7 @@ static int amstrad_plus_split_scanline;  // ASIC split screen
 static int amstrad_plus_split_address;
 static int amstrad_screen_width;  // width in bytes
 
-static void amstrad_plus_handle_dma(void);
+static void amstrad_plus_handle_dma(running_machine *machine);
 
 extern int aleste_mode;
 
@@ -976,10 +976,9 @@ DMA commands
 4020h 	STOP 	Stop processing the sound list.
 */
 
-static void amstrad_plus_dma_parse(int channel, int *addr)
+static void amstrad_plus_dma_parse(running_machine *machine, int channel, int *addr)
 {
 	unsigned short command;
-	running_machine *machine = Machine;
 
 	if(*addr & 0x01)
 		(*addr)++;  // align to even address
@@ -1044,16 +1043,16 @@ static void amstrad_plus_dma_parse(int channel, int *addr)
 	(*addr)+=2;  // point to next DMA instruction
 }
 
-static void amstrad_plus_handle_dma()
+static void amstrad_plus_handle_dma(running_machine *machine)
 {
 	if(amstrad_plus_dma_status & 0x01)  // DMA channel 0
-		amstrad_plus_dma_parse(0,&amstrad_plus_dma_0_addr);
+		amstrad_plus_dma_parse(machine,0,&amstrad_plus_dma_0_addr);
 
 	if(amstrad_plus_dma_status & 0x02)  // DMA channel 1
-		amstrad_plus_dma_parse(1,&amstrad_plus_dma_1_addr);
+		amstrad_plus_dma_parse(machine,1,&amstrad_plus_dma_1_addr);
 
 	if(amstrad_plus_dma_status & 0x04)  // DMA channel 2
-		amstrad_plus_dma_parse(2,&amstrad_plus_dma_2_addr);
+		amstrad_plus_dma_parse(machine,2,&amstrad_plus_dma_2_addr);
 }
 
 /************************************************************************
@@ -1211,7 +1210,7 @@ static void amstrad_Set_HS(int offset, int data)
 				border_counter = 1;  // border extended to cover garbage data from using the soft scroll functions
 			}
 			// CPC+/GX4000 DMA channels
-			amstrad_plus_handle_dma();  // a DMA command is handled at the leading edge of HSYNC (every 64us)
+			amstrad_plus_handle_dma(machine);  // a DMA command is handled at the leading edge of HSYNC (every 64us)
 		}
 	}
 	amstrad_CRTC_HS = data;

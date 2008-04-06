@@ -11,7 +11,6 @@
 
 /* Core includes */
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/mz700.h"
 
 /* Components */
@@ -124,7 +123,7 @@ static PIT8253_OUTPUT_CHANGED( pit_irq_2 )
 {
 	/* INTMSK: interrupt enabled? */
     if (pio_port_c_output & 0x04)
-		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line(device->machine, 0, 0, HOLD_LINE);
 }
 
 /************************ PIO ************************************************/

@@ -685,7 +685,7 @@ DEVICE_IMAGE_LOAD(vc20_rom)
 	}
 
 	logerror("loading rom %s at %.4x size:%.4x\n",image_filename(image), addr, size);
-	read_ = image_fread(image, new_memory_region( Machine, REGION_USER1, ( size & 0x1FFF ) ? ( size + 0x2000 ) : size, 0 ), size);
+	read_ = image_fread(image, new_memory_region( image->machine, REGION_USER1, ( size & 0x1FFF ) ? ( size + 0x2000 ) : size, 0 ), size);
 	if (read_ != size)
 		return 1;
 

@@ -82,9 +82,9 @@ static TIMER_CALLBACK(clear_load)
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void ti990_hold_load(void)
+void ti990_hold_load(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_MSEC(100), NULL, 0, clear_load);
 }
 

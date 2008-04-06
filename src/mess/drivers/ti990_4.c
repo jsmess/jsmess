@@ -48,7 +48,7 @@ TODO:
 
 static MACHINE_RESET(ti990_4)
 {
-	ti990_hold_load();
+	ti990_hold_load(machine);
 
 	ti990_reset_int();
 
@@ -95,7 +95,7 @@ static WRITE8_HANDLER ( ckon_ckof_callback )
 static WRITE8_HANDLER ( lrex_callback )
 {
 	/* right??? */
-	ti990_hold_load();
+	ti990_hold_load(machine);
 }
 
 #if VIDEO_911

@@ -12,7 +12,7 @@ void ti990_set_int9(int state);
 void ti990_set_int10(int state);
 void ti990_set_int13(int state);
 
-void ti990_hold_load(void);
+void ti990_hold_load(running_machine *machine);
 
  READ8_HANDLER ( ti990_panel_read );
 WRITE8_HANDLER ( ti990_panel_write );

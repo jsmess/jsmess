@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "image.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
@@ -737,7 +736,7 @@ static int detect_korean_mapper( UINT8 *rom ) {
 }
 
 DEVICE_START( sms_cart ) {
-	running_machine *machine = Machine;
+	running_machine *machine = device->machine;
 	int i;
 
 	for ( i = 0; i < MAX_CARTRIDGES; i++ ) {
@@ -764,7 +763,7 @@ DEVICE_START( sms_cart ) {
 
 DEVICE_IMAGE_LOAD( sms_cart )
 {
-	running_machine *machine = Machine;
+	running_machine *machine = image->machine;
 	int size = image_length(image);
 	int index = image_index_in_device( image );
 	const char *fname = image_filename( image );

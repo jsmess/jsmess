@@ -68,6 +68,7 @@ TODO :
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/tms9900/tms9900.h"
 #include "machine/ti990.h"
 #include "machine/990_hd.h"
@@ -76,7 +77,7 @@ TODO :
 
 static MACHINE_RESET( ti990_10 )
 {
-	ti990_hold_load();
+	ti990_hold_load(machine);
 
 	ti990_reset_int();
 
@@ -108,7 +109,7 @@ static void rset_callback(void)
 static void lrex_callback(void)
 {
 	/* right??? */
-	ti990_hold_load();
+	ti990_hold_load(Machine);
 }
 
 /*
