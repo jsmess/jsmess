@@ -92,6 +92,54 @@ static void image_unload_internal(image_slot_data *slot);
 
 
 /***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    device_get_info_int_offline - return an integer
+	state value from an allocated device; can be
+	called offline
+-------------------------------------------------*/
+
+INLINE INT64 device_get_info_int_offline(const device_config *device, UINT32 state)
+{
+	deviceinfo info;
+
+	assert(device != NULL);
+	assert(device->type != NULL);
+	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+
+	/* retrieve the value */
+	info.i = 0;
+	(*device->type)(device, state, &info);
+	return info.i;
+}
+
+
+
+/*-------------------------------------------------
+    device_get_info_fct_offline - return an integer
+	state value from an allocated device; can be
+	called offline
+-------------------------------------------------*/
+
+INLINE genf *device_get_info_fct_offline(const device_config *device, UINT32 state)
+{
+	deviceinfo info;
+
+	assert(device != NULL);
+	assert(device->type != NULL);
+	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
+
+	/* retrieve the value */
+	info.f = 0;
+	(*device->type)(device, state, &info);
+	return info.f;
+}
+
+
+
+/***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
 
@@ -210,7 +258,9 @@ static void image_exit(running_machine *machine)
 
 static int is_image_device(const device_config *device)
 {
-	return (device->type == MESS_DEVICE);
+	return (device->type == MESS_DEVICE)
+		|| (device_get_info_int_offline(device, DEVINFO_INT_IMAGE_READABLE) != 0)
+		|| (device_get_info_int_offline(device, DEVINFO_INT_IMAGE_WRITEABLE) != 0);
 }
 
 
@@ -285,19 +335,18 @@ image_device_info image_device_getinfo(const device_config *device)
 	
 	memset(&info, 0, sizeof(info));
 
+	/* retrieve type */
+	info.type = (iodevice_t) (int) device_get_info_int_offline(device, DEVINFO_INT_IMAGE_TYPE);
+
+	/* retrieve flags */
+	info.readable = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_READABLE) ? 1 : 0;
+	info.writeable = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_WRITEABLE) ? 1 : 0;
+	info.creatable = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_CREATABLE) ? 1 : 0;
+	info.must_be_loaded = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_MUST_BE_LOADED) ? 1 : 0;
+
 	iodev = mess_device_from_core_device(device);
 	if (iodev != NULL)
 	{
-		/* retrieve type */
-		info.type = iodev->type;
-
-		/* retrieve flags */
-		info.readable = iodev->readable;
-		info.writeable = iodev->writeable;
-		info.creatable = iodev->creatable;
-		info.must_be_loaded = iodev->must_be_loaded;
-		info.uses_partial_hash = iodev->partialhash != NULL;
-
 		/* retrieve name */
 		s = (*iodev->name)(iodev, iodev->index_in_device, info.name, ARRAY_LENGTH(info.name));
 		if (s != info.name)
@@ -364,13 +413,10 @@ int image_device_uses_file_extension(const device_config *device, const char *fi
 void image_device_compute_hash(char *dest, const device_config *device,
 	const void *data, size_t length, unsigned int functions)
 {
-	deviceinfo info;
 	device_image_partialhash_func partialhash;
 
 	/* retrieve the partial hash func */
-	info.f = 0;
-	(*device->type)(device, DEVINFO_FCT_IMAGE_PARTIAL_HASH, &info);
-	partialhash = (device_image_partialhash_func) info.f;
+	partialhash = (device_image_partialhash_func) device_get_info_fct_offline(device, DEVINFO_FCT_IMAGE_PARTIAL_HASH);
 
 	/* compute the hash */
 	if (partialhash != NULL)

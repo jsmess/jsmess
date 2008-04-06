@@ -267,6 +267,10 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(mess_device_config);			break;
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mess_device_token);			break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_OTHER;					break;
+		case DEVINFO_INT_IMAGE_READABLE:		info->i = mess_device->io_device.readable;		break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:		info->i = mess_device->io_device.writeable;		break;
+		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = mess_device->io_device.creatable;		break;
+		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:	info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_MUST_BE_LOADED); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:				/* Nothing */									break;
@@ -415,7 +419,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		mess_device->io_device.file_extensions		= file_extensions;
 
 		mess_device->io_device.reset_on_load		= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_RESET_ON_LOAD) ? 1 : 0;
-		mess_device->io_device.must_be_loaded		= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_MUST_BE_LOADED) ? 1 : 0;
 		mess_device->io_device.load_at_init			= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_LOAD_AT_INIT) ? 1 : 0;
 
 		mess_device->io_device.start				= (device_start_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_START);

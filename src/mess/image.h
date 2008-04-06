@@ -65,7 +65,6 @@ struct _image_device_info
 	unsigned int writeable : 1;
 	unsigned int creatable : 1;
 	unsigned int must_be_loaded : 1;
-	unsigned int uses_partial_hash : 1;
 	char name[62];
 	char file_extensions[32];
 	char instance_name[32];
@@ -79,6 +78,15 @@ typedef struct _images_private images_private;
 /* state constants specific for mountable images */
 enum
 {
+	/* --- the following bits of info are returned as integers --- */
+	DEVINFO_INT_IMAGE_FIRST = DEVINFO_INT_FIRST + 0x7000,
+	DEVINFO_INT_IMAGE_TYPE,
+	DEVINFO_INT_IMAGE_READABLE,
+	DEVINFO_INT_IMAGE_WRITEABLE,
+	DEVINFO_INT_IMAGE_CREATABLE,
+	DEVINFO_INT_IMAGE_MUST_BE_LOADED,
+	DEVINFO_INT_IMAGE_LAST = DEVINFO_INT_IMAGE_FIRST + 0x0fff,
+
 	/* --- the following bits of info are returned as pointers to functions --- */
 	DEVINFO_FCT_IMAGE_FIRST = DEVINFO_FCT_FIRST + 0x7000,
 	DEVINFO_FCT_IMAGE_LOAD,										/* R/O: device_load_handler */
@@ -86,7 +94,12 @@ enum
 	DEVINFO_FCT_IMAGE_UNLOAD,									/* R/O: device_unload_handler */
 	DEVINFO_FCT_DISPLAY,										/* R/O: device_display_func */
 	DEVINFO_FCT_IMAGE_PARTIAL_HASH,								/* R/O: device_image_partialhash_func */
-	DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff
+	DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff,
+
+	/* --- the following bits of info are returned as NULL-terminated strings --- */
+	DEVINFO_STR_IMAGE_FIRST = DEVINFO_STR_FIRST + 0x7000,
+	DEVINFO_STR_IMAGE_FILE_EXTENSIONS,
+	DEVINFO_STR_IMAGE_LAST = DEVINFO_STR_IMAGE_FIRST + 0x0fff
 };
 
 
