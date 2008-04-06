@@ -31,13 +31,13 @@ VIDEO_UPDATE( orion128 )
 			code1 = mess_ram[part1addr + y + x*256];
 			code2 = mess_ram[part2addr + y + x*256];
 			color = 0;
-			for (b = 7; b >= 0; b--)
+			for (b = 7; b >= 0; b--)			
 			{								
 				switch(orion128_video_mode) {
 					case 0 : color = ((code1 >> b) & 0x01) ? 10 : 0; break;
 					case 1 : color = ((code1 >> b) & 0x01) ? 17 : 16; break;
 					case 4 : 
-					case 6 :
+					case 6 :									 		
 					case 7 :
 									 color = ((code1 >> b) & 0x01) ? (code2 & 0x0f) : (code2 >> 4); break;						
 				}
