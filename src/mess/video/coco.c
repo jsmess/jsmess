@@ -78,7 +78,7 @@ static void internal_video_start_coco(running_machine *machine, m6847_type type)
 	cfg.horizontal_sync_callback = coco_horizontal_sync_callback;
 	cfg.field_sync_callback = coco_field_sync_callback;
 
-	m6847_init(&cfg);
+	m6847_init(machine, &cfg);
 }
 
 

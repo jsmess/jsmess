@@ -64,7 +64,7 @@ struct _m6847_config
 };
 
 /* creates a new M6847 instance */
-void m6847_init(const m6847_config *cfg);
+void m6847_init(running_machine *machine, const m6847_config *cfg);
 
 /* video update proc */
 VIDEO_UPDATE(m6847);

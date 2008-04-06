@@ -73,7 +73,7 @@ VIDEO_START(apf)
 	cfg.field_sync_callback = apf_vsync_int;
 	cfg.get_attributes = apf_get_attributes;
 	cfg.get_video_ram = apf_get_video_ram;
-	m6847_init(&cfg);
+	m6847_init(machine, &cfg);
 }
 
 VIDEO_UPDATE(apf)

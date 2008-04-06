@@ -784,7 +784,7 @@ static UINT32 get_rgb_color(int color)
 
 
 
-static void internal_video_start_coco3(m6847_type type)
+static void internal_video_start_coco3(running_machine *machine, m6847_type type)
 {
 	int i;
 	m6847_config cfg;
@@ -833,7 +833,7 @@ static void internal_video_start_coco3(m6847_type type)
 	cfg.custom_palette = video->palette_colors;
 	cfg.new_frame_callback = coco3_new_frame;
 	cfg.custom_prepare_scanline = coco3_prepare_scanline;
-	m6847_init(&cfg);
+	m6847_init(machine, &cfg);
 
 	/* save state stuff */
 	state_save_register_global_array(video->palette_ram);
@@ -847,12 +847,12 @@ static void internal_video_start_coco3(m6847_type type)
 
 VIDEO_START( coco3 )
 {
-	internal_video_start_coco3(M6847_VERSION_GIME_NTSC);
+	internal_video_start_coco3(machine, M6847_VERSION_GIME_NTSC);
 }
 
 VIDEO_START( coco3p )
 {
-	internal_video_start_coco3(M6847_VERSION_GIME_PAL);
+	internal_video_start_coco3(machine, M6847_VERSION_GIME_PAL);
 }
 
 

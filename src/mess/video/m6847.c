@@ -65,7 +65,6 @@
 
 #include "driver.h"
 #include "m6847.h"
-#include "deprecat.h"
 
 #ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
@@ -1805,7 +1804,7 @@ static void build_fontdata(const m6847_variant *v)
 
 
 
-void m6847_init(const m6847_config *cfg)
+void m6847_init(running_machine *machine, const m6847_config *cfg)
 {
 	const m6847_variant *v;
 	UINT32 frequency;
@@ -1870,7 +1869,7 @@ void m6847_init(const m6847_config *cfg)
 	if (cfg->cpu0_timing_factor > 0)
 	{
 		cpu0_clock_period = period * cfg->cpu0_timing_factor * GROSS_FACTOR;
-		cpunum_set_clock(Machine, 0, ATTOSECONDS_PER_SECOND / cpu0_clock_period);
+		cpunum_set_clock(machine, 0, ATTOSECONDS_PER_SECOND / cpu0_clock_period);
 	}
 
 	/* calculate timing */
@@ -1915,7 +1914,7 @@ void m6847_init(const m6847_config *cfg)
 
 #ifdef ENABLE_DEBUGGER
 	/* setup debug commands */
-	if (Machine->debug_mode)
+	if (machine->debug_mode)
 		debug_console_register_command("m6847_dumpscanline", CMDFLAG_NONE, 0, 0, 0, execute_dumpscanline);
 #endif /* ENABLE_DEBUGGER */
 }

@@ -96,7 +96,7 @@ static void vtech1_field_sync_callback(int data)
 }
 
 
-static void common_video_start(UINT32 *palette)
+static void common_video_start(running_machine *machine, UINT32 *palette)
 {
 	m6847_config cfg;
 
@@ -106,7 +106,7 @@ static void common_video_start(UINT32 *palette)
 	cfg.get_video_ram = vtech1_get_video_ram;
 	cfg.custom_palette = palette;
 	cfg.field_sync_callback = vtech1_field_sync_callback;
-	m6847_init(&cfg);
+	m6847_init(machine, &cfg);
 }
 
 
@@ -124,11 +124,11 @@ VIDEO_START( vtech1_monochrome )
         vtech1_palette_mono[i] = MAKE_RGB(mono, mono, mono);
 	}
 
-	common_video_start(vtech1_palette_mono);
+	common_video_start(machine, vtech1_palette_mono);
 }
 
 
 VIDEO_START( vtech1 )
 {
-	common_video_start(NULL);
+	common_video_start(machine, NULL);
 }
