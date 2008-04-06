@@ -139,6 +139,28 @@ INLINE genf *device_get_info_fct_offline(const device_config *device, UINT32 sta
 
 
 
+/*-------------------------------------------------
+    device_get_info_str_offline - return an integer
+	state value from an allocated device; can be
+	called offline
+-------------------------------------------------*/
+
+INLINE const char *device_get_info_string_offline(const device_config *device, UINT32 state)
+{
+	deviceinfo info;
+
+	assert(device != NULL);
+	assert(device->type != NULL);
+	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
+
+	/* retrieve the value */
+	info.s = 0;
+	(*device->type)(device, state, &info);
+	return info.s;
+}
+
+
+
 /***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
@@ -322,6 +344,37 @@ int image_device_count(const machine_config *config)
 ****************************************************************************/
 
 /*-------------------------------------------------
+    get_device_name - retrieves the name of a
+	device
+-------------------------------------------------*/
+
+static void get_device_name(const device_config *device, char *buffer, size_t buffer_len)
+{
+	const char *name = NULL;
+	device_get_name_func get_name;
+	
+	if (name == NULL)
+	{
+		/* first try a get_name function */
+		get_name = (device_get_name_func) device_get_info_fct_offline(device, DEVINFO_FCT_GET_NAME);
+		if (get_name != NULL)
+			name = get_name(device, buffer, buffer_len);
+	}
+
+	if (name == NULL)
+	{
+		/* next try DEVINFO_STR_NAME */
+		name = device_get_info_string_offline(device, DEVINFO_STR_NAME);
+	}
+
+	/* make sure that the name is put into the buffer */
+	if (name != buffer)
+		snprintf(buffer, buffer_len, "%s", (name != NULL) ? name : "");
+}
+
+
+
+/*-------------------------------------------------
     image_device_getinfo - returns info on a device;
 	can be called by front end code
 -------------------------------------------------*/
@@ -344,14 +397,12 @@ image_device_info image_device_getinfo(const device_config *device)
 	info.creatable = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_CREATABLE) ? 1 : 0;
 	info.must_be_loaded = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_MUST_BE_LOADED) ? 1 : 0;
 
+	/* retrieve name */
+	get_device_name(device, info.name, ARRAY_LENGTH(info.name));
+
 	iodev = mess_device_from_core_device(device);
 	if (iodev != NULL)
 	{
-		/* retrieve name */
-		s = (*iodev->name)(iodev, iodev->index_in_device, info.name, ARRAY_LENGTH(info.name));
-		if (s != info.name)
-			snprintf(info.name, ARRAY_LENGTH(info.name), "%s", s);
-
 		/* retrieve file extensions */
 		for(i = 0; iodev->file_extensions[i] != '\0'; i += strlen(&iodev->file_extensions[i]) + 1)
 			;
@@ -1265,13 +1316,9 @@ core_file *image_core_file(const device_config *image)
 
 const char *image_typename_id(const device_config *image)
 {
-	const struct IODevice *dev;
-	int id;
-	static char buf[64];
-
-	dev = mess_device_from_core_device(image);
-	id = image_index_in_device(image);
-	return dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0]));
+	static char buffer[64];
+	get_device_name(image, buffer, ARRAY_LENGTH(buffer));
+	return buffer;
 }
 
 

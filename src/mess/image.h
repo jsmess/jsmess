@@ -27,6 +27,7 @@ typedef int (*device_image_create_func)(const device_config *image, int format_t
 typedef void (*device_image_unload_func)(const device_config *image);
 typedef void (*device_display_func)(const device_config *image);
 typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
+typedef const char *(*device_get_name_func)(const device_config *device, char *buffer, size_t buffer_length);
 
 typedef enum
 {
@@ -100,6 +101,7 @@ enum
 	DEVINFO_FCT_IMAGE_UNLOAD,									/* R/O: device_image_unload_func */
 	DEVINFO_FCT_DISPLAY,										/* R/O: device_display_func */
 	DEVINFO_FCT_IMAGE_PARTIAL_HASH,								/* R/O: device_image_partialhash_func */
+	DEVINFO_FCT_GET_NAME,										/* R/O: device_get_name_func */
 	DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff,
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -269,5 +271,8 @@ const device_config *image_from_absolute_index(running_machine *machine, int abs
 
 #define DEVICE_IMAGE_UNLOAD_NAME(name)	device_unload_##name
 #define DEVICE_IMAGE_UNLOAD(name)		void DEVICE_IMAGE_UNLOAD_NAME(name)(const device_config *image)
+
+#define DEVICE_GET_NAME_NAME(name)		device_get_name_##name
+#define DEVICE_GET_NAME(name)			const char *DEVICE_GET_NAME_NAME(name)(const device_config *device, char *buffer, size_t buffer_length)
 
 #endif /* __IMAGE_H__ */

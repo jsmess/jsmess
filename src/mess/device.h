@@ -234,9 +234,6 @@ struct IODevice
 	int (*imgverify)(const UINT8 *buf, size_t size);
 	device_image_partialhash_func partialhash;
 
-	/* cosmetic/UI callbacks */
-	const char *(*name)(const struct IODevice *dev, int id, char *buf, size_t bufsize);
-
 	/* image creation options */
 	const struct OptionGuide *createimage_optguide;
 	const struct CreateImageOptions *createimage_options;
