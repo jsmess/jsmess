@@ -85,6 +85,7 @@ enum
 	DEVINFO_FCT_IMAGE_CREATE,									/* R/O: device_create_handler */
 	DEVINFO_FCT_IMAGE_UNLOAD,									/* R/O: device_unload_handler */
 	DEVINFO_FCT_DISPLAY,										/* R/O: device_display_func */
+	DEVINFO_FCT_IMAGE_PARTIAL_HASH,								/* R/O: device_image_partialhash_func */
 	DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff
 };
 
@@ -119,6 +120,10 @@ image_device_info image_device_getinfo(const device_config *device);
 
 /* checks to see if a particular devices uses a certain file extension */
 int image_device_uses_file_extension(const device_config *device, const char *file_extension);
+
+/* compute a hash, using this device's partial hash if appropriate */
+void image_device_compute_hash(char *dest, const device_config *device,
+	const void *data, size_t length, unsigned int functions);
 
 
 

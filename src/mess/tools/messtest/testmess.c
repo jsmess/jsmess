@@ -668,7 +668,7 @@ static void command_image_loadcreate(running_machine *machine)
 	const char *filename;
 	const char *format;
 	char buf[128];
-	const struct IODevice *dev;
+	image_device_info info;
 	const char *file_extensions;
 	astring *filepath;
 	int success;
@@ -690,13 +690,15 @@ static void command_image_loadcreate(running_machine *machine)
 			device_typename(device_type), device_slot);
 		return;
 	}
-	dev = mess_device_from_core_device(image);
-	file_extensions = dev->file_extensions;
+	info = image_device_getinfo(image);
+	file_extensions = info.file_extensions;
 
 	/* is an image format specified? */
 	format = current_command->u.image_args.format;
 	if (format != NULL)
 	{
+		const struct IODevice *dev = mess_device_from_core_device(image);
+
 		if (current_command->command_type != MESSTEST_COMMAND_IMAGE_CREATE)
 		{
 			state = STATE_ABORTED;

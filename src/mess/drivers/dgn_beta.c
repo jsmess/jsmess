@@ -279,13 +279,6 @@ static INPUT_PORTS_START( dgnbeta )
 INPUT_PORTS_END
 
 
-//static const char *dgnbeta_floppy_getname(const struct IODevice *dev, int id, char *buf, size_t bufsize)
-//{
-//  /* Dragon people like their floppy drives zero counted */
-//  snprintf(buf, bufsize, "Floppy #%d", id);
-//  return buf;
-//}
-
 static void dgnbeta_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */

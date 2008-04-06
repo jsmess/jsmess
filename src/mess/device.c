@@ -277,6 +277,7 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_FCT_IMAGE_CREATE:			info->f	= mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_UNLOAD); break;
 		case DEVINFO_FCT_DISPLAY:				info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_DISPLAY); break;
+		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:	info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_PARTIAL_HASH); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					info->s = "Legacy MESS Device";					break;

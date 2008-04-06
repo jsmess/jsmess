@@ -356,6 +356,31 @@ int image_device_uses_file_extension(const device_config *device, const char *fi
 
 
 
+/*-------------------------------------------------
+    image_device_compute_hash - compute a hash,
+	using this device's partial hash if appropriate
+-------------------------------------------------*/
+
+void image_device_compute_hash(char *dest, const device_config *device,
+	const void *data, size_t length, unsigned int functions)
+{
+	deviceinfo info;
+	device_image_partialhash_func partialhash;
+
+	/* retrieve the partial hash func */
+	info.f = 0;
+	(*device->type)(device, DEVINFO_FCT_IMAGE_PARTIAL_HASH, &info);
+	partialhash = (device_image_partialhash_func) info.f;
+
+	/* compute the hash */
+	if (partialhash != NULL)
+		partialhash(dest, data, length, functions);
+	else
+		hash_compute(dest, data, length, functions);
+}
+
+
+
 /****************************************************************************
     IMAGE LOADING
 ****************************************************************************/

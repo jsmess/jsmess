@@ -263,25 +263,17 @@ void SoftwarePicker_SetErrorProc(HWND hwndPicker, void (*pfnErrorProc)(const cha
 static void ComputeFileHash(software_picker_info *pPickerInfo,
 	file_info *pFileInfo, const unsigned char *pBuffer, unsigned int nLength)
 {
-	unsigned int nFunctions;
-	const struct IODevice *iodev;
-	iodevice_t type;
-	device_image_partialhash_func partialhash;
+	image_device_info info;
+	unsigned int functions;
 
-	iodev = mess_device_from_core_device(pFileInfo->device);
-	type = iodev->type;
-	partialhash = iodev->partialhash;
+	// get the device info
+	info = image_device_getinfo(pFileInfo->device);
 
-	nFunctions = hashfile_functions_used(pPickerInfo->pHashFile, type);
+	// determine which functions to use
+	functions = hashfile_functions_used(pPickerInfo->pHashFile, info.type);
 
-	if (partialhash)
-	{
-		partialhash(pFileInfo->szHash, pBuffer, nLength, nFunctions);
-	}
-	else
-	{
-		hash_compute(pFileInfo->szHash, pBuffer, nLength, nFunctions);
-	}
+	// compute the hash
+	image_device_compute_hash(pFileInfo->szHash, pFileInfo->device, pBuffer, nLength, functions);
 }
 
 
@@ -395,8 +387,8 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 	// have already been calculated
 	if ((pPickerInfo->pHashFile != NULL) && (pFileInfo->device != NULL))
 	{
-		const struct IODevice *iodev = mess_device_from_core_device(pFileInfo->device);
-		type = iodev->type;
+		image_device_info info = image_device_getinfo(pFileInfo->device);
+		type = info.type;
 		if (type < IO_COUNT)
 	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->pHashFile, type);
 		nCalculatedHashes = hash_data_used_functions(pFileInfo->szHash);
