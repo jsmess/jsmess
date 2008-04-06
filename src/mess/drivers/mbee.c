@@ -207,15 +207,12 @@ static INPUT_PORTS_START( mbee )
 //	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
 //	PORT_CONFSETTING(    0x08, DEF_STR(On))
 //	PORT_CONFSETTING(    0x00, DEF_STR(Off))
-//	PORT_CONFNAME( 0x10, 0x10, "Auto-Resize?")
-//	PORT_CONFSETTING(    0x00, DEF_STR(No))
-//	PORT_CONFSETTING(    0x10, DEF_STR(Yes))
 INPUT_PORTS_END
 
 static const gfx_layout mbee_charlayout =
 {
     8,16,                   /* 8 x 16 characters */
-    256,                    /* 256 characters */
+    257,                    /* 256 characters + cursor */
     1,                      /* 1 bits per pixel */
     { 0 },                  /* no bitplanes; 1 bit per pixel */
     /* x offsets */
