@@ -267,7 +267,6 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		if (length == 0x500000 && !strncmp((char *)&ROM[0x0120+relocate], "SUPER STREET FIGHTER2", 21))
 		{
 			gen_type = SSF2;
-			printf("it's SSF2\n");
 		}
 		is_kaiju = 1;	// the heck is this supposed to do?
 		// detect the 'Romance of the Three Kingdoms - Battle of Red Cliffs' rom, already decoded from .mdx format
@@ -433,7 +432,6 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	if (gen_type == SSF2)
 	{
-		printf("SSF2\n");
 		memcpy(&ROM[0x800000],&ROM[0x400000],0x100000);
 		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000);
 	}
