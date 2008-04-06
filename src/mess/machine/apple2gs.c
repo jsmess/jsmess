@@ -145,8 +145,8 @@ static UINT8 apple2gs_shadow;
 static UINT8 apple2gs_pending_irqs;
 static UINT8 apple2gs_mouse_x;
 static UINT8 apple2gs_mouse_y;
-static INT8 apple2gs_mouse_dx;
-static INT8 apple2gs_mouse_dy;
+static INT8  apple2gs_mouse_dx;
+static INT8  apple2gs_mouse_dy;
 static const device_config *apple2gs_cur_slot6_image;
 static emu_timer *apple2gs_scanline_timer;
 static emu_timer *apple2gs_clock_timer;
@@ -387,12 +387,12 @@ static UINT8 adb_command;
 static UINT8 adb_mode;
 static UINT8 adb_kmstatus;
 static UINT8 adb_latent_result;
-static size_t adb_command_length;
-static size_t adb_command_pos;
+static INT32 adb_command_length;
+static INT32 adb_command_pos;
 static UINT8 adb_command_bytes[8];
 static UINT8 adb_response_bytes[8];
 static UINT8 adb_response_length;
-static size_t adb_response_pos;
+static INT32 adb_response_pos;
 static UINT8 adb_memory[0x100];
 static int adb_address_keyboard;
 static int adb_address_mouse;
@@ -799,7 +799,6 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 	cpuintrf_push_context(0);
 
 	scanline = video_screen_get_vpos(machine->primary_screen);
-
 	video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* scanline interrupt */
@@ -1660,6 +1659,8 @@ static void apple2gs_setup_memory(void)
 	apple2gs_slowmem = auto_malloc(128*1024);
 	memset(apple2gs_slowmem, 0, 128*1024);
 
+	state_save_register_item_array("APPLE2GS_SLOWMEM", 0, apple2gs_slowmem);
+
 	/* install expanded memory */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
@@ -1791,4 +1792,50 @@ MACHINE_START( apple2gs )
 	/* init the various subsystems */
 	scc_init(NULL);
 	apple2gs_setup_memory();
+
+	/* save state stuff.  note that the driver takes care of docram. */
+	state_save_register_global_array(mess_ram);
+
+	state_save_register_item("NEWVIDEO", 0, apple2gs_newvideo);
+
+	state_save_register_item("VGCINT", 0, apple2gs_vgcint);
+	state_save_register_item("LANGSEL", 0, apple2gs_langsel);
+	state_save_register_item("SLTROMSEL", 0, apple2gs_sltromsel);
+	state_save_register_item("CYAREG", 0, apple2gs_cyareg);
+	state_save_register_item("INTEN", 0, apple2gs_inten);
+	state_save_register_item("INTFLAG", 0, apple2gs_intflag);
+	state_save_register_item("SHADOW", 0, apple2gs_shadow);
+	state_save_register_item("PENDIRQ", 0, apple2gs_pending_irqs);
+	state_save_register_item("MX", 0, apple2gs_mouse_x);
+	state_save_register_item("MY", 0, apple2gs_mouse_y);
+	state_save_register_item("MDX", 0, apple2gs_mouse_dx);
+	state_save_register_item("MDY", 0, apple2gs_mouse_dy);
+
+	state_save_register_item("CLKDATA", 0, clock_data);
+	state_save_register_item("CLKCTRL", 0, clock_control);
+	state_save_register_item("CLKRD", 0, clock_read);
+	state_save_register_item("CLKREG1", 0, clock_reg1);
+	state_save_register_item("CLKCURTIME", 0, clock_curtime);
+	state_save_register_item("CLKCURTIMEINT", 0, clock_curtime_interval);
+	state_save_register_item("CLKMODE", 0, clock_mode);
+	state_save_register_global_array(clock_bram);
+
+	state_save_register_global_array(adb_memory);
+	state_save_register_global_array(adb_command_bytes);
+	state_save_register_global_array(adb_response_bytes);
+	state_save_register_item("ADB", 0, adb_state);
+	state_save_register_item("ADB", 0, adb_command);
+	state_save_register_item("ADB", 0, adb_mode);
+	state_save_register_item("ADB", 0, adb_kmstatus);
+	state_save_register_item("ADB", 0, adb_latent_result);
+	state_save_register_item("ADB", 0, adb_command_length);
+	state_save_register_item("ADB", 0, adb_command_pos);
+	state_save_register_item("ADB", 0, adb_response_length);
+	state_save_register_item("ADB", 0, adb_response_pos);
+	state_save_register_item("ADB", 0, adb_address_keyboard);
+	state_save_register_item("ADB", 0, adb_address_mouse);
+
+	state_save_register_item("SNDGLUCTRL", 0, sndglu_ctrl);
+	state_save_register_item("SNDGLUADDR", 0, sndglu_addr);
+	state_save_register_item("SNDGLUDUMMYRD", 0, sndglu_dummy_read);
 }

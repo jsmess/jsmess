@@ -20,6 +20,8 @@ VIDEO_START( apple2gs )
 	apple2gs_bordercolor = 0;
 	apple2_video_start(machine, apple2gs_slowmem, 0x20000, 0, 8);
 	apple2gs_legacy_gfx = auto_bitmap_alloc(560, 192, BITMAP_FORMAT_INDEXED16);
+
+	state_save_register_item("BORDERCLR", 0, apple2gs_bordercolor);
 }
 
 
@@ -34,19 +36,6 @@ VIDEO_UPDATE( apple2gs )
 	int beamy;
 
 	beamy = cliprect->min_y;
-
-	// HACK: for some reason, we skip scanline 1.  make up for it.
-	if (beamy == 0)
-	{
-		rectangle new_cliprect;
-
-		new_cliprect.min_x = cliprect->min_x;
-		new_cliprect.max_x = cliprect->max_x;
-		new_cliprect.min_y = cliprect->min_y+1;
-		new_cliprect.max_y = cliprect->min_y+1;
-
-		video_update_apple2gs(screen, bitmap, &new_cliprect);
-	}
 
 	if (apple2gs_newvideo & 0x80)
 	{
