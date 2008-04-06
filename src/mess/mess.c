@@ -127,10 +127,10 @@ void mess_predevice_init(running_machine *machine)
 
 void mess_postdevice_init(running_machine *machine)
 {
-	const struct IODevice *dev;
 	int result = INIT_FAIL;
 	const char *image_name;
 	const device_config *image;
+	image_device_info info;
 
 	/* init all devices */
 	image_init(machine);
@@ -138,11 +138,12 @@ void mess_postdevice_init(running_machine *machine)
 	/* make sure that any required devices have been allocated */
 	for (image = image_device_first(machine->config); image != NULL; image = image_device_next(image))
 	{
-		/* identify the legacy device */
-		dev = mess_device_from_core_device(image);
+		/* get the device info */
+		info = image_device_getinfo(image);
 
 		/* is an image specified for this image */
-		image_name = mess_get_device_option(&dev->devclass, dev->index_in_device);
+		image_name = mess_get_device_option(image);
+
 		if ((image_name != NULL) && (image_name[0] != '\0'))
 		{
 			/* try to load this image */
@@ -152,7 +153,7 @@ void mess_postdevice_init(running_machine *machine)
 			if (result)
 			{
 				fatalerror_exitcode(MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
-					device_typename(dev->type),
+					info.name,
 					osd_basename((char *) image_name),
 					image_error(image));
 			}
@@ -160,9 +161,9 @@ void mess_postdevice_init(running_machine *machine)
 		else
 		{
 			/* no image... must this device be loaded? */
-			if (dev->must_be_loaded)
+			if (info.must_be_loaded)
 			{
-				fatalerror_exitcode(MAMERR_DEVICE, "Driver requires that device %s must have an image to load\n", device_typename(dev->type));
+				fatalerror_exitcode(MAMERR_DEVICE, "Driver requires that device %s must have an image to load\n", info.name);
 			}
 		}
 	}

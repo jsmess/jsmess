@@ -42,18 +42,18 @@ const options_entry mess_core_options[] =
 	option, by device and index
 -------------------------------------------------*/
 
-const char *mess_get_device_option(const mess_device_class *devclass, int device_index)
+const char *mess_get_device_option(const device_config *device)
 {
 	const char *result = NULL;
-	const char *dev_name;
+	image_device_info info;
 
 	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS))
 	{
-		/* identify the option name */
-		dev_name = device_instancename(devclass, device_index);
+		/* get the device information */
+		info = image_device_getinfo(device);
 
 		/* access the option */
-		result = options_get_string(mame_options(), dev_name);
+		result = options_get_string(mame_options(), info.instance_name);
 	}
 	return result;
 }
