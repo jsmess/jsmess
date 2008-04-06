@@ -459,16 +459,17 @@ static void x68k_keyboard_push_scancode(unsigned char code)
 static TIMER_CALLBACK(x68k_keyboard_poll)
 {
 	int x;
-	int port = port_tag_to_index("key1");
+	char port[5];
 
 	for(x=0;x<0x80;x++)
 	{
+		sprintf(port, "key%d", (x / 32) + 1);
 		// adjust delay/repeat timers
 		if(sys.keyboard.keytime[x] > 0)
 		{
 			sys.keyboard.keytime[x] -= 5;
 		}
-		if(!(readinputport(port + x/32) & (1 << (x % 32))))
+		if(!(readinputportbytag(port) & (1 << (x % 32))))
 		{
 			if(sys.keyboard.keyon[x] != 0)
 			{
@@ -482,14 +483,16 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 		// check to see if a key is being held
 		if(sys.keyboard.keyon[x] != 0 && sys.keyboard.keytime[x] == 0 && sys.keyboard.last_pressed == x)
 		{
-			if(readinputport(port + sys.keyboard.last_pressed/32) & (1 << (sys.keyboard.last_pressed % 32)))
+			sprintf(port, "key%d", (sys.keyboard.last_pressed / 32) + 1);
+			if(readinputportbytag(port) & (1 << (sys.keyboard.last_pressed % 32)))
 			{
 				x68k_keyboard_push_scancode(sys.keyboard.last_pressed);
 				sys.keyboard.keytime[sys.keyboard.last_pressed] = (sys.keyboard.repeat^2)*5+30;
 				logerror("KB: Holding key 0x%02x\n",sys.keyboard.last_pressed);
 			}
 		}
-		if((readinputport(port + x/32) & (1 << (x % 32))))
+		sprintf(port, "key%d", (x / 32) + 1);
+		if((readinputportbytag(port) & (1 << (x % 32))))
 		{
 			if(sys.keyboard.keyon[x] == 0)
 			{

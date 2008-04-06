@@ -183,6 +183,7 @@ static UINT8 tmc1800_mode_r(void)
 static UINT8 tmc1800_ef_r(void)
 {
 	UINT8 flags = 0x0f;
+	char port[4];
 
 	/*
         EF1     ?
@@ -192,7 +193,8 @@ static UINT8 tmc1800_ef_r(void)
     */
 
 	// keyboard
-	if (~readinputport(keylatch / 8) & (1 << (keylatch % 8))) flags -= EF2;
+	sprintf(port, "IN%d", keylatch / 8);
+	if (~readinputportbytag(port) & (1 << (keylatch % 8))) flags -= EF2;
 
 	return flags;
 }
@@ -216,6 +218,7 @@ static const CDP1802_CONFIG tmc1800_config =
 static UINT8 tmc2000_ef_r(void)
 {
 	int flags = 0x0f;
+	char port[4];
 
 	/*
         EF1     ?
@@ -225,7 +228,8 @@ static UINT8 tmc2000_ef_r(void)
     */
 
 	// keyboard
-	if (~readinputport(keylatch / 8) & (1 << (keylatch % 8))) flags -= EF2;
+	sprintf(port, "IN%d", keylatch / 8);
+	if (~readinputportbytag(port) & (1 << (keylatch % 8))) flags -= EF2;
 
 	return flags;
 }

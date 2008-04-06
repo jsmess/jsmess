@@ -21,7 +21,7 @@ VIDEO_UPDATE( trs80 )
 	int width = 64 - ((trs80_port_ff & 8) << 2);
 	int skip = 3 - (width >> 5);
 	int i=0,x,y,chr;
-	int adj=readinputport(0)&0x40;
+	int adj=readinputportbytag("CONFIG")&0x40;
 
 	if (width != width_store)
 	{

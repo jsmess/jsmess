@@ -108,6 +108,7 @@ static UINT8 tmc2000e_mode_r(void)
 static UINT8 tmc2000e_ef_r(void)
 {
 	UINT8 flags = 0x0f;
+	char port[4];
 
 	/*
         EF1     CDP1864
@@ -117,7 +118,8 @@ static UINT8 tmc2000e_ef_r(void)
     */
 
 	// keyboard
-	if (~readinputport(keylatch / 8) & (1 << (keylatch % 8))) flags -= EF3;
+	sprintf(port, "IN%d", keylatch / 8);
+	if (~readinputportbytag(port) & (1 << (keylatch % 8))) flags -= EF3;
 
 	return flags;
 }

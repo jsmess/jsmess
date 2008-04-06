@@ -58,7 +58,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( vip )
-	PORT_START
+	PORT_START_TAG("KEYPAD")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 MW") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
@@ -117,7 +117,7 @@ static UINT8 vip_ef_r(void)
 
 	if (cdp1861_efx) ef -= EF1;
 	// EF2 = tape (high when tone read)
-	if (readinputport(0) & (1 << keylatch)) ef -= EF3;
+	if (readinputportbytag("KEYPAD") & (1 << keylatch)) ef -= EF3;
 
 	return ef;
 }

@@ -280,6 +280,7 @@ static UINT8 tmc600_mode_r(void)
 static UINT8 tmc600_ef_r(void)
 {
 	int flags = 0x0f;
+	char port[4];
 
 	/*
         EF1     ?
@@ -289,8 +290,8 @@ static UINT8 tmc600_ef_r(void)
     */
 
 	// keyboard
-
-	flags -= (~readinputport(keylatch / 8) & (1 << (keylatch % 8))) ? EF3 : 0;
+	sprintf(port, "IN%d", keylatch / 8);
+	flags -= (~readinputportbytag(port) & (1 << (keylatch % 8))) ? EF3 : 0;
 
 	return flags;
 }
