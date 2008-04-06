@@ -10,8 +10,6 @@
 #include "sound/speaker.h"
 #include "deprecat.h"		/* "Machine" needed for z80pio interrupt */
 
-#define video_screen_get_refresh(screen)	(((screen_config *)(screen)->inline_config)->refresh)
-
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
 static UINT8 int_sw;		/* internal 1 mhz flipflop */
@@ -21,14 +19,12 @@ static UINT8 current_charset;	/* for super80m */
 
 /* the rest are for super80v */
 static UINT8 *pcgram;
-static int off_x = 0;
-static int off_y = 0;
 static UINT8 framecnt = 0;
 static UINT8 super80v_vid_col=1;			// 0 = color ram ; 1 = video ram
 static UINT8 super80v_rom_pcg=1;			// 0 = prom ; 1 = pcg
 static UINT8 mc6845_cursor[16];				// cursor shape
-static UINT8 mc6845[20];				/* registers */
-static UINT8 mc6845_reg;				/* register index */
+static UINT8 mc6845_reg[20];				/* registers */
+static UINT8 mc6845_ind;				/* register index */
 static UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
 #define MASTER_CLOCK			(XTAL_12MHz)
@@ -171,9 +167,9 @@ static void mc6845_cursor_configure(void)
 
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++) mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
 
-	r9  = mc6845[9];					// number of scan lines - 1
-	r10 = mc6845[10] & 0x1f;				// cursor start line = last 5 bits
-	r11 = mc6845[11]+1;					// cursor end line incremented to suit for-loops below
+	r9  = mc6845_reg[9];					// number of scan lines - 1
+	r10 = mc6845_reg[10] & 0x1f;				// cursor start line = last 5 bits
+	r11 = mc6845_reg[11]+1;					// cursor end line incremented to suit for-loops below
 
 	/* decide the curs_type by examining the registers */
 	if (r10 < r11) curs_type=1;				// start less than end, show start to end
@@ -198,46 +194,18 @@ static void mc6845_cursor_configure(void)
 static void mc6845_screen_configure(running_machine *machine)
 {
 	rectangle visarea;
-	UINT16 width, height, bytes;	
-	UINT8 dyn = readinputportbytag("CONFIG") & 0x10;			// read dipswitch
+
+	UINT16 width = mc6845_reg[1]*7-1;							// width in pixels
+	UINT16 height = mc6845_reg[6]*(mc6845_reg[9]+1)-1;					// height in pixels
+	UINT16 bytes = mc6845_reg[1]*mc6845_reg[6]-1;						// video ram needed -1
+
+	/* Resize the screen */
 	visarea.min_x = 0;
-	visarea.max_x = SUPER80V_SCREEN_WIDTH-1;
+	visarea.max_x = width;
 	visarea.min_y = 0;
-	visarea.max_y = SUPER80V_SCREEN_HEIGHT-1;
-
-	/* calculate the effect of sync and vertical adjustments */
-	if ( mc6845[2] ) off_x = mc6845[0] - mc6845[2] - 23; else off_x = -24;
-
-	off_y = (mc6845[4] - mc6845[7]) * (mc6845[9] + 1) + mc6845[5];
-
-	if( off_y < 0 ) off_y = 0;
-
-	if( off_y > 128 ) off_y = 128;
-
-	if (dyn)
-	{
-		off_x = 0;
-		off_y = 0;
-	}
-
-	width = mc6845[1]*7-1;							// width in pixels
-	height = mc6845[6]*(mc6845[9]+1)-1;					// height in pixels
-	bytes = mc6845[1]*mc6845[6]-1;						// video ram needed -1
-
-	/* Physically resize the screen now */
-	if (dyn)
-	{
-		visarea.min_x = 0;
-		visarea.max_x = width;
-		visarea.min_y = 0;
-		visarea.max_y = height;
-		if ((width < 610)
-		&& (height < 460)			/* bounds checking to prevent an assert or violation */
-		&& (bytes < 0x1000))
-			video_screen_configure(machine->primary_screen, width+1, height+1, &visarea, video_screen_get_refresh(machine->primary_screen)); 
-	}
-	else
-			video_screen_configure(machine->primary_screen, SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT, &visarea, video_screen_get_refresh(machine->primary_screen));	// in case dipswitch was just turned to NO
+	visarea.max_y = height;
+	if ((width < 610) && (height < 460) && (bytes < 0x1000))	/* bounds checking to prevent an assert or violation */
+		video_screen_set_visarea(machine->primary_screen, 0, width+1, 0, height+1);
 }
 
 static VIDEO_EOF( super80m )
@@ -319,10 +287,10 @@ static VIDEO_UPDATE( super80m )
 
 static VIDEO_UPDATE( super80v )
 {
-	UINT16 i, bytes = mc6845[1]*mc6845[6];
-	UINT8 speed = mc6845[10]&0x20, flash = mc6845[10]&0x40;				// cursor modes
-	UINT16 cursor = (mc6845[14]<<8) | mc6845[15];					// get cursor position
-	UINT16 screen_home = (mc6845[12]<<8) | mc6845[13];				// screen home offset (usually zero)
+	UINT16 i, bytes = mc6845_reg[1]*mc6845_reg[6];
+	UINT8 speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40;				// cursor modes
+	UINT16 cursor = (mc6845_reg[14]<<8) | mc6845_reg[15];					// get cursor position
+	UINT16 screen_home = (mc6845_reg[12]<<8) | mc6845_reg[13];				// screen home offset (usually zero)
 	UINT8 options=readinputportbytag("CONFIG");
 	framecnt++;
 
@@ -340,8 +308,8 @@ static VIDEO_UPDATE( super80v )
 	for( i = screen_home; (i < (bytes + screen_home)) & (i < 0x1000); i++ )
 	{
 		int sx, sy, chr, col;
-		sy = off_y + ((i - screen_home) / mc6845[1]) * (mc6845[9] + 1);
-		sx = (off_x + ((i - screen_home) % mc6845[1])) * 7;
+		sy = ((i - screen_home) / mc6845_reg[1]) * (mc6845_reg[9] + 1);
+		sx = ((i - screen_home) % mc6845_reg[1]) * 7;
 		chr = videoram[i];
 
 		/* get colour or b&w */
@@ -464,8 +432,8 @@ static TIMER_CALLBACK( super80_timer )
 
 static READ8_HANDLER( super80v_11_r )
 {
-	if ((mc6845_reg > 13) && (mc6845_reg < 18))		/* determine readable registers */
-		return mc6845[mc6845_reg];
+	if ((mc6845_ind > 13) && (mc6845_ind < 18))		/* determine readable registers */
+		return mc6845_reg[mc6845_ind];
 	else
 		return 0;
 }
@@ -480,14 +448,14 @@ static READ8_HANDLER( super80_f2_r )
 
 static WRITE8_HANDLER( super80v_10_w )
 {
-	if (data < 18) mc6845_reg = data; else mc6845_reg = 19;		/* make sure if you try using an invalid register your write will go nowhere */
+	if (data < 18) mc6845_ind = data; else mc6845_ind = 19;		/* make sure if you try using an invalid register your write will go nowhere */
 }
 
 static WRITE8_HANDLER( super80v_11_w )
 {
-	if (mc6845_reg < 16) mc6845[mc6845_reg] = data & mc6845_mask[mc6845_reg];	/* save data in register */
-	if (mc6845_reg < 10) mc6845_screen_configure(machine);				/* adjust screen size */
-	if ((mc6845_reg > 8) && (mc6845_reg < 12)) mc6845_cursor_configure();		/* adjust cursor shape */
+	if (mc6845_ind < 16) mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
+	if ((mc6845_ind == 1) || (mc6845_ind == 6) || (mc6845_ind == 9)) mc6845_screen_configure(machine); /* adjust screen size */
+	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape */
 }
 
 static UINT8 last_data;
@@ -713,12 +681,7 @@ static INPUT_PORTS_START( super80v )
 	PORT_INCLUDE( super80m )
 
 	PORT_MODIFY("CONFIG")
-
-	/* Enhanced options not available on real hardware */
-	PORT_BIT( 0x6, 0x6, IPT_UNUSED )
-	PORT_CONFNAME( 0x10, 0x10, "Auto-Resize?")
-	PORT_CONFSETTING(    0x00, DEF_STR(No))
-	PORT_CONFSETTING(    0x10, DEF_STR(Yes))
+	PORT_BIT( 0x16, 0x16, IPT_UNUSED )
 INPUT_PORTS_END
 
 /**************************** GRAPHICS DECODE *****************************************************************/
