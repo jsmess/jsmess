@@ -7,7 +7,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "memconv.h"
 #include "includes/crtc6845.h"
 #include "video/pc_video.h"
@@ -40,7 +39,7 @@ static void pc_video_postload(void)
 
 
 
-struct mscrtc6845 *pc_video_start(const struct mscrtc6845_config *config,
+struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6845_config *config,
 	pc_video_update_proc (*choosevideomode)(int *width, int *height, struct mscrtc6845 *crtc),
 	size_t vramsize)
 {
@@ -62,7 +61,7 @@ struct mscrtc6845 *pc_video_start(const struct mscrtc6845_config *config,
 
 	if (videoram_size)
 	{
-		video_start_generic_bitmapped(Machine);
+		video_start_generic_bitmapped(machine);
 	}
 
 	state_save_register_func_postload(pc_video_postload);

@@ -38,8 +38,8 @@ struct pc_svga_interface
 	pc_video_update_proc (*choosevideomode)(const UINT8 *sequencer, const UINT8 *crtc, const UINT8 *gc, int *width, int *height);
 };
 
-void pc_vga_init(const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf);
-void pc_vga_reset(void);
+void pc_vga_init(running_machine *machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf);
+void pc_vga_reset(running_machine *machine);
 void *pc_vga_memory(void);
 size_t pc_vga_memory_size(void);
 

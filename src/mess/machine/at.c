@@ -133,7 +133,7 @@ DRIVER_INIT( at_vga )
 
 	init_at_common(&at8042);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
-	pc_vga_init(&vga_interface, NULL);
+	pc_vga_init(machine, &vga_interface, NULL);
 }
 
 
@@ -146,7 +146,7 @@ DRIVER_INIT( ps2m30286 )
 	};
 	init_at_common(&at8042);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
-	pc_vga_init(&vga_interface, NULL);
+	pc_vga_init(machine, &vga_interface, NULL);
 }
 
 

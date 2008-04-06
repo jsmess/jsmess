@@ -358,7 +358,7 @@ static const struct pc_vga_interface vga_interface =
 
 DRIVER_INIT( pc1640 )
 {
-	pc_vga_init(&vga_interface, NULL);
+	pc_vga_init(machine, &vga_interface, NULL);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, SMH_BANK1 );
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, SMH_BANK2 );
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK3 );
@@ -388,7 +388,7 @@ DRIVER_INIT( pc_vga )
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
 	ppi8255_init(&pc_ppi8255_interface);
 
-	pc_vga_init(&vga_interface, NULL);
+	pc_vga_init(machine, &vga_interface, NULL);
 }
 
 static int pc_irq_callback(int irqline)

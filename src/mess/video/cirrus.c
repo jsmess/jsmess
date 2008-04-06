@@ -208,7 +208,7 @@ const struct pci_device_info cirrus5430_callbacks =
 WRITE8_HANDLER( cirrus_42E8_w )
 {
 	if (data & 0x80)
-		pc_vga_reset();
+		pc_vga_reset(machine);
 }
 
 

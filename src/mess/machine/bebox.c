@@ -1016,7 +1016,7 @@ DRIVER_INIT( bebox )
 	mc146818_init(MC146818_STANDARD);
 	pic8259_init(2, bebox_pic_set_int_line);
 	ide_controller_init_custom(0, &bebox_ide_interface, NULL);
-	pc_vga_init(&bebox_vga_interface, &cirrus_svga_interface);
+	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
 	kbdc8042_init(&bebox_8042_interface);
 
 	dma8237_init(2);
