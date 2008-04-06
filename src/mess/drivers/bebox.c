@@ -33,8 +33,8 @@
 #include "formats/pc_dsk.h"
 
 
-static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_1_r(machine, offset / 2); }
-static WRITE8_HANDLER(at_dma8237_1_w) { dma8237_1_w(machine, offset / 2, data); }
+static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_r((device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2); }
+static WRITE8_HANDLER(at_dma8237_1_w) { dma8237_w((device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2, data); }
 
 static READ64_HANDLER( bebox_dma8237_1_r )
 {
@@ -46,7 +46,10 @@ static WRITE64_HANDLER( bebox_dma8237_1_w )
 	write64be_with_write8_handler(at_dma8237_1_w, machine, offset, data, mem_mask);
 }
 
+
 DEV_READWRITE8TO64BE( bebox_pit8254_64be, pit8253_r, pit8253_w )
+DEV_READWRITE8TO64BE( bebox_dma8237_64be, dma8237_r, dma8237_w )
+
 
 static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE( bebox_cpu0_imask_r, bebox_cpu0_imask_w )
@@ -55,7 +58,7 @@ static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x7FFFF3F0, 0x7FFFF3F7) AM_READWRITE( bebox_crossproc_interrupts_r, bebox_crossproc_interrupts_w )
 	AM_RANGE(0x7FFFF4F0, 0x7FFFF4F7) AM_WRITE( bebox_processor_resets_w )
 
-	AM_RANGE(0x80000000, 0x8000001F) AM_READWRITE( dma8237_64be_0_r, dma8237_64be_0_w )
+	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE( DMA8237, "dma8237_1", bebox_dma8237_64be_r, bebox_dma8237_64be_w )
 	AM_RANGE(0x80000020, 0x8000003F) AM_READWRITE( pic8259_64be_0_r, pic8259_64be_0_w )
 	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE(PIT8254, "pit8254", bebox_pit8254_64be_r, bebox_pit8254_64be_w)
 	AM_RANGE(0x80000060, 0x8000006F) AM_READWRITE( kbdc8042_64be_r, kbdc8042_64be_w )
@@ -109,6 +112,12 @@ static MACHINE_DRIVER_START( bebox )
 
 	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
 	MDRV_DEVICE_CONFIG( bebox_pit8254_config )
+
+	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
+	MDRV_DEVICE_CONFIG( bebox_dma8237_1_config )
+
+	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
+	MDRV_DEVICE_CONFIG( bebox_dma8237_2_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )

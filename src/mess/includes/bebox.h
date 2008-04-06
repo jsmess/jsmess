@@ -13,6 +13,8 @@
 /*----------- defined in machine/bebox.c -----------*/
 
 extern const struct pit8253_config bebox_pit8254_config;
+extern const struct dma8237_interface bebox_dma8237_1_config;
+extern const struct dma8237_interface bebox_dma8237_2_config;
 
 MACHINE_RESET( bebox );
 DRIVER_INIT( bebox );

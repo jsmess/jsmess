@@ -106,12 +106,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(at_dma8237_1_r)
 {
-	return dma8237_1_r(machine, offset / 2);
+	return dma8237_r( (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2);
 }
 
 static WRITE8_HANDLER(at_dma8237_1_w)
 {
-	dma8237_1_w(machine, offset / 2, data);
+	dma8237_w( (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2, data);
 }
 
 static READ32_HANDLER(at32_dma8237_1_r)
@@ -125,10 +125,11 @@ static WRITE32_HANDLER(at32_dma8237_1_w)
 }
 
 DEV_READWRITE8TO32LE_LSB( at_pit8254_32le, pit8253_r, pit8253_w )
+DEV_READWRITE8TO32LE_LSB( at_dma8237_32le, dma8237_r, dma8237_w )
 
 
 static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(dma8237_0_r,				dma8237_0_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", dma8237_r, dma8237_w)
 	AM_RANGE(0x0020, 0x003f) AM_READWRITE(pic8259_0_r,				pic8259_0_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, AT_PIT8254, pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_8_r,				kbdc8042_8_w)
@@ -156,9 +157,20 @@ static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
+static READ32_HANDLER(at_page32_r)
+{
+	return read32le_with_read8_handler(at_page8_r, machine, offset, mem_mask);
+}
+
+
+static WRITE32_HANDLER(at_page32_w)
+{
+	write32le_with_write8_handler(at_page8_w, machine, offset, data, mem_mask);
+}
+
 
 static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(dma8237_32le_0_r,			dma8237_32le_0_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", at_dma8237_32le_r, at_dma8237_32le_w)
 	AM_RANGE(0x0020, 0x003f) AM_READWRITE(pic8259_32le_0_r,			pic8259_32le_0_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, AT_PIT8254, at_pit8254_32le_r, at_pit8254_32le_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
@@ -180,7 +192,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(dma8237_32le_0_r,			dma8237_32le_0_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", at_dma8237_32le_r, at_dma8237_32le_w)
 	AM_RANGE(0x0020, 0x003f) AM_READWRITE(pic8259_32le_0_r,			pic8259_32le_0_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, AT_PIT8254, at_pit8254_32le_r, at_pit8254_32le_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
@@ -447,6 +459,12 @@ static MACHINE_DRIVER_START( atcga )
 
 	MDRV_DEVICE_ADD( AT_PIT8254, PIT8254 )
 	MDRV_DEVICE_CONFIG( at_pit8254_config )
+
+	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
+	MDRV_DEVICE_CONFIG( at_dma8237_1_config )
+
+	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
+	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
 
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )

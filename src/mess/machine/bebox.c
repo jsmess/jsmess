@@ -662,7 +662,7 @@ WRITE64_HANDLER(bebox_80000480_w)
 }
 
 
-static UINT8 bebox_dma_read_byte(int channel, offs_t offset)
+static DMA8237_MEM_READ( bebox_dma_read_byte )
 {
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x7FFF0000;
@@ -670,7 +670,7 @@ static UINT8 bebox_dma_read_byte(int channel, offs_t offset)
 }
 
 
-static void bebox_dma_write_byte(int channel, offs_t offset, UINT8 data)
+static DMA8237_MEM_WRITE( bebox_dma_write_byte )
 {
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x7FFF0000;
@@ -678,7 +678,22 @@ static void bebox_dma_write_byte(int channel, offs_t offset, UINT8 data)
 }
 
 
-static const struct dma8237_interface bebox_dma =
+static DMA8237_CHANNEL_READ( bebox_dma8237_fdc_dack_r ) {
+	return pc_fdc_dack_r();
+}
+
+
+static DMA8237_CHANNEL_WRITE( bebox_dma8237_fdc_dack_w ) {
+	pc_fdc_dack_w( data );
+}
+
+
+static DMA8237_OUT_EOP( bebox_dma8237_out_eop ) {
+	pc_fdc_set_tc_state( state );
+}
+
+
+const struct dma8237_interface bebox_dma8237_1_config =
 {
 	0,
 	1.0e-6, /* 1us */
@@ -686,9 +701,23 @@ static const struct dma8237_interface bebox_dma =
 	bebox_dma_read_byte,
 	bebox_dma_write_byte,
 
-	{ 0, 0, pc_fdc_dack_r, 0 },
-	{ 0, 0, pc_fdc_dack_w, 0 },
-	pc_fdc_set_tc_state
+	{ 0, 0, bebox_dma8237_fdc_dack_r, 0 },
+	{ 0, 0, bebox_dma8237_fdc_dack_w, 0 },
+	bebox_dma8237_out_eop
+};
+
+
+const struct dma8237_interface bebox_dma8237_2_config =
+{
+	0,
+	1.0e-6, /* 1us */
+
+	NULL,
+	NULL,
+
+	{ NULL, NULL, NULL, NULL },
+	{ NULL, NULL, NULL, NULL },
+	NULL
 };
 
 
@@ -1018,9 +1047,6 @@ DRIVER_INIT( bebox )
 	ide_controller_init_custom(0, &bebox_ide_interface, NULL);
 	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
 	kbdc8042_init(&bebox_8042_interface);
-
-	dma8237_init(2);
-	dma8237_config(0, &bebox_dma);
 
 	/* install VGA memory */
 	vram_begin = 0xC1000000;

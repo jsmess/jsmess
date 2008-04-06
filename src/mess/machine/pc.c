@@ -48,6 +48,101 @@
 #include "machine/8237dma.h"
 
 
+/*************************************************************************
+ *
+ *      PC DMA stuff
+ *
+ *************************************************************************/
+
+static UINT8 dma_offset[2][4];
+
+
+READ8_HANDLER(pc_page_r)
+{
+	return 0xFF;
+}
+
+
+WRITE8_HANDLER(pc_page_w)
+{
+	switch(offset % 4) {
+	case 1:
+		dma_offset[0][2] = data;
+		break;
+	case 2:
+		dma_offset[0][3] = data;
+		break;
+	case 3:
+		dma_offset[0][0] = dma_offset[0][1] = data;
+		break;
+	}
+}
+
+
+static DMA8237_MEM_READ( pc_dma_read_byte )
+{
+	UINT8 result;
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0x0F0000;
+
+	cpuintrf_push_context(0);
+	result = program_read_byte(page_offset + offset);
+	cpuintrf_pop_context();
+
+	return result;
+}
+
+
+static DMA8237_MEM_WRITE( pc_dma_write_byte )
+{
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0x0F0000;
+
+	cpuintrf_push_context(0);
+	program_write_byte(page_offset + offset, data);
+	cpuintrf_pop_context();
+}
+
+
+static DMA8237_CHANNEL_READ( pc_dma8237_fdc_dack_r ) {
+	return pc_fdc_dack_r();
+}
+
+
+static DMA8237_CHANNEL_READ( pc_dma8237_hdc_dack_r ) {
+	return pc_hdc_dack_r();
+}
+
+
+static DMA8237_CHANNEL_WRITE( pc_dma8237_fdc_dack_w ) {
+	pc_fdc_dack_w( data );
+}
+
+
+static DMA8237_CHANNEL_WRITE( pc_dma8237_hdc_dack_w ) {
+	pc_hdc_dack_w( data );
+}
+
+
+static DMA8237_OUT_EOP( pc_dma8237_out_eop ) {
+	pc_fdc_set_tc_state( state );
+}
+
+
+const struct dma8237_interface pc_dma8237_config =
+{
+	0,
+	1.0e-6, // 1us
+
+	pc_dma_read_byte,
+	pc_dma_write_byte,
+
+	{ 0, 0, pc_dma8237_fdc_dack_r, pc_dma8237_hdc_dack_r },
+	{ 0, 0, pc_dma8237_fdc_dack_w, pc_dma8237_hdc_dack_w },
+	pc_dma8237_out_eop
+};
+
+
 /**********************************************************
  *
  * COM hardware
@@ -163,16 +258,9 @@ static void pc_fdc_interrupt(int state)
 
 static void pc_fdc_dma_drq(int state, int read_)
 {
-	dma8237_drq_write(0, FDC_DMA, state);
+	dma8237_drq_write( (device_config*)device_list_find_by_tag( Machine->config->devicelist, DMA8237, "dma8237" ), FDC_DMA, state);
 }
 
-static const struct pc_fdc_interface fdc_interface =
-{
-	NEC765A,
-	NEC765_RDY_PIN_CONNECTED,
-	pc_fdc_interrupt,
-	pc_fdc_dma_drq,
-};
 
 static const struct pc_fdc_interface fdc_interface_nc =
 {
@@ -191,7 +279,6 @@ void mess_init_pc_common(UINT32 flags) {
 		memory_set_bankptr( 10, mess_ram );
 
 	/* FDC/HDC hardware */
-	pc_fdc_init( ( flags & PCCOMMON_NEC765_RDY_NC ) ? &fdc_interface_nc : &fdc_interface);
 	pc_hdc_setup();
 
 	/* com hardware */
@@ -221,7 +308,7 @@ void mess_init_pc_common(UINT32 flags) {
 
 DRIVER_INIT( pccga )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
 	ppi8255_init(&pc_ppi8255_interface);
 	pc_rtc_init();
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
@@ -229,14 +316,14 @@ DRIVER_INIT( pccga )
 
 DRIVER_INIT( bondwell )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
 	ppi8255_init(&pc_ppi8255_interface);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pcmda )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
 	ppi8255_init(&pc_ppi8255_interface);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
@@ -262,7 +349,7 @@ DRIVER_INIT( europc )
 		rom[0xfffff]=256-a;
 	}
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
 
 	europc_rtc_init();
 //	europc_rtc_set_time(machine);
@@ -275,7 +362,7 @@ DRIVER_INIT( t1000hx )
     /* just a plain bit pattern for graphics data generation */
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
@@ -294,7 +381,7 @@ DRIVER_INIT( pc200 )
 	videoram=memory_region(REGION_CPU1)+0xb0000;
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc200_16le_port378_r );
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
 }
 
 DRIVER_INIT( pc1512 )
@@ -315,7 +402,7 @@ DRIVER_INIT( pc1512 )
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc16le_parallelport2_r );
 
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
 	mc146818_init(MC146818_IGNORE_CENTURY);
 }
 
@@ -378,14 +465,14 @@ DRIVER_INIT( pc1640 )
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
 
 	mc146818_init(MC146818_IGNORE_CENTURY);
 }
 
 DRIVER_INIT( pc_vga )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC | PCCOMMON_DMA8237_PC | PCCOMMON_NEC765_RDY_NC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
 	ppi8255_init(&pc_ppi8255_interface);
 
 	pc_vga_init(machine, &vga_interface, NULL);
@@ -397,40 +484,16 @@ static int pc_irq_callback(int irqline)
 }
 
 
-MACHINE_RESET( pc_mda )
+MACHINE_START( pc ) {
+	pc_fdc_init( &fdc_interface_nc );
+}
+
+
+MACHINE_RESET( pc )
 {
-	dma8237_reset();
 	cpunum_set_irq_callback(0, pc_irq_callback);
 }
 
-MACHINE_RESET( pc_cga )
-{
-	dma8237_reset();
-	cpunum_set_irq_callback(0, pc_irq_callback);
-}
-
-MACHINE_RESET( pc_t1t )
-{
-	dma8237_reset();
-	cpunum_set_irq_callback(0, pc_irq_callback);
-}
-
-MACHINE_RESET( pc_pc1512 ) {
-	dma8237_reset();
-	cpunum_set_irq_callback(0, pc_irq_callback);
-}
-
-MACHINE_RESET( pc_aga )
-{
-	dma8237_reset();
-	cpunum_set_irq_callback(0, pc_irq_callback);
-}
-
-MACHINE_RESET( pc_vga )
-{
-	dma8237_reset();
-	cpunum_set_irq_callback(0, pc_irq_callback);
-}
 
 /**************************************************************************
  *
