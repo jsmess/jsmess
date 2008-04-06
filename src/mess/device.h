@@ -92,13 +92,8 @@ enum
 
 struct IODevice;
 
-typedef int (*device_image_load_func)(const device_config *image);
-typedef int (*device_image_create_func)(const device_config *image, int format_type, option_resolution *format_options);
-typedef void (*device_image_unload_func)(const device_config *image);
 typedef int (*device_image_verify_func)(const UINT8 *buf, size_t size);
-typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
 typedef void (*device_getdispositions_func)(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
-typedef void (*device_display_func)(const device_config *image);
 typedef const char *(*device_getname_func)(const struct IODevice *dev, int id, char *buf, size_t bufsize);
 
 struct _mess_device_class;

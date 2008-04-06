@@ -22,6 +22,12 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef int (*device_image_load_func)(const device_config *image);
+typedef int (*device_image_create_func)(const device_config *image, int format_type, option_resolution *format_options);
+typedef void (*device_image_unload_func)(const device_config *image);
+typedef void (*device_display_func)(const device_config *image);
+typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
+
 typedef enum
 {
 	/* List of all supported devices.  Refer to the device by these names only */
@@ -89,9 +95,9 @@ enum
 
 	/* --- the following bits of info are returned as pointers to functions --- */
 	DEVINFO_FCT_IMAGE_FIRST = DEVINFO_FCT_FIRST + 0x7000,
-	DEVINFO_FCT_IMAGE_LOAD,										/* R/O: device_load_handler */
-	DEVINFO_FCT_IMAGE_CREATE,									/* R/O: device_create_handler */
-	DEVINFO_FCT_IMAGE_UNLOAD,									/* R/O: device_unload_handler */
+	DEVINFO_FCT_IMAGE_LOAD,										/* R/O: device_image_load_func */
+	DEVINFO_FCT_IMAGE_CREATE,									/* R/O: device_image_create_func */
+	DEVINFO_FCT_IMAGE_UNLOAD,									/* R/O: device_image_unload_func */
 	DEVINFO_FCT_DISPLAY,										/* R/O: device_display_func */
 	DEVINFO_FCT_IMAGE_PARTIAL_HASH,								/* R/O: device_image_partialhash_func */
 	DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff,
