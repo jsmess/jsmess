@@ -6,13 +6,14 @@ New System Drivers Supported (in no particular order):
 - Orion 128	[Miodrag Milanovic]
 
 
+
 System Driver Changes:
 ----------------------
 - [ABC80] Fixed so that it boots and keyboard works. [Robbbert]
 
 - [BW2] Added MSM6255 LCD controller emulation. [Curt Coder]
 
-- [CBM] Simplified keyboard and interrupt handling code.  [Fabio Priuli]
+- [CBM, C16] Simplified keyboard and interrupt handling code.  [Fabio Priuli]
 
 - [IBMPC,IBM5150] Renamed ibmpc driver to ibm5150.  [Wilbert Pol]
 
@@ -30,7 +31,10 @@ System Driver Changes:
 
 - [GENESIS] Clean and speed up SSF2 banking [Cowering]
 
-- [GENESIS] Add automatic support for many 'pirate' carts (thanks to Haze for them) [Cowering]
+- [GENESIS] Add automatic support for many 'pirate' carts (thanks to Haze for
+  them)  [Cowering]
+
+
 
 User Interface Changes:
 -----------------------

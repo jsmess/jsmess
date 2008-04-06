@@ -640,156 +640,45 @@ INTERRUPT_GEN( c16_frame_interrupt )
 	int value;
 
 	value = 0xff;
-	if (KEY_ATSIGN)
-		value &= ~0x80;
-	if (KEY_F3)
-		value &= ~0x40;
-	if (KEY_F2)
-		value &= ~0x20;
-	if (KEY_F1)
-		value &= ~0x10;
-	if (KEY_HELP)
-		value &= ~8;
-	if (KEY_POUND)
-		value &= ~4;
-	if (KEY_RETURN)
-		value &= ~2;
-	if (KEY_DEL)
-		value &= ~1;
+
+	value &= ~readinputportbytag( "ROW0" );
 	keyline[0] = value;
 
 	value = 0xff;
-	if (KEY_SHIFT)
-		value &= ~0x80;
-	if (KEY_E)
-		value &= ~0x40;
-	if (KEY_S)
-		value &= ~0x20;
-	if (KEY_Z)
-		value &= ~0x10;
-	if (KEY_4)
-		value &= ~8;
-	if (KEY_A)
-		value &= ~4;
-	if (KEY_W)
-		value &= ~2;
-	if (KEY_3)
-		value &= ~1;
+
+	value &= ~readinputportbytag( "ROW1" );
 	keyline[1] = value;
 
 	value = 0xff;
-	if (KEY_X)
-		value &= ~0x80;
-	if (KEY_T)
-		value &= ~0x40;
-	if (KEY_F)
-		value &= ~0x20;
-	if (KEY_C)
-		value &= ~0x10;
-	if (KEY_6)
-		value &= ~8;
-	if (KEY_D)
-		value &= ~4;
-	if (KEY_R)
-		value &= ~2;
-	if (KEY_5)
-		value &= ~1;
+
+	value &= ~readinputportbytag( "ROW2" );
 	keyline[2] = value;
 
 	value = 0xff;
-	if (KEY_V)
-		value &= ~0x80;
-	if (KEY_U)
-		value &= ~0x40;
-	if (KEY_H)
-		value &= ~0x20;
-	if (KEY_B)
-		value &= ~0x10;
-	if (KEY_8)
-		value &= ~8;
-	if (KEY_G)
-		value &= ~4;
-	if (KEY_Y)
-		value &= ~2;
-	if (KEY_7)
-		value &= ~1;
+
+	value &= ~readinputportbytag( "ROW3" );
 	keyline[3] = value;
 
 	value = 0xff;
-	if (KEY_N)
-		value &= ~0x80;
-	if (KEY_O)
-		value &= ~0x40;
-	if (KEY_K)
-		value &= ~0x20;
-	if (KEY_M)
-		value &= ~0x10;
-	if (KEY_0)
-		value &= ~8;
-	if (KEY_J)
-		value &= ~4;
-	if (KEY_I)
-		value &= ~2;
-	if (KEY_9)
-		value &= ~1;
+
+	value &= ~readinputportbytag( "ROW4" );
 	keyline[4] = value;
 
 	value = 0xff;
-	if (KEY_COMMA)
-		value &= ~0x80;
-	if (KEY_MINUS)
-		value &= ~0x40;
-	if (KEY_SEMICOLON)
-		value &= ~0x20;
-	if (KEY_POINT)
-		value &= ~0x10;
-	if (KEY_UP)
-		value &= ~8;
-	if (KEY_L)
-		value &= ~4;
-	if (KEY_P)
-		value &= ~2;
-	if (KEY_DOWN)
-		value &= ~1;
+
+	value &= ~readinputportbytag( "ROW5" );
 	keyline[5] = value;
 
 	value = 0xff;
-	if (KEY_SLASH)
-		value &= ~0x80;
-	if (KEY_PLUS)
-		value &= ~0x40;
-	if (KEY_EQUALS)
-		value &= ~0x20;
-	if (KEY_ESC)
-		value &= ~0x10;
-	if (KEY_RIGHT)
-		value &= ~8;
-	if (KEY_COLON)
-		value &= ~4;
-	if (KEY_ASTERIX)
-		value &= ~2;
-	if (KEY_LEFT)
-		value &= ~1;
+
+	value &= ~readinputportbytag( "ROW6" );
 	keyline[6] = value;
 
 	value = 0xff;
-	if (KEY_STOP)
-		value &= ~0x80;
-	if (KEY_Q)
-		value &= ~0x40;
-	if (KEY_CBM)
-		value &= ~0x20;
-	if (KEY_SPACE)
-		value &= ~0x10;
-	if (KEY_2)
-		value &= ~8;
-	if (KEY_CTRL)
-		value &= ~4;
-	if (KEY_HOME)
-		value &= ~2;
-	if (KEY_1)
-		value &= ~1;
+
+	value &= ~readinputportbytag( "ROW7" );
 	keyline[7] = value;
+
 
 	if (JOYSTICK1_PORT) {
 		value = 0xff;
@@ -841,6 +730,6 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 	vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
 	vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , KEY_SHIFTLOCK ? 1 : 0);
+	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , readinputportbytag("Special") & 0x80 ? 1 : 0);
 	set_led_status (0 /*KB_NUMLOCK_FLAG */ , JOYSTICK_SWAP ? 1 : 0);
 }
