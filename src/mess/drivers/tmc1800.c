@@ -424,7 +424,7 @@ static DRIVER_INIT( tmc1800 )
 static DRIVER_INIT( tmc2000 )
 {
 	timer_set(attotime_zero, NULL, 0, setup_beep);
-	cdp1864_configure(&tmc2000_CDP1864_interface);
+	cdp1864_configure(machine, &tmc2000_CDP1864_interface);
 }
 
 /* System Drivers */

@@ -426,7 +426,7 @@ static TIMER_CALLBACK(mpt02_setup_beep)
 static DRIVER_INIT( mpt02 )
 {
 	timer_set(attotime_zero, NULL, 0, mpt02_setup_beep);
-	cdp1864_configure(&mpt02_CDP1864_interface);
+	cdp1864_configure(machine, &mpt02_CDP1864_interface);
 }
 
 /* Game Drivers */

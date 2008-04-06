@@ -235,7 +235,7 @@ VIDEO_UPDATE( cdp1864 )
 	return 0;
 }
 
-static void cdp1864_init_palette(double res_r, double res_g, double res_b, double res_bkg)
+static void cdp1864_init_palette(running_machine *machine, double res_r, double res_g, double res_b, double res_bkg)
 {
 	int i, r, g, b, luma;
 
@@ -257,12 +257,12 @@ static void cdp1864_init_palette(double res_r, double res_g, double res_b, doubl
 
 		luma = (luma * 0xff) / 100;
 
-		palette_set_color_rgb( Machine, i, r, g, b );
+		palette_set_color_rgb( machine, i, r, g, b );
 	}
 }
 
-void cdp1864_configure(const CDP1864_interface *intf)
+void cdp1864_configure(running_machine *machine, const CDP1864_interface *intf)
 {
 	cdp1864.colorram_r = intf->colorram_r;
-	cdp1864_init_palette(intf->res_r, intf->res_g, intf->res_b, intf->res_bkg);
+	cdp1864_init_palette(machine, intf->res_r, intf->res_g, intf->res_b, intf->res_bkg);
 }

@@ -84,7 +84,7 @@ void cdp1864_dma_w(UINT8 data);
 
 void cdp1864_audio_output_enable(int value);
 
-void cdp1864_configure(const CDP1864_interface *intf);
+void cdp1864_configure(running_machine *machine, const CDP1864_interface *intf);
 
 READ8_HANDLER( cdp1864_dispon_r );
 READ8_HANDLER( cdp1864_dispoff_r );

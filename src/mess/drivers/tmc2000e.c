@@ -284,7 +284,7 @@ static DRIVER_INIT( tmc2000e )
 
 	timer_set(attotime_zero, NULL, 0, setup_beep);
 
-	cdp1864_configure(&tmc2000e_CDP1864_interface);
+	cdp1864_configure(machine, &tmc2000e_CDP1864_interface);
 }
 
 //    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     INIT        CONFIG    COMPANY        FULLNAME
