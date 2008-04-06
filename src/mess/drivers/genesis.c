@@ -70,6 +70,9 @@ static UINT16 lion2_prot1_data, lion2_prot2_data;
 static int is_rx3 = 0;
 static int is_bugsl = 0;
 static int is_sbub = 0;
+static int is_smb2 = 0;
+static int is_kof98 = 0;
+static int is_kaiju = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -197,7 +200,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -258,6 +261,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		{
 			is_ssf2 = 1;
 		}
+		is_kaiju = 1;
 		// detect the 'Romance of the Three Kingdoms - Battle of Red Cliffs' rom, already decoded from .mdx format
 		if (length == 0x200000)
 		{
@@ -334,6 +338,16 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 				is_smous = 1;
 			}
 		}
+		if (length >= 0x200000)
+		{
+			static unsigned char smb2sig[] = { 0x4e, 0xb9, 0x00, 0x0f, 0x25, 0x84};
+
+			if (!memcmp(&ROM[0xf24d6+relocate],&smb2sig[0],sizeof(smb2sig)))
+			{
+				is_smb2 = 1;
+			}
+		}
+
 		if (length == 0x200000)
 		{
 			static unsigned char smbsig[] = { 0x0c, 0x39, 0x00, 0x0c, 0x00, 0xff}; // cmpi.b  #$C,($FF1130).l
@@ -343,6 +357,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 				is_smb = 1;
 			}
 		}
+
 		if (length == 0x200000)
 		{
 			static unsigned char lionk2sig[] = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xf4};
@@ -383,7 +398,14 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 				is_sbub = 1;
 			}
 		}
-
+		if (length == 0x200000)
+		{
+			static unsigned char kof98sig[] = { 0x9b, 0xfc, 0x00, 0x00, 0x4a, 0x00};
+			if (!memcmp(&ROM[0x56ae2+relocate],&kof98sig[0],sizeof(kof98sig)))
+			{
+				is_kof98 = 1;
+			}
+		}
 	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
@@ -407,6 +429,11 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000);
 	}
 
+	if (is_kaiju)
+	{
+		memcpy(&ROM[0x400000],&ROM[0x000000],0x200000);
+		memcpy(&ROM[0x600000],&ROM[0x000000],0x200000);
+	}
 	if (is_radica)
 	{
 		memcpy(&ROM[0x400000], &ROM[0], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
@@ -550,6 +577,13 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	}
 }
 
+static WRITE16_HANDLER( g_kaiju_bank_w )
+{
+	UINT8 *ROM = memory_region(REGION_CPU1);
+	printf("%06x data %04x\n",activecpu_get_pc(), data);
+	memcpy(ROM + 0x000000, ROM + 0x400000+(data&0x7f)*0x8000, 0x8000);
+}
+
 // Soulblade handler from HazeMD
 READ16_HANDLER( soulb_0x400006_r )
 {
@@ -688,6 +722,27 @@ READ16_HANDLER( rx3_extra_r )
 	return 0xc;
 }
 
+// King of Fighters 98 handler from HazeMD
+READ16_HANDLER( g_kof98_aa_r )
+{
+	return 0xaa00;
+}
+
+READ16_HANDLER( g_kof98_0a_r )
+{
+	return 0x0a00;
+}
+
+READ16_HANDLER( g_kof98_00_r )
+{
+	return 0x0000;
+}
+
+// Super Mario Bros 2 handler from HazeMD
+READ16_HANDLER( smb2_extra_r )
+{
+	return 0xa;
+}
 
 // Bug's Life handler from HazeMD
 READ16_HANDLER( bugl_extra_r )
@@ -736,6 +791,10 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, genesis_ssf2_bank_w);
 	}
+	if (is_kaiju)
+	{
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x7fffff, 0, 0, g_kaiju_bank_w );
+	}
 
 	if (is_radica)
 	{
@@ -779,7 +838,20 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13001, 0, 0, smbro_prot_r );
 	}
+	if (is_smb2)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, smb2_extra_r);
+	}
+	if (is_kof98)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x480000, 0x480001, 0, 0, g_kof98_aa_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800e0, 0x4800e1, 0, 0, g_kof98_aa_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x4824a0, 0x4824a1, 0, 0, g_kof98_aa_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x488880, 0x488881, 0, 0, g_kof98_aa_r );
 
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x4a8820, 0x4a8821, 0, 0, g_kof98_0a_r );
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x4f8820, 0x4f8821, 0, 0, g_kof98_00_r );
+	}
 
 	if (is_elfwor)
 	{
