@@ -53,6 +53,7 @@ MESS adaptation by R. Belmont
 #include "includes/genesis.h"
 #include "devices/cartslot.h"
 #include "../../mame/drivers/megadriv.h"
+#include "cpu/m68000/m68000.h"
 
 static int is_ssf2 = 0;
 static int is_redcliff = 0;
@@ -73,6 +74,7 @@ static int is_sbub = 0;
 static int is_smb2 = 0;
 static int is_kof98 = 0;
 static int is_kaiju = 0;
+static int is_chifi3 = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -200,7 +202,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = is_chifi3 = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -368,6 +370,17 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 		if (length == 0x200000)
 		{
+			static unsigned char chifi3sig[] = { 0xb6, 0x16, 0x66, 0x00, 0x00, 0x4a};
+
+			if (!memcmp(&ROM[0x1780 + relocate],&chifi3sig[0],sizeof(chifi3sig)))
+			{
+				is_chifi3 = 1;
+			}
+		}
+
+
+		if (length == 0x200000)
+		{
 			static unsigned char lionk2sig[] = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xf4};
 
 			if (!memcmp(&ROM[0x03c2+relocate],&lionk2sig[0],sizeof(lionk2sig)))
@@ -442,10 +455,16 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		memcpy(&ROM[0x400000],&ROM[0x000000],0x200000);
 		memcpy(&ROM[0x600000],&ROM[0x000000],0x200000);
 	}
+
 	if (is_radica)
 	{
 		memcpy(&ROM[0x400000], &ROM[0], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
 		memcpy(&ROM[0x800000], &ROM[0], 0x400000); // wraparound banking (from hazemd code)
+	}
+	if (is_chifi3)
+	{
+		memcpy(ROM + 0x400000, ROM + 0x000000, 0x200000);
+		memcpy(ROM + 0x600000, ROM + 0x000000, 0x200000);
 	}
 
 
@@ -585,6 +604,110 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	}
 }
 
+
+WRITE16_HANDLER( g_chifi3_bank_w )
+{
+	UINT8 *ROM = memory_region(REGION_CPU1);
+
+	if (data==0xf100) // *hit player
+	{
+		int x;
+		for (x=0;x<0x100000;x+=0x10000)
+		{
+			memcpy(ROM + x, ROM + 0x410000, 0x10000);
+		}
+	}
+	else if (data==0xd700) // title screen..
+	{
+		int x;
+		for (x=0;x<0x100000;x+=0x10000)
+		{
+			memcpy(ROM + x, ROM + 0x470000, 0x10000);
+		}
+	}
+	else if (data==0xd300) // character hits floor
+	{
+		int x;
+		for (x=0;x<0x100000;x+=0x10000)
+		{
+			memcpy(ROM + x, ROM + 0x430000, 0x10000);
+		}
+	}
+	else if (data==0x0000)
+	{
+		int x;
+		for (x=0;x<0x100000;x+=0x10000)
+		{
+			memcpy(ROM + x, ROM + 0x400000+x, 0x10000);
+		}
+	}
+	else
+	{
+		logerror("%06x chifi3, bankw? %04x %04x\n",activecpu_get_pc(), offset,data);
+	}
+
+}
+
+READ16_HANDLER( g_chifi3_prot_r )
+{
+	UINT32 retdat;
+
+	/* not 100% correct, there may be some relationship between the reads here
+	and the writes made at the start of the game.. */
+
+	/*
+	04dc10 chifi3, prot_r? 2800
+	04cefa chifi3, prot_r? 65262
+	*/
+
+	if (activecpu_get_pc()==0x01782) // makes 'VS' screen appear
+	{
+		retdat = activecpu_get_reg(M68K_D3)&0xff;
+		retdat<<=8;
+		return retdat;
+	}
+	else if (activecpu_get_pc()==0x1c24) // background gfx etc.
+	{
+		retdat = activecpu_get_reg(M68K_D3)&0xff;
+		retdat<<=8;
+		return retdat;
+	}
+	else if (activecpu_get_pc()==0x10c4a) // unknown
+	{
+		return mame_rand(machine);
+	}
+	else if (activecpu_get_pc()==0x10c50) // unknown
+	{
+		return mame_rand(machine);
+	}
+	else if (activecpu_get_pc()==0x10c52) // relates to the game speed..
+	{
+		retdat = activecpu_get_reg(M68K_D4)&0xff;
+		retdat<<=8;
+		return retdat;
+	}
+	else if (activecpu_get_pc()==0x061ae)
+	{
+		retdat = activecpu_get_reg(M68K_D3)&0xff;
+		retdat<<=8;
+		return retdat;
+	}
+	else if (activecpu_get_pc()==0x061b0)
+	{
+		retdat = activecpu_get_reg(M68K_D3)&0xff;
+		retdat<<=8;
+		return retdat;
+	}
+	else
+	{
+		logerror("%06x chifi3, prot_r? %04x\n",activecpu_get_pc(), offset);
+	}
+
+	return 0;
+}
+
+
+// Kaiju? (Pokemon Stadium) handler from HazeMD
 static WRITE16_HANDLER( g_kaiju_bank_w )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
@@ -801,6 +924,12 @@ static DRIVER_INIT( gencommon )
 	if (is_kaiju)
 	{
 		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x7fffff, 0, 0, g_kaiju_bank_w );
+	}
+	if (is_chifi3)
+	{
+		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x4fffff, 0, 0, g_chifi3_prot_r );
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x600000, 0x6fffff, 0, 0, g_chifi3_bank_w );
+
 	}
 
 	if (is_radica)
