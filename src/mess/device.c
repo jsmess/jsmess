@@ -276,6 +276,7 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_INT_IMAGE_READABLE:		info->i = mess_device->io_device.readable;		break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:		info->i = mess_device->io_device.writeable;		break;
 		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = mess_device->io_device.creatable;		break;
+		case DEVINFO_INT_IMAGE_TYPE:			info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_TYPE); break;
 		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:	info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_MUST_BE_LOADED); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -296,6 +297,7 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_STR_VERSION:				info->s = "1.0";								break;
 		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;								break;
 		case DEVINFO_STR_CREDITS:				info->s = "Copyright the MESS Team";			break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS); break;
 	}
 }
 
@@ -357,7 +359,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 	char dynamic_tag[32];
 	device_config *device;
 	mess_device_config *mess_device;
-	const char *file_extensions;
 	int i, j, count;
 	size_t string_buffer_pos = 0;
 	int createimage_optcount;
@@ -398,24 +399,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		info_string = mess_tag;
 		mess_tag = string_buffer_putstr(mess_device->string_buffer, ARRAY_LENGTH(mess_device->string_buffer), &string_buffer_pos, info_string);
 
-		/* convert file extensions from comma delimited to null delimited */
-		file_extensions = mess_device_get_info_string(&mess_devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS);
-		if (file_extensions != NULL)
-		{
-			const char *file_extensions_copy = &mess_device->string_buffer[string_buffer_pos];
-
-			/* copy the file extensions over to the buffer */
-			for (j = 0; file_extensions[j] != '\0'; j++)
-			{
-				string_buffer_putc(mess_device->string_buffer, ARRAY_LENGTH(mess_device->string_buffer), &string_buffer_pos,
-					(file_extensions[j] != ',') ? file_extensions[j] : '\0');
-			}
-			string_buffer_putc(mess_device->string_buffer, ARRAY_LENGTH(mess_device->string_buffer), &string_buffer_pos, '\0');
-			string_buffer_putc(mess_device->string_buffer, ARRAY_LENGTH(mess_device->string_buffer), &string_buffer_pos, '\0');
-
-			file_extensions = file_extensions_copy;
-		}
-
 		/* populate the legacy MESS device */
 		mess_device->io_device.tag					= mess_tag;
 		mess_device->io_device.devconfig			= device;
@@ -423,7 +406,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		mess_device->io_device.type					= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_TYPE);
 		mess_device->io_device.position				= *position;
 		mess_device->io_device.index_in_device		= i;
-		mess_device->io_device.file_extensions		= file_extensions;
 
 		mess_device->io_device.reset_on_load		= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_RESET_ON_LOAD) ? 1 : 0;
 		mess_device->io_device.load_at_init			= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_LOAD_AT_INIT) ? 1 : 0;

@@ -36,10 +36,6 @@
 
 #define LOG_SOFTWARE	0
 
-#ifdef UNUSED_FUNCTION
-static int requested_device_type(char *tchar);
-#endif
-
 static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn);
 
 static LPCSTR SoftwareTabView_GetTabShortName(int tab);
@@ -86,7 +82,7 @@ static BOOL s_bIgnoreSoftwarePickerNotifies;
 
 struct deviceentry
 {
-	int dev_type;
+	iodevice_t dev_type;
 	const char *icon_name;
 	const char *dlgname;
 };
@@ -172,50 +168,17 @@ static const struct deviceentry s_devices[] =
 
 
 
-static void AssertValidDevice(int d)
+static const struct deviceentry *lookupdevice(iodevice_t d)
 {
-	assert((sizeof(s_devices) / sizeof(s_devices[0])) == IO_COUNT);
-	assert(((d >= 0) && (d < IO_COUNT)) || (d == IO_UNKNOWN) || (d == IO_BAD) || (d == IO_ZIP));
-}
-
-
-
-static const struct deviceentry *lookupdevice(int d)
-{
-	assert(d >= 0);
-	assert(d < IO_COUNT);
-	AssertValidDevice(d);
-	return &s_devices[d];
-}
-
-
-
-// ------------------------------------------------------------------------
-#ifdef UNUSED_FUNCTION
-static int requested_device_type(char *tchar)
-{
-	int device = -1;
 	int i;
-
-    logerror("Requested device is %s\n", tchar);
-
-	if (*tchar == '-')
+	for (i = 0; i < ARRAY_LENGTH(s_devices); i++)
 	{
-		tchar++;
-
-		for (i = 1; i < IO_COUNT; i++)
-		{
-			if (!mame_stricmp(tchar, device_typename(i)) || !mame_stricmp(tchar, device_brieftypename(i)))
-			{
-				device = i;
-				break;
-			}
-		}
+		if (s_devices[i].dev_type == d)
+			return &s_devices[i];
 	}
-
-	return device;
+	return NULL;
 }
-#endif
+
 
 
 // ------------------------------------------------------------------------
@@ -895,7 +858,7 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 {
-	int nType;
+	iodevice_t nType;
 	int nIcon;
 	int drvindex;
 	const char *icon_name;

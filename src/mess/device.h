@@ -216,7 +216,6 @@ struct IODevice
 	iodevice_t type;
 	int position;
 	int index_in_device;
-	const char *file_extensions;
 
 	/* open dispositions */
 	unsigned int readable : 1;

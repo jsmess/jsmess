@@ -375,6 +375,32 @@ static void get_device_name(const device_config *device, char *buffer, size_t bu
 
 
 /*-------------------------------------------------
+    get_device_file_extensions - retrieves the file
+	extensions used by a device
+-------------------------------------------------*/
+
+static void get_device_file_extensions(const device_config *device, char *buffer, size_t buffer_len)
+{
+	const char *file_extensions;
+	char *s;
+
+	/* be pedantic - we need room for a string list */
+	assert(buffer_len > 0);
+	buffer_len--;
+
+	/* copy the string */
+	file_extensions = device_get_info_string_offline(device, DEVINFO_STR_IMAGE_FILE_EXTENSIONS);
+	snprintf(buffer, buffer_len, "%s", (file_extensions != NULL) ? file_extensions : "");
+
+	/* convert the comma delimited list to a NUL delimited list */
+	s = buffer;
+	while((s = strchr(s, ',')) != NULL)
+		*(s++) = '\0';
+}
+
+
+
+/*-------------------------------------------------
     image_device_getinfo - returns info on a device;
 	can be called by front end code
 -------------------------------------------------*/
@@ -384,7 +410,6 @@ image_device_info image_device_getinfo(const device_config *device)
 	const struct IODevice *iodev;
 	const char *s;
 	image_device_info info;
-	int i;
 	
 	memset(&info, 0, sizeof(info));
 
@@ -400,14 +425,12 @@ image_device_info image_device_getinfo(const device_config *device)
 	/* retrieve name */
 	get_device_name(device, info.name, ARRAY_LENGTH(info.name));
 
+	/* retrieve file extensions */
+	get_device_file_extensions(device, info.file_extensions, ARRAY_LENGTH(info.file_extensions));
+
 	iodev = mess_device_from_core_device(device);
 	if (iodev != NULL)
 	{
-		/* retrieve file extensions */
-		for(i = 0; iodev->file_extensions[i] != '\0'; i += strlen(&iodev->file_extensions[i]) + 1)
-			;
-		memcpy(info.file_extensions, iodev->file_extensions, i * sizeof(info.file_extensions[0]));
-
 		/* retrieve instance name */
 		s = device_instancename(&iodev->devclass, iodev->index_in_device);
 		snprintf(info.instance_name, ARRAY_LENGTH(info.instance_name), "%s", s);
@@ -431,25 +454,26 @@ image_device_info image_device_getinfo(const device_config *device)
 int image_device_uses_file_extension(const device_config *device, const char *file_extension)
 {
 	int result = FALSE;
-	const struct IODevice *iodev;
+	const char *s;
+	char file_extension_list[256];
 	
 	/* skip initial period, if present */
 	if (file_extension[0] == '.')
 		file_extension++;
 
-	iodev = mess_device_from_core_device(device);
-	if (iodev != NULL)
+	/* retrieve file extension list */
+	get_device_file_extensions(device, file_extension_list, ARRAY_LENGTH(file_extension_list));
+
+	/* find the extensions */
+	s = file_extension_list;
+	while(!result && (*s != '\0'))
 	{
-		const char *s = iodev->file_extensions;
-		while(!result && (*s != '\0'))
+		if (!mame_stricmp(s, file_extension))
 		{
-			if (!mame_stricmp(s, file_extension))
-			{
-				result = TRUE;
-				break;
-			}
-			s += strlen(s) + 1;
+			result = TRUE;
+			break;
 		}
+		s += strlen(s) + 1;
 	}
 	return result;
 }

@@ -1353,7 +1353,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	// then set up the actual devices
 	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
 	{
-		const struct IODevice *dev = mess_device_from_core_device(img);
+		image_device_info info = image_device_getinfo(img);
 
 		new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
 		flags_for_exists = MF_STRING;
@@ -1368,13 +1368,13 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 		sub_menu = CreateMenu();
 		append_menu_uistring(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		UI_mount);
 
-		if (dev->creatable)
+		if (info.creatable)
 			append_menu_uistring(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	UI_create);
 
 		append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	UI_unmount);
 
 #if HAS_WAVE
-		if ((dev->type == IO_CASSETTE) && !strcmp(dev->file_extensions, "wav"))
+		if ((info.type == IO_CASSETTE) && !strcmp(info.file_extensions, "wav"))
 		{
 			cassette_state state;
 			state = image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED;
