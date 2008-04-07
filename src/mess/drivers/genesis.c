@@ -75,6 +75,8 @@ static int is_smb2 = 0;
 static int is_kof98 = 0;
 static int is_kaiju = 0;
 static int is_chifi3 = 0;
+static int is_realtec = 0;
+static int realtek_bank_addr=0, realtek_bank_size=0, realtek_old_bank_addr;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -202,7 +204,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = is_chifi3 = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = is_chifi3 = is_realtec = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -427,6 +429,11 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 				is_kof98 = 1;
 			}
 		}
+		if (length == 0x80000) {
+			if (!strncmp((char *)&ROM[0x7e30e + relocate],"SEGA",4)) is_realtec = 1; // Whac a Critter/mallet legend
+			if (!strncmp((char *)&ROM[0x7e100 + relocate],"SEGA",4)) is_realtec = 1; // Defend the Earth
+			if (!strncmp((char *)&ROM[0x7e1e6 + relocate],"SEGA",4)) is_realtec = 1; // Funnyworld/ballonboy
+		}
 	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
@@ -448,6 +455,16 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	{
 		memcpy(&ROM[0x800000],&ROM[0x400000],0x100000);
 		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000);
+	}
+	if (is_realtec)
+	{
+		UINT32 mirroraddr;
+		/* Realtec mapper!*/
+		UINT8 *ROM = memory_region(REGION_CPU1);
+		memcpy(&ROM[0x400000],&ROM[0x000000],0x80000);
+		for (mirroraddr = 0; mirroraddr < 0x400000;mirroraddr+=0x2000) {
+			memcpy(ROM+mirroraddr, ROM +  0x47e000, 0x002000); /* copy last 8kb across the whole rom region */
+		}
 	}
 
 	if (is_kaiju)
@@ -604,6 +621,39 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	}
 }
 
+WRITE16_HANDLER( realtec_402000_w )
+{
+	realtek_bank_addr = 0;
+	realtek_bank_size = (data>>8)&0x1f;
+}
+
+WRITE16_HANDLER( realtec_400000_w )
+{
+	int bankdata = (data >> 9) & 0x7;
+
+	UINT8 *ROM = memory_region(REGION_CPU1);
+
+	realtek_old_bank_addr = realtek_bank_addr;
+	realtek_bank_addr = (realtek_bank_addr & 0x7) | bankdata<<3;
+
+	memcpy(ROM, ROM +  (realtek_bank_addr*0x20000)+0x400000, realtek_bank_size*0x20000);
+	memcpy(ROM+ realtek_bank_size*0x20000, ROM +  (realtek_bank_addr*0x20000)+0x400000, realtek_bank_size*0x20000);
+}
+
+WRITE16_HANDLER( realtec_404000_w )
+{
+	int bankdata = (data >> 8) & 0x3;
+	UINT8 *ROM = memory_region(REGION_CPU1);
+
+	realtek_old_bank_addr = realtek_bank_addr;
+	realtek_bank_addr = (realtek_bank_addr & 0xf8)|bankdata;
+
+	if (realtek_old_bank_addr != realtek_bank_addr)
+	{
+		memcpy(ROM, ROM +  (realtek_bank_addr*0x20000)+0x400000, realtek_bank_size*0x20000);
+		memcpy(ROM+ realtek_bank_size*0x20000, ROM +  (realtek_bank_addr*0x20000)+0x400000, realtek_bank_size*0x20000);
+	}
+}
 
 WRITE16_HANDLER( g_chifi3_bank_w )
 {
@@ -978,6 +1028,14 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, smb2_extra_r);
 	}
+	if (is_realtec)
+	{
+		realtek_old_bank_addr = -1;
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, realtec_400000_w);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x402000, 0x402001, 0, 0, realtec_402000_w);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x404000, 0x404001, 0, 0, realtec_404000_w);
+	}
+
 	if (is_kof98)
 	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x480000, 0x480001, 0, 0, g_kof98_aa_r );
