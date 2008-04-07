@@ -888,6 +888,7 @@ TESTDRIVER( exeltel )
 TESTDRIVER( roma )			/* Roma							*/
 	DRIVER( roma32 )		/* Roma							*/
 
+/*********** Misc **********************************************************/
+TESTDRIVER( ex800 )
 
-	DRIVER( ex800 )
 #endif /* DRIVER_RECURSIVE */
