@@ -496,7 +496,7 @@ TESTDRIVER( ti99_232 )	/* 1983 TI 99/2 (32kb ROMs)							*/
 	/* TI 99 clones */
 	DRIVER( tutor)		/* 1983? Tomy Tutor									*/
 	DRIVER( geneve )	/* 1987? Myarc Geneve 9640							*/
-TESTDRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
+DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
 TESTDRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 
 	DRIVER( avigo )		/*													*/
@@ -881,6 +881,7 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( dallas )		/* Dallas							*/
 	DRIVER( dallas16 )		/* Dallas							*/
 	DRIVER( dallas32 )		/* Dallas							*/
+TESTDRIVER( roma )			/* Roma							*/
 	DRIVER( roma32 )		/* Roma							*/
 
 
