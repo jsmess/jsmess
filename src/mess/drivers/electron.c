@@ -27,11 +27,6 @@ Missing:
 #include "formats/uef_cas.h"
 #include "deprecat.h"
 
-static const unsigned short electron_colour_table[8]=
-{
-	0,1,2,3,4,5,6,7
-};
-
 static const rgb_t electron_palette[8]=
 {
 	MAKE_RGB(0x0ff,0x0ff,0x0ff),

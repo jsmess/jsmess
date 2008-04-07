@@ -138,10 +138,12 @@ VIDEO_UPDATE( electron )
 		}
 		break;
 	case 3:
-		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) ) {
+		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) )
 			fillbitmap( bitmap, 7, &r );
-		} else {
-			for( i = 0; i < 80; i++ ) {
+		else
+		{
+			for( i = 0; i < 80; i++ )
+			{
 				UINT8 pattern = read_vram( ula.screen_addr + i * 8 );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>6)&1] );
@@ -153,10 +155,9 @@ VIDEO_UPDATE( electron )
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)&1] );
 			}
 			ula.screen_addr += 1;
-			if ( ( scanline & 0x07 ) == 7 ) {
-				ula.screen_addr += ( 0x280 - 8 );
-			}
 		}
+
+		if ( scanline % 10 == 9 ) ula.screen_addr += ( 0x280 - 8 );
 		break;
 	case 4:
 	case 7:
