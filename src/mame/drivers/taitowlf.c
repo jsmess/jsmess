@@ -85,24 +85,24 @@ static VIDEO_UPDATE(taitowlf)
 	return 0;
 }
 
-static READ8_HANDLER(at_dma8237_2_r)
+static READ8_DEVICE_HANDLER(at_dma8237_2_r)
 {
-	return dma8237_r((device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2);
+	return dma8237_r(device, offset / 2);
 }
 
-static WRITE8_HANDLER(at_dma8237_2_w)
+static WRITE8_DEVICE_HANDLER(at_dma8237_2_w)
 {
-	dma8237_w((device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2, data);
+	dma8237_w(device, offset / 2, data);
 }
 
-static READ32_HANDLER(at32_dma8237_2_r)
+static READ32_DEVICE_HANDLER(at32_dma8237_2_r)
 {
-	return read32le_with_read8_handler(at_dma8237_2_r, machine, offset, mem_mask);
+	return read32le_with_read8_device_handler(at_dma8237_2_r, device, offset, mem_mask);
 }
 
-static WRITE32_HANDLER(at32_dma8237_2_w)
+static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
 {
-	write32le_with_write8_handler(at_dma8237_2_w, machine, offset, data, mem_mask);
+	write32le_with_write8_device_handler(at_dma8237_2_w, device, offset, data, mem_mask);
 }
 
 
@@ -442,7 +442,7 @@ static ADDRESS_MAP_START(taitowlf_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
 	AM_RANGE(0x00a0, 0x00bf) AM_READWRITE(pic8259_32le_1_r,			pic8259_32le_1_w)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE(at32_dma8237_2_r,			at32_dma8237_2_w)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide0_r, ide0_w)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
