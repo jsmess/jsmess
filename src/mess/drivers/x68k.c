@@ -1951,6 +1951,9 @@ static MACHINE_START( x68000 )
 	timer_adjust_periodic(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(1));  // a guess for now
 	sys.mouse.inputtype = 0;
 
+	nec765_init(&fdc_interface,NEC72065,NEC765_RDY_PIN_CONNECTED);
+	nec765_reset(0);
+
 	x68k_mfp = devtag_get_token(machine, MC68901, "mfp");
 }
 
@@ -1978,15 +1981,13 @@ static DRIVER_INIT( x68000 )
 	// copy last half of BIOS to a user region, to use for inital startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
+	memset(&sys,0,sizeof(sys));
+
 	ppi8255_init(&ppi_interface);
-	nec765_init(&fdc_interface,NEC72065,NEC765_RDY_PIN_CONNECTED);
 	hd63450_init(&dmac_interface);
-	nec765_reset(0);
 	mfp_init();
 	scc_init(&scc_interface);
 	rp5c15_init(machine, &rtc_intf);
-
-	memset(&sys,0,sizeof(sys));
 
 	cpunum_set_irq_callback(0, x68k_int_ack);
 
