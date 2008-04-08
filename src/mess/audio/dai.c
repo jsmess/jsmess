@@ -50,6 +50,7 @@ static void *dai_sh_start(int clock, const struct CustomSound_interface *config)
 
 static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
 {
+	device_config *pit8253 = (device_config*)device_list_find_by_tag( Machine->config->devicelist, PIT8253, "pit8253" );
 	INT16 channel_0_signal;
 	INT16 channel_1_signal;
 	INT16 channel_2_signal;
@@ -65,13 +66,13 @@ static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t 
 	stream_sample_t *sample_left = buffer[0];
 	stream_sample_t *sample_right = buffer[1];
 
-	channel_0_baseclock = pit8253_get_frequency(0, 0);
-	channel_1_baseclock = pit8253_get_frequency(0, 1);
-	channel_2_baseclock = pit8253_get_frequency(0, 2);
+	channel_0_baseclock = pit8253_get_frequency(pit8253, 0);
+	channel_1_baseclock = pit8253_get_frequency(pit8253, 1);
+	channel_2_baseclock = pit8253_get_frequency(pit8253, 2);
 
-	channel_0_signal = pit8253_get_output (0,0) ? dai_osc_volume_table[dai_osc_volume[0]] : -dai_osc_volume_table[dai_osc_volume[0]];
-	channel_1_signal = pit8253_get_output (0,1) ? dai_osc_volume_table[dai_osc_volume[1]] : -dai_osc_volume_table[dai_osc_volume[1]];
-	channel_2_signal = pit8253_get_output (0,2) ? dai_osc_volume_table[dai_osc_volume[2]] : -dai_osc_volume_table[dai_osc_volume[2]];
+	channel_0_signal = pit8253_get_output (pit8253,0) ? dai_osc_volume_table[dai_osc_volume[0]] : -dai_osc_volume_table[dai_osc_volume[0]];
+	channel_1_signal = pit8253_get_output (pit8253,1) ? dai_osc_volume_table[dai_osc_volume[1]] : -dai_osc_volume_table[dai_osc_volume[1]];
+	channel_2_signal = pit8253_get_output (pit8253,2) ? dai_osc_volume_table[dai_osc_volume[2]] : -dai_osc_volume_table[dai_osc_volume[2]];
 
 
 	while (length--)
