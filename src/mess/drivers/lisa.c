@@ -243,7 +243,7 @@ ROM_START( macxl )
 #endif
 
 	ROM_REGION(0x100,REGION_GFX1, 0)		/* video ROM (includes S/N) ; no dump known, although Lisa ROM works fine at our level of emulation */
-	ROM_LOAD( "vidstatem.rom", 0x00, 0x100, NO_DUMP)
+	ROM_LOAD( "vidstatem.rom", 0x00, 0x100, BAD_DUMP CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
 
