@@ -92,7 +92,6 @@ enum
 
 struct IODevice;
 
-typedef int (*device_image_verify_func)(const UINT8 *buf, size_t size);
 typedef void (*device_getdispositions_func)(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
 typedef const char *(*device_getname_func)(const struct IODevice *dev, int id, char *buf, size_t bufsize);
 
@@ -227,8 +226,6 @@ struct IODevice
 	/* image handling callbacks */
 	device_start_func start;
 	device_stop_func stop;
-	int (*imgverify)(const UINT8 *buf, size_t size);
-	device_image_partialhash_func partialhash;
 
 	/* image creation options */
 	const struct OptionGuide *createimage_optguide;

@@ -234,6 +234,7 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = mess_device->io_device.creatable;		break;
 		case DEVINFO_INT_IMAGE_TYPE:			info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_TYPE); break;
 		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:	info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_MUST_BE_LOADED); break;
+		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:	info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_RESET_ON_LOAD); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:				/* Nothing */									break;
@@ -243,6 +244,7 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_FCT_IMAGE_LOAD:			info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_LOAD); break;
 		case DEVINFO_FCT_IMAGE_CREATE:			info->f	= mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_UNLOAD); break;
+		case DEVINFO_FCT_IMAGE_VERIFY:			info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_VERIFY); break;
 		case DEVINFO_FCT_DISPLAY:				info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_DISPLAY); break;
 		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:	info->f = mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_PARTIAL_HASH); break;
 		case DEVINFO_FCT_GET_NAME:				info->f = (genf *) DEVICE_GET_NAME_NAME(mess_device);	break;
@@ -370,8 +372,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 
 		mess_device->io_device.start				= (device_start_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_START);
 		mess_device->io_device.stop					= (device_stop_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_STOP);
-		mess_device->io_device.imgverify			= (device_image_verify_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_VERIFY);
-		mess_device->io_device.partialhash			= (device_image_partialhash_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_PARTIAL_HASH);
 
 		mess_device->io_device.createimage_optguide	= (const struct OptionGuide *) mess_device_get_info_ptr(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE_OPTGUIDE);
 

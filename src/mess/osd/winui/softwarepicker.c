@@ -455,7 +455,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 	// set up device and CRC, if specified
 	pInfo->device = device;
-	if ((device != NULL) && (mess_device_from_core_device(device)->partialhash != NULL))
+	if ((device != NULL) && (image_device_getinfo(pPickerInfo->pConfig, device).has_partial_hash != 0))
 		nCrc = 0;
 	if (nCrc != 0)
 		snprintf(pInfo->szHash, sizeof(pInfo->szHash) / sizeof(pInfo->szHash[0]), "c:%08x#", nCrc);

@@ -34,11 +34,13 @@ struct _image_slot_data
 	/* variables that persist across image mounts */
 	object_pool *mempool;
 	const device_config *dev;
+	image_device_info info;
 
 	/* callbacks */
 	device_image_load_func load;
 	device_image_create_func create;
 	device_image_unload_func unload;
+	device_image_verify_func verify;
 
 	/* error related info */
 	image_error_t err;
@@ -213,12 +215,14 @@ void image_init(running_machine *machine)
 		slot->mempool = pool_alloc(memory_error);
 
 		/* setup the device */
-		machine->images_data->slots[indx].dev = dev;
+		slot->dev = dev;
+		slot->info = image_device_getinfo(machine->config, dev);
 
 		/* callbacks */
 		slot->load = (device_image_load_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_LOAD);
 		slot->create = (device_image_create_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_CREATE);
 		slot->unload = (device_image_unload_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_UNLOAD);
+		slot->verify = (device_image_verify_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_VERIFY);
 
 		indx++;
 	}
@@ -469,6 +473,8 @@ image_device_info image_device_getinfo(const machine_config *config, const devic
 	info.writeable = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_WRITEABLE) ? 1 : 0;
 	info.creatable = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_CREATABLE) ? 1 : 0;
 	info.must_be_loaded = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_MUST_BE_LOADED) ? 1 : 0;
+	info.reset_on_load = device_get_info_int_offline(device, DEVINFO_INT_IMAGE_RESET_ON_LOAD) ? 1 : 0;
+	info.has_partial_hash = device_get_info_fct_offline(device, DEVINFO_FCT_IMAGE_PARTIAL_HASH) ? 1 : 0;
 
 	/* retrieve name */
 	get_device_name(device, info.name, ARRAY_LENGTH(info.name));
@@ -832,26 +838,16 @@ static image_error_t load_image_by_path(image_slot_data *image, const char *soft
 
 static void determine_open_plan(image_slot_data *image, int is_create, UINT32 *open_plan)
 {
-	unsigned int readable, writeable, creatable;
 	int i = 0;
-	const struct IODevice *iodev;
-
-	/* access legacy MESS device */
-	iodev = mess_device_from_core_device(image->dev);
-
-	/* determine disposition */
-	readable = iodev->readable;
-	writeable = iodev->writeable;
-	creatable = iodev->creatable;
 
 	/* emit flags */
-	if (!is_create && readable && writeable)
+	if (!is_create && image->info.readable && image->info.writeable)
 		open_plan[i++] = OPEN_FLAG_READ | OPEN_FLAG_WRITE;
-	if (!is_create && !readable && writeable)
+	if (!is_create && !image->info.readable && image->info.writeable)
 		open_plan[i++] = OPEN_FLAG_WRITE;
-	if (!is_create && readable)
+	if (!is_create && image->info.readable)
 		open_plan[i++] = OPEN_FLAG_READ;
-	if (writeable && creatable)
+	if (image->info.writeable && image->info.creatable)
 		open_plan[i++] = OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE;
 	open_plan[i] = 0;
 }
@@ -896,7 +892,6 @@ static int image_load_internal(const device_config *image, const char *path,
 	UINT32 open_plan[4];
 	int i;
 	image_slot_data *slot = find_image_slot(image);
-	const struct IODevice *iodev = mess_device_from_core_device(image);
 
 	/* sanity checks */
 	assert_always(image != NULL, "image_load(): image is NULL");
@@ -914,7 +909,7 @@ static int image_load_internal(const device_config *image, const char *path,
 		goto done;
 
 	/* do we need to reset the CPU? */
-	if ((attotime_compare(timer_get_time(), attotime_zero) > 0) && iodev->reset_on_load)
+	if ((attotime_compare(timer_get_time(), attotime_zero) > 0) && slot->info.reset_on_load)
 		mame_schedule_hard_reset(machine);
 
 	/* determine open plan */
@@ -953,7 +948,7 @@ static int image_load_internal(const device_config *image, const char *path,
 	}
 
 	/* if applicable, call device verify */
-	if (iodev->imgverify && !image_has_been_created(image))
+	if ((slot->verify != NULL) && !image_has_been_created(image))
 	{
 		/* access the memory */
 		buffer = image_ptr(image);
@@ -964,7 +959,7 @@ static int image_load_internal(const device_config *image, const char *path,
 		}
 
 		/* verify the file */
-		err = iodev->imgverify(buffer, core_fsize(slot->file));
+		err = (*slot->verify)(buffer, core_fsize(slot->file));
 		if (err)
 		{
 			slot->err = IMAGE_ERROR_INVALIDIMAGE;
@@ -1226,8 +1221,8 @@ static void run_hash(const device_config *image,
 static int image_checkhash(image_slot_data *image)
 {
 	const game_driver *drv;
-	const struct IODevice *dev;
 	char hash_string[HASH_BUF_SIZE];
+	device_image_partialhash_func partialhash;
 	int rc;
 
 	/* this call should not be made when the image is not loaded */
@@ -1236,15 +1231,15 @@ static int image_checkhash(image_slot_data *image)
 	/* only calculate CRC if it hasn't been calculated, and the open_mode is read only */
 	if (!image->hash && !image->writeable && !image->created)
 	{
-		/* initialize key variables */
-		dev = mess_device_from_core_device(image->dev);
-
 		/* do not cause a linear read of 600 megs please */
 		/* TODO: use SHA/MD5 in the CHD header as the hash */
-		if (dev->type == IO_CDROM)
+		if (image->info.type == IO_CDROM)
 			return FALSE;
 
-		run_hash(image->dev, dev->partialhash, hash_string, HASH_CRC | HASH_MD5 | HASH_SHA1);
+		/* retrieve the partial hash func */
+		partialhash = (device_image_partialhash_func) device_get_info_fct_offline(image->dev, DEVINFO_FCT_IMAGE_PARTIAL_HASH);
+
+		run_hash(image->dev, partialhash, hash_string, HASH_CRC | HASH_MD5 | HASH_SHA1);
 
 		image->hash = image_strdup(image->dev, hash_string);
 

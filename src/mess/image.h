@@ -25,6 +25,7 @@
 typedef int (*device_image_load_func)(const device_config *image);
 typedef int (*device_image_create_func)(const device_config *image, int format_type, option_resolution *format_options);
 typedef void (*device_image_unload_func)(const device_config *image);
+typedef int (*device_image_verify_func)(const UINT8 *buf, size_t size);
 typedef void (*device_display_func)(const device_config *image);
 typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
 typedef const char *(*device_get_name_func)(const device_config *device, char *buffer, size_t buffer_length);
@@ -72,6 +73,8 @@ struct _image_device_info
 	unsigned int writeable : 1;
 	unsigned int creatable : 1;
 	unsigned int must_be_loaded : 1;
+	unsigned int reset_on_load : 1;
+	unsigned int has_partial_hash : 1;
 	char name[62];
 	char file_extensions[32];
 	char instance_name[32];
@@ -92,6 +95,7 @@ enum
 	DEVINFO_INT_IMAGE_WRITEABLE,
 	DEVINFO_INT_IMAGE_CREATABLE,
 	DEVINFO_INT_IMAGE_MUST_BE_LOADED,
+	DEVINFO_INT_IMAGE_RESET_ON_LOAD,
 	DEVINFO_INT_IMAGE_LAST = DEVINFO_INT_IMAGE_FIRST + 0x0fff,
 
 	/* --- the following bits of info are returned as pointers to functions --- */
@@ -99,6 +103,7 @@ enum
 	DEVINFO_FCT_IMAGE_LOAD,										/* R/O: device_image_load_func */
 	DEVINFO_FCT_IMAGE_CREATE,									/* R/O: device_image_create_func */
 	DEVINFO_FCT_IMAGE_UNLOAD,									/* R/O: device_image_unload_func */
+	DEVINFO_FCT_IMAGE_VERIFY,									/* R/O: device_image_verify_func */
 	DEVINFO_FCT_DISPLAY,										/* R/O: device_display_func */
 	DEVINFO_FCT_IMAGE_PARTIAL_HASH,								/* R/O: device_image_partialhash_func */
 	DEVINFO_FCT_GET_NAME,										/* R/O: device_get_name_func */
