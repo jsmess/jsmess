@@ -278,7 +278,7 @@ ROM_END
 
 ROM_START( famitwin )
     ROM_REGION( 0x10000, REGION_CPU1,0 )  /* Main RAM + program banks */
-    ROM_LOAD_OPTIONAL ("disksys.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1))
+    ROM_LOAD_OPTIONAL ("disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1))
 
     ROM_REGION( 0x2000,  REGION_GFX1,0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
