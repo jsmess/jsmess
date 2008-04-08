@@ -773,12 +773,7 @@ static OPBASE_HANDLER(mato_opbaseoverride)
 
 static void pmd85_common_driver_init (running_machine *machine)
 {
-	device_config *pit8253 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
 	memory_set_opbase_handler(0, pmd85_opbaseoverride);
-
-	pit8253_gate_w(pit8253, 0, 1);
-	pit8253_gate_w(pit8253, 1, 1);
-	pit8253_gate_w(pit8253, 2, 1);
 
 	msm8251_init(&pmd85_msm8251_interface);
 
@@ -831,6 +826,16 @@ DRIVER_INIT ( mato )
 	memory_set_opbase_handler(0, mato_opbaseoverride);
 }
 
+
+static TIMER_CALLBACK( setup_pit8253_gates ) {
+	device_config *pit8253 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
+
+	pit8253_gate_w(pit8253, 0, 1);
+	pit8253_gate_w(pit8253, 1, 1);
+	pit8253_gate_w(pit8253, 2, 1);
+}
+
+
 MACHINE_RESET( pmd85 )
 {
 	/* checking for Rom Module */
@@ -863,4 +868,6 @@ MACHINE_RESET( pmd85 )
 		case MATO:
 			break;
 	}
+
+	timer_set( attotime_zero, NULL, 0, setup_pit8253_gates );
 }
