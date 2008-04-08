@@ -864,6 +864,12 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	/* Exeltel */
 TESTDRIVER( exeltel )	
 
+	/* Cybiko */
+TESTDRIVER( cybikov1 )
+TESTDRIVER( cybikov2 )
+TESTDRIVER( cybikoxt )
+
+
 
 /****************Games*******************************************************/
 	/* Computer Electronic */
