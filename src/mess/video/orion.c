@@ -15,7 +15,8 @@ VIDEO_START( orion128 )
 }
  
 extern UINT8 orion128_video_mode;
-extern UINT8 orion128_video_page; 
+extern UINT8 orion128_video_page;
+extern UINT8 orion128_video_width;  
 
 VIDEO_UPDATE( orion128 )
 {
@@ -24,7 +25,7 @@ VIDEO_UPDATE( orion128 )
 		
 	int part1addr = (3-orion128_video_page) * 0x4000;
 	int part2addr = (3-orion128_video_page) * 0x4000 + 0x10000;			
-	for (x = 0; x < 48; x++)
+	for (x = 0; x < orion128_video_width; x++)
 	{			
 		for (y = 0; y < 256; y++)
 		{
@@ -74,4 +75,5 @@ PALETTE_INIT( orion128 )
 {
 	palette_set_colors(machine, 0, orion128_palette, ARRAY_LENGTH(orion128_palette));
 }
+
 

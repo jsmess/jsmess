@@ -14,11 +14,17 @@
 #include "machine/8255ppi.h"
 #include "machine/wd17xx.h"
 
+#define SCREEN_WIDTH_384 48
+#define SCREEN_WIDTH_480 60
+#define SCREEN_WIDTH_512 64
+
 UINT8 romdisk_lsb,romdisk_msb;
 UINT8 orion_keyboard_line;
 UINT8 orion128_video_mode;
 UINT8 orion128_video_page;
 UINT8 orion128_memory_page;
+
+UINT8 orion128_video_width;
 
 UINT8 orionz80_memory_page;
 UINT8 orionz80_dispatcher;
@@ -111,14 +117,34 @@ WRITE8_HANDLER ( orion128_romdisk_w )
 	ppi8255_0_w(machine, offset & 3, data);	
 }
 
+void orion_set_video_mode(running_machine *machine, int width) {
+		rectangle visarea;
+		
+		visarea.min_x = 0;
+		visarea.min_y = 0;
+		visarea.max_x = width-1;
+		visarea.max_y = 255;				
+		video_screen_configure(machine->primary_screen, width, 256, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);	
+}
+
 WRITE8_HANDLER ( orion128_video_mode_w )
-{	
-	orion128_video_mode = data;
+{			
+	orion128_video_mode = data & 7;
 }
 
 WRITE8_HANDLER ( orion128_video_page_w )
 {	
-	//logerror("orion128_video_page_w %02x\n",data);
+	if ((data & 0x80)==0x80) {
+		if (orion128_video_width != SCREEN_WIDTH_480) {
+				orion128_video_width = SCREEN_WIDTH_480;		
+				orion_set_video_mode(machine,480);		
+		}		
+	} else {		
+		if (orion128_video_width != SCREEN_WIDTH_384) {
+				orion128_video_width = SCREEN_WIDTH_384;
+				orion_set_video_mode(machine,384);
+		}		
+	}		
 	orion128_video_page = data & 3;
 }
 
@@ -141,6 +167,8 @@ MACHINE_RESET ( orion128 )
 	orion128_memory_page = -1;
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0xf800);
 	memory_set_bankptr(2, mess_ram + 0xf000);
+	orion128_video_width = SCREEN_WIDTH_384;
+	orion_set_video_mode(machine,384);
 }
 
 
@@ -211,7 +239,7 @@ WRITE8_HANDLER ( orion128_floppy_w )
 
 DRIVER_INIT( orionz80 )
 {
-	memset(mess_ram,0,512*1024);
+	memset(mess_ram,0,512*1024);	
 }
 
 
@@ -268,7 +296,7 @@ void orionz80_switch_bank(void)
 
 WRITE8_HANDLER ( orionz80_memory_page_w )
 {	
-	orionz80_memory_page = data;
+	orionz80_memory_page = data & 7;
 	orionz80_switch_bank();
 }
 
@@ -315,5 +343,7 @@ MACHINE_RESET ( orionz80 )
 	orion128_video_mode = 0;
 	orionz80_memory_page = 0;
 	orionz80_dispatcher = 0;
+	orion128_video_width = SCREEN_WIDTH_384;
+	orion_set_video_mode(machine,384);
 }
 
