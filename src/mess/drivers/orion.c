@@ -10,8 +10,11 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/orion.h"
+#include "machine/mc146818.h"
 #include "devices/basicdsk.h"
-  
+#include "sound/ay8910.h"
+#include "sound/speaker.h"
+
 /* Address maps */
 static ADDRESS_MAP_START(orion128_mem, ADDRESS_SPACE_PROGRAM, 8)		
 	  AM_RANGE( 0x0000, 0xefff ) AM_RAMBANK(1)	  
@@ -30,7 +33,7 @@ static ADDRESS_MAP_START( orion128_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0xf8, 0xf8) AM_WRITE ( orion128_video_mode_w )
 	AM_RANGE( 0xf9, 0xf9) AM_WRITE ( orion128_memory_page_w )
-	AM_RANGE( 0xfa, 0xfa) AM_WRITE ( orion128_video_page_w )	
+	AM_RANGE( 0xfa, 0xfa) AM_WRITE ( orion128_video_page_w )		
 ADDRESS_MAP_END
 
 
@@ -45,13 +48,7 @@ ADDRESS_MAP_END
 
   
 static ADDRESS_MAP_START( orionz80_io , ADDRESS_SPACE_IO, 8)
-  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0xf8, 0xf8) AM_WRITE ( orion128_video_mode_w )
-	AM_RANGE( 0xf9, 0xf9) AM_WRITE ( orionz80_memory_page_w )
-	AM_RANGE( 0xfa, 0xfa) AM_WRITE ( orion128_video_page_w )	
-	AM_RANGE( 0xfb, 0xfb) AM_WRITE ( orionz80_dispatcher_w )	
-	AM_RANGE( 0xff, 0xff) AM_WRITE ( orionz80_sound_w )	
+    AM_RANGE( 0x0000, 0xffff) AM_READWRITE ( orionz80_io_r, orionz80_io_w )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -277,14 +274,20 @@ static MACHINE_DRIVER_START( orion128 )
     MDRV_VIDEO_UPDATE(orion128)       
 MACHINE_DRIVER_END
 
+static const struct AY8910interface orionz80_ay_interface =
+{
+	NULL
+};
+
 static MACHINE_DRIVER_START( orionz80 )
     MDRV_CPU_ADD(Z80, 2500000)
     MDRV_CPU_PROGRAM_MAP(orionz80_mem, 0) 
     MDRV_CPU_IO_MAP(orionz80_io, 0)
+    MDRV_CPU_VBLANK_INT("main",orionz80_interrupt)
     
     MDRV_MACHINE_START( orionz80 )
     MDRV_MACHINE_RESET( orionz80 )
- 		
+	
     /* video hardware */    	
 		MDRV_SCREEN_ADD("main", RASTER)      	
 		MDRV_SCREEN_REFRESH_RATE(50)
@@ -297,7 +300,18 @@ static MACHINE_DRIVER_START( orionz80 )
 		MDRV_PALETTE_INIT( orion128 )
 		    
 		MDRV_VIDEO_START(orion128)
-    MDRV_VIDEO_UPDATE(orion128)       
+    	MDRV_VIDEO_UPDATE(orion128)    
+    	  
+    	MDRV_NVRAM_HANDLER( mc146818 ) 
+    	
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	//MDRV_SOUND_ADD(WAVE, 0)
+	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)    	
+	MDRV_SOUND_ADD(AY8912, 1773400)
+	MDRV_SOUND_CONFIG(orionz80_ay_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
 MACHINE_DRIVER_END
 
 

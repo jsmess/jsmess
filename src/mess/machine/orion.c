@@ -11,8 +11,11 @@
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
 #include "devices/basicdsk.h"
+#include "machine/mc146818.h"
 #include "machine/8255ppi.h"
 #include "machine/wd17xx.h"
+#include "sound/speaker.h"
+#include "sound/ay8910.h"
 
 #define SCREEN_WIDTH_384 48
 #define SCREEN_WIDTH_480 60
@@ -94,7 +97,7 @@ DRIVER_INIT( orion128 )
 MACHINE_START( orion128 )
 {
 	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
-	wd17xx_set_density (DEN_FM_HI);
+	wd17xx_set_density (DEN_FM_HI);	
 }
 
 READ8_HANDLER ( orion128_system_r ) 
@@ -129,23 +132,33 @@ void orion_set_video_mode(running_machine *machine, int width) {
 
 WRITE8_HANDLER ( orion128_video_mode_w )
 {			
-	orion128_video_mode = data & 7;
+	if ((data & 0x80)!=(orion128_video_mode & 0x80)) {
+		if ((data & 0x80)==0x80) {
+			orion128_video_width = SCREEN_WIDTH_480;		
+			orion_set_video_mode(machine,480);		
+		} else {
+			orion128_video_width = SCREEN_WIDTH_384;
+			orion_set_video_mode(machine,384);
+		}
+	}				
+	
+	orion128_video_mode = data;
 }
 
 WRITE8_HANDLER ( orion128_video_page_w )
 {	
-	if ((data & 0x80)==0x80) {
-		if (orion128_video_width != SCREEN_WIDTH_480) {
+	if (orion128_video_page != data) {
+		if ((data & 0x80)!=(orion128_video_page & 0x80)) {
+			if ((data & 0x80)==0x80) {
 				orion128_video_width = SCREEN_WIDTH_480;		
 				orion_set_video_mode(machine,480);		
-		}		
-	} else {		
-		if (orion128_video_width != SCREEN_WIDTH_384) {
+			} else {
 				orion128_video_width = SCREEN_WIDTH_384;
 				orion_set_video_mode(machine,384);
-		}		
-	}		
-	orion128_video_page = data & 3;
+			}
+		}				
+	}
+	orion128_video_page = data;
 }
 
 
@@ -215,7 +228,7 @@ READ8_HANDLER ( orion128_floppy_r )
 		case 0x12 : return wd17xx_sector_r(machine,0);
 		case 0x3  :
 		case 0x13 : return wd17xx_data_r(machine,0);
-	}
+	}	
 	return 0xff;
 }
 
@@ -235,6 +248,23 @@ WRITE8_HANDLER ( orion128_floppy_w )
 		case 0x20 : orion_disk_control_w(machine, offset, data);break;
 	}
 }
+READ8_HANDLER ( orionz80_floppy_rtc_r )
+{	
+	if ((offset >= 0x60) && (offset <= 0x6f)) {
+		return mc146818_port_r(machine,offset-0x60);
+	} else { 
+		return orion128_floppy_r(machine,offset);
+	}	
+}
+
+WRITE8_HANDLER ( orionz80_floppy_rtc_w )
+{		
+	if ((offset >= 0x60) && (offset <= 0x6f)) {
+		return mc146818_port_w(machine,offset-0x60,data);
+	} else { 
+		return orion128_floppy_w(machine,offset,data);
+	}	
+}
 
 
 DRIVER_INIT( orionz80 )
@@ -247,7 +277,20 @@ MACHINE_START( orionz80 )
 {
 	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
 	wd17xx_set_density (DEN_FM_HI);
+	mc146818_init(MC146818_IGNORE_CENTURY);
 }
+
+
+WRITE8_HANDLER ( orionz80_sound_w )
+{	
+	speaker_level_w(0,data);
+}
+
+WRITE8_HANDLER ( orionz80_sound_fe_w )
+{	
+	speaker_level_w(0,(data>>4) & 0x01);
+}
+
 
 WRITE8_HANDLER ( orionz80_memory_page_w );
 WRITE8_HANDLER ( orionz80_dispatcher_w );
@@ -272,16 +315,17 @@ void orionz80_switch_bank(void)
 	if ((orionz80_dispatcher & 0x20) == 0) {
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orion128_floppy_w);	
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_w);	
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orion128_floppy_r);	
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_r);	
 		
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xffff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfeff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 		
 		memory_set_bankptr(3, mess_ram + 0xf000);				
 		memory_set_bankptr(5, memory_region(REGION_CPU1) + 0xf800);		
@@ -306,11 +350,6 @@ WRITE8_HANDLER ( orionz80_dispatcher_w )
 	orionz80_switch_bank();
 }
 
-WRITE8_HANDLER ( orionz80_sound_w )
-{	
-//	logerror("orionz80_sound_w %02x\n",data);
-}
-
 MACHINE_RESET ( orionz80 ) 
 {	
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
@@ -319,16 +358,17 @@ MACHINE_RESET ( orionz80 )
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orion128_floppy_w);	
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_w);	
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orion128_floppy_r);	
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_r);	
 	
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xffff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfeff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 	
 	
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0xf800);		
@@ -347,3 +387,36 @@ MACHINE_RESET ( orionz80 )
 	orion_set_video_mode(machine,384);
 }
 
+INTERRUPT_GEN( orionz80_interrupt ) 
+{
+	if ((orionz80_dispatcher & 0x40)==0x40) {
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);	
+		speaker_level_w(0,0);
+	}	
+}
+
+READ8_HANDLER ( orionz80_io_r ) {
+	if (offset == 0xFFFD) {
+		return AY8910_read_port_0_r (machine, 0);
+	}
+	return 0xff;
+}
+
+WRITE8_HANDLER ( orionz80_io_w ) {
+	switch (offset & 0xff) {
+		case 0xf8 : orion128_video_mode_w(machine,0,data);break;
+		case 0xf9 : orionz80_memory_page_w(machine,0,data);break;
+		case 0xfa : orion128_video_page_w(machine,0,data);break;
+		case 0xfb : orionz80_dispatcher_w(machine,0,data);break;
+		case 0xfe : orionz80_sound_fe_w(machine,0,data);break;
+		case 0xff : orionz80_sound_w(machine,0,data);break;
+	}
+	switch(offset) {
+		case 0xfffd : AY8910_control_port_0_w(machine, 0, data);
+					  break;
+		case 0xbffd :
+		case 0xbefd : AY8910_write_port_0_w(machine, 0, data);
+		 			  break;		
+	}
+}
+      

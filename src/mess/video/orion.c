@@ -23,8 +23,8 @@ VIDEO_UPDATE( orion128 )
 	UINT8 code1,code2,color;
 	int y, x,b;
 		
-	int part1addr = (3-orion128_video_page) * 0x4000;
-	int part2addr = (3-orion128_video_page) * 0x4000 + 0x10000;			
+	int part1addr = (3-(orion128_video_page & 3)) * 0x4000;
+	int part2addr = (3-(orion128_video_page & 3)) * 0x4000 + 0x10000;			
 	for (x = 0; x < orion128_video_width; x++)
 	{			
 		for (y = 0; y < 256; y++)
@@ -34,7 +34,7 @@ VIDEO_UPDATE( orion128 )
 			color = 0;
 			for (b = 7; b >= 0; b--)			
 			{								
-				switch(orion128_video_mode) {
+				switch(orion128_video_mode & 7) {
 					case 0 : color = ((code1 >> b) & 0x01) ? 10 : 0; break;
 					case 1 : color = ((code1 >> b) & 0x01) ? 17 : 16; break;
 					case 4 : 
