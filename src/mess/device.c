@@ -130,50 +130,6 @@ iodevice_t device_typeid(const char *name)
 
 
 
-static const char *internal_device_instancename(const mess_device_class *devclass, int id,
-	UINT32 base, const char *(*get_dev_typename)(iodevice_t))
-{
-	iodevice_t type;
-	int count;
-	const char *result;
-	char *s;
-
-	/* retrieve info about the device instance */
-	result = mess_device_get_info_string(devclass, base + id);
-	if (!result)
-	{
-		/* not specified? default to device names based on the device type */
-		type = (iodevice_t) (int) mess_device_get_info_int(devclass, MESS_DEVINFO_INT_TYPE);
-		count = (int) mess_device_get_info_int(devclass, MESS_DEVINFO_INT_COUNT);
-		result = get_dev_typename(type);
-
-		/* need to number if there is more than one device */
-		if (count > 1)
-		{
-			s = device_temp_str();
-			sprintf(s, "%s%d", result, id + 1);
-			result = s;
-		}
-	}
-	return result;
-}
-
-
-
-const char *device_instancename(const mess_device_class *devclass, int id)
-{
-	return internal_device_instancename(devclass, id, MESS_DEVINFO_STR_NAME, device_typename);
-}
-
-
-
-const char *device_briefinstancename(const mess_device_class *devclass, int id)
-{
-	return internal_device_instancename(devclass, id, MESS_DEVINFO_STR_SHORT_NAME, device_brieftypename);
-}
-
-
-
 /*************************************
  *
  *	Device structure construction and destruction
@@ -298,6 +254,8 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;								break;
 		case DEVINFO_STR_CREDITS:				info->s = "Copyright the MESS Team";			break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS); break;
+		case DEVINFO_STR_IMAGE_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_NAME); break;
+		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_SHORT_NAME); break;
 	}
 }
 

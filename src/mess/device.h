@@ -187,9 +187,6 @@ INLINE char *device_temp_str(void)
 	return cpuintrf_temp_str();
 }
 
-const char *device_instancename(const mess_device_class *devclass, int id);
-const char *device_briefinstancename(const mess_device_class *devclass, int id);
-
 
 
 /*************************************

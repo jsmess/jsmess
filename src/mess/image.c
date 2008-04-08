@@ -379,7 +379,8 @@ static void get_device_name(const device_config *device, char *buffer, size_t bu
 	extensions used by a device
 -------------------------------------------------*/
 
-static void get_device_file_extensions(const device_config *device, char *buffer, size_t buffer_len)
+static void get_device_file_extensions(const device_config *device,
+	char *buffer, size_t buffer_len)
 {
 	const char *file_extensions;
 	char *s;
@@ -401,14 +402,57 @@ static void get_device_file_extensions(const device_config *device, char *buffer
 
 
 /*-------------------------------------------------
+    get_device_instance_name - retrieves the device
+	instance name or brief instance name
+-------------------------------------------------*/
+
+static void get_device_instance_name(const machine_config *config, const device_config *device,
+	char *buffer, size_t buffer_len, iodevice_t type, UINT32 state, const char *(*get_dev_typename)(iodevice_t))
+{
+	const char *result;
+	const device_config *that_device;
+	int count, index;
+
+	/* retrieve info about the device instance */
+	result = device_get_info_string_offline(device, state);
+	if (result != NULL)
+	{
+		/* we got info directly */
+		snprintf(buffer, buffer_len, "%s", result);
+	}
+	else
+	{
+		/* not specified? default to device names based on the device type */
+		result = get_dev_typename(type);
+
+		/* are there multiple devices of the same type */
+		count = 0;
+		index = -1;
+		for (that_device = image_device_first(config); that_device != NULL; that_device = image_device_next(that_device))
+		{
+			if (device == that_device)
+				index = count;
+			if (device_get_info_int_offline(device, DEVINFO_INT_IMAGE_TYPE) == type)
+				count++;
+		}
+
+		/* need to number if there is more than one device */
+		if (that_device != NULL)
+			snprintf(buffer, buffer_len, "%s #%d", result, index + 1);
+		else
+			snprintf(buffer, buffer_len, "%s", result);
+	}
+}
+
+
+
+/*-------------------------------------------------
     image_device_getinfo - returns info on a device;
 	can be called by front end code
 -------------------------------------------------*/
 
 image_device_info image_device_getinfo(const machine_config *config, const device_config *device)
 {
-	const struct IODevice *iodev;
-	const char *s;
 	image_device_info info;
 
 	/* sanity checks */
@@ -432,17 +476,13 @@ image_device_info image_device_getinfo(const machine_config *config, const devic
 	/* retrieve file extensions */
 	get_device_file_extensions(device, info.file_extensions, ARRAY_LENGTH(info.file_extensions));
 
-	iodev = mess_device_from_core_device(device);
-	if (iodev != NULL)
-	{
-		/* retrieve instance name */
-		s = device_instancename(&iodev->devclass, iodev->index_in_device);
-		snprintf(info.instance_name, ARRAY_LENGTH(info.instance_name), "%s", s);
+	/* retrieve instance name */
+	get_device_instance_name(config, device, info.instance_name, ARRAY_LENGTH(info.instance_name),
+		info.type, DEVINFO_STR_IMAGE_INSTANCE_NAME, device_typename);
 
-		/* retrieve brief instance name */
-		s = device_briefinstancename(&iodev->devclass, iodev->index_in_device);
-		snprintf(info.brief_instance_name, ARRAY_LENGTH(info.brief_instance_name), "%s", s);
-	}
+	/* retrieve brief instance name */
+	get_device_instance_name(config, device, info.brief_instance_name, ARRAY_LENGTH(info.brief_instance_name),
+		info.type, DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME, device_brieftypename);
 
 	return info;
 }
