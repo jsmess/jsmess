@@ -797,11 +797,11 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 //	build_generic_filter
 //============================================================
 
-static void build_generic_filter(const device_config *dev, int is_save, char *filter, size_t filter_len)
+static void build_generic_filter(const device_config *device, int is_save, char *filter, size_t filter_len)
 {
 	char *s;
 	const char *file_extensions;
-	image_device_info info = image_device_getinfo(dev);
+	image_device_info info = image_device_getinfo(device->machine->config, device);
 
 	s = filter;
 
@@ -1353,7 +1353,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	// then set up the actual devices
 	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
 	{
-		image_device_info info = image_device_getinfo(img);
+		image_device_info info = image_device_getinfo(machine->config, img);
 
 		new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
 		flags_for_exists = MF_STRING;

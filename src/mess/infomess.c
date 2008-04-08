@@ -36,7 +36,7 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
 
 	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
-		info = image_device_getinfo(dev);
+		info = image_device_getinfo(config, dev);
 
 		/* print out device type */
 		fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(device_typename(info.type)));

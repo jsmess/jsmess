@@ -72,7 +72,7 @@ int info_listdevices(core_options *opts, const char *gamename)
 
 			for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 			{
-				info = image_device_getinfo(dev);
+				info = image_device_getinfo(config, dev);
 
 				src = info.file_extensions;
 				name = info.instance_name;

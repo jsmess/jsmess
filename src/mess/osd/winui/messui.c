@@ -66,10 +66,10 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem);
 static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem);
 static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem);
 
-static BOOL DevView_GetOpenFileName(HWND hwndDevView, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength);
-static BOOL DevView_GetCreateFileName(HWND hwndDevView, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength);
-static void DevView_SetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const device_config *dev, LPCTSTR pszFilename);
-static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const device_config *dev, LPTSTR pszBuffer, UINT nBufferLength);
+static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength);
+static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength);
+static void DevView_SetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const machine_config *config, const device_config *dev, LPCTSTR pszFilename);
+static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const machine_config *config, const device_config *dev, LPTSTR pszBuffer, UINT nBufferLength);
 
 #ifdef MAME_DEBUG
 static void MessTestsBegin(void);
@@ -353,12 +353,12 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	nPos = 0;
 	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
-		image_device_info info = image_device_getinfo(dev);
+		image_device_info info = image_device_getinfo(config, dev);
 
 		// confirm any mandatory devices are loaded
 		if (info.must_be_loaded)
 		{
-			pszSoftware = GetSelectedSoftware(drvindex, dev);
+			pszSoftware = GetSelectedSoftware(drvindex, config, dev);
 			if (!pszSoftware || !*pszSoftware)
 			{
 				snprintf(szMessage, sizeof(szMessage) / sizeof(szMessage[0]),
@@ -386,15 +386,15 @@ done:
 
 
 // this is a wrapper call to wrap the idiosycracies of SetSelectedSoftware()
-static void InternalSetSelectedSoftware(int drvindex, const device_config *device, const char *pszSoftware)
+static void InternalSetSelectedSoftware(int drvindex, const machine_config *config, const device_config *device, const char *pszSoftware)
 {
 	if (!pszSoftware)
 		pszSoftware = "";
 
 	// only call SetSelectedSoftware() if this value is different
-	if (strcmp(GetSelectedSoftware(drvindex, device), pszSoftware))
+	if (strcmp(GetSelectedSoftware(drvindex, config, device), pszSoftware))
 	{
-		SetSelectedSoftware(drvindex, device, pszSoftware);
+		SetSelectedSoftware(drvindex, config, device, pszSoftware);
 	}
 }
 
@@ -417,7 +417,7 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 	{
 		for (device = image_device_first(config); device != NULL; device = image_device_next(device))
 		{
-			s = GetSelectedSoftware(drvindex, device);
+			s = GetSelectedSoftware(drvindex, config, device);
 			if ((s != NULL) && !mame_stricmp(s, pszFilename))
 				break;
 		}
@@ -445,7 +445,7 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 	if (device != NULL)
 	{
 		// place the image
-		InternalSetSelectedSoftware(drvindex, device, pszFilename);
+		InternalSetSelectedSoftware(drvindex, config, device, pszFilename);
 	}
 	else
 	{
@@ -500,7 +500,7 @@ static void MessRefreshPicker(int drvindex)
 
 	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 	{
-		pszSoftware = GetSelectedSoftware(drvindex, dev);
+		pszSoftware = GetSelectedSoftware(drvindex, config, dev);
 		if (pszSoftware && *pszSoftware)
 		{
 			i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
@@ -569,7 +569,7 @@ typedef struct
     const char *ext;
 } mess_image_type;
 
-static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_proc cfd, LPTSTR filename, mess_image_type *imagetypes)
+static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_proc cfd, LPTSTR filename, const machine_config *config, mess_image_type *imagetypes)
 {
     BOOL success;
     OPENFILENAME of;
@@ -611,7 +611,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 		if (!imagetypes[i].dev)
 			typname = "Compressed images";
 		else
-			typname = lookupdevice(image_device_getinfo(imagetypes[i].dev).type)->dlgname;
+			typname = lookupdevice(image_device_getinfo(config, imagetypes[i].dev).type)->dlgname;
 
         strcpy(s, typname);
         s += strlen(s);
@@ -695,7 +695,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 		/* special case; all non-printer devices */
 		for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
 		{
-			image_device_info info = image_device_getinfo(dev);
+			image_device_info info = image_device_getinfo(config, dev);
 
 			if (info.type != IO_PRINTER)
 				SetupImageTypes(config, &types[num_extensions], count - num_extensions, FALSE, dev);
@@ -704,7 +704,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 	}
 	else
 	{
-		image_device_info info = image_device_getinfo(dev);
+		image_device_info info = image_device_getinfo(config, dev);
 		const char *ext = info.file_extensions;
 
 		if (ext != NULL)
@@ -744,7 +744,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 
 	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
 
-	if (CommonFileImageDialog(last_directory, cfd, filename, imagetypes))
+	if (CommonFileImageDialog(last_directory, cfd, filename, config, imagetypes))
 	{
 		utf8_filename = utf8_from_tstring(filename);
 		if( !utf8_filename )
@@ -773,54 +773,44 @@ static void MessCreateDevice(const device_config *dev)
 
 
 
-static BOOL DevView_GetOpenFileName(HWND hwndDevView, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
+static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
 	BOOL bResult;
 	mess_image_type imagetypes[64];
 	HWND hwndList;
 	int gamenum;
-	machine_config *config;
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	gamenum = Picker_GetSelectedItem(hwndList);
 
-	// allocate the machine config
-	config = machine_config_alloc_with_mess_devices(drivers[gamenum]);
-
 	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
-	bResult = CommonFileImageDialog(last_directory, GetOpenFileName, pszFilename, imagetypes);
+	bResult = CommonFileImageDialog(last_directory, GetOpenFileName, pszFilename, config, imagetypes);
 
-	machine_config_free(config);
 	return bResult;
 }
 
 
 
-static BOOL DevView_GetCreateFileName(HWND hwndDevView, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
+static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
 	BOOL bResult;
 	mess_image_type imagetypes[64];
 	HWND hwndList;
 	int gamenum;
-	machine_config *config;
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	gamenum = Picker_GetSelectedItem(hwndList);
 
-	// allocate the machine config
-	config = machine_config_alloc_with_mess_devices(drivers[gamenum]);
-
 	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
-	bResult = CommonFileImageDialog(last_directory, GetSaveFileName, pszFilename, imagetypes);
+	bResult = CommonFileImageDialog(last_directory, GetSaveFileName, pszFilename, config, imagetypes);
 
-	machine_config_free(config);
 	return bResult;
 }
 
 
 
 static void DevView_SetSelectedSoftware(HWND hwndDevView, int drvindex,
-	const device_config *dev, LPCTSTR pszFilename)
+	const machine_config *config, const device_config *dev, LPCTSTR pszFilename)
 {
 	char* utf8_filename = utf8_from_tstring(pszFilename);
 	if( !utf8_filename )
@@ -833,11 +823,11 @@ static void DevView_SetSelectedSoftware(HWND hwndDevView, int drvindex,
 
 
 static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
-	const device_config *dev, LPTSTR pszBuffer, UINT nBufferLength)
+	const machine_config *config, const device_config *dev, LPTSTR pszBuffer, UINT nBufferLength)
 {
 	LPCTSTR t_buffer = NULL;
 	TCHAR* t_s;
-	LPCSTR s = GetSelectedSoftware(nDriverIndex, dev);
+	LPCSTR s = GetSelectedSoftware(nDriverIndex, config, dev);
 
 	t_s = tstring_from_utf8(s);
 	if( !t_s )

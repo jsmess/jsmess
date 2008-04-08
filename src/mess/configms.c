@@ -40,7 +40,7 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 			{
 				for (dev = image_device_first(Machine->config); (image == NULL) && (dev != NULL); dev = image_device_next(dev))
 				{
-					info = image_device_getinfo(dev);
+					info = image_device_getinfo(Machine->config, dev);
 					if (!strcmp(dev_instance, info.instance_name))
 						image = dev;
 				}
@@ -75,7 +75,7 @@ static void device_dirs_save(int config_type, xml_data_node *parentnode)
 	{
 		for (image = image_device_first(Machine->config); image != NULL; image = image_device_next(image))
 		{
-			info = image_device_getinfo(image);
+			info = image_device_getinfo(Machine->config, image);
 			dev_instance = info.instance_name;
 
 			node = xml_add_child(parentnode, "device", NULL);

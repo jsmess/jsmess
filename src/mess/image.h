@@ -137,7 +137,7 @@ int image_device_count(const machine_config *config);
 /* ----- analysis ----- */
 
 /* returns info on a device - can be called by front end code */
-image_device_info image_device_getinfo(const device_config *device);
+image_device_info image_device_getinfo(const machine_config *config, const device_config *device);
 
 /* checks to see if a particular devices uses a certain file extension */
 int image_device_uses_file_extension(const device_config *device, const char *file_extension);

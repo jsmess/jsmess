@@ -17,6 +17,15 @@
 
 
 /***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef void (*device_enum_func)(core_options *opts, const game_driver *gamedrv,
+	const machine_config *config, const device_config *device, int global_index);
+
+
+
+/***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
 
@@ -41,18 +50,14 @@ const options_entry mess_core_options[] =
 	option, by device and index
 -------------------------------------------------*/
 
-const char *mess_get_device_option(const device_config *device)
+const char *mess_get_device_option(const image_device_info *info)
 {
 	const char *result = NULL;
-	image_device_info info;
 
 	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS))
 	{
-		/* get the device information */
-		info = image_device_getinfo(device);
-
 		/* access the option */
-		result = options_get_string(mame_options(), info.instance_name);
+		result = options_get_string(mame_options(), info->instance_name);
 	}
 	return result;
 }
@@ -65,7 +70,7 @@ const char *mess_get_device_option(const device_config *device)
 -------------------------------------------------*/
 
 static void mess_enumerate_devices(core_options *opts, const machine_config *config, const game_driver *gamedrv,
-	void (*proc)(core_options *opts, const game_driver *gamedrv, const device_config *device, int global_index))
+	device_enum_func proc)
 {
 	const device_config *device;
 	int index = 0;
@@ -73,7 +78,7 @@ static void mess_enumerate_devices(core_options *opts, const machine_config *con
 	/* loop on each device instance */
 	for (device = image_device_first(config); device != NULL; device = image_device_next(device))
 	{
-		proc(opts, gamedrv, device, index++);
+		proc(opts, gamedrv, config, device, index++);
 	}
 }
 
@@ -85,7 +90,7 @@ static void mess_enumerate_devices(core_options *opts, const machine_config *con
 -------------------------------------------------*/
 
 static void add_device_options_for_device(core_options *opts, const game_driver *gamedrv,
-	const device_config *device, int global_index)
+	const machine_config *config, const device_config *device, int global_index)
 {
 	image_device_info info;
 	options_entry this_entry[2];
@@ -101,7 +106,7 @@ static void add_device_options_for_device(core_options *opts, const game_driver 
 	}
 
 	/* retrieve info about the device instance */
-	info = image_device_getinfo(device);
+	info = image_device_getinfo(config, device);
 	snprintf(dev_full_name, sizeof(dev_full_name) / sizeof(dev_full_name[0]),
 		"%s;%s", info.instance_name, info.brief_instance_name);
 
@@ -185,7 +190,7 @@ void mess_options_init(core_options *opts)
 -------------------------------------------------*/
 
 static void extract_device_options_for_device(core_options *opts, const game_driver *gamedrv,
-	const device_config *device, int global_index)
+	const machine_config *config, const device_config *device, int global_index)
 {
 	image_device_info info;
 	const char *filename;
@@ -196,7 +201,7 @@ static void extract_device_options_for_device(core_options *opts, const game_dri
 	filename = image_filename(device);
 
 	/* access other info */
-	info = image_device_getinfo(device);
+	info = image_device_getinfo(config, device);
 
 	/* and set the option */
 	options_set_string(opts, info.instance_name, filename ? filename : "", OPTION_PRIORITY_CMDLINE);

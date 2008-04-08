@@ -139,10 +139,10 @@ void mess_postdevice_init(running_machine *machine)
 	for (image = image_device_first(machine->config); image != NULL; image = image_device_next(image))
 	{
 		/* get the device info */
-		info = image_device_getinfo(image);
+		info = image_device_getinfo(machine->config, image);
 
 		/* is an image specified for this image */
-		image_name = mess_get_device_option(image);
+		image_name = mess_get_device_option(&info);
 
 		if ((image_name != NULL) && (image_name[0] != '\0'))
 		{

@@ -690,7 +690,7 @@ static void command_image_loadcreate(running_machine *machine)
 			device_typename(device_type), device_slot);
 		return;
 	}
-	info = image_device_getinfo(image);
+	info = image_device_getinfo(machine->config, image);
 	file_extensions = info.file_extensions;
 
 	/* is an image format specified? */

@@ -185,7 +185,7 @@ iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 
 	if (device != NULL)
 	{
-		type = image_device_getinfo(device).type;
+		type = image_device_getinfo(GetSoftwarePickerInfo(hwndPicker)->pConfig, device).type;
 	}
 	else
 	{
@@ -267,7 +267,7 @@ static void ComputeFileHash(software_picker_info *pPickerInfo,
 	unsigned int functions;
 
 	// get the device info
-	info = image_device_getinfo(pFileInfo->device);
+	info = image_device_getinfo(pPickerInfo->pConfig, pFileInfo->device);
 
 	// determine which functions to use
 	functions = hashfile_functions_used(pPickerInfo->pHashFile, info.type);
@@ -387,7 +387,7 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 	// have already been calculated
 	if ((pPickerInfo->pHashFile != NULL) && (pFileInfo->device != NULL))
 	{
-		image_device_info info = image_device_getinfo(pFileInfo->device);
+		image_device_info info = image_device_getinfo(pPickerInfo->pConfig, pFileInfo->device);
 		type = info.type;
 		if (type < IO_COUNT)
 	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->pHashFile, type);

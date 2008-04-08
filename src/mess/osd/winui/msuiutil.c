@@ -49,7 +49,7 @@ BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 
 	for (device = image_device_first(config); device != NULL; device = image_device_next(device))
 	{
-		if (image_device_getinfo(device).type == type)
+		if (image_device_getinfo(config, device).type == type)
 		{
 			b = TRUE;
 			break;

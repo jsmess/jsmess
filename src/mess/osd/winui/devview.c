@@ -124,6 +124,7 @@ void DevView_Refresh(HWND hwndDevView)
 			pszSelection = pDevViewInfo->pCallbacks->pfnGetSelectedSoftware(
 				hwndDevView,
 				pDevViewInfo->nGame,
+				pDevViewInfo->config,
 				pDevViewInfo->pEntries[i].dev,
 				szBuffer, sizeof(szBuffer) / sizeof(szBuffer[0]));
 
@@ -148,6 +149,7 @@ static void DevView_TextChanged(HWND hwndDevView, int nChangedEntry, LPCTSTR psz
 	{
 		pDevViewInfo->pCallbacks->pfnSetSelectedSoftware(hwndDevView,
 			pDevViewInfo->nGame,
+			pDevViewInfo->config,
 			pDevViewInfo->pEntries[nChangedEntry].dev,
 			pszFilename);
 	}
@@ -217,7 +219,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 
 		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
 		{
-			image_device_info info = image_device_getinfo(dev);
+			image_device_info info = image_device_getinfo(pDevViewInfo->config, dev);
 
 			s = tstring_from_utf8(info.name);
 			ppszDevices[i] = alloca((_tcslen(s) + 1) * sizeof(TCHAR));
@@ -253,7 +255,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 
 		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
 		{
-			image_device_info info = image_device_getinfo(dev);
+			image_device_info info = image_device_getinfo(pDevViewInfo->config, dev);
 
 			pEnt->dev = dev;
 
@@ -329,11 +331,11 @@ static void DevView_ButtonClick(HWND hwndDevView, struct DevViewEntry *pEnt, HWN
 	switch(rc)
 	{
 		case 1:
-			b = pDevViewInfo->pCallbacks->pfnGetOpenFileName(hwndDevView, pEnt->dev,
+			b = pDevViewInfo->pCallbacks->pfnGetOpenFileName(hwndDevView, pDevViewInfo->config, pEnt->dev,
 				szPath, sizeof(szPath) / sizeof(szPath[0]));
 			break;
 		case 2:
-			b = pDevViewInfo->pCallbacks->pfnGetCreateFileName(hwndDevView, pEnt->dev,
+			b = pDevViewInfo->pCallbacks->pfnGetCreateFileName(hwndDevView, pDevViewInfo->config, pEnt->dev,
 				szPath, sizeof(szPath) / sizeof(szPath[0]));
 			break;
 		case 3:

@@ -405,12 +405,16 @@ static void get_device_file_extensions(const device_config *device, char *buffer
 	can be called by front end code
 -------------------------------------------------*/
 
-image_device_info image_device_getinfo(const device_config *device)
+image_device_info image_device_getinfo(const machine_config *config, const device_config *device)
 {
 	const struct IODevice *iodev;
 	const char *s;
 	image_device_info info;
-	
+
+	/* sanity checks */
+	assert((device->machine == NULL) || (device->machine->config == config));
+
+	/* clear return value */
 	memset(&info, 0, sizeof(info));
 
 	/* retrieve type */
