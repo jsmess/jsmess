@@ -248,7 +248,7 @@ static WRITE8_HANDLER( ems_w )
     default:
       break;
     case 2:
-      memory_set_bankptr( ems.index+1, memory_region(REGION_USER1) + (ems.mapper[ems.index].address&0x7ffff) );
+      memory_set_bankptr( ems.index+1, memory_region(REGION_USER1) + (ems.mapper[ems.index].address&0xfffff) );
       break;
     }
     break;
@@ -460,7 +460,7 @@ ROM_START(pasogo)
      ROM_REGION(0x100000,REGION_CPU1, 0) // 1 megabyte dram?
 //     ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
 //     ROM_CART_LOAD(0, "bin", 0x8000, 0x8000, 0)
-	ROM_REGION(0x80000,REGION_USER1, 0)
+	ROM_REGION(0x100000,REGION_USER1, 0)
 ROM_END
 
 static void pasogo_pic_set_int_line(int which, int interrupt)
