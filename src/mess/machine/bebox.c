@@ -1012,6 +1012,11 @@ static void bebox_exit(running_machine *machine)
 	lsi53c810_exit(&scsi53c810_intf);
 }
 
+MACHINE_START( bebox )
+{
+	pc_fdc_init(&bebox_fdc_interface);
+}
+
 DRIVER_INIT( bebox )
 {
 	int cpu;
@@ -1041,7 +1046,7 @@ DRIVER_INIT( bebox )
 	uart8250_init(2, NULL);
 	uart8250_init(3, &bebox_uart_inteface);
 
-	pc_fdc_init(&bebox_fdc_interface);
+//	pc_fdc_init(&bebox_fdc_interface);
 	mc146818_init(MC146818_STANDARD);
 	pic8259_init(2, bebox_pic_set_int_line);
 	ide_controller_init_custom(0, &bebox_ide_interface, NULL);
