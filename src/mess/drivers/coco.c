@@ -771,6 +771,9 @@ static MACHINE_DRIVER_START( coco3 )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
+
+	/* devices */
+	MDRV_DEVICE_ADD("vhd", COCO_VHD)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )
@@ -1171,7 +1174,6 @@ SYSTEM_CONFIG_START(coco3)
 	CONFIG_IMPORT_FROM	( generic_coco )
 	CONFIG_DEVICE( coco3_cartslot_getinfo )
 	CONFIG_DEVICE( coco3_snapshot_getinfo )
-	CONFIG_DEVICE( coco_vhd_device_getinfo )
 	CONFIG_RAM			(128 * 1024)
 	CONFIG_RAM_DEFAULT	(512 * 1024)
 	CONFIG_RAM			(2048 * 1024)

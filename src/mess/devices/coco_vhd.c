@@ -41,6 +41,11 @@
 #include "includes/coco.h"
 
 
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
 #define VERBOSE 0
 
 #define VHDSTATUS_OK					0x00
@@ -53,43 +58,65 @@
 #define VHDCMD_WRITE	1
 #define VHDCMD_FLUSH	2
 
-static UINT32 logical_record_number;
-static UINT32 buffer_address;
-static UINT8 vhd_status;
 
 
-static const device_config *vhd_image(void)
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _vhd_info vhd_info;
+struct _vhd_info
 {
-	const device_config *image;
-	image = image_from_devtype_and_index(IO_VHD, 0);
-	return image_exists(image) ? image : NULL;
+	UINT32 logical_record_number;
+	UINT32 buffer_address;
+	UINT8 status;
+};
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE vhd_info *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == DEVICE_GET_INFO_NAME(coco_vhd));
+	return (vhd_info *) device->token;
 }
 
 
 
+/***************************************************************************
+    CORE IMPLEMENTATION
+***************************************************************************/
+
 static DEVICE_START( coco_vhd )
 {
-	vhd_status = VHDSTATUS_NO_VHD_ATTACHED;
+	vhd_info *vhd = get_safe_token(device);
+	vhd->status = VHDSTATUS_NO_VHD_ATTACHED;
 }
 
 
 
 static DEVICE_IMAGE_LOAD( coco_vhd )
 {
-	vhd_status = VHDSTATUS_POWER_ON_STATE;
-	logical_record_number = 0;
-	buffer_address = 0;
+	vhd_info *vhd = get_safe_token(image);
+	vhd->status = VHDSTATUS_POWER_ON_STATE;
+	vhd->logical_record_number = 0;
+	vhd->buffer_address = 0;
 	return INIT_PASS;
 }
 
 
 
-static void coco_vhd_readwrite(UINT8 data)
+static void coco_vhd_readwrite(const device_config *device, UINT8 data)
 {
-	const device_config *vhdfile;
+	vhd_info *vhd = get_safe_token(device);
 	int result;
 	int phyOffset;
-	UINT32 nBA = buffer_address;
+	UINT32 nBA = vhd->buffer_address;
 	UINT32 bytes_to_read;
 	UINT32 bytes_to_write;
 	UINT64 seek_position;
@@ -97,20 +124,19 @@ static void coco_vhd_readwrite(UINT8 data)
 	char buffer[1024];
 
 	/* access the image */
-	vhdfile = vhd_image();
-	if (!vhdfile)
+	if (!image_exists(device))
 	{
-		vhd_status = VHDSTATUS_NO_VHD_ATTACHED;
+		vhd->status = VHDSTATUS_NO_VHD_ATTACHED;
 		return;
 	}
 
 	/* perform the seek */
-	seek_position = ((UINT64) 256) * logical_record_number;
-	total_size = image_length(vhdfile);
-	result = image_fseek(vhdfile, MIN(seek_position, total_size), SEEK_SET);
+	seek_position = ((UINT64) 256) * vhd->logical_record_number;
+	total_size = image_length(device);
+	result = image_fseek(device, MIN(seek_position, total_size), SEEK_SET);
 	if (result < 0)
 	{
-		vhd_status = VHDSTATUS_ACCESS_DENIED;
+		vhd->status = VHDSTATUS_ACCESS_DENIED;
 		return;
 	}
 
@@ -122,10 +148,10 @@ static void coco_vhd_readwrite(UINT8 data)
 			memset(buffer, 0, sizeof(buffer));
 
 			bytes_to_write = (UINT32) MIN(seek_position - total_size, (UINT64) sizeof(buffer));
-			result = image_fwrite(vhdfile, buffer, bytes_to_write);
+			result = image_fwrite(device, buffer, bytes_to_write);
 			if (result != bytes_to_write)
 			{
-				vhd_status = VHDSTATUS_ACCESS_DENIED;
+				vhd->status = VHDSTATUS_ACCESS_DENIED;
 				return;
 			}
 
@@ -142,51 +168,52 @@ static void coco_vhd_readwrite(UINT8 data)
 			if (total_size > seek_position)
 			{
 				bytes_to_read = (UINT32) MIN((UINT64) 256, total_size - seek_position);
-				result = image_fread(vhdfile, &mess_ram[phyOffset], bytes_to_read);
+				result = image_fread(device, &mess_ram[phyOffset], bytes_to_read);
 				if (result != bytes_to_read)
 				{
-					vhd_status = VHDSTATUS_ACCESS_DENIED;
+					vhd->status = VHDSTATUS_ACCESS_DENIED;
 					return;
 				}
 			}
 
-			vhd_status = VHDSTATUS_OK;
+			vhd->status = VHDSTATUS_OK;
 			break;
 
 		case VHDCMD_WRITE: /* Write Sector */
-			result = image_fwrite(vhdfile, &(mess_ram[phyOffset]), 256);
+			result = image_fwrite(device, &(mess_ram[phyOffset]), 256);
 
 			if (result != 256)
 			{
-				vhd_status = VHDSTATUS_ACCESS_DENIED;
+				vhd->status = VHDSTATUS_ACCESS_DENIED;
 				return;
 			}
 
-			vhd_status = VHDSTATUS_OK;
+			vhd->status = VHDSTATUS_OK;
 			break;
 
 		case VHDCMD_FLUSH: /* Flush file cache */
-			vhd_status = VHDSTATUS_OK;
+			vhd->status = VHDSTATUS_OK;
 			break;
 
 		default:
-			vhd_status = VHDSTATUS_UNKNOWN_COMMAND;
+			vhd->status = VHDSTATUS_UNKNOWN_COMMAND;
 			break;
 	}
 }
 
 
 
-READ8_HANDLER(coco_vhd_io_r)
+READ8_DEVICE_HANDLER(coco_vhd_io_r)
 {
+	vhd_info *vhd = get_safe_token(device);
 	UINT8 result = 0;
 
 	switch(offset)
 	{
 		case 0xff83 - 0xff40:
 			if (VERBOSE)
-				logerror("vhd: Status read: %d\n", vhd_status );
-			result = vhd_status;
+				logerror("vhd: Status read: %d\n", vhd->status);
+			result = vhd->status;
 			break;
 	}
 	return result;
@@ -194,8 +221,9 @@ READ8_HANDLER(coco_vhd_io_r)
 
 
 
-WRITE8_HANDLER(coco_vhd_io_w)
+WRITE8_DEVICE_HANDLER(coco_vhd_io_w)
 {
+	vhd_info *vhd = get_safe_token(device);
 	int pos;
 
 	switch(offset)
@@ -204,55 +232,57 @@ WRITE8_HANDLER(coco_vhd_io_w)
 		case 0xff81 - 0xff40:
 		case 0xff82 - 0xff40:
 			pos = ((0xff82 - 0xff40) - offset) * 8;
-			logical_record_number &= ~(0xFF << pos);
-			logical_record_number += data << pos;
+			vhd->logical_record_number &= ~(0xFF << pos);
+			vhd->logical_record_number += data << pos;
 			if (VERBOSE)
-				logerror("vhd: LRN write: %6.6X\n", logical_record_number);
+				logerror("vhd: LRN write: %6.6X\n", vhd->logical_record_number);
 			break;
 
 		case 0xff83 - 0xff40:
-			coco_vhd_readwrite( data );
+			coco_vhd_readwrite(device, data);
 			if (VERBOSE)
 				logerror("vhd: Command: %d\n", data);
 			break;
 
 		case 0xff84 - 0xff40:
-			buffer_address &= 0xFFFF00FF;
-			buffer_address += data << 8;
+			vhd->buffer_address &= 0xFFFF00FF;
+			vhd->buffer_address += data << 8;
 			if (VERBOSE)
-				logerror("vhd: BA write: %X (%2.2X..)\n", buffer_address, data);
+				logerror("vhd: BA write: %X (%2.2X..)\n", vhd->buffer_address, data);
 			break;
 
 		case 0xff85 - 0xff40:
-			buffer_address &= 0xFFFFFF00;
-			buffer_address += data;
+			vhd->buffer_address &= 0xFFFFFF00;
+			vhd->buffer_address += data;
 			if (VERBOSE)
-				logerror("vhd: BA write: %X (..%2.2X)\n", buffer_address, data);
+				logerror("vhd: BA write: %X (..%2.2X)\n", vhd->buffer_address, data);
 			break;
 	}
 }
 
 
 
-void coco_vhd_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+DEVICE_GET_INFO(coco_vhd)
 {
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_VHD; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:					info->i = 1; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vhd_info); break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0; break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL; break;
+		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_VHD; break;
+		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
+		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(coco_vhd); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(coco_vhd); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(coco_vhd); break;
+		case DEVINFO_FCT_IMAGE_LOAD:					info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(coco_vhd); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_DEV_FILE:						strcpy(info->s = device_temp_str(), __FILE__); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "vhd"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+0:				strcpy(info->s = device_temp_str(), "Virtual Hard Disk"); break;
+		case DEVINFO_STR_NAME:							info->s = "Virtual Hard Disk"; break;
+		case DEVINFO_STR_FAMILY:						info->s = "Virtual Hard Disk"; break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__; break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "vhd"; break;
 	}
 }
-

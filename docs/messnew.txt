@@ -15,6 +15,9 @@ System Driver Changes:
 
 - [CBM, C16] Simplified keyboard and interrupt handling code.  [Fabio Priuli]
 
+- [COCO3] Transitioned VHD support to use MAME's core device system.  [Nate
+  Woods]
+
 - [IBMPC,IBM5150] Renamed ibmpc driver to ibm5150.  [Wilbert Pol]
 
 - [MBEE] Added snapload support for MWB filetype. Added LOCK key to keyboard.

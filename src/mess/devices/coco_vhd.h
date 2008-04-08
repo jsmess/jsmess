@@ -9,14 +9,13 @@
 #ifndef COCOVHD_H
 #define COCOVHD_H
 
-#include "device.h"
 #include "image.h"
 
+READ8_DEVICE_HANDLER(coco_vhd_io_r);
+WRITE8_DEVICE_HANDLER(coco_vhd_io_w);
 
-READ8_HANDLER(coco_vhd_io_r);
-WRITE8_HANDLER(coco_vhd_io_w);
+DEVICE_GET_INFO(coco_vhd);
 
-void coco_vhd_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-
+#define COCO_VHD	DEVICE_GET_INFO_NAME(coco_vhd)
 
 #endif /* COCOVHD_H */
