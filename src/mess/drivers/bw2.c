@@ -18,10 +18,10 @@
 
   http://www.vintage-computer.com/bondwell2.shtml
 
-  TODO:
-    - Add LCD controller
-
   http://www2.okisemi.com/site/productscatalog/displaydrivers/availabledocuments/Intro-7090.html
+
+  TODO:
+  - Fix disk loading
 ***************************************************************************/
 
 #include "driver.h"
@@ -40,19 +40,27 @@
 #define SCREEN_TAG	"main"
 #define MSM6255_TAG	"ic49"
 
+typedef struct
+{
+	UINT8 fdc_motor;
+} BW_2;
+
+static BW_2 bw2;
+
+
 /* Memory */
 
 static void bw2_set_banks(UINT8 data)
 {
 	/*
-	Y0  /RAM1  	Memory bank 1
-	Y1  /VRAM  	Video memory
-	Y2  /RAM2  	Memory bank 2
-	Y3  /RAM3  	Memory bank 3
-	Y4  /RAM4  	Memory bank 4
-	Y5  /RAM5  	Memory bank 5
-	Y6  /RAM6  	Memory bank 6
-	Y7	/RAM7	ROM
+	Y0  /RAM1   Memory bank 1
+	Y1  /VRAM   Video memory
+	Y2  /RAM2   Expansion memory bank 2
+	Y3  /RAM3   Expansion memory bank 3
+	Y4  /RAM4   Expansion memory bank 4
+	Y5  /RAM5   Expansion memory bank 5
+	Y6  /RAM6   Expansion memory bank 6
+	Y7  /ROM    System ROM
 	*/
 
 	int bank = data & 0x07;
@@ -154,14 +162,13 @@ static void bw2_wd17xx_callback(running_machine *machine, wd17xx_state_t state, 
 			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 			break;
 	}
-
 }
 
 static READ8_HANDLER( bw2_wd2797_r )
 {
 	UINT8 result = 0xff;
 
-	switch(offset & 0x03)
+	switch(offset)
 	{
 		case 0:
 			result = wd17xx_status_r(machine, 0);
@@ -182,7 +189,7 @@ static READ8_HANDLER( bw2_wd2797_r )
 
 static WRITE8_HANDLER( bw2_wd2797_w )
 {
-	switch(offset & 0x3)
+	switch(offset)
 	{
 		case 0:
 			wd17xx_command_w(machine, 0, data);
@@ -218,12 +225,12 @@ static WRITE8_HANDLER( bw2_ppi8255_a_w )
 	PA7     /STROBE to centronics printer
 	*/
 
-	switch (~data & 0x30 << 4)
+	switch (~data & 0x30)
 	{
-		case 0:
+		case 0x10:
 			wd17xx_set_drive(0);
 			break;
-		case 1:
+		case 0x20:
 			wd17xx_set_drive(1);
 			break;
 	}
@@ -286,6 +293,8 @@ static READ8_HANDLER( bw2_ppi8255_c_r )
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT | CENTRONICS_NO_RESET);
 	data = ((centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) == 0) ? 0x10 : 0;
 
+	data |= (bw2.fdc_motor) ? 0 : 0x20;
+
 	return data;
 }
 
@@ -302,6 +311,7 @@ static const ppi8255_interface bw2_ppi8255_interface =
 
 
 /* PIT */
+
 static PIT8253_OUTPUT_CHANGED( bw2_timer0_w )
 {
 	msm8251_transmit_clock();
@@ -311,7 +321,7 @@ static PIT8253_OUTPUT_CHANGED( bw2_timer0_w )
 
 static PIT8253_OUTPUT_CHANGED( bw2_timer2_w )
 {
-
+	bw2.fdc_motor = state;
 }
 
 static const struct pit8253_config bw2_pit8253_interface =
@@ -377,6 +387,12 @@ static VIDEO_UPDATE( bw2 )
 	return 0;
 }
 
+static PALETTE_INIT( bw2 )
+{
+	palette_set_color_rgb(machine, 0, 0xa5, 0xad, 0xa5);
+	palette_set_color_rgb(machine, 1, 0x31, 0x39, 0x10);
+}
+
 
 /* Machine */
 
@@ -388,6 +404,7 @@ static DRIVER_INIT( bw2 )
 
 static MACHINE_RESET( bw2 )
 {
+	memset(&bw2, 0, sizeof(bw2));
 	memory_set_bank(1, 7);
 }
 
@@ -400,7 +417,7 @@ static MACHINE_START( bw2 )
 	ppi8255_init(&bw2_ppi8255_interface);
 
 	wd17xx_init(machine, WD_TYPE_2793, bw2_wd17xx_callback, NULL);
-	wd17xx_set_density(DEN_FM_HI);
+	wd17xx_set_density(DEN_MFM_LO);
 
 	memory_configure_bank(1, 0, 1, mess_ram, 0);
 	memory_configure_bank(1, 1, 1, videoram, 0);
@@ -420,7 +437,6 @@ static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x00, 0x03 ) AM_READWRITE( ppi8255_0_r, ppi8255_0_w )
 	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE( PIT8253, "pit8253", pit8253_r, pit8253_w )
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE( MSM6255, MSM6255_TAG, msm6255_register_r, msm6255_register_w )
-
 	AM_RANGE( 0x40, 0x40 ) AM_READWRITE( msm8251_data_r, msm8251_data_w )
 	AM_RANGE( 0x41, 0x41 ) AM_READWRITE( msm8251_status_r, msm8251_control_w )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE( bw2_centronics_data_w )
@@ -588,7 +604,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_DEFAULT_LAYOUT( layout_bw2 )
 
 	MDRV_PALETTE_LENGTH( 2 )
-	MDRV_PALETTE_INIT( black_and_white )
+	MDRV_PALETTE_INIT( bw2 )
 	MDRV_VIDEO_START( bw2 )
 	MDRV_VIDEO_UPDATE( bw2 )
 

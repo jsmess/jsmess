@@ -13,6 +13,8 @@ System Driver Changes:
 
 - [BW2] Added MSM6255 LCD controller emulation. [Curt Coder]
 
+- [BW2] Fixed FDC motor status and a new palette.  [Tomas Karlsson]
+
 - [CBM, C16] Simplified keyboard and interrupt handling code.  [Fabio Priuli]
 
 - [COCO3] Transitioned VHD support to use MAME's core device system.  [Nate
