@@ -233,18 +233,22 @@ MACHINE_START( specimx )
 	wd17xx_set_density (DEN_FM_HI);
 }
 
-MACHINE_RESET( specimx )
-{
+static TIMER_CALLBACK( setup_pit8253_gates ) {
 	device_config *pit8253 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
 
+	pit8253_gate_w(pit8253, 0, 0);
+	pit8253_gate_w(pit8253, 1, 0);
+	pit8253_gate_w(pit8253, 2, 0);
+}
+
+MACHINE_RESET( specimx )
+{
 	ppi8255_init(&specialist_ppi8255_interface);
 	specimx_set_bank(2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;	
 	wd17xx_reset();
 	wd17xx_set_side(0);
-	pit8253_gate_w(pit8253, 0, 0);
-	pit8253_gate_w(pit8253, 1, 0);
-	pit8253_gate_w(pit8253, 2, 0);
+	timer_set( attotime_zero, NULL, 0, setup_pit8253_gates );
 }
 
 READ8_HANDLER ( specimx_disk_ctrl_r )

@@ -34,6 +34,7 @@ static void *specimx_sh_start(int clock, const struct CustomSound_interface *con
 
 static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
 {
+	device_config *pit8253 = (device_config*)device_list_find_by_tag( Machine->config->devicelist, PIT8253, "pit8253" );
 	INT16 channel_0_signal;
 	INT16 channel_1_signal;
 	INT16 channel_2_signal;
@@ -49,13 +50,13 @@ static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sampl
 	stream_sample_t *sample_left = buffer[0];
 	stream_sample_t *sample_right = buffer[1];
 
-	channel_0_baseclock = pit8253_get_frequency(0, 0);
-	channel_1_baseclock = pit8253_get_frequency(0, 1);
-	channel_2_baseclock = pit8253_get_frequency(0, 2);
+	channel_0_baseclock = pit8253_get_frequency(pit8253, 0);
+	channel_1_baseclock = pit8253_get_frequency(pit8253, 1);
+	channel_2_baseclock = pit8253_get_frequency(pit8253, 2);
 
-	channel_0_signal = pit8253_get_output (0,0) ? 3000 : -3000;
-	channel_1_signal = pit8253_get_output (0,1) ? 3000 : -3000;
-	channel_2_signal = pit8253_get_output (0,2) ? 3000 : -3000;
+	channel_0_signal = pit8253_get_output (pit8253,0) ? 3000 : -3000;
+	channel_1_signal = pit8253_get_output (pit8253,1) ? 3000 : -3000;
+	channel_2_signal = pit8253_get_output (pit8253,2) ? 3000 : -3000;
 
 
 	while (length--)
