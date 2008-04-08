@@ -1443,11 +1443,15 @@ static void ip225015_exit(running_machine *machine)
 	wd33c93_exit(&scsi_intf);
 }
 
+static int ip22_get_out2(running_machine *machine) {
+	return pit8253_get_output((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2 );
+}
+
 static DRIVER_INIT( ip225015 )
 {
 	static const struct kbdc8042_interface at8042 =
 	{
-		KBDC8042_STANDARD, NULL, NULL
+		KBDC8042_STANDARD, NULL, NULL, ip22_get_out2
 	};
 
 	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse

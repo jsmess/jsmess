@@ -231,11 +231,16 @@ static const struct pc_fdc_interface fdc_interface =
 };
 
 
+static int at_get_out2(running_machine *machine) {
+	return pit8253_get_output((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "at_pit8254" ), 2 );
+}
+
+
 DRIVER_INIT( atcga )
 {
 	static const struct kbdc8042_interface at8042 =
 	{
-		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt
+		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(&at8042);
 }
@@ -246,7 +251,7 @@ DRIVER_INIT( at386 )
 {
 	static const struct kbdc8042_interface at8042 =
 	{
-		KBDC8042_AT386, at_set_gate_a20, at_keyboard_interrupt
+		KBDC8042_AT386, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(&at8042);
 }
@@ -296,7 +301,7 @@ DRIVER_INIT( at_vga )
 {
 	static const struct kbdc8042_interface at8042 =
 	{
-		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt
+		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 
 	init_at_common(&at8042);
@@ -310,7 +315,7 @@ DRIVER_INIT( ps2m30286 )
 {
 	static const struct kbdc8042_interface at8042 =
 	{
-		KBDC8042_PS2, at_set_gate_a20, at_keyboard_interrupt
+		KBDC8042_PS2, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(&at8042);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);

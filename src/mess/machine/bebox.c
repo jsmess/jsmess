@@ -799,12 +799,16 @@ static void bebox_keyboard_interrupt(int state)
 	pic8259_set_irq_line(0, 1, state);
 }
 
+static int bebox_get_out2(running_machine *machine) {
+	return pit8253_get_output((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2 );
+}
 
 static const struct kbdc8042_interface bebox_8042_interface =
 {
 	KBDC8042_STANDARD,
 	NULL,
-	bebox_keyboard_interrupt
+	bebox_keyboard_interrupt,
+	bebox_get_out2
 };
 
 
