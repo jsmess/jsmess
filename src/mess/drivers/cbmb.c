@@ -413,6 +413,8 @@ static INPUT_PORTS_START (cbm500)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GRAPH NORM") PORT_CODE(KEYCODE_PGUP)
 	CBMB_KEYBOARD
 	/*C64_DIPS */
+	PORT_START_TAG( "DSW0" ) /* no idea what needs this but it bombs without it */
+	PORT_BIT (0xff, 0x00, IPT_UNUSED)
 INPUT_PORTS_END
 
 static const unsigned char cbm700_palette[] =
