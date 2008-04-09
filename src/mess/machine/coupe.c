@@ -14,8 +14,9 @@
 #include "machine/msm6242.h"
 
 
-#define LMPR_RAM0	0x20	/* If bit set ram is paged into bank 0, else its rom0 */
-#define LMPR_ROM1	0x40	/* If bit set rom1 is paged into bank 3, else its ram */
+#define LMPR_RAM0    0x20	/* If bit set ram is paged into bank 0, else its rom0 */
+#define LMPR_ROM1    0x40	/* If bit set rom1 is paged into bank 3, else its ram */
+#define HMPR_MCNTRL  0x80	/* If set external RAM is enabled */
 
 
 struct coupe_asic coupe_regs;
@@ -23,14 +24,15 @@ struct coupe_asic coupe_regs;
 
 static void coupe_update_bank(int bank, UINT8 *memory, int is_readonly)
 {
-	read8_machine_func rh;
-	write8_machine_func wh;
+	read8_machine_func rh = SMH_NOP;
+	write8_machine_func wh = SMH_NOP;
 
 	if (memory)
+	{
 		memory_set_bankptr(bank, memory);
-
-	rh = !memory ? SMH_NOP :								(read8_machine_func) (STATIC_BANK1 + (FPTR)bank - 1);
-	wh = !memory ? SMH_NOP : (is_readonly ? SMH_UNMAP :	(write8_machine_func) (STATIC_BANK1 + (FPTR)bank - 1));
+		rh = (read8_machine_func) (STATIC_BANK1 + (FPTR)bank - 1);
+		wh = is_readonly ? SMH_UNMAP : (write8_machine_func) (STATIC_BANK1 + (FPTR)bank - 1);
+	}
 
 	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, rh);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, wh);
@@ -41,7 +43,7 @@ static void coupe_update_bank(int bank, UINT8 *memory, int is_readonly)
 void coupe_update_memory(void)
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
-	int PAGE_MASK = (mess_ram_size / 0x4000) - 1;
+	int PAGE_MASK = ((mess_ram_size & 0xfffff) / 0x4000) - 1;
 	UINT8 *memory;
 	int is_readonly;
 
@@ -69,36 +71,54 @@ void coupe_update_memory(void)
 		memory = NULL;	/* Attempt to page in non existant ram region */
 	coupe_update_bank(2, memory, FALSE);
 
-
-	/* BANK3 */
-	if ( (coupe_regs.hmpr & 0x1F) <= PAGE_MASK )
-		memory = &mess_ram[(coupe_regs.hmpr & PAGE_MASK)*0x4000];
-	else
-		memory = NULL;	/* Attempt to page in non existant ram region */
-	coupe_update_bank(3, memory, FALSE);
-
-
-	/* BANK4 */
-	if (coupe_regs.lmpr & LMPR_ROM1)	/* Is Rom1 paged in at bank 4 */
+	/* only update bank 3 and 4 when external memory is not enabled */
+	if (!(coupe_regs.hmpr & HMPR_MCNTRL))
 	{
-		memory = rom + 0x4000;
-		is_readonly = TRUE;
-	}
-	else
-	{
-		if (( (coupe_regs.hmpr+1) & 0x1F) <= PAGE_MASK)
-			memory = &mess_ram[((coupe_regs.hmpr+1) & PAGE_MASK) * 0x4000];
+		/* BANK3 */
+		if ( (coupe_regs.hmpr & 0x1F) <= PAGE_MASK )
+			memory = &mess_ram[(coupe_regs.hmpr & PAGE_MASK)*0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
-		is_readonly = FALSE;
+		coupe_update_bank(3, memory, FALSE);
+	
+	
+		/* BANK4 */
+		if (coupe_regs.lmpr & LMPR_ROM1)	/* Is Rom1 paged in at bank 4 */
+		{
+			memory = rom + 0x4000;
+			is_readonly = TRUE;
+		}
+		else
+		{
+			if (( (coupe_regs.hmpr+1) & 0x1F) <= PAGE_MASK)
+				memory = &mess_ram[((coupe_regs.hmpr+1) & PAGE_MASK) * 0x4000];
+			else
+				memory = NULL;	/* Attempt to page in non existant ram region */
+			is_readonly = FALSE;
+		}
+		coupe_update_bank(4, memory, FALSE);
 	}
-	coupe_update_bank(4, memory, FALSE);
-
 
 	if (coupe_regs.vmpr & 0x40)	/* if bit set in 2 bank screen mode */
 		videoram = &mess_ram[((coupe_regs.vmpr&0x1E) & PAGE_MASK) * 0x4000];
 	else
 		videoram = &mess_ram[((coupe_regs.vmpr&0x1F) & PAGE_MASK) * 0x4000];
+}
+
+
+WRITE8_HANDLER( coupe_ext_mem_w )
+{
+	/* external RAM enabled? */
+	if (coupe_regs.hmpr & HMPR_MCNTRL)
+	{
+		UINT8 *mem = NULL;
+
+		/* only install if we have enough memory */
+		if (data >> 6 < mess_ram_size >> 20)
+			mem = &mess_ram[(mess_ram_size & 0xfffff) + (data >> 6) * 0x100000 + (data & 0x3f) * 0x4000];
+
+		coupe_update_bank(offset & 1 ? 4 : 3, mem, FALSE);
+	}
 }
 
 

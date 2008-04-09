@@ -290,6 +290,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( coupe_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(coupe_ext_mem_w)
 	AM_RANGE(0xe0, 0xe7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(coupe_disk_r, coupe_disk_w)
 	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_pen_r, coupe_clut_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_status_r, coupe_line_int_w)
@@ -600,9 +601,16 @@ static void coupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 
 
 SYSTEM_CONFIG_START(coupe)
-	CONFIG_RAM_DEFAULT(256 * 1024)
-	CONFIG_RAM(512 * 1024)
-
+	CONFIG_RAM(256 * 1024)
+	CONFIG_RAM_DEFAULT(512 * 1024)
+	CONFIG_RAM(256 * 1024 + 1 * 1024 * 1024)
+	CONFIG_RAM(512 * 1024 + 1 * 1024 * 1024)
+	CONFIG_RAM(256 * 1024 + 2 * 1024 * 1024)
+	CONFIG_RAM(512 * 1024 + 2 * 1024 * 1024)
+	CONFIG_RAM(256 * 1024 + 3 * 1024 * 1024)
+	CONFIG_RAM(512 * 1024 + 3 * 1024 * 1024)
+	CONFIG_RAM(256 * 1024 + 4 * 1024 * 1024)
+	CONFIG_RAM(512 * 1024 + 4 * 1024 * 1024)
 	CONFIG_DEVICE(coupe_floppy_getinfo)
 SYSTEM_CONFIG_END
 

@@ -33,6 +33,7 @@ extern struct coupe_asic coupe_regs;
 
 void coupe_update_memory(void);
 
+WRITE8_HANDLER( coupe_ext_mem_w );
 MACHINE_START( coupe );
 MACHINE_RESET( coupe );
 
