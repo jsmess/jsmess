@@ -280,10 +280,16 @@ MACHINE_START( orionz80 )
 	mc146818_init(MC146818_IGNORE_CENTURY);
 }
 
-
+UINT8 orion_speaker;
 WRITE8_HANDLER ( orionz80_sound_w )
 {	
-	speaker_level_w(0,data);
+	if (orion_speaker==0) {
+		orion_speaker = data;		
+	} else {
+		orion_speaker = 0 ;	
+	}
+	speaker_level_w(0,orion_speaker);
+		
 }
 
 WRITE8_HANDLER ( orionz80_sound_fe_w )
@@ -383,6 +389,7 @@ MACHINE_RESET ( orionz80 )
 	orion128_video_mode = 0;
 	orionz80_memory_page = 0;
 	orionz80_dispatcher = 0;
+	orion_speaker = 0;
 	orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
 }
@@ -390,8 +397,7 @@ MACHINE_RESET ( orionz80 )
 INTERRUPT_GEN( orionz80_interrupt ) 
 {
 	if ((orionz80_dispatcher & 0x40)==0x40) {
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);	
-		speaker_level_w(0,0);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);			
 	}	
 }
 
