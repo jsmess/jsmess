@@ -426,6 +426,8 @@ static INPUT_PORTS_START (c64gs)
 	/* 2008 FP: This has to be cleaned up later */
 	/* C64gs should simply not scan these inputs */
 	/* as a temporary solution, we keep PeT IPT_UNUSED shortcut */
+	PORT_START_TAG( "ROW0" ) /* no keyboard */
+	PORT_BIT (0xff, 0x00, IPT_UNUSED)
 	PORT_START_TAG( "ROW1" ) /* no keyboard */
 	PORT_BIT (0xff, 0x00, IPT_UNUSED)
 	PORT_START_TAG( "ROW2" ) /* no keyboard */
