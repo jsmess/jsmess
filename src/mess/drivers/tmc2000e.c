@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/printer.h"
 #include "devices/basicdsk.h"
@@ -95,7 +96,7 @@ INPUT_PORTS_END
 
 static UINT8 tmc2000e_mode_r(void)
 {
-	if (readinputportbytag("RUN") & 0x01)
+	if (input_port_read(Machine, "RUN") & 0x01)
 	{
 		return CDP1802_MODE_RUN;
 	}
@@ -119,7 +120,7 @@ static UINT8 tmc2000e_ef_r(void)
 
 	// keyboard
 	sprintf(port, "IN%d", keylatch / 8);
-	if (~readinputportbytag(port) & (1 << (keylatch % 8))) flags -= EF3;
+	if (~input_port_read(Machine, port) & (1 << (keylatch % 8))) flags -= EF3;
 
 	return flags;
 }

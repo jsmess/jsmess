@@ -82,7 +82,7 @@ VIDEO_UPDATE( mekd2 )
             int sx = width - 182 + x * 37;
             int color, code = layout[y][x];
 
-            color = (readinputport (code / 7) & (0x40 >> (code % 7))) ? 0 : 1;
+            color = (input_port_read_indexed(screen->machine, code / 7) & (0x40 >> (code % 7))) ? 0 : 1;
 
             videoram[6 * 2 + code] = color;
             drawgfx (bitmap, screen->machine->gfx[1],

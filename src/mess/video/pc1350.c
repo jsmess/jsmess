@@ -134,6 +134,7 @@ VIDEO_UPDATE( pc1350 )
 {
 	int x, y, i, j, k, b;
 	int color[2];
+	running_machine *machine = screen->machine;
 
 	bitmap_fill(bitmap, cliprect, 11);
 

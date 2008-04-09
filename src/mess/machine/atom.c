@@ -358,11 +358,11 @@ DEVICE_IMAGE_LOAD( atom_floppy )
  READ8_HANDLER ( atom_8255_portb_r )
 {
 	/* ilogerror("8255: Read port b: %02X %02X\n",
-			readinputport ((atom_8255.atom_8255_porta & 0x0f) + 1),
-			readinputport (11) & 0xc0); */
-// TODO: convert to readinputportbytag
-	return ((readinputport ((atom_8255_porta & 0x0f) + 1) & 0x3f) |
-											(readinputport (11) & 0xc0));
+			input_port_read_indexed(machine, (atom_8255.atom_8255_porta & 0x0f) + 1),
+			input_port_read_indexed(machine, 11) & 0xc0); */
+// TODO: convert to input_port_read
+	return ((input_port_read_indexed(machine, (atom_8255_porta & 0x0f) + 1) & 0x3f) |
+											(input_port_read_indexed (machine, 11) & 0xc0));
 }
 
 READ8_HANDLER ( atom_8255_portc_r )
@@ -382,7 +382,7 @@ READ8_HANDLER ( atom_8255_portc_r )
 	}
 
 	atom_8255_portc |= (m6847_get_field_sync() ? 0x00 : 0x80);
-	atom_8255_portc |= (readinputportbytag("keyboard_12") & 0x40);
+	atom_8255_portc |= (input_port_read(machine, "keyboard_12") & 0x40);
 	/* logerror("8255: Read port c (%02X)\n",atom_8255.atom_8255_portc); */
 	return (atom_8255_portc);
 }

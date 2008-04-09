@@ -162,20 +162,20 @@ static const UINT8 abc80_keycodes[7*4][8] =
 	{ 0x5f, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }
 };
 
-static void abc80_keyboard_scan(void)
+static void abc80_keyboard_scan(running_machine *machine)
 {
 	UINT8 keycode = 0;
 	UINT8 data;
 	int table = 0, row, col;
 
 	// shift, upper case
-	if (readinputportbytag("ROW7") & 0x07)
+	if (input_port_read(machine, "ROW7") & 0x07)
 	{
 		table |= 0x01;
 	}
 
 	// ctrl
-	if (readinputportbytag("ROW7") & 0x08)
+	if (input_port_read(machine, "ROW7") & 0x08)
 	{
 		table |= 0x02;
 	}
@@ -185,7 +185,7 @@ static void abc80_keyboard_scan(void)
 		char port[5];
 		sprintf(port, "ROW%d", row);
 
-		data = readinputportbytag(port);
+		data = input_port_read(machine, port);
 
 		if (data != 0)
 		{
@@ -438,7 +438,7 @@ static const struct z80_irq_daisy_chain abc80_daisy_chain[] =
 
 static TIMER_CALLBACK(abc80_keyboard_tick)
 {
-	abc80_keyboard_scan();
+	abc80_keyboard_scan(machine);
 }
 
 static MACHINE_START( abc80 )

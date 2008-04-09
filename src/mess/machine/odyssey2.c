@@ -152,7 +152,7 @@ READ8_HANDLER( odyssey2_getp2 )
     if (!(p1 & P1_KEYBOARD_SCAN_ENABLE))
 	{
 		if ((p2 & P2_KEYBOARD_SELECT_MASK) <= 5)  /* read keyboard */
-			h &= readinputport(p2 & P2_KEYBOARD_SELECT_MASK);
+			h &= input_port_read_indexed(machine, p2 & P2_KEYBOARD_SELECT_MASK);
 
 		for (i= 0x80, j = 0; i > 0; i >>= 1, j++)
 		{
@@ -188,10 +188,10 @@ READ8_HANDLER( odyssey2_getbus )
     UINT8 data = 0xff;
 
     if ((p2 & P2_KEYBOARD_SELECT_MASK) == 1)
-		data &= readinputport(6);       /* read joystick 1 */
+		data &= input_port_read_indexed(machine, 6);       /* read joystick 1 */
 
     if ((p2 & P2_KEYBOARD_SELECT_MASK) == 0)
-		data &= readinputport(7);       /* read joystick 2 */
+		data &= input_port_read_indexed(machine, 7);       /* read joystick 2 */
 
     logerror("%.6f bus read %.2x\n", attotime_to_double(timer_get_time()), data);
     return data;

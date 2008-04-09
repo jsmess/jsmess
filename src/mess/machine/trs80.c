@@ -493,7 +493,7 @@ WRITE8_HANDLER( trs80_port_ff_w )
 	if( changes & 0x03 )
 	{
 		/* virtual tape ? */
-		if( readinputportbytag("CONFIG") & 0x20 )
+		if( input_port_read(machine, "CONFIG") & 0x20 )
 		{
 			int now_cycles = activecpu_gettotalcycles();
 			int diff = now_cycles - put_cycles;
@@ -584,7 +584,7 @@ WRITE8_HANDLER( trs80_port_ff_w )
 {
 	int now_cycles = activecpu_gettotalcycles();
 	/* virtual tape ? */
-	if( readinputportbytag("CONFIG") & 0x20 )
+	if( input_port_read(machine, "CONFIG") & 0x20 )
 	{
 		int diff = now_cycles - get_cycles;
 		/* overrun since last read ? */
@@ -754,21 +754,21 @@ WRITE8_HANDLER( trs80_motor_w )
 	int result = 0;
 
 	if (offset & 1)
-		result |= readinputportbytag("LINE0");
+		result |= input_port_read(machine, "LINE0");
 	if (offset & 2)
-		result |= readinputportbytag("LINE1");
+		result |= input_port_read(machine, "LINE1");
 	if (offset & 4)
-		result |= readinputportbytag("LINE2");
+		result |= input_port_read(machine, "LINE2");
 	if (offset & 8)
-		result |= readinputportbytag("LINE3");
+		result |= input_port_read(machine, "LINE3");
 	if (offset & 16)
-		result |= readinputportbytag("LINE4");
+		result |= input_port_read(machine, "LINE4");
 	if (offset & 32)
-		result |= readinputportbytag("LINE5");
+		result |= input_port_read(machine, "LINE5");
 	if (offset & 64)
-		result |= readinputportbytag("LINE6");
+		result |= input_port_read(machine, "LINE6");
 	if (offset & 128)
-		result |= readinputportbytag("LINE7");
+		result |= input_port_read(machine, "LINE7");
 
 	return result;
 }

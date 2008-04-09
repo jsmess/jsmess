@@ -254,11 +254,11 @@ MACHINE_RESET( geneve )
 	KeyReset = 1;
 
 	/* read config */
-	has_speech = (readinputport(input_port_config) >> config_speech_bit) & config_speech_mask;
-	fdc_kind = (readinputport(input_port_config) >> config_fdc_bit) & config_fdc_mask;
-	has_ide = (readinputport(input_port_config) >> config_ide_bit) & config_ide_mask;
-	has_rs232 = (readinputport(input_port_config) >> config_rs232_bit) & config_rs232_mask;
-	has_usb_sm = (readinputport(input_port_config) >> config_usbsm_bit) & config_usbsm_mask;
+	has_speech = (input_port_read_indexed(machine, input_port_config) >> config_speech_bit) & config_speech_mask;
+	fdc_kind = (input_port_read_indexed(machine, input_port_config) >> config_fdc_bit) & config_fdc_mask;
+	has_ide = (input_port_read_indexed(machine, input_port_config) >> config_ide_bit) & config_ide_mask;
+	has_rs232 = (input_port_read_indexed(machine, input_port_config) >> config_rs232_bit) & config_rs232_mask;
+	has_usb_sm = (input_port_read_indexed(machine, input_port_config) >> config_usbsm_bit) & config_usbsm_mask;
 
 	/* set up optional expansion hardware */
 	ti99_peb_reset(0, inta_callback, intb_callback);
@@ -1035,6 +1035,7 @@ INLINE void post_in_KeyQueue(int keycode)
 
 static void poll_keyboard(void)
 {
+	running_machine *machine = Machine;
 	UINT32 keystate;
 	UINT32 key_transitions;
 	int i, j;
@@ -1076,8 +1077,8 @@ static void poll_keyboard(void)
 	/* Poll keyboard */
 	for (i=0; (i<4) && (KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
 	{
-		keystate = readinputport(input_port_keyboard_geneve + i*2)
-					| (readinputport(input_port_keyboard_geneve + i*2 + 1) << 16);
+		keystate = input_port_read_indexed(machine, input_port_keyboard_geneve + i*2)
+					| (input_port_read_indexed(machine, input_port_keyboard_geneve + i*2 + 1) << 16);
 		key_transitions = keystate ^ KeyStateSave[i];
 		if (key_transitions)
 		{
@@ -1275,9 +1276,9 @@ static void poll_mouse(void)
 	int new_mx, new_my;
 	int delta_x, delta_y, buttons;
 
-	buttons = readinputport(input_port_mouse_buttons_geneve);
-	new_mx = readinputport(input_port_mouse_deltax_geneve);
-	new_my = readinputport(input_port_mouse_deltay_geneve);
+	buttons = input_port_read_indexed(Machine, input_port_mouse_buttons_geneve);
+	new_mx = input_port_read_indexed(Machine, input_port_mouse_deltax_geneve);
+	new_my = input_port_read_indexed(Machine, input_port_mouse_deltay_geneve);
 
 	/* compute x delta */
 	delta_x = new_mx - last_mx;
@@ -1358,7 +1359,7 @@ static int R9901_0(int offset)
 {
 	int answer;
 
-	answer = readinputport(input_port_joysticks_geneve) >> (JoySel * 8);
+	answer = input_port_read_indexed(Machine, input_port_joysticks_geneve) >> (JoySel * 8);
 
 	return (answer);
 }
@@ -1379,7 +1380,7 @@ static int R9901_1(int offset)
 {
 	int answer;
 
-	answer = (readinputport(input_port_mouse_buttons_geneve) & 4) ^ 4;
+	answer = (input_port_read_indexed(Machine, input_port_mouse_buttons_geneve) & 4) ^ 4;
 
 	return answer;
 }
@@ -1400,7 +1401,7 @@ static int R9901_3(int offset)
 {
 	int answer = 0;
 
-	if (! (readinputport(input_port_mouse_buttons_geneve) & 4))
+	if (! (input_port_read_indexed(Machine, input_port_mouse_buttons_geneve) & 4))
 		answer |= 0x10;
 
 	return answer;

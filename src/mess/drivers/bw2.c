@@ -166,7 +166,7 @@ static DEVICE_IMAGE_LOAD( bw2_serial )
 	if (device_load_serial_device(image) == INIT_PASS)
 	{
 		/* setup transmit parameters */
-		serial_device_setup(image, 9600 >> readinputportbytag("BAUD"), 8, 1, SERIAL_PARITY_NONE);
+		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
 
 		/* connect serial chip to serial device */
 		msm8251_connect_to_serial_device(image);
@@ -332,7 +332,7 @@ static READ8_HANDLER( bw2_ppi8255_b_r )
 	if (row <= 9)
 	{
 		sprintf(port, "ROW%d", row);
-		return readinputportbytag(port);
+		return input_port_read(machine, port);
 	}
 
 	return 0xff;

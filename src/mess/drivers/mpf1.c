@@ -404,7 +404,7 @@ static  READ8_HANDLER( mpf1_porta_r )
 	if( keycol != 6 )
 	{
 		sprintf(port, "LINE%d", keycol);
-		retval = readinputportbytag(port);
+		retval = input_port_read(machine, port);
 	}
 	else
 	{

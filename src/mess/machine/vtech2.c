@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/vtech2.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"
@@ -224,33 +225,33 @@ static int mra_bank(int bank, int offs)
 		static int row_a,row_b,row_c,row_d;
 		if( (offs & 0x0300) == 0x0000 ) /* keyboard row A */
 		{
-			if( readinputport( 8) != row_a )
+			if( input_port_read_indexed(Machine,  8) != row_a )
 			{
-				row_a = readinputport(8);
+				row_a = input_port_read_indexed(Machine, 8);
 				data &= row_a;
 			}
 		}
 		if( (offs & 0x0300) == 0x0100 ) /* keyboard row B */
 		{
-			if( readinputport( 9) != row_b )
+			if( input_port_read_indexed(Machine,  9) != row_b )
 			{
-				row_b = readinputport( 9);
+				row_b = input_port_read_indexed(Machine,  9);
 				data &= row_b;
 			}
 		}
 		if( (offs & 0x0300) == 0x0200 ) /* keyboard row C */
 		{
-			if( readinputport(10) != row_c )
+			if( input_port_read_indexed(Machine, 10) != row_c )
 			{
-				row_c = readinputport(10);
+				row_c = input_port_read_indexed(Machine, 10);
 				data &= row_c;
 			}
 		}
 		if( (offs & 0x0300) == 0x0300 ) /* keyboard row D */
 		{
-			if( readinputport(11) != row_d )
+			if( input_port_read_indexed(Machine, 11) != row_d )
 			{
-				row_d = readinputport(11);
+				row_d = input_port_read_indexed(Machine, 11);
 				data &= row_d;
 			}
 		}
@@ -259,21 +260,21 @@ static int mra_bank(int bank, int offs)
 	{
 		/* All Lasers keyboard rows 0 through 7 */
         if( !(offs & 0x01) )
-			data &= readinputport( 0);
+			data &= input_port_read_indexed(Machine,  0);
 		if( !(offs & 0x02) )
-			data &= readinputport( 1);
+			data &= input_port_read_indexed(Machine,  1);
 		if( !(offs & 0x04) )
-			data &= readinputport( 2);
+			data &= input_port_read_indexed(Machine,  2);
 		if( !(offs & 0x08) )
-			data &= readinputport( 3);
+			data &= input_port_read_indexed(Machine,  3);
 		if( !(offs & 0x10) )
-			data &= readinputport( 4);
+			data &= input_port_read_indexed(Machine,  4);
 		if( !(offs & 0x20) )
-			data &= readinputport( 5);
+			data &= input_port_read_indexed(Machine,  5);
 		if( !(offs & 0x40) )
-			data &= readinputport( 6);
+			data &= input_port_read_indexed(Machine,  6);
 		if( !(offs & 0x80) )
-			data &= readinputport( 7);
+			data &= input_port_read_indexed(Machine,  7);
 	}
 
     /* what's bit 7 good for? tape input maybe? */

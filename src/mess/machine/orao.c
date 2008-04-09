@@ -34,26 +34,26 @@ READ8_HANDLER( orao_io_r )
 	 
 	 switch(offset) {
 	 	/* Keyboard*/
-	 	case 0x07FC : return readinputport(0); break;
-	 	case 0x07FD : return readinputport(1); break;
-	 	case 0x07FA : return readinputport(2); break;
-	 	case 0x07FB : return readinputport(3); break;
-	 	case 0x07F6 : return readinputport(4); break;
-	 	case 0x07F7 : return readinputport(5); break;
-	 	case 0x07EE : return readinputport(6); break;
-	 	case 0x07EF : return readinputport(7); break;
-	 	case 0x07DE : return readinputport(8); break;
-	 	case 0x07DF : return readinputport(9); break;
-	 	case 0x07BE : return readinputport(10); break;
-	 	case 0x07BF : return readinputport(11); break;
-	 	case 0x077E : return readinputport(12); break;
-	 	case 0x077F : return readinputport(13); break;
-	 	case 0x06FE : return readinputport(14); break;
-	 	case 0x06FF : return readinputport(15); break;
-	 	case 0x05FE : return readinputport(16); break;
-	 	case 0x05FF : return readinputport(17); break;
-	 	case 0x03FE : return readinputport(18); break;
-	 	case 0x03FF : return readinputport(19); break;
+	 	case 0x07FC : return input_port_read_indexed(machine, 0); break;
+	 	case 0x07FD : return input_port_read_indexed(machine, 1); break;
+	 	case 0x07FA : return input_port_read_indexed(machine, 2); break;
+	 	case 0x07FB : return input_port_read_indexed(machine, 3); break;
+	 	case 0x07F6 : return input_port_read_indexed(machine, 4); break;
+	 	case 0x07F7 : return input_port_read_indexed(machine, 5); break;
+	 	case 0x07EE : return input_port_read_indexed(machine, 6); break;
+	 	case 0x07EF : return input_port_read_indexed(machine, 7); break;
+	 	case 0x07DE : return input_port_read_indexed(machine, 8); break;
+	 	case 0x07DF : return input_port_read_indexed(machine, 9); break;
+	 	case 0x07BE : return input_port_read_indexed(machine, 10); break;
+	 	case 0x07BF : return input_port_read_indexed(machine, 11); break;
+	 	case 0x077E : return input_port_read_indexed(machine, 12); break;
+	 	case 0x077F : return input_port_read_indexed(machine, 13); break;
+	 	case 0x06FE : return input_port_read_indexed(machine, 14); break;
+	 	case 0x06FF : return input_port_read_indexed(machine, 15); break;
+	 	case 0x05FE : return input_port_read_indexed(machine, 16); break;
+	 	case 0x05FF : return input_port_read_indexed(machine, 17); break;
+	 	case 0x03FE : return input_port_read_indexed(machine, 18); break;
+	 	case 0x03FF : return input_port_read_indexed(machine, 19); break;
 	 	/* Tape */ 
 	 	case 0x07FF : level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
 	 								if (level <  0) { 

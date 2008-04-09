@@ -47,7 +47,7 @@ static UINT8 port_read_with_latch(UINT8 ext, UINT8 latch_state)
 
 static  READ8_HANDLER( channelf_port_0_r )
 {
-	return port_read_with_latch(readinputportbytag("PANEL"),latch[0]);
+	return port_read_with_latch(input_port_read(machine, "PANEL"),latch[0]);
 }
 
 static  READ8_HANDLER( channelf_port_1_r )
@@ -56,11 +56,11 @@ static  READ8_HANDLER( channelf_port_1_r )
 
 	if ((latch[0] & 0x40) == 0)
 	{
-		ext_value = readinputportbytag("RIGHT_C");
+		ext_value = input_port_read(machine, "RIGHT_C");
 	}
 	else
 	{
-		ext_value = 0xc0 | readinputportbytag("RIGHT_C");
+		ext_value = 0xc0 | input_port_read(machine, "RIGHT_C");
 	}
 	return port_read_with_latch(ext_value,latch[1]);
 }
@@ -71,7 +71,7 @@ static  READ8_HANDLER( channelf_port_4_r )
 
 	if ((latch[0] & 0x40) == 0)
 	{
-		ext_value = readinputportbytag("LEFT_C");
+		ext_value = input_port_read(machine, "LEFT_C");
 	}
 	else
 	{

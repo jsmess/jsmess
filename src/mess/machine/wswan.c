@@ -942,13 +942,13 @@ WRITE8_HANDLER( wswan_port_w )
 			data = data & 0xF0;
 			switch( data ) {
 			case 0x10:	/* Read Y cursors: Y1 - Y2 - Y3 - Y4 */
-				data = data | readinputport( 2 );
+				data = data | input_port_read_indexed(machine,  2 );
 				break;
 			case 0x20:	/* Read X cursors: X1 - X2 - X3 - X4 */
-				data = data | readinputport( 0 );
+				data = data | input_port_read_indexed(machine,  0 );
 				break;
 			case 0x40:	/* Read buttons: START - A - B */
-				data = data | readinputport( 1 );
+				data = data | input_port_read_indexed(machine,  1 );
 				break;
 			}
 			break;

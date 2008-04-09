@@ -28,21 +28,21 @@ DRIVER_INIT(ut88)
 READ8_HANDLER (ut88_8255_portb_r )
 {
 	switch (ut88_8255_porta ^ 0xff) {
-	  	case 0x01 : return readinputport(0);break;
-	  	case 0x02 : return readinputport(1);break;
-	  	case 0x04 : return readinputport(2);break;
-	  	case 0x08 : return readinputport(3);break;
-	  	case 0x10 : return readinputport(4);break;
-	  	case 0x20 : return readinputport(5);break;
-	  	case 0x40 : return readinputport(6);break;
-	  	case 0x80 : return readinputport(7);break;
+	  	case 0x01 : return input_port_read_indexed(machine, 0);break;
+	  	case 0x02 : return input_port_read_indexed(machine, 1);break;
+	  	case 0x04 : return input_port_read_indexed(machine, 2);break;
+	  	case 0x08 : return input_port_read_indexed(machine, 3);break;
+	  	case 0x10 : return input_port_read_indexed(machine, 4);break;
+	  	case 0x20 : return input_port_read_indexed(machine, 5);break;
+	  	case 0x40 : return input_port_read_indexed(machine, 6);break;
+	  	case 0x80 : return input_port_read_indexed(machine, 7);break;
 	}	
 	return 0xff;
 }
 
 READ8_HANDLER (ut88_8255_portc_r )
 {
-	return readinputport(8);	
+	return input_port_read_indexed(machine, 8);	
 }
 
 WRITE8_HANDLER (ut88_8255_porta_w )
@@ -104,7 +104,7 @@ READ8_HANDLER( ut88_tape_r )
 
 READ8_HANDLER( ut88mini_keyboard_r )
 {
-	return readinputport(0);	
+	return input_port_read_indexed(machine, 0);	
 }
 
 static int lcd_digit[6];

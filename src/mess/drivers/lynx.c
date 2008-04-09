@@ -52,8 +52,8 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( lynx_frame_int )
 {
     lynx_rotate=rotate;
-    if ((readinputportbytag("ROTATION")&3)!=3)
-		lynx_rotate=readinputportbytag("ROTATION")&3;
+    if ((input_port_read(machine, "ROTATION")&3)!=3)
+		lynx_rotate=input_port_read(machine, "ROTATION")&3;
 }
 
 static UINT8 lynx_read_vram(UINT16 address)

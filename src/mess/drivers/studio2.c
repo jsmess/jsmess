@@ -100,6 +100,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
 #include "video/cdp1864.h"
@@ -189,8 +190,8 @@ static UINT8 studio2_ef_r(void)
 
 	if (cdp1861_efx) ef -= EF1;
 
-	if (readinputportbytag("KEYPAD_L") & (1 << keylatch)) ef -= EF3;
-	if (readinputportbytag("KEYPAD_R") & (1 << keylatch)) ef -= EF4;
+	if (input_port_read(Machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
+	if (input_port_read(Machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
 
 	return ef;
 }
@@ -216,8 +217,8 @@ static UINT8 mpt02_ef_r(void)
 
 	if (cdp1864_efx) ef -= EF1;
 
-	if (readinputportbytag("KEYPAD_L") & (1 << keylatch)) ef -= EF3;
-	if (readinputportbytag("KEYPAD_R") & (1 << keylatch)) ef -= EF4;
+	if (input_port_read(Machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
+	if (input_port_read(Machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
 
 	return ef;
 }

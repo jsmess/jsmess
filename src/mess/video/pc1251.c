@@ -120,6 +120,7 @@ VIDEO_UPDATE( pc1251 )
 {
 	int x, y, i, j;
 	int color[2];
+	running_machine *machine = screen->machine;
 
 	bitmap_fill(bitmap, cliprect, 11);
 

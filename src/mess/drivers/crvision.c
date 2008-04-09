@@ -250,7 +250,7 @@ static UINT8 read_keyboard(int pa)
 	for (i = 0; i < 8; i++)
 	{
 		sprintf(portname, "PA%u-%u", pa, i);
-		value = readinputportbytag(portname);
+		value = input_port_read(Machine, portname);
 
 		if (value != 0xff)
 		{

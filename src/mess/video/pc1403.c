@@ -57,7 +57,7 @@ VIDEO_START( pc1403 )
 }
 
 
- READ8_HANDLER(pc1403_lcd_read)
+READ8_HANDLER(pc1403_lcd_read)
 {
     UINT8 data=pc1403_lcd.reg[offset];
     return data;
@@ -155,6 +155,7 @@ static const POCKETC_FIGURE busy={
 
 VIDEO_UPDATE( pc1403 )
 {
+	running_machine *machine = screen->machine;
 	int x, y, i, j;
 	int color[3];
 

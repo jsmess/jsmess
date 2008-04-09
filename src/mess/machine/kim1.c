@@ -8,6 +8,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/kim1.h"
 #include "sound/dac.h"
@@ -681,6 +682,7 @@ INTERRUPT_GEN( kim1_interrupt )
 INLINE int m6530_r(int chip, int offset)
 {
 	int data = 0xff;
+	running_machine *machine = Machine;
 
 	switch (offset)
 	{
@@ -693,7 +695,7 @@ INLINE int m6530_r(int chip, int offset)
 			switch (which)
 			{
 			case 0:				   /* key row 1 */
-				m6530[1].dria = readinputport(0);
+				m6530[1].dria = input_port_read_indexed(machine, 0);
 				logerror("read keybd(%d): %c%c%c%c%c%c%c\n",
 					 which,
 					 (m6530[1].dria & 0x40) ? '.' : '0',
@@ -705,7 +707,7 @@ INLINE int m6530_r(int chip, int offset)
 					 (m6530[1].dria & 0x01) ? '.' : '6');
 				break;
 			case 1:				   /* key row 2 */
-				m6530[1].dria = readinputport(1);
+				m6530[1].dria = input_port_read_indexed(machine, 1);
 				logerror("read keybd(%d): %c%c%c%c%c%c%c\n",
 					 which,
 					 (m6530[1].dria & 0x40) ? '.' : '7',
@@ -717,7 +719,7 @@ INLINE int m6530_r(int chip, int offset)
 					 (m6530[1].dria & 0x01) ? '.' : 'D');
 				break;
 			case 2:				   /* key row 3 */
-				m6530[1].dria = readinputport(2);
+				m6530[1].dria = input_port_read_indexed(machine, 2);
 				logerror("read keybd(%d): %c%c%c%c%c%c%c\n",
 					 which,
 					 (m6530[1].dria & 0x40) ? '.' : 'E',

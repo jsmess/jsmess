@@ -93,10 +93,10 @@ READ8_HANDLER( primo_be_1_r )
 	data |= (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) < 0.1) ? 0x04 : 0x00;
 
 	// bit 1 - reset button
-	data |= (readinputport(4)) ? 0x02 : 0x00;
+	data |= (input_port_read_indexed(machine, 4)) ? 0x02 : 0x00;
 
 	// bit 0 - keyboard
-	data |= (readinputport((offset&0x0030)>>4) >> (offset&0x000f))&0x0001 ? 0x01 : 0x00;
+	data |= (input_port_read_indexed(machine, (offset&0x0030)>>4) >> (offset&0x000f))&0x0001 ? 0x01 : 0x00;
 
 	return data;
 }
@@ -196,7 +196,7 @@ WRITE8_HANDLER( primo_ki_2_w )
 
 WRITE8_HANDLER( primo_FD_w )
 {
-	if (!readinputport(6))
+	if (!input_port_read_indexed(machine, 6))
 	{
 		primo_port_FD = data;
 		primo_update_memory();
@@ -240,10 +240,10 @@ DRIVER_INIT( primo64 )
 
 static void primo_common_machine_init (running_machine *machine)
 {
-	if (readinputport(6))
+	if (input_port_read_indexed(machine, 6))
 		primo_port_FD = 0x00;
 	primo_update_memory();
-	cpunum_set_clockscale(machine, 0, readinputport(5) ? 1.5 : 1.0);
+	cpunum_set_clockscale(machine, 0, input_port_read_indexed(machine, 5) ? 1.5 : 1.0);
 }
 
 MACHINE_RESET( primoa )

@@ -817,19 +817,19 @@ static READ8_HANDLER( amstrad_plus_asic_6000_r )
 		// Analogue ports
 		if(offset == 0x0808)
 		{
-			return (readinputportbytag("analog1") & 0x3f);
+			return (input_port_read(machine, "analog1") & 0x3f);
 		}
 		if(offset == 0x0809)
 		{
-			return (readinputportbytag("analog2") & 0x3f);
+			return (input_port_read(machine, "analog2") & 0x3f);
 		}
 		if(offset == 0x080a)
 		{
-			return (readinputportbytag("analog3") & 0x3f);
+			return (input_port_read(machine, "analog3") & 0x3f);
 		}
 		if(offset == 0x080b)
 		{
-			return (readinputportbytag("analog4") & 0x3f);
+			return (input_port_read(machine, "analog4") & 0x3f);
 		}
 		if(offset == 0x080c || offset == 0x080e)
 		{
@@ -1242,7 +1242,7 @@ static READ8_HANDLER ( AmstradCPC_ReadPortHandler )
 	m6845_personality_t crtc_type;
 	int page;
 
-	crtc_type = readinputportbytag_safe("crtc", 0);
+	crtc_type = input_port_read_safe(machine, "crtc", 0);
 	m6845_set_personality(crtc_type);
 
 	if(aleste_mode & 0x04)
@@ -1603,7 +1603,7 @@ int multiface_hardware_enabled(void)
 {
 		if (multiface_ram!=NULL)
 		{
-				if ((readinputportbytag("multiface") & 0x01)!=0)
+				if ((input_port_read(Machine, "multiface") & 0x01)!=0)
 				{
 						return 1;
 				}
@@ -1826,7 +1826,7 @@ static int amstrad_cpu_acknowledge_int(int cpu)
 
 static VIDEO_EOF( amstrad )
 {
-	if (readinputportbytag_safe("multiface", 0) & 0x02)
+	if (input_port_read_safe(machine, "multiface", 0) & 0x02)
 	{
 		multiface_stop(machine);
 	}
@@ -1844,7 +1844,7 @@ void amstrad_reset_machine(running_machine *machine)
 	amstrad_GateArray_write(machine, 0x0c0);
 
   // Get manufacturer name and TV refresh rate from PCB link (dipswitch for mess emulation)
-	ppi_port_inputs[amstrad_ppi_PortB] = (((readinputportbytag("solder_links")&MANUFACTURER_NAME)<<1) | (readinputportbytag("solder_links")&TV_REFRESH_RATE));
+	ppi_port_inputs[amstrad_ppi_PortB] = (((input_port_read(machine, "solder_links")&MANUFACTURER_NAME)<<1) | (input_port_read(machine, "solder_links")&TV_REFRESH_RATE));
 
 	if(amstrad_system_type != SYSTEM_CPC)
 		memset(amstrad_plus_asic_ram,0,16384);  // clear ASIC RAM
@@ -2283,7 +2283,7 @@ static READ8_HANDLER ( amstrad_psg_porta_read )
 
 		sprintf(port, "keyboard_row_%d", amstrad_read_keyboard_line);
 
-		return (readinputportbytag(port) & 0xFF);
+		return (input_port_read(machine, port) & 0xFF);
 	}
 }
 

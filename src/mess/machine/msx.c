@@ -405,8 +405,8 @@ DRIVER_INIT( msx2 )
 
 INTERRUPT_GEN( msx2_interrupt )
 {
-	v9938_set_sprite_limit(0, readinputport (8) & 0x20);
-	v9938_set_resolution(0, readinputport (8) & 0x03);
+	v9938_set_sprite_limit(0, input_port_read_indexed(machine, 8) & 0x20);
+	v9938_set_resolution(0, input_port_read_indexed(machine, 8) & 0x03);
 	v9938_interrupt(0);
 }
 
@@ -416,11 +416,11 @@ INTERRUPT_GEN( msx_interrupt )
 
 	for (i=0;i<2;i++)
 	{
-		msx1.mouse[i] = readinputport (9+i);
+		msx1.mouse[i] = input_port_read_indexed(machine, 9+i);
 		msx1.mouse_stat[i] = -1;
 	}
 
-	TMS9928A_set_spriteslimit (readinputport (8) & 0x20);
+	TMS9928A_set_spriteslimit (input_port_read_indexed(machine, 8) & 0x20);
 	TMS9928A_interrupt();
 }
 
@@ -457,10 +457,10 @@ READ8_HANDLER ( msx_psg_port_a_r )
 
 	data = (cassette_input(cassette_device_image()) > 0.0038 ? 0x80 : 0);
 
-	if ( (msx1.psg_b ^ readinputport(8) ) & 0x40)
+	if ( (msx1.psg_b ^ input_port_read_indexed(machine, 8) ) & 0x40)
 		{
 		/* game port 2 */
-		inp = readinputport(7) & 0x7f;
+		inp = input_port_read_indexed(machine, 7) & 0x7f;
 #if 0
 		if ( !(inp & 0x80) )
 			{
@@ -485,7 +485,7 @@ READ8_HANDLER ( msx_psg_port_a_r )
 	else
 		{
 		/* game port 1 */
-		inp = readinputport(6) & 0x7f;
+		inp = input_port_read_indexed(machine, 6) & 0x7f;
 #if 0
 		if ( !(inp & 0x80) )
 			{
@@ -540,7 +540,7 @@ WRITE8_HANDLER ( msx_psg_port_b_w )
 
 WRITE8_HANDLER ( msx_printer_w )
 {
-	if (readinputport (8) & 0x80) {
+	if (input_port_read_indexed(machine, 8) & 0x80) {
 		/* SIMPL emulation */
 		if (offset == 1)
 			DAC_signed_data_w (0, data);
@@ -565,7 +565,7 @@ WRITE8_HANDLER ( msx_printer_w )
 
 READ8_HANDLER ( msx_printer_r )
 {
-	if (offset == 0 && ! (readinputport (8) & 0x80) &&
+	if (offset == 0 && ! (input_port_read_indexed(machine, 8) & 0x80) &&
 			printer_status(printer_image(), 0) )
 		return 253;
 
@@ -735,7 +735,7 @@ static READ8_HANDLER( msx_ppi_port_b_r )
 	row = ppi8255_0_r(machine, 2) & 0x0f;
 	if (row <= 10)
 	{
-		data = readinputport (row/2);
+		data = input_port_read_indexed(machine, row/2);
 		if (row & 1)
 			data >>= 8;
 		result = data & 0xff;

@@ -24,6 +24,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "eventlst.h"
@@ -156,6 +157,7 @@ error:
  *******************************************************************/
 static int spectrum_setup_tap(offs_t address, UINT8 *snapshot_data, int snapshot_length)
 {
+	running_machine *machine = Machine;
 	int i, tap_block_length, load_length;
 	unsigned char lo, hi, a_reg;
 	unsigned short load_addr, return_addr, af_reg, de_reg, sp_reg;
@@ -270,7 +272,7 @@ static int spectrum_setup_tap(offs_t address, UINT8 *snapshot_data, int snapshot
 	if (TapePosition >= snapshot_length)
 	{
 		/* End of tape - either rewind or disable op base override */
-		if (readinputportbytag("CONFIG") & 0x40)
+		if (input_port_read(machine, "CONFIG") & 0x40)
 		{
 			if (data_loaded)
 			{

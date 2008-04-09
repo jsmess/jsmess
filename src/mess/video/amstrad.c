@@ -181,7 +181,7 @@ static const rgb_t amstrad_green_palette[32] =
 /* Initialise the palette */
 PALETTE_INIT( amstrad_cpc )
 {
-   	if ( ((readinputportbytag("green_display")) & 0x01)==0 )
+   	if ( ((input_port_read(machine, "green_display")) & 0x01)==0 )
 	   palette_set_colors(machine, 0, amstrad_palette, ARRAY_LENGTH(amstrad_palette));
    	else
 	   palette_set_colors(machine, 0, amstrad_green_palette, ARRAY_LENGTH(amstrad_green_palette));

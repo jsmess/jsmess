@@ -6,6 +6,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 #include "includes/pclpt.h"
 #include "machine/centroni.h"
@@ -58,7 +59,7 @@ void pc_lpt_set_device(int nr, const CENTRONICS_DEVICE *device)
 static void pc_LPT_w(int n, int offset, int data)
 {
 	PC_LPT *This=LPT+n;
-	if ( !(readinputport(2) & (0x08>>n)) ) return;
+	if ( !(input_port_read_indexed(Machine, 2) & (0x08>>n)) ) return;
 //	if (!This->on) return;
 	switch( offset )
 	{
@@ -93,7 +94,7 @@ static int pc_LPT_r(int n, int offset)
 {
 	PC_LPT *This=LPT+n;
     int data = 0xff;
-	if ( !(readinputport(2) & (0x08>>n)) ) return data;
+	if ( !(input_port_read_indexed(Machine, 2) & (0x08>>n)) ) return data;
 //	if (!This->on) return data;
 	switch( offset )
 	{

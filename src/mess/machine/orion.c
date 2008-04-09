@@ -35,7 +35,7 @@ UINT8 orionz80_dispatcher;
 READ8_HANDLER (orion_romdisk_porta_r )
 {
 	UINT8 *romdisk = memory_region(REGION_CPU1) + 0x10000;		
-	switch(readinputport(9)) {
+	switch(input_port_read_indexed(machine, 9)) {
 	  case 3 : return romdisk[romdisk_msb*256+romdisk_lsb];	
 	  case 1 : return romdisk[romdisk_msb*256+romdisk_lsb+0x10000];		  	
 	}
@@ -54,12 +54,12 @@ WRITE8_HANDLER (orion_romdisk_portc_w )
 
 READ8_HANDLER (orion_keyboard_portb_r )
 {		
-	return readinputport(orion_keyboard_line);
+	return input_port_read_indexed(machine, orion_keyboard_line);
 }
 
 READ8_HANDLER (orion_keyboard_portc_r )
 {
-	return readinputport(8);		
+	return input_port_read_indexed(machine, 8);		
 }
 
 WRITE8_HANDLER (orion_keyboard_porta_w )

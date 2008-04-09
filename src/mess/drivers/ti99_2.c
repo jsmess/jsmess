@@ -257,7 +257,7 @@ static  READ8_HANDLER ( ti99_2_read_kbd )
 	char port[6];
 
 	sprintf(port, "LINE%d", KeyRow);
-	return readinputportbytag(port);
+	return input_port_read(machine, port);
 }
 
 static  READ8_HANDLER ( ti99_2_read_misc_cru )

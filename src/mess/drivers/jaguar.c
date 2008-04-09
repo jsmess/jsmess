@@ -210,10 +210,10 @@ static READ32_HANDLER( joystick_r )
 		if ((joystick_data & (0x10000 << i)) == 0)
 		{
 			sprintf(port, "JOY%d", i);
-			joystick_result &= readinputportbytag(port);
+			joystick_result &= input_port_read(machine, port);
 
 			sprintf(port, "BUTTONS%d", i);
-			joybuts_result &= readinputportbytag(port);
+			joybuts_result &= input_port_read(machine, port);
 		}
 	}
 

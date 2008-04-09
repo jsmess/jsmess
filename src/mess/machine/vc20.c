@@ -64,7 +64,7 @@ static void vc20_via0_irq (int level)
 
 static  READ8_HANDLER( vc20_via0_read_ca1 )
 {
-	return ! ( readinputportbytag( TAG_KEYBOARD_EXTRA ) & 0x02 );
+	return ! ( input_port_read(machine,  TAG_KEYBOARD_EXTRA ) & 0x02 );
 }
 
 static  READ8_HANDLER( vc20_via0_read_ca2 )
@@ -713,16 +713,16 @@ DEVICE_IMAGE_LOAD(vc20_rom)
 INTERRUPT_GEN( vc20_frame_interrupt )
 {
 	via_0_ca1_w(machine, 0, vc20_via0_read_ca1 (machine, 0));
-	keyboard[0] = readinputportbytag( TAG_KEYBOARD_ROW0 );
-	keyboard[1] = readinputportbytag( TAG_KEYBOARD_ROW1 );
-	keyboard[2] = readinputportbytag( TAG_KEYBOARD_ROW2 );
-	keyboard[3] = readinputportbytag( TAG_KEYBOARD_ROW3 );
-	keyboard[4] = readinputportbytag( TAG_KEYBOARD_ROW4 );
-	keyboard[5] = readinputportbytag( TAG_KEYBOARD_ROW5 );
-	keyboard[6] = readinputportbytag( TAG_KEYBOARD_ROW6 );
-	keyboard[7] = readinputportbytag( TAG_KEYBOARD_ROW7 );
+	keyboard[0] = input_port_read(machine,  TAG_KEYBOARD_ROW0 );
+	keyboard[1] = input_port_read(machine,  TAG_KEYBOARD_ROW1 );
+	keyboard[2] = input_port_read(machine,  TAG_KEYBOARD_ROW2 );
+	keyboard[3] = input_port_read(machine,  TAG_KEYBOARD_ROW3 );
+	keyboard[4] = input_port_read(machine,  TAG_KEYBOARD_ROW4 );
+	keyboard[5] = input_port_read(machine,  TAG_KEYBOARD_ROW5 );
+	keyboard[6] = input_port_read(machine,  TAG_KEYBOARD_ROW6 );
+	keyboard[7] = input_port_read(machine,  TAG_KEYBOARD_ROW7 );
 
 	vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
 	vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , ( readinputportbytag( TAG_KEYBOARD_EXTRA ) & 0x01 ) ? 1 : 0);
+	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , ( input_port_read(machine,  TAG_KEYBOARD_EXTRA ) & 0x01 ) ? 1 : 0);
 }

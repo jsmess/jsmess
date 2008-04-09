@@ -35,35 +35,35 @@
   paddle 2 button to joystick right
  */
 
-#define JOYSTICK (readinputportbytag( TAG_DEVICES )&0x80)
-#define PADDLES (readinputportbytag( TAG_DEVICES )&0x40)
-#define LIGHTPEN (readinputportbytag( TAG_DEVICES )&0x20)
-#define LIGHTPEN_POINTER (LIGHTPEN&&(readinputportbytag( TAG_DEVICES )&0x10))
-#define LIGHTPEN_X_VALUE (readinputportbytag( TAG_LIGHTPENX )&~1)		/* effectiv resolution */
-#define LIGHTPEN_Y_VALUE (readinputportbytag( TAG_LIGHTPENY )&~1)		/* effectiv resolution */
-#define LIGHTPEN_BUTTON (LIGHTPEN&&(readinputportbytag( TAG_JOYSTICK )&0x80))
+#define JOYSTICK (input_port_read(machine,  TAG_DEVICES )&0x80)
+#define PADDLES (input_port_read(machine,  TAG_DEVICES )&0x40)
+#define LIGHTPEN (input_port_read(machine,  TAG_DEVICES )&0x20)
+#define LIGHTPEN_POINTER (LIGHTPEN&&(input_port_read(machine,  TAG_DEVICES )&0x10))
+#define LIGHTPEN_X_VALUE (input_port_read(machine,  TAG_LIGHTPENX )&~1)		/* effectiv resolution */
+#define LIGHTPEN_Y_VALUE (input_port_read(machine,  TAG_LIGHTPENY )&~1)		/* effectiv resolution */
+#define LIGHTPEN_BUTTON (LIGHTPEN&&(input_port_read(machine,  TAG_JOYSTICK )&0x80))
 
-#define JOYSTICK_UP (readinputportbytag( TAG_JOYSTICK )&1)
-#define JOYSTICK_DOWN (readinputportbytag( TAG_JOYSTICK )&2)
-#define JOYSTICK_LEFT (readinputportbytag( TAG_JOYSTICK )&4)
-#define JOYSTICK_RIGHT (readinputportbytag( TAG_JOYSTICK )&8)
-#define JOYSTICK_BUTTON (readinputportbytag( TAG_JOYSTICK )&0x10)
+#define JOYSTICK_UP (input_port_read(machine,  TAG_JOYSTICK )&1)
+#define JOYSTICK_DOWN (input_port_read(machine,  TAG_JOYSTICK )&2)
+#define JOYSTICK_LEFT (input_port_read(machine,  TAG_JOYSTICK )&4)
+#define JOYSTICK_RIGHT (input_port_read(machine,  TAG_JOYSTICK )&8)
+#define JOYSTICK_BUTTON (input_port_read(machine,  TAG_JOYSTICK )&0x10)
 
-#define PADDLE1_BUTTON (readinputportbytag( TAG_JOYSTICK )&0x20)
-#define PADDLE2_BUTTON (readinputportbytag( TAG_JOYSTICK )&0x40)
+#define PADDLE1_BUTTON (input_port_read(machine,  TAG_JOYSTICK )&0x20)
+#define PADDLE2_BUTTON (input_port_read(machine,  TAG_JOYSTICK )&0x40)
 
-#define PADDLE1_VALUE   readinputportbytag( TAG_PADDLE1 )
-#define PADDLE2_VALUE	readinputportbytag( TAG_PADDLE2 )
+#define PADDLE1_VALUE   input_port_read(machine,  TAG_PADDLE1 )
+#define PADDLE2_VALUE	input_port_read(machine,  TAG_PADDLE2 )
 
 
-#define DATASSETTE (readinputportbytag( TAG_DEVICES )&0x8)
-#define DATASSETTE_TONE (readinputportbytag( TAG_DEVICES )&4)
+#define DATASSETTE (input_port_read(machine,  TAG_DEVICES )&0x8)
+#define DATASSETTE_TONE (input_port_read(machine,  TAG_DEVICES )&4)
 
-#define QUICKLOAD		(readinputportbytag( TAG_CASSETTE )&8)
+#define QUICKLOAD		(input_port_read(machine,  TAG_CASSETTE )&8)
 
-#define DATASSETTE_PLAY		(readinputportbytag( TAG_CASSETTE )&4)
-#define DATASSETTE_RECORD	(readinputportbytag( TAG_CASSETTE )&2)
-#define DATASSETTE_STOP		(readinputportbytag( TAG_CASSETTE )&1)
+#define DATASSETTE_PLAY		(input_port_read(machine,  TAG_CASSETTE )&4)
+#define DATASSETTE_RECORD	(input_port_read(machine,  TAG_CASSETTE )&2)
+#define DATASSETTE_STOP		(input_port_read(machine,  TAG_CASSETTE )&1)
 
 #define VC20ADDR2VIC6560ADDR(a) (((a)>0x8000)?((a)&0x1fff):((a)|0x2000))
 #define VIC6560ADDR2VC20ADDR(a) (((a)>0x2000)?((a)&0x1fff):((a)|0x8000))

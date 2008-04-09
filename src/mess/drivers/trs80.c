@@ -94,7 +94,7 @@ Not emulated:
 
 static READ8_HANDLER (trs80_wd179x_r)
 {
-	if (readinputportbytag("CONFIG") & 0x80)
+	if (input_port_read(machine, "CONFIG") & 0x80)
 	{
 		return wd17xx_status_r(machine, offset);
 	}

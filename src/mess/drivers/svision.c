@@ -51,7 +51,7 @@ static TIMER_CALLBACK(svision_pet_timer)
 	switch (svision_pet.state)
 	{
 		case 0:
-			svision_pet.input = readinputportbytag("JOY2");
+			svision_pet.input = input_port_read(machine, "JOY2");
 			/* fall through */
 
 		case 2: case 4: case 6: case 8:
@@ -93,7 +93,7 @@ static READ8_HANDLER(svision_r)
 	switch (offset)
 	{
 		case 0x20:
-			data = readinputportbytag("JOY");
+			data = input_port_read(machine, "JOY");
 			break;
 		case 0x21:
 			data &= ~0xf;

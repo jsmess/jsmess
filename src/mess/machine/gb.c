@@ -757,9 +757,9 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x00:						/* JOYP - Joypad */
 		JOYPAD = 0xCF | data;
 		if (!(data & 0x20))
-			JOYPAD &= (readinputport (0) >> 4) | 0xF0;
+			JOYPAD &= (input_port_read_indexed(machine, 0) >> 4) | 0xF0;
 		if (!(data & 0x10))
-			JOYPAD &= readinputport (0) | 0xF0;
+			JOYPAD &= input_port_read_indexed(machine, 0) | 0xF0;
 		return;
 	case 0x01:						/* SB - Serial transfer data */
 		break;
@@ -878,7 +878,7 @@ WRITE8_HANDLER ( sgb_io_w )
 				sgb_bitcount = 0;
 				sgb_start = 1;
 				sgb_rest = 0;
-				JOYPAD = 0x0F & ((readinputport (0) >> 4) | readinputport (0) | 0xF0);
+				JOYPAD = 0x0F & ((input_port_read_indexed(machine, 0) >> 4) | input_port_read_indexed(machine, 0) | 0xF0);
 				break;
 			case 0x10:				   /* data true */
 				if (sgb_rest)
@@ -900,7 +900,7 @@ WRITE8_HANDLER ( sgb_io_w )
 					}
 					sgb_rest = 0;
 				}
-				JOYPAD = 0x1F & ((readinputport (0) >> 4) | 0xF0);
+				JOYPAD = 0x1F & ((input_port_read_indexed(machine, 0) >> 4) | 0xF0);
 				break;
 			case 0x20:				/* data false */
 				if (sgb_rest)
@@ -1321,7 +1321,7 @@ WRITE8_HANDLER ( sgb_io_w )
 					}
 					sgb_rest = 0;
 				}
-				JOYPAD = 0x2F & (readinputport (0) | 0xF0);
+				JOYPAD = 0x2F & (input_port_read_indexed(machine, 0) | 0xF0);
 				break;
 			case 0x30:				   /* rest condition */
 				if (sgb_start)

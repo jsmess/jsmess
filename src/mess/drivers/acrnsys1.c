@@ -27,7 +27,7 @@ static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 	char port[11];
 	UINT8 data;
 	sprintf(port, "keyboard_%d", key_digit);
-	data = readinputportbytag(port);
+	data = input_port_read(device->machine, port);
 	logerror("Reading %02x from row %d\n", data, key_digit);
 	return data;
 }

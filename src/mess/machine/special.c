@@ -36,14 +36,14 @@ DRIVER_INIT(special)
 
 READ8_HANDLER (specialist_8255_porta_r )
 {
-	if (readinputport(0)!=0xff) return 0xfe;
-	if (readinputport(1)!=0xff) return 0xfd;
-	if (readinputport(2)!=0xff) return 0xfb;
-	if (readinputport(3)!=0xff) return 0xf7;
-	if (readinputport(4)!=0xff) return 0xef;
-	if (readinputport(5)!=0xff) return 0xdf;
-	if (readinputport(6)!=0xff) return 0xbf;
-	if (readinputport(7)!=0xff) return 0x7f;	
+	if (input_port_read_indexed(machine, 0)!=0xff) return 0xfe;
+	if (input_port_read_indexed(machine, 1)!=0xff) return 0xfd;
+	if (input_port_read_indexed(machine, 2)!=0xff) return 0xfb;
+	if (input_port_read_indexed(machine, 3)!=0xff) return 0xf7;
+	if (input_port_read_indexed(machine, 4)!=0xff) return 0xef;
+	if (input_port_read_indexed(machine, 5)!=0xff) return 0xdf;
+	if (input_port_read_indexed(machine, 6)!=0xff) return 0xbf;
+	if (input_port_read_indexed(machine, 7)!=0xff) return 0x7f;	
 	return 0xff;
 }
 
@@ -53,21 +53,21 @@ READ8_HANDLER (specialist_8255_portb_r )
 	int dat = 0;
 	double level;	
 	
-  if ((specialist_8255_porta & 0x01)==0) dat ^= (readinputport(0) ^ 0xff);
-  if ((specialist_8255_porta & 0x02)==0) dat ^= (readinputport(1) ^ 0xff);
-  if ((specialist_8255_porta & 0x04)==0) dat ^= (readinputport(2) ^ 0xff);
-  if ((specialist_8255_porta & 0x08)==0) dat ^= (readinputport(3) ^ 0xff);
-  if ((specialist_8255_porta & 0x10)==0) dat ^= (readinputport(4) ^ 0xff);
-  if ((specialist_8255_porta & 0x20)==0) dat ^= (readinputport(5) ^ 0xff);
-  if ((specialist_8255_porta & 0x40)==0) dat ^= (readinputport(6) ^ 0xff);
-  if ((specialist_8255_porta & 0x80)==0) dat ^= (readinputport(7) ^ 0xff);
-  if ((specialist_8255_portc & 0x01)==0) dat ^= (readinputport(8) ^ 0xff);
-  if ((specialist_8255_portc & 0x02)==0) dat ^= (readinputport(9) ^ 0xff);
-  if ((specialist_8255_portc & 0x04)==0) dat ^= (readinputport(10) ^ 0xff);
-  if ((specialist_8255_portc & 0x08)==0) dat ^= (readinputport(11) ^ 0xff);
+  if ((specialist_8255_porta & 0x01)==0) dat ^= (input_port_read_indexed(machine, 0) ^ 0xff);
+  if ((specialist_8255_porta & 0x02)==0) dat ^= (input_port_read_indexed(machine, 1) ^ 0xff);
+  if ((specialist_8255_porta & 0x04)==0) dat ^= (input_port_read_indexed(machine, 2) ^ 0xff);
+  if ((specialist_8255_porta & 0x08)==0) dat ^= (input_port_read_indexed(machine, 3) ^ 0xff);
+  if ((specialist_8255_porta & 0x10)==0) dat ^= (input_port_read_indexed(machine, 4) ^ 0xff);
+  if ((specialist_8255_porta & 0x20)==0) dat ^= (input_port_read_indexed(machine, 5) ^ 0xff);
+  if ((specialist_8255_porta & 0x40)==0) dat ^= (input_port_read_indexed(machine, 6) ^ 0xff);
+  if ((specialist_8255_porta & 0x80)==0) dat ^= (input_port_read_indexed(machine, 7) ^ 0xff);
+  if ((specialist_8255_portc & 0x01)==0) dat ^= (input_port_read_indexed(machine, 8) ^ 0xff);
+  if ((specialist_8255_portc & 0x02)==0) dat ^= (input_port_read_indexed(machine, 9) ^ 0xff);
+  if ((specialist_8255_portc & 0x04)==0) dat ^= (input_port_read_indexed(machine, 10) ^ 0xff);
+  if ((specialist_8255_portc & 0x08)==0) dat ^= (input_port_read_indexed(machine, 11) ^ 0xff);
   	
 	dat = (dat  << 2) ^0xff;	
-	if (readinputport(12)!=0xff) dat ^= 0x02;
+	if (input_port_read_indexed(machine, 12)!=0xff) dat ^= 0x02;
 		
 	level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
 	if (level >=  0) { 
@@ -78,10 +78,10 @@ READ8_HANDLER (specialist_8255_portb_r )
 
 READ8_HANDLER (specialist_8255_portc_r )
 {
-	if (readinputport(8)!=0xff) return 0x0e;
-	if (readinputport(9)!=0xff) return 0x0d;
-	if (readinputport(10)!=0xff) return 0x0b;
-	if (readinputport(11)!=0xff) return 0x07;
+	if (input_port_read_indexed(machine, 8)!=0xff) return 0x0e;
+	if (input_port_read_indexed(machine, 9)!=0xff) return 0x0d;
+	if (input_port_read_indexed(machine, 10)!=0xff) return 0x0b;
+	if (input_port_read_indexed(machine, 11)!=0xff) return 0x07;
 	return 0x0f;
 }
 

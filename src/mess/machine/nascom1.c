@@ -150,7 +150,7 @@ DEVICE_IMAGE_LOAD( nascom2_floppy )
 READ8_HANDLER ( nascom1_port_00_r )
 {
 	if (nascom1_portstat.stat_count < 9)
-		return (readinputport (nascom1_portstat.stat_count) | ~0x7f);
+		return (input_port_read_indexed(machine, nascom1_portstat.stat_count) | ~0x7f);
 
 	return (0xff);
 }

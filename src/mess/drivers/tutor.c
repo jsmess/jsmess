@@ -163,7 +163,7 @@ static READ8_HANDLER(read_keyboard)
 	char port[6];
 
 	sprintf(port, "LINE%d", offset);
-	return readinputportbytag(port);
+	return input_port_read(machine, port);
 }
 
 static DEVICE_IMAGE_LOAD( tutor_cart )

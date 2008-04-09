@@ -211,7 +211,7 @@ static void mc6845_screen_configure(running_machine *machine)
 static VIDEO_EOF( super80m )
 {
 	/* if we chose another palette or colour mode, enable it */
-	UINT8 chosen_palette = (readinputportbytag("CONFIG") & 0x60)>>5;				// read colour dipswitches
+	UINT8 chosen_palette = (input_port_read(machine, "CONFIG") & 0x60)>>5;				// read colour dipswitches
 
 	if (chosen_palette != current_palette)						// any changes?
 	{
@@ -228,7 +228,7 @@ static VIDEO_UPDATE( super80 )
 	UINT8 x, y, code=32, screen_on=0;
 	UINT8 mask = screen->machine->gfx[0]->total_elements - 1;	/* 0x3F for super80; 0xFF for super80d & super80e */
 
-	if ((super80_mhz == 1) || (!(readinputportbytag("CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((super80_mhz == 1) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	/* display the picture */
@@ -249,7 +249,7 @@ static VIDEO_UPDATE( super80 )
 
 static VIDEO_UPDATE( super80m )
 {
-	UINT8 x, y, code=32, col=0, screen_on=0, options=readinputportbytag("CONFIG");
+	UINT8 x, y, code=32, col=0, screen_on=0, options=input_port_read(screen->machine, "CONFIG");
 
 	/* get selected character generator */
 	UINT8 cgen = current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
@@ -291,7 +291,7 @@ static VIDEO_UPDATE( super80v )
 	UINT8 speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40;				// cursor modes
 	UINT16 cursor = (mc6845_reg[14]<<8) | mc6845_reg[15];					// get cursor position
 	UINT16 screen_home = (mc6845_reg[12]<<8) | mc6845_reg[13];				// screen home offset (usually zero)
-	UINT8 options=readinputportbytag("CONFIG");
+	UINT8 options=input_port_read(screen->machine, "CONFIG");
 	framecnt++;
 
 	/* Get the graphics of the character under the cursor, xor with the visible cursor scan lines,
@@ -380,7 +380,7 @@ static void cassette_motor( UINT8 data )
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* does user want to hear the sound? */
-	if (readinputportbytag("CONFIG") & 8)
+	if (input_port_read(Machine, "CONFIG") & 8)
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 	else
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
@@ -409,7 +409,7 @@ static TIMER_CALLBACK( super80_timer )
 	for ( i=0; i < 8;i++)
 	{
 		sprintf(port, "LINE%d", i);
-		if (!(out_f8 & mask)) in_fa &= readinputportbytag(port);
+		if (!(out_f8 & mask)) in_fa &= input_port_read(machine, port);
 		mask<<=1;
 	}
 
@@ -440,7 +440,7 @@ static READ8_HANDLER( super80v_11_r )
 
 static READ8_HANDLER( super80_f2_r )
 {
-	UINT8 data = readinputportbytag("DSW") & 0xf0;	// dip switches on pcb
+	UINT8 data = input_port_read(machine, "DSW") & 0xf0;	// dip switches on pcb
 	data |= cass_out;			// bit 0 = output of U1, bit 1 = current wave_state
 	data |= 0x0c;				// bits 2,3 - not used
 	return data;
@@ -750,7 +750,7 @@ GFXDECODE_END
 static TIMER_CALLBACK( super80_halfspeed )
 {
 	UINT8 go_fast = 0;
-	if ((super80_mhz == 2) || (!(readinputportbytag("CONFIG") & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
+	if ((super80_mhz == 2) || (!(input_port_read(machine, "CONFIG") & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
 		go_fast++;
 
 	/* code to slow down computer to 1mhz by halting cpu on every second frame */
@@ -952,7 +952,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( super80 )
 {
-	UINT8 sw = readinputportbytag("CONFIG") & 1;				/* reading the dipswitch: 1 = autorun */
+	UINT8 sw = input_port_read(machine, "CONFIG") & 1;				/* reading the dipswitch: 1 = autorun */
 	UINT16 exec_addr, start_addr, end_addr;
 
 	if (z80bin_load_file( machine, image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)

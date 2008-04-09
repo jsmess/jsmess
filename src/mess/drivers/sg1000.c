@@ -47,20 +47,20 @@ static WRITE8_HANDLER( tvdraw_axis_w )
 {
 	if (data & 0x01)
 	{
-		tvdraw_data = readinputportbytag("TVDRAW_X");
+		tvdraw_data = input_port_read(machine, "TVDRAW_X");
 
 		if (tvdraw_data < 4) tvdraw_data = 4;
 		if (tvdraw_data > 251) tvdraw_data = 251;
 	}
 	else
 	{
-		tvdraw_data = readinputportbytag("TVDRAW_Y") + 32;
+		tvdraw_data = input_port_read(machine, "TVDRAW_Y") + 32;
 	}
 }
 
 static READ8_HANDLER( tvdraw_status_r )
 {
-	return readinputportbytag("TVDRAW_PEN");
+	return input_port_read(machine, "TVDRAW_PEN");
 }
 
 static READ8_HANDLER( tvdraw_data_r )
@@ -356,7 +356,7 @@ static READ8_HANDLER( sc3000_ppi8255_a_r )
     */
 
 	sprintf(port, "PA%d", keylatch);
-	return readinputportbytag(port);
+	return input_port_read(machine, port);
 }
 
 static READ8_HANDLER( sc3000_ppi8255_b_r )
@@ -377,7 +377,7 @@ static READ8_HANDLER( sc3000_ppi8255_b_r )
     */
 
 	sprintf(port, "PB%d", keylatch);
-	return ( readinputportbytag(port) | 0x70 );
+	return ( input_port_read(machine, port) | 0x70 );
 }
 
 static WRITE8_HANDLER( sc3000_ppi8255_c_w )
@@ -835,7 +835,7 @@ static DEVICE_IMAGE_LOAD( sf7000_serial )
 	if (device_load_serial_device(image)==INIT_PASS)
 	{
 		/* setup transmit parameters */
-		serial_device_setup(image, 9600 >> readinputportbytag("BAUD"), 8, 1, SERIAL_PARITY_NONE);
+		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
 
 		/* connect serial chip to serial device */
 		msm8251_connect_to_serial_device(image);

@@ -318,8 +318,8 @@ static READ16_HANDLER(read_keys) // Glasgow, Dallas
 {
   UINT16 data;
   data=0x0300;
-  key_low = readinputportbytag("LINE0");
-  key_hi =  readinputportbytag("LINE1");
+  key_low = input_port_read(machine, "LINE0");
+  key_hi =  input_port_read(machine, "LINE1");
 //logerror("Keyboard Offset = %x Data = %x\n  ",offset,data);
   if (key_select==key_low){data=data&0x100;}
   if (key_select==key_hi){data=data&0x200;}
@@ -330,7 +330,7 @@ static READ16_HANDLER(read_newkeys16)  //Amsterdam, Roma
 {
  UINT16 data;
 
- if (key_selector==0) data=readinputportbytag("LINE0");else data=readinputportbytag("LINE1");
+ if (key_selector==0) data=input_port_read(machine, "LINE0");else data=input_port_read(machine, "LINE1");
  logerror("read Keyboard Offset = %x Data = %x   Select = %x \n  ",offset,data,key_selector);
  data=data<<8;
  return data ;
@@ -493,8 +493,8 @@ static WRITE32_HANDLER ( write_keys32 )
 static READ32_HANDLER(read_newkeys32) // Dallas 32, Roma 32
 {
  UINT32 data;
- if (key_selector==0) data=readinputportbytag("LINE0");else data=readinputportbytag("LINE1");
- //if (key_selector==1) data=readinputportbytag("LINE0");else data=0;
+ if (key_selector==0) data=input_port_read(machine, "LINE0");else data=input_port_read(machine, "LINE1");
+ //if (key_selector==1) data=input_port_read(machine, "LINE0");else data=0;
  logerror("read Keyboard Offset = %x Data = %x\n  ",offset,data);
  data=data<<24;
  return data ;
@@ -605,8 +605,8 @@ static VIDEO_UPDATE( glasgow )
 	if (my_cursor != NULL)
 		set_cursor (my_cursor);
 
-    m_button1=readinputportbytag("BUTTON_L");
-    m_button2=readinputportbytag("BUTTON_R");
+    m_button1=input_port_read(screen->machine, "BUTTON_L");
+    m_button2=input_port_read(screen->machine, "BUTTON_R");
 
     if ( m_button1) MOUSE_BUTTON1_WAIT = 0;
 
@@ -991,8 +991,8 @@ static void set_cursor (view_item *view_cursor)
     save_x = m_x;
     save_y = m_y;
 
-    m_x=readinputportbytag("MOUSE_X");
-    m_y=readinputportbytag("MOUSE_Y");
+    m_x=input_port_read(Machine, "MOUSE_X");
+    m_y=input_port_read(Machine, "MOUSE_Y");
 
 //    logerror("m_x   = %d \n  ",m_x);
 //    logerror("m_y   = %d \n  ",m_y);

@@ -215,7 +215,7 @@ WRITE16_HANDLER ( compis_osp_pic_w )
 /*-------------------------------------------------------------------------*/
 /*  Keyboard                                                               */
 /*-------------------------------------------------------------------------*/
-static void compis_keyb_update(void)
+static void compis_keyb_update(running_machine *machine)
 {
 	UINT8 key_code;
 	UINT8 key_status;
@@ -229,7 +229,7 @@ static void compis_keyb_update(void)
 
 	for (irow = 0; irow < 6; irow++)
 	{
-		data = readinputport(irow);
+		data = input_port_read_indexed(machine, irow);
 		if (data != 0)
 		{
 			ibit = 1;
@@ -291,7 +291,7 @@ static void compis_fdc_reset(void)
 static void compis_fdc_tc(int state)
 {
 	/* Terminal count if iSBX-218A has DMA enabled */
-  	if (readinputport(7))
+  	if (input_port_read_indexed(Machine, 7))
 	{
 		nec765_set_tc_state(state);
 	}
@@ -300,7 +300,7 @@ static void compis_fdc_tc(int state)
 static void compis_fdc_int(int state)
 {
 	/* No interrupt requests if iSBX-218A has DMA enabled */
-  	if (!readinputport(7) && state)
+  	if (!input_port_read_indexed(Machine, 7) && state)
 	{
 		compis_osp_pic_irq(COMPIS_IRQ_SBX0_INT1);
 	}
@@ -309,7 +309,7 @@ static void compis_fdc_int(int state)
 static void compis_fdc_dma_drq(int state, int read)
 {
 	/* DMA requst if iSBX-218A has DMA enabled */
-  	if (readinputport(7) && state)
+  	if (input_port_read_indexed(Machine, 7) && state)
 	{
 		//compis_dma_drq(state, read);
 	}
@@ -326,7 +326,7 @@ READ16_HANDLER (compis_fdc_dack_r)
 	UINT16 data;
 	data = 0xffff;
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
-  	if (readinputport(7))
+  	if (input_port_read_indexed(machine, 7))
   	{
 		data = nec765_dack_r(machine, 0);
 	}
@@ -402,7 +402,7 @@ static READ8_HANDLER ( compis_ppi_port_b_r )
 	UINT8 data;
 
 	/* DIP switch - Test mode */
-	data = readinputport(6);
+	data = input_port_read_indexed(machine, 6);
 
 	/* Centronics busy */
 	if (!printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0))
@@ -1606,5 +1606,5 @@ MACHINE_RESET( compis )
 INTERRUPT_GEN( compis_vblank_int )
 {
 //	compis_gdc_vblank_int();
-	compis_keyb_update();
+	compis_keyb_update(machine);
 }

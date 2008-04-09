@@ -106,7 +106,7 @@ static READ8_HANDLER( gmaster_port_r )
     UINT8 data=0xff;
     switch (offset) {
     case UPD7810_PORTA:
-	data=readinputportbytag("JOY");
+	data=input_port_read(machine, "JOY");
 	break;
     default:
       logerror("%.4x port %d read %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC),offset,data);

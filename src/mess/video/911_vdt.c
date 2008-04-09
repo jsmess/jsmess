@@ -11,6 +11,7 @@ TODO:
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "911_vdt.h"
 #include "911_chr.h"
 #include "911_key.h"
@@ -576,7 +577,7 @@ void vdt911_keyboard(int unit)
 
 	/* read current key state */
 	for (i=0; i<6; i++)
-		key_buf[i] = readinputport(i);
+		key_buf[i] = input_port_read_indexed(Machine, i);
 
 
 	/* parse modifier keys */

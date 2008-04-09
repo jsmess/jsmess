@@ -135,6 +135,7 @@ static const POCKETC_FIGURE busy={
 
 VIDEO_UPDATE( pc1401 )
 {
+	running_machine *machine = screen->machine;
 	int x, y, i, j;
 	int color[2];
 

@@ -750,8 +750,8 @@ static void adb_check_mouse(running_machine *machine)
 	/* read mouse values */
 	if ((adb_kmstatus & 0x80) == 0x00)
 	{
-		new_mouse_x = readinputportbytag("adb_mouse_x");
-		new_mouse_y = readinputportbytag("adb_mouse_y");
+		new_mouse_x = input_port_read(machine, "adb_mouse_x");
+		new_mouse_y = input_port_read(machine, "adb_mouse_y");
 
 		if ((apple2gs_mouse_x != new_mouse_x) || (apple2gs_mouse_y != new_mouse_y))
 		{

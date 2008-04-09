@@ -315,7 +315,7 @@ static READ8_HANDLER( ikbd_port2_r )
 
     */
 
-	return (ikbd.tx << 3) | (readinputportbytag_safe("IKBD_JOY1", 0xff) & 0x06);
+	return (ikbd.tx << 3) | (input_port_read_safe(machine, "IKBD_JOY1", 0xff) & 0x06);
 }
 
 static WRITE8_HANDLER( ikbd_port2_w )
@@ -354,13 +354,13 @@ static WRITE8_HANDLER( ikbd_port3_w )
 
 	set_led_status(1, data & 0x01);
 
-	if (~data & 0x02) ikbd.keylatch = readinputportbytag("P31");
-	if (~data & 0x04) ikbd.keylatch = readinputportbytag("P32");
-	if (~data & 0x08) ikbd.keylatch = readinputportbytag("P33");
-	if (~data & 0x10) ikbd.keylatch = readinputportbytag("P34");
-	if (~data & 0x20) ikbd.keylatch = readinputportbytag("P35");
-	if (~data & 0x40) ikbd.keylatch = readinputportbytag("P36");
-	if (~data & 0x80) ikbd.keylatch = readinputportbytag("P37");
+	if (~data & 0x02) ikbd.keylatch = input_port_read(machine, "P31");
+	if (~data & 0x04) ikbd.keylatch = input_port_read(machine, "P32");
+	if (~data & 0x08) ikbd.keylatch = input_port_read(machine, "P33");
+	if (~data & 0x10) ikbd.keylatch = input_port_read(machine, "P34");
+	if (~data & 0x20) ikbd.keylatch = input_port_read(machine, "P35");
+	if (~data & 0x40) ikbd.keylatch = input_port_read(machine, "P36");
+	if (~data & 0x80) ikbd.keylatch = input_port_read(machine, "P37");
 }
 
 static READ8_HANDLER( ikbd_port4_r )
@@ -380,7 +380,7 @@ static READ8_HANDLER( ikbd_port4_r )
 
     */
 
-	if (readinputportbytag("config") & 0x01)
+	if (input_port_read(machine, "config") & 0x01)
 	{
 		/*
 
@@ -391,9 +391,9 @@ static READ8_HANDLER( ikbd_port4_r )
 
         */
 
-		UINT8 data = readinputportbytag_safe("IKBD_JOY0", 0xff) & 0xf0;
-		UINT8 x = readinputportbytag_safe("IKBD_MOUSEX", 0x00);
-		UINT8 y = readinputportbytag_safe("IKBD_MOUSEY", 0x00);
+		UINT8 data = input_port_read_safe(machine, "IKBD_JOY0", 0xff) & 0xf0;
+		UINT8 x = input_port_read_safe(machine, "IKBD_MOUSEX", 0x00);
+		UINT8 y = input_port_read_safe(machine, "IKBD_MOUSEY", 0x00);
 
 		if (x == ikbd.mouse_x)
 		{
@@ -440,7 +440,7 @@ static READ8_HANDLER( ikbd_port4_r )
 	}
 	else
 	{
-		return readinputportbytag_safe("IKBD_JOY0", 0xff);
+		return input_port_read_safe(machine, "IKBD_JOY0", 0xff);
 	}
 }
 
@@ -461,14 +461,14 @@ static WRITE8_HANDLER( ikbd_port4_w )
 
     */
 
-	if (~data & 0x01) ikbd.keylatch = readinputportbytag("P40");
-	if (~data & 0x02) ikbd.keylatch = readinputportbytag("P41");
-	if (~data & 0x04) ikbd.keylatch = readinputportbytag("P42");
-	if (~data & 0x08) ikbd.keylatch = readinputportbytag("P43");
-	if (~data & 0x10) ikbd.keylatch = readinputportbytag("P44");
-	if (~data & 0x20) ikbd.keylatch = readinputportbytag("P45");
-	if (~data & 0x40) ikbd.keylatch = readinputportbytag("P46");
-	if (~data & 0x80) ikbd.keylatch = readinputportbytag("P47");
+	if (~data & 0x01) ikbd.keylatch = input_port_read(machine, "P40");
+	if (~data & 0x02) ikbd.keylatch = input_port_read(machine, "P41");
+	if (~data & 0x04) ikbd.keylatch = input_port_read(machine, "P42");
+	if (~data & 0x08) ikbd.keylatch = input_port_read(machine, "P43");
+	if (~data & 0x10) ikbd.keylatch = input_port_read(machine, "P44");
+	if (~data & 0x20) ikbd.keylatch = input_port_read(machine, "P45");
+	if (~data & 0x40) ikbd.keylatch = input_port_read(machine, "P46");
+	if (~data & 0x80) ikbd.keylatch = input_port_read(machine, "P47");
 }
 
 /* DMA Sound */
@@ -812,7 +812,7 @@ static READ16_HANDLER( stbook_config_r )
 
     */
 
-	return (readinputportbytag("SW400") << 8) | 0xff;
+	return (input_port_read(machine, "SW400") << 8) | 0xff;
 }
 
 static WRITE16_HANDLER( stbook_lcd_control_w )
@@ -1405,7 +1405,7 @@ static READ8_HANDLER( mfp_gpio_r )
 
 	data |= (acia_irq << 4);
 	data |= (fdc.irq << 5);
-	data |= (readinputportbytag("config") & 0x80);
+	data |= (input_port_read(machine, "config") & 0x80);
 
 	return data;
 }
@@ -1567,7 +1567,7 @@ static READ8_HANDLER( atariste_mfp_gpio_r )
 
 	data |= (acia_irq << 4);
 	data |= (fdc.irq << 5);
-	data |= (readinputportbytag("config") & 0x80) ^ (dmasound.active << 7);
+	data |= (input_port_read(machine, "config") & 0x80) ^ (dmasound.active << 7);
 
 	return data;
 }

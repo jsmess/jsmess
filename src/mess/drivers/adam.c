@@ -441,8 +441,8 @@ static void adam_vdp_interrupt (int state)
 
 static TIMER_CALLBACK(adam_paddle_callback)
 {
-	int port7 = readinputportbytag("controller1_analog");
-	int port8 = readinputportbytag("controller2_analog");
+	int port7 = input_port_read(machine, "controller1_analog");
+	int port8 = input_port_read(machine, "controller2_analog");
 
 	if (port7 == 0)
 		adam_joy_stat[0] = 0;

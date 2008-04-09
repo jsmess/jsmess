@@ -26,12 +26,12 @@ DRIVER_INIT(mikro80)
 
 READ8_HANDLER (mikro80_8255_portb_r )
 {	
-	return readinputport(mikro80_keyboard_line);
+	return input_port_read_indexed(machine, mikro80_keyboard_line);
 }
 
 READ8_HANDLER (mikro80_8255_portc_r )
 {
-	return readinputport(8);	
+	return input_port_read_indexed(machine, 8);	
 }
 
 WRITE8_HANDLER (mikro80_8255_porta_w )

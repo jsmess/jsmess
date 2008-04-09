@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/sc61860/sc61860.h"
 
 #include "includes/pocketc.h"
@@ -28,6 +29,7 @@ void pc1251_outc(int data)
 int pc1251_ina(void)
 {
 	int data=outa;
+	running_machine *machine = Machine;
 
 	if (outb&1) {
 		if (PC1251_KEY_MINUS) data|=1;
@@ -108,17 +110,20 @@ int pc1251_ina(void)
 int pc1251_inb(void)
 {
 	int data=outb;
+	running_machine *machine = Machine;
 	if (outb&8) data|=PC1251_SWITCH_MODE;
 	return data;
 }
 
 int pc1251_brk(void)
 {
+	running_machine *machine = Machine;
 	return PC1251_KEY_BRK;
 }
 
 int pc1251_reset(void)
 {
+	running_machine *machine = Machine;
 	return PC1251_KEY_RESET;
 }
 

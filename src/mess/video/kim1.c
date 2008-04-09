@@ -77,7 +77,7 @@ VIDEO_UPDATE( kim1 )
 		{
 			int sx = width - 182 + x * 37;
 			int code = layout[y][x];
-			int color = (readinputport (code / 7) & (0x40 >> (code % 7))) ? 0 : 1;
+			int color = (input_port_read_indexed(screen->machine, code / 7) & (0x40 >> (code % 7))) ? 0 : 1;
 			videoram[6 * 2 + code] = color;
 			drawgfx (bitmap, screen->machine->gfx[1], layout[y][x], color, 0, 0, sx, sy, NULL, TRANSPARENCY_NONE, 0);
 		}

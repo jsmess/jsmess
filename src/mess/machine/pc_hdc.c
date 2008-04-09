@@ -19,6 +19,7 @@
 #include <stdio.h>
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/pc_hdc.h"
 #include "machine/pic8259.h"
 #include "machine/8237dma.h"
@@ -719,7 +720,7 @@ static UINT8 pc_hdc_dipswitch_r(int n)
 static UINT8 pc_HDC_r(int chip, offs_t offs)
 {
 	UINT8 data = 0xff;
-	if( !(readinputport(3) & (0x08>>chip)) || !pc_hdc_file(chip<<1) )
+	if( !(input_port_read_indexed(Machine, 3) & (0x08>>chip)) || !pc_hdc_file(chip<<1) )
 		return data;
 	switch( offs )
 	{
@@ -742,7 +743,7 @@ static void pc_HDC_w(int chip, offs_t offs, UINT8 data)
 	if (LOG_HDC_CALL)
 		logerror("pc_HDC_w(): chip=%d offs=%d data=0x%02x\n", chip, offs, data);
 
-	if( !(readinputport(3) & (0x08>>chip)) || !pc_hdc_file(chip<<1) )
+	if( !(input_port_read_indexed(Machine, 3) & (0x08>>chip)) || !pc_hdc_file(chip<<1) )
 		return;
 
 	switch( offs )

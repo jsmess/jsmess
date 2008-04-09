@@ -344,7 +344,7 @@ static void einstein_scan_keyboard(void)
 		if ((einstein_keyboard_line & (1<<i))==0)
 		{
 			sprintf(port, "LINE%d", i);
-			data &= readinputportbytag(port);
+			data &= input_port_read(Machine, port);
 		}
 	}
 
@@ -377,7 +377,7 @@ static TIMER_CALLBACK(einstein_keyboard_timer_callback)
 	einstein_scan_keyboard();
 
 	/* if /fire1 or /fire2 is 0, then trigger a fire interrupt if the interrupt is enabled */
-	if ((readinputportbytag("BUTTONS") & 0x03)!=0)
+	if ((input_port_read(machine, "BUTTONS") & 0x03)!=0)
 	{
 		einstein_int |= EINSTEIN_FIRE_INT;
 	}
@@ -872,7 +872,7 @@ static READ8_HANDLER(einstein_key_int_r)
 	/* bit 2: 1=printer busy */
 	/* bit 1: fire 1 */
 	/* bit 0: fire 0 */
-	data = ((readinputportbytag("EXTRA") & 0x07)<<5) | (readinputportbytag("BUTTONS") & 0x03) | 0x01c;
+	data = ((input_port_read(machine, "EXTRA") & 0x07)<<5) | (input_port_read(machine, "BUTTONS") & 0x03) | 0x01c;
 
 	/* error? */
 	if (centronics_handshake & CENTRONICS_NO_ERROR)

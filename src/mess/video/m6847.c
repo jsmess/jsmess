@@ -157,7 +157,7 @@ struct _m6847_vdg
 
 
 
-static void apply_artifacts(UINT32 *line);
+static void apply_artifacts(running_machine *machine, UINT32 *line);
 
 static m6847_vdg *m6847;
 
@@ -1215,7 +1215,7 @@ static void text_mode(int scanline, UINT32 *RESTRICT line, const m6847_pixel *RE
 
 
 
-static void render_scanline(bitmap_t *bitmap, int scanline)
+static void render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline)
 {
 	UINT32 border_color;
 	UINT32 *line;
@@ -1260,7 +1260,7 @@ static void render_scanline(bitmap_t *bitmap, int scanline)
 		if ((attrs & (M6847_AG|M6847_GM2|M6847_GM1|M6847_GM0))
 			== (M6847_AG|M6847_GM2|M6847_GM1|M6847_GM0))
 		{
-			apply_artifacts(line + 32);
+			apply_artifacts(machine, line + 32);
 		}
 	}
 	else
@@ -1293,7 +1293,7 @@ static UINT32 mix_color(double factor, UINT8 c0, UINT8 c1)
 
 
 
-static void apply_artifacts(UINT32 *line)
+static void apply_artifacts(running_machine *machine, UINT32 *line)
 {
 	/* Boy this code sucks; this code was adapted from the old M6847
 	 * artifacting implmentation.  The only reason that it didn't look as
@@ -1353,7 +1353,7 @@ static void apply_artifacts(UINT32 *line)
 	int i;
 
 	/* are we artifacting? */
-	artifacting = readinputportbytag_safe("artifacting", 0x00) & 0x03;
+	artifacting = input_port_read_safe(machine, "artifacting", 0x00) & 0x03;
 	if (artifacting == 0x00)
 		return;
 	artifacting &= 0x01;
@@ -1953,7 +1953,7 @@ VIDEO_UPDATE(m6847)
 
 		/* the video RAM has been dirtied; need to draw */
 		for (row = cliprect->min_y; row <= cliprect->max_y; row++)
-			render_scanline(bitmap, row);
+			render_scanline(screen->machine, bitmap, row);
 	}
 	else
 	{

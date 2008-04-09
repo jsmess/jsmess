@@ -235,7 +235,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	attotime end_time;
 
 	sys.mfp.gpio &= ~0x40;  // GPIP6
-	if((readinputportbytag("options") & 0x01))
+	if((input_port_read(machine, "options") & 0x01))
 	{
 		video_screen_update_partial(machine->primary_screen,scan);
 	}

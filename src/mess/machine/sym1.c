@@ -88,13 +88,13 @@ static READ8_HANDLER( sym1_riot_a_r )
 	int data = 0x7f;
 
 	/* scan keypad rows */
-	if (!(riot_port_a & 0x80)) data &= readinputportbytag("ROW-0");
-	if (!(riot_port_b & 0x01)) data &= readinputportbytag("ROW-1");
-	if (!(riot_port_b & 0x02)) data &= readinputportbytag("ROW-2");
-	if (!(riot_port_b & 0x04)) data &= readinputportbytag("ROW-3");
+	if (!(riot_port_a & 0x80)) data &= input_port_read(machine, "ROW-0");
+	if (!(riot_port_b & 0x01)) data &= input_port_read(machine, "ROW-1");
+	if (!(riot_port_b & 0x02)) data &= input_port_read(machine, "ROW-2");
+	if (!(riot_port_b & 0x04)) data &= input_port_read(machine, "ROW-3");
 
 	/* determine column */
-	if ( ((riot_port_a ^ 0xff) & (readinputportbytag("ROW-0") ^ 0xff)) & 0x7f )
+	if ( ((riot_port_a ^ 0xff) & (input_port_read(machine, "ROW-0") ^ 0xff)) & 0x7f )
 		data &= ~0x80;
 
 	return data;
@@ -106,13 +106,13 @@ static READ8_HANDLER( sym1_riot_b_r )
 	int data = 0xff;
 
 	/* determine column */
-	if ( ((riot_port_a ^ 0xff) & (readinputportbytag("ROW-1") ^ 0xff)) & 0x7f )
+	if ( ((riot_port_a ^ 0xff) & (input_port_read(machine, "ROW-1") ^ 0xff)) & 0x7f )
 		data &= ~1;
 
-	if ( ((riot_port_a ^ 0xff) & (readinputportbytag("ROW-2") ^ 0xff)) & 0x3f )
+	if ( ((riot_port_a ^ 0xff) & (input_port_read(machine, "ROW-2") ^ 0xff)) & 0x3f )
 		data &= ~2;
 
-	if ( ((riot_port_a ^ 0xff) & (readinputportbytag("ROW-3") ^ 0xff)) & 0x1f )
+	if ( ((riot_port_a ^ 0xff) & (input_port_read(machine, "ROW-3") ^ 0xff)) & 0x1f )
 		data &= ~4;
 
 	data &= ~0x80; // else hangs 8b02
@@ -199,16 +199,16 @@ static WRITE8_HANDLER( sym1_via2_a_w )
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa600, 0xa67f, 0, 0,
-		((readinputportbytag("WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK5);
+		((input_port_read(machine, "WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK5);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0400, 0x07ff, 0, 0,
-		((readinputportbytag("WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK2);
+		((input_port_read(machine, "WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK2);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0800, 0x0bff, 0, 0,
-		((readinputportbytag("WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK3);
+		((input_port_read(machine, "WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK3);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0c00, 0x0fff, 0, 0,
-		((readinputportbytag("WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK4);
+		((input_port_read(machine, "WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK4);
 }
 
 

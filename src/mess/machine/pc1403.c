@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/sc61860/sc61860.h"
 
 #include "includes/pocketc.h"
@@ -59,6 +60,7 @@ void pc1403_outa(int data)
 int pc1403_ina(void)
 {
     UINT8 data=outa;
+	running_machine *machine = Machine;
 
     if (asic[3]&1) {
 	if (KEY_7) data|=1;
@@ -193,11 +195,13 @@ void pc1403_outc(int data)
 
 int pc1403_brk(void)
 {
+	running_machine *machine = Machine;
 	return KEY_BRK;
 }
 
 int pc1403_reset(void)
 {
+	running_machine *machine = Machine;
 	return KEY_RESET;
 }
 

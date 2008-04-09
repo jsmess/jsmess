@@ -85,7 +85,7 @@ static READ8_HANDLER(read_keys)
   else
 	sprintf(port, "KEY2_%d", offset);
 
-  data=readinputportbytag(port);
+  data=input_port_read(machine, port);
 
   logerror("Keyboard Port = %s Data = %d\n  ",port,data);
   return data| 0x7f;

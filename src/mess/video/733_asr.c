@@ -21,6 +21,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "733_asr.h"
 
 #define MAX_ASR 1
@@ -628,7 +629,7 @@ void asr733_keyboard(int unit)
 
 	/* read current key state */
 	for (i=0; i<6; i++)
-		key_buf[i] = readinputport(i);
+		key_buf[i] = input_port_read_indexed(Machine, i);
 
 	/* process key modifiers */
 	if (key_buf[1] & 0x0200)

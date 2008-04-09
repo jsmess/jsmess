@@ -88,21 +88,21 @@ READ8_HANDLER( osborne1_2000_r ) {
 			break;
 		case 0x200:	/* Keyboard */
 			/* Row 0 */
-			if ( offset & 0x01 )	data &= readinputport(0);
+			if ( offset & 0x01 )	data &= input_port_read_indexed(machine, 0);
 			/* Row 1 */
-			if ( offset & 0x02 )	data &= readinputport(1);
+			if ( offset & 0x02 )	data &= input_port_read_indexed(machine, 1);
 			/* Row 2 */
-			if ( offset & 0x04 )	data &= readinputport(3);
+			if ( offset & 0x04 )	data &= input_port_read_indexed(machine, 3);
 			/* Row 3 */
-			if ( offset & 0x08 )	data &= readinputport(4);
+			if ( offset & 0x08 )	data &= input_port_read_indexed(machine, 4);
 			/* Row 4 */
-			if ( offset & 0x10 )	data &= readinputport(5);
+			if ( offset & 0x10 )	data &= input_port_read_indexed(machine, 5);
 			/* Row 5 */
-			if ( offset & 0x20 )	data &= readinputport(2);
+			if ( offset & 0x20 )	data &= input_port_read_indexed(machine, 2);
 			/* Row 6 */
-			if ( offset & 0x40 )	data &= readinputport(6);
+			if ( offset & 0x40 )	data &= input_port_read_indexed(machine, 6);
 			/* Row 7 */
-			if ( offset & 0x80 )	data &= readinputport(7);
+			if ( offset & 0x80 )	data &= input_port_read_indexed(machine, 7);
 			break;
 		case 0x900:	/* IEEE488 PIA */
 			data = pia_0_r( machine, offset & 0x03 );

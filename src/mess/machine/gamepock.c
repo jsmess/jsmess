@@ -105,11 +105,11 @@ READ8_HANDLER( gamepock_port_c_r ) {
 	UINT8	data = 0xFF;
 
 	if ( gamepock_port_a & 0x80 ) {
-		data &= readinputport(0);
+		data &= input_port_read_indexed(machine, 0);
 	}
 
 	if ( gamepock_port_a & 0x40 ) {
-		data &= readinputport(1);
+		data &= input_port_read_indexed(machine, 1);
 	}
 
 	return data;

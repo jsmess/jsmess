@@ -247,7 +247,7 @@ ADDRESS_MAP_END
 /* PCW keyboard is mapped into memory */
 static  READ8_HANDLER(pcw_keyboard_r)
 {
-	return readinputport(offset);
+	return input_port_read_indexed(machine, offset);
 }
 
 
@@ -368,7 +368,7 @@ static void pcw_update_mem(int block, int data)
 /* from Jacob Nevins docs */
 static int pcw_get_sys_status(void)
 {
-	return pcw_interrupt_counter | (readinputport(16) & (0x040 | 0x010)) | pcw_system_status;
+	return pcw_interrupt_counter | (input_port_read_indexed(Machine, 16) & (0x040 | 0x010)) | pcw_system_status;
 }
 
 static READ8_HANDLER(pcw_interrupt_counter_r)
@@ -593,9 +593,9 @@ static  READ8_HANDLER(pcw_expansion_r)
 		case 0x0e0:
 		{
 			/* spectravideo joystick */
-			if (readinputport(16) & 0x020)
+			if (input_port_read_indexed(machine, 16) & 0x020)
 			{
-				return readinputport(17);
+				return input_port_read_indexed(machine, 17);
 			}
 			else
 			{
@@ -607,7 +607,7 @@ static  READ8_HANDLER(pcw_expansion_r)
 		{
 
 			/* kempston joystick */
-			return readinputport(18);
+			return input_port_read_indexed(machine, 18);
 		}
 
 		case 0x0e1:

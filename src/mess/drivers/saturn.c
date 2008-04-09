@@ -475,7 +475,7 @@ static void smpc_intbackhelper(void)
 	}
 
 	sprintf(port, "JOY%d", intback_stage-1);	// intback_stage will be 2 or 3, 2 = player 1, 3 = player 2
-	pad = readinputportbytag(port);
+	pad = input_port_read(Machine, port);
 
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	smpc_ram[33] = 0xf1;	// no tap, direct connect
@@ -505,7 +505,7 @@ static UINT8 stv_SMPC_r8 (int offset)
 		return_data = smpcSR;
 
 	if (offset == 0x75)//PDR1 read
-		return_data = 0xff; //readinputportbytag("PDR1");
+		return_data = 0xff; //input_port_read(machine, "PDR1");
 
 	if (offset == 0x77)//PDR2 read
 		return_data=  0xff; // | EEPROM_read_bit());
@@ -2086,7 +2086,7 @@ static void saturn_init_driver(running_machine *machine, int rgn)
     smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
     smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
     smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//  smpc_ram[0x33] = readinputport(7);
+//  smpc_ram[0x33] = input_port_read_indexed(machine, 7);
  	smpc_ram[0x5f] = 0x10;
 }
 

@@ -3491,6 +3491,12 @@ UINT32 readinputportbytag_safe(const char *tag, UINT32 defvalue)
 
 
 
+UINT32 input_port_read_indexed(running_machine *machine, int port) { return readinputport(port); }
+UINT32 input_port_read(running_machine *machine, const char *tag) { return readinputportbytag(tag); }
+UINT32 input_port_read_safe(running_machine *machine, const char *tag, UINT32 defvalue) { return readinputportbytag_safe(tag, defvalue); }
+
+
+
 /*************************************
  *
  *  Input port writing

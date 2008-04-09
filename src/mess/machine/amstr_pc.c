@@ -202,8 +202,8 @@ WRITE8_HANDLER( pc1640_port60_w )
  READ8_HANDLER( pc200_port378_r )
 {
 	int data=pc_parallelport1_r(machine, offset);
-	if (offset==1) data=(data&~7)|(readinputport(1)&7);
-	if (offset==2) data=(data&~0xe0)|(readinputport(1)&0xc0);
+	if (offset==1) data=(data&~7)|(input_port_read_indexed(machine, 1)&7);
+	if (offset==2) data=(data&~0xe0)|(input_port_read_indexed(machine, 1)&0xc0);
 	return data;
 }
 
@@ -211,17 +211,17 @@ WRITE8_HANDLER( pc1640_port60_w )
  READ8_HANDLER( pc1640_port378_r )
 {
 	int data=pc_parallelport1_r(machine, offset);
-	if (offset==1) data=(data&~7)|(readinputport(1)&7);
+	if (offset==1) data=(data&~7)|(input_port_read_indexed(machine, 1)&7);
 	if (offset==2) {
 		switch (pc1640.dipstate) {
 		case 0:
-			data=(data&~0xe0)|(readinputport(1)&0xe0);
+			data=(data&~0xe0)|(input_port_read_indexed(machine, 1)&0xe0);
 			break;
 		case 1:
-			data=(data&~0xe0)|((readinputport(1)&0xe000)>>8);
+			data=(data&~0xe0)|((input_port_read_indexed(machine, 1)&0xe000)>>8);
 			break;
 		case 2:
-			data=(data&~0xe0)|((readinputport(1)&0xe00)>>4);
+			data=(data&~0xe0)|((input_port_read_indexed(machine, 1)&0xe00)>>4);
 			break;
 
 		}
@@ -251,22 +251,22 @@ READ8_HANDLER( pc1640_port278_r )
 
 static READ8_HANDLER( pc1640_mouse_x_r )
 {
-	return pc1640.mouse.x-readinputport(13);
+	return pc1640.mouse.x-input_port_read_indexed(machine, 13);
 }
 
 static READ8_HANDLER( pc1640_mouse_y_r )
 {
-	return pc1640.mouse.y-readinputport(14);
+	return pc1640.mouse.y-input_port_read_indexed(machine, 14);
 }
 
 static WRITE8_HANDLER( pc1640_mouse_x_w )
 {
-	pc1640.mouse.x=data+readinputport(13);
+	pc1640.mouse.x=data+input_port_read_indexed(machine, 13);
 }
 
 static WRITE8_HANDLER( pc1640_mouse_y_w )
 {
-	pc1640.mouse.y=data+readinputport(14);
+	pc1640.mouse.y=data+input_port_read_indexed(machine, 14);
 }
 
 READ16_HANDLER( pc1640_16le_mouse_x_r )	 { return read16le_with_read8_handler(pc1640_mouse_x_r, machine, offset, mem_mask); }

@@ -469,7 +469,7 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 		{
 			sys.keyboard.keytime[x] -= 5;
 		}
-		if(!(readinputportbytag(port) & (1 << (x % 32))))
+		if(!(input_port_read(machine, port) & (1 << (x % 32))))
 		{
 			if(sys.keyboard.keyon[x] != 0)
 			{
@@ -484,7 +484,7 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 		if(sys.keyboard.keyon[x] != 0 && sys.keyboard.keytime[x] == 0 && sys.keyboard.last_pressed == x)
 		{
 			sprintf(port, "key%d", (sys.keyboard.last_pressed / 32) + 1);
-			if(readinputportbytag(port) & (1 << (sys.keyboard.last_pressed % 32)))
+			if(input_port_read(machine, port) & (1 << (sys.keyboard.last_pressed % 32)))
 			{
 				x68k_keyboard_push_scancode(sys.keyboard.last_pressed);
 				sys.keyboard.keytime[sys.keyboard.last_pressed] = (sys.keyboard.repeat^2)*5+30;
@@ -492,7 +492,7 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 			}
 		}
 		sprintf(port, "key%d", (x / 32) + 1);
-		if((readinputportbytag(port) & (1 << (x % 32))))
+		if((input_port_read(machine, port) & (1 << (x % 32))))
 		{
 			if(sys.keyboard.keyon[x] == 0)
 			{
@@ -522,7 +522,7 @@ void mfp_recv_data(int data)
 // mouse input
 // port B of the Z8530 SCC
 // typically read from the SCC data port on receive buffer full interrupt per byte
-static int x68k_read_mouse(void)
+static int x68k_read_mouse(running_machine *machine)
 {
 	char val = 0;
 	char ipt = 0;
@@ -530,15 +530,15 @@ static int x68k_read_mouse(void)
 	switch(sys.mouse.inputtype)
 	{
 	case 0:
-		ipt = readinputportbytag("mouse1");
+		ipt = input_port_read(machine, "mouse1");
 		break;
 	case 1:
-		val = readinputportbytag("mouse2");
+		val = input_port_read(machine, "mouse2");
 		ipt = val - sys.mouse.last_mouse_x;
 		sys.mouse.last_mouse_x = val;
 		break;
 	case 2:
-		val = readinputportbytag("mouse3");
+		val = input_port_read(machine, "mouse3");
 		ipt = val - sys.mouse.last_mouse_y;
 		sys.mouse.last_mouse_y = val;
 		break;
@@ -571,7 +571,7 @@ static READ16_HANDLER( x68k_scc_r )
 	case 0:
 		return scc_r(machine, 0);
 	case 1:
-		return x68k_read_mouse();
+		return x68k_read_mouse(machine);
 	case 2:
 		return scc_r(machine, 1);
 	case 3:
@@ -643,7 +643,7 @@ static READ8_HANDLER( ppi_port_a_r )
 {
 	// Joystick 1
 	if(sys.joy.joy1_enable == 0)
-		return readinputportbytag("joy1");
+		return input_port_read(machine, "joy1");
 	else
 		return 0xff;
 }
@@ -652,7 +652,7 @@ static READ8_HANDLER( ppi_port_b_r )
 {
 	// Joystick 2
 	if(sys.joy.joy2_enable == 0)
-		return readinputportbytag("joy2");
+		return input_port_read(machine, "joy2");
 	else
 		return 0xff;
 }
@@ -1351,7 +1351,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
 static READ16_HANDLER( x68k_exp_r )
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(readinputportbytag("options") & 0x02)
+	if(input_port_read(machine, "options") & 0x02)
 	{
 		current_vector[2] = 0x02;  // bus error
 		current_irq_line = 2;
@@ -1367,7 +1367,7 @@ static READ16_HANDLER( x68k_exp_r )
 static WRITE16_HANDLER( x68k_exp_w )
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(readinputportbytag("options") & 0x02)
+	if(input_port_read(machine, "options") & 0x02)
 	{
 		current_vector[2] = 0x02;  // bus error
 		current_irq_line = 2;

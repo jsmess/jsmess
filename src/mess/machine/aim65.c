@@ -142,7 +142,7 @@ static READ8_HANDLER( aim65_riot_b_r )
 	for (row = 0; row < 8; row++) {
 		sprintf(portname, "keyboard_%d", row);
 		if (!(riot_port_a & (1 << row)))
-			data &= readinputportbytag(portname);
+			data &= input_port_read(machine, portname);
 	}
 
 	return data;
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( aim65_via0_b_w )
 
 static READ8_HANDLER( aim65_via0_b_r )
 {
-	return readinputportbytag("switches");
+	return input_port_read(machine, "switches");
 }
 
 

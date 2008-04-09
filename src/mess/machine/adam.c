@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/tms9928a.h"
 #include "includes/adam.h"
 #include "devices/cartslot.h"
@@ -115,16 +116,16 @@ void exploreKeyboard(void)
 //logerror("Exploring Keyboard.............\n");
     for(i=0;i<=255;i++) {if (KbRepeatTable[i]>0) KbRepeatTable[i]++;} /* Update repeat table */
 
-    keyboard[0] = readinputportbytag("keyboard_1");
-    keyboard[1] = readinputportbytag("keyboard_2");
-    keyboard[2] = readinputportbytag("keyboard_3");
-    keyboard[3] = readinputportbytag("keyboard_4");
-    keyboard[4] = readinputportbytag("keyboard_5");
-    keyboard[5] = readinputportbytag("keyboard_6");
-    keyboard[6] = readinputportbytag("keyboard_7");
-    keyboard[7] = readinputportbytag("keyboard_8");
-    keyboard[8] = readinputportbytag("keyboard_9");
-    keyboard[9] = readinputportbytag("keyboard_10");
+    keyboard[0] = input_port_read(Machine, "keyboard_1");
+    keyboard[1] = input_port_read(Machine, "keyboard_2");
+    keyboard[2] = input_port_read(Machine, "keyboard_3");
+    keyboard[3] = input_port_read(Machine, "keyboard_4");
+    keyboard[4] = input_port_read(Machine, "keyboard_5");
+    keyboard[5] = input_port_read(Machine, "keyboard_6");
+    keyboard[6] = input_port_read(Machine, "keyboard_7");
+    keyboard[7] = input_port_read(Machine, "keyboard_8");
+    keyboard[8] = input_port_read(Machine, "keyboard_9");
+    keyboard[9] = input_port_read(Machine, "keyboard_10");
 
 /* Reference: Appendix of COLECO ADAM TECHNICAL MANUAL at http://drushel.cwru.edu/atm/atm.html */
 
@@ -800,7 +801,7 @@ WRITE8_HANDLER( master6801_ram_w )
  READ8_HANDLER ( adam_paddle_r )
 {
 
-    if (!(readinputportbytag("controllers") & 0x0F)) return (0xFF); /* If no controllers enabled */
+    if (!(input_port_read(machine, "controllers") & 0x0F)) return (0xFF); /* If no controllers enabled */
 	/* Player 1 */
 	if ((offset & 0x02)==0)
 	{
@@ -809,9 +810,9 @@ WRITE8_HANDLER( master6801_ram_w )
 		{
 			int inport0,inport1,inport6,data;
 
-			inport0 = readinputportbytag("controller1_keypad1");
-			inport1 = readinputportbytag("controller1_keypad2");
-			inport6 = readinputportbytag("controllers");
+			inport0 = input_port_read(machine, "controller1_keypad1");
+			inport1 = input_port_read(machine, "controller1_keypad2");
+			inport6 = input_port_read(machine, "controllers");
 
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
@@ -838,8 +839,8 @@ WRITE8_HANDLER( master6801_ram_w )
 		/* Joystick and fire 2 (SAC Red Button) */
 		else
 		{
-			int data = readinputportbytag("controller1_joystick") & 0xCF;
-			int inport6 = readinputportbytag("controllers");
+			int data = input_port_read(machine, "controller1_joystick") & 0xCF;
+			int inport6 = input_port_read(machine, "controllers");
 
 			if (inport6&0x07) /* If Extra Contollers enabled */
 			{
@@ -859,8 +860,8 @@ WRITE8_HANDLER( master6801_ram_w )
 		{
 			int inport3,inport4,data;
 
-			inport3 = readinputportbytag("controller2_keypad1");
-			inport4 = readinputportbytag("controller2_keypad2");
+			inport3 = input_port_read(machine, "controller2_keypad1");
+			inport4 = input_port_read(machine, "controller2_keypad2");
 
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
@@ -885,8 +886,8 @@ WRITE8_HANDLER( master6801_ram_w )
 		/* Joystick and fire 2*/
 		else
 		{
-			int data = readinputportbytag("controller2_joystick") & 0xCF;
-			int inport6 = readinputportbytag("controllers");
+			int data = input_port_read(machine, "controller2_joystick") & 0xCF;
+			int inport6 = input_port_read(machine, "controllers");
 
 			if (inport6&0x02) /* If Roller Controller enabled */
 			{

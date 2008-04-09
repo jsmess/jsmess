@@ -54,13 +54,13 @@ static  READ8_HANDLER(apf_m1000_pia_in_a_func)
 
   UINT8 data=~0;
   if (!(pad_data & 0x08))
-    data &= readinputportbytag("joy3");
+    data &= input_port_read(machine, "joy3");
   if (!(pad_data & 0x04))
-    data &= readinputportbytag("joy2");
+    data &= input_port_read(machine, "joy2");
   if (!(pad_data & 0x02))
-    data &= readinputportbytag("joy1");
+    data &= input_port_read(machine, "joy1");
   if (!(pad_data & 0x01))
-    data &= readinputportbytag("joy0");
+    data &= input_port_read(machine, "joy0");
 
 	return data;
 }
@@ -254,7 +254,7 @@ static WRITE8_HANDLER(apf_imagination_pia_out_b_func)
 	keyboard_line = data & 0x07;
 
 	sprintf(port, "key%d", keyboard_line);
-	keyboard_data = readinputportbytag(port);
+	keyboard_data = input_port_read(machine, port);
 
 	/* bit 4: cassette motor control */
 	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),

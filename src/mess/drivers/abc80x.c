@@ -276,7 +276,7 @@ static READ8_HANDLER( abc77_data_r )
 	char port[4];
 	sprintf(port, "X%d", abc77_keylatch);
 
-	return readinputportbytag(port);
+	return input_port_read(machine, port);
 }
 
 static WRITE8_HANDLER( abc77_data_w )
@@ -301,7 +301,7 @@ static WRITE8_HANDLER( abc77_data_w )
 
 static READ8_HANDLER( abc77_ea_r )
 {
-	return readinputportbytag("DSW") & 0x01;
+	return input_port_read(machine, "DSW") & 0x01;
 }
 
 /* Memory Maps */
@@ -1048,7 +1048,7 @@ static DEVICE_IMAGE_LOAD( abc800_serial )
 	if (device_load_serial_device(image)==INIT_PASS)
 	{
 		/* setup transmit parameters */
-		serial_device_setup(image, 9600 >> readinputportbytag("BAUD"), 8, 1, SERIAL_PARITY_NONE);
+		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
 
 		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
 

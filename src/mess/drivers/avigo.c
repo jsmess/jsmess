@@ -184,7 +184,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 	for (i=0; i<4; i++)
 	{
 		sprintf(port, "LINE%d", i);
-		current_input_port_data[i] = readinputportbytag(port);
+		current_input_port_data[i] = input_port_read(machine, port);
 	}
 
 	changed = current_input_port_data[3]^previous_input_port_data[3];
@@ -222,14 +222,14 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 		previous_input_port_data[i] = current_input_port_data[i];
 	}
 
-	nx = readinputportbytag("POSX");
+	nx = input_port_read(machine, "POSX");
 	if (nx>=0x800) nx-=0x1000;
 	else if (nx<=-0x800) nx+=0x1000;
 
 	dx = nx - ox;
 	ox = nx;
 
-	ny = readinputportbytag("POSY");
+	ny = input_port_read(machine, "POSY");
 	if (ny>=0x800) ny-=0x1000;
 	else if (ny<=-0x800) ny+=0x1000;
 
@@ -424,7 +424,7 @@ static MACHINE_RESET( avigo )
 	for (i=0; i<4; i++)
 	{
 		sprintf(port, "LINE%d", i);
-		previous_input_port_data[i] = readinputportbytag(port);
+		previous_input_port_data[i] = input_port_read(machine, port);
 	}
 
 	avigo_irq = 0;
@@ -480,17 +480,17 @@ static  READ8_HANDLER(avigo_key_data_read_r)
 
 	if (avigo_key_line & 0x01)
 	{
-		data &= readinputportbytag("LINE0");
+		data &= input_port_read(machine, "LINE0");
 	}
 
 	if (avigo_key_line & 0x02)
 	{
-		data &= readinputportbytag("LINE1");
+		data &= input_port_read(machine, "LINE1");
 	}
 
 	if (avigo_key_line & 0x04)
 	{
-		data &= readinputportbytag("LINE2");
+		data &= input_port_read(machine, "LINE2");
 
 	}
 

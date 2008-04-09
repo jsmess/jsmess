@@ -130,14 +130,14 @@ static void enterprise_dave_reg_read(int RegIndex)
 
 		/* read keyboard line */
 		sprintf(port, "LINE%d", Enterprise_KeyboardLine);
-		Dave_setreg(machine, 0x015, readinputportbytag(port));
+		Dave_setreg(machine, 0x015, input_port_read(machine, port));
 		}
 		break;
 
 	case 0x016:
 	{
 		int ExternalJoystickInputs;
-		int ExternalJoystickPortInput = readinputportbytag("JOY1");
+		int ExternalJoystickPortInput = input_port_read(machine, "JOY1");
 
 		if (Enterprise_KeyboardLine<=4)
 		{

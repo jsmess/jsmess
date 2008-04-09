@@ -23,7 +23,7 @@ MACHINE_RESET( galeb )
 
 READ8_HANDLER( galeb_keyboard_r )
 {
-	 return readinputport(offset);
+	 return input_port_read_indexed(machine, offset);
 }
 
 WRITE8_HANDLER( galeb_speaker_w )

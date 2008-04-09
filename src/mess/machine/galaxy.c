@@ -24,7 +24,7 @@ int galaxy_interrupts_enabled = TRUE;
 
 READ8_HANDLER( galaxy_keyboard_r )
 {
-	return readinputport((offset>>3)&0x07) & (0x01<<(offset&0x07)) ? 0xfe : 0xff;
+	return input_port_read_indexed(machine, (offset>>3)&0x07) & (0x01<<(offset&0x07)) ? 0xfe : 0xff;
 }
 
 READ8_HANDLER( galaxy_latch_r )
@@ -167,9 +167,9 @@ DRIVER_INIT( galaxy )
 MACHINE_RESET( galaxy )
 {
 	/* ROM 2 enable/disable */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, readinputport(7) ? SMH_BANK10 : SMH_NOP);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, input_port_read_indexed(machine, 7) ? SMH_BANK10 : SMH_NOP);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
-	if (readinputport(7))
+	if (input_port_read_indexed(machine, 7))
 		memory_set_bankptr(10, memory_region(REGION_CPU1) + 0x1000);
 
 	cpunum_set_irq_callback(0, galaxy_irq_callback);

@@ -562,14 +562,14 @@ static READ8_HANDLER( ipc_bus_r )
 
     */
 
-	if (BIT(ipc.keylatch, 0)) return readinputportbytag("ROW0") | readinputportbytag("JOY0");
-	if (BIT(ipc.keylatch, 1)) return readinputportbytag("ROW1") | readinputportbytag("JOY1");
-	if (BIT(ipc.keylatch, 2)) return readinputportbytag("ROW2");
-	if (BIT(ipc.keylatch, 3)) return readinputportbytag("ROW3");
-	if (BIT(ipc.keylatch, 4)) return readinputportbytag("ROW4");
-	if (BIT(ipc.keylatch, 5)) return readinputportbytag("ROW5");
-	if (BIT(ipc.keylatch, 6)) return readinputportbytag("ROW6");
-	if (BIT(ipc.keylatch, 7)) return readinputportbytag("ROW7");
+	if (BIT(ipc.keylatch, 0)) return input_port_read(machine, "ROW0") | input_port_read(machine, "JOY0");
+	if (BIT(ipc.keylatch, 1)) return input_port_read(machine, "ROW1") | input_port_read(machine, "JOY1");
+	if (BIT(ipc.keylatch, 2)) return input_port_read(machine, "ROW2");
+	if (BIT(ipc.keylatch, 3)) return input_port_read(machine, "ROW3");
+	if (BIT(ipc.keylatch, 4)) return input_port_read(machine, "ROW4");
+	if (BIT(ipc.keylatch, 5)) return input_port_read(machine, "ROW5");
+	if (BIT(ipc.keylatch, 6)) return input_port_read(machine, "ROW6");
+	if (BIT(ipc.keylatch, 7)) return input_port_read(machine, "ROW7");
 
 	return 0;
 }

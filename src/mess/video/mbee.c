@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/mbee.h"
 
 
@@ -119,8 +120,8 @@ static int keyboard_matrix_r(int offs)
 {
 	int port = (offs >> 7) & 7;
 	int bit = (offs >> 4) & 7;
-	int data = (readinputport(port) >> bit) & 1;
-	int extra = readinputport(8);
+	int data = (input_port_read_indexed(Machine, port) >> bit) & 1;
+	int extra = input_port_read_indexed(Machine, 8);
 
 	if( extra & 0x01 )	/* extra: cursor up */
 	{

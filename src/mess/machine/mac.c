@@ -66,9 +66,9 @@
 
 static TIMER_CALLBACK(mac_scanline_tick);
 static emu_timer *mac_scanline_timer;
-static int scan_keyboard(void);
+static int scan_keyboard(running_machine *machine);
 static TIMER_CALLBACK(inquiry_timeout_func);
-static void keyboard_receive(int val);
+static void keyboard_receive(running_machine *machine, int val);
 static READ8_HANDLER(mac_via_in_a);
 static READ8_HANDLER(mac_via_in_b);
 static WRITE8_HANDLER(mac_via_out_a);
@@ -285,7 +285,7 @@ static int key_matrix[7];
 static int keycode_buf[2];
 static int keycode_buf_index;
 
-static int scan_keyboard()
+static int scan_keyboard(running_machine *machine)
 {
 	int i, j;
 	int keybuf;
@@ -298,7 +298,7 @@ static int scan_keyboard()
 
 	for (i=0; i<7; i++)
 	{
-		keybuf = readinputport(i+3);
+		keybuf = input_port_read_indexed(machine, i+3);
 
 		if (keybuf != key_matrix[i])
 		{
@@ -430,7 +430,7 @@ static TIMER_CALLBACK(kbd_clock)
 		{
 			kbd_receive = FALSE;
 			/* Process the command received from mac */
-			keyboard_receive(kbd_shift_reg & 0xff);
+			keyboard_receive(machine, kbd_shift_reg & 0xff);
 		}
 		else
 		{
@@ -478,7 +478,7 @@ static TIMER_CALLBACK(inquiry_timeout_func)
 /*
 	called when a command is received from the mac
 */
-static void keyboard_receive(int val)
+static void keyboard_receive(running_machine *machine, int val)
 {
 	switch (val)
 	{
@@ -487,7 +487,7 @@ static void keyboard_receive(int val)
 		if (LOG_KEYBOARD)
 			logerror("keyboard command : inquiry\n");
 
-		keyboard_reply = scan_keyboard();
+		keyboard_reply = scan_keyboard(machine);
 		if (keyboard_reply == 0x7B)
 		{
 			/* if NULL, wait until key pressed or timeout */
@@ -501,7 +501,7 @@ static void keyboard_receive(int val)
 		if (LOG_KEYBOARD)
 			logerror("keyboard command : instant\n");
 
-		kbd_shift_out(scan_keyboard());
+		kbd_shift_out(scan_keyboard(machine));
 		break;
 
 	case 0x16:
@@ -565,8 +565,8 @@ static void mouse_callback(running_machine *machine)
 	int			new_mx, new_my;
 	int			x_needs_update = 0, y_needs_update = 0;
 
-	new_mx = readinputport(1);
-	new_my = readinputport(2);
+	new_mx = input_port_read_indexed(machine, 1);
+	new_my = input_port_read_indexed(machine, 2);
 
 	/* see if it moved in the x coord */
 	if (new_mx != last_mx)
@@ -1206,7 +1206,7 @@ static READ8_HANDLER(mac_via_in_b)
 			val |= 0x20;
 		if (mouse_bit_x)	/* Mouse X2 */
 			val |= 0x10;
-		if ((readinputport(0) & 0x01) == 0)
+		if ((input_port_read_indexed(machine, 0) & 0x01) == 0)
 			val |= 0x08;
 	}
 	if (rtc_data_out)
@@ -1419,14 +1419,14 @@ DRIVER_INIT(macclassic)
 	ncr5380_init(&macplus_5380intf);
 }
 
-static void mac_vblank_irq(void)
+static void mac_vblank_irq(running_machine *machine)
 {
 	static int irq_count = 0, ca1_data = 0, ca2_data = 0;
 
 	/* handle keyboard */
 	if (kbd_comm == TRUE)
 	{
-		int keycode = scan_keyboard();
+		int keycode = scan_keyboard(machine);
 
 		if (keycode != 0x7B)
 		{
@@ -1467,7 +1467,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 
 	scanline = video_screen_get_vpos(machine->primary_screen);
 	if (scanline == MAC_V_VIS)
-		mac_vblank_irq();
+		mac_vblank_irq(machine);
 
 	/* check for mouse changes at 10 irqs per frame */
 	if (!(scanline % 10))

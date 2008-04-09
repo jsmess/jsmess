@@ -927,7 +927,7 @@ static void kc_keyboard_init(void)
 	for (i=0; i<KC_KEYBOARD_NUM_LINES-1; i++)
 	{
 		/* read input port */
-		kc_previous_keyboard[i] = readinputport(i);
+		kc_previous_keyboard[i] = input_port_read_indexed(Machine, i);
 	}
 }
 
@@ -982,7 +982,7 @@ static void kc_keyboard_begin_transmit(int scan_code)
 	scan = scan_code;
 
 	/* state of shift key */
-	kc_keyboard_add_bit(((readinputport(8) & 0x01)^0x01));
+	kc_keyboard_add_bit(((input_port_read_indexed(Machine, 8) & 0x01)^0x01));
 
 	for (i=0; i<6; i++)
 	{
@@ -1053,7 +1053,7 @@ static TIMER_CALLBACK(kc_keyboard_update)
 		int mask = 0x001;
 
 		/* read input port */
-		keyboard_line_data = readinputport(i);
+		keyboard_line_data = input_port_read_indexed(machine, i);
 		/* identify keys that have changed */
 		changed_keys = keyboard_line_data ^ kc_previous_keyboard[i];
 		/* store input port for next time */

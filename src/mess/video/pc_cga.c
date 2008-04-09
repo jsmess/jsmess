@@ -48,6 +48,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/pc_cga.h"
 #include "video/mc6845.h"
 #include "video/pc_video.h"
@@ -125,10 +126,10 @@ INPUT_PORTS_START( pcvideo_pc1512 )
 INPUT_PORTS_END
 
 /* Dipswitch for font selection */
-#define CGA_FONT        (readinputport(cga.config_input_port)&3)
+#define CGA_FONT        (input_port_read_indexed(machine, cga.config_input_port)&3)
 
 /* Dipswitch for monitor selection */
-#define CGA_MONITOR     (readinputport(cga.config_input_port)&0x1C)
+#define CGA_MONITOR     (input_port_read_indexed(machine, cga.config_input_port)&0x1C)
 #define CGA_MONITOR_RGB         0x00    /* Colour RGB */
 #define CGA_MONITOR_MONO        0x04    /* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE   0x08    /* Colour composite */
@@ -137,7 +138,7 @@ INPUT_PORTS_END
 
 
 /* Dipswitch for chipset selection */
-#define CGA_CHIPSET     (readinputport(cga.config_input_port)&0xE0)
+#define CGA_CHIPSET     (input_port_read_indexed(machine, cga.config_input_port)&0xE0)
 #define CGA_CHIPSET_IBM         0x00    /* Original IBM CGA */
 #define CGA_CHIPSET_PC1512      0x20    /* PC1512 CGA subset */
 #define CGA_CHIPSET_PC200       0x40    /* PC200 in CGA mode */
@@ -469,7 +470,9 @@ static VIDEO_START( pc_cga )
 
 
 
-static VIDEO_UPDATE( mc6845_cga ) {
+static VIDEO_UPDATE( mc6845_cga )
+{
+	running_machine *machine = screen->machine;
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
@@ -1045,6 +1048,8 @@ static void pc_cga_color_select_w(int data)
  */
 static void pc_cga_plantronics_w(int data)
 {
+	running_machine *machine = Machine;
+
 	CGA_LOG(1,"CGA_plantronics_w",("$%02x\n", data));
 
 	if (CGA_CHIPSET != CGA_CHIPSET_ATI) return;
@@ -1498,7 +1503,9 @@ static VIDEO_START( pc1512 )
 }
 
 
-static VIDEO_UPDATE( mc6845_pc1512 ) {
+static VIDEO_UPDATE( mc6845_pc1512 )
+{
+	running_machine *machine = screen->machine;
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 

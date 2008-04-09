@@ -324,7 +324,7 @@ static READ8_HANDLER ( sord_keyboard_r )
 	else
 		sprintf(port, "LINE%d", offset);
 
-	return readinputportbytag(port);
+	return input_port_read(machine, port);
 }
 
 static ADDRESS_MAP_START( sord_m5_mem , ADDRESS_SPACE_PROGRAM, 8)

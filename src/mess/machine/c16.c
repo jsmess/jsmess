@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
@@ -641,42 +642,42 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 	value = 0xff;
 
-	value &= ~readinputportbytag( "ROW0" );
+	value &= ~input_port_read(machine,  "ROW0" );
 	keyline[0] = value;
 
 	value = 0xff;
 
-	value &= ~readinputportbytag( "ROW1" );
+	value &= ~input_port_read(machine,  "ROW1" );
 	keyline[1] = value;
 
 	value = 0xff;
 
-	value &= ~readinputportbytag( "ROW2" );
+	value &= ~input_port_read(machine,  "ROW2" );
 	keyline[2] = value;
 
 	value = 0xff;
 
-	value &= ~readinputportbytag( "ROW3" );
+	value &= ~input_port_read(machine,  "ROW3" );
 	keyline[3] = value;
 
 	value = 0xff;
 
-	value &= ~readinputportbytag( "ROW4" );
+	value &= ~input_port_read(machine,  "ROW4" );
 	keyline[4] = value;
 
 	value = 0xff;
 
-	value &= ~readinputportbytag( "ROW5" );
+	value &= ~input_port_read(machine,  "ROW5" );
 	keyline[5] = value;
 
 	value = 0xff;
 
-	value &= ~readinputportbytag( "ROW6" );
+	value &= ~input_port_read(machine,  "ROW6" );
 	keyline[6] = value;
 
 	value = 0xff;
 
-	value &= ~readinputportbytag( "ROW7" );
+	value &= ~input_port_read(machine,  "ROW7" );
 	keyline[7] = value;
 
 
@@ -730,6 +731,6 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 	vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
 	vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , readinputportbytag("Special") & 0x80 ? 1 : 0);
+	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , input_port_read(machine, "Special") & 0x80 ? 1 : 0);
 	set_led_status (0 /*KB_NUMLOCK_FLAG */ , JOYSTICK_SWAP ? 1 : 0);
 }

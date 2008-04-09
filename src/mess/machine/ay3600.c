@@ -298,10 +298,10 @@ INLINE int a2_has_capslock(void)
 	return !a2_has_repeat(); /* BUG: Doesn't work with Ace */
 }
 
-INLINE int a2_no_ctrl_reset(void)
+INLINE int a2_no_ctrl_reset(running_machine *machine)
 {
 	return ((a2_has_repeat() && !a2_has_reset_dip()) ||
-			(a2_has_reset_dip() && !readinputportbytag("reset_dip")));
+			(a2_has_reset_dip() && !input_port_read(machine, "reset_dip")));
 }
 
 
@@ -362,7 +362,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	/* only repeat keys on a 2/2+ if special REPT key is pressed */
 	if (a2_has_repeat())
-		time_until_repeat = readinputportbytag("keyb_repeat") & 0x01 ? 0 : ~0;
+		time_until_repeat = input_port_read(machine, "keyb_repeat") & 0x01 ? 0 : ~0;
 
 	/* check caps lock and set LED here */
 	if (pressed_specialkey(SPECIALKEY_CAPSLOCK))
@@ -424,7 +424,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	/* reset key check */
 	if (pressed_specialkey(SPECIALKEY_RESET) &&
-		(a2_no_ctrl_reset() || switchkey & A2_KEY_CONTROL)) {
+		(a2_no_ctrl_reset(machine) || switchkey & A2_KEY_CONTROL)) {
 			if (!reset_flag) {
 				reset_flag = 1;
 				/* using PULSE_LINE does not allow us to press and hold key */
@@ -446,7 +446,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	for (port = 0; port < num_ports; port++)
 	{
-		data = readinputport(AY3600_KEYS_BASEPORT + port);
+		data = input_port_read_indexed(machine, AY3600_KEYS_BASEPORT + port);
 		for (bit = 0; bit < 8; bit++)
 		{
 			if (a2_has_capslock()) {

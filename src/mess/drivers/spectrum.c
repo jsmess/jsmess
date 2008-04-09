@@ -229,13 +229,13 @@ static  READ8_HANDLER(spectrum_port_fe_r)
    int lines = offset>>8;
    int data = 0xff;
 
-   int cs_extra1 = readinputportbytag("PLUS0")  & 0x1f;
-   int cs_extra2 = readinputportbytag("PLUS1")  & 0x1f;
-   int cs_extra3 = readinputportbytag("PLUS2") & 0x1f;
-   int ss_extra1 = readinputportbytag("PLUS3") & 0x1f;
-   int ss_extra2 = readinputportbytag("PLUS4") & 0x1f;
+   int cs_extra1 = input_port_read(machine, "PLUS0")  & 0x1f;
+   int cs_extra2 = input_port_read(machine, "PLUS1")  & 0x1f;
+   int cs_extra3 = input_port_read(machine, "PLUS2") & 0x1f;
+   int ss_extra1 = input_port_read(machine, "PLUS3") & 0x1f;
+   int ss_extra2 = input_port_read(machine, "PLUS4") & 0x1f;
 
-	if ( readinputportbytag("MOTOR") & 0x01 ) {
+	if ( input_port_read(machine, "MOTOR") & 0x01 ) {
 		if ( motor_toggle_previous == 0 ) {
 			cassette_motor_mode = cassette_motor_mode ^ 0x01;
 			cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
@@ -248,7 +248,7 @@ static  READ8_HANDLER(spectrum_port_fe_r)
    /* Caps - V */
    if ((lines & 1)==0)
    {
-		data &= readinputportbytag("LINE0");
+		data &= input_port_read(machine, "LINE0");
 		/* CAPS for extra keys */
 		if (cs_extra1 != 0x1f || cs_extra2 != 0x1f || cs_extra3 != 0x1f)
 			data &= ~0x01;
@@ -256,32 +256,32 @@ static  READ8_HANDLER(spectrum_port_fe_r)
 
    /* A - G */
    if ((lines & 2)==0)
-		data &= readinputportbytag("LINE1");
+		data &= input_port_read(machine, "LINE1");
 
    /* Q - T */
    if ((lines & 4)==0)
-		data &= readinputportbytag("LINE2");
+		data &= input_port_read(machine, "LINE2");
 
    /* 1 - 5 */
    if ((lines & 8)==0)
-		data &= readinputportbytag("LINE3") & cs_extra1;
+		data &= input_port_read(machine, "LINE3") & cs_extra1;
 
    /* 6 - 0 */
    if ((lines & 16)==0)
-		data &= readinputportbytag("LINE4") & cs_extra2;
+		data &= input_port_read(machine, "LINE4") & cs_extra2;
 
    /* Y - P */
    if ((lines & 32)==0)
-		data &= readinputportbytag("LINE5") & ss_extra1;
+		data &= input_port_read(machine, "LINE5") & ss_extra1;
 
    /* H - Enter */
    if ((lines & 64)==0)
-		data &= readinputportbytag("LINE6");
+		data &= input_port_read(machine, "LINE6");
 
 	/* B - Space */
 	if ((lines & 128)==0)
 	{
-		data &= readinputportbytag("LINE7") & cs_extra3 & ss_extra2;
+		data &= input_port_read(machine, "LINE7") & cs_extra3 & ss_extra2;
 		/* SYMBOL SHIFT for extra keys */
 		if (ss_extra1 != 0x1f || ss_extra2 != 0x1f)
 			data &= ~0x02;
@@ -297,7 +297,7 @@ static  READ8_HANDLER(spectrum_port_fe_r)
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
     Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
-	if (readinputportbytag("CONFIG") & 0x80)
+	if (input_port_read(machine, "CONFIG") & 0x80)
 		data ^= (0x40);
 	return data;
 }
@@ -305,19 +305,19 @@ static  READ8_HANDLER(spectrum_port_fe_r)
 /* kempston joystick interface */
 static  READ8_HANDLER(spectrum_port_1f_r)
 {
-  return readinputportbytag("KEMPSTON") & 0x1f;
+  return input_port_read(machine, "KEMPSTON") & 0x1f;
 }
 
 /* fuller joystick interface */
 static  READ8_HANDLER(spectrum_port_7f_r)
 {
-  return readinputportbytag("FULLER") | (0xff^0x8f);
+  return input_port_read(machine, "FULLER") | (0xff^0x8f);
 }
 
 /* mikrogen joystick interface */
 static  READ8_HANDLER(spectrum_port_df_r)
 {
-  return readinputportbytag("MIKROGEN") | (0xff^0x1f);
+  return input_port_read(machine, "MIKROGEN") | (0xff^0x1f);
 }
 
 static  READ8_HANDLER ( spectrum_port_r )
@@ -568,13 +568,13 @@ static const int spectrum_plus3_memory_selections[]=
 
 static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
-		if (~readinputportbytag("CONFIG") & 0x20)
+		if (~input_port_read(machine, "CONFIG") & 0x20)
 				nec765_data_w(machine, 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 {
-		if (readinputportbytag("CONFIG") & 0x20)
+		if (input_port_read(machine, "CONFIG") & 0x20)
 				return 0xff;
 		else
 				return nec765_data_r(machine, 0);
@@ -583,7 +583,7 @@ static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 
 static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 {
-		if (readinputportbytag("CONFIG") & 0x20)
+		if (input_port_read(machine, "CONFIG") & 0x20)
 				return 0xff;
 		else
 				return nec765_status_r(machine, 0);

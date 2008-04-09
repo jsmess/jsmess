@@ -175,7 +175,7 @@ READ8_HANDLER( advision_controller_r )
 	int d, in;
 
 	// Get joystick switches
-	in = readinputportbytag("joystick");
+	in = input_port_read(machine, "joystick");
 	d = in | 0x0f;
 
 	// Get buttons

@@ -23,7 +23,7 @@ READ8_HANDLER ( pc_JOY_r )
 
 	if (joystick_port >= 0)
 	{
-		data = readinputport(joystick_port + 0) ^ 0xf0;
+		data = input_port_read_indexed(machine, joystick_port + 0) ^ 0xf0;
 
 		/* timer overflow? */
 		if (attotime_compare(attotime_sub(new_time, JOY_time), ATTOTIME_IN_MSEC(10)) > 0)
@@ -33,10 +33,10 @@ READ8_HANDLER ( pc_JOY_r )
 		else
 		{
 			delta = attotime_mul(attotime_sub(new_time, JOY_time), 256 * 1000).seconds;
-			if (readinputport(joystick_port + 1) < delta) data &= ~0x01;
-			if (readinputport(joystick_port + 2) < delta) data &= ~0x02;
-			if (readinputport(joystick_port + 3) < delta) data &= ~0x04;
-			if (readinputport(joystick_port + 4) < delta) data &= ~0x08;
+			if (input_port_read_indexed(machine, joystick_port + 1) < delta) data &= ~0x01;
+			if (input_port_read_indexed(machine, joystick_port + 2) < delta) data &= ~0x02;
+			if (input_port_read_indexed(machine, joystick_port + 3) < delta) data &= ~0x04;
+			if (input_port_read_indexed(machine, joystick_port + 4) < delta) data &= ~0x08;
 		}
 	}
 	return data;

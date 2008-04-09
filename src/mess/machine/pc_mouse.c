@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/uart8250.h"
 #include "includes/pc_mouse.h"
 
@@ -62,21 +63,21 @@ static TIMER_CALLBACK(pc_mouse_scan)
 	/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
 	if (pc_mouse.head==pc_mouse.tail)
 	{
-		nx = readinputportbytag("pc_mouse_x");
+		nx = input_port_read(machine, "pc_mouse_x");
 
 		dx = nx - ox;
 		if (dx<=-0x800) dx = nx + 0x1000 - ox; /* Prevent jumping */
 		if (dx>=0x800) dx = nx - 0x1000 - ox;
 		ox = nx;
 
-		ny = readinputportbytag("pc_mouse_y");
+		ny = input_port_read(machine, "pc_mouse_y");
 
 		dy = ny - oy;
 		if (dy<=-0x800) dy = ny + 0x1000 - oy;
 		if (dy>=0x800) dy = ny - 0x1000 - oy;
 		oy = ny;
 
-		nb = readinputportbytag("pc_mouse_misc");
+		nb = input_port_read(machine, "pc_mouse_misc");
 		if ((nb & 0x80) != 0)
 		{
 			pc_mouse.protocol=TYPE_MOUSE_SYSTEMS;
@@ -219,7 +220,7 @@ void pc_mouse_handshake_in(int n, int outputs)
 			/* reset mouse */
 			pc_mouse.head = pc_mouse.tail = pc_mouse.mb = 0;
 
-			if ((readinputportbytag("pc_mouse_misc") & 0x80) == 0 )
+			if ((input_port_read(Machine, "pc_mouse_misc") & 0x80) == 0 )
 			{
 				/* Identify as Microsoft 3 Button Mouse */
 				pc_mouse.queue[pc_mouse.head] = 'M';

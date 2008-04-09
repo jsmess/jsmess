@@ -191,8 +191,8 @@ static void coleco_vdp_interrupt (int state)
 
 static TIMER_CALLBACK(paddle_callback)
 {
-    int port7 = readinputportbytag("IN7");
-    int port8 = readinputportbytag("IN8");
+    int port7 = input_port_read(machine, "IN7");
+    int port8 = input_port_read(machine, "IN8");
 
     if (port7 == 0)
 		JoyStat[0] = 0;

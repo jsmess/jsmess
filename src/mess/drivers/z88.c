@@ -88,7 +88,7 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 		for (i=0; i<8; i++)
 		{
 			sprintf(port, "LINE%d", i);
-			data &= readinputportbytag(port);
+			data &= input_port_read(machine, port);
 		}
 
 		/* if any key is pressed, then one or more bits will be 0 */
@@ -547,28 +547,28 @@ static  READ8_HANDLER(z88_port_r)
 
 
 			if ((lines & 0x080)==0)
-				data &=readinputportbytag("LINE7");
+				data &=input_port_read(machine, "LINE7");
 
 			if ((lines & 0x040)==0)
-				data &=readinputportbytag("LINE6");
+				data &=input_port_read(machine, "LINE6");
 
 			if ((lines & 0x020)==0)
-				data &=readinputportbytag("LINE5");
+				data &=input_port_read(machine, "LINE5");
 
 			if ((lines & 0x010)==0)
-				data &=readinputportbytag("LINE4");
+				data &=input_port_read(machine, "LINE4");
 
 			if ((lines & 0x008)==0)
-				data &=readinputportbytag("LINE3");
+				data &=input_port_read(machine, "LINE3");
 
 			if ((lines & 0x004)==0)
-				data &=readinputportbytag("LINE2");
+				data &=input_port_read(machine, "LINE2");
 
 			if ((lines & 0x002)==0)
-				data &=readinputportbytag("LINE1");
+				data &=input_port_read(machine, "LINE1");
 
 			if ((lines & 0x001)==0)
-				data &=readinputportbytag("LINE0");
+				data &=input_port_read(machine, "LINE0");
 
 			logerror("lines: %02x\n",lines);
 			logerror("key r: %02x\n",data);

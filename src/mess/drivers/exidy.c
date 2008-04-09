@@ -454,7 +454,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 static WRITE8_HANDLER(exidy_ff_port_w)
 {
 	/* reading the config switch */
-	switch ((readinputportbytag("CONFIG")>>1) & 0x01)
+	switch ((input_port_read(machine, "CONFIG")>>1) & 0x01)
 	{
 		case 0: /* speaker */
 			speaker_level_w(0, (data) ? 1 : 0);
@@ -518,11 +518,11 @@ static  READ8_HANDLER(exidy_fe_port_r)
 	char port[7];
 
 	/* bit 5 - vsync (inverted) */
-	data |= (((~readinputportbytag("VS")) & 0x01)<<5);
+	data |= (((~input_port_read(machine, "VS")) & 0x01)<<5);
 
 	/* bits 4..0 - keyboard data */
 	sprintf(port, "LINE%d", exidy_keyboard_line);
-	data |= (readinputportbytag(port) & 0x01f);
+	data |= (input_port_read(machine, port) & 0x01f);
 
 	return data;
 }
@@ -793,7 +793,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( exidy )
 {
-	UINT8 sw = readinputportbytag("CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
+	UINT8 sw = input_port_read(machine, "CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
 	UINT16 exec_addr, start_addr, end_addr;
 
 	if (z80bin_load_file( machine, image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)

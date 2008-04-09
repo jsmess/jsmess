@@ -18,6 +18,7 @@ would commence ($C00000).
 
 /* Core includes */
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/amiga.h"
 
 /* Components */
@@ -265,7 +266,7 @@ MACHINE_DRIVER_END
 
 static UINT8 amiga_cia_0_portA_r( void )
 {
-	UINT8 ret = readinputportbytag("CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+	UINT8 ret = input_port_read(Machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
 	ret |= amiga_fdc_status_r();
 	return ret;
 }
@@ -298,28 +299,28 @@ static void amiga_cia_0_portA_w( UINT8 data )
 
 static UINT16 amiga_read_joy0dat(void)
 {
-	if ( readinputportbytag("input") & 0x20 ) {
+	if ( input_port_read(Machine, "input") & 0x20 ) {
 		/* Joystick */
-		return readinputportbytag_safe("JOY0DAT", 0xffff);
+		return input_port_read_safe(Machine, "JOY0DAT", 0xffff);
 	} else {
 		/* Mouse */
 		int input;
-		input  = ( readinputportbytag("P0MOUSEX") & 0xff );
-		input |= ( readinputportbytag("P0MOUSEY") & 0xff ) << 8;
+		input  = ( input_port_read(Machine, "P0MOUSEX") & 0xff );
+		input |= ( input_port_read(Machine, "P0MOUSEY") & 0xff ) << 8;
 		return input;
 	}
 }
 
 static UINT16 amiga_read_joy1dat(void)
 {
-	if ( readinputportbytag("input") & 0x10 ) {
+	if ( input_port_read(Machine, "input") & 0x10 ) {
 		/* Joystick */
-		return readinputportbytag_safe("JOY1DAT", 0xffff);
+		return input_port_read_safe(Machine, "JOY1DAT", 0xffff);
 	} else {
 		/* Mouse */
 		int input;
-		input  = ( readinputportbytag("P1MOUSEX") & 0xff );
-		input |= ( readinputportbytag("P1MOUSEY") & 0xff ) << 8;
+		input  = ( input_port_read(Machine, "P1MOUSEX") & 0xff );
+		input |= ( input_port_read(Machine, "P1MOUSEY") & 0xff ) << 8;
 		return input;
 	}
 }
@@ -339,7 +340,7 @@ static void amiga_write_dsklen(UINT16 data)
 
 static void amiga_reset(void)
 {
-	if (readinputportbytag("hardware") & 0x08)
+	if (input_port_read(Machine, "hardware") & 0x08)
 	{
 		/* Install RTC */
 		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xdc0000, 0xdc003f, 0, 0, amiga_clock_r, amiga_clock_w);

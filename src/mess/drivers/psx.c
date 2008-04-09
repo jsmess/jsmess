@@ -190,6 +190,7 @@ static TIMER_CALLBACK(psx_pad_ack)
 
 static void psx_pad( int n_port, int n_data )
 {
+	running_machine *machine = Machine;
 	int b_sel;
 	int b_clock;
 	int b_data;
@@ -283,7 +284,7 @@ static void psx_pad( int n_port, int n_data )
 			if( m_pad[ n_port ].n_byte < PAD_BYTES_STANDARD )
 			{
 				sprintf(port, "IN%d", m_pad[ n_port ].n_byte + ( n_port * PAD_BYTES_STANDARD ) );
-				m_pad[ n_port ].n_shiftout = readinputportbytag(port);
+				m_pad[ n_port ].n_shiftout = input_port_read(machine, port);
 				m_pad[ n_port ].n_byte++;
 				b_ack = 1;
 			}

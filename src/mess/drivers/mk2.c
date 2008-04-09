@@ -154,7 +154,7 @@ ROM_END
 static int mk2_read_a(int chip)
 {
 	int data=0xff;
-	int help=readinputportbytag("BLACK")|readinputportbytag("WHITE"); // looks like white and black keys are the same!
+	int help=input_port_read(Machine, "BLACK")|input_port_read(Machine, "WHITE"); // looks like white and black keys are the same!
 
 	switch (rriot_0_b_r(Machine, 0)&0x7) {
 	case 4:
@@ -165,17 +165,17 @@ static int mk2_read_a(int chip)
 		if (help&2) data&=~0x10; // B
 		if (help&1) data&=~0x20; // A
 #if 0
-		if (readinputport(3)&1) data&=~0x40; //?
+		if (input_port_read_indexed(machine, 3)&1) data&=~0x40; //?
 #endif
 		break;
 	case 5:
 #if 0
-		if (readinputport(3)&2) data&=~0x1; //?
-		if (readinputport(3)&4) data&=~0x2; //?
-		if (readinputport(3)&8) data&=~0x4; //?
+		if (input_port_read_indexed(machine, 3)&2) data&=~0x1; //?
+		if (input_port_read_indexed(machine, 3)&4) data&=~0x2; //?
+		if (input_port_read_indexed(machine, 3)&8) data&=~0x4; //?
 #endif
-		if (readinputportbytag("EXTRA")&4) data&=~0x8; // Enter
-		if (readinputportbytag("EXTRA")&2) data&=~0x10; // Clear
+		if (input_port_read(Machine, "EXTRA")&4) data&=~0x8; // Enter
+		if (input_port_read(Machine, "EXTRA")&2) data&=~0x10; // Clear
 		if (help&0x80) data&=~0x20; // H
 		if (help&0x40) data&=~0x40; // G
 		break;

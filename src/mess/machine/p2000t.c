@@ -44,15 +44,15 @@ READ8_HANDLER (	p2000t_port_000f_r )
 {
 	if (p2000t_ports.port_101f & P2000M_101F_KEYINT)
 	{
-		return (readinputport (0) & readinputport (1) &
-		readinputport (2) & readinputport (3) &
-		readinputport (4) & readinputport (5) &
-		readinputport (6) & readinputport (7) &
-		readinputport (8) & readinputport (9));
+		return (input_port_read_indexed(machine, 0) & input_port_read_indexed(machine, 1) &
+		input_port_read_indexed(machine, 2) & input_port_read_indexed(machine, 3) &
+		input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) &
+		input_port_read_indexed(machine, 6) & input_port_read_indexed(machine, 7) &
+		input_port_read_indexed(machine, 8) & input_port_read_indexed(machine, 9));
 	}
 	else if (offset < 10)
 	{
-		return (readinputport (offset));
+		return (input_port_read_indexed(machine, offset));
 	}
 	return (0xff);
 }

@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/sc61860/sc61860.h"
 
 #include "includes/pocketc.h"
@@ -25,6 +26,7 @@ void pc1350_outc(int data)
 
 int pc1350_ina(void)
 {
+	running_machine *machine = Machine;
 	int data=outa;
 	int t=pc1350_keyboard_line_r();
 	if (t&1) {
@@ -127,6 +129,7 @@ int pc1350_inb(void)
 
 int pc1350_brk(void)
 {
+	running_machine *machine = Machine;
 	return PC1350_KEY_BRK;
 }
 

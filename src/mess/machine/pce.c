@@ -264,7 +264,7 @@ WRITE8_HANDLER ( pce_joystick_w )
 READ8_HANDLER ( pce_joystick_r )
 {
 	UINT8 ret;
-	int data = readinputport(0);
+	int data = input_port_read_indexed(machine, 0);
 	if(joystick_data_select) data >>= 4;
 	ret = (data & 0x0F) | pce.io_port_options;
 #ifdef UNIFIED_PCE

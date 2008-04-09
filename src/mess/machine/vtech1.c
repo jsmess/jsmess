@@ -472,13 +472,13 @@ READ8_HANDLER(vtech1_joystick_r)
     int data = 0xff;
 
 	if (!(offset & 1))
-		data &= readinputportbytag("joystick_0");
+		data &= input_port_read(machine, "joystick_0");
 	if (!(offset & 2))
-		data &= readinputportbytag("joystick_0_arm");
+		data &= input_port_read(machine, "joystick_0_arm");
 	if (!(offset & 4))
-		data &= readinputportbytag("joystick_1");
+		data &= input_port_read(machine, "joystick_1");
 	if (!(offset & 8))
-		data &= readinputportbytag("joystick_1_arm");
+		data &= input_port_read(machine, "joystick_1_arm");
 
     return data;
 }
@@ -494,7 +494,7 @@ READ8_HANDLER(vtech1_keyboard_r)
 	for (row = 0; row < 8; row++) {
 		sprintf(portname, "keyboard_%d", row);
 		if (!(offset & (1 << row)))
-			data &= readinputportbytag(portname);
+			data &= input_port_read(machine, portname);
 	}
 
 	if (video_screen_get_vblank(machine->primary_screen))

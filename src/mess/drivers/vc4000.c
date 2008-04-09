@@ -55,25 +55,25 @@ static  READ8_HANDLER(vc4000_key_r)
 	UINT8 data=0;
 	switch(offset & 0x0f) {
 	case 0x08:
-		data = readinputportbytag("KEYPAD1_1");
+		data = input_port_read(machine, "KEYPAD1_1");
 		break;
 	case 0x09:
-		data = readinputportbytag("KEYPAD1_2");
+		data = input_port_read(machine, "KEYPAD1_2");
 		break;
 	case 0x0a:
-		data = readinputportbytag("KEYPAD1_3");
+		data = input_port_read(machine, "KEYPAD1_3");
 		break;
 	case 0x0b:
-		data = readinputportbytag("PANEL");
+		data = input_port_read(machine, "PANEL");
 		break;
 	case 0x0c:
-		data = readinputportbytag("KEYPAD2_1");
+		data = input_port_read(machine, "KEYPAD2_1");
 		break;
 	case 0x0d:
-		data = readinputportbytag("KEYPAD2_2");
+		data = input_port_read(machine, "KEYPAD2_2");
 		break;
 	case 0x0e:
-		data = readinputportbytag("KEYPAD2_3");
+		data = input_port_read(machine, "KEYPAD2_3");
 		break;
 	}
 	return data;

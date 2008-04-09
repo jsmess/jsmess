@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/c128.h"
 #include "includes/c64.h"
 

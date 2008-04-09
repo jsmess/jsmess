@@ -390,7 +390,7 @@ static void COPS_queue_data(const UINT8 *data, int len)
 /* keyboard matrix to detect transition */
 static int key_matrix[8];
 
-static void scan_keyboard( void )
+static void scan_keyboard(running_machine *machine)
 {
 	int i, j;
 	int keybuf;
@@ -399,7 +399,7 @@ static void scan_keyboard( void )
 	if (! COPS_force_unplug)
 		for (i=0; i<8; i++)
 		{
-			keybuf = readinputport(i+2);
+			keybuf = input_port_read_indexed(machine, i+2);
 
 			if (keybuf != key_matrix[i])
 			{	/* if state has changed, find first bit which has changed */
@@ -444,8 +444,8 @@ static TIMER_CALLBACK(handle_mouse)
 	/*if (COPS_force_unplug)
 		return;*/	/* ???? */
 
-	new_mx = readinputport(0);
-	new_my = readinputport(1);
+	new_mx = input_port_read_indexed(machine, 0);
+	new_my = input_port_read_indexed(machine, 1);
 
 	/* see if it moved in the x coord */
 	if (new_mx != last_mx)
@@ -1299,7 +1299,7 @@ INTERRUPT_GEN( lisa_interrupt )
 		set_VTIR(machine, 1);
 
 	/* do keyboard scan */
-	scan_keyboard();
+	scan_keyboard(machine);
 }
 
 /*

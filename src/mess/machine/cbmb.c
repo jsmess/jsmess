@@ -110,12 +110,12 @@ static void cbmb_keyboard_line_select_c(int line)
 static int cbmb_keyboard_line_a(void)
 {
 	int data=0;
-	if (!(cbmb_keyline_c&1)) data|=readinputport(0);
-	if (!(cbmb_keyline_c&2)) data|=readinputport(2);
-	if (!(cbmb_keyline_c&4)) data|=readinputport(4);
-	if (!(cbmb_keyline_c&8)) data|=readinputport(6);
-	if (!(cbmb_keyline_c&0x10)) data|=readinputport(8);
-	if (!(cbmb_keyline_c&0x20)) data|=readinputport(10);
+	if (!(cbmb_keyline_c&1)) data|=input_port_read_indexed(Machine, 0);
+	if (!(cbmb_keyline_c&2)) data|=input_port_read_indexed(Machine, 2);
+	if (!(cbmb_keyline_c&4)) data|=input_port_read_indexed(Machine, 4);
+	if (!(cbmb_keyline_c&8)) data|=input_port_read_indexed(Machine, 6);
+	if (!(cbmb_keyline_c&0x10)) data|=input_port_read_indexed(Machine, 8);
+	if (!(cbmb_keyline_c&0x20)) data|=input_port_read_indexed(Machine, 10);
 
 	return data^0xff;
 }
@@ -123,12 +123,12 @@ static int cbmb_keyboard_line_a(void)
 static int cbmb_keyboard_line_b(void)
 {
 	int data=0;
-	if (!(cbmb_keyline_c&1)) data|=readinputport(1);
-	if (!(cbmb_keyline_c&2)) data|=readinputport(3);
-	if (!(cbmb_keyline_c&4)) data|=readinputport(5);
-	if (!(cbmb_keyline_c&8)) data|=readinputport(7);
-	if (!(cbmb_keyline_c&0x10)) data|=readinputport(9) | ((readinputport(12)&0x04) ? 1 : 0 );
-	if (!(cbmb_keyline_c&0x20)) data|=readinputport(11);
+	if (!(cbmb_keyline_c&1)) data|=input_port_read_indexed(Machine, 1);
+	if (!(cbmb_keyline_c&2)) data|=input_port_read_indexed(Machine, 3);
+	if (!(cbmb_keyline_c&4)) data|=input_port_read_indexed(Machine, 5);
+	if (!(cbmb_keyline_c&8)) data|=input_port_read_indexed(Machine, 7);
+	if (!(cbmb_keyline_c&0x10)) data|=input_port_read_indexed(Machine, 9) | ((input_port_read_indexed(Machine, 12)&0x04) ? 1 : 0 );
+	if (!(cbmb_keyline_c&0x20)) data|=input_port_read_indexed(Machine, 11);
 
 	return data^0xff;
 }
@@ -137,18 +137,18 @@ static int cbmb_keyboard_line_c(void)
 {
 	int data=0;
 
-	if ( (readinputport(0)&~cbmb_keyline_a)||
-		 (readinputport(1)&~cbmb_keyline_b)) data|=1;
-	if ( (readinputport(2)&~cbmb_keyline_a)||
-		 (readinputport(3)&~cbmb_keyline_b)) data|=2;
-	if ( (readinputport(4)&~cbmb_keyline_a)||
-		 (readinputport(5)&~cbmb_keyline_b)) data|=4;
-	if ( (readinputport(6)&~cbmb_keyline_a)||
-		 (readinputport(7)&~cbmb_keyline_b)) data|=8;
-	if ( (readinputport(8)&~cbmb_keyline_a)||
-		 ((readinputport(9)|((readinputport(12)&0x04)?1:0))&~cbmb_keyline_b)) data|=0x10;
-	if ( (readinputport(10)&~cbmb_keyline_a)||
-		 (readinputport(11)&~cbmb_keyline_b)) data|=0x20;
+	if ( (input_port_read_indexed(Machine, 0)&~cbmb_keyline_a)||
+		 (input_port_read_indexed(Machine, 1)&~cbmb_keyline_b)) data|=1;
+	if ( (input_port_read_indexed(Machine, 2)&~cbmb_keyline_a)||
+		 (input_port_read_indexed(Machine, 3)&~cbmb_keyline_b)) data|=2;
+	if ( (input_port_read_indexed(Machine, 4)&~cbmb_keyline_a)||
+		 (input_port_read_indexed(Machine, 5)&~cbmb_keyline_b)) data|=4;
+	if ( (input_port_read_indexed(Machine, 6)&~cbmb_keyline_a)||
+		 (input_port_read_indexed(Machine, 7)&~cbmb_keyline_b)) data|=8;
+	if ( (input_port_read_indexed(Machine, 8)&~cbmb_keyline_a)||
+		 ((input_port_read_indexed(Machine, 9)|((input_port_read_indexed(Machine, 12)&0x04)?1:0))&~cbmb_keyline_b)) data|=0x10;
+	if ( (input_port_read_indexed(Machine, 10)&~cbmb_keyline_a)||
+		 (input_port_read_indexed(Machine, 11)&~cbmb_keyline_b)) data|=0x20;
 
 	if (!cbm500) {
 		if (!cbm_ntsc) data|=0x40;
@@ -371,7 +371,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 
 	vic2_frame_interrupt (machine, 0);
 
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , (readinputport(12)&0x04) ? 1 : 0);
+	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , (input_port_read_indexed(machine, 12)&0x04) ? 1 : 0);
 #if 0
 	set_led_status (0 /*KB_NUMLOCK_FLAG */ , JOYSTICK_SWAP ? 1 : 0);
 #endif

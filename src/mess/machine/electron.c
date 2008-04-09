@@ -100,7 +100,7 @@ static READ8_HANDLER( electron_read_keyboard ) {
 	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );
 	for( i = 0; i < 14; i++ ) {
 		if ( ! ( offset & 1 ) ) {
-			data |= readinputport(i) & 0x0f;
+			data |= input_port_read_indexed(machine, i) & 0x0f;
 		}
 		offset = offset >> 1;
 	}

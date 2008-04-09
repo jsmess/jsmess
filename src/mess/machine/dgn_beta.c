@@ -562,16 +562,16 @@ static READ8_HANDLER(d_pia0_pb_r)
 		{
 			switch (Idx)
 			{
-				case 0 : Keyboard[Idx]=readinputport(0); break;
-				case 1 : Keyboard[Idx]=readinputport(1); break;
-				case 2 : Keyboard[Idx]=readinputport(2); break;
-				case 3 : Keyboard[Idx]=readinputport(3); break;
-				case 4 : Keyboard[Idx]=readinputport(4); break;
-				case 5 : Keyboard[Idx]=readinputport(5); break;
-				case 6 : Keyboard[Idx]=readinputport(6); break;
-				case 7 : Keyboard[Idx]=readinputport(7); break;
-				case 8 : Keyboard[Idx]=readinputport(8); break;
-				case 9 : Keyboard[Idx]=readinputport(9); break;
+				case 0 : Keyboard[Idx]=input_port_read_indexed(machine, 0); break;
+				case 1 : Keyboard[Idx]=input_port_read_indexed(machine, 1); break;
+				case 2 : Keyboard[Idx]=input_port_read_indexed(machine, 2); break;
+				case 3 : Keyboard[Idx]=input_port_read_indexed(machine, 3); break;
+				case 4 : Keyboard[Idx]=input_port_read_indexed(machine, 4); break;
+				case 5 : Keyboard[Idx]=input_port_read_indexed(machine, 5); break;
+				case 6 : Keyboard[Idx]=input_port_read_indexed(machine, 6); break;
+				case 7 : Keyboard[Idx]=input_port_read_indexed(machine, 7); break;
+				case 8 : Keyboard[Idx]=input_port_read_indexed(machine, 8); break;
+				case 9 : Keyboard[Idx]=input_port_read_indexed(machine, 9); break;
 			}
 
 			if(Keyboard[Idx]!=0x7F)
@@ -991,16 +991,16 @@ static void ScanInKeyboard(void)
 	{
 		switch (Idx)
 		{
-			case 0 : Row=readinputport(0) /*| 0x33*/; break;
-			case 1 : Row=readinputport(1); break;
-			case 2 : Row=readinputport(2); break;
-			case 3 : Row=readinputport(3); break;
-			case 4 : Row=readinputport(4); break;
-			case 5 : Row=readinputport(5); break;
-			case 6 : Row=readinputport(6); break;
-			case 7 : Row=readinputport(7); break;
-			case 8 : Row=readinputport(8); break;
-			case 9 : Row=readinputport(9); break;
+			case 0 : Row=input_port_read_indexed(machine, 0) /*| 0x33*/; break;
+			case 1 : Row=input_port_read_indexed(machine, 1); break;
+			case 2 : Row=input_port_read_indexed(machine, 2); break;
+			case 3 : Row=input_port_read_indexed(machine, 3); break;
+			case 4 : Row=input_port_read_indexed(machine, 4); break;
+			case 5 : Row=input_port_read_indexed(machine, 5); break;
+			case 6 : Row=input_port_read_indexed(machine, 6); break;
+			case 7 : Row=input_port_read_indexed(machine, 7); break;
+			case 8 : Row=input_port_read_indexed(machine, 8); break;
+			case 9 : Row=input_port_read_indexed(machine, 9); break;
 			default : Row=0x7F; break;
 		}
 		Keyboard[Idx]=Row;

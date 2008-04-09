@@ -400,7 +400,7 @@ static void nc_refresh_memory_bank_config(int bank)
 				memory_set_bankptr(bank+1, addr);
 
 				/* write enabled? */
-				if (readinputportbytag("EXTRA") & 0x02)
+				if (input_port_read(Machine, "EXTRA") & 0x02)
 				{
 					/* yes */
 					memory_set_bankptr(bank+5, addr);
@@ -518,7 +518,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
 	int inputport_10_state;
 	int changed_bits;
 
-    inputport_10_state = readinputportbytag("EXTRA");
+    inputport_10_state = input_port_read(machine, "EXTRA");
 
 	changed_bits = inputport_10_state^previous_inputport_10_state;
 
@@ -571,7 +571,7 @@ static void nc_common_init_machine(running_machine *machine)
     nc_memory_config[2] = 0;
     nc_memory_config[3] = 0;
 
-	previous_inputport_10_state = readinputportbytag("EXTRA");
+	previous_inputport_10_state = input_port_read(machine, "EXTRA");
 
     /* setup reset state ints are masked */
     nc_irq_mask = 0;
@@ -695,7 +695,7 @@ static READ8_HANDLER(nc_key_data_in_r)
 		nc_update_interrupts(machine);
 	}
 	sprintf(port, "LINE%d", offset);
-	return readinputportbytag(port);
+	return input_port_read(machine, port);
 }
 
 
@@ -1021,7 +1021,7 @@ static  READ8_HANDLER(nc100_card_battery_status_r)
 		nc_card_battery_status &=~(1<<7);
 	}
 
-	if (readinputport(10) & 0x02)
+	if (input_port_read_indexed(machine, 10) & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);
@@ -1432,7 +1432,7 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
 		nc_card_battery_status&=~(1<<7);
 	}
 
-	if (readinputport(10) & 0x02)
+	if (input_port_read_indexed(machine, 10) & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);

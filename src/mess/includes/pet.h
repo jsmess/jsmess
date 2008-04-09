@@ -25,10 +25,10 @@ extern int pet_font;
 
 /*----------- defined in machine/pet.c -----------*/
 
-#define CBM8096_MEMORY (readinputport(11)&8)
-#define M6809_SELECT (readinputport(11)&4)
-#define IEEE8ON (readinputport(11)&2)
-#define IEEE9ON (readinputport(11)&1)
+#define CBM8096_MEMORY (input_port_read_indexed(machine, 11)&8)
+#define M6809_SELECT (input_port_read_indexed(machine, 11)&4)
+#define IEEE8ON (input_port_read_indexed(machine, 11)&2)
+#define IEEE9ON (input_port_read_indexed(machine, 11)&1)
 
 extern UINT8 *pet_memory;
 extern UINT8 *pet_videoram;

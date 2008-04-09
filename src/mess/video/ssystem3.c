@@ -209,7 +209,7 @@ VIDEO_UPDATE( ssystem3 )
 	ssystem3_draw_led(bitmap, ssystem3_lcd.data[3]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
 	ssystem3_draw_led(bitmap, ssystem3_lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
 
-	if (readinputportbytag("Configuration")&1) { // playfield(optional device)
+	if (input_port_read(screen->machine, "Configuration")&1) { // playfield(optional device)
 	  const int lcd_signs_on[]={
 	    0, // empty
 	    1, // bauer

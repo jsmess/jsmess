@@ -298,7 +298,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	/* First we check the RESET and CLEAR SCREEN pushbutton switches. */
 
 	/* The RESET switch resets the CPU and the 6820 PIA. */
-	if (readinputport(5) & 0x0001)
+	if (input_port_read_indexed(machine, 5) & 0x0001)
 	{
 		if (!reset_flag) {
 			reset_flag = 1;
@@ -314,7 +314,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	}
 
 	/* The CLEAR SCREEN switch clears the video hardware. */
-	if (readinputport(5) & 0x0002)
+	if (input_port_read_indexed(machine, 5) & 0x0002)
 	{
 		if (!apple1_vh_clrscrn_pressed)
 		{
@@ -339,12 +339,12 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	/* The keyboard strobe line should always be low when a scan starts. */
 	pia_set_input_ca1(0, 0);
 
-	shiftkeys = readinputport(4) & 0x0003;
-	ctrlkeys = readinputport(4) & 0x000c;
+	shiftkeys = input_port_read_indexed(machine, 4) & 0x0003;
+	ctrlkeys = input_port_read_indexed(machine, 4) & 0x000c;
 
 	for (port = 0; port < 4; port++)
 	{
-		UINT32 portval = readinputport(port);
+		UINT32 portval = input_port_read_indexed(machine, port);
 		UINT32 newkeys = portval & ~(kbd_last_scan[port]);
 
 		if (newkeys)

@@ -8,52 +8,52 @@
 #define C16_H_
 
 
-#define JOYSTICK1_PORT		( readinputportbytag("CFG0") & 0x80 )
-#define JOYSTICK2_PORT		( readinputportbytag("CFG0") & 0x40 )
+#define JOYSTICK1_PORT		( input_port_read(Machine, "CFG0") & 0x80 )
+#define JOYSTICK2_PORT		( input_port_read(Machine, "CFG0") & 0x40 )
 
-#define JOYSTICK_2_LEFT		( readinputportbytag("JOY1") & 0x80 )
-#define JOYSTICK_2_RIGHT	( readinputportbytag("JOY1") & 0x40 )
-#define JOYSTICK_2_UP		( readinputportbytag("JOY1") & 0x20 )
-#define JOYSTICK_2_DOWN		( readinputportbytag("JOY1") & 0x10 )
-#define JOYSTICK_2_BUTTON	( readinputportbytag("JOY1") & 0x08 )
+#define JOYSTICK_2_LEFT		( input_port_read(Machine, "JOY1") & 0x80 )
+#define JOYSTICK_2_RIGHT	( input_port_read(Machine, "JOY1") & 0x40 )
+#define JOYSTICK_2_UP		( input_port_read(Machine, "JOY1") & 0x20 )
+#define JOYSTICK_2_DOWN		( input_port_read(Machine, "JOY1") & 0x10 )
+#define JOYSTICK_2_BUTTON	( input_port_read(Machine, "JOY1") & 0x08 )
 
-#define JOYSTICK_1_LEFT		( readinputportbytag("JOY0") & 0x80 )
-#define JOYSTICK_1_RIGHT	( readinputportbytag("JOY0") & 0x40 )
-#define JOYSTICK_1_UP		( readinputportbytag("JOY0") & 0x20 )
-#define JOYSTICK_1_DOWN		( readinputportbytag("JOY0") & 0x10 )
-#define JOYSTICK_1_BUTTON	( readinputportbytag("JOY0") & 0x08 )
+#define JOYSTICK_1_LEFT		( input_port_read(Machine, "JOY0") & 0x80 )
+#define JOYSTICK_1_RIGHT	( input_port_read(Machine, "JOY0") & 0x40 )
+#define JOYSTICK_1_UP		( input_port_read(Machine, "JOY0") & 0x20 )
+#define JOYSTICK_1_DOWN		( input_port_read(Machine, "JOY0") & 0x10 )
+#define JOYSTICK_1_BUTTON	( input_port_read(Machine, "JOY0") & 0x08 )
 
-#define JOYSTICK_SWAP		( readinputportbytag("Special") & 0x80 )
+#define JOYSTICK_SWAP		( input_port_read(Machine, "Special") & 0x80 )
 
-#define DATASSETTE_PLAY		( readinputportbytag("CFG0") & 0x04 )
-#define DATASSETTE_RECORD	( readinputportbytag("CFG0") & 0x02 )
-#define DATASSETTE_STOP		( readinputportbytag("CFG0") & 0x01 )
+#define DATASSETTE_PLAY		( input_port_read(Machine, "CFG0") & 0x04 )
+#define DATASSETTE_RECORD	( input_port_read(Machine, "CFG0") & 0x02 )
+#define DATASSETTE_STOP		( input_port_read(Machine, "CFG0") & 0x01 )
 
-#define QUICKLOAD			( readinputportbytag("CFG0") & 0x08 )
+#define QUICKLOAD			( input_port_read(Machine, "CFG0") & 0x08 )
 
 
-#define DATASSETTE			( readinputportbytag("CFG0") & 0x20 )
-#define DATASSETTE_TONE		( readinputportbytag("CFG0") & 0x10 )
+#define DATASSETTE			( input_port_read(Machine, "CFG0") & 0x20 )
+#define DATASSETTE_TONE		( input_port_read(Machine, "CFG0") & 0x10 )
 
-#define NO_REAL_FLOPPY		(( readinputportbytag("CFG1") & 0xc0 ) == 0x00 )
-#define REAL_C1551			(( readinputportbytag("CFG1") & 0xc0 ) == 0x40 )
-#define REAL_VC1541			(( readinputportbytag("CFG1") & 0xc0 ) == 0x80 )
+#define NO_REAL_FLOPPY		(( input_port_read(Machine, "CFG1") & 0xc0 ) == 0x00 )
+#define REAL_C1551			(( input_port_read(Machine, "CFG1") & 0xc0 ) == 0x40 )
+#define REAL_VC1541			(( input_port_read(Machine, "CFG1") & 0xc0 ) == 0x80 )
 
-#define IEC8ON				(( readinputportbytag("CFG1") & 0x38 ) ==8 )
-#define IEC8ON				(( readinputportbytag("CFG1") & 0x38 ) ==8 )
-#define IEC9ON				(( readinputportbytag("CFG1") & 0x07 ) ==1 )
+#define IEC8ON				(( input_port_read(Machine, "CFG1") & 0x38 ) ==8 )
+#define IEC8ON				(( input_port_read(Machine, "CFG1") & 0x38 ) ==8 )
+#define IEC9ON				(( input_port_read(Machine, "CFG1") & 0x07 ) ==1 )
 
-#define SIDCARD				( readinputportbytag("CFG2") & 0x80 )
+#define SIDCARD				( input_port_read(Machine, "CFG2") & 0x80 )
 // a lot of c64 software has been converted to c16
 // these oftenly still produce the commands for the sid chip at 0xd400
 // with following hack you can hear these sounds
-#define SIDCARD_HACK		( readinputportbytag("CFG2") & 0x40 )
+#define SIDCARD_HACK		( input_port_read(Machine, "CFG2") & 0x40 )
 
-#define C16_PAL				(( readinputportbytag("CFG2") & 0x10 ) == 0x00 )
+#define C16_PAL				(( input_port_read(Machine, "CFG2") & 0x10 ) == 0x00 )
 
-#define TYPE_C16			(( readinputportbytag("CFG2") & 0x0c ) == 0x00 )
-#define TYPE_PLUS4			(( readinputportbytag("CFG2") & 0x0c ) == 0x04 )
-#define TYPE_364			(( readinputportbytag("CFG2") & 0x0c ) == 0x08 )
+#define TYPE_C16			(( input_port_read(Machine, "CFG2") & 0x0c ) == 0x00 )
+#define TYPE_PLUS4			(( input_port_read(Machine, "CFG2") & 0x0c ) == 0x04 )
+#define TYPE_364			(( input_port_read(Machine, "CFG2") & 0x0c ) == 0x08 )
 
 
 /*----------- defined in machine/c16.c -----------*/

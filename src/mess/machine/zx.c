@@ -110,31 +110,31 @@ READ8_HANDLER ( zx_io_r )
 
 	if ((offset & 1) == 0)
 	{
-		int extra1 = readinputport(9);
-		int extra2 = readinputport(10);
+		int extra1 = input_port_read_indexed(machine, 9);
+		int extra2 = input_port_read_indexed(machine, 10);
 
 		ula_scancode_count = 0;
 		if ((offset & 0x0100) == 0)
 		{
-			data &= readinputport(1);
+			data &= input_port_read_indexed(machine, 1);
 			/* SHIFT for extra keys */
 			if (extra1 != 0xff || extra2 != 0xff)
 				data &= ~0x01;
 		}
 		if ((offset & 0x0200) == 0)
-			data &= readinputport(2);
+			data &= input_port_read_indexed(machine, 2);
 		if ((offset & 0x0400) == 0)
-			data &= readinputport(3);
+			data &= input_port_read_indexed(machine, 3);
 		if ((offset & 0x0800) == 0)
-			data &= readinputport(4) & extra1;
+			data &= input_port_read_indexed(machine, 4) & extra1;
 		if ((offset & 0x1000) == 0)
-			data &= readinputport(5) & extra2;
+			data &= input_port_read_indexed(machine, 5) & extra2;
 		if ((offset & 0x2000) == 0)
-			data &= readinputport(6);
+			data &= input_port_read_indexed(machine, 6);
 		if ((offset & 0x4000) == 0)
-			data &= readinputport(7);
+			data &= input_port_read_indexed(machine, 7);
 		if ((offset & 0x8000) == 0)
-			data &= readinputport(8);
+			data &= input_port_read_indexed(machine, 8);
 		if (video_screen_get_refresh(screen) > 55)
 			data &= ~0x40;
 
@@ -176,31 +176,31 @@ READ8_HANDLER ( pow3000_io_r )
 
 	if ((offset & 1) == 0)
 	{
-		int extra1 = readinputport(9);
-		int extra2 = readinputport(10);
+		int extra1 = input_port_read_indexed(machine, 9);
+		int extra2 = input_port_read_indexed(machine, 10);
 
 		ula_scancode_count = 0;
 		if ((offset & 0x0100) == 0)
 		{
-			data &= readinputport(1) & extra1;
+			data &= input_port_read_indexed(machine, 1) & extra1;
 			/* SHIFT for extra keys */
 			if (extra1 != 0xff || extra2 != 0xff)
 				data &= ~0x01;
 		}
 		if ((offset & 0x0200) == 0)
-			data &= readinputport(2) & extra2;
+			data &= input_port_read_indexed(machine, 2) & extra2;
 		if ((offset & 0x0400) == 0)
-			data &= readinputport(3);
+			data &= input_port_read_indexed(machine, 3);
 		if ((offset & 0x0800) == 0)
-			data &= readinputport(4);
+			data &= input_port_read_indexed(machine, 4);
 		if ((offset & 0x1000) == 0)
-			data &= readinputport(5);
+			data &= input_port_read_indexed(machine, 5);
 		if ((offset & 0x2000) == 0)
-			data &= readinputport(6);
+			data &= input_port_read_indexed(machine, 6);
 		if ((offset & 0x4000) == 0)
-			data &= readinputport(7);
+			data &= input_port_read_indexed(machine, 7);
 		if ((offset & 0x8000) == 0)
-			data &= readinputport(8);
+			data &= input_port_read_indexed(machine, 8);
 		if (video_screen_get_refresh(screen) > 55)
 			data &= ~0x40;
 

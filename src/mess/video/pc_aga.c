@@ -15,7 +15,7 @@
 #include "video/pc_video.h"
 
 
-#define CGA_MONITOR		(readinputport(20)&0x1C)
+#define CGA_MONITOR		(input_port_read_indexed(machine, 20)&0x1C)
 #define CGA_MONITOR_RGB			0x00	/* Colour RGB */
 #define CGA_MONITOR_MONO		0x04	/* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE	0x08	/* Colour composite */
@@ -489,7 +489,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 			data = mc6845_register_r( devconf, offset );
 			break;
 		case 10:
-			data = (readinputport(0) & 0x80 ) | 0x08 | aga.mda_status;
+			data = (input_port_read_indexed(machine, 0) & 0x80 ) | 0x08 | aga.mda_status;
 			aga.mda_status ^= 0x01;
 			break;
 		/* 12, 13, 14  are the LPT1 ports */
@@ -867,7 +867,7 @@ READ8_HANDLER ( pc200_cga_r )
 	case 0xe:
 		// 0x20 low cga
 		// 0x10 low special
-		result = readinputport(1)&0x38;
+		result = input_port_read_indexed(machine, 1)&0x38;
 		break;
 
 	default:

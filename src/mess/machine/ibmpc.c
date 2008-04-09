@@ -122,7 +122,7 @@ static struct {
 		 *      01 - color 40x25
 		 * 6-7  The number of floppy disk drives
 		 */
-		data = readinputport(1);
+		data = input_port_read_indexed(machine, 1);
 	}
 	else
 	{
@@ -152,13 +152,13 @@ static struct {
 	if (pc_ppi.portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data&0xf0)|((readinputport(1) >> 4) & 0x0f);
+		data = (data&0xf0)|((input_port_read_indexed(machine, 1) >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data&0xf0)|(readinputport(1) & 0x0f);
+		data = (data&0xf0)|(input_port_read_indexed(machine, 1) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 

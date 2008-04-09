@@ -75,7 +75,7 @@ static void oric_refresh_ints(running_machine *machine)
 		/* oric 1 or oric atmos */
 
 		/* if floppy disc hardware is disabled, do not allow interrupts from it */
-		if ((readinputport(9) & 0x07)==ORIC_FLOPPY_INTERFACE_NONE)
+		if ((input_port_read_indexed(machine, 9) & 0x07)==ORIC_FLOPPY_INTERFACE_NONE)
 		{
 			oric_irqs &=~(1<<1);
 		}
@@ -121,7 +121,7 @@ static void oric_keyboard_sense_refresh(void)
 	/* what if data is 0, can it sense if any of the keys on a line are pressed? */
 	int input_port_data;
 
- 	input_port_data = readinputport(1+oric_keyboard_line);
+ 	input_port_data = input_port_read_indexed(Machine, 1+oric_keyboard_line);
 
 	/* go through all bits in line */
 	for (i=0; i<8; i++)
@@ -291,7 +291,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 	to the via cb1 input. Interrupts can be generated from the vertical
 	sync, and flicker free games can be produced */
 
-	input_port_9 = readinputport(9);
+	input_port_9 = input_port_read_indexed(machine, 9);
 	/* cable is enabled? */
 	if ((input_port_9 & 0x08)!=0)
 	{
@@ -1060,7 +1060,7 @@ static void oric_install_microdisc_interface(void)
 
 static void oric_wd179x_callback(running_machine *machine, wd17xx_state_t State, void *param)
 {
-	switch (readinputport(9) &  0x07)
+	switch (input_port_read_indexed(machine, 9) &  0x07)
 	{
 		default:
 		case ORIC_FLOPPY_INTERFACE_NONE:
@@ -1135,7 +1135,7 @@ MACHINE_START( oric )
 
 MACHINE_RESET( oric )
 {
-	int disc_interface_id = readinputportbytag("oric_floppy_interface") & 0x07;
+	int disc_interface_id = input_port_read(machine, "oric_floppy_interface") & 0x07;
 
 	switch (disc_interface_id)
 	{
@@ -1195,7 +1195,7 @@ MACHINE_RESET( oric )
 READ8_HANDLER ( oric_IO_r )
 {
 #if 0
-	switch (readinputport(9) & 0x07)
+	switch (input_port_read_indexed(machine, 9) & 0x07)
 	{
 		default:
 		case ORIC_FLOPPY_INTERFACE_NONE:
@@ -1234,7 +1234,7 @@ READ8_HANDLER ( oric_IO_r )
 WRITE8_HANDLER ( oric_IO_w )
 {
 #if 0
-	switch (readinputport(9) & 0x07)
+	switch (input_port_read_indexed(machine, 9) & 0x07)
 	{
 		default:
 		case ORIC_FLOPPY_INTERFACE_NONE:
@@ -1408,13 +1408,13 @@ static  READ8_HANDLER(telestrat_via2_in_b_func)
 	/* left joystick selected? */
 	if (telestrat_via2_port_b_data & (1<<6))
 	{
-		data &= readinputport(10);
+		data &= input_port_read_indexed(machine, 10);
 	}
 
 	/* right joystick selected? */
 	if (telestrat_via2_port_b_data & (1<<7))
 	{
-		data &= readinputport(11);
+		data &= input_port_read_indexed(machine, 11);
 	}
 
 	data |= telestrat_via2_port_b_data & ((1<<7) | (1<<6) | (1<<5));

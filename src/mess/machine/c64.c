@@ -755,15 +755,16 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 
 UINT8 c64_m6510_port_read(UINT8 direction)
 {
+	running_machine *machine = Machine;
 	UINT8 data = c64_port_data;
 
 	if (c64_tape_on && !vc20_tape_switch ())
 		data &= ~0x10;
 	/* WP: motor is always marked as on??? */
 	data &= ~0x20;
-	if (is_c128(Machine) && !c128_capslock_r ())
+	if (is_c128(machine) && !c128_capslock_r ())
 		data &= ~0x40;
-	if (is_c65(Machine) && C65_KEY_DIN)
+	if (is_c65(machine) && C65_KEY_DIN)
 		data &= ~0x40; /*? */
 	return data;
 }
@@ -1137,14 +1138,14 @@ INTERRUPT_GEN( c64_frame_interrupt )
 
 	c64_nmi(machine);
 
-	c64_keyline[0] = readinputportbytag( "ROW0" );
-	c64_keyline[1] = readinputportbytag( "ROW1" );
-	c64_keyline[2] = readinputportbytag( "ROW2" );
-	c64_keyline[3] = readinputportbytag( "ROW3" );
-	c64_keyline[4] = readinputportbytag( "ROW4" );
-	c64_keyline[5] = readinputportbytag( "ROW5" );
-	c64_keyline[6] = readinputportbytag( "ROW6" );
-	c64_keyline[7] = readinputportbytag( "ROW7" );
+	c64_keyline[0] = input_port_read(machine,  "ROW0" );
+	c64_keyline[1] = input_port_read(machine,  "ROW1" );
+	c64_keyline[2] = input_port_read(machine,  "ROW2" );
+	c64_keyline[3] = input_port_read(machine,  "ROW3" );
+	c64_keyline[4] = input_port_read(machine,  "ROW4" );
+	c64_keyline[5] = input_port_read(machine,  "ROW5" );
+	c64_keyline[6] = input_port_read(machine,  "ROW6" );
+	c64_keyline[7] = input_port_read(machine,  "ROW7" );
 	
 	value = 0xff;
 	if (JOYSTICK1||JOYSTICK1_2BUTTON) {
@@ -1198,7 +1199,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 
 	if (is_c65(machine)) 
 	{
-		c65_keyline = readinputportbytag("ROW8");	
+		c65_keyline = input_port_read(machine, "ROW8");	
 	}
 
 	vic2_frame_interrupt (machine, cpunum);
@@ -1207,7 +1208,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 		vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
 		vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);
 	}
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , readinputportbytag( "Special" ) & 0x40 ? 1 : 0);
+	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , input_port_read(machine,  "Special" ) & 0x40 ? 1 : 0);
 	set_led_status (0 /*KB_NUMLOCK_FLAG */ , JOYSTICK_SWAP ? 1 : 0);
 }
 
@@ -1237,42 +1238,42 @@ INTERRUPT_GEN( c128_frame_interrupt )
 
 	value = 0xff;
 
-	value &= ~readinputportbytag( "ROW0" );
+	value &= ~input_port_read(machine,  "ROW0" );
 	c64_keyline[0] = value;
 
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW1" );
+	value &= ~input_port_read(machine,  "ROW1" );
 	c64_keyline[1] = value;
 
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW2" );
+	value &= ~input_port_read(machine,  "ROW2" );
 	c64_keyline[2] = value;
 
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW3" );
+	value &= ~input_port_read(machine,  "ROW3" );
 	c64_keyline[3] = value;
 
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW4" );
+	value &= ~input_port_read(machine,  "ROW4" );
 	c64_keyline[4] = value;
 
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW5" );
+	value &= ~input_port_read(machine,  "ROW5" );
 	c64_keyline[5] = value;
 
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW6" );
+	value &= ~input_port_read(machine,  "ROW6" );
 	c64_keyline[6] = value;
 	
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW7" );
+	value &= ~input_port_read(machine,  "ROW7" );
 	c64_keyline[7] = value;
 
 	value = 0xff;
@@ -1327,24 +1328,24 @@ INTERRUPT_GEN( c128_frame_interrupt )
 
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW8" );
+	value &= ~input_port_read(machine,  "ROW8" );
 	c128_keyline[0] = value;
 
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW9" );
+	value &= ~input_port_read(machine,  "ROW9" );
 	c128_keyline[1] = value;
 
 	value = 0xff;
 	
-	value &= ~readinputportbytag( "ROW10" );
+	value &= ~input_port_read(machine,  "ROW10" );
 	c128_keyline[2] = value;
 
 /* 2008 FP: still unsure which frame_interrupt must be used for c65, since it's not_working */
 /*	if (is_c65(machine)) {
 		value = 0xff;
 
-		value &= ~readinputportbytag( "ROW8" );
+		value &= ~input_port_read(machine,  "ROW8" );
 		c65_keyline = value;
 	}*/
 
@@ -1355,6 +1356,6 @@ INTERRUPT_GEN( c128_frame_interrupt )
 		vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
 		vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);
 	}
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , readinputportbytag( "Special" ) & 0x40 ? 1 : 0);
+	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , input_port_read(machine,  "Special" ) & 0x40 ? 1 : 0);
 	set_led_status (0 /*KB_NUMLOCK_FLAG */ , JOYSTICK_SWAP ? 1 : 0);
 }

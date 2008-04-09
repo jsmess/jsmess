@@ -167,18 +167,18 @@ INTERRUPT_GEN( kaypro_interrupt )
 	}
 
 	row = 9;
-	new = readinputport(10);
+	new = input_port_read_indexed(machine, 10);
 	chg = keyrows[row] ^ new;
 
-	if (!chg) { new = readinputport(9); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = readinputport(8); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = readinputport(7); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = readinputport(6); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = readinputport(5); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = readinputport(4); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = readinputport(3); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = readinputport(2); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = readinputport(1); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read_indexed(machine, 9); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read_indexed(machine, 8); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read_indexed(machine, 7); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read_indexed(machine, 6); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read_indexed(machine, 5); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read_indexed(machine, 4); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read_indexed(machine, 3); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read_indexed(machine, 2); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read_indexed(machine, 1); chg = keyrows[--row] ^ new; }
 	if (!chg) --row;
 
 	if (row >= 0)

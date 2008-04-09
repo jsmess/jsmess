@@ -129,13 +129,13 @@ static int lightpen_check (void)
 	return 0;
 }
 
-static void lightpen_show (void)
+static void lightpen_show (running_machine *machine)
 {
 	int color;
 
 	if (vectrex_lightpen_port != 0)
 	{
-		if (readinputport(6)&0x10)
+		if (input_port_read_indexed(machine, 6)&0x10)
 		{
 			lightpen_down=1;
 			color=0x00ff0000;
@@ -146,8 +146,8 @@ static void lightpen_show (void)
 			color=0x00ffffff;
 		}
 
-		pen_x = readinputport(8)*(x_max/0xff);
-		pen_y = readinputport(7)*(y_max/0xff);
+		pen_x = input_port_read_indexed(machine, 8)*(x_max/0xff);
+		pen_y = input_port_read_indexed(machine, 7)*(y_max/0xff);
 
 		vector_add_point(pen_x-250000,pen_y-250000,0,0xff);
 		vector_add_point(pen_x+250000,pen_y+250000,color,0xff);
@@ -167,7 +167,7 @@ VIDEO_UPDATE( vectrex )
 	double starttime;
 
 	vectrex_configuration();
-	lightpen_show();
+	lightpen_show(screen->machine);
 
 	starttime = attotime_to_double(timer_get_time()) - vectrex_persistance;
 	if (starttime < 0) starttime = 0;

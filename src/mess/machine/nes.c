@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
@@ -229,7 +230,7 @@ static int zapper_hit_pixel(running_machine *machine, const nes_input *input)
 	retVal |= ((in_0.i0 >> in_0.shift) & 0x01);
 
 	/* Check the configuration to see what's connected */
-	cfg = readinputport(PORT_CONFIG1);
+	cfg = input_port_read_indexed(machine, PORT_CONFIG1);
 
 	if (((cfg & 0x000f) == 0x0002) || ((cfg & 0x000f) == 0x0003))
 	{
@@ -263,7 +264,7 @@ static int zapper_hit_pixel(running_machine *machine, const nes_input *input)
 	retVal |= ((in_1.i0 >> in_1.shift) & 0x01);
 
 	/* Check the fake dip to see what's connected */
-	cfg = readinputport(PORT_CONFIG1);
+	cfg = input_port_read_indexed(machine, PORT_CONFIG1);
 
 	if (((cfg & 0x00f0) == 0x0020) || ((cfg & 0x00f0) == 0x0030))
 	{
@@ -309,30 +310,30 @@ static void nes_read_input_device(int cfg, nes_input *vals, int pad_port,
 	{
 		case 0x01:	/* gamepad */
 			if (pad_port >= 0)
-				vals->i0 = readinputport(pad_port);
+				vals->i0 = input_port_read_indexed(Machine, pad_port);
 			break;
 
 		case 0x02:	/* zapper 1 */
 			if (supports_zapper)
 			{
-				vals->i0 = readinputport(PORT_ZAPPER0_T);
-				vals->i1 = readinputport(PORT_ZAPPER0_X);
-				vals->i2 = readinputport(PORT_ZAPPER0_Y);
+				vals->i0 = input_port_read_indexed(Machine, PORT_ZAPPER0_T);
+				vals->i1 = input_port_read_indexed(Machine, PORT_ZAPPER0_X);
+				vals->i2 = input_port_read_indexed(Machine, PORT_ZAPPER0_Y);
 			}
 			break;
 
 		case 0x03:	/* zapper 2 */
 			if (supports_zapper)
 			{
-				vals->i0 = readinputport(PORT_ZAPPER1_T);
-				vals->i1 = readinputport(PORT_ZAPPER1_X);
-				vals->i2 = readinputport(PORT_ZAPPER1_Y);
+				vals->i0 = input_port_read_indexed(Machine, PORT_ZAPPER1_T);
+				vals->i1 = input_port_read_indexed(Machine, PORT_ZAPPER1_X);
+				vals->i2 = input_port_read_indexed(Machine, PORT_ZAPPER1_Y);
 			}
 			break;
 
 		case 0x04:	/* arkanoid paddle */
 			if (paddle_port >= 0)
-				vals->i0 = (UINT8) ((UINT8) readinputport (paddle_port) + (UINT8)0x52) ^ 0xff;
+				vals->i0 = (UINT8) ((UINT8) input_port_read_indexed(Machine, paddle_port) + (UINT8)0x52) ^ 0xff;
 			break;
 	}
 }
@@ -355,7 +356,7 @@ WRITE8_HANDLER ( nes_IN0_w )
 	in_1.shift = 0;
 
 	/* Check the configuration to see what's connected */
-	cfg = readinputport(PORT_CONFIG1);
+	cfg = input_port_read_indexed(machine, PORT_CONFIG1);
 
 	/* Read the input devices */
 	nes_read_input_device(cfg >>  0, &in_0, PORT_PAD0,  TRUE, -1);

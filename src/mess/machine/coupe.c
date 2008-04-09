@@ -124,7 +124,7 @@ MACHINE_RESET( coupe )
     coupe_regs.line_int = 0xff;  /* line interrupts disabled */
     coupe_regs.status = 0x1f;    /* no interrupts active */
 
-	if (readinputportbytag("config") & 0x01)
+	if (input_port_read(machine, "config") & 0x01)
 	{
 		/* install RTC */
 		memory_install_readwrite8_handler(0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, coupe_rtc_r, coupe_rtc_w);

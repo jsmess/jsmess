@@ -1295,7 +1295,7 @@ READ16_HANDLER ( genesis_68000_io_r )
 			/* process pad input for std 3 button pad */
 
 
-			p = readinputport(0);
+			p = input_port_read_indexed(machine, 0);
 			if (genesis_io_ram[offset]&0x40)
 			{
 				paddata = ((p&0x0f)>>0) | ((p&0xc0)>>2) | 0x40;
@@ -1321,7 +1321,7 @@ READ16_HANDLER ( genesis_68000_io_r )
 		case 0x02:
 //			logerror("I/O Data B read \n");
 
-			p = readinputport(1);
+			p = input_port_read_indexed(machine, 1);
 			if (genesis_io_ram[offset]&0x40)
 			{
 				paddata = ((p&0x0f)>>0) | ((p&0xc0)>>2) | 0x40;

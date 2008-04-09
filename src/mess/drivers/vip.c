@@ -87,7 +87,7 @@ static int vip_reset;
 
 static UINT8 vip_mode_r(void)
 {
-	if (readinputportbytag("RUN") & 0x01)
+	if (input_port_read(Machine, "RUN") & 0x01)
 	{
 		if (!vip_run)
 		{
@@ -117,7 +117,7 @@ static UINT8 vip_ef_r(void)
 
 	if (cdp1861_efx) ef -= EF1;
 	// EF2 = tape (high when tone read)
-	if (readinputportbytag("KEYPAD") & (1 << keylatch)) ef -= EF3;
+	if (input_port_read(Machine, "KEYPAD") & (1 << keylatch)) ef -= EF3;
 
 	return ef;
 }

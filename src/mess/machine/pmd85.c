@@ -202,7 +202,7 @@ static  READ8_HANDLER ( pmd85_ppi_0_porta_r )
 
 static  READ8_HANDLER ( pmd85_ppi_0_portb_r )
 {
-	return readinputport(pmd85_ppi_port_outputs[0][0]&0x0f) & readinputport(0x0f);
+	return input_port_read_indexed(machine, pmd85_ppi_port_outputs[0][0]&0x0f) & input_port_read_indexed(machine, 0x0f);
 }
 
 static  READ8_HANDLER ( pmd85_ppi_0_portc_r )
@@ -243,14 +243,14 @@ static  READ8_HANDLER ( mato_ppi_0_portb_r )
 	for (i = 0; i < 8; i++)
 	{
 		if (!(pmd85_ppi_port_outputs[0][0] & (1 << i)))
-			data &= readinputport(i);
+			data &= input_port_read_indexed(machine, i);
 	}
 	return data;
 }
 
 static  READ8_HANDLER ( mato_ppi_0_portc_r )
 {
-	return readinputport(0x08) | 0x8f;
+	return input_port_read_indexed(machine, 0x08) | 0x8f;
 }
 
 static WRITE8_HANDLER ( mato_ppi_0_portc_w )
@@ -696,7 +696,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 	static int clk_level = 1;
 	static int clk_level_tape = 1;
 
-	if (!(readinputport(0x11)&0x02))	/* V.24 / Tape Switch */
+	if (!(input_port_read_indexed(machine, 0x11)&0x02))	/* V.24 / Tape Switch */
 	{
 		/* tape reading */
 		if (cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0))&CASSETTE_PLAY)
@@ -759,14 +759,14 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 
 static OPBASE_HANDLER(pmd85_opbaseoverride)
 {
-	if (readinputport(0x10)&0x01)
+	if (input_port_read_indexed(machine, 0x10)&0x01)
 		mame_schedule_soft_reset(machine);
 	return address;
 }
 
 static OPBASE_HANDLER(mato_opbaseoverride)
 {
-	if (readinputport(0x09)&0x01)
+	if (input_port_read_indexed(machine, 0x09)&0x01)
 		mame_schedule_soft_reset(machine);
 	return address;
 }
@@ -844,7 +844,7 @@ MACHINE_RESET( pmd85 )
 		case PMD85_1:
 		case PMD85_2A:
 		case PMD85_3:
-			pmd85_rom_module_present = (readinputport(0x11)&0x01) ? 1 : 0;
+			pmd85_rom_module_present = (input_port_read_indexed(machine, 0x11)&0x01) ? 1 : 0;
 			break;
 		case ALFA:
 		case MATO:

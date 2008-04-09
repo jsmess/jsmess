@@ -174,30 +174,30 @@ READ8_HANDLER( mtx_key_lo_r )
 {
 	UINT8 data = 0xff;
 
-	if (!(key_sense & 0x01)) data &= readinputportbytag("keyboard_low_0");
-	if (!(key_sense & 0x02)) data &= readinputportbytag("keyboard_low_1");
-	if (!(key_sense & 0x04)) data &= readinputportbytag("keyboard_low_2");
-	if (!(key_sense & 0x08)) data &= readinputportbytag("keyboard_low_3");
-	if (!(key_sense & 0x10)) data &= readinputportbytag("keyboard_low_4");
-	if (!(key_sense & 0x20)) data &= readinputportbytag("keyboard_low_5");
-	if (!(key_sense & 0x40)) data &= readinputportbytag("keyboard_low_6");
-	if (!(key_sense & 0x80)) data &= readinputportbytag("keyboard_low_7");
+	if (!(key_sense & 0x01)) data &= input_port_read(machine, "keyboard_low_0");
+	if (!(key_sense & 0x02)) data &= input_port_read(machine, "keyboard_low_1");
+	if (!(key_sense & 0x04)) data &= input_port_read(machine, "keyboard_low_2");
+	if (!(key_sense & 0x08)) data &= input_port_read(machine, "keyboard_low_3");
+	if (!(key_sense & 0x10)) data &= input_port_read(machine, "keyboard_low_4");
+	if (!(key_sense & 0x20)) data &= input_port_read(machine, "keyboard_low_5");
+	if (!(key_sense & 0x40)) data &= input_port_read(machine, "keyboard_low_6");
+	if (!(key_sense & 0x80)) data &= input_port_read(machine, "keyboard_low_7");
 
 	return data;
 }
 
 READ8_HANDLER( mtx_key_hi_r )
 {
-	UINT8 data = readinputportbytag("country_code");
+	UINT8 data = input_port_read(machine, "country_code");
 
-	if (!(key_sense & 0x01)) data &= readinputportbytag("keyboard_high_0");
-	if (!(key_sense & 0x02)) data &= readinputportbytag("keyboard_high_1");
-	if (!(key_sense & 0x04)) data &= readinputportbytag("keyboard_high_2");
-	if (!(key_sense & 0x08)) data &= readinputportbytag("keyboard_high_3");
-	if (!(key_sense & 0x10)) data &= readinputportbytag("keyboard_high_4");
-	if (!(key_sense & 0x20)) data &= readinputportbytag("keyboard_high_5");
-	if (!(key_sense & 0x40)) data &= readinputportbytag("keyboard_high_6");
-	if (!(key_sense & 0x80)) data &= readinputportbytag("keyboard_high_7");
+	if (!(key_sense & 0x01)) data &= input_port_read(machine, "keyboard_high_0");
+	if (!(key_sense & 0x02)) data &= input_port_read(machine, "keyboard_high_1");
+	if (!(key_sense & 0x04)) data &= input_port_read(machine, "keyboard_high_2");
+	if (!(key_sense & 0x08)) data &= input_port_read(machine, "keyboard_high_3");
+	if (!(key_sense & 0x10)) data &= input_port_read(machine, "keyboard_high_4");
+	if (!(key_sense & 0x20)) data &= input_port_read(machine, "keyboard_high_5");
+	if (!(key_sense & 0x40)) data &= input_port_read(machine, "keyboard_high_6");
+	if (!(key_sense & 0x80)) data &= input_port_read(machine, "keyboard_high_7");
 
 	return data;
 }

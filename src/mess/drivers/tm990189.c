@@ -412,7 +412,7 @@ static int sys9901_r0(int offset)
 	if (digitsel < 9)
 	{
 		sprintf(port, "LINE%d", digitsel);
-		reply |= readinputportbytag(port) << 1;
+		reply |= input_port_read(Machine, port) << 1;
 	}
 
 	/* tape input */
@@ -632,7 +632,7 @@ static WRITE8_HANDLER(video_vdp_w)
 
 static READ8_HANDLER(video_joy_r)
 {
-	int reply = readinputportbytag("BUTTONS");
+	int reply = input_port_read(machine, "BUTTONS");
 
 
 	if (attotime_compare(timer_timeleft(joy1x_timer), attotime_zero) < 0)
@@ -652,10 +652,10 @@ static READ8_HANDLER(video_joy_r)
 
 static WRITE8_HANDLER(video_joy_w)
 {
-	timer_reset(joy1x_timer, ATTOTIME_IN_USEC(readinputportbytag("JOY1_X")*28+28));
-	timer_reset(joy1y_timer, ATTOTIME_IN_USEC(readinputportbytag("JOY1_Y")*28+28));
-	timer_reset(joy2x_timer, ATTOTIME_IN_USEC(readinputportbytag("JOY2_X")*28+28));
-	timer_reset(joy2y_timer, ATTOTIME_IN_USEC(readinputportbytag("JOY2_Y")*28+28));
+	timer_reset(joy1x_timer, ATTOTIME_IN_USEC(input_port_read(machine, "JOY1_X")*28+28));
+	timer_reset(joy1y_timer, ATTOTIME_IN_USEC(input_port_read(machine, "JOY1_Y")*28+28));
+	timer_reset(joy2x_timer, ATTOTIME_IN_USEC(input_port_read(machine, "JOY2_X")*28+28));
+	timer_reset(joy2y_timer, ATTOTIME_IN_USEC(input_port_read(machine, "JOY2_Y")*28+28));
 }
 
 

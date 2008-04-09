@@ -34,6 +34,7 @@ backup of playfield rom and picture/description of its board
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 #include "includes/ssystem3.h"
 #include "machine/6522via.h"
@@ -79,7 +80,7 @@ static void ssystem3_playfield_reset(void)
 {
   memset(&playfield, 0, sizeof(playfield));
   playfield.signal=FALSE;
-  //  playfield.on=TRUE; //readinputportbytag("Configuration")&1;
+  //  playfield.on=TRUE; //input_port_read(machine, "Configuration")&1;
 }
 
 static void ssystem3_playfield_write(int reset, int signal)
@@ -129,9 +130,10 @@ static void ssystem3_playfield_write(int reset, int signal)
 
 static void ssystem3_playfield_read(int *on, int *ready)
 {
-  *on=!(readinputportbytag("Configuration")&1);
-  //  *on=!playfield.on;
-  *ready=FALSE;
+	running_machine *machine = Machine;
+	*on=!(input_port_read(machine, "Configuration")&1);
+	//  *on=!playfield.on;
+	*ready=FALSE;
 }
 
 void ssystem3_via_write_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
@@ -144,39 +146,39 @@ UINT8 ssystem3_via_read_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs
 {
   UINT8 data=0xff;
 #if 1 // time switch
-  if (!(ssystem3.porta&0x10)) data&=readinputportbytag("matrix1")|0xf1;
-  if (!(ssystem3.porta&0x20)) data&=readinputportbytag("matrix2")|0xf1;
-  if (!(ssystem3.porta&0x40)) data&=readinputportbytag("matrix3")|0xf1;
-  if (!(ssystem3.porta&0x80)) data&=readinputportbytag("matrix4")|0xf1;
+  if (!(ssystem3.porta&0x10)) data&=input_port_read(machine, "matrix1")|0xf1;
+  if (!(ssystem3.porta&0x20)) data&=input_port_read(machine, "matrix2")|0xf1;
+  if (!(ssystem3.porta&0x40)) data&=input_port_read(machine, "matrix3")|0xf1;
+  if (!(ssystem3.porta&0x80)) data&=input_port_read(machine, "matrix4")|0xf1;
 #else
-  if (!(ssystem3.porta&0x10)) data&=readinputportbytag("matrix1")|0xf0;
-  if (!(ssystem3.porta&0x20)) data&=readinputportbytag("matrix2")|0xf0;
-  if (!(ssystem3.porta&0x40)) data&=readinputportbytag("matrix3")|0xf0;
-  if (!(ssystem3.porta&0x80)) data&=readinputportbytag("matrix4")|0xf0;
+  if (!(ssystem3.porta&0x10)) data&=input_port_read(machine, "matrix1")|0xf0;
+  if (!(ssystem3.porta&0x20)) data&=input_port_read(machine, "matrix2")|0xf0;
+  if (!(ssystem3.porta&0x40)) data&=input_port_read(machine, "matrix3")|0xf0;
+  if (!(ssystem3.porta&0x80)) data&=input_port_read(machine, "matrix4")|0xf0;
 #endif
   if (!(ssystem3.porta&1)) {
-    if (!(readinputportbytag("matrix1")&1)) data&=~0x10;
-    if (!(readinputportbytag("matrix2")&1)) data&=~0x20;
-    if (!(readinputportbytag("matrix3")&1)) data&=~0x40;
-    if (!(readinputportbytag("matrix4")&1)) data&=~0x80;
+    if (!(input_port_read(machine, "matrix1")&1)) data&=~0x10;
+    if (!(input_port_read(machine, "matrix2")&1)) data&=~0x20;
+    if (!(input_port_read(machine, "matrix3")&1)) data&=~0x40;
+    if (!(input_port_read(machine, "matrix4")&1)) data&=~0x80;
   }
   if (!(ssystem3.porta&2)) {
-    if (!(readinputportbytag("matrix1")&2)) data&=~0x10;
-    if (!(readinputportbytag("matrix2")&2)) data&=~0x20;
-    if (!(readinputportbytag("matrix3")&2)) data&=~0x40;
-    if (!(readinputportbytag("matrix4")&2)) data&=~0x80;
+    if (!(input_port_read(machine, "matrix1")&2)) data&=~0x10;
+    if (!(input_port_read(machine, "matrix2")&2)) data&=~0x20;
+    if (!(input_port_read(machine, "matrix3")&2)) data&=~0x40;
+    if (!(input_port_read(machine, "matrix4")&2)) data&=~0x80;
   }
   if (!(ssystem3.porta&4)) {
-    if (!(readinputportbytag("matrix1")&4)) data&=~0x10;
-    if (!(readinputportbytag("matrix2")&4)) data&=~0x20;
-    if (!(readinputportbytag("matrix3")&4)) data&=~0x40;
-    if (!(readinputportbytag("matrix4")&4)) data&=~0x80;
+    if (!(input_port_read(machine, "matrix1")&4)) data&=~0x10;
+    if (!(input_port_read(machine, "matrix2")&4)) data&=~0x20;
+    if (!(input_port_read(machine, "matrix3")&4)) data&=~0x40;
+    if (!(input_port_read(machine, "matrix4")&4)) data&=~0x80;
   }
   if (!(ssystem3.porta&8)) {
-    if (!(readinputportbytag("matrix1")&8)) data&=~0x10;
-    if (!(readinputportbytag("matrix2")&8)) data&=~0x20;
-    if (!(readinputportbytag("matrix3")&8)) data&=~0x40;
-    if (!(readinputportbytag("matrix4")&8)) data&=~0x80;
+    if (!(input_port_read(machine, "matrix1")&8)) data&=~0x10;
+    if (!(input_port_read(machine, "matrix2")&8)) data&=~0x20;
+    if (!(input_port_read(machine, "matrix3")&8)) data&=~0x40;
+    if (!(input_port_read(machine, "matrix4")&8)) data&=~0x80;
   }
   //  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
   return data;

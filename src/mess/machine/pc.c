@@ -163,7 +163,7 @@ are connected */
 static void pc_com_refresh_connected(int n, int data)
 {
 	/* mouse connected to this port? */
-	if (readinputport(3) & (0x80>>n))
+	if (input_port_read_indexed(Machine, 3) & (0x80>>n))
 		pc_mouse_handshake_in(n,data);
 }
 

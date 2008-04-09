@@ -370,7 +370,7 @@ static WRITE8_HANDLER ( to7_timer_cp2_out )
 
 static READ8_HANDLER ( to7_timer_port_in )
 {
-	int lightpen = (readinputport( THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 2 : 0;
+	int lightpen = (input_port_read_indexed(machine,  THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
 	return lightpen | cass;
 }
@@ -469,7 +469,7 @@ static READ8_HANDLER ( to7_sys_porta_in )
 		for ( i = 0; i < 8; i++ )
 		{
 			if ( ! (keyline & (1 << i)) )
-				val &= readinputport( THOM_INPUT_KEYBOARD + i );
+				val &= input_port_read_indexed(machine,  THOM_INPUT_KEYBOARD + i );
 		}
 		return val;
 	}
@@ -758,7 +758,7 @@ static void to7_modem_init( void )
 
 READ8_HANDLER ( to7_modem_mea8000_r )
 {
-	if ( readinputport( THOM_INPUT_MCONFIG ) & 1 )
+	if ( input_port_read_indexed(machine,  THOM_INPUT_MCONFIG ) & 1 )
 		return mea8000_r( machine, offset );
 	else
 	{
@@ -774,7 +774,7 @@ READ8_HANDLER ( to7_modem_mea8000_r )
 
 WRITE8_HANDLER ( to7_modem_mea8000_w )
 {
-	if ( readinputport( THOM_INPUT_MCONFIG ) & 1 )
+	if ( input_port_read_indexed(machine,  THOM_INPUT_MCONFIG ) & 1 )
 		mea8000_w( machine, offset, data );
 	else
 	{
@@ -822,8 +822,8 @@ static UINT8 to7_game_mute;
 static UINT8 to7_get_mouse_signal( void )
 {
 	UINT8 xa, xb, ya, yb;
-	UINT16 dx = readinputport( THOM_INPUT_GAME + 2 ); /* x axis */
-	UINT16 dy = readinputport( THOM_INPUT_GAME + 3 ); /* y axis */
+	UINT16 dx = input_port_read_indexed(Machine,  THOM_INPUT_GAME + 2 ); /* x axis */
+	UINT16 dy = input_port_read_indexed(Machine,  THOM_INPUT_GAME + 3 ); /* y axis */
 	xa = ((dx + 1) & 3) <= 1;
 	xb = (dx & 3) <= 1;
 	ya = ((dy + 1) & 3) <= 1;
@@ -843,16 +843,16 @@ static void to7_game_sound_update ( void )
 static READ8_HANDLER ( to7_game_porta_in )
 {
 	UINT8 data;
-	if ( readinputport( THOM_INPUT_CONFIG ) & 1 )
+	if ( input_port_read_indexed(machine,  THOM_INPUT_CONFIG ) & 1 )
 	{
 		/* mouse */
 		data = to7_get_mouse_signal() & 0x0c;             /* XB, YB */
-		data |= readinputport( THOM_INPUT_GAME + 4 ) & 3; /* buttons */
+		data |= input_port_read_indexed(machine,  THOM_INPUT_GAME + 4 ) & 3; /* buttons */
 	}
 	else
 	{
 		/* joystick */
-		data = readinputport( THOM_INPUT_GAME );
+		data = input_port_read_indexed(machine,  THOM_INPUT_GAME );
 		/* bit 0=0 => P1 up      bit 4=0 => P2 up
 		   bit 1=0 => P1 down    bit 5=0 => P2 down
 		   bit 2=0 => P1 left    bit 6=0 => P2 left
@@ -884,7 +884,7 @@ static READ8_HANDLER ( to7_game_porta_in )
 static READ8_HANDLER ( to7_game_portb_in )
 {
 	UINT8 data;
-	if ( readinputport( THOM_INPUT_CONFIG ) & 1 )
+	if ( input_port_read_indexed(machine,  THOM_INPUT_CONFIG ) & 1 )
 	{
 		/* mouse */
 		UINT8 mouse =  to7_get_mouse_signal();
@@ -901,7 +901,7 @@ static READ8_HANDLER ( to7_game_portb_in )
 		/* bits 2-3: action buttons B (0=pressed) */
 		/* bits 4-5: unused (ouput) */
 		/* bits 0-1: unknown! */
-		data = readinputport( THOM_INPUT_GAME + 1 );
+		data = input_port_read_indexed(machine,  THOM_INPUT_GAME + 1 );
 	}
 	return data;
 }
@@ -938,7 +938,7 @@ static const pia6821_interface to7_game =
 /* this should be called periodically */
 static TIMER_CALLBACK(to7_game_update_cb)
 {
-	if ( readinputport( THOM_INPUT_CONFIG ) & 1 )
+	if ( input_port_read_indexed(machine,  THOM_INPUT_CONFIG ) & 1 )
 	{
 		/* mouse */
 		UINT8 mouse = to7_get_mouse_signal();
@@ -948,7 +948,7 @@ static TIMER_CALLBACK(to7_game_update_cb)
 	else
 	{
 		/* joystick */
-		UINT8 in = readinputport( THOM_INPUT_GAME );
+		UINT8 in = input_port_read_indexed(machine,  THOM_INPUT_GAME );
 		pia_set_input_cb2( THOM_PIA_GAME, (in & 0x80) ? 1 : 0 ); /* P2 action A */
 		pia_set_input_ca2( THOM_PIA_GAME, (in & 0x40) ? 1 : 0 ); /* P1 action A */
 		pia_set_input_cb1( THOM_PIA_GAME, (in & 0x08) ? 1 : 0 ); /* P2 action B */
@@ -1352,7 +1352,7 @@ static READ8_HANDLER ( to770_sys_porta_in )
 {
 	/* keyboard */
 	int keyline = pia_get_output_b( THOM_PIA_SYS ) & 7;
-	return readinputport( THOM_INPUT_KEYBOARD + 7 - keyline );
+	return input_port_read_indexed(machine,  THOM_INPUT_KEYBOARD + 7 - keyline );
 }
 
 
@@ -1617,7 +1617,7 @@ static READ8_HANDLER ( mo5_sys_porta_in )
 {
 	return
 		(mo5_get_cassette() ? 0x80 : 0) |     /* bit 7: cassette input */
-		((readinputport( THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 0x20 : 0)
+		((input_port_read_indexed(machine,  THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 0x20 : 0)
 		/* bit 5: lightpen button */;
 }
 
@@ -1635,7 +1635,7 @@ static READ8_HANDLER ( mo5_sys_portb_in )
 	UINT8 portb = pia_get_output_b( THOM_PIA_SYS );
 	int col = (portb >> 1) & 7;       /* key column */
 	int lin = 7 - ((portb >> 4) & 7); /* key line */
-	return ( readinputport( THOM_INPUT_KEYBOARD+lin ) & (1 << col) ) ? 0x80 : 0;
+	return ( input_port_read_indexed(machine,  THOM_INPUT_KEYBOARD+lin ) & (1 << col) ) ? 0x80 : 0;
 }
 
 
@@ -2269,7 +2269,7 @@ static int to9_kbd_ktest ( void )
 
 	for ( line = 0; line < 10; line++ )
 	{
-		UINT8 port = readinputport( THOM_INPUT_KEYBOARD + line );
+		UINT8 port = input_port_read_indexed(Machine,  THOM_INPUT_KEYBOARD + line );
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -2494,13 +2494,13 @@ static const int to9_kbd_code[80][2] =
 /* returns the ASCII code for the key, or 0 for no key */
 static int to9_kbd_get_key( void )
 {
-	int control = ! (readinputport( THOM_INPUT_KEYBOARD + 7 ) & 1);
-	int shift   = ! (readinputport( THOM_INPUT_KEYBOARD + 9 ) & 1);
+	int control = ! (input_port_read_indexed(Machine,  THOM_INPUT_KEYBOARD + 7 ) & 1);
+	int shift   = ! (input_port_read_indexed(Machine,  THOM_INPUT_KEYBOARD + 9 ) & 1);
 	int key = -1, line, bit;
 
 	for ( line = 0; line < 10; line++ )
 	{
-		UINT8 port = readinputport( THOM_INPUT_KEYBOARD + line );
+		UINT8 port = input_port_read_indexed(Machine,  THOM_INPUT_KEYBOARD + line );
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -2591,7 +2591,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 
 		case 1: /* x axis */
 		{
-			int newx = readinputport( THOM_INPUT_GAME + 2 );
+			int newx = input_port_read_indexed(machine,  THOM_INPUT_GAME + 2 );
 			UINT8 data = ( (newx - to9_mouse_x) & 0xf ) - 8;
 			to9_kbd_send( data, 1 );
 			to9_mouse_x = newx;
@@ -2600,7 +2600,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 
 		case 2: /* y axis */
 		{
-			int newy = readinputport( THOM_INPUT_GAME + 3 );
+			int newy = input_port_read_indexed(machine,  THOM_INPUT_GAME + 3 );
 			UINT8 data = ( (newy - to9_mouse_y) & 0xf ) - 8;
 			to9_kbd_send( data, 1 );
 			to9_mouse_y = newy;
@@ -2609,7 +2609,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 
 		case 3: /* axis overflow & buttons */
 		{
-			int b = readinputport( THOM_INPUT_GAME + 4 );
+			int b = input_port_read_indexed(machine,  THOM_INPUT_GAME + 4 );
 			UINT8 data = 0;
 			if ( b & 1 ) data |= 1;
 			if ( b & 2 ) data |= 4;
@@ -2901,12 +2901,12 @@ static int to8_kbd_ktest ( void )
 {
 	int line, bit;
 
-	if ( readinputport( THOM_INPUT_CONFIG ) & 2 )
+	if ( input_port_read_indexed(Machine,  THOM_INPUT_CONFIG ) & 2 )
 		return 0; /* disabled */
 
 	for ( line = 0; line < 10; line++ )
 	{
-		UINT8 port = readinputport( THOM_INPUT_KEYBOARD + line );
+		UINT8 port = input_port_read_indexed(Machine,  THOM_INPUT_KEYBOARD + line );
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -2926,16 +2926,16 @@ static int to8_kbd_ktest ( void )
 /* keyboard scan & return keycode (or -1) */
 static int to8_kbd_get_key( void )
 {
-	int control = (readinputport( THOM_INPUT_KEYBOARD + 7 ) & 1) ? 0 : 0x100;
-	int shift   = (readinputport( THOM_INPUT_KEYBOARD + 9 ) & 1) ? 0 : 0x080;
+	int control = (input_port_read_indexed(Machine,  THOM_INPUT_KEYBOARD + 7 ) & 1) ? 0 : 0x100;
+	int shift   = (input_port_read_indexed(Machine,  THOM_INPUT_KEYBOARD + 9 ) & 1) ? 0 : 0x080;
 	int key = -1, line, bit;
 
-	if ( readinputport( THOM_INPUT_CONFIG ) & 2 )
+	if ( input_port_read_indexed(Machine,  THOM_INPUT_CONFIG ) & 2 )
 		return -1; /* disabled */
 
 	for ( line = 0; line < 10; line++ )
 	{
-		UINT8 port = readinputport( THOM_INPUT_KEYBOARD + line );
+		UINT8 port = input_port_read_indexed(Machine,  THOM_INPUT_KEYBOARD + line );
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -3625,7 +3625,7 @@ static const pia6821_interface to8_sys =
 
 static READ8_HANDLER ( to8_timer_port_in )
 {
-	int lightpen = (readinputport( THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 2 : 0;
+	int lightpen = (input_port_read_indexed(machine,  THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
 	int dtr = (centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
 	int lock = to8_kbd_caps ? 0 : 8; /* undocumented! */
@@ -3816,7 +3816,7 @@ static const pia6821_interface to9p_sys =
 
 static READ8_HANDLER ( to9p_timer_port_in )
 {
-	int lightpen = (readinputport( THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 2 : 0;
+	int lightpen = (input_port_read_indexed(machine,  THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
 	int dtr = (centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
 	return lightpen | cass | dtr;
@@ -4137,7 +4137,7 @@ static const pia6821_interface mo6_game =
 static TIMER_CALLBACK(mo6_game_update_cb)
 {
 	/* unlike the TO8, CB1 & CB2 are not connected to buttons */
-	if ( readinputport( THOM_INPUT_CONFIG ) & 1 )
+	if ( input_port_read_indexed(machine,  THOM_INPUT_CONFIG ) & 1 )
 	{
 		UINT8 mouse = to7_get_mouse_signal();
 		pia_set_input_ca1( THOM_PIA_GAME, mouse & 1 ); /* XA */
@@ -4146,7 +4146,7 @@ static TIMER_CALLBACK(mo6_game_update_cb)
 	else
 	{
 		/* joystick */
-		UINT8 in = readinputport( THOM_INPUT_GAME );
+		UINT8 in = input_port_read_indexed(machine,  THOM_INPUT_GAME );
 		pia_set_input_ca1( THOM_PIA_GAME, in & 0x04 ); /* P1 action B */
 		pia_set_input_ca2( THOM_PIA_GAME, in & 0x40 ); /* P1 action A */
 	}
@@ -4186,7 +4186,7 @@ static READ8_HANDLER ( mo6_sys_porta_in )
 	return
 		(mo5_get_cassette() ? 0x80 : 0) |     /* bit 7: cassette input */
 		8 |                                   /* bit 3: kbd-line float up to 1 */
-		((readinputport( THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 2 : 0);
+		((input_port_read_indexed(machine,  THOM_INPUT_LIGHTPEN + 2 ) & 1) ? 2 : 0);
 	/* bit 1: lightpen button */;
 }
 
@@ -4204,7 +4204,7 @@ static READ8_HANDLER ( mo6_sys_portb_in )
 		lin = 8;     /* A bit 3: 9-th kbd line select */
 
 	return
-		( readinputport( THOM_INPUT_KEYBOARD + lin ) & (1 << col) )
+		( input_port_read_indexed(machine,  THOM_INPUT_KEYBOARD + lin ) & (1 << col) )
 		?  0x80 : 0; /* bit 7: key up */
 }
 
@@ -4617,7 +4617,7 @@ static READ8_HANDLER ( mo5nr_sys_portb_in )
 	int col = (portb >> 4) & 7;    /* B bits 4-6: kbd column */
 	int lin = (portb >> 1) & 7;    /* B bits 1-3: kbd line */
 	return
-		( readinputport( THOM_INPUT_KEYBOARD + lin ) & (1 << col) )
+		( input_port_read_indexed(machine,  THOM_INPUT_KEYBOARD + lin ) & (1 << col) )
 		?  0x80 : 0; /* bit 7: key up */
 }
 

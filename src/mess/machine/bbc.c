@@ -765,7 +765,7 @@ INTERRUPT_GEN( bbcb_keyscan )
   			/* set the value of via_system ca2, by checking for any keys
     			 being pressed on the selected column */
 
-			if ((readinputport(column)|0x01)!=0xff)
+			if ((input_port_read_indexed(machine, column)|0x01)!=0xff)
 			{
 				via_0_ca2_w(machine, 0,1);
 			} else {
@@ -797,7 +797,7 @@ INTERRUPT_GEN( bbcm_keyscan )
 			/* set the value of via_system ca2, by checking for any keys
 				 being pressed on the selected column */
 
-			if ((readinputport(column)|0x01)!=0xff)
+			if ((input_port_read_indexed(machine, column)|0x01)!=0xff)
 			{
 				via_0_ca2_w(machine, 0,1);
 			} else {
@@ -823,7 +823,7 @@ static int bbc_keyboard(running_machine *machine, int data)
 	bit=0;
 
 	if (column<10) {
-		res=readinputport(column);
+		res=input_port_read_indexed(machine, column);
 	} else {
 		res=0xff;
 	}
@@ -1101,7 +1101,7 @@ static int TMSrdy=1;
 //{
 //	TMSint=(!status)&1;
 //	TMSrdy=(!tms5220_ready_r())&1;
-//	via_0_portb_w(0,(0xf | readinputport(16)|(TMSint<<6)|(TMSrdy<<7)));
+//	via_0_portb_w(0,(0xf | input_port_read_indexed(machine, 16)|(TMSint<<6)|(TMSrdy<<7)));
 //}
 
 
@@ -1111,9 +1111,9 @@ static READ8_HANDLER( bbcb_via_system_read_portb )
 //	TMSint=(!tms5220_int_r())&1;
 //	TMSrdy=(!tms5220_ready_r())&1;
 
-	//logerror("SYSTEM read portb %d\n",0xf | readinputport(16)|(TMSint<<6)|(TMSrdy<<7));
+	//logerror("SYSTEM read portb %d\n",0xf | input_port_read_indexed(machine, 16)|(TMSint<<6)|(TMSrdy<<7));
 
-	return (0xf | readinputport(16)|(TMSint<<6)|(TMSrdy<<7));
+	return (0xf | input_port_read_indexed(machine, 16)|(TMSint<<6)|(TMSrdy<<7));
 
 
 }
@@ -1287,16 +1287,16 @@ static int BBC_get_analogue_input(int channel_number)
 	switch(channel_number)
 	{
 		case 0:
-			return ((0xff-readinputport(17))<<8);
+			return ((0xff-input_port_read_indexed(Machine, 17))<<8);
 			break;
 		case 1:
-			return ((0xff-readinputport(18))<<8);
+			return ((0xff-input_port_read_indexed(Machine, 18))<<8);
 			break;
 		case 2:
-			return ((0xff-readinputport(19))<<8);
+			return ((0xff-input_port_read_indexed(Machine, 19))<<8);
 			break;
 		case 3:
-			return ((0xff-readinputport(20))<<8);
+			return ((0xff-input_port_read_indexed(Machine, 20))<<8);
 			break;
 	}
 
@@ -2124,9 +2124,9 @@ MACHINE_START( bbcb )
 {
 	//removed from here because MACHINE_START can no longer read DIP swiches.
 	//put in MACHINE_RESET instead.
-	//bbc_DFSType=  (readinputportbytag("BBCCONFIG")>>0)&0x07;
-	//bbc_SWRAMtype=(readinputportbytag("BBCCONFIG")>>3)&0x03;
-	//bbc_RAMSize=  (readinputportbytag("BBCCONFIG")>>5)&0x01;
+	//bbc_DFSType=  (input_port_read(machine, "BBCCONFIG")>>0)&0x07;
+	//bbc_SWRAMtype=(input_port_read(machine, "BBCCONFIG")>>3)&0x03;
+	//bbc_RAMSize=  (input_port_read(machine, "BBCCONFIG")>>5)&0x01;
 
 	via_config(0, &bbcb_system_via);
 	via_set_clock(0,1000000);
@@ -2149,9 +2149,9 @@ MACHINE_START( bbcb )
 
 MACHINE_RESET( bbcb )
 {
-	bbc_DFSType=  (readinputportbytag("BBCCONFIG")>>0)&0x07;
-	bbc_SWRAMtype=(readinputportbytag("BBCCONFIG")>>3)&0x03;
-	bbc_RAMSize=  (readinputportbytag("BBCCONFIG")>>5)&0x01;
+	bbc_DFSType=  (input_port_read(machine, "BBCCONFIG")>>0)&0x07;
+	bbc_SWRAMtype=(input_port_read(machine, "BBCCONFIG")>>3)&0x03;
+	bbc_RAMSize=  (input_port_read(machine, "BBCCONFIG")>>5)&0x01;
 
 	memory_set_bankptr(1,memory_region(REGION_CPU1));
 	if (bbc_RAMSize)

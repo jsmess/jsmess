@@ -79,9 +79,9 @@ static  READ8_HANDLER ( pet_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
 	if ( pet_keyline_select < 10 ) {
-		data = readinputport( pet_keyline_select );
+		data = input_port_read_indexed(machine,  pet_keyline_select );
 		/* Check for left-shift lock */
-		if ( pet_keyline_select == 8 && ( readinputport(10) & 0x80 ) ) {
+		if ( pet_keyline_select == 8 && ( input_port_read_indexed(machine, 10) & 0x80 ) ) {
 			data &= 0xFE;
 		}
 	}
@@ -93,9 +93,9 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
 	if ( pet_keyline_select < 10 ) {
-		data = readinputport( pet_keyline_select );
+		data = input_port_read_indexed(machine,  pet_keyline_select );
 		/* Check for left-shift lock */
-		if ( pet_keyline_select == 6 && ( readinputport(10) & 0x80 ) ) {
+		if ( pet_keyline_select == 6 && ( input_port_read_indexed(machine, 10) & 0x80 ) ) {
 			data &= 0xFE;
 		}
 	}
@@ -611,5 +611,5 @@ INTERRUPT_GEN( pet_frame_interrupt )
 		}
 	}
 
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , readinputport(10) & 0x80 ? 1 : 0);
+	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , input_port_read_indexed(machine, 10) & 0x80 ? 1 : 0);
 }
