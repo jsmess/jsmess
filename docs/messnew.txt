@@ -20,6 +20,16 @@ System Driver Changes:
 - [COCO3] Transitioned VHD support to use MAME's core device system.  [Nate
   Woods]
 
+- [COUPE] Rewrote interrupt handling and screen handling, fixes line
+  interrupts.  [Dirk Best]
+
+- [COUPE] Added natural keyboard support.  [Dirk Best]
+
+- [COUPE] Added support for the SAD and SDF disk image formats, as well as
+  720k CP/M images.  [Dirk Best]
+
+- [COUPE] Added support for up to four 1 MB memory expansions.  [Dirk Best]
+
 - [IBMPC,IBM5150] Renamed ibmpc driver to ibm5150.  [Wilbert Pol]
 
 - [MBEE] Added snapload support for MWB filetype. Added LOCK key to keyboard.
@@ -43,7 +53,8 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-- [MESSUI] Updated MESS icon, logo and other artwork (Asterokid, MAMEPlus team, Hobie Troxell)
+- [MESSUI] Updated MESS icon, logo and other artwork (Asterokid, MAMEPlus team,
+  Hobie Troxell)
 
 
 
