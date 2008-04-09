@@ -372,7 +372,7 @@ static const device_config *cassette_device_image(void)
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }
 
-static void cassette_motor( UINT8 data )
+static void cassette_motor( running_machine *machine, UINT8 data )
 {
 	if (data)
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -380,7 +380,7 @@ static void cassette_motor( UINT8 data )
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* does user want to hear the sound? */
-	if (input_port_read(Machine, "CONFIG") & 8)
+	if (input_port_read(machine, "CONFIG") & 8)
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 	else
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
@@ -467,7 +467,7 @@ static WRITE8_HANDLER( super80_f0_w )
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80_mhz = (data & 4) ? 1 : 2;				/* bit 2 - video on/off */
-	if (bits & 0x02) cassette_motor( data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
+	if (bits & 0x02) cassette_motor( machine, data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
 	if (bits & 0x01) cassette_output(cassette_device_image(), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
@@ -481,7 +481,7 @@ static WRITE8_HANDLER( super80v_f0_w )
 	super80v_rom_pcg = data & 0x10;					/* bit 4 - bankswitch gfx rom or pcg */
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80v_vid_col = data & 4;					/* bit 2 - bankswitch video or colour ram */
-	if (bits & 0x02) cassette_motor( data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
+	if (bits & 0x02) cassette_motor( machine, data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
 	if (bits & 0x01) cassette_output(cassette_device_image(), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
