@@ -1375,7 +1375,7 @@ END
 //
 
 #ifdef MESS
-IDB_ABOUT               BITMAP      "res\\about_mess.bmp"
+IDB_ABOUT               BITMAP                  "res\\logo_mess.bmp"
 #else
 IDB_ABOUT               BITMAP                  "res\\about.bmp"
 #endif
