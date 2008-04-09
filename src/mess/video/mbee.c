@@ -443,15 +443,17 @@ static void mc6845_screen_configure(running_machine *machine)
 
 	UINT16 width = crt.horizontal_displayed*8-1;							// width in pixels
 	UINT16 height = crt.vertical_displayed*(crt.scan_lines+1)-1;					// height in pixels
-	UINT16 bytes = crt.horizontal_displayed*crt.vertical_displayed-1;				// video ram needed -1
+	UINT16 bytes = crt.horizontal_displayed*crt.vertical_displayed-1;				// video ram needed
+
+	if (width > 511) width=511;	
+	if (height > 255) height=255;
 
 	/* Resize the screen */
 	visarea.min_x = 0;
 	visarea.max_x = width-1;
 	visarea.min_y = 0;
 	visarea.max_y = height-1;
-	if ((width < 610) && (height < 460) && (bytes < 0x800))	/* bounds checking to prevent an assert or violation */
-		video_screen_set_visarea(machine->primary_screen, 0, width, 0, height);
+	if (bytes < 0x800) video_screen_set_visarea(machine->primary_screen, 0, width, 0, height);
 }
 
 VIDEO_START( mbee )
@@ -479,7 +481,7 @@ VIDEO_UPDATE( mbee )
 	framecnt++;
 
 	/* Get the graphics of the character under the cursor, xor with the visible cursor scan lines,
-	   and store as character number 256. If inverse mode, drop bit 7 of character before xoring */
+	   and store as character number 256. */
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
 		pcgram[0x1000+i] = pcgram[(videoram[cursor]<<4) + i] ^ mc6845_cursor[i];
 
@@ -487,7 +489,7 @@ VIDEO_UPDATE( mbee )
 
 	for( i = 0; i < bytes; i++ )
 	{
-		int mem = ((i + screen_home) & 0x7ff);
+		int mem = (i + screen_home) & 0x7ff;
 		int sy = (i / crt.horizontal_displayed) * (crt.scan_lines + 1);
 		int sx = (i % crt.horizontal_displayed) << 3;
 		int chr = videoram[mem];
@@ -502,7 +504,7 @@ VIDEO_UPDATE( mbee )
 				chr = 256;					// 256 = cursor character
 
 		drawgfx( bitmap, screen->machine->gfx[0],chr,0,0,0,sx,sy,
-			cliprect,TRANSPARENCY_NONE,0);	// put character on the screen
+			NULL,TRANSPARENCY_NONE,0);	// put character on the screen
 	}
 		
 	return 0;
@@ -521,7 +523,7 @@ VIDEO_UPDATE( mbeeic )
 	framecnt++;
 
 	/* Get the graphics of the character under the cursor, xor with the visible cursor scan lines,
-	   and store as character number 256. If inverse mode, drop bit 7 of character before xoring */
+	   and store as character number 256. */
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
 		pcgram[0x1000+i] = pcgram[(videoram[cursor]<<4) + i] ^ mc6845_cursor[i];
 
@@ -529,7 +531,7 @@ VIDEO_UPDATE( mbeeic )
 
 	for( i = 0; i < bytes; i++ )
 	{
-		int mem = ((i + screen_home) & 0x7ff);
+		int mem = (i + screen_home) & 0x7ff;
 		int sy = (i / crt.horizontal_displayed) * (crt.scan_lines + 1);
 		int sx = (i % crt.horizontal_displayed) << 3;
 		int chr = videoram[mem];
