@@ -41,7 +41,7 @@ WCHAR *win_dialog_wcsdup(dialog_box *dialog, const WCHAR *s);
 #endif
 
 /* dialog operations */
-void win_dialog_runmodal(HWND wnd, dialog_box *dialog);
+void win_dialog_runmodal(running_machine *machine, HWND wnd, dialog_box *dialog);
 int win_dialog_add_combobox(dialog_box *dialog, const char *item_label, int default_value,
 	dialog_itemstoreval storeval, void *storeval_param);
 int win_dialog_add_active_combobox(dialog_box *dialog, const char *item_label, int default_value,
@@ -67,7 +67,8 @@ int win_dialog_add_notification(dialog_box *dialog, UINT notification,
 
 
 // wrapper for the standard file dialog
-BOOL win_file_dialog(HWND parent, win_file_dialog_type dlgtype, dialog_box *custom_dialog, const char *filter,
+BOOL win_file_dialog(running_machine *machine,
+	HWND parent, win_file_dialog_type dlgtype, dialog_box *custom_dialog, const char *filter,
 	const char *initial_dir, char *filename, size_t filename_len);
 
 #endif /* DIALOG_H */

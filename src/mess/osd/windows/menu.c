@@ -221,7 +221,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 		goto done;
 
 	/* ...and finally display the dialog */
-	win_dialog_runmodal(wnd, dlg);
+	win_dialog_runmodal(machine, wnd, dlg);
 
 done:
 	if (dlg)
@@ -332,7 +332,7 @@ static void customize_switches(running_machine *machine, HWND wnd, int title_str
 	if (win_dialog_add_standard_buttons(dlg))
 		goto done;
 
-	win_dialog_runmodal(wnd, dlg);
+	win_dialog_runmodal(machine, wnd, dlg);
 
 done:
 	if (dlg)
@@ -445,7 +445,7 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 	if (win_dialog_add_standard_buttons(dlg))
 		goto done;
 
-	win_dialog_runmodal(wnd, dlg);
+	win_dialog_runmodal(machine, wnd, dlg);
 
 done:
 	if (dlg)
@@ -870,7 +870,7 @@ static void change_device(HWND wnd, const device_config *img, int is_save)
 	}
 
 	// display the dialog
-	result = win_file_dialog(wnd, is_save ? WIN_FILE_DIALOG_SAVE : WIN_FILE_DIALOG_OPEN,
+	result = win_file_dialog(img->machine, wnd, is_save ? WIN_FILE_DIALOG_SAVE : WIN_FILE_DIALOG_OPEN,
 		dialog, filter, initial_dir, filename, sizeof(filename) / sizeof(filename[0]));
 	if (result)
 	{
@@ -942,7 +942,7 @@ static void paste(void)
 
 static void pause(running_machine *machine)
 {
-	mame_pause(machine, !winwindow_ui_is_paused());
+	mame_pause(machine, !winwindow_ui_is_paused(machine));
 }
 
 
@@ -1271,7 +1271,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 
 	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post()							? MFS_ENABLED : MFS_GRAYED);
 
-	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused()					? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused(machine)				? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_OPTIONS_CONFIGURATION,	has_config									? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_DIPSWITCHES,		has_dipswitch								? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_MISCINPUT,		has_misc									? MFS_ENABLED : MFS_GRAYED);
@@ -1514,7 +1514,7 @@ static void device_command(HWND wnd, const device_config *img, int devoption)
 
 #if USE_TAPEDLG
 					case DEVOPTION_CASSETTE_DIALOG:
-						tapedialog_show(wnd, id);
+						tapedialog_show(wnd, image_index_in_device(img));
 						break;
 #else
 					case DEVOPTION_CASSETTE_REWIND:
@@ -1662,7 +1662,7 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 
 	// pause while invoking certain commands
 	if (pause_for_command(command))
-		winwindow_ui_pause_from_window_thread(TRUE);
+		winwindow_ui_pause_from_window_thread(machine, TRUE);
 
 	switch(command)
 	{
@@ -1890,7 +1890,7 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 
 	// resume emulation
 	if (pause_for_command(command))
-		winwindow_ui_pause_from_window_thread(FALSE);
+		winwindow_ui_pause_from_window_thread(machine, FALSE);
 
 	return handled;
 }

@@ -1112,9 +1112,9 @@ static void seqselect_start_read_from_main_thread(void *param)
 	// the Win32 OSD code thinks that we are paused, we need to temporarily
 	// unpause ourselves or else we will block
 	pause_count = 0;
-	while(mame_is_paused(Machine) && !winwindow_ui_is_paused())
+	while(mame_is_paused(Machine) && !winwindow_ui_is_paused(Machine))
 	{
-		winwindow_ui_pause_from_main_thread(FALSE);
+		winwindow_ui_pause_from_main_thread(Machine, FALSE);
 		pause_count++;
 	}
 
@@ -1142,7 +1142,7 @@ static void seqselect_start_read_from_main_thread(void *param)
 
 	// repause the OSD code
 	while(pause_count--)
-		winwindow_ui_pause_from_main_thread(TRUE);
+		winwindow_ui_pause_from_main_thread(Machine, TRUE);
 }
 
 
@@ -1655,14 +1655,14 @@ WCHAR *win_dialog_wcsdup(dialog_box *dialog, const WCHAR *s)
 //	before_display_dialog
 //============================================================
 
-static void before_display_dialog(void)
+static void before_display_dialog(running_machine *machine)
 {
 #ifdef UNDER_CE
 	// on WinCE, suspend GAPI
 	gx_suspend();
 #endif
 
-	winwindow_ui_pause_from_window_thread(TRUE);
+	winwindow_ui_pause_from_window_thread(machine, TRUE);
 }
 
 
@@ -1671,14 +1671,14 @@ static void before_display_dialog(void)
 //	after_display_dialog
 //============================================================
 
-static void after_display_dialog(void)
+static void after_display_dialog(running_machine *machine)
 {
 #ifdef UNDER_CE
 	// on WinCE, resume GAPI
 	gx_resume();
 #endif
 
-	winwindow_ui_pause_from_window_thread(FALSE);
+	winwindow_ui_pause_from_window_thread(machine, FALSE);
 }
 
 
@@ -1687,7 +1687,7 @@ static void after_display_dialog(void)
 //	win_dialog_runmodal
 //============================================================
 
-void win_dialog_runmodal(HWND wnd, dialog_box *dialog)
+void win_dialog_runmodal(running_machine *machine, HWND wnd, dialog_box *dialog)
 {
 	assert(dialog);
 
@@ -1695,14 +1695,14 @@ void win_dialog_runmodal(HWND wnd, dialog_box *dialog)
 	dialog_prime(dialog);
 
 	// show the dialog
-	before_display_dialog();
+	before_display_dialog(machine);
 #ifndef UNICODE
 	if (GetVersion() & 0x80000000)
 		DialogBoxIndirectParamA(NULL, dialog->handle, wnd, dialog_proc, (LPARAM) dialog);
 	else
 #endif // UNICODE
 		DialogBoxIndirectParamW(NULL, dialog->handle, wnd, dialog_proc, (LPARAM) dialog);
-	after_display_dialog();
+	after_display_dialog(machine);
 }
 
 
@@ -1765,7 +1765,8 @@ static UINT_PTR CALLBACK file_dialog_hook(HWND dlgwnd, UINT message, WPARAM wpar
 //	win_file_dialog
 //============================================================
 
-BOOL win_file_dialog(HWND parent, win_file_dialog_type dlgtype, dialog_box *custom_dialog, const char *filter,
+BOOL win_file_dialog(running_machine *machine,
+	HWND parent, win_file_dialog_type dlgtype, dialog_box *custom_dialog, const char *filter,
 	const char *initial_dir, char *filename, size_t filename_len)
 {
 	win_open_file_name ofn;
@@ -1797,9 +1798,9 @@ BOOL win_file_dialog(HWND parent, win_file_dialog_type dlgtype, dialog_box *cust
 
 	snprintf(ofn.filename, ARRAY_LENGTH(ofn.filename), "%s", filename);
 
-	before_display_dialog();
+	before_display_dialog(machine);
 	result = win_get_file_name_dialog(&ofn);
-	after_display_dialog();
+	after_display_dialog(machine);
 
 	snprintf(filename, filename_len, "%s", ofn.filename);
 	return result;
