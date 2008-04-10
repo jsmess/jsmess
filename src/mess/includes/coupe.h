@@ -15,6 +15,7 @@
 struct coupe_asic
 {
 	UINT8 lmpr, hmpr, vmpr; /* memory pages */
+	UINT8 lext, hext;       /* extended memory page */
 	UINT8 border;           /* border */
 	UINT8 clut[16];         /* color lookup table, 16 entries */
 	UINT8 line_int;         /* line interrupt */

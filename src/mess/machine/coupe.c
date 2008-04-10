@@ -39,11 +39,32 @@ static void coupe_update_bank(int bank, UINT8 *memory, int is_readonly)
 }
 
 
+static void coupe_install_ext_mem(void)
+{
+	UINT8 *mem;
+
+	/* bank 3 */
+	if (coupe_regs.lext >> 6 < mess_ram_size >> 20)
+		mem = &mess_ram[(mess_ram_size & 0xfffff) + (coupe_regs.lext >> 6) * 0x100000 + (coupe_regs.lext & 0x3f) * 0x4000];
+	else
+		mem = NULL;
+
+	coupe_update_bank(3, mem, FALSE);
+
+	/* bank 4 */
+	if (coupe_regs.hext >> 6 < mess_ram_size >> 20)
+		mem = &mess_ram[(mess_ram_size & 0xfffff) + (coupe_regs.hext >> 6) * 0x100000 + (coupe_regs.hext & 0x3f) * 0x4000];
+	else
+		mem = NULL;
+
+	coupe_update_bank(4, mem, FALSE);
+}
+
 
 void coupe_update_memory(void)
 {
+	const int PAGE_MASK = ((mess_ram_size & 0xfffff) / 0x4000) - 1;
 	UINT8 *rom = memory_region(REGION_CPU1);
-	int PAGE_MASK = ((mess_ram_size & 0xfffff) / 0x4000) - 1;
 	UINT8 *memory;
 	int is_readonly;
 
@@ -65,23 +86,27 @@ void coupe_update_memory(void)
 
 
 	/* BANK2 */
-	if (( (coupe_regs.lmpr+1) & 0x1F) <= PAGE_MASK)
-		memory = &mess_ram[((coupe_regs.lmpr+1) & PAGE_MASK) * 0x4000];
+	if (((coupe_regs.lmpr + 1) & 0x1f) <= PAGE_MASK)
+		memory = &mess_ram[((coupe_regs.lmpr + 1) & PAGE_MASK) * 0x4000];
 	else
 		memory = NULL;	/* Attempt to page in non existant ram region */
 	coupe_update_bank(2, memory, FALSE);
 
 	/* only update bank 3 and 4 when external memory is not enabled */
-	if (!(coupe_regs.hmpr & HMPR_MCNTRL))
+	if (coupe_regs.hmpr & HMPR_MCNTRL)
+	{
+		coupe_install_ext_mem();
+	}
+	else
 	{
 		/* BANK3 */
-		if ( (coupe_regs.hmpr & 0x1F) <= PAGE_MASK )
+		if ((coupe_regs.hmpr & 0x1F) <= PAGE_MASK )
 			memory = &mess_ram[(coupe_regs.hmpr & PAGE_MASK)*0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		coupe_update_bank(3, memory, FALSE);
-	
-	
+
+
 		/* BANK4 */
 		if (coupe_regs.lmpr & LMPR_ROM1)	/* Is Rom1 paged in at bank 4 */
 		{
@@ -90,8 +115,8 @@ void coupe_update_memory(void)
 		}
 		else
 		{
-			if (( (coupe_regs.hmpr+1) & 0x1F) <= PAGE_MASK)
-				memory = &mess_ram[((coupe_regs.hmpr+1) & PAGE_MASK) * 0x4000];
+			if (((coupe_regs.hmpr + 1) & 0x1f) <= PAGE_MASK)
+				memory = &mess_ram[((coupe_regs.hmpr + 1) & PAGE_MASK) * 0x4000];
 			else
 				memory = NULL;	/* Attempt to page in non existant ram region */
 			is_readonly = FALSE;
@@ -99,25 +124,25 @@ void coupe_update_memory(void)
 		coupe_update_bank(4, memory, FALSE);
 	}
 
+	/* video memory location */
 	if (coupe_regs.vmpr & 0x40)	/* if bit set in 2 bank screen mode */
-		videoram = &mess_ram[((coupe_regs.vmpr&0x1E) & PAGE_MASK) * 0x4000];
+		videoram = &mess_ram[((coupe_regs.vmpr & 0x1e) & PAGE_MASK) * 0x4000];
 	else
-		videoram = &mess_ram[((coupe_regs.vmpr&0x1F) & PAGE_MASK) * 0x4000];
+		videoram = &mess_ram[((coupe_regs.vmpr & 0x1f) & PAGE_MASK) * 0x4000];
 }
 
 
 WRITE8_HANDLER( coupe_ext_mem_w )
 {
+	if (offset & 1)
+		coupe_regs.hext = data;
+	else
+		coupe_regs.lext = data;
+
 	/* external RAM enabled? */
 	if (coupe_regs.hmpr & HMPR_MCNTRL)
 	{
-		UINT8 *mem = NULL;
-
-		/* only install if we have enough memory */
-		if (data >> 6 < mess_ram_size >> 20)
-			mem = &mess_ram[(mess_ram_size & 0xfffff) + (data >> 6) * 0x100000 + (data & 0x3f) * 0x4000];
-
-		coupe_update_bank(offset & 1 ? 4 : 3, mem, FALSE);
+		coupe_install_ext_mem();
 	}
 }
 
