@@ -99,6 +99,7 @@ Some bugs left :
 #include "devices/printer.h"
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
+#include "deprecat.h"
 
 
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
