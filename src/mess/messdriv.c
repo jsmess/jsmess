@@ -822,7 +822,7 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( to9p )		/* 1986 Thomson T09+								*/
 	DRIVER( mo6 )		/* 1986 Thomson MO6									*/
 	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
-	DRIVER( pro128 )	/* 1986 Oliveti Prodest PC 128						*/
+	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
 
 	/* Cybiko, Inc. */
 TESTDRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
