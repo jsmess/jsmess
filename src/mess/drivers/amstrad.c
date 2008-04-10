@@ -213,6 +213,14 @@ static void multiface_init(void);
 static void multiface_stop(running_machine *machine);
 static int multiface_hardware_enabled(void);
 static void multiface_reset(void);
+
+static const device_config *printer_device(running_machine *machine)
+{
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
+
+
+
 /* ---------------------------------------
    - 27.05.2004 - PSG function selection -
    ---------------------------------------
@@ -332,7 +340,7 @@ static READ8_HANDLER (amstrad_ppi_portb_r)
 /* Set b6 with Parallel/Printer port ready */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0)==0 ) {
+		if (printer_is_ready(printer_device(machine))==0 ) {
 			data |= (1<<6);
 		}
 	}
@@ -2930,6 +2938,9 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_SOUND_ADD_TAG("ay", AY8912, 1000000)
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -2973,6 +2984,9 @@ static MACHINE_DRIVER_START( gx4000 )
 
 	MDRV_PALETTE_LENGTH(4096+48)  // extended 12-bit palette, and standard 32 colour palette
 	MDRV_PALETTE_INIT(amstrad_plus)
+
+	/* printer not present in the gx4000 */
+	MDRV_DEVICE_REMOVE("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( aleste )
@@ -3122,19 +3136,6 @@ static void cpc6128_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 }
 
 
-static void cpc6128_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static void cpcplus_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
@@ -3190,7 +3191,6 @@ SYSTEM_CONFIG_START( cpc6128 )
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_DEVICE(cpc6128_floppy_getinfo)
 	CONFIG_DEVICE(cpc6128_cassette_getinfo)
-	CONFIG_DEVICE(cpc6128_printer_getinfo)
 SYSTEM_CONFIG_END
 
 
@@ -3211,7 +3211,6 @@ SYSTEM_CONFIG_END
 SYSTEM_CONFIG_START( aleste )
 	CONFIG_DEVICE(aleste_floppy_getinfo)
 	CONFIG_DEVICE(cpc6128_cassette_getinfo)
-	CONFIG_DEVICE(cpc6128_printer_getinfo)
 	CONFIG_RAM_DEFAULT(2048 * 1024)  // has 2048k RAM
 SYSTEM_CONFIG_END
 

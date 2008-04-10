@@ -1739,6 +1739,9 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_SOUND_ADD(AY8910, 2000000)
 	MDRV_SOUND_CONFIG(einstein_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1778,18 +1781,6 @@ ROM_START(einstei2)
 	ROM_LOAD("charrom.rom",0x012000, 0x0800, NO_DUMP)
 ROM_END
 
-static void einstein_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void einstein_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -1804,7 +1795,6 @@ static void einstein_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 
 SYSTEM_CONFIG_START(einstein)
 	CONFIG_RAM_DEFAULT(65536)
-	CONFIG_DEVICE(einstein_printer_getinfo)
 	CONFIG_DEVICE(einstein_floppy_getinfo)
 SYSTEM_CONFIG_END
 

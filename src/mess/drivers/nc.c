@@ -1690,6 +1690,9 @@ static MACHINE_DRIVER_START( nc100 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1728,18 +1731,6 @@ ROM_START(nc200)
         ROM_REGION(((64*1024)+(512*1024)), REGION_CPU1,0)
         ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
-
-static void nc_common_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void nc_common_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -1784,7 +1775,6 @@ static void nc_common_serial_getinfo(const mess_device_class *devclass, UINT32 s
 }
 
 SYSTEM_CONFIG_START(nc_common)
-	CONFIG_DEVICE(nc_common_printer_getinfo)
 	CONFIG_DEVICE(nc_common_cartslot_getinfo)
 	CONFIG_DEVICE(nc_common_serial_getinfo)
 SYSTEM_CONFIG_END

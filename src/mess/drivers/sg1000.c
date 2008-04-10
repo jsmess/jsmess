@@ -598,6 +598,9 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SN76489, XTAL_10_738635MHz/3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sf7000 )
@@ -620,6 +623,10 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SN76489, XTAL_10_738635MHz/3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer1", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -778,26 +785,6 @@ static void sc3000_cassette_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-static void sc3000_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static void sf7000_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( sf7000_floppy )
 {
 	if (image_has_been_created(image))
@@ -877,13 +864,11 @@ SYSTEM_CONFIG_END
 SYSTEM_CONFIG_START( sc3000 )
 	CONFIG_DEVICE(sc3000_cartslot_getinfo)
 	CONFIG_DEVICE(sc3000_cassette_getinfo)
-	CONFIG_DEVICE(sc3000_printer_getinfo)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( sf7000 )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 	CONFIG_DEVICE(sc3000_cassette_getinfo)
-	CONFIG_DEVICE(sf7000_printer_getinfo)
 	CONFIG_DEVICE(sf7000_floppy_getinfo)
 	CONFIG_DEVICE(sf7000_serial_getinfo)
 SYSTEM_CONFIG_END

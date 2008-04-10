@@ -1201,6 +1201,9 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_SOUND_ADD(SAA1099, 4772720)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1239,6 +1242,9 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_SOUND_ADD(SAA1099, 4772720)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pccga )
@@ -1273,6 +1279,9 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_SOUND_ADD(SAA1099, 4772720)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1304,6 +1313,9 @@ static MACHINE_DRIVER_START( europc )
 #endif
 
 	MDRV_NVRAM_HANDLER( europc_rtc )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1339,6 +1351,9 @@ static MACHINE_DRIVER_START( xtcga )
 	MDRV_SOUND_ADD(SAA1099, 4772720)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1363,6 +1378,9 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_SOUND_ADD(CUSTOM, 0)
 	MDRV_SOUND_CONFIG(pc_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1389,6 +1407,9 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1418,6 +1439,9 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1484,6 +1508,9 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( tandy1000 )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1890,18 +1917,6 @@ static void ibmpc_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-static void ibmpc_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 3; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void ibmpc_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
@@ -1916,7 +1931,6 @@ static void ibmpc_harddisk_getinfo(const mess_device_class *devclass, UINT32 sta
 
 SYSTEM_CONFIG_START(ibmpc)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
-	CONFIG_DEVICE(ibmpc_printer_getinfo)
 	CONFIG_DEVICE(ibmpc_cassette_getinfo)
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
 	CONFIG_DEVICE(ibmpc_harddisk_getinfo)

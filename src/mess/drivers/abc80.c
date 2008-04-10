@@ -482,6 +482,9 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_SOUND_ADD(SN76477, 0)
 	MDRV_SOUND_CONFIG(sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// printer device
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -514,18 +517,6 @@ ROM_START( abc80 )
 ROM_END
 
 /* System Configuration */
-
-static void abc80_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
 
 #if 0
 static void abc80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -565,7 +556,6 @@ static void abc80_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 SYSTEM_CONFIG_START( abc80 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
-	CONFIG_DEVICE(abc80_printer_getinfo)
 //  CONFIG_DEVICE(abc80_cassette_getinfo)
 	CONFIG_DEVICE(abc80_floppy_getinfo)
 SYSTEM_CONFIG_END

@@ -194,6 +194,10 @@ static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
+
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -238,24 +242,11 @@ static void tmc2000e_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-static void tmc2000e_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 SYSTEM_CONFIG_START( tmc2000e )
 	CONFIG_RAM_DEFAULT	( 8 * 1024)
 	CONFIG_RAM			(40 * 1024)
 	CONFIG_DEVICE(tmc2000e_cassette_getinfo)
 	CONFIG_DEVICE(tmc2000e_floppy_getinfo)
-	CONFIG_DEVICE(tmc2000e_printer_getinfo)
 SYSTEM_CONFIG_END
 
 /* Driver Initialization */

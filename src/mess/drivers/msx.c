@@ -755,6 +755,9 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD(YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -811,6 +814,9 @@ static MACHINE_DRIVER_START( msx2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_NVRAM_HANDLER( msx2 )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -2187,23 +2193,10 @@ static void msx_cassette_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-static void msx_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 SYSTEM_CONFIG_START(msx)
 	CONFIG_DEVICE(msx_floppy_getinfo)
 	CONFIG_DEVICE(msx_cartslot_getinfo)
 	CONFIG_DEVICE(msx_cassette_getinfo)
-	CONFIG_DEVICE(msx_printer_getinfo)
 SYSTEM_CONFIG_END
 
 MSX_DRIVER_LIST

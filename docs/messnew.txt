@@ -71,6 +71,8 @@ Source Changes:
 
 - Major changes to transition MESS's device system onto MAME's device system.
   [Nate Woods]
+ 
+- Converted printers to the new device system.  [Nate Woods]
 
 
 

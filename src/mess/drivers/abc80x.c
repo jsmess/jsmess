@@ -797,6 +797,7 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_MACHINE_START(abc800)
 
 	MDRV_IMPORT_FROM(abc800m_video)
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc800c )
@@ -814,6 +815,7 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_MACHINE_START(abc800)
 
 	MDRV_IMPORT_FROM(abc800c_video)
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc802 )
@@ -832,6 +834,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_MACHINE_RESET(abc802)
 
 	MDRV_IMPORT_FROM(abc802_video)
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )
@@ -850,6 +853,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_MACHINE_RESET(abc806)
 
 	MDRV_IMPORT_FROM(abc806_video)
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1030,18 +1034,6 @@ static void abc800_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static void abc800_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( abc800_serial )
 {
 	/* filename specified */
@@ -1084,7 +1076,6 @@ SYSTEM_CONFIG_START( abc800 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
 	CONFIG_DEVICE(abc800_cassette_getinfo)
-	CONFIG_DEVICE(abc800_printer_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
@@ -1092,7 +1083,6 @@ SYSTEM_CONFIG_END
 SYSTEM_CONFIG_START( abc802 )
 	CONFIG_RAM_DEFAULT(64 * 1024)
 	CONFIG_DEVICE(abc800_cassette_getinfo)
-	CONFIG_DEVICE(abc800_printer_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
@@ -1100,7 +1090,6 @@ SYSTEM_CONFIG_END
 SYSTEM_CONFIG_START( abc806 )
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_DEVICE(abc800_cassette_getinfo)
-	CONFIG_DEVICE(abc800_printer_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END

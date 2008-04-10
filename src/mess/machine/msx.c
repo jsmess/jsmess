@@ -446,9 +446,9 @@ static const device_config *cassette_device_image(void)
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }
 
-static const device_config *printer_image(void)
+static const device_config *printer_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_PRINTER, 0);
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
 }
 
 READ8_HANDLER ( msx_psg_port_a_r )
@@ -555,7 +555,7 @@ WRITE8_HANDLER ( msx_printer_w )
 		{
 			if ((msx1.prn_strobe & 2) && !(data & 2))
 			{
-				printer_output(printer_image(), msx1.prn_data);
+				printer_output(printer_image(machine), msx1.prn_data);
 			}
 
 			msx1.prn_strobe = data;
@@ -566,7 +566,7 @@ WRITE8_HANDLER ( msx_printer_w )
 READ8_HANDLER ( msx_printer_r )
 {
 	if (offset == 0 && ! (input_port_read_indexed(machine, 8) & 0x80) &&
-			printer_status(printer_image(), 0) )
+			printer_is_ready(printer_image(machine)) )
 		return 253;
 
 	return 0xff;

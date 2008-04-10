@@ -388,6 +388,9 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_SOUND_ADD(AY8910, 1789773)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi328n_806 )
@@ -464,22 +467,6 @@ ROM_START( sv328n80 )
 	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Set")
 	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
-
-static void svi318_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:
-			info->i = 1;
-			break;
-
-		default:
-			printer_device_getinfo(devclass, state, info);
-			break;
-	}
-}
 
 static void svi318_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -561,7 +548,6 @@ static void svi318_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 }
 
 SYSTEM_CONFIG_START( svi318_common )
-	CONFIG_DEVICE(svi318_printer_getinfo)
 	CONFIG_DEVICE(svi318_cassette_getinfo)
 	CONFIG_DEVICE(svi318_cartslot_getinfo)
 	CONFIG_DEVICE(svi318_floppy_getinfo)

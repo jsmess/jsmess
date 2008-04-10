@@ -527,6 +527,11 @@ static  READ8_HANDLER(exidy_fe_port_r)
 	return data;
 }
 
+static const device_config *printer_device(running_machine *machine)
+{
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
+
 static READ8_HANDLER(exidy_ff_port_r)
 {
 	/* The use of the parallel port as a general purpose port is not emulated.
@@ -539,7 +544,7 @@ static READ8_HANDLER(exidy_ff_port_r)
 	/* bit 7 = printer busy
 	0 = printer is not busy */
 
-	if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0)==0 )
+	if (printer_is_ready(printer_device(machine))==0 )
 		data |= 0x080;
 
 	return data;
@@ -743,6 +748,9 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exidyd )
@@ -849,18 +857,6 @@ static void exidy_quickload_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-static void exidy_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void exidy_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -892,7 +888,6 @@ static void exidy_cassette_getinfo(const mess_device_class *devclass, UINT32 sta
 }
 
 SYSTEM_CONFIG_START(exidy)
-	CONFIG_DEVICE(exidy_printer_getinfo)
 	CONFIG_DEVICE(exidy_floppy_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(exidy_cassette_getinfo)		// use of cassette causes a hang
@@ -900,7 +895,6 @@ SYSTEM_CONFIG_START(exidy)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(exidyd)
-	CONFIG_DEVICE(exidy_printer_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(exidy_cassette_getinfo)		// use of cassette causes a hang
 	CONFIG_DEVICE(exidy_quickload_getinfo)

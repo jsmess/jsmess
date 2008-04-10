@@ -1797,6 +1797,9 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_SOUND_ADD(YM2149, Y2/16)
 	MDRV_SOUND_CONFIG(ym2149_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
@@ -1847,6 +1850,9 @@ static MACHINE_DRIVER_START( atariste )
     MDRV_SOUND_ROUTE(0, "right", 0.50)
     MDRV_SOUND_ROUTE(1, "left", 0.50)
 */
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )
@@ -1891,6 +1897,9 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_SOUND_ADD(YM3439, U517/8)
 	MDRV_SOUND_CONFIG(stbook_ym2149_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -2076,18 +2085,6 @@ static void atarist_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static void atarist_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( atarist_serial )
 {
 	/* filename specified */
@@ -2187,7 +2184,6 @@ SYSTEM_CONFIG_START( atarist )
 	CONFIG_RAM		  ( 512 * 1024) //  520ST
 	CONFIG_RAM		  ( 256 * 1024) //  260ST
 	CONFIG_DEVICE(atarist_floppy_getinfo)
-	CONFIG_DEVICE(atarist_printer_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI
@@ -2198,7 +2194,6 @@ SYSTEM_CONFIG_START( megast )
 	CONFIG_RAM		  (2048 * 1024) // Mega ST 2
 	CONFIG_RAM		  (1024 * 1024) // Mega ST 1
 	CONFIG_DEVICE(atarist_floppy_getinfo)
-	CONFIG_DEVICE(atarist_printer_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI
@@ -2208,7 +2203,6 @@ SYSTEM_CONFIG_START( atariste )
 	CONFIG_RAM_DEFAULT(1024 * 1024) // 1040STe
 	CONFIG_RAM		  ( 512 * 1024) //  520STe
 	CONFIG_DEVICE(atarist_floppy_getinfo)
-	CONFIG_DEVICE(atarist_printer_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI
@@ -2219,7 +2213,6 @@ SYSTEM_CONFIG_START( megaste )
 	CONFIG_RAM		  (2048 * 1024) // Mega STe 2
 	CONFIG_RAM		  (1024 * 1024) // Mega STe 1
 	CONFIG_DEVICE(atarist_floppy_getinfo)
-	CONFIG_DEVICE(atarist_printer_getinfo)
 	CONFIG_DEVICE(megaste_serial_getinfo)
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI
@@ -2230,7 +2223,6 @@ SYSTEM_CONFIG_START( stbook )
 	CONFIG_RAM_DEFAULT(4096 * 1024)
 	CONFIG_RAM		  (1024 * 1024)
 	CONFIG_DEVICE(atarist_floppy_getinfo)
-	CONFIG_DEVICE(atarist_printer_getinfo)
 	CONFIG_DEVICE(megaste_serial_getinfo)
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI

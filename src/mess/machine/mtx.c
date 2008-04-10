@@ -128,15 +128,15 @@ WRITE8_HANDLER( mtx_cst_w )
  *
  *************************************/
 
-static const device_config *mtx_printer_image(void)
+static const device_config *mtx_printer_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_PRINTER, 0);
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
 }
 
 READ8_HANDLER( mtx_strobe_r )
 {
 	if (mtx_prt_strobe == 0)
-		printer_output (mtx_printer_image (), mtx_prt_data);
+		printer_output (mtx_printer_image(machine), mtx_prt_data);
 
 	mtx_prt_strobe = 1;
 
@@ -148,7 +148,7 @@ READ8_HANDLER( mtx_prt_r )
 {
 	mtx_prt_strobe = 0;
 
-	return MTX_PRT_NOERROR | (printer_status (mtx_printer_image (), 0)
+	return MTX_PRT_NOERROR | (printer_is_ready (mtx_printer_image (machine))
 			? MTX_PRT_SELECTED : 0);
 }
 

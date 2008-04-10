@@ -5,6 +5,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "centroni.h"
 #include "devices/printer.h"
 
@@ -114,6 +115,27 @@ void centronics_write_handshake(int nr, int data, int mask)
 	This->control=neu;
 }
 
+static const device_config *printer_device(running_machine *machine, int index)
+{
+	const char *tag;
+	switch(index)
+	{
+		case 0:	
+			tag = "printer1";
+			break;
+		case 1:	
+			tag = "printer2";
+			break;
+		case 2:	
+			tag = "printer3";
+			break;
+		default:
+			fatalerror("Invalid device");
+			break;
+	}
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, tag);
+}
+
 int centronics_read_handshake(int nr)
 {
 	CENTRONICS *This=cent+nr;
@@ -132,7 +154,7 @@ int centronics_read_handshake(int nr)
 			data|=CENTRONICS_ONLINE;
 	}
 	data |= CENTRONICS_NO_ERROR;
-	if (!printer_status(image_from_devtype_and_index(IO_PRINTER, nr), 0))
+	if (!printer_is_ready(printer_device(Machine, nr)))
 		data |= CENTRONICS_NO_PAPER;
 
 	/* state of acknowledge */

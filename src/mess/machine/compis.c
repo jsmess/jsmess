@@ -373,6 +373,11 @@ READ16_HANDLER (compis_fdc_r)
 /*  PPI 8255                                                               */
 /*-------------------------------------------------------------------------*/
 
+static const device_config *printer_device(running_machine *machine)
+{
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
+
 /*-------------------------------------------------------------------------*/
 /* Bit 0: J7-2 Centronics D0           		                           */
 /* Bit 1: J7-3 Centronics D1           		                           */
@@ -405,7 +410,7 @@ static READ8_HANDLER ( compis_ppi_port_b_r )
 	data = input_port_read_indexed(machine, 6);
 
 	/* Centronics busy */
-	if (!printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0))
+	if (!printer_is_ready(printer_device(machine)))
 		data |= 0x20;
 
 	return 	data;

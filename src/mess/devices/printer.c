@@ -1,43 +1,77 @@
-/*
- * printer.c : simple printer port implementation
- * "online/offline" and output only.
- */
+/****************************************************************************
+
+	printer.c
+
+	Code for handling printer devices
+
+****************************************************************************/
 
 #include "driver.h"
 #include "printer.h"
 
 
-int printer_status(const device_config *img, int newstatus)
+
+/*-------------------------------------------------
+	printer_is_ready - checks to see if a printer
+	is ready
+-------------------------------------------------*/
+
+int printer_is_ready(const device_config *printer)
 {
 	/* if there is a file attached to it, it's online */
-	return image_exists(img) != 0;
+	return image_exists(printer) != 0;
 }
 
 
 
-void printer_output(const device_config *img, int data)
+/*-------------------------------------------------
+    printer_output - outputs data to a printer
+-------------------------------------------------*/
+
+void printer_output(const device_config *printer, UINT8 data)
 {
-	if (image_exists(img))
+	if (image_exists(printer))
 	{
-		UINT8 d = data;
-		image_fwrite(img, &d, 1);
+		image_fwrite(printer, &data, 1);
 	}
 }
 
 
 
-void printer_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+/*-------------------------------------------------
+    DEVICE_START(printer)
+-------------------------------------------------*/
+
+DEVICE_START(printer)
+{
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO(printer)
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(printer)
 {
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PRINTER; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = 1; break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0; break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL; break;
+		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_PRINTER; break;
+		case DEVINFO_INT_IMAGE_READABLE:				info->i = 0; break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
+		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(printer); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_DEV_FILE:						strcpy(info->s = device_temp_str(), __FILE__); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "prn"); break;
+		case DEVINFO_STR_NAME:							info->s = "Printer"; break;
+		case DEVINFO_STR_FAMILY:						info->s = "Printer"; break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__; break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "prn"; break;
 	}
 }

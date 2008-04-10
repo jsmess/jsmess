@@ -57,9 +57,9 @@ static const device_config *cassette_device_image(void)
 	return image_from_devtype_and_index(IO_CASSETTE, 0);
 }
 
-static const device_config *printer_image(void)
+static const device_config *printer_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_PRINTER, 0);
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
 }
 
 /* printer status */
@@ -69,7 +69,7 @@ static  READ8_HANDLER(atom_via_in_a_func)
 
 	data = atom_printer_data;
 
-	if (!printer_status(printer_image(),0))
+	if (!printer_is_ready(printer_image(machine)))
 	{
 		/* offline */
 		data |=0x080;
@@ -99,7 +99,7 @@ static WRITE8_HANDLER(atom_via_out_ca2_func)
 		if (data & 0x01)
 		{
 			/* output data to printer */
-			printer_output(printer_image(), atom_printer_data);
+			printer_output(printer_image(machine), atom_printer_data);
 		}
 	}
 

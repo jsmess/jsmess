@@ -245,20 +245,6 @@ static void mo5_cartridge_getinfo( const mess_device_class *devclass, UINT32 sta
 }
 
 
-/* ------------ printer ------------ */
-
-static void thom_printer_getinfo ( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch ( state ) {
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 1;
-		break;
-	default:
-		printer_device_getinfo( devclass, state, info );
-	}
-}
-
-
 /* ------------ serial ------------ */
 
 static const char *const thom_serial_names[3][3]=
@@ -715,7 +701,6 @@ SYSTEM_CONFIG_START ( to )
      CONFIG_DEVICE ( to7_cartridge_getinfo )
      CONFIG_DEVICE ( to7_cassette_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
-     CONFIG_DEVICE ( thom_printer_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
 
@@ -769,6 +754,9 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 6-bit game extention DAC */
      MDRV_SOUND_ADD ( DAC, 0 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
+
+	 /* printer */
+	 MDRV_DEVICE_ADD("printer", PRINTER)
 
 MACHINE_DRIVER_END
 
@@ -1137,7 +1125,6 @@ SYSTEM_CONFIG_START ( mo )
      CONFIG_DEVICE ( mo5_cartridge_getinfo )
      CONFIG_DEVICE ( mo5_cassette_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
-     CONFIG_DEVICE ( thom_printer_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
 

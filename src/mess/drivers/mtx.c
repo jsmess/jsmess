@@ -249,6 +249,9 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SN76489A, MTX_SYSTEM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -286,18 +289,6 @@ ROM_END
  *
  *************************************/
 
-static void mtx_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static void mtx_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
@@ -318,7 +309,6 @@ static void mtx_snapshot_getinfo(const mess_device_class *devclass, UINT32 state
 
 SYSTEM_CONFIG_START( mtx_common )
 	CONFIG_DEVICE(mtx_snapshot_getinfo)
-	CONFIG_DEVICE(mtx_printer_getinfo)
 	CONFIG_RAM(160 * 1024)
 	CONFIG_RAM(192 * 1024)
 	CONFIG_RAM(224 * 1024)

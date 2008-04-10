@@ -324,6 +324,9 @@ static MACHINE_DRIVER_START(laser110)
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_CONFIG(speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser200)
@@ -459,18 +462,6 @@ static void vtech1_quickload_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-static void vtech1_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void vtech1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
@@ -537,7 +528,6 @@ static void vtech1_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
    easily modified to work on another model. */
 
 SYSTEM_CONFIG_START(vtech1)
-    CONFIG_DEVICE(vtech1_printer_getinfo)
     CONFIG_DEVICE(cartslot_device_getinfo)
     CONFIG_DEVICE(vtech1_cassette_getinfo)
     CONFIG_DEVICE(vtech1_snapshot_getinfo)

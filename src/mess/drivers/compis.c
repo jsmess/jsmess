@@ -238,6 +238,8 @@ static MACHINE_DRIVER_START( compis )
 	MDRV_VIDEO_START(compis_gdc)
 	MDRV_VIDEO_UPDATE(compis_gdc)
 
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -250,18 +252,6 @@ ROM_START (compis)
      ROM_REGION (0x100000, REGION_CPU1, 0)
      ROM_LOAD ("compis.rom", 0xf0000, 0x10000, CRC(89877688) SHA1(7daa1762f24e05472eafc025879da90fe61d0225))
 ROM_END
-
-static void compis_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void compis_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -279,7 +269,6 @@ static void compis_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 }
 
 SYSTEM_CONFIG_START(compis)
-	CONFIG_DEVICE(compis_printer_getinfo)
 	CONFIG_DEVICE(compis_floppy_getinfo)
 SYSTEM_CONFIG_END
 

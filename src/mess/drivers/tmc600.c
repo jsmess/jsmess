@@ -468,6 +468,10 @@ static MACHINE_DRIVER_START( tmc600 )
 
 	MDRV_SOUND_ADD(CDP1869, CDP1869_DOT_CLK_PAL)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
+
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -535,18 +539,6 @@ static void tmc600_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static void tmc600_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void tmc600_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
@@ -568,7 +560,6 @@ SYSTEM_CONFIG_START( tmc600 )
 	CONFIG_RAM			(24 * 1024)
 	CONFIG_DEVICE(tmc600_cassette_getinfo)
 	CONFIG_DEVICE(tmc600_floppy_getinfo)
-	CONFIG_DEVICE(tmc600_printer_getinfo)
 	CONFIG_DEVICE(tmc600_quickload_getinfo)
 SYSTEM_CONFIG_END
 

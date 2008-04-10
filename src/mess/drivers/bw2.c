@@ -726,6 +726,9 @@ static MACHINE_DRIVER_START( bw2 )
 
 	MDRV_DEVICE_ADD(MSM6255_TAG, MSM6255)
 	MDRV_DEVICE_CONFIG(bw2_msm6255_intf)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -744,22 +747,6 @@ ROM_START( bw2 )
 	ROM_REGION(0x4000, REGION_USER1, 0)
 	ROM_LOAD("ramcard-10.bin", 0x0000, 0x4000, CRC(68cde1ba) SHA1(a776a27d64f7b857565594beb63aa2cd692dcf04))
 ROM_END
-
-static void bw2_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:
-			info->i = 1;
-			break;
-
-		default:
-			printer_device_getinfo(devclass, state, info);
-			break;
-	}
-}
 
 static void bw2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -828,7 +815,6 @@ static void bw2_serial_getinfo(const mess_device_class *devclass, UINT32 state, 
 }
 
 SYSTEM_CONFIG_START( bw2 )
-	CONFIG_DEVICE( bw2_printer_getinfo )
 	CONFIG_DEVICE( bw2_floppy_getinfo )
 	CONFIG_DEVICE( bw2_serial_getinfo )
 	CONFIG_RAM_DEFAULT( 64 * 1024 )

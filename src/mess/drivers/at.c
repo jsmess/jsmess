@@ -489,6 +489,11 @@ static MACHINE_DRIVER_START( atcga )
 #endif
 
 	MDRV_NVRAM_HANDLER( mc146818 )
+
+	/* printers */
+	MDRV_DEVICE_ADD("printer1", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -529,6 +534,11 @@ static MACHINE_DRIVER_START( ps2m30286 )
 #endif
 
 	MDRV_NVRAM_HANDLER( mc146818 )
+
+	/* printers */
+	MDRV_DEVICE_ADD("printer1", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -574,6 +584,11 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
+
+	/* printers */
+	MDRV_DEVICE_ADD("printer1", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -616,6 +631,11 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
+
+	/* printers */
+	MDRV_DEVICE_ADD("printer1", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -744,18 +764,6 @@ ROM_START( at586 )
     ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END
 
-static void ibmat_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 3; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void ibmat_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -785,7 +793,6 @@ static void ibmat_harddisk_getinfo(const mess_device_class *devclass, UINT32 sta
 
 SYSTEM_CONFIG_START(ibmat)
 	CONFIG_RAM_DEFAULT( (640+1024) * 1024 )
-	CONFIG_DEVICE(ibmat_printer_getinfo)
 	CONFIG_DEVICE(ibmat_floppy_getinfo)
 	CONFIG_DEVICE(ibmat_harddisk_getinfo)
 SYSTEM_CONFIG_END

@@ -278,9 +278,14 @@ static WRITE8_HANDLER( svi318_printer_w )
 	}
 }
 
+static const device_config *printer_device(running_machine *machine)
+{
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
+
 static READ8_HANDLER( svi318_printer_r )
 {
-	if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0) )
+	if (printer_is_ready(printer_device(machine)) )
 		return 0xfe;
 
 	return 0xff;

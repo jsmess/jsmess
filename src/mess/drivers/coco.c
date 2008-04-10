@@ -599,6 +599,9 @@ static MACHINE_DRIVER_START( dragon32 )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -619,6 +622,9 @@ static MACHINE_DRIVER_START( dragon64 )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -639,6 +645,9 @@ static MACHINE_DRIVER_START( d64plus )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -662,6 +671,9 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_SOUND_ADD(AY8912, 1000000)
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -682,6 +694,9 @@ static MACHINE_DRIVER_START( tanodr64 )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -1092,26 +1107,6 @@ static void coco3_snapshot_getinfo(const mess_device_class *devclass, UINT32 sta
 }
 
 /*************************************
-*
-*   Dragon only devices
-*
-**************************************/
-
-static void dragon_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* printer port */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										printer_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-
-/*************************************
  *
  *  CoCo sysconfig structures
  *
@@ -1138,7 +1133,6 @@ SYSTEM_CONFIG_START( generic_dragon )
 	CONFIG_DEVICE( coco_floppy_getinfo )
 	CONFIG_DEVICE( coco_cartslot_getinfo )
 	CONFIG_DEVICE( coco_snapshot_getinfo )
-	CONFIG_DEVICE( dragon_printer_getinfo )
 SYSTEM_CONFIG_END
 
 

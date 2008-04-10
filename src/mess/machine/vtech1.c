@@ -547,6 +547,11 @@ WRITE8_HANDLER(vtech1_latch_w)
  Printer Handling
 ******************************************************************************/
 
+static const device_config *printer_device(running_machine *machine)
+{
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
+
 /*
 The VZ200/300 printer interface uses I/O port address OE Hex for the ASCII
 character code data and strobe output, and address OOH for the busy/ready-bar
@@ -557,7 +562,7 @@ READ8_HANDLER(vtech1_printer_r)
 {
 	int data = 0xff;
 
-	if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0))
+	if (printer_is_ready(printer_device(machine)))
 		data &= ~0x01;
 
 	return data;
