@@ -9,6 +9,7 @@
 #include "devices/cartslot.h"
 
 #include "includes/gmaster.h"
+#include "gmaster.lh"
 
 #define MAIN_XTAL 	12000000
 
@@ -152,8 +153,8 @@ INPUT_PORTS_END
 static unsigned char gmaster_palette[2][3] =
 {
 #if 1
-    // ziemlich schwierig den lcd touch r�berzubringen
-    // es ist haupts�chlich die das fleckige gr�nlich, bl�uliche
+    // ziemlich schwierig den lcd touch rüberzubringen
+    // es ist hauptsächlich die das fleckige grünlich, bläuliche
     { 130, 159, 166 },
     { 45,45,43 }
 #else
@@ -231,6 +232,7 @@ MDRV_CPU_VBLANK_INT("main", gmaster_interrupt)
   MDRV_PALETTE_LENGTH(sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
   MDRV_VIDEO_UPDATE(gmaster)
      MDRV_PALETTE_INIT(gmaster)
+     MDRV_DEFAULT_LAYOUT(layout_gmaster)
 
      MDRV_SPEAKER_STANDARD_MONO("gmaster")
      MDRV_SOUND_ADD(CUSTOM, 0)
