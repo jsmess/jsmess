@@ -392,7 +392,7 @@ static const struct CustomSound_interface gmaster_sound_interface =
 };
 #endif
 
-static int pasogo_irq_callback(int irqline)
+static IRQ_CALLBACK(pasogo_irq_callback)
 {
 	return pic8259_acknowledge(0);
 }

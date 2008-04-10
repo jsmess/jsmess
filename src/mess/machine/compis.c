@@ -571,7 +571,7 @@ WRITE16_HANDLER ( compis_usart_w )
  *	80186 interrupt controller
  *
  *************************************/
-static int int_callback(int line)
+static IRQ_CALLBACK(int_callback)
 {
 	if (LOG_INTERRUPTS)
 		logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time()), i186.intr.poll_status & 0x1f);
@@ -1050,7 +1050,7 @@ READ16_HANDLER( i186_internal_port_r )
 			if (LOG_PORTS)
             logerror("%05X:read 80186 interrupt poll\n", activecpu_get_pc());
 			if (i186.intr.poll_status & 0x8000)
-				int_callback(0);
+				int_callback(machine, 0);
 			return (i186.intr.poll_status >> shift) & 0xff;
 
 		case 0x13:
@@ -1556,7 +1556,7 @@ static void compis_pic_set_int_line(int which, int interrupt)
 	}
 }
 
-static int compis_irq_callback(int irqline)
+static IRQ_CALLBACK(compis_irq_callback)
 {
 	return pic8259_acknowledge(0);
 }
@@ -1570,7 +1570,7 @@ static const compis_gdc_interface i82720_interface =
 DRIVER_INIT( compis )
 {
 	compis_init( &i82720_interface );
-	cpunum_set_irq_callback(0,	compis_irq_callback);
+	cpunum_set_irq_callback(0, compis_irq_callback);
 	pic8259_init(2, compis_pic_set_int_line);
 	memset (&compis, 0, sizeof (compis) );
 }

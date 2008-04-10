@@ -1388,7 +1388,7 @@ static const CENTRONICS_CONFIG einstein_cent_config[1]={
 
 /* when Z80 acknowledges int, /IORQ and /M1 will be low */
 /* this allows I057 octal latch to output data onto the bus */
-static int einstein_cpu_acknowledge_int(int cpu)
+static IRQ_CALLBACK(einstein_cpu_acknowledge_int)
 {
 	int vector = 0;
 

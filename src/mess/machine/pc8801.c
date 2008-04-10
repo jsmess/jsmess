@@ -127,7 +127,7 @@ static void pc8801_update_interrupt(running_machine *machine)
 	}
 }
 
-static int pc8801_interupt_callback (int cpu)
+static IRQ_CALLBACK(pc8801_interupt_callback)
 {
 	int level, i;
 

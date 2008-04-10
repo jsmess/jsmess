@@ -71,14 +71,14 @@ static int check_kickstart_12_13( const char *cart_name )
 
 static int amiga_ar1_spurious;
 
-static int amiga_ar1_irqack( int level )
+static IRQ_CALLBACK(amiga_ar1_irqack)
 {
-	if ( level == 7 && amiga_ar1_spurious )
+	if ( irqline == 7 && amiga_ar1_spurious )
 	{
 		return M68K_INT_ACK_SPURIOUS;
 	}
 
-	return (24+level);
+	return (24+irqline);
 }
 
 static TIMER_CALLBACK( amiga_ar1_delayed_nmi )

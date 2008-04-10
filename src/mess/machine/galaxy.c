@@ -48,7 +48,7 @@ INTERRUPT_GEN( galaxy_interrupt )
 	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
-static int galaxy_irq_callback (int cpu)
+static IRQ_CALLBACK(galaxy_irq_callback)
 {
 	galaxy_interrupts_enabled = TRUE;
 	return 1;

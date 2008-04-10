@@ -84,9 +84,9 @@ static UINT32 *cart_base;
 static size_t cart_size;
 
 
-static int jaguar_irq_callback(int level)
+static IRQ_CALLBACK(jaguar_irq_callback)
 {
-	return (level == 6) ? 0x40 : -1;
+	return (irqline == 6) ? 0x40 : -1;
 }
 
 /*************************************

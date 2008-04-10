@@ -99,7 +99,6 @@ Some bugs left :
 #include "devices/printer.h"
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
-#include "deprecat.h"
 
 
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
@@ -1807,7 +1806,7 @@ static WRITE8_HANDLER(multiface_io_write)
 /* called when cpu acknowledges int */
 /* reset top bit of interrupt line counter */
 /* this ensures that the next interrupt is no closer than 32 lines */
-static int amstrad_cpu_acknowledge_int(int cpu)
+static IRQ_CALLBACK(amstrad_cpu_acknowledge_int)
 {
 	// DMA interrupts can be automatically cleared if bit 0 of &6805 is set to 0
 	if(amstrad_plus_asic_enabled != 0 && amstrad_plus_irq_cause != 0x06 && amstrad_plus_dma_clear & 0x01)
@@ -1816,7 +1815,7 @@ static int amstrad_cpu_acknowledge_int(int cpu)
 		amstrad_plus_asic_ram[0x2c0f] &= ~0x80;  // not a raster interrupt, so this bit is reset
 		return (amstrad_plus_asic_ram[0x2805] & 0xf8) + amstrad_plus_irq_cause;
 	}
-	cpunum_set_input_line(Machine, 0,0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0,0, CLEAR_LINE);
 	amstrad_CRTC_HS_Counter &= 0x1F;
 	if(amstrad_plus_asic_enabled != 0)
 	{

@@ -324,7 +324,7 @@ DRIVER_INIT( ps2m30286 )
 
 
 
-static int at_irq_callback(int irqline)
+static IRQ_CALLBACK(at_irq_callback)
 {
 	return pic8259_acknowledge(0);
 }

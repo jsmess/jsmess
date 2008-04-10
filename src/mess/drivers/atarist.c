@@ -1410,11 +1410,11 @@ static READ8_HANDLER( mfp_gpio_r )
 	return data;
 }
 
-static int atarist_int_ack(int line)
+static IRQ_CALLBACK(atarist_int_ack)
 {
-	atarist_state *state = Machine->driver_data;
+	atarist_state *state = machine->driver_data;
 
-	if (line == MC68000_IRQ_6)
+	if (irqline == MC68000_IRQ_6)
 	{
 		return mc68901_get_vector(state->mfp);
 	}

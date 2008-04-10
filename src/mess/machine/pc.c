@@ -478,7 +478,7 @@ DRIVER_INIT( pc_vga )
 	pc_vga_init(machine, &vga_interface, NULL);
 }
 
-static int pc_irq_callback(int irqline)
+static IRQ_CALLBACK(pc_irq_callback)
 {
 	return pic8259_acknowledge(0);
 }

@@ -1458,9 +1458,9 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 //      video_screen_update_partial(machine->primary_screen,512);//sys.crtc.reg[4]);
 }
 
-static int x68k_int_ack(int line)
+static IRQ_CALLBACK(x68k_int_ack)
 {
-	if(line == 6)  // MFP
+	if(irqline == 6)  // MFP
 	{
 //      if(sys.mfp.isra & 0x10)
 //          sys.mfp.rsr &= ~0x80;
@@ -1483,22 +1483,22 @@ static int x68k_int_ack(int line)
 //      }
 		sys.mfp.current_irq = -1;
 		current_vector[6] = mc68901_get_vector(x68k_mfp);
-		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],line);
+		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],irqline);
 		return current_vector[6];
 	}
 
-	cpunum_set_input_line_and_vector(Machine, 0,line,CLEAR_LINE,current_vector[line]);
-	if(line == 1)  // IOSC
+	cpunum_set_input_line_and_vector(machine, 0,irqline,CLEAR_LINE,current_vector[irqline]);
+	if(irqline == 1)  // IOSC
 	{
 		sys.ioc.irqstatus &= ~0xf0;
 	}
-	if(line == 5)  // SCC
+	if(irqline == 5)  // SCC
 	{
 		sys.mouse.irqactive = 0;
 	}
 
-	logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[line],line);
-	return current_vector[line];
+	logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[irqline],irqline);
+	return current_vector[irqline];
 }
 
 static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
