@@ -824,6 +824,11 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
 	DRIVER( pro128 )	/* 1986 Oliveti Prodest PC 128						*/
 
+	/* Cybiko, Inc. */
+TESTDRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
+TESTDRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
+TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
+
 	/* Dick Smith */
 	DRIVER( super80 )
 	DRIVER( super80d )
@@ -864,10 +869,6 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	/* Exeltel */
 TESTDRIVER( exeltel )	
 
-	/* Cybiko */
-TESTDRIVER( cybikov1 )
-TESTDRIVER( cybikov2 )
-TESTDRIVER( cybikoxt )
 
 
 
