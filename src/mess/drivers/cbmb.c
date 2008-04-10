@@ -412,9 +412,8 @@ static INPUT_PORTS_START (cbm500)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RVS OFF") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GRAPH NORM") PORT_CODE(KEYCODE_PGUP)
 	CBMB_KEYBOARD
-	/*C64_DIPS */
-	PORT_START_TAG( "DSW0" ) /* no idea what needs this but it bombs without it */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED)
+	/* Added this line after a suggestion by etabeta. It's still unknown what process needs DSW0 to exist */
+	C64_DIPS
 INPUT_PORTS_END
 
 static const unsigned char cbm700_palette[] =
