@@ -13,55 +13,104 @@
 #include "printer.h"
 
 
-static TIMER_CALLBACK(bitbanger_overthreshhold);
 
-struct bitbanger_info
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _bitbanger_token bitbanger_token;
+struct _bitbanger_token
 {
-	const struct bitbanger_config *config;
 	double last_pulse_time;
 	double *pulses;
 	int *factored_pulses;
 	int recorded_pulses;
 	int value;
-	void *timeout_timer;
+	emu_timer *timeout_timer;
 	int over_threshhold;
 };
 
-static struct bitbanger_info *bitbangers[MAX_PRINTER];
 
-static DEVICE_START(bitbanger)
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+static TIMER_CALLBACK(bitbanger_overthreshhold);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    get_token - safely gets the bitbanger data
+-------------------------------------------------*/
+
+INLINE bitbanger_token *get_token(const device_config *device)
 {
-	int id = image_index_in_device(device);
-	struct bitbanger_info *bi;
-	const struct bitbanger_config *config;
-	const struct IODevice *dev;
-
-	dev = mess_device_from_core_device(device);
-	config = (const struct bitbanger_config *) mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_BITBANGER_CONFIG);
-
-	bi = (struct bitbanger_info *) auto_malloc(sizeof(struct bitbanger_info));
-	bi->pulses = (double *) auto_malloc(config->maximum_pulses * sizeof(double));
-	bi->factored_pulses = (int *) auto_malloc(config->maximum_pulses * sizeof(int));
-	bi->config = config;
-	bi->last_pulse_time = 0.0;
-	bi->recorded_pulses = 0;
-	bi->value = config->initial_value;
-	bi->timeout_timer = timer_alloc(bitbanger_overthreshhold, NULL);
-	bi->over_threshhold = 1;
-
-	bitbangers[id] = bi;
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == BITBANGER);
+	return (bitbanger_token *) device->token;
 }
 
 
 
-static void bitbanger_analyze(int id, struct bitbanger_info *bi)
+/*-------------------------------------------------
+    get_config - safely gets the bitbanger config
+-------------------------------------------------*/
+
+INLINE const bitbanger_config *get_config(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == BITBANGER);
+	return (const bitbanger_config *) device->static_config;
+}
+
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    DEVICE_START(bitbanger)
+-------------------------------------------------*/
+
+static DEVICE_START(bitbanger)
+{
+	bitbanger_token *bi;
+	const bitbanger_config *config = get_config(device);
+
+	bi = get_token(device);
+	bi->pulses = (double *) auto_malloc(config->maximum_pulses * sizeof(double));
+	bi->factored_pulses = (int *) auto_malloc(config->maximum_pulses * sizeof(int));
+	bi->last_pulse_time = 0.0;
+	bi->recorded_pulses = 0;
+	bi->value = config->initial_value;
+	bi->timeout_timer = timer_alloc(bitbanger_overthreshhold, (void *) device);
+	bi->over_threshhold = 1;
+}
+
+
+
+/*-------------------------------------------------
+    bitbanger_analyze
+-------------------------------------------------*/
+
+static void bitbanger_analyze(const device_config *device)
 {
 	int i, factor, total_duration;
 	double smallest_pulse;
 	double d;
+	bitbanger_token *bi = get_token(device);
+	const bitbanger_config *config = get_config(device);
 
 	/* compute the smallest pulse */
-	smallest_pulse = bi->config->pulse_threshhold;
+	smallest_pulse = config->pulse_threshhold;
 	for (i = 0; i < bi->recorded_pulses; i++)
 		if (smallest_pulse > bi->pulses[i])
 			smallest_pulse = bi->pulses[i];
@@ -75,8 +124,8 @@ static void bitbanger_analyze(int id, struct bitbanger_info *bi)
 
 		for (i = 0; i < bi->recorded_pulses; i++)
 		{
-			d = bi->pulses[i] / smallest_pulse * factor + bi->config->pulse_tolerance;
-			if ((i < (bi->recorded_pulses-1)) && (d - floor(d)) >= (bi->config->pulse_tolerance * 2))
+			d = bi->pulses[i] / smallest_pulse * factor + config->pulse_tolerance;
+			if ((i < (bi->recorded_pulses-1)) && (d - floor(d)) >= (config->pulse_tolerance * 2))
 			{
 				i = -1;
 				break;
@@ -85,48 +134,66 @@ static void bitbanger_analyze(int id, struct bitbanger_info *bi)
 			total_duration += (int) d;
 		}
 	}
-	while((i == -1) && (factor < bi->config->maximum_pulses));
+	while((i == -1) && (factor < config->maximum_pulses));
 	if (i == -1)
 		return;
 
 	/* filter the output */
-	if (bi->config->filter(image_from_devtype_and_index(IO_BITBANGER, id), bi->factored_pulses, bi->recorded_pulses, total_duration))
+	if (config->filter(device, bi->factored_pulses, bi->recorded_pulses, total_duration))
 		bi->recorded_pulses = 0;
 }
 
 
 
-static void bitbanger_addpulse(int id, struct bitbanger_info *bi, double pulse_width)
+/*-------------------------------------------------
+    bitbanger_addpulse
+-------------------------------------------------*/
+
+static void bitbanger_addpulse(const device_config *device, double pulse_width)
 {
+	bitbanger_token *bi = get_token(device);
+	const bitbanger_config *config = get_config(device);
+
 	/* exceeded total countable pulses? */
-	if (bi->recorded_pulses == bi->config->maximum_pulses)
+	if (bi->recorded_pulses == config->maximum_pulses)
 		memmove(bi->pulses, bi->pulses + 1, (--bi->recorded_pulses) * sizeof(double));
 
 	/* record the pulse */
 	bi->pulses[bi->recorded_pulses++] = pulse_width;
 
 	/* analyze, if necessary */
-	if (bi->recorded_pulses >= bi->config->minimum_pulses)
-		bitbanger_analyze(id, bi);
+	if (bi->recorded_pulses >= config->minimum_pulses)
+		bitbanger_analyze(device);
 }
 
 
 
+/*-------------------------------------------------
+    TIMER_CALLBACK(bitbanger_overthreshhold)
+-------------------------------------------------*/
+
 static TIMER_CALLBACK(bitbanger_overthreshhold)
 {
-	int id = param;
-	struct bitbanger_info *bi = bitbangers[id];
-	bitbanger_addpulse(id, bi, attotime_to_double(timer_get_time()) - bi->last_pulse_time);
+	const device_config *device = (const device_config *) ptr;
+	bitbanger_token *bi = get_token(device);
+
+	bitbanger_addpulse(device, attotime_to_double(timer_get_time()) - bi->last_pulse_time);
 	bi->over_threshhold = 1;
 	bi->recorded_pulses = 0;
 }
 
 
 
-void bitbanger_output(const device_config *img, int value)
+/*-------------------------------------------------
+    bitbanger_output - outputs data to a bitbanger
+	port
+-------------------------------------------------*/
+
+void bitbanger_output(const device_config *device, int value)
 {
-	int id = image_index_in_device(img);
-	struct bitbanger_info *bi = bitbangers[id];
+	bitbanger_token *bi = get_token(device);
+	const bitbanger_config *config = get_config(device);
+
 	double current_time;
 	double pulse_width;
 
@@ -141,8 +208,8 @@ void bitbanger_output(const device_config *img, int value)
 
 		assert(pulse_width >= 0);
 
-		if (!bi->over_threshhold && ((bi->recorded_pulses > 0) || (bi->value == bi->config->initial_value)))
-			bitbanger_addpulse(id, bi, pulse_width);
+		if (!bi->over_threshhold && ((bi->recorded_pulses > 0) || (bi->value == config->initial_value)))
+			bitbanger_addpulse(device, pulse_width);
 
 		/* update state */
 		bi->value = value;
@@ -150,27 +217,37 @@ void bitbanger_output(const device_config *img, int value)
 		bi->over_threshhold = 0;
 
 		/* update timeout timer */
-		timer_reset(bi->timeout_timer, double_to_attotime(bi->config->pulse_threshhold));
+		timer_reset(bi->timeout_timer, double_to_attotime(config->pulse_threshhold));
 	}
 }
 
 
 
-void bitbanger_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+/*-------------------------------------------------
+    DEVICE_GET_INFO(bitbanger) - device getinfo
+	function
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(bitbanger)
 {
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:						info->i = IO_BITBANGER; break;
-		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:				info->i = 1; break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(bitbanger_token); break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0; break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL; break;
+		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_PRINTER; break;
+		case DEVINFO_INT_IMAGE_READABLE:				info->i = 0; break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
+		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:					info->start = DEVICE_START_NAME(bitbanger); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(bitbanger); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "prn"); break;
+		case DEVINFO_STR_NAME:							info->s = "Bitbanger"; break;
+		case DEVINFO_STR_FAMILY:						info->s = "Bitbanger"; break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__; break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "prn"; break;
 	}
 }

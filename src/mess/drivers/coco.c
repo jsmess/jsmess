@@ -563,6 +563,58 @@ static INPUT_PORTS_START( coco3 )
 	PORT_INCLUDE( cart_autostart )
 INPUT_PORTS_END
 
+/***************************************************************************
+  Bitbanger port
+***************************************************************************/
+
+static int coco_bitbanger_filter(const device_config *img, const int *pulses, int total_pulses, int total_duration)
+{
+	int i;
+	int result = 0;
+	int word;
+	int pos;
+	int pulse_type;
+	int c;
+
+	if (total_duration >= 11)
+	{
+		word = 0;
+		pos = 0;
+		pulse_type = 0;
+		result = 1;
+
+		for (i = 0; i < total_pulses; i++)
+		{
+			if (pulse_type)
+				word |= ((1 << pulses[i]) - 1) << pos;
+			pulse_type ^= 1;
+			pos += pulses[i];
+		}
+
+		c = (word >> 1) & 0xff;
+		printer_output(img, c);
+	}
+	return result;
+}
+
+static const bitbanger_config coco_bitbanger_config =
+{
+	coco_bitbanger_filter,
+	1.0 / 10.0,
+	0.2,
+	2,
+	10,
+	0,
+	0
+};
+
+static MACHINE_DRIVER_START( coco_bitbanger )
+	MDRV_DEVICE_ADD("bitbanger", BITBANGER)
+	MDRV_DEVICE_CONFIG(coco_bitbanger_config)
+MACHINE_DRIVER_END
+
+/* ----------------------------------------------------------------------- */
+
 /* AY-8912 for Dragon Alpha, the AY-8912 simply an AY-8910 with only one io port. */
 static const struct AY8910interface ay8912_interface =
 {
@@ -717,6 +769,9 @@ static MACHINE_DRIVER_START( coco )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
+
+	/* bitbanger/printer */
+	MDRV_IMPORT_FROM( coco_bitbanger )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -737,6 +792,9 @@ static MACHINE_DRIVER_START( coco2 )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
+
+	/* bitbanger/printer */
+	MDRV_IMPORT_FROM( coco_bitbanger )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -757,6 +815,9 @@ static MACHINE_DRIVER_START( coco2b )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
+
+	/* bitbanger/printer */
+	MDRV_IMPORT_FROM( coco_bitbanger )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -786,6 +847,9 @@ static MACHINE_DRIVER_START( coco3 )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
+
+	/* bitbanger/printer */
+	MDRV_IMPORT_FROM( coco_bitbanger )
 
 	/* devices */
 	MDRV_DEVICE_ADD("vhd", COCO_VHD)
@@ -895,75 +959,11 @@ ROM_END
 
 #define rom_coco3h	rom_coco3
 
-/***************************************************************************
-  Bitbanger port
-***************************************************************************/
-
-static int coco_bitbanger_filter(const device_config *img, const int *pulses, int total_pulses, int total_duration)
-{
-	int i;
-	int result = 0;
-	int word;
-	int pos;
-	int pulse_type;
-	int c;
-
-	if (total_duration >= 11)
-	{
-		word = 0;
-		pos = 0;
-		pulse_type = 0;
-		result = 1;
-
-		for (i = 0; i < total_pulses; i++)
-		{
-			if (pulse_type)
-				word |= ((1 << pulses[i]) - 1) << pos;
-			pulse_type ^= 1;
-			pos += pulses[i];
-		}
-
-		c = (word >> 1) & 0xff;
-		printer_output(img, c);
-	}
-	return result;
-}
-
-static const struct bitbanger_config coco_bitbanger_config =
-{
-	coco_bitbanger_filter,
-	1.0 / 10.0,
-	0.2,
-	2,
-	10,
-	0,
-	0
-};
-
-/* ----------------------------------------------------------------------- */
-
 /*************************************
  *
  *  CoCo device getinfo functions
  *
  *************************************/
-
-static void coco_bitbanger_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* bitbanger port */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_BITBANGER_CONFIG:				info->p = (void *) &coco_bitbanger_config; break;
-
-		default:										bitbanger_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 
 static void coco_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -1114,7 +1114,6 @@ static void coco3_snapshot_getinfo(const mess_device_class *devclass, UINT32 sta
 
 
 SYSTEM_CONFIG_START( generic_coco )
-	CONFIG_DEVICE( coco_bitbanger_getinfo )
 	CONFIG_DEVICE( coco_cassette_getinfo )
 	CONFIG_DEVICE( coco_floppy_getinfo )
 	CONFIG_DEVICE( coco_quickload_getinfo )

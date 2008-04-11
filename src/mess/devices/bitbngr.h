@@ -6,17 +6,24 @@
 
 *********************************************************************/
 
-#ifndef BITBNGR_H
-#define BITBNGR_H
+#ifndef __BITBNGR_H__
+#define __BITBNGR_H__
 
-#include "device.h"
 #include "image.h"
 
 
-struct bitbanger_config
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+#define BITBANGER	DEVICE_GET_INFO_NAME(bitbanger)
+
+typedef struct _bitbanger_config bitbanger_config;
+struct _bitbanger_config
 {
 	/* filter function; returns non-zero if input accepted */
-	int (*filter)(const device_config *img, const int *pulses, int total_pulses, int total_duration);
+	int (*filter)(const device_config *device, const int *pulses, int total_pulses, int total_duration);
 	double pulse_threshhold;			/* the maximum duration pulse that we will consider */
 	double pulse_tolerance;				/* deviation tolerance for pulses */
 	int minimum_pulses;					/* the minimum amount of pulses before we start analyzing */
@@ -25,15 +32,17 @@ struct bitbanger_config
 	int initial_value;					/* the initial value of the bitbanger line */
 };
 
-#define IO_BITBANGER IO_PRINTER
-
-enum
-{
-	MESS_DEVINFO_PTR_BITBANGER_CONFIG = MESS_DEVINFO_PTR_DEV_SPECIFIC
-};
-
-void bitbanger_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-void bitbanger_output(const device_config *img, int value);
 
 
-#endif /* BITBNGR_H */
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+/* outputs data to a bitbanger port */
+void bitbanger_output(const device_config *device, int value);
+
+/* device getinfo function */
+DEVICE_GET_INFO(bitbanger);
+
+
+#endif /* __BITBNGR_H__ */

@@ -1122,7 +1122,7 @@ static const device_config *cassette_device_image(void)
 
 static const device_config *bitbanger_image(void)
 {
-	return image_from_devtype_and_index(IO_BITBANGER, 0);
+	return device_list_find_by_tag(Machine->config->devicelist, BITBANGER, "bitbanger");
 }
 
 static const device_config *printer_image(void)
