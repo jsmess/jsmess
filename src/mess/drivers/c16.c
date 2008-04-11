@@ -894,9 +894,9 @@ SYSTEM_CONFIG_END
 /*      YEAR    NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG   COMPANY                                FULLNAME */
 COMP ( 1984,	c16,	0,		0,		c16,	c16,	c16,	c16,     "Commodore Business Machines Co.",      "Commodore 16/116/232/264 (PAL)", 0)
 COMP ( 1984,	c16hun, c16,	0,		c16,	c16,	c16,	c16,     "Commodore Business Machines Co.",      "Commodore 16 Novotrade (PAL, Hungarian Character Set)", 0)
-COMP ( 1984,	c16c,	c16,	0,		c16c,	c16c,	c16,	c16c,    "Commodore Business Machines Co.",      "Commodore 16/116/232/264 (PAL), 1551", GAME_NOT_WORKING)
+COMP ( 1984,	c16c,	c16,	0,		c16c,	c16c,	c16,	c16c,    "Commodore Business Machines Co.",      "Commodore 16/116/232/264 (PAL), 1551", 0 )
 COMP ( 1984,	plus4,	c16,	0,		plus4,	plus4,	plus4,	plus,    "Commodore Business Machines Co.",      "Commodore +4 (NTSC)", 0)
-COMP ( 1984,	plus4c, c16,	0,		plus4c, plus4c, plus4,	plusc,   "Commodore Business Machines Co.",      "Commodore +4 (NTSC), 1551", GAME_NOT_WORKING)
+COMP ( 1984,	plus4c, c16,	0,		plus4c, plus4c, plus4,	plusc,   "Commodore Business Machines Co.",      "Commodore +4 (NTSC), 1551", 0 )
 COMP ( 1984,	c364,	c16,	0,		c364,	plus4,	plus4,	plusv,   "Commodore Business Machines Co.",      "Commodore 364 (Prototype)", GAME_IMPERFECT_SOUND)
 COMP ( 1984,	c16v,	c16,	0,		c16v,	c16v,	c16,	c16v,    "Commodore Business Machines Co.",      "Commodore 16/116/232/264 (PAL), VC1541", GAME_NOT_WORKING)
 COMP ( 1984,	plus4v, c16,	0,		plus4v, plus4v, plus4,	plusv,   "Commodore Business Machines Co.",      "Commodore +4 (NTSC), VC1541", GAME_NOT_WORKING)
