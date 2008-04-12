@@ -1406,7 +1406,7 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 				/* check for only one transition */
 				if ((data & (1<<7)) == 0)  {
 					/* output data to printer */
-					printer_output(image_from_devtype_and_index(IO_PRINTER, 0), data & 0x07f);
+					printer_output(printer_device(machine), data & 0x07f);
 				}
 			}
 			previous_printer_data_byte = data;
