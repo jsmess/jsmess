@@ -191,7 +191,7 @@ void draw_led(running_machine *machine, bitmap_t *bitmap, const char *led, int v
 		else if (c >= 'a')
 		{
 			mask = 1 << (c - 'a');
-			color = machine->pens[(valueorcolor & mask) ? 1 : 0];
+			color = (valueorcolor & mask) ? 1 : 0;
 			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = color;
 		}
 		if (c != '\r')
