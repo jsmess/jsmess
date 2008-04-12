@@ -11,10 +11,9 @@
 #include "expat.h"
 
 
+
 /***************************************************************************
-
-	Type definitions
-
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 struct _hash_file
@@ -59,9 +58,17 @@ struct hash_parse_state
 
 
 /***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
-	Functions
+static void *expat_malloc(size_t size);
+static void *expat_realloc(void *ptr, size_t size);
+static void expat_free(void *ptr);
 
+
+
+/***************************************************************************
+    CORE IMPLEMENTATION
 ***************************************************************************/
 
 static void ATTR_PRINTF(2,3) parse_error(struct hash_parse_state *state, const char *fmt, ...)
@@ -296,6 +303,7 @@ static void hashfile_parse(hash_file *hashfile,
 	struct hash_parse_state state;
 	char buf[1024];
 	UINT32 len;
+	XML_Memory_Handling_Suite memcallbacks;
 
 	mame_fseek(hashfile->file, 0, SEEK_SET);
 
@@ -306,7 +314,11 @@ static void hashfile_parse(hash_file *hashfile,
 	state.error_proc = error_proc;
 	state.param = param;
 
-	state.parser = XML_ParserCreate(NULL);
+	/* create the XML parser */
+	memcallbacks.malloc_fcn = expat_malloc;
+	memcallbacks.realloc_fcn = expat_realloc;
+	memcallbacks.free_fcn = expat_free;
+	state.parser = XML_ParserCreate_MM(NULL, &memcallbacks, NULL);
 	if (!state.parser)
 		goto done;
 
@@ -481,3 +493,30 @@ int hashfile_verify(const char *sysname, void (*my_error_proc)(const char *messa
 	return 0;
 }
 
+
+
+/***************************************************************************
+    EXPAT INTERFACES
+***************************************************************************/
+
+/*-------------------------------------------------
+    expat_malloc/expat_realloc/expat_free -
+    wrappers for memory allocation functions so
+    that they pass through out memory tracking
+    systems
+-------------------------------------------------*/
+
+static void *expat_malloc(size_t size)
+{
+	return malloc(size);
+}
+
+static void *expat_realloc(void *ptr, size_t size)
+{
+	return realloc(ptr, size);
+}
+
+static void expat_free(void *ptr)
+{
+	free(ptr);
+}

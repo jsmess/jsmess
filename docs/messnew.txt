@@ -74,6 +74,9 @@ Source Changes:
  
 - Converted printers to the new device system.  [Nate Woods]
 
+- Fixed memory bug in the hash file parsing code that could cause problems in
+  debug builds.  [Nate Woods]
+
 
 
 0.124a
