@@ -30,6 +30,11 @@ System Driver Changes:
 
 - [COUPE] Added support for up to four 1 MB memory expansions.  [Dirk Best]
 
+- [GENESIS] Clean and speed up SSF2 banking [Cowering]
+
+- [GENESIS] Add automatic support for many 'pirate' carts (thanks to Haze for
+  them)  [Cowering]
+
 - [IBMPC,IBM5150] Renamed ibmpc driver to ibm5150.  [Wilbert Pol]
 
 - [MBEE] Added snapload support for MWB filetype. Added LOCK key to keyboard.
@@ -44,19 +49,17 @@ System Driver Changes:
 
 - [VECTREX] Fixed bug #1569 [Mathis Rosenhauer]
 
-- [GENESIS] Clean and speed up SSF2 banking [Cowering]
-
-- [GENESIS] Add automatic support for many 'pirate' carts (thanks to Haze for
-  them)  [Cowering]
-
 
 
 User Interface Changes:
 -----------------------
-- [MESSUI] Updated MESS icon, logo and other artwork (Asterokid, MAMEPlus team,
-  Hobie Troxell)
+- [Windows] Fixed "Configure..." dialog problem when customizing certain
+  system's controllers.  (bugs #1570, #1573) [Nate Woods]
+  
+- [Windows UI] Updated MESS icon, logo and other artwork (Asterokid, MAMEPlus
+  team, Hobie Troxell)
 
-- [MESSUI] Fixed custom filters dialog.  (bug #1574) [Nate Woods]
+- [Windows UI] Fixed custom filters dialog.  (bug #1574) [Nate Woods]
 
 
 
