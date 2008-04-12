@@ -574,7 +574,7 @@ WRITE8_HANDLER(vtech1_printer_w)
 
 	switch (offset) {
 		case 0x0d:	/* strobe data to printer */
-			printer_output(image_from_devtype_and_index(IO_PRINTER, 0), prn_data);
+			printer_output(printer_device(machine), prn_data);
 			break;
 		case 0x0e:	/* load output latch */
 			prn_data = data;
