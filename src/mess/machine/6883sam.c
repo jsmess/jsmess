@@ -119,6 +119,13 @@ static void update_sam(void)
 
 
 
+static STATE_POSTLOAD( update_sam_postload )
+{
+	update_sam();
+}
+
+
+
 void sam_init(running_machine *machine, const sam6883_interface *intf)
 {
 	sam.state = 0;
@@ -130,7 +137,7 @@ void sam_init(running_machine *machine, const sam6883_interface *intf)
 	/* save state registration */
 	state_save_register_item("6883sam", 0, sam.state);
 	state_save_register_item("6883sam", 0, sam.video_position);
-	state_save_register_func_postload(update_sam);
+	state_save_register_postload(machine, update_sam_postload, NULL);
 }
 
 

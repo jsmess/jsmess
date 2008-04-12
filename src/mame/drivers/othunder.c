@@ -416,7 +416,7 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 static READ16_HANDLER( othunder_lightgun_r )
 {
 	static const char *const dswname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
-	return readinputportbytag(dswname[offset]);
+	return input_port_read(machine, dswname[offset]);
 }
 
 static WRITE16_HANDLER( othunder_lightgun_w )
@@ -441,10 +441,15 @@ static void reset_sound_region(void)
 	memory_set_bankptr( 10, memory_region(REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
 }
 
+static STATE_POSTLOAD( othunder_postload )
+{
+	reset_sound_region();
+}
+
 static MACHINE_START( othunder )
 {
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, othunder_postload, NULL);
 }
 
 

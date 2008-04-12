@@ -26,6 +26,7 @@ Note: These issues have been verified on a real PCB and are not emulation bugs:
       - sprite / background priority ( see level 1: birds walk through
         branches of different trees )
       - see the beginning of level 3: background screwed
+      - gray tiles around the title in Top Secret
 
 ToDo:
 - get rid of input port hack
@@ -96,13 +97,13 @@ logerror("%06x: hacked_controls_r %04x %04x\n",activecpu_get_pc(),offset,bionicc
 
 static WRITE16_HANDLER( bionicc_mpu_trigger_w )
 {
-	data = readinputport(0) >> 12;
+	data = input_port_read_indexed(machine, 0) >> 12;
 	bionicc_inp[0] = data ^ 0x0f;
 
-	data = readinputport(3); /* player 2 controls */
+	data = input_port_read_indexed(machine, 3); /* player 2 controls */
 	bionicc_inp[1] = data ^ 0xff;
 
-	data = readinputport(2); /* player 1 controls */
+	data = input_port_read_indexed(machine, 2); /* player 1 controls */
 	bionicc_inp[2] = data ^ 0xff;
 }
 

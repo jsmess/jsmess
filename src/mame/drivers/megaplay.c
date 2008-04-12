@@ -136,8 +136,13 @@ static UINT32 readpos = 1;  // serial bank selection position (9-bit)
     PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) \
     PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) \
     PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-    PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_START1 ) \
-    PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+    PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
+    PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+/* Caused 01081:
+ *  PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_START1 ) \
+ *  PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+ */
 
 #define MEGAPLAY_DSWA \
 	PORT_START \
@@ -878,11 +883,11 @@ static READ16_HANDLER ( OLD_megaplay_genesis_io_r )
 		case 1: /* port A data (joypad 1) */
 
 			if (genesis_io_ram[offset] & 0x40)
-				return_value = readinputport(1) & (genesis_io_ram[4]^0xff);
+				return_value = input_port_read_indexed(machine, 1) & (genesis_io_ram[4]^0xff);
 			else
 			{
-				return_value = readinputport(2) & (genesis_io_ram[4]^0xff);
-				return_value |= readinputport(1) & 0x03;
+				return_value = input_port_read_indexed(machine, 2) & (genesis_io_ram[4]^0xff);
+				return_value |= input_port_read_indexed(machine, 1) & 0x03;
 			}
 			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
 //          logerror ("reading joypad 1 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
@@ -891,11 +896,11 @@ static READ16_HANDLER ( OLD_megaplay_genesis_io_r )
 		case 2: /* port B data (joypad 2) */
 
 			if (genesis_io_ram[offset] & 0x40)
-				return_value = readinputport(3) & (genesis_io_ram[5]^0xff);
+				return_value = input_port_read_indexed(machine, 3) & (genesis_io_ram[5]^0xff);
 			else
 			{
-				return_value = readinputport(4) & (genesis_io_ram[5]^0xff);
-				return_value |= readinputport(3) & 0x03;
+				return_value = input_port_read_indexed(machine, 4) & (genesis_io_ram[5]^0xff);
+				return_value |= input_port_read_indexed(machine, 3) & 0x03;
 			}
 			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
 //          logerror ("reading joypad 2 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);

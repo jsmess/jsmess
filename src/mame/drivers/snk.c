@@ -290,11 +290,11 @@ static int snk_sound_register;
 /*********************************************************************/
 
 
-static int snk_rot( int which ){
+static int snk_rot( running_machine *machine, int which ){
 	static int last_value[2] = {0, 0};
 	static int cp_count[2] = {0, 0};
 	int bttn;
-	int value = readinputport(which + 1);
+	int value = input_port_read_indexed(machine, which + 1);
 
 	/* For Guerilla War we add a 0xf0 value for 1 input read once every 8 rotations.
      * 0xf0 isn't a valid direction, but avoids the "joystick error" protection
@@ -325,20 +325,20 @@ static int snk_input_port_r( running_machine *machine, int which ){
 			return value;
 		}
 
-		case SNK_ROT_PLAYER1: return snk_rot( 0 );
-		case SNK_ROT_PLAYER2: return snk_rot( 1 );
+		case SNK_ROT_PLAYER1: return snk_rot( machine, 0 );
+		case SNK_ROT_PLAYER2: return snk_rot( machine, 1 );
 
-		case SNK_INP1: return input_port_1_r(machine,0);
-		case SNK_INP2: return input_port_2_r(machine,0);
-		case SNK_INP3: return input_port_3_r(machine,0);
-		case SNK_INP4: return input_port_4_r(machine,0);
-		case SNK_INP5: return input_port_5_r(machine,0);
-		case SNK_INP6: return input_port_6_r(machine,0);
-		case SNK_INP7: return input_port_7_r(machine,0);
-		case SNK_INP8: return input_port_8_r(machine,0);
-		case SNK_INP9: return input_port_9_r(machine,0);
-		case SNK_INP10: return input_port_10_r(machine,0);
-		case SNK_INP11: return input_port_11_r(machine,0);
+		case SNK_INP1: return input_port_read_indexed(machine, 1);
+		case SNK_INP2: return input_port_read_indexed(machine, 2);
+		case SNK_INP3: return input_port_read_indexed(machine, 3);
+		case SNK_INP4: return input_port_read_indexed(machine, 4);
+		case SNK_INP5: return input_port_read_indexed(machine, 5);
+		case SNK_INP6: return input_port_read_indexed(machine, 6);
+		case SNK_INP7: return input_port_read_indexed(machine, 7);
+		case SNK_INP8: return input_port_read_indexed(machine, 8);
+		case SNK_INP9: return input_port_read_indexed(machine, 9);
+		case SNK_INP10: return input_port_read_indexed(machine, 10);
+		case SNK_INP11: return input_port_read_indexed(machine, 11);
 
 		default:
 		logerror("read from unmapped input port:%d\n", which );

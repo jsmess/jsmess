@@ -61,7 +61,7 @@ enum
 
 /* these are called by the core; they should not be called from FEs */
 void inputx_init(running_machine *machine);
-void inputx_update(void);
+void inputx_update(running_machine *machine);
 void inputx_handle_mess_extensions(input_port_entry *ipt);
 
 /* called by drivers to setup natural keyboard support */

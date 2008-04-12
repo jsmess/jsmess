@@ -53,7 +53,7 @@ VIDEO_UPDATE( thief );
 static INTERRUPT_GEN( thief_interrupt )
 {
 	/* SLAM switch causes an NMI if it's pressed */
-	if( (input_port_3_r(machine,0) & 0x10) == 0 )
+	if( (input_port_read_indexed(machine, 3) & 0x10) == 0 )
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
@@ -158,10 +158,10 @@ static READ8_HANDLER( thief_io_r )
 {
 	switch( thief_input_select )
 	{
-		case 0x01: return readinputport(0); /* dsw#1 */
-		case 0x02: return readinputport(1); /* dsw#2 */
-		case 0x04: return readinputport(2); /* inp#1 */
-		case 0x08: return readinputport(3); /* inp#2 */
+		case 0x01: return input_port_read_indexed(machine, 0); /* dsw#1 */
+		case 0x02: return input_port_read_indexed(machine, 1); /* dsw#2 */
+		case 0x04: return input_port_read_indexed(machine, 2); /* inp#1 */
+		case 0x08: return input_port_read_indexed(machine, 3); /* inp#2 */
 	}
 	return 0x00;
 }

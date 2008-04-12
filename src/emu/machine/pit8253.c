@@ -1170,8 +1170,8 @@ static DEVICE_RESET( pit8253 ) {
 	{
 		struct pit8253_timer *timer = get_timer(pit,i);
 		/* According to Intel's 8254 docs, the state of a timer is undefined
-		   until the first mode control word is written. Here we define this
-		   undefined behaviour */
+           until the first mode control word is written. Here we define this
+           undefined behaviour */
 		timer->control = timer->status = 0x30;
 		timer->rmsb = timer->wmsb = 0;
 		timer->count = timer->value = timer->latch = 0;
@@ -1201,7 +1201,7 @@ DEVICE_GET_INFO( pit8253 ) {
 	switch ( state ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(pit8253_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 256; /* FIX ME Judge! */			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
 		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -1231,4 +1231,3 @@ DEVICE_GET_INFO( pit8254 ) {
 		default:									DEVICE_GET_INFO_CALL(pit8253);				break;
 	}
 }
-

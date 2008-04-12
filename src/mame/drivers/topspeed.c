@@ -332,8 +332,8 @@ static READ16_HANDLER( topspeed_input_bypass_r )
 {
 	UINT8 port = TC0220IOC_port_r(machine,0);	/* read port number */
 	int steer = 0;
-	int analogue_steer = readinputportbytag_safe(STEER_PORT_TAG,0x00);
-	int fake = readinputportbytag_safe(FAKE_PORT_TAG,0x00);
+	int analogue_steer = input_port_read_safe(machine, STEER_PORT_TAG,0x00);
+	int fake = input_port_read_safe(machine, FAKE_PORT_TAG,0x00);
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
@@ -679,15 +679,18 @@ static const struct MSM5205interface msm5205_interface =
                      MACHINE DRIVERS
 ***********************************************************/
 
+static STATE_POSTLOAD( topspeed_postload )
+{
+	parse_control();
+	reset_sound_region();
+}
+
 static MACHINE_START( topspeed )
 {
 	state_save_register_global(cpua_ctrl);
-	state_save_register_func_postload(parse_control);
-
 	state_save_register_global(ioc220_port);
-
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, topspeed_postload, NULL);
 }
 
 static MACHINE_DRIVER_START( topspeed )

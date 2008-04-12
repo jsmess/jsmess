@@ -749,8 +749,8 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 	}
 	else if (!ultimax)
 		c64_bankswitch (0);
-	c64_memory[0x000] = program_read_byte_8( 0 );
-	c64_memory[0x001] = program_read_byte_8( 1 );
+	c64_memory[0x000] = program_read_byte( 0 );
+	c64_memory[0x001] = program_read_byte( 1 );
 }
 
 UINT8 c64_m6510_port_read(UINT8 direction)

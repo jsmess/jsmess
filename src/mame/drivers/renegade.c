@@ -243,6 +243,11 @@ static void setbank(void)
 	memory_set_bankptr(1, &RAM[bank ? 0x10000 : 0x4000]);
 }
 
+static STATE_POSTLOAD( renegade_postload )
+{
+	setbank();
+}
+
 static MACHINE_START( renegade )
 {
 	state_save_register_global_array(mcu_buffer);
@@ -251,7 +256,7 @@ static MACHINE_START( renegade )
 	state_save_register_global(mcu_key);
 
 	state_save_register_global(bank);
-	state_save_register_func_postload(setbank);
+	state_save_register_postload(machine, renegade_postload, NULL);
 }
 
 static DRIVER_INIT( kuniokun )
@@ -489,7 +494,7 @@ static INTERRUPT_GEN( renegade_interrupt )
 {
 /*
     static int coin;
-    int port = readinputport(1) & 0xc0;
+    int port = input_port_read_indexed(machine, 1) & 0xc0;
     if (port != 0xc0)
     {
         if (coin == 0)

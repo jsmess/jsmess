@@ -208,7 +208,7 @@ READ8_HANDLER( decocass_input_r )
 	switch (offset & 7)
 	{
 	case 0: case 1: case 2:
-		data = readinputport(offset & 7);
+		data = input_port_read_indexed(machine, offset & 7);
 		break;
 	case 3: case 4: case 5: case 6:
 		data = decocass_quadrature_decoder[(offset & 7) - 3];
@@ -1589,7 +1589,7 @@ WRITE8_HANDLER( decocass_de0091_w )
  *  state save setup
  *
  ***************************************************************************/
-static void decocass_state_save_postload(void)
+static STATE_POSTLOAD( decocass_state_save_postload )
 {
 #if 0
 	/* fix me - this won't work anymore */
@@ -1608,9 +1608,9 @@ static void decocass_state_save_postload(void)
 }
 
 /* To be called once from driver_init, i.e. decocass_init */
-void decocass_machine_state_save_init(void)
+void decocass_machine_state_save_init(running_machine *machine)
 {
-	state_save_register_func_postload(decocass_state_save_postload);
+	state_save_register_postload(machine, decocass_state_save_postload, NULL);
 	state_save_register_global(tape_dir);
 	state_save_register_global(tape_speed);
 	state_save_register_global(tape_time0.seconds);

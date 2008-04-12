@@ -4248,7 +4248,7 @@ static WRITE8_HANDLER( mapper144_w )
 	if(0==(offset&0x7FFF))
 		return;
 
-	data = data|(program_read_byte_8(offset)&1);
+	data = data|(program_read_byte(offset)&1);
 
 	/* Switch 8k VROM bank */
 	chr8 (data >> 4);

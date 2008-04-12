@@ -1206,7 +1206,7 @@ static void lynx_reset(running_machine *machine)
 #endif
 }
 
-static void lynx_postload(void)
+static STATE_POSTLOAD( lynx_postload )
 {
 	lynx_memory_config_w(Machine, 0, lynx_memory_config);
 }
@@ -1215,7 +1215,7 @@ MACHINE_START( lynx )
 {
 	state_save_register_global(lynx_memory_config);
 	state_save_register_global_pointer(lynx_mem_fe00, lynx_mem_fe00_size);
-	state_save_register_func_postload(lynx_postload);
+	state_save_register_postload(machine, lynx_postload, NULL);
 
 	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0x0000, 0);
 	memory_configure_bank(3, 1, 1, lynx_mem_fe00, 0);

@@ -433,9 +433,9 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
  *
  *************************************/
 
-static void williams2_postload(void)
+static STATE_POSTLOAD( williams2_postload )
 {
-	williams2_bank_select_w(Machine, 0, vram_bank);
+	williams2_bank_select_w(machine, 0, vram_bank);
 }
 
 
@@ -460,7 +460,7 @@ MACHINE_RESET( williams2 )
 	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
 
 	state_save_register_global(vram_bank);
-	state_save_register_func_postload(williams2_postload);
+	state_save_register_postload(machine, williams2_postload, NULL);
 }
 
 
@@ -568,13 +568,13 @@ WRITE8_HANDLER( williams_port_select_w )
 
 READ8_HANDLER( williams_input_port_0_3_r )
 {
-	return readinputport(port_select ? 3 : 0);
+	return input_port_read_indexed(machine, port_select ? 3 : 0);
 }
 
 
 READ8_HANDLER( williams_input_port_1_4_r )
 {
-	return readinputport(port_select ? 4 : 1);
+	return input_port_read_indexed(machine, port_select ? 4 : 1);
 }
 
 
@@ -606,7 +606,7 @@ READ8_HANDLER( williams_input_port_1_4_r )
 READ8_HANDLER( williams_49way_port_0_r )
 {
 	static const UINT8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
-	return (translate49[readinputportbytag("49WAYX") >> 4] << 4) | translate49[readinputportbytag("49WAYY") >> 4];
+	return (translate49[input_port_read(machine, "49WAYX") >> 4] << 4) | translate49[input_port_read(machine, "49WAYY") >> 4];
 }
 
 
@@ -615,7 +615,7 @@ READ8_HANDLER( williams_input_port_49way_0_5_r )
 	if (port_select)
 		return williams_49way_port_0_r(machine,0);
 	else
-		return readinputport(5);
+		return input_port_read_indexed(machine, 5);
 }
 
 
@@ -711,9 +711,9 @@ WRITE8_HANDLER( williams2_7segment_w )
  *
  *************************************/
 
-static void defender_postload(void)
+static STATE_POSTLOAD( defender_postload )
 {
-	defender_bank_select_w(Machine, 0, vram_bank);
+	defender_bank_select_w(machine, 0, vram_bank);
 }
 
 
@@ -725,7 +725,7 @@ MACHINE_RESET( defender )
 	memory_configure_bank(1, 0, 9, &memory_region(REGION_CPU1)[0x10000], 0x1000);
 	defender_bank_select_w(machine, 0, 0);
 
-	state_save_register_func_postload(defender_postload);
+	state_save_register_postload(machine, defender_postload, NULL);
 }
 
 

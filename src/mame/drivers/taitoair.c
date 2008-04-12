@@ -312,16 +312,16 @@ static READ16_HANDLER( stick_input_r )
 	switch( offset )
 	{
 		case 0x00:	/* "counter 1" lo */
-			return readinputportbytag(STICK1_PORT_TAG);
+			return input_port_read(machine, STICK1_PORT_TAG);
 
 		case 0x01:	/* "counter 2" lo */
-			return readinputportbytag(STICK2_PORT_TAG);
+			return input_port_read(machine, STICK2_PORT_TAG);
 
 		case 0x02:	/* "counter 1" hi */
-			return (readinputportbytag(STICK1_PORT_TAG) & 0xff00) >> 8;
+			return (input_port_read(machine, STICK1_PORT_TAG) & 0xff00) >> 8;
 
 		case 0x03:	/* "counter 2" hi */
-			return (readinputportbytag(STICK2_PORT_TAG) & 0xff00) >> 8;
+			return (input_port_read(machine, STICK2_PORT_TAG) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -332,10 +332,10 @@ static READ16_HANDLER( stick2_input_r )
 	switch( offset )
 	{
 		case 0x00:	/* "counter 3" lo */
-			return readinputportbytag(STICK3_PORT_TAG);
+			return input_port_read(machine, STICK3_PORT_TAG);
 
 		case 0x02:	/* "counter 3" hi */
-			return (readinputportbytag(STICK3_PORT_TAG) & 0xff00) >> 8;
+			return (input_port_read(machine, STICK3_PORT_TAG) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -355,13 +355,17 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	reset_sound_region();
 }
 
+static STATE_POSTLOAD( taitoair_postload )
+{
+	reset_sound_region();
+}
 
 static MACHINE_START( taitoair )
 {
 	dsp_HOLD_signal = ASSERT_LINE;
 
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, taitoair_postload, NULL);
 }
 
 

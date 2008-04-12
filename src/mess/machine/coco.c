@@ -965,7 +965,7 @@ static coco_input_device get_input_device(coco_input_port port)
 {
 	coco_input_device result = INPUTDEVICE_NA;
 
-	switch(readinputportbytag_safe("joystick_mode", 0x00))
+	switch(input_port_read_safe(Machine, "joystick_mode", 0x00))
 	{
 		case 0x00:
 			/* "Normal" */
@@ -1041,7 +1041,7 @@ static attotime coco_hiresjoy_computetransitiontime(const char *inputport)
 {
 	double val;
 
-	val = readinputportbytag_safe(inputport, 0) / 255.0;
+	val = input_port_read_safe(Machine, inputport, 0) / 255.0;
 
 	if (get_input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
 	{
@@ -1292,32 +1292,32 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	joystick = mux_sel2;
 
 	/* poll keyoard keys */
-	if ((readinputport(0) | pia0_pb) != 0xff) porta &= ~0x01;
-	if ((readinputport(1) | pia0_pb) != 0xff) porta &= ~0x02;
-	if ((readinputport(2) | pia0_pb) != 0xff) porta &= ~0x04;
-	if ((readinputport(3) | pia0_pb) != 0xff) porta &= ~0x08;
-	if ((readinputport(4) | pia0_pb) != 0xff) porta &= ~0x10;
-	if ((readinputport(5) | pia0_pb) != 0xff) porta &= ~0x20;
-	if ((readinputport(6) | pia0_pb) != 0xff) porta &= ~0x40;
+	if ((input_port_read_indexed(machine, 0) | pia0_pb) != 0xff) porta &= ~0x01;
+	if ((input_port_read_indexed(machine, 1) | pia0_pb) != 0xff) porta &= ~0x02;
+	if ((input_port_read_indexed(machine, 2) | pia0_pb) != 0xff) porta &= ~0x04;
+	if ((input_port_read_indexed(machine, 3) | pia0_pb) != 0xff) porta &= ~0x08;
+	if ((input_port_read_indexed(machine, 4) | pia0_pb) != 0xff) porta &= ~0x10;
+	if ((input_port_read_indexed(machine, 5) | pia0_pb) != 0xff) porta &= ~0x20;
+	if ((input_port_read_indexed(machine, 6) | pia0_pb) != 0xff) porta &= ~0x40;
 
-	if ((readinputport(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x01;
-	if ((readinputport(1) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x02;
-	if ((readinputport(2) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x04;
-	if ((readinputport(3) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x08;
-	if ((readinputport(4) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x10;
-	if ((readinputport(5) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x20;
-	if ((readinputport(6) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x40;
+	if ((input_port_read_indexed(machine, 0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x01;
+	if ((input_port_read_indexed(machine, 1) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x02;
+	if ((input_port_read_indexed(machine, 2) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x04;
+	if ((input_port_read_indexed(machine, 3) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x08;
+	if ((input_port_read_indexed(machine, 4) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x10;
+	if ((input_port_read_indexed(machine, 5) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x20;
+	if ((input_port_read_indexed(machine, 6) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x40;
 
 	switch(get_input_device(joystick ? INPUTPORT_LEFT_JOYSTICK : INPUTPORT_RIGHT_JOYSTICK))
 	{
 		case INPUTDEVICE_RIGHT_JOYSTICK:
-			joyval = readinputportbytag_safe(joystick_axis ? "joystick_right_y" : "joystick_right_x", 0x00);
+			joyval = input_port_read_safe(machine, joystick_axis ? "joystick_right_y" : "joystick_right_x", 0x00);
 			if (dac <= joyval)
 				porta |= 0x80;
 			break;
 
 		case INPUTDEVICE_LEFT_JOYSTICK:
-			joyval = readinputportbytag_safe(joystick_axis ? "joystick_left_y" : "joystick_left_x", 0x00);
+			joyval = input_port_read_safe(machine, joystick_axis ? "joystick_left_y" : "joystick_left_x", 0x00);
 			if (dac <= joyval)
 				porta |= 0x80;
 			break;
@@ -1329,17 +1329,17 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 			break;
 
 		case INPUTDEVICE_RAT:
-			joyval = readinputportbytag_safe(joystick_axis ? "rat_mouse_y" : "rat_mouse_x", 0x00);
+			joyval = input_port_read_safe(machine, joystick_axis ? "rat_mouse_y" : "rat_mouse_x", 0x00);
 			if ((dac >> 2) <= joy_rat_table[joyval])
 				porta |= 0x80;
 			break;
 
 		case INPUTDEVICE_DIECOM_LIGHTGUN:
-			if( (video_screen_get_vpos(machine->primary_screen) == readinputportbytag_safe("dclg_y", 0)) )
+			if( (video_screen_get_vpos(machine->primary_screen) == input_port_read_safe(machine, "dclg_y", 0)) )
 			{
 				/* If gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
 				dclg_output_h |= 0x02;
-				dclg_timer = readinputportbytag_safe("dclg_x", 0) << 1;
+				dclg_timer = input_port_read_safe(machine, "dclg_x", 0) << 1;
 			}
 
 			if ( (dac >> 2) <= dclg_table[ (joystick_axis ? dclg_output_h : dclg_output_v) & 0x03 ])
@@ -1348,7 +1348,7 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 			if( (dclg_state == 7) )
 			{
 				/* While in state 7, prepare to chech next video frame for a hit */
-				dclg_time = video_screen_get_time_until_pos(machine->primary_screen, readinputportbytag_safe("dclg_y", 0), 0);
+				dclg_time = video_screen_get_time_until_pos(machine->primary_screen, input_port_read_safe(machine, "dclg_y", 0), 0);
 			}
 
 			break;
@@ -1374,8 +1374,8 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	}
 
 	/* sample joystick buttons */
-	porta &= ~readinputportbytag_safe("joystick_buttons", 0);
-	port_za &= ~readinputportbytag_safe("joystick_buttons", 0);
+	porta &= ~input_port_read_safe(machine, "joystick_buttons", 0);
+	port_za &= ~input_port_read_safe(machine, "joystick_buttons", 0);
 
 	pia_set_input_a(0, porta, port_za);
 	return porta;
@@ -3052,14 +3052,14 @@ MACHINE_RESET( coco3 )
 	coco3_mmu_update(0, 8);
 }
 
-static void coco3_state_postload(void)
+static STATE_POSTLOAD( coco3_state_postload )
 {
 	coco3_mmu_update(0, 8);
 }
 
 static void update_lightgun(running_machine *machine)
 {
-	int is_lightgun = readinputportbytag_safe("joystick_mode", 0x00) == 0x40;
+	int is_lightgun = input_port_read_safe(machine, "joystick_mode", 0x00) == 0x40;
 	crosshair_set_screen(machine, 0, is_lightgun ? CROSSHAIR_SCREEN_ALL : CROSSHAIR_SCREEN_NONE);
 }
 
@@ -3105,7 +3105,7 @@ MACHINE_START( coco3 )
 	state_save_register_global(coco3_interupt_line);
 	state_save_register_global(gime_irq);
 	state_save_register_global(gime_firq);
-	state_save_register_func_postload(coco3_state_postload);
+	state_save_register_postload(machine, coco3_state_postload, NULL);
 
 	/* need to specify lightgun crosshairs */
 	timer_set(attotime_zero, NULL, 0, update_lightgun_timer_callback);

@@ -687,7 +687,7 @@ static void pokemini_render( void ) {
 				UINT8 tile = pokemini_ram[ 0x360 + ( y * vdp.map_size_x ) + x ];
 				int i;
 				for( i = 0; i < 8; i++ ) {
-					pokemini_ram[ ( y * 96 ) + ( x * 8 ) + i ] = program_read_byte_8( vdp.bg_tiles + ( tile * 8 ) + i );
+					pokemini_ram[ ( y * 96 ) + ( x * 8 ) + i ] = program_read_byte( vdp.bg_tiles + ( tile * 8 ) + i );
 				}
 			}
 		}

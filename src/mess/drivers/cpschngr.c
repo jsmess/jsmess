@@ -130,5 +130,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY     FULLNAME */
-CONS( 1995, sfzch,    0,        0,		cps1,	  sfzch,    cps1,	NULL,	"Capcom", "CPS Changer (Street Fighter ZERO)" , 0)
+CONS( 1995, sfzch,    0,        0,		cps1_10MHz,	  sfzch,    cps1,	NULL,	"Capcom", "CPS Changer (Street Fighter ZERO)" , 0)
 

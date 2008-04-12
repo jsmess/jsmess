@@ -1334,7 +1334,7 @@ MACHINE_RESET(mac)
 
 
 
-static void mac_state_load(void)
+static STATE_POSTLOAD( mac_state_load )
 {
 	int overlay = mac_overlay;
 	mac_overlay = -1;
@@ -1370,7 +1370,7 @@ static void mac_driver_init(mac_model_t model)
 
 	/* save state stuff */
 	state_save_register_global(mac_overlay);
-	state_save_register_func_postload(mac_state_load);
+	state_save_register_postload(Machine, mac_state_load, NULL);
 }
 
 

@@ -64,11 +64,6 @@ VIDEO_START( pbillian )
 	state_save_register_global(pbillian_show_power);
 }
 
-static void superqix_postload(void)
-{
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
-}
-
 VIDEO_START( superqix )
 {
 	fg_bitmap[0] = auto_bitmap_alloc(256, 256, video_screen_get_format(machine->primary_screen));
@@ -82,7 +77,6 @@ VIDEO_START( superqix )
 	state_save_register_global(show_bitmap);
 	state_save_register_global_bitmap(fg_bitmap[0]);
 	state_save_register_global_bitmap(fg_bitmap[1]);
-	state_save_register_func_postload(superqix_postload);
 }
 
 
@@ -241,14 +235,14 @@ VIDEO_UPDATE( pbillian )
 	{
 		int curr_power;
 
-		curr_power = ((readinputport(4)&0x3f)*100)/0x3f;
+		curr_power = ((input_port_read_indexed(screen->machine, 4)&0x3f)*100)/0x3f;
 		if (last_power[0] != curr_power)
 		{
 			popmessage	("Power %d%%", curr_power);
 			last_power[0] = curr_power;
 		}
 
-		curr_power = ((readinputport(6)&0x3f)*100)/0x3f;
+		curr_power = ((input_port_read_indexed(screen->machine, 6)&0x3f)*100)/0x3f;
 		if (last_power[1] != curr_power)
 		{
 			popmessage	("Power %d%%", curr_power);

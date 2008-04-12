@@ -30,7 +30,7 @@ static const UINT16 dummy_palette[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 
 /**************************************************************************/
 
-static void pc_video_postload(void)
+static STATE_POSTLOAD( pc_video_postload )
 {
 	pc_anythingdirty = 1;
 	pc_current_height = -1;
@@ -64,7 +64,7 @@ struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6
 		video_start_generic_bitmapped(machine);
 	}
 
-	state_save_register_func_postload(pc_video_postload);
+	state_save_register_postload(machine, pc_video_postload, NULL);
 	return pc_crtc;
 }
 

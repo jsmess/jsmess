@@ -138,7 +138,7 @@ static UINT32			screen_width, screen_height;
 
 /* system management helpers */
 static void tilemap_exit(running_machine *machine);
-static void tilemap_postload(void *param);
+static STATE_POSTLOAD( tilemap_postload );
 static void tilemap_dispose(tilemap *tmap);
 
 /* logical <-> memory index mapping */
@@ -355,7 +355,7 @@ tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func ma
 	tilemap_instance++;
 
 	/* reset everything after a load */
-	state_save_register_func_postload_ptr(tilemap_postload, tmap);
+	state_save_register_postload(Machine, tilemap_postload, tmap);
 	return tmap;
 }
 
@@ -379,11 +379,7 @@ void tilemap_set_user_data(tilemap *tmap, void *user_data)
 
 void tilemap_set_palette_offset(tilemap *tmap, UINT32 offset)
 {
-	if (tmap->palette_offset != offset)
-	{
-		tmap->palette_offset = offset;
-		tilemap_mark_all_tiles_dirty(tmap);
-	}
+	tmap->palette_offset = offset;
 }
 
 
@@ -1054,7 +1050,7 @@ static void tilemap_exit(running_machine *machine)
     invalidate everything
 -------------------------------------------------*/
 
-static void tilemap_postload(void *param)
+static STATE_POSTLOAD( tilemap_postload )
 {
 	/* recompute the mappings for this tilemap */
 	tilemap *tmap = param;

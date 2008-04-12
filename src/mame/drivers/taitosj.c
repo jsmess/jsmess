@@ -337,9 +337,9 @@ static CUSTOM_INPUT( kikstart_gear_r )
 		port_tag = "GEARP2";
 
 	/* gear MUST be 1, 2 or 3 */
-	if (readinputportbytag(port_tag) & 0x01) kikstart_gears[player] = 0x02;
-	if (readinputportbytag(port_tag) & 0x02) kikstart_gears[player] = 0x03;
-	if (readinputportbytag(port_tag) & 0x04) kikstart_gears[player] = 0x01;
+	if (input_port_read(machine, port_tag) & 0x01) kikstart_gears[player] = 0x02;
+	if (input_port_read(machine, port_tag) & 0x02) kikstart_gears[player] = 0x03;
+	if (input_port_read(machine, port_tag) & 0x04) kikstart_gears[player] = 0x01;
 
 	return kikstart_gears[player];
 }
@@ -552,7 +552,7 @@ static INPUT_PORTS_START( spaceskr )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -561,9 +561,9 @@ static INPUT_PORTS_START( spaceskr )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_START_TAG("DSW2")      /* Coinage */
 	DSW2_PORT
@@ -2647,7 +2647,7 @@ void taitosj_register_main_savestate(void)
 	state_save_register_global(dac_vol);
 }
 
-GAME( 1981, spaceskr, 0,        nomcu,    spaceskr,   0,       ROT180, "Taito Corporation", "Space Seeker", GAME_SUPPORTS_SAVE )
+GAME( 1981, spaceskr, 0,        nomcu,    spaceskr,   0,       ROT0,   "Taito Corporation", "Space Seeker", GAME_SUPPORTS_SAVE )
 GAME( 1981, spacecr,  0,        nomcu,    spacecr,    spacecr, ROT90,  "Taito Corporation", "Space Cruiser", GAME_SUPPORTS_SAVE )
 GAME( 1982, junglek,  0,        nomcu,    junglek,    0,       ROT180, "Taito Corporation", "Jungle King (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1982, junglkj2, junglek,  nomcu,    junglek,    0,       ROT180, "Taito Corporation", "Jungle King (Japan, earlier)", GAME_SUPPORTS_SAVE )

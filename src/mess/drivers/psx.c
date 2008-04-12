@@ -721,7 +721,7 @@ static MACHINE_RESET( psx )
 
 static DRIVER_INIT( psx )
 {
-	psx_driver_init();
+	psx_driver_init(machine);
 }
 
 static INPUT_PORTS_START( psx )

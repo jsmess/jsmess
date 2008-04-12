@@ -124,7 +124,7 @@ static WRITE16_HANDLER( protection_w )
 			program_write_word(0xffc00e, 0);
 
 			sf_fg_scroll_w(machine, 0, d1, 0);
-			sf_fg_scroll_w(machine, 0, d2, 0);
+			sf_bg_scroll_w(machine, 0, d2, 0);
 			break;
 		}
 	case 4:
@@ -144,7 +144,7 @@ static WRITE16_HANDLER( protection_w )
 				}
 				program_write_word(0xffc682, d1);
 				program_write_word(0xffc00e, off);
-				sf_fg_scroll_w(machine, 0, d1, 0);
+				sf_bg_scroll_w(machine, 0, d1, 0);
 			}
 			break;
 		}
@@ -166,12 +166,12 @@ static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
 
 static READ16_HANDLER( button1_r )
 {
-	return (scale[input_port_7_r(machine,0)]<<8)|scale[input_port_5_r(machine,0)];
+	return (scale[input_port_read_indexed(machine, 7)]<<8)|scale[input_port_read_indexed(machine, 5)];
 }
 
 static READ16_HANDLER( button2_r )
 {
-	return (scale[input_port_8_r(machine,0)]<<8)|scale[input_port_6_r(machine,0)];
+	return (scale[input_port_read_indexed(machine, 8)]<<8)|scale[input_port_read_indexed(machine, 6)];
 }
 
 

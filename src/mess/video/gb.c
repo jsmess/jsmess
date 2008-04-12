@@ -1307,7 +1307,7 @@ static void gbc_hdma(UINT16 length) {
 	dst = ((UINT16)(HDMA3 & 0x1F) << 8) | (HDMA4 & 0xF0);
 	dst |= 0x8000;
 	while( length > 0 ) {
-		program_write_byte_8( dst++, program_read_byte_8( src++ ) );
+		program_write_byte( dst++, program_read_byte( src++ ) );
 		length--;
 	}
 	HDMA1 = src >> 8;
@@ -1942,7 +1942,7 @@ WRITE8_HANDLER ( gb_video_w ) {
 			UINT8 *P = gb_oam;
 			offset = (UINT16) data << 8;
 			for (data = 0; data < 0xA0; data++)
-				*P++ = program_read_byte_8 (offset++);
+				*P++ = program_read_byte (offset++);
 		}
 		return;
 	case 0x07:						/* BGP - Background Palette */

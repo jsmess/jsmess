@@ -212,7 +212,7 @@ static READ16_HANDLER( slapshot_service_input_r )
 
 static READ16_HANDLER( opwolf3_adc_r )
 {
-	return readinputport(6 + offset)<<8;
+	return input_port_read_indexed(machine, 6 + offset)<<8;
 }
 
 static WRITE16_HANDLER( opwolf3_adc_req_w )
@@ -232,10 +232,15 @@ static void reset_sound_region(void)
 	memory_set_bankptr( 10, memory_region(REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
 }
 
+static STATE_POSTLOAD( slapshot_postload )
+{
+	reset_sound_region();
+}
+
 static MACHINE_START( slapshot )
 {
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, slapshot_postload, NULL);
 }
 
 

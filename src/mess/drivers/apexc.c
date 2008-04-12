@@ -335,7 +335,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of edit keys */
-	edit_keys = (readinputportbytag("data1") << 16) | readinputportbytag("data2");
+	edit_keys = (input_port_read(machine, "data1") << 16) | input_port_read(machine, "data2");
 
 	/* toggle data reg according to transitions */
 	panel_data_reg ^= edit_keys & (~ old_edit_keys);
@@ -345,7 +345,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of control keys */
-	control_keys = readinputportbytag("panel");
+	control_keys = input_port_read(machine, "panel");
 
 	/* compute transitions */
 	control_transitions = control_keys & (~ old_control_keys);

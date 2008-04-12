@@ -379,7 +379,7 @@ static int msm6242_rtc_address;
 
 static rtc_type_t real_time_clock(void)
 {
-	return (rtc_type_t) (int) readinputportbytag_safe("real_time_clock", 0x00);
+	return (rtc_type_t) (int) input_port_read_safe(Machine, "real_time_clock", 0x00);
 }
 
 

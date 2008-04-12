@@ -1045,12 +1045,12 @@ static void modeFE_switch(UINT16 offset, UINT8 data)
 static READ8_HANDLER(modeFE_switch_r)
 {
 	modeFE_switch(offset, 0 );
-	return program_read_byte_8( 0xFE );
+	return program_read_byte( 0xFE );
 }
 
 static WRITE8_HANDLER(modeFE_switch_w)
 {
-	program_write_byte_8( 0xFE, data );
+	program_write_byte( 0xFE, data );
 	modeFE_switch(offset, 0 );
 }
 
@@ -1342,7 +1342,7 @@ static READ8_HANDLER(a2600_get_databus_contents) {
 	if ( ! ( last_address & 0x1080 ) ) {
 		return offset;
 	}
-	last_byte = program_read_byte_8( last_address );
+	last_byte = program_read_byte( last_address );
 	if ( last_byte < 0x80 || last_byte == 0xFF ) {
 		return last_byte;
 	}
@@ -1350,9 +1350,9 @@ static READ8_HANDLER(a2600_get_databus_contents) {
 	if ( ! ( prev_address & 0x1080 ) ) {
 		return last_byte;
 	}
-	prev_byte = program_read_byte_8( prev_address );
+	prev_byte = program_read_byte( prev_address );
 	if ( prev_byte == 0xB1 ) {	/* LDA (XX),Y */
-		return program_read_byte_8( last_byte + 1 );
+		return program_read_byte( last_byte + 1 );
 	}
 	return last_byte;
 }

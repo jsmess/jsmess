@@ -305,8 +305,8 @@ static int spectrum_setup_tap(offs_t address, UINT8 *snapshot_data, int snapshot
 	{
 		sp_reg = cpunum_get_reg(0, Z80_SP);
 		return_addr =
-			((UINT16) program_read_byte_8(sp_reg + 0) ) >> 8 |
-			((UINT16) program_read_byte_8(sp_reg + 1) ) >> 0;
+			((UINT16) program_read_byte(sp_reg + 0) ) >> 8 |
+			((UINT16) program_read_byte(sp_reg + 1) ) >> 0;
 
 		sp_reg += 2;
 		cpunum_set_reg(0, Z80_SP, (sp_reg & 0x0ffff));
@@ -618,8 +618,8 @@ void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsi
 		addr = cpunum_get_reg(0, Z80_SP) & 0xFFFF;
 
 		cpunum_set_reg(0, Z80_PC,
-			((UINT16) program_read_byte_8(addr + 0) ) >> 8 |
-			((UINT16) program_read_byte_8(addr + 1) ) >> 0);
+			((UINT16) program_read_byte(addr + 0) ) >> 8 |
+			((UINT16) program_read_byte(addr + 1) ) >> 0);
 
 		addr += 2;
 		cpunum_set_reg(0, Z80_SP, (addr & 0x0ffff));

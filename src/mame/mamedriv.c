@@ -548,9 +548,9 @@ const game_driver * const drivers[] =
 	DRIVER( fenix )		/* bootleg */
 	DRIVER( falcon )	/* bootleg */
 	DRIVER( vautour )	/* bootleg (Jeutel) */
-	DRIVER( vautour2 )	/* bootleg */
+	DRIVER( falconz )	/* bootleg */
+	DRIVER( vautourz )	/* bootleg */
 	DRIVER( griffon )	/* bootleg (Videotron) */
-	DRIVER( falcona )	/* bootleg */
 	DRIVER( nextfase )	/* bootleg */
 	DRIVER( pleiads )	/* (c) 1981 Tehkan */
 	DRIVER( pleiadbl )	/* bootleg */
@@ -2007,6 +2007,7 @@ const game_driver * const drivers[] =
 	DRIVER( dendeg2x )	/* E52 (c) 1998 Taito Corporation */
 	DRIVER( sidebs )	/* E23 (c) 1996 Taito Corporation */
 	DRIVER( sidebs2 )	/* E38 (c) 1997 Taito Corporation */
+	DRIVER( sidebs2j )	/* E38 (c) 1997 Taito Corporation */
 	DRIVER( dangcurv )	/* E09 (c) 1995 Taito Corporation */
 
 	/* Taito "Wolf" System */
@@ -3561,6 +3562,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( smgpu2 )	/* (c) 1989 (FD1094, decrypted) */
 	DRIVER( smgpu1 )	/* (c) 1989 (FD1094, decrypted) */
 	DRIVER( smgpj )		/* (c) 1989 (FD1094, decrypted) */
+	DRIVER( smgpja )	/* (c) 1989 (FD1094, decrypted) */
 
 	/* Y-Board */
 	DRIVER( gforce2 )	/* (c) 1988 */
@@ -6089,8 +6091,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Midway Touchmaster / Galaxy Games */
 	DRIVER( tm )		/* (c) 1996 Midway Games */
-	DRIVER( tm3k )		/* (c) 1996 Midway Games */
-	DRIVER( tm4k )		/* (c) 1996 Midway Games */
+	DRIVER( tm3k )		/* (c) 1997 Midway Games */
+	DRIVER( tm4k )		/* (c) 1998 Midway Games */
+	DRIVER( tm5k )		/* (c) 1998 Midway Games */
+	DRIVER( tm7k )		/* (c) 1999 Midway Games */
 	DRIVER( galgbios )  /* (c) 1998 Creative Electonics & Software (CES) */
 
 	/* Cinematronics raster games */
@@ -6296,9 +6300,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( denjinmk )	/* (c) 199? Banpresto */
 	DRIVER( sdgndmrb )	/* (c) 1993 Banpresto */
 	DRIVER( cupsoc )	/* (c) 1992 Seibu */
-	DRIVER( cupsoc2 )	/* (c) 1992 Seibu */
+	DRIVER( cupsocs )	/* (c) 1992 Seibu */
+	DRIVER( cupsocs2 )	/* (c) 1992 Seibu */
+	DRIVER( cupsocsb )	/* bootleg */
 	DRIVER( olysoc92 )	/* (c) 1992 Seibu */
-	DRIVER( cupsocbl )	/* bootleg */
 	DRIVER( goal92 )	/* bootleg */
 
 	/* Jaleco games */
@@ -6431,7 +6436,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pspikesk )	/* (c) 1991 Video System Co. (Korea) */
 	DRIVER( svolly91 )	/* (c) 1991 Video System Co. (Japan) */
 	DRIVER( pspikesb )	/* bootleg */
-	DRIVER( pallavol )	/* bootleg */
+	DRIVER( spikes91 )	/* bootleg */
 	DRIVER( pspikesc )	/* bootleg */
 	DRIVER( karatblz )	/* (c) 1991 Video System Co. */
 	DRIVER( karatblu )	/* (c) 1991 Video System Co. (US) */

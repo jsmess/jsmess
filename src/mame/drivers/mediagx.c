@@ -508,20 +508,20 @@ static READ32_HANDLER( parallel_port_r )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 nibble = parallel_latched;//(readinputport(parallel_pointer / 3) >> (4 * (parallel_pointer % 3))) & 15;
+		UINT8 nibble = parallel_latched;//(input_port_read_indexed(machine, parallel_pointer / 3) >> (4 * (parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
 		logerror("%08X:parallel_port_r()\n", activecpu_get_pc());
 /*      if (controls_data == 0x18)
         {
-            r |= readinputport(0) << 8;
+            r |= input_port_read_indexed(machine, 0) << 8;
         }
         else if (controls_data == 0x60)
         {
-            r |= readinputport(1) << 8;
+            r |= input_port_read_indexed(machine, 1) << 8;
         }
         else if (controls_data == 0xff ||  controls_data == 0x50)
         {
-            r |= readinputport(2) << 8;
+            r |= input_port_read_indexed(machine, 2) << 8;
         }
 
         //r |= control_read << 8;*/
@@ -557,7 +557,7 @@ static WRITE32_HANDLER( parallel_port_w )
 
 		logerror("%08X:", activecpu_get_pc());
 
-		parallel_latched = (readinputport(parallel_pointer / 3) >> (4 * (parallel_pointer % 3))) & 15;
+		parallel_latched = (input_port_read_indexed(machine, parallel_pointer / 3) >> (4 * (parallel_pointer % 3))) & 15;
 //      parallel_pointer++;
 //      logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
 		switch (data & 0xfc)
@@ -814,8 +814,8 @@ static const struct dma8237_interface dma8237_1_config =
 
 static const struct dma8237_interface dma8237_2_config =
 {
-	0, 
-	1.0e-6, // 1us 
+	0,
+	1.0e-6, // 1us
 
 	NULL,
 	NULL,
@@ -1066,9 +1066,13 @@ static void ide_interrupt(int state)
 	pic8259_set_irq_line(1, 6, state);
 }
 
+static int mediagx_get_out2(running_machine *machine) {
+	return pit8253_get_output((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2 );
+}
+
 static const struct kbdc8042_interface at8042 =
 {
-	KBDC8042_AT386, set_gate_a20, keyboard_interrupt
+	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, mediagx_get_out2
 };
 
 static const struct ide_interface ide_intf =

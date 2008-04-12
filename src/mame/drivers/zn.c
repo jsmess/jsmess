@@ -246,8 +246,8 @@ static void sio_dip_handler( int n_data )
 	{
 		if( m_b_lastclock )
 		{
-			verboselog( 2, "read dip %02x -> %02x\n", n_data, ( ( readinputport( 7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
-			psx_sio_input( 0, PSX_SIO_IN_DATA, ( ( readinputport( 7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
+			verboselog( 2, "read dip %02x -> %02x\n", n_data, ( ( input_port_read_indexed(Machine,  7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( 0, PSX_SIO_IN_DATA, ( ( input_port_read_indexed(Machine,  7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
 			m_n_dip_bit++;
 			m_n_dip_bit &= 7;
 		}
@@ -379,17 +379,14 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( link_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( link_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( link_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-ADDRESS_MAP_END
-
-static void zn_driver_init( void )
+static void zn_driver_init( running_machine *machine )
 {
 	int n_game;
 
-	psx_driver_init();
+	psx_driver_init(machine);
 
 	n_game = 0;
 	while( zn_config_table[ n_game ].s_name != NULL )
@@ -638,7 +635,7 @@ static DRIVER_INIT( coh1000c )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb80000, 0x1fbfffff, 0, 0, SMH_BANK3 );     /* country rom */
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb60000, 0x1fb60003, 0, 0, zn_qsound_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 
 	if( strcmp( machine->gamedrv->name, "glpracr" ) == 0 ||
 		strcmp( machine->gamedrv->name, "glprac2l" ) == 0 )
@@ -870,7 +867,7 @@ static DRIVER_INIT( coh3002c )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb80000, 0x1fbfffff, 0, 0, SMH_BANK3 );     /* country rom */
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb60000, 0x1fb60003, 0, 0, zn_qsound_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh3002c )
@@ -1218,7 +1215,7 @@ static DRIVER_INIT( coh1000ta )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size1 - 1 ), 0, 0, SMH_BANK2 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size1 - 1 ), 0, 0, SMH_BANK2 );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 	mb3773_init();
 }
 
@@ -1257,29 +1254,18 @@ static NVRAM_HANDLER( coh1000ta )
 	}
 }
 
-static ADDRESS_MAP_START( fx1a_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(YM2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(YM2610_status_port_0_B_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
-	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fx1a_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2610_control_port_0_B_w)
+static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)	/* Fallthrough */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(YM2610_status_port_0_A_r, YM2610_control_port_0_A_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(YM2610_read_port_0_r, YM2610_data_port_0_A_w)
+	AM_RANGE(0xe002, 0xe002) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2610_data_port_0_B_w)
-	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xee00, 0xee00) AM_NOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(fx1a_sound_bankswitch_w)
 ADDRESS_MAP_END
@@ -1305,7 +1291,7 @@ static MACHINE_DRIVER_START( coh1000ta )
 
 	MDRV_CPU_ADD( Z80, 16000000 / 4 )
 	/* audio CPU */	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP( fx1a_sound_readmem, fx1a_sound_writemem )
+	MDRV_CPU_PROGRAM_MAP( fx1a_sound_map, 0 )
 	MDRV_MACHINE_RESET( coh1000ta )
 	MDRV_NVRAM_HANDLER( coh1000ta )
 
@@ -1349,7 +1335,7 @@ static DRIVER_INIT( coh1000tb )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size2 - 1 ), 0, 0, SMH_BANK3 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size2 - 1 ), 0, 0, SMH_BANK3 );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 	mb3773_init();
 }
 
@@ -1540,7 +1526,7 @@ static DRIVER_INIT( coh3002t )
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb40000, 0x1fb40003, 0, 0, coh3002t_unknown_w );
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb40000, 0x1fb40003, 0, 0, coh3002t_unknown_r );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh3002t )
@@ -1725,7 +1711,7 @@ static DRIVER_INIT( coh1000w )
 	// init hard disk
 	ide_controller_init(0, &atpsx_intf);
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1000w )
@@ -1913,7 +1899,7 @@ static DRIVER_INIT( coh1002e )
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fa10300, 0x1fa10303, 0, 0, coh1002e_bank_w );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00007, 0, 0, coh1002e_latch_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1002e )
@@ -2257,7 +2243,7 @@ static DRIVER_INIT( coh1000a )
 		ide_controller_init( 0, &jdredd_ide_intf );
 	}
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1000a )
@@ -2404,7 +2390,7 @@ static DRIVER_INIT( coh1001l )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f7fffff, 0, 0, SMH_BANK1 ); /* banked rom */
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, coh1001l_bnk_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1001l )
@@ -2450,7 +2436,7 @@ static DRIVER_INIT( coh1002v )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fbfffff, 0, 0, SMH_BANK2 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, coh1002v_bnk_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1002v )
@@ -2675,7 +2661,7 @@ static DRIVER_INIT( coh1002m )
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, cbaj_z80_w );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00004, 0x1fb00007, 0, 0, coh1002m_bank_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1002m )
@@ -2752,7 +2738,7 @@ static MACHINE_DRIVER_START( coh1002ml )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	MDRV_CPU_ADD( Z80, 8000000 )
-	MDRV_CPU_PROGRAM_MAP( link_readmem, link_writemem )
+	MDRV_CPU_PROGRAM_MAP( link_map, 0 )
 
 	MDRV_MACHINE_RESET( coh1002m )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
@@ -4349,7 +4335,7 @@ GAME( 1999, glpracr3, tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop R
 GAME( 1999, flamegun, tps,      coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, flameguj, flamegun, coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, tblkkuzu, tps,	coh1002m, zn, coh1002m, ROT0, "Tamsoft/D3 Publisher", "The Block Kuzushi (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, 1on1gov,  tps,	coh1002m, zn, coh1002m, ROT0, "Tecmo", "1 on 1 Government (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 2000, 1on1gov,  tps,	coh1002m, zn, coh1002m, ROT0, "Tecmo", "1 on 1 Government (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, tecmowcm, tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tecmo World Cup Millennium (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2001, mfjump,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Monster Farm Jump (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 

@@ -203,12 +203,12 @@ F94B
 
 static READ32_HANDLER( finalgdr_input0_r )
 {
-	return readinputport(0) << 16;
+	return input_port_read_indexed(machine, 0) << 16;
 }
 
 static READ32_HANDLER( finalgdr_input1_r )
 {
-	return readinputport(1) << 16;
+	return input_port_read_indexed(machine, 1) << 16;
 }
 
 static WRITE32_HANDLER( finalgdr_oki_bank_w )
@@ -617,7 +617,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sound_qs1000 )
 	MDRV_CPU_ADD(I8052, 24000000/4)	/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP( qs1000_prg_map, 0 )
+	MDRV_CPU_PROGRAM_MAP(qs1000_prg_map, 0)
 	MDRV_CPU_DATA_MAP( qs1000_data_map, 0 )
 
 MACHINE_DRIVER_END

@@ -63,7 +63,7 @@ static MACHINE_RESET( batman )
 	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 	atarigen_scanline_timer_reset(machine->primary_screen, batman_scanline_update, 8);
 	atarijsa_reset();
-	atarigen_init_save_state();
+	atarigen_init_save_state(machine);
 	state_save_register_global(latch_data);
 
 }
@@ -97,7 +97,7 @@ static WRITE16_HANDLER( batman_atarivc_w )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int result = readinputport(2);
+	int result = input_port_read_indexed(machine, 2);
 	if (atarigen_sound_to_cpu_ready) result ^= 0x0010;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
 	return result;

@@ -322,6 +322,13 @@ static void to7_update_cart_bank ( void )
 
 
 
+static STATE_POSTLOAD( to7_update_cart_bank_postload )
+{
+	to7_update_cart_bank();
+}
+
+
+
 /* write signal to 0000-1fff generates a bank switch */
 WRITE8_HANDLER ( to7_cartridge_w )
 {
@@ -1327,7 +1334,7 @@ MACHINE_START ( to7 )
 	state_save_register_global( to7_lightpen );
 	state_save_register_global( to7_lightpen_step );
 	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
-	state_save_register_func_postload( to7_update_cart_bank );
+	state_save_register_postload(machine,  to7_update_cart_bank_postload, NULL );
 }
 
 
@@ -1391,6 +1398,13 @@ static void to770_update_ram_bank( void )
 				       (mess_ram_size == 128*1024 || bank < 2) ?
 				       (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) : SMH_UNMAP );
 	old_bank = bank;
+}
+
+
+
+static STATE_POSTLOAD ( to770_update_ram_bank_postload )
+{
+	to770_update_ram_bank();
 }
 
 
@@ -1545,8 +1559,8 @@ MACHINE_START ( to770 )
 	state_save_register_global( to7_lightpen );
 	state_save_register_global( to7_lightpen_step );
 	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
-	state_save_register_func_postload( to770_update_ram_bank );
-	state_save_register_func_postload( to7_update_cart_bank );
+	state_save_register_postload(machine,  to770_update_ram_bank_postload, NULL );
+	state_save_register_postload(machine,  to7_update_cart_bank_postload, NULL );
 }
 
 
@@ -1788,6 +1802,13 @@ static void mo5_update_cart_bank ( void )
 
 
 
+static STATE_POSTLOAD( mo5_update_cart_bank_postload )
+{
+	mo5_update_cart_bank();
+}
+
+
+
 /* write signal to b000-cfff generates a bank switch */
 WRITE8_HANDLER ( mo5_cartridge_w )
 {
@@ -1895,7 +1916,7 @@ MACHINE_START ( mo5 )
 	state_save_register_global( to7_lightpen_step );
 	state_save_register_global( mo5_reg_cart );
 	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
-	state_save_register_func_postload( mo5_update_cart_bank );
+	state_save_register_postload(machine,  mo5_update_cart_bank_postload, NULL );
 }
 
 
@@ -2147,6 +2168,13 @@ static void to9_update_cart_bank ( void )
 
 
 
+static STATE_POSTLOAD( to9_update_cart_bank_postload )
+{
+	to9_update_cart_bank();
+}
+
+
+
 /* write signal to 0000-1fff generates a bank switch */
 WRITE8_HANDLER ( to9_cartridge_w )
 {
@@ -2213,6 +2241,13 @@ static void to9_update_ram_bank ( void )
 				       (mess_ram_size == 192*1024 || bank < 6) ?
 				       (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) : SMH_NOP );
 	old_bank = bank;
+}
+
+
+
+static STATE_POSTLOAD( to9_update_ram_bank_postload )
+{
+	to9_update_ram_bank();
 }
 
 
@@ -2835,8 +2870,8 @@ MACHINE_START ( to9 )
 	state_save_register_global( to7_lightpen_step );
 	state_save_register_global( to9_soft_bank );
 	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
-	state_save_register_func_postload( to9_update_ram_bank );
-	state_save_register_func_postload( to9_update_cart_bank );
+	state_save_register_postload(machine,  to9_update_ram_bank_postload, NULL );
+	state_save_register_postload(machine,  to9_update_cart_bank_postload, NULL );
 }
 
 
@@ -3201,6 +3236,13 @@ static void to8_update_floppy_bank( void )
 
 
 
+static STATE_POSTLOAD( to8_update_floppy_bank_postload )
+{
+	to8_update_floppy_bank();
+}
+
+
+
 static void to8_update_ram_bank ( void )
 {
 	UINT8 bank = 0;
@@ -3257,6 +3299,13 @@ static void to8_update_ram_bank ( void )
 
 
 
+static STATE_POSTLOAD( to8_update_ram_bank_postload )
+{
+	to8_update_ram_bank();
+}
+
+
+
 static void to8_update_cart_bank ( void )
 {
 	static int old_bank = -1;
@@ -3305,6 +3354,13 @@ static void to8_update_cart_bank ( void )
 	}
 	memory_set_bank( THOM_CART_BANK, bank );
 	old_bank = bank;
+}
+
+
+
+static STATE_POSTLOAD( to8_update_cart_bank_postload )
+{
+	to8_update_cart_bank();
 }
 
 
@@ -3785,9 +3841,9 @@ MACHINE_START ( to8 )
 	state_save_register_global( to8_data_vpage );
 	state_save_register_global( to8_cart_vpage );
 	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
-	state_save_register_func_postload( to8_update_ram_bank );
-	state_save_register_func_postload( to8_update_cart_bank );
-	state_save_register_func_postload( to8_update_floppy_bank );
+	state_save_register_postload(machine,  to8_update_ram_bank_postload, NULL );
+	state_save_register_postload(machine,  to8_update_cart_bank_postload, NULL );
+	state_save_register_postload(machine,  to8_update_floppy_bank_postload, NULL );
 }
 
 
@@ -3947,9 +4003,9 @@ MACHINE_START ( to9p )
 	state_save_register_global( to8_data_vpage );
 	state_save_register_global( to8_cart_vpage );
 	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
-	state_save_register_func_postload( to8_update_ram_bank );
-	state_save_register_func_postload( to8_update_cart_bank );
-	state_save_register_func_postload( to8_update_floppy_bank );
+	state_save_register_postload(machine,  to8_update_ram_bank_postload, NULL );
+	state_save_register_postload(machine,  to8_update_cart_bank_postload, NULL );
+	state_save_register_postload(machine,  to8_update_floppy_bank_postload, NULL );
 }
 
 
@@ -3975,6 +4031,13 @@ static void mo6_update_ram_bank ( void )
 	to8_data_vpage = bank;
 	memory_set_bank( TO8_DATA_LO, to8_data_vpage );
 	memory_set_bank( TO8_DATA_HI, to8_data_vpage );
+}
+
+
+
+static STATE_POSTLOAD( mo6_update_ram_bank_postload )
+{
+	mo6_update_ram_bank();
 }
 
 
@@ -4052,6 +4115,13 @@ static void mo6_update_cart_bank ( void )
 	old_bank = bank;
 	memory_set_bank( THOM_CART_BANK, bank );
 	memory_set_bank( TO8_BIOS_BANK, b );
+}
+
+
+
+static STATE_POSTLOAD( mo6_update_cart_bank_postload )
+{
+	mo6_update_cart_bank();
 }
 
 
@@ -4515,8 +4585,8 @@ MACHINE_START ( mo6 )
 	state_save_register_global( to8_cart_vpage );
 	state_save_register_global( mo5_reg_cart );
 	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
-	state_save_register_func_postload( mo6_update_ram_bank );
-	state_save_register_func_postload( mo6_update_cart_bank );
+	state_save_register_postload(machine,  mo6_update_ram_bank_postload, NULL );
+	state_save_register_postload(machine,  mo6_update_cart_bank_postload, NULL );
 }
 
 
@@ -4782,6 +4852,6 @@ MACHINE_START ( mo5nr )
 	state_save_register_global( to8_cart_vpage );
 	state_save_register_global( mo5_reg_cart );
 	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
-	state_save_register_func_postload( mo6_update_ram_bank );
-	state_save_register_func_postload( mo6_update_cart_bank );
+	state_save_register_postload(machine,  mo6_update_ram_bank_postload, NULL );
+	state_save_register_postload(machine,  mo6_update_cart_bank_postload, NULL );
 }

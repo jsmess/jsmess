@@ -533,15 +533,15 @@ static READ8_HANDLER( mux_r )
 	switch(mux_ctrl)
 	{
 	case 0:
-		return input_port_0_r(machine,0);
+		return input_port_read_indexed(machine, 0);
 	case 1:
-		return input_port_1_r(machine,0);
+		return input_port_read_indexed(machine, 1);
 	case 2:
-		return input_port_2_r(machine,0);
+		return input_port_read_indexed(machine, 2);
 	case 3:
-		return input_port_3_r(machine,0);
+		return input_port_read_indexed(machine, 3);
 	case 7:
-		return input_port_4_r(machine,0);
+		return input_port_read_indexed(machine, 4);
 	default:
 		logerror("Mux read from unknown port %d (%04x)\n", mux_ctrl, activecpu_get_pc());
 		return 0xff;
@@ -620,35 +620,35 @@ static int trackx,tracky;
 static READ8_HANDLER( horshoes_tracky_reset_r )
 {
 	/* reset the trackball counter */
-	tracky = readinputportbytag("AN0");
+	tracky = input_port_read(machine, "AN0");
 	return 0;
 }
 
 static READ8_HANDLER( horshoes_trackx_reset_r )
 {
 	/* reset the trackball counter */
-	trackx = readinputportbytag("AN1");
+	trackx = input_port_read(machine, "AN1");
 	return 0;
 }
 
 static READ8_HANDLER( horshoes_tracky_lo_r )
 {
-	return (readinputportbytag("AN0") - tracky) & 0xff;
+	return (input_port_read(machine, "AN0") - tracky) & 0xff;
 }
 
 static READ8_HANDLER( horshoes_tracky_hi_r )
 {
-	return (readinputportbytag("AN0") - tracky) >> 8;
+	return (input_port_read(machine, "AN0") - tracky) >> 8;
 }
 
 static READ8_HANDLER( horshoes_trackx_lo_r )
 {
-	return (readinputportbytag("AN1") - trackx) & 0xff;
+	return (input_port_read(machine, "AN1") - trackx) & 0xff;
 }
 
 static READ8_HANDLER( horshoes_trackx_hi_r )
 {
-	return (readinputportbytag("AN1") - trackx) >> 8;
+	return (input_port_read(machine, "AN1") - trackx) >> 8;
 }
 
 

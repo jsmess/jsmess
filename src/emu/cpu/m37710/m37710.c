@@ -504,80 +504,80 @@ static UINT8 m37710_internal_r(int offset)
 	switch (offset)
 	{
 		case 2: // p0
-			return io_read_byte_8(M37710_PORT0);
+			return io_read_byte_8le(M37710_PORT0);
 			break;
 		case 3: // p1
-			return io_read_byte_8(M37710_PORT1);
+			return io_read_byte_8le(M37710_PORT1);
 			break;
 		case 6: // p2
-			return io_read_byte_8(M37710_PORT2);
+			return io_read_byte_8le(M37710_PORT2);
 			break;
 		case 7: // p3
-			return io_read_byte_8(M37710_PORT3);
+			return io_read_byte_8le(M37710_PORT3);
 			break;
 		case 0xa: // p4
-			return io_read_byte_8(M37710_PORT4);
+			return io_read_byte_8le(M37710_PORT4);
 			break;
 		case 0xb: // p5
-			return io_read_byte_8(M37710_PORT5);
+			return io_read_byte_8le(M37710_PORT5);
 			break;
 		case 0xe: // p6
-			return io_read_byte_8(M37710_PORT6);
+			return io_read_byte_8le(M37710_PORT6);
 			break;
 		case 0xf: // p7
-			return io_read_byte_8(M37710_PORT7);
+			return io_read_byte_8le(M37710_PORT7);
 			break;
 		case 0x12: // p8
-			return io_read_byte_8(M37710_PORT8);
+			return io_read_byte_8le(M37710_PORT8);
 			break;
 
 		case 0x20:
-			return io_read_byte_8(M37710_ADC0_L);
+			return io_read_byte_8le(M37710_ADC0_L);
 			break;
 		case 0x21:
-			return io_read_byte_8(M37710_ADC0_H);
+			return io_read_byte_8le(M37710_ADC0_H);
 			break;
 		case 0x22:
-			return io_read_byte_8(M37710_ADC1_L);
+			return io_read_byte_8le(M37710_ADC1_L);
 			break;
 		case 0x23:
-			return io_read_byte_8(M37710_ADC1_H);
+			return io_read_byte_8le(M37710_ADC1_H);
 			break;
 		case 0x24:
-			return io_read_byte_8(M37710_ADC2_L);
+			return io_read_byte_8le(M37710_ADC2_L);
 			break;
 		case 0x25:
-			return io_read_byte_8(M37710_ADC2_H);
+			return io_read_byte_8le(M37710_ADC2_H);
 			break;
 		case 0x26:
-			return io_read_byte_8(M37710_ADC3_L);
+			return io_read_byte_8le(M37710_ADC3_L);
 			break;
 		case 0x27:
-			return io_read_byte_8(M37710_ADC3_H);
+			return io_read_byte_8le(M37710_ADC3_H);
 			break;
 		case 0x28:
-			return io_read_byte_8(M37710_ADC4_L);
+			return io_read_byte_8le(M37710_ADC4_L);
 			break;
 		case 0x29:
-			return io_read_byte_8(M37710_ADC4_H);
+			return io_read_byte_8le(M37710_ADC4_H);
 			break;
 		case 0x2a:
-			return io_read_byte_8(M37710_ADC5_L);
+			return io_read_byte_8le(M37710_ADC5_L);
 			break;
 		case 0x2b:
-			return io_read_byte_8(M37710_ADC5_H);
+			return io_read_byte_8le(M37710_ADC5_H);
 			break;
 		case 0x2c:
-			return io_read_byte_8(M37710_ADC6_L);
+			return io_read_byte_8le(M37710_ADC6_L);
 			break;
 		case 0x2d:
-			return io_read_byte_8(M37710_ADC6_H);
+			return io_read_byte_8le(M37710_ADC6_H);
 			break;
 		case 0x2e:
-			return io_read_byte_8(M37710_ADC7_L);
+			return io_read_byte_8le(M37710_ADC7_L);
 			break;
 		case 0x2f:
-			return io_read_byte_8(M37710_ADC7_H);
+			return io_read_byte_8le(M37710_ADC7_H);
 			break;
 		case 0x35:
 			return 0xff;	// UART control
@@ -598,39 +598,39 @@ static void m37710_internal_w(int offset, UINT8 data)
 	switch(offset)
 	{
 		case 2: // p0
-			io_write_byte_8(M37710_PORT0, data);
+			io_write_byte_8le(M37710_PORT0, data);
 			return;
 			break;
 		case 3: // p1
-			io_write_byte_8(M37710_PORT1, data);
+			io_write_byte_8le(M37710_PORT1, data);
 			return;
 			break;
 		case 6: // p2
-			io_write_byte_8(M37710_PORT2, data);
+			io_write_byte_8le(M37710_PORT2, data);
 			return;
 			break;
 		case 7: // p3
-			io_write_byte_8(M37710_PORT3, data);
+			io_write_byte_8le(M37710_PORT3, data);
 			return;
 			break;
 		case 0xa: // p4
-			io_write_byte_8(M37710_PORT4, data);
+			io_write_byte_8le(M37710_PORT4, data);
 			return;
 			break;
 		case 0xb: // p5
-			io_write_byte_8(M37710_PORT5, data);
+			io_write_byte_8le(M37710_PORT5, data);
 			return;
 			break;
 		case 0xe: // p6
-			io_write_byte_8(M37710_PORT6, data);
+			io_write_byte_8le(M37710_PORT6, data);
 			return;
 			break;
 		case 0xf: // p7
-			io_write_byte_8(M37710_PORT7, data);
+			io_write_byte_8le(M37710_PORT7, data);
 			return;
 			break;
 		case 0x12: // p8
-			io_write_byte_8(M37710_PORT8, data);
+			io_write_byte_8le(M37710_PORT8, data);
 			return;
 			break;
 
@@ -1041,7 +1041,7 @@ static offs_t m37710_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
 }
 #endif /* ENABLE_DEBUGGER */
 
-static void m37710_restore_state(void)
+static STATE_POSTLOAD( m37710_restore_state )
 {
 	// restore proper function pointers
 	m37710i_set_execution_mode((FLAG_M>>4) | (FLAG_X>>4));
@@ -1112,7 +1112,7 @@ static void m37710_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("M377xx", index, m37710i_cpu.reload[7].seconds);
 	state_save_register_item("M377xx", index, m37710i_cpu.reload[7].attoseconds);
 
-	state_save_register_func_postload(m37710_restore_state);
+	state_save_register_postload(Machine, m37710_restore_state, NULL);
 }
 
 /**************************************************************************

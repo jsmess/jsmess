@@ -346,7 +346,7 @@ static WRITE8_HANDLER( bw2_ppi8255_c_w )
 	PC3     Not connected
 	*/
 
-	if (readinputportbytag("RAMCARD") & 0x01)
+	if (input_port_read(machine, "RAMCARD") & 0x01)
 	{
 		ramcard_set_banks(data & 0x07);
 	}
@@ -500,7 +500,7 @@ static MACHINE_START( bw2 )
 	wd17xx_init(machine, WD_TYPE_2793, bw2_wd17xx_callback, NULL);
 	wd17xx_set_density(DEN_MFM_LO);
 
-	if (readinputportbytag("RAMCARD") & 0x01)
+	if (input_port_read(machine, "RAMCARD") & 0x01)
 	{
 		// RAMCARD installed
 		

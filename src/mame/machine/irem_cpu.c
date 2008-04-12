@@ -109,39 +109,62 @@ const UINT8 bomberman_decryption_table[256] = {
 
 const UINT8 lethalth_decryption_table[256] = {
 	0x7f,0x26,0x5d,xxxx,0xba,xxxx,0x1e,0x5e, 0xb8,xxxx,0xbc,0xe8,0x01,xxxx,0x4a,0x25, /* 00 */
+//       !!!! !!!!      !!!!      !!!! !!!!  !!!!      !!!! !!!! !!!!           !!!!
 	xxxx,0xbd,xxxx,0x22,0x10,xxxx,0x02,0x57, 0x70,xxxx,0x7c,xxxx,0xe7,0x52,xxxx,0xa9, /* 10 */
-//                      ^^^^                 ^^^^
+//                 !!!!           !!!! !!!!                      !!!! !!!!
 	xxxx,xxxx,0xc6,0x06,0xa0,0xfe,0xcf,0x8e, 0x43,0x8f,0x2d,xxxx,0xd4,0x85,0x75,0xa2, /* 20 */
-//                                                ^^^^
+//            !!!! !!!!      !!!! !!!! !!!!  !!!!                          !!!! !!!!
 	0x3d,xxxx,xxxx,0x38,0x7c,0x89,0xd1,0x80, 0x3b,0x72,0x07,xxxx,0x42,0x37,0x0a,0x18, /* 30 */
-//                                                                    ^^^^
+//                 !!!!      !!!! !!!! !!!!  !!!! !!!! !!!!                !!!!
 	0x88,0xb4,0x98,0x8b,0xb9,0x9c,0xad,0x0e, 0x2b,xxxx,0xbf,xxxx,0x55,xxxx,0x56,0xb0, /* 40 */
-//                                     ^^^^
+//  !!!!           !!!! !!!! !!!! !!!!                 !!!!      !!!!      !!!! !!!!
 	0x93,0x91,xxxx,0xeb,xxxx,0x50,0x41,0x29, 0x47,xxxx,xxxx,0x60,xxxx,0xab,xxxx,xxxx, /* 50 */
+//      !!!! !!!!      !!!!      !!!! !!!!                      !!!!      !!!!
 	0xc3,0xe2,0xd0,0xb2,0x11,0x79,xxxx,0x08, xxxx,0xfb,xxxx,0x2c,0x23,xxxx,0x28,0x0d, /* 60 */
+//  !!!! !!!! !!!! !!!!                           !!!!           !!!!
 	xxxx,xxxx,xxxx,0x83,0x3c,xxxx,0x1b,0x34, 0x5b,xxxx,0x40,xxxx,xxxx,0x04,0xfc,0x09, /* 70 */
-//                                                                              ^^^^
+//                 !!!! !!!!                 !!!!                     !!!! !!!!
 	0xb1,0xf3,0x8a,xxxx,xxxx,0x87,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xbe,0x84,0x1f,0xe6, /* 80 */
+//       !!!! !!!!                                               !!!!      !!!!
 	0xff,xxxx,0x12,xxxx,0xb5,0x36,xxxx,0xb3, xxxx,xxxx,xxxx,0xd2,0x4e,xxxx,xxxx,xxxx, /* 90 */
+//  !!!!                     !!!!      !!!!
 	0xa5,xxxx,xxxx,0xc7,xxxx,0x27,0x0b,xxxx, 0x20,xxxx,xxxx,xxxx,xxxx,xxxx,0x61,0x7f, /* A0 */
-	xxxx,xxxx,0x86,0x0f,xxxx,0xb7,xxxx,0x4f, xxxx,xxxx,0xc0,0xfd,xxxx,0x39,xxxx,0x7d, /* B0 */
+//  !!!!           !!!!           !!!!                                     !!!!
+	xxxx,xxxx,0x86,0x0f,xxxx,0xb7,xxxx,0x4f, xxxx,xxxx,0xc0,0xfd,xxxx,0x39,xxxx,0x77, /* B0 */
+//            !!!! !!!!                                !!!!           !!!!      !!!!
 	0x05,0x3a,xxxx,0x48,0x92,0x7a,0x3e,0x03, xxxx,0xf8,xxxx,0x59,0xa8,0x5f,0xf9,0xbb, /* C0 */
+//  !!!! !!!!                          !!!!                 !!!!      !!!! !!!! !!!!
 	0x81,0xfa,0x9d,0xe9,0x2e,0xa1,0xc1,0x33, xxxx,0x78,xxxx,0x0c,xxxx,0x24,0xaa,0xac, /* D0 */
+//  !!!! !!!! !!!! !!!! !!!! !!!! !!!! !!!!                           !!!!      !!!!
 	xxxx,0xb6,xxxx,0xea,xxxx,0x73,0xe5,0x58, 0x00,0xf7,xxxx,0x74,xxxx,0x7e,xxxx,0xa3, /* E0 */
+//                 !!!!           !!!! !!!!       !!!!      !!!!                !!!!
 	xxxx,0x5a,0xf6,0x32,0x46,0x2a,xxxx,xxxx, 0x53,0x4b,0x90,xxxx,0x51,0x68,0x99,0x13, /* F0 */
-//                                                                              ^^^^
+//       !!!! !!!! !!!! !!!! !!!!            !!!!      !!!!      !!!! !!!!
 };
+/*
+missing opcode:
+
+"!!!!" -> checked against gussun
+"gggg" -> very probably
+"pppp" -> probably
+"????" -> missing
+
+RZ notes:
+0xbf (0x77) risky challenge use same code
+
+*/
+
 // 0x2c (0xd4) complete guess
 // 0x2d (0x85) complete guess
 // 0xc4 (0x92) guess
 // 0xbb (0xfd) guess
-// 0x46 (0xad) guess
+// 0x46 (0xad) guess - risky challenge use same code
 // 0x6e (0x28) guess
 // 0x76 (0x1b) guess
 // 0x8d (0x84) guess
-// 0xa6 (0x0b) guess
+// 0xa6 (0x0b) guess - risky challenge use same code
 // 0xa8 (0x20) guess
-// 0xbd (0x39) guess
+// 0xbd (0x39) guess - risky challenge use same code
 // 0xc3 (0x48) guess
 // and our collection of conditional branches:
 // 0xbf (0x7d) >= (monitor test)
@@ -304,7 +327,7 @@ const UINT8 gussun_decryption_table[256] = {
     0x63,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
 //  gggg                          gggg            gggg                gggg
     xxxx,xxxx,0x75,0x24,0x08,0x83,0x32,0xe9, xxxx,0x79,xxxx,0x8f,0x22,xxxx,0xac,xxxx, /* 10 */
-//                      ????                      pppp      gggg
+//                      pppp                      pppp      gggg
     0x5d,0xa5,0x11,0x51,0x0a,0x29,xxxx,xxxx ,0xf8,0x98,0x91,0x40,0x28,0x00,0x03,0x5f, /* 20 */
 //            gggg           gggg            gggg gggg      gggg gggg pppp
     0x26,xxxx,xxxx,0x8b,0x2f,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0x90,0xb3,xxxx, /* 30 */
@@ -322,11 +345,11 @@ const UINT8 gussun_decryption_table[256] = {
     xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,xxxx, /* 90 */
 //            gggg                     gggg
     xxxx,0xa3,xxxx,xxxx,0x12,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x48,0x80,0x8c,0xd4,xxxx, /* a0 */
-//                      gggg           gggg                 ????      gggg gggg
-    0x42,xxxx,0x84,0xb6,0x77,0x3d,0x3e,xxxx, xxxx,0xb7,0x4b,xxxx,0xa4,xxxx,xxxx,xxxx, /* b0 */
-//  gggg      gggg ???? gggg      gggg            ???? pppp      gggg
+//                      gggg           gggg                 pppp      gggg gggg
+    0x42,xxxx,0x84,0xb6,0x77,0x3d,0x3e,xxxx, xxxx,0x0c,0x4b,xxxx,0xa4,xxxx,xxxx,xxxx, /* b0 */
+//  gggg      gggg pppp gggg      gggg            pppp pppp      gggg
     xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
-//            gggg                                                         pppp
+//            gggg
     0x85,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,0x4e,xxxx,0x1f,0x23,xxxx, /* d0 */
 //  gggg                                                    gggg
     0xe8,xxxx,0x89,0xa1,0xd0,xxxx,xxxx,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
@@ -343,22 +366,19 @@ missing opcode:
 "gggg" -> very probably
 "pppp" -> probably
 "????" -> missing
-"0xHH" -> right code (not supported)
-
-14 -> 08 (2097b 20980 - routine from 2097a) (08 30) to handle the player number -> probably 08
-ab -> 4f?(19570 - routine from 194e1 to 19619) (when the water go up)
-b3 -> 19 (216b6 - 216cf - 16663 (when you rotate a piece) - 175f1 - 17d2a - 17d36
-b9 -> b7 (21210 - routine from 2117e to ) 2 bytes -
 
 rz probably:
+14 -> 08 (2097b 20980 - routine from 2097a) (08 30) to handle the player number -> 08
 19 -> 79 (1df45 routine from 1df27 / 2282f - routine from 2281f to 22871) no 70,78,7a,7b,7c,7e,7f(ok) ok 79,7d
 5a -> 7c (195eb - (222fc - routine from 222ed to ) (7x j...) no 70,71,79,7a,7b ok (78,7c) -> 7c
 63 -> 7d (1df7f, 1df8c, 1df95, 21f08 - routine from 1df27 to ) no 70,78,7a,7b,7c,7e,7f(ok) ok 79,7d
 7b -> 0d
 82 -> 78 (78,7c) -> 78
 86 -> 2d
+ab -> 48 (1956f - routine from 194e1 to 19619 - bp 19567) (when the water go up) -> 48
+b3 -> b6 (216b6 - 216cf - 16663 (when you rotate a piece) - 175f1 - 17d2a - 17d36) -> b6
+b9 -> 0c (21210 - routine from 2117e to ) 2 bytes -> to handle messages in level 0 (learning level)
 ba -> 4b (1094d, 10b28 - routine from 10948 to 10b73) one byte -> probably 4b
-ce -> 01 (10236 - routine from 1017e to 10254) (01, 09, 19, 21, 29, 31) -> probably 01
 f1 -> 20 to handle the player number
 
 rz guess:

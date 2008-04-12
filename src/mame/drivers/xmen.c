@@ -460,10 +460,15 @@ static INTERRUPT_GEN( xmen_interrupt )
 	else irq3_line_hold(machine, cpunum);
 }
 
+static STATE_POSTLOAD( xmen_postload )
+{
+	sound_reset_bank();
+}
+
 static MACHINE_START( xmen )
 {
 	state_save_register_global(sound_curbank);
-	state_save_register_func_postload(sound_reset_bank);
+	state_save_register_postload(machine, xmen_postload, NULL);
 }
 
 static MACHINE_DRIVER_START( xmen )
@@ -489,8 +494,7 @@ static MACHINE_DRIVER_START( xmen )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-
+	MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )	/* correct, same issue of TMNT2 */
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(xmen)

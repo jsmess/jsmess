@@ -1804,6 +1804,15 @@ static void build_fontdata(const m6847_variant *v)
 
 
 
+static STATE_POSTLOAD( m6847_postload )
+{
+	set_field_sync();
+	set_horizontal_sync();
+	set_dirty();
+}
+
+
+
 void m6847_init(running_machine *machine, const m6847_config *cfg)
 {
 	const m6847_variant *v;
@@ -1890,9 +1899,7 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 	timer_adjust_periodic(m6847->fs_rise_timer, attotime_zero, 0, attotime_make(0, frame_period));
 
 	/* setup save states */
-	state_save_register_func_postload(set_field_sync);
-	state_save_register_func_postload(set_horizontal_sync);
-	state_save_register_func_postload(set_dirty);
+	state_save_register_postload(machine, m6847_postload, NULL);
 
 	/* build font */
 	build_fontdata(v);

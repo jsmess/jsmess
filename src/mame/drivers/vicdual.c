@@ -85,7 +85,7 @@ static void assert_coin_status(void)
 
 static CUSTOM_INPUT( vicdual_read_coin_status )
 {
-	UINT32 coin_input = readinputportbytag(COIN_PORT_TAG);
+	UINT32 coin_input = input_port_read(machine, COIN_PORT_TAG);
 
 	if (coin_input && !last_coin_input)
 	{
@@ -188,9 +188,9 @@ static CUSTOM_INPUT( vicdual_get_timer_value )
 #define COLOR_BW_PORT_TAG		"COLOR_BW"
 
 
-int vicdual_is_cabinet_color(void)
+int vicdual_is_cabinet_color(running_machine *machine)
 {
-	return (readinputportbytag(COLOR_BW_PORT_TAG) == 0);
+	return (input_port_read(machine, COLOR_BW_PORT_TAG) == 0);
 }
 
 
@@ -352,8 +352,8 @@ static READ8_HANDLER( safari_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x08)  ret = input_port_1_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -436,8 +436,8 @@ static READ8_HANDLER( frogs_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x08)  ret = input_port_1_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -544,8 +544,8 @@ static READ8_HANDLER( headon_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x08)  ret = input_port_1_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -2098,8 +2098,8 @@ static READ8_HANDLER( nsub_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x08)  ret = input_port_1_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -2193,9 +2193,9 @@ static READ8_HANDLER( invinco_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x02)  ret = input_port_1_r(machine,0);
-	if (offset & 0x08)  ret = input_port_2_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x02)  ret = input_port_read_indexed(machine, 1);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 2);
 
 	return ret;
 }

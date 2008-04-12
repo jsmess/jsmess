@@ -144,14 +144,14 @@ static READ8_HANDLER( coupe_status_r )
 	UINT8 data = 0xe0;
 	UINT8 row = ~(offset >> 8);
 
-	if (row & 0x80) data &= readinputportbytag("keyboard_row_7f") & 0xe0;
-	if (row & 0x40) data &= readinputportbytag("keyboard_row_bf") & 0xe0;
-	if (row & 0x20) data &= readinputportbytag("keyboard_row_df") & 0xe0;
-	if (row & 0x10) data &= readinputportbytag("keyboard_row_ef") & 0xe0;
-	if (row & 0x08) data &= readinputportbytag("keyboard_row_f7") & 0xe0;
-	if (row & 0x04) data &= readinputportbytag("keyboard_row_fb") & 0xe0;
-	if (row & 0x02) data &= readinputportbytag("keyboard_row_fd") & 0xe0;
-	if (row & 0x01) data &= readinputportbytag("keyboard_row_fe") & 0xe0;
+	if (row & 0x80) data &= input_port_read(machine, "keyboard_row_7f") & 0xe0;
+	if (row & 0x40) data &= input_port_read(machine, "keyboard_row_bf") & 0xe0;
+	if (row & 0x20) data &= input_port_read(machine, "keyboard_row_df") & 0xe0;
+	if (row & 0x10) data &= input_port_read(machine, "keyboard_row_ef") & 0xe0;
+	if (row & 0x08) data &= input_port_read(machine, "keyboard_row_f7") & 0xe0;
+	if (row & 0x04) data &= input_port_read(machine, "keyboard_row_fb") & 0xe0;
+	if (row & 0x02) data &= input_port_read(machine, "keyboard_row_fd") & 0xe0;
+	if (row & 0x01) data &= input_port_read(machine, "keyboard_row_fe") & 0xe0;
 
 	return data | coupe_regs.status;
 }
@@ -222,18 +222,18 @@ static READ8_HANDLER( coupe_keyboard_r )
 
 	if (row == 0)
 	{
-		data &= readinputportbytag("keyboard_row_ff") & 0x1f;
+		data &= input_port_read(machine, "keyboard_row_ff") & 0x1f;
 	}
 	else
 	{
-		if (row & 0x80) data &= readinputportbytag("keyboard_row_7f") & 0x1f;
-		if (row & 0x40) data &= readinputportbytag("keyboard_row_bf") & 0x1f;
-		if (row & 0x20) data &= readinputportbytag("keyboard_row_df") & 0x1f;
-		if (row & 0x10) data &= readinputportbytag("keyboard_row_ef") & 0x1f;
-		if (row & 0x08) data &= readinputportbytag("keyboard_row_f7") & 0x1f;
-		if (row & 0x04) data &= readinputportbytag("keyboard_row_fb") & 0x1f;
-		if (row & 0x02) data &= readinputportbytag("keyboard_row_fd") & 0x1f;
-		if (row & 0x01) data &= readinputportbytag("keyboard_row_fe") & 0x1f;
+		if (row & 0x80) data &= input_port_read(machine, "keyboard_row_7f") & 0x1f;
+		if (row & 0x40) data &= input_port_read(machine, "keyboard_row_bf") & 0x1f;
+		if (row & 0x20) data &= input_port_read(machine, "keyboard_row_df") & 0x1f;
+		if (row & 0x10) data &= input_port_read(machine, "keyboard_row_ef") & 0x1f;
+		if (row & 0x08) data &= input_port_read(machine, "keyboard_row_f7") & 0x1f;
+		if (row & 0x04) data &= input_port_read(machine, "keyboard_row_fb") & 0x1f;
+		if (row & 0x02) data &= input_port_read(machine, "keyboard_row_fd") & 0x1f;
+		if (row & 0x01) data &= input_port_read(machine, "keyboard_row_fe") & 0x1f;
 	}
 
 	return data | 0xe0;

@@ -172,7 +172,7 @@ static UINT8 sound_reset_state;
  *
  *************************************/
 
-static void bankselect_postload(void);
+static STATE_POSTLOAD( bankselect_postload );
 
 
 
@@ -252,7 +252,7 @@ static MACHINE_START( atarisy2 )
 	state_save_register_global(which_adc);
 	state_save_register_global(p2portwr_state);
 	state_save_register_global(p2portrd_state);
-	state_save_register_func_postload(bankselect_postload);
+	state_save_register_postload(machine, bankselect_postload, NULL);
 	state_save_register_global(sound_reset_state);
 }
 
@@ -359,7 +359,7 @@ static WRITE16_HANDLER( bankselect_w )
 }
 
 
-static void bankselect_postload(void)
+static STATE_POSTLOAD( bankselect_postload )
 {
 	bankselect_w(Machine, 0, bankselect[0], 0);
 	bankselect_w(Machine, 1, bankselect[1], 0);
@@ -425,9 +425,9 @@ static WRITE16_HANDLER( adc_strobe_w )
 static READ16_HANDLER( adc_r )
 {
 	if (which_adc < pedal_count)
-		return ~readinputport(3 + which_adc);
+		return ~input_port_read_indexed(machine, 3 + which_adc);
 
-	return readinputport(3 + which_adc) | 0xff00;
+	return input_port_read_indexed(machine, 3 + which_adc) | 0xff00;
 }
 
 
@@ -444,8 +444,8 @@ static READ8_HANDLER( leta_r )
 				static double last_angle;
 				static int rotations;
 
-				int analogx = readinputport(7) - 128;
-				int analogy = readinputport(8) - 128;
+				int analogx = input_port_read_indexed(machine, 7) - 128;
+				int analogy = input_port_read_indexed(machine, 8) - 128;
 				double angle;
 
 				/* if the joystick is centered, leave the rest of this alone */
@@ -481,7 +481,7 @@ static READ8_HANDLER( leta_r )
 		}
 	}
 
-	return readinputport(7 + (offset & 3));
+	return input_port_read_indexed(machine, 7 + (offset & 3));
 }
 
 

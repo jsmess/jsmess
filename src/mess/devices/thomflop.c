@@ -1716,7 +1716,7 @@ static READ8_HANDLER ( to7_network_r )
 	if ( offset == 8 )
 	{
 		/* network ID of the computer */
-		UINT8 id = readinputport( THOM_INPUT_FCONFIG ) >> 3;
+		UINT8 id = input_port_read_indexed(machine,  THOM_INPUT_FCONFIG ) >> 3;
 		VLOG(( "%f $%04x to7_network_r: read id $%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), id ));
 		return id;
 	}
@@ -1774,7 +1774,7 @@ void to7_floppy_init ( running_machine *machine, void* base )
 
 void to7_floppy_reset ( running_machine *machine )
 {
-	to7_controller_type = (readinputport( THOM_INPUT_FCONFIG ) ) & 7;
+	to7_controller_type = (input_port_read_indexed(machine,  THOM_INPUT_FCONFIG ) ) & 7;
 
 	switch ( to7_controller_type )
 	{

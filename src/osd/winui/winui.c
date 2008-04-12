@@ -5591,14 +5591,14 @@ static void MamePlayBackGame()
 			// read playback header
 			mame_fread(pPlayBack, &input_header, sizeof(inp_header));
 
-			if (!isalnum(input_header.name[0])) // If first byte is not alpha-numeric
+			if (!isalnum(input_header.gamename[0])) // If first byte is not alpha-numeric
 				mame_fseek(pPlayBack, 0, SEEK_SET); // old .inp file - no header
 			else
 			{
 				int i;
 				for (i = 0; drivers[i] != 0; i++) // find game and play it
 				{
-					if (strcmp(drivers[i]->name, input_header.name) == 0)
+					if (strcmp(drivers[i]->name, input_header.gamename) == 0)
 					{
 						nGame = i;
 						break;

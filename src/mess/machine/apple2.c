@@ -293,6 +293,13 @@ void apple2_update_memory(void)
 
 
 
+static STATE_POSTLOAD( apple2_update_memory_postload )
+{
+	apple2_update_memory();
+}
+
+
+
 /* -----------------------------------------------------------------------
  * Apple II memory map
  * ----------------------------------------------------------------------- */
@@ -1063,10 +1070,10 @@ READ8_HANDLER ( apple2_c07x_r )
 
 	if (offset == 0)
 	{
-		joystick_x1_time = attotime_to_double(timer_get_time()) + x_calibration * readinputportbytag("joystick_1_x");
-		joystick_y1_time = attotime_to_double(timer_get_time()) + y_calibration * readinputportbytag("joystick_1_y");
-		joystick_x2_time = attotime_to_double(timer_get_time()) + x_calibration * readinputportbytag("joystick_2_x");
-		joystick_y2_time = attotime_to_double(timer_get_time()) + y_calibration * readinputportbytag("joystick_2_y");
+		joystick_x1_time = attotime_to_double(timer_get_time()) + x_calibration * input_port_read(machine, "joystick_1_x");
+		joystick_y1_time = attotime_to_double(timer_get_time()) + y_calibration * input_port_read(machine, "joystick_1_y");
+		joystick_x2_time = attotime_to_double(timer_get_time()) + x_calibration * input_port_read(machine, "joystick_2_x");
+		joystick_y2_time = attotime_to_double(timer_get_time()) + y_calibration * input_port_read(machine, "joystick_2_y");
 	}
 	return 0;
 }
@@ -1532,7 +1539,7 @@ void apple2_init_common(running_machine *machine, const apple2_config *config)
 
 	/* state save registers */
 	state_save_register_global(a2);
-	state_save_register_func_postload(apple2_update_memory);
+	state_save_register_postload(machine, apple2_update_memory_postload, NULL);
 
 	/* apple2 behaves much better when the default memory is zero */
 	memset(mess_ram, 0, mess_ram_size);

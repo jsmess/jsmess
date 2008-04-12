@@ -332,7 +332,7 @@ static CUSTOM_INPUT( multiplexed_controller_r )
 
 	sprintf(tag, "IN%s-%d", (const char *)param, controller_select & 0x01);
 
-	return readinputportbytag(tag);
+	return input_port_read(machine, tag);
 }
 
 
@@ -351,10 +351,10 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 	{
 	default:
 	case 0x00: ret = 0x0000; break; /* nothing? */
-	case 0x09: ret = readinputportbytag("MAHJONG1"); break;
-	case 0x12: ret = readinputportbytag("MAHJONG2"); break;
-	case 0x1b: ret = readinputportbytag("MAHJONG3"); break; /* player 1 normal inputs? */
-	case 0x24: ret = readinputportbytag("MAHJONG4"); break;
+	case 0x09: ret = input_port_read(machine, "MAHJONG1"); break;
+	case 0x12: ret = input_port_read(machine, "MAHJONG2"); break;
+	case 0x1b: ret = input_port_read(machine, "MAHJONG3"); break; /* player 1 normal inputs? */
+	case 0x24: ret = input_port_read(machine, "MAHJONG4"); break;
 	}
 
 	return ret;
@@ -817,13 +817,13 @@ static WRITE16_HANDLER( system_control_w )
 		switch (offset & 0x07)
 		{
 		default:
-		case 0x00: neogeo_set_screen_dark(bit); break;
+		case 0x00: neogeo_set_screen_dark(machine, bit); break;
 		case 0x01: set_main_cpu_vector_table_source(bit);
 				   set_audio_cpu_rom_source(bit); /* this is a guess */
 				   break;
 		case 0x05: neogeo_set_fixed_layer_source(bit); break;
 		case 0x06: set_save_ram_unlock(bit); break;
-		case 0x07: neogeo_set_palette_bank(bit); break;
+		case 0x07: neogeo_set_palette_bank(machine, bit); break;
 
 		case 0x02: /* unknown - HC32 middle pin 1 */
 		case 0x03: /* unknown - uPD4990 pin ? */
@@ -944,6 +944,15 @@ static void set_output_data(UINT8 data)
  *
  *************************************/
 
+static STATE_POSTLOAD( neogeo_postload )
+{
+	_set_main_cpu_bank_address();
+	_set_main_cpu_vector_table_source();
+	set_audio_cpu_banking();
+	_set_audio_cpu_rom_source();
+	set_outputs();
+}
+
 static MACHINE_START( neogeo )
 {
 	/* set the BIOS bank */
@@ -987,11 +996,7 @@ static MACHINE_START( neogeo )
 	state_save_register_global(led1_value);
 	state_save_register_global(led2_value);
 
-	state_save_register_func_postload(_set_main_cpu_bank_address);
-	state_save_register_func_postload(_set_main_cpu_vector_table_source);
-	state_save_register_func_postload(set_audio_cpu_banking);
-	state_save_register_func_postload(_set_audio_cpu_rom_source);
-	state_save_register_func_postload(set_outputs);
+	state_save_register_postload(machine, neogeo_postload, NULL);
 }
 
 

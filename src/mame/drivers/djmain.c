@@ -257,14 +257,14 @@ static READ32_HANDLER( v_rom_r )
 
 static READ32_HANDLER( inp1_r )
 {
-	UINT32 result = (readinputport(5)<<24) | (readinputport(2)<<16) | (readinputport(1)<<8) | readinputport(0);
+	UINT32 result = (input_port_read_indexed(machine, 5)<<24) | (input_port_read_indexed(machine, 2)<<16) | (input_port_read_indexed(machine, 1)<<8) | input_port_read_indexed(machine, 0);
 
 	return result;
 }
 
 static READ32_HANDLER( inp2_r )
 {
-	return (readinputport(3)<<24) | (readinputport(4)<<16) | 0xffff;
+	return (input_port_read_indexed(machine, 3)<<24) | (input_port_read_indexed(machine, 4)<<16) | 0xffff;
 }
 
 static READ32_HANDLER( turntable_r )
@@ -276,7 +276,7 @@ static READ32_HANDLER( turntable_r )
 		UINT8 pos;
 		int delta;
 
-		pos = readinputport(6 + turntable_select);
+		pos = input_port_read_indexed(machine, 6 + turntable_select);
 		delta = pos - turntable_last_pos[turntable_select];
 		if (delta < -128)
 			delta += 256;
@@ -1183,6 +1183,11 @@ static const struct K054539interface k054539_interface =
  *
  *************************************/
 
+static STATE_POSTLOAD( djmain_postload )
+{
+	sndram_set_bank();
+}
+
 static MACHINE_START( djmain )
 {
 	UINT8 *region = memory_region(REGION_SOUND1);
@@ -1193,7 +1198,7 @@ static MACHINE_START( djmain )
 	state_save_register_global(v_ctrl);
 	state_save_register_global_array(obj_regs);
 
-	state_save_register_func_postload(sndram_set_bank);
+	state_save_register_postload(machine, djmain_postload, NULL);
 }
 
 
