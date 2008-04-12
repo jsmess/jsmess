@@ -230,7 +230,7 @@ static int validate_inlines(void)
 	INT32 remainder, expremainder;
 	UINT32 uremainder, expuremainder;
 	int error = FALSE;
-return error;
+
 	/* use only non-zero, positive numbers */
 	if (testu64a == 0) testu64a++;
 	if (testi64a == 0) testi64a++;
