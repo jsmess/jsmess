@@ -956,19 +956,23 @@ BEGIN
 #endif
 END
 
+#ifdef MESS
+IDD_FILTERS DIALOGEX 0, 0, 190, 196
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+EXSTYLE WS_EX_CONTEXTHELP
+CAPTION "System Filters"
+#else
 IDD_FILTERS DIALOGEX 0, 0, 190, 182
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
-#ifdef MESS
-CAPTION "System Filters"
-#else
 CAPTION "Game Filters"
 #endif
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
 #ifdef MESS
-    GROUPBOX        "System filters",IDC_STATIC,6,4,178,85
+    GROUPBOX        "System filters",IDC_STATIC,6,4,178,99
 #else
     GROUPBOX        "Game filters",IDC_STATIC,6,4,178,85
 #endif
@@ -983,12 +987,16 @@ BEGIN
     CONTROL         "&Horizontal",IDC_FILTER_HORIZONTAL,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,14,58,57,10,0,
                     HIDC_FILTER_HORIZONTAL
+#ifdef MESS
+    CONTROL         "&Computers",IDC_FILTER_COMPUTER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,72,57,10,0,HIDC_FILTER_UNAVAILABLE
+    CONTROL         "C&onsoles",IDC_FILTER_CONSOLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,72,57,10,0,HIDC_FILTER_UNAVAILABLE
+    CONTROL         "&Unavailable",IDC_FILTER_UNAVAILABLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,14,86,57,10,0,
+                    HIDC_FILTER_UNAVAILABLE
+#else    
     CONTROL         "&Unavailable",IDC_FILTER_UNAVAILABLE,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,14,72,57,10,0,
                     HIDC_FILTER_UNAVAILABLE
-#ifdef MESS
-    CONTROL         "&Computers",IDC_FILTER_COMPUTER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,72,57,10,0,HIDC_FILTER_UNAVAILABLE
-    CONTROL         "C&onsoles",IDC_FILTER_CONSOLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,58,57,10,0,HIDC_FILTER_UNAVAILABLE
 #endif
     CONTROL         "&Raster Graphics",IDC_FILTER_RASTER,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,100,16,70,10,0,
@@ -1003,16 +1011,21 @@ BEGIN
     LTEXT           "(*) = inherited from parent folder",IDC_INHERITED,14,72,
                     99,10
 #ifdef MESS
-    CTEXT           "System filters allow customizing the systems that are displayed in each folder by hiding games that match the filters applied.",IDC_STATIC,6,94,178,27
+    CTEXT           "System filters allow customizing the systems that are displayed in each folder by hiding games that match the filters applied.",IDC_STATIC,6,108,178,27
+    GROUPBOX        "&Description filter",IDC_STATIC,6,136,178,33
+    EDITTEXT        IDC_FILTER_EDIT,14,148,162,13,ES_AUTOHSCROLL,0,
+                    HIDC_FILTER_EDIT
+    DEFPUSHBUTTON   "&OK",IDOK,42,175,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,98,175,50,14
 #else
     CTEXT           "Game filters allow customizing the games that are displayed in each folder by hiding games that match the filters applied.",
                     IDC_STATIC,6,94,178,27
-#endif
     GROUPBOX        "&Description filter",IDC_STATIC,6,122,178,33
     EDITTEXT        IDC_FILTER_EDIT,14,134,162,13,ES_AUTOHSCROLL,0,
                     HIDC_FILTER_EDIT
     DEFPUSHBUTTON   "&OK",IDOK,42,161,50,14
     PUSHBUTTON      "&Cancel",IDCANCEL,98,161,50,14
+#endif
 END
 
 IDD_RESET DIALOGEX 0, 0, 190, 122

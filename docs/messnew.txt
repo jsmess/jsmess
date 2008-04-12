@@ -56,6 +56,8 @@ User Interface Changes:
 - [MESSUI] Updated MESS icon, logo and other artwork (Asterokid, MAMEPlus team,
   Hobie Troxell)
 
+- [MESSUI] Fixed custom filters dialog.  (bug #1574) [Nate Woods]
+
 
 
 Imgtool Changes:
