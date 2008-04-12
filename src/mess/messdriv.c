@@ -364,6 +364,7 @@ TESTDRIVER( c128dita )	/* Commodore 128D - PAL (italian) cost reduced set	*/
 	DRIVER( a500n )		/* Commodore Amiga 500 - NTSC						*/
 	DRIVER( a500p )		/* Commodore Amiga 500 - PAL						*/
 	DRIVER( a1000n )	/* Commodore Amiga 1000 - NTSC						*/
+	DRIVER( a1000p )	/* Commodore Amiga 1000 - PAL						*/
 	DRIVER( cdtv )
 
 	DRIVER( c65 )		/* 1991 C65 / C64DX (Prototype, NTSC)				*/

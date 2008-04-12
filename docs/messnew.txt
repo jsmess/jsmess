@@ -30,6 +30,8 @@ System Driver Changes:
 
 - [COUPE] Added support for up to four 1 MB memory expansions.  [Dirk Best]
 
+- [ELECTRON] Fixed corrupt text in Mode 3. [Robbbert]
+
 - [GENESIS] Clean and speed up SSF2 banking [Cowering]
 
 - [GENESIS] Add automatic support for many 'pirate' carts (thanks to Haze for
