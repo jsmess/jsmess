@@ -126,22 +126,6 @@ static GFXDECODE_START( apple1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple1_charlayout, 0, 1 )
 GFXDECODE_END
 
-/* Monochrome monitors were not easy to get when the Apple I was
-   introduced, so most systems used a television display with an RF
-   modulator.  Thus white seems like a more accurate foreground color
-   than green. */
-
-static const rgb_t apple1_palette[] =
-{
-	RGB_BLACK,
-	RGB_WHITE
-};
-
-static PALETTE_INIT( apple1 )
-{
-	palette_set_colors(machine, 0, apple1_palette, ARRAY_LENGTH(apple1_palette));
-}
-
 /* keyboard input */
 /*
    It's very likely that the keyboard assgnments are totally wrong: the code in machine/apple1.c
@@ -245,8 +229,8 @@ static MACHINE_DRIVER_START( apple1 )
 	MDRV_SCREEN_SIZE(40 * 7, 24 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
 	MDRV_GFXDECODE(apple1)
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(apple1_palette))
-	MDRV_PALETTE_INIT(apple1)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(apple1)
 	MDRV_VIDEO_UPDATE(apple1)
