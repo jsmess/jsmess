@@ -265,6 +265,11 @@ WRITE8_HANDLER( svi318_ppi_w )
 
 /* Printer port */
 
+static const device_config *printer_device(running_machine *machine)
+{
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
+
 static WRITE8_HANDLER( svi318_printer_w )
 {
 	if (!offset)
@@ -272,23 +277,15 @@ static WRITE8_HANDLER( svi318_printer_w )
 	else
 	{
 		if ( (svi.prn_strobe & 1) && !(data & 1) )
-			printer_output(image_from_devtype_and_index(IO_PRINTER, 0), svi.prn_data);
+			printer_output(printer_device(machine), svi.prn_data);
 
 		svi.prn_strobe = data;
 	}
 }
 
-static const device_config *printer_device(running_machine *machine)
-{
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
-}
-
 static READ8_HANDLER( svi318_printer_r )
 {
-	if (printer_is_ready(printer_device(machine)) )
-		return 0xfe;
-
-	return 0xff;
+	return printer_is_ready(printer_device(machine)) ? 0xfe:0xff;		/* 0xfe if printer is ready to work */
 }
 
 /* PSG */
