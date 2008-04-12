@@ -739,6 +739,13 @@ static TIMER_CALLBACK(setup_beep)
 }
 
 
+static MACHINE_START( pcw )
+{
+	nec765_init(&pcw_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
+	fdc_interrupt_code = 0;
+	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+}
+
 
 static DRIVER_INIT(pcw)
 {
@@ -746,7 +753,6 @@ static DRIVER_INIT(pcw)
 
 	cpunum_set_input_line_vector(0, 0,0x0ff);
 
-    nec765_init(&pcw_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 
 	/* ram paging is actually undefined at power-on */
 	pcw_banks[0] = 0;
@@ -764,9 +770,6 @@ static DRIVER_INIT(pcw)
 	pcw_system_status &= ~((1<<6) | (1<<5) | (1<<4));
 
 	pcw_interrupt_counter = 0;
-	fdc_interrupt_code = 0;
-
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 
 	roller_ram_offset = 0;
 
@@ -978,6 +981,8 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_CPU_PROGRAM_MAP(pcw_map, 0)
 	MDRV_CPU_IO_MAP(pcw_io, 0)
 	MDRV_INTERLEAVE(1)
+
+	MDRV_MACHINE_START(pcw)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

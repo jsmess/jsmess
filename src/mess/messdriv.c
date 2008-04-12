@@ -221,12 +221,12 @@ TESTDRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 	DRIVER( gx4000 )    /* Amstrad GX4000 - 1990                            */
 	DRIVER( kccomp )	/* VEB KC compact									*/
 	DRIVER( al520ex )   /* Patisonic Aleste 520EX (1993)                    */
-TESTDRIVER( pcw8256 )	/* 198? PCW8256										*/
-TESTDRIVER( pcw8512 )	/* 198? PCW8512										*/
-TESTDRIVER( pcw9256 )	/* 198? PCW9256										*/
-TESTDRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
-TESTDRIVER( pcw10 ) 	/* 198? PCW10										*/
-TESTDRIVER( pcw16 )		/* 1995 PCW16										*/
+	DRIVER( pcw8256 )	/* 198? PCW8256										*/
+	DRIVER( pcw8512 )	/* 198? PCW8512										*/
+	DRIVER( pcw9256 )	/* 198? PCW9256										*/
+	DRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
+	DRIVER( pcw10 ) 	/* 198? PCW10										*/
+	DRIVER( pcw16 )		/* 1995 PCW16										*/
 	DRIVER( nc100 )		/* 19?? NC100										*/
 	DRIVER( nc200 )		/* 19?? NC200										*/
 

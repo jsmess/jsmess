@@ -81,7 +81,7 @@
  ******************************************************************************/
 /* PeT 19.October 2000
    added/changed printer support
-   not working reliable, seams to expect parallelport in epp/ecp mode
+   not working reliably, seems to expect parallelport in epp/ecp mode
    epp/ecp modes in parallel port not supported yet
    so ui disabled */
 
@@ -1468,4 +1468,4 @@ SYSTEM_CONFIG_START(pcw16)
 SYSTEM_CONFIG_END
 
 /*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT   CONFIG,  COMPANY          FULLNAME */
-COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    pcw16,	    pcw16,   "Amstrad plc",   "PCW16", 0)
+COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    pcw16,	    pcw16,   "Amstrad plc",   "PCW16", GAME_NOT_WORKING )
