@@ -101,6 +101,7 @@ static int data_cnt = 0;                /* data count */
 static UINT8 *buffer;					/* data buffer */
 static UINT8 *ptr = 0;					/* data pointer */
 static UINT8 hdc_control;
+static void (*hdc_set_irq)(int,int);
 
 static const char *const hdc_command_names[] =
 {
@@ -165,11 +166,12 @@ static const char *const hdc_command_names[] =
 
 static TIMER_CALLBACK(pc_hdc_command);
 
-int pc_hdc_setup(void)
+int pc_hdc_setup(void (*hdc_set_irq_func)(int,int))
 {
 	int i;
 
 	hdc_control = 0;
+	hdc_set_irq = hdc_set_irq_func;
 
 	buffer = auto_malloc(17*4*512);
 
@@ -205,8 +207,10 @@ static void pc_hdc_result(int n)
 	/* dip switch selected INT 5 or 2 */
 	irq = (dip[n] & 0x40) ? 5 : 2;
 
-	pic8259_set_irq_line(0, irq, 1);
-	pic8259_set_irq_line(0, irq, 0);
+	if ( hdc_set_irq ) {
+		hdc_set_irq( irq, 1 );
+		hdc_set_irq( irq, 0 );
+	}
 
 	if (LOG_HDC_STATUS)
 		logerror("pc_hdc_result(): $%02x to $%04x\n", csb[n], data_cnt);

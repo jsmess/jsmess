@@ -48,6 +48,13 @@
 #include "machine/8237dma.h"
 
 
+static struct {
+	const device_config *pic8259_master;
+	const device_config *pic8259_slave;
+	const device_config *dma8237_1;
+	const device_config *dma8237_2;
+} pc_devices;
+
 /*************************************************************************
  *
  *      PC DMA stuff
@@ -143,6 +150,64 @@ const struct dma8237_interface pc_dma8237_config =
 };
 
 
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+
+static PIC8259_SET_INT_LINE( pc_pic8259_master_set_int_line ) {
+	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static PIC8259_SET_INT_LINE( pc_pic8259_slave_set_int_line ) {
+	pic8259_set_irq_line( pc_devices.pic8259_master, 2, interrupt);
+}
+
+
+const struct pic8259_interface pc_pic8259_master_config = {
+	pc_pic8259_master_set_int_line
+};
+
+
+const struct pic8259_interface pc_pic8259_slave_config = {
+	pc_pic8259_slave_set_int_line
+};
+
+
+/*************************************************************
+ *
+ * pit8253 configuration
+ *
+ *************************************************************/
+
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+{
+	pic8259_set_irq_line(pc_devices.pic8259_master, 0, state);
+}
+ 
+
+const struct pit8253_config pc_pit8253_config =
+{
+	{
+		{
+			4772720/4,				/* heartbeat IRQ */
+			pc_timer0_w,
+			NULL
+		}, {
+			4772720/4,				/* dram refresh */
+			NULL,
+			NULL
+		}, {
+			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			NULL,
+			pc_sh_speaker_change_clock
+		}
+	}
+};
+
+
 /**********************************************************
  *
  * COM hardware
@@ -155,7 +220,7 @@ static void pc_com_interrupt(int nr, int state)
 	static const int irq[4] = {4, 3, 4, 3};
 
 	/* issue COM1/3 IRQ4, COM2/4 IRQ3 */
-	pic8259_set_irq_line(0, irq[nr], state);
+	pic8259_set_irq_line(pc_devices.pic8259_master, irq[nr], state);
 }
 
 /* called when com registers read/written - used to update peripherals that
@@ -253,7 +318,9 @@ static const CENTRONICS_CONFIG cent_config[3]={
 
 static void pc_fdc_interrupt(int state)
 {
-	pic8259_set_irq_line(0, 6, state);
+	if ( pc_devices.pic8259_master ) {
+		pic8259_set_irq_line(pc_devices.pic8259_master, 6, state);
+	}
 }
 
 static void pc_fdc_dma_drq(int state, int read_)
@@ -270,16 +337,23 @@ static const struct pc_fdc_interface fdc_interface_nc =
 	pc_fdc_dma_drq,
 };
 
+static void pc_set_irq_line(int irq, int state) {
+	pic8259_set_irq_line(pc_devices.pic8259_master, irq, state);
+}
 
-void mess_init_pc_common(UINT32 flags) {
-	init_pc_common(flags);
+static void pc_set_keyb_int(int state) {
+	pc_set_irq_line( 1, state );
+}
+
+void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int)) {
+	init_pc_common(flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
 	if ( mess_ram )
 		memory_set_bankptr( 10, mess_ram );
 
 	/* FDC/HDC hardware */
-	pc_hdc_setup();
+	pc_hdc_setup(set_hdc_int_func);
 
 	/* com hardware */
 	uart8250_init(0, com_interface);
@@ -308,7 +382,7 @@ void mess_init_pc_common(UINT32 flags) {
 
 DRIVER_INIT( pccga )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	ppi8255_init(&pc_ppi8255_interface);
 	pc_rtc_init();
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
@@ -316,14 +390,14 @@ DRIVER_INIT( pccga )
 
 DRIVER_INIT( bondwell )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	ppi8255_init(&pc_ppi8255_interface);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pcmda )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	ppi8255_init(&pc_ppi8255_interface);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
@@ -349,7 +423,7 @@ DRIVER_INIT( europc )
 		rom[0xfffff]=256-a;
 	}
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
 	europc_rtc_init();
 //	europc_rtc_set_time(machine);
@@ -362,7 +436,7 @@ DRIVER_INIT( t1000hx )
     /* just a plain bit pattern for graphics data generation */
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
@@ -381,7 +455,7 @@ DRIVER_INIT( pc200 )
 	videoram=memory_region(REGION_CPU1)+0xb0000;
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc200_16le_port378_r );
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 DRIVER_INIT( pc1512 )
@@ -402,7 +476,7 @@ DRIVER_INIT( pc1512 )
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc16le_parallelport2_r );
 
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	mc146818_init(MC146818_IGNORE_CENTURY);
 }
 
@@ -465,14 +539,14 @@ DRIVER_INIT( pc1640 )
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
 	memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
 	mc146818_init(MC146818_IGNORE_CENTURY);
 }
 
 DRIVER_INIT( pc_vga )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	ppi8255_init(&pc_ppi8255_interface);
 
 	pc_vga_init(machine, &vga_interface, NULL);
@@ -480,7 +554,7 @@ DRIVER_INIT( pc_vga )
 
 static IRQ_CALLBACK(pc_irq_callback)
 {
-	return pic8259_acknowledge(0);
+	return pic8259_acknowledge( pc_devices.pic8259_master );
 }
 
 
@@ -492,6 +566,11 @@ MACHINE_START( pc ) {
 MACHINE_RESET( pc )
 {
 	cpunum_set_irq_callback(0, pc_irq_callback);
+
+	pc_devices.pic8259_master = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
+	pc_devices.pic8259_slave = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
+	pc_devices.dma8237_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
+	pc_devices.dma8237_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 }
 
 

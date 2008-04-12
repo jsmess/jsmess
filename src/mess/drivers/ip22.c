@@ -1456,7 +1456,7 @@ static DRIVER_INIT( ip225015 )
 
 	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
 	// interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.
-	init_pc_common(PCCOMMON_KEYBOARD_AT);
+	init_pc_common(PCCOMMON_KEYBOARD_AT, NULL);
 	kbdc8042_init(&at8042);
 
 	// SCSI init

@@ -3,7 +3,7 @@
 
 #include "driver.h"
 
-int pc_hdc_setup(void);
+int pc_hdc_setup(void (*hdc_set_irq_func)(int,int));
 
 READ8_HANDLER  ( pc_HDC1_r );
 WRITE8_HANDLER ( pc_HDC1_w );

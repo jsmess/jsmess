@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", dma8237_r, dma8237_w)
-	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_0_r,			pic8259_0_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(ppi8255_0_r,			ppi8255_0_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
@@ -189,13 +189,14 @@ ADDRESS_MAP_END
 
 DEV_READWRITE8TO16LE_LSB( pc_pit8253_16le, pit8253_r, pit8253_w )
 DEV_READWRITE8TO16LE( pc_dma8237_16le, dma8237_r, dma8237_w )
+DEV_READWRITE8TO16LE( pc_pic8259_16le, pic8259_r, pic8259_w )
 READ16_HANDLER(pc_page16le_r) { return read16le_with_read8_handler(pc_page_r, machine, offset, mem_mask); }
 WRITE16_HANDLER(pc_page16le_w) { write16le_with_write8_handler(pc_page_w, machine, offset, data, mem_mask); }
 
 
 static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", pc_dma8237_16le_r, pc_dma8237_16le_w)
-	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_16le_0_r,			pic8259_16le_0_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pc_pic8259_16le_r, pc_pic8259_16le_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(ppi8255_16le_0_r,			ppi8255_16le_0_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,			pc_page16le_w)
@@ -236,7 +237,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", dma8237_r, dma8237_w)
-	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_0_r,			pic8259_0_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r,			europc_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
@@ -276,7 +277,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tandy1000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", dma8237_r, dma8237_w)
-	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_0_r,				pic8259_0_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r,			tandy1000_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
@@ -296,7 +297,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc200_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", pc_dma8237_16le_r, pc_dma8237_16le_w)
-	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_16le_0_r,				pic8259_16le_0_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pc_pic8259_16le_r, pc_pic8259_16le_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE(pc1640_16le_mouse_x_r,			pc1640_16le_mouse_x_w)
@@ -329,7 +330,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc1640_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", pc_dma8237_16le_r, pc_dma8237_16le_w)
-	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_16le_0_r,			pic8259_16le_0_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pc_pic8259_16le_r, pc_pic8259_16le_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
 	AM_RANGE(0x0070, 0x0071) AM_READWRITE(mc146818_port16le_r,		mc146818_port16le_w)
@@ -1132,31 +1133,6 @@ static const struct YM3812interface ym3812_interface =
 };
 #endif
 
-static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
-{
-	pic8259_set_irq_line(0, 0, state);
-}
- 
-
-static const struct pit8253_config pc_pit8253_config =
-{
-	{
-		{
-			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
-		}, {
-			4772720/4,				/* dram refresh */
-			NULL,
-			NULL
-		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL,
-			pc_sh_speaker_change_clock
-		}
-	}
-};
-
 
 #define MDRV_CPU_PC(mem, port, type, clock, vblankfunc)	\
 	MDRV_CPU_ADD_TAG("main", type, clock)				\
@@ -1181,6 +1157,12 @@ static MACHINE_DRIVER_START( pcmda )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_mda )
@@ -1223,6 +1205,12 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
 
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_hercules )
 
@@ -1259,6 +1247,12 @@ static MACHINE_DRIVER_START( pccga )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1298,6 +1292,12 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
 
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_aga )
 
@@ -1331,6 +1331,12 @@ static MACHINE_DRIVER_START( xtcga )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1370,6 +1376,12 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
 
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc200 )
 
@@ -1396,6 +1408,12 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc1512 )
@@ -1425,6 +1443,12 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(pcvideo_pc1640)
@@ -1457,6 +1481,12 @@ static MACHINE_DRIVER_START( xtvga )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )
@@ -1495,6 +1525,12 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000 )

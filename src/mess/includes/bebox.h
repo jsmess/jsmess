@@ -15,6 +15,8 @@
 extern const struct pit8253_config bebox_pit8254_config;
 extern const struct dma8237_interface bebox_dma8237_1_config;
 extern const struct dma8237_interface bebox_dma8237_2_config;
+extern const struct pic8259_interface bebox_pic8259_master_config;
+extern const struct pic8259_interface bebox_pic8259_slave_config;
 
 MACHINE_START( bebox );
 MACHINE_RESET( bebox );

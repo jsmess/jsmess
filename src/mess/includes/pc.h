@@ -10,8 +10,11 @@
 /*----------- defined in machine/pc.c -----------*/
 
 extern const struct dma8237_interface pc_dma8237_config;
+extern const struct pit8253_config pc_pit8253_config;
+extern const struct pic8259_interface pc_pic8259_master_config;
+extern const struct pic8259_interface pc_pic8259_slave_config;
 
-void mess_init_pc_common(UINT32 flags);
+void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int));
 
 READ8_HANDLER( pc_page_r );
 WRITE8_HANDLER( pc_page_w );

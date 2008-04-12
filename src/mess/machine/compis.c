@@ -93,6 +93,11 @@ static struct i186_state
 	struct mem_state	mem;
 } i186;
 
+static struct {
+	const device_config	*pic8259_master;
+	const device_config	*pic8259_slave;
+} compis_devices;
+
 /* Keyboard */
 static const UINT8 compis_keyb_codes[6][16] = {
 {0x39, 0x32, 0x29, 0x20, 0x17, 0x0e, 0x05, 0x56, 0x4d, 0x44, 0x08, 0x57, 0x59, 0x4e, 0x43, 0x3a},
@@ -198,18 +203,20 @@ void compis_irq_set(UINT8 irq)
 
 static void compis_osp_pic_irq(UINT8 irq)
 {
-	pic8259_set_irq_line(0, irq, 1);
-	pic8259_set_irq_line(0, irq, 0);
+	if ( compis_devices.pic8259_master ) {
+		pic8259_set_irq_line(compis_devices.pic8259_master, irq, 1);
+		pic8259_set_irq_line(compis_devices.pic8259_master, irq, 0);
+	}
 }
 
-READ16_HANDLER ( compis_osp_pic_r )
+READ16_DEVICE_HANDLER ( compis_osp_pic_r )
 {
-	return pic8259_0_r(machine, offset);
+	return pic8259_r(device, offset);
 }
 
-WRITE16_HANDLER ( compis_osp_pic_w )
+WRITE16_DEVICE_HANDLER ( compis_osp_pic_w )
 {
-	pic8259_0_w(machine, offset, data);
+	pic8259_w(device, offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1540,25 +1547,38 @@ static void compis_cpu_init(void)
 /* Name: compis                                                            */
 /* Desc: Driver - Init                                                     */
 /*-------------------------------------------------------------------------*/
-static void compis_pic_set_int_line(int which, int interrupt)
-{
-	switch(which)
-	{
-		case 0:
-			/* Master */
-			cpunum_set_input_line(Machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
-			break;
 
-		case 1:
-			/* Slave */
-			pic8259_set_irq_line(0, 2, interrupt);
-			break;
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+ 
+static PIC8259_SET_INT_LINE( compis_pic8259_master_set_int_line ) {
+	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static PIC8259_SET_INT_LINE( compis_pic8259_slave_set_int_line ) {
+	if ( compis_devices.pic8259_master ) {
+		pic8259_set_irq_line( compis_devices.pic8259_master, 2, interrupt);
 	}
 }
 
+
+const struct pic8259_interface compis_pic8259_master_config = {
+	compis_pic8259_master_set_int_line
+};
+
+
+const struct pic8259_interface compis_pic8259_slave_config = {
+	compis_pic8259_slave_set_int_line
+};
+
+
 static IRQ_CALLBACK(compis_irq_callback)
 {
-	return pic8259_acknowledge(0);
+	return pic8259_acknowledge( compis_devices.pic8259_master);
 }
 
 static const compis_gdc_interface i82720_interface =
@@ -1567,11 +1587,11 @@ static const compis_gdc_interface i82720_interface =
 	0x8000
 };
 
+
 DRIVER_INIT( compis )
 {
 	compis_init( &i82720_interface );
 	cpunum_set_irq_callback(0, compis_irq_callback);
-	pic8259_init(2, compis_pic_set_int_line);
 	memset (&compis, 0, sizeof (compis) );
 }
 
@@ -1602,6 +1622,9 @@ MACHINE_RESET( compis )
 
 	/* OSP PIC 8259 */
 	cpunum_set_irq_callback(0, compis_irq_callback);
+
+	compis_devices.pic8259_master = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
+	compis_devices.pic8259_slave = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
 }
 
 /*-------------------------------------------------------------------------*/

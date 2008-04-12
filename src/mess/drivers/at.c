@@ -104,39 +104,31 @@ ADDRESS_MAP_END
 
 
 
-static READ8_HANDLER(at_dma8237_1_r)
+static READ8_DEVICE_HANDLER(at_dma8237_1_r)
 {
-	return dma8237_r( (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2);
+	return dma8237_r( device, offset / 2);
 }
 
-static WRITE8_HANDLER(at_dma8237_1_w)
+static WRITE8_DEVICE_HANDLER(at_dma8237_1_w)
 {
-	dma8237_w( (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2, data);
-}
-
-static READ32_HANDLER(at32_dma8237_1_r)
-{
-	return read32le_with_read8_handler(at_dma8237_1_r, machine, offset, mem_mask);
-}
-
-static WRITE32_HANDLER(at32_dma8237_1_w)
-{
-	write32le_with_write8_handler(at_dma8237_1_w, machine, offset, data, mem_mask);
+	dma8237_w( device, offset / 2, data);
 }
 
 DEV_READWRITE8TO32LE_LSB( at_pit8254_32le, pit8253_r, pit8253_w )
 DEV_READWRITE8TO32LE_LSB( at_dma8237_32le, dma8237_r, dma8237_w )
+DEV_READWRITE8TO32LE( at_pic8259_32le, pic8259_r, pic8259_w )
+DEV_READWRITE8TO32LE( at_dma8237_1_32le, at_dma8237_1_r, at_dma8237_1_w )
 
 
 static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", dma8237_r, dma8237_w)
-	AM_RANGE(0x0020, 0x003f) AM_READWRITE(pic8259_0_r,				pic8259_0_w)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE(PIC8259, "pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, AT_PIT8254, pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_8_r,				kbdc8042_8_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,			mc146818_port_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page8_r,				at_page8_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_READWRITE(pic8259_1_r,				pic8259_1_w)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE(at_dma8237_1_r,			at_dma8237_1_w)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", pic8259_r, pic8259_w)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_r, at_dma8237_1_w)
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(at_mfm_0_r,				at_mfm_0_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
 	AM_RANGE(0x0220, 0x022f) AM_READWRITE(soundblaster_r,			soundblaster_w)
@@ -171,13 +163,13 @@ static WRITE32_HANDLER(at_page32_w)
 
 static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", at_dma8237_32le_r, at_dma8237_32le_w)
-	AM_RANGE(0x0020, 0x003f) AM_READWRITE(pic8259_32le_0_r,			pic8259_32le_0_w)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE(PIC8259, "pic8259_master", at_pic8259_32le_r, at_pic8259_32le_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, AT_PIT8254, at_pit8254_32le_r, at_pit8254_32le_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_READWRITE(pic8259_32le_1_r,			pic8259_32le_1_w)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE(at32_dma8237_1_r,			at32_dma8237_1_w)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", at_pic8259_32le_r, at_pic8259_32le_w)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_32le_r, at_dma8237_1_32le_w)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,	pc32le_parallelport2_w)
 	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_32le_3_r,		uart8250_32le_3_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_32le_1_r,		uart8250_32le_1_w)
@@ -193,13 +185,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", at_dma8237_32le_r, at_dma8237_32le_w)
-	AM_RANGE(0x0020, 0x003f) AM_READWRITE(pic8259_32le_0_r,			pic8259_32le_0_w)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE(PIC8259, "pic8259_master", at_pic8259_32le_r, at_pic8259_32le_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, AT_PIT8254, at_pit8254_32le_r, at_pit8254_32le_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_READWRITE(pic8259_32le_1_r,			pic8259_32le_1_w)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE(at32_dma8237_1_r,			at32_dma8237_1_w)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", at_pic8259_32le_r, at_pic8259_32le_w)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_32le_r, at_dma8237_1_32le_w)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,		pc32le_parallelport2_w)
 	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_32le_3_r,		uart8250_32le_3_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_32le_1_r,		uart8250_32le_1_w)
@@ -420,33 +412,6 @@ static const struct YM3812interface ym3812_interface =
 #endif
 
 
-static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
-{
-	pic8259_set_irq_line(0, 0, state);
-}
-
-
-static const struct pit8253_config at_pit8254_config =
-{
-	{
-		{
-			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
-		}, {
-			4772720/4,				/* dram refresh */
-			NULL,
-			NULL
-		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL,
-			pc_sh_speaker_change_clock
-		}
-	}
-};
-
-
-
 #define MDRV_CPU_ATPC(mem, port, type, clock)	\
 	MDRV_CPU_ADD_TAG("main", type, clock)					\
 	MDRV_CPU_PROGRAM_MAP(mem##_map, 0)				\
@@ -465,6 +430,12 @@ static MACHINE_DRIVER_START( atcga )
 
 	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
 	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
 
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
@@ -510,6 +481,15 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
 	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
 
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+
+	MDRV_MACHINE_START( at )
+	MDRV_MACHINE_RESET( at )
+
 	MDRV_IMPORT_FROM( pcvideo_vga )
 
 	MDRV_SCREEN_MODIFY("main")
@@ -554,6 +534,12 @@ static MACHINE_DRIVER_START( atvga )
 
 	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
 	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
 
 	MDRV_IMPORT_FROM( pcvideo_vga )
 
@@ -608,6 +594,12 @@ static MACHINE_DRIVER_START( at386 )
 
 	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
 	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
 
 	MDRV_IMPORT_FROM( pcvideo_cga )
 

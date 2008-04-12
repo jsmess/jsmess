@@ -23,6 +23,7 @@
 #include "includes/pc.h"
 #include "includes/at.h"
 #include "machine/pckeybrd.h"
+#include "audio/pc.h"
 #include "audio/sblaster.h"
 #include "machine/i82439tx.h"
 
@@ -31,8 +32,75 @@
 
 #define LOG_PORT80 0
 
+static struct {
+	const device_config	*pic8259_master;
+	const device_config	*pic8259_slave;
+	const device_config *dma8237_1;
+	const device_config *dma8237_2;
+} at_devices;
+
 static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };
 
+
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+
+static PIC8259_SET_INT_LINE( at_pic8259_master_set_int_line ) {
+	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static PIC8259_SET_INT_LINE( at_pic8259_slave_set_int_line ) {
+	pic8259_set_irq_line( at_devices.pic8259_master, 2, interrupt);
+}
+
+
+const struct pic8259_interface at_pic8259_master_config = {
+	at_pic8259_master_set_int_line
+};
+
+
+const struct pic8259_interface at_pic8259_slave_config = {
+	at_pic8259_slave_set_int_line
+};
+
+
+
+/*************************************************************
+ *
+ * pit8254 configuration
+ *
+ *************************************************************/
+
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+{
+	if ( at_devices.pic8259_master ) {
+		pic8259_set_irq_line(at_devices.pic8259_master, 0, state);
+	}
+}
+
+
+const struct pit8253_config at_pit8254_config =
+{
+	{
+		{
+			4772720/4,				/* heartbeat IRQ */
+			pc_timer0_w,
+			NULL
+		}, {
+			4772720/4,				/* dram refresh */
+			NULL,
+			NULL
+		}, {
+			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			NULL,
+			pc_sh_speaker_change_clock
+		}
+	}
+};
 
 
 static void at_set_gate_a20(int a20)
@@ -42,10 +110,19 @@ static void at_set_gate_a20(int a20)
 }
 
 
+static void at_set_irq_line(int irq, int state) {
+	pic8259_set_irq_line(at_devices.pic8259_master, irq, state);
+}
+
+
+static void at_set_keyb_int(int state) {
+	pic8259_set_irq_line(at_devices.pic8259_master, 1, state);
+}
+
 
 static void init_at_common(const struct kbdc8042_interface *at8042)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_AT);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_AT, at_set_keyb_int, at_set_irq_line);
 	mc146818_init(MC146818_STANDARD);
 	soundblaster_config(&soundblaster);
 	kbdc8042_init(at8042);
@@ -63,7 +140,7 @@ static void init_at_common(const struct kbdc8042_interface *at8042)
 
 static void at_keyboard_interrupt(int state)
 {
-	pic8259_set_irq_line(0, 1, state);
+	pic8259_set_irq_line(at_devices.pic8259_master, 1, state);
 }
 
 
@@ -213,7 +290,7 @@ const struct dma8237_interface at_dma8237_2_config =
 
 static void at_fdc_interrupt(int state)
 {
-	pic8259_set_irq_line(0, 6, state);
+	pic8259_set_irq_line(at_devices.pic8259_master, 6, state);
 }
 
 
@@ -326,7 +403,7 @@ DRIVER_INIT( ps2m30286 )
 
 static IRQ_CALLBACK(at_irq_callback)
 {
-	return pic8259_acknowledge(0);
+	return pic8259_acknowledge( at_devices.pic8259_master);
 }
 
 
@@ -341,5 +418,9 @@ MACHINE_START( at )
 
 MACHINE_RESET( at )
 {
+	at_devices.pic8259_master = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
+	at_devices.pic8259_slave = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
+	at_devices.dma8237_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
+	at_devices.dma8237_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 }
 

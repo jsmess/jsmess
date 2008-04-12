@@ -294,7 +294,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pasogo_io, ADDRESS_SPACE_IO, 8)
 //	ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
-	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_0_r,			pic8259_0_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259", pic8259_r, pic8259_w)
      AM_RANGE(0x26, 0x27) AM_READWRITE(vg230_io_r, vg230_io_w )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8254, "pit8254", pit8253_r, pit8253_w)
      AM_RANGE(0x6c, 0x6f) AM_READWRITE(ems_r, ems_w )
@@ -394,7 +394,7 @@ static const struct CustomSound_interface gmaster_sound_interface =
 
 static IRQ_CALLBACK(pasogo_irq_callback)
 {
-	return pic8259_acknowledge(0);
+	return pic8259_acknowledge( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259"));
 }
 
 static MACHINE_RESET( pasogo )
@@ -406,7 +406,7 @@ static MACHINE_RESET( pasogo )
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-	pic8259_set_irq_line(0, 0, state);
+	pic8259_set_irq_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIC8259, "pic8259"), 0, state);
 }
 
 static const struct pit8253_config pc_pit8254_config =
@@ -428,6 +428,17 @@ static const struct pit8253_config pc_pit8254_config =
 	}
 };
 
+
+static PIC8259_SET_INT_LINE( pasogo_pic8259_set_int_line ) {
+	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static const struct pic8259_interface pasogo_pic8259_config = {
+	pasogo_pic8259_set_int_line
+};
+
+
 static MACHINE_DRIVER_START( pasogo )
      MDRV_CPU_ADD_TAG("main", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
 MDRV_CPU_PROGRAM_MAP(pasogo_mem, 0)
@@ -438,6 +449,9 @@ MDRV_CPU_VBLANK_INT("main", pasogo_interrupt)
 
 	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
 	MDRV_DEVICE_CONFIG( pc_pit8254_config )
+
+	MDRV_DEVICE_ADD( "pic8259", PIC8259 )
+	MDRV_DEVICE_CONFIG( pasogo_pic8259_config )
 
      MDRV_SCREEN_ADD("main", LCD)
      MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -463,10 +477,6 @@ ROM_START(pasogo)
 	ROM_REGION(0x100000,REGION_USER1, 0)
 ROM_END
 
-static void pasogo_pic_set_int_line(int which, int interrupt)
-{
-  cpunum_set_input_line(Machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
-}
 
 static DRIVER_INIT( pasogo )
 {
@@ -474,7 +484,6 @@ static DRIVER_INIT( pasogo )
   memset(&ems, 0, sizeof(ems));
   memory_set_bankptr( 27, memory_region(REGION_USER1) + 0x00000 );
   memory_set_bankptr( 28, memory_region(REGION_CPU1) + 0xb8000/*?*/ );
-  pic8259_init(1, pasogo_pic_set_int_line);
 }
 
 
