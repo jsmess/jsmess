@@ -56,7 +56,7 @@ const game_driver *const test_drivers[] =
 
 	/* 3DO */
 	DRIVER( 3do )		/* 3DO consoles										*/
-TESTDRIVER( 3do_pal )
+	DRIVER( 3do_pal )
 
 	/* ATARI */
 	DRIVER( a2600 )		/* Atari 2600										*/
