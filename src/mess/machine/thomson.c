@@ -18,6 +18,7 @@
 #include "audio/mea8000.h"
 #include "devices/cartslot.h"
 #include "machine/centroni.h"
+#include "devices/printer.h"
 #include "includes/serial.h"
 #include "devices/cassette.h"
 #include "formats/thom_cas.h"
@@ -523,17 +524,20 @@ typedef enum
 	TO7_IO_RS232
 } to7_io_dev;
 
-
+static const device_config *printer_device(running_machine *machine)
+{
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
 
 /* test whether a parallel or a serial device is connected: both cannot
    be exploited at the same time!
 */
-static to7_io_dev to7_io_mode( void )
+static to7_io_dev to7_io_mode( running_machine *machine )
 {
-	if ( image_exists( image_from_devtype_and_index( IO_PRINTER, 0 ) ) )
+	if ( printer_is_ready(printer_device(machine) ) )
 		return TO7_IO_CENTRONICS;
 	else if ( image_exists( image_from_devtype_and_index( IO_SERIAL, THOM_SERIAL_CC90323 ) ) )
-		return TO7_IO_CENTRONICS;
+		return TO7_IO_RS232;
 	return TO7_IO_NONE;
 }
 
@@ -572,12 +576,12 @@ static READ8_HANDLER ( to7_io_porta_in )
 	int dsr = ( to7_io_line.input_state & SERIAL_STATE_DSR ) ? 0 : 1;
 	int rd  = get_in_data_bit( to7_io_line.input_state );
 
-	if ( to7_io_mode() == TO7_IO_RS232 )
+	if ( to7_io_mode(machine) == TO7_IO_RS232 )
 		cts = to7_io_line.input_state & SERIAL_STATE_CTS ? 0 : 1;
 	else
 		cts = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 1 : 0;
 
-	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to7_io_mode(), cts, dsr, rd ));
+	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to7_io_mode(machine), cts, dsr, rd ));
 
 	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
 }
