@@ -106,17 +106,18 @@ static TIMER_CALLBACK(lightpen_trigger)
 	}
 }
 
-static int lightpen_check (void)
+
+static int lightpen_check(running_machine *machine)
 {
 	int dx, dy;
 	if (vectrex_lightpen_port != 0)
 	{
-		lightpen_down = readinputportbytag("LPENCONF") & 0x10;
+		lightpen_down = input_port_read(machine, "LPENCONF") & 0x10;
 
 		if (lightpen_down)
 		{
-			pen_x = readinputportbytag("LPENX") * (x_max / 0xff);
-			pen_y = readinputportbytag("LPENY") * (y_max / 0xff);
+			pen_x = input_port_read(machine, "LPENX") * (x_max / 0xff);
+			pen_y = input_port_read(machine, "LPENY") * (y_max / 0xff);
 
 			dx = abs(pen_x - x_int);
 			dy = abs(pen_y - y_int);
@@ -196,7 +197,7 @@ VIDEO_UPDATE( vectrex )
 {
 	int i;
 
-	vectrex_configuration();
+	vectrex_configuration(screen->machine);
 
 	/* start black */
 	vector_add_point(vectrex_points[display_start].x, 
@@ -454,7 +455,7 @@ static WRITE8_HANDLER ( v_via_cb2_w )
 
 	if (cb2 != data)
 	{
-		if (data & lightpen_check())
+		if (data & lightpen_check(machine))
 			timer_set(attotime_zero, NULL, 0, lightpen_trigger);
 
 		timer_set(attotime_zero, &blank, data, update_signal);

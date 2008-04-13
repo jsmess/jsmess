@@ -123,9 +123,9 @@ DEVICE_IMAGE_LOAD( vectrex_cart )
 
 *********************************************************************/
 
-void vectrex_configuration(void)
+void vectrex_configuration(running_machine *machine)
 {
-	unsigned char cport = readinputportbytag("3DCONF");
+	unsigned char cport = input_port_read(machine, "3DCONF");
 
 	/* Vectrex 'dipswitch' configuration */
 
@@ -202,7 +202,7 @@ void vectrex_configuration(void)
 		vectrex_beam_color = RGB_WHITE;
 		imager_colors[0]=imager_colors[1]=imager_colors[2]=imager_colors[3]=imager_colors[4]=imager_colors[5]=RGB_WHITE;
 	}
-	vectrex_lightpen_port = readinputportbytag("LPENCONF") & 0x03;
+	vectrex_lightpen_port = input_port_read(machine, "LPENCONF") & 0x03;
 }
 
 /*********************************************************************
@@ -219,7 +219,7 @@ void v_via_irq (int level)
 READ8_HANDLER( v_via_pb_r )
 {
 	int pot;
-	pot = readinputport(((vectrex_via_out[PORTB] & 0x6) >> 1)) - 0x80;
+	pot = input_port_read_indexed(machine, ((vectrex_via_out[PORTB] & 0x6) >> 1)) - 0x80;
 
 	if (pot > (signed char)vectrex_via_out[PORTA])
 		vectrex_via_out[PORTB] |= 0x20;
@@ -242,7 +242,7 @@ READ8_HANDLER( v_via_pa_r )
 
 READ8_HANDLER( s1_via_pb_r )
 {
-	return (vectrex_via_out[PORTB] & ~0x40) | (readinputportbytag("COIN") & 0x40);
+	return (vectrex_via_out[PORTB] & ~0x40) | (input_port_read(machine, "COIN") & 0x40);
 }
 
 

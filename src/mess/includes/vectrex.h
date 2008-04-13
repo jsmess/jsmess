@@ -21,7 +21,7 @@ extern int vectrex_lightpen_port;
 extern int vectrex_reset_refresh;
 
 TIMER_CALLBACK(vectrex_imager_eye);
-void vectrex_configuration(void);
+void vectrex_configuration(running_machine *machine);
 READ8_HANDLER (v_via_pa_r);
 READ8_HANDLER(v_via_pb_r );
 void v_via_irq (int level);
