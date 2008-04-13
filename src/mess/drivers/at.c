@@ -114,8 +114,8 @@ static WRITE8_DEVICE_HANDLER(at_dma8237_1_w)
 	dma8237_w( device, offset / 2, data);
 }
 
-DEV_READWRITE8TO32LE_LSB( at_pit8254_32le, pit8253_r, pit8253_w )
-DEV_READWRITE8TO32LE_LSB( at_dma8237_32le, dma8237_r, dma8237_w )
+DEV_READWRITE8TO32LE( at_pit8254_32le, pit8253_r, pit8253_w )
+DEV_READWRITE8TO32LE( at_dma8237_32le, dma8237_r, dma8237_w )
 DEV_READWRITE8TO32LE( at_pic8259_32le, pic8259_r, pic8259_w )
 DEV_READWRITE8TO32LE( at_dma8237_1_32le, at_dma8237_1_r, at_dma8237_1_w )
 
