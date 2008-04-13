@@ -149,9 +149,14 @@ static WRITE8_HANDLER( keyboard_latch_w )
 	keylatch = data;
 }
 
+static const device_config *printer_device(running_machine *machine)
+{
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
+
 static WRITE8_HANDLER( printer_w )
 {
-	printer_output(image_from_devtype_and_index(IO_PRINTER, 0), data);
+	printer_output(printer_device(machine), data);
 }
 
 /* Memory Maps */
