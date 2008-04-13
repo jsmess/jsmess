@@ -30,6 +30,11 @@
 #include "inputx.h"
 #endif
 
+// winnt.h defines this
+#ifdef DELETE
+#undef DELETE
+#endif
+
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -53,8 +58,7 @@ enum
 #define MAX_BUTTONS			32
 #define MAX_HATS			8
 #define MAX_POV				4
-#define MAX_JOYSTICKS			16
-#define MAX_JOYMAP 		(MAX_JOYSTICKS*2)
+#define MAX_JOYSTICKS		16
 
 //============================================================
 //  MACROS
@@ -88,7 +92,7 @@ struct _mouse_state
 typedef struct _joystick_state joystick_state;
 struct _joystick_state
 {
-	SDL_Joystick *device[MAX_JOYSTICKS];
+	SDL_Joystick *device;
 	INT32 axes[MAX_AXES];
 	INT32 buttons[MAX_BUTTONS];
 	INT32 hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
@@ -147,14 +151,13 @@ static device_info *			joystick_list;
 // joystick mapper
 static struct 
 {
-	int		logical;
-	int		ismapped;
-	char		*name;
-} joy_map[MAX_JOYMAP];
+	char	*name;
+	int		physical;
+} joy_map[MAX_JOYSTICKS];
+
+static int joy_logical[MAX_JOYSTICKS];
 
 static int sixaxis_mode;
-
-//static int joy_logical[MAX_JOYSTICKS];
 
 //============================================================
 //  PROTOTYPES
@@ -180,11 +183,6 @@ static device_info *generic_device_find_index(device_info *devlist_head, int ind
 //  KEYBOARD/JOYSTICK LIST
 //============================================================
 
-#define KTT_ENTRY0(MAME, SDL, VK, AS, UI) { ITEM_ID_ ## MAME, SDLK_ ## SDL, "ITEM_ID_" #MAME, (char *) UI }
-#define KTT_ENTRY1(MAME, SDL) KTT_ENTRY0(MAME, SDL, MAME, MAME, #MAME)
-// only for reference ...
-#define KTT_ENTRY2(MAME, SDL) KTT_ENTRY0(MAME, SDL, 0, 0, #MAME)
-
 // master keyboard translation table
 typedef struct _kt_table kt_table;
 struct _kt_table {
@@ -195,6 +193,138 @@ struct _kt_table {
 	const char 	*	mame_key_name;
 	char 		*	ui_name;
 };
+
+#if (SDL_VERSION_ATLEAST(1,3,0))
+
+#define OSD_SDL_INDEX(x) (x)
+
+#define KTT_ENTRY0(MAME, SDL, VK, AS, UI) { ITEM_ID_ ## MAME, SDL_SCANCODE_ ## SDL, "ITEM_ID_" #MAME, (char *) UI }
+#define KTT_ENTRY1(MAME, SDL) KTT_ENTRY0(MAME, SDL, MAME, MAME, #MAME)
+// only for reference ...
+#define KTT_ENTRY2(MAME, SDL) KTT_ENTRY0(MAME, SDL, 0, 0, #MAME)
+
+
+static kt_table sdl_key_trans_table[] =
+{
+	// MAME key			SDL key			vkey	ascii
+	KTT_ENTRY0(  ESC,			ESCAPE,			0x1b,	0x1b,		"ESC"  ),
+	KTT_ENTRY1(  1,	 			1 ),
+	KTT_ENTRY1(  2,	 			2 ),
+	KTT_ENTRY1(  3,	 			3 ),
+	KTT_ENTRY1(  4,	 			4 ),
+	KTT_ENTRY1(  5,	 			5 ),
+	KTT_ENTRY1(  6,		 		6 ),
+	KTT_ENTRY1(  7,		 		7 ),
+	KTT_ENTRY1(  8,	 			8 ),
+	KTT_ENTRY1(  9,	 			9 ),
+	KTT_ENTRY1(  0,		 		0 ),
+	KTT_ENTRY0(  MINUS,			MINUS,			0xbd,	'-',	"MINUS" ),
+	KTT_ENTRY0(  EQUALS,		EQUALS,			0xbb,	'=',	"EQUALS" ),
+	KTT_ENTRY0(  BACKSPACE,		BACKSPACE,		0x08,	0x08,	"BACKSPACE" ),
+	KTT_ENTRY0(  TAB,			TAB,			0x09,	0x09,	"TAB" ),
+	KTT_ENTRY1(  Q,				Q ),
+	KTT_ENTRY1(  W,				W ),
+	KTT_ENTRY1(  E,				E ),
+	KTT_ENTRY1(  R,				R ),
+	KTT_ENTRY1(  T,				T ),
+	KTT_ENTRY1(  Y,				Y ),
+	KTT_ENTRY1(  U,				U ),
+	KTT_ENTRY1(  I,				I ),
+	KTT_ENTRY1(  O,				O ),
+	KTT_ENTRY1(  P,				P ),
+	KTT_ENTRY0(  OPENBRACE,	LEFTBRACKET,		0xdb, 	'[',	"OPENBRACE" ),
+	KTT_ENTRY0(  CLOSEBRACE,RIGHTBRACKET, 		0xdd,	']',	"CLOSEBRACE" ),
+	KTT_ENTRY0(  ENTER,		RETURN, 			0x0d, 	0x0d,	"RETURN" ),
+	KTT_ENTRY2(  LCONTROL,	LCTRL ),
+	KTT_ENTRY1(  A,				A ),
+	KTT_ENTRY1(  S, 			S ),
+	KTT_ENTRY1(  D, 			D ),
+	KTT_ENTRY1(  F, 			F ),
+	KTT_ENTRY1(  G, 			G ),
+	KTT_ENTRY1(  H, 			H ),
+	KTT_ENTRY1(  J, 			J ),
+	KTT_ENTRY1(  K, 			K ),
+	KTT_ENTRY1(  L, 			L ),
+	KTT_ENTRY0(  COLON, 		SEMICOLON,		0xba,	';',	"COLON" ),
+	KTT_ENTRY0(  QUOTE, 		APOSTROPHE,			0xde,	'\'',	"QUOTE" ),
+	KTT_ENTRY2(  LSHIFT, 		LSHIFT ),
+	KTT_ENTRY0(  BACKSLASH,		BACKSLASH, 		0xdc,	'\\',	"BACKSLASH" ),
+	KTT_ENTRY1(  Z, 			Z ),
+	KTT_ENTRY1(  X, 			X ),
+	KTT_ENTRY1(  C, 			C ),
+	KTT_ENTRY1(  V, 			V ),
+	KTT_ENTRY1(  B, 			B ),
+	KTT_ENTRY1(  N, 			N ),
+	KTT_ENTRY1(  M, 			M ),
+	KTT_ENTRY0(  COMMA, 		COMMA,	     	0xbc,	',',	"COMMA" ),
+	KTT_ENTRY0(  STOP,	 		PERIOD, 		0xbe,	'.',	"STOP"  ),
+	KTT_ENTRY0(  SLASH, 		SLASH, 	     	0xbf,	'/',	"SLASH" ),
+	KTT_ENTRY2(  RSHIFT, 		RSHIFT ),
+	KTT_ENTRY0(  ASTERISK, 		KP_MULTIPLY,    '*',	'*',	"ASTERIX" ), 
+	KTT_ENTRY2(  LALT, 			LALT ),
+	KTT_ENTRY0(  SPACE, 		SPACE, 			' ',	' ',	"SPACE" ),
+	KTT_ENTRY2(  CAPSLOCK, 		CAPSLOCK ),
+	KTT_ENTRY2(  F1, 			F1 ),
+	KTT_ENTRY2(  F2, 			F2 ),
+	KTT_ENTRY2(  F3, 			F3 ),
+	KTT_ENTRY2(  F4, 			F4 ),
+	KTT_ENTRY2(  F5, 			F5 ),
+	KTT_ENTRY2(  F6, 			F6 ),
+	KTT_ENTRY2(  F7, 			F7 ),
+	KTT_ENTRY2(  F8, 			F8 ),
+	KTT_ENTRY2(  F9, 			F9 ),
+	KTT_ENTRY2(  F10, 			F10 ),
+	KTT_ENTRY2(  NUMLOCK, 		NUMLOCKCLEAR ),
+	KTT_ENTRY2(  SCRLOCK,	 	SCROLLLOCK ),
+	KTT_ENTRY2(  7_PAD, 		KP_7 ),
+	KTT_ENTRY2(  8_PAD, 		KP_8 ),
+	KTT_ENTRY2(  9_PAD, 		KP_9 ),
+	KTT_ENTRY2(  MINUS_PAD,		KP_MINUS ),
+	KTT_ENTRY2(  4_PAD, 		KP_4 ),
+	KTT_ENTRY2(  5_PAD, 		KP_5 ),
+	KTT_ENTRY2(  6_PAD, 		KP_6 ),
+	KTT_ENTRY2(  PLUS_PAD, 		KP_PLUS ),
+	KTT_ENTRY2(  1_PAD, 		KP_1 ),
+	KTT_ENTRY2(  2_PAD, 		KP_2 ),
+	KTT_ENTRY2(  3_PAD, 		KP_3 ),
+	KTT_ENTRY2(  0_PAD, 		KP_0 ),
+	KTT_ENTRY2(  DEL_PAD, 		KP_PERIOD ),
+	KTT_ENTRY2(  F11, 			F11 ),
+	KTT_ENTRY2(  F12, 			F12 ),
+	KTT_ENTRY2(  F13, 			F13 ),
+	KTT_ENTRY2(  F14, 			F14 ),
+	KTT_ENTRY2(  F15, 			F15 ),
+	KTT_ENTRY2(  ENTER_PAD,		KP_ENTER  ),
+	KTT_ENTRY2(  RCONTROL, 		RCTRL ),
+	KTT_ENTRY2(  SLASH_PAD,		KP_DIVIDE ),
+	KTT_ENTRY2(  PRTSCR,	 	PRINTSCREEN ),
+	KTT_ENTRY2(  RALT, 			RALT ),
+	KTT_ENTRY2(  HOME, 			HOME ),
+	KTT_ENTRY2(  UP, 			UP ),
+	KTT_ENTRY2(  PGUP, 			PAGEUP ),
+	KTT_ENTRY2(  LEFT, 			LEFT ),
+	KTT_ENTRY2(  RIGHT, 		RIGHT ),
+	KTT_ENTRY2(  END, 			END ),
+	KTT_ENTRY2(  DOWN, 			DOWN ),
+	KTT_ENTRY2(  PGDN, 			PAGEDOWN ),
+	KTT_ENTRY2(  INSERT, 		INSERT ),
+	{ ITEM_ID_DEL, SDL_SCANCODE_DELETE,  "ITEM_ID_DEL", (char *)"DELETE" },
+	KTT_ENTRY2(  LWIN, 			LGUI ),
+	KTT_ENTRY2(  RWIN, 			RGUI ),
+	KTT_ENTRY2(  MENU,	 		MENU ),
+	KTT_ENTRY0(  TILDE, 		GRAVE,  	0xc0,	'`',	"TILDE" ),
+	KTT_ENTRY0(  BACKSLASH2,	NONUSBACKSLASH,     0xdc,   '\\', "BACKSLASH2" ),
+	{ -1 }
+};
+#else
+
+#define OSD_SDL_INDEX(x) (SDLK_INDEX(x)-SDLK_FIRST)
+
+#define KTT_ENTRY0(MAME, SDL, VK, AS, UI) { ITEM_ID_ ## MAME, SDLK_ ## SDL, "ITEM_ID_" #MAME, (char *) UI }
+#define KTT_ENTRY1(MAME, SDL) KTT_ENTRY0(MAME, SDL, MAME, MAME, #MAME)
+// only for reference ...
+#define KTT_ENTRY2(MAME, SDL) KTT_ENTRY0(MAME, SDL, 0, 0, #MAME)
+
 
 static kt_table sdl_key_trans_table[] =
 {
@@ -304,15 +434,12 @@ static kt_table sdl_key_trans_table[] =
 	KTT_ENTRY2(  LWIN, 			LSUPER ),
 	KTT_ENTRY2(  RWIN, 			RSUPER ),
 	KTT_ENTRY2(  MENU,	 		MENU ),
-#if (SDL_VERSION_ATLEAST(1,3,0))
-	KTT_ENTRY0(  TILDE, 		GRAVE,  	0xc0,	'`',	"TILDE" ),
-	KTT_ENTRY0(  BACKSLASH2,	NONUSBACKSLASH,     0xdc,   '\\', "BACKSLASH2" ),
-#else
 	KTT_ENTRY0(  TILDE, 		BACKQUOTE,  	0xc0,	'`',	"TILDE" ),
 	KTT_ENTRY0(  BACKSLASH2,	HASH,     0xdc,   '\\', "BACKSLASH2" ),
-#endif
 	{ -1 }
 };
+#endif
+
 
 typedef struct _key_lookup_table key_lookup_table;
 
@@ -322,6 +449,37 @@ struct _key_lookup_table
 	const char *name;
 };
 
+#if (SDL_VERSION_ATLEAST(1,3,0))
+#define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
+#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
+#define KE7(A, B, C, D, E, F, G) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G)
+#define KE5(A, B, C, D, E) KE(A) KE(B) KE(C) KE(D) KE(E)
+#define KE3(A, B, C) KE(A) KE(B) KE(C) 
+
+static key_lookup_table sdl_lookup_table[] =
+{
+	KE7(UNKNOWN,	BACKSPACE,	TAB,		CLEAR,		RETURN,		PAUSE,		ESCAPE		)
+	KE(SPACE)
+	KE5(COMMA,		MINUS,		PERIOD,		SLASH,		0			)
+	KE8(1,			2,			3,				4,			5,			6,			7,			8			)
+	KE3(9,			SEMICOLON,		EQUALS)
+	KE5(LEFTBRACKET,BACKSLASH,	RIGHTBRACKET,	A,			B			)
+	KE8(C,			D,			E,				F,			G,			H,			I,			J			)
+	KE8(K,			L,			M,				N,			O,			P,			Q,			R			)
+	KE8(S,			T,			U,				V,			W,			X,			Y,			Z			)
+	KE8(DELETE,		KP_0,		KP_1,			KP_2,		KP_3,		KP_4,		KP_5,		KP_6		)
+	KE8(KP_7,		KP_8,		KP_9,			KP_PERIOD,	KP_DIVIDE,	KP_MULTIPLY,KP_MINUS,	KP_PLUS		)
+	KE8(KP_ENTER,	KP_EQUALS,	UP,				DOWN,		RIGHT,		LEFT,		INSERT,		HOME		)
+	KE8(END,		PAGEUP,		PAGEDOWN,		F1,			F2,			F3,			F4,			F5			)
+	KE8(F6,			F7,			F8,				F9,			F10,		F11,		F12,		F13			)
+	KE8(F14,		F15,		NUMLOCKCLEAR,	CAPSLOCK,	SCROLLLOCK,	RSHIFT,		LSHIFT,		RCTRL		)
+	KE5(LCTRL,		RALT,		LALT,			LGUI,		RGUI)
+	KE(PRINTSCREEN)
+	KE(MENU)
+	KE(UNDO)
+	{-1, ""}
+};
+#else
 #define KE(x) { SDLK_ ## x, "SDLK_" #x },
 #define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
 
@@ -336,32 +494,31 @@ static key_lookup_table sdl_lookup_table[] =
 	KE8(c,			d,			e,				f,			g,			h,			i,			j			)
 	KE8(k,			l,			m,				n,			o,			p,			q,			r			)
 	KE8(s,			t,			u,				v,			w,			x,			y,			z			)
-	{ SDLK_DELETE, "SDLK_DELETE" }, 
-#if (!SDL_VERSION_ATLEAST(1,3,0))
-	KE8(WORLD_0,	WORLD_1,	WORLD_2,	WORLD_3,	WORLD_4,	WORLD_5,	WORLD_6,	WORLD_7		)
-	KE8(WORLD_8,	WORLD_9,	WORLD_10,	WORLD_11,	WORLD_12,	WORLD_13,	WORLD_14,	WORLD_15	)
-	KE8(WORLD_16,	WORLD_17,	WORLD_18,	WORLD_19,	WORLD_20,	WORLD_21,	WORLD_22,	WORLD_23	)
-	KE8(WORLD_24,	WORLD_25,	WORLD_26,	WORLD_27,	WORLD_28,	WORLD_29,	WORLD_30,	WORLD_31	)
-	KE8(WORLD_32,	WORLD_33,	WORLD_34,	WORLD_35,	WORLD_36,	WORLD_37,	WORLD_38,	WORLD_39	)
-	KE8(WORLD_40,	WORLD_41,	WORLD_42,	WORLD_43,	WORLD_44,	WORLD_45,	WORLD_46,	WORLD_47	)
-	KE8(WORLD_48,	WORLD_49,	WORLD_50,	WORLD_51,	WORLD_52,	WORLD_53,	WORLD_54,	WORLD_55	)
-	KE8(WORLD_56,	WORLD_57,	WORLD_58,	WORLD_59,	WORLD_60,	WORLD_61,	WORLD_62,	WORLD_63	)
-	KE8(WORLD_64,	WORLD_65,	WORLD_66,	WORLD_67,	WORLD_68,	WORLD_69,	WORLD_70,	WORLD_71	)
-	KE8(WORLD_72,	WORLD_73,	WORLD_74,	WORLD_75,	WORLD_76,	WORLD_77,	WORLD_78,	WORLD_79	)
-	KE8(WORLD_80,	WORLD_81,	WORLD_82,	WORLD_83,	WORLD_84,	WORLD_85,	WORLD_86,	WORLD_87	)
-	KE8(WORLD_88,	WORLD_89,	WORLD_90,	WORLD_91,	WORLD_92,	WORLD_93,	WORLD_94,	WORLD_95	)
-#endif
-	KE8(KP0,		KP1,		KP2,		KP3,		KP4,		KP5,		KP6,		KP7			)
-	KE8(KP8,		KP9,		KP_PERIOD,	KP_DIVIDE,	KP_MULTIPLY,KP_MINUS,	KP_PLUS, 	KP_ENTER	)
-	KE8(UP,			DOWN,		RIGHT,		LEFT,		INSERT,		HOME,		KP_EQUALS,	END			)
-	KE8(PAGEUP,		PAGEDOWN,	F1,			F2,			F3,			F4,			F5,			F6			)
-	KE8(F7,			F8,			F9,			F10,		F11,		F12,		F13,		F14			)
-	KE8(F15,		NUMLOCK,	CAPSLOCK,	SCROLLOCK,	RSHIFT,		LSHIFT,		RCTRL,		LCTRL		)
-	KE8(RALT,		LALT,		RMETA,		LMETA,		LSUPER,		RSUPER,		MODE,		COMPOSE		)
-	KE8(HELP,		PRINT,		SYSREQ,		BREAK,		MENU,		POWER,		EURO,		UNDO		)
+	KE8(DELETE,		WORLD_0,	WORLD_1,		WORLD_2,	WORLD_3,	WORLD_4,	WORLD_5,	WORLD_6		)
+	KE8(WORLD_7,	WORLD_8,	WORLD_9,		WORLD_10,	WORLD_11,	WORLD_12,	WORLD_13,	WORLD_14	)
+	KE8(WORLD_15,	WORLD_16,	WORLD_17,		WORLD_18,	WORLD_19,	WORLD_20,	WORLD_21,	WORLD_22	)
+	KE8(WORLD_23,	WORLD_24,	WORLD_25,		WORLD_26,	WORLD_27,	WORLD_28,	WORLD_29,	WORLD_30	)
+	KE8(WORLD_31,	WORLD_32,	WORLD_33,		WORLD_34,	WORLD_35,	WORLD_36,	WORLD_37,	WORLD_38	)
+	KE8(WORLD_39,	WORLD_40,	WORLD_41,		WORLD_42,	WORLD_43,	WORLD_44,	WORLD_45,	WORLD_46	)
+	KE8(WORLD_47,	WORLD_48,	WORLD_49,		WORLD_50,	WORLD_51,	WORLD_52,	WORLD_53,	WORLD_54	)
+	KE8(WORLD_55,	WORLD_56,	WORLD_57,		WORLD_58,	WORLD_59,	WORLD_60,	WORLD_61,	WORLD_62	)
+	KE8(WORLD_63,	WORLD_64,	WORLD_65,		WORLD_66,	WORLD_67,	WORLD_68,	WORLD_69,	WORLD_70	)
+	KE8(WORLD_71,	WORLD_72,	WORLD_73,		WORLD_74,	WORLD_75,	WORLD_76,	WORLD_77,	WORLD_78	)
+	KE8(WORLD_79,	WORLD_80,	WORLD_81,		WORLD_82,	WORLD_83,	WORLD_84,	WORLD_85,	WORLD_86	)
+	KE8(WORLD_87,	WORLD_88,	WORLD_89,		WORLD_90,	WORLD_91,	WORLD_92,	WORLD_93,	WORLD_94	)
+	KE8(WORLD_95,	KP0,		KP1,			KP2,		KP3,		KP4,		KP5,		KP6			)
+	KE8(KP7,		KP8,		KP9,			KP_PERIOD,	KP_DIVIDE,	KP_MULTIPLY,KP_MINUS,	KP_PLUS		)
+	KE8(KP_ENTER,	KP_EQUALS,	UP,				DOWN,		RIGHT,		LEFT,		INSERT,		HOME		)
+	KE8(END,		PAGEUP,		PAGEDOWN,		F1,			F2,			F3,			F4,			F5			)
+	KE8(F6,			F7,			F8,				F9,			F10,		F11,		F12,		F13			)
+	KE8(F14,		F15,		NUMLOCK,		CAPSLOCK,	SCROLLOCK,	RSHIFT,		LSHIFT,		RCTRL		)
+	KE8(LCTRL,		RALT,		LALT,			RMETA,		LMETA,		LSUPER,		RSUPER,		MODE		)
+	KE8(COMPOSE,	HELP,		PRINT,			SYSREQ,		BREAK,		MENU,		POWER,		EURO		)
+	KE(UNDO)
 	KE(LAST)		
 	{-1, ""}
 };
+#endif
 
 #ifdef MESS
 extern int win_use_natural_keyboard;
@@ -441,14 +598,10 @@ INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 #endif
 static int joy_map_leastfree(void)
 {
-	int i,j,found;
+	int i;
 	for (i=0;i<MAX_JOYSTICKS;i++)
 	{
-		found = 0;
-		for (j=0;j<MAX_JOYMAP;j++)
-			if (joy_map[j].logical == i)
-				found = 1;
-		if (!found)
+		if (*joy_map[i].name == 0)
 			return i;
 	}
 	return -1;
@@ -464,12 +617,12 @@ static char *remove_spaces(const char *s)
 
 	if (strlen(s) == 0)
 	{
-		r = auto_malloc(strlen((char *)def_name)+1);
+		r = auto_malloc(strlen((char *)def_name) + 1);
 		strcpy(r, (char *)def_name);
 		return r;
 	}
 
-	r = auto_malloc(strlen(s));
+	r = auto_malloc(strlen(s) + 1);
 	p = r;
 	while (*s)
 	{
@@ -495,11 +648,11 @@ static void init_joymap(void)
 {
 	int stick;
 
-	for (stick=0; stick < MAX_JOYMAP; stick++)
+	for (stick=0; stick < MAX_JOYSTICKS; stick++)
 	{
 		joy_map[stick].name = (char *)"";
-		joy_map[stick].logical = -1;
-		joy_map[stick].ismapped = 0;
+		joy_map[stick].physical = -1;
+		joy_logical[stick] = -1;
 	}
 		
 	if (options_get_bool(mame_options(), SDLOPTION_JOYMAP))
@@ -519,11 +672,10 @@ static void init_joymap(void)
 		}
 		else
 		{
-			int i, cnt, logical;
+			int i, logical;
 			char buf[256];
 			char name[65];
 			
-			cnt=0;
 			while (!feof(joymap_file) && fgets(buf, 255, joymap_file))
 			{
 				if (*buf && buf[0] && buf[0] != '#')
@@ -537,10 +689,8 @@ static void init_joymap(void)
 					sscanf(buf, "%x %64c\n", &logical, name);
 					if ((logical >=0 ) && (logical < MAX_JOYSTICKS))
 					{
-						joy_map[cnt].logical = logical;
-						joy_map[cnt].name = remove_spaces(name);
-						mame_printf_verbose("Joymap: Logical id %d: %s\n", logical, joy_map[cnt].name);
-						cnt++;
+						joy_map[logical].name = remove_spaces(name);
+						mame_printf_verbose("Joymap: Logical id %d: %s\n", logical, joy_map[logical].name);
 					}
 					else
 						mame_printf_warning("Joymap: Error reading map: Line %d: %s\n", line, buf);
@@ -560,7 +710,7 @@ static void init_joymap(void)
 static void sdlinput_register_joysticks(running_machine *machine)
 {
 	device_info *devinfo;
-	int physical_stick, axis, button, hat, stick, first_free, i;
+	int physical_stick, axis, button, hat, stick, i;
 	char tempname[512];
 	SDL_Joystick *joy;
 
@@ -570,83 +720,111 @@ static void sdlinput_register_joysticks(running_machine *machine)
 	for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 	{
 		char *joy_name = remove_spaces(SDL_JoystickName(physical_stick));
-	
-		devinfo = generic_device_alloc(&joystick_list, joy_name);
-		devinfo->device = input_device_add(DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
-
-		// loop over all axes
-		joy = SDL_JoystickOpen(physical_stick);
-		devinfo->joystick.device[physical_stick] = joy;
-
-		stick = -1;
-		first_free = 0;
+		int found = 0;
+		
 		for (i=0;i<MAX_JOYSTICKS;i++)
 		{
-			if (!first_free && !joy_map[i].name[0])
-				first_free = i;
-			if (!joy_map[i].ismapped && !strcmp(joy_name,joy_map[i].name))
+			if (strcmp(joy_name,joy_map[i].name) == 0 && joy_map[i].physical < 0)
 			{
-				stick = joy_map[i].logical;
-				joy_map[i].ismapped = 1;
+				joy_map[i].physical = physical_stick;
+				found = 1;
+				joy_logical[physical_stick] = i;
 			}
 		}
-		if (stick == -1)
+		if (found == 0)
 		{
 			stick = joy_map_leastfree();
-			joy_map[first_free].logical = stick;
-			joy_map[first_free].name = joy_name;
-			joy_map[first_free].ismapped = 1;
+			joy_map[stick].physical = physical_stick;
+			joy_map[stick].name = joy_name;
+			joy_logical[physical_stick] = stick;
+		}
+	}
+
+	for (stick = 0; stick < MAX_JOYSTICKS; stick++)
+	{
+		if (*joy_map[stick].name == 0)
+		{
+			devinfo = NULL;
+			/* only map place holders if remapjoys is enabled */
+			if (options_get_bool(mame_options(), SDLOPTION_JOYMAP))
+			{
+				sprintf(tempname, "NC%d", stick);
+				devinfo = generic_device_alloc(&joystick_list, tempname);
+				devinfo->device = input_device_add(DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
+			}
+		}
+		else
+		{
+			devinfo = generic_device_alloc(&joystick_list, joy_map[stick].name);
+			devinfo->device = input_device_add(DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
 		}
 		
-		//joy_logical[physical_stick] = stick;
 
-		mame_printf_verbose("Joystick: %s\n", joy_name);
+		physical_stick = joy_map[stick].physical;
+		
+		if (physical_stick < 0)
+			continue;
+		
+		// loop over all axes
+		joy = SDL_JoystickOpen(physical_stick);
+
+		devinfo->joystick.device = joy;
+
+		mame_printf_verbose("Joystick: %s\n", devinfo->name);
 		mame_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy));
 		mame_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick);
 
 		// loop over all axes
 		for (axis = 0; axis < SDL_JoystickNumAxes(joy); axis++)
 		{
-			if (axis < 6)
-			{
-				sprintf(tempname, "J%d A%d %s", stick + 1, axis, joy_name);
-				input_device_item_add(devinfo->device, tempname, &devinfo->joystick.axes[axis], ITEM_ID_XAXIS + axis, generic_axis_get_state);
-			}
+			int itemid;
+			
+			if (axis < INPUT_MAX_AXIS)
+				itemid = ITEM_ID_XAXIS + axis;
+			else if (axis < INPUT_MAX_AXIS + INPUT_MAX_ADD_ABSOLUTE)
+				itemid = ITEM_ID_ADD_ABSOLUTE1 - INPUT_MAX_AXIS + axis;
 			else
-			{
-				sprintf(tempname, "J%d A%d %s", stick + 1, axis, joy_name);
-				input_device_item_add(devinfo->device, tempname, &devinfo->joystick.axes[axis], ITEM_ID_OTHER_AXIS_ABSOLUTE, generic_axis_get_state);
-			}
+				itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
+
+			sprintf(tempname, "A%d %s", axis, devinfo->name);
+			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.axes[axis], itemid, generic_axis_get_state);
 		}
 
 		// loop over all buttons
 		for (button = 0; button < SDL_JoystickNumButtons(joy); button++)
 		{
+			int itemid;
+			
 			devinfo->joystick.buttons[button] = 0;
 
-			if (button < 16)
-			{
-				sprintf(tempname, "J%d button %d", stick + 1, button);
-				input_device_item_add(devinfo->device, tempname, &devinfo->joystick.buttons[button], ITEM_ID_BUTTON1 + button, generic_button_get_state);
-			}
+			if (axis < INPUT_MAX_BUTTONS)
+				itemid = ITEM_ID_BUTTON1 + button;
+			else if (button < INPUT_MAX_BUTTONS + INPUT_MAX_ADD_SWITCH)
+				itemid = ITEM_ID_ADD_SWITCH1 - INPUT_MAX_BUTTONS + button;
 			else
-			{
-				sprintf(tempname, "J%d button %d", stick + 1, button);
-				input_device_item_add(devinfo->device, tempname, &devinfo->joystick.buttons[button], ITEM_ID_OTHER_SWITCH, generic_button_get_state);
-			}
+				itemid = ITEM_ID_OTHER_SWITCH;
+
+			sprintf(tempname, "button %d", button);
+			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.buttons[button], itemid, generic_button_get_state);
 		}
 
 		// loop over all hats
 		for (hat = 0; hat < SDL_JoystickNumHats(joy); hat++)
 		{
-			sprintf(tempname, "J%d hat %d Up", stick + 1, hat);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsU[hat], ITEM_ID_OTHER_SWITCH, generic_button_get_state);
-			sprintf(tempname, "J%d hat %d Down", stick + 1, hat);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsD[hat], ITEM_ID_OTHER_SWITCH, generic_button_get_state);
-			sprintf(tempname, "J%d hat %d Left", stick + 1, hat);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsL[hat], ITEM_ID_OTHER_SWITCH, generic_button_get_state);
-			sprintf(tempname, "J%d hat %d Right", stick + 1, hat);
-		    	input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsR[hat], ITEM_ID_OTHER_SWITCH, generic_button_get_state);
+			int itemid;
+			
+			sprintf(tempname, "hat %d Up", hat);
+			itemid = (hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + 4 * hat : ITEM_ID_OTHER_SWITCH;
+			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsU[hat], itemid, generic_button_get_state);
+			sprintf(tempname, "hat %d Down", hat);
+			itemid = (hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + 4 * hat : ITEM_ID_OTHER_SWITCH;
+			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsD[hat], itemid, generic_button_get_state);
+			sprintf(tempname, "hat %d Left", hat);
+			itemid = (hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + 4 * hat : ITEM_ID_OTHER_SWITCH;
+			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsL[hat], itemid, generic_button_get_state);
+			sprintf(tempname, "hat %d Right", hat);
+			itemid = (hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + 4 * hat : ITEM_ID_OTHER_SWITCH;
+	    	input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsR[hat], itemid, generic_button_get_state);
 		}
 	}
 	mame_printf_verbose("Joystick: End initialization\n");
@@ -816,7 +994,8 @@ void sdlinput_init(running_machine *machine)
 		snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 		
 		// add the item to the device
-		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[SDLK_INDEX(key_trans_table[keynum].sdl_key)-SDLK_FIRST], itemid, generic_button_get_state);
+		//printf("Test %d\n", OSD_SDL_INDEX(key_trans_table[keynum].sdl_key) );
+		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)], itemid, generic_button_get_state);
 	}
 
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
@@ -824,12 +1003,12 @@ void sdlinput_init(running_machine *machine)
 	devinfo->device = input_device_add(DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
 
 	// add the axes
-	input_device_item_add(devinfo->device, "Mouse X", &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
-	input_device_item_add(devinfo->device, "Mouse Y", &devinfo->mouse.lY, ITEM_ID_YAXIS, generic_axis_get_state);
+	input_device_item_add(devinfo->device, "X", &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
+	input_device_item_add(devinfo->device, "Y", &devinfo->mouse.lY, ITEM_ID_YAXIS, generic_axis_get_state);
 
 	for (button = 0; button < 4; button++)
 	{
-		sprintf(defname, "Mouse B%d", button + 1);
+		sprintf(defname, "B%d", button + 1);
 
 		input_device_item_add(devinfo->device, defname, &devinfo->mouse.buttons[button], ITEM_ID_BUTTON1+button, generic_button_get_state);
 	}
@@ -956,14 +1135,22 @@ void sdlinput_poll(running_machine *machine)
 			#endif
 
 			devinfo = keyboard_list;
-			devinfo->keyboard.state[SDLK_INDEX(event.key.keysym.sym)-SDLK_FIRST] = 0x80;
+#if (SDL_VERSION_ATLEAST(1,3,0))
+			devinfo->keyboard.state[OSD_SDL_INDEX(event.key.keysym.scancode)] = 0x80;
+#else
+			devinfo->keyboard.state[OSD_SDL_INDEX(event.key.keysym.sym)] = 0x80;
+#endif
 			break;
 		case SDL_KEYUP:
 			devinfo = keyboard_list;
-			devinfo->keyboard.state[SDLK_INDEX(event.key.keysym.sym)-SDLK_FIRST] = 0;
+#if (SDL_VERSION_ATLEAST(1,3,0))
+			devinfo->keyboard.state[OSD_SDL_INDEX(event.key.keysym.scancode)] = 0x0;
+#else
+			devinfo->keyboard.state[OSD_SDL_INDEX(event.key.keysym.sym)] = 0x0;
+#endif
 			break;
 		case SDL_JOYAXISMOTION:
-			devinfo = generic_device_find_index(joystick_list, event.jaxis.which);
+			devinfo = generic_device_find_index(joystick_list, joy_logical[event.jaxis.which]);
 			if (devinfo)
 			{
 				if (sixaxis_mode)
@@ -986,7 +1173,7 @@ void sdlinput_poll(running_machine *machine)
 			}
 			break;
 		case SDL_JOYHATMOTION:
-			devinfo = generic_device_find_index(joystick_list, event.jhat.which);
+			devinfo = generic_device_find_index(joystick_list, joy_logical[event.jhat.which]);
 			if (devinfo)
 			{
 				if (event.jhat.value == SDL_HAT_UP)
@@ -1025,7 +1212,7 @@ void sdlinput_poll(running_machine *machine)
 			break;
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			devinfo = generic_device_find_index(joystick_list, event.jbutton.which);
+			devinfo = generic_device_find_index(joystick_list, joy_logical[event.jbutton.which]);
 			if (devinfo)
 			{
 				devinfo->joystick.buttons[event.jbutton.button] = (event.jbutton.state == SDL_PRESSED) ? 0x80 : 0; 
