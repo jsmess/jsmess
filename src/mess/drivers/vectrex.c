@@ -17,13 +17,25 @@ Bruce Tomlin (hardware info)
 
 static ADDRESS_MAP_START( vectrex_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x7fff) AM_ROM
-	AM_RANGE( 0xc800, 0xcbff) AM_RAM AM_MIRROR( 0x0400 ) AM_BASE(&vectrex_ram_base) AM_SIZE(&vectrex_ram_size)
-	AM_RANGE( 0xd000, 0xd7ff) AM_READWRITE( via_0_r, via_0_w )
+	AM_RANGE( 0xc800, 0xcbff) AM_RAM AM_MIRROR( 0x0400 ) AM_BASE(&vectorram) AM_SIZE(&vectorram_size)
+	AM_RANGE( 0xd000, 0xd7ff) AM_READWRITE( via_0_r, vectrex_via_w )
 	AM_RANGE( 0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vectrex )
-	PORT_START
+	PORT_START_TAG("CONTR1X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
+
+	PORT_START_TAG("CONTR1Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE
+
+	PORT_START_TAG("CONTR2X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_PLAYER(2)
+
+	PORT_START_TAG("CONTR2Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START_TAG("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1)
@@ -33,19 +45,7 @@ static INPUT_PORTS_START( vectrex )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(2)
 
-	PORT_START	/* IN1 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0,255) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
-
-	PORT_START	/* IN2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0,255) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE
-
-	PORT_START	/* IN3 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0,255) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_PLAYER(2)
-
-	PORT_START	/* IN4 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0,255) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
-
-	PORT_START /* IN5 */
+	PORT_START_TAG("3DCONF")
 	PORT_DIPNAME( 0x01, 0x00, "3D Imager")
 	PORT_DIPSETTING(0x00, DEF_STR ( Off ))
 	PORT_DIPSETTING(0x01, DEF_STR ( On ))
@@ -65,19 +65,18 @@ static INPUT_PORTS_START( vectrex )
 	PORT_DIPSETTING(0x60, "Blue")
 	PORT_DIPSETTING(0x80, "Color")
 
-	PORT_START /* IN6 */
+	PORT_START_TAG("LPENCONF")
 	PORT_DIPNAME( 0x03, 0x00, "Lightpen")
 	PORT_DIPSETTING(0x00, DEF_STR ( Off ))
 	PORT_DIPSETTING(0x01, "left port")
 	PORT_DIPSETTING(0x02, "right port")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CODE(MOUSECODE_BUTTON1)
 
-    PORT_START /* Lightpen - X AXIS */
-    PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(1)
+	PORT_START_TAG("LPENY")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X )  PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
-    PORT_START /* Lightpen - Y AXIS */
-    PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(1)
-
+	PORT_START_TAG("LPENX")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y )  PORT_CROSSHAIR(X, 1, 0, 0) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_REVERSE PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
@@ -85,7 +84,7 @@ INPUT_PORTS_END
 
 static const struct AY8910interface ay8910_interface =
 {
-	input_port_0_r,
+	input_port_4_r,
 	0,
 	vectrex_psg_port_w,
 	0
@@ -94,18 +93,16 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( vectrex )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 1500000)        /* 1.5 Mhz */
+	MDRV_CPU_ADD_TAG("main", M6809, XTAL_6MHz/4)
 	MDRV_CPU_PROGRAM_MAP(vectrex_map, 0)
 
 	MDRV_SCREEN_ADD("main", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
-	MDRV_PALETTE_LENGTH(256 + 32768)
-	/*MDRV_ASPECT_RATIO(3, 4)*/
 
 	MDRV_VIDEO_START( vectrex )
 	MDRV_VIDEO_UPDATE( vectrex )
@@ -125,15 +122,15 @@ static void vectrex_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:                            info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(vectrex_cart); break;
+		case MESS_DEVINFO_PTR_LOAD:                         info->load = DEVICE_IMAGE_LOAD_NAME(vectrex_cart); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin,gam,vec"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:              strcpy(info->s = device_temp_str(), "bin,gam,vec"); break;
 
-		default:										cartslot_device_getinfo(devclass, state, info); break;
+		default:                                        cartslot_device_getinfo(devclass, state, info); break;
 	}
 }
 
@@ -142,8 +139,8 @@ SYSTEM_CONFIG_START(vectrex)
 SYSTEM_CONFIG_END
 
 ROM_START(vectrex)
-    ROM_REGION(0x10000,REGION_CPU1, 0)
-    ROM_LOAD("system.img", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7))
+	ROM_REGION(0x10000,REGION_CPU1, 0)
+	ROM_LOAD("system.img", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7))
 ROM_END
 
 
@@ -186,14 +183,18 @@ static ADDRESS_MAP_START( raaspec_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x7fff) AM_ROM
 	AM_RANGE( 0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE( 0xa000, 0xa000) AM_WRITE( raaspec_led_w )
-	AM_RANGE( 0xc800, 0xcbff) AM_RAM AM_RAM AM_MIRROR( 0x0400 )
-	AM_RANGE( 0xd000, 0xd7ff) AM_READWRITE ( via_0_r,  via_0_w)
+	AM_RANGE( 0xc800, 0xcbff) AM_RAM AM_MIRROR( 0x0400 ) AM_BASE(&vectorram) AM_SIZE(&vectorram_size)
+	AM_RANGE( 0xd000, 0xd7ff) AM_READWRITE ( via_0_r,  vectrex_via_w)
 	AM_RANGE( 0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( raaspec )
-	PORT_START
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_START_TAG("LPENCONF")
+	PORT_START_TAG("LPENY")
+	PORT_START_TAG("LPENX")
+	PORT_START_TAG("3DCONF")
+	PORT_START_TAG("BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
@@ -201,10 +202,8 @@ static INPUT_PORTS_START( raaspec )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )
-
-	PORT_START
-    PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT )
-
+	PORT_START_TAG("COIN")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 
@@ -213,8 +212,6 @@ static MACHINE_DRIVER_START( raaspec )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP( raaspec_map, 0 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
-
-	MDRV_PALETTE_LENGTH(254)
 
 	MDRV_VIDEO_START( raaspec )
 MACHINE_DRIVER_END
@@ -232,5 +229,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY FULLNAME */
-CONS( 1982, vectrex,  0, 		0,		vectrex,  vectrex,	vectrex,	vectrex,	"General Consumer Electronics",   "Vectrex" , ROT270)
-CONS( 1984, raaspec,  vectrex,	0,		raaspec,  raaspec,	0,			NULL,		"Roy Abel & Associates",   "Spectrum I+" , ROT270)
+CONS( 1982, vectrex,  0,        0,      vectrex,  vectrex,  vectrex,    vectrex,    "General Consumer Electronics",   "Vectrex" , ROT270)
+CONS( 1984, raaspec,  vectrex,  0,      raaspec,  raaspec,  vectrex,    NULL,       "Roy Abel & Associates",   "Spectrum I+" , ROT270)
