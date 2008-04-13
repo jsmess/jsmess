@@ -33,10 +33,10 @@
 #define LOG_PORT80 0
 
 static struct {
-	const device_config	*pic8259_master;
-	const device_config	*pic8259_slave;
-	const device_config *dma8237_1;
-	const device_config *dma8237_2;
+	device_config	*pic8259_master;
+	device_config	*pic8259_slave;
+	device_config	*dma8237_1;
+	device_config	*dma8237_2;
 } at_devices;
 
 static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };

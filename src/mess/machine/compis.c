@@ -94,8 +94,8 @@ static struct i186_state
 } i186;
 
 static struct {
-	const device_config	*pic8259_master;
-	const device_config	*pic8259_slave;
+	device_config	*pic8259_master;
+	device_config	*pic8259_slave;
 } compis_devices;
 
 /* Keyboard */

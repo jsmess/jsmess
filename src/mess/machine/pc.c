@@ -49,10 +49,10 @@
 
 
 static struct {
-	const device_config *pic8259_master;
-	const device_config *pic8259_slave;
-	const device_config *dma8237_1;
-	const device_config *dma8237_2;
+	device_config	*pic8259_master;
+	device_config	*pic8259_slave;
+	device_config	*dma8237_1;
+	device_config	*dma8237_2;
 } pc_devices;
 
 /*************************************************************************
