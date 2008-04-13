@@ -167,6 +167,7 @@ static bitmap_t		*tmp_bitmap;
 static int			start_vpos;
 static int			start_vblank;
 static UINT8		lum;		/* Output of P1 bit 7 influences the intensity of the background and grid colours */
+static UINT16		lfsr;
 
 static sound_stream *odyssey2_sh_channel;
 
@@ -604,6 +605,15 @@ void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t *
 				if( o2_vdc.s.sound & 0x40 )
 				{
 					signal |= *buffer << 23;
+				}
+				/* Noise poly is : L=16 W=2 10000000000100001 */
+				lfsr = ( lfsr >> 1 ) | ( ( ( lfsr & 0x01 ) ^ ( ( lfsr & 0x800 ) >> 11 ) ) << 15 );
+				if ( ! lfsr ) {
+					lfsr = 0xFFFF;
+				}
+				/* Check if noise should be applied */
+				if ( o2_vdc.s.sound & 0x10 ) {
+					*buffer |= ( lfsr & 0x01 );
 				}
 				o2_vdc.s.shift3 = signal & 0xFF;
 				o2_vdc.s.shift2 = ( signal >> 8 ) & 0xFF;
