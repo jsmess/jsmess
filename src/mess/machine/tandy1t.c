@@ -187,6 +187,9 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 		pit8253_gate_w( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
 		pc_sh_speaker(machine, data&3);
 		pc_keyb_set_clock(data&0x40);
+		if ( data & 0x80 ) {
+			pc_keyb_clear();
+		}
 		break;
 	case 2:
 		tandy_ppi.portc = data;
