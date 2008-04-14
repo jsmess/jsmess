@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/printer.h"
 #include "devices/basicdsk.h"
@@ -94,9 +93,9 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-static UINT8 tmc2000e_mode_r(void)
+static CDP1802_MODE_READ( tmc2000e_mode_r )
 {
-	if (input_port_read(Machine, "RUN") & 0x01)
+	if (input_port_read(machine, "RUN") & 0x01)
 	{
 		return CDP1802_MODE_RUN;
 	}
@@ -106,7 +105,7 @@ static UINT8 tmc2000e_mode_r(void)
 	}
 }
 
-static UINT8 tmc2000e_ef_r(void)
+static CDP1802_EF_READ( tmc2000e_ef_r )
 {
 	UINT8 flags = 0x0f;
 	char port[4];
@@ -120,12 +119,12 @@ static UINT8 tmc2000e_ef_r(void)
 
 	// keyboard
 	sprintf(port, "IN%d", keylatch / 8);
-	if (~input_port_read(Machine, port) & (1 << (keylatch % 8))) flags -= EF3;
+	if (~input_port_read(machine, port) & (1 << (keylatch % 8))) flags -= EF3;
 
 	return flags;
 }
 
-static void tmc2000e_q_w(int level)
+static CDP1802_Q_WRITE( tmc2000e_q_w )
 {
 	// CDP1864 sound generator on/off
 	cdp1864_audio_output_enable(level);
@@ -139,7 +138,7 @@ static void tmc2000e_q_w(int level)
 	// floppy control (FDC-6)
 }
 
-static const CDP1802_CONFIG tmc2000e_config =
+static const cdp1802_interface tmc2000e_config =
 {
 	tmc2000e_mode_r,
 	tmc2000e_ef_r,

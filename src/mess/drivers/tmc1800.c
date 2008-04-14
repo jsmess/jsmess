@@ -86,7 +86,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1864.h"
 #include "devices/cassette.h"
@@ -169,9 +168,9 @@ INPUT_PORTS_END
 
 // Telmac 1800
 
-static UINT8 tmc1800_mode_r(void)
+static CDP1802_MODE_READ( tmc1800_mode_r )
 {
-	if (input_port_read(Machine, "RUN") & 0x01)
+	if (input_port_read(machine, "RUN") & 0x01)
 	{
 		return CDP1802_MODE_RUN;
 	}
@@ -181,7 +180,7 @@ static UINT8 tmc1800_mode_r(void)
 	}
 }
 
-static UINT8 tmc1800_ef_r(void)
+static CDP1802_EF_READ( tmc1800_ef_r )
 {
 	UINT8 flags = 0x0f;
 	char port[4];
@@ -195,16 +194,16 @@ static UINT8 tmc1800_ef_r(void)
 
 	// keyboard
 	sprintf(port, "IN%d", keylatch / 8);
-	if (~input_port_read(Machine, port) & (1 << (keylatch % 8))) flags -= EF2;
+	if (~input_port_read(machine, port) & (1 << (keylatch % 8))) flags -= EF2;
 
 	return flags;
 }
 
-static void tmc1800_q_w(int level)
+static CDP1802_Q_WRITE( tmc1800_q_w )
 {
 }
 
-static const CDP1802_CONFIG tmc1800_config =
+static const cdp1802_interface tmc1800_config =
 {
 	tmc1800_mode_r,
 	tmc1800_ef_r,
@@ -216,7 +215,7 @@ static const CDP1802_CONFIG tmc1800_config =
 
 // Telmac 2000
 
-static UINT8 tmc2000_ef_r(void)
+static CDP1802_EF_READ( tmc2000_ef_r )
 {
 	int flags = 0x0f;
 	char port[4];
@@ -230,12 +229,12 @@ static UINT8 tmc2000_ef_r(void)
 
 	// keyboard
 	sprintf(port, "IN%d", keylatch / 8);
-	if (~input_port_read(Machine, port) & (1 << (keylatch % 8))) flags -= EF2;
+	if (~input_port_read(machine, port) & (1 << (keylatch % 8))) flags -= EF2;
 
 	return flags;
 }
 
-static void tmc2000_q_w(int level)
+static CDP1802_Q_WRITE( tmc2000_q_w )
 {
 	// turn CDP1864 sound generator on/off
 	cdp1864_audio_output_enable(level);
@@ -244,7 +243,7 @@ static void tmc2000_q_w(int level)
 	set_led_status(1, level);
 }
 
-static const CDP1802_CONFIG tmc2000_config =
+static const cdp1802_interface tmc2000_config =
 {
 	tmc1800_mode_r,
 	tmc2000_ef_r,
