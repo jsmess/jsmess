@@ -825,27 +825,32 @@ static void build_generic_filter(const device_config *device, int is_save, char 
 //	change_device
 //============================================================
 
-static void change_device(HWND wnd, const device_config *img, int is_save)
+static void change_device(HWND wnd, const device_config *device, int is_save)
 {
 	dialog_box *dialog = NULL;
 	char filter[2048];
 	char filename[MAX_PATH];
 	char buffer[512];
-	const struct IODevice *dev = mess_device_from_core_device(img);
 	const char *initial_dir;
 	BOOL result;
 	int create_format = 0;
 	option_resolution *create_args = NULL;
 	image_error_t err;
+	image_device_info info;
+	const struct IODevice *iodev;
 
-	assert(dev);
+	// sanity check
+	assert(device != NULL);
+
+	// get device info
+	info = image_device_getinfo(device->machine->config, device);
 
 	// get the file
-	if (image_exists(img))
+	if (image_exists(device))
 	{
 		const char *imgname;
-		imgname = image_basename(img);
-		strncpyz(filename, imgname, sizeof(filename) / sizeof(filename[0]));
+		imgname = image_basename(device);
+		snprintf(filename, ARRAY_LENGTH(filename), "%s", imgname);
 	}
 	else
 	{
@@ -853,49 +858,52 @@ static void change_device(HWND wnd, const device_config *img, int is_save)
 	}
 
 	// use image directory, if it is there
-	get_devicedirectory(dev->type);
-	initial_dir = image_working_directory(img);
+	get_devicedirectory(info.type);
+	initial_dir = image_working_directory(device);
 
 	// add custom dialog elements, if appropriate
-	if (is_save && dev->createimage_optguide && dev->createimage_options[0].optspec)
+	iodev = mess_device_from_core_device(device);
+	if (is_save && (iodev != NULL)
+		&& (iodev->createimage_optguide != NULL)
+		&& (iodev->createimage_options[0].optspec != NULL))
 	{
-		dialog = build_option_dialog(img, filter, sizeof(filter) / sizeof(filter[0]), &create_format, &create_args);
+		dialog = build_option_dialog(device, filter, sizeof(filter) / sizeof(filter[0]), &create_format, &create_args);
 		if (!dialog)
 			goto done;
 	}
 	else
 	{
 		// build a normal filter
-		build_generic_filter(img, is_save, filter, sizeof(filter) / sizeof(filter[0]));
+		build_generic_filter(device, is_save, filter, sizeof(filter) / sizeof(filter[0]));
 	}
 
 	// display the dialog
-	result = win_file_dialog(img->machine, wnd, is_save ? WIN_FILE_DIALOG_SAVE : WIN_FILE_DIALOG_OPEN,
+	result = win_file_dialog(device->machine, wnd, is_save ? WIN_FILE_DIALOG_SAVE : WIN_FILE_DIALOG_OPEN,
 		dialog, filter, initial_dir, filename, sizeof(filename) / sizeof(filename[0]));
 	if (result)
 	{
 		// mount the image
 		if (is_save)
-			err = image_create(img, filename, create_format, create_args);
+			err = image_create(device, filename, create_format, create_args);
 		else
-			err = image_load(img, filename);
+			err = image_load(device, filename);
 
 		// error?
 		if (err)
 		{
-			snprintf(buffer, sizeof(buffer) / sizeof(buffer[0]),
+			snprintf(buffer, ARRAY_LENGTH(buffer),
 				"Error when %s the image: %s",
 				is_save ? "creating" : "loading",
-				image_error(img));
+				image_error(device));
 
 			win_message_box_utf8(wnd, buffer, APPNAME, MB_OK);
 		}
 	}
 
 done:
-	if (dialog)
+	if (dialog != NULL)
 		win_dialog_exit(dialog);
-	if (create_args)
+	if (create_args != NULL)
 		option_resolution_close(create_args);
 }
 
