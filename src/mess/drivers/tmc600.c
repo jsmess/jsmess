@@ -71,6 +71,7 @@ Notes:
 
     TODO:
 
+	- memory mapping
     - proper emulation of the VISMAC interface (cursor blinking, color RAM), schematics are needed
     - tape interface
     - disk interface
@@ -88,59 +89,12 @@ Notes:
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "cpu/cdp1802/cdp1802.h"
+#include "includes/tmc600.h"
 #include "video/cdp1869.h"
 
-#define SCREEN_TAG	"main"
 #define CDP1869_TAG	"cdp1869"
 
-#define TMC600_PAGERAM_SIZE	0x400
-#define TMC600_PAGERAM_MASK	0x3ff
-
 /* Read/Write Handlers */
-
-static int vismac_reg_latch;
-static int vismac_color_latch;
-static int vismac_bkg_latch;
-static int vismac_blink;
-static UINT8 *pageram, *vismac_colorram;
-
-static WRITE8_HANDLER( vismac_register_w )
-{
-	vismac_reg_latch = data;
-}
-
-static WRITE8_DEVICE_HANDLER( vismac_data_w )
-{
-	switch (vismac_reg_latch)
-	{
-	case 0x20:
-		// set character color
-		vismac_color_latch = data;
-		break;
-
-	case 0x30:
-		// write cdp1869 command on the data bus
-		vismac_bkg_latch = data & 0x07;
-		cdp1869_out3_w(device, 0, data);
-		break;
-
-	case 0x40:
-		cdp1869_out4_w(device, 0, data);
-		break;
-
-	case 0x50:
-		cdp1869_out5_w(device, 0, data);
-		break;
-
-	case 0x60:
-		cdp1869_out6_w(device, 0, data);
-		break;
-
-	case 0x70:
-		cdp1869_out7_w(device, 0, data);
-		break;
-	}
-}
 
 static int keylatch;
 
@@ -171,9 +125,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tmc600_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(printer_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, vismac_data_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, tmc600_vismac_data_w)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(vismac_register_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(tmc600_vismac_register_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -316,121 +270,10 @@ static const CDP1802_CONFIG tmc600_cdp1802_config =
 	NULL
 };
 
-/* Video */
-
-static INTERRUPT_GEN( vismac_blink_int )
-{
-	vismac_blink = !vismac_blink;
-}
-
-static UINT8 tmc600_get_color(UINT16 pma)
-{
-	UINT8 color = vismac_colorram[pma];
-
-	if (BIT(color, 3) && vismac_blink)
-	{
-		return vismac_bkg_latch;
-	}
-	else
-	{
-		return color;
-	}
-}
-
-static CDP1869_PAGE_RAM_READ(tmc600_pageram_r)
-{
-	UINT16 addr = pma & TMC600_PAGERAM_MASK;
-
-	return pageram[addr];
-}
-
-static CDP1869_PAGE_RAM_WRITE(tmc600_pageram_w)
-{
-	UINT16 addr = pma & TMC600_PAGERAM_MASK;
-
-	pageram[addr] = data;
-	vismac_colorram[addr] = vismac_color_latch;
-}
-
-static CDP1869_CHAR_RAM_READ(tmc600_charram_r)
-{
-	UINT16 pageaddr = pma & TMC600_PAGERAM_MASK;
-	UINT8 column = pageram[pageaddr];
-	UINT8 color = tmc600_get_color(pageaddr);
-	UINT16 charaddr = (column << 3) | (cma & 0x07);
-	UINT8 *charrom = memory_region(REGION_GFX1);
-	UINT8 cdb = charrom[charaddr] & 0x3f;
-
-	int ccb0 = BIT(color, 2);
-	int ccb1 = BIT(color, 1);
-
-	if (BIT(cma, 3))
-	{
-		charaddr += 0x800;
-	}
-
-	return (ccb1 << 7) | (ccb0 << 6) | cdb;
-}
-
-static CDP1869_CHAR_RAM_WRITE(tmc600_charram_w)
-{
-	// character ROM cannot be written to
-}
-
-static CDP1869_PCB_READ(tmc600_pcb_r)
-{
-	UINT16 pageaddr = pma & TMC600_PAGERAM_MASK;
-	UINT8 color = tmc600_get_color(pageaddr);
-
-	int pcb = BIT(color, 0);
-
-	return pcb;
-}
-
-static const cdp1869_interface tmc600_cdp1869_intf =
-{
-	SCREEN_TAG,
-	CDP1869_DOT_CLK_PAL,
-	CDP1869_COLOR_CLK_PAL,
-	CDP1869_PAL,
-	tmc600_pageram_r,
-	tmc600_pageram_w,
-	tmc600_pcb_r,
-	tmc600_charram_r,
-	tmc600_charram_w,
-	NULL
-};
-
-static VIDEO_START( tmc600 )
-{
-	// allocate memory
-
-	pageram = auto_malloc(TMC600_PAGERAM_SIZE);
-	vismac_colorram = auto_malloc(TMC600_PAGERAM_SIZE);
-
-	// register for save state
-
-	state_save_register_global_pointer(pageram, TMC600_PAGERAM_SIZE);
-	state_save_register_global_pointer(vismac_colorram, TMC600_PAGERAM_SIZE);
-}
-
-static VIDEO_UPDATE( tmc600 )
-{
-	const device_config *cdp1869 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1869_VIDEO, CDP1869_TAG);
-
-	cdp1869_update(cdp1869, bitmap, cliprect);
-
-	return 0;
-}
-
 /* Machine Initialization */
 
 static MACHINE_START( tmc600 )
 {
-	state_save_register_global(vismac_reg_latch);
-	state_save_register_global(vismac_color_latch);
-	state_save_register_global(vismac_bkg_latch);
-	state_save_register_global(vismac_blink);
 	state_save_register_global(keylatch);
 }
 
@@ -442,30 +285,19 @@ static MACHINE_RESET( tmc600 )
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( tmc600 )
-
 	// basic system hardware
 
 	MDRV_CPU_ADD(CDP1802, 3579545)	// ???
 	MDRV_CPU_PROGRAM_MAP(tmc600_map, 0)
 	MDRV_CPU_IO_MAP(tmc600_io_map, 0)
 	MDRV_CPU_CONFIG(tmc600_cdp1802_config)
-	MDRV_CPU_PERIODIC_INT(vismac_blink_int, 2)
 
 	MDRV_MACHINE_START(tmc600)
 	MDRV_MACHINE_RESET(tmc600)
 
 	// video hardware
 
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_PALETTE_LENGTH(8+64)
-	MDRV_PALETTE_INIT(cdp1869)
-	MDRV_VIDEO_START(tmc600)
-	MDRV_VIDEO_UPDATE(tmc600)
-	MDRV_SCREEN_RAW_PARAMS(CDP1869_DOT_CLK_PAL, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_PAL, CDP1869_SCANLINE_VBLANK_END_PAL, CDP1869_SCANLINE_VBLANK_START_PAL)
-
-	MDRV_DEVICE_ADD(CDP1869_TAG, CDP1869_VIDEO)
-	MDRV_DEVICE_CONFIG(tmc600_cdp1869_intf)
+	MDRV_IMPORT_FROM(tmc600_video)
 
 	// sound hardware
 
@@ -476,7 +308,6 @@ static MACHINE_DRIVER_START( tmc600 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
-
 MACHINE_DRIVER_END
 
 /* ROMs */
