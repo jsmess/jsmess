@@ -695,7 +695,8 @@ DEVICE_IMAGE_LOAD( msx_floppy )
 
 static WRITE8_HANDLER ( msx_ppi_port_a_w )
 {
-	msx1.primary_slot = ppi8255_peek (0,0);
+	msx1.primary_slot = data;
+
 	if (VERBOSE)
 		logerror ("write to primary slot select: %02x\n", msx1.primary_slot);
 	msx_memory_map_all ();

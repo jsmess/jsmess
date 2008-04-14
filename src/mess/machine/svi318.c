@@ -45,6 +45,8 @@ typedef struct {
 	UINT8	bankHigh1_read_only;
 	UINT8	*bankHigh2_ptr;
 	UINT8	bankHigh2_read_only;
+	/* keyboard */
+	UINT8	keyboard_row;
 	/* printer */
 	UINT8	prn_data;
 	UINT8	prn_strobe;
@@ -196,7 +198,7 @@ static  READ8_HANDLER ( svi318_ppi_port_b_r )
 {
 	int row;
 
-	row = ppi8255_peek (0, 2) & 0x0f;
+	row = svi.keyboard_row;
 	if (row <= 10)
 	{
 		if (row == 6)
@@ -240,6 +242,8 @@ static WRITE8_HANDLER ( svi318_ppi_port_c_w )
 
 	/* cassette signal write */
 	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x20) ? -1.0 : +1.0);
+
+	svi.keyboard_row = data & 0x0F;
 }
 
 static const ppi8255_interface svi318_ppi8255_interface =

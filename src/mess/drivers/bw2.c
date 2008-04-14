@@ -44,6 +44,7 @@
 
 static UINT8 *ramcard_ram;
 static int ramcard_bank;
+static UINT8 keyboard_row;
 
 /* Memory */
 
@@ -309,6 +310,8 @@ static WRITE8_HANDLER( bw2_ppi8255_a_w )
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT | CENTRONICS_NO_RESET);
 	centronics_write_handshake(0, (data & 0x80) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+
+	keyboard_row = data & 0x0F;
 }
 
 static READ8_HANDLER( bw2_ppi8255_b_r )
@@ -327,7 +330,7 @@ static READ8_HANDLER( bw2_ppi8255_b_r )
 	UINT8 row;
 	char port[5];
 
-	row = ppi8255_peek(0, 0) & 0x0f;
+	row = keyboard_row;
 	if (row <= 9)
 	{
 		sprintf(port, "ROW%d", row);
