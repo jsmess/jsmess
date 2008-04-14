@@ -78,9 +78,9 @@ MACHINE_RESET( cdp1864 );
 VIDEO_START( cdp1864 );
 VIDEO_UPDATE( cdp1864 );
 
- READ8_HANDLER( cdp1864_dispon_r );
+READ8_HANDLER( cdp1864_dispon_r );
 
-void cdp1864_dma_w(UINT8 data);
+CDP1802_DMA_WRITE( cdp1864_dma_w );
 
 void cdp1864_audio_output_enable(int value);
 

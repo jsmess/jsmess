@@ -15,7 +15,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
@@ -100,13 +99,6 @@ static CDP1861_ON_EFX_CHANGED( vip_efx_w )
 	cdp1861_efx = level;
 }
 
-static void vip_dma_w(UINT8 data)
-{
-	const device_config *cdp1861 = device_list_find_by_tag(Machine->config->devicelist, CDP1861, CDP1861_TAG);
-
-	cdp1861_dma_w(cdp1861, data);
-}
-
 static const cdp1861_interface vip_cdp1861_intf =
 {
 	SCREEN_TAG,
@@ -130,9 +122,9 @@ static VIDEO_UPDATE( vip )
 static int vip_run;
 static int vip_reset;
 
-static UINT8 vip_mode_r(void)
+static CDP1802_MODE_READ( vip_mode_r )
 {
-	if (input_port_read(Machine, "RUN") & 0x01)
+	if (input_port_read(machine, "RUN") & 0x01)
 	{
 		if (!vip_run)
 		{
@@ -147,7 +139,7 @@ static UINT8 vip_mode_r(void)
 	{
 		if (!vip_reset)
 		{
-			const device_config *cdp1861 = device_list_find_by_tag(Machine->config->devicelist, CDP1861, CDP1861_TAG);
+			const device_config *cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
 			cdp1861->reset(cdp1861);
 			vip_reset = 1;
 			vip_run = 0;
@@ -157,25 +149,32 @@ static UINT8 vip_mode_r(void)
 	}
 }
 
-static UINT8 vip_ef_r(void)
+static CDP1802_EF_READ( vip_ef_r )
 {
 	int ef = 0x0f;
 
 	if (cdp1861_efx) ef -= EF1;
 	// EF2 = tape (high when tone read)
-	if (input_port_read(Machine, "KEYPAD") & (1 << keylatch)) ef -= EF3;
+	if (input_port_read(machine, "KEYPAD") & (1 << keylatch)) ef -= EF3;
 
 	return ef;
 }
 
-static void vip_q_w(int level)
+static CDP1802_Q_WRITE( vip_q_w )
 {
 	beep_set_state(0, level);
 	// PWR Q TAPE
 	set_led_status(1, level);
 }
 
-static const CDP1802_CONFIG vip_config =
+static CDP1802_DMA_WRITE( vip_dma_w )
+{
+	const device_config *cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
+
+	cdp1861_dma_w(cdp1861, data);
+}
+
+static const cdp1802_interface vip_config =
 {
 	vip_mode_r,
 	vip_ef_r,
@@ -189,7 +188,7 @@ static const CDP1802_CONFIG vip_config =
 
 static MACHINE_START( vip )
 {
-	UINT8 *ram= memory_region(REGION_CPU1);
+	UINT8 *ram = memory_region(REGION_CPU1);
 	UINT16 addr;
 
 	state_save_register_global(keylatch);

@@ -1,9 +1,7 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "sound/beep.h"
 #include "video/cdp1864.h"
-
 
 static bitmap_t *cdptmpbitmap;
 
@@ -115,10 +113,10 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 	}
 }
 
-void cdp1864_dma_w(UINT8 data)
+CDP1802_DMA_WRITE( cdp1864_dma_w )
 {
-	int sx = video_screen_get_hpos(Machine->primary_screen) + 4;
-	int y = video_screen_get_vpos(Machine->primary_screen);
+	int sx = video_screen_get_hpos(machine->primary_screen) + 4;
+	int y = video_screen_get_vpos(machine->primary_screen);
 	int x;
 
 	for (x = 0; x < 8; x++)

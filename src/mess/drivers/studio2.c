@@ -195,13 +195,6 @@ static CDP1861_ON_EFX_CHANGED( studio2_efx_w )
 	cdp1861_efx = level;
 }
 
-static void studio2_dma_w(UINT8 data)
-{
-	const device_config *cdp1861 = device_list_find_by_tag(Machine->config->devicelist, CDP1861, CDP1861_TAG);
-
-	cdp1861_dma_w(cdp1861, data);
-}
-
 static const cdp1861_interface studio2_cdp1861_intf =
 {
 	SCREEN_TAG,
@@ -224,29 +217,36 @@ static VIDEO_UPDATE( studio2 )
 
 static int cdp1802_mode = CDP1802_MODE_RESET;
 
-static UINT8 studio2_mode_r(void)
+static CDP1802_MODE_READ( studio2_mode_r )
 {
 	return cdp1802_mode;
 }
 
-static UINT8 studio2_ef_r(void)
+static CDP1802_EF_READ( studio2_ef_r )
 {
 	int ef = 0x0f;
 
 	if (cdp1861_efx) ef -= EF1;
 
-	if (input_port_read(Machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
-	if (input_port_read(Machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
+	if (input_port_read(machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
+	if (input_port_read(machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
 
 	return ef;
 }
 
-static void studio2_q_w(int level)
+static CDP1802_Q_WRITE( studio2_q_w )
 {
 	beep_set_state(0, level);
 }
 
-static const CDP1802_CONFIG studio2_config =
+static CDP1802_DMA_WRITE( studio2_dma_w )
+{
+	const device_config *cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
+
+	cdp1861_dma_w(cdp1861, data);
+}
+
+static const cdp1802_interface studio2_config =
 {
 	studio2_mode_r,
 	studio2_ef_r,
@@ -256,19 +256,19 @@ static const CDP1802_CONFIG studio2_config =
 	studio2_dma_w
 };
 
-static UINT8 mpt02_ef_r(void)
+static CDP1802_EF_READ( mpt02_ef_r )
 {
 	int ef = 0x0f;
 
 	if (cdp1864_efx) ef -= EF1;
 
-	if (input_port_read(Machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
-	if (input_port_read(Machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
+	if (input_port_read(machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
+	if (input_port_read(machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
 
 	return ef;
 }
 
-static const CDP1802_CONFIG mpt02_config =
+static const cdp1802_interface mpt02_config =
 {
 	studio2_mode_r,
 	mpt02_ef_r,
@@ -278,7 +278,7 @@ static const CDP1802_CONFIG mpt02_config =
 	cdp1864_dma_w
 };
 
-/* Machine Initialization */
+/* machine Initialization */
 
 static MACHINE_START( studio2 )
 {
@@ -299,7 +299,7 @@ static MACHINE_RESET( mpt02 )
 	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 }
 
-/* Machine Drivers */
+/* machine Drivers */
 
 static MACHINE_DRIVER_START( studio2 )
 

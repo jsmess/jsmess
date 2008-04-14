@@ -82,7 +82,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "devices/printer.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
@@ -224,9 +223,9 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-static UINT8 tmc600_mode_r(void)
+static CDP1802_MODE_READ( tmc600_mode_r )
 {
-	if (input_port_read(Machine, "RUN") & 0x01)
+	if (input_port_read(machine, "RUN") & 0x01)
 	{
 		return CDP1802_MODE_RESET;
 	}
@@ -236,7 +235,7 @@ static UINT8 tmc600_mode_r(void)
 	}
 }
 
-static UINT8 tmc600_ef_r(void)
+static CDP1802_EF_READ( tmc600_ef_r )
 {
 	int flags = 0x0f;
 	char port[4];
@@ -250,21 +249,17 @@ static UINT8 tmc600_ef_r(void)
 
 	// keyboard
 	sprintf(port, "IN%d", keylatch / 8);
-	flags -= (~input_port_read(Machine, port) & (1 << (keylatch % 8))) ? EF3 : 0;
+	flags -= (~input_port_read(machine, port) & (1 << (keylatch % 8))) ? EF3 : 0;
 
 	return flags;
 }
 
-static void tmc600_q_w(int level)
-{
-}
-
-static const CDP1802_CONFIG tmc600_cdp1802_config =
+static const cdp1802_interface tmc600_cdp1802_config =
 {
 	tmc600_mode_r,
 	tmc600_ef_r,
 	NULL,
-	tmc600_q_w,
+	NULL,
 	NULL,
 	NULL
 };
