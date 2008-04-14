@@ -71,7 +71,6 @@ Notes:
 
     TODO:
 
-	- memory mapping
     - proper emulation of the VISMAC interface (cursor blinking, color RAM), schematics are needed
     - tape interface
     - disk interface
@@ -117,7 +116,7 @@ static WRITE8_HANDLER( printer_w )
 
 static ADDRESS_MAP_START( tmc600_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM
+	AM_RANGE(0x6000, 0xbfff) AM_RAMBANK(1)
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
@@ -274,6 +273,26 @@ static const CDP1802_CONFIG tmc600_cdp1802_config =
 
 static MACHINE_START( tmc600 )
 {
+	memory_configure_bank(1, 0, 1, mess_ram, 0);
+	memory_set_bank(1, 0);
+
+	switch (mess_ram_size)
+	{
+	case 8*1024:
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+
+	case 16*1024:
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+
+	case 24*1024:
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		break;
+	}
+
 	state_save_register_global(keylatch);
 }
 
