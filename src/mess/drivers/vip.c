@@ -24,7 +24,8 @@
 
 #define XTAL XTAL_3_52128MHz
 
-extern int cdp1861_efx;
+#define SCREEN_TAG "main"
+#define CDP1861_TAG "cdp1861"
 
 /* Read/Write Handlers */
 
@@ -49,7 +50,7 @@ static ADDRESS_MAP_START( vip_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vip_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READWRITE(cdp1861_dispon_r, cdp1861_dispoff_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861, CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 //  AM_RANGE(0x03, 0x03) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(bankswitch_w)
@@ -80,6 +81,50 @@ static INPUT_PORTS_START( vip )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 
+/* Video */
+
+static int cdp1861_efx;
+
+static CDP1861_ON_INT_CHANGED( vip_int_w )
+{
+	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+}
+
+static CDP1861_ON_DMAO_CHANGED( vip_dmao_w )
+{
+	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+}
+
+static CDP1861_ON_EFX_CHANGED( vip_efx_w )
+{
+	cdp1861_efx = level;
+}
+
+static void vip_dma_w(UINT8 data)
+{
+	const device_config *cdp1861 = device_list_find_by_tag(Machine->config->devicelist, CDP1861, CDP1861_TAG);
+
+	cdp1861_dma_w(cdp1861, data);
+}
+
+static const cdp1861_interface vip_cdp1861_intf =
+{
+	SCREEN_TAG,
+	XTAL_3_52128MHz,
+	vip_int_w,
+	vip_dmao_w,
+	vip_efx_w
+};
+
+static VIDEO_UPDATE( vip )
+{
+	const device_config *cdp1861 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1861, CDP1861_TAG);
+
+	cdp1861_update(cdp1861, bitmap, cliprect);
+
+	return 0;
+}
+
 /* CDP1802 Configuration */
 
 static int vip_run;
@@ -102,7 +147,8 @@ static UINT8 vip_mode_r(void)
 	{
 		if (!vip_reset)
 		{
-			machine_reset_cdp1861(Machine);
+			const device_config *cdp1861 = device_list_find_by_tag(Machine->config->devicelist, CDP1861, CDP1861_TAG);
+			cdp1861->reset(cdp1861);
 			vip_reset = 1;
 			vip_run = 0;
 		}
@@ -136,16 +182,8 @@ static const CDP1802_CONFIG vip_config =
 	NULL,
 	vip_q_w,
 	NULL,
-	cdp1861_dma_w
+	vip_dma_w
 };
-
-PALETTE_INIT( vip )
-{
-	palette_set_color(machine,0,RGB_BLACK); /* black */
-	palette_set_color(machine,1,RGB_WHITE); /* white */
-	palette_set_color(machine,2,RGB_WHITE); /* white */
-	palette_set_color(machine,3,RGB_BLACK); /* black */
-}
 
 /* Machine Initialization */
 
@@ -177,7 +215,8 @@ static MACHINE_START( vip )
 
 static MACHINE_RESET( vip )
 {
-	MACHINE_RESET_CALL(cdp1861);
+	const device_config *cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
+	cdp1861->reset(cdp1861);
 	memory_set_bank(1, 1);
 }
 
@@ -194,14 +233,16 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_MACHINE_RESET(vip)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_PALETTE_INIT(vip)
-	MDRV_VIDEO_START(cdp1861)
-	MDRV_VIDEO_UPDATE(cdp1861)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_VIDEO_UPDATE(vip)
+
+	MDRV_DEVICE_ADD(CDP1861_TAG, CDP1861)
+	MDRV_DEVICE_CONFIG(vip_cdp1861_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

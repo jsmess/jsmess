@@ -84,6 +84,7 @@ Source Changes:
 - Fixed memory bug in the hash file parsing code that could cause problems in
   debug builds.  [Nate Woods]
 
+- Converted CDP1861 display controller to the new device system. [Curt Coder]
 
 
 0.124a

@@ -21,8 +21,8 @@
 
 */
 
-#ifndef __CDP1861_VIDEO__
-#define __CDP1861_VIDEO__
+#ifndef __CDP1861__
+#define __CDP1861__
 
 #define CDP1861_VISIBLE_COLUMNS	64
 #define CDP1861_VISIBLE_LINES	128
@@ -48,17 +48,47 @@
 #define CDP1861_SCANLINE_EFX_BOTTOM_START	CDP1861_SCANLINE_DISPLAY_END - 4
 #define CDP1861_SCANLINE_EFX_BOTTOM_END		CDP1861_SCANLINE_DISPLAY_END
 
-#define CDP1861_CYCLES_DMA_START	2*8
-#define CDP1861_CYCLES_DMA_ACTIVE	8*8
-#define CDP1861_CYCLES_DMA_WAIT		6*8
+typedef void (*cdp1861_on_int_changed_func) (const device_config *device, int level);
+#define CDP1861_ON_INT_CHANGED(name) void name(const device_config *device, int level)
 
-MACHINE_RESET( cdp1861 );
-VIDEO_START( cdp1861 );
-VIDEO_UPDATE( cdp1861 );
+typedef void (*cdp1861_on_dmao_changed_func) (const device_config *device, int level);
+#define CDP1861_ON_DMAO_CHANGED(name) void name(const device_config *device, int level)
 
-READ8_HANDLER( cdp1861_dispon_r );
-WRITE8_HANDLER( cdp1861_dispoff_w );
+typedef void (*cdp1861_on_efx_changed_func) (const device_config *device, int level);
+#define CDP1861_ON_EFX_CHANGED(name) void name(const device_config *device, int level)
 
-void cdp1861_dma_w(UINT8 data);
+#define CDP1861		DEVICE_GET_INFO_NAME(cdp1861)
+
+/* interface */
+typedef struct _cdp1861_interface cdp1861_interface;
+struct _cdp1861_interface
+{
+	const char *screen_tag;		/* screen we are acting on */
+	int clock;					/* the clock (pin 1) of the chip */
+
+	/* this gets called for every change of the INT pin (pin 3) */
+	cdp1861_on_int_changed_func		on_int_changed;
+
+	/* this gets called for every change of the DMAO pin (pin 2) */
+	cdp1861_on_dmao_changed_func	on_dmao_changed;
+
+	/* this gets called for every change of the EFX pin (pin 9) */
+	cdp1861_on_efx_changed_func		on_efx_changed;
+};
+
+/* device interface */
+DEVICE_GET_INFO( cdp1861 );
+
+/* display on */
+READ8_DEVICE_HANDLER( cdp1861_dispon_r );
+
+/* display off */
+WRITE8_DEVICE_HANDLER( cdp1861_dispoff_w );
+
+/* DMA write */
+void cdp1861_dma_w(const device_config *device, UINT8 data);
+
+/* screen update */
+void cdp1861_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

@@ -108,8 +108,8 @@ Notes:
 #include "sound/beep.h"
 #include "sound/discrete.h"
 
-extern int cdp1861_efx;
-extern int cdp1864_efx;
+#define SCREEN_TAG "main"
+#define CDP1861_TAG "cdp1861"
 
 /* Read/Write Handlers */
 
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( studio2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( studio2_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(cdp1861_dispon_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1861, CDP1861_TAG, cdp1861_dispon_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
@@ -175,6 +175,51 @@ static INPUT_PORTS_START( studio2 )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 2/Right 9") PORT_CODE(KEYCODE_3_PAD)
 INPUT_PORTS_END
 
+/* Video */
+
+static int cdp1861_efx;
+extern int cdp1864_efx;
+
+static CDP1861_ON_INT_CHANGED( studio2_int_w )
+{
+	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+}
+
+static CDP1861_ON_DMAO_CHANGED( studio2_dmao_w )
+{
+	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+}
+
+static CDP1861_ON_EFX_CHANGED( studio2_efx_w )
+{
+	cdp1861_efx = level;
+}
+
+static void studio2_dma_w(UINT8 data)
+{
+	const device_config *cdp1861 = device_list_find_by_tag(Machine->config->devicelist, CDP1861, CDP1861_TAG);
+
+	cdp1861_dma_w(cdp1861, data);
+}
+
+static const cdp1861_interface studio2_cdp1861_intf =
+{
+	SCREEN_TAG,
+	XTAL_3_52128MHz,
+	studio2_int_w,
+	studio2_dmao_w,
+	studio2_efx_w
+};
+
+static VIDEO_UPDATE( studio2 )
+{
+	const device_config *cdp1861 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1861, CDP1861_TAG);
+
+	cdp1861_update(cdp1861, bitmap, cliprect);
+
+	return 0;
+}
+
 /* CDP1802 Configuration */
 
 static int cdp1802_mode = CDP1802_MODE_RESET;
@@ -208,7 +253,7 @@ static const CDP1802_CONFIG studio2_config =
 	NULL,
 	studio2_q_w,
 	NULL,
-	cdp1861_dma_w
+	studio2_dma_w
 };
 
 static UINT8 mpt02_ef_r(void)
@@ -243,7 +288,8 @@ static MACHINE_START( studio2 )
 
 static MACHINE_RESET( studio2 )
 {
-	MACHINE_RESET_CALL(cdp1861);
+	const device_config *cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
+	cdp1861->reset(cdp1861);
 }
 
 static MACHINE_RESET( mpt02 )
@@ -269,14 +315,16 @@ static MACHINE_DRIVER_START( studio2 )
 
     // video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(3579545/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(cdp1861)
-	MDRV_VIDEO_UPDATE(cdp1861)
+	MDRV_VIDEO_UPDATE(studio2)
+
+	MDRV_DEVICE_ADD(CDP1861_TAG, CDP1861)
+	MDRV_DEVICE_CONFIG(studio2_cdp1861_intf)
 
 	// sound hardware
 
