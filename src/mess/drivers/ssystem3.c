@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
 				   */
 //  AM_RANGE( 0x4000, 0x40ff) AM_NOP
 /*
-  probably zusatzger t memory (battery powered ram 256x4? at 0x4000)
+  probably zusatzgerät memory (battery powered ram 256x4? at 0x4000)
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
 	AM_RANGE( 0x6000, 0x600f) AM_READWRITE( via_0_r, via_0_w )

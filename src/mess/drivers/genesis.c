@@ -1051,7 +1051,7 @@ static DRIVER_INIT( gencommon )
 	{
 	/* is there more to this, i can't seem to get off the first level? */
 	/*
-	Elf Wor (Unl) - return (0×55@0×400000 OR 0xc9@0×400004) AND (0×0f@0×400002 OR 0×18@0×400006). It is probably best to add handlers for all 4 addresses.
+	Elf Wor (Unl) - return (0Ã—55@0Ã—400000 OR 0xc9@0Ã—400004) AND (0Ã—0f@0Ã—400002 OR 0Ã—18@0Ã—400006). It is probably best to add handlers for all 4 addresses.
 	*/
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, elfwor_0x400000_r );
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, elfwor_0x400004_r );

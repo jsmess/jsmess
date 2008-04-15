@@ -214,10 +214,10 @@ VIDEO_UPDATE( ssystem3 )
 	    0, // empty
 	    1, // bauer
 	    3, // springer
-	    0x11, // läufer
+	    0x11, // lÃ¤ufer
 	    7, // turm
 	    0x1f, // dame
-	    0x17, // könig
+	    0x17, // kÃ¶nig
 	    0
 	  };
 	  int y, x;
