@@ -249,8 +249,9 @@
 
 #include "driver.h"
 #include "includes/abc80x.h"
-#include "video/mc6845.h"
 #include "machine/z80dart.h"
+#include "machine/e0516.h"
+#include "video/mc6845.h"
 
 #define ABC800_CHAR_WIDTH	6
 
@@ -356,6 +357,8 @@ WRITE8_HANDLER( abc806_colorram_w )
 
 READ8_HANDLER( abc806_fgctlprom_r )
 {
+	const device_config *e0516 = device_list_find_by_tag(machine->config->devicelist, E0516, E0516_TAG);
+
 	/*
 
 		bit		description
@@ -373,17 +376,15 @@ READ8_HANDLER( abc806_fgctlprom_r )
 
 	UINT8 data = 0;
 
-	//data |= e0516_dio_r() << 7;
+	data |= e0516_dio_r(e0516) << 7;
 
 	return data;
 }
 
 WRITE8_HANDLER( abc806_fgctlprom_w )
 {
-}
+	const device_config *e0516 = device_list_find_by_tag(machine->config->devicelist, E0516, E0516_TAG);
 
-WRITE8_HANDLER( abc806_sync_w )
-{
 	/*
 
 		bit		description
@@ -400,12 +401,16 @@ WRITE8_HANDLER( abc806_sync_w )
 	*/
 
 	abc806_eme = BIT(data, 0);
-	abc806_40 = BIT(data, 1);
+	abc806_40 = !BIT(data, 1);
 	abc806_txoff = BIT(data, 4);
 
-	//e0516_cs_w(BIT(data, 5));
-	//e0516_clk_w(BIT(data, 6));
-	//e0516_dio_w(BIT(data, 7));
+	e0516_cs_w(e0516, BIT(data, 5));
+	e0516_clk_w(e0516, BIT(data, 6));
+	e0516_dio_w(e0516, BIT(data, 7));
+}
+
+WRITE8_HANDLER( abc806_sync_w )
+{
 }
 
 /* Timer Callbacks */
@@ -637,8 +642,8 @@ static MC6845_ON_VSYNC_CHANGED(abc806_vsync_changed)
 
 /* MC6845 Interfaces */
 
-static const mc6845_interface abc800m_crtc6845_interface = {
-	"main",
+static const mc6845_interface abc800m_mc6845_interface = {
+	SCREEN_TAG,
 	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -649,8 +654,8 @@ static const mc6845_interface abc800m_crtc6845_interface = {
 	abc800_vsync_changed
 };
 
-static const mc6845_interface abc800c_crtc6845_interface = {
-	"main",
+static const mc6845_interface abc800c_mc6845_interface = {
+	SCREEN_TAG,
 	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -661,8 +666,8 @@ static const mc6845_interface abc800c_crtc6845_interface = {
 	abc800_vsync_changed
 };
 
-static const mc6845_interface abc802_crtc6845_interface = {
-	"main",
+static const mc6845_interface abc802_mc6845_interface = {
+	SCREEN_TAG,
 	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -673,8 +678,8 @@ static const mc6845_interface abc802_crtc6845_interface = {
 	abc802_vsync_changed
 };
 
-static const mc6845_interface abc806_crtc6845_interface = {
-	"main",
+static const mc6845_interface abc806_mc6845_interface = {
+	SCREEN_TAG,
 	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -717,29 +722,37 @@ static VIDEO_START(abc806)
 
 static VIDEO_UPDATE( abc800m )
 {
-	const device_config *abc800_mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
-	mc6845_update(abc800_mc6845, bitmap, cliprect);
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MC6845_TAG);
+	
+	mc6845_update(mc6845, bitmap, cliprect);
+	
 	return 0;
 }
 
 static VIDEO_UPDATE( abc800c )
 {
-	const device_config *abc800_mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
-	mc6845_update(abc800_mc6845, bitmap, cliprect);
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MC6845_TAG);
+	
+	mc6845_update(mc6845, bitmap, cliprect);
+	
 	return 0;
 }
 
 static VIDEO_UPDATE( abc802 )
 {
-	const device_config *abc800_mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
-	mc6845_update(abc800_mc6845, bitmap, cliprect);
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MC6845_TAG);
+	
+	mc6845_update(mc6845, bitmap, cliprect);
+	
 	return 0;
 }
 
 static VIDEO_UPDATE( abc806 )
 {
-	const device_config *abc800_mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
-	mc6845_update(abc800_mc6845, bitmap, cliprect);
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MC6845_TAG);
+	
+	mc6845_update(mc6845, bitmap, cliprect);
+	
 	return 0;
 }
 
@@ -747,11 +760,11 @@ static VIDEO_UPDATE( abc806 )
 
 MACHINE_DRIVER_START( abc800m_video )
 	// device interface
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG(abc800m_crtc6845_interface)
+	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
+	MDRV_DEVICE_CONFIG(abc800m_mc6845_interface)
 
 	// video hardware
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -768,11 +781,11 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( abc800c_video )
 	// device interface
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG(abc800c_crtc6845_interface)
+	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
+	MDRV_DEVICE_CONFIG(abc800c_mc6845_interface)
 
 	// video hardware
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -789,11 +802,11 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( abc802_video )
 	// device interface
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG(abc802_crtc6845_interface)
+	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
+	MDRV_DEVICE_CONFIG(abc802_mc6845_interface)
 
 	// video hardware
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -810,11 +823,11 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( abc806_video )
 	// device interface
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG(abc806_crtc6845_interface)
+	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
+	MDRV_DEVICE_CONFIG(abc806_mc6845_interface)
 
 	// video hardware
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

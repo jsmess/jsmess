@@ -10,6 +10,10 @@
 #define ABC800_X01	XTAL_12MHz
 #define ABC806_X02	XTAL_32_768kHz
 
+#define SCREEN_TAG	"main"
+#define E0516_TAG	"j13"
+#define MC6845_TAG	"mc6845"
+
 /*----------- defined in video/abc80x.c -----------*/
 
 MACHINE_DRIVER_EXTERN(abc800m_video);
