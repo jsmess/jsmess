@@ -26,14 +26,14 @@ static struct snapquick_info *snapquick_infolist;
 static TIMER_CALLBACK(snapquick_processsnapshot)
 {
 	struct snapquick_info *si = (struct snapquick_info *) ptr;
-	snapquick_loadproc loadproc;
+	snapquick_load_func loadproc;
 	const char *file_type;
 	const struct IODevice *dev;
 
 	dev = mess_device_from_core_device(si->img);
-	loadproc = (snapquick_loadproc) mess_device_get_info_fct(&dev->devclass, MESS_DEVINFO_PTR_SNAPSHOT_LOAD);
+	loadproc = (snapquick_load_func) mess_device_get_info_fct(&dev->devclass, MESS_DEVINFO_PTR_SNAPSHOT_LOAD);
 	file_type = image_filetype(si->img);
-	loadproc(machine, si->img, file_type, si->file_size);
+	loadproc(si->img, file_type, si->file_size);
 	image_unload(si->img);
 }
 

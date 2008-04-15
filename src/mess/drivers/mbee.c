@@ -438,10 +438,10 @@ ROM_END
 
 static QUICKLOAD_LOAD( mbee )
 {
-	UINT8 sw = input_port_read(machine, "CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
+	UINT8 sw = input_port_read(image->machine, "CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
 	UINT16 exec_addr, start_addr, end_addr;
 
-	if (z80bin_load_file( machine, image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
+	if (z80bin_load_file(image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
 		return INIT_FAIL;
 
 	if (exec_addr == 0xffff) return INIT_PASS;			/* data file */
@@ -478,7 +478,7 @@ static void mbee_quickload_getinfo(const mess_device_class *devclass, UINT32 sta
 static SNAPSHOT_LOAD( mbee )
 {
 	UINT16 i, j;
-	UINT8 data, sw = input_port_read(machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */
+	UINT8 data, sw = input_port_read(image->machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */
 
 	for (i = 0; i < snapshot_size; i++)
 	{

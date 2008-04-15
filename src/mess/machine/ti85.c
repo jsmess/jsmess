@@ -637,8 +637,8 @@ SNAPSHOT_LOAD( ti8x )
 
 	switch (ti_calculator_model)
 	{
-		case TI_85: ti85_setup_snapshot(machine, ti8x_snapshot_data); break;
-		case TI_86: ti86_setup_snapshot(machine, ti8x_snapshot_data); break;
+		case TI_85: ti85_setup_snapshot(image->machine, ti8x_snapshot_data); break;
+		case TI_86: ti86_setup_snapshot(image->machine, ti8x_snapshot_data); break;
 	}
 	free(ti8x_snapshot_data);
 	return INIT_PASS;

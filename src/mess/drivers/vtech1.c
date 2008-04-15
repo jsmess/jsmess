@@ -408,10 +408,10 @@ ROM_END
 
 static QUICKLOAD_LOAD( vtech1 )
 {
-	UINT8 sw = input_port_read(machine, "CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
+	UINT8 sw = input_port_read(image->machine, "CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
 	UINT16 exec_addr, start_addr, end_addr;
 
-	if (z80bin_load_file( machine, image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
+	if (z80bin_load_file(image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
 		return INIT_FAIL;
 
 	/* A Microsoft Basic program needs some manipulation before it can be run.

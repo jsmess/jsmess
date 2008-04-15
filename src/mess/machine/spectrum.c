@@ -109,7 +109,7 @@ SNAPSHOT_LOAD(spectrum)
 			logerror("Invalid .SNA file size.\n");
 			goto error;
 		}
-		spectrum_setup_sna(machine, snapshot_data, snapshot_size);
+		spectrum_setup_sna(image->machine, snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "sp"))
 	{
@@ -118,11 +118,11 @@ SNAPSHOT_LOAD(spectrum)
 			logerror("Invalid .SP signature.\n");
 			goto error;
 		}
-		spectrum_setup_sp(machine, snapshot_data, snapshot_size);
+		spectrum_setup_sp(image->machine, snapshot_data, snapshot_size);
 	}
 	else
 	{
-		spectrum_setup_z80(machine, snapshot_data, snapshot_size);
+		spectrum_setup_z80(image->machine, snapshot_data, snapshot_size);
 	}
 	free(snapshot_data);
 	logerror("Snapshot loaded - new PC = %04x\n", (unsigned) cpunum_get_reg(0, Z80_PC) & 0x0ffff);

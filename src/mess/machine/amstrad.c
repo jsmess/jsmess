@@ -193,7 +193,7 @@ SNAPSHOT_LOAD(amstrad)
 		return INIT_FAIL;
 	}
 
-	amstrad_handle_snapshot(machine, snapshot);
+	amstrad_handle_snapshot(image->machine, snapshot);
 	free(snapshot);
 	return INIT_PASS;
 }

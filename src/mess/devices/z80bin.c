@@ -17,7 +17,7 @@
 #include "snapquik.h"
 
 
-int z80bin_load_file( running_machine *machine, const device_config *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
+int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
 {
 	int ch;
 	UINT16 args[3];
@@ -83,7 +83,7 @@ static QUICKLOAD_LOAD( z80bin )
 {
 	UINT16 exec_addr, start_addr, end_addr;
 
-	if (z80bin_load_file( machine, image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
+	if (z80bin_load_file( image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
 		return INIT_FAIL;
 
 	if (exec_addr == 0xffff) return INIT_PASS;			/* non-executable data file */
