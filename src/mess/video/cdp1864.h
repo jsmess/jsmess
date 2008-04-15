@@ -29,11 +29,10 @@
 
 */
 
-#ifndef __CDP1864_VIDEO__
-#define __CDP1864_VIDEO__
+#ifndef __CDP1864__
+#define __CDP1864__
 
 #define CDP1864_CLK_FREQ		1750000.0
-#define CDP1864_DEFAULT_LATCH	0x35
 
 #define CDP1864_VISIBLE_COLUMNS	64
 #define CDP1864_VISIBLE_LINES	192
@@ -61,34 +60,67 @@
 #define CDP1864_SCANLINE_EFX_BOTTOM_START	CDP1864_SCANLINE_DISPLAY_END - 4
 #define CDP1864_SCANLINE_EFX_BOTTOM_END		CDP1864_SCANLINE_DISPLAY_END
 
-#define CDP1864_CYCLES_DMA_START	2*8
-#define CDP1864_CYCLES_DMA_ACTIVE	8*8
-#define CDP1864_CYCLES_DMA_WAIT		6*8
+typedef void (*cdp1864_on_int_changed_func) (const device_config *device, int level);
+#define CDP1864_ON_INT_CHANGED(name) void name(const device_config *device, int level)
 
-typedef struct CDP1864_interface
+typedef void (*cdp1864_on_dmao_changed_func) (const device_config *device, int level);
+#define CDP1864_ON_DMAO_CHANGED(name) void name(const device_config *device, int level)
+
+typedef void (*cdp1864_on_efx_changed_func) (const device_config *device, int level);
+#define CDP1864_ON_EFX_CHANGED(name) void name(const device_config *device, int level)
+
+typedef UINT8 (*cdp1864_color_ram_read_func)(const device_config *device, UINT16 addr);
+#define CDP1864_COLOR_RAM_READ(name) UINT8 name(const device_config *device, UINT16 addr)
+
+#define CDP1864		DEVICE_GET_INFO_NAME(cdp1864)
+
+/* interface */
+typedef struct _cdp1864_interface cdp1864_interface;
+struct _cdp1864_interface
 {
-	double res_r; // red
-	double res_g; // green
-	double res_b; // blue
-	double res_bkg; // background
-	int (*colorram_r)(UINT16 addr);
-} CDP1864_interface;
+	const char *screen_tag;		/* screen we are acting on */
+	int clock;					/* the clock (pin 2) of the chip */
 
-MACHINE_RESET( cdp1864 );
-VIDEO_START( cdp1864 );
-VIDEO_UPDATE( cdp1864 );
+	/* this gets called for every change of the INT pin (pin 36) */
+	cdp1864_on_int_changed_func		on_int_changed;
 
-READ8_HANDLER( cdp1864_dispon_r );
+	/* this gets called for every change of the DMAO pin (pin 37) */
+	cdp1864_on_dmao_changed_func	on_dmao_changed;
 
-CDP1802_DMA_WRITE( cdp1864_dma_w );
+	/* this gets called for every change of the EFX pin (pin 18) */
+	cdp1864_on_efx_changed_func		on_efx_changed;
 
-void cdp1864_audio_output_enable(int value);
+	/* color ram access */
+	cdp1864_color_ram_read_func		color_ram_r;
 
-void cdp1864_configure(running_machine *machine, const CDP1864_interface *intf);
+	double res_r;				/* red output resistor value */
+	double res_g;				/* green output resistor value */
+	double res_b;				/* blue output resistor value */
+	double res_bkg;				/* background output resistor value */
+};
 
-READ8_HANDLER( cdp1864_dispon_r );
-READ8_HANDLER( cdp1864_dispoff_r );
-WRITE8_HANDLER( cdp1864_step_bgcolor_w );
-WRITE8_HANDLER( cdp1864_tone_latch_w );
+/* device interface */
+DEVICE_GET_INFO( cdp1864 );
+
+/* display on (0x69) */
+READ8_DEVICE_HANDLER( cdp1864_dispon_r );
+
+/* display off (0x6c) */
+READ8_DEVICE_HANDLER( cdp1864_dispoff_r );
+
+/* step background color (0x61) */
+WRITE8_DEVICE_HANDLER( cdp1864_step_bgcolor_w );
+
+/* load tone latch (0x64) */
+WRITE8_DEVICE_HANDLER( cdp1864_tone_latch_w );
+
+/* audio output enable */
+void cdp1864_aoe_w(const device_config *device, int level);
+
+/* DMA write */
+void cdp1864_dma_w(const device_config *device, UINT8 data);
+
+/* screen update */
+void cdp1864_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

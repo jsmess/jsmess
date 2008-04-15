@@ -195,6 +195,7 @@ static DEVICE_START( cdp1861 )
 	cdp1861->intf = device->static_config;
 
 	assert(cdp1861->intf != NULL);
+	assert(cdp1861->intf->clock > 0);
 	assert(cdp1861->intf->on_int_changed != NULL);
 	assert(cdp1861->intf->on_dmao_changed != NULL);
 	assert(cdp1861->intf->on_efx_changed != NULL);

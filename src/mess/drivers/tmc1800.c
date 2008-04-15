@@ -92,6 +92,9 @@
 #include "sound/beep.h"
 #include "rescap.h"
 
+#define SCREEN_TAG "main"
+#define CDP1864_TAG "cdp1864"
+
 extern VIDEO_START( osm200 );
 extern VIDEO_UPDATE( osm200 );
 
@@ -104,11 +107,11 @@ static WRITE8_HANDLER( keyboard_latch_w )
 	keylatch = data;
 }
 
-static WRITE8_HANDLER( tmc2000_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 {
 	memory_set_bank(1, data & 0x01);
 
-	cdp1864_tone_latch_w(machine, 0, data);
+	cdp1864_tone_latch_w(device, 0, data);
 }
 
 /* Memory Maps */
@@ -132,9 +135,9 @@ static ADDRESS_MAP_START( tmc2000_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READWRITE(cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(cdp1864_dispoff_r, tmc2000_bankswitch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispoff_r, tmc2000_bankswitch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -163,6 +166,55 @@ static INPUT_PORTS_START( tmc1800 )
 	PORT_START_TAG("RUN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
+
+/* Video */
+
+static int cdp1864_efx;
+
+static CDP1864_ON_INT_CHANGED( tmc2000_int_w )
+{
+	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+}
+
+static CDP1864_ON_DMAO_CHANGED( tmc2000_dmao_w )
+{
+	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+}
+
+static CDP1864_ON_EFX_CHANGED( tmc2000_efx_w )
+{
+	cdp1864_efx = level;
+}
+
+static CDP1864_COLOR_RAM_READ( tmc2000_colorram_r )
+{
+	UINT8 data = colorram[addr]; // 0x04 = ~B, 0x02 = ~R, 0x01 = ~G
+
+	return ~(((data & 0x04) >> 1) + ((data & 0x02) << 1) + (data & 0x01)) & 0x07;
+}
+
+static const cdp1864_interface tmc2000_cdp1864_intf =
+{
+	SCREEN_TAG,
+	CDP1864_CLK_FREQ,
+	tmc2000_int_w,
+	tmc2000_dmao_w,
+	tmc2000_efx_w,
+	tmc2000_colorram_r,
+	RES_K(2.2),	// unverified
+	RES_K(1),	// unverified
+	RES_K(5.1),	// unverified
+	RES_K(4.7)	// unverified
+};
+
+static VIDEO_UPDATE( tmc2000 )
+{
+	const device_config *cdp1864 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1864, CDP1864_TAG);
+
+	cdp1864_update(cdp1864, bitmap, cliprect);
+
+	return 0;
+}
 
 /* CDP1802 Interfaces */
 
@@ -236,11 +288,20 @@ static CDP1802_EF_READ( tmc2000_ef_r )
 
 static CDP1802_Q_WRITE( tmc2000_q_w )
 {
+	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
+
 	// turn CDP1864 sound generator on/off
-	cdp1864_audio_output_enable(level);
+	cdp1864_aoe_w(cdp1864, level);
 
 	// set Q led status
 	set_led_status(1, level);
+}
+
+static CDP1802_DMA_WRITE( tmc2000_dma_w )
+{
+	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
+
+	cdp1864_dma_w(cdp1864, data);
 }
 
 static const cdp1802_interface tmc2000_config =
@@ -250,7 +311,7 @@ static const cdp1802_interface tmc2000_config =
 	NULL,
 	tmc2000_q_w,
 	NULL,
-	cdp1864_dma_w
+	tmc2000_dma_w
 };
 
 /* Machine Initialization */
@@ -275,7 +336,8 @@ static MACHINE_START( tmc2000 )
 
 static MACHINE_RESET( tmc2000 )
 {
-	MACHINE_RESET_CALL(cdp1864);
+	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
+	cdp1864->reset(cdp1864);
 
 	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 
@@ -286,7 +348,6 @@ static MACHINE_RESET( tmc2000 )
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( tmc1800 )
-
 	// basic system hardware
 
 	MDRV_CPU_ADD(CDP1802, XTAL_1_75MHz)
@@ -299,7 +360,7 @@ static MACHINE_DRIVER_START( tmc1800 )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
 
@@ -310,7 +371,6 @@ static MACHINE_DRIVER_START( tmc1800 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tmc2000 )
-
 	// basic system hardware
 
 	MDRV_CPU_ADD(CDP1802, XTAL_1_75MHz)
@@ -323,13 +383,15 @@ static MACHINE_DRIVER_START( tmc2000 )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLK_FREQ, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_VIDEO_START(cdp1864)
-	MDRV_VIDEO_UPDATE(cdp1864)
+	MDRV_VIDEO_UPDATE(tmc2000)
+
+	MDRV_DEVICE_ADD(CDP1864_TAG, CDP1864)
+	MDRV_DEVICE_CONFIG(tmc2000_cdp1864_intf)
 
 	// sound hardware
 
@@ -398,22 +460,6 @@ SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
-static int tmc2000_colorram_r(UINT16 addr)
-{
-	UINT8 data = colorram[addr]; // 0x04 = ~B, 0x02 = ~R, 0x01 = ~G
-
-	return ~(((data & 0x04) >> 1) + ((data & 0x02) << 1) + (data & 0x01)) & 0x07;
-}
-
-static const CDP1864_interface tmc2000_CDP1864_interface =
-{
-	RES_K(2.2),	// unverified
-	RES_K(1),	// unverified
-	RES_K(5.1),	// unverified
-	RES_K(4.7),	// unverified
-	tmc2000_colorram_r
-};
-
 static TIMER_CALLBACK(setup_beep)
 {
 	beep_set_state(0, 0);
@@ -428,7 +474,6 @@ static DRIVER_INIT( tmc1800 )
 static DRIVER_INIT( tmc2000 )
 {
 	timer_set(attotime_zero, NULL, 0, setup_beep);
-	cdp1864_configure(machine, &tmc2000_CDP1864_interface);
 }
 
 /* System Drivers */
