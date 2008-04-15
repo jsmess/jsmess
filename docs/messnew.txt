@@ -57,6 +57,8 @@ User Interface Changes:
 -----------------------
 - [Windows] Fixed "Configure..." dialog problem when customizing certain
   system's controllers.  (bugs #1570, #1573) [Nate Woods]
+
+- [Windows] Reduced flickering in input configuration dialog.  [Nate Woods]
   
 - [Windows UI] Updated MESS icon, logo and other artwork (Asterokid, MAMEPlus
   team, Hobie Troxell)

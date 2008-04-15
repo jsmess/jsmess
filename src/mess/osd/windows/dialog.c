@@ -1078,7 +1078,12 @@ static void seqselect_settext(HWND editwnd)
 
 	// reset the selection
 	if (GetFocus() == editwnd)
-		SendMessage(editwnd, EM_SETSEL, 0, -1);
+	{
+		DWORD start = 0, end = 0;
+		SendMessage(editwnd, EM_GETSEL, (WPARAM) (LPDWORD) &start, (LPARAM) (LPDWORD) &end);
+		if ((start != 0) || (end != strlen(buffer)))
+			SendMessage(editwnd, EM_SETSEL, 0, -1);
+	}
 
 	astring_free(seqstring);
 }
