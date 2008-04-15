@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
 				   */
 //  AM_RANGE( 0x4000, 0x40ff) AM_NOP
 /*
-  probably zusatzger�t memory (battery powered ram 256x4? at 0x4000)
+  probably zusatzger t memory (battery powered ram 256x4? at 0x4000)
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
 	AM_RANGE( 0x6000, 0x600f) AM_READWRITE( via_0_r, via_0_w )
@@ -284,7 +284,7 @@ static INPUT_PORTS_START( ssystem3 )
 
 
   PORT_START_TAG( "Switches" )
-//PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seams to be direct wired to reset
+//PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seems to be direct wired to reset
 //	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?CLEAR") PORT_CODE(KEYCODE_F1)
 //	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?ENTER") PORT_CODE(KEYCODE_ENTER)
   PORT_START_TAG( "matrix1" )
@@ -367,5 +367,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY     FULLNAME */
-CONS( 1979,	ssystem3, 0, 		0,		ssystem3, ssystem3,	ssystem3,	NULL,		"NOVAG Industries Ltd.",  "Chess Champion Super System III", GAME_NO_SOUND)
+CONS( 1979,	ssystem3, 0, 		0,		ssystem3, ssystem3,	ssystem3,	NULL,		"NOVAG Industries Ltd.",  "Chess Champion Super System III", GAME_NOT_WORKING | GAME_NO_SOUND)
 //chess champion MK III in germany
