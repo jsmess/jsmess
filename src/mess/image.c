@@ -436,13 +436,13 @@ static void get_device_instance_name(const machine_config *config, const device_
 		{
 			if (device == that_device)
 				index = count;
-			if (device_get_info_int_offline(device, DEVINFO_INT_IMAGE_TYPE) == type)
+			if (device_get_info_int_offline(that_device, DEVINFO_INT_IMAGE_TYPE) == type)
 				count++;
 		}
 
 		/* need to number if there is more than one device */
-		if (that_device != NULL)
-			snprintf(buffer, buffer_len, "%s #%d", result, index + 1);
+		if (count > 1)
+			snprintf(buffer, buffer_len, "%s%d", result, index + 1);
 		else
 			snprintf(buffer, buffer_len, "%s", result);
 	}
