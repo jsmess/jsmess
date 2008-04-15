@@ -717,8 +717,8 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 					types[num_extensions].ext = ext;
 					num_extensions++;
 				}
+				ext += strlen(ext) + 1;
 			}
-			ext += strlen(ext) + 1;
 		}
 	}
 }

@@ -256,8 +256,8 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;								break;
 		case DEVINFO_STR_CREDITS:				info->s = "Copyright the MESS Team";			break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS); break;
-		case DEVINFO_STR_IMAGE_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_NAME); break;
-		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_SHORT_NAME); break;
+		case DEVINFO_STR_IMAGE_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_NAME + mess_device->io_device.index_in_device); break;
+		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_SHORT_NAME + mess_device->io_device.index_in_device); break;
 	}
 }
 
