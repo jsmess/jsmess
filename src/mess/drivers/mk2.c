@@ -84,7 +84,7 @@ static TIMER_CALLBACK( update_leds )
 	int i;
 
 	for (i=0; i<4; i++)
-		output_set_digit_value(i, mk2_led[i]);
+	output_set_digit_value(i, mk2_led[i]);
 	output_set_led_value(0, mk2_led[4]&8?1:0);
 	output_set_led_value(1, mk2_led[4]&0x20?1:0);
 	output_set_led_value(2, mk2_led[4]&0x10?1:0);
@@ -165,14 +165,14 @@ static int mk2_read_a(int chip)
 		if (help&2) data&=~0x10; // B
 		if (help&1) data&=~0x20; // A
 #if 0
-		if (input_port_read_indexed(machine, 3)&1) data&=~0x40; //?
+		if (input_port_read(Machine, "???")&1) data&=~0x40; //?
 #endif
 		break;
 	case 5:
 #if 0
-		if (input_port_read_indexed(machine, 3)&2) data&=~0x1; //?
-		if (input_port_read_indexed(machine, 3)&4) data&=~0x2; //?
-		if (input_port_read_indexed(machine, 3)&8) data&=~0x4; //?
+		if (input_port_read(Machine, "???")&2) data&=~0x1; //?
+		if (input_port_read(Machine, "???")&4) data&=~0x2; //?
+		if (input_port_read(Machine, "???")&8) data&=~0x4; //?
 #endif
 		if (input_port_read(Machine, "EXTRA")&4) data&=~0x8; // Enter
 		if (input_port_read(Machine, "EXTRA")&2) data&=~0x10; // Clear

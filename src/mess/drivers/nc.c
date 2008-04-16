@@ -1021,7 +1021,7 @@ static  READ8_HANDLER(nc100_card_battery_status_r)
 		nc_card_battery_status &=~(1<<7);
 	}
 
-	if (input_port_read_indexed(machine, 10) & 0x02)
+	if (input_port_read(machine, "EXTRA") & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);
@@ -1432,7 +1432,7 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
 		nc_card_battery_status&=~(1<<7);
 	}
 
-	if (input_port_read_indexed(machine, 10) & 0x02)
+	if (input_port_read(machine, "EXTRA") & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);

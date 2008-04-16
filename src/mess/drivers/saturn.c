@@ -2086,7 +2086,7 @@ static void saturn_init_driver(running_machine *machine, int rgn)
     smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
     smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
     smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//  smpc_ram[0x33] = input_port_read_indexed(machine, 7);
+//  smpc_ram[0x33] = input_port_read(machine, "???");
  	smpc_ram[0x5f] = 0x10;
 }
 

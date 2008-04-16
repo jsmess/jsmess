@@ -1038,7 +1038,7 @@ static READ8_HANDLER(pcw16_system_status_r)
 {
 //  logerror("system status r: \n");
 
-	return pcw16_system_status | (input_port_read_indexed(machine, 0) & 0x04);
+	return pcw16_system_status | (input_port_read(machine, "EXTRA") & 0x04);
 }
 
 static READ8_HANDLER(pcw16_timer_interrupt_counter_r)
@@ -1244,7 +1244,7 @@ static void pcw16_com_refresh_connected(int serial_port_id)
 			new_inputs = 0;
 
 			/* Power switch is connected to Ring indicator */
-			if (input_port_read_indexed(Machine, 0) & 0x040)
+			if (input_port_read(Machine, "EXTRA") & 0x040)
 			{
 				new_inputs = UART8250_INPUTS_RING_INDICATOR;
 			}
@@ -1379,7 +1379,7 @@ static MACHINE_RESET( pcw16 )
 }
 
 static INPUT_PORTS_START(pcw16)
-	PORT_START
+	PORT_START_TAG("EXTRA")
 	/* vblank */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VBLANK)
 	/* power switch - default is on */
