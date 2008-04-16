@@ -123,24 +123,24 @@ VIDEO_UPDATE( nes )
 	ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
 
 	/* figure out what sights to draw, and draw them */
-	if ((input_port_read_indexed(screen->machine, PORT_CONFIG1) & 0x000f) == 0x0002)
+	if ((input_port_read(screen->machine, "CONTROLLERS") & 0x000f) == 0x0002)
 		sights |= 0x0001;
-	if ((input_port_read_indexed(screen->machine, PORT_CONFIG1) & 0x000f) == 0x0003)
+	if ((input_port_read(screen->machine, "CONTROLLERS") & 0x000f) == 0x0003)
 		sights |= 0x0002;
-	if ((input_port_read_indexed(screen->machine, PORT_CONFIG1) & 0x00f0) == 0x0020)
+	if ((input_port_read(screen->machine, "CONTROLLERS") & 0x00f0) == 0x0020)
 		sights |= 0x0001;
-	if ((input_port_read_indexed(screen->machine, PORT_CONFIG1) & 0x00f0) == 0x0030)
+	if ((input_port_read(screen->machine, "CONTROLLERS") & 0x00f0) == 0x0030)
 		sights |= 0x0002;
 	if (sights & 0x0001)
-		draw_sight(bitmap, 0x30, input_port_read_indexed(screen->machine, PORT_ZAPPER0_X), input_port_read_indexed(screen->machine, PORT_ZAPPER0_Y));
+		draw_sight(bitmap, 0x30, input_port_read(screen->machine, "ZAPPER1_X"), input_port_read(screen->machine, "ZAPPER1_Y"));
 	if (sights & 0x0002)
-		draw_sight(bitmap, 0x00, input_port_read_indexed(screen->machine, PORT_ZAPPER1_X), input_port_read_indexed(screen->machine, PORT_ZAPPER1_Y));
+		draw_sight(bitmap, 0x00, input_port_read(screen->machine, "ZAPPER2_X"), input_port_read(screen->machine, "ZAPPER2_Y"));
 
 	/* if this is a disk system game, check for the flip-disk key */
 	if (nes.mapper == 20)
 	{
 		// latch this input so it doesn't go at warp speed
-		if ((input_port_read_indexed(screen->machine, PORT_FLIPKEY) & 0x01) && (!last_frame_flip))
+		if ((input_port_read(screen->machine, "FLIPDISK") & 0x01) && (!last_frame_flip))
 		{
 			last_frame_flip = 1;
 			nes_fds.current_side++;
@@ -157,7 +157,7 @@ VIDEO_UPDATE( nes )
 			}
 		}
 
-		if (!(input_port_read_indexed(screen->machine, PORT_FLIPKEY) & 0x01))
+		if (!(input_port_read(screen->machine, "FLIPDISK") & 0x01))
 		{
 			last_frame_flip = 0;
 		}

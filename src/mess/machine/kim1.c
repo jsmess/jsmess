@@ -694,8 +694,8 @@ INLINE int m6530_r(int chip, int offset)
 
 			switch (which)
 			{
-			case 0:				   /* key row 1 */
-				m6530[1].dria = input_port_read_indexed(machine, 0);
+			case 0:				   /* key row 0 */
+				m6530[1].dria = input_port_read(machine, "LINE0");
 				logerror("read keybd(%d): %c%c%c%c%c%c%c\n",
 					 which,
 					 (m6530[1].dria & 0x40) ? '.' : '0',
@@ -706,8 +706,8 @@ INLINE int m6530_r(int chip, int offset)
 					 (m6530[1].dria & 0x02) ? '.' : '5',
 					 (m6530[1].dria & 0x01) ? '.' : '6');
 				break;
-			case 1:				   /* key row 2 */
-				m6530[1].dria = input_port_read_indexed(machine, 1);
+			case 1:				   /* key row 1 */
+				m6530[1].dria = input_port_read(machine, "LINE1");
 				logerror("read keybd(%d): %c%c%c%c%c%c%c\n",
 					 which,
 					 (m6530[1].dria & 0x40) ? '.' : '7',
@@ -718,8 +718,8 @@ INLINE int m6530_r(int chip, int offset)
 					 (m6530[1].dria & 0x02) ? '.' : 'C',
 					 (m6530[1].dria & 0x01) ? '.' : 'D');
 				break;
-			case 2:				   /* key row 3 */
-				m6530[1].dria = input_port_read_indexed(machine, 2);
+			case 2:				   /* key row 2 */
+				m6530[1].dria = input_port_read(machine, "LINE2");
 				logerror("read keybd(%d): %c%c%c%c%c%c%c\n",
 					 which,
 					 (m6530[1].dria & 0x40) ? '.' : 'E',
@@ -808,11 +808,11 @@ static void m6530_w(int chip, int offset, int data)
 
 			switch (which)
 			{
-			case 0:				   /* key row 1 */
+			case 0:				   /* key row 0 */
 				break;
-			case 1:				   /* key row 2 */
+			case 1:				   /* key row 1 */
 				break;
-			case 2:				   /* key row 3 */
+			case 2:				   /* key row 2 */
 				break;
 			case 3:				   /* WR4?? */
 				break;

@@ -230,7 +230,7 @@ static int zapper_hit_pixel(running_machine *machine, const nes_input *input)
 	retVal |= ((in_0.i0 >> in_0.shift) & 0x01);
 
 	/* Check the configuration to see what's connected */
-	cfg = input_port_read_indexed(machine, PORT_CONFIG1);
+	cfg = input_port_read(machine, "CONTROLLERS");
 
 	if (((cfg & 0x000f) == 0x0002) || ((cfg & 0x000f) == 0x0003))
 	{
@@ -264,7 +264,7 @@ static int zapper_hit_pixel(running_machine *machine, const nes_input *input)
 	retVal |= ((in_1.i0 >> in_1.shift) & 0x01);
 
 	/* Check the fake dip to see what's connected */
-	cfg = input_port_read_indexed(machine, PORT_CONFIG1);
+	cfg = input_port_read(machine, "CONTROLLERS");
 
 	if (((cfg & 0x00f0) == 0x0020) || ((cfg & 0x00f0) == 0x0030))
 	{
@@ -302,6 +302,8 @@ static int zapper_hit_pixel(running_machine *machine, const nes_input *input)
 static void nes_read_input_device(int cfg, nes_input *vals, int pad_port,
 	int supports_zapper, int paddle_port)
 {
+	char port[5];
+
 	vals->i0 = 0;
 	vals->i1 = 0;
 	vals->i2 = 0;
@@ -310,30 +312,33 @@ static void nes_read_input_device(int cfg, nes_input *vals, int pad_port,
 	{
 		case 0x01:	/* gamepad */
 			if (pad_port >= 0)
-				vals->i0 = input_port_read_indexed(Machine, pad_port);
+			{
+				sprintf(port, "PAD%d", pad_port+1);
+				vals->i0 = input_port_read(Machine, port);
+			}
 			break;
 
 		case 0x02:	/* zapper 1 */
 			if (supports_zapper)
 			{
-				vals->i0 = input_port_read_indexed(Machine, PORT_ZAPPER0_T);
-				vals->i1 = input_port_read_indexed(Machine, PORT_ZAPPER0_X);
-				vals->i2 = input_port_read_indexed(Machine, PORT_ZAPPER0_Y);
+				vals->i0 = input_port_read(Machine, "ZAPPER1_T");
+				vals->i1 = input_port_read(Machine, "ZAPPER1_X");
+				vals->i2 = input_port_read(Machine, "ZAPPER1_Y");
 			}
 			break;
 
 		case 0x03:	/* zapper 2 */
 			if (supports_zapper)
 			{
-				vals->i0 = input_port_read_indexed(Machine, PORT_ZAPPER1_T);
-				vals->i1 = input_port_read_indexed(Machine, PORT_ZAPPER1_X);
-				vals->i2 = input_port_read_indexed(Machine, PORT_ZAPPER1_Y);
+				vals->i0 = input_port_read(Machine, "ZAPPER2_T");
+				vals->i1 = input_port_read(Machine, "ZAPPER2_X");
+				vals->i2 = input_port_read(Machine, "ZAPPER2_Y");
 			}
 			break;
 
 		case 0x04:	/* arkanoid paddle */
 			if (paddle_port >= 0)
-				vals->i0 = (UINT8) ((UINT8) input_port_read_indexed(Machine, paddle_port) + (UINT8)0x52) ^ 0xff;
+				vals->i0 = (UINT8) ((UINT8) input_port_read(Machine, "PADDLE") + (UINT8)0x52) ^ 0xff;
 			break;
 	}
 }
@@ -356,13 +361,13 @@ WRITE8_HANDLER ( nes_IN0_w )
 	in_1.shift = 0;
 
 	/* Check the configuration to see what's connected */
-	cfg = input_port_read_indexed(machine, PORT_CONFIG1);
+	cfg = input_port_read(machine, "CONTROLLERS");
 
 	/* Read the input devices */
-	nes_read_input_device(cfg >>  0, &in_0, PORT_PAD0,  TRUE, -1);
-	nes_read_input_device(cfg >>  4, &in_1, PORT_PAD1,  TRUE, PORT_PADDLE1);
-	nes_read_input_device(cfg >>  8, &in_2, PORT_PAD2, FALSE, -1);
-	nes_read_input_device(cfg >> 12, &in_3, PORT_PAD3, FALSE, -1);
+	nes_read_input_device(cfg >>  0, &in_0, 0,  TRUE, -1);
+	nes_read_input_device(cfg >>  4, &in_1, 1,  TRUE,  1);
+	nes_read_input_device(cfg >>  8, &in_2, 2, FALSE, -1);
+	nes_read_input_device(cfg >> 12, &in_3, 3, FALSE, -1);
 
 	if (cfg & 0x0f00)
 		in_0.i0 |= (in_2.i0 << 8) | (0x08 << 16);
