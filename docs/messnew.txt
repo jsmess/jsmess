@@ -46,6 +46,9 @@ System Driver Changes:
 
 - [T1000HX] Fixed bug #1130.  [Wilbert Pol]
 
+- [THOMSON] Fixed crashes with non-default ram sizes.  (bug #1443) [Antoine
+  Mine]
+
 - [TUTOR] Changed joystick to use keypad instead of arrow keys by default.
   [Fabio Priuli]
 
