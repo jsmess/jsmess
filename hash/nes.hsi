@@ -213,6 +213,10 @@
 		<extrainfo>0 0 7 0</extrainfo>
 
 	</hash>
+	<hash crc32="d138a1cb" sha1="8fac8ce31784f9ebae15871b3d307134c24a982d" name="15-in-1 (Kaiser - KS-122) (Unl)">
+		<extrainfo>175 0 16 16</extrainfo>
+
+	</hash>
 	<hash crc32="a96b5e8d" sha1="3c965b1ddc6a340028e91e04e725a0735697ea42" name="15-in-1 [p1]">
 		<extrainfo>205 0 32 64</extrainfo>
 
@@ -2808,15 +2812,11 @@
 		<extrainfo>23 0 8 16</extrainfo>
 
 	</hash>
-	<hash crc32="5281b355" sha1="5899be5c478487a8bc1eff44ff38c3ffdf2fc522" name="Akumajou Special - Boku Dracula-kun (J) [T-Eng1.02_Vice]">
+	<hash crc32="febebc81" sha1="6413cb04d0bb63feb5502102184bad2d7b6a08df" name="Akumajou Special - Boku Dracula-kun (J) [T+Eng1.03_Vice]">
 		<extrainfo>23 0 8 16</extrainfo>
 
 	</hash>
 	<hash crc32="f526b000" sha1="8c8faf50f14f944ed296bf2ef473a58d421f7707" name="Akumajou Special - Boku Dracula-kun (J) [T+EngR1_Kalas]">
-		<extrainfo>23 0 8 16</extrainfo>
-
-	</hash>
-	<hash crc32="febebc81" sha1="6413cb04d0bb63feb5502102184bad2d7b6a08df" name="Akumajou Special - Boku Dracula-kun (J) [T+Eng1.03_Vice]">
 		<extrainfo>23 0 8 16</extrainfo>
 
 	</hash>
@@ -2833,6 +2833,10 @@
 
 	</hash>
 	<hash crc32="76141434" sha1="00ccd1a79f2e6659cd1abbd54b316b2860e771b7" name="Akumajou Special - Boku Dracula-kun (J) [T-Eng1.01_Vice]">
+		<extrainfo>23 0 8 16</extrainfo>
+
+	</hash>
+	<hash crc32="5281b355" sha1="5899be5c478487a8bc1eff44ff38c3ffdf2fc522" name="Akumajou Special - Boku Dracula-kun (J) [T-Eng1.02_Vice]">
 		<extrainfo>23 0 8 16</extrainfo>
 
 	</hash>
@@ -3042,21 +3046,25 @@
 		<extrainfo>2 1 8 0</extrainfo>
 
 	</hash>
-	<hash crc32="7ed97719" sha1="49c2bc696fffe271fd342635a454945108cf3f56" name="All Night Nippon Super Mario Bros. (J) [a1]">
+	<hash crc32="788b9b4d" sha1="c629d6b27d011468ae2830752e1552085f62a158" name="All Night Nippon Super Mario Bros V0.66e by YY (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="b1be99c2" sha1="6530fd19a6a98fe807cffd850c80cbb6b75bda61" name="All Night Nippon Super Mario Bros. (J)">
+	<hash crc32="7ed97719" sha1="49c2bc696fffe271fd342635a454945108cf3f56" name="All Night Nippon Super Mario Bros. (J) (FDS Conversion) [a1]">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="b1be99c2" sha1="6530fd19a6a98fe807cffd850c80cbb6b75bda61" name="All Night Nippon Super Mario Bros. (J) (FDS Conversion)">
 		<status>Known Bad Image</status>
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="e61400c4" sha1="f3bfea3e581a527b606b45b7ba88ce30e6b3efc1" name="All Night Nippon Super Mario Bros. (J)">
+	<hash crc32="e61400c4" sha1="f3bfea3e581a527b606b45b7ba88ce30e6b3efc1" name="All Night Nippon Super Mario Bros. (J) (FDS Conversion)">
 		<status>Known Bad Image</status>
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="e2482419" sha1="287aef229e77b6bc2bfb500f906e9c906393862d" name="All Night Nippon Super Mario Bros. (J)">
+	<hash crc32="e2482419" sha1="287aef229e77b6bc2bfb500f906e9c906393862d" name="All Night Nippon Super Mario Bros. (J) (FDS Conversion)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -7401,7 +7409,7 @@
 		<extrainfo>15 2 64 0</extrainfo>
 
 	</hash>
-	<hash crc32="6bf3f6a3" sha1="0d21e90eb41ecaa24df7f4e7fa9bd95cb396bc32" name="Bio Miracle Bokutte Upa (J) (Mario Baby - FDS Hack)">
+	<hash crc32="6bf3f6a3" sha1="0d21e90eb41ecaa24df7f4e7fa9bd95cb396bc32" name="Bio Miracle Bokutte Upa (J) (Mario Baby - FDS Conversion)">
 		<extrainfo>42 0 8 0</extrainfo>
 
 	</hash>
@@ -8336,6 +8344,10 @@
 	</hash>
 	<hash crc32="4407b612" sha1="d7cdd8266f912ea1da8c4fb6ebd0e3f33ed51bb1" name="Bomber Mario (Bomberman Hack)">
 		<extrainfo>0 1 1 1</extrainfo>
+
+	</hash>
+	<hash crc32="1b252de4" sha1="e7cbb6808796229c3fd4ac637c4d6a60d8ef38de" name="Bomber Mario (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="c21522ba" sha1="0dd0a6c5e00bb4a6221212219f923639ca5b107b" name="Bomber Mario V1.00 (SMB1 Hack)">
@@ -20994,6 +21006,10 @@
 		<extrainfo>1 2 8 16</extrainfo>
 
 	</hash>
+	<hash crc32="96c0a6f8" sha1="96fed4451a2b1d58618873b820d11d922695b48a" name="Fast Scrolling Mario (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="a7996b6f" sha1="e08f729aa0cd80f96bc5d531d1385e6c79701481" name="Fatal Fury 2 (Unl) [a1]">
 		<status>Known Bad Image</status>
 		<extrainfo>83 0 8 32</extrainfo>
@@ -21213,6 +21229,10 @@
 	<hash crc32="2f24b4ee" sha1="3a015292e1301ecd6f8f6c42c137a5147d6e2ace" name="Felix vs Jerry (Unl)">
 		<status>GoodNES Verified Image</status>
 		<extrainfo>4 0 8 16</extrainfo>
+
+	</hash>
+	<hash crc32="1fb4022d" sha1="b50c82a4018a7a361c471f8789c2d11fe1777a4b" name="Feng Yin Dao (NJ072) (Ch)">
+		<extrainfo>4 2 32 0</extrainfo>
 
 	</hash>
 	<hash crc32="53a9b53a" sha1="1826d7c39ac1d49b20f07e9cfbba6b87c0493797" name="Ferrari - Grand Prix Challenge (E)">
@@ -22607,16 +22627,16 @@
 		<extrainfo>10 2 16 16</extrainfo>
 
 	</hash>
+	<hash crc32="f18ad56d" sha1="75d689fe39d3bea804ab7692e84d6c480f1a6c6a" name="Fire Emblem Gaiden (J) [T+Eng97b2-Repair110206_J2e+Starwolf]">
+		<extrainfo>10 2 16 16</extrainfo>
+
+	</hash>
 	<hash crc32="bf800575" sha1="6aacfee9b9041b48478f1445bdf6b8ce02190561" name="Fire Emblem Gaiden (J) [T+Eng97b2_J2e]">
 		<status>Overdumped Image</status>
 		<extrainfo>10 2 16 16</extrainfo>
 
 	</hash>
 	<hash crc32="467fe41e" sha1="5eadcc7d763473ab53aa9d6582aafbdd77d81523" name="Fire Emblem Gaiden (J) [T+Eng97b2_J2e]">
-		<extrainfo>10 2 16 16</extrainfo>
-
-	</hash>
-	<hash crc32="f18ad56d" sha1="75d689fe39d3bea804ab7692e84d6c480f1a6c6a" name="Fire Emblem Gaiden (J) [T+Eng97b2-Repair110206_J2e+Starwolf]">
 		<extrainfo>10 2 16 16</extrainfo>
 
 	</hash>
@@ -30109,7 +30129,7 @@
 		<extrainfo>1 0 8 16</extrainfo>
 
 	</hash>
-	<hash crc32="1649c27a" sha1="a384746e3c6f29d1ec9f0ed5e55ad55757bf1ad3" name="Invisible Mario Bros (SMB1 Hack)">
+	<hash crc32="5338d1fc" sha1="7317b488fd1b2db6677abf6ee020a30ba8dd7562" name="Invisible Bricks Mario (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -33332,6 +33352,10 @@
 		<extrainfo>0 1 2 4</extrainfo>
 
 	</hash>
+	<hash crc32="6cb6d619" sha1="8d6f1ec0d36145459947f5b854f815494d5dcc1f" name="Kou Dai Bao Shi - Yin (Ch)">
+		<extrainfo>163 3 128 0</extrainfo>
+
+	</hash>
 	<hash crc32="c5c51a1e" sha1="8d5abf45788b9257736a964f274ff2115947ff89" name="Kouryuu Densetsu Villgust Gaiden (J)">
 		<status>Known Bad Image</status>
 		<extrainfo>4 2 8 32</extrainfo>
@@ -35205,8 +35229,16 @@
 		<extrainfo>4 0 8 16</extrainfo>
 
 	</hash>
+	<hash crc32="dab90d01" sha1="dd1c9927610dbabf1fe03ab3c21f2e860e304797" name="Low G Man - The Low Gravity Man (E) [f1]">
+		<extrainfo>4 0 8 16</extrainfo>
+
+	</hash>
 	<hash crc32="93991433" sha1="93b758fccb9a4d9e69e851172d2647aebabad461" name="Low G Man - The Low Gravity Man (U)">
 		<status>GoodNES Verified Image</status>
+		<extrainfo>4 0 8 16</extrainfo>
+
+	</hash>
+	<hash crc32="2ced7bda" sha1="a774ec230dfa79c728268ebdaf0a475f008bbde4" name="Low G Man - The Low Gravity Man (U) [f1]">
 		<extrainfo>4 0 8 16</extrainfo>
 
 	</hash>
@@ -35546,6 +35578,10 @@
 	</hash>
 	<hash crc32="fcebcc5f" sha1="78f45e325e7f5e64e9a0c145f86b800b5bf8f947" name="M82 Game Selectable Working Product Display (E)">
 		<extrainfo>0 1 1 1</extrainfo>
+
+	</hash>
+	<hash crc32="669a32f2" sha1="1ca8b723ee20921108a2d257a51d5bbd899b5e6a" name="Ma Bu Mi Zhen &amp; Qu Wei Cheng Yu Wu (Ch)">
+		<extrainfo>241 1 16 0</extrainfo>
 
 	</hash>
 	<hash crc32="0652445d" sha1="ee951b0ef218257cfb3f9b700a42402c62252e8e" name="Ma Li 12 [p1]">
@@ -36919,6 +36955,10 @@
 	<hash crc32="c55b3857" sha1="6c46db12ac2f06e3d9b11c4f8b4cad9288647b3d" name="Mario Family 10-in-1 [p1]">
 		<status>Known Bad Image</status>
 		<extrainfo>4 0 32 64</extrainfo>
+
+	</hash>
+	<hash crc32="691fd8b3" sha1="3ff489fadc23a7b2353b0872583ee31383256a6e" name="Mario Fan by M.K.H (SMB1 Hack)">
+		<extrainfo>0 5 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="1cbb3389" sha1="7fda0be91df0c05cd2c5f7761101116fca9b93af" name="Mario Fantasy Adventure (FF1 Hack)">
@@ -38841,7 +38881,7 @@
 		<extrainfo>1 2 16 0</extrainfo>
 
 	</hash>
-	<hash crc32="d8012992" sha1="5f0943dc8145542abc70bf20e4754b3c08653399" name="Meikyuu Jiin Dababa (FDS Hack) (Unl)">
+	<hash crc32="d8012992" sha1="5f0943dc8145542abc70bf20e4754b3c08653399" name="Meikyuu Jiin Dababa (FDS Conversion) (Unl)">
 		<status>GoodNES Verified Image</status>
 		<extrainfo>108 1 8 0</extrainfo>
 
@@ -41245,10 +41285,6 @@
 		<extrainfo>215 0 16 64</extrainfo>
 
 	</hash>
-	<hash crc32="09f7c4ee" sha1="1adffd511baf2d78d59eb98835415dac1f62a998" name="Mortal Kombat 4 (8p) [p1]">
-		<extrainfo>0 0 7 0</extrainfo>
-
-	</hash>
 	<hash crc32="a39311ca" sha1="f2020072550518768d7fa46dbc7c2b987b9f75a5" name="Mortal Kombat 4 (Unl)">
 		<status>GoodNES Verified Image</status>
 		<extrainfo>4 0 8 16</extrainfo>
@@ -41270,7 +41306,7 @@
 	</hash>
 	<hash crc32="f13f51ec" sha1="bdc3c7c109be6c37a04e689864eb19058ec75b5b" name="Mortal Kombat Bros (SMB1 Hack)">
 		<status>Known Bad Image</status>
-		<extrainfo>0 0 2 1</extrainfo>
+		<extrainfo>3 1 2 4</extrainfo>
 
 	</hash>
 	<hash crc32="eda38049" sha1="5e15cd8117e9094b2503ed656054278f3ba23f14" name="Mortal Kombat Bros (SMB1 Hack)">
@@ -41296,9 +41332,13 @@
 		<extrainfo>90 0 8 64</extrainfo>
 
 	</hash>
-	<hash crc32="51ceac29" sha1="41cadabce79d19e7c9a94cfaf8a5e89db2102e6b" name="Mortal Kombat Trilogy (Unl)">
+	<hash crc32="51ceac29" sha1="41cadabce79d19e7c9a94cfaf8a5e89db2102e6b" name="Mortal Kombat Trilogy - MK5 (16player) (Unl)">
 		<status>GoodNES Verified Image</status>
 		<extrainfo>4 0 8 32</extrainfo>
+
+	</hash>
+	<hash crc32="09f7c4ee" sha1="1adffd511baf2d78d59eb98835415dac1f62a998" name="Mortal Kombat Trilogy - MK5 (8player) (Unl) [U][p1]">
+		<extrainfo>0 0 7 0</extrainfo>
 
 	</hash>
 	<hash crc32="27f3a202" sha1="11fdd6ace7bb0fd549d8280e3c45c9b6f7237137" name="Mortal Kombat V1996 Turbo 30 Peoples (Unl)">
@@ -55377,6 +55417,10 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
+	<hash crc32="8cbed76b" sha1="c8f1a2e70ef60d39c8231af566b745e4a5a0c8f4" name="Slow Scrolling Mario (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="0da0cd7c" sha1="7f3a0fb1ce4eb36a018d62e788b85b7e900d2bd3" name="Smash Ping Pong (J) (FDS Conversion)">
 		<extrainfo>3 0 2 2</extrainfo>
 
@@ -55490,19 +55534,7 @@
 		<extrainfo>0 5 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="56b9c39b" sha1="de31ab6c799c7b7b27e01bfd5c4d324430e1caac" name="SMB1-110 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
 	<hash crc32="0216e839" sha1="09e2de5f14ea7358cdb525396c24099491051769" name="SMB1-123 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="bdc9a51f" sha1="839a465f3362131ddcc7f6c950abd85c1d727efd" name="SMB1-124 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="0bee7bc5" sha1="58a9b2140e78573e9c71b93648b839ac6a2e40da" name="SMB1-132 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -55514,15 +55546,12 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="40d61968" sha1="25913c9241521bf601545fc87c44ce194b2ca0a2" name="SMB1-147 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
 	<hash crc32="686f3006" sha1="6e240da6096106cf80ffe4dc92e8a8adf39b57f6" name="SMB1-152 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="c170b476" sha1="504ca23ad408eb8a61bab31dca37af8358764ab8" name="SMB1-155 (SMB1 Hack)">
+		<status>Known Bad Image</status>
 		<extrainfo>0 5 2 1</extrainfo>
 
 	</hash>
@@ -55531,14 +55560,6 @@
 
 	</hash>
 	<hash crc32="341b5713" sha1="3bb9511a0f0ddefe89ba2aa4bf761c37061ff263" name="SMB1-174 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="a417b552" sha1="ec0209b67f33d49342f125d151b9780b9fd6575a" name="SMB1-176 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="7f41daed" sha1="f64db56bbe94b96e57976e19db042e042e31a20f" name="SMB1-205 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -55562,10 +55583,6 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="96c0a6f8" sha1="96fed4451a2b1d58618873b820d11d922695b48a" name="SMB1-220 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
 	<hash crc32="ee597ac6" sha1="7e4024960612189d1a4372c7326ce446b619681d" name="SMB1-222 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
@@ -55578,31 +55595,7 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="5338d1fc" sha1="7317b488fd1b2db6677abf6ee020a30ba8dd7562" name="SMB1-225 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="e040fc95" sha1="6eb1e3aa3e6fd23744c71ea7bb816e8813443f5b" name="SMB1-226 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="03b1685a" sha1="c47303a9215714d2acedf3dc11f42a4e48da25e3" name="SMB1-227 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="d38079de" sha1="a8404e020e720295217df6d79bada01a759781d7" name="SMB1-228 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
 	<hash crc32="ee937894" sha1="4a0197858076dc22d46268749cdf053cae9eb66e" name="SMB1-231 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="8cbed76b" sha1="c8f1a2e70ef60d39c8231af566b745e4a5a0c8f4" name="SMB1-232 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="5fd29fb7" sha1="c6ca3c337e9492c8f1727090fbef64017e52fef8" name="SMB1-233 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -55630,24 +55623,12 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="e54fa141" sha1="77645a0094da2dcc6bbe0c95d1c0bc005f205cd1" name="SMB1-245 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
 	<hash crc32="5282eaa1" sha1="856b068371a5c930b74173ef3f4379d368db5c2f" name="SMB1-246 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="7b753604" sha1="e9f976523d8adef628e149868ac9edfe9eff0839" name="SMB1-249 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="1b252de4" sha1="e7cbb6808796229c3fd4ac637c4d6a60d8ef38de" name="SMB1-250 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="691fd8b3" sha1="3ff489fadc23a7b2353b0872583ee31383256a6e" name="SMB1-251 (SMB1 Hack)">
-		<extrainfo>0 5 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="f08374fe" sha1="9c674ad1952a7f57facddb4b95b9a93525933ae6" name="SMB1-253 (SMB1 Hack)">
@@ -55666,31 +55647,7 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="966595bb" sha1="22501ac337e6cea4b2d209b7327bb541c6a016e2" name="SMB1-257 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="17030fdf" sha1="0a54fa8eedec787901c5277eeb1b5b13eb529e20" name="SMB1-49 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="6f970427" sha1="e551fa86dc1adae65175f7ee7d8f9b7fecb38cec" name="SMB1-52 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="97496f42" sha1="bcaa8a71218ad966419ee3fabeb1b4709106d13e" name="SMB1-53 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
 	<hash crc32="3e9ff390" sha1="e4b7cbe96e3cf82c95f6be9e60b3489f5399c872" name="SMB1-54 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="00b0887f" sha1="c41a029c82c430cd886a1b1b462a2a898cbf1cd1" name="SMB1-55 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="64fd1a0b" sha1="6888d51d54d6adaa21f3245af69512eef40b0271" name="SMB1-71 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -55718,10 +55675,6 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="8114b178" sha1="495c4db1c1981ed4619ec5e9d64aed63ad87aaad" name="SMB1-F13 (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
 	<hash crc32="a14cd1e3" sha1="f579840db74eccc12b9a7749241c1186a36fa3d8" name="SMB1-F2 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
@@ -55739,6 +55692,7 @@
 
 	</hash>
 	<hash crc32="d0326914" sha1="162e9794fa5d5d2495dd5514cf3e815dcbdcb88f" name="SMB1-X9 (SMB1 Hack)">
+		<status>Known Bad Image</status>
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -60149,6 +60103,19 @@
 		<extrainfo>4 0 4 1</extrainfo>
 
 	</hash>
+	<hash crc32="3d3cbd24" sha1="f3b998073241fe588e28ff6b6f63ba01b4c237bb" name="Super Mario Bros 2 V1.06e_B1 by YY (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="619a80e9" sha1="3ec355f65bd3a5a0e477d9d48b1e3d81b7dccf11" name="Super Mario Bros 2 Vx.xx_B1 by YY (SMB1 Hack)">
+		<status>Known Bad Image</status>
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="9c0ffa58" sha1="e776eb4c590851c858c6df4c41ba66aad2440c66" name="Super Mario Bros 2 Vx.xx_B1 by YY (SMB1 Hack)">
+		<extrainfo>0 5 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="29bf076b" sha1="89d1eb76088ac0e8abcc1f34b002e73a2f5b5393" name="Super Mario Bros 2000 (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
@@ -60468,6 +60435,10 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
+	<hash crc32="7f41daed" sha1="f64db56bbe94b96e57976e19db042e042e31a20f" name="Super Mario Bros by D-6U (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="4ad4409f" sha1="03062c027b08fac7e63dabb94252b0abe093a546" name="Super Mario Bros by Excel (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
@@ -60505,6 +60476,10 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
+	<hash crc32="bdc9a51f" sha1="839a465f3362131ddcc7f6c950abd85c1d727efd" name="Super Mario Bros by HI (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="dfc342a2" sha1="c467dfb74f2cb7fd3290bbde596a9503271fc2d6" name="Super Mario Bros by IMKNOWN (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
@@ -60537,6 +60512,14 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
+	<hash crc32="a417b552" sha1="ec0209b67f33d49342f125d151b9780b9fd6575a" name="Super Mario Bros by Mana (SMB1 Hack) [a1]">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="0bee7bc5" sha1="58a9b2140e78573e9c71b93648b839ac6a2e40da" name="Super Mario Bros by Mana (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="dc1ecc8e" sha1="ff6e3f1a69157c2f983fda4e0785da2978b993b0" name="Super Mario Bros by Mikachu (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
@@ -60563,6 +60546,14 @@
 	</hash>
 	<hash crc32="6f6eab13" sha1="4ace9410aaccdc4913623d07f694eba7f4d3670b" name="Super Mario Bros by RORAN (V051129) (SMB1 Hack)">
 		<extrainfo>0 5 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="da29fb90" sha1="f3c1cc0d121e5954982ce645142ad81081355076" name="Super Mario Bros by Scroll (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="966595bb" sha1="22501ac337e6cea4b2d209b7327bb541c6a016e2" name="Super Mario Bros by Tekhacks (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="a5be93fe" sha1="7e18d5dac83bfa915c351e3b0b753a00cd2c3fc1" name="Super Mario Bros by TMR9 (SMB1 Hack) [a1]">
@@ -60623,6 +60614,10 @@
 
 	</hash>
 	<hash crc32="d15c56a2" sha1="7889a3f7e96a75c03caa0632c4ca22dd73493394" name="Super Mario Bros Fast and Trained (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="817ac1f1" sha1="172e3a8a430b8cea8532f6a1c3f70c5e870767e7" name="Super Mario Bros Faster by Scroll (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -60827,14 +60822,6 @@
 		<extrainfo>4 0 2 2</extrainfo>
 
 	</hash>
-	<hash crc32="da29fb90" sha1="f3c1cc0d121e5954982ce645142ad81081355076" name="Super Mario Bros Scroll (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="817ac1f1" sha1="172e3a8a430b8cea8532f6a1c3f70c5e870767e7" name="Super Mario Bros Scroll Faster (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
 	<hash crc32="b81b61ac" sha1="73a170c6167ea3e74f41ed7d8cbee1a73de6387d" name="Super Mario Bros Shugyou (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
@@ -60892,6 +60879,14 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
+	<hash crc32="df1ee944" sha1="f97646efa6910f38cdae2469f1ca244db0f9c03c" name="Super Mario Bros V2.55e by YY (SMB1 Hack) [a1]">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="5618600d" sha1="ce8fd798872db317379c72b4e6ba2dc899ac78db" name="Super Mario Bros V2.55e by YY (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="e1bf376f" sha1="c8911ca43980d3a40dc4500d450ae8e832b01721" name="Super Mario Bros Vertical (SMB1 Hack)">
 		<status>Known Bad Image</status>
 		<extrainfo>4 0 2 1</extrainfo>
@@ -60919,6 +60914,10 @@
 
 	</hash>
 	<hash crc32="ad06b98d" sha1="94ce1f756849b9e6ed3e50c3485d9213776024ec" name="Super Mario Bros XXXX (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="8114b178" sha1="495c4db1c1981ed4619ec5e9d64aed63ad87aaad" name="Super Mario Bros Zemi (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -61422,7 +61421,7 @@
 		<extrainfo>3 3 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="281326ed" sha1="dc8ddb78cbb575623b701954df951f05e81388ea" name="Super Mario Bros. 2 (J) (Kaiser Pirate) [p1]">
+	<hash crc32="281326ed" sha1="dc8ddb78cbb575623b701954df951f05e81388ea" name="Super Mario Bros. 2 (J) (Kaiser) [p1]">
 		<extrainfo>142 0 8 0</extrainfo>
 
 	</hash>
@@ -62247,6 +62246,10 @@
 		<extrainfo>4 0 16 16</extrainfo>
 
 	</hash>
+	<hash crc32="40d61968" sha1="25913c9241521bf601545fc87c44ce194b2ca0a2" name="Super Moraler by Mane (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="ba036fd9" sha1="bfa4903d66397c27fe1af5b8e93e2eff3b156fe5" name="Super Mushroom (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
@@ -62457,6 +62460,14 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
+	<hash crc32="03b1685a" sha1="c47303a9215714d2acedf3dc11f42a4e48da25e3" name="Super Scoring Mario (SMB1 Hack) [a1]">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="e040fc95" sha1="6eb1e3aa3e6fd23744c71ea7bb816e8813443f5b" name="Super Scoring Mario (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="c3b2e39e" sha1="9e5c2fb23dbe54b8dc34eb92eaacde6facd81ff8" name="Super Shinobi, The (Unl)">
 		<status>GoodNES Verified Image</status>
 		<extrainfo>4 0 16 32</extrainfo>
@@ -62472,6 +62483,10 @@
 	</hash>
 	<hash crc32="21a653c7" sha1="40a801ff63db5e719a8a53537c1c78f398483fc8" name="Super Sky Kid (VS)">
 		<extrainfo>4 8 2 4</extrainfo>
+
+	</hash>
+	<hash crc32="5fd29fb7" sha1="c6ca3c337e9492c8f1727090fbef64017e52fef8" name="Super Slow Scrolling Mario (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="6bbdfa86" sha1="3ba5ce2e487cf173caadcc174d07c7384a1b741e" name="Super Snowboard Bros (SMB1 Hack)">
@@ -63704,6 +63719,10 @@
 	</hash>
 	<hash crc32="2a0c9105" sha1="3044f96c42683a4ce809dabfc2cfbba8093bce89" name="Tanespot by Jonathan &amp; Hans Knektar (PD)">
 		<extrainfo>3 1 2 4</extrainfo>
+
+	</hash>
+	<hash crc32="c978b69a" sha1="94ef5687f988df234ef21ea599ce3f62c2579207" name="Tang Bo Hu Dian Qiu Xiang (NJ069) (Ch)">
+		<extrainfo>241 3 32 0</extrainfo>
 
 	</hash>
 	<hash crc32="2ca9bf7f" sha1="b9f444ff60f60c177eeec8671bec3731b0f6fe49" name="Tang Mu Li Xian Ji (Ch)">
@@ -69576,6 +69595,10 @@
 		<extrainfo>4 0 8 32</extrainfo>
 
 	</hash>
+	<hash crc32="09ff878c" sha1="7f87d120c9e12ad9df984d999a0e7c02b9cc4275" name="Ultimate Muscle - Team Aho vs Generation X (Kinnikuman - Muscle Tag Match Hack)">
+		<extrainfo>0 1 1 1</extrainfo>
+
+	</hash>
 	<hash crc32="892434dd" sha1="dfd47797dedddb36f5ca73f0e7d994ed792e2adf" name="Ultimate Stuntman (Camerica)">
 		<status>GoodNES Verified Image</status>
 		<extrainfo>71 0 16 0</extrainfo>
@@ -69597,6 +69620,10 @@
 	</hash>
 	<hash crc32="5d25774c" sha1="3b05b1976fe23d23446779be064ff4b2e2581e2f" name="Ultra Easy Frogger by Rob (PD)">
 		<extrainfo>1 0 1 0</extrainfo>
+
+	</hash>
+	<hash crc32="e54fa141" sha1="77645a0094da2dcc6bbe0c95d1c0bc005f205cd1" name="Ultra Fast Scrolling Mario (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="9adfc8f0" sha1="371882429c5e4da94baefef79d361d4cd99069be" name="Ultraman Club - Kaijuu Dai Kessen!! (J)">
@@ -69708,7 +69735,35 @@
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
+	<hash crc32="1649c27a" sha1="a384746e3c6f29d1ec9f0ed5e55ad55757bf1ad3" name="Underwater Mario Maze (SMB1 Hack) [a2]">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="00b0887f" sha1="c41a029c82c430cd886a1b1b462a2a898cbf1cd1" name="Underwater Mario Maze (SMB1 Hack) [a3]">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="6f970427" sha1="e551fa86dc1adae65175f7ee7d8f9b7fecb38cec" name="Underwater Mario Maze (SMB1 Hack) [a4]">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="17030fdf" sha1="0a54fa8eedec787901c5277eeb1b5b13eb529e20" name="Underwater Mario Maze (SMB1 Hack) [a5]">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="97496f42" sha1="bcaa8a71218ad966419ee3fabeb1b4709106d13e" name="Underwater Mario Maze (SMB1 Hack) [a6]">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
 	<hash crc32="f4d0f08c" sha1="959a76d03dfb8d168632ce7268108ae8d520ee6f" name="Underwater Mario Maze (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="64fd1a0b" sha1="6888d51d54d6adaa21f3245af69512eef40b0271" name="Underwater Mario Maze w-HI! Bubbles (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="56b9c39b" sha1="de31ab6c799c7b7b27e01bfd5c4d324430e1caac" name="Underwater Maze Mario (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
@@ -69755,11 +69810,6 @@
 		<extrainfo>3 1 2 4</extrainfo>
 
 	</hash>
-	<hash crc32="74f204d4" sha1="7480734d576dc52e49112b42188748e6fbcab5c5" name="Unknown Bad Super Mario Bros (SMB1 Hack)">
-		<status>Known Bad Image</status>
-		<extrainfo>3 1 2 4</extrainfo>
-
-	</hash>
 	<hash crc32="25bea48e" sha1="074e78f1a9198377e66635b1c47dd1d24cb881e6" name="Unknown Bad Super Mario Bros (SMB1 Hack)">
 		<status>Known Bad Image</status>
 		<extrainfo>3 1 2 8</extrainfo>
@@ -69779,6 +69829,10 @@
 	</hash>
 	<hash crc32="98899688" sha1="79473e7dd448d604630f862dbfdf5510a89d4cfd" name="Unknown Hack Mario (20050703) (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
+
+	</hash>
+	<hash crc32="74f204d4" sha1="7480734d576dc52e49112b42188748e6fbcab5c5" name="Unknown Hack Mario (SMB1 Hack)">
+		<extrainfo>0 1 2 4</extrainfo>
 
 	</hash>
 	<hash crc32="c9751e65" sha1="8526da561b21599b04a40a1d90a90041b5374fed" name="Unknown Multi Cart w-10-Yard Fight [p1][hFFE]">
@@ -71081,6 +71135,10 @@
 		<extrainfo>3 1 2 4</extrainfo>
 
 	</hash>
+	<hash crc32="600e717b" sha1="0c7ca363ea26632e1a61c7f40e0fe8e8538ed76a" name="Wei Luo Chuan Qi (Ch)">
+		<extrainfo>74 2 16 32</extrainfo>
+
+	</hash>
 	<hash crc32="5e8507b5" sha1="20c25d18506e056a46f42bf495025f2ef79490c3" name="Weird Mario Bros (SMB1 Hack)">
 		<extrainfo>0 1 2 1</extrainfo>
 
@@ -71817,6 +71875,10 @@
 	</hash>
 	<hash crc32="adb810f8" sha1="ff93357a36f2b946e02f1a826a04c4f8c73edf1b" name="Woody Poko (J)">
 		<extrainfo>2 1 8 0</extrainfo>
+
+	</hash>
+	<hash crc32="d38079de" sha1="a8404e020e720295217df6d79bada01a759781d7" name="World 4-1 Fast Enemies (SMB1 Hack)">
+		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="e294c86f" sha1="8c8b07062801f380589a13cefc2893c064515d9e" name="World Boxing (J) [hFFE][p1]">
@@ -73243,31 +73305,6 @@
 	</hash>
 	<hash crc32="4e800048" sha1="dac50763b69224770ec3d13c4bd5fc6f54435600" name="Yuu Yuu Hakusho Final - Makai Saikyou Retsuden (English) (Unl)">
 		<extrainfo>115 0 8 32</extrainfo>
-
-	</hash>
-	<hash crc32="788b9b4d" sha1="c629d6b27d011468ae2830752e1552085f62a158" name="YY-ALL V0.66e (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="df1ee944" sha1="f97646efa6910f38cdae2469f1ca244db0f9c03c" name="YY-SMB V2.55e (SMB1 Hack) [a1]">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="5618600d" sha1="ce8fd798872db317379c72b4e6ba2dc899ac78db" name="YY-SMB V2.55e (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="3d3cbd24" sha1="f3b998073241fe588e28ff6b6f63ba01b4c237bb" name="YY-SMB2 B1 V1.06e (SMB1 Hack)">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="619a80e9" sha1="3ec355f65bd3a5a0e477d9d48b1e3d81b7dccf11" name="YY-SMB2 B1 Vx.xx (SMB1 Hack)">
-		<status>Known Bad Image</status>
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="9c0ffa58" sha1="e776eb4c590851c858c6df4c41ba66aad2440c66" name="YY-SMB2 B1 Vx.xx (SMB1 Hack)">
-		<extrainfo>0 5 2 1</extrainfo>
 
 	</hash>
 	<hash crc32="5ca6e871" sha1="e6202a7035305552c1d829ab8a0b93c736f57181" name="Zabucom - It Could Be A MOTHERSHIP (PD)">
