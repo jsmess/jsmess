@@ -17,10 +17,22 @@
 #include "debug/debugcon.h"
 #endif /* ENABLE_DEBUGGER */
 
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
 #define NUM_SIMUL_KEYS	(UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)
 #define LOG_INPUTX		0
 #define DUMP_CODES		0
 #define SPACE_COUNT		3
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef struct _mess_input_code mess_input_code;
 struct _mess_input_code
@@ -46,6 +58,12 @@ struct _char_info
 	const char *name;
 	const char *alternate;	/* alternative string, in UTF-8 */
 };
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
 
 static const char_info charinfo[] =
 {
@@ -322,6 +340,8 @@ static const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(RCONTROL),	"Right Ctrl",	NULL },		/* right control key */
 	{ UCHAR_MAMEKEY(CANCEL),	"Break",		NULL }		/* Break/Pause key */
 };
+
+
 
 #define INVALID_CHAR '?'
 
@@ -923,7 +943,12 @@ static TIMER_CALLBACK(inputx_timerproc)
 
 
 
-void inputx_update(running_machine *machine)
+/*-------------------------------------------------
+    mess_input_port_update_hook - hook function
+	called from core to allow for natural keyboard	
+-------------------------------------------------*/
+
+void mess_input_port_update_hook(int portnum, UINT32 *digital)
 {
 	const key_buffer *keybuf;
 	const mess_input_code *code;
@@ -943,12 +968,15 @@ void inputx_update(running_machine *machine)
 			code = find_code(ch);
 
 			/* loop through this character's component codes */
-			if (code)
+			if (code != NULL)
 			{
-				for (i = 0; i < ARRAY_LENGTH(code->ipt) && code->ipt[i]; i++)
+				for (i = 0; i < ARRAY_LENGTH(code->ipt) && (code->ipt[i] != NULL); i++)
 				{
-					value = code->ipt[i]->mask;
-					input_port_set_digital_value(machine, code->port[i], value, value);
+					if (code->port[i] == portnum)
+					{
+						value = code->ipt[i]->mask;
+						*digital |= value;
+					}
 				}
 			}
 		}

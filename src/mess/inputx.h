@@ -6,17 +6,15 @@
 
 *********************************************************************/
 
-#ifndef INPUTX_H
-#define INPUTX_H
+#ifndef __INPUTX_H__
+#define __INPUTX_H__
 
 #include "mame.h"
 #include "driver.h"
 
 
 /***************************************************************************
-
-	Constants
-
+    CONSTANTS
 ***************************************************************************/
 
 /* input classes */
@@ -30,12 +28,6 @@ enum
 	INPUT_CLASS_CATEGORIZED,
 	INPUT_CLASS_MISC
 };
-
-/***************************************************************************
-
-	Macros
-
-***************************************************************************/
 
 /* MESS uses Supplementary private use B to represent code points
  * corresponding to MAME keycodes and shift keys.  The nice thing about
@@ -54,14 +46,12 @@ enum
 
 
 /***************************************************************************
-
-	Prototypes
-
+    FUNCTION PROTOTYPES
 ***************************************************************************/
 
 /* these are called by the core; they should not be called from FEs */
 void inputx_init(running_machine *machine);
-void inputx_update(running_machine *machine);
+void mess_input_port_update_hook(int portnum, UINT32 *digital);
 void inputx_handle_mess_extensions(input_port_entry *ipt);
 
 /* called by drivers to setup natural keyboard support */
