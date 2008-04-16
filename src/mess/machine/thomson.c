@@ -1315,6 +1315,8 @@ MACHINE_START ( to7 )
 	memory_configure_bank( THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
 	memory_configure_bank( THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_set_bank( THOM_BASE_BANK, 0 );
+	memory_set_bank( THOM_VRAM_BANK, 0 );
+	memory_set_bank( THOM_CART_BANK, 0 );
 
 	if ( mess_ram_size > 24*1024 )
 	{
@@ -1397,10 +1399,16 @@ static void to770_update_ram_bank( void )
 	if ( bank != old_bank )
 		LOG_BANK(( "to770_update_ram_bank: RAM bank change %i\n", bank ));
 
-	memory_set_bank( THOM_RAM_BANK, bank );
-	memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0,
-				       (mess_ram_size == 128*1024 || bank < 2) ?
-				       (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) : SMH_UNMAP );
+	if ( mess_ram_size == 128*1024 || bank < 2 )
+	{
+		memory_set_bank( THOM_RAM_BANK, bank );
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0, (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
+	}
+	else
+	{
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0, SMH_UNMAP );
+	}
+
 	old_bank = bank;
 }
 
@@ -1556,6 +1564,9 @@ MACHINE_START ( to770 )
 	memory_configure_bank( THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
 	memory_configure_bank( THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_set_bank( THOM_BASE_BANK, 0 );
+	memory_set_bank( THOM_RAM_BANK,  0 );
+	memory_set_bank( THOM_VRAM_BANK, 0 );
+	memory_set_bank( THOM_CART_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -1612,7 +1623,7 @@ static TIMER_CALLBACK(mo5_periodic_cb)
 
 static void mo5_init_timer(void)
 {
-	/* time is a faster than 50 Hz to match video framerate */
+	/* time is a little faster than 50 Hz to match video framerate */
 	timer_adjust_periodic(mo5_periodic_timer, attotime_zero, 0, ATTOTIME_IN_USEC( 19968 ));
 }
 
@@ -1912,6 +1923,8 @@ MACHINE_START ( mo5 )
 	memory_configure_bank( THOM_CART_BANK, 4, 4, mess_ram + 0xc000, 0x4000 );
 	memory_configure_bank( THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
 	memory_set_bank( THOM_BASE_BANK, 0 );
+	memory_set_bank( THOM_CART_BANK, 0 );
+	memory_set_bank( THOM_VRAM_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -2240,10 +2253,16 @@ static void to9_update_ram_bank ( void )
 	if ( old_bank != bank )
 		LOG_BANK(( "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk ));
 
-	memory_set_bank( THOM_RAM_BANK, bank );
-	memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0,
-				       (mess_ram_size == 192*1024 || bank < 6) ?
-				       (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) : SMH_NOP );
+	if ( mess_ram_size == 192*1024 || bank < 6 )
+	{
+		memory_set_bank( THOM_RAM_BANK, bank );
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0, (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
+	}
+	else
+	{
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0, SMH_NOP );
+	}
+
 	old_bank = bank;
 }
 
@@ -2865,7 +2884,10 @@ MACHINE_START ( to9 )
 	memory_configure_bank( THOM_CART_BANK, 0, 12, mem + 0x10000, 0x4000 );
 	memory_configure_bank( THOM_BASE_BANK, 0,  1, mess_ram + 0x4000, 0x4000 );
 	memory_configure_bank( THOM_RAM_BANK,  0, 10, mess_ram + 0x8000, 0x4000 );
+	memory_set_bank( THOM_VRAM_BANK, 0 );
+	memory_set_bank( THOM_CART_BANK, 0 );
 	memory_set_bank( THOM_BASE_BANK, 0 );
+	memory_set_bank( THOM_RAM_BANK,  0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -3287,18 +3309,18 @@ static void to8_update_ram_bank ( void )
 	    undistorted space, such as cartridge, page 0 (video), or page 1
 	*/
 	to8_data_vpage = bank;
-	memory_set_bank( TO8_DATA_LO, to8_data_vpage );
-	memory_set_bank( TO8_DATA_HI, to8_data_vpage );
-	memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0,
-				       (mess_ram_size == 512*1024 || to8_data_vpage < 16) ?
-				       to8_data_vpage <= 4 ? to8_data_lo_w :
-				       (write8_machine_func)(STATIC_BANK1 + TO8_DATA_LO - 1) :
-				       SMH_NOP );
-	memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0,
-				       (mess_ram_size == 512*1024 || to8_data_vpage < 16) ?
-				       to8_data_vpage <= 4 ? to8_data_hi_w :
-				       (write8_machine_func)(STATIC_BANK1 + TO8_DATA_HI - 1) :
-				       SMH_NOP );
+	if ( mess_ram_size == 512*1024 || to8_data_vpage < 16 )
+	{
+		memory_set_bank( TO8_DATA_LO, to8_data_vpage );
+		memory_set_bank( TO8_DATA_HI, to8_data_vpage );
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, to8_data_vpage <= 4 ? to8_data_lo_w : (write8_machine_func)(STATIC_BANK1 + TO8_DATA_LO - 1) );
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, to8_data_vpage <= 4 ? to8_data_hi_w : (write8_machine_func)(STATIC_BANK1 + TO8_DATA_HI - 1) );
+	}
+	else
+	{
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_NOP );
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP );
+	}
 }
 
 
@@ -3356,7 +3378,12 @@ static void to8_update_cart_bank ( void )
 				LOG_BANK(( "to8_update_cart_bank: CART is external cartridge bank %i\n", thom_cart_bank ));
 		}
 	}
-	memory_set_bank( THOM_CART_BANK, bank );
+
+	if ( mess_ram_size == 512*1024 || bank < 16 ) 
+	{
+		memory_set_bank( THOM_CART_BANK, bank );
+	}
+
 	old_bank = bank;
 }
 
@@ -3826,8 +3853,13 @@ MACHINE_START ( to8 )
 	memory_configure_bank( TO8_DATA_LO,    0, 32, mess_ram + 0x2000, 0x4000 );
 	memory_configure_bank( TO8_DATA_HI,    0, 32, mess_ram + 0x0000, 0x4000 );
 	memory_configure_bank( TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
-	memory_set_bank( TO8_SYS_LO, 0 );
-	memory_set_bank( TO8_SYS_HI, 0 );
+	memory_set_bank( THOM_CART_BANK, 0 );
+	memory_set_bank( THOM_VRAM_BANK, 0 );
+	memory_set_bank( TO8_SYS_LO,  0 );
+	memory_set_bank( TO8_SYS_HI,  0 );
+	memory_set_bank( TO8_DATA_LO, 0 );
+	memory_set_bank( TO8_DATA_HI, 0 );
+	memory_set_bank( TO8_BIOS_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -3988,8 +4020,13 @@ MACHINE_START ( to9p )
 	memory_configure_bank( TO8_DATA_LO,    0, 32, mess_ram + 0x2000, 0x4000 );
 	memory_configure_bank( TO8_DATA_HI,    0, 32, mess_ram + 0x0000, 0x4000 );
 	memory_configure_bank( TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
-	memory_set_bank( TO8_SYS_LO, 0 );
-	memory_set_bank( TO8_SYS_HI, 0 );
+	memory_set_bank( THOM_CART_BANK, 0 );
+	memory_set_bank( THOM_VRAM_BANK, 0 );
+	memory_set_bank( TO8_SYS_LO,  0 );
+	memory_set_bank( TO8_SYS_HI,  0 );
+	memory_set_bank( TO8_DATA_LO, 0 );
+	memory_set_bank( TO8_DATA_HI, 0 );
+	memory_set_bank( TO8_BIOS_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -4572,8 +4609,13 @@ MACHINE_START ( mo6 )
 	memory_configure_bank( TO8_DATA_LO,    0, 8, mess_ram + 0x2000, 0x4000 );
 	memory_configure_bank( TO8_DATA_HI,    0, 8, mess_ram + 0x0000, 0x4000 );
 	memory_configure_bank( TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
-	memory_set_bank( TO8_SYS_LO, 0 );
-	memory_set_bank( TO8_SYS_HI, 0 );
+	memory_set_bank( THOM_CART_BANK, 0 );
+	memory_set_bank( THOM_VRAM_BANK, 0 );
+	memory_set_bank( TO8_SYS_LO,  0 );
+	memory_set_bank( TO8_SYS_HI,  0 );
+	memory_set_bank( TO8_DATA_LO, 0 );
+	memory_set_bank( TO8_DATA_HI, 0 );
+	memory_set_bank( TO8_BIOS_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -4839,8 +4881,13 @@ MACHINE_START ( mo5nr )
 	memory_configure_bank( TO8_DATA_LO,    0, 8, mess_ram + 0x2000, 0x4000 );
 	memory_configure_bank( TO8_DATA_HI,    0, 8, mess_ram + 0x0000, 0x4000 );
 	memory_configure_bank( TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
-	memory_set_bank( TO8_SYS_LO, 0 );
-	memory_set_bank( TO8_SYS_HI, 0 );
+	memory_set_bank( THOM_CART_BANK, 0 );
+	memory_set_bank( THOM_VRAM_BANK, 0 );
+	memory_set_bank( TO8_SYS_LO,  0 );
+	memory_set_bank( TO8_SYS_HI,  0 );
+	memory_set_bank( TO8_DATA_LO, 0 );
+	memory_set_bank( TO8_DATA_HI, 0 );
+	memory_set_bank( TO8_BIOS_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
