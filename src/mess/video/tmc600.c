@@ -90,24 +90,14 @@ static CDP1869_CHAR_RAM_READ(tmc600_charram_r)
 	UINT16 pageaddr = pma & TMC600_PAGERAM_MASK;
 	UINT8 column = pageram[pageaddr];
 	UINT8 color = tmc600_get_color(pageaddr);
-	UINT16 charaddr = (column << 3) | (cma & 0x07);
+	UINT16 charaddr = ((cma & 0x08) << 8) | (column << 3) | (cma & 0x07);
 	UINT8 *charrom = memory_region(REGION_GFX1);
 	UINT8 cdb = charrom[charaddr] & 0x3f;
 
 	int ccb0 = BIT(color, 2);
 	int ccb1 = BIT(color, 1);
 
-	if (BIT(cma, 3))
-	{
-		charaddr += 0x800;
-	}
-
 	return (ccb1 << 7) | (ccb0 << 6) | cdb;
-}
-
-static CDP1869_CHAR_RAM_WRITE(tmc600_charram_w)
-{
-	// character ROM cannot be written to
 }
 
 static CDP1869_PCB_READ(tmc600_pcb_r)
@@ -120,7 +110,7 @@ static CDP1869_PCB_READ(tmc600_pcb_r)
 	return pcb;
 }
 
-static const cdp1869_interface tmc600_cdp1869_intf =
+static CDP1869_INTERFACE( tmc600_cdp1869_intf )
 {
 	SCREEN_TAG,
 	CDP1869_DOT_CLK_PAL,
@@ -130,7 +120,7 @@ static const cdp1869_interface tmc600_cdp1869_intf =
 	tmc600_pageram_w,
 	tmc600_pcb_r,
 	tmc600_charram_r,
-	tmc600_charram_w,
+	NULL,
 	NULL
 };
 
