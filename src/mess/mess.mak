@@ -100,7 +100,7 @@ CPUS += M68000
 CPUS += M68EC020
 CPUS += M68020
 #CPUS += M68040
-#CPUS += T11
+CPUS += T11
 CPUS += S2650
 #CPUS += TMS34010
 #CPUS += TMS34020
@@ -349,6 +349,7 @@ DRVLIBS = \
 	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
 	$(MESSOBJ)/be.a \
+	$(MESSOBJ)/bk.a \
 	$(MESSOBJ)/bondwell.a \
 	$(MESSOBJ)/cbm.a \
 	$(MESSOBJ)/cbmshare.a \
@@ -1214,6 +1215,11 @@ $(MESSOBJ)/orion.a:      \
 	$(MESS_DRIVERS)/orion.o \
 	$(MESS_MACHINE)/orion.o \
 	$(MESS_VIDEO)/orion.o \
+
+$(MESSOBJ)/bk.a:      \
+	$(MESS_DRIVERS)/bk.o \
+	$(MESS_MACHINE)/bk.o \
+	$(MESS_VIDEO)/bk.o \
 
 $(MESSOBJ)/bondwell.a: \
 	$(MESS_DRIVERS)/bw2.o
