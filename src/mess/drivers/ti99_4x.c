@@ -35,6 +35,7 @@ Historical notes: TI made several last minute design changes.
 #include "devices/harddriv.h"
 #include "machine/smartmed.h"
 #include "sound/5220intf.h"
+#include "machine/idectrl.h"
 
 /*
     memory map
@@ -528,6 +529,9 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_SOUND_ADD(TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* devices */
+	MDRV_IDE_CONTROLLER_ADD( "ide", ~0, ti99_ide_interrupt )	/* FIXME */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4_50hz)
@@ -557,6 +561,8 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
+	/* devices */
+	MDRV_IDE_CONTROLLER_ADD( "ide", ~0, ti99_ide_interrupt )	/* FIXME */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4a_60hz)
@@ -585,6 +591,9 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	/* devices */
+	MDRV_IDE_CONTROLLER_ADD( "ide", ~0, ti99_ide_interrupt )	/* FIXME */
 MACHINE_DRIVER_END
 
 
@@ -614,6 +623,9 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	/* devices */
+	MDRV_IDE_CONTROLLER_ADD( "ide", ~0, ti99_ide_interrupt )	/* FIXME */
 MACHINE_DRIVER_END
 
 
@@ -651,6 +663,9 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	/* devices */
+	MDRV_IDE_CONTROLLER_ADD( "ide", ~0, ti99_ide_interrupt )	/* FIXME */
 MACHINE_DRIVER_END
 
 

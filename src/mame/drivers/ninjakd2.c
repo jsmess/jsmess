@@ -8,8 +8,7 @@ The peculiar feature of this hardware is the ability to disable clearing of the
 sprite framebuffer, therefore overdrawing new sprites on top of the ones drawn
 in the previous frames.
 When sprite overdrawing is enabled, not all sprites leave trails: only the ones
-using color codes C, D, and E. Sprites using color code F have the special
-effect of clearing the trails which have been left by other sprites.
+using color codes C, D, and E.
 
 
 Game              Board
@@ -378,9 +377,9 @@ static ADDRESS_MAP_START( ninjakd2_main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(ninjakd2_bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE(ninjakd2_sprite_overdraw_w)
 	AM_RANGE(0xc208, 0xc20c) AM_WRITE(ninjakd2_bg_ctrl_w)	// scroll + enable
-	AM_RANGE(0xc800, 0xcdff) AM_RAM AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(&ninjakd2_fg_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_WRITE(ninjakd2_bgvideoram_w) AM_BASE(&ninjakd2_bg_videoram)
+	AM_RANGE(0xc800, 0xcdff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(&ninjakd2_fg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE(&ninjakd2_bg_videoram)
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
 	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE(&spriteram)
 ADDRESS_MAP_END
@@ -391,9 +390,9 @@ static ADDRESS_MAP_START( mnight_main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xd9ff) AM_RAM
 	AM_RANGE(0xda00, 0xdfff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(ninjakd2_bgvideoram_w) AM_BASE(&ninjakd2_bg_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(&ninjakd2_fg_videoram)
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE(&ninjakd2_bg_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(&ninjakd2_fg_videoram)
+	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("KEYCOIN")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("PAD1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("PAD2")
@@ -410,8 +409,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( robokid_main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(&ninjakd2_fg_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(&ninjakd2_fg_videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
 	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
 	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(robokid_bg0_videoram_r, robokid_bg0_videoram_w)	// banked
@@ -455,8 +454,8 @@ static ADDRESS_MAP_START( omegaf_main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(robokid_bg0_videoram_r, robokid_bg0_videoram_w)	// banked
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(&ninjakd2_fg_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(&ninjakd2_fg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
 	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE(&spriteram)
 ADDRESS_MAP_END
@@ -1473,8 +1472,8 @@ static DRIVER_INIT(mnight)
  *************************************/
 
 GAME( 1987, ninjakd2, 0,        ninjakd2, ninjakd2, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", 0 )
-GAME( 1987, ninjak2a, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2)", 0 )
-GAME( 1987, ninjak2b, ninjakd2, ninjakd2, rdaction, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3)", 0 )
+GAME( 1987, ninjak2a, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", 0 )
+GAME( 1987, ninjak2b, ninjakd2, ninjakd2, rdaction, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", 0 )
 GAME( 1987, rdaction, ninjakd2, ninjakd2, rdaction, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", 0 )
 GAME( 1987, mnight,   0,        mnight,   mnight,   mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", GAME_IMPERFECT_GRAPHICS )
 GAME( 1987, arkarea,  0,        mnight,   arkarea,  mnight,   ROT0,   "UPL", "Ark Area", 0 )

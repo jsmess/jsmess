@@ -157,30 +157,31 @@ READ8_HANDLER (specimx_video_color_r )
 	return specimx_color;
 }
 
-void specimx_set_bank(int i,int data) {		
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffbf, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xffc0, 0xffdf, 0, 0, SMH_BANK4);
+static void specimx_set_bank(running_machine *machine, int i,int data)
+{
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffbf, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xffc0, 0xffdf, 0, 0, SMH_BANK4);
 	memory_set_bankptr(4, mess_ram + 0xffc0);
 	switch(i) {
 		case 0 :			  
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, video_memory_w);
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, video_memory_w);
 			
 				memory_set_bankptr(1, mess_ram);
 				memory_set_bankptr(2, mess_ram + 0x9000);
 				memory_set_bankptr(3, mess_ram + 0xc000);				
 				break;
 		case 1 :
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_BANK2);
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_BANK2);
 			
 				memory_set_bankptr(1, mess_ram + 0x10000);
 				memory_set_bankptr(2, mess_ram + 0x19000);
 				memory_set_bankptr(3, mess_ram + 0x1c000);								
 				break;
 		case 2 :
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_UNMAP);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_UNMAP);
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
 			
 				memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000);
 				memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x19000);
@@ -194,7 +195,7 @@ void specimx_set_bank(int i,int data) {
 }
 WRITE8_HANDLER( specimx_select_bank )
 {	
-	specimx_set_bank(offset, data);	
+	specimx_set_bank(machine, offset, data);	
 }
 
 DRIVER_INIT(specimx)
@@ -239,7 +240,7 @@ static TIMER_CALLBACK( setup_pit8253_gates ) {
 
 MACHINE_RESET( specimx )
 {
-	specimx_set_bank(2,0x00); // Initiali load ROM disk
+	specimx_set_bank(machine, 2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;	
 	wd17xx_reset();
 	wd17xx_set_side(0);
@@ -313,18 +314,18 @@ WRITE8_HANDLER( specimx_sound_w)
 static UINT8 RR_register;
 static UINT8 RC_register;
 
-void erik_set_bank(void) {		
+static void erik_set_bank(running_machine *machine) {		
 	UINT8 bank1 = (RR_register & 3);
 	UINT8 bank2 = ((RR_register >> 2) & 3);
 	UINT8 bank3 = ((RR_register >> 4) & 3);
 	UINT8 bank4 = ((RR_register >> 6) & 3);
 	
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_BANK4);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_BANK5);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK6);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_BANK4);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_BANK5);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK6);
 	
 	switch(bank1) {
 		case 	1: 						
@@ -333,7 +334,7 @@ void erik_set_bank(void) {
 						memory_set_bankptr(1, mess_ram + 0x10000*(bank1-1));			 
 						break;		
 		case 	0: 
-						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 						memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000);	
 						break;
 	}
@@ -344,7 +345,7 @@ void erik_set_bank(void) {
 						memory_set_bankptr(2, mess_ram + 0x10000*(bank2-1) + 0x4000);			 
 						break;		
 		case 	0: 
-						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_UNMAP);
+						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_UNMAP);
 						memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x14000);	
 						break;
 	}
@@ -355,7 +356,7 @@ void erik_set_bank(void) {
 						memory_set_bankptr(3, mess_ram + 0x10000*(bank3-1) + 0x9000);			 
 						break;		
 		case 	0: 
-						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
+						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
 						memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x19000);	
 						break;
 	}
@@ -368,12 +369,12 @@ void erik_set_bank(void) {
 						memory_set_bankptr(6, mess_ram + 0x10000*(bank4-1) + 0x0f800);			 
 						break;		
 		case 	0: 
-						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_UNMAP);
+						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_UNMAP);
 						memory_set_bankptr(4, memory_region(REGION_CPU1) + 0x1c000);	
-						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_UNMAP);
-						memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_NOP);
-						memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_w);
-						memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_r);
+						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_UNMAP);
+						memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_NOP);
+						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_w);
+						memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_r);
 						break;
 	}
 }
@@ -401,7 +402,7 @@ MACHINE_RESET( erik )
 	
 	RR_register = 0x00;	
 	RC_register = 0x00;
-	erik_set_bank();				
+	erik_set_bank(machine);				
 }
 
 READ8_HANDLER ( erik_rr_reg_r )
@@ -411,7 +412,7 @@ READ8_HANDLER ( erik_rr_reg_r )
 WRITE8_HANDLER( erik_rr_reg_w ) 
 {
 	RR_register = data;
-	erik_set_bank();
+	erik_set_bank(machine);
 }
 
 READ8_HANDLER ( erik_rc_reg_r ) 

@@ -314,19 +314,19 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 	/* set ram bank, for invalid pages a nop-handler will be installed */
 	if (ram_page >= mess_ram_size/0x8000)
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_NOP, SMH_NOP);
 	}
 	else if (ram_page + 1 == mess_ram_size/0x8000)
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
 		memory_set_bank(4, ram_page);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK3, SMH_BANK3);
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK3, SMH_BANK3);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
 		memory_set_bank(3, ram_page);
 		memory_set_bank(4, ram_page);
 	}
@@ -362,8 +362,8 @@ DRIVER_INIT( rs128 )
 	z80dart_init(0, &mtx_dart_intf);
 
 	/* install handlers for dart interface */
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_IO, 0x0c, 0x0d, 0, 0, mtx_dart_data_r, mtx_dart_data_w);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_IO, 0x0e, 0x0f, 0, 0, mtx_dart_control_r, mtx_dart_control_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0c, 0x0d, 0, 0, mtx_dart_data_r, mtx_dart_data_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0f, 0, 0, mtx_dart_control_r, mtx_dart_control_w);
 }
 
 MACHINE_RESET( rs128 )

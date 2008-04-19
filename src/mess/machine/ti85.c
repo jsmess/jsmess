@@ -130,12 +130,12 @@ static TIMER_CALLBACK(ti85_timer_callback)
 	}
 }
 
-static void update_ti85_memory (void)
+static void update_ti85_memory (running_machine *machine)
 {
 	memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x010000 + 0x004000*ti85_memory_page_0x4000);
 }
 
-static void update_ti86_memory (void)
+static void update_ti86_memory (running_machine *machine)
 {
 	write8_machine_func wh;
 
@@ -150,7 +150,7 @@ static void update_ti86_memory (void)
 		memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x010000 + 0x004000*(ti85_memory_page_0x4000&0x0f));
 		wh = SMH_UNMAP;
 	}
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, wh);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, wh);
 
 	if (ti86_memory_page_0x8000 & 0x40)
 	{
@@ -163,7 +163,7 @@ static void update_ti86_memory (void)
 		memory_set_bankptr(3,memory_region(REGION_CPU1) + 0x010000 + 0x004000*(ti86_memory_page_0x8000&0x0f));
 		wh = SMH_UNMAP;
 	}
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, wh);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, wh);
 }
 
 /***************************************************************************
@@ -195,8 +195,8 @@ MACHINE_START( ti81 )
 
 	timer_pulse(ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
 	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
 	memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
 }
@@ -225,8 +225,8 @@ MACHINE_START( ti85 )
 
 	timer_pulse(ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
 	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
 	memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
 
@@ -254,7 +254,7 @@ MACHINE_START( ti86 )
 
 	ti86_ram = auto_malloc(128*1024);
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
 		memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
 		memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
@@ -392,7 +392,7 @@ WRITE8_HANDLER ( ti85_port_0004_w )
 WRITE8_HANDLER ( ti85_port_0005_w )
 {
 	ti85_memory_page_0x4000 = data;
-	update_ti85_memory();
+	update_ti85_memory(machine);
 }
 
 WRITE8_HANDLER ( ti85_port_0006_w )
@@ -412,13 +412,13 @@ WRITE8_HANDLER ( ti85_port_0007_w )
 WRITE8_HANDLER ( ti86_port_0005_w )
 {
 	ti85_memory_page_0x4000 = data&((data&0x40)?0x47:0x4f);
-	update_ti86_memory();
+	update_ti86_memory(machine);
 }
 
 WRITE8_HANDLER ( ti86_port_0006_w )
 {
 	ti86_memory_page_0x8000 = data&((data&0x40)?0x47:0x4f);
-	update_ti86_memory();
+	update_ti86_memory(machine);
 }
 
 
@@ -547,7 +547,7 @@ static void ti85_setup_snapshot (running_machine *machine, UINT8 * data)
 	ti85_keypad_mask = hdw[0x00]&0x7f;
 
 	ti85_memory_page_0x4000 = hdw[0x08]&0xff;
-	update_ti85_memory ();
+	update_ti85_memory(machine);
 
 	ti85_power_mode = hdw[0x14]&0xff;
 
@@ -589,7 +589,7 @@ static void ti86_setup_snapshot (running_machine *machine, UINT8 * data)
 	ti86_memory_page_0x8000 = hdw[0x0c]&0xff ? 0x40 : 0x00;
 	ti86_memory_page_0x8000 |= hdw[0x10]&0x0f;
 
-	update_ti86_memory ();
+	update_ti86_memory(machine);
 
 	lo = hdw[0x2c] & 0x0ff;
 	hi = hdw[0x2d] & 0x0ff;

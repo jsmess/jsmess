@@ -415,7 +415,7 @@ const cia6526_interface c64_cia1 =
 	}
 };
 
-static void c64_bankswitch (int reset);
+static void c64_bankswitch(running_machine *machine, int reset);
 static void c64_robocop2_w(running_machine *machine, int offset, int value)
 {
 	/* robocop2 0xe00
@@ -437,7 +437,7 @@ static void c64_robocop2_w(running_machine *machine, int offset, int value)
 	if (is_c128(machine))
 		c128_bankswitch_64(machine, 0);
 	else
-		c64_bankswitch(0);
+		c64_bankswitch(machine, 0);
 }
 
 static void c64_supergames_w(running_machine *machine, int offset, int value)
@@ -465,7 +465,7 @@ static void c64_supergames_w(running_machine *machine, int offset, int value)
 	if (is_c128(machine))
 		c128_bankswitch_64 (machine, 0);
 	else
-		c64_bankswitch (0);
+		c64_bankswitch(machine, 0);
 }
 
 WRITE8_HANDLER( c64_write_io )
@@ -602,7 +602,7 @@ READ8_HANDLER(c64_ioarea_r)
  * E000    ROMH    RAM
  * F000    ROMH    ROMH
  */
-static void c64_bankswitch (int reset)
+static void c64_bankswitch(running_machine *machine, int reset)
 {
 	static int old = -1, exrom, game;
 	int data, loram, hiram, charen;
@@ -651,8 +651,8 @@ static void c64_bankswitch (int reset)
 		|| (charen && (loram || hiram)))
 	{
 		c64_io_enabled = 1;
-//		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_read_io);
-//		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_write_io);
+//		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_read_io);
+//		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_write_io);
 //		if ( cpu_getactivecpu() >= 0 )
 //			memory_set_opbase(activecpu_get_physical_pc_byte());
 	}
@@ -665,8 +665,8 @@ static void c64_bankswitch (int reset)
 		} else {
 			c64_io_ram_r_ptr = c64_memory + 0xd000;
 		}
-//		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK5);
-//		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK6);
+//		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK5);
+//		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK6);
 //		memory_set_bankptr (6, c64_memory + 0xd000);
 //		if (!charen && (loram || hiram))
 //		{
@@ -681,7 +681,7 @@ static void c64_bankswitch (int reset)
 	if (!c64_game && c64_exrom)
 	{
 		memory_set_bankptr (7, romh);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_NOP);
 	}
 	else
 	{
@@ -748,7 +748,7 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 		//c65_bankswitch();
 	}
 	else if (!ultimax)
-		c64_bankswitch (0);
+		c64_bankswitch(Machine, 0);
 	c64_memory[0x000] = program_read_byte( 0 );
 	c64_memory[0x001] = program_read_byte( 1 );
 }
@@ -998,9 +998,9 @@ MACHINE_START( c64 )
 	c64_rom_load();
 
 	if (is_c128(machine))
-		c128_bankswitch_64 (machine, 1);
+		c128_bankswitch_64(machine, 1);
 	if (!ultimax)
-		c64_bankswitch (1);
+		c64_bankswitch(machine, 1);
 	memory_set_opbase_handler( 0, c64_opbase );
 }
 

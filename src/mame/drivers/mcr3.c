@@ -455,7 +455,7 @@ static ADDRESS_MAP_START( mcrmono_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xea00, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE(mcr3_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_RAM, mcr3_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xf800, 0xffff) AM_ROM		/* schematics show a 2716 @ 2B here, but nobody used it */
 ADDRESS_MAP_END
 
@@ -485,8 +485,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spyhunt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(SMH_RAM, spyhunt_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, spyhunt_alpharam_w) AM_BASE(&spyhunt_alpharam)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_BASE(&spyhunt_alpharam)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_WRITE(mcr3_paletteram_w) AM_BASE(&paletteram)
@@ -1468,26 +1468,26 @@ static void mcr_common_init(int sound_board)
 static DRIVER_INIT( demoderm )
 {
 	mcr_common_init(MCR_TURBO_CHIP_SQUEAK);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x01, 0x01, 0, 0, demoderm_ip1_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, demoderm_ip2_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, demoderm_op6_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x01, 0x01, 0, 0, demoderm_ip1_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, demoderm_ip2_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, demoderm_op6_w);
 }
 
 
 static DRIVER_INIT( sarge )
 {
 	mcr_common_init(MCR_TURBO_CHIP_SQUEAK);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, turbocs_data_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, turbocs_data_w);
 }
 
 
 static DRIVER_INIT( maxrpm )
 {
 	mcr_common_init(MCR_TURBO_CHIP_SQUEAK);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x01, 0x01, 0, 0, maxrpm_ip1_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, maxrpm_ip2_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, maxrpm_op5_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, maxrpm_op6_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x01, 0x01, 0, 0, maxrpm_ip1_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, maxrpm_ip2_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, maxrpm_op5_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, maxrpm_op6_w);
 
 	state_save_register_global(maxrpm_adc_control);
 	state_save_register_global(maxrpm_adc_select);
@@ -1500,26 +1500,26 @@ static DRIVER_INIT( maxrpm )
 static DRIVER_INIT( rampage )
 {
 	mcr_common_init(MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, rampage_ip4_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, rampage_op6_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, rampage_ip4_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, rampage_op6_w);
 }
 
 
 static DRIVER_INIT( powerdrv )
 {
 	mcr_common_init(MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, powerdrv_ip2_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, powerdrv_op5_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, powerdrv_op6_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, powerdrv_ip2_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, powerdrv_op5_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, powerdrv_op6_w);
 }
 
 
 static DRIVER_INIT( stargrds )
 {
 	mcr_common_init(MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0, stargrds_ip0_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, stargrds_op5_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, stargrds_op6_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0, stargrds_ip0_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, stargrds_op5_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, stargrds_op6_w);
 }
 
 
@@ -1558,7 +1558,7 @@ static DRIVER_INIT( turbotag )
 	cpunum_suspend(1, SUSPEND_REASON_DISABLE, 1);
 
 	/* kludge for bad ROM read */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0b53, 0x0b53, 0, 0, turbotag_kludge_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0b53, 0x0b53, 0, 0, turbotag_kludge_r);
 }
 
 

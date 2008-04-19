@@ -71,9 +71,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
-	AM_RANGE(0x02000, 0x027ff) AM_READWRITE(SMH_RAM, raiden_background_w) AM_BASE(&raiden_back_data)
-	AM_RANGE(0x02800, 0x02fff) AM_READWRITE(SMH_RAM, raiden_foreground_w) AM_BASE(&raiden_fore_data)
-	AM_RANGE(0x03000, 0x03fff) AM_READWRITE(SMH_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE(raiden_background_w) AM_BASE(&raiden_back_data)
+	AM_RANGE(0x02800, 0x02fff) AM_RAM_WRITE(raiden_foreground_w) AM_BASE(&raiden_fore_data)
+	AM_RANGE(0x03000, 0x03fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x07ffe, 0x0afff) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
@@ -473,12 +473,12 @@ static READ16_HANDLER( sub_cpu_spina_r )
 
 static DRIVER_INIT( raiden )
 {
-	memory_install_read16_handler(1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spin_r);
+	memory_install_read16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spin_r);
 }
 
-static void memory_patcha(void)
+static void memory_patcha(running_machine *machine)
 {
-	memory_install_read16_handler(1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spina_r);
+	memory_install_read16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spina_r);
 }
 
 /* This is based on code by Niclas Karlsson Mate, who figured out the
@@ -512,13 +512,13 @@ static void common_decrypt(void)
 
 static DRIVER_INIT( raidenk )
 {
-	memory_patcha();
+	memory_patcha(machine);
 	common_decrypt();
 }
 
 static DRIVER_INIT( raidena )
 {
-	memory_patcha();
+	memory_patcha(machine);
 	common_decrypt();
 	seibu_sound_decrypt(REGION_CPU3,0x20000);
 }

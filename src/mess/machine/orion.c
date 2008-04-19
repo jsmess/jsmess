@@ -309,7 +309,7 @@ WRITE8_HANDLER ( orionz80_sound_fe_w )
 WRITE8_HANDLER ( orionz80_memory_page_w );
 WRITE8_HANDLER ( orionz80_dispatcher_w );
 
-void orionz80_switch_bank(void)
+static void orionz80_switch_bank(running_machine *machine)
 {
 	UINT8 bank_select;
 	UINT8 segment_select;
@@ -317,7 +317,7 @@ void orionz80_switch_bank(void)
 	bank_select = (orionz80_dispatcher & 0x0c) >> 2;
 	segment_select = orionz80_dispatcher & 0x03;
 	
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	if ((orionz80_dispatcher & 0x80)==0) { // dispatcher on
 		memory_set_bankptr(1, mess_ram + 0x10000 * bank_select + segment_select * 0x4000 );		
 	} else { // dispatcher off
@@ -327,19 +327,19 @@ void orionz80_switch_bank(void)
 	memory_set_bankptr(2, mess_ram + 0x4000 + 0x10000 * orionz80_memory_page);		
 	
 	if ((orionz80_dispatcher & 0x20) == 0) {
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_w);	
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_r);	
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_w);	
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_r);	
 		
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfeff, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfeff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 		
 		memory_set_bankptr(3, mess_ram + 0xf000);				
 		memory_set_bankptr(5, memory_region(REGION_CPU1) + 0xf800);		
@@ -355,34 +355,34 @@ void orionz80_switch_bank(void)
 WRITE8_HANDLER ( orionz80_memory_page_w )
 {	
 	orionz80_memory_page = data & 7;
-	orionz80_switch_bank();
+	orionz80_switch_bank(machine);
 }
 
 WRITE8_HANDLER ( orionz80_dispatcher_w )
 {	
 	orionz80_dispatcher = data;
-	orionz80_switch_bank();
+	orionz80_switch_bank(machine);
 }
 
 MACHINE_RESET ( orionz80 ) 
 {	
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xefff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf3ff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xefff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf3ff, 0, 0, SMH_BANK3);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_w);	
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_r);	
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_w);	
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_r);	
 	
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfeff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfeff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 	
 	
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0xf800);		

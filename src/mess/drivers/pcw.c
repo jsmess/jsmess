@@ -267,14 +267,14 @@ static void pcw_update_read_memory_block(int block, int bank)
 	{
 		/* when upper 16 bytes are accessed use keyboard read
            handler */
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
+		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
 			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, 0, 0,
 			pcw_keyboard_r);
 	}
 	else
 	{
 		/* restore bank handler across entire block */
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
+		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
 			block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,
 			(read8_machine_func) (STATIC_BANK1 + (FPTR)block));
 	}

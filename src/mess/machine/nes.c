@@ -56,7 +56,7 @@ static nes_input in_1;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void init_nes_core(void);
+static void init_nes_core(running_machine *machine);
 static void nes_machine_stop(running_machine *machine);
 
 
@@ -70,7 +70,7 @@ static const device_config *cartslot_image(void)
 	return image_from_devtype_and_index(IO_CARTSLOT, 0);
 }
 
-static void init_nes_core (void)
+static void init_nes_core (running_machine *machine)
 {
 	/* We set these here in case they weren't set in the cart loader */
 	nes.rom = memory_region(REGION_CPU1);
@@ -80,8 +80,8 @@ static void init_nes_core (void)
 
 	/* Brutal hack put in as a consequence of the new memory system; we really
 	 * need to fix the NES code */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK10);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK10);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK10);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK10);
 	memory_set_bankptr(10, nes.rom);
 
 	battery_ram = nes.wram;
@@ -92,12 +92,12 @@ static void init_nes_core (void)
 		case 20:
 			nes.slow_banking = 0;
 			nes_fds.data = auto_malloc( 0x8000 );
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4030, 0x403f, 0, 0, fds_r);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xdfff, 0, 0, SMH_BANK2);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4030, 0x403f, 0, 0, fds_r);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xdfff, 0, 0, SMH_BANK2);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK1);
 
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4020, 0x402f, 0, 0, fds_w);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xdfff, 0, 0, SMH_BANK2);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4020, 0x402f, 0, 0, fds_w);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xdfff, 0, 0, SMH_BANK2);
 
 			memory_set_bankptr(1, &nes.rom[0xe000]);
 			memory_set_bankptr(2, nes_fds.data );
@@ -105,22 +105,22 @@ static void init_nes_core (void)
 		case 40:
 			nes.slow_banking = 1;
 			/* Game runs code in between banks, so we do things different */
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_RAM);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, SMH_ROM);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_RAM);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, SMH_ROM);
 
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, nes_mapper_w);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, nes_mapper_w);
 			break;
 		default:
 			nes.slow_banking = 0;
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK5);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_BANK2);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK3);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK4);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK5);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_BANK2);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK3);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK4);
 
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, nes_mapper_w);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, nes_mapper_w);
 			break;
 	}
 
@@ -185,7 +185,7 @@ MACHINE_RESET( nes )
 
 MACHINE_START( nes )
 {
-	init_nes_core();
+	init_nes_core(machine);
 	add_exit_callback(machine, nes_machine_stop);
 }
 

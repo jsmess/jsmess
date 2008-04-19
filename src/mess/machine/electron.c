@@ -173,9 +173,9 @@ WRITE8_HANDLER( electron_ula_w ) {
 			ula.rompage = data & 0x0f;
 			if ( ula.rompage == 8 || ula.rompage == 9 ) {
 				ula.rompage = 8;
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, electron_read_keyboard );
+				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, electron_read_keyboard );
 			} else {
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2 );
+				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2 );
 			}
 			memory_set_bank(2, ula.rompage);
 		}

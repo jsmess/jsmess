@@ -129,7 +129,7 @@ const char *ram_string(char *buffer, UINT32 ram)
 
 /* ----------------------------------------------------------------------- */
 
-UINT8 *memory_install_ram8_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t ram_offset, int bank)
+UINT8 *memory_install_ram8_handler(running_machine *machine, int cpunum, int spacenum, offs_t start, offs_t end, offs_t ram_offset, int bank)
 {
 	read8_machine_func read_bank = (read8_machine_func) (FPTR)(STATIC_BANK1 + bank - 1);
 	write8_machine_func write_bank = (write8_machine_func) (FPTR)(STATIC_BANK1 + bank - 1);
@@ -137,15 +137,15 @@ UINT8 *memory_install_ram8_handler(int cpunum, int spacenum, offs_t start, offs_
 
 	memory_set_bankptr(bank, mess_ram + ram_offset);
 
-	memory_install_read8_handler(cpunum, spacenum, start,
+	memory_install_read8_handler(machine, cpunum, spacenum, start,
 		MIN(end, start - ram_offset + mess_ram_size - 1), 0, 0, read_bank);
-	memory_install_write8_handler(cpunum, spacenum, start,
+	memory_install_write8_handler(machine, cpunum, spacenum, start,
 		MIN(end, start - ram_offset + mess_ram_size - 1), 0, 0, write_bank);
 
 	if (bank_size > (mess_ram_size - ram_offset))
 	{
-		memory_install_read8_handler(cpunum, spacenum, start - ram_offset + mess_ram_size, end, 0, 0, SMH_ROM);
-		memory_install_write8_handler(cpunum, spacenum, start - ram_offset + mess_ram_size, end, 0, 0, SMH_ROM);
+		memory_install_read8_handler(machine, cpunum, spacenum, start - ram_offset + mess_ram_size, end, 0, 0, SMH_ROM);
+		memory_install_write8_handler(machine, cpunum, spacenum, start - ram_offset + mess_ram_size, end, 0, 0, SMH_ROM);
 	}
 	return mess_ram + ram_offset;
 }

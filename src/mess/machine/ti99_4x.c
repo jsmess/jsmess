@@ -102,10 +102,10 @@ static void ti99_CS_output(int offset, int data);
 static void ti99_8_internal_dsr_reset(void);
 
 static void ti99_4p_internal_dsr_reset(void);
-static void ti99_TIxram_init(void);
-static void ti99_sAMSxram_init(void);
-static void ti99_4p_mapper_init(void);
-static void ti99_myarcxram_init(void);
+static void ti99_TIxram_init(running_machine *machine);
+static void ti99_sAMSxram_init(running_machine *machine);
+static void ti99_4p_mapper_init(running_machine *machine);
+static void ti99_myarcxram_init(running_machine *machine);
 static void ti99_evpc_reset(void);
 
 /*
@@ -727,9 +727,9 @@ void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxpar
            how the switches are set. Later we use the configuration switches to
            determine which one to use. */
 	ti99_peb_init();
-        ti99_floppy_controllers_init_all(machine);
-        ti99_ide_init();
-        ti99_rs232_init();
+	ti99_floppy_controllers_init_all(machine);
+	ti99_ide_init();
+	ti99_rs232_init();
 	ti99_hsgpl_init();
 	ti99_usbsm_init();
 }
@@ -821,8 +821,8 @@ MACHINE_RESET( ti99 )
 
 		if (ti99_model != model_99_8)
 		{
-			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x93ff, 0, 0, ti99_rspeech_r);
-			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x9400, 0x97ff, 0, 0, ti99_wspeech_w);
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x93ff, 0, 0, ti99_rspeech_r);
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9400, 0x97ff, 0, 0, ti99_wspeech_w);
 
 			sndti_set_info_int(SOUND_TMS5220, 0, SNDINFO_INT_TMS5220_VARIANT, variant_tmc0285);
 		}
@@ -831,8 +831,8 @@ MACHINE_RESET( ti99 )
 	{
 		if (ti99_model != model_99_8)
 		{
-			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x93ff, 0, 0, ti99_nop_8_r);
-			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x9400, 0x97ff, 0, 0, ti99_nop_8_w);
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x93ff, 0, 0, ti99_nop_8_r);
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9400, 0x97ff, 0, 0, ti99_nop_8_w);
 		}
 	}
 
@@ -840,25 +840,25 @@ MACHINE_RESET( ti99 )
 	{
 	case xRAM_kind_none:
 	default:
-		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_nop_8_r);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_nop_8_w);
-		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_nop_8_r);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_nop_8_w);
+		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_nop_8_r);
+		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_nop_8_w);
+		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_nop_8_r);
+		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_nop_8_w);
 		break;
 	case xRAM_kind_TI:
-		ti99_TIxram_init();
+		ti99_TIxram_init(machine);
 		break;
 	case xRAM_kind_super_AMS:
-		ti99_sAMSxram_init();
+		ti99_sAMSxram_init(machine);
 		break;
 	case xRAM_kind_99_4p_1Mb:
-		ti99_4p_mapper_init();
+		ti99_4p_mapper_init(machine);
 		break;
 	case xRAM_kind_foundation_128k:
 	case xRAM_kind_foundation_512k:
 	case xRAM_kind_myarc_128k:
 	case xRAM_kind_myarc_512k:
-		ti99_myarcxram_init();
+		ti99_myarcxram_init(machine);
 		break;
 	case xRAM_kind_99_8:
 		break;
@@ -2610,12 +2610,12 @@ static WRITE16_HANDLER ( ti99_TIxramlow_w );
 static READ16_HANDLER ( ti99_TIxramhigh_r );
 static WRITE16_HANDLER ( ti99_TIxramhigh_w );
 
-static void ti99_TIxram_init(void)
+static void ti99_TIxram_init(running_machine *machine)
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_TIxramlow_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_TIxramlow_w);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_TIxramhigh_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_TIxramhigh_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_TIxramlow_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_TIxramlow_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_TIxramhigh_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_TIxramhigh_w);
 }
 
 /* low 8 kb: 0x2000-0x3fff */
@@ -2682,15 +2682,15 @@ static int sAMSlookup[16];
 
 
 /* set up super AMS handlers, and set initial state */
-static void ti99_sAMSxram_init(void)
+static void ti99_sAMSxram_init(running_machine *machine)
 {
 	int i;
 
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_sAMSxramlow_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_sAMSxramlow_w);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_sAMSxramhigh_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_sAMSxramhigh_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_sAMSxramlow_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_sAMSxramlow_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_sAMSxramhigh_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_sAMSxramhigh_w);
 
 	ti99_peb_set_card_handlers(0x1e00, & sAMS_expansion_handlers);
 
@@ -2792,27 +2792,27 @@ static int ti99_4p_mapper_lookup[16];
 
 
 /* set up handlers, and set initial state */
-static void ti99_4p_mapper_init(void)
+static void ti99_4p_mapper_init(running_machine *machine)
 {
 	int i;
 
 	/* Not required at run-time */
-	/*memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, SMH_BANK3);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, SMH_BANK3);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, SMH_BANK4);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, SMH_BANK4);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, SMH_BANK5);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, SMH_BANK5);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, SMH_BANK6);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, SMH_BANK6);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, SMH_BANK7);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, SMH_BANK7);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, SMH_BANK8);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, SMH_BANK8);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, SMH_BANK9);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, SMH_BANK9);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, SMH_BANK10);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, SMH_BANK10);*/
+	/*memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, SMH_BANK3);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, SMH_BANK3);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, SMH_BANK4);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, SMH_BANK4);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, SMH_BANK5);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, SMH_BANK5);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, SMH_BANK6);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, SMH_BANK6);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, SMH_BANK7);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, SMH_BANK7);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, SMH_BANK8);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, SMH_BANK8);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, SMH_BANK9);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, SMH_BANK9);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, SMH_BANK10);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, SMH_BANK10);*/
 
 	ti99_peb_set_16bit_card_handlers(0x1e00, & ti99_4p_mapper_handlers);
 
@@ -2946,12 +2946,12 @@ static int myarc_page_offset_mask;
 
 
 /* set up myarc handlers, and set initial state */
-static void ti99_myarcxram_init(void)
+static void ti99_myarcxram_init(running_machine *machine)
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_myarcxramlow_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_myarcxramlow_w);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_myarcxramhigh_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_myarcxramhigh_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_myarcxramlow_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_myarcxramlow_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_myarcxramhigh_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_myarcxramhigh_w);
 
 	switch (xRAM_kind)
 	{

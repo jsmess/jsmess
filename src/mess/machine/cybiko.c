@@ -79,29 +79,29 @@ static void cybiko_rs232_reset( void);
 // DRIVER INIT & EXIT //
 ////////////////////////
 
-static void init_ram_handler( offs_t start, offs_t size, offs_t mirror)
+static void init_ram_handler(running_machine *machine, offs_t start, offs_t size, offs_t mirror)
 {
-	memory_install_read_handler( 0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, mirror - size, STATIC_BANK1);
-	memory_install_write_handler( 0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, mirror - size, STATIC_BANK1);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, mirror - size, STATIC_BANK1);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, mirror - size, STATIC_BANK1);
 	memory_set_bankptr( 1, mess_ram);
 }
 
 DRIVER_INIT( cybikov1 )
 {
 	_logerror( 0, ("init_cybikov1\n"));
-	init_ram_handler( 0x200000, mess_ram_size, 0x200000);
+	init_ram_handler(machine, 0x200000, mess_ram_size, 0x200000);
 }
 
 DRIVER_INIT( cybikov2 )
 {
 	_logerror( 0, ("init_cybikov2\n"));
-	init_ram_handler( 0x200000, mess_ram_size, 0x200000);
+	init_ram_handler(machine, 0x200000, mess_ram_size, 0x200000);
 }
 
 DRIVER_INIT( cybikoxt )
 {
 	_logerror( 0, ("init_cybikoxt\n"));
-	init_ram_handler( 0x400000, mess_ram_size, 0x200000);
+	init_ram_handler(machine, 0x400000, mess_ram_size, 0x200000);
 }
 
 ////////////////////

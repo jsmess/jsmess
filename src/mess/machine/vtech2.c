@@ -192,8 +192,8 @@ WRITE8_HANDLER( laser_bank_select_w )
 				write_handler = SMH_NOP;
 			}
 		}
-		memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, read_handler);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, write_handler);
+		memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, read_handler);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, write_handler);
     }
 }
 

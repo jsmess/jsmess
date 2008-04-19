@@ -113,8 +113,8 @@ static READ8_HANDLER( jumpcoas_custom_io_r )
 static ADDRESS_MAP_START( fastfred_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_READWRITE(SMH_RAM, fastfred_videoram_w) AM_BASE(&fastfred_videoram)
-	AM_RANGE(0xd800, 0xd83f) AM_READWRITE(SMH_RAM, fastfred_attributes_w) AM_BASE(&fastfred_attributesram)
+	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE(&fastfred_videoram)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE(&fastfred_attributesram)
 	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(&fastfred_spriteram) AM_SIZE(&fastfred_spriteram_size)
 	AM_RANGE(0xd860, 0xdbff) AM_RAM // Unused, but initialized
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(input_port_0_r, SMH_RAM) AM_BASE(&fastfred_background_color)
@@ -136,10 +136,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jumpcoas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd03f) AM_READWRITE(SMH_RAM, fastfred_attributes_w) AM_BASE(&fastfred_attributesram)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE(&fastfred_attributesram)
 	AM_RANGE(0xd040, 0xd05f) AM_RAM AM_BASE(&fastfred_spriteram) AM_SIZE(&fastfred_spriteram_size)
 	AM_RANGE(0xd060, 0xd3ff) AM_RAM
-	AM_RANGE(0xd800, 0xdbff) AM_MIRROR(0x400) AM_READWRITE(SMH_RAM, fastfred_videoram_w) AM_BASE(&fastfred_videoram)
+	AM_RANGE(0xd800, 0xdbff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE(&fastfred_videoram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_RAM) AM_BASE(&fastfred_background_color)
 	AM_RANGE(0xe800, 0xe800) AM_READ(input_port_0_r)
 	AM_RANGE(0xe801, 0xe801) AM_READ(input_port_1_r)
@@ -166,9 +166,9 @@ static ADDRESS_MAP_START( imago_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x6fff) AM_ROM
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(SMH_RAM, imago_fg_videoram_w) AM_BASE(&imago_fg_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(SMH_RAM, fastfred_videoram_w) AM_BASE(&fastfred_videoram)
-	AM_RANGE(0xd800, 0xd83f) AM_READWRITE(SMH_RAM, fastfred_attributes_w) AM_BASE(&fastfred_attributesram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(imago_fg_videoram_w) AM_BASE(&imago_fg_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE(&fastfred_videoram)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE(&fastfred_attributesram)
 	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(&fastfred_spriteram) AM_SIZE(&fastfred_spriteram_size)
 	AM_RANGE(0xd860, 0xd8ff) AM_RAM // Unused, but initialized
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)
@@ -861,8 +861,8 @@ extern int fastfred_hardware_type;
 
 static DRIVER_INIT( flyboy )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
 	fastfred_hardware_type = 1;
 }
 
@@ -873,22 +873,19 @@ static DRIVER_INIT( flyboyb )
 
 static DRIVER_INIT( fastfred )
 {
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, SMH_NOP );
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r, SMH_NOP);
 	fastfred_hardware_type = 1;
 }
 
 static DRIVER_INIT( jumpcoas )
 {
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, SMH_NOP );
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
 	fastfred_hardware_type = 0;
 }
 
 static DRIVER_INIT( boggy84 )
 {
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, SMH_NOP );
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
 	fastfred_hardware_type = 2;
 }
 

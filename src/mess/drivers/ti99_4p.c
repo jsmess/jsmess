@@ -42,6 +42,7 @@
 #include "machine/smartmed.h"
 #include "sound/5220intf.h"
 #include "devices/harddriv.h"
+#include "machine/idectrl.h"
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 
@@ -263,6 +264,7 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_VIDEO_START(ti99_4ev)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
@@ -275,6 +277,9 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_SOUND_ADD(TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* devices */
+	MDRV_IDE_CONTROLLER_ADD( "ide", ~0, ti99_ide_interrupt )	/* FIXME */
 MACHINE_DRIVER_END
 
 

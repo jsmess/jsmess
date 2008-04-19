@@ -705,7 +705,7 @@ static ADDRESS_MAP_START( equites_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&equites_workram) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM AM_WRITE(equites_bg_videoram_w) AM_BASE(&equites_bg_videoram)
+	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE(&equites_bg_videoram)
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
 	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE(&spriteram16)
@@ -741,7 +741,7 @@ static ADDRESS_MAP_START( splndrbt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_WRITE(equites_bg_videoram_w) AM_BASE(&equites_bg_videoram)
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE(&equites_bg_videoram)
 	AM_RANGE(0x400800, 0x400fff) AM_RAM
 	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_BASE(&spriteram16)	// sprite RAM 0,1
 	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE(&spriteram16_2)	// sprite RAM 2 (8-bit)
@@ -1822,8 +1822,8 @@ static DRIVER_INIT( gekisou )
 	unpack_region(REGION_GFX3);
 
 	// install special handlers for unknown device (protection?)
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1836,7 +1836,7 @@ static DRIVER_INIT( hvoltage )
 	unpack_region(REGION_GFX3);
 
 #if HVOLTAGE_DEBUG
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
 #endif
 }
 

@@ -85,14 +85,14 @@ extern READ16_HANDLER( legionna_mcu_r );
 extern WRITE16_HANDLER( legionna_mcu_w );
 extern READ16_HANDLER( heatbrl_mcu_r );
 extern WRITE16_HANDLER( heatbrl_mcu_w );
-extern READ16_HANDLER( godzilla_cop_mcu_r );
-extern WRITE16_HANDLER( godzilla_cop_mcu_w );
-extern READ16_HANDLER( denjinmk_cop_mcu_r );
-extern WRITE16_HANDLER( denjinmk_cop_mcu_w );
-extern READ16_HANDLER( sdgndmrb_cop_mcu_r );
-extern WRITE16_HANDLER( sdgndmrb_cop_mcu_w );
-extern READ16_HANDLER( copdx_0_r );
-extern WRITE16_HANDLER( copdx_0_w );
+extern READ16_HANDLER( godzilla_mcu_r );
+extern WRITE16_HANDLER( godzilla_mcu_w );
+extern READ16_HANDLER( denjinmk_mcu_r );
+extern WRITE16_HANDLER( denjinmk_mcu_w );
+extern READ16_HANDLER( sdgndmrb_mcu_r );
+extern WRITE16_HANDLER( sdgndmrb_mcu_w );
+extern READ16_HANDLER( cupsoc_mcu_r );
+extern WRITE16_HANDLER( cupsoc_mcu_w );
 extern READ16_HANDLER( copdxbl_0_r );
 extern WRITE16_HANDLER( copdxbl_0_w );
 
@@ -117,56 +117,48 @@ extern VIDEO_UPDATE( sdgndmrb );
 extern UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
 
 
-static WRITE16_HANDLER( legionna_paletteram16_w )	/* xBBBBxRRRRxGGGGx */
-{
-	int a;
-	COMBINE_DATA(&paletteram16[offset]);
-	a = paletteram16[offset];
-	palette_set_color_rgb(Machine,offset,pal4bit(a >> 1),pal4bit(a >> 6),pal4bit(a >> 11));
-}
-
 /*****************************************************************************/
 
 
 static ADDRESS_MAP_START( legionna_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_READWRITE(legionna_mcu_r, legionna_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM AM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-	AM_RANGE(0x102800, 0x1037ff) AM_RAM AM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM
+	AM_RANGE(0x100400, 0x1007ff) AM_RAM AM_READWRITE(legionna_mcu_r, legionna_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
+	AM_RANGE(0x102800, 0x1037ff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
 	AM_RANGE(0x104000, 0x104fff) AM_RAM /* The 4000-4fff area contains PALETTE words and may be extra paletteram? */
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x106000, 0x106fff) AM_RAM /* is this used outside inits ?? */
-	AM_RANGE(0x107000, 0x107fff) AM_RAM AM_WRITE(legionna_paletteram16_w) AM_BASE(&paletteram16)	/* palette xRRRRxGGGGxBBBBx ? */
+	AM_RANGE(0x107000, 0x107fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)	/* palette xRRRRxGGGGxBBBBx ? */
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM /* main ram */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( heatbrl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_READWRITE(heatbrl_mcu_r, heatbrl_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
-	AM_RANGE(0x100800, 0x100fff) AM_RAM AM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM
+	AM_RANGE(0x100400, 0x1007ff) AM_RAM AM_READWRITE(heatbrl_mcu_r, heatbrl_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( godzilla_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_READWRITE(godzilla_cop_mcu_r, godzilla_cop_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM
+	AM_RANGE(0x100400, 0x1007ff) AM_RAM AM_READWRITE(godzilla_mcu_r, godzilla_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
 	AM_RANGE(0x100800, 0x100fff) AM_RAM
-	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-	AM_RANGE(0x102800, 0x1037ff) AM_RAM AM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-	AM_RANGE(0x103800, 0x103fff) AM_RAM AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
+	AM_RANGE(0x102800, 0x1037ff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
+	AM_RANGE(0x103800, 0x103fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x106000, 0x1067ff) AM_RAM
 	AM_RANGE(0x106800, 0x106fff) AM_RAM
@@ -174,33 +166,41 @@ static ADDRESS_MAP_START( godzilla_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
+/* did they swap the lines, or does the protection device swap the words during the DMA?? */
+WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
+{
+	offset^=1;
+	COMBINE_DATA(&paletteram16[offset]);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine,offset,data,mem_mask);
+}
+
 static ADDRESS_MAP_START( denjinmk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_READWRITE(denjinmk_cop_mcu_r, denjinmk_cop_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM
+	AM_RANGE(0x100400, 0x1007ff) AM_RAM AM_READWRITE(denjinmk_mcu_r, denjinmk_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
 	AM_RANGE(0x100800, 0x100fff) AM_RAM
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM AM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-	AM_RANGE(0x102800, 0x103fff) AM_RAM AM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
+	AM_RANGE(0x102800, 0x103fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
 	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x11dfff) AM_RAM
-	AM_RANGE(0x11e000, 0x11efff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x11e000, 0x11efff) AM_RAM_WRITE(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x11f000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sdgndmrb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_READWRITE(sdgndmrb_cop_mcu_r, sdgndmrb_cop_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
-	AM_RANGE(0x100800, 0x100fff) AM_RAM AM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-	AM_RANGE(0x103000, 0x103fff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM
+	AM_RANGE(0x100400, 0x1007ff) AM_RAM AM_READWRITE(sdgndmrb_mcu_r, sdgndmrb_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
 	AM_RANGE(0x105000, 0x105fff) AM_RAM
 	AM_RANGE(0x106000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x107fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
@@ -209,14 +209,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cupsoc_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_READWRITE(copdx_0_r,copdx_0_w) AM_BASE(&cop_mcu_ram)
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM
+	AM_RANGE(0x100400, 0x1007ff) AM_RAM AM_READWRITE(cupsoc_mcu_r,cupsoc_mcu_w) AM_BASE(&cop_mcu_ram)
 	AM_RANGE(0x100800, 0x100fff) AM_RAM AM_READWRITE(SMH_RAM,legionna_background_w) AM_BASE(&legionna_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-	AM_RANGE(0x103000, 0x103fff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) /*<according to the debug mode,there is a DMA that copies from here to the paletteram>*/
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) /*<according to the debug mode,there is a DMA that copies from here to the paletteram>*/
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
@@ -230,12 +230,12 @@ static ADDRESS_MAP_START( cupsocbl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_READWRITE(copdxbl_0_r,copdxbl_0_w) AM_BASE(&cop_mcu_ram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM AM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-	AM_RANGE(0x103000, 0x103fff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) /*<according to the debug mode,there is a DMA that copies from here to the paletteram>*/
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) /*<according to the debug mode,there is a DMA that copies from here to the paletteram>*/
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
@@ -1290,9 +1290,10 @@ ROM_START( legionna )
 	ROM_LOAD32_BYTE( "3",           0x00002, 0x20000, CRC(553fc7c0) SHA1(b12a2eea6b2c9bd76c0c74ddf2765d58510f586a) )
 	ROM_LOAD32_BYTE( "legion4.bin", 0x00003, 0x20000, CRC(2cc36c98) SHA1(484fc6eeeed89386ec69df0f92919b742cfdd89f) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "6",   0x00000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_USER1, ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD16_BYTE( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )
@@ -1331,9 +1332,10 @@ ROM_START( legionnu )
 	ROM_LOAD32_BYTE( "3",   0x00002, 0x20000, CRC(553fc7c0) SHA1(b12a2eea6b2c9bd76c0c74ddf2765d58510f586a) )
 	ROM_LOAD32_BYTE( "4",   0x00003, 0x20000, CRC(91fd4648) SHA1(8ad6d0512996b88d3c0c7a96912eebaae2333424) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "6",   0x00000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_USER1, ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD16_BYTE( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )	/* chars, some BK3 tiles too */
@@ -1372,9 +1374,10 @@ ROM_START( heatbrl )
 	ROM_LOAD32_BYTE( "3e_ver2.9f",   0x00002, 0x20000, CRC(a2c41715) SHA1(a15b7a35ae0792ed00c47426d2e07c445acd8b8d) )
 	ROM_LOAD32_BYTE( "4e_ver2.9h",   0x00003, 0x20000, CRC(a50f4f08) SHA1(f468e4a016a53803b8404bacdef5712311c6f0ac) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
@@ -1407,9 +1410,10 @@ ROM_START( heatbrlo )
 	ROM_LOAD32_BYTE( "barrel.3h",   0x00002, 0x20000, CRC(823373a0) SHA1(1bb7f811df4f85db8ca10e59fe22137a09470def) )
 	ROM_LOAD32_BYTE( "barrel.4h",   0x00003, 0x20000, CRC(19a8606b) SHA1(6e950212c532e46bb6645c3c1f8205c2a4ea2c87) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
@@ -1446,9 +1450,10 @@ ROM_START( heatbrlu )
 	ROM_LOAD32_BYTE( "3e_ver2.9f",   0x00002, 0x20000, CRC(a2c41715) SHA1(a15b7a35ae0792ed00c47426d2e07c445acd8b8d) )
 	ROM_LOAD32_BYTE( "4e_ver2.9h",   0x00003, 0x20000, CRC(a50f4f08) SHA1(f468e4a016a53803b8404bacdef5712311c6f0ac) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
@@ -1530,9 +1535,10 @@ ROM_START( godzilla )
 	ROM_LOAD32_BYTE( "4.026",        0x000002, 0x020000, CRC(bb8c0132) SHA1(fa8b049f590be710b3cf82f27deade63656db730) )
 	ROM_LOAD32_BYTE( "3.023",        0x000003, 0x020000, CRC(bb16e5d0) SHA1(31d8941e6e297b1f410944f0063a4c9219d23f23) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "8.016",        0x000000, 0x08000, CRC(4ab76e43) SHA1(40c34fade03161c4b50f9f6a2ae61078b8d8ea6d) )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "11.620",       0x000000, 0x010000, CRC(58e0e41f) SHA1(563c633eb3d4df41e467c93957c74b540a0ae43c) )
@@ -1647,17 +1653,17 @@ ROM_START( denjinmk )
 	ROM_LOAD32_BYTE( "rom3.026",        0x000002, 0x040000, CRC(781b942e) SHA1(f1f4ddc332de3dc29b716a1b82c2ecc2045efb3a) )
 	ROM_LOAD32_BYTE( "rom4.023",        0x000003, 0x040000, CRC(502a588b) SHA1(9055b631240fe52d33b572e34275d31a9f3d290f) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "rom5.016",        0x000000, 0x08000, CRC(7fe7e352) SHA1(1ceae22186751ca91dfffab7bd11f275e693451f) )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "rom7.620",       0x000000, 0x010000, CRC(e1f759b1) SHA1(ddc60e78e7791a59c59403dd4089b3f6e1ecf8cb) )
 	ROM_LOAD16_BYTE( "rom8.615",       0x000001, 0x010000, CRC(cc36af0d) SHA1(69c2ae38f03be79be4d138fcc73a6a86407eb285) )
 
 	ROM_REGION( 0x500000, REGION_GFX2, ROMREGION_DISPOSE )
-    ROM_LOAD( "obj-0-3.748",     0x000000, 0x100000, BAD_DUMP CRC(3dcc7b04) SHA1(3c3ad5ddc18a42046348dcb54e65f6173c003d72) ) /* half size?# 0,1 */
-	/* the graphics for this region are missing, the previous rom should probably be twice the size, note the filename 0-3 */
+    ROM_LOAD( "obj-0-3.748",     0x000000, 0x200000, CRC(67c26a67) SHA1(20543ca9dcf3fed0884968b5249b34b59a14b791) ) /* banks 0,1,2,3 */
 	ROM_LOAD( "obj-4-5.756",     0x200000, 0x100000, CRC(01f8d4e6) SHA1(25b69da693be8c3404f750b419c330a7a56e88ec) ) /* 4,5 */
 	ROM_LOAD( "obj-6-7.743",     0x300000, 0x100000, CRC(e5805757) SHA1(9d392c27eef7c1fcda560dac17ba9d7ae2287ac8) ) /* 6,7 */
 	ROM_LOAD( "obj-8-9.757",     0x400000, 0x100000, CRC(c8f7e1c9) SHA1(a746d187b50a0ecdd5a7f687a2601e5dc8bfe272) ) /* 8,9 */
@@ -1746,6 +1752,7 @@ ROM_START( sdgndmrb )
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rb-s.016",     0x000000, 0x08000, CRC(8439bf5b) SHA1(089009b91768d64edef6639e7694723d2d1c46ff) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "rb-f1.620",    0x000000, 0x010000, CRC(792c403d) SHA1(3c606af696fe8f3d6edefdab3940bd5eb341bca9) )
@@ -1782,9 +1789,10 @@ ROM_START( cupsoc )
 	ROM_LOAD32_BYTE( "scc_03.bin",   0x000002, 0x040000, CRC(2d23d78f) SHA1(c479ded8782f2d23e123b7d00ec57c18a8f80578) )
 	ROM_LOAD32_BYTE( "scc_04.bin",   0x000003, 0x040000, CRC(e8877461) SHA1(3be44459699fd455b0daaac10e8a37d1b7985607) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",    0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "scc_06.bin",   0x000000, 0x010000, CRC(f1a18ec6) SHA1(43f8ec3fc541b8dc2a17533329dd3448afadcb3b) )
@@ -1818,9 +1826,10 @@ ROM_START( cupsocs )
 	ROM_LOAD32_BYTE( "3_10f.bin",   0x000002, 0x040000, CRC(c0333f0c) SHA1(ed02897724de4cf981aa8c6ce98551b9e79efff3) )
 	ROM_LOAD32_BYTE( "4_10k.bin",   0x000003, 0x040000, CRC(288f11d4) SHA1(424cb3d1428f7195decce2ba6eebc1e24d9bb207) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "7_8a.bin",    0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "6_7x.bin",   0x000000, 0x010000, CRC(7981366e) SHA1(b859bf23c5ae466f4020958a06935192fa68ee8d) )
@@ -1854,9 +1863,10 @@ ROM_START( cupsocs2 )
 	ROM_LOAD32_BYTE( "seibu3.10f",   0x000002, 0x040000, CRC(3be8a330) SHA1(f821080acd29c5801abc36da3341aabaea82ceb0) )
 	ROM_LOAD32_BYTE( "seibu4.10k",   0x000003, 0x040000, CRC(f30167ea) SHA1(5431296e3245631c90362373027c54166f8fba16) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",    0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
@@ -1888,9 +1898,10 @@ ROM_START( olysoc92 )
 	ROM_LOAD32_BYTE( "u026.3",       0x000002, 0x040000, CRC(f71cc626) SHA1(7f66031509063d5fac33a3b5873b616c7ad0c25b) )
 	ROM_LOAD32_BYTE( "u023.4",       0x000003, 0x040000, CRC(2ba10e6c) SHA1(d682d97426a749cfdbaf728edb219dbf84e9eef8) )
 
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",    0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )

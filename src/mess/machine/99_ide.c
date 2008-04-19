@@ -27,8 +27,6 @@
 
 
 /* prototypes */
-static void ide_interrupt_callback(int state);
-
 static int ide_cru_r(running_machine *machine, int offset);
 static void ide_cru_w(running_machine *machine, int offset, int data);
 static READ8_HANDLER(ide_mem_r);
@@ -66,11 +64,6 @@ static int input_latch, output_latch;
 
 static int ide_irq, clk_irq;
 
-static const struct ide_interface ti99_ide_interface =
-{
-	ide_interrupt_callback
-};
-
 /* The card has a 8-bit->16-bit demultiplexer that can be set-up to assume
 either that the LSByte of a word is accessed first or that the MSByte of a word
 is accessed first.  The former is true with ti-99/4(a), the latter with the
@@ -79,11 +72,11 @@ only supported ti-99/4(a) (LSByte first) mode. */
 static int tms9995_mode;
 
 /*
-	ide_interrupt_callback()
+	ti99_ide_interrupt()
 
 	IDE interrupt callback
 */
-static void ide_interrupt_callback(int state)
+void ti99_ide_interrupt(int state)
 {
 	ide_irq = state;
 	if (cru_register & cru_reg_int_en)
@@ -221,7 +214,7 @@ static void ide_cru_w(running_machine *machine, int offset, int data)
 
 		if ((offset == 6) || (offset == 7))
 			if ((cru_register & cru_reg_int_en) && !(cru_register & cru_reg_reset))
-				ide_controller_reset(0);
+				devtag_reset(machine, IDE_CONTROLLER, "ide");
 		break;
 	}
 }
@@ -257,7 +250,8 @@ static READ8_HANDLER(ide_mem_r)
 		case 2:		/* IDE registers set 1 (CS1Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				input_latch = (! (offset & 0x10)) ? ide_bus_0_r(0, (offset >> 1) & 0x7) : 0;
+				const device_config *ide_device = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 0, (offset >> 1) & 0x7) : 0;
 			}
 
 			/* return latched input */
@@ -268,7 +262,8 @@ static READ8_HANDLER(ide_mem_r)
 		case 3:		/* IDE registers set 2 (CS3Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				input_latch = (! (offset & 0x10)) ? ide_bus_0_r(1, (offset >> 1) & 0x7) : 0;
+				const device_config *ide_device = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 1, (offset >> 1) & 0x7) : 0;
 			}
 
 			/* return latched input */
@@ -333,7 +328,8 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				ide_bus_0_w(0, (offset >> 1) & 0x7, output_latch);
+				const device_config *ide_device = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+				ide_bus_w(ide_device, 0, (offset >> 1) & 0x7, output_latch);
 			}
 			break;
 		case 3:		/* IDE registers set 2 (CS3Fx) */
@@ -350,7 +346,8 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				ide_bus_0_w(1, (offset >> 1) & 0x7, output_latch);
+				const device_config *ide_device = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+				ide_bus_w(ide_device, 1, (offset >> 1) & 0x7, output_latch);
 			}
 			break;
 		}
@@ -377,7 +374,7 @@ void ti99_ide_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, 
 		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_IDEDRIVE_INTERFACE: info->p = (void *) &ti99_ide_interface; break;
+		case DEVINFO_PTR_IDEDRIVE_INTERFACE: info->p = (void *) ~0; /* FIXME */ break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_DEV_TAG:					strcpy(info->s = device_temp_str(), "99_ide"); break;

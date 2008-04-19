@@ -72,7 +72,7 @@ extern QUICKLOAD_LOAD( spectrum );
 
 /*----------- defined in drivers/spectrum.c -----------*/
 
-extern void ts2068_update_memory(void);
+extern void ts2068_update_memory(running_machine *machine);
 extern int spectrum_128_port_7ffd_data;
 extern int spectrum_plus3_port_1ffd_data;
 extern int ts2068_port_ff_data;
@@ -80,8 +80,8 @@ extern int ts2068_port_f4_data;
 extern int PreviousFE;
 extern unsigned char *spectrum_128_screen_location;
 
-extern void spectrum_128_update_memory(void);
-extern void spectrum_plus3_update_memory(void);
+extern void spectrum_128_update_memory(running_machine *machine);
+extern void spectrum_plus3_update_memory(running_machine *machine);
 
 
 /*----------- defined in video/spectrum.c -----------*/

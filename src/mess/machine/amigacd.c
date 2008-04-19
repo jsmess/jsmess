@@ -386,14 +386,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 static void	dmac_install(offs_t base)
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, base, base + 0xFFFF, 0, 0, amiga_dmac_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, base, base + 0xFFFF, 0, 0, amiga_dmac_w);
+	memory_install_read16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, base, base + 0xFFFF, 0, 0, amiga_dmac_r);
+	memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, base, base + 0xFFFF, 0, 0, amiga_dmac_w);
 }
 
 static void	dmac_uninstall(offs_t base)
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
+	memory_install_read16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
+	memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
 }
 
 static const amiga_autoconfig_device dmac_device =

@@ -245,13 +245,13 @@ DRIVER_INIT( pc1403 )
 	memory_set_bankptr(1, memory_region(REGION_USER1));
 	if (RAM32K)
 	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_RAM);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_RAM);
 	}
 	else
 	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_NOP);
 	}
 }
 

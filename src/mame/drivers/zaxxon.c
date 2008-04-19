@@ -475,7 +475,7 @@ static WRITE8_HANDLER( zaxxon_coin_lockout_w )
 static ADDRESS_MAP_START( zaxxon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM AM_WRITE(zaxxon_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x18fc) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x18fc) AM_READ_PORT("SW01")
@@ -498,8 +498,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( congo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM AM_WRITE(zaxxon_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM AM_WRITE(congo_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc4) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x1fc4) AM_READ_PORT("SW01")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
@@ -1457,16 +1457,15 @@ static DRIVER_INIT( razmataz )
 	DRIVER_INIT_CALL(zaxxon);
 
 	/* additional input ports are wired */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, port_tag_to_handler8("SW04"));
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc008, 0xc008, 0, 0x18f3, port_tag_to_handler8("SW08"));
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc00c, 0xc00c, 0, 0x18f3, port_tag_to_handler8("SW0C"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, port_tag_to_handler8("SW04"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc008, 0xc008, 0, 0x18f3, port_tag_to_handler8("SW08"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00c, 0xc00c, 0, 0x18f3, port_tag_to_handler8("SW0C"));
 
 	/* unknown behavior expected here */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);
 
 	/* connect the universal sound board */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_data_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
 
 	/* additional state saving */
 	state_save_register_global_array(razmataz_dial_pos);
@@ -1480,8 +1479,7 @@ static DRIVER_INIT( ixion )
 	DRIVER_INIT_CALL(zaxxon);
 
 	/* connect the universal sound board */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_data_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
 }
 
 

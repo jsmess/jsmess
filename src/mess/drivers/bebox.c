@@ -25,6 +25,7 @@
 #include "machine/pckeybrd.h"
 #include "machine/8042kbdc.h"
 #include "machine/pit8253.h"
+#include "machine/idectrl.h"
 
 /* Devices */
 #include "devices/mflopimg.h"
@@ -125,6 +126,8 @@ static MACHINE_DRIVER_START( bebox )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( bebox_pic8259_slave_config )
+
+	MDRV_IDE_CONTROLLER_ADD( "ide", ~0, bebox_ide_interrupt )	/* FIXME */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )

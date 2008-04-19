@@ -167,33 +167,33 @@ DRIVER_INIT( pc1251 )
 	// 4 kb memory feedback 512 bytes too few???
 	// 11 kb ram: program stored at 8000
 #if 1
-	memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xc7ff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xc7ff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x8000);
 #else
 	if (PC1251_RAM11K)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xafff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xc5ff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc600, 0xc7ff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xf7ff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xafff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xc5ff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc600, 0xc7ff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xf7ff, 0, 0, SMH_RAM);
 	}
 	else if (PC1251_RAM6K)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xc7ff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcbff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xc7ff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcbff, 0, 0, SMH_RAM);
 	}
 	else if (PC1251_RAM4K)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xb7ff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xc7ff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcbff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xb7ff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xc7ff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcbff, 0, 0, SMH_RAM);
 	}
 	else
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xc5ff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc600, 0xc9ff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xca00, 0xcbff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xc5ff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc600, 0xc9ff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xca00, 0xcbff, 0, 0, SMH_RAM);
 	}
 #endif
 }

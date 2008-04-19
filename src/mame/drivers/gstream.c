@@ -153,11 +153,11 @@ static WRITE32_HANDLER( gstream_tilemap3_scrolly_w ) { tilemap3_scrolly = data; 
 static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE(&gstream_workram) // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
-	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM AM_WRITE(gstream_vram_w) AM_BASE(&gstream_vram) // video ram
+	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE(&gstream_vram) // video ram
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION(REGION_USER2,0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM AM_WRITE(gstream_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
@@ -465,7 +465,7 @@ static READ32_HANDLER( gstream_speedup_r )
 
 static DRIVER_INIT( gstream )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
 
 }
 GAME( 2002, gstream, 0, gstream, gstream, gstream, ROT270, "Oriental Soft Japan", "G-Stream G2020", GAME_IMPERFECT_SOUND )

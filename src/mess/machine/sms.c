@@ -923,8 +923,8 @@ MACHINE_RESET(sms)
 
 	if ( sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER ) {
 		/* Install special memory handlers */
-		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0000, 0, 0, sms_codemasters_page0_w );
-		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000, 0, 0, sms_codemasters_page1_w );
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0000, 0, 0, sms_codemasters_page0_w );
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000, 0, 0, sms_codemasters_page1_w );
 	}
 
 	/* Initialize SIO stuff for GG */

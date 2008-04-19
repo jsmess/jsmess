@@ -1243,7 +1243,7 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_CPU_VBLANK_INT_HACK(cps2_interrupt,262)	// 262  /* ??? interrupts per frame */
 
 	MDRV_CPU_ADD(Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(qsound_map,0)
+	MDRV_CPU_PROGRAM_MAP(qsound_sub_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
 
 //  MDRV_INTERLEAVE(262)  /* 262 scanlines, for raster effects */
@@ -7155,7 +7155,7 @@ static DRIVER_INIT( ssf2tb )
 static DRIVER_INIT ( pzloop2 )
 {
 	DRIVER_INIT_CALL(cps2);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
 }
 
 

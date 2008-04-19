@@ -461,9 +461,9 @@ static READ8_HANDLER( protection_r )
 static ADDRESS_MAP_START( looping_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(SMH_RAM, looping_videoram_w) AM_BASE_MEMBER(looping_state, videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(looping_videoram_w) AM_BASE_MEMBER(looping_state, videoram)
 
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_READWRITE(SMH_RAM, looping_colorram_w) AM_BASE_MEMBER(looping_state, colorram)
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM_WRITE(looping_colorram_w) AM_BASE_MEMBER(looping_state, colorram)
 	AM_RANGE(0x9840, 0x987f) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(looping_state, spriteram)
 	AM_RANGE(0x9880, 0x98ff) AM_MIRROR(0x0700) AM_RAM
 
@@ -781,7 +781,7 @@ static DRIVER_INIT( looping )
 		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7007, 0, 0, protection_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7007, 0, 0, protection_r);
 }
 
 

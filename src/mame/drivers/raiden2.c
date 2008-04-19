@@ -75,7 +75,7 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 /* machine/seicop.c */
 extern READ16_HANDLER( raiden2_cop2_r );
 extern WRITE16_HANDLER( raiden2_cop2_w );
-extern void cop_init(void);
+//extern void cop_init(void);
 
 
 
@@ -482,14 +482,6 @@ static VIDEO_UPDATE ( raiden2 )
 
 static INTERRUPT_GEN( raiden2_interrupt )
 {
-	mainram[0x740/2] = input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 3) << 8);
-	mainram[0x742/2] = 0xffff;
-	mainram[0x744/2] = input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 1) << 8);
-	mainram[0x746/2] = 0xffff;
-	mainram[0x748/2] = 0xffff;
-	mainram[0x74a/2] = 0xffff;
-	mainram[0x74c/2] = input_port_read_indexed(machine, 4) | 0xff00;
-	mainram[0x74e/2] = 0xffff;
 
 	cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc0/4);	/* VBL */
 	logerror("VSYNC\n");
@@ -518,22 +510,22 @@ static void sprcpt_init(void)
 }
 
 
-static WRITE16_HANDLER(sprcpt_adr_w)
+WRITE16_HANDLER(sprcpt_adr_w)
 {
 	combine32(&sprcpt_adr, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_data_1_w)
+WRITE16_HANDLER(sprcpt_data_1_w)
 {
 	combine32(sprcpt_data_1+sprcpt_adr, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_data_2_w)
+WRITE16_HANDLER(sprcpt_data_2_w)
 {
 	combine32(sprcpt_data_2+sprcpt_adr, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_data_3_w)
+WRITE16_HANDLER(sprcpt_data_3_w)
 {
 	combine32(sprcpt_data_3+sprcpt_idx, offset, data, mem_mask);
 	if(offset == 1) {
@@ -543,7 +535,7 @@ static WRITE16_HANDLER(sprcpt_data_3_w)
 	}
 }
 
-static WRITE16_HANDLER(sprcpt_data_4_w)
+WRITE16_HANDLER(sprcpt_data_4_w)
 {
 	combine32(sprcpt_data_4+sprcpt_idx, offset, data, mem_mask);
 	if(offset == 1) {
@@ -553,17 +545,17 @@ static WRITE16_HANDLER(sprcpt_data_4_w)
 	}
 }
 
-static WRITE16_HANDLER(sprcpt_val_1_w)
+WRITE16_HANDLER(sprcpt_val_1_w)
 {
 	combine32(sprcpt_val+0, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_val_2_w)
+WRITE16_HANDLER(sprcpt_val_2_w)
 {
 	combine32(sprcpt_val+1, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_flags_1_w)
+WRITE16_HANDLER(sprcpt_flags_1_w)
 {
 	combine32(&sprcpt_flags1, offset, data, mem_mask);
 	if(offset == 1) {
@@ -592,7 +584,7 @@ static WRITE16_HANDLER(sprcpt_flags_1_w)
 	}
 }
 
-static WRITE16_HANDLER(sprcpt_flags_2_w)
+WRITE16_HANDLER(sprcpt_flags_2_w)
 {
 	COMBINE_DATA(&sprcpt_flags2);
 	if(offset == 0) {
@@ -741,37 +733,33 @@ static void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
 static MACHINE_RESET(raiden2)
 {
 	sprcpt_init();
-	cop_init();
+	MACHINE_RESET_CALL(seibu_sound_1);
+
+	//cop_init();
 }
 
 
 /* MEMORY MAPS */
 
-static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00400, 0x005ff) AM_READWRITE(raiden2_cop2_r, raiden2_cop2_w)
+extern UINT16* cop_mcu_ram;
+extern WRITE16_HANDLER( raiden2_mcu_w );
+extern READ16_HANDLER( raiden2_mcu_r );
 
-	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
-	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
-	AM_RANGE(0x006a8, 0x006ab) AM_WRITE(sprcpt_data_4_w)
-	AM_RANGE(0x006ac, 0x006af) AM_WRITE(sprcpt_flags_1_w)
-	AM_RANGE(0x006b0, 0x006b3) AM_WRITE(sprcpt_data_1_w)
-	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
-	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
-	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
-	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
+static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)
 
 	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE(&mainram)
 //  AM_RANGE(0x00000, 0x003ff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_READWRITE(SMH_RAM, raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_READWRITE(SMH_RAM, raiden2_foreground_w) AM_BASE(&fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_READWRITE(SMH_RAM, raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_READWRITE(SMH_RAM, raiden2_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
+    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
-	AM_RANGE(0x10000, 0x1efff) AM_READWRITE(SMH_RAM, w1x) AM_BASE(&w1ram)
-	AM_RANGE(0x1f000, 0x1ffff) AM_READWRITE(SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(1)
 	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK(2)
@@ -780,6 +768,8 @@ ADDRESS_MAP_END
 /* INPUT PORTS */
 
 static INPUT_PORTS_START( raiden2 )
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -853,11 +843,13 @@ static INPUT_PORTS_START( raiden2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raidendx )
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -931,6 +923,9 @@ static INPUT_PORTS_START( raidendx )
 	PORT_START	/* START BUTTONS */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -998,6 +993,9 @@ static MACHINE_DRIVER_START( raiden2 )
 
 	MDRV_MACHINE_RESET(raiden2)
 
+	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
+
+
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -1017,6 +1015,10 @@ static MACHINE_DRIVER_START( raiden2 )
 
 	MDRV_VIDEO_START(raiden2)
 	MDRV_VIDEO_UPDATE(raiden2)
+
+	/* sound hardware */
+	SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
+
 
 /* Sound hardware infos: Z80 and YM2151 are clocked at XTAL_28_63636MHz/8 */
 /* The 2 Oki M6295 are clocked at XTAL_28_63636MHz/28 and pin 7 is high for both */
@@ -1052,10 +1054,15 @@ YM2151   OKI M6295 VOI2  Z8400A
 ROM_START( raiden2 )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) )
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("prg1",   0x000001, 0x80000, CRC(4609b5f2) SHA1(272d2aa75b8ea4d133daddf42c4fc9089093df2e) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "snd",  0x000000, 0x10000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
+	ROM_LOAD( "snd",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
+
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "px0",	0x000000,	0x020000,	CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) )
@@ -1070,9 +1077,11 @@ ROM_START( raiden2 )
 	ROM_LOAD32_WORD( "obj3",  0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
 	ROM_LOAD32_WORD( "obj4",  0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_REGION( 0x080000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "voi1", 0x00000, 0x80000, CRC(f340457b) SHA1(8169acb24c82f68d223a31af38ee36eb6cb3adf4) )
-	ROM_LOAD( "voi2", 0x80000, 0x80000, CRC(d321ff54) SHA1(b61e602525f36eb28a1408ffb124abfbb6a08706) )
+
+	ROM_REGION( 0x080000, REGION_SOUND2, 0 )	/* ADPCM samples */
+	ROM_LOAD( "voi2", 0x00000, 0x80000, CRC(d321ff54) SHA1(b61e602525f36eb28a1408ffb124abfbb6a08706) )
 ROM_END
 
 /*
@@ -1100,7 +1109,9 @@ S5 U0724     27C1024     ROM7        966D
 ROM_START( raiden2a )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) ) // rom1
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("rom2e",  0x000001, 0x80000, CRC(458d619c) SHA1(842bf0eeb5d192a6b188f4560793db8dad697683) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom5",  0x000000, 0x10000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
@@ -1122,12 +1133,16 @@ ROM_START( raiden2a )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "rom6", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 ROM_START( raiden2b )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) ) // rom1
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("rom2j",  0x000001, 0x80000, CRC(e4e4fb4c) SHA1(7ccf33fe9a1cddf0c7e80d7ed66d615a828b3bb9) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom5",  0x000000, 0x10000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
@@ -1149,6 +1164,8 @@ ROM_START( raiden2b )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "rom6", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 /*
@@ -1193,7 +1210,9 @@ CUSTOM:       SEI150
 ROM_START( raiden2c )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) ) // rom1
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("rom2j",  0x000001, 0x80000, CRC(e4e4fb4c) SHA1(7ccf33fe9a1cddf0c7e80d7ed66d615a828b3bb9) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rd2_5.110",  0x000000, 0x10000,  CRC(c2028ba2) SHA1(f6a9322b669ff82dea6ecf52ad3bd5d0901cce1b) )
@@ -1215,13 +1234,17 @@ ROM_START( raiden2c )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "rom6", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) )
-	ROM_LOAD( "r2_voi2.bin", 0x80000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 )	/* ADPCM samples */
+	ROM_LOAD( "r2_voi2.bin", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2d )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("seibu1",   0x000000, 0x80000, CRC(c1fc70f5) SHA1(a054f5ae9583972c406d9cf871340d5e072d71a3) )
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("seibu2",   0x000001, 0x80000, CRC(28d5365f) SHA1(21efe29c2d373229c2ff302d86e59c2c94fa6d03) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5",  0x000000, 0x10000, CRC(5db9f922) SHA1(8257aab98657fe44df19d2a48d85fcf65b3d98c6) )
@@ -1241,7 +1264,9 @@ ROM_START( raiden2d )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "seibu6", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) )
-	ROM_LOAD( "r2_voi2.bin", 0x80000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 )	/* ADPCM samples */
+	ROM_LOAD( "r2_voi2.bin", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 
@@ -1289,7 +1314,9 @@ r2_voi2.bin   262144  0x8cf0d17e  TC534000P Dumped as 27C040. 1'st and
 ROM_START( raiden2e )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("r2_prg_0.bin",   0x000000, 0x80000, CRC(2abc848c) SHA1(1df4276d0074fcf1267757fa0b525a980a520f3d) )
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("r2_prg_1.bin",   0x000001, 0x80000, CRC(509ade43) SHA1(7cdee7bb00a6a1c7899d10b96385d54c261f6f5a) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2_snd.bin",  0x000000, 0x10000, CRC(6bad0a3e) SHA1(eb7ae42353e1984cd60b569c26cdbc3b025a7da6) )
@@ -1309,7 +1336,9 @@ ROM_START( raiden2e )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "r2_voi1.bin", 0x00000, 0x40000, CRC(488d050f) SHA1(fde2fd64fea6bc39e1a42885d21d362bc6be2ac2) )
-	ROM_LOAD( "r2_voi2.bin", 0x80000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 )	/* ADPCM samples */
+	ROM_LOAD( "r2_voi2.bin", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 
@@ -1388,7 +1417,9 @@ ROM_START( raidndx )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "dx_6.3b",   0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
-	ROM_LOAD( "dx_pcm.3a", 0x80000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 )	/* ADPCM samples */
+	ROM_LOAD( "dx_pcm.3a", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 
 	ROM_REGION( 0x40000, REGION_USER2, 0 )	/* COPDX */
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
@@ -1460,7 +1491,9 @@ ROM_START( raidndxj )
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "dx_6.3b",   0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 	/* not from this set, assumed to be the same */
-	ROM_LOAD( "dx_pcm.3a", 0x80000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 )	/* ADPCM samples */
+	ROM_LOAD( "dx_pcm.3a", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 
 	ROM_REGION( 0x40000, REGION_USER2, 0 )	/* COPDX */
 		/* not from this set, assumed to be the same */
@@ -1537,7 +1570,9 @@ ROM_START( raidndxa )
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "dx_6.3b",   0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 	/* not from this set, assumed to be the same */
-	ROM_LOAD( "dx_pcm.3a", 0x80000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 )	/* ADPCM samples */
+	ROM_LOAD( "dx_pcm.3a", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 
 	ROM_REGION( 0x40000, REGION_USER2, 0 )	/* COPDX */
 		/* not from this set, assumed to be the same */
@@ -1572,7 +1607,9 @@ ROM_START( raidndxm )
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "dx_6.3b",   0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 	/* not from this set, assumed to be the same */
-	ROM_LOAD( "dx_pcm.3a", 0x80000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 )	/* ADPCM samples */
+	ROM_LOAD( "dx_pcm.3a", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 
 	ROM_REGION( 0x40000, REGION_USER2, 0 )	/* COPDX */
 		/* not from this set, assumed to be the same */
@@ -1610,6 +1647,8 @@ ROM_START( zeroteam )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.4a
+
+	ROM_REGION( 0x100000, REGION_SOUND2, ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 ROM_START( zeroteaa )
@@ -1639,6 +1678,8 @@ ROM_START( zeroteaa )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.bin
+
+	ROM_REGION( 0x100000, REGION_SOUND2, ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 ROM_START( zerotsel )
@@ -1668,6 +1709,8 @@ ROM_START( zerotsel )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.bin
+
+	ROM_REGION( 0x100000, REGION_SOUND2, ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 /* set contained only program roms, was marked as 'non-encrytped' but program isn't encrypted anyway?! */
@@ -1698,6 +1741,8 @@ ROM_START( zeroteab )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.4a
+
+	ROM_REGION( 0x100000, REGION_SOUND2, ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 /* Different hardware, uses COPX-D3 for protection  */
@@ -1723,6 +1768,8 @@ ROM_START( nzerotea )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 
@@ -1822,7 +1869,7 @@ static DRIVER_INIT (raiden2)
 	/* wrong , there must be some banking this just stops it crashing */
 	UINT8 *RAM = memory_region(REGION_USER1);
 
-	memory_set_bankptr(1,&RAM[0x000000]);
+	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_set_bankptr(2,&RAM[0x040000]);
 
 	raiden2_decrypt_sprites();
@@ -1974,13 +2021,13 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00880, 0x0bfff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_READWRITE(SMH_RAM, raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_READWRITE(SMH_RAM, raiden2_foreground_w) AM_BASE(&fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_READWRITE(SMH_RAM, raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_READWRITE(SMH_RAM, raiden2_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
+    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_READWRITE(SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 
 	/* not sure of bank sizes etc. */
 	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK(1)

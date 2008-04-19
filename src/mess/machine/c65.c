@@ -6,6 +6,7 @@
  ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/c65.h"
 #include "includes/c64.h"
 
@@ -446,9 +447,9 @@ static WRITE8_HANDLER(c65_ram_expansion_w)
 		expansion_ram_begin = 0x80000;
 		expansion_ram_end = 0x80000 + (mess_ram_size - 128*1024) - 1;
 
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, expansion_ram_begin, expansion_ram_end,
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, expansion_ram_begin, expansion_ram_end,
 			0, 0, (data == 0x00) ? SMH_BANK16 : SMH_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, expansion_ram_begin, expansion_ram_end,
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, expansion_ram_begin, expansion_ram_end,
 			0, 0, (data == 0x00) ? SMH_BANK16 : SMH_NOP);
 
 		if (data == 0x00)
@@ -591,8 +592,8 @@ static void c65_bankswitch_interface(int value)
 			rh = c65_read_io_dc00;
 			wh = c65_write_io_dc00;
 		}
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, rh);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, wh);
+		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, rh);
+		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, wh);
 	}
 
 	c65_io_dc00_on=!(value&1);
@@ -677,8 +678,8 @@ void c65_bankswitch (void)
 			memory_set_bankptr (8, c64_colorram+0x400);
 			memory_set_bankptr (9, c64_colorram+0x400);
 		}
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, rh8);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, wh9);
+		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, rh8);
+		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, wh9);
 	}
 	else
 	{
@@ -701,8 +702,8 @@ void c65_bankswitch (void)
 			memory_set_bankptr (8, c64_memory + 0xdc00);
 		}
 	}
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, rh4);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, wh5);
+	memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, rh4);
+	memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, wh5);
 
 	if (!c64_game && c64_exrom)
 	{

@@ -130,8 +130,8 @@ static void init_at_common(const struct kbdc8042_interface *at8042)
 	if (mess_ram_size > 0x0a0000)
 	{
 		offs_t ram_limit = 0x100000 + mess_ram_size - 0x0a0000;
-		memory_install_read_handler(0,  ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, STATIC_BANK1);
-		memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, STATIC_BANK1);
+		memory_install_read_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, 1);
+		memory_install_write_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, 1);
 		memory_set_bankptr(1, mess_ram + 0xa0000);
 	}
 }
@@ -350,11 +350,11 @@ static void at_map_vga_memory(offs_t begin, offs_t end, read8_machine_func rh, w
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
+			memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
+			memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
 
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, rh);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, wh);
+			memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, rh);
+			memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, wh);
 			break;
 	}
 }

@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xdfe0, 0xdfe0) AM_NOP
 
-	AM_RANGE(0xe000, 0xe3ff) AM_READWRITE(SMH_RAM, pturn_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(pturn_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_w)
 
@@ -521,8 +521,8 @@ ROM_END
 static DRIVER_INIT(pturn)
 {
 	/*
-    memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
-    memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
+    memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
+    memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
     */
 }
 

@@ -196,10 +196,10 @@ static READ16_HANDLER( pitfighb_cheap_slapstic_r )
 }
 
 
-static void pitfighb_cheap_slapstic_init(void)
+static void pitfighb_cheap_slapstic_init(running_machine *machine)
 {
 	/* install a read handler */
-	bslapstic_base = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x038000, 0x03ffff, 0, 0, pitfighb_cheap_slapstic_r);
+	bslapstic_base = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x038000, 0x03ffff, 0, 0, pitfighb_cheap_slapstic_r);
 
 	/* allocate memory for a copy of bank 0 */
 	bslapstic_bank0 = auto_malloc(0x2000);
@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfd0000, 0xfd0001) AM_READ(atarigen_sound_upper_r)
 	AM_RANGE(0xfd8000, 0xfdffff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
-	AM_RANGE(0xfe8000, 0xfe89ff) AM_READWRITE(SMH_RAM, atarigen_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xff0000, 0xff0fff) AM_WRITE(atarirle_0_spriteram_w) AM_BASE(&atarirle_0_spriteram)
 	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_BASE(&mo_command)
 	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
@@ -961,7 +961,7 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 	atarigen_eeprom_default = NULL;
 	if (slapstic == -1)
 	{
-		pitfighb_cheap_slapstic_init();
+		pitfighb_cheap_slapstic_init(machine);
 		state_save_register_global(bslapstic_bank);
 		state_save_register_global(bslapstic_primed);
 		state_save_register_postload(machine, pitfighb_state_postload, NULL);

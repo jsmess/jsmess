@@ -301,16 +301,16 @@ DRIVER_INIT( pc1401 )
 
 	if (RAM10K)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_RAM);
 	}
 	else if (RAM4K)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x37ff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,  0x3800, 0x3fff, 0, 0, SMH_RAM);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x37ff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0x3800, 0x3fff, 0, 0, SMH_RAM);
 	}
 	else
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_NOP);
 	}
 }
 

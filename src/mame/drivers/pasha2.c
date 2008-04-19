@@ -216,8 +216,8 @@ static WRITE16_HANDLER( pasha2_lamps_w )
 
 static ADDRESS_MAP_START( pasha2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE(&wram)
-	AM_RANGE(0x40000000, 0x4001ffff) AM_RAM AM_WRITE(bitmap_0_w)
-	AM_RANGE(0x40020000, 0x4003ffff) AM_RAM AM_WRITE(bitmap_1_w)
+	AM_RANGE(0x40000000, 0x4001ffff) AM_RAM_WRITE(bitmap_0_w)
+	AM_RANGE(0x40020000, 0x4003ffff) AM_RAM_WRITE(bitmap_1_w)
 	AM_RANGE(0x40060000, 0x40060001) AM_WRITENOP
 	AM_RANGE(0x40064000, 0x40064001) AM_WRITENOP
 	AM_RANGE(0x40068000, 0x40068001) AM_WRITENOP
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( pasha2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40074000, 0x40074001) AM_WRITE(vbuffer_set_w)
 	AM_RANGE(0x40078000, 0x40078001) AM_WRITENOP //once at startup -> to disable the eeprom?
 	AM_RANGE(0x80000000, 0x803fffff) AM_ROMBANK(1)
-	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM AM_WRITE(pasha2_palette_w) AM_BASE(&paletteram16) //tilemap? palette?
+	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE(pasha2_palette_w) AM_BASE(&paletteram16) //tilemap? palette?
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1,0)
 ADDRESS_MAP_END
 
@@ -457,7 +457,7 @@ static READ16_HANDLER( pasha2_speedup_r )
 
 static DRIVER_INIT( pasha2 )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
 
 	memory_set_bankptr(1, memory_region(REGION_USER2));
 }

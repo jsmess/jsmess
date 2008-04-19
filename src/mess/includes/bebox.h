@@ -44,5 +44,7 @@ WRITE64_HANDLER( bebox_page_w );
 WRITE64_HANDLER( bebox_80000480_w );
 WRITE64_HANDLER( bebox_flash_w );
 
+void bebox_ide_interrupt(int state);
+
 
 #endif /* BEBOX_H_ */

@@ -104,12 +104,12 @@ static void avigo_setbank(int bank, void *address, read8_machine_func rh, write8
 	}
 	if (rh)
 	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
+		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
 			(bank * 0x4000) + 0x3FFF, 0, 0, rh);
 	}
 	if (wh)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
+		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
 			(bank * 0x4000) + 0x3FFF, 0, 0, wh);
 	}
 }

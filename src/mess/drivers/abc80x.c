@@ -159,12 +159,12 @@ static WRITE8_HANDLER( abc806_bankswitch_w )
 
 			if (bank < 7)
 			{
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end, 0, 0, SMH_UNMAP);
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end, 0, 0, SMH_UNMAP);
 				logerror("ABC806 deallocating %04x-%04x back to ROM\n", bank_start, bank_end);
 			}
 			else
 			{
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end, 0, 0, (write8_machine_func)(FPTR)(STATIC_BANK1 + bank));
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end, 0, 0, (write8_machine_func)(FPTR)(STATIC_BANK1 + bank));
 				logerror("ABC806 deallocating %04x-%04x back to RAM\n", bank_start, bank_end);
 			}
 		}
@@ -742,24 +742,24 @@ static MACHINE_START( abc806 )
 
 	MACHINE_START_CALL(abc800);
 
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1, SMH_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2, SMH_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK3, SMH_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK4, SMH_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4fff, 0, 0, SMH_BANK5, SMH_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5fff, 0, 0, SMH_BANK6, SMH_UNMAP);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, SMH_BANK7, SMH_UNMAP);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK3, SMH_UNMAP);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK4, SMH_UNMAP);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4fff, 0, 0, SMH_BANK5, SMH_UNMAP);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5fff, 0, 0, SMH_BANK6, SMH_UNMAP);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, SMH_BANK7, SMH_UNMAP);
 
-//	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7fff, 0, 0, SMH_BANK8, SMH_BANK8);
+//	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7fff, 0, 0, SMH_BANK8, SMH_BANK8);
 
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, SMH_BANK9, SMH_BANK9);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9fff, 0, 0, SMH_BANK10, SMH_BANK10);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, SMH_BANK11, SMH_BANK11);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, 0, 0, SMH_BANK12, SMH_BANK12);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK13, SMH_BANK13);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK14, SMH_BANK14);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_BANK15, SMH_BANK15);
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, SMH_BANK16, SMH_BANK16);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, SMH_BANK9, SMH_BANK9);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9fff, 0, 0, SMH_BANK10, SMH_BANK10);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, SMH_BANK11, SMH_BANK11);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, 0, 0, SMH_BANK12, SMH_BANK12);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK13, SMH_BANK13);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK14, SMH_BANK14);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_BANK15, SMH_BANK15);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, SMH_BANK16, SMH_BANK16);
 
 	for (bank = 1; bank < 17; bank++)
 	{

@@ -2346,7 +2346,8 @@ V-V                           TP-027
 	DRIVER( lstduelb )	/* bootleg */
 	DRIVER( madgear )	/*  2/1989 (c) 1989 (US) */
 	DRIVER( madgearj )	/*  2/1989 (c) 1989 (Japan) */
-	DRIVER( ledstorm )	/*  2/1989 (c) 1989 (US) */
+	DRIVER( ledstorm )	/*  1988 (c) 1988 (US) */
+	DRIVER( ledstrm2 )	/*  1988 (c) 1988 (US) */
 	/*  3/1989 Dokaben (baseball) - see below among "Mitchell" games */
 	/*  8/1989 Dokaben 2 (baseball) - see below among "Mitchell" games */
 	/* 10/1989 Capcom Baseball - see below among "Mitchell" games */
@@ -3452,8 +3453,9 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( sdib )		/* (c) 1987 (FD1089A, decrypted) */
 	DRIVER( sdibl )		/* (c) 1987 bootleg */
 	DRIVER( defense )	/* (c) 1987 (FD1094, decrypted) */
-	DRIVER( shinobi4 )	/* (c) 1987 */
-	DRIVER( shinobi3 )	/* (c) 1987 */
+	DRIVER( shinobi5 )	/* (c) 1987 */
+	DRIVER( shinobi4 )	/* (c) 1987 (MC-8123B) */
+	DRIVER( shinobi3 )	/* (c) 1987 (MC-8123B) */
 	DRIVER( shinobi2 )	/* (c) 1987 (FD1094, decrypted) */
 	DRIVER( sonicbom )	/* (c) 1987 (FD1094, decrypted) */
 	DRIVER( sjryuko )	/* (c) 1988 White Board (FD1094, decrypted) */
@@ -6341,6 +6343,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( scudhamm )	/* (c) 1994 Jaleco */
 	DRIVER( tetrisp2 )	/* (c) 1997 Jaleco */
 	DRIVER( teplus2j )	/* (c) 1997 Jaleco */
+	DRIVER( nndmseal )	/* (c) 1997 I'Max/Jaleco */
 	DRIVER( stepstag )	/* (c) 1999 Jaleco */
 	DRIVER( rockn )		/* (c) 1999 Jaleco */
 	DRIVER( rockna )	/* (c) 1999 Jaleco */
@@ -6447,6 +6450,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( aerofgtc )	/* (c) 1992 Video System Co. */
 	DRIVER( sonicwi )	/* (c) 1992 Video System Co. (Japan) */
 	DRIVER( aerfboot )	/* bootleg */
+	DRIVER( aerfboo2 )	/* bootleg */
 	DRIVER( wbbc97 )	/* (c) 1997 Comad */
 	DRIVER( welltris )	/* (c) 1991 Video System Co. (Japan) */
 	DRIVER( welltrij )	/* (c) 1991 Video System Co. (Japan) */

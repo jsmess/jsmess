@@ -338,7 +338,7 @@ static void spectrum_update_paging(void)
 	if (spectrum_128_port_7ffd_data == -1)
 		return;
 	if (spectrum_plus3_port_1ffd_data == -1)
-		spectrum_128_update_memory();
+		spectrum_128_update_memory(Machine);
 
 	else
 	{
@@ -347,7 +347,7 @@ static void spectrum_update_paging(void)
 			spectrum_plus3_port_1ffd_data = 0x04;
 		else
 			spectrum_plus3_port_1ffd_data = 0;
-		spectrum_plus3_update_memory();
+		spectrum_plus3_update_memory(Machine);
 	}
 }
 
@@ -1035,13 +1035,13 @@ void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsi
 		{
 			ts2068_port_f4_data = 0x03;
 			ts2068_port_ff_data = 0x00;
-			ts2068_update_memory();
+			ts2068_update_memory(Machine);
 		}
 		if (z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068 && !strcmp(machine->gamedrv->name,"ts2068"))
 		{
 			ts2068_port_f4_data = pSnapshot[35];
 			ts2068_port_ff_data = pSnapshot[36];
-			ts2068_update_memory();
+			ts2068_update_memory(Machine);
 		}
 	}
 }

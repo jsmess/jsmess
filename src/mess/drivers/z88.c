@@ -12,7 +12,9 @@
         Kevin Thacker [MESS driver]
 
  ******************************************************************************/
+
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/z88.h"
 #include "sound/speaker.h"
 
@@ -190,8 +192,8 @@ static void z88_install_memory_handler_pair(offs_t start, offs_t size, int bank_
 	write_handler = (write_addr != NULL) ? (write8_machine_func) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : SMH_UNMAP;
 
 	/* install the handlers */
-	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, read_handler);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, write_handler);
+	memory_install_read8_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, read_handler);
+	memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, write_handler);
 
 	/* and set the banks */
 	if (read_addr != NULL)

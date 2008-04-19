@@ -85,15 +85,15 @@ static READ8_HANDLER( mirrorcolorram_r ) { offset = ((offset >> 5) & 0x1f) | ((o
 
 
 static ADDRESS_MAP_START( decocass_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READWRITE(SMH_RAM, ram_w) AM_BASE(&decocass_rambase)
-	AM_RANGE(0x6000, 0xbfff) AM_READWRITE(SMH_RAM, charram_w) AM_BASE(&decocass_charram) /* still RMS3 RAM */
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(SMH_RAM, fgvideoram_w) AM_BASE(&decocass_fgvideoram) AM_SIZE(&decocass_fgvideoram_size)  /* DSP3 RAM */
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(SMH_RAM, fgcolorram_w) AM_BASE(&decocass_colorram) AM_SIZE(&decocass_colorram_size)
+	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE(ram_w) AM_BASE(&decocass_rambase)
+	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(charram_w) AM_BASE(&decocass_charram) /* still RMS3 RAM */
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_BASE(&decocass_fgvideoram) AM_SIZE(&decocass_fgvideoram_size)  /* DSP3 RAM */
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgcolorram_w) AM_BASE(&decocass_colorram) AM_SIZE(&decocass_colorram_size)
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(SMH_RAM, tileram_w) AM_BASE(&decocass_tileram) AM_SIZE(&decocass_tileram_size)
-	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_RAM, objectram_w) AM_BASE(&decocass_objectram) AM_SIZE(&decocass_objectram_size)
-	AM_RANGE(0xe000, 0xe0ff) AM_READWRITE(SMH_RAM, decocass_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tileram_w) AM_BASE(&decocass_tileram) AM_SIZE(&decocass_tileram_size)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(objectram_w) AM_BASE(&decocass_objectram) AM_SIZE(&decocass_objectram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE(decocass_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe300, 0xe300) AM_READWRITE(input_port_7_r, decocass_watchdog_count_w)
 	AM_RANGE(0xe301, 0xe301) AM_READWRITE(input_port_8_r, decocass_watchdog_flip_w)
 	AM_RANGE(0xe302, 0xe302) AM_WRITE(decocass_color_missiles_w)
@@ -1138,8 +1138,7 @@ static DRIVER_INIT( decocrom )
 		decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xafff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xafff, 0, 0, decocass_de0091_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xafff, 0, 0, SMH_BANK1, decocass_de0091_w);
 	memory_configure_bank(1, 0, 1, decocass_charram, 0);
 	memory_configure_bank(1, 1, 1, memory_region(REGION_USER3), 0);
 	memory_configure_bank_decrypted(1, 0, 1, &decrypted[0x6000], 0);
@@ -1147,7 +1146,7 @@ static DRIVER_INIT( decocrom )
 	memory_set_bank(1, 0);
 
 	/* install the bank selector */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe900, 0xe900, 0, 0, decocass_e900_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe900, 0xe900, 0, 0, decocass_e900_w);
 }
 
 

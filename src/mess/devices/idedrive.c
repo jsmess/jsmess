@@ -13,6 +13,8 @@
 #include "harddriv.h"
 #include "machine/idectrl.h"
 
+/* FIXME - this is so completely broken until we device-ize IDE drives */
+struct ide_interface;
 
 static void ide_get_params(const device_config *image, int *which_bus, int *which_address,
 	struct ide_interface **intf,
@@ -60,7 +62,8 @@ static DEVICE_START(ide_hd)
 	parent_init(device);
 
 	/* configure IDE */
-	ide_controller_init_custom(which_bus, intf, NULL);
+	/* FIXME IDE */
+	/* ide_controller_init_custom(which_bus, intf, NULL); */
 }
 
 
@@ -84,8 +87,9 @@ static DEVICE_IMAGE_LOAD(ide_hd)
 		return result;
 
 	/* configure IDE */
-	ide_controller_init_custom(which_bus, intf, mess_hd_get_chd_file(image));
-	ide_controller_reset(which_bus);
+	/* FIXME IDE */
+	/* ide_controller_init_custom(which_bus, intf, mess_hd_get_chd_file(image)); */
+	/* ide_controller_reset(which_bus); */
 	return INIT_PASS;
 }
 
@@ -108,8 +112,9 @@ static DEVICE_IMAGE_UNLOAD(ide_hd)
 	parent_unload(image);
 
 	/* configure IDE */
-	ide_controller_init_custom(which_bus, intf, NULL);
-	ide_controller_reset(which_bus);
+	/* FIXME IDE */
+	/* ide_controller_init_custom(which_bus, intf, NULL); */
+	/* ide_controller_reset(which_bus); */
 }
 
 
@@ -138,12 +143,6 @@ static int ide_hd_validity_check(const mess_device_class *devclass)
 	if (!intf)
 	{
 		mame_printf_error("%s: IDE device does not specify an interface\n", devclass->gamedrv->name);
-		error = 1;
-	}
-
-	if (count > MAX_IDE_CONTROLLERS)
-	{
-		mame_printf_error("%s: Too many IDE devices; maximum is %d\n", devclass->gamedrv->name, MAX_IDE_CONTROLLERS);
 		error = 1;
 	}
 

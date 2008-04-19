@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/coupe.h"
 #include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
@@ -34,8 +35,8 @@ static void coupe_update_bank(int bank, UINT8 *memory, int is_readonly)
 		wh = is_readonly ? SMH_UNMAP : (write8_machine_func) (STATIC_BANK1 + (FPTR)bank - 1);
 	}
 
-	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, rh);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, wh);
+	memory_install_read8_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, rh);
+	memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, wh);
 }
 
 
@@ -172,12 +173,12 @@ MACHINE_RESET( coupe )
 	if (input_port_read(machine, "config") & 0x01)
 	{
 		/* install RTC */
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, coupe_rtc_r, coupe_rtc_w);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, coupe_rtc_r, coupe_rtc_w);
 	}
 	else
 	{
 		/* no RTC support */
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, SMH_UNMAP, SMH_UNMAP);
 	}
 
     coupe_update_memory();

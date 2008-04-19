@@ -425,12 +425,12 @@ static void nc_refresh_memory_bank_config(int bank)
 		break;
 	}
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
+	memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
 		(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, read_handler);
 
 	if (write_handler)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,
+		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
 			(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, write_handler);
 	}
 }

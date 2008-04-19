@@ -47,8 +47,8 @@ static ADDRESS_MAP_START( svi318_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x88, 0x88) AM_WRITE( AY8910_control_port_0_w )
 	AM_RANGE( 0x8c, 0x8c) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x90, 0x90) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x96, 0x97) AM_WRITE( svi318_ppi_w )
-	AM_RANGE( 0x98, 0x9a) AM_READ( svi318_ppi_r )
+	AM_RANGE( 0x96, 0x97) AM_DEVWRITE( PPI8255, "ppi8255", svi318_ppi_w )
+	AM_RANGE( 0x98, 0x9a) AM_DEVREAD( PPI8255, "ppi8255", svi318_ppi_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi328_806_io, ADDRESS_SPACE_IO, 8 )
@@ -62,8 +62,8 @@ static ADDRESS_MAP_START( svi328_806_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x88, 0x88) AM_WRITE( AY8910_control_port_0_w )
 	AM_RANGE( 0x8c, 0x8c) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x90, 0x90) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x96, 0x97) AM_WRITE( svi318_ppi_w )
-	AM_RANGE( 0x98, 0x9a) AM_READ( svi318_ppi_r )
+	AM_RANGE( 0x96, 0x97) AM_DEVWRITE( PPI8255, "ppi8255", svi318_ppi_w )
+	AM_RANGE( 0x98, 0x9a) AM_DEVREAD( PPI8255, "ppi8255", svi318_ppi_r )
 ADDRESS_MAP_END
 
 /*

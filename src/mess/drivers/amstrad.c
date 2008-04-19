@@ -575,18 +575,18 @@ static void AmstradCPC_SetLowerRom(int Data)
 		amstrad_plus_lower_addr = (Data & 0x18) >> 3;  // address of lower ROM area
 		if(amstrad_plus_lower_addr == 3)
 		{
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_r);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_r);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_w);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_w);
+			memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_r);
+			memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_r);
+			memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_w);
+			memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_w);
 			amstrad_plus_asic_regpage = 1;  // enable ASIC registers
 		}
 		else
 		{
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK3);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK4);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK11);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK12);
+			memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK3);
+			memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK4);
+			memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK11);
+			memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK12);
 			amstrad_plus_asic_regpage = 0;  // disable ASIC registers
 		}
 //      logerror("SYS: Secondary ROM select (lower ROM) - data = %02x - cart bank %i, addr %i\n",Data,amstrad_plus_lower,amstrad_plus_lower_addr);
@@ -2003,7 +2003,7 @@ static TIMER_CALLBACK(amstrad_vh_execute_crtc_cycles_callback)
 	amstrad_vh_execute_crtc_cycles(param);
 }
 
-static void amstrad_common_init(void)
+static void amstrad_common_init(running_machine *machine)
 {
 	aleste_mode = 0;
 
@@ -2012,29 +2012,29 @@ static void amstrad_common_init(void)
 	amstrad_CRTC_HS_Counter = 2;
 	previous_amstrad_UpperRom_data = 0xff;
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK2);
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK3);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK4);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK3);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK4);
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK5);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_BANK6);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK5);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_BANK6);
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK7);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK8);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK7);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK8);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK9);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK10);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK9);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK10);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK11);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK12);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, SMH_BANK11);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK12);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK13);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_BANK14);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK13);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_BANK14);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK15);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK16);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK15);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK16);
 
 	cpunum_reset(0);
 	if(amstrad_system_type == SYSTEM_CPC)
@@ -2089,7 +2089,7 @@ static MACHINE_RESET( amstrad )
 	}
 
 	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0x018000];
-	amstrad_common_init();
+	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 
 	multiface_init();
@@ -2132,7 +2132,7 @@ static MACHINE_RESET( plus )
 	amstrad_plus_dma_clear = 1;  // by default, DMA interrupts must be cleared by writing to the DSCR (&6c0f)
 	amstrad_plus_irq_cause = 6;
 
-	amstrad_common_init();
+	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 	amstrad_plus_asic_ram[0x2805] = 0x01;  // interrupt vector is undefined at startup, except that bit 0 is always 1.
 	AmstradCPC_GA_SetRamConfiguration();
@@ -2181,7 +2181,7 @@ static MACHINE_RESET( gx4000 )
 	amstrad_plus_dma_clear = 1;  // by default, DMA interrupts must be cleared by writing to the DSCR (&6c0f)
 	amstrad_plus_irq_cause = 6;
 
-	amstrad_common_init();
+	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 	amstrad_plus_asic_ram[0x2805] = 0x01;  // interrupt vector is undefined at startup, except that bit 0 is always 1.
 	AmstradCPC_GA_SetRamConfiguration();
@@ -2200,7 +2200,7 @@ static MACHINE_RESET( kccomp )
 		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[0x014000];
 	}
 
-	amstrad_common_init();
+	amstrad_common_init(machine);
 	kccomp_reset_machine(machine);
 
 	/* bit 1 = /TEST. When 0, KC compact will enter data transfer
@@ -2230,7 +2230,7 @@ static MACHINE_RESET( aleste )
 
 	Amstrad_ROM_Table[3] = &memory_region(REGION_CPU1)[0x01c000];  // MSX-DOS / BIOS
 	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0x018000];  // AMSDOS
-	amstrad_common_init();
+	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 
 	nec765_init(&aleste_8272_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);

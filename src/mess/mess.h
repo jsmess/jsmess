@@ -109,7 +109,7 @@ const char *ram_string(char *buffer, UINT32 ram);
 int			ram_validate_option(void);
 void		ram_dump(const char *filename);
 
-UINT8 *memory_install_ram8_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t ram_offset, int bank);
+UINT8 *memory_install_ram8_handler(running_machine *machine, int cpunum, int spacenum, offs_t start, offs_t end, offs_t ram_offset, int bank);
 
 /* --------------------------------------------------------------------------------------------- */
 

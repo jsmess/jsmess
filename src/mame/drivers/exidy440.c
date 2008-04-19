@@ -302,15 +302,15 @@ static CUSTOM_INPUT( hitnmiss_button1_r )
  *
  *************************************/
 
-void exidy440_bank_select(UINT8 bank)
+void exidy440_bank_select(running_machine *machine, UINT8 bank)
 {
 	/* for the showdown case, bank 0 is a PLD */
 	if (showdown_bank_data[0] != NULL)
 	{
 		if (bank == 0 && exidy440_bank != 0)
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, showdown_bank0_r);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, showdown_bank0_r);
 		else if (bank != 0 && exidy440_bank == 0)
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK1);
 	}
 
 	/* select the bank and update the bank pointer */
@@ -454,7 +454,7 @@ static WRITE8_HANDLER( topsecex_yscroll_w )
 static MACHINE_RESET( exidy440 )
 {
 	exidy440_bank = 0xff;
-	exidy440_bank_select(0);
+	exidy440_bank_select(machine, 0);
 }
 
 
@@ -467,7 +467,7 @@ static MACHINE_RESET( exidy440 )
 
 static ADDRESS_MAP_START( exidy440_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&exidy440_imageram)
-	AM_RANGE(0x2000, 0x209f) AM_READWRITE(SMH_RAM, exidy440_spriteram_w) AM_BASE(&spriteram)
+	AM_RANGE(0x2000, 0x209f) AM_RAM_WRITE(exidy440_spriteram_w) AM_BASE(&spriteram)
 	AM_RANGE(0x20a0, 0x29ff) AM_RAM
 	AM_RANGE(0x2a00, 0x2aff) AM_READWRITE(exidy440_videoram_r, exidy440_videoram_w)
 	AM_RANGE(0x2b00, 0x2b00) AM_READ(exidy440_vertical_pos_r)
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START( exidy440_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE(&exidy440_scanline)
 	AM_RANGE(0x2b03, 0x2b03) AM_READWRITE(input_port_0_r, exidy440_control_w)
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(exidy440_paletteram_r, exidy440_paletteram_w)
-	AM_RANGE(0x2e00, 0x2e1f) AM_READWRITE(SMH_RAM, sound_command_w)
+	AM_RANGE(0x2e00, 0x2e1f) AM_RAM_WRITE(sound_command_w)
 	AM_RANGE(0x2e20, 0x2e3f) AM_READWRITE(exidy440_input_port_3_r, exidy440_input_port_3_w)
 	AM_RANGE(0x2e40, 0x2e5f) AM_READWRITE(SMH_NOP, exidy440_coin_counter_w)	/* read: clear coin counters I/O2 */
 	AM_RANGE(0x2e60, 0x2e7f) AM_READWRITE(input_port_1_r, SMH_NOP)
@@ -1934,7 +1934,7 @@ static DRIVER_INIT( claypign )
 {
 	DRIVER_INIT_CALL(exidy440);
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec0, 0x2ec3, 0, 0, claypign_protection_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec0, 0x2ec3, 0, 0, claypign_protection_r);
 }
 
 
@@ -1943,11 +1943,11 @@ static DRIVER_INIT( topsecex )
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec6, 0x2ec6, 0, 0, input_port_4_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec7, 0x2ec7, 0, 0, input_port_6_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec6, 0x2ec6, 0, 0, input_port_4_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec7, 0x2ec7, 0, 0, input_port_6_r);
 
-	topsecex_yscroll = memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
+	topsecex_yscroll = memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
 }
 
 

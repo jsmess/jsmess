@@ -227,12 +227,12 @@ static const struct via6522_interface user_via =
 DRIVER_INIT( aim65 )
 {
 	/* Init RAM */
-	memory_install_readwrite8_handler (0, ADDRESS_SPACE_PROGRAM,
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 		0, mess_ram_size - 1, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(1, mess_ram);
 
 	if (mess_ram_size < 4 * 1024)
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 
 	pia_config(0, &pia);

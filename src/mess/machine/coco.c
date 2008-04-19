@@ -170,7 +170,7 @@ static int dragon_plus_reg;			/* Dragon plus control reg */
 /* Memory map related CoCo 1/2 and Dragons only */
 static UINT8 *bas_rom_bank;			/* Dragon 64 / Alpha rom bank in use, basic rom bank on coco */
 static UINT8 *bottom_32k;			/* ram to be mapped into bottom 32K */
-static void setup_memory_map(void);
+static void setup_memory_map(running_machine *machine);
 
 
 /* These sets of defines control logging.  When MAME_DEBUG is off, all logging
@@ -1619,7 +1619,7 @@ static void dragon_page_rom(int	romswitch)
 	bas_rom_bank = bank;			/* Record which rom we are using so that the irq routine */
 						/* uses the vectors from the correct rom ! (alpha) */
 
-	setup_memory_map();			/* Setup memory map as needed */
+	setup_memory_map(Machine);			/* Setup memory map as needed */
 }
 
 /********************************************************************************************/
@@ -1822,7 +1822,7 @@ WRITE8_HANDLER ( plus_reg_w )
 		default	: bottom_32k=&mess_ram[0x00000]; break; // Just to shut the compiler up !
 	}
 
-	setup_memory_map();
+	setup_memory_map(Machine);
 }
 
 
@@ -1863,7 +1863,7 @@ READ8_HANDLER(dragon_alpha_mapped_irq_r)
 	return bas_rom_bank[0x3ff0 + offset];
 }
 
-static void setup_memory_map(void)
+static void setup_memory_map(running_machine *machine)
 {
 	/*
 	The following table contains the RAM block mappings for the CoCo 1/2 and Dragon computers
@@ -1953,13 +1953,13 @@ static void setup_memory_map(void)
 			else
 				memory_set_bankptr(block_index+1,&mess_ram[memmap[wbank-1].start]);
 
-			memory_install_read_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
-			memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
+			memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
+			memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
 		}
 		else
 		{
-			memory_install_read_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
-			memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
+			memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
+			memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
 		}
 	}
 
@@ -1977,7 +1977,7 @@ static void setup_memory_map(void)
 				offset=&coco_rom[0x4000+(0x1000*(block_index-4))];
 
 			memory_set_bankptr(block_index + 9,offset);
-			memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0, STATIC_NOP);
+			memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0, STATIC_NOP);
 		}
 	}
 }
@@ -1999,7 +1999,7 @@ static void d_sam_set_pageonemode(int val)
 		else
 			bottom_32k=mess_ram;
 
-		setup_memory_map();
+		setup_memory_map(Machine);
 	}
 }
 
@@ -2029,7 +2029,7 @@ static void d_sam_set_memorysize(int val)
 	 * TODO:  Verify that the CoCo 3 ignored this
 	 */
 
-	setup_memory_map();
+	setup_memory_map(Machine);
 }
 
 
@@ -2130,7 +2130,7 @@ static void d_sam_set_maptype(int val)
 	if(val)
 		bottom_32k=mess_ram;	// Always reset, when in maptype 1
 
-	setup_memory_map();
+	setup_memory_map(Machine);
 }
 
 /*************************************
@@ -2274,7 +2274,7 @@ static void coco3_mmu_update(int lowblock, int hiblock)
 
 		/* set up the banks */
 		memory_set_bankptr(i + 1, readbank);
-		memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, bank_info[i].start, bank_info[i].end, 0, 0, writebank);
+		memory_install_write_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, bank_info[i].start, bank_info[i].end, 0, 0, writebank);
 
 		if (LOG_MMU)
 		{

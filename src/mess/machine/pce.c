@@ -201,14 +201,14 @@ DEVICE_IMAGE_LOAD(pce_cart)
 
 	/* Check for Street fighter 2 */
 	if ( size == PCE_ROM_MAXSIZE ) {
-		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w );
+		memory_install_write8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w );
 	}
 
 	/* Check for Populous */
 	if ( ! memcmp( ROM + 0x1F26, "POPULOUS", 8 ) ) {
 		cartridge_ram = auto_malloc( 0x8000 );
 		memory_set_bankptr( 2, cartridge_ram );
-		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w );
+		memory_install_write8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w );
 	}
 
 	/* Check for CD system card */
@@ -219,7 +219,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 			pce_sys3_card = 1;
 			cartridge_ram = auto_malloc( 0x30000 );
 			memory_set_bankptr( 4, cartridge_ram );
-			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w );
+			memory_install_write8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w );
 		}
 	}
 	return 0;

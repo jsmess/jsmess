@@ -177,8 +177,8 @@ static ADDRESS_MAP_START( joinem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb504, 0xb504) AM_READ(input_port_4_r)
 	AM_RANGE(0xb506, 0xb507) AM_READWRITE(jack_flipscreen_r, jack_flipscreen_w)
 	AM_RANGE(0xb700, 0xb700) AM_WRITE(joinem_misc_w)
-	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_WRITE(jack_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xbc00, 0xbfff) AM_RAM AM_WRITE(jack_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb800, 0xbbff) AM_RAM_WRITE(jack_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 
@@ -1455,10 +1455,10 @@ static DRIVER_INIT( striv )
 	}
 
 	// Set-up the weirdest questions read ever done
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, striv_question_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, striv_question_r);
 
 	// Nop out unused sprites writes
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb0ff, 0, 0, SMH_NOP);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb0ff, 0, 0, SMH_NOP);
 
 	timer_rate = 128;
 }

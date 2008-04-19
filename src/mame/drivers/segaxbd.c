@@ -521,14 +521,14 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE(1) AM_BASE(&backupram1)
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE(2) AM_BASE(&backupram2)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE(SMH_RAM, segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_READWRITE(SMH_RAM, segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
+	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
 	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_READWRITE(segaic16_multiply_0_r, segaic16_multiply_0_w)
 	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_READWRITE(segaic16_divide_0_r, segaic16_divide_0_w)
 	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_READWRITE(segaic16_compare_timer_0_r, segaic16_compare_timer_0_w)
 	AM_RANGE(0x100000, 0x100fff) AM_MIRROR(0x00f000) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x110000, 0x11ffff) AM_WRITE(segaic16_sprites_draw_0_w)
-	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_READWRITE(SMH_RAM, segaic16_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x130000, 0x13ffff) AM_READWRITE(adc_r, adc_w)
 	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_0_r, iochip_0_w)
 	AM_RANGE(0x150000, 0x15000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_1_r, iochip_1_w)
@@ -2427,7 +2427,7 @@ static DRIVER_INIT( aburner2 )
 	xboard_generic_init();
 	xboard_set_road_priority(0);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
 }
 
 
@@ -2444,14 +2444,14 @@ static DRIVER_INIT( loffire )
 	adc_reverse[1] = adc_reverse[3] = 1;
 
 	/* install extra synchronization on core shared memory */
-	loffire_sync = memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
+	loffire_sync = memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
 }
 
 
 static DRIVER_INIT( smgp )
 {
 	xboard_generic_init();
-	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
 }
 
 

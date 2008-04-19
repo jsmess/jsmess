@@ -510,7 +510,7 @@ static DRIVER_INIT( jaguar )
 	state_save_register_global(eeprom_enable);
 
 	/* init the sound system and install DSP speedups */
-	cojag_sound_init();
+	cojag_sound_init(machine);
 }
 
 static QUICKLOAD_LOAD( jaguar )

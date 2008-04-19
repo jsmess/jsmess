@@ -26,7 +26,7 @@
 /* address spaces */
 enum
 {
-	ADDRESS_SPACE_PROGRAM = 0,			/* program address space */
+	ADDRESS_SPACE_PROGRAM = 0,		/* program address space */
 	ADDRESS_SPACE_DATA,				/* data address space */
 	ADDRESS_SPACE_IO,				/* I/O address space */
 	ADDRESS_SPACES					/* maximum number of address spaces */
@@ -107,14 +107,14 @@ typedef void	(*write64_machine_func)(ATTR_UNUSED running_machine *machine, ATTR_
 
 
 /* device read/write handlers */
-typedef UINT8	(*read8_device_func)  (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset);
-typedef void	(*write8_device_func) (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
-typedef UINT16	(*read16_device_func) (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
-typedef void	(*write16_device_func)(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
-typedef UINT32	(*read32_device_func) (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
-typedef void	(*write32_device_func)(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
-typedef UINT64	(*read64_device_func) (ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
-typedef void	(*write64_device_func)(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+typedef UINT8	(*read8_device_func)  (ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset);
+typedef void	(*write8_device_func) (ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
+typedef UINT16	(*read16_device_func) (ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
+typedef void	(*write16_device_func)(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
+typedef UINT32	(*read32_device_func) (ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
+typedef void	(*write32_device_func)(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
+typedef UINT64	(*read64_device_func) (ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
+typedef void	(*write64_device_func)(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
 
 
 /* data_accessors is a struct with accessors of all flavors */
@@ -192,10 +192,14 @@ struct _address_map_entry
 	offs_t					addrmirror;			/* mirror bits */
 	offs_t					addrmask;			/* mask bits */
 	read_handler 			read;				/* read handler callback */
+	UINT8					read_bits;			/* bits for the read handler callback (0=default, 1=8, 2=16, 3=32) */
+	UINT8					read_mask;			/* mask bits indicating which subunits to process */
 	const char *			read_name;			/* read handler callback name */
 	device_type				read_devtype;		/* read device type for device references */
 	const char *			read_devtag;		/* read tag for the relevant device */
 	write_handler 			write;				/* write handler callback */
+	UINT8					write_bits;			/* bits for the write handler callback (0=default, 1=8, 2=16, 3=32) */
+	UINT8					write_mask;			/* mask bits indicating which subunits to process */
 	const char *			write_name;			/* write handler callback name */
 	device_type				write_devtype;		/* read device type for device references */
 	const char *			write_devtag;		/* read tag for the relevant device */
@@ -284,6 +288,8 @@ union _addrmap16_token
 	write16_device_func		dwrite;				/* pointer to native device write handler */
 	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
 	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read8_device_func		dread8;				/* pointer to 8-bit device read handler */
+	write8_device_func		dwrite8;			/* pointer to 8-bit device write handler */
 	read_handler			read;				/* generic read handlers */
 	write_handler			write;				/* generic write handlers */
 	device_type				devtype;			/* device type */
@@ -304,8 +310,12 @@ union _addrmap32_token
 	write32_device_func		dwrite;				/* pointer to native device write handler */
 	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
 	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read8_device_func		dread8;				/* pointer to 8-bit device read handler */
+	write8_device_func		dwrite8;			/* pointer to 8-bit device write handler */
 	read16_machine_func		mread16;			/* pointer to 16-bit machine read handler */
 	write16_machine_func	mwrite16;			/* pointer to 16-bit machine write handler */
+	read16_device_func		dread16;			/* pointer to 16-bit device read handler */
+	write16_device_func		dwrite16;			/* pointer to 16-bit device write handler */
 	read_handler			read;				/* generic read handlers */
 	write_handler			write;				/* generic write handlers */
 	device_type				devtype;			/* device type */
@@ -326,10 +336,16 @@ union _addrmap64_token
 	write64_device_func		dwrite;				/* pointer to native device write handler */
 	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
 	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read8_device_func		dread8;				/* pointer to 8-bit device read handler */
+	write8_device_func		dwrite8;			/* pointer to 8-bit device write handler */
 	read16_machine_func		mread16;			/* pointer to 16-bit machine read handler */
 	write16_machine_func	mwrite16;			/* pointer to 16-bit machine write handler */
+	read16_device_func		dread16;			/* pointer to 16-bit device read handler */
+	write16_device_func		dwrite16;			/* pointer to 16-bit device write handler */
 	read32_machine_func		mread32;			/* pointer to 32-bit machine read handler */
 	write32_machine_func	mwrite32;			/* pointer to 32-bit machine write handler */
+	read32_device_func		dread32;			/* pointer to 32-bit device read handler */
+	write32_device_func		dwrite32;			/* pointer to 32-bit device write handler */
 	read_handler			read;				/* generic read handlers */
 	write_handler			write;				/* generic write handlers */
 	device_type				devtype;			/* device type */
@@ -359,14 +375,14 @@ union _addrmap64_token
 
 
 /* device read/write handler function macros */
-#define READ8_DEVICE_HANDLER(name) 		UINT8  name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset)
-#define WRITE8_DEVICE_HANDLER(name) 	void   name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
-#define READ16_DEVICE_HANDLER(name)		UINT16 name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
-#define WRITE16_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
-#define READ32_DEVICE_HANDLER(name)		UINT32 name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
-#define WRITE32_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
-#define READ64_DEVICE_HANDLER(name)		UINT64 name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
-#define WRITE64_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
+#define READ8_DEVICE_HANDLER(name) 		UINT8  name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset)
+#define WRITE8_DEVICE_HANDLER(name) 	void   name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+#define READ16_DEVICE_HANDLER(name)		UINT16 name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
+#define WRITE16_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
+#define READ32_DEVICE_HANDLER(name)		UINT32 name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
+#define WRITE32_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
+#define READ64_DEVICE_HANDLER(name)		UINT64 name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
+#define WRITE64_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
 
 
 /* static memory handler (SMH) macros that can be used in place of read/write handlers */
@@ -451,42 +467,75 @@ union _addrmap64_token
 
 
 /* wrappers for dynamic read handler installation */
-#define memory_install_read_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_read_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_read8_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_read8_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_read16_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_read16_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_read32_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_read32_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_read64_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_read64_handler(cpu, space, start, end, mask, mirror, handler, #handler)
+#define memory_install_read_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, rhandler, (FPTR)NULL, #rhandler, NULL)
+#define memory_install_read8_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_handler8(machine, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
+#define memory_install_read16_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_handler16(machine, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
+#define memory_install_read32_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_handler32(machine, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
+#define memory_install_read64_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_handler64(machine, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
+
+#define memory_install_read_device_handler(device, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
+#define memory_install_read8_device_handler(device, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_device_handler8(device, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
+#define memory_install_read16_device_handler(device, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_device_handler16(device, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
+#define memory_install_read32_device_handler(device, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_device_handler32(device, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
+#define memory_install_read64_device_handler(device, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_device_handler64(device, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
 
 
 /* wrappers for dynamic write handler installation */
-#define memory_install_write_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_write_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_write8_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_write8_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_write16_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_write16_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_write32_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_write32_handler(cpu, space, start, end, mask, mirror, handler, #handler)
-#define memory_install_write64_handler(cpu, space, start, end, mask, mirror, handler) \
-	_memory_install_write64_handler(cpu, space, start, end, mask, mirror, handler, #handler)
+#define memory_install_write_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, (FPTR)NULL, whandler, NULL, #whandler)
+#define memory_install_write8_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_handler8(machine, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
+#define memory_install_write16_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_handler16(machine, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
+#define memory_install_write32_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_handler32(machine, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
+#define memory_install_write64_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_handler64(machine, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
+
+#define memory_install_write_device_handler(device, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_device_handler(device, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
+#define memory_install_write8_device_handler(device, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_device_handler8(device, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
+#define memory_install_write16_device_handler(device, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_device_handler16(device, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
+#define memory_install_write32_device_handler(device, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_device_handler32(device, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
+#define memory_install_write64_device_handler(device, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_device_handler64(device, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
 
 
 /* wrappers for dynamic read/write handler installation */
-#define memory_install_readwrite_handler(cpu, space, start, end, mask, mirror, rhandler, whandler) \
-	_memory_install_readwrite_handler(cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
-#define memory_install_readwrite8_handler(cpu, space, start, end, mask, mirror, rhandler, whandler) \
-	_memory_install_readwrite8_handler(cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
-#define memory_install_readwrite16_handler(cpu, space, start, end, mask, mirror, rhandler, whandler) \
-	_memory_install_readwrite16_handler(cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
-#define memory_install_readwrite32_handler(cpu, space, start, end, mask, mirror, rhandler, whandler) \
-	_memory_install_readwrite32_handler(cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
-#define memory_install_readwrite64_handler(cpu, space, start, end, mask, mirror, rhandler, whandler) \
-	_memory_install_readwrite64_handler(cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+#define memory_install_readwrite_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+#define memory_install_readwrite8_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_handler8(machine, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+#define memory_install_readwrite16_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_handler16(machine, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+#define memory_install_readwrite32_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_handler32(machine, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+#define memory_install_readwrite64_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_handler64(machine, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+
+#define memory_install_readwrite_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+#define memory_install_readwrite8_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_device_handler8(device, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+#define memory_install_readwrite16_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_device_handler16(device, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+#define memory_install_readwrite32_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_device_handler32(device, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+#define memory_install_readwrite64_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_device_handler64(device, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 
 
 /* macros for accessing bytes and words within larger chunks */
@@ -532,6 +581,31 @@ union _addrmap64_token
 #define address_map_0 NULL
 
 
+/* maps a full 64-bit mask down to an 8-bit byte mask */
+#define UNITMASK8(x) \
+	((((UINT64)(x) >> (63-7)) & 0x80) | \
+	 (((UINT64)(x) >> (55-6)) & 0x40) | \
+	 (((UINT64)(x) >> (47-5)) & 0x20) | \
+	 (((UINT64)(x) >> (39-4)) & 0x10) | \
+	 (((UINT64)(x) >> (31-3)) & 0x08) | \
+	 (((UINT64)(x) >> (23-2)) & 0x04) | \
+	 (((UINT64)(x) >> (15-1)) & 0x02) | \
+	 (((UINT64)(x) >> ( 7-0)) & 0x01))
+
+/* maps a full 64-bit mask down to a 4-bit word mask */
+#define UNITMASK16(x) \
+	((((UINT64)(x) >> (63-3)) & 0x08) | \
+	 (((UINT64)(x) >> (47-2)) & 0x04) | \
+	 (((UINT64)(x) >> (31-1)) & 0x02) | \
+	 (((UINT64)(x) >> (15-0)) & 0x01))
+
+/* maps a full 64-bit mask down to a 2-bit dword mask */
+#define UNITMASK32(x) \
+	((((UINT64)(x) >> (63-1)) & 0x02) | \
+	 (((UINT64)(x) >> (31-0)) & 0x01))
+
+
+
 /* start/end tags for the address map */
 #define ADDRESS_MAP_START(_name, _space, _bits) \
 	const addrmap##_bits##_token address_map_##_name[] = { \
@@ -574,31 +648,103 @@ union _addrmap64_token
 	TOKEN_UINT64_PACK2(ADDRMAP_TOKEN_MIRROR, 8, _mirror, 32),
 
 #define AM_READ(_handler) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_READ, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 0, 8, 0, 8), \
 	TOKEN_PTR(mread, _handler), \
 	TOKEN_STRING(#_handler),
 
+#define AM_READ8(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 8, 8, UNITMASK8(_unitmask), 8), \
+	TOKEN_PTR(mread8, _handler), \
+	TOKEN_STRING(#_handler),
+
+#define AM_READ16(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 16, 8, UNITMASK16(_unitmask), 8), \
+	TOKEN_PTR(mread16, _handler), \
+	TOKEN_STRING(#_handler),
+
+#define AM_READ32(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 32, 8, UNITMASK32(_unitmask), 8), \
+	TOKEN_PTR(mread32, _handler), \
+	TOKEN_STRING(#_handler),
+
 #define AM_WRITE(_handler) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_WRITE, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 0, 8, 0, 8), \
 	TOKEN_PTR(mwrite, _handler), \
 	TOKEN_STRING(#_handler),
 
+#define AM_WRITE8(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 8, 8, UNITMASK8(_unitmask), 8), \
+	TOKEN_PTR(mwrite8, _handler), \
+	TOKEN_STRING(#_handler),
+
+#define AM_WRITE16(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 16, 8, UNITMASK16(_unitmask), 8), \
+	TOKEN_PTR(mwrite16, _handler), \
+	TOKEN_STRING(#_handler),
+
+#define AM_WRITE32(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 32, 8, UNITMASK32(_unitmask), 8), \
+	TOKEN_PTR(mwrite32, _handler), \
+	TOKEN_STRING(#_handler),
+
 #define AM_DEVREAD(_type, _tag, _handler) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_DEVICE_READ, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 0, 8, 0, 8), \
 	TOKEN_PTR(dread, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
+#define AM_DEVREAD8(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 8, 8, UNITMASK8(_unitmask), 8), \
+	TOKEN_PTR(dread8, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_DEVREAD16(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 16, 8, UNITMASK16(_unitmask), 8), \
+	TOKEN_PTR(dread16, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_DEVREAD32(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 32, 8, UNITMASK32(_unitmask), 8), \
+	TOKEN_PTR(dread32, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
 #define AM_DEVWRITE(_type, _tag, _handler) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_DEVICE_WRITE, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 0, 8, 0, 8), \
 	TOKEN_PTR(dwrite, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
+#define AM_DEVWRITE8(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 8, 8, UNITMASK8(_unitmask), 8), \
+	TOKEN_PTR(dwrite8, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_DEVWRITE16(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 16, 8, UNITMASK16(_unitmask), 8), \
+	TOKEN_PTR(dwrite16, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_DEVWRITE32(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 32, 8, UNITMASK32(_unitmask), 8), \
+	TOKEN_PTR(dwrite32, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
 #define AM_READ_PORT(_tag) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_READ_PORT, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ_PORT, 8, 0, 8, 0, 8), \
 	TOKEN_STRING(_tag),
 
 #define AM_REGION(_region, _offs) \
@@ -624,13 +770,24 @@ union _addrmap64_token
 
 /* common shortcuts */
 #define AM_READWRITE(_read,_write)			AM_READ(_read) AM_WRITE(_write)
+#define AM_READWRITE8(_read,_write,_shift)	AM_READ8(_read,_shift) AM_WRITE8(_write,_shift)
+#define AM_READWRITE16(_read,_write,_shift)	AM_READ16(_read,_shift) AM_WRITE16(_write,_shift)
+#define AM_READWRITE32(_read,_write,_shift)	AM_READ32(_read,_shift) AM_WRITE32(_write,_shift)
+
 #define AM_DEVREADWRITE(_type,_tag,_read,_write) AM_DEVREAD(_type,_tag,_read) AM_DEVWRITE(_type,_tag,_write)
+#define AM_DEVREADWRITE8(_type,_tag,_read,_write,_shift) AM_DEVREAD8(_type,_tag,_read,_shift) AM_DEVWRITE8(_type,_tag,_write,_shift)
+#define AM_DEVREADWRITE16(_type,_tag,_read,_write,_shift) AM_DEVREAD16(_type,_tag,_read,_shift) AM_DEVWRITE16(_type,_tag,_write,_shift)
+#define AM_DEVREADWRITE32(_type,_tag,_read,_write,_shift) AM_DEVREAD32(_type,_tag,_read,_shift) AM_DEVWRITE32(_type,_tag,_write,_shift)
+
 #define AM_ROM								AM_READ(SMH_ROM)
-#define AM_RAM								AM_READWRITE(SMH_RAM, SMH_RAM)
-#define AM_WRITEONLY						AM_WRITE(SMH_RAM)
-#define AM_UNMAP							AM_READWRITE(SMH_UNMAP, SMH_UNMAP)
 #define AM_ROMBANK(_bank)					AM_READ(SMH_BANK(_bank))
+
+#define AM_RAM								AM_READWRITE(SMH_RAM, SMH_RAM)
 #define AM_RAMBANK(_bank)					AM_READWRITE(SMH_BANK(_bank), SMH_BANK(_bank))
+#define AM_RAM_WRITE(_write)				AM_READWRITE(SMH_RAM, _write)
+#define AM_WRITEONLY						AM_WRITE(SMH_RAM)
+
+#define AM_UNMAP							AM_READWRITE(SMH_UNMAP, SMH_UNMAP)
 #define AM_NOP								AM_READWRITE(SMH_NOP, SMH_NOP)
 #define AM_READNOP							AM_READ(SMH_NOP)
 #define AM_WRITENOP							AM_WRITE(SMH_NOP)
@@ -717,21 +874,18 @@ void		memory_set_log_unmap(int spacenum, int log);
 int			memory_get_log_unmap(int spacenum);
 
 /* dynamic address space mapping */
-void *		_memory_install_read_handler   (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR handler, const char *handler_name);
-UINT8 *		_memory_install_read8_handler  (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func handler, const char *handler_name);
-UINT16 *	_memory_install_read16_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func handler, const char *handler_name);
-UINT32 *	_memory_install_read32_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func handler, const char *handler_name);
-UINT64 *	_memory_install_read64_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func handler, const char *handler_name);
-void *		_memory_install_write_handler  (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR handler, const char *handler_name);
-UINT8 *		_memory_install_write8_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_machine_func handler, const char *handler_name);
-UINT16 *	_memory_install_write16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_machine_func handler, const char *handler_name);
-UINT32 *	_memory_install_write32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_machine_func handler, const char *handler_name);
-UINT64 *	_memory_install_write64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_machine_func handler, const char *handler_name);
-void *		_memory_install_readwrite_handler  (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);
-UINT8 *		_memory_install_readwrite8_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name);
-UINT16 *	_memory_install_readwrite16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name);
-UINT32 *	_memory_install_readwrite32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name);
-UINT64 *	_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+void *		_memory_install_handler  (running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);
+UINT8 *		_memory_install_handler8 (running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT16 *	_memory_install_handler16(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT32 *	_memory_install_handler32(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT64 *	_memory_install_handler64(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+
+/* dynamic device address space mapping */
+void *		_memory_install_device_handler  (const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);
+UINT8 *		_memory_install_device_handler8 (const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, write8_device_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT16 *	_memory_install_device_handler16(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, write16_device_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT32 *	_memory_install_device_handler32(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, write32_device_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT64 *	_memory_install_device_handler64(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name);
 
 /* memory debugging */
 void 		memory_dump(FILE *file);

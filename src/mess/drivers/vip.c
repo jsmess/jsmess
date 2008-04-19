@@ -195,13 +195,13 @@ static MACHINE_START( vip )
 	state_save_register_global(vip_reset);
 	state_save_register_global(vip_run);
 
-	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
 
 	if (mess_ram_size < 0x8000)
 	{
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, SMH_UNMAP);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, SMH_UNMAP);
 	}
 
 	for (addr = 0; addr < mess_ram_size; addr++)

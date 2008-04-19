@@ -116,9 +116,9 @@ static void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 	rh = (read16_machine_func) (FPTR)bank;
 	wh = is_rom ? SMH_UNMAP : (write16_machine_func) (FPTR)bank;
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, memory_begin,
+	memory_install_read16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, memory_begin,
 		memory_end, memory_mask, 0, rh);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, memory_begin,
+	memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, memory_begin,
 		memory_end, memory_mask, 0, wh);
 
 	memory_set_bankptr(bank, memory_data);

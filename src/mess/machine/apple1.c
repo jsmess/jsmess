@@ -146,9 +146,9 @@ static int apple1_kbd_data = 0;
 DRIVER_INIT( apple1 )
 {
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 								 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 								  0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, mess_ram);
 

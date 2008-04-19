@@ -1151,7 +1151,7 @@ static const struct riot6532_interface r6532_interface =
 };
 
 
-static void install_banks(int count, unsigned init)
+static void install_banks(running_machine *machine, int count, unsigned init)
 {
 	int i;
 
@@ -1165,7 +1165,7 @@ static void install_banks(int count, unsigned init)
 			SMH_BANK4,
 		};
 
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, 0, 0, handler[i]);
 
@@ -1549,83 +1549,83 @@ static MACHINE_RESET( a2600 )
 	switch (banking_mode)
 	{
 	case mode2K:
-		install_banks(2, 0x0000);
+		install_banks(machine, 2, 0x0000);
 		break;
 
 	case mode4K:
-		install_banks(1, 0x0000);
+		install_banks(machine, 1, 0x0000);
 		break;
 
 	case modeF8:
 		if (!memcmp(&CART[0x1ffc],snowwhite,sizeof(snowwhite))) {
-			install_banks(1, 0x0000);
+			install_banks(machine, 1, 0x0000);
 		} else {
-			install_banks(1, 0x1000);
+			install_banks(machine, 1, 0x1000);
 		}
 		break;
 
 	case modeFA:
-		install_banks(1, 0x2000);
+		install_banks(machine, 1, 0x2000);
 		break;
 
 	case modeF6:
-		install_banks(1, 0x0000);
+		install_banks(machine, 1, 0x0000);
 		break;
 
 	case modeF4:
-		install_banks(1, 0x7000);
+		install_banks(machine, 1, 0x7000);
 		break;
 
 	case modeFE:
-		install_banks(1, 0x0000);
+		install_banks(machine, 1, 0x0000);
 		break;
 
 	case modeE0:
-		install_banks(4, 0x1c00);
+		install_banks(machine, 4, 0x1c00);
 		break;
 
 	case mode3F:
-		install_banks(2, cart_size - 0x800);
+		install_banks(machine, 2, cart_size - 0x800);
 		number_banks = cart_size / 0x800;
 		break;
 
 	case modeUA:
-		install_banks(1, 0x1000);
+		install_banks(machine, 1, 0x1000);
 		break;
 
 	case modeE7:
-		install_banks(2, 0x3800);
+		install_banks(machine, 2, 0x3800);
 		break;
 
 	case modeDC:
-		install_banks(1, 0x1000 * current_bank);
+		install_banks(machine, 1, 0x1000 * current_bank);
 		break;
 
 	case modeCV:
-		install_banks(2, 0x0000);
+		install_banks(machine, 2, 0x0000);
 		break;
 
 	case mode3E:
-		install_banks(2, cart_size - 0x800);
+		install_banks(machine, 2, cart_size - 0x800);
 		number_banks = cart_size / 0x800;
 		mode3E_ram_enabled = 0;
 		break;
 
 	case modeSS:
-		install_banks(2, 0x0000);
+		install_banks(machine, 2, 0x0000);
 		break;
 
 	case modeFV:
-		install_banks(1, 0x0000);
+		install_banks(machine, 1, 0x0000);
 		current_bank = 0;
 		break;
 
 	case modeDPC:
-		install_banks(1, 0x0000);
+		install_banks(machine, 1, 0x0000);
 		break;
 
 	case mode32in1:
-		install_banks(2, 0x0000);
+		install_banks(machine, 2, 0x0000);
 		current_reset_bank_counter = current_reset_bank_counter & 0x1F;
 		break;
 
@@ -1634,7 +1634,7 @@ static MACHINE_RESET( a2600 )
 		if ( cart_size == 0x2000 )
 			current_reset_bank_counter = 0;
 		current_bank = current_reset_bank_counter * 2;
-		install_banks(1, 0x1000 * current_bank);
+		install_banks(machine, 1, 0x1000 * current_bank);
 		break;
 	}
 
@@ -1642,7 +1642,7 @@ static MACHINE_RESET( a2600 )
 
 	if (banking_mode == modeDC)
 	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fec, 0x1fec, 0, 0, current_bank_r);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fec, 0x1fec, 0, 0, current_bank_r);
 	}
 
 	/* set up bank switch registers */
@@ -1650,68 +1650,68 @@ static MACHINE_RESET( a2600 )
 	switch (banking_mode)
 	{
 	case modeF8:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
 		break;
 
 	case modeFA:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_r);
 		break;
 
 	case modeF6:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_r);
 		memory_set_opbase_handler( 0, modeF6_opbase );
 		break;
 
 	case modeF4:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_r);
 		break;
 
 	case modeE0:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_r);
 		break;
 
 	case mode3F:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x3f, 0, 0, mode3F_switch_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00, 0x3f, 0, 0, mode3F_switch_w);
 		break;
 
 	case modeUA:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x200, 0x27f, 0, 0, modeUA_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x200, 0x27f, 0, 0, modeUA_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200, 0x27f, 0, 0, modeUA_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200, 0x27f, 0, 0, modeUA_switch_r);
 		break;
 
 	case modeE7:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_r);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x18ff, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1900, 0x19ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x18ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1900, 0x19ff, 0, 0, SMH_BANK9);
 		memory_set_bankptr( 9, extra_RAM + 4 * 256 );
 		break;
 
 	case modeDC:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_r);
 		break;
 
 	case modeFE:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeFE_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeFE_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeFE_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeFE_switch_r);
 		break;
 
 	case mode3E:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3e, 0x3e, 0, 0, mode3E_RAM_switch_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3f, 0x3f, 0, 0, mode3E_switch_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x15ff, 0, 0, mode3E_RAM_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3e, 0x3e, 0, 0, mode3E_RAM_switch_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3f, 0x3f, 0, 0, mode3E_switch_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x15ff, 0, 0, mode3E_RAM_w);
 		break;
 
 	case modeSS:
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, modeSS_r);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, modeSS_r);
 		bank_base[1] = extra_RAM + 2 * 0x800;
 		bank_base[2] = CART;
 		memory_set_bankptr( 1, bank_base[1] );
@@ -1724,15 +1724,15 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case modeFV:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_r);
 		break;
 
 	case modeDPC:
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x103f, 0, 0, modeDPC_r);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1040, 0x107f, 0, 0, modeDPC_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x103f, 0, 0, modeDPC_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1040, 0x107f, 0, 0, modeDPC_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
 		memory_set_opbase_handler( 0, modeDPC_opbase_handler );
 		{
 			int	data_fetcher;
@@ -1752,8 +1752,8 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case modeJVP:
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_r);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_w);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_w);
 		break;
 	}
 
@@ -1761,24 +1761,24 @@ static MACHINE_RESET( a2600 )
 
 	if (banking_mode == modeFA)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x10ff, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1100, 0x11ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x10ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1100, 0x11ff, 0, 0, SMH_BANK9);
 
 		memory_set_bankptr(9, extra_RAM);
 	}
 
 	if (banking_mode == modeCV)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x17ff, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x13ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x17ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x13ff, 0, 0, SMH_BANK9);
 
 		memory_set_bankptr(9, extra_RAM);
 	}
 
 	if (chip)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x107f, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1080, 0x10ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x107f, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1080, 0x10ff, 0, 0, SMH_BANK9);
 
 		memory_set_bankptr(9, extra_RAM);
 	}

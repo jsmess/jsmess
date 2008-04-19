@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( joemacr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x154000, 0x155fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
 	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x164000, 0x165fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x170000, 0x170003) AM_RAM AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0x170000, 0x170003) AM_RAM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0x180000, 0x180003) AM_READWRITE(oki_r,oki_w)
 	AM_RANGE(0x1c0000, 0x1c0003) AM_READWRITE(oki2_r,oki2_w)
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( chainrec_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x454000, 0x455fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
 	AM_RANGE(0x460000, 0x461fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x464000, 0x465fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x470000, 0x470003) AM_RAM AM_WRITE(SMH_NOP) // ??
+	AM_RANGE(0x470000, 0x470003) AM_RAM_WRITE(SMH_NOP) // ??
 	AM_RANGE(0x480000, 0x480003) AM_READWRITE(oki_r,oki_w)
 ADDRESS_MAP_END
 
@@ -368,7 +368,7 @@ static ADDRESS_MAP_START( magdrop_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x3d4000, 0x3d5fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
 	AM_RANGE(0x3e0000, 0x3e1fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x3e4000, 0x3e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x3f0000, 0x3f0003) AM_RAM AM_WRITE(SMH_NOP) //?
+	AM_RANGE(0x3f0000, 0x3f0003) AM_RAM_WRITE(SMH_NOP) //?
 	AM_RANGE(0x400000, 0x400003) AM_READWRITE(oki_r,oki_w)
 ADDRESS_MAP_END
 
@@ -389,7 +389,7 @@ static ADDRESS_MAP_START( magdropp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x6d4000, 0x6d5fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
 	AM_RANGE(0x6e0000, 0x6e1fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x6e4000, 0x6e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x6f0000, 0x6f0003) AM_RAM AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0x6f0000, 0x6f0003) AM_RAM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0x780000, 0x780003) AM_READWRITE(oki_r,oki_w)
 ADDRESS_MAP_END
 
@@ -409,7 +409,7 @@ static ADDRESS_MAP_START( mitchell156_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x1e4000, 0x1e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
-	AM_RANGE(0x1f0000, 0x1f0003) AM_RAM AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0x1f0000, 0x1f0003) AM_RAM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&simpl156_systemram) // work ram (32-bit)
 ADDRESS_MAP_END
@@ -1163,7 +1163,7 @@ static READ32_HANDLER( joemacr_speedup_r )
 
 static DRIVER_INIT (joemacr)
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0201018, 0x020101b, 0, 0, joemacr_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201018, 0x020101b, 0, 0, joemacr_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1175,7 +1175,7 @@ static READ32_HANDLER( chainrec_speedup_r )
 
 static DRIVER_INIT (chainrec)
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0201018, 0x020101b, 0, 0, chainrec_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201018, 0x020101b, 0, 0, chainrec_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = chainrec_eeprom;
 }
@@ -1188,14 +1188,14 @@ static READ32_HANDLER( prtytime_speedup_r )
 
 static DRIVER_INIT (prtytime)
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = prtytime_eeprom;
 }
 
 static DRIVER_INIT (gangonta)
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = gangonta_eeprom;
 }
@@ -1209,7 +1209,7 @@ static READ32_HANDLER( charlien_speedup_r )
 
 static DRIVER_INIT (charlien)
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0201010, 0x0201013, 0, 0, charlien_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201010, 0x0201013, 0, 0, charlien_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1221,7 +1221,7 @@ static READ32_HANDLER( osman_speedup_r )
 
 static DRIVER_INIT (osman)
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = osman_eeprom;
 
@@ -1229,7 +1229,7 @@ static DRIVER_INIT (osman)
 
 static DRIVER_INIT (candance)
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = candance_eeprom;
 }

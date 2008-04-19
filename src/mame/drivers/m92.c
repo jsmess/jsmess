@@ -368,7 +368,7 @@ static WRITE16_HANDLER( m92_sound_status_w )
 /* appears to be an earlier board */
 static ADDRESS_MAP_START( lethalth_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_READWRITE(SMH_RAM, m92_vram_w) AM_BASE(&m92_vram_data)
+	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_BASE(&m92_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( m92_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK(1)
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK(2)	/* Mirror of rom:  Used by In The Hunt as protection */
-	AM_RANGE(0xd0000, 0xdffff) AM_READWRITE(SMH_RAM, m92_vram_w) AM_BASE(&m92_vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m92_vram_w) AM_BASE(&m92_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
@@ -2060,8 +2060,7 @@ static DRIVER_INIT( majtitl2 )
 	init_m92(machine, 1);
 
 	/* This game has an eprom on the game board */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf0000, 0xf3fff, 0, 0, m92_eeprom_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
 
 	m92_game_kludge=2;
 }
@@ -2083,7 +2082,7 @@ static DRIVER_INIT( lethalth )
 	m92_irq_vectorbase=0x20;
 
 	/* NOP out the bankswitcher */
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0x20, 0x21, 0, 0, SMH_NOP);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x20, 0x21, 0, 0, SMH_NOP);
 }
 
 static DRIVER_INIT( nbbatman )

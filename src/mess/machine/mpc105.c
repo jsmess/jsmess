@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "mpc105.h"
 #include "machine/pci.h"
 
@@ -23,21 +24,21 @@ struct mpc105_info
 static struct mpc105_info *mpc105;
 
 
-static void mpc105_update_memory(void)
+static void mpc105_update_memory(running_machine *machine)
 {
 	int cpunum, bank;
 	offs_t begin, end;
 
 	if (LOG_MPC105)
-		logerror("mpc105_update_memory(): Updating memory (bank enable=0x%02X)\n", mpc105->bank_enable);
+		logerror("mpc105_update_memory(machine): Updating memory (bank enable=0x%02X)\n", mpc105->bank_enable);
 
 	if (mpc105->bank_base > 0)
 	{
 		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 		{
 			/* first clear everything out */
-			memory_install_read64_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
-			memory_install_write64_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
+			memory_install_read64_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
+			memory_install_write64_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
 		}
 	}
 
@@ -63,9 +64,9 @@ static void mpc105_update_memory(void)
 				{
 					for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 					{
-						memory_install_read64_handler(cpunum, ADDRESS_SPACE_PROGRAM, begin, end,
+						memory_install_read64_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, begin, end,
 							0, 0, (read64_machine_func) (FPTR)(bank + mpc105->bank_base));
-						memory_install_write64_handler(cpunum, ADDRESS_SPACE_PROGRAM, begin, end,
+						memory_install_write64_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, begin, end,
 							0, 0, (write64_machine_func) (FPTR)(bank + mpc105->bank_base));
 					}
 					memory_set_bankptr(bank + mpc105->bank_base, mess_ram);
@@ -173,7 +174,7 @@ static void mpc105_pci_write(int function, int offset, UINT32 data, UINT32 mem_m
 			if (mpc105->bank_registers[i] != data)
 			{
 				mpc105->bank_registers[i] = data;
-				mpc105_update_memory();
+				mpc105_update_memory(Machine);
 			}
 			break;
 
@@ -181,7 +182,7 @@ static void mpc105_pci_write(int function, int offset, UINT32 data, UINT32 mem_m
 			if (mpc105->bank_enable != (UINT8) data)
 			{
 				mpc105->bank_enable = (UINT8) data;
-				mpc105_update_memory();
+				mpc105_update_memory(Machine);
 			}
 			break;
 

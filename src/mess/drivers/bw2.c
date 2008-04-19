@@ -48,7 +48,7 @@ static UINT8 keyboard_row;
 
 /* Memory */
 
-static void bw2_set_banks(UINT8 data)
+static void bw2_set_banks(running_machine *machine, UINT8 data)
 {
 	/*
 	Y0  /RAM1  	Memory bank 1
@@ -67,8 +67,8 @@ static void bw2_set_banks(UINT8 data)
 	{
 	case 0:
 	case 1:
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
 		break;
 
 	case 2:
@@ -78,26 +78,26 @@ static void bw2_set_banks(UINT8 data)
 	case 6:
 		if (mess_ram_size < ((bank + 1) * 32 * 1024))
 		{
-			memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
 		}
 		else
 		{
-			memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
 		}
 		break;
 
 	case 7:
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
 		break;
 	}
 
 	memory_set_bank(1, bank);
 }
 
-static void ramcard_set_banks(UINT8 data)
+static void ramcard_set_banks(running_machine *machine, UINT8 data)
 {
 	/*
 	Y0  /RAM1  	Memory bank 1
@@ -117,8 +117,8 @@ static void ramcard_set_banks(UINT8 data)
 	case 0:
 	case 1:
 	case 5:
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
 		break;
 
 	case 3:
@@ -126,20 +126,20 @@ static void ramcard_set_banks(UINT8 data)
 	case 6:
 		if (mess_ram_size < ((bank + 1) * 32 * 1024))
 		{
-			memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
 		}
 		else
 		{
-			memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
 		}
 		break;
 
 	case 2:
 	case 7:
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
 		break;
 	}
 
@@ -351,11 +351,11 @@ static WRITE8_HANDLER( bw2_ppi8255_c_w )
 
 	if (input_port_read(machine, "RAMCARD") & 0x01)
 	{
-		ramcard_set_banks(data & 0x07);
+		ramcard_set_banks(machine, data & 0x07);
 	}
 	else
 	{
-		bw2_set_banks(data & 0x07);
+		bw2_set_banks(machine, data & 0x07);
 	}
 }
 
@@ -511,7 +511,7 @@ static MACHINE_START( bw2 )
 		memory_configure_bank(1, 7, 1, memory_region(REGION_CPU1), 0);
 		memory_configure_bank(1, 8, 16, ramcard_ram, 0x8000);
 
-		memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x30, 0x30, 0, 0x0f, &ramcard_bank_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x30, 0x30, 0, 0x0f, &ramcard_bank_w);
 	}
 	else
 	{

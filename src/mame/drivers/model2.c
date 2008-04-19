@@ -1280,7 +1280,7 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01100000, 0x0110ffff) AM_READWRITE(sys24_tile32_r, sys24_tile32_w) AM_MIRROR(0x10000)
 	AM_RANGE(0x01180000, 0x011fffff) AM_READWRITE(sys24_char32_r, sys24_char32_w) AM_MIRROR(0x100000)
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE(SMH_RAM, pal32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE(pal32_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE(&model2_colorxlat)
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
@@ -1311,9 +1311,9 @@ static ADDRESS_MAP_START( model2o_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE( model2_serial_r, model2o_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_READWRITE(SMH_RAM, model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_READWRITE(SMH_RAM, model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE(SMH_RAM, model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c00007) AM_READ(analog_r)
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ(ctrl10_r)
@@ -1338,9 +1338,9 @@ static ADDRESS_MAP_START( model2a_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE( model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_READWRITE(SMH_RAM, model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_READWRITE(SMH_RAM, model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE(SMH_RAM, model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READWRITE(ctrl0_r, ctrl0_w)
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ(ctrl1_r)
@@ -3911,8 +3911,7 @@ ROM_END
 
 static DRIVER_INIT( genprot )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 }
 
@@ -3920,8 +3919,7 @@ static DRIVER_INIT( pltkids )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -3932,8 +3930,7 @@ static DRIVER_INIT( zerogun )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -3942,15 +3939,14 @@ static DRIVER_INIT( zerogun )
 
 static DRIVER_INIT( daytonam )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x240000, 0x24ffff, 0, 0, maxx_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x240000, 0x24ffff, 0, 0, maxx_r );
 }
 
 static DRIVER_INIT( sgt24h )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	ROM[0x56578/4] = 0x08000004;
@@ -3961,8 +3957,7 @@ static DRIVER_INIT( doa )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	ROM[0x630/4] = 0x08000004;

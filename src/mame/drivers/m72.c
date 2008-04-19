@@ -475,57 +475,57 @@ static WRITE16_HANDLER( protection_w )
 		copy_le(&protection_ram[0x0fe0],protection_crc,CRC_LEN);
 }
 
-static void install_protection_handler(const UINT8 *code,const UINT8 *crc)
+static void install_protection_handler(running_machine *machine, const UINT8 *code,const UINT8 *crc)
 {
 	protection_ram = auto_malloc(0x1000);
 	protection_code = code;
 	protection_crc =  crc;
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, protection_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, protection_w);
 	memory_set_bankptr(1, protection_ram);
 }
 
 static DRIVER_INIT( bchopper )
 {
-	install_protection_handler(bchopper_code,bchopper_crc);
+	install_protection_handler(machine, bchopper_code,bchopper_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( mrheli )
 {
-	install_protection_handler(bchopper_code,mrheli_crc);
+	install_protection_handler(machine, bchopper_code,mrheli_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspirit )
 {
-	install_protection_handler(nspirit_code,nspirit_crc);
+	install_protection_handler(machine, nspirit_code,nspirit_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspiritj )
 {
-	install_protection_handler(nspirit_code,nspiritj_crc);
+	install_protection_handler(machine, nspirit_code,nspiritj_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( imgfight )
 {
-	install_protection_handler(imgfight_code,imgfight_crc);
+	install_protection_handler(machine, imgfight_code,imgfight_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
 }
 
 static DRIVER_INIT( loht )
 {
-	install_protection_handler(loht_code,loht_crc);
+	install_protection_handler(machine, loht_code,loht_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(m72_videoram2,0,0x4000);
@@ -546,45 +546,44 @@ static DRIVER_INIT( loht_mcu )
 
 	protection_ram = auto_malloc(0x10000);
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_r, m72_main_mcu_w);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 }
 
 
 static DRIVER_INIT( xmultipl )
 {
-	install_protection_handler(xmultipl_code,xmultipl_crc);
+	install_protection_handler(machine, xmultipl_code,xmultipl_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, xmultipl_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, xmultipl_sample_trigger_w);
 }
 
 static DRIVER_INIT( dbreed72 )
 {
-	install_protection_handler(dbreed72_code,dbreed72_crc);
+	install_protection_handler(machine, dbreed72_code,dbreed72_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dbreed72_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dbreed72_sample_trigger_w);
 }
 
 static DRIVER_INIT( airduel )
 {
-	install_protection_handler(airduel_code,airduel_crc);
+	install_protection_handler(machine, airduel_code,airduel_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
 }
 
 static DRIVER_INIT( dkgenm72 )
 {
-	install_protection_handler(dkgenm72_code,dkgenm72_crc);
+	install_protection_handler(machine, dkgenm72_code,dkgenm72_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( gallop )
 {
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
 }
 
 
@@ -645,8 +644,8 @@ static ADDRESS_MAP_START( NAME##_map, ADDRESS_SPACE_PROGRAM, 16 )		\
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	\
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)			\
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)		\
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)		\
-	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)		\
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)		\
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)		\
 	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)							\
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM										\
 ADDRESS_MAP_END
@@ -665,8 +664,8 @@ static ADDRESS_MAP_START( dbreed_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -676,8 +675,8 @@ static ADDRESS_MAP_START( rtype2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
@@ -687,8 +686,8 @@ static ADDRESS_MAP_START( majtitle_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE(&majtitle_rowscrollram)
 	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0xac000, 0xaffff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xb0000, 0xbffff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)	/* larger than the other games */
+	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)	/* larger than the other games */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_BASE(&spriteram16_2)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
@@ -706,8 +705,8 @@ static ADDRESS_MAP_START( hharry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -719,8 +718,8 @@ static ADDRESS_MAP_START( hharryu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(SMH_RAM)	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -733,8 +732,8 @@ static ADDRESS_MAP_START( kengo_map, ADDRESS_SPACE_PROGRAM, 16 )
 AM_RANGE(0xb4000, 0xb4001) AM_WRITE(SMH_NOP)	/* ??? */
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x80000, 0x83fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0x84000, 0x87fff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END

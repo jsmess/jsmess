@@ -24,7 +24,7 @@ static UINT8 pmd85_ppi_port_outputs[4][3];
 
 static UINT8 pmd85_startup_mem_map = 0;
 static UINT8 pmd853_memory_mapping = 0x01;
-static void (*pmd85_update_memory) (void);
+static void (*pmd85_update_memory)(running_machine *);
 
 enum {PMD85_LED_1, PMD85_LED_2, PMD85_LED_3};
 enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO};
@@ -33,17 +33,17 @@ static UINT8 pmd85_model;
 
 static emu_timer * pmd85_cassette_timer;
 
-static void pmd851_update_memory (void)
+static void pmd851_update_memory(running_machine *machine)
 {
 	if (pmd85_startup_mem_map)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_NOP);
 
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_NOP);
 
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
 		memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x010000);
@@ -55,14 +55,14 @@ static void pmd851_update_memory (void)
 	}
 	else
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK3);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK4);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK5);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK3);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK4);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK5);
 
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK4);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK4);
 
 		memory_set_bankptr(1, mess_ram);
 		memory_set_bankptr(2, mess_ram + 0x1000);
@@ -72,13 +72,13 @@ static void pmd851_update_memory (void)
 	}
 }
 
-static void pmd852a_update_memory (void)
+static void pmd852a_update_memory(running_machine *machine)
 {
 	if (pmd85_startup_mem_map)
 	{
 
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_UNMAP);
 
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
 		memory_set_bankptr(2, mess_ram + 0x9000);
@@ -94,8 +94,8 @@ static void pmd852a_update_memory (void)
 	}
 	else
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK3);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK3);
 
 		memory_set_bankptr(1, mess_ram);
 		memory_set_bankptr(2, mess_ram + 0x1000);
@@ -105,7 +105,7 @@ static void pmd852a_update_memory (void)
 	}
 }
 
-static void pmd853_update_memory (void)
+static void pmd853_update_memory(running_machine *machine)
 {
 	if (pmd85_startup_mem_map)
 	{
@@ -139,13 +139,13 @@ static void pmd853_update_memory (void)
 	}
 }
 
-static void alfa_update_memory (void)
+static void alfa_update_memory(running_machine *machine)
 {
 	if (pmd85_startup_mem_map)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x33ff, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3400, 0x3fff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x33ff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3400, 0x3fff, 0, 0, SMH_NOP);
 
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
 		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x011000);
@@ -156,9 +156,9 @@ static void alfa_update_memory (void)
 	}
 	else
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x33ff, 0, 0, SMH_BANK2);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3400, 0x3fff, 0, 0, SMH_BANK3);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x33ff, 0, 0, SMH_BANK2);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3400, 0x3fff, 0, 0, SMH_BANK3);
 
 		memory_set_bankptr(1, mess_ram);
 		memory_set_bankptr(2, mess_ram + 0x1000);
@@ -167,11 +167,11 @@ static void alfa_update_memory (void)
 	}
 }
 
-static void mato_update_memory (void)
+static void mato_update_memory(running_machine *machine)
 {
 	if (pmd85_startup_mem_map)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
 		memory_set_bankptr(2, mess_ram + 0xc000);
@@ -180,7 +180,7 @@ static void mato_update_memory (void)
 	}
 	else
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 
 		memory_set_bankptr(1, mess_ram);
 		memory_set_bankptr(2, mess_ram + 0x4000);
@@ -525,7 +525,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 	if (pmd85_startup_mem_map)
 	{
 		pmd85_startup_mem_map = 0;
-		pmd85_update_memory();
+		(*pmd85_update_memory)(machine);
 	}
 
 	switch (offset & 0x0c)
@@ -539,7 +539,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 							if ((offset & 0x03) == 0x03)
 							{
 								pmd853_memory_mapping = data & 0x01;
-								pmd85_update_memory();
+								(*pmd85_update_memory)(machine);
 							}
 							break;
 				}
@@ -632,7 +632,7 @@ WRITE8_HANDLER ( mato_io_w )
 	if (pmd85_startup_mem_map)
 	{
 		pmd85_startup_mem_map = 0;
-		pmd85_update_memory();
+		(*pmd85_update_memory)(machine);
 	}
 
 	switch (offset & 0x0c)
@@ -890,7 +890,7 @@ MACHINE_RESET( pmd85 )
 	/* memory initialization */
 	memset(mess_ram, 0, sizeof(unsigned char)*0x10000);
 	pmd85_startup_mem_map = 1;
-	pmd85_update_memory();
+	pmd85_update_memory(machine);
 
 	/* io devices initialization */
 	switch (pmd85_model)

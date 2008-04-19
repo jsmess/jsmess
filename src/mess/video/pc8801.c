@@ -8,6 +8,7 @@
 	but the pen colours may be wrong. This needs to be tested. */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "includes/pc8801.h"
 
@@ -298,10 +299,10 @@ int is_pc8801_vram_select(void)
   }
 
 
-	if (rh5) memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, rh5);
-	if (wh5) memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, wh5);
-	if (rh6) memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, rh6);
-	if (wh6) memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, wh6);
+	if (rh5) memory_install_read8_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, rh5);
+	if (wh5) memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, wh5);
+	if (rh6) memory_install_read8_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, rh6);
+	if (wh6) memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, wh6);
 }
 
 WRITE8_HANDLER(pc88sr_disp_32)

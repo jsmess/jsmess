@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( arkanoid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd00c, 0xd00c) AM_READ(arkanoid_68705_input_0_r)  /* mainly an input port, with 2 bits from the 68705 */
 	AM_RANGE(0xd010, 0xd010) AM_READWRITE(input_port_1_r, watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READWRITE(arkanoid_Z80_mcu_r, arkanoid_Z80_mcu_w)  /* input from the 68705 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
@@ -504,7 +504,7 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd00c, 0xd00c) AM_READ(input_port_0_r)
 	AM_RANGE(0xd010, 0xd010) AM_READWRITE(input_port_1_r, watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READ(arkanoid_input_2_r) AM_WRITENOP
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
@@ -1082,47 +1082,47 @@ ROM_END
 
 /* Driver Initialization */
 
-static void arkanoid_bootleg_init( void )
+static void arkanoid_bootleg_init( running_machine *machine )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf002, 0xf002, 0, 0, arkanoid_bootleg_f002_r );
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd018, 0xd018, 0, 0, arkanoid_bootleg_d018_w );
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd008, 0xd008, 0, 0, arkanoid_bootleg_d008_r );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf002, 0xf002, 0, 0, arkanoid_bootleg_f002_r );
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd018, 0xd018, 0, 0, arkanoid_bootleg_d018_w );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd008, 0xd008, 0, 0, arkanoid_bootleg_d008_r );
 }
 
 static DRIVER_INIT( arkangc )
 {
 	arkanoid_bootleg_id = ARKANGC;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkangc2 )
 {
 	arkanoid_bootleg_id = ARKANGC2;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkblock )
 {
 	arkanoid_bootleg_id = ARKBLOCK;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkbloc2 )
 {
 	arkanoid_bootleg_id = ARKBLOC2;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkgcbl )
 {
 	arkanoid_bootleg_id = ARKGCBL;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( paddle2 )
 {
 	arkanoid_bootleg_id = PADDLE2;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 

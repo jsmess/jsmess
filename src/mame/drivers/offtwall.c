@@ -290,14 +290,14 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260050, 0x260051) AM_WRITE(io_latch_w)
 	AM_RANGE(0x260060, 0x260061) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_READWRITE(SMH_RAM, atarigen_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(offtwall_atarivc_r, offtwall_atarivc_w) AM_BASE(&atarivc_data)
-	AM_RANGE(0x3f4000, 0x3f5eff) AM_READWRITE(SMH_RAM, atarigen_playfield_latched_msb_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE(atarigen_playfield_latched_msb_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_BASE(&atarivc_eof_data)
-	AM_RANGE(0x3f5f80, 0x3f5fff) AM_READWRITE(SMH_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_READWRITE(SMH_RAM, atarigen_playfield_upper_w) AM_BASE(&atarigen_playfield_upper)
+	AM_RANGE(0x3f5f80, 0x3f5fff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE(&atarigen_playfield_upper)
 	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
-	AM_RANGE(0x3fd000, 0x3fd7ff) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x3fd000, 0x3fd7ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3fd800, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -506,9 +506,9 @@ static DRIVER_INIT( offtwall )
 	atarijsa_init(machine, 3, 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	spritecache_count = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
-	bankswitch_base = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x037ec2, 0x037f39, 0, 0, bankswitch_r);
-	unknown_verify_base = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3fdf1e, 0x3fdf1f, 0, 0, unknown_verify_r);
+	spritecache_count = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
+	bankswitch_base = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x037ec2, 0x037f39, 0, 0, bankswitch_r);
+	unknown_verify_base = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3fdf1e, 0x3fdf1f, 0, 0, unknown_verify_r);
 }
 
 
@@ -518,9 +518,9 @@ static DRIVER_INIT( offtwalc )
 	atarijsa_init(machine, 3, 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	spritecache_count = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
-	bankswitch_base = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x037eca, 0x037f43, 0, 0, bankswitch_r);
-	unknown_verify_base = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3fdf24, 0x3fdf25, 0, 0, unknown_verify_r);
+	spritecache_count = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
+	bankswitch_base = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x037eca, 0x037f43, 0, 0, bankswitch_r);
+	unknown_verify_base = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3fdf24, 0x3fdf25, 0, 0, unknown_verify_r);
 }
 
 

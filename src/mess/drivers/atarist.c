@@ -1451,29 +1451,29 @@ static const CENTRONICS_CONFIG atarist_centronics_config[1] =
 	}
 };
 
-static void atarist_configure_memory(void)
+static void atarist_configure_memory(running_machine *machine)
 {
 	switch (mess_ram_size)
 	{
 	case 256 * 1024:
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x03ffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x03ffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 512 * 1024:
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 1024 * 1024:
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x0fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x0fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 2048 * 1024:
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 4096 * 1024:
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
 		break;
 	}
 
@@ -1483,7 +1483,7 @@ static void atarist_configure_memory(void)
 	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x200000, 0);
 	memory_set_bank(2, 0);
 
-	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
 	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0xfa0000, 0);
 	memory_set_bank(3, 0);
@@ -1523,7 +1523,7 @@ static MACHINE_START( atarist )
 {
 	atarist_state *state = machine->driver_data;
 
-	atarist_configure_memory();
+	atarist_configure_memory(machine);
 	atarist_state_save();
 
 	centronics_config(0, atarist_centronics_config);
@@ -1613,7 +1613,7 @@ static MACHINE_START( atariste )
 {
 	atarist_state *state = machine->driver_data;
 
-	atarist_configure_memory();
+	atarist_configure_memory(machine);
 	atariste_state_save();
 
 	centronics_config(0, atarist_centronics_config);
@@ -1635,17 +1635,17 @@ static MACHINE_START( megaste )
 	rp5c15_init(machine, &rtc_intf);
 }
 
-static void stbook_configure_memory(void)
+static void stbook_configure_memory(running_machine *machine)
 {
 	switch (mess_ram_size)
 	{
 	case 1024 * 1024:
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0x080000, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0x080000, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 4096 * 1024:
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
 		break;
 	}
 
@@ -1655,7 +1655,7 @@ static void stbook_configure_memory(void)
 	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x200000, 0);
 	memory_set_bank(2, 0);
 
-	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
 	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0xfa0000, 0);
 	memory_set_bank(3, 0);
@@ -1749,7 +1749,7 @@ static MACHINE_START( stbook )
 {
 	atarist_state *state = machine->driver_data;
 
-	stbook_configure_memory();
+	stbook_configure_memory(machine);
 	atariste_state_save();
 
 	state_save_register_global(krxd);
@@ -2151,7 +2151,7 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_BANK3, SMH_BANK3);
+			memory_install_readwrite16_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_BANK3, SMH_BANK3);
 
 			return INIT_PASS;
 		}

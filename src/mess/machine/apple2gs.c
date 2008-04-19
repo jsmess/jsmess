@@ -1650,7 +1650,7 @@ static WRITE8_HANDLER( apple2gs_slowmem_w )
 }
 
 
-static void apple2gs_setup_memory(void)
+static void apple2gs_setup_memory(running_machine *machine)
 {
 	offs_t begin, end;
 	apple2_memmap_config cfg;
@@ -1662,40 +1662,40 @@ static void apple2gs_setup_memory(void)
 	state_save_register_item_array("APPLE2GS_SLOWMEM", 0, apple2gs_slowmem);
 
 	/* install expanded memory */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, mess_ram + 0x010000);
 
 	/* install hi memory */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe00000, 0xe1ffff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe00000, 0xe1ffff, 0, 0, apple2gs_slowmem_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe00400, 0xe007ff, 0, 0, apple2gs_E004xx_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe02000, 0xe03fff, 0, 0, apple2gs_E02xxx_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe10400, 0xe107ff, 0, 0, apple2gs_E104xx_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe12000, 0xe13fff, 0, 0, apple2gs_E12xxx_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe00000, 0xe1ffff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe00000, 0xe1ffff, 0, 0, apple2gs_slowmem_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe00400, 0xe007ff, 0, 0, apple2gs_E004xx_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe02000, 0xe03fff, 0, 0, apple2gs_E02xxx_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe10400, 0xe107ff, 0, 0, apple2gs_E104xx_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe12000, 0xe13fff, 0, 0, apple2gs_E12xxx_w);
 	memory_set_bankptr(2, apple2gs_slowmem);
 
 	/* install alternate ROM bank */
 	begin = 0x1000000 - memory_region_length(REGION_CPU1);
 	end = 0xffffff;
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, SMH_BANK3);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, SMH_BANK3);
 	memory_set_bankptr(3, memory_region(REGION_CPU1));
 
 	/* install new xxC000-xxCFFF handlers */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_w);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_w);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_w);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_w);
 	memory_set_opbase_handler(0, apple2gs_opbase);
 
 	/* install aux memory writes (for shadowing) */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x010400, 0x0107FF, 0, 0, apple2gs_aux0400_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x012000, 0x013FFF, 0, 0, apple2gs_aux2000_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x014000, 0x019FFF, 0, 0, apple2gs_aux4000_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x010400, 0x0107FF, 0, 0, apple2gs_aux0400_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x012000, 0x013FFF, 0, 0, apple2gs_aux2000_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x014000, 0x019FFF, 0, 0, apple2gs_aux4000_w);
 
 	/* setup the Apple II memory system */
 	memset(&cfg, 0, sizeof(cfg));
@@ -1791,7 +1791,7 @@ MACHINE_START( apple2gs )
 
 	/* init the various subsystems */
 	scc_init(NULL);
-	apple2gs_setup_memory();
+	apple2gs_setup_memory(machine);
 
 	/* save state stuff.  note that the driver takes care of docram. */
 	state_save_register_global_array(mess_ram);

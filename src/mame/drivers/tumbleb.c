@@ -793,9 +793,9 @@ static ADDRESS_MAP_START( suprtrio_main_cpu, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_BASE(&suprtrio_control)
-	AM_RANGE(0xa20000, 0xa20fff) AM_RAM AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0xa22000, 0xa22fff) AM_RAM AM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
-	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
+	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
+	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_READ(input_port_0_word_r) AM_WRITE(suprtrio_tilebank_w)
 
@@ -3329,7 +3329,7 @@ static DRIVER_INIT( tumbleb2 )
 	tumblepb_patch_code(0x000132);
 	#endif
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100001, 0, 0, tumbleb2_soundmcu_w );
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100001, 0, 0, tumbleb2_soundmcu_w );
 
 }
 
@@ -3366,7 +3366,7 @@ static READ16_HANDLER( bcstory_1a0_read )
 static DRIVER_INIT ( bcstory )
 {
 	tumblepb_gfx1_rearrange();
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x180008, 0x180009, 0, 0, bcstory_1a0_read ); // io should be here??
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180008, 0x180009, 0, 0, bcstory_1a0_read ); // io should be here??
 }
 
 
@@ -3608,7 +3608,7 @@ static DRIVER_INIT( htchctch )
 
 	HCROM[0x1e228/2] = 0x4e75;
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x140000, 0x1407ff, 0, 0, SMH_NOP ); // kill palette writes as the interrupt code we don't have controls them
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140000, 0x1407ff, 0, 0, SMH_NOP ); // kill palette writes as the interrupt code we don't have controls them
 
 
 	{
@@ -3674,10 +3674,10 @@ static DRIVER_INIT( chokchok )
 	DRIVER_INIT_CALL(htchctch);
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x140000, 0x140fff, 0, 0, paletteram16_xxxxBBBBGGGGRRRR_word_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140000, 0x140fff, 0, 0, paletteram16_xxxxBBBBGGGGRRRR_word_w);
 
 	/* slightly different banking */
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, chokchok_tilebank_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, chokchok_tilebank_w);
 }
 
 static DRIVER_INIT( wlstar )
@@ -3685,7 +3685,7 @@ static DRIVER_INIT( wlstar )
 	DRIVER_INIT_CALL(htchctch);
 
 	/* slightly different banking */
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
 }
 
 static DRIVER_INIT ( dquizgo )
