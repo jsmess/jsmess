@@ -77,6 +77,7 @@ static int is_kaiju = 0;
 static int is_chifi3 = 0;
 static int is_realtec = 0;
 static int realtek_bank_addr=0, realtek_bank_size=0, realtek_old_bank_addr;
+static int is_19in1 = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -204,7 +205,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = is_chifi3 = is_realtec = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = is_chifi3 = is_realtec = is_19in1 = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -434,6 +435,17 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			if (!strncmp((char *)&ROM[0x7e100 + relocate],"SEGA",4)) is_realtec = 1; // Defend the Earth
 			if (!strncmp((char *)&ROM[0x7e1e6 + relocate],"SEGA",4)) is_realtec = 1; // Funnyworld/ballonboy
 		}
+		// detect 'Super 19 in 1'
+		if (length == 0x400000)
+		{
+		 	static unsigned char s19in1sig[] = { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38};
+
+		 	if (!memcmp(&ROM[0x1e700+relocate],&s19in1sig[0],sizeof(s19in1sig))) // super19in1
+			{
+				is_19in1 = 1;
+			}
+
+		}
 	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
@@ -456,6 +468,11 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		memcpy(&ROM[0x800000],&ROM[0x400000],0x100000);
 		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000);
 	}
+	if (is_19in1) {
+		UINT8 *ROM = memory_region(REGION_CPU1);
+		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000); // reset to menu
+	}
+
 	if (is_realtec)
 	{
 		UINT32 mirroraddr;
@@ -756,6 +773,11 @@ READ16_HANDLER( g_chifi3_prot_r )
 	return 0;
 }
 
+static WRITE16_HANDLER( s19in1_bank )
+{
+	UINT8 *ROM = memory_region(REGION_CPU1);
+	memcpy(ROM + 0x000000, ROM + 0x400000+((offset << 1)*0x10000), 0x80000);
+}
 
 // Kaiju? (Pokemon Stadium) handler from HazeMD
 static WRITE16_HANDLER( g_kaiju_bank_w )
@@ -1028,6 +1050,10 @@ static DRIVER_INIT( gencommon )
 	{
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, smb2_extra_r);
 	}
+	if (is_19in1)
+	{
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13038, 0, 0, s19in1_bank);
+	}
 	if (is_realtec)
 	{
 		realtek_old_bank_addr = -1;
@@ -1049,9 +1075,8 @@ static DRIVER_INIT( gencommon )
 
 	if (is_elfwor)
 	{
-	/* is there more to this, i can't seem to get off the first level? */
 	/*
-	Elf Wor (Unl) - return (0×55@0×400000 OR 0xc9@0×400004) AND (0×0f@0×400002 OR 0×18@0×400006). It is probably best to add handlers for all 4 addresses.
+	Elf Wor (Unl) - return (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006). It is probably best to add handlers for all 4 addresses.
 	*/
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, elfwor_0x400000_r );
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, elfwor_0x400004_r );
