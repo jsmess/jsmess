@@ -13,6 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "machine/8255ppi.h"
 #include "includes/dai.h"
 
 #define DEBUG_DAI_VIDEO	0

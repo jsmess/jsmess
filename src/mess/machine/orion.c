@@ -76,15 +76,24 @@ WRITE8_HANDLER (orion_keyboard_porta_w )
 	}	
 }
 
-static const ppi8255_interface orion128_ppi8255_interface =
+const ppi8255_interface orion128_ppi8255_interface_1 =
 {
-	2,
-	{orion_romdisk_porta_r, NULL,									},
-	{NULL,									orion_keyboard_portb_r},
-	{NULL,									orion_keyboard_portc_r},
-	{NULL,									orion_keyboard_porta_w},
-	{orion_romdisk_portb_w, NULL,									},
-	{orion_romdisk_portc_w, NULL,									}
+	orion_romdisk_porta_r,
+	NULL,
+	NULL,
+	NULL,
+	orion_romdisk_portb_w,
+	orion_romdisk_portc_w
+};
+
+const ppi8255_interface orion128_ppi8255_interface_2 =
+{
+	NULL,
+	orion_keyboard_portb_r,
+	orion_keyboard_portc_r,
+	orion_keyboard_porta_w,
+	NULL,
+	NULL
 };
 
 /* Driver initialization */
@@ -102,22 +111,22 @@ MACHINE_START( orion128 )
 
 READ8_HANDLER ( orion128_system_r ) 
 {
-	return ppi8255_1_r(machine, offset & 3);
+	return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ), offset & 3);
 }
 
 WRITE8_HANDLER ( orion128_system_w ) 
 {
-	ppi8255_1_w(machine, offset & 3, data);	
+	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ), offset & 3, data);	
 }
 
 READ8_HANDLER ( orion128_romdisk_r ) 
 {
-	return ppi8255_0_r(machine, offset & 3);	
+	return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);	
 }
 
 WRITE8_HANDLER ( orion128_romdisk_w ) 
 {	
-	ppi8255_0_w(machine, offset & 3, data);	
+	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data);	
 }
 
 void orion_set_video_mode(running_machine *machine, int width) {
@@ -173,7 +182,6 @@ WRITE8_HANDLER ( orion128_memory_page_w )
 MACHINE_RESET ( orion128 ) 
 {		
 	wd17xx_reset();
-	ppi8255_init(&orion128_ppi8255_interface);
 	orion_keyboard_line = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
@@ -383,7 +391,6 @@ MACHINE_RESET ( orionz80 )
 	memory_set_bankptr(5, memory_region(REGION_CPU1) + 0xf800);		
 	
 	wd17xx_reset();
-	ppi8255_init(&orion128_ppi8255_interface);
 	orion_keyboard_line = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;

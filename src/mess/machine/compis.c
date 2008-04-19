@@ -447,25 +447,24 @@ static WRITE8_HANDLER ( compis_ppi_port_c_w )
 	compis_fdc_tc((data & 0x80)?1:0);
 }
 
-static const ppi8255_interface compis_ppi_interface =
+const ppi8255_interface compis_ppi_interface =
 {
-    1,
-    {NULL},
-    {compis_ppi_port_b_r},
-    {NULL},
-    {compis_ppi_port_a_w},
-    {NULL},
-    {compis_ppi_port_c_w}
+    NULL,
+    compis_ppi_port_b_r,
+    NULL,
+    compis_ppi_port_a_w,
+    NULL,
+    compis_ppi_port_c_w
 };
 
-READ16_HANDLER ( compis_ppi_r )
+READ16_DEVICE_HANDLER ( compis_ppi_r )
 {
-	return ppi8255_0_r(machine, offset);
+	return ppi8255_r(device, offset);
 }
 
-WRITE16_HANDLER ( compis_ppi_w )
+WRITE16_DEVICE_HANDLER ( compis_ppi_w )
 {
-	ppi8255_0_w(machine, offset, data);
+	ppi8255_w(device, offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1603,9 +1602,6 @@ MACHINE_RESET( compis )
 {
 	/* CPU */
 	compis_cpu_init();
-
-	/* PPI */
-	ppi8255_init(&compis_ppi_interface);
 
 	/* FDC */
 	nec765_init(&compis_fdc_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);

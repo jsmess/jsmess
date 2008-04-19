@@ -90,13 +90,12 @@ static WRITE8_HANDLER ( pc_ppi_portc_w );
 status information */
 const ppi8255_interface pc_ppi8255_interface =
 {
-	1,
-	{pc_ppi_porta_r},
-	{pc_ppi_portb_r},
-	{pc_ppi_portc_r},
-	{pc_ppi_porta_w},
-	{pc_ppi_portb_w},
-	{pc_ppi_portc_w}
+	pc_ppi_porta_r,
+	pc_ppi_portb_r,
+	pc_ppi_portc_r,
+	pc_ppi_porta_w,
+	pc_ppi_portb_w,
+	pc_ppi_portc_w
 };
 
 static struct {

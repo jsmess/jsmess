@@ -17,8 +17,8 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "includes/pc8801.h"
 #include "machine/8255ppi.h"
+#include "includes/pc8801.h"
 #include "machine/nec765.h"
 #include "sound/beep.h"
 
@@ -721,24 +721,24 @@ MACHINE_RESET( pc88srh )
 
 /* 5 inch floppy drive */
 
-static UINT8 load_8255_A(int chip)
+static UINT8 load_8255_A(running_machine *machine, int chip)
 {
-	return use_5FD ? ppi8255_get_portB(1-chip) : 0xff;
+	return use_5FD ? ppi8255_get_portB((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
 }
 
-static UINT8 load_8255_B(int chip)
+static UINT8 load_8255_B(running_machine *machine, int chip)
 {
-	return use_5FD ? ppi8255_get_portA(1-chip) : 0xff;
+	return use_5FD ? ppi8255_get_portA((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
 }
 
-static UINT8 load_8255_C(int chip)
+static UINT8 load_8255_C(running_machine *machine, int chip)
 {
 	UINT8 result = 0xFF;
 	UINT8 port_c;
 
 	if (use_5FD)
 	{
-		port_c = ppi8255_get_portC(1-chip);
+		port_c = ppi8255_get_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) );
 		result = ((port_c >> 4) & 0x0F) | ((port_c << 4) & 0xF0);
 	}
 
@@ -765,23 +765,32 @@ static UINT8 load_8255_C(int chip)
 	return result;
 }
 
-static READ8_HANDLER( load_8255_chip0_A )	{ return load_8255_A(0); }
-static READ8_HANDLER( load_8255_chip1_A )	{ return load_8255_A(1); }
-static READ8_HANDLER( load_8255_chip0_B )	{ return load_8255_B(0); }
-static READ8_HANDLER( load_8255_chip1_B )	{ return load_8255_B(1); }
-static READ8_HANDLER( load_8255_chip0_C )	{ return load_8255_C(0); }
-static READ8_HANDLER( load_8255_chip1_C )	{ return load_8255_C(1); }
+static READ8_HANDLER( load_8255_chip0_A )	{ return load_8255_A(machine, 0); }
+static READ8_HANDLER( load_8255_chip1_A )	{ return load_8255_A(machine, 1); }
+static READ8_HANDLER( load_8255_chip0_B )	{ return load_8255_B(machine, 0); }
+static READ8_HANDLER( load_8255_chip1_B )	{ return load_8255_B(machine, 1); }
+static READ8_HANDLER( load_8255_chip0_C )	{ return load_8255_C(machine, 0); }
+static READ8_HANDLER( load_8255_chip1_C )	{ return load_8255_C(machine, 1); }
 
 
-static const ppi8255_interface pc8801_8255_config =
+const ppi8255_interface pc8801_8255_config_0 =
 {
-	2,
-	{ load_8255_chip0_A, load_8255_chip1_A },
-	{ load_8255_chip0_B, load_8255_chip1_B },
-	{ load_8255_chip0_C, load_8255_chip1_C },
-	{ NULL, NULL },
-	{ NULL, NULL },
-	{ NULL, NULL },
+	load_8255_chip0_A,
+	load_8255_chip0_B,
+	load_8255_chip0_C,
+	NULL,
+	NULL,
+	NULL
+};
+
+const ppi8255_interface pc8801_8255_config_1 =
+{
+    load_8255_chip1_A,
+    load_8255_chip1_B,
+    load_8255_chip1_C,
+    NULL,
+    NULL,
+    NULL
 };
 
  READ8_HANDLER(pc8801fd_nec765_tc)
@@ -811,7 +820,6 @@ static const struct nec765_interface pc8801_fdc_interface=
 static void pc8801_init_5fd(void)
 {
 	use_5FD = (input_port_read_indexed(Machine, 18)&0x80)!=0x00;
-	ppi8255_init(&pc8801_8255_config);
 	if (!use_5FD)
 		cpunum_suspend(1, SUSPEND_REASON_DISABLE, 1);
 	else

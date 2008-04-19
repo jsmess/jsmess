@@ -423,13 +423,12 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
    -----------------------------*/
 static const ppi8255_interface amstrad_ppi8255_interface =
 {
-	1,                       /* number of PPIs to emulate */
-	{amstrad_ppi_porta_r},   /* port A read */
-	{amstrad_ppi_portb_r},   /* port B read */
-	{NULL},                  /* port C read */
-	{amstrad_ppi_porta_w},   /* port A write */
-	{NULL},                  /* port B write */
-	{amstrad_ppi_portc_w}    /* port C write */
+	amstrad_ppi_porta_r,   /* port A read */
+	amstrad_ppi_portb_r,   /* port B read */
+	NULL,                  /* port C read */
+	amstrad_ppi_porta_w,   /* port A write */
+	NULL,                  /* port B write */
+	amstrad_ppi_portc_w    /* port C write */
 };
 
 static void aleste_interrupt(int state)
@@ -1300,7 +1299,7 @@ b9 b8 | PPI Function Read/Write status
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
-			data = ppi8255_r(0, r1r0);
+			data = ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), r1r0);
 	}
 /* if b10 = 0 : Expansion Peripherals Read selected
 
@@ -1421,7 +1420,7 @@ b9 b8 | PPI Function Read/Write status
 */
 	if ((offset & (1<<11)) == 0) {
 		unsigned int Index = ((offset & 0x0300) >> 8);
-		ppi8255_w(0, Index, data);
+		ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), Index, data);
 	}
 /* if b10 = 0 : Expansion Peripherals Write selected */
 	if ((offset & (1<<10)) == 0) {
@@ -2042,8 +2041,6 @@ static void amstrad_common_init(void)
 		cpunum_set_input_line_vector(0, 0,0xff);
 	else
 		cpunum_set_input_line_vector(0, 0,0x00);
-
-	ppi8255_init(&amstrad_ppi8255_interface);
 
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
@@ -2912,14 +2909,17 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
 	MDRV_CPU_IO_MAP(amstrad_io, 0)
 
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(AMSTRAD_FPS)
 	MDRV_INTERLEAVE(1)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(19968))
 
 	MDRV_MACHINE_RESET( amstrad )
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( amstrad_ppi8255_interface )
+
     /* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(AMSTRAD_FPS)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(19968))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(800, 312)
 	/* Amstrad Monitor Visible AREA : 768x272 */
@@ -2989,9 +2989,11 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_DEVICE_REMOVE("printer", PRINTER)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( aleste )
 	MDRV_IMPORT_FROM(amstrad)
 	MDRV_MACHINE_RESET(aleste)
+
 	MDRV_SOUND_REPLACE("ay", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

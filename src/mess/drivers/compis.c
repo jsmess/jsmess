@@ -33,6 +33,7 @@
 
 #include "driver.h"
 #include "devconv.h"
+#include "machine/8255ppi.h"
 #include "includes/compis.h"
 #include "video/i82720.h"
 #include "devices/mflopimg.h"
@@ -56,7 +57,7 @@ DEV_READWRITE8TO16LE( compis_pit8253, pit8253_r, pit8253_w )
 DEV_READWRITE8TO16LE( compis_pit8254, pit8253_r, pit8253_w )
 
 static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16)
-	AM_RANGE( 0x0000, 0x0007) AM_READWRITE( compis_ppi_r, compis_ppi_w )	/* PPI 8255         */
+	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE(PPI8255, "ppi8255", compis_ppi_r, compis_ppi_w )	/* PPI 8255         */
 	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE(PIT8253, "pit8253", compis_pit_r, compis_pit_w )	/* PIT 8253         */
 	AM_RANGE( 0x0100, 0x011b) AM_READWRITE( compis_rtc_r, compis_rtc_w ) 	/* RTC 58174            */
 	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE(PIC8259, "pic8259_master", compis_osp_pic_r, compis_osp_pic_w ) /* PIC 8259 (80150/80130)  */
@@ -230,6 +231,9 @@ static MACHINE_DRIVER_START( compis )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( compis_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG ( compis_ppi_interface )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

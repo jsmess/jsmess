@@ -8,9 +8,12 @@
 #define ATOM_H_
 
 #include "devices/snapquik.h"
+#include "machine/8255ppi.h"
 
 
 /*----------- defined in machine/atom.c -----------*/
+
+extern const ppi8255_interface atom_8255_int;
 
 MACHINE_RESET( atom );
 QUICKLOAD_LOAD( atom );

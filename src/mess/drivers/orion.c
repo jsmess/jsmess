@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/8255ppi.h"
 #include "includes/orion.h"
 #include "machine/mc146818.h"
 #include "devices/basicdsk.h"
@@ -257,7 +258,13 @@ static MACHINE_DRIVER_START( orion128 )
     
     MDRV_MACHINE_START( orion128 )
     MDRV_MACHINE_RESET( orion128 )
- 		
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( orion128_ppi8255_interface_1 )
+
+	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
+	MDRV_DEVICE_CONFIG( orion128_ppi8255_interface_2 )
+
     /* video hardware */    	
 		MDRV_SCREEN_ADD("main", RASTER)      	
 		MDRV_SCREEN_REFRESH_RATE(50)

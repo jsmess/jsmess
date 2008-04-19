@@ -7,10 +7,12 @@
 #ifndef SPECIAL_H_
 #define SPECIAL_H_
 
+#include "machine/8255ppi.h"
 
 /*----------- defined in machine/special.c -----------*/
 
 extern const struct pit8253_config specimx_pit8253_intf;
+extern const ppi8255_interface specialist_ppi8255_interface;
 
 extern DRIVER_INIT( special );
 extern MACHINE_RESET( special );

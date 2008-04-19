@@ -12,10 +12,12 @@
 #ifndef MZ700_H_
 #define MZ700_H_
 
+#include "machine/8255ppi.h"
 
 /*----------- defined in machine/mz700.c -----------*/
 
 extern const struct pit8253_config mz700_pit8253_config;
+extern const ppi8255_interface mz700_ppi8255_interface;
 
 DRIVER_INIT( mz700 );
 MACHINE_RESET( mz700 );

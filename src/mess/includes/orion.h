@@ -10,6 +10,9 @@
 
 /*----------- defined in machine/orion.c -----------*/
 
+extern const ppi8255_interface orion128_ppi8255_interface_1;
+extern const ppi8255_interface orion128_ppi8255_interface_2;
+
 extern DRIVER_INIT( orion128 );
 extern MACHINE_START( orion128 );
 extern MACHINE_RESET( orion128 );

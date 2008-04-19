@@ -381,13 +381,12 @@ static READ8_HANDLER( bw2_ppi8255_c_r )
 
 static const ppi8255_interface bw2_ppi8255_interface =
 {
-	1,
-	{ NULL },
-	{ bw2_ppi8255_b_r },
-	{ bw2_ppi8255_c_r },
-	{ bw2_ppi8255_a_w },
-	{ NULL },
-	{ bw2_ppi8255_c_w },
+	NULL,
+	bw2_ppi8255_b_r,
+	bw2_ppi8255_c_r,
+	bw2_ppi8255_a_w,
+	NULL,
+	bw2_ppi8255_c_w,
 };
 
 
@@ -498,8 +497,6 @@ static MACHINE_START( bw2 )
 
 	msm8251_init(&bw2_msm8251_interface);
 
-	ppi8255_init(&bw2_ppi8255_interface);
-
 	wd17xx_init(machine, WD_TYPE_2793, bw2_wd17xx_callback, NULL);
 	wd17xx_set_density(DEN_MFM_LO);
 
@@ -536,7 +533,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_READWRITE( ppi8255_0_r, ppi8255_0_w )
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE( PPI8255, "ppi8255", ppi8255_r, ppi8255_w )
 	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE( PIT8253, "pit8253", pit8253_r, pit8253_w )
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE( MSM6255, MSM6255_TAG, msm6255_register_r, msm6255_register_w )
 //	AM_RANGE( 0x30, 0x3f ) SLOT
@@ -713,6 +710,9 @@ static MACHINE_DRIVER_START( bw2 )
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
 	MDRV_DEVICE_CONFIG( bw2_pit8253_interface )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( bw2_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD( SCREEN_TAG, LCD )

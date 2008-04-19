@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    drivers/sorc.c
+    drivers/sord.c
 
     Sord m5 system driver
 
@@ -93,9 +93,9 @@ static  READ8_HANDLER(fd5_data_r)
 
 	LOG(("fd5 0x010 r: %02x %04x\n",fd5_databus,activecpu_get_pc()));
 
-	ppi8255_set_portC(0, 0x50);
-	ppi8255_set_portC(0, 0x10);
-	ppi8255_set_portC(0, 0x50);
+	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x10);
+	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
 
 	return fd5_databus;
 }
@@ -107,9 +107,9 @@ static WRITE8_HANDLER(fd5_data_w)
 	fd5_databus = data;
 
 	/* set stb on data write */
-	ppi8255_set_portC(0, 0x50);
-	ppi8255_set_portC(0, 0x40);
-	ppi8255_set_portC(0, 0x50);
+	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x40);
+	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
 
 	cpu_yield();
 }
@@ -187,7 +187,7 @@ static MACHINE_RESET( sord_m5_fd5 )
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
 	sord_fd5_init();
 	MACHINE_RESET_CALL(sord_m5);
-	ppi8255_set_portC(0, 0x50);
+	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
 }
 
 
@@ -287,13 +287,12 @@ static WRITE8_HANDLER(sord_ppi_portc_w)
 
 static const ppi8255_interface sord_ppi8255_interface =
 {
-	1,
-	{sord_ppi_porta_r},
-	{sord_ppi_portb_r},
-	{sord_ppi_portc_r},
-	{sord_ppi_porta_w},
-	{sord_ppi_portb_w},
-	{sord_ppi_portc_w}
+	sord_ppi_porta_r,
+	sord_ppi_portb_r,
+	sord_ppi_portc_r,
+	sord_ppi_porta_w,
+	sord_ppi_portb_w,
+	sord_ppi_portc_w
 };
 
 /*********************************************************************************************/
@@ -439,7 +438,7 @@ static ADDRESS_MAP_START( srdm5fd5_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x30, 0x3f)					AM_READ(sord_keyboard_r)
 	AM_RANGE(0x40, 0x40)					AM_WRITE(							sord_printer_w)
 	AM_RANGE(0x50, 0x50)					AM_READWRITE(sord_sys_r,			sord_sys_w)
-	AM_RANGE(0x70, 0x73)					AM_READWRITE(ppi8255_0_r,			ppi8255_0_w)
+	AM_RANGE(0x70, 0x73)					AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 
@@ -477,9 +476,6 @@ static MACHINE_START( sord_m5 )
 static MACHINE_RESET( sord_m5 )
 {
 	z80ctc_init(0, &sord_m5_ctc_intf);
-
-	/* PI-5 interface connected to Sord M5 */
-	ppi8255_init(&sord_ppi8255_interface);
 
 //  cassette_timer = timer_pulse(TIME_IN_HZ(11025), NULL, 0, cassette_timer_callback);
 	TMS9928A_reset ();
@@ -637,6 +633,9 @@ static MACHINE_DRIVER_START( sord_m5 )
 
 	MDRV_MACHINE_START( sord_m5 )
 	MDRV_MACHINE_RESET( sord_m5 )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( sord_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)

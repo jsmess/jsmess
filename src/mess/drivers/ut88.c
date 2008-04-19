@@ -43,7 +43,7 @@ static ADDRESS_MAP_START( ut88mini_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ut88_io , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x04, 0x07) AM_READWRITE ( ut88_keyboard_r, ut88_keyboard_w )
+	AM_RANGE( 0x04, 0x07) AM_DEVREADWRITE ( PPI8255, "ppi8255", ut88_keyboard_r, ut88_keyboard_w )
 	AM_RANGE( 0xA1, 0xA1) AM_READWRITE ( ut88_tape_r, 	  ut88_sound_w	  )
 ADDRESS_MAP_END
 
@@ -163,7 +163,10 @@ static MACHINE_DRIVER_START( ut88 )
     MDRV_CPU_PROGRAM_MAP(ut88_mem, 0) 
     MDRV_CPU_IO_MAP(ut88_io, 0)
     MDRV_MACHINE_RESET( ut88 )
- 		
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ut88_ppi8255_interface )
+
     /* video hardware */    	
 		MDRV_SCREEN_ADD("main", RASTER)      	
 		MDRV_SCREEN_REFRESH_RATE(50)

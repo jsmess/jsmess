@@ -104,15 +104,14 @@ WRITE8_HANDLER (specialist_8255_portc_w )
 	
 }
 
-static const ppi8255_interface specialist_ppi8255_interface =
+const ppi8255_interface specialist_ppi8255_interface =
 {
-	1,
-	{specialist_8255_porta_r},
-	{specialist_8255_portb_r},
-	{specialist_8255_portc_r},
-	{specialist_8255_porta_w},
-	{specialist_8255_portb_w},
-	{specialist_8255_portc_w}
+	specialist_8255_porta_r,
+	specialist_8255_portb_r,
+	specialist_8255_portc_r,
+	specialist_8255_porta_w,
+	specialist_8255_portb_w,
+	specialist_8255_portc_w
 };
 
 static TIMER_CALLBACK( special_reset )
@@ -125,19 +124,16 @@ MACHINE_RESET( special )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, special_reset);
 	memory_set_bank(1, 1);	
-
-	ppi8255_init(&specialist_ppi8255_interface);
 }
 
 READ8_HANDLER( specialist_keyboard_r )
 {	
-	return ppi8255_0_r(machine, (offset & 3));	
-	return 0;
+	return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), (offset & 3));
 }
 
 WRITE8_HANDLER( specialist_keyboard_w )
 {	
-	ppi8255_0_w(machine, (offset & 3) , data );	
+	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), (offset & 3) , data );
 }
 
 
@@ -243,7 +239,6 @@ static TIMER_CALLBACK( setup_pit8253_gates ) {
 
 MACHINE_RESET( specimx )
 {
-	ppi8255_init(&specialist_ppi8255_interface);
 	specimx_set_bank(2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;	
 	wd17xx_reset();
@@ -402,7 +397,6 @@ MACHINE_START( erik )
 
 MACHINE_RESET( erik )
 {
-	ppi8255_init(&specialist_ppi8255_interface);
 	wd17xx_reset();		
 	
 	RR_register = 0x00;	

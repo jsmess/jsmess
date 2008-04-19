@@ -7,12 +7,16 @@
 #ifndef UT88_H_
 #define UT88_H_
 
+#include "machine/8255ppi.h"
 
 /*----------- defined in machine/ut88.c -----------*/
+
+extern const ppi8255_interface ut88_ppi8255_interface;
+
 extern DRIVER_INIT( ut88 );
 extern MACHINE_RESET( ut88 );
-extern READ8_HANDLER( ut88_keyboard_r );
-extern WRITE8_HANDLER( ut88_keyboard_w );
+extern READ8_DEVICE_HANDLER( ut88_keyboard_r );
+extern WRITE8_DEVICE_HANDLER( ut88_keyboard_w );
 extern WRITE8_HANDLER( ut88_sound_w );
 extern READ8_HANDLER( ut88_tape_r );
 

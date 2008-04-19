@@ -7,6 +7,7 @@
 #ifndef DAI_H_
 #define DAI_H_
 
+#include "machine/8255ppi.h"
 
 #define DAI_DEBUG	1
 
@@ -14,6 +15,7 @@
 /*----------- defined in machine/dai.c -----------*/
 
 extern const struct pit8253_config dai_pit8253_intf;
+extern const ppi8255_interface dai_ppi82555_intf;
 
 MACHINE_START( dai );
 READ8_HANDLER( dai_io_discrete_devices_r );

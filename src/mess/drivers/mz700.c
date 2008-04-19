@@ -65,6 +65,7 @@
 
 /* Core includes */
 #include "driver.h"
+#include "machine/8255ppi.h"
 #include "includes/mz700.h"
 #include "machine/pit8253.h"
 
@@ -259,6 +260,9 @@ static MACHINE_DRIVER_START(mz700)
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
 	MDRV_DEVICE_CONFIG( mz700_pit8253_config )
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( mz700_ppi8255_interface )
+
 	/* video hardware - include overscan */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -290,6 +294,9 @@ static MACHINE_DRIVER_START(mz800)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
 	MDRV_DEVICE_CONFIG( mz700_pit8253_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( mz700_ppi8255_interface )
 
 	/* video hardware - include overscan */
 	MDRV_SCREEN_ADD("main", RASTER)

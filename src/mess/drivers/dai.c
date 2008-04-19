@@ -60,9 +60,9 @@ Timings:
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/8255ppi.h"
 #include "includes/dai.h"
 #include "machine/pit8253.h"
-#include "machine/8255ppi.h"
 #include "machine/tms5501.h"
 #include "devices/cassette.h"
 
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( dai_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xfb00, 0xfbff) AM_READWRITE( amd9511_r, amd9511_w )
 	AM_RANGE( 0xfc00, 0xfcff) AM_DEVREADWRITE( PIT8253, "pit8253", pit8253_r, pit8253_w )
 	AM_RANGE( 0xfd00, 0xfdff) AM_READWRITE( dai_io_discrete_devices_r, dai_io_discrete_devices_w )
-	AM_RANGE( 0xfe00, 0xfeff) AM_READWRITE( ppi8255_0_r, ppi8255_0_w )
+	AM_RANGE( 0xfe00, 0xfeff) AM_DEVREADWRITE( PPI8255, "ppi8255", ppi8255_r, ppi8255_w )
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( tms5501_0_r, tms5501_0_w )
 ADDRESS_MAP_END
 
@@ -186,6 +186,9 @@ static MACHINE_DRIVER_START( dai )
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
 	MDRV_DEVICE_CONFIG( dai_pit8253_intf )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( dai_ppi82555_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -11,6 +11,7 @@
 #include "driver.h"
 #include "sound/custom.h"
 #include "machine/pit8253.h"
+#include "machine/8255ppi.h"
 #include "includes/dai.h"
 #include "streams.h"
 #include "deprecat.h"

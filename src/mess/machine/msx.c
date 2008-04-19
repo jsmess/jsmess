@@ -13,9 +13,9 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "machine/8255ppi.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
-#include "machine/8255ppi.h"
 #include "machine/tc8521.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
@@ -327,15 +327,14 @@ static WRITE8_HANDLER ( msx_ppi_port_a_w );
 static WRITE8_HANDLER ( msx_ppi_port_c_w );
 static READ8_HANDLER (msx_ppi_port_b_r );
 
-static const ppi8255_interface msx_ppi8255_interface =
+const ppi8255_interface msx_ppi8255_interface =
 {
-	1,
-	{NULL},
-	{msx_ppi_port_b_r},
-	{NULL},
-	{msx_ppi_port_a_w},
-	{NULL},
-	{msx_ppi_port_c_w}
+	NULL,
+	msx_ppi_port_b_r,
+	NULL,
+	msx_ppi_port_a_w,
+	NULL,
+	msx_ppi_port_c_w
 };
 
 static const struct tc8521_interface tc = { NULL };
@@ -358,7 +357,6 @@ static void msx_init(running_machine *machine)
 	}
 
 	cpunum_set_input_line_vector (0, 0, 0xff);
-	ppi8255_init (&msx_ppi8255_interface);
 
 	msx_memory_init (machine);
 
@@ -733,7 +731,7 @@ static READ8_HANDLER( msx_ppi_port_b_r )
 	UINT8 result = 0xff;
 	int row, data;
 
-	row = ppi8255_0_r(machine, 2) & 0x0f;
+	row = ppi8255_r( (device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 2) & 0x0f;
 	if (row <= 10)
 	{
 		data = input_port_read_indexed(machine, row/2);

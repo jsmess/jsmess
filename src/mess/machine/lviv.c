@@ -13,8 +13,8 @@
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "cpu/i8085/i8085.h"
-#include "includes/lviv.h"
 #include "machine/8255ppi.h"
+#include "includes/lviv.h"
 #include "sound/speaker.h"
 
 
@@ -141,11 +141,11 @@ static WRITE8_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			return ppi8255_0_r(machine, offset & 3);
+			return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
 			break;
 
 		case 1:
-			return ppi8255_1_r(machine, offset & 3);
+			return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
 			break;
 
 		case 2:
@@ -178,11 +178,11 @@ WRITE8_HANDLER ( lviv_io_w )
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			ppi8255_0_w(machine, offset & 3, data);
+			ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3, data);
 			break;
 
 		case 1:
-			ppi8255_1_w(machine, offset & 3, data);
+			ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data);
 			break;
 
 		case 2:
@@ -194,22 +194,29 @@ WRITE8_HANDLER ( lviv_io_w )
 }
 
 
-static const ppi8255_interface lviv_ppi8255_interface =
+const ppi8255_interface lviv_ppi8255_interface_0 =
 {
-	2,
-	{lviv_ppi_0_porta_r, lviv_ppi_1_porta_r},
-	{lviv_ppi_0_portb_r, lviv_ppi_1_portb_r},
-	{lviv_ppi_0_portc_r, lviv_ppi_1_portc_r},
-	{lviv_ppi_0_porta_w, lviv_ppi_1_porta_w},
-	{lviv_ppi_0_portb_w, lviv_ppi_1_portb_w},
-	{lviv_ppi_0_portc_w, lviv_ppi_1_portc_w}
+	lviv_ppi_0_porta_r,
+	lviv_ppi_0_portb_r,
+	lviv_ppi_0_portc_r,
+	lviv_ppi_0_porta_w,
+	lviv_ppi_0_portb_w,
+	lviv_ppi_0_portc_w
+};
+
+const ppi8255_interface lviv_ppi8255_interface_1 =
+{
+	lviv_ppi_1_porta_r,
+	lviv_ppi_1_portb_r,
+	lviv_ppi_1_portc_r,
+	lviv_ppi_1_porta_w,
+	lviv_ppi_1_portb_w,
+	lviv_ppi_1_portc_w
 };
 
 MACHINE_RESET( lviv )
 {
 	memory_set_opbase_handler(0, lviv_opbaseoverride);
-
-	ppi8255_init(&lviv_ppi8255_interface);
 
 	lviv_video_ram = mess_ram + 0xc000;
 

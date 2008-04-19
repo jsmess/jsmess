@@ -14,9 +14,9 @@
 #include "deprecat.h"
 #include "devices/cassette.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/8255ppi.h"
 #include "includes/dai.h"
 #include "machine/pit8253.h"
-#include "machine/8255ppi.h"
 #include "machine/tms5501.h"
 
 #define DEBUG_DAI_PORTS	0
@@ -92,12 +92,14 @@ static const tms5501_init_param dai_tms5501_init_param =
 	2000000.
 };
 
-static const ppi8255_interface dai_ppi82555_intf =
+const ppi8255_interface dai_ppi82555_intf =
 {
-	1, 			/* 1 chip */
-	{ NULL, NULL },		/* Port A read */
-	{ NULL, NULL },		/* Port B read */
-	{ NULL, NULL },		/* Port C read */
+	NULL,	/* Port A read */
+	NULL,	/* Port B read */
+	NULL,	/* Port C read */
+	NULL,	/* Port A write */
+	NULL,	/* Port B write */
+	NULL	/* Port C write */
 };
 
 const struct pit8253_config dai_pit8253_intf =
@@ -129,7 +131,6 @@ MACHINE_START( dai )
 	memory_configure_bank(2, 0, 4, memory_region(REGION_CPU1) + 0x010000, 0x1000);
 
 	tms5501_init(0, &dai_tms5501_init_param);
-	ppi8255_init(&dai_ppi82555_intf);
 
 	timer_set(attotime_zero, NULL, 0, dai_bootstrap_callback);
 }

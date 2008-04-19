@@ -10,6 +10,9 @@
 
 /*----------- defined in machine/pc8801.c -----------*/
 
+extern const ppi8255_interface pc8801_8255_config_0;
+extern const ppi8255_interface pc8801_8255_config_1;
+
 WRITE8_HANDLER(pc8801_write_interrupt_level);
 WRITE8_HANDLER(pc8801_write_interrupt_mask);
  READ8_HANDLER(pc88sr_inport_30);

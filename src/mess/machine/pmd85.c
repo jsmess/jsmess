@@ -12,8 +12,8 @@
 #include "driver.h"
 #include "devices/cassette.h"
 #include "cpu/i8085/i8085.h"
-#include "includes/pmd85.h"
 #include "machine/8255ppi.h"
+#include "includes/pmd85.h"
 #include "machine/msm8251.h"
 #include "machine/pit8253.h"
 #include "includes/serial.h"
@@ -468,7 +468,7 @@ static WRITE8_HANDLER ( pmd85_ppi_3_portc_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return ppi8255_0_r(machine, offset & 0x03);
+							return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 0x03);
 				}
 				break;
 		case 0x08:	/* ROM module connector */
@@ -483,7 +483,7 @@ static WRITE8_HANDLER ( pmd85_ppi_3_portc_w )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										return ppi8255_3_r(machine, offset & 0x03);
+										return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_3" ), offset & 0x03);
 							}
 						}
 						break;
@@ -503,11 +503,11 @@ static WRITE8_HANDLER ( pmd85_ppi_3_portc_w )
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
-										return ppi8255_1_r(machine, offset & 0x03);
+										return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 0x03);
 								case 0x50:	/* 8253 */
 										return pit8253_r( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 0x03);
 								case 0x70:	/* 8255 (IMS-2) */
-										return ppi8255_2_r(machine, offset & 0x03);
+										return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ), offset & 0x03);
 							}
 							break;
 					case 0x80:	/* external interfaces */
@@ -534,7 +534,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							ppi8255_0_w(machine, offset & 0x03, data);
+							ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 0x03, data);
 							/* PMD-85.3 memory banking */
 							if ((offset & 0x03) == 0x03)
 							{
@@ -556,7 +556,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										ppi8255_3_w(machine, offset & 0x03, data);
+										ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_3" ), offset & 0x03, data);
 										break;
 							}
 						}
@@ -577,14 +577,14 @@ WRITE8_HANDLER ( pmd85_io_w )
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
-										ppi8255_1_w(machine, offset & 0x03, data);
+										ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 0x03, data);
 										break;
 								case 0x50:	/* 8253 */
 										pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:	/* 8255 (IMS-2) */
-										ppi8255_2_w(machine, offset & 0x03, data);
+										ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ), offset & 0x03, data);
 										break;
 							}
 							break;
@@ -618,7 +618,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return ppi8255_0_r(machine, offset & 0x03);
+							return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 0x03);
 				}
 				break;
 	}
@@ -641,44 +641,85 @@ WRITE8_HANDLER ( mato_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							ppi8255_0_w(machine, offset & 0x03, data);
+							ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 0x03, data);
 							break;
 				}
 				break;
 	}
 }
 
-static const ppi8255_interface pmd85_ppi8255_interface =
+const ppi8255_interface pmd85_ppi8255_interface[4] =
 {
-	4,
-	{pmd85_ppi_0_porta_r, pmd85_ppi_1_porta_r, pmd85_ppi_2_porta_r, pmd85_ppi_3_porta_r},
-	{pmd85_ppi_0_portb_r, pmd85_ppi_1_portb_r, pmd85_ppi_2_portb_r, pmd85_ppi_3_portb_r},
-	{pmd85_ppi_0_portc_r, pmd85_ppi_1_portc_r, pmd85_ppi_2_portc_r, pmd85_ppi_3_portc_r},
-	{pmd85_ppi_0_porta_w, pmd85_ppi_1_porta_w, pmd85_ppi_2_porta_w, pmd85_ppi_3_porta_w},
-	{pmd85_ppi_0_portb_w, pmd85_ppi_1_portb_w, pmd85_ppi_2_portb_w, pmd85_ppi_3_portb_w},
-	{pmd85_ppi_0_portc_w, pmd85_ppi_1_portc_w, pmd85_ppi_2_portc_w, pmd85_ppi_3_portc_w}
+	{
+		pmd85_ppi_0_porta_r,
+		pmd85_ppi_0_portb_r,
+		pmd85_ppi_0_portc_r,
+		pmd85_ppi_0_porta_w,
+		pmd85_ppi_0_portb_w,
+		pmd85_ppi_0_portc_w
+	},
+	{
+		pmd85_ppi_1_porta_r,
+		pmd85_ppi_1_portb_r,
+		pmd85_ppi_1_portc_r,
+		pmd85_ppi_1_porta_w,
+		pmd85_ppi_1_portb_w,
+		pmd85_ppi_1_portc_w
+	},
+	{
+		pmd85_ppi_2_porta_r,
+		pmd85_ppi_2_portb_r,
+		pmd85_ppi_2_portc_r,
+		pmd85_ppi_2_porta_w,
+		pmd85_ppi_2_portb_w,
+		pmd85_ppi_2_portc_w
+	},
+	{
+		pmd85_ppi_3_porta_r,
+		pmd85_ppi_3_portb_r,
+		pmd85_ppi_3_portc_r,
+		pmd85_ppi_3_porta_w,
+		pmd85_ppi_3_portb_w,
+		pmd85_ppi_3_portc_w
+	}
 };
 
-static const ppi8255_interface alfa_ppi8255_interface =
+const ppi8255_interface alfa_ppi8255_interface[3] =
 {
-	3,
-	{pmd85_ppi_0_porta_r, pmd85_ppi_1_porta_r, pmd85_ppi_2_porta_r},
-	{pmd85_ppi_0_portb_r, pmd85_ppi_1_portb_r, pmd85_ppi_2_portb_r},
-	{pmd85_ppi_0_portc_r, pmd85_ppi_1_portc_r, pmd85_ppi_2_portc_r},
-	{pmd85_ppi_0_porta_w, pmd85_ppi_1_porta_w, pmd85_ppi_2_porta_w},
-	{pmd85_ppi_0_portb_w, pmd85_ppi_1_portb_w, pmd85_ppi_2_portb_w},
-	{pmd85_ppi_0_portc_w, pmd85_ppi_1_portc_w, pmd85_ppi_2_portc_w}
+	{
+		pmd85_ppi_0_porta_r,
+		pmd85_ppi_0_portb_r,
+		pmd85_ppi_0_portc_r,
+		pmd85_ppi_0_porta_w,
+		pmd85_ppi_0_portb_w,
+		pmd85_ppi_0_portc_w
+	},
+	{
+		pmd85_ppi_1_porta_r,
+		pmd85_ppi_1_portb_r,
+		pmd85_ppi_1_portc_r,
+		pmd85_ppi_1_porta_w,
+		pmd85_ppi_1_portb_w,
+		pmd85_ppi_1_portc_w
+	},
+	{
+		pmd85_ppi_2_porta_r,
+		pmd85_ppi_2_portb_r,
+		pmd85_ppi_2_portc_r,
+		pmd85_ppi_2_porta_w,
+		pmd85_ppi_2_portb_w,
+		pmd85_ppi_2_portc_w
+	}
 };
 
-static const ppi8255_interface mato_ppi8255_interface =
+const ppi8255_interface mato_ppi8255_interface =
 {
-	1,
-	{pmd85_ppi_0_porta_r},
-	{mato_ppi_0_portb_r},
-	{mato_ppi_0_portc_r},
-	{pmd85_ppi_0_porta_w},
-	{pmd85_ppi_0_portb_w},
-	{mato_ppi_0_portc_w}
+	pmd85_ppi_0_porta_r,
+	mato_ppi_0_portb_r,
+	mato_ppi_0_portc_r,
+	pmd85_ppi_0_porta_w,
+	pmd85_ppi_0_portb_w,
+	mato_ppi_0_portc_w
 };
 
 static struct serial_connection pmd85_cassette_serial_connection;
@@ -790,7 +831,6 @@ DRIVER_INIT ( pmd851 )
 {
 	pmd85_model = PMD85_1;
 	pmd85_update_memory = pmd851_update_memory;
-	ppi8255_init(&pmd85_ppi8255_interface);
 	pmd85_common_driver_init(machine);
 }
 
@@ -798,7 +838,6 @@ DRIVER_INIT ( pmd852a )
 {
 	pmd85_model = PMD85_2A;
 	pmd85_update_memory = pmd852a_update_memory;
-	ppi8255_init(&pmd85_ppi8255_interface);
 	pmd85_common_driver_init(machine);
 }
 
@@ -806,7 +845,6 @@ DRIVER_INIT ( pmd853 )
 {
 	pmd85_model = PMD85_3;
 	pmd85_update_memory = pmd853_update_memory;
-	ppi8255_init(&pmd85_ppi8255_interface);
 	pmd85_common_driver_init(machine);
 }
 
@@ -814,7 +852,6 @@ DRIVER_INIT ( alfa )
 {
 	pmd85_model = ALFA;
 	pmd85_update_memory = alfa_update_memory;
-	ppi8255_init(&alfa_ppi8255_interface);
 	pmd85_common_driver_init(machine);
 }
 
@@ -822,7 +859,6 @@ DRIVER_INIT ( mato )
 {
 	pmd85_model = MATO;
 	pmd85_update_memory = mato_update_memory;
-	ppi8255_init(&mato_ppi8255_interface);
 	memory_set_opbase_handler(0, mato_opbaseoverride);
 }
 

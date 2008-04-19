@@ -50,15 +50,14 @@ WRITE8_HANDLER (ut88_8255_porta_w )
 	ut88_8255_porta = data;	
 }
 
-static const ppi8255_interface ut88_ppi8255_interface =
+const ppi8255_interface ut88_ppi8255_interface =
 {
-	1,
-	{NULL},
-	{ut88_8255_portb_r},
-	{ut88_8255_portc_r},
-	{ut88_8255_porta_w},
-	{NULL},
-	{NULL},
+	NULL,
+	ut88_8255_portb_r,
+	ut88_8255_portc_r,
+	ut88_8255_porta_w,
+	NULL,
+	NULL,
 };
 
 static TIMER_CALLBACK( ut88_reset )
@@ -70,20 +69,19 @@ MACHINE_RESET( ut88 )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, ut88_reset);
 	memory_set_bank(1, 1);	
-	ppi8255_init(&ut88_ppi8255_interface);
 	ut88_8255_porta = 0;
 }
 
 
-READ8_HANDLER( ut88_keyboard_r )
+READ8_DEVICE_HANDLER( ut88_keyboard_r )
 {
-	return ppi8255_0_r(machine, offset^0x03);	
+	return ppi8255_r(device, offset^0x03);	
 }
 
 
-WRITE8_HANDLER( ut88_keyboard_w )
+WRITE8_DEVICE_HANDLER( ut88_keyboard_w )
 {
-	ppi8255_0_w(machine, offset^0x03, data);
+	ppi8255_w(device, offset^0x03, data);
 }
 
 WRITE8_HANDLER( ut88_sound_w )

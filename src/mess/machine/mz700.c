@@ -11,13 +11,14 @@
 
 /* Core includes */
 #include "driver.h"
-#include "includes/mz700.h"
 
 /* Components */
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
 #include "sound/beep.h"
+
+#include "includes/mz700.h"
 
 /* Devices */
 #include "devices/cassette.h"
@@ -44,14 +45,13 @@ static WRITE8_HANDLER ( pio_port_a_w );
 static WRITE8_HANDLER ( pio_port_b_w );
 static WRITE8_HANDLER ( pio_port_c_w );
 
-static const ppi8255_interface ppi8255 = {
-    1,
-	{pio_port_a_r},
-	{pio_port_b_r},
-	{pio_port_c_r},
-	{pio_port_a_w},
-	{pio_port_b_w},
-	{pio_port_c_w}
+const ppi8255_interface mz700_ppi8255_interface = {
+	pio_port_a_r,
+	pio_port_b_r,
+	pio_port_c_r,
+	pio_port_a_w,
+	pio_port_b_w,
+	pio_port_c_w
 };
 
 static int pio_port_a_output;
@@ -81,8 +81,6 @@ static TIMER_CALLBACK(ne556_callback)
 
 DRIVER_INIT( mz700 )
 {
-	ppi8255_init(&ppi8255);
-
 	videoram_size = 0x5000;
 	videoram = auto_malloc(videoram_size);
 	colorram = auto_malloc(0x800);
@@ -228,7 +226,7 @@ READ8_HANDLER ( mz700_mmio_r )
 	{
 	/* the first four ports are connected to a 8255 PPI */
     case 0: case 1: case 2: case 3:
-		data = ppi8255_r(0, offset & 3);
+		data = ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
 		break;
 
 	case 4: case 5: case 6: case 7:
@@ -252,7 +250,7 @@ WRITE8_HANDLER ( mz700_mmio_w )
 	{
 	/* the first four ports are connected to a 8255 PPI */
     case 0: case 1: case 2: case 3:
-		ppi8255_w(0, offset & 3, data);
+		ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3, data);
         break;
 
 	/* the next four ports are connected to a 8253 PIT */
@@ -510,7 +508,7 @@ static UINT8 mz800_palette_bank;
 	{
 	/* the first four ports are connected to a 8255 PPI */
     case 0: case 1: case 2: case 3:
-		data = ppi8255_r(0, offset & 3);
+		data = ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
 		break;
 
 	case 4: case 5: case 6: case 7:

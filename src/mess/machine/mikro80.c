@@ -48,15 +48,14 @@ WRITE8_HANDLER (mikro80_8255_porta_w )
 	}	
 }
 
-static const ppi8255_interface mikro80_ppi8255_interface =
+const ppi8255_interface mikro80_ppi8255_interface =
 {
-	1,
-	{NULL},
-	{mikro80_8255_portb_r},
-	{mikro80_8255_portc_r},
-	{mikro80_8255_porta_w},
-	{NULL},
-	{NULL},
+	NULL,
+	mikro80_8255_portb_r,
+	mikro80_8255_portc_r,
+	mikro80_8255_porta_w,
+	NULL,
+	NULL,
 };
 
 static TIMER_CALLBACK( mikro80_reset )
@@ -68,19 +67,18 @@ MACHINE_RESET( mikro80 )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, mikro80_reset);
 	memory_set_bank(1, 1);	
-	ppi8255_init(&mikro80_ppi8255_interface);
 	mikro80_keyboard_line = 0;
 }
 
 
-READ8_HANDLER( mikro80_keyboard_r )
+READ8_DEVICE_HANDLER( mikro80_keyboard_r )
 {
-	return ppi8255_0_r(machine, offset^0x03);	
+	return ppi8255_r(device, offset^0x03);	
 }
 
-WRITE8_HANDLER( mikro80_keyboard_w )
+WRITE8_DEVICE_HANDLER( mikro80_keyboard_w )
 {
-	ppi8255_0_w(machine, offset^0x03, data);
+	ppi8255_w(device, offset^0x03, data);
 }
 
 

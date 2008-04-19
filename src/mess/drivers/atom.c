@@ -59,7 +59,6 @@ Hardware:   PPIA 8255
 
 /* Core includes */
 #include "driver.h"
-#include "includes/atom.h"
 
 /* Components */
 #include "machine/centroni.h"
@@ -75,6 +74,8 @@ Hardware:   PPIA 8255
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 
+#include "includes/atom.h"
+
 
 /* functions */
 
@@ -88,7 +89,7 @@ static ADDRESS_MAP_START( atom_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&videoram) /* VDG 6847 */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
-	AM_RANGE(0xb000, 0xb003) AM_READWRITE(ppi8255_0_r, ppi8255_0_w) /* PPIA 8255 */
+	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE( PPI8255, "ppi8255", ppi8255_r, ppi8255_w) /* PPIA 8255 */
 	AM_RANGE(0xb800, 0xbbff) AM_READWRITE(via_0_r, via_0_w)			/* VIA 6522 */
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_ROM
@@ -104,7 +105,7 @@ static ADDRESS_MAP_START( atomeb_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* VDG 6847 */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_BANK1)	/* eprom data from eprom box */
-	AM_RANGE(0xb000, 0xb003) AM_READWRITE(ppi8255_0_r, ppi8255_0_w) /* PPIA 8255 */
+	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE( PPI8255, "ppi8255", ppi8255_r, ppi8255_w) /* PPIA 8255 */
 	AM_RANGE(0xb800, 0xbbff) AM_READWRITE(via_0_r, via_0_w)			/* VIA 6522 */
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(atom_eprom_box_r, atom_eprom_box_w)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
@@ -254,12 +255,16 @@ static MACHINE_DRIVER_START( atom )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M65C02, 1000000)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(atom_mem, 0)
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
 	MDRV_MACHINE_RESET( atom )
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( atom_8255_int )
+
 	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+
 	MDRV_VIDEO_START(atom)
 	MDRV_VIDEO_UPDATE(m6847)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

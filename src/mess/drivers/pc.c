@@ -163,7 +163,7 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", dma8237_r, dma8237_w)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(ppi8255_0_r,			ppi8255_0_w)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,				pc_JOY_w)
 #ifdef EXP_ON
@@ -190,6 +190,7 @@ ADDRESS_MAP_END
 DEV_READWRITE8TO16LE_LSB( pc_pit8253_16le, pit8253_r, pit8253_w )
 DEV_READWRITE8TO16LE( pc_dma8237_16le, dma8237_r, dma8237_w )
 DEV_READWRITE8TO16LE( pc_pic8259_16le, pic8259_r, pic8259_w )
+DEV_READWRITE8TO16LE( pc_ppi8255_16le, ppi8255_r, ppi8255_w )
 READ16_HANDLER(pc_page16le_r) { return read16le_with_read8_handler(pc_page_r, machine, offset, mem_mask); }
 WRITE16_HANDLER(pc_page16le_w) { write16le_with_write8_handler(pc_page_w, machine, offset, data, mem_mask); }
 
@@ -198,7 +199,7 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", pc_dma8237_16le_r, pc_dma8237_16le_w)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pc_pic8259_16le_r, pc_pic8259_16le_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(ppi8255_16le_0_r,			ppi8255_16le_0_w)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255", pc_ppi8255_16le_r, pc_ppi8255_16le_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,			pc_page16le_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
 #ifdef EXP_ON
@@ -1164,6 +1165,9 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_mda )
 
@@ -1211,6 +1215,9 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_hercules )
 
@@ -1253,6 +1260,9 @@ static MACHINE_DRIVER_START( pccga )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1298,6 +1308,9 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_aga )
 
@@ -1337,6 +1350,9 @@ static MACHINE_DRIVER_START( xtcga )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1382,6 +1398,9 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc200 )
 
@@ -1414,6 +1433,9 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc1512 )
@@ -1449,6 +1471,9 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(pcvideo_pc1640)
@@ -1487,6 +1512,9 @@ static MACHINE_DRIVER_START( xtvga )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )
@@ -1531,6 +1559,9 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000 )

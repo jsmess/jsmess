@@ -246,25 +246,24 @@ static WRITE8_HANDLER ( svi318_ppi_port_c_w )
 	svi.keyboard_row = data & 0x0F;
 }
 
-static const ppi8255_interface svi318_ppi8255_interface =
+const ppi8255_interface svi318_ppi8255_interface =
 {
-	1,
-	{svi318_ppi_port_a_r},
-	{svi318_ppi_port_b_r},
-	{NULL},
-	{NULL},
-	{NULL},
-	{svi318_ppi_port_c_w}
+	svi318_ppi_port_a_r,
+	svi318_ppi_port_b_r,
+	NULL,
+	NULL,
+	NULL,
+	svi318_ppi_port_c_w
 };
 
-READ8_HANDLER( svi318_ppi_r )
+READ8_DEVICE_HANDLER( svi318_ppi_r )
 {
-	return ppi8255_0_r(machine, offset);
+	return ppi8255_r(device, offset);
 }
 
-WRITE8_HANDLER( svi318_ppi_w )
+WRITE8_DEVICE_HANDLER( svi318_ppi_w )
 {
-	ppi8255_0_w(machine, offset + 2, data);
+	ppi8255_w(device, offset + 2, data);
 }
 
 /* Printer port */
@@ -592,7 +591,6 @@ DRIVER_INIT( svi318 )
 	}
 
 	cpunum_set_input_line_vector (0, 0, 0xff);
-	ppi8255_init (&svi318_ppi8255_interface);
 
 	/* memory */
 	svi.empty_bank = auto_malloc (0x8000);
@@ -667,9 +665,6 @@ MACHINE_RESET( svi318 )
 {
 	/* video stuff */
 	TMS9928A_reset();
-
-	/* PPI */
-	ppi8255_0_w(machine, 3, 0x92);
 
 	svi.bank_switch = 0xff;
 	svi318_set_banks();

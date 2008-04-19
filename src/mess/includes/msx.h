@@ -46,6 +46,8 @@ typedef struct {
 
 /*----------- defined in machine/msx.c -----------*/
 
+extern const ppi8255_interface msx_ppi8255_interface;
+
 /* start/stop functions */
 extern DRIVER_INIT( msx );
 extern DRIVER_INIT( msx2 );

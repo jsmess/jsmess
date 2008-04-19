@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE( PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 // SF-7000
@@ -122,10 +122,10 @@ static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE( PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe0, 0xe0) AM_READ(nec765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(nec765_data_r, nec765_data_w)
-	AM_RANGE(0xe4, 0xe7) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE( PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xe9, 0xe9) AM_READWRITE(msm8251_status_r, msm8251_control_w)
 ADDRESS_MAP_END
@@ -400,19 +400,17 @@ static WRITE8_HANDLER( sc3000_ppi8255_c_w )
 
 static const ppi8255_interface sc3000_ppi8255_intf =
 {
-	1, 						// 1 chip
-	{ sc3000_ppi8255_a_r },	// Port A read
-	{ sc3000_ppi8255_b_r },	// Port B read
-	{ NULL },				// Port C read
-	{ NULL },				// Port A write
-	{ NULL },				// Port B write
-	{ sc3000_ppi8255_c_w },	// Port C write
+	sc3000_ppi8255_a_r,	// Port A read
+	sc3000_ppi8255_b_r,	// Port B read
+	NULL,				// Port C read
+	NULL,				// Port A write
+	NULL,				// Port B write
+	sc3000_ppi8255_c_w,	// Port C write
 };
 
 static MACHINE_START( sc3000 )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	ppi8255_init(&sc3000_ppi8255_intf);
 }
 
 // SF-7000
@@ -494,15 +492,24 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 	centronics_write_handshake(1, (data & 0x80) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
 }
 
-static const ppi8255_interface sf7000_ppi8255_intf =
+static const ppi8255_interface sf7000_ppi8255_intf[2] =
 {
-	2, 											// 2 chips
-	{ sc3000_ppi8255_a_r, sf7000_ppi8255_a_r },	// Port A read
-	{ sc3000_ppi8255_b_r, NULL },				// Port B read
-	{ NULL, NULL },								// Port C read
-	{ NULL, NULL },								// Port A write
-	{ NULL, sf7000_ppi8255_b_w },				// Port B write
-	{ sc3000_ppi8255_c_w, sf7000_ppi8255_c_w },	// Port C write
+	{
+		sc3000_ppi8255_a_r,		// Port A read
+		sc3000_ppi8255_b_r,		// Port B read
+		NULL,					// Port C read
+		NULL,					// Port A write
+		NULL,					// Port B write
+		sc3000_ppi8255_c_w		// Port C write
+	},
+	{
+		sf7000_ppi8255_a_r,		// Port A read
+		NULL,					// Port B read
+		NULL,					// Port C read
+		NULL,					// Port A write
+		sf7000_ppi8255_b_w,		// Port B write
+		sf7000_ppi8255_c_w		// Port C write
+	}
 };
 
 /* callback for /INT output from FDC */
@@ -539,7 +546,6 @@ static const CENTRONICS_CONFIG sf7000_centronics_config[1] = {
 static MACHINE_START( sf7000 )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	ppi8255_init(&sf7000_ppi8255_intf);
 	nec765_init(&sf7000_nec765_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
 	msm8251_init(&sf7000_uart_interface);
@@ -588,6 +594,9 @@ static MACHINE_DRIVER_START( sc3000 )
 
 	MDRV_MACHINE_START( sc3000 )
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( sc3000_ppi8255_intf )
+
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("main")
@@ -612,6 +621,12 @@ static MACHINE_DRIVER_START( sf7000 )
 
 	MDRV_MACHINE_START( sf7000 )
 	MDRV_MACHINE_RESET( sf7000 )
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( sf7000_ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( sf7000_ppi8255_intf[1] )
 
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)

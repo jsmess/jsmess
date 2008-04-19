@@ -9,7 +9,11 @@
 #ifndef SVI318_H_
 #define SVI318_H_
 
+#include "machine/8255ppi.h"
+
 /*----------- defined in machine/svi318.c -----------*/
+
+extern const ppi8255_interface svi318_ppi8255_interface;
 
 DRIVER_INIT( svi318 );
 MACHINE_START( svi318_pal );
@@ -31,8 +35,8 @@ WRITE8_HANDLER( svi318_writemem4 );
 READ8_HANDLER( svi318_io_ext_r );
 WRITE8_HANDLER( svi318_io_ext_w );
 
-READ8_HANDLER( svi318_ppi_r );
-WRITE8_HANDLER( svi318_ppi_w );
+READ8_DEVICE_HANDLER( svi318_ppi_r );
+WRITE8_DEVICE_HANDLER( svi318_ppi_w );
 
 WRITE8_HANDLER( svi318_psg_port_b_w );
 READ8_HANDLER( svi318_psg_port_a_r );

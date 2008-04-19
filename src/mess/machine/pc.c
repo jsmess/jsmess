@@ -383,7 +383,6 @@ void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*se
 DRIVER_INIT( pccga )
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	ppi8255_init(&pc_ppi8255_interface);
 	pc_rtc_init();
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
@@ -391,14 +390,12 @@ DRIVER_INIT( pccga )
 DRIVER_INIT( bondwell )
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	ppi8255_init(&pc_ppi8255_interface);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pcmda )
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	ppi8255_init(&pc_ppi8255_interface);
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
@@ -547,7 +544,6 @@ DRIVER_INIT( pc1640 )
 DRIVER_INIT( pc_vga )
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	ppi8255_init(&pc_ppi8255_interface);
 
 	pc_vga_init(machine, &vga_interface, NULL);
 }

@@ -1136,14 +1136,14 @@ static WRITE16_HANDLER( x68k_mfp_w )
 }
 
 
-static WRITE16_HANDLER( x68k_ppi_w )
+static WRITE16_DEVICE_HANDLER( x68k_ppi_w )
 {
-	ppi8255_w(0,offset & 0x03,data);
+	ppi8255_w(device,offset & 0x03,data);
 }
 
-static READ16_HANDLER( x68k_ppi_r )
+static READ16_DEVICE_HANDLER( x68k_ppi_r )
 {
-	return ppi8255_r(0,offset & 0x03);
+	return ppi8255_r(device,offset & 0x03);
 }
 
 static READ16_HANDLER( x68k_rtc_r )
@@ -1521,7 +1521,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 	AM_RANGE(0xe96000, 0xe97fff) AM_READWRITE(x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
+	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE(PPI8255, "ppi8255", x68k_ppi_r, x68k_ppi_w)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
 	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
@@ -1550,13 +1550,12 @@ static const mc68901_interface mfp_interface =
 
 static const ppi8255_interface ppi_interface =
 {
-	1,  // 1 PPI
-	{ ppi_port_a_r },
-	{ ppi_port_b_r },
-	{ ppi_port_c_r },
-	{ NULL },
-	{ NULL },
-	{ ppi_port_c_w }
+	ppi_port_a_r,
+	ppi_port_b_r,
+	ppi_port_c_r,
+	NULL,
+	NULL,
+	ppi_port_c_w
 };
 
 static const struct hd63450_interface dmac_interface =
@@ -1983,7 +1982,6 @@ static DRIVER_INIT( x68000 )
 
 	memset(&sys,0,sizeof(sys));
 
-	ppi8255_init(&ppi_interface);
 	hd63450_init(&dmac_interface);
 	mfp_init();
 	scc_init(&scc_interface);
@@ -2015,6 +2013,9 @@ static MACHINE_DRIVER_START( x68000 )
 	/* device hardware */
 	MDRV_DEVICE_ADD("mfp", MC68901)
 	MDRV_DEVICE_CONFIG(mfp_interface)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// The 16 I/O port combinations for the 8255 (P8255A-5, 8628LLP, (c) 1981 AMD)
-	AM_RANGE(0x00, 0x03) AM_READWRITE(ppi8255_0_r, ppi8255_0_w) AM_MIRROR(0x3C)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w) AM_MIRROR(0x3C)
 
 //  TODO: create drivers to emulate the following two chips
 //  The 16 I/O port combinations for the CTC (Zilog, Z0843004PSC, Z80 CTC, 8644)
@@ -510,13 +510,12 @@ static WRITE8_HANDLER( mpf1_portc_w )
 
 static const ppi8255_interface ppi8255_intf =
 {
-	1, 					/* 1 chip */
-	{ mpf1_porta_r },	/* Port A read */
-	{ mpf1_portb_r },	/* Port B read */
-	{ mpf1_portc_r },	/* Port C read */
-	{ mpf1_porta_w },	/* Port A write */
-	{ mpf1_portb_w },	/* Port B write */
-	{ mpf1_portc_w },	/* Port C write */
+	mpf1_porta_r,	/* Port A read */
+	mpf1_portb_r,	/* Port B read */
+	mpf1_portc_r,	/* Port C read */
+	mpf1_porta_w,	/* Port A write */
+	mpf1_portb_w,	/* Port B write */
+	mpf1_portc_w,	/* Port C write */
 };
 
 /* Machine Initialization */
@@ -530,9 +529,6 @@ static MACHINE_RESET( mpf1 )
 	// CTC
 /*  z80ctc_init(&ctc_intf);
     z80ctc_reset(0);*/
-
-	// 8255
-	ppi8255_init(&ppi8255_intf);
 
 	// leds
 	for (lednum = 0; lednum < 6; lednum++)
@@ -551,6 +547,9 @@ static MACHINE_DRIVER_START( mpf1 )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET( mpf1 )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf )
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", RASTER)
