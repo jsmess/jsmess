@@ -1387,9 +1387,11 @@ DRIVER_INIT(mac512ke)
 
 static const SCSIConfigTable dev_table =
 {
-	2,                                      /* 2 SCSI devices */
-	{ { SCSI_ID_5, 1, SCSI_DEVICE_HARDDISK },  /* SCSI ID 5, using CHD 1, and it's a harddisk */
-	 { SCSI_ID_6, 0, SCSI_DEVICE_HARDDISK } } /* SCSI ID 6, using CHD 0, and it's a harddisk */
+	1,                                      /* 2 SCSI devices */
+	{
+	 { SCSI_ID_5, 0, SCSI_DEVICE_HARDDISK },  /* SCSI ID 5, using CHD 1, and it's a harddisk */
+	 { SCSI_ID_6, 1, SCSI_DEVICE_HARDDISK }   /* SCSI ID 6, using CHD 0, and it's a harddisk */
+	}
 };
 
 static const struct NCR5380interface macplus_5380intf =
@@ -1398,25 +1400,24 @@ static const struct NCR5380interface macplus_5380intf =
 	NULL		// IRQ (unconnected on the Mac Plus)
 };
 
+MACHINE_START( macscsi )
+{
+	ncr5380_init(&macplus_5380intf);
+}
+
 DRIVER_INIT(macplus)
 {
 	mac_driver_init(MODEL_MAC_PLUS);
-
-	ncr5380_init(&macplus_5380intf);
 }
 
 DRIVER_INIT(macse)
 {
 	mac_driver_init(MODEL_MAC_SE);
-
-	ncr5380_init(&macplus_5380intf);
 }
 
 DRIVER_INIT(macclassic)
 {
 	mac_driver_init(MODEL_MAC_CLASSIC);
-
-	ncr5380_init(&macplus_5380intf);
 }
 
 static void mac_vblank_irq(running_machine *machine)

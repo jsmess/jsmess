@@ -1,5 +1,5 @@
 /*
- * ncr5380.h
+ * ncr5380.h SCSI controller
  *
  */
 
@@ -7,6 +7,8 @@
 #define _NCR5380_H_
 
 #include "machine/scsidev.h"
+
+#define NCR5380_DEVICE_CONVERSION (0)
 
 struct NCR5380interface
 {
@@ -37,10 +39,19 @@ enum
 #define R5380_CURDATA_DTACK	(R5380_CURDATA | 0x10)
 
 extern void ncr5380_init( const struct NCR5380interface *interface );
+extern void ncr5380_exit( const struct NCR5380interface *interface );
 extern void ncr5380_read_data(int bytes, UINT8 *pData);
 extern void ncr5380_write_data(int bytes, UINT8 *pData);
 extern void *ncr5380_get_device(int id);
 extern READ8_HANDLER(ncr5380_r);
 extern WRITE8_HANDLER(ncr5380_w);
+
+// device stuff
+
+#if NCR5380_DEVICE_CONVERSION
+#define NCR5380	DEVICE_GET_INFO_NAME(ncr5380)
+
+DEVICE_GET_INFO(scsi5380);
+#endif
 
 #endif

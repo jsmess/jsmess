@@ -49,13 +49,7 @@ static const char *const wnames[] =
 	"DMA initiator rec"
 };
 
-typedef struct
-{
-	void *data;		// device's "this" pointer
-	pSCSIDispatch handler;	// device's handler routine
-} SCSIDev;
-
-static SCSIDev devices[8];	// SCSI IDs 0-7
+static SCSIInstance *devices[8];	// SCSI IDs 0-7
 static const struct NCR5380interface *intf;
 
 static UINT8 n5380_Registers[8];
@@ -63,6 +57,21 @@ static UINT8 last_id;
 static UINT8 n5380_Command[32];
 static INT32 cmd_ptr, d_ptr, d_limit;
 static UINT8 n5380_Data[512];
+
+#if NCR5380_DEVICE_CONVERSION
+typedef struct _ncr5380_t ncr5380_t;	
+struct _ncr5380_t
+{
+	SCSIInstance *devices[8];
+	struct NCR5380interface *intf;
+
+	UINT8 n5380_Registers[8];
+	UINT8 last_id;
+	UINT8 n5380_Command[32];
+	INT32 cmd_ptr, d_ptr, d_limit;
+	UINT8 n5380_Data[512];
+};
+#endif
 
 // get the length of a SCSI command based on it's command byte type
 static int get_cmd_len(int cbyte)
@@ -172,9 +181,13 @@ WRITE8_HANDLER(ncr5380_w)
 					if (get_cmd_len(n5380_Command[0]) == cmd_ptr)
 					{
 						if (VERBOSE)
-							logerror("Command (to ID %d): %x %x %x %x %x %x\n", last_id, n5380_Command[0], n5380_Command[1], n5380_Command[2], n5380_Command[3], n5380_Command[4], n5380_Command[5]);
+							logerror("NCR5380: Command (to ID %d): %x %x %x %x %x %x\n", last_id, n5380_Command[0], n5380_Command[1], n5380_Command[2], n5380_Command[3], n5380_Command[4], n5380_Command[5]);
 
-						d_limit = devices[last_id].handler(SCSIOP_EXEC_COMMAND, devices[last_id].data, 0, &n5380_Command[0]);
+						SCSISetCommand(devices[last_id], &n5380_Command[0], 16);
+						SCSIExecCommand(devices[last_id], &d_limit);
+
+						if (VERBOSE)
+							logerror("NCR5380: Command returned %d bytes\n",  d_limit);
 
 						d_ptr = 0;
 
@@ -203,12 +216,16 @@ WRITE8_HANDLER(ncr5380_w)
 				// if the device exists, make the bus busy.
 				// otherwise don't.
 
-				if (devices[last_id].handler)
+				if (devices[last_id])
 				{
+					if (VERBOSE)
+						logerror("NCR5380: Giving the bus for ID %d\n", last_id);
 					n5380_Registers[R5380_BUSSTATUS] |= 0x40;
 				}
 				else
 				{
+					if (VERBOSE)
+						logerror("NCR5380: Rejecting the bus for ID %d\n", last_id);
 					n5380_Registers[R5380_BUSSTATUS] &= ~0x40;
 				}
 			}
@@ -333,7 +350,7 @@ READ8_HANDLER(ncr5380_r)
 	return rv;
 }
 
-extern void ncr5380_init( const struct NCR5380interface *interface )
+void ncr5380_init( const struct NCR5380interface *interface )
 {
 	int i;
 
@@ -346,9 +363,7 @@ extern void ncr5380_init( const struct NCR5380interface *interface )
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		/* compilation error */
-		/* devices[interface->scsidevs->devices[i].scsiID].handler = interface->scsidevs->devices[i].handler; */
-		/* interface->scsidevs->devices[i].handler(SCSIOP_ALLOC_INSTANCE, &devices[interface->scsidevs->devices[i].scsiID].data, interface->scsidevs->devices[i].diskID, (UINT8 *)NULL); */
+		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskID );
 	}
 
 	state_save_register_item_array("ncr5380", 0, n5380_Registers);
@@ -360,11 +375,24 @@ extern void ncr5380_init( const struct NCR5380interface *interface )
 	state_save_register_item("ncr5380", 0, d_limit);
 }
 
+void ncr5380_exit( const struct NCR5380interface *interface )
+{
+	int i;
+
+	// clean up the devices
+	for (i = 0; i < interface->scsidevs->devs_present; i++)
+	{
+		SCSIDeleteInstance( devices[interface->scsidevs->devices[i].scsiID] );
+	}
+}
+
 void ncr5380_read_data(int bytes, UINT8 *pData)
 {
-	if (devices[last_id].handler)
+	if (devices[last_id])
 	{
-		devices[last_id].handler(SCSIOP_READ_DATA, devices[last_id].data, bytes, pData);
+		if (VERBOSE)
+			logerror("NCR5380: issuing read for %d bytes\n", bytes);
+		SCSIReadData(devices[last_id], pData, bytes);
 	}
 	else
 	{
@@ -374,9 +402,9 @@ void ncr5380_read_data(int bytes, UINT8 *pData)
 
 void ncr5380_write_data(int bytes, UINT8 *pData)
 {
-	if (devices[last_id].handler)
+	if (devices[last_id])
 	{
-		devices[last_id].handler(SCSIOP_WRITE_DATA, devices[last_id].data, bytes, pData);
+		SCSIWriteData(devices[last_id], pData, bytes);
 	}
 	else
 	{
@@ -388,13 +416,57 @@ void *ncr5380_get_device(int id)
 {
 	void *ret;
 
-	if (devices[id].handler)
+	if (devices[id])
 	{
 		logerror("ncr5380: fetching dev pointer for SCSI ID %d\n", id);
-		devices[id].handler(SCSIOP_GET_DEVICE, devices[id].data, 0, (UINT8 *)&ret);
+		SCSIGetDevice(devices[id], &ret);
 
 		return ret;
 	}
 
 	return NULL;
 }
+
+/* device interface */
+#if NCR5380_DEVICE_CONVERSION
+static DEVICE_START( ncr5380 ) 
+{
+}
+
+
+static DEVICE_RESET( ncr5380 ) 
+{
+}
+
+
+static DEVICE_SET_INFO( ncr5380 ) 
+{
+	switch ( state ) 
+	{
+		/* no parameters to set */
+	}
+}
+
+
+DEVICE_GET_INFO( ncr5380 ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ncr5380_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;				      		break;
+		case DEVINFO_INT_CLASS:				info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:			info->set_info = DEVICE_SET_INFO_NAME(ncr5380);	break;
+		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(ncr5380);	break;
+		case DEVINFO_FCT_STOP:				/* nothing */				 	break;
+		case DEVINFO_FCT_RESET:				info->reset = DEVICE_RESET_NAME(ncr5380);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:				info->s = "NCR 5380";		   		break;
+		case DEVINFO_STR_FAMILY:			info->s = "NCR53xx";		   		break;
+		case DEVINFO_STR_VERSION:			info->s = "1.1";		   		break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;		   		break;
+		case DEVINFO_STR_CREDITS:			info->s = "Copyright the MAME and MESS Teams"; break;
+	}
+}
+#endif

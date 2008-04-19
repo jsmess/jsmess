@@ -38,6 +38,7 @@
 #include "driver.h"
 #include "includes/mac.h"
 #include "machine/6522via.h"
+#include "machine/ncr5380.h"
 #include "devices/sonydriv.h"
 #include "devices/harddriv.h"
 
@@ -97,12 +98,12 @@ static MACHINE_DRIVER_START( mac512ke )
 	MDRV_NVRAM_HANDLER(mac)
 MACHINE_DRIVER_END
 
-
-
 static MACHINE_DRIVER_START( macplus )
 	MDRV_IMPORT_FROM( mac512ke )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(macplus_map, 0)
+
+	MDRV_MACHINE_START(macscsi)
 MACHINE_DRIVER_END
 
 

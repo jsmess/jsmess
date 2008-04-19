@@ -21,6 +21,7 @@
 
 /*----------- defined in machine/mac.c -----------*/
 
+MACHINE_START( macscsi );
 MACHINE_RESET( mac );
 
 DRIVER_INIT(mac128k512k);
