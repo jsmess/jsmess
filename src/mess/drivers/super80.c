@@ -189,8 +189,7 @@ static void mc6845_cursor_configure(void)
 	if (curs_type == 3) for (i = r11; i < r10;i++) mc6845_cursor[i]=0; // now take a bite out of the middle
 }
 
-/* Resize the screen within the limits of the hardware.
-	If we are using dynamic screen resizing, expand the image to fill the screen area */
+/* Resize the screen within the limits of the hardware. Expand the image to fill the screen area */
 static void mc6845_screen_configure(running_machine *machine)
 {
 	rectangle visarea;
@@ -201,11 +200,11 @@ static void mc6845_screen_configure(running_machine *machine)
 
 	/* Resize the screen */
 	visarea.min_x = 0;
-	visarea.max_x = width;
+	visarea.max_x = width-1;
 	visarea.min_y = 0;
-	visarea.max_y = height;
+	visarea.max_y = height-1;
 	if ((width < 610) && (height < 460) && (bytes < 0x1000))	/* bounds checking to prevent an assert or violation */
-		video_screen_set_visarea(machine->primary_screen, 0, width+1, 0, height+1);
+		video_screen_set_visarea(machine->primary_screen, 0, width, 0, height);
 }
 
 static VIDEO_EOF( super80m )
@@ -305,17 +304,17 @@ static VIDEO_UPDATE( super80v )
 
 	decodechar(screen->machine->gfx[0],256, pcgram);			// and into machine graphics
 
-	for( i = screen_home; (i < (bytes + screen_home)) & (i < 0x1000); i++ )
+	for( i = 0; i < bytes; i++ )
 	{
-		int sx, sy, chr, col;
-		sy = ((i - screen_home) / mc6845_reg[1]) * (mc6845_reg[9] + 1);
-		sx = ((i - screen_home) % mc6845_reg[1]) * 7;
-		chr = videoram[i];
+		int mem = (i + screen_home) & 0xfff;
+		int sy = (i / mc6845_reg[1]) * (mc6845_reg[9] + 1);
+		int sx = (i % mc6845_reg[1]) * 7;
+		int chr = videoram[mem];
 
 		/* get colour or b&w */
+		int col = 5;					/* green */
 		if ((options & 0x60) == 0x60) col = 15;		/* b&w */
-		else col = 5;					/* green */
-		if (!(options & 0x40)) col = colorram[i];			// read a byte of colour
+		if (!(options & 0x40)) col = colorram[mem];			// read a byte of colour
 
 		if ((!super80v_rom_pcg) && (chr > 0x7f))			// is it a high chr in inverse mode
 		{
