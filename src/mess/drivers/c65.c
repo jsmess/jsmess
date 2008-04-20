@@ -304,9 +304,6 @@ static MACHINE_DRIVER_START( c65pal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 MACHINE_DRIVER_END
 
-static DRIVER_INIT( c65 )			{ c65_driver_init(); }
-static DRIVER_INIT( c65pal )		{ c65pal_driver_init(); }
-
 static void c65_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)

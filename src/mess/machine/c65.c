@@ -790,20 +790,14 @@ static void c65_common_driver_init (void)
 				  c64_vic_interrupt, c65_bankswitch_interface);
 }
 
-void c65_driver_init (void)
+DRIVER_INIT( c65 )
 {
 	dma.version=2;
 	c65_common_driver_init ();
 
 }
 
-void c65_driver_alpha1_init (void)
-{
-	dma.version=1;
-	c65_common_driver_init ();
-}
-
-void c65pal_driver_init (void)
+DRIVER_INIT( c65pal )
 {
 	dma.version=1;
 	c64_pal = 1;

@@ -25,9 +25,8 @@ extern UINT8 *c65_interface;
 void c65_bankswitch (void);
 void c65_colorram_write (int offset, int value);
 
-void c65_driver_init (void);
-void c65_driver_alpha1_init (void);
-void c65pal_driver_init (void);
+DRIVER_INIT( c65 );
+DRIVER_INIT( c65pal );
 MACHINE_START( c65 );
 
 
