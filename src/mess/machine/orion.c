@@ -59,7 +59,12 @@ READ8_HANDLER (orion_keyboard_portb_r )
 
 READ8_HANDLER (orion_keyboard_portc_r )
 {
-	return input_port_read_indexed(machine, 8);		
+	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	UINT8 dat = input_port_read_indexed(machine, 8);
+	if (level <  0) { 
+		dat ^= 0x10;
+ 	}	
+	return dat;		
 }
 
 WRITE8_HANDLER (orion_keyboard_porta_w )
@@ -74,6 +79,11 @@ WRITE8_HANDLER (orion_keyboard_porta_w )
 	  	case 0x40 : orion_keyboard_line = 6;break;
 	  	case 0x80 : orion_keyboard_line = 7;break;
 	}	
+}
+
+WRITE8_HANDLER (orion_cassette_portc_w )
+{
+	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x01 ? 1 : -1);	
 }
 
 const ppi8255_interface orion128_ppi8255_interface_1 =
@@ -93,7 +103,7 @@ const ppi8255_interface orion128_ppi8255_interface_2 =
 	orion_keyboard_portc_r,
 	orion_keyboard_porta_w,
 	NULL,
-	NULL
+	orion_cassette_portc_w
 };
 
 /* Driver initialization */
@@ -182,6 +192,7 @@ WRITE8_HANDLER ( orion128_memory_page_w )
 MACHINE_RESET ( orion128 ) 
 {		
 	wd17xx_reset();
+	wd17xx_set_density (DEN_FM_HI);	
 	orion_keyboard_line = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;

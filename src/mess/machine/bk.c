@@ -75,7 +75,7 @@ MACHINE_RESET( bk0010 )
 	bk_scrool = 01330;
 }
 
-READ16_HANDLER (bk_key_state_r) {
+READ16_HANDLER (bk_key_state_r) {		
 	return kbd_state;
 }
 READ16_HANDLER (bk_key_code_r) {
@@ -88,7 +88,15 @@ READ16_HANDLER (bk_vid_scrool_r) {
 }
 
 READ16_HANDLER (bk_key_press_r) {
-	return 0x8080 | key_pressed;
+	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	UINT16 cas;
+	if (level < 0) { 
+	 	cas = 0x00; 
+ 	} else {
+		cas = 0x20;
+	}
+
+	return 0x8080 | key_pressed | cas;
 }
 
 WRITE16_HANDLER(bk_key_state_w) {

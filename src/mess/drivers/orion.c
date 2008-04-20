@@ -13,6 +13,8 @@
 #include "includes/orion.h"
 #include "machine/mc146818.h"
 #include "devices/basicdsk.h"
+#include "devices/cassette.h"
+#include "formats/rk_cas.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 
@@ -279,6 +281,10 @@ static MACHINE_DRIVER_START( orion128 )
 	    
 	MDRV_VIDEO_START(orion128)
     MDRV_VIDEO_UPDATE(orion128)       
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)    		    
 MACHINE_DRIVER_END
 
 static const struct AY8910interface orionz80_ay_interface =
@@ -320,13 +326,27 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	//MDRV_SOUND_ADD(WAVE, 0)
-	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)    	
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)    	
 	MDRV_SOUND_ADD(AY8912, 1773400)
 	MDRV_SOUND_CONFIG(orionz80_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
 MACHINE_DRIVER_END
 
+
+static void orion_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rko_cassette_formats; break;
+
+		default:					cassette_device_getinfo(devclass, state, info); break;
+	}
+}
 
 static void orion_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -348,11 +368,13 @@ static void orion_floppy_getinfo(const mess_device_class *devclass, UINT32 state
  
 SYSTEM_CONFIG_START(orion128)
 	CONFIG_RAM_DEFAULT(256 * 1024)
+	CONFIG_DEVICE(orion_cassette_getinfo);
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(orionz80)
 	CONFIG_RAM_DEFAULT(512 * 1024)
+	CONFIG_DEVICE(orion_cassette_getinfo);
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
  

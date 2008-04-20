@@ -164,6 +164,12 @@ static const struct CassetteFormat rks_cassette_format = {
 	NULL
 };
 
+static const struct CassetteFormat rko_cassette_format = {
+	"rko",
+	rk20_cassette_identify,
+	rk20_cassette_load,
+	NULL
+};
 
 CASSETTE_FORMATLIST_START(rku_cassette_formats)
 	CASSETTE_FORMAT(rku_cassette_format)
@@ -175,4 +181,8 @@ CASSETTE_FORMATLIST_END
 
 CASSETTE_FORMATLIST_START(rks_cassette_formats)
 	CASSETTE_FORMAT(rks_cassette_format)
+CASSETTE_FORMATLIST_END
+
+CASSETTE_FORMATLIST_START(rko_cassette_formats)
+	CASSETTE_FORMAT(rko_cassette_format)
 CASSETTE_FORMATLIST_END
