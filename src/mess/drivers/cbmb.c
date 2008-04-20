@@ -703,12 +703,6 @@ static MACHINE_DRIVER_START( cbm500 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
-static DRIVER_INIT( cbm500 )	{ cbm500_driver_init(); }
-static DRIVER_INIT( cbm600 )	{ cbm600_driver_init(); }
-static DRIVER_INIT( cbm600hu )	{ cbm600hu_driver_init(); }
-static DRIVER_INIT( cbm600pal )	{ cbm600pal_driver_init(); }
-static DRIVER_INIT( cbm700 )	{ cbm700_driver_init(); }
-
 static void cbmb_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
@@ -772,6 +766,3 @@ COMP (1983,	cbm620hu, cbm610,	0,		cbm600pal,	cbm600pal,	cbm600hu,	cbmb,	"Commodo
 COMP (1983,	cbm710,   cbm610,   0,		cbm700, 	cbm700, 	cbm700, 	cbmb,	"Commodore Business Machines Co.",  "Commodore B128-80HP/710",                  GAME_NOT_WORKING)
 COMP (1983,	cbm720,	  cbm610,	0,		cbm700,		cbm700,		cbm700,		cbmb,	"Commodore Business Machines Co.",	"Commodore B256-80HP/720",					GAME_NOT_WORKING)
 COMP (1983,	cbm720se, cbm610,	0,		cbm700,     cbm700,		cbm700,		cbmb,	"Commodore Business Machines Co.",	"Commodore B256-80HP/720 Swedish/Finnish",	GAME_NOT_WORKING)
-#if 0
-COMP (1983,	cbm730,   cbm610,   0,		cbmbx, 		cbmb, 		cbmb, 		cbmb,    "Commodore Business Machines Co.",	"Commodore BX128-80HP/BX256-80HP/730", GAME_NOT_WORKING)
-#endif

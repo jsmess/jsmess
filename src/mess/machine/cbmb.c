@@ -251,27 +251,27 @@ static void cbmb_common_driver_init (void)
 	cbm_ieee_open();
 }
 
-void cbm600_driver_init (void)
+DRIVER_INIT( cbm600 )
 {
 	cbmb_common_driver_init ();
 	cbm_ntsc = 1;
 	cbm600_vh_init();
 }
 
-void cbm600pal_driver_init (void)
+DRIVER_INIT( cbm600pal )
 {
 	cbmb_common_driver_init ();
 	cbm_ntsc = 0;
 	cbm600_vh_init();
 }
 
-void cbm600hu_driver_init (void)
+DRIVER_INIT( cbm600hu )
 {
 	cbmb_common_driver_init ();
 	cbm_ntsc = 0;
 }
 
-void cbm700_driver_init (void)
+DRIVER_INIT( cbm700 )
 {
 	cbmb_common_driver_init ();
 	cbm700 = 1;
@@ -279,7 +279,7 @@ void cbm700_driver_init (void)
 	cbm700_vh_init();
 }
 
-void cbm500_driver_init (void)
+DRIVER_INIT( cbm500 )
 {
 	cbmb_common_driver_init ();
 	cbm500=1;

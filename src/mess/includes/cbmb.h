@@ -135,11 +135,11 @@ extern UINT8 *cbmb_colorram;
 
 WRITE8_HANDLER ( cbmb_colorram_w );
 
-void cbm500_driver_init (void);
-void cbm600_driver_init (void);
-void cbm600pal_driver_init (void);
-void cbm600hu_driver_init (void);
-void cbm700_driver_init (void);
+DRIVER_INIT( cbm500 );
+DRIVER_INIT( cbm600 );
+DRIVER_INIT( cbm600pal );
+DRIVER_INIT( cbm600hu );
+DRIVER_INIT( cbm700 );
 MACHINE_RESET( cbmb );
 
 void cbmb_rom_load(void);
