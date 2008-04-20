@@ -78,6 +78,7 @@ static int is_chifi3 = 0;
 static int is_realtec = 0;
 static int realtek_bank_addr=0, realtek_bank_size=0, realtek_old_bank_addr;
 static int is_19in1 = 0;
+static int is_15in1 = 0;
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -205,7 +206,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = is_chifi3 = is_realtec = is_19in1 = 0;
+	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = is_chifi3 = is_realtec = is_19in1 = is_15in1 = 0;
 
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
@@ -446,6 +447,17 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			}
 
 		}
+		// detect 'Super 15 in 1'
+		if (length == 0x200000)
+		{
+		 	static unsigned char s15in1sig[] = { 0x22, 0x3c, 0x00, 0xa1, 0x30, 0x00};
+
+		 	if (!memcmp(&ROM[0x17bb2+relocate],&s15in1sig[0],sizeof(s15in1sig))) // super15in1
+			{
+				is_15in1 = 1;
+			}
+		}
+
 	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
@@ -470,7 +482,11 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	}
 	if (is_19in1) {
 		UINT8 *ROM = memory_region(REGION_CPU1);
-		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000); // reset to menu
+		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000); // allow hard reset to menu
+	}
+	if (is_15in1) {
+		UINT8 *ROM = memory_region(REGION_CPU1);
+		memcpy(&ROM[0x400000],&ROM[0x000000],0x200000); // allow hard reset to menu
 	}
 
 	if (is_realtec)
@@ -1052,7 +1068,11 @@ static DRIVER_INIT( gencommon )
 	}
 	if (is_19in1)
 	{
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13038, 0, 0, s19in1_bank);
+		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13039, 0, 0, s19in1_bank);
+	}
+	if (is_15in1)
+	{
+		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13039, 0, 0, s19in1_bank);
 	}
 	if (is_realtec)
 	{
