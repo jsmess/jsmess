@@ -1255,6 +1255,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 			w->command = data & ~FDC_MASK_TYPE_II;
 			w->command_type = TYPE_II;
 			w->status &= ~STA_2_LOST_DAT;
+			w->status |= STA_2_BUSY;
 			wd17xx_clear_data_request(machine);
 
 			wd17xx_timed_read_sector_request();
@@ -1271,6 +1272,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 			w->command = data & ~FDC_MASK_TYPE_II;
 			w->command_type = TYPE_II;
 			w->status &= ~STA_2_LOST_DAT;
+			w->status |= STA_2_BUSY;
 			wd17xx_clear_data_request(machine);
 
 			wd17xx_timed_write_sector_request();
