@@ -53,8 +53,6 @@ void cbmcartslot_device_getinfo(const mess_device_class *devclass, UINT32 state,
 # else
 #  define VERBOSE_DBG 1
 # endif
-#else
-# define PET_TEST_CODE
 #endif
 
 #define DBG_LOG(n,m,a) LOG(VERBOSE_DBG,n,m,a)

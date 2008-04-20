@@ -9,14 +9,6 @@
 #ifndef VC1541_H_
 #define VC1541_H_
 
-
-#ifdef PET_TEST_CODE
-/* test with preliminary VC1541 emulation */
-#define VC1541
-/*#define CPU_SYNC */
-#endif
-
-
 typedef struct {
 	int cpunr;
 	int devicenr;

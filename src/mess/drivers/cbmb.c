@@ -740,10 +740,6 @@ static void cbmb_quickload_getinfo(const mess_device_class *devclass, UINT32 sta
 SYSTEM_CONFIG_START(cbmb)
 	CONFIG_DEVICE(cbmb_cbmcartslot_getinfo)
 	CONFIG_DEVICE(cbmb_quickload_getinfo)
-#ifdef PET_TEST_CODE
-	/* monitor OR tape routine in kernel */
-	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-#endif
 SYSTEM_CONFIG_END
 
 static void cbm500_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -766,10 +762,6 @@ static void cbm500_quickload_getinfo(const mess_device_class *devclass, UINT32 s
 SYSTEM_CONFIG_START(cbm500)
 	CONFIG_DEVICE(cbmb_cbmcartslot_getinfo)
 	CONFIG_DEVICE(cbm500_quickload_getinfo)
-#ifdef PET_TEST_CODE
-	/* monitor OR tape routine in kernel */
-	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-#endif
 SYSTEM_CONFIG_END
 
 /*     YEAR     NAME      PARENT    COMPAT  MACHINE     INPUT       INIT        CONFIG  COMPANY                             FULLNAME */

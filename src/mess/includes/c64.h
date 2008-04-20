@@ -123,8 +123,6 @@
 #define JOYSTICK_2_BUTTON	(( input_port_read(Machine,  "JOY" ) & 8 ))
 #define JOYSTICK_2_BUTTON2	(( input_port_read(Machine,  "JOY" ) & 4 ))
 
-#define QUICKLOAD			( input_port_read(Machine,  "Config" ) & 0x8000 )
-
 /* to be cleaned up, when tape emulation uses standard MESS cassette code */
 #define DATASSETTE			( input_port_read(Machine,  "Config" ) & 0x4000 )
 #define DATASSETTE_TONE		( input_port_read(Machine,  "Config" ) & 0x2000 )

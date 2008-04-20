@@ -350,10 +350,6 @@ static INPUT_PORTS_START( c64 )
 	PORT_DIPSETTING(	0x00, "Automatic")
 	PORT_DIPSETTING(	0x04, "Ultimax (GAME)")
 	PORT_DIPSETTING(	0x08, "C64 (EXROM)")
-#ifdef PET_TEST_CODE
-	PORT_DIPSETTING (	0x10, "CBM Supergames")
-	PORT_DIPSETTING (	0x14, "Ocean Robocop2")
-#endif
 	PORT_INCLUDE(c64_keyboard)
 INPUT_PORTS_END
 
@@ -377,10 +373,6 @@ static INPUT_PORTS_START (vic64s)
 	PORT_DIPSETTING(	0x00, "Automatic")
 	PORT_DIPSETTING(	0x04, "Ultimax (GAME)")
 	PORT_DIPSETTING(	0x08, "C64 (EXROM)")
-#ifdef PET_TEST_CODE
-	PORT_DIPSETTING (	0x10, "CBM Supergames")
-	PORT_DIPSETTING (	0x14, "Ocean Robocop2")
-#endif
 	PORT_INCLUDE(vic64s_keyboard)
 INPUT_PORTS_END
 
@@ -417,10 +409,6 @@ static INPUT_PORTS_START (c64gs)
 	PORT_DIPSETTING(	0x00, "Automatic")
 	PORT_DIPSETTING(	0x04, "Ultimax (GAME)")
 	PORT_DIPSETTING(	0x08, "C64 (EXROM)")
-#ifdef PET_TEST_CODE
-	PORT_DIPSETTING (	0x10, "CBM Supergames")
-	PORT_DIPSETTING (	0x14, "Ocean Robocop2")
-#endif
 	PORT_BIT (0x02, 0x00, IPT_UNUSED)		   /* no serial bus */
 	PORT_BIT (0x01, 0x00, IPT_UNUSED)
 	/* 2008 FP: This has to be cleaned up later */
@@ -458,10 +446,6 @@ static INPUT_PORTS_START (sx64)
 	PORT_DIPSETTING(	0x00, "Automatic")
 	PORT_DIPSETTING(	0x04, "Ultimax (GAME)")
 	PORT_DIPSETTING(	0x08, "C64 (EXROM)")
-#ifdef PET_TEST_CODE
-	PORT_DIPSETTING(	0x10, "CBM Supergames")
-	PORT_DIPSETTING(	0x14, "Ocean Robocop2")
-#endif
 	/* 1 vc1541 build in, device number selectable 8,9,10,11 */
 	PORT_INCLUDE(c64_keyboard)
 INPUT_PORTS_END
@@ -478,10 +462,6 @@ static INPUT_PORTS_START (vip64)
 	PORT_DIPSETTING(	0x00, "Automatic")
 	PORT_DIPSETTING(	0x04, "Ultimax (GAME)")
 	PORT_DIPSETTING(	0x08, "C64 (EXROM)")
-#ifdef PET_TEST_CODE
-	PORT_DIPSETTING(	0x10, "CBM Supergames")
-	PORT_DIPSETTING(	0x14, "Ocean Robocop2")
-#endif
 	 /* 1 vc1541 build in, device number selectable 8,9,10,11 */
 	 PORT_INCLUDE(vic64s_keyboard)
 INPUT_PORTS_END

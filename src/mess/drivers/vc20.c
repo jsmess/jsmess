@@ -843,20 +843,6 @@ SYSTEM_CONFIG_START(vc20v)
 	CONFIG_RAM(32 * 1024)
 SYSTEM_CONFIG_END
 
-#ifdef PET_TEST_CODE
-SYSTEM_CONFIG_START(vc20i)
-	CONFIG_DEVICE(cbmvc20_cartslot_getinfo)
-	CONFIG_DEVICE(vc20_quickload_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
-	CONFIG_DEVICE(c2031_device_getinfo)
-	CONFIG_RAM_DEFAULT(5 * 1024)
-	CONFIG_RAM(8 * 1024)
-	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(24 * 1024)
-	CONFIG_RAM(32 * 1024)
-SYSTEM_CONFIG_END
-#endif
-
 /*      YEAR    NAME        PARENT  COMPAT  MACHINE INPUT       INIT    CONFIG     COMPANY                          FULLNAME */
 COMP ( 1981,	vic20,		0,		0,		vic20,	vic20,		vic20,	vc20,      "Commodore Business Machines Co.",  "VIC20 (NTSC)", GAME_IMPERFECT_SOUND)
 COMP ( 1981,	vic20i, 	vic20,	0,		vic20i, vic20i, 	vic20i, vc20,      "Commodore Business Machines Co.",  "VIC20 (NTSC), IEEE488 Interface (SYS45065)",   GAME_IMPERFECT_SOUND)
