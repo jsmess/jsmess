@@ -53,6 +53,8 @@
 #define R3000_CLOCK			XTAL_40MHz
 #define M68K_CLOCK			XTAL_50MHz
 
+static QUICKLOAD_LOAD( jaguar );
+
 /*************************************
  *
  *  Global variables
@@ -474,12 +476,13 @@ static MACHINE_DRIVER_START( jaguar )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+
+	/* quickload */
+	MDRV_QUICKLOAD_ADD(jaguar, "bin", 0)
 MACHINE_DRIVER_END
 
 
@@ -522,24 +525,8 @@ static QUICKLOAD_LOAD( jaguar )
 	return INIT_PASS;
 }
 
-static void jaguar_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_jaguar; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 SYSTEM_CONFIG_START(jaguar)
 	CONFIG_DEVICE(cartslot_device_getinfo)
-	CONFIG_DEVICE(jaguar_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 

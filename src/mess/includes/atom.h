@@ -17,9 +17,9 @@ extern const ppi8255_interface atom_8255_int;
 
 MACHINE_RESET( atom );
 QUICKLOAD_LOAD( atom );
- READ8_HANDLER (atom_8255_porta_r);
- READ8_HANDLER (atom_8255_portb_r);
- READ8_HANDLER (atom_8255_portc_r);
+READ8_HANDLER (atom_8255_porta_r);
+READ8_HANDLER (atom_8255_portb_r);
+READ8_HANDLER (atom_8255_portc_r);
 WRITE8_HANDLER (atom_8255_porta_w );
 WRITE8_HANDLER (atom_8255_portb_w );
 WRITE8_HANDLER (atom_8255_portc_w );

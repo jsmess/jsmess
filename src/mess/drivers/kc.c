@@ -124,106 +124,6 @@ static ADDRESS_MAP_START(kc85_4_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x0ffff) AM_READWRITE( kc85_4_port_r, kc85_4_port_w )
 ADDRESS_MAP_END
 
-
-#ifdef UNUSED_FUNCTION
-static  READ8_HANDLER(kc85_4d_port_r)
-{
-	int port;
-
-	port = offset & 0x0ff;
-
-	switch (port)
-	{
-		case 0x080:
-			return kc85_module_r(machine, offset);
-
-		case 0x085:
-		case 0x084:
-			return kc85_4_84_r(machine, offset);
-
-
-		case 0x086:
-		case 0x087:
-			return kc85_4_86_r(machine, offset);
-
-		case 0x088:
-		case 0x089:
-			return kc85_pio_data_r(machine, port-0x088);
-		case 0x08a:
-		case 0x08b:
-			return kc85_pio_control_r(machine, port-0x08a);
-		case 0x08c:
-		case 0x08d:
-		case 0x08e:
-		case 0x08f:
-			return kc85_ctc_r(machine, port-0x08c);
-		case 0x0f0:
-		case 0x0f1:
-		case 0x0f2:
-		case 0x0f3:
-			return kc85_disc_interface_ram_r(machine, offset);
-
-	}
-
-	logerror("unhandled port r: %04x\n",offset);
-	return 0x0ff;
-}
-
-static WRITE8_HANDLER(kc85_4d_port_w)
-{
-	int port;
-
-	port = offset & 0x0ff;
-
-	switch (port)
-	{
-		case 0x080:
-			kc85_module_w(offset,data);
-			return;
-
-		case 0x085:
-		case 0x084:
-			kc85_4_84_w(offset,data);
-			return;
-
-		case 0x086:
-		case 0x087:
-			kc85_4_86_w(offset,data);
-			return;
-
-		case 0x088:
-		case 0x089:
-			kc85_4_pio_data_w(port-0x088, data);
-			return;
-
-		case 0x08a:
-		case 0x08b:
-			kc85_pio_control_w(port-0x08a, data);
-			return;
-
-		case 0x08c:
-		case 0x08d:
-		case 0x08e:
-		case 0x08f:
-			kc85_ctc_w(port-0x08c, data);
-			return;
-
-		case 0x0f0:
-		case 0x0f1:
-		case 0x0f2:
-		case 0x0f3:
-			kc85_disc_interface_ram_w(offset,data);
-			return;
-	}
-
-	logerror("unhandled port w: %04x\n",offset);
-}
-
-ADDRESS_MAP_START(kc85_4d_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0x0ffff) AM_READWRITE(kc85_4d_port_r, kc85_4d_port_w)
-ADDRESS_MAP_END
-#endif
-
 static ADDRESS_MAP_START(kc85_4_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK1, SMH_BANK7)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK2, SMH_BANK8)
@@ -370,6 +270,9 @@ static MACHINE_DRIVER_START( kc85_3 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* devices */
+	MDRV_QUICKLOAD_ADD(kc, "kcc", 0)
 MACHINE_DRIVER_END
 
 
@@ -432,25 +335,9 @@ static void kc85_cassette_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static void kc85_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "kcc"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_kc; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 SYSTEM_CONFIG_START(kc85)
 	CONFIG_RAM_DEFAULT		(64 * 1024)
 	CONFIG_DEVICE(kc85_cassette_getinfo)
-	CONFIG_DEVICE(kc85_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 static void kc85d_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

@@ -453,6 +453,9 @@ static MACHINE_DRIVER_START( lviv )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* snapshot */
+	MDRV_SNAPSHOT_ADD(lviv, "sav", 0)
 MACHINE_DRIVER_END
 
 
@@ -474,21 +477,6 @@ static void lviv_cassette_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static void lviv_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* snapshot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sav"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_lviv; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 ROM_START(lviv)
 	ROM_REGION(0x14000,REGION_CPU1,0)
 	ROM_SYSTEM_BIOS( 0, "lviv", "Lviv/L'vov" )
@@ -503,7 +491,6 @@ SYSTEM_CONFIG_START(lviv)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 	/* 9-Oct-2003 - Changed to lvt because lv? is an invalid file extension */
 	CONFIG_DEVICE(lviv_cassette_getinfo)
-	CONFIG_DEVICE(lviv_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
 

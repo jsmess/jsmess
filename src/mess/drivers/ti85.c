@@ -374,6 +374,12 @@ static MACHINE_DRIVER_START( ti85 )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( ti85d )
+	MDRV_IMPORT_FROM( ti85 )
+	MDRV_SNAPSHOT_ADD(ti8x, "sav", 0)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( ti86 )
 	MDRV_IMPORT_FROM( ti85 )
 	MDRV_CPU_MODIFY("main")
@@ -384,6 +390,13 @@ static MACHINE_DRIVER_START( ti86 )
 
 	MDRV_NVRAM_HANDLER( ti86 )
 MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( ti86d )
+	MDRV_IMPORT_FROM( ti86 )
+	MDRV_SNAPSHOT_ADD(ti8x, "sav", 0)
+MACHINE_DRIVER_END
+
 
 ROM_START (ti81)
 	ROM_REGION (0x18000, REGION_CPU1,0)
@@ -463,21 +476,6 @@ ROM_START (ti83p)
 	ROMX_LOAD( "ti83pv112.bin", 0x10000, 0x80000, CRC(ddca5026) SHA1(6615df5554076b6b81bd128bf847d2ff046e556b), ROM_BIOS(3) )
 ROM_END
 
-static void ti85_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* snapshot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sav"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_ti8x; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void ti85_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
@@ -502,23 +500,7 @@ static void ti85_serial_getinfo(const mess_device_class *devclass, UINT32 state,
 
 SYSTEM_CONFIG_START(ti85)
 	CONFIG_DEVICE(ti85_serial_getinfo)
-	CONFIG_DEVICE(ti85_snapshot_getinfo)
 SYSTEM_CONFIG_END
-
-static void ti86_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* snapshot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sav"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_ti8x; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void ti86_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -544,15 +526,14 @@ static void ti86_serial_getinfo(const mess_device_class *devclass, UINT32 state,
 
 SYSTEM_CONFIG_START(ti86)
 	CONFIG_DEVICE(ti86_serial_getinfo)
-	CONFIG_DEVICE(ti86_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                        FLAGS */
 COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      NULL,   "Texas Instruments",    "TI-81",                        0 )
-COMP( 1992, ti85,       0,      0,      ti85,   ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        0 )
+COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        0 )
 COMP( 1993, ti82,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-82",                        GAME_NOT_WORKING )
 COMP( 1996, ti83,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83",                        GAME_NOT_WORKING )
-COMP( 1997, ti86,       0,      0,      ti86,   ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        0 )
+COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        0 )
 COMP( 1999, ti83p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus",                   GAME_NOT_WORKING )
 /*
 COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )

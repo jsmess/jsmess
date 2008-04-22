@@ -351,6 +351,9 @@ static MACHINE_DRIVER_START( level1 )
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_CONFIG(speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* devices */
+	MDRV_QUICKLOAD_ADD(trs80_cmd, "cmd", 0.5)
 MACHINE_DRIVER_END
 
 
@@ -469,26 +472,7 @@ static void trs80_cassette_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static void trs80_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cmd"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_trs80_cmd; break;
-
-		/* --- the following bits of info are returned as doubles --- */
-		case MESS_DEVINFO_FLOAT_QUICKLOAD_DELAY:				info->d = 0.5; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 SYSTEM_CONFIG_START(trs80)
-	CONFIG_DEVICE(trs80_quickload_getinfo)
 	CONFIG_DEVICE(trs80_cassette_getinfo)
 SYSTEM_CONFIG_END
 
@@ -518,7 +502,7 @@ SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME      PARENT     COMPAT         MACHINE   INPUT  INIT  CONFIG   COMPANY  FULLNAME */
-COMP( 1977, trs80,    0,	 0,		level1,   trs80, trs80,    trs80,	"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
+COMP( 1977, trs80,    0,	     0,		level1,   trs80, trs80,    trs80,	"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
 COMP( 1978, trs80l2,  trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Radio Shack Level II Basic)" , 0)
 COMP( 1978, trs80l2a, trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (R/S L2 Basic)" , 0)
 COMP( 1980, sys80,    trs80,	 0,		model1,   trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)

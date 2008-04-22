@@ -2941,6 +2941,9 @@ static MACHINE_DRIVER_START( amstrad )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* snapshot */
+	MDRV_SNAPSHOT_ADD(amstrad, "sna", 0)
 MACHINE_DRIVER_END
 
 
@@ -3158,22 +3161,6 @@ static void cpcplus_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 }
 
 
-static void cpcplus_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* snapshot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sna"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_amstrad; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static void aleste_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -3199,14 +3186,12 @@ SYSTEM_CONFIG_END
 SYSTEM_CONFIG_START( cpcplus )
 	CONFIG_IMPORT_FROM(cpc6128)
 	CONFIG_DEVICE(cpcplus_cartslot_getinfo)
-	CONFIG_DEVICE(cpcplus_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
 
 SYSTEM_CONFIG_START( gx4000 )
 	CONFIG_RAM_DEFAULT(64 * 1024)  // has 64k RAM
 	CONFIG_DEVICE(cpcplus_cartslot_getinfo)
-	CONFIG_DEVICE(cpcplus_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
 

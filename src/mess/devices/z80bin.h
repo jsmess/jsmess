@@ -7,16 +7,29 @@
 
 *********************************************************************/
 
-#ifndef Z80BIN_H
-#define Z80BIN_H
+#ifndef __Z80BIN_H__
+#define __Z80BIN_H__
 
-#include "device.h"
 #include "image.h"
 
 
-void z80bin_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
+#define Z80BIN	DEVICE_GET_INFO_NAME(z80bin)
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+/* device getinfo function */
+DEVICE_GET_INFO(z80bin);
+
+/* please stop using this method - z80bin needs to be encapsulated into a proper device */
 int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr );
 
 
-#endif /* Z80BIN_H */
+#endif /* __Z80BIN_H__ */

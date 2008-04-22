@@ -29,8 +29,6 @@
 #define DATASSETTE_RECORD	( input_port_read(Machine, "CFG0") & 0x02 )
 #define DATASSETTE_STOP		( input_port_read(Machine, "CFG0") & 0x01 )
 
-#define QUICKLOAD			( input_port_read(Machine, "CFG0") & 0x08 )
-
 
 #define DATASSETTE			( input_port_read(Machine, "CFG0") & 0x20 )
 #define DATASSETTE_TONE		( input_port_read(Machine, "CFG0") & 0x10 )

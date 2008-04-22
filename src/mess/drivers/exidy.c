@@ -96,6 +96,8 @@
 #include "sound/speaker.h"
 
 
+static QUICKLOAD_LOAD( exidy );
+
 static DEVICE_IMAGE_LOAD( exidy_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
@@ -751,6 +753,9 @@ static MACHINE_DRIVER_START( exidy )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* quickload */
+	MDRV_QUICKLOAD_ADD(exidy, "bin", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exidyd )
@@ -841,22 +846,6 @@ static QUICKLOAD_LOAD( exidy )
 	return INIT_PASS;
 }
 
-static void exidy_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_DEV_FILE:		strcpy(info->s = device_temp_str(), __FILE__); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "bin"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:	info->f = (genf *) quickload_load_exidy; break;
-
-		default:				quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void exidy_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -891,13 +880,11 @@ SYSTEM_CONFIG_START(exidy)
 	CONFIG_DEVICE(exidy_floppy_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(exidy_cassette_getinfo)		// use of cassette causes a hang
-	CONFIG_DEVICE(exidy_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(exidyd)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(exidy_cassette_getinfo)		// use of cassette causes a hang
-	CONFIG_DEVICE(exidy_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 

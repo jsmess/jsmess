@@ -10,6 +10,8 @@
 #include "sound/speaker.h"
 #include "deprecat.h"		/* "Machine" needed for z80pio interrupt */
 
+static QUICKLOAD_LOAD( super80 );
+
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
 static UINT8 int_sw;		/* internal 1 mhz flipflop */
@@ -814,6 +816,9 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* quickload */
+	MDRV_QUICKLOAD_ADD(super80, "bin", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80d )
@@ -860,6 +865,9 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* quickload */
+	MDRV_QUICKLOAD_ADD(super80, "bin", 0)
 MACHINE_DRIVER_END
 
 static void driver_init_common( void )
@@ -963,22 +971,6 @@ static QUICKLOAD_LOAD( super80 )
 	return INIT_PASS;
 }
 
-static void super80_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_DEV_FILE:		strcpy(info->s = device_temp_str(), __FILE__); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "bin"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:	info->f = (genf *) quickload_load_super80; break;
-
-		default:				quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( super80_cart )
 {
 /*	int size = mame_fsize(fp);
@@ -1027,13 +1019,10 @@ static void super80_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 		default:				cassette_device_getinfo(devclass, state, info); break;
 	}
 }
-INPUT_PORTS_START(0)
-INPUT_PORTS_END
 
 SYSTEM_CONFIG_START(super80)
 	CONFIG_DEVICE(super80_cassette_getinfo)
 	CONFIG_DEVICE(super80_cartslot_getinfo)
-	CONFIG_DEVICE(super80_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE INPUT     INIT       CONFIG   COMPANY       FULLNAME */

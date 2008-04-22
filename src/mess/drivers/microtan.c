@@ -243,6 +243,10 @@ static MACHINE_DRIVER_START( microtan )
 	MDRV_SOUND_ADD(AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	// snapshot/quickload
+	MDRV_SNAPSHOT_ADD(microtan, "m65", 0.5)
+	MDRV_QUICKLOAD_ADD(microtan_hexfile, "hex", 0.5)
 MACHINE_DRIVER_END
 
 ROM_START( microtan )
@@ -274,46 +278,8 @@ static void microtan_cassette_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-static void microtan_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* snapshot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "m65"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_microtan; break;
-
-		/* --- the following bits of info are returned as doubles --- */
-		case MESS_DEVINFO_FLOAT_SNAPSHOT_DELAY:				info->d = 0.5; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static void microtan_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "hex"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_microtan_hexfile; break;
-
-		/* --- the following bits of info are returned as doubles --- */
-		case MESS_DEVINFO_FLOAT_QUICKLOAD_DELAY:				info->d = 0.5; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 SYSTEM_CONFIG_START( microtan )
 	CONFIG_DEVICE(microtan_cassette_getinfo)
-	CONFIG_DEVICE(microtan_snapshot_getinfo)
-	CONFIG_DEVICE(microtan_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY      FULLNAME

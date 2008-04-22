@@ -50,7 +50,9 @@ elektor TV Game Computer which is a kind of developer machine for the VC4000.
 #include "devices/cartslot.h"
 #include "devices/snapquik.h" 
 
-static  READ8_HANDLER(vc4000_key_r)
+static QUICKLOAD_LOAD( vc4000 );
+
+static READ8_HANDLER(vc4000_key_r)
 {
 	UINT8 data=0;
 	switch(offset & 0x0f) {
@@ -210,6 +212,9 @@ static MACHINE_DRIVER_START( vc4000 )
 	MDRV_SOUND_ADD(CUSTOM, 0)
 	MDRV_SOUND_CONFIG(vc4000_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* quickload */
+	MDRV_QUICKLOAD_ADD(vc4000, "tvc", 0)
 MACHINE_DRIVER_END
 
 ROM_START(vc4000)
@@ -331,26 +336,10 @@ QUICKLOAD_LOAD(vc4000)
 	return INIT_PASS;
 }
 
-static void vc4000_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tvc"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_vc4000; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-  
 
 SYSTEM_CONFIG_START(vc4000)
 	CONFIG_RAM_DEFAULT(5 * 1024) 
 	CONFIG_DEVICE(vc4000_cartslot_getinfo)
-	CONFIG_DEVICE(vc4000_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 /*    	YEAR		NAME	PARENT	COMPAT	MACHINE	INPUT	INIT		CONFIG	COMPANY		FULLNAME */

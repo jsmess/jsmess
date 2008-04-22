@@ -140,6 +140,9 @@ static MACHINE_DRIVER_START( galaxy )
 
 	MDRV_VIDEO_START( galaxy )
 	MDRV_VIDEO_UPDATE( galaxy )
+
+	/* snapshot */
+	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
 MACHINE_DRIVER_END
 
 ROM_START (galaxy)
@@ -150,28 +153,12 @@ ROM_START (galaxy)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
-static void galaxy_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* snapshot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "gal"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_galaxy; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 SYSTEM_CONFIG_START(galaxy)
 	CONFIG_RAM(2 * 1024)
 	CONFIG_RAM_DEFAULT(6 * 1024)
 	CONFIG_RAM((6+16) * 1024)
 	CONFIG_RAM((6+32) * 1024)
 	CONFIG_RAM((6+48) * 1024)
-	CONFIG_DEVICE(galaxy_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */

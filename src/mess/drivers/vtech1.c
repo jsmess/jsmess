@@ -115,6 +115,8 @@ Notes:
 #include "formats/vt_cas.h"
 
 
+static QUICKLOAD_LOAD(vtech1);
+
 /******************************************************************************
  Address Maps
 ******************************************************************************/
@@ -327,6 +329,10 @@ static MACHINE_DRIVER_START(laser110)
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(vtech1, "vz", 0.5)
+	MDRV_QUICKLOAD_ADD(vtech1, "bin", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser200)
@@ -446,22 +452,6 @@ static QUICKLOAD_LOAD( vtech1 )
 	return INIT_PASS;
 }
 
-static void vtech1_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_DEV_FILE:		strcpy(info->s = device_temp_str(), __FILE__); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "bin"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:	info->f = (genf *) quickload_load_vtech1; break;
-
-		default:				quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void vtech1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
@@ -474,24 +464,6 @@ static void vtech1_cassette_getinfo(const mess_device_class *devclass, UINT32 st
 		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) vtech1_cassette_formats; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static void vtech1_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* snapshot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "vz"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_vtech1; break;
-
-		/* --- the following bits of info are returned as doubles --- */
-		case MESS_DEVINFO_FLOAT_SNAPSHOT_DELAY:				info->d = 0.5; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
 	}
 }
 
@@ -530,9 +502,7 @@ static void vtech1_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 SYSTEM_CONFIG_START(vtech1)
     CONFIG_DEVICE(cartslot_device_getinfo)
     CONFIG_DEVICE(vtech1_cassette_getinfo)
-    CONFIG_DEVICE(vtech1_snapshot_getinfo)
     CONFIG_DEVICE(vtech1_floppy_getinfo)
-	CONFIG_DEVICE(vtech1_quickload_getinfo)
 	CONFIG_RAM_DEFAULT (66 * 1024)   /* with 64K memory expansion */
 	CONFIG_RAM         (4098 * 1024) /* with 4MB memory expansion */
 SYSTEM_CONFIG_END

@@ -249,6 +249,10 @@ static MACHINE_DRIVER_START( primoa32 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(primo, "pss", 0)
+	MDRV_QUICKLOAD_ADD(primo, "pp", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primoa48 )
@@ -363,36 +367,6 @@ static void primo_cassette_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static void primo_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* snapshot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pss"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_primo; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static void primo_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pp"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_primo; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
@@ -408,21 +382,8 @@ static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-static void primo_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* snapshot */
-	switch(state)
-	{
-		default:										cbmfloppy_device_getinfo(devclass, state, info); break;
-	}
-}
-#endif /* UNUSED_FUNCTION */
-
 SYSTEM_CONFIG_START( primoa )
 	CONFIG_DEVICE(primo_cassette_getinfo)
-	CONFIG_DEVICE(primo_snapshot_getinfo)
-	CONFIG_DEVICE(primo_quickload_getinfo)
 	CONFIG_DEVICE(primo_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

@@ -654,6 +654,9 @@ static MACHINE_DRIVER_START( dragon32 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -677,6 +680,9 @@ static MACHINE_DRIVER_START( dragon64 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -700,6 +706,9 @@ static MACHINE_DRIVER_START( d64plus )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -726,6 +735,9 @@ static MACHINE_DRIVER_START( dgnalpha )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -749,6 +761,9 @@ static MACHINE_DRIVER_START( tanodr64 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -772,6 +787,10 @@ static MACHINE_DRIVER_START( coco )
 
 	/* bitbanger/printer */
 	MDRV_IMPORT_FROM( coco_bitbanger )
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -795,6 +814,10 @@ static MACHINE_DRIVER_START( coco2 )
 
 	/* bitbanger/printer */
 	MDRV_IMPORT_FROM( coco_bitbanger )
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -818,6 +841,10 @@ static MACHINE_DRIVER_START( coco2b )
 
 	/* bitbanger/printer */
 	MDRV_IMPORT_FROM( coco_bitbanger )
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -850,6 +877,10 @@ static MACHINE_DRIVER_START( coco3 )
 
 	/* bitbanger/printer */
 	MDRV_IMPORT_FROM( coco_bitbanger )
+
+	/* snapshot/quickload */
+	MDRV_SNAPSHOT_ADD(coco3_pak, "pak", 0)
+	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 
 	/* devices */
 	MDRV_DEVICE_ADD("vhd", COCO_VHD)
@@ -1016,26 +1047,6 @@ static void coco_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 
 
 
-static void coco_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "bin"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:	info->f = (genf *) quickload_load_coco; break;
-
-		/* --- the following bits of info are returned as doubles --- */
-		case MESS_DEVINFO_FLOAT_QUICKLOAD_DELAY:			info->d = 0.5; break;
-
-		default:				quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-
 static void coco_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
@@ -1076,36 +1087,6 @@ static void coco3_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 
 
 
-static void coco_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pak"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_coco_pak; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-
-static void coco3_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pak"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_coco3_pak; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 /*************************************
  *
  *  CoCo sysconfig structures
@@ -1116,13 +1097,11 @@ static void coco3_snapshot_getinfo(const mess_device_class *devclass, UINT32 sta
 SYSTEM_CONFIG_START( generic_coco )
 	CONFIG_DEVICE( coco_cassette_getinfo )
 	CONFIG_DEVICE( coco_floppy_getinfo )
-	CONFIG_DEVICE( coco_quickload_getinfo )
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( generic_coco12 )
 	CONFIG_IMPORT_FROM( generic_coco )
 	CONFIG_DEVICE( coco_cartslot_getinfo )
-	CONFIG_DEVICE( coco_snapshot_getinfo )
 SYSTEM_CONFIG_END
 
 /* These have to be split up, as the CoCo has a bitbanger */
@@ -1131,7 +1110,6 @@ SYSTEM_CONFIG_START( generic_dragon )
 	CONFIG_DEVICE( coco_cassette_getinfo )
 	CONFIG_DEVICE( coco_floppy_getinfo )
 	CONFIG_DEVICE( coco_cartslot_getinfo )
-	CONFIG_DEVICE( coco_snapshot_getinfo )
 SYSTEM_CONFIG_END
 
 
@@ -1166,7 +1144,6 @@ SYSTEM_CONFIG_END
 SYSTEM_CONFIG_START(coco3)
 	CONFIG_IMPORT_FROM	( generic_coco )
 	CONFIG_DEVICE( coco3_cartslot_getinfo )
-	CONFIG_DEVICE( coco3_snapshot_getinfo )
 	CONFIG_RAM			(128 * 1024)
 	CONFIG_RAM_DEFAULT	(512 * 1024)
 	CONFIG_RAM			(2048 * 1024)

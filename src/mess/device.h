@@ -82,11 +82,6 @@ enum
 	MESS_DEVINFO_STR_DESCRIPTION = MESS_DEVINFO_STR_SHORT_NAME + MAX_DEV_INSTANCES,
 
 	MESS_DEVINFO_STR_DEV_SPECIFIC = 0x28000,					/* R/W: Device-specific values start here */
-
-	/* --- the following bits of info are returned as doubles --- */
-	MESS_DEVINFO_FLOAT_FIRST = 0x30000,
-
-	MESS_DEVINFO_FLOAT_DEV_SPECIFIC = 0x38000				/* R/W: Device-specific values start here */
 };
 
 
@@ -170,14 +165,6 @@ INLINE const char *mess_device_get_info_string(const mess_device_class *devclass
 	info.s = NULL;
 	devclass->get_info(devclass, state, &info);
 	return info.s;
-}
-
-INLINE double mess_device_get_info_double(const mess_device_class *devclass, UINT32 state)
-{
-	union devinfo info;
-	info.d = 0.0;
-	devclass->get_info(devclass, state, &info);
-	return info.d;
 }
 
 INLINE char *device_temp_str(void)

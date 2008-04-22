@@ -59,8 +59,6 @@
 #define DATASSETTE (input_port_read(machine,  TAG_DEVICES )&0x8)
 #define DATASSETTE_TONE (input_port_read(machine,  TAG_DEVICES )&4)
 
-#define QUICKLOAD		(input_port_read(machine,  TAG_CASSETTE )&8)
-
 #define DATASSETTE_PLAY		(input_port_read(machine,  TAG_CASSETTE )&4)
 #define DATASSETTE_RECORD	(input_port_read(machine,  TAG_CASSETTE )&2)
 #define DATASSETTE_STOP		(input_port_read(machine,  TAG_CASSETTE )&1)

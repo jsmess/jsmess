@@ -252,6 +252,9 @@ static MACHINE_DRIVER_START( mtx512 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* snapshot */
+	MDRV_SNAPSHOT_ADD(mtx, "mtb", 0.5)
 MACHINE_DRIVER_END
 
 
@@ -289,26 +292,7 @@ ROM_END
  *
  *************************************/
 
-static void mtx_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "mtb"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_mtx; break;
-
-		/* --- the following bits of info are returned as doubles --- */
-		case MESS_DEVINFO_FLOAT_SNAPSHOT_DELAY:				info->d = 0.5; break;
-
-		default:										snapshot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 SYSTEM_CONFIG_START( mtx_common )
-	CONFIG_DEVICE(mtx_snapshot_getinfo)
 	CONFIG_RAM(160 * 1024)
 	CONFIG_RAM(192 * 1024)
 	CONFIG_RAM(224 * 1024)

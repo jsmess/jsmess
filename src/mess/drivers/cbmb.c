@@ -658,6 +658,9 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SID6581, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* devices */
+	MDRV_QUICKLOAD_ADD(cbmb, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 MACHINE_DRIVER_END
 
 
@@ -701,6 +704,9 @@ static MACHINE_DRIVER_START( cbm500 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SID6581, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* devices */
+	MDRV_QUICKLOAD_ADD(cbm500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 MACHINE_DRIVER_END
 
 static void cbmb_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -714,48 +720,13 @@ static void cbmb_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-static void cbmb_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "p00,prg"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_cbmb; break;
-
-		/* --- the following bits of info are returned as doubles --- */
-		case MESS_DEVINFO_FLOAT_QUICKLOAD_DELAY:				info->d = CBM_QUICKLOAD_DELAY; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
 
 SYSTEM_CONFIG_START(cbmb)
 	CONFIG_DEVICE(cbmb_cbmcartslot_getinfo)
-	CONFIG_DEVICE(cbmb_quickload_getinfo)
 SYSTEM_CONFIG_END
-
-static void cbm500_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "p00,prg"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_cbm500; break;
-
-		/* --- the following bits of info are returned as doubles --- */
-		case MESS_DEVINFO_FLOAT_QUICKLOAD_DELAY:				info->d = CBM_QUICKLOAD_DELAY; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
 
 SYSTEM_CONFIG_START(cbm500)
 	CONFIG_DEVICE(cbmb_cbmcartslot_getinfo)
-	CONFIG_DEVICE(cbm500_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 /*     YEAR     NAME      PARENT    COMPAT  MACHINE     INPUT       INIT        CONFIG  COMPANY                             FULLNAME */

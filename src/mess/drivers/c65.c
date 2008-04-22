@@ -290,6 +290,9 @@ static MACHINE_DRIVER_START( c65 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 	MDRV_SOUND_ADD_TAG("sid_l", SID8580, 985248)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
+
+	/* devices */
+	MDRV_QUICKLOAD_ADD(cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c65pal )
@@ -304,26 +307,8 @@ static MACHINE_DRIVER_START( c65pal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 MACHINE_DRIVER_END
 
-static void c65_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "p00,prg"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_cbm_c65; break;
-
-		/* --- the following bits of info are returned as doubles --- */
-		case MESS_DEVINFO_FLOAT_QUICKLOAD_DELAY:				info->d = CBM_QUICKLOAD_DELAY; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 SYSTEM_CONFIG_START(c65)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(c65_quickload_getinfo)
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_RAM((128 + 512) * 1024)
 	CONFIG_RAM((128 + 4096) * 1024)

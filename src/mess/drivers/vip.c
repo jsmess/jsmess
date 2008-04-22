@@ -21,6 +21,8 @@
 #include "sound/beep.h"
 #include "video/cdp1861.h"
 
+static QUICKLOAD_LOAD(vip);
+
 #define XTAL XTAL_3_52128MHz
 
 #define SCREEN_TAG "main"
@@ -247,6 +249,9 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* devices */
+	MDRV_QUICKLOAD_ADD(vip, "cos", 0)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -273,21 +278,6 @@ static QUICKLOAD_LOAD( vip )
 	return INIT_PASS;
 }
 
-static void vip_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cos"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_vip; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void vip_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
@@ -305,7 +295,6 @@ SYSTEM_CONFIG_START( vip )
 	CONFIG_RAM			( 4 * 1024)
 	CONFIG_RAM			(32 * 1024)
 	CONFIG_DEVICE(vip_cassette_getinfo)
-	CONFIG_DEVICE(vip_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 /* Driver Initialization */

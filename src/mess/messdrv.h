@@ -71,6 +71,8 @@ struct SystemConfigurationParamBlock
 		cfg->device_position++;										\
 	}																\
 
+#define construct_sysconfig_0	NULL
+
 /******************************************************************************
  * MESS' version of the GAME() macros of MAME
  * CONS is for consoles

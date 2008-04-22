@@ -802,6 +802,9 @@ static MACHINE_DRIVER_START( psxntsc )
 	MDRV_SOUND_CONFIG( psxspu_interface )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
+
+	/* quickload */
+	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psxpal )
@@ -832,6 +835,9 @@ static MACHINE_DRIVER_START( psxpal )
 	MDRV_SOUND_CONFIG( psxspu_interface )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
+
+	/* quickload */
+	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
 MACHINE_DRIVER_END
 
 ROM_START( psj )
@@ -921,25 +927,6 @@ ROM_START( psa )
 	ROMX_LOAD( "ps-41a.bin",    0x0000000, 0x080000, CRC(502224b6) SHA1(14df4f6c1e367ce097c11deae21566b4fe5647a9), ROM_BIOS(2) )
 ROM_END
 
-static void psx_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* quickload */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "exe,psx"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_psx_exe_load; break;
-
-		default:										quickload_device_getinfo(devclass, state, info); break;
-	}
-}
-
-SYSTEM_CONFIG_START( psx )
-	CONFIG_DEVICE(psx_quickload_getinfo)
-SYSTEM_CONFIG_END
-
 /*
 The version number & release date is stored in ascii text at the end of every bios, except for scph1000.
 There is also a BCD encoded date at offset 0x100, but this is set to 22091994 for versions prior to 2.2
@@ -975,7 +962,7 @@ Version 4.3 E
 */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY                             FULLNAME                            FLAGS */
-CONS( 1994, psj,    0,      0,      psxntsc,    psx,    psx,    psx,    "Sony Computer Entertainment Inc.", "Sony PlayStation (Japan)",         GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, pse,    psj,    0,      psxpal,     psx,    psx,    psx,    "Sony Computer Entertainment Inc.", "Sony PlayStation (Europe)",        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psu,    psj,    0,      psxntsc,    psx,    psx,    psx,    "Sony Computer Entertainment Inc.", "Sony PlayStation (USA)",           GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psa,    psj,    0,      psxntsc,    psx,    psx,    psx,    "Sony Computer Entertainment Inc.", "Sony PlayStation (Asia-Pacific)",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1994, psj,    0,      0,      psxntsc,    psx,    psx,    0,      "Sony Computer Entertainment Inc.", "Sony PlayStation (Japan)",         GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, pse,    psj,    0,      psxpal,     psx,    psx,    0,      "Sony Computer Entertainment Inc.", "Sony PlayStation (Europe)",        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, psu,    psj,    0,      psxntsc,    psx,    psx,    0,      "Sony Computer Entertainment Inc.", "Sony PlayStation (USA)",           GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, psa,    psj,    0,      psxntsc,    psx,    psx,    0,      "Sony Computer Entertainment Inc.", "Sony PlayStation (Asia-Pacific)",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
