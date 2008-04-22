@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "sound/3812intf.h"
 #include "machine/8255ppi.h"
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "devices/printer.h"
@@ -118,7 +118,7 @@ DEV_READWRITE8TO32LE( at_pit8254_32le, pit8253_r, pit8253_w )
 DEV_READWRITE8TO32LE( at_dma8237_32le, dma8237_r, dma8237_w )
 DEV_READWRITE8TO32LE( at_pic8259_32le, pic8259_r, pic8259_w )
 DEV_READWRITE8TO32LE( at_dma8237_1_32le, at_dma8237_1_r, at_dma8237_1_w )
-DEV_READWRITE8TO32LE( uart8250_32le, ins8250_r, ins8250_w )
+DEV_READWRITE8TO32LE( ins8250_32le, ins8250_r, ins8250_w )
 
 
 static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
@@ -172,14 +172,14 @@ static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", at_pic8259_32le_r, at_pic8259_32le_w)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_32le_r, at_dma8237_1_32le_w)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,	pc32le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", uart8250_32le_r, uart8250_32le_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", uart8250_32le_r, uart8250_32le_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", ins8250_32le_r, ins8250_32le_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", ins8250_32le_r, ins8250_32le_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,			pc32le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,			pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc32le_parallelport1_r,	pc32le_parallelport1_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc32le_fdc_r,				pc32le_fdc_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc32le_parallelport0_r,	pc32le_parallelport0_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", uart8250_32le_r, uart8250_32le_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", ins8250_32le_r, ins8250_32le_w)
 ADDRESS_MAP_END
 
 
@@ -194,14 +194,14 @@ static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", at_pic8259_32le_r, at_pic8259_32le_w)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_32le_r, at_dma8237_1_32le_w)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,		pc32le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", uart8250_32le_r, uart8250_32le_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", uart8250_32le_r, uart8250_32le_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", ins8250_32le_r, ins8250_32le_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", ins8250_32le_r, ins8250_32le_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,				pc32le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,				pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc32le_parallelport1_r,		pc32le_parallelport1_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc32le_fdc_r,				pc32le_fdc_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc32le_parallelport0_r,		pc32le_parallelport0_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", uart8250_32le_r, uart8250_32le_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", ins8250_32le_r, ins8250_32le_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_READWRITE(pci_32le_r,				pci_32le_w)
 ADDRESS_MAP_END
 

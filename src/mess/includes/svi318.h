@@ -10,12 +10,12 @@
 #define SVI318_H_
 
 #include "machine/8255ppi.h"
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 
 /*----------- defined in machine/svi318.c -----------*/
 
 extern const ppi8255_interface svi318_ppi8255_interface;
-extern const ins8250_interface svi318_uart8250_interface[2];
+extern const ins8250_interface svi318_ins8250_interface[2];
 
 DRIVER_INIT( svi318 );
 MACHINE_START( svi318_pal );

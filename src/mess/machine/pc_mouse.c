@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 #include "includes/pc_mouse.h"
 
 

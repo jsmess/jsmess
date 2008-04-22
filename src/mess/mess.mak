@@ -472,7 +472,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_MACHINE)/rriot.o    \
 	$(MESS_MACHINE)/74145.o    \
-	$(MESS_MACHINE)/uart8250.o \
+	$(MESS_MACHINE)/ins8250.o \
 	$(MESS_MACHINE)/pc_mouse.o \
 	$(MESS_MACHINE)/pclpt.o    \
 	$(MESS_MACHINE)/centroni.o \

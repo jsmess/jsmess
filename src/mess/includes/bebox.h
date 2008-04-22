@@ -9,7 +9,7 @@
 #ifndef BEBOX_H_
 #define BEBOX_H_
 
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 
 /*----------- defined in machine/bebox.c -----------*/
 

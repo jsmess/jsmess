@@ -46,7 +46,7 @@ Tandy 1000 (80386) variations:
 #include "devconv.h"
 
 #include "machine/8255ppi.h"
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 

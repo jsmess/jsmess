@@ -15,7 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "machine/8255ppi.h"
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
@@ -65,7 +65,7 @@ static void svi318_set_banks (void);
 
 /* Serial ports */
 
-static INS8250_INTERRUPT( svi318_uart8250_interrupt )
+static INS8250_INTERRUPT( svi318_ins8250_interrupt )
 {
 	if (svi.bankLow != SVI_CART) {
 		cpunum_set_input_line(device->machine, 0, 0, (state ? HOLD_LINE : CLEAR_LINE));
@@ -78,18 +78,18 @@ static INS8250_REFRESH_CONNECT( svi318_com_refresh_connected )
 	ins8250_handshake_in(device, UART8250_HANDSHAKE_IN_CTS|UART8250_HANDSHAKE_IN_DSR|UART8250_INPUTS_RING_INDICATOR|UART8250_INPUTS_DATA_CARRIER_DETECT);
 }
 
-const ins8250_interface svi318_uart8250_interface[2]=
+const ins8250_interface svi318_ins8250_interface[2]=
 {
 	{
 		1000000,
-		svi318_uart8250_interrupt,
+		svi318_ins8250_interrupt,
 		NULL,
 		NULL,
 		svi318_com_refresh_connected
 	},
 	{
 		3072000,
-		svi318_uart8250_interrupt,
+		svi318_ins8250_interrupt,
 		NULL,
 		NULL,
 		NULL

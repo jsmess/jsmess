@@ -43,7 +43,7 @@
 #include "includes/avigo.h"
 #include "machine/intelfsh.h"
 #include "machine/tc8521.h"
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 #include "sound/speaker.h"
 
 

@@ -97,7 +97,7 @@
 #include "video/pc_vga.h"
 #include "video/cirrus.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 #include "machine/pc_fdc.h"
 #include "machine/mpc105.h"
 #include "machine/mc146818.h"

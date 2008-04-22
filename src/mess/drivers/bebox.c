@@ -16,7 +16,7 @@
 #include "video/pc_vga.h"
 #include "video/cirrus.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
 #include "machine/pc_fdc.h"
@@ -51,7 +51,7 @@ static WRITE64_HANDLER( bebox_dma8237_1_w )
 DEV_READWRITE8TO64BE( bebox_pit8254_64be, pit8253_r, pit8253_w )
 DEV_READWRITE8TO64BE( bebox_dma8237_64be, dma8237_r, dma8237_w )
 DEV_READWRITE8TO64BE( bebox_pic8259_64be, pic8259_r, pic8259_w )
-DEV_READWRITE8TO64BE( bebox_uart8250_64be, ins8250_r, ins8250_w )
+DEV_READWRITE8TO64BE( bebox_ins8250_64be, ins8250_r, ins8250_w )
 
 
 static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
@@ -70,11 +70,11 @@ static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE( PIC8259, "pic8259_slave", bebox_pic8259_64be_r, bebox_pic8259_64be_w )
 	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE( bebox_dma8237_1_r, bebox_dma8237_1_w)
 	AM_RANGE(0x800001F0, 0x800001F7) AM_READWRITE( bebox_800001F0_r, bebox_800001F0_w )
-	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE( NS16550, "ns16550_1", bebox_uart8250_64be_r, bebox_uart8250_64be_w )
-	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE( NS16550, "ns16550_2", bebox_uart8250_64be_r, bebox_uart8250_64be_w )
-	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE( NS16550, "ns16550_3", bebox_uart8250_64be_r, bebox_uart8250_64be_w )
+	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE( NS16550, "ns16550_1", bebox_ins8250_64be_r, bebox_ins8250_64be_w )
+	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE( NS16550, "ns16550_2", bebox_ins8250_64be_r, bebox_ins8250_64be_w )
+	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE( NS16550, "ns16550_3", bebox_ins8250_64be_r, bebox_ins8250_64be_w )
 	AM_RANGE(0x800003F0, 0x800003F7) AM_READWRITE( bebox_800003F0_r, bebox_800003F0_w )
-	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE( NS16550, "ns16550_0", bebox_uart8250_64be_r, bebox_uart8250_64be_w )
+	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE( NS16550, "ns16550_0", bebox_ins8250_64be_r, bebox_ins8250_64be_w )
 	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE( bebox_80000480_r, bebox_80000480_w )
 	AM_RANGE(0x80000CF8, 0x80000CFF) AM_READWRITE( pci_64be_r, pci_64be_w )
 	AM_RANGE(0x800042E8, 0x800042EF) AM_WRITE( cirrus_64be_42E8_w )

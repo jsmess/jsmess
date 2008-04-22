@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-#include "machine/uart8250.h"
+#include "machine/ins8250.h"
 
 typedef enum
 {
