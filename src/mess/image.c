@@ -21,6 +21,7 @@
 #include "hashfile.h"
 #include "mamecore.h"
 #include "messopts.h"
+#include "ui.h"
 
 
 
@@ -1149,6 +1150,34 @@ void image_seterror(const device_config *image, image_error_t err, const char *m
 	{
 		slot->err_message = image_strdup(image, message);
 	}
+}
+
+
+
+/*-------------------------------------------------
+    image_message - used to display a message while
+	loading
+-------------------------------------------------*/
+
+void image_message(const device_config *device, const char *format, ...)
+{
+	image_slot_data *slot;
+	va_list args;
+	char buffer[256];
+
+	/* sanity checks */
+	slot = find_image_slot(device);
+	assert(is_loaded(slot) || slot->is_loading);
+
+	/* format the message */
+	va_start(args, format);
+	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, args);
+	va_end(args);
+
+	/* display the popup for a standard amount of time */
+	ui_popup_time(10, "%s: %s",
+		image_basename(device),
+		buffer);
 }
 
 

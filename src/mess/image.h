@@ -174,6 +174,9 @@ const char *image_error(const device_config *img);
 /* used to set the error that occured during image loading */
 void image_seterror(const device_config *img, image_error_t err, const char *message);
 
+/* used to display a message while loading */
+void image_message(const device_config *device, const char *format, ...);
+
 
 
 /****************************************************************************

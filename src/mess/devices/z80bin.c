@@ -70,7 +70,8 @@ int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *
 
 	size = (end_addr[0] - start_addr[0] + 1) & 0xffff;
 
-	logerror("%s\nsize=%04X : start=%04X : end=%04X : exec=%04X",pgmname,size,start_addr[0],end_addr[0],exec_addr[0]);
+	/* display a message about the loaded quickload */
+	image_message(image, "size=%04X : start=%04X : end=%04X : exec=%04X", size,start_addr[0],end_addr[0],exec_addr[0]);
 
 	for (i = 0; i < size; i++)
 	{
