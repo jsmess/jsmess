@@ -360,9 +360,9 @@ static void avigo_refresh_memory(void)
 
 
 
-static void avigo_com_interrupt(int irq_num, int state)
+static INS8250_INTERRUPT( avigo_com_interrupt )
 {
-        logerror("com int\r\n");
+	logerror("com int\r\n");
 
 	avigo_irq &= ~(1<<3);
 
@@ -376,15 +376,13 @@ static void avigo_com_interrupt(int irq_num, int state)
 
 
 
-static const uart8250_interface avigo_com_interface[1]=
+static const ins8250_interface avigo_com_interface =
 {
-	{
-		TYPE16550,
-		1843200,
-		avigo_com_interrupt,
-		NULL,
-		NULL
-	},
+	1843200,
+	avigo_com_interrupt,
+	NULL,
+	NULL,
+	NULL
 };
 
 /* this is needed because this driver uses handlers in memory that gets executed */
@@ -437,10 +435,6 @@ static MACHINE_RESET( avigo )
 
 	/* real time clock */
 	tc8521_init(&avigo_tc8521_interface);
-
-	/* serial/uart */
-	uart8250_init(0, avigo_com_interface);
-	uart8250_reset(0);
 
 	/* clear */
 	memset(mess_ram, 0, 128*1024);
@@ -826,7 +820,7 @@ static ADDRESS_MAP_START( avigo_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x028, 0x028) AM_WRITE( avigo_speaker_w)
 	AM_RANGE(0x02d, 0x02d) AM_READ( avigo_ad_data_r)
 	AM_RANGE(0x02e, 0x02f) AM_READ( avigo_unmapped_r)
-	AM_RANGE(0x030, 0x037) AM_READWRITE( uart8250_0_r, uart8250_0_w )
+	AM_RANGE(0x030, 0x037) AM_DEVREADWRITE( NS16550, "ns16550", ins8250_r, ins8250_w )
 	AM_RANGE(0x038, 0x0ff) AM_READ( avigo_unmapped_r)
 ADDRESS_MAP_END
 
@@ -875,6 +869,9 @@ static MACHINE_DRIVER_START( avigo )
 	MDRV_MACHINE_START( avigo )
 	MDRV_MACHINE_RESET( avigo )
 	MDRV_NVRAM_HANDLER( avigo )
+
+	MDRV_DEVICE_ADD( "ns16550", NS16550 )
+	MDRV_DEVICE_CONFIG( avigo_com_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", LCD)

@@ -4,77 +4,61 @@
 
 **********************************************************************/
 
-#ifndef UART8250_H
-#define UART8250_H
+#ifndef __INS8250_H_
+#define __INS8250_H_
 
-typedef enum { TYPE8250, TYPE16550 } UART_TYPE;
+#define INS8250		DEVICE_GET_INFO_NAME(ins8250)
+#define INS8250A	DEVICE_GET_INFO_NAME(ins8250a)
+#define NS16450		DEVICE_GET_INFO_NAME(ns16450)
+#define NS16550		DEVICE_GET_INFO_NAME(ns16550)
+#define NS16550A	DEVICE_GET_INFO_NAME(ns16550a)
+#define PC16550D	DEVICE_GET_INFO_NAME(pc16550d)
+
+
+typedef void (*ins8250_interrupt_func)(const device_config *device, int state);
+typedef void (*ins8250_transmit_func)(const device_config *device, int data);
+typedef void (*ins8250_handshake_out_func)(const device_config *device, int data);
+typedef void (*ins8250_refresh_connect_func)(const device_config *device);
+
+#define INS8250_INTERRUPT(name)			void name(const device_config *device, int state)
+#define INS8250_TRANSMIT(name)			void name(const device_config *device, int data)
+#define INS8250_HANDSHAKE_OUT(name)		void name(const device_config *device, int data)
+#define INS8250_REFRESH_CONNECT(name)	void name(const device_config *device)
 
 typedef struct
 {
-	UART_TYPE type;
 	long clockin;
-	void (*interrupt)(int id, int int_state);
+	ins8250_interrupt_func			interrupt;
 
 #define UART8250_HANDSHAKE_OUT_DTR 0x01
 #define UART8250_HANDSHAKE_OUT_RTS 0x02
-	void (*transmit)(int id, int data);
-	void (*handshake_out)(int id, int data);
+	ins8250_transmit_func			transmit;
+	ins8250_handshake_out_func		handshake_out;
 
 	// refresh object connected to this port
-	void (*refresh_connected)(int id);
-} uart8250_interface;
+	ins8250_refresh_connect_func	refresh_connected;
+} ins8250_interface;
 
 
+void ins8250_receive(const device_config *device, int data);
 
-void uart8250_init(int n, const uart8250_interface *);
-void uart8250_reset(int n);
-void uart8250_receive(int n, int data);
+#define UART8250_HANDSHAKE_IN_DSR			0x020
+#define UART8250_HANDSHAKE_IN_CTS			0x010
+#define UART8250_INPUTS_RING_INDICATOR		0x0040
+#define UART8250_INPUTS_DATA_CARRIER_DETECT	0x0080
 
-#define UART8250_HANDSHAKE_IN_DSR 0x020
-#define UART8250_HANDSHAKE_IN_CTS 0x010
-#define UART8250_INPUTS_RING_INDICATOR 0x0040
-#define UART8250_INPUTS_DATA_CARRIER_DETECT 0x0080
-void uart8250_handshake_in(int n, int data);
+void ins8250_handshake_in(const device_config *device, int new_msr);
 
-UINT8 uart8250_r(int n, offs_t offset);
-void uart8250_w(int n, offs_t offset, UINT8 data);
+READ8_DEVICE_HANDLER( ins8250_r );
+WRITE8_DEVICE_HANDLER( ins8250_w );
 
-/* helpers */
-READ8_HANDLER ( uart8250_0_r );
-READ8_HANDLER ( uart8250_1_r );
-READ8_HANDLER ( uart8250_2_r );
-READ8_HANDLER ( uart8250_3_r );
-WRITE8_HANDLER ( uart8250_0_w );
-WRITE8_HANDLER ( uart8250_1_w );
-WRITE8_HANDLER ( uart8250_2_w );
-WRITE8_HANDLER ( uart8250_3_w );
-
-READ16_HANDLER ( uart8250_16le_0_r );
-READ16_HANDLER ( uart8250_16le_1_r );
-READ16_HANDLER ( uart8250_16le_2_r );
-READ16_HANDLER ( uart8250_16le_3_r );
-WRITE16_HANDLER ( uart8250_16le_0_w );
-WRITE16_HANDLER ( uart8250_16le_1_w );
-WRITE16_HANDLER ( uart8250_16le_2_w );
-WRITE16_HANDLER ( uart8250_16le_3_w );
-
-READ32_HANDLER ( uart8250_32le_0_r );
-READ32_HANDLER ( uart8250_32le_1_r );
-READ32_HANDLER ( uart8250_32le_2_r );
-READ32_HANDLER ( uart8250_32le_3_r );
-WRITE32_HANDLER ( uart8250_32le_0_w );
-WRITE32_HANDLER ( uart8250_32le_1_w );
-WRITE32_HANDLER ( uart8250_32le_2_w );
-WRITE32_HANDLER ( uart8250_32le_3_w );
-
-READ64_HANDLER ( uart8250_64be_0_r );
-READ64_HANDLER ( uart8250_64be_1_r );
-READ64_HANDLER ( uart8250_64be_2_r );
-READ64_HANDLER ( uart8250_64be_3_r );
-WRITE64_HANDLER ( uart8250_64be_0_w );
-WRITE64_HANDLER ( uart8250_64be_1_w );
-WRITE64_HANDLER ( uart8250_64be_2_w );
-WRITE64_HANDLER ( uart8250_64be_3_w );
+/* device interface */
+DEVICE_GET_INFO( ins8250 );
+DEVICE_GET_INFO( ins8250a );
+DEVICE_GET_INFO( ns16450 );
+DEVICE_GET_INFO( ns16550 );
+DEVICE_GET_INFO( ns16550a );
+DEVICE_GET_INFO( pc16550d );
 
 
-#endif /* UART8250_H */
+#endif /* __INS8250_H_ */

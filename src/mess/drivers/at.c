@@ -118,6 +118,7 @@ DEV_READWRITE8TO32LE( at_pit8254_32le, pit8253_r, pit8253_w )
 DEV_READWRITE8TO32LE( at_dma8237_32le, dma8237_r, dma8237_w )
 DEV_READWRITE8TO32LE( at_pic8259_32le, pic8259_r, pic8259_w )
 DEV_READWRITE8TO32LE( at_dma8237_1_32le, at_dma8237_1_r, at_dma8237_1_w )
+DEV_READWRITE8TO32LE( uart8250_32le, ins8250_r, ins8250_w )
 
 
 static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
@@ -133,8 +134,8 @@ static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
 	AM_RANGE(0x0220, 0x022f) AM_READWRITE(soundblaster_r,			soundblaster_w)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc_parallelport2_r,		pc_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_3_r,				uart8250_3_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_1_r,				uart8250_1_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", ins8250_r, ins8250_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", ins8250_r, ins8250_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,				pc_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_parallelport1_r,		pc_parallelport1_w)
@@ -143,9 +144,9 @@ static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0389, 0x0389) AM_WRITE(								YM3812_write_port_0_w)
 #endif
 	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,		pc_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_2_r,				uart8250_2_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(NS16450, "ns16450_2", ins8250_r, ins8250_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,					pc_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_0_r,				uart8250_0_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 
@@ -171,14 +172,14 @@ static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", at_pic8259_32le_r, at_pic8259_32le_w)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_32le_r, at_dma8237_1_32le_w)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,	pc32le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_32le_3_r,		uart8250_32le_3_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_32le_1_r,		uart8250_32le_1_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", uart8250_32le_r, uart8250_32le_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", uart8250_32le_r, uart8250_32le_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,			pc32le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,			pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc32le_parallelport1_r,	pc32le_parallelport1_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc32le_fdc_r,				pc32le_fdc_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc32le_parallelport0_r,	pc32le_parallelport0_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_32le_0_r,		uart8250_32le_0_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", uart8250_32le_r, uart8250_32le_w)
 ADDRESS_MAP_END
 
 
@@ -193,14 +194,14 @@ static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", at_pic8259_32le_r, at_pic8259_32le_w)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_32le_r, at_dma8237_1_32le_w)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,		pc32le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_32le_3_r,		uart8250_32le_3_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_32le_1_r,		uart8250_32le_1_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", uart8250_32le_r, uart8250_32le_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", uart8250_32le_r, uart8250_32le_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,				pc32le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,				pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc32le_parallelport1_r,		pc32le_parallelport1_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc32le_fdc_r,				pc32le_fdc_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc32le_parallelport0_r,		pc32le_parallelport0_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_32le_0_r,		uart8250_32le_0_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", uart8250_32le_r, uart8250_32le_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_READWRITE(pci_32le_r,				pci_32le_w)
 ADDRESS_MAP_END
 
@@ -437,6 +438,18 @@ static MACHINE_DRIVER_START( atcga )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
 
+	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
 
@@ -486,6 +499,18 @@ static MACHINE_DRIVER_START( ps2m30286 )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
 
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
@@ -540,6 +565,18 @@ static MACHINE_DRIVER_START( atvga )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
 
 	MDRV_IMPORT_FROM( pcvideo_vga )
 
@@ -600,6 +637,18 @@ static MACHINE_DRIVER_START( at386 )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
 
 	MDRV_IMPORT_FROM( pcvideo_cga )
 

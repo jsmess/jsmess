@@ -49,10 +49,10 @@
 
 
 static struct {
-	device_config	*pic8259_master;
-	device_config	*pic8259_slave;
-	device_config	*dma8237_1;
-	device_config	*dma8237_2;
+	const device_config	*pic8259_master;
+	const device_config	*pic8259_slave;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
 } pc_devices;
 
 /*************************************************************************
@@ -215,54 +215,61 @@ const struct pit8253_config pc_pit8253_config =
  **********************************************************/
 
 /* called when a interrupt is set/cleared from com hardware */
-static void pc_com_interrupt(int nr, int state)
+static INS8250_INTERRUPT( pc_com_interrupt_1 )
 {
-	static const int irq[4] = {4, 3, 4, 3};
+	pic8259_set_irq_line(pc_devices.pic8259_master, 4, state);
+}
 
-	/* issue COM1/3 IRQ4, COM2/4 IRQ3 */
-	pic8259_set_irq_line(pc_devices.pic8259_master, irq[nr], state);
+static INS8250_INTERRUPT( pc_com_interrupt_2 )
+{
+	pic8259_set_irq_line(pc_devices.pic8259_master, 3, state);
 }
 
 /* called when com registers read/written - used to update peripherals that
 are connected */
-static void pc_com_refresh_connected(int n, int data)
+static void pc_com_refresh_connected_common(const device_config *device, int n, int data)
 {
 	/* mouse connected to this port? */
-	if (input_port_read_indexed(Machine, 3) & (0x80>>n))
-		pc_mouse_handshake_in(n,data);
+	if (input_port_read_indexed(device->machine, 3) & (0x80>>n))
+		pc_mouse_handshake_in(device,data);
 }
+
+static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_0 ) { pc_com_refresh_connected_common( device, 0, data ); }
+static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_1 ) { pc_com_refresh_connected_common( device, 1, data ); }
+static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_2 ) { pc_com_refresh_connected_common( device, 2, data ); }
+static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_3 ) { pc_com_refresh_connected_common( device, 3, data ); }
 
 /* PC interface to PC-com hardware. Done this way because PCW16 also
 uses PC-com hardware and doesn't have the same setup! */
-static const uart8250_interface com_interface[4]=
+const ins8250_interface ibmpc_com_interface[4]=
 {
 	{
-		TYPE8250,
 		1843200,
-		pc_com_interrupt,
+		pc_com_interrupt_1,
 		NULL,
-		pc_com_refresh_connected
+		pc_com_handshake_out_0,
+		NULL
 	},
 	{
-		TYPE8250,
 		1843200,
-		pc_com_interrupt,
+		pc_com_interrupt_2,
 		NULL,
-		pc_com_refresh_connected
+		pc_com_handshake_out_1,
+		NULL
 	},
 	{
-		TYPE8250,
 		1843200,
-		pc_com_interrupt,
+		pc_com_interrupt_1,
 		NULL,
-		pc_com_refresh_connected
+		pc_com_handshake_out_2,
+		NULL
 	},
 	{
-		TYPE8250,
 		1843200,
-		pc_com_interrupt,
+		pc_com_interrupt_2,
 		NULL,
-		pc_com_refresh_connected
+		pc_com_handshake_out_3,
+		NULL
 	}
 };
 
@@ -355,16 +362,6 @@ void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*se
 	/* FDC/HDC hardware */
 	pc_hdc_setup(set_hdc_int_func);
 
-	/* com hardware */
-	uart8250_init(0, com_interface);
-	uart8250_reset(0);
-	uart8250_init(1, com_interface+1);
-	uart8250_reset(1);
-	uart8250_init(2, com_interface+2);
-	uart8250_reset(2);
-	uart8250_init(3, com_interface+3);
-	uart8250_reset(3);
-
 	pc_lpt_config(0, lpt_config);
 	centronics_config(0, cent_config);
 	pc_lpt_set_device(0, &CENTRONICS_PRINTER_DEVICE);
@@ -376,7 +373,6 @@ void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*se
 	pc_lpt_set_device(2, &CENTRONICS_PRINTER_DEVICE);
 
 	/* serial mouse */
-	pc_mouse_set_serial_port(0);
 	pc_mouse_initialise();
 }
 
@@ -563,10 +559,11 @@ MACHINE_RESET( pc )
 {
 	cpunum_set_irq_callback(0, pc_irq_callback);
 
-	pc_devices.pic8259_master = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
-	pc_devices.pic8259_slave = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
-	pc_devices.dma8237_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
-	pc_devices.dma8237_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	pc_devices.pic8259_master = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
+	pc_devices.pic8259_slave = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
+	pc_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
+	pc_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ) );
 }
 
 

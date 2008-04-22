@@ -7,12 +7,15 @@
 #ifndef PC_H_
 #define PC_H_
 
+#include "machine/uart8250.h"
+
 /*----------- defined in machine/pc.c -----------*/
 
 extern const struct dma8237_interface pc_dma8237_config;
 extern const struct pit8253_config pc_pit8253_config;
 extern const struct pic8259_interface pc_pic8259_master_config;
 extern const struct pic8259_interface pc_pic8259_slave_config;
+extern const ins8250_interface ibmpc_com_interface[4];
 
 void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int));
 

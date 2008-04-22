@@ -65,27 +65,22 @@ static void svi318_set_banks (void);
 
 /* Serial ports */
 
-static void svi318_uart8250_interrupt(int nr, int state)
+static INS8250_INTERRUPT( svi318_uart8250_interrupt )
 {
 	if (svi.bankLow != SVI_CART) {
-		cpunum_set_input_line(Machine, 0, 0, (state ? HOLD_LINE : CLEAR_LINE));
+		cpunum_set_input_line(device->machine, 0, 0, (state ? HOLD_LINE : CLEAR_LINE));
 	}
 }
 
-static void svi318_com_refresh_connected(int serial_port_id)
+static INS8250_REFRESH_CONNECT( svi318_com_refresh_connected )
 {
-	switch (serial_port_id)
-	{
-	case 0:	/* Motorola MC14412 modem */
-		uart8250_handshake_in(0, UART8250_HANDSHAKE_IN_CTS|UART8250_HANDSHAKE_IN_DSR|UART8250_INPUTS_RING_INDICATOR|UART8250_INPUTS_DATA_CARRIER_DETECT);
-		break;
-	}
+	/* Motorola MC14412 modem */
+	ins8250_handshake_in(device, UART8250_HANDSHAKE_IN_CTS|UART8250_HANDSHAKE_IN_DSR|UART8250_INPUTS_RING_INDICATOR|UART8250_INPUTS_DATA_CARRIER_DETECT);
 }
 
-static const uart8250_interface svi318_uart8250_interface[2]=
+const ins8250_interface svi318_uart8250_interface[2]=
 {
 	{
-		TYPE8250,
 		1000000,
 		svi318_uart8250_interrupt,
 		NULL,
@@ -93,7 +88,6 @@ static const uart8250_interface svi318_uart8250_interface[2]=
 		svi318_com_refresh_connected
 	},
 	{
-		TYPE8250,
 		3072000,
 		svi318_uart8250_interrupt,
 		NULL,
@@ -625,10 +619,6 @@ DRIVER_INIT( svi318 )
 		}
 		cpunum_set_info_ptr(0, CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i], (void*)table);
 	}
-
-	/* serial */
-	uart8250_init(0, svi318_uart8250_interface);
-	uart8250_init(1, svi318_uart8250_interface+1);
 }
 
 static const TMS9928a_interface svi318_tms9928a_interface =
@@ -670,9 +660,6 @@ MACHINE_RESET( svi318 )
 	svi318_set_banks();
 
 	wd17xx_reset();
-
-	uart8250_reset(0);
-	uart8250_reset(1);
 }
 
 INTERRUPT_GEN( svi318_interrupt )
@@ -859,7 +846,7 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x2D:
 	case 0x2E:
 	case 0x2F:
-		data = uart8250_1_r(machine, offset & 7);
+		data = ins8250_r(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_1" ), offset & 7);
 		break;
 	case 0x30:
 		data = wd17xx_status_r(machine, 0);
@@ -905,7 +892,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x25:
 	case 0x26:
 	case 0x27:
-		uart8250_0_w(machine, offset & 7, data);
+		ins8250_w(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ), offset & 7, data);
 		break;
 	case 0x28:
 	case 0x29:
@@ -915,7 +902,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x2D:
 	case 0x2E:
 	case 0x2F:
-		uart8250_1_w(machine, offset & 7, data);
+		ins8250_w(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_1" ), offset & 7, data);
 		break;
 	case 0x30:
 		wd17xx_command_w(machine, 0, data);

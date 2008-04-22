@@ -342,27 +342,50 @@ static void bebox_set_irq_bit(running_machine *machine, unsigned int interrupt_b
  *
  *************************************/
 
-static void bebox_uart_transmit(int id, int data)
+static INS8250_TRANSMIT( bebox_uart_transmit )
 {
 	if (LOG_UART)
-		logerror("bebox_uart_transmit(): id=%d data=0x%02X\n", id, data);
+		logerror("bebox_uart_transmit(): data=0x%02X\n", data);
 }
 
 
-static void bebox_uart_handshake(int id, int data)
+static INS8250_HANDSHAKE_OUT( bebox_uart_handshake )
 {
 	if (LOG_UART)
-		logerror("bebox_uart_handshake(): id=%d data=0x%02X\n", id, data);
+		logerror("bebox_uart_handshake(): data=0x%02X\n", data);
 }
 
 
-static const uart8250_interface bebox_uart_inteface =
+const ins8250_interface bebox_uart_inteface[4] =
 {
-	TYPE16550,
-	0,
-	NULL,
-	bebox_uart_transmit,
-	bebox_uart_handshake
+	{
+		0,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	},
+	{
+		0,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	},
+	{
+		0,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	},
+	{
+		0,
+		NULL,
+		bebox_uart_transmit,
+		bebox_uart_handshake,
+		NULL
+	}
 };
 
 
@@ -1085,12 +1108,6 @@ DRIVER_INIT( bebox )
 		memory_install_write64_handler(machine, cpu, ADDRESS_SPACE_PROGRAM, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK3);
 	}
 	memory_set_bankptr(3, mess_ram);
-
-	/* set up UARTs */
-	uart8250_init(0, NULL);
-	uart8250_init(1, NULL);
-	uart8250_init(2, NULL);
-	uart8250_init(3, &bebox_uart_inteface);
 
 //	pc_fdc_init(&bebox_fdc_interface);
 	mc146818_init(MC146818_STANDARD);

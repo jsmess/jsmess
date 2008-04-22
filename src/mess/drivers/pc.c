@@ -171,8 +171,8 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 #endif
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc_rtc_r,				pc_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc_parallelport2_r,	pc_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_3_r,			uart8250_3_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_1_r,			uart8250_1_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(INS8250, "ins8250_3", ins8250_r, ins8250_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", ins8250_r, ins8250_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,			pc_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,			pc_HDC2_w)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return8_FF) /* anonymous bios should not recogniced realtimeclock */
@@ -181,9 +181,9 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_YM3812_0_r,		pc_YM3812_0_w)
 #endif
 	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,	pc_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_2_r,			uart8250_2_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", ins8250_r, ins8250_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_0_r,			uart8250_0_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 
@@ -191,6 +191,7 @@ DEV_READWRITE8TO16LE_LSB( pc_pit8253_16le, pit8253_r, pit8253_w )
 DEV_READWRITE8TO16LE( pc_dma8237_16le, dma8237_r, dma8237_w )
 DEV_READWRITE8TO16LE( pc_pic8259_16le, pic8259_r, pic8259_w )
 DEV_READWRITE8TO16LE( pc_ppi8255_16le, ppi8255_r, ppi8255_w )
+DEV_READWRITE8TO16LE( pc_ins8250_16le, ins8250_r, ins8250_w )
 READ16_HANDLER(pc_page16le_r) { return read16le_with_read8_handler(pc_page_r, machine, offset, mem_mask); }
 WRITE16_HANDLER(pc_page16le_w) { write16le_with_write8_handler(pc_page_w, machine, offset, data, mem_mask); }
 
@@ -207,8 +208,8 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 #endif
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc16le_rtc_r,				pc16le_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc16le_parallelport2_r,	pc16le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_16le_3_r,		uart8250_16le_3_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_16le_1_r,		uart8250_16le_1_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(INS8250, "ins8250_3", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", pc_ins8250_16le_r, pc_ins8250_16le_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,			pc16le_HDC2_w)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return16_FFFF) /* anonymous bios should not recogniced realtimeclock */
@@ -217,9 +218,9 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc16le_YM3812_0_r,		pc16le_YM3812_0_w)
 #endif
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_16le_2_r,		uart8250_16le_2_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", pc_ins8250_16le_r, pc_ins8250_16le_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,				pc16le_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_16le_0_r,		uart8250_16le_0_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", pc_ins8250_16le_r, pc_ins8250_16le_w)
 ADDRESS_MAP_END
 
 
@@ -246,8 +247,8 @@ static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r,			europc_jim_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc_parallelport2_r,	pc_parallelport2_w)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ     (europc_jim2_r)
-	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_3_r,			uart8250_3_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_1_r,			uart8250_1_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(INS8250, "ins8250_3", ins8250_r, ins8250_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", ins8250_r, ins8250_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,			pc_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,			pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc_parallelport1_r,	pc_parallelport1_w)
@@ -255,9 +256,9 @@ static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_YM3812_0_r,		pc_YM3812_0_w)
 #endif
 //  AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,   pc16le_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_2_r,			uart8250_2_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", ins8250_r, ins8250_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_0_r,			uart8250_0_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 
@@ -284,14 +285,14 @@ static ADDRESS_MAP_START(tandy1000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
 	AM_RANGE(0x00c0, 0x00c0) AM_WRITE(								SN76496_0_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_1_r,				uart8250_1_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_0", ins8250_r, ins8250_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,				pc_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,			pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,		pc_parallelport0_w)
 	AM_RANGE(0x03d0, 0x03df) AM_READWRITE(pc_T1T_r,					pc_T1T_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,					pc_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_0_r,				uart8250_0_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 
@@ -306,15 +307,15 @@ static ADDRESS_MAP_START(pc200_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,				pc_page16le_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,					pc16le_JOY_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc16le_parallelport2_r,		pc16le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_16le_3_r,				uart8250_16le_3_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_16le_1_r,				uart8250_16le_1_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(INS8250, "ins8250_3", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", pc_ins8250_16le_r, pc_ins8250_16le_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,				pc16le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,				pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc200_16le_port378_r,			pc16le_parallelport1_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_16le_2_r,				uart8250_16le_2_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", pc_ins8250_16le_r, pc_ins8250_16le_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,					pc16le_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_16le_0_r,				uart8250_16le_0_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", pc_ins8250_16le_r, pc_ins8250_16le_w)
 ADDRESS_MAP_END
 
 
@@ -340,15 +341,15 @@ static ADDRESS_MAP_START(pc1640_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,				pc_page16le_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc16le_parallelport2_r,		pc16le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_16le_3_r,		uart8250_16le_3_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_16le_1_r,		uart8250_16le_1_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(INS8250, "ins8250_3", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", pc_ins8250_16le_r, pc_ins8250_16le_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,			pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc1640_16le_port378_r,			pc16le_parallelport1_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_16le_2_r,		uart8250_16le_2_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", pc_ins8250_16le_r, pc_ins8250_16le_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,				pc16le_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_16le_0_r,		uart8250_16le_0_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", pc_ins8250_16le_r, pc_ins8250_16le_w)
 ADDRESS_MAP_END
 
 
@@ -1168,6 +1169,18 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_mda )
 
@@ -1218,6 +1231,18 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_hercules )
 
@@ -1263,6 +1288,18 @@ static MACHINE_DRIVER_START( pccga )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1311,6 +1348,18 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_aga )
 
@@ -1353,6 +1402,18 @@ static MACHINE_DRIVER_START( xtcga )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1401,6 +1462,18 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
 
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc200 )
 
@@ -1436,6 +1509,18 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc1512 )
@@ -1474,6 +1559,18 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(pcvideo_pc1640)
@@ -1515,6 +1612,18 @@ static MACHINE_DRIVER_START( xtvga )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )
@@ -1562,6 +1671,12 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000 )

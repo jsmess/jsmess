@@ -1,7 +1,69 @@
 /**********************************************************************
 
-	8250 UART interface and emulation
+	National Semiconductor 8250 UART interface and emulation
 
+   More information on the different models can be found in
+   section 1.6 at this location:
+     http://www.freebsd.org/doc/en_US.ISO8859-1/articles/serial-uart/ 
+
+Model overview (from page above):
+
+INS8250
+This part was used in the original IBM PC and IBM PC/XT. The original name
+for this part was the INS8250 ACE (Asynchronous Communications Element) and
+it is made from NMOS technology.
+
+The 8250 uses eight I/O ports and has a one-byte send and a one-byte receive
+buffer. This original UART has several race conditions and other flaws. The
+original IBM BIOS includes code to work around these flaws, but this made
+the BIOS dependent on the flaws being present, so subsequent parts like the
+8250A, 16450 or 16550 could not be used in the original IBM PC or IBM PC/XT.
+
+INS8250-B
+This is the slower speed of the INS8250 made from NMOS technology. It contains
+the same problems as the original INS8250.
+
+INS8250A
+An improved version of the INS8250 using XMOS technology with various functional
+flaws corrected. The INS8250A was used initially in PC clone computers by vendors
+who used “clean” BIOS designs. Because of the corrections in the chip, this part
+could not be used with a BIOS compatible with the INS8250 or INS8250B.
+
+INS82C50A
+This is a CMOS version (low power consumption) of the INS8250A and has similar
+functional characteristics.
+
+NS16450
+Same as NS8250A with improvements so it can be used with faster CPU bus designs.
+IBM used this part in the IBM AT and updated the IBM BIOS to no longer rely on
+the bugs in the INS8250.
+
+NS16C450
+This is a CMOS version (low power consumption) of the NS16450.
+
+NS16550
+Same as NS16450 with a 16-byte send and receive buffer but the buffer design
+was flawed and could not be reliably be used.
+
+NS16550A
+Same as NS16550 with the buffer flaws corrected. The 16550A and its successors
+have become the most popular UART design in the PC industry, mainly due to
+its ability to reliably handle higher data rates on operating systems with
+sluggish interrupt response times.
+
+NS16C552
+This component consists of two NS16C550A CMOS UARTs in a single package.
+
+PC16550D
+Same as NS16550A with subtle flaws corrected. This is revision D of the
+16550 family and is the latest design available from National Semiconductor.
+
+
+Known issues:
+- MESS does currently not handle all these model specific features.
+
+
+History:
 	KT - 14-Jun-2000 - Improved Interrupt setting/clearing
 	KT - moved into seperate file so it can be used in Super I/O emulation and
 		any other system which uses a PC type COM port
@@ -21,11 +83,29 @@
 if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A;
 
 
+/* device types */
+enum {
+	TYPE_INS8250 = 0,
+	TYPE_INS8250A,
+	TYPE_NS16450,
+	TYPE_NS16550,
+	TYPE_NS16550A,
+	TYPE_PC16550D,
+
+	NUM_TYPES
+};
+
+
+/* device tags */
+static const char * const device_tags[NUM_TYPES] = { "ins8250", "ins8250a", "ns16450", "ns16550", "ns16550a", "pc16550d" };
+
+
 #define VERBOSE_COM 0
 #define COM_LOG(n,m,a) LOG(VERBOSE_COM,n,m,a)
 
 typedef struct {
-	uart8250_interface interface;
+	const ins8250_interface *interface;
+	int	device_type;
 
 	UINT8 thr;  /* 0 -W transmitter holding register */
 	UINT8 rbr; /* 0 R- receiver buffer register */
@@ -48,9 +128,7 @@ typedef struct {
 		UINT8 data;
 		double time;
 	} send;
-} UART8250;
-
-static UART8250 uart[4]={ { { TYPE8250 } } };
+} ins8250_t;
 
 /* int's pending */
 #define COM_INT_PENDING_RECEIVED_DATA_AVAILABLE	0x0001
@@ -59,32 +137,46 @@ static UART8250 uart[4]={ { { TYPE8250 } } };
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
 
 #define DLAB(n) (uart[n].lcr&0x80) //divisor latch access bit
-#define LOOP(n) (uart[n].mcr&0x10)
+#define LOOP(n) (ins8250->mcr&0x10)
 
 
+
+INLINE ins8250_t *get_safe_token(const device_config *device) {
+	assert( device != NULL );
+	assert( device->token != NULL );
+	assert( ( device->type == DEVICE_GET_INFO_NAME(ins8250) ) ||
+			( device->type == DEVICE_GET_INFO_NAME(ins8250a) ) ||
+			( device->type == DEVICE_GET_INFO_NAME(ns16450) ) ||
+			( device->type == DEVICE_GET_INFO_NAME(ns16550) ) ||
+			( device->type == DEVICE_GET_INFO_NAME(ns16550a) ) ||
+			( device->type == DEVICE_GET_INFO_NAME(pc16550d) ) );
+	return ( ins8250_t *) device->token;
+}
 
 
 /* setup iir with the priority id */
-static void uart8250_setup_iir(int n)
+static void ins8250_setup_iir(const device_config *device)
 {
-	uart[n].iir &= ~(0x04|0x02);
+	ins8250_t	*ins8250 = get_safe_token(device);
+
+	ins8250->iir &= ~(0x04|0x02);
 
 	/* highest to lowest */
-	if (uart[n].int_pending & COM_INT_PENDING_RECEIVER_LINE_STATUS)
+	if (ins8250->int_pending & COM_INT_PENDING_RECEIVER_LINE_STATUS)
 	{
-		uart[n].iir |=0x04|0x02;
+		ins8250->iir |=0x04|0x02;
 		return;
 	}
 
-	if (uart[n].int_pending & COM_INT_PENDING_RECEIVED_DATA_AVAILABLE)
+	if (ins8250->int_pending & COM_INT_PENDING_RECEIVED_DATA_AVAILABLE)
 	{
-		uart[n].iir |=0x04;
+		ins8250->iir |=0x04;
 		return;
 	}
 
-	if (uart[n].int_pending & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY)
+	if (ins8250->int_pending & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY)
 	{
-		uart[n].iir |=0x02;
+		ins8250->iir |=0x02;
 		return;
 	}
 
@@ -93,26 +185,27 @@ static void uart8250_setup_iir(int n)
 
 
 /* ints will continue to be set for as long as there are ints pending */
-static void uart8250_update_interrupt(int n)
+static void ins8250_update_interrupt(const device_config *device)
 {
+	ins8250_t	*ins8250 = get_safe_token(device);
 	int state;
 
 	/* disable int output? */
-	if ((uart[n].mcr & 0x08) == 0)
+	if ((ins8250->mcr & 0x08) == 0)
 		return;
 
 	/* if any bits are set and are enabled */
-	if (((uart[n].int_pending&uart[n].ier) & 0x0f) != 0)
+	if (((ins8250->int_pending&ins8250->ier) & 0x0f) != 0)
 	{
 		/* trigger next highest priority int */
 
 		/* set int */
 		state = 1;
 
-		uart8250_setup_iir(n);
+		ins8250_setup_iir(device);
 
 		/* int pending */
-		uart[n].iir |= 0x01;
+		ins8250->iir |= 0x01;
 	}
 	else
 	{
@@ -120,268 +213,246 @@ static void uart8250_update_interrupt(int n)
 		state = 0;
 
 		/* no ints pending */
-		uart[n].iir &= ~0x01;
+		ins8250->iir &= ~0x01;
 		/* priority level */
-		uart[n].iir &= ~(0x04|0x02);
+		ins8250->iir &= ~(0x04|0x02);
 	}
 
 
 	/* set or clear the int */
-	if (uart[n].interface.interrupt)
-		uart[n].interface.interrupt(n, state);
+	if (ins8250->interface->interrupt)
+		ins8250->interface->interrupt(device, state);
 }
 
 
 
 /* set pending bit and trigger int */
-static void uart8250_trigger_int(int n, int flag)
+static void ins8250_trigger_int(const device_config *device, int flag)
 {
-	uart[n].int_pending |= flag;
+	ins8250_t	*ins8250 = get_safe_token(device);
 
-	uart8250_update_interrupt(n);
+	ins8250->int_pending |= flag;
+	ins8250_update_interrupt(device);
 }
 
 
 
 /* clear pending bit, if any ints are pending, then int will be triggered, otherwise it
 will be cleared */
-static void uart8250_clear_int(int n, int flag)
+static void ins8250_clear_int(const device_config *device, int flag)
 {
-	uart[n].int_pending &= ~flag;
+	ins8250_t	*ins8250 = get_safe_token(device);
 
-	uart8250_update_interrupt(n);
+	ins8250->int_pending &= ~flag;
+	ins8250_update_interrupt(device);
 }
 
 
-
-void uart8250_init(int nr, const uart8250_interface *new_interface)
-{
-	memset(&uart[nr], 0, sizeof(uart[nr]));
-	if (new_interface)
-		memcpy(&uart[nr].interface, new_interface, sizeof(uart8250_interface));
-}
-
-
-
-/* 1 based */
-void uart8250_reset(int n)
-{
-	uart[n].ier = 0;
-	uart[n].iir = 1;
-	uart[n].lcr = 0;
-	uart[n].mcr = 0;
-	uart[n].lsr = (1<<5) | (1<<6);
-
-	uart[n].send.active=0;
-
-	/* refresh with reset state of register */
-	if (uart[n].interface.refresh_connected)
-		uart[n].interface.refresh_connected(n);
-}
-
-
-
-void uart8250_w(int n, offs_t idx, UINT8 data)
+WRITE8_DEVICE_HANDLER( ins8250_w )
 {
     static const char P[8] = "NONENHNL";  /* names for parity select */
+	ins8250_t	*ins8250 = get_safe_token(device);
     int tmp;
 
-	switch (idx)
+	switch (offset)
 	{
 		case 0:
-			if (uart[n].lcr & 0x80)
+			if (ins8250->lcr & 0x80)
 			{
-				uart[n].dll = data;
-				tmp = uart[n].dlm * 256 + uart[n].dll;
-				COM_LOG(1,"COM_dll_w",("COM%d $%02x: [$%04x = %d baud]\n",
-					n+1, data, tmp, (tmp)?(int)(uart[n].interface.clockin/16/tmp):0));
+				ins8250->dll = data;
+				tmp = ins8250->dlm * 256 + ins8250->dll;
+				COM_LOG(1,"COM_dll_w",("COM $%02x: [$%04x = %d baud]\n",
+					 data, tmp, (tmp)?(int)(ins8250->interface->clockin/16/tmp):0));
 			}
 			else
 			{
-				uart[n].thr = data;
-				COM_LOG(2,"COM_thr_w",("COM%d $%02x\n", n+1, data));
+				ins8250->thr = data;
+				COM_LOG(2,"COM_thr_w",("COM $%02x\n", data));
 
 				if (LOOP(n))
 				{
-					uart[n].lsr |= 1;
-					uart[n].rbr = data;
+					ins8250->lsr |= 1;
+					ins8250->rbr = data;
 				}
 				/* writing to thr will clear the int */
-				uart8250_clear_int(n, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+				ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 			}
 			break;
 		case 1:
-			if (uart[n].lcr & 0x80)
+			if (ins8250->lcr & 0x80)
 			{
-				uart[n].dlm = data;
-				tmp = uart[n].dlm * 256 + uart[n].dll;
-                COM_LOG(1,"COM_dlm_w",("COM%d $%02x: [$%04x = %d baud]\n",
-					n+1, data, tmp, (tmp)?(int)(uart[n].interface.clockin/16/tmp):0));
+				ins8250->dlm = data;
+				tmp = ins8250->dlm * 256 + ins8250->dll;
+                COM_LOG(1,"COM_dlm_w",("COM $%02x: [$%04x = %d baud]\n",
+					data, tmp, (tmp)?(int)(ins8250->interface->clockin/16/tmp):0));
 			}
 			else
 			{
-				uart[n].ier = data;
-				COM_LOG(2,"COM_ier_w",("COM%d $%02x: enable int on RX %d, THRE %d, RLS %d, MS %d\n",
-					n+1, data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1));
+				ins8250->ier = data;
+				COM_LOG(2,"COM_ier_w",("COM $%02x: enable int on RX %d, THRE %d, RLS %d, MS %d\n",
+					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1));
 			}
             break;
 		case 2:
-			COM_LOG(1,"COM_fcr_w",("COM%d $%02x (16550 only)\n", n+1, data));
+			COM_LOG(1,"COM_fcr_w",("COM $%02x (16550 only)\n", data));
             break;
 		case 3:
-			uart[n].lcr = data;
-			COM_LOG(1,"COM_lcr_w",("COM%d $%02x word length %d, stop bits %d, parity %c, break %d, DLAB %d\n",
-				n+1, data, 5+(data&3), 1+((data>>2)&1), P[(data>>3)&7], (data>>6)&1, (data>>7)&1));
+			ins8250->lcr = data;
+			COM_LOG(1,"COM_lcr_w",("COM $%02x word length %d, stop bits %d, parity %c, break %d, DLAB %d\n",
+				data, 5+(data&3), 1+((data>>2)&1), P[(data>>3)&7], (data>>6)&1, (data>>7)&1));
             break;
 		case 4:
-			uart[n].mcr = data;
-			COM_LOG(1,"COM_mcr_w",("COM%d $%02x DTR %d, RTS %d, OUT1 %d, OUT2 %d, loopback %d\n",
-				n+1, data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1));
-			if (uart[n].interface.handshake_out)
-				uart[n].interface.handshake_out(n,data);
+			ins8250->mcr = data;
+			COM_LOG(1,"COM_mcr_w",("COM $%02x DTR %d, RTS %d, OUT1 %d, OUT2 %d, loopback %d\n",
+				data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1));
+			if (ins8250->interface->handshake_out)
+				ins8250->interface->handshake_out(device,data);
             break;
 		case 5:
 			break;
 		case 6:
 			break;
 		case 7:
-			uart[n].scr = data;
-			COM_LOG(2,"COM_scr_w",("COM%d $%02x\n", n+1, data));
+			ins8250->scr = data;
+			COM_LOG(2,"COM_scr_w",("COM $%02x\n", data));
             break;
 	}
 
-	if (uart[n].interface.refresh_connected)
-		uart[n].interface.refresh_connected(n);
+	if (ins8250->interface->refresh_connected)
+		ins8250->interface->refresh_connected(device);
 }
 
 
 
-UINT8 uart8250_r(int n, offs_t idx)
+READ8_DEVICE_HANDLER( ins8250_r )
 {
+	ins8250_t	*ins8250 = get_safe_token(device);
 	int data = 0x0ff;
 
-	switch (idx)
+	switch (offset)
 	{
 		case 0:
-			if (uart[n].lcr & 0x80)
+			if (ins8250->lcr & 0x80)
 			{
-				data = uart[n].dll;
-				COM_LOG(1,"COM_dll_r",("COM%d $%02x\n", n+1, data));
+				data = ins8250->dll;
+				COM_LOG(1,"COM_dll_r",("COM $%02x\n", data));
 			}
 			else
 			{
-				data = uart[n].rbr;
-				if( uart[n].lsr & 0x01 )
+				data = ins8250->rbr;
+				if( ins8250->lsr & 0x01 )
 				{
-					uart[n].lsr &= ~0x01;		/* clear data ready status */
-					COM_LOG(2,"COM_rbr_r",("COM%d $%02x\n", n+1, data));
+					ins8250->lsr &= ~0x01;		/* clear data ready status */
+					COM_LOG(2,"COM_rbr_r",("COM $%02x\n", data));
 				}
 
-				uart8250_clear_int(n, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+				ins8250_clear_int(device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 			}
 			break;
 		case 1:
-			if (uart[n].lcr & 0x80)
+			if (ins8250->lcr & 0x80)
 			{
-				data = uart[n].dlm;
-				COM_LOG(1,"COM_dlm_r",("COM%d $%02x\n", n+1, data));
+				data = ins8250->dlm;
+				COM_LOG(1,"COM_dlm_r",("COM $%02x\n", data));
 			}
 			else
 			{
-				data = uart[n].ier;
-				COM_LOG(2,"COM_ier_r",("COM%d $%02x\n", n+1, data));
+				data = ins8250->ier;
+				COM_LOG(2,"COM_ier_r",("COM $%02x\n", data));
             }
             break;
 		case 2:
-			data = uart[n].iir;
-			COM_LOG(2,"COM_iir_r",("COM%d $%02x\n", n+1, data));
+			data = ins8250->iir;
+			COM_LOG(2,"COM_iir_r",("COM $%02x\n", data));
 			/* this may not be correct. It says that reading this register will
 			clear the int if this is the source of the int?? */
-			uart8250_clear_int(n, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+			ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
             break;
 		case 3:
-			data = uart[n].lcr;
-			COM_LOG(2,"COM_lcr_r",("COM%d $%02x\n", n+1, data));
+			data = ins8250->lcr;
+			COM_LOG(2,"COM_lcr_r",("COM $%02x\n", data));
             break;
 		case 4:
-			data = uart[n].mcr;
-			COM_LOG(2,"COM_mcr_r",("COM%d $%02x\n", n+1, data));
+			data = ins8250->mcr;
+			COM_LOG(2,"COM_mcr_r",("COM $%02x\n", data));
             break;
 		case 5:
 
 #if 0
-			if (uart[n].send.active && (timer_get_time()-uart[n].send.time>uart_byte_time(n)))
+			if (ins8250->send.active && (timer_get_time()-ins8250->send.time>uart_byte_time(n)))
 			{
 				// currently polling is enough for pc1512
-				uart[n].lsr |= 0x40; /* set TSRE */
-				uart[n].send.active = 0;
+				ins8250->lsr |= 0x40; /* set TSRE */
+				ins8250->send.active = 0;
 				if (LOOP(n))
 				{
-					uart[n].lsr |= 1;
-					uart[n].rbr = uart[n].send.data;
+					ins8250->lsr |= 1;
+					ins8250->rbr = ins8250->send.data;
 				}
 			}
 #endif
-			uart[n].lsr |= 0x20; /* set THRE */
-			data = uart[n].lsr;
-			if( uart[n].lsr & 0x1f )
+			ins8250->lsr |= 0x20; /* set THRE */
+			data = ins8250->lsr;
+			if( ins8250->lsr & 0x1f )
 			{
-				uart[n].lsr &= 0xe1; /* clear FE, PE and OE and BREAK bits */
-				COM_LOG(2,"COM_lsr_r",("COM%d $%02x, DR %d, OE %d, PE %d, FE %d, BREAK %d, THRE %d, TSRE %d\n",
-					n+1, data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1, (data>>5)&1, (data>>6)&1));
+				ins8250->lsr &= 0xe1; /* clear FE, PE and OE and BREAK bits */
+				COM_LOG(2,"COM_lsr_r",("COM $%02x, DR %d, OE %d, PE %d, FE %d, BREAK %d, THRE %d, TSRE %d\n",
+					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1, (data>>5)&1, (data>>6)&1));
 			}
 
 			/* reading line status register clears int */
-			uart8250_clear_int(n, COM_INT_PENDING_RECEIVER_LINE_STATUS);
+			ins8250_clear_int(device, COM_INT_PENDING_RECEIVER_LINE_STATUS);
             break;
 		case 6:
-			if (uart[n].mcr & 0x10)	/* loopback test? */
+			if (ins8250->mcr & 0x10)	/* loopback test? */
 			{
-				data = uart[n].mcr << 4;
+				data = ins8250->mcr << 4;
 				/* build delta values */
-				uart[n].msr = (uart[n].msr ^ data) >> 4;
-				uart[n].msr |= data;
+				ins8250->msr = (ins8250->msr ^ data) >> 4;
+				ins8250->msr |= data;
 			}
-			data = uart[n].msr;
-			uart[n].msr &= 0xf0; /* reset delta values */
-			COM_LOG(2,"COM_msr_r",("COM%d $%02x\n", n+1, data));
+			data = ins8250->msr;
+			ins8250->msr &= 0xf0; /* reset delta values */
+			COM_LOG(2,"COM_msr_r",("COM $%02x\n", data));
 
 			/* reading msr clears int */
-			uart8250_clear_int(n, COM_INT_PENDING_MODEM_STATUS_REGISTER);
+			ins8250_clear_int(device, COM_INT_PENDING_MODEM_STATUS_REGISTER);
 
 			break;
 		case 7:
-			data = uart[n].scr;
-			COM_LOG(2,"COM_scr_r",("COM%d $%02x\n", n+1, data));
+			data = ins8250->scr;
+			COM_LOG(2,"COM_scr_r",("COM $%02x\n", data));
             break;
 	}
 
-	if (uart[n].interface.refresh_connected)
-		uart[n].interface.refresh_connected(n);
+	if (ins8250->interface->refresh_connected)
+		ins8250->interface->refresh_connected(device);
 
     return data;
 }
 
 
 
-void uart8250_receive(int n, int data)
+void ins8250_receive(const device_config *device, int data)
 {
+	ins8250_t	*ins8250 = get_safe_token(device);
+
     /* check if data rate 1200 baud is set */
-	if( uart[n].dlm != 0x00 || uart[n].dll != 0x60 )
-        uart[n].lsr |= 0x08; /* set framing error */
+	if( ins8250->dlm != 0x00 || ins8250->dll != 0x60 )
+        ins8250->lsr |= 0x08; /* set framing error */
 
     /* if data not yet serviced */
-	if( uart[n].lsr & 0x01 )
-		uart[n].lsr |= 0x02; /* set overrun error */
+	if( ins8250->lsr & 0x01 )
+		ins8250->lsr |= 0x02; /* set overrun error */
 
     /* put data into receiver buffer register */
-    uart[n].rbr = data;
+    ins8250->rbr = data;
 
     /* set data ready status */
-    uart[n].lsr |= 0x01;
+    ins8250->lsr |= 0x01;
 
 	/* set pending state for this interrupt. */
-	uart8250_trigger_int(n, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+	ins8250_trigger_int(device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 
 
 //	/* OUT2 + received line data avail interrupt enabled? */
@@ -396,16 +467,18 @@ void uart8250_receive(int n, int data)
 /**************************************************************************
  *	change the modem status register
  **************************************************************************/
-void uart8250_handshake_in(int n, int new_msr)
+void ins8250_handshake_in(const device_config *device, int new_msr)
 {
+	ins8250_t	*ins8250 = get_safe_token(device);
+
 	/* no change in modem status bits? */
-	if( ((uart[n].msr ^ new_msr) & 0xf0) == 0 )
+	if( ((ins8250->msr ^ new_msr) & 0xf0) == 0 )
 		return;
 
 	/* set delta status bits 0..3 and new modem status bits 4..7 */
-    uart[n].msr = (((uart[n].msr ^ new_msr) >> 4) & 0x0f) | (new_msr & 0xf0);
+    ins8250->msr = (((ins8250->msr ^ new_msr) >> 4) & 0x0f) | (new_msr & 0xf0);
 
-	uart8250_trigger_int(n, COM_INT_PENDING_MODEM_STATUS_REGISTER);
+	ins8250_trigger_int(device, COM_INT_PENDING_MODEM_STATUS_REGISTER);
 
 //	/* set up interrupt information register */
   //  COM_iir[n] &= ~(0x06 | 0x01);
@@ -419,38 +492,188 @@ void uart8250_handshake_in(int n, int new_msr)
 }
 
 
-READ8_HANDLER ( uart8250_0_r ) { return uart8250_r(0, offset); }
-READ8_HANDLER ( uart8250_1_r ) { return uart8250_r(1, offset); }
-READ8_HANDLER ( uart8250_2_r ) { return uart8250_r(2, offset); }
-READ8_HANDLER ( uart8250_3_r ) { return uart8250_r(3, offset); }
-WRITE8_HANDLER ( uart8250_0_w ) { uart8250_w(0, offset, data); }
-WRITE8_HANDLER ( uart8250_1_w ) { uart8250_w(1, offset, data); }
-WRITE8_HANDLER ( uart8250_2_w ) { uart8250_w(2, offset, data); }
-WRITE8_HANDLER ( uart8250_3_w ) { uart8250_w(3, offset, data); }
+static void common_start( const device_config *device, int device_type ) {
+	ins8250_t	*ins8250 = get_safe_token(device);
 
-READ16_HANDLER ( uart8250_16le_0_r ) { return read16le_with_read8_handler(uart8250_0_r, machine, offset, mem_mask); }
-READ16_HANDLER ( uart8250_16le_1_r ) { return read16le_with_read8_handler(uart8250_1_r, machine, offset, mem_mask); }
-READ16_HANDLER ( uart8250_16le_2_r ) { return read16le_with_read8_handler(uart8250_2_r, machine, offset, mem_mask); }
-READ16_HANDLER ( uart8250_16le_3_r ) { return read16le_with_read8_handler(uart8250_3_r, machine, offset, mem_mask); }
-WRITE16_HANDLER ( uart8250_16le_0_w ) { write16le_with_write8_handler(uart8250_0_w, machine, offset, data, mem_mask); }
-WRITE16_HANDLER ( uart8250_16le_1_w ) { write16le_with_write8_handler(uart8250_1_w, machine, offset, data, mem_mask); }
-WRITE16_HANDLER ( uart8250_16le_2_w ) { write16le_with_write8_handler(uart8250_2_w, machine, offset, data, mem_mask); }
-WRITE16_HANDLER ( uart8250_16le_3_w ) { write16le_with_write8_handler(uart8250_3_w, machine, offset, data, mem_mask); }
+	ins8250->interface = device->static_config;
+	ins8250->device_type = device_type;
+}
 
-READ32_HANDLER ( uart8250_32le_0_r ) { return read32le_with_read8_handler(uart8250_0_r, machine, offset, mem_mask); }
-READ32_HANDLER ( uart8250_32le_1_r ) { return read32le_with_read8_handler(uart8250_1_r, machine, offset, mem_mask); }
-READ32_HANDLER ( uart8250_32le_2_r ) { return read32le_with_read8_handler(uart8250_2_r, machine, offset, mem_mask); }
-READ32_HANDLER ( uart8250_32le_3_r ) { return read32le_with_read8_handler(uart8250_3_r, machine, offset, mem_mask); }
-WRITE32_HANDLER ( uart8250_32le_0_w ) { write32le_with_write8_handler(uart8250_0_w, machine, offset, data, mem_mask); }
-WRITE32_HANDLER ( uart8250_32le_1_w ) { write32le_with_write8_handler(uart8250_1_w, machine, offset, data, mem_mask); }
-WRITE32_HANDLER ( uart8250_32le_2_w ) { write32le_with_write8_handler(uart8250_2_w, machine, offset, data, mem_mask); }
-WRITE32_HANDLER ( uart8250_32le_3_w ) { write32le_with_write8_handler(uart8250_3_w, machine, offset, data, mem_mask); }
 
-READ64_HANDLER ( uart8250_64be_0_r ) { return read64be_with_read8_handler(uart8250_0_r, machine, offset, mem_mask); }
-READ64_HANDLER ( uart8250_64be_1_r ) { return read64be_with_read8_handler(uart8250_1_r, machine, offset, mem_mask); }
-READ64_HANDLER ( uart8250_64be_2_r ) { return read64be_with_read8_handler(uart8250_2_r, machine, offset, mem_mask); }
-READ64_HANDLER ( uart8250_64be_3_r ) { return read64be_with_read8_handler(uart8250_3_r, machine, offset, mem_mask); }
-WRITE64_HANDLER ( uart8250_64be_0_w ) { write64be_with_write8_handler(uart8250_0_w, machine, offset, data, mem_mask); }
-WRITE64_HANDLER ( uart8250_64be_1_w ) { write64be_with_write8_handler(uart8250_1_w, machine, offset, data, mem_mask); }
-WRITE64_HANDLER ( uart8250_64be_2_w ) { write64be_with_write8_handler(uart8250_2_w, machine, offset, data, mem_mask); }
-WRITE64_HANDLER ( uart8250_64be_3_w ) { write64be_with_write8_handler(uart8250_3_w, machine, offset, data, mem_mask); }
+static DEVICE_START( ins8250 ) {
+	common_start( device, TYPE_INS8250 );
+}
+
+
+static DEVICE_START( ins8250a ) {
+	common_start( device, TYPE_INS8250A );
+}
+
+
+static DEVICE_START( ns16450 ) {
+	common_start( device, TYPE_NS16450 );
+}
+
+
+static DEVICE_START( ns16550 ) {
+	common_start( device, TYPE_NS16550 );
+}
+
+
+static DEVICE_START( ns16550a ) {
+	common_start( device, TYPE_NS16550A );
+}
+
+
+static DEVICE_START( pc16550d ) {
+	common_start( device, TYPE_PC16550D );
+}
+
+
+static DEVICE_RESET( ins8250 ) {
+	ins8250_t	*ins8250 = get_safe_token(device);
+
+	ins8250->ier = 0;
+	ins8250->iir = 1;
+	ins8250->lcr = 0;
+	ins8250->mcr = 0;
+	ins8250->lsr = (1<<5) | (1<<6);
+
+	ins8250->send.active=0;
+
+	/* refresh with reset state of register */
+	if (ins8250->interface->refresh_connected)
+		ins8250->interface->refresh_connected(device);
+}
+
+
+static DEVICE_SET_INFO( ins8250 ) {
+	switch ( state ) {
+		/* no parameters to set */
+	}
+}
+
+
+DEVICE_GET_INFO( ins8250 ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(ins8250_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
+		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:					info->set_info = DEVICE_SET_INFO_NAME(ins8250);	break;
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ins8250);	break;
+		case DEVINFO_FCT_STOP:						/* nothing */								break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(ins8250);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:						info->s = "National Semiconductor INS8250/INS8250B";	break;
+		case DEVINFO_STR_FAMILY:					info->s = "INS8250";						break;
+		case DEVINFO_STR_VERSION:					info->s = "1.00";							break;
+		case DEVINFO_STR_SOURCE_FILE:				info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:					info->s = "Copyright the MESS Team";		break;
+	}
+}
+
+
+DEVICE_GET_INFO( ins8250a ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_STR_NAME:						info->s = "National Semiconductor INS8250A/INS82C50A";	break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ins8250a);	break;
+
+		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( ns16450 ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_STR_NAME:						info->s = "National Semiconductor NS16450/PC16450";	break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ns16450);	break;
+
+		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( ns16550 ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_STR_NAME:						info->s = "National Semiconductor NS16550/PC16550";	break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ns16550);	break;
+
+		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( ns16550a ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_STR_NAME:						info->s = "National Semiconductor NS16550A/PC16550A";	break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ns16550a);	break;
+
+		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( pc16550d ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_STR_NAME:						info->s = "National Semiconductor PC16550D";	break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(pc16550d);	break;
+
+		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
+	}
+}
+
+
+//READ8_HANDLER ( uart8250_0_r ) { return uart8250_r(0, offset); }
+//READ8_HANDLER ( uart8250_1_r ) { return uart8250_r(1, offset); }
+//READ8_HANDLER ( uart8250_2_r ) { return uart8250_r(2, offset); }
+//READ8_HANDLER ( uart8250_3_r ) { return uart8250_r(3, offset); }
+//WRITE8_HANDLER ( uart8250_0_w ) { uart8250_w(0, offset, data); }
+//WRITE8_HANDLER ( uart8250_1_w ) { uart8250_w(1, offset, data); }
+//WRITE8_HANDLER ( uart8250_2_w ) { uart8250_w(2, offset, data); }
+//WRITE8_HANDLER ( uart8250_3_w ) { uart8250_w(3, offset, data); }
+//
+//READ16_HANDLER ( uart8250_16le_0_r ) { return read16le_with_read8_handler(uart8250_0_r, machine, offset, mem_mask); }
+//READ16_HANDLER ( uart8250_16le_1_r ) { return read16le_with_read8_handler(uart8250_1_r, machine, offset, mem_mask); }
+//READ16_HANDLER ( uart8250_16le_2_r ) { return read16le_with_read8_handler(uart8250_2_r, machine, offset, mem_mask); }
+//READ16_HANDLER ( uart8250_16le_3_r ) { return read16le_with_read8_handler(uart8250_3_r, machine, offset, mem_mask); }
+//WRITE16_HANDLER ( uart8250_16le_0_w ) { write16le_with_write8_handler(uart8250_0_w, machine, offset, data, mem_mask); }
+//WRITE16_HANDLER ( uart8250_16le_1_w ) { write16le_with_write8_handler(uart8250_1_w, machine, offset, data, mem_mask); }
+//WRITE16_HANDLER ( uart8250_16le_2_w ) { write16le_with_write8_handler(uart8250_2_w, machine, offset, data, mem_mask); }
+//WRITE16_HANDLER ( uart8250_16le_3_w ) { write16le_with_write8_handler(uart8250_3_w, machine, offset, data, mem_mask); }
+//
+//READ32_HANDLER ( uart8250_32le_0_r ) { return read32le_with_read8_handler(uart8250_0_r, machine, offset, mem_mask); }
+//READ32_HANDLER ( uart8250_32le_1_r ) { return read32le_with_read8_handler(uart8250_1_r, machine, offset, mem_mask); }
+//READ32_HANDLER ( uart8250_32le_2_r ) { return read32le_with_read8_handler(uart8250_2_r, machine, offset, mem_mask); }
+//READ32_HANDLER ( uart8250_32le_3_r ) { return read32le_with_read8_handler(uart8250_3_r, machine, offset, mem_mask); }
+//WRITE32_HANDLER ( uart8250_32le_0_w ) { write32le_with_write8_handler(uart8250_0_w, machine, offset, data, mem_mask); }
+//WRITE32_HANDLER ( uart8250_32le_1_w ) { write32le_with_write8_handler(uart8250_1_w, machine, offset, data, mem_mask); }
+//WRITE32_HANDLER ( uart8250_32le_2_w ) { write32le_with_write8_handler(uart8250_2_w, machine, offset, data, mem_mask); }
+//WRITE32_HANDLER ( uart8250_32le_3_w ) { write32le_with_write8_handler(uart8250_3_w, machine, offset, data, mem_mask); }
+//
+//READ64_HANDLER ( uart8250_64be_0_r ) { return read64be_with_read8_handler(uart8250_0_r, machine, offset, mem_mask); }
+//READ64_HANDLER ( uart8250_64be_1_r ) { return read64be_with_read8_handler(uart8250_1_r, machine, offset, mem_mask); }
+//READ64_HANDLER ( uart8250_64be_2_r ) { return read64be_with_read8_handler(uart8250_2_r, machine, offset, mem_mask); }
+//READ64_HANDLER ( uart8250_64be_3_r ) { return read64be_with_read8_handler(uart8250_3_r, machine, offset, mem_mask); }
+//WRITE64_HANDLER ( uart8250_64be_0_w ) { write64be_with_write8_handler(uart8250_0_w, machine, offset, data, mem_mask); }
+//WRITE64_HANDLER ( uart8250_64be_1_w ) { write64be_with_write8_handler(uart8250_1_w, machine, offset, data, mem_mask); }
+//WRITE64_HANDLER ( uart8250_64be_2_w ) { write64be_with_write8_handler(uart8250_2_w, machine, offset, data, mem_mask); }
+//WRITE64_HANDLER ( uart8250_64be_3_w ) { write64be_with_write8_handler(uart8250_3_w, machine, offset, data, mem_mask); }
