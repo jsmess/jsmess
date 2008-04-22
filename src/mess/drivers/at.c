@@ -41,8 +41,6 @@
 
 #include "machine/8237dma.h"
 #include "machine/pci.h"
-#include "memconv.h"
-#include "devconv.h"
 
 /* window resizing with dirtybuffering traping in xmess window */
 
@@ -114,12 +112,6 @@ static WRITE8_DEVICE_HANDLER(at_dma8237_1_w)
 	dma8237_w( device, offset / 2, data);
 }
 
-DEV_READWRITE8TO32LE( at_pit8254_32le, pit8253_r, pit8253_w )
-DEV_READWRITE8TO32LE( at_dma8237_32le, dma8237_r, dma8237_w )
-DEV_READWRITE8TO32LE( at_pic8259_32le, pic8259_r, pic8259_w )
-DEV_READWRITE8TO32LE( at_dma8237_1_32le, at_dma8237_1_r, at_dma8237_1_w )
-DEV_READWRITE8TO32LE( ins8250_32le, ins8250_r, ins8250_w )
-
 
 static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", dma8237_r, dma8237_w)
@@ -150,58 +142,46 @@ static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
-static READ32_HANDLER(at_page32_r)
-{
-	return read32le_with_read8_handler(at_page8_r, machine, offset, mem_mask);
-}
-
-
-static WRITE32_HANDLER(at_page32_w)
-{
-	write32le_with_write8_handler(at_page8_w, machine, offset, data, mem_mask);
-}
-
-
 static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", at_dma8237_32le_r, at_dma8237_32le_w)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE(PIC8259, "pic8259_master", at_pic8259_32le_r, at_pic8259_32le_w)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, AT_PIT8254, at_pit8254_32le_r, at_pit8254_32le_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, AT_PIT8254, pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", at_pic8259_32le_r, at_pic8259_32le_w)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_32le_r, at_dma8237_1_32le_w)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8(PIC8259, "pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8(DMA8237, "dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,	pc32le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", ins8250_32le_r, ins8250_32le_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", ins8250_32le_r, ins8250_32le_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(NS16450, "ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(NS16450, "ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,			pc32le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,			pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc32le_parallelport1_r,	pc32le_parallelport1_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc32le_fdc_r,				pc32le_fdc_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc32le_parallelport0_r,	pc32le_parallelport0_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", ins8250_32le_r, ins8250_32le_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(NS16450, "ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
 
 
 static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", at_dma8237_32le_r, at_dma8237_32le_w)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE(PIC8259, "pic8259_master", at_pic8259_32le_r, at_pic8259_32le_w)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, AT_PIT8254, at_pit8254_32le_r, at_pit8254_32le_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, AT_PIT8254, pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", at_pic8259_32le_r, at_pic8259_32le_w)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_32le_r, at_dma8237_1_32le_w)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8(PIC8259, "pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8(DMA8237, "dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,		pc32le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", ins8250_32le_r, ins8250_32le_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", ins8250_32le_r, ins8250_32le_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(NS16450, "ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(NS16450, "ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,				pc32le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,				pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc32le_parallelport1_r,		pc32le_parallelport1_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc32le_fdc_r,				pc32le_fdc_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc32le_parallelport0_r,		pc32le_parallelport0_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", ins8250_32le_r, ins8250_32le_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(NS16450, "ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x0cf8, 0x0cff) AM_READWRITE(pci_32le_r,				pci_32le_w)
 ADDRESS_MAP_END
 
