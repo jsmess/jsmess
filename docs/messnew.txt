@@ -2,14 +2,16 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-- BK 0010 [Miodrag Milanovic]
+- BK 0010/0010.01 [Miodrag Milanovic]
 - Bondwell 2 (not working)  [Tomas Karlsson]
-- Orion 128	[Miodrag Milanovic]
+- Orion 128/Z80 Card II/Pro	[Miodrag Milanovic]
 
 
 System Driver Changes:
 ----------------------
 - [ABC80] Fixed so that it boots and keyboard works. [Robbbert]
+
+- [BK] Added cassete loading [Miodrag Milanovic]
 
 - [BW2] Added MSM6255 LCD controller emulation. [Curt Coder]
 
@@ -42,6 +44,8 @@ System Driver Changes:
 - [MBEE] Added snapload support for MWB filetype. Added LOCK key to keyboard.
   [Robbbert]
 
+- [ORION] Added cassete loading [Miodrag Milanovic]
+
 - [SPECIAL] Added Erik clone, and fixed bank switch problem [Miodrag Milanovic]
 
 - [T1000HX] Fixed bug #1130.  [Wilbert Pol]
@@ -53,7 +57,6 @@ System Driver Changes:
   [Fabio Priuli]
 
 - [VECTREX] Fixed bug #1569 [Mathis Rosenhauer]
-
 
 
 User Interface Changes:
@@ -91,6 +94,7 @@ Source Changes:
 
 - Converted CDP1861 and CDP1864 display controllers to devices. [Curt Coder]
 
+- Updated WD17xx floppy driver,now busy signal is set right [Miodrag Milanovic]
 
 0.124a
 
