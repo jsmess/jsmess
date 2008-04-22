@@ -42,8 +42,6 @@ Tandy 1000 (80386) variations:
 
 #include "driver.h"
 #include "deprecat.h"
-#include "memconv.h"
-#include "devconv.h"
 
 #include "machine/8255ppi.h"
 #include "machine/ins8250.h"
@@ -128,9 +126,6 @@ static WRITE8_HANDLER( pc_YM3812_0_w )
 		YM3812_write_port_0_w(machine, 0, data);
 }
 
-static READ16_HANDLER( pc16le_YM3812_0_r ) { return read16le_with_read8_handler(pc_YM3812_0_r, machine, offset, mem_mask); }
-static WRITE16_HANDLER( pc16le_YM3812_0_w ) { write16le_with_write8_handler(pc_YM3812_0_w, machine, offset, data, mem_mask); }
-
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( pc16le_SN76496_0_w ) { write16le_with_write8_handler(SN76496_0_w, machine, offset, data, mem_mask); }
 #endif
@@ -187,40 +182,31 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
-DEV_READWRITE8TO16LE_LSB( pc_pit8253_16le, pit8253_r, pit8253_w )
-DEV_READWRITE8TO16LE( pc_dma8237_16le, dma8237_r, dma8237_w )
-DEV_READWRITE8TO16LE( pc_pic8259_16le, pic8259_r, pic8259_w )
-DEV_READWRITE8TO16LE( pc_ppi8255_16le, ppi8255_r, ppi8255_w )
-DEV_READWRITE8TO16LE( pc_ins8250_16le, ins8250_r, ins8250_w )
-READ16_HANDLER(pc_page16le_r) { return read16le_with_read8_handler(pc_page_r, machine, offset, mem_mask); }
-WRITE16_HANDLER(pc_page16le_w) { write16le_with_write8_handler(pc_page_w, machine, offset, data, mem_mask); }
-
-
 static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", pc_dma8237_16le_r, pc_dma8237_16le_w)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pc_pic8259_16le_r, pc_pic8259_16le_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255", pc_ppi8255_16le_r, pc_ppi8255_16le_w)
-	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,			pc_page16le_w)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8(DMA8237, "dma8237", dma8237_r, dma8237_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8(PIT8253, "pit8253", pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8(PPI8255, "ppi8255", ppi8255_r, ppi8255_w, 0xffff)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
 #ifdef EXP_ON
 	AM_RANGE(0x0210, 0x0217) AM_READWRITE(pc_EXP_r,					pc_EXP_w)
 #endif
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc16le_rtc_r,				pc16le_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc16le_parallelport2_r,	pc16le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(INS8250, "ins8250_3", pc_ins8250_16le_r, pc_ins8250_16le_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(INS8250, "ins8250_3", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(INS8250, "ins8250_1", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,			pc16le_HDC2_w)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return16_FFFF) /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc16le_parallelport1_r,	pc16le_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc16le_YM3812_0_r,		pc16le_YM3812_0_w)
+	AM_RANGE(0x0388, 0x0389) AM_READWRITE8(pc_YM3812_0_r,			pc_YM3812_0_w, 0xffff)
 #endif
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(INS8250, "ins8250_2", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,				pc16le_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(INS8250, "ins8250_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -298,24 +284,24 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(pc200_io, ADDRESS_SPACE_IO, 16)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", pc_dma8237_16le_r, pc_dma8237_16le_w)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pc_pic8259_16le_r, pc_pic8259_16le_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8(DMA8237, "dma8237", dma8237_r, dma8237_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8(PIT8253, "pit8253", pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE(pc1640_16le_mouse_x_r,			pc1640_16le_mouse_x_w)
 	AM_RANGE(0x007a, 0x007b) AM_READWRITE(pc1640_16le_mouse_y_r,			pc1640_16le_mouse_y_w)
-	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,				pc_page16le_w)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,					pc_page_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,					pc16le_JOY_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc16le_parallelport2_r,		pc16le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(INS8250, "ins8250_3", pc_ins8250_16le_r, pc_ins8250_16le_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(INS8250, "ins8250_3", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(INS8250, "ins8250_1", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,				pc16le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,				pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc200_16le_port378_r,			pc16le_parallelport1_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(INS8250, "ins8250_2", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,					pc16le_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(INS8250, "ins8250_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -331,25 +317,25 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(pc1640_io, ADDRESS_SPACE_IO, 16)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", pc_dma8237_16le_r, pc_dma8237_16le_w)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pc_pic8259_16le_r, pc_pic8259_16le_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pc_pit8253_16le_r, pc_pit8253_16le_w)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8(DMA8237, "dma8237", dma8237_r, dma8237_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8(PIT8253, "pit8253", pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
 	AM_RANGE(0x0070, 0x0071) AM_READWRITE(mc146818_port16le_r,		mc146818_port16le_w)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE(pc1640_16le_mouse_x_r,	pc1640_16le_mouse_x_w)
 	AM_RANGE(0x007a, 0x007b) AM_READWRITE(pc1640_16le_mouse_y_r,	pc1640_16le_mouse_y_w)
-	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,				pc_page16le_w)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc16le_parallelport2_r,		pc16le_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(INS8250, "ins8250_3", pc_ins8250_16le_r, pc_ins8250_16le_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(INS8250, "ins8250_3", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(INS8250, "ins8250_1", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,			pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc1640_16le_port378_r,			pc16le_parallelport1_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(INS8250, "ins8250_2", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,				pc16le_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", pc_ins8250_16le_r, pc_ins8250_16le_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(INS8250, "ins8250_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
