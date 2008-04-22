@@ -8,7 +8,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "ui.h"
 #include "z80bin.h"
 #include "snapquik.h"
 
@@ -49,7 +48,10 @@ int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *
 		if (ch != '\0')
 		{
 			if (i >= (ARRAY_LENGTH(pgmname) - 1))
+			{
+				image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, "File name too long");
 				return INIT_FAIL;
+			}
 
 			pgmname[i] = ch;	/* build program name */
 			i++;
@@ -71,7 +73,7 @@ int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *
 	size = (end_addr[0] - start_addr[0] + 1) & 0xffff;
 
 	/* display a message about the loaded quickload */
-	image_message(image, "size=%04X : start=%04X : end=%04X : exec=%04X", size,start_addr[0],end_addr[0],exec_addr[0]);
+	image_message(image, " %s\nsize=%04X : start=%04X : end=%04X : exec=%04X",pgmname,size,start_addr[0],end_addr[0],exec_addr[0]);
 
 	for (i = 0; i < size; i++)
 	{
