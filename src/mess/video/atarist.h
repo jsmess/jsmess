@@ -39,14 +39,14 @@
 
 READ16_HANDLER( atarist_shifter_base_r );
 READ16_HANDLER( atarist_shifter_counter_r );
-READ16_HANDLER( atarist_shifter_sync_r );
+READ8_HANDLER( atarist_shifter_sync_r );
 READ16_HANDLER( atarist_shifter_palette_r );
-READ16_HANDLER( atarist_shifter_mode_r );
+READ8_HANDLER( atarist_shifter_mode_r );
 
 WRITE16_HANDLER( atarist_shifter_base_w );
-WRITE16_HANDLER( atarist_shifter_sync_w );
+WRITE8_HANDLER( atarist_shifter_sync_w );
 WRITE16_HANDLER( atarist_shifter_palette_w );
-WRITE16_HANDLER( atarist_shifter_mode_w );
+WRITE8_HANDLER( atarist_shifter_mode_w );
 
 /* Atari STe Shifter */
 
@@ -86,6 +86,7 @@ WRITE16_HANDLER( atarist_blitter_dst_inc_y_w );
 WRITE16_HANDLER( atarist_blitter_dst_w );
 WRITE16_HANDLER( atarist_blitter_count_x_w );
 WRITE16_HANDLER( atarist_blitter_count_y_w );
+WRITE16_HANDLER( atarist_blitter_op_w );
 WRITE16_HANDLER( atarist_blitter_op_w );
 WRITE16_HANDLER( atarist_blitter_ctrl_w );
 

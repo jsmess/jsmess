@@ -9,6 +9,7 @@
 #ifndef X68K_H_
 #define X68K_H_
 
+#define MC68901_TAG	"mc68901"
 
 #define GFX16     0
 #define GFX256    1

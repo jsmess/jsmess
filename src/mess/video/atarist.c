@@ -36,6 +36,7 @@ static struct SHIFTER
 
 static emu_timer *atarist_glue_timer;
 static emu_timer *atarist_shifter_timer;
+static const device_config *mfp;
 
 INLINE pen_t atarist_shift_mode_0(running_machine *machine)
 {
@@ -160,8 +161,7 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 	if (de != shifter.de)
 	{
-		atarist_state *state = machine->driver_data;
-		mc68901_tbi_w(state->mfp, de);
+		mc68901_tbi_w(mfp, de);
 		shifter.de = de;
 	}
 
@@ -250,26 +250,26 @@ READ16_HANDLER( atarist_shifter_counter_r )
 	return 0;
 }
 
-READ16_HANDLER( atarist_shifter_sync_r )
+READ8_HANDLER( atarist_shifter_sync_r )
 {
 	return shifter.sync;
 }
 
-WRITE16_HANDLER( atarist_shifter_sync_w )
+WRITE8_HANDLER( atarist_shifter_sync_w )
 {
-	shifter.sync = data >> 8;
+	shifter.sync = data;
 	logerror("SHIFTER Sync %x\n", shifter.sync);
 	atarist_set_screen_parameters();
 }
 
-READ16_HANDLER( atarist_shifter_mode_r )
+READ8_HANDLER( atarist_shifter_mode_r )
 {
-	return shifter.mode << 8;
+	return shifter.mode;
 }
 
-WRITE16_HANDLER( atarist_shifter_mode_w )
+WRITE8_HANDLER( atarist_shifter_mode_w )
 {
-	shifter.mode = data >> 8;
+	shifter.mode = data;
 	logerror("SHIFTER Mode %x\n", shifter.mode);
 }
 
@@ -718,6 +718,8 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 
 VIDEO_START( atarist )
 {
+	mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
+
 	atarist_shifter_timer = timer_alloc(atarist_shifter_tick, NULL);
 	atarist_glue_timer = timer_alloc(atarist_glue_tick, NULL);
 

@@ -139,8 +139,6 @@
 #include "devices/basicdsk.h"
 #include "includes/x68k.h"
 
-mc68901_t *x68k_mfp;
-
 struct x68k_system sys;
 
 extern UINT16* gvram;  // Graphic VRAM
@@ -941,6 +939,8 @@ static READ16_HANDLER( x68k_sysport_r )
 
 static READ16_HANDLER( x68k_mfp_r )
 {
+	const device_config *x68k_mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
+
 	return mc68901_register_r(x68k_mfp, offset);
 }
 
@@ -1010,6 +1010,8 @@ READ16_HANDLER( x68k_mfp_r )
 
 static WRITE16_HANDLER( x68k_mfp_w )
 {
+	const device_config *x68k_mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
+
 	/* For the Interrupt registers, the bits are set out as such:
        Reg A - bit 7: GPIP7 (HSync)
                bit 6: GPIP6 (CRTC CIRQ)
@@ -1418,7 +1420,7 @@ static void x68k_fm_irq(int irq)
 
 }
 
-static READ8_HANDLER(mfp_gpio_r)
+static MC68901_GPIO_READ( mfp_gpio_r )
 {
 	UINT8 data = sys.mfp.gpio;
 
@@ -1431,15 +1433,15 @@ static READ8_HANDLER(mfp_gpio_r)
 	return data;
 }
 
-static void mfp_irq_callback(mc68901_t *chip, int state)
+static MC68901_ON_IRQ_CHANGED( mfp_irq_callback )
 {
 	static int prev;
-	if(prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
+	if(prev == CLEAR_LINE && level == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
 	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 		return;
-	cpunum_set_input_line(Machine, 0, 6, state);
-	prev = state;
+	cpunum_set_input_line(device->machine, 0, 6, level);
+	prev = level;
 }
 
 static INTERRUPT_GEN( x68k_vsync_irq )
@@ -1460,6 +1462,8 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 
 static IRQ_CALLBACK(x68k_int_ack)
 {
+	const device_config *x68k_mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
+
 	if(irqline == 6)  // MFP
 	{
 //      if(sys.mfp.isra & 0x10)
@@ -1952,8 +1956,6 @@ static MACHINE_START( x68000 )
 
 	nec765_init(&fdc_interface,NEC72065,NEC765_RDY_PIN_CONNECTED);
 	nec765_reset(0);
-
-	x68k_mfp = devtag_get_token(machine, MC68901, "mfp");
 }
 
 static DRIVER_INIT( x68000 )
@@ -2011,7 +2013,7 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_MACHINE_RESET( x68000 )
 
 	/* device hardware */
-	MDRV_DEVICE_ADD("mfp", MC68901)
+	MDRV_DEVICE_ADD(MC68901_TAG, MC68901)
 	MDRV_DEVICE_CONFIG(mfp_interface)
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )

@@ -31,8 +31,6 @@
 
 extern struct x68k_system sys;
 
-extern mc68901_t *x68k_mfp;
-
 extern emu_timer* scanline_timer;
 extern emu_timer* raster_irq;
 extern emu_timer* vblank_irq;
@@ -250,6 +248,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 
 TIMER_CALLBACK(x68k_crtc_vblank_irq)
 {
+	const device_config *x68k_mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
 	int val = param;
 	attotime irq_time;
 	int vblank_line;
@@ -273,6 +272,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		logerror("CRTC: VBlank off\n");
 	}
 
+	if (x68k_mfp != NULL)
 	mc68901_tai_w(x68k_mfp, sys.crtc.vblank);
 }
 
