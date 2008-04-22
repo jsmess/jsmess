@@ -2,6 +2,7 @@
 
 		Orion driver by Miodrag Milanovic
 
+		22/04/2008 Orion Pro added
 		02/04/2008 Preliminary driver.
 		     
 ****************************************************************************/
@@ -19,6 +20,8 @@
 #include "sound/speaker.h"
 
 /* Address maps */
+
+/* Orion 128 */
 static ADDRESS_MAP_START(orion128_mem, ADDRESS_SPACE_PROGRAM, 8)		
 	AM_RANGE( 0x0000, 0xefff ) AM_RAMBANK(1)	  
 	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK(2)	  
@@ -31,6 +34,7 @@ static ADDRESS_MAP_START(orion128_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xfa00, 0xfaff ) AM_WRITE (orion128_video_page_w)		    
 ADDRESS_MAP_END
 
+/* Orion Z80 Card II */
 static ADDRESS_MAP_START( orion128_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -38,7 +42,6 @@ static ADDRESS_MAP_START( orion128_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0xf9, 0xf9) AM_WRITE ( orion128_memory_page_w )
 	AM_RANGE( 0xfa, 0xfa) AM_WRITE ( orion128_video_page_w )		
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START(orionz80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -49,9 +52,25 @@ static ADDRESS_MAP_START(orionz80_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(SMH_BANK5, SMH_BANK5)
 ADDRESS_MAP_END
 
-  
+/* Orion Pro */  
 static ADDRESS_MAP_START( orionz80_io , ADDRESS_SPACE_IO, 8)
     AM_RANGE( 0x0000, 0xffff) AM_READWRITE ( orionz80_io_r, orionz80_io_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(orionpro_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x1fff ) AM_READWRITE(SMH_BANK1, SMH_BANK1)	  
+	AM_RANGE( 0x2000, 0x3fff ) AM_READWRITE(SMH_BANK2, SMH_BANK2)	  
+	AM_RANGE( 0x4000, 0x7fff ) AM_READWRITE(SMH_BANK3, SMH_BANK3)
+	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(SMH_BANK4, SMH_BANK4)
+	AM_RANGE( 0xc000, 0xefff ) AM_READWRITE(SMH_BANK5, SMH_BANK5)	
+	AM_RANGE( 0xf000, 0xf3ff ) AM_READWRITE(SMH_BANK6, SMH_BANK6)
+    AM_RANGE( 0xf400, 0xf7ff ) AM_READWRITE(SMH_BANK7, SMH_BANK7)
+    AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(SMH_BANK8, SMH_BANK8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( orionpro_io , ADDRESS_SPACE_IO, 8)
+    AM_RANGE( 0x0000, 0xffff) AM_READWRITE ( orionpro_io_r, orionpro_io_w )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -333,6 +352,45 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( orionpro )
+    MDRV_CPU_ADD(Z80, 5000000)
+    MDRV_CPU_PROGRAM_MAP(orionpro_mem, 0) 
+    MDRV_CPU_IO_MAP(orionpro_io, 0)
+    
+    MDRV_MACHINE_START( orionpro )
+    MDRV_MACHINE_RESET( orionpro )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( orion128_ppi8255_interface_1 )
+
+	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
+	MDRV_DEVICE_CONFIG( orion128_ppi8255_interface_2 )
+
+	/* video hardware */    	
+	MDRV_SCREEN_ADD("main", RASTER)      	
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(384, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+
+	MDRV_PALETTE_LENGTH(18)
+	MDRV_PALETTE_INIT( orion128 )
+		    
+	MDRV_VIDEO_START(orion128)
+    MDRV_VIDEO_UPDATE(orion128)    
+    	  
+    MDRV_NVRAM_HANDLER( mc146818 ) 
+    	
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)    	
+	MDRV_SOUND_ADD(AY8912, 1773400)
+	MDRV_SOUND_CONFIG(orionz80_ay_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
+MACHINE_DRIVER_END
 
 static void orion_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -377,7 +435,13 @@ SYSTEM_CONFIG_START(orionz80)
 	CONFIG_DEVICE(orion_cassette_getinfo);
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
- 
+
+SYSTEM_CONFIG_START(orionpro)
+	CONFIG_RAM_DEFAULT(512 * 1024)
+	CONFIG_DEVICE(orion_cassette_getinfo);
+	CONFIG_DEVICE(orion_floppy_getinfo);
+SYSTEM_CONFIG_END
+
 /* ROM definition */
 
 ROM_START( orion128 )
@@ -424,10 +488,18 @@ ROM_START( orionzms )
     ROM_LOAD( "romdisk1.bin", 0x20000, 0xd800, CRC(61C22EEC))
 ROM_END
 
+ROM_START( orionpro )
+	ROM_REGION( 0x32000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_LOAD( "rom1-210.bin",    0x10000, 0x2000, CRC(8E1A0C78))
+	ROM_LOAD( "rom2-210.bin",    0x12000, 0x10000, CRC(7CB7A49B))
+	ROM_LOAD( "romd1.bin",  	 0x22000, 0x10000, CRC(B38B34CB))
+ROM_END
+
 /* Driver */
  
-/*    YEAR  NAME   			PARENT  	COMPAT  MACHINE 	  INPUT   		INIT  	 	CONFIG 		COMPANY 			 FULLNAME   FLAGS */
-COMP( 1990, orion128, 	 0,  	 			0,		orion128, 	orion128, 	orion128, orion128,  "", 					 "Orion 128",	 0)
-COMP( 1990, orionms, 	   orion128, 	0,		orion128, 	ms7007, 		orion128, orion128,  "", 					 "Orion 128 (MS7007)",	 0)
-COMP( 1990, orionz80, 	 orion128, 	0,		orionz80, 	orion128, 	orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II",	 0)
-COMP( 1990, orionzms, 	 orion128, 	0,		orionz80, 	ms7007, 		orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II (MS7007)",	 0)
+/*    YEAR  NAME   		PARENT  	COMPAT  MACHINE 	INPUT   		INIT  	CONFIG 	COMPANY 			 FULLNAME   FLAGS */
+COMP( 1990, orion128, 	 0,  		0,		orion128, 	orion128, 	orion128, orion128,  "", 					 "Orion 128",	 0)
+COMP( 1990, orionms, 	 orion128, 	0,		orion128, 	ms7007, 	orion128, orion128,  "", 					 "Orion 128 (MS7007)",	 0)
+COMP( 1990, orionz80, 	 orion128, 	0,		orionz80, 	orion128,	orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II",	 0)
+COMP( 1990, orionzms, 	 orion128, 	0,		orionz80, 	ms7007, 	orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II (MS7007)",	 0)
+COMP( 1994, orionpro, 	 orion128, 	0,		orionpro, 	orion128, 	orion128, orionpro,  "", 					 "Orion Pro",	 0)

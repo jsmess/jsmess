@@ -863,6 +863,7 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( orionms )		
 	DRIVER( orionz80 )	
 	DRIVER( orionzms )	
+	DRIVER( orionpro )
 	
 	/* BK */
 	DRIVER( bk0010 )	

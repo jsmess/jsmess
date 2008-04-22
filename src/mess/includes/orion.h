@@ -37,6 +37,12 @@ extern WRITE8_HANDLER ( orion128_floppy_w );
 extern DEVICE_IMAGE_LOAD( orion_floppy );
 extern READ8_HANDLER ( orionz80_io_r );
 extern WRITE8_HANDLER ( orionz80_io_w );
+
+extern DRIVER_INIT( orionpro );
+extern MACHINE_START( orionpro );
+extern MACHINE_RESET( orionpro );
+extern READ8_HANDLER ( orionpro_io_r );
+extern WRITE8_HANDLER ( orionpro_io_w );
     
 /*----------- defined in video/orion.c -----------*/
 
