@@ -1,122 +1,197 @@
 #include "lmc1992.h"
 
-static struct LMC1992
+#define LOG (0)
+
+typedef struct _lmc1992_t lmc1992_t;
+struct _lmc1992_t
 {
-	const lmc1992_interface *intf;
+	const lmc1992_interface *intf;	/* interface */
 
-	int enable;
-	int data;
-	int clock;
-	UINT16 si;
+	int enable;						/* enable latch */
+	int data;						/* data latch */
+	int clock;						/* clock latch */
+	UINT16 si;						/* serial in shift register */
 
-	int input;
-	int bass, treble;
-	int volume;
-	int fader_rf, fader_lf, fader_rr, fader_lr;
-} lmc;
+	int input;						/* input select */
+	int bass;						/* bass */
+	int treble;						/* treble */
+	int volume;						/* volume */
+	int fader_rf;					/* right front fader */
+	int fader_lf;					/* left front fader */
+	int fader_rr;					/* right rear fader */
+	int fader_lr;					/* left rear fader */
+};
 
-static void lmc1992_command_w(int addr, int data)
+INLINE lmc1992_t *get_safe_token(const device_config *device)
 {
+	assert(device != NULL);
+	assert(device->token != NULL);
+
+	return (lmc1992_t *)device->token;
+}
+
+static void lmc1992_command_w(const device_config *device, int addr, int data)
+{
+	lmc1992_t *lmc1992 = get_safe_token(device);
+
 	switch (addr)
 	{
 	case LMC1992_FUNCTION_INPUT_SELECT:
 		if (data == LCM1992_INPUT_SELECT_OPEN)
 		{
-			logerror("LMC1992 Input Select : OPEN\n");
+			if (LOG) logerror("LMC1992 Input Select : OPEN\n");
 		}
 		else
 		{
-			logerror("LMC1992 Input Select : INPUT%u\n", data);
+			if (LOG) logerror("LMC1992 Input Select : INPUT%u\n", data);
 		}
-		lmc.input = data;
+		lmc1992->input = data;
 		break;
+
 	case LMC1992_FUNCTION_BASS:
-		logerror("LMC1992 Bass : %i dB\n", -40 + (data * 2));
-		lmc.bass = data;
+		if (LOG) logerror("LMC1992 Bass : %i dB\n", -40 + (data * 2));
+		lmc1992->bass = data;
 		break;
+
 	case LMC1992_FUNCTION_TREBLE:
-		logerror("LMC1992 Treble : %i dB\n", -40 + (data * 2));
-		lmc.treble = data;
+		if (LOG) logerror("LMC1992 Treble : %i dB\n", -40 + (data * 2));
+		lmc1992->treble = data;
 		break;
+
 	case LMC1992_FUNCTION_VOLUME:
-		logerror("LMC1992 Volume : %i dB\n", -80 + (data * 2));
-		lmc.volume = data;
+		if (LOG) logerror("LMC1992 Volume : %i dB\n", -80 + (data * 2));
+		lmc1992->volume = data;
 		break;
+
 	case LMC1992_FUNCTION_RIGHT_FRONT_FADER:
-		logerror("LMC1992 Right Front Fader : %i dB\n", -40 + (data * 2));
-		lmc.fader_rf = data;
+		if (LOG) logerror("LMC1992 Right Front Fader : %i dB\n", -40 + (data * 2));
+		lmc1992->fader_rf = data;
 		break;
+
 	case LMC1992_FUNCTION_LEFT_FRONT_FADER:
-		logerror("LMC1992 Left Front Fader : %i dB\n", -40 + (data * 2));
-		lmc.fader_lf = data;
+		if (LOG) logerror("LMC1992 Left Front Fader : %i dB\n", -40 + (data * 2));
+		lmc1992->fader_lf = data;
 		break;
+
 	case LMC1992_FUNCTION_RIGHT_REAR_FADER:
-		logerror("LMC1992 Right Rear Fader : %i dB\n", -40 + (data * 2));
-		lmc.fader_rr = data;
+		if (LOG) logerror("LMC1992 Right Rear Fader : %i dB\n", -40 + (data * 2));
+		lmc1992->fader_rr = data;
 		break;
+
 	case LMC1992_FUNCTION_LEFT_REAR_FADER:
-		logerror("LMC1992 Left Rear Fader : %i dB\n", -40 + (data * 2));
-		lmc.fader_lr = data;
+		if (LOG) logerror("LMC1992 Left Rear Fader : %i dB\n", -40 + (data * 2));
+		lmc1992->fader_lr = data;
 		break;
 	}
 }
 
-void lmc1992_clock_w(int level)
+void lmc1992_clock_w(const device_config *device, int level)
 {
+	lmc1992_t *lmc1992 = get_safe_token(device);
+
 	// clock data in on rising edge
 
-	if ((lmc.enable == 0) && ((lmc.clock == 0) && (level == 1)))
+	if ((lmc1992->enable == 0) && ((lmc1992->clock == 0) && (level == 1)))
 	{
-		lmc.si >>= 1;
-		lmc.si = lmc.si & 0x7fff;
+		lmc1992->si >>= 1;
+		lmc1992->si = lmc1992->si & 0x7fff;
 
-		if (lmc.data)
+		if (lmc1992->data)
 		{
-			lmc.si &= 0x8000;
+			lmc1992->si &= 0x8000;
 		}
 	}
 
-	lmc.clock = level;
+	lmc1992->clock = level;
 }
 
-void lmc1992_data_w(int level)
+void lmc1992_data_w(const device_config *device, int level)
 {
-	lmc.data = level;
+	lmc1992_t *lmc1992 = get_safe_token(device);
+
+	lmc1992->data = level;
 }
 
-void lmc1992_enable_w(int level)
+void lmc1992_enable_w(const device_config *device, int level)
 {
-	if ((lmc.enable == 0) && (level == 1))
+	lmc1992_t *lmc1992 = get_safe_token(device);
+
+	if ((lmc1992->enable == 0) && (level == 1))
 	{
-		UINT8 device = (lmc.si & 0xc000) >> 14;
-		UINT8 addr = (lmc.si & 0x3800) >> 11;
-		UINT8 data = (lmc.si & 0x07e0) >> 5;
+		UINT8 device_addr = (lmc1992->si & 0xc000) >> 14;
+		UINT8 addr = (lmc1992->si & 0x3800) >> 11;
+		UINT8 data = (lmc1992->si & 0x07e0) >> 5;
 
-		if (device == LMC1992_MICROWIRE_DEVICE_ADDRESS)
+		if (device_addr == LMC1992_MICROWIRE_DEVICE_ADDRESS)
 		{
-			lmc1992_command_w(addr, data);
+			lmc1992_command_w(device, addr, data);
 		}
 	}
 
-	lmc.enable = level;
+	lmc1992->enable = level;
 }
 
-void lmc1992_config(const lmc1992_interface *intf)
+/* Device Interface */
+
+static DEVICE_START( lmc1992 )
 {
-	memset(&lmc, 0, sizeof(lmc));
+	lmc1992_t *lmc1992 = get_safe_token(device);
+	char unique_tag[30];
 
-	lmc.intf = intf;
+	/* validate arguments */
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
 
-	state_save_register_global(lmc.enable);
-	state_save_register_global(lmc.data);
-	state_save_register_global(lmc.clock);
-	state_save_register_global(lmc.si);
-	state_save_register_global(lmc.input);
-	state_save_register_global(lmc.bass);
-	state_save_register_global(lmc.treble);
-	state_save_register_global(lmc.volume);
-	state_save_register_global(lmc.fader_rf);
-	state_save_register_global(lmc.fader_lf);
-	state_save_register_global(lmc.fader_rr);
-	state_save_register_global(lmc.fader_lr);
+	lmc1992->intf = device->static_config;
+
+//	assert(lmc1992->intf != NULL);
+
+	/* register for state saving */
+	state_save_combine_module_and_tag(unique_tag, "LMC1992", device->tag);
+
+	state_save_register_item(unique_tag, 0, lmc1992->enable);
+	state_save_register_item(unique_tag, 0, lmc1992->data);
+	state_save_register_item(unique_tag, 0, lmc1992->clock);
+	state_save_register_item(unique_tag, 0, lmc1992->si);
+	state_save_register_item(unique_tag, 0, lmc1992->input);
+	state_save_register_item(unique_tag, 0, lmc1992->bass);
+	state_save_register_item(unique_tag, 0, lmc1992->treble);
+	state_save_register_item(unique_tag, 0, lmc1992->volume);
+	state_save_register_item(unique_tag, 0, lmc1992->fader_rf);
+	state_save_register_item(unique_tag, 0, lmc1992->fader_lf);
+	state_save_register_item(unique_tag, 0, lmc1992->fader_rr);
+	state_save_register_item(unique_tag, 0, lmc1992->fader_lr);
+}
+
+static DEVICE_SET_INFO( lmc1992 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+DEVICE_GET_INFO( lmc1992 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(lmc1992_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(lmc1992); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(lmc1992);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "LMC1992";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "LMC1992";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
+	}
 }

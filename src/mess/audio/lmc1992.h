@@ -26,7 +26,11 @@
 
 #include "driver.h"
 
-typedef struct
+#define LMC1992		DEVICE_GET_INFO_NAME(lmc1992)
+
+/* interface */
+typedef struct _lmc1992_interface lmc1992_interface;
+struct _lmc1992_interface
 {
 	int dummy;
 	// left input 1
@@ -37,7 +41,8 @@ typedef struct
 	// right input 2
 	// right input 3
 	// right input 4
-} lmc1992_interface;
+};
+#define LMC1992_INTERFACE(name) const lmc1992_interface(name) =
 
 enum
 {
@@ -62,10 +67,10 @@ enum
 
 #define LMC1992_MICROWIRE_DEVICE_ADDRESS	2
 
-void lmc1992_clock_w(int level);
-void lmc1992_data_w(int level);
-void lmc1992_enable_w(int level);
+DEVICE_GET_INFO(lmc1992);
 
-void lmc1992_config(const lmc1992_interface *intf);
+void lmc1992_clock_w(const device_config *device, int level);
+void lmc1992_data_w(const device_config *device, int level);
+void lmc1992_enable_w(const device_config *device, int level);
 
 #endif

@@ -657,13 +657,15 @@ static struct MICROWIRE
 
 static emu_timer *microwire_timer;
 
-static void atariste_microwire_shift(void)
+static void atariste_microwire_shift(running_machine *machine)
 {
+	const device_config *lmc1992 = device_list_find_by_tag(machine->config->devicelist, LMC1992, LMC1992_TAG);
+
 	if (BIT(mwire.mask, 15))
 	{
-		lmc1992_data_w(BIT(mwire.data, 15));
-		lmc1992_clock_w(1);
-		lmc1992_clock_w(0);
+		lmc1992_data_w(lmc1992, BIT(mwire.data, 15));
+		lmc1992_clock_w(lmc1992, 1);
+		lmc1992_clock_w(lmc1992, 0);
 	}
 
 	// rotate mask and data left
@@ -675,20 +677,22 @@ static void atariste_microwire_shift(void)
 
 static TIMER_CALLBACK( atariste_microwire_tick )
 {
+	const device_config *lmc1992 = device_list_find_by_tag(machine->config->devicelist, LMC1992, LMC1992_TAG);
+
 	switch (mwire.shift)
 	{
 	case 0:
-		lmc1992_enable_w(0);
-		atariste_microwire_shift();
+		lmc1992_enable_w(lmc1992, 0);
+		atariste_microwire_shift(machine);
 		break;
 
 	default:
-		atariste_microwire_shift();
+		atariste_microwire_shift(machine);
 		break;
 
 	case 15:
-		atariste_microwire_shift();
-		lmc1992_enable_w(1);
+		atariste_microwire_shift(machine);
+		lmc1992_enable_w(lmc1992, 1);
 		mwire.shift = 0;
 		timer_enable(microwire_timer, 0);
 		break;
@@ -1790,6 +1794,8 @@ static MACHINE_DRIVER_START( atariste )
     MDRV_SOUND_ROUTE(0, "right", 0.50)
     MDRV_SOUND_ROUTE(1, "left", 0.50)
 */
+	MDRV_DEVICE_ADD(LMC1992_TAG, LMC1992)
+//	MDRV_DEVICE_CONFIG(atariste_lmc1992_intf)
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
