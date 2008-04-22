@@ -641,39 +641,3 @@ DEVICE_GET_INFO( pc16550d ) {
 	}
 }
 
-
-//READ8_HANDLER ( uart8250_0_r ) { return uart8250_r(0, offset); }
-//READ8_HANDLER ( uart8250_1_r ) { return uart8250_r(1, offset); }
-//READ8_HANDLER ( uart8250_2_r ) { return uart8250_r(2, offset); }
-//READ8_HANDLER ( uart8250_3_r ) { return uart8250_r(3, offset); }
-//WRITE8_HANDLER ( uart8250_0_w ) { uart8250_w(0, offset, data); }
-//WRITE8_HANDLER ( uart8250_1_w ) { uart8250_w(1, offset, data); }
-//WRITE8_HANDLER ( uart8250_2_w ) { uart8250_w(2, offset, data); }
-//WRITE8_HANDLER ( uart8250_3_w ) { uart8250_w(3, offset, data); }
-//
-//READ16_HANDLER ( uart8250_16le_0_r ) { return read16le_with_read8_handler(uart8250_0_r, machine, offset, mem_mask); }
-//READ16_HANDLER ( uart8250_16le_1_r ) { return read16le_with_read8_handler(uart8250_1_r, machine, offset, mem_mask); }
-//READ16_HANDLER ( uart8250_16le_2_r ) { return read16le_with_read8_handler(uart8250_2_r, machine, offset, mem_mask); }
-//READ16_HANDLER ( uart8250_16le_3_r ) { return read16le_with_read8_handler(uart8250_3_r, machine, offset, mem_mask); }
-//WRITE16_HANDLER ( uart8250_16le_0_w ) { write16le_with_write8_handler(uart8250_0_w, machine, offset, data, mem_mask); }
-//WRITE16_HANDLER ( uart8250_16le_1_w ) { write16le_with_write8_handler(uart8250_1_w, machine, offset, data, mem_mask); }
-//WRITE16_HANDLER ( uart8250_16le_2_w ) { write16le_with_write8_handler(uart8250_2_w, machine, offset, data, mem_mask); }
-//WRITE16_HANDLER ( uart8250_16le_3_w ) { write16le_with_write8_handler(uart8250_3_w, machine, offset, data, mem_mask); }
-//
-//READ32_HANDLER ( uart8250_32le_0_r ) { return read32le_with_read8_handler(uart8250_0_r, machine, offset, mem_mask); }
-//READ32_HANDLER ( uart8250_32le_1_r ) { return read32le_with_read8_handler(uart8250_1_r, machine, offset, mem_mask); }
-//READ32_HANDLER ( uart8250_32le_2_r ) { return read32le_with_read8_handler(uart8250_2_r, machine, offset, mem_mask); }
-//READ32_HANDLER ( uart8250_32le_3_r ) { return read32le_with_read8_handler(uart8250_3_r, machine, offset, mem_mask); }
-//WRITE32_HANDLER ( uart8250_32le_0_w ) { write32le_with_write8_handler(uart8250_0_w, machine, offset, data, mem_mask); }
-//WRITE32_HANDLER ( uart8250_32le_1_w ) { write32le_with_write8_handler(uart8250_1_w, machine, offset, data, mem_mask); }
-//WRITE32_HANDLER ( uart8250_32le_2_w ) { write32le_with_write8_handler(uart8250_2_w, machine, offset, data, mem_mask); }
-//WRITE32_HANDLER ( uart8250_32le_3_w ) { write32le_with_write8_handler(uart8250_3_w, machine, offset, data, mem_mask); }
-//
-//READ64_HANDLER ( uart8250_64be_0_r ) { return read64be_with_read8_handler(uart8250_0_r, machine, offset, mem_mask); }
-//READ64_HANDLER ( uart8250_64be_1_r ) { return read64be_with_read8_handler(uart8250_1_r, machine, offset, mem_mask); }
-//READ64_HANDLER ( uart8250_64be_2_r ) { return read64be_with_read8_handler(uart8250_2_r, machine, offset, mem_mask); }
-//READ64_HANDLER ( uart8250_64be_3_r ) { return read64be_with_read8_handler(uart8250_3_r, machine, offset, mem_mask); }
-//WRITE64_HANDLER ( uart8250_64be_0_w ) { write64be_with_write8_handler(uart8250_0_w, machine, offset, data, mem_mask); }
-//WRITE64_HANDLER ( uart8250_64be_1_w ) { write64be_with_write8_handler(uart8250_1_w, machine, offset, data, mem_mask); }
-//WRITE64_HANDLER ( uart8250_64be_2_w ) { write64be_with_write8_handler(uart8250_2_w, machine, offset, data, mem_mask); }
-//WRITE64_HANDLER ( uart8250_64be_3_w ) { write64be_with_write8_handler(uart8250_3_w, machine, offset, data, mem_mask); }
