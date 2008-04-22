@@ -50,35 +50,19 @@ MESS adaptation by R. Belmont
 
 #include "driver.h"
 #include "sound/2612intf.h"
-#include "includes/genesis.h"
+//#include "includes/genesis.h"
 #include "devices/cartslot.h"
 #include "../../mame/drivers/megadriv.h"
 #include "cpu/m68000/m68000.h"
 
-static int is_ssf2 = 0;
-static int is_redcliff = 0;
-static int is_radica = 0;
-static int is_kof99 = 0;
-static int is_soulb = 0;
-static int is_mjlovr = 0;
-static int is_squir = 0;
-static int squirrel_king_extra = 0;
-static int is_smous = 0;
-static int is_smb = 0;
-static int is_elfwor = 0;
-static int is_lionk2 = 0;
+static UINT16 squirrel_king_extra = 0;
 static UINT16 lion2_prot1_data, lion2_prot2_data;
-static int is_rx3 = 0;
-static int is_bugsl = 0;
-static int is_sbub = 0;
-static int is_smb2 = 0;
-static int is_kof98 = 0;
-static int is_kaiju = 0;
-static int is_chifi3 = 0;
-static int is_realtec = 0;
-static int realtek_bank_addr=0, realtek_bank_size=0, realtek_old_bank_addr;
-static int is_19in1 = 0;
-static int is_15in1 = 0;
+static UINT16 realtek_bank_addr=0, realtek_bank_size=0, realtek_old_bank_addr;
+
+static int genesis_last_loaded_image_length = -1;
+
+//where a fresh copy of rom is stashed for reset and banking setup
+#define VIRGIN_COPY_GEN 0xd00000
 
 static UINT8 *genesis_sram;
 static int genesis_sram_start;
@@ -86,31 +70,32 @@ static int genesis_sram_len = 0;
 static int genesis_sram_active;
 static int genesis_sram_readonly;
 
+
 static READ16_HANDLER( genesis_sram_read )
 {
-        UINT16 retval = 0;
+	UINT16 retval = 0;
 
-        offset <<= 1;
+	offset <<= 1;
 
-        if (genesis_sram_active)
-        {
-                retval |= genesis_sram[offset] << 8;
-                retval |= genesis_sram[offset ^ 1] & 0xff;
-        }
+	if (genesis_sram_active)
+	{
+		retval |= genesis_sram[offset] << 8;
+		retval |= genesis_sram[offset ^ 1] & 0xff;
+	}
 
-        return retval;
+	return retval;
 }
 
 
 static WRITE16_HANDLER( genesis_sram_write )
 {
-        offset <<= 1;
+	offset <<= 1;
 
-        if (!genesis_sram_readonly)
-        {
-                genesis_sram[offset] = data >> 8;
-                genesis_sram[offset ^ 1] = data & 0xff;
-        }
+	if (!genesis_sram_readonly)
+	{
+		genesis_sram[offset] = data >> 8;
+		genesis_sram[offset ^ 1] = data & 0xff;
+	}
 }
 
 
@@ -206,12 +191,11 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-	is_ssf2 = is_redcliff = is_radica = is_kof99 = is_soulb = is_mjlovr = is_squir = is_smous = is_elfwor = is_lionk2 = is_rx3 = is_bugsl = is_sbub = is_smb2 = is_kof98 = is_kaiju = is_chifi3 = is_realtec = is_19in1 = is_15in1 = 0;
 
 	rawROM = memory_region(REGION_CPU1);
-        ROM = rawROM /*+ 512 */;
+    ROM = rawROM /*+ 512 */;
 
-        length = image_fread(image, rawROM + 0x2000, 0x600000);
+    length = image_fread(image, rawROM + 0x2000, 0x600000);
 	logerror("image length = 0x%x\n", length);
 
 	if (genesis_isSMD(&rawROM[0x2200],(unsigned)length))	/* is this a SMD file..? */
@@ -262,203 +246,8 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	/* BIN it is, then */
 	{
 		relocate = 0x2000;
+		genesis_last_loaded_image_length = length; // this will be -1 for MD and SMD so can't map those roms to custom mappers (yet)
 
-		if (length == 0x500000 && !strncmp((char *)&ROM[0x0120+relocate], "SUPER STREET FIGHTER2", 21))
-		{
-			is_ssf2 = 1;
-		}
-		// detect the 'Romance of the Three Kingdoms - Battle of Red Cliffs' rom, already decoded from .mdx format
-		if (length == 0x200000)
-		{
-		 	static unsigned char redcliffsig[] = { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04}; // move.b  ($400004).l,d0
-		 	if (!memcmp(&ROM[0xce560+relocate],&redcliffsig[0],sizeof(redcliffsig)))
-			{
-				is_redcliff = 1;
-			}
-		}
-		// detect the Radica TV games.. these probably should be a seperate driver since they are a seperate 'console'
-		if (length == 0x400000)
-		{
-		 	static unsigned char radicasig[] = { 0xd0, 0x30, 0x39, 0x00, 0xa1, 0x30}; // jmp (a0) move.w ($a130xx),d0
-
-		 	if (!memcmp(&ROM[0x3c031d+relocate],&radicasig[0],sizeof(radicasig))) // ssf+gng
-			{
-				is_radica = 1;
-			}
-		 	if (!memcmp(&ROM[0x3f031d+relocate],&radicasig[0],sizeof(radicasig))) // 6in1 vol 1
-			{
-				is_radica = 1;
-			}
-
-		}
-
-		// detect the King of Fighters '99 unlicensed game
-		if (length == 0x300000)
-		{
-		 	static unsigned char kof99sig[] = { 0x20, 0x3c, 0x30, 0x00, 0x00, 0xa1}; // move.l  #$300000A1,d0
-
-		 	if (!memcmp(&ROM[0x1fd0d2+relocate],&kof99sig[0],sizeof(kof99sig)))
-			{
-				is_kof99 = 1;
-			}
-		}
-
-		// detect the Soul Blade unlicensed game
-		if (length == 0x400000)
-		{
-		 	static unsigned char soulbsig[] = { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff}; // move.w  #$C,($FF020A).l (what happens if check fails)
-
-		 	if (!memcmp(&ROM[0x028460+relocate],&soulbsig[0],sizeof(soulbsig)))
-			{
-				is_soulb = 1;
-			}
-		}
-
-		// detect Mahjong Lover unlicensed game
-		if (length == 0x100000)
-		{
-		 	static unsigned char mjlovrsig[] = { 0x13, 0xf9, 0x00, 0x40, 0x00, 0x00}; // move.b  ($400000).l,($FFFF0C).l (partial)
-
-		 	if (!memcmp(&ROM[0x01b24+relocate],&mjlovrsig[0],sizeof(mjlovrsig)))
-			{
-				is_mjlovr = 1;
-			}
-		}
-		// detect Squirrel King unlicensed game
-		if (length == 0x100000)
-		{
-		 	static unsigned char squirsig[] = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xfa};
-
-		 	if (!memcmp(&ROM[0x03b4+relocate],&squirsig[0],sizeof(squirsig)))
-			{
-				is_squir = 1;
-			}
-		}
-		if (length == 0x80000)
-		{
-		 	static unsigned char smoussig[] = { 0x4d, 0xf9, 0x00, 0x40, 0x00, 0x02};
-
-		 	if (!memcmp(&ROM[0x08c8+relocate],&smoussig[0],sizeof(smoussig)))
-			{
-				is_smous = 1;
-			}
-		}
-		if (length >= 0x200000)
-		{
-			static unsigned char smb2sig[] = { 0x4e, 0xb9, 0x00, 0x0f, 0x25, 0x84};
-
-			if (!memcmp(&ROM[0xf24d6+relocate],&smb2sig[0],sizeof(smb2sig)))
-			{
-				is_smb2 = 1;
-			}
-		}
-		if (length >= 0x200000)
-		{
-			static unsigned char smb2sig[] = { 0x4e, 0xb9, 0x00, 0x0f, 0x25, 0x84};
-
-			if (!memcmp(&ROM[0xf24d6+relocate],&smb2sig[0],sizeof(smb2sig)))
-			{
-				is_smb2 = 1;
-			}
-		}
-
-		if (length == 0x200000)
-		{
-			static unsigned char kaijusig[] = { 0x19, 0x7c, 0x00, 0x01, 0x00, 0x00};
-
-			if (!memcmp(&ROM[0x674e + relocate],&kaijusig[0],sizeof(kaijusig)))
-			{
-				is_kaiju = 1;
-			}
-		}
-
-		if (length == 0x200000)
-		{
-			static unsigned char chifi3sig[] = { 0xb6, 0x16, 0x66, 0x00, 0x00, 0x4a};
-
-			if (!memcmp(&ROM[0x1780 + relocate],&chifi3sig[0],sizeof(chifi3sig)))
-			{
-				is_chifi3 = 1;
-			}
-		}
-
-
-		if (length == 0x200000)
-		{
-			static unsigned char lionk2sig[] = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xf4};
-
-			if (!memcmp(&ROM[0x03c2+relocate],&lionk2sig[0],sizeof(lionk2sig)))
-			{
-				is_lionk2 = 1;
-			}
-		}
-
-		if (length == 0x100000)
-		{
-			static unsigned char bugslsig[] = { 0x20, 0x12, 0x13, 0xc0, 0x00, 0xff};
-
-			if (!memcmp(&ROM[0xee0d0+relocate],&bugslsig[0],sizeof(bugslsig)))
-			{
-				is_bugsl = 1;
-			}
-		}
-
-		if (length == 0x100000 && !strncmp((char *)&ROM[0x0172+relocate], "GAME : ELF WOR", 14))
-		{
-			is_elfwor = 1;
-		}
-		if (length == 0x200000)
-		{
-			static unsigned char rx3sig[] = { 0x66, 0x00, 0x00, 0x0e, 0x30, 0x3c};
-			if (!memcmp(&ROM[0xc8b90+relocate],&rx3sig[0],sizeof(rx3sig)))
-			{
-				is_rx3 = 1;
-			}
-		}
-		if (length == 0x100000)
-		{
-			static unsigned char sbubsig[] = { 0x0c, 0x39, 0x00, 0x55, 0x00, 0x40}; // 	cmpi.b  #$55,($400000).l
-			if (!memcmp(&ROM[0x123e4+relocate],&sbubsig[0],sizeof(sbubsig)))
-			{
-				is_sbub = 1;
-			}
-		}
-		if (length == 0x200000)
-		{
-			static unsigned char kof98sig[] = { 0x9b, 0xfc, 0x00, 0x00, 0x4a, 0x00};
-			if (!memcmp(&ROM[0x56ae2+relocate],&kof98sig[0],sizeof(kof98sig)))
-			{
-				is_kof98 = 1;
-			}
-		}
-		if (length == 0x80000) {
-			if (!strncmp((char *)&ROM[0x7e30e + relocate],"SEGA",4)) is_realtec = 1; // Whac a Critter/mallet legend
-			if (!strncmp((char *)&ROM[0x7e100 + relocate],"SEGA",4)) is_realtec = 1; // Defend the Earth
-			if (!strncmp((char *)&ROM[0x7e1e6 + relocate],"SEGA",4)) is_realtec = 1; // Funnyworld/ballonboy
-		}
-		// detect 'Super 19 in 1'
-		if (length == 0x400000)
-		{
-		 	static unsigned char s19in1sig[] = { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38};
-
-		 	if (!memcmp(&ROM[0x1e700+relocate],&s19in1sig[0],sizeof(s19in1sig))) // super19in1
-			{
-				is_19in1 = 1;
-			}
-
-		}
-		// detect 'Super 15 in 1'
-		if (length == 0x200000)
-		{
-		 	static unsigned char s15in1sig[] = { 0x22, 0x3c, 0x00, 0xa1, 0x30, 0x00};
-
-		 	if (!memcmp(&ROM[0x17bb2+relocate],&s15in1sig[0],sizeof(s15in1sig))) // super15in1
-			{
-				is_15in1 = 1;
-			}
-		}
-
-	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
 
@@ -474,110 +263,32 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		ROM[ptr + 1] = ROM[relocate + ptr + 1];
 #endif
 	}
-
-	if (is_ssf2)
-	{
-		memcpy(&ROM[0x800000],&ROM[0x400000],0x100000);
-		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000);
-	}
-	if (is_19in1) {
-		UINT8 *ROM = memory_region(REGION_CPU1);
-		memcpy(&ROM[0x400000],&ROM[0x000000],0x400000); // allow hard reset to menu
-	}
-	if (is_15in1) {
-		UINT8 *ROM = memory_region(REGION_CPU1);
-		memcpy(&ROM[0x400000],&ROM[0x000000],0x200000); // allow hard reset to menu
-	}
-
-	if (is_realtec)
-	{
-		UINT32 mirroraddr;
-		/* Realtec mapper!*/
-		UINT8 *ROM = memory_region(REGION_CPU1);
-		memcpy(&ROM[0x400000],&ROM[0x000000],0x80000);
-		for (mirroraddr = 0; mirroraddr < 0x400000;mirroraddr+=0x2000) {
-			memcpy(ROM+mirroraddr, ROM +  0x47e000, 0x002000); /* copy last 8kb across the whole rom region */
-		}
-	}
-
-	if (is_kaiju)
-	{
-		memcpy(&ROM[0x400000],&ROM[0x000000],0x200000);
-		memcpy(&ROM[0x600000],&ROM[0x000000],0x200000);
-	}
-
-	if (is_radica)
-	{
-		memcpy(&ROM[0x400000], &ROM[0], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
-		memcpy(&ROM[0x800000], &ROM[0], 0x400000); // wraparound banking (from hazemd code)
-	}
-	if (is_chifi3)
-	{
-		memcpy(ROM + 0x400000, ROM + 0x000000, 0x200000);
-		memcpy(ROM + 0x600000, ROM + 0x000000, 0x200000);
-	}
-
-
-        /* check if cart has battery save */
-	genesis_sram_len = 0;
-	genesis_sram = NULL;
-	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
-	{
-		genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
-		genesis_sram_len = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
-	}
-
-	if (genesis_sram_start != genesis_sram_len)
-	{
-                if (genesis_sram_start & 1)
-                        genesis_sram_start -= 1;
-                if (!(genesis_sram_len & 1))
-                        genesis_sram_len += 1;
-		genesis_sram_len -= (genesis_sram_start - 1);
-		genesis_sram = auto_malloc (genesis_sram_len);
-		memset(genesis_sram, 0, genesis_sram_len);
-		image_battery_load(image_from_devtype_and_index(IO_CARTSLOT,0), genesis_sram, genesis_sram_len);
-
-                if (length - 0x200 < genesis_sram_start)
-		{
-                        genesis_sram_active = 1;
-		}
-
-                memory_install_read16_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, (genesis_sram_start + genesis_sram_len - 1) & 0x3fffff, 0, 0, genesis_sram_read);
-
-                memory_install_write16_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, (genesis_sram_start + genesis_sram_len - 1) & 0x3fffff, 0, 0, genesis_sram_write);
-                memory_install_write16_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
-	}
+	memcpy(&ROM[VIRGIN_COPY_GEN],&ROM[0x000000],0x500000);  // store a copy of data for MACHINE_RESET processing
 
 	return INIT_PASS;
-
+	}
 bad:
 	return INIT_FAIL;
 }
-
 /* we don't use the bios rom (its not needed and only provides security on early models) */
 
 ROM_START(genesis)
-//	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
-	ROM_REGION(0x0a00000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(gensvp)
-//	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
-	ROM_REGION(0x0a00000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(megadriv)
-//	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
-	ROM_REGION(0x0a00000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(megadrij)
-//	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
-	ROM_REGION(0x0a00000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION(0x1415000, REGION_CPU1, ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
@@ -654,13 +365,13 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	}
 }
 
-WRITE16_HANDLER( realtec_402000_w )
+static WRITE16_HANDLER( realtec_402000_w )
 {
 	realtek_bank_addr = 0;
 	realtek_bank_size = (data>>8)&0x1f;
 }
 
-WRITE16_HANDLER( realtec_400000_w )
+static WRITE16_HANDLER( realtec_400000_w )
 {
 	int bankdata = (data >> 9) & 0x7;
 
@@ -673,7 +384,7 @@ WRITE16_HANDLER( realtec_400000_w )
 	memcpy(ROM+ realtek_bank_size*0x20000, ROM +  (realtek_bank_addr*0x20000)+0x400000, realtek_bank_size*0x20000);
 }
 
-WRITE16_HANDLER( realtec_404000_w )
+static WRITE16_HANDLER( realtec_404000_w )
 {
 	int bankdata = (data >> 8) & 0x3;
 	UINT8 *ROM = memory_region(REGION_CPU1);
@@ -688,7 +399,7 @@ WRITE16_HANDLER( realtec_404000_w )
 	}
 }
 
-WRITE16_HANDLER( g_chifi3_bank_w )
+static WRITE16_HANDLER( g_chifi3_bank_w )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 
@@ -731,7 +442,7 @@ WRITE16_HANDLER( g_chifi3_bank_w )
 
 }
 
-READ16_HANDLER( g_chifi3_prot_r )
+static READ16_HANDLER( g_chifi3_prot_r )
 {
 	UINT32 retdat;
 
@@ -803,41 +514,41 @@ static WRITE16_HANDLER( g_kaiju_bank_w )
 }
 
 // Soulblade handler from HazeMD
-READ16_HANDLER( soulb_0x400006_r )
+static READ16_HANDLER( soulb_0x400006_r )
 {
 	return 0xf000;
 }
 
-READ16_HANDLER( soulb_0x400002_r )
+static READ16_HANDLER( soulb_0x400002_r )
 {
 	return 0x9800;
 }
 
-READ16_HANDLER( soulb_0x400004_r )
+static READ16_HANDLER( soulb_0x400004_r )
 {
 	return 0xc900;
 }
 
 // Mahjong Lover handler from HazeMD
-READ16_HANDLER( mjlovr_prot_1_r )
+static READ16_HANDLER( mjlovr_prot_1_r )
 {
 	return 0x9000;
 }
 
-READ16_HANDLER( mjlovr_prot_2_r )
+static READ16_HANDLER( mjlovr_prot_2_r )
 {
 	return 0xd300;
 }
 
 // Super Mario Bros handler from HazeMD
-READ16_HANDLER( smbro_prot_r )
+static READ16_HANDLER( smbro_prot_r )
 {
 	return 0xc;
 }
 
 
 // Smart Mouse handler from HazeMD
-READ16_HANDLER( smous_prot_r )
+static READ16_HANDLER( smous_prot_r )
 {
 	switch (offset)
 	{
@@ -851,30 +562,30 @@ READ16_HANDLER( smous_prot_r )
 }
 
 // Super Bubble Bobble MD handler from HazeMD
-READ16_HANDLER( sbub_extra1_r )
+static READ16_HANDLER( sbub_extra1_r )
 {
 	return 0x5500;
 }
 
-READ16_HANDLER( sbub_extra2_r )
+static READ16_HANDLER( sbub_extra2_r )
 {
 	return 0x0f00;
 }
 
 // KOF99 handler from HazeMD
-READ16_HANDLER( kof99_0xA13002_r )
+static READ16_HANDLER( kof99_0xA13002_r )
 {
 	// write 02 to a13002.. shift right 1?
 	return 0x01;
 }
 
-READ16_HANDLER( kof99_00A1303E_r )
+static READ16_HANDLER( kof99_00A1303E_r )
 {
 	// write 3e to a1303e.. shift right 1?
 	return 0x1f;
 }
 
-READ16_HANDLER( kof99_0xA13000_r )
+static READ16_HANDLER( kof99_0xA13000_r )
 {
 	// no write, startup check, chinese message if != 0
 	return 0x0;
@@ -882,7 +593,7 @@ READ16_HANDLER( kof99_0xA13000_r )
 
 // Radica handler from HazeMD
 
-READ16_HANDLER( radica_bank_select )
+static READ16_HANDLER( radica_bank_select )
 {
 	int bank = offset&0x3f;
 	UINT8 *ROM = memory_region(REGION_CPU1);
@@ -892,99 +603,99 @@ READ16_HANDLER( radica_bank_select )
 
 // ROTK Red Cliff handler from HazeMD
 
-READ16_HANDLER( redclif_prot_r )
+static READ16_HANDLER( redclif_prot_r )
 {
 	return -0x56 << 8;
 }
 
-READ16_HANDLER( redclif_prot2_r )
+static READ16_HANDLER( redclif_prot2_r )
 {
 	return 0x55 << 8;
 }
 
 // Squirrel King handler from HazeMD, this does not give screen garbage like HazeMD compile If you reset it twice
-READ16_HANDLER( squirrel_king_extra_r )
+static READ16_HANDLER( squirrel_king_extra_r )
 {
 	return squirrel_king_extra;
 
 }
-WRITE16_HANDLER( squirrel_king_extra_w )
+static WRITE16_HANDLER( squirrel_king_extra_w )
 {
 	squirrel_king_extra = data;
 }
 
 // Lion King 2 handler from HazeMD
-READ16_HANDLER( lion2_prot1_r )
+static READ16_HANDLER( lion2_prot1_r )
 {
 	return lion2_prot1_data;
 }
 
-READ16_HANDLER( lion2_prot2_r )
+static READ16_HANDLER( lion2_prot2_r )
 {
 	return lion2_prot2_data;
 }
 
-WRITE16_HANDLER ( lion2_prot1_w )
+static WRITE16_HANDLER ( lion2_prot1_w )
 {
 	lion2_prot1_data = data;
 }
 
-WRITE16_HANDLER ( lion2_prot2_w )
+static WRITE16_HANDLER ( lion2_prot2_w )
 {
 	lion2_prot2_data = data;
 }
 
 // Rockman X3 handler from HazeMD
-READ16_HANDLER( rx3_extra_r )
+static READ16_HANDLER( rx3_extra_r )
 {
 	return 0xc;
 }
 
 // King of Fighters 98 handler from HazeMD
-READ16_HANDLER( g_kof98_aa_r )
+static READ16_HANDLER( g_kof98_aa_r )
 {
 	return 0xaa00;
 }
 
-READ16_HANDLER( g_kof98_0a_r )
+static READ16_HANDLER( g_kof98_0a_r )
 {
 	return 0x0a00;
 }
 
-READ16_HANDLER( g_kof98_00_r )
+static READ16_HANDLER( g_kof98_00_r )
 {
 	return 0x0000;
 }
 
 // Super Mario Bros 2 handler from HazeMD
-READ16_HANDLER( smb2_extra_r )
+static READ16_HANDLER( smb2_extra_r )
 {
 	return 0xa;
 }
 
 // Bug's Life handler from HazeMD
-READ16_HANDLER( bugl_extra_r )
+static READ16_HANDLER( bugl_extra_r )
 {
 	return 0x28;
 }
 
 // Elf Wor handler from HazeMD (DFJustin says the title is 'Linghuan Daoshi Super Magician')
-READ16_HANDLER( elfwor_0x400000_r )
+static READ16_HANDLER( elfwor_0x400000_r )
 {
 	return 0x5500;
 }
 
-READ16_HANDLER( elfwor_0x400002_r )
+static READ16_HANDLER( elfwor_0x400002_r )
 {
 	return 0x0f00;
 }
 
-READ16_HANDLER( elfwor_0x400004_r )
+static READ16_HANDLER( elfwor_0x400004_r )
 {
 	return 0xc900;
 }
 
-READ16_HANDLER( elfwor_0x400006_r )
+static READ16_HANDLER( elfwor_0x400006_r )
 {
 	return 0x1800;
 }
@@ -1002,134 +713,9 @@ static DRIVER_INIT( gencommon )
 {
 	if (genesis_sram)
 	{
-                add_exit_callback(machine, genesis_machine_stop);
+		add_exit_callback(machine, genesis_machine_stop);
 	}
 
-	if (is_ssf2)
-	{
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, genesis_ssf2_bank_w);
-	}
-	if (is_kaiju)
-	{
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x7fffff, 0, 0, g_kaiju_bank_w );
-	}
-	if (is_chifi3)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x4fffff, 0, 0, g_chifi3_prot_r );
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000, 0x6fffff, 0, 0, g_chifi3_bank_w );
-
-	}
-
-	if (is_radica)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa1307f, 0, 0, radica_bank_select );
-	}
-
-	if (is_kof99) {
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, kof99_0xA13000_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13002, 0xA13003, 0, 0, kof99_0xA13002_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA1303e, 0xA1303f, 0, 0, kof99_00A1303E_r );
-	}
-
-	if (is_soulb) {
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, soulb_0x400006_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, soulb_0x400002_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, soulb_0x400004_r );
-	}
-
-	if (is_redcliff)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, redclif_prot2_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r );
-	}
-
-	if (is_mjlovr)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, mjlovr_prot_1_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x401000, 0x401001, 0, 0, mjlovr_prot_2_r );
-	}
-
-	if (is_squir)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
-	}
-	if (is_smous)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, smous_prot_r );
-	}
-	if (is_smb)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13001, 0, 0, smbro_prot_r );
-	}
-	if (is_smb2)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, smb2_extra_r);
-	}
-	if (is_19in1)
-	{
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13039, 0, 0, s19in1_bank);
-	}
-	if (is_15in1)
-	{
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13039, 0, 0, s19in1_bank);
-	}
-	if (is_realtec)
-	{
-		realtek_old_bank_addr = -1;
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, realtec_400000_w);
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x402000, 0x402001, 0, 0, realtec_402000_w);
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x404000, 0x404001, 0, 0, realtec_404000_w);
-	}
-
-	if (is_kof98)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x480000, 0x480001, 0, 0, g_kof98_aa_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800e0, 0x4800e1, 0, 0, g_kof98_aa_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4824a0, 0x4824a1, 0, 0, g_kof98_aa_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x488880, 0x488881, 0, 0, g_kof98_aa_r );
-
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a8820, 0x4a8821, 0, 0, g_kof98_0a_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f8820, 0x4f8821, 0, 0, g_kof98_00_r );
-	}
-
-	if (is_elfwor)
-	{
-	/*
-	Elf Wor (Unl) - return (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006). It is probably best to add handlers for all 4 addresses.
-	*/
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, elfwor_0x400000_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, elfwor_0x400004_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, elfwor_0x400002_r );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, elfwor_0x400006_r );
-	}
-
-	if (is_lionk2)
-	{
-		memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, lion2_prot1_w );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, lion2_prot1_r );
-		memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, lion2_prot2_w );
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, lion2_prot2_r );
-	}
-
-	if (is_rx3)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, rx3_extra_r);
-	}
-
-	if (is_bugsl)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, bugl_extra_r);
-	}
-
-	if (is_sbub)
-	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, sbub_extra1_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, sbub_extra2_r);
-}
-
-	/* install NOP handler for TMSS */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
 
 }
 
@@ -1151,14 +737,323 @@ static DRIVER_INIT( genjpn )
 	DRIVER_INIT_CALL(megadrij);
 }
 
+// only looks for == in the compare for LSB systems
+static int allendianmemcmp(const void *s1, const void *s2, size_t n)
+{
+unsigned char *realbuf;
+
+#ifdef LSB_FIRST
+unsigned char flippedbuf[64];
+unsigned int i;
+
+if ((n & 1) || (n > 63)) return -1 ; // don't want odd sized buffers or too large a compare
+for (i = 0; i < n; i++) flippedbuf[i] = *((char *)s2 + (i ^ 1));
+realbuf = flippedbuf;
+
+#else
+
+realbuf = s2;
+
+#endif
+return memcmp(s1,realbuf,n);
+}
+
+void setup_megadriv_custom_mappers(running_machine *machine)
+{
+	static int relocate = VIRGIN_COPY_GEN;
+	unsigned char *ROM;
+	UINT32 mirroraddr;
+
+	ROM = memory_region(REGION_CPU1);
+
+	if (genesis_last_loaded_image_length == 0x500000 && !allendianmemcmp((char *)&ROM[0x0120+relocate], "SUPER STREET FIGHTER2 ", 22))
+	{
+		memcpy(&ROM[0x800000],&ROM[VIRGIN_COPY_GEN+0x400000],0x100000);
+		memcpy(&ROM[0x400000],&ROM[VIRGIN_COPY_GEN],0x400000);
+		memcpy(&ROM[0x000000],&ROM[VIRGIN_COPY_GEN],0x400000);
+		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, genesis_ssf2_bank_w);
+	}
+	/* detect the 'Romance of the Three Kingdoms - Battle of Red Cliffs' rom, already decoded from .mdx format */
+	if (genesis_last_loaded_image_length == 0x200000)
+	{
+		static unsigned char redcliffsig[] = { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04}; // move.b  ($400004).l,d0
+		if (!allendianmemcmp(&ROM[0xce560+relocate],&redcliffsig[0],sizeof(redcliffsig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, redclif_prot2_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r );
+		}
+	}
+	/* detect the Radica TV games.. these probably should be a seperate driver since they are a seperate 'console' */
+	if (genesis_last_loaded_image_length == 0x400000)
+	{
+		static unsigned char radicasig[] = { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1}; // jmp (a0) move.w ($a130xx),d0
+
+		if (!allendianmemcmp(&ROM[0x3c031c+relocate],&radicasig[0],sizeof(radicasig)) ||
+		    !allendianmemcmp(&ROM[0x3f031c+relocate],&radicasig[0],sizeof(radicasig))) // ssf+gng + radica vol1
+		{
+			memcpy(&ROM[0x400000],&ROM[VIRGIN_COPY_GEN],0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
+			memcpy(&ROM[0x800000],&ROM[VIRGIN_COPY_GEN],0x400000); // wraparound banking (from hazemd code)
+			memcpy(&ROM[0x000000],&ROM[VIRGIN_COPY_GEN],0x400000);
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa1307f, 0, 0, radica_bank_select );
+		}
+
+	}
+
+	// detect the King of Fighters '99 unlicensed game
+	if (genesis_last_loaded_image_length == 0x300000)
+	{
+		static unsigned char kof99sig[] = { 0x20, 0x3c, 0x30, 0x00, 0x00, 0xa1}; // move.l  #$300000A1,d0
+
+		if (!allendianmemcmp(&ROM[0x1fd0d2+relocate],&kof99sig[0],sizeof(kof99sig)))
+		{
+			//memcpy(&ROM[0x000000],&ROM[VIRGIN_COPY_GEN],0x300000);
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, kof99_0xA13000_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13002, 0xA13003, 0, 0, kof99_0xA13002_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA1303e, 0xA1303f, 0, 0, kof99_00A1303E_r );
+		}
+	}
+
+	// detect the Soul Blade unlicensed game
+	if (genesis_last_loaded_image_length == 0x400000)
+	{
+		static unsigned char soulbsig[] = { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff}; // move.w  #$C,($FF020A).l (what happens if check fails)
+
+		if (!allendianmemcmp(&ROM[0x028460+relocate],&soulbsig[0],sizeof(soulbsig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, soulb_0x400006_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, soulb_0x400002_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, soulb_0x400004_r );
+		}
+	}
+
+	// detect Mahjong Lover unlicensed game
+	if (genesis_last_loaded_image_length == 0x100000)
+	{
+		static unsigned char mjlovrsig[] = { 0x13, 0xf9, 0x00, 0x40, 0x00, 0x00}; // move.b  ($400000).l,($FFFF0C).l (partial)
+
+		if (!allendianmemcmp(&ROM[0x01b24+relocate],&mjlovrsig[0],sizeof(mjlovrsig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, mjlovr_prot_1_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x401000, 0x401001, 0, 0, mjlovr_prot_2_r );
+		}
+	}
+	// detect Squirrel King unlicensed game
+	if (genesis_last_loaded_image_length == 0x100000)
+	{
+		static unsigned char squirsig[] = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xfa};
+
+		if (!allendianmemcmp(&ROM[0x03b4+relocate],&squirsig[0],sizeof(squirsig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
+		}
+	}
+	if (genesis_last_loaded_image_length == 0x80000)
+	{
+		static unsigned char smoussig[] = { 0x4d, 0xf9, 0x00, 0x40, 0x00, 0x02};
+
+		if (!allendianmemcmp(&ROM[0x08c8+relocate],&smoussig[0],sizeof(smoussig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, smous_prot_r );
+		}
+	}
+	if (genesis_last_loaded_image_length >= 0x200000)
+	{
+		static unsigned char smbsig[] = { 0x20, 0x4d, 0x41, 0x52, 0x49, 0x4f};
+
+		if (!allendianmemcmp(&ROM[0xc8cb0+relocate],&smbsig[0],sizeof(smbsig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, smbro_prot_r );
+		}
+	}
+	if (genesis_last_loaded_image_length >= 0x200000)
+	{
+		static unsigned char smb2sig[] = { 0x4e, 0xb9, 0x00, 0x0f, 0x25, 0x84};
+
+		if (!allendianmemcmp(&ROM[0xf24d6+relocate],&smb2sig[0],sizeof(smb2sig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, smb2_extra_r);
+		}
+	}
+	if (genesis_last_loaded_image_length == 0x200000)
+	{
+		static unsigned char kaijusig[] = { 0x19, 0x7c, 0x00, 0x01, 0x00, 0x00};
+
+		if (!allendianmemcmp(&ROM[0x674e + relocate],&kaijusig[0],sizeof(kaijusig)))
+		{
+			memcpy(&ROM[0x400000],&ROM[VIRGIN_COPY_GEN],0x200000);
+			memcpy(&ROM[0x600000],&ROM[VIRGIN_COPY_GEN],0x200000);
+			memcpy(&ROM[0x000000],&ROM[VIRGIN_COPY_GEN],0x200000);
+
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x7fffff, 0, 0, g_kaiju_bank_w );
+		}
+	}
+
+	if (genesis_last_loaded_image_length == 0x200000)
+	{
+		static unsigned char chifi3sig[] = { 0xb6, 0x16, 0x66, 0x00, 0x00, 0x4a};
+
+		if (!allendianmemcmp(&ROM[0x1780 + relocate],&chifi3sig[0],sizeof(chifi3sig)))
+		{
+			memcpy(&ROM[0x400000],&ROM[VIRGIN_COPY_GEN],0x200000);
+			memcpy(&ROM[0x600000],&ROM[VIRGIN_COPY_GEN],0x200000);
+			memcpy(&ROM[0x000000],&ROM[VIRGIN_COPY_GEN],0x200000);
+
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x4fffff, 0, 0, g_chifi3_prot_r );
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000, 0x6fffff, 0, 0, g_chifi3_bank_w );
+		}
+	}
+
+
+	if (genesis_last_loaded_image_length == 0x200000)
+	{
+		static unsigned char lionk2sig[] = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xf4};
+
+		if (!allendianmemcmp(&ROM[0x03c2+relocate],&lionk2sig[0],sizeof(lionk2sig)))
+		{
+			memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, lion2_prot1_w );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, lion2_prot1_r );
+			memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, lion2_prot2_w );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, lion2_prot2_r );
+		}
+	}
+
+	if (genesis_last_loaded_image_length == 0x100000)
+	{
+		static unsigned char bugslsig[] = { 0x20, 0x12, 0x13, 0xc0, 0x00, 0xff};
+
+		if (!allendianmemcmp(&ROM[0xee0d0+relocate],&bugslsig[0],sizeof(bugslsig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, bugl_extra_r);
+		}
+	}
+
+	if (genesis_last_loaded_image_length == 0x100000 && !allendianmemcmp((char *)&ROM[0x0172+relocate], "GAME : ELF WOR", 14))
+	{
+	/*
+	Elf Wor (Unl) - return (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006). It is probably best to add handlers for all 4 addresses.
+	*/
+		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, elfwor_0x400000_r );
+		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, elfwor_0x400004_r );
+		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, elfwor_0x400002_r );
+		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, elfwor_0x400006_r );
+	}
+	if (genesis_last_loaded_image_length == 0x200000)
+	{
+		static unsigned char rx3sig[] = { 0x66, 0x00, 0x00, 0x0e, 0x30, 0x3c};
+		if (!allendianmemcmp(&ROM[0xc8b90+relocate],&rx3sig[0],sizeof(rx3sig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13001, 0, 0, rx3_extra_r);
+		}
+	}
+	if (genesis_last_loaded_image_length == 0x100000)
+	{
+		static unsigned char sbubsig[] = { 0x0c, 0x39, 0x00, 0x55, 0x00, 0x40}; // 	cmpi.b  #$55,($400000).l
+		if (!allendianmemcmp(&ROM[0x123e4+relocate],&sbubsig[0],sizeof(sbubsig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, sbub_extra1_r);
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, sbub_extra2_r);
+		}
+	}
+	if (genesis_last_loaded_image_length == 0x200000)
+	{
+		static unsigned char kof98sig[] = { 0x9b, 0xfc, 0x00, 0x00, 0x4a, 0x00};
+		if (!allendianmemcmp(&ROM[0x56ae2+relocate],&kof98sig[0],sizeof(kof98sig)))
+		{
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x480000, 0x480001, 0, 0, g_kof98_aa_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800e0, 0x4800e1, 0, 0, g_kof98_aa_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4824a0, 0x4824a1, 0, 0, g_kof98_aa_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x488880, 0x488881, 0, 0, g_kof98_aa_r );
+
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a8820, 0x4a8821, 0, 0, g_kof98_0a_r );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f8820, 0x4f8821, 0, 0, g_kof98_00_r );
+		}
+	}
+	if (genesis_last_loaded_image_length == 0x80000)
+	{
+		if (!allendianmemcmp((char *)&ROM[0x7e30e + relocate],"SEGA",4) ||
+		    !allendianmemcmp((char *)&ROM[0x7e100 + relocate],"SEGA",4) ||
+		    !allendianmemcmp((char *)&ROM[0x7e1e6 + relocate],"SEGA",4))  { // Whac a Critter/mallet legend, Defend the Earth, Funnyworld/ballonboy
+				realtek_old_bank_addr = -1;
+				/* Realtec mapper!*/
+				memcpy(&ROM[0x400000],&ROM[relocate],0x80000);
+				for (mirroraddr = 0; mirroraddr < 0x400000;mirroraddr+=0x2000) {
+					memcpy(ROM+mirroraddr, ROM +  relocate + 0x7e000, 0x002000); /* copy last 8kb across the whole rom region */
+				}
+
+				memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, realtec_400000_w);
+				memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x402000, 0x402001, 0, 0, realtec_402000_w);
+				memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x404000, 0x404001, 0, 0, realtec_404000_w);
+			}
+	}
+	// detect 'Super 19 in 1'
+	if (genesis_last_loaded_image_length == 0x400000)
+	{
+		static unsigned char s19in1sig[] = { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38};
+
+		if (!allendianmemcmp(&ROM[0x1e700+relocate],&s19in1sig[0],sizeof(s19in1sig))) // super19in1
+		{
+			memcpy(&ROM[0x400000],&ROM[VIRGIN_COPY_GEN],0x400000); // allow hard reset to menu
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13039, 0, 0, s19in1_bank);
+		}
+
+	}
+	// detect 'Super 15 in 1'
+	if (genesis_last_loaded_image_length == 0x200000)
+	{
+		static unsigned char s15in1sig[] = { 0x22, 0x3c, 0x00, 0xa1, 0x30, 0x00};
+
+		if (!allendianmemcmp(&ROM[0x17bb2+relocate],&s15in1sig[0],sizeof(s15in1sig))) // super15in1
+		{
+			memcpy(&ROM[0x400000],&ROM[VIRGIN_COPY_GEN],0x200000); // allow hard reset to menu
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA13000, 0xA13039, 0, 0, s19in1_bank);
+		}
+	}
+
+        /* check if cart has battery save */
+	genesis_sram_len = 0;
+	genesis_sram = NULL;
+	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
+	{
+		genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
+		genesis_sram_len = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
+	}
+
+	if (genesis_sram_start != genesis_sram_len)
+	{
+                if (genesis_sram_start & 1)
+                        genesis_sram_start -= 1;
+                if (!(genesis_sram_len & 1))
+                        genesis_sram_len += 1;
+		genesis_sram_len -= (genesis_sram_start - 1);
+		genesis_sram = auto_malloc (genesis_sram_len);
+		memset(genesis_sram, 0, genesis_sram_len);
+		image_battery_load(image_from_devtype_and_index(IO_CARTSLOT,0), genesis_sram, genesis_sram_len);
+
+                if (genesis_last_loaded_image_length - 0x200 < genesis_sram_start)
+		{
+                        genesis_sram_active = 1;
+		}
+
+        memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, (genesis_sram_start + genesis_sram_len - 1) & 0x3fffff, 0, 0, genesis_sram_read);
+        memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, (genesis_sram_start + genesis_sram_len - 1) & 0x3fffff, 0, 0, genesis_sram_write);
+        memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
+	}
+
+
+	/* install NOP handler for TMSS */
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
+}
+
+
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     INIT   CONFIG   COMPANY   FULLNAME */
-CONS( 1989, genesis,  0,		0,	megadriv,  megadri6, genusa,	genesis, "Sega",   "Genesis (USA, NTSC)", 0)
-CONS( 1993, gensvp,   genesis,	0,	megdsvp,   megdsvp, megadsvp,	genesis, "Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
-CONS( 1990, megadriv, genesis,	0,	megadriv,  megadri6, geneur,	genesis, "Sega",   "Mega Drive (Europe, PAL)", 0)
-CONS( 1988, megadrij, genesis,	0,	megadriv,  megadri6, genjpn,	genesis, "Sega",   "Mega Drive (Japan, NTSC)", 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     INIT  		CONFIG   COMPANY   FULLNAME */
+CONS( 1989, genesis,  0,		0,      megadriv,  megadri6, genusa,	genesis, "Sega",   "Genesis (USA, NTSC)", 0)
+CONS( 1993, gensvp,   genesis,	0,      megdsvp,   megdsvp,  megadsvp,	genesis, "Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
+CONS( 1990, megadriv, genesis,	0,      megadriv,  megadri6, geneur,	genesis, "Sega",   "Mega Drive (Europe, PAL)", 0)
+CONS( 1988, megadrij, genesis,	0,      megadriv,  megadri6, genjpn,	genesis, "Sega",   "Mega Drive (Japan, NTSC)", 0)
