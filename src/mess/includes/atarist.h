@@ -17,6 +17,7 @@
 typedef struct _atarist_state atarist_state;
 struct _atarist_state
 {
+	int dummy;	/* appease compiler */
 };
 
 #endif
