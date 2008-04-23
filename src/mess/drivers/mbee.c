@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_SNAPSHOT_ADD(mbee, "mwb", 0.5)
+	MDRV_SNAPSHOT_ADD(mbee, "mwb,com", 0.5)
 	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 0)
 MACHINE_DRIVER_END
 
@@ -467,25 +467,54 @@ static SNAPSHOT_LOAD( mbee )
 	UINT16 i, j;
 	UINT8 data, sw = input_port_read(image->machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */
 
-	for (i = 0; i < snapshot_size; i++)
+	/* mwb files - standard basic files */
+
+	if ((!(strcmp(image_filetype(image),"mwb"))) || (!(strcmp(image_filetype(image),"MWB")))) 
 	{
-		j = (0x8c0 + i) & 0xffff;
+		for (i = 0; i < snapshot_size; i++)
+		{
+			j = 0x8c0 + i;
 
-		if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
+			if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
 
-		if ((j < mbee_size) || (j > 0xefff)) program_write_byte(j, data);
-	}
+			if ((j < mbee_size) || (j > 0xefff))
+				program_write_byte(j, data);
+			else
+				return INIT_FAIL;
+		}
 
-	if (sw)
-	{
-		program_write_word_16le(0xa2,0x801e);		/* fix warm-start vector to get around some copy-protections */
-		cpunum_set_reg(0, REG_PC, 0x801e);
+		if (sw)
+		{
+			program_write_word_16le(0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
+			cpunum_set_reg(0, REG_PC, 0x801e);
+		}
+		else
+			program_write_word_16le(0xa2,0x8517);
 	}
 	else
-		program_write_word_16le(0xa2,0x8517);
+
+	/* com files - most com files are just machine-language games with a wrapper and don't need cp/m to be present */
+
+	if ((!(strcmp(image_filetype(image),"com"))) || (!(strcmp(image_filetype(image),"COM")))) 
+	{
+		for (i = 0; i < snapshot_size; i++)
+		{
+			j = 0x100 + i;
+
+			if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
+
+			if ((j < mbee_size) || (j > 0xefff))
+				program_write_byte(j, data);
+			else
+				return INIT_FAIL;
+		}
+
+		if (sw) cpunum_set_reg(0, REG_PC, 0x100);
+	}
 
 	return INIT_PASS;
 }
+
 
 static void mbee_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
