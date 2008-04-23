@@ -57,7 +57,7 @@
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
 
-static SNAPSHOT_LOAD( mbee );
+static QUICKLOAD_LOAD( mbee );
 static Z80BIN_EXECUTE( mbee );
 
 static size_t mbee_size;
@@ -312,7 +312,7 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_SNAPSHOT_ADD(mbee, "mwb", 0.5)
+	MDRV_QUICKLOAD_ADD(mbee, "mwb,com", 0.5)
 	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 0)
 MACHINE_DRIVER_END
 
@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_SNAPSHOT_ADD(mbee, "mwb,com", 0.5)
+	MDRV_QUICKLOAD_ADD(mbee, "mwb,com", 0.5)
 	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 0)
 MACHINE_DRIVER_END
 
@@ -462,16 +462,15 @@ static Z80BIN_EXECUTE( mbee )
 	}
 }
 
-static SNAPSHOT_LOAD( mbee )
+static QUICKLOAD_LOAD( mbee )
 {
 	UINT16 i, j;
 	UINT8 data, sw = input_port_read(image->machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */
 
-	/* mwb files - standard basic files */
-
-	if ((!(strcmp(image_filetype(image),"mwb"))) || (!(strcmp(image_filetype(image),"MWB")))) 
+	if (!mame_stricmp(image_filetype(image), "mwb"))
 	{
-		for (i = 0; i < snapshot_size; i++)
+		/* mwb files - standard basic files */
+		for (i = 0; i < quickload_size; i++)
 		{
 			j = 0x8c0 + i;
 
@@ -491,13 +490,10 @@ static SNAPSHOT_LOAD( mbee )
 		else
 			program_write_word_16le(0xa2,0x8517);
 	}
-	else
-
-	/* com files - most com files are just machine-language games with a wrapper and don't need cp/m to be present */
-
-	if ((!(strcmp(image_filetype(image),"com"))) || (!(strcmp(image_filetype(image),"COM")))) 
+	else if (!mame_stricmp(image_filetype(image), "com"))
 	{
-		for (i = 0; i < snapshot_size; i++)
+		/* com files - most com files are just machine-language games with a wrapper and don't need cp/m to be present */
+		for (i = 0; i < quickload_size; i++)
 		{
 			j = 0x100 + i;
 
