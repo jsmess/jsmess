@@ -400,6 +400,13 @@ static void InternalSetSelectedSoftware(int drvindex, const machine_config *conf
 
 
 
+static int is_null_or_empty(const char *s)
+{
+	return (s == NULL) || (s[0] == '\0');
+}
+
+
+
 // Places the specified image in the specified slot; nID = -1 means don't matter
 static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR pszFilename)
 {
@@ -423,7 +430,8 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 		}
 	}
 
-	// still not found?  find an image using the same file extension
+	// still not found?  find an empty slot for which the device uses the
+	// same file extension
 	if (device == NULL)
 	{
 		const char *file_extension;		
@@ -436,7 +444,8 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 		{
 			for (device = image_device_first(config); device != NULL; device = image_device_next(device))
 			{
-				if (image_device_uses_file_extension(device, file_extension))
+				s = GetSelectedSoftware(drvindex, config, device);
+				if (is_null_or_empty(s) && image_device_uses_file_extension(device, file_extension))
 					break;
 			}
 		}
