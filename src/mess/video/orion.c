@@ -23,11 +23,11 @@ extern UINT8 orionpro_pseudo_color;
 
 VIDEO_UPDATE( orion128 )
 {
-	UINT8 code1,code2,color;
+	UINT8 code1,code2,code3,code4,color;
 	int y, x,b;
 	int orionproshift = (orion128_video_mode & 0x10) ? 1 : 0;
 	int part1addr = (3-((orion128_video_page & 3) | orionproshift)) * 0x4000;
-	int part2addr = (3-((orion128_video_page & 3) | orionproshift)) * 0x4000 + 0x10000;			
+	int part2addr = part1addr + 0x10000;			
 	int video_mode = orion128_video_mode & orion_video_mode_mask;
 	for (x = 0; x < orion128_video_width; x++)
 	{			
@@ -35,6 +35,8 @@ VIDEO_UPDATE( orion128 )
 		{
 			code1 = mess_ram[part1addr + y + x*256];			
 			code2 = mess_ram[part2addr + y + x*256];
+			code3 = mess_ram[part1addr + y + x*256 + 0x4000];
+			code4 = mess_ram[part2addr + y + x*256 + 0x4000];
 			if ((video_mode==14) || (video_mode==15)) {
 				code2 = orionpro_pseudo_color;
 			}
@@ -49,7 +51,20 @@ VIDEO_UPDATE( orion128 )
 					case 7 :
 					case 14 :
 					case 15 :
-							 color = ((code1 >> b) & 0x01) ? (code2 & 0x0f) : (code2 >> 4); break;						
+							 color = ((code1 >> b) & 0x01) ? (code2 & 0x0f) : (code2 >> 4); break;		
+							 
+					default:
+						switch(orion128_video_mode & orion_video_mode_mask & 20) {					
+							case 16 : 
+									 color = (((code1 >> b) & 0x01) << 2) + (((code2 >> b) & 0x01) << 1) + ((code3 >> b) & 0x01);
+									 break;							 
+							case 20 :
+									 color = (((code1 >> b) & 0x01) << 2) + (((code2 >> b) & 0x01) << 1) + ((code3 >> b) & 0x01);
+									 if ((((code1 >> b) & 0x01)==1) && (color!=0)) {
+										color += 8;
+									 }
+									 break;
+						 }								
 				}
 				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) = color;
 			}

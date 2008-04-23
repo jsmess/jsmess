@@ -379,9 +379,7 @@ static MACHINE_DRIVER_START( orionpro )
 		    
 	MDRV_VIDEO_START(orion128)
     MDRV_VIDEO_UPDATE(orion128)    
-    	  
-    MDRV_NVRAM_HANDLER( mc146818 ) 
-    	
+    	      	
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
