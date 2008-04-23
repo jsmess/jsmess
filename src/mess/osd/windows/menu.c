@@ -800,14 +800,25 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 static void build_generic_filter(const device_config *device, int is_save, char *filter, size_t filter_len)
 {
 	char *s;
-	const char *file_extensions;
 	image_device_info info = image_device_getinfo(device->machine->config, device);
 
+	// make the file extension list be comma delimited
+	s = info.file_extensions;
+	do
+	{
+		s += strlen(s);
+		if (s[1] != '\0')
+		{
+			*(s++) = ',';
+		}
+	}
+	while(*s != '\0');
+
+	// start writing the filter
 	s = filter;
 
 	// common image types
-	file_extensions = info.file_extensions;
-	s += add_filter_entry(filter, filter_len, "Common image types", file_extensions);
+	s += add_filter_entry(filter, filter_len, "Common image types", info.file_extensions);
 
 	// all files
 	s += sprintf(s, "All files (*.*)|*.*|");
