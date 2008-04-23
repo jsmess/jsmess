@@ -53,7 +53,6 @@ Todo:
 #include "devices/printer.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
-#include "ui.h"
 
 
 #define LOG_VTECH1_LATCH 0
@@ -180,13 +179,12 @@ SNAPSHOT_LOAD(vtech1)
 {
 	UINT8 i, header[24];
 	UINT16 start, end, size;
-	char * pgmname;
-	pgmname = (char *) malloc(18);
+	char pgmname[18];
 
 	/* get the header */
 	image_fread(image, &header, sizeof(header));
 	for (i = 0; i < 16; i++) pgmname[i] = header[i+4];
-	pgmname[16] = 0;
+	pgmname[16] = '\0';
 
 	/* get start and end addresses */
 	start = pick_integer_le(header, 22, 2);
@@ -196,8 +194,9 @@ SNAPSHOT_LOAD(vtech1)
 	/* check if we have enough ram */
 	if (mess_ram_size < size)
 	{
-		ui_popup_time(10,"SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
-		free(pgmname);
+		char message[256];
+		snprintf(message, ARRAY_LENGTH(message), "SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
+		image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, message);
 		return INIT_FAIL;
 	}
 
@@ -216,21 +215,18 @@ SNAPSHOT_LOAD(vtech1)
 		program_write_byte(0x78fc, end / 256);
 		program_write_byte(0x78fd, end % 256); /* start free mem, end variable table */
 		program_write_byte(0x78fe, end / 256);
-		popmessage("%s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		free(pgmname);
+		image_message(image, " %s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		break;
 
 	case VZ_MCODE:		/* 0xF1 */
 		program_write_byte(0x788e, start % 256); /* usr subroutine address */
 		program_write_byte(0x788f, start / 256);
-		popmessage("%s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		free(pgmname);
+		image_message(image, " %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		cpunum_set_reg(0, REG_PC, start);				/* start program */
 		break;
 
 	default:
 		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
-		free(pgmname);
 		return INIT_FAIL;
 		break;
 	}
