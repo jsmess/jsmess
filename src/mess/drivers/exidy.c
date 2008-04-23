@@ -96,7 +96,7 @@
 #include "sound/speaker.h"
 
 
-static QUICKLOAD_LOAD( exidy );
+static Z80BIN_EXECUTE( exidy );
 
 static DEVICE_IMAGE_LOAD( exidy_floppy )
 {
@@ -755,7 +755,7 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(exidy, "bin", 0)
+	MDRV_Z80BIN_QUICKLOAD_ADD(exidy, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exidyd )
@@ -804,18 +804,10 @@ ROM_START(exidyd)
 	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
 ROM_END
 
-static QUICKLOAD_LOAD( exidy )
+static Z80BIN_EXECUTE( exidy )
 {
-	UINT8 sw = input_port_read(image->machine, "CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
-	UINT16 exec_addr, start_addr, end_addr;
-
-	if (z80bin_load_file(image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
-		return INIT_FAIL;
-
-	if (exec_addr == 0xffff) return INIT_PASS;			/* data file */
-
-	if ((exec_addr >= 0xc000) && (exec_addr <= 0xdfff) && (program_read_byte(0xdffa) != 0xc3))
-		return INIT_PASS;					/* can't run a program if the cartridge isn't in */
+	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (program_read_byte(0xdffa) != 0xc3))
+		return;					/* can't run a program if the cartridge isn't in */
 
 	/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
 	1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
@@ -825,7 +817,7 @@ static QUICKLOAD_LOAD( exidy )
 		C858 = an autorun basic program will have this exec address on the tape
 		C3DD = part of basic that displays READY and lets user enter input */
 
-	if ((start_addr == 0x1d5) || (exec_addr == 0xc858))
+	if ((start_address == 0x1d5) || (execute_address == 0xc858))
 	{
 		UINT8 i, data[]={
 			0xcd, 0x26, 0xc4,	// CALL C426	;set up other pointers
@@ -833,17 +825,26 @@ static QUICKLOAD_LOAD( exidy )
 			0x36, 0,		// LD (HL),00	;make sure dummy end-of-line is there
 			0xc3, 0x89, 0xc6,};	// JP C689	;run program
 
-		for (i = 0; i < 11; i++) program_write_byte(0xf01f + i, data[i]);
-		if (!sw) program_write_word_16le(0xf028,0xc3dd);
-		program_write_byte(0x1b7, end_addr&0xff);		/* Tell BASIC where program ends */
-		program_write_byte(0x1b8, end_addr>>8);
-		if ((exec_addr != 0xc858) && (sw)) program_write_word_16le(0xf028,exec_addr);
+		for (i = 0; i < ARRAY_LENGTH(data); i++)
+			program_write_byte(0xf01f + i, data[i]);
+
+		if (!autorun)
+			program_write_word_16le(0xf028,0xc3dd);
+
+		/* tell BASIC where program ends */
+		program_write_byte(0x1b7, (end_address >> 0) & 0xff);
+		program_write_byte(0x1b8, (end_address >> 8) & 0xff);
+
+		if ((execute_address != 0xc858) && autorun)
+			program_write_word_16le(0xf028, execute_address);
+
 		cpunum_set_reg(0, REG_PC, 0xf01f);
 	}
 	else
-	if (sw) cpunum_set_reg(0, REG_PC, exec_addr);
-
-	return INIT_PASS;
+	{
+		if (autorun)
+			cpunum_set_reg(0, REG_PC, execute_address);
+	}
 }
 
 static void exidy_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

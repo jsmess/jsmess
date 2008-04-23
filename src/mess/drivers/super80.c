@@ -10,8 +10,6 @@
 #include "sound/speaker.h"
 #include "deprecat.h"		/* "Machine" needed for z80pio interrupt */
 
-static QUICKLOAD_LOAD( super80 );
-
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
 static UINT8 int_sw;		/* internal 1 mhz flipflop */
@@ -818,7 +816,7 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(super80, "bin", 0)
+	MDRV_Z80BIN_QUICKLOAD_ADD(default, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80d )
@@ -867,7 +865,7 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(super80, "bin", 0)
+	MDRV_Z80BIN_QUICKLOAD_ADD(default, 0)
 MACHINE_DRIVER_END
 
 static void driver_init_common( void )
@@ -956,20 +954,6 @@ ROM_START( super80v )
 ROM_END
 
 /**************************** DEVICES *****************************************************************/
-
-static QUICKLOAD_LOAD( super80 )
-{
-	UINT8 sw = input_port_read(image->machine, "CONFIG") & 1;				/* reading the dipswitch: 1 = autorun */
-	UINT16 exec_addr, start_addr, end_addr;
-
-	if (z80bin_load_file(image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
-		return INIT_FAIL;
-
-	if ((exec_addr != 0xffff) && (sw))
-		cpunum_set_reg(0, REG_PC, exec_addr);
-
-	return INIT_PASS;
-}
 
 static DEVICE_IMAGE_LOAD( super80_cart )
 {

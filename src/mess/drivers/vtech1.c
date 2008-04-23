@@ -115,7 +115,7 @@ Notes:
 #include "formats/vt_cas.h"
 
 
-static QUICKLOAD_LOAD(vtech1);
+static Z80BIN_EXECUTE(vtech1);
 
 /******************************************************************************
  Address Maps
@@ -332,7 +332,7 @@ static MACHINE_DRIVER_START(laser110)
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(vtech1, "vz", 0.5)
-	MDRV_QUICKLOAD_ADD(vtech1, "bin", 0)
+	MDRV_Z80BIN_QUICKLOAD_ADD(vtech1, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser200)
@@ -412,14 +412,8 @@ ROM_END
  System Config
 ******************************************************************************/
 
-static QUICKLOAD_LOAD( vtech1 )
+static Z80BIN_EXECUTE( vtech1 )
 {
-	UINT8 sw = input_port_read(image->machine, "CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
-	UINT16 exec_addr, start_addr, end_addr;
-
-	if (z80bin_load_file(image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
-		return INIT_FAIL;
-
 	/* A Microsoft Basic program needs some manipulation before it can be run.
 	1. A start address of 7ae9 indicates a basic program which needs its pointers fixed up.
 	2. If autorun is turned off, the pointers still need fixing, but then display READY.
@@ -428,12 +422,12 @@ static QUICKLOAD_LOAD( vtech1 )
 		7ae9 = start (load) address of a conventional basic program
 		791e = custom routine to fix basic pointers */
 
-	program_write_word_16le(0x791c,end_addr+1);
-	program_write_word_16le(0x781e,exec_addr);
+	program_write_word_16le(0x791c, end_address + 1);
+	program_write_word_16le(0x781e, execute_address);
 
-	if (start_addr == 0x7ae9)
+	if (start_address == 0x7ae9)
 	{
-		UINT8 i, data[17]={
+		UINT8 i, data[]={
 			0xe5,			// PUSH HL	;save pcode pointer
 			0x2a, 0x1c, 0x79,	// LD HL,(791C)	;get saved end_addr+1
 			0x22, 0xf9, 0x78,	// LD (78F9),HL	;move it to correct place
@@ -442,14 +436,19 @@ static QUICKLOAD_LOAD( vtech1 )
 			0xcb, 0x9e,		// RES 3,(HL)	;turn off verify (just in case)
 			0xc3, 0xcf, 0x36,};	// JP 36CF	;enter bios at autorun point
 
-		for (i = 0; i < 17; i++) program_write_byte(0x791e + i, data[i]);
-		if (!sw) program_write_byte(0x7929, 0xb6);	/* turn off autorun */
+		for (i = 0; i < ARRAY_LENGTH(data); i++)
+			program_write_byte(0x791e + i, data[i]);
+
+		if (!autorun)
+			program_write_byte(0x7929, 0xb6);	/* turn off autorun */
+
 		cpunum_set_reg(0, REG_PC, 0x791e);
 	}
 	else
-	if ((exec_addr != 0xffff) && (sw)) cpunum_set_reg(0, REG_PC, exec_addr);
-
-	return INIT_PASS;
+	{
+		if (autorun)
+			cpunum_set_reg(0, REG_PC, execute_address);
+	}
 }
 
 static void vtech1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

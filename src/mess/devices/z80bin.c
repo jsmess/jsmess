@@ -22,11 +22,11 @@
 ***************************************************************************/
 
 /*-------------------------------------------------
-    z80bin_load_file - this is a public function
-	that really should be static
+    z80bin_load_file - load a z80bin file into
+	memory
 -------------------------------------------------*/
 
-int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
+static int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
 {
 	int ch;
 	UINT16 args[3];
@@ -98,13 +98,33 @@ int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *
 
 static QUICKLOAD_LOAD( z80bin )
 {
+	const z80bin_config *config;
 	UINT16 exec_addr, start_addr, end_addr;
+	int autorun;
 
-	if (z80bin_load_file( image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
+	/* load the binary into memory */
+	if (z80bin_load_file(image, file_type, &exec_addr, &start_addr, &end_addr) == INIT_FAIL)
 		return INIT_FAIL;
 
-	if (exec_addr != 0xffff)	/* non-executable data file */
-		cpunum_set_reg(0, REG_PC, exec_addr);	/* start program */
+	/* is this file executable? */
+	if (exec_addr != 0xffff)
+	{
+		config = (const z80bin_config *) image->inline_config;
+
+		/* check to see if autorun is on (I hate how this works) */
+		autorun = input_port_read_safe(image->machine, "CONFIG", 0xFF) & 1;
+
+		/* start program */
+		if (config->execute != NULL)
+		{
+			(*config->execute)(start_addr, end_addr, exec_addr, autorun);
+		}
+		else
+		{
+			if (autorun)
+				cpunum_set_reg(0, REG_PC, exec_addr);	
+		}
+	}
 
 	return INIT_PASS;
 }
@@ -120,6 +140,9 @@ DEVICE_GET_INFO(z80bin)
 	/* quickload */
 	switch(state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(z80bin_config); break;
+
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__; break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "bin"; break;

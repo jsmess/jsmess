@@ -87,7 +87,8 @@ Source Changes:
 - Major changes to transition MESS's device system onto MAME's device system.
   [Nate Woods]
  
-- Converted printers to the new device system.  [Nate Woods]
+- Converted printers, snapshots and quickloads to the new device system.
+  [Nate Woods]
 
 - Fixed memory bug in the hash file parsing code that could cause problems in
   debug builds.  [Nate Woods]

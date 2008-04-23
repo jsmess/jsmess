@@ -58,7 +58,7 @@
 #include "devices/z80bin.h"
 
 static SNAPSHOT_LOAD( mbee );
-static QUICKLOAD_LOAD( mbee );
+static Z80BIN_EXECUTE( mbee );
 
 static size_t mbee_size;
 
@@ -313,7 +313,7 @@ static MACHINE_DRIVER_START( mbee )
 
 	/* devices */
 	MDRV_SNAPSHOT_ADD(mbee, "mwb", 0.5)
-	MDRV_QUICKLOAD_ADD(mbee, "bin", 0)
+	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 0)
 MACHINE_DRIVER_END
 
 
@@ -350,7 +350,7 @@ static MACHINE_DRIVER_START( mbeeic )
 
 	/* devices */
 	MDRV_SNAPSHOT_ADD(mbee, "mwb", 0.5)
-	MDRV_QUICKLOAD_ADD(mbee, "bin", 0)
+	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 0)
 MACHINE_DRIVER_END
 
 
@@ -447,27 +447,19 @@ ROM_END
 
 ***************************************************************************/
 
-static QUICKLOAD_LOAD( mbee )
+static Z80BIN_EXECUTE( mbee )
 {
-	UINT8 sw = input_port_read(image->machine, "CONFIG") & 1;			/* reading the dipswitch: 1 = autorun */
-	UINT16 exec_addr, start_addr, end_addr;
+	program_write_word_16le(0xa6, execute_address);			/* fix the EXEC command */
 
-	if (z80bin_load_file(image, file_type, &exec_addr, &start_addr, &end_addr ) == INIT_FAIL)
-		return INIT_FAIL;
-
-	if (exec_addr == 0xffff) return INIT_PASS;			/* data file */
-
-	program_write_word_16le(0xa6,exec_addr);			/* fix the EXEC command */
-
-	if (sw)
+	if (autorun)
 	{
-		program_write_word_16le(0xa2,exec_addr);		/* fix warm-start vector to get around some copy-protections */
-		cpunum_set_reg(0, REG_PC, exec_addr);
+		program_write_word_16le(0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
+		cpunum_set_reg(0, REG_PC, execute_address);
 	}
 	else
-		program_write_word_16le(0xa2,0x8517);
-
-	return INIT_PASS;
+	{
+		program_write_word_16le(0xa2, 0x8517);
+	}
 }
 
 static SNAPSHOT_LOAD( mbee )
