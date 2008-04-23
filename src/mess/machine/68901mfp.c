@@ -1335,19 +1335,11 @@ static TIMER_CALLBACK( timer_d )
 
 void mc68901_tai_w(const device_config *device, int value)
 {
-	mc68901_t *mc68901 = get_safe_token(device);
-
-	assert(mc68901 != NULL);
-
 	mc68901_ti_w(device, MC68901_TIMER_A, value);
 }
 
 void mc68901_tbi_w(const device_config *device, int value)
 {
-	mc68901_t *mc68901 = get_safe_token(device);
-
-	assert(mc68901 != NULL);
-
 	mc68901_ti_w(device, MC68901_TIMER_B, value);
 }
 
