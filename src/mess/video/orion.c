@@ -23,10 +23,11 @@ extern UINT8 orionpro_pseudo_color;
 
 VIDEO_UPDATE( orion128 )
 {
-	UINT8 code1,code2,code3,code4,color;
+	UINT8 code1,code2,code3,code4,color,val;
 	int y, x,b;
 	int orionproshift = (orion128_video_mode & 0x10) ? 1 : 0;
 	int part1addr = (3-((orion128_video_page & 3) | orionproshift)) * 0x4000;
+
 	int part2addr = part1addr + 0x10000;			
 	int video_mode = orion128_video_mode & orion_video_mode_mask;
 	for (x = 0; x < orion128_video_width; x++)
@@ -46,7 +47,22 @@ VIDEO_UPDATE( orion128 )
 				switch(orion128_video_mode & orion_video_mode_mask) {
 					case 0 : color = ((code1 >> b) & 0x01) ? 10 : 0; break;
 					case 1 : color = ((code1 >> b) & 0x01) ? 17 : 16; break;
-					case 4 : 
+					case 4 : val = (((code1 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
+							 switch(val) {
+							 	case 0 : color = 0; break; // black
+							 	case 1 : color = 4; break; // red
+							 	case 2 : color = 2; break; // green
+							 	case 3 : color = 1; break; // blue
+							 }
+							 break; 
+					case 5 : val = (((code1 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
+							 switch(val) {
+							 	case 0 : color = 7; break; // white
+							 	case 1 : color = 4; break; // red
+							 	case 2 : color = 2; break; // green
+							 	case 3 : color = 1; break; // blue
+							 }
+							 break; 
 					case 6 :									 		
 					case 7 :
 					case 14 :
@@ -56,11 +72,11 @@ VIDEO_UPDATE( orion128 )
 					default:
 						switch(orion128_video_mode & orion_video_mode_mask & 20) {					
 							case 16 : 
-									 color = (((code1 >> b) & 0x01) << 2) + (((code2 >> b) & 0x01) << 1) + ((code3 >> b) & 0x01);
+									 color = (((code1 >> b) & 0x01) << 2) + (((code3 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
 									 break;							 
 							case 20 :
-									 color = (((code1 >> b) & 0x01) << 2) + (((code2 >> b) & 0x01) << 1) + ((code3 >> b) & 0x01);
-									 if ((((code1 >> b) & 0x01)==1) && (color!=0)) {
+									 color = (((code1 >> b) & 0x01) << 2) + (((code3 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
+									 if ((((code4 >> b) & 0x01)==1) && (color!=0)) {
 										color += 8;
 									 }
 									 break;

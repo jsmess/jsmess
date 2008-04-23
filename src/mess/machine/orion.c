@@ -599,7 +599,7 @@ MACHINE_RESET ( orionpro )
 
 READ8_HANDLER ( orionpro_io_r ) {
 	switch (offset & 0xff) {		
-		case 0x00 : return 0x86;
+		case 0x00 : return 0x56;
 		case 0x04 : return orionpro_ram0_segment;
 		case 0x05 : return orionpro_ram1_segment;
 		case 0x06 : return orionpro_ram2_segment;
@@ -652,8 +652,7 @@ WRITE8_HANDLER ( orionpro_io_w ) {
 */		
 		case 0xf8 : orion128_video_mode_w(machine,0,data);break;
 		case 0xf9 : orionpro_128_page = data;	  orionpro_bank_switch(machine); break;
-		case 0xfa : orion128_video_page_w(machine,0,data);break;
-		//case 0xfb : orionz80_dispatcher_w(machine,0,data);break;
+		case 0xfa : orion128_video_page_w(machine,0,data);break;		
 		case 0xfc : orionpro_pseudo_color = data;break;
 		case 0xfe : orionz80_sound_fe_w(machine,0,data);break;
 		case 0xff : orionz80_sound_w(machine,0,data);break;
