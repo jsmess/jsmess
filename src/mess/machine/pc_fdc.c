@@ -227,6 +227,17 @@ static void pc_fdc_data_rate_w(UINT8 data)
 	 | | `-------------- 1 = turn floppy drive B motor on
 	 | `---------------- 1 = turn floppy drive C motor on
 	 `------------------ 1 = turn floppy drive D motor on
+
+	On a PC Jr the DOR is wired up a bit differently:
+	|7|6|5|4|3|2|1|0|
+	 | | | | | | | `--- Drive enable ( 0 = off, 1 = on )
+	 | | | | | | `----- Reserved
+	 | | | | | `------- Reserved
+	 | | | | `--------- Reserved
+	 | | | `----------- Reserved
+	 | | `------------- Watchdog Timer Enable ( 0 = watchdog enabled, 1 = watchdog disabled )
+	 | `--------------- Watchdog Timer Trigger ( on a 1->0 transition to strobe the trigger )
+	 `----------------- FDC Reset ( 0 = hold reset, 1 = release reset )
  */
 
 static void pc_fdc_dor_w(UINT8 data)
