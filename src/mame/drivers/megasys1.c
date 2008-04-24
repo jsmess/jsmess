@@ -274,11 +274,11 @@ static READ16_HANDLER( ip_select_r )
 
 	switch (i)
 	{
-			case 0 :	return coins_r(machine,0,0);	break;
-			case 1 :	return player1_r(machine,0,0);	break;
-			case 2 :	return player2_r(machine,0,0);	break;
-			case 3 :	return dsw1_r(machine,0,0);		break;
-			case 4 :	return dsw2_r(machine,0,0);		break;
+			case 0 :	return coins_r(machine,0,0xffff);	break;
+			case 1 :	return player1_r(machine,0,0xffff);	break;
+			case 2 :	return player2_r(machine,0,0xffff);	break;
+			case 3 :	return dsw1_r(machine,0,0xffff);	break;
+			case 4 :	return dsw2_r(machine,0,0xffff);	break;
 			default	 :	return 0x0006;
 	}
 }
@@ -286,7 +286,7 @@ static READ16_HANDLER( ip_select_r )
 static WRITE16_HANDLER( ip_select_w )
 {
 	COMBINE_DATA(&ip_select);
-	cpunum_set_input_line(Machine, 0,2,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,2,HOLD_LINE);
 }
 
 
@@ -795,10 +795,11 @@ static void irq_handler(int irq)
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	0,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
 	irq_handler
 };
 
@@ -2931,8 +2932,8 @@ static READ16_HANDLER( protection_peekaboo_r )
 	switch (protection_val)
 	{
 		case 0x02:	return 0x03;
-		case 0x51:	return player1_r(machine,0,0);
-		case 0x52:	return player2_r(machine,0,0);
+		case 0x51:	return player1_r(machine,0,0xffff);
+		case 0x52:	return player2_r(machine,0,0xffff);
 		default:	return protection_val;
 	}
 }
@@ -2955,7 +2956,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 		}
 	}
 
-	cpunum_set_input_line(Machine, 0,4,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,4,HOLD_LINE);
 }
 
 

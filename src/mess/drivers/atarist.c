@@ -1295,6 +1295,8 @@ static WRITE8_HANDLER( ym2149_port_b_w )
 
 static const struct AY8910interface ym2149_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	0,
 	0,
 	ym2149_port_a_w,
@@ -1633,6 +1635,8 @@ static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 
 static const struct AY8910interface stbook_ym2149_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	0,
 	0,
 	stbook_ym2149_port_a_w,

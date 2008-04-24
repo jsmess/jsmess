@@ -192,7 +192,6 @@ actual code sent to the hardware.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "megasys1.h"
 
 /* Variables defined here, that have to be shared: */
@@ -455,7 +454,7 @@ WRITE16_HANDLER( megasys1_vregs_A_w )
 								cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 							break;
 
-		case 0x308/2   :	soundlatch_word_w(machine,0,new_data,0);
+		case 0x308/2   :	soundlatch_word_w(machine,0,new_data,0xffff);
 							cpunum_set_input_line(machine, 1,4,HOLD_LINE);
 							break;
 
@@ -472,7 +471,7 @@ READ16_HANDLER( megasys1_vregs_C_r )
 {
 	switch (offset)
 	{
-		case 0x8000/2:	return soundlatch2_word_r(machine,0,0);
+		case 0x8000/2:	return soundlatch2_word_r(machine,0,0xffff);
 		default:		return megasys1_vregs[offset];
 	}
 }
@@ -507,7 +506,7 @@ WRITE16_HANDLER( megasys1_vregs_C_w )
 							break;
 
 		case 0x8000/2   :	/* Cybattler reads sound latch on irq 2 */
-							soundlatch_word_w(machine,0,new_data,0);
+							soundlatch_word_w(machine,0,new_data,0xffff);
 							cpunum_set_input_line(machine, 1,2,HOLD_LINE);
 							break;
 

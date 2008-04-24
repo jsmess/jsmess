@@ -36,19 +36,17 @@ static WRITE8_HANDLER(pc_w){homerun_xpc=data;}
 
 static const ppi8255_interface ppi8255_intf =
 {
-	1,
-	{ 0 },
-	{ 0  },
-	{ 0  },
-	{ pa_w },
-	{ pb_w },
-	{ pc_w },
+	NULL,
+	NULL,
+	NULL,
+	pa_w,
+	pb_w,
+	pc_w
 };
 
 
 static MACHINE_RESET( homerun )
 {
-	ppi8255_init(&ppi8255_intf);
 }
 
 static const gfx_layout gfxlayout =
@@ -101,7 +99,7 @@ static ADDRESS_MAP_START( homerun_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP) /* ?? */
 	AM_RANGE(0x20, 0x20) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x30, 0x33) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x40, 0x40) AM_READ(homerun_40_r)
 	AM_RANGE(0x50, 0x50) AM_READ(input_port_2_r)
 	AM_RANGE(0x60, 0x60) AM_READ(input_port_1_r)
@@ -111,10 +109,15 @@ ADDRESS_MAP_END
 
 static const struct YM2203interface ym2203_interface =
 {
-	input_port_3_r,
-	0,
-	0,
-	homerun_banking_w
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_3_r,
+		NULL,
+		NULL,
+		homerun_banking_w
+	},
+	NULL
 };
 
 
@@ -192,6 +195,9 @@ static MACHINE_DRIVER_START( homerun )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(homerun)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

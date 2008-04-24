@@ -1,5 +1,14 @@
-/*
+/* raiden 2 board test note 17/04/08 (based on test by dox)
 
+ rom banking is at 6c9, bit 0x80
+  -- the game only writes this directly at startup, must be written indirectly by
+     one of the protection commands? or mirrored?
+  value of 0x80 puts 0x00000-0x1ffff at 0x20000 - 0x3ffff
+  value of 0x00 puts 0x20000-0x3ffff at 0x20000 - 0x3ffff
+
+*/
+
+/*
 Raiden 2 Hardware
 
 Games on this PCB / Similar PCBs
@@ -610,7 +619,7 @@ static void handle_io_w(int offset, UINT16 data, UINT16 mem_mask)
 	COMBINE_DATA(&mainram[offset]);
 	switch(offset) {
 	default:
-		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask ^ 0xffff, activecpu_get_pc());
+		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
 	}
 }
 
@@ -638,12 +647,12 @@ static WRITE16_HANDLER(any_w)
 		   offset != 0x444/2 && offset != 0x6de/2 && offset != 0x47e/2 &&
 		   offset != 0x4a0/2 && offset != 0x620/2 && offset != 0x6c6/2 &&
 		   offset != 0x628/2 && offset != 0x62a/2)
-			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask ^ 0xffff, activecpu_get_pc());
+			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
 	}
 
 	if(0 && c_w[offset]>1000 && !c_r[offset]) {
 		if(offset != 0x4c0/2 && (offset<0x500/2 || offset > 0x503/2))
-			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask ^ 0xffff, c_w[offset], c_r[offset], activecpu_get_pc());
+			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, c_w[offset], c_r[offset], activecpu_get_pc());
 	}
 
 	//  if(offset == 0x471 || (offset >= 0xb146 && offset < 0xb156))
@@ -654,7 +663,7 @@ static WRITE16_HANDLER(any_w)
 	//  show = offset == 0x704 || offset == 0x710 || offset == 0x71c;
 
 	if(show)
-		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask ^ 0xffff, activecpu_get_pc());
+		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
 
 	//  if(offset == 0x700)
 	//      cpu_setbank(2, memory_region(REGION_USER1)+0x20000*data);
@@ -666,7 +675,7 @@ static WRITE16_HANDLER(w1x)
 {
 	COMBINE_DATA(&w1ram[offset]);
 	if(0 && offset < 0x800/2)
-		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask ^ 0xffff, activecpu_get_pc());
+		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask, activecpu_get_pc());
 }
 
 #ifdef UNUSED_FUNCTION

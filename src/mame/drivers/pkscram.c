@@ -87,7 +87,7 @@ static WRITE16_HANDLER( pkscramble_output_w )
 
 	if (!(out & 0x2000) && interrupt_line_active)
 	{
-	    cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
+	    cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 		interrupt_line_active = 0;
 	}
 
@@ -266,7 +266,11 @@ static void irqhandler(int irq)
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,0,0,0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
 	irqhandler
 };
 

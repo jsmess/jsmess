@@ -463,17 +463,19 @@ static READ8_HANDLER( popeye_portA_r )
 	int res;
 
 
-	res = input_port_3_r(machine,offset);
-	res |= (input_port_4_r(machine,offset) << (7-dswbit)) & 0x80;
+	res = input_port_read_indexed(machine,3);
+	res |= (input_port_read_indexed(machine,4) << (7-dswbit)) & 0x80;
 
 	return res;
 }
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	popeye_portA_r,
-	0,
-	0,
+	NULL,
+	NULL,
 	popeye_portB_w
 };
 

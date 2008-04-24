@@ -245,10 +245,10 @@ static READ16_HANDLER( selected_ip_r )
 {
 	switch (hcrash_selected_ip & 0xf)
 	{												// From WEC Le Mans Schems:
-		case 0xc:  return input_port_8_r(machine,offset);	// Accel - Schems: Accelevr
-		case 0:    return input_port_8_r(machine,offset);
-		case 0xd:  return input_port_9_r(machine,offset);	// Wheel - Schems: Handlevr
-		case 1:    return input_port_9_r(machine,offset);
+		case 0xc:  return input_port_read_indexed(machine,8);	// Accel - Schems: Accelevr
+		case 0:    return input_port_read_indexed(machine,8);
+		case 0xd:  return input_port_read_indexed(machine,9);	// Wheel - Schems: Handlevr
+		case 1:    return input_port_read_indexed(machine,9);
 
 		default: return ~0;
 	}
@@ -2091,13 +2091,20 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface_1 =
 {
-	nemesis_portA_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	nemesis_portA_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface ay8910_interface_2 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	k005289_control_A_w,
 	k005289_control_B_w
 };

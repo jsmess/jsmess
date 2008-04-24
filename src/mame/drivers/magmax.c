@@ -9,7 +9,6 @@ Additional tweaking by Jarek Burczynski
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"
 
@@ -34,13 +33,13 @@ static WRITE16_HANDLER( magmax_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		sound_latch = (data & 0xff) << 1;
-		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 	}
 }
 
 static READ8_HANDLER( magmax_sound_irq_ack )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 	return 0;
 }
 
@@ -353,8 +352,10 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	ay8910_portA_0_w, /*write port A*/
 	ay8910_portB_0_w  /*write port B*/
 };

@@ -335,7 +335,7 @@ static READ16_HANDLER( tharrier_mcu_r )
 		return res << 8;
 	}
 	else
-		return ~input_port_1_word_r(machine,0,0);
+		return ~input_port_read_indexed(machine,1);
 }
 
 static WRITE16_HANDLER( macross2_sound_command_w )
@@ -3676,7 +3676,12 @@ GFXDECODE_END
 
 static const struct YM2203interface ym2203_nmk004_interface =
 {
-	0,0,0,0,NMK004_irq
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	NMK004_irq
 };
 
 static void ym2203_irqhandler(int irq)
@@ -3686,7 +3691,12 @@ static void ym2203_irqhandler(int irq)
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,0,0,0,ym2203_irqhandler
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	ym2203_irqhandler
 };
 
 static INTERRUPT_GEN( nmk_interrupt )

@@ -592,7 +592,7 @@ static INTERRUPT_GEN( generate_nmi )
 static WRITE8_HANDLER( itech8_nmi_ack_w )
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
@@ -803,7 +803,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -1683,10 +1683,14 @@ INPUT_PORTS_END
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	0,
-	ym2203_portb_out,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		NULL,
+		ym2203_portb_out,
+	},
 	generate_sound_irq
 };
 

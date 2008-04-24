@@ -191,7 +191,7 @@ static WRITE8_HANDLER( robokid_bankselect_w )
 static WRITE8_HANDLER( ninjakd2_soundreset_w )
 {
 	// bit 4 resets sound CPU
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(data & 0x80);
@@ -904,7 +904,11 @@ static void irqhandler(int irq)
 
 static const struct YM2203interface ym2203_interface =
 {
-	0, 0, 0, 0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
 	irqhandler
 };
 

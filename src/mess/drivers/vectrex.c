@@ -84,6 +84,8 @@ INPUT_PORTS_END
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_4_r,
 	0,
 	vectrex_psg_port_w,

@@ -1063,13 +1063,12 @@ attotime video_screen_get_frame_period(const device_config *screen)
 
 	/* a lot of modules want to the period of the primary screen, so
        if we are screenless, return something reasonable so that we don't fall over */
-    if (video_screen_count(screen->machine->config) == 0)
-    {
-    	assert(screen == NULL);
-    	ret = DEFAULT_FRAME_PERIOD;
+	if (screen == NULL || video_screen_count(screen->machine->config) == 0)
+	{
+		ret = DEFAULT_FRAME_PERIOD;
 	}
-    else
-    {
+	else
+	{
 		screen_state *state = get_safe_token(screen);
 		ret = attotime_make(0, state->frame_period);
 	}
@@ -1990,11 +1989,13 @@ static void update_refresh_speed(running_machine *machine)
 			UINT32 target_speed;
 
 			/* find the screen with the shortest frame period (max refresh rate) */
+			/* note that we first check the token since this can get called before all screens are created */
 			for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
-			{
-				screen_state *state = get_safe_token(screen);
-				min_frame_period = MIN(min_frame_period, state->frame_period);
-			}
+				if (screen->token != NULL)
+				{
+					screen_state *state = get_safe_token(screen);
+					min_frame_period = MIN(min_frame_period, state->frame_period);
+				}
 
 			/* compute a target speed as an integral percentage */
 			target_speed = floor(minrefresh * 100.0 / ATTOSECONDS_TO_HZ(min_frame_period));

@@ -618,6 +618,8 @@ MACHINE_DRIVER_END
 /* AY-8912 for Dragon Alpha, the AY-8912 simply an AY-8910 with only one io port. */
 static const struct AY8910interface ay8912_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	dgnalpha_psg_porta_read,	/* portA read */
 	NULL,    					/* portB read */
 	dgnalpha_psg_porta_write,	/* portA write */

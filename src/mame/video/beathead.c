@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "beathead.h"
 
 
@@ -58,10 +57,10 @@ VIDEO_START( beathead )
 WRITE32_HANDLER( beathead_vram_transparent_w )
 {
 	/* writes to this area appear to handle transparency */
-	if (!(data & 0x000000ff)) mem_mask |= 0x000000ff;
-	if (!(data & 0x0000ff00)) mem_mask |= 0x0000ff00;
-	if (!(data & 0x00ff0000)) mem_mask |= 0x00ff0000;
-	if (!(data & 0xff000000)) mem_mask |= 0xff000000;
+	if (!(data & 0x000000ff)) mem_mask &= ~0x000000ff;
+	if (!(data & 0x0000ff00)) mem_mask &= ~0x0000ff00;
+	if (!(data & 0x00ff0000)) mem_mask &= ~0x00ff0000;
+	if (!(data & 0xff000000)) mem_mask &= ~0xff000000;
 	COMBINE_DATA(&videoram32[offset]);
 }
 
@@ -71,7 +70,7 @@ WRITE32_HANDLER( beathead_vram_bulk_w )
 	/* it appears that writes to this area pass in a mask for 4 words in VRAM */
 	/* allowing them to be filled from a preset latch */
 	offset &= ~3;
-	data = data & ~mem_mask & 0x0f0f0f0f;
+	data = data & mem_mask & 0x0f0f0f0f;
 
 	/* for now, just handle the bulk fill case; the others we'll catch later */
 	if (data == 0x0f0f0f0f)
@@ -115,7 +114,7 @@ WRITE32_HANDLER( beathead_finescroll_w )
 	if ((oldword & 8) && !(newword & 8) && video_screen_get_vpos(machine->primary_screen) != 261)
 	{
 		logerror("Suspending time! (scanline = %d)\n", video_screen_get_vpos(machine->primary_screen));
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -133,7 +132,7 @@ WRITE32_HANDLER( beathead_palette_w )
 	int r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 0x01);
 	int g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 0x01);
 	int b = ((newword << 1) & 0x3e) | ((newword >> 15) & 0x01);
-	palette_set_color_rgb(Machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb(machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 

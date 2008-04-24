@@ -52,7 +52,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "vicdual.h"
 
 
@@ -68,7 +67,6 @@
 #define COIN_PORT_TAG		"COIN"
 
 static UINT32 coin_status;
-static UINT32 last_coin_input;
 
 
 static TIMER_CALLBACK( clear_coin_status )
@@ -85,9 +83,13 @@ static void assert_coin_status(void)
 
 static CUSTOM_INPUT( vicdual_read_coin_status )
 {
-	UINT32 coin_input = input_port_read(machine, COIN_PORT_TAG);
+	return coin_status;
+}
 
-	if (coin_input && !last_coin_input)
+
+static INPUT_CHANGED( coin_changed )
+{
+	if (newval && !oldval)
 	{
 		/* increment the coin counter */
 		coin_counter_w(0, 1);
@@ -98,16 +100,12 @@ static CUSTOM_INPUT( vicdual_read_coin_status )
 		/* simulate the coin switch being closed for a while */
 		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(machine->primary_screen))), NULL, 0, clear_coin_status);
 	}
-
-	last_coin_input = coin_input;
-
-	return coin_status;
 }
 
 
 #define PORT_COIN									\
 	PORT_START_TAG(COIN_PORT_TAG)					\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )		\
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_changed, NULL) \
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
@@ -270,8 +268,8 @@ static READ8_HANDLER( depthch_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine, 0);
-	if (offset & 0x08)  ret = input_port_1_r(machine, 0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -555,9 +553,9 @@ static READ8_HANDLER( sspaceat_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine, 0);
-	if (offset & 0x04)  ret = input_port_1_r(machine, 0);
-	if (offset & 0x08)  ret = input_port_2_r(machine, 0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine,0);
+	if (offset & 0x04)  ret = input_port_read_indexed(machine,1);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine,2);
 
 	return ret;
 }
@@ -744,10 +742,10 @@ static READ8_HANDLER( headon2_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine, 0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine,0);
  	if (offset & 0x02)  /* schematics show this as in input port, but never read from */
-	if (offset & 0x04)  ret = input_port_1_r(machine, 0);
-	if (offset & 0x08)  ret = input_port_2_r(machine, 0);
+	if (offset & 0x04)  ret = input_port_read_indexed(machine,1);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine,2);
 	if (offset & 0x12)  logerror("********* Read from port %x\n", offset);
 
 	return ret;

@@ -161,6 +161,8 @@ http://www.z88forever.org.uk/zxplus3e/
 
 static const struct AY8910interface spectrum_ay_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	NULL
 };
 

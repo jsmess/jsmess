@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "segag80r.h"
 #include "machine/8255ppi.h"
@@ -425,7 +424,21 @@ static const struct CustomSound_interface sega005_custom_interface =
 };
 
 
+static const ppi8255_interface ppi8255_005_intf =
+{
+	NULL,
+	NULL,
+	NULL,
+	sega005_sound_a_w,
+	sega005_sound_b_w,
+	NULL
+};
+
+
 MACHINE_DRIVER_START( 005_sound_board )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_005_intf )
 
 	/* sound hardware */
 	MDRV_SOUND_START(005)
@@ -449,18 +462,6 @@ MACHINE_DRIVER_END
 
 static SOUND_START( 005 )
 {
-	static const ppi8255_interface ppi_intf =
-	{
-		1,
-		{ 0 },
-		{ 0 },
-		{ 0 },
-		{ sega005_sound_a_w },
-		{ sega005_sound_b_w },
-		{ 0 }
-	};
-	ppi8255_init(&ppi_intf);
-
 	state_save_register_global_array(sound_state);
 	state_save_register_global(sound_addr);
 	state_save_register_global(sound_data);
@@ -819,7 +820,21 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static const ppi8255_interface monsterb_ppi_intf =
+{
+	NULL,
+	NULL,
+	n7751_status_r,
+	monsterb_sound_a_w,
+	monsterb_sound_b_w,
+	n7751_command_w
+};
+
+
 MACHINE_DRIVER_START( monsterb_sound_board )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( monsterb_ppi_intf )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(N7751, 6000000)
@@ -851,18 +866,6 @@ MACHINE_DRIVER_END
 
 static SOUND_START( monsterb )
 {
-	static const ppi8255_interface ppi_intf =
-	{
-		1,
-		{ 0 },
-		{ 0 },
-		{ n7751_status_r },
-		{ monsterb_sound_a_w },
-		{ monsterb_sound_b_w },
-		{ n7751_command_w }
-	};
-	ppi8255_init(&ppi_intf);
-
 	state_save_register_global_array(sound_state);
 	state_save_register_global(sound_addr);
 	state_save_register_global(n7751_command);
@@ -934,7 +937,7 @@ static WRITE8_HANDLER( n7751_command_w )
         D3    = /INT line
     */
 	n7751_command = data & 0x07;
-	cpunum_set_input_line(Machine, 1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 

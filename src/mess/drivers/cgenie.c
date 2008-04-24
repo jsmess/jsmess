@@ -369,6 +369,8 @@ static PALETTE_INIT( cgenie )
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	cgenie_psg_port_a_r,
 	cgenie_psg_port_b_r,
 	cgenie_psg_port_a_w,

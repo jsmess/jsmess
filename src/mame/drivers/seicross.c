@@ -43,7 +43,6 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -107,8 +106,8 @@ static WRITE8_HANDLER( friskyt_portB_w )
 	if (((portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	/* other bits unknown */
@@ -391,9 +390,11 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
 	friskyt_portB_r,
-	0,
+	NULL,
 	friskyt_portB_w
 };
 

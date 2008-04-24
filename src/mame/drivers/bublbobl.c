@@ -325,7 +325,7 @@ WRITE8_HANDLER( bublbobl_68705_ddrB_w );
 #if 0 // doesn't work for some reason
 static WRITE8_HANDLER(soundcpu_reset_w)
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 #endif
 
@@ -723,10 +723,11 @@ static void irqhandler(int irq)
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	0,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
 	irqhandler
 };
 

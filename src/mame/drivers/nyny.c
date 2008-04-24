@@ -138,13 +138,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
-	pia_1_ca1_w(machine, 0, input_port_0_r(machine, 0) & 0x01);
+	pia_1_ca1_w(machine, 0, input_port_read_indexed(machine, 0) & 0x01);
 
 	/* CA2 - copy of PA1 (SERVICE1) */
-	pia_1_ca2_w(machine, 0, input_port_0_r(machine, 0) & 0x02);
+	pia_1_ca2_w(machine, 0, input_port_read_indexed(machine, 0) & 0x02);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(machine, 0, input_port_5_r(machine, 0));
+	pia_1_cb1_w(machine, 0, input_port_read_indexed(machine, 5));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -461,8 +461,10 @@ static WRITE8_HANDLER( nyny_ay8910_37_port_b_w )
 
 static const struct AY8910interface ay8910_37_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	nyny_ay8910_37_port_a_w,
 	nyny_ay8910_37_port_b_w
 };
@@ -470,8 +472,12 @@ static const struct AY8910interface ay8910_37_interface =
 
 static const struct AY8910interface ay8910_64_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_3_r,
-	input_port_2_r
+	input_port_2_r,
+	NULL,
+	NULL
 };
 
 

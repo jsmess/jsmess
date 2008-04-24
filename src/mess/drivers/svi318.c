@@ -289,6 +289,8 @@ INPUT_PORTS_END
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	svi318_psg_port_a_r,
 	NULL,
 	NULL,

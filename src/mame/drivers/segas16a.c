@@ -144,7 +144,6 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "system16.h"
 #include "machine/8255ppi.h"
 #include "cpu/i8039/i8039.h"
@@ -198,13 +197,12 @@ static WRITE8_HANDLER( tilemap_sound_w );
 
 static const ppi8255_interface single_ppi_intf =
 {
-	1,
-	{ NULL },
-	{ NULL },
-	{ NULL },
-	{ soundlatch_w },
-	{ video_control_w },
-	{ tilemap_sound_w }
+	NULL,
+	NULL,
+	NULL,
+	soundlatch_w,
+	video_control_w,
+	tilemap_sound_w
 };
 
 
@@ -228,9 +226,6 @@ static void system16a_generic_init(running_machine *machine)
 	custom_io_w = NULL;
 	lamp_changed_w = NULL;
 	i8751_vblank_hook = NULL;
-
-	/* configure the 8255 interface */
-	ppi8255_init(&single_ppi_intf);
 }
 
 
@@ -266,7 +261,7 @@ static MACHINE_RESET( system16a )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-	ppi8255_0_w(machine, param >> 8, param & 0xff);
+	ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), param >> 8, param & 0xff);
 }
 
 
@@ -276,7 +271,7 @@ static READ16_HANDLER( standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return ppi8255_0_r(machine, offset & 3);
+			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
 
 		case 0x1000/2:
 			return input_port_read_indexed(machine, offset & 3);
@@ -301,7 +296,7 @@ static WRITE16_HANDLER( standard_io_w )
 				timer_call_after_resynch(NULL, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -380,7 +375,7 @@ static WRITE8_HANDLER( tilemap_sound_w )
              0= Sound is disabled
              1= sound is enabled
     */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
 }
@@ -396,7 +391,7 @@ static WRITE8_HANDLER( tilemap_sound_w )
 static READ8_HANDLER( sound_data_r )
 {
 	/* assert ACK */
-	ppi8255_set_portC(0, 0x00);
+	ppi8255_set_portC(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x00);
 	return soundlatch_r(machine, offset);
 }
 
@@ -432,8 +427,8 @@ static WRITE8_HANDLER( n7751_control_w )
         D1 = /RESET line on 7751
         D0 = /IRQ line on 7751
     */
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(Machine, 2, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
@@ -553,12 +548,12 @@ static void quartet_i8751_sim(running_machine *machine)
 	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* X scroll values */
-	segaic16_textram_0_w(machine, 0xff8/2, workram[0x0d14/2], 0);
-	segaic16_textram_0_w(machine, 0xffa/2, workram[0x0d18/2], 0);
+	segaic16_textram_0_w(machine, 0xff8/2, workram[0x0d14/2], 0xffff);
+	segaic16_textram_0_w(machine, 0xffa/2, workram[0x0d18/2], 0xffff);
 
 	/* page values */
-	segaic16_textram_0_w(machine, 0xe9e/2, workram[0x0d1c/2], 0);
-	segaic16_textram_0_w(machine, 0xe9c/2, workram[0x0d1e/2], 0);
+	segaic16_textram_0_w(machine, 0xe9e/2, workram[0x0d1c/2], 0xffff);
+	segaic16_textram_0_w(machine, 0xe9c/2, workram[0x0d1e/2], 0xffff);
 }
 
 
@@ -1791,6 +1786,9 @@ static MACHINE_DRIVER_START( system16a )
 
 	MDRV_MACHINE_RESET(system16a)
 	MDRV_NVRAM_HANDLER(system16a)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( single_ppi_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

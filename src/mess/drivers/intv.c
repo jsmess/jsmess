@@ -90,6 +90,8 @@ static PALETTE_INIT( intv )
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	intv_right_control_r,
 	intv_left_control_r,
 	0,

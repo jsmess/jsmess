@@ -86,7 +86,7 @@ static WRITE32_HANDLER( paletteram32_w )
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 
-	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -212,7 +212,7 @@ static READ32_HANDLER( obj_rom_r )
 	if (ACCESSING_BITS_0_15)
 		offset += 2;
 
-	if (~mem_mask & 0xff00ff00)
+	if (mem_mask & 0xff00ff00)
 		offset++;
 
 	return mem8[offset] * 0x01010101;
@@ -232,7 +232,7 @@ static WRITE32_HANDLER( v_ctrl_w )
 		if (pending_vb_int && !DISABLE_VB_INT)
 		{
 			pending_vb_int = 0;
-			cpunum_set_input_line(Machine, 0, MC68000_IRQ_4, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
 		}
 	}
 }
@@ -310,24 +310,24 @@ static WRITE32_HANDLER( turntable_select_w )
 static READ32_DEVICE_HANDLER( ide_std_r )
 {
 	if (ACCESSING_BITS_0_7)
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0x00ff) >> 8;
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0xff00) >> 8;
 	else
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0x0000) << 16;
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0xffff) << 16;
 }
 
 static WRITE32_DEVICE_HANDLER( ide_std_w )
 {
 	if (ACCESSING_BITS_0_7)
-		ide_controller16_w(device, IDE_STD_OFFSET + offset, data << 8, 0x00ff);
+		ide_controller16_w(device, IDE_STD_OFFSET + offset, data << 8, 0xff00);
 	else
-		ide_controller16_w(device, IDE_STD_OFFSET + offset, data >> 16, 0x0000);
+		ide_controller16_w(device, IDE_STD_OFFSET + offset, data >> 16, 0xffff);
 }
 
 
 static READ32_DEVICE_HANDLER( ide_alt_r )
 {
 	if (offset == 0)
-		return ide_controller16_r(device, IDE_ALT_OFFSET, 0xff00) << 24;
+		return ide_controller16_r(device, IDE_ALT_OFFSET, 0x00ff) << 24;
 
 	return 0;
 }
@@ -335,7 +335,7 @@ static READ32_DEVICE_HANDLER( ide_alt_r )
 static WRITE32_DEVICE_HANDLER( ide_alt_w )
 {
 	if (offset == 0 && ACCESSING_BITS_16_23)
-		ide_controller16_w(device, IDE_ALT_OFFSET, data >> 24, 0xff00);
+		ide_controller16_w(device, IDE_ALT_OFFSET, data >> 24, 0x00ff);
 }
 
 
@@ -402,17 +402,17 @@ static WRITE32_HANDLER( light_ctrl_2_w )
 
 static WRITE32_HANDLER( unknown590000_w )
 {
-	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, ~mem_mask);
+	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown802000_w )
 {
-	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, ~mem_mask);
+	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknownc02000_w )
 {
-	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, ~mem_mask);
+	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, mem_mask);
 }
 
 

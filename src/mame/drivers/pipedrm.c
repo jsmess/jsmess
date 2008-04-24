@@ -201,7 +201,7 @@ static WRITE8_HANDLER( sound_command_nonmi_w )
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	pending_command = 0;
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -533,7 +533,12 @@ static void irqhandler(int irq)
 
 static const struct YM2608interface ym2608_interface =
 {
-	0,0,0,0,irqhandler,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	irqhandler,
 	REGION_SOUND1
 };
 

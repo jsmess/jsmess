@@ -143,7 +143,7 @@ static READ32_HANDLER(test3_r)
 
 static WRITE32_HANDLER( avengrs_eprom_w )
 {
-	if (mem_mask==0xffff00ff) {
+	if (ACCESSING_BITS_8_15) {
 		UINT8 ebyte=(data>>8)&0xff;
 //      if (ebyte&0x80) {
 			EEPROM_set_clock_line((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
@@ -151,7 +151,7 @@ static WRITE32_HANDLER( avengrs_eprom_w )
 			EEPROM_set_cs_line((ebyte & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 //      }
 	}
-	else if (mem_mask==0xffffff00) {
+	else if (ACCESSING_BITS_0_7) {
 		//volume control todo
 	}
 	else
@@ -162,12 +162,12 @@ static WRITE32_HANDLER( avengrs_palette_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	/* x bbbbb ggggg rrrrr */
-	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 static READ32_HANDLER( avengrs_sound_r )
 {
-	if (mem_mask==0x00ffffff) {
+	if (ACCESSING_BITS_24_31) {
 		return YMZ280B_status_0_r(machine,0)<<24;
 	} else {
 		logerror("%08x:  non-byte read from sound mask %08x\n",activecpu_get_pc(),mem_mask);
@@ -178,7 +178,7 @@ static READ32_HANDLER( avengrs_sound_r )
 
 static WRITE32_HANDLER( avengrs_sound_w )
 {
-	if (mem_mask==0x00ffffff) {
+	if (ACCESSING_BITS_24_31) {
 		if (offset)
 			YMZ280B_data_0_w(machine,0,data>>24);
 		else
@@ -218,7 +218,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cpunum_set_input_line(Machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */

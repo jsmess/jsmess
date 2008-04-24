@@ -11,7 +11,6 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 /* from video */
@@ -50,7 +49,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 static WRITE8_HANDLER( sound_reset_w )
 {
 	if ( data & 1 )
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE );
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE );
 }
 
 
@@ -246,7 +245,12 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
-	soundlatch_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	soundlatch_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static INTERRUPT_GEN( timelimt_irq ) {

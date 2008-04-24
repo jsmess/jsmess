@@ -7,7 +7,6 @@ To enter service mode, keep 1&2 pressed on reset
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/z80/z80.h"
@@ -76,13 +75,13 @@ static WRITE8_HANDLER( megazone_portB_w )
 
 static WRITE8_HANDLER( megazone_i8039_irq_w )
 {
-	cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
 	if ((data & 0x80) == 0)
-		cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
 	i8039_status = (data & 0x70) >> 4;
 }
 
@@ -303,9 +302,11 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	megazone_portA_r,
-	0,
-	0,
+	NULL,
+	NULL,
 	megazone_portB_w
 };
 

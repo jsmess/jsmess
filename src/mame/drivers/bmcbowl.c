@@ -203,7 +203,7 @@ static WRITE16_HANDLER( bmc_RAMDAC_offset_w )
 static WRITE16_HANDLER( bmc_RAMDAC_color_w )
 {
 		colorram[clr_offset]=data;
-		palette_set_color_rgb(Machine,clr_offset/3,pal6bit(colorram[(clr_offset/3)*3]),pal6bit(colorram[(clr_offset/3)*3+1]),pal6bit(colorram[(clr_offset/3)*3+2]));
+		palette_set_color_rgb(machine,clr_offset/3,pal6bit(colorram[(clr_offset/3)*3]),pal6bit(colorram[(clr_offset/3)*3+1]),pal6bit(colorram[(clr_offset/3)*3+2]));
 		clr_offset=(clr_offset+1)%768;
 }
 
@@ -463,9 +463,11 @@ static WRITE8_HANDLER(input_mux_w)
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	dips1_r,
-	0,
-	0,
+	NULL,
+	NULL,
 	input_mux_w
 };
 

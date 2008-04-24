@@ -2855,6 +2855,8 @@ INPUT_PORTS_END
    --------------------*/
 static const struct AY8910interface ay8912_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	amstrad_psg_porta_read,	/* portA read */
 	amstrad_psg_porta_read,	/* portB read */
 	NULL,					/* portA write */

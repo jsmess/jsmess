@@ -7,7 +7,6 @@
 *************************************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
 
@@ -50,7 +49,7 @@ static VIDEO_UPDATE( cowrace )
 static WRITE8_HANDLER( cowrace_soundlatch_w )
 {
 	soundlatch_w(0, data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 #endif
 
@@ -152,9 +151,13 @@ INPUT_PORTS_END
 
 static const struct YM2203interface ym2203_interface_1 =
 {
-	soundlatch_r,	OKIM6295_status_0_r,	// read  A,B
-	0,				OKIM6295_data_0_w,		// write A,B
-	0
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		soundlatch_r,	OKIM6295_status_0_r,	// read  A,B
+		NULL,			OKIM6295_data_0_w,		// write A,B
+	},
+	NULL
 };
 
 

@@ -77,12 +77,11 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	coin_counter_w(0,data & 0x02);
 
 	/* bit 4 = enable rom reading thru K051316 #1 & #2 */
-	if ((K051316_readroms = (data & 0x10))){
+	K051316_readroms = (data & 0x10);
+	if (K051316_readroms)
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, K051316_rom_1_r);	/* 051316 (ROM test) */
-	}
-	else{
+	else
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, K051316_1_r);		/* 051316 */
-	}
 
 	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Saunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */
@@ -90,9 +89,9 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	/* the headlight (which have the shadow bit set) become highlights */
 	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
 	if (data & 0x08)
-		palette_set_shadow_factor(Machine,1/PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_set_shadow_factor(machine,1/PALETTE_DEFAULT_SHADOW_FACTOR);
 	else
-		palette_set_shadow_factor(Machine,PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_set_shadow_factor(machine,PALETTE_DEFAULT_SHADOW_FACTOR);
 
 	if ((data & 0x80) != last)
 	{
@@ -103,7 +102,7 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 
 		/* only affect the background */
 		for (i = 512;i < 1024;i++)
-			palette_set_brightness(Machine,i,brt);
+			palette_set_brightness(machine,i,brt);
 	}
 
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
@@ -136,7 +135,7 @@ static READ8_HANDLER( analog_read_r )
 
 static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 

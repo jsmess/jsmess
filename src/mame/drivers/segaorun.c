@@ -79,13 +79,12 @@ static WRITE8_HANDLER( video_control_w );
 
 static const ppi8255_interface single_ppi_intf =
 {
-	1,
-	{ unknown_porta_r },
-	{ unknown_portb_r },
-	{ unknown_portc_r },
-	{ unknown_porta_w },
-	{ unknown_portb_w },
-	{ video_control_w }
+	unknown_porta_r,
+	unknown_portb_r,
+	unknown_portc_r,
+	unknown_porta_w,
+	unknown_portb_w,
+	video_control_w
 };
 
 
@@ -155,9 +154,6 @@ static void outrun_generic_init(running_machine *machine)
 
 	/* init the FD1094 */
 	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
-
-	/* configure the 8255 interface */
-	ppi8255_init(&single_ppi_intf);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;
@@ -364,7 +360,7 @@ static READ16_HANDLER( misc_io_r )
 	if (custom_io_r)
 		return custom_io_r(machine, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -375,7 +371,7 @@ static WRITE16_HANDLER( misc_io_w )
 		custom_io_w(machine, offset, data, mem_mask);
 		return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -385,7 +381,7 @@ static READ16_HANDLER( outrun_custom_io_r )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			return ppi8255_0_r(machine, offset & 3);
+			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
 
 		case 0x10/2:
 			return input_port_read_indexed(machine, offset & 3);
@@ -401,7 +397,7 @@ static READ16_HANDLER( outrun_custom_io_r )
 	}
 
 	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -412,7 +408,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
-				ppi8255_0_w(machine, offset & 3, data);
+				ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3, data);
 			return;
 
 		case 0x20/2:
@@ -438,7 +434,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 			segaic16_sprites_draw_0_w(machine, offset, data, mem_mask);
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -460,7 +456,7 @@ static READ16_HANDLER( shangon_custom_io_r )
 		}
 	}
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -493,7 +489,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
 			/* ADC trigger */
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -828,6 +824,9 @@ static MACHINE_DRIVER_START( outrundx )
 
 	MDRV_MACHINE_RESET(outrun)
 	MDRV_INTERLEAVE(100)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( single_ppi_intf )
 
 	/* video hardware */
 	MDRV_GFXDECODE(segaorun)

@@ -78,7 +78,6 @@ Blitter source graphics
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "tutankhm.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/i8039/i8039.h"
@@ -145,7 +144,7 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 	if (last == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 	}
 
 	last = data;
@@ -154,14 +153,14 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
-	cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
 	if ((data & 0x80) == 0)
-		cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
 	i8039_status = (data & 0x70) >> 4;
 }
 
@@ -325,9 +324,11 @@ INPUT_PORTS_END
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	junofrst_portA_r,
-	0,
-	0,
+	NULL,
+	NULL,
 	junofrst_portB_w
 };
 

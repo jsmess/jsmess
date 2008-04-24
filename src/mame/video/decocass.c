@@ -5,7 +5,6 @@
  ***********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/decocass.h"
 
 static INT32 watchdog_count;
@@ -209,7 +208,7 @@ WRITE8_HANDLER( decocass_paletteram_w )
      * (ME/ input on 1st paletteram, inverter -> ME/ on 2nd)
      */
 	offset = (offset & 31) ^ 16;
-	colortable_palette_set_color(Machine->colortable, offset, MAKE_RGB(pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6)));
+	colortable_palette_set_color(machine->colortable, offset, MAKE_RGB(pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6)));
 }
 
 WRITE8_HANDLER( decocass_charram_w )
@@ -608,7 +607,7 @@ VIDEO_UPDATE( decocass )
 	int scrollx, scrolly_l, scrolly_r;
 	rectangle clip;
 
-	if (0xc0 != (input_port_2_r(screen->machine, 0) & 0xc0))  /* coin slots assert an NMI */
+	if (0xc0 != (input_port_read_indexed(screen->machine, 2) & 0xc0))  /* coin slots assert an NMI */
 		cpunum_set_input_line(screen->machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (watchdog_flip & 0x04))

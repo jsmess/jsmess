@@ -164,7 +164,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
@@ -1826,31 +1825,41 @@ static WRITE8_HANDLER( dac_vol_w )
 
 static const struct AY8910interface ay8910_interface_1 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_6_r,
-	input_port_7_r
+	input_port_7_r,
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface ay8910_interface_2 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	dac_out_w,	/* port Awrite */
 	dac_vol_w	/* port Bwrite */
 };
 
 static const struct AY8910interface ay8910_interface_3 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	input_port_4_f0_w,
-	0
+	NULL
 };
 
 static const struct AY8910interface ay8910_interface_4 =
 {
-	0,
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
+	NULL,
 	taitosj_sndnmi_msk_w	/* port Bwrite */
 };
 

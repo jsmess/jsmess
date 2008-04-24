@@ -372,11 +372,11 @@ static WRITE16_HANDLER( irqctrl_w )
 
 		// Bit 0 : SUBINT
 		if ( (wecleman_irqctrl & 1) && (!(data & 1)) )	// 1->0 transition
-			cpunum_set_input_line(Machine, 1,4,HOLD_LINE);
+			cpunum_set_input_line(machine, 1,4,HOLD_LINE);
 
 		// Bit 1 : NSUBRST
-		if (data & 2)   cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE  );
-		else                    cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
+		if (data & 2)   cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE  );
+		else                    cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
 
 		// Bit 2 : SOUND-ON
 		// Bit 3 : SOUNDRST
@@ -408,9 +408,9 @@ static READ16_HANDLER( selected_ip_r )
 {
 	switch ( (wecleman_selected_ip >> 5) & 3 )
 	{												// From WEC Le Mans Schems:
-		case 0:  return input_port_4_r(machine, offset);		// Accel - Schems: Accelevr
+		case 0:  return input_port_read_indexed(machine,4);		// Accel - Schems: Accelevr
 		case 1:  return ~0;							// ????? - Schems: Not Used
-		case 2:  return input_port_5_r(machine, offset);		// Wheel - Schems: Handlevr
+		case 2:  return input_port_read_indexed(machine,5);		// Wheel - Schems: Handlevr
 		case 3:  return ~0;							// Table - Schems: Turnvr
 
 		default: return ~0;

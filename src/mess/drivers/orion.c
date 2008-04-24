@@ -308,6 +308,8 @@ MACHINE_DRIVER_END
 
 static const struct AY8910interface orionz80_ay_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	NULL
 };
 

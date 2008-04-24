@@ -322,7 +322,7 @@ static READ8_HANDLER( ssio_irq_clear )
 {
 	/* a read here asynchronously resets the 14024 count, clearing /SINT */
 	ssio_14024_count = 0;
-	cpunum_set_input_line(Machine, ssio_sound_cpu, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, ssio_sound_cpu, 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -446,16 +446,20 @@ void ssio_set_custom_output(int which, int mask, write8_machine_func handler)
 /********* sound interfaces ***********/
 static const struct AY8910interface ssio_ay8910_interface_1 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	ssio_porta0_w,
 	ssio_portb0_w
 };
 
 static const struct AY8910interface ssio_ay8910_interface_2 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	ssio_porta1_w,
 	ssio_portb1_w
 };

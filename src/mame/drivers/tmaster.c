@@ -2,7 +2,7 @@
 
                       -= Touch Master / Galaxy Games =-
 
-                    driver by   Luca Elia (l.elia@tin.it)
+         driver by Luca Elia (l.elia@tin.it) and Mariusz Wojcieszek
 
 
 CPU:    68000
@@ -11,16 +11,13 @@ Sound:  OKI6295
 
 [Touch Master]
 
-Input:  Pressure sensitive touch screen
+Input:  Microtouch touch screen
 Other:  Dallas NVRAM + optional RTC
 To Do:
 
-- Proper touchscreen controller emulation. Currently it's flakey and
-  tends to stop registering user input (try coining up in that case)
-- Protection in tm4k and later games
+- Protection in tm4k and later games (where is DS1204 mapped?)
 - Coin optics
-- RTC emulation (there's code to check the upper bytes of NVRAM to see if
-  the real time clock is present, and to only use it in that case)
+- Is sound banking correct?
 
 To be dumped and added:
 
@@ -30,10 +27,11 @@ Touch Master 7000 *
 Touch Master 8000 *(?)
 
 * There is a reported "Minnesota" version with modifications due to legal issues
-  Touch Master 5000 is labeled "DOMESTIC" (AKA "Standard"), is there an EXPORT version?
+  Touch Master (current set) is a Euro version, all other sets are "DOMESTIC" (AKA "Standard").
   Is there a Touch Master 6000?  TM5K is version 7.10, then TM7K is version 8, TM8K is version 9.04
   Starting with Touch Master 2000, each later version is a chipswap for the mainboard.
    IE: Touch Master 8000 chips can update any Touch Master mainboard 2000 through 7000
+  Each version (IE: 2000, 3000, 7000 ect) has different girls for Strip Poker ;-)
 
 Touch Master 8000 part lists:
 
@@ -47,6 +45,10 @@ A-5343-60194-5  U39 Graphics
 A-5343-60194-8  U40 Graphics
 A-5343-60194-9  U41 Graphics
 A-21657-007     Security Key
+
+Known Versions not dumped:
+  Touch Master 7000 V8.04
+  Touch Master 8000 V9.04 (from service bulletin)
 
 ******************************************************************
 
@@ -64,6 +66,8 @@ To Do:
 #include "deprecat.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
+#include "machine/microtch.h"
+#include "machine/68681.h"
 
 /***************************************************************************
 
@@ -89,73 +93,69 @@ static WRITE16_HANDLER( tmaster_oki_bank_w )
 
 /***************************************************************************
 
-                     Touch Screen Controller - PRELIMINARY
+    68681 DUART <-> Microtouch touch screen controller communication
 
 ***************************************************************************/
 
-static int touchscreen;
-
-static void show_touchscreen(running_machine *machine)
+static void duart_irq_handler(UINT8 vector)
 {
-#ifdef MAME_DEBUG
-	popmessage("% d] %03x %03x - %d",touchscreen,input_port_read(machine, "TSCREEN_X")&0x1ff,input_port_read(machine, "TSCREEN_Y"),okibank);
-#endif
+	cpunum_set_input_line_and_vector(Machine, 0, 4, HOLD_LINE, vector);
+};
+
+static void duart_tx(int channel, UINT8 data)
+{
+	if ( channel == 0 )
+	{
+		//logerror( "duart->microtouch: %02x %c\n", data, (char)data);
+		microtouch_rx(1, &data);
+	}
+};
+
+static void microtouch_tx(UINT8 data)
+{
+	//logerror( "microtouch->duart: %02x %c\n", data, (char)data);
+	duart_68681_rx_data(0, data);
 }
 
-static WRITE16_HANDLER( tmaster_tscreen_reset_w )
+
+/***************************************************************************
+
+  DS1644 RTC
+
+***************************************************************************/
+
+static UINT8 rtc_ram[8];
+
+static UINT8 binary_to_BCD(UINT8 data)
 {
-	if (ACCESSING_BITS_0_7 && data == 0x05)
+	data %= 100;
+
+	return ((data / 10) << 4) | (data %10);
+}
+
+static READ16_HANDLER(rtc_r)
+{
+	mame_system_time systime;
+
+	mame_get_current_datetime(Machine, &systime);
+	rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
+	rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
+	rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);
+	rtc_ram[0x4] = binary_to_BCD(systime.local_time.weekday+1);
+	rtc_ram[0x5] = binary_to_BCD(systime.local_time.mday);
+	rtc_ram[0x6] = binary_to_BCD(systime.local_time.month+1);
+	rtc_ram[0x7] = binary_to_BCD(systime.local_time.year % 100);
+
+	return rtc_ram[offset];
+}
+
+static WRITE16_HANDLER(rtc_w)
+{
+	if ( offset == 0 )
 	{
-		touchscreen = 0;
-		show_touchscreen(machine);
+		rtc_ram[0x0] = data & 0xff;
 	}
 }
-
-static READ16_HANDLER( tmaster_tscreen_next_r )
-{
-	if (touchscreen != -1)
-		touchscreen++;
-	if (touchscreen == 6)
-		touchscreen = -1;
-	show_touchscreen(machine);
-
-	return 0;
-}
-
-static READ16_HANDLER( tmaster_tscreen_x_hi_r )
-{
-	switch (touchscreen)
-	{
-		case -1:	return 0xf1;
-	}
-	return 0x01;
-}
-
-static READ16_HANDLER( tmaster_tscreen_x_lo_r )
-{
-	UINT16 val = 0;
-
-	int press1 = input_port_read(machine, "TSCREEN_X") & 0x4000;
-	int press2 = input_port_read(machine, "TSCREEN_X") & 0x8000;
-	if (press1)	press2 = 1;
-
-	switch (touchscreen)
-	{
-		case 1:	val = press1 ? 0 : 1<<6;	break;	// press
-		case 2:	val = input_port_read(machine, "TSCREEN_X") & 0x003;	break;
-		case 3:	val = (input_port_read(machine, "TSCREEN_X") >> 2) & 0x7f;	break;
-		case 4:	val = 0;	break;
-		case 5:	val = ((input_port_read(machine, "TSCREEN_Y")^0xff) >> 1) & 0x7f;	break;
-
-		default:
-			return 0;
-	}
-	return val | (press2 ? 0x80 : 0);	// away : hover
-}
-
-static READ16_HANDLER( tmaster_tscreen_y_hi_r )	{	return 0x01;	}
-static READ16_HANDLER( tmaster_tscreen_y_lo_r )	{	return 0x00;	}
-
 
 
 /***************************************************************************
@@ -362,7 +362,7 @@ static WRITE16_HANDLER( tmaster_blitter_w )
 	{
 		case 0x0e:
 			tmaster_draw();
-			cpunum_set_input_line(Machine, 0, 2, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 			break;
 	}
 }
@@ -390,16 +390,12 @@ static READ16_HANDLER( tmaster_coins_r )
 static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x27ffff ) AM_RAM
-	AM_RANGE( 0x280000, 0x28ffff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x280000, 0x28ffef ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x28fff0, 0x28ffff ) AM_READWRITE( rtc_r, rtc_w )
 
 	AM_RANGE( 0x300010, 0x300011 ) AM_READ( tmaster_coins_r )
 
-	AM_RANGE( 0x300022, 0x300023 ) AM_READ ( tmaster_tscreen_x_hi_r )
-	AM_RANGE( 0x300024, 0x300025 ) AM_WRITE( tmaster_tscreen_reset_w )
-	AM_RANGE( 0x300026, 0x300027 ) AM_READ ( tmaster_tscreen_x_lo_r )
-	AM_RANGE( 0x300028, 0x300029 ) AM_READ ( tmaster_tscreen_next_r )
-	AM_RANGE( 0x300032, 0x300033 ) AM_READ ( tmaster_tscreen_y_hi_r )
-	AM_RANGE( 0x300036, 0x300037 ) AM_READ ( tmaster_tscreen_y_lo_r )
+	AM_RANGE( 0x300020, 0x30003f ) AM_READWRITE( duart_68681_r, duart_68681_w )
 
 	AM_RANGE( 0x300040, 0x300041 ) AM_WRITE( tmaster_oki_bank_w )
 
@@ -488,7 +484,7 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 		palette_data[palette_index] = data & 0xff;
 		if (++palette_index == 3)
 		{
-			palette_set_color(Machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
+			palette_set_color(machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
 			palette_index = 0;
 			palette_offset++;
 		}
@@ -603,20 +599,13 @@ ADDRESS_MAP_END
                                 Input Ports
 
 ***************************************************************************/
-
-static INPUT_PORTS_START( tmaster )
-	PORT_START_TAG("TSCREEN_X")
-	PORT_BIT( 0x01ff, 0x100, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1, 0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(3) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 )	PORT_IMPULSE(5)	// press
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON2 )					// hover
-
-	PORT_START_TAG("TSCREEN_Y")
-	PORT_BIT( 0x0ff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(3) PORT_PLAYER(1)
+static INPUT_PORTS_START( tm )
+	PORT_INCLUDE(microtouch)
 
 	PORT_START_TAG("COIN") // IN3
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1		)	PORT_IMPULSE(2)	// m. coin 1 (coin optics?)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN1		)	PORT_IMPULSE(4)	// m. coin 2 (coin optics?)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_COIN1		)	PORT_IMPULSE(6)	// dbv input (coin optics?)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_UNKNOWN	) // m. coin 1 (coin optics?)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN	) // m. coin 2 (coin optics?)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN	) // dbv input (coin optics?)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_COIN1		)	// (service coin?)
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW	)
@@ -626,10 +615,32 @@ static INPUT_PORTS_START( tmaster )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL	)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1		)	// e. coin 1
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN2		)	// e. coin 2
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN3		)	// e. coin 3
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4		)	// e. coin 4
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1		)	PORT_IMPULSE(2) // e. coin 1
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN	)	// e. coin 2
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN	)	// e. coin 3
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN	)	// e. coin 4
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tmaster )
+	PORT_INCLUDE(microtouch)
+
+	PORT_START_TAG("COIN") // IN3
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1		)	PORT_IMPULSE(2)	// m. coin 1 (coin optics?)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN	) // m. coin 2 (coin optics?)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN	) // dbv input (coin optics?)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_COIN1		)	// (service coin?)
+	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW	)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_SERVICE1	)	// calibrate
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL	)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN	)	// e. coin 1
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN	)	// e. coin 2
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN	)	// e. coin 3
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN	)	// e. coin 4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galgames )
@@ -684,9 +695,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_RESET( tmaster )
+static MACHINE_START( tmaster )
 {
-	touchscreen = -1;
+	duart_68681_init(0, duart_irq_handler, duart_tx);
+	microtouch_init(microtouch_tx, 0);
 }
 
 static INTERRUPT_GEN( tm3k_interrupt )
@@ -695,13 +707,6 @@ static INTERRUPT_GEN( tm3k_interrupt )
 	{
 		case 0:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
 		case 1:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
-
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:		cpunum_set_input_line_and_vector(machine, 0, 4, HOLD_LINE, 0x100/4);	break;	// touch screen controller
-
 		default:	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
 	}
 }
@@ -709,9 +714,9 @@ static INTERRUPT_GEN( tm3k_interrupt )
 static MACHINE_DRIVER_START( tm3k )
 	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(tmaster_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(tm3k_interrupt,2+5+20) // ??
+	MDRV_CPU_VBLANK_INT_HACK(tm3k_interrupt,2+20) // ??
 
-	MDRV_MACHINE_RESET(tmaster)
+	MDRV_MACHINE_START(tmaster)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 
@@ -735,21 +740,8 @@ static MACHINE_DRIVER_START( tm3k )
 MACHINE_DRIVER_END
 
 
-static INTERRUPT_GEN( tm_interrupt )
-{
-	switch (cpu_getiloops())
-	{
-		case 0:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
-		case 2:		cpunum_set_input_line_and_vector(machine, 0, 4, HOLD_LINE, 0x100/4);	break;	// touch screen controller
-		default:	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
-	}
-}
-
 static MACHINE_DRIVER_START( tm )
 	MDRV_IMPORT_FROM(tm3k)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT_HACK(tm_interrupt,3+20) // ??
 
 	MDRV_SOUND_REPLACE("OKI",OKIM6295, 1122000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
@@ -831,8 +823,8 @@ Dumped by ANY
 
 ROM_START( tm )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
-	ROM_LOAD16_BYTE( "tmaster.u51", 0x000000, 0x080000, CRC(edaa5874) SHA1(48b99bc7f5a6453def265967ca7d8eefdf9dc97b) )
-	ROM_LOAD16_BYTE( "tmaster.u52", 0x000001, 0x080000, CRC(e9fd30fc) SHA1(d91ea05d5f574603883336729fb9df705688945d) )
+	ROM_LOAD16_BYTE( "tmaster.u51", 0x000000, 0x080000, CRC(edaa5874) SHA1(48b99bc7f5a6453def265967ca7d8eefdf9dc97b) ) /* Ver: 3.00 Euro 11-25-96 */
+	ROM_LOAD16_BYTE( "tmaster.u52", 0x000001, 0x080000, CRC(e9fd30fc) SHA1(d91ea05d5f574603883336729fb9df705688945d) ) /* Ver: 3.00 Euro 11-25-96 */
 
 	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_ERASE )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tmaster.u38", 0x100000, 0x080000, CRC(68885ef6) SHA1(010602b59c33c3e490491a296ddaf8952e315b83) )
@@ -868,7 +860,7 @@ TM3K_u39.bin               5.0  Video Images & Graphics         6029
 TM3K_u40.bin               5.0  Video Images & Graphics         ccb4
 TM3K_u41.bin               5.0  Video Images & Graphics         54a7
 u62 (NOT INCLUDED)         N/A  Battery Memory Module           N/A
-J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Labeled A-21657-002
+J12 DALLAS DS1204V         N/A  Security Key (required for this Version???) - Labeled A-21657-002
 -----------------------------------------------------------------------------------
 
 SCN68681c1n40
@@ -1084,20 +1076,6 @@ ROM_START( galgbios )
 	// RAM, filled by the 68000 and fed to the OKI
 ROM_END
 
-static DRIVER_INIT( tm3k )
-{
-	// try this if you need to calibrate
-#if 0
-	UINT16 *ROM = (UINT16 *)memory_region( REGION_CPU1 );
-	// tscreen test
-	ROM[0x75e3c/2] = 0x4ef9;
-	ROM[0x75e3e/2] = 0x0007;
-	ROM[0x75e40/2] = 0x5e4a;
-
-	// tscreen test
-	ROM[0x765ca/2] = 0x7001;
-#endif
-}
 
 static DRIVER_INIT( tm4k )
 {
@@ -1176,9 +1154,9 @@ static DRIVER_INIT( galgames )
 	memory_configure_bank(4, 0, 1, memory_region(REGION_CPU1)+0x200000, 0x40000);
 }
 
-GAME( 1996, tm,       0, tm,       tmaster,  0,        ROT0, "Midway",                         "Touchmaster",               GAME_NOT_WORKING )
-GAME( 1997, tm3k,     0, tm3k,     tmaster,  tm3k,     ROT0, "Midway",                         "Touchmaster 3000 (v5.01)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS)	// imp. graphics due to bad dump
-GAME( 1998, tm4k,     0, tm3k,     tmaster,  tm4k,     ROT0, "Midway",                         "Touchmaster 4000 (v6.02)",  GAME_NOT_WORKING )
-GAME( 1998, tm5k,     0, tm3k,     tmaster,  tm5k,     ROT0, "Midway",                         "Touchmaster 5000 (v7.10)",  GAME_NOT_WORKING )
-GAME( 1999, tm7k,     0, tm3k,     tmaster,  tm7k,     ROT0, "Midway",                         "Touchmaster 7000 (v8.00)",  GAME_NOT_WORKING )
+GAME( 1996, tm,       0, tm,       tm,       0,        ROT0, "Midway",                         "Touchmaster (v3.00 Euro)",           0 )
+GAME( 1997, tm3k,     0, tm3k,     tmaster,  0,        ROT0, "Midway",                         "Touchmaster 3000 (v5.01 Standard)",  GAME_IMPERFECT_GRAPHICS)	// imp. graphics due to bad dump
+GAME( 1998, tm4k,     0, tm3k,     tmaster,  tm4k,     ROT0, "Midway",                         "Touchmaster 4000 (v6.02 Standard)",  0 )
+GAME( 1998, tm5k,     0, tm3k,     tmaster,  tm5k,     ROT0, "Midway",                         "Touchmaster 5000 (v7.10 Standard)",  0 )
+GAME( 1999, tm7k,     0, tm3k,     tmaster,  tm7k,     ROT0, "Midway",                         "Touchmaster 7000 (v8.00 Standard)",  0 )
 GAME( 1998, galgbios, 0, galgames, galgames, galgames, ROT0, "Creative Electonics & Software", "Galaxy Games (BIOS v1.90)", GAME_IS_BIOS_ROOT )

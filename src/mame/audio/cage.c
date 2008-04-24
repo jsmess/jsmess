@@ -467,7 +467,7 @@ static READ32_HANDLER( cage_from_main_r )
 		logerror("%06X:CAGE read command = %04X\n", activecpu_get_pc(), cage_from_main);
 	cpu_to_cage_ready = 0;
 	update_control_lines();
-	cpunum_set_input_line(Machine, cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
+	cpunum_set_input_line(machine, cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
 
@@ -506,7 +506,7 @@ UINT16 main_from_cage_r(void)
 		logerror("%06X:main read data = %04X\n", activecpu_get_pc(), soundlatch_word_r(Machine, 0, 0));
 	cage_to_cpu_ready = 0;
 	update_control_lines();
-	return soundlatch_word_r(Machine, 0, 0);
+	return soundlatch_word_r(Machine, 0, 0xffff);
 }
 
 

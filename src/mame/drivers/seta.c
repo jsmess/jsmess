@@ -1497,7 +1497,7 @@ static WRITE16_HANDLER( sub_ctrl_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				if ( !(old_data&1) && (data&1) )
-					cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+					cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 				old_data = data;
 			}
 			break;
@@ -2594,7 +2594,7 @@ static WRITE16_HANDLER( kiwame_nvram_w )
 
 static READ16_HANDLER( kiwame_input_r )
 {
-	int row_select = kiwame_nvram_r( machine,0x10a/2,0 ) & 0x1f;
+	int row_select = kiwame_nvram_r( machine,0x10a/2,0x00ff ) & 0x1f;
 	int i;
 
 	for(i = 0; i < 5; i++)
@@ -2704,7 +2704,7 @@ static READ8_HANDLER( wiggie_soundlatch_r )
 static WRITE16_HANDLER( wiggie_soundlatch_w )
 {
 	wiggie_soundlatch = data >> 8;
-	cpunum_set_input_line(Machine, 1,0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1,0, HOLD_LINE);
 }
 
 
@@ -6674,8 +6674,15 @@ static INTERRUPT_GEN( seta_sub_interrupt )
 
 static const struct YM2203interface tndrcade_ym2203_interface =
 {
-	dsw1_r,		/* input A: DSW 1 */
-	dsw2_r		/* input B: DSW 2 */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		dsw1_r,		/* input A: DSW 1 */
+		dsw2_r,		/* input B: DSW 2 */
+		NULL,
+		NULL
+	},
+	NULL
 };
 
 

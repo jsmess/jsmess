@@ -142,7 +142,7 @@ static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 
 static WRITE8_HANDLER( chinagat_sub_IRQ_w )
 {
-	cpunum_set_input_line(Machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	cpunum_set_input_line(machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static WRITE8_HANDLER( chinagat_cpu_sound_cmd_w )
@@ -483,10 +483,11 @@ static INTERRUPT_GEN( chinagat_interrupt )
 /* This is only on the second bootleg board */
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	0,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
 	chinagat_irq_handler
 };
 

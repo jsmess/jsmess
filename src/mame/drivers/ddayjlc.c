@@ -52,7 +52,6 @@ $842f = lives
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 static INT32 char_bank = 0;
@@ -381,7 +380,12 @@ static VIDEO_UPDATE( ddayjlc )
 
 static const struct AY8910interface ay8910_interface =
 {
-	soundlatch_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	soundlatch_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static INTERRUPT_GEN( ddayjlc_interrupt )

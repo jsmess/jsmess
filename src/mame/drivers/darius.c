@@ -189,19 +189,19 @@ static READ16_HANDLER( darius_ioc_r )
 			return (taitosound_comm_r(machine,0) & 0xff);	/* sound interface read */
 
 		case 0x04:
-			return input_port_0_word_r(machine,0,mem_mask);	/* IN0 */
+			return input_port_read_indexed(machine,0);	/* IN0 */
 
 		case 0x05:
-			return input_port_1_word_r(machine,0,mem_mask);	/* IN1 */
+			return input_port_read_indexed(machine,1);	/* IN1 */
 
 		case 0x06:
-			return input_port_2_word_r(machine,0,mem_mask);	/* IN2 */
+			return input_port_read_indexed(machine,2);	/* IN2 */
 
 		case 0x07:
 			return coin_word;	/* bits 3&4 coin lockouts, must return zero */
 
 		case 0x08:
-			return input_port_3_word_r(machine,0,mem_mask);	/* DSW */
+			return input_port_read_indexed(machine,3);	/* DSW */
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",activecpu_get_pc(),offset);
@@ -808,19 +808,27 @@ static void irqhandler(int irq)	/* assumes Z80 sandwiched between 68Ks */
 
 static const struct YM2203interface ym2203_interface_1 =
 {
-	0,		/* portA read */
-	0,
-	darius_write_portA0,	/* portA write */
-	darius_write_portB0,	/* portB write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,					/* portA read */
+		NULL,
+		darius_write_portA0,	/* portA write */
+		darius_write_portB0,	/* portB write */
+	},
 	irqhandler
 };
 
 static const struct YM2203interface ym2203_interface_2 =
 {
-	0,		/* portA read */
-	0,
-	darius_write_portA1,	/* portA write */
-	darius_write_portB1		/* portB write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,					/* portA read */
+		NULL,
+		darius_write_portA1,	/* portA write */
+		darius_write_portB1		/* portB write */
+	},
 };
 
 

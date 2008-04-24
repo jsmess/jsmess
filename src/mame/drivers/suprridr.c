@@ -80,7 +80,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "suprridr.h"
 #include "sound/ay8910.h"
 
@@ -136,7 +135,7 @@ static READ8_HANDLER( sound_data_r )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 
@@ -338,7 +337,12 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
-	sound_data_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	sound_data_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 

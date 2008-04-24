@@ -52,7 +52,7 @@ static WRITE8_HANDLER ( xxmissio_status_m_w )
 
 		case 0x40:
 			xxmissio_status &= ~0x08;
-			cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0x10);
+			cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0x10);
 			break;
 
 		case 0x80:
@@ -75,7 +75,7 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 
 		case 0x80:
 			xxmissio_status &= ~0x04;
-			cpunum_set_input_line_and_vector(Machine, 0,0,HOLD_LINE,0x10);
+			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0x10);
 			break;
 	}
 }
@@ -275,16 +275,28 @@ GFXDECODE_END
 
 static const struct YM2203interface ym2203_interface_1 =
 {
-	input_port_2_r,
-	input_port_3_r
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_2_r,
+		input_port_3_r,
+		NULL,
+		NULL
+	},
+	NULL
 };
 
 static const struct YM2203interface ym2203_interface_2 =
 {
-	0,
-	0,
-	xxmissio_scroll_x_w,
-	xxmissio_scroll_y_w
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		xxmissio_scroll_x_w,
+		xxmissio_scroll_y_w
+	},
+	NULL
 };
 
 static MACHINE_DRIVER_START( xxmissio )

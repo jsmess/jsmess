@@ -147,7 +147,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
@@ -407,16 +407,20 @@ static WRITE8_HANDLER( portB_1_w )
 
 static const struct AY8910interface ay8910_interface_1 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	portA_0_w,
 	portB_0_w
 };
 
 static const struct AY8910interface ay8910_interface_2 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	portA_1_w,
 	portB_1_w
 };

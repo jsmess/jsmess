@@ -226,7 +226,7 @@ static WRITE32_HANDLER( s1945_mcu_w )
 	// Accesses are always bytes, so resolve it
 	int suboff;
 	for(suboff=0; suboff < 3; suboff++)
-		if(!((0xff << (8*suboff)) & mem_mask))
+		if((0xff << (8*suboff)) & mem_mask)
 			break;
 	data >>= 8*suboff;
 	offset = offset*4+4+(3-suboff);
@@ -381,7 +381,7 @@ static READ8_HANDLER( psikyo_soundlatch_r )
 
 static WRITE8_HANDLER( psikyo_clear_nmi_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 	z80_nmi = 0;
 }
 

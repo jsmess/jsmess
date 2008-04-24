@@ -492,10 +492,14 @@ static  READ8_HANDLER(opn_dummy_input){return 0xff;}
 
 static const struct YM2203interface ym2203_interface =
 {
-	opn_dummy_input,
-	opn_dummy_input,
-	0,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		opn_dummy_input,
+		opn_dummy_input,
+		0,
+		0
+	},
 	pc88sr_sound_interupt
 };
 

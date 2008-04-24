@@ -42,7 +42,7 @@ static INTERRUPT_GEN( ironhors_interrupt )
 
 static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( ironhors_filter_w )
@@ -402,9 +402,9 @@ static const discrete_mixer_desc ironhors_mixer_desc_final =
 
 static DISCRETE_SOUND_START( ironhors )
 
-	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_03, 2, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_01, 0, 5.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_02, 1, 5.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_03, 2, 5.0, 0)
 
 	DISCRETE_INPUTX_STREAM(NODE_04, 3, 1.0, 0)
 
@@ -427,10 +427,15 @@ DISCRETE_SOUND_END
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	ironhors_filter_w,
-	0
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		ironhors_filter_w,
+		NULL
+	},
+	NULL
 };
 
 

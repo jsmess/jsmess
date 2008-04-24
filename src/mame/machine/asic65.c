@@ -158,7 +158,7 @@ void asic65_reset(int state)
 		else if (!state && asic65_reset_state)
 		{
 			if (asic65_command != -1)
-				asic65_data_w(Machine, 1, asic65_command, 0);
+				asic65_data_w(Machine, 1, asic65_command, 0xffff);
 		}
 
 		/* update the state */
@@ -480,7 +480,7 @@ static WRITE16_HANDLER( asic65_68k_w )
 static READ16_HANDLER( asic65_68k_r )
 {
 	asic65_tfull = 0;
-	cpunum_set_input_line(Machine, asic65_cpunum, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, asic65_cpunum, 0, CLEAR_LINE);
 	return asic65_tdata;
 }
 

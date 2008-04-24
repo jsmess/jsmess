@@ -449,7 +449,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 
 static STATE_POSTLOAD( profbank_banksw_restore )
 {
-	profpac_banksw_w(Machine, 0, profpac_bank);
+	profpac_banksw_w(machine, 0, profpac_bank);
 }
 
 
@@ -510,7 +510,12 @@ static z80ctc_interface ctc_intf =
 
 static const struct AY8910interface ay8912_interface =
 {
-	input_port_5_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	input_port_5_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 

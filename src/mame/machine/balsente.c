@@ -1014,8 +1014,8 @@ WRITE8_HANDLER( balsente_counter_control_w )
 	counter_set_gate(0, (data >> 1) & 1);
 
 	/* bits D2 and D4 control the clear/reset flags on the flip-flop that feeds counter 0 */
-	if (!(data & 0x04)) set_counter_0_ff(Machine, 1);
-	if (!(data & 0x10)) set_counter_0_ff(Machine, 0);
+	if (!(data & 0x04)) set_counter_0_ff(machine, 1);
+	if (!(data & 0x10)) set_counter_0_ff(machine, 0);
 
 	/* bit 5 clears the NMI interrupt; recompute the I/O state now */
 	m6850_update_io();
@@ -1219,22 +1219,22 @@ READ8_HANDLER( grudge_steering_r )
 
 READ8_HANDLER( shrike_shared_6809_r )
 {
-  UINT16 mem_mask = offset & 1 ? 0xff : 0xff00;
+  UINT16 mem_mask = offset & 1 ? 0xff00 : 0x00ff;
 
   switch( offset )
   {
     case 6: // return OK for 68k status register until motors hooked up
       return 0;
     default:
-      return ( shrike_shared[offset >> 1] & mem_mask ) >> ( ~mem_mask & 8 );
+      return ( shrike_shared[offset >> 1] & ~mem_mask ) >> ( mem_mask & 8 );
   }
 }
 
 
 WRITE8_HANDLER( shrike_shared_6809_w )
 {
-  UINT16 mem_mask = offset & 1 ? 0xff : 0xff00;
-  shrike_shared[offset >> 1] = ( shrike_shared[offset >> 1] & ~mem_mask ) | ( data << ( ~mem_mask & 0x8 ) );
+  UINT16 mem_mask = offset & 1 ? 0xff00 : 0x00ff;
+  shrike_shared[offset >> 1] = ( shrike_shared[offset >> 1] & mem_mask ) | ( data << ( mem_mask & 0x8 ) );
 }
 
 // uses movep, so writes even 8 bit addresses to odd 16 bit addresses, reads as 16 bit from odd addresses
@@ -1246,6 +1246,6 @@ WRITE16_HANDLER( shrike_io_68k_w )
 
 READ16_HANDLER( shrike_io_68k_r )
 {
-  return ( shrike_io[offset] & ~mem_mask ) >> ( 8 & mem_mask );
+  return ( shrike_io[offset] & mem_mask ) >> ( 8 & ~mem_mask );
 }
 

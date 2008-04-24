@@ -1735,6 +1735,7 @@ const game_driver * const drivers[] =
 
 	/* Taito "tnzs" (Seta) hardware */
 	DRIVER( plumppop )	/* A98 (c) 1987 Taito Corporation (Japan) */
+	DRIVER( jpopnics )  /* (c)1992 NICs, based on Plump Pop code */
 	DRIVER( extrmatn )	/* B06 (c) 1987 World Games */
 	DRIVER( extrmatj )	/* B06 (c) 1987 Taito Corporation (Japan)*/
 	DRIVER( arknoid2 )	/* B08 (c) 1987 Taito Corporation Japan (World) */
@@ -2277,6 +2278,7 @@ V-V                           TP-027
 	DRIVER( 1942 )		/* 12/1984 (c) 1984 */
 	DRIVER( 1942a )		/* 12/1984 (c) 1984 */
 	DRIVER( 1942b )		/* 12/1984 (c) 1984 */
+	DRIVER( 1942w )		/* 12/1984 (c) 1984 + Williams Electronics license (c) 1985 */
 	DRIVER( exedexes )	/*  2/1985 (c) 1985 */
 	DRIVER( savgbees )	/*  2/1985 (c) 1985 + Memetron license */
 	DRIVER( commando )	/*  5/1985 (c) 1985 (World) */
@@ -2288,6 +2290,7 @@ V-V                           TP-027
 	DRIVER( gng )		/*  9/1985 (c) 1985 */
 	DRIVER( gnga )		/*  9/1985 (c) 1985 */
 	DRIVER( gngbl )		/* bootleg */
+	DRIVER( gngblita )	/* bootleg */
 	DRIVER( gngt )		/*  9/1985 (c) 1985 */
 	DRIVER( makaimur )	/*  9/1985 (c) 1985 */
 	DRIVER( makaimuc )	/*  9/1985 (c) 1985 */
@@ -4394,6 +4397,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( solomonj )	/* (c) 1986 Tecmo */
 	DRIVER( rygar )		/* 6002 - (c) 1986 Tecmo */
 	DRIVER( rygar2 )	/* 6002 - (c) 1986 Tecmo */
+	DRIVER( rygar3 )	/* 6002 - (c) 1986 Tecmo */
 	DRIVER( rygarj )	/* 6002 - (c) 1986 Tecmo */
 	DRIVER( gemini )	/* (c) 1987 Tecmo */
 	DRIVER( silkworm )	/* 6217 - (c) 1988 Tecmo */
@@ -7867,8 +7871,12 @@ Other Sun games
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
 	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
-	DRIVER( snookr10 )	/* (c) 1998 Sandiy */
 	DRIVER( saloon )	/* 199? unknown */
+
+	/* Sandii' */
+	DRIVER( snookr10 )	/* (c) 1998 Sandii' */
+	DRIVER( apple10 )	/* (c) 1998 Sandii' */
+	DRIVER( tenballs )	/* 1997 unknown */
 
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */

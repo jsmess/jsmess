@@ -348,7 +348,7 @@ static WRITE8_HANDLER( sound_data_w )
 	if (!(data & 0x04) && (last_sound_data & 0x04))
 		sound_latch = (sound_latch << 1) | (~data & 0x01);
 
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 	last_sound_data = data;
 }
@@ -391,6 +391,8 @@ static CUSTOM_INPUT( p2_controls_r )
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	sound_latch_r,
 	0,
 	0,

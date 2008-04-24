@@ -478,7 +478,7 @@ static MACHINE_RESET( magworm )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -1583,6 +1583,8 @@ GFXDECODE_END
 
 static const struct AY8910interface centipdb_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	caterplr_rand_r
 };
 

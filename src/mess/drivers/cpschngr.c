@@ -31,13 +31,22 @@ void punisher_decode(void) { }
 void slammast_decode(void) { }
 #endif
 
+void forogttn_dummy_function(running_machine *machine)
+{
+	/* Forgotten Worlds has extra inputs on the B-board CN-MOWS connector for the dial controls. */
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800040, 0x800041, 0, 0, forgottn_dial_0_reset_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800048, 0x800049, 0, 0, forgottn_dial_1_reset_w);
+	memory_install_read16_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x800052, 0x800055, 0, 0, forgottn_dial_0_r);
+	memory_install_read16_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x80005a, 0x80005d, 0, 0, forgottn_dial_1_r);
+}
+
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
 
-#define CODE_SIZE 0x200000
+#define CODE_SIZE 0x400000
 
 static INPUT_PORTS_START( sfzch )
 	PORT_START_TAG("IN0")     /* IN0 */

@@ -10,7 +10,6 @@ colour, including the word "Konami"
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
@@ -68,7 +67,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 8  is EEPROM data */
 	/* bit 9  is EEPROM ready */
 	/* bit 10 is service button */
-	res = (EEPROM_read_bit()<<8) | input_port_1_word_r(machine,0,0);
+	res = (EEPROM_read_bit()<<8) | input_port_read_indexed(machine,1);
 
 	if (init_eeprom_count)
 	{

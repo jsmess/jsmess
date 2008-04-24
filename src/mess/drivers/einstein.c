@@ -1610,6 +1610,8 @@ static  READ8_HANDLER(einstein_port_b_read)
 
 static const struct AY8910interface einstein_ay_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	NULL,
 	einstein_port_b_read,
 	einstein_port_a_write,

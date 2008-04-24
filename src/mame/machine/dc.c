@@ -5,7 +5,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "debugger.h"
 #include "dc.h"
 #include "cpu/sh4/sh4.h"
@@ -142,7 +141,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	*shift = 0;
 
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
-	if ((mem_mask != U64(0x00000000ffffffff)) && (mem_mask != U64(0xffffffff00000000)))
+	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
 		mame_printf_verbose("Wrong mask! (PC=%x)\n", activecpu_get_pc());
 		#ifdef ENABLE_DEBUGGER
@@ -150,7 +149,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 		#endif
 	}
 
-	if (mem_mask == U64(0x00000000ffffffff))
+	if (mem_mask == U64(0xffffffff00000000))
 	{
 		reg++;
 		*shift = 32;
@@ -633,7 +632,7 @@ READ64_HANDLER( dc_gdrom_r )
 {
 	UINT32 off;
 
-	if ((int)mem_mask & 1)
+	if ((int)~mem_mask & 1)
 	{
 		off=(offset << 1) | 1;
 	}
@@ -654,7 +653,7 @@ WRITE64_HANDLER( dc_gdrom_w )
 {
 	UINT32 dat,off;
 
-	if ((int)mem_mask & 1)
+	if ((int)~mem_mask & 1)
 	{
 		dat=(UINT32)(data >> 32);
 		off=(offset << 1) | 1;
@@ -748,7 +747,7 @@ READ64_HANDLER( dc_modem_r )
 
 	// from ElSemi: this makes Atomiswave do it's "verbose boot" with a Sammy logo and diagnostics instead of just running the cart.
 	// our PVR emulation is apparently not good enough for that to work yet though.
-	if ((reg == 0x280/4) && (mem_mask == U64(0xffffffff00000000)))
+	if ((reg == 0x280/4) && (mem_mask == U64(0x00000000ffffffff)))
 	{
 		return 1;
 	}
@@ -850,7 +849,7 @@ READ64_HANDLER( dc_aica_reg_r )
 
 //  mame_printf_verbose("AICA REG: [%08x] read %llx, mask %llx\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
-	return (UINT64) AICA_0_r(machine, offset*2, 0x0000)<<shift;
+	return (UINT64) AICA_0_r(machine, offset*2, 0xffff)<<shift;
 }
 
 WRITE64_HANDLER( dc_aica_reg_w )
@@ -867,12 +866,12 @@ WRITE64_HANDLER( dc_aica_reg_w )
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 		}
         }
 
@@ -883,7 +882,7 @@ WRITE64_HANDLER( dc_aica_reg_w )
 
 READ32_HANDLER( dc_arm_aica_r )
 {
-	return AICA_0_r(machine, offset*2, 0x0000);
+	return AICA_0_r(machine, offset*2, 0xffff);
 }
 
 WRITE32_HANDLER( dc_arm_aica_w )

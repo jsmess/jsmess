@@ -331,7 +331,7 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 		int r = BITSWAP8((x >>  0) & 0x1f, 7,6,5, 0,1,2,3,4 );
 		int g = BITSWAP8((x >>  5) & 0x1f, 7,6,5, 0,1,2,3,4 );
 		int b = BITSWAP8((x >> 10) & 0x1f, 7,6,5, 0,1,2,3,4 );
-		palette_set_color_rgb(Machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -386,7 +386,7 @@ static WRITE8_HANDLER( nanajign_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0)>>3) | ((br & 0xe0)>>5);
-		palette_set_color_rgb(Machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -1263,7 +1263,7 @@ static WRITE8_HANDLER( tenkai_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0)>>3) | ((br & 0xe0)>>5);
-		palette_set_color_rgb(Machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -3583,10 +3583,14 @@ INPUT_PORTS_END
 
 static const struct YM2203interface hanamai_ym2203_interface =
 {
-	input_port_1_r,				/* Port A Read: DSW */
-	input_port_0_r,				/* Port B Read: DSW */
-	0,							/* Port A Write */
-	0,							/* Port B Write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_1_r,				/* Port A Read: DSW */
+		input_port_0_r,				/* Port B Read: DSW */
+		NULL,							/* Port A Write */
+		NULL,							/* Port B Write */
+	},
 	sprtmtch_sound_callback		/* IRQ handler */
 };
 
@@ -3650,6 +3654,8 @@ MACHINE_DRIVER_END
 
 static const struct AY8910interface hnoridur_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_0_r		/* Port A Read: DSW */
 };
 
@@ -3700,10 +3706,14 @@ MACHINE_DRIVER_END
 
 static const struct YM2203interface sprtmtch_ym2203_interface =
 {
-	input_port_3_r,				/* Port A Read: DSW */
-	input_port_4_r,				/* Port B Read: DSW */
-	0,							/* Port A Write */
-	0,							/* Port B Write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_3_r,				/* Port A Read: DSW */
+		input_port_4_r,				/* Port B Read: DSW */
+		NULL,						/* Port A Write */
+		NULL,						/* Port B Write */
+	},
 	sprtmtch_sound_callback,	/* IRQ handler */
 };
 
@@ -3871,10 +3881,11 @@ MACHINE_DRIVER_END
 
 static const struct YM2203interface jantouki_ym2203_interface =
 {
-	0,							/* Port A Read: DSW */
-	0,							/* Port B Read: DSW */
-	0,							/* Port A Write */
-	0,							/* Port B Write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
 	jantouki_sound_callback		/* IRQ handler */
 };
 
@@ -4042,6 +4053,8 @@ MACHINE_DRIVER_END
 
 static const struct AY8910interface htengoku_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	// A            B
 	htengoku_dsw_r,	0,					// R
 	0,				htengoku_dsw_w		// W
@@ -4100,6 +4113,8 @@ static INTERRUPT_GEN( tenkai_interrupt )
 
 static const struct AY8910interface tenkai_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	// A                // B
 	tenkai_dsw_r,		0,				// Read
 	0,					tenkai_dswsel_w	// Write

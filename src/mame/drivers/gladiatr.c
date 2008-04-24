@@ -329,7 +329,7 @@ static WRITE8_HANDLER( gladiatr_flipscreen_w )
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
 static WRITE8_HANDLER( gladiatr_irq_patch_w )
 {
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 #endif
 
@@ -656,16 +656,27 @@ static READ8_HANDLER(f1_r)
 
 static const struct YM2203interface ppking_ym2203_interface =
 {
-	f1_r,
-	f1_r
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		f1_r,
+		f1_r,
+		NULL,
+		NULL
+	},
+	NULL
 };
 
 static const struct YM2203interface gladiatr_ym2203_interface =
 {
-	0,
-	gladiator_dsw3_r,         /* port B read */
-	gladiator_int_control_w, /* port A write */
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		gladiator_dsw3_r,         /* port B read */
+		gladiator_int_control_w, /* port A write */
+		NULL,
+	},
 	gladiator_ym_irq          /* NMI request for 2nd cpu */
 };
 

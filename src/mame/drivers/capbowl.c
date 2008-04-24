@@ -163,21 +163,21 @@ static WRITE8_HANDLER( capbowl_rom_select_w )
 
 static READ8_HANDLER( track_0_r )
 {
-	return (input_port_0_r(machine, offset) & 0xf0) | ((input_port_2_r(machine, offset) - last_trackball_val[0]) & 0x0f);
+	return (input_port_read_indexed(machine, 0) & 0xf0) | ((input_port_read_indexed(machine, 2) - last_trackball_val[0]) & 0x0f);
 }
 
 
 static READ8_HANDLER( track_1_r )
 {
-	return (input_port_1_r(machine, offset) & 0xf0) | ((input_port_3_r(machine, offset) - last_trackball_val[1]) & 0x0f);
+	return (input_port_read_indexed(machine, 1) & 0xf0) | ((input_port_read_indexed(machine, 3) - last_trackball_val[1]) & 0x0f);
 }
 
 
 static WRITE8_HANDLER( track_reset_w )
 {
 	/* reset the trackball counters */
-	last_trackball_val[0] = input_port_2_r(machine, offset);
-	last_trackball_val[1] = input_port_3_r(machine, offset);
+	last_trackball_val[0] = input_port_read_indexed(machine, 2);
+	last_trackball_val[1] = input_port_read_indexed(machine, 3);
 
 	watchdog_reset_w(machine, offset, data);
 }
@@ -332,10 +332,14 @@ INPUT_PORTS_END
 
 static const struct YM2203interface ym2203_interface =
 {
-	ticket_dispenser_r,
-	0,
-	0,
-	ticket_dispenser_w,  /* Also a status LED. See memory map above */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		ticket_dispenser_r,
+		NULL,
+		NULL,
+		ticket_dispenser_w,  /* Also a status LED. See memory map above */
+	},
 	firqhandler
 };
 

@@ -352,7 +352,7 @@ static WRITE16_HANDLER( iochip_0_w )
             */
 			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(machine,0,0);
 			segaic16_set_display_enable(data & 0x20);
-			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 3:
@@ -482,7 +482,7 @@ static READ16_HANDLER( smgp_excs_r )
 
 static WRITE16_HANDLER( smgp_excs_w )
 {
-	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
 }
 
 
