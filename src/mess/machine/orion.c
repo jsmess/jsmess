@@ -480,18 +480,16 @@ MACHINE_START( orionpro )
 {
 	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
 	wd17xx_set_density (DEN_FM_HI);
-	orion_video_mode_mask = 31;
-	orionpro_pseudo_color = 0;
 }
 
 WRITE8_HANDLER ( orionpro_memory_page_w );
 
 void orionpro_bank_switch(running_machine *machine)
 {
-	int page = orionpro_page % 8; // we have only 8 pages	
+	int page = orionpro_page & 7; // we have only 8 pages	
 	int is128 = (orionpro_dispatcher & 0x80) ? 1 : 0;
 	if (is128==1) {
-		page = orionpro_128_page % 8;
+		page = orionpro_128_page & 7;
 	}
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK2);
@@ -507,28 +505,28 @@ void orionpro_bank_switch(running_machine *machine)
 		memory_set_bankptr(1, mess_ram + 0x10000 * page);
 		memory_set_bankptr(2, mess_ram + 0x10000 * page + 0x2000);		
 	} else {                
-		memory_set_bankptr(1, mess_ram + (orionpro_ram0_segment % 32) * 0x4000);
-		memory_set_bankptr(2, mess_ram + (orionpro_ram0_segment % 32) * 0x4000 + 0x2000);
+		memory_set_bankptr(1, mess_ram + (orionpro_ram0_segment & 31) * 0x4000);
+		memory_set_bankptr(2, mess_ram + (orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
 	}
 	if ((orionpro_dispatcher & 0x10)==0x10) {	// ROM1 enabled		
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000);		
+		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x30000);		
 	}
 	if ((orionpro_dispatcher & 0x08)==0x08) {	// ROM2 enabled
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x12000 + (orionpro_rom2_segment & 7) * 0x2000);		
+		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x32000 + (orionpro_rom2_segment & 7) * 0x2000);		
 	}
 
 	if ((orionpro_dispatcher & 0x02)==0x00) {	// RAM1 segment disabled
 		memory_set_bankptr(3, mess_ram + 0x10000 * page + 0x4000);		
 	} else {                     
-		memory_set_bankptr(3, mess_ram + (orionpro_ram1_segment % 32) * 0x4000);		
+		memory_set_bankptr(3, mess_ram + (orionpro_ram1_segment & 31) * 0x4000);		
 	}
 	
 	if ((orionpro_dispatcher & 0x04)==0x00) {	// RAM2 segment disabled
 		memory_set_bankptr(4, mess_ram + 0x10000 * page + 0x8000);
 	} else {        
-		memory_set_bankptr(4, mess_ram + (orionpro_ram2_segment % 32) * 0x4000);
+		memory_set_bankptr(4, mess_ram + (orionpro_ram2_segment & 31) * 0x4000);
 	}
 	
 	memory_set_bankptr(5, mess_ram + 0x10000 * page + 0xc000);
@@ -594,7 +592,9 @@ MACHINE_RESET ( orionpro )
 	orion_speaker = 0;
 	orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
-	wd17xx_command_w(machine,0,0);
+
+	orion_video_mode_mask = 31;
+	orionpro_pseudo_color = 0;
 }
 
 READ8_HANDLER ( orionpro_io_r ) {
@@ -615,10 +615,10 @@ READ8_HANDLER ( orionpro_io_r ) {
 		case 0x1a : 
 		case 0x1b : 
 					return orion128_system_r(machine,(offset & 0xff)-0x18); break;
-/*		case 0x28 : return orionpro_romdisk_r(machine,0); break;
-		case 0x29 : return orionpro_romdisk_r(machine,1); break;
-		case 0x2a : return orionpro_romdisk_r(machine,2); break;
-		case 0x2b : return orionpro_romdisk_r(machine,3); break;*/
+		case 0x28 : return orion128_romdisk_r(machine,0); break;
+		case 0x29 : return orion128_romdisk_r(machine,1); break;
+		case 0x2a : return orion128_romdisk_r(machine,2); break;
+		case 0x2b : return orion128_romdisk_r(machine,3); break;
 	}
 	if (offset == 0xFFFD) {
 		return AY8910_read_port_0_r (machine, 0);
@@ -644,12 +644,10 @@ WRITE8_HANDLER ( orionpro_io_w ) {
 		case 0x1a : 
 		case 0x1b : 
 					orion128_system_w(machine,(offset & 0xff)-0x18,data); break;
-/*		
-		case 0x28 : orionpro_romdisk_w(machine,0,data); break;
-		case 0x29 : orionpro_romdisk_w(machine,1,data); break;
-		case 0x2a : orionpro_romdisk_w(machine,2,data); break;
-		case 0x2b : orionpro_romdisk_w(machine,3,data); break;
-*/		
+		case 0x28 : orion128_romdisk_w(machine,0,data); break;
+		case 0x29 : orion128_romdisk_w(machine,1,data); break;
+		case 0x2a : orion128_romdisk_w(machine,2,data); break;
+		case 0x2b : orion128_romdisk_w(machine,3,data); break;
 		case 0xf8 : orion128_video_mode_w(machine,0,data);break;
 		case 0xf9 : orionpro_128_page = data;	  orionpro_bank_switch(machine); break;
 		case 0xfa : orion128_video_page_w(machine,0,data);break;		
