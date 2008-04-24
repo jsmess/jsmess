@@ -391,16 +391,18 @@ static void COPS_queue_data(const UINT8 *data, int len)
 /* keyboard matrix to detect transition */
 static int key_matrix[8];
 
-static void scan_keyboard( void )
+static void scan_keyboard(running_machine *machine)
 {
 	int i, j;
 	int keybuf;
 	UINT8 keycode;
+	char port[6];
 
 	if (! COPS_force_unplug)
 		for (i=0; i<8; i++)
 		{
-			keybuf = readinputport(i+2);
+			sprintf(port, "LINE%d", i);
+			keybuf = input_port_read(machine, port);
 
 			if (keybuf != key_matrix[i])
 			{	/* if state has changed, find first bit which has changed */
@@ -445,8 +447,8 @@ static TIMER_CALLBACK(handle_mouse)
 	/*if (COPS_force_unplug)
 		return;*/	/* ???? */
 
-	new_mx = readinputport(0);
-	new_my = readinputport(1);
+	new_mx = input_port_read(machine, "MOUSE_X");
+	new_my = input_port_read(machine, "MOUSE_Y");
 
 	/* see if it moved in the x coord */
 	if (new_mx != last_mx)
@@ -1303,7 +1305,7 @@ INTERRUPT_GEN( lisa_interrupt )
 		set_VTIR(machine, 0);
 	
 	/* do keyboard scan */
-	scan_keyboard();
+	scan_keyboard(machine);
 }
 
 /*
@@ -1746,13 +1748,13 @@ WRITE16_HANDLER ( lisa_w )
 			COMBINE_DATA((UINT16 *) (lisa_ram_ptr + address));
 			if (diag2)
 			{
-				if ((ACCESSING_LSB)
+				if ((ACCESSING_BITS_0_7)
 					&& ! (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x1 << (address & 0x7);
 					bad_parity_count++;
 				}
-				if ((ACCESSING_MSB)
+				if ((ACCESSING_BITS_8_15)
 					&& ! (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x2 << (address & 0x7);
@@ -1761,13 +1763,13 @@ WRITE16_HANDLER ( lisa_w )
 			}
 			else if (bad_parity_table[address >> 3] & (0x3 << (address & 0x7)))
 			{
-				if ((ACCESSING_LSB)
+				if ((ACCESSING_BITS_0_7)
 					&& (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x1 << (address & 0x7));
 					bad_parity_count--;
 				}
-				if ((ACCESSING_MSB)
+				if ((ACCESSING_BITS_8_15)
 					&& (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x2 << (address & 0x7));
@@ -1785,13 +1787,13 @@ WRITE16_HANDLER ( lisa_w )
 			COMBINE_DATA((UINT16 *) (lisa_ram_ptr + address));
 			if (diag2)
 			{
-				if ((ACCESSING_LSB)
+				if ((ACCESSING_BITS_0_7)
 					&& ! (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x1 << (address & 0x7);
 					bad_parity_count++;
 				}
-				if ((ACCESSING_MSB)
+				if ((ACCESSING_BITS_8_15)
 					&& ! (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x2 << (address & 0x7);
@@ -1800,13 +1802,13 @@ WRITE16_HANDLER ( lisa_w )
 			}
 			else if (bad_parity_table[address >> 3] & (0x3 << (address & 0x7)))
 			{
-				if ((ACCESSING_LSB)
+				if ((ACCESSING_BITS_0_7)
 					&& (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x1 << (address & 0x7));
 					bad_parity_count--;
 				}
-				if ((ACCESSING_MSB)
+				if ((ACCESSING_BITS_8_15)
 					&& (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x2 << (address & 0x7));
@@ -1949,7 +1951,7 @@ static READ16_HANDLER ( lisa_IO_r )
 		{
 			if (! (offset & 0x400))
 			{
-				/*if (ACCESSING_LSB)*/	/* Geez, who cares ? */
+				/*if (ACCESSING_BITS_0_7)*/	/* Geez, who cares ? */
 					answer = lisa_fdc_ram[offset & 0x03ff] & 0xff;	/* right ??? */
 			}
 		}
@@ -1966,13 +1968,13 @@ static READ16_HANDLER ( lisa_IO_r )
 
 			case 2:	/* parallel port */
 				/* 1 VIA located at 0xD901 */
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					return via_read(1, (offset >> 2) & 0xf);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				/* 1 VIA located at 0xDD81 */
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					return via_read(0, offset & 0xf);
 				break;
 			}
@@ -2075,7 +2077,7 @@ static WRITE16_HANDLER ( lisa_IO_w )
 			/* Floppy Disk Controller shared RAM */
 			if (! (offset & 0x0400))
 			{
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					lisa_fdc_ram[offset & 0x03ff] = data & 0xff;
 			}
 		}
@@ -2088,12 +2090,12 @@ static WRITE16_HANDLER ( lisa_IO_w )
 				break;
 
 			case 2:	/* paralel port */
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					via_write(1, (offset >> 2) & 0xf, data & 0xff);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
-				if (ACCESSING_LSB)
+				if (ACCESSING_BITS_0_7)
 					via_write(0, offset & 0xf, data & 0xff);
 				break;
 			}
