@@ -277,7 +277,8 @@ INLINE void set_VTIR(running_machine *machine, int value)
 	if (VTIR != value)
 	{
 		VTIR = value;
-		lisa_field_interrupts(machine);
+		if (VTIR==1)
+			lisa_field_interrupts(machine);
 	}
 }
 
@@ -337,7 +338,7 @@ INLINE void COPS_send_data_if_possible(void)
 {
 	if ((! hold_COPS_data) && fifo_size && (! COPS_Ready))
 	{
-		/*logerror("Pushing one byte of data to VIA\n");*/
+		logerror("Pushing one byte of data to VIA\n");
 
 		via_set_input_a(0, fifo_data[fifo_head]);	/* output data */
 		if (fifo_head == mouse_data_offset)
@@ -366,7 +367,7 @@ static void COPS_queue_data(const UINT8 *data, int len)
 #endif
 
 	{
-		/*logerror("Adding %d bytes of data to FIFO\n", len);*/
+		logerror("Adding %d bytes of data to FIFO\n", len);
 
 		while (len--)
 		{
@@ -390,7 +391,7 @@ static void COPS_queue_data(const UINT8 *data, int len)
 /* keyboard matrix to detect transition */
 static int key_matrix[8];
 
-static void scan_keyboard(running_machine *machine)
+static void scan_keyboard( void )
 {
 	int i, j;
 	int keybuf;
@@ -399,7 +400,7 @@ static void scan_keyboard(running_machine *machine)
 	if (! COPS_force_unplug)
 		for (i=0; i<8; i++)
 		{
-			keybuf = input_port_read_indexed(machine, i+2);
+			keybuf = readinputport(i+2);
 
 			if (keybuf != key_matrix[i])
 			{	/* if state has changed, find first bit which has changed */
@@ -444,8 +445,8 @@ static TIMER_CALLBACK(handle_mouse)
 	/*if (COPS_force_unplug)
 		return;*/	/* ???? */
 
-	new_mx = input_port_read_indexed(machine, 0);
-	new_my = input_port_read_indexed(machine, 1);
+	new_mx = readinputport(0);
+	new_my = readinputport(1);
 
 	/* see if it moved in the x coord */
 	if (new_mx != last_mx)
@@ -915,7 +916,8 @@ VIDEO_UPDATE( lisa )
 	for (y = 0; y < resy; y++)
 	{
 		for (x = 0; x < resx; x++)
-			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> ((x+y*resx) & 0xf))) ? 0 : 1;
+//			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> ((x+y*resx) & 0xf))) ? 0 : 1;
+			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> (x & 0xf))) ? 0 : 1;
 		draw_scanline8(bitmap, 0, y, resx, line_buffer, screen->machine->pens, -1);
 	}
 	return 0;
@@ -937,7 +939,7 @@ static OPBASE_HANDLER (lisa_OPbaseoverride)
 	{
 		if (address & 0x004000)
 		{
-			the_seg = 0;	/* correct ??? */
+//			the_seg = 0;	/* correct ??? */
 		}
 		else
 		{
@@ -1297,9 +1299,11 @@ INTERRUPT_GEN( lisa_interrupt )
 	/* set VBI */
 	if (VTMSK)
 		set_VTIR(machine, 1);
-
+	else
+		set_VTIR(machine, 0);
+	
 	/* do keyboard scan */
-	scan_keyboard(machine);
+	scan_keyboard();
 }
 
 /*
@@ -1487,7 +1491,7 @@ READ16_HANDLER ( lisa_r )
 	{	/* special setup mode */
 		if (offset & 0x002000)
 		{
-			the_seg = 0;	/* correct ??? */
+//			the_seg = 0;	/* correct ??? */
 		}
 		else
 		{
@@ -1588,42 +1592,9 @@ READ16_HANDLER ( lisa_r )
 				/* problem : due to collisions with video, timings of the LISA CPU
 				are slightly different from timings of a bare 68k */
 				/* so we use a kludge... */
-#if 0
-				/* theory - probably partially wrong, anyway */
-				int time_in_frame = cpu_getcurrentcycles();
-				int videoROM_address;
-
-				videoROM_address = (time_in_frame / 4) & 0x7f;
-
-				if ((time_in_frame >= 70000) || (time_in_frame <= 74000))	/* these values are approximative */
-				{	/* if VSyncing, read ROM 2nd half ? */
-					videoROM_address |= 0x80;
-				}
-#else
-				/* kludge */
-				/* this code assumes the program always tries to read consecutive bytes */
-#if 0
-				int time_in_frame = cpu_getcurrentcycles();
-				static int videoROM_address = 0;
-
-				videoROM_address = (videoROM_address + 1) & 0x7f;
-				/* the BOOT ROM only reads 56 bits, so there must be some wrap-around for
-				videoROM_address <= 56 */
-				/* pixel clock 20MHz, memory access rate 1.25MHz, horizontal clock 22.7kHz
-				according to Apple, which must stand for 1.25MHz/55 = 22727kHz, vertical
-				clock approximately 60Hz, which means there are about 380 lines, including VBlank */
-				if (videoROM_address == 55)
-					videoROM_address = 0;
-
-				if ((time_in_frame >= 70000) && (time_in_frame <= 74000))	/* these values are approximative */
-				{	/* if VSyncing, read ROM 2nd half ? */
-					videoROM_address |= 0x80;
-				}
-#else
 				int time_in_frame = video_screen_get_vpos(machine->primary_screen);
 				static int videoROM_address = 0;
 
-				videoROM_address = (videoROM_address + 1) & 0x7f;
 				/* the BOOT ROM only reads 56 bits, so there must be some wrap-around for
 				videoROM_address <= 56 */
 				/* pixel clock 20MHz, memory access rate 1.25MHz, horizontal clock 22.7kHz
@@ -1631,8 +1602,6 @@ READ16_HANDLER ( lisa_r )
 				clock approximately 60Hz, which means there are about 380 lines, including VBlank */
 				/* The values are different on the Mac XL, and I don't know the correct values
 				for sure. */
-				if (videoROM_address == ((lisa_features.has_mac_xl_video) ? 48/* ??? */ : 55))
-					videoROM_address = 0;
 
 				/* Something appears to be wrong with the timings, since we expect to read the
 				2nd half when v-syncing, i.e. for lines beyond the 431th or 364th one (provided
@@ -1642,24 +1611,31 @@ READ16_HANDLER ( lisa_r )
 				if (lisa_features.has_mac_xl_video)
 				{
 					if ((time_in_frame >= 374) && (time_in_frame <= 392))	/* these values have not been tested */
-					{	/* if VSyncing, read ROM 2nd half ? */
-						videoROM_address |= 0x80;
-					}
+						answer = videoROM_ptr[videoROM_address|0x80] << 8;
+					else
+						answer = videoROM_ptr[videoROM_address] << 8;
 				}
 				else
 				{
-					if ((time_in_frame >= 319) && (time_in_frame <= 338))	/* these values are approximative */
-					{	/* if VSyncing, read ROM 2nd half ? */
-						videoROM_address |= 0x80;
+					if ((time_in_frame >= 364) && (time_in_frame <= 375))
+					{
+						answer = videoROM_ptr[videoROM_address|0x80] << 8;
+  				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer,safe_activecpu_get_pc(),time_in_frame);
+					}
+					else
+					{
+						answer = videoROM_ptr[videoROM_address] << 8;
+  				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer,safe_activecpu_get_pc(),time_in_frame);
 					}
 				}
-#endif
 
-#endif
 
-				answer = videoROM_ptr[videoROM_address] << 8;
+				videoROM_address = (videoROM_address + 1) & 0x7f;
+				if (videoROM_address == ((lisa_features.has_mac_xl_video) ? 48 : 56)) {
+    				logerror("loop %d\n", videoROM_address);
+					videoROM_address = 0;
+				}
 
-				/*logerror("%X %X\n", videoROM_address, answer);*/
 			}
 			break;
 		}
@@ -1683,23 +1659,23 @@ WRITE16_HANDLER ( lisa_w )
 	{
 		if (offset & 0x002000)
 		{
-			the_seg = 0;	/* correct ??? */
+//			the_seg = 0;	/* correct ??? */
 		}
 		else
 		{
 			if (offset & 0x004000)
 			{	/* write to MMU register */
-				/*logerror("write to segment registers (%X:%X) ", the_seg, segment);*/
+				logerror("write to segment registers (%X:%X) ", the_seg, segment);
 				if (offset & 0x000004)
 				{	/* sorg register */
-					/*logerror("sorg, data = %X\n", data);*/
-					real_mmu_regs[the_seg][segment].sorg = data;
+					logerror("sorg, data = %X\n", data);
+					real_mmu_regs[the_seg][segment].sorg = data & 0xFFF;
 					mmu_regs[the_seg][segment].sorg = (data & 0x0fff) << 9;
 				}
 				else
 				{	/* slim register */
-					/*logerror("slim, data = %X\n", data);*/
-					real_mmu_regs[the_seg][segment].slim = data;
+					logerror("slim, data = %X\n", data);
+					real_mmu_regs[the_seg][segment].slim = data & 0xFFF;
 					mmu_regs[the_seg][segment].slim = (~ (data << 9)) & 0x01ffff;
 					switch ((data & 0x0f00) >> 8)
 					{
@@ -1729,11 +1705,11 @@ WRITE16_HANDLER ( lisa_w )
 						mmu_regs[the_seg][segment].type = invalid;
 						break;
 					case 0xF:
-						/*logerror("type : special I/O\n");*/
+						logerror("type : special I/O\n");
 						mmu_regs[the_seg][segment].type = special_IO;
 						break;
 					default:	/* "unpredictable results" */
-						/*logerror("type : unknown\n");*/
+						logerror("type : unknown\n");
 						mmu_regs[the_seg][segment].type = invalid;
 						break;
 					}
@@ -1770,13 +1746,13 @@ WRITE16_HANDLER ( lisa_w )
 			COMBINE_DATA((UINT16 *) (lisa_ram_ptr + address));
 			if (diag2)
 			{
-				if ((ACCESSING_BITS_0_7)
+				if ((ACCESSING_LSB)
 					&& ! (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x1 << (address & 0x7);
 					bad_parity_count++;
 				}
-				if ((ACCESSING_BITS_8_15)
+				if ((ACCESSING_MSB)
 					&& ! (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x2 << (address & 0x7);
@@ -1785,13 +1761,13 @@ WRITE16_HANDLER ( lisa_w )
 			}
 			else if (bad_parity_table[address >> 3] & (0x3 << (address & 0x7)))
 			{
-				if ((ACCESSING_BITS_0_7)
+				if ((ACCESSING_LSB)
 					&& (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x1 << (address & 0x7));
 					bad_parity_count--;
 				}
-				if ((ACCESSING_BITS_8_15)
+				if ((ACCESSING_MSB)
 					&& (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x2 << (address & 0x7));
@@ -1809,13 +1785,13 @@ WRITE16_HANDLER ( lisa_w )
 			COMBINE_DATA((UINT16 *) (lisa_ram_ptr + address));
 			if (diag2)
 			{
-				if ((ACCESSING_BITS_0_7)
+				if ((ACCESSING_LSB)
 					&& ! (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x1 << (address & 0x7);
 					bad_parity_count++;
 				}
-				if ((ACCESSING_BITS_8_15)
+				if ((ACCESSING_MSB)
 					&& ! (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] |= 0x2 << (address & 0x7);
@@ -1824,13 +1800,13 @@ WRITE16_HANDLER ( lisa_w )
 			}
 			else if (bad_parity_table[address >> 3] & (0x3 << (address & 0x7)))
 			{
-				if ((ACCESSING_BITS_0_7)
+				if ((ACCESSING_LSB)
 					&& (bad_parity_table[address >> 3] & (0x1 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x1 << (address & 0x7));
 					bad_parity_count--;
 				}
-				if ((ACCESSING_BITS_8_15)
+				if ((ACCESSING_MSB)
 					&& (bad_parity_table[address >> 3] & (0x2 << (address & 0x7))))
 				{
 					bad_parity_table[address >> 3] &= ~ (0x2 << (address & 0x7));
@@ -1909,17 +1885,21 @@ INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 		seg &= ~2;
 		break;
 	case 0x0010:	/* SETUP register SET */
+    	logerror("setup SET PC=%x\n", safe_activecpu_get_pc());
 		setup = 1;
 		break;
 	case 0x0012:	/* SETUP register RESET */
+    	logerror("setup UNSET PC=%x\n", safe_activecpu_get_pc());
 		setup = 0;
 		break;
 	case 0x001A:	/* Enable Vertical Retrace Interrupt */
+    	logerror("enable retrace PC=%x\n", safe_activecpu_get_pc());
 		VTMSK = 1;
 		break;
 	case 0x0018:	/* Disable Vertical Retrace Interrupt */
+    	logerror("disable retrace PC=%x\n", safe_activecpu_get_pc());
 		VTMSK = 0;
-		set_VTIR(machine, 0);
+		set_VTIR(machine, 2);
 		break;
 	case 0x0016:	/* Enable Soft Error Detect. */
 	case 0x0014:	/* Disable Soft Error Detect. */
@@ -1969,7 +1949,7 @@ static READ16_HANDLER ( lisa_IO_r )
 		{
 			if (! (offset & 0x400))
 			{
-				/*if (ACCESSING_BITS_0_7)*/	/* Geez, who cares ? */
+				/*if (ACCESSING_LSB)*/	/* Geez, who cares ? */
 					answer = lisa_fdc_ram[offset & 0x03ff] & 0xff;	/* right ??? */
 			}
 		}
@@ -1986,13 +1966,13 @@ static READ16_HANDLER ( lisa_IO_r )
 
 			case 2:	/* parallel port */
 				/* 1 VIA located at 0xD901 */
-				if (ACCESSING_BITS_0_7)
+				if (ACCESSING_LSB)
 					return via_read(1, (offset >> 2) & 0xf);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				/* 1 VIA located at 0xDD81 */
-				if (ACCESSING_BITS_0_7)
+				if (ACCESSING_LSB)
 					return via_read(0, offset & 0xf);
 				break;
 			}
@@ -2019,9 +1999,40 @@ static READ16_HANDLER ( lisa_IO_r )
 			answer = 0;
 			if (! parity_error_pending)
 				answer |= 0x02;
-			if (! VTIR)
-				answer |= 0x04;
+			if (VTIR<=1)
+// GFE : needs to be in phase with Serial NUM
+			{
+				int time_in_frame = video_screen_get_vpos(machine->primary_screen);
+				if (lisa_features.has_mac_xl_video)
+				{
+					if ((time_in_frame >= 374) && (time_in_frame <= 392))	/* these values have not been tested */
+					{	/* if VSyncing, read ROM 2nd half ? */
+					}
+					else
+					{
+						VTIR=0;
+						answer |= 0x04;
+					}
+				}
+				else
+				{
+    			 logerror("read status time=%x\n", time_in_frame);
+					if ((time_in_frame >= 364) && (time_in_frame <= 383))	/* these values are approximative */
+					{	/* if VSyncing, read ROM 2nd half ? */
+					}
+					else
+					{
+						VTIR=0;
+						answer |= 0x04;
+					}
+				}
+
+			}
+			else
+						answer |= 0x04;
 			/* huh... we need to emulate some other bits */
+			 logerror("read status PC=%x val=%x\n", safe_activecpu_get_pc(),answer);
+
 			break;
 		}
 		break;
@@ -2064,7 +2075,7 @@ static WRITE16_HANDLER ( lisa_IO_w )
 			/* Floppy Disk Controller shared RAM */
 			if (! (offset & 0x0400))
 			{
-				if (ACCESSING_BITS_0_7)
+				if (ACCESSING_LSB)
 					lisa_fdc_ram[offset & 0x03ff] = data & 0xff;
 			}
 		}
@@ -2077,12 +2088,12 @@ static WRITE16_HANDLER ( lisa_IO_w )
 				break;
 
 			case 2:	/* paralel port */
-				if (ACCESSING_BITS_0_7)
+				if (ACCESSING_LSB)
 					via_write(1, (offset >> 2) & 0xf, data & 0xff);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
-				if (ACCESSING_BITS_0_7)
+				if (ACCESSING_LSB)
 					via_write(0, offset & 0xf, data & 0xff);
 				break;
 			}
