@@ -1734,7 +1734,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_t1000 )
+	MDRV_IMPORT_FROM( pcvideo_pcjr )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

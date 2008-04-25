@@ -11,6 +11,7 @@
 #include "driver.h"
 #include "pc_t1t.h"
 #include "video/mc6845.h"
+#include "machine/pic8259.h"
 
 
 /***************************************************************************
@@ -21,10 +22,13 @@
 
 static PALETTE_INIT( pcjr );
 static VIDEO_START( pc_t1t );
+static VIDEO_START( pc_pcjr );
 static VIDEO_UPDATE( mc6845_t1000 );
 static MC6845_UPDATE_ROW( t1000_update_row );
 static MC6845_ON_HSYNC_CHANGED( t1000_hsync_changed );
 static MC6845_ON_VSYNC_CHANGED( t1000_vsync_changed );
+static MC6845_ON_VSYNC_CHANGED( pcjr_vsync_changed );
+
 
 static const mc6845_interface mc6845_t1000_intf = {
 	T1000_SCREEN_NAME,		/* screen number */
@@ -38,6 +42,7 @@ static const mc6845_interface mc6845_t1000_intf = {
 	t1000_vsync_changed		/* on_vsync_changed */
 };
 
+
 MACHINE_DRIVER_START( pcvideo_t1000 )
 	MDRV_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -49,6 +54,34 @@ MACHINE_DRIVER_START( pcvideo_t1000 )
 	MDRV_DEVICE_CONFIG( mc6845_t1000_intf )
 
 	MDRV_VIDEO_START(pc_t1t)
+	MDRV_VIDEO_UPDATE( mc6845_t1000 )
+MACHINE_DRIVER_END
+
+
+static const mc6845_interface mc6845_pcjr_intf = {
+	T1000_SCREEN_NAME,		/* screen number */
+	XTAL_14_31818MHz/16,	/* clock, needs verification */
+	8,						/* numbers of pixels per video memory address */
+	NULL,					/* begin_update */
+	t1000_update_row,		/* update_row */
+	NULL,					/* end_update */
+	NULL,					/* on_de_chaged */
+	t1000_hsync_changed,	/* on_hsync_changed */
+	pcjr_vsync_changed		/* on_vsync_changed */
+};
+
+
+MACHINE_DRIVER_START( pcvideo_pcjr )
+	MDRV_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
+	MDRV_PALETTE_LENGTH( 16 )
+	MDRV_PALETTE_INIT(pcjr)
+
+	MDRV_DEVICE_ADD(T1000_MC6845_NAME, MC6845)
+	MDRV_DEVICE_CONFIG( mc6845_pcjr_intf )
+
+	MDRV_VIDEO_START(pc_pcjr)
 	MDRV_VIDEO_UPDATE( mc6845_t1000 )
 MACHINE_DRIVER_END
 
@@ -99,6 +132,7 @@ static struct {
 	UINT8 *displayram;
 
 	UINT8 *chr_gen;
+	UINT8	chr_size;
 
 	mc6845_update_row_func	update_row;
 	UINT8	hsync;
@@ -111,10 +145,22 @@ static VIDEO_START( pc_t1t )
 	pcjr.chr_gen = memory_region(REGION_GFX1);
 	pcjr.update_row = NULL;
 	pcjr.bank = 0;
+	pcjr.chr_size = 16;
 
 	videoram_size = 0x8000;
 }
 
+
+static VIDEO_START( pc_pcjr )
+{
+	pcjr.chr_gen = memory_region(REGION_GFX1);
+	pcjr.update_row = NULL;
+	pcjr.bank = 0;
+	pcjr.mode_control = 0x08;
+	pcjr.chr_size = 8;
+
+	videoram_size = 0x8000;
+}
 
 static VIDEO_UPDATE( mc6845_t1000 ) {
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, T1000_MC6845_NAME);
@@ -132,7 +178,7 @@ static MC6845_UPDATE_ROW( t1000_text_inten_update_row ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = pcjr.displayram[ offset ];
 		UINT8 attr = pcjr.displayram[ offset +1 ];
-		UINT8 data = pcjr.chr_gen[ chr * 16 + ra ];
+		UINT8 data = pcjr.chr_gen[ chr * pcjr.chr_size + ra ];
 		UINT16 fg = attr & 0x0F;
 		UINT16 bg = ( attr >> 4 ) & 0x07;
 
@@ -160,7 +206,7 @@ static MC6845_UPDATE_ROW( t1000_text_blink_update_row ) {
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = pcjr.displayram[ offset ];
 		UINT8 attr = pcjr.displayram[ offset +1 ];
-		UINT8 data = pcjr.chr_gen[ chr * 16 + ra ];
+		UINT8 data = pcjr.chr_gen[ chr * pcjr.chr_size + ra ];
 		UINT16 fg = attr & 0x0F;
 		UINT16 bg = ( attr >> 4 ) & 0x07;
 
@@ -398,6 +444,7 @@ static int pc_t1t_color_select_r(void)
  *  7-6 not used
  *  5-4 color EGA, color ET4000: diagnose video display feedback, select
  *      from color plane enable
+ *  4   holds current dot being displayed
  *  3   in vertical retrace
  *  2   (CGA,color EGA) light pen switch is off
  *      (MCGA,color ET4000) reserved (0)
@@ -411,6 +458,9 @@ static int pc_t1t_color_select_r(void)
 static int pc_t1t_status_r(void)
 {
     int data = pcjr.vsync | pcjr.status | pcjr.hsync;
+	/* HACK HACK HACK */
+	data |= ( pcjr.hsync ? 0x10 : 0x00 );
+	/* end HACK */
     return data;
 }
 
@@ -629,5 +679,13 @@ static MC6845_ON_VSYNC_CHANGED( t1000_vsync_changed ) {
 	if ( vsync ) {
 		pcjr.pc_framecnt++;
 	}
+}
+
+static MC6845_ON_VSYNC_CHANGED( pcjr_vsync_changed ) {
+	pcjr.vsync = vsync ? 8 : 0;
+	if ( vsync ) {
+		pcjr.pc_framecnt++;
+	}
+	pic8259_set_irq_line(device_list_find_by_tag( device->machine->config->devicelist, PIC8259, "pic8259_master" ), 5, vsync);
 }
 
