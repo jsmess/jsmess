@@ -227,25 +227,14 @@ static void pc_fdc_data_rate_w(UINT8 data)
 	 | | `-------------- 1 = turn floppy drive B motor on
 	 | `---------------- 1 = turn floppy drive C motor on
 	 `------------------ 1 = turn floppy drive D motor on
-
-	On a PC Jr the DOR is wired up a bit differently:
-	|7|6|5|4|3|2|1|0|
-	 | | | | | | | `--- Drive enable ( 0 = off, 1 = on )
-	 | | | | | | `----- Reserved
-	 | | | | | `------- Reserved
-	 | | | | `--------- Reserved
-	 | | | `----------- Reserved
-	 | | `------------- Watchdog Timer Enable ( 0 = watchdog enabled, 1 = watchdog disabled )
-	 | `--------------- Watchdog Timer Trigger ( on a 1->0 transition to strobe the trigger )
-	 `----------------- FDC Reset ( 0 = hold reset, 1 = release reset )
  */
 
-static void pc_fdc_dor_w(UINT8 data)
+static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 {
 	int selected_drive;
 	int floppy_count;
 
-	floppy_count = device_count(Machine, IO_FLOPPY);
+	floppy_count = device_count(machine, IO_FLOPPY);
 
 	if (floppy_count > (fdc->digital_output_register & 0x03))
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, fdc->digital_output_register & 0x03), 1, 0);
@@ -321,6 +310,75 @@ static void pc_fdc_dor_w(UINT8 data)
 }
 
 
+/*	PCJr FDC Digitial Output Register (DOR)
+
+	On a PC Jr the DOR is wired up a bit differently:
+	|7|6|5|4|3|2|1|0|
+	 | | | | | | | `--- Drive enable ( 0 = off, 1 = on )
+	 | | | | | | `----- Reserved
+	 | | | | | `------- Reserved
+	 | | | | `--------- Reserved
+	 | | | `----------- Reserved
+	 | | `------------- Watchdog Timer Enable ( 0 = watchdog enabled, 1 = watchdog disabled )
+	 | `--------------- Watchdog Timer Trigger ( on a 1->0 transition to strobe the trigger )
+	 `----------------- FDC Reset ( 0 = hold reset, 1 = release reset )
+ */
+
+static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
+{
+	int floppy_count;
+
+	floppy_count = device_count(machine, IO_FLOPPY);
+
+	/* set floppy drive motor state */
+	if (floppy_count > 0)
+		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), data & 0x01);
+
+	if ( data & 0x01 )
+	{
+		if ( floppy_count )
+			floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
+	}
+
+	/* reset? */
+	if ( ! (data & 0x80) )
+	{
+		/* yes */
+
+			/* pc-xt expects a interrupt to be generated
+			when the fdc is reset.
+			In the FDC docs, it states that a INT will
+			be generated if READY input is true when the
+			fdc is reset.
+
+				It also states, that outputs to drive are set to 0.
+				Maybe this causes the drive motor to go on, and therefore
+				the ready line is set.
+
+			This in return causes a int?? ---
+
+
+		what is not yet clear is if this is a result of the drives ready state
+		changing...
+		*/
+			nec765_set_ready_state(1);
+
+		/* set FDC at reset */
+		nec765_set_reset_state(1);
+	}
+	else
+	{
+		pc_fdc_set_tc_state(0);
+
+		/* release reset on fdc */
+		nec765_set_reset_state(0);
+	}
+
+	logerror("pcjr_fdc_dor_w: changing dor from %02x to %02x\n", fdc->digital_output_register, data);
+
+	fdc->digital_output_register = data;
+}
+
 
 READ8_HANDLER ( pc_fdc_r )
 {
@@ -367,7 +425,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 		case 1:	/* n/a */
 			break;
 		case 2:
-			pc_fdc_dor_w(data);
+			pc_fdc_dor_w(machine, data);
 			break;
 		case 3:
 			/* tape drive select? */
@@ -391,6 +449,22 @@ WRITE8_HANDLER ( pc_fdc_w )
 			 *		1 0		 250 kbps
 			 *		1 1		1000 kbps
 			 */
+			break;
+	}
+}
+
+WRITE8_HANDLER ( pcjr_fdc_w )
+{
+	if (LOG_FDC)
+		logerror("pcjr_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) activecpu_get_reg(REG_PC), offset, data);
+
+	switch(offset)
+	{
+		case 2:
+			pcjr_fdc_dor_w( machine, data );
+			break;
+		default:
+			pc_fdc_w( machine, offset, data );
 			break;
 	}
 }

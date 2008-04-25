@@ -285,6 +285,27 @@ ADDRESS_MAP_END
 
 
 
+static ADDRESS_MAP_START(ibmpcjr_io, ADDRESS_SPACE_IO, 8)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237", dma8237_r, dma8237_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259_master", pic8259_r, pic8259_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
+	AM_RANGE(0x00a0, 0x00a0) AM_WRITE( pc_nmi_enable_w )
+	AM_RANGE(0x00c0, 0x00c0) AM_WRITE(								SN76496_0_w)
+	AM_RANGE(0x00f0, 0x00f7) AM_READWRITE(pc_fdc_r,					pcjr_fdc_w)
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_0", ins8250_r, ins8250_w)
+	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,				pc_HDC1_w)
+	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
+	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,			pc_t1t_p37x_w)
+	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,		pc_parallelport0_w)
+	AM_RANGE(0x03d0, 0x03df) AM_READWRITE(pc_T1T_r,					pc_T1T_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", ins8250_r, ins8250_w)
+ADDRESS_MAP_END
+
+
+
 static ADDRESS_MAP_START(pc200_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8(DMA8237, "dma8237", dma8237_r, dma8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff)
@@ -1684,6 +1705,51 @@ static MACHINE_DRIVER_START( t1000hx )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( ibmpcjr )
+	/* basic machine hardware */
+	MDRV_CPU_PC(tandy1000, ibmpcjr, I8088, 8000000, tandy1000_frame_interrupt)
+
+	MDRV_MACHINE_START(pc)
+	MDRV_MACHINE_RESET(pc)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+
+	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
+	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+
+	/* video hardware */
+	MDRV_IMPORT_FROM( pcvideo_t1000 )
+
+    /* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ADD(SN76496, 2386360)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_NVRAM_HANDLER( tandy1000 )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
+MACHINE_DRIVER_END
+
 #if 0
 	//pcjr roms? (incomplete dump, most likely 64 kbyte)
 	// basic c1.20
@@ -2131,7 +2197,7 @@ COMP(  1985,	bondwell,	ibm5150,	0,		pccga,		bondwell,   bondwell,	ibmpc,   "Bond
 COMP(  1988,	europc,		ibm5150,	0,		europc,     europc,		europc,     ibmpc,   "Schneider Rdf. AG",  "EURO PC", 0)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,    ibmpc,   "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
+COMP(  1983,	ibmpcjr,	ibm5150,	0,		ibmpcjr,    tandy1t,	t1000hx,    ibmpc,   "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
 COMP(  1987,	t1000hx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000HX", 0)
 COMP(  1987,	t1000sx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
 

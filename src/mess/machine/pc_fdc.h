@@ -41,6 +41,7 @@ void pc_fdc_dack_w(int);
 
 READ8_HANDLER(pc_fdc_r);
 WRITE8_HANDLER(pc_fdc_w);
+WRITE8_HANDLER ( pcjr_fdc_w );
 
 #endif /* PC_FDC_H */
 
