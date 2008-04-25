@@ -41,6 +41,8 @@ System Driver Changes:
 
 - [IBMPC,IBM5150] Renamed ibmpc driver to ibm5150.  [Wilbert Pol]
 
+- [LISA] Fixes serial number read.  (bug #1583)  [Gilles Fetis]
+
 - [MBEE] Added snapload support for COM and MWB filetypes. Added LOCK key to
   keyboard. [Robbbert]
 
