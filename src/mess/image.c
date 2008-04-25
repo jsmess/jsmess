@@ -1192,7 +1192,7 @@ void image_message(const device_config *device, const char *format, ...)
 static int read_hash_config(const char *sysname, image_slot_data *image)
 {
 	hash_file *hashfile = NULL;
-	const struct hash_info *info = NULL;
+	const hash_info *info = NULL;
 
 	/* open the hash file */
 	hashfile = hashfile_open(sysname, FALSE, NULL);

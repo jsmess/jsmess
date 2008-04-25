@@ -43,7 +43,7 @@ struct _file_info
 	// hash information
 	char szHash[HASH_BUF_SIZE];
 	BOOL bHashRealized;
-	const struct hash_info *pHashInfo;
+	const hash_info *pHashInfo;
 
 	LPCSTR pszZipEntryName;
 	LPCSTR pszSubName;

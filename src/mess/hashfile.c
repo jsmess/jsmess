@@ -22,7 +22,7 @@ struct _hash_file
 	object_pool *pool;
 	unsigned int functions[IO_COUNT];
 
-	struct hash_info **preloaded_hashes;
+	hash_info **preloaded_hashes;
 	int preloaded_hash_count;
 
 	void (*error_proc)(const char *message);
@@ -46,13 +46,13 @@ struct hash_parse_state
 	int done;
 
 	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const char *hash);
-	void (*use_proc)(hash_file *hashfile, void *param, struct hash_info *hi);
+	void (*use_proc)(hash_file *hashfile, void *param, hash_info *hi);
 	void (*error_proc)(const char *message);
 	void *param;
 
 	enum hash_parse_position pos;
 	char **text_dest;
-	struct hash_info *hi;
+	hash_info *hi;
 };
 
 
@@ -122,7 +122,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 {
 	struct hash_parse_state *state = (struct hash_parse_state *) data;
 	const char *name;
-	struct hash_info *hi;
+	hash_info *hi;
 	char **text_dest;
 	char hash_string[HASH_BUF_SIZE];
 	unsigned int functions, all_functions;
@@ -207,7 +207,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			/* do we use this hash? */
 			if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, hash_string))
 			{
-				hi = pool_malloc(state->hashfile->pool, sizeof(struct hash_info));
+				hi = pool_malloc(state->hashfile->pool, sizeof(hash_info));
 				if (!hi)
 					return;
 				memset(hi, 0, sizeof(*hi));
@@ -296,7 +296,7 @@ static void data_handler(void *data, const XML_Char *s, int len)
 
 static void hashfile_parse(hash_file *hashfile,
 	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const char *hash),
-	void (*use_proc)(hash_file *hashfile, void *param, struct hash_info *hi),
+	void (*use_proc)(hash_file *hashfile, void *param, hash_info *hi),
 	void (*error_proc)(const char *message),
 	void *param)
 {
@@ -349,9 +349,9 @@ done:
 
 /* ----------------------------------------------------------------------- */
 
-static void preload_use_proc(hash_file *hashfile, void *param, struct hash_info *hi)
+static void preload_use_proc(hash_file *hashfile, void *param, hash_info *hi)
 {
-	struct hash_info **new_preloaded_hashes;
+	hash_info **new_preloaded_hashes;
 
 	new_preloaded_hashes = pool_realloc(hashfile->pool, hashfile->preloaded_hashes,
 		(hashfile->preloaded_hash_count + 1) * sizeof(*new_preloaded_hashes));
@@ -428,7 +428,7 @@ void hashfile_close(hash_file *hashfile)
 struct hashlookup_params
 {
 	const char *hash;
-	struct hash_info *hi;
+	hash_info *hi;
 };
 
 
@@ -442,7 +442,7 @@ static int singular_selector_proc(hash_file *hashfile, void *param, const char *
 
 
 
-static void singular_use_proc(hash_file *hashfile, void *param, struct hash_info *hi)
+static void singular_use_proc(hash_file *hashfile, void *param, hash_info *hi)
 {
 	struct hashlookup_params *hlparams = (struct hashlookup_params *) param;
 	hlparams->hi = hi;
@@ -450,7 +450,7 @@ static void singular_use_proc(hash_file *hashfile, void *param, struct hash_info
 
 
 
-const struct hash_info *hashfile_lookup(hash_file *hashfile, const char *hash)
+const hash_info *hashfile_lookup(hash_file *hashfile, const char *hash)
 {
 	struct hashlookup_params param;
 	int i;
