@@ -317,6 +317,20 @@ static const CENTRONICS_CONFIG cent_config[3]={
 
 /**********************************************************
  *
+ * NMI handling
+ *
+ **********************************************************/
+
+static UINT8	nmi_enabled;
+
+WRITE8_HANDLER( pc_nmi_enable_w ) {
+	logerror( "%08X: changing NMI state to %s\n", activecpu_get_pc(), data & 0x80 ? "enabled" : "disabled" );
+
+	nmi_enabled = data & 0x80;
+}
+
+/**********************************************************
+ *
  * NEC uPD765 floppy interface
  *
  **********************************************************/

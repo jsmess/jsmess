@@ -19,6 +19,8 @@ extern const ins8250_interface ibmpc_com_interface[4];
 
 void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int));
 
+WRITE8_HANDLER( pc_nmi_enable_w );
+
 READ8_HANDLER( pc_page_r );
 WRITE8_HANDLER( pc_page_w );
 
