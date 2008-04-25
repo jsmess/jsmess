@@ -185,7 +185,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8(DMA8237, "dma8237", dma8237_r, dma8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8(PIT8253, "pit8253", pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8(PIT8253, "pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8(PPI8255, "ppi8255", ppi8255_r, ppi8255_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
@@ -1367,7 +1367,7 @@ static MACHINE_DRIVER_START( europc )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( xtcga )
+static MACHINE_DRIVER_START( ibm5160 )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc16, pc16, I8086, 12000000, pc_cga_frame_interrupt)
 
@@ -1746,7 +1746,7 @@ ROM_START( ibm5150 )
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))		/* WDC Expansion ROM C8000-C9FFF */
 
 	/* IBM PC 5150 (rev 2: 1501-476 10/27/82) 5-screw case w/1501981 CGA Card, ROM Basic 1.1 */
-	ROM_SYSTEM_BIOS( 0, "rev3", "IBM PC 5150 1501471 10/27/82" )
+	ROM_SYSTEM_BIOS( 0, "default", "IBM PC 5150 1501471 10/27/82" )
 	ROMX_LOAD("5000019.u29", 0xf6000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9), ROM_BIOS(1))		/* ROM Basic 1.1 F6000-F7FFF */
 	ROMX_LOAD("5000021.u30", 0xf8000, 0x2000, CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731), ROM_BIOS(1))		/* ROM Basic 1.1 F8000-F9FFF */
 	ROMX_LOAD("5000022.u31", 0xfa000, 0x2000, CRC(aac3fc37) SHA1(c9e0529470edf04da093bb8c8ae2536c688c1a74), ROM_BIOS(1))		/* ROM Basic 1.1 FA000-FBFFF */
@@ -1945,11 +1945,26 @@ ROM_START( t1000rl )
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
 ROM_END
 
-ROM_START( ibmxt )
+ROM_START( ibm5160 )
 	ROM_REGION16_LE(0x100000,REGION_CPU1, 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
-	ROM_LOAD16_BYTE("xt050986.0", 0xf0000, 0x8000, CRC(83727c42) SHA1(1b218f96aa9570beef5c1f2d7b07433b21dc4599))
-	ROM_LOAD16_BYTE("xt050986.1", 0xf0001, 0x8000, CRC(2a629953) SHA1(048bb1a0b437ae7b93a4d71648cee12e5e37892c))
+
+	ROM_SYSTEM_BIOS( 0, "rev1", "IBM XT 5160 08/16/82" )	/* ROMs marked as BAD_DUMP for now. We expect the data to be in a different ROM chip layout */
+	ROMX_LOAD("basicc11.f6", 0xf6000, 0x2000, BAD_DUMP CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9), ROM_BIOS(1) )
+	ROMX_LOAD("basicc11.f8", 0xf8000, 0x2000, BAD_DUMP CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731), ROM_BIOS(1) )
+	ROMX_LOAD("basicc11.fa", 0xfa000, 0x2000, BAD_DUMP CRC(aac3fc37) SHA1(c9e0529470edf04da093bb8c8ae2536c688c1a74), ROM_BIOS(1) )
+	ROMX_LOAD("basicc11.fc", 0xfc000, 0x2000, BAD_DUMP CRC(3062b3fc) SHA1(5134dd64721cbf093d059ee5d3fd09c7f86604c7), ROM_BIOS(1) )
+	ROMX_LOAD("pc081682.bin", 0xfe000, 0x2000, BAD_DUMP CRC(5c3f0256) SHA1(b42c78abd0a9c630a2f972ad2bae46d83c3a2a09), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS( 1, "rev2", "IBM XT 5160 11/08/82" )	/* Same as PC 5155 BIOS */
+	ROMX_LOAD("pc110882", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS( 2, "rev3", "IBM XT 5160 01/10/86" )    /* Has enhanced keyboard support and a 3.5" drive */
+	ROMX_LOAD("pc011086", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(3) )
+
+	ROM_SYSTEM_BIOS( 3, "rev4", "IBM XT 5160 05/09/86" )
+	ROMX_LOAD("xt050986.0", 0xf0000, 0x8000, CRC(83727c42) SHA1(1b218f96aa9570beef5c1f2d7b07433b21dc4599), ROM_SKIP(1) | ROM_BIOS(4))
+	ROMX_LOAD("xt050986.1", 0xf0001, 0x8000, CRC(2a629953) SHA1(048bb1a0b437ae7b93a4d71648cee12e5e37892c), ROM_SKIP(1) | ROM_BIOS(4))
 
 	/* Character rom */
 	ROM_REGION(0x2000,REGION_GFX1, 0)
@@ -2108,7 +2123,6 @@ SYSTEM_CONFIG_END
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
 COMP(  1981,	ibm5150,	0,			0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1982,	ibmpca,		ibm5150,	0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 08/16/82" , 0)
 COMP(  1984,	dgone,		ibm5150,	0,		pccga,      pccga,	    pccga,	    ibmpc,   "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
 COMP(  1987,	pc,			ibm5150,	0,		pccga,      pccga,		pccga,	    ibmpc,   "",  "PC (CGA)" , 0)
 COMP(  1985,	bondwell,	ibm5150,	0,		pccga,		bondwell,   bondwell,	ibmpc,   "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
@@ -2120,7 +2134,7 @@ COMP(  1987,	t1000hx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy
 COMP(  1987,	t1000sx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
 
 // xt class (pc but 8086)
-COMP(  1986,	ibmxt,		ibm5150,	0,		xtcga,      xtcga,		pccga,		ibmpc,   "International Business Machines",  "IBM PC/XT (CGA)" , 0)
+COMP(  1982,	ibm5160,	ibm5150,	0,		ibm5160,    xtcga,		pccga,		ibmpc,   "International Business Machines",  "IBM XT 5160" , 0)
 COMP(  1988,	pc200,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Sinclair Research",  "PC200 Professional Series", 0)
 COMP(  1988,	pc20,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PC20" , 0)
 COMP(  1987,	ppc512,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PPC512", 0)

@@ -372,7 +372,6 @@ TESTDRIVER( c128dita )	/* Commodore 128D - PAL (italian) cost reduced set	*/
 
 	/* IBM PC & Clones */
 	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/
-	DRIVER( ibmpca )	/* 1982 IBM PC										*/
 	DRIVER( dgone )		/* 1984 Data General/One */
 	DRIVER( pcmda )		/* 1987 PC with MDA									*/
 	DRIVER( pcherc )    /* 1987 PC with Hercules (for testing hercules)		*/
@@ -386,7 +385,7 @@ TESTDRIVER( bondwell )	/* 1985	Bondwell (CGA)								*/
 TESTDRIVER( t1000sx )	/* 1987 Tandy 1000SX (similiar to PCJr)				*/
 
 	/* xt */
-	DRIVER( ibmxt )		/* 1986	IBM XT										*/
+	DRIVER( ibm5160 )	/* 1982	IBM XT 5160									*/
 	DRIVER( pc200 )		/* 1988 Sinclair PC200								*/
 	DRIVER( pc20 )		/* 1988 Amstrad PC20								*/
 TESTDRIVER( ppc512 )	/* 1987 Amstrad PPC512								*/
