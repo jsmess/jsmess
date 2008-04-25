@@ -55,6 +55,10 @@ static void mc6845_screen_configure(running_machine *machine);
 WRITE8_HANDLER ( mbee_pcg_color_latch_w )
 {
 	mbee_pcg_color_latch = data;
+	if (data & 0x40)
+		memory_set_bank( 3, 1);
+	else
+		memory_set_bank( 3, 0);
 }
 
  READ8_HANDLER ( mbee_pcg_color_latch_r )
@@ -67,14 +71,6 @@ WRITE8_HANDLER ( mbee_videoram_w )
 	videoram[offset] = data;
 }
 
- READ8_HANDLER ( mbee_videoram_r )
-{
-	if( m6545_video_bank & 0x01 )
-		return pcgram[offset];
-	else
-		return videoram[offset];
-}
-
 WRITE8_HANDLER ( mbee_pcg_w )
 {
 	if( pcgram[0x0800+offset] != data )
@@ -84,11 +80,6 @@ WRITE8_HANDLER ( mbee_pcg_w )
 		/* decode character graphics again */
 		decodechar(machine->gfx[0], chr, pcgram);
 	}
-}
-
- READ8_HANDLER ( mbee_pcg_r )
-{
-	return pcgram[0x0800+offset];
 }
 
 WRITE8_HANDLER ( mbee_pcg_color_w )
@@ -105,15 +96,6 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 	}
 	else
 		colorram[offset] = data;
-}
-
- READ8_HANDLER ( mbee_pcg_color_r )
-{
-
-	if ( mbee_pcg_color_latch & 0x40 )
-		return colorram[offset];
-	else
-		return pcgram[0x0800+offset];
 }
 
 static int keyboard_matrix_r(int offs)
@@ -179,6 +161,10 @@ WRITE8_HANDLER ( mbee_color_bank_w )
 WRITE8_HANDLER ( mbee_video_bank_w )
 {
 	m6545_video_bank = data;
+	if (data & 1)
+		memory_set_bank( 2, 0);
+	else
+		memory_set_bank( 2, 1);
 }
 
 static void m6545_update_strobe(int param)
@@ -365,7 +351,7 @@ WRITE8_HANDLER ( m6545_data_w )
 			break;
 		crt.screen_address_hi = data;
 		addr = 0x17000+((data & 32) << 6);
-		memcpy(memory_region(REGION_CPU1)+0xf000, memory_region(REGION_CPU1)+addr, 0x800);
+		memcpy(pcgram, memory_region(REGION_CPU1)+addr, 0x800);
 		for (i = 0; i < 128; i++)
 				decodechar(machine->gfx[0],i, pcgram);
 		break;
@@ -461,15 +447,15 @@ static void mc6845_screen_configure(running_machine *machine)
 
 VIDEO_START( mbee )
 {
-	videoram = auto_malloc(0x800);
-	pcgram = memory_region(REGION_CPU1)+0xf000;
+	videoram = memory_region(REGION_CPU1)+0x15000;
+	pcgram = memory_region(REGION_CPU1)+0x11000;
 }
 
 VIDEO_START( mbeeic )
 {
-	videoram = auto_malloc(0x800);
-	colorram = auto_malloc(0x800);
-	pcgram = memory_region(REGION_CPU1)+0xf000;
+	videoram = memory_region(REGION_CPU1)+0x15000;
+	colorram = memory_region(REGION_CPU1)+0x15800;
+	pcgram = memory_region(REGION_CPU1)+0x11000;
 }
 
 VIDEO_UPDATE( mbee )

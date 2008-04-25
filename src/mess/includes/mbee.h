@@ -46,13 +46,8 @@ WRITE8_HANDLER ( mbee_video_bank_w );
  READ8_HANDLER ( mbee_pcg_color_latch_r );
 WRITE8_HANDLER ( mbee_pcg_color_latch_w );
 
- READ8_HANDLER ( mbee_videoram_r );
 WRITE8_HANDLER ( mbee_videoram_w );
-
- READ8_HANDLER ( mbee_pcg_color_r );
 WRITE8_HANDLER ( mbee_pcg_color_w );
-
- READ8_HANDLER ( mbee_pcg_r );
 WRITE8_HANDLER ( mbee_pcg_w );
 
 VIDEO_START( mbee );
