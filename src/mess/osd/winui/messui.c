@@ -4,6 +4,7 @@
 //
 //============================================================
 
+// standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <assert.h>
 #include <string.h>
@@ -15,6 +16,7 @@
 #include <winuser.h>
 #include <tchar.h>
 
+// MAME/MAMEOS/MAMEUI/MESS headers
 #include "screenshot.h"
 #include "bitmask.h"
 #include "winui.h"
@@ -34,15 +36,74 @@
 #include "messui.h"
 #include "winutf8.h"
 
+
+//============================================================
+//  PARAMETERS
+//============================================================
+
 #define LOG_SOFTWARE	0
 
-static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn);
 
-static LPCSTR SoftwareTabView_GetTabShortName(int tab);
-static LPCSTR SoftwareTabView_GetTabLongName(int tab);
-static void SoftwareTabView_OnSelectionChanged(void);
-static void SoftwareTabView_OnMoveSize(void);
-static void SetupSoftwareTabView(void);
+//============================================================
+//  TYPEDEFS
+//============================================================
+
+typedef struct _mess_image_type mess_image_type;
+struct _mess_image_type
+{
+	const device_config *dev;
+    const char *ext;
+};
+
+
+typedef struct _device_entry device_entry;
+struct _device_entry
+{
+	iodevice_t dev_type;
+	const char *icon_name;
+	const char *dlgname;
+};
+
+
+
+
+//============================================================
+//  GLOBAL VARIABLES
+//============================================================
+
+char g_szSelectedItem[MAX_PATH];
+
+
+
+//============================================================
+//  LOCAL VARIABLES
+//============================================================
+
+static int s_nGame;
+static BOOL s_bIgnoreSoftwarePickerNotifies;
+
+static int *mess_icon_index;
+
+// TODO - We need to make icons for Cylinders, Punch Cards, and Punch Tape!
+static const device_entry s_devices[] =
+{
+	{ IO_CARTSLOT,	"roms",		"Cartridge images" },
+	{ IO_FLOPPY,	"floppy",	"Floppy disk images" },
+	{ IO_HARDDISK,	"hard",		"Hard disk images" },
+	{ IO_CYLINDER,	NULL,		"Cylinders" },
+	{ IO_CASSETTE,	NULL,		"Cassette images" },
+	{ IO_PUNCHCARD,	NULL,		"Punchcard images" },
+	{ IO_PUNCHTAPE,	NULL,		"Punchtape images" },
+	{ IO_PRINTER,	NULL,		"Printer Output" },
+	{ IO_SERIAL,	NULL,		"Serial Output" },
+	{ IO_PARALLEL,	NULL,		"Parallel Output" },
+	{ IO_SNAPSHOT,	"snapshot",	"Snapshots" },
+	{ IO_QUICKLOAD,	"snapshot",	"Quickloads" },
+	{ IO_MEMCARD,	NULL,		"Memory cards" },
+	{ IO_CDROM,		NULL,		"CD-ROM images" }
+};
+
+
 
 static const LPCTSTR mess_column_names[] =
 {
@@ -56,7 +117,19 @@ static const LPCTSTR mess_column_names[] =
 	TEXT("MD5")
 };
 
-static int *mess_icon_index;
+
+
+//============================================================
+//  PROTOTYPES
+//============================================================
+
+static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn);
+
+static LPCSTR SoftwareTabView_GetTabShortName(int tab);
+static LPCSTR SoftwareTabView_GetTabLongName(int tab);
+static void SoftwareTabView_OnSelectionChanged(void);
+static void SoftwareTabView_OnMoveSize(void);
+static void SetupSoftwareTabView(void);
 
 static void MessOpenOtherSoftware(const device_config *dev);
 static void MessCreateDevice(const device_config *dev);
@@ -75,17 +148,11 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex, c
 static void MessTestsBegin(void);
 #endif /* MAME_DEBUG */
 
-char g_szSelectedItem[MAX_PATH];
 
-static int s_nGame;
-static BOOL s_bIgnoreSoftwarePickerNotifies;
 
-struct deviceentry
-{
-	iodevice_t dev_type;
-	const char *icon_name;
-	const char *dlgname;
-};
+//============================================================
+//  PICKER/TABVIEW CALLBACKS
+//============================================================
 
 static const struct PickerCallbacks s_softwareListCallbacks =
 {
@@ -135,40 +202,23 @@ static const struct TabViewCallbacks s_softwareTabViewCallbacks =
 
 
 
-// ------------------------------------------------------------------------
-// Image types
+//============================================================
+//  Image types
 //
-// IO_ZIP is used for ZIP files
-// IO_ALIAS is used for unknown types
-// IO_COUNT is used for bad files
-// ------------------------------------------------------------------------
+//	IO_ZIP is used for ZIP files
+//	IO_UNKNOWN is used for unknown types
+//	IO_BAD is used for bad files
+//============================================================
 
 #define IO_ZIP		(IO_COUNT + 0)
 #define IO_BAD		(IO_COUNT + 1)
 #define IO_UNKNOWN	(IO_COUNT + 2)
 
-// TODO - We need to make icons for Cylinders, Punch Cards, and Punch Tape!
-static const struct deviceentry s_devices[] =
-{
-	{ IO_CARTSLOT,	"roms",		"Cartridge images" },
-	{ IO_FLOPPY,	"floppy",	"Floppy disk images" },
-	{ IO_HARDDISK,	"hard",		"Hard disk images" },
-	{ IO_CYLINDER,	NULL,		"Cylinders" },
-	{ IO_CASSETTE,	NULL,		"Cassette images" },
-	{ IO_PUNCHCARD,	NULL,		"Punchcard images" },
-	{ IO_PUNCHTAPE,	NULL,		"Punchtape images" },
-	{ IO_PRINTER,	NULL,		"Printer Output" },
-	{ IO_SERIAL,	NULL,		"Serial Output" },
-	{ IO_PARALLEL,	NULL,		"Parallel Output" },
-	{ IO_SNAPSHOT,	"snapshot",	"Snapshots" },
-	{ IO_QUICKLOAD,	"snapshot",	"Quickloads" },
-	{ IO_MEMCARD,	NULL,		"Memory cards" },
-	{ IO_CDROM,		NULL,		"CD-ROM images" }
-};
+//============================================================
+//  IMPLEMENTATION
+//============================================================
 
-
-
-static const struct deviceentry *lookupdevice(iodevice_t d)
+static const device_entry *lookupdevice(iodevice_t d)
 {
 	int i;
 	for (i = 0; i < ARRAY_LENGTH(s_devices); i++)
@@ -180,10 +230,6 @@ static const struct deviceentry *lookupdevice(iodevice_t d)
 }
 
 
-
-// ------------------------------------------------------------------------
-// UI
-// ------------------------------------------------------------------------
 
 BOOL CreateMessIcons(void)
 {
@@ -572,12 +618,6 @@ void InitMessPicker(void)
 // Open others dialog
 // ------------------------------------------------------------------------
 
-typedef struct
-{
-	const device_config *dev;
-    const char *ext;
-} mess_image_type;
-
 static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_proc cfd, LPTSTR filename, const machine_config *config, mess_image_type *imagetypes)
 {
     BOOL success;
@@ -927,7 +967,6 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 	LPCSTR pszName;
 	LPSTR s;
 	int drvindex;
-	const device_config *device;
 	HWND hwndList;
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
@@ -942,9 +981,6 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 		pszName = s ? s + 1 : pszFullName;
 
 		// Do the dirty work
-		device = SoftwarePicker_LookupDevice(hwndSoftwarePicker, nItem);
-		if (device == NULL)
-			return;
 		MessSpecifyImage(drvindex, NULL, pszFullName);
 
 		// Set up s_szSelecteItem, for the benefit of UpdateScreenShot()
