@@ -1652,7 +1652,7 @@ static void SetMainTitle(void)
 	char buffer[100];
 
 	sscanf(build_version,"%s",version);
-	snprintf(buffer, ARRAY_LENGTH(buffer), "%s %s", MAMEUINAME, version);
+	snprintf(buffer, ARRAY_LENGTH(buffer), "%s %s", MAMEUINAME, GetVersionString());
 	win_set_window_text_utf8(hMain,buffer);
 }
 
@@ -5586,23 +5586,33 @@ static void MamePlayBackGame()
 		// check for game name embedded in .inp header
 		if (pPlayBack)
 		{
-			inp_header input_header;
+			int i;
+			inp_header ihdr;
 
-			// read playback header
-			mame_fread(pPlayBack, &input_header, sizeof(inp_header));
-
-			if (!isalnum(input_header.gamename[0])) // If first byte is not alpha-numeric
-				mame_fseek(pPlayBack, 0, SEEK_SET); // old .inp file - no header
-			else
+			/* read the header and verify that it is a modern version; if not, print an error */
+			if (mame_fread(pPlayBack, &ihdr, sizeof(inp_header)) != sizeof(inp_header))
 			{
-				int i;
-				for (i = 0; drivers[i] != 0; i++) // find game and play it
+				MameMessageBox("Input file is corrupt or invalid (missing header)");
+				return;
+			}
+
+			if (memcmp("MAMEINP\0", ihdr.header, 8) != 0)
+			{
+				MameMessageBox("Input file invalid or in an older, unsupported format");
+				return;
+			}
+			if (ihdr.majversion != INP_HEADER_MAJVERSION)
+			{
+				MameMessageBox("Input file format version mismatch");
+				return;
+			}
+
+			for (i = 0; drivers[i] != 0; i++) // find game and play it
+			{
+				if (strcmp(drivers[i]->name, ihdr.gamename) == 0)
 				{
-					if (strcmp(drivers[i]->name, input_header.gamename) == 0)
-					{
-						nGame = i;
-						break;
-					}
+					nGame = i;
+					break;
 				}
 			}
 		}
@@ -5730,6 +5740,7 @@ static void MamePlayRecordGame()
 			path[strlen(path)-1] = 0; // take off trailing back slash
 
 		memset(&playopts, 0, sizeof(playopts));
+		strcat(fname, ".inp");
 		playopts.record = fname;
 		MamePlayGameWithOptions(nGame, &playopts);
 	}
