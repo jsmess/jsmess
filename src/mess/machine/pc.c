@@ -156,8 +156,15 @@ const struct dma8237_interface pc_dma8237_config =
  *
  *************************************************************/
 
+static emu_timer	*pc_int_delay_timer;
+
+static TIMER_CALLBACK( pc_delayed_pic8259_irq ) {
+	cpunum_set_input_line(pc_devices.pic8259_master->machine, 0, 0, param ? HOLD_LINE : CLEAR_LINE);
+}
+
 static PIC8259_SET_INT_LINE( pc_pic8259_master_set_int_line ) {
-	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	timer_adjust_oneshot( pc_int_delay_timer, ATTOTIME_IN_CYCLES(1,0), interrupt );
+//	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -578,6 +585,8 @@ MACHINE_RESET( pc )
 	pc_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
 	pc_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ) );
+
+	pc_int_delay_timer = timer_alloc( pc_delayed_pic8259_irq, NULL );
 }
 
 
