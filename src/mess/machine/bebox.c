@@ -500,7 +500,7 @@ WRITE64_HANDLER( bebox_800001F0_w ) { write64be_with_write8_handler(bebox_800001
 
 READ64_HANDLER( bebox_800003F0_r )
 {
-	UINT64 result = pc64be_fdc_r(machine, offset, mem_mask | 0xFFFF);
+	UINT64 result = read64be_with_read8_handler(pc_fdc_r, machine, offset, mem_mask | 0xFFFF);
 
 	if (((mem_mask >> 8) & 0xFF) == 0)
 	{
@@ -519,7 +519,7 @@ READ64_HANDLER( bebox_800003F0_r )
 
 WRITE64_HANDLER( bebox_800003F0_w )
 {
-	pc64be_fdc_w(machine, offset, data, mem_mask | 0xFFFF);
+	write64be_with_write8_handler(pc_fdc_w, machine, offset, data, mem_mask | 0xFFFF);
 
 	if (((mem_mask >> 8) & 0xFF) == 0)
 		ide_controller_w(ide_device(machine), 0x3F6, (data >> 8) & 0xFF);

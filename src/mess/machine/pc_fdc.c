@@ -395,12 +395,3 @@ WRITE8_HANDLER ( pc_fdc_w )
 	}
 }
 
-READ16_HANDLER( pc16le_fdc_r ) { return read16le_with_read8_handler(pc_fdc_r, machine, offset, mem_mask); }
-WRITE16_HANDLER( pc16le_fdc_w ) { write16le_with_write8_handler(pc_fdc_w, machine, offset, data, mem_mask); }
-
-READ32_HANDLER( pc32le_fdc_r ) { return read32le_with_read8_handler(pc_fdc_r, machine, offset, mem_mask); }
-WRITE32_HANDLER( pc32le_fdc_w ) { write32le_with_write8_handler(pc_fdc_w, machine, offset, data, mem_mask); }
-
-READ64_HANDLER( pc64be_fdc_r ) { return read64be_with_read8_handler(pc_fdc_r, machine, offset, mem_mask); }
-WRITE64_HANDLER( pc64be_fdc_w ) { write64be_with_write8_handler(pc_fdc_w,machine,  offset, data, mem_mask); }
-

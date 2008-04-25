@@ -42,15 +42,6 @@ void pc_fdc_dack_w(int);
 READ8_HANDLER(pc_fdc_r);
 WRITE8_HANDLER(pc_fdc_w);
 
-READ16_HANDLER(pc16le_fdc_r);
-WRITE16_HANDLER(pc16le_fdc_w);
-
-READ32_HANDLER(pc32le_fdc_r);
-WRITE32_HANDLER(pc32le_fdc_w);
-
-READ64_HANDLER(pc64be_fdc_r);
-WRITE64_HANDLER(pc64be_fdc_w);
-
 #endif /* PC_FDC_H */
 
 

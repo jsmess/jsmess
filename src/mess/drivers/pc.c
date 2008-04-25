@@ -207,7 +207,7 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 #endif
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(INS8250, "ins8250_2", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,				pc16le_fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(INS8250, "ins8250_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START(pc200_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc200_16le_port378_r,			pc16le_parallelport1_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(INS8250, "ins8250_2", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,					pc16le_fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,					pc_fdc_w, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(INS8250, "ins8250_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START(pc1640_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc1640_16le_port378_r,			pc16le_parallelport1_w)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(INS8250, "ins8250_2", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,				pc16le_fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(INS8250, "ins8250_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
