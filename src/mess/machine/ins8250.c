@@ -263,6 +263,7 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 				{
 					ins8250->lsr |= 1;
 					ins8250->rbr = data;
+					ins8250_trigger_int( device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE );
 				}
 				/* writing to thr will clear the int */
 				ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
@@ -294,11 +295,30 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 				data, 5+(data&3), 1+((data>>2)&1), P[(data>>3)&7], (data>>6)&1, (data>>7)&1));
             break;
 		case 4:
-			ins8250->mcr = data;
-			COM_LOG(1,"COM_mcr_w",("COM \"%s\" $%02x DTR %d, RTS %d, OUT1 %d, OUT2 %d, loopback %d\n", device->tag,
-				data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1));
-			if (ins8250->interface->handshake_out)
-				ins8250->interface->handshake_out(device,data);
+			if ( ( ins8250->mcr & 0x1f ) != ( data & 0x1f ) ) {
+				ins8250->mcr = data & 0x1f;
+				COM_LOG(1,"COM_mcr_w",("COM \"%s\" $%02x DTR %d, RTS %d, OUT1 %d, OUT2 %d, loopback %d\n", device->tag,
+					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1));
+				if (ins8250->interface->handshake_out)
+					ins8250->interface->handshake_out(device,data);
+
+				if ( ins8250->mcr & 0x10 ) {	/* loopback test */
+					data = ( ( ins8250->mcr & 0x0c ) << 4 ) | ( ( ins8250->mcr & 0x01 ) << 5 ) | ( ( ins8250->mcr & 0x02 ) << 3 );
+					if ( ( ins8250->msr & 0x20 ) != ( data & 0x20 ) ) {
+						data |= 0x02;
+					}
+					if ( ( ins8250->msr & 0x10 ) != ( data & 0x10 ) ) {
+						data |= 0x01;
+					}
+					if ( ( ins8250->msr & 0x40 ) && ! ( data & 0x40 ) ) {
+						data |= 0x04;
+					}
+					if ( ( ins8250->msr & 0x80 ) != ( data & 0x80 ) ) {
+						data |= 0x08;
+					}
+					ins8250->msr = data;
+				}
+			}
             break;
 		case 5:
 			/*
@@ -425,13 +445,6 @@ READ8_DEVICE_HANDLER( ins8250_r )
 			ins8250_clear_int(device, COM_INT_PENDING_RECEIVER_LINE_STATUS);
             break;
 		case 6:
-			if (ins8250->mcr & 0x10)	/* loopback test? */
-			{
-				data = ins8250->mcr << 4;
-				/* build delta values */
-				ins8250->msr = (ins8250->msr ^ data) >> 4;
-				ins8250->msr |= data;
-			}
 			data = ins8250->msr;
 			ins8250->msr &= 0xf0; /* reset delta values */
 			COM_LOG(2,"COM_msr_r",("COM \"%s\" $%02x\n", device->tag, data));
