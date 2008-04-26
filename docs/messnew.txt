@@ -72,7 +72,7 @@ User Interface Changes:
 - [Windows UI] Updated MESS icon, logo and other artwork (Asterokid, MAMEPlus
   team, Hobie Troxell)
 
-- [Windows UI] Fixed custom filters dialog.  (bug #1574) [Nate Woods]
+- [Windows UI] Fixed custom filters dialog.  (bugs #1561, #1574) [Nate Woods]
 
 
 
