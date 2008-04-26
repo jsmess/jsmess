@@ -61,6 +61,7 @@ System Driver Changes:
 - [VECTREX] Fixed bug #1569 [Mathis Rosenhauer]
 
 
+
 User Interface Changes:
 -----------------------
 - [Windows] Fixed "Configure..." dialog problem when customizing certain
@@ -97,7 +98,13 @@ Source Changes:
 
 - Converted CDP1861 and CDP1864 display controllers to devices. [Curt Coder]
 
-- Updated WD17xx floppy driver,now busy signal is set right [Miodrag Milanovic]
+- Updated WD17xx floppy implementation; busy signal is now set correctly.
+  [Miodrag Milanovic]
+
+- Clarified error message when MESS fails to load because of a device that is
+  expected to be present.  (bug #1493)  [Nate Woods]
+
+
 
 0.124a
 

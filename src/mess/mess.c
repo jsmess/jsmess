@@ -163,7 +163,7 @@ void mess_postdevice_init(running_machine *machine)
 			/* no image... must this device be loaded? */
 			if (info.must_be_loaded)
 			{
-				fatalerror_exitcode(MAMERR_DEVICE, "Driver requires that device %s must have an image to load\n", info.name);
+				fatalerror_exitcode(MAMERR_DEVICE, "Driver requires that device \"%s\" must have an image to load\n", info.instance_name);
 			}
 		}
 	}
