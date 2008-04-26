@@ -25,7 +25,6 @@
 
 #define NUM_SIMUL_KEYS	(UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)
 #define LOG_INPUTX		0
-#define DUMP_CODES		0
 #define SPACE_COUNT		3
 
 
@@ -381,26 +380,34 @@ static const char_info *find_charinfo(unicode_char target_char)
 
 ***************************************************************************/
 
-static const char *charstr(unicode_char ch)
+/*-------------------------------------------------
+    code_point_string - obtain a string representation of a
+	given code; used for logging and debugging
+-------------------------------------------------*/
+
+static const char *code_point_string(unicode_char ch)
 {
 	static char buf[16];
 	const char *result = buf;
 
 	switch(ch)
 	{
+		/* check some magic values */
 		case '\0':	strcpy(buf, "\\0");		break;
 		case '\r':	strcpy(buf, "\\r");		break;
 		case '\n':	strcpy(buf, "\\n");		break;
 		case '\t':	strcpy(buf, "\\t");		break;
 
 		default:
-			if (ch < 128)
+			if ((ch >= 32) && (ch < 128))
 			{
+				/* seven bit ASCII is easy */
 				buf[0] = (char) ch;
 				buf[1] = '\0';
 			}
-			else if ((ch >= UCHAR_MAMEKEY_BEGIN) && (ch < UCHAR_MAMEKEY_BEGIN + 1024))
+			else if (ch >= UCHAR_MAMEKEY_BEGIN)
 			{
+				/* try to obtain a codename with input_code_name(); this can result in an empty string */
 				astring *astr = astring_alloc();
 				input_code_name(astr, (input_code) ch - UCHAR_MAMEKEY_BEGIN);
 				snprintf(buf, ARRAY_LENGTH(buf), "%s", astring_c(astr));
@@ -408,8 +415,13 @@ static const char *charstr(unicode_char ch)
 			}
 			else
 			{
-				snprintf(buf, ARRAY_LENGTH(buf), "U+%04X", (unsigned) ch);
+				/* empty string; resolve later */
+				buf[0] = '\0';
 			}
+
+			/* did we fail to resolve? if so, we have a last resort */
+			if (buf[0] == '\0')
+				snprintf(buf, ARRAY_LENGTH(buf), "U+%04X", (unsigned) ch);
 			break;
 	}
 	return result;
@@ -467,7 +479,7 @@ static int scan_keys(const input_port_entry *input_ports, mess_input_code *codes
 						code_count++;
 
 						if (LOG_INPUTX)
-							logerror("inputx: code=%i (%s) port=%i ipt->name='%s'\n", (int) code, charstr(code), port, ipt->name);
+							logerror("inputx: code=%i (%s) port=%i ipt->name='%s'\n", (int) code, code_point_string(code), port, ipt->name);
 					}
 				}
 				break;
@@ -595,9 +607,7 @@ int inputx_validitycheck(const game_driver *gamedrv, input_port_entry **memory)
 
 
 /***************************************************************************
-
-	Core
-
+    CORE IMPLEMENTATION
 ***************************************************************************/
 
 static mess_input_code *codes;
@@ -613,10 +623,8 @@ static TIMER_CALLBACK(inputx_timerproc);
 
 
 #ifdef ENABLE_DEBUGGER
-static void execute_input(int ref, int params, const char *param[])
-{
-	inputx_post_coded(param[0]);
-}
+static void execute_input(int ref, int params, const char *param[]);
+static void execute_dumpkbd(int ref, int params, const char *param[]);
 #endif /* ENABLE_DEBUGGER */
 
 
@@ -640,32 +648,6 @@ static void setup_keybuffer(running_machine *machine)
 
 
 
-/*-------------------------------------------------
-    dump_codes - output all natural keyboard data
-	to a text file
--------------------------------------------------*/
-
-static void dump_codes(void)
-{
-	FILE *f;
-	int i;
-
-	f = fopen("codes.txt", "w");
-	if (!f)
-		return;
-
-	if (codes)
-	{
-		for (i = 0; codes[i].ch; i++)
-		{
-			fprintf(f, "%-10d (%s)\n", codes[i].ch, charstr(codes[i].ch));
-		}
-	}
-	fclose(f);
-}
-
-
-
 void inputx_init(running_machine *machine)
 {
 	codes = NULL;
@@ -677,15 +659,16 @@ void inputx_init(running_machine *machine)
 
 #ifdef ENABLE_DEBUGGER
 	if (machine->debug_mode)
+	{
 		debug_console_register_command("input", CMDFLAG_NONE, 0, 1, 1, execute_input);
+		debug_console_register_command("dumpkbd", CMDFLAG_NONE, 0, 0, 1, execute_dumpkbd);
+	}
 #endif /* ENABLE_DEBUGGER */
 
 	/* posting keys directly only makes sense for a computer */
 	if (machine->gamedrv->flags & GAME_COMPUTER)
 	{
 		codes = build_codes(machine->input_ports);
-		if (DUMP_CODES)
-			dump_codes();
 		setup_keybuffer(machine);
 	}
 }
@@ -868,7 +851,7 @@ void inputx_postn_rate(const unicode_char *text, size_t text_len, attotime rate)
 				if (LOG_INPUTX)
 				{
 					code = find_code(ch);
-					logerror("inputx_postn(): code=%i (%s) port=%i ipt->name='%s'\n", (int) ch, charstr(ch), code ? code->port[0] : -1, (code && code->ipt[0]) ? code->ipt[0]->name : "<null>");
+					logerror("inputx_postn(): code=%i (%s) port=%i ipt->name='%s'\n", (int) ch, code_point_string(ch), code ? code->port[0] : -1, (code && code->ipt[0]) ? code->ipt[0]->name : "<null>");
 				}
 
 				if (can_post_key_directly(ch))
@@ -1475,3 +1458,97 @@ int input_category_active(running_machine *machine, int category)
 	}
 	return FALSE;
 }
+
+
+
+/***************************************************************************
+    DEBUGGER SUPPORT
+***************************************************************************/
+
+/*-------------------------------------------------
+    execute_input - debugger command to enter
+	natural keyboard input
+-------------------------------------------------*/
+
+#ifdef ENABLE_DEBUGGER
+static void execute_input(int ref, int params, const char *param[])
+{
+	inputx_post_coded(param[0]);
+}
+#endif /* ENABLE_DEBUGGER */
+
+
+
+/*-------------------------------------------------
+    execute_dumpkbd - debugger command to natural
+	keyboard codes
+-------------------------------------------------*/
+
+#ifdef ENABLE_DEBUGGER
+static void execute_dumpkbd(int ref, int params, const char *param[])
+{
+	const char *filename;
+	FILE *file = NULL;
+	const mess_input_code *code;
+	char buffer[512];
+	size_t pos;
+	int i, j;
+	size_t left_column_width = 24;
+
+	/* was there a file specified? */
+	filename = (params > 0) ? param[0] : NULL;
+	if (filename != NULL)
+	{
+		/* if so, open it */
+		file = fopen(filename, "w");
+		if (file == NULL)
+		{
+			debug_console_printf("Cannot open \"%s\"\n", filename);
+			return;
+		}
+	}
+
+	if ((codes != NULL) && (codes[0].ch != 0))
+	{
+		/* loop through all codes */
+		for (i = 0; codes[i].ch; i++)
+		{
+			code = &codes[i];
+			pos = 0;
+
+			/* describe the character code */
+			pos += snprintf(&buffer[pos], ARRAY_LENGTH(buffer) - pos, "%08X (%s) ",
+				code->ch,
+				code_point_string(code->ch));
+
+			/* pad with spaces */
+			while(pos < left_column_width)
+				buffer[pos++] = ' ';
+			buffer[pos] = '\0';
+
+			/* identify the keys used */
+			for (j = 0; j < ARRAY_LENGTH(code->ipt) && (code->ipt[j] != NULL); j++)
+			{
+				pos += snprintf(&buffer[pos], ARRAY_LENGTH(buffer) - pos, "%s'%s'",
+					(j > 0) ? ", " : "",
+					code->ipt[j]->name);
+			}
+
+			/* and output it as appropriate */
+			if (file != NULL)
+				fprintf(file, "%s\n", buffer);
+			else
+				debug_console_printf("%s\n", buffer);
+		}
+	}
+	else
+	{
+		debug_console_printf("No natural keyboard support\n");
+	}
+
+	/* cleanup */
+	if (file != NULL)
+		fclose(file);
+
+}
+#endif /* ENABLE_DEBUGGER */

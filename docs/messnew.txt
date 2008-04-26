@@ -104,6 +104,9 @@ Source Changes:
 - Clarified error message when MESS fails to load because of a device that is
   expected to be present.  (bug #1493)  [Nate Woods]
 
+- Created a 'dumpkbd' debugger command to dump all natural keyboard info.
+  [Nate Woods]
+
 
 
 0.124a
