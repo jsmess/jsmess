@@ -172,7 +172,6 @@ DEVICE_IMAGE_LOAD( mess_hd )
 }
 
 
-#ifdef UNUSED_FUNCTION
 static DEVICE_IMAGE_CREATE( mess_hd )
 {
 	int err;
@@ -199,7 +198,7 @@ static DEVICE_IMAGE_CREATE( mess_hd )
 error:
 	return INIT_FAIL;
 }
-#endif
+
 
 
 /*************************************
@@ -272,14 +271,15 @@ void harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:						info->i = IO_HARDDISK; break;
 		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:				info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:				info->i = 0; break;
 		case MESS_DEVINFO_INT_CREATE_OPTCOUNT:			info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(mess_hd); break;
 		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(mess_hd); break;
 		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = DEVICE_IMAGE_UNLOAD_NAME(mess_hd); break;
+		case MESS_DEVINFO_PTR_CREATE:					info->create = DEVICE_IMAGE_CREATE_NAME(mess_hd); break;
 		case MESS_DEVINFO_PTR_CREATE_OPTGUIDE:			info->p = (void *) mess_hd_option_guide; break;
 		case MESS_DEVINFO_PTR_CREATE_OPTSPEC+0:			info->p = (void *) mess_hd_option_spec;
 

@@ -48,6 +48,8 @@ System Driver Changes:
 
 - [ORION] Added cassete loading [Miodrag Milanovic]
 
+- [PC] Fixed error reporting when loading non-existant images.  [Nate Woods]
+
 - [SPECIAL] Added Erik clone, and fixed bank switch problem [Miodrag Milanovic]
 
 - [T1000HX] Fixed bug #1130.  [Wilbert Pol]
