@@ -107,6 +107,9 @@ Source Changes:
 - Created a 'dumpkbd' debugger command to dump all natural keyboard info.
   [Nate Woods]
 
+- Fixed a regression in natural keyboard support that could cause certain keys
+  to not be recognized.  (bug #1564)  [Nate Woods]
+
 
 
 0.124a
