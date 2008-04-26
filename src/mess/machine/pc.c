@@ -215,6 +215,31 @@ const struct pit8253_config pc_pit8253_config =
 };
 
 
+/*
+  On the PC Jr the input for clock 1 seems to be selectable
+  based on bit 4(/5?) written to output port A0h. This is not
+  supported yet.
+ */
+
+const struct pit8253_config pcjr_pit8253_config =
+{
+	{
+		{
+			4772720/4,              /* heartbeat IRQ */
+			pc_timer0_w,
+			NULL
+		}, {
+			4772720/4,              /* dram refresh */
+			NULL,
+			NULL
+		}, {
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
+			NULL,
+			NULL					/* TIMER AUDIO signal */
+		}
+	}
+};
+
 /**********************************************************
  *
  * COM hardware

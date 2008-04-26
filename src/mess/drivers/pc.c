@@ -37,6 +37,12 @@ Tandy 1000 (80286) variations:
 Tandy 1000 (80386) variations:
 1000RSX/1000RSX-HD	1M-9M RAM			25.0/8.0 MHz	v01.10.00
 
+IBM PC Jr:
+
+TODO: Which clock signals are available in a PC Jr?
+      - What clock is Y1? This eventually gets passed on to the CPU (ZM40?) and some other components by a 8284 (ZM8?).
+      - Is the clock attached to the Video Gate Array (ZM36?) exactly 14MHz?
+
 ***************************************************************************/
 
 
@@ -1707,13 +1713,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ibmpcjr )
 	/* basic machine hardware */
-	MDRV_CPU_PC(tandy1000, ibmpcjr, I8088, 8000000, tandy1000_frame_interrupt)
+	MDRV_CPU_PC(tandy1000, ibmpcjr, I8088, 5000000, tandy1000_frame_interrupt)	/* TODO: Get correct cpu frequency */
 
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( pcjr_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )

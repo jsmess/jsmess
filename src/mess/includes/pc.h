@@ -13,6 +13,7 @@
 
 extern const struct dma8237_interface pc_dma8237_config;
 extern const struct pit8253_config pc_pit8253_config;
+extern const struct pit8253_config pcjr_pit8253_config;
 extern const struct pic8259_interface pc_pic8259_master_config;
 extern const struct pic8259_interface pc_pic8259_slave_config;
 extern const ins8250_interface ibmpc_com_interface[4];
