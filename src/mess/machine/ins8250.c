@@ -162,19 +162,19 @@ static void ins8250_setup_iir(const device_config *device)
 	ins8250->iir &= ~(0x04|0x02);
 
 	/* highest to lowest */
-	if (ins8250->int_pending & COM_INT_PENDING_RECEIVER_LINE_STATUS)
+	if (ins8250->ier & ins8250->int_pending & COM_INT_PENDING_RECEIVER_LINE_STATUS)
 	{
 		ins8250->iir |=0x04|0x02;
 		return;
 	}
 
-	if (ins8250->int_pending & COM_INT_PENDING_RECEIVED_DATA_AVAILABLE)
+	if (ins8250->ier & ins8250->int_pending & COM_INT_PENDING_RECEIVED_DATA_AVAILABLE)
 	{
 		ins8250->iir |=0x04;
 		return;
 	}
 
-	if (ins8250->int_pending & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY)
+	if (ins8250->ier & ins8250->int_pending & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY)
 	{
 		ins8250->iir |=0x02;
 		return;
@@ -322,6 +322,18 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 
 			break;
 		case 6:
+			/*
+			  This register can be written, but if you write a 1 bit into any of
+			  bits 3 - 0, you could cause an interrupt if the appropriate IER bit
+			  is set.
+			 */
+			COM_LOG(1,"COM_msr_w",("COM $%02x\n", data ));
+
+			ins8250->msr = data;
+
+			if ( ins8250->msr & 0x0f ) {
+				ins8250_trigger_int( device, COM_INT_PENDING_MODEM_STATUS_REGISTER );
+			}
 			break;
 		case 7:
 			ins8250->scr = data;
