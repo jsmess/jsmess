@@ -213,11 +213,9 @@ static void ins8250_update_interrupt(const device_config *device)
 		ins8250->iir &= ~(0x04|0x02);
 	}
 
-	if ( ins8250->mcr & 0x08 ) {
-		/* set or clear the int */
-		if (ins8250->interface->interrupt)
-			ins8250->interface->interrupt(device, state);
-	}
+	/* set or clear the int */
+	if (ins8250->interface->interrupt)
+		ins8250->interface->interrupt(device, state);
 }
 
 
@@ -287,6 +285,8 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 				ins8250->ier = data;
 				COM_LOG(2,"COM_ier_w",("COM $%02x: enable int on RX %d, THRE %d, RLS %d, MS %d\n",
 					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1));
+				COM_LOG(2,"COM_ier_w",("COM lsr = $%02x, int_pending = $%02x\n", ins8250->lsr, ins8250->int_pending ));
+				ins8250_update_interrupt(device);
 			}
             break;
 		case 2:
@@ -314,17 +314,12 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 
 			ins8250->lsr = data;
 
-			switch( ins8250->lsr & 0x21 ) {
-			case 0x01:
-				ins8250_trigger_int( device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE );
-				break;
-			case 0x20:
-				ins8250_trigger_int( device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY );
-				break;
-			case 0x21:
-				ins8250_trigger_int( device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE | COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY );
-				break;
-			}
+			tmp = 0;
+			tmp |= ( ins8250->lsr & 0x01 ) ? COM_INT_PENDING_RECEIVED_DATA_AVAILABLE : 0;
+			tmp |= ( ins8250->lsr & 0x1e ) ? COM_INT_PENDING_RECEIVER_LINE_STATUS : 0;
+			tmp |= ( ins8250->lsr & 0x20 ) ? COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY : 0;
+			ins8250_trigger_int( device, tmp );
+
 			break;
 		case 6:
 			break;
@@ -380,9 +375,11 @@ READ8_DEVICE_HANDLER( ins8250_r )
 		case 2:
 			data = ins8250->iir;
 			COM_LOG(2,"COM_iir_r",("COM $%02x\n", data));
-			/* this may not be correct. It says that reading this register will
-			clear the int if this is the source of the int?? */
-			ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+			/* The documentation says that reading this register will
+			clear the int if this is the source of the int */
+			if ( ins8250->ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY ) {
+				ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+			}
             break;
 		case 3:
 			data = ins8250->lcr;
