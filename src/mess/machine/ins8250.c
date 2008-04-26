@@ -190,10 +190,6 @@ static void ins8250_update_interrupt(const device_config *device)
 	ins8250_t	*ins8250 = get_safe_token(device);
 	int state;
 
-	/* disable int output? */
-	if ((ins8250->mcr & 0x08) == 0)
-		return;
-
 	/* if any bits are set and are enabled */
 	if (((ins8250->int_pending&ins8250->ier) & 0x0f) != 0)
 	{
@@ -201,11 +197,10 @@ static void ins8250_update_interrupt(const device_config *device)
 
 		/* set int */
 		state = 1;
-
 		ins8250_setup_iir(device);
 
 		/* int pending */
-		ins8250->iir |= 0x01;
+		ins8250->iir &= ~0x01;
 	}
 	else
 	{
@@ -213,15 +208,16 @@ static void ins8250_update_interrupt(const device_config *device)
 		state = 0;
 
 		/* no ints pending */
-		ins8250->iir &= ~0x01;
+		ins8250->iir |= 0x01;
 		/* priority level */
 		ins8250->iir &= ~(0x04|0x02);
 	}
 
-
-	/* set or clear the int */
-	if (ins8250->interface->interrupt)
-		ins8250->interface->interrupt(device, state);
+	if ( ins8250->mcr & 0x08 ) {
+		/* set or clear the int */
+		if (ins8250->interface->interrupt)
+			ins8250->interface->interrupt(device, state);
+	}
 }
 
 
@@ -309,6 +305,26 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 				ins8250->interface->handshake_out(device,data);
             break;
 		case 5:
+			/*
+			  This register can be written, but if you write a 1 bit into any of
+			  bits 5 - 0, you could cause an interrupt if the appropriate IER bit
+			  is set.
+			*/
+			COM_LOG(1,"COM_lsr_w",("COM $%02x\n", data ));
+
+			ins8250->lsr = data;
+
+			switch( ins8250->lsr & 0x21 ) {
+			case 0x01:
+				ins8250_trigger_int( device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE );
+				break;
+			case 0x20:
+				ins8250_trigger_int( device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY );
+				break;
+			case 0x21:
+				ins8250_trigger_int( device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE | COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY );
+				break;
+			}
 			break;
 		case 6:
 			break;
