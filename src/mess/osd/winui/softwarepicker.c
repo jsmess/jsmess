@@ -69,10 +69,7 @@ struct _software_picker_info
 	int current_position;
 	directory_search_info *first_search_info;
 	directory_search_info *last_search_info;
-	const game_driver *driver;
-	machine_config *config;
-	hash_file *hashfile;
-	void (*error_callback)(const char *message);
+	const software_config *config;
 };
 
 
@@ -185,7 +182,7 @@ iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 
 	if (device != NULL)
 	{
-		type = image_device_getinfo(GetSoftwarePickerInfo(hwndPicker)->config, device).type;
+		type = image_device_getinfo(GetSoftwarePickerInfo(hwndPicker)->config->mconfig, device).type;
 	}
 	else
 	{
@@ -196,66 +193,21 @@ iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 
 
 
-void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *driver)
+void SoftwarePicker_SetDriver(HWND hwndPicker, const software_config *config)
 {
-	software_picker_info *pPickerInfo;
 	int i;
-
-	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
-
-	// did the driver change?
-	if (pPickerInfo->driver != driver)
-	{
-		// is there a hash file loaded?
-		if (pPickerInfo->hashfile != NULL)
-		{
-			// close down the file
-			hashfile_close(pPickerInfo->hashfile);
-			pPickerInfo->hashfile = NULL;
-
-			// invalidate the hash "realization"
-			for (i = 0; i < pPickerInfo->file_index_length; i++)
-			{
-				pPickerInfo->file_index[i]->hashinfo = NULL;
-				pPickerInfo->file_index[i]->hash_realized = FALSE;
-			}
-			pPickerInfo->hashes_realized = 0;
-		}
-
-		// is there a machine_config loaded?
-		if (pPickerInfo->config != NULL)
-		{
-			// free the machine_config
-			machine_config_free(pPickerInfo->config);
-			pPickerInfo->config = NULL;
-		}
-
-		// change the driver value
-		pPickerInfo->driver = driver;
-
-		// if we have a driver, we have to load some stuff
-		if (driver != NULL)
-		{
-			// get the configuration
-			pPickerInfo->config = machine_config_alloc_with_mess_devices(driver);
-
-			// find a hash file
-			while((driver != NULL) && !pPickerInfo->hashfile)
-			{
-				pPickerInfo->hashfile = hashfile_open_options(MameUIGlobal(), driver->name, TRUE, pPickerInfo->error_callback);
-				driver = mess_next_compatible_driver(driver);
-			}
-		}
-	}
-}
-
-
-
-void SoftwarePicker_SetErrorProc(HWND hwndPicker, void (*error_callback)(const char *message))
-{
 	software_picker_info *pPickerInfo;
+
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
-	pPickerInfo->error_callback = error_callback;
+	pPickerInfo->config = config;
+
+	// invalidate the hash "realization"
+	for (i = 0; i < pPickerInfo->file_index_length; i++)
+	{
+		pPickerInfo->file_index[i]->hashinfo = NULL;
+		pPickerInfo->file_index[i]->hash_realized = FALSE;
+	}
+	pPickerInfo->hashes_realized = 0;
 }
 
 
@@ -267,10 +219,10 @@ static void ComputeFileHash(software_picker_info *pPickerInfo,
 	unsigned int functions;
 
 	// get the device info
-	info = image_device_getinfo(pPickerInfo->config, pFileInfo->device);
+	info = image_device_getinfo(pPickerInfo->config->mconfig, pFileInfo->device);
 
 	// determine which functions to use
-	functions = hashfile_functions_used(pPickerInfo->hashfile, info.type);
+	functions = hashfile_functions_used(pPickerInfo->config->hashfile, info.type);
 
 	// compute the hash
 	image_device_compute_hash(pFileInfo->hash_string, pFileInfo->device, pBuffer, nLength, functions);
@@ -385,12 +337,12 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 
 	// Determine which hash functions we need to use for this file, and which hashes
 	// have already been calculated
-	if ((pPickerInfo->hashfile != NULL) && (pFileInfo->device != NULL))
+	if ((pPickerInfo->config->hashfile != NULL) && (pFileInfo->device != NULL))
 	{
-		image_device_info info = image_device_getinfo(pPickerInfo->config, pFileInfo->device);
+		image_device_info info = image_device_getinfo(pPickerInfo->config->mconfig, pFileInfo->device);
 		type = info.type;
 		if (type < IO_COUNT)
-	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->hashfile, type);
+	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->config->hashfile, type);
 		nCalculatedHashes = hash_data_used_functions(pFileInfo->hash_string);
 	}
 
@@ -401,9 +353,9 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 		pPickerInfo->file_index[nIndex]->hash_realized = TRUE;
 		pPickerInfo->hashes_realized++;
 
-		if (pPickerInfo->hashfile)
+		if (pPickerInfo->config->hashfile)
 		{
-			pPickerInfo->file_index[nIndex]->hashinfo = hashfile_lookup(pPickerInfo->hashfile,
+			pPickerInfo->file_index[nIndex]->hashinfo = hashfile_lookup(pPickerInfo->config->hashfile,
 				pPickerInfo->file_index[nIndex]->hash_string);
 		}
 	}
@@ -430,9 +382,9 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	// look up the device
 	if (strrchr(pszFilename, '.'))
 		pszExtension = strrchr(pszFilename, '.');
-	if ((pszExtension != NULL) && (pPickerInfo->driver != NULL))
+	if ((pszExtension != NULL) && (pPickerInfo->config != NULL))
 	{
-		for (device = image_device_first(pPickerInfo->config); device != NULL; device = image_device_next(device))
+		for (device = image_device_first(pPickerInfo->config->mconfig); device != NULL; device = image_device_next(device))
 		{
 			if (image_device_uses_file_extension(device, pszExtension))
 				break;
@@ -455,7 +407,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 	// set up device and CRC, if specified
 	pInfo->device = device;
-	if ((device != NULL) && (image_device_getinfo(pPickerInfo->config, device).has_partial_hash != 0))
+	if ((device != NULL) && (image_device_getinfo(pPickerInfo->config->mconfig, device).has_partial_hash != 0))
 		nCrc = 0;
 	if (nCrc != 0)
 		snprintf(pInfo->hash_string, sizeof(pInfo->hash_string) / sizeof(pInfo->hash_string[0]), "c:%08x#", nCrc);
@@ -720,7 +672,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 			SoftwarePicker_FreeSearchInfo(pSearchInfo);
 		}
 	}
-	else if (pPickerInfo->hashfile && (pPickerInfo->hashes_realized
+	else if (pPickerInfo->config->hashfile && (pPickerInfo->hashes_realized
 		< pPickerInfo->file_index_length))
 	{
 		// time to realize some hashes
@@ -737,7 +689,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 		if (!pFileInfo->hash_realized)
 		{
 			type = mess_device_from_core_device(pFileInfo->device)->type;
-			if (hashfile_functions_used(pPickerInfo->hashfile, type))
+			if (hashfile_functions_used(pPickerInfo->config->hashfile, type))
 			{
 				// only calculate the hash if it is appropriate for this device
 				if (!SoftwarePicker_CalculateHash(hwndPicker, pPickerInfo->current_position))

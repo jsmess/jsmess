@@ -26,10 +26,9 @@
 struct DevViewInfo
 {
 	HFONT hFont;
-	int nGame;
 	int nWidth;
 	BOOL bSurpressFilenameChanged;
-	machine_config *config;
+	const software_config *config;
 	const struct DevViewCallbacks *pCallbacks;
 	struct DevViewEntry *pEntries;
 };
@@ -75,11 +74,7 @@ static void DevView_Clear(HWND hwndDevView)
 		pDevViewInfo->pEntries = NULL;
 	}
 
-	if (pDevViewInfo->config != NULL)
-	{
-		machine_config_free(pDevViewInfo->config);
-		pDevViewInfo->config = NULL;
-	}
+	pDevViewInfo->config = NULL;
 }
 
 
@@ -123,8 +118,8 @@ void DevView_Refresh(HWND hwndDevView)
 		{
 			pszSelection = pDevViewInfo->pCallbacks->pfnGetSelectedSoftware(
 				hwndDevView,
-				pDevViewInfo->nGame,
-				pDevViewInfo->config,
+				pDevViewInfo->config->driver_index,
+				pDevViewInfo->config->mconfig,
 				pDevViewInfo->pEntries[i].dev,
 				szBuffer, sizeof(szBuffer) / sizeof(szBuffer[0]));
 
@@ -148,8 +143,8 @@ static void DevView_TextChanged(HWND hwndDevView, int nChangedEntry, LPCTSTR psz
 	if (!pDevViewInfo->bSurpressFilenameChanged && pDevViewInfo->pCallbacks->pfnSetSelectedSoftware)
 	{
 		pDevViewInfo->pCallbacks->pfnSetSelectedSoftware(hwndDevView,
-			pDevViewInfo->nGame,
-			pDevViewInfo->config,
+			pDevViewInfo->config->driver_index,
+			pDevViewInfo->config->mconfig,
 			pDevViewInfo->pEntries[nChangedEntry].dev,
 			pszFilename);
 	}
@@ -183,7 +178,7 @@ static LRESULT CALLBACK DevView_EditWndProc(HWND hwndEdit, UINT nMessage, WPARAM
 
 
 
-BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
+BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 {
 	struct DevViewInfo *pDevViewInfo;
 	const device_config *dev;
@@ -199,17 +194,14 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 
 	pDevViewInfo = GetDevViewInfo(hwndDevView);
 
-	// already selected this driver?
-	if (nGame == pDevViewInfo->nGame)
-		return TRUE;
-
+	// clear out
 	DevView_Clear(hwndDevView);
 
-	// allocate the machine config
-	pDevViewInfo->config = machine_config_alloc_with_mess_devices(drivers[nGame]);
+	// copy the config
+	pDevViewInfo->config = config;
 
 	// count total amount of devices
-	nDevCount = image_device_count(pDevViewInfo->config);
+	nDevCount = image_device_count(pDevViewInfo->config->mconfig);
 
 	if (nDevCount > 0)
 	{
@@ -217,9 +209,9 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 		ppszDevices = (LPTSTR *) alloca(nDevCount * sizeof(*ppszDevices));
 		i = 0;
 
-		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
+		for (dev = image_device_first(pDevViewInfo->config->mconfig); dev != NULL; dev = image_device_next(dev))
 		{
-			image_device_info info = image_device_getinfo(pDevViewInfo->config, dev);
+			image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
 
 			s = tstring_from_utf8(info.name);
 			ppszDevices[i] = alloca((_tcslen(s) + 1) * sizeof(TCHAR));
@@ -253,9 +245,9 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 		DevView_GetColumns(hwndDevView, &nStaticPos, &nStaticWidth,
 			&nEditPos, &nEditWidth, &nButtonPos, &nButtonWidth);
 
-		for (dev = image_device_first(pDevViewInfo->config); dev != NULL; dev = image_device_next(dev))
+		for (dev = image_device_first(pDevViewInfo->config->mconfig); dev != NULL; dev = image_device_next(dev))
 		{
-			image_device_info info = image_device_getinfo(pDevViewInfo->config, dev);
+			image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
 
 			pEnt->dev = dev;
 
@@ -293,7 +285,6 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 		}
 	}
 
-	pDevViewInfo->nGame = nGame;
 	DevView_Refresh(hwndDevView);
 	return TRUE;
 }
@@ -331,11 +322,11 @@ static void DevView_ButtonClick(HWND hwndDevView, struct DevViewEntry *pEnt, HWN
 	switch(rc)
 	{
 		case 1:
-			b = pDevViewInfo->pCallbacks->pfnGetOpenFileName(hwndDevView, pDevViewInfo->config, pEnt->dev,
+			b = pDevViewInfo->pCallbacks->pfnGetOpenFileName(hwndDevView, pDevViewInfo->config->mconfig, pEnt->dev,
 				szPath, sizeof(szPath) / sizeof(szPath[0]));
 			break;
 		case 2:
-			b = pDevViewInfo->pCallbacks->pfnGetCreateFileName(hwndDevView, pDevViewInfo->config, pEnt->dev,
+			b = pDevViewInfo->pCallbacks->pfnGetCreateFileName(hwndDevView, pDevViewInfo->config->mconfig, pEnt->dev,
 				szPath, sizeof(szPath) / sizeof(szPath[0]));
 			break;
 		case 3:
@@ -357,13 +348,15 @@ static BOOL DevView_Setup(HWND hwndDevView)
 {
 	struct DevViewInfo *pDevViewInfo;
 
+	// allocate the device view info
 	pDevViewInfo = malloc(sizeof(struct DevViewInfo));
 	if (!pDevViewInfo)
 		return FALSE;
 	memset(pDevViewInfo, 0, sizeof(*pDevViewInfo));
-	pDevViewInfo->nGame = -1;
+
 	SetWindowLongPtr(hwndDevView, GWLP_USERDATA, (LONG_PTR) pDevViewInfo);
 
+	// create and specify the font
 	pDevViewInfo->hFont = CreateFont(10, 0, 0, 0, FW_NORMAL, 0, 0, 0, 0, 0,
 		0, 0, 0, TEXT("MS Sans Serif"));
 	SendMessage(hwndDevView, WM_SETFONT, (WPARAM) pDevViewInfo->hFont, FALSE);

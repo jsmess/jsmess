@@ -1,6 +1,9 @@
 #ifndef DEVVIEW_H
 #define DEVVIEW_H
 
+#include "swconfig.h"
+
+
 struct DevViewCallbacks
 {
 	BOOL (*pfnGetOpenFileName)(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength);
@@ -10,7 +13,7 @@ struct DevViewCallbacks
 };
 
 void DevView_SetCallbacks(HWND hwndDevView, const struct DevViewCallbacks *pCallbacks);
-BOOL DevView_SetDriver(HWND hwndDevView, int nGame);
+BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config);
 void DevView_RegisterClass(void);
 void DevView_Refresh(HWND hwndDevView);
 

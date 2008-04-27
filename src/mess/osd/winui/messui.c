@@ -35,6 +35,7 @@
 #include "strconv.h"
 #include "messui.h"
 #include "winutf8.h"
+#include "swconfig.h"
 
 
 //============================================================
@@ -79,7 +80,7 @@ char g_szSelectedItem[MAX_PATH];
 //  LOCAL VARIABLES
 //============================================================
 
-static int s_nGame;
+static software_config *config;
 static BOOL s_bIgnoreSoftwarePickerNotifies;
 
 static int *mess_icon_index;
@@ -133,7 +134,7 @@ static void SetupSoftwareTabView(void);
 
 static void MessOpenOtherSoftware(const device_config *dev);
 static void MessCreateDevice(const device_config *dev);
-static void MessRefreshPicker(int drvindex);
+static void MessRefreshPicker(void);
 
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem);
 static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem);
@@ -346,25 +347,49 @@ static BOOL AddSoftwarePickerDirs(HWND hwndPicker, LPCSTR pszDirectories, LPCSTR
 
 void MyFillSoftwareList(int drvindex, BOOL bForce)
 {
+	BOOL is_same;
 	const game_driver *drv;
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareDevView;
 
+	// do we have to do anything?
+	if (!bForce)
+	{
+		if (config != NULL)
+			is_same = (drvindex == config->driver_index);
+		else
+			is_same = (drvindex < 0);
+		if (is_same)
+			return;
+	}
+
+	// free the machine config, if necessary
+	if (config != NULL)
+	{
+		software_config_free(config);
+		config = NULL;
+	}
+
+	// allocate the machine config, if necessary
+	if (drvindex >= 0)
+	{
+		config = software_config_alloc(drvindex, MameUIGlobal(), NULL);
+	}
+
+	// locate key widgets
 	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
 
-	// Set up the device view
-	DevView_SetDriver(hwndSoftwareDevView, drvindex);
+	// set up the device view
+	DevView_SetDriver(hwndSoftwareDevView, config);
 
-	if (!bForce && (s_nGame == drvindex))
-		return;
-	s_nGame = drvindex;
-
-	// Set up the software picker
+	// set up the software picker
 	SoftwarePicker_Clear(hwndSoftwarePicker);
+	SoftwarePicker_SetDriver(hwndSoftwarePicker, config);
+
+	// add the relevant paths
 	drv = drivers[drvindex];
-	SoftwarePicker_SetDriver(hwndSoftwarePicker, drv);
-	while(drv)
+	while(drv != NULL)
 	{
 		AddSoftwarePickerDirs(hwndSoftwarePicker, GetSoftwareDirs(), drv->name);
 		drv = mess_next_compatible_driver(drv);
@@ -528,24 +553,20 @@ void MessReadMountedSoftware(int drvindex)
 	DevView_Refresh(GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW));
 
 	// Now read stuff into picker
-	MessRefreshPicker(drvindex);
+	MessRefreshPicker();
 }
 
 
 
-static void MessRefreshPicker(int drvindex)
+static void MessRefreshPicker(void)
 {
 	HWND hwndSoftware;
 	int i;
 	LVFINDINFO lvfi;
-	machine_config *config;
 	const device_config *dev;
 	LPCSTR pszSoftware;
 
 	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
-
-	// allocate the machine config
-	config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
 
 	s_bIgnoreSoftwarePickerNotifies = TRUE;
 
@@ -553,9 +574,9 @@ static void MessRefreshPicker(int drvindex)
 	// be problematic
 	ListView_SetItemState(hwndSoftware, -1, 0, LVIS_SELECTED);
 
-	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
+	for (dev = image_device_first(config->mconfig); dev != NULL; dev = image_device_next(dev))
 	{
-		pszSoftware = GetSelectedSoftware(drvindex, config, dev);
+		pszSoftware = GetSelectedSoftware(config->driver_index, config->mconfig, dev);
 		if (pszSoftware && *pszSoftware)
 		{
 			i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
@@ -575,7 +596,6 @@ static void MessRefreshPicker(int drvindex)
 		}
 	}
 
-	machine_config_free(config);
 	s_bIgnoreSoftwarePickerNotifies = FALSE;
 }
 
@@ -586,7 +606,7 @@ void InitMessPicker(void)
 	struct PickerOptions opts;
 	HWND hwndSoftware;
 
-	s_nGame = -1;
+	config = NULL;
 	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 
 	memset(&opts, 0, sizeof(opts));
@@ -865,7 +885,7 @@ static void DevView_SetSelectedSoftware(HWND hwndDevView, int drvindex,
 	if( !utf8_filename )
 		return;
 	MessSpecifyImage(drvindex, dev, utf8_filename);
-	MessRefreshPicker(drvindex);
+	MessRefreshPicker();
 	free(utf8_filename);
 }
 

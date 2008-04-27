@@ -30,6 +30,8 @@ struct _hash_info
 
 typedef struct _hash_file hash_file;
 
+typedef void (*hashfile_error_func)(const char *message);
+
 
 
 /***************************************************************************
@@ -37,12 +39,11 @@ typedef struct _hash_file hash_file;
 ***************************************************************************/
 
 /* opens a hash file; if is_preload is non-zero, the entire file is preloaded */
-hash_file *hashfile_open(const char *sysname, int is_preload,
-	void (*error_proc)(const char *message));
+hash_file *hashfile_open(const char *sysname, int is_preload, hashfile_error_func error_proc);
 
 /* opens a hash file; if is_preload is non-zero, the entire file is preloaded */
 hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is_preload,
-	void (*error_proc)(const char *message));
+	hashfile_error_func error_proc);
 
 /* closes a hash file and associated resources */
 void hashfile_close(hash_file *hashfile);
