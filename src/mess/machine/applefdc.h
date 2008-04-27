@@ -11,15 +11,27 @@
 
 *********************************************************************/
 
-#ifndef APPLEFDC_H
-#define APPLEFDC_H
+#ifndef __APPLEFDC_H__
+#define __APPLEFDC_H__
 
 #include "driver.h"
+
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
 #define APPLEFDC_PH0	0x01
 #define APPLEFDC_PH1	0x02
 #define APPLEFDC_PH2	0x04
 #define APPLEFDC_PH3	0x08
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef enum
 {
@@ -42,10 +54,15 @@ struct _applefdc_interface
 };
 
 
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
 void applefdc_init(const applefdc_interface *intf);
 READ8_HANDLER( applefdc_r );
 WRITE8_HANDLER( applefdc_w );
 UINT8 applefdc_get_lines(void);
 
 
-#endif /* APPLEFDC_H */
+#endif /* __APPLEFDC_H__ */
