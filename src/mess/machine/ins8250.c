@@ -137,7 +137,8 @@ typedef struct {
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
 
 
-INLINE ins8250_t *get_safe_token(const device_config *device) {
+INLINE ins8250_t *get_safe_token(const device_config *device)
+{
 	assert( device != NULL );
 	assert( device->token != NULL );
 	assert( ( device->type == DEVICE_GET_INFO_NAME(ins8250) ) ||
@@ -295,25 +296,31 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 				data, 5+(data&3), 1+((data>>2)&1), P[(data>>3)&7], (data>>6)&1, (data>>7)&1));
             break;
 		case 4:
-			if ( ( ins8250->mcr & 0x1f ) != ( data & 0x1f ) ) {
+			if ( ( ins8250->mcr & 0x1f ) != ( data & 0x1f ) )
+			{
 				ins8250->mcr = data & 0x1f;
 				COM_LOG(1,"COM_mcr_w",("COM \"%s\" $%02x DTR %d, RTS %d, OUT1 %d, OUT2 %d, loopback %d\n", device->tag,
 					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1));
 				if (ins8250->interface->handshake_out)
 					ins8250->interface->handshake_out(device,data);
 
-				if ( ins8250->mcr & 0x10 ) {	/* loopback test */
+				if ( ins8250->mcr & 0x10 )		/* loopback test */
+				{
 					data = ( ( ins8250->mcr & 0x0c ) << 4 ) | ( ( ins8250->mcr & 0x01 ) << 5 ) | ( ( ins8250->mcr & 0x02 ) << 3 );
-					if ( ( ins8250->msr & 0x20 ) != ( data & 0x20 ) ) {
+					if ( ( ins8250->msr & 0x20 ) != ( data & 0x20 ) )
+					{
 						data |= 0x02;
 					}
-					if ( ( ins8250->msr & 0x10 ) != ( data & 0x10 ) ) {
+					if ( ( ins8250->msr & 0x10 ) != ( data & 0x10 ) )
+					{
 						data |= 0x01;
 					}
-					if ( ( ins8250->msr & 0x40 ) && ! ( data & 0x40 ) ) {
+					if ( ( ins8250->msr & 0x40 ) && ! ( data & 0x40 ) )
+					{
 						data |= 0x04;
 					}
-					if ( ( ins8250->msr & 0x80 ) != ( data & 0x80 ) ) {
+					if ( ( ins8250->msr & 0x80 ) != ( data & 0x80 ) )
+					{
 						data |= 0x08;
 					}
 					ins8250->msr = data;
@@ -347,7 +354,8 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 
 			ins8250->msr = data;
 
-			if ( ins8250->msr & 0x0f ) {
+			if ( ins8250->msr & 0x0f )
+			{
 				ins8250_trigger_int( device, COM_INT_PENDING_MODEM_STATUS_REGISTER );
 			}
 			break;
@@ -405,7 +413,8 @@ READ8_DEVICE_HANDLER( ins8250_r )
 			COM_LOG(2,"COM_iir_r",("COM \"%s\" $%02x\n", device->tag, data));
 			/* The documentation says that reading this register will
 			clear the int if this is the source of the int */
-			if ( ins8250->ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY ) {
+			if ( ins8250->ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY )
+			{
 				ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 			}
             break;
@@ -526,7 +535,8 @@ void ins8250_handshake_in(const device_config *device, int new_msr)
 }
 
 
-static void common_start( const device_config *device, int device_type ) {
+static void common_start( const device_config *device, int device_type )
+{
 	ins8250_t	*ins8250 = get_safe_token(device);
 
 	ins8250->interface = device->static_config;
@@ -534,37 +544,44 @@ static void common_start( const device_config *device, int device_type ) {
 }
 
 
-static DEVICE_START( ins8250 ) {
+static DEVICE_START( ins8250 )
+{
 	common_start( device, TYPE_INS8250 );
 }
 
 
-static DEVICE_START( ins8250a ) {
+static DEVICE_START( ins8250a )
+{
 	common_start( device, TYPE_INS8250A );
 }
 
 
-static DEVICE_START( ns16450 ) {
+static DEVICE_START( ns16450 )
+{
 	common_start( device, TYPE_NS16450 );
 }
 
 
-static DEVICE_START( ns16550 ) {
+static DEVICE_START( ns16550 )
+{
 	common_start( device, TYPE_NS16550 );
 }
 
 
-static DEVICE_START( ns16550a ) {
+static DEVICE_START( ns16550a )
+{
 	common_start( device, TYPE_NS16550A );
 }
 
 
-static DEVICE_START( pc16550d ) {
+static DEVICE_START( pc16550d )
+{
 	common_start( device, TYPE_PC16550D );
 }
 
 
-static DEVICE_RESET( ins8250 ) {
+static DEVICE_RESET( ins8250 )
+{
 	ins8250_t	*ins8250 = get_safe_token(device);
 
 	ins8250->ier = 0;
@@ -581,15 +598,19 @@ static DEVICE_RESET( ins8250 ) {
 }
 
 
-static DEVICE_SET_INFO( ins8250 ) {
-	switch ( state ) {
+static DEVICE_SET_INFO( ins8250 )
+{
+	switch ( state )
+	{
 		/* no parameters to set */
 	}
 }
 
 
-DEVICE_GET_INFO( ins8250 ) {
-	switch ( state ) {
+DEVICE_GET_INFO( ins8250 )
+{
+	switch ( state )
+	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(ins8250_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
@@ -611,8 +632,10 @@ DEVICE_GET_INFO( ins8250 ) {
 }
 
 
-DEVICE_GET_INFO( ins8250a ) {
-	switch ( state ) {
+DEVICE_GET_INFO( ins8250a )
+{
+	switch ( state )
+	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_STR_NAME:						info->s = "National Semiconductor INS8250A/INS82C50A";	break;
 
@@ -624,8 +647,10 @@ DEVICE_GET_INFO( ins8250a ) {
 }
 
 
-DEVICE_GET_INFO( ns16450 ) {
-	switch ( state ) {
+DEVICE_GET_INFO( ns16450 )
+{
+	switch ( state )
+	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_STR_NAME:						info->s = "National Semiconductor NS16450/PC16450";	break;
 
@@ -637,8 +662,10 @@ DEVICE_GET_INFO( ns16450 ) {
 }
 
 
-DEVICE_GET_INFO( ns16550 ) {
-	switch ( state ) {
+DEVICE_GET_INFO( ns16550 )
+{
+	switch ( state )
+	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_STR_NAME:						info->s = "National Semiconductor NS16550/PC16550";	break;
 
@@ -650,8 +677,10 @@ DEVICE_GET_INFO( ns16550 ) {
 }
 
 
-DEVICE_GET_INFO( ns16550a ) {
-	switch ( state ) {
+DEVICE_GET_INFO( ns16550a )
+{
+	switch ( state )
+	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_STR_NAME:						info->s = "National Semiconductor NS16550A/PC16550A";	break;
 
@@ -663,8 +692,10 @@ DEVICE_GET_INFO( ns16550a ) {
 }
 
 
-DEVICE_GET_INFO( pc16550d ) {
-	switch ( state ) {
+DEVICE_GET_INFO( pc16550d )
+{
+	switch ( state )
+	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_STR_NAME:						info->s = "National Semiconductor PC16550D";	break;
 
