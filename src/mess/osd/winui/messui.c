@@ -539,10 +539,17 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 
 
 
-static void MessRemoveImage(int drvindex, const device_config *device, LPCSTR pszFilename)
+static void MessRemoveImage(int drvindex, const char *pszFilename)
 {
-	if (device != NULL)
-		MessSpecifyImage(drvindex, device, NULL);
+	const device_config *device;
+	const char *s;
+
+	for (device = image_device_first(config->mconfig); device != NULL; device = image_device_next(device))
+	{
+		s = GetSelectedSoftware(drvindex, config->mconfig, device);
+		if ((s != NULL) && !strcmp(pszFilename, s))
+			MessSpecifyImage(drvindex, device, NULL);
+	}
 }
 
 
@@ -964,18 +971,16 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem)
 {
 	int drvindex;
-	const device_config *device;
-	LPCSTR pszFullName;
+	const char *pszFullName;
 	HWND hwndList;
 
 	if (!s_bIgnoreSoftwarePickerNotifies)
 	{
 		hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 		drvindex = Picker_GetSelectedItem(hwndList);
-		device = SoftwarePicker_LookupDevice(hwndSoftwarePicker, nItem);
 		pszFullName = SoftwarePicker_LookupFilename(hwndSoftwarePicker, nItem);
 
-		MessRemoveImage(drvindex, device, pszFullName);
+		MessRemoveImage(drvindex, pszFullName);
 	}
 }
 
