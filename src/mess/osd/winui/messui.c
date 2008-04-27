@@ -481,21 +481,17 @@ static int is_null_or_empty(const char *s)
 // Places the specified image in the specified slot; nID = -1 means don't matter
 static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR pszFilename)
 {
-	machine_config *config;
 	const char *s;
 
 	if (LOG_SOFTWARE)
 		dprintf("MessSpecifyImage(): device=%p pszFilename='%s'\n", device, pszFilename);
 
-	// allocate the machine config
-	config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
-
 	// if device is NULL, this is a special case; try to find existing image
 	if (device == NULL)
 	{
-		for (device = image_device_first(config); device != NULL; device = image_device_next(device))
+		for (device = image_device_first(config->mconfig); device != NULL; device = image_device_next(device))
 		{
-			s = GetSelectedSoftware(drvindex, config, device);
+			s = GetSelectedSoftware(drvindex, config->mconfig, device);
 			if ((s != NULL) && !mame_stricmp(s, pszFilename))
 				break;
 		}
@@ -513,9 +509,9 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 
 		if (file_extension != NULL)
 		{
-			for (device = image_device_first(config); device != NULL; device = image_device_next(device))
+			for (device = image_device_first(config->mconfig); device != NULL; device = image_device_next(device))
 			{
-				s = GetSelectedSoftware(drvindex, config, device);
+				s = GetSelectedSoftware(drvindex, config->mconfig, device);
 				if (is_null_or_empty(s) && image_device_uses_file_extension(device, file_extension))
 					break;
 			}
@@ -525,7 +521,7 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 	if (device != NULL)
 	{
 		// place the image
-		InternalSetSelectedSoftware(drvindex, config, device, pszFilename);
+		InternalSetSelectedSoftware(drvindex, config->mconfig, device, pszFilename);
 	}
 	else
 	{
@@ -533,8 +529,6 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 		if (LOG_SOFTWARE)
 			dprintf("MessSpecifyImage(): Failed to place image '%s'\n", pszFilename);
 	}
-
-	machine_config_free(config);
 }
 
 
