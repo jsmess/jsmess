@@ -5,7 +5,6 @@
 */
 
 #include "machine/hd63450.h"
-#include "deprecat.h"
 
 
 static struct hd63450 dmac;
@@ -29,7 +28,7 @@ void hd63450_init(const struct hd63450_interface* intf)
 	}
 }
 
-int hd63450_read(int offset, UINT16 mem_mask)
+int hd63450_read(running_machine *machine, int offset, UINT16 mem_mask)
 {
 	int channel,reg;
 
@@ -78,7 +77,7 @@ int hd63450_read(int offset, UINT16 mem_mask)
 	return 0xff;
 }
 
-void hd63450_write(int offset, int data, UINT16 mem_mask)
+void hd63450_write(running_machine *machine, int offset, int data, UINT16 mem_mask)
 {
 	int channel,reg;
 
@@ -116,7 +115,7 @@ void hd63450_write(int offset, int data, UINT16 mem_mask)
 		{
 			dmac.reg[channel].ccr = data & 0x00ff;
 			if((data & 0x0080))// && !dmac.intf->dma_read[channel] && !dmac.intf->dma_write[channel])
-				dma_transfer_start(Machine, channel,0);
+				dma_transfer_start(machine, channel,0);
 			if(data & 0x0010)  // software abort
 				dma_transfer_abort(channel);
 			if(data & 0x0020)  // halt operation
@@ -388,6 +387,6 @@ int hd63450_get_error_vector(int channel)
 }
 
 
-READ16_HANDLER(hd63450_r) { return hd63450_read(offset,mem_mask); }
-WRITE16_HANDLER(hd63450_w) { hd63450_write(offset,data,mem_mask); }
+READ16_HANDLER(hd63450_r) { return hd63450_read(machine,offset,mem_mask); }
+WRITE16_HANDLER(hd63450_w) { hd63450_write(machine,offset,data,mem_mask); }
 
