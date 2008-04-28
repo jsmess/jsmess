@@ -1024,7 +1024,7 @@ static void wd17xx_timed_read_sector_request(void)
 	int usecs;
 	wd17xx_info *w = &wd;
 
-	usecs = 40; /* How long should we wait? How about 40 micro seconds? */
+	usecs = 10; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
 	timer_reset(w->timer_rs, ATTOTIME_IN_USEC(usecs));
@@ -1038,7 +1038,7 @@ static void wd17xx_timed_write_sector_request(void)
 	int usecs;
 	wd17xx_info *w = &wd;
 
-	usecs = 40; /* How long should we wait? How about 40 micro seconds? */
+	usecs = 10; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
 	timer_reset(w->timer_ws, ATTOTIME_IN_USEC(usecs));
