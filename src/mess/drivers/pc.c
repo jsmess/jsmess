@@ -297,7 +297,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE( pc_nmi_enable_w )
+	AM_RANGE(0x00a0, 0x00a0) AM_READWRITE( pcjr_nmi_enable_r, pc_nmi_enable_w )
 	AM_RANGE(0x00c0, 0x00c0) AM_WRITE(								SN76496_0_w)
 	AM_RANGE(0x00f0, 0x00f7) AM_READWRITE(pc_fdc_r,					pcjr_fdc_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
@@ -1734,7 +1734,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_CPU_PC(tandy1000, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
 
 	MDRV_MACHINE_START(pc)
-	MDRV_MACHINE_RESET(pc)
+	MDRV_MACHINE_RESET(pcjr)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
 	MDRV_DEVICE_CONFIG( pcjr_pit8253_config )
@@ -1749,7 +1749,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( pcjr_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
 	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
@@ -2223,7 +2223,7 @@ COMP(  1985,	bondwell,	ibm5150,	0,		pccga,		bondwell,   bondwell,	ibmpc,   "Bond
 COMP(  1988,	europc,		ibm5150,	0,		europc,     europc,		europc,     ibmpc,   "Schneider Rdf. AG",  "EURO PC", 0)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,	ibm5150,	0,		ibmpcjr,    tandy1t,	t1000hx,    ibmpc,   "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
+COMP(  1983,	ibmpcjr,	ibm5150,	0,		ibmpcjr,    tandy1t,	pcjr,       ibmpc,   "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
 COMP(  1987,	t1000hx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000HX", 0)
 COMP(  1987,	t1000sx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
 
