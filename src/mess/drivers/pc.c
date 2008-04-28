@@ -1218,6 +1218,8 @@ static MACHINE_DRIVER_START( pcmda )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1280,6 +1282,8 @@ static MACHINE_DRIVER_START( pcherc )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pccga )
@@ -1338,6 +1342,8 @@ static MACHINE_DRIVER_START( pccga )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1393,6 +1399,8 @@ static MACHINE_DRIVER_START( europc )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1452,6 +1460,8 @@ static MACHINE_DRIVER_START( ibm5160 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1500,6 +1510,8 @@ static MACHINE_DRIVER_START( pc200 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1550,6 +1562,8 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1603,6 +1617,8 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1708,6 +1724,8 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 
@@ -1754,6 +1772,8 @@ static MACHINE_DRIVER_START( ibmpcjr )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
 #if 0
