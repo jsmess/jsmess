@@ -177,9 +177,6 @@ static const struct AY8910interface spectrum_ay_interface =
  bit 2-0: border colour
 */
 
-static int		motor_toggle_previous = 0;
-static int		cassette_motor_mode = 0;
-
 int PreviousFE = 0;
 
 static WRITE8_HANDLER(spectrum_port_fe_w)
@@ -232,16 +229,6 @@ static  READ8_HANDLER(spectrum_port_fe_r)
    int cs_extra3 = input_port_read(machine, "PLUS2") & 0x1f;
    int ss_extra1 = input_port_read(machine, "PLUS3") & 0x1f;
    int ss_extra2 = input_port_read(machine, "PLUS4") & 0x1f;
-
-	if ( input_port_read(machine, "MOTOR") & 0x01 ) {
-		if ( motor_toggle_previous == 0 ) {
-			cassette_motor_mode = cassette_motor_mode ^ 0x01;
-			cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
-		}
-		motor_toggle_previous = 1;
-	} else {
-		motor_toggle_previous = 0;
-	}
 
    /* Caps - V */
    if ((lines & 1)==0)
@@ -1903,10 +1890,6 @@ static INPUT_PORTS_START( spectrum )
 	PORT_DIPSETTING(0x00, "Enabled" )
 	PORT_DIPSETTING(0x20, "Disabled" )
 	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START_TAG("MOTOR") /* [17] Toggle cassette motor */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Motor") PORT_CODE(KEYCODE_F1)
-
 INPUT_PORTS_END
 
 #define ZX_COL_0	MAKE_RGB(0x00, 0x00, 0x00)
@@ -2289,7 +2272,7 @@ static void spectrum_common_cassette_getinfo(const mess_device_class *devclass, 
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
 		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)tzx_cassette_formats; break;
 		default:					cassette_device_getinfo(devclass, state, info); break;
 	}
