@@ -620,41 +620,20 @@ MACHINE_RESET( pc )
  *      Interrupt handlers.
  *
  **************************************************************************/
-static void pc_generic_frame_interrupt(void (*pc_timer)(void))
-{
-	if (pc_timer)
-		pc_timer();
 
+INTERRUPT_GEN( pc_frame_interrupt )
+{
 	pc_keyboard();
-}
-
-INTERRUPT_GEN( pc_mda_frame_interrupt )
-{
-	pc_generic_frame_interrupt(NULL);
-}
-
-INTERRUPT_GEN( pc_cga_frame_interrupt )
-{
-	pc_generic_frame_interrupt(NULL);
-}
-
-INTERRUPT_GEN( pc_pc1512_frame_interrupt )
-{
-	pc_generic_frame_interrupt(NULL);
-}
-
-INTERRUPT_GEN( tandy1000_frame_interrupt )
-{
-	pc_generic_frame_interrupt(NULL);
-}
-
-INTERRUPT_GEN( pc_aga_frame_interrupt )
-{
-	pc_generic_frame_interrupt(NULL);
 }
 
 INTERRUPT_GEN( pc_vga_frame_interrupt )
 {
-	pc_generic_frame_interrupt(NULL /* vga_timer */);
+	//vga_timer();
+	pc_keyboard();
+}
+
+INTERRUPT_GEN( pcjr_frame_interrupt )
+{
+	pc_keyboard();
 }
 

@@ -38,12 +38,8 @@ DRIVER_INIT( t1000hx );
 MACHINE_START( pc );
 MACHINE_RESET( pc );
 
-INTERRUPT_GEN( pc_cga_frame_interrupt );
-INTERRUPT_GEN( pc_pc1512_frame_interrupt );
-INTERRUPT_GEN( pc_mda_frame_interrupt );
-INTERRUPT_GEN( tandy1000_frame_interrupt );
-INTERRUPT_GEN( pc_aga_frame_interrupt );
+INTERRUPT_GEN( pc_frame_interrupt );
 INTERRUPT_GEN( pc_vga_frame_interrupt );
-
+INTERRUPT_GEN( pcjr_frame_interrupt );
 
 #endif /* PC_H_ */
