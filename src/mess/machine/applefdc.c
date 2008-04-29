@@ -43,8 +43,8 @@
 ***************************************************************************/
 
 /* logging */
-#define LOG_IWM			0
-#define LOG_IWM_EXTRA	0
+#define LOG_APPLEFDC		0
+#define LOG_APPLEFDC_EXTRA	0
 
 
 
@@ -129,18 +129,28 @@ void applefdc_init(const applefdc_interface *intf)
 
 
 
-/* R. Nabet : Next two functions look more like a hack than a real feature of the IWM */
-/* I left them there because I had no idea what they intend to do.
-They never get called when booting the Mac Plus driver. */
+/*-------------------------------------------------
+    iwm_enable2 - hackish function
+-------------------------------------------------*/
+
 static int iwm_enable2(void)
 {
+	/* R. Nabet : This function looks more like a hack than a real feature of the IWM; */
+	/* it is not called from the Mac Plus driver */
 	return (applefdc_lines & APPLEFDC_PH1) && (applefdc_lines & APPLEFDC_PH3);
 }
 
 
 
+/*-------------------------------------------------
+    iwm_readenable2handshake - hackish function
+-------------------------------------------------*/
+
 static int iwm_readenable2handshake(void)
 {
+	/* R. Nabet : This function looks more like a hack than a real feature of the IWM; */
+	/* it is not called from the Mac Plus driver */
+
 	static int val = 0;
 
 	if (val++ > 3)
@@ -150,6 +160,10 @@ static int iwm_readenable2handshake(void)
 }
 
 
+
+/*-------------------------------------------------
+    applefdc_statusreg_r - reads the status register
+-------------------------------------------------*/
 
 static int applefdc_statusreg_r(void)
 {
@@ -175,15 +189,23 @@ static int applefdc_statusreg_r(void)
 
 
 
+/*-------------------------------------------------
+    iwm_modereg_w - changes the mode register
+-------------------------------------------------*/
+
 static void iwm_modereg_w(int data)
 {
 	iwm_mode = data & 0x1f;	/* Write mode register */
 
-	if (LOG_IWM_EXTRA)
+	if (LOG_APPLEFDC_EXTRA)
 		logerror("iwm_modereg_w: iwm_mode=0x%02x\n", (int) iwm_mode);
 }
 
 
+
+/*-------------------------------------------------
+    applefdc_read_reg - reads a register
+-------------------------------------------------*/
 
 static UINT8 applefdc_read_reg(int lines)
 {
@@ -204,7 +226,7 @@ static UINT8 applefdc_read_reg(int lines)
 				 * 3.5 inch drives.  Eventually we should check to see if latch mode is
 				 * off
 				 */
-				if (LOG_IWM)
+				if (LOG_APPLEFDC)
 				{
 					if ((iwm_mode & IWM_MODE_LATCHMODE) == 0)
 						logerror("applefdc_read_reg(): latch mode off not implemented\n");
@@ -234,6 +256,10 @@ static UINT8 applefdc_read_reg(int lines)
 
 
 
+/*-------------------------------------------------
+    applefdc_write_reg - writes a register
+-------------------------------------------------*/
+
 static void applefdc_write_reg(UINT8 data)
 {
 	switch(applefdc_lines & (IWM_Q6 | IWM_Q7))
@@ -250,7 +276,7 @@ static void applefdc_write_reg(UINT8 data)
 				 * 3.5 inch drives.  Eventually we should check to see if latch mode is
 				 * off
 				 */
-				if (LOG_IWM)
+				if (LOG_APPLEFDC)
 				{
 					if ((iwm_mode & IWM_MODE_LATCHMODE) == 0)
 						logerror("applefdc_write_reg(): latch mode off not implemented\n");
@@ -264,6 +290,11 @@ static void applefdc_write_reg(UINT8 data)
 }
 
 
+
+/*-------------------------------------------------
+    TIMER_CALLBACK(iwm_turnmotor_onoff) - timer
+	callback for turning motor on or off
+-------------------------------------------------*/
 
 static TIMER_CALLBACK(iwm_turnmotor_onoff)
 {
@@ -289,11 +320,15 @@ static TIMER_CALLBACK(iwm_turnmotor_onoff)
 	if (iwm_intf.set_enable_lines)
 		iwm_intf.set_enable_lines(enable_lines);
 
-	if (LOG_IWM_EXTRA)
+	if (LOG_APPLEFDC_EXTRA)
 		logerror("iwm_turnmotor_onoff(): Turning motor %s\n", status ? "on" : "off");
 }
 
 
+
+/*-------------------------------------------------
+    iwm_access
+-------------------------------------------------*/
 
 static void iwm_access(int offset)
 {
@@ -309,7 +344,7 @@ static void iwm_access(int offset)
 		"Q7"
 	};
 
-	if (LOG_IWM_EXTRA)
+	if (LOG_APPLEFDC_EXTRA)
 	{
 		logerror("iwm_access(): %s line %s\n",
 			(offset & 1) ? "setting" : "clearing", lines[offset >> 1]);
@@ -352,13 +387,18 @@ static void iwm_access(int offset)
 
 
 
+/*-------------------------------------------------
+    applefdc_r - reads a byte from the FDC
+-------------------------------------------------*/
+
 READ8_HANDLER( applefdc_r )
 {
 	UINT8 result = 0;
 
+	/* normalize offset */
 	offset &= 15;
 
-	if (LOG_IWM_EXTRA)
+	if (LOG_APPLEFDC_EXTRA)
 		logerror("applefdc_r: offset=%i\n", offset);
 
 	iwm_access(offset);
@@ -405,11 +445,16 @@ READ8_HANDLER( applefdc_r )
 
 
 
+/*-------------------------------------------------
+    applefdc_w - writes a byte to the FDC
+-------------------------------------------------*/
+
 WRITE8_HANDLER( applefdc_w )
 {
+	/* normalize offset */
 	offset &= 15;
 
-	if (LOG_IWM_EXTRA)
+	if (LOG_APPLEFDC_EXTRA)
 		logerror("applefdc_w: offset=%i data=0x%02x\n", offset, data);
 
 	iwm_access(offset);
@@ -445,6 +490,10 @@ WRITE8_HANDLER( applefdc_w )
 }
 
 
+
+/*-------------------------------------------------
+    applefdc_w - writes a byte to the FDC
+-------------------------------------------------*/
 
 UINT8 applefdc_get_lines(void)
 {
