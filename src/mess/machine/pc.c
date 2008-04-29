@@ -168,17 +168,9 @@ const struct dma8237_interface pc_dma8237_config =
  *
  *************************************************************/
 
-static emu_timer	*pc_int_delay_timer;
-
-static TIMER_CALLBACK( pc_delayed_pic8259_irq )
-{
-	cpunum_set_input_line(pc_devices.pic8259_master->machine, 0, 0, param ? HOLD_LINE : CLEAR_LINE);
-}
-
 static PIC8259_SET_INT_LINE( pc_pic8259_master_set_int_line )
 {
-	timer_adjust_oneshot( pc_int_delay_timer, ATTOTIME_IN_CYCLES(1,0), interrupt );
-//	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -197,6 +189,49 @@ const struct pic8259_interface pc_pic8259_master_config =
 const struct pic8259_interface pc_pic8259_slave_config =
 {
 	pc_pic8259_slave_set_int_line
+};
+
+
+/*************************************************************
+ *
+ * PCJR pic8259 configuration
+ *
+ * Part of the PCJR CRT POST test at address F0452/F0454 writes
+ * to the PIC enabling an IRQ which is then immediately fired,
+ * however it is expected that the actual IRQ is taken one
+ * instruction later (the irq bit is reset by the instruction
+ * at F0454). Delaying taking of an IRQ by one instruction for
+ * all cases breaks floppy emulation. This seems to be a really
+ * tight corner case. For now we delay the IRQ by one instruction
+ * only for the PCJR and only when it's inside the POST checks.
+ *
+ *************************************************************/
+
+static emu_timer	*pc_int_delay_timer;
+
+
+static TIMER_CALLBACK( pcjr_delayed_pic8259_irq )
+{
+    cpunum_set_input_line(pc_devices.pic8259_master->machine, 0, 0, param ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static PIC8259_SET_INT_LINE( pcjr_pic8259_master_set_int_line )
+{
+	if ( cpunum_get_reg( 0, REG_PC ) == 0xF0454 )
+	{
+		timer_adjust_oneshot( pc_int_delay_timer, ATTOTIME_IN_CYCLES(1,0), interrupt );
+	}
+	else
+	{
+		cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	}
+}
+
+
+const struct pic8259_interface pcjr_pic8259_master_config =
+{
+	pcjr_pic8259_master_set_int_line
 };
 
 
@@ -982,8 +1017,6 @@ MACHINE_RESET( pc )
 	pc_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
 	pc_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ) );
-
-	pc_int_delay_timer = timer_alloc( pc_delayed_pic8259_irq, NULL );
 }
 
 
@@ -991,6 +1024,7 @@ MACHINE_RESET( pcjr )
 {
 	MACHINE_RESET_CALL( pc );
 	pcjr_keyb_init();
+	pc_int_delay_timer = timer_alloc( pcjr_delayed_pic8259_irq, NULL );
 }
 
 

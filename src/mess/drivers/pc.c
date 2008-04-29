@@ -1743,7 +1743,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_DEVICE_CONFIG( pc_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( pcjr_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
