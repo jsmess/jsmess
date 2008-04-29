@@ -383,8 +383,39 @@ WRITE8_HANDLER( pc_nmi_enable_w )
 
 /*************************************************************
  *
- * NMI handling and
- * PCJR raw keybaord handling
+ * PCJR NMI and raw keybaord handling
+ *
+ * raw signals on the keyboard cable:
+ * ---_-b0b1b2b3b4b5b6b7pa----------------------
+ *    | | | | | | | | | | |
+ *    | | | | | | | | | | *--- 11 stop bits ( -- = 1 stop bit )
+ *    | | | | | | | | | *----- parity bit ( 0 = _-, 1 = -_ )
+ *    | | | | | | | | *------- bit 7 ( 0 = _-, 1 = -_ )
+ *    | | | | | | | *--------- bit 6 ( 0 = _-, 1 = -_ )
+ *    | | | | | | *----------- bit 5 ( 0 = _-, 1 = -_ )
+ *    | | | | | *------------- bit 4 ( 0 = _-, 1 = -_ )
+ *    | | | | *--------------- bit 3 ( 0 = _-, 1 = -_ )
+ *    | | | *----------------- bit 2 ( 0 = _-, 1 = -_ )
+ *    | | *------------------- bit 1 ( 0 = _-, 1 = -_ )
+ *    | *--------------------- bit 0 ( 0 = _-, 1 = -_ )
+ *    *----------------------- start bit (always _- )
+ *
+ * An entire bit lasts for 440 uSec, half bit time is 220 uSec.
+ * Transferring an entire byte takes 21 x 440uSec. The extra
+ * time of the stop bits is to allow the CPU to do other things
+ * besides decoding keyboard signals.
+ *
+ * These signals get inverted before going to the PCJR
+ * handling hardware. The sequence for the start then
+ * becomes:
+ *
+ * __-_b0b1.....
+ *   |
+ *   *---- on the 0->1 transition of the start bit a keyboard
+ *         latch signal is set to 1 and an NMI is generated
+ *         when enabled.
+ *         The keyboard latch is reset by reading from the
+ *         NMI enable port (A0h).
  *
  *************************************************************/
 
