@@ -45,11 +45,17 @@ struct pc_fdc
 	/* stored int state */
 	int int_state;
 
+	/* PCJR watchdog timer */
+	emu_timer	*watchdog;
+
 	struct pc_fdc_interface fdc_interface;
 };
 
 static struct pc_fdc *fdc;
 
+/* Prototypes */
+
+static TIMER_CALLBACK( watchdog_timeout );
 static void pc_fdc_hw_interrupt(int state);
 static void pc_fdc_hw_dma_drq(int,int);
 static const device_config *pc_fdc_get_image(int floppy_index);
@@ -93,6 +99,8 @@ void pc_fdc_init(const struct pc_fdc_interface *iface)
 
 	/* setup nec765 interface */
 	nec765_init(&pc_fdc_nec765_interface, iface->nec765_type, iface->nec765_rdy_pin);
+
+	fdc->watchdog = timer_alloc( watchdog_timeout, NULL );
 
 	pc_fdc_reset();
 
@@ -319,10 +327,20 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 	 | | | | | `------- Reserved
 	 | | | | `--------- Reserved
 	 | | | `----------- Reserved
-	 | | `------------- Watchdog Timer Enable ( 0 = watchdog enabled, 1 = watchdog disabled )
+	 | | `------------- Watchdog Timer Enable ( 0 = watchdog disabled, 1 = watchdog enabled )
 	 | `--------------- Watchdog Timer Trigger ( on a 1->0 transition to strobe the trigger )
 	 `----------------- FDC Reset ( 0 = hold reset, 1 = release reset )
  */
+
+static TIMER_CALLBACK( watchdog_timeout )
+{
+	/* Trigger a watchdog timeout signal */
+	if ( fdc->fdc_interface.pc_fdc_interrupt )
+	{
+		fdc->fdc_interface.pc_fdc_interrupt( 1 );
+		fdc->fdc_interface.pc_fdc_interrupt( 0 );
+	}
+}
 
 static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 {
@@ -338,6 +356,19 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 	{
 		if ( floppy_count )
 			floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
+	}
+
+	/* Is the watchdog timer disabled */
+	if ( ! ( data & 0x20 ) )
+	{
+		timer_adjust_oneshot( fdc->watchdog, attotime_never, 0 );
+	} else {
+		/* Check for 1->0 watchdog trigger */
+		if ( ( fdc->digital_output_register & 0x40 ) && ! ( data & 0x40 ) )
+		{
+			/* Start watchdog timer here */
+			timer_adjust_oneshot( fdc->watchdog, ATTOTIME_IN_SEC(3), 0 );
+		}
 	}
 
 	/* reset? */

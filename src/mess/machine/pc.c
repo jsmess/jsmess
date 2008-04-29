@@ -438,14 +438,14 @@ READ8_HANDLER( pcjr_nmi_enable_r )
 
 static TIMER_CALLBACK( pcjr_keyb_signal_callback )
 {
-		pcjr_keyb.raw_keyb_data = pcjr_keyb.raw_keyb_data >> 1;
-		pcjr_keyb.signal_count--;
+	pcjr_keyb.raw_keyb_data = pcjr_keyb.raw_keyb_data >> 1;
+	pcjr_keyb.signal_count--;
 
-		if ( pcjr_keyb.signal_count <= 0 )
-		{
-			timer_adjust_periodic( pcjr_keyb.keyb_signal_timer, attotime_never, 0, attotime_never );
-			pcjr_keyb.transferring = 0;
-		}
+	if ( pcjr_keyb.signal_count <= 0 )
+	{
+		timer_adjust_periodic( pcjr_keyb.keyb_signal_timer, attotime_never, 0, attotime_never );
+		pcjr_keyb.transferring = 0;
+	}
 }
 
 
@@ -691,6 +691,7 @@ static READ8_HANDLER ( pcjr_ppi_portc_r )
 	int data=0xff;
 
 	data&=~0x80;
+	data &= ~0x04;		/* floppy drive installed */
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( pc_ppi.portb & 0x08 ) )
 	{
