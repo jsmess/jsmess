@@ -112,6 +112,8 @@ Source Changes:
 - Fixed a regression in natural keyboard support that could cause certain keys
   to not be recognized.  (bug #1564)  [Nate Woods]
 
+- Converted HD63450 DMA controller to the new device system.  [Barry Rodewald]
+
 
 
 0.124a

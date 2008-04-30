@@ -344,12 +344,14 @@ void mfp_set_timer(int timer, unsigned char data)
 // 4 channel DMA controller (Hitachi HD63450)
 static WRITE16_HANDLER( x68k_dmac_w )
 {
-	hd63450_w(machine, offset, data, mem_mask);
+	const device_config* device = device_list_find_by_tag(machine->config->devicelist,HD63450,"hd63450");
+	hd63450_w(device, offset, data, mem_mask);
 }
 
 static READ16_HANDLER( x68k_dmac_r )
 {
-	return hd63450_r(machine, offset, mem_mask);
+	const device_config* device = device_list_find_by_tag(machine->config->devicelist,HD63450,"hd63450");
+	return hd63450_r(device, offset, mem_mask);
 }
 
 static void x68k_keyboard_ctrl_w(int data)
@@ -1383,7 +1385,8 @@ static WRITE16_HANDLER( x68k_exp_w )
 
 static void x68k_dma_irq(running_machine *machine, int channel)
 {
-	current_vector[3] = hd63450_get_vector(channel);
+	const device_config *device = device_list_find_by_tag(machine->config->devicelist, HD63450, "hd63450");
+	current_vector[3] = hd63450_get_vector(device, channel);
 	current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,current_vector[3]);
 	cpunum_set_input_line_and_vector(machine, 0,3,ASSERT_LINE,current_vector[3]);
@@ -1399,9 +1402,10 @@ static void x68k_dma_end(int channel,int irq)
 
 static void x68k_dma_error(int channel, int irq)
 {
+	const device_config *device = device_list_find_by_tag(Machine->config->devicelist, HD63450, "hd63450");
 	if(irq != 0)
 	{
-		current_vector[3] = hd63450_get_error_vector(channel);
+		current_vector[3] = hd63450_get_error_vector(device,channel);
 		current_irq_line = 3;
 		cpunum_set_input_line_and_vector(Machine, 0,3,ASSERT_LINE,current_vector[3]);
 	}
@@ -1562,7 +1566,7 @@ static const ppi8255_interface ppi_interface =
 	ppi_port_c_w
 };
 
-static const struct hd63450_interface dmac_interface =
+static const hd63450_intf dmac_interface =
 {
 	0,  // CPU - 68000
 	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_USEC(4),STATIC_ATTOTIME_IN_USEC(32)},  // Cycle steal mode timing (guesstimate)
@@ -1984,7 +1988,6 @@ static DRIVER_INIT( x68000 )
 
 	memset(&sys,0,sizeof(sys));
 
-	hd63450_init(&dmac_interface);
 	mfp_init();
 	scc_init(&scc_interface);
 	rp5c15_init(machine, &rtc_intf);
@@ -2018,6 +2021,9 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ppi_interface )
+
+	MDRV_DEVICE_ADD( "hd63450", HD63450 )
+	MDRV_DEVICE_CONFIG( dmac_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
