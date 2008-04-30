@@ -50,6 +50,8 @@ System Driver Changes:
 
 - [PC] Fixed error reporting when loading non-existant images.  [Nate Woods]
 
+- [QL] Converted ZX8301/2 into devices, and fixed system halting. [Curt Coder]
+
 - [SPECIAL] Added Erik clone, and fixed bank switch problem [Miodrag Milanovic]
 
 - [T1000HX] Fixed bug #1130.  [Wilbert Pol]
