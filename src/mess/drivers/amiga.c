@@ -35,6 +35,23 @@ would commence ($C00000).
 
 
 /***************************************************************************
+  Battery Backed-Up Clock (MSM6264)
+***************************************************************************/
+
+static READ16_HANDLER( amiga_clock_r )
+{
+	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+	return msm6242_r(rtc, offset / 2);
+}
+
+
+static WRITE16_HANDLER( amiga_clock_w )
+{ 
+	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+	msm6242_w(rtc, offset / 2, data);
+}
+
+/***************************************************************************
   Address maps
 ***************************************************************************/
 
@@ -73,6 +90,7 @@ ADDRESS_MAP_END
  * FC0000-FFFFFF Kickstart ROM
  *
  */
+
 
 static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
@@ -334,24 +352,6 @@ static void amiga_write_dsklen(UINT16 data)
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
 			amiga_fdc_setup_dma();
 	}
-}
-
-
-/***************************************************************************
-  Battery Backed-Up Clock (MSM6264)
-***************************************************************************/
-
-static READ16_HANDLER( amiga_clock_r )
-{
-	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
-	return msm6242_r(rtc, offset / 2);
-}
-
-
-static WRITE16_HANDLER( amiga_clock_w )
-{ 
-	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
-	msm6242_w(rtc, offset / 2, data);
 }
 
 
