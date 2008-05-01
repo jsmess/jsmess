@@ -60,6 +60,7 @@ Note on the bioses:
 #include "machine/wd17xx.h"
 #include "sound/saa1099.h"
 #include "sound/speaker.h"
+#include "machine/msm6242.h"
 
 /* devices */
 #include "devices/mflopimg.h"
@@ -514,6 +515,9 @@ static MACHINE_DRIVER_START( coupe )
 
 	MDRV_VIDEO_UPDATE(coupe)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+
+	/* devices */
+	MDRV_DEVICE_ADD("sambus_clock", MSM6242)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

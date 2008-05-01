@@ -35,12 +35,6 @@ would commence ($C00000).
 
 
 /***************************************************************************
-  Battery Backed-Up Clock (MSM6264)
-***************************************************************************/
-static READ16_HANDLER( amiga_clock_r ) { return msm6242_r( machine, offset / 2 ); }
-static WRITE16_HANDLER( amiga_clock_w ) { msm6242_w( machine, offset / 2, data ); }
-
-/***************************************************************************
   Address maps
 ***************************************************************************/
 
@@ -211,6 +205,9 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_VIDEO_START(amiga)
 	MDRV_VIDEO_UPDATE(amiga)
 
+	/* devices */
+	MDRV_DEVICE_ADD("rtc", MSM6242)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
@@ -263,6 +260,7 @@ MACHINE_DRIVER_END
   Amiga specific stuff
 
 ***************************************************************************/
+
 
 static UINT8 amiga_cia_0_portA_r( void )
 {
@@ -337,6 +335,25 @@ static void amiga_write_dsklen(UINT16 data)
 			amiga_fdc_setup_dma();
 	}
 }
+
+
+/***************************************************************************
+  Battery Backed-Up Clock (MSM6264)
+***************************************************************************/
+
+static READ16_HANDLER( amiga_clock_r )
+{
+	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+	return msm6242_r(rtc, offset / 2);
+}
+
+
+static WRITE16_HANDLER( amiga_clock_w )
+{ 
+	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+	msm6242_w(rtc, offset / 2, data);
+}
+
 
 static void amiga_reset(void)
 {

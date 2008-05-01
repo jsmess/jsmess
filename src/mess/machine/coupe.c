@@ -150,13 +150,15 @@ WRITE8_HANDLER( coupe_ext_mem_w )
 
 static READ8_HANDLER( coupe_rtc_r )
 {
-	return msm6242_r(machine, offset >> 12);
+	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "sambus_clock");
+	return msm6242_r(rtc, offset >> 12);
 }
 
 
 static WRITE8_HANDLER( coupe_rtc_w )
 {
-	msm6242_w(machine, offset >> 12, data);
+	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "sambus_clock");
+	msm6242_w(rtc, offset >> 12, data);
 }
 
 

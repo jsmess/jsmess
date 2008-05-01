@@ -398,7 +398,10 @@ static UINT8 fdc_coco3plus_r(coco_cartridge *cartridge, UINT16 addr)
 	{
 		case 0x10:	/* FF50 */
 			if (real_time_clock() == RTC_DISTO)
-				result = msm6242_r(machine, msm6242_rtc_address);
+			{
+				dev = device_list_find_by_tag(machine->config->devicelist, MSM6242, "disto");
+				result = msm6242_r(dev, msm6242_rtc_address);
+			}
 			break;
 
 		case 0x38:	/* FF78 */
@@ -447,7 +450,10 @@ static void fdc_coco3plus_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 	{
 		case 0x10:	/* FF50 */
 			if (real_time_clock() == RTC_DISTO)
-				msm6242_w(machine, msm6242_rtc_address, data);
+			{
+				dev = device_list_find_by_tag(machine->config->devicelist, MSM6242, "disto");
+				msm6242_w(dev, msm6242_rtc_address, data);
+			}
 			break;
 
 		case 0x11:	/* FF51 */

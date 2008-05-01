@@ -13,6 +13,7 @@
 #include "driver.h"
 #include "machine/6821pia.h"
 #include "video/m6847.h"
+#include "machine/msm6242.h"
 #include "machine/6883sam.h"
 #include "includes/coco.h"
 #include "devices/basicdsk.h"
@@ -793,6 +794,9 @@ static MACHINE_DRIVER_START( coco )
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
+
+	/* devices */
+	MDRV_DEVICE_ADD("disto", MSM6242)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -820,6 +824,9 @@ static MACHINE_DRIVER_START( coco2 )
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
+
+	/* devices */
+	MDRV_DEVICE_ADD("disto", MSM6242)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -847,6 +854,9 @@ static MACHINE_DRIVER_START( coco2b )
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
+
+	/* devices */
+	MDRV_DEVICE_ADD("disto", MSM6242)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -886,6 +896,7 @@ static MACHINE_DRIVER_START( coco3 )
 
 	/* devices */
 	MDRV_DEVICE_ADD("vhd", COCO_VHD)
+	MDRV_DEVICE_ADD("disto", MSM6242)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )
