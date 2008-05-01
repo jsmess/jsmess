@@ -523,17 +523,8 @@ SYSTEM_CONFIG_START(sms)
 	CONFIG_DEVICE(sms_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-static void sg1000_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
-	/* cartslot */
-	switch(state) {
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
-		default:					sms_cartslot_getinfo(devclass, state, info); break;
-	}
-}
 
-SYSTEM_CONFIG_START(sg1000)
-	CONFIG_DEVICE(sg1000_cartslot_getinfo)
-SYSTEM_CONFIG_END
+SYSTEM_CONFIG_EXTERN(sg1000)
 
 static void smssdisp_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
 	switch(state) {
