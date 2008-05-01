@@ -1,0 +1,427 @@
+/***************************************************************************
+
+	NOTE: ****** Specbusy: press N, R, or E to boot *************
+
+
+        Spectrum/Inves/TK90X etc. memory map:
+
+    CPU:
+        0000-3fff ROM
+        4000-ffff RAM
+
+        Spectrum 128/+2/+2a/+3 memory map:
+
+        CPU:
+                0000-3fff Banked ROM/RAM (banked rom only on 128/+2)
+                4000-7fff Banked RAM
+                8000-bfff Banked RAM
+                c000-ffff Banked RAM
+
+        TS2068 memory map: (Can't have both EXROM and DOCK active)
+        The 8K EXROM can be loaded into multiple pages.
+
+    CPU:
+                0000-1fff     ROM / EXROM / DOCK (Cartridge)
+                2000-3fff     ROM / EXROM / DOCK
+                4000-5fff \
+                6000-7fff  \
+                8000-9fff  |- RAM / EXROM / DOCK
+                a000-bfff  |
+                c000-dfff  /
+                e000-ffff /
+
+
+Interrupts:
+
+Changes:
+
+29/1/2000   KT -    Implemented initial +3 emulation.
+30/1/2000   KT -    Improved input port decoding for reading and therefore
+            correct keyboard handling for Spectrum and +3.
+31/1/2000   KT -    Implemented buzzer sound for Spectrum and +3.
+            Implementation copied from Paul Daniel's Jupiter driver.
+            Fixed screen display problems with dirty chars.
+            Added support to load .Z80 snapshots. 48k support so far.
+13/2/2000   KT -    Added Interface II, Kempston, Fuller and Mikrogen
+            joystick support.
+17/2/2000   DJR -   Added full key descriptions and Spectrum+ keys.
+            Fixed Spectrum +3 keyboard problems.
+17/2/2000   KT -    Added tape loading from WAV/Changed from DAC to generic
+            speaker code.
+18/2/2000   KT -    Added tape saving to WAV.
+27/2/2000   KT -    Took DJR's changes and added my changes.
+27/2/2000   KT -    Added disk image support to Spectrum +3 driver.
+27/2/2000   KT -    Added joystick I/O code to the Spectrum +3 I/O handler.
+14/3/2000   DJR -   Tape handling dipswitch.
+26/3/2000   DJR -   Snapshot files are now classifed as snapshots not
+            cartridges.
+04/4/2000   DJR -   Spectrum 128 / +2 Support.
+13/4/2000   DJR -   +4 Support (unofficial 48K hack).
+13/4/2000   DJR -   +2a Support (rom also used in +3 models).
+13/4/2000   DJR -   TK90X, TK95 and Inves support (48K clones).
+21/4/2000   DJR -   TS2068 and TC2048 support (TC2048 Supports extra video
+            modes but doesn't have bank switching or sound chip).
+09/5/2000   DJR -   Spectrum +2 (France, Spain), +3 (Spain).
+17/5/2000   DJR -   Dipswitch to enable/disable disk drives on +3 and clones.
+27/6/2000   DJR -   Changed 128K/+3 port decoding (sound now works in Zub 128K).
+06/8/2000   DJR -   Fixed +3 Floppy support
+10/2/2001   KT  -   Re-arranged code and split into each model emulated.
+            Code is split into 48k, 128k, +3, tc2048 and ts2048
+            segments. 128k uses some of the functions in 48k, +3
+            uses some functions in 128, and tc2048/ts2048 use some
+            of the functions in 48k. The code has been arranged so
+            these functions come in some kind of "override" order,
+            read functions changed to use  READ8_HANDLER and write
+            functions changed to use WRITE8_HANDLER.
+            Added Scorpion256 preliminary.
+18/6/2001   DJR -   Added support for Interface 2 cartridges.
+xx/xx/2001  KS -    TS-2068 sound fixed.
+            Added support for DOCK cartridges for TS-2068.
+            Added Spectrum 48k Psycho modified rom driver.
+            Added UK-2086 driver.
+23/12/2001  KS -    48k machines are now able to run code in screen memory.
+                Programs which keep their code in screen memory
+                like monitors, tape copiers, decrunchers, etc.
+                works now.
+                Fixed problem with interrupt vector set to 0xffff (much
+            more 128k games works now).
+                A useful used trick on the Spectrum is to set
+                interrupt vector to 0xffff (using the table
+                which contain 0xff's) and put a byte 0x18 hex,
+                the opcode for JR, at this address. The first
+                byte of the ROM is a 0xf3 (DI), so the JR will
+                jump to 0xfff4, where a long JP to the actual
+                interrupt routine is put. Due to unideal
+                bankswitching in MAME this JP were to 0001 what
+                causes Spectrum to reset. Fixing this problem
+                made much more software runing (i.e. Paperboy).
+            Corrected frames per second value for 48k and 128k
+            Sincalir machines.
+                There are 50.08 frames per second for Spectrum
+                48k what gives 69888 cycles for each frame and
+                50.021 for Spectrum 128/+2/+2A/+3 what gives
+                70908 cycles for each frame.
+            Remaped some Spectrum+ keys.
+                Presing F3 to reset was seting 0xf7 on keyboard
+                input port. Problem occured for snapshots of
+                some programms where it was readed as pressing
+                key 4 (which is exit in Tapecopy by R. Dannhoefer
+                for example).
+            Added support to load .SP snapshots.
+            Added .BLK tape images support.
+                .BLK files are identical to .TAP ones, extension
+                is an only difference.
+08/03/2002  KS -    #FF port emulation added.
+                Arkanoid works now, but is not playable due to
+                completly messed timings.
+
+Initialisation values used when determining which model is being emulated:
+ 48K        Spectrum doesn't use either port.
+ 128K/+2    Bank switches with port 7ffd only.
+ +3/+2a     Bank switches with both ports.
+
+Notes:
+ 1. No contented memory.
+ 2. No hi-res colour effects (need contended memory first for accurate timing).
+ 3. Multiface 1 and Interface 1 not supported.
+ 4. Horace and the Spiders cartridge doesn't run properly.
+ 5. Tape images not supported:
+    .TZX, .SPC, .ITM, .PAN, .TAP(Warajevo), .VOC, .ZXS.
+ 6. Snapshot images not supported:
+    .ACH, .PRG, .RAW, .SEM, .SIT, .SNX, .ZX, .ZXS, .ZX82.
+ 7. 128K emulation is not perfect - the 128K machines crash and hang while
+    running quite a lot of games.
+ 8. Disk errors occur on some +3 games.
+ 9. Video hardware of all machines is timed incorrectly.
+10. EXROM and HOME cartridges are not emulated.
+11. The TK90X and TK95 roms output 0 to port #df on start up.
+12. The purpose of this port is unknown (probably display mode as TS2068) and
+    thus is not emulated.
+
+Very detailed infos about the ZX Spectrum +3e can be found at
+
+http://www.z88forever.org.uk/zxplus3e/
+
+*******************************************************************************/
+
+#include "driver.h"
+#include "includes/spectrum.h"
+#include "eventlst.h"
+#include "devices/snapquik.h"
+#include "devices/cartslot.h"
+#include "devices/cassette.h"
+#include "sound/ay8910.h"
+#include "sound/speaker.h"
+#include "formats/tzx_cas.h"
+
+static const struct AY8910interface spectrum_ay_interface =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL
+};
+
+/****************************************************************************************************/
+/* Spectrum 128 specific functions */
+
+int spectrum_128_port_7ffd_data = -1;
+unsigned char *spectrum_128_screen_location = NULL;
+
+static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
+{
+   /* D0-D2: RAM page located at 0x0c000-0x0ffff */
+   /* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
+   /* D4 - ROM select - which rom paged into 0x0000-0x03fff */
+   /* D5 - Disable paging */
+
+	/* disable paging? */
+	if (spectrum_128_port_7ffd_data & 0x20)
+			return;
+
+	/* store new state */
+	spectrum_128_port_7ffd_data = data;
+
+	/* update memory */
+	spectrum_128_update_memory(machine);
+}
+
+void spectrum_128_update_memory(running_machine *machine)
+{
+	unsigned char *ChosenROM;
+	int ROMSelection;
+
+	if (spectrum_128_port_7ffd_data & 8)
+	{
+			logerror("SCREEN 1: BLOCK 7\n");
+			spectrum_128_screen_location = mess_ram + (7<<14);
+	}
+	else
+	{
+			logerror("SCREEN 0: BLOCK 5\n");
+			spectrum_128_screen_location = mess_ram + (5<<14);
+	}
+
+	/* select ram at 0x0c000-0x0ffff */
+	{
+			int ram_page;
+			unsigned char *ram_data;
+
+			ram_page = spectrum_128_port_7ffd_data & 0x07;
+			ram_data = mess_ram + (ram_page<<14);
+
+			memory_set_bankptr(4, ram_data);
+
+			logerror("RAM at 0xc000: %02x\n",ram_page);
+	}
+
+	/* ROM switching */
+	ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01);
+
+	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
+
+	ChosenROM = memory_region(REGION_CPU1) + 0x010000 + (ROMSelection<<14);
+
+	memory_set_bankptr(1, ChosenROM);
+
+	logerror("rom switch: %02x\n", ROMSelection);
+}
+
+
+
+WRITE8_HANDLER(spectrum_128_port_bffd_w)
+{
+	AY8910_write_port_0_w(machine, 0, data);
+}
+
+WRITE8_HANDLER(spectrum_128_port_fffd_w)
+{
+	AY8910_control_port_0_w(machine, 0, data);
+}
+
+READ8_HANDLER(spectrum_128_port_fffd_r)
+{
+	return AY8910_read_port_0_r(machine, 0);
+}
+
+static  READ8_HANDLER ( spectrum_128_port_r )
+{
+	 if ((offset & 1)==0)
+	 {
+		 return spectrum_port_fe_r(machine, offset);
+	 }
+
+	 if ((offset & 2)==0)
+	 {
+		switch ((offset>>14) & 0x03)
+		{
+			default:
+				break;
+
+			case 3:
+				return spectrum_128_port_fffd_r(machine, offset);
+		}
+	 }
+
+	 /* don't think these are correct! */
+	 if ((offset & 0xff)==0x1f)
+		 return spectrum_port_1f_r(machine, offset);
+
+	 if ((offset & 0xff)==0x7f)
+		 return spectrum_port_7f_r(machine, offset);
+
+	 if ((offset & 0xff)==0xdf)
+		 return spectrum_port_df_r(machine, offset);
+
+	 return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
+}
+
+static WRITE8_HANDLER ( spectrum_128_port_w )
+{
+		if ((offset & 1)==0)
+				spectrum_port_fe_w(machine, offset,data);
+
+		/* Only decodes on A15, A14 & A1 */
+		else if ((offset & 2)==0)
+		{
+				switch ((offset>>8) & 0xc0)
+				{
+						case 0x40:
+								spectrum_128_port_7ffd_w(machine, offset, data);
+								break;
+						case 0x80:
+								spectrum_128_port_bffd_w(machine, offset, data);
+								break;
+						case 0xc0:
+								spectrum_128_port_fffd_w(machine, offset, data);
+								break;
+						default:
+								logerror("Write %02x to 128 port: %04x\n", data, offset);
+				}
+		}
+		else
+		{
+			logerror("Write %02x to 128 port: %04x\n", data, offset);
+		}
+}
+
+/* ports are not decoded full.
+The function decodes the ports appropriately */
+static ADDRESS_MAP_START (spectrum_128_io, ADDRESS_SPACE_IO, 8)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE( spectrum_128_port_r, spectrum_128_port_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START (spectrum_128_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE( SMH_BANK1, SMH_BANK1 )
+	AM_RANGE( 0x4000, 0x7fff) AM_READWRITE( SMH_BANK2, SMH_BANK2 )
+	AM_RANGE( 0x8000, 0xbfff) AM_READWRITE( SMH_BANK3, SMH_BANK3 )
+	AM_RANGE( 0xc000, 0xffff) AM_READWRITE( SMH_BANK4, SMH_BANK4 )
+ADDRESS_MAP_END
+
+static MACHINE_RESET( spectrum_128 )
+{
+	memset(mess_ram,0,128*1024);
+	/* 0x0000-0x3fff always holds ROM */
+
+	/* Bank 5 is always in 0x4000 - 0x7fff */
+	memory_set_bankptr(2, mess_ram + (5<<14));
+
+	/* Bank 2 is always in 0x8000 - 0xbfff */
+	memory_set_bankptr(3, mess_ram + (2<<14));
+
+	/* set initial ram config */
+	spectrum_128_port_7ffd_data = 0;
+	spectrum_128_update_memory(machine);
+
+	MACHINE_RESET_CALL(spectrum);
+}
+
+MACHINE_DRIVER_START( spectrum_128 )
+	MDRV_IMPORT_FROM( spectrum )
+
+	MDRV_CPU_REPLACE("main", Z80, 3500000)        /* 3.5 Mhz */
+	MDRV_CPU_PROGRAM_MAP(spectrum_128_mem, 0)
+	MDRV_CPU_IO_MAP(spectrum_128_io, 0)
+
+	MDRV_MACHINE_RESET( spectrum_128 )
+
+    /* video hardware */
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_INIT( spectrum_128 )
+	MDRV_SCREEN_REFRESH_RATE(50.021)
+	MDRV_VIDEO_START( spectrum_128 )
+	MDRV_VIDEO_UPDATE( spectrum_128 )
+
+	/* sound hardware */
+	MDRV_SOUND_ADD(AY8912, 1773400)
+	MDRV_SOUND_CONFIG(spectrum_ay_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END
+
+
+
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
+
+ROM_START(spec128)
+	ROM_REGION(0x18000,REGION_CPU1,0)
+	ROM_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5))
+	ROM_LOAD("zx128_1.rom",0x14000,0x4000, CRC(b96a36be) SHA1(80080644289ed93d71a1103992a154cc9802b2fa))
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+ROM_START(spec128s)
+	ROM_REGION(0x18000,REGION_CPU1,0)
+	ROM_LOAD("zx128s0.rom",0x10000,0x4000, CRC(453d86b2) SHA1(968937b1c750f0ef6205f01c6db4148da4cca4e3))
+	ROM_LOAD("zx128s1.rom",0x14000,0x4000, CRC(6010e796) SHA1(bea3f397cc705eafee995ea629f4a82550562f90))
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+ROM_START(specpls2)
+	ROM_REGION(0x18000,REGION_CPU1,0)
+	ROM_LOAD("zxp2_0.rom",0x10000,0x4000, CRC(5d2e8c66) SHA1(72703f9a3e734f3c23ec34c0727aae4ccbef9a91))
+	ROM_LOAD("zxp2_1.rom",0x14000,0x4000, CRC(98b1320b) SHA1(de8b0d2d0379cfe7c39322a086ca6da68c7f23cb))
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+ROM_START(specpl2a)
+	ROM_REGION(0x20000,REGION_CPU1,0)
+	ROM_LOAD("p2a41_0.rom",0x10000,0x4000, CRC(30c9f490) SHA1(62ec15a4af56cd1d206d0bd7011eac7c889a595d))
+	ROM_LOAD("p2a41_1.rom",0x14000,0x4000, CRC(a7916b3f) SHA1(1a7812c383a3701e90e88d1da086efb0c033ac72))
+	ROM_LOAD("p2a41_2.rom",0x18000,0x4000, CRC(c9a0b748) SHA1(8df145d10ff78f98138682ea15ebccb2874bf759))
+	ROM_LOAD("p2a41_3.rom",0x1c000,0x4000, CRC(b88fd6e3) SHA1(be365f331942ec7ec35456b641dac56a0dbfe1f0))
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+
+ROM_START(specp2fr)
+	ROM_REGION(0x18000,REGION_CPU1,0)
+	ROM_LOAD("plus2fr0.rom",0x10000,0x4000, CRC(c684c535) SHA1(56684c4c85a616e726a50707483b9a42d8e724ed))
+	ROM_LOAD("plus2fr1.rom",0x14000,0x4000, CRC(f5e509c5) SHA1(7e398f62689c9d90a36d3a101351ec9987207308))
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+ROM_START(specp2sp)
+	ROM_REGION(0x18000,REGION_CPU1,0)
+	ROM_LOAD("plus2sp0.rom",0x10000,0x4000, CRC(e807d06e) SHA1(8259241b28ff85441f1bedc2bee53445767c51c5))
+	ROM_LOAD("plus2sp1.rom",0x14000,0x4000, CRC(41981d4b) SHA1(ec0d5a158842d20601b4fbeaefc6668db979d0e1))
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+SYSTEM_CONFIG_START(spec128)
+	CONFIG_IMPORT_FROM(spectrum)
+	CONFIG_RAM_DEFAULT(128 * 1024)
+SYSTEM_CONFIG_END
+
+
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
+COMP( 1986, spec128,  0,		0,		spectrum_128,	spectrum,	0,		spec128,	"Sinclair Research",    "ZX Spectrum 128" , 0 )
+COMP( 1985, spec128s, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Sinclair Research",    "ZX Spectrum 128 (Spain)" , 0 )
+COMP( 1986, specpls2, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2" , 0 )
+COMP( 1986, specp2fr, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2 (France)" , 0 )
+COMP( 1986, specp2sp, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2 (Spain)" , 0 )

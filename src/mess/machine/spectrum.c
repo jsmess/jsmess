@@ -35,17 +35,14 @@
 #include "utils.h"
 
 
-static unsigned long TapePosition = 0;
 static void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsigned long SnapshotSize);
 static void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsigned long SnapshotSize);
 static void spectrum_setup_sp(running_machine *machine, unsigned char *pSnapshot, unsigned long SnapshotSize);
-static int spectrum_setup_tap(offs_t address, UINT8 *snapshot_data, int snapshot_length);
+//static int spectrum_setup_tap(offs_t address, UINT8 *snapshot_data, int snapshot_length);
 
 TIMEX_CART_TYPE timex_cart_type = TIMEX_CART_NONE;
 UINT8 timex_cart_chunks = 0x00;
 UINT8 * timex_cart_data;
-static UINT8 *cassette_snapshot;
-static int cassette_snapshot_size;
 
 typedef enum
 {
@@ -57,39 +54,9 @@ typedef enum
 }
 SPECTRUM_SNAPSHOT_TYPE;
 
-static OPBASE_HANDLER(spectrum_opbaseoverride)
-{
-	if (cassette_snapshot_size > 0)
-		return spectrum_setup_tap(address, cassette_snapshot, cassette_snapshot_size);
-
-	/* Execute code in spectrum 48k screen memory */
-	if ((spectrum_128_port_7ffd_data == -1) && (spectrum_plus3_port_1ffd_data == -1))
-	{
-		if (address>=0x4000 && address<=0x57ff)
-		{
-			opcode_base = opcode_arg_base = spectrum_characterram-0x4000;
-			return -1;
-		}
-		if (address>=0x5800 && address<=0x5aff)
-		{
-			opcode_base = opcode_arg_base = spectrum_colorram-0x5800;
-			return -1;
-		}
-	}
-
-	/* Hack for correct handling 0xffff interrupt vector */
-	if (address == 0x0001)
-		if (cpunum_get_reg(0, REG_PREVIOUSPC)==0xffff)
-		{
-			cpunum_set_reg(0, Z80_PC, 0xfff4);
-			return 0xfff4;
-		}
-	return address;
-}
-
 MACHINE_RESET( spectrum )
 {
-	memory_set_opbase_handler(0, spectrum_opbaseoverride);
+	//memory_set_opbase_handler(0, spectrum_opbaseoverride);
 }
 
 SNAPSHOT_LOAD(spectrum)
@@ -132,192 +99,6 @@ error:
 	if (snapshot_data)
 		free(snapshot_data);
 	return INIT_FAIL;
-}
-
-/*******************************************************************
- *
- *      Override load routine (0x0556 in 48K ROM) if loading .TAP files
- *      Tape blocks are as follows.
- *      2 bytes length of block excluding these 2 bytes (LSB first)
- *      1 byte  flag byte (0x00 for headers, 0xff for data)
- *      n bytes data
- *      1 byte  checksum
- *
- *      The load routine uses the following registers:
- *      IX              Start address for block
- *      DE              Length of block
- *      A               Flag byte (as above)
- *      Carry Flag      Set for Load, reset for verify
- *
- *      On exit the carry flag is set if loading/verifying was successful.
- *
- *      Note: it is not always possible to trap the exact entry to the
- *      load routine so things get rather messy!
- *
- *******************************************************************/
-static int spectrum_setup_tap(offs_t address, UINT8 *snapshot_data, int snapshot_length)
-{
-	running_machine *machine = Machine;
-	int i, tap_block_length, load_length;
-	unsigned char lo, hi, a_reg;
-	unsigned short load_addr, return_addr, af_reg, de_reg, sp_reg;
-	static int data_loaded = 0;			/* Whether any data files (not headers) were loaded */
-
-/*        logerror("PC=%02x\n", address); */
-	/* It is not always possible to trap the call to the actual load
-	 * routine so trap the LD-EDGE-1 and LD-EDGE-2 routines which
-	 * check the earphone socket.
-	 */
-
-	if ((spectrum_128_port_7ffd_data == -1) && (spectrum_plus3_port_1ffd_data == -1))
-	{
-		if (address>=0x4000 && address<=0x57ff)
-		{
-			opcode_base = opcode_arg_base = spectrum_characterram-0x4000;
-			return -1;
-		}
-		if (address>=0x5800 && address<=0x5aff)
-		{
-			opcode_base = opcode_arg_base = spectrum_colorram-0x5800;
-			return -1;
-		}
-	}
-	if (address == 0x0001)
-		if (cpunum_get_reg(0, REG_PREVIOUSPC)==0xffff)
-		{
-			cpunum_set_reg(0, Z80_PC, 0xfff4);
-			return 0xfff4;
-		}
-
-	if (ts2068_port_f4_data == -1)
-	{
-		if ((address < 0x05e3) || (address > 0x0604))
-			return address;
-
-		/* For Spectrum 128/+2/+3 check which rom is paged */
-		if ((spectrum_128_port_7ffd_data != -1) || (spectrum_plus3_port_1ffd_data != -1))
-		{
-			if (spectrum_plus3_port_1ffd_data != -1)
-			{
-				if (!spectrum_plus3_port_1ffd_data & 0x04)
-					return address;
-			}
-			if (!spectrum_128_port_7ffd_data & 0x10)
-				return address;
-		}
-	}
-	else
-	{
-		/* For TS2068 also check that EXROM is paged into bottom 8K.
-		 * Code is not relocatable so don't need to check EXROM in other pages.
-		 */
-		if ((!ts2068_port_f4_data & 0x01) || (!ts2068_port_ff_data & 0x80))
-			return address;
-		if ((address < 0x018d) || (address > 0x01aa))
-			return address;
-	}
-	lo = snapshot_data[TapePosition] & 0x0ff;
-	hi = snapshot_data[TapePosition + 1] & 0x0ff;
-	tap_block_length = (hi << 8) | lo;
-
-	/* By the time that load has been trapped the block type and carry
-	 * flags are in the AF' register. */
-	af_reg = cpunum_get_reg(0, Z80_AF2);
-	a_reg = (af_reg & 0xff00) >> 8;
-
-	if ((a_reg == snapshot_data[TapePosition + 2]) && (af_reg & 0x0001))
-	{
-		/* Correct flag byte and carry flag set so try loading */
-		load_addr = cpunum_get_reg(0, Z80_IX);
-		de_reg = cpunum_get_reg(0, Z80_DE);
-
-		load_length = MIN(de_reg, tap_block_length - 2);
-		load_length = MIN(load_length, 65536 - load_addr);
-		/* Actual number of bytes of block that can be loaded -
-		 * Don't try to load past the end of memory */
-
-		for (i = 0; i < load_length; i++)
-			program_write_byte(load_addr + i, snapshot_data[TapePosition + i + 3]);
-		cpunum_set_reg(0, Z80_IX, load_addr + load_length);
-		cpunum_set_reg(0, Z80_DE, de_reg - load_length);
-		if (de_reg == (tap_block_length - 2))
-		{
-			/* Successful load - Set carry flag and A to 0 */
-			if ((de_reg != 17) || (a_reg))
-				data_loaded = 1;		/* Non-header file loaded */
-			cpunum_set_reg(0, Z80_AF, (af_reg & 0x00ff) | 0x0001);
-			logerror("Loaded %04x bytes from address %04x onwards (type=%02x) using tape block at offset %ld\n", load_length,
-					 load_addr, a_reg, TapePosition);
-		}
-		else
-		{
-			/* Wrong tape block size - reset carry flag */
-			cpunum_set_reg(0, Z80_AF, af_reg & 0xfffe);
-			logerror("Bad block length %04x bytes wanted starting at address %04x (type=%02x) , Data length of tape block at offset %ld is %04x bytes\n",
-					 de_reg, load_addr, a_reg, TapePosition, tap_block_length - 2);
-		}
-	}
-	else
-	{
-		/* Wrong flag byte or verify selected so reset carry flag to indicate failure */
-		cpunum_set_reg(0, Z80_AF, af_reg & 0xfffe);
-		if (af_reg & 0x0001)
-			logerror("Failed to load tape block at offset %ld - type wanted %02x, got type %02x\n", TapePosition, a_reg,
-					 snapshot_data[TapePosition + 2]);
-		else
-			logerror("Failed to load tape block at offset %ld - verify selected\n", TapePosition);
-	}
-
-	TapePosition += (tap_block_length + 2);
-	if (TapePosition >= snapshot_length)
-	{
-		/* End of tape - either rewind or disable op base override */
-		if (input_port_read(machine, "CONFIG") & 0x40)
-		{
-			if (data_loaded)
-			{
-				TapePosition = 0;
-				data_loaded = 0;
-				logerror("All tape blocks used! - rewinding tape to start\n");
-			}
-			else
-			{
-				/* Disable .TAP support if no files were loaded to avoid getting caught in infinite loop */
-				logerror("No valid data loaded! - disabling .TAP support\n");
-				cassette_snapshot = NULL;
-				cassette_snapshot_size = 0;
-
-			}
-		}
-		else
-		{
-			logerror("All tape blocks used! - disabling .TAP support\n");
-			cassette_snapshot = NULL;
-			cassette_snapshot_size = 0;
-		}
-	}
-
-	/* Leave the load routine by removing addresses from the stack
-	 * until one outside the load routine is found.
-	 * eg. SA/LD-RET at address 053f (00e5 on TS2068)
-	 */
-	do
-	{
-		sp_reg = cpunum_get_reg(0, Z80_SP);
-		return_addr =
-			((UINT16) program_read_byte(sp_reg + 0) ) >> 8 |
-			((UINT16) program_read_byte(sp_reg + 1) ) >> 0;
-
-		sp_reg += 2;
-		cpunum_set_reg(0, Z80_SP, (sp_reg & 0x0ffff));
-		cpunum_set_reg(0, Z80_PC, (return_addr & 0x0ffff));
-	}
-	while (((return_addr != 0x053f) && (return_addr < 0x0605) && (ts2068_port_f4_data == -1)) ||
-		   ((return_addr != 0x00e5) && (return_addr < 0x01aa) && (ts2068_port_f4_data != -1)));
-
-       	logerror("Load return address=%04x, SP=%04x\n", return_addr, sp_reg);
-
-	return return_addr;
 }
 
 /*******************************************************************

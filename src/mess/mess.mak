@@ -673,10 +673,17 @@ $(MESSOBJ)/kaypro.a:   \
 $(MESSOBJ)/sinclair.a: \
 	$(MESS_VIDEO)/border.o		\
 	$(MESS_VIDEO)/spectrum.o		\
+	$(MESS_VIDEO)/spec128.o		\
+	$(MESS_VIDEO)/timex.o		\
 	$(MESS_VIDEO)/zx.o		\
 	$(MESS_DRIVERS)/zx.o		\
 	$(MESS_MACHINE)/zx.o		\
 	$(MESS_DRIVERS)/spectrum.o		\
+	$(MESS_DRIVERS)/spec128.o		\
+	$(MESS_DRIVERS)/timex.o		\
+	$(MESS_DRIVERS)/specpls3.o		\
+	$(MESS_DRIVERS)/scorpion.o		\
+	$(MESS_DRIVERS)/pentagon.o		\
 	$(MESS_MACHINE)/spectrum.o		\
 	$(MESS_FORMATS)/zx81_p.o		\
 	$(MESS_DRIVERS)/ql.o		\

@@ -71,39 +71,63 @@ extern QUICKLOAD_LOAD( spectrum );
 
 
 /*----------- defined in drivers/spectrum.c -----------*/
+INPUT_PORTS_EXTERN( spectrum );
+MACHINE_DRIVER_EXTERN( spectrum );
+SYSTEM_CONFIG_EXTERN(spectrum)
+SYSTEM_CONFIG_EXTERN(spectrum_common)
 
-extern void ts2068_update_memory(running_machine *machine);
-extern int spectrum_128_port_7ffd_data;
-extern int spectrum_plus3_port_1ffd_data;
-extern int ts2068_port_ff_data;
-extern int ts2068_port_f4_data;
+extern READ8_HANDLER(spectrum_port_1f_r);
+extern READ8_HANDLER(spectrum_port_7f_r);
+extern READ8_HANDLER(spectrum_port_df_r);
+extern READ8_HANDLER(spectrum_port_fe_r);
+extern WRITE8_HANDLER(spectrum_port_fe_w);
 extern int PreviousFE;
-extern unsigned char *spectrum_128_screen_location;
 
+/*----------- defined in drivers/spec128.c -----------*/
+MACHINE_DRIVER_EXTERN( spectrum_128 );
+
+extern READ8_HANDLER(spectrum_128_port_fffd_r);
+extern WRITE8_HANDLER(spectrum_128_port_bffd_w);
+extern WRITE8_HANDLER(spectrum_128_port_fffd_w);
+extern unsigned char *spectrum_128_screen_location;
 extern void spectrum_128_update_memory(running_machine *machine);
+extern int spectrum_128_port_7ffd_data;
+
+/*----------- defined in drivers/specpls3.c -----------*/
+extern int spectrum_plus3_port_1ffd_data;
 extern void spectrum_plus3_update_memory(running_machine *machine);
 
+/*----------- defined in drivers/spec128.c -----------*/
+extern void ts2068_update_memory(running_machine *machine);
+extern int ts2068_port_ff_data;
+extern int ts2068_port_f4_data;
 
 /*----------- defined in video/spectrum.c -----------*/
+extern int frame_number;    /* Used for handling FLASH 1 */
+extern int flash_invert;
+
+extern PALETTE_INIT( spectrum );
 
 extern VIDEO_START( spectrum );
 extern VIDEO_UPDATE( spectrum );
 extern VIDEO_EOF( spectrum );
 
+extern unsigned char *spectrum_characterram;
+extern unsigned char *spectrum_colorram;
+
+extern const gfx_layout spectrum_charlayout;
+
+/*----------- defined in video/spec128.c -----------*/
+extern PALETTE_INIT( spectrum_128 );
+
 extern VIDEO_START( spectrum_128 );
 extern VIDEO_UPDATE( spectrum_128 );
 
+
+/*----------- defined in video/timex.c -----------*/
 extern VIDEO_EOF( ts2068 );
 extern VIDEO_UPDATE( ts2068 );
 
 extern VIDEO_UPDATE( tc2048 );
-
-extern unsigned char *spectrum_characterram;
-extern unsigned char *spectrum_colorram;
-extern WRITE8_HANDLER ( spectrum_characterram_w );
-extern  READ8_HANDLER  ( spectrum_characterram_r );
-extern WRITE8_HANDLER ( spectrum_colorram_w );
-extern  READ8_HANDLER  ( spectrum_colorram_r );
-
 
 #endif /* SPECTRUM_H */
