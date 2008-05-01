@@ -21,6 +21,7 @@
 
 #include "driver.h"
 #include "zx8302.h"
+#include "devices/microdrv.h"
 #include <time.h>
 
 #define LOG 0
@@ -62,19 +63,6 @@ enum
 #define ZX8302_TXD_START	0
 #define ZX8302_TXD_STOP		9
 #define ZX8302_TXD_STOP2	10
-
-#define MDV_SECTOR_COUNT	255
-#define MDV_SECTOR_LENGTH	686
-#define MDV_IMAGE_LENGTH	(MDV_SECTOR_COUNT * MDV_SECTOR_LENGTH)
-
-#define MDV_PREAMBLE_LENGTH			12
-#define MDV_GAP_LENGTH				120
-
-#define MDV_OFFSET_HEADER_PREAMBLE	0
-#define MDV_OFFSET_HEADER			MDV_OFFSET_HEADER_PREAMBLE + MDV_PREAMBLE_LENGTH
-#define MDV_OFFSET_DATA_PREAMBLE	28
-#define MDV_OFFSET_DATA				MDV_OFFSET_DATA_PREAMBLE + MDV_PREAMBLE_LENGTH
-#define MDV_OFFSET_GAP				566
 
 typedef struct _zx8302_t zx8302_t;
 struct _zx8302_t

@@ -10,7 +10,6 @@
 
     TODO:
 
-	- add microdrives as devices
 	- get modified Danish version to boot (e.g. MD_DESEL was patched to jump to 0x1cd5e)
 
 */
@@ -19,6 +18,7 @@
 #include "cpu/i8039/i8039.h"
 #include "cpu/m68000/m68000.h"
 #include "devices/cartslot.h"
+#include "devices/microdrv.h"
 #include "includes/serial.h"
 #include "sound/speaker.h"
 #include "video/zx8301.h"
@@ -27,6 +27,8 @@
 #define SCREEN_TAG	"main"
 #define ZX8301_TAG	"IC22"
 #define ZX8302_TAG	"IC23"
+#define MDV1_TAG	"mdv1"
+#define MDV2_TAG	"mdv2"
 
 #define X1 XTAL_15MHz
 #define X2 XTAL_32_768kHz
@@ -519,6 +521,8 @@ static ZX8302_INTERFACE( ql_zx8302_intf )
 {
 	X1,
 	X2,
+	MDV1_TAG,
+	MDV2_TAG,
 	ql_irq_w,
 	ql_baudx4_w,
 	ql_comdata_w
@@ -578,6 +582,9 @@ static MACHINE_DRIVER_START( ql )
 
 	MDRV_DEVICE_ADD(ZX8302_TAG, ZX8302)
 	MDRV_DEVICE_CONFIG(ql_zx8302_intf)
+
+	MDRV_DEVICE_ADD(MDV1_TAG, MICRODRIVE)
+	MDRV_DEVICE_ADD(MDV2_TAG, MICRODRIVE)
 
 	// video hardware
 

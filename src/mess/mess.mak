@@ -462,6 +462,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_DEVICES)/dsk.o		\
 	$(MESS_DEVICES)/z80bin.o	\
 	$(MESS_DEVICES)/chd_cd.o	\
+	$(MESS_DEVICES)/microdrv.o	\
 	$(MESS_MACHINE)/6551.o		\
 	$(MESS_MACHINE)/smartmed.o	\
 	$(MESS_VIDEO)/m6847.o		\

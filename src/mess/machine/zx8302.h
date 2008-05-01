@@ -51,6 +51,9 @@ struct _zx8302_interface
 	int clock;					/* the CPU clock (pin 25) of the chip */
 	int rtc_clock;				/* the RTC clock (pin 30) of the chip */
 
+	const char *mdv1_tag;		/* microdrive 1 */
+	const char *mdv2_tag;		/* microdrive 2 */
+
 	/* this gets called for every change of the IPLIL pin (pin 26) */
 	zx8302_irq_callback_func		irq_callback;
 
