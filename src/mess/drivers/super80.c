@@ -816,7 +816,7 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
-	MDRV_Z80BIN_QUICKLOAD_ADD(default, 0)
+	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80d )
@@ -865,7 +865,7 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
-	MDRV_Z80BIN_QUICKLOAD_ADD(default, 0)
+	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
 MACHINE_DRIVER_END
 
 static void driver_init_common( void )

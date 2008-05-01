@@ -331,8 +331,8 @@ static MACHINE_DRIVER_START(laser110)
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(vtech1, "vz", 0.5)
-	MDRV_Z80BIN_QUICKLOAD_ADD(vtech1, 0)
+	MDRV_SNAPSHOT_ADD(vtech1, "vz", 1.5)
+	MDRV_Z80BIN_QUICKLOAD_ADD(vtech1, 1.5)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser200)

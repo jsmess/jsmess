@@ -312,8 +312,8 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(mbee, "mwb,com", 0.5)
-	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 0)
+	MDRV_QUICKLOAD_ADD(mbee, "mwb,com", 2)
+	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 2)
 MACHINE_DRIVER_END
 
 
@@ -349,8 +349,8 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(mbee, "mwb,com", 0.5)
-	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 0)
+	MDRV_QUICKLOAD_ADD(mbee, "mwb,com", 2)
+	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 2)
 MACHINE_DRIVER_END
 
 

@@ -755,7 +755,7 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	/* quickload */
-	MDRV_Z80BIN_QUICKLOAD_ADD(exidy, 0)
+	MDRV_Z80BIN_QUICKLOAD_ADD(exidy, 3)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exidyd )
