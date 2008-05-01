@@ -183,47 +183,42 @@ VIDEO_START( marvins )
 		switch (snk_gamegroup)
 		{
 			case 0:	// Marvin's Maze
-				tilemap_set_scrolldx( bg_tilemap, 271, 287 );
-				tilemap_set_scrolldy( bg_tilemap, 0, -40 );
+				tilemap_set_scrolldx( bg_tilemap, 271, 287  );
+				tilemap_set_scrolldy( bg_tilemap,   0,  -40  );
 
-				tilemap_set_scrolldx( fg_tilemap, 15, 13+18 );
-				tilemap_set_scrolldy( fg_tilemap, 0, -40 );
+				tilemap_set_scrolldx( fg_tilemap,  15, 13+18 );
+				tilemap_set_scrolldy( fg_tilemap,   0, -40   );
+
+				tilemap_set_scrolldx( tx_tilemap,  16, 16    );
+				tilemap_set_scrolldy( tx_tilemap,   0, 0     );
 
 				sprite_flip_adjust = 256+182+1;
 			break;
 
-			/*
-                Old settings for the the following games:
-
-                tilemap_set_scrolldx( bg_tilemap, -16, -10 );
-                tilemap_set_scrolldy( bg_tilemap,   0, -40 );
-
-                tilemap_set_scrolldx( fg_tilemap,  16,  22 );
-                tilemap_set_scrolldy( fg_tilemap,   0, -40 );
-
-                Note that while the new settings are more accurate they cannot handle flipscreen.
-            */
 			case 1:	// Mad Crasher
-				tilemap_set_scrolldx( bg_tilemap,256,  0 );
-				tilemap_set_scrolldy( bg_tilemap, 12,  0 );
+				tilemap_set_scrolldx( bg_tilemap, 256, 0     );
+				tilemap_set_scrolldy( bg_tilemap,  12, 0     );
 
-				tilemap_set_scrolldx( fg_tilemap,  0,  0 );
-				tilemap_set_scrolldy( fg_tilemap,  6,  0 );
+				tilemap_set_scrolldx( fg_tilemap,   0, 0     );
+				tilemap_set_scrolldy( fg_tilemap,   6, -24   );
+
+				tilemap_set_scrolldx( tx_tilemap,  16, 16    );
+				tilemap_set_scrolldy( tx_tilemap,   0, +8    );
 			break;
 
 			case 2:	// VanguardII
-				tilemap_set_scrolldx( bg_tilemap,  7,  0 );
-				tilemap_set_scrolldy( bg_tilemap,-20,  0 );
+				tilemap_set_scrolldx( bg_tilemap,   7, +14   );
+				tilemap_set_scrolldy( bg_tilemap, -20, -60   );
 
-				tilemap_set_scrolldx( fg_tilemap, 15,  0 );
-				tilemap_set_scrolldy( fg_tilemap,  0,  0 );
+				tilemap_set_scrolldx( fg_tilemap,  15, +32   );
+				tilemap_set_scrolldy( fg_tilemap,   0, -40   );
+
+				tilemap_set_scrolldx( tx_tilemap,  16, 16    );
+				tilemap_set_scrolldy( tx_tilemap,   0, 0     );
 
 				sprite_flip_adjust = 256+182;
 			break;
 		}
-
-		tilemap_set_scrolldx( tx_tilemap, 16, 16 );
-		tilemap_set_scrolldy( tx_tilemap, 0, 0 );
 	}
 }
 
@@ -238,30 +233,56 @@ static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectan
 	const UINT8 *base = videoram+0x400;
 	const gfx_element *gfx = machine->gfx[0];
 	int row;
-	for( row=0; row<4; row++ )
-	{
-		int sy,sx = (row&1)*8;
-		const UINT8 *source = base + (row&1)*32;
-		if( row>1 )
+	if (!flipscreen)
+		for( row=0; row<4; row++ )
 		{
-			sx+=256+16;
-		}
-		else
-		{
-			source+=30*32;
-		}
+			int sy,sx = (row&1)*8;
+			const UINT8 *source = base + (row&1)*32;
+			if( row>1 )
+			{
+				sx+=256+16;
+			}
+			else
+			{
+				source+=30*32;
+			}
 
-		for( sy=0; sy<256; sy+=8 )
-		{
-			int tile_number = *source++;
-			drawgfx( bitmap, gfx,
-			    tile_number, tile_number>>5,
-			    0,0, /* no flip */
-			    sx,sy,
-			    cliprect,
-			    TRANSPARENCY_NONE, 0xf );
+			for( sy=0; sy<256; sy+=8 )
+			{
+				int tile_number = *source++;
+				drawgfx( bitmap, gfx,
+				    tile_number, tile_number>>5,
+				    0,0,
+				    sx,sy,
+				    cliprect,
+				    TRANSPARENCY_NONE, 0xf );
+			}
 		}
-	}
+	else
+		for( row=0; row<4; row++ )
+		{
+			int sy,sx = (row&1)*8;
+			const UINT8 *source = base + 30*32 + 32 - (row&1)*32;
+			if( row>1 )
+			{
+				sx+=256+16;
+			}
+			else
+			{
+				source-=30*32;
+			}
+
+			for( sy=255; sy>=0; sy-=8 )
+			{
+				int tile_number = *source++;
+				drawgfx( bitmap, gfx,
+				    tile_number, tile_number>>5,
+				    1,1,
+				    sx,sy-5*8,
+				    cliprect,
+				    TRANSPARENCY_NONE, 0xf );
+			}
+		}
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
@@ -367,8 +388,8 @@ VIDEO_UPDATE( marvins )
 		tilemap_set_scrolly( bg_tilemap,    0, bg_scrolly );
 		tilemap_set_scrollx( fg_tilemap,    0, fg_scrollx );
 		tilemap_set_scrolly( fg_tilemap,    0, fg_scrolly );
-		tilemap_set_scrollx( tx_tilemap,  0, 0 );
-		tilemap_set_scrolly( tx_tilemap,  0, 0 );
+		tilemap_set_scrollx( tx_tilemap,    0, 0 );
+		tilemap_set_scrolly( tx_tilemap,    0, 0 );
 
 		tilemap_draw(bitmap,&finalclip,fg_tilemap,TILEMAP_DRAW_OPAQUE ,0);
 		draw_sprites(screen->machine,bitmap,cliprect, sprite_scrollx+29+1, sprite_scrolly+16, 0, sprite_partition );
@@ -433,13 +454,13 @@ VIDEO_UPDATE( madcrash )
 			flipscreen = attributes&0x80;
 			tilemap_set_flip( ALL_TILEMAPS, flipscreen?TILEMAP_FLIPY|TILEMAP_FLIPX:0);
 		}
-
-		tilemap_set_scrollx( bg_tilemap, 0, bg_scrollx );
-		tilemap_set_scrolly( bg_tilemap, 0, bg_scrolly );
-		tilemap_set_scrollx( fg_tilemap, 0, fg_scrollx );
-		tilemap_set_scrolly( fg_tilemap, 0, fg_scrolly );
+		tilemap_set_scrollx( bg_tilemap,  0, bg_scrollx );
+		tilemap_set_scrolly( bg_tilemap,  0, bg_scrolly );
+		tilemap_set_scrollx( fg_tilemap,  0, fg_scrollx );
+		tilemap_set_scrolly( fg_tilemap,  0, fg_scrolly );
 		tilemap_set_scrollx( tx_tilemap,  0, 0 );
 		tilemap_set_scrolly( tx_tilemap,  0, 0 );
+
 
 		tilemap_draw(bitmap,&finalclip,bg_tilemap,TILEMAP_DRAW_OPAQUE ,0);
 		draw_sprites(screen->machine,bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 0, sprite_partition );

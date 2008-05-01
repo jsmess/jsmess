@@ -13,6 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "devices/snapquik.h"
 #include "includes/psx.h"

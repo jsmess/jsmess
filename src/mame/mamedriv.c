@@ -1761,6 +1761,7 @@ const game_driver * const drivers[] =
 	/* Taito L-System games */
 	DRIVER( raimais )	/* B36 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( raimaisj )	/* B36 (c) 1988 Taito Corporation */
+	DRIVER( raimaijo )	/* B36 (c) 1988 Taito Corporation */
 	DRIVER( kurikint )	/* B42 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( kurikinu )	/* B42 (c) 1988 Taito America Corporation (US) */
 	DRIVER( kurikinj )	/* B42 (c) 1988 Taito Corporation (Japan) */
@@ -2366,6 +2367,7 @@ V-V                           TP-027
 
 	/* Capcom CPS1 games */
 	DRIVER( forgottn )	/*  7/1988 (c) 1988 (US) */
+	DRIVER( forgott1 )	/*  7/1988 (c) 1988 (World?) */
 	DRIVER( lostwrld )	/*  7/1988 (c) 1988 (Japan) */
 	DRIVER( ghouls )	/* 12/1988 (c) 1988 (World) */
 	DRIVER( ghoulsu )	/* 12/1988 (c) 1988 (US) */
@@ -2375,6 +2377,7 @@ V-V                           TP-027
 	DRIVER( striderj )	/*  3/1989 (c) 1989 */
 	DRIVER( stridrja )	/*  3/1989 (c) 1989 */
 	DRIVER( dynwar )	/*  4/1989 (c) 1989 (World) */
+	DRIVER( dynwaru )	/*  4/1989 (c) 1989 (US) */
 	DRIVER( dynwarj )	/*  4/1989 (c) 1989 (Japan) */
 	DRIVER( willow )	/*  6/1989 (c) 1989 (US) */
 	DRIVER( willowj )	/*  6/1989 (c) 1989 (Japan) */
@@ -2387,6 +2390,7 @@ V-V                           TP-027
 	DRIVER( ffightub )	/* 12/1989 (c) (US)    */
 	DRIVER( ffightj )	/* 12/1989 (c) (Japan) */
 	DRIVER( ffightj1 )	/* 12/1989 (c) (Japan) */
+	DRIVER( ffightj2 )	/* 12/1989 (c) (Japan) */
 	DRIVER( 1941 )		/*  2/1990 (c) 1990 (World) */
 	DRIVER( 1941j )		/*  2/1990 (c) 1990 (Japan) */
 	DRIVER( mercs )		/* 02/03/1990 (c) 1990 (World) */
@@ -2592,7 +2596,8 @@ V-V                           TP-027
 	DRIVER( ddsomj )	/* 19/06/1996 (c) 1996 (Japan) */
 	DRIVER( ddsoma )	/* 19/06/1996 (c) 1996 (Asia) */
 	DRIVER( ddsomb )	/* 23/02/1996 (c) 1996 (Brazil) */
-	DRIVER( sfa2 )		/* 06/03/1996 (c) 1996 (US) */
+	DRIVER( sfa2 )		/* 06/03/1996 (c) 1996 (Euro) */
+	DRIVER( sfa2u )		/* 06/03/1996 (c) 1996 (US) */
 	DRIVER( sfz2j )		/* 27/02/1996 (c) 1996 (Japan) */
 	DRIVER( sfz2a )		/* 27/02/1996 (c) 1996 (Asia) */
 	DRIVER( sfz2b )		/* 31/05/1996 (c) 1996 (Brazil) */
@@ -6098,6 +6103,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Midway Touchmaster / Galaxy Games */
 	DRIVER( tm )		/* (c) 1996 Midway Games */
 	DRIVER( tm3k )		/* (c) 1997 Midway Games */
+	DRIVER( tm3ka )		/* (c) 1997 Midway Games */
 	DRIVER( tm4k )		/* (c) 1998 Midway Games */
 	DRIVER( tm5k )		/* (c) 1998 Midway Games */
 	DRIVER( tm7k )		/* (c) 1999 Midway Games */
@@ -6229,6 +6235,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( raiden2c )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raiden2d )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raiden2e )	/* (c) 1993 Seibu Kaihatsu */
+	DRIVER( raiden2f )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndx )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndxa )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndxj )	/* (c) 1993 Seibu Kaihatsu */
@@ -6299,7 +6306,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( skysmash )	/* (c) 1990 Nihon System Inc. */
 	DRIVER( legionna )	/* (c) 1992 Tad (World) */
 	DRIVER( legionnu )	/* (c) 1992 Tad + Fabtek license (US) */
-	DRIVER( heatbrl )	/* (c) 1992 Tad (World) */
+	DRIVER( heatbrl )	/* (c) 1992 Tad (World version 3) */
+	DRIVER( heatbrl2 )	/* (c) 1992 Tad (World version 2) */
 	DRIVER( heatbrlo )	/* (c) 1992 Tad (World) */
 	DRIVER( heatbrlu )	/* (c) 1992 Tad (US) */
 	DRIVER( godzilla )	/* (c) 1993 Banpresto */
@@ -7016,6 +7024,7 @@ Other Sun games
 	DRIVER( tgtball )	/* (c) 1995 Yun Sung */
 	DRIVER( tgtballa )	/* (c) 1995 Yun Sung */
 	DRIVER( torus )		/* (c) 1996 Yun Sung */
+	DRIVER( paprazzi )	/* (c) 1996 Yun Sung */
 	DRIVER( madball )	/* (c) 1998 Yun Sung */
 	DRIVER( madballn )	/* (c) 1998 Yun Sung */
 	DRIVER( cannball )	/* (c) 1995 Yun Sung / Soft Visio */
@@ -7805,6 +7814,7 @@ Other Sun games
 	DRIVER( pitbossm )	/* (c) 1994 Merit */
 	DRIVER( megat3 )	/* (c) 1995 Merit */
 	DRIVER( megat4 )	/* (c) 1996 Merit */
+	DRIVER( megat4a )	/* (c) 1996 Merit */
 	DRIVER( megat4te )	/* (c) 1996 Merit */
 	DRIVER( megat5 )	/* (c) 1997 Merit */
 	DRIVER( megat6 )	/* (c) 1998 Merit */

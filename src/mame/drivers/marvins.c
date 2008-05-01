@@ -775,6 +775,6 @@ static DRIVER_INIT( vangrd2 )
 }
 
 
-GAME( 1983, marvins,  0, marvins,  marvins,  marvins,  ROT270, "SNK", "Marvin's Maze", GAME_NO_COCKTAIL )
+GAME( 1983, marvins,  0, marvins,  marvins,  marvins,  ROT270, "SNK", "Marvin's Maze", 0 )
 GAME( 1984, madcrash, 0, madcrash, madcrash, madcrash, ROT0,   "SNK", "Mad Crasher", GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, vangrd2,  0, vangrd2,  vangrd2,  vangrd2,  ROT270, "SNK", "Vanguard II", GAME_NO_COCKTAIL )
+GAME( 1984, vangrd2,  0, vangrd2,  vangrd2,  vangrd2,  ROT270, "SNK", "Vanguard II", 0 )

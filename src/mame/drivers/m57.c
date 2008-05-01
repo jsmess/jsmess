@@ -198,7 +198,7 @@ INPUT_PORTS_END
 static const gfx_layout spritelayout =
 {
 	16,32,
-	RGN_FRAC(1,6),
+	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ STEP8(0,1), STEP8(16*8,1) },
@@ -244,7 +244,7 @@ static MACHINE_DRIVER_START( m57 )
 	MDRV_VIDEO_UPDATE(m57)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(m52_small_audio)
+	MDRV_IMPORT_FROM(m52_sound_c_audio)
 MACHINE_DRIVER_END
 
 
