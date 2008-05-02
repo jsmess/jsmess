@@ -21,7 +21,7 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, ADDRESS_SPACE_PROGRAM, 8)
-	  AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK(1) // First bank
+	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK(1) // First bank
     AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM    
     AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE(&specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
@@ -30,7 +30,7 @@ static ADDRESS_MAP_START(specialist_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specialp_mem, ADDRESS_SPACE_PROGRAM, 8)
-	  AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK(1) // First bank
+	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK(1) // First bank
     AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM    
     AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE(&specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
@@ -39,12 +39,12 @@ static ADDRESS_MAP_START(specialp_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(erik_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x3fff ) AM_READWRITE(SMH_BANK1, SMH_BANK1)
-    AM_RANGE( 0x4000, 0x8fff ) AM_READWRITE(SMH_BANK2, SMH_BANK2) 
-    AM_RANGE( 0x9000, 0xbfff ) AM_READWRITE(SMH_BANK3, SMH_BANK3) 
-    AM_RANGE( 0xc000, 0xefff ) AM_READWRITE(SMH_BANK4, SMH_BANK4)
-    AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(SMH_BANK5, SMH_BANK5)
-    AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(SMH_BANK6, SMH_BANK6)
+    AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK(1)
+    AM_RANGE( 0x4000, 0x8fff ) AM_RAMBANK(2)
+    AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK(3)
+    AM_RANGE( 0xc000, 0xefff ) AM_RAMBANK(4)
+    AM_RANGE( 0xf000, 0xf7ff ) AM_RAMBANK(5)
+    AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK(6)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( erik_io_map, ADDRESS_SPACE_IO, 8 )
@@ -59,11 +59,11 @@ static ADDRESS_MAP_START( erik_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specimx_mem, ADDRESS_SPACE_PROGRAM, 8)
-	  ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE( 0x0000, 0x8fff ) AM_READWRITE(SMH_BANK1, SMH_BANK1)
-		AM_RANGE( 0x9000, 0xbfff ) AM_READWRITE(SMH_BANK2, SMH_BANK2)
-  	AM_RANGE( 0xc000, 0xffbf ) AM_READWRITE(SMH_BANK3, SMH_BANK3)
-    AM_RANGE( 0xffc0, 0xffdf ) AM_READWRITE(SMH_BANK4, SMH_BANK4)
+	ADDRESS_MAP_UNMAP_HIGH
+    AM_RANGE( 0x0000, 0x8fff ) AM_RAMBANK(1)
+	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK(2)
+  	AM_RANGE( 0xc000, 0xffbf ) AM_RAMBANK(3)
+    AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK(4)
     AM_RANGE( 0xffe0, 0xffe3 ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard   
     AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
     AM_RANGE( 0xffe8, 0xffe8 ) AM_READWRITE(wd17xx_status_r,wd17xx_command_w) 
@@ -325,24 +325,24 @@ static MACHINE_DRIVER_START( special )
 	MDRV_DEVICE_CONFIG( specialist_ppi8255_interface )
 
     /* video hardware */    	
-		MDRV_SCREEN_ADD("main", RASTER)      	
-		MDRV_SCREEN_REFRESH_RATE(50)
-		MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-		MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-		MDRV_SCREEN_SIZE(384, 256)
-		MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-		MDRV_PALETTE_LENGTH(2)
-		MDRV_PALETTE_INIT(black_and_white)	
+	MDRV_SCREEN_ADD("main", RASTER)      	
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(384, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)	
 		
     MDRV_VIDEO_START(special)
     MDRV_VIDEO_UPDATE(special)
 
     /* audio hardware */
-		MDRV_SPEAKER_STANDARD_MONO("mono")
-		MDRV_SOUND_ADD(DAC, 0)
-		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	        
-		MDRV_SOUND_ADD(WAVE, 0)
-		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)        
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	        
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)        
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( specialp )
@@ -354,8 +354,8 @@ static MACHINE_DRIVER_START( specialp )
     MDRV_SCREEN_MODIFY("main")
     MDRV_VIDEO_START(specialp)
     MDRV_VIDEO_UPDATE(specialp)
-		MDRV_SCREEN_SIZE(512, 256)
-		MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MDRV_SCREEN_SIZE(512, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( specimx )
@@ -367,17 +367,17 @@ static MACHINE_DRIVER_START( specimx )
   	MDRV_MACHINE_RESET ( specimx )
 	     		
     /* video hardware */    	
-		MDRV_SCREEN_MODIFY("main")		
-		MDRV_PALETTE_LENGTH(16)
-		MDRV_PALETTE_INIT( specimx )
+	MDRV_SCREEN_MODIFY("main")		
+	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_INIT( specimx )
 		
    	MDRV_VIDEO_START(specimx)
    	MDRV_VIDEO_UPDATE(specimx)
 
     /* audio hardware */
-		MDRV_SOUND_ADD(CUSTOM, 0)
-		MDRV_SOUND_CONFIG(specimx_sound_interface)
-		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)        		
+	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_CONFIG(specimx_sound_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)        		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( erik )
@@ -393,23 +393,23 @@ static MACHINE_DRIVER_START( erik )
 	MDRV_DEVICE_CONFIG( specialist_ppi8255_interface )
 
     /* video hardware */    	
-		MDRV_SCREEN_ADD("main", RASTER)      	
-		MDRV_SCREEN_REFRESH_RATE(50)
-		MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-		MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-		MDRV_SCREEN_SIZE(384, 256)
-		MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-		MDRV_PALETTE_LENGTH(8)
-		MDRV_PALETTE_INIT(erik)	
+	MDRV_SCREEN_ADD("main", RASTER)      	
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(384, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(erik)	
 		
     MDRV_VIDEO_START(erik)
     MDRV_VIDEO_UPDATE(erik)
     /* audio hardware */
-		MDRV_SPEAKER_STANDARD_MONO("mono")
-		MDRV_SOUND_ADD(DAC, 0)
-		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	        
-		MDRV_SOUND_ADD(WAVE, 0)
-		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)        
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	        
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)        
 MACHINE_DRIVER_END
  
 /* ROM definition */
@@ -500,11 +500,11 @@ SYSTEM_CONFIG_END
 
 /* Driver */
  
-/*    YEAR  NAME   			PARENT  COMPAT 	 MACHINE 	INPUT   	INIT  	CONFIG 		COMPANY 			 FULLNAME   	FLAGS */
+/*    YEAR  NAME   		PARENT  COMPAT 	 MACHINE 	INPUT   	INIT  	CONFIG 		COMPANY 			 FULLNAME   	FLAGS */
 COMP( 1985, special,    0,     	0, 		special, 	special, 	special, special,  "", 					 "Specialist",		0)
-COMP( 1985, specialp,   special,0, 		specialp, special, 	special, special,  "", 					 "Specialist + hires graph",		0)
-COMP( 1985, lik,    		special,0, 		special, 	special, 	special, special,  "", 					 "Lik",		 		0)
+COMP( 1985, specialp,   special,0, 		specialp, 	special, 	special, special,  "", 					 "Specialist + hires graph",		0)
+COMP( 1985, lik,    	special,0, 		special, 	special, 	special, special,  "", 					 "Lik",		 		0)
 COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	specimx, specimx,  "", 					 "Specialist MX", 	0)
-COMP( 1994, erik,   		special,0, 		erik, 		special, 	erik, 	 erik,  	 "", 					 "Erik", 	0)
+COMP( 1994, erik,   	special,0, 		erik, 		special, 	erik, 	 erik,  	 "", 				 "Erik", 	0)
 
 

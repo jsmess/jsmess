@@ -20,11 +20,11 @@
     
 /* Address maps */
 static ADDRESS_MAP_START(b2m_mem, ADDRESS_SPACE_PROGRAM, 8)
- 	  AM_RANGE (0x0000, 0x27ff) AM_READWRITE(SMH_BANK1, SMH_BANK1)
- 	  AM_RANGE (0x2800, 0x2fff) AM_READWRITE(SMH_BANK2, SMH_BANK2)
- 	  AM_RANGE (0x3000, 0x6fff) AM_READWRITE(SMH_BANK3, SMH_BANK3)
- 	  AM_RANGE (0x7000, 0xdfff) AM_READWRITE(SMH_BANK4, SMH_BANK4)
- 	  AM_RANGE (0xe000, 0xffff) AM_READWRITE(SMH_BANK5, SMH_BANK5)
+	AM_RANGE (0x0000, 0x27ff) AM_RAMBANK(1)
+ 	AM_RANGE (0x2800, 0x2fff) AM_RAMBANK(2)
+ 	AM_RANGE (0x3000, 0x6fff) AM_RAMBANK(3)
+ 	AM_RANGE (0x7000, 0xdfff) AM_RAMBANK(4)
+ 	AM_RANGE (0xe000, 0xffff) AM_RAMBANK(5)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( b2m_io, ADDRESS_SPACE_IO, 8 )
@@ -248,6 +248,6 @@ SYSTEM_CONFIG_END
 /* Driver */
  
 /*    YEAR  NAME   	PARENT  COMPAT  MACHINE 	INPUT   	INIT  	 CONFIG COMPANY 				 FULLNAME   FLAGS */
-COMP( 1983, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 b2m,  	"", 					 "Bashkiria-2M",	 0)
-COMP( 1983, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 b2m,  	"", 					 "Bashkiria-2M ROM-disk",	 0)
+COMP( 1989, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M",	 0)
+COMP( 1989, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M ROM-disk",	 0)
 
