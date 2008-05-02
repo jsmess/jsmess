@@ -17,6 +17,8 @@
 #include "machine/wd17xx.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
+#include "sound/custom.h"
+#include "streams.h"
 
 static int b2m_8255_porta;
 UINT16 b2m_video_scroll;
@@ -153,12 +155,16 @@ static PIT8253_FREQUENCY_CHANGED(bm2_pit_clk)
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_irq)
 {
+	if (state==1) logerror("Timer IRQ\n");
 	pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),1,state);	
 }
 
+UINT8 vblank_state = 0;
 INTERRUPT_GEN (b2m_vblank_interrupt)
 {
-	pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),0,1);		
+	vblank_state++;
+	if (vblank_state>1) vblank_state=0;
+	pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
 }
 const struct pit8253_config b2m_pit8253_intf =
 {
@@ -329,6 +335,7 @@ static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
 DRIVER_INIT(b2m)
 {
 	memset(mess_ram,0,128*1024);	
+	vblank_state = 0;
 }
 
 WRITE8_HANDLER ( b2m_palette_w ) 
@@ -425,4 +432,64 @@ DEVICE_IMAGE_LOAD( b2m_floppy )
 
 	basicdsk_set_geometry (image, 80, 2, 5, 1024, 1, 0, FALSE);	
 	return INIT_PASS;
+}
+
+static sound_stream *mixer_channel;
+static void *b2m_sh_start(int clock, const struct CustomSound_interface *config);
+static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
+
+const struct CustomSound_interface b2m_sound_interface =
+{
+	b2m_sh_start,
+	NULL,
+	NULL
+};
+
+static void *b2m_sh_start(int clock, const struct CustomSound_interface *config)
+{
+	mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, b2m_sh_update);
+	return (void *) ~0;
+}
+
+static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
+{
+	device_config *pit8253 = (device_config*)device_list_find_by_tag( Machine->config->devicelist, PIT8253, "pit8253" );
+	INT16 channel_1_signal;
+	static int channel_1_incr = 0;
+	int channel_1_baseclock;
+
+	int rate = Machine->sample_rate / 2;
+
+	stream_sample_t *sample_left = buffer[0];
+	stream_sample_t *sample_right = buffer[1];
+
+	channel_1_baseclock = pit8253_get_frequency(pit8253, 1);
+
+	channel_1_signal = pit8253_get_output (pit8253,1) ? 3000 : -3000;
+
+
+	while (length--)
+	{
+		*sample_left = 0;
+		*sample_right = 0;
+
+		/* music channel 1 */
+
+		*sample_left = channel_1_signal;
+		channel_1_incr -= channel_1_baseclock;
+		while( channel_1_incr < 0 )
+		{
+			channel_1_incr += rate;
+			channel_1_signal = -channel_1_signal;
+		}
+
+		
+		sample_left++;
+		sample_right++;
+	}
+}
+
+void b2m_sh_change_clock(double clock)
+{
+	stream_update(mixer_channel);
 }

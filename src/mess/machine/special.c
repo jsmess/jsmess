@@ -301,12 +301,6 @@ DEVICE_IMAGE_LOAD( specimx_floppy )
 	return INIT_PASS;
 }
 
-WRITE8_HANDLER( specimx_sound_w)
-{
-	
-		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ),offset,data);		
-}
-
 
 /*
 	Erik

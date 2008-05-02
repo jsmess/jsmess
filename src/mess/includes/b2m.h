@@ -18,6 +18,9 @@ extern const ppi8255_interface b2m_ppi8255_interface_1;
 extern const ppi8255_interface b2m_ppi8255_interface_2;
 extern const ppi8255_interface b2m_ppi8255_interface_3;
 
+extern const struct CustomSound_interface b2m_sound_interface;
+extern void b2m_sh_change_clock(double);
+
 extern DRIVER_INIT( b2m );
 extern MACHINE_START( b2m );
 extern MACHINE_RESET( b2m );

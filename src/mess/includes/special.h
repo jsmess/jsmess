@@ -33,8 +33,6 @@ extern WRITE8_HANDLER( specimx_video_color_w );
 extern READ8_HANDLER ( specimx_disk_ctrl_r );
 extern WRITE8_HANDLER( specimx_disk_ctrl_w );
 
-extern WRITE8_HANDLER( specimx_sound_w );
-
 extern DRIVER_INIT( erik );
 extern MACHINE_RESET( erik );
 extern MACHINE_START( erik );
