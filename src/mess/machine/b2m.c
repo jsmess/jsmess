@@ -16,6 +16,21 @@
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
 #include "machine/pic8259.h"
+#include "machine/msm8251.h"
+
+static int b2m_8255_porta;
+UINT16 b2m_video_scroll;
+static int b2m_8255_portc;
+
+UINT8 b2m_video_page;
+static UINT8 b2m_drive;
+static UINT8 b2m_side;
+
+static UINT8 b2m_romdisk_lsb;
+static UINT8 b2m_romdisk_msb;
+
+static UINT8 b2m_color[4];
+static UINT8 b2m_localmachine;
 
 READ8_HANDLER (b2m_keyboard_r )
 {		
@@ -166,13 +181,6 @@ const struct pit8253_config b2m_pit8253_intf =
 	}
 };
 
-static int b2m_8255_porta;
-UINT16 b2m_video_scroll;
-static int b2m_8255_portc;
-
-UINT8 b2m_video_page;
-
-
 WRITE8_HANDLER (b2m_8255_porta_w )
 {	
 	b2m_8255_porta = data;
@@ -211,11 +219,7 @@ const ppi8255_interface b2m_ppi8255_interface_1 =
 	b2m_8255_portc_w
 };
 
-UINT8 b2m_drive;
-UINT8 b2m_side;
 
-
-UINT8 b2m_8255_portc_e;
 WRITE8_HANDLER (b2m_ext_8255_porta_w )
 {	
 }
@@ -261,15 +265,10 @@ const ppi8255_interface b2m_ppi8255_interface_2 =
 	b2m_ext_8255_portc_w
 };
 
-
-
-UINT8 b2m_romdisk_lsb;
-UINT8 b2m_romdisk_msb;
-
 READ8_HANDLER (b2m_romdisk_porta_r )
 {
 	UINT8 *romdisk = memory_region(REGION_CPU1) + 0x12000;		
-	return romdisk[b2m_romdisk_msb*256+b2m_romdisk_lsb-0x8000];	
+	return romdisk[b2m_romdisk_msb*256+b2m_romdisk_lsb];	
 }
 
 WRITE8_HANDLER (b2m_romdisk_portb_w )
@@ -278,8 +277,8 @@ WRITE8_HANDLER (b2m_romdisk_portb_w )
 }
 
 WRITE8_HANDLER (b2m_romdisk_portc_w )
-{		
-	b2m_romdisk_msb = data;	
+{			
+	b2m_romdisk_msb = data & 0x7f;	
 }
 
 const ppi8255_interface b2m_ppi8255_interface_3 =
@@ -332,9 +331,49 @@ DRIVER_INIT(b2m)
 	memset(mess_ram,0,128*1024);	
 }
 
+WRITE8_HANDLER ( b2m_palette_w ) 
+{
+	UINT8 b = (3 - ((data >> 6) & 3)) * 0x55;
+	UINT8 g = (3 - ((data >> 4) & 3)) * 0x55;
+	UINT8 r = (3 - ((data >> 2) & 3)) * 0x55;
+	
+	UINT8 bw = (3 - (data & 3)) * 0x55;
+	
+	b2m_color[offset] = data;		
+	
+	if (input_port_read_indexed(machine,11)==1) {
+		palette_set_color_rgb(machine,offset, r, g, b);
+	} else {
+		palette_set_color_rgb(machine,offset, bw, bw, bw);
+	}
+}
+
+READ8_HANDLER ( b2m_palette_r )
+{
+	return b2m_color[offset];
+}
+
+WRITE8_HANDLER ( b2m_localmachine_w ) 
+{
+	b2m_localmachine = data;
+}
+
+READ8_HANDLER ( b2m_localmachine_r ) 
+{
+	return b2m_localmachine;
+}
+
+static const struct msm8251_interface b2m_msm8251_interface =
+{
+	NULL,
+	NULL,
+	NULL
+};
+
 MACHINE_START(b2m)
 {
 	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);	
+	msm8251_init(&b2m_msm8251_interface);
 }
 
 IRQ_CALLBACK(b2m_irq_callback)
@@ -351,6 +390,7 @@ const struct pic8259_interface b2m_pic8259_config = {
 MACHINE_RESET(b2m)
 {
 	wd17xx_reset();
+	msm8251_reset();
 	
 	b2m_side = 0;
 	b2m_drive = 0;

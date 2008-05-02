@@ -35,7 +35,7 @@ VIDEO_UPDATE( b2m )
 			}			
 			for (b = 7; b >= 0; b--)
 			{								
-				col = (((code1 >> b) & 0x01)<<1) + ((code2 >> b) & 0x01);
+				col = (((code2 >> b) & 0x01)<<1) + ((code1 >> b) & 0x01);
 				*BITMAP_ADDR16(bitmap, y, x*8+b) =  col;
 			}
 		}				
@@ -46,9 +46,9 @@ VIDEO_UPDATE( b2m )
 
 const rgb_t b2m_palette[4] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
-	MAKE_RGB(0x60, 0x60, 0x60), // 1
-	MAKE_RGB(0xa0, 0xa0, 0xa0), // 2 
-	MAKE_RGB(0xff, 0xff, 0xff), // 3  
+	MAKE_RGB(0x00, 0x00, 0x00), // 1
+	MAKE_RGB(0x00, 0x00, 0x00), // 2 
+	MAKE_RGB(0x00, 0x00, 0x00), // 3  
 };
 
 PALETTE_INIT( b2m )

@@ -30,6 +30,10 @@ extern READ8_HANDLER( b2m_8255_1_r );
 extern WRITE8_HANDLER( b2m_8255_1_w );
 extern READ8_HANDLER( b2m_8255_2_r );
 extern WRITE8_HANDLER( b2m_8255_2_w );
+extern READ8_HANDLER( b2m_palette_r );
+extern WRITE8_HANDLER( b2m_palette_w );
+extern READ8_HANDLER( b2m_localmachine_r );
+extern WRITE8_HANDLER( b2m_localmachine_w );
 extern DEVICE_IMAGE_LOAD( b2m_floppy );
 /*----------- defined in video/b2m.c -----------*/
 extern VIDEO_START( b2m );

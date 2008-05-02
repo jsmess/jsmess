@@ -13,6 +13,7 @@
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/msm8251.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "includes/b2m.h"
@@ -32,9 +33,11 @@ static ADDRESS_MAP_START( b2m_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r,pit8253_w)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(b2m_8255_1_r,b2m_8255_1_w)
   	AM_RANGE(0x08, 0x0b) AM_READWRITE(b2m_8255_0_r,b2m_8255_0_w) 
-  //AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w) 
-//  AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w) 	
+    AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w) 
+	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w) 	
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE(PIC8259, "pic8259", pic8259_r, pic8259_w )
+	AM_RANGE(0x18, 0x18) AM_READWRITE(msm8251_data_r,msm8251_data_w)
+	AM_RANGE(0x19, 0x19) AM_READWRITE(msm8251_status_r,msm8251_control_w)
   	AM_RANGE(0x1c, 0x1c) AM_READWRITE(wd17xx_status_r,wd17xx_command_w) 
   	AM_RANGE(0x1d, 0x1d) AM_READWRITE(wd17xx_track_r,wd17xx_track_w) 
   	AM_RANGE(0x1e, 0x1e) AM_READWRITE(wd17xx_sector_r,wd17xx_sector_w) 
@@ -46,13 +49,11 @@ static ADDRESS_MAP_START( b2m_rom_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r,pit8253_w)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(b2m_8255_2_r,b2m_8255_2_w)
   	AM_RANGE(0x08, 0x0b) AM_READWRITE(b2m_8255_0_r,b2m_8255_0_w) 
-  //AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w) 
-//  AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w) 	
+    AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w) 
+	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w) 	
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE(PIC8259, "pic8259", pic8259_r, pic8259_w )
-  	AM_RANGE(0x1c, 0x1c) AM_READWRITE(wd17xx_status_r,wd17xx_command_w) 
-  	AM_RANGE(0x1d, 0x1d) AM_READWRITE(wd17xx_track_r,wd17xx_track_w) 
-  	AM_RANGE(0x1e, 0x1e) AM_READWRITE(wd17xx_sector_r,wd17xx_sector_w) 
-  	AM_RANGE(0x1f, 0x1f) AM_READWRITE(wd17xx_data_r,wd17xx_data_w) 	
+	AM_RANGE(0x18, 0x18) AM_READWRITE(msm8251_data_r,msm8251_data_w)
+	AM_RANGE(0x19, 0x19) AM_READWRITE(msm8251_status_r,msm8251_control_w)
 ADDRESS_MAP_END
 
 
@@ -157,6 +158,10 @@ INPUT_PORTS_START( b2m )
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
+	PORT_START /* port 11 */
+		PORT_CONFNAME(0x01, 0x01, "Monitor")
+			PORT_CONFSETTING(0x01, "Color")		
+			PORT_CONFSETTING(0x00, "B/W")			
 INPUT_PORTS_END
  
 /* Machine driver */
