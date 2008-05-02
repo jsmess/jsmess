@@ -869,6 +869,10 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( bk001001 )		
 	DRIVER( bk0010fd )	
 		
+	/* Bashkiria-2M */
+	DRIVER( b2m )	
+	DRIVER( b2mrom )		
+
 	/* Bondwell */
 	DRIVER( bw2 )
 

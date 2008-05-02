@@ -2,6 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Bashkiria-2M [Miodrag Milanovic]
 - BK 0010/0010.01 [Miodrag Milanovic]
 - Bondwell 2 (not working)  [Tomas Karlsson]
 - Orion 128/Z80 Card II/Pro	[Miodrag Milanovic]

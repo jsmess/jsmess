@@ -346,6 +346,7 @@ DRVLIBS = \
 	$(MESSOBJ)/at.a \
 	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/avigo.a \
+	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
 	$(MESSOBJ)/be.a \
@@ -1229,6 +1230,11 @@ $(MESSOBJ)/bk.a:      \
 	$(MESS_DRIVERS)/bk.o \
 	$(MESS_MACHINE)/bk.o \
 	$(MESS_VIDEO)/bk.o \
+
+$(MESSOBJ)/b2m.a:      \
+	$(MESS_DRIVERS)/b2m.o \
+	$(MESS_MACHINE)/b2m.o \
+	$(MESS_VIDEO)/b2m.o \
 
 $(MESSOBJ)/bondwell.a: \
 	$(MESS_DRIVERS)/bw2.o
