@@ -2727,7 +2727,7 @@ static void InitializeBIOSUI(HWND hwnd)
 		if (g_nGame == GLOBAL_OPTIONS)
 		{
 			(void)ComboBox_InsertString(hCtrl, i, TEXT("None"));
-			(void)ComboBox_SetItemData( hCtrl, i++, "none");
+			(void)ComboBox_SetItemData( hCtrl, i++, "");
 			return;
 		}
 		if (g_nGame == FOLDER_OPTIONS) //Folder Options
@@ -2736,11 +2736,11 @@ static void InitializeBIOSUI(HWND hwnd)
 			if (DriverHasOptionalBIOS(g_nFolderGame) == FALSE)
 			{
 				(void)ComboBox_InsertString(hCtrl, i, TEXT("None"));
-				(void)ComboBox_SetItemData( hCtrl, i++, "default");
+				(void)ComboBox_SetItemData( hCtrl, i++, "");
 				return;
 			}
 			(void)ComboBox_InsertString(hCtrl, i, TEXT("Default"));
-			(void)ComboBox_SetItemData( hCtrl, i++, "default");
+			(void)ComboBox_SetItemData( hCtrl, i++, "");
 
 			if (gamedrv->rom != NULL)
 			{
@@ -2764,11 +2764,11 @@ static void InitializeBIOSUI(HWND hwnd)
 		if (DriverHasOptionalBIOS(g_nGame) == FALSE)
 		{
 			(void)ComboBox_InsertString(hCtrl, i, TEXT("None"));
-			(void)ComboBox_SetItemData( hCtrl, i++, "none");
+			(void)ComboBox_SetItemData( hCtrl, i++, "");
 			return;
 		}
 		(void)ComboBox_InsertString(hCtrl, i, TEXT("Default"));
-		(void)ComboBox_SetItemData( hCtrl, i++, "default");
+		(void)ComboBox_SetItemData( hCtrl, i++, "");
 
 		if (gamedrv->rom != NULL)
 		{
