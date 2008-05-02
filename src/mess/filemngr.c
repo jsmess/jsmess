@@ -412,6 +412,20 @@ static void fs_generate_filelist(void)
 	free(tmp_types);
 }
 
+
+
+static int string_ends_with(const char *str, const char *target)
+{
+	size_t str_length = strlen(str);
+	size_t target_length = strlen(target);
+
+	return (str_length >= target_length)
+		&& !strcmp(&str[str_length - target_length], target);
+
+}
+
+
+
 #define UI_SHIFT_PRESSED		(input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
 #define UI_CONTROL_PRESSED		(input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
 /* and mask to get bits */
@@ -567,9 +581,10 @@ static int fileselect(int selected, const char *default_selection, const char *w
 					}
 					else
 					{
-						strncpyz(entered_filename, curdir, strlen(curdir)+1);
-						strncatz(entered_filename, PATH_SEPARATOR, sizeof(entered_filename) / sizeof(entered_filename[0]));
-						strncatz(entered_filename, fs_item[sel].text, sizeof(entered_filename) / sizeof(entered_filename[0]));
+						snprintf(entered_filename, ARRAY_LENGTH(entered_filename), "%s%s%s",
+							curdir,
+							string_ends_with(curdir, PATH_SEPARATOR) ? "" : PATH_SEPARATOR,
+							fs_item[sel].text);
 					}
 
 					fs_free();

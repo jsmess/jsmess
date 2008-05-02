@@ -70,6 +70,9 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
+- Fixed bug in file selector that could cause paths to contain extraneous
+  separators.  (bug #1595) [Nate Woods]
+
 - [Windows] Fixed "Configure..." dialog problem when customizing certain
   system's controllers.  (bugs #1570, #1573) [Nate Woods]
 
