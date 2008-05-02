@@ -225,7 +225,7 @@ WRITE8_HANDLER (b2m_ext_8255_portb_w )
 
 WRITE8_HANDLER (b2m_ext_8255_portc_w )
 {		
-	UINT8 drive = (data >> 1) & 1;
+	UINT8 drive = ((data >> 1) & 1) ^ 1;
 	UINT8 side  = (data  & 1) ^ 1;
 	
 	if (b2m_drive!=drive) {
