@@ -18,7 +18,7 @@
 #include "eventlst.h"
 #include "video/border.h"
 
-inline void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
