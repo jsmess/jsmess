@@ -27,8 +27,10 @@
 #define VIC2_VSIZE	200
 /* of course you clock select an other clock, but for accurate */
 /* video timing */
-#define VIC6567_CLOCK	(8180000/8)
-#define VIC6569_CLOCK	(7880000/8)
+#define VIC6567_CLOCK	1022730
+			/* (8180000/8) old value */
+#define VIC6569_CLOCK	985250
+			/* (7880000/8) old value */ 
 /* pixel clock 8 mhz */
 /* accesses to memory with 2 megahertz */
 /* needs 2 memory accesses for 8 pixel */
@@ -39,7 +41,7 @@
 
 /* pal 50 Hz vertical screen refresh, screen consists of 312 lines
  * ntsc 60 Hz vertical screen refresh, screen consists of 262 lines */
-#define VIC6567_LINES 261
+#define VIC6567_LINES 262
 #define VIC6569_LINES 312
 #define VIC2_LINES (vic2.pal?VIC6569_LINES:VIC6567_LINES)
 

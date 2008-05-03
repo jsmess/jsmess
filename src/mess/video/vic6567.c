@@ -242,13 +242,14 @@ void vic6567_init (int chip_vic2e, int pal,
 {
 	memset(&vic2, 0, sizeof(vic2));
 
+	vic2.pal = pal;
 	vic2.lines = VIC2_LINES;
 
 	vic2.dma_read = dma_read;
 	vic2.dma_read_color = dma_read_color;
 	vic2.interrupt = irq;
 	vic2.vic2e = chip_vic2e;
-	vic2.pal = pal;
+	
 	vic2.on = TRUE;
 }
 
@@ -1322,7 +1323,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 			timer_set (attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
 		}
 	}
-	if (vic2.rasterline == C64_2_RASTERLINE (RASTERLINE))
+	if (vic2.rasterline == C64_2_RASTERLINE(RASTERLINE))
 	{
 		if (vic2.on)
 			vic2_drawlines (vic2.lastline, vic2.rasterline);
