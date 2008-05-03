@@ -740,22 +740,22 @@ static DRIVER_INIT( genjpn )
 // only looks for == in the compare for LSB systems
 static int allendianmemcmp(const void *s1, const void *s2, size_t n)
 {
-unsigned char *realbuf;
+	const unsigned char *realbuf;
 
 #ifdef LSB_FIRST
-unsigned char flippedbuf[64];
-unsigned int i;
-
-if ((n & 1) || (n > 63)) return -1 ; // don't want odd sized buffers or too large a compare
-for (i = 0; i < n; i++) flippedbuf[i] = *((char *)s2 + (i ^ 1));
-realbuf = flippedbuf;
+	unsigned char flippedbuf[64];
+	unsigned int i;
+	
+	if ((n & 1) || (n > 63)) return -1 ; // don't want odd sized buffers or too large a compare
+	for (i = 0; i < n; i++) flippedbuf[i] = *((char *)s2 + (i ^ 1));
+	realbuf = flippedbuf;
 
 #else
-
-realbuf = s2;
-
+	
+	realbuf = s2;
+	
 #endif
-return memcmp(s1,realbuf,n);
+	return memcmp(s1,realbuf,n);
 }
 
 void setup_megadriv_custom_mappers(running_machine *machine)
