@@ -14,6 +14,7 @@
 #include "mame.h"
 
 #ifdef ENABLE_DEBUGGER
+#include "deprecat.h"
 #include "debug/debugcon.h"
 #endif /* ENABLE_DEBUGGER */
 
@@ -685,14 +686,14 @@ void inputx_setup_natural_keyboard(
 	charqueue_empty = charqueue_empty_;
 }
 
-int inputx_can_post(void)
+int inputx_can_post(running_machine *machine)
 {
 	return queue_chars || codes;
 }
 
-static key_buffer *get_buffer(void)
+static key_buffer *get_buffer(running_machine *machine)
 {
-	assert(inputx_can_post());
+	assert(inputx_can_post(machine));
 	return (key_buffer *) keybuffer;
 }
 
@@ -759,9 +760,9 @@ static int can_post_key_alternate(unicode_char ch)
 
 
 
-int inputx_can_post_key(unicode_char ch)
+int inputx_can_post_key(running_machine *machine, unicode_char ch)
 {
-	return inputx_can_post() && (can_post_key_directly(ch) || can_post_key_alternate(ch));
+	return inputx_can_post(machine) && (can_post_key_directly(ch) || can_post_key_alternate(ch));
 }
 
 
@@ -795,11 +796,11 @@ static attotime choose_delay(unicode_char ch)
 
 
 
-static void internal_post_key(unicode_char ch)
+static void internal_post_key(running_machine *machine, unicode_char ch)
 {
 	key_buffer *keybuf;
 
-	keybuf = get_buffer();
+	keybuf = get_buffer(machine);
 
 	/* need to start up the timer? */
 	if (keybuf->begin_pos == keybuf->end_pos)
@@ -814,16 +815,16 @@ static void internal_post_key(unicode_char ch)
 
 
 
-static int buffer_full(void)
+static int buffer_full(running_machine *machine)
 {
 	key_buffer *keybuf;
-	keybuf = get_buffer();
+	keybuf = get_buffer(machine);
 	return ((keybuf->end_pos + 1) % (sizeof(keybuf->buffer) / sizeof(keybuf->buffer[0]))) == keybuf->begin_pos;
 }
 
 
 
-void inputx_postn_rate(const unicode_char *text, size_t text_len, attotime rate)
+void inputx_postn_rate(running_machine *machine, const unicode_char *text, size_t text_len, attotime rate)
 {
 	int last_cr = 0;
 	unicode_char ch;
@@ -833,9 +834,9 @@ void inputx_postn_rate(const unicode_char *text, size_t text_len, attotime rate)
 
 	current_rate = rate;
 
-	if (inputx_can_post())
+	if (inputx_can_post(machine))
 	{
-		while((text_len > 0) && !buffer_full())
+		while((text_len > 0) && !buffer_full(machine))
 		{
 			ch = *(text++);
 			text_len--;
@@ -857,7 +858,7 @@ void inputx_postn_rate(const unicode_char *text, size_t text_len, attotime rate)
 				if (can_post_key_directly(ch))
 				{
 					/* we can post this key in the queue directly */
-					internal_post_key(ch);
+					internal_post_key(machine, ch);
 				}
 				else if (can_post_key_alternate(ch))
 				{
@@ -868,7 +869,7 @@ void inputx_postn_rate(const unicode_char *text, size_t text_len, attotime rate)
 					while(*s)
 					{
 						s += uchar_from_utf8(&ch, s, strlen(s));
-						internal_post_key(ch);
+						internal_post_key(machine, ch);
 					}
 				}
 			}
@@ -887,7 +888,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 	key_buffer *keybuf;
 	attotime delay;
 
-	keybuf = get_buffer();
+	keybuf = get_buffer(machine);
 
 	if (queue_chars)
 	{
@@ -931,7 +932,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 	called from core to allow for natural keyboard	
 -------------------------------------------------*/
 
-void mess_input_port_update_hook(int portnum, UINT32 *digital)
+void mess_input_port_update_hook(running_machine *machine, int portnum, UINT32 *digital)
 {
 	const key_buffer *keybuf;
 	const mess_input_code *code;
@@ -939,9 +940,9 @@ void mess_input_port_update_hook(int portnum, UINT32 *digital)
 	int i;
 	UINT32 value;
 
-	if (inputx_can_post())
+	if (inputx_can_post(machine))
 	{
-		keybuf = get_buffer();
+		keybuf = get_buffer(machine);
 
 		/* is the key down right now? */
 		if (keybuf->status_keydown && (keybuf->begin_pos != keybuf->end_pos))
@@ -1035,10 +1036,10 @@ const char *inputx_key_name(unicode_char ch)
 
 /* --------------------------------------------------------------------- */
 
-int inputx_is_posting(void)
+int inputx_is_posting(running_machine *machine)
 {
 	const key_buffer *keybuf;
-	keybuf = get_buffer();
+	keybuf = get_buffer(machine);
 	return (keybuf->begin_pos != keybuf->end_pos) || (charqueue_empty && !charqueue_empty());
 }
 
@@ -1050,7 +1051,7 @@ int inputx_is_posting(void)
 
 ***************************************************************************/
 
-void inputx_postn_coded_rate(const char *text, size_t text_len, attotime rate)
+void inputx_postn_coded_rate(running_machine *machine, const char *text, size_t text_len, attotime rate)
 {
 	size_t i, j, key_len, increment;
 	unicode_char ch;
@@ -1114,7 +1115,7 @@ void inputx_postn_coded_rate(const char *text, size_t text_len, attotime rate)
 		}
 
 		if (ch)
-			inputx_postc_rate(ch, rate);
+			inputx_postc_rate(machine, ch, rate);
 		i += increment;
 	}
 }
@@ -1127,45 +1128,45 @@ void inputx_postn_coded_rate(const char *text, size_t text_len, attotime rate)
 
 ***************************************************************************/
 
-void inputx_postn(const unicode_char *text, size_t text_len)
+void inputx_postn(running_machine *machine, const unicode_char *text, size_t text_len)
 {
-	inputx_postn_rate(text, text_len, attotime_make(0, 0));
+	inputx_postn_rate(machine, text, text_len, attotime_make(0, 0));
 }
 
 
 
-void inputx_post_rate(const unicode_char *text, attotime rate)
+void inputx_post_rate(running_machine *machine, const unicode_char *text, attotime rate)
 {
 	size_t len = 0;
 	while(text[len])
 		len++;
-	inputx_postn_rate(text, len, rate);
+	inputx_postn_rate(machine, text, len, rate);
 }
 
 
 
-void inputx_post(const unicode_char *text)
+void inputx_post(running_machine *machine, const unicode_char *text)
 {
-	inputx_post_rate(text, attotime_make(0, 0));
+	inputx_post_rate(machine, text, attotime_make(0, 0));
 }
 
 
 
-void inputx_postc_rate(unicode_char ch, attotime rate)
+void inputx_postc_rate(running_machine *machine, unicode_char ch, attotime rate)
 {
-	inputx_postn_rate(&ch, 1, rate);
+	inputx_postn_rate(machine, &ch, 1, rate);
 }
 
 
 
-void inputx_postc(unicode_char ch)
+void inputx_postc(running_machine *machine, unicode_char ch)
 {
-	inputx_postc_rate(ch, attotime_make(0, 0));
+	inputx_postc_rate(machine, ch, attotime_make(0, 0));
 }
 
 
 
-void inputx_postn_utf16_rate(const utf16_char *text, size_t text_len, attotime rate)
+void inputx_postn_utf16_rate(running_machine *machine, const utf16_char *text, size_t text_len, attotime rate)
 {
 	size_t len = 0;
 	unicode_char c;
@@ -1176,7 +1177,7 @@ void inputx_postn_utf16_rate(const utf16_char *text, size_t text_len, attotime r
 	{
 		if (len == (sizeof(buf) / sizeof(buf[0])))
 		{
-			inputx_postn(buf, len);
+			inputx_postn(machine, buf, len);
 			len = 0;
 		}
 
@@ -1215,36 +1216,36 @@ void inputx_postn_utf16_rate(const utf16_char *text, size_t text_len, attotime r
 		}
 		buf[len++] = c;
 	}
-	inputx_postn_rate(buf, len, rate);
+	inputx_postn_rate(machine, buf, len, rate);
 }
 
 
 
-void inputx_postn_utf16(const utf16_char *text, size_t text_len)
+void inputx_postn_utf16(running_machine *machine, const utf16_char *text, size_t text_len)
 {
-	inputx_postn_utf16_rate(text, text_len, attotime_make(0, 0));
+	inputx_postn_utf16_rate(machine, text, text_len, attotime_make(0, 0));
 }
 
 
 
-void inputx_post_utf16_rate(const utf16_char *text, attotime rate)
+void inputx_post_utf16_rate(running_machine *machine, const utf16_char *text, attotime rate)
 {
 	size_t len = 0;
 	while(text[len])
 		len++;
-	inputx_postn_utf16_rate(text, len, rate);
+	inputx_postn_utf16_rate(machine, text, len, rate);
 }
 
 
 
-void inputx_post_utf16(const utf16_char *text)
+void inputx_post_utf16(running_machine *machine, const utf16_char *text)
 {
-	inputx_post_utf16_rate(text, attotime_make(0, 0));
+	inputx_post_utf16_rate(machine, text, attotime_make(0, 0));
 }
 
 
 
-void inputx_postn_utf8_rate(const char *text, size_t text_len, attotime rate)
+void inputx_postn_utf8_rate(running_machine *machine, const char *text, size_t text_len, attotime rate)
 {
 	size_t len = 0;
 	unicode_char buf[256];
@@ -1255,7 +1256,7 @@ void inputx_postn_utf8_rate(const char *text, size_t text_len, attotime rate)
 	{
 		if (len == (sizeof(buf) / sizeof(buf[0])))
 		{
-			inputx_postn(buf, len);
+			inputx_postn(machine, buf, len);
 			len = 0;
 		}
 
@@ -1269,49 +1270,49 @@ void inputx_postn_utf8_rate(const char *text, size_t text_len, attotime rate)
 		text_len -= rc;
 		buf[len++] = c;
 	}
-	inputx_postn_rate(buf, len, rate);
+	inputx_postn_rate(machine, buf, len, rate);
 }
 
 
 
-void inputx_postn_utf8(const char *text, size_t text_len)
+void inputx_postn_utf8(running_machine *machine, const char *text, size_t text_len)
 {
-	inputx_postn_utf8_rate(text, text_len, attotime_make(0, 0));
+	inputx_postn_utf8_rate(machine, text, text_len, attotime_make(0, 0));
 }
 
 
 
-void inputx_post_utf8_rate(const char *text, attotime rate)
+void inputx_post_utf8_rate(running_machine *machine, const char *text, attotime rate)
 {
-	inputx_postn_utf8_rate(text, strlen(text), rate);
+	inputx_postn_utf8_rate(machine, text, strlen(text), rate);
 }
 
 
 
-void inputx_post_utf8(const char *text)
+void inputx_post_utf8(running_machine *machine, const char *text)
 {
-	inputx_post_utf8_rate(text, attotime_make(0, 0));
+	inputx_post_utf8_rate(machine, text, attotime_make(0, 0));
 }
 
 
 
-void inputx_post_coded(const char *text)
+void inputx_post_coded(running_machine *machine, const char *text)
 {
-	inputx_postn_coded(text, strlen(text));
+	inputx_postn_coded(machine, text, strlen(text));
 }
 
 
 
-void inputx_post_coded_rate(const char *text, attotime rate)
+void inputx_post_coded_rate(running_machine *machine, const char *text, attotime rate)
 {
-	inputx_postn_coded_rate(text, strlen(text), rate);
+	inputx_postn_coded_rate(machine, text, strlen(text), rate);
 }
 
 
 
-void inputx_postn_coded(const char *text, size_t text_len)
+void inputx_postn_coded(running_machine *machine, const char *text, size_t text_len)
 {
-	inputx_postn_coded_rate(text, text_len, attotime_make(0, 0));
+	inputx_postn_coded_rate(machine, text, text_len, attotime_make(0, 0));
 }
 
 
@@ -1473,7 +1474,7 @@ int input_category_active(running_machine *machine, int category)
 #ifdef ENABLE_DEBUGGER
 static void execute_input(int ref, int params, const char *param[])
 {
-	inputx_post_coded(param[0]);
+	inputx_post_coded(Machine, param[0]);
 }
 #endif /* ENABLE_DEBUGGER */
 

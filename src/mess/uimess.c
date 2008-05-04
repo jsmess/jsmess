@@ -214,7 +214,7 @@ void ui_paste(running_machine *machine)
 	if (text != NULL)
 	{
 		/* post the text */
-		inputx_post_utf8(text);
+		inputx_post_utf8(machine, text);
 
 		/* free the string */
 		free(text);

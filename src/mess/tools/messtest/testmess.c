@@ -510,7 +510,7 @@ static void command_input(running_machine *machine)
 	/* post a set of characters to the emulation */
 	if (state == STATE_READY)
 	{
-		if (!inputx_can_post())
+		if (!inputx_can_post(machine))
 		{
 			state = STATE_ABORTED;
 			report_message(MSG_FAILURE, "Natural keyboard input not supported for this driver");
@@ -520,11 +520,11 @@ static void command_input(running_machine *machine)
 		/* input_chars can be NULL, so we should check for that */
 		if (current_command->u.input_args.input_chars)
 		{
-			inputx_post_utf8_rate(current_command->u.input_args.input_chars,
+			inputx_post_utf8_rate(machine, current_command->u.input_args.input_chars,
 				current_command->u.input_args.rate);
 		}
 	}
-	state = inputx_is_posting() ? STATE_INCOMMAND : STATE_READY;
+	state = inputx_is_posting(machine) ? STATE_INCOMMAND : STATE_READY;
 }
 
 

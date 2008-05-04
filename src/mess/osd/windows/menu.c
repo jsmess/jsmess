@@ -1253,7 +1253,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 
 	set_command_state(menu_bar, ID_FILE_SAVESTATE,			state_filename[0] != '\0'					? MFS_ENABLED : MFS_GRAYED);
 
-	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post()							? MFS_ENABLED : MFS_GRAYED);
+	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post(machine)					? MFS_ENABLED : MFS_GRAYED);
 
 	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused(machine)				? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_OPTIONS_CONFIGURATION,	has_config									? MFS_ENABLED : MFS_GRAYED);
@@ -1271,8 +1271,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	set_command_state(menu_bar, ID_KEYBOARD_EMULATED,		(has_keyboard) ?
 																(!win_use_natural_keyboard					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
-	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post()) ?
-																(win_use_natural_keyboard					? MFS_CHECKED : MFS_ENABLED)
+	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(machine)) ?																(win_use_natural_keyboard					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
 	set_command_state(menu_bar, ID_KEYBOARD_CUSTOMIZE,		has_keyboard								? MFS_ENABLED : MFS_GRAYED);
 
@@ -2093,7 +2092,7 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 		{
 			if (wparam == keytrans[i][0])
 			{
-				inputx_postc(keytrans[i][1]);
+				inputx_postc(Machine, keytrans[i][1]);
 				message = WM_NULL;
 
 				/* check to see if there is a corresponding WM_CHAR in our
@@ -2115,7 +2114,7 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 
 		case WM_CHAR:
 			if (win_use_natural_keyboard)
-				inputx_postc(wparam);
+				inputx_postc(Machine, wparam);
 			break;
 
 		case WM_PASTE:
