@@ -154,58 +154,11 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
 
-/* +3 hardware */
-#include "machine/nec765.h"
-#include "devices/dsk.h"
-
-/****************************************************************************************************/
-/* BETADISK/TR-DOS disc controller emulation */
-/* microcontroller KR1818VG93 is a russian wd179x clone */
 #include "machine/wd17xx.h"
-
-/*
-DRQ (D6) and INTRQ (D7).
-DRQ - signal showing request of data by microcontroller
-INTRQ - signal of completion of execution of command.
-*/
-
-static int betadisk_status;
-static int betadisk_active;
-
-static void betadisk_wd179x_callback(running_machine *machine, wd17xx_state_t state, void *param)
-{
-	switch (state)
-	{
-		case WD17XX_DRQ_SET:
-		{
-			betadisk_status |= (1<<6);
-		}
-		break;
-
-		case WD17XX_DRQ_CLR:
-		{
-			betadisk_status &=~(1<<6);
-		}
-		break;
-
-		case WD17XX_IRQ_SET:
-		{
-			betadisk_status |= (1<<7);
-		}
-		break;
-
-		case WD17XX_IRQ_CLR:
-		{
-			betadisk_status &=~(1<<7);
-		}
-		break;
-	}
-}
+#include "machine/beta.h"
 
 MACHINE_START( scorpion )
 {
-	betadisk_active = 0;
-	betadisk_status = 0x03f;
 	wd17xx_init(machine, WD_TYPE_179X, betadisk_wd179x_callback, NULL);
 }
 
@@ -239,21 +192,44 @@ D6-D7 - not used. ( yet ? )
 
 static int scorpion_256_port_1ffd_data = 0;
 
+static int ROMSelection;
+
+static OPBASE_HANDLER( scorpion_opbase )
+{	
+	if ( address >= 0x4000 ) {
+		if (ROMSelection == 3) {			
+			ROMSelection = 1;
+			betadisk_disable();
+			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x014000); // Set BASIC ROM
+		}
+	} 
+	else if ((address & 0xff00) == 0x3d00)
+	{
+		if (ROMSelection == 1)
+		{
+			ROMSelection = 3;
+			betadisk_enable();
+			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x01c000); // Set TRDOS ROM			
+		}
+	} 
+	return address;
+}
+
 static void scorpion_update_memory(running_machine *machine)
 {
 	unsigned char *ChosenROM;
-	int ROMSelection;
+	
 	read8_machine_func rh;
 	write8_machine_func wh;
 
 	if (spectrum_128_port_7ffd_data & 8)
 	{
-		logerror("SCREEN 1: BLOCK 7\n");
+		//logerror("SCREEN 1: BLOCK 7\n");
 		spectrum_128_screen_location = mess_ram + (7<<14);
 	}
 	else
 	{
-		logerror("SCREEN 0: BLOCK 5\n");
+		//logerror("SCREEN 0: BLOCK 5\n");
 		spectrum_128_screen_location = mess_ram + (5<<14);
 	}
 
@@ -267,13 +243,13 @@ static void scorpion_update_memory(running_machine *machine)
 
 		memory_set_bankptr(4, ram_data);
 
-		logerror("RAM at 0xc000: %02x\n",ram_page);
+		//logerror("RAM at 0xc000: %02x\n",ram_page);
 	}
 
 	if (scorpion_256_port_1ffd_data & 0x01)
 	{
 		/* ram at 0x0000 */
-		logerror("RAM at 0x0000\n");
+		//logerror("RAM at 0x0000\n");
 
 		/* connect page 0 of ram to 0x0000 */
 		rh = SMH_BANK1;
@@ -283,7 +259,7 @@ static void scorpion_update_memory(running_machine *machine)
 	else
 	{
 		/* rom at 0x0000 */
-		logerror("ROM at 0x0000\n");
+		//logerror("ROM at 0x0000\n");
 
 		/* connect page 0 of rom to 0x0000 */
 		rh = SMH_BANK1;
@@ -303,16 +279,26 @@ static void scorpion_update_memory(running_machine *machine)
 
 		memory_set_bankptr(1, ChosenROM);
 
-		logerror("rom switch: %02x\n", ROMSelection);
+		//logerror("rom switch: %02x\n", ROMSelection);
 	}
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, rh);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, wh);
 }
 
 
+
+static TIMER_CALLBACK(nmi_check_callback)
+{
+	if ((input_port_read(machine, "NMI") & 1)==1) {
+		scorpion_256_port_1ffd_data |= 0x02;
+		scorpion_update_memory(machine);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	}
+}
+
 static WRITE8_HANDLER(scorpion_port_7ffd_w)
 {
-	logerror("scorpion 7ffd w: %02x\n", data);
+	//logerror("scorpion 7ffd w: %02x\n", data);
 
 	/* disable paging? */
 	if (spectrum_128_port_7ffd_data & 0x20)
@@ -327,7 +313,7 @@ static WRITE8_HANDLER(scorpion_port_7ffd_w)
 
 static WRITE8_HANDLER(scorpion_port_1ffd_w)
 {
-	logerror("scorpion 1ffd w: %02x\n", data);
+	//logerror("scorpion 1ffd w: %02x\n", data);
 
 	scorpion_256_port_1ffd_data = data;
 
@@ -337,91 +323,31 @@ static WRITE8_HANDLER(scorpion_port_1ffd_w)
 		scorpion_update_memory(machine);
 	}
 }
-
-
-/* not sure if decoding is full or partial on scorpion */
-/* TO BE CHECKED! */
-static  READ8_HANDLER(scorpion_port_r)
-{
-
-	 /* KT: the following is not decoded exactly, need to check what
-     is correct */
-	 if ((offset & 2)==0)
-	 {
-		 switch ((offset>>8) & 0xff)
-		 {
-				case 0xff: return spectrum_128_port_fffd_r(machine, offset);
-				case 0x1f: return spectrum_port_1f_r(machine, offset);
-				case 0x7f: return spectrum_port_7f_r(machine, offset);
-				case 0xdf: return spectrum_port_df_r(machine, offset);
-		 }
-	 }
-	 switch (offset & 0x0ff)
-	 {
-	 	case 0x0fe:
-	 		return spectrum_port_fe_r(machine, offset);
-/*		case 0x01f:
-			return wd17xx_status_r(machine, offset);
-		case 0x03f:
-			return wd17xx_track_r(machine, offset);
-		case 0x05f:
-			return wd17xx_sector_r(machine, offset);
-		case 0x07f:
-			return wd17xx_data_r(machine, offset);
-		case 0x0ff:
-			return betadisk_status;*/
-	 }
-	 return 0xff;
-}
-
-
-/* not sure if decoding is full or partial on scorpion */
-/* TO BE CHECKED! */
-static WRITE8_HANDLER(scorpion_port_w)
-{
-	 switch (offset & 0x0ff)
-	 {
-		case 0xfe : spectrum_port_fe_w(machine, offset, data);
-					break;
-		default:
-			 if ((offset & 2)==0)
-			{
-					switch ((offset>>8) & 0xf0)
-					{
-						case 0x70:
-								scorpion_port_7ffd_w(machine, offset, data);
-								break;
-						case 0xb0:
-								spectrum_128_port_bffd_w(machine, offset, data);
-								break;
-						case 0xf0:
-								spectrum_128_port_fffd_w(machine, offset, data);
-								break;
-						case 0x10:
-								scorpion_port_1ffd_w(machine, offset, data);
-								break;
-						default:
-								logerror("Write %02x to scorpion port: %04x\n", data, offset);
-					}
-			}
-			else
-			{
-				logerror("Write %02x to scorpion port: %04x\n", data, offset);
-			}
-	}
-}
-
-
-
+  
 /* ports are not decoded full.
 The function decodes the ports appropriately */
-static ADDRESS_MAP_START (scorpion_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(scorpion_port_r, scorpion_port_w)
+static ADDRESS_MAP_START (scorpion_io, ADDRESS_SPACE_IO, 8)	
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x001f, 0x001f) AM_READWRITE(betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x003f, 0x003f) AM_READWRITE(betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x005f, 0x005f) AM_READWRITE(betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x007f, 0x007f) AM_READWRITE(betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff) 
+	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3ffd)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_write_port_0_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(AY8910_read_port_0_r,AY8910_control_port_0_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(scorpion_port_1ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
 
 static MACHINE_RESET( scorpion )
 {
+	betadisk_disable();
+	betadisk_clear_status();
+
+	memory_set_opbase_handler( 0, scorpion_opbase ); 
+	
 	memset(mess_ram,0,256*1024);
 	
 	/* Bank 5 is always in 0x4000 - 0x7fff */
@@ -434,6 +360,12 @@ static MACHINE_RESET( scorpion )
 	scorpion_256_port_1ffd_data = 0;
 
 	scorpion_update_memory(machine);	
+	
+	MACHINE_RESET_CALL(spectrum);
+	
+	wd17xx_reset();	
+	
+	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, nmi_check_callback);
 }
 
 static MACHINE_DRIVER_START( scorpion )
@@ -461,12 +393,12 @@ ROM_START(scorpion)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-
 SYSTEM_CONFIG_EXTERN(spectrum)
 
 SYSTEM_CONFIG_START(scorpion)
 	CONFIG_IMPORT_FROM(spectrum)
 	CONFIG_RAM_DEFAULT(256 * 1024)
+	CONFIG_DEVICE(beta_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */

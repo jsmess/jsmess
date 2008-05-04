@@ -329,119 +329,18 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 		}
 }
 
-/* decoding as per spectrum FAQ on www.worldofspectrum.org */
-static  READ8_HANDLER ( spectrum_plus3_port_r )
-{
-	 if ((offset & 1)==0)
-	 {
-		 return spectrum_port_fe_r(machine, offset);
-	 }
-
-	 if ((offset & 2)==0)
-	 {
-		 switch ((offset>>14) & 0x03)
-		 {
-			/* +3 fdc,memory,centronics */
-			case 0:
-			{
-				switch ((offset>>12) & 0x03)
-				{
-					/* +3 centronics */
-					case 0:
-						break;
-
-					/* +3 fdc status */
-					case 2:
-						return spectrum_plus3_port_2ffd_r(machine, offset);
-					/* +3 fdc data */
-					case 3:
-						return spectrum_plus3_port_3ffd_r(machine, offset);
-
-					default:
-						break;
-				}
-			}
-			break;
-
-			/* 128k AY data */
-			case 3:
-				return spectrum_128_port_fffd_r(machine, offset);
-
-			default:
-				break;
-		 }
-	 }
-
-	 return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
-}
-
-static WRITE8_HANDLER ( spectrum_plus3_port_w )
-{
-		if ((offset & 1)==0)
-				spectrum_port_fe_w(machine, offset, data);
-
-		/* the following is not decoded exactly, need to check
-        what is correct! */
-
-		if ((offset & 2)==0)
-		{
-			switch ((offset>>14) & 0x03)
-			{
-				/* +3 fdc,memory,centronics */
-				case 0:
-				{
-					switch ((offset>>12) & 0x03)
-					{
-						/* +3 centronics */
-						case 0:
-						{
-
-
-						}
-						break;
-
-						/* +3 memory */
-						case 1:
-							spectrum_plus3_port_1ffd_w(machine, offset, data);
-							break;
-
-						/* +3 fdc data */
-						case 3:
-							spectrum_plus3_port_3ffd_w(machine, offset, data);
-							break;
-
-						default:
-							break;
-					}
-				}
-				break;
-
-				/* 128k memory */
-				case 1:
-					spectrum_plus3_port_7ffd_w(machine, offset, data);
-					break;
-
-				/* 128k AY data */
-				case 2:
-					spectrum_128_port_bffd_w(machine, offset, data);
-					break;
-
-				/* 128K AY register */
-				case 3:
-					spectrum_128_port_fffd_w(machine, offset, data);
-
-				default:
-					break;
-			}
-		}
-
-/*logerror("Write %02x to +3 port: %04x\n", data, offset); */
-}
-
 /* ports are not decoded full.
 The function decodes the ports appropriately */
 static ADDRESS_MAP_START (spectrum_plus3_io, ADDRESS_SPACE_IO, 8)
-		AM_RANGE(0x0000, 0xffff) AM_READWRITE( spectrum_plus3_port_r, spectrum_plus3_port_w )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff) 
+	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_write_port_0_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(AY8910_read_port_0_r,AY8910_control_port_0_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(spectrum_plus3_port_1ffd_w) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x2000, 0x2000) AM_READ(spectrum_plus3_port_2ffd_r) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( spectrum_plus3 )

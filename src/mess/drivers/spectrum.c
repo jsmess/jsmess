@@ -275,52 +275,34 @@ READ8_HANDLER(spectrum_port_fe_r)
 /* kempston joystick interface */
 READ8_HANDLER(spectrum_port_1f_r)
 {
-  return input_port_read(machine, "KEMPSTON") & 0x1f;
+	return input_port_read(machine, "KEMPSTON") & 0x1f;
 }
 
 /* fuller joystick interface */
 READ8_HANDLER(spectrum_port_7f_r)
 {
-  return input_port_read(machine, "FULLER") | (0xff^0x8f);
+	return input_port_read(machine, "FULLER") | (0xff^0x8f);
 }
 
 /* mikrogen joystick interface */
 READ8_HANDLER(spectrum_port_df_r)
 {
-  return input_port_read(machine, "MIKROGEN") | (0xff^0x1f);
+	return input_port_read(machine, "MIKROGEN") | (0xff^0x1f);
 }
 
-static  READ8_HANDLER ( spectrum_port_r )
+static  READ8_HANDLER ( spectrum_port_ula_r )
 {
-	if ((offset & 1)==0)
-		return spectrum_port_fe_r(machine, offset);
-
-	if ((offset & 0xff)==0x1f)
-		return spectrum_port_1f_r(machine, offset);
-
-	if ((offset & 0xff)==0x7f)
-		return spectrum_port_7f_r(machine, offset);
-
-	if ((offset & 0xff)==0xdf)
-		return spectrum_port_df_r(machine, offset);
-
 	return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_colorram[(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
-}
-
-static WRITE8_HANDLER ( spectrum_port_w )
-{
-	if ((offset & 1)==0)
-		spectrum_port_fe_w(machine, offset,data);
-	else
-	{
-		logerror("Write %02x to Port: %04x\n", data, offset);
-	}
 }
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
 static ADDRESS_MAP_START (spectrum_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE( spectrum_port_r, spectrum_port_w )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff) 
+	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x01, 0x01) AM_READ(spectrum_port_ula_r) AM_MIRROR(0xfffe)
 ADDRESS_MAP_END
 
 /****************************************************************************************************/
@@ -442,6 +424,8 @@ INPUT_PORTS_START( spectrum )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIKROGEN JOYSTICK LEFT") PORT_CODE(JOYCODE_X_LEFT_SWITCH)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIKROGEN JOYSTICK FIRE") PORT_CODE(JOYCODE_BUTTON1)
 
+	PORT_START_TAG("NMI") 
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12)
 
 	PORT_START_TAG("CONFIG") /* [16] */
 	PORT_DIPNAME(0x80, 0x00, "Hardware Version")
@@ -498,7 +482,6 @@ MACHINE_DRIVER_START( spectrum )
 	MDRV_SNAPSHOT_ADD(spectrum, "sna,z80,sp", 0)
 	MDRV_QUICKLOAD_ADD(spectrum, "scr", 0)
 MACHINE_DRIVER_END
-
 
 /***************************************************************************
 
@@ -567,6 +550,36 @@ ROM_START(inves)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+/* Romanian clones - added by Miodrag Milanovic */
+ROM_START(jet)
+	ROM_REGION(0x10000,REGION_CPU1,0)
+	ROM_LOAD("jet.rom", 0x0000, 0x4000, CRC(E56A7D11) )
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
+ROM_END
+
+ROM_START(cip03)
+	ROM_REGION(0x10000,REGION_CPU1,0)
+	ROM_LOAD("cip03.rom", 0x0000, 0x4000, CRC(C7D0CD3C) )
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
+ROM_END
+
+ROM_START(hc85)
+	ROM_REGION(0x10000,REGION_CPU1,0)
+	ROM_LOAD("hc85.rom", 0x0000, 0x4000, CRC(3AB60FB5) )
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
+ROM_END
+
+ROM_START(hc90)
+	ROM_REGION(0x10000,REGION_CPU1,0)
+	ROM_LOAD("hc90.rom", 0x0000, 0x4000, CRC(78C14D9A) )
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
+ROM_END
+
+ROM_START(hc91)
+	ROM_REGION(0x10000,REGION_CPU1,0)
+	ROM_LOAD("hc91.rom", 0x0000, 0x4000, CRC(8BF53761) )
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
+ROM_END
 
 static void spectrum_common_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -601,3 +614,10 @@ COMP( 1987, speclec,  spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Sinclair
 COMP( 1986, inves,    spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Investronica",	"Inves Spectrum 48K+" , 0)
 COMP( 1985, tk90x,    spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Micro Digital",	"TK-90x Color Computer" , 0)
 COMP( 1986, tk95,     spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Micro Digital",	"TK-95 Color Computer" , 0)
+
+
+COMP( 1990, jet,   	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Electromagnetica",	"JET" , 0)
+COMP( 1982, cip03, 	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Electronica",	"CIP-03" , 0)
+COMP( 1985, hc85, 	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Ice Felix",	"HC85" , 0)
+COMP( 1990, hc90, 	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Ice Felix",	"HC90" , 0)
+COMP( 1991, hc91, 	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Ice Felix",	"HC91" , 0)

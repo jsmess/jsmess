@@ -172,27 +172,6 @@ static WRITE8_HANDLER(ts2068_port_f4_w)
 		ts2068_update_memory(machine);
 }
 
-static WRITE8_HANDLER(ts2068_port_f5_w)
-{
-		AY8910_control_port_0_w(machine, 0, data);
-}
-
-static  READ8_HANDLER(ts2068_port_f6_r)
-{
-		/* TODO - Reading from register 14 reads the joystick ports
-           set bit 8 of address to read joystick #1
-           set bit 9 of address to read joystick #2
-           if both bits are set then OR values
-           Bit 0 up, 1 down, 2 left, 3 right, 7 fire active low. Other bits 1
-        */
-		return AY8910_read_port_0_r(machine, 0);
-}
-
-static WRITE8_HANDLER(ts2068_port_f6_w)
-{
-		AY8910_write_port_0_w(machine, 0, data);
-}
-
 static  READ8_HANDLER(ts2068_port_ff_r)
 {
 		return ts2068_port_ff_data;
@@ -210,48 +189,6 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
 		ts2068_update_memory(machine);
 		logerror("Port %04x write %02x\n", offset, data);
 }
-
-
-static READ8_HANDLER ( ts2068_port_r )
-{
-	switch (offset & 0xff)
-	{
-		/* Note: keys only decoded on port #fe not all even ports so
-           ports #f4 & #f6 correctly read */
-		case 0xf4: return ts2068_port_f4_r(machine, offset);
-		case 0xf6: return ts2068_port_f6_r(machine, offset);
-		case 0xff: return ts2068_port_ff_r(machine, offset);
-
-		case 0xfe: return spectrum_port_fe_r(machine, offset);
-		case 0x1f: return spectrum_port_1f_r(machine, offset);
-		case 0x7f: return spectrum_port_7f_r(machine, offset);
-		case 0xdf: return spectrum_port_df_r(machine, offset);
-	}
-	logerror("Read from port: %04x\n", offset);
-
-	return 0xff;
-}
-
-static WRITE8_HANDLER ( ts2068_port_w )
-{
-/* Ports #fd & #fc were reserved by Timex for bankswitching and are not used
-   by either the hardware or system software.
-   Port #fb is the Thermal printer port and works exactly as the Sinclair
-   Printer - ie not yet emulated.
-*/
-	switch (offset & 0xff)
-	{
-		case 0xfe: spectrum_port_fe_w(machine, offset,data); break;
-		case 0xf4: ts2068_port_f4_w(machine, offset,data); break;
-		case 0xf5: ts2068_port_f5_w(machine, offset,data); break;
-		case 0xf6: ts2068_port_f6_w(machine, offset,data); break;
-		case 0xff: ts2068_port_ff_w(machine, offset,data); break;
-		default:
-				logerror("Write %02x to Port: %04x\n", data, offset);
-	}
-}
-
-
 
 /*******************************************************************
  *
@@ -594,9 +531,15 @@ void ts2068_update_memory(running_machine *machine)
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, wh);
 }
 
-
-static ADDRESS_MAP_START (ts2068_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE( ts2068_port_r, ts2068_port_w )
+static ADDRESS_MAP_START (ts2068_io, ADDRESS_SPACE_IO, 8)	
+	AM_RANGE(0x1f, 0x1f ) AM_READ( spectrum_port_1f_r ) AM_MIRROR(0xff00)
+	AM_RANGE(0x7f, 0x7f ) AM_READ( spectrum_port_7f_r ) AM_MIRROR(0xff00)
+	AM_RANGE(0xdf, 0xdf ) AM_READ( spectrum_port_df_r ) AM_MIRROR(0xff00)
+	AM_RANGE(0xf4, 0xf4 ) AM_READWRITE( ts2068_port_f4_r,ts2068_port_f4_w ) AM_MIRROR(0xff00)
+	AM_RANGE(0xf5, 0xf5 ) AM_WRITE( AY8910_control_port_0_w ) AM_MIRROR(0xff00)
+	AM_RANGE(0xf6, 0xf6 ) AM_READWRITE( AY8910_read_port_0_r,AY8910_write_port_0_w ) AM_MIRROR(0xff00)
+	AM_RANGE(0xfe, 0xfe ) AM_READWRITE( spectrum_port_fe_r,spectrum_port_fe_w )  AM_MIRROR(0xff00)  AM_MASK(0xffff)
+	AM_RANGE(0xff, 0xff ) AM_READWRITE( ts2068_port_ff_r,ts2068_port_ff_w ) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (ts2068_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -625,44 +568,18 @@ static MACHINE_RESET( ts2068 )
 /* TC2048 specific functions */
 
 
-static void tc2048_port_ff_w(int offset, int data)
+static WRITE8_HANDLER (tc2048_port_ff_w)
 {
 		ts2068_port_ff_data = data;
 		logerror("Port %04x write %02x\n", offset, data);
 }
 
-static  READ8_HANDLER ( tc2048_port_r )
-{
-		if ((offset & 1)==0)
-				return spectrum_port_fe_r(machine, offset);
-		switch (offset & 0xff)
-		{
-				case 0xff: return ts2068_port_ff_r(machine, offset);
-				case 0x1f: return spectrum_port_1f_r(machine, offset);
-				case 0x7f: return spectrum_port_7f_r(machine, offset);
-				case 0xdf: return spectrum_port_df_r(machine, offset);
-		}
-
-		logerror("Read from port: %04x\n", offset);
-		return 0xff;
-}
-
-static WRITE8_HANDLER ( tc2048_port_w )
-{
-		if ((offset & 1)==0)
-				spectrum_port_fe_w(machine, offset,data);
-		else if ((offset & 0xff)==0xff)
-				tc2048_port_ff_w(offset, data);
-		else
-		{
-				logerror("Write %02x to Port: %04x\n", data, offset);
-		}
-}
-
-/* ports are not decoded full.
-The function decodes the ports appropriately */
 static ADDRESS_MAP_START (tc2048_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE( tc2048_port_r, tc2048_port_w )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff) 
+	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
+	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,tc2048_port_ff_w)  AM_MIRROR(0xff00)	
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (tc2048_mem, ADDRESS_SPACE_PROGRAM, 8)

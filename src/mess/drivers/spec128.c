@@ -226,88 +226,20 @@ void spectrum_128_update_memory(running_machine *machine)
 	logerror("rom switch: %02x\n", ROMSelection);
 }
 
-
-
-WRITE8_HANDLER(spectrum_128_port_bffd_w)
+static  READ8_HANDLER ( spectrum_128_ula_r )
 {
-	AY8910_write_port_0_w(machine, 0, data);
+	return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
 }
 
-WRITE8_HANDLER(spectrum_128_port_fffd_w)
-{
-	AY8910_control_port_0_w(machine, 0, data);
-}
-
-READ8_HANDLER(spectrum_128_port_fffd_r)
-{
-	return AY8910_read_port_0_r(machine, 0);
-}
-
-static  READ8_HANDLER ( spectrum_128_port_r )
-{
-	 if ((offset & 1)==0)
-	 {
-		 return spectrum_port_fe_r(machine, offset);
-	 }
-
-	 if ((offset & 2)==0)
-	 {
-		switch ((offset>>14) & 0x03)
-		{
-			default:
-				break;
-
-			case 3:
-				return spectrum_128_port_fffd_r(machine, offset);
-		}
-	 }
-
-	 /* don't think these are correct! */
-	 if ((offset & 0xff)==0x1f)
-		 return spectrum_port_1f_r(machine, offset);
-
-	 if ((offset & 0xff)==0x7f)
-		 return spectrum_port_7f_r(machine, offset);
-
-	 if ((offset & 0xff)==0xdf)
-		 return spectrum_port_df_r(machine, offset);
-
-	 return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
-}
-
-static WRITE8_HANDLER ( spectrum_128_port_w )
-{
-		if ((offset & 1)==0)
-				spectrum_port_fe_w(machine, offset,data);
-
-		/* Only decodes on A15, A14 & A1 */
-		else if ((offset & 2)==0)
-		{
-				switch ((offset>>8) & 0xc0)
-				{
-						case 0x40:
-								spectrum_128_port_7ffd_w(machine, offset, data);
-								break;
-						case 0x80:
-								spectrum_128_port_bffd_w(machine, offset, data);
-								break;
-						case 0xc0:
-								spectrum_128_port_fffd_w(machine, offset, data);
-								break;
-						default:
-								logerror("Write %02x to 128 port: %04x\n", data, offset);
-				}
-		}
-		else
-		{
-			logerror("Write %02x to 128 port: %04x\n", data, offset);
-		}
-}
-
-/* ports are not decoded full.
-The function decodes the ports appropriately */
 static ADDRESS_MAP_START (spectrum_128_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE( spectrum_128_port_r, spectrum_128_port_w )
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff) 
+	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x007f, 0x007f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x00df, 0x00df) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_128_port_7ffd_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_write_port_0_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(AY8910_read_port_0_r,AY8910_control_port_0_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x0001, 0x0001) AM_READ(spectrum_128_ula_r) AM_MIRROR(0xfffe)	
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (spectrum_128_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -413,6 +345,12 @@ ROM_START(specp2sp)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START(hc128)
+	ROM_REGION(0x18000,REGION_CPU1,0)
+	ROM_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5))
+	ROM_LOAD("hc128.rom",  0x14000, 0x4000, CRC(0241E960) )
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
+ROM_END
 SYSTEM_CONFIG_START(spec128)
 	CONFIG_IMPORT_FROM(spectrum)
 	CONFIG_RAM_DEFAULT(128 * 1024)
@@ -425,3 +363,4 @@ COMP( 1985, spec128s, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Sincla
 COMP( 1986, specpls2, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2" , 0 )
 COMP( 1986, specp2fr, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2 (France)" , 0 )
 COMP( 1986, specp2sp, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2 (Spain)" , 0 )
+COMP( 1992, hc128,	  spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Ice Felix",			"HC128" , 0)

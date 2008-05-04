@@ -155,17 +155,10 @@ static PIT8253_FREQUENCY_CHANGED(bm2_pit_clk)
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_irq)
 {
-	if (state==1) logerror("Timer IRQ\n");
 	pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),1,state);	
 }
 
-UINT8 vblank_state = 0;
-INTERRUPT_GEN (b2m_vblank_interrupt)
-{
-	vblank_state++;
-	if (vblank_state>1) vblank_state=0;
-	pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
-}
+
 const struct pit8253_config b2m_pit8253_intf =
 {
 	{
@@ -329,6 +322,7 @@ static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
 {		
 	cpunum_set_input_line(Machine, 0, 0,interrupt ?  HOLD_LINE : CLEAR_LINE);  
 } 
+UINT8 vblank_state = 0;
 
 
 /* Driver initialization */
@@ -393,6 +387,18 @@ const struct pic8259_interface b2m_pic8259_config = {
 	b2m_pic_set_int_line
 };
 
+INTERRUPT_GEN (b2m_vblank_interrupt)
+{	
+	//vblank_state++;
+	//if (vblank_state>1) vblank_state=0;
+	//pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
+}
+static TIMER_CALLBACK (b2m_callback)
+{	
+	vblank_state++;
+	if (vblank_state>1) vblank_state=0;
+	pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
+}
 
 MACHINE_RESET(b2m)
 {
@@ -406,6 +412,8 @@ MACHINE_RESET(b2m)
 
 	cpunum_set_irq_callback(0, b2m_irq_callback);
 	b2m_set_bank(machine,7);
+		
+	timer_pulse(ATTOTIME_IN_HZ(1), NULL, 0, b2m_callback);
 }
 
 DEVICE_IMAGE_LOAD( b2m_floppy )
