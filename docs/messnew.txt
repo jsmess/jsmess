@@ -22,6 +22,8 @@ System Driver Changes:
 
 - [C64] Bug fix, and fixed some timings.  [roberto zandonà]
 
+- [C64] Fixed joystick 2.  (bug #1150) [roberto zandonà]
+
 - [COCO/COCO3] Transitioned Bitbanger and VHD support to use MAME's core
   device system.  [Nate Woods]
 
