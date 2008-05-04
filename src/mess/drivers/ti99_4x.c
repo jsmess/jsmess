@@ -16,7 +16,10 @@ Similar to TI99/4a, except for the following:
 Historical notes: TI made several last minute design changes.
     * TI99/4 prototypes had an extra port for an I/R joystick and keypad interface.
     * early TI99/4 prototypes were designed for a tms9985, not a tms9900.
-*/
+
+Note: Changes in MAME 0.124u4 caused the execution of code via the read handlers to no longer work.
+	Therefore, the PEB at 4000-5FFF is commented out until a solution is found.
+	Also, the ti99_4ev title screen isn't working. Press 1 to enter Basic. */
 
 #include "driver.h"
 #include "deprecat.h"
@@ -42,10 +45,10 @@ Historical notes: TI made several last minute design changes.
 */
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
-
+	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM										/*system ROM*/
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*lower 8kb of RAM extension - installed dynamically*/
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
+//	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_cart_r, ti99_cart_w)		/*cartridge memory*/
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAMBANK(1)			/*RAM PAD, mirrored 4 times*/
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(ti99_nop_8_r, ti99_wsnd_w)	/*soundchip write*/
@@ -60,10 +63,10 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
-
+	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM										/*system ROM*/
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*lower 8kb of RAM extension - installed dynamically*/
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
+//	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_cart_r, ti99_cart_w)		/*cartridge memory*/
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAMBANK(1)			/*RAM PAD, mirrored 4 times*/
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(ti99_nop_8_r, ti99_wsnd_w)	/*soundchip write*/
