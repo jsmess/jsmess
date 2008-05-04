@@ -317,6 +317,10 @@ enum
 	/* special meaning handled by custom code */
 	IPT_SPECIAL,
 
+#ifdef MESS
+	IPT_UI_PASTE,
+#endif /* MESS */
+
 	__ipt_max
 };
 

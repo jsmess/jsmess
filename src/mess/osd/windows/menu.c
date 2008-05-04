@@ -921,41 +921,6 @@ done:
 
 
 //============================================================
-//	paste
-//============================================================
-
-static void paste(void)
-{
-	HANDLE h;
-	LPSTR text;
-	size_t mb_size;
-	size_t w_size;
-	LPWSTR wtext;
-
-	if (!OpenClipboard(NULL))
-		return;
-
-	h = GetClipboardData(CF_TEXT);
-	if (h)
-	{
-		text = GlobalLock(h);
-		if (text)
-		{
-			mb_size = strlen(text);
-			w_size = MultiByteToWideChar(CP_ACP, 0, text, mb_size, NULL, 0);
-			wtext = (LPWSTR) alloca(w_size * sizeof(WCHAR));
-			MultiByteToWideChar(CP_ACP, 0, text, mb_size, wtext, w_size);
-			inputx_postn_utf16(wtext, w_size);
-			GlobalUnlock(h);
-		}
-	}
-
-	CloseClipboard();
-}
-
-
-
-//============================================================
 //	pause
 //============================================================
 
@@ -1706,7 +1671,7 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			break;
 
 		case ID_EDIT_PASTE:
-			paste();
+			PostMessage(wnd, WM_PASTE, 0, 0);
 			break;
 
 		case ID_KEYBOARD_NATURAL:
@@ -2151,6 +2116,10 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 		case WM_CHAR:
 			if (win_use_natural_keyboard)
 				inputx_postc(wparam);
+			break;
+
+		case WM_PASTE:
+			ui_paste(Machine);
 			break;
 
 		case WM_COMMAND:

@@ -26,4 +26,7 @@ int filemanager(int selected);
 /* tape control */
 int tapecontrol(int selected);
 
+/* paste */
+void ui_paste(running_machine *machine);
+
 #endif /* UIMESS_H */

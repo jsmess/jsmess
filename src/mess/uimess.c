@@ -198,3 +198,25 @@ int mess_disable_builtin_ui(running_machine *machine)
 {
 	return mess_use_new_ui() || ((machine->gamedrv->flags & GAME_COMPUTER) && !mess_ui_active());
 }
+
+
+
+/*-------------------------------------------------
+    ui_paste - does a paste from the keyboard
+-------------------------------------------------*/
+
+void ui_paste(running_machine *machine)
+{
+	/* retrieve the clipboard text */
+	char *text = osd_get_clipboard_text();
+
+	/* was a result returned? */
+	if (text != NULL)
+	{
+		/* post the text */
+		inputx_post_utf8(text);
+
+		/* free the string */
+		free(text);
+	}
+}

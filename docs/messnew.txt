@@ -78,6 +78,8 @@ User Interface Changes:
 - Fixed bug in file selector that could cause paths to contain extraneous
   separators.  (bug #1595) [Nate Woods]
 
+- Shift+ScrollLock now triggers a paste command.  [Nate Woods]
+
 - [Windows] Fixed "Configure..." dialog problem when customizing certain
   system's controllers.  (bugs #1570, #1573) [Nate Woods]
 
@@ -125,6 +127,8 @@ Source Changes:
   to not be recognized.  (bug #1564)  [Nate Woods]
 
 - Converted HD63450 DMA controller to the new device system.  [Barry Rodewald]
+
+- New MESS specific OSD call:  osd_get_clipboard_text().  [Nate Woods]
 
 
 
