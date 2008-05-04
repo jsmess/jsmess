@@ -1,7 +1,7 @@
 /**************************************************************************************
-* Gameboy sound emulation (c) Anthony Kruize (trandor@labyrinth.net.au)
+* Game Boy sound emulation (c) Anthony Kruize (trandor@labyrinth.net.au)
 *
-* Anyways, sound on the gameboy consists of 4 separate 'channels'
+* Anyways, sound on the Game Boy consists of 4 separate 'channels'
 *   Sound1 = Quadrangular waves with SWEEP and ENVELOPE functions  (NR10,11,12,13,14)
 *   Sound2 = Quadrangular waves with ENVELOPE functions (NR21,22,23,24)
 *   Sound3 = Wave patterns from WaveRAM (NR30,31,32,33,34)

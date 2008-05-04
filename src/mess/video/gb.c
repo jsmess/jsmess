@@ -2,7 +2,7 @@
 
   gb.c
 
-  Video file to handle emulation of the Nintendo GameBoy.
+  Video file to handle emulation of the Nintendo Game Boy.
 
   Original code                               Carsten Sorensen   1998
   Mess modifications, bug fixes and speedups  Hans de Goede      1998
@@ -128,7 +128,7 @@ static const unsigned char palette[] =
 	0x84,0x80,0x4E,		/* Medium */
 	0x4E,0x4E,0x4E,		/* Dark */
 
-/* Palette for GameBoy Pocket/Light */
+/* Palette for Game Boy Pocket/Light */
 	0xC4,0xCF,0xA1,		/* Background */
 	0x8B,0x95,0x6D,		/* Light      */
 	0x6B,0x73,0x53,		/* Medium     */
@@ -459,7 +459,7 @@ static void gb_update_scanline( running_machine *machine ) {
 	profiler_mark(PROFILER_END);
 }
 
-/* --- Super Gameboy Specific --- */
+/* --- Super Game Boy Specific --- */
 
 INLINE void sgb_update_sprites (void)
 {
@@ -792,7 +792,7 @@ static void sgb_update_scanline( running_machine *machine ) {
 	profiler_mark(PROFILER_END);
 }
 
-/* --- Gameboy Color Specific --- */
+/* --- Game Boy Color Specific --- */
 
 INLINE void cgb_update_sprites ( running_machine *machine ) {
 	bitmap_t *bitmap = tmpbitmap;
@@ -1367,7 +1367,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.oam_locked = UNLOCKED;
 			gb_lcd.vram_locked = UNLOCKED;
 			/*
-				There seems to a kind of feature in the gameboy hardware when the lowest bits of the
+				There seems to a kind of feature in the Game Boy hardware when the lowest bits of the
 				SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
 				than usual.
 				The SGB probably has the same bug.
@@ -1598,7 +1598,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.oam_locked = UNLOCKED;
 			gb_lcd.vram_locked = UNLOCKED;
 			/*
-				There seems to a kind of feature in the gameboy hardware when the lowest bits of the
+				There seems to a kind of feature in the Game Boy hardware when the lowest bits of the
 				SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
 				than usual.
 				The SGB probably has the same bug.

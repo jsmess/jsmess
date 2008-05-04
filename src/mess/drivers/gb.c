@@ -2,7 +2,7 @@
 
   gb.c
 
-  Driver file to handle emulation of the Nintendo Gameboy.
+  Driver file to handle emulation of the Nintendo Game Boy.
   By:
 
   Hans de Goede               1998
@@ -164,7 +164,7 @@ STAT 222222222222222222223333333333333333333333333333333333333333333000000000000
      etc
 
 
-Mappers used in the gameboy
+Mappers used in the Game Boy
 ===========================
 
 MBC1 Mapper
@@ -444,9 +444,9 @@ space. This mapper uses 32KB sized banks.
 
 
 /* Initial value of the cpu registers (hacks until we get bios dumps) */
-static const UINT16 sgb_cpu_regs[6] = { 0x01B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };    /* Super GameBoy                    */
-static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* GameBoy Pocket / Super GameBoy 2 */
-static const UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* GameBoy Color  / Gameboy Advance */
+static const UINT16 sgb_cpu_regs[6] = { 0x01B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };    /* Super Game Boy                    */
+static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Pocket / Super Game Boy 2 */
+static const UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Color  / Game Boy Advance */
 static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };	/* Megaduck */
 
 static const Z80GB_CONFIG dmg_cpu_reset = { NULL, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
@@ -756,13 +756,13 @@ ROM_START( megaduck )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  CONFIG   COMPANY     FULLNAME */
-CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    gameboy_gb, "Nintendo", "GameBoy"  , 0)
-CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    gameboy, "Nintendo", "Super GameBoy" , 0)
-CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    gameboy, "Nintendo", "GameBoy Pocket" , 0)
-CONS( 1998, gbcolor,  0,       gameboy,	gbcolor,  gameboy, 0,    gb_cgb, "Nintendo", "GameBoy Color" , 0)
+CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    gameboy_gb, "Nintendo", "Game Boy"  , 0)
+CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    gameboy, "Nintendo", "Super Game Boy" , 0)
+CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    gameboy, "Nintendo", "Game Boy Pocket" , 0)
+CONS( 1998, gbcolor,  0,       gameboy,	gbcolor,  gameboy, 0,    gb_cgb, "Nintendo", "Game Boy Color" , 0)
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
    system there's no way to verify. Same goes for the colors of the LCD. We are no using the default
-   GameBoy green colors */
+   Game Boy green colors */
 CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, 0,    megaduck,"Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , 0)
 

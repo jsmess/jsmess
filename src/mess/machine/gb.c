@@ -2,7 +2,7 @@
 
   gb.c
 
-  Machine file to handle emulation of the Nintendo GameBoy.
+  Machine file to handle emulation of the Nintendo Game Boy.
 
   Changes:
 
@@ -26,8 +26,8 @@
 						 Added support for games with more than 128 ROM banks.
 	12/6/2002		AK - Rewrote the way bg and sprite palettes are handled.
 						 The window layer no longer has it's own palette.
-						 Added Super GameBoy support.
-	13/6/2002		AK - Added GameBoy Color support.
+						 Added Super Game Boy support.
+	13/6/2002		AK - Added Game Boy Color support.
 
 	17/5/2004       WP - Added Megaduck/Cougar Boy support.
 	13/6/2005		WP - Added support for bootstrap rom banking.
@@ -1739,7 +1739,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		logerror("Cart Information\n");
 		logerror("\tName:             %s\n", S);
 		logerror("\tType:             %s [0x%2X]\n", CartTypes[gb_header[0x0147]], gb_header[0x0147] );
-		logerror("\tGameBoy:          %s\n", (gb_header[0x0143] == 0xc0) ? "No" : "Yes" );
+		logerror("\tGame Boy:         %s\n", (gb_header[0x0143] == 0xc0) ? "No" : "Yes" );
 		logerror("\tSuper GB:         %s [0x%2X]\n", (gb_header[0x0146] == 0x03) ? "Yes" : "No", gb_header[0x0146] );
 		logerror("\tColor GB:         %s [0x%2X]\n", (gb_header[0x0143] == 0x80 || gb_header[0x0143] == 0xc0) ? "Yes" : "No", gb_cart[0x0143] );
 		logerror("\tROM Size:         %d 16kB Banks [0x%2X]\n", ROMBanks, gb_header[0x0148]);
@@ -1910,10 +1910,10 @@ MACHINE_RESET( megaduck )
 }
 
 /*
- Map megaduck video related area on to regular Gameboy video area
+ Map megaduck video related area on to regular Game Boy video area
 
  Different locations of the video registers:
- Register      GameBoy    MegaDuck
+ Register      Game Boy   MegaDuck
  LCDC          FF40       FF10  (See different bit order below)
  STAT          FF41       FF11
  SCY           FF42       FF12
@@ -1933,7 +1933,7 @@ MACHINE_RESET( megaduck )
 
  Different LCDC register
 
- GameBoy        MegaDuck
+ Game Boy       MegaDuck
  0                      6       - BG & Window Display : 0 - Off, 1 - On
  1                      0       - OBJ Display: 0 - Off, 1 - On
  2                      1       - OBJ Size: 0 - 8x8, 1 - 8x16
@@ -1969,7 +1969,7 @@ WRITE8_HANDLER ( megaduck_video_w )
 	gb_video_w(machine, offset, data );
 }
 
-/* Map megaduck audio offset to gameboy audio offsets */
+/* Map megaduck audio offset to game boy audio offsets */
 
 static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
