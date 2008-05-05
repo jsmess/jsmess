@@ -53,6 +53,10 @@ Known Non-Issues (confirmed on Real Genesis)
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
+#ifdef MESS
+extern void setup_megadriv_custom_mappers(running_machine *);
+#endif
+
 /* the same on all systems? */
 #define MASTER_CLOCK		53693100
 /* timing details */
@@ -4816,6 +4820,9 @@ MACHINE_RESET( megadriv )
 
 	memset(megadrive_ram,0x00,0x10000);
 
+#ifdef MESS
+	setup_megadriv_custom_mappers(machine);
+#endif
 
 }
 
