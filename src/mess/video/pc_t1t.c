@@ -693,6 +693,36 @@ static void pc_t1t_bank_w(int data)
 	pc_t1t_mode_switch();
 }
 
+
+static void pc_pcjr_bank_w(int data)
+{
+	if (pcjr.bank != data)
+	{
+		int dram, vram;
+		pcjr.bank = data;
+		/* it seems the video ram is mapped to the last 128K of main memory */
+#if 1
+		if ((data&0xc0)==0xc0) /* needed for lemmings */
+		{
+			dram = 0x80000 + ((data & 0x06) << 14);
+			vram = 0x80000 + ((data & 0x30) << (14-3));
+		}
+		else
+		{
+			dram = 0x80000 + ((data & 0x07) << 14);
+			vram = 0x80000 + ((data & 0x38) << (14-3));
+		}
+#else
+		dram = (data & 0x07) << 14;
+		vram = (data & 0x38) << (14-3);
+#endif
+		videoram = &memory_region(REGION_CPU1)[vram];
+		pcjr.displayram = &memory_region(REGION_CPU1)[dram];
+	}
+	pc_pcjr_mode_switch();
+}
+
+
 static int pc_t1t_bank_r(void)
 {
 	return pcjr.bank;
@@ -776,7 +806,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 		case 12:
 			break;
 		case 15:
-			pc_t1t_bank_w(data);
+			pc_pcjr_bank_w(data);
 			break;
 
 		default:
