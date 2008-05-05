@@ -283,6 +283,7 @@ enum
 	IPT_UI_SHOW_PROFILER,
 	IPT_UI_TOGGLE_UI,
 	IPT_UI_TOGGLE_DEBUG,
+	IPT_UI_PASTE,
 	IPT_UI_SAVE_STATE,
 	IPT_UI_LOAD_STATE,
 	IPT_UI_ADD_CHEAT,
@@ -316,10 +317,6 @@ enum
 
 	/* special meaning handled by custom code */
 	IPT_SPECIAL,
-
-#ifdef MESS
-	IPT_UI_PASTE,
-#endif /* MESS */
 
 	__ipt_max
 };

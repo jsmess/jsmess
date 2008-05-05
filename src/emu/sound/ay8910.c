@@ -39,8 +39,8 @@
   This is backed by oscilloscope pictures from the datasheet. If a fixed volume
   is set, i.e. enveloppe is disabled, the output voltage is set to 0V. Recordings
   I found on the web for gyruss indicate, that the AY-3-8910 offset should
-  be around 1.5V. This will also make sound levels more compatible with
-  user descriptions.
+  be around 0.2V. This will also make sound levels more compatible with
+  user observations for scramble.
 
   The Model:
                      5V     5V
@@ -66,8 +66,9 @@ where used to calibrate channel mixing for the YM2149. This was done using
 a least square approach using a fixed RL of 1K Ohm.
 
 For the AY measurements cited in e.g. openmsx as "Hacker Kay" for a single
-channel were taken. These were normalized to 0 ... 65535 and adapted to on
-offset of 1.5V and a VPP of 1.3V.
+channel were taken. These were normalized to 0 ... 65535 and consequently
+adapted to an offset of 0.2V and a VPP of 1.3V. These measurements are in
+line e.g. with the formula used by pcmenc for the volume: vol(i) = exp(i/2-7.5).
 
 The following is documentation from the code moved here and amended to reflect
 the changes done:
@@ -310,7 +311,7 @@ INLINE void build_3D_table(double rl, const ay_ym_param *par, const ay_ym_param 
 	if (normalize)
 	{
 		for (j=0; j < 32*32*32*8; j++)
-			tab[j] = MAX_OUTPUT * (((temp[j] - min)/(max-min)) - 0.25) * factor;
+			tab[j] = MAX_OUTPUT * (((temp[j] - min)/(max-min))) * factor;
 	}
 	else
 	{

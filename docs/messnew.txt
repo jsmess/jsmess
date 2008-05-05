@@ -1,4 +1,4 @@
-﻿0.124.1
+﻿0.125
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -106,7 +106,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.124u5.  This incorporates all features of the
+- The core is based on MAME 0.125.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Major changes to transition MESS's device system onto MAME's device system.
