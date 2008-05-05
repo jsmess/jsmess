@@ -16,14 +16,16 @@
 #define MDA_LOG(N,M,A) \
 	if(VERBOSE_MDA>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 
-const unsigned char mda_palette[4][3] = {
+const unsigned char mda_palette[4][3] =
+{
 	{ 0x00,0x00,0x00 },
 	{ 0x00,0x55,0x00 },
 	{ 0x00,0xaa,0x00 },
 	{ 0x00,0xff,0x00 }
 };
 
-static struct {
+static struct
+{
 	UINT8 status;
 
 	int pc_framecnt;
@@ -54,7 +56,8 @@ static MC6845_UPDATE_ROW( mda_update_row );
 static MC6845_ON_HSYNC_CHANGED( mda_hsync_changed );
 static MC6845_ON_VSYNC_CHANGED( mda_vsync_changed );
 
-static const mc6845_interface mc6845_mda_intf = {
+static const mc6845_interface mc6845_mda_intf =
+{
 	MDA_SCREEN_NAME,	/* screen number */
 	MDA_CLOCK/9 /*?*/,	/* clock */
 	9,					/* number of pixels per video memory address */
@@ -117,7 +120,8 @@ VIDEO_START( pc_mda )
 }
 
 
-static VIDEO_UPDATE( mc6845_mda ) {
+static VIDEO_UPDATE( mc6845_mda )
+{
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MDA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect );
 	return 0;
@@ -130,13 +134,15 @@ static VIDEO_UPDATE( mc6845_mda ) {
   character codes 176 to 223.
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
+static MC6845_UPDATE_ROW( mda_text_inten_update_row )
+{
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
 	if ( y == 0 ) MDA_LOG(1,"mda_text_inten_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset + 1 ];
@@ -144,11 +150,13 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
 		UINT8 bg = 0;
 
-		if ( ( attr & ~0x88 ) == 0 ) {
+		if ( ( attr & ~0x88 ) == 0 )
+		{
 			data = 0x00;
 		}
 
-		switch( attr ) {
+		switch( attr )
+		{
 		case 0x70:
 			bg = 2;
 			fg = 0;
@@ -167,7 +175,8 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 			break;
 		}
 
-		if ( i == cursor_x || ( attr & 0x07 ) == 0x01 ) {
+		if ( ( i == cursor_x && ( mda.pc_framecnt & 0x08 ) ) || ( attr & 0x07 ) == 0x01 )
+		{
 			data = 0xFF;
 		}
 
@@ -179,9 +188,12 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 		*p = ( data & 0x04 ) ? fg : bg; p++;
 		*p = ( data & 0x02 ) ? fg : bg; p++;
 		*p = ( data & 0x01 ) ? fg : bg; p++;
-		if ( ( chr & 0xE0 ) == 0xC0 ) {
+		if ( ( chr & 0xE0 ) == 0xC0 )
+		{
 			*p = ( data & 0x01 ) ? fg : bg; p++;
-		} else {
+		}
+		else
+		{
 			*p = bg; p++;
 		}
 	}
@@ -194,13 +206,15 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
   character codes 176 to 223.
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
+static MC6845_UPDATE_ROW( mda_text_blink_update_row )
+{
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
 	if ( y == 0 ) MDA_LOG(1,"mda_text_blink_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset + 1 ];
@@ -208,11 +222,13 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
 		UINT8 bg = 0;
 
-		if ( ( attr & ~0x88 ) == 0 ) {
+		if ( ( attr & ~0x88 ) == 0 )
+		{
 			data = 0x00;
 		}
 
-		switch( attr ) {
+		switch( attr )
+		{
 		case 0x70:
 		case 0xF0:
 			bg = 2;
@@ -225,13 +241,22 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 			break;
 		}
 
-		if ( i == cursor_x ) {
+		if ( ( attr & 0x07 ) == 0x01 )
+		{
 			data = 0xFF;
-		} else {
-			if ( ( attr & 0x07 ) == 0x01 ) {
+		}
+
+		if ( i == cursor_x )
+		{
+			if ( mda.pc_framecnt & 0x08 )
+			{
 				data = 0xFF;
 			}
-			if ( ( attr & 0x80 ) && ( mda.pc_framecnt & 0x40 ) ) {
+		}
+		else
+		{
+			if ( ( attr & 0x80 ) && ( mda.pc_framecnt & 0x10 ) )
+			{
 				data = 0x00;
 			}
 		}
@@ -244,30 +269,38 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 		*p = ( data & 0x04 ) ? fg : bg; p++;
 		*p = ( data & 0x02 ) ? fg : bg; p++;
 		*p = ( data & 0x01 ) ? fg : bg; p++;
-		if ( ( chr & 0xE0 ) == 0xC0 ) {
+		if ( ( chr & 0xE0 ) == 0xC0 )
+		{
 			*p = ( data & 0x01 ) ? fg : bg; p++;
-		} else {
+		}
+		else
+		{
 			*p = bg; p++;
 		}
 	}
 }
 
 
-static MC6845_UPDATE_ROW( mda_update_row ) {
-	if ( mda.update_row ) {
+static MC6845_UPDATE_ROW( mda_update_row )
+{
+	if ( mda.update_row )
+	{
 		mda.update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param );
 	}
 }
 
 
-static MC6845_ON_HSYNC_CHANGED( mda_hsync_changed ) {
+static MC6845_ON_HSYNC_CHANGED( mda_hsync_changed )
+{
 	mda.hsync = hsync ? 1 : 0;
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( mda_vsync_changed ) {
+static MC6845_ON_VSYNC_CHANGED( mda_vsync_changed )
+{
 	mda.vsync = vsync ? 0x80 : 0;
-	if ( vsync ) {
+	if ( vsync )
+	{
 		mda.pc_framecnt++;
 	}
 }
@@ -282,7 +315,8 @@ static void mda_mode_control_w(int data)
 		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
 	mda.mode_control = data;
 
-	switch( mda.mode_control & 0x2a ) {
+	switch( mda.mode_control & 0x2a )
+	{
 	case 0x08:
 		mda.update_row = mda_text_inten_update_row;
 		break;
@@ -377,7 +411,8 @@ allow this.
 The divder/pixels per 6845 clock is 9 for text mode and 16 for graphics mode.
 */
 
-static const mc6845_interface mc6845_hercules_intf = {
+static const mc6845_interface mc6845_hercules_intf =
+{
 	HERCULES_SCREEN_NAME,	/* screen number */
 	MDA_CLOCK/9 /*?*/,		/* clock */
 	9,						/* number of pixels per video memory address */
@@ -405,7 +440,8 @@ MACHINE_DRIVER_START( pcvideo_hercules )
 MACHINE_DRIVER_END
 
 
-static VIDEO_START( pc_hercules ) {
+static VIDEO_START( pc_hercules )
+{
 	int buswidth;
 
 	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
@@ -440,13 +476,15 @@ static VIDEO_START( pc_hercules ) {
   bit 7 being the leftmost.
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( hercules_gfx_update_row ) {
+static MC6845_UPDATE_ROW( hercules_gfx_update_row )
+{
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	gfx_base = ( ( mda.mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;
 
 	if ( y == 0 ) MDA_LOG(1,"hercules_gfx_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT8	data = videoram[ gfx_base + ( ( ma + i ) << 1 ) ];
 
 		*p = ( data & 0x80 ) ? 2 : 0; p++;
@@ -472,21 +510,24 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row ) {
 }
 
 
-static VIDEO_UPDATE( mc6845_hercules ) {
+static VIDEO_UPDATE( mc6845_hercules )
+{
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, HERCULES_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect );
 	return 0;
 }
 
 
-static void hercules_mode_control_w(running_machine *machine, int data) {
+static void hercules_mode_control_w(running_machine *machine, int data)
+{
 	device_config	*devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, HERCULES_MC6845_NAME);
 
 	MDA_LOG(1,"hercules_mode_control_w",("$%02x: colums %d, gfx %d, enable %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
 	mda.mode_control = data;
 
-	switch( mda.mode_control & 0x2a ) {
+	switch( mda.mode_control & 0x2a )
+	{
 	case 0x08:
 		mda.update_row = mda_text_inten_update_row;
 		break;
@@ -513,10 +554,12 @@ static void hercules_config_w(int data)
 }
 
 
-static WRITE8_HANDLER ( pc_hercules_w ) {
+static WRITE8_HANDLER ( pc_hercules_w )
+{
 	device_config   *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, HERCULES_MC6845_NAME);
 
-	switch( offset ) {
+	switch( offset )
+	{
 	case 0: case 2: case 4: case 6:
 		mc6845_address_w( devconf, offset, data );
 		break;
@@ -551,11 +594,13 @@ static int pc_hercules_status_r(void)
 }
 
 
-static READ8_HANDLER ( pc_hercules_r ) {
+static READ8_HANDLER ( pc_hercules_r )
+{
 	device_config	*devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, HERCULES_MC6845_NAME);
 	int data = 0xff;
 
-	switch( offset ) {
+	switch( offset )
+	{
 	case 0: case 2: case 4: case 6:
 		/* return last written mc6845 address value here? */
 		break;
