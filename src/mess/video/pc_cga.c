@@ -45,6 +45,34 @@
 
 	(source John Elliott http://www.seasip.info/AmstradXT/pc1512disp.html)
 
+
+  Cursor signal handling:
+
+  The alpha dots signal is set when a character pixel should be set. This signal is
+  also set when the cursor should be displayed. The following formula for alpha
+  dots is derived from the schematics:
+  ALPHA DOTS = ( ( CURSOR DLY ) AND ( CURSOR BLINK ) ) OR ( ( ( NOT AT7 ) OR CURSOR DLY OR -BLINK OR NOT ENABLE BLINK ) AND ( CHG DOTS ) )
+
+  -CURSOR BLINK = VSYNC DLY (LS393) (changes every 8 vsyncs)
+  -BLINK = -CURSOR BLINK (LS393) (changes every 16 vsyncs)
+  -CURSOR DLY = -CURSOR signal from mc6845 and LS174
+  CHG DOTS = character pixel (from character rom)
+
+  For non-blinking modes this formula reduces to:
+  ALPHA DOTS = ( ( CURSOR DLY ) AND ( CURSOR BLINK ) ) OR ( CHG DOTS )
+
+  This means the cursor switches on/off state every 8 vsyncs.
+
+
+  For blinking modes this formula reduces to:
+  ALPHA DOTS = ( ( CURSOR DLY ) AND ( CURSOR BLINK ) ) OR ( ( ( NOT AT7 ) OR CURSOR DLY OR -BLINK ) AND ( CHG DOTS ) )
+
+  So, at the cursor location the attribute blinking is ignored and only regular
+  cursor blinking takes place (state switches every 8 vsyncs). On non-cursor
+  locations with the highest attribute bits set the character will switch
+  on/off every 16 vsyncs. In all other cases the character is displayed as
+  usual.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -160,7 +188,8 @@ static VIDEO_START( pc1512 );
 static VIDEO_UPDATE( mc6845_pc1512 );
 
 
-static const mc6845_interface mc6845_cga_intf = {
+static const mc6845_interface mc6845_cga_intf =
+{
 	CGA_SCREEN_NAME,	/* screen number */
 	XTAL_14_31818MHz/8,	/* clock */
 	8,					/* numbers of pixels per video memory address */
@@ -231,7 +260,8 @@ static struct
  *
  ***************************************************************************/
 
-struct ntsc_decoder {
+struct ntsc_decoder
+{
 	int period;
 
 	int *I_filter;
@@ -248,9 +278,11 @@ struct ntsc_decoder {
 
 
 /* Clear NTSC buffers and running totals. Call this before the beginning of each new line. */
-static void ntsc_clear(struct ntsc_decoder *ntsc) {
+static void ntsc_clear(struct ntsc_decoder *ntsc)
+{
 	int j;
-	for (j=0;j<ntsc->period;++j) {
+	for (j=0;j<ntsc->period;++j)
+	{
 		ntsc->Y_buffer[j] = 0;
 		ntsc->I_buffer[j] = 0;
 		ntsc->Q_buffer[j] = 0;
@@ -274,7 +306,8 @@ static void ntsc_clear(struct ntsc_decoder *ntsc) {
 
    The correct value for hue will usually be a multiple of 128.
 */
-static void ntsc_decoder_init(struct ntsc_decoder *ntsc, int period, int hue) {
+static void ntsc_decoder_init(struct ntsc_decoder *ntsc, int period, int hue)
+{
 	int j;
 
 	ntsc->period = period;
@@ -284,7 +317,8 @@ static void ntsc_decoder_init(struct ntsc_decoder *ntsc, int period, int hue) {
 	ntsc->I_buffer = auto_malloc(period * sizeof(int));
 	ntsc->Q_buffer = auto_malloc(period * sizeof(int));
 	ntsc_clear(ntsc);
-	for (j=0;j<period;++j) {
+	for (j=0;j<period;++j)
+	{
 		double angle = M_PI*((hue+(j<<8))/(period*128.0)-33.0/180);
 		ntsc->I_filter[j] = (int)(512.0*cos(angle));
 		ntsc->Q_filter[j] = (int)(512.0*sin(angle));
@@ -302,7 +336,8 @@ static void ntsc_decoder_init(struct ntsc_decoder *ntsc, int period, int hue) {
    first call ntsc_decode(ntsc, input, NULL, 1) with "input" containing the
    samples directly before the samples you will subsequently be using.
 */
-static void ntsc_decode(struct ntsc_decoder *ntsc, UINT8 *input, UINT8 *output, int periods) {
+static void ntsc_decode(struct ntsc_decoder *ntsc, UINT8 *input, UINT8 *output, int periods)
+{
 	int j;
 
 	int *I_filter;
@@ -317,14 +352,16 @@ static void ntsc_decode(struct ntsc_decoder *ntsc, UINT8 *input, UINT8 *output, 
 	int R,G,B;
 	int period = ntsc->period;
 
-	while ((--periods)>=0) {
+	while ((--periods)>=0)
+	{
 		I_filter = ntsc->I_filter;
 		Q_filter = ntsc->Q_filter;
 		Y_buffer = ntsc->Y_buffer;
 		I_buffer = ntsc->I_buffer;
 		Q_buffer = ntsc->Q_buffer;
 
-		for (j=0;j<period;++j) {
+		for (j=0;j<period;++j)
+		{
 
 			/* Get next point */
 			Y = *(input++);
@@ -385,14 +422,18 @@ static PALETTE_INIT( pc_cga )
 {
 	int i, r, g, b;
 
-	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ ) {
+	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
+	{
 		palette_set_color_rgb( machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
 	}
 
 	i = 0x8000;
-	for ( r = 0; r < 32; r++ ) {
-		for ( g = 0; g < 32; g++ ) {
-			for ( b = 0; b < 32; b++ ) {
+	for ( r = 0; r < 32; r++ )
+	{
+		for ( g = 0; g < 32; g++ )
+		{
+			for ( b = 0; b < 32; b++ )
+			{
 				palette_set_color_rgb( machine, i, r << 3, g << 3, b << 3 );
 				i++;
 			}
@@ -477,7 +518,8 @@ static VIDEO_UPDATE( mc6845_cga )
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
-	switch ( CGA_FONT & 0x01 ) {
+	switch ( CGA_FONT & 0x01 )
+	{
 	case 0:
 		cga.chr_gen = memory_region(REGION_GFX1) + 0x1800;
 		break;
@@ -494,12 +536,14 @@ static VIDEO_UPDATE( mc6845_cga )
   The character cell size is 16x8
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
+static MC6845_UPDATE_ROW( cga_text_inten_update_row )
+{
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
@@ -507,7 +551,8 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 		UINT16 fg = attr & 0x0F;
 		UINT16 bg = attr >> 4;
 
-		if ( i == cursor_x ) {
+		if ( i == cursor_x && ( cga.frame & 0x08 ) )
+		{
 			data = 0xFF;
 		}
 
@@ -528,12 +573,14 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
   The character cell size is 16x8. Composite monitor, greyscale.
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row ) {
+static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
+{
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
@@ -541,7 +588,8 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row ) {
 		UINT16 fg = 0x10 + ( attr & 0x0F );
 		UINT16 bg = 0x10 + ( ( attr >> 4 ) & 0x07 );
 
-		if ( i == cursor_x ) {
+		if ( i == cursor_x && ( cga.frame & 0x08 ) )
+		{
 			data = 0xFF;
 		}
 
@@ -561,19 +609,22 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row ) {
   The character cell size is 16x8
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
+static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
+{
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_alt_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
 		UINT8 data = cga.chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
 
-		if ( i == cursor_x ) {
+		if ( i == cursor_x && ( cga.frame & 0x08 ) )
+		{
 			data = 0xFF;
 		}
 
@@ -594,12 +645,14 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
   The character cell size is 16x8
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
+static MC6845_UPDATE_ROW( cga_text_blink_update_row )
+{
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
@@ -607,10 +660,17 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 		UINT16 fg = attr & 0x0F;
 		UINT16 bg = attr >> 4;
 
-		if ( i == cursor_x ) {
-			data = 0xFF;
-		} else {
-			if ( ( attr & 0x80 ) && ( cga.frame & 0x10 ) ) {
+		if ( i == cursor_x )
+		{
+			if ( cga.frame & 0x08 )
+			{
+				data = 0xFF;
+			}
+		}
+		else
+		{
+			if ( ( attr & 0x80 ) && ( cga.frame & 0x10 ) )
+			{
 				data = 0x00;
 			}
 		}
@@ -632,12 +692,14 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
   The character cell size is 16x8
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
+static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
+{
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_alt_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
@@ -645,10 +707,17 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
 		UINT16 fg = attr & 0x07;
 		UINT16 bg = 0;
 
-		if ( i == cursor_x ) {
-			data = 0xFF;
-		} else {
-			if ( ( attr & 0x80 ) && ( cga.frame & 0x10 ) ) {
+		if ( i == cursor_x )
+		{
+			if ( cga.frame & 0x08 )
+			{
+				data = 0xFF;
+			}
+		}
+		else
+		{
+			if ( ( attr & 0x80 ) && ( cga.frame & 0x10 ) )
+			{
 				data = 0x00;
 				bg = ( attr >> 4 ) & 0x07;
 			}
@@ -668,12 +737,14 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
 
 /* The lo-res (320x200) graphics mode on a colour composite monitor */
 
-static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
+static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
+{
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bppl_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
@@ -700,7 +771,8 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
 
 static const UINT8 yc_lut2[4] = { 0, 182, 71, 255 };
 
-static const UINT8 yc_lut[16][8] = {
+static const UINT8 yc_lut[16][8] =
+{
 	{ 0, 0, 0, 0, 0, 0, 0, 0 },	/* black */
 	{ 0, 0, 0, 0, 1, 1, 1, 1 },	/* blue */
 	{ 0, 1, 1, 1, 1, 0, 0, 0 },	/* green */
@@ -720,7 +792,8 @@ static const UINT8 yc_lut[16][8] = {
 	{ 3, 3, 3, 3, 3, 3, 3, 3 }, /* white */
 };
 
-static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
+static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
+{
 	UINT8	samples[1280];
 	UINT8	ntsc_decoded[3*1280];
 	int		samp_index = 0;
@@ -728,15 +801,18 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bpph_update_row",("\n"));
-if ( NTSC_FILTER ) {
+if ( NTSC_FILTER )
+{
 	ntsc_clear( &ntsc );
 	memset( ntsc_decoded, 0, sizeof(ntsc_decoded));
 }
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
-if ( NTSC_FILTER ) {
+if ( NTSC_FILTER )
+{
 		samples[samp_index] = yc_lut2[yc_lut[data>>4][0]]; samp_index++;
 		samples[samp_index] = yc_lut2[yc_lut[data>>4][1]]; samp_index++;
 		samples[samp_index] = yc_lut2[yc_lut[data>>4][2]]; samp_index++;
@@ -767,7 +843,8 @@ if ( NTSC_FILTER ) {
 
 		data = videoram[ offset + 1 ];
 
-if ( NTSC_FILTER ) {
+if ( NTSC_FILTER )
+{
 		samples[samp_index] = yc_lut2[yc_lut[data>>4][0]]; samp_index++;
 		samples[samp_index] = yc_lut2[yc_lut[data>>4][1]]; samp_index++;
 		samples[samp_index] = yc_lut2[yc_lut[data>>4][2]]; samp_index++;
@@ -796,11 +873,13 @@ if ( NTSC_FILTER ) {
 		*p = data & 0x0F; p++;
 		*p = data & 0x0F; p++;
 	}
-if (NTSC_FILTER) {
+if (NTSC_FILTER)
+{
 	ntsc_decode( &ntsc, samples, ntsc_decoded, 160 );
 	p = BITMAP_ADDR16(bitmap, y, 0);
 	samp_index = 0;
-	for ( i = 0; i < ( 8 * x_count ); i++ ) {
+	for ( i = 0; i < ( 8 * x_count ); i++ )
+	{
 		int r = ( ntsc_decoded[samp_index] + ntsc_decoded[samp_index+3] ) / 2;
 		int g = ( ntsc_decoded[samp_index+1] + ntsc_decoded[samp_index+4] ) / 2;
 		int b = ( ntsc_decoded[samp_index+2] + ntsc_decoded[samp_index+5] ) / 2;
@@ -818,12 +897,14 @@ if (NTSC_FILTER) {
   cga fetches 2 byte per mc6845 access.
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
+static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
+{
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
@@ -849,13 +930,15 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
+static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
+{
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT8	fg = cga.color_select & 0x0F;
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_1bpp_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
@@ -882,43 +965,58 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
 }
 
 
-static MC6845_UPDATE_ROW( cga_update_row ) {
-	if ( cga.update_row ) {
+static MC6845_UPDATE_ROW( cga_update_row )
+{
+	if ( cga.update_row )
+	{
 		cga.update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param );
 	}
 }
 
 
-static MC6845_ON_HSYNC_CHANGED( cga_hsync_changed ) {
+static MC6845_ON_HSYNC_CHANGED( cga_hsync_changed )
+{
 	cga.hsync = hsync ? 1 : 0;
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( cga_vsync_changed ) {
+static MC6845_ON_VSYNC_CHANGED( cga_vsync_changed )
+{
 	cga.vsync = vsync ? 8 : 0;
-	if ( vsync ) {
+	if ( vsync )
+	{
 		cga.frame++;
 	}
 }
 
 
-static void pc_cga_set_palette_luts(void) {
+static void pc_cga_set_palette_luts(void)
+{
 	/* Setup 2bpp palette lookup table */
-	if ( cga.mode_control & 0x10 ) {
+	if ( cga.mode_control & 0x10 )
+	{
 		cga.palette_lut_2bpp[0] = 0;
-	} else {
+	}
+	else
+	{
 		cga.palette_lut_2bpp[0] = cga.color_select & 0x0F;
 	}
-	if ( cga.mode_control & 0x04 ) {
+	if ( cga.mode_control & 0x04 )
+	{
 		cga.palette_lut_2bpp[1] = ( ( cga.color_select & 0x10 ) >> 1 ) | 3;
 		cga.palette_lut_2bpp[2] = ( ( cga.color_select & 0x10 ) >> 1 ) | 4;
 		cga.palette_lut_2bpp[3] = ( ( cga.color_select & 0x10 ) >> 1 ) | 7;
-	} else {
-		if ( cga.color_select & 0x20 ) {
+	}
+	else
+	{
+		if ( cga.color_select & 0x20 )
+		{
 			cga.palette_lut_2bpp[1] = ( ( cga.color_select & 0x10 ) >> 1 ) | 3;
 			cga.palette_lut_2bpp[2] = ( ( cga.color_select & 0x10 ) >> 1 ) | 5;
 			cga.palette_lut_2bpp[3] = ( ( cga.color_select & 0x10 ) >> 1 ) | 7;
-		} else {
+		}
+		else
+		{
 			cga.palette_lut_2bpp[1] = ( ( cga.color_select & 0x10 ) >> 1 ) | 2;
 			cga.palette_lut_2bpp[2] = ( ( cga.color_select & 0x10 ) >> 1 ) | 4;
 			cga.palette_lut_2bpp[3] = ( ( cga.color_select & 0x10 ) >> 1 ) | 6;
@@ -957,27 +1055,37 @@ static void pc_cga_mode_control_w(running_machine *machine, int data)
 	cga.mode_control = data;
 
 	//logerror("mode set to %02X\n", cga.mode_control & 0x3F );
-	switch ( cga.mode_control & 0x3F ) {
+	switch ( cga.mode_control & 0x3F )
+	{
 	case 0x08: case 0x09: case 0x0C: case 0x0D:
 		mc6845_set_hpixels_per_column( devconf, 8 );
-		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
-			if ( cga.mode_control & 0x04 ) {
+		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
+		{
+			if ( cga.mode_control & 0x04 )
+			{
 				/* Composite greyscale */
 				cga.update_row = cga_text_inten_comp_grey_update_row;
-			} else {
+			}
+			else
+			{
 				/* Composite colour */
 				cga.update_row = cga_text_inten_update_row;
 			}
-		} else {
+		}
+		else
+		{
 			/* RGB colour */
 			cga.update_row = cga_text_inten_update_row;
 		}
 		break;
 	case 0x0A: case 0x0B: case 0x2A: case 0x2B:
 		mc6845_set_hpixels_per_column( devconf, 8 );
-		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
+		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
+		{
 			cga.update_row = cga_gfx_4bppl_update_row;
-		} else {
+		}
+		else
+		{
 			cga.update_row = cga_gfx_2bpp_update_row;
 		}
 		break;
@@ -991,9 +1099,12 @@ static void pc_cga_mode_control_w(running_machine *machine, int data)
 		break;
 	case 0x1A: case 0x1B: case 0x3A: case 0x3B:
 		mc6845_set_hpixels_per_column( devconf, 16 );
-		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
+		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
+		{
 			cga.update_row = cga_gfx_4bpph_update_row;
-		} else {
+		}
+		else
+		{
 			cga.update_row = cga_gfx_1bpp_update_row;
 		}
 		break;
@@ -1003,15 +1114,21 @@ static void pc_cga_mode_control_w(running_machine *machine, int data)
 		break;
 	case 0x28: case 0x29: case 0x2C: case 0x2D:
 		mc6845_set_hpixels_per_column( devconf, 8 );
-		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
-			if ( cga.mode_control & 0x04 ) {
+		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
+		{
+			if ( cga.mode_control & 0x04 )
+			{
 				/* Composite greyscale */
 				cga.update_row = cga_text_blink_update_row;
-			} else {
+			}
+			else
+			{
 				/* Composite colour */
 				cga.update_row = cga_text_blink_update_row;
 			}
-		} else {
+		}
+		else
+		{
 			/* RGB colour */
 			cga.update_row = cga_text_blink_update_row;
 		}
@@ -1316,7 +1433,8 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 static const int videoram_offset[4]= { 0x0000, 0x4000, 0x8000, 0xC000 };
 
 
-static const UINT8 mc6845_writeonce_register[31] = {
+static const UINT8 mc6845_writeonce_register[31] =
+{
 	1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
@@ -1330,13 +1448,15 @@ static struct
 } pc1512;
 
 
-static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row ) {
+static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
+{
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT16	offset_base = ra << 13;
 	int i;
 
 	if ( y == 0 ) CGA_LOG(1,"pc1512_gfx_4bpp_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ ) {
+	for ( i = 0; i < x_count; i++ )
+	{
 		UINT16 offset = offset_base | ( ( ma + i ) & 0x1FFF );
 		UINT16 i = ( cga.color_select & 8 ) ? videoram[ videoram_offset[3] | offset ] << 3 : 0;
 		UINT16 r = ( cga.color_select & 4 ) ? videoram[ videoram_offset[2] | offset ] << 2 : 0;
@@ -1359,7 +1479,8 @@ static WRITE8_HANDLER ( pc1512_w )
 {
 	device_config	*devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 
-	switch (offset) {
+	switch (offset)
+	{
 	case 0: case 2: case 4: case 6:
 		data &= 0x1F;
 		mc6845_address_w( devconf, offset, data );
@@ -1367,9 +1488,11 @@ static WRITE8_HANDLER ( pc1512_w )
 		break;
 
 	case 1: case 3: case 5: case 7:
-		if ( ! pc1512.mc6845_locked_register[pc1512.mc6845_address] ) {
+		if ( ! pc1512.mc6845_locked_register[pc1512.mc6845_address] )
+		{
 			mc6845_register_w( devconf, offset, data );
-			if ( mc6845_writeonce_register[pc1512.mc6845_address] ) {
+			if ( mc6845_writeonce_register[pc1512.mc6845_address] )
+			{
 				pc1512.mc6845_locked_register[pc1512.mc6845_address] = 1;
 			}
 		}
@@ -1377,22 +1500,29 @@ static WRITE8_HANDLER ( pc1512_w )
 
 	case 0x8:
 		/* Check if we're changing to graphics mode 2 */
-		if ( ( cga.mode_control & 0x12 ) != 0x12 && ( data & 0x12 ) == 0x12 ) {
+		if ( ( cga.mode_control & 0x12 ) != 0x12 && ( data & 0x12 ) == 0x12 )
+		{
 			pc1512.write = 0x0F;
-		} else {
+		}
+		else
+		{
 			memory_set_bankptr(1, videoram + videoram_offset[0]);
 		}
 		cga.mode_control = data;
-		switch( cga.mode_control & 0x3F ) {
+		switch( cga.mode_control & 0x3F )
+		{
 		case 0x08: case 0x09: case 0x0C: case 0x0D:
 			mc6845_set_hpixels_per_column( devconf, 8 );
 			cga.update_row = cga_text_inten_update_row;
 			break;
 		case 0x0A: case 0x0B: case 0x2A: case 0x2B:
 			mc6845_set_hpixels_per_column( devconf, 8 );
-			if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
+			if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
+			{
 				cga.update_row = cga_gfx_4bppl_update_row;
-			} else {
+			}
+			else
+			{
 				cga.update_row = cga_gfx_2bpp_update_row;
 			}
 			break;
@@ -1432,7 +1562,8 @@ static WRITE8_HANDLER ( pc1512_w )
 
 	case 0xe:
 		pc1512.read = data;
-		if ( ( cga.mode_control & 0x12 ) == 0x12 ) {
+		if ( ( cga.mode_control & 0x12 ) == 0x12 )
+		{
 			memory_set_bankptr(1, videoram + videoram_offset[data & 3]);
 		}
 		break;
@@ -1447,7 +1578,8 @@ static READ8_HANDLER ( pc1512_r )
 {
 	UINT8 data;
 
-	switch (offset) {
+	switch (offset)
+	{
 	case 0xd:
 		data = pc1512.write;
 		break;
@@ -1466,7 +1598,8 @@ static READ8_HANDLER ( pc1512_r )
 
 static WRITE8_HANDLER ( pc1512_videoram_w )
 {
-	if ( ( cga.mode_control & 0x12 ) == 0x12 ) {
+	if ( ( cga.mode_control & 0x12 ) == 0x12 )
+	{
 		if (pc1512.write & 1)
 			videoram[offset+videoram_offset[0]] = data; /* blue plane */
 		if (pc1512.write & 2)
@@ -1475,7 +1608,9 @@ static WRITE8_HANDLER ( pc1512_videoram_w )
 			videoram[offset+videoram_offset[2]] = data; /* red */
 		if (pc1512.write & 8)
 			videoram[offset+videoram_offset[3]] = data; /* intensity (text, 4color) */
-	} else {
+	}
+	else
+	{
 		videoram[offset + videoram_offset[0]] = data;
 	}
 }
@@ -1510,7 +1645,8 @@ static VIDEO_UPDATE( mc6845_pc1512 )
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
-	switch ( CGA_FONT & 0x03 ) {
+	switch ( CGA_FONT & 0x03 )
+	{
 	case 0:
 		cga.chr_gen = memory_region(REGION_GFX1) + 0x0000;
 		break;
