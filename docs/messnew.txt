@@ -12,6 +12,9 @@ System Driver Changes:
 ----------------------
 - [ABC80] Fixed so that it boots and keyboard works. [Robbbert]
 
+- [APPLE2] Changed slot system to be implemented as MAME devices.  [Nate
+  Woods]
+
 - [BK] Added cassete loading [Miodrag Milanovic]
 
 - [BW2] Added MSM6255 LCD controller emulation. [Curt Coder]
@@ -132,6 +135,9 @@ Source Changes:
 - Converted HD63450 DMA controller to the new device system.  [Barry Rodewald]
 
 - New MESS specific OSD call:  osd_get_clipboard_text().  [Nate Woods]
+
+- Changed Apple FDC/IWM implementation to be a MAME device.  This affects the
+  Apple II, Apple III, Apple IIgs, Lisa and Mac drivers.  [Nate Woods]
 
 
 

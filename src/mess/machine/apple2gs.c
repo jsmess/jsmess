@@ -1734,14 +1734,7 @@ MACHINE_RESET( apple2gs )
 
 MACHINE_START( apple2gs )
 {
-	apple2_config cfg;
-
-	memset(&cfg, 0, sizeof(cfg));
-	cfg.slots[0] = &apple2_slot_langcard;
-	cfg.slots[4] = &apple2_slot_mockingboard;
-	cfg.slots[6] = &apple2_slot_iwm;
-
-	apple2_init_common(machine, &cfg);
+	apple2_init_common(machine);
 
 	/* set up Apple IIgs vectoring */
 	cpunum_set_info_fct(0, CPUINFO_PTR_G65816_READVECTOR_CALLBACK, (genf *) apple2gs_read_vector);

@@ -9,6 +9,7 @@
 #ifndef APPLE3_H_
 #define APPLE3_H_
 
+#include "machine/applefdc.h"
 
 #define VAR_VM0			0x0001
 #define VAR_VM1			0x0002
@@ -23,6 +24,7 @@
 /*----------- defined in machine/apple3.c -----------*/
 
 extern UINT32 a3;
+extern const applefdc_interface apple3_fdc_interface;
 
 MACHINE_RESET( apple3 );
 DRIVER_INIT( apple3 );

@@ -1,14 +1,22 @@
-/*
-    experimental LISA driver
+/*********************************************************************
+
+	drivers/lisa.c
+
+	Experimental LISA driver
 
     Raphael Nabet, 2000
-*/
+
+*********************************************************************/
 
 #include "driver.h"
 #include "includes/lisa.h"
 #include "devices/sonydriv.h"
-/*#include "machine/6522via.h"*/
+#include "machine/applefdc.h"
 
+
+/***************************************************************************
+    ADDRESS MAP
+***************************************************************************/
 
 static ADDRESS_MAP_START(lisa_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(lisa_r, lisa_w)			/* no fixed map, we use an MMU */
@@ -31,6 +39,50 @@ static ADDRESS_MAP_START(lisa210_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)		/* handler for wrap-around */
 ADDRESS_MAP_END
 
+
+
+/***************************************************************************
+    DEVICE CONFIG
+***************************************************************************/
+
+static void lisa2_set_iwm_enable_lines(int enable_mask)
+{
+	/* E1 & E2 is connected to the Sony SEL line (?) */
+	/*logerror("new sel line state %d\n", (enable_mask) ? 0 : 1);*/
+	sony_set_sel_line((enable_mask) ? 0 : 1);
+}
+
+static void lisa210_set_iwm_enable_lines(int enable_mask)
+{
+	/* E2 is connected to the Sony enable line (?) */
+	sony_set_enable_lines(enable_mask >> 1);
+}
+
+static const applefdc_interface lisa2_fdc_interface =
+{
+	sony_set_lines,
+	lisa2_set_iwm_enable_lines,
+
+	sony_read_data,
+	sony_write_data,
+	sony_read_status
+};
+
+static const applefdc_interface lisa210_fdc_interface =
+{
+	sony_set_lines,
+	lisa210_set_iwm_enable_lines,
+
+	sony_read_data,
+	sony_write_data,
+	sony_read_status
+};
+
+
+
+/***************************************************************************
+    MACHINE DRIVER
+***************************************************************************/
 
 /* Lisa1 and Lisa 2 machine */
 static MACHINE_DRIVER_START( lisa )
@@ -63,7 +115,12 @@ static MACHINE_DRIVER_START( lisa )
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	/* nvram */
 	MDRV_NVRAM_HANDLER(lisa)
+
+	/* devices */
+	MDRV_DEVICE_ADD("fdc", IWM)
+	MDRV_DEVICE_CONFIG(lisa2_fdc_interface)
 MACHINE_DRIVER_END
 
 
@@ -71,6 +128,10 @@ static MACHINE_DRIVER_START( lisa210 )
 	MDRV_IMPORT_FROM( lisa )
 	MDRV_CPU_MODIFY( "fdc" )
 	MDRV_CPU_PROGRAM_MAP(lisa210_fdc_map, 0)
+
+	/* Lisa 2/10 and MacXL had a slightly different FDC interface */	
+	MDRV_DEVICE_MODIFY("fdc", IWM)
+	MDRV_DEVICE_CONFIG(lisa210_fdc_interface)
 MACHINE_DRIVER_END
 
 

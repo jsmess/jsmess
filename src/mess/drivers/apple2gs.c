@@ -49,6 +49,11 @@
 #include "devices/sonydriv.h"
 #include "devices/appldriv.h"
 #include "sound/es5503.h"
+#include "machine/ap2_slot.h"
+#include "machine/ap2_lang.h"
+#include "machine/applefdc.h"
+#include "machine/mockngbd.h"
+#include "sound/ay8910.h"
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -170,6 +175,11 @@ static MACHINE_DRIVER_START( apple2gs )
 	MDRV_SOUND_CONFIG(es5503_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
+
+	/* replace the old-style FDC with an IWM */
+	MDRV_DEVICE_REMOVE("fdc", APPLEFDC)
+	MDRV_DEVICE_ADD("fdc", IWM)
+	MDRV_DEVICE_CONFIG(apple2_fdc_interface)
 MACHINE_DRIVER_END
 
 

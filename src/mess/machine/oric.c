@@ -495,12 +495,16 @@ CALL &320 to start, or use BOBY rom.
 
 static void oric_install_apple2_interface(running_machine *machine)
 {
+	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+		APPLEFDC,
+		"fdc");
+
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0300, 0x030f, 0, 0, oric_IO_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_r);
+	memory_install_read8_device_handler(fdc, 0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0320, 0x03ff, 0, 0, SMH_BANK4);
 
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0300, 0x030f, 0, 0, oric_IO_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_w);
+	memory_install_write8_device_handler(fdc, 0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_w);
 	memory_set_bankptr(4, 	memory_region(REGION_CPU1) + 0x014000 + 0x020);
 }
 
@@ -585,12 +589,16 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 /* APPLE 2 INTERFACE V2 */
 static void oric_install_apple2_v2_interface(running_machine *machine)
 {
+	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+		APPLEFDC,
+		"fdc");
+
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0300, 0x030f, 0, 0, oric_IO_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_r);
+	memory_install_read8_device_handler(fdc, 0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0320, 0x03ff, 0, 0, SMH_BANK4);
 
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0300, 0x030f, 0, 0, oric_IO_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_w);
+	memory_install_write8_device_handler(fdc, 0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0380, 0x0383, 0, 0, apple2_v2_interface_w);
 
 	apple2_v2_interface_w(machine, 0, 0);

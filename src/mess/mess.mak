@@ -703,6 +703,9 @@ $(MESSOBJ)/apple.a:   \
 	$(MESS_FORMATS)/ap2_dsk.o		\
 	$(MESS_FORMATS)/ap_dsk35.o		\
 	$(MESS_MACHINE)/ay3600.o		\
+	$(MESS_MACHINE)/ap2_slot.o		\
+	$(MESS_MACHINE)/ap2_lang.o		\
+	$(MESS_MACHINE)/mockngbd.o		\
 	$(MESS_MACHINE)/lisa.o			\
 	$(MESS_DRIVERS)/lisa.o			\
 	$(MESS_MACHINE)/applefdc.o		\

@@ -1,0 +1,168 @@
+/*********************************************************************
+
+	ap2_slot.c
+
+	Implementation of Apple II device slots
+
+*********************************************************************/
+
+#include "ap2_slot.h"
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _apple2_slot_token apple2_slot_token;
+struct _apple2_slot_token
+{
+	const device_config *slot_device;
+};
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE void assert_valid(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->type == APPLE2_SLOT);
+}
+
+
+
+INLINE const apple2_slot_config *get_config(const device_config *device)
+{
+	assert_valid(device);
+	return (const apple2_slot_config *) device->inline_config;
+}
+
+
+
+INLINE apple2_slot_token *get_token(const device_config *device)
+{
+	assert_valid(device);
+	return (apple2_slot_token *) device->token;
+}
+
+
+
+/***************************************************************************
+    CORE IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    apple2_slot - looks up a slot
+-------------------------------------------------*/
+
+const device_config *apple2_slot(running_machine *machine, int slotnum)
+{
+	char buffer[7];
+
+	assert((slotnum >= 0) && (slotnum <= 7));
+	snprintf(buffer, ARRAY_LENGTH(buffer), "slot_%d", slotnum);
+	
+	return device_list_find_by_tag(
+		machine->config->devicelist,
+		APPLE2_SLOT,
+		buffer);
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_START(apple2_slot) - device start
+	function
+-------------------------------------------------*/
+
+static DEVICE_START(apple2_slot)
+{
+	const apple2_slot_config *config = get_config(device);
+	apple2_slot_token *token = get_token(device);
+
+	if (config->tag != NULL)
+	{
+		/* locate the device */
+		token->slot_device = device_list_find_by_tag(
+			device->machine->config->devicelist,
+			DEVICE_TYPE_WILDCARD,
+			config->tag);
+
+		assert(token->slot_device != NULL);
+	}
+	else
+	{
+		token->slot_device = NULL;
+	}
+}
+
+
+
+/*-------------------------------------------------
+    apple2_slot_r - slot read function
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER(apple2_slot_r)
+{
+	UINT8 result = 0x00;
+	const apple2_slot_config *config = get_config(device);
+	apple2_slot_token *token = get_token(device);
+
+	/* do we actually have a device, and can we read? */
+	if ((token->slot_device != NULL) && (config->rh != NULL))
+	{
+		result = (*config->rh)(token->slot_device, offset);
+	}
+
+	return result;
+}
+
+
+
+/*-------------------------------------------------
+    apple2_slot_w - slot write function
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(apple2_slot_w)
+{
+	const apple2_slot_config *config = get_config(device);
+	apple2_slot_token *token = get_token(device);
+
+	/* do we actually have a device, and can we read? */
+	if ((token->slot_device != NULL) && (config->wh != NULL))
+	{
+		(*config->wh)(token->slot_device, offset, data);
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO(apple2_slot) - device get info
+	function
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(apple2_slot)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(apple2_slot_token);		break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(apple2_slot_config);		break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						/* Nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(apple2_slot);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Apple II Slot";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "Apple II Slot";					break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+	}
+}

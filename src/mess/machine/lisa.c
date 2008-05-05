@@ -1118,19 +1118,6 @@ DRIVER_INIT( mac_xl )
 	bad_parity_table = auto_malloc(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
-static void lisa2_set_iwm_enable_lines(int enable_mask)
-{
-	/* E1 & E2 is connected to the Sony SEL line (?) */
-	/*logerror("new sel line state %d\n", (enable_mask) ? 0 : 1);*/
-	sony_set_sel_line((enable_mask) ? 0 : 1);
-}
-
-static void lisa210_set_iwm_enable_lines(int enable_mask)
-{
-	/* E2 is connected to the Sony enable line (?) */
-	sony_set_enable_lines(enable_mask >> 1);
-}
-
 MACHINE_RESET( lisa )
 {
 	mouse_timer = timer_alloc(handle_mouse, NULL);
@@ -1182,28 +1169,6 @@ MACHINE_RESET( lisa )
 
 	/* initialize floppy */
 	{
-		static applefdc_interface intf =
-		{
-			APPLEFDC_IWM,
-			sony_set_lines,
-			sony_set_enable_lines,
-
-			sony_read_data,
-			sony_write_data,
-			sony_read_status
-		};
-
-		if (lisa_features.floppy_hardware == sony_lisa2)
-		{
-			intf.set_enable_lines = lisa2_set_iwm_enable_lines;
-		}
-		if (lisa_features.floppy_hardware == sony_lisa210)
-		{
-			intf.set_enable_lines = lisa210_set_iwm_enable_lines;
-		}
-
-		applefdc_init(& intf);
-
 		if (lisa_features.floppy_hardware == sony_lisa2)
 			sony_set_enable_lines(1);	/* on lisa2, drive unit 1 is always selected (?) */
 	}
@@ -1335,8 +1300,12 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 			MT1 = offset & 1;
 			if (MT1 && ! oldMT1)
 			{
+				const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+					IWM,
+					"fdc");
+
 				PWM_floppy_motor_speed = (PWM_floppy_motor_speed << 1) & 0xff;
-				if (applefdc_get_lines() & APPLEFDC_PH0)
+				if (applefdc_get_lines(fdc) & APPLEFDC_PH0)
 					PWM_floppy_motor_speed |= 1;
 				sony_set_speed(((256-PWM_floppy_motor_speed) * 1.3) + 237);
 			}
@@ -1367,11 +1336,14 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 READ8_HANDLER ( lisa_fdc_io_r )
 {
 	int answer=0;
+	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+		IWM,
+		"fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0:	/* IWM */
-		answer = /*iwm_lisa_r*/applefdc_r(machine, offset);
+		answer = applefdc_r(fdc, offset);
 		break;
 
 	case 1:	/* TTL glue */
@@ -1393,10 +1365,14 @@ READ8_HANDLER ( lisa_fdc_io_r )
 
 WRITE8_HANDLER ( lisa_fdc_io_w )
 {
+	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+		IWM,
+		"fdc");
+
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0:	/* IWM */
-		/*iwm_lisa_w*/applefdc_w(machine, offset, data);
+		applefdc_w(fdc, offset, data);
 		break;
 
 	case 1:	/* TTL glue */

@@ -1,7 +1,8 @@
 /****************************************************************************
-	Mac hardware
 
-	The hardware for Mac 128k, 512k, 512ke, Plus (SCSI, SCC, etc).
+	machine/mac.c
+
+	Mac hardware - Mac 128k, 512k, 512ke, Plus (SCSI, SCC, etc)
 
 	Nate Woods
 	Ernesto Corvi
@@ -1113,22 +1114,29 @@ READ16_HANDLER ( mac_iwm_r )
 	 * this driver along
 	 */
 
-	int result = 0;
+	UINT16 result = 0;
+	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+		IWM,
+		"fdc");
 
 	if (LOG_MAC_IWM)
 		logerror("mac_iwm_r: offset=0x%08x\n", offset);
 
-	result = applefdc_r(machine, offset >> 8);
+	result = applefdc_r(fdc, offset >> 8);
 	return (result << 8) | result;
 }
 
 WRITE16_HANDLER ( mac_iwm_w )
 {
+	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+		IWM,
+		"fdc");
+
 	if (LOG_MAC_IWM)
 		logerror("mac_iwm_w: offset=0x%08x data=0x%04x\n", offset, data);
 
 	if (ACCESSING_BITS_0_7)
-		applefdc_w(machine, offset >> 8, data & 0xff);
+		applefdc_w(fdc, offset >> 8, data & 0xff);
 }
 
 /* *************************************************************************
@@ -1296,22 +1304,6 @@ MACHINE_RESET(mac)
 
 	/* initialize serial */
 	scc_init(&mac_scc8530_interface);
-
-	/* initialize floppy */
-	{
-		static const applefdc_interface intf =
-		{
-			APPLEFDC_IWM,
-			sony_set_lines,
-			sony_set_enable_lines,
-
-			sony_read_data,
-			sony_write_data,
-			sony_read_status
-		};
-
-		applefdc_init(&intf);
-	}
 
 	/* setup the memory overlay */
 	set_memory_overlay(1);

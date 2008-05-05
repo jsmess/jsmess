@@ -1,47 +1,54 @@
-/*
- *  Mac Plus & 512ke emulation
- *
- *  Nate Woods, Raphael Nabet
- *
- *
- *      0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
- *      0x400000 - 0x4fffff     ROM
- *      0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
- *      0x600000 - 0x6fffff     RAM
- *      0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Control Chip) Read
- *      0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Write
- *      0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
- *      0xe80000 - 0xefffff     Rockwell 6522 VIA
- *      0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
- *      0xfffff0 - 0xffffff     Auto Vector
- *
- *
- *  Interrupts:
- *      M68K:
- *          Level 1 from VIA
- *          Level 2 from SCC
- *          Level 4 : Interrupt switch (not implemented)
- *
- *      VIA:
- *          CA1 from VBLANK
- *          CA2 from 1 Hz clock (RTC)
- *          CB1 from Keyboard Clock
- *          CB2 from Keyboard Data
- *          SR  from Keyboard Data Ready
- *
- *      SCC:
- *          PB_EXT  from mouse Y circuitry
- *          PA_EXT  from mouse X circuitry
- *
- */
+/****************************************************************************
+
+	drivers/mac.c
+	Mac Plus & 512ke emulation
+ 
+	Nate Woods, Raphael Nabet
+ 
+ 
+	    0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
+	    0x400000 - 0x4fffff     ROM
+ 	    0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
+ 	    0x600000 - 0x6fffff     RAM
+	    0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Control Chip) Read
+	    0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Write
+	    0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
+	    0xe80000 - 0xefffff     Rockwell 6522 VIA
+	    0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
+	    0xfffff0 - 0xffffff     Auto Vector
+	
+	
+	Interrupts:
+	    M68K:
+	        Level 1 from VIA
+	        Level 2 from SCC
+	        Level 4 : Interrupt switch (not implemented)
+ 
+	    VIA:
+	        CA1 from VBLANK
+	        CA2 from 1 Hz clock (RTC)
+	        CB1 from Keyboard Clock
+	        CB2 from Keyboard Data
+	        SR  from Keyboard Data Ready
+	
+	    SCC:
+	        PB_EXT  from mouse Y circuitry
+	        PA_EXT  from mouse X circuitry
+ 
+****************************************************************************/
 
 #include "driver.h"
 #include "includes/mac.h"
 #include "machine/6522via.h"
 #include "machine/ncr5380.h"
+#include "machine/applefdc.h"
 #include "devices/sonydriv.h"
 #include "devices/harddriv.h"
 
+
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
 
 static ADDRESS_MAP_START(mac512ke_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x800000, 0x9fffff) AM_READ(mac_scc_r)
@@ -62,10 +69,32 @@ ADDRESS_MAP_END
 
 
 
+/***************************************************************************
+    DEVICE CONFIG
+***************************************************************************/
+
 static const struct CustomSound_interface custom_interface =
 {
 	mac_sh_start
 };
+
+
+
+static const applefdc_interface mac_iwm_interface =
+{
+	sony_set_lines,
+	sony_set_enable_lines,
+
+	sony_read_data,
+	sony_write_data,
+	sony_read_status
+};
+
+
+
+/***************************************************************************
+    MACHINE DRIVERS
+***************************************************************************/
 
 static MACHINE_DRIVER_START( mac512ke )
 	/* basic machine hardware */
@@ -95,7 +124,12 @@ static MACHINE_DRIVER_START( mac512ke )
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	/* nvram */
 	MDRV_NVRAM_HANDLER(mac)
+
+	/* devices */
+	MDRV_DEVICE_ADD("fdc", IWM)
+	MDRV_DEVICE_CONFIG(mac_iwm_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( macplus )

@@ -119,7 +119,11 @@ static void apple3_profile_w(offs_t offset, UINT8 data)
 
 static READ8_HANDLER( apple3_c0xx_r )
 {
+	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+		APPLEFDC,
+		"fdc");
 	UINT8 result = 0xFF;
+
 	switch(offset)
 	{
 		case 0x00: case 0x01: case 0x02: case 0x03:
@@ -184,7 +188,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			result = applefdc_r(machine, offset);
+			result = applefdc_r(fdc, offset);
 			break;
 
 		case 0xF0:
@@ -201,6 +205,9 @@ static READ8_HANDLER( apple3_c0xx_r )
 
 static WRITE8_HANDLER( apple3_c0xx_w )
 {
+	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+		IWM,
+		"fdc");
 	switch(offset)
 	{
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -245,7 +252,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			applefdc_w(machine, offset, data);
+			applefdc_w(fdc, offset, data);
 			break;
 
 		case 0xF0:
@@ -688,9 +695,8 @@ static void apple3_set_enable_lines(int enable_mask)
 
 
 
-static const applefdc_interface apple3_fdc_interface =
+const applefdc_interface apple3_fdc_interface =
 {
-	APPLEFDC_APPLE2,
 	apple525_set_lines,
 	apple3_set_enable_lines,
 	apple525_read_data,
@@ -705,7 +711,6 @@ DRIVER_INIT( apple3 )
 	memory_region(REGION_CPU1)[0x0685] = 0x00;
 
 	apple3_enable_mask = 0;
-	applefdc_init(&apple3_fdc_interface);
 	apple3_update_drives();
 
 	acia_6551_init();

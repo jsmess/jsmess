@@ -9,6 +9,8 @@
 #ifndef APPLE2_H_
 #define APPLE2_H_
 
+#include "machine/applefdc.h"
+
 
 /* -----------------------------------------------------------------------
  * Softswitch values
@@ -37,41 +39,16 @@
 
 #define VAR_DHIRES		VAR_AN3
 
-/* ----------------------------------------------------------------------- */
-
-#define APPLE2_SLOT_COUNT	8
-
-typedef struct _apple2_slotdevice apple2_slotdevice;
-struct _apple2_slotdevice
-{
-	const char *name;
-	const char *description;
-	void *(*init)(running_machine *machine, int slot);
-	void (*reset)(running_machine *machine, void *token);
-	UINT8 (*read)(running_machine *machine, void *token, offs_t offset);
-	void (*write)(running_machine *machine, void *token, offs_t offset, UINT8 data);
-};
-
-typedef struct _apple2_config apple2_config;
-struct _apple2_config
-{
-	const apple2_slotdevice *slots[APPLE2_SLOT_COUNT];
-};
-
-
 /*----------- defined in machine/apple2.c -----------*/
 
 extern UINT32 a2;
 
-extern const apple2_slotdevice apple2_slot_langcard;
-extern const apple2_slotdevice apple2_slot_mockingboard;
-extern const apple2_slotdevice apple2_slot_floppy525;
-extern const apple2_slotdevice apple2_slot_iwm;
+extern const applefdc_interface apple2_fdc_interface;
 
 void apple2_iwm_setdiskreg(UINT8 data);
 UINT8 apple2_iwm_getdiskreg(void);
 
-void apple2_init_common(running_machine *machine, const apple2_config *config);
+void apple2_init_common(running_machine *machine);
 MACHINE_START( apple2 );
 UINT8 apple2_getfloatingbusvalue(void);
 READ8_HANDLER( apple2_c0xx_r );
