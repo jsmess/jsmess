@@ -84,6 +84,7 @@ TODO: Which clock signals are available in a PC Jr?
 #include "devices/mflopimg.h"
 #include "devices/harddriv.h"
 #include "devices/cassette.h"
+#include "devices/cartslot.h"
 #include "formats/pc_dsk.h"
 
 #include "machine/8237dma.h"
@@ -289,6 +290,19 @@ static ADDRESS_MAP_START(tandy1000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
+
+
+static ADDRESS_MAP_START(ibmpcjr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK(10)
+	AM_RANGE(0xa0000, 0xaffff) AM_RAM
+	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
+	AM_RANGE(0xb8000, 0xbffff) AM_READWRITE(pc_t1t_videoram_r, pc_video_videoram_w)
+	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
+	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
+	AM_RANGE(0xca000, 0xcffff) AM_NOP
+	AM_RANGE(0xd0000, 0xeffff) AM_ROM
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(ibmpcjr_io, ADDRESS_SPACE_IO, 8)
@@ -1731,7 +1745,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ibmpcjr )
 	/* basic machine hardware */
-	MDRV_CPU_PC(tandy1000, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
+	MDRV_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
 
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pcjr)
@@ -2204,11 +2218,36 @@ static void ibmpc_harddisk_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
+static void pcjr_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch( state )
+	{
+	/* --- the following bits of info are returned as 64-bit signed integers --- */
+	case MESS_DEVINFO_INT_COUNT:						info->i = 2; break;
+	case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
+
+	/* --- the following bits of info are returned as pointers to data or functions --- */
+	case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME( pcjr_cartridge ); break;
+
+	/* --- the following bits of info are returned as NULL-terminated strings --- */
+	case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy( info->s = device_temp_str(), "jrc" ); break;
+
+	default:											cartslot_device_getinfo( devclass, state, info ); break;
+	}
+}
+
 SYSTEM_CONFIG_START(ibmpc)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
 	CONFIG_DEVICE(ibmpc_cassette_getinfo)
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
 	CONFIG_DEVICE(ibmpc_harddisk_getinfo)
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START(pcjr)
+	CONFIG_RAM_DEFAULT( 640 * 1024 )
+	CONFIG_DEVICE(ibmpc_cassette_getinfo)
+	CONFIG_DEVICE(ibmpc_floppy_getinfo)
+	CONFIG_DEVICE(pcjr_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************
@@ -2225,7 +2264,7 @@ COMP(  1985,	bondwell,	ibm5150,	0,		pccga,		bondwell,   bondwell,	ibmpc,   "Bond
 COMP(  1988,	europc,		ibm5150,	0,		europc,     europc,		europc,     ibmpc,   "Schneider Rdf. AG",  "EURO PC", 0)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,	ibm5150,	0,		ibmpcjr,    tandy1t,	pcjr,       ibmpc,   "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
+COMP(  1983,	ibmpcjr,	ibm5150,	0,		ibmpcjr,    tandy1t,	pcjr,       pcjr,    "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
 COMP(  1987,	t1000hx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000HX", 0)
 COMP(  1987,	t1000sx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
 

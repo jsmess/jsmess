@@ -45,6 +45,8 @@ MACHINE_START( pc );
 MACHINE_RESET( pc );
 MACHINE_RESET( pcjr );
 
+DEVICE_IMAGE_LOAD( pcjr_cartridge );
+
 INTERRUPT_GEN( pc_frame_interrupt );
 INTERRUPT_GEN( pc_vga_frame_interrupt );
 INTERRUPT_GEN( pcjr_frame_interrupt );
