@@ -491,44 +491,20 @@ MACHINE_DRIVER_END
 
 ROM_START(spectrum)
 	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("spectrum.rom", 0x0000, 0x4000, CRC(ddee531f) SHA1(5ea7c2b824672e914525d1d5c419d71b84a426a2))
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-ROM_START(specbusy)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("48-busy.rom", 0x0000, 0x4000, CRC(1511cddb) SHA1(ab3c36daad4325c1d3b907b6dc9a14af483d14ec))
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-ROM_START(specpsch)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("48-psych.rom", 0x0000, 0x4000, CRC(cd60b589) SHA1(0853e25857d51dd41b20a6dbc8e80f028c5befaa))
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-ROM_START(specgrot)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("48-groot.rom", 0x0000, 0x4000, CRC(abf18c45) SHA1(51165cde68e218512d3145467074bc7e786bf307))
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-ROM_START(specimc)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("48-imc.rom", 0x0000, 0x4000, CRC(d1be99ee) SHA1(dee814271c4d51de257d88128acdb324fb1d1d0d))
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-ROM_START(speclec)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("80-lec.rom", 0x0000, 0x4000, CRC(5b5c92b1) SHA1(bb7a77d66e95d2e28ebb610e543c065e0d428619))
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-
-ROM_START(specpls4)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("plus4.rom",0x0000,0x4000, CRC(7e0f47cb) SHA1(c103e89ef58e6ade0c01cea0247b332623bd9a30))
+	ROM_SYSTEM_BIOS(0, "spectrum", "ZX Spectrum")
+	ROMX_LOAD("spectrum.rom", 0x0000, 0x4000, CRC(ddee531f) SHA1(5ea7c2b824672e914525d1d5c419d71b84a426a2), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "specbusy", "BusySoft Upgrade v1.18")
+	ROMX_LOAD("48-busy.rom", 0x0000, 0x4000, CRC(1511cddb) SHA1(ab3c36daad4325c1d3b907b6dc9a14af483d14ec), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "specpsch", "Maly's Psycho Upgrade")
+	ROMX_LOAD("48-psych.rom", 0x0000, 0x4000, CRC(cd60b589) SHA1(0853e25857d51dd41b20a6dbc8e80f028c5befaa), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "specgrot", "De Groot's Upgrade")
+	ROMX_LOAD("48-groot.rom", 0x0000, 0x4000, CRC(abf18c45) SHA1(51165cde68e218512d3145467074bc7e786bf307), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "specimc", "Collier's Upgrade")
+	ROMX_LOAD("48-imc.rom", 0x0000, 0x4000, CRC(d1be99ee) SHA1(dee814271c4d51de257d88128acdb324fb1d1d0d), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(5, "speclec", "LEC Upgrade")
+	ROMX_LOAD("80-lec.rom", 0x0000, 0x4000, CRC(5b5c92b1) SHA1(bb7a77d66e95d2e28ebb610e543c065e0d428619), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(6, "specpls4", "ZX Spectrum +4")
+	ROMX_LOAD("plus4.rom",0x0000,0x4000, CRC(7e0f47cb) SHA1(c103e89ef58e6ade0c01cea0247b332623bd9a30), ROM_BIOS(7))
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
@@ -548,37 +524,6 @@ ROM_START(inves)
 	ROM_REGION(0x10000,REGION_CPU1,0)
 	ROM_LOAD("inves.rom",0x0000,0x4000, CRC(8ff7a4d1) SHA1(d020440638aff4d39467128413ef795677be9c23))
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-/* Romanian clones - added by Miodrag Milanovic */
-ROM_START(jet)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("jet.rom", 0x0000, 0x4000, CRC(E56A7D11) )
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
-ROM_END
-
-ROM_START(cip03)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("cip03.rom", 0x0000, 0x4000, CRC(C7D0CD3C) )
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
-ROM_END
-
-ROM_START(hc85)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("hc85.rom", 0x0000, 0x4000, CRC(3AB60FB5) )
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
-ROM_END
-
-ROM_START(hc90)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("hc90.rom", 0x0000, 0x4000, CRC(78C14D9A) )
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
-ROM_END
-
-ROM_START(hc91)
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("hc91.rom", 0x0000, 0x4000, CRC(8BF53761) )
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
 ROM_END
 
 static void spectrum_common_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -605,19 +550,6 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
 COMP( 1982, spectrum, 0,        0,		spectrum,		spectrum,	0,		spectrum,	"Sinclair Research",	"ZX Spectrum" , 0)
-COMP( 2000, specpls4, spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Sinclair Research",	"ZX Spectrum +4", GAME_COMPUTER_MODIFIED )
-COMP( 1994, specbusy, spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Sinclair Research",	"ZX Spectrum (BusySoft Upgrade v1.18)", GAME_COMPUTER_MODIFIED )
-COMP( ????, specpsch, spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Sinclair Research",	"ZX Spectrum (Maly's Psycho Upgrade)", GAME_COMPUTER_MODIFIED )
-COMP( ????, specgrot, spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Sinclair Research",	"ZX Spectrum (De Groot's Upgrade)", GAME_COMPUTER_MODIFIED )
-COMP( 1985, specimc,  spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Sinclair Research",	"ZX Spectrum (Collier's Upgrade)", GAME_COMPUTER_MODIFIED )
-COMP( 1987, speclec,  spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Sinclair Research",	"ZX Spectrum (LEC Upgrade)", GAME_COMPUTER_MODIFIED )
 COMP( 1986, inves,    spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Investronica",	"Inves Spectrum 48K+" , 0)
 COMP( 1985, tk90x,    spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Micro Digital",	"TK-90x Color Computer" , 0)
 COMP( 1986, tk95,     spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Micro Digital",	"TK-95 Color Computer" , 0)
-
-
-COMP( 1990, jet,   	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Electromagnetica",	"JET" , 0)
-COMP( 1982, cip03, 	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Electronica",	"CIP-03" , 0)
-COMP( 1985, hc85, 	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Ice Felix",	"HC85" , 0)
-COMP( 1990, hc90, 	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Ice Felix",	"HC90" , 0)
-COMP( 1991, hc91, 	spectrum,  0,		spectrum,		spectrum,	0,		spectrum,	"Ice Felix",	"HC91" , 0)

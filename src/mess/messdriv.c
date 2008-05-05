@@ -421,12 +421,6 @@ TESTDRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
 	DRIVER( tree4th )	/* Sinclair ZX-81 Tree-Forth by Tree Systems		*/
 
 	DRIVER( spectrum )	/* 1982 ZX Spectrum									*/
-	DRIVER( specpls4 )	/* 2000 ZX Spectrum +4								*/
-	DRIVER( specbusy )	/* 1994 ZX Spectrum (BusySoft Upgrade v1.18)		*/
-	DRIVER( specpsch )	/* 19?? ZX Spectrum (Maly's Psycho Upgrade)			*/
-	DRIVER( specgrot )	/* ???? ZX Spectrum (De Groot's Upgrade)			*/
-	DRIVER( specimc )	/* 1985 ZX Spectrum (Collier's Upgrade)				*/
-	DRIVER( speclec )	/* 1987 ZX Spectrum (LEC Upgrade)					*/
 	DRIVER( inves )		/* 1986 Inves Spectrum 48K+							*/
 	DRIVER( tk90x )		/* 1985 TK90x Color Computer						*/
 	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/

@@ -330,7 +330,6 @@ ROM_START(specpl2a)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-
 ROM_START(specp2fr)
 	ROM_REGION(0x18000,REGION_CPU1,0)
 	ROM_LOAD("plus2fr0.rom",0x10000,0x4000, CRC(c684c535) SHA1(56684c4c85a616e726a50707483b9a42d8e724ed))
@@ -345,17 +344,10 @@ ROM_START(specp2sp)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-ROM_START(hc128)
-	ROM_REGION(0x18000,REGION_CPU1,0)
-	ROM_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5))
-	ROM_LOAD("hc128.rom",  0x14000, 0x4000, CRC(0241E960) )
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)	
-ROM_END
 SYSTEM_CONFIG_START(spec128)
 	CONFIG_IMPORT_FROM(spectrum)
 	CONFIG_RAM_DEFAULT(128 * 1024)
 SYSTEM_CONFIG_END
-
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
 COMP( 1986, spec128,  0,		0,		spectrum_128,	spectrum,	0,		spec128,	"Sinclair Research",    "ZX Spectrum 128" , 0 )
@@ -363,4 +355,3 @@ COMP( 1985, spec128s, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Sincla
 COMP( 1986, specpls2, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2" , 0 )
 COMP( 1986, specp2fr, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2 (France)" , 0 )
 COMP( 1986, specp2sp, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2 (Spain)" , 0 )
-COMP( 1992, hc128,	  spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Ice Felix",			"HC128" , 0)
