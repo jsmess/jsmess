@@ -247,6 +247,6 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
 COMP( 1985, bk0010, 	 0,  	 0,	bk0010, 	bk0010, 	bk0010, bk,  "Elektronika",			 "BK-0010",	 0)
 COMP( 1986, bk001001, 	bk0010,  0,	bk0010, 	bk0010, 	bk0010, bk,  "Elektronika",			 "BK-0010.01",	 0)
-COMP( 1986, bk0010fd, 	bk0010,  0,	bk0010fd, 	bk0010, 	bk0010, bk,  "Elektronika",			 "BK-0010 FDD",	 0)
+COMP( 1986, bk0010fd, 	bk0010,  0,	bk0010fd, 	bk0010, 	bk0010, bk,  "Elektronika",			 "BK-0010 FDD",	 GAME_NOT_WORKING)
 
 

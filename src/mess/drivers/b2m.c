@@ -253,6 +253,6 @@ SYSTEM_CONFIG_END
 /* Driver */
  
 /*    YEAR  NAME   	PARENT  COMPAT  MACHINE 	INPUT   	INIT  	 CONFIG COMPANY 				 FULLNAME   FLAGS */
-COMP( 1989, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M",	 0)
-COMP( 1989, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M ROM-disk",	 0)
+COMP( 1989, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M",	 GAME_NOT_WORKING)
+COMP( 1989, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M ROM-disk",	 GAME_NOT_WORKING)
 

@@ -402,4 +402,4 @@ SYSTEM_CONFIG_START(scorpion)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( ????, scorpion, 0,		 0,		scorpion,		spectrum,	0,		scorpion,	"Zonov and Co.",		"Zs Scorpion 256", 0 )
+COMP( ????, scorpion, spec128,	 0,		scorpion,	spectrum,	0,		scorpion,	"Zonov and Co.",		"Zs Scorpion 256", GAME_NOT_WORKING )

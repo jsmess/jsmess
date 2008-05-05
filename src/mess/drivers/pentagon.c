@@ -182,4 +182,4 @@ SYSTEM_CONFIG_START(pentagon)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( ????, pentagon, 0, 		0,		pentagon,	spectrum,	0,		pentagon,	"???",		"Pentagon", 0)
+COMP( ????, pentagon, spec128,	0,		pentagon,	spectrum,	0,		pentagon,	"???",		"Pentagon", GAME_NOT_WORKING)
