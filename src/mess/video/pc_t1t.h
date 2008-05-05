@@ -10,5 +10,6 @@ MACHINE_DRIVER_EXTERN( pcvideo_pcjr );
  READ8_HANDLER ( pc_t1t_videoram_r );
 WRITE8_HANDLER ( pc_T1T_w );
  READ8_HANDLER (	pc_T1T_r );
+WRITE8_HANDLER( pc_pcjr_w );
 
 #endif /* PC_T1T_H */
