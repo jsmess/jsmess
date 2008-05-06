@@ -75,6 +75,8 @@ System Driver Changes:
 - [THOMSON] Fixed crashes with non-default ram sizes.  (bug #1443) [Antoine
   Mine]
 
+- [TI99] Natural keyboard fix.  [Fabio Priuli]
+
 - [TUTOR] Changed joystick to use keypad instead of arrow keys by default.
   [Fabio Priuli]
 
