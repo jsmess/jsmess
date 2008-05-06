@@ -4,6 +4,23 @@
 
 	Implementation of the Apple II Mockingboard
 
+	The Mockingboard comes in different flavours:
+
+	* Sound I:	   one AY-3-8910 chip for three audio channels
+	* Speech I:	   one SC-01 chip
+	* Sound II:	   two AY-3-8910 chips for six audio channels
+	* Sound/Speech I:  one AY-3-8910 and one SC-01
+
+	* Mockingboard A:  two AY-3-8913 chips for six audio channels and two open sockets for SSI-263 speech chips
+	* Mockingboard B:  not a soundcard per se, but just two SSI-263 speech chip upgrade for Mockingboard A
+	* Mockingboard C:  two AY-3-8913 and one SSI-263 (essentially a Mockingboard A with the upgrade pre-installed, only one speech chip allowed)
+	* Mockingboard D:  for Apple IIc only, two AY-3-8913 and one SSI-263, connected to the serial port and its own particular driver
+	* Mockingboard M:  bundled with Mindscape's Bank Street Music Writer, with two AY-3-8913 chips and an open socket
+	                   for one speech chip. This model included a headphone jack and a jumper to permit sound to be played
+	                   through the Apple's built-in speaker.
+	* Mockingboard v1: a clone of the Mockingboard A from ReactiveMicro.com
+ 
+
 	TODO - When sound cores and the 6522 VIA become devices, and devices
 	can contain other devices, start containing AY8910 and 6522VIA
 	implementations
