@@ -1,4 +1,4 @@
-﻿0.125
+0.125
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -96,7 +96,7 @@ User Interface Changes:
 
 - Shift+ScrollLock now triggers a paste command.  [Nate Woods]
 
-- File manager fix.  (bug #1600) [Nate Woods]
+- Fixed file manager navigation keys.  (bug #1600) [Nate Woods]
 
 - [Windows] Made -nonewui default.  Depending on the reaction this spawns,
   the newui may be removed in the future.  [Nate Woods]

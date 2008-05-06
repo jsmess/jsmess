@@ -537,7 +537,7 @@ static int fileselect(int selected, const char *default_selection, const char *w
 		}
 
 		/* up backs up by one item */
-		if (input_ui_pressed_repeat(IPT_UI_DOWN, 6))
+		if (input_ui_pressed_repeat(IPT_UI_UP, 6))
 		{
 			sel--;
 			sel = MAX(0,sel);
