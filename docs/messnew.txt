@@ -15,19 +15,16 @@ System Driver Changes:
 - [APPLE2] Changed slot system to be implemented as MAME devices.  [Nate
   Woods]
 
-- [BK] Added cassete loading [Miodrag Milanovic]
+- [BK] Added cassette loading [Miodrag Milanovic]
 
 - [BW2] Added MSM6255 LCD controller emulation. [Curt Coder]
-
-- [BW2] Fixed FDC motor status and a new palette.  [Tomas Karlsson]
-
-- [BW2] Changed RAMCARD to not be installed by default.  [Tomas Karlsson]
 
 - [CBM, C16] Simplified keyboard and interrupt handling code.  [Fabio Priuli]
 
 - [C64] Bug fix, and fixed some timings.  [roberto zandonà]
 
-- [C64] Fixed joystick 2.  (bug #1150) [roberto zandonà]
+- [C64] Partial input fix, joystick 2 still not working.  (bug #1150) [roberto
+  zandonà]
 
 - [COCO/COCO3] Transitioned Bitbanger and VHD support to use MAME's core
   device system.  [Nate Woods]
@@ -59,6 +56,8 @@ System Driver Changes:
 - [ORION] Added cassete loading [Miodrag Milanovic]
 
 - [PC] Fixed error reporting when loading non-existant images.  [Nate Woods]
+
+- [PC] Fixed cursor blinking.  (bug #1096) [Wilbert Pol]
 
 - [QL] Converted ZX8301/2 into devices, and fixed system halting. [Curt Coder]
 
