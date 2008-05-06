@@ -137,7 +137,6 @@ static int screenshot_num;
 static int format_index;
 static UINT64 runtime_hash;
 static void *wavptr;
-static int seen_first_update;
 static render_target *target;
 
 /* command list */
@@ -293,7 +292,6 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	screenshot_num = 0;
 	runtime_hash = 0;
 	had_failure = FALSE;
-	seen_first_update = FALSE;
 	videoram = NULL;
 	videoram_size = 0;
 
@@ -988,11 +986,13 @@ void osd_update(running_machine *machine, int skip_redraw)
 
 	render_target_get_primitives(target);
 
-	/* is this the first update?  if so, eat it */
-	if (!seen_first_update)
+	/* don't do anything if we are initializing! */
+	switch(mame_get_phase(machine))
 	{
-		seen_first_update = TRUE;
-		return;
+		case MAME_PHASE_PREINIT:
+		case MAME_PHASE_INIT:
+		case MAME_PHASE_RESET:
+			return;
 	}
 
 	/* if we have already aborted or completed, our work is done */
