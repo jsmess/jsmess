@@ -58,7 +58,7 @@ static void bw2_set_banks(running_machine *machine, UINT8 data)
 	Y4  /RAM4  	Memory bank 4
 	Y5  /RAM5  	Memory bank 5
 	Y6  /RAM6  	Memory bank 6
-	Y7	/ROM	ROM
+	Y7  /ROM 	ROM
 	*/
 
 	int bank = data & 0x07;
@@ -107,7 +107,7 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 	Y4  /RAM4  	Memory bank 4
 	Y5  /RAM5  	RAMCARD RAM
 	Y6  /RAM6  	Memory bank 6
-	Y7	/ROM	ROM
+	Y7  /ROM 	ROM
 	*/
 
 	int bank = data & 0x07;
@@ -681,7 +681,7 @@ static INPUT_PORTS_START( bw2 )
 	PORT_CONFSETTING( 0x05, "300 baud" )
 
 	PORT_START_TAG("RAMCARD")
-	PORT_CONFNAME( 0x01, 0x01, "RAMCARD Installed")
+	PORT_CONFNAME( 0x01, 0x00, "RAMCARD Installed")
 	PORT_CONFSETTING( 0x01, DEF_STR( Yes ) )
 	PORT_CONFSETTING( 0x00, DEF_STR( No ) )
 INPUT_PORTS_END

@@ -21,6 +21,8 @@ System Driver Changes:
 
 - [BW2] Fixed FDC motor status and a new palette.  [Tomas Karlsson]
 
+- [BW2] Changed RAMCARD to not be installed by default.  [Tomas Karlsson]
+
 - [CBM, C16] Simplified keyboard and interrupt handling code.  [Fabio Priuli]
 
 - [C64] Bug fix, and fixed some timings.  [roberto zandonà]
