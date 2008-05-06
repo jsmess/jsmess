@@ -178,7 +178,7 @@ struct _wd17xx_info
 	emu_timer	*timer, *timer_rs, *timer_ws, *timer_rid;
 	int		data_direction;
 
-	UINT8   ipl;					/* index pulse */
+	UINT8   ipl;					/* index pulse */	
 };
 
 
@@ -257,6 +257,8 @@ static UINT8 current_drive;
 /* this is the head currently selected */
 static UINT8 hd = 0;
 
+/* pause time when writeing/reading sector */
+static int wd17xx_pause_time;
 /**************************************************************************/
 
 static const device_config *wd17xx_current_image(void)
@@ -402,7 +404,7 @@ void wd17xx_init(running_machine *machine, wd17xx_type_t type, void (*callback)(
 	wd.timer = timer_alloc(wd17xx_misc_timer_callback, NULL);
 	wd.timer_rs = timer_alloc(wd17xx_read_sector_callback, NULL);
 	wd.timer_ws = timer_alloc(wd17xx_write_sector_callback, NULL);
-
+	wd17xx_pause_time = 40;
 	wd17xx_reset();
 }
 
@@ -1024,7 +1026,7 @@ static void wd17xx_timed_read_sector_request(void)
 	int usecs;
 	wd17xx_info *w = &wd;
 
-	usecs = 10; /* How long should we wait? How about 40 micro seconds? */
+	usecs = wd17xx_pause_time; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
 	timer_reset(w->timer_rs, ATTOTIME_IN_USEC(usecs));
@@ -1038,13 +1040,16 @@ static void wd17xx_timed_write_sector_request(void)
 	int usecs;
 	wd17xx_info *w = &wd;
 
-	usecs = 10; /* How long should we wait? How about 40 micro seconds? */
+	usecs = wd17xx_pause_time; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
 	timer_reset(w->timer_ws, ATTOTIME_IN_USEC(usecs));
 }
 
-
+void wd17xx_set_pause_time(int usec)
+{
+	wd17xx_pause_time = usec;
+}
 
 /* read the FDC status register. This clears IRQ line too */
  READ8_HANDLER ( wd17xx_status_r )

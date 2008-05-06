@@ -73,6 +73,7 @@ WRITE8_HANDLER( wd17xx_data_w );
 READ8_HANDLER( wd17xx_r );
 WRITE8_HANDLER( wd17xx_w );
 
+void wd17xx_set_pause_time(int usec); /* default is 40 usec if not set */
 #endif /* WD179X_H */
 
 

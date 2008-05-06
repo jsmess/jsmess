@@ -374,6 +374,7 @@ static const struct msm8251_interface b2m_msm8251_interface =
 MACHINE_START(b2m)
 {
 	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);	
+	wd17xx_set_pause_time(10);
 	msm8251_init(&b2m_msm8251_interface);
 }
 
