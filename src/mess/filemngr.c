@@ -426,8 +426,8 @@ static int string_ends_with(const char *str, const char *target)
 
 
 
-#define UI_SHIFT_PRESSED		(input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
-#define UI_CONTROL_PRESSED		(input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
+#define UI_SHIFT_PRESSED               (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
+
 /* and mask to get bits */
 #define SEL_BITS_MASK			(~SEL_MASK)
 
@@ -516,41 +516,44 @@ static int fileselect(int selected, const char *default_selection, const char *w
 
 		visible = 0;
 
-		if (input_ui_pressed_repeat(IPT_UI_DOWN, 8))
+		/* down advances by one item */
+		if (input_ui_pressed_repeat(IPT_UI_DOWN, 6))
 		{
-			if (UI_CONTROL_PRESSED)
-			{
-				sel = total - 1;
-			}
-			else
-			if (UI_SHIFT_PRESSED)
-			{
-				sel = (sel + visible - 1);
-				sel = MIN(sel,total);
-			}
-			else
-			{
-				sel++;
-				sel = MIN(sel,total);
-			}
+			sel++;
+			sel = MIN(sel,total);
 		}
 
-		if (input_ui_pressed_repeat(IPT_UI_UP, 8))
+		/* end goes to the last */
+		if (input_ui_pressed_repeat(IPT_UI_END, 6))
 		{
-			if (UI_CONTROL_PRESSED)
-			{
-				sel = 1;
-			}
-			if (UI_SHIFT_PRESSED)
-			{
-				sel = (sel - visible + 1);
-				sel = MAX(0,sel);
-			}
-			else
-			{
-				sel--;
-				sel = MAX(0,sel);
-			}
+			sel = total - 1;
+		}
+
+		/* page down advances by visible_items */
+		if (input_ui_pressed_repeat(IPT_UI_PAGE_DOWN, 6))
+		{
+			sel = (sel + visible - 1);
+			sel = MIN(sel,total);
+		}
+
+		/* up backs up by one item */
+		if (input_ui_pressed_repeat(IPT_UI_DOWN, 6))
+		{
+			sel--;
+			sel = MAX(0,sel);
+		}
+
+		/* home goes to the start */
+		if (input_ui_pressed_repeat(IPT_UI_HOME, 6))
+		{
+			sel = 1;
+		}
+
+		/* page up backs up by visible_items */
+		if (input_ui_pressed_repeat(IPT_UI_PAGE_UP, 6))
+		{
+			sel = (sel - visible + 1);
+			sel = MAX(0,sel);
 		}
 
 		if (input_ui_pressed(IPT_UI_SELECT))
