@@ -49,7 +49,7 @@ System Driver Changes:
 
 - [IBMPC,IBM5150] Renamed ibmpc driver to ibm5150.  [Wilbert Pol]
 
-- [LISA] Fixes serial number read.  (bug #1583)  [Gilles Fetis]
+- [LISA] Fixed serial number read.  (bug #1583)  [Gilles Fetis]
 
 - [MBEE] Added snapload support for COM and MWB filetypes. Added LOCK key to
   keyboard. [Robbbert]
@@ -59,6 +59,8 @@ System Driver Changes:
 - [PC] Fixed error reporting when loading non-existant images.  [Nate Woods]
 
 - [PC] Fixed cursor blinking.  (bug #1096) [Wilbert Pol]
+
+- [PCJR] Various improvements, promoted from TESTDRIVER.  [Wilbert Pol]
 
 - [QL] Converted ZX8301/2 into devices, and fixed system halting. [Curt Coder]
 
@@ -70,7 +72,8 @@ System Driver Changes:
 
 - [SPECTRUM] IO maps are done in proper way [Miodrag Milanovic]
 
-- [SPECTRUM] Homebrew ROMs are "romified" [Miodrag Milanovic]
+- [SPECTRUM] Homebrew ROMs are now selectable BIOSes instead of separate
+  drivers. [Miodrag Milanovic]
 
 - [T1000HX] Fixed bug #1130.  [Wilbert Pol]
 
