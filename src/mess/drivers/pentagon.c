@@ -16,91 +16,47 @@ MACHINE_START( pentagon )
 	wd17xx_init(machine, WD_TYPE_179X, betadisk_wd179x_callback, NULL);
 }
 
-
 static int ROMSelection;
 
 static OPBASE_HANDLER( pentagon_opbase )
 {	
-	if ( address >= 0x4000 ) {
-		if (ROMSelection == 3) {			
-			ROMSelection = 1;
+	if (betadisk_is_active()) {
+		if (activecpu_get_pc() >= 0x4000) {
+			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable();
-			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x014000); // Set BASIC ROM
-		}
-	} 
-	else if ((address & 0xff00) == 0x3d00)
+			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000 + 0x4000*ROMSelection); // Set BASIC ROM
+		} 	
+	} else if (((activecpu_get_pc() & 0xff00) == 0x3d00) && (ROMSelection==1))
 	{
-		if (ROMSelection == 1)
-		{
-			ROMSelection = 3;
-			betadisk_enable();
-			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x01c000); // Set TRDOS ROM			
-		}
+		ROMSelection = 3;
+		betadisk_enable();
+		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x01c000); // Set TRDOS ROM			
 	} 
 	return address;
 }
 
 static void pentagon_update_memory(running_machine *machine)
 {
-	unsigned char *ChosenROM;
-	
-	read8_machine_func rh;
-	write8_machine_func wh;
+	spectrum_128_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	if (spectrum_128_port_7ffd_data & 8)
-	{
-		//logerror("SCREEN 1: BLOCK 7\n");
-		spectrum_128_screen_location = mess_ram + (7<<14);
+	memory_set_bankptr(4, mess_ram + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
+
+	if( betadisk_is_active() && !( spectrum_128_port_7ffd_data & 0x10 ) ) {    
+		/* GLUK */
+		ROMSelection = 2;
 	}
 	else
 	{
-		//logerror("SCREEN 0: BLOCK 5\n");
-		spectrum_128_screen_location = mess_ram + (5<<14);
+		/* ROM switching */
+		ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ;
 	}
-
-	/* select ram at 0x0c000-0x0ffff */
-	{
-		int ram_page;
-		unsigned char *ram_data;
-
-		ram_page = (spectrum_128_port_7ffd_data & 0x07);
-		ram_data = mess_ram + (ram_page<<14);
-
-		memory_set_bankptr(4, ram_data);
-
-		//logerror("RAM at 0xc000: %02x\n",ram_page);
-	}
-
-		/* rom at 0x0000 */
-		//logerror("ROM at 0x0000\n");
-
-		/* connect page 0 of rom to 0x0000 */
-		rh = SMH_BANK1;
-		wh = SMH_NOP;
-
- 		if( betadisk_is_active() && !( spectrum_128_port_7ffd_data & 0x10 ) ) {    
-			ROMSelection = 2;
-		}
-		else
-		{
-			/* ROM switching */
-			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ;
-		}
-		/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-		ChosenROM = memory_region(REGION_CPU1) + 0x010000 + (ROMSelection<<14);
-
-		memory_set_bankptr(1, ChosenROM);
-
-		//logerror("rom switch: %02x\n", ROMSelection);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, rh);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, wh);
+	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
+	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000 + (ROMSelection<<14));
 }
 
 static WRITE8_HANDLER(pentagon_port_7ffd_w)
 {
-	//logerror("pentagon 7ffd w: %02x\n", data);
-
-	/* disable paging? */
+	/* disable paging */
 	if (spectrum_128_port_7ffd_data & 0x20)
 		return;
 
@@ -126,6 +82,9 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( pentagon )
 {
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+
 	betadisk_enable();
 	betadisk_clear_status();
 
@@ -142,9 +101,7 @@ static MACHINE_RESET( pentagon )
 	spectrum_128_port_7ffd_data = 0;
 
 	pentagon_update_memory(machine);	
-	
-	MACHINE_RESET_CALL(spectrum);
-	
+		
 	wd17xx_reset();	
 }
 

@@ -103,7 +103,7 @@ READ8_HANDLER(betadisk_data_r)
 READ8_HANDLER(betadisk_state_r)
 {
 	if (betadisk_active==1) {
-		return betadisk_status | 0x3f; 
+		return betadisk_status; 
 	} else {
 		return 0xff;
 	}
@@ -114,11 +114,12 @@ WRITE8_HANDLER(betadisk_param_w)
 	if (betadisk_active==1) {
   		wd17xx_set_drive ( data & 3);  
   		wd17xx_set_side ((data & 0x10) ? 0 : 1 );
-  		wd17xx_set_density(data & 0x20 ? DEN_MFM_LO : DEN_FM_LO );
+  		wd17xx_set_density(data & 0x20 ? DEN_MFM_HI : DEN_FM_LO );
   		if ((data & 0x04) == 0) // reset
   		{
   			wd17xx_reset();	
-  		}    			
+  		}    		
+  		betadisk_status = (data & 0x3f) | betadisk_status;
   	}
 } 	
 

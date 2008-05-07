@@ -54,9 +54,21 @@ typedef enum
 }
 SPECTRUM_SNAPSHOT_TYPE;
 
+static OPBASE_HANDLER(spectrum_opbaseoverride)
+{
+	/* Hack for correct handling 0xffff interrupt vector */
+	if (address == 0x0001)
+		if (cpunum_get_reg(0, REG_PREVIOUSPC)==0xffff)
+		{
+			cpunum_set_reg(0, Z80_PC, 0xfff4);
+			return 0xfff4;
+		}
+	return address;
+}
+
 MACHINE_RESET( spectrum )
 {
-	//memory_set_opbase_handler(0, spectrum_opbaseoverride);
+	memory_set_opbase_handler(0, spectrum_opbaseoverride);
 }
 
 SNAPSHOT_LOAD(spectrum)
