@@ -5,8 +5,8 @@ of images that MESS users need to deal with.  Functions include retrieving and
 storing files and CRC checking/validation.
 
 Imgtool is part of the MESS project.  It shares large portions of code with
-MESS/MAME, and its existance would not be if it were not for MESS.  As such,
-the distribution terms are the same as MESS.  Please read mess.txt thouroughly.
+MESS/MAME, and its existence would not be if it were not for MESS.  As such,
+the distribution terms are the same as MESS.  Please read mess.txt thoroughly.
 
 Some portions in Imgtool is Copyright (c) 1989, 1993 The Regents of the
 University of California.  All rights reserved.
