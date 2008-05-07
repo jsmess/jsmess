@@ -27,7 +27,7 @@
 
 	<datfile	srcpath="../sysinfo.dat"		text="Emulated Systems"		destpath="sysinfo"/>
 	
-	<file		filepath="images/logo.gif"/>
+	<file		filepath="windows/images/logo.gif"/>
 	<file		filepath="windows/images/command.gif"/>
 	<file		filepath="windows/images/frog.gif"/>
 	<file		filepath="windows/images/gui.gif"/>
