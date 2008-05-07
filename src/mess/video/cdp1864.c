@@ -31,7 +31,6 @@ struct _cdp1864_t
 	/* video state */
 	int disp;						/* display on */
 	int dmaout;						/* DMA request active */
-	int dmaptr;						/* DMA pointer */
 	int bgcolor;					/* background color */
 
 	/* sound state */
@@ -70,7 +69,6 @@ static TIMER_CALLBACK(cdp1864_int_tick)
 		if (cdp1864->disp)
 		{
 			cdp1864->intf->on_int_changed(device, HOLD_LINE);
-			cdp1864->dmaptr = 0;
 		}
 
 		timer_adjust_oneshot(cdp1864->int_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_INT_END, 0), 0);
@@ -249,6 +247,8 @@ void cdp1864_dma_w(const device_config *device, UINT8 data)
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
+	UINT16 addr = activecpu_get_reg(CDP1802_R0);
+
 	int sx = video_screen_get_hpos(cdp1864->screen) + 4;
 	int y = video_screen_get_vpos(cdp1864->screen);
 	int x;
@@ -259,15 +259,13 @@ void cdp1864_dma_w(const device_config *device, UINT8 data)
 
 		if (data & 0x80)
 		{
-			color = cdp1864->intf->color_ram_r(device, cdp1864->dmaptr);
+			color = cdp1864->intf->color_ram_r(device, addr);
 		}
 
 		*BITMAP_ADDR16(cdp1864->bitmap, y, sx + x) = color;
 
 		data <<= 1;
 	}
-
-	cdp1864->dmaptr++;
 }
 
 /* Sound Update */
@@ -375,7 +373,6 @@ static DEVICE_START( cdp1864 )
 
 	state_save_register_item(unique_tag, 0, cdp1864->disp);
 	state_save_register_item(unique_tag, 0, cdp1864->dmaout);
-	state_save_register_item(unique_tag, 0, cdp1864->dmaptr);
 	state_save_register_item(unique_tag, 0, cdp1864->bgcolor);
 
 	state_save_register_item(unique_tag, 0, cdp1864->audio);
@@ -396,7 +393,6 @@ static DEVICE_RESET( cdp1864 )
 	
 	cdp1864->disp = 0;
 	cdp1864->dmaout = 0;
-	cdp1864->dmaptr = 0;
 	cdp1864->bgcolor = 0;
 
 	cdp1864->intf->on_int_changed(device, CLEAR_LINE);
