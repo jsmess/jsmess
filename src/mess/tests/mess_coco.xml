@@ -70,10 +70,10 @@
 <test name="coco_006" driver="coco2b">
 	<!-- This test tests printing -->
 	<wait time="2"/>
-	<imagecreate type="prin"/>
+	<imagecreate tag="bitbanger"/>
 	<input>?#-2, "FOO";&#13;</input>
 	<wait time="4"/>
-	<imageverify type="prin">"FOO"</imageverify>
+	<imageverify tag="bitbanger">"FOO"</imageverify>
 </test>
 
 <test name="coco_bug993" driver="coco2b" ramsize="16k">

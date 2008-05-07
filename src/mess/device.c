@@ -642,8 +642,6 @@ const device_config *image_from_devtype_and_index(iodevice_t type, int id)
 	const device_config *dev;
 	const struct IODevice *iodev;
 
-	assert(id < device_count(Machine, type));
-
 	for (dev = device_list_first(Machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
 	{
 		iodev = mess_device_from_core_device(dev);

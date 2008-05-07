@@ -23,6 +23,19 @@
 #include "debug/debugcpu.h"
 #endif /* ENABLE_DEBUGGER */
 
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define MESSTEST_ALWAYS_DUMP_SCREENSHOT		1
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef enum
 {
 	STATE_READY,
@@ -30,6 +43,8 @@ typedef enum
 	STATE_ABORTED,
 	STATE_DONE
 } messtest_running_state_t;
+
+
 
 typedef enum
 {
@@ -51,7 +66,20 @@ typedef enum
 	MESSTEST_COMMAND_HARD_RESET
 } messtest_command_type_t;
 
-struct messtest_command
+
+
+typedef struct _messtest_device_identity messtest_device_identity;
+struct _messtest_device_identity
+{
+	const char *tag;
+	iodevice_t type;
+	int slot;
+};
+
+
+
+typedef struct _messtest_command messtest_command;
+struct _messtest_command
 {
 	messtest_command_type_t command_type;
 	union
@@ -69,16 +97,13 @@ struct messtest_command
 			offs_t end;
 			const void *verify_data;
 			size_t verify_data_size;
-			iodevice_t device_type;
-			int device_slot;
+			messtest_device_identity device_ident;
 		} verify_args;
 		struct
 		{
 			const char *filename;
 			const char *format;
-			iodevice_t device_type;
-			int device_slot;
-			const char *device_tag;
+			messtest_device_identity device_ident;
 		} image_args;
 		struct
 		{
@@ -88,13 +113,16 @@ struct messtest_command
 	} u;
 };
 
-struct messtest_testcase
+
+
+typedef struct _messtest_testcase messtest_testcase;
+struct _messtest_testcase
 {
 	const char *name;
 	const char *bios;
 	const char *driver;
 	attotime time_limit;	/* 0.0 = default */
-	struct messtest_command *commands;
+	messtest_command *commands;
 
 	/* options */
 	UINT32 ram;
@@ -102,12 +130,17 @@ struct messtest_testcase
 	unsigned int enabled : 1;
 };
 
+
+
+typedef struct _messtest_specific_state messtest_specific_state;
 struct messtest_specific_state
 {
-	struct messtest_testcase testcase;
+	messtest_testcase testcase;
 	int command_count;
-	struct messtest_command current_command;
+	messtest_command current_command;
 };
+
+
 
 typedef enum
 {
@@ -116,7 +149,10 @@ typedef enum
 	MESSTEST_RESULT_RUNTIMEFAILURE
 } messtest_result_t;
 
-struct messtest_results
+
+
+typedef struct _messtest_results messtest_results;
+struct _messtest_results
 {
 	messtest_result_t rc;
 	UINT64 runtime_hash;	/* A value that is a hash taken from certain runtime parameters; used to detect different execution paths */
@@ -124,14 +160,15 @@ struct messtest_results
 
 
 
-#define MESSTEST_ALWAYS_DUMP_SCREENSHOT		1
-
+/***************************************************************************
+    LOCAL VARIABLES
+***************************************************************************/
 
 static messtest_running_state_t state;
 static int had_failure;
 static attotime wait_target;
 static attotime final_time;
-static const struct messtest_command *current_command;
+static const messtest_command *current_command;
 static int test_flags;
 static int screenshot_num;
 static int format_index;
@@ -143,9 +180,9 @@ static render_target *target;
 static mess_pile command_pile;
 static object_pool *command_pool;
 static int command_count;
-static struct messtest_command new_command;
+static messtest_command new_command;
 
-static struct messtest_testcase current_testcase;
+static messtest_testcase current_testcase;
 
 static const options_entry win_mess_opts[] =
 {
@@ -156,6 +193,10 @@ static const options_entry win_mess_opts[] =
 };
 
 
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 static astring *assemble_software_path(astring *str, const game_driver *gamedrv, const char *filename)
 {
@@ -264,7 +305,7 @@ static void messtest_output_error(void *param, const char *format, va_list argpt
 
 
 
-static messtest_result_t run_test(int flags, struct messtest_results *results)
+static messtest_result_t run_test(int flags, messtest_results *results)
 {
 	const game_driver *driver;
 	messtest_result_t rc;
@@ -320,7 +361,7 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 		fullpath = assemble_software_path(astring_alloc(), driver, current_command->u.image_args.filename);
 
 		/* get the option name */
-		device_opt = device_typename(current_command->u.image_args.device_type);
+		device_opt = device_typename(current_command->u.image_args.device_ident.type);
 
 		/* set the option */
 		options_set_string(opts, device_opt, astring_c(fullpath), OPTION_PRIORITY_CMDLINE);
@@ -656,12 +697,44 @@ static void command_image_preload(running_machine *machine)
 }
 
 
+
+static const device_config *find_device_by_identity(running_machine *machine, const messtest_device_identity *ident)
+{
+	const device_config *device;
+
+	/* look up the image slot */
+	if (ident->type == IO_UNKNOWN)
+	{
+		/* no device_type was specified; use the new preferred mechanism */
+		device = device_list_find_by_tag(machine->config->devicelist, DEVICE_TYPE_WILDCARD, ident->tag);
+	}
+	else if (ident->tag != NULL)
+	{
+		/* perform a legacy lookup by tag */
+		device = image_from_devtag_and_index(machine, ident->tag, ident->slot);
+	}
+	else
+	{
+		/* perform a legacy lookup by device type */
+		device = image_from_devtype_and_index(ident->type, ident->slot);
+	}
+
+	/* did the image slot lookup fail? */
+	if (device == NULL)
+	{
+		state = STATE_ABORTED;
+		report_message(MSG_FAILURE, "Device '%s %i' does not exist",
+			device_typename(ident->type), ident->slot);
+	}
+
+	return device;
+}
+
+
+
 static void command_image_loadcreate(running_machine *machine)
 {
 	const device_config *image;
-	int device_type;
-	int device_slot;
-	const char *device_tag;
 	int i, format_index = 0;
 	const char *filename;
 	const char *format;
@@ -672,22 +745,11 @@ static void command_image_loadcreate(running_machine *machine)
 	int success;
 	const game_driver *gamedrv;
 
-	device_slot = current_command->u.image_args.device_slot;
-	device_type = current_command->u.image_args.device_type;
-	device_tag = current_command->u.image_args.device_tag;
-
 	/* look up the image slot */
-	if (device_tag)
-		image = image_from_devtag_and_index(machine, device_tag, device_slot);
-	else
-		image = image_from_devtype_and_index(device_type, device_slot);
-	if (!image)
-	{
-		state = STATE_ABORTED;
-		report_message(MSG_FAILURE, "Image slot '%s %i' does not exist",
-			device_typename(device_type), device_slot);
+	image = find_device_by_identity(machine, &current_command->u.image_args.device_ident);
+	if (image == NULL)
 		return;
-	}
+
 	info = image_device_getinfo(machine->config, image);
 	file_extensions = info.file_extensions;
 
@@ -852,9 +914,13 @@ static void command_verify_image(running_machine *machine)
 	verify_data = (const UINT8 *) current_command->u.verify_args.verify_data;
 	verify_data_size = current_command->u.verify_args.verify_data_size;
 
-	image = image_from_devtype_and_index(current_command->u.verify_args.device_type, current_command->u.verify_args.device_slot);
+	/* look up the device */
+	image = find_device_by_identity(machine, &current_command->u.verify_args.device_ident);
+	if (image == NULL)
+		return;
+
 	filename = image_filename(image);
-	if (!filename)
+	if (filename == NULL)
 	{
 		state = STATE_ABORTED;
 		report_message(MSG_FAILURE, "Failed verification: Device Not Loaded");
@@ -1059,7 +1125,7 @@ static int append_command(void)
 {
 	if (pile_write(&command_pile, &new_command, sizeof(new_command)))
 		return FALSE;
-	current_testcase.commands = (struct messtest_command *) pile_getptr(&command_pile);
+	current_testcase.commands = (messtest_command *) pile_getptr(&command_pile);
 	command_count++;
 	return TRUE;
 }
@@ -1208,11 +1274,50 @@ static void node_checkblank(xml_data_node *node)
 
 
 
-static void node_image(xml_data_node *node, messtest_command_type_t command)
+static int get_device_identity_tags(xml_data_node *node, messtest_device_identity *ident)
 {
 	xml_attribute_node *attr_node;
 	const char *s2;
-	int preload, device_type;
+
+	/* clear out the result */
+	memset(ident, 0, sizeof(*ident));
+
+	/* 'type' attribute */
+	attr_node = xml_get_attribute(node, "type");
+	if (attr_node != NULL)
+	{
+		s2 = attr_node->value;
+
+		ident->type = device_typeid(s2);
+		if (ident->type <= IO_UNKNOWN)
+		{
+			error_baddevicetype(s2);
+			return FALSE;
+		}
+	}
+	else
+	{
+		/* the device type was unspecified */
+		ident->type = IO_UNKNOWN;
+	}
+
+	/* 'slot' attribute */
+	attr_node = xml_get_attribute(node, "slot");
+	ident->slot = (attr_node != NULL) ? atoi(attr_node->value) : 0;
+
+	/* 'tag' attribute */
+	attr_node = xml_get_attribute(node, "tag");
+	ident->tag = (attr_node != NULL) ? attr_node->value : NULL;
+
+	return TRUE;
+}
+
+
+
+static void node_image(xml_data_node *node, messtest_command_type_t command)
+{
+	xml_attribute_node *attr_node;
+	int preload;
 
 	memset(&new_command, 0, sizeof(new_command));
 	new_command.command_type = command;
@@ -1227,35 +1332,14 @@ static void node_image(xml_data_node *node, messtest_command_type_t command)
 	attr_node = xml_get_attribute(node, "filename");
 	new_command.u.image_args.filename = attr_node ? attr_node->value : NULL;
 
-	/* 'type' attribute */
-	attr_node = xml_get_attribute(node, "type");
-	if (!attr_node)
-	{
-		error_missingattribute("type");
+	/* 'tag', 'type', 'slot' attributes */
+	if (!get_device_identity_tags(node, &new_command.u.image_args.device_ident))
 		return;
-	}
-	s2 = attr_node->value;
-
-	device_type = device_typeid(s2);
-	if (device_type < 0)
-	{
-		error_baddevicetype(s2);
-		return;
-	}
-	new_command.u.image_args.device_type = device_type;
-
-	/* 'slot' attribute */
-	attr_node = xml_get_attribute(node, "slot");
-	new_command.u.image_args.device_slot = attr_node ? atoi(attr_node->value) : 0;
 
 	/* 'format' attribute */
 	format_index = 0;
 	attr_node = xml_get_attribute(node, "format");
 	new_command.u.image_args.format = attr_node ? attr_node->value : NULL;
-
-	/* 'tag' attribute */
-	attr_node = xml_get_attribute(node, "tag");
-	new_command.u.image_args.device_tag = attr_node ? attr_node->value : NULL;
 
 	if (!append_command())
 	{
@@ -1341,9 +1425,6 @@ static void node_memverify(xml_data_node *node)
 
 static void node_imageverify(xml_data_node *node)
 {
-	xml_attribute_node *attr_node;
-	const char *s;
-	iodevice_t device_type;
 	void *new_buffer;
 	mess_pile pile;
 
@@ -1351,23 +1432,9 @@ static void node_imageverify(xml_data_node *node)
 	memset(&new_command, 0, sizeof(new_command));
 	new_command.command_type = MESSTEST_COMMAND_VERIFY_IMAGE;
 
-	/* 'type' attribute */
-	attr_node = xml_get_attribute(node, "type");
-	s = attr_node ? attr_node->value : NULL;
-	if (!s)
-	{
-		error_missingattribute("type");
+	/* 'tag', 'type', 'slot' attributes */
+	if (!get_device_identity_tags(node, &new_command.u.verify_args.device_ident))
 		return;
-	}
-
-	device_type = device_typeid(s);
-	if (device_type < 0)
-	{
-		error_baddevicetype(s);
-		return;
-	}
-
-	new_command.u.verify_args.device_type = device_type;
 
 	pile_init(&pile);
 	messtest_get_data(node, &pile);
