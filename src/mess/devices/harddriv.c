@@ -76,6 +76,7 @@ static const char *mess_hd_option_spec =
 
 struct mess_hd
 {
+	chd_file *chd;
 	hard_disk_file *hard_disk_handle;
 };
 
@@ -116,7 +117,6 @@ static int internal_load_mess_hd(const device_config *image, const char *metadat
 {
 	chd_error err = 0;
 	struct mess_hd *hd;
-	chd_file *chd;
 	int is_writeable;
 	int id = image_index_in_device(image);
 
@@ -126,28 +126,28 @@ static int internal_load_mess_hd(const device_config *image, const char *metadat
 	do
 	{
 		is_writeable = image_is_writable(image);
-		chd = NULL;
-		err = chd_open_file(image_core_file(image), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &chd);
+		hd->chd = NULL;
+		err = chd_open_file(image_core_file(image), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &hd->chd);
 
 		/* special case; if we get CHDERR_FILE_NOT_WRITEABLE, make the
 		 * image read only and repeat */
 		if (err == CHDERR_FILE_NOT_WRITEABLE)
 			image_make_readonly(image);
 	}
-	while(!chd && is_writeable && (err == CHDERR_FILE_NOT_WRITEABLE));
-	if (!chd)
+	while(!hd->chd && is_writeable && (err == CHDERR_FILE_NOT_WRITEABLE));
+	if (!hd->chd)
 		goto done;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
 	if (metadata)
 	{
-		err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
+		err = chd_set_metadata(hd->chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
 		if (err != CHDERR_NONE)
 			goto done;
 	}
 
 	/* open the hard disk file */
-	hd->hard_disk_handle = hard_disk_open(chd);
+	hd->hard_disk_handle = hard_disk_open(hd->chd);
 	if (!hd->hard_disk_handle)
 		goto done;
 
@@ -156,8 +156,12 @@ static int internal_load_mess_hd(const device_config *image, const char *metadat
 done:
 	if (err)
 	{
-		if (chd)
-			chd_close(chd);
+		/* if we had an error, close out the CHD */
+		if (hd->chd != NULL)
+		{
+			chd_close(hd->chd);
+			hd->chd = NULL;
+		}
 
 		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, chd_get_error_string(err));
 	}
@@ -212,9 +216,19 @@ error:
 DEVICE_IMAGE_UNLOAD( mess_hd )
 {
 	struct mess_hd *hd = get_drive(image);
-	assert(hd->hard_disk_handle);
-	hard_disk_close(hd->hard_disk_handle);
-	hd->hard_disk_handle = NULL;
+
+	if (hd->hard_disk_handle != NULL)
+	{
+		hard_disk_close(hd->hard_disk_handle);
+		hd->hard_disk_handle = NULL;
+	}
+
+	if (hd->chd != NULL)
+	{
+		chd_close(hd->chd);
+		hd->chd = NULL;
+	}
+
 	drive_handles[image_index_in_device(image)] = NULL;
 }
 
