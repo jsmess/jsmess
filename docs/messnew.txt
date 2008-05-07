@@ -42,6 +42,9 @@ System Driver Changes:
 
 - [ELECTRON] Fixed corrupt text in Mode 3. [Robbbert]
 
+- [EP128] Merged ex128 and ex128a drivers, to use alternate BIOSes.  [Fabio
+  Priuli]
+
 - [GENESIS] Clean and speed up SSF2 banking [Cowering]
 
 - [GENESIS] Add automatic support for many 'pirate' carts (thanks to Haze for
