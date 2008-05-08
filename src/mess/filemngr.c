@@ -489,7 +489,7 @@ static int fileselect(int selected, const char *default_selection, const char *w
 			fs_item[sel & SEL_MASK].subtext = current_filespecification;
 
 			/* display the menu */
-			ui_menu_draw(fs_item, fs_total, sel & SEL_MASK, NULL);
+			visible = ui_menu_draw(fs_item, fs_total, sel & SEL_MASK, NULL);
 
 			/* update string with any keys that are pressed */
 			name = update_entered_string();
@@ -512,49 +512,46 @@ static int fileselect(int selected, const char *default_selection, const char *w
 		}
 
 
-		ui_menu_draw(fs_item, fs_total, sel, NULL);
+		visible = ui_menu_draw(fs_item, fs_total, sel, NULL);
 
-		visible = 0;
+		/* Maybe the following code up to IPT_UI_PAUSE can be replaced with a call to ui_menu_generic_keys() */
+
+		/* up backs up by one item */
+		if (input_ui_pressed_repeat(IPT_UI_UP, 6))
+			sel = (sel + total - 1) % total;
 
 		/* down advances by one item */
 		if (input_ui_pressed_repeat(IPT_UI_DOWN, 6))
-		{
-			sel++;
-			sel = MIN(sel,total);
-		}
+			sel = (sel +  1) % total;
 
-		/* end goes to the last */
-		if (input_ui_pressed_repeat(IPT_UI_END, 6))
+		/* page up backs up by visible_items */
+		if (input_ui_pressed_repeat(IPT_UI_PAGE_UP, 6))
 		{
-			sel = total - 1;
+			if (sel >= visible - 1)
+				sel -= visible - 1;
+			else
+				sel = 0;
 		}
 
 		/* page down advances by visible_items */
 		if (input_ui_pressed_repeat(IPT_UI_PAGE_DOWN, 6))
 		{
-			sel = (sel + visible - 1);
-			sel = MIN(sel,total);
-		}
-
-		/* up backs up by one item */
-		if (input_ui_pressed_repeat(IPT_UI_UP, 6))
-		{
-			sel--;
-			sel = MAX(0,sel);
+			sel += visible - 1;
+			if (sel >= total)
+				sel = total - 1;
 		}
 
 		/* home goes to the start */
-		if (input_ui_pressed_repeat(IPT_UI_HOME, 6))
-		{
-			sel = 1;
-		}
+		if (input_ui_pressed(IPT_UI_HOME))
+			sel = 0;
 
-		/* page up backs up by visible_items */
-		if (input_ui_pressed_repeat(IPT_UI_PAGE_UP, 6))
-		{
-			sel = (sel - visible + 1);
-			sel = MAX(0,sel);
-		}
+		/* end goes to the last */
+		if (input_ui_pressed(IPT_UI_END))
+			sel = total - 1;
+
+		/* pause enables/disables pause */
+		if (input_ui_pressed(IPT_UI_PAUSE))
+			mame_pause(Machine, !mame_is_paused(Machine));
 
 		if (input_ui_pressed(IPT_UI_SELECT))
 		{
@@ -656,7 +653,7 @@ int filemanager(int selected)
 	ui_menu_item menu_items[40];
 	const device_config *devices[40];
 	char names[40][64];
-	int sel, total, arrowize;
+	int sel, total, visible, arrowize;
 	const device_config *image;
 
 	sel = selected - 1;
@@ -708,7 +705,7 @@ int filemanager(int selected)
 	}
 
 	memset(&menu_items[total], 0, sizeof(menu_items[total]));
-	menu_items[total].text = ui_getstring(UI_returntomain);
+	menu_items[total].text = "Return to Prior Menu";
 	total++;
 
 	arrowize = 0;
@@ -721,7 +718,7 @@ int filemanager(int selected)
 		menu_items[sel & SEL_MASK].subtext = entered_filename;
 
 		/* display the menu */
-		ui_menu_draw(menu_items, total, sel & SEL_MASK, NULL);
+		visible = ui_menu_draw(menu_items, total, sel & SEL_MASK, NULL);
 
 		/* update string with any keys that are pressed */
 		name = update_entered_string();
@@ -738,13 +735,46 @@ int filemanager(int selected)
 		return sel + 1;
 	}
 
-	ui_menu_draw(menu_items, total, sel, NULL);
+	visible = ui_menu_draw(menu_items, total, sel, NULL);
 
-	if (input_ui_pressed_repeat(IPT_UI_DOWN, 8))
-		sel = (sel + 1) % total;
+	/* Maybe the following code up to IPT_UI_PAUSE can be replaced with a call to ui_menu_generic_keys() */
 
-	if (input_ui_pressed_repeat(IPT_UI_UP, 8))
+	/* up backs up by one item */
+	if (input_ui_pressed_repeat(IPT_UI_UP, 6))
 		sel = (sel + total - 1) % total;
+
+	/* down advances by one item */
+	if (input_ui_pressed_repeat(IPT_UI_DOWN, 6))
+		sel = (sel +  1) % total;
+
+	/* page up backs up by visible_items */
+	if (input_ui_pressed_repeat(IPT_UI_PAGE_UP, 6))
+	{
+		if (sel >= visible - 1)
+			sel -= visible - 1;
+		else
+			sel = 0;
+	}
+
+	/* page down advances by visible_items */
+	if (input_ui_pressed_repeat(IPT_UI_PAGE_DOWN, 6))
+	{
+		sel += visible - 1;
+		if (sel >= total)
+			sel = total - 1;
+	}
+
+	/* home goes to the start */
+	if (input_ui_pressed(IPT_UI_HOME))
+		sel = 0;
+
+	/* end goes to the last */
+	if (input_ui_pressed(IPT_UI_END))
+		sel = total - 1;
+
+	/* pause enables/disables pause */
+	if (input_ui_pressed(IPT_UI_PAUSE))
+		mame_pause(Machine, !mame_is_paused(Machine));
 
 	if (input_ui_pressed(IPT_UI_SELECT))
 	{
