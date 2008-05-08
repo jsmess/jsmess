@@ -1,10 +1,11 @@
-0.125
+﻿0.125
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Bashkiria-2M (not fully operational) [Miodrag Milanovic]
 - BK 0010/0010.01 [Miodrag Milanovic]
 - Bondwell 2 (not working)  [Tomas Karlsson]
+- Dick Smith Super-80 with VDUEB (original version) [Robbbert]
 - KOEI PasoGo (not working) [Peter Trauner]
 - Orion 128/Z80 Card II/Pro	[Miodrag Milanovic]
 - Pentagon (not fully operational)[Miodrag Milanovic]
@@ -54,7 +55,7 @@ System Driver Changes:
 
 - [LISA] Fixed serial number read.  (bug #1583)  [Gilles Fetis]
 
-- [MBEE] Added snapload support for COM and MWB filetypes. Added LOCK key to
+- [MBEE] Added quikload support for COM and MWB filetypes. Added LOCK key to
   keyboard. [Robbbert]
 
 - [ORION] Added cassete loading [Miodrag Milanovic]

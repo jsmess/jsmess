@@ -827,6 +827,7 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( super80d )
 	DRIVER( super80e )
 	DRIVER( super80m )
+	DRIVER( super80r )
 	DRIVER( super80v )
 
 	/* Galeb */
