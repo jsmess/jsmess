@@ -19,11 +19,11 @@
 
 <h2>Quick Start</h2>
 
-<p>Open MESSUI double clicking messui.exe and you will see a screen like this:</p>
+<p>Open MESSUI by double clicking messui.exe and you will see a screen like this:</p>
 
 <p align="center"><img alt="easyEmu!" src="images/gui.gif" width="593" height="432" border="1" /></p>
 
-<p>When you run MESSUI for the first time it will automatically hunt for available BIOS files. If it doesn't find any or you add more press "F5" to
+<p>When you run MESSUI for the first time it will automatically hunt for available system rom files. If it doesn't find any or you add more press "F5" to
 update the system list.</p>
 
 <h2>Menu Options</h2>
@@ -419,7 +419,7 @@ digital system.</td>
 </tr>
 <tr>
 <td width="25%" class="tablehead">Enable Steadykey Support</td>
-<td class="tabledesc">If you find that MESS won't let you press more than one key at a time (usually during combos infighting games on consoles or
+<td class="tabledesc">If you find that MESS won't let you press more than one key at a time (usually during combos in fighting games on consoles or
 the Capcom CPS Changer), steadykey will help.</td>
 </tr>
 <tr>
@@ -435,8 +435,42 @@ the Capcom CPS Changer), steadykey will help.</td>
 <td colspan="2" class="tabletitle">Miscellaneous Tab</td>
 </tr>
 <tr>
-<td class="tablehead">Use Additional system Artwork</td>
-<td class="tabledesc">Enables the artwork system.</td>
+<td class="tablehead">Enable system cheats</td>
+<td class="tabledesc">Cheater...!!</td>
+</tr>
+<tr>
+<td class="tablehead">Error log (for Developers)</td>
+<td class="tabledesc">Enables some extra logging features.</td>
+</tr>
+<tr>
+<td class="tablehead">Sleep when possible</td>
+<td class="tabledesc">Allows MESS to give time back to the system when running with -throttle. This allows other programs to have some CPU time, assuming that the
+game isn't taxing 100% of your CPU resources. This option can potentially cause hiccups in performance if other demanding programs are running. The default is ON.</td>
+</tr>
+<tr>
+<td class="tablehead">Skip System info</td>
+<td class="tabledesc">Bypasses initial system info screen when starting a new system</td>
+</tr>
+<tr>
+<tr>
+<td class="tablehead">Save game state on exit</td>
+<td class="tabledesc">If save states are supported on the system it will save the state (not working).</td>
+</tr>
+<tr>
+<td class="tablehead">Multi-threaded rendering</td>
+<td class="tabledesc">	Enables multithreading within MESS. At the moment, this causes the window and all DirectDraw/Direct3D code to execute on a second thread, which can improve performance on hyperthreaded and multicore systems. The default is OFF (-nomultithreading).</td>
+</tr>
+<tr>
+<td class="tablehead">Thread priority</td>
+<td class="tabledesc">Sets the thread priority for the MESS threads. By default the priority is left alone to guarantee proper cooperation with other applications. The valid range is -15 to 1, with 1 being the highest priority. The default is 0 (NORMAL priority).</td>
+</tr>
+<tr>
+<td class="tablehead">Skip warnings</td>
+<td class="tabledesc">Bypasses system warning screens when starting a new system. Not reccomended.</td>
+</tr>
+<tr>
+<td class="tablehead">Use New UI</td>
+<td class="tabledesc">Utilize a windows menu based system as opposed to the classic "MAME" like interface</td>
 </tr>
 <tr>
 <td class="tablehead">Backdrops</td>
@@ -455,40 +489,11 @@ the Capcom CPS Changer), steadykey will help.</td>
 <td class="tabledesc">Crops the edges of the artwork to the edge of the system screen.</td>
 </tr>
 <tr>
-<td class="tablehead">Artwork</td>
-<td class="tabledesc">Sets the resolution of the artwork to be used. Most artwork is a very high resolution and MESS reduces the resolution in most
-cases to be more compatible. Setting this option to high will give you the best image possible.</td>
-</tr>
-<tr>
 <td class="tablehead">BIOS</td>
 <td class="tabledesc">Select the system BIOS to use.</td>
 </tr>
-<tr>
-<td class="tablehead">Use Keyboard LEDs as system indicators</td>
-<td class="tabledesc">Uses the keyboard LED's to simulate the LED's on an arcade board.</td>
-</tr>
-<tr>
-<td width="23%" height="10" class="tablehead">Enable system Cheats</td>
-<td width="77%" height="10" class="Maintext">Enables the system cheating system built into MESS.</td>
-</tr>
-<tr>
-<td class="tablehead">Use less CPU time when possible</td>
-<td class="tabledesc">Reduces the CPU time used by MESSUI.</td>
-</tr>
-<tr>
-<td class="tablehead">Use pre-0.63 timing</td>
-<td class="tabledesc">Helps in compatibility with some systems</td>
-</tr>
-<tr>
-<td class="tablehead">Error Log</td>
-<td class="tabledesc">Records a log file of the actions MESS takes when loading a system to help developers check for errors.</td>
-</tr>
-<tr>
-<td class="tablehead">Use New UI</td>
-<td class="tabledesc">This option will only be active if D3D is turned off on the Direct3D Tab and what it does is replace the on-screen menus like
-Mame uses with a windows based menu system.</td>
-</tr>
 </table>
+
 <p align="center"><img src="images/propvec.gif" /><br />
 <br /></p>
 <table width="98%" border="1" bordercolor="#EEEEEE" align="center" cellpadding="3">
