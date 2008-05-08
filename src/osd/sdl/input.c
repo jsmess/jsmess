@@ -1123,13 +1123,13 @@ void sdlinput_poll(running_machine *machine)
 					if (event.key.keysym.sym == mess_keytrans[i][0])
 					{
 						translated = 1;
-						inputx_postc(mess_keytrans[i][1]);
+						inputx_postc(machine, mess_keytrans[i][1]);
 					}
 				}
 
 				if (!translated)
 				{
-					inputx_postc(event.key.keysym.unicode);
+					inputx_postc(machine, event.key.keysym.unicode);
 				}
 			}
 			#endif
