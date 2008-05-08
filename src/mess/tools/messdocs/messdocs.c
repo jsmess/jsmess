@@ -25,6 +25,20 @@ struct messdocs_state
 };
 
 
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static void *expat_malloc(size_t size);
+static void *expat_realloc(void *ptr, size_t size);
+static void expat_free(void *ptr);
+
+
+
+/***************************************************************************
+    CORE IMPLEMENTATION
+***************************************************************************/
+
 static void ATTR_PRINTF(3,4) process_error(struct messdocs_state *state, const char *tag, const char *msgfmt, ...)
 {
 	/*va_list va;*/
@@ -501,6 +515,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	FILE *chm_hhp;
 	int i;
 	char *s;
+	XML_Memory_Handling_Suite memcallbacks;
 
 	memset(&state, 0, sizeof(state));
 	state.pool = pool_alloc(NULL);
@@ -551,7 +566,11 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	fprintf(state.chm_toc, "</OBJECT>\n");
 	fprintf(state.chm_toc, "<UL>\n");
 
-	state.parser = XML_ParserCreate(NULL);
+	/* create the XML parser */
+	memcallbacks.malloc_fcn = expat_malloc;
+	memcallbacks.realloc_fcn = expat_realloc;
+	memcallbacks.free_fcn = expat_free;
+	state.parser = XML_ParserCreate_MM(NULL, &memcallbacks, NULL);
 	if (!state.parser)
 		goto outofmemory;
 
@@ -634,3 +653,30 @@ void CLIB_DECL logerror(const char *text,...)
 {
 }
 
+
+
+/***************************************************************************
+    EXPAT INTERFACES
+***************************************************************************/
+
+/*-------------------------------------------------
+    expat_malloc/expat_realloc/expat_free -
+    wrappers for memory allocation functions so
+    that they pass through out memory tracking
+    systems
+-------------------------------------------------*/
+
+static void *expat_malloc(size_t size)
+{
+	return malloc(size);
+}
+
+static void *expat_realloc(void *ptr, size_t size)
+{
+	return realloc(ptr, size);
+}
+
+static void expat_free(void *ptr)
+{
+	free(ptr);
+}
