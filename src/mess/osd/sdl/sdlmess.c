@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -8,6 +9,20 @@
 
 #include "osdmess.h"
 #include "utils.h"
+
+#ifdef SDLMAME_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <tchar.h>
+#endif
+
+#ifdef SDLMAME_MACOSX
+#include <Carbon/Carbon.h>
+#endif
+
+#ifdef SDLMAME_UNIX
+#include <X11/Xatom.h>
+#endif
 
 //============================================================
 //   osd_getcurdir
@@ -180,3 +195,184 @@ file_error osd_rmdir(const char *dir)
 	return filerr;
 }
 
+#ifdef SDLMAME_MACOSX
+//============================================================
+//	osd_get_clipboard_text
+//============================================================
+
+char *osd_get_clipboard_text(void)
+{
+	char *result = NULL; /* core expects a malloced buffer of uft8 data */
+
+	PasteboardRef pasteboard_ref;
+	OSStatus err;
+	PasteboardSyncFlags sync_flags;
+	PasteboardItemID item_id;
+	CFIndex flavor_count;
+	CFArrayRef flavor_type_array;
+	CFIndex flavor_index;
+	ItemCount item_count;
+	UInt32 item_index;
+	Boolean	success = 0;
+	
+	err = PasteboardCreate(kPasteboardClipboard, &pasteboard_ref);
+
+	if (!err)
+	{
+		sync_flags = PasteboardSynchronize( pasteboard_ref );
+		
+		err = PasteboardGetItemCount(pasteboard_ref, &item_count );
+		
+		for (item_index=1; item_index<=item_count; item_index++)
+		{
+			err = PasteboardGetItemIdentifier(pasteboard_ref, item_index, &item_id);
+			
+			if (!err)
+			{
+				err = PasteboardCopyItemFlavors(pasteboard_ref, item_id, &flavor_type_array);
+				
+				if (!err)
+				{
+					flavor_count = CFArrayGetCount(flavor_type_array);
+				
+					for (flavor_index = 0; flavor_index < flavor_count; flavor_index++)
+					{
+						CFStringRef flavor_type;
+						CFDataRef flavor_data;
+						
+						flavor_type = (CFStringRef)CFArrayGetValueAtIndex(flavor_type_array, flavor_index);
+						
+						if (UTTypeConformsTo(flavor_type, CFSTR("public.utf16-plain-text")))
+						{
+							CFStringRef string_ref;
+							CFIndex length;
+							
+							err = PasteboardCopyItemFlavorData(pasteboard_ref, item_id, flavor_type, &flavor_data);
+							string_ref = CFStringCreateWithBytes(NULL, CFDataGetBytePtr(flavor_data), CFDataGetLength(flavor_data), kCFStringEncodingUTF16, false );
+							length = CFStringGetLength(string_ref) * 2;
+							result = malloc(length);
+							success = CFStringGetCString(string_ref, result, length, kCFStringEncodingUTF8);
+							
+							if (!success)
+							{
+								free(result);
+								result = NULL;
+							}
+				
+							CFRelease(string_ref);
+							CFRelease(flavor_data);
+							break;
+						}
+					}
+				
+					CFRelease(flavor_type_array);
+				}
+			}
+			
+			if (success)
+				break;
+		}
+
+		CFRelease(pasteboard_ref);
+	}
+	
+	return result;
+}
+#endif
+
+#ifdef SDLMAME_WIN32
+//============================================================
+//	get_clipboard_text_by_format
+//============================================================
+
+static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID data))
+{
+	char *result = NULL;
+	HANDLE data_handle;
+	LPVOID data;
+
+	// check to see if this format is available
+	if (IsClipboardFormatAvailable(format))
+	{
+		// open the clipboard
+		if (OpenClipboard(NULL))
+		{
+			// try to access clipboard data
+			data_handle = GetClipboardData(format);
+			if (data_handle != NULL)
+			{
+				// lock the data
+				data = GlobalLock(data_handle);
+				if (data != NULL)
+				{
+					// invoke the convert
+					result = (*convert)(data);
+
+					// unlock the data
+					GlobalUnlock(data_handle);
+				}
+			}
+
+			// close out the clipboard
+			CloseClipboard();
+		}
+	}
+	return result;
+}
+
+
+
+//============================================================
+//	convert_wide
+//============================================================
+
+static char *convert_wide(LPCVOID data)
+{
+	return utf8_from_wstring((LPCWSTR) data);
+}
+
+
+
+//============================================================
+//	convert_ansi
+//============================================================
+
+static char *convert_ansi(LPCVOID data)
+{
+	return utf8_from_astring((LPCSTR) data);
+}
+
+
+
+//============================================================
+//	osd_get_clipboard_text
+//============================================================
+
+char *osd_get_clipboard_text(void)
+{
+	char *result = NULL;
+
+	// try to access unicode text
+	if (result == NULL)
+		result = get_clipboard_text_by_format(CF_UNICODETEXT, convert_wide);
+
+	// try to access ANSI text
+	if (result == NULL)
+		result = get_clipboard_text_by_format(CF_TEXT, convert_ansi);
+
+	return result;
+}
+#endif
+
+#ifdef SDLMAME_UNIX
+//============================================================
+//	osd_get_clipboard_text
+//============================================================
+
+char *osd_get_clipboard_text(void)
+{
+	char *result = NULL;
+
+	return result;
+}
+#endif
