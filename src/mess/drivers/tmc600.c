@@ -255,7 +255,7 @@ static CDP1802_EF_READ( tmc600_ef_r )
 	return flags;
 }
 
-static const cdp1802_interface tmc600_cdp1802_config =
+static CDP1802_INTERFACE( tmc600_cdp1802_config )
 {
 	tmc600_mode_r,
 	tmc600_ef_r,

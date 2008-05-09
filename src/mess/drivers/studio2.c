@@ -193,7 +193,7 @@ static CDP1861_ON_EFX_CHANGED( studio2_efx_w )
 	cdp1861_efx = level;
 }
 
-static const cdp1861_interface studio2_cdp1861_intf =
+static CDP1861_INTERFACE( studio2_cdp1861_intf )
 {
 	SCREEN_TAG,
 	XTAL_3_52128MHz,
@@ -228,19 +228,13 @@ static CDP1864_ON_EFX_CHANGED( mpt02_efx_w )
 	cdp1864_efx = level;
 }
 
-static CDP1864_COLOR_RAM_READ( mpt02_colorram_r )
-{
-	return colorram[addr / 4]; // 0x04 = R, 0x02 = B, 0x01 = G
-}
-
-static const cdp1864_interface mpt02_cdp1864_intf =
+static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 {
 	SCREEN_TAG,
 	CDP1864_CLK_FREQ,
 	mpt02_int_w,
 	mpt02_dmao_w,
 	mpt02_efx_w,
-	mpt02_colorram_r,
 	RES_K(2.2),	// unverified
 	RES_K(1),	// unverified
 	RES_K(5.1),	// unverified
@@ -289,7 +283,7 @@ static CDP1802_DMA_WRITE( studio2_dma_w )
 	cdp1861_dma_w(cdp1861, data);
 }
 
-static const cdp1802_interface studio2_config =
+static CDP1802_INTERFACE( studio2_config )
 {
 	studio2_mode_r,
 	studio2_ef_r,
@@ -315,10 +309,16 @@ static CDP1802_DMA_WRITE( mpt02_dma_w )
 {
 	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
 
-	cdp1864_dma_w(cdp1864, data);
+	UINT8 color = colorram[ma / 4]; // 0x04 = R, 0x02 = B, 0x01 = G
+
+	int rdata = BIT(color, 2);
+	int gdata = BIT(color, 0);
+	int bdata = BIT(color, 1);
+
+	cdp1864_dma_w(cdp1864, data, rdata, gdata, bdata);
 }
 
-static const cdp1802_interface mpt02_config =
+static CDP1802_INTERFACE( mpt02_config )
 {
 	studio2_mode_r,
 	mpt02_ef_r,

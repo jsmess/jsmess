@@ -261,7 +261,7 @@ DEVICE_GET_INFO( cdp1861 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "RCA CDP1861";					break;
-		case DEVINFO_STR_FAMILY:						info->s = "RCA CDP1861";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "RCA CDP1800";					break;
 		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;

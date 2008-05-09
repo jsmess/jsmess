@@ -233,7 +233,7 @@ static CDP1802_Q_WRITE( comx35_q_w )
 	cassette_output(cassette_device_image(), level ? -1.0 : +1.0);
 }
 
-static const cdp1802_interface comx35_cdp1802_config =
+static CDP1802_INTERFACE( comx35_cdp1802_config )
 {
 	comx35_mode_r,
 	comx35_ef_r,

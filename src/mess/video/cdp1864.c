@@ -243,11 +243,9 @@ WRITE8_DEVICE_HANDLER( cdp1864_tone_latch_w )
 
 /* DMA Write */
 
-void cdp1864_dma_w(const device_config *device, UINT8 data)
+void cdp1864_dma_w(const device_config *device, UINT8 data, int rdata, int gdata, int bdata)
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
-
-	UINT16 addr = activecpu_get_reg(CDP1802_R0);
 
 	int sx = video_screen_get_hpos(cdp1864->screen) + 4;
 	int y = video_screen_get_vpos(cdp1864->screen);
@@ -257,9 +255,9 @@ void cdp1864_dma_w(const device_config *device, UINT8 data)
 	{
 		int color = CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor];
 
-		if (data & 0x80)
+		if (BIT(data, 7))
 		{
-			color = cdp1864->intf->color_ram_r(device, addr);
+			color = (gdata << 2) | (bdata << 1) | rdata;
 		}
 
 		*BITMAP_ADDR16(cdp1864->bitmap, y, sx + x) = color;
@@ -427,7 +425,7 @@ DEVICE_GET_INFO( cdp1864 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "RCA CDP1861";					break;
-		case DEVINFO_STR_FAMILY:						info->s = "RCA CDP1861";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "RCA CDP1800";					break;
 		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;

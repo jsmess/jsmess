@@ -326,7 +326,7 @@ static CDP1861_ON_EFX_CHANGED( tmc1800_efx_w )
 	cdp1861_efx = level;
 }
 
-static const cdp1861_interface tmc1800_cdp1861_intf =
+static CDP1861_INTERFACE( tmc1800_cdp1861_intf )
 {
 	SCREEN_TAG,
 	XTAL_1_75MHz,
@@ -363,19 +363,13 @@ static CDP1864_ON_EFX_CHANGED( tmc2000_efx_w )
 	cdp1864_efx = level;
 }
 
-static CDP1864_COLOR_RAM_READ( tmc2000_colorram_r )
-{
-	return (~colorram[addr & 0x1ff]) & 0x07;
-}
-
-static const cdp1864_interface tmc2000_cdp1864_intf =
+static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 {
 	SCREEN_TAG,
 	CDP1864_CLK_FREQ,
 	tmc2000_int_w,
 	tmc2000_dmao_w,
 	tmc2000_efx_w,
-	tmc2000_colorram_r,
 	RES_K(2.2),	// unverified
 	RES_K(1),	// unverified
 	RES_K(5.1),	// unverified
@@ -413,11 +407,15 @@ static CDP1802_EF_READ( tmc1800_ef_r )
 	char port[4];
 
 	/*
-        EF1     ?
+        EF1     CDP1861
         EF2     tape in
         EF3     keyboard
         EF4     ?
     */
+
+	// CDP1861
+
+	if (!cdp1861_efx) flags -= EF1;
 
 	// tape in
 
@@ -530,7 +528,13 @@ static CDP1802_DMA_WRITE( tmc2000_dma_w )
 {
 	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
 
-	cdp1864_dma_w(cdp1864, data);
+	UINT8 color = (~colorram[ma & 0x1ff]) & 0x07;
+	
+	int rdata = BIT(color, 2);
+	int gdata = BIT(color, 0);
+	int bdata = BIT(color, 1);
+
+	cdp1864_dma_w(cdp1864, data, rdata, gdata, bdata);
 }
 
 static const cdp1802_interface tmc2000_config =
@@ -614,10 +618,17 @@ static CDP1802_DMA_WRITE( oscnano_dma_w )
 {
 	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
 
-	cdp1864_dma_w(cdp1864, data);
+	UINT16 addr = activecpu_get_reg(CDP1802_R0);
+	UINT8 color = (colorram[addr & 0x1ff]) & 0x07;
+	
+	int rdata = BIT(color, 0);
+	int gdata = BIT(color, 1);
+	int bdata = BIT(color, 2);
+
+	cdp1864_dma_w(cdp1864, data, rdata, gdata, bdata);
 }
 
-static const cdp1802_interface oscnano_config =
+static CDP1802_INTERFACE( oscnano_config )
 {
 	oscnano_mode_r,
 	oscnano_ef_r,
@@ -664,6 +675,11 @@ static MACHINE_START( tmc2000 )
 
 	switch (mess_ram_size)
 	{
+	case 4*1024:
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+
 	case 16*1024:
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
@@ -888,7 +904,8 @@ SYSTEM_CONFIG_START( osc1000b )
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( tmc2000 )
-	CONFIG_RAM_DEFAULT	(16 * 1024)
+	CONFIG_RAM_DEFAULT	( 4 * 1024)
+	CONFIG_RAM			(16 * 1024)
 	CONFIG_RAM			(32 * 1024)
 	CONFIG_DEVICE(tmc1800_cassette_getinfo)
 SYSTEM_CONFIG_END
@@ -916,5 +933,5 @@ static DRIVER_INIT( tmc1800 )
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY         FULLNAME        FLAGS */
 COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,    tmc1800,    "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    tmc1800,    "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1980, oscnano,	0,		0,		oscnano,	oscnano,	tmc1800,	oscnano,	"OSCOM Oy",		"OSCOM Nano",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1980, oscnano,	0,		0,		oscnano,	oscnano,	tmc1800,	oscnano,	"OSCOM Oy",		"OSCOM Nano",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    tmc1800,    tmc2000,    "Telercas Oy",  "Telmac 2000",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

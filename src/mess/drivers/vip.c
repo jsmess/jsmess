@@ -101,7 +101,7 @@ static CDP1861_ON_EFX_CHANGED( vip_efx_w )
 	cdp1861_efx = level;
 }
 
-static const cdp1861_interface vip_cdp1861_intf =
+static CDP1861_INTERFACE( vip_cdp1861_intf )
 {
 	SCREEN_TAG,
 	XTAL_3_52128MHz,
@@ -176,7 +176,7 @@ static CDP1802_DMA_WRITE( vip_dma_w )
 	cdp1861_dma_w(cdp1861, data);
 }
 
-static const cdp1802_interface vip_config =
+static CDP1802_INTERFACE( vip_config )
 {
 	vip_mode_r,
 	vip_ef_r,

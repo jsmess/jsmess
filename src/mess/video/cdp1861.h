@@ -75,6 +75,7 @@ struct _cdp1861_interface
 	/* this gets called for every change of the EFX pin (pin 9) */
 	cdp1861_on_efx_changed_func		on_efx_changed;
 };
+#define CDP1861_INTERFACE(name) const cdp1861_interface (name)=
 
 /* device interface */
 DEVICE_GET_INFO( cdp1861 );

@@ -1,3 +1,34 @@
+/*
+
+	Telmac 2000E
+    ------------
+    (c) 1980 Telercas Oy, Finland
+
+    CPU:        CDP1802A    1.75 MHz
+    RAM:        8 KB
+    ROM:        8 KB
+
+    Video:      CDP1864     1.75 MHz
+    Color RAM:  1 KB
+
+    Colors:     8 fg, 4 bg
+    Resolution: 64x192
+    Sound:      frequency control, volume on/off
+    Keyboard:   ASCII (RCA VP-601/VP-611), KB-16/KB-64
+
+    SBASIC:     24.0
+
+
+    Telmac TMC-121/111/112
+    ----------------------
+    (c) 198? Telercas Oy, Finland
+
+    CPU:        CDP1802A    ? MHz
+
+    Built from Telmac 2000 series cards. Huge metal box.
+
+*/
+
 #include "driver.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/printer.h"
@@ -9,6 +40,11 @@
 
 #define SCREEN_TAG "main"
 #define CDP1864_TAG "cdp1864"
+
+static const device_config *cassette_device_image(void)
+{
+	return image_from_devtype_and_index(IO_CASSETTE, 0);
+}
 
 /* Read/Write Handlers */
 
@@ -60,7 +96,7 @@ static WRITE8_HANDLER( keyboard_latch_w )
 static ADDRESS_MAP_START( tmc2000e_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0xfc00, 0xffff) AM_WRITEONLY AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000e_io_map, ADDRESS_SPACE_IO, 8 )
@@ -70,7 +106,7 @@ static ADDRESS_MAP_START( tmc2000e_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(vismac_r, vismac_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(input_port_0_r, io_select_w)
+	AM_RANGE(0x07, 0x07) AM_READ_PORT("DSW0") AM_WRITE(io_select_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -113,19 +149,13 @@ static CDP1864_ON_EFX_CHANGED( tmc2000e_efx_w )
 	cdp1864_efx = level;
 }
 
-static CDP1864_COLOR_RAM_READ( tmc2000e_colorram_r )
-{
-	return colorram[addr]; // 0x04 = R, 0x02 = B, 0x01 = G
-}
-
-static const cdp1864_interface tmc2000e_cdp1864_intf =
+static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 {
 	SCREEN_TAG,
 	CDP1864_CLK_FREQ,
 	tmc2000e_int_w,
 	tmc2000e_dmao_w,
 	tmc2000e_efx_w,
-	tmc2000e_colorram_r,
 	RES_K(2.2),	// unverified
 	RES_K(1),	// unverified
 	RES_K(5.1),	// unverified
@@ -162,12 +192,21 @@ static CDP1802_EF_READ( tmc2000e_ef_r )
 
 	/*
         EF1     CDP1864
-        EF2     tape/floppy
+        EF2     tape in/floppy
         EF3     keyboard
         EF4     I/O port
     */
 
+	// CDP1864
+
+	if (!cdp1864_efx) flags -= EF1;
+
+	// tape in
+
+	if (cassette_input(cassette_device_image()) > +1.0) flags -= EF2;
+	
 	// keyboard
+
 	sprintf(port, "IN%d", keylatch / 8);
 	if (~input_port_read(machine, port) & (1 << (keylatch % 8))) flags -= EF3;
 
@@ -178,14 +217,17 @@ static CDP1802_Q_WRITE( tmc2000e_q_w )
 {
 	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
 
-	// CDP1864 sound generator on/off
+	// turn CDP1864 sound generator on/off
+
 	cdp1864_aoe_w(cdp1864, level);
 
 	// set Q led status
-	// leds: Wait, Q, Power
+
 	set_led_status(1, level);
 
-	// tape output
+	// tape out
+
+	cassette_output(cassette_device_image(), level ? -1.0 : +1.0);
 
 	// floppy control (FDC-6)
 }
@@ -194,10 +236,16 @@ static CDP1802_DMA_WRITE( tmc2000e_dma_w )
 {
 	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
 
-	cdp1864_dma_w(cdp1864, data);
+	UINT8 color = (colorram[ma & 0x3ff]) & 0x07; // 0x04 = R, 0x02 = B, 0x01 = G
+	
+	int rdata = BIT(color, 2);
+	int gdata = BIT(color, 0);
+	int bdata = BIT(color, 1);
+
+	cdp1864_dma_w(cdp1864, data, rdata, gdata, bdata);
 }
 
-static const cdp1802_interface tmc2000e_config =
+static CDP1802_INTERFACE( tmc2000e_config )
 {
 	tmc2000e_mode_r,
 	tmc2000e_ef_r,
@@ -277,7 +325,8 @@ static void tmc2000e_cassette_getinfo(const mess_device_class *devclass, UINT32 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
