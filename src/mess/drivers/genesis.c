@@ -249,24 +249,24 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		genesis_last_loaded_image_length = length; // this will be -1 for MD and SMD so can't map those roms to custom mappers (yet)
 
 
-	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
+		ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
 
- 	for (ptr = 0; ptr < 0x502000; ptr += 2)		/* mangle bytes for littleendian machines */
-	{
+ 		for (ptr = 0; ptr < 0x502000; ptr += 2)		/* mangle bytes for littleendian machines */
+		{
 #ifdef LSB_FIRST
-		int temp = ROM[relocate + ptr];
+			int temp = ROM[relocate + ptr];
 
-		ROM[ptr] = ROM[relocate + ptr + 1];
-		ROM[ptr + 1] = temp;
+			ROM[ptr] = ROM[relocate + ptr + 1];
+			ROM[ptr + 1] = temp;
 #else
-		ROM[ptr] = ROM[relocate + ptr];
-		ROM[ptr + 1] = ROM[relocate + ptr + 1];
+			ROM[ptr] = ROM[relocate + ptr];
+			ROM[ptr + 1] = ROM[relocate + ptr + 1];
 #endif
+		}
+		memcpy(&ROM[VIRGIN_COPY_GEN],&ROM[0x000000],0x500000);  // store a copy of data for MACHINE_RESET processing
 	}
-	memcpy(&ROM[VIRGIN_COPY_GEN],&ROM[0x000000],0x500000);  // store a copy of data for MACHINE_RESET processing
-
 	return INIT_PASS;
-	}
+
 bad:
 	return INIT_FAIL;
 }
