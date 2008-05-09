@@ -20,7 +20,7 @@
 #include <Carbon/Carbon.h>
 #endif
 
-#ifdef SDLMAME_UNIX
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX)
 #include <X11/Xatom.h>
 #endif
 
@@ -364,7 +364,7 @@ char *osd_get_clipboard_text(void)
 }
 #endif
 
-#ifdef SDLMAME_UNIX
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX)
 //============================================================
 //	osd_get_clipboard_text
 //============================================================
