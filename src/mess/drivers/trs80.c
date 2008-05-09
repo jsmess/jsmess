@@ -195,7 +195,7 @@ NB: row 7 contains some originally unused bits
 
 static INPUT_PORTS_START( trs80 )
 	PORT_START_TAG("CONFIG") /* IN0 */
-	PORT_CONFNAME(	  0x80, 0x80,	"Floppy Disc Drives")
+	PORT_CONFNAME(	  0x80, 0x00,	"Floppy Disc Drives")
 	PORT_CONFSETTING(	0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(	0x80, DEF_STR( On ) )
 	PORT_CONFNAME(	  0x40, 0x40,	"Video RAM") PORT_CODE(KEYCODE_F1)
