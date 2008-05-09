@@ -306,6 +306,39 @@ static void vic3_drawlines (int first, int last)
 						vic2.sprites[i].paintedline[j] = 0;
 				}
 			}
+			// sprite wrap y at the top of the screen
+			else if (SPRITEON (i) && (yoff == 1 + yend - ybegin) && (SPRITE_Y_POS (i) < 1 + yend - ybegin))
+			{
+				int wrapped = 1 + yend - ybegin - SPRITE_Y_POS (i);
+				syend = yend;
+
+				if (SPRITE_Y_EXPAND (i))
+				{
+					if (wrapped & 1) vic2.sprites[i].repeat = 1;
+					wrapped >>= 1;
+					syend = 21 * 2 - 1 - wrapped * 2;
+					if (syend > (yend - ybegin)) syend = yend - ybegin;
+				}
+				else
+				{
+					syend = 21 - 1 - wrapped;
+					if (syend > (yend - ybegin)) syend = yend - ybegin;
+				}
+
+				vic2.sprites[i].line = wrapped;
+
+				if (SPRITE_MULTICOLOR (i))
+					vic2_draw_sprite_multi (i, yoff, 0 , syend);
+				else
+					vic2_draw_sprite (i, yoff, 0 , syend);
+
+				if ((syend != yend) || (vic2.sprites[i].line > 20))
+				{
+					for (j = syend; j <= yend; j++)
+						vic2.sprites[i].paintedline[j] = 0;
+					vic2.sprites[i].line = vic2.sprites[i].repeat = 0;
+				}
+			}
 			else if (SPRITEON (i) && (yoff + ybegin <= SPRITE_Y_POS (i))
 					 && (yoff + yend >= SPRITE_Y_POS (i)))
 			{
