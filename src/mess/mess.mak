@@ -358,6 +358,7 @@ DRVLIBS = \
 	$(MESSOBJ)/coco.a \
 	$(MESSOBJ)/coleco.a \
 	$(MESSOBJ)/compis.a \
+	$(MESSOBJ)/comx.a \
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/cybiko.a \
@@ -1240,6 +1241,11 @@ $(MESSOBJ)/b2m.a:      \
 	$(MESS_MACHINE)/b2m.o \
 	$(MESS_VIDEO)/b2m.o \
 
+$(MESSOBJ)/comx.a:				\
+	$(MESS_DRIVERS)/comx35.o	\
+	$(MESS_VIDEO)/comx35.o		\
+	$(MESS_MACHINE)/cdp1871.o	\
+	
 $(MESSOBJ)/bondwell.a: \
 	$(MESS_DRIVERS)/bw2.o
 

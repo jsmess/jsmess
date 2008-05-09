@@ -1,10 +1,11 @@
-0.125
+﻿0.125
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Bashkiria-2M (not fully operational) [Miodrag Milanovic]
 - BK 0010/0010.01 [Miodrag Milanovic]
 - Bondwell 2 (not working)  [Tomas Karlsson]
+- COMX 35 (not working) [Curt Coder]
 - Dick Smith Super-80 with VDUEB (original version) [Robbbert]
 - KOEI PasoGo (not working) [Peter Trauner]
 - Orion 128/Z80 Card II/Pro	[Miodrag Milanovic]
