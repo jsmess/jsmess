@@ -1,4 +1,4 @@
-﻿0.125
+0.125
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -28,7 +28,7 @@ System Driver Changes:
 - [C64] Partial input fix, joystick 2 still not working. (bug #1150) [Roberto
   Zandonà]
 
-- [C64] Implentation of sprite wrapping at the top of the screen. (bug #1159)
+- [C64] Implentation of sprite wrapping at the top of the screen. (bug #1599)
   [Roberto Zandonà]
 
 - [COCO/COCO3] Transitioned Bitbanger and VHD support to use MAME's core
