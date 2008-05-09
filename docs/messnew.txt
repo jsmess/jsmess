@@ -79,6 +79,8 @@ System Driver Changes:
 - [SPECTRUM] Homebrew ROMs are now selectable BIOSes instead of separate
   drivers. [Miodrag Milanovic]
 
+- [SVI318] UART fix.  [Tomas Karlsson]
+
 - [T1000HX] Fixed bug #1130.  [Wilbert Pol]
 
 - [THOMSON] Fixed crashes with non-default ram sizes.  (bug #1443) [Antoine

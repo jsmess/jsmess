@@ -26,9 +26,9 @@
 
 enum {
 	SVI_INTERNAL	= 0,
-	SVI_CART		= 1,
-	SVI_EXPRAM2		= 2,
-	SVI_EXPRAM3		= 3
+	SVI_CART    	= 1,
+	SVI_EXPRAM2 	= 2,
+	SVI_EXPRAM3 	= 3
 };
 
 typedef struct {
@@ -63,6 +63,7 @@ static UINT32 pcart_rom_size;
 
 static void svi318_set_banks (void);
 
+
 /* Serial ports */
 
 static INS8250_INTERRUPT( svi318_ins8250_interrupt )
@@ -95,6 +96,7 @@ const ins8250_interface svi318_ins8250_interface[2]=
 		NULL
 	}
 };
+
 
 /* Cartridge */
 
@@ -826,7 +828,7 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x12:
 		data = svi318_printer_r(machine, 0);
 		break;
-/* some UART status is not working
+
 	case 0x20:
 	case 0x21:
 	case 0x22:
@@ -835,9 +837,9 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x25:
 	case 0x26:
 	case 0x27:
-		data = uart8250_0_r(machine, offset & 7);
+		data = ins8250_r(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ), offset & 7);
 		break;
-*/
+
 	case 0x28:
 	case 0x29:
 	case 0x2A:
@@ -848,6 +850,7 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x2F:
 		data = ins8250_r(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_1" ), offset & 7);
 		break;
+
 	case 0x30:
 		data = wd17xx_status_r(machine, 0);
 		break;
@@ -884,6 +887,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x11:
 		svi318_printer_w(machine, offset & 1, data);
 		break;
+
 	case 0x20:
 	case 0x21:
 	case 0x22:
@@ -894,6 +898,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x27:
 		ins8250_w(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ), offset & 7, data);
 		break;
+
 	case 0x28:
 	case 0x29:
 	case 0x2A:
@@ -904,6 +909,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x2F:
 		ins8250_w(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_1" ), offset & 7, data);
 		break;
+
 	case 0x30:
 		wd17xx_command_w(machine, 0, data);
 		break;
@@ -922,6 +928,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x38:
 		svi318_fdc_density_side_w(machine, 0, data);
 		break;
+
 	case 0x50: {
 		device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
 		mc6845_address_w(devconf, 0, data);
@@ -932,6 +939,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 		mc6845_register_w(devconf, 0, data);
 		}
 		break;
+
 	case 0x58:
 		svi806_ram_enable_w(machine, 0, data);
 		break;
