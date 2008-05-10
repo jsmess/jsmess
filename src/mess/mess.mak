@@ -1112,7 +1112,7 @@ $(MESSOBJ)/multitch.a:					\
 
 $(MESSOBJ)/telmac.a:					\
 	$(MESS_DRIVERS)/tmc1800.o	\
-	$(MESS_VIDEO)/osm200.o	\
+	$(MESS_VIDEO)/tmc1800.o	\
 	$(MESS_DRIVERS)/tmc600.o	\
 	$(MESS_VIDEO)/tmc600.o	\
 	$(MESS_DRIVERS)/tmc2000e.o	\

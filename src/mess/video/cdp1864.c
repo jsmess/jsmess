@@ -327,7 +327,7 @@ void cdp1864_update(const device_config *device, bitmap_t *bitmap, const rectang
 	}
 	else
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		fillbitmap(bitmap, get_black_pen(device->machine), cliprect);
 	}
 }
 
