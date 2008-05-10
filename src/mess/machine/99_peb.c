@@ -404,7 +404,7 @@ WRITE16_HANDLER ( ti99_4x_peb_w )
 	activecpu_adjust_icount(-4);
 
 	/* simulate byte write */
-	data = (tmp_buffer & mem_mask) | (data & ~mem_mask);
+	data = (tmp_buffer & ~mem_mask) | (data & mem_mask);
 
 	if (active_card != -1)
 	{
@@ -689,7 +689,7 @@ READ16_HANDLER ( ti99_4p_peb_r )
 
 			handler16 = ti99_4p_expansion_ports[active_card].w.width_16bit.mem_read;
 			if (handler16)
-				reply = (*handler16)(machine, offset, /*mem_mask*/0);
+				reply = (*handler16)(machine, offset, /*mem_mask*/0xffff);
 		}
 	}
 
@@ -721,7 +721,7 @@ WRITE16_HANDLER ( ti99_4p_peb_w )
 	else
 	{
 		/* simulate byte write */
-		data = (tmp_buffer & mem_mask) | (data & ~mem_mask);
+		data = (tmp_buffer & ~mem_mask) | (data & mem_mask);
 
 		if (ti99_4p_expansion_ports[active_card].width == width_8bit)
 		{
@@ -740,7 +740,7 @@ WRITE16_HANDLER ( ti99_4p_peb_w )
 
 			handler16 = ti99_4p_expansion_ports[active_card].w.width_16bit.mem_write;
 			if (handler16)
-				(*handler16)(machine, offset, data, /*mem_mask*/0);
+				(*handler16)(machine, offset, data, /*mem_mask*/0xffff);
 		}
 	}
 }
