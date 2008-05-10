@@ -1,4 +1,36 @@
-﻿0.125
+﻿0.125.1
+
+New System Drivers Supported (in no particular order):
+------------------------------------------------------
+(none)
+
+
+
+System Driver Changes:
+----------------------
+(none)
+
+
+
+User Interface Changes:
+-----------------------
+(none)
+
+
+
+Imgtool Changes:
+----------------
+(none)
+
+
+
+Source Changes:
+----------------
+(none)
+
+
+
+0.125
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -10,6 +42,8 @@ New System Drivers Supported (in no particular order):
 - KOEI PasoGo (not working) [Peter Trauner]
 - Orion 128/Z80 Card II/Pro	[Miodrag Milanovic]
 - Pentagon (not fully operational)[Miodrag Milanovic]
+
+
 
 System Driver Changes:
 ----------------------
