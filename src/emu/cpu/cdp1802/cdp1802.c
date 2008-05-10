@@ -191,7 +191,7 @@ static void cdp1802_output_state_code(running_machine *machine)
 {
 	if (cdp1802.intf->sc_w)
 	{
-		cdp1802_state state_code;
+		cdp1802_state state_code = 0;
 
 		switch (cdp1802.state)
 		{
