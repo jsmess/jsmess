@@ -153,6 +153,7 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 {
 	SCREEN_TAG,
 	CDP1864_CLK_FREQ,
+	CDP1864_INTERLACED,
 	tmc2000e_int_w,
 	tmc2000e_dmao_w,
 	tmc2000e_efx_w,
