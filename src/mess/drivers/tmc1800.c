@@ -87,11 +87,11 @@ static const device_config *cassette_device_image(void)
 
 /* Read/Write Handlers */
 
-static int keylatch;
-
 static WRITE8_HANDLER( tmc1800_keylatch_w )
 {
-	keylatch = data;
+	tmc1800_state *state = machine->driver_data;
+
+	state->keylatch = data;
 }
 
 static WRITE8_HANDLER( tmc2000_keylatch_w )
@@ -111,7 +111,9 @@ static WRITE8_HANDLER( tmc2000_keylatch_w )
 
 	*/
 
-	keylatch = data & 0x3f;
+	tmc2000_state *state = machine->driver_data;
+
+	state->keylatch = data & 0x3f;
 }
 
 static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
@@ -338,8 +340,8 @@ static CDP1802_EF_READ( tmc1800_ef_r )
 
 	// keyboard
 
-	sprintf(port, "IN%d", keylatch / 8);
-	if (~input_port_read(machine, port) & (1 << (keylatch % 8))) flags -= EF3;
+	sprintf(port, "IN%d", state->keylatch / 8);
+	if (~input_port_read(machine, port) & (1 << (state->keylatch % 8))) flags -= EF3;
 
 	return flags;
 }
@@ -418,8 +420,8 @@ static CDP1802_EF_READ( tmc2000_ef_r )
 
 	// keyboard
 
-	sprintf(port, "IN%d", keylatch / 8);
-	if (~input_port_read(machine, port) & (1 << (keylatch % 8))) flags -= EF3;
+	sprintf(port, "IN%d", state->keylatch / 8);
+	if (~input_port_read(machine, port) & (1 << (state->keylatch % 8))) flags -= EF3;
 
 	return flags;
 }
@@ -506,8 +508,8 @@ static CDP1802_EF_READ( oscnano_ef_r )
 
 	// keyboard
 
-	sprintf(port, "IN%d", keylatch / 8);
-	if (~input_port_read(machine, port) & (1 << (keylatch % 8))) flags -= EF3;
+	sprintf(port, "IN%d", state->keylatch / 8);
+	if (~input_port_read(machine, port) & (1 << (state->keylatch % 8))) flags -= EF3;
 
 	// monitor
 
@@ -562,7 +564,9 @@ static CDP1802_INTERFACE( oscnano_config )
 
 static MACHINE_START( tmc1800 )
 {
-	state_save_register_global(keylatch);
+	tmc1800_state *state = machine->driver_data;
+
+	state_save_register_global(state->keylatch);
 }
 
 static MACHINE_RESET( tmc1800 )
@@ -584,7 +588,10 @@ static MACHINE_RESET( osc1000b )
 
 static MACHINE_START( tmc2000 )
 {
-	state_save_register_global(keylatch);
+	tmc2000_state *state = machine->driver_data;
+	UINT16 addr;
+
+	state_save_register_global(state->keylatch);
 
 	// RAM banking
 
@@ -608,6 +615,11 @@ static MACHINE_START( tmc2000 )
 		break;
 	}
 
+	for (addr = 0; addr < mess_ram_size; addr++)
+	{
+		mess_ram[addr] = mame_rand(machine) & 0xff;
+	}
+
 	// ROM/ColorRAM banking
 
 	colorram = auto_malloc(0x200);
@@ -616,6 +628,11 @@ static MACHINE_START( tmc2000 )
 	memory_configure_bank(2, 1, 1, &colorram, 0);
 
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x0e00, SMH_BANK2, SMH_UNMAP);
+
+	for (addr = 0; addr < 0x200; addr++)
+	{
+		colorram[addr] = mame_rand(machine) & 0xff;
+	}
 }
 
 static MACHINE_RESET( tmc2000 )
@@ -633,7 +650,9 @@ static MACHINE_RESET( tmc2000 )
 
 static MACHINE_START( oscnano )
 {
-	state_save_register_global(keylatch);
+	tmc2000_state *state = machine->driver_data;
+
+	state_save_register_global(state->keylatch);
 
 	// RAM banking
 
@@ -758,7 +777,7 @@ ROM_END
 ROM_START( tmc2000 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "default",  "PROM N:o 200" )
-	ROMX_LOAD( "200.m5",    0x8000, 0x0200, BAD_DUMP CRC(6af8e362) SHA1(ebc11e110ec355defb0a4fcbd0063eb3ad4ba23b), ROM_BIOS(1) ) // typed in from the manual
+	ROMX_LOAD( "200.m5",    0x8000, 0x0200, BAD_DUMP CRC(79da3221) SHA1(008da3ef4f69ab1a493362dfca856375b19c94bd), ROM_BIOS(1) ) // typed in from the manual
 	ROM_SYSTEM_BIOS( 1, "prom202",  "PROM N:o 202" )
 	ROMX_LOAD( "202.m5",    0x8000, 0x0200, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tool2000", "TOOL-2000" )

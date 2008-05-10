@@ -9,6 +9,7 @@
 
     TODO:
 
+	- interlace mode
     - connect to sound system when possible
 
 */
@@ -152,32 +153,36 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 	}
 }
 
-
 /* Palette Initialization */
 
-static void cdp1864_init_palette(running_machine *machine, double res_r, double res_g, double res_b, double res_bkg)
+static void cdp1864_init_palette(const device_config *device)
 {
-	int i, r, g, b, luma;
+	cdp1864_t *cdp1864 = get_safe_token(device);
+	int i;
 
-	double res_total = res_r + res_g + res_b;
+	double res_total = cdp1864->intf->res_r + cdp1864->intf->res_g + cdp1864->intf->res_b + cdp1864->intf->res_bkg;
 
-	int weight_r = (res_r / res_total) * 100;
-	int weight_g = (res_g / res_total) * 100;
-	int weight_b = (res_b / res_total) * 100;
+	int weight_r = (cdp1864->intf->res_r / res_total) * 100;
+	int weight_g = (cdp1864->intf->res_g / res_total) * 100;
+	int weight_b = (cdp1864->intf->res_b / res_total) * 100;
+	int weight_bkg = (cdp1864->intf->res_bkg / res_total) * 100;
 
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 16; i++)
 	{
-		luma = (i & 4) ? weight_r : 0;
+		int r, g, b, luma = 0;
+
+		luma += (i & 4) ? weight_r : 0;
 		luma += (i & 1) ? weight_g : 0;
 		luma += (i & 2) ? weight_b : 0;
+		luma += (i & 8) ? 0 : weight_bkg;
+
+		luma = (luma * 0xff) / 100;
 
 		r = (i & 4) ? luma : 0;
 		g = (i & 1) ? luma : 0;
 		b = (i & 2) ? luma : 0;
 
-		luma = (luma * 0xff) / 100;
-
-		palette_set_color_rgb( machine, i, r, g, b );
+		palette_set_color_rgb( device->machine, i, r, g, b );
 	}
 }
 
@@ -253,7 +258,7 @@ void cdp1864_dma_w(const device_config *device, UINT8 data, int rdata, int gdata
 
 	for (x = 0; x < 8; x++)
 	{
-		int color = CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor];
+		int color = CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8;
 
 		if (BIT(data, 7))
 		{
@@ -322,8 +327,8 @@ void cdp1864_update(const device_config *device, bitmap_t *bitmap, const rectang
 
 	if (cdp1864->disp)
 	{
-		fillbitmap(bitmap, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor], cliprect);
-		copybitmap_trans(bitmap, cdp1864->bitmap, 0, 0, 0, 0, cliprect, cdp1864->bgcolor);
+		copybitmap(bitmap, cdp1864->bitmap, 0, 0, 0, 0, cliprect);
+		fillbitmap(cdp1864->bitmap, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8, cliprect);
 	}
 	else
 	{
@@ -357,9 +362,10 @@ static DEVICE_START( cdp1864 )
 
 	/* allocate the temporary bitmap */
 	cdp1864->bitmap = auto_bitmap_alloc(video_screen_get_width(cdp1864->screen), video_screen_get_height(cdp1864->screen), video_screen_get_format(cdp1864->screen));
+	fillbitmap(cdp1864->bitmap, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8, 0);
 
 	/* initialize the palette */
-	cdp1864_init_palette(device->machine, cdp1864->intf->res_r, cdp1864->intf->res_g, cdp1864->intf->res_b, cdp1864->intf->res_bkg);
+	cdp1864_init_palette(device);
 
 	/* create the timers */
 	cdp1864->int_timer = timer_alloc(cdp1864_int_tick, (void *)device);
