@@ -524,7 +524,17 @@ SYSTEM_CONFIG_START(sms)
 SYSTEM_CONFIG_END
 
 
-SYSTEM_CONFIG_EXTERN(sg1000)
+static void sg1000m3_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
+	/* cartslot */
+	switch(state) {
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
+		default:					sms_cartslot_getinfo(devclass, state, info); break;
+	}
+}
+
+SYSTEM_CONFIG_START(sg1000m3)
+	CONFIG_DEVICE(sg1000m3_cartslot_getinfo)
+SYSTEM_CONFIG_END
 
 static void smssdisp_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
 	switch(state) {
@@ -601,7 +611,7 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY     FULLNAME                            FLAGS */
-CONS( 1984, sg1000m3,   sms,        0,      smsfm,      sms,    0,      sg1000,     "Sega",     "SG-1000 Mark III",                 FLAG_REGION_JAPAN | FLAG_FM )
+CONS( 1984, sg1000m3,   sms,        0,      smsfm,      sms,    0,      sg1000m3,   "Sega",     "SG-1000 Mark III",                 FLAG_REGION_JAPAN | FLAG_FM )
 CONS( 1986, sms1,       sms,        0,      sms1ntsc,   sms,    0,      sms,        "Sega",     "Master System I",                  FLAG_BIOS_FULL )
 CONS( 1986, sms1pal,    sms,        0,      sms1pal,    sms,    0,      sms,        "Sega",     "Master System I (PAL)" ,           FLAG_BIOS_FULL )
 CONS( 1986, smssdisp,   sms,        0,      smssdisp,   sms,    0,      smssdisp,   "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
