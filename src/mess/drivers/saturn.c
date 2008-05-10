@@ -760,10 +760,10 @@ static READ32_HANDLER ( stv_SMPC_r32 )
 	/* registers are all byte accesses, convert here */
 	offset = offset << 2; // multiply offset by 4
 
-	if (!(mem_mask & 0xff000000))	{ byte = 0; readdata = stv_SMPC_r8(offset+byte) << 24; }
-	if (!(mem_mask & 0x00ff0000))	{ byte = 1; readdata = stv_SMPC_r8(offset+byte) << 16; }
-	if (!(mem_mask & 0x0000ff00))	{ byte = 2; readdata = stv_SMPC_r8(offset+byte) << 8;  }
-	if (!(mem_mask & 0x000000ff))	{ byte = 3; readdata = stv_SMPC_r8(offset+byte) << 0;  }
+	if (!(~mem_mask & 0xff000000))	{ byte = 0; readdata = stv_SMPC_r8(offset+byte) << 24; }
+	if (!(~mem_mask & 0x00ff0000))	{ byte = 1; readdata = stv_SMPC_r8(offset+byte) << 16; }
+	if (!(~mem_mask & 0x0000ff00))	{ byte = 2; readdata = stv_SMPC_r8(offset+byte) << 8;  }
+	if (!(~mem_mask & 0x000000ff))	{ byte = 3; readdata = stv_SMPC_r8(offset+byte) << 0;  }
 
 	return readdata;
 }
@@ -776,10 +776,10 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 	/* registers are all byte accesses, convert here so we can use the data more easily later */
 	offset = offset << 2; // multiply offset by 4
 
-	if (!(mem_mask & 0xff000000))	{ byte = 0; writedata = data >> 24; }
-	if (!(mem_mask & 0x00ff0000))	{ byte = 1; writedata = data >> 16; }
-	if (!(mem_mask & 0x0000ff00))	{ byte = 2; writedata = data >> 8;  }
-	if (!(mem_mask & 0x000000ff))	{ byte = 3; writedata = data >> 0;  }
+	if (!(~mem_mask & 0xff000000))	{ byte = 0; writedata = data >> 24; }
+	if (!(~mem_mask & 0x00ff0000))	{ byte = 1; writedata = data >> 16; }
+	if (!(~mem_mask & 0x0000ff00))	{ byte = 2; writedata = data >> 8;  }
+	if (!(~mem_mask & 0x000000ff))	{ byte = 3; writedata = data >> 0;  }
 
 	writedata &= 0xff;
 
@@ -892,8 +892,8 @@ static INTERRUPT_GEN( stv_interrupt )
 
 static UINT8 port_sel,mux_data;
 
-#define HI_WORD_ACCESS (mem_mask & 0x00ff0000) == 0
-#define LO_WORD_ACCESS (mem_mask & 0x000000ff) == 0
+#define HI_WORD_ACCESS (~mem_mask & 0x00ff0000) == 0
+#define LO_WORD_ACCESS (~mem_mask & 0x000000ff) == 0
 
 /*
 
