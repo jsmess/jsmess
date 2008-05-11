@@ -23,6 +23,7 @@ $(LIBOSD): $(OSDOBJS)
 ifeq ($(TARGETOS),win32)
 OSDCOREOBJS += \
 	$(MESS_SDLOBJ)/glob.o	\
+	$(MESS_SDLOBJ)/winutils.o \
 	$(MESS_SDLOBJ)/w32util.o
 endif
 

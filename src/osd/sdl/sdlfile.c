@@ -459,6 +459,7 @@ file_error osd_copyfile(const char *destfile, const char *srcfile)
 //  osd_stat
 //============================================================
 
+#ifndef SDLMAME_WIN32
 osd_directory_entry *osd_stat(const char *path)
 {
 	osd_directory_entry *result = NULL;
@@ -484,4 +485,5 @@ osd_directory_entry *osd_stat(const char *path)
 	
 	return result;
 }
+#endif
 #endif
