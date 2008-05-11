@@ -14,6 +14,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tchar.h>
+#include "strconv.h"
 #endif
 
 #ifdef SDLMAME_MACOSX
