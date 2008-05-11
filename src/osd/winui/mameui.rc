@@ -363,9 +363,9 @@ BEGIN
     CTEXT           "Multi Emulator Super System",IDC_STATIC,147,7,142,
                     11,NOT WS_GROUP
     CTEXT           "Version 0",IDC_VERSION,147,18,142,11,NOT WS_GROUP
-    CTEXT           "Copyright (C) 1998-2007 The MESS Team",IDC_STATIC,147,
+    CTEXT           "Copyright (C) 1998-2008 The MESS Team",IDC_STATIC,147,
                     29,142,10,NOT WS_GROUP
-    CTEXT           "MESS UI based on MAMEUI version by",IDC_STATIC,147,51,142,10,NOT
+    CTEXT           "MESSUI based on MAMEUI version by",IDC_STATIC,147,51,142,10,NOT
                     WS_GROUP
 #else
     CTEXT           "Multiple Arcade Machine Emulator",IDC_STATIC,147,7,142,
