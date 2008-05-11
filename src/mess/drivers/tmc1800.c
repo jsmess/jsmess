@@ -66,19 +66,26 @@
 
 	TODO:
 
-	- tmc2000: fix display
 	- tmc2000: add missing keys
 	- tmc2000: TOOL-2000 rom banking
 
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/tmc1800.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
 #include "video/cdp1864.h"
 #include "devices/cassette.h"
+#include "devices/snapquik.h"
 #include "sound/beep.h"
+
+static QUICKLOAD_LOAD( tmc1800 );
+static QUICKLOAD_LOAD( tmc2000 );
+
+static MACHINE_RESET( tmc1800 );
+static MACHINE_RESET( tmc2000 );
 
 static const device_config *cassette_device_image(void)
 {
@@ -123,21 +130,20 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 	// enable RAM
 
 	memory_set_bank(1, 1);
+	memory_set_bank(2, bank);
 
 	if (bank)
 	{
 		// enable Color RAM
 
-		memory_install_readwrite8_handler(device->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x0e00, SMH_UNMAP, SMH_BANK2);
+		memory_install_readwrite8_handler(device->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x7e00, SMH_UNMAP, SMH_BANK2);
 	}
 	else
 	{
 		// enable ROM
 
-		memory_install_readwrite8_handler(device->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x0e00, SMH_BANK2, SMH_UNMAP);
+		memory_install_readwrite8_handler(device->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
 	}
-
-	memory_set_bank(2, bank);
 
 	cdp1864_tone_latch_w(device, 0, data);
 }
@@ -306,12 +312,23 @@ INPUT_PORTS_END
 
 static CDP1802_MODE_READ( tmc1800_mode_r )
 {
+	tmc1800_state *state = machine->driver_data;
+
 	if (input_port_read(machine, "RUN") & 0x01)
 	{
+		if (state->reset)
+		{
+			MACHINE_RESET_CALL(tmc2000);
+
+			state->reset = 0;
+		}
+
 		return CDP1802_MODE_RUN;
 	}
 	else
 	{
+		state->reset = 1;
+
 		return CDP1802_MODE_RESET;
 	}
 }
@@ -382,15 +399,22 @@ static const cdp1802_interface osc1000b_config =
 
 static CDP1802_MODE_READ( tmc2000_mode_r )
 {
+	tmc2000_state *state = machine->driver_data;
+
 	if (input_port_read(machine, "RUN") & 0x01)
 	{
+		if (state->reset)
+		{
+			MACHINE_RESET_CALL(tmc2000);
+
+			state->reset = 0;
+		}
+
 		return CDP1802_MODE_RUN;
 	}
 	else
 	{
-		// enable ROM at 0x0000
-
-		memory_set_bank(1, 0);
+		state->reset = 1;
 
 		return CDP1802_MODE_RESET;
 	}
@@ -446,8 +470,9 @@ static CDP1802_Q_WRITE( tmc2000_q_w )
 static CDP1802_DMA_WRITE( tmc2000_dma_w )
 {
 	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
+	tmc2000_state *state = machine->driver_data;
 
-	UINT8 color = (~colorram[ma & 0x1ff]) & 0x07;
+	UINT8 color = ~(state->colorram[ma & 0x1ff]) & 0x07;
 	
 	int rdata = BIT(color, 2);
 	int gdata = BIT(color, 0);
@@ -539,13 +564,7 @@ static CDP1802_DMA_WRITE( oscnano_dma_w )
 {
 	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
 
-	UINT8 color = (colorram[ma & 0x1ff]) & 0x07;
-	
-	int rdata = BIT(color, 0);
-	int gdata = BIT(color, 1);
-	int bdata = BIT(color, 2);
-
-	cdp1864_dma_w(cdp1864, data, rdata, gdata, bdata);
+	cdp1864_dma_w(cdp1864, data, 1, 1, 1);
 }
 
 static CDP1802_INTERFACE( oscnano_config )
@@ -620,18 +639,18 @@ static MACHINE_START( tmc2000 )
 		mess_ram[addr] = mame_rand(machine) & 0xff;
 	}
 
-	// ROM/ColorRAM banking
+	// ROM/colorram banking
 
-	colorram = auto_malloc(0x200);
+	state->colorram = auto_malloc(0x200);
 
 	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
-	memory_configure_bank(2, 1, 1, &colorram, 0);
+	memory_configure_bank(2, 1, 1, state->colorram, 0);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x0e00, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
 
 	for (addr = 0; addr < 0x200; addr++)
 	{
-		colorram[addr] = mame_rand(machine) & 0xff;
+		state->colorram[addr] = mame_rand(machine) & 0xff;
 	}
 }
 
@@ -642,8 +661,12 @@ static MACHINE_RESET( tmc2000 )
 
 	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 
+	// enable ROM
+
 	memory_set_bank(1, 0);
 	memory_set_bank(2, 0);
+
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
 }
 
 // OSCOM Nano
@@ -688,6 +711,10 @@ static MACHINE_DRIVER_START( tmc1800 )
 	// video hardware
 
 	MDRV_IMPORT_FROM(tmc1800_video)
+
+	// quickload
+
+	MDRV_QUICKLOAD_ADD(tmc1800, "bin", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( osc1000b )
@@ -706,6 +733,10 @@ static MACHINE_DRIVER_START( osc1000b )
 	// video hardware
 
 	MDRV_IMPORT_FROM(osc1000b_video)
+
+	// quickload
+
+	MDRV_QUICKLOAD_ADD(tmc2000, "bin", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tmc2000 )
@@ -731,6 +762,10 @@ static MACHINE_DRIVER_START( tmc2000 )
 
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// quickload
+
+	MDRV_QUICKLOAD_ADD(tmc2000, "bin", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( oscnano )
@@ -756,6 +791,10 @@ static MACHINE_DRIVER_START( oscnano )
 
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// quickload
+
+	MDRV_QUICKLOAD_ADD(tmc1800, "bin", 0)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -790,6 +829,40 @@ ROM_START( oscnano )
 ROM_END
 
 /* System Configuration */
+
+static QUICKLOAD_LOAD( tmc1800 )
+{
+	running_machine *machine = Machine;
+	int size = image_length(image);
+
+	if (size > mess_ram_size)
+	{
+		return INIT_FAIL;
+	}
+
+	image_fread(image, &mess_ram, size);
+
+	MACHINE_RESET_CALL(tmc1800);
+
+	return INIT_PASS;
+}
+
+static QUICKLOAD_LOAD( tmc2000 )
+{
+	running_machine *machine = Machine;
+	int size = image_length(image);
+
+	if (size > mess_ram_size)
+	{
+		return INIT_FAIL;
+	}
+
+	image_fread(image, &mess_ram, size);
+
+	MACHINE_RESET_CALL(tmc2000);
+
+	return INIT_PASS;
+}
 
 static void tmc1800_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
