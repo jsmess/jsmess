@@ -266,7 +266,7 @@ static TIMER_CALLBACK(fdc_sync_proc)
 	if ( fdc_status[drive].mfm[cur_pos-2] == ( ( sync >> 8 ) & 0xff ) &&
 		 fdc_status[drive].mfm[cur_pos-1] == ( sync & 0xff ) )
 	{
-		amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_DSKSYN, 0);
+		amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_DSKSYN, 0xffff);
 	}
 
 	if ( sector < 10 )
@@ -308,7 +308,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 		{
 			logerror("Write to disk unsupported yet\n" );
 
-			amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0);
+			amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0xffff);
 		}
 	}
 	else
@@ -341,7 +341,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 
 		if ( fdc_status[drive].len <= 0 )
 		{
-			amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0);
+			amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0xffff);
 		}
 		else
 		{
@@ -372,7 +372,7 @@ void amiga_fdc_setup_dma( void ) {
 
 	if ( drive == -1 ) {
 		logerror("Disk DMA started with no drive selected!\n" );
-		amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0);
+		amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0xffff);
 		return;
 	}
 

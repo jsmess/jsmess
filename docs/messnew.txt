@@ -8,7 +8,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-- [AMIGACD] Fixed regression introduced in 0.125.  [Fabio Priuli]
+- [AMIGACD / AMIGAFDC] Fixed a couple of regressions introduced in 0.125. Still CDTV regression is not fixed. [Fabio Priuli]
 
 - [B2M] Added SHA-1's.  [Fabio Priuli]
 
