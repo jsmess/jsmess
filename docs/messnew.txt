@@ -18,6 +18,10 @@ System Driver Changes:
 
 - [ORION] Added SHA-1's.  [Fabio Priuli]
 
+- [ORION] ROMDISK's are carts now [Miodrag Milanovic]
+
+- [ORION] Added support for "Lucksian Key" format disks [Miodrag Milanovic]
+
 - [PCE] Added .bin extension.  [Fabio Priuli]
 
 - [PENTAGON] Added SHA-1's.  [Fabio Priuli]

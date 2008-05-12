@@ -15,6 +15,7 @@
 #include "machine/mc146818.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
+#include "devices/cartslot.h"
 #include "formats/rk_cas.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
@@ -159,13 +160,6 @@ INPUT_PORTS_START( orion128 )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_RCONTROL)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_LALT)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_RALT)
-	PORT_START /* port 9 */
-		PORT_CONFNAME(0x01, 0x01, "ROM Disk")
-			PORT_CONFSETTING(0x01, "Installed")		
-			PORT_CONFSETTING(0x00, "Not installed")		
-		PORT_CONFNAME(0x02, 0x02, "ROM Disk version")
-			PORT_CONFSETTING(0x02, "Version 4")
-			PORT_CONFSETTING(0x00, "Version 1")
 INPUT_PORTS_END
 INPUT_PORTS_START( ms7007 )
 	PORT_START /* line 0 */
@@ -251,15 +245,7 @@ INPUT_PORTS_START( ms7007 )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_RCONTROL)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_LALT)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_RALT)
-	PORT_START /* port 9 */
-		PORT_CONFNAME(0x01, 0x01, "ROM Disk")
-			PORT_CONFSETTING(0x01, "Installed")		
-			PORT_CONFSETTING(0x00, "Not installed")		
-		PORT_CONFNAME(0x02, 0x02, "ROM Disk version")
-			PORT_CONFSETTING(0x02, "Version 4")
-			PORT_CONFSETTING(0x00, "Version 1")
-			
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_RALT)			
 INPUT_PORTS_END
  
 /* Machine driver */
@@ -417,18 +403,21 @@ static void orion_floppy_getinfo(const mess_device_class *devclass, UINT32 state
  
 SYSTEM_CONFIG_START(orion128)
 	CONFIG_RAM_DEFAULT(256 * 1024)
+	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(orion_cassette_getinfo);
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(orionz80)
 	CONFIG_RAM_DEFAULT(512 * 1024)
+	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(orion_cassette_getinfo);
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(orionpro)
 	CONFIG_RAM_DEFAULT(512 * 1024)
+	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(orion_cassette_getinfo);
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
@@ -441,15 +430,13 @@ ROM_START( orion128 )
     ROMX_LOAD( "m2rk.bin",    0x0f800, 0x0800, CRC(2025c234) SHA1(caf86918629be951fe698cddcdf4589f07e2fb96), ROM_BIOS(1) )
     ROM_SYSTEM_BIOS( 1, "m2_2rk", "Version 3.2.2 rk" )
     ROMX_LOAD( "m2_2rk.bin",  0x0f800, 0x0800, CRC(fc662351) SHA1(7c6de67127fae5869281449de1c503597c0c058e), ROM_BIOS(2) )    
-    ROM_LOAD( "romdisk4.bin", 0x10000, 0xdb90, CRC(d4cb4c93) SHA1(290a8b585c984b5a78f65b8481364bbfc0714861) )    
-    ROM_LOAD( "romdisk1.bin", 0x20000, 0xd800, CRC(61c22eec) SHA1(45985bc462efab5e640652253fb3bc8acee4b343) )
+    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionms )
     ROM_REGION( 0x30000, REGION_CPU1, ROMREGION_ERASEFF )
     ROM_LOAD( "ms7007.bin",   0x0f800, 0x0800, CRC(c6174ba3) SHA1(8f9a42c3e09684718fe4121a8408e7860129d26f) )         
-    ROM_LOAD( "romdisk4.bin", 0x10000, 0xdb90, CRC(d4cb4c93) SHA1(290a8b585c984b5a78f65b8481364bbfc0714861) )    
-    ROM_LOAD( "romdisk1.bin", 0x20000, 0xd800, CRC(61c22eec) SHA1(45985bc462efab5e640652253fb3bc8acee4b343) )
+    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionz80 )
@@ -464,8 +451,7 @@ ROM_START( orionz80 )
     ROMX_LOAD( "m34zrk.bin",  0x0f800, 0x0800, CRC(787c3903) SHA1(476c1c0b88e5efb582292eebec15e24d054c8851), ROM_BIOS(4) )
     ROM_SYSTEM_BIOS( 4, "m35zrkd", "Version 3.5 zrkd" )
     ROMX_LOAD( "m35zrkd.bin", 0x0f800, 0x0800, CRC(9368b38f) SHA1(64a77f22119d40c9b18b64d78ad12acc6fff9efb), ROM_BIOS(5) )
-    ROM_LOAD( "romdisk4.bin", 0x10000, 0xdb90, CRC(d4cb4c93) SHA1(290a8b585c984b5a78f65b8481364bbfc0714861) )    
-    ROM_LOAD( "romdisk1.bin", 0x20000, 0xd800, CRC(61c22eec) SHA1(45985bc462efab5e640652253fb3bc8acee4b343) )
+    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionzms )
@@ -476,17 +462,14 @@ ROM_START( orionzms )
     ROMX_LOAD( "m34zms.bin",  0x0f800, 0x0800, CRC(0f87a80b) SHA1(ab1121092e61268d8162ed8a7d4fd081016a409a), ROM_BIOS(2) )
     ROM_SYSTEM_BIOS( 2, "m35zmsd", "Version 3.5 zmsd" )
     ROMX_LOAD( "m35zmsd.bin", 0x0f800, 0x0800, CRC(f714ff37) SHA1(fbe9514adb3384aff146cbedd4fede37ce9591e1), ROM_BIOS(3) )
-    ROM_LOAD( "romdisk4.bin", 0x10000, 0xdb90, CRC(d4cb4c93) SHA1(290a8b585c984b5a78f65b8481364bbfc0714861) )    
-    ROM_LOAD( "romdisk1.bin", 0x20000, 0xd800, CRC(61c22eec) SHA1(45985bc462efab5e640652253fb3bc8acee4b343) )
+    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionpro )
 	ROM_REGION( 0x52000, REGION_CPU1, ROMREGION_ERASEFF )
-    ROM_LOAD( "romdisk4.bin", 0x10000, 0xdb90,  CRC(d4cb4c93) SHA1(290a8b585c984b5a78f65b8481364bbfc0714861) )    
-    ROM_LOAD( "romdisk1.bin", 0x20000, 0xd800,  CRC(61c22eec) SHA1(45985bc462efab5e640652253fb3bc8acee4b343) )
-	ROM_LOAD( "rom1-210.bin", 0x30000, 0x2000,  CRC(8e1a0c78) SHA1(61c8a5ed596ce7e3fd32da920dcc80dc5375b421) )
-	ROM_LOAD( "rom2-210.bin", 0x32000, 0x10000, CRC(7cb7a49b) SHA1(601f3dd61db323407c4874fd7f23c10dccac0209) )
-	ROM_LOAD( "romd1.bin",    0x42000, 0x10000, CRC(b38b34cb) SHA1(456f2bffb6f83934d7546d0f25330070bc0fc35c) )
+    ROM_CART_LOAD(0, "bin",   0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_LOAD( "rom1-210.bin", 0x20000, 0x2000,  CRC(8e1a0c78) SHA1(61c8a5ed596ce7e3fd32da920dcc80dc5375b421) )
+	ROM_LOAD( "rom2-210.bin", 0x22000, 0x10000, CRC(7cb7a49b) SHA1(601f3dd61db323407c4874fd7f23c10dccac0209) )
 ROM_END
 
 /* Driver */

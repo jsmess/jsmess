@@ -38,11 +38,7 @@ UINT8 orion_video_mode_mask;
 READ8_HANDLER (orion_romdisk_porta_r )
 {
 	UINT8 *romdisk = memory_region(REGION_CPU1) + 0x10000;		
-	switch(input_port_read_indexed(machine, 9)) {
-	  case 3 : return romdisk[romdisk_msb*256+romdisk_lsb];	
-	  case 1 : return romdisk[romdisk_msb*256+romdisk_lsb+0x10000];		  	
-	}
-	return 0xff;	
+	return romdisk[romdisk_msb*256+romdisk_lsb];	
 }
 
 WRITE8_HANDLER (orion_romdisk_portb_w )
@@ -230,6 +226,8 @@ DEVICE_IMAGE_LOAD( orion_floppy )
 			{
 			case 800*1024:
 				break;
+			case 720*1024:
+				break;
 			default:
 				return INIT_FAIL;
 			}
@@ -240,7 +238,11 @@ DEVICE_IMAGE_LOAD( orion_floppy )
 	if (device_load_basicdsk_floppy (image) != INIT_PASS)
 		return INIT_FAIL;
 
-	basicdsk_set_geometry (image, 80, 2, 5, 1024, 1, 0, FALSE);
+	if (size==800*1024) {
+		basicdsk_set_geometry (image, 80, 2, 5, 1024, 1, 0, FALSE);
+	} else {
+		basicdsk_set_geometry (image, 80, 2, 9, 512, 1, 0, FALSE);
+	}
 	return INIT_PASS;
 }
 
@@ -510,11 +512,11 @@ void orionpro_bank_switch(running_machine *machine)
 	}
 	if ((orionpro_dispatcher & 0x10)==0x10) {	// ROM1 enabled		
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x30000);		
+		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x20000);		
 	}
 	if ((orionpro_dispatcher & 0x08)==0x08) {	// ROM2 enabled
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x32000 + (orionpro_rom2_segment & 7) * 0x2000);		
+		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x22000 + (orionpro_rom2_segment & 7) * 0x2000);		
 	}
 
 	if ((orionpro_dispatcher & 0x02)==0x00) {	// RAM1 segment disabled
