@@ -58,7 +58,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- Fixed performance problems with -triplebuffer.  (bug #1539) [Justin Kerk]
 
 
 
