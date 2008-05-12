@@ -427,7 +427,7 @@ ROM_END
 
 ROM_START( specialp )
     ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )    
-    ROM_LOAD( "special6.rom", 0xc000, 0x1000, CRC(F0C5A0AC))
+    ROM_LOAD( "special6.rom", 0xc000, 0x1000, CRC(f0c5a0ac) SHA1(50b53bd7c05117930aa84653a9ea0fc0c6f0f496) )
  ROM_END
 
 ROM_START( lik )

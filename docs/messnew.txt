@@ -8,7 +8,37 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [B2M] Added SHA-1's.  [Fabio Priuli]
+
+- [BK] Added SHA-1's.  [Fabio Priuli]
+
+- [GAMEBOY] Added .bin extension.  [Fabio Priuli]
+
+- [ORION] Added SHA-1's.  [Fabio Priuli]
+
+- [PCE] Added .bin extension.  [Fabio Priuli]
+
+- [PENTAGON] Added SHA-1's.  [Fabio Priuli]
+
+- [POKEMINI] Added .bin extension.  [Fabio Priuli]
+
+- [PRAV8DD] Merged prav8dda.  [Fabio Priuli]
+
 - [TI99] Fixed disk controller.  [Michael Zapf]
+
+- [SATURN] Fixed mem_mask regressions.  [R. Belmont]
+
+- [SCORPION] Added SHA-1's.  [Fabio Priuli]
+
+- [SG1000] Added .bin extension.  [Fabio Priuli]
+
+- [SMS] Added .bin extension.  [Fabio Priuli]
+
+- [SPECIAL] Added SHA-1's.  [Fabio Priuli]
+
+- [UT88] Added SHA-1's.  [Fabio Priuli]
+
+- [ZX81] Consolidated variants to use alternative BIOSes.  [Fabio Priuli]
 
 
 

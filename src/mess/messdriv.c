@@ -413,12 +413,9 @@ TESTDRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
 	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
 	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
 	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
-	DRIVER( aszmic )	/* ASZMIC ZX-81 ROM swap							*/
 	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
 	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
 	DRIVER( lambda )	/* Lambda 8300										*/
-	DRIVER( h4th )		/* Sinclair ZX-81 Forth by David Husband			*/
-	DRIVER( tree4th )	/* Sinclair ZX-81 Tree-Forth by Tree Systems		*/
 
 	DRIVER( spectrum )	/* 1982 ZX Spectrum									*/
 	DRIVER( inves )		/* 1986 Inves Spectrum 48K+							*/
@@ -596,7 +593,6 @@ TESTDRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 	DRIVER( orica )		/* 1984 Oric Atmos									*/
 	DRIVER( prav8d )	/* 1985 Pravetz 8D									*/
 	DRIVER( prav8dd )	/* 1989 Pravetz 8D (Disk ROM)						*/
-	DRIVER( prav8dda )	/* 1989 Pravetz 8D (Disk ROM, alternate)			*/
 	DRIVER( telstrat )	/* ??? Oric Telestrat/Stratos						*/
 
 	/* PHILIPS */

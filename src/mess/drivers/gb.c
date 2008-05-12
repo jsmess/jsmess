@@ -639,7 +639,7 @@ static void gameboy_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(gb_cart); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "gb,gmb,cgb,gbc,sgb"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "gb,gmb,cgb,gbc,sgb,bin"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}

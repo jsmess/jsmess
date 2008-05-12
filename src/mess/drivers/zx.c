@@ -448,32 +448,24 @@ MACHINE_DRIVER_END
 
 ROM_START(zx80)
 	ROM_REGION( 0x10000, REGION_CPU1,0 )
-	ROM_LOAD( "zx80.rom", 0x0000, 0x1000, CRC(4c7fc597) SHA1(b6769a3197c77009e0933e038c15b43cf4c98c7a) )
-ROM_END
-
-ROM_START(aszmic)
-	ROM_REGION( 0x10000, REGION_CPU1,0 )
-	ROM_LOAD( "aszmic.rom", 0x0000, 0x1000, CRC(6c123536) SHA1(720867cbfafafc8c7438bbc325a77eaef571e5c0) )
+	ROM_SYSTEM_BIOS(0, "default", "BASIC")
+	ROMX_LOAD( "zx80.rom",   0x0000, 0x1000, CRC(4c7fc597) SHA1(b6769a3197c77009e0933e038c15b43cf4c98c7a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "aszmic", "ASZMIC")
+	ROMX_LOAD( "aszmic.rom", 0x0000, 0x1000, CRC(6c123536) SHA1(720867cbfafafc8c7438bbc325a77eaef571e5c0), ROM_BIOS(2) )
 ROM_END
 
 ROM_START(zx81)
 	ROM_REGION( 0x10000, REGION_CPU1,0 )
 	ROM_SYSTEM_BIOS(0, "3rd", "3rd rev.")
-	ROMX_LOAD( "zx81b.rom", 0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515), ROM_BIOS(1) )
+	ROMX_LOAD( "zx81b.rom",   0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "1st", "1st rev.")
-	ROMX_LOAD( "zx81.rom",  0x0000, 0x2000, CRC(fcbbd617) SHA1(a0ade36540561cc1691bb6f0c42ceae12484a102), ROM_BIOS(2) )
+	ROMX_LOAD( "zx81.rom",    0x0000, 0x2000, CRC(fcbbd617) SHA1(a0ade36540561cc1691bb6f0c42ceae12484a102), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "2nd", "2nd rev.")
-	ROMX_LOAD( "zx81a.rom", 0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc), ROM_BIOS(3) )
-ROM_END
-
-ROM_START(h4th)
-	ROM_REGION( 0x10000, REGION_CPU1,0 )
-	ROM_LOAD( "h4th.rom", 0x0000, 0x2000, CRC(257d5a32) SHA1(03809a6b464609ff924f7e55a85eef875cd47ae8) )
-ROM_END
-
-ROM_START(tree4th)
-	ROM_REGION( 0x10000, REGION_CPU1,0 )
-	ROM_LOAD( "tree4th.rom", 0x0000, 0x2000, CRC(71616238) SHA1(3ee15779e03482b10fc59eb4df2446376c56b00d) )
+	ROMX_LOAD( "zx81a.rom",   0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "hforth", "Forth by David Husband")
+	ROMX_LOAD( "h4th.rom",    0x0000, 0x2000, CRC(257d5a32) SHA1(03809a6b464609ff924f7e55a85eef875cd47ae8), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(4, "tforth", "Forth by Tree Systems")
+	ROMX_LOAD( "tree4th.rom", 0x0000, 0x2000, CRC(71616238) SHA1(3ee15779e03482b10fc59eb4df2446376c56b00d), ROM_BIOS(5) )
 ROM_END
 
 ROM_START(ts1000)
@@ -572,10 +564,7 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                     FULLNAME                                        FLAGS */
 COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,   "Sinclair Research",        "ZX-80",                                        GAME_NOT_WORKING )
-COMP( 1981, aszmic,     zx80,   0,      zx80,       zx80,       zx,     zx80,   "Sinclair Research",        "ZX.Aszmic",                                    GAME_NOT_WORKING )
 COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "ZX-81",                                        GAME_NOT_WORKING )
-COMP( 198?, h4th,       zx81,   0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "Sinclair ZX-81 Forth by David Husband",        GAME_NOT_WORKING )
-COMP( 198?, tree4th,    zx81,   0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "Sinclair ZX-81 Tree-Forth by Tree Systems",    GAME_NOT_WORKING )
 COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,   "Timex Sinclair",           "Timex Sinclair 1000",                          GAME_NOT_WORKING )
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pow3000,    zx,     pc8300, "Your Computer",            "PC8300",                                       GAME_NOT_WORKING )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pc8300, "Creon Enterprises",        "Power 3000",                                   GAME_NOT_WORKING )

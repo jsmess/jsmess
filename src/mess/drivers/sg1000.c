@@ -724,7 +724,7 @@ static void sg1000_cartslot_getinfo( const mess_device_class *devclass, UINT32 s
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sg1000_cart); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg,bin"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
 	}
@@ -784,7 +784,7 @@ static void sc3000_cartslot_getinfo( const mess_device_class *devclass, UINT32 s
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sc3000_cart); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg,sc"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg,sc,bin"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
 	}

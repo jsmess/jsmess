@@ -509,24 +509,20 @@ ROM_START(telstrat)
 ROM_END
 
 ROM_START(prav8d)
-    ROM_REGION (0x10000+0x4000+0x0100+0x200,REGION_CPU1,0)
-    ROM_LOAD ("pravetzt.rom", 0x10000, 0x4000, CRC(58079502) SHA1(7afc276cb118adff72e4f16698f94bf3b2c64146))
-	ROM_LOAD_OPTIONAL ("8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6))
-    ROM_LOAD_OPTIONAL ("8ddoshi.rom",0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b))
+    ROM_REGION( 0x10000+0x4000+0x0100+0x0200, REGION_CPU1, 0 )
+    ROM_LOAD( "pravetzt.rom", 0x10000, 0x4000, CRC(58079502) SHA1(7afc276cb118adff72e4f16698f94bf3b2c64146) )
+	ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
+    ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 ROM_START(prav8dd)
-    ROM_REGION (0x10000+0x4000+0x0100+0x0200,REGION_CPU1,0)
-    ROM_LOAD ("8d.rom", 0x10000, 0x4000, CRC(b48973ef) SHA1(fd47c977fc215a3b577596a7483df53e8a1e9c83))
-    ROM_LOAD_OPTIONAL ("8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6))
-    ROM_LOAD_OPTIONAL ("8ddoshi.rom",0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b))
-ROM_END
-
-ROM_START(prav8dda)
-    ROM_REGION (0x10000+0x4000+0x0100+0x200,REGION_CPU1,0)
-    ROM_LOAD ("pravetzd.rom", 0x10000, 0x4000, CRC(f8d23821) SHA1(f87ad3c5832773b6e0614905552a80c98dc8e2a5))
-	ROM_LOAD_OPTIONAL ("8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6))
-    ROM_LOAD_OPTIONAL ("8ddoshi.rom",0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b))
+    ROM_REGION( 0x10000+0x4000+0x0100+0x0200, REGION_CPU1, 0 )
+	ROM_SYSTEM_BIOS( 0, "default", "Disk ROM, 1989")
+	ROMX_LOAD( "8d.rom",       0x10000, 0x4000, CRC(b48973ef) SHA1(fd47c977fc215a3b577596a7483df53e8a1e9c83), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "radosoft", "RadoSoft Disk ROM, 1992")
+	ROMX_LOAD( "pravetzd.rom", 0x10000, 0x4000, CRC(f8d23821) SHA1(f87ad3c5832773b6e0614905552a80c98dc8e2a5), ROM_BIOS(2) )
+    ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
+    ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 static void oric_common_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -597,9 +593,8 @@ SYSTEM_CONFIG_END
 
 
 /*    YEAR   NAME       PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG    COMPANY         FULLNAME */
-COMP( 1983,  oric1,     0,      0,		oric,       oric,	    0,	    oric1,    "Tangerine",    "Oric 1" , 0)
-COMP( 1984,  orica,     oric1,	0,		oric,	    orica,	    0,	    oric1,    "Tangerine",    "Oric Atmos" , 0)
-COMP( 1985,  prav8d,    oric1,  0,		oric,       prav8d,     0,      prav8,    "Pravetz",      "Pravetz 8D", 0)
-COMP( 1989, prav8dd,   oric1,  0,		oric,       prav8d,     0,      prav8,    "Pravetz",      "Pravetz 8D (Disk ROM)", GAME_COMPUTER_MODIFIED)
-COMP( 1992, prav8dda,  oric1,  0,		oric,       prav8d,     0,      prav8,    "Pravetz",      "Pravetz 8D (Disk ROM, RadoSoft)", GAME_COMPUTER_MODIFIED)
-COMP( 1986, telstrat,  oric1,  0,		telstrat,   telstrat,   0,      oric1,    "Tangerine",    "Oric Telestrat", GAME_NOT_WORKING )
+COMP( 1983, oric1,     0,		0,		oric,       oric,	    0,	    oric1,    "Tangerine",    "Oric 1" , 0)
+COMP( 1984, orica,     oric1,	0,		oric,	    orica,	    0,	    oric1,    "Tangerine",    "Oric Atmos" , 0)
+COMP( 1985, prav8d,    oric1,	0,		oric,       prav8d,     0,      prav8,    "Pravetz",      "Pravetz 8D", 0)
+COMP( 1989, prav8dd,   oric1,	0,		oric,       prav8d,     0,      prav8,    "Pravetz",      "Pravetz 8D (Disk ROM)", GAME_COMPUTER_MODIFIED)
+COMP( 1986, telstrat,  oric1,	0,		telstrat,   telstrat,   0,      oric1,    "Tangerine",    "Oric Telestrat", GAME_NOT_WORKING )

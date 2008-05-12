@@ -240,7 +240,7 @@ static void pce_cartslot_getinfo(const mess_device_class *devclass, UINT32 state
 		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = pce_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pce"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pce,bin"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
