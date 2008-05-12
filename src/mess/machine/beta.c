@@ -153,10 +153,27 @@ WRITE8_HANDLER(betadisk_data_w)
 
 DEVICE_IMAGE_LOAD( beta_floppy )
 {
+	UINT8 data[1];
+	int heads;
+	int cylinders;
+	
 	if (device_load_basicdsk_floppy (image) != INIT_PASS)
 		return INIT_FAIL;
 
-	basicdsk_set_geometry (image, 80, 2, 16, 256, 1, 0, FALSE);
+	image_fseek( image, 0x8e3 , SEEK_SET );
+	/* Read and verify the header */
+	if ( 1 != image_fread( image, data, 1 ) )
+	{
+		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
+		return 1;
+	} 
+	
+	image_fseek( image, 0 , SEEK_SET );
+  	/* guess geometry of disk */
+  	heads =  data[0] & 0x08 ? 1 : 2;
+  	cylinders = data[0] & 0x01 ? 40 : 80;
+  
+	basicdsk_set_geometry (image, cylinders, heads, 16, 256, 1, 0, FALSE);
 	return INIT_PASS;
 }
 
