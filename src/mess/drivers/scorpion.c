@@ -228,12 +228,14 @@ static OPBASE_HANDLER( scorpion_opbase )
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable();
 			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000 + 0x4000*ROMSelection); // Set BASIC ROM
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 		} 	
 	} else if (((activecpu_get_pc() & 0xff00) == 0x3d00) && (ROMSelection==1))
 	{
 		ROMSelection = 3;
 		betadisk_enable();
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x01c000); // Set TRDOS ROM			
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	} 
 	return address;
 }
@@ -262,17 +264,14 @@ static WRITE8_HANDLER(scorpion_port_7ffd_w)
 
 static WRITE8_HANDLER(scorpion_port_1ffd_w)
 {
-	scorpion_256_port_1ffd_data = data;
-
-	/* disable paging */
+	/* if paging not disabled */
 	if ((spectrum_128_port_7ffd_data & 0x20)==0)
 	{
+		scorpion_256_port_1ffd_data = data;
 		scorpion_update_memory(machine);
 	}
 }
   
-/* ports are not decoded full.
-The function decodes the ports appropriately */
 static ADDRESS_MAP_START (scorpion_io, ADDRESS_SPACE_IO, 8)	
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x001f, 0x001f) AM_READWRITE(betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
