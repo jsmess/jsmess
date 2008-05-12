@@ -82,7 +82,7 @@ static void check_interrupts( running_machine *machine )
 		return;
 
 	/* otherwise, generate the IRQ */
-	amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
+	amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 }
 
 static TIMER_CALLBACK(dmac_dma_proc)
