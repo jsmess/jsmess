@@ -12,7 +12,18 @@
 #include "imgtool.h"
 #include "utils.h"
 
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
 #define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : NULL)))
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef struct _basictoken_tableent basictoken_tableent;
 struct _basictoken_tableent
@@ -22,6 +33,8 @@ struct _basictoken_tableent
 	const char *const *tokens;
 	int num_tokens;
 };
+
+
 
 typedef struct _basictokens basictokens;
 struct _basictokens
@@ -34,6 +47,10 @@ struct _basictokens
 };
 
 
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	imgtool_partition *partition, const char *filename,
@@ -238,7 +255,7 @@ static const char *const cocobas_statements[] =
 	"BACKUP",	/* 0xdd */
 	"COPY",		/* 0xde */
 	"DSKI$",	/* 0xdf */
-	"DSKO$"		/* 0xe0 */
+	"DSKO$",	/* 0xe0 */
 	"DOS",		/* 0xe1 */
 	"WIDTH",	/* 0xe2 */
 	"PALETTE",	/* 0xe3 */

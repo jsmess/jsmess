@@ -59,7 +59,8 @@ User Interface Changes:
 
 Imgtool Changes:
 ----------------
-(none)
+- [COCO BASIC] Fixed tokenization for DSKO$ command and above.  (bug #1609)
+  [Nate Woods]
 
 
 
