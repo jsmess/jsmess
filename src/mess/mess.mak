@@ -957,9 +957,9 @@ $(MESSOBJ)/acorn.a:    \
 
 $(MESSOBJ)/samcoupe.a: \
 	$(MESS_FORMATS)/coupedsk.o \
-	$(MESS_VIDEO)/coupe.o	 \
-	$(MESS_DRIVERS)/coupe.o	\
-	$(MESS_MACHINE)/coupe.o	 \
+	$(MESS_VIDEO)/samcoupe.o	 \
+	$(MESS_DRIVERS)/samcoupe.o	\
+	$(MESS_MACHINE)/samcoupe.o	 \
 
 $(MESSOBJ)/sharp.a:    \
 	$(MESS_VIDEO)/mz700.o		\
