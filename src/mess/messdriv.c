@@ -685,7 +685,7 @@ TESTDRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
 
 
 	/* MILES GORDON TECHNOLOGY */
-	DRIVER( coupe )		/* 1989 Sam Coupe									*/
+	DRIVER( samcoupe )		/* 1989 Sam Coupe									*/
 
 	/* MOTOROLA */
 TESTDRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
