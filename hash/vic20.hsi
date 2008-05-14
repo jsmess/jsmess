@@ -6,8 +6,8 @@
 	<!-- They are provided here as a database to help the emulation of this system. -->
 	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
 	<!-- problem with file formats -->
-	<!-- prg are images, but startet with 2 bytes for its load address -->
-	<!-- so gives other crc then binary file -->
+	<!-- prg are images, but started with 2 bytes for its load address -->
+	<!-- so gives other crc than binary file -->
 	<!-- some roms check if they are run in ram, and stop working -->
 	<!-- MODULES not booting -->
 	<hash crc32="05acb7ab" name="adventure land (.40)(ad1)">
