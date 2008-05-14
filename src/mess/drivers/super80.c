@@ -1,4 +1,4 @@
-/* Super80.c written by Robbbert, 2005-2008. See super80.txt for documentation. */
+/* Super80.c written by Robbbert, 2005-2008. See the MESS wiki for documentation. */
 
 #include "driver.h"
 #include "machine/z80pio.h"
@@ -957,6 +957,8 @@ ROM_START( super80d )
 	ROMX_LOAD("super80d.u26", 0xc000, 0x1000, CRC(cebd2613) SHA1(87b94cc101a5948ce590211c68272e27f4cbe95a), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "super80f", "MDS (original)")
 	ROMX_LOAD("super80f.u26", 0xc000, 0x1000, CRC(d39775f0) SHA1(b47298ee028924612e9728bb2debd0f47399add7), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "super80g", "MDS (upgraded)")
+	ROMX_LOAD("super80g.u26", 0xc000, 0x1000, CRC(7386f507) SHA1(69d7627033d62bd4e886ccc136e89f1524d38f47), ROM_BIOS(3))
 	ROM_LOAD("super80.u33",	  0xd000, 0x1000, CRC(cf8020a8) SHA1(2179a61f80372cd49e122ad3364773451531ae85) )
 	ROM_LOAD("super80.u42",	  0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
 
