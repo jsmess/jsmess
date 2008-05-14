@@ -25,10 +25,10 @@ Changes:
                   the future to support others
 
 Note on the bioses:
- SAM Coupé ROM Images
+ SAM Coupe ROM Images
  --------------------
 
- This archive contains many versions of the SAM Coupé 32K ROM image, released
+ This archive contains many versions of the SAM Coupe 32K ROM image, released
  with kind permission from the ROM author, Dr Andy Wright.
 
  Thanks to Simon N Goodwin for supplying the files, which include two dumped
@@ -54,7 +54,7 @@ Note on the bioses:
 
 /* core includes */
 #include "driver.h"
-#include "includes/coupe.h"
+#include "includes/samcoupe.h"
 
 /* components */
 #include "machine/wd17xx.h"
@@ -67,8 +67,8 @@ Note on the bioses:
 #include "formats/coupedsk.h"
 
 
-#define COUPE_XTAL_X1  XTAL_24MHz
-#define COUPE_XTAL_X2  XTAL_4_433619MHz
+#define SAMCOUPE_XTAL_X1  XTAL_24MHz
+#define SAMCOUPE_XTAL_X2  XTAL_4_433619MHz
 
 
 
@@ -78,7 +78,7 @@ Note on the bioses:
  *
  *************************************/
 
-static READ8_HANDLER( coupe_disk_r )
+static READ8_HANDLER( samcoupe_disk_r )
 {
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive((offset >> 4) & 1);
@@ -97,7 +97,7 @@ static READ8_HANDLER( coupe_disk_r )
 }
 
 
-static WRITE8_HANDLER( coupe_disk_w )
+static WRITE8_HANDLER( samcoupe_disk_w )
 {
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive((offset >> 4) & 1);
@@ -114,7 +114,7 @@ static WRITE8_HANDLER( coupe_disk_w )
 }
 
 
-static READ8_HANDLER( coupe_pen_r )
+static READ8_HANDLER( samcoupe_pen_r )
 {
 	UINT8 data;
 
@@ -134,13 +134,13 @@ static READ8_HANDLER( coupe_pen_r )
 }
 
 
-static WRITE8_HANDLER( coupe_clut_w )
+static WRITE8_HANDLER( samcoupe_clut_w )
 {	
-	coupe_regs.clut[(offset >> 8) & 0x0f] = data & 0x7f;
+	samcoupe_regs.clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 
-static READ8_HANDLER( coupe_status_r )
+static READ8_HANDLER( samcoupe_status_r )
 {
 	UINT8 data = 0xe0;
 	UINT8 row = ~(offset >> 8);
@@ -154,69 +154,69 @@ static READ8_HANDLER( coupe_status_r )
 	if (row & 0x02) data &= input_port_read(machine, "keyboard_row_fd") & 0xe0;
 	if (row & 0x01) data &= input_port_read(machine, "keyboard_row_fe") & 0xe0;
 
-	return data | coupe_regs.status;
+	return data | samcoupe_regs.status;
 }
 
 
-static WRITE8_HANDLER( coupe_line_int_w )
+static WRITE8_HANDLER( samcoupe_line_int_w )
 {
-	coupe_regs.line_int = data;
+	samcoupe_regs.line_int = data;
 }
 
 
-static READ8_HANDLER( coupe_lmpr_r )
+static READ8_HANDLER( samcoupe_lmpr_r )
 {
-	return coupe_regs.lmpr;
+	return samcoupe_regs.lmpr;
 }
 
 
-static WRITE8_HANDLER( coupe_lmpr_w )
+static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
-	coupe_regs.lmpr = data;
-	coupe_update_memory();
+	samcoupe_regs.lmpr = data;
+	samcoupe_update_memory();
 }
 
 
-static READ8_HANDLER( coupe_hmpr_r )
+static READ8_HANDLER( samcoupe_hmpr_r )
 {
-	return coupe_regs.hmpr;
+	return samcoupe_regs.hmpr;
 }
 
 
-static WRITE8_HANDLER( coupe_hmpr_w )
+static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
-	coupe_regs.hmpr = data;
-	coupe_update_memory();
+	samcoupe_regs.hmpr = data;
+	samcoupe_update_memory();
 }
 
 
-static READ8_HANDLER( coupe_vmpr_r )
+static READ8_HANDLER( samcoupe_vmpr_r )
 {
-	return coupe_regs.vmpr;
+	return samcoupe_regs.vmpr;
 }
 
 
-static WRITE8_HANDLER( coupe_vmpr_w )
+static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
-	coupe_regs.vmpr = data;
-	coupe_update_memory();
+	samcoupe_regs.vmpr = data;
+	samcoupe_update_memory();
 }
 
 
-static READ8_HANDLER( coupe_midi_r )
+static READ8_HANDLER( samcoupe_midi_r )
 {
 	logerror("Read from midi port\n");
 	return 0xff;
 }
 
 
-static WRITE8_HANDLER( coupe_midi_w )
+static WRITE8_HANDLER( samcoupe_midi_w )
 {
 	logerror("Write to midi port: 0x%02x\n", data);
 }
 
 
-static READ8_HANDLER( coupe_keyboard_r )
+static READ8_HANDLER( samcoupe_keyboard_r )
 {
 	UINT8 data = 0xff;
 	UINT8 row = ~(offset >> 8);
@@ -241,16 +241,16 @@ static READ8_HANDLER( coupe_keyboard_r )
 }
 
 
-static WRITE8_HANDLER( coupe_border_w )
+static WRITE8_HANDLER( samcoupe_border_w )
 {
-	coupe_regs.border = data;
+	samcoupe_regs.border = data;
 
 	/* DAC output state */
 	speaker_level_w(0,(data >> 4) & 0x01);
 }
 
 
-static READ8_HANDLER( coupe_attributes_r )
+static READ8_HANDLER( samcoupe_attributes_r )
 {
 	if (video_screen_get_vblank(machine->primary_screen))
 	{
@@ -266,7 +266,7 @@ static READ8_HANDLER( coupe_attributes_r )
 }
 
 
-static WRITE8_HANDLER( coupe_sound_w )
+static WRITE8_HANDLER( samcoupe_sound_w )
 {
 	if (offset & 0x100)
 		saa1099_control_port_0_w(machine, 0, data);
@@ -282,7 +282,7 @@ static WRITE8_HANDLER( coupe_sound_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( coupe_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( samcoupe_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(2)
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
@@ -290,17 +290,17 @@ static ADDRESS_MAP_START( coupe_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( coupe_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(coupe_ext_mem_w)
-	AM_RANGE(0xe0, 0xe7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(coupe_disk_r, coupe_disk_w)
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_pen_r, coupe_clut_w)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_status_r, coupe_line_int_w)
-	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_lmpr_r, coupe_lmpr_w)
-	AM_RANGE(0xfb, 0xfb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_hmpr_r, coupe_hmpr_w)
-	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_vmpr_r, coupe_vmpr_w)
-	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_midi_r, coupe_midi_w)
-	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_keyboard_r, coupe_border_w)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(coupe_attributes_r, coupe_sound_w)
+static ADDRESS_MAP_START( samcoupe_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(samcoupe_ext_mem_w)
+	AM_RANGE(0xe0, 0xe7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_pen_r, samcoupe_clut_w)
+	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_status_r, samcoupe_line_int_w)
+	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lmpr_r, samcoupe_lmpr_w)
+	AM_RANGE(0xfb, 0xfb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_hmpr_r, samcoupe_hmpr_w)
+	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_vmpr_r, samcoupe_vmpr_w)
+	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_midi_r, samcoupe_midi_w)
+	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_keyboard_r, samcoupe_border_w)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_attributes_r, samcoupe_sound_w)
 ADDRESS_MAP_END
 
 
@@ -317,25 +317,25 @@ static TIMER_CALLBACK( irq_off )
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	
 	/* adjust STATUS register */
-	coupe_regs.status |= param;
+	samcoupe_regs.status |= param;
 }
 
 
-void coupe_irq(running_machine *machine, UINT8 src)
+void samcoupe_irq(running_machine *machine, UINT8 src)
 {
 	/* set irq and a timer to set it off again */
 	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	timer_set(ATTOTIME_IN_USEC(20), NULL, src, irq_off);
 	
 	/* adjust STATUS register */
-	coupe_regs.status &= ~src;
+	samcoupe_regs.status &= ~src;
 }
 
 
-static INTERRUPT_GEN( coupe_frame_interrupt )
+static INTERRUPT_GEN( samcoupe_frame_interrupt )
 {
 	/* signal frame interrupt */
-	coupe_irq(machine, 0x08);
+	samcoupe_irq(machine, 0x08);
 }
 
 
@@ -346,7 +346,7 @@ static INTERRUPT_GEN( coupe_frame_interrupt )
  *
  *************************************/
 
-static INPUT_PORTS_START( coupe )
+static INPUT_PORTS_START( samcoupe )
 	PORT_START_TAG("keyboard_row_fe")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)     PORT_CHAR('z') PORT_CHAR('Z')
@@ -460,7 +460,7 @@ INPUT_PORTS_END
 
     Not quite max of 255 but close enough for me!
  */
-static PALETTE_INIT( coupe )
+static PALETTE_INIT( samcoupe )
 {
 	int i;
 
@@ -496,24 +496,24 @@ static PALETTE_INIT( coupe )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( coupe )
+static MACHINE_DRIVER_START( samcoupe )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, COUPE_XTAL_X1/4) /* 6 Mhz */
-	MDRV_CPU_PROGRAM_MAP(coupe_mem, 0)
-	MDRV_CPU_IO_MAP(coupe_io, 0)
-	MDRV_CPU_VBLANK_INT("main", coupe_frame_interrupt)
+	MDRV_CPU_ADD(Z80, SAMCOUPE_XTAL_X1/4) /* 6 Mhz */
+	MDRV_CPU_PROGRAM_MAP(samcoupe_mem, 0)
+	MDRV_CPU_IO_MAP(samcoupe_io, 0)
+	MDRV_CPU_VBLANK_INT("main", samcoupe_frame_interrupt)
 
-	MDRV_MACHINE_START(coupe)
-	MDRV_MACHINE_RESET(coupe)
+	MDRV_MACHINE_START(samcoupe)
+	MDRV_MACHINE_RESET(samcoupe)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(COUPE_XTAL_X1/2, 768, 0, 512, 312, 0, 192) /* border area? */
+	MDRV_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, 768, 0, 512, 312, 0, 192) /* border area? */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_PALETTE_LENGTH(128)
-	MDRV_PALETTE_INIT(coupe)
+	MDRV_PALETTE_INIT(samcoupe)
 
-	MDRV_VIDEO_UPDATE(coupe)
+	MDRV_VIDEO_UPDATE(samcoupe)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	/* devices */
@@ -523,7 +523,7 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD(SAA1099, COUPE_XTAL_X1/3) /* 8 MHz */
+	MDRV_SOUND_ADD(SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -540,7 +540,7 @@ MACHINE_DRIVER_END
 	It does match the 3.0 one the most, but the first half differs in one byte 
 	and in the second half, the case of the "plc" in the company string differs.
 */
-ROM_START( coupe )
+ROM_START( samcoupe )
 	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0,  "31",  "v3.1" )
 	ROMX_LOAD( "rom31.z5",  0x0000, 0x8000, CRC(0b7e3585) SHA1(c86601633fb61a8c517f7657aad9af4e6870f2ee), ROM_BIOS(1) )
@@ -580,7 +580,7 @@ ROM_END
  *
  *************************************/
 
-static void coupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static void samcoupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -604,7 +604,7 @@ static void coupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 }
 
 
-SYSTEM_CONFIG_START(coupe)
+SYSTEM_CONFIG_START(samcoupe)
 	CONFIG_RAM(256 * 1024)
 	CONFIG_RAM_DEFAULT(512 * 1024)
 	CONFIG_RAM(256 * 1024 + 1 * 1024 * 1024)
@@ -615,7 +615,7 @@ SYSTEM_CONFIG_START(coupe)
 	CONFIG_RAM(512 * 1024 + 3 * 1024 * 1024)
 	CONFIG_RAM(256 * 1024 + 4 * 1024 * 1024)
 	CONFIG_RAM(512 * 1024 + 4 * 1024 * 1024)
-	CONFIG_DEVICE(coupe_floppy_getinfo)
+	CONFIG_DEVICE(samcoupe_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 
@@ -626,5 +626,5 @@ SYSTEM_CONFIG_END
  *
  *************************************/
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT   CONFIG  COMPANY                        FULLNAME     FLAGS */
-COMP( 1989, coupe, 0,      0,      coupe,   coupe, 0,     coupe,  "Miles Gordon Technology plc", "Sam Coupe", 0 )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  INIT   CONFIG  COMPANY                        FULLNAME     FLAGS */
+COMP( 1989, samcoupe, 0,      0,   samcoupe,  samcoupe, 0,   samcoupe,  "Miles Gordon Technology plc", "Sam Coupe", 0 )

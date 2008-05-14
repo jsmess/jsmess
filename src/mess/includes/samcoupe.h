@@ -8,11 +8,11 @@
  *
  ****************************************************************************/
 
-#ifndef COUPE_H_
-#define COUPE_H_
+#ifndef SAMCOUPE_H_
+#define SAMCOUPE_H_
 
 
-struct coupe_asic
+struct samcoupe_asic
 {
 	UINT8 lmpr, hmpr, vmpr; /* memory pages */
 	UINT8 lext, hext;       /* extended memory page */
@@ -23,25 +23,25 @@ struct coupe_asic
 };
 
 
-/*----------- defined in drivers/coupe.c -----------*/
+/*----------- defined in drivers/samcoupe.c -----------*/
 
-void coupe_irq(running_machine *machine, UINT8 src);
-
-
-/*----------- defined in machine/coupe.c -----------*/
-
-extern struct coupe_asic coupe_regs; 
-
-void coupe_update_memory(void);
-
-WRITE8_HANDLER( coupe_ext_mem_w );
-MACHINE_START( coupe );
-MACHINE_RESET( coupe );
+void samcoupe_irq(running_machine *machine, UINT8 src);
 
 
-/*----------- defined in video/coupe.c -----------*/
+/*----------- defined in machine/samcoupe.c -----------*/
 
-VIDEO_UPDATE( coupe );
+extern struct samcoupe_asic samcoupe_regs; 
+
+void samcoupe_update_memory(void);
+
+WRITE8_HANDLER( samcoupe_ext_mem_w );
+MACHINE_START( samcoupe );
+MACHINE_RESET( samcoupe );
 
 
-#endif /* COUPE_H_ */
+/*----------- defined in video/samcoupe.c -----------*/
+
+VIDEO_UPDATE( samcoupe );
+
+
+#endif /* SAMCOUPE_H_ */
