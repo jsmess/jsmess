@@ -692,7 +692,8 @@ static void c64_bankswitch(running_machine *machine, int reset)
 		memory_set_bankptr (8, c64_memory + 0xe000);
 	}
 	/* make sure the opbase function gets called each time */
-	opcode_memory_max = 0xcfff;
+	/* NPW 15-May-2008 - Another hack in the C64 drivers broken! */
+	/* opbase->mem_max = 0xcfff; */
 	game = c64_game;
 	exrom = c64_exrom;
 	old = data;
@@ -969,18 +970,18 @@ void c64_common_init_machine (running_machine *machine)
 static OPBASE_HANDLER( c64_opbase ) {
 	if ( ( address & 0xf000 ) == 0xd000 ) {
 		if ( c64_io_enabled ) {
-			opcode_mask = 0x0fff;
-			opcode_arg_base = c64_io_mirror;
-			opcode_base = c64_io_mirror;
-			opcode_memory_min = 0x0000;
-			opcode_memory_max = 0xcfff;
+			opbase->mask = 0x0fff;
+			opbase->ram = c64_io_mirror;
+			opbase->rom = c64_io_mirror;
+			opbase->mem_min = 0x0000;
+			opbase->mem_max = 0xcfff;
 			c64_io_mirror[address & 0x0fff] = c64_read_io( machine, address & 0x0fff );
 		} else {
-			opcode_mask = 0x0fff;
-			opcode_arg_base = c64_io_ram_r_ptr;
-			opcode_base = c64_io_ram_r_ptr;
-			opcode_memory_min = 0x0000;
-			opcode_memory_max = 0xcfff;
+			opbase->mask = 0x0fff;
+			opbase->ram = c64_io_ram_r_ptr;
+			opbase->rom = c64_io_ram_r_ptr;
+			opbase->mem_min = 0x0000;
+			opbase->mem_max = 0xcfff;
 		}
 		return ~0;
 	}

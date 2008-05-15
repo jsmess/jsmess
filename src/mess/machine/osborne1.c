@@ -194,11 +194,11 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 static OPBASE_HANDLER( osborne1_opbase ) {
 	if ( ( address & 0xF000 ) == 0x2000 ) {
 		if ( ! osborne1.bank2_enabled ) {
-			opcode_mask = 0x0fff;
-			opcode_arg_base = mess_ram + 0x2000;
-			opcode_base = mess_ram + 0x2000;
-			opcode_memory_min = 0x2000;
-			opcode_memory_max = 0x2fff;
+			opbase->mask = 0x0fff;
+			opbase->ram = mess_ram + 0x2000;
+			opbase->rom = mess_ram + 0x2000;
+			opbase->mem_min = 0x2000;
+			opbase->mem_max = 0x2fff;
 			return ~0;
 		}
 	}

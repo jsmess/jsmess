@@ -1565,6 +1565,7 @@ const game_driver * const drivers[] =
 	DRIVER( pitnrun )	/* PR  (c) 1984 Taito Corporation */
 	DRIVER( pitnruna )	/* PR  (c) 1984 Taito Corporation */
 	DRIVER( lkage )		/* A54 (c) 1984 Taito Corporation */
+	DRIVER( lkageo )	/* A54 (c) 1984 Taito Corporation */
 	DRIVER( lkageb )	/* bootleg */
 	DRIVER( lkageb2 )	/* bootleg */
 	DRIVER( lkageb3 )	/* bootleg */
@@ -2057,6 +2058,7 @@ const game_driver * const drivers[] =
 	DRIVER( demonwld )	/* TP-016 (c) 1990 Toaplan (+ Taito license when set to Japan) */
 	DRIVER( demonwl1 )	/* TP-016 (c) 1989 Toaplan + Taito license */
 	DRIVER( demonwl2 )	/* TP-016 (c) 1989 Toaplan */
+	DRIVER( demonwl3 )	/* TP-016 (c) 1989 Toaplan */
 	DRIVER( fireshrk )	/* TP-017 (c) 1990 Toaplan */
 	DRIVER( samesame )	/* TP-017 (c) 1989 Toaplan */
 	DRIVER( samesam2 )	/* TP-017 (c) 1989 Toaplan */
@@ -2093,6 +2095,7 @@ const game_driver * const drivers[] =
 	/* More Toaplan Games */
 	DRIVER( tekipaki )	/* TP-020 (c) 1991 Toaplan */
 	DRIVER( ghox )		/* TP-021 (c) 1991 Toaplan */
+	DRIVER( ghoxa )		/* TP-021 (c) 1991 Toaplan */
 	DRIVER( dogyuun )	/* TP-022 (c) 1992 Toaplan */
 	DRIVER( kbash )		/* TP-023 (c) 1993 Toaplan */
 	DRIVER( kbash2 )	/* bootleg */
@@ -2312,6 +2315,7 @@ V-V                           TP-027
 	DRIVER( lwings )	/* 11/1986 (c) 1986 */
 	DRIVER( lwings2 )	/* 11/1986 (c) 1986 */
 	DRIVER( lwingsjp )	/* 11/1986 (c) 1986 */
+	DRIVER( lwingsb )	/* 11/1986 (c) 1986 (bootleg)*/
 	DRIVER( sidearms )	/* 12/1986 (c) 1986 (World) */
 	DRIVER( sidearmr )	/* 12/1986 (c) 1986 + Romstar license (US) */
 	DRIVER( sidearjp )	/* 12/1986 (c) 1986 (Japan) */
@@ -4811,19 +4815,19 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hmcompmx )	/* GX858 (c) 1999 */
 	DRIVER( bm4thmix )	/* GX847 (c) 1999 (Japan) */
 	DRIVER( bm5thmix )	/* GX981 (c) 1999 (Japan) */
-	DRIVER( bmclubmx )	/*       (c) 2000 (Japan) */
+	DRIVER( bmclubmx )	/* GX993 (c) 2000 (Japan) */
 	DRIVER( bmcorerm )	/* GXA05 (c) 1999 (Japan) */
 	DRIVER( bmdct )		/* GX995 (c) 2000 (Japan) */
 	DRIVER( bmcompm2 )	/* GX988 (c) 2000 (Japan) */
 	DRIVER( hmcompm2 )	/* GX988 (c) 2000 */
 	DRIVER( bm6thmix )	/* GXA21 (c) 2001 (Japan) */
-	DRIVER( bm7thmix )	/*       (c) 2001 (Japan) */
-	//DRIVER( bmfinal ) /*       (c) 2002 (Japan) */
+	DRIVER( bm7thmix )	/* GXB07 (c) 2001 (Japan) */
+	DRIVER( bmfinal )	/* GXC01 (c) 2002 (Japan) */
 
-	//DRIVER( popn1 )       /*       (c) 1998 (Japan) */
-	//DRIVER( popn2 )       /*       (c) 1998 (Japan) */
-	//DRIVER( popn3 )       /*       (c) 1999 (Japan) */
-	//DRIVER( popnstex )    /*       (c) 1999 (Japan) */
+	//DRIVER( popn1 )       /* GX803 (c) 1998 (Japan) */
+	//DRIVER( popn2 )       /* GX831 (c) 1998 (Japan) */
+	//DRIVER( popn3 )       /* GX980 (c) 1999 (Japan) */
+	//DRIVER( popnstex )    /* GX970 (c) 1999 (Japan) */
 
 	/* Firebeat games */
 	DRIVER( ppp )		/* GQ977 (c) 2000 */
@@ -7581,7 +7585,6 @@ Other Sun games
 	DRIVER( aztarac )	/* (c) 1983 Centuri (vector game) */
 	DRIVER( mole )		/* (c) 1982 Yachiyo Electronics, Ltd. */
 	DRIVER( thehand )	/* (c) 1981 T.I.C. */
-	DRIVER( gotya )		/* (c) 1981 Game-A-Tron */
 	DRIVER( mrjong )	/* (c) 1983 Kiwako */
 	DRIVER( crazyblk )	/* (c) 1983 Kiwako + ECI license */
 	DRIVER( blkbustr )	/* (c) 1983 Kiwako + ECI license */
@@ -7715,8 +7718,6 @@ Other Sun games
 	DRIVER( cfarm )		/* (c) 1999 LAI Games */
 	DRIVER( cclownz )	/* (c) 1999 LAI Games */
 	DRIVER( rotaryf )
-	DRIVER( sbugger )	/* (c) 1981 Game-A-Tron */
-	DRIVER( sbuggera )	/* (c) 1981 Game-A-Tron */
 	DRIVER( portrait )	/* (c) 1983 Olympia */
 	DRIVER( portrata )	/* (c) 1983 Olympia */
 	DRIVER( enigma2 )	/* (c) 1981 Game Plan (Zilec Electronics license) */
@@ -7811,9 +7812,11 @@ Other Sun games
 	DRIVER( couplep )	/* (c) 1988 Merit */
 	DRIVER( couplei )	/* (c) 1988 Merit */
 	DRIVER( pitboss2 )	/* (c) 1988 Merit */
-	DRIVER( spitboss )	/* (c) 198? Merit */
+	DRIVER( spitboss )	/* (c) 1988 Merit */
+	DRIVER( pitbosss )	/* (c) 1990 Merit */
 	DRIVER( pitbossm )	/* (c) 1994 Merit */
-	DRIVER( megat3 )	/* (c) 1995 Merit */
+	DRIVER( megat3 )	/* (c) 1996 Merit */
+	DRIVER( megat3a )	/* (c) 1995 Merit */
 	DRIVER( megat3te )	/* (c) 1996 Merit */
 	DRIVER( megat4 )	/* (c) 1996 Merit */
 	DRIVER( megat4a )	/* (c) 1996 Merit */
@@ -7889,6 +7892,13 @@ Other Sun games
 	DRIVER( snookr10 )	/* (c) 1998 Sandii' */
 	DRIVER( apple10 )	/* (c) 1998 Sandii' */
 	DRIVER( tenballs )	/* 1997 unknown */
+
+	/* Game-A-Tron */
+	DRIVER( gotya )		/* (c) 1981 Game-A-Tron */
+	DRIVER( sbugger )	/* (c) 1981 Game-A-Tron */
+	DRIVER( sbuggera )	/* (c) 1981 Game-A-Tron */
+	DRIVER( gatcards )	/* (c) 1983 Game-A-Tron */
+	DRIVER( gatslots )	/* (c) 1983 Game-A-Tron */
 
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */

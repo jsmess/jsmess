@@ -648,10 +648,10 @@ static OPBASE_HANDLER( apple3_opbase )
 	if ((address & 0xFF00) == 0x0000)
 	{
 		opptr = apple3_get_zpa_addr(address);
-		opcode_mask = ~0;
-		opcode_base = opcode_arg_base = opptr - address;
-		opcode_memory_min = address;
-		opcode_memory_max = address;
+		opbase->mask = ~0;
+		opbase->rom = opbase->ram = opptr - address;
+		opbase->mem_min = address;
+		opbase->mem_max = address;
 		address = ~0;
 	}
 	return address;

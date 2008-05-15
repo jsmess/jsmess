@@ -297,19 +297,19 @@ static OPBASE_HANDLER( a310_setopbase )
 	// if the boot ROM is mapped in, do some trickery to make it show up
 	if (a310_latchrom)
 	{
-		opcode_mask = 0x1fffff;
-		opcode_memory_min = 0;
-		opcode_memory_max = 0x1fffff;
-		opcode_base = opcode_arg_base = memory_region(REGION_CPU1);
+		opbase->mask = 0x1fffff;
+		opbase->mem_min = 0;
+		opbase->mem_max = 0x1fffff;
+		opbase->rom = opbase->ram = memory_region(REGION_CPU1);
 	}
 	else	// executing from logical memory
 	{
 		UINT32 page = address / page_sizes[a310_pagesize];
 
-		opcode_mask = page_sizes[a310_pagesize]-1;
-		opcode_memory_min = page * page_sizes[a310_pagesize];
-		opcode_memory_max = opcode_memory_min + opcode_mask;
-		opcode_base = opcode_arg_base = (UINT8 *)&a310_physmem[(a310_pages[page] * page_sizes[a310_pagesize])>>2];
+		opbase->mask = page_sizes[a310_pagesize]-1;
+		opbase->mem_min = page * page_sizes[a310_pagesize];
+		opbase->mem_max = opbase->mem_min + opbase->mask;
+		opbase->rom = opbase->ram = (UINT8 *)&a310_physmem[(a310_pages[page] * page_sizes[a310_pagesize])>>2];
 	}
 
 	return ~0;

@@ -719,15 +719,15 @@ static OPBASE_HANDLER( modeF6_opbase )
 static OPBASE_HANDLER( modeSS_opbase )
 {
 	if ( address & 0x1000 ) {
-		opcode_mask = 0x7ff;
-		opcode_memory_min = ( address & 0xf800 );
-		opcode_memory_max = ( address & 0xf800 ) | 0x7ff;
+		opbase->mask = 0x7ff;
+		opbase->mem_min = ( address & 0xf800 );
+		opbase->mem_max = ( address & 0xf800 ) | 0x7ff;
 		if ( address & 0x800 ) {
-			opcode_arg_base = bank_base[2];
-			opcode_base = bank_base[2];
+			opbase->ram = bank_base[2];
+			opbase->rom = bank_base[2];
 		} else {
-			opcode_arg_base = bank_base[1];
-			opcode_base = bank_base[1];
+			opbase->ram = bank_base[1];
+			opbase->rom = bank_base[1];
 		}
 		return ~0;
 	}

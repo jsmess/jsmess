@@ -1118,7 +1118,7 @@ static OPBASE_HANDLER( abc800_opbase_handler )
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		opcode_base = opcode_arg_base = memory_region(REGION_CPU1);
+		opbase->rom = opbase->ram = memory_region(REGION_CPU1);
 		return ~0;
 	}
 

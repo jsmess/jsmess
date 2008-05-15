@@ -1600,12 +1600,12 @@ static OPBASE_HANDLER( apple2gs_opbase )
 				opptr = apple2gs_getslotmem(address);
 		}
 
-		if (opptr)
+		if (opptr != NULL)
 		{
-			opcode_mask = ~0;
-			opcode_base = opcode_arg_base = opptr - address;
-			opcode_memory_min = address;
-			opcode_memory_max = address;
+			opbase->mask = ~0;
+			opbase->rom = opbase->ram = opptr - address;
+			opbase->mem_min = address;
+			opbase->mem_max = address;
 			address = ~0;
 		}
 	}

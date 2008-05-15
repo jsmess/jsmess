@@ -4,26 +4,30 @@
   Driver by Mariusz Wojcieszek
 
   CRT 250 (basic components, also used by CRT260)
-    Main CPU: 1xZ80B
-  Sound: 1xYM2149F (or compatible)
-    Video: 2xYamaha V9938 (MSX2 video chip!)
-  Other: 2xZ80APIO (I/O and interrupt controllers)
-         1x8255 (I/O)
+   Main CPU: Z80B
+      Sound: Yamaha YM2149F (or compatible)
+      Video: 2 Yamaha V9938 (MSX2 video chip!)
+      Other: 2 Z80APIO (I/O and interrupt controllers)
+             1 8255 (I/O)
 
   CRT 260 additional components:
   - Microtouch touch screen controller (SMT-3)
   - PC16550 UART (for communication with touch screen controller)
   - DS1204 Electronic Key (for protection)
   - DS1232 Reset and Watchdog
-  - DS1644 (megat4te) 32K NVRAM + RTC
   - MAX232 (for MegaLink)
+
+    One of the following Dallas Nonvolatile SRAM chips:
+    - DS1225Y 64K Non-volitile SRAM (Mega Touch 4)
+    - DS1230Y 256K Non-volitile SRAM (Mega Touch 6)
+    - DS1644 32K NVRAM + RTC (Tournament sets)
 
   Known Games:
 
   CRT 250:
   Pit Boss II (c)1988
   Super Pit Boss (c)1988
-  *Pit Boss Superstar (c)1989
+  Pit Boss Superstar (c)1990
   *Pit Boss Superstar 30 (c)1993
   Pit Boss Megastar (c)1994
 
@@ -37,6 +41,7 @@
   Megatouch IV Tournament Edition (c)1996
   *Super Megatouch IV (c) 1996
   *Megatouch 5 (c)1997
+  *Megatouch 5 Tournament Edition (c)1997
   Megatouch 6 (c)1998
   *Megatouch 7 Encore (c)2000
 
@@ -973,6 +978,18 @@ ROM_START( pitboss2 )
 	ROM_LOAD( "u16", 0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) )
 ROM_END
 
+ROM_START( pitbosss )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )
+	ROM_LOAD( "9221-10-0b.u9",  0x00000, 0x10000, CRC(e1fbf7cb) SHA1(e04163219c357cd3da2a78ba2590d453df8e9477) )
+	ROM_LOAD( "9221-10-0.u10",  0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) )
+	ROM_LOAD( "9221-10-0b.u11", 0x20000, 0x10000, CRC(6d6dfaf3) SHA1(de76c577eef1bb6637aacffedcc40266af92506e) )
+	ROM_LOAD( "9221-10-0.u12",  0x30000, 0x10000, CRC(3577a203) SHA1(80f9c827ad9dea2c6af788bd3b46ab65e8c594eb) )
+	ROM_LOAD( "9221-10-0.u13",  0x40000, 0x10000, CRC(466f81f9) SHA1(88429d9ff53d27bf639200852a7bf61768c8fd1b) )
+	ROM_LOAD( "9221-10-0.u14",  0x50000, 0x10000, CRC(0720faa6) SHA1(1d78d711e3aab1ecf604ae7b9c374d27639a97c3) )
+	ROM_LOAD( "9221-10-0.u15",  0x60000, 0x10000, CRC(c302b4c2) SHA1(d62d4bb33a9ccb95d1e550f9e439be3316b94c99) )
+	ROM_LOAD( "9221-10-0.u16",  0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pitboss2
+ROM_END
+
 ROM_START( spitboss )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )
 	ROM_LOAD( "u9-0a.rom",  0x00000, 0x10000, CRC(e0c45c9c) SHA1(534bff67c8fee08f1c348275de8977659efa9f69) )
@@ -1052,7 +1069,9 @@ ROM_END
              one PC16550DN
              one PB255a or L5220574
              One Dallas DS1204 Data Key
-             One dallas DS1225Y 16k Non-volitile SRAM
+             One Dallas DS1225Y 64k Non-volitile SRAM (Mega Touch 4)
+              or Dallas DS1230Y 256K Non-volitile SRAM (Mega Touch 6)
+              or Dallas DS1644 32K NVRAM + RTC (Tournament sets)
              Two Z80APIO (Z0842004PSC)
 
     OSC 21.477270 MHz & 1.8432MHz (near the PC16550DN)
@@ -1077,6 +1096,10 @@ C1996 MII
  U38-R0E     = 27C4001 (AKA 27C040)
 C1996 MII
 
+9255-40-01
+U5-B-RO1     =  Dallas DS1204V
+C1996 MII
+
 
 Actual Megatouch 6 rom labels
 --------------------------------
@@ -1097,6 +1120,11 @@ C1998 MII
  U38-R0A     = 27C801
 C1998 MII
 
+9255-80
+U5-B-RO1     =  Dallas DS1204V
+C1998 MII
+
+
 PAL:
 SC3944-0A.u19 = PALCE22V10H-25PC/4
 SC3980.u40    = PALCE16V8H-25
@@ -1105,14 +1133,14 @@ SC3943.u20    = ATF16V8B25PC
 
 */
 
-ROM_START( megat3 )
+ROM_START( megat3 ) /* Dallas DS1204V security key at U5 labeled 9255-20-01 U5-RO1 C1995 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "9255-20-01_u32-r0",  0x000000, 0x080000, CRC(ac969296) SHA1(7e09e9141637339b83c21f2488560cdf8a460069) ) /* Location U32 */
+	ROM_LOAD( "9255-20-01_u32-roa", 0x000000, 0x080000, CRC(69110f8f) SHA1(253487f0b4a82072efb7c70bebf953ea1c41d0d8) ) /* Location U32 */
 	ROM_RELOAD(                     0x080000, 0x080000)
-	ROM_LOAD( "9255-01_u36-r0",     0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
+	ROM_LOAD( "qs9255-01_u36-ro",   0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x080000)
-	ROM_LOAD( "9255-01_u37-r0",     0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
-	ROM_LOAD( "9255-20-01_u38-rof", 0x300000, 0x080000, CRC(85f48b91) SHA1(7a38644ac7ee55a254c037122af919fb268744a1) ) /* Location U38 */
+	ROM_LOAD( "qs9255-01_u37-ro",   0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
+	ROM_LOAD( "9255-20-06_u38-ron", 0x300000, 0x080000, CRC(f9ff003a) SHA1(6c32098593c444785de2deca0f8748042980d84d) ) /* Location U38, 02/20/1996 09:24:17 */
 	ROM_RELOAD(                     0x380000, 0x080000)
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
@@ -1122,14 +1150,14 @@ ROM_START( megat3 )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-
-ROM_START( megat3te )
+ROM_START( megat3a ) /* Dallas DS1204V security key at U5 labeled 9255-20-01 U5-RO1 C1995 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "9255-30-01_u32-r0",  0x000000, 0x100000, CRC(31ac0004) SHA1(4bec97a852a7dadb0ab4f193bc376ed149102082) ) /* Location U32 */
-	ROM_LOAD( "9255-01_u36-r0",     0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
+	ROM_LOAD( "9255-20-01_u32-ro",  0x000000, 0x080000, CRC(ac969296) SHA1(7e09e9141637339b83c21f2488560cdf8a460069) ) /* Location U32 */
+	ROM_RELOAD(                     0x080000, 0x080000)
+	ROM_LOAD( "qs9255-01_u36-ro",   0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x080000)
-	ROM_LOAD( "9255-01_u37-r0",     0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
-	ROM_LOAD( "9255-30-0_u38-r0e",  0x300000, 0x080000, CRC(52ca7dd8) SHA1(9f44f158d67d7443405b87a18fc89d9c88be1dea) ) /* Location U38 */
+	ROM_LOAD( "qs9255-01_u37-ro",   0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
+	ROM_LOAD( "9255-20-01_u38-rof", 0x300000, 0x080000, CRC(85f48b91) SHA1(7a38644ac7ee55a254c037122af919fb268744a1) ) /* Location U38, 10/27/1995 14:23:00 */
 	ROM_RELOAD(                     0x380000, 0x080000)
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
@@ -1139,15 +1167,30 @@ ROM_START( megat3te )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
+ROM_START( megat3te ) /* Dallas DS1204V security key at U5 labeled 9255-30-01 U5-RO1 C1995 MII */
+	ROM_REGION( 0x400000, REGION_CPU1, 0 )
+	ROM_LOAD( "9255-30-01_u32-ro",  0x000000, 0x100000, CRC(31ac0004) SHA1(4bec97a852a7dadb0ab4f193bc376ed149102082) ) /* Location U32 */
+	ROM_LOAD( "qs9255-01_u36-ro",   0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
+	ROM_RELOAD(                     0x180000, 0x080000)
+	ROM_LOAD( "qs9255-01_u37-ro",   0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
+	ROM_LOAD( "9255-30-01_u38-roe", 0x300000, 0x080000, CRC(52ca7dd8) SHA1(9f44f158d67d7443405b87a18fc89d9c88be1dea) ) /* Location U38, 02/15/1996 16:04:36 */
+	ROM_RELOAD(                     0x380000, 0x080000)
 
-ROM_START( megat4 )
+	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
+ROM_START( megat4 ) /* Dallas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x80000)
 	ROM_LOAD( "qs9255-02_u37-ro",   0x200000, 0x80000,  CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) ) /* Location U37 */
 	ROM_RELOAD(                     0x280000, 0x80000)
-	ROM_LOAD( "9255-40-01_u38-roe", 0x300000, 0x80000,  CRC(407c5e57) SHA1(c7c907b3fd6a8e64dcc6c71288505980862effce) ) /* Location U38 */
+	ROM_LOAD( "9255-40-01_u38-roe", 0x300000, 0x80000,  CRC(407c5e57) SHA1(c7c907b3fd6a8e64dcc6c71288505980862effce) ) /* Location U38, 07/22/1996 14:52:24 */
 	ROM_RELOAD(                     0x380000, 0x80000)
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
@@ -1157,14 +1200,14 @@ ROM_START( megat4 )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat4a )
+ROM_START( megat4a ) /* Dallas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x80000)
 	ROM_LOAD( "qs9255-02_u37-ro",   0x200000, 0x80000,  CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) ) /* Location U37 */
 	ROM_RELOAD(                     0x280000, 0x80000)
-	ROM_LOAD( "9255-40-01_u38-rod", 0x300000, 0x80000,  CRC(0d098424) SHA1(ef2810ccd636e69378fd353c8a95605274bb227f) ) /* Location U38 */
+	ROM_LOAD( "9255-40-01_u38-rod", 0x300000, 0x80000,  CRC(0d098424) SHA1(ef2810ccd636e69378fd353c8a95605274bb227f) ) /* Location U38, 07/08/1996 14:16:56 */
 	ROM_RELOAD(                     0x380000, 0x80000)
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
@@ -1174,14 +1217,14 @@ ROM_START( megat4a )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat4te )
+ROM_START( megat4te ) /* Dallas DS1204V security key at U5 labeled 9255-50-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x80000)
 	ROM_LOAD( "qs9255-02_u37-ro",   0x200000, 0x80000,  CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) ) /* Location U37 */
 	ROM_RELOAD(                     0x280000, 0x80000)
-	ROM_LOAD( "9255-50-01_u38-rod", 0x300000, 0x080000, CRC(124d5b84) SHA1(3c2117f56d0dc406bfb508989729e36781e215a4) ) /* Location U38 */
+	ROM_LOAD( "9255-50-01_u38-rod", 0x300000, 0x080000, CRC(124d5b84) SHA1(3c2117f56d0dc406bfb508989729e36781e215a4) ) /* Location U38, 07/02/1996 14:41:59 */
 	ROM_RELOAD(                     0x380000, 0x080000 )
 
 	ROM_REGION( 0x8000, REGION_USER1, 0 ) // DS1644 nv ram
@@ -1194,16 +1237,16 @@ ROM_START( megat4te )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat5 )
+ROM_START( megat5 ) /* U32 is a bad dump, the other 3 roms look to be ok */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "megat5.u32",  0x000000, 0x80000, BAD_DUMP CRC(89932443) SHA1(68d2fbf2a5050fc5371595a105fe06f4276b0b67) )
-	ROM_RELOAD(              0x080000, 0x80000)
-	ROM_LOAD( "megat5.u36",  0x100000, 0x80000, BAD_DUMP CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
-	ROM_RELOAD(              0x180000, 0x80000)
-	ROM_LOAD( "megat5.u37",  0x200000, 0x80000, BAD_DUMP CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
-	ROM_RELOAD(              0x280000, 0x80000)
-	ROM_LOAD( "megat5.u38",  0x300000, 0x80000, BAD_DUMP CRC(018e36c7) SHA1(8e9b457238a40b10d59887d13bac9c0a05c73614) )
-	ROM_RELOAD(              0x380000, 0x80000)
+	ROM_LOAD( "megat5.u32",         0x000000, 0x80000, BAD_DUMP CRC(89932443) SHA1(68d2fbf2a5050fc5371595a105fe06f4276b0b67) )
+	ROM_RELOAD(                     0x080000, 0x80000)
+	ROM_LOAD( "megat5.u36",         0x100000, 0x80000, BAD_DUMP CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
+	ROM_RELOAD(                     0x180000, 0x80000)
+	ROM_LOAD( "megat5.u37",         0x200000, 0x80000, BAD_DUMP CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
+	ROM_RELOAD(                     0x280000, 0x80000)
+	ROM_LOAD( "9255-60-01_u38-roc", 0x300000, 0x80000, BAD_DUMP CRC(018e36c7) SHA1(8e9b457238a40b10d59887d13bac9c0a05c73614) ) /* Location U38, 07/10/1997 16:27:51 */
+	ROM_RELOAD(                     0x380000, 0x80000)
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
 	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
@@ -1212,13 +1255,13 @@ ROM_START( megat5 )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat6 )
+ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO1 C1998 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-60-01_u32-ro",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) ) /* Location U32 */
 	ROM_LOAD( "qs9255-08_u36-ro",   0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x080000 )
 	ROM_LOAD( "qs9255-08_u37-ro",   0x200000, 0x100000, CRC(5ba01949) SHA1(1598949ea18d07bbc78af0ddd279a687173c1229) ) /* Location U37 */
-	ROM_LOAD( "9255-80-01_u38-roa", 0x300000, 0x100000, CRC(3df6b840) SHA1(31ba1ac04eed3e76cdf637507dedcc5f7e22c919) ) /* Location U38 */
+	ROM_LOAD( "9255-80-01_u38-roa", 0x300000, 0x100000, CRC(3df6b840) SHA1(31ba1ac04eed3e76cdf637507dedcc5f7e22c919) ) /* Location U38, 08/07/1998 15:54:23 */
 
 	ROM_REGION( 0x8000, REGION_USER1, 0 ) // DS1230 nv ram
 	ROM_LOAD( "ds1230y.u31",  0x00000, 0x8000, CRC(51b6da5c) SHA1(1d53af89d7867bb48b9d46feff6fc3b7e8e80ac8) )
@@ -1242,7 +1285,6 @@ static DRIVER_INIT(megat3)
 
 };
 
-
 static DRIVER_INIT(megat3te)
 {
 	static const UINT8 megat3_ds1204_key[8] =
@@ -1256,7 +1298,6 @@ static DRIVER_INIT(megat3te)
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
-
 
 static DRIVER_INIT(megat4)
 {
@@ -1287,17 +1328,19 @@ static DRIVER_INIT(megat6)
 }
 
 /* CRT 250 */
-GAME( 1988, pitboss2,  0,    meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss II", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, spitboss,  0,    meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Super Pit Boss", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, pitboss2,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss II", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, spitboss,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Super Pit Boss", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosss,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss Superstar", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + question roms */
 GAME( 1994, pitbossm,  0,      meritm_crt250_questions, pitbossm, 0, ROT0, "Merit", "Pit Boss Megastar", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 */
-GAME( 1995, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 ROF)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-06 RON)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, megat3a,   megat3, meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 ROF)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat3te,  megat3, meritm_crt260, meritm_crt260, megat3te, ROT0, "Merit", "Megatouch III Tournament Edition (9255-30-01 ROE)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4,    0,      meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Megatouch IV (9255-40-01 ROE)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4a,   megat4, meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Megatouch IV (9255-40-01 ROD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4te,  megat4, meritm_crt260, meritm_crt260, megat4te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, 0,	       ROT0, "Merit", "Megatouch 5", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
+GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, 0,	       ROT0, "Merit", "Megatouch 5 (9255-60-01 ROC)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
 GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, megat6,   ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA)", GAME_IMPERFECT_GRAPHICS )

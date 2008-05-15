@@ -19,24 +19,9 @@ NA-2 Games:
 
 To Do:
 
-- Pressing "F3" (reset) crashes MAME
-
-- Emeralda:
-    After selecting the game type, tilemap scrolling is briefly incorrect
-    The demo sprites are incorrect, you should see a dolphin speaking
-    the instructions and the playfield is wrong.
-    Byte 0x25 of the NVRAM controls the FBI logo. 0x00 is on, 0x01 is off
-
-- Hook up ROZ registers
-    Example:  In Emeralda the game logo rotates and zooms in against a black
-    background with bubbles during the intro.  Then at the second green screen
-    when flashing Please Insert Coin, the word NAMCO rotates past the viewer.
-
-- Is view area controlled by registers?
+- view area / screen resolution controlled by registers?
 
 - Xday 2:
-    has some graphics glitches (wrong sprite tiles); probably blitter-related
-
     Rom board  M112
     Rom board custom Key chip i.d. C394
     Game uses a small cash-register type printer (connects to rom board)
@@ -74,6 +59,8 @@ Notes:
 -   Almost all quiz games using JAMMA edge connector assign
     button1 to up, button 2 to down, button 3 to left, button 4 to right.
     But Taito F2 quiz games assign button 3 to right and button 4 to left.
+
+-   Emeralda: Byte 0x25 of the NVRAM, when zero, enables the FBI logo.
 
 
 Namco NA2 hardware
@@ -833,11 +820,11 @@ transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 		logerror( "bad blt src %08x\n", source );
 		return -1;
 	}
-	if( dest>=0xf00000 && dest<=0xf02000 )
+	if( dest>=0xf00000 && dest<0xf02000 )
 	{
 		namcona1_paletteram_w( machine, (dest-0xf00000)/2, data, 0xffff );
 	}
-	else if( dest>=0xf40000 && dest<=0xf80000 )
+	else if( dest>=0xf40000 && dest<0xf80000 )
 	{
 		namcona1_gfxram_w( machine, (dest-0xf40000)/2, data, 0xffff );
 	}
@@ -845,17 +832,17 @@ transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 	{
 		namcona1_videoram_w( machine, (dest-0xff0000)/2, data, 0xffff );
 	}
-	else if( dest>=0xff8000 && dest<=0xffdfff )
+	else if( dest>=0xff8000 && dest<0xffc000 )
 	{
-		namcona1_sparevram[(dest-0xff8000)/2] = data;
+		namcona1_rozvideoram_w( machine, (dest-0xff8000)/2, data, 0xffff );
 	}
-	else if( dest>=0xfff000 && dest<=0xffffff )
+	else if( dest>=0xfff000 && dest<0x1000000 )
 	{
 		spriteram16[(dest-0xfff000)/2] = data;
 	}
 	else
 	{
-		logerror( "bad blt dst %08x\n", dest );
+		logerror( "bad blit dest %08x\n", dest );
 		return -1;
 	}
 	return 0;
@@ -865,7 +852,7 @@ static void
 blit_setup( int format, int *bytes_per_row, int *pitch, int mode )
 {
 	if( mode == 3 )
-	{
+	{ /* TILE DATA */
 		switch( format )
 		{
 		case 0x0001:
@@ -888,7 +875,7 @@ blit_setup( int format, int *bytes_per_row, int *pitch, int mode )
 		}
 	}
 	else
-	{
+	{ /* SHAPE DATA */
 		switch( format )
 		{
 		case 0x00bd: /* Numan Athletics */
@@ -933,29 +920,6 @@ blit_setup( int format, int *bytes_per_row, int *pitch, int mode )
 	}
 } /* blit_setup */
 
-/*
-$efff20: sprite control: 0x3a,0x3e,0x3f
-            bit 0x01 selects spriteram bank
-
-               0    2    4    6    8    a    c    e
-$efff00:    src0 src1 src2 dst0 dst1 dst2 BANK [src
-$efff10:    src] [dst dst] #BYT BLIT eINT 001f 0001
-$efff20:    003f 003f IACK ---- ---- ---- ---- ----
-$efff30:    ---- ---- ---- ---- ---- ---- ---- ----
-$efff40:    ---- ---- ---- ---- ---- ---- ---- ----
-$efff50:    ---- ---- ---- ---- ---- ---- ---- ----
-$efff60:    ---- ---- ---- ---- ---- ---- ---- ----
-$efff70:    ---- ---- ---- ---- ---- ---- ---- ----
-$efff80:    0050 0170 0020 0100 0000 0000 0000 GFXE
-$efff90:    0000 0001 0002 0003 FLIP ---- ---- ----
-$efffa0:    PRI  PRI  PRI  PRI  ---- ---- 00c0 ----     priority (0..7)
-$efffb0:    COLR COLR COLR COLR 0001 0004 0000 ----     color (0..f)
-$efffc0:    ???? ???? ???? ???? ???? ???? ???? ----     ROZ
-
-Emeralda:
-$efff80:    0048 0177 0020 0100 0000 00fd 0000 GFXE
-*/
-
 static void namcona1_blit( running_machine *machine )
 {
 	int src0 = namcona1_vreg[0x0];
@@ -969,29 +933,29 @@ static void namcona1_blit( running_machine *machine )
 	int gfxbank = namcona1_vreg[0x6];
 
 	/* dest and source are provided as dword offsets */
-	UINT32 src_baseaddr	= 2*((namcona1_vreg[0x7]<<16)|namcona1_vreg[0x8]);
-	UINT32 dst_baseaddr	= 2*((namcona1_vreg[0x9]<<16)|namcona1_vreg[0xa]);
+	UINT32 src_baseaddr	= 2*(0xffffff&((namcona1_vreg[0x7]<<16)|namcona1_vreg[0x8]));
+	UINT32 dst_baseaddr	= 2*(0xffffff&((namcona1_vreg[0x9]<<16)|namcona1_vreg[0xa]));
 
 	int num_bytes = namcona1_vreg[0xb];
 
-	int dest_offset, source_offset;
-	int dest_bytes_per_row, dst_pitch;
-	int source_bytes_per_row, src_pitch;
+	int dst_offset, src_offset;
+	int dst_bytes_per_row, dst_pitch;
+	int src_bytes_per_row, src_pitch;
 
 	(void)dst2;
 	(void)dst0;
 	(void)src2;
 	(void)src0;
-
-/*  logerror( "0x%08x: blt(%08x,%08x,%08x);%04x %04x %04x; %04x %04x %04x; gfx=%04x\n",
+/*
+    logerror( "0x%08x: blt(%08x,%08x,numBytes=%04x);src=%04x %04x %04x; dst=%04x %04x %04x; gfx=%04x\n",
         activecpu_get_pc(),
         dst_baseaddr,src_baseaddr,num_bytes,
         src0,src1,src2,
         dst0,dst1,dst2,
-        gfxbank );*/
-
-	blit_setup( dst1, &dest_bytes_per_row, &dst_pitch, gfxbank);
-	blit_setup( src1, &source_bytes_per_row, &src_pitch, gfxbank );
+        gfxbank );
+*/
+	blit_setup( dst1, &dst_bytes_per_row, &dst_pitch, gfxbank);
+	blit_setup( src1, &src_bytes_per_row, &src_pitch, gfxbank );
 
 	if( num_bytes&1 )
 	{
@@ -1003,32 +967,32 @@ static void namcona1_blit( running_machine *machine )
 		dst_baseaddr += 0xf40000;
 	}
 
-	dest_offset		= 0;
-	source_offset	= 0;
+	dst_offset = 0;
+	src_offset = 0;
 
 	while( num_bytes>0 )
 	{
 		if( transfer_dword(machine,
-			dst_baseaddr + dest_offset,
-			src_baseaddr + source_offset ) )
+			dst_baseaddr + dst_offset,
+			src_baseaddr + src_offset ) )
 		{
 			return;
 		}
 
 		num_bytes -= 2;
 
-		dest_offset+=2;
-		if( dest_offset >= dest_bytes_per_row )
+		dst_offset+=2;
+		if( dst_offset >= dst_bytes_per_row )
 		{
 			dst_baseaddr += dst_pitch;
-			dest_offset = 0;
+			dst_offset = 0;
 		}
 
-		source_offset+=2;
-		if( source_offset >= source_bytes_per_row )
+		src_offset+=2;
+		if( src_offset >= src_bytes_per_row )
 		{
 			src_baseaddr += src_pitch;
-			source_offset = 0;
+			src_offset = 0;
 		}
 	}
 } /* namcona1_blit */
@@ -1085,8 +1049,9 @@ static ADDRESS_MAP_START( namcona1_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(&namcona1_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xff7fff) AM_READWRITE(namcona1_videoram_r, namcona1_videoram_w) AM_BASE(&videoram16)
-	AM_RANGE(0xff8000, 0xffdfff) AM_RAM AM_BASE(&namcona1_sparevram)	/* spare videoram */
+	AM_RANGE(0xff0000, 0xff7fff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(&videoram16)
+	AM_RANGE(0xff8000, 0xffbfff) AM_READWRITE(namcona1_rozvideoram_r, namcona1_rozvideoram_w) AM_BASE(&namcona1_rozvideoram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(&namcona1_scroll)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE(&spriteram16)			/* spriteram */
 ADDRESS_MAP_END
@@ -1270,17 +1235,26 @@ static ADDRESS_MAP_START( namcona1_mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x1f) AM_READ( portana_r )
 ADDRESS_MAP_END
 
+
 static INTERRUPT_GEN( namcona1_interrupt )
 {
 	int level = cpu_getiloops(); /* 0,1,2,3,4 */
 	if( level==0 )
 	{
-		simulate_mcu(machine);
+		simulate_mcu( machine );
 	}
 	if( mEnableInterrupts )
 	{
 		if( (namcona1_vreg[0x1a/2]&(1<<level))==0 )
 		{
+			if( level==2 )
+			{ // posirq used with dolphin in Emeraldia's "how to play" attract mode
+				int scanline = namcona1_vreg[0x8a/2]&0xff;
+				if( scanline )
+				{
+					video_screen_update_partial(machine->primary_screen, scanline );
+				}
+			}
 			cpunum_set_input_line(machine, 0, level+1, HOLD_LINE);
 		}
 	}
@@ -1293,7 +1267,9 @@ static INTERRUPT_GEN( namcona1_interrupt )
 static INTERRUPT_GEN( mcu_interrupt )
 {
 	if (cpu_getiloops() == 0)
+	{
  		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ1, HOLD_LINE);
+	}
 	else if (cpu_getiloops() == 1)
 	{
 		cpunum_set_input_line(machine, 1, M37710_LINE_ADC, HOLD_LINE);
@@ -1360,24 +1336,30 @@ static MACHINE_DRIVER_START( namcona1w )
 MACHINE_DRIVER_END
 
 static ADDRESS_MAP_START( namcona2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_RAM)		/* work RAM */
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_RAM) /* work RAM */
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION(REGION_CPU1, 0x280000)	/* data */
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION(REGION_CPU1, 0x080000)	/* code */
 	AM_RANGE(0xe00000, 0xe00fff) AM_READ(namcona1_nvram_r)
+	/* xday: additional battery-backed ram at 00E024FA? */
 	AM_RANGE(0xe40000, 0xe4000f) AM_READ(custom_key_r)
 	AM_RANGE(0xefff00, 0xefffff) AM_READ(namcona1_vreg_r)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READ(namcona1_paletteram_r)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(namcona1_gfxram_r)
 	AM_RANGE(0xff0000, 0xff7fff) AM_READ(namcona1_videoram_r)
-	AM_RANGE(0xff8000, 0xffdfff) AM_READ(SMH_RAM)		/* spare videoram */
-	AM_RANGE(0xffe000, 0xffefff) AM_READ(SMH_RAM)		/* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_READ(SMH_RAM)		/* spriteram */
+	AM_RANGE(0xff8000, 0xffbfff) AM_READ(namcona1_rozvideoram_r )
+	AM_RANGE(0xffd000, 0xffdfff) AM_READ(SMH_RAM) /* unknown */
+	AM_RANGE(0xffe000, 0xffefff) AM_READ(SMH_RAM) /* scroll registers */
+	AM_RANGE(0xfff000, 0xffffff) AM_READ(SMH_RAM) /* spriteram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namcona2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000fff) AM_WRITE(namcona1_mcu_w) AM_BASE(&mcu_ram)
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_RAM) AM_BASE(&namcona1_workram)
 	AM_RANGE(0x3f8008, 0x3f8009) AM_WRITE(mcu_command_w)
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(SMH_NOP) /* xday: serial out? */
+	AM_RANGE(0xd40000, 0xd40001) AM_WRITE(SMH_NOP) /* xday: serial out? */
+	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(SMH_NOP) /* xday: serial out? */
+	AM_RANGE(0xdc0000, 0xdc001f) AM_WRITE(SMH_NOP) /* xday: serial config? */
 	AM_RANGE(0x400000, 0xdfffff) AM_WRITE(SMH_ROM) /* data + code */
 	AM_RANGE(0xe00000, 0xe00fff) AM_WRITE(namcona1_nvram_w)
 	AM_RANGE(0xe40000, 0xe4000f) AM_WRITE(custom_key_w)
@@ -1385,7 +1367,8 @@ static ADDRESS_MAP_START( namcona2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf01fff) AM_WRITE(namcona1_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_WRITE(namcona1_gfxram_w)
 	AM_RANGE(0xff0000, 0xff7fff) AM_WRITE(namcona1_videoram_w) AM_BASE(&videoram16)
-	AM_RANGE(0xff8000, 0xffdfff) AM_WRITE(SMH_RAM) AM_BASE(&namcona1_sparevram)
+	AM_RANGE(0xff8000, 0xffbfff) AM_WRITE(namcona1_rozvideoram_w) AM_BASE(&namcona1_rozvideoram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_WRITE(SMH_RAM) /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_WRITE(SMH_RAM) AM_BASE(&namcona1_scroll)
 	AM_RANGE(0xfff000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
 ADDRESS_MAP_END

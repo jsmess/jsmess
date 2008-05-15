@@ -388,12 +388,12 @@ static const ins8250_interface avigo_com_interface =
 /* this is needed because this driver uses handlers in memory that gets executed */
 static OPBASE_HANDLER( avigo_opbase_handler )
 {
-	void *opbase;
+	void *opbase_ptr;
 
-	opbase = avigo_banked_opbase[address / 0x4000];
-	if (opbase)
+	opbase_ptr = avigo_banked_opbase[address / 0x4000];
+	if (opbase_ptr != NULL)
 	{
-		opcode_base = opcode_arg_base = opbase;
+		opbase->rom = opbase->ram = opbase_ptr;
 		address = ~0;
 	}
 	return address;
