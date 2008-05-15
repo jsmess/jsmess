@@ -43,17 +43,14 @@ DEVICE_IMAGE_LOAD( comx35_floppy )
 
 		switch (size)
 		{
-		case 35*16*128:
+		case 35*1*16*128:
 			/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
 			basicdsk_set_geometry(image, 35, 1, 16, 128, 0, 0, FALSE);
 			break;
 
-		case 70*16*128:
-			basicdsk_set_geometry(image, 70, 1, 16, 128, 0, 0, FALSE);
-			break;
-
-		case 89*16*128: // ???
-			basicdsk_set_geometry(image, 89, 1, 16, 128, 0, 0, FALSE);
+		case 35*2*16*128:
+			/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
+			basicdsk_set_geometry(image, 35, 2, 16, 128, 0, 0, FALSE);
 			break;
 		}
 

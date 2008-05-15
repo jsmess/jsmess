@@ -17,7 +17,7 @@ System Driver Changes:
 
 - [BK] Added SHA-1's.  [Fabio Priuli]
 
-- [COMX35] System is now working except for the FDC.  [Curt Coder]
+- [COMX35] System is now working.  [Curt Coder]
 
 - [GAMEBOY] Added .bin extension.  [Fabio Priuli]
 
