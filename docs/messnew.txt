@@ -17,6 +17,8 @@ System Driver Changes:
 
 - [BK] Added SHA-1's.  [Fabio Priuli]
 
+- [C64] Joystick fix. (bug #1150) [Roberto Zandonà]
+
 - [COMX35] System is now working.  [Curt Coder]
 
 - [GAMEBOY] Added .bin extension.  [Fabio Priuli]
