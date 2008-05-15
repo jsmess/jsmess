@@ -528,6 +528,16 @@ READ8_HANDLER( c64_read_io )
 		return sid6581_0_port_r (machine, offset & 0x3ff);
 	else if (offset < 0xc00)
 		return c64_colorram[offset & 0x3ff];
+	else if (offset == 0xc00)
+		{
+			cia_set_port_mask_value(0, 0, JOYSTICK_SWAP?c64_keyline[8]:c64_keyline[9]);
+			return cia_0_r(machine, offset);
+		}
+	else if (offset == 0xc01)
+		{
+			cia_set_port_mask_value(0, 1, JOYSTICK_SWAP?c64_keyline[9]:c64_keyline[8]);
+			return cia_0_r(machine, offset);
+		}
 	else if (offset < 0xd00)
 		return cia_0_r(machine, offset);
 	else if (c64_cia1_on && (offset < 0xe00))
