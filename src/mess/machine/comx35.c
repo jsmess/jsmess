@@ -60,6 +60,7 @@ DEVICE_IMAGE_LOAD( comx35_floppy )
 	if (device_load_basicdsk_floppy(image) == INIT_PASS)
 	{
 		int size = image_length(image);
+		UINT8 header[0x20] = {0};
 
 		switch (size)
 		{
@@ -69,8 +70,18 @@ DEVICE_IMAGE_LOAD( comx35_floppy )
 			break;
 
 		case 35*2*16*128:
-			/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
-			basicdsk_set_geometry(image, 35, 2, 16, 128, 0, 0, FALSE);
+			image_fread(image, header, 0x20);
+
+			if (header[0x12] == 0x01)
+			{
+				/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
+				basicdsk_set_geometry(image, 70, 1, 16, 128, 0, 0, FALSE);
+			}
+			else
+			{
+				/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
+				basicdsk_set_geometry(image, 35, 2, 16, 128, 0, 0, FALSE);
+			}
 			break;
 		}
 
