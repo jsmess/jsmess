@@ -25,11 +25,14 @@ emu_timer *ula_nmi = NULL;
 //emu_timer *ula_irq = NULL;
 int ula_nmi_active, ula_irq_active;
 int ula_frame_vsync = 0;
-int ula_scancode_count = 0;
+//int ula_scancode_count = 0;
 int ula_scanline_count = 0;
 static int old_x = 0;
 static int old_y = 0;
 static int old_c = 0;
+static UINT8 charline[32];
+static UINT8 charline_ptr;
+static int offs1 = 0;
 
 /*
  * Toggle the video output between black and white.
@@ -106,9 +109,9 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	rectangle r = *video_screen_get_visible_area(screen);
 	bitmap_t *bitmap = tmpbitmap;
 
-	r.min_y = r.max_y = video_screen_get_vpos(machine->primary_screen);
+	r.min_y = r.max_y = ula_scanline_count;
 	fillbitmap(bitmap, 1, &r);
-	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
+//	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	if (++ula_scanline_count == height)
 		ula_scanline_count = 0;
@@ -116,8 +119,6 @@ static TIMER_CALLBACK(zx_ula_nmi)
 
 static TIMER_CALLBACK(zx_ula_irq)
 {
-	const device_config *screen = video_screen_first(machine->config);
-	int height = video_screen_get_height(screen);
 
 	/*
 	 * An IRQ is issued on the ZX80/81 whenever the R registers
@@ -126,70 +127,72 @@ static TIMER_CALLBACK(zx_ula_irq)
 	 */
 	if (ula_irq_active)
 	{
-		logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
+//		logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
 
 		ula_irq_active = 0;
-		if (++ula_scancode_count == 8)
-			ula_scancode_count = 0;
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-		if (++ula_scanline_count == height)
-			ula_scanline_count = 0;
 	}
 }
 
-int zx_ula_r(running_machine *machine, int offs, int region)
+void zx_ula_r(running_machine *machine, int offs, int region)
 {
-	bitmap_t *bitmap = tmpbitmap;
-	int x, y, chr, data, ireg, rreg, cycles, offs0 = offs, halted = 0;
-	UINT8 *chrgen, *rom = memory_region(REGION_CPU1);
-	UINT16 *scanline;
+	const device_config *screen = video_screen_first(machine->config);
+	int offs0 = offs & 0x7fff;
+	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 chr = rom[offs0];
 
-	if (!ula_irq_active)
+	if ((!ula_irq_active) && (chr == 0x76))
 	{
+		bitmap_t *bitmap = tmpbitmap;
+		UINT16 y, *scanline;
+		UINT16 ireg = cpunum_get_reg(0, Z80_I) << 8;
+		UINT8 creg = cpunum_get_reg(0, Z80_C);
+		UINT8 data, *chrgen;
+		chrgen = memory_region(region);
+
+		if ((++ula_scanline_count == video_screen_get_height(screen)) || (creg == 32))
+		{
+			ula_scanline_count = 0;
+			offs1 = offs0;
+		}
+
 		ula_frame_vsync = 3;
 
-		chrgen = memory_region(region);
-		ireg = cpunum_get_reg(0, Z80_I) << 8;
-		rreg = cpunum_get_reg(0, Z80_R);
-		y = video_screen_get_vpos(machine->primary_screen);
+		charline_ptr = 0;
 
-		cycles = 4 * (64 - (rreg & 63));
-		timer_set(ATTOTIME_IN_CYCLES(cycles, 0), NULL, 0, zx_ula_irq);
-		ula_irq_active = 1;
-		scanline = BITMAP_ADDR16(bitmap, y, 0);
-
-		for (x = 0; x < 256; x += 8)
+		for (y = offs1+1; ((y < offs0) && (charline_ptr < ARRAY_LENGTH(charline))); y++)
 		{
-			chr = rom[offs & 0x7fff];
-/*			if (!halted)
-				logerror("ULA %3d[%d] VID, R:$%02X, PC:$%04x, CHR:%02x\n", y, ula_scancode_count, rreg, offs & 0x7fff, chr);*/
-			if (chr & 0x40)
-			{
-				halted = 1;
-				rom[offs] = chr;
-				data = 0x00;
-			}
-			else
-			{
-				data = chrgen[ireg | ((chr & 0x3f) << 3) | ula_scancode_count];
-				rom[offs] = 0x00;
-				if (chr & 0x80)
-					data ^= 0xff;
-				offs++;
-			}
-
-			scanline[x + 0] = (data >> 7) & 1;
-			scanline[x + 1] = (data >> 6) & 1;
-			scanline[x + 2] = (data >> 5) & 1;
-			scanline[x + 3] = (data >> 4) & 1;
-			scanline[x + 4] = (data >> 3) & 1;
-			scanline[x + 5] = (data >> 2) & 1;
-			scanline[x + 6] = (data >> 1) & 1;
-			scanline[x + 7] = (data >> 0) & 1;
+			charline[charline_ptr] = rom[y];
+			charline_ptr++;
 		}
-	}
+		for (y = charline_ptr; y < ARRAY_LENGTH(charline); y++)
+			charline[y] = 0;
 
-	return rom[offs0];
+		timer_set(ATTOTIME_IN_CYCLES(((32 - charline_ptr) << 2), 0), NULL, 0, zx_ula_irq);
+		ula_irq_active++;
+
+		scanline = BITMAP_ADDR16(bitmap, ula_scanline_count, 0);
+		y = 0;
+
+		for (charline_ptr = 0; charline_ptr < ARRAY_LENGTH(charline); charline_ptr++)
+		{
+			chr = charline[charline_ptr];
+			data = chrgen[ireg | ((chr & 0x3f) << 3) | ((8 - creg)&7) ];
+			if (chr & 0x80) data ^= 0xff;
+
+			scanline[y++] = (data >> 7) & 1;
+			scanline[y++] = (data >> 6) & 1;
+			scanline[y++] = (data >> 5) & 1;
+			scanline[y++] = (data >> 4) & 1;
+			scanline[y++] = (data >> 3) & 1;
+			scanline[y++] = (data >> 2) & 1;
+			scanline[y++] = (data >> 1) & 1;
+			scanline[y++] = (data >> 0) & 1;
+			charline[charline_ptr] = 0;
+		}
+
+		if (creg == 1) offs1 = offs0;
+	}
 }
 
 VIDEO_START( zx )

@@ -19,8 +19,8 @@
     hi-res and hi-res modes.
     Some memory packs are unemulated.
 
-Current issues: 4th and tree4th need their address maps worked out (eg, the stack is set to FD80)
-		All drivers: Broken screen
+Current issues: 4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
+		All drivers: Screen issues, and run extremely slowly
 
 
 ****************************************************************************/
@@ -35,18 +35,17 @@ Current issues: 4th and tree4th need their address maps worked out (eg, the stac
 
 static ADDRESS_MAP_START( zx80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_NOP
+	AM_RANGE(0xc000, 0xc2ff) AM_RAM // dummy space for screen memory
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zx81_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_NOP
+	AM_RANGE(0xc000, 0xc2ff) AM_RAM // dummy space for screen memory
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8300_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM	// PC8300 comes with 16K RAM
-	AM_RANGE(0x8000, 0xffff) AM_NOP
+	AM_RANGE(0xc000, 0xc2ff) AM_RAM // dummy space for screen memory
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zx80_io_map, ADDRESS_SPACE_IO, 8 )
@@ -386,10 +385,11 @@ static MACHINE_DRIVER_START( zx80 )
 	MDRV_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_PAL_SCANLINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_PAL_SCANLINES-1)
 	MDRV_GFXDECODE(zx80)
-	MDRV_PALETTE_LENGTH(6)
+	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(zx80)
 
 	MDRV_VIDEO_START(zx)
+	MDRV_VIDEO_EOF(zx)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 
 	// sound hardware
