@@ -305,6 +305,11 @@ static DEVICE_START( cdp1871 )
 	assert(cdp1871->intf != NULL);
 	assert(cdp1871->intf->clock > 0);
 
+	/* set initial values */
+	cdp1871->next_da = 1;
+	cdp1871->next_rpt = 1;
+	change_output_lines(device);
+	
 	/* create the timers */
 	cdp1871->scan_timer = timer_alloc(cdp1871_scan_tick, (void *)device);
 	timer_adjust_periodic(cdp1871->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cdp1871->intf->clock));

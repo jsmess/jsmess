@@ -2,15 +2,12 @@
 
 	TODO:
 
-	- empty keyboard buffer at startup
+	- enter key in F&M BASIC 3.1
+	- improve key mappings
+	- unreliable DOS commands
 	- F&M joycard detection
-	- DOS ROM mirror @ 0xdd0-0xddf
-	- DOS CAT halts after version prompt
-	- fix CDP1869 scrolling
-	- ROM_COPY only when bioses used
-	- power on reset timeout value?
-	- reset on SPACE+RESET
-	- DMA memory refresh
+	- configure bioses properly
+	- detect 70-track disk images
 
 	- tape
 	- PL-80 plotter
@@ -65,12 +62,12 @@ ADDRESS_MAP_END
 #define COMX35_DEVICES \
 	PORT_CONFSETTING( 0x00, DEF_STR( None ) ) \
 	PORT_CONFSETTING( 0x01, "DOS Card" ) \
-	PORT_CONFSETTING( 0x02, "Standard Printer Card" ) \
-	PORT_CONFSETTING( 0x03, "Standard Printer Card (F&M)" ) \
-	PORT_CONFSETTING( 0x04, "Serial Printer Card" ) \
-	PORT_CONFSETTING( 0x05, "Thermal Printer Card" ) \
+	PORT_CONFSETTING( 0x02, "Parallel Output Interface" ) \
+	PORT_CONFSETTING( 0x03, "Parallel Output Interface (F&M)" ) \
+	PORT_CONFSETTING( 0x04, "RS-232C Serial Output Interface" ) \
+	PORT_CONFSETTING( 0x05, "Thermal Printer Interface" ) \
 	PORT_CONFSETTING( 0x06, "F&M Joycard" ) \
-	PORT_CONFSETTING( 0x07, "80 Column Card" ) \
+	PORT_CONFSETTING( 0x07, "80-Column Card" ) \
 	PORT_CONFSETTING( 0x08, "RAM Card" )
 
 static INPUT_PORTS_START( comx35 )
@@ -162,7 +159,7 @@ static INPUT_PORTS_START( comx35 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RT") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RT") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED(comx35_reset, NULL)
 
 	PORT_START_TAG("JOY1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
@@ -188,7 +185,7 @@ static INPUT_PORTS_START( comx35 )
 	PORT_CONFSETTING( 0x03, "COMX PL-80 Plotter" )
 
 	PORT_START_TAG("EXPANSION")
-	PORT_CONFNAME( 0x0f, 0x00, "Expansion (without Expansion Box)")
+	PORT_CONFNAME( 0x0f, 0x00, "Expansion Slot")
 	COMX35_DEVICES
 
 	PORT_START_TAG("SLOT1")
@@ -230,19 +227,24 @@ static CDP1802_EF_READ( comx35_ef_r )
         EF4     cassette in (ear)
     */
 
+	// CDP1869 predisplay
 	if (!state->cdp1869_prd) flags -= EF1;
 
 	if (state->iden)
 	{
+		// interrupts disabled: PAL/NTSC
 		if (!state->pal_ntsc) flags -= EF2;
 	}
 	else
 	{
+		// interrupts enabled: keyboard repeat
 		if (!state->cdp1871_efxb) flags -= EF2;
 	}
 
+	// keyboard data available
 	if (!state->cdp1871_efxa) flags -= EF3;
 
+	// cassette input, expansion device flag
 	if (!state->cdp1802_ef4 || cassette_input(cassette_device_image()) > +1.0) flags -= EF4;
 
 	return flags;
@@ -250,9 +252,40 @@ static CDP1802_EF_READ( comx35_ef_r )
 
 static CDP1802_SC_WRITE( comx35_sc_w )
 {
-	if (state == CDP1802_STATE_CODE_S3_INTERRUPT)
+	comx35_state *driver_state = machine->driver_data;
+
+	switch (state)
 	{
+	case CDP1802_STATE_CODE_S0_FETCH:
+		// not connected
+		break;
+
+	case CDP1802_STATE_CODE_S1_EXECUTE:
+		// every other S1 triggers a DMAOUT request
+		if (driver_state->dma)
+		{
+			driver_state->dma = 0;
+
+			if (!driver_state->iden)
+			{
+				cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+			}
+		}
+		else
+		{
+			driver_state->dma = 1;
+		}
+		break;
+
+	case CDP1802_STATE_CODE_S2_DMA:
+		// DMA acknowledge clears the DMAOUT request
+		cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		break;
+
+	case CDP1802_STATE_CODE_S3_INTERRUPT:
+		// interrupt acknowledge clears the INT request
 		cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+		break;
 	}
 }
 
@@ -264,9 +297,11 @@ static CDP1802_Q_WRITE( comx35_q_w )
 
 	if (state->iden && level)
 	{
+		// enable interrupts
 		state->iden = 0;
 	}
 
+	// cassette output
 	cassette_output(cassette_device_image(), level ? -1.0 : +1.0);
 }
 
@@ -394,7 +429,7 @@ ROM_START( comx35p )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "basic100", "COMX BASIC V1.00" )
 	ROMX_LOAD( "comx_10.u21",			0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(1) )
-	ROM_FILL( 0xe000, 0x2000, 0xff )
+	ROM_FILL( 0xe000, 0x1000, 0xff )
 
 	ROM_SYSTEM_BIOS( 1, "default", "COMX BASIC V1.00 with Expansion Box" )
 	ROMX_LOAD( "comx_10.u21",			0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(2) )

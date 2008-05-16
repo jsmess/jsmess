@@ -7,6 +7,7 @@
 #include "video/cdp1869.h"
 #include "video/mc6845.h"
 #include "includes/comx35.h"
+#include "rescap.h"
 
 enum
 {
@@ -28,6 +29,25 @@ enum
 static const device_config *printer_device(running_machine *machine)
 {
 	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
+
+static int expansion_box_installed(void)
+{
+	return (memory_region(REGION_CPU1)[0xe800] != 0xff);
+}
+
+static int dos_card_active(running_machine *machine)
+{
+	comx35_state *state = machine->driver_data;
+
+	if (expansion_box_installed())
+	{
+		return (state->bank == BANK_FLOPPY);
+	}
+	else
+	{
+		return input_port_read(machine, "EXPANSION") == BANK_FLOPPY;
+	}
 }
 
 /* Floppy Disc Controller */
@@ -241,7 +261,7 @@ static int get_active_bank(running_machine *machine, UINT8 data)
 	comx35_state *state = machine->driver_data;
 	int bank = 0;
 
-	if (memory_region(REGION_CPU1)[0xe000] != 0xff)
+	if (expansion_box_installed())
 	{
 		// expansion box
 
@@ -448,17 +468,6 @@ WRITE8_HANDLER( comx35_io_w )
 
 /* Machine Initialization */
 
-static TIMER_CALLBACK( dma_tick )
-{
-	comx35_state *state = machine->driver_data;
-
-	if (!state->iden)
-	{
-	//	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, ASSERT_LINE);
-	//	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
-	}
-}
-
 static TIMER_CALLBACK( reset_tick )
 {
 	comx35_state *state = machine->driver_data;
@@ -466,9 +475,28 @@ static TIMER_CALLBACK( reset_tick )
 	state->cdp1802_mode = CDP1802_MODE_RUN;
 }
 
+static OPBASE_HANDLER( comx35_opbase_handler )
+{
+	if (address >= 0x0dd0 && address <= 0x0ddf)
+	{
+		if (dos_card_active(machine))
+		{
+			// read opcode from DOS ROM
+			opbase->rom = opbase->ram = memory_region(REGION_USER1);
+			return ~0;
+		}
+	}
+
+	return address;
+}
+
 MACHINE_START( comx35p )
 {
 	comx35_state *state = machine->driver_data;
+
+	// opbase handling for DOS Card
+
+	memory_set_opbase_handler(0, comx35_opbase_handler);
 
 	// card slot banking
 
@@ -478,10 +506,10 @@ MACHINE_START( comx35p )
 
 	memory_set_bank(1, 0);
 
-	// allocate DMA timer
-
-	state->dma_timer = timer_alloc(dma_tick, NULL);
-	timer_adjust_periodic(state->dma_timer, attotime_zero, 0, ATTOTIME_IN_HZ(CDP1869_CPU_CLK_PAL / 8));
+	if (!expansion_box_installed())
+	{
+		state->bank = input_port_read(machine, "EXPANSION");
+	}
 
 	// allocate reset timer
 	
@@ -504,7 +532,7 @@ MACHINE_START( comx35p )
 	state_save_register_global(state->cdp1802_ef4);
 	state_save_register_global(state->iden);
 	state_save_register_global(state->slot);
-
+	state_save_register_global(state->dma);
 	state_save_register_global(state->pal_ntsc);
 	state_save_register_global(state->cdp1869_prd);
 
@@ -522,8 +550,6 @@ MACHINE_START( comx35n )
 
 	MACHINE_START_CALL(comx35p);
 
-	timer_adjust_periodic(state->dma_timer, attotime_zero, 0, ATTOTIME_IN_HZ(CDP1869_CPU_CLK_NTSC / 8));
-
 	// screen format
 
 	state->pal_ntsc = CDP1869_NTSC;
@@ -532,11 +558,20 @@ MACHINE_START( comx35n )
 MACHINE_RESET( comx35 )
 {
 	comx35_state *state = machine->driver_data;
+	int t = RES_K(27) * CAP_U(1) * 1000; // t = R1 * C1
 
 	state->cdp1802_mode = CDP1802_MODE_RESET;
 	state->iden = 1;
 
-	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_MSEC(200), 0);
+	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_MSEC(t), 0);
+}
+
+INPUT_CHANGED( comx35_reset )
+{
+	if (BIT(input_port_read(machine, "RESET"), 0) && BIT(input_port_read(machine, "D6"), 7))
+	{
+		MACHINE_RESET_CALL(comx35);
+	}
 }
 
 /* Quickload */

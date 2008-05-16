@@ -32,9 +32,10 @@ struct _comx35_state
 	int cdp1802_mode;		/* CPU mode */
 	int cdp1802_q;			/* Q flag */
 	int cdp1802_ef4;		/* EF4 flag */
-	int iden;				/* interrupt enable */
+	int iden;				/* interrupt/DMA enable */
 	int slot;				/* selected slot */
 	int bank;				/* selected device bank */
+	int dma;				/* memory refresh DMA */
 
 	/* video state */
 	int pal_ntsc;			/* PAL/NTSC */
@@ -54,7 +55,6 @@ struct _comx35_state
 
 	/* timers */
 	emu_timer *reset_timer;	/* power on reset timer */
-	emu_timer *dma_timer;	/* memory refresh timer */
 };
 
 /* ---------- defined in machine/comx35.c ---------- */
@@ -67,6 +67,7 @@ WRITE8_HANDLER( comx35_io_w );
 MACHINE_START( comx35p );
 MACHINE_START( comx35n );
 MACHINE_RESET( comx35 );
+INPUT_CHANGED( comx35_reset );
 
 DEVICE_IMAGE_LOAD( comx35_floppy );
 QUICKLOAD_LOAD( comx35 );
