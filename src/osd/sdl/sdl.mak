@@ -60,6 +60,7 @@ CFLAGS += $(OPT_FLAGS)
 ifdef BIGENDIAN
 X86_MIPS3_DRC =
 X86_PPC_DRC =
+FORCE_DRC_C_BACKEND = 1
 endif
 
 # OS/2 can't have OpenGL (aww)

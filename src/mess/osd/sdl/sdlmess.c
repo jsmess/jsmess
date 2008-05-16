@@ -22,7 +22,10 @@
 #endif
 
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX)
+#include <SDL_timer.h>
+#include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <SDL_syswm.h>
 #endif
 
 //============================================================
@@ -381,7 +384,91 @@ char *osd_get_clipboard_text(void)
 }
 #endif
 
-#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX)
+#if defined(SDL_VIDEO_DRIVER_X11)
+//============================================================
+//	osd_get_clipboard_text
+//============================================================
+
+char *osd_get_clipboard_text(void)
+{
+	SDL_SysWMinfo info;
+	Display* display;
+	Window our_win;
+	Window selection_win;
+	Atom data_type;
+	int data_format;
+	unsigned long nitems;
+	unsigned long bytes_remaining;
+	unsigned char* prop;
+	char* result;
+	XEvent event;
+	Uint32 t0, t1;
+	Atom types[2];
+	int i;
+
+	/* get & validate SDL sys-wm info */
+	SDL_VERSION(&info.version);
+	if ( ! SDL_GetWMInfo( &info ) ) 
+		return NULL;
+	if ( info.subsystem != SDL_SYSWM_X11 ) 
+		return NULL;
+	if ( (display = info.info.x11.display) == NULL ) 
+		return NULL;
+	if ( (our_win = info.info.x11.window) == None ) 
+		return NULL;
+
+	/* request data to owner */
+	selection_win = XGetSelectionOwner( display, XA_PRIMARY ); 
+	if ( selection_win == None ) 
+		return NULL;
+
+	/* first, try UTF-8, then latin-1 */
+	types[0] = XInternAtom( display, "UTF8_STRING", False );
+	types[1] = XA_STRING; /* latin-1 */
+
+	for ( i = 0; i < sizeof( types ) / sizeof( types[0] ); i++ )
+	{
+
+		XConvertSelection( display, XA_PRIMARY, types[i], types[i], our_win, CurrentTime );
+
+		/* wait for SelectionNotify, but no more than 100 ms */
+		t0 = t1 = SDL_GetTicks();
+		while ( 1 )
+		{
+			if (  XCheckTypedWindowEvent( display, our_win,  SelectionNotify, &event ) ) break;
+			SDL_Delay( 1 );
+			t1 = SDL_GetTicks();
+			if ( t1 - t0 > 100 )
+				return NULL;
+		}
+		if ( event.xselection.property == None )
+			continue;
+
+		/* get property & check its type */
+		if ( XGetWindowProperty( display, our_win, types[i], 0, 65536, False, types[i],
+					 &data_type, &data_format, &nitems, &bytes_remaining, &prop ) 
+		     != Success )
+			continue;
+		if ( ! prop ) 
+			continue;
+		if ( (data_format != 8) || (data_type != types[i]) )
+		{
+			XFree( prop );
+			continue;
+		}
+		
+		/* return a copy & free original */
+		result = core_strdup( (char*) prop );
+		XFree( prop );
+		return result;
+	}
+
+	return NULL;
+}
+
+#endif
+
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDL_VIDEO_DRIVER_X11)
 //============================================================
 //	osd_get_clipboard_text
 //============================================================

@@ -17,6 +17,12 @@
 #define OSX_DEBUGGER_FONT_NAME		"Monaco"
 #define OSX_DEBUGGER_FONT_SIZE		10
 
+#if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050
+#define OSX_LEOPARD 1
+#else
+#define OSX_LEOPARD 0
+#endif
+
 // standard windows headers
 #include <Carbon/Carbon.h>
 
@@ -534,7 +540,6 @@ int debugwin_is_debugger_visible(void)
 static debugwin_info *debug_window_create(const char *title, void *unused)
 {
 	CGDirectDisplayID	mainID = CGMainDisplayID();
-	GDHandle			mainDevice;
 
 	debugwin_info *info = NULL;
 	Rect work_bounds;
@@ -579,8 +584,20 @@ static debugwin_info *debug_window_create(const char *title, void *unused)
 	}
 	
 	// fill in some defaults
-	DMGetGDeviceByDisplayID((DisplayIDType)mainID, &mainDevice, TRUE);
-	GetAvailableWindowPositioningBounds(mainDevice, &work_bounds);
+	{
+#if OSX_LEOPARD
+		HIRect		mainBounds;
+		HIWindowGetAvailablePositioningBounds( mainID, kHICoordSpaceScreenPixel, &mainBounds );
+		work_bounds.left = mainBounds.origin.x;
+		work_bounds.top = mainBounds.origin.y;
+		work_bounds.right = mainBounds.origin.x + mainBounds.size.width;
+		work_bounds.bottom = mainBounds.origin.y + mainBounds.size.height;
+#else
+		GDHandle	mainDevice;
+		DMGetGDeviceByDisplayID((DisplayIDType)mainID, &mainDevice, TRUE);
+		GetAvailableWindowPositioningBounds(mainDevice, &work_bounds);
+#endif
+	}
 	info->minwidth = 200;
 	info->minheight = 200;
 	info->maxwidth = work_bounds.right - work_bounds.left;
@@ -3023,7 +3040,6 @@ void console_create_window(void)
 	ControlFontStyleRec		style;
 	Str255		fontName;
 	CGDirectDisplayID	mainID = CGMainDisplayID();
-	GDHandle			mainDevice;
 	MenuItemIndex	menuIndex;
 	ControlButtonContentInfo	content;
 
@@ -3144,8 +3160,20 @@ void console_create_window(void)
 		}
 
 	// get the work bounds
-	DMGetGDeviceByDisplayID((DisplayIDType)mainID, &mainDevice, TRUE);
-	GetAvailableWindowPositioningBounds(mainDevice, &work_bounds);
+	{
+#if OSX_LEOPARD
+		HIRect		mainBounds;
+		HIWindowGetAvailablePositioningBounds( mainID, kHICoordSpaceScreenPixel, &mainBounds );
+		work_bounds.left = mainBounds.origin.x;
+		work_bounds.top = mainBounds.origin.y;
+		work_bounds.right = mainBounds.origin.x + mainBounds.size.width;
+		work_bounds.bottom = mainBounds.origin.y + mainBounds.size.height;
+#else
+		GDHandle	mainDevice;
+		DMGetGDeviceByDisplayID((DisplayIDType)mainID, &mainDevice, TRUE);
+		GetAvailableWindowPositioningBounds(mainDevice, &work_bounds);
+#endif
+}
 
 	// adjust the min/max sizes for the window style
 	bounds.top = bounds.left = 0;
