@@ -10,13 +10,32 @@
 #include "../imgtool/imgtool.h"
 #include "../imgtool/modules.h"
 
+
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define VERBOSE_FILECHAIN	0
 
-struct expected_dirent
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _expected_dirent expected_dirent;
+struct _expected_dirent
 {
 	const char *filename;
 	int size;
 };
+
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 static const char *tempfile_name(void)
 {
@@ -202,7 +221,7 @@ static void node_putfile(struct imgtooltest_state *state, xml_data_node *node)
 	if (VERBOSE_FILECHAIN)
 	{
 		char buf[1024];
-		err = imgtool_partition_get_chain_string(state->partition, filename, buf, sizeof(buf) / sizeof(buf[0]));
+		err = imgtool_partition_get_chain_string(state->partition, filename, buf, ARRAY_LENGTH(buf));
 		if (err == IMGTOOLERR_SUCCESS)
 			report_message(MSG_INFO, "Filechain '%s': %s", filename, buf);
 	}
@@ -286,8 +305,8 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 	xml_attribute_node *attr_node;
 	xml_data_node *child_node;
 	const char *filename;
-	struct expected_dirent *entry;
-	struct expected_dirent entries[256];
+	expected_dirent *entry;
+	expected_dirent entries[256];
 	int entry_count;
 
 	if (!state->partition)
