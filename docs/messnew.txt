@@ -23,6 +23,8 @@ System Driver Changes:
 
 - [GAMEBOY] Added .bin extension.  [Fabio Priuli]
 
+- [GENESIS / MD] Fixed cheat issue [ShimaPong, Fabio Priuli]
+
 - [ORION] Added SHA-1's.  [Fabio Priuli]
 
 - [ORION] ROMDISK's are carts now [Miodrag Milanovic]
