@@ -4,11 +4,23 @@
 
 	Filter for Microsoft-style tokenized BASIC files
 
+	BASIC files typically follow the following format:
+
+		int8     $ff
+		int16    <TOTAL LENGTH>
+		...
+        int16    <PTR_NEXT_LINE>
+        int16    <LINE_NUM>
+        int8[]   <TOKENISED_DATA>
+        int8     $00     End of line delimiter
+
 *****************************************************************************/
 
 #include <string.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <ctype.h>
+
 #include "imgtool.h"
 #include "utils.h"
 
@@ -52,6 +64,11 @@ struct _basictokens
     IMPLEMENTATION
 ***************************************************************************/
 
+/*-------------------------------------------------
+    basic_readfile - reads a file and decodes
+	BASIC tokens into ASCII text
+-------------------------------------------------*/
+
 static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	imgtool_partition *partition, const char *filename,
 	const char *fork, imgtool_stream *destf)
@@ -66,8 +83,9 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	const basictoken_tableent *token_table;
 	const char *token;
 
+	/* open a memory stream */
 	mem_stream = stream_open_mem(NULL, 0);
-	if (!mem_stream)
+	if (mem_stream == NULL)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
 		goto done;
@@ -78,11 +96,13 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	if (err)
 		goto done;
 
-	/* skip first bytes */
+	/* skip first few bytes */
 	stream_seek(mem_stream, tokens->skip_bytes, SEEK_SET);
 
+	/* keep reading line headers */
 	while(stream_read(mem_stream, line_header, sizeof(line_header)) == sizeof(line_header))
 	{
+		/* pluck the address and line number out */
 		if (tokens->be)
 		{
 			address = (UINT16) pick_integer_be(line_header, 0, 2);
@@ -94,6 +114,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 			line_number = (UINT16) pick_integer_le(line_header, 2, 2);
 		}
 
+		/* write the line number */
 		stream_printf(destf, "%u ", (unsigned) line_number);
 		shift = 0x00;
 
@@ -139,23 +160,203 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	}
 
 done:
-	if (mem_stream)
+	if (mem_stream != NULL)
 		stream_close(mem_stream);
 	return err;
 }
 
 
 
+/*-------------------------------------------------
+    basic_writefile - translates ASCII text to
+	BASIC tokens and writes it to a file
+-------------------------------------------------*/
+
 static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	imgtool_partition *partition, const char *filename,
 	const char *fork, imgtool_stream *sourcef, option_resolution *opts)
 {
-	return IMGTOOLERR_UNIMPLEMENTED;
+	imgtoolerr_t err;
+	imgtool_stream *mem_stream;
+	char buf[1024];
+	int eof = FALSE;
+	UINT32 len;
+	char c;
+	int i, j, pos, in_quotes;
+	UINT16 line_number;
+	UINT8 line_header[4];
+	UINT8 file_header[3];
+	const basictoken_tableent *token_table;
+	const char *token;
+	UINT8 token_shift, token_value;
+	UINT16 address;
+
+	/* open a memory stream */
+	mem_stream = stream_open_mem(NULL, 0);
+	if (mem_stream == NULL)
+	{
+		err = IMGTOOLERR_OUTOFMEMORY;
+		goto done;
+	}
+
+	/* skip first few bytes */
+	stream_fill(mem_stream, 0x00, tokens->skip_bytes);
+
+	/* loop until the file is complete */
+	while(!eof)
+	{
+		/* read a line */
+		pos = 0;
+		while((len = stream_read(sourcef, &c, 1)) > 0)
+		{
+			/* break if at end of line */
+			if ((c == '\r') || (c == '\n'))
+				break;
+
+			if (pos <= ARRAY_LENGTH(buf) - 1)
+			{
+				buf[pos++] = c;
+			}
+		}
+		eof = (len == 0);
+		buf[pos] = '\0';
+
+		/* ignore lines that don't start with digits */
+		if (isdigit(buf[0]))
+		{
+			/* start at beginning of line */
+			pos = 0;
+
+			/* read line number */
+			line_number = 0;
+			while(isdigit(buf[pos]))
+			{
+				line_number *= 10;
+				line_number += (buf[pos++] - '0');
+			}
+			
+			/* determine address */
+			if (tokens->baseaddress != 0)
+			{
+				address = tokens->baseaddress + (UINT16)stream_size(mem_stream) + 4;
+			}
+			else
+			{
+				address = 0x0000;
+			}
+
+			/* set up line header */
+			memset(&line_header, 0, sizeof(line_header));
+			if (tokens->be)
+			{
+				place_integer_be(line_header, 0, 2, address);
+				place_integer_be(line_header, 2, 2, line_number);
+			}
+			else
+			{
+				place_integer_be(line_header, 0, 2, address);
+				place_integer_be(line_header, 2, 2, line_number);
+			}
+			
+			/* emit line header */
+			stream_write(mem_stream, line_header, sizeof(line_header));
+
+			/* skip spaces */
+			while(isspace(buf[pos]))
+				pos++;
+
+			/* when we start out, we are not within quotation marks */
+			in_quotes = FALSE;
+
+			/* read until end of line */
+			while(buf[pos] != '\0')
+			{
+				token = NULL;
+				token_shift = 0;
+				token_value = 0;
+
+				if (buf[pos] == '\"')
+				{
+					/* flip quotation status */
+					in_quotes = !in_quotes;
+				}
+				else if (!in_quotes)
+				{
+					for (i = 0; (token == NULL) && (i < tokens->num_entries); i++)
+					{
+						token_table = &tokens->entries[i];
+						for (j = 0; (token == NULL) && (j < token_table->num_tokens); j++)
+						{
+							if (!strncmp(&buf[pos], token_table->tokens[j], strlen(token_table->tokens[j])))
+							{
+								token = token_table->tokens[j];
+								token_shift = token_table->shift;
+								token_value = token_table->base + j;
+								pos += strlen(token);
+							}
+						}
+					}
+				}
+
+				/* did we find a token? */
+				if (token != NULL)
+				{
+					/* emit the token */
+					if (token_shift != 0)
+						stream_write(mem_stream, &token_shift, 1);
+					stream_write(mem_stream, &token_value, 1);
+				}
+				else
+				{
+					/* no token; emit the byte */
+					stream_write(mem_stream, &buf[pos++], 1);
+				}
+			}
+
+			/* emit line terminator */
+			stream_fill(mem_stream, 0x00, 1);
+		}
+	}
+
+	/* emit program terminator */
+	stream_fill(mem_stream, 0x00, 2);
+
+	/* reset stream */
+	stream_seek(mem_stream, 0, SEEK_SET);
+
+	/* this is somewhat gross */
+	if (tokens->skip_bytes >= 3)
+	{
+		if (tokens->be)
+		{
+			place_integer_be(file_header, 0, 1, 0xFF);
+			place_integer_be(file_header, 1, 2, stream_size(mem_stream));
+		}
+		else
+		{
+			place_integer_le(file_header, 0, 1, 0xFF);
+			place_integer_le(file_header, 1, 2, stream_size(mem_stream));
+		}
+		stream_write(mem_stream, file_header, 3);
+		stream_seek(mem_stream, 0, SEEK_SET);
+	}
+
+	/* write actual file */
+	err = imgtool_partition_write_file(partition, filename, fork, mem_stream, opts, NULL);
+	if (err)
+		goto done;
+
+done:
+	if (mem_stream != NULL)
+		stream_close(mem_stream);
+	return err;
 }
 
 
 
-/* ----------------------------------------------------------------------- */
+/***************************************************************************
+    TOKEN DEFINITIONS
+***************************************************************************/
 
 static const char *const cocobas_statements[] =
 {
@@ -2590,21 +2791,12 @@ static const char *const basic_100[] = /* "BASIC 10.0" - supported by c65 & clon
 };
 
 #endif
-/*
-		int8     $ff
-		int16    <TOTAL LENGTH>
-		...
-        int16    <PTR_NEXT_LINE>
-        int16    <LINE_NUM>
-        int8[]   <TOKENISED_DATA>
-        int8     $00     End of line delimiter
- */
 
-/*************************************
- *
- *  CoCo BASIC
- *
- *************************************/
+
+
+/***************************************************************************
+    COCO BASIC
+***************************************************************************/
 
 static const basictoken_tableent cocobas_tokenents[] =
 {
@@ -2646,11 +2838,9 @@ void filter_cocobas_getinfo(UINT32 state, union filterinfo *info)
 
 
 
-/*************************************
- *
- *  Dragon BASIC
- *
- *************************************/
+/***************************************************************************
+    DRAGON BASIC
+***************************************************************************/
 
 static const basictoken_tableent dragonbas_tokenents[] =
 {
@@ -2690,16 +2880,18 @@ void filter_dragonbas_getinfo(UINT32 state, union filterinfo *info)
 	}
 }
 
-/*************************************
- *
- *  VZBASIC
- *
- *************************************/
+
+
+/***************************************************************************
+    VZBASIC
+***************************************************************************/
 
 static const basictoken_tableent vzbas_tokenents[] =
 {
-	{ 0x00,	0x80,	vzbas,	sizeof(vzbas) / sizeof(vzbas[0]) }
+	{ 0x00, 0x80,	vzbas,	sizeof(vzbas) / sizeof(vzbas[0]) }
 };
+
+
 
 static const basictokens vzbas_tokens =
 {

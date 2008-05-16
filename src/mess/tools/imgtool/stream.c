@@ -313,7 +313,7 @@ UINT32 stream_write(imgtool_stream *s, const void *buf, UINT32 sz)
 				}
 
 				/* do we have to limit sz? */
-				if (sz < (s->filesize - s->position))
+				if (sz > (s->filesize - s->position))
 					sz = (UINT32) (s->filesize - s->position);
 
 				memcpy(s->u.buffer + s->position, buf, sz);

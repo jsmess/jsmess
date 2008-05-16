@@ -65,6 +65,8 @@ User Interface Changes:
 
 Imgtool Changes:
 ----------------
+- Now supporting encoding of tokenized BASIC files.  (bug #1609) [Nate Woods]
+
 - [COCO BASIC] Fixed tokenization for DSKO$ command and above.  (bug #1609)
   [Nate Woods]
 
