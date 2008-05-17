@@ -112,6 +112,9 @@ static VIDEO_START( comx35 )
 
 	// register for save state
 
+	state_save_register_global(state->pal_ntsc);
+	state_save_register_global(state->cdp1869_prd);
+
 	state_save_register_global_pointer(state->pageram, COMX35_PAGERAM_SIZE);
 	state_save_register_global_pointer(state->charram, COMX35_CHARRAM_SIZE);
 }
@@ -193,6 +196,7 @@ static MACHINE_DRIVER_START( comx35_80_video )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
+	MDRV_VIDEO_START(comx35)
 	MDRV_VIDEO_UPDATE(comx35_80)
 
 	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)

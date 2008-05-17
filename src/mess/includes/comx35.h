@@ -35,6 +35,7 @@ struct _comx35_state
 	int iden;				/* interrupt/DMA enable */
 	int slot;				/* selected slot */
 	int bank;				/* selected device bank */
+	int rambank;			/* selected RAM bank */
 	int dma;				/* memory refresh DMA */
 
 	/* video state */

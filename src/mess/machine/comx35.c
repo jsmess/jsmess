@@ -267,10 +267,9 @@ static void printer_w(running_machine *machine, UINT8 data)
 
 /* Read/Write Handlers */
 
-static int get_active_bank(running_machine *machine, UINT8 data)
+static void get_active_bank(running_machine *machine, UINT8 data)
 {
 	comx35_state *state = machine->driver_data;
-	int bank = 0;
 
 	if (expansion_box_installed())
 	{
@@ -292,26 +291,24 @@ static int get_active_bank(running_machine *machine, UINT8 data)
 		{
 			sprintf(port, "SLOT%d", state->slot);
 
-			bank = input_port_read(machine, port);
+			state->bank = input_port_read(machine, port);
 		}
 	}
 	else
 	{
 		// no expansion box
 
-		bank = input_port_read(machine, "EXPANSION");
+		state->bank = input_port_read(machine, "EXPANSION");
 	}
 
-	return bank;
+	// RAM expansion bank
+	state->rambank = (data >> 5) & 0x03;
 }
 
-WRITE8_HANDLER( comx35_bank_select_w )
+static void set_active_bank(running_machine *machine)
 {
 	comx35_state *state = machine->driver_data;
-
-	int bank = get_active_bank(machine, data);
-
-	state->bank = bank;
+	int bank = state->bank;
 
 	switch (state->bank)
 	{
@@ -363,9 +360,7 @@ WRITE8_HANDLER( comx35_bank_select_w )
 
 	case BANK_RAMCARD:
 		{
-			int rambank = (data >> 5) & 0x03;
-
-			bank = BANK_RAMCARD + rambank;
+			bank = BANK_RAMCARD + state->rambank;
 
 			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK1, SMH_BANK1);
 		}
@@ -373,6 +368,12 @@ WRITE8_HANDLER( comx35_bank_select_w )
 	}
 
 	memory_set_bank(1, bank);
+}
+
+WRITE8_HANDLER( comx35_bank_select_w )
+{
+	get_active_bank(machine, data);
+	set_active_bank(machine);
 }
 
 READ8_HANDLER( comx35_io_r )
@@ -501,6 +502,11 @@ static OPBASE_HANDLER( comx35_opbase_handler )
 	return address;
 }
 
+static STATE_POSTLOAD( comx35_state_save_postload )
+{
+	set_active_bank(machine);
+}
+
 MACHINE_START( comx35p )
 {
 	comx35_state *state = machine->driver_data;
@@ -538,14 +544,16 @@ MACHINE_START( comx35p )
 
 	// register save states
 
+	state_save_register_postload(machine, comx35_state_save_postload, NULL);
+
 	state_save_register_global(state->cdp1802_mode);
 	state_save_register_global(state->cdp1802_q);
 	state_save_register_global(state->cdp1802_ef4);
 	state_save_register_global(state->iden);
 	state_save_register_global(state->slot);
+	state_save_register_global(state->bank);
+	state_save_register_global(state->rambank);
 	state_save_register_global(state->dma);
-	state_save_register_global(state->pal_ntsc);
-	state_save_register_global(state->cdp1869_prd);
 
 	state_save_register_global(state->cdp1871_efxa);
 	state_save_register_global(state->cdp1871_efxb);
