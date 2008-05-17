@@ -1031,7 +1031,7 @@ static const SCSIConfigTable dev_table =
 	2, /* 2 SCSI devices */
 	{
 		{ SCSI_ID_0, 0, SCSI_DEVICE_HARDDISK },	/* SCSI ID 0, using HD 0, HD */
-		{ SCSI_ID_3, 0, SCSI_DEVICE_CDROM }	/* SCSI ID 3, using CHD 0, CD-ROM */
+		{ SCSI_ID_3, 3, SCSI_DEVICE_CDROM }	/* SCSI ID 3, using CHD 0, CD-ROM */
 	}
 };
 
@@ -1084,6 +1084,9 @@ static void bebox_exit(running_machine *machine)
 MACHINE_START( bebox )
 {
 	pc_fdc_init(&bebox_fdc_interface);
+	/* SCSI */
+	lsi53c810_init(&scsi53c810_intf);
+	add_exit_callback(machine, bebox_exit);
 }
 
 DRIVER_INIT( bebox )
@@ -1109,7 +1112,6 @@ DRIVER_INIT( bebox )
 	}
 	memory_set_bankptr(3, mess_ram);
 
-//	pc_fdc_init(&bebox_fdc_interface);
 	mc146818_init(MC146818_STANDARD);
 	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
 	kbdc8042_init(&bebox_8042_interface);
@@ -1122,10 +1124,6 @@ DRIVER_INIT( bebox )
 		memory_install_read64_handler(machine, cpu, ADDRESS_SPACE_PROGRAM, vram_begin, vram_end, 0, 0, bebox_video_r);
 		memory_install_write64_handler(machine, cpu, ADDRESS_SPACE_PROGRAM, vram_begin, vram_end, 0, 0, bebox_video_w);
 	}
-
-	/* SCSI */
-	lsi53c810_init(&scsi53c810_intf);
-	add_exit_callback(machine, bebox_exit);
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for
 	 * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
