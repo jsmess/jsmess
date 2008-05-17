@@ -59,7 +59,7 @@ MACHINE_START( mc10 )
 
 READ8_HANDLER ( mc10_bfff_r )
 {
-	/*   BIT 0 KEYBOARD ROW 1
+    /*   BIT 0 KEYBOARD ROW 1
      *   BIT 1 KEYBOARD ROW 2
      *   BIT 2 KEYBOARD ROW 3
      *   BIT 3 KEYBOARD ROW 4
@@ -69,17 +69,17 @@ READ8_HANDLER ( mc10_bfff_r )
 
 	int val = 0x40;
 
-	if ((input_port_read_indexed(machine, 0) | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(machine, "LINE0") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x01;
-	if ((input_port_read_indexed(machine, 1) | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(machine, "LINE1") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x02;
-	if ((input_port_read_indexed(machine, 2) | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(machine, "LINE2") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x04;
-	if ((input_port_read_indexed(machine, 3) | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(machine, "LINE3") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x08;
-	if ((input_port_read_indexed(machine, 4) | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(machine, "LINE4") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x10;
-	if ((input_port_read_indexed(machine, 5) | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(machine, "LINE5") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x20;
 
 	return val;
@@ -114,7 +114,7 @@ READ8_HANDLER ( mc10_port1_r )
 
 WRITE8_HANDLER ( mc10_port1_w )
 {
-	/*   BIT 0  KEYBOARD COLUMN 1 STROBE
+    /*   BIT 0  KEYBOARD COLUMN 1 STROBE
      *   BIT 1  KEYBOARD COLUMN 2 STROBE
      *   BIT 2  KEYBOARD COLUMN 3 STROBE
      *   BIT 3  KEYBOARD COLUMN 4 STROBE
@@ -129,7 +129,7 @@ WRITE8_HANDLER ( mc10_port1_w )
 
 READ8_HANDLER ( mc10_port2_r )
 {
-	/*   BIT 1 KEYBOARD SHIFT/CONTROL KEYS INPUT
+    /*   BIT 1 KEYBOARD SHIFT/CONTROL KEYS INPUT
      * ! BIT 2 PRINTER OTS INPUT
      * ! BIT 3 RS232 INPUT DATA
      *   BIT 4 CASSETTE TAPE INPUT
@@ -138,7 +138,7 @@ READ8_HANDLER ( mc10_port2_r )
 	const device_config *img = image_from_devtype_and_index(IO_CASSETTE, 0);
 	int val = 0xed;
 
-	if ((input_port_read_indexed(machine, 6) | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(machine, "LINE6") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x02;
 
 	if (cassette_input(img) >= 0)

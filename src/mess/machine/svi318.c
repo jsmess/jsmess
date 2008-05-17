@@ -172,7 +172,7 @@ static READ8_HANDLER ( svi318_ppi_port_a_r )
 		data |= 0x80;
 	if (!svi318_cassette_present(0))
 		data |= 0x40;
-	data |= input_port_read_indexed(machine, 12) & 0x30;
+	data |= input_port_read(machine, "BUTTONS") & 0x30;
 
 	return data;
 }
@@ -193,14 +193,13 @@ static READ8_HANDLER ( svi318_ppi_port_a_r )
 static  READ8_HANDLER ( svi318_ppi_port_b_r )
 {
 	int row;
+	char port[7];
 
 	row = svi.keyboard_row;
 	if (row <= 10)
 	{
-		if (row == 6)
-			return input_port_read_indexed(machine, row) & input_port_read_indexed(machine, 14);
-		else
-			return input_port_read_indexed(machine, row);
+		sprintf(port, "LINE%d", row);
+		return input_port_read_indexed(machine, row);
 	}
 	return 0xff;
 }
@@ -304,7 +303,7 @@ static READ8_HANDLER( svi318_printer_r )
 
 READ8_HANDLER( svi318_psg_port_a_r )
 {
-	return input_port_read_indexed(machine, 11);
+	return input_port_read(machine, "JOYSTICKS");
 }
 
 /*
@@ -668,7 +667,7 @@ INTERRUPT_GEN( svi318_interrupt )
 {
 	int set;
 
-	set = input_port_read_indexed(machine, 13);
+	set = input_port_read(machine, "CONFIG");
 	TMS9928A_set_spriteslimit (set & 0x20);
 	TMS9928A_interrupt();
 }
