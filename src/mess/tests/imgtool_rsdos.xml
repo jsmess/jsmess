@@ -119,4 +119,11 @@
 	<checkfile name="FOO.BAS" filter="cocobas">'10 GOTO10&#13;&#10;'</checkfile>
 </imgtooltest>
 
+<imgtooltest name="coco_rs_006">
+  <!-- NOTE: should be using &eoln; here; this test assumes that the host is CRLF -->
+  <createimage driver="coco_jvc_rsdos"/>
+  <putfile name="FOO.BAS" filter="cocobas">'10 GOTO10&#13;&#10;'</putfile>
+  <checkfile name="FOO.BAS">0xFF000E2607000A81A53130000000</checkfile>
+</imgtooltest>
+
 </tests>
