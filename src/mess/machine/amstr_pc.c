@@ -192,7 +192,7 @@ WRITE8_HANDLER( pc1640_port60_w )
 
 	case 2:
 		data = pc1640.port62;
-		if (pit8253_get_output(0, 2))
+		if (pit8253_get_output(device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2))
 			data |= 0x20;
 		break;
 	}

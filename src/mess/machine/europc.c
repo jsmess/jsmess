@@ -192,7 +192,7 @@ WRITE8_HANDLER( europc_pio_w )
 		data=europc_pio.port61;
 		break;
 	case 2:
-		if (pit8253_get_output(0,2)) data|=0x20;
+		if (pit8253_get_output(device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ),2)) data|=0x20;
 		break;
 	}
 	return data;
