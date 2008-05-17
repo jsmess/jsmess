@@ -100,6 +100,18 @@ easier to manage.
 #include "devices/cococart.h"
 
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define JOYSTICK_MUX_DELAY				ATTOTIME_IN_USEC(16)
+
+
+
+/***************************************************************************
+    LOCAL VARIABLES / PROTOTYPES
+***************************************************************************/
+
 /*common vars/calls */
 static UINT8 *coco_rom;
 static int dclg_state, dclg_output_h, dclg_output_v, dclg_timer;
@@ -385,6 +397,10 @@ static emu_timer *nmi_timer;
 static emu_timer *halt_timer;
 
 
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 /***************************************************************************
   PAK files
@@ -1240,19 +1256,19 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 
 static WRITE8_HANDLER ( d_pia0_ca2_w )
 {
-	timer_adjust_oneshot(mux_sel1_timer, ATTOTIME_IN_USEC(16), data);
+	timer_adjust_oneshot(mux_sel1_timer, JOYSTICK_MUX_DELAY, data);
 }
 
 static TIMER_CALLBACK(coco_update_sel1_timerproc)
 {
-	mux_sel1 = param;;
+	mux_sel1 = param;
 	(*update_keyboard)(machine);
 	soundmux_update();
 }
 
 static WRITE8_HANDLER ( d_pia0_cb2_w )
 {
-	timer_adjust_oneshot(mux_sel2_timer, ATTOTIME_IN_USEC(16), data);
+	timer_adjust_oneshot(mux_sel2_timer, JOYSTICK_MUX_DELAY, data);
 }
 
 static TIMER_CALLBACK(coco_update_sel2_timerproc)
