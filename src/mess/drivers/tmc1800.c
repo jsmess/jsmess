@@ -66,6 +66,7 @@
 
 	TODO:
 
+	- tape input/output
 	- tmc2000: add missing keys
 	- tmc2000: TOOL-2000 rom banking
 
@@ -86,6 +87,7 @@ static QUICKLOAD_LOAD( tmc2000 );
 
 static MACHINE_RESET( tmc1800 );
 static MACHINE_RESET( tmc2000 );
+static MACHINE_RESET( oscnano );
 
 static const device_config *cassette_device_image(void)
 {
@@ -121,6 +123,28 @@ static WRITE8_HANDLER( tmc2000_keylatch_w )
 	tmc2000_state *state = machine->driver_data;
 
 	state->keylatch = data & 0x3f;
+}
+
+static WRITE8_HANDLER( oscnano_keylatch_w )
+{
+	/*
+
+		bit		description
+		
+		0		X0
+		1		X1
+		2		X2
+		3		Y0
+		4		not connected
+		5		not connected
+		6		not connected
+		7		not connected
+
+	*/
+
+	tmc2000_state *state = machine->driver_data;
+
+	state->keylatch = data & 0x0f;
 }
 
 static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
@@ -204,7 +228,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oscnano_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tmc1800_keylatch_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(oscnano_keylatch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispoff_r, oscnano_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -495,15 +519,22 @@ static const cdp1802_interface tmc2000_config =
 
 static CDP1802_MODE_READ( oscnano_mode_r )
 {
+	tmc2000_state *state = machine->driver_data;
+
 	if (input_port_read(machine, "RUN") & 0x01)
 	{
+		if (state->reset)
+		{
+			MACHINE_RESET_CALL(oscnano);
+
+			state->reset = 0;
+		}
+
 		return CDP1802_MODE_RUN;
 	}
 	else
 	{
-		// enable ROM at 0x0000
-
-		memory_set_bank(1, 0);
+		state->reset = 1;
 
 		return CDP1802_MODE_RESET;
 	}
@@ -825,7 +856,7 @@ ROM_END
 
 ROM_START( oscnano )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "mmi6349.ic", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
+	ROM_LOAD( "mmi6349.ic", 0x8000, 0x0200, BAD_DUMP CRC(1ec1b432) SHA1(ac41f5e38bcd4b80bd7a5b277a2c600899fd5fb8) ) // equivalent to 82S141
 ROM_END
 
 /* System Configuration */
@@ -920,4 +951,4 @@ static DRIVER_INIT( tmc1800 )
 COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,    tmc1800,    "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    tmc1800,    "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    tmc1800,    tmc2000,    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
-COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	tmc1800,	oscnano,	"OSCOM Oy",		"OSCOM Nano",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	tmc1800,	oscnano,	"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )

@@ -774,11 +774,15 @@ TESTDRIVER( hp48g )		/* HP48 G/GX										*/
 	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
 
 	/* Telercas Oy */
-TESTDRIVER(tmc1800)		/* 1977 Telmac 1800									*/
-	DRIVER(tmc2000)		/* 1980 Telmac 2000									*/
-TESTDRIVER(tmc2000e)	/* 1980 Telmac 2000E								*/
-TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
-	DRIVER(tmc600s2)	/* 1982 Telmac TMC-600 (Series II)					*/
+TESTDRIVER(tmc1800)
+	DRIVER(tmc2000)
+TESTDRIVER(tmc2000e)
+TESTDRIVER(tmc600s1)
+	DRIVER(tmc600s2)
+
+	/* OSCOM Oy */
+TESTDRIVER(osc1000b)
+	DRIVER(oscnano)
 
 	/* MIT */
 	DRIVER( tx0_64kw )	/* April 1956 MIT TX-0 (64kw RAM)					*/
