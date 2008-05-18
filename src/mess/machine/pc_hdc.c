@@ -14,14 +14,23 @@
 	The format of the so called 'POD' (power on drive paramters?) area
 	read from the MBR (master boot record) at offset 1AD to 1BD is wrong.
 
+
+
+	There were a lot of different Fixed Disk Adapter for the IBM pcs.
+	Xebec produced a couple of the Fixed Disk Adapter for IBM.
+	
+	One Xebec Adapter has these roms on it:
+	One MK6xxxx ROM: 62X0822__(M)_AMI_8621MAB__S68B364-P__(C)IBM_CORP_1982,1985__PHILIPPINES.12D.2364.bin
+	One 2732 ROM for the Z80: 104839RE__COPYRIGHT__XEBEC_1986.12A.2732.bin
+
+
+	tandon Fixed Disk Adapter found in an IBM 5150:
+	600963-001__TYPE_5.U12.2764.bin
+
 ***************************************************************************/
 
-#include <stdio.h>
-
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/pc_hdc.h"
-#include "machine/pic8259.h"
 #include "machine/8237dma.h"
 #include "devices/harddriv.h"
 #include "memconv.h"
@@ -73,7 +82,7 @@
 
 /* XT hard disk controller control bits */
 #define CTL_PIO 		0x00
-#define CTL_DMA 		0x03
+#define CTL_DMA 		0x01
 
 static int idx = 0; 							/* contoller * 2 + drive */
 static int drv = 0; 							/* 0 master, 1 slave drive */
@@ -99,9 +108,11 @@ static emu_timer *timer[MAX_BOARD];
 
 static int data_cnt = 0;                /* data count */
 static UINT8 *buffer;					/* data buffer */
-static UINT8 *ptr = 0;					/* data pointer */
+static UINT8 *buffer_ptr = 0;			/* data pointer */
 static UINT8 hdc_control;
 static void (*hdc_set_irq)(int,int);
+static const device_config *pc_hdc_dma8237;
+
 
 static const char *const hdc_command_names[] =
 {
@@ -182,12 +193,20 @@ int pc_hdc_setup(void (*hdc_set_irq_func)(int,int))
 		status[i] = 0;
 		error[i] = 0;
 		dip[i] = 0xff;
+		pc_hdc_dma8237 = NULL;
 		timer[i] = timer_alloc(pc_hdc_command, NULL);
 		if (!timer[i])
 			return -1;
 	}
 	return 0;
 }
+
+
+void pc_hdc_set_dma8237_device( const device_config *dma8237 )
+{
+	pc_hdc_dma8237 = dma8237;
+}
+
 
 static hard_disk_file *pc_hdc_file(int id)
 {
@@ -200,16 +219,15 @@ static hard_disk_file *pc_hdc_file(int id)
 	return mess_hd_get_hard_disk_file(img);
 }
 
-static void pc_hdc_result(int n)
+static void pc_hdc_result(int n, int set_error_info)
 {
 	int irq;
 
 	/* dip switch selected INT 5 or 2 */
 	irq = (dip[n] & 0x40) ? 5 : 2;
 
-	if ( hdc_set_irq ) {
+	if ( ( hdc_control & 0x02 ) && hdc_set_irq ) {
 		hdc_set_irq( irq, 1 );
-		hdc_set_irq( irq, 0 );
 	}
 
 	if (LOG_HDC_STATUS)
@@ -217,7 +235,7 @@ static void pc_hdc_result(int n)
 
 	buffer[data_cnt++] = csb[n];
 
-	if (csb[n] & CSB_ERROR)
+	if (set_error_info && ( csb[n] & CSB_ERROR ) )
 	{
         buffer[data_cnt++] = error[n];
 		if (error[n] & 0x80)
@@ -385,7 +403,7 @@ static void execute_read(void)
 	}
 	else
 	{
-		dma8237_run_transfer(0, HDC_DMA);
+		dma8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
 	}
 }
 
@@ -417,7 +435,7 @@ static void execute_write(void)
 	}
 	else
 	{
-		dma8237_run_transfer(0, HDC_DMA);
+		dma8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
 	}
 }
 
@@ -458,14 +476,19 @@ static int test_ready(int n)
 static TIMER_CALLBACK(pc_hdc_command)
 {
 	int n = param;
+	int set_error_info = 1;
+	int old_error = error[n];			/* Previous error data is needed for CMD_SENSE */
+	int old_csb = csb[n];
 	UINT8 cmd;
 	const char *command_name;
 
 	csb[n] = 0x00;
 	error[n] = 0;
 
-	ptr = buffer;
+	buffer_ptr = buffer;
 	cmd = buffer[0];
+
+	get_drive(n);
 
 	if (LOG_HDC_STATUS)
 	{
@@ -477,14 +500,23 @@ static TIMER_CALLBACK(pc_hdc_command)
 	switch (cmd)
 	{
 		case CMD_TESTREADY:
-		case CMD_SENSE:
-			get_drive(n);
+			set_error_info = 0;
 			test_ready(n);
             break;
+		case CMD_SENSE:
+			error[n] = old_error;
+			csb[n] = old_csb;
+			/* Perform error code translation. This may need to be expanded in the future. */
+			buffer[data_cnt++] = ( error[n] & 0xC0 ) | ( ( error[n] & 0x04 ) ? 0x04 : 0x00 ) ;
+			buffer[data_cnt++] = (drv << 5) | head[idx];
+			buffer[data_cnt++] = ((cylinder[idx] >> 2) & 0xc0) | sector[idx];
+			buffer[data_cnt++] = cylinder[idx] & 0xff;
+			set_error_info = 0;
+			break;
 		case CMD_RECALIBRATE:
-			get_drive(n);
 			get_chsn(n);
-/*			test_ready(n); */
+			test_ready(n);
+			set_error_info = 0;
             break;
 
 		case CMD_FORMATDRV:
@@ -493,14 +525,12 @@ static TIMER_CALLBACK(pc_hdc_command)
 		case CMD_FORMATBAD:
 		case CMD_SEEK:
 		case CMD_DRIVEDIAG:
-			get_drive(n);
 			get_chsn(n);
 			test_ready(n);
             break;
 
 		case CMD_READ:
 		case CMD_READLONG:
-			get_drive(n);
 			get_chsn(n);
 
 			if (LOG_HDC_STATUS)
@@ -511,11 +541,11 @@ static TIMER_CALLBACK(pc_hdc_command)
 
 			if (test_ready(n))
 				execute_read();
+			set_error_info = 0;
 			break;
 
 		case CMD_WRITE:
 		case CMD_WRITELONG:
-			get_drive(n);
 			get_chsn(n);
 
 			if (LOG_HDC_STATUS)
@@ -529,7 +559,6 @@ static TIMER_CALLBACK(pc_hdc_command)
 			break;
 
 		case CMD_SETPARAM:
-			get_drive(n);
 			get_chsn(n);
 			cylinders[idx] = ((buffer[6]&3)<<8) | buffer[7];
 			heads[idx] = buffer[8] & 0x1f;
@@ -549,7 +578,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			break;
 
 	}
-	pc_hdc_result(n);
+	pc_hdc_result(n, set_error_info);
 }
 
 
@@ -580,7 +609,7 @@ static void pc_hdc_data_w(int n, int data)
 		if (LOG_HDC_DATA)
 			logerror("hdc_data_w BOARD #%d $%02x: ", n, data);
 
-        ptr = buffer;
+        buffer_ptr = buffer;
 		data_cnt = 6;	/* expect 6 bytes including this one */
 		status[n] &= ~STA_READY;
 		status[n] &= ~STA_INPUT;
@@ -614,7 +643,7 @@ static void pc_hdc_data_w(int n, int data)
 				data_cnt = 0;
 				status[n] |= STA_INPUT;
 				csb[n] |= CSB_ERROR | 0x20; /* unknown command */
-				pc_hdc_result(n);
+				pc_hdc_result(n, 1);
 				break;
 		}
 		if( data_cnt )
@@ -626,7 +655,7 @@ static void pc_hdc_data_w(int n, int data)
 		if (LOG_HDC_DATA)
 			logerror("hdc_data_w BOARD #%d $%02x\n", n, data);
 
-		*ptr++ = data;
+		*buffer_ptr++ = data;
 		status[n] |= STA_READY;
 		if (--data_cnt == 0)
 		{
@@ -654,7 +683,7 @@ static void pc_hdc_reset_w(int n, int data)
 	csb[n] = 0;
 	status[n] = STA_COMMAND | STA_READY;
 	memset(buffer, 0, sizeof(buffer));
-	ptr = buffer;
+	buffer_ptr = buffer;
 	data_cnt = 0;
 }
 
@@ -670,10 +699,16 @@ static void pc_hdc_select_w(int n, int data)
 
 static void pc_hdc_control_w(int n, int data)
 {
+	int irq = irq = (dip[n] & 0x40) ? 5 : 2;
+
 	if (LOG_HDC_STATUS)
 		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpunum_get_reg(0, REG_PC), data);
 
 	hdc_control = data;
+
+	if ( ! ( hdc_control & 0x02 ) && hdc_set_irq ) {
+		hdc_set_irq( irq, 0 );
+	}
 }
 
 
@@ -683,7 +718,7 @@ static UINT8 pc_hdc_data_r(int n)
 	UINT8 data = 0xff;
 	if( data_cnt )
 	{
-		data = *ptr++;
+		data = *buffer_ptr++;
 		status[n] &= ~STA_INTERRUPT;
 		if( --data_cnt == 0 )
 		{
@@ -706,6 +741,21 @@ static UINT8 pc_hdc_status_r(int n)
 
 
 
+/*
+	Dipswitch configuration
+
+
+	Tandon/Western Digital Fixed Disk Controller
+	bit0-1 : Determine disk size(?)
+		Causes geometry data to be read from c8043, c8053, c8063, c8073 (?)
+		00 - 40 Mbytes
+		01 - 30 Mbytes
+		10 - 10 Mbytes
+		11 - 20 Mbytes
+	bit2-7 : unknown
+
+ */
+
 static UINT8 pc_hdc_dipswitch_r(int n)
 {
 	int data = dip[n];
@@ -724,8 +774,7 @@ static UINT8 pc_hdc_dipswitch_r(int n)
 static UINT8 pc_HDC_r(int chip, offs_t offs)
 {
 	UINT8 data = 0xff;
-	if( !(input_port_read_indexed(Machine, 3) & (0x08>>chip)) || !pc_hdc_file(chip<<1) )
-		return data;
+
 	switch( offs )
 	{
 		case 0: data = pc_hdc_data_r(chip); 	 break;
@@ -735,7 +784,7 @@ static UINT8 pc_HDC_r(int chip, offs_t offs)
 	}
 
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_r(): chip=%d offs=%d result=0x%02x\n", chip, offs, data);
+		logerror("pc_HDC_r(): pc=%06X chip=%d offs=%d result=0x%02x\n", activecpu_get_pc(), chip, offs, data);
 
 	return data;
 }
@@ -745,10 +794,7 @@ static UINT8 pc_HDC_r(int chip, offs_t offs)
 static void pc_HDC_w(int chip, offs_t offs, UINT8 data)
 {
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_w(): chip=%d offs=%d data=0x%02x\n", chip, offs, data);
-
-	if( !(input_port_read_indexed(Machine, 3) & (0x08>>chip)) || !pc_hdc_file(chip<<1) )
-		return;
+		logerror("pc_HDC_w(): pc=%06X chip=%d offs=%d data=0x%02x\n", activecpu_get_pc(), chip, offs, data);
 
 	switch( offs )
 	{

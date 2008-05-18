@@ -57,8 +57,7 @@
 static struct {
 	const device_config	*pic8259_master;
 	const device_config	*pic8259_slave;
-	const device_config	*dma8237_1;
-	const device_config	*dma8237_2;
+	const device_config	*dma8237;
 } pc_devices;
 
 /*************************************************************************
@@ -783,7 +782,7 @@ static void pc_fdc_interrupt(int state)
 
 static void pc_fdc_dma_drq(int state, int read_)
 {
-	dma8237_drq_write( (device_config*)device_list_find_by_tag( Machine->config->devicelist, DMA8237, "dma8237" ), FDC_DMA, state);
+	dma8237_drq_write( pc_devices.dma8237, FDC_DMA, state);
 }
 
 
@@ -1014,9 +1013,9 @@ MACHINE_RESET( pc )
 
 	pc_devices.pic8259_master = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
 	pc_devices.pic8259_slave = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
-	pc_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
-	pc_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	pc_devices.dma8237 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237" );
 	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ) );
+	pc_hdc_set_dma8237_device( pc_devices.dma8237 );
 }
 
 
@@ -1082,6 +1081,14 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 INTERRUPT_GEN( pc_frame_interrupt )
 {
 	pc_keyboard();
+
+	/* Extermely crappy hack to have let the ibm5150 support 640kb. For testing purposes only. */
+//	if ( mess_ram[0x413] == 0x00 && mess_ram[0x414] == 0x01 )
+//	{
+//		mess_ram[0x413] = 640 & 0xff;
+//		mess_ram[0x414] = 640 >> 8;
+//	}
+
 }
 
 INTERRUPT_GEN( pc_vga_frame_interrupt )
