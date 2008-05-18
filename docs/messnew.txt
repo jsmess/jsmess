@@ -19,7 +19,7 @@ System Driver Changes:
 
 - [C64] Joystick fix. (bug #1150) [Roberto Zandonà]
 
-- [COMX35] System is now working.  [Curt Coder]
+- [COMX35] System is now working.  [Curt Coder, Marcel van Tongeren]
 
 - [GAMEBOY] Added .bin extension.  [Fabio Priuli]
 
