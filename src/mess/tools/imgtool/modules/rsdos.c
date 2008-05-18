@@ -568,6 +568,8 @@ static imgtoolerr_t rsdos_diskimage_suggesttransfer(imgtool_partition *partition
 		suggestions[0].filter = NULL;
 		suggestions[1].viability = SUGGESTION_POSSIBLE;
 		suggestions[1].filter = filter_eoln_getinfo;
+		suggestions[2].viability = SUGGESTION_POSSIBLE;
+		suggestions[2].filter = filter_cocobas_getinfo;
 	}
 
 	return IMGTOOLERR_SUCCESS;
