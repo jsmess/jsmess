@@ -7,9 +7,6 @@
 *         Fix SCSI DMA to handle chains properly
 *         Probably many more things
 *
-*  NOTE: this driver does not work with the MIPS DRC!
-*  You must use the interpreter and take the speed hit :(
-*
 *  Memory map:
 *
 *  18000000 - 1effffff      RESERVED - Unused
@@ -452,7 +449,7 @@ static READ32_HANDLER( hpc3_hd0_r )
 	case 0x0000/4:
 	case 0x4000/4:
 //      verboselog( 2, "HPC3 HD0 Status Read: %08x (%08x): %08x\n", 0x1fb90000 + ( offset << 2), mem_mask, nHPC3_hd0_regs[0x17] );
-		if (!(mem_mask & 0x000000ff))
+		if (!(mem_mask & 0xffffff00))
 		{
 			return wd33c93_r( machine, 0 );
 		}
@@ -464,7 +461,7 @@ static READ32_HANDLER( hpc3_hd0_r )
 	case 0x0004/4:
 	case 0x4004/4:
 //      verboselog( 2, "HPC3 HD0 Register Read: %08x (%08x): %08x\n", 0x1fb90000 + ( offset << 2), mem_mask, nHPC3_hd0_regs[nHPC3_hd0_register] );
-		if (!(mem_mask & 0x000000ff))
+		if (!(mem_mask & 0xffffff00))
 		{
 			return wd33c93_r( machine, 1 );
 		}
@@ -488,7 +485,7 @@ static WRITE32_HANDLER( hpc3_hd0_w )
 	case 0x0000/4:
 	case 0x4000/4:
 //      verboselog( 2, "HPC3 HD0 Register Select Write: %08x\n", data );
-		if (!(mem_mask & 0x000000ff))
+		if (!(mem_mask & 0xffffff00))
 		{
 			wd33c93_w( machine, 0, data & 0x000000ff );
 		}
@@ -496,7 +493,7 @@ static WRITE32_HANDLER( hpc3_hd0_w )
 	case 0x0004/4:
 	case 0x4004/4:
 //      verboselog( 2, "HPC3 HD0 Register %d Write: %08x\n", nHPC3_hd0_register, data );
-		if (!(mem_mask & 0x000000ff))
+		if (!(mem_mask & 0xffffff00))
 		{
 			wd33c93_w( machine, 1,  data & 0x000000ff );
 		}
@@ -1428,8 +1425,8 @@ static void scsi_irq(int state)
 static const SCSIConfigTable dev_table =
 {
         1,                                      /* 1 SCSI device */
-        { { SCSI_ID_4, 0, SCSI_DEVICE_CDROM },  /* SCSI ID 4, using CD 0, and it's a CD-ROM */
-	  { SCSI_ID_2, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 2, using HD 0, and it's a CD-ROM */
+        { { SCSI_ID_4, 0, SCSI_DEVICE_CDROM } }  /* SCSI ID 4, using CD 0, and it's a CD-ROM */
+//	  { SCSI_ID_2, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 2, using HD 0, and it's a CD-ROM */
 };
 
 static const struct WD33C93interface scsi_intf =
