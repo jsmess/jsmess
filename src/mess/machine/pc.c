@@ -550,13 +550,14 @@ static struct {
 	int portc_switch_high;
 	int speaker;
 	int keyboard_disabled;
+	UINT8	keyb_clock;
 	UINT8	portb;
 } pc_ppi={ 0 };
 
 
 static READ8_HANDLER (pc_ppi_porta_r)
 {
-	int data;
+	int data = 0xFF;
 
 	/* KB port A */
 	if (pc_ppi.keyboard_disabled)
@@ -574,7 +575,10 @@ static READ8_HANDLER (pc_ppi_porta_r)
 	}
 	else
 	{
-		data = pc_keyb_read();
+		if ( pc_ppi.keyb_clock )
+		{
+			data = pc_keyb_read();
+		}
 	}
     PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
     return data;
@@ -652,9 +656,10 @@ static WRITE8_HANDLER ( pc_ppi_portb_w )
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
 	pc_ppi.keyboard_disabled = data & 0x80;
+	pc_ppi.keyb_clock = data & 0x40;
 	pit8253_gate_w( device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
 	pc_sh_speaker(machine, data & 0x03);
-	pc_keyb_set_clock(data & 0x40);
+	pc_keyb_set_clock( pc_ppi.keyb_clock );
 
 	cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 

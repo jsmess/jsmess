@@ -499,14 +499,8 @@ static TIMER_CALLBACK(pc_hdc_command)
 	switch (cmd)
 	{
 		case CMD_TESTREADY:
-			/*
-			 * Commenting out these 2 lines below make the hard disk controller work
-			 * under the ibm5160 drivers. But this does make one hard disk show up
-			 * twice in the ibm5150 driver. This is something that will need to be
-			 * fixed with time.
-			 */
-//			set_error_info = 0;
-//			test_ready(n);
+			set_error_info = 0;
+			test_ready(n);
             break;
 		case CMD_SENSE:
 			/* Perform error code translation. This may need to be expanded in the future. */
