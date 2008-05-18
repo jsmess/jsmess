@@ -59,7 +59,7 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-(none)
+- File Manager and Tape Control cleanups.  [Nate Woods]
 
 
 

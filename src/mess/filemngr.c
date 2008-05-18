@@ -14,8 +14,20 @@
 #include "uimenu.h"
 #include "mslegacy.h"
 
+
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define SEL_BITS	12
 #define SEL_MASK	((1<<SEL_BITS)-1)
+
+
+
+/***************************************************************************
+    LOCAL VARIABLES
+***************************************************************************/
 
 static int count_chars_entered;
 static char *enter_string;
@@ -24,6 +36,12 @@ static int enter_filename_mode;
 static char curdir[260];
 
 static char entered_filename[512];
+
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 static void start_enter_string(char *string_buffer, int max_string_size, int filename_mode)
 {
@@ -435,6 +453,7 @@ static int fileselect(int selected, const char *default_selection, const char *w
 {
 	int sel, total, arrowize;
 	int visible;
+	running_machine *machine = Machine;
 
 	sel = selected - 1;
 
@@ -551,7 +570,7 @@ static int fileselect(int selected, const char *default_selection, const char *w
 
 		/* pause enables/disables pause */
 		if (input_ui_pressed(IPT_UI_PAUSE))
-			mame_pause(Machine, !mame_is_paused(Machine));
+			mame_pause(machine, !mame_is_paused(machine));
 
 		if (input_ui_pressed(IPT_UI_SELECT))
 		{
@@ -648,19 +667,20 @@ static int fileselect(int selected, const char *default_selection, const char *w
 
 int filemanager(int selected)
 {
+	running_machine *machine = Machine;
 	static int previous_sel;
 	const char *name;
 	ui_menu_item menu_items[40];
 	const device_config *devices[40];
 	char names[40][64];
-	int sel, total, visible, arrowize;
+	UINT32 sel, total, visible, arrowize;
 	const device_config *image;
 
 	sel = selected - 1;
 	total = 0;
 
 	/* Cycle through all devices for this system */
-	for (image = image_device_first(Machine->config); image != NULL; image = image_device_next(image))
+	for (image = image_device_first(machine->config); image != NULL; image = image_device_next(image))
 	{
 		strcpy( names[total], image_typename_id(image) );
 		name = image_filename(image);
@@ -737,45 +757,6 @@ int filemanager(int selected)
 
 	visible = ui_menu_draw(menu_items, total, sel, NULL);
 
-	/* Maybe the following code up to IPT_UI_PAUSE can be replaced with a call to ui_menu_generic_keys() */
-
-	/* up backs up by one item */
-	if (input_ui_pressed_repeat(IPT_UI_UP, 6))
-		sel = (sel + total - 1) % total;
-
-	/* down advances by one item */
-	if (input_ui_pressed_repeat(IPT_UI_DOWN, 6))
-		sel = (sel +  1) % total;
-
-	/* page up backs up by visible_items */
-	if (input_ui_pressed_repeat(IPT_UI_PAGE_UP, 6))
-	{
-		if (sel >= visible - 1)
-			sel -= visible - 1;
-		else
-			sel = 0;
-	}
-
-	/* page down advances by visible_items */
-	if (input_ui_pressed_repeat(IPT_UI_PAGE_DOWN, 6))
-	{
-		sel += visible - 1;
-		if (sel >= total)
-			sel = total - 1;
-	}
-
-	/* home goes to the start */
-	if (input_ui_pressed(IPT_UI_HOME))
-		sel = 0;
-
-	/* end goes to the last */
-	if (input_ui_pressed(IPT_UI_END))
-		sel = total - 1;
-
-	/* pause enables/disables pause */
-	if (input_ui_pressed(IPT_UI_PAUSE))
-		mame_pause(Machine, !mame_is_paused(Machine));
-
 	if (input_ui_pressed(IPT_UI_SELECT))
 	{
 		int os_sel;
@@ -826,9 +807,14 @@ int filemanager(int selected)
 			sel |= 1 << SEL_BITS;	/* we'll ask for a key */
 		}
 	}
-
-	if (input_ui_pressed(IPT_UI_CANCEL))
+	else if (input_ui_pressed(IPT_UI_CANCEL))
+	{
 		sel = -1;
+	}
+	else
+	{
+		ui_menu_generic_keys(&sel, total, visible);
+	}
 
 	if (input_ui_pressed(IPT_UI_CONFIGURE))
 		sel = -2;

@@ -14,6 +14,12 @@
 #include "devices/cassette.h"
 #include "deprecat.h"
 
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
 void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config *img, int *curpos, int *endpos)
 {
 	double t0, t1;
@@ -34,6 +40,7 @@ void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config
 
 int tapecontrol(int selected)
 {
+	running_machine *machine = Machine;
 	static int id = 0;
 	char timepos[32];
 	ui_menu_item menu_item[40];
@@ -151,7 +158,7 @@ int tapecontrol(int selected)
 		{
 		case 0:
 			id--;
-			if (id < 0) id = device_count(Machine, IO_CASSETTE)-1;
+			if (id < 0) id = device_count(machine, IO_CASSETTE)-1;
 			break;
 		}
 	}
@@ -162,7 +169,7 @@ int tapecontrol(int selected)
 		{
 		case 0:
 			id++;
-			if (id > device_count(Machine, IO_CASSETTE)-1) id = 0;
+			if (id > device_count(machine, IO_CASSETTE)-1) id = 0;
 			break;
 		}
 	}
@@ -177,7 +184,7 @@ int tapecontrol(int selected)
 			switch (sel)
 			{
 			case 0:
-				id = (id + 1) % device_count(Machine, IO_CASSETTE);
+				id = (id + 1) % device_count(machine, IO_CASSETTE);
 				break;
 			case 2:
 				/* Pause/stop */
