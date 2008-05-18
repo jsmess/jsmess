@@ -981,6 +981,7 @@ $(MESSOBJ)/sharp.a:    \
 	$(MESS_VIDEO)/x68k.o	\
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/rp5c15.o	\
+	$(MESS_MACHINE)/x68k_hdc.o	\
 
 $(MESSOBJ)/hp48.a:     \
 	$(MESS_MACHINE)/hp48.o     \

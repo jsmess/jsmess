@@ -86,7 +86,7 @@
 
     HDC/HDD : SASI and SCSI are not implemented, not a requirement at this point.
 
-    RTC : Seems to work. (Tested using SX-Windows' Timer application)
+    RTC : Seems to work. (Tested using SX-Window's Timer application)
 
     DMA : FDD reading mostly works, other channels should work for effective memory copying (channel 2, often
           used to copy data to video RAM or the palette in the background).
@@ -96,17 +96,16 @@
     SCC : Works enough to get the mouse running
 
     Video : Text mode works, but is rather slow, especially scrolling up (uses multple "raster copy" commands).
-            16 and 256 graphic layers work, but colours on a 65,536 colour layer are wrong.
+            Graphic layers work.
             BG tiles and sprites work, but many games have the sprites offset by a small amount (some by a lot :))
 
     Other issues:
       Bus error exceptions are a bit late at times.  Currently using a fake bus error for MIDI expansion checks.  These
       are used determine if a piece of expansion hardware is present.
-      Partial updates don't work at all well, and can be excruciatingly slow.
-      Keyboard doesn't work well for games.
+      Keyboard doesn't work (MFP USART).
       Supervisor area set isn't implemented.
 
-    Some minor game-specific issues (at 19/06/07):
+    Some minor game-specific issues (at 14/05/08):
       Pacmania:      Black squares on the maze (transparency?).
       Nemesis '94:   Menu system doesn't work except for start buttons.
       Flying Shark:  Appears to lock up at main menu.
@@ -115,9 +114,8 @@
       Dragon Buster: Text is black and unreadable (text palette should be loaded from disk, but it reads all zeroes).
       Baraduke:      Corrupt background, locks up on demo mode.
       Viewpoint:     Corrupt graphics on title screen, phantom movements on title screen, corrupt sprites, locks up.
-      Mr. Do:        Locks up or resets after some time.  Happens on Mr Do vs. Unicorns, as well.
       Tetris:        Black dots over screen (text layer).
-      Parodius Da!:  Water isn't animated (beginning of stage 1), black squares (raster effects?)
+      Parodius Da!:  Black squares in areas.
 
 
     More detailed documentation at http://x68kdev.emuvibes.com/iomap.html - if you can stand broken english :)
@@ -137,7 +135,11 @@
 #include "machine/hd63450.h"
 #include "machine/rp5c15.h"
 #include "devices/basicdsk.h"
+#include "devices/harddriv.h"
+#include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
+
+//#define ENABLE_SASI
 
 struct x68k_system sys;
 
@@ -674,6 +676,14 @@ WRITE8_HANDLER( ppi_port_b_w )
 }
 #endif
 
+/* PPI port C (Joystick control, R/W)
+   bit 7    - IOC7 - Function B operation of joystick 1 (?)
+   bit 6    - IOC6 - Function A operation of joystick 1 (?)
+   bit 5    - IOC5 - Enable Joystick 2
+   bit 4    - IOC4 - Enable Joystick 1
+   bits 3,2 - ADPCM Sample rate
+   bits 1,0 - ADPCM Pan
+*/
 static WRITE8_HANDLER( ppi_port_c_w )
 {
 	// ADPCM / Joystick control
@@ -800,24 +810,6 @@ static void fdc_drq(int state, int read_write)
 	sys.fdc.drq_state = state;
 }
 
-static WRITE16_HANDLER( x68k_hdc_w )
-{
-	// SASI HDC - HDDs are not a required system component, so this is something to be done later
-	logerror("SASI: write to HDC, offset %04x, data %04x\n",offset,data);
-}
-
-static READ16_HANDLER( x68k_hdc_r )
-{
-	logerror("SASI: [%08x] read from HDC, offset %04x\n",activecpu_get_pc(),offset);
-	switch(offset)
-	{
-	case 0x01:
-		return 0x00;
-	default:
-		return 0xff;
-	}
-}
-
 static WRITE16_HANDLER( x68k_fm_w )
 {
 	switch(offset)
@@ -849,7 +841,22 @@ static WRITE8_HANDLER( x68k_ct_w )
 	nec765_set_ready_state(data & 0x01);
 }
 
-
+/*
+ Custom I/O controller at 0xe9c000
+ 0xe9c001 (R) - Interrupt status
+ 0xe9c001 (W) - Interrupt mask (low nibble only)
+                - bit 7 = FDC interrupt
+                - bit 6 = FDD interrupt
+                - bit 5 = Printer Busy signal
+                - bit 4 = HDD interrupt
+                - bit 3 = HDD interrupts enabled
+                - bit 2 = FDC interrupts enabled
+                - bit 1 = FDD interrupts enabled
+                - bit 0 = Printer interrupts enabled
+ 0xe9c003 (W) - Interrupt vector
+                - bits 7-2 = vector
+                - bits 1,0 = device (00 = FDC, 01 = FDD, 10 = HDD, 11 = Printer)
+*/
 static WRITE16_HANDLER( x68k_ioc_w )
 {
 	switch(offset)
@@ -894,6 +901,26 @@ static READ16_HANDLER( x68k_ioc_r )
 	}
 }
 
+/*
+ System ports at 0xe8e000
+ Port 1 (0xe8e001) - Monitor contrast (bits 3-0)
+ Port 2 (0xe8e003) - Display / 3D scope control
+                     - bit 3 - Display control signal (0 = on)
+                     - bit 1 - 3D scope left shutter (0 = closed)
+                     - bit 0 - 3D scope right shutter
+ Port 3 (0xe8e005) - Colour image unit control (bits 3-0)
+ Port 4 (0xe8e007) - Keyboard/NMI/Dot clock
+                     - bit 3 - (R) 1 = Keyboard connected, (W) 1 = Key data can be transmitted
+                     - bit 1 - NMI Reset
+                     - bit 0 - HRL - high resolution dot clock - 1 = 1/2, 1/4, 1/8, 0 = 1/2, 1/3, 1/6 (normal)
+ Port 5 (0xe8e009) - ROM (bits 7-4)/DRAM (bits 3-0) wait, X68030 only
+ Port 6 (0xe8e00b) - CPU type and clock speed (XVI or later only, X68000 returns 0xFF)
+                     - bits 7-4 - CPU Type (1100 = 68040, 1101 = 68030, 1110 = 68020, 1111 = 68000)
+                     - bits 3-0 - clock speed (1001 = 50MHz, 40, 33, 25, 20, 16, 1111 = 10MHz)
+ Port 7 (0xe8e00d) - SRAM write enable - if 0x31 is written to this port, writing to SRAM is allowed.
+                                         Any other value, then SRAM is read only.
+ Port 8 (0xe8e00f) - Power off control - write 0x00, 0x0f, 0x0f sequentially to switch power off.
+*/
 static WRITE16_HANDLER( x68k_sysport_w )
 {
 	render_container* container;
@@ -1188,8 +1215,10 @@ static WRITE16_HANDLER( x68k_sram_w )
 static READ16_HANDLER( x68k_sram_r )
 {
 	// HACKS!
+#ifndef ENABLE_SASI
 	if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 		return 0x0000;
+#endif
 	if(offset == 0x08/2)
 		return mess_ram_size >> 16;  // RAM size
 	/*if(offset == 0x46/2)
@@ -1527,7 +1556,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
 	AM_RANGE(0xe92000, 0xe93fff) AM_READWRITE(x68k_adpcm_r, x68k_adpcm_w)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
-	AM_RANGE(0xe96000, 0xe97fff) AM_READWRITE(x68k_hdc_r, x68k_hdc_w)
+	AM_RANGE(0xe96000, 0xe97fff) AM_DEVREADWRITE(X68KHDC,"x68k_hdc",x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE(PPI8255, "ppi8255", x68k_ppi_r, x68k_ppi_w)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
@@ -1881,6 +1910,28 @@ static void x68k_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
+static void x68k_sasihd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+	case MESS_DEVINFO_INT_COUNT:
+		info->i = 1;
+		break;
+	case MESS_DEVINFO_STR_NAME:			
+		strcpy(info->s = device_temp_str(), "sasihd"); 
+		break;
+	case MESS_DEVINFO_STR_SHORT_NAME:					
+		strcpy(info->s = device_temp_str(), "sasi"); 
+		break;
+	case MESS_DEVINFO_STR_DESCRIPTION:					
+		strcpy(info->s = device_temp_str(), "SASI Hard Disk"); 
+		break;
+	default:
+		harddisk_device_getinfo(devclass, state, info); 
+		break;
+	}
+}
+
 static MACHINE_RESET( x68000 )
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
@@ -2025,6 +2076,8 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_DEVICE_ADD( "hd63450", HD63450 )
 	MDRV_DEVICE_CONFIG( dmac_interface )
 
+	MDRV_DEVICE_ADD( "x68k_hdc", X68KHDC )
+
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55.45)
@@ -2054,6 +2107,7 @@ MACHINE_DRIVER_END
 
 SYSTEM_CONFIG_START(x68000)
 	CONFIG_DEVICE(x68k_floppy_getinfo)
+	CONFIG_DEVICE(x68k_sasihd_getinfo)
 	CONFIG_RAM(0x100000)
 	CONFIG_RAM(0x200000)
 	CONFIG_RAM(0x300000)
