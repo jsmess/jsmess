@@ -602,20 +602,6 @@ static void image_fread_memory(const device_config *image, UINT16 addr, UINT32 c
 	image_fread(image, ptr, count);
 }
 
-static void write_memory(UINT16 addr, UINT8 data)
-{
-	UINT8 *ptr = (UINT8 *) memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, addr);
-
-	ptr[0] = data;
-}
-
-static UINT8 read_memory(UINT16 addr)
-{
-	UINT8 *ptr = (UINT8 *) memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, addr);
-
-	return ptr[0];
-}
-
 QUICKLOAD_LOAD( comx35 )
 {
 	UINT8 header[16] = {0};
@@ -741,16 +727,16 @@ QUICKLOAD_LOAD( comx35 )
 			image_fread(image, header, 2);
 
 			array_length = (header[0] << 8) | header[1];
-			start_array = (read_memory(0x4295) << 8) | read_memory(0x4296);
+			start_array = (program_read_byte(0x4295) << 8) | program_read_byte(0x4296);
 			end_array = start_array + (size - 7);
 
-			write_memory(0x4299, end_array >> 8);
-			write_memory(0x429a, end_array & 0xff);
+			program_write_byte(0x4299, end_array >> 8);
+			program_write_byte(0x429a, end_array & 0xff);
 			
 			start_string = start_array + array_length;
 
-			write_memory(0x4292, start_string >> 8);
-			write_memory(0x4293, start_string & 0xff);
+			program_write_byte(0x4292, start_string >> 8);
+			program_write_byte(0x4293, start_string & 0xff);
 
 			image_fread_memory(image, start_array, size);
 		}
