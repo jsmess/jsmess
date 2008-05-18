@@ -478,7 +478,6 @@ static TIMER_CALLBACK(pc_hdc_command)
 	int n = param;
 	int set_error_info = 1;
 	int old_error = error[n];			/* Previous error data is needed for CMD_SENSE */
-	int old_csb = csb[n];
 	UINT8 cmd;
 	const char *command_name;
 
@@ -500,14 +499,18 @@ static TIMER_CALLBACK(pc_hdc_command)
 	switch (cmd)
 	{
 		case CMD_TESTREADY:
-			set_error_info = 0;
-			test_ready(n);
+			/*
+			 * Commenting out these 2 lines below make the hard disk controller work
+			 * under the ibm5160 drivers. But this does make one hard disk show up
+			 * twice in the ibm5150 driver. This is something that will need to be
+			 * fixed with time.
+			 */
+//			set_error_info = 0;
+//			test_ready(n);
             break;
 		case CMD_SENSE:
-			error[n] = old_error;
-			csb[n] = old_csb;
 			/* Perform error code translation. This may need to be expanded in the future. */
-			buffer[data_cnt++] = ( error[n] & 0xC0 ) | ( ( error[n] & 0x04 ) ? 0x04 : 0x00 ) ;
+			buffer[data_cnt++] = ( old_error & 0xC0 ) | ( ( old_error & 0x04 ) ? 0x04 : 0x00 ) ;
 			buffer[data_cnt++] = (drv << 5) | head[idx];
 			buffer[data_cnt++] = ((cylinder[idx] >> 2) & 0xc0) | sector[idx];
 			buffer[data_cnt++] = cylinder[idx] & 0xff;
@@ -515,8 +518,6 @@ static TIMER_CALLBACK(pc_hdc_command)
 			break;
 		case CMD_RECALIBRATE:
 			get_chsn(n);
-			test_ready(n);
-			set_error_info = 0;
             break;
 
 		case CMD_FORMATDRV:
