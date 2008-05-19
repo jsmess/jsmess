@@ -373,14 +373,14 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( cdp1869_pcb_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = field->port->machine->driver_data;
 
 	return state->cdp1869_pcb;
 }
 
 static CUSTOM_INPUT( cdp1869_predisplay_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = field->port->machine->driver_data;
 
 	return state->cdp1869_prd;
 }
@@ -394,7 +394,7 @@ static INPUT_PORTS_START( destryer )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // LF
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // FR
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, 0)
 
 	PORT_START_TAG("IN1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
@@ -434,7 +434,7 @@ static INPUT_PORTS_START( altair )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // LF
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // FR
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, 0)
 
 	PORT_START_TAG("IN1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
@@ -484,7 +484,7 @@ static INPUT_PORTS_START( draco )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, 0)
 
 	PORT_START_TAG("IN1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
