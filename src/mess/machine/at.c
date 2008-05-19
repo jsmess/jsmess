@@ -29,14 +29,15 @@
 
 #include "machine/pc_fdc.h"
 #include "machine/pc_hdc.h"
+#include "includes/pc_mouse.h"
 
 #define LOG_PORT80 0
 
 static struct {
-	device_config	*pic8259_master;
-	device_config	*pic8259_slave;
-	device_config	*dma8237_1;
-	device_config	*dma8237_2;
+	const device_config	*pic8259_master;
+	const device_config	*pic8259_slave;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
 } at_devices;
 
 static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };
@@ -282,6 +283,72 @@ const struct dma8237_interface at_dma8237_2_config =
 
 /**********************************************************
  *
+ * COM hardware
+ *
+ **********************************************************/
+
+/* called when a interrupt is set/cleared from com hardware */
+static INS8250_INTERRUPT( at_com_interrupt_1 )
+{
+	pic8259_set_irq_line(at_devices.pic8259_master, 4, state);
+}
+
+static INS8250_INTERRUPT( at_com_interrupt_2 )
+{
+	pic8259_set_irq_line(at_devices.pic8259_master, 3, state);
+}
+
+/* called when com registers read/written - used to update peripherals that
+are connected */
+static void at_com_refresh_connected_common(const device_config *device, int n, int data)
+{
+	/* mouse connected to this port? */
+	if (input_port_read_indexed(device->machine, 3) & (0x80>>n))
+		pc_mouse_handshake_in(device,data);
+}
+
+static INS8250_HANDSHAKE_OUT( at_com_handshake_out_0 ) { at_com_refresh_connected_common( device, 0, data ); }
+static INS8250_HANDSHAKE_OUT( at_com_handshake_out_1 ) { at_com_refresh_connected_common( device, 1, data ); }
+static INS8250_HANDSHAKE_OUT( at_com_handshake_out_2 ) { at_com_refresh_connected_common( device, 2, data ); }
+static INS8250_HANDSHAKE_OUT( at_com_handshake_out_3 ) { at_com_refresh_connected_common( device, 3, data ); }
+
+/* PC interface to PC-com hardware. Done this way because PCW16 also
+uses PC-com hardware and doesn't have the same setup! */
+const ins8250_interface ibm5170_com_interface[4]=
+{
+	{
+		1843200,
+		at_com_interrupt_1,
+		NULL,
+		at_com_handshake_out_0,
+		NULL
+	},
+	{
+		1843200,
+		at_com_interrupt_2,
+		NULL,
+		at_com_handshake_out_1,
+		NULL
+	},
+	{
+		1843200,
+		at_com_interrupt_1,
+		NULL,
+		at_com_handshake_out_2,
+		NULL
+	},
+	{
+		1843200,
+		at_com_interrupt_2,
+		NULL,
+		at_com_handshake_out_3,
+		NULL
+	}
+};
+
+
+/**********************************************************
+ *
  * NEC uPD765 floppy interface
  *
  **********************************************************/
@@ -422,5 +489,6 @@ MACHINE_RESET( at )
 	at_devices.pic8259_slave = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
 	at_devices.dma8237_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
 	at_devices.dma8237_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, NS16450, "ns16450_0" ) );
 }
 

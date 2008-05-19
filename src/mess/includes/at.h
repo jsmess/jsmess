@@ -17,6 +17,7 @@ extern const struct pic8259_interface at_pic8259_slave_config;
 extern const struct pit8253_config at_pit8254_config;
 extern const struct dma8237_interface at_dma8237_1_config;
 extern const struct dma8237_interface at_dma8237_2_config;
+extern const ins8250_interface ibm5170_com_interface[4];
 
 
 READ8_HANDLER( at_page8_r );
