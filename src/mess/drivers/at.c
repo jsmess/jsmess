@@ -69,17 +69,18 @@
 */
 #define GAMEBLASTER
 
-static ADDRESS_MAP_START( at_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( at16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK(10)
 	AM_RANGE(0x0a0000, 0x0affff) AM_NOP
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_NOP
-	AM_RANGE(0x0b8000, 0x0bffff) AM_READWRITE(SMH_RAM, pc_video_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x0b8000, 0x0bffff) AM_READWRITE(SMH_RAM, pc_video_videoram16le_w) AM_BASE((UINT16 **)&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
 	AM_RANGE(0x0c8000, 0x0c9fff) AM_ROM
 	AM_RANGE(0x0ca000, 0x0cffff) AM_RAM
 	AM_RANGE(0x0d0000, 0x0effff) AM_RAM
 	AM_RANGE(0x0f0000, 0x0fffff) AM_ROM
 ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( at386_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)
@@ -113,32 +114,49 @@ static WRITE8_DEVICE_HANDLER(at_dma8237_1_w)
 }
 
 
-static ADDRESS_MAP_START(at_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", dma8237_r, dma8237_w)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE(PIC8259, "pic8259_master", pic8259_r, pic8259_w)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, AT_PIT8254, pit8253_r, pit8253_w)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_8_r,				kbdc8042_8_w)
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,			mc146818_port_w)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page8_r,				at_page8_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_slave", pic8259_r, pic8259_w)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at_dma8237_1_r, at_dma8237_1_w)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(at_mfm_0_r,				at_mfm_0_w)
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
-	AM_RANGE(0x0220, 0x022f) AM_READWRITE(soundblaster_r,			soundblaster_w)
-	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc_parallelport2_r,		pc_parallelport2_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE(NS16450, "ns16450_3", ins8250_r, ins8250_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(NS16450, "ns16450_1", ins8250_r, ins8250_w)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,				pc_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_parallelport1_r,		pc_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_READWRITE(YM3812_status_port_0_r,	YM3812_control_port_0_w)
-	AM_RANGE(0x0389, 0x0389) AM_WRITE(								YM3812_write_port_0_w)
+static READ8_HANDLER(at_adlib_r)
+{
+	if ( offset )
+		return 0xFF;
+	else
+		return YM3812_status_port_0_r( machine, 0 );
+}
+
+static WRITE8_HANDLER(at_adlib_w)
+{
+	if ( offset )
+		YM3812_write_port_0_w( machine, 0, data );
+	else
+		YM3812_control_port_0_w( machine, 0, data );
+}
 #endif
-	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,		pc_parallelport0_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(NS16450, "ns16450_2", ins8250_r, ins8250_w)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,					pc_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(NS16450, "ns16450_0", ins8250_r, ins8250_w)
+
+static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, AT_PIT8254, pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x0060, 0x006f) AM_READWRITE8(kbdc8042_8_r,             kbdc8042_8_w, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(mc146818_port_r,          mc146818_port_w, 0xffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,               at_page8_w, 0xffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8(PIC8259, "pic8259_slave", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8(DMA8237, "dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,                 pc_JOY_w, 0xffff)
+	AM_RANGE(0x0220, 0x022f) AM_READWRITE8(soundblaster_r,           soundblaster_w, 0xffff)
+	AM_RANGE(0x0278, 0x027f) AM_READWRITE8(pc_parallelport2_r,       pc_parallelport2_w, 0xffff)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(NS16450, "ns16450_3", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(NS16450, "ns16450_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,                pc_HDC1_w, 0xffff)
+	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,                pc_HDC2_w, 0xffff)
+	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_parallelport1_r,       pc_parallelport1_w, 0xffff)
+#ifdef ADLIB
+	AM_RANGE(0x0388, 0x0389) AM_READWRITE8(at_adlib_r,               at_adlib_w, 0xffff)
+#endif
+	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE8(pc_parallelport0_r,       pc_parallelport0_w, 0xffff)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(NS16450, "ns16450_2", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,                 pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(NS16450, "ns16450_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -401,7 +419,7 @@ static const struct YM3812interface ym3812_interface =
 
 static MACHINE_DRIVER_START( ibm5170 )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at, at, I80286, 6000000)
+	MDRV_CPU_ATPC(at16, at16, I80286, 6000000)
 
 	MDRV_DEVICE_ADD( AT_PIT8254, PIT8254 )
 	MDRV_DEVICE_CONFIG( at_pit8254_config )
@@ -468,7 +486,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ps2m30286 )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at, at, I80286, 12000000)
+	MDRV_CPU_ATPC(at16, at16, I80286, 12000000)
 
 	MDRV_DEVICE_ADD( AT_PIT8254, PIT8254 )
 	MDRV_DEVICE_CONFIG( at_pit8254_config )
@@ -534,7 +552,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atvga )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at, at, I80286, 12000000)
+	MDRV_CPU_ATPC(at16, at16, I80286, 12000000)
 
 	MDRV_DEVICE_ADD( AT_PIT8254, PIT8254 )
 	MDRV_DEVICE_CONFIG( at_pit8254_config )
