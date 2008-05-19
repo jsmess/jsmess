@@ -36,7 +36,7 @@ static CDP1869_CHAR_RAM_READ( comx35_charram_r )
 
 	UINT16 pageaddr = pma & COMX35_PAGERAM_MASK;
 	UINT8 column = state->pageram[pageaddr] & 0x7f;
-	UINT16 charaddr = (cma << 7) | column;
+	UINT16 charaddr = (column << 4) | cma;
 
 	return state->charram[charaddr];
 }
@@ -47,7 +47,7 @@ static CDP1869_CHAR_RAM_WRITE( comx35_charram_w )
 
 	UINT16 pageaddr = pma & COMX35_PAGERAM_MASK;
 	UINT8 column = state->pageram[pageaddr] & 0x7f;
-	UINT16 charaddr = (cma << 7) | column;
+	UINT16 charaddr = (column << 4) | cma;
 
 	state->charram[charaddr] = data;
 }

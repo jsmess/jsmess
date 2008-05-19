@@ -54,6 +54,18 @@ struct _comx35_state
 	int fdc_irq;			/* interrupt request */
 	int fdc_drq_enable;		/* EF4 enabled */
 
+	/* printer state */
+	UINT8 centronics_data;	/* centronics data */
+
+	/* PL-80 plotter state */
+	UINT16 font_addr;		/* font ROM pack address latch */
+	UINT8 x_motor_phase;	/* X motor phase */
+	UINT8 y_motor_phase;	/* Y motor phase */
+	UINT8 z_motor_phase;	/* Z motor phase */
+	UINT8 plotter_data;		/* plotter data bus */
+	int plotter_ack;		/* plotter acknowledge */
+	int plotter_online;		/* online LED */
+
 	/* timers */
 	emu_timer *reset_timer;	/* power on reset timer */
 };
@@ -64,6 +76,11 @@ WRITE8_HANDLER( comx35_bank_select_w );
 READ8_HANDLER( comx35_io_r );
 READ8_HANDLER( comx35_io2_r );
 WRITE8_HANDLER( comx35_io_w );
+
+WRITE8_HANDLER( pl80_port_a_w );
+WRITE8_HANDLER( pl80_port_c_w );
+WRITE8_HANDLER( pl80_port_d_w );
+READ8_HANDLER( pl80_port_d_r );
 
 MACHINE_START( comx35p );
 MACHINE_START( comx35n );
