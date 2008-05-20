@@ -430,6 +430,18 @@ static const char *code_point_string(unicode_char ch)
 
 
 
+static unicode_char get_keyboard_code(const input_port_entry *ipt, int i)
+{
+	unicode_char ch = ipt->keyboard.chars[i];
+
+	/* special hack to allow for PORT_CODE('\xA3') */
+	if ((ch >= 0xFFFFFF80) && (ch <= 0xFFFFFFFF))
+		ch &= 0xFF;
+	return ch;
+}
+
+
+
 static int scan_keys(const input_port_entry *input_ports, mess_input_code *codes, UINT32 *ports, const input_port_entry **shift_ports, int keys, int shift)
 {
 	int code_count = 0;
@@ -448,8 +460,8 @@ static int scan_keys(const input_port_entry *input_ports, mess_input_code *codes
 			case IPT_KEYBOARD:
 				ipt_key = ipt;
 
-				code = ipt->keyboard.chars[shift];
-				if (code)
+				code = get_keyboard_code(ipt, shift);
+				if (code != 0)
 				{
 					/* is this a shifter key? */
 					if ((code >= UCHAR_SHIFT_BEGIN) && (code <= UCHAR_SHIFT_END))
@@ -986,7 +998,7 @@ void inputx_handle_mess_extensions(input_port_entry *ipt)
 
 			for (i = 0; i < ARRAY_LENGTH(ipt->keyboard.chars) && ipt->keyboard.chars[i]; i++)
 			{
-				ch = ipt->keyboard.chars[i];
+				ch = get_keyboard_code(ipt, i);
 				pos += snprintf(&buf[pos], ARRAY_LENGTH(buf) - pos, "%-*s ", MAX(SPACE_COUNT - 1, 0), inputx_key_name(ch));
 			}
 
@@ -1007,9 +1019,10 @@ void inputx_handle_mess_extensions(input_port_entry *ipt)
 
 const char *inputx_key_name(unicode_char ch)
 {
-	static char buf[2];
+	static char buf[UTF8_CHAR_MAX + 1];
 	const char_info *ci;
 	const char *result;
+	int pos;
 
 	ci = find_charinfo(ch);
 	result = ci ? ci->name : NULL;
@@ -1020,10 +1033,10 @@ const char *inputx_key_name(unicode_char ch)
 	}
 	else
 	{
-		if ((ch <= 0x7F) && isprint(ch))
+		if ((ch > 0x7F) || isprint(ch))
 		{
-			buf[0] = (char) ch;
-			buf[1] = '\0';
+			pos = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
+			buf[pos] = '\0';
 			result = buf;
 		}
 		else

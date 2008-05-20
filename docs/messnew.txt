@@ -61,6 +61,9 @@ User Interface Changes:
 -----------------------
 - File Manager and Tape Control cleanups.  [Nate Woods]
 
+- Fixed default key naming of keyboard inputs for non-ASCII characters.  [Nate
+  Woods]
+
 
 
 Imgtool Changes:

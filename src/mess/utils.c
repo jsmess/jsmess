@@ -36,7 +36,7 @@ void rtrim(char *buf)
 	buflen = strlen(buf);
 	if (buflen)
 	{
-		for (s = &buf[buflen-1]; s >= buf && isspace(*s); s--)
+		for (s = &buf[buflen-1]; s >= buf && (*s >= '\0') && isspace(*s); s--)
 			*s = '\0';
 	}
 }
