@@ -167,18 +167,18 @@ INTERRUPT_GEN( kaypro_interrupt )
 	}
 
 	row = 9;
-	new = input_port_read_indexed(machine, 10);
+	new = input_port_read(machine, "ROW9");
 	chg = keyrows[row] ^ new;
 
-	if (!chg) { new = input_port_read_indexed(machine, 9); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read_indexed(machine, 8); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read_indexed(machine, 7); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read_indexed(machine, 6); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read_indexed(machine, 5); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read_indexed(machine, 4); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read_indexed(machine, 3); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read_indexed(machine, 2); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read_indexed(machine, 1); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(machine, "ROW8"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(machine, "ROW7"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(machine, "ROW6"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(machine, "ROW5"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(machine, "ROW4"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(machine, "ROW3"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(machine, "ROW2"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(machine, "ROW1"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(machine, "ROW0"); chg = keyrows[--row] ^ new; }
 	if (!chg) --row;
 
 	if (row >= 0)
