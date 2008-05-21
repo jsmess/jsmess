@@ -403,22 +403,24 @@ DRIVER_INIT( msx2 )
 
 INTERRUPT_GEN( msx2_interrupt )
 {
-	v9938_set_sprite_limit(0, input_port_read_indexed(machine, 8) & 0x20);
-	v9938_set_resolution(0, input_port_read_indexed(machine, 8) & 0x03);
+	v9938_set_sprite_limit(0, input_port_read(machine, "DSW") & 0x20);
+	v9938_set_resolution(0, input_port_read(machine, "DSW") & 0x03);
 	v9938_interrupt(0);
 }
 
 INTERRUPT_GEN( msx_interrupt )
 {
 	int i;
-
+	char port[7];
+	
 	for (i=0;i<2;i++)
 	{
-		msx1.mouse[i] = input_port_read_indexed(machine, 9+i);
+		sprintf(port, "MOUSE%d", i);
+		msx1.mouse[i] = input_port_read(machine, port);
 		msx1.mouse_stat[i] = -1;
 	}
 
-	TMS9928A_set_spriteslimit (input_port_read_indexed(machine, 8) & 0x20);
+	TMS9928A_set_spriteslimit (input_port_read(machine, "DSW") & 0x20);
 	TMS9928A_interrupt();
 }
 
@@ -455,10 +457,10 @@ READ8_HANDLER ( msx_psg_port_a_r )
 
 	data = (cassette_input(cassette_device_image()) > 0.0038 ? 0x80 : 0);
 
-	if ( (msx1.psg_b ^ input_port_read_indexed(machine, 8) ) & 0x40)
+	if ( (msx1.psg_b ^ input_port_read(machine, "DSW") ) & 0x40)
 		{
 		/* game port 2 */
-		inp = input_port_read_indexed(machine, 7) & 0x7f;
+		inp = input_port_read(machine, "JOY1") & 0x7f;
 #if 0
 		if ( !(inp & 0x80) )
 			{
@@ -483,7 +485,7 @@ READ8_HANDLER ( msx_psg_port_a_r )
 	else
 		{
 		/* game port 1 */
-		inp = input_port_read_indexed(machine, 6) & 0x7f;
+		inp = input_port_read(machine, "JOY0") & 0x7f;
 #if 0
 		if ( !(inp & 0x80) )
 			{
@@ -538,7 +540,8 @@ WRITE8_HANDLER ( msx_psg_port_b_w )
 
 WRITE8_HANDLER ( msx_printer_w )
 {
-	if (input_port_read_indexed(machine, 8) & 0x80) {
+	if (input_port_read(machine, "DSW") & 0x80) 
+	{
 		/* SIMPL emulation */
 		if (offset == 1)
 			DAC_signed_data_w (0, data);
@@ -563,7 +566,7 @@ WRITE8_HANDLER ( msx_printer_w )
 
 READ8_HANDLER ( msx_printer_r )
 {
-	if (offset == 0 && ! (input_port_read_indexed(machine, 8) & 0x80) &&
+	if (offset == 0 && ! (input_port_read(machine, "DSW") & 0x80) &&
 			printer_is_ready(printer_image(machine)) )
 		return 253;
 
@@ -730,11 +733,14 @@ static READ8_HANDLER( msx_ppi_port_b_r )
 {
 	UINT8 result = 0xff;
 	int row, data;
+	char port[5];
 
 	row = ppi8255_r( (device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 2) & 0x0f;
 	if (row <= 10)
 	{
-		data = input_port_read_indexed(machine, row/2);
+		sprintf(port, "KEY%d", row/2);
+		data = input_port_read(machine, port);
+
 		if (row & 1)
 			data >>= 8;
 		result = data & 0xff;
