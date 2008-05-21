@@ -24,6 +24,7 @@ READ8_HANDLER( at_page8_r );
 WRITE8_HANDLER( at_page8_w );
 
 DRIVER_INIT( atcga );
+DRIVER_INIT( atega );
 DRIVER_INIT( at386 );
 DRIVER_INIT( at586 );
 

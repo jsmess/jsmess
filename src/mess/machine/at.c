@@ -31,7 +31,7 @@
 #include "machine/pc_hdc.h"
 #include "includes/pc_mouse.h"
 
-#define LOG_PORT80 0
+#define LOG_PORT80 1
 
 static struct {
 	const device_config	*pic8259_master;
@@ -387,6 +387,26 @@ DRIVER_INIT( atcga )
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(&at8042);
+}
+
+
+DRIVER_INIT( atega )
+{
+	static const struct kbdc8042_interface at8042 =
+	{
+		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
+	};
+	UINT8	*dst = memory_region( REGION_CPU1 ) + 0xc8000;
+	UINT8	*src = memory_region( REGION_USER1 ) + 0x3fff;
+	int		i;
+
+	init_at_common(&at8042);
+
+	/* Perform the EGA bios address line swaps */
+	for( i = 0; i < 0x4000; i++ )
+	{
+		*dst++ = *src--;
+	}
 }
 
 
