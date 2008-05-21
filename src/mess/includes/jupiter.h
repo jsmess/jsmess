@@ -17,13 +17,6 @@ DEVICE_IMAGE_LOAD( jupiter_ace );
 DEVICE_IMAGE_LOAD( jupiter_tap );
 DEVICE_IMAGE_UNLOAD( jupiter_tap );
 
-READ8_HANDLER( jupiter_port_fefe_r);
-READ8_HANDLER( jupiter_port_fdfe_r);
-READ8_HANDLER( jupiter_port_fbfe_r);
-READ8_HANDLER( jupiter_port_f7fe_r);
-READ8_HANDLER( jupiter_port_effe_r);
-READ8_HANDLER( jupiter_port_dffe_r);
-READ8_HANDLER( jupiter_port_bffe_r);
 READ8_HANDLER( jupiter_port_7ffe_r);
 WRITE8_HANDLER( jupiter_port_fe_w);
 

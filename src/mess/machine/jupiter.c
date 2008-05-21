@@ -90,9 +90,9 @@ MACHINE_START( jupiter )
 	logerror("jupiter_init\r\n");
 	logerror("data: %p\n", jupiter_data);
 
-	if (input_port_read_indexed(machine, 8) != jupiter_ramsize)
+	if (input_port_read(machine, "CFG") != jupiter_ramsize)
 	{
-		jupiter_ramsize = input_port_read_indexed(machine, 8);
+		jupiter_ramsize = input_port_read(machine, "CFG");
 		switch (jupiter_ramsize)
 		{
 			case 03:
@@ -272,45 +272,10 @@ DEVICE_IMAGE_UNLOAD( jupiter_tap )
 	}
 }
 
- READ8_HANDLER ( jupiter_port_fefe_r )
-{
-	return (input_port_read_indexed(machine, 0));
-}
-
- READ8_HANDLER ( jupiter_port_fdfe_r )
-{
-	return (input_port_read_indexed(machine, 1));
-}
-
- READ8_HANDLER ( jupiter_port_fbfe_r )
-{
-	return (input_port_read_indexed(machine, 2));
-}
-
- READ8_HANDLER ( jupiter_port_f7fe_r )
-{
-	return (input_port_read_indexed(machine, 3));
-}
-
- READ8_HANDLER ( jupiter_port_effe_r )
-{
-	return (input_port_read_indexed(machine, 4));
-}
-
- READ8_HANDLER ( jupiter_port_dffe_r )
-{
-	return (input_port_read_indexed(machine, 5));
-}
-
- READ8_HANDLER ( jupiter_port_bffe_r )
-{
-	return (input_port_read_indexed(machine, 6));
-}
-
- READ8_HANDLER ( jupiter_port_7ffe_r )
+READ8_HANDLER ( jupiter_port_7ffe_r )
 {
 	speaker_level_w(0,0);
-	return (input_port_read_indexed(machine, 7));
+	return (input_port_read(machine, "KEY7"));
 }
 
 WRITE8_HANDLER ( jupiter_port_fe_w )
