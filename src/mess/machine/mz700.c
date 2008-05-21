@@ -137,9 +137,11 @@ static  READ8_HANDLER ( pio_port_a_r )
 static  READ8_HANDLER ( pio_port_b_r )
 {
 	UINT8 demux_LS145, data = 0xff;
+	char port[6];
 
     demux_LS145 = pio_port_a_output & 15;
-    data = input_port_read_indexed(machine, 1 + demux_LS145);
+	sprintf(port, "ROW%d", demux_LS145);
+    data = input_port_read(machine, port);
 	LOG(2,"mz700_pio_port_b_r",("%02X\n", data));
 
     return data;
@@ -164,7 +166,7 @@ static READ8_HANDLER (pio_port_c_r )
 	if (ne556_out[0])
         data |= 0x40;           /* set the 556OUT status */
 
-    data |= input_port_read_indexed(machine, 0);   /* get VBLANK in bit 7 */
+    data |= input_port_read(machine, "STATUS");   /* get VBLANK in bit 7 */
 
 	LOG(2,"mz700_pio_port_c_r",("%02X\n", data));
 
@@ -235,7 +237,7 @@ READ8_HANDLER ( mz700_mmio_r )
 
 	case 8:
 		data = ne556_out[1] ? 0x01 : 0x00;
-		data |= input_port_read_indexed(machine, 12);	/* get joystick ports */
+		data |= input_port_read(machine, "JOY");	/* get joystick ports */
 		if (video_screen_get_hpos(machine->primary_screen) >= visarea->max_x - 32)
 			data |= 0x80;
 		LOG(1,"mz700_e008_r",("%02X\n", data));
