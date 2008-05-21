@@ -1,6 +1,7 @@
 /***************************************************************************
 Galaksija driver by Krzysztof Strzecha
 
+21/05/2008 Added real video implementation (Miodrag Milanovic)
 18/04/2005 Possibilty to disable ROM 2. 2k, 22k, 38k and 54k memory
        configurations added.
 13/03/2005 Memory mapping improved. Palette corrected. Supprort for newer
@@ -17,7 +18,6 @@ Galaksija driver by Krzysztof Strzecha
 01/01/2001 Preliminary driver.
 
 To do:
--Video subsystem 'real' emulation
 -Tape
 -Galaksija Plus
 
@@ -40,7 +40,6 @@ static ADDRESS_MAP_START (galaxy_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ( galaxy_keyboard_r )
 	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_READWRITE( galaxy_latch_r, galaxy_latch_w )
 ADDRESS_MAP_END
-
 
 static GFXDECODE_START( galaxy )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, galaxy_charlayout, 0, 2 )
@@ -129,29 +128,32 @@ static INPUT_PORTS_START (galaxy)
 		PORT_CONFSETTING(	0x00, "Not installed")
 INPUT_PORTS_END
 
+
+#define XTAL 6144000
+
+
 static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)
+	MDRV_CPU_ADD(Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)
 	MDRV_CPU_IO_MAP(galaxy_readport, galaxy_writeport)
 	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(0)
-	MDRV_INTERLEAVE(1)
+	MDRV_CPU_PERIODIC_INT(gal_video,XTAL)
 
 	MDRV_MACHINE_RESET( galaxy )
 
 	/* video hardware */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 208)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 208-1)
+	MDRV_SCREEN_SIZE(384, 212)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 212-1)
 	MDRV_GFXDECODE( galaxy )
 	MDRV_PALETTE_LENGTH(sizeof (galaxy_palette) / 3)
 	MDRV_PALETTE_INIT( galaxy )
 
-	MDRV_VIDEO_START( galaxy )
-	MDRV_VIDEO_UPDATE( galaxy )
+	MDRV_VIDEO_START( generic_bitmapped )
+	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
@@ -165,6 +167,7 @@ ROM_START (galaxy)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
+
 SYSTEM_CONFIG_START(galaxy)
 	CONFIG_RAM(2 * 1024)
 	CONFIG_RAM_DEFAULT(6 * 1024)
@@ -174,4 +177,4 @@ SYSTEM_CONFIG_START(galaxy)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
-COMP(1983,	galaxy,	0,	0,	galaxy,	galaxy,	galaxy,	galaxy,	"",	"Galaksija", 0)
+COMP(1983,	galaxy,		0,		0,	galaxy,	galaxy,	galaxy,	galaxy,	"Elektronika inzenjering",			"Galaksija", 	  0)

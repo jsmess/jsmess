@@ -16,8 +16,6 @@
 #define LOG_GALAXY_LATCH_R(_port, _data) do { if (DEBUG_GALAXY_LATCH) logerror ("Galaxy latch read : %04x, Data: %02x\n", _port, _data); } while (0)
 #define LOG_GALAXY_LATCH_W(_port, _data) do { if (DEBUG_GALAXY_LATCH) logerror ("Galaxy latch write: %04x, Data: %02x\n", _port, _data); } while (0)
 
-int galaxy_interrupts_enabled = TRUE;
-
 /***************************************************************************
   I/O devices
 ***************************************************************************/
@@ -27,30 +25,32 @@ READ8_HANDLER( galaxy_keyboard_r )
 	return input_port_read_indexed(machine, (offset>>3)&0x07) & (0x01<<(offset&0x07)) ? 0xfe : 0xff;
 }
 
+
+UINT8 gal_latch_value = 0;
+
 READ8_HANDLER( galaxy_latch_r )
 {
-	UINT8 data = 0xff;
-	LOG_GALAXY_LATCH_R(offset, data);
-	return data;
+	return 0xff;	
+}
+WRITE8_HANDLER( galaxy_latch_w )
+{	
+	gal_latch_value = data;	
 }
 
-WRITE8_HANDLER( galaxy_latch_w )
-{
-	LOG_GALAXY_LATCH_W(offset, data);
-}
+
 
 /***************************************************************************
   Interrupts
 ***************************************************************************/
 
 INTERRUPT_GEN( galaxy_interrupt )
-{
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+{	
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);	
 }
 
-static IRQ_CALLBACK(galaxy_irq_callback)
+IRQ_CALLBACK ( galaxy_irq_callback )
 {
-	galaxy_interrupts_enabled = TRUE;
+	gal_cnt = 0;
 	return 1;
 }
 
@@ -168,11 +168,8 @@ MACHINE_RESET( galaxy )
 {
 	/* ROM 2 enable/disable */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, input_port_read_indexed(machine, 7) ? SMH_BANK10 : SMH_NOP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
-	if (input_port_read_indexed(machine, 7))
-		memory_set_bankptr(10, memory_region(REGION_CPU1) + 0x1000);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);	
+	memory_set_bankptr(10, memory_region(REGION_CPU1) + 0x1000);
 
 	cpunum_set_irq_callback(0, galaxy_irq_callback);
-
-	galaxy_interrupts_enabled = TRUE;
 }
