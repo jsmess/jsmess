@@ -710,6 +710,7 @@ TESTDRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
 
 	/* GALAKSIJA */
 	DRIVER( galaxy )
+	DRIVER( galaxyp )
 
 	/* Lviv/L'vov */
 	DRIVER( lviv )		/* Lviv/L'vov										*/

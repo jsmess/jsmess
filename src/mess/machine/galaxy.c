@@ -173,3 +173,24 @@ MACHINE_RESET( galaxy )
 
 	cpunum_set_irq_callback(0, galaxy_irq_callback);
 }
+
+DRIVER_INIT( galaxyp )
+{
+	DRIVER_INIT_CALL(galaxy);
+}
+
+MACHINE_RESET( galaxyp )
+{
+	UINT8 *ROM = memory_region(REGION_CPU1);
+	
+	cpunum_set_irq_callback(0, galaxy_irq_callback);	
+			
+	ROM[0x0037] = 0x29;
+	ROM[0x03f9] = 0xcd;
+	ROM[0x03fa] = 0x00;
+	ROM[0x03fb] = 0xe0;
+	
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_BANK11);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_NOP);	
+	memory_set_bankptr(11, memory_region(REGION_CPU1) + 0xe000);	
+}

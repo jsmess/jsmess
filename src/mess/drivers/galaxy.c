@@ -1,6 +1,7 @@
 /***************************************************************************
-Galaksija driver by Krzysztof Strzecha
+Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 
+22/05/2008 Galaksija plus initial support
 21/05/2008 Added real video implementation (Miodrag Milanovic)
 18/04/2005 Possibilty to disable ROM 2. 2k, 22k, 38k and 54k memory
        configurations added.
@@ -17,28 +18,56 @@ Galaksija driver by Krzysztof Strzecha
 03/01/2001 Snapshot loading added.
 01/01/2001 Preliminary driver.
 
-To do:
--Tape
--Galaksija Plus
-
 ***************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/galaxy.h"
 #include "devices/snapquik.h"
+#include "devices/cassette.h"
+#include "sound/ay8910.h"
 
-static ADDRESS_MAP_START (galaxy_readport, ADDRESS_SPACE_IO, 8)
-ADDRESS_MAP_END
+static  READ8_HANDLER ( galaxy_port_r )
+{
+	 return 0;
+}
 
-static ADDRESS_MAP_START (galaxy_writeport, ADDRESS_SPACE_IO, 8)
+static WRITE8_HANDLER ( galaxy_port_w )
+{
+	if ((offset & 0x41)==0x01) { // A6 zero A0 active
+		AY8910_write_port_0_w(machine,offset, data);
+	}
+	if ((offset & 0x41)==0x00) { // A6 zero A0 on zero
+		AY8910_control_port_0_w(machine,offset, data);
+	}
+}
+
+
+static WRITE8_HANDLER ( galaxy_cassette_w )
+{
+	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), data); 
+}
+
+static ADDRESS_MAP_START (galaxy_io, ADDRESS_SPACE_IO, 8)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE( galaxy_port_r, galaxy_port_w )
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START (galaxy_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ( galaxy_keyboard_r )
+	AM_RANGE(0x2035, 0x2035) AM_WRITE( galaxy_cassette_w)
 	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_READWRITE( galaxy_latch_r, galaxy_latch_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START (galaxyp_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM // ROM A
+	AM_RANGE(0x1000, 0x1fff) AM_ROM // ROM B
+	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ( galaxy_keyboard_r )
+	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_WRITE( galaxy_cassette_w)
+	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_READWRITE( galaxy_latch_r, galaxy_latch_w )
+	AM_RANGE(0xe000, 0xefff) AM_ROM // ROM C 
+	AM_RANGE(0xf000, 0xffff) AM_ROM // ROM D
 ADDRESS_MAP_END
 
 static GFXDECODE_START( galaxy )
@@ -51,7 +80,7 @@ Small note about natural keyboard support. Currently:
 - "Break" is mapped to 'F1'
 - "Repeat" is mapped to 'F2'                           */
 
-static INPUT_PORTS_START (galaxy)
+static INPUT_PORTS_START (galaxy_common)
 	PORT_START /* line 0 */
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)		PORT_CHAR('A')
@@ -121,13 +150,26 @@ static INPUT_PORTS_START (galaxy)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START /* port 7 */
-		PORT_CONFNAME(0x01, 0x01, "ROM 2")
-		PORT_CONFSETTING(	0x01, "Installed")
-		PORT_CONFSETTING(	0x00, "Not installed")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( galaxy )
+	PORT_INCLUDE( galaxy_common )	
+	PORT_START /* port 7 */
+		PORT_CONFNAME(0x01, 0x01, "ROM 2")
+			PORT_CONFSETTING(0x01, "Installed")
+			PORT_CONFSETTING(0x00, "Not installed")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( galaxyp )
+	PORT_INCLUDE( galaxy_common )	
+INPUT_PORTS_END
+
+static const struct AY8910interface galaxy_ay_interface =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL
+};
 
 #define XTAL 6144000
 
@@ -136,7 +178,7 @@ static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)
-	MDRV_CPU_IO_MAP(galaxy_readport, galaxy_writeport)
+	MDRV_CPU_IO_MAP(galaxy_io, 0)
 	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -157,6 +199,44 @@ static MACHINE_DRIVER_START( galaxy )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
+	
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( galaxyp )
+	/* basic machine hardware */
+	MDRV_CPU_ADD(Z80, XTAL / 2)
+	MDRV_CPU_PROGRAM_MAP(galaxyp_mem, 0)
+	MDRV_CPU_IO_MAP(galaxy_io, 0)
+	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_CPU_PERIODIC_INT(gal_video,XTAL)
+
+	MDRV_MACHINE_RESET( galaxyp )
+
+	/* video hardware */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(384, 212)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 212-1)
+	MDRV_GFXDECODE( galaxy )
+	MDRV_PALETTE_LENGTH(sizeof (galaxy_palette) / 3)
+	MDRV_PALETTE_INIT( galaxy )
+
+	MDRV_VIDEO_START( generic_bitmapped )
+	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	
+	/* snapshot */
+	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(AY8910, XTAL/4)
+	MDRV_SOUND_CONFIG(galaxy_ay_interface)
+	MDRV_SOUND_ADD(WAVE, 0)		
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 ROM_START (galaxy)
@@ -167,6 +247,27 @@ ROM_START (galaxy)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
+ROM_START (galaxyp)
+	ROM_REGION (0x10000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358))		
+	ROM_LOAD ("galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1))
+	ROM_LOAD ("galplus.bin", 0xe000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee))	
+	ROM_REGION(0x0800, REGION_GFX1,0)
+	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
+ROM_END
+
+static void galaxy_common_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
+
+		default:					cassette_device_getinfo(devclass, state, info); break;
+	}
+}
 
 SYSTEM_CONFIG_START(galaxy)
 	CONFIG_RAM(2 * 1024)
@@ -174,7 +275,14 @@ SYSTEM_CONFIG_START(galaxy)
 	CONFIG_RAM((6+16) * 1024)
 	CONFIG_RAM((6+32) * 1024)
 	CONFIG_RAM((6+48) * 1024)
+	CONFIG_DEVICE(galaxy_common_cassette_getinfo)	
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START(galaxyp)
+	CONFIG_RAM_DEFAULT((6) * 1024)
+	CONFIG_DEVICE(galaxy_common_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
 COMP(1983,	galaxy,		0,		0,	galaxy,	galaxy,	galaxy,	galaxy,	"Elektronika inzenjering",			"Galaksija", 	  0)
+COMP(1985,	galaxyp,	galaxy,	0,	galaxyp,galaxyp,galaxyp,galaxyp,"Elektronika inzenjering",			"Galaksija plus", 0)

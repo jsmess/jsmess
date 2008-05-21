@@ -25,6 +25,8 @@ extern MACHINE_RESET( galaxyp );
 extern UINT32 gal_cnt;
 extern UINT8 gal_latch_value;
 
+extern DRIVER_INIT( galaxyp );
+extern MACHINE_RESET( galaxyp );
 /*----------- defined in video/galaxy.c -----------*/
 
 extern const gfx_layout galaxy_charlayout;
