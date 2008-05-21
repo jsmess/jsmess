@@ -315,14 +315,17 @@ static const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(F13),		"F13",			NULL },		/* F13 function key */
 	{ UCHAR_MAMEKEY(F14),		"F14",			NULL },		/* F14 function key */
 	{ UCHAR_MAMEKEY(F15),		"F15",			NULL },		/* F15 function key */
-	{ UCHAR_MAMEKEY(ESC),		"Esc",			"\033" },	/* esc key */
-	{ UCHAR_MAMEKEY(INSERT),	"Insert",		NULL },		/* insert key */
-	{ UCHAR_MAMEKEY(DEL),		"Delete",		"\010" },	/* delete key */
-	{ UCHAR_MAMEKEY(HOME),		"Home",			"\014" },	/* home key */
-	{ UCHAR_MAMEKEY(LEFT),		"Cursor Left",	NULL },		/* cursor left */
-	{ UCHAR_MAMEKEY(RIGHT),		"Cursor Right",	NULL },		/* cursor right */
-	{ UCHAR_MAMEKEY(UP),		"Cursor Up",	NULL },		/* cursor up */
-	{ UCHAR_MAMEKEY(DOWN),		"Cursor Down",	NULL },		/* cursor down */
+	{ UCHAR_MAMEKEY(ESC),		"Esc",			"\033" },	/* Esc key */
+	{ UCHAR_MAMEKEY(INSERT),	"Insert",		NULL },		/* Insert key */
+	{ UCHAR_MAMEKEY(DEL),		"Delete",		"\010" },	/* Delete key */
+	{ UCHAR_MAMEKEY(HOME),		"Home",			"\014" },	/* Home key */
+	{ UCHAR_MAMEKEY(END),		"End",			NULL },		/* End key */
+	{ UCHAR_MAMEKEY(PGUP),		"Page Up",		NULL },		/* Page Up key */
+	{ UCHAR_MAMEKEY(PGDN),		"Page Down",	NULL },		/* Page Down key */
+	{ UCHAR_MAMEKEY(LEFT),		"Cursor Left",	NULL },		/* Cursor Left */
+	{ UCHAR_MAMEKEY(RIGHT),		"Cursor Right",	NULL },		/* Cursor Right */
+	{ UCHAR_MAMEKEY(UP),		"Cursor Up",	NULL },		/* Cursor Up */
+	{ UCHAR_MAMEKEY(DOWN),		"Cursor Down",	NULL },		/* Cursor Down */
 	{ UCHAR_MAMEKEY(0_PAD),		"Keypad 0",		NULL },		/* 0 on the numeric keypad */
 	{ UCHAR_MAMEKEY(1_PAD),		"Keypad 1",		NULL },		/* 1 on the numeric keypad */
 	{ UCHAR_MAMEKEY(2_PAD),		"Keypad 2",		NULL },		/* 2 on the numeric keypad */
@@ -333,11 +336,25 @@ static const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(7_PAD),		"Keypad 7",		NULL },		/* 7 on the numeric keypad */
 	{ UCHAR_MAMEKEY(8_PAD),		"Keypad 8",		NULL },		/* 8 on the numeric keypad */
 	{ UCHAR_MAMEKEY(9_PAD),		"Keypad 9",		NULL },		/* 9 on the numeric keypad */
+	{ UCHAR_MAMEKEY(SLASH_PAD),	"Keypad /",		NULL },		/* / on the numeric keypad */
+	{ UCHAR_MAMEKEY(MINUS_PAD),	"Keypad -",		NULL },		/* - on the numeric Keypad */
+	{ UCHAR_MAMEKEY(PLUS_PAD),	"Keypad +",		NULL },		/* + on the numeric Keypad */
 	{ UCHAR_MAMEKEY(DEL_PAD),	"Keypad .",		NULL },		/* . on the numeric keypad */
-	{ UCHAR_MAMEKEY(LSHIFT),	"Left Shift",	NULL },		/* left shift key */
-	{ UCHAR_MAMEKEY(RSHIFT),	"Right Shift",	NULL },		/* right shift key */
-	{ UCHAR_MAMEKEY(LCONTROL),	"Left Ctrl",	NULL },		/* left control key */
-	{ UCHAR_MAMEKEY(RCONTROL),	"Right Ctrl",	NULL },		/* right control key */
+	{ UCHAR_MAMEKEY(ENTER_PAD),	"Keypad Enter",	NULL },		/* Enter on the numeric keypad */
+	{ UCHAR_MAMEKEY(PRTSCR),	"Print Screen",	NULL },		/* Print Screen key */
+	{ UCHAR_MAMEKEY(PAUSE),		"Pause",		NULL },		/* Pause key */
+	{ UCHAR_MAMEKEY(LSHIFT),	"Left Shift",	NULL },		/* Left Shift key */
+	{ UCHAR_MAMEKEY(RSHIFT),	"Right Shift",	NULL },		/* Right Shift key */
+	{ UCHAR_MAMEKEY(LCONTROL),	"Left Ctrl",	NULL },		/* Left Control key */
+	{ UCHAR_MAMEKEY(RCONTROL),	"Right Ctrl",	NULL },		/* Right Control key */
+	{ UCHAR_MAMEKEY(LALT),		"Left Alt",		NULL },		/* Left Alt key */
+	{ UCHAR_MAMEKEY(RALT),		"Right Alt",	NULL },		/* Right Alt key */
+	{ UCHAR_MAMEKEY(SCRLOCK),	"Scroll Lock",	NULL },		/* Scroll Lock key */
+	{ UCHAR_MAMEKEY(NUMLOCK),	"Num Lock",		NULL },		/* Num Lock key */
+	{ UCHAR_MAMEKEY(CAPSLOCK),	"Caps Lock",	NULL },		/* Caps Lock key */
+	{ UCHAR_MAMEKEY(LWIN),		"Left Win",		NULL },		/* Left Win key */
+	{ UCHAR_MAMEKEY(RWIN),		"Right Win",	NULL },		/* Right Win key */
+	{ UCHAR_MAMEKEY(MENU),		"Menu",			NULL },		/* Menu key */
 	{ UCHAR_MAMEKEY(CANCEL),	"Break",		NULL }		/* Break/Pause key */
 };
 
