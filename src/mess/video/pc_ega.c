@@ -22,19 +22,83 @@ static struct
 	const device_config	*mc6845;
 	mc6845_update_row_func	update_row;
 
-	/* Attribute registers AR00 - AR14  */
+	/* Attribute registers AR00 - AR14 
+	*/
 	struct {
 		UINT8	index;
 		UINT8	data[32];
 	} attribute;
 
-	/* Sequencer registers SR00 - SR07 */
+	/* Sequencer registers SR00 - SR04
+
+	  SR00 - 7 6 5 4 3 2 1 0 - Reset Control Register
+	         | | | | | | | |
+	         | | | | | | | +-- Must be 1 for normal operation
+	         | | | | | | +---- Must be 1 for normal operation
+	         | | | | | +------ reserved/unused
+	         | | | | +-------- reserved/unused
+	         | | | +---------- reserved/unused
+	         | | +------------ reserved/unused
+	         | +-------------- reserved/unused
+	         +---------------- reserved/unused
+
+	  SR01 - 7 6 5 4 3 2 1 0 - Clocking Mode
+	         | | | | | | | |
+	         | | | | | | | +-- 0 = 9 dots per char, 1 = 8 dots per char
+	         | | | | | | +---- clock frequency, 0 = 4 out of 5 memory cycles, 1 = 2 out of 5 memory cycles
+	         | | | | | +------ shift load
+	         | | | | +-------- 0 = normal dot clock, 1 = master dot clock / 2
+	         | | | +---------- reserved/unused
+	         | | +------------ reserved/unused
+	         | +-------------- reserved/unused
+	         +---------------- reserved/unused
+
+	  SR02 - 7 6 5 4 3 2 1 0 - Map Mask
+	         | | | | | | | |
+	         | | | | | | | +-- 1 = enable map 0
+	         | | | | | | +---- 1 = enable map 1
+	         | | | | | +------ 1 = enable map 2
+	         | | | | +-------- 1 = enable map 3
+	         | | | +---------- reserved/unused
+	         | | +------------ reserved/unused
+	         | +-------------- reserved/unused
+	         +---------------- reserved/unused
+
+	  SR03 - 7 6 5 4 3 2 1 0 - Character Map Select
+	         | | | | | | | |
+	         | | | | | | | +-- select plane for character map B
+	         | | | | | | +---- select plane for character map B
+	         | | | | | +------ select plane for character map A
+	         | | | | +-------- select plane for character map A
+	         | | | +---------- reserved/unused
+	         | | +------------ reserved/unused
+	         | +-------------- reserved/unused
+	         +---------------- reserved/unused
+	       Meaning of the plane selection bits:
+	       00 - 1st 8K plane 2 bank 0
+	       01 - 1st 8K plane 2 bank 1
+	       10 - 1st 8K plane 2 bank 2
+	       11 - 1st 8K plane 2 bank 3
+
+	  SR04 - 7 6 5 4 3 2 1 0 - Memory Mode Register
+	         | | | | | | | |
+	         | | | | | | | +-- 0 = graphics mode, 1 = text mode
+	         | | | | | | +---- 0 = no memory extension, 1 = memory extension
+	         | | | | | +------ 0 = odd/even storage, 1 = sequential storage
+	         | | | | +-------- reserved/unused
+	         | | | +---------- reserved/unused
+	         | | +------------ reserved/unused
+	         | +-------------- reserved/unused
+	         +---------------- reserved/unused
+
+	*/
 	struct {
 		UINT8	index;
 		UINT8	data[8];
 	} sequencer;
 
-	/* Graphics controller registers GR00 - GR08 */
+	/* Graphics controller registers GR00 - GR08
+	*/
 	struct {
 		UINT8	index;
 		UINT8	data[16];
@@ -69,7 +133,7 @@ static WRITE32_HANDLER( pc_ega32le_3c0_w );
 static const mc6845_interface mc6845_ega_intf =
 {
 	EGA_SCREEN_NAME,	/* screen number */
-	XTAL_14_31818MHz/8,	/* clock (this is still wrong?) */
+	16257000/8,			/* clock */
 	8,					/* numbers of pixels per video memory address */
 	NULL,				/* begin_update */
 	ega_update_row,		/* update_row */
@@ -159,6 +223,24 @@ static VIDEO_START( pc_ega )
 
 	ega.mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, EGA_MC6845_NAME);
 	ega.update_row = NULL;
+
+	/* Set up default palette */
+	ega.attribute.data[0] = 0;
+	ega.attribute.data[1] = 1;
+	ega.attribute.data[2] = 2;
+	ega.attribute.data[3] = 3;
+	ega.attribute.data[4] = 4;
+	ega.attribute.data[5] = 5;
+	ega.attribute.data[6] = 0x14;
+	ega.attribute.data[7] = 7;
+	ega.attribute.data[8] = 0x38;
+	ega.attribute.data[9] = 0x39;
+	ega.attribute.data[10] = 0x3A;
+	ega.attribute.data[11] = 0x3B;
+	ega.attribute.data[12] = 0x3C;
+	ega.attribute.data[13] = 0x3D;
+	ega.attribute.data[14] = 0x3E;
+	ega.attribute.data[15] = 0x3F;
 }
 
 
@@ -321,6 +403,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 	case 1:
 		if ( ( ega.attribute.index & 0x30 ) != 0x20 )
 		{
+//logerror("AR%02x = 0x%02x\n", ega.attribute.index & 0x1F, data );
 			ega.attribute.data[ ega.attribute.index & 0x1F ] = data;
 		}
 		break;
@@ -334,6 +417,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		ega.sequencer.index = data;
 		break;
 	case 5:
+//logerror("SR%02x = 0x%02x\n", ega.graphics_controller.index & 0x07, data );
 		ega.sequencer.data[ ega.sequencer.index & 0x07 ] = data;
 		break;
 
@@ -342,6 +426,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		ega.graphics_controller.index = data;
 		break;
 	case 15:
+//logoerror("GR%02x = 0x%02x\n", ega.graphics_controller.index & 0x0F, data );
 		ega.graphics_controller.data[ ega.graphics_controller.index & 0x0F ] = data;
 		break;
 	}
