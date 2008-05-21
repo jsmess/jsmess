@@ -337,6 +337,7 @@ static const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(8_PAD),		"Keypad 8",		NULL },		/* 8 on the numeric keypad */
 	{ UCHAR_MAMEKEY(9_PAD),		"Keypad 9",		NULL },		/* 9 on the numeric keypad */
 	{ UCHAR_MAMEKEY(SLASH_PAD),	"Keypad /",		NULL },		/* / on the numeric keypad */
+	{ UCHAR_MAMEKEY(ASTERISK),	"Keypad *",		NULL },		/* * on the numeric keypad */
 	{ UCHAR_MAMEKEY(MINUS_PAD),	"Keypad -",		NULL },		/* - on the numeric Keypad */
 	{ UCHAR_MAMEKEY(PLUS_PAD),	"Keypad +",		NULL },		/* + on the numeric Keypad */
 	{ UCHAR_MAMEKEY(DEL_PAD),	"Keypad .",		NULL },		/* . on the numeric keypad */
