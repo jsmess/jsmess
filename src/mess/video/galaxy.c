@@ -4,8 +4,8 @@
 
   Functions to emulate the video hardware of the Galaksija.
   
-  01/03/2008 - Update by Miodrag Milanovic to make Galaksija video work with new SVN code
-  21/05/2008 - Real video implementation by Miodrag Milanovic
+  20/05/2008 - Real video implementation by Miodrag Milanovic
+  01/03/2008 - Update by Miodrag Milanovic to make Galaksija video work with new SVN code  
 ***************************************************************************/
 
 #include "driver.h"
@@ -44,28 +44,48 @@ UINT32 gal_cnt = 0;
 static UINT8 code = 0;
 static UINT8 first = 0;
 
-INTERRUPT_GEN( gal_video )
+emu_timer *gal_video_timer = NULL;
+
+TIMER_CALLBACK( gal_video )
 {	
-	UINT8 *gfx = memory_region(REGION_GFX1);	
-	UINT8 dat = (gal_latch_value & 0x3c) >> 2;
-	if (gal_cnt < 384 * 212) { // display on screen just first 212 lines
-		if ((gal_cnt % 8)==0) { //fetch code
-  			UINT16 addr = (cpunum_get_reg(0, Z80_I) << 8) |  cpunum_get_reg(0, Z80_R) | ((gal_latch_value & 0x80) ^ 0x80);  		  		
-  			if (first==0 && (cpunum_get_reg(0, Z80_R) & 0x1f) ==0) {
-	  			// Due to a fact that on real processor latch value is set at
-	  			// the end of last cycle we need to skip dusplay of double 	  			
-	  			// first char in each row	  			
-	  			code = 0xff;
-	  			first = 1;
-			} else {
-				code = program_read_byte(addr) & 0xbf;
-				code += (code & 0x80) >> 1;	
-				code = gfx[(code & 0x7f) +(dat << 7 )];		
-				first = 0;				
+	if (galaxy_interrupts_enabled==TRUE) {
+		UINT8 *gfx = memory_region(REGION_GFX1);	
+		UINT8 dat = (gal_latch_value & 0x3c) >> 2;
+		if (gal_cnt < 384 * 212) { // display on screen just first 212 lines			
+			if (((gal_cnt+4) % 8)==0) { //fetch code
+	  			UINT16 addr = (cpunum_get_reg(0, Z80_I) << 8) |  cpunum_get_reg(0, Z80_R) | ((gal_latch_value & 0x80) ^ 0x80);  		  		
+	  			if (first==0 && (cpunum_get_reg(0, Z80_R) & 0x1f) ==0) {
+		  			// Due to a fact that on real processor latch value is set at
+		  			// the end of last cycle we need to skip dusplay of double 	  			
+		  			// first char in each row	  			
+		  			code = 0xff;
+		  			first = 1;
+				} else {
+					code = program_read_byte(addr) & 0xbf;
+					code += (code & 0x80) >> 1;	
+					code = gfx[(code & 0x7f) +(dat << 7 )];		
+					first = 0;				
+				}
 			}
-		}
-		*BITMAP_ADDR16(tmpbitmap, gal_cnt / 384, gal_cnt % 384) = (code >> (gal_cnt & 7)) & 1;
-	}
-	
-	gal_cnt++;				
+			*BITMAP_ADDR16(tmpbitmap, gal_cnt / 384, gal_cnt % 384) = (code >> ((gal_cnt+4) & 7)) & 1;
+		}	
+		gal_cnt++;		
+	}		
 }
+
+VIDEO_START ( galaxy ) 
+{
+	return VIDEO_START_CALL ( generic_bitmapped );
+}
+
+VIDEO_UPDATE( galaxy )
+{
+	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, attotime_never);
+	if (galaxy_interrupts_enabled == FALSE) {
+		rectangle black_area = {0,384-1,0,212-2};
+		fillbitmap(tmpbitmap, 1, &black_area);				
+	}
+	galaxy_interrupts_enabled = FALSE;		
+	return VIDEO_UPDATE_CALL ( generic_bitmapped );
+}
+

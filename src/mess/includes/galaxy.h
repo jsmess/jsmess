@@ -12,6 +12,8 @@
 
 /*----------- defined in machine/galaxy.c -----------*/
 
+extern int galaxy_interrupts_enabled;
+
 extern DRIVER_INIT( galaxy );
 extern MACHINE_RESET( galaxy );
 extern INTERRUPT_GEN( galaxy_interrupt );
@@ -32,7 +34,11 @@ extern MACHINE_RESET( galaxyp );
 extern const gfx_layout galaxy_charlayout;
 extern const unsigned char galaxy_palette[2*3];
 extern PALETTE_INIT( galaxy );
-extern INTERRUPT_GEN( gal_video );
 
+extern VIDEO_START( galaxy );
+extern VIDEO_UPDATE( galaxy );
+extern TIMER_CALLBACK( gal_video );
+
+extern emu_timer *gal_video_timer;
 
 #endif /* GALAXY_H_ */

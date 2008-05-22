@@ -1,8 +1,9 @@
 /***************************************************************************
 Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 
-22/05/2008 Galaksija plus initial support
-21/05/2008 Added real video implementation (Miodrag Milanovic)
+22/05/2008 Tape support added (Miodrag Milanovic)
+21/05/2008 Galaksija plus initial support (Miodrag Milanovic)
+20/05/2008 Added real video implementation (Miodrag Milanovic)
 18/04/2005 Possibilty to disable ROM 2. 2k, 22k, 38k and 54k memory
        configurations added.
 13/03/2005 Memory mapping improved. Palette corrected. Supprort for newer
@@ -27,29 +28,16 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
 
-static  READ8_HANDLER ( galaxy_port_r )
-{
-	 return 0;
-}
-
-static WRITE8_HANDLER ( galaxy_port_w )
-{
-	if ((offset & 0x41)==0x01) { // A6 zero A0 active
-		AY8910_write_port_0_w(machine,offset, data);
-	}
-	if ((offset & 0x41)==0x00) { // A6 zero A0 on zero
-		AY8910_control_port_0_w(machine,offset, data);
-	}
-}
-
-
 static WRITE8_HANDLER ( galaxy_cassette_w )
 {
 	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), data); 
 }
 
-static ADDRESS_MAP_START (galaxy_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE( galaxy_port_r, galaxy_port_w )
+static ADDRESS_MAP_START (galaxyp_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0x01)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xbe, 0xbe) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xbf, 0xbf) AM_WRITE(AY8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -177,12 +165,10 @@ static const struct AY8910interface galaxy_ay_interface =
 static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, XTAL / 2)
-	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)
-	MDRV_CPU_IO_MAP(galaxy_io, 0)
+	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)	
 	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_CPU_PERIODIC_INT(gal_video,XTAL)
 
 	MDRV_MACHINE_RESET( galaxy )
 
@@ -195,7 +181,7 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_PALETTE_INIT( galaxy )
 
 	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MDRV_VIDEO_UPDATE( galaxy )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
@@ -209,11 +195,10 @@ static MACHINE_DRIVER_START( galaxyp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxyp_mem, 0)
-	MDRV_CPU_IO_MAP(galaxy_io, 0)
+	MDRV_CPU_IO_MAP(galaxyp_io, 0)
 	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_CPU_PERIODIC_INT(gal_video,XTAL)
 
 	MDRV_MACHINE_RESET( galaxyp )
 
@@ -226,7 +211,7 @@ static MACHINE_DRIVER_START( galaxyp )
 	MDRV_PALETTE_INIT( galaxy )
 
 	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MDRV_VIDEO_UPDATE( galaxy )
 	
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)

@@ -10,11 +10,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/galaxy.h"
-
-#define DEBUG_GALAXY_LATCH	0
-
-#define LOG_GALAXY_LATCH_R(_port, _data) do { if (DEBUG_GALAXY_LATCH) logerror ("Galaxy latch read : %04x, Data: %02x\n", _port, _data); } while (0)
-#define LOG_GALAXY_LATCH_W(_port, _data) do { if (DEBUG_GALAXY_LATCH) logerror ("Galaxy latch write: %04x, Data: %02x\n", _port, _data); } while (0)
+#include "devices/cassette.h"
 
 /***************************************************************************
   I/O devices
@@ -22,9 +18,13 @@
 
 READ8_HANDLER( galaxy_keyboard_r )
 {
-	return input_port_read_indexed(machine, (offset>>3)&0x07) & (0x01<<(offset&0x07)) ? 0xfe : 0xff;
+	if (offset == 0) {
+		double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
+		return (level >  0) ? 0xfe : 0xff;
+	} else {
+		return input_port_read_indexed(machine, (offset>>3)&0x07) & (0x01<<(offset&0x07)) ? 0xfe : 0xff;
+	}
 }
-
 
 UINT8 gal_latch_value = 0;
 
@@ -42,6 +42,7 @@ WRITE8_HANDLER( galaxy_latch_w )
 /***************************************************************************
   Interrupts
 ***************************************************************************/
+int galaxy_interrupts_enabled = TRUE;
 
 INTERRUPT_GEN( galaxy_interrupt )
 {	
@@ -51,6 +52,8 @@ INTERRUPT_GEN( galaxy_interrupt )
 IRQ_CALLBACK ( galaxy_irq_callback )
 {
 	gal_cnt = 0;
+	galaxy_interrupts_enabled = TRUE;
+	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, ATTOTIME_IN_HZ(6144000));
 	return 1;
 }
 
@@ -172,6 +175,10 @@ MACHINE_RESET( galaxy )
 	memory_set_bankptr(10, memory_region(REGION_CPU1) + 0x1000);
 
 	cpunum_set_irq_callback(0, galaxy_irq_callback);
+	galaxy_interrupts_enabled = TRUE;
+	
+	gal_video_timer = timer_alloc(gal_video, NULL);
+	timer_adjust_periodic(gal_video_timer, attotime_zero, 0,attotime_never);
 }
 
 DRIVER_INIT( galaxyp )
@@ -193,4 +200,9 @@ MACHINE_RESET( galaxyp )
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_BANK11);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_NOP);	
 	memory_set_bankptr(11, memory_region(REGION_CPU1) + 0xe000);	
+	galaxy_interrupts_enabled = TRUE;
+
+	gal_video_timer = timer_alloc(gal_video, NULL);
+	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, attotime_never);
+
 }
