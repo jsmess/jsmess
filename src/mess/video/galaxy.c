@@ -48,11 +48,12 @@ emu_timer *gal_video_timer = NULL;
 
 TIMER_CALLBACK( gal_video )
 {	
+	int y,x;
 	if (galaxy_interrupts_enabled==TRUE) {
 		UINT8 *gfx = memory_region(REGION_GFX1);	
 		UINT8 dat = (gal_latch_value & 0x3c) >> 2;
-		if (gal_cnt < 384 * 212) { // display on screen just first 212 lines			
-			if (((gal_cnt+4) % 8)==0) { //fetch code
+		if ((gal_cnt > 96 * 2) && (gal_cnt < 96 * 210)) { // display on screen just first 208 lines			
+			if (((gal_cnt) % 2)==0) { //fetch code
 	  			UINT16 addr = (cpunum_get_reg(0, Z80_I) << 8) |  cpunum_get_reg(0, Z80_R) | ((gal_latch_value & 0x80) ^ 0x80);  		  		
 	  			if (first==0 && (cpunum_get_reg(0, Z80_R) & 0x1f) ==0) {
 		  			// Due to a fact that on real processor latch value is set at
@@ -66,8 +67,17 @@ TIMER_CALLBACK( gal_video )
 					code = gfx[(code & 0x7f) +(dat << 7 )];		
 					first = 0;				
 				}
-			}
-			*BITMAP_ADDR16(tmpbitmap, gal_cnt / 384, gal_cnt % 384) = (code >> ((gal_cnt+4) & 7)) & 1;
+				y = gal_cnt / 96 - 2;
+				x = (gal_cnt % 96)*4;
+				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 0) & 1; x++;
+				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 1) & 1; x++;
+				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 2) & 1; x++;
+				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 3) & 1; x++;
+				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 4) & 1; x++;
+				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 5) & 1; x++;
+				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 6) & 1; x++;
+				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 7) & 1; 
+			}			
 		}	
 		gal_cnt++;		
 	}		

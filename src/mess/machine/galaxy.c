@@ -55,7 +55,7 @@ IRQ_CALLBACK ( galaxy_irq_callback )
 {
 	gal_cnt = 0;
 	galaxy_interrupts_enabled = TRUE;
-	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, ATTOTIME_IN_HZ(6144000));
+	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, ATTOTIME_IN_HZ(6144000 / 4));
 	return 1;
 }
 
