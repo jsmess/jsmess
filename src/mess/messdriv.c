@@ -878,6 +878,7 @@ TESTDRIVER( exeltel )
 	/* Comx World Operations Ltd */
 	DRIVER( comx35p )
 	DRIVER( comx35n )
+TESTDRIVER( comxpl80 )
 
 /****************Games*******************************************************/
 	/* Computer Electronic */
