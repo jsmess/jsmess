@@ -835,7 +835,6 @@ DRIVER_INIT( pccga )
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	pc_rtc_init();
-	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( bondwell )
@@ -847,7 +846,6 @@ DRIVER_INIT( bondwell )
 DRIVER_INIT( pcmda )
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( europc )
