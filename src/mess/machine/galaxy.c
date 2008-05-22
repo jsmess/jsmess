@@ -34,7 +34,9 @@ READ8_HANDLER( galaxy_latch_r )
 }
 WRITE8_HANDLER( galaxy_latch_w )
 {	
-	gal_latch_value = data;	
+	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
+	gal_latch_value = data;		
+	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), val); 
 }
 
 
