@@ -46,9 +46,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START (galaxyp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // ROM A
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // ROM B
-	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ( galaxy_keyboard_r )	
+	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ( galaxy_keyboard_r )
 	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_READWRITE( galaxy_latch_r, galaxy_latch_w )
-	AM_RANGE(0xe000, 0xefff) AM_ROM // ROM C 
+	AM_RANGE(0xe000, 0xefff) AM_ROM // ROM C
 	AM_RANGE(0xf000, 0xffff) AM_ROM // ROM D
 ADDRESS_MAP_END
 
@@ -135,7 +135,7 @@ static INPUT_PORTS_START (galaxy_common)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galaxy )
-	PORT_INCLUDE( galaxy_common )	
+	PORT_INCLUDE( galaxy_common )
 	PORT_START /* port 7 */
 		PORT_CONFNAME(0x01, 0x01, "ROM 2")
 			PORT_CONFSETTING(0x01, "Installed")
@@ -143,7 +143,7 @@ static INPUT_PORTS_START( galaxy )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galaxyp )
-	PORT_INCLUDE( galaxy_common )	
+	PORT_INCLUDE( galaxy_common )
 INPUT_PORTS_END
 
 static const struct AY8910interface galaxy_ay_interface =
@@ -159,7 +159,7 @@ static const struct AY8910interface galaxy_ay_interface =
 static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, XTAL / 2)
-	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)	
+	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( galaxy )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
-	
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -206,7 +206,7 @@ static MACHINE_DRIVER_START( galaxyp )
 
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( galaxy )
-	
+
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
 
@@ -214,7 +214,7 @@ static MACHINE_DRIVER_START( galaxyp )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8910, XTAL/4)
 	MDRV_SOUND_CONFIG(galaxy_ay_interface)
-	MDRV_SOUND_ADD(WAVE, 0)		
+	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
@@ -228,9 +228,9 @@ ROM_END
 
 ROM_START (galaxyp)
 	ROM_REGION (0x10000, REGION_CPU1, ROMREGION_ERASEFF)
-	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358))		
+	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358))
 	ROM_LOAD ("galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1))
-	ROM_LOAD ("galplus.bin", 0xe000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee))	
+	ROM_LOAD ("galplus.bin", 0xe000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee))
 	ROM_REGION(0x0800, REGION_GFX1,0)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
@@ -243,7 +243,7 @@ static void galaxy_common_cassette_getinfo(const mess_device_class *devclass, UI
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
 		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)gtp_cassette_formats; break;	
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)gtp_cassette_formats; break;
 		default:					cassette_device_getinfo(devclass, state, info); break;
 	}
 }
@@ -254,7 +254,7 @@ SYSTEM_CONFIG_START(galaxy)
 	CONFIG_RAM((6+16) * 1024)
 	CONFIG_RAM((6+32) * 1024)
 	CONFIG_RAM((6+48) * 1024)
-	CONFIG_DEVICE(galaxy_common_cassette_getinfo)	
+	CONFIG_DEVICE(galaxy_common_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(galaxyp)

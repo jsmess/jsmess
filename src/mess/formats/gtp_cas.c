@@ -1,8 +1,8 @@
 /*
-	
-	Tape support for Glaksija GTP format
-		
-	Miodrag Milanovic
+
+    Tape support for Glaksija GTP format
+
+    Miodrag Milanovic
 */
 #include "driver.h"
 #include "formats/gtp_cas.h"
@@ -13,10 +13,9 @@
 #define WAVE_HIGH		0x5a9e
 #define WAVE_NULL		0
 
-
-#define 	GTP_BLOCK_STANDARD	0x00
-#define		GTP_BLOCK_TURBO		0x01
-#define		GTP_BLOCK_NAME		0x10
+#define	GTP_BLOCK_STANDARD	0x00
+#define	GTP_BLOCK_TURBO		0x01
+#define	GTP_BLOCK_NAME		0x10
 
 static INT16	wave_data;
 static INT16  	len;
@@ -57,7 +56,7 @@ static int gtp_mod_1( INT16 **buffer )
 	gtp_output_wave(buffer,PULSE_WIDTH);
 	wave_data = WAVE_NULL;
 	gtp_output_wave(buffer,PERIOD_1 - 2 * PULSE_WIDTH);
-	
+
 	return PERIOD_1 * 2;
 }
 
@@ -69,7 +68,7 @@ static int gtp_mod_0( INT16 **buffer )
 	gtp_output_wave(buffer,PULSE_WIDTH);
 	wave_data = WAVE_NULL;
 	gtp_output_wave(buffer,PERIOD_0 - 2 * PULSE_WIDTH);
-	
+
 	return PERIOD_0;
 }
 
@@ -78,12 +77,12 @@ static int gtp_byte( INT16 **buffer, UINT8 val )
 	UINT8 b;
 	int j,size = 0;
 	for (j=0;j<8;j++) {
-		b = (val >> j) & 1;			
-		if (b==0) {				
+		b = (val >> j) & 1;
+		if (b==0) {
 			size += gtp_mod_0(buffer);
-		} else {				
+		} else {
 			size += gtp_mod_1(buffer);
-		}				
+		}
 	}
 	return size;
 }
@@ -97,42 +96,42 @@ static int gtp_sync( INT16 **buffer )
 		if (i!=0) {
 			// Interbyte pause
 			wave_data = WAVE_NULL;
-			gtp_output_wave(buffer,INTERBYTE_PAUSE);			
+			gtp_output_wave(buffer,INTERBYTE_PAUSE);
 			size += INTERBYTE_PAUSE;
 		}
 		size += gtp_byte(buffer,0);
 	}
-	return size;	
+	return size;
 }
 
 static int gtp_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
-	int size,n;	
-	size = 0;	
+	int size,n;
+	size = 0;
 	n = 0;
 	if (casdata == NULL) return -1;
-	while(n<caslen) {				
+	while(n<caslen) {
 		int block_type = casdata[n];
 		int block_size = casdata[n+2]*256 + casdata[n+1];
 		n+=5;
 		if (block_type==GTP_BLOCK_STANDARD) {
 			// Interblock pause
-			size += INTERBLOCK_PAUSE;		
-			size += 100 * (PERIOD_0 * 8 + INTERBYTE_PAUSE) - INTERBYTE_PAUSE;		
+			size += INTERBLOCK_PAUSE;
+			size += 100 * (PERIOD_0 * 8 + INTERBYTE_PAUSE) - INTERBYTE_PAUSE;
 			size += (PERIOD_0 * 8 + INTERBYTE_PAUSE) * block_size;
 		}
 		n += block_size;
-	} 			
-	len = caslen;		
+	}
+	len = caslen;
 	return size;
 }
 
 static int gtp_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
-	int i,size,n;	
-	size = 0;	
+	int i,size,n;
+	size = 0;
 	n = 0;
 	if (bytes == NULL) return -1;
-	while(n<len) 
-	{			
+	while(n<len)
+	{
 		int block_type = bytes[n];
 		int block_size = bytes[n+2]*256 + bytes[n+1];
 		n+=5;
@@ -141,20 +140,20 @@ static int gtp_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 			// Interblock pause
 			wave_data = WAVE_NULL;
 			gtp_output_wave(&buffer,INTERBLOCK_PAUSE);
-			size += INTERBLOCK_PAUSE;		
+			size += INTERBLOCK_PAUSE;
 			size += gtp_sync(&buffer);
-			
+
 			for (i=0;i<block_size;i++) {
 				// Interbyte pause
 				wave_data = WAVE_NULL;
-				gtp_output_wave(&buffer,INTERBYTE_PAUSE);			
+				gtp_output_wave(&buffer,INTERBYTE_PAUSE);
 				size += INTERBYTE_PAUSE;
-				
+
 				size += gtp_byte(&buffer,bytes[n]);
 				n++;
-			}			
+			}
 		}
-	} 				
+	}
 	return size;
 }
 
