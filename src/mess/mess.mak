@@ -1003,6 +1003,7 @@ $(MESSOBJ)/galaxy.a:   \
 	$(MESS_VIDEO)/galaxy.o   \
 	$(MESS_DRIVERS)/galaxy.o	\
 	$(MESS_MACHINE)/galaxy.o   \
+	$(MESS_FORMATS)/gtp_cas.o	\
 
 $(MESSOBJ)/lviv.a:   \
 	$(MESS_VIDEO)/lviv.o   \

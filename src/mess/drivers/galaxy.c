@@ -27,6 +27,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
+#include "formats/gtp_cas.h"
 
 static ADDRESS_MAP_START (galaxyp_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
@@ -168,7 +169,7 @@ static MACHINE_DRIVER_START( galaxy )
 	/* video hardware */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 212)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 212-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MDRV_GFXDECODE( galaxy )
 	MDRV_PALETTE_LENGTH(sizeof (galaxy_palette) / 3)
 	MDRV_PALETTE_INIT( galaxy )
@@ -242,7 +243,7 @@ static void galaxy_common_cassette_getinfo(const mess_device_class *devclass, UI
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
 		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)gtp_cassette_formats; break;	
 		default:					cassette_device_getinfo(devclass, state, info); break;
 	}
 }

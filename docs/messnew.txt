@@ -3,7 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - OSCOM Nano  [Curt Coder, HobbyLabs]
-
+- Galaksija Plus [Miodrag Milanovic]
 
 
 System Driver Changes:
@@ -20,6 +20,10 @@ System Driver Changes:
 - [C64] Joystick fix. (bug #1150) [Roberto Zandonà]
 
 - [COMX35] System is now working.  [Curt Coder, Marcel van Tongeren]
+
+- [GALAXY] Added real video emulation [Miodrag Milanovic]
+
+- [GALAXY] GTP file support [Miodrag Milanovic]
 
 - [GAMEBOY] Added .bin extension.  [Fabio Priuli]
 
