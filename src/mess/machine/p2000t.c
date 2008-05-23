@@ -42,17 +42,20 @@ static struct
 
 READ8_HANDLER (	p2000t_port_000f_r )
 {
+	char port[6];
+
 	if (p2000t_ports.port_101f & P2000M_101F_KEYINT)
 	{
-		return (input_port_read_indexed(machine, 0) & input_port_read_indexed(machine, 1) &
-		input_port_read_indexed(machine, 2) & input_port_read_indexed(machine, 3) &
-		input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) &
-		input_port_read_indexed(machine, 6) & input_port_read_indexed(machine, 7) &
-		input_port_read_indexed(machine, 8) & input_port_read_indexed(machine, 9));
+		return (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") &
+		input_port_read(machine, "KEY2") & input_port_read(machine, "KEY3") &
+		input_port_read(machine, "KEY4") & input_port_read(machine, "KEY5") &
+		input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7") &
+		input_port_read(machine, "KEY8") & input_port_read(machine, "KEY9"));
 	}
 	else if (offset < 10)
 	{
-		return (input_port_read_indexed(machine, offset));
+		sprintf(port, "KEY%d", offset);
+		return (input_port_read(machine, port));
 	}
 	return (0xff);
 }
