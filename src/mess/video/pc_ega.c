@@ -4,7 +4,89 @@
 
 TODO - Write documentation
 
-The EGA graphics card introduced a lot of new indexed registers to handle the
+"Regular" register on an EGA graphics card:
+
+	3C2 - 7 6 5 4 3 2 1 0 - Misc Output Register - Write Only
+	      | | | | | | | |
+	      | | | | | | | +-- 3Bx/3Dx I/O port select
+	      | | | | | | |     0 = 3Bx for CRTC I/O, 3BA for status reg 1
+	      | | | | | | |     1 = 3Dx for CRTC I/O, 3DA for status reg 1
+	      | | | | | | +---- enable ram
+	      | | | | | |       0 = disable ram from the processor
+	      | | | | | |       1 = enable ram to respond to addresses
+	      | | | | | |           designated by the Control Data Select
+	      | | | | | |           value in the Graphics Controllers.
+	      | | | | | +------ clock select bit 0
+	      | | | | +-------- clock select bit 1
+	      | | | |           00 = 14Mhz from Processor I/O channel
+	      | | | |           01 = 16MHz on-bord clock
+	      | | | |           10 = External clock from feature connector
+	      | | | |           11 = reserved/unused
+	      | | | +---------- disable video drivers
+	      | | |             0 = activate internal video drivers
+	      | | |             1 = disable internal video drivers
+	      | | +------------ page bit for odd/even. Selects between 2 pages
+	      | |               of 64KB of memory when in odd/even mode.
+	      | |               0 = select low page
+	      | |               1 = select high page
+	      | +-------------- horizontal retrace polarity
+	      |                 0 = select positive
+	      |                 1 = select negative
+	      +---------------- vertical retrace polarity
+	                        0 = select positive
+	                        1 = select negative
+
+
+	3C2 - 7 6 5 4 3 2 1 0 - Input Status Reg 0 - Read Only
+	      | | | | | | | |
+	      | | | | | | | +-- reserved/unused
+	      | | | | | | +---- reserved/unused
+	      | | | | | +------ reserved/unused
+	      | | | | +-------- reserved/unused
+	      | | | +---------- switch sense
+	      | | |             0 = switch is closed
+	      | | |             1 = allows processor to read the 4 config switches
+	      | | |                 on the EGA adapter. The setting of CLKSEL determines
+	      | | |                 switch to read.
+	      | | +------------ input from FEAT0 on the feature connector
+	      | +-------------- input from FEAT1 on the feature connector
+	      +---------------- CRT Interrupt
+	                        0 = vertical retrace if occuring
+	                        1 = video is being displayed
+
+
+	3XA - 7 6 5 4 3 2 1 0 - Feature Control Register - Write Only
+	      | | | | | | | |
+	      | | | | | | | +-- output to FEAT0 of the feature connector
+	      | | | | | | +---- output to FEAT1 of the feature connector
+	      | | | | | +------ reserved/unused
+	      | | | | +-------- reserved/unused
+	      | | | +---------- reserved/unused
+	      | | +------------ reserved/unused
+	      | +-------------- reserved/unused
+	      +---------------- reserved/unused
+
+	3XA - 7 6 5 4 3 2 1 0 - Input Status Reg 1 - Read Only
+	      | | | | | | | |
+	      | | | | | | | +-- display enable
+	      | | | | | | |     0 = indicates the CRT raster is in a horizontal or vertical retrace
+	      | | | | | | |     1 = otherwise
+	      | | | | | | +---- light pen strobe
+	      | | | | | |       0 = light pen trigger has not been set
+	      | | | | | |       1 = light pen trigger has been set
+	      | | | | | +------ light pen switch
+	      | | | | |         0 = switch is closed
+	      | | | | |         1 = switch is open
+	      | | | | +-------- vertical retrace
+	      | | | |           0 = video information is being displayed
+	      | | | |           1 = CRT is in vertical retrace
+	      | | | +---------- diagnostic usage
+	      | | +------------ diagnostic usage
+	      | +-------------- reserved/unused
+	      +---------------- reserved/unused
+
+
+The EGA graphics card introduces a lot of new indexed registers to handle the
 enhanced graphics. These new indexed registers can be divided into three
 groups:
 - attribute registers
@@ -15,19 +97,19 @@ groups:
 Attribute Registers AR00 - AR13
 
 The Attribute Registers are all accessed through I/O port 0x3C0. The first
-write to I/O port 0x3C0 sets an auto-incrementing index register. Further
-writes to I/O port 0x3C0 actually set the data to the indexed register.
+write to I/O port 0x3C0 sets the index register. The next write to I/O port
+0x3C0 actually sets the data to the indexed register.
 
 	3C0 - 7 6 5 4 3 2 1 0 - Attribute Access Register
 	      | | | | | | | |
-	      | | | | | | | +--
-	      | | | | | | +----
-	      | | | | | +------
-	      | | | | +--------
-	      | | | +----------
-	      | | +------------
-	      | +--------------
-	      +----------------
+	      | | | | | | | +-- index bit 0
+	      | | | | | | +---- index bit 1
+	      | | | | | +------ index bit 2
+	      | | | | +-------- index bit 3
+	      | | | +---------- index bit 4
+	      | | +------------ palette source
+	      | +-------------- reserved/unused
+	      +---------------- reserved/unused
 
 
 	AR00-AR0F - 7 6 5 4 3 2 1 0 - Palette Register #00 - #0F
@@ -335,11 +417,16 @@ static struct
 	const device_config	*mc6845;
 	mc6845_update_row_func	update_row;
 
+	/* Registers */
+	UINT8	misc_output;
+	UINT8	feature_control;
+
 	/* Attribute registers AR00 - AR14 
 	*/
 	struct {
 		UINT8	index;
 		UINT8	data[32];
+		UINT8	index_write;
 	} attribute;
 
 	/* Sequencer registers SR00 - SR04
@@ -368,18 +455,24 @@ static PALETTE_INIT( pc_ega );
 static MC6845_UPDATE_ROW( ega_update_row );
 static MC6845_ON_HSYNC_CHANGED( ega_hsync_changed );
 static MC6845_ON_VSYNC_CHANGED( ega_vsync_changed );
-static READ8_HANDLER( pc_ega8_3d0_r );
-static WRITE8_HANDLER( pc_ega8_3d0_w );
-static READ16_HANDLER( pc_ega16le_3d0_r );
-static WRITE16_HANDLER( pc_ega16le_3d0_w );
-static READ32_HANDLER( pc_ega32le_3d0_r );
-static WRITE32_HANDLER( pc_ega32le_3d0_w );
+static READ8_HANDLER( pc_ega8_3b0_r );
+static WRITE8_HANDLER( pc_ega8_3b0_w );
+static READ16_HANDLER( pc_ega16le_3b0_r );
+static WRITE16_HANDLER( pc_ega16le_3b0_w );
+static READ32_HANDLER( pc_ega32le_3b0_r );
+static WRITE32_HANDLER( pc_ega32le_3b0_w );
 static READ8_HANDLER( pc_ega8_3c0_r );
 static WRITE8_HANDLER( pc_ega8_3c0_w );
 static READ16_HANDLER( pc_ega16le_3c0_r );
 static WRITE16_HANDLER( pc_ega16le_3c0_w );
 static READ32_HANDLER( pc_ega32le_3c0_r );
 static WRITE32_HANDLER( pc_ega32le_3c0_w );
+static READ8_HANDLER( pc_ega8_3d0_r );
+static WRITE8_HANDLER( pc_ega8_3d0_w );
+static READ16_HANDLER( pc_ega16le_3d0_r );
+static WRITE16_HANDLER( pc_ega16le_3d0_w );
+static READ32_HANDLER( pc_ega32le_3d0_r );
+static WRITE32_HANDLER( pc_ega32le_3d0_w );
 
 
 static const mc6845_interface mc6845_ega_intf =
@@ -437,28 +530,34 @@ static VIDEO_START( pc_ega )
 		case 8:
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK11 );
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram_w );
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_r );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_w );
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_r );
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_w );
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega8_3c0_r );
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega8_3c0_w );
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_r );
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_w );
 			break;
 
 		case 16:
 			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK11 );
 			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram16le_w );
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_r );
-			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_w );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_r );
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_w );
 			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega16le_3c0_r );
 			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega16le_3c0_w );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_r );
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_w );
 			break;
 
 		case 32:
 			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK11 );
 			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram32_w );
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_r );
-			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_w );
+			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_r );
+			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_w );
 			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega32le_3c0_r );
 			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega32le_3c0_w );
+			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_r );
+			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_w );
 			break;
 
 		default:
@@ -475,6 +574,8 @@ static VIDEO_START( pc_ega )
 
 	ega.mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, EGA_MC6845_NAME);
 	ega.update_row = NULL;
+	ega.misc_output = 0;
+	ega.attribute.index_write = 1;
 
 	/* Set up default palette */
 	ega.attribute.data[0] = 0;
@@ -528,13 +629,13 @@ static MC6845_ON_VSYNC_CHANGED( ega_vsync_changed )
 }
 
 
-static READ8_HANDLER( pc_ega8_3d0_r )
+static READ8_HANDLER( pc_ega8_3X0_r )
 {
 	int data = 0xff;
 
 	if ( VERBOSE_EGA )
 	{
-		logerror("pc_ega_3b0_r: offset = %02x\n", offset );
+		logerror("pc_ega_3X0_r: offset = %02x\n", offset );
 	}
 
 	switch ( offset )
@@ -549,9 +650,12 @@ static READ8_HANDLER( pc_ega8_3d0_r )
 		data = mc6845_register_r( ega.mc6845, offset );
 		break;
 
-	/* Display status */
+	/* Input Status Register 1 */
 	case 10:
 		data = ega.vsync | ega.hsync;
+
+		/* Reset the attirubte writing flip flop to let the next write go to the index reigster */
+		ega.attribute.index_write = 1;
 		break;
 	}
 
@@ -559,11 +663,11 @@ static READ8_HANDLER( pc_ega8_3d0_r )
 }
 
 
-static WRITE8_HANDLER( pc_ega8_3d0_w )
+static WRITE8_HANDLER( pc_ega8_3X0_w )
 {
 	if ( VERBOSE_EGA )
 	{
-		logerror("pc_ega_3b0_w: offset = %02x, data = %02x\n", offset, data );
+		logerror("pc_ega_3X0_w: offset = %02x, data = %02x\n", offset, data );
 	}
 
 	switch ( offset )
@@ -584,11 +688,42 @@ static WRITE8_HANDLER( pc_ega8_3d0_w )
 
 	/* Feature Control */
 	case 10:
+		ega.feature_control = data;
 		break;
 
 	/* Clear Light Pen Flip Flop */
 	case 11:
 		break;
+	}
+}
+
+
+static READ8_HANDLER( pc_ega8_3b0_r )
+{
+	return ( ega.misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r( machine, offset );
+}
+
+
+static READ8_HANDLER( pc_ega8_3d0_r )
+{
+	return ( ega.misc_output & 0x01 ) ? pc_ega8_3X0_r( machine, offset ) : 0xFF;
+}
+
+
+static WRITE8_HANDLER( pc_ega8_3b0_w )
+{
+	if ( ! ( ega.misc_output & 0x01 ) )
+	{
+		pc_ega8_3X0_w( machine, offset, data );
+	}
+}
+
+
+static WRITE8_HANDLER( pc_ega8_3d0_w )
+{
+	if ( ega.misc_output & 0x01 )
+	{
+		pc_ega8_3X0_w( machine, offset, data );
 	}
 }
 
@@ -606,33 +741,25 @@ static READ8_HANDLER( pc_ega8_3c0_r )
 	{
 	/* Attributes Controller */
 	case 0:
-		data = ega.attribute.index;
-		break;
-	case 1:
-		if ( ( ega.attribute.index & 0x30 ) != 0x20 )
-		{
-			data = ega.attribute.data[ ega.attribute.index & 0x1F ];
-		}
 		break;
 
 	/* Feature Read */
 	case 2:
+		data = ( data & 0x0F );
+		data |= ( ( ega.feature_control & 0x03 ) << 5 );
+		data |= ( ega.vsync ? 0x00 : 0x80 );
 		break;
 
 	/* Sequencer */
 	case 4:
-		data = ega.sequencer.index;
 		break;
 	case 5:
-		data = ega.sequencer.data[ ega.sequencer.index & 0x07 ];
 		break;
 
 	/* Graphics Controller */
 	case 14:
-		data = ega.graphics_controller.index;
 		break;
 	case 15:
-		data = ega.graphics_controller.data[ ega.graphics_controller.index & 0x0F];
 		break;
 	}
 	return data;
@@ -650,18 +777,20 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 	{
 	/* Attributes Controller */
 	case 0:
-		ega.attribute.index = data;
-		break;
-	case 1:
-		if ( ( ega.attribute.index & 0x30 ) != 0x20 )
+		if ( ega.attribute.index_write )
 		{
-//logerror("AR%02x = 0x%02x\n", ega.attribute.index & 0x1F, data );
+			ega.attribute.index = data;
+		}
+		else
+		{
 			ega.attribute.data[ ega.attribute.index & 0x1F ] = data;
 		}
+		ega.attribute.index_write ^= 0x01;
 		break;
 
 	/* Misccellaneous Output */
 	case 2:
+		ega.misc_output = data;
 		break;
 
 	/* Sequencer */
@@ -684,13 +813,18 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 	}
 }
 
-static READ16_HANDLER( pc_ega16le_3d0_r ) { return read16le_with_read8_handler(pc_ega8_3d0_r,machine,  offset, mem_mask); }
-static WRITE16_HANDLER( pc_ega16le_3d0_w ) { write16le_with_write8_handler(pc_ega8_3d0_w, machine, offset, data, mem_mask); }
-static READ32_HANDLER( pc_ega32le_3d0_r ) { return read32le_with_read8_handler(pc_ega8_3d0_r, machine, offset, mem_mask); }
-static WRITE32_HANDLER( pc_ega32le_3d0_w ) { write32le_with_write8_handler(pc_ega8_3d0_w, machine, offset, data, mem_mask); }
+static READ16_HANDLER( pc_ega16le_3b0_r ) { return read16le_with_read8_handler(pc_ega8_3b0_r,machine,  offset, mem_mask); }
+static WRITE16_HANDLER( pc_ega16le_3b0_w ) { write16le_with_write8_handler(pc_ega8_3b0_w, machine, offset, data, mem_mask); }
+static READ32_HANDLER( pc_ega32le_3b0_r ) { return read32le_with_read8_handler(pc_ega8_3b0_r, machine, offset, mem_mask); }
+static WRITE32_HANDLER( pc_ega32le_3b0_w ) { write32le_with_write8_handler(pc_ega8_3b0_w, machine, offset, data, mem_mask); }
 
 static READ16_HANDLER( pc_ega16le_3c0_r ) { return read16le_with_read8_handler(pc_ega8_3c0_r,machine,  offset, mem_mask); }
 static WRITE16_HANDLER( pc_ega16le_3c0_w ) { write16le_with_write8_handler(pc_ega8_3c0_w, machine, offset, data, mem_mask); }
 static READ32_HANDLER( pc_ega32le_3c0_r ) { return read32le_with_read8_handler(pc_ega8_3c0_r, machine, offset, mem_mask); }
 static WRITE32_HANDLER( pc_ega32le_3c0_w ) { write32le_with_write8_handler(pc_ega8_3c0_w, machine, offset, data, mem_mask); }
+
+static READ16_HANDLER( pc_ega16le_3d0_r ) { return read16le_with_read8_handler(pc_ega8_3d0_r,machine,  offset, mem_mask); }
+static WRITE16_HANDLER( pc_ega16le_3d0_w ) { write16le_with_write8_handler(pc_ega8_3d0_w, machine, offset, data, mem_mask); }
+static READ32_HANDLER( pc_ega32le_3d0_r ) { return read32le_with_read8_handler(pc_ega8_3d0_r, machine, offset, mem_mask); }
+static WRITE32_HANDLER( pc_ega32le_3d0_w ) { write32le_with_write8_handler(pc_ega8_3d0_w, machine, offset, data, mem_mask); }
 
