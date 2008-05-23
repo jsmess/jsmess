@@ -396,7 +396,7 @@ DRIVER_INIT( atega )
 	{
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
-	UINT8	*dst = memory_region( REGION_CPU1 ) + 0xc8000;
+	UINT8	*dst = memory_region( REGION_CPU1 ) + 0xc0000;
 	UINT8	*src = memory_region( REGION_USER1 ) + 0x3fff;
 	int		i;
 
