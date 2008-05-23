@@ -152,6 +152,8 @@ static int gtp_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 				size += gtp_byte(&buffer,bytes[n]);
 				n++;
 			}
+		} else {
+			n += block_size;
 		}
 	}
 	return size;
