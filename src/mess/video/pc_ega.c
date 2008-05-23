@@ -3,7 +3,320 @@
   Enhanced Graphics Adapter (EGA) section
 
 TODO - Write documentation
-     - Get proper clock setting
+
+The EGA graphics card introduced a lot of new indexed registers to handle the
+enhanced graphics. These new indexed registers can be divided into three
+groups:
+- attribute registers
+- sequencer registers
+- graphics controllers registers
+
+
+Attribute Registers AR00 - AR13
+
+The Attribute Registers are all accessed through I/O port 0x3C0. The first
+write to I/O port 0x3C0 sets an auto-incrementing index register. Further
+writes to I/O port 0x3C0 actually set the data to the indexed register.
+
+	3C0 - 7 6 5 4 3 2 1 0 - Attribute Access Register
+	      | | | | | | | |
+	      | | | | | | | +--
+	      | | | | | | +----
+	      | | | | | +------
+	      | | | | +--------
+	      | | | +----------
+	      | | +------------
+	      | +--------------
+	      +----------------
+
+
+	AR00-AR0F - 7 6 5 4 3 2 1 0 - Palette Register #00 - #0F
+	            | | | | | | | |
+	            | | | | | | | +-- MSB B
+	            | | | | | | +---- MSB G
+	            | | | | | +------ MSB R
+	            | | | | +-------- LSB B
+	            | | | +---------- LSB G
+	            | | +------------ LSB R
+	            | +-------------- reserved/unused
+	            +---------------- reserved/unused
+
+
+	AR10 - 7 6 5 4 3 2 1 0 - Mode Control Register
+	       | | | | | | | |
+	       | | | | | | | +-- Text/Graphics select
+	       | | | | | | +---- Monochrome/Color select
+	       | | | | | +------ 9th dot setting
+	       | | | | +-------- Blink Enable
+	       | | | +---------- reserved/unsued
+	       | | +------------ 0 = line compare does not affect pixel output
+	       | |               1 = line compare does affect pixel output
+	       | +-------------- 0 = pixel changes every dot clock
+	       |                 1 = pixel changes every other dot clock
+	       +---------------- reserved/unused
+
+
+	AR11 - 7 6 5 4 3 2 1 0 - Overscan Color Register
+	       | | | | | | | |
+	       | | | | | | | +-- MSB B
+	       | | | | | | +---- MSB G
+	       | | | | | +------ MSB R
+	       | | | | +-------- LSB B
+	       | | | +---------- LSB G
+	       | | +------------ LSB R
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	AR12 - 7 6 5 4 3 2 1 0 - Color Plane Enable Register
+	       | | | | | | | |
+	       | | | | | | | +-- Enable plane 0
+	       | | | | | | +---- Enable plane 1
+	       | | | | | +------ Enable plane 2
+	       | | | | +-------- Enable plane 3
+	       | | | +---------- Video Status Mux bit 0
+	       | | +------------ Video Status Mux bit 1
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	AR13 - 7 6 5 4 3 2 1 0 - Horizontal Panning Register
+	       | | | | | | | |
+	       | | | | | | | +-- Pixel left shift bit 0
+	       | | | | | | +---- Pixel left shift bit 1
+	       | | | | | +------ Pixel left shift bit 2
+	       | | | | +-------- Pixel left shift bit 3
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+Sequencer Registers SR00 - SR04
+
+The Sequencer Registers are accessed through an index register located at I/O
+port 0x3C4, and a data register located at I/O port 0x3C5.
+
+	3C4 - 7 6 5 4 3 2 1 0 - Sequencer Index Register - Write Only
+	      | | | | | | | |
+          | | | | | | | +-- index bit 0
+	      | | | | | | +---- index bit 1
+	      | | | | | +------ index bit 2
+	      | | | | +-------- reserved/unused
+	      | | | +---------- reserved/unused
+	      | | +------------ reserved/unused
+	      | +-------------- reserved/unused
+	      +---------------- reserved/unused
+
+
+	3C5 - 7 6 5 4 3 2 1 0 - Sequencer Data Register - Write Only
+	      | | | | | | | |
+          | | | | | | | +-- data bit 0
+	      | | | | | | +---- data bit 1
+	      | | | | | +------ data bit 2
+	      | | | | +-------- data bit 3
+	      | | | +---------- data bit 4
+	      | | +------------ data bit 5
+	      | +-------------- data bit 6
+	      +---------------- data bit 7
+
+
+	SR00 - 7 6 5 4 3 2 1 0 - Reset Control Register
+	       | | | | | | | |
+	       | | | | | | | +-- Must be 1 for normal operation
+	       | | | | | | +---- Must be 1 for normal operation
+	       | | | | | +------ reserved/unused
+	       | | | | +-------- reserved/unused
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	SR01 - 7 6 5 4 3 2 1 0 - Clocking Mode
+	       | | | | | | | |
+	       | | | | | | | +-- 0 = 9 dots per char, 1 = 8 dots per char
+	       | | | | | | +---- clock frequency, 0 = 4 out of 5 memory cycles, 1 = 2 out of 5 memory cycles
+	       | | | | | +------ shift load
+	       | | | | +-------- 0 = normal dot clock, 1 = master dot clock / 2
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	SR02 - 7 6 5 4 3 2 1 0 - Map Mask
+	       | | | | | | | |
+	       | | | | | | | +-- 1 = enable map 0
+	       | | | | | | +---- 1 = enable map 1
+	       | | | | | +------ 1 = enable map 2
+	       | | | | +-------- 1 = enable map 3
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	SR03 - 7 6 5 4 3 2 1 0 - Character Map Select
+	       | | | | | | | |
+	       | | | | | | | +-- select plane for character map B
+	       | | | | | | +---- select plane for character map B
+	       | | | | | +------ select plane for character map A
+	       | | | | +-------- select plane for character map A
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+	     Meaning of the plane selection bits:
+	     00 - 1st 8K plane 2 bank 0
+	     01 - 1st 8K plane 2 bank 1
+	     10 - 1st 8K plane 2 bank 2
+	     11 - 1st 8K plane 2 bank 3
+
+
+	SR04 - 7 6 5 4 3 2 1 0 - Memory Mode Register
+	       | | | | | | | |
+	       | | | | | | | +-- 0 = graphics mode, 1 = text mode
+	       | | | | | | +---- 0 = no memory extension, 1 = memory extension
+	       | | | | | +------ 0 = odd/even storage, 1 = sequential storage
+	       | | | | +-------- reserved/unused
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+Graphics Controller Registers GR00 - GR08
+
+The Graphics Controller Registers are accessed through an index register
+located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
+
+	GR00 - 7 6 5 4 3 2 1 0 - Set/Reset Register
+	       | | | | | | | |
+	       | | | | | | | +-- set/reset for plane 0
+	       | | | | | | +---- set/reset for plane 1
+	       | | | | | +------ set/reset for plane 2
+	       | | | | +-------- set/reset for plane 3
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	GR01 - 7 6 5 4 3 2 1 0 - Enable Set/Reset Register
+	       | | | | | | | |
+	       | | | | | | | +-- enable set/reset for plane 0
+	       | | | | | | +---- enable set/reset for plane 1
+	       | | | | | +------ enable set/reset for plane 2
+	       | | | | +-------- enable set/reset for plane 3
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	GR02 - 7 6 5 4 3 2 1 0 - Color Compare Register
+	       | | | | | | | |
+	       | | | | | | | +-- color compare 0
+	       | | | | | | +---- color compare 1
+	       | | | | | +------ color compare 2
+	       | | | | +-------- color compare 3
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	GR03 - 7 6 5 4 3 2 1 0 - Data Rotate Register
+	       | | | | | | | |
+	       | | | | | | | +-- number of positions to rotate bit 0
+	       | | | | | | +---- number of positions to rotate bit 1
+	       | | | | | +------ number of positions to rotate bit 2
+	       | | | | +-------- function select bit 0
+	       | | | +---------- function select bit 1
+	       | | |             00 = data overwrites in specified color
+	       | | |             01 = data ANDed with latched data
+	       | | |             10 = data ORed with latched data
+	       | | |             11 = data XORed with latched data
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	GR04 - 7 6 5 4 3 2 1 0 - Read Map Select Register
+	       | | | | | | | |
+	       | | | | | | | +-- plane select bit 0
+	       | | | | | | +---- plane select bit 1
+	       | | | | | +------ plane select bit 2
+	       | | | | +-------- reserved/unused
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	GR05 - 7 6 5 4 3 2 1 0 - Mode Register
+	       | | | | | | | |
+	       | | | | | | | +-- write mode bit 0
+	       | | | | | | +---- write mode bit 1
+	       | | | | | |       00 = write 8 bits of value in set/reset register if enabled,
+	       | | | | | |            otherwise write rotated processor data
+	       | | | | | |       01 = write with contents of processor latches
+	       | | | | | |       10 = memory plane 0-3 filled with 8 bits of value of data bit 0-3
+	       | | | | | |       11 = reserved/unused
+	       | | | | | +------ test condition
+	       | | | | |         0 = normal operation
+	       | | | | |         1 = put outputs in high impedance state
+	       | | | | +-------- read mode
+	       | | | |           0 = read from plane selected by GR04
+	       | | | |           1 = do color compare
+	       | | | +---------- odd/even addressing mode
+	       | | +------------ shift register mode
+	       | |               0 = sequential
+	       | |               1 = even bits from even maps, odd bits from odd maps
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	GR06 - 7 6 5 4 3 2 1 0 - Miscellaneous Register
+	       | | | | | | | |
+	       | | | | | | | +-- 0 = text mode, 1 = graphics mode
+	       | | | | | | +---- chain odd maps to even
+	       | | | | | +------ memory map bit 0
+	       | | | | +-------- memory map bit 1
+	       | | | |           00 = 0xA0000, 128KB
+	       | | | |           01 = 0xA0000, 64KB
+	       | | | |           10 = 0xB0000, 32KB
+	       | | | |           11 = 0xB8000, 32KB
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	GR07 - 7 6 5 4 3 2 1 0 - Color Plane Ignore Register
+	       | | | | | | | |
+	       | | | | | | | +-- ignore color plane 0
+	       | | | | | | +---- ignore color plane 1
+	       | | | | | +------ ignore color plane 2
+	       | | | | +-------- ignore color plane 3
+	       | | | +---------- reserved/unused
+	       | | +------------ reserved/unused
+	       | +-------------- reserved/unused
+	       +---------------- reserved/unused
+
+
+	GR08 - 7 6 5 4 3 2 1 0 - Bit Mask Register
+	       | | | | | | | |
+	       | | | | | | | +-- write enable bit 0
+	       | | | | | | +---- write enable bit 1
+	       | | | | | +------ write enable bit 2
+	       | | | | +-------- write enable bit 3
+	       | | | +---------- write enable bit 4
+	       | | +------------ write enable bit 5
+	       | +-------------- write enable bit 6
+	       +---------------- write enable bit 7
+
 
 ***************************************************************************/
 
@@ -30,67 +343,6 @@ static struct
 	} attribute;
 
 	/* Sequencer registers SR00 - SR04
-
-	  SR00 - 7 6 5 4 3 2 1 0 - Reset Control Register
-	         | | | | | | | |
-	         | | | | | | | +-- Must be 1 for normal operation
-	         | | | | | | +---- Must be 1 for normal operation
-	         | | | | | +------ reserved/unused
-	         | | | | +-------- reserved/unused
-	         | | | +---------- reserved/unused
-	         | | +------------ reserved/unused
-	         | +-------------- reserved/unused
-	         +---------------- reserved/unused
-
-	  SR01 - 7 6 5 4 3 2 1 0 - Clocking Mode
-	         | | | | | | | |
-	         | | | | | | | +-- 0 = 9 dots per char, 1 = 8 dots per char
-	         | | | | | | +---- clock frequency, 0 = 4 out of 5 memory cycles, 1 = 2 out of 5 memory cycles
-	         | | | | | +------ shift load
-	         | | | | +-------- 0 = normal dot clock, 1 = master dot clock / 2
-	         | | | +---------- reserved/unused
-	         | | +------------ reserved/unused
-	         | +-------------- reserved/unused
-	         +---------------- reserved/unused
-
-	  SR02 - 7 6 5 4 3 2 1 0 - Map Mask
-	         | | | | | | | |
-	         | | | | | | | +-- 1 = enable map 0
-	         | | | | | | +---- 1 = enable map 1
-	         | | | | | +------ 1 = enable map 2
-	         | | | | +-------- 1 = enable map 3
-	         | | | +---------- reserved/unused
-	         | | +------------ reserved/unused
-	         | +-------------- reserved/unused
-	         +---------------- reserved/unused
-
-	  SR03 - 7 6 5 4 3 2 1 0 - Character Map Select
-	         | | | | | | | |
-	         | | | | | | | +-- select plane for character map B
-	         | | | | | | +---- select plane for character map B
-	         | | | | | +------ select plane for character map A
-	         | | | | +-------- select plane for character map A
-	         | | | +---------- reserved/unused
-	         | | +------------ reserved/unused
-	         | +-------------- reserved/unused
-	         +---------------- reserved/unused
-	       Meaning of the plane selection bits:
-	       00 - 1st 8K plane 2 bank 0
-	       01 - 1st 8K plane 2 bank 1
-	       10 - 1st 8K plane 2 bank 2
-	       11 - 1st 8K plane 2 bank 3
-
-	  SR04 - 7 6 5 4 3 2 1 0 - Memory Mode Register
-	         | | | | | | | |
-	         | | | | | | | +-- 0 = graphics mode, 1 = text mode
-	         | | | | | | +---- 0 = no memory extension, 1 = memory extension
-	         | | | | | +------ 0 = odd/even storage, 1 = sequential storage
-	         | | | | +-------- reserved/unused
-	         | | | +---------- reserved/unused
-	         | | +------------ reserved/unused
-	         | +-------------- reserved/unused
-	         +---------------- reserved/unused
-
 	*/
 	struct {
 		UINT8	index;
