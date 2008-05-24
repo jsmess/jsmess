@@ -245,14 +245,16 @@ skip_warnings             0
 commands on the <a href="win32cmd.htm" target="_blank">MESS W32 Commands</a> page. The only difference is the 1 or 0 that follows the command. These
 mean yes (1) or no (0) on most commands but check on the setup page as they may refer to a value. The lines starting with # are comments and are
 ignored by MESS.</p>
-<p class="normal">Remember no matter what changes you make you cant mess up MESS, just change the setting back or delete the config file and start
+<p class="normal">Remember no matter what changes you make you can't mess up MESS, just change the setting back or delete the config file and start
 again.</p>
 <p class="normal">&nbsp;</p>
 <hr />
 <h2>Types Of Config Files</h2>
 <p class="normal">There are four types of config types. You have one for vector games called <span class="filename">vector.ini</span> and one for
-specific drivers for games e.g. <span class="filename">cps2.ini</span> or <span class="filename">neogeo.ini</span> You can also create files for
-specific parent rom sets that will be used by all of the clones or you can make config file for specific clones.</p>
+specific drivers for games, e.g. <span class="filename">oric.ini</span> would affect all the systems in oric.c (which are oric1, orica, prav8d, 
+prav8dd and telstrat). You can also create files for specific parent sets that will be used by all of the clones, e.g. <span class="filename">
+oric1.ini</span> would be used also by the clones (i.e. orica, prav8d, prav8dd, telstrat), or you can make config file for specific clones (e.g.  
+<span class="filename">prav8d.ini</span> in the example above).</p>
 <p class="normal">To find out what drivers a game uses you can add the -verbose option to your command line. e.g. <span class="command">MESS a2600
 -verbose</span> and will give you something like the following...</p>
 <table width="52%" border="1" align="center">

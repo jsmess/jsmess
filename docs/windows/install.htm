@@ -20,13 +20,14 @@ you have you may need a tool like <a href="http://www.winzip.com" target="_blank
 <hr />
 <h2>MESS folders and files</h2>
 <p class="normal">When you have uncompressed the ZIP file you should see some folders and a few other files. Here is an example of what MESS version
-0.105 (mess0105b.zip) looks like once it is uncompressed. The latest version should be similar.</p>
+0.105 (mess0105b.zip) looks like once it is uncompressed (actually some of them could appear after you run MESS the first time). The latest version 
+should be similar. However, if any folder is missing, and you need it, you can simply create it and MESS will use it as described below.</p>
 <p class="normal" align="center"><img src="images/tree.gif" alt="tree" border="2" name="Folder" id="Folder" /></p>
 <p class="normal">Below is a brief explanation each folder.</p>
 <table width="58%" border="1">
 <tr>
 <td width="15%" class="tablehead">artwork</td>
-<td width="85%" class="normal">Background artwork files for certain systems.</td>
+<td width="85%" class="normal">Background artwork files for certain systems, e.g. overlays for vectrex games.</td>
 </tr>
 <tr>
 <td width="15%" class="tablehead">cfg</td>
@@ -73,39 +74,43 @@ you have you may need a tool like <a href="http://www.winzip.com" target="_blank
 <td width="85%" class="normal">Contains some programs used to manipulate disk images.</td>
 </tr>
 </table>
+<p class="normal">If you prefer to use different directories for any of the above, you simply have to edit the corresponding
+entry in mess.ini.</p>
 <p class="normal">Below is a brief explanation each file.</p>
 <table width="58%" border="1">
 <tr>
 <td width="15%" class="tablehead">chdman.exe</td>
-<td width="85%" class="normal">DESCRIPTION</td>
+<td width="85%" class="normal">This is a command line utility which allows to create blank Hard Disks in the CHD format 
+supported by MESS, for use with emulated systems which use Hard Disk (e.g. ti99_4a).</td>
 </tr>
 <tr>
 <td width="15%" class="tablehead">imgtool.exe</td>
-<td width="85%" class="normal">DESCRIPTION</td>
+<td width="85%" class="normal">This is a command line utility to handle different file formats supported by MESS.</td>
 </tr>
 <tr>
 <td width="15%" class="tablehead">mess.chm</td>
-<td width="85%" class="normal">DESCRIPTION</td>
+<td width="85%" class="normal">MESS help file, to be opened from the GUI when you click on 'Help'.</td>
 </tr>
 <tr>
 <td width="15%" class="tablehead">mess.exe</td>
-<td width="85%" class="normal">DESCRIPTION</td>
+<td width="85%" class="normal">This is the command line version of the emulator.</td>
 </tr>
 <tr>
 <td width="15%" class="tablehead">messui.exe</td>
-<td width="85%" class="normal">DESCRIPTION</td>
+<td width="85%" class="normal">This is the GUI version of the emulator.</td>
 </tr>
 <tr>
 <td width="15%" class="tablehead">messlib.dll</td>
-<td width="85%" class="normal">DESCRIPTION</td>
+<td width="85%" class="normal">This is the .dll shared by the command line and GUI versions, i.e. the core of the emulator.</td>
 </tr>
 <tr>
 <td width="15%" class="tablehead">sysinfo.dat</td>
-<td width="85%" class="normal">DESCRIPTION</td>
+<td width="85%" class="normal">This is a support file including informations about Features, Usage and History of the emulated 
+systems.</td>
 </tr>
 <tr>
 <td width="15%" class="tablehead">wimgtool.exe</td>
-<td width="85%" class="normal">DESCRIPTION</td>
+<td width="85%" class="normal">This is the GUI version of imgtool.exe</td>
 </tr>
 </table>
 </body>

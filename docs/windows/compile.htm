@@ -71,14 +71,14 @@ other versions of the following files.</p>
 <td><span><b>Description</b></span></td>
 </tr>
 <tr>
-<td><span><a href="http://mamedev.org/tools/mingw-mame-20060210.exe">mingw-mame-20060210.exe</a></span></td>
+<td><span><a href="http://mamedev.org/tools/mingw-mame-20070810.exe">mingw-mame-20070810.exe</a></span></td>
 <td><span>6718 kB</span></td>
 <td><span>MinGW tools for MAME/MESS.</span></td>
 </tr>
 <tr>
 <td><span><a href="http://alleg.sourceforge.net/files/dx80_mgw.zip">dx80_mgw.zip</a></span></td>
 <td><span>451 kB</span></td>
-<td><span>DirectX 8.0 headers, required for <a href="http://www.mess.org/">MESS</a> 0.122. Uncompress this over the MinGW directory.</span></td>
+<td><span>DirectX 8.0 headers, required for <a href="http://www.mess.org/">MESS</a> 0.125. Uncompress this over the MinGW directory.</span></td>
 </tr>
 </table>
 <hr />
@@ -94,10 +94,12 @@ have it open, type <span class="command">cd \Program Files\MinGW</span> &nbsp;an
 once again that you have <span class="filename">unzip.exe</span> in <span class="filename">c:\windows\command\</span></p>
 <hr />
 <h2>5. Set up MinGW</h2>
-<p>Next we will have to set up the environment variables. To make the changes permanent, we will have to edit <span class="filename">AUTOEXEC.BAT</span>, which is a file that always gets run before Windows starts up. Type <span class="command">edit \autoexec.bat</span>
+<p>Next we will have to set up the environment variables. To make the changes permanent, we will have to edit <span class="filename">AUTOEXEC.BAT</span>, 
+which is a file that always gets run before Windows starts up. Type <span class="command">edit \autoexec.bat</span>
 and hit enter. There might be a lot of things in there, so do not touch anything else than what you are told to.</p>
 <p>Find the line which says something like <span class="filename">PATH C:\WIN98;C:\WIN98\COMMAND</span> (there might be some other directories
-defined after these two). Add <span class="command">;C:\MINGW\BIN</span> to the end of that line, so that it will look like <span class="filename">PATH C:\WIN98;C:\WIN98\COMMAND</span><span class="command">;C:\MINGW\BIN</span> (again, there might be something extra in there, leave
+defined after these two). Add <span class="command">;C:\MINGW\BIN</span> to the end of that line, so that it will look like <span class="filename">
+PATH C:\WIN98;C:\WIN98\COMMAND</span><span class="command">;C:\MINGW\BIN</span> (again, there might be something extra in there, leave
 them as they are). Take note that if you have added <span class="filename">C:\DJGPP\BIN</span> into that line, you should remove it. Now you can save
 the file (<span>ALT-F</span> then <span>S</span>) and quit (<span>ALT-F</span> then <span>X</span> ) (These might differ depending on your language
 version of Windows). Then you will need to reboot your computer, to make the changes effective.</p>
@@ -107,7 +109,8 @@ c:\mingw\mingw.bat</span> and write <span class="command">SET PATH=%PATH%;c:\min
 <hr />
 <h2>6. Compile MESS</h2>
 <p>Now you can compile <a href="http://www.mess.org/">MESS</a>. The <a href="http://www.mess.org/">MESS</a> source is distributed as a source
-override on the <a href="http://www.mame.net/">MAME</a> source.&nbsp; Therefore you will need to download both the <a href="http://www.mame.net/">MAME</a> and <a href="http://www.mess.org/">MESS</a> source ZIPs into&nbsp; <span class="filename">c:\download\</span></p>
+override on the <a href="http://www.mamedev.org/">MAME</a> source.&nbsp; Therefore you will need to download both the <a href="http://www.mamedev.org/">MAME</a> 
+and <a href="http://www.mess.org/">MESS</a> source ZIPs into&nbsp; <span class="filename">c:\download\</span></p>
 <table width="100%" border="2" cellspacing="1" cellpadding="5">
 <tr>
 <td><span><b>File&nbsp;name</b></span></td>
@@ -115,26 +118,28 @@ override on the <a href="http://www.mame.net/">MAME</a> source.&nbsp; Therefore 
 <td><span><b>Description</b></span></td>
 </tr>
 <tr>
-<td><a href="http://www.mamedev.org/releases/mame0122s.zip"><b>mame0122s.zip</b></a></td>
+<td><a href="http://www.mamedev.org/releases/mame0125s.zip"><b>mame0125s.zip</b></a></td>
 <td>12136 kB</td>
-<td>This is the source archive of <a href="http://www.mame.net/">MAME</a> 0.122.</td>
+<td>This is the source archive of <a href="http://www.mamedev.org/">MAME</a> 0.125.</td>
 </tr>
 <tr>
-<td><a href="http://www.mess.org/files/mess0122s.zip"><b>mess0122s.zip</b></a></td>
+<td><a href="http://www.mess.org/files/mess0125s.zip"><b>mess0125s.zip</b></a></td>
 <td>10819 kB</td>
-<td>This is the source archive of <a href="http://www.mess.org/">MESS</a> 0.122.</td>
+<td>This is the source archive of <a href="http://www.mess.org/">MESS</a> 0.125.</td>
 </tr>
 </table>
-<p>Go to the download directory by typing <span class="command">cd \download</span> and uncompress the <a href="http://www.mame.net/">MAME</a> and
+<p>Go to the download directory by typing <span class="command">cd \download</span> and uncompress the <a href="http://www.mamedev.org/">MAME</a> and
 <a href="http://www.mess.org/">MESS</a> sources by typing the following commands</p>
 <ul>
-<li><span class="command">unzip mame0122s.zip</span></li>
+<li><span class="command">unzip mame0125s.zip</span></li>
 <li><span class="command">unzip mame.zip -d c:\mingw\mess\</span></li>
-<li><span class="command">unzip</span> <span class="command">mess0122s.zip -d c:\mingw\mess\</span> .</li>
+<li><span class="command">unzip mess0125s.zip -d c:\mingw\mess\</span> .</li>
 </ul>
 <p>Then you can compile <a href="http://www.mess.org/">MESS</a>. Type <span class="command">make TARGET=mess</span> and hit enter. This will
-finally compile <a href="http://www.mess.org/">MESS</a> itself. If you want to compile the CPU optimized versions, type <span class="command">make TARGET=mess ARCHOPTS=-march=pentiumpro</span> instead of just <span class="command">make TARGET=mess</span> . It will take a lot of time, ranging from 15 minutes to an hour depending on your CPU speed, so go get yourself something to
-drink.</p>
+finally compile <a href="http://www.mess.org/">MESS</a> itself. If you want to compile the CPU optimized versions, type <span class="command">
+make TARGET=mess ARCHOPTS=-march=pentiumpro</span> instead of just <span class="command">make TARGET=mess</span> . It will take a lot of time, 
+ranging from 15 minutes to an hour depending on your CPU speed, so go get yourself something to drink. If your computer is dual core, you can 
+speed up a bit the compilation using <span class="command">make -j3 TARGET=mess</span>.</p>
 <p>When the compilation is done, you can type <span class="command">dir</span>. You should see a brand new <span class="filename">MESS.EXE</span> in
 there.</p>
 <p>You also need to make the INI file, by typing <span class="command">mess -cc</span> (an abbreviation of -createconfig).</p>
