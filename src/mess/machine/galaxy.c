@@ -29,8 +29,8 @@ READ8_HANDLER( galaxy_keyboard_r )
 UINT8 gal_latch_value = 0;
 
 WRITE8_HANDLER( galaxy_latch_w )
-{
-	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
+{	
+	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;			
 	gal_latch_value = data;
 	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), val);
 }
