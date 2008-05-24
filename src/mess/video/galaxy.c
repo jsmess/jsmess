@@ -43,7 +43,7 @@ PALETTE_INIT( galaxy )
 UINT32 gal_cnt = 0;
 static UINT8 code = 0;
 static UINT8 first = 0;
-
+UINT32 start_addr = 0;
 emu_timer *gal_video_timer = NULL;
 
 TIMER_CALLBACK( gal_video )
@@ -95,6 +95,17 @@ TIMER_CALLBACK( gal_video )
 				}
 				y = gal_cnt / 48 - 2;
 				x = (gal_cnt % 48) * 8;
+				
+				/* hack - until calc of R is fixed in Z80 */
+				if (x==11*8 && y==0) {
+					start_addr = addr;
+				}
+				if ((x/8 >=11) && (x/8<44)) {
+					code = program_read_byte(start_addr + y * 32 + (gal_cnt % 48)-11);
+				} else {
+					code = 0xff;
+				}
+				/* end of hack */
 				
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 0) & 1; x++;
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 1) & 1; x++;
