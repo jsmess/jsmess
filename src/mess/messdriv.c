@@ -540,9 +540,8 @@ TESTDRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
 
 	/* TANDY RADIO SHACK */
-	DRIVER( trs80 )		/* TRS-80 Model I	- Radio Shack Level I BASIC		*/
-	DRIVER( trs80l2 )	/* TRS-80 Model I	- Radio Shack Level II BASIC	*/
-	DRIVER( trs80l2a )	/* TRS-80 Model I	- R/S L2 BASIC					*/
+	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
+	DRIVER( trs80l2 )	/* TRS-80 Model I - Level II BASIC					*/
 	DRIVER( sys80 )		/* EACA System 80									*/
 	DRIVER( lnw80 )		/* LNW Research LNW-80								*/
 	DRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
