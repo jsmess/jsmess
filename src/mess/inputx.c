@@ -44,8 +44,7 @@ typedef struct _mess_input_code mess_input_code;
 struct _mess_input_code
 {
 	unicode_char ch;
-	input_port_config_c port[NUM_SIMUL_KEYS];
-	input_field_config_c ipt[NUM_SIMUL_KEYS];
+	input_field_config_c field[NUM_SIMUL_KEYS];
 };
 
 typedef struct _key_buffer key_buffer;
@@ -511,11 +510,9 @@ static int scan_keys(const input_port_config *portconfig, mess_input_code *codes
 						if (codes)
 						{
 							/* if we have a destination, record the codes used here */
-							memcpy(codes[code_count].port, ports, sizeof(ports[0]) * keys);
-							memcpy((void *) codes[code_count].ipt, shift_ports, sizeof(shift_ports[0]) * keys);
+							memcpy((void *) codes[code_count].field, shift_ports, sizeof(shift_ports[0]) * keys);
 							codes[code_count].ch = code;
-							codes[code_count].port[keys] = port;
-							codes[code_count].ipt[keys] = field;
+							codes[code_count].field[keys] = field;
 						}
 
 						/* increment the count */
@@ -543,11 +540,11 @@ static mess_input_code *build_codes(const input_port_config *portconfig)
 {
 	mess_input_code *codes = NULL;
 	const input_port_config *ports[NUM_SIMUL_KEYS];
-	const input_field_config *ipts[NUM_SIMUL_KEYS];
+	const input_field_config *fields[NUM_SIMUL_KEYS];
 	int code_count;
 
 	/* first count the number of codes */
-	code_count = scan_keys(portconfig, NULL, ports, ipts, 0, 0);
+	code_count = scan_keys(portconfig, NULL, ports, fields, 0, 0);
 	if (code_count > 0)
 	{
 		/* allocate the codes */
@@ -555,7 +552,7 @@ static mess_input_code *build_codes(const input_port_config *portconfig)
 		memset(codes, 0, sizeof(*codes) * (code_count + 1));
 
 		/* and populate them */
-		scan_keys(portconfig, codes, ports, ipts, 0, 0);
+		scan_keys(portconfig, codes, ports, fields, 0, 0);
 	}
 	return codes;
 }
@@ -743,7 +740,7 @@ static int can_post_key_directly(unicode_char ch)
 	{
 		code = find_code(ch);
 		if (code)
-			rc = code->ipt[0] != NULL;
+			rc = code->field[0] != NULL;
 	}
 	return rc;
 }
@@ -868,7 +865,7 @@ void inputx_postn_rate(running_machine *machine, const unicode_char *text, size_
 				if (LOG_INPUTX)
 				{
 					code = find_code(ch);
-					logerror("inputx_postn(): code=%i (%s) port=%p field->name='%s'\n", (int) ch, code_point_string(ch), code ? code->port[0] : NULL, (code && code->ipt[0]) ? code->ipt[0]->name : "<null>");
+					logerror("inputx_postn(): code=%i (%s) field->name='%s'\n", (int) ch, code_point_string(ch), (code && code->field[0]) ? code->field[0]->name : "<null>");
 				}
 
 				if (can_post_key_directly(ch))
@@ -948,7 +945,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 	called from core to allow for natural keyboard	
 -------------------------------------------------*/
 
-void mess_input_port_update_hook(running_machine *machine, const input_port_config *port)
+void mess_input_port_update_hook(running_machine *machine, const input_port_config *port, input_port_value *digital)
 {
 	const key_buffer *keybuf;
 	const mess_input_code *code;
@@ -970,13 +967,12 @@ void mess_input_port_update_hook(running_machine *machine, const input_port_conf
 			/* loop through this character's component codes */
 			if (code != NULL)
 			{
-				for (i = 0; i < ARRAY_LENGTH(code->ipt) && (code->ipt[i] != NULL); i++)
+				for (i = 0; i < ARRAY_LENGTH(code->field) && (code->field[i] != NULL); i++)
 				{
-					if (code->port[i] == port)
+					if (code->field[i]->port == port)
 					{
-						value = code->ipt[i]->mask;
-						/* 24-May-2008 - FIXME */
-						/* *digital |= value; */
+						value = code->field[i]->mask;
+						*digital |= value;
 					}
 				}
 			}
@@ -1573,11 +1569,11 @@ static void execute_dumpkbd(int ref, int params, const char *param[])
 			buffer[pos] = '\0';
 
 			/* identify the keys used */
-			for (j = 0; j < ARRAY_LENGTH(code->ipt) && (code->ipt[j] != NULL); j++)
+			for (j = 0; j < ARRAY_LENGTH(code->field) && (code->field[j] != NULL); j++)
 			{
 				pos += snprintf(&buffer[pos], ARRAY_LENGTH(buffer) - pos, "%s'%s'",
 					(j > 0) ? ", " : "",
-					code->ipt[j]->name);
+					code->field[j]->name);
 			}
 
 			/* and output it as appropriate */
