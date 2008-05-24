@@ -32,7 +32,6 @@
  ******************************************************************************/
 
 #include "driver.h"
-#include "devconv.h"
 #include "machine/8255ppi.h"
 #include "includes/compis.h"
 #include "video/i82720.h"
@@ -52,9 +51,6 @@ static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE( 0x80000, 0xeffff) AM_NOP
 	AM_RANGE( 0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
-
-DEV_READWRITE8TO16LE( compis_pit8253, pit8253_r, pit8253_w )
-DEV_READWRITE8TO16LE( compis_pit8254, pit8253_r, pit8253_w )
 
 static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE(PPI8255, "ppi8255", compis_ppi_r, compis_ppi_w )	/* PPI 8255         */
