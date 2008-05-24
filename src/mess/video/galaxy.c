@@ -123,7 +123,7 @@ TIMER_CALLBACK( gal_video )
 
 VIDEO_START ( galaxy )
 {
-	return VIDEO_START_CALL ( generic_bitmapped );
+	VIDEO_START_CALL ( generic_bitmapped );
 }
 
 VIDEO_UPDATE( galaxy )
