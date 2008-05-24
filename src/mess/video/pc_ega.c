@@ -229,10 +229,10 @@ port 0x3C4, and a data register located at I/O port 0x3C5.
 
 	SR02 - 7 6 5 4 3 2 1 0 - Map Mask
 	       | | | | | | | |
-	       | | | | | | | +-- 1 = enable map 0
-	       | | | | | | +---- 1 = enable map 1
-	       | | | | | +------ 1 = enable map 2
-	       | | | | +-------- 1 = enable map 3
+	       | | | | | | | +-- 1 = enable map 0 for writing
+	       | | | | | | +---- 1 = enable map 1 for writing
+	       | | | | | +------ 1 = enable map 2 for writing
+	       | | | | +-------- 1 = enable map 3 for writing
 	       | | | +---------- reserved/unused
 	       | | +------------ reserved/unused
 	       | +-------------- reserved/unused
@@ -241,19 +241,26 @@ port 0x3C4, and a data register located at I/O port 0x3C5.
 
 	SR03 - 7 6 5 4 3 2 1 0 - Character Map Select
 	       | | | | | | | |
-	       | | | | | | | +-- select plane for character map B
-	       | | | | | | +---- select plane for character map B
-	       | | | | | +------ select plane for character map A
-	       | | | | +-------- select plane for character map A
+	       | | | | | | | +-- character map select B bit 0
+	       | | | | | | +---- character map select B bit 1
+	       | | | | | |       Selects the map used to generate alpha characters when
+	       | | | | | |       attribute bit 3 is set to 0
+	       | | | | | |       00 = map 0 - 1st 8KB of plane 2 bank 0
+	       | | | | | |       01 = map 1 - 2nd 8KB of plane 2 bank 1
+	       | | | | | |       10 = map 2 - 3rd 8KB of plane 2 bank 2
+	       | | | | | |       11 = map 3 - 4th 8KB of plane 2 bank 3
+	       | | | | | +------ character map select A bit 0
+	       | | | | +-------- character map select A bit 1
+	       | | | |           Selects the map used to generate alpha characters when
+	       | | | |           attribute bit 3 is set to 1
+	       | | | |           00 = map 0 - 1st 8KB of plane 2 bank 0
+	       | | | |           01 = map 1 - 2nd 8KB of plane 2 bank 1
+	       | | | |           10 = map 2 - 3rd 8KB of plane 2 bank 2
+	       | | | |           11 = map 3 - 4th 8KB of plane 2 bank 3
 	       | | | +---------- reserved/unused
 	       | | +------------ reserved/unused
 	       | +-------------- reserved/unused
 	       +---------------- reserved/unused
-	     Meaning of the plane selection bits:
-	     00 - 1st 8K plane 2 bank 0
-	     01 - 1st 8K plane 2 bank 1
-	     10 - 1st 8K plane 2 bank 2
-	     11 - 1st 8K plane 2 bank 3
 
 
 	SR04 - 7 6 5 4 3 2 1 0 - Memory Mode Register
@@ -417,6 +424,13 @@ static struct
 	const device_config	*mc6845;
 	mc6845_update_row_func	update_row;
 
+	/* Video memory and related variables */
+	UINT8	*videoram;
+	UINT8	*videoram_nothing;
+	UINT8	*videoram_a0000;
+	UINT8	*videoram_b0000;
+	UINT8	*videoram_b8000;
+
 	/* Registers */
 	UINT8	misc_output;
 	UINT8	feature_control;
@@ -449,6 +463,9 @@ static struct
 } ega;
 
 
+/*
+	Prototypes
+*/
 static VIDEO_START( pc_ega );
 static VIDEO_UPDATE( mc6845_ega );
 static PALETTE_INIT( pc_ega );
@@ -473,6 +490,9 @@ static READ16_HANDLER( pc_ega16le_3d0_r );
 static WRITE16_HANDLER( pc_ega16le_3d0_w );
 static READ32_HANDLER( pc_ega32le_3d0_r );
 static WRITE32_HANDLER( pc_ega32le_3d0_w );
+static WRITE8_HANDLER( pc_ega_videoram_w );
+static WRITE16_HANDLER( pc_ega_videoram16le_w );
+static WRITE32_HANDLER( pc_ega_videoram32le_w );
 
 
 static const mc6845_interface mc6845_ega_intf =
@@ -520,6 +540,37 @@ static PALETTE_INIT( pc_ega )
 }
 
 
+static void pc_ega_install_banks( void )
+{
+	switch ( ega.graphics_controller.data[6] & 0x0c )
+	{
+	case 0x00:		/* 0xA0000, 128KB */
+		ega.videoram_a0000 = ega.videoram + 0x10000;
+		ega.videoram_b0000 = ega.videoram;
+		ega.videoram_b8000 = ega.videoram + 0x8000;
+		break;
+	case 0x04:		/* 0xA0000, 64KB */
+		ega.videoram_a0000 = ega.videoram + 0x10000;
+		ega.videoram_b0000 = NULL;
+		ega.videoram_b8000 = NULL;
+		break;
+	case 0x08:		/* 0xB0000, 32KB */
+		ega.videoram_a0000 = NULL;
+		ega.videoram_b0000 = ega.videoram;
+		ega.videoram_b8000 = NULL;
+		break;
+	case 0x0c:		/* 0xB8000, 32KB */
+		ega.videoram_a0000 = NULL;
+		ega.videoram_b0000 = NULL;
+		ega.videoram_b8000 = ega.videoram;
+		break;
+	}
+	memory_set_bankptr( 11, ega.videoram_a0000 ? ega.videoram_a0000 : ega.videoram_nothing );
+	memory_set_bankptr( 12, ega.videoram_b0000 ? ega.videoram_b0000 : ega.videoram_nothing );
+	memory_set_bankptr( 13, ega.videoram_b8000 ? ega.videoram_b8000 : ega.videoram_nothing );
+}
+
+
 static VIDEO_START( pc_ega )
 {
 	int buswidth;
@@ -528,8 +579,10 @@ static VIDEO_START( pc_ega )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK11 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram_w );
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram_w );
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_r );
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_w );
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega8_3c0_r );
@@ -539,8 +592,10 @@ static VIDEO_START( pc_ega )
 			break;
 
 		case 16:
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK11 );
-			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram16le_w );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
+			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
+			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram16le_w );
 			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_r );
 			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_w );
 			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega16le_3c0_r );
@@ -550,8 +605,10 @@ static VIDEO_START( pc_ega )
 			break;
 
 		case 32:
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK11 );
-			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram32_w );
+			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
+			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
+			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
+			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram32le_w );
 			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_r );
 			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_w );
 			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega32le_3c0_r );
@@ -565,12 +622,16 @@ static VIDEO_START( pc_ega )
 			break;
 	}
 
-	/* 256KB Video ram max on an EGA card */
-	videoram_size = 0x40000;
+	memset( &ega, 0, sizeof( ega ) );
 
-	videoram = auto_malloc(videoram_size);
+	/* Install 256KB Video ram on our EGA card */
+	ega.videoram = memory_region( REGION_GFX2 );
 
-	memory_set_bankptr(11, videoram);
+	memset( ega.videoram + 256 * 1024, 0xFF, 64 * 1024 );
+
+	ega.videoram_nothing = ega.videoram + ( 256 * 1024 );
+
+	pc_ega_install_banks();
 
 	ega.mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, EGA_MC6845_NAME);
 	ega.update_row = NULL;
@@ -783,6 +844,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		}
 		else
 		{
+			logerror("AR%02X = 0x%02x\n", ega.attribute.index & 0x1F, data );
 			ega.attribute.data[ ega.attribute.index & 0x1F ] = data;
 		}
 		ega.attribute.index_write ^= 0x01;
@@ -798,7 +860,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		ega.sequencer.index = data;
 		break;
 	case 5:
-//logerror("SR%02x = 0x%02x\n", ega.graphics_controller.index & 0x07, data );
+		logerror("SR%02X = 0x%02x\n", ega.sequencer.index & 0x07, data );
 		ega.sequencer.data[ ega.sequencer.index & 0x07 ] = data;
 		break;
 
@@ -807,8 +869,14 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		ega.graphics_controller.index = data;
 		break;
 	case 15:
-//logoerror("GR%02x = 0x%02x\n", ega.graphics_controller.index & 0x0F, data );
+		logerror("GR%02X = 0x%02x\n", ega.graphics_controller.index & 0x0F, data );
 		ega.graphics_controller.data[ ega.graphics_controller.index & 0x0F ] = data;
+		switch ( ega.graphics_controller.index & 0x0F )
+		{
+		case 6:			/* GR06 */
+			pc_ega_install_banks();
+			break;
+		}
 		break;
 	}
 }
@@ -827,4 +895,33 @@ static READ16_HANDLER( pc_ega16le_3d0_r ) { return read16le_with_read8_handler(p
 static WRITE16_HANDLER( pc_ega16le_3d0_w ) { write16le_with_write8_handler(pc_ega8_3d0_w, machine, offset, data, mem_mask); }
 static READ32_HANDLER( pc_ega32le_3d0_r ) { return read32le_with_read8_handler(pc_ega8_3d0_r, machine, offset, mem_mask); }
 static WRITE32_HANDLER( pc_ega32le_3d0_w ) { write32le_with_write8_handler(pc_ega8_3d0_w, machine, offset, data, mem_mask); }
+
+static WRITE8_HANDLER( pc_ega_videoram_w )
+{
+	switch ( offset & 0x18000 )
+	{
+	case 0x00000:
+	case 0x08000:
+		if ( ega.videoram_a0000 )
+		{
+			ega.videoram_a0000[offset & 0xffff] = data;
+		}
+		break;
+	case 0x10000:
+		if ( ega.videoram_b0000 )
+		{
+			ega.videoram_b0000[offset & 0x7fff] = data;
+		}
+		break;
+	case 0x18000:
+		if ( ega.videoram_b8000 )
+		{
+			ega.videoram_b8000[offset & 0x7fff] = data;
+		}
+		break;
+	}
+}
+
+static WRITE16_HANDLER( pc_ega_videoram16le_w ) { write16le_with_write8_handler(pc_ega_videoram_w, machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( pc_ega_videoram32le_w ) { write32le_with_write8_handler(pc_ega_videoram_w, machine, offset, data, mem_mask); }
 

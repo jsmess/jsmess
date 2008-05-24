@@ -72,9 +72,7 @@
 
 static ADDRESS_MAP_START( at16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK(10)
-	AM_RANGE(0x0a0000, 0x0affff) AM_NOP
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_NOP
-//	AM_RANGE(0x0b8000, 0x0bffff) AM_READWRITE(SMH_RAM, pc_video_videoram16le_w) AM_BASE((UINT16 **)&videoram) AM_SIZE(&videoram_size)
+//	AM_RANGE(0x0a0000, 0x0bffff) AM_READWRITE(SMH_RAM, pc_video_videoram16le_w) AM_BASE((UINT16 **)&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
 	AM_RANGE(0x0c8000, 0x0cffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0effff) AM_RAM
@@ -419,7 +417,7 @@ static const struct YM3812interface ym3812_interface =
 
 static MACHINE_DRIVER_START( ibm5170 )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at16, at16, I80286, 8000000 /*6000000*/)
+	MDRV_CPU_ATPC(at16, at16, I80286, 12000000 /*6000000*/)
 
 	MDRV_DEVICE_ADD( AT_PIT8254, PIT8254 )
 	MDRV_DEVICE_CONFIG( at_pit8254_config )
@@ -746,6 +744,8 @@ ROM_START( ibm5170 )
 	ROM_REGION(0x08100, REGION_GFX1, 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
+	ROM_REGION(0x50000, REGION_GFX2, ROMREGION_ERASE00)
+
 	/* This region holds the original EGA Video bios */
 	ROM_REGION(0x4000, REGION_USER1, 0)
 	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
@@ -884,8 +884,8 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT        CONFIG   COMPANY     FULLNAME */
-COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,		atega,	    ibmat,   "International Business Machines",  "IBM PC/AT 5170 (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,      atega,      ibmat,   "International Business Machines",  "IBM PC/AT 5170 8MHz (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,		atega,	    ibmat,   "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
+COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,      atega,      ibmat,   "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,		ps2m30286,	ibmat,   "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5170a,  atcga,		atcga,	    ibmat,   "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       ibm5170a,  atcga,		atcga,	    ibmat,   "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
