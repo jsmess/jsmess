@@ -1163,11 +1163,11 @@ static WRITE8_HANDLER( bbcb_via_system_write_cb2 )
 
 
 
-static void bbc_via_system_irq(int level)
+static void bbc_via_system_irq(running_machine *machine, int level)
 {
 //  logerror("SYSTEM via irq %d %d %d\n",via_system_irq,via_user_irq,level);
   via_system_irq=level;
-  bbc_setirq(Machine);
+  bbc_setirq(machine);
 }
 
 
@@ -1253,10 +1253,10 @@ static WRITE8_HANDLER( bbcb_via_user_write_ca2 )
 	via_1_ca1_w(machine, 0,data);
 }
 
-static void bbc_via_user_irq(int level)
+static void bbc_via_user_irq(running_machine *machine, int level)
 {
   via_user_irq=level;
-  bbc_setirq(Machine);
+  bbc_setirq(machine);
 }
 
 

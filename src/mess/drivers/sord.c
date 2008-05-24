@@ -298,10 +298,10 @@ static const ppi8255_interface sord_ppi8255_interface =
 /*********************************************************************************************/
 
 
-static void sord_m5_ctc_interrupt(int state)
+static void sord_m5_ctc_interrupt(running_machine *machine, int state)
 {
 	//logerror("interrupting ctc %02x\r\n ",state);
-	cpunum_set_input_line(Machine, 0, 0, state);
+	cpunum_set_input_line(machine, 0, 0, state);
 }
 
 static z80ctc_interface	sord_m5_ctc_intf =
@@ -451,12 +451,12 @@ static const CENTRONICS_CONFIG sordm5_cent_config[1] =
 	},
 };
 
-static void sordm5_video_interrupt_callback(int state)
+static void sordm5_video_interrupt_callback(running_machine *machine, int state)
 {
 	if (state)
 	{
-		z80ctc_0_trg3_w(Machine, 0, 1);
-		z80ctc_0_trg3_w(Machine, 0, 0);
+		z80ctc_0_trg3_w(machine, 0, 1);
+		z80ctc_0_trg3_w(machine, 0, 0);
 	}
 }
 
@@ -622,7 +622,7 @@ static const struct z80_irq_daisy_chain sord_m5_daisy_chain[] =
 
 static INTERRUPT_GEN( sord_interrupt )
 {
-	if (TMS9928A_interrupt())
+	if (TMS9928A_interrupt(machine))
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 

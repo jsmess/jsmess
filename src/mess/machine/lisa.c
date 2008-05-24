@@ -131,7 +131,7 @@ static WRITE8_HANDLER(COPS_via_out_a);
 static WRITE8_HANDLER(COPS_via_out_b);
 static WRITE8_HANDLER(COPS_via_out_ca2);
 static WRITE8_HANDLER(COPS_via_out_cb2);
-static void COPS_via_irq_func(int val);
+static void COPS_via_irq_func(running_machine *machine, int val);
 static  READ8_HANDLER(parallel_via_in_b);
 
 static int KBIR;	/* COPS VIA interrupt pending */
@@ -842,12 +842,12 @@ static WRITE8_HANDLER(COPS_via_out_cb2)
 	speaker_level_w(0, data);
 }
 
-static void COPS_via_irq_func(int val)
+static void COPS_via_irq_func(running_machine *machine, int val)
 {
 	if (KBIR != val)
 	{
 		KBIR = val;
-		lisa_field_interrupts(Machine);
+		lisa_field_interrupts(machine);
 	}
 }
 

@@ -586,8 +586,9 @@ MACHINE_RESET( comx35 )
 
 INPUT_CHANGED( comx35_reset )
 {
-	if (BIT(input_port_read(machine, "RESET"), 0) && BIT(input_port_read(machine, "D6"), 7))
+	if (BIT(input_port_read(field->port->machine, "RESET"), 0) && BIT(input_port_read(field->port->machine, "D6"), 7))
 	{
+		running_machine *machine = field->port->machine;
 		MACHINE_RESET_CALL(comx35);
 	}
 }

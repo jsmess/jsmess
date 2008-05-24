@@ -27,7 +27,7 @@ struct _mc6846_interface
   write8_machine_func out_cto_func; /* 1-bit output */
 
   /* timer interrupt */
-  void ( * irq_func ) ( int state );
+  void ( * irq_func ) ( running_machine *machine, int state );
 
   /* CPU identifier (defines the clock rate) */
   int cpunum;

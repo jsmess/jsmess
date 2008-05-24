@@ -130,10 +130,10 @@ static WRITE8_HANDLER ( d_pia1_cb2_w);
 static WRITE8_HANDLER ( d_pia0_cb2_w);
 static WRITE8_HANDLER ( d_pia1_ca2_w);
 static WRITE8_HANDLER ( d_pia0_ca2_w);
-static void d_pia0_irq_a(int state);
-static void d_pia0_irq_b(int state);
-static void d_pia1_firq_a(int state);
-static void d_pia1_firq_b(int state);
+static void d_pia0_irq_a(running_machine *machine, int state);
+static void d_pia0_irq_b(running_machine *machine, int state);
+static void d_pia1_firq_a(running_machine *machine, int state);
+static void d_pia1_firq_b(running_machine *machine, int state);
 static void d_sam_set_pageonemode(int val);
 static void d_sam_set_mpurate(int val);
 static void d_sam_set_memorysize(int val);
@@ -154,10 +154,10 @@ static UINT8 coco3_mmu[16];
 static UINT8 coco3_interupt_line;
 static UINT8 gime_firq, gime_irq;
 
-static void coco3_pia0_irq_a(int state);
-static void coco3_pia0_irq_b(int state);
-static void coco3_pia1_firq_a(int state);
-static void coco3_pia1_firq_b(int state);
+static void coco3_pia0_irq_a(running_machine *machine, int state);
+static void coco3_pia0_irq_b(running_machine *machine, int state);
+static void coco3_pia1_firq_a(running_machine *machine, int state);
+static void coco3_pia1_firq_b(running_machine *machine, int state);
 static void coco3_sam_set_maptype(int val);
 static const UINT8 *coco3_sam_get_rambase(void);
 
@@ -172,8 +172,8 @@ static void dragon_page_rom(int	romswitch);
 
 /* Dragon Alpha specific */
 static WRITE8_HANDLER ( dgnalpha_pia2_pa_w );
-static void d_pia2_firq_a(int state);
-static void d_pia2_firq_b(int state);
+static void d_pia2_firq_a(running_machine *machine, int state);
+static void d_pia2_firq_b(running_machine *machine, int state);
 static int dgnalpha_just_reset;		/* Reset flag used to ignore first NMI after reset */
 
 /* Dragon Plus specific */
@@ -813,55 +813,55 @@ static void coco3_recalc_firq(running_machine *machine)
 		d_recalc_firq(machine);
 }
 
-static void d_pia0_irq_a(int state)
+static void d_pia0_irq_a(running_machine *machine, int state)
 {
-	d_recalc_irq(Machine);
+	d_recalc_irq(machine);
 }
 
-static void d_pia0_irq_b(int state)
+static void d_pia0_irq_b(running_machine *machine, int state)
 {
-	d_recalc_irq(Machine);
+	d_recalc_irq(machine);
 }
 
-static void d_pia1_firq_a(int state)
+static void d_pia1_firq_a(running_machine *machine, int state)
 {
-	d_recalc_firq(Machine);
+	d_recalc_firq(machine);
 }
 
-static void d_pia1_firq_b(int state)
+static void d_pia1_firq_b(running_machine *machine, int state)
 {
-	d_recalc_firq(Machine);
+	d_recalc_firq(machine);
 }
 
 /* Dragon Alpha second PIA IRQ lines also cause FIRQ */
-static void d_pia2_firq_a(int state)
+static void d_pia2_firq_a(running_machine *machine, int state)
 {
-	d_recalc_firq(Machine);
+	d_recalc_firq(machine);
 }
 
-static void d_pia2_firq_b(int state)
+static void d_pia2_firq_b(running_machine *machine, int state)
 {
-	d_recalc_firq(Machine);
+	d_recalc_firq(machine);
 }
 
-static void coco3_pia0_irq_a(int state)
+static void coco3_pia0_irq_a(running_machine *machine, int state)
 {
-	coco3_recalc_irq(Machine);
+	coco3_recalc_irq(machine);
 }
 
-static void coco3_pia0_irq_b(int state)
+static void coco3_pia0_irq_b(running_machine *machine, int state)
 {
-	coco3_recalc_irq(Machine);
+	coco3_recalc_irq(machine);
 }
 
-static void coco3_pia1_firq_a(int state)
+static void coco3_pia1_firq_a(running_machine *machine, int state)
 {
-	coco3_recalc_firq(Machine);
+	coco3_recalc_firq(machine);
 }
 
-static void coco3_pia1_firq_b(int state)
+static void coco3_pia1_firq_b(running_machine *machine, int state)
 {
-	coco3_recalc_firq(Machine);
+	coco3_recalc_firq(machine);
 }
 
 static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int state)
@@ -1412,7 +1412,7 @@ static UINT8 coco3_update_keyboard(running_machine *machine)
 
 /* three functions that update the keyboard in varying ways */
 static WRITE8_HANDLER ( d_pia0_pb_w )					{ (*update_keyboard)(machine); }
-INPUT_CHANGED(coco_keyboard_changed)					{ (*update_keyboard)(machine); }
+INPUT_CHANGED(coco_keyboard_changed)					{ (*update_keyboard)(field->port->machine); }
 static TIMER_CALLBACK(coco_update_keyboard_timerproc)	{ (*update_keyboard)(machine); }
 
 static WRITE8_HANDLER ( d_pia0_pa_w )
@@ -3081,7 +3081,7 @@ static void update_lightgun(running_machine *machine)
 
 INPUT_CHANGED( coco_joystick_mode_changed )
 {
-	update_lightgun(machine);
+	update_lightgun(field->port->machine);
 }
 
 static TIMER_CALLBACK( update_lightgun_timer_callback )

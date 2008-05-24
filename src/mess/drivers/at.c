@@ -402,7 +402,7 @@ static const unsigned i286_address_mask = 0x00ffffff;
 
 #if defined(ADLIB)
 /* irq line not connected to pc on adlib cards (and compatibles) */
-static void irqhandler(int linestate) {}
+static void irqhandler(running_machine *machine, int linestate) {}
 
 static const struct YM3812interface ym3812_interface =
 {

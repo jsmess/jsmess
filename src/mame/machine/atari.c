@@ -40,7 +40,7 @@ static void a600xl_mmu(running_machine *machine, UINT8 new_mmu);
 
 static void pokey_reset(running_machine *machine);
 
-void atari_interrupt_cb(int mask)
+void atari_interrupt_cb(running_machine *machine, int mask)
 {
 
 	if (VERBOSE_POKEY)
@@ -69,7 +69,7 @@ void atari_interrupt_cb(int mask)
 			logerror("atari interrupt_cb TIMR1\n");
 	}
 
-	cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 /**************************************************************
@@ -135,13 +135,13 @@ void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 	/* check if self-test ROM changed */
 	if ( new_mmu & 0x80 )
 	{
-		logerror("%s MMU SELFTEST RAM\n", Machine->gamedrv->name);
+		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
 		rbank2 = SMH_NOP;
 		wbank2 = SMH_NOP;
 	}
 	else
 	{
-		logerror("%s MMU SELFTEST ROM\n", Machine->gamedrv->name);
+		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
 		rbank2 = SMH_BANK2;
 		wbank2 = SMH_UNMAP;
 	}
@@ -159,7 +159,7 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	/* check if memory C000-FFFF changed */
 	if( new_mmu & 0x01 )
 	{
-		logerror("%s MMU BIOS ROM\n", Machine->gamedrv->name);
+		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
 		rbank3 = SMH_BANK3;
 		wbank3 = SMH_UNMAP;
 		base3 = memory_region(REGION_CPU1)+0x14000;  /* 8K lo BIOS */
@@ -169,7 +169,7 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	}
 	else
 	{
-		logerror("%s MMU BIOS RAM\n", Machine->gamedrv->name);
+		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
 		rbank3 = SMH_BANK3;
 		wbank3 = SMH_BANK3;
 		base3 = memory_region(REGION_CPU1)+0x0c000;  /* 8K RAM */
@@ -185,14 +185,14 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	/* check if BASIC changed */
 	if( new_mmu & 0x02 )
 	{
-		logerror("%s MMU BASIC RAM\n", Machine->gamedrv->name);
+		logerror("%s MMU BASIC RAM\n", machine->gamedrv->name);
 		rbank1 = SMH_BANK1;
 		wbank1 = SMH_BANK1;
 		base1 = memory_region(REGION_CPU1)+0x0a000;  /* 8K RAM */
 	}
 	else
 	{
-		logerror("%s MMU BASIC ROM\n", Machine->gamedrv->name);
+		logerror("%s MMU BASIC ROM\n", machine->gamedrv->name);
 		rbank1 = SMH_BANK1;
 		wbank1 = SMH_UNMAP;
 		base1 = memory_region(REGION_CPU1)+0x10000;  /* 8K BASIC */
@@ -203,14 +203,14 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	/* check if self-test ROM changed */
 	if( new_mmu & 0x80 )
 	{
-		logerror("%s MMU SELFTEST RAM\n", Machine->gamedrv->name);
+		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
 		rbank2 = SMH_BANK2;
 		wbank2 = SMH_BANK2;
 		base2 = memory_region(REGION_CPU1)+0x05000;  /* 0x0800 bytes */
 	}
 	else
 	{
-		logerror("%s MMU SELFTEST ROM\n", Machine->gamedrv->name);
+		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
 		rbank2 = SMH_BANK2;
 		wbank2 = SMH_UNMAP;
 		base2 = memory_region(REGION_CPU1)+0x15000;  /* 0x0800 bytes */
@@ -742,39 +742,39 @@ static void atari_machine_start(running_machine *machine, int type, const pia682
 
 	/* GTIA */
 	memset(&gtia_intf, 0, sizeof(gtia_intf));
-	if (port_tag_to_index("console") >= 0)
+	if (input_port_by_tag(machine->portconfig, "console") != NULL)
 		gtia_intf.console_read = console_read;
 	if (sndti_exists(SOUND_DAC, 0))
 		gtia_intf.console_write = console_write;
 	gtia_init(machine, &gtia_intf);
 
 	/* pokey */
-	add_reset_callback(Machine, pokey_reset);
+	add_reset_callback(machine, pokey_reset);
 
 	/* PIA */
 	if (pia_intf)
 	{
 		pia_config(0, pia_intf);
-		add_reset_callback(Machine, _pia_reset);
+		add_reset_callback(machine, _pia_reset);
 	}
 
 	/* ANTIC */
-	add_reset_callback(Machine, _antic_reset);
+	add_reset_callback(machine, _antic_reset);
 
 	/* cartridge */
 	if (has_cart)
-		add_reset_callback(Machine, cart_reset);
+		add_reset_callback(machine, cart_reset);
 
 #ifdef MESS
 	{
 		offs_t ram_top;
 		offs_t ram_size;
 
-		if (!strcmp(Machine->gamedrv->name, "a400")
-			|| !strcmp(Machine->gamedrv->name, "a400pal")
-			|| !strcmp(Machine->gamedrv->name, "a800")
-			|| !strcmp(Machine->gamedrv->name, "a800pal")
-			|| !strcmp(Machine->gamedrv->name, "a800xl"))
+		if (!strcmp(machine->gamedrv->name, "a400")
+			|| !strcmp(machine->gamedrv->name, "a400pal")
+			|| !strcmp(machine->gamedrv->name, "a800")
+			|| !strcmp(machine->gamedrv->name, "a800pal")
+			|| !strcmp(machine->gamedrv->name, "a800xl"))
 		{
 			ram_size = 0xA000;
 		}

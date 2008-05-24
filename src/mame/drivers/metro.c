@@ -151,11 +151,11 @@ static READ16_HANDLER( metro_irq_cause_r )
 
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
 	/*  Get the pending IRQs (only the enabled ones, e.g. where
         irq_enable is *0*)  */
-	UINT16 irq = metro_irq_cause_r(Machine,0,0xffff) & ~*metro_irq_enable;
+	UINT16 irq = metro_irq_cause_r(machine,0,0xffff) & ~*metro_irq_enable;
 
 	if (irq_line == -1)	/* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
@@ -167,12 +167,12 @@ static void update_irq_state(void)
 		{
 			if (irq & (1 << i))
 			{
-				cpunum_set_input_line(Machine, 0, metro_irq_levels[i]&7, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, metro_irq_levels[i]&7, ASSERT_LINE);
 				return;
 			}
 			i++;
 		}
-		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	}
 	else
 	{
@@ -181,7 +181,7 @@ static void update_irq_state(void)
             source by peeking a register (metro_irq_cause_r) */
 
 		int state =	(irq ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(Machine, 0, irq_line, state);
+		cpunum_set_input_line(machine, 0, irq_line, state);
 	}
 }
 
@@ -218,7 +218,7 @@ static WRITE16_HANDLER( metro_irq_cause_w )
 		if (data & 0x80)	requested_int[7] = 0;
 	}
 
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 
@@ -228,12 +228,12 @@ static INTERRUPT_GEN( metro_interrupt )
 	{
 		case 0:
 			requested_int[0] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		default:
 			requested_int[4] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 	}
 }
@@ -243,7 +243,7 @@ static INTERRUPT_GEN( bangball_interrupt )
 {
 	requested_int[0] = 1;	// set scroll regs if a flag is set
 	requested_int[4] = 1;	// clear that flag
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 
@@ -262,12 +262,12 @@ static INTERRUPT_GEN( karatour_interrupt )
 			requested_int[5] = 1;	// write the scroll registers
 			/* the duration is a guess */
 			timer_set(ATTOTIME_IN_USEC(2500), NULL, 0, vblank_end_callback);
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		default:
 			requested_int[4] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 	}
 }
@@ -277,7 +277,7 @@ static emu_timer *mouja_irq_timer;
 static TIMER_CALLBACK( mouja_irq_callback )
 {
 	requested_int[0] = 1;
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
@@ -289,7 +289,7 @@ static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 static INTERRUPT_GEN( mouja_interrupt )
 {
 	requested_int[1] = 1;
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 
@@ -299,7 +299,7 @@ static INTERRUPT_GEN( gakusai_interrupt )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 	}
 }
@@ -310,18 +310,18 @@ static INTERRUPT_GEN( dokyusei_interrupt )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 		case 1:	// needed?
 			requested_int[5] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 	}
 }
 
-static void ymf278b_interrupt(int active)
+static void ymf278b_interrupt(running_machine *machine, int active)
 {
-	cpunum_set_input_line(Machine, 0, 2, active);
+	cpunum_set_input_line(machine, 0, 2, active);
 }
 
 /***************************************************************************
@@ -514,9 +514,9 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	portb = data;
 }
 
-static void metro_sound_irq_handler(int state)
+static void metro_sound_irq_handler(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =
@@ -679,7 +679,7 @@ static UINT16 *metro_blitter_regs;
 static TIMER_CALLBACK( metro_blit_done )
 {
 	requested_int[blitter_bit] = 1;
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 INLINE int blt_read(const UINT8 *ROM, const int offs)
@@ -1939,9 +1939,9 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 	memory_set_bankptr(1, &RAM[bankaddress]);
 }
 
-static void blzntrnd_irqhandler(int irq)
+static void blzntrnd_irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface blzntrnd_ym2610_interface =
@@ -4653,22 +4653,22 @@ static INTERRUPT_GEN( puzzlet_interrupt )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		case 1:
 			requested_int[3] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		case 2:
 			requested_int[5] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		case 3:
 			requested_int[2] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		default:
@@ -5458,6 +5458,29 @@ ROM_START( lastfort )
 	ROM_LOAD( "tr_jb11", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) )
 ROM_END
 
+ROM_START( lastfork )
+	ROM_REGION( 0x040000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "7f-9",  0x000000, 0x020000, CRC(d2894c1f) SHA1(4f4ab6d8ce69999cd7c4a9ddabec8d1e8fefc6fc) )
+	ROM_LOAD16_BYTE( "8f-10", 0x000001, 0x020000, CRC(9696ea39) SHA1(27af0c6399cd7be40aa8a1c1b58e0db8408aff11) )
+
+	ROM_REGION( 0x02c000, REGION_CPU2, 0 )		/* NEC78C10 Code */
+	ROM_LOAD( "tr_jb12", 0x000000, 0x004000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
+	ROM_CONTINUE(        0x010000, 0x01c000 )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "7i-2",  0x000000, 0x040000, CRC(d1fe8d7b) SHA1(88b1973ebb47b91a49f6b4f722c9cc33e5330694) , ROM_SKIP(7))
+	ROMX_LOAD( "10i-4", 0x000001, 0x040000, CRC(058126d4) SHA1(985177556c8545e6a65a41083246b31509de7130) , ROM_SKIP(7))
+	ROMX_LOAD( "13i-6", 0x000002, 0x040000, CRC(39a9dea2) SHA1(9f8067cff15be93771d42b3776ee7ca1b7c61798) , ROM_SKIP(7))
+	ROMX_LOAD( "16i-8", 0x000003, 0x040000, CRC(4c050baa) SHA1(3e0b2029d7c0b6cd32b22f147663cd22975ce8c3) , ROM_SKIP(7))
+	ROMX_LOAD( "5i-1",  0x000004, 0x040000, CRC(0d503f05) SHA1(0b1ce22630bb2326930f0f3b5710c6c191730c45) , ROM_SKIP(7))
+	ROMX_LOAD( "8i-3",  0x000005, 0x040000, CRC(b6d4f753) SHA1(2864ad5fe4186e4e15bb7d5dafa6a9b8c803d7d0) , ROM_SKIP(7))
+	ROMX_LOAD( "12i-5", 0x000006, 0x040000, CRC(ce69c805) SHA1(88debdbd8e73da54c1c25a1a60f27a05dac3f104) , ROM_SKIP(7))
+	ROMX_LOAD( "14i-7", 0x000007, 0x040000, CRC(0cb38317) SHA1(6e18096f6616aa0d9c4f3a2394561ed3f636731e) , ROM_SKIP(7))
+
+	ROM_REGION( 0x020000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "tr_jb11", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) )
+ROM_END
+
 /* German version on PCB VG460-(A) */
 
 ROM_START( lastforg )
@@ -5466,8 +5489,8 @@ ROM_START( lastforg )
 	ROM_LOAD16_BYTE( "trma03.bin",    0x000001, 0x020000, CRC(b00fb126) SHA1(7dd4b7a2d1c5401fde2275ef76fac1ccc586a0bd) )
 
 	ROM_REGION( 0x02c000, REGION_CPU2, 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "trma01.bin",    0x000000, 0x004000,  CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) )	// 11xxxxxxxxxxxxxxx = 0xFF
-	ROM_CONTINUE(         0x010000, 0x01c000 )
+	ROM_LOAD( "trma01.bin",  0x000000, 0x004000,  CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) ) /* Same as parent set, but different label */
+	ROM_CONTINUE(            0x010000, 0x01c000 )
 
 	ROM_REGION( 0x200000, REGION_GFX1, 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "trma04.bin", 0x000000, 0x080000, CRC(5feafc6f) SHA1(eb50905eb0d25eb342e08d591907f79b5eadff43) , ROM_GROUPWORD | ROM_SKIP(6))
@@ -5476,7 +5499,7 @@ ROM_START( lastforg )
 	ROMX_LOAD( "trma06.bin", 0x000006, 0x080000, CRC(d366c04e) SHA1(e0a67688043cb45916860d32ff1076d9257e6ad9) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x020000, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "trma08.bin",   0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) )
+	ROM_LOAD( "trma08.bin",   0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) ) /* Same as parent set, but different label */
 ROM_END
 
 /***************************************************************************
@@ -6140,6 +6163,7 @@ GAME( 1994, dharma,   0,        dharma,   dharma,   metro,    ROT0,   "Metro",  
 GAME( 1994, dharmak,  dharma,   dharma,   dharma,   dharmak,  ROT0,   "Metro",                                  "Dharma Doujou (Korea)",             0 )
 GAME( 1994, lastfort, 0,        lastfort, lastfort, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride",            0 )
 GAME( 1994, lastfero, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Erotic)",   0 )
+GAME( 1994, lastfork, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Korea)",    0 )
 GAME( 1994, lastforg, lastfort, lastforg, ladykill, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (German)",   0 )
 GAME( 1994, toride2g, 0,        toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden",          GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, torid2gg, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden (German)", GAME_IMPERFECT_GRAPHICS )

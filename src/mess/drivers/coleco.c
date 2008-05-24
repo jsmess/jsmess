@@ -177,15 +177,15 @@ extern int JoyStat[2];
 
 static INTERRUPT_GEN( coleco_interrupt )
 {
-    TMS9928A_interrupt();
+    TMS9928A_interrupt(machine);
 }
 
-static void coleco_vdp_interrupt (int state)
+static void coleco_vdp_interrupt (running_machine *machine, int state)
 {
 	static int last_state = 0;
 
     // only if it goes up
-	if (state && !last_state) cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (state && !last_state) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	last_state = state;
 }
 

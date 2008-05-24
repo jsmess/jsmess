@@ -1440,7 +1440,7 @@ static void x68k_dma_error(int channel, int irq)
 	}
 }
 
-static void x68k_fm_irq(int irq)
+static void x68k_fm_irq(running_machine *machine, int irq)
 {
 	if(irq == CLEAR_LINE)
 	{

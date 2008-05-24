@@ -121,9 +121,9 @@ static MACHINE_RESET( dc_console )
 	AICA_set_ram_base(0, dc_sound_ram, 2*1024*1024);
 }
 
-static void aica_irq(int irq)
+static void aica_irq(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct AICAinterface aica_interface =

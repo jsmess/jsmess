@@ -135,7 +135,7 @@ static MACHINE_RESET(tutor)
 static INTERRUPT_GEN( tutor_vblank_interrupt )
 {
 	/* No vblank interrupt? */
-	TMS9928A_interrupt();
+	TMS9928A_interrupt(machine);
 }
 
 static const device_config *printer_fp(void)

@@ -101,6 +101,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "99_peb.h"
 
 /* TRUE if we are using the snug sgcpu 99/4p 16-bit extensions */
@@ -162,8 +163,8 @@ static int senila, senilb;
 static int tmp_buffer;
 
 /* inta/intb handlers */
-static void (*inta_callback)(int state);
-static void (*intb_callback)(int state);
+static void (*inta_callback)(running_machine *machine, int state);
+static void (*intb_callback)(running_machine *machine, int state);
 
 
 /*
@@ -187,7 +188,7 @@ void ti99_peb_init()
 	in_intb_callback: callback called when the state of INTB changes (may be
 		NULL)
 */
-void ti99_peb_reset(int in_has_16bit_peb, void (*in_inta_callback)(int state), void (*in_intb_callback)(int state))
+void ti99_peb_reset(int in_has_16bit_peb, void (*in_inta_callback)(running_machine *machine, int state), void (*in_intb_callback)(running_machine *machine, int state))
 {
 	has_16bit_peb = in_has_16bit_peb;
 	inta_callback = in_inta_callback;
@@ -286,13 +287,13 @@ void ti99_peb_set_ila_bit(int bit, int state)
 	{
 		ila |= 1 << bit;
 		if (inta_callback)
-			(*inta_callback)(1);
+			(*inta_callback)(Machine, 1);
 	}
 	else
 	{
 		ila &= ~(1 << bit);
 		if ((! ila) && inta_callback)
-			(*inta_callback)(0);
+			(*inta_callback)(Machine, 0);
 	}
 }
 
@@ -311,13 +312,13 @@ void ti99_peb_set_ilb_bit(int bit, int state)
 	{
 		ilb |= 1 << bit;
 		if (intb_callback)
-			(*intb_callback)(1);
+			(*intb_callback)(Machine, 1);
 	}
 	else
 	{
 		ilb &= ~(1 << bit);
 		if ((! ilb) && intb_callback)
-			(*intb_callback)(0);
+			(*intb_callback)(Machine, 0);
 	}
 }
 

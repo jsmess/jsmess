@@ -24,8 +24,8 @@
 
 
 /* prototypes */
-static void inta_callback(int state);
-static void intb_callback(int state);
+static void inta_callback(running_machine *machine, int state);
+static void intb_callback(running_machine *machine, int state);
 
 static void read_key_if_possible(void);
 static void poll_keyboard(void);
@@ -254,11 +254,11 @@ MACHINE_RESET( geneve )
 	KeyReset = 1;
 
 	/* read config */
-	has_speech = (input_port_read_indexed(machine, input_port_config) >> config_speech_bit) & config_speech_mask;
-	fdc_kind = (input_port_read_indexed(machine, input_port_config) >> config_fdc_bit) & config_fdc_mask;
-	has_ide = (input_port_read_indexed(machine, input_port_config) >> config_ide_bit) & config_ide_mask;
-	has_rs232 = (input_port_read_indexed(machine, input_port_config) >> config_rs232_bit) & config_rs232_mask;
-	has_usb_sm = (input_port_read_indexed(machine, input_port_config) >> config_usbsm_bit) & config_usbsm_mask;
+	has_speech = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_speech_bit) & config_speech_mask;
+	fdc_kind = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_fdc_bit) & config_fdc_mask;
+	has_ide = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_ide_bit) & config_ide_mask;
+	has_rs232 = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_rs232_bit) & config_rs232_mask;
+	has_usb_sm = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_usbsm_bit) & config_usbsm_mask;
 
 	/* set up optional expansion hardware */
 	ti99_peb_reset(0, inta_callback, intb_callback);
@@ -342,16 +342,16 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 /*
 	inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
 */
-static void inta_callback(int state)
+static void inta_callback(running_machine *machine, int state)
 {
 	tms9901_set_single_int(0, 1, state);
-	cpunum_set_input_line(Machine, 0, 1, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
 	intb is connected to tms9901 IRQ12 line.
 */
-static void intb_callback(int state)
+static void intb_callback(running_machine *machine, int state)
 {
 	tms9901_set_single_int(0, 12, state);
 }

@@ -28,14 +28,14 @@ static ADDRESS_MAP_START( bbcbc_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x81, 0x81) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 ADDRESS_MAP_END
 
-static void tms_interrupt(int dummy)
+static void tms_interrupt(running_machine *machine, int dummy)
 {
-	cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( bbcbc_interrupt )
 {
-    TMS9928A_interrupt();
+    TMS9928A_interrupt(machine);
 }
 
 static INPUT_PORTS_START( bbcbc )

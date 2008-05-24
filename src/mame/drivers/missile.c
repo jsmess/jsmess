@@ -239,7 +239,6 @@
 ******************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/pokey.h"
 
 
@@ -328,7 +327,7 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	int v = scanline_to_v(video_screen_get_vpos(machine->primary_screen));
+	int v = scanline_to_v(video_screen_get_vpos(field->port->machine->primary_screen));
 	return v < 24;
 }
 
@@ -610,7 +609,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
-		watchdog_reset(Machine);
+		watchdog_reset(machine);
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)

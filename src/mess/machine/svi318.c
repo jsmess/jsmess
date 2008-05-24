@@ -563,9 +563,9 @@ MACHINE_RESET( svi328_806 )
 
 /* Init functions */
 
-void svi318_vdp_interrupt(int i)
+void svi318_vdp_interrupt(running_machine *machine, int i)
 {
-	cpunum_set_input_line(Machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cpunum_set_input_line(machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 DRIVER_INIT( svi318 )
@@ -669,7 +669,7 @@ INTERRUPT_GEN( svi318_interrupt )
 
 	set = input_port_read(machine, "CONFIG");
 	TMS9928A_set_spriteslimit (set & 0x20);
-	TMS9928A_interrupt();
+	TMS9928A_interrupt(machine);
 }
 
 /* Memory */

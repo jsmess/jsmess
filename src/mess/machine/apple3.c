@@ -485,10 +485,10 @@ static WRITE8_HANDLER(apple3_via_0_out_b) { apple3_via_out(machine, &via_0_b, da
 static WRITE8_HANDLER(apple3_via_1_out_a) { apple3_via_out(machine, &via_1_a, data); }
 static WRITE8_HANDLER(apple3_via_1_out_b) { apple3_via_out(machine, &via_1_b, data); }
 
-static void apple2_via_1_irq_func(int state)
+static void apple2_via_1_irq_func(running_machine *machine, int state)
 {
 	if (!via_1_irq && state)
-		cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, PULSE_LINE);
 	via_1_irq = state;
 }
 

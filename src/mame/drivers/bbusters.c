@@ -666,15 +666,15 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq( int irq )
+static void sound_irq( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2608interface ym2608_interface =
 {
 	{
-		AY8910_LEGACY_OUTPUT,
+		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	},

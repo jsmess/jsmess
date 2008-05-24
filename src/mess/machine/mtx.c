@@ -49,9 +49,8 @@ static char mtx_prt_data = 0;
  *
  *************************************/
 
-static void mtx_tms9929a_interrupt(int data)
+static void mtx_tms9929a_interrupt(running_machine *machine, int data)
 {
-	running_machine *machine = Machine;
 	z80ctc_0_trg0_w(machine, 0, data ? 0 : 1);
 }
 
@@ -65,7 +64,7 @@ static const TMS9928a_interface tms9928a_interface =
 
 INTERRUPT_GEN( mtx_interrupt )
 {
-	TMS9928A_interrupt();
+	TMS9928A_interrupt(machine);
 }
 
 
@@ -210,10 +209,10 @@ READ8_HANDLER( mtx_key_hi_r )
  *
  *************************************/
 
-static void mtx_ctc_interrupt(int state)
+static void mtx_ctc_interrupt(running_machine *machine, int state)
 {
 //  logerror("mtx_ctc_interrupt: %02x\n", state);
-	cpunum_set_input_line(Machine, 0, 0, state);
+	cpunum_set_input_line(machine, 0, 0, state);
 }
 
 READ8_HANDLER( mtx_ctc_r )

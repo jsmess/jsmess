@@ -313,12 +313,12 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( sg1000_int )
 {
-    TMS9928A_interrupt();
+    TMS9928A_interrupt(machine);
 }
 
-static void sg1000_vdp_interrupt(int state)
+static void sg1000_vdp_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line_and_vector(Machine, 0, INPUT_LINE_IRQ0, state, 0x38);
+	cpunum_set_input_line_and_vector(machine, 0, INPUT_LINE_IRQ0, state, 0x38);
 }
 
 static const TMS9928a_interface tms9928a_interface =

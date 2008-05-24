@@ -86,6 +86,7 @@
 #define FREG(x)				DRCUML_PTYPE_FLOAT_REGISTER, (DRCUML_REG_F0 + (x))
 #define MVAR(x)				DRCUML_PTYPE_MAPVAR, (DRCUML_MAPVAR_M0 + (x))
 #define MEM(x)				DRCUML_PTYPE_MEMORY, (FPTR)(x)
+#define PARAM(t,v)			(t), (v)
 
 
 
@@ -128,12 +129,11 @@
 
 
 /* ----- Internal Register Operations ----- */
-#define UML_SETMODE(block, mode)							do { drcuml_block_append_1(block, DRCUML_OP_SETMODE, 4, IF_ALWAYS,  mode); } while (0)
-#define UML_GETMODE(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETMODE, 4, IF_ALWAYS,  dst); } while (0)
 #define UML_SETFMOD(block, mode)							do { drcuml_block_append_1(block, DRCUML_OP_SETFMOD, 4, IF_ALWAYS,  mode); } while (0)
 #define UML_GETFMOD(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETFMOD, 4, IF_ALWAYS,  dst); } while (0)
-#define UML_SUBICNT(block, delta, param)					do { drcuml_block_append_2(block, DRCUML_OP_SUBICNT, 4, IF_ALWAYS,  delta, param); } while (0)
 #define UML_GETEXP(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETEXP,  4, IF_ALWAYS,  dst); } while (0)
+#define UML_SAVE(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_SAVE,    4, IF_ALWAYS,  MEM(dst)); } while (0)
+#define UML_RESTORE(block, src)								do { drcuml_block_append_1(block, DRCUML_OP_RESTORE, 4, IF_ALWAYS,  MEM(src)); } while (0)
 
 
 /* ----- 32-Bit Integer Operations ----- */
@@ -169,6 +169,9 @@
 
 #define UML_SEXT1(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_SEXT1,   4, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_SEXT2(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_SEXT2,   4, IF_ALWAYS,  dst, src1); } while (0)
+
+#define UML_XTRACT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_XTRACT,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
+#define UML_INSERT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_INSERT,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
 
 #define UML_NEG(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_NEG,     4, FLAGS_NONE, dst, src1); } while (0)
 #define UML_NEGf(block, dst, src1, flags)					do { drcuml_block_append_2(block, DRCUML_OP_NEG,     4, flags,      dst, src1); } while (0)
@@ -273,6 +276,9 @@
 #define UML_DSEXT1(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_SEXT1,   8, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_DSEXT2(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_SEXT2,   8, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_DSEXT4(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_SEXT4,   8, IF_ALWAYS,  dst, src1); } while (0)
+
+#define UML_DXTRACT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_XTRACT,  8, IF_ALWAYS,  dst, src, shift, mask); } while (0)
+#define UML_DINSERT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_INSERT,  8, IF_ALWAYS,  dst, src, shift, mask); } while (0)
 
 #define UML_DNEG(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_NEG,     8, FLAGS_NONE, dst, src1); } while (0)
 #define UML_DNEGf(block, dst, src1, flags)					do { drcuml_block_append_2(block, DRCUML_OP_NEG,     8, flags,      dst, src1); } while (0)

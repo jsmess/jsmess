@@ -51,8 +51,8 @@ enum
 
 /* these are called by the core; they should not be called from FEs */
 void inputx_init(running_machine *machine);
-void mess_input_port_update_hook(running_machine *machine, int portnum, UINT32 *digital);
-void inputx_handle_mess_extensions(input_port_entry *ipt);
+void mess_input_port_update_hook(running_machine *machine, const input_port_config *port);
+/*void inputx_handle_mess_extensions(input_port_entry *ipt);*/
 
 /* called by drivers to setup natural keyboard support */
 void inputx_setup_natural_keyboard(
@@ -60,8 +60,9 @@ void inputx_setup_natural_keyboard(
 	int (*accept_char)(unicode_char ch),
 	int (*charqueue_empty)(void));
 
-/* run the validity checks */
-int inputx_validitycheck(const game_driver *gamedrv, input_port_entry **memory);
+/* validity checks */
+int mess_validate_input_ports(int drivnum, const machine_config *config, const input_port_config *portlist);
+int mess_validate_natural_keyboard_statics(void);
 
 /* these can be called from FEs */
 int inputx_can_post(running_machine *machine);
@@ -90,9 +91,9 @@ void inputx_postn_coded(running_machine *machine, const char *text, size_t text_
 void inputx_postn_coded_rate(running_machine *machine, const char *text, size_t text_len, attotime rate);
 
 /* miscellaneous functions */
-int input_classify_port(const input_port_entry *in);
+int input_classify_port(const input_field_config *field);
 int input_has_input_class(running_machine *machine, int inputclass);
-int input_player_number(const input_port_entry *in);
+int input_player_number(const input_field_config *field);
 int input_count_players(running_machine *machine);
 int input_category_active(running_machine *machine, int category);
 

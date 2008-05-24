@@ -105,20 +105,20 @@ static WRITE8_HANDLER(d_pia0_pa_w);
 static READ8_HANDLER(d_pia0_pb_r);
 static WRITE8_HANDLER(d_pia0_pb_w);
 static WRITE8_HANDLER(d_pia0_cb2_w);
-static void d_pia0_irq_a(int state);
-static void d_pia0_irq_b(int state);
+static void d_pia0_irq_a(running_machine *machine, int state);
+static void d_pia0_irq_b(running_machine *machine, int state);
 static READ8_HANDLER(d_pia1_pa_r);
 static WRITE8_HANDLER(d_pia1_pa_w);
 static READ8_HANDLER(d_pia1_pb_r);
 static WRITE8_HANDLER(d_pia1_pb_w);
-static void d_pia1_irq_a(int state);
-static void d_pia1_irq_b(int state);
+static void d_pia1_irq_a(running_machine *machine, int state);
+static void d_pia1_irq_b(running_machine *machine, int state);
 static READ8_HANDLER(d_pia2_pa_r);
 static WRITE8_HANDLER(d_pia2_pa_w);
 static READ8_HANDLER(d_pia2_pb_r);
 static WRITE8_HANDLER(d_pia2_pb_w);
-static void d_pia2_irq_a(int state);
-static void d_pia2_irq_b(int state);
+static void d_pia2_irq_a(running_machine *machine, int state);
+static void d_pia2_irq_b(running_machine *machine, int state);
 
 static void cpu0_recalc_irq(running_machine *machine, int state);
 static void cpu0_recalc_firq(running_machine *machine, int state);
@@ -647,14 +647,14 @@ static WRITE8_HANDLER(d_pia0_cb2_w)
 }
 
 
-static void d_pia0_irq_a(int state)
+static void d_pia0_irq_a(running_machine *machine, int state)
 {
-	cpu0_recalc_irq(Machine, state);
+	cpu0_recalc_irq(machine, state);
 }
 
-static void d_pia0_irq_b(int state)
+static void d_pia0_irq_b(running_machine *machine, int state)
 {
-	cpu0_recalc_firq(Machine, state);
+	cpu0_recalc_firq(machine, state);
 }
 
 /* PIA #1 at $FC24-$FC27 I63
@@ -739,14 +739,14 @@ static WRITE8_HANDLER(d_pia1_pb_w)
 	}
 }
 
-static void d_pia1_irq_a(int state)
+static void d_pia1_irq_a(running_machine *machine, int state)
 {
-	cpu0_recalc_irq(Machine, state);
+	cpu0_recalc_irq(machine, state);
 }
 
-static void d_pia1_irq_b(int state)
+static void d_pia1_irq_b(running_machine *machine, int state)
 {
-	cpu0_recalc_irq(Machine, state);
+	cpu0_recalc_irq(machine, state);
 }
 
 /* PIA #2 at FCC0-FCC3 I28
@@ -842,16 +842,16 @@ static WRITE8_HANDLER(d_pia2_pb_w)
 	vid_set_gctrl(data);
 }
 
-static void d_pia2_irq_a(int state)
+static void d_pia2_irq_a(running_machine *machine, int state)
 {
 	logerror("PIA2 IRQ1 state=%02X\n",state);
-	cpu0_recalc_irq(Machine, state);
+	cpu0_recalc_irq(machine, state);
 }
 
-static void d_pia2_irq_b(int state)
+static void d_pia2_irq_b(running_machine *machine, int state)
 {
 	logerror("PIA2 IRQ2 state=%02X\n",state);
-	cpu0_recalc_irq(Machine, state);
+	cpu0_recalc_irq(machine, state);
 }
 
 /************************************ Recalculate CPU inturrupts ****************************/

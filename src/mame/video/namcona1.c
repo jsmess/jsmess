@@ -16,7 +16,6 @@ UINT16 *namcona1_vreg;
 UINT16 *namcona1_scroll;
 UINT16 *namcona1_workram;
 UINT16 *namcona1_sparevram;
-UINT16 *namcona1_rozvideoram;
 UINT16 *namcona1_pixmap;
 
 /* private variables */
@@ -92,11 +91,11 @@ static TILE_GET_INFO( roz_get_info )
 {
 	/* each logical tile is constructed from 4*4 normal tiles */
 	int tilemap_color = roz_palette;
-	int use_4bpp_gfx = namcona1_vreg[0xbc/2]&16;
+	int use_4bpp_gfx = namcona1_vreg[0xbc/2]&16; /* ? */
 	int c = tile_index%0x40;
 	int r = tile_index/0x40;
-	int data = namcona1_rozvideoram[(r/4)*0x40+c/4]+(c%4)+(r%4)*0x40;
-	int tile = data&0xfff;
+	int data = videoram16[0x8000/2+(r/4)*0x40+c/4]&0xfbf; /* mask out bit 0x40 - patch for Emeraldia Japan */
+	int tile = (data+(c%4)+(r%4)*0x40)&0xfff;
 	int gfx = use_4bpp_gfx;
 	if( use_4bpp_gfx )
 	{
@@ -129,22 +128,19 @@ static TILE_GET_INFO( roz_get_info )
 	}
 } /* roz_get_info */
 
-WRITE16_HANDLER( namcona1_rozvideoram_w )
-{
-	COMBINE_DATA( &namcona1_rozvideoram[offset] );
-	roz_dirty = 1;
-}
-READ16_HANDLER( namcona1_rozvideoram_r )
-{
-	return namcona1_rozvideoram[offset];
-}
-
 /*************************************************************************/
 
 WRITE16_HANDLER( namcona1_videoram_w )
 {
 	COMBINE_DATA( &videoram16[offset] );
-	tilemap_mark_tile_dirty( bg_tilemap[offset/0x1000], offset&0xfff );
+	if( offset<0x8000/2 )
+	{
+		tilemap_mark_tile_dirty( bg_tilemap[offset/0x1000], offset&0xfff );
+	}
+	else if( offset<0xa000/2 )
+	{
+		roz_dirty = 1;
+	}
 } /* namcona1_videoram_w */
 
 READ16_HANDLER( namcona1_videoram_r )
@@ -157,8 +153,19 @@ READ16_HANDLER( namcona1_videoram_r )
 static void
 UpdatePalette(running_machine *machine, int offset )
 {
-	UINT16 color = paletteram16[offset]; /* -RRRRRGGGGGBBBBB */
-	palette_set_color_rgb( machine, offset, pal5bit(color >> 10), pal5bit(color >> 5), pal5bit(color >> 0));
+	UINT16 data = paletteram16[offset]; /* -RRRRRGG GGGBBBBB */
+	/**
+     * sprites can be configured to use an alternate interpretation of palette ram
+     * (used in-game in Emeraldia)
+     *
+     * RRRGGGBB RRRGGGBB
+     */
+	int r = (((data&0x00e0)>>5)+((data&0xe000)>>13)*2)*0xff/(0x7*3);
+	int g = (((data&0x001c)>>2)+((data&0x1c00)>>10)*2)*0xff/(0x7*3);
+	int b = (((data&0x0003)>>0)+((data&0x0300)>>8)*2)*0xff/(0x3*3);
+	palette_set_color_rgb( machine, offset+0x1000, r, g, b);
+
+	palette_set_color_rgb( machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 } /* namcona1_paletteram_w */
 
 READ16_HANDLER( namcona1_paletteram_r )
@@ -170,8 +177,7 @@ WRITE16_HANDLER( namcona1_paletteram_w )
 {
 	COMBINE_DATA( &paletteram16[offset] );
 	if( namcona1_vreg[0x8e/2] )
-	{
-		/* graphics enabled; update palette immediately */
+	{ /* graphics enabled; update palette immediately */
 		UpdatePalette(machine, offset );
 	}
 	else
@@ -293,8 +299,7 @@ static void UpdateGfx(running_machine *machine)
 			}
 		}
 
-		pSource = namcona1_rozvideoram;
-		for( i=0; i<0x800; i++ )
+		for( i=0; i<0x1000; i++ )
 		{
 			if( dirtychar[*pSource++ & 0xfff] )
 			{
@@ -303,7 +308,7 @@ static void UpdateGfx(running_machine *machine)
 			}
 		}
 
-		for( i = 0;i < 0x1000;i++ )
+		for( i = 0;i <0x1000; i++ )
 		{
 			if( dirtychar[i] )
 			{
@@ -333,9 +338,8 @@ VIDEO_START( namcona1 )
 	}
 
 	shaperam		     = auto_malloc( 0x2000*4 );
-	cgram			     = auto_malloc( 0x1000*0x20*2 );
+	cgram			     = auto_malloc( 0x1000*0x40 );
 	dirtychar		     = auto_malloc( 0x1000 );
-	namcona1_rozvideoram = auto_malloc( 0x4000 );
 
 	gfx0 = allocgfx( &cg_layout_8bpp );
 	gfx0->total_colors = machine->config->total_colors/256;
@@ -476,8 +480,8 @@ static void pdraw_tile(running_machine *machine,
 										dest[x] = palette_shadow_table[dest[x]];
 									}
 									else
-									{ // bad?
-										dest[x] = pal_base+c;
+									{
+										dest[x] = pal_base + c + 0x1000;
 									}
 								}
 								else
@@ -584,13 +588,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const pen_t *paldata )
 {
 	int x;
-	UINT16 data;
-
 	for( x=0; x<38*8; x+=2 )
 	{
-		pPri[x / 2] = 0xff;
-		data = *pSource++;
-		pDest[x] = paldata[data>>8];
+		UINT16 data = *pSource++;
+		pPri[x+0] = 0xff;
+		pPri[x+1] = 0xff;
+		pDest[x+0] = paldata[data>>8];
 		pDest[x+1] = paldata[data&0xff];
 	} /* next x */
 } /* draw_pixel_line */
@@ -647,32 +650,25 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 				draw_pixel_line(
 					BITMAP_ADDR16(bitmap, line, 0),
 					BITMAP_ADDR8(priority_bitmap, line, 0),
-					namcona1_rozvideoram + (ydata-0x4000) + 25,
+					videoram16 + ydata + 25,
 					paldata );
 			}
 			else
 			{
-				// used in emeraldia
-				if(which == NAMCONA1_NUM_TILEMAPS )// && namcona1_vreg[0x8a/2] == 0xfd /* maybe reg & 0x4 */)
+				if(which == NAMCONA1_NUM_TILEMAPS )
 				{
-					int incxx = ((INT16)namcona1_vreg[0xc0/2])<<8; // or incyy ?
+					int incxx = ((INT16)namcona1_vreg[0xc0/2])<<8;
 					int incxy = ((INT16)namcona1_vreg[0xc2/2])<<8;
 					int incyx = ((INT16)namcona1_vreg[0xc4/2])<<8;
-					int incyy = ((INT16)namcona1_vreg[0xc6/2])<<8; // or incxx ?
+					int incyy = ((INT16)namcona1_vreg[0xc6/2])<<8;
 					INT16 xoffset = namcona1_vreg[0xc8/2];
 					INT16 yoffset = namcona1_vreg[0xca/2];
-					int dx = 46;
-					int dy = -8;
-
-					// now, apply adjustments to startx, starty to translate the
-					// ROZ plane.  Note that these are corrected by the inc parameters
-					// to account for scale/rotate state.
+					int dx = 46; /* horizontal adjust */
+					int dy = -8; /* vertical adjust */
 					UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
 					UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
-
 					tilemap_draw_roz_primask(bitmap, &clip, roz_tilemap,
-						startx, starty, incxx, incxy, incyx, incyy,
-						0, 0, primask, 0);
+						startx, starty, incxx, incxy, incyx, incyy, 0, 0, primask, 0);
 				}
 				else
 				{
@@ -737,7 +733,15 @@ VIDEO_UPDATE( namcona1 )
 		{
 			for( which=4; which>=0; which-- )
 			{
-				int pri = namcona1_vreg[0xa0/2+which]&0x7; /* likely wrong for roz plane */
+				int pri;
+				if( which==4 )
+				{
+					pri = namcona1_vreg[0xa0/2+5]&0x7;
+				}
+				else
+				{
+					pri = namcona1_vreg[0xa0/2+which]&0x7;
+				}
 				if( pri == priority )
 				{
 					draw_background(screen->machine,bitmap,cliprect,which,priority);
@@ -751,6 +755,8 @@ VIDEO_UPDATE( namcona1 )
 }
 
 /*
+roz bad in emeraldaj - blit param?
+
 $efff20: sprite control: 0x3a,0x3e,0x3f
             bit 0x01 selects spriteram bank
 
@@ -758,10 +764,18 @@ $efff20: sprite control: 0x3a,0x3e,0x3f
 $efff00:    src0 src1 src2 dst0 dst1 dst2 BANK [src
 $efff10:    src] [dst dst] #BYT BLIT eINT 001f 0001
 $efff20:    003f 003f IACK ---- ---- ---- ---- ----
-$efff80:    0050 0170 0020 0100 0000 POSI 0000 GFXE     POSI: scanline for POSIRQ
+...
+$efff80:    0050 0170 0020 0100 0170 POS? 0000 GFXE
 $efff90:    0000 0001 0002 0003 FLIP ---- ---- ----
-$efffa0:    PRI  PRI  PRI  PRI  ---- PRI? --?? ----     priority (0..7)
-$efffb0:    CLR  CLR  CLR  CLR  0001 CLR? BPP  ----     color (0..f), bpp flag per layer
-$efffc0:    RZXX RZXY RZYX RZYY RZX0 RZY0 ???? ----     ROZ
-*/
+$efffa0:    PRI  PRI  PRI  PRI  ???? PRI  00c0 ----     priority (0..7)
+$efffb0:    CLR  CLR  CLR  CLR  0001 CLR  BPP  ----     color (0..f), bpp flag per layer
+$efffc0:    RZXX RZXY RZYX RZYY RZX0 RZY0 0044 ----     ROZ
 
+
+Emeralda:   0048 0177 0020 0100 0000 00f0 0000 0001     in-game
+            0050 0170 0020 0100 0000 00f0 0000 0001     self test
+
+NumanAth:   0050 0170 0020 0100 0170 00d8 0000 0001     in-game
+
+
+*/

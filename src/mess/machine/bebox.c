@@ -908,28 +908,28 @@ static WRITE64_HANDLER( scsi53c810_w )
 {
 	int reg = offset*8;
 	if (!(mem_mask & U64(0xff00000000000000))) {
-		lsi53c810_reg_w(reg+0, data >> 56);
+		lsi53c810_reg_w(machine, reg+0, data >> 56);
 	}
 	if (!(mem_mask & U64(0x00ff000000000000))) {
-		lsi53c810_reg_w(reg+1, data >> 48);
+		lsi53c810_reg_w(machine, reg+1, data >> 48);
 	}
 	if (!(mem_mask & U64(0x0000ff0000000000))) {
-		lsi53c810_reg_w(reg+2, data >> 40);
+		lsi53c810_reg_w(machine, reg+2, data >> 40);
 	}
 	if (!(mem_mask & U64(0x000000ff00000000))) {
-		lsi53c810_reg_w(reg+3, data >> 32);
+		lsi53c810_reg_w(machine, reg+3, data >> 32);
 	}
 	if (!(mem_mask & U64(0x00000000ff000000))) {
-		lsi53c810_reg_w(reg+4, data >> 24);
+		lsi53c810_reg_w(machine, reg+4, data >> 24);
 	}
 	if (!(mem_mask & U64(0x0000000000ff0000))) {
-		lsi53c810_reg_w(reg+5, data >> 16);
+		lsi53c810_reg_w(machine, reg+5, data >> 16);
 	}
 	if (!(mem_mask & U64(0x000000000000ff00))) {
-		lsi53c810_reg_w(reg+6, data >> 8);
+		lsi53c810_reg_w(machine, reg+6, data >> 8);
 	}
 	if (!(mem_mask & U64(0x00000000000000ff))) {
-		lsi53c810_reg_w(reg+7, data >> 0);
+		lsi53c810_reg_w(machine, reg+7, data >> 0);
 	}
 }
 
@@ -947,10 +947,10 @@ static UINT32 scsi53c810_fetch(UINT32 dsp)
 }
 
 
-static void scsi53c810_irq_callback(void)
+static void scsi53c810_irq_callback(running_machine *machine)
 {
-	bebox_set_irq_bit(Machine, 21, 1);
-	bebox_set_irq_bit(Machine, 21, 0);
+	bebox_set_irq_bit(machine, 21, 1);
+	bebox_set_irq_bit(machine, 21, 0);
 }
 
 

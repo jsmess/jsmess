@@ -108,7 +108,7 @@ typedef enum
 /* defines for input ports */
 enum
 {
-	input_port_config = 0,
+	INPUT_PORT_CONFIG = 0,
 	input_port_mousex,									/* optional mouse */
 	input_port_mousey,									/* optional mouse */
 	input_port_mouse_buttons,							/* optional mouse */
@@ -194,7 +194,7 @@ WRITE16_HANDLER( ti99_wgpl_w );
 READ16_HANDLER ( ti99_4p_rgpl_r );
 WRITE16_HANDLER ( ti99_4p_wgpl_w );
 
-extern void tms9901_set_int2(int state);
+extern void tms9901_set_int2(running_machine *machine, int state);
 
- READ8_HANDLER ( ti99_8_r );
+READ8_HANDLER ( ti99_8_r );
 WRITE8_HANDLER ( ti99_8_w );

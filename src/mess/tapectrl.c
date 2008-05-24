@@ -12,7 +12,6 @@
 #include "uimenu.h"
 #include "mslegacy.h"
 #include "devices/cassette.h"
-#include "deprecat.h"
 
 
 
@@ -38,9 +37,8 @@ void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config
 		*endpos = t1;
 }
 
-int tapecontrol(int selected)
+int tapecontrol(running_machine *machine, int selected)
 {
-	running_machine *machine = Machine;
 	static int id = 0;
 	char timepos[32];
 	ui_menu_item menu_item[40];
@@ -66,9 +64,9 @@ int tapecontrol(int selected)
 		strcat(name, ui_getstring(UI_righthilight));
 		ui_draw_message_window(name);
 
-		if (input_ui_pressed(IPT_UI_SELECT) || input_ui_pressed(IPT_UI_CANCEL))
+		if (input_ui_pressed(machine, IPT_UI_SELECT) || input_ui_pressed(machine, IPT_UI_CANCEL))
 			sel = -1;
-		if (input_ui_pressed(IPT_UI_CONFIGURE))
+		if (input_ui_pressed(machine, IPT_UI_CONFIGURE))
 			sel = -2;
 
 		return sel + 1;
@@ -139,20 +137,20 @@ int tapecontrol(int selected)
 
 	ui_menu_draw(menu_item, total, sel, NULL);
 
-	if (input_ui_pressed_repeat(IPT_UI_DOWN,8))
+	if (input_ui_pressed_repeat(machine, IPT_UI_DOWN,8))
 	{
 		if (sel < total - 1) sel++;
 		else sel = 0;
 	}
 
-	if (input_ui_pressed_repeat(IPT_UI_UP,8))
+	if (input_ui_pressed_repeat(machine, IPT_UI_UP,8))
 	{
 		if (sel > 0) sel--;
 		else sel = total - 1;
 	}
 
 
-	if (input_ui_pressed(IPT_UI_LEFT))
+	if (input_ui_pressed(machine, IPT_UI_LEFT))
 	{
 		switch (sel)
 		{
@@ -163,7 +161,7 @@ int tapecontrol(int selected)
 		}
 	}
 
-	if (input_ui_pressed(IPT_UI_RIGHT))
+	if (input_ui_pressed(machine, IPT_UI_RIGHT))
 	{
 		switch (sel)
 		{
@@ -174,7 +172,7 @@ int tapecontrol(int selected)
 		}
 	}
 
-	if (input_ui_pressed(IPT_UI_SELECT))
+	if (input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if (sel == total - 1)
 			sel = -1;
@@ -210,10 +208,10 @@ int tapecontrol(int selected)
 		}
 	}
 
-	if (input_ui_pressed(IPT_UI_CANCEL))
+	if (input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
-	if (input_ui_pressed(IPT_UI_CONFIGURE))
+	if (input_ui_pressed(machine, IPT_UI_CONFIGURE))
 		sel = -2;
 
 	return sel + 1;

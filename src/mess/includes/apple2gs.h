@@ -33,7 +33,7 @@ MACHINE_RESET( apple2gs );
 
 NVRAM_HANDLER( apple2gs );
 
-void apple2gs_doc_irq(int state);
+void apple2gs_doc_irq(running_machine *machine, int state);
 
 
 /*----------- defined in video/apple2gs.c -----------*/

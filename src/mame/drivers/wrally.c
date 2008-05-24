@@ -80,6 +80,18 @@ Palette related:
 * 2xMS6264A-20NC (8KB SRAM) @ C8 & C9 (palette RAM (xxxxBBBBRRRRGGGG))
 * 2x74HCT273 (octal D-Type flip-flop with clear) @ B8 & B9 (connected to RGB output)
 
+Controls related: (added by Mirko Mattioli)
+=================
+When optical wheel is selected (via dipswitch), then gear shift (low/high) is enabled.
+On the real PCB the optical wheel encoder is connected to 74LS169 ICs (@A16 and @A17)
+via a flip-flop IC mounted in the steering wheel assembly. As a result, the output
+of the flip-flop generates a signal that contains the information about the steering
+direction; this signal is routed to pin #1 (U/D) at ICs A16 and A17 (high when turn
+left and low when turn right). The second signal of the optical encoder goes directly
+to pin #2 (CLK) at ICs A16 and A17 and it is a clock for the 74LS169 ICs; this clock
+frequency is proportional to the movements of the steering wheel: fast movements
+produces a high clock frequency, slow movements a low freq.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -91,6 +103,7 @@ Palette related:
 extern UINT16 *wrally_vregs;
 extern UINT16 *wrally_videoram;
 extern UINT16 *wrally_spriteram;
+static UINT16 *wrally_shareram;
 
 VIDEO_START( wrally );
 VIDEO_UPDATE( wrally );
@@ -123,15 +136,29 @@ static ADDRESS_MAP_START( wrally_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(SMH_NOP)												/* Sound muting */
 	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(wrally_flipscreen_w)									/* Flip screen */
 	AM_RANGE(0x70006a, 0x70007b) AM_WRITE(SMH_NOP)												/* ??? */
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE(1)												/* Work RAM (shared with DS5002FP) */
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_BASE(&wrally_shareram)										/* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
+
+static READ8_HANDLER( dallas_share_r )
+{
+	UINT8 *shareram = (UINT8 *)wrally_shareram;
+
+	return shareram[BYTE_XOR_LE(offset)];
+}
+
+static WRITE8_HANDLER( dallas_share_w )
+{
+	UINT8 *shareram = (UINT8 *)wrally_shareram;
+
+	shareram[BYTE_XOR_LE(offset)] = data;
+}
 
 static ADDRESS_MAP_START( dallas_rom, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									/* Code in NVRAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dallas_ram, ADDRESS_SPACE_DATA, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE(1)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dallas_share_r, dallas_share_w)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
 ADDRESS_MAP_END
 
 /* DS5002FP configuration */
@@ -193,7 +220,7 @@ PORT_START	/* INPUTS, COINSW & STARTSW */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Gear Shift") PORT_TOGGLE PORT_REVERSE
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -206,8 +233,9 @@ PORT_START	/* INPUTS, COINSW & STARTSW */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-PORT_START	/* Wheel control? */
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* not implemented */
+PORT_START	/* Wheel control */
+	PORT_BIT( 0xff00, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_RIGHT) PORT_CODE_INC(KEYCODE_LEFT) PORT_REVERSE
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 PORT_START	/* INPUTS, TEST & SERVICE */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )

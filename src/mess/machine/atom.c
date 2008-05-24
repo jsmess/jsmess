@@ -40,15 +40,15 @@ static char atom_printer_data = 0x07f;
 /* I am not sure if this is correct, the atom appears to have a 2.4Khz timer used for reading tapes?? */
 static int	timer_state = 0;
 
-static void atom_via_irq_func(int state)
+static void atom_via_irq_func(running_machine *machine, int state)
 {
 	if (state)
 	{
-		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	}
 }
 

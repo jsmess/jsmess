@@ -173,7 +173,7 @@ WRITE8_HANDLER( hp48_mem_w ) {
 
 /* priority on the bus
    hdw, ram, ce2, ce1, nce3, rom */
-void hp48_mem_reset(void)
+void hp48_mem_reset(running_machine *machine)
 {
 	int i;
 	hp48s.state=0;
@@ -184,7 +184,7 @@ void hp48_mem_reset(void)
 	hp48_config();
 }
 
-void hp48_mem_config(int v)
+void hp48_mem_config(running_machine *machine, int v)
 {
 	logerror("hp48_mem_config called\n");
 	if (hp48s.mem[HDW].adr==-1) {
@@ -228,7 +228,7 @@ void hp48_mem_config(int v)
 	}
 }
 
-void hp48_mem_unconfig(int v)
+void hp48_mem_unconfig(running_machine *machine, int v)
 {
 	int i;
 	for (i=0; i+1< sizeof(hp48s.mem)/sizeof(hp48s.mem[0]); i++) {
@@ -250,7 +250,7 @@ void hp48_mem_unconfig(int v)
 #define CE2_ID_ADR 0xf8
 #define NCE3_ID_SIZE 1
 #define NCE3_ID_ADR 0xf2
-int hp48_mem_id(void)
+int hp48_mem_id(running_machine *machine)
 {
 	if (hp48s.mem[HDW].adr==-1) {
 		return (hp48s.mem[HDW].adr&~0x3f)|HDW_ID_ADR;
@@ -272,7 +272,7 @@ HP48_HARDWARE hp48_hardware={
 	{0}
 };
 
-void hp48_crc(int adr, int data)
+void hp48_crc(running_machine *machine, int adr, int data)
 {
 	if ((hp48s.mem[HDW].adr==-1)
 		||(adr<(hp48s.mem[HDW].adr&~0x3f))
@@ -424,12 +424,12 @@ static TIMER_CALLBACK(hp48_timer)
 	}
 }
 
-void hp48_out(int v)
+void hp48_out(running_machine *machine, int v)
 {
 	out=v;
 }
 
-int hp48_in(void)
+int hp48_in(running_machine *machine)
 {
 	int data=0;
 #if 1
@@ -556,5 +556,5 @@ DRIVER_INIT( hp48g )
 
 MACHINE_RESET( hp48 )
 {
-	hp48_mem_reset();
+	hp48_mem_reset(machine);
 }

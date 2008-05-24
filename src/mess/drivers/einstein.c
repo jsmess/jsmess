@@ -402,16 +402,16 @@ static TIMER_CALLBACK(einstein_keyboard_timer_callback)
 
 
 /* interrupt state callback for ctc */
-static void einstein_ctc_interrupt(int state)
+static void einstein_ctc_interrupt(running_machine *machine, int state)
 {
 	logerror("ctc irq state: %02x\n",state);
-	cpunum_set_input_line(Machine, 0, 1, state);
+	cpunum_set_input_line(machine, 0, 1, state);
 }
 
-static void einstein_pio_interrupt(int state)
+static void einstein_pio_interrupt(running_machine *machine, int state)
 {
 	logerror("pio irq state: %02x\n",state);
-	cpunum_set_input_line(Machine, 0, 3, state);
+	cpunum_set_input_line(machine, 0, 3, state);
 }
 
 static WRITE8_HANDLER(einstein_serial_transmit_clock)

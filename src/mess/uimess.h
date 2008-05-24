@@ -18,13 +18,13 @@ int mess_disable_builtin_ui(running_machine *machine);
 
 /* image info screen */
 int ui_sprintf_image_info(running_machine *machine, char *buf);
-UINT32 ui_menu_image_info(UINT32 state);
+UINT32 ui_menu_image_info(running_machine *machine, UINT32 state);
 
 /* file manager */
-int filemanager(int selected);
+int filemanager(running_machine *machine, int selected);
 
 /* tape control */
-int tapecontrol(int selected);
+int tapecontrol(running_machine *machine, int selected);
 
 /* paste */
 void ui_paste(running_machine *machine);

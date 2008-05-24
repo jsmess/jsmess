@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "mame.h"
-#include "deprecat.h"
 #include "configms.h"
 #include "config.h"
 #include "xmlfile.h"
@@ -20,7 +19,7 @@
 	configuration items
 -------------------------------------------------*/
 
-static void device_dirs_load(int config_type, xml_data_node *parentnode)
+static void device_dirs_load(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 	const device_config *dev;
@@ -38,9 +37,9 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 
 			if ((dev_instance != NULL) && (dev_instance[0] != '\0'))
 			{
-				for (dev = image_device_first(Machine->config); (image == NULL) && (dev != NULL); dev = image_device_next(dev))
+				for (dev = image_device_first(machine->config); (image == NULL) && (dev != NULL); dev = image_device_next(dev))
 				{
-					info = image_device_getinfo(Machine->config, dev);
+					info = image_device_getinfo(machine->config, dev);
 					if (!strcmp(dev_instance, info.instance_name))
 						image = dev;
 				}
@@ -63,7 +62,7 @@ static void device_dirs_load(int config_type, xml_data_node *parentnode)
 	directories to the configuration file
 -------------------------------------------------*/
 
-static void device_dirs_save(int config_type, xml_data_node *parentnode)
+static void device_dirs_save(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 	image_device_info info;
@@ -73,9 +72,9 @@ static void device_dirs_save(int config_type, xml_data_node *parentnode)
 	/* only care about game-specific data */
 	if (config_type == CONFIG_TYPE_GAME)
 	{
-		for (image = image_device_first(Machine->config); image != NULL; image = image_device_next(image))
+		for (image = image_device_first(machine->config); image != NULL; image = image_device_next(image))
 		{
-			info = image_device_getinfo(Machine->config, image);
+			info = image_device_getinfo(machine->config, image);
 			dev_instance = info.instance_name;
 
 			node = xml_add_child(parentnode, "device", NULL);
@@ -97,5 +96,5 @@ static void device_dirs_save(int config_type, xml_data_node *parentnode)
 
 void mess_config_init(running_machine *machine)
 {
-	config_register("device_directories", device_dirs_load, device_dirs_save);
+	config_register(machine, "device_directories", device_dirs_load, device_dirs_save);
 }

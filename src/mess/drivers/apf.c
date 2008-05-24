@@ -148,7 +148,7 @@ void apf_update_ints(running_machine *machine)
 	cpunum_set_input_line(machine, 0, 0, apf_ints ? HOLD_LINE : CLEAR_LINE);
 }
 
-static void	apf_m1000_irq_a_func(int state)
+static void	apf_m1000_irq_a_func(running_machine *machine, int state)
 {
 	if (state)
 	{
@@ -159,11 +159,11 @@ static void	apf_m1000_irq_a_func(int state)
 		apf_ints&=~1;
 	}
 
-	apf_update_ints(Machine);
+	apf_update_ints(machine);
 }
 
 
-static void	apf_m1000_irq_b_func(int state)
+static void	apf_m1000_irq_b_func(running_machine *machine, int state)
 {
 	//logerror("pia 0 irq b %d\n",state);
 
@@ -176,7 +176,7 @@ static void	apf_m1000_irq_b_func(int state)
 		apf_ints&=~2;
 	}
 
-	apf_update_ints(Machine);
+	apf_update_ints(machine);
 
 }
 
@@ -274,7 +274,7 @@ static WRITE8_HANDLER(apf_imagination_pia_out_cb2_func)
 {
 }
 
-static void	apf_imagination_irq_a_func(int state)
+static void	apf_imagination_irq_a_func(running_machine *machine, int state)
 {
 	if (state)
 	{
@@ -285,11 +285,11 @@ static void	apf_imagination_irq_a_func(int state)
 		apf_ints&=~4;
 	}
 
-	apf_update_ints(Machine);
+	apf_update_ints(machine);
 
 }
 
-static void	apf_imagination_irq_b_func(int state)
+static void	apf_imagination_irq_b_func(running_machine *machine, int state)
 {
 	if (state)
 	{
@@ -300,7 +300,7 @@ static void	apf_imagination_irq_b_func(int state)
 		apf_ints&=~8;
 	}
 
-	apf_update_ints(Machine);
+	apf_update_ints(machine);
 
 }
 

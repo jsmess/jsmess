@@ -27,7 +27,7 @@ DEVICE_IMAGE_LOAD( svi318_cart );
 DEVICE_IMAGE_UNLOAD( svi318_cart );
 
 INTERRUPT_GEN( svi318_interrupt );
-void svi318_vdp_interrupt(int i);
+void svi318_vdp_interrupt(running_machine *machine, int i);
 
 WRITE8_HANDLER( svi318_writemem1 );
 WRITE8_HANDLER( svi318_writemem2 );

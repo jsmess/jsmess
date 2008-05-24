@@ -76,7 +76,7 @@ TODO:
 static READ16_HANDLER ( ti99_rspeech_r );
 static WRITE16_HANDLER ( ti99_wspeech_w );
 
-static void tms9901_set_int1(int state);
+static void tms9901_set_int1(running_machine *machine, int state);
 static void tms9901_interrupt_callback(int intreq, int ic);
 static int ti99_R9901_0(int offset);
 static int ti99_R9901_1(int offset);
@@ -792,17 +792,17 @@ MACHINE_RESET( ti99 )
 	else if (ti99_model == model_99_4p)
 		xRAM_kind = xRAM_kind_99_4p_1Mb;	/* hack */
 	else
-		xRAM_kind = (input_port_read_indexed(machine, input_port_config) >> config_xRAM_bit) & config_xRAM_mask;
+		xRAM_kind = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_xRAM_bit) & config_xRAM_mask;
 	if (ti99_model == model_99_8)
 		has_speech = TRUE;
 	else
-		has_speech = (input_port_read_indexed(machine, input_port_config) >> config_speech_bit) & config_speech_mask;
-	fdc_kind = (input_port_read_indexed(machine, input_port_config) >> config_fdc_bit) & config_fdc_mask;
-	has_ide = (input_port_read_indexed(machine, input_port_config) >> config_ide_bit) & config_ide_mask;
-	has_rs232 = (input_port_read_indexed(machine, input_port_config) >> config_rs232_bit) & config_rs232_mask;
-	has_handset = (ti99_model == model_99_4) && ((input_port_read_indexed(machine, input_port_config) >> config_handsets_bit) & config_handsets_mask);
-	has_hsgpl = (ti99_model == model_99_4p) || ((input_port_read_indexed(machine, input_port_config) >> config_hsgpl_bit) & config_hsgpl_mask);
-	has_usb_sm = (input_port_read_indexed(machine, input_port_config) >> config_usbsm_bit) & config_usbsm_mask;
+		has_speech = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_speech_bit) & config_speech_mask;
+	fdc_kind = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_fdc_bit) & config_fdc_mask;
+	has_ide = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_ide_bit) & config_ide_mask;
+	has_rs232 = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_rs232_bit) & config_rs232_mask;
+	has_handset = (ti99_model == model_99_4) && ((input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_handsets_bit) & config_handsets_mask);
+	has_hsgpl = (ti99_model == model_99_4p) || ((input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_hsgpl_bit) & config_hsgpl_mask);
+	has_usb_sm = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_usbsm_bit) & config_usbsm_mask;
 
 	/* set up optional expansion hardware */
 	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
@@ -944,10 +944,10 @@ VIDEO_START( ti99_4ev )
 */
 INTERRUPT_GEN( ti99_vblank_interrupt )
 {
-	TMS9928A_interrupt();
+	TMS9928A_interrupt(machine);
 	if (has_handset)
 		ti99_handset_task();
-	has_mecmouse = (input_port_read_indexed(machine, input_port_config) >> config_mecmouse_bit) & config_mecmouse_mask;
+	has_mecmouse = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_mecmouse_bit) & config_mecmouse_mask;
 	if (has_mecmouse)
 		mecmouse_poll();
 }
@@ -959,7 +959,7 @@ INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 	if (++line_count == 262)
 	{
 		line_count = 0;
-		has_mecmouse = (input_port_read_indexed(machine, input_port_config) >> config_mecmouse_bit) & config_mecmouse_mask;
+		has_mecmouse = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_mecmouse_bit) & config_mecmouse_mask;
 		if (has_mecmouse)
 			mecmouse_poll();
 	}
@@ -2181,7 +2181,7 @@ nota:
 /*
 	set the state of int1 (called by the peb core)
 */
-static void tms9901_set_int1(int state)
+static void tms9901_set_int1(running_machine *machine, int state)
 {
 	tms9901_set_single_int(0, 1, state);
 }
@@ -2189,7 +2189,7 @@ static void tms9901_set_int1(int state)
 /*
 	set the state of int2 (called by the tms9928 core)
 */
-void tms9901_set_int2(int state)
+void tms9901_set_int2(running_machine *machine, int state)
 {
 	tms9901_set_single_int(0, 2, state);
 }

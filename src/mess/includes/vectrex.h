@@ -24,7 +24,7 @@ TIMER_CALLBACK(vectrex_imager_eye);
 void vectrex_configuration(running_machine *machine);
 READ8_HANDLER (v_via_pa_r);
 READ8_HANDLER(v_via_pb_r );
-void v_via_irq (int level);
+void v_via_irq (running_machine *machine, int level);
 WRITE8_HANDLER ( vectrex_psg_port_w );
 
 DRIVER_INIT( vectrex );

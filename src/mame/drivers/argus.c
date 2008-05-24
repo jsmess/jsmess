@@ -171,9 +171,9 @@ static INTERRUPT_GEN( argus_interrupt )
 }
 
 /* Handler called by the YM2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =
@@ -554,7 +554,7 @@ static INPUT_PORTS_START( butasan )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:2" )			/* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:1" )			/* Listed as "Unused" */
 
-	PORT_START_TAG("DSW2")
+	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

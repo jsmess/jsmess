@@ -278,30 +278,30 @@ static UINT8 keymodreg;
   Helper Functions
 ***************************************************************************/
 
-INLINE int a2_has_keypad(void)
+INLINE int a2_has_keypad(running_machine *machine)
 {
-	return port_tag_to_index("keypad_1") != -1;
+	return input_port_by_tag(machine->portconfig, "keypad_1") != NULL;
 }
 
-INLINE int a2_has_reset_dip(void)
+INLINE int a2_has_reset_dip(running_machine *machine)
 {
-	return port_tag_to_index("reset_dip") != -1;
+	return input_port_by_tag(machine->portconfig, "reset_dip") != NULL;
 }
 
-INLINE int a2_has_repeat(void)
+INLINE int a2_has_repeat(running_machine *machine)
 {
-	return port_tag_to_index("keyb_repeat") != -1;
+	return input_port_by_tag(machine->portconfig, "keyb_repeat") != NULL;
 }
 
-INLINE int a2_has_capslock(void)
+INLINE int a2_has_capslock(running_machine *machine)
 {
-	return !a2_has_repeat(); /* BUG: Doesn't work with Ace */
+	return !a2_has_repeat(machine); /* BUG: Doesn't work with Ace */
 }
 
 INLINE int a2_no_ctrl_reset(running_machine *machine)
 {
-	return ((a2_has_repeat() && !a2_has_reset_dip()) ||
-			(a2_has_reset_dip() && !input_port_read(machine, "reset_dip")));
+	return ((a2_has_repeat(machine) && !a2_has_reset_dip(machine)) ||
+			(a2_has_reset_dip(machine) && !input_port_read(machine, "reset_dip")));
 }
 
 
@@ -361,7 +361,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	/* check for these special cases because they affect the emulated key codes */
 
 	/* only repeat keys on a 2/2+ if special REPT key is pressed */
-	if (a2_has_repeat())
+	if (a2_has_repeat(machine))
 		time_until_repeat = input_port_read(machine, "keyb_repeat") & 0x01 ? 0 : ~0;
 
 	/* check caps lock and set LED here */
@@ -440,7 +440,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* run through real keys and see what's being pressed */
-	num_ports = a2_has_keypad() ? 9 : 7;
+	num_ports = a2_has_keypad(machine) ? 9 : 7;
 
 	keymodreg &= ~A2_KEYMOD_KEYPAD;
 
@@ -449,7 +449,7 @@ static TIMER_CALLBACK(AY3600_poll)
 		data = input_port_read_indexed(machine, AY3600_KEYS_BASEPORT + port);
 		for (bit = 0; bit < 8; bit++)
 		{
-			if (a2_has_capslock()) {
+			if (a2_has_capslock(machine)) {
 				curkey = ay3600_key_remap_2e[caps_lock][port*8+bit][switchkey];
 				curkey_unmodified = ay3600_key_remap_2e[caps_lock][port*8+bit][0];
 			} else {

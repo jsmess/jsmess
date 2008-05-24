@@ -559,7 +559,7 @@ static MACHINE_RESET( ip204415 )
 	nRTC_Temp = 0;
 }
 
-static void scsi_irq(int state)
+static void scsi_irq(running_machine *machine, int state)
 {
 }
 

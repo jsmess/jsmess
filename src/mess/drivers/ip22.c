@@ -1271,10 +1271,8 @@ static void dump_chain(UINT32 ch_base)
 
 static UINT8 dma_buffer[4096];
 
-static void scsi_irq(int state)
+static void scsi_irq(running_machine *machine, int state)
 {
-	running_machine *machine = Machine;
-
 	if (state)
 	{
 		if (wd33c93_get_dma_count())

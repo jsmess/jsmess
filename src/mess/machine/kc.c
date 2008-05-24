@@ -1725,14 +1725,14 @@ WRITE8_HANDLER ( kc85_ctc_w )
 }
 
 
-static void kc85_pio_interrupt(int state)
+static void kc85_pio_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, 0, state);
+	cpunum_set_input_line(machine, 0, 0, state);
 }
 
-static void kc85_ctc_interrupt(int state)
+static void kc85_ctc_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, 1, state);
+	cpunum_set_input_line(machine, 0, 1, state);
 }
 
 /* callback for ardy output from PIO */

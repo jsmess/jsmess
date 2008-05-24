@@ -91,7 +91,7 @@ static INPUT_CHANGED( kbd_update )
 		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
 		if ( key_buf_was_empty && ( key_buf_pos != key_cur_pos ) )
 		{
-			timer_adjust_oneshot(kbd_timer, attotime_div(video_screen_get_frame_period(machine->primary_screen),4), 0);
+			timer_adjust_oneshot(kbd_timer, attotime_div(video_screen_get_frame_period(field->port->machine->primary_screen),4), 0);
 		}
 	}
 }

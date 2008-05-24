@@ -59,7 +59,6 @@ Verification still needed for the other PCBs.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "sound/3812intf.h"
@@ -1193,7 +1192,7 @@ static const gfx_layout spikes91_spritelayout =
 	16,16,
 	RGN_FRAC(1,4),
 	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
 	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
@@ -1300,9 +1299,9 @@ static GFXDECODE_START( wbbc97 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, wbbc97_spritelayout, 1024, 64 )	/* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =
@@ -1909,7 +1908,7 @@ ROM_START( spikes91 )
 	ROM_LOAD( "5.ic74",   0x40000, 0x20000, CRC(d7fcd97c) SHA1(eb7c8ac111f5916350aae0ee3edc019207fef654) )
 	ROM_LOAD( "6.ic73",   0x60000, 0x20000, CRC(e6b9107f) SHA1(aaab2f2dfb85ee764091253c9a4ab89bc51d7518) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE | ROMREGION_INVERT )
 	ROM_LOAD( "11.ic118",   0x00000, 0x40000, CRC(6e65b4b2) SHA1(5296e8095ec60f79a5cd3f9db829c7d491670282) )
 	ROM_LOAD( "12.ic119",   0x40000, 0x40000, CRC(60e0d3e0) SHA1(93efc58b03610e7f18ff076ac985428a446454f9) )
 	ROM_LOAD( "13.ic120",   0x80000, 0x40000, CRC(89213a8c) SHA1(8524d5c14669d9b03f1fe050c4318d4111bc8ef7) )
@@ -2448,7 +2447,7 @@ GAME( 1991, pspikes,  0,        pspikes,  pspikes,  0, ROT0,   "Video System Co.
 GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Power Spikes (Korea)", GAME_NO_COCKTAIL )
 GAME( 1991, svolly91, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Super Volley '91 (Japan)", GAME_NO_COCKTAIL )
 GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, 0, ROT0,   "bootleg",          "Power Spikes (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1991, spikes91, pspikes,  spikes91, pspikes,  0, ROT0,   "bootleg",          "1991 Spikes (Italian bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_NO_COCKTAIL )
+GAME( 1991, spikes91, pspikes,  spikes91, pspikes,  0, ROT0,   "bootleg",          "1991 Spikes (Italian bootleg)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
 GAME( 1991, pspikesc, pspikes,  pspikesc, pspikesc, 0, ROT0,   "bootleg",          "Power Spikes (China)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 GAME( 1991, karatblz, 0,        karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (World?)", GAME_NO_COCKTAIL )
 GAME( 1991, karatblu, karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", GAME_NO_COCKTAIL )

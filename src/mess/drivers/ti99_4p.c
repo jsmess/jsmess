@@ -95,10 +95,10 @@ static INPUT_PORTS_START(ti99_4p)
 
 	/* 1 port for config */
 	PORT_START	/* config */
-		PORT_BIT( config_speech_mask << config_speech_bit, 1 << config_speech_bit, IPT_DIPSWITCH_NAME) PORT_NAME("Speech synthesis")
+		PORT_DIPNAME( config_speech_mask << config_speech_bit, 1 << config_speech_bit, "Speech synthesis")
 			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
 			PORT_DIPSETTING( 1 << config_speech_bit, DEF_STR( On ) )
-		PORT_BIT( config_fdc_mask << config_fdc_bit, fdc_kind_hfdc << config_fdc_bit, IPT_DIPSWITCH_NAME) PORT_NAME("Floppy disk controller")
+		PORT_DIPNAME( config_fdc_mask << config_fdc_bit, fdc_kind_hfdc << config_fdc_bit, "Floppy disk controller")
 			PORT_DIPSETTING( fdc_kind_none << config_fdc_bit, DEF_STR( None ) )
 			PORT_DIPSETTING( fdc_kind_TI << config_fdc_bit, "Texas Instruments SD" )
 #if HAS_99CCFDC
@@ -106,16 +106,16 @@ static INPUT_PORTS_START(ti99_4p)
 #endif
 			PORT_DIPSETTING( fdc_kind_BwG << config_fdc_bit, "SNUG's BwG" )
 			PORT_DIPSETTING( fdc_kind_hfdc << config_fdc_bit, "Myarc's HFDC" )
-		/*PORT_BIT( config_ide_mask << config_ide_bit, 1 << config_ide_bit, IPT_DIPSWITCH_NAME) PORT_NAME("Nouspickel's IDE card")
+		/*PORT_DIPNAME( config_ide_mask << config_ide_bit, 1 << config_ide_bit, IPT_DIPSWITCH_NAME) PORT_NAME("Nouspickel's IDE card")
             PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
             PORT_DIPSETTING( 1 << config_ide_bit, DEF_STR( On ) )*/
-		PORT_BIT( config_rs232_mask << config_rs232_bit, /*1 << config_rs232_bit*/0, IPT_DIPSWITCH_NAME) PORT_NAME("TI RS232 card")
+		PORT_DIPNAME( config_rs232_mask << config_rs232_bit, /*1 << config_rs232_bit*/0, "TI RS232 card")
 			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
 			PORT_DIPSETTING( 1 << config_rs232_bit, DEF_STR( On ) )
-		PORT_BIT( config_mecmouse_mask << config_mecmouse_bit, 0, IPT_DIPSWITCH_NAME) PORT_NAME("Mechatronics Mouse")
+		PORT_DIPNAME( config_mecmouse_mask << config_mecmouse_bit, 0, "Mechatronics Mouse")
 			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
 			PORT_DIPSETTING( 1 << config_mecmouse_bit, DEF_STR( On ) )
-		PORT_BIT( config_usbsm_mask << config_usbsm_bit, 1 << config_usbsm_bit, IPT_DIPSWITCH_NAME) PORT_NAME("Nouspickel's USB-SM card")
+		PORT_DIPNAME( config_usbsm_mask << config_usbsm_bit, 1 << config_usbsm_bit, "Nouspickel's USB-SM card")
 			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
 			PORT_DIPSETTING( 1 << config_usbsm_bit, DEF_STR( On ) )
 

@@ -180,7 +180,7 @@ static TIMER_CALLBACK(psx_pad_ack)
 	int n_port = param;
 	if( m_pad[ n_port ].n_state != PAD_STATE_IDLE )
 	{
-		psx_sio_input( 0, PSX_SIO_IN_DSR, m_pad[ n_port ].b_ack * PSX_SIO_IN_DSR );
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, m_pad[ n_port ].b_ack * PSX_SIO_IN_DSR );
 		if( !m_pad[ n_port ].b_ack )
 		{
 			m_pad[ n_port ].b_ack = 1;
@@ -217,7 +217,7 @@ static void psx_pad( int n_port, int n_data )
 	case PAD_STATE_READ:
 		if( m_pad[ n_port ].b_lastclock && !b_clock )
 		{
-			psx_sio_input( 0, PSX_SIO_IN_DATA, ( m_pad[ n_port ].n_shiftout & 1 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( m_pad[ n_port ].n_shiftout & 1 ) * PSX_SIO_IN_DATA );
 			m_pad[ n_port ].n_shiftout >>= 1;
 		}
 		if( !m_pad[ n_port ].b_lastclock && b_clock )
@@ -634,7 +634,7 @@ static WRITE32_HANDLER( psx_cd_w )
 		if (psx_cdcmd)
 			psx_cdcmd();
 
-		psx_irq_set(0x0004);
+		psx_irq_set(machine, 0x0004);
 	}
 	else if( mem_mask == 0xff00ffff )
 	{

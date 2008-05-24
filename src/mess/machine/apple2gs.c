@@ -336,15 +336,15 @@ static void apple2gs_remove_irq(running_machine *machine, UINT8 irq_mask)
 	}
 }
 
-void apple2gs_doc_irq(int state)
+void apple2gs_doc_irq(running_machine *machine, int state)
 {
 	if (state)
 	{
-		apple2gs_add_irq(Machine, IRQ_DOC);
+		apple2gs_add_irq(machine, IRQ_DOC);
 	}
 	else
 	{
-		apple2gs_remove_irq(Machine, IRQ_DOC);
+		apple2gs_remove_irq(machine, IRQ_DOC);
 	}
 }
 

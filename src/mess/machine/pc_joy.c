@@ -19,11 +19,11 @@ READ8_HANDLER ( pc_JOY_r )
 	UINT8 data = 0;
 	int delta;
 	attotime new_time = timer_get_time();
-	int joystick_port = port_tag_to_index("pc_joy");
+	const input_port_config *joystick_port = input_port_by_tag(machine->portconfig, "pc_joy");
 
-	if (joystick_port >= 0)
+	if (joystick_port != NULL)
 	{
-		data = input_port_read_indexed(machine, joystick_port + 0) ^ 0xf0;
+		data = input_port_read_direct(joystick_port) ^ 0xf0;
 
 		/* timer overflow? */
 		if (attotime_compare(attotime_sub(new_time, JOY_time), ATTOTIME_IN_MSEC(10)) > 0)
@@ -33,10 +33,10 @@ READ8_HANDLER ( pc_JOY_r )
 		else
 		{
 			delta = attotime_mul(attotime_sub(new_time, JOY_time), 256 * 1000).seconds;
-			if (input_port_read_indexed(machine, joystick_port + 1) < delta) data &= ~0x01;
-			if (input_port_read_indexed(machine, joystick_port + 2) < delta) data &= ~0x02;
-			if (input_port_read_indexed(machine, joystick_port + 3) < delta) data &= ~0x04;
-			if (input_port_read_indexed(machine, joystick_port + 4) < delta) data &= ~0x08;
+			if (input_port_read(machine, "pc_joy_1") < delta) data &= ~0x01;
+			if (input_port_read(machine, "pc_joy_2") < delta) data &= ~0x02;
+			if (input_port_read(machine, "pc_joy_3") < delta) data &= ~0x04;
+			if (input_port_read(machine, "pc_joy_4") < delta) data &= ~0x08;
 		}
 	}
 	return data;
@@ -79,16 +79,16 @@ INPUT_PORTS_START( pc_joystick )
 	PORT_BIT( 0x0040, 0x0000, IPT_BUTTON1) PORT_NAME("Joystick 2 Button 1") PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, 0x0000, IPT_BUTTON2) PORT_NAME("Joystick 2 Button 2") PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("pc_joy_1")
 	PORT_BIT(0xff,0x80,IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_REVERSE
 
-	PORT_START
+	PORT_START_TAG("pc_joy_2")
 	PORT_BIT(0xff,0x80,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_REVERSE
 
-	PORT_START
+	PORT_START_TAG("pc_joy_3")
 	PORT_BIT(0xff,0x80,IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2) PORT_REVERSE
 
-	PORT_START
+	PORT_START_TAG("pc_joy_4")
 	PORT_BIT(0xff,0x80,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 

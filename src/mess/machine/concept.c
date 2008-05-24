@@ -47,7 +47,7 @@ static WRITE8_HANDLER(via_out_a);
 static  READ8_HANDLER(via_in_b);
 static WRITE8_HANDLER(via_out_b);
 static WRITE8_HANDLER(via_out_cb2);
-static void via_irq_func(int state);
+static void via_irq_func(running_machine *machine, int state);
 
 
 static const struct via6522_interface concept_via6522_intf =
@@ -274,9 +274,9 @@ static WRITE8_HANDLER(via_out_cb2)
 /*
 	VIA irq -> 68k level 5
 */
-static void via_irq_func(int state)
+static void via_irq_func(running_machine *machine, int state)
 {
-	concept_set_interrupt(Machine, TIMINT_level, state);
+	concept_set_interrupt(machine, TIMINT_level, state);
 }
 
 READ16_HANDLER(concept_io_r)

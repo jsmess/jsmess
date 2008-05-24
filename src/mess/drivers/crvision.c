@@ -197,12 +197,12 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( crvision_int )
 {
-    TMS9928A_interrupt();
+    TMS9928A_interrupt(machine);
 }
 
-static void crvision_vdp_interrupt(int state)
+static void crvision_vdp_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, state);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, state);
 }
 
 static const TMS9928a_interface tms9918_intf =

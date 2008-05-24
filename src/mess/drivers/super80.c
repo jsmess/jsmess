@@ -341,9 +341,9 @@ static VIDEO_UPDATE( super80v )
 
 /**************************** PIO ******************************************************************************/
 
-static void pio_interrupt(int state)
+static void pio_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line( Machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line( machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const z80pio_interface pio_intf =

@@ -104,7 +104,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "fromance.h"
 #include "sound/2608intf.h"
@@ -525,16 +524,16 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static const struct YM2608interface ym2608_interface =
 {
 	{
-		AY8910_LEGACY_OUTPUT,
+		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	},

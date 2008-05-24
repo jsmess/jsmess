@@ -600,7 +600,7 @@ static INPUT_PORTS_START( undrfire )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
 
 	PORT_START_TAG("FAKE")
-	PORT_BIT(    0x01, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Show gun target") PORT_CODE(KEYCODE_F1) PORT_TOGGLE
+	PORT_DIPNAME( 0x01, 0x00, "Show gun target" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -1024,4 +1024,4 @@ static DRIVER_INIT( cbombers )
 GAME( 1993, undrfire, 0,        undrfire, undrfire, undrfire, ROT0, "Taito Corporation Japan", "Under Fire (World)", 0 )
 GAME( 1993, undrfiru, undrfire, undrfire, undrfire, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)", 0 )
 GAME( 1993, undrfirj, undrfire, undrfire, undrfire, undrfire, ROT0, "Taito Corporation", "Under Fire (Japan)", 0 )
-GAME( 1994, cbombers, 0,        cbombers, cbombers, cbombers, ROT0, "Taito Corporation", "Chase Bombers", 0 )
+GAME( 1994, cbombers, 0,        cbombers, cbombers, cbombers, ROT0, "Taito Corporation", "Chase Bombers", GAME_IMPERFECT_GRAPHICS )

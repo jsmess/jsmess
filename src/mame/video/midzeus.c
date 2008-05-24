@@ -5,7 +5,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "eminline.h"
 #include "includes/midzeus.h"
 #include "video/poly.h"
@@ -85,11 +84,11 @@ static UINT32 *waveram[2];
 static void exit_handler(running_machine *machine);
 
 static void zeus_pointer_w(UINT32 which, UINT32 data, int logit);
-static void zeus_register16_w(offs_t offset, UINT16 data, int logit);
-static void zeus_register32_w(offs_t offset, UINT32 data, int logit);
-static void zeus_register_update(offs_t offset);
-static int zeus_fifo_process(const UINT32 *data, int numwords);
-static void zeus_draw_model(UINT32 texdata, int logit);
+static void zeus_register16_w(running_machine *machine, offs_t offset, UINT16 data, int logit);
+static void zeus_register32_w(running_machine *machine, offs_t offset, UINT32 data, int logit);
+static void zeus_register_update(running_machine *machine, offs_t offset);
+static int zeus_fifo_process(running_machine *machine, const UINT32 *data, int numwords);
+static void zeus_draw_model(running_machine *machine, UINT32 texdata, int logit);
 static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit);
 
 static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
@@ -444,11 +443,11 @@ WRITE32_HANDLER( zeus_w )
 
 	/* 32-bit mode */
 	if (zeusbase[0x80] & 0x00020000)
-		zeus_register32_w(offset, data, logit);
+		zeus_register32_w(machine, offset, data, logit);
 
 	/* 16-bit mode */
 	else
-		zeus_register16_w(offset, data, logit);
+		zeus_register16_w(machine, offset, data, logit);
 }
 
 
@@ -522,11 +521,11 @@ static void zeus_pointer_w(UINT32 which, UINT32 data, int logit)
  *
  *************************************/
 
-static void zeus_register16_w(offs_t offset, UINT16 data, int logit)
+static void zeus_register16_w(running_machine *machine, offs_t offset, UINT16 data, int logit)
 {
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* write to high part on odd addresses */
 	if (offset & 1)
@@ -542,15 +541,15 @@ static void zeus_register16_w(offs_t offset, UINT16 data, int logit)
 
 	/* handle the update */
 	if ((offset & 1) == 0)
-		zeus_register_update(offset);
+		zeus_register_update(machine, offset);
 }
 
 
-static void zeus_register32_w(offs_t offset, UINT32 data, int logit)
+static void zeus_register32_w(running_machine *machine, offs_t offset, UINT32 data, int logit)
 {
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* always write to low word? */
 	zeusbase[offset & ~1] = data;
@@ -568,7 +567,7 @@ static void zeus_register32_w(offs_t offset, UINT32 data, int logit)
 
 	/* handle the update */
 	if ((offset & 1) == 0)
-		zeus_register_update(offset);
+		zeus_register_update(machine, offset);
 }
 
 
@@ -579,7 +578,7 @@ static void zeus_register32_w(offs_t offset, UINT32 data, int logit)
  *
  *************************************/
 
-static void zeus_register_update(offs_t offset)
+static void zeus_register_update(running_machine *machine, offs_t offset)
 {
 	/* handle the writes; only trigger on low accesses */
 	switch (offset)
@@ -656,9 +655,9 @@ static void zeus_register_update(offs_t offset)
                 we simply assert immediately if this is enabled. invasn needs this for proper
                 operations */
 			if (zeusbase[0x80] & 0x02000000)
-				cpunum_set_input_line(Machine, 0, 2, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
 			else
-				cpunum_set_input_line(Machine, 0, 2, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
 			break;
 
 		case 0x84:
@@ -717,7 +716,7 @@ static void zeus_register_update(offs_t offset)
 		case 0xc6:
 		case 0xc8:
 		case 0xca:
-			video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 			{
 				int vtotal = zeusbase[0xca] >> 16;
 				int htotal = zeusbase[0xc6] >> 16;
@@ -729,7 +728,7 @@ static void zeus_register_update(offs_t offset)
 				visarea.max_y = zeusbase[0xc8] & 0xffff;
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
-					video_screen_configure(Machine->primary_screen, htotal, vtotal, &visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));
+					video_screen_configure(machine->primary_screen, htotal, vtotal, &visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));
 					zeus_cliprect = visarea;
 					zeus_cliprect.max_x -= zeus_cliprect.min_x;
 					zeus_cliprect.min_x = 0;
@@ -738,13 +737,13 @@ static void zeus_register_update(offs_t offset)
 			break;
 
 		case 0xcc:
-			video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 			log_fifo = input_code_pressed(KEYCODE_L);
 			break;
 
 		case 0xe0:
 			zeus_fifo[zeus_fifo_words++] = zeusbase[0xe0];
-			if (zeus_fifo_process(zeus_fifo, zeus_fifo_words))
+			if (zeus_fifo_process(machine, zeus_fifo, zeus_fifo_words))
 				zeus_fifo_words = 0;
 			break;
 	}
@@ -758,7 +757,7 @@ static void zeus_register_update(offs_t offset)
  *
  *************************************/
 
-static int zeus_fifo_process(const UINT32 *data, int numwords)
+static int zeus_fifo_process(running_machine *machine, const UINT32 *data, int numwords)
 {
 	/* handle logging */
 	switch (data[0] >> 24)
@@ -778,14 +777,14 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 		case 0x13:	/* invasn */
 			if (log_fifo)
 				log_fifo_command(data, numwords, "");
-			zeus_draw_model((zeusbase[0x06] << 16), log_fifo);
+			zeus_draw_model(machine, (zeusbase[0x06] << 16), log_fifo);
 			break;
 
 		/* 0x17: write 16-bit value to low registers */
 		case 0x17:
 			if (log_fifo)
 				log_fifo_command(data, numwords, " -- reg16");
-			zeus_register16_w((data[0] >> 16) & 0x7f, data[0], log_fifo);
+			zeus_register16_w(machine, (data[0] >> 16) & 0x7f, data[0], log_fifo);
 			break;
 
 		/* 0x18: write 32-bit value to low registers */
@@ -795,7 +794,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 				return FALSE;
 			if (log_fifo)
 				log_fifo_command(data, numwords, " -- reg32");
-			zeus_register32_w((data[0] >> 16) & 0x7f, data[1], log_fifo);
+			zeus_register32_w(machine, (data[0] >> 16) & 0x7f, data[1], log_fifo);
 			break;
 
 		/* 0x1A: sync pipeline(?) */
@@ -939,7 +938,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 			if (log_fifo)
 				log_fifo_command(data, numwords, "");
 			zeus_objdata = data[1];
-			zeus_draw_model(data[2], log_fifo);
+			zeus_draw_model(machine, data[2], log_fifo);
 			break;
 
 		default:
@@ -959,7 +958,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
  *
  *************************************/
 
-static void zeus_draw_model(UINT32 texdata, int logit)
+static void zeus_draw_model(running_machine *machine, UINT32 texdata, int logit)
 {
 	UINT32 databuffer[32];
 	int databufcount = 0;
@@ -1018,7 +1017,7 @@ static void zeus_draw_model(UINT32 texdata, int logit)
 					case 0x17:	/* mk4 */
 						if (logit)
 							logerror("reg16");
-						zeus_register16_w((databuffer[0] >> 16) & 0x7f, databuffer[0], logit);
+						zeus_register16_w(machine, (databuffer[0] >> 16) & 0x7f, databuffer[0], logit);
 						if (((databuffer[0] >> 16) & 0x7f) == 0x06)
 							texdata = (texdata & 0xffff) | (zeusbase[0x06] << 16);
 						break;
@@ -1026,7 +1025,7 @@ static void zeus_draw_model(UINT32 texdata, int logit)
 					case 0x19:	/* invasn */
 						if (logit)
 							logerror("reg32");
-						zeus_register32_w((databuffer[0] >> 16) & 0x7f, databuffer[1], logit);
+						zeus_register32_w(machine, (databuffer[0] >> 16) & 0x7f, databuffer[1], logit);
 						if (((databuffer[0] >> 16) & 0x7f) == 0x06)
 							texdata = (texdata & 0xffff) | (zeusbase[0x06] << 16);
 						break;

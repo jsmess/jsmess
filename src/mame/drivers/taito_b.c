@@ -1380,7 +1380,7 @@ static INPUT_PORTS_START( crimecj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("IN1")
 	TAITO_B_PLAYERS_INPUT( 2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2566,9 +2566,9 @@ GFXDECODE_END
 
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface_rsaga2 =

@@ -114,35 +114,35 @@ static void thom_irq_init ( void )
 
 
 
-static void thom_irq_0  ( int state )
+static void thom_irq_0  ( running_machine *machine, int state )
 {
-	thom_set_irq  ( Machine, 0, state );
+	thom_set_irq  ( machine, 0, state );
 }
 
-static void thom_irq_1  ( int state )
+static void thom_irq_1  ( running_machine *machine, int state )
 {
-	thom_set_irq  ( Machine, 1, state );
+	thom_set_irq  ( machine, 1, state );
 }
 
-static void thom_irq_3  ( int state )
+static void thom_irq_3  ( running_machine *machine, int state )
 {
-	thom_set_irq  ( Machine, 3, state );
+	thom_set_irq  ( machine, 3, state );
 }
 
-static void thom_firq_1 ( int state )
+static void thom_firq_1 ( running_machine *machine, int state )
 {
-	thom_set_firq ( Machine, 1, state );
+	thom_set_firq ( machine, 1, state );
 }
 
-static void thom_firq_2 ( int state )
+static void thom_firq_2 ( running_machine *machine, int state )
 {
-	thom_set_firq ( Machine, 2, state );
+	thom_set_firq ( machine, 2, state );
 }
 
 #ifdef CHARDEV
-static void thom_irq_4  ( int state )
+static void thom_irq_4  ( running_machine *machine, int state )
 {
-	thom_set_irq  ( Machine, 4, state );
+	thom_set_irq  ( machine, 4, state );
 }
 #endif
 
@@ -2354,7 +2354,7 @@ static void to9_kbd_update_irq ( void )
 	if ( (to9_kbd_intr & 3) == 1 && (to9_kbd_status & ACIA_6850_TDRE) )
 		to9_kbd_status |= ACIA_6850_irq; /* ready to transmit interrupt */
 
-	thom_irq_3( to9_kbd_status & ACIA_6850_irq );
+	thom_irq_3( Machine, to9_kbd_status & ACIA_6850_irq );
 }
 
 
@@ -3505,7 +3505,7 @@ READ8_HANDLER  ( to8_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( to7_lightpen )
 		{
-			thom_firq_2( 0 );
+			thom_firq_2( machine, 0 );
 			to8_lightpen_intr = 0;
 			res = count & 0xff;
 		}
@@ -3763,7 +3763,7 @@ static void to8_lightpen_cb ( int step )
 	if ( ! to7_lightpen )
 		return;
 
-	thom_firq_2( 1 );
+	thom_firq_2( Machine, 1 );
 	to7_lightpen_step = step;
 	to8_lightpen_intr = 1;
 }
@@ -4388,7 +4388,7 @@ READ8_HANDLER  ( mo6_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( to7_lightpen )
 		{
-			thom_firq_2( 0 );
+			thom_firq_2( machine, 0 );
 			to8_lightpen_intr = 0;
 			res =  count & 0xff;
 		}

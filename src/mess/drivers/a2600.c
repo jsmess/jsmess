@@ -1138,7 +1138,7 @@ static  READ8_HANDLER( switch_A_r )
 static WRITE8_HANDLER( switch_B_w ) {
 }
 
-static void irq_callback(int state) {
+static void irq_callback(running_machine *machine, int state) {
 }
 
 static const struct riot6532_interface r6532_interface =
@@ -1431,6 +1431,8 @@ static MACHINE_START( a2600p )
 }
 
 static void set_category_value( running_machine *machine, const char* cat, const char *cat_selection ) {
+	/* NPW 22-May-2008 - FIXME */
+#if 0
 	input_port_entry	*cat_in = NULL;
 	input_port_entry	*in;
 
@@ -1443,6 +1445,7 @@ static void set_category_value( running_machine *machine, const char* cat, const
 			return;
 		}
 	}
+#endif
 }
 
 static void set_controller( running_machine *machine, const char *controller, unsigned int selection ) {

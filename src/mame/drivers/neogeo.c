@@ -295,15 +295,15 @@ static void start_interrupt_timers(running_machine *machine)
  *
  *************************************/
 
-static void audio_cpu_irq(int assert)
+static void audio_cpu_irq(running_machine *machine, int assert)
 {
-	cpunum_set_input_line(Machine, 1, 0, assert ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void audio_cpu_assert_nmi(void)
+static void audio_cpu_assert_nmi(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -332,7 +332,7 @@ static CUSTOM_INPUT( multiplexed_controller_r )
 
 	sprintf(tag, "IN%s-%d", (const char *)param, controller_select & 0x01);
 
-	return input_port_read(machine, tag);
+	return input_port_read(field->port->machine, tag);
 }
 
 
@@ -351,10 +351,10 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 	{
 	default:
 	case 0x00: ret = 0x0000; break; /* nothing? */
-	case 0x09: ret = input_port_read(machine, "MAHJONG1"); break;
-	case 0x12: ret = input_port_read(machine, "MAHJONG2"); break;
-	case 0x1b: ret = input_port_read(machine, "MAHJONG3"); break; /* player 1 normal inputs? */
-	case 0x24: ret = input_port_read(machine, "MAHJONG4"); break;
+	case 0x09: ret = input_port_read(field->port->machine, "MAHJONG1"); break;
+	case 0x12: ret = input_port_read(field->port->machine, "MAHJONG2"); break;
+	case 0x1b: ret = input_port_read(field->port->machine, "MAHJONG3"); break; /* player 1 normal inputs? */
+	case 0x24: ret = input_port_read(field->port->machine, "MAHJONG4"); break;
 	}
 
 	return ret;
@@ -444,7 +444,7 @@ static void calendar_clock(void)
 
 static CUSTOM_INPUT( get_calendar_status )
 {
-	return (pd4990a_databit_r(machine, 0) << 1) | pd4990a_testbit_r(machine, 0);
+	return (pd4990a_databit_r(field->port->machine, 0) << 1) | pd4990a_testbit_r(field->port->machine, 0);
 }
 
 
@@ -566,7 +566,7 @@ static WRITE16_HANDLER( audio_command_w )
 	{
 		soundlatch_w(machine, 0, data >> 8);
 
-		audio_cpu_assert_nmi();
+		audio_cpu_assert_nmi(machine);
 
 		/* boost the interleave to let the audio CPU read the command */
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));

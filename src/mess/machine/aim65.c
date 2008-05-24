@@ -37,9 +37,9 @@ static UINT8 riot_port_a;
 ******************************************************************************/
 
 
-static void aim65_via_irq_func(int state)
+static void aim65_via_irq_func(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 /* STEP/RUN
@@ -155,9 +155,9 @@ static WRITE8_HANDLER(aim65_riot_a_w)
 }
 
 
-static void aim65_riot_irq(int state)
+static void aim65_riot_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 

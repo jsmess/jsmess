@@ -487,39 +487,41 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 
 
 
-static void find_switch(running_machine *machine, const char *switch_name, const char *switch_setting,
-	int switch_type, int switch_setting_type,
-	input_port_entry **in_switch, input_port_entry **in_switch_setting)
+static const input_setting_config *find_switch(running_machine *machine, const char *switch_name,
+	const char *switch_setting, int switch_type, int *found_field)
 {
-	input_port_entry *in;
-
-	*in_switch = NULL;
-	*in_switch_setting = NULL;
+	int found = FALSE;
+	const input_port_config *port;
+	const input_field_config *field = NULL;
+	const input_setting_config *setting = NULL;
 
 	/* find switch with the name */
-	in = machine->input_ports;
-	while(in->type != IPT_END)
+	found = FALSE;
+	for (port = machine->portconfig; !found && (port != NULL); port = port->next)
 	{
-		if (in->type == switch_type && input_port_active(in)
-			&& input_port_name(in) && !mame_stricmp(input_port_name(in), switch_name))
-			break;
-		in++;
+		for (field = port->fieldlist; !found && (field != NULL); field = field->next)
+		{
+			if (field->type == switch_type && input_field_name(field) && !mame_stricmp(input_field_name(field), switch_name))
+				found = TRUE;
+		}
 	}
-	if (in->type == IPT_END)
-		return;
-	*in_switch = in;
 
-	/* find the setting */
-	in++;
-	while(in->type == switch_setting_type)
+	/* did we find the field? */
+	if (field != NULL)
 	{
-		if (input_port_active(in) && input_port_name(in) && !mame_stricmp(input_port_name(in), switch_setting))
-			break;
-		in++;
+		/* we did find the field - now find the setting */
+		for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		{
+			if (setting->name != NULL && !mame_stricmp(setting->name, switch_setting))
+				break;
+		}
 	}
-	if (in->type != switch_setting_type)
-		return;
-	*in_switch_setting = in;
+
+	/* return whether the field was found at all, if we're asked that */
+	if (found_field != NULL)
+		*found_field = (field != NULL);
+
+	return setting;
 }
 
 
@@ -638,8 +640,8 @@ static void command_checkblank(running_machine *machine)
 
 static void command_switch(running_machine *machine)
 {
-	input_port_entry *switch_name;
-	input_port_entry *switch_setting;
+	int found_field;
+	const input_setting_config *setting;
 
 	/* special hack until we support video targets natively */
 	if (!strcmp(current_command->u.switch_args.name, "Video type"))
@@ -662,31 +664,36 @@ static void command_switch(running_machine *machine)
 		}
 	}
 
-	find_switch(machine, current_command->u.switch_args.name, current_command->u.switch_args.value,
-		IPT_DIPSWITCH_NAME, IPT_DIPSWITCH_SETTING, &switch_name, &switch_setting);
+	/* first try dip switches */
+	setting = find_switch(machine, current_command->u.switch_args.name,
+		current_command->u.switch_args.value, IPT_DIPSWITCH, &found_field);
 
-	if (!switch_name || !switch_setting)
+	if (setting == NULL)
 	{
-		find_switch(machine, current_command->u.switch_args.name, current_command->u.switch_args.value,
-			IPT_CONFIG_NAME, IPT_CONFIG_SETTING, &switch_name, &switch_setting);
+		/* failing that, try configs */
+		setting = find_switch(machine, current_command->u.switch_args.name,
+			current_command->u.switch_args.value, IPT_CONFIG, &found_field);
 	}
 
-	if (!switch_name)
+	if (setting == NULL)
 	{
+		/* now failing that, really fail - lets report a good message */
+		if (found_field)
+		{
+			report_message(MSG_FAILURE, "Cannot find setting '%s' on switch '%s'",
+				current_command->u.switch_args.value, current_command->u.switch_args.name);
+		}
+		else
+		{
+			report_message(MSG_FAILURE, "Cannot find switch named '%s'", current_command->u.switch_args.name);
+		}
 		state = STATE_ABORTED;
-		report_message(MSG_FAILURE, "Cannot find switch named '%s'", current_command->u.switch_args.name);
 		return;
 	}
 
-	if (!switch_setting)
-	{
-		state = STATE_ABORTED;
-		report_message(MSG_FAILURE, "Cannot find setting '%s' on switch '%s'",
-			current_command->u.switch_args.value, current_command->u.switch_args.name);
-		return;
-	}
-
-	switch_name->default_value = switch_setting->default_value;
+	/* success! */
+	/* FIXME */
+	/* switch_name->default_value = setting->value; */
 }
 
 

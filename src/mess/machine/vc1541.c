@@ -399,15 +399,15 @@ static TIMER_CALLBACK(vc1541_timer)
  * also ca1 (books says cb2)
  * irq to m6502 irq connected (or with second via irq)
  */
-static void vc1541_via0_irq (int level)
+static void vc1541_via0_irq (running_machine *machine, int level)
 {
 	vc1541->via0irq = level;
 	DBG_LOG(2, "vc1541 via0 irq",("level %d %d\n",vc1541->via0irq,vc1541->via1irq));
-	cpunum_set_input_line (Machine, vc1541->cpunumber,
+	cpunum_set_input_line (machine, vc1541->cpunumber,
 					  M6502_IRQ_LINE, vc1541->via1irq || vc1541->via0irq);
 }
 
-static  READ8_HANDLER( vc1541_via0_read_portb )
+static READ8_HANDLER( vc1541_via0_read_portb )
 {
 	static int old=-1;
 	int value = 0x7a;
@@ -498,15 +498,15 @@ static WRITE8_HANDLER( vc1541_via0_write_portb )
  *
  * irq to m6502 irq connected
  */
-static void vc1541_via1_irq (int level)
+static void vc1541_via1_irq (running_machine *machine, int level)
 {
 	vc1541->via1irq = level;
 	DBG_LOG(2, "vc1541 via1 irq",("level %d %d\n",vc1541->via0irq,vc1541->via1irq));
-	cpunum_set_input_line (Machine, vc1541->cpunumber,
+	cpunum_set_input_line (machine, vc1541->cpunumber,
 					  M6502_IRQ_LINE, vc1541->via1irq || vc1541->via0irq);
 }
 
-static  READ8_HANDLER( vc1541_via1_read_porta )
+static READ8_HANDLER( vc1541_via1_read_porta )
 {
 	int data=vc1541->head.data[vc1541->d64.pos];
 	DBG_LOG(2, "vc1541 drive",("port a read %.2x\n", data));

@@ -236,9 +236,9 @@ static void osborne1_update_irq_state(running_machine *machine) {
 	}
 }
 
-static void ieee_pia_irq_a_func(int state) {
+static void ieee_pia_irq_a_func(running_machine *machine, int state) {
 	osborne1.pia_0_irq_state = state;
-	osborne1_update_irq_state(Machine);
+	osborne1_update_irq_state(machine);
 }
 
 static const pia6821_interface osborne1_ieee_pia_config = {
@@ -277,9 +277,9 @@ static WRITE8_HANDLER( video_pia_port_b_w ) {
 	//logerror("Video pia port b write: %02X\n", data );
 }
 
-static void video_pia_irq_a_func(int state) {
+static void video_pia_irq_a_func(running_machine *machine, int state) {
 	osborne1.pia_1_irq_state = state;
-	osborne1_update_irq_state(Machine);
+	osborne1_update_irq_state(machine);
 }
 
 static const pia6821_interface osborne1_video_pia_config = {

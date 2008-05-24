@@ -3505,6 +3505,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( shinoblb )	/* (c) 1987 (but bootleg) */
 	DRIVER( shinobld )	/* (c) 1987 (but bootleg) */
 	DRIVER( tetrisbl )	/* (c) 1988 (but bootleg) */
+	DRIVER( beautyb )	/* (c) 1991 AMT */
 	DRIVER( tturfbl )	/* (c) 1989 (Datsu bootleg) */
 	DRIVER( wb3bbl )	/* BOOTLEG */
 
@@ -6670,6 +6671,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sarukani )	/* (c) 1997 Kaneko / Mediaworks (Japan) */
 	DRIVER( cyvern )	/* (c) 1998 Kaneko (Japan) */
 	DRIVER( galpans2 )	/* (c) 1999 Kaneko (Japan) */
+	DRIVER( galpansu )	/* (c) 1999 Kaneko (Korea) */
 	DRIVER( panicstr )	/* (c) 1999 Kaneko (Japan) */
 	DRIVER( senknow )	/* (c) 1999 Kaneko / Kouyousha (Japan) */
 	DRIVER( gutsn )		/* (c) 2000 Kaneko / Kouyousha (Japan) */
@@ -6990,6 +6992,7 @@ Other Sun games
 	DRIVER( dharmak )	/* (c) 1994 */
 	DRIVER( lastfort )	/* (c) 1994 */
 	DRIVER( lastfero )	/* (c) 1994 */
+	DRIVER( lastfork )	/* (c) 1994 */
 	DRIVER( lastforg )	/* (c) 1994 */
 	DRIVER( toride2g )	/* (c) 1994 */
 	DRIVER( torid2gg )	/* (c) 1994 */
@@ -7680,6 +7683,7 @@ Other Sun games
 	DRIVER( 9ballsh2 )	/* (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games" */
 	DRIVER( 9ballsh3 )	/* (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games" */
 	DRIVER( gumbo )		/* (c) 1994 Min Corp. */
+	DRIVER( mspuzzlg )	/* (c) 1994 Min Corp. */
 	DRIVER( mspuzzle )	/* (c) 1994 Min Corp. */
 	DRIVER( mspuzzln )	/* (c) 1994 Min Corp. */
 	DRIVER( msbingo )	/* (C) 1994 Min Corp. */

@@ -57,17 +57,17 @@ UINT8 *vc20_memory_9400;
  pa2 till pa6, port b, cb1, cb2 userport
  irq connected to m6502 nmi
 */
-static void vc20_via0_irq (int level)
+static void vc20_via0_irq (running_machine *machine, int level)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, level);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, level);
 }
 
-static  READ8_HANDLER( vc20_via0_read_ca1 )
+static READ8_HANDLER( vc20_via0_read_ca1 )
 {
 	return ! ( input_port_read(machine,  TAG_KEYBOARD_EXTRA ) & 0x02 );
 }
 
-static  READ8_HANDLER( vc20_via0_read_ca2 )
+static READ8_HANDLER( vc20_via0_read_ca2 )
 {
 	DBG_LOG (1, "tape", ("motor read %d\n", via0_ca2));
 	return via0_ca2;
@@ -121,12 +121,12 @@ static WRITE8_HANDLER( vc20_via0_write_porta )
  * cb2 inverted serial data out
  * irq connected to m6502 irq
  */
-static void vc20_via1_irq (int level)
+static void vc20_via1_irq (running_machine *machine, int level)
 {
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, level);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, level);
 }
 
-static  READ8_HANDLER( vc20_via1_read_porta )
+static READ8_HANDLER( vc20_via1_read_porta )
 {
 	int value = 0xff;
 

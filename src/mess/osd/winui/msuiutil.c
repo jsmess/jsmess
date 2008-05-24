@@ -14,8 +14,10 @@ BOOL DriverIsModified(int driver_index)
 
 BOOL DriverUsesMouse(int driver_index)
 {
-	const input_port_entry *input_ports;
+	// NPW 23-May-2008 - Temporarily disabling
 	BOOL retval = FALSE;
+#if 0
+	const input_port_entry *input_ports;
 
 	if (drivers[driver_index]->ipt)
 	{
@@ -34,7 +36,7 @@ BOOL DriverUsesMouse(int driver_index)
 
 		end_resource_tracking();
 	}
-
+#endif
 	return retval;
 }
 

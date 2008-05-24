@@ -27,6 +27,8 @@
 #define NUM_SIMUL_KEYS	(UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)
 #define LOG_INPUTX		0
 #define SPACE_COUNT		3
+#define INVALID_CHAR	'?'
+#define IP_NAME_DEFAULT	NULL
 
 
 
@@ -34,12 +36,16 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef const input_port_config *input_port_config_c;
+typedef const input_field_config *input_field_config_c;
+
+
 typedef struct _mess_input_code mess_input_code;
 struct _mess_input_code
 {
 	unicode_char ch;
-	UINT32 port[NUM_SIMUL_KEYS];
-	const input_port_entry *ipt[NUM_SIMUL_KEYS];
+	input_port_config_c port[NUM_SIMUL_KEYS];
+	input_field_config_c ipt[NUM_SIMUL_KEYS];
 };
 
 typedef struct _key_buffer key_buffer;
@@ -361,13 +367,15 @@ static const char_info charinfo[] =
 
 
 
-#define INVALID_CHAR '?'
 
 /***************************************************************************
-
-	Char info lookup
-
+    MISCELLANEOUS
 ***************************************************************************/
+
+/*-------------------------------------------------
+    find_charinfo - looks up information about a
+	particular character
+-------------------------------------------------*/
 
 static const char_info *find_charinfo(unicode_char target_char)
 {
@@ -394,9 +402,7 @@ static const char_info *find_charinfo(unicode_char target_char)
 
 
 /***************************************************************************
-
-	Code assembling
-
+    CODE ASSEMBLING
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -448,9 +454,14 @@ static const char *code_point_string(unicode_char ch)
 
 
 
-static unicode_char get_keyboard_code(const input_port_entry *ipt, int i)
+/*-------------------------------------------------
+    get_keyboard_code - accesses a particular
+	keyboard code
+-------------------------------------------------*/
+
+static unicode_char get_keyboard_code(const input_field_config *field, int i)
 {
-	unicode_char ch = ipt->keyboard.chars[i];
+	unicode_char ch = field->chars[i];
 
 	/* special hack to allow for PORT_CODE('\xA3') */
 	if ((ch >= 0xFFFFFF80) && (ch <= 0xFFFFFFFF))
@@ -460,33 +471,34 @@ static unicode_char get_keyboard_code(const input_port_entry *ipt, int i)
 
 
 
-static int scan_keys(const input_port_entry *input_ports, mess_input_code *codes, UINT32 *ports, const input_port_entry **shift_ports, int keys, int shift)
+/*-------------------------------------------------
+    scan_keys - scans through input ports and
+	sets up natural keyboard input mapping
+-------------------------------------------------*/
+
+static int scan_keys(const input_port_config *portconfig, mess_input_code *codes, input_port_config_c *ports, input_field_config_c *shift_ports, int keys, int shift)
 {
 	int code_count = 0;
-	const input_port_entry *ipt;
-	const input_port_entry *ipt_key = NULL;
-	UINT32 port = (UINT32) -1;
+	const input_port_config *port;
+	const input_field_config *field;
 	unicode_char code;
 
 	assert(keys < NUM_SIMUL_KEYS);
 
-	ipt = input_ports;
-	while(ipt->type != IPT_END)
+	for (port = portconfig; port != NULL; port = port->next)
 	{
-		switch(ipt->type)
+		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			case IPT_KEYBOARD:
-				ipt_key = ipt;
-
-				code = get_keyboard_code(ipt, shift);
+			if (field->type == IPT_KEYBOARD)
+			{
+				code = get_keyboard_code(field, shift);
 				if (code != 0)
 				{
 					/* is this a shifter key? */
 					if ((code >= UCHAR_SHIFT_BEGIN) && (code <= UCHAR_SHIFT_END))
 					{
-						ports[keys] = port;
-						shift_ports[keys] = ipt_key;
-						code_count += scan_keys(input_ports,
+						shift_ports[keys] = field;
+						code_count += scan_keys(portconfig,
 							codes ? &codes[code_count] : NULL,
 							ports,
 							shift_ports,
@@ -503,27 +515,18 @@ static int scan_keys(const input_port_entry *input_ports, mess_input_code *codes
 							memcpy((void *) codes[code_count].ipt, shift_ports, sizeof(shift_ports[0]) * keys);
 							codes[code_count].ch = code;
 							codes[code_count].port[keys] = port;
-							codes[code_count].ipt[keys] = ipt_key;
+							codes[code_count].ipt[keys] = field;
 						}
 
 						/* increment the count */
 						code_count++;
 
 						if (LOG_INPUTX)
-							logerror("inputx: code=%i (%s) port=%i ipt->name='%s'\n", (int) code, code_point_string(code), port, ipt->name);
+							logerror("inputx: code=%i (%s) port=%p field->name='%s'\n", (int) code, code_point_string(code), port, field->name);
 					}
 				}
-				break;
-
-			case IPT_PORT:
-				port++;
-				/* fall through */
-
-			default:
-				ipt_key = NULL;
-				break;
+			}
 		}
-		ipt++;
 	}
 	return code_count;
 }
@@ -536,15 +539,15 @@ static int scan_keys(const input_port_entry *input_ports, mess_input_code *codes
 	chars
 -------------------------------------------------*/
 
-static mess_input_code *build_codes(const input_port_entry *input_ports)
+static mess_input_code *build_codes(const input_port_config *portconfig)
 {
 	mess_input_code *codes = NULL;
-	UINT32 ports[NUM_SIMUL_KEYS];
-	const input_port_entry *ipts[NUM_SIMUL_KEYS];
+	const input_port_config *ports[NUM_SIMUL_KEYS];
+	const input_field_config *ipts[NUM_SIMUL_KEYS];
 	int code_count;
 
 	/* first count the number of codes */
-	code_count = scan_keys(input_ports, NULL, ports, ipts, 0, 0);
+	code_count = scan_keys(portconfig, NULL, ports, ipts, 0, 0);
 	if (code_count > 0)
 	{
 		/* allocate the codes */
@@ -552,7 +555,7 @@ static mess_input_code *build_codes(const input_port_entry *input_ports)
 		memset(codes, 0, sizeof(*codes) * (code_count + 1));
 
 		/* and populate them */
-		scan_keys(input_ports, codes, ports, ipts, 0, 0);
+		scan_keys(portconfig, codes, ports, ipts, 0, 0);
 	}
 	return codes;
 }
@@ -560,76 +563,59 @@ static mess_input_code *build_codes(const input_port_entry *input_ports)
 
 
 /***************************************************************************
-
-	Validity checks
-
+    VALIDITY CHECKS
 ***************************************************************************/
 
-int inputx_validitycheck(const game_driver *gamedrv, input_port_entry **memory)
+/*-------------------------------------------------
+    mess_validate_input_ports - validates the
+	natural keyboard setup of a set of input ports
+-------------------------------------------------*/
+
+int mess_validate_input_ports(int drivnum, const machine_config *config, const input_port_config *portlist)
 {
-	mess_input_code *codes;
-	const input_port_entry *input_ports;
-	const input_port_entry *ipt;
-	int port_count, i, j;
-	int error = 0;
+	int error = FALSE;
+
+	if (drivers[drivnum]->flags & GAME_COMPUTER)
+	{
+		/* unused hook */
+	}
+
+	return error;
+}
+
+
+
+/*-------------------------------------------------
+    mess_validate_natural_keyboard_statics - 
+	validates natural keyboard static data
+-------------------------------------------------*/
+
+int mess_validate_natural_keyboard_statics(void)
+{
+	int i;
+	int error = FALSE;
 	unicode_char last_char = 0;
 	const char_info *ci;
 
-	if (gamedrv)
+	/* check to make sure that charinfo is in order */
+	for (i = 0; i < sizeof(charinfo) / sizeof(charinfo[0]); i++)
 	{
-		if (gamedrv->flags & GAME_COMPUTER)
+		if (last_char >= charinfo[i].ch)
 		{
-			/* allocate the input ports */
-			*memory = input_port_allocate(gamedrv->ipt, *memory);
-			input_ports = *memory;
-
-			codes = build_codes(input_ports);
-			if (codes)
-			{
-				/* count the total amount of ports */
-				port_count = 0;
-				for (ipt = input_ports; ipt->type != IPT_END; ipt++)
-				{
-					if (ipt->type == IPT_PORT)
-						port_count++;
-				}
-
-				for (i = 0; codes[i].ch; i++)
-				{
-					for (j = 0; j < NUM_SIMUL_KEYS; j++)
-					{
-						if (codes[i].port[j] >= port_count)
-						{
-							mame_printf_error("%s: invalid inputx translation for code %i port %i\n", gamedrv->name, i, j);
-							error = 1;
-						}
-					}
-				}
-			}
+			mame_printf_error("inputx: charinfo is out of order; 0x%08x should be higher than 0x%08x\n", charinfo[i].ch, last_char);
+			error = TRUE;
 		}
+		last_char = charinfo[i].ch;
 	}
-	else
-	{
-		/* check to make sure that charinfo is in order */
-		for (i = 0; i < sizeof(charinfo) / sizeof(charinfo[0]); i++)
-		{
-			if (last_char >= charinfo[i].ch)
-			{
-				mame_printf_error("inputx: charinfo is out of order; 0x%08x should be higher than 0x%08x\n", charinfo[i].ch, last_char);
-				error = 1;
-			}
-			last_char = charinfo[i].ch;
-		}
 
-		/* check to make sure that I can look up everything on alternate_charmap */
-		for (i = 0; i < sizeof(charinfo) / sizeof(charinfo[0]); i++)
+	/* check to make sure that I can look up everything on alternate_charmap */
+	for (i = 0; i < sizeof(charinfo) / sizeof(charinfo[0]); i++)
+	{
+		ci = find_charinfo(charinfo[i].ch);
+		if (ci != &charinfo[i])
 		{
-			ci = find_charinfo(charinfo[i].ch);
-			if (ci != &charinfo[i])
-			{
-				mame_printf_error("inputx: expected find_charinfo(0x%08x) to work properly\n", charinfo[i].ch);
-				error = 1;
-			}
+			mame_printf_error("inputx: expected find_charinfo(0x%08x) to work properly\n", charinfo[i].ch);
+			error = TRUE;
 		}
 	}
 	return error;
@@ -699,7 +685,7 @@ void inputx_init(running_machine *machine)
 	/* posting keys directly only makes sense for a computer */
 	if (machine->gamedrv->flags & GAME_COMPUTER)
 	{
-		codes = build_codes(machine->input_ports);
+		codes = build_codes(machine->portconfig);
 		setup_keybuffer(machine);
 	}
 }
@@ -882,7 +868,7 @@ void inputx_postn_rate(running_machine *machine, const unicode_char *text, size_
 				if (LOG_INPUTX)
 				{
 					code = find_code(ch);
-					logerror("inputx_postn(): code=%i (%s) port=%i ipt->name='%s'\n", (int) ch, code_point_string(ch), code ? code->port[0] : -1, (code && code->ipt[0]) ? code->ipt[0]->name : "<null>");
+					logerror("inputx_postn(): code=%i (%s) port=%p field->name='%s'\n", (int) ch, code_point_string(ch), code ? code->port[0] : NULL, (code && code->ipt[0]) ? code->ipt[0]->name : "<null>");
 				}
 
 				if (can_post_key_directly(ch))
@@ -962,7 +948,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 	called from core to allow for natural keyboard	
 -------------------------------------------------*/
 
-void mess_input_port_update_hook(running_machine *machine, int portnum, UINT32 *digital)
+void mess_input_port_update_hook(running_machine *machine, const input_port_config *port)
 {
 	const key_buffer *keybuf;
 	const mess_input_code *code;
@@ -986,10 +972,11 @@ void mess_input_port_update_hook(running_machine *machine, int portnum, UINT32 *
 			{
 				for (i = 0; i < ARRAY_LENGTH(code->ipt) && (code->ipt[i] != NULL); i++)
 				{
-					if (code->port[i] == portnum)
+					if (code->port[i] == port)
 					{
 						value = code->ipt[i]->mask;
-						*digital |= value;
+						/* 24-May-2008 - FIXME */
+						/* *digital |= value; */
 					}
 				}
 			}
@@ -999,7 +986,7 @@ void mess_input_port_update_hook(running_machine *machine, int portnum, UINT32 *
 
 
 
-void inputx_handle_mess_extensions(input_port_entry *ipt)
+void inputx_handle_mess_extensions(input_field_config *ipt)
 {
 	char buf[256];
 	int i, pos;
@@ -1014,7 +1001,7 @@ void inputx_handle_mess_extensions(input_port_entry *ipt)
 			buf[0] = '\0';
 			pos = 0;
 
-			for (i = 0; i < ARRAY_LENGTH(ipt->keyboard.chars) && ipt->keyboard.chars[i]; i++)
+			for (i = 0; i < ARRAY_LENGTH(ipt->chars) && ipt->chars[i]; i++)
 			{
 				ch = get_keyboard_code(ipt, i);
 				pos += snprintf(&buf[pos], ARRAY_LENGTH(buf) - pos, "%-*s ", MAX(SPACE_COUNT - 1, 0), inputx_key_name(ch));
@@ -1355,112 +1342,130 @@ void inputx_postn_coded(running_machine *machine, const char *text, size_t text_
 	This stuff is here more out of convienience than anything else
 ***************************************************************************/
 
-int input_classify_port(const input_port_entry *port)
+int input_classify_port(const input_field_config *field)
 {
 	int result;
 
-	if (port->unused)
-		return INPUT_CLASS_INTERNAL;
-	if (port->category && (port->type != IPT_CATEGORY_SETTING))
+	if (field->category && (field->type != IPT_CATEGORY))
 		return INPUT_CLASS_CATEGORIZED;
 
-	switch(port->type) {
-	case IPT_JOYSTICK_UP:
-	case IPT_JOYSTICK_DOWN:
-	case IPT_JOYSTICK_LEFT:
-	case IPT_JOYSTICK_RIGHT:
-	case IPT_JOYSTICKLEFT_UP:
-	case IPT_JOYSTICKLEFT_DOWN:
-	case IPT_JOYSTICKLEFT_LEFT:
-	case IPT_JOYSTICKLEFT_RIGHT:
-	case IPT_JOYSTICKRIGHT_UP:
-	case IPT_JOYSTICKRIGHT_DOWN:
-	case IPT_JOYSTICKRIGHT_LEFT:
-	case IPT_JOYSTICKRIGHT_RIGHT:
-	case IPT_BUTTON1:
-	case IPT_BUTTON2:
-	case IPT_BUTTON3:
-	case IPT_BUTTON4:
-	case IPT_BUTTON5:
-	case IPT_BUTTON6:
-	case IPT_BUTTON7:
-	case IPT_BUTTON8:
-	case IPT_BUTTON9:
-	case IPT_BUTTON10:
-	case IPT_AD_STICK_X:
-	case IPT_AD_STICK_Y:
-	case IPT_AD_STICK_Z:
-	case IPT_TRACKBALL_X:
-	case IPT_TRACKBALL_Y:
-	case IPT_LIGHTGUN_X:
-	case IPT_LIGHTGUN_Y:
-	case IPT_MOUSE_X:
-	case IPT_MOUSE_Y:
-	case IPT_START:
-	case IPT_SELECT:
-		result = INPUT_CLASS_CONTROLLER;
-		break;
+	switch(field->type)
+	{
+		case IPT_JOYSTICK_UP:
+		case IPT_JOYSTICK_DOWN:
+		case IPT_JOYSTICK_LEFT:
+		case IPT_JOYSTICK_RIGHT:
+		case IPT_JOYSTICKLEFT_UP:
+		case IPT_JOYSTICKLEFT_DOWN:
+		case IPT_JOYSTICKLEFT_LEFT:
+		case IPT_JOYSTICKLEFT_RIGHT:
+		case IPT_JOYSTICKRIGHT_UP:
+		case IPT_JOYSTICKRIGHT_DOWN:
+		case IPT_JOYSTICKRIGHT_LEFT:
+		case IPT_JOYSTICKRIGHT_RIGHT:
+		case IPT_BUTTON1:
+		case IPT_BUTTON2:
+		case IPT_BUTTON3:
+		case IPT_BUTTON4:
+		case IPT_BUTTON5:
+		case IPT_BUTTON6:
+		case IPT_BUTTON7:
+		case IPT_BUTTON8:
+		case IPT_BUTTON9:
+		case IPT_BUTTON10:
+		case IPT_AD_STICK_X:
+		case IPT_AD_STICK_Y:
+		case IPT_AD_STICK_Z:
+		case IPT_TRACKBALL_X:
+		case IPT_TRACKBALL_Y:
+		case IPT_LIGHTGUN_X:
+		case IPT_LIGHTGUN_Y:
+		case IPT_MOUSE_X:
+		case IPT_MOUSE_Y:
+		case IPT_START:
+		case IPT_SELECT:
+			result = INPUT_CLASS_CONTROLLER;
+			break;
 
-	case IPT_KEYBOARD:
-		result = INPUT_CLASS_KEYBOARD;
-		break;
+		case IPT_KEYBOARD:
+			result = INPUT_CLASS_KEYBOARD;
+			break;
 
-	case IPT_CONFIG_NAME:
-		result = INPUT_CLASS_CONFIG;
-		break;
+		case IPT_CONFIG:
+			result = INPUT_CLASS_CONFIG;
+			break;
 
-	case IPT_DIPSWITCH_NAME:
-		result = INPUT_CLASS_DIPSWITCH;
-		break;
+		case IPT_DIPSWITCH:
+			result = INPUT_CLASS_DIPSWITCH;
+			break;
 
-	case 0:
-		if (port->name && (port->name != (const char *) -1))
-			result = INPUT_CLASS_MISC;
-		else
+		case 0:
+			if (field->name && (field->name != (const char *) -1))
+				result = INPUT_CLASS_MISC;
+			else
+				result = INPUT_CLASS_INTERNAL;
+			break;
+
+		default:
 			result = INPUT_CLASS_INTERNAL;
-		break;
-
-	default:
-		result = INPUT_CLASS_INTERNAL;
-		break;
+			break;
 	}
 	return result;
 }
 
 
 
-int input_player_number(const input_port_entry *port)
+int input_player_number(const input_field_config *port)
 {
 	return port->player;
 }
 
 
 
+/*-------------------------------------------------
+    input_has_input_class - checks to see if a 
+	particular input class is present
+-------------------------------------------------*/
+
 int input_has_input_class(running_machine *machine, int inputclass)
 {
-	input_port_entry *in;
-	for (in = machine->input_ports; in->type != IPT_END; in++)
+	const input_port_config *port;
+	const input_field_config *field;
+
+	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
-		if (input_classify_port(in) == inputclass)
-			return TRUE;
+		for (field = port->fieldlist; field != NULL; field = field->next)
+		{
+			if (input_classify_port(field) == inputclass)
+				return TRUE;
+		}
 	}
 	return FALSE;
 }
 
 
 
+/*-------------------------------------------------
+    input_count_players - counts the number of
+	active players
+-------------------------------------------------*/
+
 int input_count_players(running_machine *machine)
 {
-	const input_port_entry *in;
+	const input_port_config *port;
+	const input_field_config *field;
 	int joystick_count;
 
 	joystick_count = 0;
-	for (in = machine->input_ports; in->type != IPT_END; in++)
+	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
-		if (input_classify_port(in) == INPUT_CLASS_CONTROLLER)
+		for (field = port->fieldlist;  field != NULL; field = field->next)
 		{
-			if (joystick_count <= in->player + 1)
-				joystick_count = in->player + 1;
+			if (input_classify_port(field) == INPUT_CLASS_CONTROLLER)
+			{
+				if (joystick_count <= field->player + 1)
+					joystick_count = field->player + 1;
+			}
 		}
 	}
 	return joystick_count;
@@ -1468,24 +1473,33 @@ int input_count_players(running_machine *machine)
 
 
 
+/*-------------------------------------------------
+    input_category_active - checks to see if a
+	specific category is active
+-------------------------------------------------*/
+
 int input_category_active(running_machine *machine, int category)
 {
-	const input_port_entry *in;
-	const input_port_entry *in_base = NULL;
+	int found;
+	const input_port_config *port;
+	const input_field_config *field = NULL;
+	const input_setting_config *setting;
 
 	assert(category >= 1);
 
-	for (in = machine->input_ports; in->type != IPT_END; in++)
+	found = FALSE;
+	for (port = machine->portconfig; !found && (port != NULL); port = port->next)
 	{
-		switch(in->type) {
-		case IPT_CATEGORY_NAME:
-			in_base = in;
-			break;
+		for (field = port->fieldlist; !found && (field != NULL); field = field->next)
+			found = (field->type == IPT_CATEGORY) && (field->category == category);
+	}
 
-		case IPT_CATEGORY_SETTING:
-			if ((in->category == category) && (in_base->default_value == in->default_value))
+	if (field != NULL)
+	{
+		for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		{
+			if (setting->value == field->defvalue)
 				return TRUE;
-			break;
 		}
 	}
 	return FALSE;

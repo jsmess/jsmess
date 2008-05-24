@@ -69,13 +69,13 @@ typedef struct {
 extern HP48_HARDWARE hp48_hardware;
 
 extern UINT8 *hp48_ram, *hp48_card1, *hp48_card2;
-void hp48_mem_reset(void);
-void hp48_mem_config(int v);
-void hp48_mem_unconfig(int v);
-int hp48_mem_id(void);
-void hp48_crc(int adr, int data);
-int hp48_in(void);
-void hp48_out(int v);
+void hp48_mem_reset(running_machine *machine);
+void hp48_mem_config(running_machine *machine, int v);
+void hp48_mem_unconfig(running_machine *machine, int v);
+int hp48_mem_id(running_machine *machine);
+void hp48_crc(running_machine *machine, int adr, int data);
+int hp48_in(running_machine *machine);
+void hp48_out(running_machine *machine, int v);
 
 DRIVER_INIT( hp48s );
 DRIVER_INIT( hp48g );

@@ -26,7 +26,6 @@
     You could even multiply the PC by the stack pointer if you wanted."
 
 
-
  driver by Pierpaolo Prazzoli & Tomasz Slanina
 
  - Pierpaolo Prazzoli 2006.05.06

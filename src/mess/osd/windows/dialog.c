@@ -1264,38 +1264,22 @@ static LRESULT seqselect_apply(dialog_box *dialog, HWND editwnd, UINT message, W
 //	input_port_mutable_seq
 //============================================================
 
-static input_seq *input_port_mutable_seq(input_port_entry *port, int seqtype)
+static input_seq *input_port_mutable_seq(input_field_config *field, int seqtype)
 {
 	input_seq *portseq;
 
-	// if port is disabled, return no key
-	if (port->unused)
+	// if field is disabled, return no key
+	if (field->flags & FIELD_FLAG_UNUSED)
 		return NULL;
 
 	// handle the various seq types
-	switch (seqtype)
-	{
-		case SEQ_TYPE_STANDARD:
-			portseq = &port->seq;
-			break;
-
-		case SEQ_TYPE_INCREMENT:
-			portseq = &port->analog.incseq;
-			break;
-
-		case SEQ_TYPE_DECREMENT:
-			portseq = &port->analog.decseq;
-			break;
-
-		default:
-			return NULL;
-	}
+	portseq = &field->seq[seqtype];
 
 	// does this override the default? if not, find the default setting
 	if (input_seq_get_1(portseq) == SEQCODE_DEFAULT)
 	{
 		const input_seq *default_portseq;
-		default_portseq = input_port_default_seq(port->type, port->player, seqtype);
+		default_portseq = input_type_seq(field->port->machine, field->type, field->player, seqtype);
 		*portseq = *default_portseq;
 	}
 	return portseq;
@@ -1306,12 +1290,12 @@ static input_seq *input_port_mutable_seq(input_port_entry *port, int seqtype)
 //============================================================
 
 static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
-	short cx, short cy, input_port_entry *port, int is_analog, int seq)
+	short cx, short cy, input_field_config *field, int is_analog, int seq)
 {
 	seqselect_info *stuff;
 	input_seq *code;
 
-	code = input_port_mutable_seq(port, seq);
+	code = input_port_mutable_seq(field, seq);
 
 	if (dialog_write_item(di, WS_CHILD | WS_VISIBLE | SS_ENDELLIPSIS | ES_CENTER | SS_SUNKEN,
 			x, y, cx, cy, NULL, DLGITEM_EDIT, NULL))
@@ -1336,7 +1320,7 @@ static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
 //	win_dialog_add_seqselect
 //============================================================
 
-int win_dialog_add_portselect(dialog_box *dialog, input_port_entry *port, const RECT *r)
+int win_dialog_add_portselect(dialog_box *dialog, input_field_config *field, const RECT *r)
 {
 	dialog_box *di = dialog;
 	short x;
@@ -1353,10 +1337,10 @@ int win_dialog_add_portselect(dialog_box *dialog, input_port_entry *port, const 
 	int is_analog[3];
 	int len;
 
-	port_name = input_port_name(port);
+	port_name = input_field_name(field);
 	assert(port_name);
 
-	if (port_type_is_analog(port->type))
+	if (field->type >= __ipt_analog_start && field->type <= __ipt_analog_end)
 	{
 		seq_types[seq_count] = SEQ_TYPE_STANDARD;
 		port_suffix[seq_count] = " Analog";
@@ -1405,7 +1389,7 @@ int win_dialog_add_portselect(dialog_box *dialog, input_port_entry *port, const 
 			x += dialog->layout->label_width + DIM_HORIZONTAL_SPACING;
 
 			if (dialog_add_single_seqselect(di, x, y, DIM_EDIT_WIDTH, DIM_NORMAL_ROW_HEIGHT,
-					port, is_analog[seq], seq_types[seq]))
+					field, is_analog[seq], seq_types[seq]))
 				return 1;
 			y += DIM_VERTICAL_SPACING + DIM_NORMAL_ROW_HEIGHT;
 			x += DIM_EDIT_WIDTH + DIM_HORIZONTAL_SPACING;
@@ -1427,7 +1411,7 @@ int win_dialog_add_portselect(dialog_box *dialog, input_port_entry *port, const 
 			height	/= pixels_to_ydlgunits;
 
 			if (dialog_add_single_seqselect(di, x, y, width, height,
-					port, is_analog[seq], seq_types[seq]))
+					field, is_analog[seq], seq_types[seq]))
 				return 1;
 		}
 	}

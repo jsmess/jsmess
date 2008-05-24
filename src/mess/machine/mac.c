@@ -75,7 +75,7 @@ static READ8_HANDLER(mac_via_in_b);
 static WRITE8_HANDLER(mac_via_out_a);
 static WRITE8_HANDLER(mac_via_out_b);
 static WRITE8_HANDLER(mac_via_out_cb2);
-static void mac_via_irq(int state);
+static void mac_via_irq(running_machine *machine, int state);
 static offs_t mac_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
 static const struct via6522_interface mac_via6522_intf =
@@ -1253,11 +1253,11 @@ static WRITE8_HANDLER(mac_via_out_b)
 		mac_adb_newaction((data & 0x30) >> 4);
 }
 
-static void mac_via_irq(int state)
+static void mac_via_irq(running_machine *machine, int state)
 {
 	/* interrupt the 68k (level 1) */
 	//cpunum_set_input_line(machine, 0, 1, state);
-	set_via_interrupt(Machine, state);
+	set_via_interrupt(machine, state);
 }
 
 READ16_HANDLER ( mac_via_r )

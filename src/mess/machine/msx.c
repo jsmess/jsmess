@@ -277,9 +277,9 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 	}
 }
 
-void msx_vdp_interrupt(int i)
+void msx_vdp_interrupt(running_machine *machine, int i)
 {
-	cpunum_set_input_line (Machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cpunum_set_input_line (machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static void msx_ch_reset_core (void)
@@ -421,7 +421,7 @@ INTERRUPT_GEN( msx_interrupt )
 	}
 
 	TMS9928A_set_spriteslimit (input_port_read(machine, "DSW") & 0x20);
-	TMS9928A_interrupt();
+	TMS9928A_interrupt(machine);
 }
 
 /*

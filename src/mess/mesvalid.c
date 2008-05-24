@@ -286,7 +286,6 @@ int mess_validitychecks(void)
 	int error = 0;
 	iodevice_t devtype;
 	const char *name;
-	input_port_entry *inputports = NULL;
 
 	/* make sure that all of the UI_* strings are set for all devices */
 	for (devtype = 0; devtype < IO_COUNT; devtype++)
@@ -310,13 +309,10 @@ int mess_validitychecks(void)
 
 		/* check system config */
 		ram_option_count(drivers[i]);
-
-		/* make sure that our input system likes this driver */
-		error = inputx_validitycheck(drivers[i], &inputports) || error;
 	}
 
 	/* call other validity checks */
-	error = inputx_validitycheck(NULL, &inputports) || error;
+	error = mess_validate_natural_keyboard_statics() || error;
 	error = device_valididtychecks() || error;
 
 	return error;

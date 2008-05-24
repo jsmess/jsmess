@@ -61,7 +61,7 @@ struct compare_timer_chip
 	UINT16	counter;
 	UINT8	bit;
 	void	(*sound_w)(UINT8);
-	void	(*timer_ack)(void);
+	void	(*timer_ack)(running_machine *);
 };
 
 
@@ -218,7 +218,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			/*   03 - maybe controls halt and reset lines together? */
 			if ((oldval ^ chip->regs[offset]) & 3)
 			{
-				cpunum_set_input_line(Machine, chip->cpunum, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
+				cpunum_set_input_line(machine, chip->cpunum, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
 				if ((chip->regs[offset] & 3) == 3)
 					fd1094_machine_init();
 			}
@@ -232,7 +232,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 		case 0x04:
 			/* controls IRQ lines to 68000, negative logic -- write $B to signal IRQ4 */
 			if ((chip->regs[offset] & 7) != 7)
-				cpunum_set_input_line(Machine, chip->cpunum, (~chip->regs[offset] & 7), HOLD_LINE);
+				cpunum_set_input_line(machine, chip->cpunum, (~chip->regs[offset] & 7), HOLD_LINE);
 			break;
 
 		case 0x05:
@@ -585,7 +585,7 @@ WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(2, offset, data, mem_mask); }
  *
  *************************************/
 
-void segaic16_compare_timer_init(int which, void (*sound_write_callback)(UINT8), void (*timer_ack_callback)(void))
+void segaic16_compare_timer_init(int which, void (*sound_write_callback)(UINT8), void (*timer_ack_callback)(running_machine *))
 {
 	compare_timer[which].sound_w = sound_write_callback;
 	compare_timer[which].timer_ack = timer_ack_callback;
@@ -644,7 +644,7 @@ static void update_compare(int which, int update_history)
 static void timer_interrupt_ack(int which)
 {
 	if (compare_timer[which].timer_ack)
-		(*compare_timer[which].timer_ack)();
+		(*compare_timer[which].timer_ack)(Machine);
 }
 
 

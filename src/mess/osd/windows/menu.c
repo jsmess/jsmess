@@ -126,7 +126,8 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 static void customize_input(running_machine *machine, HWND wnd, const char *title, artwork_cust_type cust_type, int player, int inputclass, const char *section)
 {
 	dialog_box *dlg;
-	input_port_entry *in;
+	const input_port_config *port;
+	const input_field_config *field;
 	png_info png;
 	struct inputform_customization customizations[128];
 	RECT *pr;
@@ -134,7 +135,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 
 	struct
 	{
-		input_port_entry *in;
+		input_field_config *field;
 		const RECT *pr;
 	} portslots[256];
 
@@ -157,51 +158,52 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 		win_dialog_add_separator(dlg);
 	}
 
-	in = machine->input_ports;
-	while(in->type != IPT_END)
+	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
-		this_inputclass = input_classify_port(in);
-		if (input_port_name(in) && (this_inputclass == inputclass))
+		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			/* most of the time, the player parameter is the player number
-			 * but in the case of INPUT_CLASS_CATEGORIZED, it is the
-			 * category */
-			if (inputclass == INPUT_CLASS_CATEGORIZED)
-				this_player = in->category;
-			else
-                this_player = input_player_number(in);
-
-			if (this_player == player)
+			this_inputclass = input_classify_port(field);
+			if (input_field_name(field) && (this_inputclass == inputclass))
 			{
-				/* check to see if the custom artwork for this configure dialog
-				 * says anything about this input */
-				pr = NULL;
-				for (i = 0; customizations[i].ipt != IPT_END; i++)
-				{
-					if (in->type == customizations[i].ipt)
-					{
-						pr = (RECT *) alloca(sizeof(*pr));
-						pr->left = customizations[i].x;
-						pr->top = customizations[i].y;
-						pr->right = pr->left + customizations[i].width;
-						pr->bottom = pr->top + customizations[i].height;
-						break;
-					}
-				}
+				/* most of the time, the player parameter is the player number
+				 * but in the case of INPUT_CLASS_CATEGORIZED, it is the
+				 * category */
+				if (inputclass == INPUT_CLASS_CATEGORIZED)
+					this_player = field->category;
+				else
+					this_player = input_player_number(field);
 
-				/* store this InputPort/RECT combo in our list.  we do not
-				 * necessarily want to add it yet because we the INI might
-				 * want to reorder the tab order */
-				if (customizations[i].ipt == IPT_END)
-					i = portslot_count++;
-				if (i < (sizeof(portslots) / sizeof(portslots[0])))
+				if (this_player == player)
 				{
-					portslots[i].in = in;
-					portslots[i].pr = pr;
+					/* check to see if the custom artwork for this configure dialog
+					 * says anything about this input */
+					pr = NULL;
+					for (i = 0; customizations[i].ipt != IPT_END; i++)
+					{
+						if (field->type == customizations[i].ipt)
+						{
+							pr = (RECT *) alloca(sizeof(*pr));
+							pr->left = customizations[i].x;
+							pr->top = customizations[i].y;
+							pr->right = pr->left + customizations[i].width;
+							pr->bottom = pr->top + customizations[i].height;
+							break;
+						}
+					}
+
+					/* store this InputPort/RECT combo in our list.  we do not
+					 * necessarily want to add it yet because we the INI might
+					 * want to reorder the tab order */
+					if (customizations[i].ipt == IPT_END)
+						i = portslot_count++;
+					if (i < (sizeof(portslots) / sizeof(portslots[0])))
+					{
+						portslots[i].field = (input_field_config *) field;
+						portslots[i].pr = pr;
+					}
 				}
 			}
 		}
-		in++;
 	}
 
 	/* finally add the portselects to the dialog */
@@ -209,9 +211,9 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 		portslot_count = sizeof(portslots) / sizeof(portslots[0]);
 	for (i = 0; i < portslot_count; i++)
 	{
-		if (portslots[i].in)
+		if (portslots[i].field)
 		{
-			if (win_dialog_add_portselect(dlg, portslots[i].in, portslots[i].pr))
+			if (win_dialog_add_portselect(dlg, portslots[i].field, portslots[i].pr))
 				goto done;
 		}
 	}
@@ -281,8 +283,8 @@ static void customize_categorizedinput(running_machine *machine, HWND wnd, const
 
 static void storeval_inputport(void *param, int val)
 {
-	input_port_entry *in = (input_port_entry *) param;
-	in->default_value = (UINT16) val;
+	input_field_config *field = (input_field_config *) param;
+	field->defvalue = (UINT16) val;
 }
 
 
@@ -291,10 +293,12 @@ static void storeval_inputport(void *param, int val)
 //	customize_switches
 //============================================================
 
-static void customize_switches(running_machine *machine, HWND wnd, int title_string_num, UINT32 ipt_name, UINT32 ipt_setting)
+static void customize_switches(running_machine *machine, HWND wnd, int title_string_num, UINT32 ipt_name)
 {
 	dialog_box *dlg;
-	input_port_entry *in;
+	const input_port_config *port;
+	const input_field_config *field;
+	const input_setting_config *setting;
 	const char *switch_name = NULL;
 	UINT32 type;
 
@@ -302,29 +306,23 @@ static void customize_switches(running_machine *machine, HWND wnd, int title_str
 	if (!dlg)
 		goto done;
 
-	for (in = machine->input_ports; in->type != IPT_END; in++)
+	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
-		type = in->type;
+		for (field = port->fieldlist; field != NULL; field = field->next)
+		{
+			type = field->type;
 
-		if (type == ipt_name)
-		{
-			if (input_port_active(in))
+			if (type == ipt_name)
 			{
-				switch_name = input_port_name(in);
-				if (win_dialog_add_combobox(dlg, switch_name, in->default_value, storeval_inputport, in))
+				switch_name = input_field_name(field);
+				if (win_dialog_add_combobox(dlg, switch_name, field->defvalue, storeval_inputport, (input_field_config *) field))
 					goto done;
-			}
-			else
-			{
-				switch_name = NULL;
-			}
-		}
-		else if (type == ipt_setting)
-		{
-			if (switch_name)
-			{
-				if (win_dialog_add_combobox_item(dlg, input_port_name(in), in->default_value))
-					goto done;
+
+				for (setting = field->settinglist; setting != NULL; setting = setting->next)
+				{
+					if (win_dialog_add_combobox_item(dlg, setting->name, setting->value))
+						goto done;
+				}
 			}
 		}
 	}
@@ -347,7 +345,7 @@ done:
 
 static void customize_dipswitches(running_machine *machine, HWND wnd)
 {
-	customize_switches(machine, wnd, UI_dipswitches, IPT_DIPSWITCH_NAME, IPT_DIPSWITCH_SETTING);
+	customize_switches(machine, wnd, UI_dipswitches, IPT_DIPSWITCH);
 }
 
 
@@ -358,7 +356,7 @@ static void customize_dipswitches(running_machine *machine, HWND wnd)
 
 static void customize_configuration(running_machine *machine, HWND wnd)
 {
-	customize_switches(machine, wnd, UI_configuration, IPT_CONFIG_NAME, IPT_CONFIG_SETTING);
+	customize_switches(machine, wnd, UI_configuration, IPT_CONFIG);
 }
 
 
@@ -367,30 +365,66 @@ static void customize_configuration(running_machine *machine, HWND wnd)
 //	customize_analogcontrols
 //============================================================
 
+enum
+{
+	ANALOG_ITEM_KEYSPEED,
+	ANALOG_ITEM_CENTERSPEED,
+	ANALOG_ITEM_REVERSE,
+	ANALOG_ITEM_SENSITIVITY
+};
+
+
+
+static void store_analogitem(void *param, int val, int selected_item)
+{
+	const input_field_config *field = (const input_field_config *) param;
+	input_field_user_settings settings;
+
+	input_field_get_user_settings(field, &settings);
+
+	switch(selected_item)
+	{
+		case ANALOG_ITEM_KEYSPEED:		settings.delta = val;		break;
+		case ANALOG_ITEM_CENTERSPEED:	settings.centerdelta = val;	break;
+		case ANALOG_ITEM_REVERSE:		settings.reverse = val;		break;
+		case ANALOG_ITEM_SENSITIVITY:	settings.sensitivity = val;	break;
+	}
+	input_field_set_user_settings(field, &settings);
+}
+
+
+
 static void store_delta(void *param, int val)
 {
-	((input_port_entry *) param)->analog.delta = val;
+	store_analogitem(param, val, ANALOG_ITEM_KEYSPEED);
 }
 
 
 
 static void store_centerdelta(void *param, int val)
 {
-	((input_port_entry *) param)->analog.centerdelta = val;
+	store_analogitem(param, val, ANALOG_ITEM_CENTERSPEED);
 }
 
 
 
 static void store_reverse(void *param, int val)
 {
-	((input_port_entry *) param)->analog.reverse = val;
+	store_analogitem(param, val, ANALOG_ITEM_REVERSE);
 }
 
 
 
 static void store_sensitivity(void *param, int val)
 {
-	((input_port_entry *) param)->analog.sensitivity = val;
+	store_analogitem(param, val, ANALOG_ITEM_SENSITIVITY);
+}
+
+
+
+static int port_type_is_analog(int type)
+{
+	return (type >= __ipt_analog_start && type <= __ipt_analog_end);
 }
 
 
@@ -398,7 +432,9 @@ static void store_sensitivity(void *param, int val)
 static void customize_analogcontrols(running_machine *machine, HWND wnd)
 {
 	dialog_box *dlg;
-	input_port_entry *in;
+	const input_port_config *port;
+	const input_field_config *field;
+	input_field_user_settings settings;
 	const char *name;
 	char buf[255];
 	static const struct dialog_layout layout = { 120, 52 };
@@ -407,39 +443,40 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 	if (!dlg)
 		goto done;
 
-	in = machine->input_ports;
-
-	while (in->type != IPT_END)
+	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
-		if (port_type_is_analog(in->type))
+		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			name = input_port_name(in);
+			if (port_type_is_analog(field->type))
+			{
+				input_field_get_user_settings(field, &settings);
+				name = input_field_name(field);
 
-			_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
-				"%s %s", name, ui_getstring(UI_keyjoyspeed));
-			if (win_dialog_add_adjuster(dlg, buf, in->analog.delta, 1, 255, FALSE, store_delta, in))
-				goto done;
+				_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+					"%s %s", name, ui_getstring(UI_keyjoyspeed));
+				if (win_dialog_add_adjuster(dlg, buf, settings.delta, 1, 255, FALSE, store_delta, (input_field_config *) field))
+					goto done;
 
-			_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
-				"%s %s", name, ui_getstring(UI_centerspeed));
-			if (win_dialog_add_adjuster(dlg, buf, in->analog.centerdelta, 1, 255, FALSE, store_centerdelta, in))
-				goto done;
+				_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+					"%s %s", name, ui_getstring(UI_centerspeed));
+				if (win_dialog_add_adjuster(dlg, buf, settings.centerdelta, 1, 255, FALSE, store_centerdelta, (input_field_config *) field))
+					goto done;
 
-			_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
-				"%s %s", name, ui_getstring(UI_reverse));
-			if (win_dialog_add_combobox(dlg, buf, in->analog.reverse ? 1 : 0, store_reverse, in))
-				goto done;
-			if (win_dialog_add_combobox_item(dlg, ui_getstring(UI_off), 0))
-				goto done;
-			if (win_dialog_add_combobox_item(dlg, ui_getstring(UI_on), 1))
-				goto done;
+				_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+					"%s %s", name, ui_getstring(UI_reverse));
+				if (win_dialog_add_combobox(dlg, buf, settings.reverse ? 1 : 0, store_reverse, (input_field_config *) field))
+					goto done;
+				if (win_dialog_add_combobox_item(dlg, ui_getstring(UI_off), 0))
+					goto done;
+				if (win_dialog_add_combobox_item(dlg, ui_getstring(UI_on), 1))
+					goto done;
 
-			_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
-				"%s %s", name, ui_getstring(UI_sensitivity));
-			if (win_dialog_add_adjuster(dlg, buf, in->analog.sensitivity, 1, 255, TRUE, store_sensitivity, in))
-				goto done;
+				_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+					"%s %s", name, ui_getstring(UI_sensitivity));
+				if (win_dialog_add_adjuster(dlg, buf, settings.sensitivity, 1, 255, TRUE, store_sensitivity, (input_field_config *) field))
+					goto done;
+			}
 		}
-		in++;
 	}
 
 	if (win_dialog_add_standard_buttons(dlg))
@@ -1088,21 +1125,23 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	HMENU joystick_menu;
 	int i, j;
 	HMENU submenu = NULL;
-	const input_port_entry *in;
-	const input_port_entry *in_setting;
+	const input_port_config *port;
+	const input_field_config *field;
+	const input_setting_config *setting;
 	char buf[256];
 	int child_count = 0;
 
-	in = machine->input_ports;
 	use_input_categories = 0;
-	while(in->type != IPT_END)
+	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
-		if (in->type == IPT_CATEGORY_NAME)
+		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			use_input_categories = 1;
-			break;
+			if (field->type == IPT_CATEGORY)
+			{
+				use_input_categories = 1;
+				break;
+			}
 		}
-		in++;
 	}
 
 	joystick_menu = find_sub_menu(menu_bar, "&Options\0&Joysticks\0", TRUE);
@@ -1112,27 +1151,31 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	if (use_input_categories)
 	{
 		// using input categories
-		for (i = 0; machine->input_ports[i].type != IPT_END; i++)
+		i = 0;
+		for (port = machine->portconfig; port != NULL; port = port->next)
 		{
-			in = &machine->input_ports[i];
-			if ((in->type) == IPT_CATEGORY_NAME)
+			for (field = port->fieldlist; field != NULL; field = field->next)
 			{
-				submenu = CreateMenu();
-				if (!submenu)
-					return;
-
-				// append all of the category settings
-				for (j = i + 1; (machine->input_ports[j].type) == IPT_CATEGORY_SETTING; j++)
+				if (field->type == IPT_CATEGORY)
 				{
-					in_setting = &machine->input_ports[j];
-					append_menu_utf8(submenu, MF_STRING, ID_INPUT_0 + j, in_setting->name);
-				}
+					submenu = CreateMenu();
+					if (!submenu)
+						return;
 
-				// tack on the final items and the menu item
-				AppendMenu(submenu, MF_SEPARATOR, 0, NULL);
-				AppendMenu(submenu, MF_STRING, ID_INPUT_0 + i, TEXT("&Configure..."));
-				append_menu_utf8(joystick_menu, MF_STRING | MF_POPUP, (UINT_PTR) submenu, in->name);
-				child_count++;
+					// append all of the category settings
+					j = 0;
+					for (setting = field->settinglist; setting != NULL; setting = setting->next)
+					{
+						append_menu_utf8(submenu, MF_STRING, ID_INPUT_0 + j++, setting->name);
+					}
+
+					// tack on the final items and the menu item
+					AppendMenu(submenu, MF_SEPARATOR, 0, NULL);
+					AppendMenu(submenu, MF_STRING, ID_INPUT_0 + i, TEXT("&Configure..."));
+					append_menu_utf8(joystick_menu, MF_STRING | MF_POPUP, (UINT_PTR) submenu, field->name);
+					child_count++;
+				}
+				i++;
 			}
 		}
 	}
@@ -1210,8 +1253,9 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	UINT flags_for_writing;
 	const device_config *img;
 	int has_config, has_dipswitch, has_keyboard, has_analog, has_misc;
-	const input_port_entry *in;
-	UINT16 in_cat_value = 0;
+	const input_port_config *port;
+	const input_field_config *field;
+	const input_setting_config *setting;
 	int frameskip;
 	int orientation;
 	int speed;
@@ -1242,12 +1286,15 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	has_misc		= input_has_input_class(machine, INPUT_CLASS_MISC);
 
 	has_analog = 0;
-	for (in = machine->input_ports; in->type != IPT_END; in++)
+	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
-		if (port_type_is_analog(in->type))
+		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			has_analog = 1;
-			break;
+			if (port_type_is_analog(field->type))
+			{
+				has_analog = 1;
+				break;
+			}
 		}
 	}
 
@@ -1294,17 +1341,16 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	// if we are using categorized input, we need to properly checkmark the categories
 	if (use_input_categories)
 	{
-		for (i = 0; machine->input_ports[i].type != IPT_END; i++)
+		for (port = machine->portconfig; port != NULL; port = port->next)
 		{
-			in = &machine->input_ports[i];
-			switch(in->type) {
-			case IPT_CATEGORY_NAME:
-				in_cat_value = in->default_value;
-				break;
-
-			case IPT_CATEGORY_SETTING:
-				set_command_state(menu_bar, ID_INPUT_0 + i, (in->default_value == in_cat_value) ? MFS_CHECKED : MFS_ENABLED);
-				break;
+			for (field = port->fieldlist; field != NULL; field = field->next)
+			{
+				if (field->type == IPT_CATEGORY)
+				{
+					i = 0;
+					for (setting = field->settinglist; setting != NULL; setting = setting->next)
+						set_command_state(menu_bar, ID_INPUT_0 + i++, (setting->value == field->defvalue) ? MFS_CHECKED : MFS_ENABLED);
+				}
 			}
 		}
 	}
@@ -1637,9 +1683,11 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 	int dev_command, i;
 	const device_config *img;
 	int port_count;
-	UINT16 setting, category;
-	input_port_entry *in;
+	UINT16 category;
 	const char *section;
+	const input_port_config *port;
+	const input_field_config *field;
+	const input_setting_config *setting;
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 	win_window_info *window = (win_window_info *)ptr;
 
@@ -1805,8 +1853,12 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			// quickly come up with a port count, so we can upper bound commands
 			// near ID_INPUT_0
 			port_count = 0;
-			while(machine->input_ports[port_count].type != IPT_END)
-				port_count++;
+			field = NULL;
+			for (port = machine->portconfig; port != NULL; port = port->next)
+			{
+				for (field = port->fieldlist; field != NULL; field = field->next)
+					port_count++;
+			}
 
 			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + frameskip_level_count()))
 			{
@@ -1832,35 +1884,42 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			else if ((command >= ID_INPUT_0) && (command < ID_INPUT_0 + port_count))
 			{
 				// customize categorized input
-				in = &machine->input_ports[command - ID_INPUT_0];
-				switch(in->type) {
-				case IPT_CATEGORY_NAME:
-					// customize the input type
-					category = 0;
-					section = NULL;
-					for (i = 1; (in[i].type) == IPT_CATEGORY_SETTING; i++)
-					{
-						if (in[i].default_value == in[0].default_value)
+				i = command - ID_INPUT_0;
+				for (port = machine->portconfig; (i > 0) && (port != NULL); port = port->next)
+				{
+					for (field = port->fieldlist; (i > 0) && (field != NULL); field = field->next)
+						;
+				}
+
+				switch(field->type)
+				{
+					case IPT_CATEGORY:
+						// customize the input type
+						category = 0;
+						section = NULL;
+						for (setting = field->settinglist; setting != NULL; setting = setting->next)
 						{
-							category = in[i].category;
-							section = in[i].name;
+							if (field->defvalue == setting->value)
+							{
+								//category = in[i].category;
+								//section = in[i].name;
+							}
 						}
-					}
-					customize_categorizedinput(machine, wnd, section, category);
-					break;
+						customize_categorizedinput(machine, wnd, section, category);
+						break;
 
-				case IPT_CATEGORY_SETTING:
-					// change the input type for this category
-					setting = in->default_value;
-					while((in->type) != IPT_CATEGORY_NAME)
-						in--;
-					in->default_value = setting;
-					break;
+//					case IPT_CATEGORY_SETTING:
+//						// change the input type for this category
+//						setting = in->default_value;
+//						while((in->type) != IPT_CATEGORY_NAME)
+//							in--;
+//						in->default_value = setting;
+//						break;
 
-				default:
-					// should never happen
-					handled = 0;
-					break;
+					default:
+						// should never happen
+						handled = 0;
+						break;
 				}
 			}
 			else

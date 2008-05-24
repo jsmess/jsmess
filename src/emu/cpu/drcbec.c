@@ -154,6 +154,7 @@ union _drcbec_instruction
 	float *				pfloat;
 	double *			pdouble;
 	void				(*cfunc)(void *);
+	drcuml_machine_state *state;
 	const drcuml_codehandle *handle;
 	const drcbec_instruction *inst;
 	const drcbec_instruction **pinst;
@@ -172,9 +173,10 @@ static void drcbec_reset(drcbe_state *drcbe);
 static int drcbec_execute(drcbe_state *state, drcuml_codehandle *entry);
 static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcuml_instruction *instlist, UINT32 numinst);
 static int drcbec_hash_exists(drcbe_state *state, UINT32 mode, UINT32 pc);
+static void drcbec_get_info(drcbe_state *state, drcbe_info *info);
 
 /* private helper functions */
-static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, void **immedptr, int size, int immedsize, const drcuml_parameter *param);
+static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, void **immedptr, int size, const drcuml_parameter *param);
 static void fixup_label(void *parameter, drccodeptr labelcodeptr);
 static int dmulu(UINT64 *dstlo, UINT64 *dsthi, UINT64 src1, UINT64 src2, int flags);
 static int dmuls(UINT64 *dstlo, UINT64 *dsthi, INT64 src1, INT64 src2, int flags);
@@ -236,7 +238,8 @@ const drcbe_interface drcbe_c_be_interface =
 	drcbec_reset,
 	drcbec_execute,
 	drcbec_generate,
-	drcbec_hash_exists
+	drcbec_hash_exists,
+	drcbec_get_info
 };
 
 
@@ -331,8 +334,9 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 	for (inum = 0; inum < numinst; inum++)
 	{
 		const drcuml_instruction *inst = &instlist[inum];
+		UINT8 psize[ARRAY_LENGTH(instlist->param)];
 		drcuml_instruction modified_inst;
-		int immedsize, immedbytes, immedwords, pnum;
+		int immedbytes, immedwords, pnum;
 		void *immed;
 
 		/* handle most instructions generally, but a few special cases */
@@ -391,17 +395,32 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 					inst = &modified_inst;
 				}
 
-				/* determine the maximum size of an immediate; mostly this is just the instruction size */
-				immedsize = inst->size;
+				/* determine the operand size for each operand; mostly this is just the instruction size */
+				for (pnum = 0; pnum < inst->numparams; pnum++)
+					psize[pnum] = inst->size;
+				if ((inst->opcode >= DRCUML_OP_LOAD1U && inst->opcode <= DRCUML_OP_LOAD8U) || inst->opcode == DRCUML_OP_FLOAD)
+					psize[2] = 4;
+				if ((inst->opcode >= DRCUML_OP_STORE1 && inst->opcode <= DRCUML_OP_STORE8) || inst->opcode == DRCUML_OP_FSTORE)
+					psize[1] = 4;
+				if ((inst->opcode >= DRCUML_OP_READ1U && inst->opcode <= DRCUML_OP_READ8M) || inst->opcode == DRCUML_OP_FREAD)
+					psize[1] = psize[2] = 4;
+				if ((inst->opcode >= DRCUML_OP_WRITE1 && inst->opcode <= DRCUML_OP_WRIT8M) || inst->opcode == DRCUML_OP_FWRITE)
+					psize[0] = psize[1] = 4;
+				if (inst->opcode >= DRCUML_OP_FTOI4 && inst->opcode <= DRCUML_OP_FTOI4C)
+					psize[0] = 4;
+				if (inst->opcode >= DRCUML_OP_FTOI8 && inst->opcode <= DRCUML_OP_FTOI8C)
+					psize[0] = 8;
+				if ((inst->opcode >= DRCUML_OP_ZEXT1 && inst->opcode <= DRCUML_OP_SEXT4) || inst->opcode == DRCUML_OP_FFRFS || inst->opcode == DRCUML_OP_FFRI4)
+					psize[1] = 4;
 				if (inst->opcode == DRCUML_OP_FFRFD || inst->opcode == DRCUML_OP_FFRI8)
-					immedsize = 8;
+					psize[1] = 8;
 
 				/* count how many bytes of immediates we need */
 				immedbytes = 0;
 				for (pnum = 0; pnum < inst->numparams; pnum++)
 					if (inst->param[pnum].type == DRCUML_PTYPE_MAPVAR ||
 						(inst->param[pnum].type == DRCUML_PTYPE_IMMEDIATE && inst->param[pnum].value != 0))
-						immedbytes += immedsize;
+						immedbytes += psize[pnum];
 
 				/* compute how many instruction words we need for that */
 				immedwords = (immedbytes + sizeof(drcbec_instruction) - 1) / sizeof(drcbec_instruction);
@@ -414,7 +433,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 
 				/* output each of the parameters */
 				for (pnum = 0; pnum < inst->numparams; pnum++)
-					output_parameter(drcbe, &dst, &immed, inst->size, immedsize, &inst->param[pnum]);
+					output_parameter(drcbe, &dst, &immed, psize[pnum], &inst->param[pnum]);
 
 				/* point past the end of the immediates */
 				dst += immedwords;
@@ -441,6 +460,18 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 static int drcbec_hash_exists(drcbe_state *state, UINT32 mode, UINT32 pc)
 {
 	return drchash_code_exists(state->hash, mode, pc);
+}
+
+
+/*-------------------------------------------------
+    drcbec_get_info - return information about
+    the back-end implementation
+-------------------------------------------------*/
+
+static void drcbec_get_info(drcbe_state *state, drcbe_info *info)
+{
+	info->direct_iregs = 0;
+	info->direct_fregs = 0;
 }
 
 
@@ -497,7 +528,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				if (newinst == NULL)
 				{
 					assert(sp < ARRAY_LENGTH(callstack));
-					drcbe->state.exp.l = PARAM1;
+					drcbe->state.exp = PARAM1;
 					newinst = (const drcbec_instruction *)drcuml_handle_codeptr(inst[2].handle);
 					callstack[sp++] = inst;
 				}
@@ -558,7 +589,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				assert(sp < ARRAY_LENGTH(callstack));
 				newinst = (const drcbec_instruction *)drcuml_handle_codeptr(inst[0].handle);
 				assert_in_cache(drcbe->cache, newinst);
-				drcbe->state.exp.l = PARAM1;
+				drcbe->state.exp = PARAM1;
 				callstack[sp++] = inst;
 				inst = newinst;
 				continue;
@@ -589,7 +620,17 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_GETEXP, 4, 0):		/* GETEXP  dst                    */
-				PARAM0 = drcbe->state.exp.l;
+				PARAM0 = drcbe->state.exp;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SAVE, 4, 0):		/* SAVE    dst                    */
+				*inst[0].state = drcbe->state;
+				inst[0].state->flags = flags;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_RESTORE, 4, 0):	/* RESTORE dst                    */
+				drcbe->state = *inst[0].state;
+				flags = inst[0].state->flags;
 				break;
 
 
@@ -704,6 +745,16 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = (INT16)PARAM1;
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_XTRACT, 4, 0):		/* XTRACT  dst,src,count,mask[,f] */
+				shift = PARAM2 & 31;
+				PARAM0 = ((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_INSERT, 4, 0):		/* INSERT  dst,src,count,mask[,f] */
+				shift = PARAM2 & 31;
+				PARAM0 = (PARAM0 & ~PARAM3) | (((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3);
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADD, 4, 0):		/* ADD     dst,src1,src2[,f]      */
 				PARAM0 = PARAM1 + PARAM2;
 				break;
@@ -720,7 +771,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADDC, 4, 1):
 				temp32 = PARAM1 + PARAM2 + (flags & DRCUML_FLAG_C);
-				flags = FLAGS32_NZCV_ADD(temp32, PARAM1, PARAM2);
+				if (PARAM2 + 1 != 0)
+					flags = FLAGS32_NZCV_ADD(temp32, PARAM1, PARAM2 + (flags & DRCUML_FLAG_C));
+				else
+					flags = FLAGS32_NZCV_ADD(temp32, PARAM1 + (flags & DRCUML_FLAG_C), PARAM2);
 				PARAM0 = temp32;
 				break;
 
@@ -740,7 +794,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SUBB, 4, 1):
 				temp32 = PARAM1 - PARAM2 - (flags & DRCUML_FLAG_C);
-				flags = FLAGS32_NZCV_SUB(temp32, PARAM1, PARAM2);
+				if (PARAM2 + 1 != 0)
+					flags = FLAGS32_NZCV_SUB(temp32, PARAM1, PARAM2 + (flags & DRCUML_FLAG_C));
+				else
+					flags = FLAGS32_NZCV_SUB(temp32, PARAM1 - (flags & DRCUML_FLAG_C), PARAM2);
 				PARAM0 = temp32;
 				break;
 
@@ -845,6 +902,16 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 			case MAKE_OPCODE_SHORT(DRCUML_OP_XOR, 4, 1):
 				temp32 = PARAM1 ^ PARAM2;
 				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 4, 0):		/* LZCNT   dst,src[,f]            */
+				PARAM0 = count_leading_zeros(PARAM1);
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 4, 1):
+				temp32 = count_leading_zeros(PARAM1);
+				flags = (temp32 == 0) ? DRCUML_FLAG_Z : 0;
 				PARAM0 = temp32;
 				break;
 
@@ -1081,27 +1148,37 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ZEXT1, 8, 0):		/* DZEXT1  dst,src                */
-				DPARAM0 = (UINT8)DPARAM1;
+				DPARAM0 = (UINT8)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ZEXT2, 8, 0):		/* DZEXT2  dst,src                */
-				DPARAM0 = (UINT16)DPARAM1;
+				DPARAM0 = (UINT16)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ZEXT4, 8, 0):		/* DZEXT4  dst,src                */
-				DPARAM0 = (UINT32)DPARAM1;
+				DPARAM0 = (UINT32)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT1, 8, 0):		/* DSEXT1  dst,src                */
-				DPARAM0 = (INT8)DPARAM1;
+				DPARAM0 = (INT8)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT2, 8, 0):		/* DSEXT2  dst,src                */
-				DPARAM0 = (INT16)DPARAM1;
+				DPARAM0 = (INT16)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT4, 8, 0):		/* DSEXT4  dst,src                */
-				DPARAM0 = (INT32)DPARAM1;
+				DPARAM0 = (INT32)PARAM1;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_XTRACT, 8, 0):		/* DXTRACT dst,src,count,mask[,f] */
+				shift = DPARAM2 & 63;
+				DPARAM0 = ((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_INSERT, 8, 0):		/* DINSERT dst,src,count,mask[,f] */
+				shift = DPARAM2 & 63;
+				DPARAM0 = (DPARAM0 & ~DPARAM3) | (((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADD, 8, 0):		/* DADD    dst,src1,src2[,f]      */
@@ -1120,7 +1197,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADDC, 8, 1):
 				temp64 = DPARAM1 + DPARAM2 + (flags & DRCUML_FLAG_C);
-				flags = FLAGS64_NZCV_ADD(temp64, DPARAM1, DPARAM2);
+				if (DPARAM2 + 1 != 0)
+					flags = FLAGS64_NZCV_ADD(temp64, DPARAM1, DPARAM2 + (flags & DRCUML_FLAG_C));
+				else
+					flags = FLAGS64_NZCV_ADD(temp64, DPARAM1 + (flags & DRCUML_FLAG_C), DPARAM2);
 				DPARAM0 = temp64;
 				break;
 
@@ -1140,7 +1220,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SUBB, 8, 1):
 				temp64 = DPARAM1 - DPARAM2 - (flags & DRCUML_FLAG_C);
-				flags = FLAGS64_NZCV_SUB(temp64, DPARAM1, DPARAM2);
+				if (DPARAM2 + 1 != 0)
+					flags = FLAGS64_NZCV_SUB(temp64, DPARAM1, DPARAM2 + (flags & DRCUML_FLAG_C));
+				else
+					flags = FLAGS64_NZCV_SUB(temp64, DPARAM1 - (flags & DRCUML_FLAG_C), DPARAM2);
 				DPARAM0 = temp64;
 				break;
 
@@ -1236,6 +1319,22 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				temp64 = DPARAM1 ^ DPARAM2;
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 8, 0):		/* DLZCNT  dst,src[,f]            */
+				if ((UINT32)(DPARAM1 >> 32) != 0)
+					DPARAM0 = count_leading_zeros(DPARAM1 >> 32);
+				else
+					DPARAM0 = 32 + count_leading_zeros(DPARAM1);
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 8, 1):
+				if ((UINT32)(DPARAM1 >> 32) != 0)
+					temp32 = count_leading_zeros(DPARAM1 >> 32);
+				else
+					temp32 = 32 + count_leading_zeros(DPARAM1);
+				flags = (temp32 == 0) ? DRCUML_FLAG_Z : 0;
+				DPARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SHL, 8, 0):		/* DSHL    dst,src,count[,f]      */
@@ -1489,11 +1588,11 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FREAD, 8, 0):		/* FDREAD  dst,space,src1         */
-				PARAM0 = (UINT64)(*active_address_space[PARAM1].accessors->read_qword)(PARAM2);
+				DPARAM0 = (UINT64)(*active_address_space[PARAM1].accessors->read_qword)(PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FWRITE, 8, 0):		/* FDWRITE space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_qword)(PARAM1, PARAM2);
+				(*active_address_space[PARAM0].accessors->write_qword)(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FMOV, 8, 1):		/* FDMOV   dst,src[,c]            */
@@ -1634,7 +1733,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
     output_parameter - output a parameter
 -------------------------------------------------*/
 
-static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, void **immedptr, int size, int immedsize, const drcuml_parameter *param)
+static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, void **immedptr, int size, const drcuml_parameter *param)
 {
 	drcbec_instruction *dst = *dstptr;
 	void *immed = *immedptr;
@@ -1655,18 +1754,18 @@ static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, vo
 			else
 			{
 				(dst++)->v = immed;
-				if (immedsize == 4)
+				if (size == 4)
 					*(UINT32 *)immed = (UINT32)param->value;
 				else
 					*(UINT64 *)immed = (UINT64)param->value;
-				immed = (UINT8 *)immed + immedsize;
+				immed = (UINT8 *)immed + size;
 			}
 			break;
 
 		/* int registers point to the appropriate part of the integer register state */
 		case DRCUML_PTYPE_INT_REGISTER:
 			if (size == 4)
-				(dst++)->puint32 = &drcbe->state.r[param->value - DRCUML_REG_I0].l;
+				(dst++)->puint32 = &drcbe->state.r[param->value - DRCUML_REG_I0].w.l;
 			else
 				(dst++)->puint64 = &drcbe->state.r[param->value - DRCUML_REG_I0].d;
 			break;
@@ -1674,7 +1773,7 @@ static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, vo
 		/* float registers point to the appropriate part of the floating point register state */
 		case DRCUML_PTYPE_FLOAT_REGISTER:
 			if (size == 4)
-				(dst++)->pfloat = &drcbe->state.f[param->value - DRCUML_REG_F0].l;
+				(dst++)->pfloat = &drcbe->state.f[param->value - DRCUML_REG_F0].s.l;
 			else
 				(dst++)->pdouble = &drcbe->state.f[param->value - DRCUML_REG_F0].d;
 			break;

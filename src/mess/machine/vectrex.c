@@ -211,9 +211,9 @@ void vectrex_configuration(running_machine *machine)
 
 *********************************************************************/
 
-void v_via_irq (int level)
+void v_via_irq (running_machine *machine, int level)
 {
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, level);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, level);
 }
 
 READ8_HANDLER( v_via_pb_r )

@@ -624,8 +624,8 @@ static void psx_gpu_init( running_machine *machine )
 	int n_level2;
 	int n_shade;
 	int n_shaded;
-	int width = video_screen_get_width(Machine->primary_screen);
-	int height = video_screen_get_height(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 #if defined( MAME_DEBUG )
 	DebugMeshInit();
@@ -3902,7 +3902,7 @@ INTERRUPT_GEN( psx_vblank )
 #endif
 
 	m_n_gpustatus ^= ( 1L << 31 );
-	psx_irq_set( 0x0001 );
+	psx_irq_set( machine, 0x0001 );
 }
 
 void psx_gpu_reset( void )

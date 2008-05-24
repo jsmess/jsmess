@@ -322,9 +322,9 @@ WRITE8_HANDLER(c64_tape_read)
 	cia_issue_index(0);
 }
 
-static void c64_cia0_interrupt (int level)
+static void c64_cia0_interrupt (running_machine *machine, int level)
 {
-	c64_irq (Machine, level || vicirq);
+	c64_irq (machine, level || vicirq);
 }
 
 void c64_vic_interrupt (int level)
@@ -386,9 +386,9 @@ static void c64_cia1_port_a_w (UINT8 data)
 	}
 }
 
-static void c64_cia1_interrupt (int level)
+static void c64_cia1_interrupt (running_machine *machine, int level)
 {
-	c64_nmi(Machine);
+	c64_nmi(machine);
 }
 
 const cia6526_interface c64_cia0 =

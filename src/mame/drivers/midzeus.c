@@ -25,7 +25,6 @@ The Grid         v1.2   10/18/2000
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "includes/midzeus.h"
@@ -451,7 +450,7 @@ static CUSTOM_INPUT( custom_49way_r )
 	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = param;
 	const char *namey = namex + strlen(namex) + 1;
-	return (translate49[input_port_read(machine, namey) >> 4] << 4) | translate49[input_port_read(machine, namex) >> 4];
+	return (translate49[input_port_read(field->port->machine, namey) >> 4] << 4) | translate49[input_port_read(field->port->machine, namex) >> 4];
 }
 
 
@@ -464,7 +463,7 @@ static WRITE32_HANDLER( keypad_select_w )
 
 static CUSTOM_INPUT( keypad_r )
 {
-	UINT32 bits = input_port_read(machine, param);
+	UINT32 bits = input_port_read(field->port->machine, param);
 	UINT8 select = keypad_select;
 	while ((select & 1) != 0)
 	{
@@ -540,7 +539,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 	/* bits 0-1 enable IRQs (?) */
 	/* bits 2-3 reset IRQ states */
 	gun_irq_state &= ~((gun_control >> 2) & 3);
-	update_gun_irq(Machine);
+	update_gun_irq(machine);
 
 	for (player = 0; player < 2; player++)
 	{

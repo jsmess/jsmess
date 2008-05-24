@@ -14,7 +14,7 @@ void osd_set_mastervolume(int attenuation)
 {
 }
 
-void osd_customize_inputport_list(input_port_default_entry *defaults)
+void osd_customize_input_type_list(input_type_desc *typelist)
 {
 }
 

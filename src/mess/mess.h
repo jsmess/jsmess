@@ -55,7 +55,7 @@ UINT32 hash_data_extract_crc32(const char *d);
 /***************************************************************************/
 
 #if HAS_WAVE
-int tapecontrol(int selected);
+int tapecontrol(running_machine *machine, int selected);
 void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config *img, int *curpos, int *endpos);
 #endif
 

@@ -406,7 +406,7 @@ static WRITE8_HANDLER ( oric_via_out_cb2_func )
 }
 
 
-static void	oric_via_irq_func(int state)
+static void	oric_via_irq_func(running_machine *machine, int state)
 {
 	oric_irqs &= ~(1<<0);
 
@@ -420,7 +420,7 @@ static void	oric_via_irq_func(int state)
 		oric_irqs |=(1<<0);
 	}
 
-	oric_refresh_ints(Machine);
+	oric_refresh_ints(machine);
 }
 
 
@@ -1437,7 +1437,7 @@ static WRITE8_HANDLER(telestrat_via2_out_b_func)
 }
 
 
-static void	telestrat_via2_irq_func(int state)
+static void	telestrat_via2_irq_func(running_machine *machine, int state)
 {
     oric_irqs &=~(1<<2);
 
@@ -1448,7 +1448,7 @@ static void	telestrat_via2_irq_func(int state)
         oric_irqs |=(1<<2);
 	}
 
-    oric_refresh_ints(Machine);
+    oric_refresh_ints(machine);
 }
 static const struct via6522_interface telestrat_via2_interface=
 {

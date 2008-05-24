@@ -7,7 +7,6 @@
 *********************************************************************/
 
 #include "mame.h"
-#include "deprecat.h"
 #include "mslegacy.h"
 #include "uimenu.h"
 #include "uimess.h"
@@ -31,7 +30,7 @@ void mess_ui_update(running_machine *machine)
 	/* traditional MESS interface */
 	if (machine->gamedrv->flags & GAME_COMPUTER)
 	{
-		if( input_ui_pressed(IPT_UI_TOGGLE_UI) )
+		if( input_ui_pressed(machine, IPT_UI_TOGGLE_UI) )
 		{
 			if( !ui_toggle_key )
 			{
@@ -161,14 +160,14 @@ int ui_sprintf_image_info(running_machine *machine, char *buf)
 
 
 
-UINT32 ui_menu_image_info(UINT32 state)
+UINT32 ui_menu_image_info(running_machine *machine, UINT32 state)
 {
 	char buf[2048];
 	char *bufptr = buf;
 	UINT32 selected = 0;
 
 	/* add the game info */
-	bufptr += ui_sprintf_image_info(Machine, bufptr);
+	bufptr += ui_sprintf_image_info(machine, bufptr);
 
 	/* make it look like a menu */
 	bufptr += sprintf(bufptr, "\n\t%s %s %s", ui_getstring(UI_lefthilight), ui_getstring(UI_returntomain), ui_getstring(UI_righthilight));
@@ -177,7 +176,7 @@ UINT32 ui_menu_image_info(UINT32 state)
 	ui_draw_message_window(buf);
 
 	/* handle the keys */
-	ui_menu_generic_keys(&selected, 1, 0);
+	ui_menu_generic_keys(machine, &selected, 1, 0);
 	return selected;
 }
 

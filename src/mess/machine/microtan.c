@@ -215,11 +215,11 @@ static WRITE8_HANDLER (via_0_out_cb2 )
     LOG(("microtan_via_0_out_cb2 %d\n", data));
 }
 
-static void via_0_irq(int state)
+static void via_0_irq(running_machine *machine, int state)
 {
     LOG(("microtan_via_0_irq %d\n", state));
     via_0_irq_line = state;
-    microtan_set_irq_line(Machine);
+    microtan_set_irq_line(machine);
 }
 
 /**************************************************************
@@ -287,11 +287,11 @@ static WRITE8_HANDLER ( via_1_out_cb2 )
     LOG(("microtan_via_1_out_cb2 %d\n", data));
 }
 
-static void via_1_irq(int state)
+static void via_1_irq(running_machine *machine, int state)
 {
     LOG(("microtan_via_1_irq %d\n", state));
     via_1_irq_line = state;
-    microtan_set_irq_line(Machine);
+    microtan_set_irq_line(machine);
 }
 
 /**************************************************************
