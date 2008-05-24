@@ -181,7 +181,7 @@ port 0x3C4, and a data register located at I/O port 0x3C5.
 
 	3C4 - 7 6 5 4 3 2 1 0 - Sequencer Index Register - Write Only
 	      | | | | | | | |
-          | | | | | | | +-- index bit 0
+	      | | | | | | | +-- index bit 0
 	      | | | | | | +---- index bit 1
 	      | | | | | +------ index bit 2
 	      | | | | +-------- reserved/unused
@@ -193,7 +193,7 @@ port 0x3C4, and a data register located at I/O port 0x3C5.
 
 	3C5 - 7 6 5 4 3 2 1 0 - Sequencer Data Register - Write Only
 	      | | | | | | | |
-          | | | | | | | +-- data bit 0
+	      | | | | | | | +-- data bit 0
 	      | | | | | | +---- data bit 1
 	      | | | | | +------ data bit 2
 	      | | | | +-------- data bit 3
@@ -690,6 +690,78 @@ static MC6845_ON_VSYNC_CHANGED( ega_vsync_changed )
 }
 
 
+static MC6845_UPDATE_ROW( pc_ega_graphics )
+{
+	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
+	int	i;
+
+	for ( i = 0; i < x_count; i++ )
+	{
+		*p = 0;
+	}
+}
+
+
+static MC6845_UPDATE_ROW( pc_ega_text )
+{
+	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
+	int	i;
+
+//	logerror( "pc_ega_text: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
+
+	for ( i = 0; i < x_count; i++ )
+	{
+		UINT16	offset = ( ma + i ) << 1;
+		UINT8	chr = ega.videoram[ offset ];
+		UINT8	attr = ega.videoram[ offset + 1 ];
+		UINT8	data = ega.videoram[ 0x10000 + chr * 32 + ra ];
+		UINT16	fg = ega.attribute.data[ attr & 0x0F ];
+		UINT16	bg = ega.attribute.data[ attr >> 4 ];
+
+		*p = ( data & 0x80 ) ? fg : bg; p++;
+		*p = ( data & 0x40 ) ? fg : bg; p++;
+		*p = ( data & 0x20 ) ? fg : bg; p++;
+		*p = ( data & 0x10 ) ? fg : bg; p++;
+		*p = ( data & 0x08 ) ? fg : bg; p++;
+		*p = ( data & 0x04 ) ? fg : bg; p++;
+		*p = ( data & 0x02 ) ? fg : bg; p++;
+		*p = ( data & 0x01 ) ? fg : bg; p++;
+	}
+}
+
+
+static void pc_ega_change_mode( void )
+{
+	ega.update_row = NULL;
+
+	/* Check for graphics mode */
+	if (   ( ega.attribute.data[0x10] & 0x01 ) &&
+	     ! ( ega.sequencer.data[0x04] & 0x01 ) &&
+	       ( ega.graphics_controller.data[0x06] & 0x01 ) )
+	{
+		if ( VERBOSE_EGA )
+		{
+			logerror("pc_ega_change_mode(): Switch to graphics mode\n");
+		}
+
+		ega.update_row = pc_ega_graphics;
+	}
+
+	/* Check for text mode */
+	if ( ! ( ega.attribute.data[0x10] & 0x01 ) &&
+	       ( ega.sequencer.data[0x04] & 0x01 ) &&
+	     ! ( ega.graphics_controller.data[0x06] & 0x01 ) )
+	{
+		if ( VERBOSE_EGA )
+		{
+			logerror("pc_ega_chnage_mode(): Switching to text mode\n");
+		}
+
+		ega.update_row = pc_ega_text;
+	}
+}
+
+
 static READ8_HANDLER( pc_ega8_3X0_r )
 {
 	int data = 0xff;
@@ -829,6 +901,24 @@ static READ8_HANDLER( pc_ega8_3c0_r )
 
 static WRITE8_HANDLER( pc_ega8_3c0_w )
 {
+	static const UINT8 ar_reg_mask[0x20] =
+		{
+			0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
+			0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
+			0x7F, 0x3F, 0x3F, 0x0F, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		};
+	static const UINT8 sr_reg_mask[0x08] =
+		{
+			0x03, 0x0F, 0x0F, 0x0F, 0x07, 0x00, 0x00, 0x00
+		};
+	static const UINT8 gr_reg_mask[0x10] =
+		{
+			0x0F, 0x0F, 0x0F, 0x1F, 0x07, 0x3F, 0x0F, 0x0F,
+			0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		};
+	int	index = 0;
+
 	if ( VERBOSE_EGA )
 	{
 		logerror("pc_ega_3c0_w: offset = %02x, data = %02x\n", offset, data );
@@ -844,8 +934,19 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		}
 		else
 		{
-			logerror("AR%02X = 0x%02x\n", ega.attribute.index & 0x1F, data );
-			ega.attribute.data[ ega.attribute.index & 0x1F ] = data;
+			index = ega.attribute.index & 0x1F;
+
+			logerror("AR%02X = 0x%02x\n", index, data );
+
+			/* Clear unused bits */
+			ega.attribute.data[ index ] = data & ar_reg_mask[ index ];
+
+			switch ( index )
+			{
+			case 0x10:		/* AR10 */
+				pc_ega_change_mode();
+				break;
+			}
 		}
 		ega.attribute.index_write ^= 0x01;
 		break;
@@ -860,8 +961,20 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		ega.sequencer.index = data;
 		break;
 	case 5:
-		logerror("SR%02X = 0x%02x\n", ega.sequencer.index & 0x07, data );
-		ega.sequencer.data[ ega.sequencer.index & 0x07 ] = data;
+		index = ega.sequencer.index & 0x07;
+
+		logerror("SR%02X = 0x%02x\n", index & 0x07, data );
+
+		/* Clear unused bits */
+		ega.sequencer.data[ index ] = data & sr_reg_mask[ index ];
+
+		switch ( index )
+		{
+		case 0x01:		/* SR01 */
+		case 0x04:		/* SR04 */
+			pc_ega_change_mode();
+			break;
+		}
 		break;
 
 	/* Graphics Controller */
@@ -869,11 +982,17 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		ega.graphics_controller.index = data;
 		break;
 	case 15:
-		logerror("GR%02X = 0x%02x\n", ega.graphics_controller.index & 0x0F, data );
-		ega.graphics_controller.data[ ega.graphics_controller.index & 0x0F ] = data;
-		switch ( ega.graphics_controller.index & 0x0F )
+		index = ega.graphics_controller.index & 0x0F;
+
+		logerror("GR%02X = 0x%02x\n", index, data );
+
+		/* Clear unused bits */
+		ega.graphics_controller.data[ index ] = data & gr_reg_mask[ index ];
+
+		switch ( index )
 		{
-		case 6:			/* GR06 */
+		case 0x06:		/* GR06 */
+			pc_ega_change_mode();
 			pc_ega_install_banks();
 			break;
 		}
