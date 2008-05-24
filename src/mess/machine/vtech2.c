@@ -225,33 +225,33 @@ static int mra_bank(int bank, int offs)
 		static int row_a,row_b,row_c,row_d;
 		if( (offs & 0x0300) == 0x0000 ) /* keyboard row A */
 		{
-			if( input_port_read_indexed(Machine,  8) != row_a )
+			if( input_port_read(Machine, "ROWA") != row_a )
 			{
-				row_a = input_port_read_indexed(Machine, 8);
+				row_a = input_port_read(Machine, "ROWA");
 				data &= row_a;
 			}
 		}
 		if( (offs & 0x0300) == 0x0100 ) /* keyboard row B */
 		{
-			if( input_port_read_indexed(Machine,  9) != row_b )
+			if( input_port_read(Machine, "ROWB") != row_b )
 			{
-				row_b = input_port_read_indexed(Machine,  9);
+				row_b = input_port_read(Machine, "ROWB");
 				data &= row_b;
 			}
 		}
 		if( (offs & 0x0300) == 0x0200 ) /* keyboard row C */
 		{
-			if( input_port_read_indexed(Machine, 10) != row_c )
+			if( input_port_read(Machine, "ROWC") != row_c )
 			{
-				row_c = input_port_read_indexed(Machine, 10);
+				row_c = input_port_read(Machine, "ROWC");
 				data &= row_c;
 			}
 		}
 		if( (offs & 0x0300) == 0x0300 ) /* keyboard row D */
 		{
-			if( input_port_read_indexed(Machine, 11) != row_d )
+			if( input_port_read(Machine, "ROWD") != row_d )
 			{
-				row_d = input_port_read_indexed(Machine, 11);
+				row_d = input_port_read(Machine, "ROWD");
 				data &= row_d;
 			}
 		}
@@ -260,21 +260,21 @@ static int mra_bank(int bank, int offs)
 	{
 		/* All Lasers keyboard rows 0 through 7 */
         if( !(offs & 0x01) )
-			data &= input_port_read_indexed(Machine,  0);
+			data &= input_port_read(Machine, "ROW0");
 		if( !(offs & 0x02) )
-			data &= input_port_read_indexed(Machine,  1);
+			data &= input_port_read(Machine, "ROW1");
 		if( !(offs & 0x04) )
-			data &= input_port_read_indexed(Machine,  2);
+			data &= input_port_read(Machine, "ROW2");
 		if( !(offs & 0x08) )
-			data &= input_port_read_indexed(Machine,  3);
+			data &= input_port_read(Machine, "ROW3");
 		if( !(offs & 0x10) )
-			data &= input_port_read_indexed(Machine,  4);
+			data &= input_port_read(Machine, "ROW4");
 		if( !(offs & 0x20) )
-			data &= input_port_read_indexed(Machine,  5);
+			data &= input_port_read(Machine, "ROW5");
 		if( !(offs & 0x40) )
-			data &= input_port_read_indexed(Machine,  6);
+			data &= input_port_read(Machine, "ROW6");
 		if( !(offs & 0x80) )
-			data &= input_port_read_indexed(Machine,  7);
+			data &= input_port_read(Machine, "ROW7");
 	}
 
     /* what's bit 7 good for? tape input maybe? */
