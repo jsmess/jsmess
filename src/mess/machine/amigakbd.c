@@ -58,10 +58,11 @@ static TIMER_CALLBACK( kbd_update_callback )
 static INPUT_CHANGED( kbd_update )
 {
 	int	index = *( (int*)(param) ), i;
-	UINT32	delta = oldval ^ newval;
+	UINT32	oldvalue = oldval * field->mask, newvalue = newval * field->mask;
+	UINT32	delta = oldvalue ^ newvalue;
 
 	/* Special case Page UP, which we will use as Action Replay button */
-	if ( (index == 3) && ( delta & 0x80000000 ) && ( newval & 0x80000000 ) )
+	if ( (index == 3) && ( delta & 0x80000000 ) && ( newvalue & 0x80000000 ) )
 	{
 		const amiga_machine_interface *amiga_intf = amiga_get_interface();
 
@@ -78,7 +79,7 @@ static INPUT_CHANGED( kbd_update )
 		{
 			if ( delta & ( 1 << i ) )
 			{
-				int down = ( newval & ( 1 << i ) ) ? 0 : 1;
+				int down = ( newvalue & ( 1 << i ) ) ? 0 : 1;
 				int scancode = ( ( (index*32)+i ) << 1 ) | down;
 				int amigacode = ~scancode;
 

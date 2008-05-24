@@ -8,7 +8,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-- [AMIGA] Partial keyboard fix. [Roberto Zandonà]
+- [AMIGA] Fixed Keyboard. (bug #1590) [Roberto Zandonà]
 
 - [AMIGACD / AMIGAFDC] Fixed a couple of regressions introduced in 0.125.
   Still CDTV regression is not fixed. [Fabio Priuli]
