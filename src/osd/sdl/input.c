@@ -1262,45 +1262,44 @@ int sdlinput_should_hide_mouse(void)
 //  osd_customize_inputport_list
 //============================================================
 
-void osd_customize_inputport_list(input_port_default_entry *defaults)
+void osd_customize_input_type_list(input_type_desc *typelist)
 {
-	input_port_default_entry *idef = defaults;
 	#ifdef MESS
 	int mameid_code ,ui_code;
 	#endif
-
-	// loop over all the defaults
-	while (idef->type != IPT_END)
+	input_type_desc *typedesc;
+	
+	// loop over the defaults
+	for (typedesc = typelist; typedesc != NULL; typedesc = typedesc->next)
 	{
-		// map in some OSD-specific keys
-		switch (idef->type)
+		switch (typedesc->type)
 		{
 			#ifdef MESS
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
 				mameid_code = lookup_mame_code((const char *)options_get_string(mame_options(), SDLOPTION_UIMODEKEY));
 				ui_code = INPUT_CODE(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, mameid_code);
-				input_seq_set_1(&idef->defaultseq, ui_code);
+				input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], ui_code);
 				break;
 			#endif
 			// alt-enter for fullscreen
 			case IPT_OSD_1:
-				idef->token = "TOGGLE_FULLSCREEN";
-				idef->name = "Toggle Fullscreen";
-				input_seq_set_2(&idef->defaultseq, KEYCODE_ENTER, KEYCODE_LALT);
+				typedesc->token = "TOGGLE_FULLSCREEN";
+				typedesc->name = "Toggle Fullscreen";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_ENTER, KEYCODE_LALT);
 				break;
 
 			// disable UI_SELECT when LALT is down, this stops selecting
 			// things in the menu when toggling fullscreen with LALT+ENTER
 /*			case IPT_UI_SELECT:
-				input_seq_set_3(&idef->defaultseq, KEYCODE_ENTER, SEQCODE_NOT, KEYCODE_LALT);
+				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_ENTER, SEQCODE_NOT, KEYCODE_LALT);
 				break;*/
 
 			// page down for fastforward (must be OSD_3 as per src/emu/ui.c)
 			case IPT_UI_FAST_FORWARD:
-				idef->token = "FAST_FORWARD";
-				idef->name = "Fast Forward";
-				input_seq_set_1(&idef->defaultseq, KEYCODE_PGDN);
+				typedesc->token = "FAST_FORWARD";
+				typedesc->name = "Fast Forward";
+				input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_PGDN);
 				break;
 			
 			// OSD hotkeys use LCTRL and start at F3, they start at
@@ -1310,107 +1309,104 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 
 			// LCTRL-F3 to toggle fullstretch
 			case IPT_OSD_2:
-				idef->token = "TOGGLE_FULLSTRETCH";
-				idef->name = "Toggle Uneven stretch";
-				input_seq_set_2(&idef->defaultseq, KEYCODE_F3, KEYCODE_LCONTROL);
+				typedesc->token = "TOGGLE_FULLSTRETCH";
+				typedesc->name = "Toggle Uneven stretch";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F3, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the reset key
 			case IPT_UI_SOFT_RESET:
-				input_seq_set_5(&idef->defaultseq, KEYCODE_F3, SEQCODE_NOT, KEYCODE_LCONTROL, SEQCODE_NOT, KEYCODE_LSHIFT);
+				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F3, SEQCODE_NOT, KEYCODE_LCONTROL, SEQCODE_NOT, KEYCODE_LSHIFT);
 				break;
 			
 			// LCTRL-F4 to toggle keep aspect
 			case IPT_OSD_4:
-				idef->token = "TOGGLE_KEEP_ASPECT";
-				idef->name = "Toggle Keepaspect";
-				input_seq_set_2(&idef->defaultseq, KEYCODE_F4, KEYCODE_LCONTROL);
+				typedesc->token = "TOGGLE_KEEP_ASPECT";
+				typedesc->name = "Toggle Keepaspect";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F4, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the show gfx key
 			case IPT_UI_SHOW_GFX:
-				input_seq_set_3(&idef->defaultseq, KEYCODE_F4, SEQCODE_NOT, KEYCODE_LCONTROL);
+				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F4, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			
 			// LCTRL-F5 to toggle OpenGL filtering
 			case IPT_OSD_5:
-				idef->token = "TOGGLE_FILTER";
-				idef->name = "Toggle Filter";
-				input_seq_set_2(&idef->defaultseq, KEYCODE_F5, KEYCODE_LCONTROL);
+				typedesc->token = "TOGGLE_FILTER";
+				typedesc->name = "Toggle Filter";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F5, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the toggle debug key
 			case IPT_UI_TOGGLE_DEBUG:
-				input_seq_set_3(&idef->defaultseq, KEYCODE_F5, SEQCODE_NOT, KEYCODE_LCONTROL);
+				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F5, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			
 			// LCTRL-F6 to decrease OpenGL prescaling
 			case IPT_OSD_6:
-				idef->token = "DECREASE_PRESCALE";
-				idef->name = "Decrease Prescaling";
-				input_seq_set_2(&idef->defaultseq, KEYCODE_F6, KEYCODE_LCONTROL);
+				typedesc->token = "DECREASE_PRESCALE";
+				typedesc->name = "Decrease Prescaling";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F6, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the toggle cheat key
 			case IPT_UI_TOGGLE_CHEAT:
-				input_seq_set_3(&idef->defaultseq, KEYCODE_F6, SEQCODE_NOT, KEYCODE_LCONTROL);
+				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F6, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			
 			// LCTRL-F7 to increase OpenGL prescaling
 			case IPT_OSD_7:
-				idef->token = "INCREASE_PRESCALE";
-				idef->name = "Increase Prescaling";
-				input_seq_set_2(&idef->defaultseq, KEYCODE_F7, KEYCODE_LCONTROL);
+				typedesc->token = "INCREASE_PRESCALE";
+				typedesc->name = "Increase Prescaling";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F7, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the load state key
 			case IPT_UI_LOAD_STATE:
-				input_seq_set_5(&idef->defaultseq, KEYCODE_F7, SEQCODE_NOT, KEYCODE_LCONTROL, SEQCODE_NOT, KEYCODE_LSHIFT);
+				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F7, SEQCODE_NOT, KEYCODE_LCONTROL, SEQCODE_NOT, KEYCODE_LSHIFT);
 				break;
 			
 			// LCTRL-F8 to decrease prescaling effect #
 			case IPT_OSD_8:
 				if (sdl_use_unsupported()) {
-					idef->token = "DECREASE_EFFECT";
-					idef->name = "Decrease Effect";
-					input_seq_set_2(&idef->defaultseq, KEYCODE_F8, KEYCODE_LCONTROL);
+					typedesc->token = "DECREASE_EFFECT";
+					typedesc->name = "Decrease Effect";
+					input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F8, KEYCODE_LCONTROL);
 				}
 				break;
 			// add a Not lcrtl condition to frameskip decrease
 			case IPT_UI_FRAMESKIP_DEC:
 				if (sdl_use_unsupported())
-					input_seq_set_3(&idef->defaultseq, KEYCODE_F8, SEQCODE_NOT, KEYCODE_LCONTROL);
+					input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F8, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			
 			// LCTRL-F9 to increase prescaling effect #
 			case IPT_OSD_9:
 				if (sdl_use_unsupported()) {
-					idef->token = "INCREASE_EFFECT";
-					idef->name = "Increase Effect";
-					input_seq_set_2(&idef->defaultseq, KEYCODE_F9, KEYCODE_LCONTROL);
+					typedesc->token = "INCREASE_EFFECT";
+					typedesc->name = "Increase Effect";
+					input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F9, KEYCODE_LCONTROL);
 				}
 				break;
 			// add a Not lcrtl condition to frameskip increase
 			case IPT_UI_FRAMESKIP_INC:
 				if (sdl_use_unsupported())
-					input_seq_set_3(&idef->defaultseq, KEYCODE_F9, SEQCODE_NOT, KEYCODE_LCONTROL);
+					input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F9, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			
 			// LCTRL-F10 to toggle the renderer (software vs opengl)
 			case IPT_OSD_10:
-				idef->token = "TOGGLE_RENDERER";
-				idef->name = "Toggle OpenGL/software rendering";
-				input_seq_set_2(&idef->defaultseq, KEYCODE_F10, KEYCODE_LCONTROL);
+				typedesc->token = "TOGGLE_RENDERER";
+				typedesc->name = "Toggle OpenGL/software rendering";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F10, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the throttle key
 			case IPT_UI_THROTTLE:
-				input_seq_set_3(&idef->defaultseq, KEYCODE_F10, SEQCODE_NOT, KEYCODE_LCONTROL);
+				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F10, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between apps)
 			case IPT_UI_CONFIGURE:
-				input_seq_set_5(&idef->defaultseq, KEYCODE_TAB, SEQCODE_NOT, KEYCODE_LALT, SEQCODE_NOT, KEYCODE_RALT);
+				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_TAB, SEQCODE_NOT, KEYCODE_LALT, SEQCODE_NOT, KEYCODE_RALT);
 				break;
 		}
-
-		// find the next one
-		idef++;
 	}
 }
 
