@@ -95,7 +95,7 @@ static void video_exit(running_machine *machine);
 static void init_monitors(void);
 static sdl_monitor_info *pick_monitor(int index);
 
-static void check_osd_inputs(void);
+static void check_osd_inputs(running_machine *machine);
 
 static void extract_video_config(running_machine *machine);
 static void load_effect_overlay(running_machine *machine, const char *filename);
@@ -356,7 +356,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 
 	// poll the joystick values here
 	sdlinput_poll(machine);
-	check_osd_inputs();
+	check_osd_inputs(machine);
 
 #ifdef ENABLE_DEBUGGER
 	debugwin_update_during_game();
@@ -512,47 +512,47 @@ finishit:
 //  check_osd_inputs
 //============================================================
 
-static void check_osd_inputs(void)
+static void check_osd_inputs(running_machine *machine)
 {
 	sdl_window_info *window = sdl_window_list;
 
 	// check for toggling fullscreen mode
-	if (input_ui_pressed(IPT_OSD_1))
+	if (input_ui_pressed(machine, IPT_OSD_1))
 		sdlwindow_toggle_full_screen(window);
 	
-	if (input_ui_pressed(IPT_OSD_2))
+	if (input_ui_pressed(machine, IPT_OSD_2))
 	{
 		video_config.fullstretch = !video_config.fullstretch;
 		ui_popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
 	}
 	
-	if (input_ui_pressed(IPT_OSD_4))
+	if (input_ui_pressed(machine, IPT_OSD_4))
 	{
 		video_config.keepaspect = !video_config.keepaspect;
 		ui_popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
 	
 #if USE_OPENGL
-	if (input_ui_pressed(IPT_OSD_5))
+	if (input_ui_pressed(machine, IPT_OSD_5))
 	{
 		video_config.filter = !video_config.filter;
 		ui_popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
 	}
 #endif
 
-	if (input_ui_pressed(IPT_OSD_6))
+	if (input_ui_pressed(machine, IPT_OSD_6))
 		sdlwindow_modify_prescale(window, -1);
 
-	if (input_ui_pressed(IPT_OSD_7))
+	if (input_ui_pressed(machine, IPT_OSD_7))
 		sdlwindow_modify_prescale(window, 1);
 
-	if (input_ui_pressed(IPT_OSD_8))
+	if (input_ui_pressed(machine, IPT_OSD_8))
 		sdlwindow_modify_effect(window, -1);
 
-	if (input_ui_pressed(IPT_OSD_9))
+	if (input_ui_pressed(machine, IPT_OSD_9))
 		sdlwindow_modify_effect(window, 1);
 
-	if (input_ui_pressed(IPT_OSD_10))
+	if (input_ui_pressed(machine, IPT_OSD_10))
 		sdlwindow_toggle_draw(window);
 }
 
