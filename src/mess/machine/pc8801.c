@@ -194,7 +194,8 @@ WRITE8_HANDLER(pc88sr_outport_40)
   if((port_save&0x04) == 0x00 && (data&0x04) != 0x00) calender_shift();
   port_save=data;
 
-  if((input_port_read_indexed(machine, 17)&0x40)==0x00) {
+  if((input_port_read(machine, "DSW1") & 0x40) == 0x00) 
+  {
     data&=0x7f;
   }
   switch(data&0xa0) {
@@ -241,7 +242,7 @@ WRITE8_HANDLER(pc88sr_outport_40)
   int r;
 
   /* read DIP-SW */
-  r=input_port_read_indexed(machine, 17)<<1;
+  r=input_port_read(machine, "DSW1")<<1;
   /* change bit 0 according BASIC mode */
   if(is_Nbasic) {
     r&=0xfe;
@@ -268,7 +269,7 @@ WRITE8_HANDLER(pc88sr_outport_40)
   int r;
 
   /* read DIP-SW */
-  r=input_port_read_indexed(machine, 18)<<1;
+  r=input_port_read(machine, "DSW2")<<1;
   /* change bit 6 according speed switch */
   if(pc88sr_is_highspeed) {
     r|=0x40;
@@ -572,8 +573,8 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
 	pc8801_update_bank();
 	pc8801_video_init(machine, hireso);
 
-  if(extmem_mode!=input_port_read_indexed(machine, 19)) {
-    extmem_mode=input_port_read_indexed(machine, 19);
+  if(extmem_mode!=input_port_read(machine, "MEM")) {
+    extmem_mode=input_port_read(machine, "MEM");
     if(extRAM!=NULL) {
       free(extRAM);
       extRAM=NULL;
@@ -695,7 +696,7 @@ static void pc88sr_ch_reset (running_machine *machine, int hireso)
 {
   int a;
 
-  a=input_port_read_indexed(machine, 16);
+  a=input_port_read(machine, "CFG");
   is_Nbasic = ((a&0x01)==0x00);
   is_V2mode = ((a&0x02)==0x00);
   pc88sr_is_highspeed = ((a&0x04)!=0x00);
@@ -819,7 +820,7 @@ static const struct nec765_interface pc8801_fdc_interface=
 
 static void pc8801_init_5fd(void)
 {
-	use_5FD = (input_port_read_indexed(Machine, 18)&0x80)!=0x00;
+	use_5FD = (input_port_read(Machine, "DSW2") & 0x80) != 0x00;
 	if (!use_5FD)
 		cpunum_suspend(1, SUSPEND_REASON_DISABLE, 1);
 	else
