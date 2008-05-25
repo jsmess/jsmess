@@ -139,8 +139,6 @@
 #include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
 
-//#define ENABLE_SASI
-
 struct x68k_system sys;
 
 extern UINT16* gvram;  // Graphic VRAM
@@ -1215,10 +1213,8 @@ static WRITE16_HANDLER( x68k_sram_w )
 static READ16_HANDLER( x68k_sram_r )
 {
 	// HACKS!
-#ifndef ENABLE_SASI
-	if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
-		return 0x0000;
-#endif
+//	if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
+//		return 0x0000;
 	if(offset == 0x08/2)
 		return mess_ram_size >> 16;  // RAM size
 	/*if(offset == 0x46/2)
