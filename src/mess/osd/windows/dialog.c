@@ -97,8 +97,9 @@ typedef struct _seqselect_info seqselect_info;
 struct _seqselect_info
 {
 	WNDPROC oldwndproc;
-	input_seq *code;		// pointer to the input_seq
-	input_seq newcode;		// the new input_seq; committed to *code when we are done
+	const input_field_config *field;		// pointer to the field
+	input_field_user_settings settings;		// the new settings
+	input_seq *code;						// the input_seq within settings
 	WORD pos;
 	BOOL is_analog;
 	seqselect_state poll_state;
@@ -1069,7 +1070,7 @@ static void seqselect_settext(HWND editwnd)
 
 	// retrieve the seq name
 	seqstring = astring_alloc();
-	input_seq_name(seqstring, &stuff->newcode);
+	input_seq_name(seqstring, stuff->code);
 
 	// change the text - avoid calls to SetWindowText() if we can
 	win_get_window_text_utf8(editwnd, buffer, ARRAY_LENGTH(buffer));
@@ -1135,7 +1136,7 @@ static void seqselect_start_read_from_main_thread(void *param)
 	while(stuff->poll_state == SEQSELECT_STATE_POLLING)
 	{
 		// poll
-		ret = input_seq_poll(&stuff->newcode);
+		ret = input_seq_poll(stuff->code);
 		seqselect_settext(editwnd);
 	}
 
@@ -1238,7 +1239,6 @@ static LRESULT seqselect_setup(dialog_box *dialog, HWND editwnd, UINT message, W
 	seqselect_info *stuff = (seqselect_info *) lparam;
 	LONG_PTR lp;
 
-	memcpy(&stuff->newcode, stuff->code, sizeof(stuff->newcode));
 	lp = SetWindowLongPtr(editwnd, GWLP_WNDPROC, (LONG_PTR) seqselect_wndproc);
 	stuff->oldwndproc = (WNDPROC) lp;
 	SetWindowLongPtr(editwnd, GWLP_USERDATA, lparam);
@@ -1256,33 +1256,11 @@ static LRESULT seqselect_apply(dialog_box *dialog, HWND editwnd, UINT message, W
 {
 	seqselect_info *stuff;
 	stuff = get_seqselect_info(editwnd);
-	memcpy(stuff->code, &stuff->newcode, sizeof(*(stuff->code)));
+
+	// store the settings
+	input_field_set_user_settings(stuff->field, &stuff->settings);
+
 	return 0;
-}
-
-//============================================================
-//	input_port_mutable_seq
-//============================================================
-
-static input_seq *input_port_mutable_seq(input_field_config *field, int seqtype)
-{
-	input_seq *portseq;
-
-	// if field is disabled, return no key
-	if (field->flags & FIELD_FLAG_UNUSED)
-		return NULL;
-
-	// handle the various seq types
-	portseq = &field->seq[seqtype];
-
-	// does this override the default? if not, find the default setting
-	if (input_seq_get_1(portseq) == SEQCODE_DEFAULT)
-	{
-		const input_seq *default_portseq;
-		default_portseq = input_type_seq(field->port->machine, field->type, field->player, seqtype);
-		*portseq = *default_portseq;
-	}
-	return portseq;
 }
 
 //============================================================
@@ -1290,23 +1268,28 @@ static input_seq *input_port_mutable_seq(input_field_config *field, int seqtype)
 //============================================================
 
 static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
-	short cx, short cy, input_field_config *field, int is_analog, int seq)
+	short cx, short cy, const input_field_config *field, int is_analog, int seq)
 {
 	seqselect_info *stuff;
-	input_seq *code;
 
-	code = input_port_mutable_seq(field, seq);
-
+	// write the dialog item
 	if (dialog_write_item(di, WS_CHILD | WS_VISIBLE | SS_ENDELLIPSIS | ES_CENTER | SS_SUNKEN,
 			x, y, cx, cy, NULL, DLGITEM_EDIT, NULL))
 		return 1;
+
+	// allocate a seqselect_info
 	stuff = (seqselect_info *) pool_malloc(di->mempool, sizeof(seqselect_info));
 	if (!stuff)
 		return 1;
+
+	// initialize the structure
 	memset(stuff, 0, sizeof(*stuff));
-	stuff->code = code;
+	input_field_get_user_settings(field, &stuff->settings);
+	stuff->field = field;
 	stuff->pos = di->item_count;
 	stuff->is_analog = is_analog;
+	stuff->code = &stuff->settings.seq[seq];
+
 	if (dialog_add_trigger(di, di->item_count, TRIGGER_INITDIALOG, 0, seqselect_setup, di->item_count, (LPARAM) stuff, NULL, NULL))
 		return 1;
 	if (dialog_add_trigger(di, di->item_count, TRIGGER_APPLY, 0, seqselect_apply, 0, 0, NULL, NULL))
@@ -1320,7 +1303,7 @@ static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
 //	win_dialog_add_seqselect
 //============================================================
 
-int win_dialog_add_portselect(dialog_box *dialog, input_field_config *field, const RECT *r)
+int win_dialog_add_portselect(dialog_box *dialog, const input_field_config *field, const RECT *r)
 {
 	dialog_box *di = dialog;
 	short x;

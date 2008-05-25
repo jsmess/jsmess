@@ -135,7 +135,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 
 	struct
 	{
-		input_field_config *field;
+		const input_field_config *field;
 		const RECT *pr;
 	} portslots[256];
 
@@ -198,7 +198,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 						i = portslot_count++;
 					if (i < (sizeof(portslots) / sizeof(portslots[0])))
 					{
-						portslots[i].field = (input_field_config *) field;
+						portslots[i].field = field;
 						portslots[i].pr = pr;
 					}
 				}
@@ -283,8 +283,12 @@ static void customize_categorizedinput(running_machine *machine, HWND wnd, const
 
 static void storeval_inputport(void *param, int val)
 {
-	input_field_config *field = (input_field_config *) param;
-	field->defvalue = (UINT16) val;
+	const input_field_config *field = (input_field_config *) param;
+	input_field_user_settings settings;
+
+	input_field_get_user_settings(field, &settings);
+	settings.value = (UINT16) val;
+	input_field_set_user_settings(field, &settings);
 }
 
 
@@ -315,7 +319,7 @@ static void customize_switches(running_machine *machine, HWND wnd, int title_str
 			if (type == ipt_name)
 			{
 				switch_name = input_field_name(field);
-				if (win_dialog_add_combobox(dlg, switch_name, field->defvalue, storeval_inputport, (input_field_config *) field))
+				if (win_dialog_add_combobox(dlg, switch_name, field->defvalue, storeval_inputport, (void *) field))
 					goto done;
 
 				for (setting = field->settinglist; setting != NULL; setting = setting->next)
@@ -454,17 +458,17 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 
 				_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
 					"%s %s", name, ui_getstring(UI_keyjoyspeed));
-				if (win_dialog_add_adjuster(dlg, buf, settings.delta, 1, 255, FALSE, store_delta, (input_field_config *) field))
+				if (win_dialog_add_adjuster(dlg, buf, settings.delta, 1, 255, FALSE, store_delta, (void *) field))
 					goto done;
 
 				_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
 					"%s %s", name, ui_getstring(UI_centerspeed));
-				if (win_dialog_add_adjuster(dlg, buf, settings.centerdelta, 1, 255, FALSE, store_centerdelta, (input_field_config *) field))
+				if (win_dialog_add_adjuster(dlg, buf, settings.centerdelta, 1, 255, FALSE, store_centerdelta, (void *) field))
 					goto done;
 
 				_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
 					"%s %s", name, ui_getstring(UI_reverse));
-				if (win_dialog_add_combobox(dlg, buf, settings.reverse ? 1 : 0, store_reverse, (input_field_config *) field))
+				if (win_dialog_add_combobox(dlg, buf, settings.reverse ? 1 : 0, store_reverse, (void *) field))
 					goto done;
 				if (win_dialog_add_combobox_item(dlg, ui_getstring(UI_off), 0))
 					goto done;
@@ -473,7 +477,7 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 
 				_snprintf(buf, sizeof(buf) / sizeof(buf[0]),
 					"%s %s", name, ui_getstring(UI_sensitivity));
-				if (win_dialog_add_adjuster(dlg, buf, settings.sensitivity, 1, 255, TRUE, store_sensitivity, (input_field_config *) field))
+				if (win_dialog_add_adjuster(dlg, buf, settings.sensitivity, 1, 255, TRUE, store_sensitivity, (void *) field))
 					goto done;
 			}
 		}
