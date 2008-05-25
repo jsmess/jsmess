@@ -66,6 +66,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Play and Record &MNG Output...", ID_FILE_PLAY_RECORD_MNG
         MENUITEM SEPARATOR
+        MENUITEM "Play and Record &uncompressed AVI Output...", ID_FILE_PLAY_RECORD_AVI
+        MENUITEM SEPARATOR
         MENUITEM "Loa&d Savestate...",          ID_FILE_LOADSTATE
         MENUITEM SEPARATOR
 #ifdef MESS
@@ -1487,11 +1489,13 @@ BEGIN
     ID_FILE_PLAY_RECORD     "Record a system for later playback"
     ID_FILE_PLAY_BACK       "Playback a recorded system"
     ID_FILE_PLAY_RECORD_WAVE "Record the sound output of a system"
+    ID_FILE_PLAY_RECORD_AVI "Record the complete output of a system"
 #else
     ID_FILE_PLAY_RECORD     "Record a game for later playback"
     ID_FILE_PLAY_BACK       "Playback a recorded game"
     ID_FILE_PLAY_RECORD_WAVE "Record the audio output of a game"
     ID_FILE_PLAY_RECORD_MNG "Record the video output of a game"
+    ID_FILE_PLAY_RECORD_AVI "Record the complete output of a game"
 #endif
     ID_VIEW_PICTURE_AREA    "Show or hide the picture area"
     ID_HELP_CONTENTS        "Display help contents"

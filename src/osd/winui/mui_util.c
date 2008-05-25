@@ -356,6 +356,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			struct DriversInfo *gameinfo = &drivers_info[ndriver];
 			const rom_entry *region, *rom;
 			machine_config *config;
+			const input_port_config *input_ports;
 			int num_speakers;
 
 			/* Allocate machine config */
@@ -430,6 +431,27 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			gameinfo->usesLightGun = FALSE;
 			if (gamedrv->ipt != NULL)
 			{
+				const input_port_config *port;
+				input_ports = input_port_config_alloc(gamedrv->ipt);
+				
+				for (port = input_ports; port != NULL; port = port->next)
+				{
+					const input_field_config *field;
+					for (field = port->fieldlist; field != NULL; field = field->next)
+ 					{
+						UINT32 type;
+						type = field->type;
+						if (type == IPT_END)
+							break;
+						if (type == IPT_DIAL || type == IPT_PADDLE || 
+							type == IPT_TRACKBALL_X || type == IPT_TRACKBALL_Y ||
+							type == IPT_AD_STICK_X || type == IPT_AD_STICK_Y)
+							gameinfo->usesTrackball = TRUE;
+						if (type == IPT_LIGHTGUN_X || type == IPT_LIGHTGUN_Y)
+							gameinfo->usesLightGun = TRUE;
+					}
+				}
+				input_port_config_free(input_ports);
 			}
 		}
 	}

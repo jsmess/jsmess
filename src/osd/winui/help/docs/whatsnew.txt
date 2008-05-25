@@ -1,199 +1,226 @@
-0.123u1
+0.125u2
 -------
 
 
 MAMETesters Bugs Fixed
 ----------------------
-jantouki0121u3gra [RansAckeR]
-mcnpshnt0120u3gra [RansAckeR]
-mjdialq2_0120u3gra [RansAckeR]
-mjifb0111u2gra [RansAckeR]
-goldbug0105u4gra [stephh]
-zn.c0122u8yel [smf]
-pwrinst2_0122u8gra [Sonikos]
+01815: [Save/Restore] All Sets: Saved machine states do not properly 
+       adjust to changes in -samplerate (Aaron Giles)
+01671: [Interface] every set with PORT_MODIFY used for DIPs (e.g. 
+       arknoidj): the modified dipswitches are always listed at the 
+       bottom of the list (Aaron Giles)
+01814: [Sound] YM2608 games (tail2nos, sformula, wc90, mechatt): Only 
+       basic music, no more samples (couriersud)
+01497: [Graphics] numanath, numanatj: Graphics corruption on 
+       title screen. (Phil Stroffolino)
+01804: [Core] carnevil, sfrush: Seattle games crash on startup 
+       (Aaron Giles)
 
 
 
 Source Changes
 --------------
-Removed 'type' parameter from tilemap_create. [Zsolt Vasvari]
+Fixed long-standing bug with Emeralda text colors. A sprite 
+attribute exists which signals an alternate interpretation of 
+palette ram. Fixed priority for the bitmap layer used in Numan 
+Athletics. [Phil Stroffolino]
 
-audio/dkong.c: [couriersud]
- * fix dkong audio over-modulation issue with DAC sound
- * surround the fix with a DK_REVIEW define for later review.
+Restructured input port internals and cleaned up inptport.c:
+[Aaron Giles]
 
-Changed the use of machine->remapped_colortable to machine->pens where
-the drivers weren't using color tables. [Zsolt Vasvari]
+    * Input ports are now maintained hierarchically. At the top
+      level are input ports, which contain a list of fields. Each
+      field represents one or more bits of the port. Certain fields
+      such as DIP switches and configuration switches contain a
+      list of settings, which can be selected. DIP switch fields
+      can also contain a list of DIP switch locations.
 
-Corrected the clocks on the following pcbs: Formation Z, MagMax, 
-SlapFight and Tiger Heli. Changed Oki m6295 pin 7 to "high" on Toki 
-and Blood Bros. [Corrado Tomaselli]
+    * Normalized behavior of port overrides (via PORT_INCLUDE or
+      by defining multiple overlapping bits). All fields within a
+      port are kept in strict increasing bit order, so altered DIP
+      switches are now kept in the appropriate order. This addresses
+      MAMETesters bug 01671.
 
-Improve build independence for CPU/sound cores. Rescued the M65CE02 
-core from bitrot hell, and fixed some MESS cores that were broken by 
-the deprecat.h changes. [Atari Ace]
+    * Live port state is now fully separate from configured 
+      state. This is manifested in a similar way to devices, where
+      a const list of ports can be managed either offline or live.
+      Each port has a pointer to an opaque set of live state which
+      is NULL when offline or valid when live. Each port also has
+      a running_machine * which is also NULL when offline.
 
-Corrected the initial detection of extended INP files. 
-[Barry Rodewald]
+    * Because of this new arrangement, the conversion from tokens
+      to a list of ports now requires reasonably complex memory
+      allocation, so these port lists must be explicitly allocated
+      and freed (they are not mantained by automatic resource
+      allocation).
 
-Moved Galaxy Games emulation to tmaster.c. [Luca Elia]
+    * Custom and changed callbacks now take a pointer to a field
+      config instead of a running machine. This provides more
+      information about what field triggered the change notification.
+      The machine can be found by referenced field->port->machine.
 
-makefile/build updates: [couriersud, Aaron Giles]
- * moved verinfo.c to src/build
- * moved rules for verinfo to src/build/build.mak
- * removed osdcore.h from file2str.c, verinfo.c, png2bdc.c
+    * The inptport.c module has been cleaned up and many 
+      ambiguities resolved. Most of this is internal, though it did
+      result in osd_customize_inputport_list() being changed to
+      osd_customize_input_type_list(). The parameter to this function
+      is now a linked list instead of an array, and the structures
+      referenced have been reorganized somewhat.
 
-Removed color tables from gsword, hyperspt, jailbrek, magmax, 
-konamigx, markham, megazone, pandoras, rocnrope, strnskil, trackfld,
-tp84, shaolins, scotrsht, pingpong, skykid, wiping, punchout, ikki,
-rallyx, fastfred, fcombat, finalizr, flower, funworld, galivan,
-gdrawpkr, goldstar, hanaawas, higemaru, ironhors, jackal, kchamp.
-Added resnet.c color computations where appropriate. [Zsolt Vasvari]
+    * Updated config.c to pass machine parameters to its callbacks.
 
-Simplfied Mag Max background drawing code. [Zsolt Vasvari]
+    * Updated validity checks, XML output, and UI system to handle
+      the new structures.
 
-Further altered the Exidy 440 code in preparation for moving to proper
-sound chip emulation. [Zsolt Vasvari]
+    * Moved large table of default input settings to a separate
+      include file inpttype.h.
 
-Unified transparency handling between scotrsht, shaolins, tp84.
-[Zsolt Vasvari]
+    * Removed gross hacks in trackfld and hyperspt NVRAM. These
+      may be broken as a result.
 
-Split timer_adjust() into timer_adjust_oneshot() and 
-timer_adjust_periodic(). Updated all call sites. [Aaron Giles]
+Further Namco NA-1 changes: [Phil Stroffolino]
+ * Adjusted alternate palette handling weights to more accurately 
+   match real hardware - text anti-aliasing is much more noticable.
+ * Adjustment to roz layer priority - prevents roz layer from 
+   incorrectly being displayed over backgrounds in some games (i.e. 
+   numanathj)
+ * Added a mask when processing the roz tilemap to avoid defects in 
+   emeraldj
 
-Fixed some arkanoid clones INPUT_PORTS definitions that were curiously 
-using PORT_START_TAG("DSW") instead of PORT_MODIFY("DSW"). [stephh]
+Fixed black pixel patches present in the TC0100SCN fg layer of 
+undrfire and groundfx. [Philip Bennett]
 
-Fixed DIP switches and inputs for all games in cvs.c. [stephh]
+Universal DRC system updates and improvements: [Aaron Giles]
 
-Added HOTD2-specific BIOSes. [Arzeno Fabrice]
+   UML:
+    * Added back-end validation mechanism, and a handful of tests as 
+      examples. This will be expanded in the future.
+    * Added several new opcodes:
+       - SAVE dumps the entire virtual machine state to a struct
+       - RESTORE applies the data in a struct to the live state
+       - LZCNT counts leading zeros in an operand
+       - XTRACT extracts a bitfield to another register (rlwinm)
+       - INSERT inserts a bitfield into a register (rlwimi)
+    * Added new back-end function get_info() which returns information 
+      from the back-end about how many actual registers will be 
+      mapped.
 
-Added more accurate emulation of the priority system and the beam
-logic in stactics. Removed color table. Centered crosshair. Used
-proper game orientation. Unified memory maps. Switched game to use the
-artwork system. Set GAME_IMPERFECT_GRAPHICS until artwork is created.
-[Zsolt Vasvari]
+   x86 back-end:
+    * Implemented all new opcodes.
+    * Implemented get_info() function.
+    * Fixed several bugs relating to shifts/rotates and optimizing out
+      cases incorrectly.
 
-Added sound support to Champion Skill. Removed GAME_NO_SOUND flags.
-Increased interrupts per frame, music was too slow. Minor comments 
-adjustment. [Mirko Buffoni]
+   x64 back-end:
+    * Implemented all new opcodes.
+    * Implemented get_info() function.
+    * Added defines for new Penryn opcodes to x86emit.h.
+    * Added support for ROUNDSS and ROUNDSD on Penryn architectures. 
+      This hasn't been tested. If you have a Penryn-based system, 
+      give it a try.
+    * Fixed several bugs relating to shifts/rotates and optimizing out
+      cases incorrectly.
+   
+   C back-end:
+    * Implemented all new opcodes.
+    * Implemented get_info() function.
+    * Cleaned up operand sizing.
+    * Fixed several errors that made it not work on bigendian systems
 
-Used PORT_SERVICE and PORT_SERVICE_NO_TOGGLE macros when it was 
-possible. [stephh]
+   MIPS DRC:
+    * Added some instrumentation for the MMU. To enable it, turn on 
+      PRINTF_MMU at the top of the file.
+    * Fixed front-end so that virtual no-op instructions are still 
+      targeted as branch targets.
+    * Fixed front-end to mark the beginning of each sequence as 
+      needing TLB validation, since any sequence can be jumped to 
+      from anywhere.
+    * Redid the MIPS3 TLB implementation. Fixed the exception vector 
+      and type handling. Changed the bitfields to directly map from 
+      the MIPS TLB format. Added distinction between TLB fill and TLB 
+      valid/modified exceptions.
+    * Added separate modes for user, supervisor, and kernel modes. 
+      Each mode does proper verification of addresses now and 
+      generates address errors for invalid accesses.
+    * Fixed several bugs in the TLB implementation; not everything 
+      works yet but it's a lot closer.
+    * Made COP0 access checking mandatory in non-kernel modes.
+    * Fixed several crashes when recompiling virtual no-ops.
+    * Fixed TLB bug where entries for virtual address 0 were present 
+      by default.
+    * Fixed bug in the map variable implementation that would 
+      sometimes result in incorrectly recovered values.
+    * Implemented IDT instructions. All invalid instruction asserts 
+      are now runtime-only.
+    * Added support to map a few common registers to machine registers 
+      if the machine supports it. Currently only x64 on Windows has 
+      enough free registers to do so, though PowerPC will almost
+      certainly be able to take advantage of this. Gives a minor 
+      speedup.
+    * Updated to use INSERT and XTRACT where appropriate.
+    * Cleaned up register usage to free up one machine register for
+      x64 on Linux.
+  
+Added World Rally wheel support. [Mirko Mattioli]
 
-In the cps2 driver, Changed the GAME definitions to reflect how many 
-players and how many buttons there are for each game. Rewrote the 
-INPUT_PORTS definitions to use PORT_INCLUDE, PORT_MODIFY and 
-PORT_CUSTOM macros. Added a few notes about the inputs when I thought 
-they were needed to avoid wrong bug reports. Started to clean the 
-driver. [stephh]
+Fixed spikes91 sprite colours without resorting to hacks.
+[David Haywood]
 
-Added PCB and/or chip docs updates for Blaze On (kaneko16.c),
-Sand Scorpion (sandscrp.c), Flash Point (segas16b.c). [Brian Troha]
+Fixed N64 rendering on big-endian targets. [R. Belmont]
 
-Fixed kangaroo colors by assuming an inversion not present in the
-schematics. [Nicola Salmoria]
+Fixed CDP1869 character memory access, and Cidelsa sprite flashing.
+[Curt Coder]
 
-Added the ability to pass absolute paths to mame_schedule_save() and 
-mame_schedule_load(). [Nathan Woods]
+Fixed 80286 databus widths. [Wilbert Pol]
 
-Naomi/DC updates: [Samuele Zannoli]
- - Add SH4 I/O ports
- - Connected the 93C46 of the naomi and the x76f100 of the rom board 
-    and filled them with dummy data to satisfy the BIOS
- - Implemented some of the JVS transfers that will be needed to use 
-    the controls
- - Implemented ROM board DMA
- - Set proper NAOMI RAM sizes (32 MB main, 8 MB for AICA)
- - Improved PVR-TA graphics emulation
+Added proper interpolation sub-cycles to the TMS5110 and TMS5220 
+('PC' cycles and A/B subcycles of each) and updated comments. 
+[Lord Nightmare]
 
-Set proper ARM7 clock for Naomi. [Deunan Knute]
+Fixed World Rally MCU comms on big-endian. [R. Belmont]
 
-ARM7 updates: [Anonymous]
- - correct mode at reset (it's always 0b1....)
- - HandlePSRTransfer: remove wrong code, correct detection of 
-    privileged mode
- - correct carry output for ROR
- - Thumb ASR Rd,Rs: correct carry computation
- - Thumb ldmia/stmia: correct value for writeback when the writeback 
-    reg is in the list
- - ARM ldm/stm ignore lower bits of the address
- - most of the exceptions force the I bit
- - ignore some flag bits in the CPSR
+Changed defaults so that joysticks are enabled standard. [Aaron Giles]
 
-Some improvements to the Funworld driver and new games added. 
-[Roberto Fresca]
- - Switched to XTAL def.
- - Fixed Magic Card II graphics issues.
- - Fixed Magic Card II inputs.
- - Fixed screen and visible area to snooker10.
- - Renamed set monglfir to mongolnw.
- - Renamed sets description based on languages instead of countries.
- - Fixed some years and manufacturers.
+Some improvements to Sandii' games: [Roberto Fresca, f205v]
+ - Confirmed the CPU clock after some PCB measurements.
+ - Changed the SND clock to 1MHz to match the PCB measurement.
+ - Corrected the internal OKI6295 frequency turning the pin 7 state to HIGH.
+ - Inputs: Eliminated all pulse limitations.
+   Affected buttons have a rattled sound in the real thing too.
  - Updated technical notes.
- - Cleaned up the driver.
- 
-Did some cleanup of the 'special case' mess that the rallyx driver
-has become. [Zsolt Vasvari]
 
-Removed no longer used TRANSPARENCY_COLOR. [Zsolt Vasvari]
+Corrected several bugs in the emulation of the saturn CPU. These 
+corrections are needed to make new HP48 drivers (to be submitted to 
+MESS imminently) work. [Antoine Mine]
 
-MC6845 updates: [Zsolt Vasvari]
- - changed the 6845 to be handle based -- adjusted all drivers
- - renamed crtc6845 to mc6845
- - allow reading registers 12 and 13
- - reading write-only registers return 0
- - updated comments in header
- 
-Changed qix.c to RGB32 mode and made its videoram_w do the partial 
-updating instead of a per scanline timer. [Zsolt Vasvari]
-
-Fixed 'mario' and 'masao' memory maps to match the Dip Switches port 
-name. [stephh]
-
-Fixed pooyan transparency. Updated to use resnet code. [Zsolt Vasvari]
-
-Changed ZN2 clock speed to 100MHz to match board notes. [smf]
-
-Added DIP locations for sitv, sicv, invadpt2, lrescue, invasion. Fixed 
-coin2 for superinv & invasion. [RansAckeR]
-
-Added initialization to machine/nmk112.c. This resolves a multi-
-session audio problem reported for donpachi. Also added some variable 
-initialization to machine/n64.c to fix running starsldr multi-session.
+Eliminated a large number of global Machine references. Added machine
+parameters to IRQ callbacks throughout the system to help remove
+more. Reduced the number of files needing deprecat.h by ~200.
 [Atari Ace]
 
-Added diplocations to policetr and marked some as unused based on 
-manual and schematics. [Mike Ellery]
+Some work on lwings.c: Input clean up, added dip locations, fixed 
+lwingsb life DIP switches, and merged machine drivers. [Sonikos]
 
-Fixed fatal error in the maxaflex, mf_bdash and mf_achas drivers.
-[Atari Ace]
+Updated Gorf sample volume to match new samples from Chris Law.
+[Chris Law]
 
-Several more risky challenge opcodes. You can now see "gameplay".
-[robiza]
+Added built-in overlay for Moon Shuttle. [Deacon Blue]
 
 
 
 New games added or promoted from NOT_WORKING status
 ---------------------------------------------------
-Galaxy Games (BIOS v1.90) [Luca Elia]
-Royal Vegas Joker Card [Roberto Fresca]
+1991 Spikes (Italian bootleg) [robiza]
 
 
 
 New clones added
 ----------------
-Contra (US, Set 2) [Brian Troha]
-Zero Wing (2 player simultaneous ver.) [Brian Troha]
-Sand Scorpion (Revised Hardware) [Stefan Lindberg]
-Galaxian (Taito) [Stefan Lindberg]
-Jolly Card (3x3 deal) [Roberto Fresca]
-Jolly Card Professional 2.0 [Roberto Fresca]
-Lucky Lady (3x3 deal) [Roberto Fresca]
-Lucky Lady (4x1 aces) [Roberto Fresca]
+Last Fortress - Toride (Korea) [The Guru]
+Miss Puzzle (Clone of Gumbo) [The Guru]
+Gals Panic SU (Korea) [The Guru]
 
 
 
 New games marked as GAME_NOT_WORKING
 ------------------------------------
-World PK Soccer V2 (ver 1.1) [David Haywood]
+Beauty Block [David Haywood]

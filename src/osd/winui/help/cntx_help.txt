@@ -5,11 +5,11 @@ Enables anti-aliasing of vector lines providing a smoother look.
 .topic HIDC_ARTWORK_CROP
 Enables cropping external artwork down to selected window or resolution
 .topic HIDC_ASPECT
-Enables manual override of Mame32's 4:3 or 3:4 aspect ratio calculation.  Rarely used.
+Enables manual override of MameUI's 4:3 or 3:4 aspect ratio calculation.  Rarely used.
 .topic HIDC_ASPECTRATIOD
-Enables manual override of Mame32's 4:3 or 3:4 aspect ratio calculation.  Rarely used.
+Enables manual override of MameUI's 4:3 or 3:4 aspect ratio calculation.  Rarely used.
 .topic HIDC_ASPECTRATION
-Enables manual override of Mame32's 4:3 or 3:4 aspect ratio calculation.  Rarely used.
+Enables manual override of MameUI's 4:3 or 3:4 aspect ratio calculation.  Rarely used.
 .topic HIDC_AUDIO_LATENCY
 Selects the level of audio latency, adjusting this can often eliminate desync of the sound and associated scratchiness.
 .topic HIDC_AUTOFRAMESKIP
@@ -43,7 +43,7 @@ Selects appropriate host controller for emulated controls.
 .topic HIDC_DUAL_LIGHTGUN
 Enables support for dual light guns.
 .topic HIDC_ENABLE_AUTOSAVE
-Enables Mame32 to use the contents of the \sav directory to restart a game at last quit.
+Enables MameUI to use the contents of the \sav directory to restart a game at last quit.
 .topic HIDC_FILTER_CLONES
 Enables filtering out clones, leaving only parent games showing.
 .topic HIDC_FILTER_EDIT
@@ -79,12 +79,13 @@ Selects the level of the full-screen contrast including artwork and UI.
 .topic HIDC_FSGAMMA
 Selects the level of the full-screen gamma including artwork and UI.
 .topic HIDC_GAME_CAPTION
+Attempts to remove the titlebar from a windowed game.
 .topic HIDC_GAMMA
 Selects the gamma level of the screen [but not artwork or UI].
 .topic HIDC_HIDE_MOUSE
 Enables hiding the mouse cursor on launch, useful for fullscreen UI w/ keyboard controlled cabinets, etc.
 .topic HIDC_HIGH_PRIORITY
-Selects Mame32's thread priority, default is 0.  Running at real-time 1 is not recommended for potential control lag and sound desync.
+Selects MameUI's thread priority, default is 0.  Running at real-time 1 is not recommended for potential control lag and sound desync.
 .topic HIDC_HISTORY
 Enables display of the history.dat file if present in the root directory.
 .topic HIDC_HWSTRETCH
@@ -92,7 +93,7 @@ Enables hardware stretch for DirectDraw.
 .topic HIDC_JDZ
 Selects the level for an analogue joystick's deadzone.
 .topic HIDC_JOY_GUI
-Enables controlling the Mame32 GUI with a gamepad.
+Enables controlling the MameUI GUI with a gamepad.
 .topic HIDC_JOYSTICK
 Enables gamepad control within games.
 .topic HIDC_JSAT
@@ -114,7 +115,7 @@ Enables mouse support within games.
 .topic HIDC_MULTITHREAD_RENDERING
 Enables handing off the final video blit to a second thread.  Still experimental [.118] and may cause issues.
 .topic HIDC_NUMSCREENS
-Selects number of screens for Mame32 to produce, windowed or multi-head physical monitors.
+Selects number of screens for MameUI to produce, windowed or multi-head physical monitors.
 .topic HIDC_OVERLAYS
 Enables art overlays in supported games.
 .topic HIDC_PADDLE
@@ -146,7 +147,7 @@ Enables resetting and clearing filters applied to folders.
 .topic HIDC_RESET_GAMES
 Enables resetting games to use default options.
 .topic HIDC_RESET_UI
-Enables resetting the options to fresh Mame32 install settings.
+Enables resetting the options to fresh MameUI install settings.
 .topic HIDC_ROTATE
 Selects rotation setting for game display.  Use the Auto options for pivot LCDs.
 .topic HIDC_SAMPLERATE
@@ -166,7 +167,7 @@ Enables skipping game info screen when games started.
 .topic HIDC_SPEED
 Selects the speed of gameplay, relative to realtime; smaller numbers are slower.
 .topic HIDC_SLEEP
-Enables giving more timeslices back to the system, allowing Mame32 to 'play nicer' with other apps.
+Enables giving more timeslices back to the system, allowing MameUI to 'play nicer' with other apps.
 .topic HIDC_START_GAME_CHECK
 Enables running a mini-audit on application launch.
 .topic HIDC_STEADYKEY
@@ -184,6 +185,7 @@ Selects appropriate host controller for emulated controls.
 .topic HIDC_TRIPLE_BUFFER
 Enables the use of triple buffering during fullscreen gaming.
 .topic HIDC_USE_DEFAULT
+Enables reseting to default.
 .topic HIDC_USE_MOUSE
 Selects appropriate host controller for emulated controls.
 .topic HIDC_USE_SOUND

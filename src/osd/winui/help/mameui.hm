@@ -25,6 +25,7 @@ HID_FILE_PLAY_BACK                      0x19C54
 HID_FILE_PLAY_RECORD_WAVE               0x19C55
 HID_FILE_PLAY_RECORD_MNG                0x19C56
 HID_VIEW_PICTURE_AREA                   0x19C57
+HID_FILE_PLAY_RECORD_AVI                0x19C58
 HID_HELP_CONTENTS                       0x19C59
 HID_HELP_WHATS_NEW32                    0x19C5A
 HID_HELP_TROUBLE                        0x19C5B

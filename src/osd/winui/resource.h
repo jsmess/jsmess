@@ -355,7 +355,8 @@
 #define ID_FILE_PLAY_BACK               40020
 #define ID_FILE_PLAY_RECORD_WAVE        40021
 #define ID_FILE_PLAY_RECORD_MNG         40022
-#define ID_VIEW_PICTURE_AREA            40023
+#define ID_FILE_PLAY_RECORD_AVI         40023
+#define ID_VIEW_PICTURE_AREA            40024
 #define ID_HELP_CONTENTS                40025
 #define ID_HELP_WHATS_NEWUI             40026
 #define ID_HELP_TROUBLE                 40027

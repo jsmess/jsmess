@@ -244,6 +244,7 @@ struct _play_options
 	const char *state;			// OPTION_STATE
 	const char *wavwrite;		// OPTION_WAVWRITE
 	const char *mngwrite;		// OPTION_MNGWRITE
+	const char *aviwrite;		// OPTION_AVIWRITE
 };
 
 /***************************************************************************
@@ -302,6 +303,7 @@ static void             MamePlayRecordGame(void);
 static void             MamePlayBackGame(void);
 static void             MamePlayRecordWave(void);
 static void             MamePlayRecordMNG(void);
+static void             MamePlayRecordAVI(void);
 static void				MameLoadState(void);
 static void             MamePlayGameWithOptions(int nGame, const play_options *playopts);
 static BOOL             GameCheck(void);
@@ -775,10 +777,6 @@ static ResizeItem main_resize_items[] =
 	{ RA_ID,   { IDC_SSPICTURE },FALSE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_HISTORY },  TRUE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_SSTAB },    FALSE,	RA_RIGHT | RA_TOP,                 NULL },
-#ifdef MESS
-	{ RA_ID,   { IDC_SWLIST },    TRUE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
-	{ RA_ID,   { IDC_SPLITTER3 },FALSE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
-#endif /* MESS */
 	{ RA_END,  { 0 },            FALSE, 0,                                 NULL }
 };
 
@@ -820,11 +818,7 @@ static MYBITMAPINFO     bmDesc;
 /* List view Column text */
 const LPCTSTR column_names[COLUMN_MAX] =
 {
-#ifdef MESS
-	TEXT("System"),
-#else
 	TEXT("Game"),
-#endif
 	TEXT("Screen"),
 	//TEXT("ROMs"),
 	TEXT("Samples"),
@@ -920,11 +914,6 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 	// Tell mame were to get the INIs
 	options_set_string(mame_opts, OPTION_INIPATH, GetIniDir(), OPTION_PRIORITY_CMDLINE);
 
-#ifdef MESS
-	// add MESS specific device options
-	mess_add_device_options(mame_opts, drivers[nGameIndex]);
-#endif // MESS
-
 	// set any specified play options
 	if (playopts != NULL)
 	{
@@ -938,6 +927,8 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 			options_set_string(mame_opts, OPTION_WAVWRITE, playopts->wavwrite, OPTION_PRIORITY_CMDLINE);
 		if (playopts->mngwrite != NULL)
 			options_set_string(mame_opts, OPTION_MNGWRITE, playopts->mngwrite, OPTION_PRIORITY_CMDLINE);
+		if (playopts->aviwrite != NULL)
+			options_set_string(mame_opts, OPTION_AVIWRITE, playopts->aviwrite, OPTION_PRIORITY_CMDLINE);
 	}
 
 	// Mame will parse all the needed .ini files.
@@ -1310,10 +1301,6 @@ void UpdateScreenShot(void)
 
 	if (have_selection)
 	{
-#ifdef MESS
-		if (!g_szSelectedItem[0] || !LoadScreenShotEx(Picker_GetSelectedItem(hwndList), g_szSelectedItem,
-			TabView_GetCurrentTab(hTabCtrl)))
-#endif
 		// load and set image, or empty it if we don't have one
 		LoadScreenShot(Picker_GetSelectedItem(hwndList), TabView_GetCurrentTab(hTabCtrl));
 	}
@@ -1730,10 +1717,6 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 
 	RegisterClass(&wndclass);
 
-#ifdef MESS
-	DevView_RegisterClass();
-#endif //MESS
-
 	InitCommonControls();
 
 	// Are we using an Old comctl32.dll?
@@ -1919,9 +1902,6 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	dprintf("did init tree");
 
 	/* Initialize listview columns */
-#ifdef MESS
-	InitMessPicker();
-#endif
 	InitListView();
 	SetFocus(hwndList);
 
@@ -3156,9 +3136,6 @@ static void EnableSelection(int nGame)
 	HMENU			hMenu = GetMenu(hMain);
 	TCHAR*          t_description;
 
-#ifdef MESS
-	MyFillSoftwareList(nGame, FALSE);
-#endif
 
 	t_description = tstring_from_utf8(ConvertAmpersandString(ModifyThe(drivers[nGame]->description)));
 	if( !t_description )
@@ -4023,6 +4000,10 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		MamePlayRecordMNG();
 		return TRUE;
 
+	case ID_FILE_PLAY_RECORD_AVI:
+		MamePlayRecordAVI();
+		return TRUE;
+
 	case ID_FILE_LOADSTATE :
 		MameLoadState();
 		return TRUE;
@@ -4311,15 +4292,6 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		{
 			folder = GetFolderByName(FOLDER_SOURCE, GetDriverFilename(Picker_GetSelectedItem(hwndList)) );
 			InitPropertyPage(hInst, hwnd, GetSelectedPickItemIcon(), OPTIONS_GAME, folder->m_nFolderId, Picker_GetSelectedItem(hwndList));
-#ifdef MESS
-			{
-				extern BOOL g_bModifiedSoftwarePaths;
-				if (g_bModifiedSoftwarePaths) {
-					g_bModifiedSoftwarePaths = FALSE;
-					MessUpdateSoftwareList();
-				}
-			}
-#endif
 		}
 		/* Just in case the toggle MMX on/off */
 		UpdateStatusBar();
@@ -4395,9 +4367,6 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 			int  nResult;
 			BOOL bUpdateRoms;
 			BOOL bUpdateSamples;
-#ifdef MESS
-			BOOL bUpdateSoftware;
-#endif
 
 			nResult = DialogBox(GetModuleHandle(NULL),
 								MAKEINTRESOURCE(IDD_DIRECTORIES),
@@ -4408,12 +4377,6 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 
 			bUpdateRoms    = ((nResult & DIRDLG_ROMS)	 == DIRDLG_ROMS)	? TRUE : FALSE;
 			bUpdateSamples = ((nResult & DIRDLG_SAMPLES) == DIRDLG_SAMPLES) ? TRUE : FALSE;
-#ifdef MESS
-			bUpdateSoftware = ((nResult & DIRDLG_SOFTWARE) == DIRDLG_SOFTWARE) ? TRUE : FALSE;
-
-			if (bUpdateSoftware)
-				MessUpdateSoftwareList();
-#endif /* MESS */
 
 			if (s_pWatcher)
 			{
@@ -4639,11 +4602,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 				return FALSE;
 			}
 		}
-#ifdef MESS
-		return MessCommand(hwnd, id, hwndCtl, codeNotify);
-#else
 		break;
-#endif
 	}
 
 	return FALSE;
@@ -5077,10 +5036,6 @@ static void CreateIcons(void)
 	// restore our view
 	SetWindowLong(hwndList,GWL_STYLE,dwStyle);
 
-#ifdef MESS
-	CreateMessIcons();
-#endif
-
 	// Now set up header specific stuff
 	hHeaderImages = ImageList_Create(8,8,ILC_COLORDDB | ILC_MASK,2,2);
 	hIcon = LoadIcon(hInst,MAKEINTRESOURCE(IDI_HEADER_UP));
@@ -5303,6 +5258,7 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	TCHAR* t_filename;
 	TCHAR* t_statedir = 0;
 	TCHAR* t_artdir = 0;
+	TCHAR* t_snapdir = 0;
 	TCHAR t_filename_buffer[MAX_PATH]  = {0, };
 	char *utf8_filename;
 
@@ -5331,6 +5287,9 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	case FILETYPE_MNG_FILES :
 		of.lpstrFilter   = TEXT("videos (*.mng)\0*.mng;\0All files (*.*)\0*.*\0");
 		break;
+	case FILETYPE_AVI_FILES :
+		of.lpstrFilter   = TEXT("videos (*.avi)\0*.avi;\0All files (*.*)\0*.*\0");
+		break;
 	case FILETYPE_EFFECT_FILES :
 		of.lpstrFilter   = TEXT("effects (*.png)\0*.png;\0All files (*.*)\0*.*\0");
 		break;
@@ -5350,18 +5309,24 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 
 		of.lpstrInitialDir = t_statedir;
 	}
-	else
+	else if (filetype == FILETYPE_EFFECT_FILES)
 	{
-		if (filetype == FILETYPE_EFFECT_FILES)
-		{
-			t_artdir = tstring_from_utf8(GetArtDir());
-			if( !t_artdir )
-				return FALSE;
+		t_artdir = tstring_from_utf8(GetArtDir());
+		if( !t_artdir )
+			return FALSE;
 
-			of.lpstrInitialDir = t_artdir;
-		}
-		else
-			of.lpstrInitialDir = last_directory;
+		of.lpstrInitialDir = t_artdir;
+	}
+	else if (filetype == FILETYPE_MNG_FILES || filetype == FILETYPE_AVI_FILES)
+	{
+		t_snapdir = tstring_from_utf8(GetImgDir());
+		if( !t_snapdir )
+			return FALSE;
+
+		of.lpstrInitialDir = t_snapdir;
+	}
+	else {
+		of.lpstrInitialDir = last_directory;
 	}
 	of.lpstrTitle        = NULL;
 	of.Flags             = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
@@ -5380,6 +5345,9 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 		break;
 	case FILETYPE_MNG_FILES :
 		of.lpstrDefExt       = TEXT("mng");
+		break;
+	case FILETYPE_AVI_FILES :
+		of.lpstrDefExt       = TEXT("avi");
 		break;
 	case FILETYPE_EFFECT_FILES :
 		of.lpstrDefExt       = TEXT("png");
@@ -5400,6 +5368,8 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 		free(t_artdir);
 	if( t_statedir )
 		free(t_statedir);
+	if( t_snapdir )
+		free(t_snapdir);
 
 	utf8_filename = utf8_from_tstring(t_filename_buffer);
 	if (utf8_filename != NULL)
@@ -5778,27 +5748,66 @@ static void MamePlayRecordMNG()
 {
 	int  nGame;
 	char filename[MAX_PATH] = { 0, };
-	play_options playopts;
 
 	nGame = Picker_GetSelectedItem(hwndList);
 	strcpy(filename, drivers[nGame]->name);
 
 	if (CommonFileDialog(GetSaveFileName, filename, FILETYPE_MNG_FILES))
 	{
+		char drive[_MAX_DRIVE];
+		char dir[_MAX_DIR];
+		char fname[_MAX_FNAME];
+		char ext[_MAX_EXT];
+		char path[MAX_PATH];
+		play_options playopts;
+
+		_splitpath(filename, drive, dir, fname, ext);
+
+		sprintf(path,"%s%s",drive,dir);
+		if (path[strlen(path)-1] == '\\')
+			path[strlen(path)-1] = 0; // take off trailing back slash
+
 		memset(&playopts, 0, sizeof(playopts));
-		playopts.mngwrite = filename;
+		strcat(fname, ".mng");
+		playopts.mngwrite = fname;
 		MamePlayGameWithOptions(nGame, &playopts);
 	}	
 }
 
+static void MamePlayRecordAVI()
+{
+	int  nGame;
+	char filename[MAX_PATH] = { 0, };
+
+	nGame = Picker_GetSelectedItem(hwndList);
+	strcpy(filename, drivers[nGame]->name);
+
+	if (CommonFileDialog(GetSaveFileName, filename, FILETYPE_AVI_FILES))
+	{
+		char drive[_MAX_DRIVE];
+		char dir[_MAX_DIR];
+		char fname[_MAX_FNAME];
+		char ext[_MAX_EXT];
+		char path[MAX_PATH];
+		play_options playopts;
+
+		_splitpath(filename, drive, dir, fname, ext);
+
+		sprintf(path,"%s%s",drive,dir);
+		if (path[strlen(path)-1] == '\\')
+			path[strlen(path)-1] = 0; // take off trailing back slash
+
+		memset(&playopts, 0, sizeof(playopts));
+		strcat(fname, ".avi");
+		playopts.aviwrite = fname;
+		MamePlayGameWithOptions(nGame, &playopts);
+	}	
+}
+
+
 static void MamePlayGameWithOptions(int nGame, const play_options *playopts)
 {
 	DWORD dwExitCode;
-
-#ifdef MESS
-	if (!MessApproveImageList(hMain, nGame))
-		return;
-#endif
 
 	if (g_pJoyGUI != NULL)
 		KillTimer(hMain, JOYGUI_TIMER);
