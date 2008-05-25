@@ -141,12 +141,12 @@ READ8_HANDLER(vc4000_video_r)
  
 #ifndef ANALOG_HACK
 	case 0xcc:
-		if (!activecpu_get_reg(S2650_FO)) data=input_port_read_indexed(machine, 7);
-		else data=input_port_read_indexed(machine, 8);
+		if (!activecpu_get_reg(S2650_FO)) data=input_port_read(machine, "JOY1_X");
+		else data=input_port_read(machine, "JOY1_Y");
 		break;
 	case 0xcd:
-		if (!activecpu_get_reg(S2650_FO)) data=input_port_read_indexed(machine, 9);
-		else data=input_port_read_indexed(machine, 10);
+		if (!activecpu_get_reg(S2650_FO)) data=input_port_read(machine, "JOY2_X");
+		else data=input_port_read(machine, "JOY2_Y");
 		break;
 #else
 
@@ -155,13 +155,13 @@ READ8_HANDLER(vc4000_video_r)
 		// between 20 and 225
 		if (!activecpu_get_reg(S2650_FO))
 		{
-			if (input_port_read_indexed(machine, 7)&0x1) data=20;
-			if (input_port_read_indexed(machine, 7)&0x2) data=225;
+			if (input_port_read(machine, "JOYS") & 0x1) data=20;
+			if (input_port_read(machine, "JOYS") & 0x2) data=225;
 		}
 		else
 		{
-			if (input_port_read_indexed(machine, 7)&0x4) data=225;
-			if (input_port_read_indexed(machine, 7)&0x8) data=20;
+			if (input_port_read(machine, "JOYS") & 0x4) data=225;
+			if (input_port_read(machine, "JOYS") & 0x8) data=20;
 		}
 		break;
 
@@ -169,13 +169,13 @@ READ8_HANDLER(vc4000_video_r)
 		data = 0x66;
 		if (!activecpu_get_reg(S2650_FO))
 		{
-			if (input_port_read_indexed(machine, 7)&0x10) data=20;
-			if (input_port_read_indexed(machine, 7)&0x20) data=225;
+			if (input_port_read(machine, "JOYS") & 0x10) data=20;
+			if (input_port_read(machine, "JOYS") & 0x20) data=225;
 		}
 		else
 		{
-			if (input_port_read_indexed(machine, 7)&0x40) data=225;
-			if (input_port_read_indexed(machine, 7)&0x80) data=20;
+			if (input_port_read(machine, "JOYS") & 0x40) data=225;
+			if (input_port_read(machine, "JOYS") & 0x80) data=20;
 		}
 		break;
 #endif

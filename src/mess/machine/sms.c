@@ -316,7 +316,7 @@ WRITE8_HANDLER(sms_YM2413_data_port_0_w) {
 }
 
  READ8_HANDLER(gg_input_port_2_r) {
-	//logerror("joy 2 read, val: %02x, pc: %04x\n", (( IS_REGION_JAPAN ? 0x00 : 0x40) | (input_port_read_indexed(machine, 2) & 0x80)), activecpu_get_pc());
+	//logerror("joy 2 read, val: %02x, pc: %04x\n", (( IS_REGION_JAPAN ? 0x00 : 0x40) | (input_port_read(machine, "JOY2") & 0x80)), activecpu_get_pc());
 	return (( IS_REGION_JAPAN ? 0x00 : 0x40 ) | (input_port_read(machine, "JOY2") & 0x80));
 }
 
