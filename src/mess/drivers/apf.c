@@ -16,7 +16,7 @@ todo for apf m1000:
 #include "driver.h"
 #include "video/m6847.h"
 #include "includes/apf.h"
-#include "deprecat.h"
+//#include "deprecat.h"
 
 #include "machine/6821pia.h"
 #include "machine/wd17xx.h"
