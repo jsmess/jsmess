@@ -777,6 +777,10 @@ static ResizeItem main_resize_items[] =
 	{ RA_ID,   { IDC_SSPICTURE },FALSE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_HISTORY },  TRUE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_SSTAB },    FALSE,	RA_RIGHT | RA_TOP,                 NULL },
+#ifdef MESS
+	{ RA_ID,   { IDC_SWLIST },    TRUE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
+	{ RA_ID,   { IDC_SPLITTER3 },FALSE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
+#endif /* MESS */
 	{ RA_END,  { 0 },            FALSE, 0,                                 NULL }
 };
 
@@ -818,7 +822,11 @@ static MYBITMAPINFO     bmDesc;
 /* List view Column text */
 const LPCTSTR column_names[COLUMN_MAX] =
 {
+#ifdef MESS
+	TEXT("System"),
+#else
 	TEXT("Game"),
+#endif
 	TEXT("Screen"),
 	//TEXT("ROMs"),
 	TEXT("Samples"),
@@ -913,6 +921,11 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 
 	// Tell mame were to get the INIs
 	options_set_string(mame_opts, OPTION_INIPATH, GetIniDir(), OPTION_PRIORITY_CMDLINE);
+
+#ifdef MESS
+	// add MESS specific device options
+	mess_add_device_options(mame_opts, drivers[nGameIndex]);
+#endif // MESS
 
 	// set any specified play options
 	if (playopts != NULL)
@@ -1301,6 +1314,10 @@ void UpdateScreenShot(void)
 
 	if (have_selection)
 	{
+#ifdef MESS
+		if (!g_szSelectedItem[0] || !LoadScreenShotEx(Picker_GetSelectedItem(hwndList), g_szSelectedItem,
+			TabView_GetCurrentTab(hTabCtrl)))
+#endif
 		// load and set image, or empty it if we don't have one
 		LoadScreenShot(Picker_GetSelectedItem(hwndList), TabView_GetCurrentTab(hTabCtrl));
 	}
@@ -1717,6 +1734,10 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 
 	RegisterClass(&wndclass);
 
+#ifdef MESS
+	DevView_RegisterClass();
+#endif //MESS
+
 	InitCommonControls();
 
 	// Are we using an Old comctl32.dll?
@@ -1902,6 +1923,9 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	dprintf("did init tree");
 
 	/* Initialize listview columns */
+#ifdef MESS
+	InitMessPicker();
+#endif
 	InitListView();
 	SetFocus(hwndList);
 
@@ -3136,6 +3160,9 @@ static void EnableSelection(int nGame)
 	HMENU			hMenu = GetMenu(hMain);
 	TCHAR*          t_description;
 
+#ifdef MESS
+	MyFillSoftwareList(nGame, FALSE);
+#endif
 
 	t_description = tstring_from_utf8(ConvertAmpersandString(ModifyThe(drivers[nGame]->description)));
 	if( !t_description )
@@ -4292,6 +4319,15 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		{
 			folder = GetFolderByName(FOLDER_SOURCE, GetDriverFilename(Picker_GetSelectedItem(hwndList)) );
 			InitPropertyPage(hInst, hwnd, GetSelectedPickItemIcon(), OPTIONS_GAME, folder->m_nFolderId, Picker_GetSelectedItem(hwndList));
+#ifdef MESS
+			{
+				extern BOOL g_bModifiedSoftwarePaths;
+				if (g_bModifiedSoftwarePaths) {
+					g_bModifiedSoftwarePaths = FALSE;
+					MessUpdateSoftwareList();
+				}
+			}
+#endif
 		}
 		/* Just in case the toggle MMX on/off */
 		UpdateStatusBar();
@@ -4367,6 +4403,9 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 			int  nResult;
 			BOOL bUpdateRoms;
 			BOOL bUpdateSamples;
+#ifdef MESS
+			BOOL bUpdateSoftware;
+#endif
 
 			nResult = DialogBox(GetModuleHandle(NULL),
 								MAKEINTRESOURCE(IDD_DIRECTORIES),
@@ -4377,6 +4416,12 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 
 			bUpdateRoms    = ((nResult & DIRDLG_ROMS)	 == DIRDLG_ROMS)	? TRUE : FALSE;
 			bUpdateSamples = ((nResult & DIRDLG_SAMPLES) == DIRDLG_SAMPLES) ? TRUE : FALSE;
+#ifdef MESS
+			bUpdateSoftware = ((nResult & DIRDLG_SOFTWARE) == DIRDLG_SOFTWARE) ? TRUE : FALSE;
+
+			if (bUpdateSoftware)
+				MessUpdateSoftwareList();
+#endif /* MESS */
 
 			if (s_pWatcher)
 			{
@@ -4602,7 +4647,11 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 				return FALSE;
 			}
 		}
+#ifdef MESS
+		return MessCommand(hwnd, id, hwndCtl, codeNotify);
+#else
 		break;
+#endif
 	}
 
 	return FALSE;
@@ -5035,6 +5084,10 @@ static void CreateIcons(void)
 
 	// restore our view
 	SetWindowLong(hwndList,GWL_STYLE,dwStyle);
+
+#ifdef MESS
+	CreateMessIcons();
+#endif
 
 	// Now set up header specific stuff
 	hHeaderImages = ImageList_Create(8,8,ILC_COLORDDB | ILC_MASK,2,2);
@@ -5808,6 +5861,11 @@ static void MamePlayRecordAVI()
 static void MamePlayGameWithOptions(int nGame, const play_options *playopts)
 {
 	DWORD dwExitCode;
+
+#ifdef MESS
+	if (!MessApproveImageList(hMain, nGame))
+		return;
+#endif
 
 	if (g_pJoyGUI != NULL)
 		KillTimer(hMain, JOYGUI_TIMER);
