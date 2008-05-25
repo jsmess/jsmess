@@ -321,7 +321,7 @@ static void fs_generate_filelist(void)
 
 	/* insert blank line */
 	n = fs_alloc();
-	fs_item[n].text = "-";
+	fs_item[n].text = MENU_SEPARATOR_ITEM;
 	fs_types[n] = FILESELECT_NONE;
 
 	/* current directory */
@@ -331,7 +331,7 @@ static void fs_generate_filelist(void)
 
 	/* blank line */
 	n = fs_alloc();
-	fs_item[n].text = "-";
+	fs_item[n].text = MENU_SEPARATOR_ITEM;
 	fs_types[n] = FILESELECT_NONE;
 
 	/* file specification */
@@ -342,7 +342,7 @@ static void fs_generate_filelist(void)
 
 	/* insert blank line */
 	n = fs_alloc();
-	fs_item[n].text = "-";
+	fs_item[n].text = MENU_SEPARATOR_ITEM;
 	fs_types[n] = FILESELECT_NONE;
 
 	/* insert empty specifier */
