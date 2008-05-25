@@ -61,6 +61,7 @@ static struct DriversInfo
 	BOOL usesSamples;
 	BOOL usesTrackball;
 	BOOL usesLightGun;
+	BOOL usesMouse;
 	BOOL supportsSaveState;
 	BOOL isVertical;
 } *drivers_info = NULL;
@@ -449,6 +450,8 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 							gameinfo->usesTrackball = TRUE;
 						if (type == IPT_LIGHTGUN_X || type == IPT_LIGHTGUN_Y)
 							gameinfo->usesLightGun = TRUE;
+						if (type == IPT_MOUSE_X || type == IPT_MOUSE_Y)
+							gameinfo->usesMouse = TRUE;
 					}
 				}
 				input_port_config_free(input_ports);
@@ -519,6 +522,11 @@ BOOL DriverUsesTrackball(int driver_index)
 BOOL DriverUsesLightGun(int driver_index)
 {
 	return GetDriversInfo(driver_index)->usesLightGun;
+}
+
+BOOL DriverUsesMouse(int driver_index)
+{
+	return GetDriversInfo(driver_index)->usesMouse;
 }
 
 BOOL DriverSupportsSaveState(int driver_index)
