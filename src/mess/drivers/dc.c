@@ -23,7 +23,6 @@
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
 #include "dc.h"
-#include "deprecat.h"
 
 #define CPU_CLOCK (200000000)
 

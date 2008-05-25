@@ -12,7 +12,6 @@
 #include "machine/6821pia.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-#include "deprecat.h"
 
 /* Memory Map */
 
@@ -241,7 +240,7 @@ static WRITE8_HANDLER( pia_porta_w )
 	keylatch = ~data & 0x0f;
 }
 
-static UINT8 read_keyboard(int pa)
+static UINT8 read_keyboard(running_machine *machine, int pa)
 {
 	int i;
 	UINT8 value;
@@ -250,7 +249,7 @@ static UINT8 read_keyboard(int pa)
 	for (i = 0; i < 8; i++)
 	{
 		sprintf(portname, "PA%u-%u", pa, i);
-		value = input_port_read(Machine, portname);
+		value = input_port_read(machine, portname);
 
 		if (value != 0xff)
 		{
@@ -297,19 +296,19 @@ static READ8_HANDLER( pia_portb_r )
 
 	if (keylatch & 0x01)
 	{
-		return read_keyboard(0);
+		return read_keyboard(machine, 0);
 	}
 	else if (keylatch & 0x02)
 	{
-		return read_keyboard(1);
+		return read_keyboard(machine, 1);
 	}
 	else if (keylatch & 0x04)
 	{
-		return read_keyboard(2);
+		return read_keyboard(machine, 2);
 	}
 	else if (keylatch & 0x08)
 	{
-		return read_keyboard(3);
+		return read_keyboard(machine, 3);
 	}
 
 	return 0xff;
