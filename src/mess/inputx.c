@@ -982,41 +982,41 @@ void mess_input_port_update_hook(running_machine *machine, const input_port_conf
 
 
 
-void inputx_handle_mess_extensions(input_field_config *ipt)
+/*-------------------------------------------------
+    mess_get_keyboard_key_name - builds the name of
+	a key based on natural keyboard characters
+-------------------------------------------------*/
+
+astring *mess_get_keyboard_key_name(const input_field_config *field)
 {
-	char buf[256];
-	int i, pos;
+	astring *result = astring_alloc();
+	int i;
 	unicode_char ch;
 
-	/* process MESS specific extensions to all ports */
-	while(ipt->type != IPT_END)
+
+	/* loop through each character on the field*/
+	for (i = 0; i < ARRAY_LENGTH(field->chars) && (field->chars[i] != '\0'); i++)
 	{
-		/* is this a keyboard port with the default name? */
-		if (ipt->type == IPT_KEYBOARD && (ipt->name == IP_NAME_DEFAULT))
-		{
-			buf[0] = '\0';
-			pos = 0;
-
-			for (i = 0; i < ARRAY_LENGTH(ipt->chars) && ipt->chars[i]; i++)
-			{
-				ch = get_keyboard_code(ipt, i);
-				pos += snprintf(&buf[pos], ARRAY_LENGTH(buf) - pos, "%-*s ", MAX(SPACE_COUNT - 1, 0), inputx_key_name(ch));
-			}
-
-			/* trim extra spaces */
-			rtrim(buf);
-
-			/* specify the key name */
-			if (buf[0] != '\0')
-				ipt->name = auto_strdup(buf);
-			else
-				ipt->name = "Unnamed Key";
-		}
-		ipt++;
+		ch = get_keyboard_code(field, i);
+		astring_printf(result, "%s%-*s ", astring_c(result), MAX(SPACE_COUNT - 1, 0), inputx_key_name(ch));
 	}
+
+	/* trim extra spaces */
+	astring_trimspace(result);
+
+	/* special case */
+	if (astring_len(result) == 0)
+		astring_cpyc(result, "Unnamed Key");
+
+	return result;
 }
 
 
+
+/*-------------------------------------------------
+    inputx_key_name - returns the name of a
+	specific key
+-------------------------------------------------*/
 
 const char *inputx_key_name(unicode_char ch)
 {

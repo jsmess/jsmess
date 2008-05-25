@@ -52,7 +52,7 @@ enum
 /* these are called by the core; they should not be called from FEs */
 void inputx_init(running_machine *machine);
 void mess_input_port_update_hook(running_machine *machine, const input_port_config *port, input_port_value *digital);
-/*void inputx_handle_mess_extensions(input_port_entry *ipt);*/
+astring *mess_get_keyboard_key_name(const input_field_config *field);
 
 /* called by drivers to setup natural keyboard support */
 void inputx_setup_natural_keyboard(
