@@ -291,6 +291,7 @@ static int scan_keyboard(running_machine *machine)
 	int i, j;
 	int keybuf;
 	int keycode;
+	char port[6];
 
 	if (keycode_buf_index)
 	{
@@ -299,7 +300,8 @@ static int scan_keyboard(running_machine *machine)
 
 	for (i=0; i<7; i++)
 	{
-		keybuf = input_port_read_indexed(machine, i+3);
+		sprintf(port, "KEY%d", i);
+		keybuf = input_port_read(machine, port);
 
 		if (keybuf != key_matrix[i])
 		{
@@ -566,8 +568,8 @@ static void mouse_callback(running_machine *machine)
 	int			new_mx, new_my;
 	int			x_needs_update = 0, y_needs_update = 0;
 
-	new_mx = input_port_read_indexed(machine, 1);
-	new_my = input_port_read_indexed(machine, 2);
+	new_mx = input_port_read(machine, "MOUSE1");
+	new_my = input_port_read(machine, "MOUSE2");
 
 	/* see if it moved in the x coord */
 	if (new_mx != last_mx)
@@ -1214,7 +1216,7 @@ static READ8_HANDLER(mac_via_in_b)
 			val |= 0x20;
 		if (mouse_bit_x)	/* Mouse X2 */
 			val |= 0x10;
-		if ((input_port_read_indexed(machine, 0) & 0x01) == 0)
+		if ((input_port_read(machine, "MOUSE0") & 0x01) == 0)
 			val |= 0x08;
 	}
 	if (rtc_data_out)

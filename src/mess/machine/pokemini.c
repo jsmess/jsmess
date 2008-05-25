@@ -643,7 +643,7 @@ READ8_HANDLER( pokemini_hwreg_r ) {
 	case 0x0A:	return ( timers.seconds_counter >> 8 ) & 0xFF;
 	case 0x0B:	return ( timers.seconds_counter >> 16 ) & 0xFF;
 	case 0x41:	return timers.hz256_counter;
-	case 0x52:	return input_port_read_indexed(machine,  0 );
+	case 0x52:	return input_port_read(machine, "INPUTS");
 	}
 	logerror( "%0X: Read from unknown hardware address: %02X\n", activecpu_get_pc(), offset );
 	return pokemini_hwreg[offset];

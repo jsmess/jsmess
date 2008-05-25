@@ -110,7 +110,7 @@ static void ti85_receive_screen (running_machine *machine);
 
 static TIMER_CALLBACK(ti85_timer_callback)
 {
-	if (input_port_read_indexed(machine, 8)&0x01)
+	if (input_port_read(machine, "ON") & 0x01)
 	{
 		if (ti85_ON_interrupt_mask && !ti85_ON_pressed)
 		{
@@ -286,13 +286,17 @@ READ8_HANDLER ( ti85_port_0000_r )
 	int data = 0xff;
 	int port;
 	int bit;
+	char tag[6];
 
 	if (ti85_keypad_mask == 0x7f) return data;
 
 	for (bit = 0; bit < 7; bit++)
 		if (~ti85_keypad_mask&(0x01<<bit))
 			for (port = 0; port < 8; port++)
-				data ^= input_port_read_indexed(machine, port)&(0x01<<bit) ? 0x01<<port : 0x00;
+				{
+				sprintf(tag, "BIT%d", port);
+				data ^= input_port_read(machine, tag) & (0x01<<bit) ? 0x01<<port : 0x00;
+				}
 	return data;
 }
 
@@ -794,7 +798,7 @@ void ti85_update_serial (running_machine *machine)
 {
 	if (ti85_serial_status == TI85_SEND_STOP)
 	{
-		if (input_port_read_indexed(machine, 9)&0x01)
+		if (input_port_read(machine, "SERIAL") & 0x01)
 		{
 			if(!ti85_alloc_serial_data_memory(15)) return;
 			if(!ti85_receive_serial (ti85_receive_buffer, 7*8))
@@ -813,7 +817,7 @@ void ti85_update_serial (running_machine *machine)
 		{
 			ti85_receive_serial(NULL, 0);
 			ti85_free_serial_data_memory(machine);
-			if (input_port_read_indexed(machine, 10)&0x01)
+			if (input_port_read(machine, "DUMP") & 0x01)
 			{
 				ti85_serial_status = TI85_PREPARE_SCREEN_REQUEST;
 				ti85_serial_transfer_type = TI85_RECEIVE_SCREEN;

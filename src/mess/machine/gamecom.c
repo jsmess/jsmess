@@ -114,9 +114,9 @@ static void handle_stylus_press( UINT8 column ) {
 	static UINT32 stylus_y;
 
 	if ( column == 0 ) {
-		if ( ! ( input_port_read_indexed(Machine, 2) & 0x04 ) ) {
-			stylus_x = input_port_read_indexed(Machine,  3 ) >> 4;
-			stylus_y = input_port_read_indexed(Machine,  4 ) >> 4;
+		if ( ! ( input_port_read(Machine, "IN2") & 0x04 ) ) {
+			stylus_x = input_port_read(Machine, "IN3") >> 4;
+			stylus_y = input_port_read(Machine, "IN4") >> 4;
 		} else {
 			stylus_x = 16;
 			stylus_y = 16;
@@ -208,8 +208,8 @@ WRITE8_HANDLER( gamecom_internal_w )
 						/* P0 bit 7 cleared => 8B (button A) */
 						/* P1 bit 0 cleared => 8C (button B) */
 						/* P1 bit 1 cleared => 8D (button C) */
-					cpunum_set_reg( 0, SM8500_P0, input_port_read_indexed(machine, 0) );
-					cpunum_set_reg( 0, SM8500_P1, ( cpunum_get_reg( 0, SM8500_P1 ) & 0xFC ) | ( input_port_read_indexed(machine, 1) & 0x03 ) );
+					cpunum_set_reg( 0, SM8500_P0, input_port_read(machine, "IN0") );
+					cpunum_set_reg( 0, SM8500_P1, ( cpunum_get_reg( 0, SM8500_P1 ) & 0xFC ) | ( input_port_read(machine, "IN1") & 0x03 ) );
 					break;
 				case 0xFFFF:	/* keys #2 */
 						/* P0 bit 0 cleared => 88 (power) */
@@ -222,7 +222,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 						/* P0 bit 7 cleared => A0 */
 						/* P1 bit 0 cleared => A0 */
 						/* P1 bit 1 cleared => A0 */
-					cpunum_set_reg( 0, SM8500_P0, ( cpunum_get_reg( 0, SM8500_P0 ) & 0xFC ) | ( input_port_read_indexed(machine, 2) & 0x03 ) );
+					cpunum_set_reg( 0, SM8500_P0, ( cpunum_get_reg( 0, SM8500_P0 ) & 0xFC ) | ( input_port_read(machine, "IN2") & 0x03 ) );
 					cpunum_set_reg( 0, SM8500_P1, 0xFF );
 					break;
 				}

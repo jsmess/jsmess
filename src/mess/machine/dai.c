@@ -34,7 +34,7 @@ static UINT8 dai_cassette_motor[2];
 
 static OPBASE_HANDLER(dai_opbaseoverride)
 {
-	tms5501_set_pio_bit_7 (0, (input_port_read_indexed(machine, 8) & 0x04) ? 1:0);
+	tms5501_set_pio_bit_7 (0, (input_port_read(machine, "IN8") & 0x04) ? 1:0);
 	return address;
 }
 
@@ -62,11 +62,15 @@ static UINT8 dai_keyboard_read (void)
 {
 	UINT8 data = 0x00;
 	int i;
+	char port[5];
 
 	for (i = 0; i < 8; i++)
 	{
 		if (dai_keyboard_scan_mask & (1 << i))
-			data |= input_port_read_indexed(Machine, i);
+		{
+			sprintf(port, "IN%d", i);
+			data |= input_port_read(Machine, port);
+		}
 	}
 	return data;
 }
@@ -170,7 +174,7 @@ MACHINE_START( dai )
 
 	switch(offset & 0x000f) {
 	case 0x00:
-		data = input_port_read_indexed(machine, 8);
+		data = input_port_read(machine, "IN8");
 		data |= 0x08;			// serial ready
 		if (mame_rand(machine)&0x01)
 			data |= 0x40;		// random number generator

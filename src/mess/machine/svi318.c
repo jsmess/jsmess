@@ -199,7 +199,7 @@ static  READ8_HANDLER ( svi318_ppi_port_b_r )
 	if (row <= 10)
 	{
 		sprintf(port, "LINE%d", row);
-		return input_port_read_indexed(machine, row);
+		return input_port_read(machine, port);
 	}
 	return 0xff;
 }

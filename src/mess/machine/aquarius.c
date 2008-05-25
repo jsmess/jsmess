@@ -18,9 +18,9 @@ static	int	aquarius_ramsize = 0;
 MACHINE_RESET( aquarius )
 {
 	logerror("aquarius_init\r\n");
-	if (input_port_read(machine, "ram") != aquarius_ramsize)
+	if (input_port_read(machine, "RAM") != aquarius_ramsize)
 	{
-		aquarius_ramsize = input_port_read(machine, "ram");
+		aquarius_ramsize = input_port_read(machine, "RAM");
 		switch (aquarius_ramsize)
 		{
 			case 02:
@@ -47,8 +47,8 @@ MACHINE_RESET( aquarius )
 
  READ8_HANDLER ( aquarius_port_ff_r )
 {
-
 	int loop, loop2, bc, rpl;
+	char port[6];
 
 	bc = activecpu_get_reg(Z80_BC) >> 8;
 	rpl = 0xff;
@@ -57,8 +57,8 @@ MACHINE_RESET( aquarius )
 	{
 		if (!(bc & loop))
 		{
-// TODO: replace it with input_port_read
-			rpl &= input_port_read_indexed (machine, loop2);
+			sprintf(port, "KEY%d", loop2);
+			rpl &= input_port_read(machine, port);
 		}
 	}
 

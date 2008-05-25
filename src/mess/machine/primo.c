@@ -79,6 +79,7 @@ static void primo_update_memory(running_machine *machine)
 READ8_HANDLER( primo_be_1_r )
 {
 	UINT8 data = 0x00;
+	char port[5];
 
 	// bit 7, 6 - not used
 
@@ -93,10 +94,11 @@ READ8_HANDLER( primo_be_1_r )
 	data |= (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) < 0.1) ? 0x04 : 0x00;
 
 	// bit 1 - reset button
-	data |= (input_port_read_indexed(machine, 4)) ? 0x02 : 0x00;
+	data |= (input_port_read(machine, "RESET")) ? 0x02 : 0x00;
 
 	// bit 0 - keyboard
-	data |= (input_port_read_indexed(machine, (offset&0x0030)>>4) >> (offset&0x000f))&0x0001 ? 0x01 : 0x00;
+	sprintf(port, "IN%d", (offset & 0x0030) >> 4);
+	data |= (input_port_read(machine, port) >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
 
 	return data;
 }
@@ -196,7 +198,7 @@ WRITE8_HANDLER( primo_ki_2_w )
 
 WRITE8_HANDLER( primo_FD_w )
 {
-	if (!input_port_read_indexed(machine, 6))
+	if (!input_port_read(machine, "MEMORY_EXPANSION"))
 	{
 		primo_port_FD = data;
 		primo_update_memory(machine);
@@ -240,10 +242,10 @@ DRIVER_INIT( primo64 )
 
 static void primo_common_machine_init (running_machine *machine)
 {
-	if (input_port_read_indexed(machine, 6))
+	if (input_port_read(machine, "MEMORY_EXPANSION"))
 		primo_port_FD = 0x00;
 	primo_update_memory(machine);
-	cpunum_set_clockscale(machine, 0, input_port_read_indexed(machine, 5) ? 1.5 : 1.0);
+	cpunum_set_clockscale(machine, 0, input_port_read(machine, "CPU_CLOCK") ? 1.5 : 1.0);
 }
 
 MACHINE_RESET( primoa )

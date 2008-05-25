@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 /* todo: alternate forms of input (multitap, mouse, etc.) */
 static INPUT_PORTS_START( pce )
 
-    PORT_START  /* Player 1 controls */
+    PORT_START_TAG("JOY")  /* Player 1 controls */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button II */
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) /* select */
