@@ -8,7 +8,6 @@
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
-#include "deprecat.h"		/* "Machine" needed for z80pio interrupt */
 
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
