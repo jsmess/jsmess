@@ -19,6 +19,11 @@ System Driver Changes:
 
 - [C64] Joystick fix. (bug #1150) [Roberto Zandonà]
 
+- [COCO] Changed MUX delay from 16us to 8us to fix a joystick input bug under
+  [Nitr]OS-9.  Since this delay was introduced to fix Photon (as per bug #655)
+  and we've been unable to test Photon, it is unclear whether this reintroduces
+  bug #655.  (bug #1608) [Nate Woods]
+
 - [COMX35] System is now working.  [Curt Coder, Marcel van Tongeren]
 
 - [GALAXY] Added real video emulation [Miodrag Milanovic]

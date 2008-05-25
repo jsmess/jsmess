@@ -104,7 +104,9 @@ easier to manage.
     PARAMETERS
 ***************************************************************************/
 
-#define JOYSTICK_MUX_DELAY				ATTOTIME_IN_USEC(16)
+/* this MUX delay was introduced to fix bug #655, but the delay was originally
+ * 16us.  This was reduced to 8us to fix bug #1608 */
+#define JOYSTICK_MUX_DELAY				ATTOTIME_IN_USEC(8)
 
 
 
