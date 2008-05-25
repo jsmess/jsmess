@@ -1442,6 +1442,13 @@ static int ip22_get_out2(running_machine *machine) {
 	return pit8253_get_output((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2 );
 }
 
+static MACHINE_START( ip22 )
+{
+	// SCSI init
+	wd33c93_init(&scsi_intf);
+	add_exit_callback(machine, ip225015_exit);
+}
+
 static DRIVER_INIT( ip225015 )
 {
 	static const struct kbdc8042_interface at8042 =
@@ -1453,10 +1460,6 @@ static DRIVER_INIT( ip225015 )
 	// interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.
 	init_pc_common(PCCOMMON_KEYBOARD_AT, NULL);
 	kbdc8042_init(&at8042);
-
-	// SCSI init
-	wd33c93_init(&scsi_intf);
-	add_exit_callback(machine, ip225015_exit);
 
 	nIOC_ParReadCnt = 0;
 }
@@ -1596,6 +1599,8 @@ static MACHINE_DRIVER_START( ip225015 )
 	MDRV_SCREEN_SIZE(1280+64, 1024+64)
 	MDRV_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
 	MDRV_PALETTE_LENGTH(65536)
+
+	MDRV_MACHINE_START( ip22 )
 
 	MDRV_VIDEO_START( newport )
 	MDRV_VIDEO_UPDATE( newport )
