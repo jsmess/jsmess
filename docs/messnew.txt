@@ -34,6 +34,8 @@ System Driver Changes:
 
 - [GENESIS / MD] Fixed cheat issue [ShimaPong, Fabio Priuli]
 
+- [MSX2] Fixed bug in floppy emulation.  [Yano Hirokuni]
+
 - [ORION] Added SHA-1's.  [Fabio Priuli]
 
 - [ORION] ROMDISK's are carts now [Miodrag Milanovic]

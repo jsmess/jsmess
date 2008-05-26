@@ -1216,6 +1216,7 @@ MSX_SLOT_WRITE(diskrom)
 	case 0x7ffc:
 		wd17xx_set_side (val & 1);
 		state->mem[0x3ffc] = val | 0xfe;
+		break;
 	case 0x7ffd:
 		wd17xx_set_drive (val & 1);
 		if ((state->mem[0x3ffd] ^ val) & 0x40) {
