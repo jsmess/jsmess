@@ -796,6 +796,7 @@ $(MESSOBJ)/pcshare.a:					\
 	$(MESS_VIDEO)/pc_cga.o	\
 	$(MESS_VIDEO)/cgapal.o	\
 	$(MESS_VIDEO)/pc_vga.o	\
+	$(MESS_VIDEO)/crtc_ega.o	\
 	$(MESS_VIDEO)/pc_ega.o
 
 $(MESSOBJ)/pc.a:	   \

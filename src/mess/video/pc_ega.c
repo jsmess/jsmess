@@ -411,7 +411,7 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 
 #include "driver.h"
 #include "video/pc_ega.h"
-#include "video/mc6845.h"
+#include "video/crtc_ega.h"
 #include "video/pc_video.h"
 #include "memconv.h"
 
@@ -421,8 +421,8 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 
 static struct
 {
-	const device_config	*mc6845;
-	mc6845_update_row_func	update_row;
+	const device_config	*crtc_ega;
+	crtc_ega_update_row_func	update_row;
 
 	/* Video memory and related variables */
 	UINT8	*videoram;
@@ -430,6 +430,8 @@ static struct
 	UINT8	*videoram_a0000;
 	UINT8	*videoram_b0000;
 	UINT8	*videoram_b8000;
+	UINT8	*charA;
+	UINT8	*charB;
 
 	/* Registers */
 	UINT8	misc_output;
@@ -459,7 +461,7 @@ static struct
 
 	UINT8	frame_cnt;
 	UINT8	vsync;
-	UINT8	hsync;
+	UINT8	display_enable;
 } ega;
 
 
@@ -467,11 +469,11 @@ static struct
 	Prototypes
 */
 static VIDEO_START( pc_ega );
-static VIDEO_UPDATE( mc6845_ega );
+static VIDEO_UPDATE( pc_ega );
 static PALETTE_INIT( pc_ega );
-static MC6845_UPDATE_ROW( ega_update_row );
-static MC6845_ON_HSYNC_CHANGED( ega_hsync_changed );
-static MC6845_ON_VSYNC_CHANGED( ega_vsync_changed );
+static CRTC_EGA_UPDATE_ROW( ega_update_row );
+static CRTC_EGA_ON_DE_CHANGED( ega_de_changed );
+static CRTC_EGA_ON_VSYNC_CHANGED( ega_vsync_changed );
 static READ8_HANDLER( pc_ega8_3b0_r );
 static WRITE8_HANDLER( pc_ega8_3b0_w );
 static READ16_HANDLER( pc_ega16le_3b0_r );
@@ -495,7 +497,7 @@ static WRITE16_HANDLER( pc_ega_videoram16le_w );
 static WRITE32_HANDLER( pc_ega_videoram32le_w );
 
 
-static const mc6845_interface mc6845_ega_intf =
+static const crtc_ega_interface crtc_ega_ega_intf =
 {
 	EGA_SCREEN_NAME,	/* screen number */
 	16257000/8,			/* clock */
@@ -503,8 +505,8 @@ static const mc6845_interface mc6845_ega_intf =
 	NULL,				/* begin_update */
 	ega_update_row,		/* update_row */
 	NULL,				/* end_update */
-	NULL,				/* on_de_chaged */
-	ega_hsync_changed,	/* on_hsync_changed */
+	ega_de_changed,		/* on_de_chaged */
+	NULL,				/* on_hsync_changed */
 	ega_vsync_changed	/* on_vsync_changed */
 };
 
@@ -512,16 +514,16 @@ static const mc6845_interface mc6845_ega_intf =
 MACHINE_DRIVER_START( pcvideo_ega )
 	MDRV_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
+	MDRV_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
 	MDRV_PALETTE_LENGTH( 64 )
 
 	MDRV_PALETTE_INIT(pc_ega)
 
-	MDRV_DEVICE_ADD(EGA_MC6845_NAME, MC6845)
-	MDRV_DEVICE_CONFIG( mc6845_ega_intf )
+	MDRV_DEVICE_ADD(EGA_CRTC_NAME, CRTC_EGA)
+	MDRV_DEVICE_CONFIG( crtc_ega_ega_intf )
 
 	MDRV_VIDEO_START( pc_ega )
-	MDRV_VIDEO_UPDATE( mc6845_ega )
+	MDRV_VIDEO_UPDATE( pc_ega )
 MACHINE_DRIVER_END
 
 
@@ -633,7 +635,7 @@ static VIDEO_START( pc_ega )
 
 	pc_ega_install_banks();
 
-	ega.mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, EGA_MC6845_NAME);
+	ega.crtc_ega = device_list_find_by_tag(machine->config->devicelist, CRTC_EGA, EGA_CRTC_NAME);
 	ega.update_row = NULL;
 	ega.misc_output = 0;
 	ega.attribute.index_write = 1;
@@ -658,14 +660,14 @@ static VIDEO_START( pc_ega )
 }
 
 
-static VIDEO_UPDATE( mc6845_ega )
+static VIDEO_UPDATE( pc_ega )
 {
-	mc6845_update( ega.mc6845, bitmap, cliprect);
+	crtc_ega_update( ega.crtc_ega, bitmap, cliprect);
 	return 0;
 }
 
 
-static MC6845_UPDATE_ROW( ega_update_row )
+static CRTC_EGA_UPDATE_ROW( ega_update_row )
 {
 	if ( ega.update_row )
 	{
@@ -674,13 +676,13 @@ static MC6845_UPDATE_ROW( ega_update_row )
 }
 
 
-static MC6845_ON_HSYNC_CHANGED( ega_hsync_changed )
+static CRTC_EGA_ON_DE_CHANGED( ega_de_changed )
 {
-	ega.hsync = hsync ? 1 : 0;
+	ega.display_enable = display_enabled ? 1 : 0;
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( ega_vsync_changed )
+static CRTC_EGA_ON_VSYNC_CHANGED( ega_vsync_changed )
 {
 	ega.vsync = vsync ? 8 : 0;
 	if ( vsync )
@@ -690,7 +692,7 @@ static MC6845_ON_VSYNC_CHANGED( ega_vsync_changed )
 }
 
 
-static MC6845_UPDATE_ROW( pc_ega_graphics )
+static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 {
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int	i;
@@ -702,7 +704,7 @@ static MC6845_UPDATE_ROW( pc_ega_graphics )
 }
 
 
-static MC6845_UPDATE_ROW( pc_ega_text )
+static CRTC_EGA_UPDATE_ROW( pc_ega_text )
 {
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int	i;
@@ -714,7 +716,7 @@ static MC6845_UPDATE_ROW( pc_ega_text )
 		UINT16	offset = ( ma + i ) << 1;
 		UINT8	chr = ega.videoram[ offset ];
 		UINT8	attr = ega.videoram[ offset + 1 ];
-		UINT8	data = ega.videoram[ 0x10000 + chr * 32 + ra ];
+		UINT8	data = ( attr & 0x08 ) ? ega.charA[ chr * 32 + ra ] : ega.charB[ chr * 32 + ra ];
 		UINT16	fg = ega.attribute.data[ attr & 0x0F ];
 		UINT16	bg = ega.attribute.data[ attr >> 4 ];
 
@@ -730,8 +732,10 @@ static MC6845_UPDATE_ROW( pc_ega_text )
 }
 
 
-static void pc_ega_change_mode( void )
+static void pc_ega_change_mode( const device_config *device )
 {
+	int clock, pixels;
+
 	ega.update_row = NULL;
 
 	/* Check for graphics mode */
@@ -758,7 +762,30 @@ static void pc_ega_change_mode( void )
 		}
 
 		ega.update_row = pc_ega_text;
+
+		/* Set character maps */
+		if ( ega.sequencer.data[0x04] & 0x02 )
+		{
+			ega.charA = ega.videoram + 0x10000 + ( ( ega.sequencer.data[0x03] & 0x0c ) >> 1 ) * 0x2000;
+			ega.charB = ega.videoram + 0x10000 + ( ega.sequencer.data[0x03] & 0x03 ) * 0x2000;
+		}
+		else
+		{
+			ega.charA = ega.videoram + 0x10000;
+			ega.charB = ega.videoram + 0x10000;
+		}
 	}
+
+	/* Check for changes to the crtc input clock and number of pixels per clock */
+	clock = ( ( ega.misc_output & 0x0c ) ? 16257000 : XTAL_14_31818MHz );
+	pixels = ( ( ega.sequencer.data[0x01] & 0x01 ) ? 8 : 9 );
+
+	if ( ega.sequencer.data[0x01] & 0x08 )
+	{
+		clock >>= 1;
+	}
+	crtc_ega_set_clock( device, clock / pixels );
+	crtc_ega_set_hpixels_per_column( device, pixels );
 }
 
 
@@ -780,12 +807,12 @@ static READ8_HANDLER( pc_ega8_3X0_r )
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		data = mc6845_register_r( ega.mc6845, offset );
+		data = crtc_ega_register_r( ega.crtc_ega, offset );
 		break;
 
 	/* Input Status Register 1 */
 	case 10:
-		data = ega.vsync | ega.hsync;
+		data = ega.vsync | ega.display_enable;
 
 		/* Reset the attirubte writing flip flop to let the next write go to the index reigster */
 		ega.attribute.index_write = 1;
@@ -807,12 +834,12 @@ static WRITE8_HANDLER( pc_ega8_3X0_w )
 	{
 	/* CRT Controller - address register */
 	case 0: case 2: case 4: case 6:
-		mc6845_address_w( ega.mc6845, offset, data );
+		crtc_ega_address_w( ega.crtc_ega, offset, data );
 		break;
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		mc6845_register_w( ega.mc6845, offset, data );
+		crtc_ega_register_w( ega.crtc_ega, offset, data );
 		break;
 
 	/* Set Light Pen Flip Flop */
@@ -944,7 +971,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 			switch ( index )
 			{
 			case 0x10:		/* AR10 */
-				pc_ega_change_mode();
+				pc_ega_change_mode( ega.crtc_ega );
 				break;
 			}
 		}
@@ -954,6 +981,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 	/* Misccellaneous Output */
 	case 2:
 		ega.misc_output = data;
+		pc_ega_change_mode( ega.crtc_ega );
 		break;
 
 	/* Sequencer */
@@ -971,8 +999,9 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		switch ( index )
 		{
 		case 0x01:		/* SR01 */
+		case 0x03:		/* SR03 */
 		case 0x04:		/* SR04 */
-			pc_ega_change_mode();
+			pc_ega_change_mode( ega.crtc_ega );
 			break;
 		}
 		break;
@@ -992,7 +1021,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		switch ( index )
 		{
 		case 0x06:		/* GR06 */
-			pc_ega_change_mode();
+			pc_ega_change_mode( ega.crtc_ega );
 			pc_ega_install_banks();
 			break;
 		}
