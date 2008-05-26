@@ -240,7 +240,7 @@ static CDP1802_EF_READ( comx35_ef_r )
 	if (!state->cdp1871_efxa) flags -= EF3;
 
 	// cassette input, expansion device flag
-	if (!state->cdp1802_ef4 || cassette_input(cassette_device_image()) > +1.0) flags -= EF4;
+	if (!state->cdp1802_ef4 || cassette_input(cassette_device_image()) < -0.9) flags -= EF4;
 
 	return flags;
 }
@@ -319,7 +319,7 @@ static CDP1871_ON_DA_CHANGED( comx35_da_w )
 	state->cdp1871_efxa = level;
 }
 
-static CDP1871_ON_DA_CHANGED( comx35_rpt_w )
+static CDP1871_ON_RPT_CHANGED( comx35_rpt_w )
 {
 	comx35_state *state = device->machine->driver_data;
 
@@ -371,6 +371,9 @@ static MACHINE_DRIVER_START( comx35p )
 	MDRV_SOUND_ADD(CDP1869, CDP1869_DOT_CLK_PAL)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
+	MDRV_SOUND_ADD_TAG("tape", WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	// printer
 
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -407,6 +410,9 @@ static MACHINE_DRIVER_START( comx35n )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(CDP1869, CDP1869_DOT_CLK_NTSC)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD_TAG("tape", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// printer
@@ -462,7 +468,7 @@ static void comx35_cassette_getinfo(const mess_device_class *devclass, UINT32 st
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
