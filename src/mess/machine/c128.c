@@ -11,8 +11,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "includes/c128.h"
-#include "includes/c64.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
@@ -25,6 +23,9 @@
 #include "includes/vc20tape.h"
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
+
+#include "includes/c128.h"
+#include "includes/c64.h"
 
 
 /*
@@ -63,13 +64,6 @@ static void c128_set_m8502_read_handler(running_machine *machine, UINT16 start, 
 	int cpunum;
 	cpunum = mame_find_cpu_index(machine, "m8502");
 	memory_install_read8_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, start, end, 0, 0, rh);
-}
-
-
-
-int c128_capslock_r (void)
-{
-	return !KEY_DIN;
 }
 
 static WRITE8_HANDLER(c128_dma8726_port_w)
@@ -290,10 +284,10 @@ static int mmu_page0, mmu_page1;
 	 c128_va1617 = MMU_VIC_ADDR;
 #if 1
 	 memory_set_bankptr(10, c128_z80);
-	 memory_set_bankptr(11, c128_ram+0x1000);
-	 if ( ((C128_MAIN_MEMORY==RAM256KB)&&(MMU_RAM_ADDR>=0x40000))
-		  ||((C128_MAIN_MEMORY==RAM128KB)&&(MMU_RAM_ADDR>=0x20000)) )
-		 c128_ram=NULL;
+	 memory_set_bankptr(11, c128_ram + 0x1000);
+	 if ( (( (input_port_read(Machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (input_port_read(Machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
+		 c128_ram = NULL;
 #else
 	 if (MMU_BOTTOM)
 		 c128_ram_bottom = MMU_SIZE;
@@ -302,11 +296,14 @@ static int mmu_page0, mmu_page1;
 
 	 if (MMU_RAM_ADDR==0) { /* this is used in z80 mode for rom on/off switching !*/
 		 memory_set_bankptr(10, c128_z80);
-		 memory_set_bankptr(11, c128_z80+0x400);
-	 } else {
+		 memory_set_bankptr(11, c128_z80 + 0x400);
+	 } 
+	 else 
+	 {
 		 memory_set_bankptr(10, (c128_ram_bottom > 0 ? c64_memory : c128_ram));
 		 memory_set_bankptr(11, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
 	 }
+	 
 	 memory_set_bankptr(1, (c128_ram_bottom > 0 ? c64_memory : c128_ram));
 	 memory_set_bankptr(2, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
 
@@ -319,18 +316,45 @@ static int mmu_page0, mmu_page1;
 	 else
 		 c128_ram_top = 0x10000;
 
-	 if (c128_ram_top > 0xc000) { memory_set_bankptr(6, c128_ram + 0xc000); }
-	 else { memory_set_bankptr(6, c64_memory + 0xc000); }
-	 if (c128_ram_top > 0xe000) { memory_set_bankptr(7, c128_ram + 0xe000); }
-	 else { memory_set_bankptr(7, c64_memory + 0xd000); }
-	 if (c128_ram_top > 0xf000) { memory_set_bankptr(8, c128_ram + 0xf000); }
-	 else { memory_set_bankptr(8, c64_memory + 0xe000); }
-	 if (c128_ram_top > 0xff05) { memory_set_bankptr(9, c128_ram + 0xff05); }
-	 else { memory_set_bankptr(9, c64_memory + 0xff05); }
+	 if (c128_ram_top > 0xc000) 
+	 { 
+		memory_set_bankptr(6, c128_ram + 0xc000); 
+	 }
+	 else 
+	 { 
+		memory_set_bankptr(6, c64_memory + 0xc000); 
+	 }
 
-	 if ( ((C128_MAIN_MEMORY==RAM256KB)&&(MMU_RAM_ADDR>=0x40000))
-		  ||((C128_MAIN_MEMORY==RAM128KB)&&(MMU_RAM_ADDR>=0x20000)) )
-		 c128_ram=NULL;
+	 if (c128_ram_top > 0xe000) 
+	 { 
+		memory_set_bankptr(7, c128_ram + 0xe000); 
+	 }
+	 else 
+	 { 
+		memory_set_bankptr(7, c64_memory + 0xd000); 
+	 }
+
+	 if (c128_ram_top > 0xf000) 
+	 { 
+		memory_set_bankptr(8, c128_ram + 0xf000); 
+	 }
+	 else 
+	 { 
+		memory_set_bankptr(8, c64_memory + 0xe000); 
+	 }
+
+	 if (c128_ram_top > 0xff05) 
+	 { 
+		memory_set_bankptr(9, c128_ram + 0xff05); 
+	 }
+	 else 
+	 { 
+		memory_set_bankptr(9, c64_memory + 0xff05); 
+	 }
+
+	 if ( (( (input_port_read(Machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (input_port_read(Machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
+		 c128_ram = NULL;
 #endif
  }
 
@@ -494,8 +518,10 @@ static void c128_bankswitch_128 (running_machine *machine, int reset)
 			memory_set_bankptr(14, c128_external_function + 0x2000);
 			memory_set_bankptr(16, c128_external_function + 0x3f05);
 		}
-		if ( ((C128_MAIN_MEMORY==RAM256KB)&&(MMU_RAM_ADDR>=0x40000))
-			 ||((C128_MAIN_MEMORY==RAM128KB)&&(MMU_RAM_ADDR>=0x20000)) ) c128_ram=NULL;
+
+		if ( (( (input_port_read(Machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
+				|| (( (input_port_read(Machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
+			c128_ram = NULL;
 	}
 }
 
@@ -612,14 +638,17 @@ WRITE8_HANDLER( c128_mmu8722_port_w )
 			data &= ~0x10;
 		if (!c64_exrom)
 			data &= ~0x20;
-		if (KEY_4080)
+		if (input_port_read(Machine, "SPECIAL") & 0x10)
 			data &= ~0x80;
 		break;
 	case 0xb:
 		/* hinybble number of 64 kb memory blocks */
-		if (C128_MAIN_MEMORY==RAM256KB) data=0x4f;
-		else if (C128_MAIN_MEMORY==RAM1MB) data=0xf;
-		else data=0x2f;
+		if ((input_port_read(Machine, "CFG") & 0x300) == 0x100)			// 256KB RAM
+			data = 0x4f;
+		else if ((input_port_read(Machine, "CFG") & 0x300) == 0x200)	//	1MB
+			data = 0xf;
+		else 
+			data = 0x2f;
 		break;
 	case 0xc:
 	case 0xd:

@@ -7,8 +7,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "includes/c65.h"
-#include "includes/c64.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
@@ -19,6 +17,9 @@
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "video/vic4567.h"
+
+#include "includes/c65.h"
+#include "includes/c64.h"
 
 
 static int c65_charset_select=0;
@@ -180,7 +181,8 @@ static int c65_dma_port_r(running_machine *machine, int offset)
 
 static void c65_6511_port_w(running_machine *machine, int offset, int value)
 {
-	if (offset==7) {
+	if (offset==7) 
+	{
 		c65_6511_port=value;
 	}
 	DBG_LOG (2, "r6511 write", ("%.2x %.2x\n", offset, value));
@@ -189,8 +191,11 @@ static void c65_6511_port_w(running_machine *machine, int offset, int value)
 static int c65_6511_port_r(running_machine *machine, int offset)
 {
 	int data=0xff;
-	if (offset==7) {
-		if (C65_KEY_DIN) data &= ~1;
+
+	if (offset==7) 
+	{
+		if (input_port_read(machine, "SPECIAL") & 0x20) 
+			data &= ~1;
 	}
 	DBG_LOG (2, "r6511 read", ("%.2x\n", offset));
 

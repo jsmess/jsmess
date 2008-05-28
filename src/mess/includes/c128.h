@@ -15,18 +15,6 @@
 #define C128_H_
 
 
-#define C128_MAIN_MEMORY	( input_port_read(Machine, "Config") & 0x300 )
-#define RAM128KB			( 0x00 )
-#define RAM256KB			( 0x100 )
-#define RAM1MB				( 0x200 )
-
-#define VDC_RAM_64KBYTE		( input_port_read(Machine, "Config") & 0x40 ) /* else 16KB */
-#define MONITOR_TV			( input_port_read(Machine, "Config") & 0x20 ) /* else RGBI */
-
-#define KEY_DIN				( input_port_read(Machine,  "Special" ) & 0x20 )
-#define KEY_4080			( input_port_read(Machine,  "Special" ) & 0x10 )
-
-
 /*----------- defined in machine/c128.c -----------*/
 
 extern UINT8 *c128_basic;
@@ -43,7 +31,6 @@ WRITE8_HANDLER(c128_mmu8722_port_w);
 READ8_HANDLER(c128_mmu8722_port_r);
 WRITE8_HANDLER(c128_mmu8722_ff00_w);
 READ8_HANDLER(c128_mmu8722_ff00_r);
-int c128_capslock_r (void);
 WRITE8_HANDLER(c128_write_0000);
 WRITE8_HANDLER(c128_write_1000);
 WRITE8_HANDLER(c128_write_4000);

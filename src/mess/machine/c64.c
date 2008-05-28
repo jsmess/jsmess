@@ -28,8 +28,7 @@
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
-#include "includes/c128.h"
-#include "includes/c65.h"
+#include "includes/c128.h"	/* we need c128_bankswitch_64 in c64_m6510_port_write */
 #include "includes/c64.h"
 
 static void c64_driver_shutdown (running_machine *machine);
@@ -70,12 +69,15 @@ int c64_tape_on = 1;
 static int c64_cia1_on = 1;
 static UINT8 cartridge = 0;
 static int c64_io_enabled = 0;
+
 static enum
 {
-	CartridgeAuto = 0, CartridgeUltimax, CartridgeC64,
-	CartridgeSuperGames, CartridgeRobocop2
+	CartridgeAuto = 0, 
+	CartridgeUltimax, 
+	CartridgeC64
 }
 cartridgetype = CartridgeAuto;
+
 static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq = 0;
 
@@ -94,25 +96,27 @@ static void c64_nmi(running_machine *machine)
 	static int nmilevel = 0;
 	int cia1irq = cia_get_irq(1);
 
-	if (nmilevel != KEY_RESTORE||cia1irq)
+	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
 		if (is_c128(machine))
 		{
 			if (cpu_getactivecpu()==0)
 			{
 				/* z80 */
-				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 			}
 			else
 			{
-				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 			}
 		}
+		
 		else
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 		}
-		nmilevel = KEY_RESTORE||cia1irq;
+		
+		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
 	}
 }
 
@@ -243,7 +247,7 @@ static UINT8 c64_cia0_port_a_r (void)
 		value &=t;
 	}
 
-	if (JOYSTICK_SWAP)
+	if ( input_port_read(Machine, "DSW0") & 0x0100 )
 		value &= c64_keyline[8];
 	else
 		value &= c64_keyline[9];
@@ -260,13 +264,15 @@ static UINT8 c64_cia0_port_b_r (void)
     if (!(cia0porta & 0x40)) value &= c64_keyline[6];
     if (!(cia0porta & 0x20)) value &= c64_keyline[5];
     if (!(cia0porta & 0x10)) value &= c64_keyline[4];
-    if (!(cia0porta & 8)) value &= c64_keyline[3];
-    if (!(cia0porta & 4)) value &= c64_keyline[2];
-    if (!(cia0porta & 2)) value &= c64_keyline[1];
-    if (!(cia0porta & 1)) value &= c64_keyline[0];
+    if (!(cia0porta & 0x08)) value &= c64_keyline[3];
+    if (!(cia0porta & 0x04)) value &= c64_keyline[2];
+    if (!(cia0porta & 0x02)) value &= c64_keyline[1];
+    if (!(cia0porta & 0x01)) value &= c64_keyline[0];
 
-    if (JOYSTICK_SWAP) value &= c64_keyline[9];
-    else value &= c64_keyline[8];
+	if ( input_port_read(Machine, "DSW0") & 0x0100 )
+		value &= c64_keyline[9];
+    else 
+		value &= c64_keyline[8];
 
     if (is_c128(Machine))
     {
@@ -415,59 +421,6 @@ const cia6526_interface c64_cia1 =
 	}
 };
 
-static void c64_bankswitch(running_machine *machine, int reset);
-static void c64_robocop2_w(running_machine *machine, int offset, int value)
-{
-	/* robocop2 0xe00
-	 * 80 94 80 94 80
-	 * 80 81 80 82 83 80
-	 */
-	roml=cbm_rom[value&0xf].chip;
-	romh=cbm_rom[(value&0xf)+0x10].chip;
-	if (value & 0x80)
-	{
-		c64_game = value & 0x10;
-		c64_exrom = 1;
-	}
-	else
-	{
-		c64_game = c64_exrom = 1;
-	}
-
-	if (is_c128(machine))
-		c128_bankswitch_64(machine, 0);
-	else
-		c64_bankswitch(machine, 0);
-}
-
-static void c64_supergames_w(running_machine *machine, int offset, int value)
-{
-	/* supergam 0xf00
-	 * 4 9 4
-	 * 4 0 c
-	 */
-	roml=cbm_rom[value&3].chip;
-	romh=cbm_rom[value&3].chip+0x2000;
-	if (value & 4)
-	{
-		c64_game = 0;
-		c64_exrom = 1;
-	}
-	else
-	{
-		c64_game = c64_exrom = 1;
-	}
-	if (value == 0xc)
-	{
-		c64_game = c64_exrom = 0;
-	}
-
-	if (is_c128(machine))
-		c128_bankswitch_64 (machine, 0);
-	else
-		c64_bankswitch(machine, 0);
-}
-
 WRITE8_HANDLER( c64_write_io )
 {
 	c64_io_mirror[ offset ] = data;
@@ -489,21 +442,11 @@ WRITE8_HANDLER( c64_write_io )
 	else if (offset < 0xf00)
 	{
 		/* i/o 1 */
-		if (cartridge && (cartridgetype == CartridgeRobocop2))
-		{
-			c64_robocop2_w(machine, offset&0xff, data);
-		}
-		else
 			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 	}
 	else
 	{
 		/* i/o 2 */
-		if (cartridge && (cartridgetype == CartridgeSuperGames))
-		{
-			c64_supergames_w(machine, offset&0xff, data);
-		}
-		else
 			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 	}
 }
@@ -530,12 +473,12 @@ READ8_HANDLER( c64_read_io )
 		return c64_colorram[offset & 0x3ff];
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(0, 0, JOYSTICK_SWAP?c64_keyline[8]:c64_keyline[9]);
+			cia_set_port_mask_value(0, 0, input_port_read(Machine, "DSW0") & 0x0100 ? c64_keyline[8] : c64_keyline[9] );
 			return cia_0_r(machine, offset);
 		}
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(0, 1, JOYSTICK_SWAP?c64_keyline[9]:c64_keyline[8]);
+			cia_set_port_mask_value(0, 1, input_port_read(Machine, "DSW0") & 0x0100 ? c64_keyline[9] : c64_keyline[8] );
 			return cia_0_r(machine, offset);
 		}
 	else if (offset < 0xd00)
@@ -769,13 +712,13 @@ UINT8 c64_m6510_port_read(UINT8 direction)
 	running_machine *machine = Machine;
 	UINT8 data = c64_port_data;
 
-	if (c64_tape_on && !vc20_tape_switch ())
+	if (c64_tape_on && !vc20_tape_switch())
 		data &= ~0x10;
 	/* WP: motor is always marked as on??? */
 	data &= ~0x20;
-	if (is_c128(machine) && !c128_capslock_r ())
+	if (is_c128(machine) && (input_port_read(machine, "SPECIAL") & 0x20))	/* Check Caps Lock */
 		data &= ~0x40;
-	if (is_c65(machine) && C65_KEY_DIN)
+	if (is_c65(machine) && (input_port_read(machine, "SPECIAL") & 0x20))	/* Check Caps Lock */
 		data &= ~0x40; /*? */
 	return data;
 }
@@ -785,32 +728,48 @@ int c64_paddle_read (int which)
 	int pot1=0xff, pot2=0xff, pot3=0xff, pot4=0xff, temp;
 	UINT8 cia0porta = cia_get_output_a(0);
 
-	if (PADDLES34)
+	if ((input_port_read(Machine, "DSW0") & 0x0e00 ) == 0x0400)					/* Paddle_2 and Paddle_3 */
 	{
-		if (which) pot4=PADDLE4_VALUE;
-		else pot3=PADDLE3_VALUE;
+		if (which) 
+			pot4 = (input_port_read(Machine, "PADDLE3") & 0xff);
+		else 
+			pot3 = (input_port_read(Machine, "PADDLE2") & 0xff);
 	}
-	if (JOYSTICK2_2BUTTON&&which) {
-		if (JOYSTICK_2_BUTTON2) pot4=0x00;
+	if (( (input_port_read(Machine, "DSW0") & 0x0e00) == 0x0600 ) && which)		/* 2 Buttons Joystick_2 */
+	{
+		if (input_port_read(Machine, "JOY1") & 0x20 )
+			pot4 = 0x00;
 	}
-	if (MOUSE2) {
-		if (which) pot4=MOUSE2_Y;
-		else pot3=MOUSE2_X;
+	if ( (input_port_read(Machine, "DSW0") & 0x0e00) == 0x0800 )				/* Mouse_2 */
+	{
+		if (which) 
+			pot4 = input_port_read(Machine, "TRACKY");
+		else 
+			pot3 = input_port_read(Machine, "TRACKX");
 	}
-	if (PADDLES12) {
-		if (which) pot2=PADDLE2_VALUE;
-		else pot1=PADDLE1_VALUE;
+	if ((input_port_read(Machine, "DSW0") & 0xe000 ) == 0x4000)					/* Paddle_0 & Paddle_1 */
+	{
+		if (which) 
+			pot2 = (input_port_read(Machine, "PADDLE1") & 0xff);
+		else 
+			pot1 = (input_port_read(Machine, "PADDLE0") & 0xff);
 	}
-	if (JOYSTICK1_2BUTTON&&which) {
-		if (JOYSTICK_1_BUTTON2) pot1=0x00;
+	if (( (input_port_read(Machine, "DSW0") & 0xe000) == 0x6000 ) && which)		/* 2 Buttons Joystick_1 */
+	{
+		if (input_port_read(Machine, "JOY0") & 0x20 )
+			pot1 = 0x00;
 	}
-	if (MOUSE1) {
-		if (which) pot2=MOUSE1_Y;
-		else pot1=MOUSE1_X;
+	if (( input_port_read(Machine, "DSW0") & 0xe000 ) == 0x8000 )				/* Mouse_1 */
+	{	
+		if (which) 
+			pot2 = input_port_read(Machine, "TRACKY");
+		else 
+			pot1 = input_port_read(Machine, "TRACKX");
 	}
-	if (JOYSTICK_SWAP) {
-		temp=pot1;pot1=pot2;pot2=pot1;
-		temp=pot3;pot3=pot4;pot4=pot3;
+	if (input_port_read(Machine, "DSW0") & 0x0100)								/* Swap */
+	{
+		temp = pot1; pot1 = pot2; pot2 = pot1;
+		temp = pot3; pot3 = pot4; pot4 = pot3;
 	}
 	switch (cia0porta & 0xc0) {
 	case 0x40:
@@ -1023,20 +982,21 @@ MACHINE_START( c64 )
 void c64_rom_recognition (void)
 {
     int i;
+	
     cartridgetype=CartridgeAuto;
-    for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0]))
-	     &&(cbm_rom[i].size!=0); i++) {
-	cartridge=1;
-	if ( BETWEEN(0xa000, 0xbfff, cbm_rom[i].addr,
-		     cbm_rom[i].addr+cbm_rom[i].size) ) {
-	    cartridgetype=CartridgeC64;
-	} else if ( BETWEEN(0xe000, 0xffff, cbm_rom[i].addr,
-			    cbm_rom[i].addr+cbm_rom[i].size) ) {
-	    cartridgetype=CartridgeUltimax;
-	}
+    
+	for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0])) && (cbm_rom[i].size!=0); i++) 
+	{
+		cartridge=1;
+		if ( BETWEEN(0xa000, 0xbfff, cbm_rom[i].addr, cbm_rom[i].addr+cbm_rom[i].size) ) 
+		{
+			cartridgetype=CartridgeC64;
+		} 
+		else if ( BETWEEN(0xe000, 0xffff, cbm_rom[i].addr, cbm_rom[i].addr+cbm_rom[i].size) ) 
+		{
+			cartridgetype=CartridgeUltimax;
+		}
     }
-    if (i==4) cartridgetype=CartridgeSuperGames;
-    if (i==32) cartridgetype=CartridgeRobocop2;
 }
 
 void c64_rom_load(void)
@@ -1047,192 +1007,110 @@ void c64_rom_load(void)
     c64_game = 1;
     if (cartridge)
     {
-	if (AUTO_MODULE && (cartridgetype == CartridgeAuto))
-	{
-	    logerror("Cartridge type not recognized using Machine type\n");
-	}
-	if (C64_MODULE && (cartridgetype == CartridgeUltimax))
-	{
-	    logerror("Cartridge could be ultimax type!?\n");
-	}
-	if (ULTIMAX_MODULE && (cartridgetype == CartridgeC64))
-	{
-	    logerror("Cartridge could be c64 type!?\n");
-	}
-	if (C64_MODULE)
-	    cartridgetype = CartridgeC64;
-	else if (ULTIMAX_MODULE)
-	    cartridgetype = CartridgeUltimax;
-	else if (SUPERGAMES_MODULE)
-	    cartridgetype = CartridgeSuperGames;
-	else if (ROBOCOP2_MODULE)
-	    cartridgetype = CartridgeRobocop2;
-	if ((cbm_c64_exrom!=-1)&&(cbm_c64_game!=-1)) {
-	    c64_exrom=cbm_c64_exrom;
-	    c64_game=cbm_c64_game;
-	} else if (ultimax || (cartridgetype == CartridgeUltimax)) {
-	    c64_game = 0;
-	} else {
-	    c64_exrom = 0;
-	}
-	if (ultimax) {
-	    for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0]))
-		     &&(cbm_rom[i].size!=0); i++) {
-		if (cbm_rom[i].addr==CBM_ROM_ADDR_LO) {
-		    memcpy(c64_memory+0x8000+0x2000-cbm_rom[i].size,
-			   cbm_rom[i].chip, cbm_rom[i].size);
-		} else if ((cbm_rom[i].addr==CBM_ROM_ADDR_HI)
-			   ||(cbm_rom[i].addr==CBM_ROM_ADDR_UNKNOWN)) {
-		    memcpy(c64_memory+0xe000+0x2000-cbm_rom[i].size,
-			   cbm_rom[i].chip, cbm_rom[i].size);
-		} else {
-		    memcpy(c64_memory+cbm_rom[i].addr, cbm_rom[i].chip,
-			   cbm_rom[i].size);
+		if (((input_port_read(Machine, "CFG") & 0x1c ) == 0) && (cartridgetype == CartridgeAuto))	// AUTO_MODULE
+		{
+			logerror("Cartridge type not recognized using Machine type\n");
 		}
-	    }
-        } else if ( (cartridgetype==CartridgeRobocop2)
-		    ||(cartridgetype==CartridgeSuperGames) ) {
-	    roml=0;
-	    romh=0;
-	    for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0]))
-		     &&(cbm_rom[i].size!=0); i++) {
-		if (!roml
-		    && ((cbm_rom[i].addr==CBM_ROM_ADDR_UNKNOWN)
-			||(cbm_rom[i].addr==CBM_ROM_ADDR_LO)
-			||(cbm_rom[i].addr==0x8000)) ) {
-		    roml=cbm_rom[i].chip;
+	
+		if (((input_port_read(Machine, "CFG") & 0x1c ) == 8) && (cartridgetype == CartridgeUltimax))// C64_MODULE
+		{
+			logerror("Cartridge could be ultimax type!?\n");
 		}
-		if (!romh
-		    && ((cbm_rom[i].addr==CBM_ROM_ADDR_HI)
-			||(cbm_rom[i].addr==0xa000) ) ){
-		    romh=cbm_rom[i].chip;
+	
+		if (((input_port_read(Machine, "CFG") & 0x1c ) == 4) && (cartridgetype == CartridgeC64))	// ULTIMAX_MODULE
+		{
+			logerror("Cartridge could be c64 type!?\n");
 		}
-		if (!romh
-		    && (cbm_rom[i].addr==0x8000)
-		    &&(cbm_rom[i].size==0x4000) ){
-		    romh=cbm_rom[i].chip+0x2000;
+
+		if ((input_port_read(Machine, "CFG") & 0x1c ) == 8)			// C64_MODULE
+			cartridgetype = CartridgeC64;
+
+		else if ((input_port_read(Machine, "CFG") & 0x1c ) == 4)	// ULTIMAX_MODULE
+			cartridgetype = CartridgeUltimax;
+
+		if ((cbm_c64_exrom!=-1)&&(cbm_c64_game!=-1)) 
+		{
+			c64_exrom=cbm_c64_exrom;
+			c64_game=cbm_c64_game;
+		} 
+	
+		else if (ultimax || (cartridgetype == CartridgeUltimax)) 
+		{
+			c64_game = 0;
+		} 
+	
+		else 
+		{
+			c64_exrom = 0;
 		}
-	    }
-	} else /*if ((cartridgetype == CartridgeC64)||
-				 (cartridgetype == CartridgeUltimax) )*/{
-	    roml=c64_roml;
-	    romh=c64_romh;
-	    memset(roml, 0, 0x2000);
-	    memset(romh, 0, 0x2000);
-	    for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0]))
-		     &&(cbm_rom[i].size!=0); i++) {
-		if ((cbm_rom[i].addr==CBM_ROM_ADDR_UNKNOWN)
-		    ||(cbm_rom[i].addr==CBM_ROM_ADDR_LO) ) {
-		    memcpy(roml+0x2000-cbm_rom[i].size,
-			   cbm_rom[i].chip, cbm_rom[i].size);
-		} else if ( ((cartridgetype == CartridgeC64)
-			     &&(cbm_rom[i].addr==CBM_ROM_ADDR_HI))
-			    ||((cartridgetype==CartridgeUltimax)
-			       &&(cbm_rom[i].addr==CBM_ROM_ADDR_HI)) ) {
-		    memcpy(romh+0x2000-cbm_rom[i].size,
-			   cbm_rom[i].chip, cbm_rom[i].size);
-		} else if (cbm_rom[i].addr<0xc000) {
-		    memcpy(roml+cbm_rom[i].addr-0x8000, cbm_rom[i].chip,
-			   cbm_rom[i].size);
-		} else {
-		    memcpy(romh+cbm_rom[i].addr-0xe000,
-			   cbm_rom[i].chip, cbm_rom[i].size);
+	
+		if (ultimax) 
+		{
+			for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0]))
+				&&(cbm_rom[i].size!=0); i++) 
+			{
+				if (cbm_rom[i].addr==CBM_ROM_ADDR_LO) 
+				{
+					memcpy(c64_memory+0x8000+0x2000-cbm_rom[i].size,
+					cbm_rom[i].chip, cbm_rom[i].size);
+				} 
+				else if ((cbm_rom[i].addr==CBM_ROM_ADDR_HI)
+				       ||(cbm_rom[i].addr==CBM_ROM_ADDR_UNKNOWN)) 
+				{
+					memcpy(c64_memory+0xe000+0x2000-cbm_rom[i].size,
+					cbm_rom[i].chip, cbm_rom[i].size);
+				} 
+				else 
+				{
+					memcpy(c64_memory+cbm_rom[i].addr, cbm_rom[i].chip,
+					cbm_rom[i].size);
+				}
+			}
+        } 
+		
+		else /*if ((cartridgetype == CartridgeC64) || (cartridgetype == CartridgeUltimax) )*/
+		{
+			roml=c64_roml;
+			romh=c64_romh;
+			memset(roml, 0, 0x2000);
+			memset(romh, 0, 0x2000);
+			for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0])) && (cbm_rom[i].size!=0); i++) 
+			{
+				if ((cbm_rom[i].addr==CBM_ROM_ADDR_UNKNOWN) ||(cbm_rom[i].addr==CBM_ROM_ADDR_LO) ) 
+				{
+					memcpy(roml+0x2000-cbm_rom[i].size, cbm_rom[i].chip, cbm_rom[i].size);
+				} 
+				else if ( ((cartridgetype == CartridgeC64) && (cbm_rom[i].addr == CBM_ROM_ADDR_HI))
+			       ||((cartridgetype == CartridgeUltimax) && (cbm_rom[i].addr == CBM_ROM_ADDR_HI)) ) 
+				{
+					memcpy(romh+0x2000-cbm_rom[i].size, cbm_rom[i].chip, cbm_rom[i].size);
+				} 
+				else if (cbm_rom[i].addr<0xc000) 
+				{
+					memcpy(roml+cbm_rom[i].addr-0x8000, cbm_rom[i].chip, cbm_rom[i].size);
+				} 
+				else 
+				{
+					memcpy(romh+cbm_rom[i].addr-0xe000, cbm_rom[i].chip, cbm_rom[i].size);
+				}
+			}
 		}
-	    }
-	}
     }
 }
 
 INTERRUPT_GEN( c64_frame_interrupt )
 {
-	int value, value2;
-
-	c64_nmi(machine);
-
-	c64_keyline[0] = input_port_read(machine,  "ROW0" );
-	c64_keyline[1] = input_port_read(machine,  "ROW1" );
-	c64_keyline[2] = input_port_read(machine,  "ROW2" );
-	c64_keyline[3] = input_port_read(machine,  "ROW3" );
-	c64_keyline[4] = input_port_read(machine,  "ROW4" );
-	c64_keyline[5] = input_port_read(machine,  "ROW5" );
-	c64_keyline[6] = input_port_read(machine,  "ROW6" );
-	c64_keyline[7] = input_port_read(machine,  "ROW7" );
-	
-	value = 0xff;
-	if (JOYSTICK1||JOYSTICK1_2BUTTON) {
-		if (JOYSTICK_1_BUTTON)
-			value &= ~0x10;
-		if (JOYSTICK_1_RIGHT)
-			value &= ~8;
-		if (JOYSTICK_1_LEFT)
-			value &= ~4;
-		if (JOYSTICK_1_DOWN)
-			value &= ~2;
-		if (JOYSTICK_1_UP)
-			value &= ~1;
-	} else if (PADDLES12) {
-		if (PADDLE2_BUTTON)
-			value &= ~8;
-		if (PADDLE1_BUTTON)
-			value &= ~4;
-	} else if (MOUSE1) {
-		if (MOUSE1_BUTTON1)
-			value &= ~0x10;
-		if (MOUSE1_BUTTON2)
-			value &= ~1;
-	}
-	c64_keyline[8] = value;
-
-	value2 = 0xff;
-	if (JOYSTICK2||JOYSTICK2_2BUTTON) {
-		if (JOYSTICK_2_BUTTON)
-			value2 &= ~0x10;
-		if (JOYSTICK_2_RIGHT)
-			value2 &= ~8;
-		if (JOYSTICK_2_LEFT)
-			value2 &= ~4;
-		if (JOYSTICK_2_DOWN)
-			value2 &= ~2;
-		if (JOYSTICK_2_UP)
-			value2 &= ~1;
-	} else if (PADDLES34) {
-		if (PADDLE4_BUTTON)
-			value2 &= ~8;
-		if (PADDLE3_BUTTON)
-			value2 &= ~4;
-	} else if (MOUSE2) {
-		if (MOUSE2_BUTTON1)
-			value2 &= ~0x10;
-		if (MOUSE2_BUTTON2)
-			value2 &= ~1;
-	}
-	c64_keyline[9] = value2;
-
-	if (is_c65(machine)) 
-	{
-		c65_keyline = input_port_read(machine, "ROW8");	
-	}
-
-	vic2_frame_interrupt (machine, cpunum);
-
-	if (c64_tape_on) {
-		vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
-		vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);
-	}
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , input_port_read(machine,  "Special" ) & 0x40 ? 1 : 0);
-	set_led_status (0 /*KB_NUMLOCK_FLAG */ , JOYSTICK_SWAP ? 1 : 0);
-}
-
-INTERRUPT_GEN( c128_frame_interrupt )
-{
 	static int monitor=-1;
-	int value, value2;
+	int value, i;
+	char port[6], port2[5];
 
 	c64_nmi(machine);
 
-		if (MONITOR_TV!=monitor)
+	 if (is_c128(machine))
+	 {
+	 	if ((input_port_read(Machine, "CFG") & 0x20) != monitor)
 		{
-			if (MONITOR_TV)
+			if (input_port_read(Machine, "CFG") & 0x20)
 			{
 				vic2_set_rastering(0);
 				vdc8563_set_rastering(1);
@@ -1244,129 +1122,91 @@ INTERRUPT_GEN( c128_frame_interrupt )
 				vdc8563_set_rastering(0);
 				video_screen_set_visarea(machine->primary_screen, 0, 335, 0, 215);
 			}
-			monitor=MONITOR_TV;
+			monitor = input_port_read(Machine, "CFG") & 0x20;
 		}
+	}
+
+	/* Lines 0-7 : common keyboard */
+	for (i=0; i<8; i++)
+	{
+		value = 0xff;
+		sprintf(port, "ROW%d", i);
+		value &= ~input_port_read(machine, port);
+		c64_keyline[i] = value;
+	}
 
 	value = 0xff;
-
-	value &= ~input_port_read(machine,  "ROW0" );
-	c64_keyline[0] = value;
-
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW1" );
-	c64_keyline[1] = value;
-
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW2" );
-	c64_keyline[2] = value;
-
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW3" );
-	c64_keyline[3] = value;
-
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW4" );
-	c64_keyline[4] = value;
-
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW5" );
-	c64_keyline[5] = value;
-
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW6" );
-	c64_keyline[6] = value;
-	
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW7" );
-	c64_keyline[7] = value;
-
-	value = 0xff;
-	if (JOYSTICK1||JOYSTICK1_2BUTTON) {
-		if (JOYSTICK_1_BUTTON)
-			value &= ~0x10;
-		if (JOYSTICK_1_RIGHT)
+	if ( ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x2000) || ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x6000) ) 
+	{
+		value &= ~(input_port_read(machine, "JOY0") & 0x1f);
+	} 
+	else if ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x4000)
+	{
+		if (input_port_read(machine, "PADDLE1") & 0x100)
 			value &= ~8;
-		if (JOYSTICK_1_LEFT)
+		if (input_port_read(machine, "PADDLE0") & 0x100)
 			value &= ~4;
-		if (JOYSTICK_1_DOWN)
-			value &= ~2;
-		if (JOYSTICK_1_UP)
-			value &= ~1;
-	} else if (PADDLES12) {
-		if (PADDLE2_BUTTON)
-			value &= ~8;
-		if (PADDLE1_BUTTON)
-			value &= ~4;
-	} else if (MOUSE1) {
-		if (MOUSE1_BUTTON1)
-			value &= ~0x10;
-		if (MOUSE1_BUTTON2)
-			value &= ~1;
+	} 
+	else if (( input_port_read(machine, "DSW0") & 0xe000 ) == 0x8000 )
+	{
+			if (input_port_read(machine, "TRACKIPT") & 0x02)
+				value &= ~0x10;
+			if (input_port_read(machine, "TRACKIPT") & 0x01)
+				value &= ~1;
 	}
 	c64_keyline[8] = value;
 
-	value2 = 0xff;
-	if (JOYSTICK2||JOYSTICK2_2BUTTON) {
-		if (JOYSTICK_2_BUTTON)
-			value2 &= ~0x10;
-		if (JOYSTICK_2_RIGHT)
-			value2 &= ~8;
-		if (JOYSTICK_2_LEFT)
-			value2 &= ~4;
-		if (JOYSTICK_2_DOWN)
-			value2 &= ~2;
-		if (JOYSTICK_2_UP)
-			value2 &= ~1;
-	} else if (PADDLES34) {
-		if (PADDLE4_BUTTON)
-			value2 &= ~8;
-		if (PADDLE3_BUTTON)
-			value2 &= ~4;
-	} else if (MOUSE2) {
-		if (MOUSE2_BUTTON1)
-			value2 &= ~0x10;
-		if (MOUSE2_BUTTON2)
-			value2 &= ~1;
+	value = 0xff;
+	if ( ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0200) || ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0600) ) 
+	{
+		value &= ~(input_port_read(machine, "JOY1") & 0x1f);
+	} 
+	else if ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0400)
+	{
+		if (input_port_read(machine, "PADDLE3") & 0x100)
+			value &= ~8;
+		if (input_port_read(machine, "PADDLE2") & 0x100)
+			value &= ~4;
+	} 
+	else if (( input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0800 )
+	{
+			if (input_port_read(machine, "TRACKIPT") & 0x02)
+				value &= ~0x10;
+			if (input_port_read(machine, "TRACKIPT") & 0x01)
+				value &= ~1;
 	}
-	c64_keyline[9] = value2;
+	c64_keyline[9] = value;
 
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW8" );
-	c128_keyline[0] = value;
+	/* C128 only : keypad input ports */
+	if (is_c128(machine)) 
+	{
+		for (i=0; i<3; i++)
+		{
+			value = 0xff;
+			sprintf(port2, "KP%d", i);
+			value &= ~input_port_read(machine, port2);
+			c128_keyline[i] = value;
+		}
+	}
 
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW9" );
-	c128_keyline[1] = value;
-
-	value = 0xff;
-	
-	value &= ~input_port_read(machine,  "ROW10" );
-	c128_keyline[2] = value;
-
-/* 2008 FP: still unsure which frame_interrupt must be used for c65, since it's not_working */
-/*	if (is_c65(machine)) {
+	/* C65 only : function keys input ports */
+	if (is_c65(machine)) 
+	{
 		value = 0xff;
 
-		value &= ~input_port_read(machine,  "ROW8" );
+		value &= ~input_port_read(machine, "FUNCT");
 		c65_keyline = value;
-	}*/
+	}
 
 
 	vic2_frame_interrupt (machine, cpunum);
 
-	if (c64_tape_on) {
-		vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
-		vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);
+	if (c64_tape_on) 
+	{
+		vc20_tape_config (input_port_read(machine, "CFG") & 0x4000, input_port_read(machine, "DSW0") & 0x2000);		/* DATASSETTE, DATASSETTE_TONE */
+		vc20_tape_buttons (input_port_read(machine, "CFG") & 0x1000, input_port_read(machine, "DSW0") & 0x0800, input_port_read(machine, "DSW0") & 0x0400);	/* DATASETTE_PLAY, DATASETTE_RECORD, DATASETTE_STOP */
 	}
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , input_port_read(machine,  "Special" ) & 0x40 ? 1 : 0);
-	set_led_status (0 /*KB_NUMLOCK_FLAG */ , JOYSTICK_SWAP ? 1 : 0);
+
+	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
+	set_led_status (0, input_port_read(machine, "DSW0") & 0x0100 ? 1 : 0);		/*KB_NUMLOCK_FLAG */ 
 }

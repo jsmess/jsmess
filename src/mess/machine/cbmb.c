@@ -5,7 +5,6 @@
 ***************************************************************************/
 #include <ctype.h>
 #include "driver.h"
-#include "includes/cbmb.h"
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
@@ -20,6 +19,12 @@
 #include "includes/cbmieeeb.h"
 #include "video/vic6567.h"
 
+#include "includes/cbmb.h"
+
+/* 2008-05 FP: Were these added as a reminder to add configs of 
+drivers 8 & 9 as in pet.c ? */
+#define IEEE8ON 0
+#define IEEE9ON 0
 
 static TIMER_CALLBACK(cbmb_frame_interrupt);
 
@@ -109,13 +114,20 @@ static void cbmb_keyboard_line_select_c(int line)
 
 static int cbmb_keyboard_line_a(void)
 {
-	int data=0;
-	if (!(cbmb_keyline_c&1)) data|=input_port_read_indexed(Machine, 0);
-	if (!(cbmb_keyline_c&2)) data|=input_port_read_indexed(Machine, 2);
-	if (!(cbmb_keyline_c&4)) data|=input_port_read_indexed(Machine, 4);
-	if (!(cbmb_keyline_c&8)) data|=input_port_read_indexed(Machine, 6);
-	if (!(cbmb_keyline_c&0x10)) data|=input_port_read_indexed(Machine, 8);
-	if (!(cbmb_keyline_c&0x20)) data|=input_port_read_indexed(Machine, 10);
+	int data = 0;
+	
+	if (!(cbmb_keyline_c & 1)) 
+		data |= input_port_read(Machine, "ROW0");
+	if (!(cbmb_keyline_c & 2)) 
+		data |= input_port_read(Machine, "ROW2");
+	if (!(cbmb_keyline_c & 4)) 
+		data |= input_port_read(Machine, "ROW4");
+	if (!(cbmb_keyline_c & 8)) 
+		data |= input_port_read(Machine, "ROW6");
+	if (!(cbmb_keyline_c & 0x10)) 
+		data |= input_port_read(Machine, "ROW8");
+	if (!(cbmb_keyline_c & 0x20)) 
+		data |= input_port_read(Machine, "ROW10");
 
 	return data^0xff;
 }
@@ -123,12 +135,19 @@ static int cbmb_keyboard_line_a(void)
 static int cbmb_keyboard_line_b(void)
 {
 	int data=0;
-	if (!(cbmb_keyline_c&1)) data|=input_port_read_indexed(Machine, 1);
-	if (!(cbmb_keyline_c&2)) data|=input_port_read_indexed(Machine, 3);
-	if (!(cbmb_keyline_c&4)) data|=input_port_read_indexed(Machine, 5);
-	if (!(cbmb_keyline_c&8)) data|=input_port_read_indexed(Machine, 7);
-	if (!(cbmb_keyline_c&0x10)) data|=input_port_read_indexed(Machine, 9) | ((input_port_read_indexed(Machine, 12)&0x04) ? 1 : 0 );
-	if (!(cbmb_keyline_c&0x20)) data|=input_port_read_indexed(Machine, 11);
+	
+	if (!(cbmb_keyline_c & 1)) 
+		data |= input_port_read(Machine, "ROW1");
+	if (!(cbmb_keyline_c & 2)) 
+		data |= input_port_read(Machine, "ROW3");
+	if (!(cbmb_keyline_c & 4)) 
+		data |= input_port_read(Machine, "ROW5");
+	if (!(cbmb_keyline_c & 8)) 
+		data |= input_port_read(Machine, "ROW7");
+	if (!(cbmb_keyline_c & 0x10)) 
+		data |= input_port_read(Machine, "ROW9") | ((input_port_read(Machine, "SPECIAL") & 0x04) ? 1 : 0 );
+	if (!(cbmb_keyline_c & 0x20)) 
+		data |= input_port_read(Machine, "ROW11");
 
 	return data^0xff;
 }
@@ -137,22 +156,31 @@ static int cbmb_keyboard_line_c(void)
 {
 	int data=0;
 
-	if ( (input_port_read_indexed(Machine, 0)&~cbmb_keyline_a)||
-		 (input_port_read_indexed(Machine, 1)&~cbmb_keyline_b)) data|=1;
-	if ( (input_port_read_indexed(Machine, 2)&~cbmb_keyline_a)||
-		 (input_port_read_indexed(Machine, 3)&~cbmb_keyline_b)) data|=2;
-	if ( (input_port_read_indexed(Machine, 4)&~cbmb_keyline_a)||
-		 (input_port_read_indexed(Machine, 5)&~cbmb_keyline_b)) data|=4;
-	if ( (input_port_read_indexed(Machine, 6)&~cbmb_keyline_a)||
-		 (input_port_read_indexed(Machine, 7)&~cbmb_keyline_b)) data|=8;
-	if ( (input_port_read_indexed(Machine, 8)&~cbmb_keyline_a)||
-		 ((input_port_read_indexed(Machine, 9)|((input_port_read_indexed(Machine, 12)&0x04)?1:0))&~cbmb_keyline_b)) data|=0x10;
-	if ( (input_port_read_indexed(Machine, 10)&~cbmb_keyline_a)||
-		 (input_port_read_indexed(Machine, 11)&~cbmb_keyline_b)) data|=0x20;
+	if ( (input_port_read(Machine, "ROW0") & ~cbmb_keyline_a)||
+		 (input_port_read(Machine, "ROW1") & ~cbmb_keyline_b)) 
+		 data |= 1;
+	if ( (input_port_read(Machine, "ROW2") & ~cbmb_keyline_a)||
+		 (input_port_read(Machine, "ROW3") & ~cbmb_keyline_b)) 
+		 data |= 2;
+	if ( (input_port_read(Machine, "ROW4") & ~cbmb_keyline_a)||
+		 (input_port_read(Machine, "ROW5") & ~cbmb_keyline_b)) 
+		 data |= 4;
+	if ( (input_port_read(Machine, "ROW6") & ~cbmb_keyline_a)||
+		 (input_port_read(Machine, "ROW7") & ~cbmb_keyline_b)) 
+		 data |= 8;
+	if ( (input_port_read(Machine, "ROW8") & ~cbmb_keyline_a)||
+		 ((input_port_read(Machine, "ROW9")|((input_port_read(Machine, "SPECIAL") & 0x04) ? 1 : 0)) & ~cbmb_keyline_b)) 
+		 data |= 0x10;
+	if ( (input_port_read(Machine, "ROW10") & ~cbmb_keyline_a)||
+		 (input_port_read(Machine, "ROW11") & ~cbmb_keyline_b)) 
+		 data |= 0x20;
 
-	if (!cbm500) {
-		if (!cbm_ntsc) data|=0x40;
-		if (!cbm700) data|=0x80;
+	if (!cbm500) 
+	{
+		if (!cbm_ntsc) 
+			data |= 0x40;
+		if (!cbm700) 
+			data |= 0x80;
 	}
 	return data^0xff;
 }
@@ -320,60 +348,53 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 
 #if 0
 	value = 0xff;
-	if (JOYSTICK1||JOYSTICK1_2BUTTON) {
-		if (JOYSTICK_1_BUTTON)
-			value &= ~0x10;
-		if (JOYSTICK_1_RIGHT)
+	if ( ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x2000) || ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x6000) ) 
+	{
+		value &= ~(input_port_read(machine, "JOY0") & 0x1f);
+	} 
+	else if (input_port_read(machine, "DSW0") & 0xe000 ) == 0x4000)
+	{
+		if (input_port_read(machine, "PADDLE1") & 0x100)
 			value &= ~8;
-		if (JOYSTICK_1_LEFT)
+		if (input_port_read(machine, "PADDLE0") & 0x100)
 			value &= ~4;
-		if (JOYSTICK_1_DOWN)
-			value &= ~2;
-		if (JOYSTICK_1_UP)
-			value &= ~1;
-	} else if (PADDLES12) {
-		if (PADDLE2_BUTTON)
-			value &= ~8;
-		if (PADDLE1_BUTTON)
-			value &= ~4;
-	} else if (MOUSE1) {
-		if (JOYSTICK_1_BUTTON)
-			value &= ~0x10;
-		if (JOYSTICK_1_BUTTON2)
-			value &= ~1;
+	} 
+	else if (( input_port_read(machine, "DSW0") & 0xe000 ) == 0x8000 )
+	{
+			if (input_port_read(machine, "TRACKIPT") & 0x02)
+				value &= ~0x10;
+			if (input_port_read(machine, "TRACKIPT") & 0x01)
+				value &= ~1;
 	}
 	cbmb_keyline[8] = value;
 
-	value2 = 0xff;
-	if (JOYSTICK2||JOYSTICK2_2BUTTON) {
-		if (JOYSTICK_2_BUTTON)
-			value2 &= ~0x10;
-		if (JOYSTICK_2_RIGHT)
-			value2 &= ~8;
-		if (JOYSTICK_2_LEFT)
-			value2 &= ~4;
-		if (JOYSTICK_2_DOWN)
-			value2 &= ~2;
-		if (JOYSTICK_2_UP)
-			value2 &= ~1;
-	} else if (PADDLES34) {
-		if (PADDLE4_BUTTON)
-			value2 &= ~8;
-		if (PADDLE3_BUTTON)
-			value2 &= ~4;
-	} else if (MOUSE2) {
-		if (JOYSTICK_2_BUTTON)
-			value2 &= ~0x10;
-		if (JOYSTICK_2_BUTTON2)
-			value2 &= ~1;
+	value = 0xff;
+	if ( ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0200) || ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0600) ) 
+	{
+		value &= ~(input_port_read(machine, "JOY1") & 0x1f);		// joy2: everything but button2
+	} 
+	else if (input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0400)	// pad3-4
+	{
+		if (input_port_read(machine, "PADDLE3") & 0x100)
+			value &= ~8;
+		if (input_port_read(machine, "PADDLE2") & 0x100)
+			value &= ~4;
+	} 
+	else if (( input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0800 )	//mouse2
+	{
+			if (input_port_read(machine, "TRACKIPT") & 0x02)	//mouse2_button1 = mouse1_button1
+				value &= ~0x10;
+			if (input_port_read(machine, "TRACKIPT") & 0x01)	//mouse2_button2 = mouse1_button2
+				value &= ~1;
 	}
-	cbmb_keyline[9] = value2;
+	}
+	cbmb_keyline[9] = value;
 #endif
 
 	vic2_frame_interrupt (machine, 0);
 
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , (input_port_read_indexed(machine, 12)&0x04) ? 1 : 0);
+	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
 #if 0
-	set_led_status (0 /*KB_NUMLOCK_FLAG */ , JOYSTICK_SWAP ? 1 : 0);
+	set_led_status (0, input_port_read(machine, "DSW0") & 0x100 ? 1 : 0);		/*KB_NUMLOCK_FLAG */
 #endif
 }

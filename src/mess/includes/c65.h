@@ -8,9 +8,6 @@
 #define C65_H_
 
 
-#define C65_KEY_DIN ( input_port_read (machine, "Special") & 0x20 )
-
-
 /*----------- defined in machine/c65.c -----------*/
 
 /*extern UINT8 *c65_memory; */

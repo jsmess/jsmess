@@ -79,6 +79,13 @@
 #define XPOS 8
 #define YPOS 8
 
+/* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
+
+#define LIGHTPEN_BUTTON		(((input_port_read(machine, "DSW0") & 0xe000 ) == 0xa000 ) && (input_port_read(machine, "TRACKIPT") & 0x02))
+#define LIGHTPEN_POINTER	(((input_port_read(machine, "DSW0") & 0xe000 ) == 0xa000 ) && (input_port_read(machine, "DSW0") & 0x1000))
+#define LIGHTPEN_X_VALUE	(input_port_read(machine, "TRACKX") & ~1)
+#define LIGHTPEN_Y_VALUE	(input_port_read(machine, "TRACKY") & ~1)
+
 /* lightpen delivers values from internal counters
  * they do not start with the visual area or frame area */
 #define VIC2_MAME_XPOS 0

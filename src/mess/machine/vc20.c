@@ -20,14 +20,14 @@
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
-
-#include "includes/vc20.h"
-#include "includes/vc1541.h"
 #include "machine/6522via.h"
+#include "includes/vc1541.h"
 #include "includes/vc20tape.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
 #include "video/vic6560.h"
+
+#include "includes/vc20.h"
 
 static UINT8 keyboard[8] =
 {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
@@ -64,7 +64,7 @@ static void vc20_via0_irq (running_machine *machine, int level)
 
 static READ8_HANDLER( vc20_via0_read_ca1 )
 {
-	return ! ( input_port_read(machine,  TAG_KEYBOARD_EXTRA ) & 0x02 );
+	return ! ( input_port_read(machine, "SPECIAL") & 0x02 );
 }
 
 static READ8_HANDLER( vc20_via0_read_ca2 )
@@ -83,18 +83,26 @@ static  READ8_HANDLER( vc20_via0_read_porta )
 {
 	UINT8 value = 0xff;
 
-	if (JOYSTICK) {
-		if (JOYSTICK_BUTTON) value&=~0x20;
-		if (JOYSTICK_LEFT) value&=~0x10;
-		if (JOYSTICK_DOWN) value&=~0x8;
-		if (JOYSTICK_UP) value&=~0x4;
+	if (input_port_read(machine, "CFG") & 0x80)		/* JOYSTICK */
+	{
+		if (input_port_read(machine, "JOY") & 0x10) /* JOY_BUTTON */
+			value&=~0x20;
+		if (input_port_read(machine, "JOY") & 4)	/* JOY_LEFT */
+			value&=~0x10;
+		if (input_port_read(machine, "JOY") & 2)	/* JOY_DOWN */
+			value&=~0x8;
+		if (input_port_read(machine, "JOY") & 1)	/* JOY_UP */
+			value&=~0x4;
 	}
-	if (PADDLES) {
-		if (PADDLE1_BUTTON) value&=~0x10;
+	if (input_port_read(machine, "CFG") & 0x40)		 /* PADDLE */
+	{
+		if (input_port_read(machine, "JOY") & 0x20)  /* PUDDLE1_BUTTON */
+			value&=~0x10;
 	}
 	/* to short to be recognized normally */
 	/* should be reduced to about 1 or 2 microseconds */
-	/*  if(LIGHTPEN_BUTTON) value&=~0x20; */
+	/*  if ((input_port_read(machine, "CFG") & 0x20 ) && (input_port_read(machine, "JOY") & 0x80) )  // i.e. LIGHTPEN_BUTTON
+		value&=~0x20; */
 	if (!serial_clock || !cbm_serial_clock_read ())
 		value &= ~1;
 	if (!serial_data || !cbm_serial_data_read ())
@@ -268,11 +276,16 @@ static  READ8_HANDLER( vc20_via1_read_portb )
 	value &=t;
     }
 
-	if (JOYSTICK) {
-		if (JOYSTICK_RIGHT) value&=~0x80;
+	if (input_port_read(machine, "CFG") & 0x80)		/* JOYSTICK */
+	{
+		if (input_port_read(machine, "JOY") & 8) 	/* JOY_RIGHT */
+			value &= ~0x80;
 	}
-	if (PADDLES) {
-		if (PADDLE2_BUTTON) value&=~0x80;
+	
+	if (input_port_read(machine, "CFG") & 0x40) 	/* PADDLE */
+	{
+		if (input_port_read(machine, "JOY") & 0x40)  /* PUDDLE2_BUTTON */
+			value &= ~0x80;
 	}
 
 	return value;
@@ -713,16 +726,17 @@ DEVICE_IMAGE_LOAD(vc20_rom)
 INTERRUPT_GEN( vc20_frame_interrupt )
 {
 	via_0_ca1_w(machine, 0, vc20_via0_read_ca1 (machine, 0));
-	keyboard[0] = input_port_read(machine,  TAG_KEYBOARD_ROW0 );
-	keyboard[1] = input_port_read(machine,  TAG_KEYBOARD_ROW1 );
-	keyboard[2] = input_port_read(machine,  TAG_KEYBOARD_ROW2 );
-	keyboard[3] = input_port_read(machine,  TAG_KEYBOARD_ROW3 );
-	keyboard[4] = input_port_read(machine,  TAG_KEYBOARD_ROW4 );
-	keyboard[5] = input_port_read(machine,  TAG_KEYBOARD_ROW5 );
-	keyboard[6] = input_port_read(machine,  TAG_KEYBOARD_ROW6 );
-	keyboard[7] = input_port_read(machine,  TAG_KEYBOARD_ROW7 );
+	keyboard[0] = input_port_read(machine, "ROW0");
+	keyboard[1] = input_port_read(machine, "ROW1");
+	keyboard[2] = input_port_read(machine, "ROW2");
+	keyboard[3] = input_port_read(machine, "ROW3");
+	keyboard[4] = input_port_read(machine, "ROW4");
+	keyboard[5] = input_port_read(machine, "ROW5");
+	keyboard[6] = input_port_read(machine, "ROW6");
+	keyboard[7] = input_port_read(machine, "ROW7");
 
-	vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
-	vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , ( input_port_read(machine,  TAG_KEYBOARD_EXTRA ) & 0x01 ) ? 1 : 0);
+	vc20_tape_config (input_port_read(machine, "CFG") & 0x08, input_port_read(machine, "CFG") & 0x04);	/* DATASSETTE, DATASSETTE_TONE */
+	vc20_tape_buttons (input_port_read(machine, "DEVS") & 4, input_port_read(machine, "DEVS") & 2, input_port_read(machine, "DEVS") & 1);	/* DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP */
+	
+	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x01 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
 }

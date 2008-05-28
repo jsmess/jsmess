@@ -45,6 +45,13 @@ const struct CustomSound_interface vic6560_sound_interface =
 
 UINT8 vic6560[16];
 
+/* 2008-05 FP: lightpen code needs to read input port from vc20.c */
+
+#define LIGHTPEN_BUTTON		((input_port_read(machine, "CFG") & 0x20) && (input_port_read(machine, "JOY") & 0x80))
+#define LIGHTPEN_POINTER	((input_port_read(machine, "CFG") & 0x20) && (input_port_read(machine, "CFG") & 0x10))
+#define LIGHTPEN_X_VALUE	(input_port_read(machine, "LIGHTX") & ~1)
+#define LIGHTPEN_Y_VALUE	(input_port_read(machine, "LIGHTY") & ~1)
+
 /* lightpen delivers values from internal counters
  * they do not start with the visual area or frame area */
 #define VIC6560_X_BEGIN 38
@@ -276,10 +283,10 @@ WRITE8_HANDLER ( vic6560_port_w )
 		val = vic6560[offset];
 		break;
 	case 8:						   /* poti 1 */
-		val = PADDLE1_VALUE;
+		val = input_port_read(machine, "PADDLE0");
 		break;
 	case 9:						   /* poti 2 */
-		val = PADDLE2_VALUE;
+		val = input_port_read(machine, "PADDLE1");
 		break;
 	default:
 		val = vic6560[offset];

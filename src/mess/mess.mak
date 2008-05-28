@@ -596,6 +596,7 @@ $(MESSOBJ)/cbmshare.a: \
 	$(MESS_MACHINE)/vc1541.o	 \
 	$(MESS_MACHINE)/cbmieeeb.o \
 	$(MESS_MACHINE)/cbmserb.o  \
+	$(MESS_MACHINE)/cbmipt.o   \
 	$(MESS_MACHINE)/c64.o      \
 	$(MESS_MACHINE)/c65.o		\
 	$(MESS_VIDEO)/vic6567.o	 \

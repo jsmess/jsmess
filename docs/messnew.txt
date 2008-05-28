@@ -24,6 +24,26 @@ System Driver Changes:
   and we've been unable to test Photon, it is unclear whether this reintroduces
   bug #655.  (bug #1608) [Nate Woods]
 
+- [COMMODORE] Large clean-up of input ports across Commodore machines (Amiga 
+  excluded) [Fabio Priuli]: 
+  * created machine/cbmipt.c to reduce duplicate code across drivers
+    and hidden dependencies; 
+  * converted to tagged inputs; 
+  * added partial natural keyboard support (keys are almost all there, 
+    but there are still a few issues); 
+  * replaced a lot of constants with direct reads to tagged inputs, 
+    cleaning up most of the Commodore files in includes/ ;
+  * simplified interrupt handling for c64 and c16;
+  * fixed pet.c machines which were starting Caps Lock'ed;
+  * propagated ':/;' fixes (from rev. 2542) to all the drivers with the 
+    same error;
+  * removed some dead code for cart handling (never fully implemented 
+    and obsolete after rev. 2421);
+  * removed hacked SID from c16;
+  * fixed key mappings to follow the real keyboard (also added plus4 
+    input ports for this same reason);
+  * documented keyboard layouts.
+
 - [COMX35] System is now working.  [Curt Coder, Marcel van Tongeren]
 
 - [GALAXY] Added real video emulation [Miodrag Milanovic]
