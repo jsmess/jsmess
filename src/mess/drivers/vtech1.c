@@ -417,7 +417,6 @@ static Z80BIN_EXECUTE( vtech1 )
 	/* A Microsoft Basic program needs some manipulation before it can be run.
 	1. A start address of 7ae9 indicates a basic program which needs its pointers fixed up.
 	2. If autorun is turned off, the pointers still need fixing, but then display READY.
-	NOTE: This overrides the exec_addr of 0xffff.
 	Important addresses:
 		7ae9 = start (load) address of a conventional basic program
 		791e = custom routine to fix basic pointers */
