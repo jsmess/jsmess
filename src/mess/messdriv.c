@@ -868,6 +868,10 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( b2m )	
 	DRIVER( b2mrom )		
 
+	/* Radio-86RK */
+	DRIVER( radio86 )	
+	DRIVER( radio4k )		
+
 	/* Bondwell */
 	DRIVER( bw2 )
 

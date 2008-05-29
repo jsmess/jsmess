@@ -408,6 +408,7 @@ DRVLIBS = \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pmd85.a \
 	$(MESSOBJ)/primo.a \
+	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rca.a \
 	$(MESSOBJ)/rockwell.a \
 	$(MESSOBJ)/samcoupe.a \
@@ -1247,6 +1248,12 @@ $(MESSOBJ)/b2m.a:      \
 	$(MESS_DRIVERS)/b2m.o \
 	$(MESS_MACHINE)/b2m.o \
 	$(MESS_VIDEO)/b2m.o \
+
+$(MESSOBJ)/radio.a:      \
+	$(MESS_DRIVERS)/radio86.o \
+	$(MESS_MACHINE)/radio86.o \
+	$(MESS_VIDEO)/radio86.o \
+	$(MESS_VIDEO)/i8275.o \
 
 $(MESSOBJ)/comx.a:				\
 	$(MESS_DRIVERS)/comx35.o	\

@@ -5,7 +5,7 @@ New System Drivers Supported (in no particular order):
 - OSCOM Nano  [Curt Coder, HobbyLabs]
 - Galaksija Plus [Miodrag Milanovic]
 - Grundy NewBrain A/AD/MD (not working) [Curt Coder]
-
+- Radio-86RK [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------
@@ -54,6 +54,8 @@ System Driver Changes:
 - [GAMEBOY] Added .bin extension.  [Fabio Priuli]
 
 - [GENESIS / MD] Fixed cheat issue [ShimaPong, Fabio Priuli]
+
+- [I8275] Implementation of Intel 8275 CRT [Miodrag Milanovic]
 
 - [MSX2] Fixed bug in floppy emulation.  [Yano Hirokuni]
 
