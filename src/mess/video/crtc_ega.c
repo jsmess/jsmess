@@ -97,7 +97,7 @@ struct _crtc_ega_t
 	int		has_valid_parameters;
 };
 
-static DEVICE_GET_INFO( crtc_vga );
+//static DEVICE_GET_INFO( crtc_vga );
 
 static STATE_POSTLOAD( crtc_ega_state_save_postload );
 static void recompute_parameters(crtc_ega_t *crtc_ega, int postload);
