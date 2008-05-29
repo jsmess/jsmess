@@ -1546,7 +1546,7 @@ static INTERRUPT_GEN( ip22_vbl )
 	}
 }
 
-static const struct mips3_config config =
+static const mips3_config config =
 {
 	32768,	/* code cache size */
 	32768	/* data cache size */

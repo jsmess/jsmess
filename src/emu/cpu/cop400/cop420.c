@@ -13,8 +13,9 @@
 
     TODO:
 
+    - run interrupt test suite
+    - run production test suite
     - remove LBIops
-    - INIL
 
 */
 
@@ -52,7 +53,8 @@ typedef struct
 	UINT8	G_mask;
 	UINT8	D_mask;
 	UINT4	IL;
-	int		last_si;
+	UINT4	in[4];
+	UINT8	si;
 	int		last_skip;
 } COP420_Regs;
 
@@ -65,6 +67,7 @@ static int LBIops33[256];
 
 static emu_timer *cop420_serial_timer;
 static emu_timer *cop420_counter_timer;
+static emu_timer *cop420_inil_timer;
 
 #include "420ops.c"
 
@@ -118,12 +121,12 @@ static void cop420_op23(UINT8 opcode)
 
 static const s_opcode opcode_33_map[256]=
 {
-	{1, inil 		},{1, skgbz0 	},{1, illegal 	},{1, skgbz2 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal		},{1, skgbz0 	},{1, illegal 	},{1, skgbz2 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, skgbz1 	},{1, illegal 	},{1, skgbz3 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, skgz	 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, inin 		},{1, illegal 	},{1, ing	 	},{1, illegal 	},{1, cqma	 	},{1, illegal 	},{1, inl	 	},{1, illegal 	},
+	{1, inin 		},{1, inil 		},{1, ing	 	},{1, illegal 	},{1, cqma	 	},{1, illegal 	},{1, inl	 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, omg	 	},{1, illegal 	},{1, camq	 	},{1, illegal 	},{1, obd	 	},{1, illegal 	},
 
@@ -136,14 +139,14 @@ static const s_opcode opcode_33_map[256]=
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 
-	{1, illegal 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
 
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
@@ -168,9 +171,9 @@ static const s_opcode opcode_map[256]=
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 	{1, casc		},{1, skmbz1	},{1, xabr		},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
-	{1, skc			},{1, ske		},{1, sc		},{2, cop420_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds 		},
+	{1, skc			},{1, ske		},{1, sc		},{1, cop420_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds 		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
-	{1, asc			},{1, add		},{1, rc		},{2, cop420_op33  	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, asc			},{1, add		},{1, rc		},{1, cop420_op33  	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 
 	{1, comp		},{1, skt		},{1, rmb2		},{1, rmb3			},{1, nop		},{1, rmb1		},{1, smb2		},{1, smb1		},
@@ -232,6 +235,24 @@ static TIMER_CALLBACK(cop420_counter_tick)
 	}
 }
 
+/* IN Latches */
+
+static TIMER_CALLBACK(cop420_inil_tick)
+{
+	UINT8 in = IN_IN();
+	int i;
+
+	for (i = 0; i < 4; i++)
+	{
+		R.in[i] = (R.in[i] << 1) | BIT(in, i);
+
+		if ((R.in[i] & 0x07) == 0x04) // 100
+		{
+			IL |= (1 << i);
+		}
+	}
+}
+
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
@@ -247,7 +268,10 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	timer_adjust_periodic(cop420_serial_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
 
 	cop420_counter_timer = timer_alloc(cop420_counter_tick, NULL);
-	timer_adjust_periodic(cop420_counter_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock / 1024));
+	timer_adjust_periodic(cop420_counter_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
+
+	cop420_inil_timer = timer_alloc(cop420_inil_tick, NULL);
+	timer_adjust_periodic(cop420_inil_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
 
 	for (i=0; i<256; i++) InstLen[i]=1;
 
@@ -262,10 +286,7 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	for (i=0x38; i<0x40; i++) LBIops[i] = 1;
 
 	for (i=0; i<256; i++) LBIops33[i] = 0;
-	for (i=0x81; i<0x89; i++) LBIops33[i] = 1;
-	for (i=0x91; i<0x99; i++) LBIops33[i] = 1;
-	for (i=0xa1; i<0xa9; i++) LBIops33[i] = 1;
-	for (i=0xb1; i<0xb9; i++) LBIops33[i] = 1;
+	for (i=0x80; i<0xc0; i++) LBIops33[i] = 1;
 
 	state_save_register_item("cop420", index, PC);
 	state_save_register_item("cop420", index, R.PREVPC);
@@ -286,8 +307,9 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("cop420", index, R.counter);
 	state_save_register_item("cop420", index, R.G_mask);
 	state_save_register_item("cop420", index, R.D_mask);
-	state_save_register_item("cop420", index, R.last_si);
+	state_save_register_item("cop420", index, R.si);
 	state_save_register_item("cop420", index, R.last_skip);
+	state_save_register_item_array("cop420", index, R.in);
 }
 
 static void cop422_init(int index, int clock, const void *config, int (*irqcallback)(int))
@@ -373,32 +395,27 @@ static int cop420_execute(int cycles)
 
 			// check for interrupt
 
-			if (BIT(EN, 1))
+			if (BIT(EN, 1) && BIT(IL, 1))
 			{
-				UINT8 in = IN_IN();
+				void *function = opcode_map[ROM(PC)].function;
 
-				if (BIT(IL, 1) && !BIT(in, 1))
+				if ((function != jp) &&	(function != jmp) && (function != jsr))
 				{
-					void *function = opcode_map[ROM(PC)].function;
+					// store skip logic
+					R.last_skip = skip;
+					skip = 0;
 
-					if ((function != jp) &&	(function != jmp) && (function != jsr))
-					{
-						// store skip logic
-						R.last_skip = skip;
-						skip = 0;
+					// push next PC
+					PUSH(PC + 1);
 
-						// push next PC
-						PUSH(PC + 1);
+					// jump to interrupt service routine
+					PC = 0x0ff;
 
-						// jump to interrupt service routine
-						PC = 0x0ff;
-
-						// disable interrupt
-						EN &= ~0x02;
-					}
+					// disable interrupt
+					EN &= ~0x02;
 				}
 
-				IL = in;
+				IL &= ~2;
 			}
 
 			// skip next instruction?

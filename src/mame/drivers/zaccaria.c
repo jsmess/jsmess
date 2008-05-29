@@ -685,8 +685,9 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(TMS5220, XTAL_640kHz)
-/* not right, frequency measured is 560khz. There is no resonator, the clock is obtained from discrete components. We wait for schematics */
+	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */
+	/* 162kHz measured on pin 3 20 minutesa fter power on. Clock would then be 162*4=648kHz. */
+	MDRV_SOUND_ADD(TMS5200, 640000)
 	MDRV_SOUND_CONFIG(tms5220_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END

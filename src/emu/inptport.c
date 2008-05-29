@@ -101,6 +101,7 @@
 #include "deprecat.h"
 #include <ctype.h>
 #include <time.h>
+#include <stdarg.h>
 
 #ifdef MESS
 #include "inputx.h"
@@ -208,7 +209,6 @@ struct _input_field_state
 	input_port_value			value;				/* current value of this port */
 	UINT8						impulse;			/* counter for impulse controls */
 	UINT8						last;				/* were we pressed last time? */
-	UINT8						toggle;				/* current toggle state */
 	UINT8						joydir;				/* digital joystick direction index */
 	char *						name;				/* overridden name */
 };
@@ -482,15 +482,16 @@ static void frame_update_analog_field(analog_field_state *analog);
 static int frame_get_digital_field_state(const input_field_config *field);
 
 /* port configuration helpers */
-static input_port_config *port_config_detokenize(input_port_config *listhead, const input_port_token *ipt);
+static input_port_config *port_config_detokenize(input_port_config *listhead, const input_port_token *ipt, char *errorbuf, int errorbuflen);
 static input_port_config *port_config_alloc(const input_port_config **listhead);
 static void port_config_free(const input_port_config **portptr);
 static input_port_config *port_config_find(const input_port_config *listhead, const char *tag);
 static input_field_config *field_config_alloc(input_port_config *port, int type, input_port_value defvalue, input_port_value maskbits);
+static void field_config_insert(input_field_config *field, input_port_value *disallowedbits, char *errorbuf, int errorbuflen);
 static void field_config_free(input_field_config **fieldptr);
 static input_setting_config *setting_config_alloc(input_field_config *field, input_port_value value, const char *name);
 static void setting_config_free(input_setting_config **settingptr);
-static const input_field_diplocation *diplocation_list_alloc(const input_field_config *field, const char *location);
+static const input_field_diplocation *diplocation_list_alloc(const input_field_config *field, const char *location, char *errorbuf, int errorbuflen);
 static void diplocation_free(input_field_diplocation **diplocptr);
 
 /* tokenization helpers */
@@ -597,6 +598,60 @@ INLINE int get_port_index(const input_port_config *portlist, const char *tag)
 }
 
 
+/*-------------------------------------------------
+    get_port_tag - return a guaranteed tag for
+    a port
+-------------------------------------------------*/
+
+INLINE const char *get_port_tag(const input_port_config *port, char *tempbuffer)
+{
+	const input_port_config *curport;
+	int index = 0;
+
+	if (port->tag != NULL)
+		return port->tag;
+	for (curport = port->machine->portconfig; curport != NULL; curport = curport->next)
+	{
+		if (curport == port)
+			break;
+		index++;
+	}
+	sprintf(tempbuffer, "(PORT#%d)", index);
+	return tempbuffer;
+}
+
+
+/*-------------------------------------------------
+    error_buf_append - append text to an error
+    buffer
+-------------------------------------------------*/
+
+INLINE void *error_buf_append(char *errorbuf, int errorbuflen, const char *format, ...)
+{
+	int curlen = (errorbuf != NULL) ? strlen(errorbuf) : 0;
+	int bytesleft = errorbuflen - curlen;
+	va_list va;
+
+	va_start(va, format);
+	if (strlen(format) + 25 < bytesleft)
+		vsprintf(&errorbuf[curlen], format, va);
+	va_end(va);
+
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    condition_equal - TRUE if two conditions are
+    equivalent
+-------------------------------------------------*/
+
+INLINE int condition_equal(const input_condition *cond1, const input_condition *cond2)
+{
+	return (cond1->mask == cond2->mask && cond1->value == cond2->value && cond1->condition == cond2->condition && strcmp(cond1->tag, cond2->tag) == 0);
+}
+
+
 
 /***************************************************************************
     CORE SYSTEM MANAGEMENT
@@ -610,6 +665,7 @@ INLINE int get_port_index(const input_port_config *portlist, const char *tag)
 time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 {
 	input_port_private *portdata;
+	char errorbuf[1024];
 	time_t basetime;
 
 	/* allocate memory for our data structure */
@@ -627,7 +683,11 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 	/* if we have a token list, proceed */
 	if (tokens != NULL)
 	{
-		machine->portconfig = input_port_config_alloc(tokens);
+		machine->portconfig = input_port_config_alloc(tokens, errorbuf, sizeof(errorbuf));
+		if (errorbuf[0] != 0)
+			mame_printf_error("Input port errors:\n%s", errorbuf);
+		if (machine->portconfig == NULL)
+			fatalerror("Unable to construct input ports!");
 		init_port_state(machine);
 	}
 
@@ -669,14 +729,16 @@ static void input_port_exit(running_machine *machine)
     input ports from the given token list
 -------------------------------------------------*/
 
-const input_port_config *input_port_config_alloc(const input_port_token *tokens)
+const input_port_config *input_port_config_alloc(const input_port_token *tokens, char *errorbuf, int errorbuflen)
 {
-	return port_config_detokenize(NULL, tokens);
+	if (errorbuf != NULL)
+		*errorbuf = 0;
+	return port_config_detokenize(NULL, tokens, errorbuf, errorbuflen);
 }
 
 
 /*-------------------------------------------------
-    input_port_config_alloc - free memory
+    input_port_config_free - free memory
     allocated from input_port_alloc
 -------------------------------------------------*/
 
@@ -838,6 +900,86 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 		field->state->analog->centerdelta = settings->centerdelta;
 		field->state->analog->reverse = settings->reverse;
 	}
+}
+
+
+/*-------------------------------------------------
+    input_field_select_previous_setting - select
+    the previous item for a DIP switch or
+    configuration field
+-------------------------------------------------*/
+
+void input_field_select_previous_setting(const input_field_config *field)
+{
+	const input_setting_config *setting, *prevsetting;
+	int found_match = FALSE;
+
+	/* only makes sense if we have settings */
+	assert(field->settinglist != NULL);
+
+	/* scan the list of settings looking for a match on the current value */
+	prevsetting = NULL;
+	for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		if (input_condition_true(field->port->machine, &setting->condition))
+		{
+			if (setting->value == field->state->value)
+			{
+				found_match = TRUE;
+				if (prevsetting != NULL)
+					break;
+			}
+			prevsetting = setting;
+		}
+
+	/* if we didn't find a matching value, select the first */
+	if (!found_match)
+	{
+		for (prevsetting = field->settinglist; prevsetting != NULL; prevsetting = prevsetting->next)
+			if (input_condition_true(field->port->machine, &prevsetting->condition))
+				break;
+	}
+
+	/* update the value to the previous one */
+	if (prevsetting != NULL)
+		field->state->value = prevsetting->value;
+}
+
+
+/*-------------------------------------------------
+    input_field_select_next_setting - select the
+    next item for a DIP switch or
+    configuration field
+-------------------------------------------------*/
+
+void input_field_select_next_setting(const input_field_config *field)
+{
+	const input_setting_config *setting, *nextsetting;
+
+	/* only makes sense if we have settings */
+	assert(field->settinglist != NULL);
+
+	/* scan the list of settings looking for a match on the current value */
+	nextsetting = NULL;
+	for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		if (input_condition_true(field->port->machine, &setting->condition))
+			if (setting->value == field->state->value)
+				break;
+
+	/* if we found one, scan forward for the next valid one */
+	if (setting != NULL)
+		for (nextsetting = setting->next; nextsetting != NULL; nextsetting = nextsetting->next)
+			if (input_condition_true(field->port->machine, &nextsetting->condition))
+				break;
+
+	/* if we hit the end, search from the beginning */
+	if (nextsetting == NULL)
+		for (nextsetting = field->settinglist; nextsetting != NULL; nextsetting = nextsetting->next)
+			if (input_condition_true(field->port->machine, &nextsetting->condition))
+				break;
+
+	/* update the value to the previous one */
+	if (nextsetting != NULL)
+		field->state->value = nextsetting->value;
 }
 
 
@@ -1077,7 +1219,6 @@ input_port_value input_port_read_direct(const input_port_config *port)
 			input_port_value newbits = (*custom->field->custom)(custom->field, custom->field->custom_param);
 			result = (result & ~custom->field->mask) | ((newbits << custom->shift) & custom->field->mask);
 		}
-
 
 	/* update VBLANK bits */
 	if (port->state->vblank != 0)
@@ -2162,20 +2303,6 @@ static int frame_get_digital_field_state(const input_field_config *field)
 		return FALSE;
 #endif /* MESS */
 
-	/* skip locked-out coin inputs */
-	if (field->type >= IPT_COIN1 && field->type <= IPT_COIN8 && coinlockedout[field->type - IPT_COIN1])
-	{
-		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
-		return FALSE;
-	}
-
-	/* skip locked-out service inputs */
-	if (field->type >= IPT_SERVICE1 && field->type <= IPT_SERVICE4 && servicecoinlockedout[field->type - IPT_SERVICE1])
-	{
-		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
-		return FALSE;
-	}
-
 	/* if this is a switch-down event, handle impulse and toggle */
 	if (changed && curstate)
 	{
@@ -2183,21 +2310,32 @@ static int frame_get_digital_field_state(const input_field_config *field)
 		if (field->impulse != 0 && field->state->impulse == 0)
 			field->state->impulse = field->impulse;
 
-		/* toggle controls: flip the toggle state */
+		/* toggle controls: flip the toggle state or advance to the next setting */
 		if (field->flags & FIELD_FLAG_TOGGLE)
-			field->state->toggle = !field->state->toggle;
+		{
+			if (field->settinglist == NULL)
+				field->state->value ^= field->mask;
+			else
+				input_field_select_next_setting(field);
+		}
 	}
 
 	/* update the current state with the impulse state */
-	if (field->impulse != 0 && field->state->impulse != 0)
+	if (field->impulse != 0)
 	{
-		field->state->impulse--;
-		curstate = TRUE;
+		if (field->state->impulse != 0)
+		{
+			field->state->impulse--;
+			curstate = TRUE;
+		}
+		else
+			curstate = FALSE;
 	}
 
-	/* update the current state with the toggle state */
+	/* for toggle switches, the current value is folded into the port's default value */
+	/* so we always return FALSE here */
 	if (field->flags & FIELD_FLAG_TOGGLE)
-		curstate = field->state->toggle;
+		curstate = FALSE;
 
 	/* additional logic to restrict digital joysticks */
 	if (curstate && field->state->joystick != NULL && field->way != 16)
@@ -2207,6 +2345,12 @@ static int frame_get_digital_field_state(const input_field_config *field)
 			curstate = FALSE;
 	}
 
+	/* skip locked-out coin inputs */
+	if (curstate && field->type >= IPT_COIN1 && field->type <= IPT_COIN8 && coinlockedout[field->type - IPT_COIN1])
+	{
+		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
+		return FALSE;
+	}
 	return curstate;
 }
 
@@ -2221,12 +2365,13 @@ static int frame_get_digital_field_state(const input_field_config *field)
     detokenize a series of input port tokens
 -------------------------------------------------*/
 
-static input_port_config *port_config_detokenize(input_port_config *listhead, const input_port_token *ipt)
+static input_port_config *port_config_detokenize(input_port_config *listhead, const input_port_token *ipt, char *errorbuf, int errorbuflen)
 {
 	UINT32 entrytype = INPUT_TOKEN_INVALID;
 	input_setting_config *cursetting = NULL;
 	input_field_config *curfield = NULL;
 	input_port_config *curport = NULL;
+	input_port_value maskbits = 0;
 
 	/* loop over tokens until we hit the end */
 	while (entrytype != INPUT_TOKEN_END)
@@ -2247,12 +2392,23 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 			/* including */
 			case INPUT_TOKEN_INCLUDE:
-				listhead = port_config_detokenize(listhead, TOKEN_GET_PTR(ipt, tokenptr));
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
+				maskbits = 0;
+
+				listhead = port_config_detokenize(listhead, TOKEN_GET_PTR(ipt, tokenptr), errorbuf, errorbuflen);
+				curport = NULL;
+				curfield = NULL;
+				cursetting = NULL;
 				break;
 
 			/* start of a new input port */
 			case INPUT_TOKEN_START:
 			case INPUT_TOKEN_START_TAG:
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
+				maskbits = 0;
+
 				curport = port_config_alloc((const input_port_config **)&listhead);
 				if (entrytype == INPUT_TOKEN_START_TAG)
 					curport->tag = TOKEN_GET_STRING(ipt);
@@ -2262,28 +2418,40 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 			/* modify an existing port */
 			case INPUT_TOKEN_MODIFY:
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
+				maskbits = 0;
+
 				curport = port_config_find(listhead, TOKEN_GET_STRING(ipt));
+				curfield = NULL;
+				cursetting = NULL;
 				break;
 
 			/* input field definition */
 			case INPUT_TOKEN_FIELD:
-				if (curport == NULL)
-					fatalerror("INPUT_TOKEN_FIELD encountered with no active port");
-
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, type, 24);
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 
+				if (curport == NULL)
+					return error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_FIELD encountered with no active port (mask=%X defval=%X)\n", mask, defval);
+
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, type, defval, mask);
 				cursetting = NULL;
 				break;
 
 			/* field or setting condition */
 			case INPUT_TOKEN_CONDITION:
-				if (curfield == NULL && cursetting == NULL)
-					fatalerror("INPUT_TOKEN_CONDITION encountered with no active field or setting");
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL && cursetting == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CONDITION encountered with no active field or setting\n");
+					TOKEN_SKIP_UINT32(ipt);
+					TOKEN_SKIP_UINT64(ipt);
+					break;
+				}
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, condition.condition, 24);
 				TOKEN_GET_UINT64_UNPACK2(ipt, condition.mask, 32, condition.value, 32);
 				condition.tag = TOKEN_GET_STRING(ipt);
@@ -2304,74 +2472,108 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 			case INPUT_TOKEN_PLAYER7:
 			case INPUT_TOKEN_PLAYER8:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_PLAYERn encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_PLAYERn encountered with no active field\n");
+					break;
+				}
 				curfield->player = entrytype - INPUT_TOKEN_PLAYER1;
 				break;
 
 			/* field category */
 			case INPUT_TOKEN_CATEGORY:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CATEGORY encountered with no active field");
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CATEGORY encountered with no active field\n");
+					TOKEN_SKIP_UINT32(ipt);
+					break;
+				}
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, curfield->category, 24);
 				break;
 
 			/* field flags */
 			case INPUT_TOKEN_UNUSED:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_UNUSED encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_UNUSED encountered with no active field\n");
+					break;
+				}
 				curfield->flags |= FIELD_FLAG_UNUSED;
 				break;
 
 			case INPUT_TOKEN_COCKTAIL:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_COCKTAIL encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_COCKTAIL encountered with no active field\n");
+					break;
+				}
 				curfield->flags |= FIELD_FLAG_COCKTAIL;
 				curfield->player = 1;
 				break;
 
 			case INPUT_TOKEN_ROTATED:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_ROTATED encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_ROTATED encountered with no active field\n");
+					break;
+				}
 				curfield->flags |= FIELD_FLAG_ROTATED;
 				break;
 
 			case INPUT_TOKEN_TOGGLE:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_TOGGLE encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_TOGGLE encountered with no active field\n");
+					break;
+				}
 				curfield->flags |= FIELD_FLAG_TOGGLE;
 				break;
 
 			/* field impulse */
 			case INPUT_TOKEN_IMPULSE:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_IMPULSE encountered with no active field");
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_IMPULSE encountered with no active field\n");
+					TOKEN_SKIP_UINT32(ipt);
+					break;
+				}
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, curfield->impulse, 24);
 				break;
 
 			/* field name */
 			case INPUT_TOKEN_NAME:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_NAME encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_NAME encountered with no active field\n");
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
 				curfield->name = input_port_string_from_token(*ipt++);
 				break;
 
 			/* field code sequence */
 			case INPUT_TOKEN_CODE:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CODE encountered with no active field");
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CODE encountered with no active field\n");
+					TOKEN_SKIP_UINT64(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
-
 				input_seq_append_or(&curfield->seq[SEQ_TYPE_STANDARD], val);
 				break;
 
 			/* field custom callback */
 			case INPUT_TOKEN_CUSTOM:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CUSTOM encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CUSTOM encountered with no active field\n");
+					TOKEN_SKIP_PTR(ipt);
+					TOKEN_SKIP_PTR(ipt);
+					break;
+				}
 				curfield->custom = TOKEN_GET_PTR(ipt, customptr);
 				curfield->custom_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
 				break;
@@ -2379,7 +2581,12 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 			/* field changed callback */
 			case INPUT_TOKEN_CHANGED:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CHANGED encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CHANGED encountered with no active field\n");
+					TOKEN_SKIP_PTR(ipt);
+					TOKEN_SKIP_PTR(ipt);
+					break;
+				}
 				curfield->changed = TOKEN_GET_PTR(ipt, changedptr);
 				curfield->changed_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
 				break;
@@ -2387,8 +2594,12 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 			/* DIP switch location */
 			case INPUT_TOKEN_DIPLOCATION:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_DIPLOCATION encountered with no active field");
-				curfield->diploclist = diplocation_list_alloc(curfield, TOKEN_GET_STRING(ipt));
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_DIPLOCATION encountered with no active field\n");
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
+				curfield->diploclist = diplocation_list_alloc(curfield, TOKEN_GET_STRING(ipt), errorbuf, errorbuflen);
 				break;
 
 			/* joystick flags */
@@ -2397,18 +2608,23 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 			case INPUT_TOKEN_8WAY:
 			case INPUT_TOKEN_16WAY:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_nWAY encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_nWAY encountered with no active field\n");
+					break;
+				}
 				curfield->way = 2 << (entrytype - INPUT_TOKEN_2WAY);
 				break;
 
 			/* (MESS) natural keyboard support */
 			case INPUT_TOKEN_CHAR:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CHAR encountered with no active field");
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CHAR encountered with no active field\n");
+					TOKEN_SKIP_UINT64(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
-
 				for (index = 0; index < ARRAY_LENGTH(curfield->chars); index++)
 					if (curfield->chars[index] == 0)
 					{
@@ -2420,69 +2636,97 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 			/* analog minimum/maximum */
 			case INPUT_TOKEN_MINMAX:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_MINMAX encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_MINMAX encountered with no active field\n");
+					TOKEN_SKIP_UINT64(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, curfield->min, 32, curfield->max, 32);
 				break;
 
 			/* analog sensitivity */
 			case INPUT_TOKEN_SENSITIVITY:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_SENSITIVITY encountered with no active field");
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_SENSITIVITY encountered with no active field\n");
+					TOKEN_SKIP_UINT32(ipt);
+					break;
+				}
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, curfield->sensitivity, 24);
 				break;
 
 			/* analog keyboard delta */
 			case INPUT_TOKEN_KEYDELTA:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_KEYDELTA encountered with no active field");
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_KEYDELTA encountered with no active field\n");
+					TOKEN_SKIP_UINT32(ipt);
+					break;
+				}
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, curfield->delta, -24);
 				curfield->centerdelta = curfield->delta;
 				break;
 
 			/* analog autocenter delta */
 			case INPUT_TOKEN_CENTERDELTA:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CENTERDELTA encountered with no active field");
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CENTERDELTA encountered with no active field\n");
+					TOKEN_SKIP_UINT32(ipt);
+					break;
+				}
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, curfield->centerdelta, -24);
 				break;
 
 			/* analog reverse flags */
 			case INPUT_TOKEN_REVERSE:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_REVERSE encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_REVERSE encountered with no active field\n");
+					break;
+				}
 				curfield->flags |= ANALOG_FLAG_REVERSE;
 				break;
 
 			case INPUT_TOKEN_RESET:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_RESET encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_RESET encountered with no active field\n");
+					break;
+				}
 				curfield->flags |= ANALOG_FLAG_RESET;
 				break;
 
 			case INPUT_TOKEN_WRAPS:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_WRAPS encountered with no active field");
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_WRAPS encountered with no active field\n");
 				curfield->flags |= ANALOG_FLAG_WRAPS;
 				break;
 
 			case INPUT_TOKEN_INVERT:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_INVERT encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_INVERT encountered with no active field\n");
+					break;
+				}
 				curfield->flags |= ANALOG_FLAG_INVERT;
 				break;
 
 			/* analog crosshair parameters */
 			case INPUT_TOKEN_CROSSHAIR:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CROSSHAIR encountered with no active field");
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CROSSHAIR encountered with no active field\n");
+					TOKEN_SKIP_UINT32(ipt);
+					TOKEN_SKIP_UINT64(ipt);
+					break;
+				}
 				TOKEN_GET_UINT32_UNPACK3(ipt, entrytype, 8, curfield->crossaxis, 4, curfield->crossaltaxis, -20);
 				TOKEN_GET_UINT64_UNPACK2(ipt, curfield->crossscale, -32, curfield->crossoffset, -32);
-
 				curfield->crossaltaxis *= 1.0f / 65536.0f;
 				curfield->crossscale *= 1.0f / 65536.0f;
 				curfield->crossoffset *= 1.0f / 65536.0f;
@@ -2490,83 +2734,113 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 			/* analog decrement sequence */
 			case INPUT_TOKEN_CODE_DEC:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CODE_DEC encountered with no active field");
-				index = entrytype - INPUT_TOKEN_CODE;
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CODE_DEC encountered with no active field\n");
+					TOKEN_SKIP_UINT64(ipt);
+					break;
+				}
+				index = entrytype - INPUT_TOKEN_CODE;
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
-
 				input_seq_append_or(&curfield->seq[SEQ_TYPE_DECREMENT], val);
 				break;
 
 			/* analog increment sequence */
 			case INPUT_TOKEN_CODE_INC:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CODE_INC encountered with no active field");
-				index = entrytype - INPUT_TOKEN_CODE;
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					TOKEN_SKIP_UINT64(ipt);
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CODE_INC encountered with no active field\n");
+					break;
+				}
+				index = entrytype - INPUT_TOKEN_CODE;
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
-
 				input_seq_append_or(&curfield->seq[SEQ_TYPE_INCREMENT], val);
 				break;
 
-			/* analog wraps flag */
-
+			/* analog full turn count */
 			case INPUT_TOKEN_FULL_TURN_COUNT:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_FULL_TURN_COUNT encountered with no active field");
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_FULL_TURN_COUNT encountered with no active field\n");
+					TOKEN_SKIP_UINT32(ipt);
+					break;
+				}
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, curfield->full_turn_count, 24);
 				break;
 
 			case INPUT_TOKEN_POSITIONS:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_POSITIONS encountered with no active field");
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_POSITIONS encountered with no active field\n");
+					TOKEN_SKIP_UINT32(ipt);
+					break;
+				}
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, curfield->max, 24);
 				break;
 
 			case INPUT_TOKEN_REMAP_TABLE:
 				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_REMAP_TABLE encountered with no active field");
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_REMAP_TABLE encountered with no active field\n");
+					TOKEN_SKIP_PTR(ipt);
+					break;
+				}
 				curfield->remap_table = TOKEN_GET_PTR(ipt, ui32ptr);
 				break;
 
 			/* DIP switch definition */
 			case INPUT_TOKEN_DIPNAME:
 				if (curport == NULL)
-					fatalerror("INPUT_TOKEN_DIPNAME encountered with no active port");
-
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_DIPNAME encountered with no active port\n");
+					TOKEN_SKIP_UINT64(ipt);
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
-
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_DIPSWITCH, defval, mask);
 				cursetting = NULL;
-
 				curfield->name = input_port_string_from_token(*ipt++);
 				break;
 
 			/* DIP switch setting */
 			case INPUT_TOKEN_DIPSETTING:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_DIPSETTING encountered with no active field");
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_DIPSETTING encountered with no active field\n");
+					TOKEN_SKIP_UINT64(ipt);
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-
 				cursetting = setting_config_alloc(curfield, defval & curfield->mask, input_port_string_from_token(*ipt++));
 				break;
 
 			/* special DIP switch with on/off values */
 			case INPUT_TOKEN_SPECIAL_ONOFF:
-				if (curport == NULL)
-					fatalerror("INPUT_TOKEN_SPECIAL_ONOFF encountered with no active port");
-
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT32_UNPACK3(ipt, entrytype, 8, hasdiploc, 1, temptoken.i, 23);
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 
+				if (curport == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_SPECIAL_ONOFF encountered with no active port\n");
+					TOKEN_SKIP_UINT32(ipt);
+					TOKEN_SKIP_UINT64(ipt);
+					if (hasdiploc)
+						TOKEN_SKIP_STRING(ipt);
+					break;
+				}
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_DIPSWITCH, defval, mask);
 				cursetting = NULL;
 
@@ -2577,7 +2851,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					curfield->seq[SEQ_TYPE_STANDARD].code[0] = KEYCODE_F2;
 				}
 				if (hasdiploc)
-					curfield->diploclist = diplocation_list_alloc(curfield, TOKEN_GET_STRING(ipt));
+					curfield->diploclist = diplocation_list_alloc(curfield, TOKEN_GET_STRING(ipt), errorbuf, errorbuflen);
 
 				temptoken.i = INPUT_STRING_Off;
 				cursetting = setting_config_alloc(curfield, defval & mask, input_port_string_from_token(temptoken));
@@ -2589,70 +2863,92 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 			/* configuration definition */
 			case INPUT_TOKEN_CONFNAME:
 				if (curport == NULL)
-					fatalerror("INPUT_TOKEN_CONFNAME encountered with no active port");
-
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CONFNAME encountered with no active port\n");
+					TOKEN_SKIP_UINT64(ipt);
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
-
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_CONFIG, defval, mask);
 				cursetting = NULL;
-
 				curfield->name = input_port_string_from_token(*ipt++);
 				break;
 
 			/* configuration setting */
 			case INPUT_TOKEN_CONFSETTING:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CONFSETTING encountered with no active field");
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CONFSETTING encountered with no active field\n");
+					TOKEN_SKIP_UINT64(ipt);
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-
 				cursetting = setting_config_alloc(curfield, defval & curfield->mask, input_port_string_from_token(*ipt++));
 				break;
 
 			/* configuration definition */
 			case INPUT_TOKEN_CATEGORY_NAME:
 				if (curport == NULL)
-					fatalerror("INPUT_TOKEN_CATEGORY_NAME encountered with no active port");
-
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CATEGORY_NAME encountered with no active port\n");
+					TOKEN_SKIP_UINT64(ipt);
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
-
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_CATEGORY, defval, mask);
 				cursetting = NULL;
-
 				curfield->name = input_port_string_from_token(*ipt++);
 				break;
 
 			/* configuration setting */
 			case INPUT_TOKEN_CATEGORY_SETTING:
-				if (curfield == NULL)
-					fatalerror("INPUT_TOKEN_CATEGORY_SETTING encountered with no active field");
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CATEGORY_SETTING encountered with no active field\n");
+					TOKEN_SKIP_UINT64(ipt);
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-
 				cursetting = setting_config_alloc(curfield, defval & curfield->mask, input_port_string_from_token(*ipt++));
 				break;
 
 			/* analog adjuster definition */
 			case INPUT_TOKEN_ADJUSTER:
-				if (curport == NULL)
-					fatalerror("INPUT_TOKEN_ADJUSTER encountered with no active port");
-
 				TOKEN_UNGET_UINT32(ipt);
+				if (curport == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_ADJUSTER encountered with no active port\n");
+					TOKEN_SKIP_UINT64(ipt);
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_ADJUSTER, defval, 0xff);
 				cursetting = NULL;
-
 				curfield->name = TOKEN_GET_STRING(ipt);
 				break;
 
 			default:
-				fatalerror("Invalid token %d in input ports\n", entrytype);
+				error_buf_append(errorbuf, errorbuflen, "Invalid token %d in input ports\n", entrytype);
 				break;
 		}
 	}
+
+	/* insert any pending fields */
+	if (curfield != NULL)
+		field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 
 	return listhead;
 }
@@ -2723,45 +3019,13 @@ static input_port_config *port_config_find(const input_port_config *listhead, co
 
 /*-------------------------------------------------
     field_config_alloc - allocate a new input
-    port field config, replacing any intersecting
-    fields already present and inserting at the
-    correct sorted location
+    port field config
 -------------------------------------------------*/
 
 static input_field_config *field_config_alloc(input_port_config *port, int type, input_port_value defvalue, input_port_value maskbits)
 {
-	const input_field_config * const *scanfieldptr;
-	const input_field_config * const *scanfieldnextptr;
 	input_field_config *config;
-	input_port_value lowbit;
 	int seqtype;
-
-	/* first modify/nuke any entries that intersect our maskbits */
-	for (scanfieldptr = &port->fieldlist; *scanfieldptr != NULL; scanfieldptr = scanfieldnextptr)
-	{
-		scanfieldnextptr = &(*scanfieldptr)->next;
-		if (((*scanfieldptr)->mask & maskbits) != 0)
-		{
-			/* reduce the mask of the field we found */
-			config = (input_field_config *)*scanfieldptr;
-			config->mask &= ~maskbits;
-
-			/* if the new entry fully overrides the previous one, we nuke */
-			if (config->mask == 0)
-			{
-				field_config_free((input_field_config **)scanfieldptr);
-				scanfieldnextptr = scanfieldptr;
-			}
-		}
-	}
-
-	/* make a mask of just the low bit */
-	lowbit = (maskbits ^ (maskbits - 1)) & maskbits;
-
-	/* scan forward to find where to insert ourselves */
-	for (scanfieldptr = (const input_field_config * const *)&port->fieldlist; *scanfieldptr != NULL; scanfieldptr = &(*scanfieldptr)->next)
-		if ((*scanfieldptr)->mask > lowbit)
-			break;
 
 	/* allocate memory */
 	config = malloc_or_die(sizeof(*config));
@@ -2776,11 +3040,62 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 	for (seqtype = 0; seqtype < ARRAY_LENGTH(config->seq); seqtype++)
 		input_seq_set_1(&config->seq[seqtype], SEQCODE_DEFAULT);
 
-	/* insert it into the list */
-	config->next = *scanfieldptr;
-	*(input_field_config **)scanfieldptr = config;
-
 	return config;
+}
+
+
+/*-------------------------------------------------
+    field_config_insert - insert an allocated
+    input port field config, replacing any
+    intersecting fields already present and
+    inserting at the correct sorted location
+-------------------------------------------------*/
+
+static void field_config_insert(input_field_config *field, input_port_value *disallowedbits, char *errorbuf, int errorbuflen)
+{
+	const input_field_config * const *scanfieldptr;
+	const input_field_config * const *scanfieldnextptr;
+	input_field_config *config;
+	input_port_value lowbit;
+
+	/* verify against the disallowed bits, but only if we are condition-free */
+	if (field->condition.condition == PORTCOND_ALWAYS)
+	{
+		if ((field->mask & *disallowedbits) != 0)
+			error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_FIELD specifies duplicate port bits (mask=%X)\n", field->mask);
+		*disallowedbits |= field->mask;
+	}
+
+	/* first modify/nuke any entries that intersect our maskbits */
+	for (scanfieldptr = &field->port->fieldlist; *scanfieldptr != NULL; scanfieldptr = scanfieldnextptr)
+	{
+		scanfieldnextptr = &(*scanfieldptr)->next;
+		if (((*scanfieldptr)->mask & field->mask) != 0 && (field->condition.condition == PORTCOND_ALWAYS || condition_equal(&(*scanfieldptr)->condition, &field->condition)))
+		{
+			/* reduce the mask of the field we found */
+			config = (input_field_config *)*scanfieldptr;
+			config->mask &= ~field->mask;
+
+			/* if the new entry fully overrides the previous one, we nuke */
+			if (config->mask == 0)
+			{
+				field_config_free((input_field_config **)scanfieldptr);
+				scanfieldnextptr = scanfieldptr;
+			}
+		}
+	}
+
+	/* make a mask of just the low bit */
+	lowbit = (field->mask ^ (field->mask - 1)) & field->mask;
+
+	/* scan forward to find where to insert ourselves */
+	for (scanfieldptr = (const input_field_config * const *)&field->port->fieldlist; *scanfieldptr != NULL; scanfieldptr = &(*scanfieldptr)->next)
+		if ((*scanfieldptr)->mask > lowbit)
+			break;
+
+	/* insert it into the list */
+	field->next = *scanfieldptr;
+	*(input_field_config **)scanfieldptr = field;
 }
 
 
@@ -2858,7 +3173,7 @@ static void setting_config_free(input_setting_config **settingptr)
     descriptions
 -------------------------------------------------*/
 
-static const input_field_diplocation *diplocation_list_alloc(const input_field_config *field, const char *location)
+static const input_field_diplocation *diplocation_list_alloc(const input_field_config *field, const char *location, char *errorbuf, int errorbuflen)
 {
 	input_field_diplocation *head = NULL;
 	input_field_diplocation **tailptr = &head;
@@ -2910,7 +3225,10 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		{
 			char *namecopy;
 			if (lastname == NULL)
-				fatalerror("Switch location '%s' missing switch name!", location);
+			{
+				error_buf_append(errorbuf, errorbuflen, "Switch location '%s' missing switch name!\n", location);
+				lastname = (char *)"UNK";
+			}
 			(*tailptr)->swname = namecopy = malloc_or_die(strlen(lastname) + 1);
 			strcpy(namecopy, lastname);
 		}
@@ -2925,8 +3243,9 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 
 		/* now scan the switch number */
 		if (sscanf(number, "%d", &val) != 1)
-			fatalerror("Switch location '%s' has invalid format!", location);
-		(*tailptr)->swnum = val;
+			error_buf_append(errorbuf, errorbuflen, "Switch location '%s' has invalid format!\n", location);
+		else
+			(*tailptr)->swnum = val;
 
 		/* advance to the next item */
 		curentry = comma;
@@ -2939,7 +3258,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 	for (bits = 0, temp = field->mask; temp != 0 && bits < 32; bits++)
 		temp &= temp - 1;
 	if (bits != entries)
-		fatalerror("Switch location '%s' does not describe enough bits for mask %X\n", location, field->mask);
+		error_buf_append(errorbuf, errorbuflen, "Switch location '%s' does not describe enough bits for mask %X\n", location, field->mask);
 	return head;
 }
 
@@ -3218,6 +3537,7 @@ static int load_game_config(running_machine *machine, xml_data_node *portnode, i
 	input_port_value mask, defvalue;
 	const input_field_config *field;
 	const input_port_config *port;
+	char tempbuffer[20];
 	const char *tag;
 
 	/* read the mask, index, and defvalue attributes */
@@ -3227,7 +3547,7 @@ static int load_game_config(running_machine *machine, xml_data_node *portnode, i
 
 	/* find the port we want; if no tag, search them all */
 	for (port = machine->portconfig; port != NULL; port = port->next)
-		if (tag == NULL || (port->tag != NULL && strcmp(port->tag, tag) == 0))
+		if (tag == NULL || strcmp(get_port_tag(port, tempbuffer), tag) == 0)
 			for (field = port->fieldlist; field != NULL; field = field->next)
 
 				/* find the matching mask and defvalue */
@@ -3420,8 +3740,10 @@ static void save_game_inputs(running_machine *machine, xml_data_node *parentnode
 					xml_data_node *portnode = xml_add_child(parentnode, "port", NULL);
 					if (portnode != NULL)
 					{
+						char tempbuffer[20];
+
 						/* add the identifying information and attributes */
-						xml_set_attribute(portnode, "tag", port->tag);
+						xml_set_attribute(portnode, "tag", get_port_tag(port, tempbuffer));
 						xml_set_attribute(portnode, "type", input_field_type_to_token(machine, field->type, field->player));
 						xml_set_attribute_int(portnode, "mask", field->mask);
 						xml_set_attribute_int(portnode, "defvalue", field->defvalue & field->mask);

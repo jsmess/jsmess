@@ -936,7 +936,7 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 /* ----- port configurations ----- */
 
 /* allocate a list of input ports from the given token list */
-const input_port_config *input_port_config_alloc(const input_port_token *tokens);
+const input_port_config *input_port_config_alloc(const input_port_token *tokens, char *errorbuf, int errorbuflen);
 
 /* free memory allocated from input_port_alloc */
 void input_port_config_free(const input_port_config *portlist);
@@ -988,6 +988,11 @@ void input_field_get_user_settings(const input_field_config *field, input_field_
 /* modify the current settings for the given input field */
 void input_field_set_user_settings(const input_field_config *field, const input_field_user_settings *settings);
 
+/* select the previous item for a DIP switch or configuration field */
+void input_field_select_previous_setting(const input_field_config *field);
+
+/* select the next item for a DIP switch or configuration field */
+void input_field_select_next_setting(const input_field_config *field);
 
 
 /* ----- user interface sequence reading ----- */

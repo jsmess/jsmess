@@ -22,6 +22,7 @@
 #define MIPS3_MIN_PAGE_SIZE			(1 << MIPS3_MIN_PAGE_SHIFT)
 #define MIPS3_MIN_PAGE_MASK			(MIPS3_MIN_PAGE_SIZE - 1)
 #define MIPS3_MAX_PADDR_SHIFT		32
+#define MIPS3_TLB_ENTRIES			48
 
 /* cycle parameters */
 #define MIPS3_COUNT_READ_CYCLES		250
@@ -159,25 +160,6 @@ typedef enum _mips3_flavor mips3_flavor;
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-/* memory access function table */
-typedef struct _memory_accessors memory_accessors;
-struct _memory_accessors
-{
-	UINT8			(*readbyte)(offs_t);
-	UINT16			(*readhalf)(offs_t);
-	UINT32			(*readword)(offs_t);
-	UINT32			(*readword_masked)(offs_t, UINT32);
-	UINT64			(*readdouble)(offs_t);
-	UINT64			(*readdouble_masked)(offs_t, UINT64);
-	void			(*writebyte)(offs_t, UINT8);
-	void			(*writehalf)(offs_t, UINT16);
-	void			(*writeword)(offs_t, UINT32);
-	void			(*writeword_masked)(offs_t, UINT32, UINT32);
-	void			(*writedouble)(offs_t, UINT64);
-	void			(*writedouble_masked)(offs_t, UINT64, UINT64);
-};
-
-
 /* MIPS3 TLB entry */
 typedef struct _mips3_tlb_entry mips3_tlb_entry;
 struct _mips3_tlb_entry
@@ -186,6 +168,10 @@ struct _mips3_tlb_entry
 	UINT64			entry_hi;
 	UINT64			entry_lo[2];
 };
+
+
+/* forward declaration of implementation-specific state */
+typedef struct _mips3imp_state mips3imp_state;
 
 
 /* MIPS3 state */
@@ -212,7 +198,7 @@ struct _mips3_state
 
 	/* memory accesses */
 	UINT8			bigendian;
-	memory_accessors memory;
+	data_accessors	memory;
 
 	/* cache memory */
 	UINT32 *		icache;
@@ -221,8 +207,11 @@ struct _mips3_state
 	size_t			dcache_size;
 
 	/* MMU */
-	mips3_tlb_entry tlb[48];
+	mips3_tlb_entry tlb[MIPS3_TLB_ENTRIES];
 	UINT32 *		tlb_table;
+
+	/* for use by specific implementations */
+	mips3imp_state *impstate;
 };
 
 
@@ -231,7 +220,7 @@ struct _mips3_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int), void *memory);
+size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int), void *memory);
 void mips3com_reset(mips3_state *mips);
 #ifdef ENABLE_DEBUGGER
 offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
@@ -241,7 +230,7 @@ void mips3com_update_cycle_counting(mips3_state *mips);
 void mips3com_map_tlb_entries(mips3_state *mips);
 void mips3com_unmap_tlb_entries(mips3_state *mips);
 void mips3com_recompute_tlb_table(mips3_state *mips);
-int mips3com_translate_address(mips3_state *mips, int space, offs_t *address);
+int mips3com_translate_address(mips3_state *mips, int space, int intention, offs_t *address);
 void mips3com_tlbr(mips3_state *mips);
 void mips3com_tlbwi(mips3_state *mips);
 void mips3com_tlbwr(mips3_state *mips);

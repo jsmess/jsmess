@@ -52,7 +52,7 @@ static VIDEO_UPDATE( ip204415 )
 	return 0;
 }
 
-static const struct EEPROM_interface eeprom_interface_93C56 =
+static const eeprom_interface eeprom_interface_93C56 =
 {
 	7,					// address bits 7
 	16,					// data bits    16
@@ -67,21 +67,21 @@ static NVRAM_HANDLER(93C56)
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);
+		eeprom_save(file);
 	}
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C56);
+		eeprom_init(&eeprom_interface_93C56);
 		if (file)
 		{
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 		{
 			int length;
 			UINT8 *dat;
 
-			dat = EEPROM_get_data_pointer(&length);
+			dat = eeprom_get_data_pointer(&length);
 			memset(dat, 0, length);
 		}
 	}
@@ -156,7 +156,7 @@ static READ32_HANDLER( hpc_r )
 		break;
 	case 0x01bc:
 //      verboselog( 2, "HPC CPU Serial EEPROM Read\n" );
-		return ( ( EEPROM_read_bit() << 4 ) );
+		return ( ( eeprom_read_bit() << 4 ) );
 		break;
 	case 0x01c4:
 		verboselog( 2, "HPC Local IO Register 0 Mask Read: %08x (%08x)\n", nHPC_LocalIOReg0Mask, mem_mask );
@@ -361,9 +361,9 @@ static WRITE32_HANDLER( hpc_w )
 		{
 			verboselog( 2, "    CPU board LED on\n" );
 		}
-		EEPROM_write_bit( (data & 0x00000008) ? 1 : 0 );
-		EEPROM_set_cs_line( (data & 0x00000002) ? ASSERT_LINE : CLEAR_LINE );
-		EEPROM_set_clock_line( (data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_write_bit( (data & 0x00000008) ? 1 : 0 );
+		eeprom_set_cs_line( (data & 0x00000002) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line( (data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
 		break;
 	case 0x01c4:
 		verboselog( 2, "HPC Local IO Register 0 Mask Write: %08x (%08x)\n", data, mem_mask );
@@ -604,7 +604,7 @@ static void ip20_chdcd_getinfo(const mess_device_class *devclass, UINT32 state, 
 	}
 }
 
-static const struct mips3_config config =
+static const mips3_config config =
 {
 	32768,	/* code cache size */
 	32768	/* data cache size */

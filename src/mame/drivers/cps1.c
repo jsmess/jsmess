@@ -167,6 +167,13 @@ READ16_HANDLER( cps1_dsw_r )
 	return (in << 8) | 0xff;
 }
 
+READ16_HANDLER( cps1_hack_dsw_r )
+{
+	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
+	int in = input_port_read(machine, dswname[offset]);
+	return (in << 8) | in;
+}
+
 READ16_HANDLER( cps1_in1_r )
 {
 	return input_port_read(machine, "IN1");
@@ -174,14 +181,12 @@ READ16_HANDLER( cps1_in1_r )
 
 READ16_HANDLER( cps1_in2_r )
 {
-	int buttons = input_port_read(machine, "IN2");
-	return buttons << 8 | buttons;
+	return input_port_read(machine, "IN2");
 }
 
 READ16_HANDLER( cps1_in3_r )
 {
-	int buttons = input_port_read(machine, "IN3");
-	return buttons << 8 | buttons;
+	return input_port_read(machine, "IN3");
 }
 
 
@@ -347,7 +352,7 @@ static WRITE8_HANDLER( qsound_banksw_w )
 ********************************************************************/
 
 #ifndef MESS
-static const struct EEPROM_interface qsound_eeprom_interface =
+static const eeprom_interface qsound_eeprom_interface =
 {
 	7,		/* address bits */
 	8,		/* data bits */
@@ -356,7 +361,7 @@ static const struct EEPROM_interface qsound_eeprom_interface =
 	"0111"	/* erase command */
 };
 
-static const struct EEPROM_interface pang3_eeprom_interface =
+static const eeprom_interface pang3_eeprom_interface =
 {
 	6,		/* address bits */
 	16,		/* data bits */
@@ -368,33 +373,33 @@ static const struct EEPROM_interface pang3_eeprom_interface =
 static NVRAM_HANDLER( qsound )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&qsound_eeprom_interface);
+		eeprom_init(&qsound_eeprom_interface);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 	}
 }
 
 static NVRAM_HANDLER( pang3 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&pang3_eeprom_interface);
+		eeprom_init(&pang3_eeprom_interface);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 	}
 }
 #endif
 
 READ16_HANDLER( cps1_eeprom_port_r )
 {
-	return EEPROM_read_bit();
+	return eeprom_read_bit();
 }
 
 WRITE16_HANDLER( cps1_eeprom_port_w )
@@ -406,9 +411,9 @@ WRITE16_HANDLER( cps1_eeprom_port_w )
         bit 6 = clock
         bit 7 = cs
         */
-		EEPROM_write_bit(data & 0x01);
-		EEPROM_set_cs_line((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x01);
+		eeprom_set_cs_line((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -754,8 +759,8 @@ static INPUT_PORTS_START( ghouls )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW(C):3" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(C):4" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW(C):3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW(C):4" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW(C):5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -826,8 +831,8 @@ static INPUT_PORTS_START( ghoulsu )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW(C):3" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(C):4" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW(C):3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW(C):4" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW(C):5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2520,8 +2525,8 @@ static INPUT_PORTS_START( knights )
 	PORT_START_TAG("DSWA")
 	CPS1_COINAGE_2( "SW(A)" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW(A):4" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW(A):5" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW(A):6" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW(A):5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW(A):6" )
 	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" )	PORT_DIPLOCATION("SW(A):7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -5200,6 +5205,41 @@ ROM_START( nemoj )
 	ROM_LOAD( "nm_31.13c",  0x20000, 0x20000, CRC(2650a0a8) SHA1(e9e8cc1b27a2cb3e87124061fabcf42982f0611f) )	// == nm_19.12c
 ROM_END
 
+/*
+B-Board 90629B
+
+for gfx can use either mask ROMs (HN62404P-17) in the upper four rows, or
+EPROMS (HN27C4096G-15) in the lower four rows.
+
+euro version has mask ROMs laid out like this:
+sf2-5m.4a  in socket 2
+sf2-7m.6a  in socket 4
+sf2-1m.3a  in socket 1
+sf2-3m.5a  in socket 3
+sf2-6m.4c  in socket 11
+sf2-8m.6c  in socket 13
+sf2-2m.3c  in socket 10
+sf2-4m.5c  in socket 12
+sf2-13m.4d in socket 21
+sf2-15m.6d in socket 23
+sf2-9m.3d  in socket 20
+sf2-11m.5d in socket 22
+
+the Japanese version has EPROMS laid out like this:
+sf2_06.8a
+sf2_08.10a
+sf2_05.7a
+sf2_07.9a
+sf2_15.8c
+sf2_17.10c
+sf2_14.7c
+sf2_16.9c
+sf2_25.8d
+sf2_27.10d
+sf2_24.7d
+sf2_26.9d
+*/
+
 ROM_START( sf2 )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "sf2e.30g",      0x00000, 0x20000, CRC(fe39ee33) SHA1(22558eb15e035b09b80935a32b8425d91cd79669) )	// matches sf2u.30i
@@ -7754,6 +7794,14 @@ static DRIVER_INIT( forgottn )
 	DRIVER_INIT_CALL(cps1);
 }
 
+static DRIVER_INIT( sf2hack )
+{
+	/* some SF2 hacks have some inputs wired to the LSB instead of MSB */
+	memory_install_read16_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x800018, 0x80001f, 0, 0, cps1_hack_dsw_r);
+
+	DRIVER_INIT_CALL(cps1);
+}
+
 static DRIVER_INIT( wof )
 {
 	wof_decode();
@@ -7894,12 +7942,12 @@ GAME( 1992, sf2accp2, sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg
 GAME( 1992, sf2m1,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M1)", GAME_NOT_WORKING )
 GAME( 1992, sf2m2,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M2)", GAME_NOT_WORKING )
 GAME( 1992, sf2m3,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M3)", GAME_NOT_WORKING )
-GAME( 1992, sf2m4,    sf2ce,    cps1_12MHz, sf2j,     cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M4)", 0 )
-GAME( 1992, sf2m5,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M5)", 0 )
-GAME( 1992, sf2m6,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M6)", 0 )
-GAME( 1992, sf2m7,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M7)", 0 )
-GAME( 1992, sf2yyc,   sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (YYC)", 0 )
-GAME( 1992, sf2koryu, sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Kouryu)", 0 )
+GAME( 1992, sf2m4,    sf2ce,    cps1_12MHz, sf2j,     sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M4)", 0 )
+GAME( 1992, sf2m5,    sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M5)", 0 )
+GAME( 1992, sf2m6,    sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M6)", 0 )
+GAME( 1992, sf2m7,    sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M7)", 0 )
+GAME( 1992, sf2yyc,   sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (YYC)", 0 )
+GAME( 1992, sf2koryu, sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (Kouryu)", 0 )
 GAME( 1992, varth,    0,        cps1_12MHz, varth,    cps1,     ROT270, "Capcom", "Varth - Operation Thunderstorm (World 920714)" , 0)		// "ETC"    12MHz not verified but game slows down at 10MHz
 GAME( 1992, varthr1,  varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom", "Varth - Operation Thunderstorm (World 920612)" , 0)		// "ETC"
 GAME( 1992, varthu,   varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom (Romstar license)", "Varth - Operation Thunderstorm (US 920612)", 0 )

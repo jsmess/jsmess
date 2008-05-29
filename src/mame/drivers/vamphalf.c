@@ -106,38 +106,38 @@ static WRITE32_HANDLER( ym2151_register32_w )
 static READ16_HANDLER( eeprom_r )
 {
 	if(offset)
-		return EEPROM_read_bit();
+		return eeprom_read_bit();
 	else
 		return 0;
 }
 
 static READ32_HANDLER( eeprom32_r )
 {
-	return EEPROM_read_bit();
+	return eeprom_read_bit();
 }
 
 static WRITE16_HANDLER( eeprom_w )
 {
 	if(offset)
 	{
-		EEPROM_write_bit(data & 0x01);
-		EEPROM_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
-		EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_write_bit(data & 0x01);
+		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
 static WRITE32_HANDLER( eeprom32_w )
 {
-	EEPROM_write_bit(data & 0x01);
-	EEPROM_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
-	EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom_write_bit(data & 0x01);
+	eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE32_HANDLER( finalgdr_eeprom_w )
 {
-	EEPROM_write_bit(data & 0x4000);
-	EEPROM_set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
-	EEPROM_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom_write_bit(data & 0x4000);
+	eeprom_set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE16_HANDLER( flipscreen_w )
@@ -493,7 +493,7 @@ static INPUT_PORTS_START( finalgdr )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0080, IP_ACTIVE_LOW )
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -538,18 +538,18 @@ static const UINT8 misncrft_default_nvram[128] = {
 static NVRAM_HANDLER( 93C46_vamphalf )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 		if (file)
 		{
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 		{
-			if (!strcmp(machine->gamedrv->name,"suplup")) EEPROM_set_data(suplup_default_nvram,128);
-			if (!strcmp(machine->gamedrv->name,"misncrft")) EEPROM_set_data(misncrft_default_nvram,128);
+			if (!strcmp(machine->gamedrv->name,"suplup")) eeprom_set_data(suplup_default_nvram,128);
+			if (!strcmp(machine->gamedrv->name,"misncrft")) eeprom_set_data(misncrft_default_nvram,128);
 		}
 	}
 }
@@ -558,15 +558,15 @@ static NVRAM_HANDLER( finalgdr )
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);
+		eeprom_save(file);
 		mame_fwrite(file, finalgdr_backupram, 0x80*0x100);
 	}
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 		if (file)
 		{
-			EEPROM_load(file);
+			eeprom_load(file);
 			mame_fread(file, finalgdr_backupram, 0x80*0x100);
 		}
 	}

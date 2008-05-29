@@ -698,7 +698,7 @@ static INTERRUPT_GEN( cps2_interrupt )
  *
  *************************************/
 
-static const struct EEPROM_interface cps2_eeprom_interface =
+static const eeprom_interface cps2_eeprom_interface =
 {
 	6,		/* address bits */
 	16,		/* data bits */
@@ -710,19 +710,14 @@ static const struct EEPROM_interface cps2_eeprom_interface =
 static NVRAM_HANDLER( cps2 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-        EEPROM_init(&cps2_eeprom_interface);
+        eeprom_init(&cps2_eeprom_interface);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 	}
-}
-
-static CUSTOM_INPUT( cps2_eeprom_port_r )
-{
-    return EEPROM_read_bit();
 }
 
 static WRITE16_HANDLER( cps2_eeprom_port_w )
@@ -739,9 +734,9 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	/* bit 7 - */
 
 	/* EEPROM */
-	EEPROM_write_bit(data & 0x1000);
-	EEPROM_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
-	EEPROM_set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_write_bit(data & 0x1000);
+	eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -955,7 +950,7 @@ static INPUT_PORTS_START( cps2 )
     PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
     PORT_START_TAG("IN2")      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cps2_eeprom_port_r, NULL)
+    PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
     PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
     PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4143,6 +4138,30 @@ ROM_START( mvscb )
 ROM_END
 
 ROM_START( mpang )
+	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "mpne.03c", 0x000000, 0x80000, CRC(fe16fc9f) SHA1(be22bf8a0abd53d2e7ebc12d3d0020bf799a25e9) )
+	ROM_LOAD16_WORD_SWAP( "mpne.04c", 0x080000, 0x80000, CRC(2cc5ec22) SHA1(c188349c26a64bad325cfa218849ed1e94303087) )
+
+	ROM_REGION( 0x1000000, REGION_GFX1, 0 )
+	ROMX_LOAD( "mpn-simm.01c",   0x0000000, 0x200000, CRC(388db66b) SHA1(7416cce3d0dbea71c92ea9f72f5536146f757b45) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "mpn-simm.01d",   0x0000001, 0x200000, CRC(aff1b494) SHA1(d376c02ce01e71a7707d3d3fe5b0ae59ce781686) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "mpn-simm.01a",   0x0000002, 0x200000, CRC(a9c4857b) SHA1(66f538105c710d1480141e48a15b1a760f5ce985) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "mpn-simm.01b",   0x0000003, 0x200000, CRC(f759df22) SHA1(1678e3e819dd808f3a6fdd52b7c933eac4777b5b) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "mpn-simm.03c",   0x0000004, 0x200000, CRC(dec6b720) SHA1(331776e1cba3fb82071e7c2195dc4ae27b3613a2) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "mpn-simm.03d",   0x0000005, 0x200000, CRC(f8774c18) SHA1(58e0ea4dd62e39bcfaa3a2be4ef08eb2f0bd3c00) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "mpn-simm.03a",   0x0000006, 0x200000, CRC(c2aea4ec) SHA1(f5e2a815fa802598611efa48e5de97e929155e77) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "mpn-simm.03b",   0x0000007, 0x200000, CRC(84d6dc33) SHA1(f5ababb479facc08c425381570644230c09334e7) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+
+	ROM_REGION( QSOUND_SIZE, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "mpn.01",   0x00000, 0x08000, CRC(90c7adb6) SHA1(a2653e977e5e0457b249e098e5ca0abc93dac336) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "mpn-simm.05a",   0x000000, 0x200000, CRC(318a2e21) SHA1(c573cd88f8279a062c73ef1d79cd8421dbdcd93e) ) // ROM on a simm
+	ROM_LOAD16_WORD_SWAP( "mpn-simm.05b",   0x200000, 0x200000, CRC(5462f4e8) SHA1(299fbdab700e735e6395c5d9e3f079bb2e3dbd73) ) // ROM on a simm
+ROM_END
+
+ROM_START( mpangu )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "mpn.03", 0x000000, 0x80000, CRC(6e7ed03c) SHA1(3562362d9573252d4d19dbfd0ec7e47e9eaa5f46) ) /* USA version, but has no "u" in label code */
 	ROM_LOAD16_WORD_SWAP( "mpn.04", 0x080000, 0x80000, CRC(de079131) SHA1(95da2a03cb642963aabfebd8337003961ca4db71) )
@@ -7393,7 +7412,8 @@ GAME( 2000, mmatrixj, mmatrix,  cps2, cps2_2p1b, cps2,     ROT0,   "Capcom, supp
 
 /* Games released on CPS-2 hardware by Mitchell */
 
-GAME( 2000, mpang,    0,        cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (USA 001010)", 0 )
+GAME( 2000, mpang,    0,        cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (Euro 001010)", 0 )
+GAME( 2000, mpangu,   mpang,    cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (USA 001010)", 0 )
 GAME( 2000, mpangj,   mpang,    cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (Japan 001011)", 0 )
 GAME( 2001, pzloop2,  0,        cps2, pzloop2,   pzloop2,  ROT0,   "Mitchell, distributed by Capcom", "Puzz Loop 2 (Euro 010302)", 0 )
 GAME( 2001, pzloop2j, pzloop2,  cps2, pzloop2,   pzloop2,  ROT0,   "Mitchell, distributed by Capcom", "Puzz Loop 2 (Japan 010205)", 0 )

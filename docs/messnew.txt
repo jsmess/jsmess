@@ -117,7 +117,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.125u2.  This incorporates all features of the
+- The core is based on MAME 0.125u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Fixed performance problems with -triplebuffer.  (bug #1539) [Justin Kerk]

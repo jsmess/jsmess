@@ -1356,6 +1356,7 @@ const game_driver * const drivers[] =
 	DRIVER( shtridra )	/* (c) 1984 Seibu Kaihatsu */
 	DRIVER( wilytowr )	/* M63 (c) 1984 */
 	DRIVER( atomboy )	/* M63 (c) 1985 Irem + Memetron license */
+	DRIVER( atomboya )	/* M63 (c) 1985 Irem + Memetron license */
 	DRIVER( fghtbskt )	/* (c) 1984 Paradise Co. Ltd. */
 	/* M62 */
 	DRIVER( kungfum )	/* (c) 1984 */
@@ -2688,7 +2689,8 @@ V-V                           TP-027
 	DRIVER( mmatrixj )	/* 12/04/2000 (c) 2000 Takumi (Japan) */
 	DRIVER( 1944 )		/* 20/06/2000 (c) 2000 Eighting/Raizing (US) */
 	DRIVER( 1944j )		/* 20/06/2000 (c) 2000 Eighting/Raizing (Japan) */
-	DRIVER( mpang )		/* 10/10/2000 (c) 2000 Mitchell (US) */
+	DRIVER( mpang )		/* 10/10/2000 (c) 2000 Mitchell (Euro) */
+	DRIVER( mpangu )	/* 10/10/2000 (c) 2000 Mitchell (US) */
 	DRIVER( mpangj )	/* 11/10/2000 (c) 2000 Mitchell (Japan) */
 	DRIVER( progear )	/* 17/01/2001 (c) 2001 Cave (US) */
 	DRIVER( progearj )	/* 17/01/2001 (c) 2001 Cave (Japan) */
@@ -3771,10 +3773,10 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( vf2b )		/* 1995 */
 	DRIVER( vf2o )		/* 1995 */
 	DRIVER( vcop2 )		/* 1995 */
-	DRIVER( dynamcop )	/* 1996 */
-	DRIVER( dyndeka2 )	/* 1996 */
 	DRIVER( doaa )		/* 1996 */
 	DRIVER( zeroguna )	/* 1997 */
+	DRIVER( dynamcop )	/* 1998 */
+	DRIVER( dyndeka2 )	/* 1998 */
 	DRIVER( pltkidsa )	/* 1998 */
 
 	/* Model 2B-CRX (SHARC, SCSP sound board) */
@@ -3784,7 +3786,6 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( gunblade )	/* 1995 */
 	DRIVER( indy500 )	/* 1995 */
 	DRIVER( skytargt )	/* 1995 */
-	DRIVER( dynmcopb )	/* 1996 */
 	DRIVER( schamp )	/* 1996 */
 	DRIVER( lastbrnx )	/* 1996 */
 	DRIVER( lastbrnj )	/* 1996 */
@@ -3793,9 +3794,10 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( von )		/* 1996 */
 	DRIVER( vonusa )	/* 1996 */
 	DRIVER( dynabb )	/* 1996 */
-	DRIVER( dyndek2b )	/* 1996 */
 	DRIVER( zerogun )	/* 1997 */
 	DRIVER( zerogunj )	/* 1997 */
+	DRIVER( dynmcopb )	/* 1998 */
+	DRIVER( dyndek2b )	/* 1998 */
 	DRIVER( pltkids )	/* 1998 */
 
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
@@ -3805,6 +3807,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( overrev )	/* 1997 */
 	DRIVER( topskatr )	/* 1997 */
 	DRIVER( bel )		/* 1998 */
+	DRIVER( dynmcopc )	/* 1998 */
 
 	/* Sega Model 3 Games */
 
@@ -7543,6 +7546,7 @@ Other Sun games
 	DRIVER( trivialp )	/* (c) 1996 */
 	DRIVER( scrabble )	/* (c) 1997 */
 	DRIVER( hngmnjpm )	/* (c) 1998 */
+	DRIVER( coronatn )	/* (c) 1999 */
 
 	/* Other Games */
 	DRIVER( astinvad )	/* (c) 1980 Stern */
@@ -7772,7 +7776,13 @@ Other Sun games
 	DRIVER( funybubc )	/* (c) 1999 Comad Industries */
 	DRIVER( dcheese )	/* (c) 1993 HAR */
 	DRIVER( lottof2 )	/* (c) 1993 HAR */
-	DRIVER( fredmem )	/* (c) 1993 HAR */
+	DRIVER( fredmem )	/* (c) 1994 Coastal Amusements */
+	DRIVER( fredmeus )	/* (c) 1994 Coastal Amusements */
+	DRIVER( fredmeuk )  /* (c) 1994 Coastal Amusements */
+	DRIVER( fredmemj )	/* (c) 1994 Coastal Amusements */
+	DRIVER( fredmemc )  /* (c) 1994 Coastal Amusements */
+	DRIVER( fredmesp )  /* (c) 1994 Coastal Amusements */
+	DRIVER( cecmatch )  /* (c) 1993 Coastal Amusements */
 	DRIVER( f15se )		/* (c) 1991 Microprose */
 	DRIVER( f15se21 )	/* (c) 1991 Microprose */
 	DRIVER( botss )		/* (c) 1992 Microprose */
@@ -7924,7 +7934,6 @@ Other Sun games
 	DRIVER( attckufo )	/* (c) 1980 Ryoto Electric Co. */
 	DRIVER( fortecar )
 	DRIVER( jackpool )	/* (c) 1997 Electronic Projects */
-	DRIVER( suprpool )	/* (c) 1997 Nazionale Elettronica Giochi S.A.S. */
 	DRIVER( murogem )	/* ??? */
 	DRIVER( murogema )	/* ??? */
 	DRIVER( lasvegas )	/* hack */
@@ -7935,6 +7944,7 @@ Other Sun games
 	DRIVER( magic10 )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic10a )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic102 )	/* (c) 1997 ABM Games */
+	DRIVER( suprpool )	/* (c) 1997 Nazionale Elettronica Giochi S.A.S. */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */
 	DRIVER( wheelfir )	/* (c) 199? TCH */
@@ -8054,6 +8064,7 @@ Other Sun games
 	DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0716 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
+	DRIVER( pexp0112 )	/* (c) 1995 IGT - International Gaming Technology */
 	DRIVER( pexs0006 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( pexmp006 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
