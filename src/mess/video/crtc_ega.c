@@ -10,7 +10,7 @@
 #include "crtc_ega.h"
 
 
-#define LOG		(1)
+#define LOG		(0)
 
 
 /* device types */
@@ -112,7 +112,7 @@ INLINE crtc_ega_t *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert((device->type == DEVICE_GET_INFO_NAME(crtc_ega)) ||
-		   (device->type == DEVICE_GET_INFO_NAME(crtc_vga)) );
+		   /*(device->type == DEVICE_GET_INFO_NAME(crtc_vga))*/0 );
 
 	return (crtc_ega_t *)device->token;
 }
