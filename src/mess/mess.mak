@@ -188,7 +188,7 @@ CPUS += RSP
 #CPUS += ALPHA8201
 #CPUS += ALPHA8301
 CPUS += CDP1802
-#CPUS += COP420
+CPUS += COP420
 #CPUS += COP410
 #CPUS += TLCS90
 #CPUS += MB8841
@@ -375,6 +375,7 @@ DRVLIBS = \
 	$(MESSOBJ)/gce.a \
 	$(MESSOBJ)/glasgow.a \
 	$(MESSOBJ)/gmaster.a \
+	$(MESSOBJ)/grundy.a \
 	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/jupiter.a \
@@ -1255,7 +1256,10 @@ $(MESSOBJ)/comx.a:				\
 	$(MESS_MACHINE)/cdp1871.o	\
 	
 $(MESSOBJ)/bondwell.a: \
-	$(MESS_DRIVERS)/bw2.o
+	$(MESS_DRIVERS)/bw2.o \
+
+$(MESSOBJ)/grundy.a: \
+	$(MESS_DRIVERS)/newbrain.o
 
 #-------------------------------------------------
 # layout dependencies

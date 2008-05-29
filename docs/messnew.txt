@@ -4,6 +4,7 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - OSCOM Nano  [Curt Coder, HobbyLabs]
 - Galaksija Plus [Miodrag Milanovic]
+- Grundy NewBrain A/AD/MD (not working) [Curt Coder]
 
 
 System Driver Changes:

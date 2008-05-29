@@ -879,6 +879,11 @@ TESTDRIVER( exeltel )
 	DRIVER( comx35n )
 TESTDRIVER( comxpl80 )
 
+	/* Grundy Business Systems Ltd */
+	DRIVER( newbrain )
+	DRIVER( newbraid )
+	DRIVER( newbramd )
+
 /****************Games*******************************************************/
 	/* Computer Electronic */
 	DRIVER( mk1 )		/* Chess Champion MK I								*/
