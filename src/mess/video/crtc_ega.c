@@ -829,7 +829,7 @@ DEVICE_GET_INFO( crtc_ega )
 	}
 }
 
-
+#if 0
 DEVICE_GET_INFO( crtc_vga )
 {
 	switch (state)
@@ -837,4 +837,5 @@ DEVICE_GET_INFO( crtc_vga )
 		default:										DEVICE_GET_INFO_CALL( crtc_ega );			break;
 	}
 }
+#endif
 
