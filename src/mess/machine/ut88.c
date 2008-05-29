@@ -21,7 +21,7 @@ DRIVER_INIT(ut88)
 	/* set initialy ROM to be visible on first bank */
 	UINT8 *RAM = memory_region(REGION_CPU1);	
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
-  memory_configure_bank(1, 1, 2, RAM, 0x0000);
+  	memory_configure_bank(1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
 }
 
@@ -102,7 +102,22 @@ READ8_HANDLER( ut88_tape_r )
 
 READ8_HANDLER( ut88mini_keyboard_r )
 {
-	return input_port_read_indexed(machine, 0);	
+	// This is real keyboard implementation
+	UINT8 *keyrom1 = memory_region(REGION_CPU1)+ 0x10000;
+	UINT8 *keyrom2 = memory_region(REGION_CPU1)+ 0x10100;
+	
+	UINT8 key = keyrom2[input_port_read_indexed(machine, 1)];
+	// if keyboard 2nd part returned 0 on 4th bit output from 
+	// first part is used
+	if ((key & 0x08) ==0x00) {		
+		key = keyrom1[input_port_read_indexed(machine, 0)];	
+	}	
+	// for delete key there is special key producing code 0x80
+	key = (input_port_read_indexed(machine, 2) & 0x80)==0x80 ? key : 0x80; 	
+	// If key 0 is pressed it value is 0x10 this is done by additional 
+	// discrete logic
+	key = (input_port_read_indexed(machine, 0) & 0x01)==0x01 ? key : 0x10;
+	return key;
 }
 
 static int lcd_digit[6];
