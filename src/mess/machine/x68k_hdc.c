@@ -16,12 +16,31 @@
 */
 
 #include "x68k_hdc.h"
+#include "devices/harddriv.h"
+#include "image.h"
+
+struct hd_state hd;
 
 static TIMER_CALLBACK( req_delay )
 {
 	sasi_ctrl_t* sasi = ptr;
 	sasi->req = 1;
 	sasi->status_port |= 0x01;
+}
+
+unsigned char SASIReadByte(const device_config* device)
+{
+	int ret;
+	unsigned char val;
+
+	ret = image_fread(device,&val,1);
+	
+	return val;
+}
+
+void SASIWriteByte(const device_config* device, unsigned char val)
+{
+	image_fwrite(device,&val,1);
 }
 
 DEVICE_START( x68k_hdc )
@@ -33,11 +52,13 @@ DEVICE_START( x68k_hdc )
 	sasi->status = 0x00;
 	sasi->status_port = 0x00;
 	sasi->phase = SASI_PHASE_BUSFREE;
+	hd.current_block = 0;
 }
 
 WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 {
 	sasi_ctrl_t* sasi = device->token;
+	unsigned int lba = 0;
 
 	switch(offset)
 	{
@@ -51,15 +72,33 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 				case SASI_CMD_SPECIFY:
 					sasi->transfer_byte_total = 10;
 					break;
+				case SASI_CMD_WRITE:
+					sasi->transfer_byte_total = (0x100 * sasi->command[4]);
+					break;
 				default:
-					sasi->transfer_byte_total = 0x800;
+					sasi->transfer_byte_total = 0x100;
 				}
 			}
-			// TODO: Do something with written data
 
 			if(sasi->command[0] == SASI_CMD_SPECIFY)
 			{
 				logerror("SPECIFY: wrote 0x%02x\n",data);
+			}
+
+			if(sasi->command[0] == SASI_CMD_WRITE)
+			{
+				if(!image_exists(device))
+				{
+					sasi->phase = SASI_PHASE_STATUS;
+					sasi->io = 1;  // Output
+					sasi->status_port |= 0x04;  // C/D remains the same
+					sasi->status = 0x02;
+					logerror("SASI: No HD connected.\n");
+				}
+				else
+				{
+					SASIWriteByte(device,data);
+				}
 			}
 
 			sasi->req = 0;
@@ -108,7 +147,6 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 			if(sasi->command_byte_count >= sasi->command_byte_total)
 			{
 				// End of command
-				// TODO: Actually execute SASI command
 
 				switch(sasi->command[0])
 				{
@@ -137,6 +175,72 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 					sasi->transfer_byte_count = 0;
 					sasi->transfer_byte_total = 0;
 					logerror("SASI: SPECIFY\n");
+					break;
+				case SASI_CMD_READ:
+					if(!image_exists(device))
+					{
+						sasi->phase = SASI_PHASE_STATUS;
+						sasi->io = 1;  // Output
+						sasi->status_port |= 0x04;  // C/D remains the same
+						sasi->cd = 1;
+						sasi->status_port |= 0x08;
+						sasi->status = 0x02;
+						logerror("SASI: No HD connected\n");
+					}
+					else
+					{
+						sasi->phase = SASI_PHASE_READ;
+						sasi->io = 1;
+						sasi->status_port |= 0x04;
+						sasi->cd = 0;
+						sasi->status_port &= ~0x08;
+						sasi->transfer_byte_count = 0;
+						sasi->transfer_byte_total = 0;
+						lba = sasi->command[3];
+						lba |= sasi->command[2] << 8;
+						lba |= (sasi->command[1] & 0x1f) << 16;
+						image_fseek(device,lba * 256,SEEK_SET);
+						logerror("SASI: READ (LBA 0x%06x, blocks = %i)\n",lba,sasi->command[4]);
+					}
+					break;
+				case SASI_CMD_WRITE:
+					if(!image_exists(device))
+					{
+						sasi->phase = SASI_PHASE_STATUS;
+						sasi->io = 1;  // Output
+						sasi->status_port |= 0x04;  // C/D remains the same
+						sasi->cd = 1;
+						sasi->status_port |= 0x08;
+						sasi->status = 0x02;
+						logerror("SASI: No HD connected\n");
+					}
+					else
+					{
+						sasi->phase = SASI_PHASE_WRITE;
+						sasi->io = 0;
+						sasi->status_port &= ~0x04;
+						sasi->cd = 0;
+						sasi->status_port &= ~0x08;
+						sasi->transfer_byte_count = 0;
+						sasi->transfer_byte_total = 0;
+						lba = sasi->command[3];
+						lba |= sasi->command[2] << 8;
+						lba |= (sasi->command[1] & 0x1f) << 16;
+						image_fseek(device,lba * 256,SEEK_SET);
+						logerror("SASI: WRITE (LBA 0x%06x, blocks = %i)\n",lba,sasi->command[4]);
+					}
+					break;
+				case SASI_CMD_SEEK:
+						sasi->phase = SASI_PHASE_STATUS;
+						sasi->io = 1;  // Output
+						sasi->status_port |= 0x04;  // C/D remains the same
+						sasi->cd = 1;
+						sasi->status_port |= 0x08;
+						lba = sasi->command[3];
+						lba |= sasi->command[2] << 8;
+						lba |= (sasi->command[1] & 0x1f) << 16;
+						image_fseek(device,lba * 256,SEEK_SET);
+						logerror("SASI: SEEK (LBA 0x%06x)\n",lba);
 					break;
 				default:
 					sasi->phase = SASI_PHASE_STATUS;
@@ -179,13 +283,13 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 		break;
 	}
 
-	logerror("SASI: write to HDC, offset %04x, data %04x\n",offset,data);
+//	logerror("SASI: write to HDC, offset %04x, data %04x\n",offset,data);
 }
 
 READ16_DEVICE_HANDLER( x68k_hdc_r )
 {
 	sasi_ctrl_t* sasi = device->token;
-	int retval;
+	int retval = 0xff;
 
 	switch(offset)
 	{
@@ -231,6 +335,10 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 					else
 						sasi->transfer_byte_total = sasi->command[3];
 					break;
+				case SASI_CMD_READ:
+					sasi->transfer_byte_total = (0x100 * sasi->command[4]);
+					sasi->transfer_byte_count = 0;
+					break;
 				default:
 					sasi->transfer_byte_total = 0;
 				}
@@ -241,6 +349,20 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 			case SASI_CMD_REQUEST_SENSE:
 				retval = sasi->sense[sasi->transfer_byte_count];
 				logerror("REQUEST SENSE: read value 0x%02x\n",retval);
+				break;
+			case SASI_CMD_READ:
+				if(!image_exists(device))
+				{
+					sasi->phase = SASI_PHASE_STATUS;
+					sasi->io = 1;  // Output
+					sasi->status_port |= 0x04;  // C/D remains the same
+					sasi->status = 0x02;
+					logerror("SASI: No HD connected.\n");
+				}
+				else
+				{
+					retval = SASIReadByte(device);
+				}
 				break;
 			default:
 				retval = 0;
@@ -265,7 +387,7 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 		}
 		return 0x00;
 	case 0x01:
-		logerror("SASI: [%08x] read from status port, read 0x%02x\n",activecpu_get_pc(),sasi->status_port);
+//		logerror("SASI: [%08x] read from status port, read 0x%02x\n",activecpu_get_pc(),sasi->status_port);
 		return sasi->status_port;
 	case 0x02:
 		return 0xff;  // write-only
@@ -289,21 +411,29 @@ DEVICE_GET_INFO(x68k_hdc)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_OTHER;				break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sasi_ctrl_t);				break;
+		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_HARDDISK; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(x68k_hdc); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(x68k_hdc);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/*info->reset = DEVICE_RESET_NAME(x68k_hdc);*/	break;
+		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
+		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 0; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "X68000 SASI Hard Disk Controller";	break;
+			/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "SASI Hard Disk";	break;
 		case DEVINFO_STR_FAMILY:						info->s = "SASI Hard Disk Controller";			break;
 		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team"; 		break;
+		case MESS_DEVINFO_STR_NAME:						info->s = "sasihd"; 			break;
+		case MESS_DEVINFO_STR_SHORT_NAME:				info->s = "sasi"; 			break;
+		case MESS_DEVINFO_STR_DESCRIPTION:				info->s = "SASI Hard Disk"; 			break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "hdf"; break;
 	}
 }
 

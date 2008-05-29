@@ -1594,8 +1594,8 @@ static const ppi8255_interface ppi_interface =
 static const hd63450_intf dmac_interface =
 {
 	0,  // CPU - 68000
-	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_USEC(4),STATIC_ATTOTIME_IN_USEC(32)},  // Cycle steal mode timing (guesstimate)
-	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_NSEC(50),STATIC_ATTOTIME_IN_NSEC(50),STATIC_ATTOTIME_IN_NSEC(50)}, // Burst mode timing (guesstimate)
+	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_NSEC(450),STATIC_ATTOTIME_IN_USEC(4),STATIC_ATTOTIME_IN_USEC(32)},  // Cycle steal mode timing (guesstimate)
+	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_NSEC(450),STATIC_ATTOTIME_IN_NSEC(50),STATIC_ATTOTIME_IN_NSEC(50)}, // Burst mode timing (guesstimate)
 	x68k_dma_end,
 	x68k_dma_error,
 	{ x68k_fdc_read_byte, 0, 0, 0 },
@@ -1906,28 +1906,6 @@ static void x68k_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
-static void x68k_sasihd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_STR_NAME:			
-		strcpy(info->s = device_temp_str(), "sasihd"); 
-		break;
-	case MESS_DEVINFO_STR_SHORT_NAME:					
-		strcpy(info->s = device_temp_str(), "sasi"); 
-		break;
-	case MESS_DEVINFO_STR_DESCRIPTION:					
-		strcpy(info->s = device_temp_str(), "SASI Hard Disk"); 
-		break;
-	default:
-		harddisk_device_getinfo(devclass, state, info); 
-		break;
-	}
-}
-
 static MACHINE_RESET( x68000 )
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
@@ -2103,7 +2081,6 @@ MACHINE_DRIVER_END
 
 SYSTEM_CONFIG_START(x68000)
 	CONFIG_DEVICE(x68k_floppy_getinfo)
-	CONFIG_DEVICE(x68k_sasihd_getinfo)
 	CONFIG_RAM(0x100000)
 	CONFIG_RAM(0x200000)
 	CONFIG_RAM(0x300000)

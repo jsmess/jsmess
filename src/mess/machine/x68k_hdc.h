@@ -96,8 +96,19 @@ struct _sasi_ctrl_t
 	int req;  // REQ
 };
 
+struct hd_state
+{
+	int current_block;
+	int current_pos;
+};
+
+unsigned char SASIReadByte(const device_config* device);
+
 DEVICE_START( x68k_hdc );
 DEVICE_GET_INFO( x68k_hdc );
+
+DEVICE_IMAGE_LOAD( sasihd );
+DEVICE_IMAGE_UNLOAD( sasihd );
 
 #define X68KHDC DEVICE_GET_INFO_NAME(x68k_hdc)
 

@@ -84,6 +84,15 @@ System Driver Changes:
 
 - [UT88] Added SHA-1's.  [Fabio Priuli]
 
+- [X68000] Added basic SASI hard disk support [Barry Rodewald]:
+  Currently supported SASI commands:
+  * Rezero Unit
+  * Specify
+  * Request Sense
+  * Read
+  * Write
+  * Seek
+
 - [ZX81] Consolidated variants to use alternative BIOSes.  [Fabio Priuli]
 
 

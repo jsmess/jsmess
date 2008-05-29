@@ -337,7 +337,7 @@ void hd63450_single_transfer(const device_config* device, int x)
 						break;
 					case 0x30:  // 8 bit packed (?)
 						data = program_read_byte(dmac->reg[x].mar);  // read from memory address
-						//program_write_byte(dmac->reg[x].dar, data);  // write to device address  -- disabled for now
+						program_write_byte(dmac->reg[x].dar, data);  // write to device address
 						datasize = 1;
 						break;
 					}
