@@ -25,14 +25,14 @@ WRITE8_HANDLER (atom_8255_portb_w );
 WRITE8_HANDLER (atom_8255_portc_w );
 
 /* for floppy disc interface */
- READ8_HANDLER (atom_8271_r);
+READ8_HANDLER (atom_8271_r);
 WRITE8_HANDLER (atom_8271_w);
 
 DEVICE_IMAGE_LOAD( atom_floppy );
 
- READ8_HANDLER(atom_eprom_box_r);
+READ8_HANDLER(atom_eprom_box_r);
 WRITE8_HANDLER(atom_eprom_box_w);
-void atom_eprom_box_init(void);
+void atom_eprom_box_init(running_machine *machine);
 
 MACHINE_RESET( atomeb );
 

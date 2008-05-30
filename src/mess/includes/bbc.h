@@ -103,7 +103,7 @@ extern unsigned char vidmem[0x10000];
 void set_video_memory_lookups(int ramsize);
 void bbc_frameclock(void);
 void setscreenstart(int b4,int b5);
-void bbcbp_setvideoshadow(int vdusel);
+void bbcbp_setvideoshadow(running_machine *machine, int vdusel);
 
 WRITE8_HANDLER ( videoULA_w );
 

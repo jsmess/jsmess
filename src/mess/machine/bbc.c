@@ -187,7 +187,7 @@ WRITE8_HANDLER ( page_selectbp_w )
 	{
 		//the video display should now use this flag to display the shadow ram memory
 		vdusel=(data>>7)&0x01;
-		bbcbp_setvideoshadow(vdusel);
+		bbcbp_setvideoshadow(machine, vdusel);
 		//need to make the video display do a full screen refresh for the new memory area
 		memory_set_bankptr(2, memory_region(REGION_CPU1)+0x3000);
 	}
@@ -406,7 +406,7 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 		memory_set_bankptr(7,memory_region(REGION_USER1)+0x40000);
 	}
 
-	bbcbp_setvideoshadow(ACCCON_D);
+	bbcbp_setvideoshadow(machine, ACCCON_D);
 
 
 	if (ACCCON_X)

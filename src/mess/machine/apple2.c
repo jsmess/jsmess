@@ -90,16 +90,16 @@ static READ8_HANDLER(read_floatingbus)
 
 
 
-void apple2_setup_memory(const apple2_memmap_config *config)
+void apple2_setup_memory(running_machine *machine, const apple2_memmap_config *config)
 {
 	apple2_mem_config = *config;
 	apple2_current_meminfo = NULL;
-	apple2_update_memory();
+	apple2_update_memory(machine);
 }
 
 
 
-void apple2_update_memory(void)
+void apple2_update_memory(running_machine *machine)
 {
 	int i, bank, rbank, wbank;
 	int full_update = 0;
@@ -293,7 +293,7 @@ void apple2_update_memory(void)
 
 static STATE_POSTLOAD( apple2_update_memory_postload )
 {
-	apple2_update_memory();
+	apple2_update_memory(machine);
 }
 
 
@@ -567,7 +567,7 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 
 
 
-void apple2_setvar(UINT32 val, UINT32 mask)
+void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
 {
 	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask, (unsigned int) cpunum_get_reg(0, REG_PC)));
 
@@ -581,7 +581,7 @@ void apple2_setvar(UINT32 val, UINT32 mask)
 	a2 &= ~mask;
 	a2 |= val;
 
-	apple2_update_memory();
+	apple2_update_memory(machine);
 }
 
 
@@ -748,12 +748,12 @@ static void apple2_reset(running_machine *machine)
 		|| !strcmp(machine->gamedrv->name, "apple2c3")
 		|| !strcmp(machine->gamedrv->name, "apple2cp")
 		|| !strncmp(machine->gamedrv->name, "apple2g", 7);
-	apple2_setvar(need_intcxrom ? VAR_INTCXROM : 0, ~0);
+	apple2_setvar(machine, need_intcxrom ? VAR_INTCXROM : 0, ~0);
 
 	// ROM 0 cannot boot unless language card bank 2 is write-enabled (but read ROM) on startup
 	if (!strncmp(machine->gamedrv->name, "apple2g", 7))
 	{
-		apple2_setvar(VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
+		apple2_setvar(machine, VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
 	}
 
 	a2_speaker_state = 0;
@@ -870,7 +870,7 @@ WRITE8_HANDLER ( apple2_c00x_w )
 {
 	UINT32 mask;
 	mask = 1 << (offset / 2);
-	apple2_setvar((offset & 1) ? mask : 0, mask);
+	apple2_setvar(machine, (offset & 1) ? mask : 0, mask);
 }
 
 
@@ -947,7 +947,7 @@ WRITE8_HANDLER( apple2_c02x_w )
 	switch(offset)
 	{
 		case 0x08:
-			apple2_setvar((a2 & VAR_ROMSWITCH) ^ VAR_ROMSWITCH, VAR_ROMSWITCH);
+			apple2_setvar(machine, (a2 & VAR_ROMSWITCH) ^ VAR_ROMSWITCH, VAR_ROMSWITCH);
 			break;
 	}
 }
@@ -997,7 +997,7 @@ READ8_HANDLER ( apple2_c05x_r )
 		offset ^= 1;
 
 	mask = 0x100 << (offset / 2);
-	apple2_setvar((offset & 1) ? mask : 0, mask);
+	apple2_setvar(machine, (offset & 1) ? mask : 0, mask);
 	return apple2_getfloatingbusvalue();
 }
 
@@ -1312,7 +1312,7 @@ MACHINE_START( apple2 )
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
 	mem_cfg.auxmem = apple2cp_ce00_ram;
-	apple2_setup_memory(&mem_cfg);
+	apple2_setup_memory(machine, &mem_cfg);
 
 	/* perform initial reset */
 	apple2_reset(machine);

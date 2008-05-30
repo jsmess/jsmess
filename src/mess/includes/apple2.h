@@ -56,7 +56,7 @@ WRITE8_HANDLER( apple2_c0xx_w );
 
 INTERRUPT_GEN( apple2_interrupt );
 
-void apple2_setvar(UINT32 val, UINT32 mask);
+void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask);
 
 
 /*----------- defined in video/apple2.c -----------*/
@@ -128,8 +128,8 @@ struct _apple2_memmap_config
 
 /*----------- defined in machine/apple2.c -----------*/
 
-void apple2_setup_memory(const apple2_memmap_config *config);
-void apple2_update_memory(void);
+void apple2_setup_memory(running_machine *machine, const apple2_memmap_config *config);
+void apple2_update_memory(running_machine *machine);
 
 
 #endif /* APPLE2_H_ */

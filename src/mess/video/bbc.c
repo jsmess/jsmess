@@ -647,7 +647,7 @@ void bbc_frameclock(void)
 
 /**** BBC B+ Shadow Ram change ****/
 
-void bbcbp_setvideoshadow(int vdusel)
+void bbcbp_setvideoshadow(running_machine *machine, int vdusel)
 {
 	if (vdusel)
 	{

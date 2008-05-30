@@ -1144,7 +1144,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 
 		case 0x2D:	/* C02D - SLTROMSEL */
 			apple2gs_sltromsel = data;
-			apple2_update_memory();
+			apple2_update_memory(machine);
 			break;
 
 		case 0x31:	/* C031 - DISKREG */
@@ -1170,7 +1170,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			if (apple2gs_shadow != data)
 			{
 				apple2gs_shadow = data;
-				apple2_update_memory();
+				apple2_update_memory(machine);
 			}
 			break;
 
@@ -1208,7 +1208,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			break;
 
 		case 0x68:	/* C068 - STATEREG */
-			apple2_setvar(
+			apple2_setvar(machine,
 				((data & 0x80) ? VAR_ALTZP : 0) |
 				((data & 0x40) ? VAR_PAGE2 : 0) |
 				((data & 0x20) ? VAR_RAMRD : 0) |
@@ -1703,7 +1703,7 @@ static void apple2gs_setup_memory(running_machine *machine)
 	cfg.memmap = apple2gs_memmap_entries;
 	cfg.auxmem = apple2gs_slowmem;
 	cfg.auxmem_length = 0x20000;
-	apple2_setup_memory(&cfg);
+	apple2_setup_memory(machine, &cfg);
 }
 
 

@@ -462,7 +462,7 @@ WRITE8_HANDLER(atom_8271_w)
 /* emulates a 16-slot eprom box for the Atom */
 static unsigned char selected_eprom = 0;
 
-static void atom_eprom_box_refresh(void)
+static void atom_eprom_box_refresh(running_machine *machine)
 {
     unsigned char *eprom_data;
 
@@ -472,13 +472,13 @@ static void atom_eprom_box_refresh(void)
 	memory_set_bankptr(1, eprom_data);
 }
 
-void atom_eprom_box_init(void)
+void atom_eprom_box_init(running_machine *machine)
 {
 	/* set initial eprom */
 	selected_eprom = 0;
 	/* set memory handler */
 	/* init */
-	atom_eprom_box_refresh();
+	atom_eprom_box_refresh(machine);
 }
 
 /* write to eprom box, changes eprom selected */
@@ -486,7 +486,7 @@ WRITE8_HANDLER(atom_eprom_box_w)
 {
 	selected_eprom = data & 0x0f;
 
-	atom_eprom_box_refresh();
+	atom_eprom_box_refresh(machine);
 }
 
 /* read from eprom box register, can this be done in the real hardware */
@@ -498,6 +498,6 @@ READ8_HANDLER(atom_eprom_box_r)
 MACHINE_RESET( atomeb )
 {
 	MACHINE_RESET_CALL(atom);
-	atom_eprom_box_init();
+	atom_eprom_box_init(machine);
 }
 
