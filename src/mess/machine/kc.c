@@ -902,6 +902,7 @@ static void kc_keyboard_add_pulse_to_transmit_buffer(int pulse_state)
 static void kc_keyboard_init(void)
 {
 	int i;
+	char port[6];
 
 	/* head and tail of list is at beginning */
 	keyboard_data.head = (keyboard_data.tail = 0);
@@ -925,8 +926,9 @@ static void kc_keyboard_init(void)
 
 	for (i=0; i<KC_KEYBOARD_NUM_LINES-1; i++)
 	{
+		sprintf(port, "KEY%d", i);
 		/* read input port */
-		kc_previous_keyboard[i] = input_port_read_indexed(Machine, i);
+		kc_previous_keyboard[i] = input_port_read(Machine, port);
 	}
 }
 
@@ -981,7 +983,7 @@ static void kc_keyboard_begin_transmit(int scan_code)
 	scan = scan_code;
 
 	/* state of shift key */
-	kc_keyboard_add_bit(((input_port_read_indexed(Machine, 8) & 0x01)^0x01));
+	kc_keyboard_add_bit(((input_port_read(Machine, "SHIFT") & 0x01)^0x01));
 
 	for (i=0; i<6; i++)
 	{
@@ -1050,9 +1052,11 @@ static TIMER_CALLBACK(kc_keyboard_update)
 		int keyboard_line_data;
 		int changed_keys;
 		int mask = 0x001;
+		char port[6];
 
+		sprintf(port, "KEY%d", i);
 		/* read input port */
-		keyboard_line_data = input_port_read_indexed(machine, i);
+		keyboard_line_data = input_port_read(machine, port);
 		/* identify keys that have changed */
 		changed_keys = keyboard_line_data ^ kc_previous_keyboard[i];
 		/* store input port for next time */
