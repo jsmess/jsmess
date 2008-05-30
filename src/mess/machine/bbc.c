@@ -2061,7 +2061,7 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 
 	size = image_length (image);
 
-    addr = 0x8000 + (0x4000 * image_index_in_device(image));
+	addr = 0x8000 + (0x4000 * image_index_in_device(image));
 
 
 	logerror("loading rom %s at %.4x size:%.4x\n",image_filename(image), addr, size);

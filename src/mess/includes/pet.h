@@ -12,9 +12,9 @@
 /*----------- defined in video/pet.c -----------*/
 
 /* call to init videodriver */
-void pet_vh_init (void);
-void pet80_vh_init (void);
-void superpet_vh_init (void);
+void pet_vh_init (running_machine *machine);
+void pet80_vh_init (running_machine *machine);
+void superpet_vh_init (running_machine *machine);
 VIDEO_UPDATE( pet );
 MC6845_UPDATE_ROW( pet40_update_row );
 MC6845_UPDATE_ROW( pet80_update_row );

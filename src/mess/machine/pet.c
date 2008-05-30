@@ -515,14 +515,14 @@ DRIVER_INIT( pet )
 {
 	pet_common_driver_init(machine);
 	pia_config(0, &pet_pia0);
-	pet_vh_init();
+	pet_vh_init(machine);
 }
 
 DRIVER_INIT( petb )
 {
 	pet_common_driver_init(machine);
 	pia_config(0, &petb_pia0);
-	pet_vh_init();
+	pet_vh_init(machine);
 }
 
 DRIVER_INIT( pet1 )
@@ -530,14 +530,14 @@ DRIVER_INIT( pet1 )
 	pet_basic1 = 1;
 	pet_common_driver_init(machine);
 	pia_config(0, &pet_pia0);
-	pet_vh_init();
+	pet_vh_init(machine);
 }
 
 DRIVER_INIT( pet40 )
 {
 	pet_common_driver_init(machine);
 	pia_config(0, &pet_pia0);
-	pet_vh_init();
+	pet_vh_init(machine);
 }
 
 DRIVER_INIT( cbm80 )
@@ -549,7 +549,7 @@ DRIVER_INIT( cbm80 )
 	pia_config(0, &petb_pia0);
 	videoram = &pet_memory[0x8000];
 	videoram_size = 0x800;
-	pet80_vh_init();
+	pet80_vh_init(machine);
 }
 
 DRIVER_INIT( superpet )
@@ -563,7 +563,7 @@ DRIVER_INIT( superpet )
 	memory_configure_bank(1, 0, 16, superpet_memory, 0x1000);
 	memory_set_bank(1, 0);
 
-	superpet_vh_init();
+	superpet_vh_init(machine);
 }
 
 MACHINE_RESET( pet )

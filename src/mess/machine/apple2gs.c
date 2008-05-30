@@ -573,7 +573,7 @@ static UINT8 adb_read_datareg(void)
 
 
 
-static void adb_write_datareg(UINT8 data)
+static void adb_write_datareg(running_machine *machine, UINT8 data)
 {
 	if (LOG_ADB)
 		logerror("adb_write_datareg(): data=0x%02x\n", data);
@@ -1127,7 +1127,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			break;
 
 		case 0x26:	/* C026 - DATAREG */
-			adb_write_datareg(data);
+			adb_write_datareg(machine, data);
 			break;
 
 		case 0x27:	/* C027 - KMSTATUS */
@@ -1511,7 +1511,7 @@ static const apple2_memmap_entry apple2gs_memmap_entries[] =
 
 
 
-static UINT8 *apple2gs_getslotmem(offs_t address)
+static UINT8 *apple2gs_getslotmem(running_machine *machine, offs_t address)
 {
 	UINT8 *rom;
 
@@ -1544,7 +1544,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 		slot = (address & 0x000F00) / 0x100;
 
 		if ((slot > 7) || ((apple2gs_sltromsel & (1 << slot)) == 0))
-			result = *apple2gs_getslotmem(address);
+			result = *apple2gs_getslotmem(machine, address);
 		else
 			result = apple2_getfloatingbusvalue();
 	}
@@ -1570,7 +1570,7 @@ static void apple2gs_xxCxxx_w(running_machine *machine, offs_t address, UINT8 da
 		slot = (address & 0x000F00) / 0x100;
 
 		if ((slot > 7) || ((apple2gs_sltromsel & (1 << slot)) == 0))
-			*apple2gs_getslotmem(address) = data;
+			*apple2gs_getslotmem(machine, address) = data;
 	}
 }
 
@@ -1590,14 +1590,14 @@ static OPBASE_HANDLER( apple2gs_opbase )
 		else if ((address & 0x000F00) == 0x000000)
 		{
 			if (((address & 0xFF) >= 0x71) && ((address & 0xFF) <= 0x7F))
-				opptr = apple2gs_getslotmem(address);
+				opptr = apple2gs_getslotmem(machine, address);
 		}
 		else
 		{
 			slot = (address & 0x000F00) / 0x100;
 
 			if ((slot > 7) || ((apple2gs_sltromsel & (1 << slot)) == 0))
-				opptr = apple2gs_getslotmem(address);
+				opptr = apple2gs_getslotmem(machine, address);
 		}
 
 		if (opptr != NULL)

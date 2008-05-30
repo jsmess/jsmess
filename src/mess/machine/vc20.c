@@ -481,7 +481,7 @@ WRITE8_HANDLER( vc20_6000_w ) {
 	}
 }
 
-static void vc20_memory_init(void)
+static void vc20_memory_init(running_machine *machine)
 {
 	static int inited=0;
 	UINT8 *memory = memory_region (REGION_CPU1);
@@ -517,12 +517,12 @@ static void vc20_memory_init(void)
 	inited=1;
 }
 
-static void vc20_common_driver_init (void)
+static void vc20_common_driver_init (running_machine *machine)
 {
 #ifdef VC1541
 	VC1541_CONFIG vc1541= { 1, 8 };
 #endif
-	vc20_memory_init();
+	vc20_memory_init(machine);
 
 	vc20_tape_open (via_1_ca1_w);
 
@@ -548,13 +548,13 @@ void vc20_driver_shutdown (void)
 
 DRIVER_INIT( vc20 )
 {
-	vc20_common_driver_init ();
+	vc20_common_driver_init (machine);
 	vic6561_init (vic6560_dma_read, vic6560_dma_read_color);
 }
 
 DRIVER_INIT( vic20 )
 {
-	vc20_common_driver_init ();
+	vc20_common_driver_init (machine);
 	vic6560_init (vic6560_dma_read, vic6560_dma_read_color);
 }
 
@@ -566,7 +566,7 @@ DRIVER_INIT( vic1001 )
 DRIVER_INIT( vic20i )
 {
 	ieee=1;
-	vc20_common_driver_init ();
+	vc20_common_driver_init (machine);
 	vic6560_init (vic6560_dma_read, vic6560_dma_read_color);
 	via_config (4, &via4);
 	via_config (5, &via5);
@@ -631,7 +631,7 @@ static int vc20_rom_id(const device_config *image)
 
 DEVICE_START(vc20_rom)
 {
-	vc20_memory_init();
+	vc20_memory_init(device->machine);
 	vc20_rom_2000 = NULL;
 	vc20_rom_4000 = NULL;
 	vc20_rom_6000 = NULL;

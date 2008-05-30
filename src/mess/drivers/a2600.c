@@ -132,7 +132,7 @@ static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 // try to detect 2600 controller setup. returns 32bits with left/right controller info
 
-static unsigned long detect_2600controllers(void)
+static unsigned long detect_2600controllers(running_machine *machine)
 {
 #define JOYS 0x001
 #define PADD 0x002
@@ -206,7 +206,7 @@ static unsigned long detect_2600controllers(void)
 	return (left << 16) + right;
 }
 
-static int detect_modeDC(void)
+static int detect_modeDC(running_machine *machine)
 {
 	int i,numfound = 0;
 	// signature is also in 'video reflex'.. maybe figure out that controller port someday...
@@ -225,7 +225,7 @@ static int detect_modeDC(void)
 	return 0;
 }
 
-static int detect_modef6(void)
+static int detect_modef6(running_machine *machine)
 {
 	int i,numfound = 0;
 	static const unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
@@ -243,7 +243,7 @@ static int detect_modef6(void)
 	return 0;
 }
 
-static int detect_mode3E(void)
+static int detect_mode3E(running_machine *machine)
 {
 	// this one is a little hacky.. looks for STY $3e, which is unique to
 	// 'not boulderdash', but is the only example i have (cow)
@@ -265,7 +265,7 @@ static int detect_mode3E(void)
 	return 0;
 }
 
-static int detect_modeSS(void)
+static int detect_modeSS(running_machine *machine)
 {
 	int i,numfound = 0;
 	static const unsigned char signature[5] = { 0xbd, 0xe5, 0xff, 0x95, 0x81 };
@@ -283,7 +283,7 @@ static int detect_modeSS(void)
 	return 0;
 }
 
-static int detect_modeFE(void)
+static int detect_modeFE(running_machine *machine)
 {
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][5] =  {
@@ -308,7 +308,7 @@ static int detect_modeFE(void)
 	return 0;
 }
 
-static int detect_modeE0(void)
+static int detect_modeE0(running_machine *machine)
 {
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] =  {
@@ -335,7 +335,7 @@ static int detect_modeE0(void)
 	return 0;
 }
 
-static int detect_modeCV(void)
+static int detect_modeCV(running_machine *machine)
 {
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
@@ -358,7 +358,7 @@ static int detect_modeCV(void)
 	return 0;
 }
 
-static int detect_modeFV(void)
+static int detect_modeFV(running_machine *machine)
 {
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
@@ -381,7 +381,7 @@ static int detect_modeFV(void)
 	return 0;
 }
 
-static int detect_modeJVP(void)
+static int detect_modeJVP(running_machine *machine)
 {
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][4] = {
@@ -404,7 +404,7 @@ static int detect_modeJVP(void)
 	return 0;
 }
 
-static int detect_modeE7(void)
+static int detect_modeE7(running_machine *machine)
 {
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
@@ -427,7 +427,7 @@ static int detect_modeE7(void)
 	return 0;
 }
 
-static int detect_modeUA(void)
+static int detect_modeUA(running_machine *machine)
 {
 	int i,numfound = 0;
 	static const unsigned char signature[3] = { 0x8d, 0x40, 0x02 };
@@ -445,7 +445,7 @@ static int detect_modeUA(void)
 	return 0;
 }
 
-static int detect_8K_mode3F(void)
+static int detect_8K_mode3F(running_machine *machine)
 {
 	int i,numfound = 0;
 	static const unsigned char signature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
@@ -469,7 +469,7 @@ static int detect_8K_mode3F(void)
 	return 0;
 }
 
-static int detect_32K_mode3F(void)
+static int detect_32K_mode3F(running_machine *machine)
 {
 	int i,numfound = 0;
 	static const unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
@@ -487,7 +487,7 @@ static int detect_32K_mode3F(void)
 	return 0;
 }
 
-static int detect_super_chip(void)
+static int detect_super_chip(running_machine *machine)
 {
 	int i,j;
 	static const unsigned char signatures[][5] = {
@@ -559,7 +559,7 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 
 	image_fread(image, CART, cart_size);
 
-	if (!(cart_size == 0x4000 && detect_modef6())) {
+	if (!(cart_size == 0x4000 && detect_modef6(image->machine))) {
 		while (cart_size > 0x00800) {
 			if (!memcmp(CART, &CART[cart_size/2],cart_size/2)) cart_size /= 2;
 			else break;
@@ -585,69 +585,69 @@ static int next_bank(void)
 }
 
 
-static void modeF8_switch(UINT16 offset, UINT8 data)
+static void modeF8_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-static void modeFA_switch(UINT16 offset, UINT8 data)
+static void modeFA_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-static void modeF6_switch(UINT16 offset, UINT8 data)
+static void modeF6_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-static void modeF4_switch(UINT16 offset, UINT8 data)
+static void modeF4_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-static void mode3F_switch(UINT16 offset, UINT8 data)
+static void mode3F_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
 	memory_set_bankptr(1, bank_base[1]);
 }
-static void modeUA_switch(UINT16 offset, UINT8 data)
+static void modeUA_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + (offset >> 6) * 0x1000;
 	memory_set_bankptr(1, bank_base[1]);
 }
-static void modeE0_switch(UINT16 offset, UINT8 data)
+static void modeE0_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	int bank = 1 + (offset >> 3);
 	bank_base[bank] = CART + 0x400 * (offset & 7);
 	memory_set_bankptr(bank, bank_base[bank]);
 }
-static void modeE7_switch(UINT16 offset, UINT8 data)
+static void modeE7_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-static void modeE7_RAM_switch(UINT16 offset, UINT8 data)
+static void modeE7_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	memory_set_bankptr(9, extra_RAM + (4 + offset) * 256 );
 }
-static void modeDC_switch(UINT16 offset, UINT8 data)
+static void modeDC_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * next_bank();
 	memory_set_bankptr(1, bank_base[1]);
 }
-static void mode3E_switch(UINT16 offset, UINT8 data)
+static void mode3E_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
 	memory_set_bankptr(1, bank_base[1]);
 	mode3E_ram_enabled = 0;
 }
-static void mode3E_RAM_switch(UINT16 offset, UINT8 data)
+static void mode3E_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	ram_base = extra_RAM + 0x200 * ( data & 0x3F );
 	memory_set_bankptr(1, ram_base );
 	mode3E_ram_enabled = 1;
 }
-static void modeFV_switch(UINT16 offset, UINT8 data)
+static void modeFV_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	//printf("ModeFV %04x\n",offset);
 	if (!FVlocked && ( activecpu_get_pc() & 0x1F00 ) == 0x1F00 ) {
@@ -657,7 +657,7 @@ static void modeFV_switch(UINT16 offset, UINT8 data)
 		memory_set_bankptr(1, bank_base[1]);
 	}
 }
-static void modeJVP_switch(UINT16 offset, UINT8 data)
+static void modeJVP_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	switch( offset ) {
 	case 0x00:
@@ -674,38 +674,38 @@ static void modeJVP_switch(UINT16 offset, UINT8 data)
 
 
 /* These read handlers will return the byte from the new bank */
-static  READ8_HANDLER(modeF8_switch_r) { modeF8_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
-static  READ8_HANDLER(modeFA_switch_r) { modeFA_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
-static  READ8_HANDLER(modeF6_switch_r) { modeF6_switch(offset, 0); return bank_base[1][0xff6 + offset]; }
-static  READ8_HANDLER(modeF4_switch_r) { modeF4_switch(offset, 0); return bank_base[1][0xff4 + offset]; }
-static  READ8_HANDLER(modeE0_switch_r) { modeE0_switch(offset, 0); return bank_base[4][0x3e0 + offset]; }
-static  READ8_HANDLER(modeE7_switch_r) { modeE7_switch(offset, 0); return bank_base[1][0xfe0 + offset]; }
-static  READ8_HANDLER(modeE7_RAM_switch_r) { modeE7_RAM_switch(offset, 0); return 0; }
-static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(offset, 0); return 0; }
-static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(offset, 0); return bank_base[1][0xff0 + offset]; }
-static  READ8_HANDLER(modeFV_switch_r) { modeFV_switch(offset, 0); return bank_base[1][0xfd0 + offset]; }
-static  READ8_HANDLER(modeJVP_switch_r) { modeJVP_switch(offset, 0); return riot_ram[ 0x20 + offset ]; }
+static  READ8_HANDLER(modeF8_switch_r) { modeF8_switch(machine, offset, 0); return bank_base[1][0xff8 + offset]; }
+static  READ8_HANDLER(modeFA_switch_r) { modeFA_switch(machine, offset, 0); return bank_base[1][0xff8 + offset]; }
+static  READ8_HANDLER(modeF6_switch_r) { modeF6_switch(machine, offset, 0); return bank_base[1][0xff6 + offset]; }
+static  READ8_HANDLER(modeF4_switch_r) { modeF4_switch(machine, offset, 0); return bank_base[1][0xff4 + offset]; }
+static  READ8_HANDLER(modeE0_switch_r) { modeE0_switch(machine, offset, 0); return bank_base[4][0x3e0 + offset]; }
+static  READ8_HANDLER(modeE7_switch_r) { modeE7_switch(machine, offset, 0); return bank_base[1][0xfe0 + offset]; }
+static  READ8_HANDLER(modeE7_RAM_switch_r) { modeE7_RAM_switch(machine, offset, 0); return 0; }
+static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(machine, offset, 0); return 0; }
+static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(machine, offset, 0); return bank_base[1][0xff0 + offset]; }
+static  READ8_HANDLER(modeFV_switch_r) { modeFV_switch(machine, offset, 0); return bank_base[1][0xfd0 + offset]; }
+static  READ8_HANDLER(modeJVP_switch_r) { modeJVP_switch(machine, offset, 0); return riot_ram[ 0x20 + offset ]; }
 
 
-static WRITE8_HANDLER(modeF8_switch_w) { modeF8_switch(offset, data); }
-static WRITE8_HANDLER(modeFA_switch_w) { modeFA_switch(offset, data); }
-static WRITE8_HANDLER(modeF6_switch_w) { modeF6_switch(offset, data); }
-static WRITE8_HANDLER(modeF4_switch_w) { modeF4_switch(offset, data); }
-static WRITE8_HANDLER(modeE0_switch_w) { modeE0_switch(offset, data); }
-static WRITE8_HANDLER(modeE7_switch_w) { modeE7_switch(offset, data); }
-static WRITE8_HANDLER(modeE7_RAM_switch_w) { modeE7_RAM_switch(offset, data); }
-static WRITE8_HANDLER(mode3F_switch_w) { mode3F_switch(offset, data); }
-static WRITE8_HANDLER(modeUA_switch_w) { modeUA_switch(offset, data); }
-static WRITE8_HANDLER(modeDC_switch_w) { modeDC_switch(offset, data); }
-static WRITE8_HANDLER(mode3E_switch_w) { mode3E_switch(offset, data); }
-static WRITE8_HANDLER(mode3E_RAM_switch_w) { mode3E_RAM_switch(offset, data); }
+static WRITE8_HANDLER(modeF8_switch_w) { modeF8_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeFA_switch_w) { modeFA_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeF6_switch_w) { modeF6_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeF4_switch_w) { modeF4_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeE0_switch_w) { modeE0_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeE7_switch_w) { modeE7_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeE7_RAM_switch_w) { modeE7_RAM_switch(machine, offset, data); }
+static WRITE8_HANDLER(mode3F_switch_w) { mode3F_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeUA_switch_w) { modeUA_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeDC_switch_w) { modeDC_switch(machine, offset, data); }
+static WRITE8_HANDLER(mode3E_switch_w) { mode3E_switch(machine, offset, data); }
+static WRITE8_HANDLER(mode3E_RAM_switch_w) { mode3E_RAM_switch(machine, offset, data); }
 static WRITE8_HANDLER(mode3E_RAM_w) {
 	if ( mode3E_ram_enabled ) {
 		ram_base[offset] = data;
 	}
 }
-static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(offset, data); }
-static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(offset, data); riot_ram[ 0x20 + offset ] = data; }
+static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(machine, offset, data); riot_ram[ 0x20 + offset ] = data; }
 
 
 static OPBASE_HANDLER( modeF6_opbase )
@@ -1479,24 +1479,24 @@ static MACHINE_RESET( a2600 )
 	current_reset_bank_counter++;
 
 	/* auto-detect special controllers */
-	controltemp = detect_2600controllers();
+	controltemp = detect_2600controllers(machine);
 	set_controller( machine, STR_LEFT_CONTROLLER, controltemp >> 16 );
 	set_controller( machine, STR_RIGHT_CONTROLLER, controltemp & 0xFFFF );
 
 	/* auto-detect bank mode */
 
-	if (banking_mode == 0xff) if (detect_modeDC()) banking_mode = modeDC;
-	if (banking_mode == 0xff) if (detect_mode3E()) banking_mode = mode3E;
-	if (banking_mode == 0xff) if (detect_modeFE()) banking_mode = modeFE;
-	if (banking_mode == 0xff) if (detect_modeSS()) banking_mode = modeSS;
-	if (banking_mode == 0xff) if (detect_modeE0()) banking_mode = modeE0;
-	if (banking_mode == 0xff) if (detect_modeCV()) banking_mode = modeCV;
-	if (banking_mode == 0xff) if (detect_modeFV()) banking_mode = modeFV;
-	if (banking_mode == 0xff) if (detect_modeJVP()) banking_mode = modeJVP;
-	if (banking_mode == 0xff) if (detect_modeUA()) banking_mode = modeUA;
-	if (banking_mode == 0xff) if (detect_8K_mode3F()) banking_mode = mode3F;
-	if (banking_mode == 0xff) if (detect_32K_mode3F()) banking_mode = mode3F;
-	if (banking_mode == 0xff) if (detect_modeE7()) banking_mode = modeE7;
+	if (banking_mode == 0xff) if (detect_modeDC(machine)) banking_mode = modeDC;
+	if (banking_mode == 0xff) if (detect_mode3E(machine)) banking_mode = mode3E;
+	if (banking_mode == 0xff) if (detect_modeFE(machine)) banking_mode = modeFE;
+	if (banking_mode == 0xff) if (detect_modeSS(machine)) banking_mode = modeSS;
+	if (banking_mode == 0xff) if (detect_modeE0(machine)) banking_mode = modeE0;
+	if (banking_mode == 0xff) if (detect_modeCV(machine)) banking_mode = modeCV;
+	if (banking_mode == 0xff) if (detect_modeFV(machine)) banking_mode = modeFV;
+	if (banking_mode == 0xff) if (detect_modeJVP(machine)) banking_mode = modeJVP;
+	if (banking_mode == 0xff) if (detect_modeUA(machine)) banking_mode = modeUA;
+	if (banking_mode == 0xff) if (detect_8K_mode3F(machine)) banking_mode = mode3F;
+	if (banking_mode == 0xff) if (detect_32K_mode3F(machine)) banking_mode = mode3F;
+	if (banking_mode == 0xff) if (detect_modeE7(machine)) banking_mode = modeE7;
 
 	if (banking_mode == 0xff) {
 		switch (cart_size)
@@ -1538,7 +1538,7 @@ static MACHINE_RESET( a2600 )
 
 	if (cart_size == 0x2000 || cart_size == 0x4000 || cart_size == 0x8000)
 	{
-		chip = detect_super_chip();
+		chip = detect_super_chip(machine);
 	}
 
 	/* Super chip games:

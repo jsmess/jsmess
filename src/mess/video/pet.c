@@ -10,13 +10,13 @@
 #include "includes/pet.h"
 
 
-void pet_vh_init (void)
+void pet_vh_init (running_machine *machine)
 {
 	UINT8 *gfx = memory_region(REGION_GFX1);
 	int i;
 
 	/* inversion logic on board */
-    for (i = 0; i < 0x400; i++)
+	for (i = 0; i < 0x400; i++)
 	{
 		gfx[0x800+i] = gfx[0x400+i];
 		gfx[0x400+i] = gfx[i]^0xff;
@@ -24,13 +24,13 @@ void pet_vh_init (void)
 	}
 }
 
-void pet80_vh_init (void)
+void pet80_vh_init (running_machine *machine)
 {
 	UINT8 *gfx = memory_region(REGION_GFX1);
 	int i;
 
 	/* inversion logic on board */
-    for (i = 0; i < 0x400; i++) {
+	for (i = 0; i < 0x400; i++) {
 		gfx[0x800+i] = gfx[0x400+i];
 		gfx[0x400+i] = gfx[i]^0xff;
 		gfx[0x0c00+i] = gfx[0x800+i]^0xff;
@@ -43,7 +43,7 @@ void pet80_vh_init (void)
 	}
 }
 
-void superpet_vh_init (void)
+void superpet_vh_init (running_machine *machine)
 {
 	UINT8 *gfx = memory_region(REGION_GFX1);
 	int i;

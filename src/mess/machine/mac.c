@@ -196,7 +196,7 @@ static void set_scc_waitrequest(int waitrequest)
 
 
 
-static void set_memory_overlay(int overlay)
+static void set_memory_overlay(running_machine *machine, int overlay)
 {
 	offs_t memory_size;
 	UINT8 *memory_data;
@@ -1237,7 +1237,7 @@ static WRITE8_HANDLER(mac_via_out_a)
 	 * possibly later models), overlay was set on reset, but cleared on the
 	 * first access to the ROM. */
 	if (mac_model < MODEL_MAC_SE)
-		set_memory_overlay((data & 0x10) >> 4);
+		set_memory_overlay(machine, (data & 0x10) >> 4);
 }
 
 static WRITE8_HANDLER(mac_via_out_b)
@@ -1296,7 +1296,7 @@ WRITE16_HANDLER ( mac_via_w )
 
 static TIMER_CALLBACK(set_memory_overlay_callback)
 {
-	set_memory_overlay(param);
+	set_memory_overlay(machine, param);
 }
 
 MACHINE_RESET(mac)
@@ -1308,7 +1308,7 @@ MACHINE_RESET(mac)
 	scc_init(&mac_scc8530_interface);
 
 	/* setup the memory overlay */
-	set_memory_overlay(1);
+	set_memory_overlay(machine, 1);
 
 	/* reset the via */
 	via_reset();
@@ -1332,12 +1332,12 @@ static STATE_POSTLOAD( mac_state_load )
 {
 	int overlay = mac_overlay;
 	mac_overlay = -1;
-	set_memory_overlay(overlay);
+	set_memory_overlay(machine, overlay);
 }
 
 
 
-static void mac_driver_init(mac_model_t model)
+static void mac_driver_init(running_machine *machine, mac_model_t model)
 {
 	mac_overlay = -1;
 	mac_model = model;
@@ -1349,7 +1349,7 @@ static void mac_driver_init(mac_model_t model)
 	mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
 		memory_region_length(REGION_USER1), memory_region(REGION_USER1), TRUE, 3);
 
-	set_memory_overlay(1);
+	set_memory_overlay(machine, 1);
 
 	/* configure via */
 	via_config(0, &mac_via6522_intf);
@@ -1371,12 +1371,12 @@ static void mac_driver_init(mac_model_t model)
 
 DRIVER_INIT(mac128k512k)
 {
-	mac_driver_init(MODEL_MAC_128K512K);
+	mac_driver_init(machine, MODEL_MAC_128K512K);
 }
 
 DRIVER_INIT(mac512ke)
 {
-	mac_driver_init(MODEL_MAC_512KE);
+	mac_driver_init(machine, MODEL_MAC_512KE);
 }
 
 static const SCSIConfigTable dev_table =
@@ -1401,17 +1401,17 @@ MACHINE_START( macscsi )
 
 DRIVER_INIT(macplus)
 {
-	mac_driver_init(MODEL_MAC_PLUS);
+	mac_driver_init(machine, MODEL_MAC_PLUS);
 }
 
 DRIVER_INIT(macse)
 {
-	mac_driver_init(MODEL_MAC_SE);
+	mac_driver_init(machine, MODEL_MAC_SE);
 }
 
 DRIVER_INIT(macclassic)
 {
-	mac_driver_init(MODEL_MAC_CLASSIC);
+	mac_driver_init(machine, MODEL_MAC_CLASSIC);
 }
 
 static void mac_vblank_irq(running_machine *machine)

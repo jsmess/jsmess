@@ -130,7 +130,7 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 	*BITMAP_ADDR32(tmpbitmap, y, x) = pen;
 }
 
-INLINE void atarist_shifter_load(void)
+INLINE void atarist_shifter_load(running_machine *machine)
 {
 	UINT8 *RAM = memory_region(REGION_CPU1) + shifter.ofs;
 
@@ -167,7 +167,7 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 	if (de)
 	{
-		atarist_shifter_load();
+		atarist_shifter_load(machine);
 	}
 
 	if ((y == shifter.vblank_start) && (x == 0))
@@ -400,7 +400,7 @@ static struct BLITTER
 	UINT32 srcbuf;
 } blitter;
 
-static void atarist_blitter_source(void)
+static void atarist_blitter_source(running_machine *machine)
 {
 	UINT8 *RAM = memory_region(REGION_CPU1) + blitter.src;
 
@@ -439,7 +439,7 @@ static UINT16 atarist_blitter_hop(void)
 	return 0;
 }
 
-static void atarist_blitter_op(UINT16 s, UINT32 dstaddr, UINT16 mask)
+static void atarist_blitter_op(running_machine *machine, UINT16 s, UINT32 dstaddr, UINT16 mask)
 {
 	UINT8 *dst = memory_region(REGION_CPU1) + dstaddr;
 	UINT16 d = (dst[1] << 8) + dst[0];
@@ -460,12 +460,12 @@ static TIMER_CALLBACK( atarist_blitter_tick )
 	{
 		if (blitter.skew & ATARIST_BLITTER_SKEW_FXSR)
 		{
-			atarist_blitter_source();
+			atarist_blitter_source(machine);
 			blitter.src += blitter.src_inc_x;
 		}
 
-		atarist_blitter_source();
-		atarist_blitter_op(atarist_blitter_hop(), blitter.dst, blitter.endmask1);
+		atarist_blitter_source(machine);
+		atarist_blitter_op(machine, atarist_blitter_hop(), blitter.dst, blitter.endmask1);
 		blitter.xcount--;
 
 		while (blitter.xcount > 0)
@@ -477,15 +477,15 @@ static TIMER_CALLBACK( atarist_blitter_tick )
 			{
 				if (!(blitter.skew & ATARIST_BLITTER_SKEW_NFSR))
 				{
-					atarist_blitter_source();
+					atarist_blitter_source(machine);
 				}
 
-				atarist_blitter_op(atarist_blitter_hop(), blitter.dst, blitter.endmask3);
+				atarist_blitter_op(machine, atarist_blitter_hop(), blitter.dst, blitter.endmask3);
 			}
 			else
 			{
-				atarist_blitter_source();
-				atarist_blitter_op(atarist_blitter_hop(), blitter.dst, blitter.endmask2);
+				atarist_blitter_source(machine);
+				atarist_blitter_op(machine, atarist_blitter_hop(), blitter.dst, blitter.endmask2);
 			}
 
 			blitter.xcount--;
