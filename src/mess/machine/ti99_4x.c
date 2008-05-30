@@ -792,17 +792,17 @@ MACHINE_RESET( ti99 )
 	else if (ti99_model == model_99_4p)
 		xRAM_kind = xRAM_kind_99_4p_1Mb;	/* hack */
 	else
-		xRAM_kind = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_xRAM_bit) & config_xRAM_mask;
+		xRAM_kind = (input_port_read(machine, "CFG") >> config_xRAM_bit) & config_xRAM_mask;
 	if (ti99_model == model_99_8)
 		has_speech = TRUE;
 	else
-		has_speech = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_speech_bit) & config_speech_mask;
-	fdc_kind = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_fdc_bit) & config_fdc_mask;
-	has_ide = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_ide_bit) & config_ide_mask;
-	has_rs232 = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_rs232_bit) & config_rs232_mask;
-	has_handset = (ti99_model == model_99_4) && ((input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_handsets_bit) & config_handsets_mask);
-	has_hsgpl = (ti99_model == model_99_4p) || ((input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_hsgpl_bit) & config_hsgpl_mask);
-	has_usb_sm = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_usbsm_bit) & config_usbsm_mask;
+		has_speech = (input_port_read(machine, "CFG") >> config_speech_bit) & config_speech_mask;
+	fdc_kind = (input_port_read(machine, "CFG") >> config_fdc_bit) & config_fdc_mask;
+	has_ide = (input_port_read(machine, "CFG") >> config_ide_bit) & config_ide_mask;
+	has_rs232 = (input_port_read(machine, "CFG") >> config_rs232_bit) & config_rs232_mask;
+	has_handset = (ti99_model == model_99_4) && ((input_port_read(machine, "CFG") >> config_handsets_bit) & config_handsets_mask);
+	has_hsgpl = ((ti99_model == model_99_4p) || (input_port_read(machine, "CFG") >> config_hsgpl_bit) & config_hsgpl_mask);
+	has_usb_sm = (input_port_read(machine, "CFG") >> config_usbsm_bit) & config_usbsm_mask;
 
 	/* set up optional expansion hardware */
 	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
@@ -947,7 +947,7 @@ INTERRUPT_GEN( ti99_vblank_interrupt )
 	TMS9928A_interrupt(machine);
 	if (has_handset)
 		ti99_handset_task();
-	has_mecmouse = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_mecmouse_bit) & config_mecmouse_mask;
+	has_mecmouse = (input_port_read(machine, "CFG") >> config_mecmouse_bit) & config_mecmouse_mask;
 	if (has_mecmouse)
 		mecmouse_poll();
 }
@@ -959,7 +959,7 @@ INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 	if (++line_count == 262)
 	{
 		line_count = 0;
-		has_mecmouse = (input_port_read_indexed(machine, INPUT_PORT_CONFIG) >> config_mecmouse_bit) & config_mecmouse_mask;
+		has_mecmouse = (input_port_read(machine, "CFG") >> config_mecmouse_bit) & config_mecmouse_mask;
 		if (has_mecmouse)
 			mecmouse_poll();
 	}
@@ -1821,11 +1821,13 @@ static int ti99_handset_poll_keyboard(int num)
 	UINT32 key_buf;
 	UINT8 current_key;
 	int i;
+	char port1[5], port2[5];
 
 
 	/* read current key state */
-	key_buf = ( input_port_read_indexed(machine, input_port_IR_keypads+num)
-					| (input_port_read_indexed(machine, input_port_IR_keypads+num+1) << 16) ) >> (4*num);
+	sprintf(port1, "KP%d", num);
+	sprintf(port2, "KP%d", num+1);
+	key_buf = ( input_port_read(machine, port1) | (input_port_read(machine, port2) << 16) ) >> (4*num);
 
 	/* If a key was previously pressed, this key was not shift, and this key is
 	still down, then don't change the current key press. */
@@ -1902,10 +1904,13 @@ static int ti99_handset_poll_joystick(int num)
 	UINT8 current_joy;
 	int current_joy_x, current_joy_y;
 	int message;
+	char port1[6], port2[6];
 
 	/* read joystick position */
-	current_joy_x = input_port_read_indexed(machine, input_port_IR_joysticks+2*num);
-	current_joy_y = input_port_read_indexed(machine, input_port_IR_joysticks+2*num+1);
+	sprintf(port1, "JOY%d", 2*num);
+	sprintf(port2, "JOY%d", 2*num+1);
+	current_joy_x = input_port_read(machine, port1);
+	current_joy_y = input_port_read(machine, port2);
 	/* compare with last saved position */
 	current_joy = current_joy_x | (current_joy_y << 4);
 	if (current_joy != previous_joy[num])
@@ -2091,8 +2096,8 @@ static void mecmouse_poll(void)
 	int new_mx, new_my;
 	int delta_x, delta_y;
 
-	new_mx = input_port_read_indexed(machine, input_port_mousex);
-	new_my = input_port_read_indexed(machine, input_port_mousey);
+	new_mx = input_port_read(machine, "MOUSEX");
+	new_my = input_port_read(machine, "MOUSEY");
 
 	/* compute x delta */
 	delta_x = new_mx - last_mx;
@@ -2223,12 +2228,13 @@ static int ti99_R9901_0(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
+	char port[7];
 
 	if ((ti99_model == model_99_4) && (KeyCol == 7))
 		answer = (ti99_handset_poll_bus() << 3) | 0x80;
 	else if (has_mecmouse && (KeyCol == ((ti99_model == model_99_4) ? 6 : 7)))
 	{
-		int buttons = input_port_read_indexed(machine, input_port_mouse_buttons) & 3;
+		int buttons = input_port_read(machine, "MOUSE0") & 3;
 
 		answer = (mecmouse_read_y ? mecmouse_y_buf : mecmouse_x_buf) << 4;
 
@@ -2240,12 +2246,15 @@ static int ti99_R9901_0(int offset)
 			answer |= 0x80;
 	}
 	else
-		answer = ((input_port_read_indexed(machine, input_port_keyboard + (KeyCol >> 1)) >> ((KeyCol & 1) * 8)) << 3) & 0xF8;
-
+	{
+		sprintf(port, "KEY%d", (KeyCol >> 1));
+		answer = ((input_port_read(machine, port) >> ((KeyCol & 1) * 8)) << 3) & 0xF8;
+	}
+	
 	if ((ti99_model == model_99_4a) || (ti99_model == model_99_4p))
 	{
 		if (! AlphaLockLine)
-			answer &= ~ (input_port_read_indexed(machine, input_port_caps_lock) << 3);
+			answer &= ~ (input_port_read(machine, "ALPHA") << 3);
 	}
 
 	return answer;
@@ -2264,12 +2273,16 @@ static int ti99_R9901_1(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
+	char port[7];
 
 	if (/*(ti99_model == model_99_4) &&*/ (KeyCol == 7))
 		answer = 0x07;
 	else
-		answer = ((input_port_read_indexed(machine, input_port_keyboard + (KeyCol >> 1)) >> ((KeyCol & 1) * 8)) >> 5) & 0x07;
-
+	{
+		sprintf(port, "KEY%d", (KeyCol >> 1));
+		answer = ((input_port_read(machine, port) >> ((KeyCol & 1) * 8)) >> 5) & 0x07;
+	}
+	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
 	/*if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0)
 		answer |= 8;*/
@@ -2348,10 +2361,11 @@ static int ti99_8_R9901_0(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
+	char port[7];
 
 	if (has_mecmouse && (KeyCol == 15))
 	{
-		int buttons = input_port_read_indexed(machine, input_port_mouse_buttons) & 3;
+		int buttons = input_port_read(machine, "MOUSE0") & 3;
 
 		answer = ((mecmouse_read_y ? mecmouse_y_buf : mecmouse_x_buf) << 7) & 0x80;
 
@@ -2360,8 +2374,11 @@ static int ti99_8_R9901_0(int offset)
 			answer |= 0x40;
 	}
 	else
-		answer = (input_port_read_indexed(machine, input_port_keyboard + KeyCol) << 6) & 0xC0;
-
+	{
+		sprintf(port, "KEY%d", KeyCol);
+		answer = (input_port_read(machine, port) << 6) & 0xC0;
+	}
+	
 	return answer;
 }
 
@@ -2378,10 +2395,11 @@ static int ti99_8_R9901_1(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
+	char port[7];
 
 	if (has_mecmouse && (KeyCol == 15))
 	{
-		int buttons = input_port_read_indexed(machine, input_port_mouse_buttons) & 3;
+		int buttons = input_port_read(machine, "MOUSE0") & 3;
 
 		answer = ((mecmouse_read_y ? mecmouse_y_buf : mecmouse_x_buf) << 1) & 0x03;
 
@@ -2390,8 +2408,11 @@ static int ti99_8_R9901_1(int offset)
 			answer |= 0x04;
 	}
 	else
-		answer = (input_port_read_indexed(machine, input_port_keyboard + KeyCol) >> 2) & 0x07;
-
+	{
+		sprintf(port, "KEY%d", KeyCol);
+		answer = (input_port_read(machine, port) >> 2) & 0x07;
+	}
+	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
 	/*if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0)
 		answer |= 8;*/

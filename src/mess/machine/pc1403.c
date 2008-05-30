@@ -62,133 +62,72 @@ int pc1403_ina(void)
     UINT8 data=outa;
 	running_machine *machine = Machine;
 
-    if (asic[3]&1) {
-	if (KEY_7) data|=1;
-	if (KEY_8) data|=2;
-	if (KEY_9) data|=4;
-	if (KEY_DIV) data|=8;
-	if (KEY_XM) data|=0x10;
-	// 0x20
-	// 0x40
-	// 0x80
-    }
-    if (asic[3]&2) {
-	if (KEY_4) data|=1;
-	if (KEY_5) data|=2;
-	if (KEY_6) data|=4;
-	if (KEY_MUL) data|=8;
-	if (KEY_RM) data|=0x10;
-	if (KEY_SHIFT) data|=0x20;
-	if (KEY_DEF) data|=0x40;
-	if (KEY_SMALL) data|=0x80;
-    }
-    if (asic[3]&4) {
-	if (KEY_1) data|=1;
-	if (KEY_2) data|=2;
-	if (KEY_3) data|=4;
-	if (KEY_MINUS) data|=8;
-	if (KEY_MPLUS) data|=0x10;
-	if (KEY_Q) data|=0x20;
-	if (KEY_A) data|=0x40;
-	if (KEY_Z) data|=0x80;
-    }
-    if (asic[3]&8) {
-	if (KEY_0) data|=1;
-	if (KEY_SIGN) data|=2;
-	if (KEY_POINT) data|=4;
-	if (KEY_PLUS) data|=8;
-	if (KEY_EQUALS) data|=0x10;
-	if (KEY_W) data|=0x20;
-	if (KEY_S) data|=0x40;
-	if (KEY_X) data|=0x80;
-    }
-    if (asic[3]&0x10) {
-	if (KEY_HYP) data|=1;
-	if (KEY_SIN) data|=2;
-	if (KEY_COS) data|=4;
-	if (KEY_TAN) data|=8;
-	//0x10 toggles indicator 3c bit 0 japan?
-	if (KEY_E) data|=0x20;
-	if (KEY_D) data|=0x40;
-	if (KEY_C) data|=0x80;
-    }
-    if (asic[3]&0x20) {
-	if (KEY_HEX) data|=1;
-	if (KEY_DEG) data|=2;
-	if (KEY_LN) data|=4;
-	if (KEY_LOG) data|=8;
-	//0x10 tilde
-	if (KEY_R) data|=0x20;
-	if (KEY_F) data|=0x40;
-	if (KEY_V) data|=0x80;
-    }
-    if (asic[3]&0x40) {
-	if (KEY_EXP) data|=1;
-	if (KEY_POT) data|=2;
-	if (KEY_ROOT) data|=4;
-	if (KEY_SQUARE) data|=8;
-	//0x10 - yen
-	if (KEY_T) data|=0x20;
-	if (KEY_G) data|=0x40;
-	if (KEY_B) data|=0x80;
-    }
-    if (outa&1) {
-	if (power||(KEY_CCE)) data|=2;
-	if (KEY_STAT) data|=4;
-	if (KEY_FE) data|=8;
-	if (KEY_DOWN) data|=0x10;
-	if (KEY_Y) data|=0x20;
-	if (KEY_H) data|=0x40;
-	if (KEY_N) data|=0x80;
-    }
-    if (outa&2) {
-	if (KEY_BRACE_RIGHT) data|=4;
-	if (KEY_1X) data|=8;
-	if (KEY_UP) data|=0x10;
-	if (KEY_U) data|=0x20;
-	if (KEY_J) data|=0x40;
-	if (KEY_M) data|=0x80;
-    }
-    if (outa&4) {
-	if (KEY_BRACE_LEFT) data|=8;
-	if (KEY_LEFT) data|=0x10;
-	if (KEY_I) data|=0x20;
-	if (KEY_K) data|=0x40;
-	if (KEY_SPC) data|=0x80;
-    }
-    if (outa&8) {
-	if (KEY_RIGHT) data|=0x10;
-	if (KEY_O) data|=0x20;
-	if (KEY_L) data|=0x40;
-	if (KEY_ENTER) data|=0x80;
-    }
-    if (outa&0x10) {
-	if (KEY_P) data|=0x20;
-	if (KEY_COMMA) data|=0x40;
-	if (KEY_BASIC) data|=0x80;
-    }
-    if (outa&0x20) {
-	//0x40 shift lock
-	if (KEY_CAL) data|=0x80;
-    }
-    if (outa&0x40) {
-	if (KEY_OFF) data|=0x80;
-    }
+    if (asic[3] & 0x01)
+		data |= input_port_read(machine, "KEY0");
+
+    if (asic[3] & 0x02)
+		data |= input_port_read(machine, "KEY1");
+
+    if (asic[3] & 0x04)
+		data |= input_port_read(machine, "KEY2");
+
+    if (asic[3] & 0x08)
+		data |= input_port_read(machine, "KEY3");
+
+    if (asic[3] & 0x10)
+		data |= input_port_read(machine, "KEY4");
+
+    if (asic[3] & 0x20)
+		data |= input_port_read(machine, "KEY5");
+
+    if (asic[3] & 0x40)
+		data |= input_port_read(machine, "KEY6");
+
+    if (outa & 0x01)
+	{
+		data |= input_port_read(machine, "KEY7");
+		
+		/* At Power Up we fake a 'C-CE' pressure */
+		if (power)
+			data |= 0x02;
+	}
+
+    if (outa & 0x02)
+		data |= input_port_read(machine, "KEY8");
+
+    if (outa & 0x04)
+		data |= input_port_read(machine, "KEY9");
+
+    if (outa & 0x08)
+		data |= input_port_read(machine, "KEY10");
+
+    if (outa & 0x10)
+		data |= input_port_read(machine, "KEY11");
+
+    if (outa & 0x20)
+		data |= input_port_read(machine, "KEY12");
+
+    if (outa & 0x40)
+		data |= input_port_read(machine, "KEY13");
+
     return data;
 }
 
 #if 0
 int pc1403_inb(void)
 {
-	int data=outb;
-	if (KEY_OFF) data|=1;
+	int data = outb;
+
+	if (input_port_read(machine, "KEY13")) 
+		data |= 1;
+
 	return data;
 }
 #endif
 
 void pc1403_outc(int data)
 {
-    pc1403_portc=data;
+    pc1403_portc = data;
     logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time()), activecpu_get_pc(), data);
 }
 
@@ -196,13 +135,13 @@ void pc1403_outc(int data)
 int pc1403_brk(void)
 {
 	running_machine *machine = Machine;
-	return KEY_BRK;
+	return (input_port_read(machine, "EXTRA") & 0x01);
 }
 
 int pc1403_reset(void)
 {
 	running_machine *machine = Machine;
-	return KEY_RESET;
+	return (input_port_read(machine, "EXTRA") & 0x02);
 }
 
 /* currently enough to save the external ram */
@@ -243,7 +182,7 @@ DRIVER_INIT( pc1403 )
 	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
 
 	memory_set_bankptr(1, memory_region(REGION_USER1));
-	if (RAM32K)
+	if ((input_port_read(machine, "DSW0") & 0x80) == 0x80)
 	{
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_RAM);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_RAM);

@@ -160,7 +160,7 @@ MACHINE_RESET( pdp1 )
 {
 	int config;
 
-	config = input_port_read_indexed(machine, pdp1_config);
+	config = input_port_read(machine, "CFG");
 	pdp1_reset_param.extend_support = (config >> pdp1_config_extend_bit) & pdp1_config_extend_mask;
 	pdp1_reset_param.hw_mul_div = (config >> pdp1_config_hw_mul_div_bit) & pdp1_config_hw_mul_div_mask;
 	pdp1_reset_param.type_20_sbs = (config >> pdp1_config_type_20_sbs_bit) & pdp1_config_type_20_sbs_mask;
@@ -1175,7 +1175,7 @@ void iot_dra(int op2, int nac, int mb, int *io, int ac)
 */
 void iot_011(int op2, int nac, int mb, int *io, int ac)
 {
-	int key_state = input_port_read_indexed(Machine, pdp1_spacewar_controllers);
+	int key_state = input_port_read(Machine, "SPACEWAR");
 	int reply;
 
 
@@ -1257,10 +1257,14 @@ static void pdp1_keyboard(running_machine *machine)
 	static int old_typewriter_keys[4];
 
 	int typewriter_transitions;
+	char port[5];
 
 
 	for (i=0; i<4; i++)
-		typewriter_keys[i] = input_port_read_indexed(machine, pdp1_typewriter + i);
+	{
+		sprintf(port, "TWR%d", i);
+		typewriter_keys[i] = input_port_read(machine, port);
+	}
 
 	for (i=0; i<4; i++)
 	{
@@ -1291,9 +1295,9 @@ static void pdp1_lightpen(void)
 	int current_state;
 	static int previous_state;
 
-	lightpen.active = (input_port_read_indexed(machine, pdp1_config) >> pdp1_config_lightpen_bit) & pdp1_config_lightpen_mask;
+	lightpen.active = (input_port_read(machine, "CFG") >> pdp1_config_lightpen_bit) & pdp1_config_lightpen_mask;
 
-	current_state = input_port_read_indexed(machine, pdp1_lightpen_state);
+	current_state = input_port_read(machine, "LIGHTPEN");
 
 	/* update pen down state */
 	lightpen.down = lightpen.active && (current_state & pdp1_lightpen_down);
@@ -1315,8 +1319,8 @@ static void pdp1_lightpen(void)
 	previous_state = current_state;
 
 	/* update pen position */
-	x_delta = input_port_read_indexed(machine, pdp1_lightpen_x);
-	y_delta = input_port_read_indexed(machine, pdp1_lightpen_y);
+	x_delta = input_port_read(machine, "LIGHTX");
+	y_delta = input_port_read(machine, "LIGHTY");
 
 	if (x_delta >= 0x80)
 		x_delta -= 0x100;
@@ -1356,10 +1360,10 @@ INTERRUPT_GEN( pdp1_interrupt )
 	int ta_transitions;
 
 
-	cpunum_set_reg(0, PDP1_SS, input_port_read_indexed(machine, pdp1_sense_switches));
+	cpunum_set_reg(0, PDP1_SS, input_port_read(machine, "SENSE"));
 
 	/* read new state of control keys */
-	control_keys = input_port_read_indexed(machine, pdp1_control_switches);
+	control_keys = input_port_read(machine, "CSW");
 
 	if (control_keys & pdp1_control)
 	{
@@ -1451,7 +1455,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 
 
 		/* handle test word keys */
-		tw_keys = (input_port_read_indexed(machine, pdp1_tw_switches_MSB) << 16) | input_port_read_indexed(machine, pdp1_tw_switches_LSB);
+		tw_keys = (input_port_read(machine, "TWDMSB") << 16) | input_port_read(machine, "TWDLSB");
 
 		/* compute transitions */
 		tw_transitions = tw_keys & (~ old_tw_keys);
@@ -1464,7 +1468,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 
 
 		/* handle address keys */
-		ta_keys = input_port_read_indexed(machine, pdp1_ta_switches);
+		ta_keys = input_port_read(machine, "TSTADD");
 
 		/* compute transitions */
 		ta_transitions = ta_keys & (~ old_ta_keys);

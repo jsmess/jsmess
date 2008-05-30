@@ -28,103 +28,69 @@ void pc1251_outc(int data)
 
 int pc1251_ina(void)
 {
-	int data=outa;
+	int data = outa;
 	running_machine *machine = Machine;
 
-	if (outb&1) {
-		if (PC1251_KEY_MINUS) data|=1;
-		if (power||PC1251_KEY_CL) data|=2; // problem with the deg lcd
-		if (PC1251_KEY_ASTERIX) data|=4;
-		if (PC1251_KEY_SLASH) data|=8;
-		if (PC1251_KEY_DOWN) data|=0x10;
-		if (PC1251_KEY_E) data|=0x20;
-		if (PC1251_KEY_D) data|=0x40;
-		if (PC1251_KEY_C) data|=0x80;
+	if (outb & 0x01)
+	{
+		data |= input_port_read(machine, "KEY0");
+
+		/* At Power Up we fake a 'CL' pressure */
+		if (power)
+			data |= 0x02;		// problem with the deg lcd
 	}
-	if (outb&2) {
-		if (PC1251_KEY_PLUS) data|=1;
-		if (PC1251_KEY_9) data|=2;
-		if (PC1251_KEY_3) data|=4;
-		if (PC1251_KEY_6) data|=8;
-		if (PC1251_KEY_SHIFT) data|=0x10;
-		if (PC1251_KEY_W) data|=0x20;
-		if (PC1251_KEY_S) data|=0x40;
-		if (PC1251_KEY_X) data|=0x80;
-	}
-	if (outb&4) {
-		if (PC1251_KEY_POINT) data|=1;
-		if (PC1251_KEY_8) data|=2;
-		if (PC1251_KEY_2) data|=4;
-		if (PC1251_KEY_5) data|=8;
-		if (PC1251_KEY_DEF) data|=0x10;
-		if (PC1251_KEY_Q) data|=0x20;
-		if (PC1251_KEY_A) data|=0x40;
-		if (PC1251_KEY_Z) data|=0x80;
-	}
-	if (outa&1) {
-		if (PC1251_KEY_7) data|=2;
-		if (PC1251_KEY_1) data|=4;
-		if (PC1251_KEY_4) data|=8;
-		if (PC1251_KEY_UP) data|=0x10;
-		if (PC1251_KEY_R) data|=0x20;
-		if (PC1251_KEY_F) data|=0x40;
-		if (PC1251_KEY_V) data|=0x80;
-	}
-	if (outa&2) {
-		if (PC1251_KEY_EQUALS) data|=4;
-		if (PC1251_KEY_P) data|=8;
-		if (PC1251_KEY_LEFT) data|=0x10;
-		if (PC1251_KEY_T) data|=0x20;
-		if (PC1251_KEY_G) data|=0x40;
-		if (PC1251_KEY_B) data|=0x80;
-	}
-	if (outa&4) {
-		if (PC1251_KEY_O) data|=8;
-		if (PC1251_KEY_RIGHT) data|=0x10;
-		if (PC1251_KEY_Y) data|=0x20;
-		if (PC1251_KEY_H) data|=0x40;
-		if (PC1251_KEY_N) data|=0x80;
-	}
-	if (outa&8) {
-//		if (PC1251_KEY_DOWN) data|=0x10; //?
-		if (PC1251_KEY_U) data|=0x20;
-		if (PC1251_KEY_J) data|=0x40;
-		if (PC1251_KEY_M) data|=0x80;
-	}
-	if (outa&0x10) {
-		if (PC1251_KEY_I) data|=0x20;
-		if (PC1251_KEY_K) data|=0x40;
-		if (PC1251_KEY_SPACE) data|=0x80;
-	}
-	if (outa&0x20) {
-		if (PC1251_KEY_L) data|=0x40;
-		if (PC1251_KEY_ENTER) data|=0x80;
-	}
-	if (outa&0x40) {
-		if (PC1251_KEY_0) data|=0x80;
-	}
+
+	if (outb & 0x02)
+		data |= input_port_read(machine, "KEY1");
+
+	if (outb & 0x04)
+		data |= input_port_read(machine, "KEY2");
+
+	if (outa & 0x01)
+		data |= input_port_read(machine, "KEY3");
+
+	if (outa & 0x02)
+		data |= input_port_read(machine, "KEY4");
+
+	if (outa & 0x04)
+		data |= input_port_read(machine, "KEY5");
+
+	if (outa & 0x08)
+		data |= input_port_read(machine, "KEY6");
+
+	if (outa & 0x10)
+		data |= input_port_read(machine, "KEY7");
+
+	if (outa & 0x20)
+		data |= input_port_read(machine, "KEY8");
+
+	if (outa & 0x40)
+		data |= input_port_read(machine, "KEY9");
 
 	return data;
 }
 
 int pc1251_inb(void)
 {
-	int data=outb;
+	int data = outb;
 	running_machine *machine = Machine;
-	if (outb&8) data|=PC1251_SWITCH_MODE;
+
+	if (outb & 0x08) 
+		data |= (input_port_read(machine, "MODE") & 0x07);
+
 	return data;
 }
 
 int pc1251_brk(void)
 {
 	running_machine *machine = Machine;
-	return PC1251_KEY_BRK;
+	return (input_port_read(machine, "EXTRA") & 0x01);
 }
 
 int pc1251_reset(void)
 {
 	running_machine *machine = Machine;
-	return PC1251_KEY_RESET;
+	return (input_port_read(machine, "EXTRA") & 0x02);
 }
 
 /* currently enough to save the external ram */
@@ -170,20 +136,20 @@ DRIVER_INIT( pc1251 )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xc7ff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x8000);
 #else
-	if (PC1251_RAM11K)
+	if ((input_port_read(machine, "DSW0") & 0xc0) == 0xc0)
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xafff, 0, 0, SMH_RAM);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xc5ff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc600, 0xc7ff, 0, 0, SMH_RAM);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xf7ff, 0, 0, SMH_RAM);
 	}
-	else if (PC1251_RAM6K)
+	else if ((input_port_read(machine, "DSW0") & 0xc0) == 0x80)
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xc7ff, 0, 0, SMH_RAM);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcbff, 0, 0, SMH_RAM);
 	}
-	else if (PC1251_RAM4K)
+	else if ((input_port_read(machine, "DSW0") & 0xc0) == 0x40)
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xb7ff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xc7ff, 0, 0, SMH_RAM);

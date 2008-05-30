@@ -105,22 +105,8 @@ typedef enum
 #endif
 } fdc_kind_t;
 
-/* defines for input ports */
-enum
-{
-	INPUT_PORT_CONFIG = 0,
-	input_port_mousex,									/* optional mouse */
-	input_port_mousey,									/* optional mouse */
-	input_port_mouse_buttons,							/* optional mouse */
-	input_port_keyboard,								/* 4 (/4x) or 16 (/8) input ports */
 
-	input_port_caps_lock = input_port_keyboard+4,		/* /4a only */
-
-	input_port_IR_joysticks = input_port_keyboard+4,	/* /4 only */
-	input_port_IR_keypads = input_port_IR_joysticks+8	/* /4 only */
-};
-
-/* defines for input port input_port_config */
+/* defines for input port "CFG" */
 enum
 {
 	config_xRAM_bit		= 0,

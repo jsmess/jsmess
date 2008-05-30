@@ -1309,22 +1309,22 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	joystick_axis = mux_sel1;
 	joystick = mux_sel2;
 
-	/* poll keyoard keys */
-	if ((input_port_read_indexed(machine, 0) | pia0_pb) != 0xff) porta &= ~0x01;
-	if ((input_port_read_indexed(machine, 1) | pia0_pb) != 0xff) porta &= ~0x02;
-	if ((input_port_read_indexed(machine, 2) | pia0_pb) != 0xff) porta &= ~0x04;
-	if ((input_port_read_indexed(machine, 3) | pia0_pb) != 0xff) porta &= ~0x08;
-	if ((input_port_read_indexed(machine, 4) | pia0_pb) != 0xff) porta &= ~0x10;
-	if ((input_port_read_indexed(machine, 5) | pia0_pb) != 0xff) porta &= ~0x20;
-	if ((input_port_read_indexed(machine, 6) | pia0_pb) != 0xff) porta &= ~0x40;
+	/* poll keyboard keys */
+	if ((input_port_read(machine, "row0") | pia0_pb) != 0xff) porta &= ~0x01;
+	if ((input_port_read(machine, "row1") | pia0_pb) != 0xff) porta &= ~0x02;
+	if ((input_port_read(machine, "row2") | pia0_pb) != 0xff) porta &= ~0x04;
+	if ((input_port_read(machine, "row3") | pia0_pb) != 0xff) porta &= ~0x08;
+	if ((input_port_read(machine, "row4") | pia0_pb) != 0xff) porta &= ~0x10;
+	if ((input_port_read(machine, "row5") | pia0_pb) != 0xff) porta &= ~0x20;
+	if ((input_port_read(machine, "row6") | pia0_pb) != 0xff) porta &= ~0x40;
 
-	if ((input_port_read_indexed(machine, 0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x01;
-	if ((input_port_read_indexed(machine, 1) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x02;
-	if ((input_port_read_indexed(machine, 2) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x04;
-	if ((input_port_read_indexed(machine, 3) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x08;
-	if ((input_port_read_indexed(machine, 4) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x10;
-	if ((input_port_read_indexed(machine, 5) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x20;
-	if ((input_port_read_indexed(machine, 6) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x40;
+	if ((input_port_read(machine, "row0") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x01;
+	if ((input_port_read(machine, "row1") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x02;
+	if ((input_port_read(machine, "row2") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x04;
+	if ((input_port_read(machine, "row3") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x08;
+	if ((input_port_read(machine, "row4") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x10;
+	if ((input_port_read(machine, "row5") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x20;
+	if ((input_port_read(machine, "row6") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x40;
 
 	switch(get_input_device(joystick ? INPUTPORT_LEFT_JOYSTICK : INPUTPORT_RIGHT_JOYSTICK))
 	{

@@ -27,94 +27,50 @@ void pc1350_outc(int data)
 int pc1350_ina(void)
 {
 	running_machine *machine = Machine;
-	int data=outa;
-	int t=pc1350_keyboard_line_r();
-	if (t&1) {
-		if (PC1350_KEY_BRACE_CLOSE) data|=1;
-		if (PC1350_KEY_COLON) data|=2;
-		if (PC1350_KEY_SEMICOLON) data|=4;
-		if (PC1350_KEY_COMMA) data|=8;
-		if (PC1350_KEY_SML) data|=0x10;
-		if (PC1350_KEY_DEF) data|=0x20;
-		// not sure if both shifts are wired to the same contacts
-		if (PC1350_KEY_LSHIFT||PC1350_KEY_RSHIFT) data|=0x40;
+	int data = outa;
+	int t = pc1350_keyboard_line_r();
+
+	if (t & 0x01)
+		data |= input_port_read(machine, "KEY0");
+
+	if (t & 0x02)
+		data |= input_port_read(machine, "KEY1");
+
+	if (t & 0x04)
+		data |= input_port_read(machine, "KEY2");
+
+	if (t & 0x08)
+		data |= input_port_read(machine, "KEY3");
+
+	if (t & 0x10)
+		data |= input_port_read(machine, "KEY4");
+
+	if (t & 0x20)
+		data |= input_port_read(machine, "KEY5");
+
+	if (outa & 0x01)
+		data |= input_port_read(machine, "KEY6");
+
+	if (outa & 0x02)
+		data |= input_port_read(machine, "KEY7");
+
+	if (outa & 0x04)
+	{
+		data |= input_port_read(machine, "KEY8");
+	
+		/* At Power Up we fake a 'CLS' pressure */
+		if (power)
+			data |= 0x08;
 	}
-	if (t&2) {
-		if (PC1350_KEY_BRACE_OPEN) data|=1;
-		if (PC1350_KEY_SLASH) data|=2;
-		if (PC1350_KEY_ASTERIX) data|=4;
-		if (PC1350_KEY_MINUS) data|=8;
-		if (PC1350_KEY_Z) data|=0x10;
-		if (PC1350_KEY_A) data|=0x20;
-		if (PC1350_KEY_Q) data|=0x40;
-	}
-	if (t&4) {
-		if (PC1350_KEY_9) data|=1;
-		if (PC1350_KEY_6) data|=2;
-		if (PC1350_KEY_3) data|=4;
-		if (PC1350_KEY_PLUS) data|=8;
-		if (PC1350_KEY_X) data|=0x10;
-		if (PC1350_KEY_S) data|=0x20;
-		if (PC1350_KEY_W) data|=0x40;
-	}
-	if (t&8) {
-		if (PC1350_KEY_8) data|=1;
-		if (PC1350_KEY_5) data|=2;
-		if (PC1350_KEY_2) data|=4;
-		if (PC1350_KEY_POINT) data|=8;
-		if (PC1350_KEY_C) data|=0x10;
-		if (PC1350_KEY_D) data|=0x20;
-		if (PC1350_KEY_E) data|=0x40;
-	}
-	if (t&0x10) {
-		if (PC1350_KEY_7) data|=1;
-		if (PC1350_KEY_4) data|=2;
-		if (PC1350_KEY_1) data|=4;
-		if (PC1350_KEY_0) data|=8;
-		if (PC1350_KEY_V) data|=0x10;
-		if (PC1350_KEY_F) data|=0x20;
-		if (PC1350_KEY_R) data|=0x40;
-	}
-	if (t&0x20) {
-		if (PC1350_KEY_UP) data|=1;
-		if (PC1350_KEY_DOWN) data|=2;
-		if (PC1350_KEY_LEFT) data|=4;
-		if (PC1350_KEY_RIGHT) data|=8;
-		if (PC1350_KEY_B) data|=0x10;
-		if (PC1350_KEY_G) data|=0x20;
-		if (PC1350_KEY_T) data|=0x40;
-	}
-	if (outa&1) {
-//		if (PC1350_KEY_1) data|=2; //?
-		if (PC1350_KEY_INS) data|=4;
-		if (PC1350_KEY_DEL) data|=8;
-		if (PC1350_KEY_N) data|=0x10;
-		if (PC1350_KEY_H) data|=0x20;
-		if (PC1350_KEY_Y) data|=0x40;
-	}
-	if (outa&2) {
-//		if (PC1350_KEY_2) data|=4; //?
-		if (PC1350_KEY_MODE) data|=8;
-		if (PC1350_KEY_M) data|=0x10;
-		if (PC1350_KEY_J) data|=0x20;
-		if (PC1350_KEY_U) data|=0x40;
-	}
-	if (outa&4) {
-		if (power||PC1350_KEY_CLS) data|=8;
-		if (PC1350_KEY_SPACE) data|=0x10;
-		if (PC1350_KEY_K) data|=0x20;
-		if (PC1350_KEY_I) data|=0x40;
-	}
-	if (outa&8) {
-		if (PC1350_KEY_ENTER) data|=0x10;
-		if (PC1350_KEY_L) data|=0x20;
-		if (PC1350_KEY_O) data|=0x40;
-	}
-	if (outa&0x10) {
-		if (PC1350_KEY_EQUALS) data|=0x20;
-		if (PC1350_KEY_P) data|=0x40;
-	}
-	if (PC1350_KEY_OFF&&(outa&0xc0) ) data|=0xc0;
+
+	if (outa & 0x08)
+		data |= input_port_read(machine, "KEY9");
+
+	if (outa & 0x10)
+		data |= input_port_read(machine, "KEY10");
+
+	if (outa & 0xc0) 
+		data |= input_port_read(machine, "KEY11");
 
 	// missing lshift
 
@@ -130,7 +86,7 @@ int pc1350_inb(void)
 int pc1350_brk(void)
 {
 	running_machine *machine = Machine;
-	return PC1350_KEY_BRK;
+	return (input_port_read(machine, "EXTRA") & 0x01);
 }
 
 /* currently enough to save the external ram */

@@ -45,15 +45,7 @@ void tx0_plot(int x, int y);
 VIDEO_UPDATE( tx0 );
 void tx0_typewriter_drawchar(running_machine *machine, int character);
 
-enum
-{
-	tx0_control_switches = 0,		/* various operator control panel switches */
-	tx0_tsr_switches_MSW = 1,		/* toggle switch register switches */
-	tx0_tsr_switches_LSW = 2,
-	tx0_typewriter = 3				/* typewriter keys */
-};
-
-/* defines for each bit and mask in input port tx0_control_switches */
+/* defines for each bit and mask in input port "CSW" */
 enum
 {
 	/* bit numbers */

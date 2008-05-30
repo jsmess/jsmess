@@ -175,12 +175,14 @@ static void poll_keyboard(running_machine *machine)
 	UINT32 key_transitions;
 	int i, j;
 	int keycode;
+	char port1[6], port2[6];
 
 
 	for (i=0; (i</*4*/3) && (KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
 	{
-		keystate = input_port_read_indexed(machine, input_port_keyboard_concept + i*2)
-					| (input_port_read_indexed(machine, input_port_keyboard_concept + i*2 + 1) << 16);
+		sprintf(port1, "KEY%d", 2*i);
+		sprintf(port2, "KEY%d", 2*i+1);
+		keystate = input_port_read(machine, port1) | (input_port_read(machine, port2) << 16);
 		key_transitions = keystate ^ KeyStateSave[i];
 		if (key_transitions)
 		{
@@ -253,7 +255,7 @@ static  READ8_HANDLER(via_in_b)
 {
 	UINT8 status;
 
-	status = ((input_port_read_indexed(machine, dipswitch_port_concept) & 0x80) >> 1) | ((input_port_read_indexed(machine, dipswitch_port_concept) & 0x40) << 1);
+	status = ((input_port_read(machine, "DSW0") & 0x80) >> 1) | ((input_port_read(machine, "DSW0") & 0x40) << 1);
 	LOG(("via_in_b: VIA port B (DIP switches, Video, Comm Rate) - status: 0x%2.2x\n", status));
 	return status;
 }

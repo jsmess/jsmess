@@ -1117,11 +1117,14 @@ static void tx0_keyboard(running_machine *machine)
 
 	int typewriter_transitions;
 	int charcode, lr;
-
+	char port[5];
 
 	for (i=0; i<4; i++)
-		typewriter_keys[i] = input_port_read_indexed(machine, tx0_typewriter + i);
-
+	{
+		sprintf(port, "TWR%d", i);
+		typewriter_keys[i] = input_port_read(machine, port);
+	}
+	
 	for (i=0; i<4; i++)
 	{
 		typewriter_transitions = typewriter_keys[i] & (~ old_typewriter_keys[i]);
@@ -1162,7 +1165,7 @@ INTERRUPT_GEN( tx0_interrupt )
 
 
 	/* read new state of control keys */
-	control_keys = input_port_read_indexed(machine, tx0_control_switches);
+	control_keys = input_port_read(machine, "CSW");
 
 	if (control_keys & tx0_control)
 	{
@@ -1231,7 +1234,7 @@ INTERRUPT_GEN( tx0_interrupt )
 
 
 		/* handle toggle switch register keys */
-		tsr_keys = (input_port_read_indexed(machine, tx0_tsr_switches_MSW) << 16) | input_port_read_indexed(machine, tx0_tsr_switches_LSW);
+		tsr_keys = (input_port_read(machine, "MSW") << 16) | input_port_read(machine, "LSW");
 
 		/* compute transitions */
 		tsr_transitions = tsr_keys & (~ old_tsr_keys);

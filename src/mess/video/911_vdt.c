@@ -573,12 +573,14 @@ void vdt911_keyboard(int unit)
 	int i, j;
 	modifier_state_t modifier_state;
 	int repeat_mode;
-
+	char port[6];
 
 	/* read current key state */
 	for (i=0; i<6; i++)
-		key_buf[i] = input_port_read_indexed(Machine, i);
-
+	{
+		sprintf(port, "KEY%d", i);
+		key_buf[i] = input_port_read(Machine, port);
+	}
 
 	/* parse modifier keys */
 	if ((USES_8BIT_CHARCODES(unit))

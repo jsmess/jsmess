@@ -142,7 +142,7 @@ VIDEO_UPDATE( pc1350 )
 	color[0] = pocketc_colortable[PC1350_CONTRAST][0];
 	color[1] = pocketc_colortable[PC1350_CONTRAST][1];
 
-	for (k=0, y=DOWN; k<4; y+=16,k++)
+	for (k=0, y=DOWN; k<4; y+=16, k++)
 	{
 		for (x=RIGHT, i=pc1350_addr[k]; i<0xa00; i+=0x200)
 		{
@@ -157,17 +157,18 @@ VIDEO_UPDATE( pc1350 )
 	}
 	/* 783c: 0 SHIFT 1 DEF 4 RUN 5 PRO 6 JAPAN 7 SML */
 	/* I don't know how they really look like in the lcd */
-	pocketc_draw_special(bitmap,RIGHT-30,DOWN+45,shift,
-						pc1350_lcd.reg[0x83c]&1?color[1]:color[0]);
-	pocketc_draw_special(bitmap,RIGHT-30,DOWN+55,def,
-						pc1350_lcd.reg[0x83c]&2?color[1]:color[0]);
-	pocketc_draw_special(bitmap,RIGHT-30,DOWN+5,run,
-						pc1350_lcd.reg[0x83c]&0x10?color[1]:color[0]);
-	pocketc_draw_special(bitmap,RIGHT-30,DOWN+15,pro,
-						pc1350_lcd.reg[0x83c]&0x20?color[1]:color[0]);
-	pocketc_draw_special(bitmap,RIGHT-30,DOWN+25,japan,
-						pc1350_lcd.reg[0x83c]&0x40?color[1]:color[0]);
-	pocketc_draw_special(bitmap,RIGHT-30,DOWN+35,sml,
-						pc1350_lcd.reg[0x83c]&0x80?color[1]:color[0]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+45, shift,
+						pc1350_lcd.reg[0x83c] & 0x01 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+55, def,
+						pc1350_lcd.reg[0x83c] & 0x02 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+5, run,
+						pc1350_lcd.reg[0x83c] & 0x10 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+15, pro,
+						pc1350_lcd.reg[0x83c] & 0x20 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+25, japan,
+						pc1350_lcd.reg[0x83c] & 0x40 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, RIGHT-30, DOWN+35, sml,
+						pc1350_lcd.reg[0x83c] & 0x80 ? color[1] : color[0]);
+
 	return 0;
 }

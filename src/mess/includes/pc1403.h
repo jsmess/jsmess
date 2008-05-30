@@ -9,9 +9,7 @@
 #ifndef PC1403_H_
 #define PC1403_H_
 
-
-#define KEY_SMALL input_port_read_indexed(machine, 1)&0x40
-#define RAM32K (input_port_read_indexed(machine, 10)&0x80)==0x80
+#define CONTRAST (input_port_read(machine, "DSW0") & 0x07)
 
 
 /*----------- defined in machine/pc1403.c -----------*/

@@ -418,13 +418,22 @@ static READ8_HANDLER( cybiko_key_r_byte )
 {
 	UINT8 data = 0xFF;
 	int i;
+	char port[4];
+	
 	_logerror( 2, ("cybiko_key_r_byte (%08X)\n", offset));
 	// A11
-	if (!(offset & (1 << 11))) data &= 0xFE;
+	if (!(offset & (1 << 11))) 
+		data &= 0xFE;
 	// A1 .. A9
-	for (i=1;i<10;i++) if (!(offset & (1 << i))) data &= input_port_read_indexed(machine,  i - 1);
+	for (i=1; i<10; i++) 
+		if (!(offset & (1 << i))) 
+		{
+			sprintf(port, "A%d", i);
+			data &= input_port_read(machine, port);
+		}
 	// A0
-	if (!(offset & (1 <<  0))) data |= 0xFF;
+	if (!(offset & (1 <<  0))) 
+		data |= 0xFF;
 	//
 	return data;
 }
@@ -448,7 +457,7 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		// keyboard
 		case H8S_IO_PORT1 :
 		{
-			//if (input_port_read_indexed(machine, 0) & 0x02) data = data | 0x08; else data = data & (~0x08); // "esc" key
+			//if (input_port_read(machine, "A1") & 0x02) data = data | 0x08; else data = data & (~0x08); // "esc" key
 			data = data | 0x08;
 		}
 		break;

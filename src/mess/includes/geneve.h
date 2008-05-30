@@ -22,18 +22,6 @@ enum
 };
 
 
-/* defines for input ports */
-enum
-{
-	input_port_config_geneve = 0,
-	input_port_joysticks_geneve,
-	input_port_mouse_buttons_geneve,
-	input_port_mouse_deltax_geneve,
-	input_port_mouse_deltay_geneve,
-	input_port_keyboard_geneve
-};
-
-
 /*----------- defined in machine/geneve.c -----------*/
 
 /* prototypes for machine code */

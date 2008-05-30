@@ -18,23 +18,7 @@
 
 /*----------- defined in drivers/pdp1.c -----------*/
 
-/* defines for input port numbers */
-enum
-{
-	pdp1_spacewar_controllers = 0,
-	pdp1_control_switches = 1,		/* various operator control panel switches */
-	pdp1_sense_switches = 2,		/* sense switches */
-	pdp1_ta_switches = 3,			/* test address switches */
-	pdp1_tw_switches_MSB = 4,		/* test word switches */
-	pdp1_tw_switches_LSB = 5,
-	pdp1_typewriter = 6,			/* typewriter keys */
-	pdp1_config = 10,				/* pseudo input port with config */
-	pdp1_lightpen_state = 11,		/* pseudo input port with light pen down */
-	pdp1_lightpen_x = 12,			/* pseudo input port with light pen x deltas */
-	pdp1_lightpen_y = 13			/* pseudo input port with light pen y deltas */
-};
-
-/* defines for each bit and mask in input port pdp1_control_switches */
+/* defines for each bit and mask in input port "CSW" */
 enum
 {
 	/* bit numbers */

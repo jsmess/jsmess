@@ -22,7 +22,7 @@
 static UINT8 outa,outb;
 UINT8 pc1401_portc;
 
-static int power=1; /* simulates pressed cce when mess is started */
+static int power = 1; /* simulates pressed cce when mess is started */
 
 void pc1401_outa(int data)
 {
@@ -43,108 +43,53 @@ void pc1401_outc(int data)
 int pc1401_ina(void)
 {
 	running_machine *machine = Machine;
-	int data=outa;
-	if (outb&1) {
-		if (KEY_SIGN) data|=1;
-		if (KEY_8) data|=2;
-		if (KEY_2) data|=4;
-		if (KEY_5) data|=8;
-		if (KEY_CAL) data|=0x10;
-		if (KEY_Q) data|=0x20;
-		if (KEY_A) data|=0x40;
-		if (KEY_Z) data|=0x80;
+	int data = outa;
+
+	if (outb & 0x01) 
+		data |= input_port_read(machine, "KEY0");
+
+	if (outb & 0x02) 
+		data |= input_port_read(machine, "KEY1");
+
+	if (outb & 0x04) 
+		data |= input_port_read(machine, "KEY2");
+
+	if (outb & 0x08) 
+		data |= input_port_read(machine, "KEY3");
+
+	if (outb & 0x10) 
+		data |= input_port_read(machine, "KEY4");
+
+	if (outb & 0x20) 
+	{
+		data |= input_port_read(machine, "KEY5");
+	
+		/* At Power Up we fake a 'C-CE' pressure */
+		if (power)
+			data |= 0x01;
 	}
-	if (outb&2) {
-		if (KEY_POINT) data|=1;
-		if (KEY_9) data|=2;
-		if (KEY_3) data|=4;
-		if (KEY_6) data|=8;
-		if (KEY_BASIC) data|=0x10;
-		if (KEY_W) data|=0x20;
-		if (KEY_S) data|=0x40;
-		if (KEY_X) data|=0x80;
-	}
-	if (outb&4) {
-		if (KEY_PLUS) data|=1;
-		if (KEY_DIV) data|=2;
-		if (KEY_MINUS) data|=4;
-		if (KEY_MUL) data|=8;
-		if (KEY_DEF) data|=0x10;
-		if (KEY_E) data|=0x20;
-		if (KEY_D) data|=0x40;
-		if (KEY_C) data|=0x80;
-	}
-	if (outb&8) {
-		if (KEY_BRACE_RIGHT) data|=1;
-		if (KEY_BRACE_LEFT) data|=2;
-		if (KEY_SQUARE) data|=4;
-		if (KEY_ROOT) data|=8;
-		if (KEY_POT) data|=0x10;
-		if (KEY_EXP) data|=0x20;
-		if (KEY_XM) data|=0x40;
-		if (KEY_EQUALS) data|=0x80;
-	}
-	if (outb&0x10) {
-		if (KEY_STAT) data|=1;
-		if (KEY_1X) data|=2;
-		if (KEY_LOG) data|=4;
-		if (KEY_LN) data|=8;
-		if (KEY_DEG) data|=0x10;
-		if (KEY_HEX) data|=0x20;
-		if (KEY_MPLUS) data|=0x80;
-	}
-	if (outb&0x20) {
-		if (power||(KEY_CCE)) data|=1;
-		if (KEY_FE) data|=2;
-		if (KEY_TAN) data|=4;
-		if (KEY_COS) data|=8;
-		if (KEY_SIN) data|=0x10;
-		if (KEY_HYP) data|=0x20;
-		if (KEY_SHIFT) data|=0x40;
-		if (KEY_RM) data|=0x80;
-	}
-	if (outa&1) {
-		if (KEY_7) data|=2;
-		if (KEY_1) data|=4;
-		if (KEY_4) data|=8;
-		if (KEY_DOWN) data|=0x10;
-		if (KEY_R) data|=0x20;
-		if (KEY_F) data|=0x40;
-		if (KEY_V) data|=0x80;
-	}
-	if (outa&2) {
-		if (KEY_COMMA) data|=4;
-		if (KEY_P) data|=8;
-		if (KEY_UP) data|=0x10;
-		if (KEY_T) data|=0x20;
-		if (KEY_G) data|=0x40;
-		if (KEY_B) data|=0x80;
-	}
-	if (outa&4) {
-		if (KEY_O) data|=8;
-		if (KEY_LEFT) data|=0x10;
-		if (KEY_Y) data|=0x20;
-		if (KEY_H) data|=0x40;
-		if (KEY_N) data|=0x80;
-	}
-	if (outa&8) {
-		if (KEY_RIGHT) data|=0x10;
-		if (KEY_U) data|=0x20;
-		if (KEY_J) data|=0x40;
-		if (KEY_M) data|=0x80;
-	}
-	if (outa&0x10) {
-		if (KEY_I) data|=0x20;
-		if (KEY_K) data|=0x40;
-		if (KEY_SPC) data|=0x80;
-	}
-	if (outa&0x20) {
-		if (KEY_L) data|=0x40;
-		if (KEY_ENTER) data|=0x80;
-	}
-	if (outa&0x40) {
-		if (KEY_0) data|=0x80;
-	}
+
+	if (outa & 0x01) 
+		data |= input_port_read(machine, "KEY6");
+
+	if (outa & 0x02) 
+		data |= input_port_read(machine, "KEY7");
+
+	if (outa & 0x04) 
+		data |= input_port_read(machine, "KEY8");
+
+	if (outa & 0x08)
+		data |= input_port_read(machine, "KEY9");
+
+	if (outa & 0x10)
+		data |= input_port_read(machine, "KEY10");
+
+	if (outa & 0x20)
+		data |= input_port_read(machine, "KEY11");
+
+	if (outa & 0x40)
+		data |= input_port_read(machine, "KEY12");
+
 	return data;
 }
 
@@ -152,20 +97,23 @@ int pc1401_inb(void)
 {
 	running_machine *machine = Machine;
 	int data=outb;
-	if (KEY_OFF) data|=1;
+
+	if (input_port_read(machine, "EXTRA") & 0x04) 
+		data |= 0x01;
+
 	return data;
 }
 
 int pc1401_brk(void)
 {
 	running_machine *machine = Machine;
-	return KEY_BRK;
+	return (input_port_read(machine, "EXTRA") & 0x01);
 }
 
 int pc1401_reset(void)
 {
 	running_machine *machine = Machine;
-	return KEY_RESET;
+	return (input_port_read(machine, "EXTRA") & 0x02);
 }
 
 /* currently enough to save the external ram */
@@ -295,15 +243,17 @@ DRIVER_INIT( pc1401 )
 	for (i=0; i<sizeof(sucker);i++) pc1401_mem[0x4000+i]=sucker[i];
 	logerror("%d %d\n",i, 0x4000+i);
 #endif
-	for (i=0; i<128; i++) gfx[i]=i;
+
+	for (i=0; i<128; i++) 
+		gfx[i]=i;
 
 	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1401_power_up);
 
-	if (RAM10K)
+	if ((input_port_read(machine, "DSW0") & 0xc0) == 0x80)
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_RAM);
 	}
-	else if (RAM4K)
+	else if ((input_port_read(machine, "DSW0") & 0xc0) == 0x40)
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x37ff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0x3800, 0x3fff, 0, 0, SMH_RAM);

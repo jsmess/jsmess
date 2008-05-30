@@ -160,36 +160,50 @@ VIDEO_UPDATE( pc1401 )
 		}
     }
 
-    pocketc_draw_special(bitmap,RIGHT+149,DOWN+24,line,
-			 pc1401_lcd.reg[0x3c]&8?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT,DOWN-10,busy,
-			 pc1401_lcd.reg[0x3d]&1?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+18,DOWN-10,def,
-			 pc1401_lcd.reg[0x3d]&2?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+43,DOWN-10,shift,
-			 pc1401_lcd.reg[0x3d]&4?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+63,DOWN-10,hyp,
-			 pc1401_lcd.reg[0x3d]&8?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+38,DOWN+24,line,
-			 pc1401_lcd.reg[0x3d]&0x10?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+23,DOWN+24,line,
-			 pc1401_lcd.reg[0x3d]&0x20?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+8,DOWN+24,line,
-			 pc1401_lcd.reg[0x3d]&0x40?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+183,DOWN-10,e,
-			 pc1401_lcd.reg[0x7c]&1?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+176,DOWN-10,m,
-			 pc1401_lcd.reg[0x7c]&2?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+168,DOWN-10,braces,
-			 pc1401_lcd.reg[0x7c]&4?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+138,DOWN-10,rad,
-			 pc1401_lcd.reg[0x7c]&8?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+134,DOWN-10,g,
-			 pc1401_lcd.reg[0x7c]&0x10?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+126,DOWN-10,de,
-			 pc1401_lcd.reg[0x7c]&0x20?color[1]:color[0]);
-    pocketc_draw_special(bitmap,RIGHT+165,DOWN+24,line,
-			 pc1401_lcd.reg[0x7c]&0x40?color[1]:color[0]);
+	pocketc_draw_special(bitmap, RIGHT+149, DOWN+24, line, 
+			pc1401_lcd.reg[0x3c] & 0x08 ? color[1] : color[0]);
+	
+	pocketc_draw_special(bitmap, RIGHT, DOWN-10, busy, 
+			pc1401_lcd.reg[0x3d] & 0x01 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+18, DOWN-10, def,
+			pc1401_lcd.reg[0x3d] & 0x02 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+43, DOWN-10,shift,
+			pc1401_lcd.reg[0x3d] & 0x04 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+63, DOWN-10,hyp,
+			pc1401_lcd.reg[0x3d] & 0x08 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+38, DOWN+24,line,
+			pc1401_lcd.reg[0x3d] & 0x10 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+23, DOWN+24,line,
+			pc1401_lcd.reg[0x3d] & 0x20 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+8, DOWN+24,line,
+			pc1401_lcd.reg[0x3d] & 0x40 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+183, DOWN-10,e,
+			pc1401_lcd.reg[0x7c] & 0x01 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+176, DOWN-10,m,
+			pc1401_lcd.reg[0x7c] & 0x02 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+168, DOWN-10,braces,
+			pc1401_lcd.reg[0x7c] & 0x04 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+138, DOWN-10,rad,
+			pc1401_lcd.reg[0x7c] & 0x08 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+134, DOWN-10,g,
+			pc1401_lcd.reg[0x7c] & 0x10 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+126, DOWN-10,de,
+			pc1401_lcd.reg[0x7c] & 0x20 ? color[1] : color[0]);
+
+	pocketc_draw_special(bitmap, RIGHT+165, DOWN+24,line,
+			pc1401_lcd.reg[0x7c] & 0x40 ? color[1] : color[0]);
 
 /*
   603c: 3 STAT

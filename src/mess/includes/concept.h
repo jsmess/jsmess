@@ -12,14 +12,6 @@
 #define CONCEPT_H_
 
 
-enum
-{
-	input_port_keyboard_concept = 0,
-	dipswitch_port_concept = 6,
-	display_orientation_concept = 7
-};
-
-
 /*----------- defined in machine/concept.c -----------*/
 
 MACHINE_START(concept);

@@ -625,11 +625,16 @@ void asr733_keyboard(int unit)
 	int i, j;
 	modifier_state_t modifier_state;
 	int repeat_mode;
-
+	char port[6];
 
 	/* read current key state */
-	for (i=0; i<6; i++)
-		key_buf[i] = input_port_read_indexed(Machine, i);
+	/* 2008-05 FP: in 733_asr.h there are only 4 input ports defined... */
+	/* for (i=0; i<6; i++) */
+	for (i=0; i<4; i++)
+	{
+		sprintf(port, "KEY%d", i);
+		key_buf[i] = input_port_read(Machine, port);
+	}
 
 	/* process key modifiers */
 	if (key_buf[1] & 0x0200)
