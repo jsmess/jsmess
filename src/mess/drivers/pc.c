@@ -810,9 +810,11 @@ static INPUT_PORTS_START( pc200 )
 	PORT_DIPNAME( 0x08, 0x00, "37a 0x40")
 	PORT_DIPSETTING(	0x00, "0x00" )
 	PORT_DIPSETTING(	0x08, "0x08" )
-	PORT_DIPNAME( 0x10, 0x00, "37a 0x80")
+/* 2008-05 FP: This Dip Switch overlaps the next one. 
+Since pc200 is anyway NOT_WORKING, I comment out this one */
+/*	PORT_DIPNAME( 0x10, 0x00, "37a 0x80")
 	PORT_DIPSETTING(	0x00, "0x00" )
-	PORT_DIPSETTING(	0x10, "0x10" )
+	PORT_DIPSETTING(	0x10, "0x10" ) */
 	PORT_DIPNAME( 0x30, 0x00, "Integrated Graphics Adapter")
 	PORT_DIPSETTING(	0x00, "CGA 1" )
 	PORT_DIPSETTING(	0x10, "CGA 2" )
@@ -972,7 +974,6 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
     PORT_START /* IN1 */
-	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 //  PORT_DIPSETTING(    0x00, "PC 512k" ) // machine crashes with ega bios at 0xc0000
 	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) ) //prego attendere
