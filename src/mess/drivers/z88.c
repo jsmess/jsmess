@@ -14,7 +14,6 @@
  ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/z88.h"
 #include "sound/speaker.h"
 
@@ -178,7 +177,7 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 
 
 
-static void z88_install_memory_handler_pair(offs_t start, offs_t size, int bank_base, void *read_addr, void *write_addr)
+static void z88_install_memory_handler_pair(running_machine *machine, offs_t start, offs_t size, int bank_base, void *read_addr, void *write_addr)
 {
 	read8_machine_func read_handler;
 	write8_machine_func write_handler;
@@ -192,8 +191,8 @@ static void z88_install_memory_handler_pair(offs_t start, offs_t size, int bank_
 	write_handler = (write_addr != NULL) ? (write8_machine_func) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : SMH_UNMAP;
 
 	/* install the handlers */
-	memory_install_read8_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, read_handler);
-	memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, write_handler);
+	memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, read_handler);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, write_handler);
 
 	/* and set the banks */
 	if (read_addr != NULL)
@@ -219,7 +218,7 @@ explains why the extra checks are done
     bank 3      0xC000-0xFFFF
 */
 
-static void z88_refresh_memory_bank(int bank)
+static void z88_refresh_memory_bank(running_machine *machine, int bank)
 {
 	void *read_addr;
 	void *write_addr;
@@ -261,7 +260,7 @@ static void z88_refresh_memory_bank(int bank)
 	}
 
 	/* install the banks */
-	z88_install_memory_handler_pair(bank * 0x4000, 0x4000, bank * 2 + 1, read_addr, write_addr);
+	z88_install_memory_handler_pair(machine, bank * 0x4000, 0x4000, bank * 2 + 1, read_addr, write_addr);
 
 	if (bank == 0)
 	{
@@ -281,7 +280,7 @@ static void z88_refresh_memory_bank(int bank)
 			write_addr = mess_ram;
 		}
 
-		z88_install_memory_handler_pair(0x0000, 0x2000, 9, read_addr, write_addr);
+		z88_install_memory_handler_pair(machine, 0x0000, 0x2000, 9, read_addr, write_addr);
 	}
 }
 
@@ -293,10 +292,10 @@ static MACHINE_RESET( z88 )
 
 	blink_reset();
 
-	z88_refresh_memory_bank(0);
-	z88_refresh_memory_bank(1);
-	z88_refresh_memory_bank(2);
-	z88_refresh_memory_bank(3);
+	z88_refresh_memory_bank(machine, 0);
+	z88_refresh_memory_bank(machine, 1);
+	z88_refresh_memory_bank(machine, 2);
+	z88_refresh_memory_bank(machine, 3);
 }
 
 static ADDRESS_MAP_START(z88_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -373,7 +372,7 @@ static WRITE8_HANDLER(blink_srx_w)
 {
 	blink.mem[offset] = data;
 
-	z88_refresh_memory_bank(offset);
+	z88_refresh_memory_bank(machine, offset);
 }
 /*
  00b0 00
@@ -470,7 +469,7 @@ static WRITE8_HANDLER(z88_port_w)
 
 			if ((changed_bits & (1<<2))!=0)
 			{
-				z88_refresh_memory_bank(0);
+				z88_refresh_memory_bank(machine, 0);
 			}
 		}
 		return;

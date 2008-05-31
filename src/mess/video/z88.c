@@ -157,10 +157,10 @@ VIDEO_EOF( z88 )
 ***************************************************************************/
 VIDEO_UPDATE( z88 )
 {
-    int x,y;
-    unsigned char *ptr = z88_convert_address(screen->machine, blink.sbf);
+	int x,y;
+	unsigned char *ptr = z88_convert_address(screen->machine, blink.sbf);
 	unsigned char *stored_ptr = ptr;
-    int pen0, pen1;
+	int pen0, pen1;
 
 	for (y=0; y<(Z88_SCREEN_HEIGHT>>3); y++)
 	{
