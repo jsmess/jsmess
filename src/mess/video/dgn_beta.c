@@ -400,7 +400,7 @@ static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, b
 	}
 }
 
-static void beta_plot_char_line(int x,int y, bitmap_t *bitmap)
+static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t *bitmap)
 {
 	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
 	unsigned char *data 	= memory_region(REGION_GFX1);		// ptr to char rom
@@ -682,7 +682,7 @@ VIDEO_UPDATE( dgnbeta )
 			if ((beta_scr_x>=0) && (beta_scr_x<699) && (beta_scr_y>=0) && (beta_scr_y<549))
 			{
 				if(IsTextMode)
-					beta_plot_char_line(beta_scr_x, beta_scr_y, bitmap);
+					beta_plot_char_line(screen->machine, beta_scr_x, beta_scr_y, bitmap);
 				else
 					beta_plot_gfx_line(beta_scr_x, beta_scr_y, bitmap);
 			}

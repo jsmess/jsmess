@@ -17,7 +17,8 @@ static UINT8 *ram;
 static UINT8 p1, p2;
 static size_t	cart_size;
 
-static void odyssey2_switch_banks(void) {
+static void odyssey2_switch_banks(running_machine *machine)
+{
 	switch ( cart_size ) {
 	case 12288:
 		/* 12KB cart support (for instance, KTAA as released) */
@@ -59,11 +60,10 @@ DRIVER_INIT( odyssey2 )
 
 MACHINE_RESET( odyssey2 )
 {
-    /* jump to "last" bank, will work for all sizes due to being mirrored */
-    p1 = 0xFF;
-    p2 = 0xFF;
-	odyssey2_switch_banks();
-    return;
+	/* jump to "last" bank, will work for all sizes due to being mirrored */
+	p1 = 0xFF;
+	p2 = 0xFF;
+	odyssey2_switch_banks(machine);
 }
 
 /****** External RAM ******************************/
@@ -127,21 +127,21 @@ WRITE8_HANDLER( g7400_bus_w )
 
 READ8_HANDLER( odyssey2_getp1 )
 {
-    UINT8 data = p1;
+	UINT8 data = p1;
 
-    logerror("%.9f p1 read %.2x\n", attotime_to_double(timer_get_time()), data);
-    return data;
+	logerror("%.9f p1 read %.2x\n", attotime_to_double(timer_get_time()), data);
+	return data;
 }
 
 WRITE8_HANDLER( odyssey2_putp1 )
 {
-    p1 = data;
+	p1 = data;
 
-	odyssey2_switch_banks();
+	odyssey2_switch_banks(machine);
 
 	odyssey2_lum_w ( machine, 0, p1 >> 7 );
 
-    logerror("%.6f p1 written %.2x\n", attotime_to_double(timer_get_time()), data);
+	logerror("%.6f p1 written %.2x\n", attotime_to_double(timer_get_time()), data);
 }
 
 READ8_HANDLER( odyssey2_getp2 )

@@ -122,7 +122,7 @@ static void determine_sprite_collisions(void)
     }
 }
 
-static void render_sprites(void)
+static void render_sprites(running_machine *machine)
 {
     INT32 cardMemoryLocation, pixelSize;
     INT32 spritePixelHeight;
@@ -710,7 +710,7 @@ void stic_screenrefresh(running_machine *machine)
 		// Render the background
 		render_background(machine, tmpbitmap);
 		// Render the sprites into their buffers
-		render_sprites();
+		render_sprites(machine);
 		for (i = 0; i < 8; i++) intv_sprite[i].collision = 0;
 		// Copy the sprites to the background
 		copy_sprites_to_background(machine, tmpbitmap);

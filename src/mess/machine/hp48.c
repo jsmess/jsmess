@@ -67,7 +67,7 @@ static struct {
 } hp48_banks[129];
 
 // to do support weired comparator settings
-static void hp48_config(void)
+static void hp48_config(running_machine *machine)
 {
 	static const read8_machine_func read_handlers[11] = { 0, SMH_BANK1, SMH_BANK2, SMH_BANK3, SMH_BANK4, SMH_BANK5, SMH_BANK6, SMH_BANK7, SMH_BANK8, SMH_BANK9, SMH_BANK10 };
 	int i, begin_bank, end_bank, begin, end, mem_type, bank;
@@ -181,7 +181,7 @@ void hp48_mem_reset(running_machine *machine)
 	for (i=0; i+1< sizeof(hp48s.mem)/sizeof(hp48s.mem[0]); i++) {
 		hp48s.mem[i].adr=-1;
 	}
-	hp48_config();
+	hp48_config(machine);
 }
 
 void hp48_mem_config(running_machine *machine, int v)
@@ -190,7 +190,7 @@ void hp48_mem_config(running_machine *machine, int v)
 	if (hp48s.mem[HDW].adr==-1) {
 		logerror("Configuring HDW at %06X\n", v );
 		hp48s.mem[HDW].adr=v;
-		hp48_config();
+		hp48_config(machine);
 	} else if (hp48s.mem[RAM].adr==-1) {
 		if (hp48s.state==0) {
 			v = 0x100000 - v;
@@ -201,7 +201,7 @@ void hp48_mem_config(running_machine *machine, int v)
 			logerror("Configuring RAM at %06X\n", v );
 			hp48s.mem[RAM].adr=v;
 			hp48s.state=0;
-			hp48_config();
+			hp48_config(machine);
 		}
 	} else if (hp48s.mem[CARD1].adr==-1) {
 		if (hp48s.state==0) {
@@ -212,7 +212,7 @@ void hp48_mem_config(running_machine *machine, int v)
 			logerror("Configuring CARD1 at %06X\n", v );
 			hp48s.mem[CARD1].adr=v;
 			hp48s.state=0;
-			hp48_config();
+			hp48_config(machine);
 		}
 	} else if (hp48s.mem[CARD2].adr==-1) {
 		if (hp48s.state==0) {
@@ -223,7 +223,7 @@ void hp48_mem_config(running_machine *machine, int v)
 			logerror("Configuring CARD2 at %06X\n", v );
 			hp48s.mem[CARD2].adr=v;
 			hp48s.state=0;
-			hp48_config();
+			hp48_config(machine);
 		}
 	}
 }
@@ -235,7 +235,7 @@ void hp48_mem_unconfig(running_machine *machine, int v)
 		if (hp48s.mem[i].adr==v) {
 			hp48s.mem[i].adr=-1;
 			hp48s.state=0;
-			hp48_config();
+			hp48_config(machine);
 			break;
 		}
 	}
