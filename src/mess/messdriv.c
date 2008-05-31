@@ -725,8 +725,7 @@ TESTDRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
 	DRIVER( alfa )		/* Alfa (PMD-85.1 clone)							*/
 
 	/* Statny */
-	DRIVER( mato )		/* Mato (Basic ROM) (PMD-85.2 clone)				*/
-	DRIVER( matoh )		/* Mato (Games ROM) (PMD-85.2 clone)				*/
+	DRIVER( mato )		/* Mato (PMD-85.2 clone)							*/
 
 	/* Microkey */
 	DRIVER( primoa32 )	/* Primo A-32										*/

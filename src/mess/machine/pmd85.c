@@ -202,7 +202,10 @@ static  READ8_HANDLER ( pmd85_ppi_0_porta_r )
 
 static  READ8_HANDLER ( pmd85_ppi_0_portb_r )
 {
-	return input_port_read_indexed(machine, pmd85_ppi_port_outputs[0][0]&0x0f) & input_port_read_indexed(machine, 0x0f);
+	char port[7];
+	
+	sprintf(port, "KEY%d", (pmd85_ppi_port_outputs[0][0] & 0x0f));
+	return input_port_read(machine, port) & input_port_read(machine, "KEY15");
 }
 
 static  READ8_HANDLER ( pmd85_ppi_0_portc_r )
@@ -239,18 +242,22 @@ static  READ8_HANDLER ( mato_ppi_0_portb_r )
 {
 	int i;
 	UINT8 data = 0xff;
+	char port[6];
 
 	for (i = 0; i < 8; i++)
 	{
 		if (!(pmd85_ppi_port_outputs[0][0] & (1 << i)))
-			data &= input_port_read_indexed(machine, i);
+		{
+			sprintf(port, "KEY%d", i);
+			data &= input_port_read(machine, port);
+		}
 	}
 	return data;
 }
 
 static  READ8_HANDLER ( mato_ppi_0_portc_r )
 {
-	return input_port_read_indexed(machine, 0x08) | 0x8f;
+	return input_port_read(machine, "KEY8") | 0x8f;
 }
 
 static WRITE8_HANDLER ( mato_ppi_0_portc_w )
@@ -737,7 +744,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 	static int clk_level = 1;
 	static int clk_level_tape = 1;
 
-	if (!(input_port_read_indexed(machine, 0x11)&0x02))	/* V.24 / Tape Switch */
+	if (!(input_port_read(machine, "DSW0") & 0x02))	/* V.24 / Tape Switch */
 	{
 		/* tape reading */
 		if (cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0))&CASSETTE_PLAY)
@@ -800,14 +807,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 
 static OPBASE_HANDLER(pmd85_opbaseoverride)
 {
-	if (input_port_read_indexed(machine, 0x10)&0x01)
-		mame_schedule_soft_reset(machine);
-	return address;
-}
-
-static OPBASE_HANDLER(mato_opbaseoverride)
-{
-	if (input_port_read_indexed(machine, 0x09)&0x01)
+	if (input_port_read(machine, "RESET") & 0x01) 
 		mame_schedule_soft_reset(machine);
 	return address;
 }
@@ -859,7 +859,7 @@ DRIVER_INIT ( mato )
 {
 	pmd85_model = MATO;
 	pmd85_update_memory = mato_update_memory;
-	memory_set_opbase_handler(0, mato_opbaseoverride);
+	memory_set_opbase_handler(0, pmd85_opbaseoverride);
 }
 
 
@@ -880,7 +880,7 @@ MACHINE_RESET( pmd85 )
 		case PMD85_1:
 		case PMD85_2A:
 		case PMD85_3:
-			pmd85_rom_module_present = (input_port_read_indexed(machine, 0x11)&0x01) ? 1 : 0;
+			pmd85_rom_module_present = (input_port_read(machine, "DSW0") & 0x01) ? 1 : 0;
 			break;
 		case ALFA:
 		case MATO:
