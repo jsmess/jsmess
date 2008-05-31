@@ -72,7 +72,8 @@ static int tms9995_mode;
 /*
 	Initilaizes USB-SmartMedia card, set up handlers
 */
-void ti99_usbsm_init() {
+void ti99_usbsm_init(running_machine *machine)
+{
 	ti99_usbsm_RAM = auto_malloc(0x100000);
 }
 

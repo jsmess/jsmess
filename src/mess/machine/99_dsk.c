@@ -438,7 +438,7 @@ static const ti99_peb_card_handlers_t fdc_handlers =
 /*
 	Reset fdc card, set up handlers
 */
-void ti99_fdc_reset(void)
+void ti99_fdc_reset(running_machine *machine)
 {
 	ti99_disk_DSR = memory_region(region_dsr) + offset_fdc_dsr;
 	DSEL = 0;
@@ -855,7 +855,7 @@ static UINT8 *bwg_ram;
 /*
 	Reset fdc card, set up handlers
 */
-void ti99_bwg_reset(void)
+void ti99_bwg_reset(running_machine *machine)
 {
 	ti99_disk_DSR = memory_region(region_dsr) + offset_bwg_dsr;
         bwg_ram = memory_region(region_dsr) + offset_bwg_ram;
@@ -1227,7 +1227,7 @@ static void hfdc_int_callback(int which, int state)
 /*
 	Reset fdc card, set up handlers
 */
-void ti99_hfdc_reset(void)
+void ti99_hfdc_reset(running_machine *machine)
 {
 	ti99_disk_DSR = memory_region(region_dsr) + offset_hfdc_dsr;
 	hfdc_ram = memory_region(region_dsr) + offset_hfdc_ram;

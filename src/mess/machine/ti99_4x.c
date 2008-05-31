@@ -728,10 +728,10 @@ void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxpar
            determine which one to use. */
 	ti99_peb_init();
 	ti99_floppy_controllers_init_all(machine);
-	ti99_ide_init();
-	ti99_rs232_init();
-	ti99_hsgpl_init();
-	ti99_usbsm_init();
+	ti99_ide_init(machine);
+	ti99_rs232_init(machine);
+	ti99_hsgpl_init(machine);
+	ti99_usbsm_init(machine);
 }
 
 
@@ -817,7 +817,7 @@ MACHINE_RESET( ti99 )
 	{
 		static const spchroms_interface speech_intf = { region_speech_rom };
 
-		spchroms_config(& speech_intf);
+		spchroms_config(machine, &speech_intf);
 
 		if (ti99_model != model_99_8)
 		{
@@ -867,34 +867,34 @@ MACHINE_RESET( ti99 )
 	switch (fdc_kind)
 	{
 	case fdc_kind_TI:
-		ti99_fdc_reset();
+		ti99_fdc_reset(machine);
 		break;
 #if HAS_99CCFDC
 	case fdc_kind_CC:
-		ti99_ccfdc_reset();
+		ti99_ccfdc_reset(machine);
 		break;
 #endif
 	case fdc_kind_BwG:
-		ti99_bwg_reset();
+		ti99_bwg_reset(machine);
 		break;
 	case fdc_kind_hfdc:
-		ti99_hfdc_reset();
+		ti99_hfdc_reset(machine);
 		break;
 	case fdc_kind_none:
 		break;
 	}
 
 	if (has_ide) {
-		ti99_ide_reset(ti99_model == model_99_8);
+		ti99_ide_reset(machine, ti99_model == model_99_8);
 		ti99_ide_load_memcard();
 	}
 
 	if (has_rs232)
-		ti99_rs232_reset();
+		ti99_rs232_reset(machine);
 
 	if (has_hsgpl)	{
-            ti99_hsgpl_reset();
-            ti99_hsgpl_load_memcard();
+		ti99_hsgpl_reset(machine);
+		ti99_hsgpl_load_memcard(machine);
 	}
 	else
 		hsgpl_crdena = 0;

@@ -107,7 +107,7 @@ PALETTE_INIT( asr733 )
 /*
 	Initialize the asr core
 */
-void asr733_init(void)
+void asr733_init(running_machine *machine)
 {
 	UINT8 *dst;
 

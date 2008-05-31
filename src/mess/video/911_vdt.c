@@ -174,7 +174,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 /*
 	Initialize the 911 vdt core
 */
-void vdt911_init(void)
+void vdt911_init(running_machine *machine)
 {
 	UINT8 *base;
 

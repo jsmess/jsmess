@@ -307,9 +307,9 @@ ROM_END
 static DRIVER_INIT( ti990_4 )
 {
 #if VIDEO_911
-	vdt911_init();
+	vdt911_init(machine);
 #else
-	asr733_init();
+	asr733_init(machine);
 #endif
 }
 

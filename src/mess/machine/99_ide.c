@@ -97,7 +97,7 @@ static void clk_interrupt_callback(int state)
 /*
 	Initializes the ide card, set up handlers
 */
-void ti99_ide_init()
+void ti99_ide_init(running_machine *machine)
 {
 	rtc65271_init(memory_region(region_dsr) + offset_ide_ram2, clk_interrupt_callback);
 	ti99_ide_RAM = memory_region(region_dsr) + offset_ide_ram;
@@ -106,7 +106,7 @@ void ti99_ide_init()
 /*
 	Reset ide card, set up handlers
 */
-void ti99_ide_reset(int in_tms9995_mode)
+void ti99_ide_reset(running_machine *machine, int in_tms9995_mode)
 {
 	ti99_peb_set_card_handlers(0x1000, & ide_handlers);
 

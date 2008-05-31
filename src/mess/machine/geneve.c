@@ -210,9 +210,9 @@ MACHINE_START( geneve )
            determine which one to use. */
 	ti99_peb_init();
         ti99_floppy_controllers_init_all(machine);
-        ti99_ide_init();
-        ti99_rs232_init();
-	ti99_usbsm_init();
+        ti99_ide_init(machine);
+        ti99_rs232_init(machine);
+	ti99_usbsm_init(machine);
 	mm58274c_init(machine, 0, 1);
 	add_exit_callback(machine, machine_stop_geneve);
 }
@@ -267,24 +267,24 @@ MACHINE_RESET( geneve )
 	{
 		static const spchroms_interface speech_intf = { region_speech_rom };
 
-		spchroms_config(& speech_intf);
+		spchroms_config(machine, &speech_intf);
 	}
 
 	switch (fdc_kind)
 	{
 	case fdc_kind_TI:
-		ti99_fdc_reset();
+		ti99_fdc_reset(machine);
 		break;
 #if HAS_99CCFDC
 	case fdc_kind_CC:
-		ti99_ccfdc_reset();
+		ti99_ccfdc_reset(machine);
 		break;
 #endif
 	case fdc_kind_BwG:
-		ti99_bwg_reset();
+		ti99_bwg_reset(machine);
 		break;
 	case fdc_kind_hfdc:
-		ti99_hfdc_reset();
+		ti99_hfdc_reset(machine);
 		break;
 	case fdc_kind_none:
 		break;
@@ -292,12 +292,12 @@ MACHINE_RESET( geneve )
 
 	if (has_ide)
 	{
-		ti99_ide_reset(TRUE);
+		ti99_ide_reset(machine, TRUE);
 		ti99_ide_load_memcard();
 	}
 
 	if (has_rs232)
-		ti99_rs232_reset();
+		ti99_rs232_reset(machine);
 
 	if (has_usb_sm)
 		ti99_usbsm_reset(machine, TRUE);
@@ -307,9 +307,6 @@ static void machine_stop_geneve(running_machine *machine)
 {
 	if (has_ide)
 		ti99_ide_save_memcard();
-
-	if (has_rs232)
-		ti99_rs232_cleanup();
 
 	tms9901_cleanup(0);
 }

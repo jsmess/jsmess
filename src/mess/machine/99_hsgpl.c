@@ -134,7 +134,7 @@ enum
 };
 
 
-static int ti99_hsgpl_file_load(mame_file *file)
+static int ti99_hsgpl_file_load(running_machine *machine, mame_file *file)
 {
 	UINT8 version;
 
@@ -207,7 +207,7 @@ static int ti99_hsgpl_get_dirty_flag(void)
 
 
 
-int ti99_hsgpl_load_memcard(void)
+int ti99_hsgpl_load_memcard(running_machine *machine)
 {
 	file_error filerr;
 	mame_file *file;
@@ -215,7 +215,7 @@ int ti99_hsgpl_load_memcard(void)
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, "hsgpl.nv", OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 		return /*1*/0;
-	if (ti99_hsgpl_file_load(file))
+	if (ti99_hsgpl_file_load(machine, file))
 	{
 		mame_fclose(file);
 		return 1;
@@ -225,7 +225,7 @@ int ti99_hsgpl_load_memcard(void)
 	return 0;
 }
 
-int ti99_hsgpl_save_memcard(void)
+int ti99_hsgpl_save_memcard(running_machine *machine)
 {
 	file_error filerr;
 	mame_file *file;
@@ -250,7 +250,7 @@ int ti99_hsgpl_save_memcard(void)
 /*
 	Initialize hsgpl card, set up handlers
 */
-void ti99_hsgpl_init(void)
+void ti99_hsgpl_init(running_machine *machine)
 {
 	hsgpl.GRAM_ptr = memory_region(region_hsgpl) + offset_hsgpl_gram;
 	hsgpl.RAM6_ptr = memory_region(region_hsgpl) + offset_hsgpl_ram6;
@@ -268,7 +268,7 @@ void ti99_hsgpl_init(void)
 /*
 	Reset hsgpl card
 */
-void ti99_hsgpl_reset(void)
+void ti99_hsgpl_reset(running_machine *machine)
 {
 	hsgpl.addr = 0;
 	hsgpl.raddr_LSB = 0;

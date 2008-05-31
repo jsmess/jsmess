@@ -35,6 +35,7 @@ static int rs232_cru_r(running_machine *machine, int offset);
 static void rs232_cru_w(running_machine *machine, int offset, int data);
 static READ8_HANDLER(rs232_mem_r);
 static WRITE8_HANDLER(rs232_mem_w);
+static void ti99_rs232_cleanup(running_machine *machine);
 
 /* pointer to the rs232 ROM data */
 static UINT8 *rs232_DSR;
@@ -160,17 +161,19 @@ DEVICE_IMAGE_UNLOAD( ti99_4_rs232 )
 /*
 	Initializes rs232 card, set up handlers
 */
-void ti99_rs232_init(void)
+void ti99_rs232_init(running_machine *machine)
 {
 	rs232_DSR = memory_region(region_dsr) + offset_rs232_dsr;
 	tms9902_init(0, &tms9902_params);
 	tms9902_init(1, &tms9902_params);
+	
+	add_exit_callback(machine, ti99_rs232_cleanup);
 }
 
 /*
 	Reset rs232 card, set up handlers
 */
-void ti99_rs232_reset(void)
+void ti99_rs232_reset(running_machine *machine)
 {
 	rs232_DSR = memory_region(region_dsr) + offset_rs232_dsr;
 
@@ -190,7 +193,7 @@ void ti99_rs232_reset(void)
 /*
 	rs232 card clean-up
 */
-void ti99_rs232_cleanup(void)
+static void ti99_rs232_cleanup(running_machine *machine)
 {
 	tms9902_cleanup(0);
 	tms9902_cleanup(1);

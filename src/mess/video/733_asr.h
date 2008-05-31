@@ -16,7 +16,7 @@ GFXDECODE_EXTERN( asr733 );
 
 extern PALETTE_INIT ( asr733 ) ;
 
-void asr733_init(void);
+void asr733_init(running_machine *machine);
 int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(int state));
 
 void asr733_reset(int unit);
@@ -24,7 +24,7 @@ void asr733_reset(int unit);
 int asr733_cru_r(int offset, int unit);
 void asr733_cru_w(running_machine *machine, int offset, int data, int unit);
 
- READ8_HANDLER(asr733_0_cru_r);
+READ8_HANDLER(asr733_0_cru_r);
 WRITE8_HANDLER(asr733_0_cru_w);
 
 void asr733_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y);

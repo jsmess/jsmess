@@ -278,7 +278,7 @@ static DRIVER_INIT( ti990_10 )
 
 	memmove(memory_region(REGION_CPU1)+0x1FFC00, memory_region(REGION_CPU1)+0x1FFC00+(page*0x400), 0x400);
 #endif
-	vdt911_init();
+	vdt911_init(machine);
 }
 
 static INPUT_PORTS_START(ti990_10)
