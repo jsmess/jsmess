@@ -351,6 +351,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	int caps_lock = 0;
 	int curkey;
 	int curkey_unmodified;
+	char ipt[11];
 
 	static int reset_flag = 0;
 	static int last_key = 0xff; 	/* necessary for special repeat key behaviour */
@@ -446,13 +447,18 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	for (port = 0; port < num_ports; port++)
 	{
-		data = input_port_read_indexed(machine, AY3600_KEYS_BASEPORT + port);
+		sprintf(ipt, "%s%d", (port < 7) ? "keyb_" : "keypad_" , (port < 7) ? port : port - 6);
+		data = input_port_read(machine, ipt);
+
 		for (bit = 0; bit < 8; bit++)
 		{
-			if (a2_has_capslock(machine)) {
+			if (a2_has_capslock(machine)) 
+			{
 				curkey = ay3600_key_remap_2e[caps_lock][port*8+bit][switchkey];
 				curkey_unmodified = ay3600_key_remap_2e[caps_lock][port*8+bit][0];
-			} else {
+			} 
+			else 
+			{
 				curkey = ay3600_key_remap_2[port*8+bit][switchkey];
 				curkey_unmodified = ay3600_key_remap_2[port*8+bit][0];
 			}
