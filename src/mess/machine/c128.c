@@ -787,7 +787,7 @@ static int c128_dma_read_color (int offset)
 		return c64_colorram[(offset & 0x3ff)|((c64_port6510&0x3)<<10)] & 0xf;
 }
 
-static void c128_common_driver_init (void)
+static void c128_common_driver_init(running_machine *machine)
 {
 	UINT8 *gfx=memory_region(REGION_GFX1);
 	int i;
@@ -830,7 +830,7 @@ static void c128_common_driver_init (void)
 
 DRIVER_INIT( c128 )
 {
-	c128_common_driver_init ();
+	c128_common_driver_init(machine);
 	vic6567_init (1, c64_pal,
 				  c128_dma_read, c128_dma_read_color, c64_vic_interrupt);
 	vic2_set_rastering(0);
@@ -841,7 +841,7 @@ DRIVER_INIT( c128 )
 DRIVER_INIT( c128pal )
 {
 	c64_pal = 1;
-	c128_common_driver_init ();
+	c128_common_driver_init(machine);
 	vic6567_init (1, c64_pal,
 				  c128_dma_read, c128_dma_read_color, c64_vic_interrupt);
 	vic2_set_rastering(1);

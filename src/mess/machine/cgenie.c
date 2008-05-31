@@ -637,7 +637,7 @@ static void tape_get_byte(void)
  * header and skip leading description, if present.
  * The filename is taken from BASIC input buffer at 41E8 ff.
  *******************************************************************/
-static void tape_get_open(void)
+static void tape_get_open(running_machine *machine)
 {
 	if( !tape_get_file )
 	{
@@ -677,7 +677,7 @@ static void tape_get_open(void)
 	}
 }
 
-static void tape_get_bit(void)
+static void tape_get_bit(running_machine *machine)
 {
 	int now_cycles = activecpu_gettotalcycles();
 	int limit = 10 * memory_region(REGION_CPU1)[0x4312];
@@ -708,7 +708,7 @@ static void tape_get_bit(void)
 			/* need to read get new data ? */
 			if( --get_bit_count <= 0 )
 			{
-				tape_get_open();
+				tape_get_open(machine);
 				tape_get_byte();
 			}
 			/* shift next sync or data bit to bit 16 */
@@ -816,12 +816,12 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 	port_ff = data;
 }
 
- READ8_HANDLER( cgenie_port_ff_r )
+READ8_HANDLER( cgenie_port_ff_r )
 {
 	/* virtual tape ? */
 
 	if( input_port_read_indexed(machine, 0) & 0x08 )
-		tape_get_bit();
+		tape_get_bit(machine);
 
 	return port_ff;
 }

@@ -31,7 +31,7 @@ static const device_config *printer_device(running_machine *machine)
 	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
 }
 
-static int expansion_box_installed(void)
+static int expansion_box_installed(running_machine *machine)
 {
 	return (memory_region(REGION_CPU1)[0xe800] != 0xff);
 }
@@ -40,7 +40,7 @@ static int dos_card_active(running_machine *machine)
 {
 	comx35_state *state = machine->driver_data;
 
-	if (expansion_box_installed())
+	if (expansion_box_installed(machine))
 	{
 		return (state->bank == BANK_FLOPPY);
 	}
@@ -271,7 +271,7 @@ static void get_active_bank(running_machine *machine, UINT8 data)
 {
 	comx35_state *state = machine->driver_data;
 
-	if (expansion_box_installed())
+	if (expansion_box_installed(machine))
 	{
 		// expansion box
 
@@ -522,7 +522,7 @@ MACHINE_START( comx35p )
 
 	memory_set_bank(1, 0);
 
-	if (!expansion_box_installed())
+	if (!expansion_box_installed(machine))
 	{
 		state->bank = input_port_read(machine, "EXPANSION");
 	}

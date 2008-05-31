@@ -461,7 +461,7 @@ static TIMER_CALLBACK(adam_paddle_callback)
 		cpunum_set_input_line (machine, 0, 0, HOLD_LINE);
 }
 
-void set_memory_banks(void)
+void set_memory_banks(running_machine *machine)
 {
 /*
 Lineal virtual memory map:
@@ -573,7 +573,7 @@ Lineal virtual memory map:
 	}
 }
 
-void resetPCB(void)
+void resetPCB(running_machine *machine)
 {
     int i;
     memory_region(REGION_CPU1)[adam_pcb] = 0x01;
@@ -611,7 +611,7 @@ static MACHINE_RESET( adam )
 	}
 
 	adam_net_data = 0;
-	set_memory_banks();
+	set_memory_banks(machine);
 	adam_pcb=0xFEC0;
 	clear_keyboard_buffer();
 

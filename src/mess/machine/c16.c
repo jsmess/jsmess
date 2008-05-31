@@ -110,7 +110,7 @@ UINT8 c16_m7501_port_read(void)
 	return data;
 }
 
-static void c16_bankswitch (void)
+static void c16_bankswitch (running_machine *machine)
 {
 	memory_set_bankptr(9, mess_ram);
 
@@ -154,7 +154,7 @@ static void c16_bankswitch (void)
 WRITE8_HANDLER(c16_switch_to_rom)
 {
 	ted7360_rom = 1;
-	c16_bankswitch ();
+	c16_bankswitch(machine);
 }
 
 /* write access to fddX load data flipflop
@@ -175,7 +175,7 @@ WRITE8_HANDLER(c16_select_roms)
 	lowrom = offset & 3;
 	highrom = (offset & 0xc) >> 2;
 	if (ted7360_rom)
-		c16_bankswitch ();
+		c16_bankswitch(machine);
 }
 
 WRITE8_HANDLER(c16_switch_to_ram)

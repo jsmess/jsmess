@@ -514,7 +514,7 @@ void exploreKeyboard(void)
     /* 0xF0-0xFF - Reserved for internal use by keyboard software */
 }
 
-static void master6801_behaviour(int offset, int data)
+static void master6801_behaviour(running_machine *machine, int offset, int data)
 {
 /*
 The Master MC6801 controls all AdamNet operations, keyboard, tapes, disks...
@@ -687,7 +687,7 @@ WRITE8_HANDLER( common_writes_w )
     {
         case 0: /* Internal RAM */
             memory_region(REGION_CPU1)[0x08000+offset] = data;
-            if (offset>=(adam_pcb-0x08000)) master6801_behaviour(offset+0x08000, data);
+            if (offset>=(adam_pcb-0x08000)) master6801_behaviour(machine, offset+0x08000, data);
             break;
         case 1: /* ROM Expansion */
             break;
@@ -714,7 +714,7 @@ WRITE8_HANDLER( adamnet_w )
 	UINT8 *BankBase;
 	BankBase = &memory_region(REGION_CPU1)[0x00000];
 
-	if (data==0x0F) resetPCB();
+	if (data==0x0F) resetPCB(machine);
 	if ( (adam_lower_memory==0) && ((data&0x02)!=(adam_net_data&0x02)) )
 	{
 		if (data&0x02)
@@ -773,7 +773,7 @@ WRITE8_HANDLER( adam_memory_map_controller_w )
 
     adam_lower_memory = (data & 0x03);
     adam_upper_memory = (data & 0x0C)>>2;
-    set_memory_banks();
+    set_memory_banks(machine);
     //logerror("Configurando la memoria, L:%02xh, U:%02xh\n", adam_lower_memory, adam_upper_memory);
 }
 

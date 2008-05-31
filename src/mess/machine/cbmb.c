@@ -256,7 +256,7 @@ static void cbmb_change_font(running_machine *machine, int level)
 	cbmb_vh_set_font(level);
 }
 
-static void cbmb_common_driver_init (void)
+static void cbmb_common_driver_init(running_machine *machine)
 {
 	cbmb_chargen=memory_region(REGION_CPU1)+0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
@@ -282,35 +282,35 @@ static void cbmb_common_driver_init (void)
 
 DRIVER_INIT( cbm600 )
 {
-	cbmb_common_driver_init ();
+	cbmb_common_driver_init(machine);
 	cbm_ntsc = 1;
-	cbm600_vh_init();
+	cbm600_vh_init(machine);
 }
 
 DRIVER_INIT( cbm600pal )
 {
-	cbmb_common_driver_init ();
+	cbmb_common_driver_init(machine);
 	cbm_ntsc = 0;
-	cbm600_vh_init();
+	cbm600_vh_init(machine);
 }
 
 DRIVER_INIT( cbm600hu )
 {
-	cbmb_common_driver_init ();
+	cbmb_common_driver_init(machine);
 	cbm_ntsc = 0;
 }
 
 DRIVER_INIT( cbm700 )
 {
-	cbmb_common_driver_init ();
+	cbmb_common_driver_init(machine);
 	cbm700 = 1;
 	cbm_ntsc = 0;
-	cbm700_vh_init();
+	cbm700_vh_init(machine);
 }
 
 DRIVER_INIT( cbm500 )
 {
-	cbmb_common_driver_init ();
+	cbmb_common_driver_init(machine);
 	cbm500=1;
 	cbm_ntsc = 1;
 	vic6567_init (0, 0, cbmb_dma_read, cbmb_dma_read_color, NULL);

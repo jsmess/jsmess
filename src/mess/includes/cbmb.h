@@ -43,8 +43,8 @@ MC6845_UPDATE_ROW( cbm600_update_row );
 MC6845_UPDATE_ROW( cbm700_update_row );
 MC6845_ON_DE_CHANGED( cbmb_display_enable_changed );
 
-void cbm600_vh_init(void);
-void cbm700_vh_init(void);
+void cbm600_vh_init(running_machine *machine);
+void cbm700_vh_init(running_machine *machine);
 VIDEO_START( cbm700 );
 
 void cbmb_vh_set_font(int font);

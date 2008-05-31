@@ -10,8 +10,8 @@
 
 /*----------- defined in drivers/adam.c -----------*/
 
-void set_memory_banks(void);
-void resetPCB(void);
+void set_memory_banks(running_machine *machine);
+void resetPCB(running_machine *machine);
 
 
 /*----------- defined in machine/adam.c -----------*/
@@ -30,18 +30,18 @@ void exploreKeyboard(void);
 DEVICE_IMAGE_LOAD( adam_floppy );
 DEVICE_IMAGE_UNLOAD( adam_floppy );
 
- READ8_HANDLER  ( adamnet_r );
+READ8_HANDLER  ( adamnet_r );
 WRITE8_HANDLER ( adamnet_w );
- READ8_HANDLER  ( adam_paddle_r );
+READ8_HANDLER  ( adam_paddle_r );
 WRITE8_HANDLER ( adam_paddle_toggle_off );
 WRITE8_HANDLER ( adam_paddle_toggle_on );
 WRITE8_HANDLER ( adam_memory_map_controller_w );
- READ8_HANDLER ( adam_memory_map_controller_r );
- READ8_HANDLER ( adam_mem_r );
- READ8_HANDLER ( adam_video_r );
+READ8_HANDLER ( adam_memory_map_controller_r );
+READ8_HANDLER ( adam_mem_r );
+READ8_HANDLER ( adam_video_r );
 WRITE8_HANDLER ( adam_video_w );
 WRITE8_HANDLER ( common_writes_w );
- READ8_HANDLER  ( master6801_ram_r );
+READ8_HANDLER  ( master6801_ram_r );
 WRITE8_HANDLER ( master6801_ram_w );
 
 

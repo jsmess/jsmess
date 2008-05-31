@@ -22,7 +22,7 @@ VIDEO_UPDATE( cbmb_crtc )
 	return 0;
 }
 
-void cbm600_vh_init(void)
+void cbm600_vh_init(running_machine *machine)
 {
 	UINT8 *gfx = memory_region(REGION_GFX1);
 	int i;
@@ -35,7 +35,7 @@ void cbm600_vh_init(void)
 	}
 }
 
-void cbm700_vh_init(void)
+void cbm700_vh_init(running_machine *machine)
 {
 	UINT8 *gfx = memory_region(REGION_GFX1);
 	int i;
