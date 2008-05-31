@@ -883,7 +883,7 @@ static void setup_cart_banks( void ) {
 	}
 }
 
-static void setup_banks( void ) {
+static void setup_banks( running_machine *machine ) {
 	sms_banking_bios[1] = sms_banking_cart[1] = sms_banking_none[1] = memory_region(REGION_CPU1);
 	sms_banking_bios[2] = sms_banking_cart[2] = sms_banking_none[2] = memory_region(REGION_CPU1);
 	sms_banking_bios[3] = sms_banking_cart[3] = sms_banking_none[3] = memory_region(REGION_CPU1);
@@ -936,7 +936,7 @@ MACHINE_RESET(sms)
 
 	sms_store_control = 0;
 
-	setup_banks();
+	setup_banks(machine);
 
 	setup_rom(machine);
 

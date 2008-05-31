@@ -797,7 +797,7 @@ ADDRESS_MAP_END
 
 
 
-static void einstein_page_rom(void)
+static void einstein_page_rom(running_machine *machine)
 {
 	if (einstein_rom_enabled)
 	{
@@ -848,7 +848,7 @@ static WRITE8_HANDLER(einstein_drive_w)
 static WRITE8_HANDLER(einstein_rom_w)
 {
 	einstein_rom_enabled^=1;
-	einstein_page_rom();
+	einstein_page_rom(machine);
 }
 
 static READ8_HANDLER(einstein_key_int_r)
@@ -1444,7 +1444,7 @@ static MACHINE_RESET( einstein )
 	TMS9928A_reset ();
 
 	einstein_rom_enabled = 1;
-	einstein_page_rom();
+	einstein_page_rom(machine);
 
 	einstein_ctc_trigger = 0;
 

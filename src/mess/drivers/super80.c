@@ -908,7 +908,7 @@ static MACHINE_DRIVER_START( super80r )
 	MDRV_CPU_IO_MAP(super80r_io, 0)
 MACHINE_DRIVER_END
 
-static void driver_init_common( void )
+static void driver_init_common( running_machine *machine )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xc000);
@@ -918,7 +918,7 @@ static void driver_init_common( void )
 static DRIVER_INIT( super80 )
 {
 	timer_pulse(ATTOTIME_IN_HZ(100),NULL,0,super80_halfspeed);	/* timer for 1mhz slowdown */
-	driver_init_common();
+	driver_init_common(machine);
 }
 
 static DRIVER_INIT( super80d )
@@ -934,7 +934,7 @@ static DRIVER_INIT( super80v )
 	pcgram = memory_region(REGION_CPU1)+0xf000;
 	videoram = memory_region(REGION_CPU1)+0x18000;
 	colorram = memory_region(REGION_CPU1)+0x1C000;
-	driver_init_common();
+	driver_init_common(machine);
 }
 
 
@@ -1014,17 +1014,6 @@ ROM_END
 
 static DEVICE_IMAGE_LOAD( super80_cart )
 {
-/*	int size = mame_fsize(fp);
-	UINT8 *mem = malloc(size);
-	if( mem )
-	{
-		if( mame_fread(fp, mem, size) == size )
-		{
-			memcpy(memory_region(REGION_CPU1)+0xc000, mem, size);
-		}
-		free(mem);
-	} */
-
 	image_fread(image, memory_region(REGION_CPU1) + 0xc000, 0x3000);
 
 	return INIT_PASS;

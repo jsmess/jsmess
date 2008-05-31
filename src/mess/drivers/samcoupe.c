@@ -173,7 +173,7 @@ static READ8_HANDLER( samcoupe_lmpr_r )
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
 	samcoupe_regs.lmpr = data;
-	samcoupe_update_memory();
+	samcoupe_update_memory(machine);
 }
 
 
@@ -186,7 +186,7 @@ static READ8_HANDLER( samcoupe_hmpr_r )
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
 	samcoupe_regs.hmpr = data;
-	samcoupe_update_memory();
+	samcoupe_update_memory(machine);
 }
 
 
@@ -199,7 +199,7 @@ static READ8_HANDLER( samcoupe_vmpr_r )
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
 	samcoupe_regs.vmpr = data;
-	samcoupe_update_memory();
+	samcoupe_update_memory(machine);
 }
 
 

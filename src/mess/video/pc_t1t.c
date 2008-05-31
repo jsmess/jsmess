@@ -665,7 +665,7 @@ static int pc_t1t_vga_data_r(void)
  *	   6-7	Display mode. 0: Text, 1: 16K graphics mode (4,5,6,8)
  *			2: 32K graphics mode (9,Ah)
  */
-static void pc_t1t_bank_w(int data)
+static void pc_t1t_bank_w(running_machine *machine, int data)
 {
 	if (pcjr.bank != data)
 	{
@@ -687,14 +687,14 @@ static void pc_t1t_bank_w(int data)
 		dram = (data & 0x07) << 14;
 		vram = (data & 0x38) << (14-3);
 #endif
-        videoram = &memory_region(REGION_CPU1)[vram];
+		videoram = &memory_region(REGION_CPU1)[vram];
 		pcjr.displayram = &memory_region(REGION_CPU1)[dram];
 	}
 	pc_t1t_mode_switch();
 }
 
 
-static void pc_pcjr_bank_w(int data)
+static void pc_pcjr_bank_w(running_machine *machine, int data)
 {
 	if (pcjr.bank != data)
 	{
@@ -757,19 +757,19 @@ WRITE8_HANDLER ( pc_T1T_w )
 			break;
 		case 10:
 			pc_t1t_vga_index_w(data);
-            break;
-        case 11:
+			break;
+		case 11:
 			pc_t1t_lightpen_strobe_w(data);
 			break;
 		case 12:
-            break;
+			break;
 		case 13:
-            break;
-        case 14:
+			break;
+		case 14:
 			pc_t1t_vga_data_w(data);
-            break;
-        case 15:
-			pc_t1t_bank_w(data);
+			break;
+		case 15:
+			pc_t1t_bank_w(machine, data);
 			break;
     }
 }
@@ -806,7 +806,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 		case 12:
 			break;
 		case 15:
-			pc_pcjr_bank_w(data);
+			pc_pcjr_bank_w(machine, data);
 			break;
 
 		default:

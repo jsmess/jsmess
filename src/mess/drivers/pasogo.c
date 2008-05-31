@@ -480,10 +480,10 @@ ROM_END
 
 static DRIVER_INIT( pasogo )
 {
-  vg230_init(machine);
-  memset(&ems, 0, sizeof(ems));
-  memory_set_bankptr( 27, memory_region(REGION_USER1) + 0x00000 );
-  memory_set_bankptr( 28, memory_region(REGION_CPU1) + 0xb8000/*?*/ );
+	vg230_init(machine);
+	memset(&ems, 0, sizeof(ems));
+	memory_set_bankptr( 27, memory_region(REGION_USER1) + 0x00000 );
+	memory_set_bankptr( 28, memory_region(REGION_CPU1) + 0xb8000/*?*/ );
 }
 
 

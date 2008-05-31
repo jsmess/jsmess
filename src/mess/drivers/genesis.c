@@ -193,9 +193,9 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
 
 	rawROM = memory_region(REGION_CPU1);
-    ROM = rawROM /*+ 512 */;
+	ROM = rawROM /*+ 512 */;
 
-    length = image_fread(image, rawROM + 0x2000, 0x600000);
+	length = image_fread(image, rawROM + 0x2000, 0x600000);
 	logerror("image length = 0x%x\n", length);
 
 	if (genesis_isSMD(&rawROM[0x2200],(unsigned)length))	/* is this a SMD file..? */

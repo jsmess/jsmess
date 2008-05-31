@@ -32,7 +32,7 @@ void samcoupe_irq(running_machine *machine, UINT8 src);
 
 extern struct samcoupe_asic samcoupe_regs; 
 
-void samcoupe_update_memory(void);
+void samcoupe_update_memory(running_machine *machine);
 
 WRITE8_HANDLER( samcoupe_ext_mem_w );
 MACHINE_START( samcoupe );

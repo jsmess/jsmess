@@ -61,7 +61,7 @@ static SVI_318 svi;
 static UINT8 *pcart;
 static UINT32 pcart_rom_size;
 
-static void svi318_set_banks (void);
+static void svi318_set_banks(running_machine *machine);
 
 
 /* Serial ports */
@@ -328,7 +328,7 @@ WRITE8_HANDLER( svi318_psg_port_b_w )
 		set_led_status (0, !(data & 0x20) );
 
 	svi.bank_switch = data;
-	svi318_set_banks ();
+	svi318_set_banks(machine);
 }
 
 /* Disk drives  */
@@ -522,7 +522,7 @@ static void svi318_80col_init(running_machine *machine)
 static WRITE8_HANDLER( svi806_ram_enable_w )
 {
 	svi.svi806_ram_enabled = ( data & 0x01 );
-	svi318_set_banks();
+	svi318_set_banks(machine);
 }
 
 VIDEO_START( svi328_806 )
@@ -554,7 +554,7 @@ MACHINE_RESET( svi328_806 )
 
 	svi318_80col_init(machine);
 	svi.svi806_present = 1;
-	svi318_set_banks();
+	svi318_set_banks(machine);
 
 	/* Set SVI-806 80 column card palette */
 	palette_set_color_rgb( machine, TMS9928A_PALETTE_SIZE, 0, 0, 0 );		/* Monochrome black */
@@ -658,7 +658,7 @@ MACHINE_RESET( svi318 )
 	TMS9928A_reset();
 
 	svi.bank_switch = 0xff;
-	svi318_set_banks();
+	svi318_set_banks(machine);
 
 	wd17xx_reset();
 }
@@ -712,7 +712,7 @@ WRITE8_HANDLER( svi318_writemem4 )
 	}
 }
 
-static void svi318_set_banks ()
+static void svi318_set_banks(running_machine *machine)
 {
 	const UINT8 v = svi.bank_switch;
 

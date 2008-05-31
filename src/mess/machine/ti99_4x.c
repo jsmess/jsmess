@@ -99,14 +99,14 @@ static void ti99_CS_motor(int offset, int data);
 static void ti99_audio_gate(int offset, int data);
 static void ti99_CS_output(int offset, int data);
 
-static void ti99_8_internal_dsr_reset(void);
+static void ti99_8_internal_dsr_reset(running_machine *machine);
 
-static void ti99_4p_internal_dsr_reset(void);
+static void ti99_4p_internal_dsr_reset(running_machine *machine);
 static void ti99_TIxram_init(running_machine *machine);
 static void ti99_sAMSxram_init(running_machine *machine);
 static void ti99_4p_mapper_init(running_machine *machine);
 static void ti99_myarcxram_init(running_machine *machine);
-static void ti99_evpc_reset(void);
+static void ti99_evpc_reset(running_machine *machine);
 
 /*
 	pointer to extended RAM area
@@ -808,10 +808,10 @@ MACHINE_RESET( ti99 )
 	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
 
 	if (ti99_model == model_99_8)
-		ti99_8_internal_dsr_reset();
+		ti99_8_internal_dsr_reset(machine);
 
 	if (ti99_model == model_99_4p)
-		ti99_4p_internal_dsr_reset();
+		ti99_4p_internal_dsr_reset(machine);
 
         if (has_speech)
 	{
@@ -903,7 +903,7 @@ MACHINE_RESET( ti99 )
 		ti99_usbsm_reset(machine, ti99_model == model_99_8);
 
 	if (has_evpc)
-		ti99_evpc_reset();
+		ti99_evpc_reset(machine);
 
 	/* initialize mechatronics mouse */
 	mecmouse_sel = 0;
@@ -2508,7 +2508,7 @@ static UINT8 *ti99_8_internal_DSR;
 
 
 /* set up handlers, and set initial state */
-static void ti99_8_internal_dsr_reset(void)
+static void ti99_8_internal_dsr_reset(running_machine *machine)
 {
 	ti99_8_internal_DSR = memory_region(REGION_CPU1) + offset_rom0_8 + 0x4000;
 
@@ -2565,7 +2565,7 @@ static UINT16 *ti99_4p_internal_DSR;
 
 
 /* set up handlers, and set initial state */
-static void ti99_4p_internal_dsr_reset(void)
+static void ti99_4p_internal_dsr_reset(running_machine *machine)
 {
 	ti99_4p_internal_DSR = (UINT16 *) (memory_region(REGION_CPU1) + offset_rom4_4p);
 	ti99_4p_internal_ROM6 = (UINT16 *) (memory_region(REGION_CPU1) + offset_rom6_4p);
@@ -3102,7 +3102,7 @@ static const ti99_peb_card_handlers_t evpc_handlers =
 /*
 	Reset evpc card, set up handlers
 */
-static void ti99_evpc_reset(void)
+static void ti99_evpc_reset(running_machine *machine)
 {
 	ti99_evpc_DSR = memory_region(region_dsr) + offset_evpc_dsr;
 

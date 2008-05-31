@@ -62,7 +62,7 @@ static void samcoupe_install_ext_mem(void)
 }
 
 
-void samcoupe_update_memory(void)
+void samcoupe_update_memory(running_machine *machine)
 {
 	const int PAGE_MASK = ((mess_ram_size & 0xfffff) / 0x4000) - 1;
 	UINT8 *rom = memory_region(REGION_CPU1);
@@ -166,11 +166,11 @@ MACHINE_RESET( samcoupe )
 {
 	memset(&samcoupe_regs, 0, sizeof(samcoupe_regs));
 	
-    samcoupe_regs.lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */
-    samcoupe_regs.hmpr = 0x01;
-    samcoupe_regs.vmpr = 0x81;
-    samcoupe_regs.line_int = 0xff;  /* line interrupts disabled */
-    samcoupe_regs.status = 0x1f;    /* no interrupts active */
+	samcoupe_regs.lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */
+	samcoupe_regs.hmpr = 0x01;
+	samcoupe_regs.vmpr = 0x81;
+	samcoupe_regs.line_int = 0xff;  /* line interrupts disabled */
+	samcoupe_regs.status = 0x1f;    /* no interrupts active */
 
 	if (input_port_read(machine, "config") & 0x01)
 	{
@@ -183,7 +183,7 @@ MACHINE_RESET( samcoupe )
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, SMH_UNMAP, SMH_UNMAP);
 	}
 
-    samcoupe_update_memory();
+	samcoupe_update_memory(machine);
 }
 
 

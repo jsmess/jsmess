@@ -10,7 +10,8 @@
 #include "driver.h"
 #include "video/i8275.h"
 
-I8275_DISPLAY_PIXELS(radio86_display_pixels) {
+I8275_DISPLAY_PIXELS(radio86_display_pixels)
+{
 	//int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt);
 	int i;
 	bitmap_t *bitmap = tmpbitmap;

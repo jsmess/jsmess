@@ -442,7 +442,7 @@ static PALETTE_INIT( pc_cga )
 }
 
 
-static int internal_pc_cga_video_start(int personality)
+static int internal_pc_cga_video_start(running_machine *machine, int personality)
 {
 	memset(&cga, 0, sizeof(cga));
 	cga.update_row = NULL;
@@ -454,7 +454,7 @@ static int internal_pc_cga_video_start(int personality)
 	state_save_register_item("pccga", 0, cga.status);
 	state_save_register_item("pccga", 0, cga.plantronics);
 
-	cga.config_input_port = input_port_by_tag(Machine->portconfig, "pcvideo_cga_config" );
+	cga.config_input_port = input_port_by_tag(machine->portconfig, "pcvideo_cga_config" );
 
 	return 0;
 }
@@ -504,7 +504,7 @@ static VIDEO_START( pc_cga )
 
 	memory_set_bankptr(11, videoram);
 
-	internal_pc_cga_video_start(M6845_PERSONALITY_GENUINE);
+	internal_pc_cga_video_start(machine, M6845_PERSONALITY_GENUINE);
 
 	ntsc_decoder_init( &ntsc, 8, 256 );
 }
@@ -1631,7 +1631,7 @@ static VIDEO_START( pc1512 )
 	pc1512.read = 0;
 
 	/* PC1512 cut-down 6845 */
-	internal_pc_cga_video_start(M6845_PERSONALITY_PC1512);
+	internal_pc_cga_video_start(machine, M6845_PERSONALITY_PC1512);
 }
 
 
