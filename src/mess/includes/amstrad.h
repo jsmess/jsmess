@@ -24,14 +24,14 @@ enum {
 
 /*----------- defined in drivers/amstrad.c -----------*/
 
-void amstrad_reset_machine(running_machine *);
-void amstrad_GateArray_write(running_machine *,int);
-void amstrad_rethinkMemory(void);
-void amstrad_setLowerRom(void);
-void amstrad_setUpperRom(void);
+void amstrad_reset_machine(running_machine *machine);
+void amstrad_GateArray_write(running_machine *machine,int);
+void amstrad_rethinkMemory(running_machine *machine);
+void amstrad_setLowerRom(running_machine *machine);
+void amstrad_setUpperRom(running_machine *machine);
 
-void AmstradCPC_SetUpperRom(int);
-void AmstradCPC_PALWrite(int);
+void AmstradCPC_SetUpperRom(running_machine *machine, int);
+void AmstradCPC_PALWrite(running_machine *machine, int);
 
 
 /*----------- defined in machine/amstrad.c -----------*/

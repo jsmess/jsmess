@@ -120,7 +120,7 @@ void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 
 	amstrad_GateArray_write(machine, ((pSnapshot[0x040] & 0x03f) | 0x080));
 
-	AmstradCPC_PALWrite(((pSnapshot[0x041] & 0x03f) | 0x0c0));
+	AmstradCPC_PALWrite(machine, ((pSnapshot[0x041] & 0x03f) | 0x0c0));
 
 	/* init CRTC */
 	for (i=0; i<18; i++)
@@ -129,10 +129,10 @@ void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
                 m6845_register_w(0, pSnapshot[0x043+i] & 0x0ff);
 	}
 
-    m6845_address_w(0,i);
+	m6845_address_w(0,i);
 
 	/* upper rom selection */
-	AmstradCPC_SetUpperRom(pSnapshot[0x055]);
+	AmstradCPC_SetUpperRom(machine, pSnapshot[0x055]);
 
 	/* PPI */
 	ppi8255_w(0,3,pSnapshot[0x059] & 0x0ff);
@@ -168,7 +168,7 @@ void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 
 		memcpy(mess_ram, &pSnapshot[0x0100], MemorySize);
 	}
-	amstrad_rethinkMemory();
+	amstrad_rethinkMemory(machine);
 }
 
 /* load snapshot */

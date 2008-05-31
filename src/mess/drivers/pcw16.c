@@ -416,7 +416,7 @@ static void pcw16_set_bank_handlers(int bank, PCW16_RAM_TYPE type)
 		(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, write_handler);
 }
 
-static void pcw16_update_bank(int bank)
+static void pcw16_update_bank(running_machine *machine, int bank)
 {
 	unsigned char *mem_ptr = mess_ram;
 	int bank_id = 0;
@@ -493,12 +493,12 @@ static void pcw16_update_bank(int bank)
 
 
 /* update memory h/w */
-static void pcw16_update_memory(void)
+static void pcw16_update_memory(running_machine *machine)
 {
-	pcw16_update_bank(0);
-	pcw16_update_bank(1);
-	pcw16_update_bank(2);
-	pcw16_update_bank(3);
+	pcw16_update_bank(machine, 0);
+	pcw16_update_bank(machine, 1);
+	pcw16_update_bank(machine, 2);
+	pcw16_update_bank(machine, 3);
 
 }
 
@@ -515,7 +515,7 @@ static WRITE8_HANDLER(pcw16_bankhw_w)
 
 	pcw16_banks[offset] = data;
 
-	pcw16_update_memory();
+	pcw16_update_memory(machine);
 }
 
 static WRITE8_HANDLER(pcw16_video_control_w)
@@ -1314,7 +1314,7 @@ static void pcw16_reset(running_machine *machine)
 	pc_fdc_set_tc_state(0);
 	/* select first rom page */
 	pcw16_banks[0] = 0;
-	pcw16_update_memory();
+	pcw16_update_memory(machine);
 
 	/* temp rtc setup */
 	rtc_seconds = 0;

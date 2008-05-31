@@ -120,7 +120,7 @@ static void z88_vh_render_line(bitmap_t *bitmap, int x, int y,int pen)
 }
 
 /* convert absolute offset into correct address to get data from */
-static unsigned  char *z88_convert_address(unsigned long offset)
+static unsigned char *z88_convert_address(running_machine *machine, unsigned long offset)
 {
 //        return mess_ram;
 	if (offset>(32*16384))
@@ -158,7 +158,7 @@ VIDEO_EOF( z88 )
 VIDEO_UPDATE( z88 )
 {
     int x,y;
-    unsigned char *ptr = z88_convert_address(blink.sbf);
+    unsigned char *ptr = z88_convert_address(screen->machine, blink.sbf);
 	unsigned char *stored_ptr = ptr;
     int pen0, pen1;
 
@@ -223,12 +223,12 @@ VIDEO_UPDATE( z88 )
 					if (ch & 0x0100)
 					{
 						ch_index =ch & 0x0ff;	//(~0x0100);
-						pCharGfx = z88_convert_address(blink.hires1);
+						pCharGfx = z88_convert_address(screen->machine, blink.hires1);
 					}
 					else
 					{
 						ch_index = ch & 0x0ff;
-						pCharGfx = z88_convert_address(blink.hires0);
+						pCharGfx = z88_convert_address(screen->machine, blink.hires0);
 					}
 
 					pCharGfx += (ch_index<<3);
@@ -246,13 +246,13 @@ VIDEO_UPDATE( z88 )
 				{
 				   ch_index = ch & (~0x01c0);
 
-				   pCharGfx = z88_convert_address(blink.lores0);
+				   pCharGfx = z88_convert_address(screen->machine, blink.lores0);
 				}
 				else
 				{
 				   ch_index = ch;
 
-				   pCharGfx = z88_convert_address(blink.lores1);
+				   pCharGfx = z88_convert_address(screen->machine, blink.lores1);
 				}
 
 				pCharGfx += (ch_index<<3);
