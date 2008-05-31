@@ -32,20 +32,25 @@ DRIVER_INIT(radio86)
 READ8_HANDLER (radio86_8255_portb_r2 )
 {
 	UINT8 key = 0xff;
-	if ((radio86_keyboard_mask & 0x01)!=0) { key &= input_port_read_indexed(machine,0); }
-	if ((radio86_keyboard_mask & 0x02)!=0) { key &= input_port_read_indexed(machine,1); }
-	if ((radio86_keyboard_mask & 0x04)!=0) { key &= input_port_read_indexed(machine,2); }
-	if ((radio86_keyboard_mask & 0x08)!=0) { key &= input_port_read_indexed(machine,3); }
-	if ((radio86_keyboard_mask & 0x10)!=0) { key &= input_port_read_indexed(machine,4); }
-	if ((radio86_keyboard_mask & 0x20)!=0) { key &= input_port_read_indexed(machine,5); }
-	if ((radio86_keyboard_mask & 0x40)!=0) { key &= input_port_read_indexed(machine,6); }
-	if ((radio86_keyboard_mask & 0x80)!=0) { key &= input_port_read_indexed(machine,7); }
+	if ((radio86_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
+	if ((radio86_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
+	if ((radio86_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
+	if ((radio86_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
+	if ((radio86_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
+	if ((radio86_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
+	if ((radio86_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
+	if ((radio86_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
 	return key;
 }
 
 READ8_HANDLER (radio86_8255_portc_r2 )
 {
-	return input_port_read_indexed(machine, 8);
+	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	UINT8 dat = input_port_read(machine,"LINE8");
+	if (level <  0) { 
+		dat ^= 0x10;
+ 	}	
+	return dat;	
 }
 
 WRITE8_HANDLER (radio86_8255_porta_w2 )
@@ -117,23 +122,3 @@ MACHINE_RESET( radio86 )
 	dma8257_config(0, &radio86_dma);
 	dma8257_reset();
 }
-
-READ8_HANDLER( radio86_keyboard_r )
-{
-	return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
-}
-
-WRITE8_HANDLER( radio86_keyboard_w )
-{
-	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ),offset^0x03, data);
-}
-
-READ8_HANDLER( radio86_tape_r )
-{
-	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
-	if (level <  0) {
-		 	return 0x00;
- 	}
-	return 0xff;
-}
-

@@ -21,6 +21,7 @@ extern const i8275_interface radio86_i8275_interface;
 extern I8275_DISPLAY_PIXELS(radio86_display_pixels);
 
 extern VIDEO_UPDATE( radio86 );
+extern PALETTE_INIT( radio86 );
 
 
 #endif /* radio86_H_ */

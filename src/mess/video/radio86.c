@@ -10,9 +10,8 @@
 #include "driver.h"
 #include "video/i8275.h"
 
-I8275_DISPLAY_PIXELS(radio86_display_pixels)
+I8275_DISPLAY_PIXELS(radio86_display_pixels) 
 {
-	//int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt);
 	int i;
 	bitmap_t *bitmap = tmpbitmap;
 	UINT8 *charmap = memory_region(REGION_GFX1);
@@ -23,7 +22,10 @@ I8275_DISPLAY_PIXELS(radio86_display_pixels)
 	if (lten) {
 		pixels = 0xff;
 	}
-	for(i=0;i<6;i++) {
+	if (rvv) {
+		pixels ^= 0xff;
+	}
+	for(i=0;i<6;i++) {		
 		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1;
 	}
 }
@@ -34,5 +36,16 @@ VIDEO_UPDATE( radio86 )
 	i8275_update( devconf, bitmap, cliprect);
 	VIDEO_UPDATE_CALL ( generic_bitmapped );
 	return 0;
+}
+
+const rgb_t radio86_palette[3] = {
+	MAKE_RGB(0x00, 0x00, 0x00), // black
+	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
+	MAKE_RGB(0xff, 0xff, 0xff)	// highlight 
+};
+
+PALETTE_INIT( radio86 )
+{
+	palette_set_colors(machine, 0, radio86_palette, ARRAY_LENGTH(radio86_palette));
 }
 
