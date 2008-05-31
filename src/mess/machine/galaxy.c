@@ -22,7 +22,9 @@ READ8_HANDLER( galaxy_keyboard_r )
 		double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
 		return (level >  0) ? 0xfe : 0xff;
 	} else {
-		return input_port_read_indexed(machine, (offset>>3)&0x07) & (0x01<<(offset&0x07)) ? 0xfe : 0xff;
+		char port[6];
+		sprintf(port,"LINE%d",(offset>>3)&0x07);
+		return input_port_read(machine, port) & (0x01<<(offset&0x07)) ? 0xfe : 0xff;
 	}
 }
 
@@ -168,7 +170,7 @@ DRIVER_INIT( galaxy )
 MACHINE_RESET( galaxy )
 {
 	/* ROM 2 enable/disable */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, input_port_read_indexed(machine, 7) ? SMH_BANK10 : SMH_NOP);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, input_port_read(machine, "ROM2") ? SMH_BANK10 : SMH_NOP);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
 	memory_set_bankptr(10, memory_region(REGION_CPU1) + 0x1000);
 

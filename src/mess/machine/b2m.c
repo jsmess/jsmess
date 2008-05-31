@@ -38,18 +38,18 @@ READ8_HANDLER (b2m_keyboard_r )
 {		
 	UINT8 key = 0x00;
 	if (offset < 0x100) {
-		if ((offset & 0x01)!=0) { key |= input_port_read_indexed(machine,0); }
-		if ((offset & 0x02)!=0) { key |= input_port_read_indexed(machine,1); }
-		if ((offset & 0x04)!=0) { key |= input_port_read_indexed(machine,2); }
-		if ((offset & 0x08)!=0) { key |= input_port_read_indexed(machine,3); }
-		if ((offset & 0x10)!=0) { key |= input_port_read_indexed(machine,4); }
-		if ((offset & 0x20)!=0) { key |= input_port_read_indexed(machine,5); }
-		if ((offset & 0x40)!=0) { key |= input_port_read_indexed(machine,6); }
-		if ((offset & 0x80)!=0) { key |= input_port_read_indexed(machine,7); }					
+		if ((offset & 0x01)!=0) { key |= input_port_read(machine,"LINE0"); }
+		if ((offset & 0x02)!=0) { key |= input_port_read(machine,"LINE1"); }
+		if ((offset & 0x04)!=0) { key |= input_port_read(machine,"LINE2"); }
+		if ((offset & 0x08)!=0) { key |= input_port_read(machine,"LINE3"); }
+		if ((offset & 0x10)!=0) { key |= input_port_read(machine,"LINE4"); }
+		if ((offset & 0x20)!=0) { key |= input_port_read(machine,"LINE5"); }
+		if ((offset & 0x40)!=0) { key |= input_port_read(machine,"LINE6"); }
+		if ((offset & 0x80)!=0) { key |= input_port_read(machine,"LINE7"); }					
 	} else {
-		if ((offset & 0x01)!=0) { key |= input_port_read_indexed(machine,8); }
-		if ((offset & 0x02)!=0) { key |= input_port_read_indexed(machine,9); }
-		if ((offset & 0x04)!=0) { key |= input_port_read_indexed(machine,10); }
+		if ((offset & 0x01)!=0) { key |= input_port_read(machine,"LINE8"); }
+		if ((offset & 0x02)!=0) { key |= input_port_read(machine,"LINE9"); }
+		if ((offset & 0x04)!=0) { key |= input_port_read(machine,"LINE10"); }
 	}
 	return key;
 }
@@ -342,7 +342,7 @@ WRITE8_HANDLER ( b2m_palette_w )
 	
 	b2m_color[offset] = data;		
 	
-	if (input_port_read_indexed(machine,11)==1) {
+	if (input_port_read(machine,"MONITOR")==1) {
 		palette_set_color_rgb(machine,offset, r, g, b);
 	} else {
 		palette_set_color_rgb(machine,offset, bw, bw, bw);

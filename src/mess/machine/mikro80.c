@@ -27,20 +27,20 @@ DRIVER_INIT(mikro80)
 READ8_HANDLER (mikro80_8255_portb_r )
 {
 	UINT8 key = 0xff;
-	if ((mikro80_keyboard_mask & 0x01)!=0) { key &= input_port_read_indexed(machine,0); }
-	if ((mikro80_keyboard_mask & 0x02)!=0) { key &= input_port_read_indexed(machine,1); }
-	if ((mikro80_keyboard_mask & 0x04)!=0) { key &= input_port_read_indexed(machine,2); }
-	if ((mikro80_keyboard_mask & 0x08)!=0) { key &= input_port_read_indexed(machine,3); }
-	if ((mikro80_keyboard_mask & 0x10)!=0) { key &= input_port_read_indexed(machine,4); }
-	if ((mikro80_keyboard_mask & 0x20)!=0) { key &= input_port_read_indexed(machine,5); }
-	if ((mikro80_keyboard_mask & 0x40)!=0) { key &= input_port_read_indexed(machine,6); }
-	if ((mikro80_keyboard_mask & 0x80)!=0) { key &= input_port_read_indexed(machine,7); }
+	if ((mikro80_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
+	if ((mikro80_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
+	if ((mikro80_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
+	if ((mikro80_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
+	if ((mikro80_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
+	if ((mikro80_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
+	if ((mikro80_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
+	if ((mikro80_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
 	return key;
 }
 
 READ8_HANDLER (mikro80_8255_portc_r )
 {
-	return input_port_read_indexed(machine, 8);
+	return input_port_read(machine, "LINE8");
 }
 
 WRITE8_HANDLER (mikro80_8255_porta_w )

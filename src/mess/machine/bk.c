@@ -23,7 +23,9 @@ static TIMER_CALLBACK(keyboard_callback)
 	UINT8 code,i,j;
 
 	for(i=1;i<12;i++) {
-		code = 	input_port_read_indexed(machine, i);
+		char port[7];
+		sprintf(port,"LINE%d",i);
+		code = 	input_port_read(machine, port);
 		if (code!=0) {
 			for(j=0;j<8;j++) {
 				if (code == (1 << j)) {
@@ -31,19 +33,19 @@ static TIMER_CALLBACK(keyboard_callback)
 					break;
 				}
 			}
-			if ((input_port_read_indexed(machine,0) & 4) ==4) {
+			if ((input_port_read(machine,"LINE0") & 4) ==4) {
 				if (i==6 || i==7) {
 					key_code -= 16;
 				}
 
 			}
-			if ((input_port_read_indexed(machine,0) & 4) ==4) {
+			if ((input_port_read(machine,"LINE0") & 4) ==4) {
 				if (i>=8 && i<=11) {
 					key_code += 32;
 				}
 			}
 			key_pressed = 0x40;
-			if ((input_port_read_indexed(machine,0) & 2) ==0) {
+			if ((input_port_read(machine,"LINE0") & 2) ==0) {
 				key_irq_vector = 0x30;
 			} else {
 				key_irq_vector = 0xBC;

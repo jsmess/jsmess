@@ -23,7 +23,7 @@
 #define SCREEN_WIDTH_512 64
 
 UINT8 romdisk_lsb,romdisk_msb;
-UINT8 orion_keyboard_line;
+UINT8 orion_keyboard_mask;
 UINT8 orion128_video_mode;
 UINT8 orion128_video_page;
 UINT8 orion128_memory_page;
@@ -53,13 +53,23 @@ WRITE8_HANDLER (orion_romdisk_portc_w )
 
 READ8_HANDLER (orion_keyboard_portb_r )
 {		
-	return input_port_read_indexed(machine, orion_keyboard_line);
+	UINT8 key = 0xff;
+	if ((orion_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
+	if ((orion_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
+	if ((orion_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
+	if ((orion_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
+	if ((orion_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
+	if ((orion_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
+	if ((orion_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
+	if ((orion_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
+	return key;
+	
 }
 
 READ8_HANDLER (orion_keyboard_portc_r )
 {
 	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
-	UINT8 dat = input_port_read_indexed(machine, 8);
+	UINT8 dat = input_port_read(machine, "LINE8");
 	if (level <  0) { 
 		dat ^= 0x10;
  	}	
@@ -68,16 +78,7 @@ READ8_HANDLER (orion_keyboard_portc_r )
 
 WRITE8_HANDLER (orion_keyboard_porta_w )
 {	
-	switch (data ^ 0xff) {
-	  	case 0x01 : orion_keyboard_line = 0;break;
-	  	case 0x02 : orion_keyboard_line = 1;break;
-	  	case 0x04 : orion_keyboard_line = 2;break;
-	  	case 0x08 : orion_keyboard_line = 3;break;
-	  	case 0x10 : orion_keyboard_line = 4;break;
-	  	case 0x20 : orion_keyboard_line = 5;break;
-	  	case 0x40 : orion_keyboard_line = 6;break;
-	  	case 0x80 : orion_keyboard_line = 7;break;
-	}	
+	orion_keyboard_mask = data ^ 0xff;
 }
 
 WRITE8_HANDLER (orion_cassette_portc_w )
@@ -203,7 +204,7 @@ MACHINE_RESET ( orion128 )
 {		
 	wd17xx_reset();
 	wd17xx_set_density (DEN_FM_HI);	
-	orion_keyboard_line = 0;
+	orion_keyboard_mask = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orion128_memory_page = -1;
@@ -419,7 +420,7 @@ MACHINE_RESET ( orionz80 )
 	memory_set_bankptr(5, memory_region(REGION_CPU1) + 0xf800);		
 	
 	wd17xx_reset();
-	orion_keyboard_line = 0;
+	orion_keyboard_mask = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orionz80_memory_page = 0;
@@ -577,7 +578,7 @@ MACHINE_RESET ( orionpro )
 	
 	wd17xx_reset();
 
-	orion_keyboard_line = 0;
+	orion_keyboard_mask = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orionpro_ram0_segment = 0;

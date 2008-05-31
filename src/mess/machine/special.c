@@ -36,14 +36,14 @@ DRIVER_INIT(special)
 
 READ8_HANDLER (specialist_8255_porta_r )
 {
-	if (input_port_read_indexed(machine, 0)!=0xff) return 0xfe;
-	if (input_port_read_indexed(machine, 1)!=0xff) return 0xfd;
-	if (input_port_read_indexed(machine, 2)!=0xff) return 0xfb;
-	if (input_port_read_indexed(machine, 3)!=0xff) return 0xf7;
-	if (input_port_read_indexed(machine, 4)!=0xff) return 0xef;
-	if (input_port_read_indexed(machine, 5)!=0xff) return 0xdf;
-	if (input_port_read_indexed(machine, 6)!=0xff) return 0xbf;
-	if (input_port_read_indexed(machine, 7)!=0xff) return 0x7f;	
+	if (input_port_read(machine, "LINE0")!=0xff) return 0xfe;
+	if (input_port_read(machine, "LINE1")!=0xff) return 0xfd;
+	if (input_port_read(machine, "LINE2")!=0xff) return 0xfb;
+	if (input_port_read(machine, "LINE3")!=0xff) return 0xf7;
+	if (input_port_read(machine, "LINE4")!=0xff) return 0xef;
+	if (input_port_read(machine, "LINE5")!=0xff) return 0xdf;
+	if (input_port_read(machine, "LINE6")!=0xff) return 0xbf;
+	if (input_port_read(machine, "LINE7")!=0xff) return 0x7f;	
 	return 0xff;
 }
 
@@ -53,21 +53,21 @@ READ8_HANDLER (specialist_8255_portb_r )
 	int dat = 0;
 	double level;	
 	
-  if ((specialist_8255_porta & 0x01)==0) dat ^= (input_port_read_indexed(machine, 0) ^ 0xff);
-  if ((specialist_8255_porta & 0x02)==0) dat ^= (input_port_read_indexed(machine, 1) ^ 0xff);
-  if ((specialist_8255_porta & 0x04)==0) dat ^= (input_port_read_indexed(machine, 2) ^ 0xff);
-  if ((specialist_8255_porta & 0x08)==0) dat ^= (input_port_read_indexed(machine, 3) ^ 0xff);
-  if ((specialist_8255_porta & 0x10)==0) dat ^= (input_port_read_indexed(machine, 4) ^ 0xff);
-  if ((specialist_8255_porta & 0x20)==0) dat ^= (input_port_read_indexed(machine, 5) ^ 0xff);
-  if ((specialist_8255_porta & 0x40)==0) dat ^= (input_port_read_indexed(machine, 6) ^ 0xff);
-  if ((specialist_8255_porta & 0x80)==0) dat ^= (input_port_read_indexed(machine, 7) ^ 0xff);
-  if ((specialist_8255_portc & 0x01)==0) dat ^= (input_port_read_indexed(machine, 8) ^ 0xff);
-  if ((specialist_8255_portc & 0x02)==0) dat ^= (input_port_read_indexed(machine, 9) ^ 0xff);
-  if ((specialist_8255_portc & 0x04)==0) dat ^= (input_port_read_indexed(machine, 10) ^ 0xff);
-  if ((specialist_8255_portc & 0x08)==0) dat ^= (input_port_read_indexed(machine, 11) ^ 0xff);
+  if ((specialist_8255_porta & 0x01)==0) dat ^= (input_port_read(machine, "LINE0") ^ 0xff);
+  if ((specialist_8255_porta & 0x02)==0) dat ^= (input_port_read(machine, "LINE1") ^ 0xff);
+  if ((specialist_8255_porta & 0x04)==0) dat ^= (input_port_read(machine, "LINE2") ^ 0xff);
+  if ((specialist_8255_porta & 0x08)==0) dat ^= (input_port_read(machine, "LINE3") ^ 0xff);
+  if ((specialist_8255_porta & 0x10)==0) dat ^= (input_port_read(machine, "LINE4") ^ 0xff);
+  if ((specialist_8255_porta & 0x20)==0) dat ^= (input_port_read(machine, "LINE5") ^ 0xff);
+  if ((specialist_8255_porta & 0x40)==0) dat ^= (input_port_read(machine, "LINE6") ^ 0xff);
+  if ((specialist_8255_porta & 0x80)==0) dat ^= (input_port_read(machine, "LINE7") ^ 0xff);
+  if ((specialist_8255_portc & 0x01)==0) dat ^= (input_port_read(machine, "LINE8") ^ 0xff);
+  if ((specialist_8255_portc & 0x02)==0) dat ^= (input_port_read(machine, "LINE9") ^ 0xff);
+  if ((specialist_8255_portc & 0x04)==0) dat ^= (input_port_read(machine, "LINE10") ^ 0xff);
+  if ((specialist_8255_portc & 0x08)==0) dat ^= (input_port_read(machine, "LINE11") ^ 0xff);
   	
 	dat = (dat  << 2) ^0xff;	
-	if (input_port_read_indexed(machine, 12)!=0xff) dat ^= 0x02;
+	if (input_port_read(machine, "LINE12")!=0xff) dat ^= 0x02;
 		
 	level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
 	if (level >=  0) { 
@@ -78,10 +78,10 @@ READ8_HANDLER (specialist_8255_portb_r )
 
 READ8_HANDLER (specialist_8255_portc_r )
 {
-	if (input_port_read_indexed(machine, 8)!=0xff) return 0x0e;
-	if (input_port_read_indexed(machine, 9)!=0xff) return 0x0d;
-	if (input_port_read_indexed(machine, 10)!=0xff) return 0x0b;
-	if (input_port_read_indexed(machine, 11)!=0xff) return 0x07;
+	if (input_port_read(machine, "LINE8")!=0xff) return 0x0e;
+	if (input_port_read(machine, "LINE9")!=0xff) return 0x0d;
+	if (input_port_read(machine, "LINE10")!=0xff) return 0x0b;
+	if (input_port_read(machine, "LINE11")!=0xff) return 0x07;
 	return 0x0f;
 }
 

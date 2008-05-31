@@ -7,7 +7,7 @@
 #include "formats/rk_cas.h"
 
 
-#define RK_WAV_FREQUENCY	44100
+#define RK_WAV_FREQUENCY	44000
 #define WAVE_HIGH		32767
 #define WAVE_LOW		-32768
 
@@ -115,8 +115,6 @@ static casserr_t rk20_cassette_identify( cassette_image *cassette, struct Casset
 	return cassette_legacy_identify( cassette, opts, &rk20_legacy_fill_wave );
 }
 
-
-
 static casserr_t rk20_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &rk20_legacy_fill_wave );
 }
@@ -131,17 +129,13 @@ static const struct CassetteLegacyWaveFiller rk60_legacy_fill_wave = {
 	0					/* trailer_samples */
 };
 
-
 static casserr_t rk60_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
 	return cassette_legacy_identify( cassette, opts, &rk60_legacy_fill_wave );
 }
 
-
-
 static casserr_t rk60_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &rk60_legacy_fill_wave );
 }
-
 
 static const struct CassetteFormat rku_cassette_format = {
 	"rku",
@@ -171,6 +165,13 @@ static const struct CassetteFormat rko_cassette_format = {
 	NULL
 };
 
+static const struct CassetteFormat rkr_cassette_format = {
+	"rkr",
+	rk20_cassette_identify,
+	rk20_cassette_load,
+	NULL
+};
+
 CASSETTE_FORMATLIST_START(rku_cassette_formats)
 	CASSETTE_FORMAT(rku_cassette_format)
 CASSETTE_FORMATLIST_END
@@ -185,4 +186,8 @@ CASSETTE_FORMATLIST_END
 
 CASSETTE_FORMATLIST_START(rko_cassette_formats)
 	CASSETTE_FORMAT(rko_cassette_format)
+CASSETTE_FORMATLIST_END
+
+CASSETTE_FORMATLIST_START(rkr_cassette_formats)
+	CASSETTE_FORMAT(rkr_cassette_format)
 CASSETTE_FORMATLIST_END

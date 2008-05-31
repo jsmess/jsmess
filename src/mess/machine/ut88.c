@@ -28,21 +28,21 @@ DRIVER_INIT(ut88)
 READ8_HANDLER (ut88_8255_portb_r )
 {
 	switch (ut88_8255_porta ^ 0xff) {
-	  	case 0x01 : return input_port_read_indexed(machine, 0);break;
-	  	case 0x02 : return input_port_read_indexed(machine, 1);break;
-	  	case 0x04 : return input_port_read_indexed(machine, 2);break;
-	  	case 0x08 : return input_port_read_indexed(machine, 3);break;
-	  	case 0x10 : return input_port_read_indexed(machine, 4);break;
-	  	case 0x20 : return input_port_read_indexed(machine, 5);break;
-	  	case 0x40 : return input_port_read_indexed(machine, 6);break;
-	  	case 0x80 : return input_port_read_indexed(machine, 7);break;
+	  	case 0x01 : return input_port_read(machine, "LINE0");break;
+	  	case 0x02 : return input_port_read(machine, "LINE1");break;
+	  	case 0x04 : return input_port_read(machine, "LINE2");break;
+	  	case 0x08 : return input_port_read(machine, "LINE3");break;
+	  	case 0x10 : return input_port_read(machine, "LINE4");break;
+	  	case 0x20 : return input_port_read(machine, "LINE5");break;
+	  	case 0x40 : return input_port_read(machine, "LINE6");break;
+	  	case 0x80 : return input_port_read(machine, "LINE7");break;
 	}	
 	return 0xff;
 }
 
 READ8_HANDLER (ut88_8255_portc_r )
 {
-	return input_port_read_indexed(machine, 8);	
+	return input_port_read(machine, "LINE8");	
 }
 
 WRITE8_HANDLER (ut88_8255_porta_w )
@@ -106,17 +106,17 @@ READ8_HANDLER( ut88mini_keyboard_r )
 	UINT8 *keyrom1 = memory_region(REGION_CPU1)+ 0x10000;
 	UINT8 *keyrom2 = memory_region(REGION_CPU1)+ 0x10100;
 	
-	UINT8 key = keyrom2[input_port_read_indexed(machine, 1)];
+	UINT8 key = keyrom2[input_port_read(machine, "LINE1")];
 	// if keyboard 2nd part returned 0 on 4th bit output from 
 	// first part is used
 	if ((key & 0x08) ==0x00) {		
-		key = keyrom1[input_port_read_indexed(machine, 0)];	
+		key = keyrom1[input_port_read(machine, "LINE0")];	
 	}	
 	// for delete key there is special key producing code 0x80
-	key = (input_port_read_indexed(machine, 2) & 0x80)==0x80 ? key : 0x80; 	
+	key = (input_port_read(machine, "LINE2") & 0x80)==0x80 ? key : 0x80; 	
 	// If key 0 is pressed it value is 0x10 this is done by additional 
 	// discrete logic
-	key = (input_port_read_indexed(machine, 0) & 0x01)==0x01 ? key : 0x10;
+	key = (input_port_read(machine, "LINE0") & 0x01)==0x01 ? key : 0x10;
 	return key;
 }
 
