@@ -12,15 +12,6 @@
 
 /*************************** common ********************************/
 
-/* input ports (first port number of each class) */
-#define THOM_INPUT_LIGHTPEN  0 /* 3 ports: analog X, analog Y, and button */
-#define THOM_INPUT_GAME      3 /* 2-5 ports: joystick, mouse */
-#define THOM_INPUT_KEYBOARD  8 /* 8-10 lines */
-#define THOM_INPUT_CONFIG   18 /* machine-specific options */
-#define THOM_INPUT_FCONFIG  19 /* floppy / network options */
-#define THOM_INPUT_VCONFIG  20 /* video options */
-#define THOM_INPUT_MCONFIG  21 /* modem / speech options */
-
 /* 6821 PIAs */
 #define THOM_PIA_SYS    0  /* system PIA */
 #define THOM_PIA_GAME   1  /* music & game PIA (joypad + sound) */

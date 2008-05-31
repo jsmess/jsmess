@@ -59,7 +59,7 @@ static int thom_update_screen_size( running_machine *machine )
 {
 	const device_config *screen = video_screen_first(machine->config);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
-	UINT8 p = input_port_read_indexed(machine,  THOM_INPUT_VCONFIG );
+	UINT8 p = input_port_read(machine, "vconfig");
 	int new_w, new_h, changed = 0;
 
 	switch ( p & 3 )
@@ -140,8 +140,8 @@ struct thom_vsignal thom_get_vsignal ( void )
 
 static void thom_get_lightpen_pos( int*x, int* y )
 {
-	*x = input_port_read_indexed(Machine,  THOM_INPUT_LIGHTPEN     );
-	*y = input_port_read_indexed(Machine,  THOM_INPUT_LIGHTPEN + 1 );
+	*x = input_port_read(Machine, "lightpen_x");
+	*y = input_port_read(Machine, "lightpen_y");
 
 	if ( *x < 0 )
 		*x = 0;
