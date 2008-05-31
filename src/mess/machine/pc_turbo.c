@@ -26,8 +26,10 @@ static TIMER_CALLBACK(pc_turbo_callback)
 {
 	struct pc_turbo_info *ti = (struct pc_turbo_info *) ptr;
 	int val;
+	char ipt[6];
 
-	val = input_port_read_indexed(machine, ti->port) & ti->mask;
+	sprintf(ipt, "DSW%d", ti->port);
+	val = input_port_read(machine, ipt) & ti->mask;
 
 	if (val != ti->cur_val)
 	{

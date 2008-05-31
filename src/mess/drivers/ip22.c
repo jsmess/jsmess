@@ -1464,10 +1464,10 @@ static DRIVER_INIT( ip225015 )
 }
 
 static INPUT_PORTS_START( ip225015 )
-	PORT_START	// unused IN0
-	PORT_START	// unused IN1
-	PORT_START	// unused IN2
-	PORT_START	// unused IN3
+	PORT_START_TAG("IN0")	// unused IN0
+	PORT_START_TAG("DSW0")	// unused IN1
+	PORT_START_TAG("DSW1")	// unused IN2
+	PORT_START_TAG("DSW2")	// unused IN3
 	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 INPUT_PORTS_END

@@ -313,7 +313,7 @@ are connected */
 static void pc_com_refresh_connected_common(const device_config *device, int n, int data)
 {
 	/* mouse connected to this port? */
-	if (input_port_read_indexed(device->machine, 3) & (0x80>>n))
+	if (input_port_read(device->machine, "DSW2") & (0x80>>n))
 		pc_mouse_handshake_in(device,data);
 }
 
@@ -571,7 +571,7 @@ static READ8_HANDLER (pc_ppi_porta_r)
 		 *      01 - color 40x25
 		 * 6-7  The number of floppy disk drives
 		 */
-		data = input_port_read_indexed(machine, 1);
+		data = input_port_read(machine, "DSW0");
 	}
 	else
 	{
@@ -607,13 +607,13 @@ static READ8_HANDLER ( pc_ppi_portc_r )
 	if (pc_ppi.portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data&0xf0)|((input_port_read_indexed(machine, 1) >> 4) & 0x0f);
+		data = (data & 0xf0) | ((input_port_read(machine, "DSW0") >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data&0xf0)|(input_port_read_indexed(machine, 1) & 0x0f);
+		data = (data & 0xf0) | (input_port_read(machine, "DSW0") & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
@@ -840,7 +840,7 @@ DRIVER_INIT( pccga )
 DRIVER_INIT( bondwell )
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
+	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pcmda )
@@ -878,7 +878,7 @@ DRIVER_INIT( europc )
 DRIVER_INIT( t1000hx )
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
+	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pc200 )

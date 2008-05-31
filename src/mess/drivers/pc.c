@@ -384,11 +384,11 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pcmda )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_BIT ( 0x80, 0x80,	 IPT_VBLANK )
 	PORT_BIT ( 0x7f, 0x7f,	 IPT_UNUSED )
 
-	PORT_START /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
 	PORT_DIPSETTING(	0x40, "2" )
@@ -411,7 +411,7 @@ static INPUT_PORTS_START( pcmda )
 	PORT_DIPSETTING(	0x00, DEF_STR(No) )
 	PORT_DIPSETTING(	0x01, DEF_STR(Yes) )
 
-    PORT_START /* IN2 */
+    PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR(No) )
 	PORT_DIPSETTING(	0x80, DEF_STR(Yes) )
@@ -437,7 +437,7 @@ static INPUT_PORTS_START( pcmda )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
 
-	PORT_START /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
@@ -459,12 +459,12 @@ static INPUT_PORTS_START( pcmda )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pccga )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START /* IN1 */
+    PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
 	PORT_DIPSETTING(	0x40, "2" )
@@ -486,7 +486,8 @@ static INPUT_PORTS_START( pccga )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
-	PORT_START /* IN2 */
+
+	PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
@@ -512,7 +513,7 @@ static INPUT_PORTS_START( pccga )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START /* IN3 */
+    PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
@@ -535,14 +536,14 @@ static INPUT_PORTS_START( pccga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( europc )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START /* IN1 */
+    PORT_START_TAG("DSW0") /* IN1 */
 
-	PORT_START /* IN2 */
+	PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
@@ -568,7 +569,7 @@ static INPUT_PORTS_START( europc )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START /* IN3 */
+    PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
@@ -591,12 +592,12 @@ static INPUT_PORTS_START( europc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bondwell )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START /* IN1 */
+    PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
 	PORT_DIPSETTING(	0x40, "2" )
@@ -618,7 +619,8 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
-	PORT_START /* IN2 */
+
+	PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
@@ -644,7 +646,7 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START /* IN3 */
+    PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
@@ -668,12 +670,12 @@ static INPUT_PORTS_START( bondwell )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xtcga )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START /* IN1 */
+    PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
 	PORT_DIPSETTING(	0x40, "2" )
@@ -695,7 +697,8 @@ static INPUT_PORTS_START( xtcga )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
-	PORT_START /* IN2 */
+
+	PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
@@ -721,7 +724,7 @@ static INPUT_PORTS_START( xtcga )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START /* IN3 */
+    PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
@@ -746,15 +749,15 @@ static INPUT_PORTS_START( xtcga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tandy1t )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START /* IN1 */
+    PORT_START_TAG("DSW0") /* IN1 */
 	PORT_BIT ( 0xff, 0xff,	 IPT_UNUSED )
 
-    PORT_START /* IN2 */
+    PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
@@ -770,7 +773,7 @@ static INPUT_PORTS_START( tandy1t )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START /* IN3 */
+    PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
@@ -792,12 +795,12 @@ static INPUT_PORTS_START( tandy1t )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc200 )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START /* IN1 */
+    PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 	PORT_DIPSETTING(	0x00, "English/less checks" )
 	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) ) //prego attendere
@@ -825,7 +828,8 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 	PORT_DIPSETTING(	0x40, "Color 40 Columns" )
 	PORT_DIPSETTING(	0x80, "Color 80 Columns" )
 	PORT_DIPSETTING(	0xc0, DEF_STR( Mono ) )
-	PORT_START /* IN2 */
+
+	PORT_START_TAG("DSW1") /* IN2 */
 PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
@@ -847,7 +851,7 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START /* IN3 */
+    PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x00, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
@@ -867,7 +871,7 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 
-    PORT_START /* IN20 */
+    PORT_START_TAG("VIDEO") /* IN20 */
 	PORT_CONFNAME( 0x03, 0x03, "IDA character set")
 	PORT_CONFSETTING(0x00, "Greek")
 	PORT_CONFSETTING(0x01, "Norwegian (Codepage 860)")
@@ -882,12 +886,12 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc1512 )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START /* IN1 */
+    PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 	PORT_DIPSETTING(	0x00, "English/less checks" )
 	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) ) //prego attendere
@@ -901,7 +905,8 @@ static INPUT_PORTS_START( pc1512 )
 	PORT_BIT( 0xc0, 0x00,	IPT_UNUSED ) // not used in pc1512
 	PORT_BIT( 0xe00, 0x00,	IPT_UNUSED ) // not used in pc1512
 	PORT_BIT( 0xe000, 0x00,	IPT_UNUSED ) // not used in pc1512
-	PORT_START /* IN2 */
+
+	PORT_START_TAG("DSW1") /* IN2 */
 PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
@@ -923,7 +928,7 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START /* IN3 */
+    PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x00, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
@@ -947,7 +952,7 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc1640 )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_DIPNAME( 0x08, 0x08, "VGA 1")
 	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
@@ -973,7 +978,7 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-    PORT_START /* IN1 */
+    PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 //  PORT_DIPSETTING(    0x00, "PC 512k" ) // machine crashes with ega bios at 0xc0000
 	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) ) //prego attendere
@@ -1023,7 +1028,8 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(	0xa000, "CGA 80 Columns" )
 	PORT_DIPSETTING(	0xe000, "MDA/Hercules/Multiple Graphic Adapters" )
 #endif
-	PORT_START /* IN2 */
+
+	PORT_START_TAG("DSW1") /* IN2 */
 PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
@@ -1045,7 +1051,7 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START /* IN3 */
+    PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x00, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
@@ -1068,7 +1074,7 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xtvga )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_DIPNAME( 0x08, 0x08, "VGA 1")
 	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
@@ -1082,7 +1088,7 @@ static INPUT_PORTS_START( xtvga )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-    PORT_START /* IN1 */
+    PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
 	PORT_DIPSETTING(	0x40, "2" )
@@ -1104,7 +1110,8 @@ static INPUT_PORTS_START( xtvga )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
-	PORT_START /* IN2 */
+
+	PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
@@ -1130,7 +1137,7 @@ static INPUT_PORTS_START( xtvga )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START /* IN3 */
+    PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )

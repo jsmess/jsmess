@@ -303,7 +303,7 @@ are connected */
 static void at_com_refresh_connected_common(const device_config *device, int n, int data)
 {
 	/* mouse connected to this port? */
-	if (input_port_read_indexed(device->machine, 3) & (0x80>>n))
+	if (input_port_read(device->machine, "DSW2") & (0x80>>n))
 		pc_mouse_handshake_in(device,data);
 }
 
@@ -469,7 +469,7 @@ DRIVER_INIT( at_vga )
 	};
 
 	init_at_common(&at8042);
-	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
+	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 }
 
@@ -482,7 +482,7 @@ DRIVER_INIT( ps2m30286 )
 		KBDC8042_PS2, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(&at8042);
-	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
+	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 }
 

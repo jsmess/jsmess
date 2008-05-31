@@ -59,7 +59,7 @@ void pc_lpt_set_device(int nr, const CENTRONICS_DEVICE *device)
 static void pc_LPT_w(int n, int offset, int data)
 {
 	PC_LPT *This=LPT+n;
-	if ( !(input_port_read_indexed(Machine, 2) & (0x08>>n)) ) return;
+	if ( !(input_port_read(Machine, "DSW1") & (0x08>>n)) ) return;
 //	if (!This->on) return;
 	switch( offset )
 	{
@@ -94,7 +94,7 @@ static int pc_LPT_r(int n, int offset)
 {
 	PC_LPT *This=LPT+n;
     int data = 0xff;
-	if ( !(input_port_read_indexed(Machine, 2) & (0x08>>n)) ) return data;
+	if ( !(input_port_read(Machine, "DSW1") & (0x08>>n)) ) return data;
 //	if (!This->on) return data;
 	switch( offset )
 	{
