@@ -69,7 +69,7 @@ static int put_cycles = 0;		/* cycle count at last output port change */
 static int get_cycles = 0;		/* cycle count at last input port read */
 
 static void tape_put_byte(UINT8 value);
-static void tape_get_open(void);
+static void tape_get_open(running_machine *machine);
 static void tape_put_close(running_machine *machine);
 
 #define FW TRS80_FONT_W
@@ -431,7 +431,7 @@ static void tape_put_close(running_machine *machine)
 	tape_put_file = 0;
 }
 
-static void tape_get_byte(void)
+static void tape_get_byte(running_machine *machine)
 {
 	int 	count;
 	UINT8	value;
@@ -458,7 +458,7 @@ static void tape_get_byte(void)
 	}
 }
 
-static void tape_get_open(void)
+static void tape_get_open(running_machine *machine)
 {
 	/* TODO: remove this */
 	unsigned char *RAM = memory_region(REGION_CPU1);
@@ -609,8 +609,8 @@ WRITE8_HANDLER( trs80_port_ff_w )
 				/* need to read get new data ? */
 				if (--get_bit_count <= 0)
 				{
-					tape_get_open();
-					tape_get_byte();
+					tape_get_open(machine);
+					tape_get_byte(machine);
 				}
 				/* shift next sync or data bit to bit 16 */
 				tape_bits <<= 1;

@@ -60,7 +60,7 @@ static GAMECOM_TIMER gamecom_timer[2];
 //static const int gamecom_timer_limit[8] = { 2/2, 1024/2, 2048/2, 4096/2, 8192/2, 16384/2, 32768/2, 65536/2 };
 static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
-static void gamecom_dma_init(void);
+static void gamecom_dma_init(running_machine *machine);
 
 static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
@@ -94,7 +94,7 @@ MACHINE_RESET( gamecom )
 	gamecom_internal_w( machine, SM8521_WDTC, 0x38 );
 }
 
-static void gamecom_set_mmu( int mmu, UINT8 data ) {
+static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data ) {
 	if ( data < 32 ) {
 		/* select internal ROM bank */
 		memory_set_bankptr( mmu, memory_region(REGION_USER1) + (data << 13) );
@@ -237,10 +237,10 @@ WRITE8_HANDLER( gamecom_internal_w )
 				default:   cartridge = NULL;       break;
 				}
 				/* update banks to reflect possible change of cartridge slot */
-				gamecom_set_mmu( 1, internal_registers[SM8521_MMU1] );
-				gamecom_set_mmu( 2, internal_registers[SM8521_MMU2] );
-				gamecom_set_mmu( 3, internal_registers[SM8521_MMU3] );
-				gamecom_set_mmu( 4, internal_registers[SM8521_MMU4] );
+				gamecom_set_mmu( machine, 1, internal_registers[SM8521_MMU1] );
+				gamecom_set_mmu( machine, 2, internal_registers[SM8521_MMU2] );
+				gamecom_set_mmu( machine, 3, internal_registers[SM8521_MMU3] );
+				gamecom_set_mmu( machine, 4, internal_registers[SM8521_MMU4] );
 				return;
 	case SM8521_SYS:	cpunum_set_reg( 0, SM8500_SYS, data ); return;
 	case SM8521_CKC:	cpunum_set_reg( 0, SM8500_CKC, data ); return;
@@ -256,16 +256,16 @@ WRITE8_HANDLER( gamecom_internal_w )
 		logerror( "Write to MMU0\n" );
 		break;
 	case SM8521_MMU1:
-		gamecom_set_mmu( 1, data );
+		gamecom_set_mmu( machine, 1, data );
 		break;
 	case SM8521_MMU2:
-		gamecom_set_mmu( 2, data );
+		gamecom_set_mmu( machine, 2, data );
 		break;
 	case SM8521_MMU3:
-		gamecom_set_mmu( 3, data );
+		gamecom_set_mmu( machine, 3, data );
 		break;
 	case SM8521_MMU4:
-		gamecom_set_mmu( 4, data );
+		gamecom_set_mmu( machine, 4, data );
 		break;
 
 	/* Video hardware and DMA */
@@ -283,7 +283,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 		gamecom_dma.decrement_y = data & 0x10;
 		gamecom_dma.enabled = data & 0x80;
 		if ( gamecom_dma.enabled ) {
-			gamecom_dma_init();
+			gamecom_dma_init(machine);
 		}
 		break;
 	case SM8521_DMX1:
@@ -407,7 +407,7 @@ READ8_HANDLER( gamecom_internal_r )
 
 /* The manual is not conclusive as to which bit of the DMVP register (offset 0x3D) determines
    which page for source or destination is used */
-static void gamecom_dma_init(void) {
+static void gamecom_dma_init(running_machine *machine) {
 	if ( gamecom_dma.decrement_x || gamecom_dma.decrement_y ) {
 		logerror( "TODO: Decrement-x and decrement-y are not supported yet\n" );
 	}

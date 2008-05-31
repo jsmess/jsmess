@@ -30,7 +30,7 @@ static int parse_rom_name(const rom_entry *roment, int *position, const char **e
 
 
 
-static int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, const device_config *image)
+static int load_cartridge(running_machine *machine, const rom_entry *romrgn, const rom_entry *roment, const device_config *image)
 {
 	UINT32 region, flags;
 	offs_t offset, length, read_length, pos = 0, len;
@@ -127,7 +127,7 @@ static int process_cartridge(const device_config *image, const device_config *fi
 				parse_rom_name(roment, &position, NULL);
 				if (position == image_index_in_device(image))
 				{
-					result = load_cartridge(romrgn, roment, file);
+					result = load_cartridge(image->machine, romrgn, roment, file);
 					if (!result)
 						return result;
 				}
