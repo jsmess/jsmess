@@ -43,7 +43,7 @@ static void lviv_update_memory (void)
 
 static OPBASE_HANDLER(lviv_opbaseoverride)
 {
-	if (input_port_read_indexed(machine, 12)&0x01)
+	if (input_port_read(machine, "RESET") & 0x01)
 		mame_schedule_soft_reset(machine);
 	return address;
 }
@@ -63,7 +63,7 @@ static  READ8_HANDLER ( lviv_ppi_0_portc_r )
 	UINT8 data = lviv_ppi_port_outputs[0][2] & 0x0f;
 	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.038)
 		data |= 0x10;
-	if (lviv_ppi_port_outputs[0][0] & input_port_read_indexed(machine, 13))
+	if (lviv_ppi_port_outputs[0][0] & input_port_read(machine, "JOY"))
 		data |= 0x80;
 	return data;
 }
@@ -95,22 +95,22 @@ static  READ8_HANDLER ( lviv_ppi_1_porta_r )
 
 static  READ8_HANDLER ( lviv_ppi_1_portb_r )	/* keyboard reading */
 {
-	return	((lviv_ppi_port_outputs[1][0]&0x01) ? 0xff : input_port_read_indexed(machine, 0)) &
-		((lviv_ppi_port_outputs[1][0]&0x02) ? 0xff : input_port_read_indexed(machine, 1)) &
-		((lviv_ppi_port_outputs[1][0]&0x04) ? 0xff : input_port_read_indexed(machine, 2)) &
-		((lviv_ppi_port_outputs[1][0]&0x08) ? 0xff : input_port_read_indexed(machine, 3)) &
-		((lviv_ppi_port_outputs[1][0]&0x10) ? 0xff : input_port_read_indexed(machine, 4)) &
-		((lviv_ppi_port_outputs[1][0]&0x20) ? 0xff : input_port_read_indexed(machine, 5)) &
-		((lviv_ppi_port_outputs[1][0]&0x40) ? 0xff : input_port_read_indexed(machine, 6)) &
-		((lviv_ppi_port_outputs[1][0]&0x80) ? 0xff : input_port_read_indexed(machine, 7));
+	return	((lviv_ppi_port_outputs[1][0] & 0x01) ? 0xff : input_port_read(machine, "KEY0")) &
+		((lviv_ppi_port_outputs[1][0] & 0x02) ? 0xff : input_port_read(machine, "KEY1")) &
+		((lviv_ppi_port_outputs[1][0] & 0x04) ? 0xff : input_port_read(machine, "KEY2")) &
+		((lviv_ppi_port_outputs[1][0] & 0x08) ? 0xff : input_port_read(machine, "KEY3")) &
+		((lviv_ppi_port_outputs[1][0] & 0x10) ? 0xff : input_port_read(machine, "KEY4")) &
+		((lviv_ppi_port_outputs[1][0] & 0x20) ? 0xff : input_port_read(machine, "KEY5")) &
+		((lviv_ppi_port_outputs[1][0] & 0x40) ? 0xff : input_port_read(machine, "KEY6")) &
+		((lviv_ppi_port_outputs[1][0] & 0x80) ? 0xff : input_port_read(machine, "KEY7"));
 }
 
 static  READ8_HANDLER ( lviv_ppi_1_portc_r )     /* keyboard reading */
 {
-	return	((lviv_ppi_port_outputs[1][2]&0x01) ? 0xff : input_port_read_indexed(machine, 8))  &
-		((lviv_ppi_port_outputs[1][2]&0x02) ? 0xff : input_port_read_indexed(machine, 9))  &
-		((lviv_ppi_port_outputs[1][2]&0x04) ? 0xff : input_port_read_indexed(machine, 10)) &
-		((lviv_ppi_port_outputs[1][2]&0x08) ? 0xff : input_port_read_indexed(machine, 11));
+	return	((lviv_ppi_port_outputs[1][2] & 0x01) ? 0xff : input_port_read(machine, "KEY8")) &
+		((lviv_ppi_port_outputs[1][2] & 0x02) ? 0xff : input_port_read(machine, "KEY9" )) &
+		((lviv_ppi_port_outputs[1][2] & 0x04) ? 0xff : input_port_read(machine, "KEY10")) &
+		((lviv_ppi_port_outputs[1][2] & 0x08) ? 0xff : input_port_read(machine, "KEY11"));
 }
 
 static WRITE8_HANDLER ( lviv_ppi_1_porta_w )	/* kayboard scaning */
