@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 
 #include "includes/hp48.h"
 
@@ -128,7 +127,7 @@ static void hp48_config(running_machine *machine)
 			begin = begin_bank << 13;
 			end = ( end_bank << 13 ) | 0x1FFF;
 
-			memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, read_handlers[bank] );
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, read_handlers[bank] );
 			memory_set_bankptr( bank, hp48_banks[begin_bank].base );
 
 			bank++;
@@ -139,9 +138,9 @@ static void hp48_config(running_machine *machine)
 	}
 
 	if ( hp48s.mem[HDW].adr != -1 ) {
-		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, hp48s.mem[HDW].adr&~0x3f,
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, hp48s.mem[HDW].adr&~0x3f,
 								 hp48s.mem[HDW].adr|0x3f, 0, 0, hp48_read);
-//		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, hp48s.mem[HDW].adr&~0x3f,
+//		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, hp48s.mem[HDW].adr&~0x3f,
 //								  hp48s.mem[HDW].adr|0x3f, 0, 0, hp48_write);
 	}
 }

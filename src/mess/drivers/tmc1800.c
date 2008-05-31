@@ -73,7 +73,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/tmc1800.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
@@ -863,7 +862,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( tmc1800 )
 {
-	running_machine *machine = Machine;
+	running_machine *machine = image->machine;
 	int size = image_length(image);
 
 	if (size > mess_ram_size)
@@ -880,7 +879,7 @@ static QUICKLOAD_LOAD( tmc1800 )
 
 static QUICKLOAD_LOAD( tmc2000 )
 {
-	running_machine *machine = Machine;
+	running_machine *machine = image->machine;
 	int size = image_length(image);
 
 	if (size > mess_ram_size)

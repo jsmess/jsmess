@@ -10,8 +10,8 @@
 
 /*----------- defined in drivers/adam.c -----------*/
 
-void set_memory_banks(running_machine *machine);
-void resetPCB(running_machine *machine);
+void adam_set_memory_banks(running_machine *machine);
+void adam_reset_pcb(running_machine *machine);
 
 
 /*----------- defined in machine/adam.c -----------*/
@@ -24,8 +24,8 @@ extern int adam_pcb;
 
 int adam_cart_verify(const UINT8 *buf, size_t size);
 
-void clear_keyboard_buffer(void);
-void exploreKeyboard(void);
+void adam_clear_keyboard_buffer(void);
+void adam_explore_keyboard(running_machine *machine);
 
 DEVICE_IMAGE_LOAD( adam_floppy );
 DEVICE_IMAGE_UNLOAD( adam_floppy );

@@ -2,12 +2,11 @@
 
   adam.c
 
-  Machine file to handle emulation of the ColecoAdam.
+  machine file to handle emulation of the ColecoAdam.
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/tms9928a.h"
 #include "includes/adam.h"
 #include "devices/cartslot.h"
@@ -64,7 +63,7 @@ DEVICE_IMAGE_UNLOAD( adam_floppy )
 
 
 
-void clear_keyboard_buffer(void)
+void adam_clear_keyboard_buffer(void)
 {
     int i;
 
@@ -108,7 +107,7 @@ static void addToKeyboardBuffer(unsigned char kbcode)
     }
 }
 
-void exploreKeyboard(void)
+void adam_explore_keyboard(running_machine *machine)
 {
     int controlKey, shiftKey;
     int i, keyboard[10];
@@ -116,16 +115,16 @@ void exploreKeyboard(void)
 //logerror("Exploring Keyboard.............\n");
     for(i=0;i<=255;i++) {if (KbRepeatTable[i]>0) KbRepeatTable[i]++;} /* Update repeat table */
 
-    keyboard[0] = input_port_read(Machine, "keyboard_1");
-    keyboard[1] = input_port_read(Machine, "keyboard_2");
-    keyboard[2] = input_port_read(Machine, "keyboard_3");
-    keyboard[3] = input_port_read(Machine, "keyboard_4");
-    keyboard[4] = input_port_read(Machine, "keyboard_5");
-    keyboard[5] = input_port_read(Machine, "keyboard_6");
-    keyboard[6] = input_port_read(Machine, "keyboard_7");
-    keyboard[7] = input_port_read(Machine, "keyboard_8");
-    keyboard[8] = input_port_read(Machine, "keyboard_9");
-    keyboard[9] = input_port_read(Machine, "keyboard_10");
+    keyboard[0] = input_port_read(machine, "keyboard_1");
+    keyboard[1] = input_port_read(machine, "keyboard_2");
+    keyboard[2] = input_port_read(machine, "keyboard_3");
+    keyboard[3] = input_port_read(machine, "keyboard_4");
+    keyboard[4] = input_port_read(machine, "keyboard_5");
+    keyboard[5] = input_port_read(machine, "keyboard_6");
+    keyboard[6] = input_port_read(machine, "keyboard_7");
+    keyboard[7] = input_port_read(machine, "keyboard_8");
+    keyboard[8] = input_port_read(machine, "keyboard_9");
+    keyboard[9] = input_port_read(machine, "keyboard_10");
 
 /* Reference: Appendix of COLECO ADAM TECHNICAL MANUAL at http://drushel.cwru.edu/atm/atm.html */
 
@@ -714,7 +713,8 @@ WRITE8_HANDLER( adamnet_w )
 	UINT8 *BankBase;
 	BankBase = &memory_region(REGION_CPU1)[0x00000];
 
-	if (data==0x0F) resetPCB(machine);
+	if (data==0x0F)
+		adam_reset_pcb(machine);
 	if ( (adam_lower_memory==0) && ((data&0x02)!=(adam_net_data&0x02)) )
 	{
 		if (data&0x02)
@@ -773,7 +773,7 @@ WRITE8_HANDLER( adam_memory_map_controller_w )
 
     adam_lower_memory = (data & 0x03);
     adam_upper_memory = (data & 0x0C)>>2;
-    set_memory_banks(machine);
+    adam_set_memory_banks(machine);
     //logerror("Configurando la memoria, L:%02xh, U:%02xh\n", adam_lower_memory, adam_upper_memory);
 }
 
