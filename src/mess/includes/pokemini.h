@@ -11,13 +11,11 @@
 /*----------- defined in machine/pokemini.c -----------*/
 
 extern UINT8 *pokemini_ram;
-extern MACHINE_RESET( pokemini );
-extern WRITE8_HANDLER( pokemini_hwreg_w );
-extern READ8_HANDLER( pokemini_hwreg_r );
-extern INTERRUPT_GEN( pokemini_int );
+MACHINE_RESET( pokemini );
+WRITE8_HANDLER( pokemini_hwreg_w );
+READ8_HANDLER( pokemini_hwreg_r );
 
 DEVICE_START( pokemini_cart );
 DEVICE_IMAGE_LOAD( pokemini_cart );
-
 
 #endif /* POKEMINI_H */

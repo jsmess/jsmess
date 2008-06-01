@@ -12,12 +12,14 @@ The LCD is likely to be a SSD1828 LCD.
 #include "cpu/minx/minx.h"
 #include "devices/cartslot.h"
 
+
 static ADDRESS_MAP_START( pokemini_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x000000, 0x000FFF )  AM_ROM							/* bios */
 	AM_RANGE( 0x001000, 0x001FFF )	AM_RAM AM_BASE( &pokemini_ram)				/* VRAM/RAM */
 	AM_RANGE( 0x002000, 0x0020FF )  AM_READWRITE( pokemini_hwreg_r, pokemini_hwreg_w )	/* hardware registers */
 	AM_RANGE( 0x002100, 0x1FFFFF )  AM_ROM							/* cartridge area */
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( pokemini )
 	PORT_START_TAG("INPUTS")
@@ -31,18 +33,23 @@ static INPUT_PORTS_START( pokemini )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Power")
 INPUT_PORTS_END
 
-static PALETTE_INIT( pokemini ) {
-	static const unsigned char pokemini_pal[4][3] = {
+
+static PALETTE_INIT( pokemini )
+{
+	static const unsigned char pokemini_pal[4][3] =
+	{
 		{ 0xFF, 0xFB, 0x87 },
 		{ 0xB1, 0xAE, 0x4E },
 		{ 0x84, 0x80, 0x4E },
 		{ 0x4E, 0x4E, 0x4E }
 	};
 	int i;
-	for( i = 0; i < 4; i++ ) {
+	for( i = 0; i < 4; i++ )
+	{
 		palette_set_color_rgb( machine, i, pokemini_pal[i][0], pokemini_pal[i][1], pokemini_pal[i][2] );
 	}
 }
+
 
 static MACHINE_DRIVER_START( pokemini )
 	/* basic machine hardware */
@@ -64,9 +71,7 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
 	MDRV_PALETTE_LENGTH( 4 )
 	MDRV_PALETTE_INIT( pokemini )
-	MDRV_SCREEN_REFRESH_RATE( 30 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_CPU_VBLANK_INT("main", pokemini_int)
+	MDRV_SCREEN_REFRESH_RATE( 72 )
 
 	/* sound hardware */
 #if 0	
@@ -76,8 +81,11 @@ static MACHINE_DRIVER_START( pokemini )
 #endif
 MACHINE_DRIVER_END
 
-static void pokemini_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
-	switch( state ) {
+
+static void pokemini_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
+{
+	switch( state )
+	{
 	case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
 	case MESS_DEVINFO_INT_MUST_BE_LOADED:	info->i = 0; break;
 	case MESS_DEVINFO_PTR_START:			info->start = DEVICE_START_NAME(pokemini_cart); break;
@@ -87,14 +95,17 @@ static void pokemini_cartslot_getinfo( const mess_device_class *devclass, UINT32
 	}
 }
 
+
 SYSTEM_CONFIG_START( pokemini )
 	CONFIG_DEVICE( pokemini_cartslot_getinfo )
 SYSTEM_CONFIG_END
+
 
 ROM_START( pokemini )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )
 	ROM_LOAD( "bios.min", 0x0000, 0x1000, CRC(aed3c14d) SHA1(daad4113713ed776fbd47727762bca81ba74915f) )
 ROM_END
+
 
 CONS( 1999, pokemini, 0, 0, pokemini, pokemini, 0, pokemini, "Nintendo", "Pokemon Mini", GAME_NOT_WORKING )
 
