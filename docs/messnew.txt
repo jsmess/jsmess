@@ -67,6 +67,9 @@ System Driver Changes:
 
 - [PCE] Added .bin extension.  [Fabio Priuli]
 
+- [PCE] Remap inputs to match the usual MESS layout in e.g. NES and label
+  buttons I and II.  [Justin Kerk]
+
 - [PENTAGON] Added SHA-1's.  [Fabio Priuli]
 
 - [POKEMINI] Added .bin extension.  [Fabio Priuli]

@@ -48,7 +48,7 @@ Super System Card:
                           Known Bugs
 ***********************************************************************
 - TV Sports Basketball game freezes.
-- Ankuku Densetsu: graphics flake out during intro (DMA issues)
+- Ankoku Densetsu: graphics flake out during intro (DMA issues)
 **********************************************************************/
 
 #include "driver.h"
@@ -118,10 +118,11 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pce )
 
     PORT_START_TAG("JOY")  /* Player 1 controls */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button II */
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) /* select */
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* run */
+    /* II is left of I on the original pad so we map them in reverse order */
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button I")
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button II")
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  )
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("P1 Run")
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
