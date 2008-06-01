@@ -153,7 +153,7 @@ static const device_config *cassette_device_image(void)
  **************************************************************/
 static  READ8_HANDLER (via_0_in_a )
 {
-    int data = input_port_read_indexed(machine, 10);
+    int data = input_port_read(machine, "JOY");
     LOG(("microtan_via_0_in_a %02X\n", data));
     return data;
 }
@@ -592,6 +592,7 @@ INTERRUPT_GEN( microtan_interrupt )
 {
     int mod, row, col, chg, new;
     static int lastrow = 0, mask = 0x00, key = 0x00, repeat = 0, repeater = 0;
+	char port[6];
 
     if( repeat )
     {
@@ -603,18 +604,19 @@ INTERRUPT_GEN( microtan_interrupt )
         repeat = repeater;
     }
 
+
     row = 9;
-    new = input_port_read_indexed(machine, row);
+    new = input_port_read(machine, "ROW8");
     chg = keyrows[--row] ^ new;
-    if (!chg) { new = input_port_read_indexed(machine, row); chg = keyrows[--row] ^ new; }
-    if (!chg) { new = input_port_read_indexed(machine, row); chg = keyrows[--row] ^ new; }
-    if (!chg) { new = input_port_read_indexed(machine, row); chg = keyrows[--row] ^ new; }
-    if (!chg) { new = input_port_read_indexed(machine, row); chg = keyrows[--row] ^ new; }
-    if (!chg) { new = input_port_read_indexed(machine, row); chg = keyrows[--row] ^ new; }
-    if (!chg) { new = input_port_read_indexed(machine, row); chg = keyrows[--row] ^ new; }
-    if (!chg) { new = input_port_read_indexed(machine, row); chg = keyrows[--row] ^ new; }
-    if (!chg) { new = input_port_read_indexed(machine, row); chg = keyrows[--row] ^ new; }
-    if (!chg) --row;
+
+	while ( !chg && row > 0)
+	{
+		sprintf(port, "ROW%d", row - 1);
+		new = input_port_read(machine, port); 
+		chg = keyrows[--row] ^ new; 
+	}
+    if (!chg) 
+		--row;
 
     if (row >= 0)
     {
@@ -623,9 +625,9 @@ INTERRUPT_GEN( microtan_interrupt )
         key = 0x00;
         lastrow = row;
         /* CapsLock LED */
-        if( row == 3 && chg == 0x80 )
-            set_led_status(1, (keyrows[3] & 0x80) ? 0 : 1);
-
+		if( row == 3 && chg == 0x80 )
+			set_led_status(1, (keyrows[3] & 0x80) ? 0 : 1);
+		
         if (new & chg)  /* key(s) pressed ? */
         {
             mod = 0;
@@ -881,7 +883,7 @@ DRIVER_INIT( microtan )
         dst += 4;
     }
 
-    switch (input_port_read_indexed(machine, 0) & 3)
+    switch (input_port_read(machine, "DSW") & 3)
     {
         case 0:  // 1K only :)
             memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_NOP);
@@ -904,9 +906,13 @@ DRIVER_INIT( microtan )
 MACHINE_RESET( microtan )
 {
     int i;
-
+	char port[6];
+	
     for (i = 1; i < 10;  i++)
-        keyrows[i] = input_port_read_indexed(machine, 1+i);
+	{
+		sprintf(port, "ROW%d", i-1);
+        keyrows[i] = input_port_read(machine, port);
+	}
     set_led_status(1, (keyrows[3] & 0x80) ? 0 : 1);
 
     via_config(0, &via6522[0]);
