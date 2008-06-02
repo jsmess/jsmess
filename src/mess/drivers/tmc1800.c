@@ -1,64 +1,55 @@
 /*
 
-    tmc1800.c
+Telmac 2000
 
+PCB Layout
+----------
 
-    MESS Driver by Curt Coder
+|-----------------------------------------------------------|
+|															|
+|	 |					4051	4042		2114	2114	|
+|	CN1														|
+|	 |					4051	4042		2114	2114	|
+|															|
+|	4011				4013	|--------|	2114	2114	|
+|								|  4515  |					|
+|						4013	|--------|	2114	2114	|
+|								4042						|						
+|						4011				2114	2114	|
+|								4011						|
+|						4011				2114	2114	|
+|SW1														|
+|						4011	|--------|	2114	2114	|
+|								|  PROM  |					|
+|						40107	|--------|	2114	2114	|
+|	4050	1.75Mhz											|
+|						|-------------|		2114	2114	|
+|						|   CDP1802   |						|
+|						|-------------|		2114	2114	|
+|			4049											|
+|						|-------------|		2114	2114	|
+|		4.43MHz			|   CDP1864   |						|
+|						|-------------|		2114	2114	|
+|															|
+|				741				4502		2114	2114	|
+|  -														|
+|  |							2114		2114	2114	|
+| CN2														|
+|  |			4001			4051		2114	2114	|
+|  -														|
+|											2114	2114	|
+|-----------------------------------------------------------|
 
-
-    Telmac 1800
-    -----------
-    (c) 10/1977 Telercas Oy, Finland
-
-    CPU:        CDP1802     1.76 MHz
-    RAM:        2 KB (4 KB)
-    ROM:        512 B
-
-	Video:		CDP1861
-
-    Designer:   Osmo Kainulainen
-    Keyboard:   OS-70 A (QWERTY, hexadecimal keypad)
-
-
-    OSCOM 1000B
-    -----------
-    (c) 197? OSCOM Oy, Finland
-
-    CPU:        CDP1802A    ? MHz
-
-    Video:      OSM-200 (1 KB videoram, 10.2 MHz xtal)
-
-    Enhanced Telmac 1800 with built-in CRT board (OSM-200).
-
-
-    Telmac 2000
-    -----------
-    (c) 1980 Telercas Oy, Finland
-
-    CPU:        CDP1802A    1.75 MHz
-    RAM:        16 KB
-    ROM:        512 B / 2 KB (TOOL-2000)
-
-    Video:      CDP1864     1.75 MHz
-    Color RAM:  512 B
-
-    Colors:     8 fg, 4 bg
-    Resolution: 64x192
-    Sound:      frequency control, volume on/off
-    Keyboard:   ASCII, KB-16, KB-64
-
-
-    OSCOM Nano
-    ----------
-    (c) 1981 OSCOM Oy, Finland
-
-    CPU:        CDP1802A    1.75 MHz
-    ROM:        512 B / 1 KB
-	RAM:		4 KB
-
-	Video:		CDP1864		1.75 MHz
-
-    Small form factor version of Telmac 1800. Combined text and graphics output.
+Notes:
+    All IC's shown.
+	
+    PROM	- MMI6341
+	2114	- 2114 4096 Bit (1024x4) NMOS Static RAM
+	CDP1802	- RCA CDP1802 CMOS 8-Bit Microprocessor @ 1.75 MHz
+	CDP1864	- RCA CDP1864CE COS/MOS PAL Compatible Color TV Interface @ 1.75 MHz
+	CN1		- keyboard connector
+	CN2		- ASTEC RF modulator connector
+	SW1		- Run/Reset switch
 
 */
 
@@ -326,7 +317,7 @@ static INPUT_PORTS_START( oscnano )
 	PORT_INCLUDE(tmc1800)
 
 	PORT_MODIFY("RUN")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Monitor") PORT_CODE(KEYCODE_M) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Monitor") PORT_CODE(KEYCODE_M)
 INPUT_PORTS_END
 
 /* CDP1802 Interfaces */
