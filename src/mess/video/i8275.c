@@ -164,7 +164,7 @@ READ8_DEVICE_HANDLER( i8275_r )
 		i8275->status_reg &= ~I8275_STATUS_DMA_UNDERRUN;
 		i8275->status_reg &= ~I8275_STATUS_IMPROPER_COMMAND;
 		i8275->status_reg &= ~I8275_STATUS_LIGHT_PEN;
-		i8275->status_reg &= ~I8275_STATUS_INTERRUPT_REQUEST;
+		i8275->status_reg &= ~I8275_STATUS_INTERRUPT_REQUEST;		
 	}
 	else
 	{
@@ -332,14 +332,14 @@ void i8275_draw_char_line(const device_config *device)
 	UINT8 lten = 0;
 	UINT8 fifo_read = 0;
 	for(line=0;line<=i8275->lines_per_row;line++) {
-		if (i8275->undeline_line_num & 0x08) {
-			vsp = (line==0 || line==i8275->lines_per_row) ? 1 : 0;
-		}
 		// If line counter is 1 then select right values
 		lc = (i8275->line_counter_mode==1) ? (line - 1) % i8275->lines_per_row : line;
 		fifo_read = 0;
 		for(xpos=0;xpos<=i8275->chars_per_row;xpos++) {
 			UINT8 chr =	(i8275->buffer_used==0) ? i8275->row_buffer_2[xpos] : i8275->row_buffer_1[xpos];
+			if (i8275->undeline_line_num & 0x08) {
+				vsp = (line==0 || line==i8275->lines_per_row) ? 1 : 0;
+			}
 
 			if ((chr & 0x80)==0x80) {
 				if ((chr & 0xc0)==0xc0) {
@@ -388,7 +388,8 @@ void i8275_draw_char_line(const device_config *device)
 				i8275->gpa,  // general purpose attribute code
 				i8275->hlgt  // highlight
 			);
-		}
+			vsp = 0;
+		}		
 		i8275->ypos++;
 	}
 	i8275->current_row++;
