@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/cop400/cop400.h"
 #include "machine/nec765.h"
@@ -25,6 +26,7 @@
 	NEC 765AC @ 4 MHz (418)
 	MC6850 ACIA (459)
 	Z80CTC (458)
+	ADC0809 (427)
 
 */
 
@@ -36,6 +38,7 @@
 	- main z80 interrupt from COP420
 	- video
 	- tape
+	- layout for the 16-segment displays
 
 	- floppy disc controller
 	- CP/M 2.2
@@ -79,6 +82,8 @@ static WRITE8_HANDLER( newbrain_cop_g_w )
 	*/
 
 	// _Z80INT = ((_CLK | _CLKINT) & _COPINT)
+
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, BIT(data, 0) ? HOLD_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( newbrain_cop_g_r )
@@ -97,22 +102,6 @@ static READ8_HANDLER( newbrain_cop_g_r )
 	newbrain_state *state = machine->driver_data;
 
 	return (BIT(state->keydata, 3) << 3) | (BIT(state->keydata, 0) << 2) | (BIT(state->keydata, 1) << 1);
-}
-
-static READ8_HANDLER( newbrain_cop_d_r )
-{
-	/*
-
-		bit		description
-		
-		D0		inverted to K4
-		D1		TDO
-		D2		inverted to K6
-		D3		
-
-	*/
-
-	return 0;
 }
 
 static WRITE8_HANDLER( newbrain_cop_d_w )
@@ -135,6 +124,8 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 		state->keylatch = 0;
 	}
 
+	state->cop_tdo = BIT(data, 1);
+
 	if (!BIT(data, 2))
 	{
 		char port[4];
@@ -149,6 +140,8 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 		sprintf(port, "D%d", state->keylatch);
 		
 		state->keydata = input_port_read(machine, port);
+
+		output_set_digit_value(state->keylatch, state->segment_data[state->keylatch]);
 	}
 }
 
@@ -167,24 +160,35 @@ static READ8_HANDLER( newbrain_cop_in_r )
 
 	newbrain_state *state = machine->driver_data;
 
-	return BIT(state->keydata, 2);
+	return (state->cop_rd << 3) | (state->cop_access << 2) | (state->cop_rd << 1) | BIT(state->keydata, 2);
 }
 
 static WRITE8_HANDLER( newbrain_cop_so_w )
 {
 	// connected to K1
+
+	newbrain_state *state = machine->driver_data;
+
+	state->cop_so = data;
 }
 
 static WRITE8_HANDLER( newbrain_cop_sk_w )
 {
 	// connected to K2
+
+	newbrain_state *state = machine->driver_data;
+
+	state->segment_data[state->keylatch] >>= 1;
+	state->segment_data[state->keylatch] = (state->cop_so << 15) | (state->segment_data[state->keylatch] & 0x7fff);
 }
 
 static READ8_HANDLER( newbrain_cop_si_r )
 {
 	// connected to TDI
 
-	return 0;
+	newbrain_state *state = machine->driver_data;
+
+	return state->cop_tdi;
 }
 
 #ifdef UNUSED_CODE
@@ -231,6 +235,28 @@ static WRITE8_HANDLER( fdc_io2_w )
 	nec765_set_tc_state(BIT(data, 2));
 }
 
+static READ8_HANDLER( fdc_io3_r )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		FDC INT
+		6		PAGING
+		7		FDC ATT
+
+	*/
+
+	newbrain_state *state = machine->driver_data;
+
+	return state->fdc_int << 5;
+}
+
 static WRITE8_HANDLER( io_w )
 {
 	/*
@@ -268,7 +294,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( newbrain_cop_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(newbrain_cop_l_r, newbrain_cop_l_w)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_READWRITE(newbrain_cop_g_r, newbrain_cop_g_w)
-	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_READWRITE(newbrain_cop_d_r, newbrain_cop_d_w)
+	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(newbrain_cop_d_w)
 	AM_RANGE(COP400_PORT_IN, COP400_PORT_IN) AM_READ(newbrain_cop_in_r)
 	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_WRITE(newbrain_cop_sk_w)
 	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_READWRITE(newbrain_cop_si_r, newbrain_cop_so_w)
@@ -418,6 +444,9 @@ static const struct acia6850_interface newbrain_acia_intf =
 
 static void newbrain_fdc_interrupt(int state)
 {
+	newbrain_state *driver_state = Machine->driver_data;
+
+	driver_state->fdc_int = state;
 }
 
 static const struct nec765_interface newbrain_nec765_interface =
@@ -426,13 +455,13 @@ static const struct nec765_interface newbrain_nec765_interface =
 	NULL
 };
 
-MACHINE_START( newbrain )
+static MACHINE_START( newbrain )
 {
 	nec765_init(&newbrain_nec765_interface, NEC765A, NEC765_RDY_PIN_NOT_CONNECTED);
 	acia6850_config(0, &newbrain_acia_intf);
 }
 
-MACHINE_RESET( newbrain )
+static MACHINE_RESET( newbrain )
 {
 }
 
@@ -441,6 +470,11 @@ static const struct z80_irq_daisy_chain newbrain_daisy_chain[] =
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
 	{ 0, 0, 0, 0, -1 }
 };
+
+static INTERRUPT_GEN( newbrain_interrupt )
+{
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
+}
 
 /* Machine Drivers */
 
@@ -452,6 +486,7 @@ static MACHINE_DRIVER_START( newbrain )
 	MDRV_CPU_ADD_TAG("main", Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_io_map, 0)
+	MDRV_CPU_VBLANK_INT("main", newbrain_interrupt)
 
 	MDRV_CPU_ADD_TAG("cop", COP420, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
@@ -495,17 +530,14 @@ ROM_START( newbrain )
 	ROM_SYSTEM_BIOS( 0, "default", "ROM 2.0" )
 	ROMX_LOAD( "aben20.rom", 0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(1) )
 	ROMX_LOAD( "cd20tci.rom", 0xc000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(1) )
-
 	ROM_SYSTEM_BIOS( 1, "rom191", "ROM 1.91" )
 	ROMX_LOAD( "aben191.rom", 0xa000, 0x2000, CRC(b7be8d89) SHA1(cce8d0ae7aa40245907ea38b7956c62d039d45b7), ROM_BIOS(2) )
 	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(2) )
 	ROMX_LOAD( "ef1x.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(2) )
-
 	ROM_SYSTEM_BIOS( 2, "rom19", "ROM 1.9" )
 	ROMX_LOAD( "aben19.rom", 0xa000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(3) )
 	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
 	ROMX_LOAD( "ef1x.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(3) )
-
 	ROM_SYSTEM_BIOS( 3, "rom14", "ROM 1.4" )
 	ROMX_LOAD( "aben14.rom", 0xa000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(4) )
 	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
