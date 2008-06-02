@@ -8,11 +8,11 @@
     port fc:
     ========
     input/output:
-        hd6402 uart data
+        uart data
 
     port fd:
     ========
-    input: hd6402 uart status
+    input: uart status
         bit 4: parity error (RPE)
         bit 3: framing error (RFE)
         bit 2: over-run (RDP)
@@ -55,6 +55,33 @@
 
     The cassette interface hardware converts square-wave pulses into bits which the uart receives.
 
+    1. the cassette format: "frequency shift" is converted
+    into the uart data format "non-return to zero"
+
+    2. on cassette a 1 data bit is stored as a high frequency
+    and a 0 data bit as a low frequency
+    - At 1200 baud, a logic 1 is 1 cycle of 1200hz and a logic 0 is 1/2 cycle of 600hz.
+    - At 300 baud, a logic 1 is 8 cycles of 2400hz and a logic 0 is 4 cycles of 1200hz.
+
+    Attenuation is applied to the signal and the square wave edges are rounded.
+
+    A manchester encoder is used. A flip-flop synchronises input
+    data on the positive-edge of the clock pulse.
+
+    Interestingly the data on cassette is stored in xmodem-checksum.
+
+
+	Due to bugs in the hardware and software of a real Sorcerer, the serial
+	interface misbehaves.
+	1. Sorcerer I had a hardware problem causing rs232 idle to be a space (+9v)
+	instead of mark (-9v). Fixed in Sorcerer II.
+	2. When you select a different baud for rs232, it was "remembered" but not
+	sent to port fe. It only gets sent when motor on was requested. Motor on is
+	only meaningful in a cassette operation.
+	3. The monitor software always resets the device to cassette whenever the
+	keyboard is scanned, motors altered, or an error occurred.
+	4. The above problems make rs232 communication impractical unless you write
+	your own routines or create a corrected monitor rom.
 
     Sound:
 
@@ -66,10 +93,6 @@
 
  ******************************************************************************
 
-    The Sorcerer comes with a non-standard Serial Port with connections for
-    rs232 and the 2 cassette players. The connections for cassette 1 are duplicated
-    on a set of phono plugs.
-
     The CPU clock speed is 2.106mhz, which was increased to 4.0mhz on the last production runs.
 
     The Sorcerer has a bus connection for S100 equipment. This allows the connection
@@ -79,12 +102,42 @@
 
     The driver "exidyd" emulates the most common form, a cassette-based system with 48k of ram.
 
+*******************************************************************************
+
+
+Emulation status:
+
+exidy: 32k disk-based system. Disks not tested. Optional S-100 interface not implemented.
+exidyd: 48k cassette-based system. Disks and S-100 are not options on this system.
+
+Real machines had optional RAM sizes of 4k, 16k, 32k, 48k (officially).
+Unofficially, the cart could hold another 8k of static RAM (4x 6116), giving 56k total.
+
+On the back of the machine is a 50-pin expansion port, which could be hooked to the
+expansion unit.
+
+Also is a 25-pin parallel port, allowing inwards and outwards communication.
+It was often hooked to a printer, a joystick, a music card, or a speaker.
+
+We emulate the printer and the speaker.
+
+Another 25-pin port provided two-way serial communications. Only two speeds are
+available - 300 baud and 1200 baud. There is no handshaking. This protocol is
+currently not emulated.
+
+Other pins on this connector provided for two cassette players. The connections
+for cassette unit 1 are duplicated on a set of phono plugs.
+
+We emulate the use of two cassette units. An option allows you to hear the sound
+of the tape during playback.
+
+The sorcerer has a UART device used by the serial interface and the cassette system.
+So far, it has been tested to work at 300 baud.
 
 ********************************************************************************/
 #include "driver.h"
 #include "includes/exidy.h"
 #include "machine/centroni.h"
-#include "machine/hd6402.h"
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
@@ -94,6 +147,7 @@
 #include "devices/printer.h"
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
+#include "machine/ay31015.h"
 
 
 static Z80BIN_EXECUTE( exidy );
@@ -111,122 +165,138 @@ static DEVICE_IMAGE_LOAD( exidy_floppy )
 }
 
 
-static unsigned char exidy_fe;
-static int exidy_keyboard_line;
-static unsigned long exidy_hd6402_state;
+static UINT8 exidy_fe = 0xff;
+static UINT8 exidy_keyboard_line;
 
 static WRITE8_HANDLER(exidy_fe_port_w);
 
-/* timer for exidy serial chip transmit and receive */
-static emu_timer *serial_timer;
+#if 0
 
-static TIMER_CALLBACK(exidy_serial_timer_callback)
-{
+The serial code (which was never connected to the outside) is disabled for now.
+
+/* timer for exidy serial chip transmit and receive */
+//static emu_timer *serial_timer;
+
+//static TIMER_CALLBACK(exidy_serial_timer_callback)
+//{
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
     Transmit and receive clocks are connected to the same clock */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
-	if (exidy_fe & 0x080)
-	{
-		/* trigger transmit clock on hd6402 */
-		hd6402_transmit_clock();
-		/* trigger receive clock on hd6402 */
-		hd6402_receive_clock();
-	}
-}
-
+//	if (exidy_fe & 0x80)
+//	{
+		connect to rs232
+//	}
+//}
+#endif
 
 
 /* timer to read cassette waveforms */
-static void *cassette_timer;
-
-/* cassette data is converted into bits which are clocked into serial chip */
-static struct serial_connection cassette_serial_connection;
-
-/* two flip-flops used to store state of bit coming from cassette */
-static int cassette_input_ff[2];
-/* state of clock, used to clock in bits */
-static int cassette_clock_state;
-/* a up-counter. when this reaches a fixed value, the cassette clock state is changed */
-static int cassette_clock_counter;
-
-/*  1. the cassette format: "frequency shift" is converted
-    into the uart data format "non-return to zero"
-
-    2. on cassette a 1 data bit is stored as a high frequency
-    and a 0 data bit as a low frequency
-    - At 1200 baud, a logic 1 is 1 cycle of 1200hz and a logic 0 is 1/2 cycle of 600hz.
-    - At 300 baud, a logic 1 is 8 cycles of 2400hz and a logic 0 is 4 cycles of 1200hz.
-
-    Attenuation is applied to the signal and the square wave edges are rounded.
-
-    A manchester encoder is used. A flip-flop synchronises input
-    data on the positive-edge of the clock pulse.
-
-    Interestingly the data on cassette is stored in xmodem-checksum.
+static emu_timer *cassette_timer;
 
 
-*/
-
-/* only works for one cassette so far */
-static TIMER_CALLBACK(exidy_cassette_timer_callback)
+static const device_config *cassette_device_image(void)
 {
-	cassette_clock_counter++;
+	if (exidy_fe & 0x20)
+		return image_from_devtype_and_index(IO_CASSETTE, 1);
+	else
+		return image_from_devtype_and_index(IO_CASSETTE, 0);
+}
 
-	if (cassette_clock_counter==(4800/1200))
+static UINT8 cass_data[]={ 0, 0, 0, 0, 0, 0, 0 };
+
+static TIMER_CALLBACK(exidy_cassette_tc)
+{
+	UINT8 cass_ws = 0;
+	switch (exidy_fe & 0xc0)		// bit 7 low indicates cassette
 	{
-		/* reset counter */
-		cassette_clock_counter = 0;
+		case 0x00:				// cassette 300 baud - works
 
-		/* toggle state of clock */
-		cassette_clock_state^=0x0ffffffff;
+			/* loading a tape - this is basically the same as the super80.
+				We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
 
-		/* previously was 0, now gone 1 */
-		/* +ve edge detected */
-		if (cassette_clock_state)
-		{
-			int bit;
+			cass_data[1]++;
 
-			/* clock bits into cassette flip flops */
-			/* bit is inverted! */
+			cass_ws = (cassette_input(cassette_device_image()) > +0.02) ? 1 : 0;
 
-			/* detect level */
-			bit = 1;
-			if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.0038)
-				bit = 0;
-			cassette_input_ff[0] = bit;
-			/* detect level */
-			bit = 1;
-			if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 1)) > 0.0038)
-				bit = 0;
+			if (cass_ws != cass_data[0])
+			{
+				cass_data[0] = cass_ws;
+				cass_data[2] = ((cass_data[1] < 0x6) || (cass_data[1] > 0x20)) ? 1 : 0;
+				cass_data[1] = 0;
+				if (cass_data[2] != cass_data[3])
+				{
+					ay31015_si(cass_data[2]);
+					cass_data[3] = cass_data[2];
+				}
+			}
 
-			cassette_input_ff[1] = bit;
+			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
+				Synchronisation of the frequency pulses to the uart is extremely important. */
 
-			logerror("cassette bit: %0d\n",bit);
+			cass_data[5]++;
+			if (!(cass_data[5] & 0x1f))
+			{
+				cass_ws = ay31015_so();
+				if (cass_ws != cass_data[4])
+				{
+					cass_data[4] = cass_ws;
+					cass_data[5]=0;
+				}
+			}
 
-			/* set out data bit */
-			set_out_data_bit(cassette_serial_connection.State, cassette_input_ff[0]);
-			/* output through serial connection */
-			serial_connection_out(&cassette_serial_connection);
+			if (!(cass_data[5] & 3))
+			{
+				if (!((cass_data[4] == 0) && (cass_data[5] & 4)))
+				{
+					cass_data[6] ^= 1;			// toggle output state, except on 2nd half of low bit
+					cassette_output(cassette_device_image(), cass_data[6] ? -1.0 : +1.0);
+				}
+			}
+			return;
 
-			/* update hd6402 receive clock */
-			hd6402_receive_clock();
-		}
+		case 0x40:				// cassette 1200 baud - not working at this time
+			/* loading a tape */
+			cass_data[1]++;
+
+			cass_ws = (cassette_input(cassette_device_image()) > +0.02) ? 1 : 0;
+
+			if (cass_ws != cass_data[0])
+			{
+				cass_data[0] = cass_ws;
+				cass_data[2] = ((cass_data[1] < 0xc) || (cass_data[1] > 0x20)) ? 1 : 0;
+				cass_data[1] = 0;
+				if (cass_data[2] != cass_data[3])
+				{
+					ay31015_si(cass_data[2]);
+					cass_data[3] = cass_data[2];
+				}
+				cass_data[2] = 0;
+			}
+
+			/* saving a tape - convert the serial stream from the uart, into 600 and 1200 Hz frequencies. */
+
+			cass_data[5]++;
+			if (!(cass_data[5] & 0x07))
+			{
+				cass_ws = ay31015_so();
+				if (cass_ws != cass_data[4])
+				{
+					cass_data[4] = cass_ws;
+					cass_data[5]=0;
+				}
+			}
+
+			if (!(cass_data[5] & 7))
+			{
+				if (!((cass_data[4] == 0) && (cass_data[5] & 8)))
+				{
+					cass_data[6] ^= 1;			// toggle output state, except on 2nd half of low bit
+					cassette_output(cassette_device_image(), cass_data[6] ? -1.0 : +1.0);
+				}
+			}
+			return;
 	}
-}
-
-static void exidy_hd6402_callback(int mask, int data)
-{
-	exidy_hd6402_state &=~mask;
-	exidy_hd6402_state |= (data & mask);
-
-	logerror("hd6402 state: %04x %04x\n",mask,data);
-}
-
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK( exidy_reset )
-{
-	memory_set_bank(1, 0);
 }
 
 static void exidy_printer_handshake_in(int number, int data, int mask)
@@ -246,15 +316,17 @@ static const CENTRONICS_CONFIG exidy_cent_config[1]={
 	},
 };
 
-static void cassette_serial_in(int id, unsigned long state)
+
+/* after the first 4 bytes have been read from ROM, switch the ram back in */
+static TIMER_CALLBACK( exidy_reset )
 {
-	cassette_serial_connection.input_state = state;
+	memory_set_bank(1, 0);
 }
 
 static MACHINE_START( exidyd )
 {
-	serial_timer = timer_alloc(exidy_serial_timer_callback, NULL);
-	cassette_timer = timer_alloc(exidy_cassette_timer_callback, NULL);
+//	serial_timer = timer_alloc(exidy_serial_timer_callback, NULL);
+	cassette_timer = timer_alloc(exidy_cassette_tc, NULL);
 }
 
 static MACHINE_START( exidy )
@@ -265,17 +337,11 @@ static MACHINE_START( exidy )
 
 static MACHINE_RESET( exidyd )
 {
-	hd6402_init();
-	hd6402_set_callback(exidy_hd6402_callback);
-	hd6402_reset();
+	ay31015_init();
 
 	centronics_config(0, exidy_cent_config);
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-
-	serial_connection_init(&cassette_serial_connection);
-	serial_connection_set_in_callback(&cassette_serial_connection, cassette_serial_in);
-
 	exidy_fe_port_w(machine, 0, 0);
 
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
@@ -330,45 +396,13 @@ static WRITE8_HANDLER ( exidy_wd179x_w )
 
 static WRITE8_HANDLER(exidy_fc_port_w)
 {
-	logerror("exidy fc w: %04x %02x\n",offset,data);
-
-	hd6402_set_input(HD6402_INPUT_TBRL, HD6402_INPUT_TBRL);
-	hd6402_data_w(machine, offset, data);
+	ay31015_ds( data );
 }
 
 
 static WRITE8_HANDLER(exidy_fd_port_w)
 {
-	logerror("exidy fd w: %04x %02x\n",offset,data);
-
-	/* bit 0,1: char length select */
-	if (data & 1)
-		hd6402_set_input(HD6402_INPUT_CLS1, HD6402_INPUT_CLS1);
-	else
-		hd6402_set_input(HD6402_INPUT_CLS1, 0);
-
-	if (data & 2)
-		hd6402_set_input(HD6402_INPUT_CLS2, HD6402_INPUT_CLS2);
-	else
-		hd6402_set_input(HD6402_INPUT_CLS2, 0);
-
-	/* bit 2: stop bit count */
-	if (data & 4)
-		hd6402_set_input(HD6402_INPUT_SBS, HD6402_INPUT_SBS);
-	else
-		hd6402_set_input(HD6402_INPUT_SBS, 0);
-
-	/* bit 3: parity type select */
-	if (data & 8)
-		hd6402_set_input(HD6402_INPUT_EPE, HD6402_INPUT_EPE);
-	else
-		hd6402_set_input(HD6402_INPUT_EPE, 0);
-
-	/* bit 4: inhibit parity (no parity) */
-	if (data & 16)
-		hd6402_set_input(HD6402_INPUT_PI, HD6402_INPUT_PI);
-	else
-		hd6402_set_input(HD6402_INPUT_PI, 0);
+	ay31015_cs( data );
 }
 
 #define EXIDY_CASSETTE_MOTOR_MASK ((1<<4)|(1<<5))
@@ -376,81 +410,69 @@ static WRITE8_HANDLER(exidy_fd_port_w)
 
 static WRITE8_HANDLER(exidy_fe_port_w)
 {
-	int changed_bits;
+	UINT8 changed_bits = (exidy_fe ^ data) & 0xf0;
+	exidy_fe = data;
+
 	/* bits 0..3 */
 	exidy_keyboard_line = data & 0x0f;
 
-	changed_bits = exidy_fe^data;
+	if (!changed_bits) return;
+
 	/* bits 4..5 */
-	/* either cassette motor state changed */
-	if ((changed_bits & EXIDY_CASSETTE_MOTOR_MASK)!=0)
+	/* does user want to hear the sound? */
+	if ((input_port_read(machine, "CONFIG") & 8) && (data & EXIDY_CASSETTE_MOTOR_MASK))
 	{
-		/* cassette 1 motor */
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),
-			(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
-			CASSETTE_MASK_MOTOR);
-
-		/* cassette 2 motor */
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1),
-			(data & 0x20) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
-			CASSETTE_MASK_MOTOR);
-
-		if ((data & EXIDY_CASSETTE_MOTOR_MASK)==0)
+		if (data & 0x20)
 		{
-			/* both are now off */
-
-			/* stop timer */
-			timer_adjust_oneshot(cassette_timer, attotime_zero, 0);
+			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
 		else
 		{
-			/* if both motors were off previously, at least one motor has been switched on */
-			if ((exidy_fe & EXIDY_CASSETTE_MOTOR_MASK)==0)
-			{
-				cassette_clock_counter = 0;
-				cassette_clock_state = 0;
-				/* start timer */
-				/* the correct baud rate should be being used here (see bit 6 below) */
-				timer_adjust_periodic(cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(4800));
-			}
+			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
-	}
-	/* bit 7 */
-	if (data & 0x080)
-	{
-		/* connect to serial device (not yet emulated) */
-	/* Due to bugs in the hardware and software of a real Sorcerer, the serial
-	interface misbehaves.
-	1. Sorcerer I had a hardware problem causing rs232 idle to be a space (+9v)
-	instead of mark (-9v). Fixed in Sorcerer II.
-	2. When you select a different baud for rs232, it was "remembered" but not
-	sent to port fe. It only gets sent when motor on was requested. Motor on is
-	only meaningful in a cassette operation.
-	3. The monitor software always resets the device to cassette whenever the
-	keyboard is scanned, motors altered, or an error occurred.
-	4. The above problems make rs232 communication impractical unless you write
-	your own routines or create a corrected monitor rom. */
 	}
 	else
 	{
-		/* connect to tape */
-		hd6402_connect(&cassette_serial_connection);
+		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 	}
+
+	/* cassette 1 motor */
+	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),
+		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
+	/* cassette 2 motor */
+	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1),
+		(data & 0x20) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
+	if ((data & EXIDY_CASSETTE_MOTOR_MASK) && (~data & 0x80))
+		timer_adjust_periodic(cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(19200));
+	else
+		timer_adjust_oneshot(cassette_timer, attotime_zero, 0);
+
 	/* bit 6 */
-	if ((changed_bits & (1<<6))!=0)
+	if (changed_bits & 0x40)
 	{
-		int baud_rate;
-
-		baud_rate = 300;
-		if (data & (1<<6))
-		{
-			baud_rate = 1200;
-		}
-
-		timer_adjust_periodic(serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
+		ay31015_set_rx_clock_speed ((data & 0x40) ? 19200 : 4800);
+		ay31015_set_tx_clock_speed ((data & 0x40) ? 14400 : 4800);
 	}
 
-	exidy_fe = data;
+	/* bit 7 */
+	if (changed_bits & 0x80)
+	{
+		if (data & 0x80)
+		{
+		/* connect to serial device (not yet emulated) */
+//			timer_adjust_periodic(serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
+		}
+		else
+		{
+		/* connect to tape */
+//			hd6402_connect(&cassette_serial_connection);
+		}
+	}
 }
 
 static WRITE8_HANDLER(exidy_ff_port_w)
@@ -473,43 +495,18 @@ static WRITE8_HANDLER(exidy_ff_port_w)
 
 static READ8_HANDLER(exidy_fc_port_r)
 {
-	UINT8 data;
-
-	hd6402_set_input(HD6402_INPUT_DRR, HD6402_INPUT_DRR);
-	data = hd6402_data_r(machine, offset);
-
-	logerror("exidy fc r: %04x %02x\n",offset,data);
-
+	UINT8 data = ay31015_rde();
+	ay31015_rdav();
 	return data;
 }
 
 static READ8_HANDLER(exidy_fd_port_r)
 {
 	/* set unused bits high */
-	UINT8 data = 0xe0;
-
-	/* bit 4: parity error */
-	if (exidy_hd6402_state & HD6402_OUTPUT_PE) data |= 16;
-
-	/* bit 3: framing error */
-	if (exidy_hd6402_state & HD6402_OUTPUT_FE) data |= 8;
-
-	/* bit 2: over-run error */
-	if (exidy_hd6402_state & HD6402_OUTPUT_OE) data |= 4;
-
-	/* bit 1: data receive ready - data ready in receive reg */
-	if (exidy_hd6402_state & HD6402_OUTPUT_DR) data |= 2;
-
-	/* bit 0: transmitter buffer receive empty */
-	/* if this BIT is forced high, then the cassette save routine does not hang */
-	if (exidy_hd6402_state & HD6402_OUTPUT_TBRE) data |= 1;
-
-	logerror("exidy fd r: %04x %02x\n",offset,data);
-
-	return data;
+	return ay31015_swe() | 0xe0;
 }
 
-static  READ8_HANDLER(exidy_fe_port_r)
+static READ8_HANDLER(exidy_fe_port_r)
 {
 	/* bits 6..7
      - hardware handshakes from user port
@@ -573,7 +570,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exidyd_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK(1)
-	AM_RANGE(0x0800, 0xbfff) AM_RAM		/* ram 48k diskless machine */
+	AM_RANGE(0x0800, 0xbfff) AM_RAM		/* ram 48k cassette-based machine */
 	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM		/* char rom */
@@ -716,9 +713,9 @@ static INPUT_PORTS_START(exidy)
 	PORT_CONFNAME( 0x02, 0x00, "Parallel port" )
 	PORT_CONFSETTING(    0x00, "Speaker" )
 	PORT_CONFSETTING(    0x02, "Printer" )
-//	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
-//	PORT_CONFSETTING(    0x08, DEF_STR(On))
-//	PORT_CONFSETTING(    0x00, DEF_STR(Off))
+	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
+	PORT_CONFSETTING(    0x08, DEF_STR(On))
+	PORT_CONFSETTING(    0x00, DEF_STR(Off))
 INPUT_PORTS_END
 
 /**********************************************************************************************************/
@@ -746,8 +743,12 @@ static MACHINE_DRIVER_START( exidy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
+	MDRV_SOUND_ADD(WAVE, 1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
 	MDRV_SOUND_ADD(SPEAKER, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	// speaker on parallel port
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -770,7 +771,6 @@ static DRIVER_INIT( exidy )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xe000);
-//	timer_pulse(ATTOTIME_IN_HZ(200000),NULL,0,exidy_timer);		/* timer for cassette */
 }
 
 /***************************************************************************
@@ -851,15 +851,15 @@ static void exidy_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(exidy_floppy); break;
+		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(exidy_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk"); break;
 
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:					legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
 }
 
@@ -869,21 +869,22 @@ static void exidy_cassette_getinfo(const mess_device_class *devclass, UINT32 sta
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
 
-		default:										cassette_device_getinfo(devclass, state, info); break;
+		default:					cassette_device_getinfo(devclass, state, info); break;
 	}
 }
 
 SYSTEM_CONFIG_START(exidy)
 	CONFIG_DEVICE(exidy_floppy_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
-	CONFIG_DEVICE(exidy_cassette_getinfo)		// use of cassette causes a hang
+	CONFIG_DEVICE(exidy_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(exidyd)
 	CONFIG_DEVICE(cartslot_device_getinfo)
-	CONFIG_DEVICE(exidy_cassette_getinfo)		// use of cassette causes a hang
+	CONFIG_DEVICE(exidy_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 

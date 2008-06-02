@@ -999,7 +999,7 @@ $(MESSOBJ)/aquarius.a: \
 	$(MESS_MACHINE)/aquarius.o \
 
 $(MESSOBJ)/exidy.a:    \
-	$(MESS_MACHINE)/hd6402.o     \
+	$(MESS_MACHINE)/ay31015.o   \
 	$(MESS_DRIVERS)/exidy.o		\
 	$(MESS_VIDEO)/exidy.o      \
 
