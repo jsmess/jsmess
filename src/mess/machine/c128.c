@@ -133,27 +133,34 @@ WRITE8_HANDLER( c128_write_d000 )
 
 static READ8_HANDLER( c128_read_io )
 {
-	switch ((offset&0xf00)>>8) {
-	case 0:case 1: case 2: case 3:
+	if (offset < 0x400)
 		return vic2_port_r (machine, offset & 0x3ff);
-	case 4:
+	else if (offset < 0x500)
 		return sid6581_0_port_r (machine, offset & 0xff);
-	case 5:
+	else if (offset < 0x600)
 		return c128_mmu8722_port_r (machine, offset & 0xff);
-	case 6:case 7:
+	else if (offset < 0x800)
 		return vdc8563_port_r (machine, offset & 0xff);
-	case 8: case 9: case 0xa: case 0xb:
+	else if (offset < 0xc00)
 		return c64_colorram[offset & 0x3ff];
-	case 0xc:
+	else if (offset == 0xc00)
+		{
+			cia_set_port_mask_value(0, 0, input_port_read(Machine, "DSW0") & 0x0100 ? c64_keyline[8] : c64_keyline[9] );
+			return cia_0_r(machine, offset);
+		}
+	else if (offset == 0xc01)
+		{
+			cia_set_port_mask_value(0, 1, input_port_read(Machine, "DSW0") & 0x0100 ? c64_keyline[9] : c64_keyline[8] );
+			return cia_0_r(machine, offset);
+		}
+	else if (offset < 0xd00)
 		return cia_0_r(machine, offset);
-	case 0xd:
+	else if (offset < 0xe00)
 		return cia_1_r(machine, offset);
-	case 0xf:
+	else if ((offset >= 0xf00) & (offset <= 0xfff))
 		return c128_dma8726_port_r(machine, offset&0xff);
-	case 0xe:default:
-		DBG_LOG (1, "io read", ("%.3x\n", offset));
-		return 0xff;
-	}
+	DBG_LOG (1, "io read", ("%.3x\n", offset));
+	return 0xff;
 }
 
 void c128_bankswitch_64 (running_machine *machine, int reset)
