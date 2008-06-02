@@ -262,7 +262,6 @@ static UINT8 keymodreg;
 #define MAGIC_KEY_REPEAT_NUMBER		80
 
 #define AY3600_KEYS_LENGTH			128
-#define AY3600_KEYS_BASEPORT		0
 
 // IIgs keymod flags
 #define A2_KEYMOD_SHIFT		1

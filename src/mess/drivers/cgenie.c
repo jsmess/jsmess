@@ -172,7 +172,7 @@ static INPUT_PORTS_START( cgenie )
 		PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)			PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 		PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)			PORT_CHAR(' ')
 
-	/* 2008-05 FP: Below we still miss a 'Lock' key, two 'Rst' keys (used in pair the should restart the 
+	/* 2008-05 FP: Below we still miss a 'Lock' key, two 'Rst' keys (used in pair, they should restart the 
 	system) and, I guess, two unused inputs (according to the user manual, there are no other keys on the 
 	keyboard)  */
 	PORT_START_TAG("ROW7")
