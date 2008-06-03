@@ -1362,8 +1362,10 @@ logerror("prc.count is %02x\n", prc.count);
 	{
 		prc.count = 0;
 		prc.frame_count++;
-
-		if ( prc.frame_count >= prc.max_frame_count )
+	}
+	else
+	{
+		if ( prc.count == 0x18 && prc.frame_count >= prc.max_frame_count )
 		{
 			prc.frame_count = 0;
 
@@ -1385,6 +1387,75 @@ logerror("prc.count is %02x\n", prc.count);
 			/* Check if the sprites should be drawn */
 			if ( prc.sprites_enabled )
 			{
+				UINT16	spr;
+
+				for ( spr = 0x35C; spr >= 0x300; spr -= 4 )
+				{
+					int		spr_x = ( pokemini_ram[ spr + 0 ] & 0x7F ) - 16;
+					int		spr_y = ( pokemini_ram[ spr + 1 ] & 0x7F ) - 16;
+					UINT8	spr_tile = pokemini_ram[ spr + 2 ];
+					UINT8	spr_flag = pokemini_ram[ spr + 3 ];
+
+					if ( spr_flag & 0x08 )
+					{
+						UINT16	gfx, mask;
+						UINT32	spr_base = prc.spr_tiles + spr_tile * 64;
+						int		i, j;
+
+						for ( i = 0; i < 16; i++ )
+						{
+							if ( spr_x + i >= 0 && spr_x + i < 96 )
+							{
+								int rel_x = ( spr_flag & 0x01 ) ? 15 - i : i;
+								UINT32	s = spr_base + ( ( rel_x & 0x08 ) << 2 ) + ( rel_x & 0x07 );
+
+								mask = ~ ( program_read_byte( s ) | ( program_read_byte( s + 8 ) << 8 ) );
+								gfx = program_read_byte( s + 16 ) | ( program_read_byte( s + 24 ) << 8 );
+
+								/* Are the colors inverted? */
+								if ( spr_flag & 0x04 )
+								{
+									gfx = ~gfx;
+								}
+
+								for ( j = 0; j < 16; j++ )
+								{
+									if ( spr_y + j >= 0 && spr_y + j < 64 )
+									{
+										UINT16	ram_addr = ( ( ( spr_y + j ) >> 3 ) * 96 ) + spr_x + i;
+
+										if ( spr_flag & 0x02 )
+										{
+											if ( mask & 0x8000 || 1 )
+											{
+												pokemini_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
+												if ( gfx & 0x8000 )
+												{
+													pokemini_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
+												}
+											}
+											mask <<= 1;
+											gfx <<= 1;
+										}
+										else
+										{
+											if ( mask & 0x0001 || 1 )
+											{
+												pokemini_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
+												if ( gfx & 0x0001 )
+												{
+													pokemini_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
+												}
+											}
+											mask >>= 1;
+											gfx >>= 1;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 
 			/* Set PRC Render interrupt */
@@ -1410,11 +1481,11 @@ logerror("prc.count is %02x\n", prc.count);
 						*BITMAP_ADDR16(tmpbitmap, y + 7, x) = ( data & 0x80 ) ? 3 : 0;
 					}
 				}
-			}
 
-			/* Set PRC Copy interrupt */
-			pm_reg[0x27] |= 0x80;
-			pokemini_check_irqs( machine );
+				/* Set PRC Copy interrupt */
+				pm_reg[0x27] |= 0x80;
+				pokemini_check_irqs( machine );
+			}
 		}
 
 		/* Set possible input irqs */
