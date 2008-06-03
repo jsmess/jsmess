@@ -1426,7 +1426,7 @@ logerror("prc.count is %02x\n", prc.count);
 
 										if ( spr_flag & 0x02 )
 										{
-											if ( mask & 0x8000 || 1 )
+											if ( mask & 0x8000 )
 											{
 												pokemini_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												if ( gfx & 0x8000 )
@@ -1439,7 +1439,7 @@ logerror("prc.count is %02x\n", prc.count);
 										}
 										else
 										{
-											if ( mask & 0x0001 || 1 )
+											if ( mask & 0x0001 )
 											{
 												pokemini_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												if ( gfx & 0x0001 )
