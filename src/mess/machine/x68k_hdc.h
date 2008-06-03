@@ -30,7 +30,7 @@ enum
 	SASI_CMD_REQUEST_SENSE,
 	SASI_CMD_FORMAT_UNIT,
 	SASI_CMD_RESERVED_05,
-	SASI_CMD_RESERVED_06,
+	SASI_CMD_FORMAT_UNIT_06,  // the X68000 uses command 0x06 for Format Unit, despite the SASI specs saying 0x04
 	SASI_CMD_RESERVED_07,
 	SASI_CMD_READ,
 	SASI_CMD_RESERVED_09,
@@ -107,8 +107,7 @@ unsigned char SASIReadByte(const device_config* device);
 DEVICE_START( x68k_hdc );
 DEVICE_GET_INFO( x68k_hdc );
 
-DEVICE_IMAGE_LOAD( sasihd );
-DEVICE_IMAGE_UNLOAD( sasihd );
+DEVICE_IMAGE_CREATE( sasihd );
 
 #define X68KHDC DEVICE_GET_INFO_NAME(x68k_hdc)
 

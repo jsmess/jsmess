@@ -17,6 +17,7 @@
 
 #include "x68k_hdc.h"
 #include "devices/harddriv.h"
+#include "device.h"
 #include "image.h"
 
 struct hd_state hd;
@@ -55,10 +56,29 @@ DEVICE_START( x68k_hdc )
 	hd.current_block = 0;
 }
 
+DEVICE_IMAGE_CREATE( sasihd )
+{
+	// create 20MB HD
+	int x;
+	int ret;
+	unsigned char sectordata[256];  // empty block data
+
+	memset(sectordata,0,256);
+	for(x=0;x<0x013c98;x++)  // 0x13c98 = number of blocks on a 20MB HD
+	{
+		ret = image_fwrite(image,sectordata,256);
+		if(ret < 256)
+			return INIT_FAIL;
+	}
+
+	return INIT_PASS;
+}
+
 WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 {
 	sasi_ctrl_t* sasi = device->token;
 	unsigned int lba = 0;
+	char* blk;
 
 	switch(offset)
 	{
@@ -236,11 +256,34 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 						sasi->status_port |= 0x04;  // C/D remains the same
 						sasi->cd = 1;
 						sasi->status_port |= 0x08;
+						logerror("SASI: SEEK (LBA 0x%06x)\n",lba);
+					break;
+				case SASI_CMD_FORMAT_UNIT:
+				case SASI_CMD_FORMAT_UNIT_06:
+					/*
+						Format Unit command format  (differs from SASI spec?)
+						0 |   0x06
+						1 |   Unit number (0-7) | LBA MSB (high 5 bits)
+						2 |   LBA
+						3 |   LBA LSB
+						4 |   ??  (usually 0x01)
+						5 |   ??
+					*/
+						sasi->phase = SASI_PHASE_STATUS;
+						sasi->io = 1;  // Output
+						sasi->status_port |= 0x04;  // C/D remains the same
+						sasi->cd = 1;
+						sasi->status_port |= 0x08;
 						lba = sasi->command[3];
 						lba |= sasi->command[2] << 8;
 						lba |= (sasi->command[1] & 0x1f) << 16;
 						image_fseek(device,lba * 256,SEEK_SET);
-						logerror("SASI: SEEK (LBA 0x%06x)\n",lba);
+						blk = malloc(256*33);
+						memset(blk,0,256*33);
+						// formats 33 256-byte blocks
+						image_fwrite(device,blk,256*33);
+						free(blk);
+						logerror("SASI: FORMAT UNIT (LBA 0x%06x)\n",lba);
 					break;
 				default:
 					sasi->phase = SASI_PHASE_STATUS;
@@ -414,15 +457,16 @@ DEVICE_GET_INFO(x68k_hdc)
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sasi_ctrl_t);				break;
 		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_HARDDISK; break;
+		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
+		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(x68k_hdc); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(x68k_hdc);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/*info->reset = DEVICE_RESET_NAME(x68k_hdc);*/	break;
-		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 0; break;
+		case DEVINFO_FCT_IMAGE_CREATE:					info->f = (genf *)DEVICE_IMAGE_CREATE_NAME(sasihd);	break;
 
 			/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "SASI Hard Disk";	break;
