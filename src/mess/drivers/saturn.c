@@ -2328,8 +2328,11 @@ ROM_START(saturnjp)
 	ROM_REGION( 0x480000, REGION_CPU1, 0 ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101", "Japan v1.01 (941228)")
 	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "100", "Japan v1.00 (940921)")
-	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "1003", "Japan v1.003 (941012)")
+	ROMX_LOAD("sega1003.bin", 0x00000000, 0x00080000, CRC(b3c63c25) SHA1(7b23b53d62de0f29a23e423d0fe751dfb469c2fa), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "100", "Japan v1.00 (940921)")
+	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(3))
+	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
 	ROM_COPY( REGION_CPU1,0,0,0x080000)
 	ROM_REGION( 0x100000, REGION_CPU3, ROMREGION_ERASE00 ) /* 68000 code */
@@ -2344,6 +2347,7 @@ ROM_START(saturn)
 	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
+	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
 	ROM_COPY( REGION_CPU1,0,0,0x080000)
 	ROM_REGION( 0x100000, REGION_CPU3, ROMREGION_ERASE00 ) /* 68000 code */
@@ -2357,6 +2361,7 @@ ROM_START(saturneu)
 	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
+	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
 	ROM_COPY( REGION_CPU1,0,0,0x080000)
 	ROM_REGION( 0x100000, REGION_CPU3, ROMREGION_ERASE00 ) /* 68000 code */
@@ -2367,6 +2372,7 @@ ROM_END
 ROM_START(vsaturn)
 	ROM_REGION( 0x480000, REGION_CPU1, 0 ) /* SH2 code */
 	ROM_LOAD("vsaturn.bin", 0x00000000, 0x00080000, CRC(e4d61811) SHA1(4154e11959f3d5639b11d7902b3a393a99fb5776))
+	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
 	ROM_COPY( REGION_CPU1,0,0,0x080000)
 	ROM_REGION( 0x100000, REGION_CPU3, ROMREGION_ERASE00 ) /* 68000 code */
@@ -2377,6 +2383,7 @@ ROM_END
 ROM_START(hisaturn)
 	ROM_REGION( 0x480000, REGION_CPU1, 0 ) /* SH2 code */
 	ROM_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796))
+	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
 	ROM_COPY( REGION_CPU1,0,0,0x080000)
 	ROM_REGION( 0x100000, REGION_CPU3, ROMREGION_ERASE00 ) /* 68000 code */
@@ -2397,49 +2404,9 @@ static void saturn_chdcd_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-static DEVICE_IMAGE_LOAD( saturn_cart )
-{
-	UINT8 *ROM = memory_region(REGION_CPU1)+0x80000;
-	UINT8 *tmp;
-	int i;
-
-	tmp = malloc(image_length(image));
-
-	image_fread(image, tmp, image_length(image));
-
-	// now assemble the image in memory in the right order
-	for (i = 0; i < image_length(image); i++)
-	{
-		ROM[i] = tmp[BYTE4_XOR_BE(i)];
-	}
-
-	free(tmp);
-
-	return INIT_PASS;
-}
-
-static void saturn_cart_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:	 	   	info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 0; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD: 			info->load = device_load_saturn_cart; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "bin"); break;
-
-		default:   					cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 SYSTEM_CONFIG_START( saturn )
 	CONFIG_DEVICE(saturn_chdcd_getinfo)
-	CONFIG_DEVICE(saturn_cart_getinfo)
+	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************
