@@ -80,6 +80,8 @@ System Driver Changes:
 
 - [SATURN] Fixed mem_mask regressions.  [R. Belmont]
 
+- [SATURN] Added ROM cartridge support. [R. Belmont]
+
 - [SCORPION] Added SHA-1's.  [Fabio Priuli]
 
 - [SG1000] Added .bin extension.  [Fabio Priuli]
