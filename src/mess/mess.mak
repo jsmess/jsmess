@@ -1272,7 +1272,8 @@ $(MESSOBJ)/bondwell.a: \
 	$(MESS_DRIVERS)/bw2.o \
 
 $(MESSOBJ)/grundy.a: \
-	$(MESS_DRIVERS)/newbrain.o
+	$(MESS_DRIVERS)/newbrain.o \
+	$(MESS_VIDEO)/newbrain.o
 
 #-------------------------------------------------
 # layout dependencies
