@@ -31,7 +31,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "mc6843.h"
 #include "devices/flopdrv.h"
 
@@ -753,13 +752,13 @@ WRITE8_HANDLER ( mc6843_w )
 
 
 
-void mc6843_reset ( void )
+void mc6843_reset ( running_machine *machine )
 {
 	int i;
 	LOG (( "mc6843 reset\n" ));
 
 	/* setup/reset floppy drive */
-	for ( i = 0; i < device_count( Machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, mc6843_index_pulse_callback );
@@ -787,7 +786,7 @@ void mc6843_reset ( void )
 
 
 
-void mc6843_config ( const mc6843_interface* iface )
+void mc6843_config ( running_machine *machine, const mc6843_interface* iface )
 {
 	assert( iface );
 	mc6843 = auto_malloc( sizeof( * mc6843 ) );
@@ -814,5 +813,5 @@ void mc6843_config ( const mc6843_interface* iface )
 	state_save_register_item( "mc6843", 0, mc6843->data_id );
 	state_save_register_item( "mc6843", 0, mc6843->index_pulse );
 
-	mc6843_reset();
+	mc6843_reset(machine);
 }

@@ -1,6 +1,5 @@
 /* Core includes */
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/kc.h"
 
 /* Components */
@@ -846,7 +845,7 @@ static unsigned char kc_brdy;
 */
 
 static kc_keyboard keyboard_data;
-static void kc_keyboard_attempt_transmit(void);
+static void kc_keyboard_attempt_transmit(running_machine *machine);
 static TIMER_CALLBACK(kc_keyboard_update);
 
 /* this is called at a regular interval */
@@ -899,7 +898,7 @@ static void kc_keyboard_add_pulse_to_transmit_buffer(int pulse_state)
 
 
 /* initialise keyboard queue */
-static void kc_keyboard_init(void)
+static void kc_keyboard_init(running_machine *machine)
 {
 	int i;
 	char port[6];
@@ -928,7 +927,7 @@ static void kc_keyboard_init(void)
 	{
 		sprintf(port, "KEY%d", i);
 		/* read input port */
-		kc_previous_keyboard[i] = input_port_read(Machine, port);
+		kc_previous_keyboard[i] = input_port_read(machine, port);
 	}
 }
 
@@ -969,7 +968,7 @@ static void kc_keyboard_add_bit(int bit)
 }
 
 
-static void kc_keyboard_begin_transmit(int scan_code)
+static void kc_keyboard_begin_transmit(running_machine *machine, int scan_code)
 {
 	int i;
 	int scan;
@@ -983,7 +982,7 @@ static void kc_keyboard_begin_transmit(int scan_code)
 	scan = scan_code;
 
 	/* state of shift key */
-	kc_keyboard_add_bit(((input_port_read(Machine, "SHIFT") & 0x01)^0x01));
+	kc_keyboard_add_bit(((input_port_read(machine, "SHIFT") & 0x01)^0x01));
 
 	for (i=0; i<6; i++)
 	{
@@ -1016,7 +1015,7 @@ static void kc_keyboard_begin_transmit(int scan_code)
 }
 
 /* attempt to transmit a new keycode to the base unit */
-static void kc_keyboard_attempt_transmit(void)
+static void kc_keyboard_attempt_transmit(running_machine *machine)
 {
 	/* is the keyboard transmit is idle */
 	if (keyboard_data.transmit_state == KC_KEYBOARD_TRANSMIT_IDLE)
@@ -1034,7 +1033,7 @@ static void kc_keyboard_attempt_transmit(void)
 			keyboard_data.head = (keyboard_data.head + 1) % KC_KEYCODE_QUEUE_LENGTH;
 
 			/* setup transmit buffer with scan-code */
-			kc_keyboard_begin_transmit(code);
+			kc_keyboard_begin_transmit(machine, code);
 		}
 	}
 }
@@ -1087,7 +1086,7 @@ static TIMER_CALLBACK(kc_keyboard_update)
 		}
 	}
 
-	kc_keyboard_attempt_transmit();
+	kc_keyboard_attempt_transmit(machine);
 }
 
 /*********************************************************************/
@@ -1834,7 +1833,7 @@ static z80ctc_interface	kc85_ctc_intf =
     kc85_zc2_callback
 };
 
-static void	kc85_common_init(void)
+static void	kc85_common_init(running_machine *machine)
 {
 	z80pio_init(0, &kc85_pio_intf);
 	z80ctc_init(0, &kc85_ctc_intf);
@@ -1843,7 +1842,7 @@ static void	kc85_common_init(void)
 	z80pio_reset(0);
 
 	kc_cassette_init();
-	kc_keyboard_init();
+	kc_keyboard_init(machine);
 
 	/* kc85 has a 50hz input to the ctc channel 2 and 3 */
 	/* channel 2 this controls the video colour flash */
@@ -1873,7 +1872,7 @@ MACHINE_RESET( kc85_4 )
 	kc85_4_update_0x0c000(machine);
 	kc85_4_update_0x0e000(machine);
 
-	kc85_common_init();
+	kc85_common_init(machine);
 
 	kc85_4_update_0x00000(machine);
 
@@ -1906,7 +1905,7 @@ MACHINE_RESET( kc85_3 )
 	kc85_3_update_0x0c000(machine);
 	kc85_3_update_0x0e000(machine);
 
-	kc85_common_init();
+	kc85_common_init(machine);
 
 	kc85_3_update_0x00000(machine);
 

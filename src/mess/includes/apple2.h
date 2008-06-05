@@ -45,7 +45,7 @@ extern UINT32 a2;
 
 extern const applefdc_interface apple2_fdc_interface;
 
-void apple2_iwm_setdiskreg(UINT8 data);
+void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data);
 UINT8 apple2_iwm_getdiskreg(void);
 
 void apple2_init_common(running_machine *machine);

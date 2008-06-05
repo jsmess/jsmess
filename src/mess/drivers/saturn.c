@@ -464,7 +464,7 @@ static void system_reset()
 	/*Order is surely wrong but whatever...*/
 }
 
-static void smpc_intbackhelper(void)
+static void smpc_intbackhelper(running_machine *machine)
 {
 	int pad;
 	char port[5];
@@ -476,7 +476,7 @@ static void smpc_intbackhelper(void)
 	}
 
 	sprintf(port, "JOY%d", intback_stage-1);	// intback_stage will be 2 or 3, 2 = player 1, 3 = player 2
-	pad = input_port_read(Machine, port);
+	pad = input_port_read(machine, port);
 
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	smpc_ram[33] = 0xf1;	// no tap, direct connect
@@ -540,7 +540,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 		{
 			intback_stage = 2;
 		}
-		smpc_intbackhelper();
+		smpc_intbackhelper(machine);
 		cpunum_set_input_line_and_vector(machine, 0, 8, HOLD_LINE , 0x47);
 	}
 
@@ -698,7 +698,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 			//  if(!(stv_scu[40] & 0x0080)) /*System Manager(SMPC) irq*/ /* we can't check this .. breaks controls .. probably issues elsewhere? */
 				{
 //                  if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
-					smpc_intbackhelper();
+					smpc_intbackhelper(machine);
 					cpunum_set_input_line_and_vector(machine, 0, 8, HOLD_LINE , 0x47);
 				}
 			break;

@@ -1148,7 +1148,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			break;
 
 		case 0x31:	/* C031 - DISKREG */
-			apple2_iwm_setdiskreg(data);
+			apple2_iwm_setdiskreg(machine, data);
 			break;
 
 		case 0x32:	/* C032 - SCANINT */

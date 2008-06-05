@@ -1288,9 +1288,8 @@ static void pdp1_keyboard(running_machine *machine)
 		old_typewriter_keys[i] = typewriter_keys[i];
 }
 
-static void pdp1_lightpen(void)
+static void pdp1_lightpen(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	int x_delta, y_delta;
 	int current_state;
 	static int previous_state;
@@ -1489,5 +1488,5 @@ INTERRUPT_GEN( pdp1_interrupt )
 		pdp1_keyboard(machine);
 	}
 
-	pdp1_lightpen();
+	pdp1_lightpen(machine);
 }

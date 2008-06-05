@@ -338,7 +338,7 @@ SMH_BANK1, SMH_BANK2, SMH_BANK3, SMH_BANK4};
 static const write8_machine_func nc_bankhandler_w[]={
 SMH_BANK5, SMH_BANK6, SMH_BANK7, SMH_BANK8};
 
-static void nc_refresh_memory_bank_config(int bank)
+static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 {
 	int mem_type;
 	int mem_bank;
@@ -400,7 +400,7 @@ static void nc_refresh_memory_bank_config(int bank)
 				memory_set_bankptr(bank+1, addr);
 
 				/* write enabled? */
-				if (input_port_read(Machine, "EXTRA") & 0x02)
+				if (input_port_read(machine, "EXTRA") & 0x02)
 				{
 					/* yes */
 					memory_set_bankptr(bank+5, addr);
@@ -425,22 +425,22 @@ static void nc_refresh_memory_bank_config(int bank)
 		break;
 	}
 
-	memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 		(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, read_handler);
 
 	if (write_handler)
 	{
-		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, write_handler);
 	}
 }
 
-static void nc_refresh_memory_config(void)
+static void nc_refresh_memory_config(running_machine *machine)
 {
-	nc_refresh_memory_bank_config(0);
-	nc_refresh_memory_bank_config(1);
-	nc_refresh_memory_bank_config(2);
-	nc_refresh_memory_bank_config(3);
+	nc_refresh_memory_bank_config(machine, 0);
+	nc_refresh_memory_bank_config(machine, 1);
+	nc_refresh_memory_bank_config(machine, 2);
+	nc_refresh_memory_bank_config(machine, 3);
 }
 
 
@@ -552,7 +552,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
 	if (changed_bits & 0x02)
 	{
 		/* yes refresh memory config */
-		nc_refresh_memory_config();
+		nc_refresh_memory_config(machine);
 	}
 
 	previous_inputport_10_state = inputport_10_state;
@@ -588,7 +588,7 @@ static void nc_common_init_machine(running_machine *machine)
     /* at reset set to 1 */
     nc_poweroff_control = 1;
 
-    nc_refresh_memory_config();
+    nc_refresh_memory_config(machine);
 	nc_update_interrupts(machine);
 
 	/* keyboard timer */
@@ -623,7 +623,7 @@ static WRITE8_HANDLER(nc_memory_management_w)
 	LOG(("Memory management W: %02x %02x\n",offset,data));
         nc_memory_config[offset] = data;
 
-        nc_refresh_memory_config();
+        nc_refresh_memory_config(machine);
 }
 
 static WRITE8_HANDLER(nc_irq_mask_w)

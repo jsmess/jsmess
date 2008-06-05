@@ -3,7 +3,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/lynx.h"
 #include "cpu/m6502/m6502.h"
 
@@ -1208,7 +1207,7 @@ static void lynx_reset(running_machine *machine)
 
 static STATE_POSTLOAD( lynx_postload )
 {
-	lynx_memory_config_w(Machine, 0, lynx_memory_config);
+	lynx_memory_config_w(machine, 0, lynx_memory_config);
 }
 
 MACHINE_START( lynx )

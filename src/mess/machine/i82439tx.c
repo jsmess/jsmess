@@ -199,7 +199,7 @@ static void intel82439tx_pci_write(int function, int offset, UINT32 data, UINT32
 	}
 
 	/* hack to compensate for weird issue (maybe the Pentium core needs to support caching? */
-	if ((cpunum_get_reg(0, REG_PC) == 0xFCB01) && !strcmp(Machine->gamedrv->name, "at586"))
+	if ((cpunum_get_reg(0, REG_PC) == 0xFCB01) && !strcmp(machine->gamedrv->name, "at586"))
 	{
 		memory_region(REGION_USER1)[0x3CB01] = 0xF3;
 		memory_region(REGION_USER1)[0x3CB02] = 0xA4;
@@ -218,7 +218,7 @@ static const struct pci_device_info intel82439tx_callbacks =
 
 
 
-void intel82439tx_init(void)
+void intel82439tx_init(running_machine *machine)
 {
 	/* setup PCI */
 	pci_init();
@@ -232,18 +232,18 @@ void intel82439tx_init(void)
 	i82439tx->regs[0x04] = 0x02020202;
 	i82439tx->regs[0x05] = 0x00000002;
 
-	intel82439tx_configure_memory(Machine, 0, 0xF0000, 0xFFFFF, BANK_F0000_R, bank_f0000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xC0000, 0xC3FFF, BANK_C0000_R, bank_c0000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xC4000, 0xC7FFF, BANK_C4000_R, bank_c4000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xC8000, 0xCCFFF, BANK_C8000_R, bank_c8000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xCC000, 0xCFFFF, BANK_CC000_R, bank_cc000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xD0000, 0xD3FFF, BANK_D0000_R, bank_d0000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xD4000, 0xD7FFF, BANK_D4000_R, bank_d4000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xD8000, 0xDBFFF, BANK_D8000_R, bank_d8000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xDC000, 0xDFFFF, BANK_DC000_R, bank_dc000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xE0000, 0xE3FFF, BANK_E0000_R, bank_e0000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xE4000, 0xE7FFF, BANK_E4000_R, bank_e4000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xE8000, 0xECFFF, BANK_E8000_R, bank_e8000_w);
-	intel82439tx_configure_memory(Machine, 0, 0xEC000, 0xEFFFF, BANK_EC000_R, bank_ec000_w);
+	intel82439tx_configure_memory(machine, 0, 0xF0000, 0xFFFFF, BANK_F0000_R, bank_f0000_w);
+	intel82439tx_configure_memory(machine, 0, 0xC0000, 0xC3FFF, BANK_C0000_R, bank_c0000_w);
+	intel82439tx_configure_memory(machine, 0, 0xC4000, 0xC7FFF, BANK_C4000_R, bank_c4000_w);
+	intel82439tx_configure_memory(machine, 0, 0xC8000, 0xCCFFF, BANK_C8000_R, bank_c8000_w);
+	intel82439tx_configure_memory(machine, 0, 0xCC000, 0xCFFFF, BANK_CC000_R, bank_cc000_w);
+	intel82439tx_configure_memory(machine, 0, 0xD0000, 0xD3FFF, BANK_D0000_R, bank_d0000_w);
+	intel82439tx_configure_memory(machine, 0, 0xD4000, 0xD7FFF, BANK_D4000_R, bank_d4000_w);
+	intel82439tx_configure_memory(machine, 0, 0xD8000, 0xDBFFF, BANK_D8000_R, bank_d8000_w);
+	intel82439tx_configure_memory(machine, 0, 0xDC000, 0xDFFFF, BANK_DC000_R, bank_dc000_w);
+	intel82439tx_configure_memory(machine, 0, 0xE0000, 0xE3FFF, BANK_E0000_R, bank_e0000_w);
+	intel82439tx_configure_memory(machine, 0, 0xE4000, 0xE7FFF, BANK_E4000_R, bank_e4000_w);
+	intel82439tx_configure_memory(machine, 0, 0xE8000, 0xECFFF, BANK_E8000_R, bank_e8000_w);
+	intel82439tx_configure_memory(machine, 0, 0xEC000, 0xEFFFF, BANK_EC000_R, bank_ec000_w);
 }
 

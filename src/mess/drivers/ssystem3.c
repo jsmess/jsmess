@@ -34,7 +34,6 @@ backup of playfield rom and picture/description of its board
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 #include "includes/ssystem3.h"
 #include "machine/6522via.h"
@@ -128,9 +127,8 @@ static void ssystem3_playfield_write(int reset, int signal)
   playfield.signal=signal;
 }
 
-static void ssystem3_playfield_read(int *on, int *ready)
+static void ssystem3_playfield_read(running_machine *machine, int *on, int *ready)
 {
-	running_machine *machine = Machine;
 	*on=!(input_port_read(machine, "Configuration")&1);
 	//  *on=!playfield.on;
 	*ready=FALSE;
@@ -206,11 +204,11 @@ UINT8 ssystem3_via_read_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs
    bit 5: input low x/$37 4 (else 1)
 
  */
-UINT8 ssystem3_via_read_b(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset)
+UINT8 ssystem3_via_read_b(running_machine *machine, ATTR_UNUSED offs_t offset)
 {
   UINT8 data=0xff;
   int on, ready;
-  ssystem3_playfield_read(&on, &ready);
+  ssystem3_playfield_read(machine, &on, &ready);
   if (!on) data&=~0x20;
   if (!ready) data&=~0x10;
   return data;

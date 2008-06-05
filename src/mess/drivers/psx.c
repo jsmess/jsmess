@@ -189,9 +189,8 @@ static TIMER_CALLBACK(psx_pad_ack)
 	}
 }
 
-static void psx_pad( int n_port, int n_data )
+static void psx_pad( running_machine *machine, int n_port, int n_data )
 {
-	running_machine *machine = Machine;
 	int b_sel;
 	int b_clock;
 	int b_data;
@@ -312,9 +311,9 @@ static void psx_mcd( int n_port, int n_data )
 static void psx_sio0( int n_data )
 {
 	/* todo: raise data & ack when nothing is driving it low */
-	psx_pad( 0, n_data );
+	psx_pad( Machine, 0, n_data );
 	psx_mcd( 0, n_data );
-	psx_pad( 1, n_data ^ PSX_SIO_OUT_DTR );
+	psx_pad( Machine, 1, n_data ^ PSX_SIO_OUT_DTR );
 	psx_mcd( 1, n_data ^ PSX_SIO_OUT_DTR );
 }
 

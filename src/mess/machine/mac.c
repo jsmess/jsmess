@@ -104,7 +104,7 @@ static mac_model_t mac_model;
 
 
 
-static void mac_install_memory(offs_t memory_begin, offs_t memory_end,
+static void mac_install_memory(running_machine *machine, offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom, int bank)
 {
 	offs_t memory_mask;
@@ -117,9 +117,9 @@ static void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 	rh = (read16_machine_func) (FPTR)bank;
 	wh = is_rom ? SMH_UNMAP : (write16_machine_func) (FPTR)bank;
 
-	memory_install_read16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, memory_begin,
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memory_begin,
 		memory_end, memory_mask, 0, rh);
-	memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, memory_begin,
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memory_begin,
 		memory_end, memory_mask, 0, wh);
 
 	memory_set_bankptr(bank, memory_data);
@@ -227,7 +227,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		}
 
 		/* install the memory */
-		mac_install_memory(0x000000, 0x3fffff, memory_size, memory_data, is_rom, 1);
+		mac_install_memory(machine, 0x000000, 0x3fffff, memory_size, memory_data, is_rom, 1);
 
 		mac_overlay = overlay;
 
@@ -1343,10 +1343,10 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	mac_model = model;
 
 	/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
-	mac_install_memory(0x600000, 0x6fffff, mess_ram_size, mess_ram, FALSE, 2);
+	mac_install_memory(machine, 0x600000, 0x6fffff, mess_ram_size, mess_ram, FALSE, 2);
 
 	/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
-	mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
+	mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
 		memory_region_length(REGION_USER1), memory_region(REGION_USER1), TRUE, 3);
 
 	set_memory_overlay(machine, 1);
@@ -1364,7 +1364,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 
 	/* save state stuff */
 	state_save_register_global(mac_overlay);
-	state_save_register_postload(Machine, mac_state_load, NULL);
+	state_save_register_postload(machine, mac_state_load, NULL);
 }
 
 

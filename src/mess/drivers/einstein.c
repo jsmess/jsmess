@@ -333,7 +333,7 @@ static TIMER_CALLBACK(einstein_ctc_trigger_callback)
 }
 
 /* refresh keyboard data. It is refreshed when the keyboard line is written */
-static void einstein_scan_keyboard(void)
+static void einstein_scan_keyboard(running_machine *machine)
 {
 	unsigned char data = 0x0ff;
 	int i;
@@ -344,7 +344,7 @@ static void einstein_scan_keyboard(void)
 		if ((einstein_keyboard_line & (1<<i))==0)
 		{
 			sprintf(port, "LINE%d", i);
-			data &= input_port_read(Machine, port);
+			data &= input_port_read(machine, port);
 		}
 	}
 
@@ -374,7 +374,7 @@ static void einstein_update_interrupts(running_machine *machine)
 
 static TIMER_CALLBACK(einstein_keyboard_timer_callback)
 {
-	einstein_scan_keyboard();
+	einstein_scan_keyboard(machine);
 
 	/* if /fire1 or /fire2 is 0, then trigger a fire interrupt if the interrupt is enabled */
 	if ((input_port_read(machine, "BUTTONS") & 0x03)!=0)
@@ -1594,12 +1594,12 @@ static WRITE8_HANDLER(einstein_port_a_write)
 //  logerror("line: %02x\n",einstein_keyboard_line);
 
 	/* re-scan the keyboard */
-	einstein_scan_keyboard();
+	einstein_scan_keyboard(machine);
 }
 
-static  READ8_HANDLER(einstein_port_b_read)
+static READ8_HANDLER(einstein_port_b_read)
 {
-	einstein_scan_keyboard();
+	einstein_scan_keyboard(machine);
 
 //  logerror("key: %02x\n",einstein_keyboard_data);
 

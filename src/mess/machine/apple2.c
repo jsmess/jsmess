@@ -194,11 +194,11 @@ void apple2_update_memory(running_machine *machine)
 
 			/* install the actual handlers */
 			if (begin <= end_r)
-				memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, begin, end_r, 0, 0, rh);
+				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, begin, end_r, 0, 0, rh);
 
 			/* did we 'go past the end?' */
 			if (end_r < apple2_mem_config.memmap[i].end)
-				memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, end_r + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
+				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, end_r + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
 
 			/* set the memory bank */
 			if (rbase)
@@ -269,11 +269,11 @@ void apple2_update_memory(running_machine *machine)
 
 			/* install the actual handlers */
 			if (begin <= end_w)
-				memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, begin, end_w, 0, 0, wh);
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, begin, end_w, 0, 0, wh);
 
 			/* did we 'go past the end?' */
 			if (end_w < apple2_mem_config.memmap[i].end)
-				memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, end_w + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
+				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, end_w + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
 
 			/* set the memory bank */
 			if (wbase)
@@ -1101,21 +1101,21 @@ WRITE8_HANDLER ( apple2_c07x_w )
 
 static int apple2_fdc_diskreg;
 
-static int apple2_fdc_has_35(void)
+static int apple2_fdc_has_35(running_machine *machine)
 {
-	return device_count_tag_from_machine(Machine, "sonydriv") > 0;
+	return device_count_tag_from_machine(machine, "sonydriv") > 0;
 }
 
-static int apple2_fdc_has_525(void)
+static int apple2_fdc_has_525(running_machine *machine)
 {
-	return device_count_tag_from_machine(Machine, "apple525driv") > 0;
+	return device_count_tag_from_machine(machine, "apple525driv") > 0;
 }
 
 static void apple2_fdc_set_lines(UINT8 lines)
 {
 	if (apple2_fdc_diskreg & 0x40)
 	{
-		if (apple2_fdc_has_35())
+		if (apple2_fdc_has_35(Machine))
 		{
 			/* slot 5: 3.5" disks */
 			sony_set_lines(lines);
@@ -1123,7 +1123,7 @@ static void apple2_fdc_set_lines(UINT8 lines)
 	}
 	else
 	{
-		if (apple2_fdc_has_525())
+		if (apple2_fdc_has_525(Machine))
 		{
 			/* slot 6: 5.25" disks */
 			apple525_set_lines(lines);
@@ -1143,13 +1143,13 @@ static void apple2_fdc_set_enable_lines(int enable_mask)
 	else
 		slot6_enable_mask = enable_mask;
 
-	if (apple2_fdc_has_35())
+	if (apple2_fdc_has_35(Machine))
 	{
 		/* set the 3.5" enable lines */
 		sony_set_enable_lines(slot5_enable_mask);
 	}
 
-	if (apple2_fdc_has_525())
+	if (apple2_fdc_has_525(Machine))
 	{
 		/* set the 5.25" enable lines */
 		apple525_set_enable_lines(slot6_enable_mask);
@@ -1164,7 +1164,7 @@ static UINT8 apple2_fdc_read_data(void)
 
 	if (apple2_fdc_diskreg & 0x40)
 	{
-		if (apple2_fdc_has_35())
+		if (apple2_fdc_has_35(Machine))
 		{
 			/* slot 5: 3.5" disks */
 			result = sony_read_data();
@@ -1172,7 +1172,7 @@ static UINT8 apple2_fdc_read_data(void)
 	}
 	else
 	{
-		if (apple2_fdc_has_525())
+		if (apple2_fdc_has_525(Machine))
 		{
 			/* slot 6: 5.25" disks */
 			result = apple525_read_data();
@@ -1187,7 +1187,7 @@ static void apple2_fdc_write_data(UINT8 data)
 {
 	if (apple2_fdc_diskreg & 0x40)
 	{
-		if (apple2_fdc_has_35())
+		if (apple2_fdc_has_35(Machine))
 		{
 			/* slot 5: 3.5" disks */
 			sony_write_data(data);
@@ -1195,7 +1195,7 @@ static void apple2_fdc_write_data(UINT8 data)
 	}
 	else
 	{
-		if (apple2_fdc_has_525())
+		if (apple2_fdc_has_525(Machine))
 		{
 			/* slot 6: 5.25" disks */
 			apple525_write_data(data);
@@ -1211,7 +1211,7 @@ static int apple2_fdc_read_status(void)
 
 	if (apple2_fdc_diskreg & 0x40)
 	{
-		if (apple2_fdc_has_35())
+		if (apple2_fdc_has_35(Machine))
 		{
 			/* slot 5: 3.5" disks */
 			result = sony_read_status();
@@ -1219,7 +1219,7 @@ static int apple2_fdc_read_status(void)
 	}
 	else
 	{
-		if (apple2_fdc_has_525())
+		if (apple2_fdc_has_525(Machine))
 		{
 			/* slot 6: 5.25" disks */
 			result = apple525_read_status();
@@ -1230,10 +1230,10 @@ static int apple2_fdc_read_status(void)
 
 
 
-void apple2_iwm_setdiskreg(UINT8 data)
+void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data)
 {
 	apple2_fdc_diskreg = data & 0xC0;
-	if (apple2_fdc_has_35())
+	if (apple2_fdc_has_35(machine))
 		sony_set_sel_line(apple2_fdc_diskreg & 0x80);
 }
 

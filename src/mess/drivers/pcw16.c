@@ -374,7 +374,7 @@ static  READ8_HANDLER(pcw16_no_mem_r)
 	return 0x0ff;
 }
 
-static void pcw16_set_bank_handlers(int bank, PCW16_RAM_TYPE type)
+static void pcw16_set_bank_handlers(running_machine *machine, int bank, PCW16_RAM_TYPE type)
 {
 	read8_machine_func read_handler;
 	write8_machine_func write_handler;
@@ -410,9 +410,9 @@ static void pcw16_set_bank_handlers(int bank, PCW16_RAM_TYPE type)
 		break;
 	}
 
-	memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 		(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, read_handler);
-	memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 		(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, write_handler);
 }
 
@@ -469,7 +469,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 		if (bank_id<4)
 		{
 			/* rom */
-			pcw16_set_bank_handlers(bank, PCW16_MEM_ROM);
+			pcw16_set_bank_handlers(machine, bank, PCW16_MEM_ROM);
 		}
 		else
 		{
@@ -477,17 +477,17 @@ static void pcw16_update_bank(running_machine *machine, int bank)
             64-128 are for flash-rom 1 */
 			if ((bank_id & 0x040)==0)
 			{
-				pcw16_set_bank_handlers(bank, PCW16_MEM_FLASH_1);
+				pcw16_set_bank_handlers(machine, bank, PCW16_MEM_FLASH_1);
 			}
 			else
 			{
-				pcw16_set_bank_handlers(bank, PCW16_MEM_FLASH_2);
+				pcw16_set_bank_handlers(machine, bank, PCW16_MEM_FLASH_2);
 			}
 		}
 	}
 	else
 	{
-		pcw16_set_bank_handlers(bank, PCW16_MEM_DRAM);
+		pcw16_set_bank_handlers(machine, bank, PCW16_MEM_DRAM);
 	}
 }
 
@@ -1252,7 +1252,7 @@ static INS8250_REFRESH_CONNECT( pcw16_com_refresh_connected_2 )
 	new_inputs = 0;
 
 	/* Power switch is connected to Ring indicator */
-	if (input_port_read(Machine, "EXTRA") & 0x040)
+	if (input_port_read(device->machine, "EXTRA") & 0x040)
 	{
 		new_inputs = UART8250_INPUTS_RING_INDICATOR;
 	}

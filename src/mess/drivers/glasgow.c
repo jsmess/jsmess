@@ -23,7 +23,6 @@ sp_rinter@gmx.de
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68k.h"
 #include "cpu/m68000/m68000.h"
 #include "glasgow.lh"
@@ -175,7 +174,7 @@ static const BOARD_FIELD start_board[8][8] =
 
   static view_item *my_cursor;
 
-  static void set_cursor (view_item *view_cursor);
+  static void set_cursor (running_machine *machine, view_item *view_cursor);
 
   static view_item *get_view_item(render_target *target, const char *v_name);
 
@@ -604,7 +603,7 @@ static VIDEO_UPDATE( glasgow )
 // Mouse movement
 //
 	if (my_cursor != NULL)
-		set_cursor (my_cursor);
+		set_cursor (screen->machine, my_cursor);
 
     m_button1=input_port_read(screen->machine, "BUTTON_L");
     m_button2=input_port_read(screen->machine, "BUTTON_R");
@@ -967,7 +966,7 @@ CONS(  1984, dallas16, 0,        0,    amsterd,       new_keyboard,   0,		NULL, 
 
 
 
-static void set_cursor (view_item *view_cursor)
+static void set_cursor (running_machine *machine, view_item *view_cursor)
   {
 
    static INT16 save_x, save_y;
@@ -976,8 +975,8 @@ static void set_cursor (view_item *view_cursor)
     save_x = m_x;
     save_y = m_y;
 
-    m_x=input_port_read(Machine, "MOUSE_X");
-    m_y=input_port_read(Machine, "MOUSE_Y");
+    m_x=input_port_read(machine, "MOUSE_X");
+    m_y=input_port_read(machine, "MOUSE_Y");
 
 //    logerror("m_x   = %d \n  ",m_x);
 //    logerror("m_y   = %d \n  ",m_y);

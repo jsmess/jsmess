@@ -94,7 +94,7 @@ static NVRAM_HANDLER( avigo )
 	}
 }
 
-static void avigo_setbank(int bank, void *address, read8_machine_func rh, write8_machine_func wh)
+static void avigo_setbank(running_machine *machine, int bank, void *address, read8_machine_func rh, write8_machine_func wh)
 {
 	if (address)
 	{
@@ -104,12 +104,12 @@ static void avigo_setbank(int bank, void *address, read8_machine_func rh, write8
 	}
 	if (rh)
 	{
-		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
 			(bank * 0x4000) + 0x3FFF, 0, 0, rh);
 	}
 	if (wh)
 	{
-		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
 			(bank * 0x4000) + 0x3FFF, 0, 0, wh);
 	}
 }
@@ -292,7 +292,7 @@ static const struct tc8521_interface avigo_tc8521_interface =
 	avigo_tc8521_alarm_int
 };
 
-static void avigo_refresh_memory(void)
+static void avigo_refresh_memory(running_machine *machine)
 {
 	unsigned char *addr;
 
@@ -319,21 +319,21 @@ static void avigo_refresh_memory(void)
 
 	addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x4000);
 	addr = addr + (avigo_rom_bank_l<<14);
-	avigo_setbank(1, addr, avigo_flash_0x4000_read_handler, avigo_flash_0x4000_write_handler);
+	avigo_setbank(machine, 1, addr, avigo_flash_0x4000_read_handler, avigo_flash_0x4000_write_handler);
 
 	switch (avigo_ram_bank_h)
 	{
 		/* %101 */
 		/* screen */
 		case 0x06:
-			avigo_setbank(2, NULL, avigo_vid_memory_r, avigo_vid_memory_w);
+			avigo_setbank(machine, 2, NULL, avigo_vid_memory_r, avigo_vid_memory_w);
 			break;
 
 		/* %001 */
 		/* ram */
 		case 0x01:
 			addr = mess_ram + ((avigo_ram_bank_l & 0x07)<<14);
-			avigo_setbank(2, addr, SMH_BANK3, SMH_BANK7);
+			avigo_setbank(machine, 2, addr, SMH_BANK3, SMH_BANK7);
 			break;
 
 		/* %111 */
@@ -343,7 +343,7 @@ static void avigo_refresh_memory(void)
 
 			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
 			addr = addr + (avigo_ram_bank_l<<14);
-			avigo_setbank(2, addr, avigo_flash_0x8000_read_handler,
+			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler,
 				SMH_NOP /* avigo_flash_0x8000_write_handler */);
 			break;
 
@@ -352,7 +352,7 @@ static void avigo_refresh_memory(void)
 
 			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
 			addr = addr + (avigo_ram_bank_l<<14);
-			avigo_setbank(2, addr, avigo_flash_0x8000_read_handler,
+			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler,
 				SMH_NOP /* avigo_flash_0x8000_write_handler */);
 			break;
 	}
@@ -371,7 +371,7 @@ static INS8250_INTERRUPT( avigo_com_interrupt )
 		avigo_irq |= (1<<3);
 	}
 
-	avigo_refresh_ints(Machine);
+	avigo_refresh_ints(device->machine);
 }
 
 
@@ -442,12 +442,12 @@ static MACHINE_RESET( avigo )
 	memory_set_opbase_handler(0, avigo_opbase_handler);
 
 	addr = (unsigned char *)intelflash_getmemptr(0);
-	avigo_setbank(0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
+	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
 
-	avigo_setbank(3, mess_ram, NULL, NULL);
+	avigo_setbank(machine, 3, mess_ram, NULL, NULL);
 
 	/* 0x08000 is specially banked! */
-	avigo_refresh_memory();
+	avigo_refresh_memory(machine);
 }
 
 static MACHINE_START( avigo )
@@ -544,7 +544,7 @@ static WRITE8_HANDLER(avigo_rom_bank_l_w)
 
         avigo_rom_bank_l = data & 0x03f;
 
-        avigo_refresh_memory();
+        avigo_refresh_memory(machine);
 }
 
 static WRITE8_HANDLER(avigo_rom_bank_h_w)
@@ -564,7 +564,7 @@ static WRITE8_HANDLER(avigo_rom_bank_h_w)
 	avigo_rom_bank_h = data;
 
 
-        avigo_refresh_memory();
+        avigo_refresh_memory(machine);
 }
 
 static WRITE8_HANDLER(avigo_ram_bank_l_w)
@@ -573,7 +573,7 @@ static WRITE8_HANDLER(avigo_ram_bank_l_w)
 
         avigo_ram_bank_l = data & 0x03f;
 
-        avigo_refresh_memory();
+        avigo_refresh_memory(machine);
 }
 
 static WRITE8_HANDLER(avigo_ram_bank_h_w)
@@ -582,7 +582,7 @@ static WRITE8_HANDLER(avigo_ram_bank_h_w)
 
 	avigo_ram_bank_h = data;
 
-        avigo_refresh_memory();
+        avigo_refresh_memory(machine);
 }
 
 static  READ8_HANDLER(avigo_ad_control_status_r)

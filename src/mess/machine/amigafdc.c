@@ -15,7 +15,6 @@
 #include "amiga.h"
 #include "amigafdc.h"
 #include "machine/6526cia.h"
-#include "deprecat.h"
 
 
 #define MAX_TRACK_BYTES			12500
@@ -361,7 +360,7 @@ bail:
 	timer_reset( fdc_status[drive].dma_timer, attotime_never );
 }
 
-void amiga_fdc_setup_dma( void ) {
+void amiga_fdc_setup_dma( running_machine *machine ) {
 	int i, cur_pos, drive = -1, len_words = 0;
 	int time = 0;
 
@@ -372,7 +371,7 @@ void amiga_fdc_setup_dma( void ) {
 
 	if ( drive == -1 ) {
 		logerror("Disk DMA started with no drive selected!\n" );
-		amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0xffff);
+		amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0xffff);
 		return;
 	}
 

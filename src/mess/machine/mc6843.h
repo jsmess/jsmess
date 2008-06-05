@@ -21,10 +21,10 @@ struct _mc6843_interface
 
 /* ---------- functions ------------ */
 
-extern void mc6843_config ( const mc6843_interface *func );
+extern void mc6843_config ( running_machine *machine, const mc6843_interface *func );
 
 /* reset by external signal */
-extern void mc6843_reset ( void );
+extern void mc6843_reset ( running_machine *machine );
 
 /* interface to CPU via address/data bus */
 extern READ8_HANDLER  ( mc6843_r );

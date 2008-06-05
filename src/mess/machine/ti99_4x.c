@@ -84,8 +84,8 @@ static int ti99_R9901_2(int offset);
 static int ti99_R9901_3(int offset);
 
 static void ti99_handset_set_ack(int offset, int data);
-static void ti99_handset_task(void);
-static void mecmouse_poll(void);
+static void ti99_handset_task(running_machine *machine);
+static void mecmouse_poll(running_machine *machine);
 static void ti99_KeyC(int offset, int data);
 static void ti99_AlphaW(int offset, int data);
 
@@ -946,10 +946,10 @@ INTERRUPT_GEN( ti99_vblank_interrupt )
 {
 	TMS9928A_interrupt(machine);
 	if (has_handset)
-		ti99_handset_task();
+		ti99_handset_task(machine);
 	has_mecmouse = (input_port_read(machine, "CFG") >> config_mecmouse_bit) & config_mecmouse_mask;
 	if (has_mecmouse)
-		mecmouse_poll();
+		mecmouse_poll(machine);
 }
 
 INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
@@ -961,7 +961,7 @@ INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 		line_count = 0;
 		has_mecmouse = (input_port_read(machine, "CFG") >> config_mecmouse_bit) & config_mecmouse_mask;
 		if (has_mecmouse)
-			mecmouse_poll();
+			mecmouse_poll(machine);
 	}
 }
 
@@ -1767,7 +1767,7 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 
 	if (handset_buflen == 0)
 		/* See if we need to post a new event */
-		ti99_handset_task();
+		ti99_handset_task(machine);
 }
 
 /*
@@ -1813,9 +1813,8 @@ static void ti99_handset_post_message(int message)
 
 	Returns TRUE if the handset state has changed and a message was posted.
 */
-static int ti99_handset_poll_keyboard(int num)
+static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 {
-	running_machine *machine = Machine;
 	static UINT8 previous_key[max_handsets];
 
 	UINT32 key_buf;
@@ -1897,10 +1896,9 @@ static int ti99_handset_poll_keyboard(int num)
 
 	Returns TRUE if the handset state has changed and a message was posted.
 */
-static int ti99_handset_poll_joystick(int num)
+static int ti99_handset_poll_joystick(running_machine *machine, int num)
 {
 	static UINT8 previous_joy[max_handsets];
-	running_machine *machine = Machine;
 	UINT8 current_joy;
 	int current_joy_x, current_joy_y;
 	int message;
@@ -1969,28 +1967,28 @@ static int ti99_handset_poll_joystick(int num)
 
 	Manage handsets, posting an event if the state of any handset has changed.
 */
-static void ti99_handset_task(void)
+static void ti99_handset_task(running_machine *machine)
 {
 	int i;
 
 	if (handset_buflen == 0)
 	{	/* poll every handset */
 		for (i=0; i<max_handsets; i++)
-			if (ti99_handset_poll_joystick(i))
+			if (ti99_handset_poll_joystick(machine, i))
 				return;
 		for (i=0; i<max_handsets; i++)
-			if (ti99_handset_poll_keyboard(i))
+			if (ti99_handset_poll_keyboard(machine, i))
 				return;
 	}
 	else if (handset_buflen == 3)
 	{	/* update messages after they have been posted */
 		if (handset_buf & 1)
 		{	/* keyboard */
-			ti99_handset_poll_keyboard((~ (handset_buf >> 1)) & 0x3);
+			ti99_handset_poll_keyboard(machine, (~ (handset_buf >> 1)) & 0x3);
 		}
 		else
 		{	/* joystick */
-			ti99_handset_poll_joystick((~ (handset_buf >> 1)) & 0x3);
+			ti99_handset_poll_joystick(machine, (~ (handset_buf >> 1)) & 0x3);
 		}
 	}
 }
@@ -2089,10 +2087,9 @@ static void mecmouse_select(int selnow, int stick1, int stick2)
 	}
 }
 
-static void mecmouse_poll(void)
+static void mecmouse_poll(running_machine *machine)
 {
 	static int last_mx = 0, last_my = 0;
-	running_machine *machine = Machine;
 	int new_mx, new_my;
 	int delta_x, delta_y;
 

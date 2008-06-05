@@ -59,7 +59,6 @@
 #include <assert.h>
 
 #include "driver.h"
-#include "deprecat.h"
 #include "debug/debugcon.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -235,7 +234,7 @@ static int IsIOPage(int	Page)
 // this should probably be considdered a hack !
 //
 
-static void UpdateBanks(int first, int last)
+static void UpdateBanks(running_machine *machine, int first, int last)
 {
 	int		Page;
 	UINT8 		*readbank;
@@ -292,8 +291,8 @@ static void UpdateBanks(int first, int last)
 
 		PageRegs[TaskReg][Page].memory=readbank;
 		memory_set_bankptr(Page+1,readbank);
-		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end,0,0,writebank);
-		memory_install_write8_handler(Machine, 1, ADDRESS_SPACE_PROGRAM, bank_start, bank_end,0,0,writebank);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end,0,0,writebank);
+		memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, bank_start, bank_end,0,0,writebank);
 
 		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)(FPTR)readbank));
 		LOG_BANK_UPDATE(("PageRegsSet Task=%X Page=%x\n",TaskReg,Page));
@@ -304,7 +303,7 @@ static void UpdateBanks(int first, int last)
 }
 
 //
-static void SetDefaultTask(void)
+static void SetDefaultTask(running_machine *machine)
 {
 	int		Idx;
 
@@ -334,7 +333,7 @@ static void SetDefaultTask(void)
 	PageRegs[TaskReg][IOPage].value=IOPageValue;
 	PageRegs[TaskReg][IOPage+1].value=IOPageValue;
 
-	UpdateBanks(0,IOPage+1);
+	UpdateBanks(machine, 0,IOPage+1);
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
@@ -359,9 +358,9 @@ WRITE8_HANDLER( dgn_beta_page_w )
 
 	if (EnableMapRegs)
 	{
-		UpdateBanks(offset,offset);
+		UpdateBanks(machine, offset,offset);
 		if (offset==15)
-			UpdateBanks(offset+1,offset+1);
+			UpdateBanks(machine, offset+1,offset+1);
 	}
 }
 
@@ -807,7 +806,7 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 		{
 			TaskReg=NoPagingTask;
 		}
-		UpdateBanks(0,IOPage+1);
+		UpdateBanks(machine, 0,IOPage+1);
 	}
 	else
 	{
@@ -815,7 +814,7 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 		if ((PIATaskReg!=OldTask) && (EnableMapRegs))
 		{
 			TaskReg=PIATaskReg;
-			UpdateBanks(0,IOPage+1);
+			UpdateBanks(machine, 0,IOPage+1);
 		}
 	}
 	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n",TaskReg,PIATaskReg));
@@ -1045,7 +1044,7 @@ static void dgnbeta_reset(running_machine *machine)
 	PIATaskReg=0;
 	EnableMapRegs=0;
 	memset(PageRegs,0,sizeof(PageRegs));	/* Reset page registers to 0 */
-	SetDefaultTask();
+	SetDefaultTask(machine);
 
 	pia_reset();
 

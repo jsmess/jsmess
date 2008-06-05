@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/samcoupe.h"
 #include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
@@ -23,7 +22,7 @@
 struct samcoupe_asic samcoupe_regs;
 
 
-static void samcoupe_update_bank(int bank, UINT8 *memory, int is_readonly)
+static void samcoupe_update_bank(running_machine *machine, int bank, UINT8 *memory, int is_readonly)
 {
 	read8_machine_func rh = SMH_NOP;
 	write8_machine_func wh = SMH_NOP;
@@ -35,12 +34,12 @@ static void samcoupe_update_bank(int bank, UINT8 *memory, int is_readonly)
 		wh = is_readonly ? SMH_UNMAP : (write8_machine_func) (STATIC_BANK1 + (FPTR)bank - 1);
 	}
 
-	memory_install_read8_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, rh);
-	memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, wh);
+	memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, rh);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, wh);
 }
 
 
-static void samcoupe_install_ext_mem(void)
+static void samcoupe_install_ext_mem(running_machine *machine)
 {
 	UINT8 *mem;
 
@@ -50,7 +49,7 @@ static void samcoupe_install_ext_mem(void)
 	else
 		mem = NULL;
 
-	samcoupe_update_bank(3, mem, FALSE);
+	samcoupe_update_bank(machine, 3, mem, FALSE);
 
 	/* bank 4 */
 	if (samcoupe_regs.hext >> 6 < mess_ram_size >> 20)
@@ -58,7 +57,7 @@ static void samcoupe_install_ext_mem(void)
 	else
 		mem = NULL;
 
-	samcoupe_update_bank(4, mem, FALSE);
+	samcoupe_update_bank(machine, 4, mem, FALSE);
 }
 
 
@@ -83,7 +82,7 @@ void samcoupe_update_memory(running_machine *machine)
 		memory = rom;	/* Rom0 paged in */
 		is_readonly = TRUE;
 	}
-	samcoupe_update_bank(1, memory, is_readonly);
+	samcoupe_update_bank(machine, 1, memory, is_readonly);
 
 
 	/* BANK2 */
@@ -91,12 +90,12 @@ void samcoupe_update_memory(running_machine *machine)
 		memory = &mess_ram[((samcoupe_regs.lmpr + 1) & PAGE_MASK) * 0x4000];
 	else
 		memory = NULL;	/* Attempt to page in non existant ram region */
-	samcoupe_update_bank(2, memory, FALSE);
+	samcoupe_update_bank(machine, 2, memory, FALSE);
 
 	/* only update bank 3 and 4 when external memory is not enabled */
 	if (samcoupe_regs.hmpr & HMPR_MCNTRL)
 	{
-		samcoupe_install_ext_mem();
+		samcoupe_install_ext_mem(machine);
 	}
 	else
 	{
@@ -105,7 +104,7 @@ void samcoupe_update_memory(running_machine *machine)
 			memory = &mess_ram[(samcoupe_regs.hmpr & PAGE_MASK)*0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
-		samcoupe_update_bank(3, memory, FALSE);
+		samcoupe_update_bank(machine, 3, memory, FALSE);
 
 
 		/* BANK4 */
@@ -122,7 +121,7 @@ void samcoupe_update_memory(running_machine *machine)
 				memory = NULL;	/* Attempt to page in non existant ram region */
 			is_readonly = FALSE;
 		}
-		samcoupe_update_bank(4, memory, FALSE);
+		samcoupe_update_bank(machine, 4, memory, FALSE);
 	}
 
 	/* video memory location */
@@ -143,7 +142,7 @@ WRITE8_HANDLER( samcoupe_ext_mem_w )
 	/* external RAM enabled? */
 	if (samcoupe_regs.hmpr & HMPR_MCNTRL)
 	{
-		samcoupe_install_ext_mem();
+		samcoupe_install_ext_mem(machine);
 	}
 }
 

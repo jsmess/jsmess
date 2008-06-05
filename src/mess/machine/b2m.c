@@ -150,12 +150,12 @@ void b2m_set_bank(running_machine *machine,int bank)
 }
 static PIT8253_FREQUENCY_CHANGED(bm2_pit_clk)
 {
-	pit8253_set_clockin((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIT8253, "pit8253"), 0, frequency);
+	pit8253_set_clockin((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIT8253, "pit8253"), 0, frequency);
 }
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_irq)
 {
-	pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),1,state);	
+	pic8259_set_irq_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIC8259, "pic8259"),1,state);	
 }
 
 
@@ -320,7 +320,7 @@ WRITE8_HANDLER( b2m_8255_0_w )
 
 static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
 {		
-	cpunum_set_input_line(Machine, 0, 0,interrupt ?  HOLD_LINE : CLEAR_LINE);  
+	cpunum_set_input_line(device->machine, 0, 0,interrupt ?  HOLD_LINE : CLEAR_LINE);  
 } 
 UINT8 vblank_state = 0;
 
@@ -380,7 +380,7 @@ MACHINE_START(b2m)
 
 IRQ_CALLBACK(b2m_irq_callback)
 {	
-	return pic8259_acknowledge((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"));	
+	return pic8259_acknowledge((device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259"));	
 } 
 
 
@@ -392,13 +392,13 @@ INTERRUPT_GEN (b2m_vblank_interrupt)
 {	
 	//vblank_state++;
 	//if (vblank_state>1) vblank_state=0;
-	//pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
+	//pic8259_set_irq_line((device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
 }
 static TIMER_CALLBACK (b2m_callback)
 {	
 	vblank_state++;
 	if (vblank_state>1) vblank_state=0;
-	pic8259_set_irq_line((device_config*)device_list_find_by_tag( Machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
+	pic8259_set_irq_line((device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
 }
 
 MACHINE_RESET(b2m)

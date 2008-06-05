@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
@@ -145,12 +144,12 @@ static READ8_HANDLER( c128_read_io )
 		return c64_colorram[offset & 0x3ff];
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(0, 0, input_port_read(Machine, "DSW0") & 0x0100 ? c64_keyline[8] : c64_keyline[9] );
+			cia_set_port_mask_value(0, 0, input_port_read(machine, "DSW0") & 0x0100 ? c64_keyline[8] : c64_keyline[9] );
 			return cia_0_r(machine, offset);
 		}
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(0, 1, input_port_read(Machine, "DSW0") & 0x0100 ? c64_keyline[9] : c64_keyline[8] );
+			cia_set_port_mask_value(0, 1, input_port_read(machine, "DSW0") & 0x0100 ? c64_keyline[9] : c64_keyline[8] );
 			return cia_0_r(machine, offset);
 		}
 	else if (offset < 0xd00)
@@ -285,15 +284,15 @@ static int mmu_page0, mmu_page1;
 
 /* typical z80 configuration
    0x3f 0x3f 0x7f 0x3e 0x7e 0xb0 0x0b 0x00 0x00 0x01 0x00 */
- static void c128_bankswitch_z80 (void)
- {
+static void c128_bankswitch_z80 (running_machine *machine)
+{
 	 c128_ram = c64_memory + MMU_RAM_ADDR;
 	 c128_va1617 = MMU_VIC_ADDR;
 #if 1
 	 memory_set_bankptr(10, c128_z80);
 	 memory_set_bankptr(11, c128_ram + 0x1000);
-	 if ( (( (input_port_read(Machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
-		  || (( (input_port_read(Machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
+	 if ( (( (input_port_read(machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (input_port_read(machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
 		 c128_ram = NULL;
 #else
 	 if (MMU_BOTTOM)
@@ -359,11 +358,11 @@ static int mmu_page0, mmu_page1;
 		memory_set_bankptr(9, c64_memory + 0xff05); 
 	 }
 
-	 if ( (( (input_port_read(Machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
-		  || (( (input_port_read(Machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
+	 if ( (( (input_port_read(machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (input_port_read(machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
 		 c128_ram = NULL;
 #endif
- }
+}
 
 static void c128_bankswitch_128 (running_machine *machine, int reset)
 {
@@ -526,8 +525,8 @@ static void c128_bankswitch_128 (running_machine *machine, int reset)
 			memory_set_bankptr(16, c128_external_function + 0x3f05);
 		}
 
-		if ( (( (input_port_read(Machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
-				|| (( (input_port_read(Machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
+		if ( (( (input_port_read(machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
+				|| (( (input_port_read(machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
 			c128_ram = NULL;
 	}
 }
@@ -542,7 +541,7 @@ static void c128_bankswitch (running_machine *machine, int reset)
 			DBG_LOG (1, "switching to z80",
 						("active %d\n",cpu_getactivecpu()) );
 			memory_set_context(0);
-			c128_bankswitch_z80();
+			c128_bankswitch_z80(machine);
 			memory_set_context(1);
 			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
@@ -576,7 +575,7 @@ static void c128_bankswitch (running_machine *machine, int reset)
 		return;
 	}
 	if (!MMU_CPU8502)
-		c128_bankswitch_z80();
+		c128_bankswitch_z80(machine);
 	else
 		c128_bankswitch_128(machine, reset);
 }
@@ -630,7 +629,7 @@ WRITE8_HANDLER( c128_mmu8722_port_w )
 	}
 }
 
- READ8_HANDLER( c128_mmu8722_port_r )
+READ8_HANDLER( c128_mmu8722_port_r )
 {
 	int data;
 
@@ -645,14 +644,14 @@ WRITE8_HANDLER( c128_mmu8722_port_w )
 			data &= ~0x10;
 		if (!c64_exrom)
 			data &= ~0x20;
-		if (input_port_read(Machine, "SPECIAL") & 0x10)
+		if (input_port_read(machine, "SPECIAL") & 0x10)
 			data &= ~0x80;
 		break;
 	case 0xb:
 		/* hinybble number of 64 kb memory blocks */
-		if ((input_port_read(Machine, "CFG") & 0x300) == 0x100)			// 256KB RAM
+		if ((input_port_read(machine, "CFG") & 0x300) == 0x100)			// 256KB RAM
 			data = 0x4f;
-		else if ((input_port_read(Machine, "CFG") & 0x300) == 0x200)	//	1MB
+		else if ((input_port_read(machine, "CFG") & 0x300) == 0x200)	//	1MB
 			data = 0xf;
 		else 
 			data = 0x2f;

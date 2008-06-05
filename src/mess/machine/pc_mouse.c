@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/ins8250.h"
 #include "includes/pc_mouse.h"
 
@@ -221,7 +220,7 @@ INS8250_HANDSHAKE_OUT( pc_mouse_handshake_in )
 			/* reset mouse */
 			pc_mouse.head = pc_mouse.tail = pc_mouse.mb = 0;
 
-			if ((input_port_read(Machine, "pc_mouse_misc") & 0x80) == 0 )
+			if ((input_port_read(device->machine, "pc_mouse_misc") & 0x80) == 0 )
 			{
 				/* Identify as Microsoft 3 Button Mouse */
 				pc_mouse.queue[pc_mouse.head] = 'M';

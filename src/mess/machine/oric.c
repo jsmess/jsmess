@@ -19,7 +19,9 @@
 
 #include <stdio.h>
 #include "driver.h"
+#if 0
 #include "deprecat.h"
+#endif
 #include "includes/oric.h"
 #include "machine/wd17xx.h"
 #include "machine/6522via.h"
@@ -108,7 +110,7 @@ static unsigned char oric_via_port_a_data;
 
 
 /* refresh keyboard sense */
-static void oric_keyboard_sense_refresh(void)
+static void oric_keyboard_sense_refresh(running_machine *machine)
 {
 	/* The following assumes that if a 0 is written, it can be used to detect if any key
 	has been pressed.. */
@@ -122,7 +124,7 @@ static void oric_keyboard_sense_refresh(void)
 	char port[6];
 
 	sprintf(port, "ROW%d", oric_keyboard_line);
- 	input_port_data = input_port_read(Machine, port);
+ 	input_port_data = input_port_read(machine, port);
 
 	/* go through all bits in line */
 	for (i=0; i<8; i++)
@@ -184,11 +186,11 @@ static  READ8_HANDLER ( oric_via_in_a_func )
 	return oric_via_port_a_data;
 }
 
-static  READ8_HANDLER ( oric_via_in_b_func )
+static READ8_HANDLER ( oric_via_in_b_func )
 {
 	int data;
 
-	oric_keyboard_sense_refresh();
+	oric_keyboard_sense_refresh(machine);
 
 	data = oric_key_sense_bit;
 	data |= oric_keyboard_line & 0x07;

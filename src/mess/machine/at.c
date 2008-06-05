@@ -425,7 +425,7 @@ DRIVER_INIT( at386 )
 DRIVER_INIT( at586 )
 {
 	DRIVER_INIT_CALL(at386);
-	intel82439tx_init();
+	intel82439tx_init(machine);
 }
 
 

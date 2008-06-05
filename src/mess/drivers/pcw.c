@@ -258,7 +258,7 @@ static  READ8_HANDLER(pcw_keyboard_r)
  * PCW Banking
  * ----------------------------------------------------------------------- */
 
-static void pcw_update_read_memory_block(int block, int bank)
+static void pcw_update_read_memory_block(running_machine *machine, int block, int bank)
 {
 	memory_set_bankptr(block + 1, mess_ram + ((bank * 0x4000) % mess_ram_size));
 
@@ -267,14 +267,14 @@ static void pcw_update_read_memory_block(int block, int bank)
 	{
 		/* when upper 16 bytes are accessed use keyboard read
            handler */
-		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, 0, 0,
 			pcw_keyboard_r);
 	}
 	else
 	{
 		/* restore bank handler across entire block */
-		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,
 			(read8_machine_func) (STATIC_BANK1 + (FPTR)block));
 	}
@@ -293,7 +293,7 @@ static void pcw_update_write_memory_block(int block, int bank)
 /* &F4 O  b7-b4: when set, force memory reads to access the same bank as
 writes for &C000, &0000, &8000, and &4000 respectively */
 
-static void pcw_update_mem(int block, int data)
+static void pcw_update_mem(running_machine *machine, int block, int data)
 {
 	/* expansion ram select.
         if block is 0-7, selects internal ram instead for read/write
@@ -305,7 +305,7 @@ static void pcw_update_mem(int block, int data)
 		/* same bank for reading and writing */
 		bank = data & 0x7f;
 
-		pcw_update_read_memory_block(block, bank);
+		pcw_update_read_memory_block(machine, block, bank);
 		pcw_update_write_memory_block(block, bank);
 	}
 	else
@@ -351,7 +351,7 @@ static void pcw_update_mem(int block, int data)
 			read_bank = (data>>4) & 0x07;
 		}
 
-		pcw_update_read_memory_block(block, read_bank);
+		pcw_update_read_memory_block(machine, block, read_bank);
 
 		write_bank = data & 0x07;
 		pcw_update_write_memory_block(block, write_bank);
@@ -369,9 +369,9 @@ static void pcw_update_mem(int block, int data)
 }
 
 /* from Jacob Nevins docs */
-static int pcw_get_sys_status(void)
+static int pcw_get_sys_status(running_machine *machine)
 {
-	return pcw_interrupt_counter | (input_port_read(Machine, "EXTRA") & (0x040 | 0x010)) | pcw_system_status;
+	return pcw_interrupt_counter | (input_port_read(machine, "EXTRA") & (0x040 | 0x010)) | pcw_system_status;
 }
 
 static READ8_HANDLER(pcw_interrupt_counter_r)
@@ -381,7 +381,7 @@ static READ8_HANDLER(pcw_interrupt_counter_r)
 	/* from Jacob Nevins docs */
 
 	/* get data */
-	data = pcw_get_sys_status();
+	data = pcw_get_sys_status(machine);
 	/* clear int counter */
 	pcw_interrupt_counter = 0;
 	/* update interrupt */
@@ -396,17 +396,17 @@ static WRITE8_HANDLER(pcw_bank_select_w)
 	LOG(("BANK: %2x %x\n",offset, data));
 	pcw_banks[offset] = data;
 
-	pcw_update_mem(offset, data);
+	pcw_update_mem(machine, offset, data);
 }
 
 static WRITE8_HANDLER(pcw_bank_force_selection_w)
 {
 	pcw_bank_force = data;
 
-	pcw_update_mem(0, pcw_banks[0]);
-	pcw_update_mem(1, pcw_banks[1]);
-	pcw_update_mem(2, pcw_banks[2]);
-	pcw_update_mem(3, pcw_banks[3]);
+	pcw_update_mem(machine, 0, pcw_banks[0]);
+	pcw_update_mem(machine, 1, pcw_banks[1]);
+	pcw_update_mem(machine, 2, pcw_banks[2]);
+	pcw_update_mem(machine, 3, pcw_banks[3]);
 }
 
 
@@ -439,7 +439,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		case 0:
 		{
 			pcw_boot = 0;
-			pcw_update_mem(0, pcw_banks[0]);
+			pcw_update_mem(machine, 0, pcw_banks[0]);
 		}
 		break;
 
@@ -579,10 +579,10 @@ static WRITE8_HANDLER(pcw_system_control_w)
 	}
 }
 
-static  READ8_HANDLER(pcw_system_status_r)
+static READ8_HANDLER(pcw_system_status_r)
 {
 	/* from Jacob Nevins docs */
-	return pcw_get_sys_status();
+	return pcw_get_sys_status(machine);
 }
 
 /* read from expansion hardware - additional hardware not part of
@@ -763,10 +763,10 @@ static DRIVER_INIT(pcw)
 	pcw_banks[2] = 2;
 	pcw_banks[3] = 3;
 
-	pcw_update_mem(0, pcw_banks[0]);
-	pcw_update_mem(1, pcw_banks[1]);
-	pcw_update_mem(2, pcw_banks[2]);
-	pcw_update_mem(3, pcw_banks[3]);
+	pcw_update_mem(machine, 0, pcw_banks[0]);
+	pcw_update_mem(machine, 1, pcw_banks[1]);
+	pcw_update_mem(machine, 2, pcw_banks[2]);
+	pcw_update_mem(machine, 3, pcw_banks[3]);
 
 	/* lower 4 bits are interrupt counter */
 	pcw_system_status = 0x000;
