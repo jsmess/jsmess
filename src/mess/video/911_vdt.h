@@ -58,7 +58,7 @@ WRITE8_HANDLER(vdt911_0_cru_w);
 
 void vdt911_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y);
 
-void vdt911_keyboard(int unit);
+void vdt911_keyboard(running_machine *machine, int unit);
 
 #define VDT911_KEY_PORTS																		\
 	PORT_START_TAG("KEY0")	/* keys 1-16 */																	\

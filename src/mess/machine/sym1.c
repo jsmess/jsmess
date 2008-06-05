@@ -8,7 +8,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/sym1.h"
 
 /* M6502 CPU */

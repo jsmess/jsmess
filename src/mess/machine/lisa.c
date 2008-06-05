@@ -37,7 +37,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/lisa.h"
 #include "machine/6522via.h"
 #include "machine/applefdc.h"

@@ -87,7 +87,7 @@ static MACHINE_RESET( ti990_10 )
 
 static INTERRUPT_GEN( ti990_10_line_interrupt )
 {
-	vdt911_keyboard(0);
+	vdt911_keyboard(machine, 0);
 
 	ti990_line_interrupt();
 }

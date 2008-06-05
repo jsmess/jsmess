@@ -466,7 +466,7 @@ static READ8_HANDLER ( to7_sys_porta_in )
 	if ( to7_lightpen )
 	{
 		/* lightpen hi */
-		return to7_lightpen_gpl( TO7_LIGHTPEN_DECAL, to7_lightpen_step ) >> 8;
+		return to7_lightpen_gpl( machine, TO7_LIGHTPEN_DECAL, to7_lightpen_step ) >> 8;
 	}
 	else
 	{
@@ -493,7 +493,7 @@ static READ8_HANDLER ( to7_sys_porta_in )
 static READ8_HANDLER ( to7_sys_portb_in )
 {
 	/* lightpen low */
-	return to7_lightpen_gpl( TO7_LIGHTPEN_DECAL, to7_lightpen_step ) & 0xff;
+	return to7_lightpen_gpl( machine, TO7_LIGHTPEN_DECAL, to7_lightpen_step ) & 0xff;
 }
 
 

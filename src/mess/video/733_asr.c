@@ -21,7 +21,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "733_asr.h"
 
 #define MAX_ASR 1
@@ -606,7 +605,7 @@ static const unsigned char key_translate[3][51] =
 	keyboard handler: should be called regularly by machine code, for instance
 	every Video Blank Interrupt.
 */
-void asr733_keyboard(int unit)
+void asr733_keyboard(running_machine *machine, int unit)
 {
 	typedef enum
 	{
@@ -633,7 +632,7 @@ void asr733_keyboard(int unit)
 	for (i=0; i<4; i++)
 	{
 		sprintf(port, "KEY%d", i);
-		key_buf[i] = input_port_read(Machine, port);
+		key_buf[i] = input_port_read(machine, port);
 	}
 
 	/* process key modifiers */

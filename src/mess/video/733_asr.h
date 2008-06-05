@@ -29,7 +29,7 @@ WRITE8_HANDLER(asr733_0_cru_w);
 
 void asr733_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y);
 
-void asr733_keyboard(int unit);
+void asr733_keyboard(running_machine *machine, int unit);
 
 #define ASR733_KEY_PORTS																		\
 	PORT_START_TAG("KEY0")	/* keys 1-16 */																	\

@@ -10,7 +10,6 @@ to make the standard pc driver one level more complex, so own driver
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 //#include "vidhrdw/generic.h"
 #include "devices/cartslot.h"
 #include "machine/pic8259.h"

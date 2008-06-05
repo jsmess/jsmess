@@ -14,7 +14,6 @@
 
 /* Core includes */
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/microtan.h"
 
 /* Components */

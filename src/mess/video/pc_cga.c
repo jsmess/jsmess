@@ -76,7 +76,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
+//#include "deprecat.h"
 #include "video/pc_cga.h"
 #include "video/mc6845.h"
 #include "video/pc_video.h"

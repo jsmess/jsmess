@@ -8,7 +8,6 @@
 	but the pen colours may be wrong. This needs to be tested. */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "includes/pc8801.h"
 
@@ -238,7 +237,7 @@ ZZZ
 
 #undef XXX
 
-int is_pc8801_vram_select(void)
+int is_pc8801_vram_select(running_machine *machine)
 {
 	read8_machine_func rh5 = NULL, rh6 = NULL;
 	write8_machine_func wh5 = NULL, wh6 = NULL;
@@ -299,17 +298,17 @@ int is_pc8801_vram_select(void)
   }
 
 
-	if (rh5) memory_install_read8_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, rh5);
-	if (wh5) memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, wh5);
-	if (rh6) memory_install_read8_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, rh6);
-	if (wh6) memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, wh6);
+	if (rh5) memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, rh5);
+	if (wh5) memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, wh5);
+	if (rh6) memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, rh6);
+	if (wh6) memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, wh6);
 }
 
 WRITE8_HANDLER(pc88sr_disp_32)
 {
   analog_palette=((data & 0x20) != 0x00);
   ALUON=((data & 0x40) != 0x00);
-  pc8801_update_bank();
+  pc8801_update_bank(machine);
 }
 
 WRITE8_HANDLER(pc88sr_ALU)
@@ -322,7 +321,7 @@ WRITE8_HANDLER(pc88sr_ALU)
     ALU2=data;
     break;
   }
-  pc8801_update_bank();
+  pc8801_update_bank(machine);
 }
 
 WRITE8_HANDLER(pc8801_vramsel)
@@ -332,7 +331,7 @@ WRITE8_HANDLER(pc8801_vramsel)
   } else {
     selected_vram=offset+1;
   }
-  pc8801_update_bank();
+  pc8801_update_bank(machine);
 }
 
  READ8_HANDLER(pc8801_vramtest)

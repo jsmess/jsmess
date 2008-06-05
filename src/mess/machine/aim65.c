@@ -6,7 +6,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/aim65.h"
 
 /* Peripheral chips */

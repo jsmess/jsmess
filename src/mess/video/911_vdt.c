@@ -11,7 +11,6 @@ TODO:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "911_vdt.h"
 #include "911_chr.h"
 #include "911_key.h"
@@ -551,7 +550,7 @@ static const unsigned char (*const key_translate[])[91] =
 	keyboard handler: should be called regularly by machine code, for instance
 	every Video Blank Interrupt.
 */
-void vdt911_keyboard(int unit)
+void vdt911_keyboard(running_machine *machine, int unit)
 {
 	typedef enum
 	{
@@ -579,7 +578,7 @@ void vdt911_keyboard(int unit)
 	for (i=0; i<6; i++)
 	{
 		sprintf(port, "KEY%d", i);
-		key_buf[i] = input_port_read(Machine, port);
+		key_buf[i] = input_port_read(machine, port);
 	}
 
 	/* parse modifier keys */

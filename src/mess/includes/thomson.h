@@ -243,10 +243,10 @@ extern struct thom_vsignal thom_get_vsignal ( void );
 /************************* lightpen ********************************/
 
 /* specific TO7 / T9000 lightpen code (no video gate-array) */
-extern unsigned to7_lightpen_gpl ( int decx, int decy );
+extern unsigned to7_lightpen_gpl ( running_machine *machine, int decx, int decy );
 
 /* video position corresponding to lightpen (with some offset) */
-extern struct thom_vsignal thom_get_lightpen_vsignal ( int xdec, int ydec,
+extern struct thom_vsignal thom_get_lightpen_vsignal ( running_machine *machine, int xdec, int ydec,
 						       int xdec2 );
 
 /* specify a lightpencall-back function, called nb times per frame */

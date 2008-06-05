@@ -33,7 +33,7 @@ extern INTERRUPT_GEN( pc8801_interrupt );
 extern MACHINE_RESET( pc88srl );
 extern MACHINE_RESET( pc88srh );
 
-void pc8801_update_bank(void);
+void pc8801_update_bank(running_machine *machine);
 extern unsigned char *pc8801_mainRAM;
 extern int pc88sr_is_highspeed;
 READ8_HANDLER(pc8801fd_nec765_tc);
@@ -50,7 +50,7 @@ WRITE8_HANDLER(pc8801_write_extmem);
 /*----------- defined in video/pc8801.c -----------*/
 
 void pc8801_video_init (running_machine *machine, int hireso);
-int is_pc8801_vram_select(void);
+int is_pc8801_vram_select(running_machine *machine);
 WRITE8_HANDLER(pc8801_vramsel);
  READ8_HANDLER(pc8801_vramtest);
 extern unsigned char *pc88sr_textRAM;

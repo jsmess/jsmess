@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"

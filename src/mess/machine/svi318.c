@@ -9,7 +9,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/mc6845.h"
 #include "includes/svi318.h"
 #include "cpu/z80/z80.h"

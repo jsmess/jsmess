@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/mbee.h"
 
 
@@ -98,15 +97,15 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 		colorram[offset] = data;
 }
 
-static int keyboard_matrix_r(int offs)
+static int keyboard_matrix_r(running_machine *machine, int offs)
 {
 	char portname[6];
 	int port = (offs >> 7) & 7;
 	int bit = (offs >> 4) & 7;
-	int extra = input_port_read(Machine, "EXTRA");
+	int extra = input_port_read(machine, "EXTRA");
 	int data = 0;
 	sprintf(portname, "LINE%d", port);
-	data = (input_port_read(Machine, portname) >> bit) & 1;
+	data = (input_port_read(machine, portname) >> bit) & 1;
 
 	if( extra & 0x01 )	/* extra: cursor up */
 	{
@@ -167,10 +166,10 @@ WRITE8_HANDLER ( mbee_video_bank_w )
 		memory_set_bank( 2, 1);
 }
 
-static void m6545_update_strobe(int param)
+static void m6545_update_strobe(running_machine *machine, int param)
 {
 	int data;
-	data = keyboard_matrix_r(param);
+	data = keyboard_matrix_r(machine, param);
 	crt.update_strobe = 1;
 //	if( data )
 //		logerror("6545 update_strobe_cb $%04X = $%02X\n", param, data);
@@ -261,7 +260,7 @@ READ8_HANDLER ( m6545_status_r )
 		/* shared memory latch */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
 //		logerror("6545 transp_latch $%04X\n", addr);
-		m6545_update_strobe(addr);
+		m6545_update_strobe(machine, addr);
 		break;
 	default:
 		logerror("6545 read unmapped port $%X\n", crt.idx);
@@ -383,7 +382,7 @@ WRITE8_HANDLER ( m6545_data_w )
 		/* shared memory latch */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
 //		logerror("6545 transp_latch $%04X\n", addr);
-		m6545_update_strobe(addr);
+		m6545_update_strobe(machine, addr);
 		break;
 	default:
 		logerror("6545 write unmapped port $%X <- $%02X\n", crt.idx, data);
@@ -465,7 +464,7 @@ VIDEO_UPDATE( mbee )
 	UINT16 cursor = (crt.cursor_address_hi<<8) | crt.cursor_address_lo;			// get cursor position
 	UINT16 screen_home = (crt.screen_address_hi<<8) | crt.screen_address_lo;		// screen home offset (usually zero)
 
-	for( i = 0; i < 0x380; i += 0x10 ) keyboard_matrix_r(i);
+	for( i = 0; i < 0x380; i += 0x10 ) keyboard_matrix_r(screen->machine, i);
 
 	framecnt++;
 
@@ -507,7 +506,7 @@ VIDEO_UPDATE( mbeeic )
 	UINT16 screen_home = (crt.screen_address_hi<<8) | crt.screen_address_lo;		// screen home offset (usually zero)
 	UINT16 colourm = (mbee_pcg_color_latch & 0x0e) << 7;
 
-	for( i = 0; i < 0x380; i += 0x10 ) keyboard_matrix_r(i);
+	for( i = 0; i < 0x380; i += 0x10 ) keyboard_matrix_r(screen->machine, i);
 
 	framecnt++;
 
