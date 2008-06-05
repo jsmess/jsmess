@@ -493,6 +493,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mm58274c.o \
 	$(MESS_MACHINE)/z80dart.o	\
 	$(MESS_MACHINE)/68901mfp.o \
+	$(MESS_FORMATS)/rk_cas.o	\
 	$(MESS_VIDEO)/msm6255.o	\
 
 
@@ -1220,7 +1221,6 @@ $(MESSOBJ)/pasogo.a:			\
 $(MESSOBJ)/ut88.a:      \
 	$(MESS_DRIVERS)/ut88.o \
 	$(MESS_MACHINE)/ut88.o \
-	$(MESS_FORMATS)/rk_cas.o		\
 	$(MESS_VIDEO)/ut88.o \
 
 $(MESSOBJ)/mikro80.a:      \
@@ -1253,6 +1253,12 @@ $(MESSOBJ)/radio.a:      \
 	$(MESS_DRIVERS)/radio86.o \
 	$(MESS_MACHINE)/radio86.o \
 	$(MESS_VIDEO)/radio86.o \
+	$(MESS_DRIVERS)/apogee.o \
+	$(MESS_MACHINE)/apogee.o \
+	$(MESS_VIDEO)/apogee.o \
+	$(MESS_DRIVERS)/mikrosha.o \
+	$(MESS_MACHINE)/mikrosha.o \
+	$(MESS_VIDEO)/mikrosha.o \
 	$(MESS_VIDEO)/i8275.o \
 
 $(MESSOBJ)/comx.a:				\

@@ -2,9 +2,11 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-- OSCOM Nano  [Curt Coder, HobbyLabs]
+- Apogee BK-01 [Miodrag Milanovic]
 - Galaksija Plus [Miodrag Milanovic]
 - Grundy NewBrain A/AD/MD (not working) [Curt Coder]
+- Mikrosha [Miodrag Milanovic]
+- OSCOM Nano  [Curt Coder, HobbyLabs]
 - Radio-86RK [Miodrag Milanovic]
 
 System Driver Changes:

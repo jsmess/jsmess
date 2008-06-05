@@ -871,6 +871,8 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( radio86 )
 	DRIVER( radio4k )
 	DRIVER( spektr01 )
+	DRIVER( apogee )
+	DRIVER( mikrosha )
 
 	/* Bondwell */
 	DRIVER( bw2 )
