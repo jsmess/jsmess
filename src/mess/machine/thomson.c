@@ -1478,7 +1478,7 @@ static const mc6846_interface to770_timer =
 READ8_HANDLER ( to770_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( TO7_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, TO7_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
 	int count, inil, init, lt3;
 	count = to7_lightpen ? l.count : v.count;
 	inil  = to7_lightpen ? l.inil  : v.inil;
@@ -1701,7 +1701,7 @@ static const pia6821_interface mo5_sys =
 READ8_HANDLER ( mo5_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( MO5_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, MO5_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
 	int count, inil, init, lt3;
 	count = to7_lightpen ? l.count : v.count;
 	inil  = to7_lightpen ? l.inil  : v.inil;
@@ -1984,10 +1984,10 @@ READ8_HANDLER  ( to9_ieee_r )
 
 
 
-READ8_HANDLER  ( to9_gatearray_r )
+READ8_HANDLER ( to9_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( TO9_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, TO9_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
 	int count, inil, init, lt3;
 	count = to7_lightpen ? l.count : v.count;
 	inil  = to7_lightpen ? l.inil  : v.inil;
@@ -3504,10 +3504,10 @@ WRITE8_HANDLER ( to8_floppy_w )
 
 
 
-READ8_HANDLER  ( to8_gatearray_r )
+READ8_HANDLER ( to8_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( TO8_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, TO8_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
 	int count, inil, init, lt3;
 	UINT8 res;
 	count = to7_lightpen ? l.count : v.count;
@@ -4389,10 +4389,10 @@ static const pia6821_interface mo6_sys =
 
 
 
-READ8_HANDLER  ( mo6_gatearray_r )
+READ8_HANDLER ( mo6_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( MO6_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, MO6_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
 	int count, inil, init, lt3;
 	UINT8 res;
 	count = to7_lightpen ? l.count : v.count;
