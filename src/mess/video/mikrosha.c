@@ -10,11 +10,13 @@
 #include "driver.h"
 #include "video/i8275.h"
 
+UINT8 mikrosha_font_page;
+
 I8275_DISPLAY_PIXELS(mikrosha_display_pixels)
 {
 	int i;
 	bitmap_t *bitmap = tmpbitmap;
-	UINT8 *charmap = memory_region(REGION_GFX1);
+	UINT8 *charmap = memory_region(REGION_GFX1) + (mikrosha_font_page & 1) * 0x400;
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;

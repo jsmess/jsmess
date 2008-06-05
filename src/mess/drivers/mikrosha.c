@@ -21,7 +21,7 @@ static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
-    //AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
+    AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
     AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
     //AM_RANGE( 0xd800, 0xd603 ) AM_MIRROR(0x07fc) // Timer
     AM_RANGE( 0xf800, 0xffff ) AM_WRITE(dma8257_0_w)	 // DMA
@@ -123,8 +123,8 @@ static MACHINE_DRIVER_START( mikrosha )
 	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
 	MDRV_DEVICE_CONFIG( mikrosha_ppi8255_interface_1 )
 
-	//MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	//MDRV_DEVICE_CONFIG( mikrosha_ppi8255_interface_2 )
+	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
+	MDRV_DEVICE_CONFIG( mikrosha_ppi8255_interface_2 )
 
 	MDRV_DEVICE_ADD( "i8275", I8275 )
 	MDRV_DEVICE_CONFIG(mikrosha_i8275_interface)

@@ -68,6 +68,21 @@ const ppi8255_interface mikrosha_ppi8255_interface_1 =
 	NULL,
 };
 
+WRITE8_HANDLER (mikrosha_8255_font_page_w )
+{
+	mikrosha_font_page = (data  > 7) & 1;
+}
+
+const ppi8255_interface mikrosha_ppi8255_interface_2 =
+{
+	NULL,
+	NULL,
+	NULL,
+	NULL,	
+	mikrosha_8255_font_page_w,
+	NULL
+};
+
 I8275_DMA_REQUEST(mikrosha_video_dma_request) {
 	dma8257_drq_write(0, 2, state);
 }
