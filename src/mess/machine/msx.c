@@ -284,7 +284,7 @@ void msx_vdp_interrupt(running_machine *machine, int i)
 static void msx_ch_reset_core (running_machine *machine)
 {
 	msx_memory_reset (machine);
-	msx_memory_map_all ();
+	msx_memory_map_all (machine);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -699,7 +699,7 @@ static WRITE8_HANDLER ( msx_ppi_port_a_w )
 
 	if (VERBOSE)
 		logerror ("write to primary slot select: %02x\n", msx1.primary_slot);
-	msx_memory_map_all ();
+	msx_memory_map_all (machine);
 }
 
 static WRITE8_HANDLER ( msx_ppi_port_c_w )
@@ -932,7 +932,7 @@ void msx_memory_set_carts (void)
 	}
 }
 
-void msx_memory_map_page (int page)
+void msx_memory_map_page (running_machine *machine, int page)
 {
 	int slot_primary;
 	int slot_secondary;
@@ -952,15 +952,15 @@ void msx_memory_map_page (int page)
 		logerror ("mapping %s in %d/%d/%d\n", slot->name, slot_primary,
 			slot_secondary, page);
 	}
-	slot->map (state, page);
+	slot->map (machine, state, page);
 }
 
-void msx_memory_map_all (void)
+void msx_memory_map_all (running_machine *machine)
 {
 	int i;
 
 	for (i=0; i<4; i++) {
-		msx_memory_map_page (i);
+		msx_memory_map_page (machine, i);
 	}
 }
 
@@ -968,7 +968,7 @@ WRITE8_HANDLER (msx_superloadrunner_w)
 {
 	msx1.superloadrunner_bank = data;
 	if (msx1.slot[2]->slot_type == SLOT_SUPERLOADRUNNER) {
-		msx1.slot[2]->map (msx1.state[2], 2);
+		msx1.slot[2]->map (machine, msx1.state[2], 2);
 	}
 	msx_page0_w(machine, -1, data);
 }
@@ -982,7 +982,7 @@ WRITE8_HANDLER (msx_page0_w)
 		msx1.ram_pages[0][offset] = data;
 		break;
 	case MSX_MEM_HANDLER:
-		msx1.slot[0]->write (msx1.state[0], offset, data);
+		msx1.slot[0]->write (machine, msx1.state[0], offset, data);
 	}
 }
 
@@ -993,7 +993,7 @@ WRITE8_HANDLER (msx_page1_w)
 		msx1.ram_pages[1][offset] = data;
 		break;
 	case MSX_MEM_HANDLER:
-		msx1.slot[1]->write (msx1.state[1], 0x4000 + offset, data);
+		msx1.slot[1]->write (machine, msx1.state[1], 0x4000 + offset, data);
 	}
 }
 
@@ -1004,7 +1004,7 @@ WRITE8_HANDLER (msx_page2_w)
 		msx1.ram_pages[2][offset] = data;
 		break;
 	case MSX_MEM_HANDLER:
-		msx1.slot[2]->write (msx1.state[2], 0x8000 + offset, data);
+		msx1.slot[2]->write (machine, msx1.state[2], 0x8000 + offset, data);
 	}
 }
 
@@ -1015,7 +1015,7 @@ WRITE8_HANDLER (msx_page3_w)
 		msx1.ram_pages[3][offset] = data;
 		break;
 	case MSX_MEM_HANDLER:
-		msx1.slot[3]->write (msx1.state[3], 0xc000 + offset, data);
+		msx1.slot[3]->write (machine, msx1.state[3], 0xc000 + offset, data);
 	}
 }
 
@@ -1028,7 +1028,7 @@ WRITE8_HANDLER (msx_sec_slot_w)
 			logerror ("write to secondary slot %d select: %02x\n", slot, data);
 
 		msx1.secondary_slot[slot] = data;
-		msx_memory_map_all ();
+		msx_memory_map_all (machine);
 	}
 	else {
 		msx_page3_w(machine, 0x3fff, data);
@@ -1052,7 +1052,7 @@ WRITE8_HANDLER (msx_ram_mapper_w)
 {
 	msx1.ram_mapper[offset] = data;
 	if (msx1.slot[offset]->slot_type == SLOT_RAM_MM) {
-		msx1.slot[offset]->map (msx1.state[offset], offset);
+		msx1.slot[offset]->map (machine, msx1.state[offset], offset);
 	}
 }
 
@@ -1066,11 +1066,11 @@ WRITE8_HANDLER (msx_90in1_w)
 	msx1.korean90in1_bank = data;
 	if (msx1.slot[1]->slot_type == SLOT_KOREAN_90IN1)
 	{
-		msx1.slot[1]->map (msx1.state[1], 1);
+		msx1.slot[1]->map (machine, msx1.state[1], 1);
 	}
 	if (msx1.slot[2]->slot_type == SLOT_KOREAN_90IN1)
 	{
-		msx1.slot[2]->map (msx1.state[2], 2);
+		msx1.slot[2]->map (machine, msx1.state[2], 2);
 	}
 }
 

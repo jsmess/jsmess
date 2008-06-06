@@ -18,7 +18,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
@@ -76,7 +75,6 @@ MSX_SLOT_RESET(empty)
 
 MSX_SLOT_MAP(empty)
 {
-	running_machine *machine = Machine;
 	msx_cpu_setbank (machine, page * 2 + 1, msx1.empty);
 	msx_cpu_setbank (machine, page * 2 + 2, msx1.empty);
 }
@@ -98,7 +96,6 @@ MSX_SLOT_RESET(rom)
 
 MSX_SLOT_MAP(rom)
 {
-	running_machine *machine = Machine;
 	UINT8 *mem = state->mem + (page - state->start_page) * 0x4000;
 
 	msx_cpu_setbank (machine, page * 2 + 1, mem);
@@ -118,7 +115,6 @@ MSX_SLOT_INIT(ram)
 
 MSX_SLOT_MAP(ram)
 {
-	running_machine *machine = Machine;
 	UINT8 *mem = state->mem + (page - state->start_page) * 0x4000;
 
 	msx1.ram_pages[page] = mem;
@@ -182,7 +178,6 @@ MSX_SLOT_RESET(rammm)
 
 MSX_SLOT_MAP(rammm)
 {
-	running_machine *machine = Machine;
 	UINT8 *mem = state->mem +
 			0x4000 * (msx1.ram_mapper[page] & state->bank_mask);
 
@@ -211,7 +206,6 @@ MSX_SLOT_RESET(msxdos2)
 
 MSX_SLOT_MAP(msxdos2)
 {
-	running_machine *machine = Machine;
 	if (page != 1) {
 		msx_cpu_setbank (machine, page * 2 + 1, msx1.empty);
 		msx_cpu_setbank (machine, page * 2 + 2, msx1.empty);
@@ -225,7 +219,7 @@ MSX_SLOT_WRITE(msxdos2)
 {
 	if (addr == 0x6000) {
 		state->banks[0] = val & 3;
-		slot_msxdos2_map (state, 1);
+		slot_msxdos2_map (machine, state, 1);
 	}
 }
 
@@ -260,7 +254,6 @@ MSX_SLOT_RESET(konami)
 
 MSX_SLOT_MAP(konami)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, state->mem);
@@ -285,23 +278,23 @@ MSX_SLOT_WRITE(konami)
 	switch (addr) {
 	case 0x6000:
 		state->banks[1] = val & state->bank_mask;
-		slot_konami_map (state, 1);
+		slot_konami_map (machine, state, 1);
 		if (msx1.state[0] == state) {
-			slot_konami_map (state, 0);
+			slot_konami_map (machine, state, 0);
 		}
 		break;
 	case 0x8000:
 		state->banks[2] = val & state->bank_mask;
-		slot_konami_map (state, 2);
+		slot_konami_map (machine, state, 2);
 		if (msx1.state[3] == state) {
-			slot_konami_map (state, 3);
+			slot_konami_map (machine, state, 3);
 		}
 		break;
 	case 0xa000:
 		state->banks[3] = val & state->bank_mask;
-		slot_konami_map (state, 2);
+		slot_konami_map (machine, state, 2);
 		if (msx1.state[3] == state) {
-			slot_konami_map (state, 3);
+			slot_konami_map (machine, state, 3);
 		}
 	}
 }
@@ -354,7 +347,6 @@ static  READ8_HANDLER (konami_scc_bank5)
 
 MSX_SLOT_MAP(konami_scc)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, state->mem + state->banks[2] * 0x2000);
@@ -378,28 +370,26 @@ MSX_SLOT_MAP(konami_scc)
 
 MSX_SLOT_WRITE(konami_scc)
 {
-	running_machine *machine = Machine;
-
 	if (addr >= 0x5000 && addr < 0x5800) {
 		state->banks[0] = val & state->bank_mask;
-		slot_konami_scc_map (state, 1);
+		slot_konami_scc_map (machine, state, 1);
 		if (msx1.state[3] == state) {
-			slot_konami_scc_map (state, 3);
+			slot_konami_scc_map (machine, state, 3);
 		}
 	}
 	else if (addr >= 0x7000 && addr < 0x7800) {
 		state->banks[1] = val & state->bank_mask;
-		slot_konami_scc_map (state, 1);
+		slot_konami_scc_map (machine, state, 1);
 		if (msx1.state[3] == state) {
-			slot_konami_scc_map (state, 3);
+			slot_konami_scc_map (machine, state, 3);
 		}
 	}
 	else if (addr >= 0x9000 && addr < 0x9800) {
 		state->banks[2] = val & state->bank_mask;
 		state->cart.scc.active = ((val & 0x3f) == 0x3f);
-		slot_konami_scc_map (state, 2);
+		slot_konami_scc_map (machine, state, 2);
 		if (msx1.state[0] == state) {
-			slot_konami_scc_map (state, 0);
+			slot_konami_scc_map (machine, state, 0);
 		}
 	}
 	else if (state->cart.scc.active && addr >= 0x9800 && addr < 0xa000) {
@@ -428,9 +418,9 @@ MSX_SLOT_WRITE(konami_scc)
 	}
 	else if (addr >= 0xb000 && addr < 0xb800) {
 		state->banks[3] = val & state->bank_mask;
-		slot_konami_scc_map (state, 2);
+		slot_konami_scc_map (machine, state, 2);
 		if (msx1.state[0] == state) {
-			slot_konami_scc_map (state, 0);
+			slot_konami_scc_map (machine, state, 0);
 		}
 	}
 }
@@ -466,7 +456,6 @@ MSX_SLOT_RESET(ascii8)
 
 MSX_SLOT_MAP(ascii8)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, msx1.empty);
@@ -495,10 +484,10 @@ MSX_SLOT_WRITE(ascii8)
 
 		state->banks[bank] = val & state->bank_mask;
 		if (bank <= 1) {
-			slot_ascii8_map (state, 1);
+			slot_ascii8_map (machine, state, 1);
 		}
 		else if (msx1.state[2] == state) {
-			slot_ascii8_map (state, 2);
+			slot_ascii8_map (machine, state, 2);
 		}
 	}
 }
@@ -534,7 +523,6 @@ MSX_SLOT_RESET(ascii16)
 
 MSX_SLOT_MAP(ascii16)
 {
-	running_machine *machine = Machine;
 	UINT8 *mem;
 
 	switch (page) {
@@ -562,12 +550,12 @@ MSX_SLOT_WRITE(ascii16)
 {
 	if (addr >= 0x6000 && addr < 0x6800) {
 		state->banks[0] = val & state->bank_mask;
-		slot_ascii16_map (state, 1);
+		slot_ascii16_map (machine, state, 1);
 	}
 	else if (addr >= 0x7000 && addr < 0x7800) {
 		state->banks[1] = val & state->bank_mask;
 		if (msx1.state[2] == state) {
-			slot_ascii16_map (state, 2);
+			slot_ascii16_map (machine, state, 2);
 		}
 	}
 }
@@ -626,7 +614,6 @@ static UINT8 *ascii8_sram_bank_select (slot_state *state, int bankno)
 
 MSX_SLOT_MAP(ascii8_sram)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, msx1.empty);
@@ -655,10 +642,10 @@ MSX_SLOT_WRITE(ascii8_sram)
 
 		state->banks[bank] = val;
 		if (bank <= 1) {
-			slot_ascii8_sram_map (state, 1);
+			slot_ascii8_sram_map (machine, state, 1);
 		}
 		else if (msx1.state[2] == state) {
-			slot_ascii8_sram_map (state, 2);
+			slot_ascii8_sram_map (machine, state, 2);
 		}
 	}
 	if (addr >= 0x8000 && addr < 0xc000) {
@@ -778,7 +765,6 @@ static UINT8 *ascii16_sram_bank_select (slot_state *state, int bankno)
 
 MSX_SLOT_MAP(ascii16_sram)
 {
-	running_machine *machine = Machine;
 	UINT8 *mem;
 
 	switch (page) {
@@ -806,12 +792,12 @@ MSX_SLOT_WRITE(ascii16_sram)
 {
 	if (addr >= 0x6000 && addr < 0x6800) {
 		state->banks[0] = val;
-		slot_ascii16_sram_map (state, 1);
+		slot_ascii16_sram_map (machine, state, 1);
 	}
 	else if (addr >= 0x7000 && addr < 0x7800) {
 		state->banks[1] = val;
 		if (msx1.state[2] == state) {
-			slot_ascii16_sram_map (state, 2);
+			slot_ascii16_sram_map (machine, state, 2);
 		}
 	}
 	else if (addr >= 0x8000 && addr < 0xc000) {
@@ -914,7 +900,6 @@ MSX_SLOT_RESET(rtype)
 
 MSX_SLOT_MAP(rtype)
 {
-	running_machine *machine = Machine;
 	UINT8 *mem;
 
 	switch (page) {
@@ -951,7 +936,7 @@ MSX_SLOT_WRITE(rtype)
 		}
 		state->banks[0] = data;
 		if (msx1.state[2] == state) {
-			slot_rtype_map (state, 2);
+			slot_rtype_map (machine, state, 2);
 		}
 	}
 }
@@ -990,7 +975,6 @@ MSX_SLOT_RESET(gmaster2)
 
 MSX_SLOT_MAP(gmaster2)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 	case 1:
@@ -1033,9 +1017,9 @@ MSX_SLOT_WRITE(gmaster2)
 			val = val & 15;
 		}
 		state->banks[1] = val;
-		slot_gmaster2_map (state, 1);
+		slot_gmaster2_map (machine, state, 1);
 		if (msx1.state[0] == state) {
-			slot_gmaster2_map (state, 0);
+			slot_gmaster2_map (machine, state, 0);
 		}
 	}
 	else if (addr >= 0x8000 && addr < 0x9000) {
@@ -1046,9 +1030,9 @@ MSX_SLOT_WRITE(gmaster2)
 			val = val & 15;
 		}
 		state->banks[2] = val;
-		slot_gmaster2_map (state, 2);
+		slot_gmaster2_map (machine, state, 2);
 		if (msx1.state[3] == state) {
-			slot_gmaster2_map (state, 3);
+			slot_gmaster2_map (machine, state, 3);
 		}
 	}
 	else if (addr >= 0xa000 && addr < 0xb000) {
@@ -1059,9 +1043,9 @@ MSX_SLOT_WRITE(gmaster2)
 			val = val & 15;
 		}
 		state->banks[3] = val;
-		slot_gmaster2_map (state, 2);
+		slot_gmaster2_map (machine, state, 2);
 		if (msx1.state[3] == state) {
-			slot_gmaster2_map (state, 3);
+			slot_gmaster2_map (machine, state, 3);
 		}
 	}
 	else if (addr >= 0xb000 && addr < 0xc000) {
@@ -1184,7 +1168,6 @@ static READ8_HANDLER (msx_diskrom_page2_r)
 
 MSX_SLOT_MAP(diskrom)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, msx1.empty);
@@ -1209,8 +1192,6 @@ MSX_SLOT_MAP(diskrom)
 
 MSX_SLOT_WRITE(diskrom)
 {
-	running_machine *machine = Machine;
-
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}
@@ -1298,7 +1279,6 @@ static  READ8_HANDLER (msx_diskrom2_page2_r)
 
 MSX_SLOT_MAP(diskrom2)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, msx1.empty);
@@ -1322,8 +1302,6 @@ MSX_SLOT_MAP(diskrom2)
 
 MSX_SLOT_WRITE(diskrom2)
 {
-	running_machine *machine = Machine;
-
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}
@@ -1372,7 +1350,6 @@ MSX_SLOT_RESET(synthesizer)
 
 MSX_SLOT_MAP(synthesizer)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, msx1.empty);
@@ -1424,7 +1401,6 @@ MSX_SLOT_RESET(majutsushi)
 
 MSX_SLOT_MAP(majutsushi)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, state->mem + state->banks[0] * 0x2000);
@@ -1452,16 +1428,16 @@ MSX_SLOT_WRITE(majutsushi)
 	}
 	else if (addr >= 0x6000 && addr < 0x8000) {
 		state->banks[1] = val & 0x0f;
-		slot_majutsushi_map (state, 1);
+		slot_majutsushi_map (machine, state, 1);
 		if (msx1.state[0] == state) {
-			slot_konami_map (state, 0);
+			slot_konami_map (machine, state, 0);
 		}
 	}
 	else if (addr >= 0x8000 && addr < 0xc000) {
 		state->banks[addr < 0xa000 ? 2 : 3] = val & 0x0f;
-		slot_majutsushi_map (state, 2);
+		slot_majutsushi_map (machine, state, 2);
 		if (msx1.state[3] == state) {
-			slot_konami_map (state, 3);
+			slot_konami_map (machine, state, 3);
 		}
 	}
 }
@@ -1529,7 +1505,6 @@ MSX_SLOT_RESET(fmpac)
 
 MSX_SLOT_MAP(fmpac)
 {
-	running_machine *machine = Machine;
 	if (page == 1) {
 		if (state->cart.fmpac.sram_active) {
 			msx_cpu_setbank (machine, 3, state->cart.fmpac.mem);
@@ -1548,7 +1523,6 @@ MSX_SLOT_MAP(fmpac)
 
 MSX_SLOT_WRITE(fmpac)
 {
-	running_machine *machine = Machine;
 	int i, data;
 
 	if (addr >= 0x4000 && addr < 0x6000 && state->cart.fmpac.sram_support) {
@@ -1587,7 +1561,7 @@ MSX_SLOT_WRITE(fmpac)
 	case 0x7ff7:
 		state->banks[0] = val & state->bank_mask;
 		state->cart.fmpac.mem[0x3ff7] = val & state->bank_mask;
-		slot_fmpac_map (state, 1);
+		slot_fmpac_map (machine, state, 1);
 		break;
 	}
 }
@@ -1685,7 +1659,6 @@ MSX_SLOT_RESET(superloadrunner)
 
 MSX_SLOT_MAP(superloadrunner)
 {
-	running_machine *machine = Machine;
 	if (page == 2) {
 		UINT8 *mem = state->mem +
 				(msx1.superloadrunner_bank & state->bank_mask) * 0x4000;
@@ -1719,7 +1692,6 @@ MSX_SLOT_RESET(crossblaim)
 
 MSX_SLOT_MAP(crossblaim)
 {
-	running_machine *machine = Machine;
 	UINT8 *mem;
 
 	/* This might look odd, but it's what happens on the real cartridge */
@@ -1764,13 +1736,13 @@ MSX_SLOT_WRITE(crossblaim)
 	state->banks[0] = block;
 
 	if (msx1.state[0] == state) {
-		slot_crossblaim_map (state, 0);
+		slot_crossblaim_map (machine, state, 0);
 	}
 	if (msx1.state[2] == state) {
-		slot_crossblaim_map (state, 2);
+		slot_crossblaim_map (machine, state, 2);
 	}
 	if (msx1.state[3] == state) {
-		slot_crossblaim_map (state, 3);
+		slot_crossblaim_map (machine, state, 3);
 	}
 }
 
@@ -1806,7 +1778,6 @@ MSX_SLOT_RESET(korean80in1)
 
 MSX_SLOT_MAP(korean80in1)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, msx1.empty);
@@ -1835,10 +1806,10 @@ MSX_SLOT_WRITE(korean80in1)
 
 		state->banks[bank] = val & state->bank_mask;
 		if (bank <= 1) {
-			slot_korean80in1_map (state, 1);
+			slot_korean80in1_map (machine, state, 1);
 		}
 		else if (msx1.state[2] == state) {
-			slot_korean80in1_map (state, 2);
+			slot_korean80in1_map (machine, state, 2);
 		}
 	}
 }
@@ -1871,7 +1842,6 @@ MSX_SLOT_RESET(korean90in1)
 
 MSX_SLOT_MAP(korean90in1)
 {
-	running_machine *machine = Machine;
 	UINT8 *mem;
 	UINT8 mask = (msx1.korean90in1_bank & 0xc0) == 0x80 ? 0x3e : 0x3f;
 	mem = state->mem +
@@ -1937,7 +1907,6 @@ MSX_SLOT_RESET(korean126in1)
 
 MSX_SLOT_MAP(korean126in1)
 {
-	running_machine *machine = Machine;
 	UINT8 *mem;
 
 	switch (page) {
@@ -1967,10 +1936,10 @@ MSX_SLOT_WRITE(korean126in1)
 		int bank = addr & 1;
 		state->banks[bank] = val & state->bank_mask;
 		if (bank == 0) {
-			slot_korean126in1_map (state, 1);
+			slot_korean126in1_map (machine, state, 1);
 		}
 		else if (msx1.state[2] == state) {
-			slot_korean126in1_map (state, 2);
+			slot_korean126in1_map (machine, state, 2);
 		}
 	}
 }
@@ -2060,7 +2029,6 @@ static  READ8_HANDLER (soundcartridge_sccp)
 
 MSX_SLOT_MAP(soundcartridge)
 {
-	running_machine *machine = Machine;
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, state->mem + state->banks[2] * 0x2000);
@@ -2088,7 +2056,6 @@ MSX_SLOT_MAP(soundcartridge)
 MSX_SLOT_WRITE(soundcartridge)
 {
 	int i;
-	running_machine *machine = Machine;
 
 	if (addr < 0x4000) {
 		return;
@@ -2100,9 +2067,9 @@ MSX_SLOT_WRITE(soundcartridge)
 		else if (addr >= 0x5000 && addr < 0x5800) {
 			state->banks[0] = val & state->bank_mask;
 			state->cart.sccp.banks_saved[0] = val;
-			slot_soundcartridge_map (state, 1);
+			slot_soundcartridge_map (machine, state, 1);
 			if (msx1.state[3] == state) {
-				slot_soundcartridge_map (state, 3);
+				slot_soundcartridge_map (machine, state, 3);
 			}
 		}
 	}
@@ -2114,9 +2081,9 @@ MSX_SLOT_WRITE(soundcartridge)
 			state->banks[1] = val & state->bank_mask;
 			state->cart.sccp.banks_saved[1] = val;
 			if (msx1.state[3] == state) {
-				slot_soundcartridge_map (state, 3);
+				slot_soundcartridge_map (machine, state, 3);
 			}
-			slot_soundcartridge_map (state, 1);
+			slot_soundcartridge_map (machine, state, 1);
 		}
 	}
 	else if (addr < 0xa000) {
@@ -2129,9 +2096,9 @@ MSX_SLOT_WRITE(soundcartridge)
 			state->cart.sccp.scc_active =
 					(((val & 0x3f) == 0x3f) && !(state->cart.sccp.mode & 0x20));
 
-			slot_soundcartridge_map (state, 2);
+			slot_soundcartridge_map (machine, state, 2);
 			if (msx1.state[0] == state) {
-				slot_soundcartridge_map (state, 0);
+				slot_soundcartridge_map (machine, state, 0);
 			}
 		}
 		else if (addr >= 0x9800 && state->cart.sccp.scc_active) {
@@ -2169,9 +2136,9 @@ MSX_SLOT_WRITE(soundcartridge)
 			state->banks[3] = val & state->bank_mask;
 			state->cart.sccp.sccp_active =
 					(val & 0x80) && (state->cart.sccp.mode & 0x20);
-			slot_soundcartridge_map (state, 2);
+			slot_soundcartridge_map (machine, state, 2);
 			if (msx1.state[0] == state) {
-				slot_soundcartridge_map (state, 0);
+				slot_soundcartridge_map (machine, state, 0);
 			}
 		}
 		else if (addr >= 0xb800 && state->cart.sccp.sccp_active) {
@@ -2228,7 +2195,7 @@ MSX_SLOT_WRITE(soundcartridge)
 		state->cart.sccp.sccp_active =
 				((state->cart.sccp.banks_saved[3] & 0x80) && (val & 0x20));
 
-		slot_soundcartridge_map (state, 2);
+		slot_soundcartridge_map (machine, state, 2);
 	}
 }
 

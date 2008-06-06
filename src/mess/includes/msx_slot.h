@@ -151,8 +151,8 @@ typedef struct {
 	char name[32];
 	int (*init)(slot_state*, int page, UINT8 *mem, int size);
 	void (*reset)(running_machine *machine, slot_state*);
-	void (*map)(slot_state*, int page);
-	void (*write)(slot_state*, UINT16, UINT8);
+	void (*map)(running_machine *machine, slot_state*, int page);
+	void (*write)(running_machine *machine, slot_state*, UINT16, UINT8);
 	int (*loadsram)(slot_state*);
 	int (*savesram)(slot_state*);
 } msx_slot;
@@ -217,9 +217,9 @@ const msx_slot msx_slot_list[] = {
 #define MSX_SLOT_INIT(nm)			 static int \
 	slot_##nm##_init (slot_state *state, int page, UINT8 *mem, int size)
 #define MSX_SLOT_MAP(nm)			\
-	static void slot_##nm##_map (slot_state *state, int page)
+	static void slot_##nm##_map (running_machine *machine, slot_state *state, int page)
 #define MSX_SLOT_WRITE(nm)			\
-	static void slot_##nm##_write (slot_state *state, UINT16 addr, UINT8 val)
+	static void slot_##nm##_write (running_machine *machine, slot_state *state, UINT16 addr, UINT8 val)
 #define MSX_SLOT_RESET(nm)			\
 	static void slot_##nm##_reset (running_machine *machine, slot_state *state)
 #define MSX_SLOT_LOADSRAM(nm)		\
