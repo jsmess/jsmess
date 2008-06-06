@@ -8,6 +8,8 @@ The LCD is likely to be a SSD1828 LCD.
 ********************************************************************/
 
 #include "driver.h"
+#include "sound/speaker.h"
+#include "machine/i2cmem.h"
 #include "includes/pokemini.h"
 #include "cpu/minx/minx.h"
 #include "devices/cartslot.h"
@@ -51,6 +53,13 @@ static PALETTE_INIT( pokemini )
 }
 
 
+static const struct Speaker_interface speaker_interface =
+{
+	3,				/* optional: number of different levels */
+	NULL			/* optional: level lookup table */
+};
+
+
 static MACHINE_DRIVER_START( pokemini )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG( "main", MINX, 4000000 )
@@ -59,6 +68,8 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( pokemini )
+
+	MDRV_NVRAM_HANDLER( i2cmem_0 )
 
 	/* video hardware */
 	MDRV_VIDEO_START( generic_bitmapped )
@@ -74,12 +85,17 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_SCREEN_REFRESH_RATE( 72 )
 
 	/* sound hardware */
-#if 0	
-	MDRV_SPEAKER_STANDARD_STEREO( "left", "right" )
-	MDRV_SOUND_ROUTE( 0, "left", 0.50 )
-	MDRV_SOUND_ROUTE( 0, "right", 0.50 )
-#endif
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_CONFIG(speaker_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
+
+
+static DRIVER_INIT( pokemini )
+{
+	i2cmem_init( 0, I2CMEM_SLAVE_ADDRESS, 0, 0x2000, NULL);
+}
 
 
 static void pokemini_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
@@ -107,5 +123,5 @@ ROM_START( pokemini )
 ROM_END
 
 
-CONS( 1999, pokemini, 0, 0, pokemini, pokemini, 0, pokemini, "Nintendo", "Pokemon Mini", GAME_NOT_WORKING )
+CONS( 1999, pokemini, 0, 0, pokemini, pokemini, pokemini, pokemini, "Nintendo", "Pokemon Mini", GAME_NOT_WORKING )
 

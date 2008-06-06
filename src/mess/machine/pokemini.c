@@ -7,6 +7,8 @@
 
 
 #include "driver.h"
+#include "sound/speaker.h"
+#include "machine/i2cmem.h"
 #include "includes/pokemini.h"
 #include "cpu/minx/minx.h"
 
@@ -189,13 +191,36 @@ static void pokemini_check_irqs( running_machine *machine )
 
 	if ( vector )
 	{
-		logerror("Triggering IRQ with vector %02x\n", vector );
+		//logerror("Triggering IRQ with vector %02x\n", vector );
 		/* Trigger interrupt and set vector */
 		cpunum_set_input_line_and_vector( machine, 0, 0, ASSERT_LINE, vector );
 	}
 	else
 	{
 		cpunum_set_input_line( machine, 0, 0, CLEAR_LINE );
+	}
+}
+
+
+static void pokemini_update_sound( running_machine *machine )
+{
+	/* Check if sound should be muted */
+	if ( pm_reg[0x70] & 0x03 )
+	{
+		speaker_level_w( 0, 0 );
+	}
+	else
+	{
+		static const int levels[4] = { 0, 1, 1, 2 };
+		int level = levels[ pm_reg[0x71] & 0x03 ];
+
+//		if ( ( ( pm_reg[0x48] & 0x80 ) && ( pm_reg[0x4E] | ( pm_reg[0x4F] << 8 ) ) > ( pm_reg[0x4C] | ( pm_reg[0x4D] << 8 ) ) )
+//		  || ( ( pm_reg[0x48] & 0x80 ) && pm_reg[0x4F] > pm_reg[0x4D] ) )
+//		{
+			level = 0;
+//		}
+
+		speaker_level_w( 0, level );
 	}
 }
 
@@ -356,6 +381,16 @@ static TIMER_CALLBACK(pokemini_timer3_callback)
 			pm_reg[0x4E] = pm_reg[0x4A];
 		}
 	}
+
+	if ( pm_reg[0x48] & 0x80 )
+	{
+		if (  ( pm_reg[0x4E] == pm_reg[0x4C] ) && ( pm_reg[0x4F] == pm_reg[0x4D] ) )
+		{
+			pm_reg[0x27] |= 0x01;
+			pokemini_check_irqs( machine );
+		}
+		pokemini_update_sound( machine );
+	}
 }
 
 
@@ -369,6 +404,16 @@ static TIMER_CALLBACK(pokemini_timer3_hi_callback)
 		pokemini_check_irqs( machine );
 		pm_reg[0x4F] = pm_reg[0x4B];
 	}
+
+	if ( ! ( pm_reg[0x48] & 0x80 ) )
+	{
+		if( pm_reg[0x4F] == pm_reg[0x4D] )
+		{
+			pm_reg[0x27] |= 0x01;
+			pokemini_check_irqs( machine );
+		}
+		pokemini_update_sound( machine );
+	}
 }
 
 
@@ -377,7 +422,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
 
-	logerror( "%0X: Write to hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+	//logerror( "%0X: Write to hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
 
 	switch( offset )
 	{
@@ -1076,6 +1121,8 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 		{
 			timer_enable( timers.timer3_hi, 0 );
 		}
+		pm_reg[0x48] = data;
+		pokemini_update_sound( machine );
 		break;
 	case 0x49:	/* Timer 3 control 2
 			   Bit 0   R/W Unknown
@@ -1100,18 +1147,27 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 		{
 			timer_enable( timers.timer3_hi, 0 );
 		}
+		pm_reg[0x49] = data;
+		pokemini_update_sound( machine );
 		break;
 	case 0x4A:	/* Timer 3 preset value (low)
 			   Bit 0-7 R/W Timer 3 preset value bit 0-7
 			*/
+		pm_reg[0x4A] = data;
+		pokemini_update_sound( machine );
 		break;
 	case 0x4B:	/* Timer 3 preset value (high)
 			   Bit 0-7 R/W Timer 3 preset value bit 8-15
 			*/
+		pm_reg[0x4B] = data;
+		pokemini_update_sound( machine );
 		break;
 	case 0x4C:	/* Timer 3 sound-pivot (low)
 			   Bit 0-7 R/W Timer 3 sound-pivot value bit 0-7
 			*/
+		pm_reg[0x4C] = data;
+		pokemini_update_sound( machine );
+		break;
 	case 0x4D:	/* Timer 3 sound-pivot (high)
 			   Bit 0-7 R/W Timer 3 sound-pivot value bit 8-15
 
@@ -1120,7 +1176,8 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Pulse-Width of 50% = Half of preset-value
 			   Pulse-Width of 100% = Same as preset-value
 			*/
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		pm_reg[0x4D] = data;
+		pokemini_update_sound( machine );
 		break;
 	case 0x4E:	/* Timer 3 counter (low), read only
 			   Bit 0-7 R/W Timer 3 counter value bit 0-7
@@ -1151,6 +1208,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 6   R/W Unknown
 			   Bit 7   R/W Unknown
 			*/
+		break;
 	case 0x61:	/* I/O peripheral status control
 			   Bit 0   R/W IR received bit (if device not selected: 0)
 			   Bit 1   R/W IR transmit (if device not selected: 0)
@@ -1161,6 +1219,16 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 6       Always 1
 			   Bit 7   R/W IR received bit (mirror, if device not selected: 0)
 			*/
+		if ( pm_reg[0x60] & 0x04 )
+			i2cmem_write( 0, I2CMEM_SDA, ( data & 0x04 ) ? 1 : 0 );
+
+		if ( pm_reg[0x60] & 0x08 )
+			i2cmem_write( 0, I2CMEM_SCL, ( data & 0x08 ) ? 1 : 0 );
+		break;
+	case 0x70:	/* Sound related */
+		pm_reg[0x70] = data;
+		pokemini_update_sound( machine );
+		break;
 	case 0x71:	/* Sound volume
 			   Bit 0-1 R/W Sound volume
 			               00 - 0%
@@ -1170,7 +1238,8 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 2   R/W Always set to 0
 			   Bit 3-7     Unused
 			*/
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		pm_reg[0x71] = data;
+		pokemini_update_sound( machine );
 		break;
 	case 0x80:	/* LCD control
 			   Bit 0   R/W Invert colors; 0 - normal, 1 - inverted
@@ -1307,13 +1376,26 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 
 READ8_HANDLER( pokemini_hwreg_r )
 {
+	UINT8 data = pm_reg[offset];
+
 	switch( offset )
 	{
 	case 0x52:	return input_port_read(machine, "INPUTS");
+	case 0x61:
+		if ( ! ( pm_reg[0x60] & 0x04 ) )
+		{
+			data = ( data & ~ 0x04 ) | ( i2cmem_read( 0, I2CMEM_SDA ) ? 0x04 : 0x00 );
+		}
+
+		if ( ! ( pm_reg[0x60] & 0x08 ) )
+		{
+			data &= ~0x08;
+		}
+		break;
 	case 0x81:	return ( pm_reg[offset] & 0x0F ) | ( prc.frame_count << 4 );
 	case 0x8A:	return prc.count;
 	}
-	return pm_reg[offset];
+	return data;
 }
 
 DEVICE_START( pokemini_cart )
@@ -1356,7 +1438,6 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 {
 	prc.count++;
 
-logerror("prc.count is %02x\n", prc.count);
 	/* Check for overflow */
 	if ( prc.count >= 0x42 )
 	{
