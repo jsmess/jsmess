@@ -347,7 +347,7 @@ static MACHINE_RESET( spectrum_plus3 )
 {
 	memset(mess_ram,0,128*1024);
 	
-	nec765_init(&spectrum_plus3_nec765_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
+	nec765_init(machine, &spectrum_plus3_nec765_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
 
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);

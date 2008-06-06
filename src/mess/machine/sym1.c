@@ -289,7 +289,7 @@ DRIVER_INIT( sym1 )
 	r6532_reset(0);
 
 	/* configure 74145 */
-	ttl74145_config(0, &ttl74145_intf);
+	ttl74145_config(machine, 0, &ttl74145_intf);
 
 	/* allocate a timer to refresh the led display */
 	led_update = timer_alloc(led_refresh, NULL);

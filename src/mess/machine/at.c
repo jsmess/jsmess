@@ -121,7 +121,7 @@ static void at_set_keyb_int(int state) {
 }
 
 
-static void init_at_common(const struct kbdc8042_interface *at8042)
+static void init_at_common(running_machine *machine, const struct kbdc8042_interface *at8042)
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_AT, at_set_keyb_int, at_set_irq_line);
 	mc146818_init(MC146818_STANDARD);
@@ -131,8 +131,8 @@ static void init_at_common(const struct kbdc8042_interface *at8042)
 	if (mess_ram_size > 0x0a0000)
 	{
 		offs_t ram_limit = 0x100000 + mess_ram_size - 0x0a0000;
-		memory_install_read_handler(Machine, 0,  ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, 1);
-		memory_install_write_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, 1);
+		memory_install_read_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, 1);
+		memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, 1);
 		memory_set_bankptr(1, mess_ram + 0xa0000);
 	}
 }
@@ -228,7 +228,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 
 
 static DMA8237_CHANNEL_READ( at_dma8237_fdc_dack_r ) {
-	return pc_fdc_dack_r();
+	return pc_fdc_dack_r(device->machine);
 }
 
 
@@ -238,7 +238,7 @@ static DMA8237_CHANNEL_READ( at_dma8237_hdc_dack_r ) {
 
 
 static DMA8237_CHANNEL_WRITE( at_dma8237_fdc_dack_w ) {
-	pc_fdc_dack_w( data );
+	pc_fdc_dack_w( device->machine, data );
 }
 
 
@@ -248,7 +248,7 @@ static DMA8237_CHANNEL_WRITE( at_dma8237_hdc_dack_w ) {
 
 
 static DMA8237_OUT_EOP( at_dma8237_out_eop ) {
-	pc_fdc_set_tc_state( state );
+	pc_fdc_set_tc_state( device->machine, state );
 }
 
 
@@ -386,7 +386,7 @@ DRIVER_INIT( atcga )
 	{
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
-	init_at_common(&at8042);
+	init_at_common(machine, &at8042);
 }
 
 
@@ -400,7 +400,7 @@ DRIVER_INIT( atega )
 	UINT8	*src = memory_region( REGION_USER1 ) + 0x3fff;
 	int		i;
 
-	init_at_common(&at8042);
+	init_at_common(machine, &at8042);
 
 	/* Perform the EGA bios address line swaps */
 	for( i = 0; i < 0x4000; i++ )
@@ -417,7 +417,7 @@ DRIVER_INIT( at386 )
 	{
 		KBDC8042_AT386, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
-	init_at_common(&at8042);
+	init_at_common(machine, &at8042);
 }
 
 
@@ -468,7 +468,7 @@ DRIVER_INIT( at_vga )
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 
-	init_at_common(&at8042);
+	init_at_common(machine, &at8042);
 	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 }
@@ -481,7 +481,7 @@ DRIVER_INIT( ps2m30286 )
 	{
 		KBDC8042_PS2, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
-	init_at_common(&at8042);
+	init_at_common(machine, &at8042);
 	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 }
@@ -498,7 +498,7 @@ static IRQ_CALLBACK(at_irq_callback)
 MACHINE_START( at )
 {
 	cpunum_set_irq_callback(0, at_irq_callback);
-	pc_fdc_init( &fdc_interface );
+	pc_fdc_init( machine, &fdc_interface );
 }
 
 

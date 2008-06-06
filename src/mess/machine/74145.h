@@ -25,7 +25,7 @@ struct _ttl74145_interface
 };
 
 /* Configuration */
-void ttl74145_config(int which, const ttl74145_interface *intf);
+void ttl74145_config(running_machine *machine, int which, const ttl74145_interface *intf);
 void ttl74145_reset(int which);
 
 /* Standard handlers */

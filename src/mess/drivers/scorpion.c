@@ -309,7 +309,7 @@ static MACHINE_RESET( scorpion )
 
 	scorpion_update_memory(machine);	
 		
-	wd17xx_reset();	
+	wd17xx_reset(machine);	
 	
 	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, nmi_check_callback);
 }

@@ -451,7 +451,7 @@ void ti99_fdc_reset(running_machine *machine)
 	use_80_track_drives = FALSE;
 
 	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
-	wd17xx_reset();		/* resets the fdc */
+	wd17xx_reset(machine);		/* resets the fdc */
 	wd17xx_set_density(DEN_FM_LO);
 }
 
@@ -644,7 +644,8 @@ static const ti99_peb_card_handlers_t ccfdc_handlers =
 	ccfdc_mem_w
 };
 
-void ti99_ccfdc_reset(void)
+#if HAS_99CCFDC
+void ti99_ccfdc_reset(running_machine *machine)
 {
 	ti99_disk_DSR = memory_region(region_dsr) + offset_ccfdc_dsr;
 	DSEL = 0;
@@ -658,10 +659,10 @@ void ti99_ccfdc_reset(void)
 
 	ti99_peb_set_card_handlers(0x1100, & ccfdc_handlers);
 
-	wd17xx_reset();		/* initialize the floppy disk controller */
+	wd17xx_reset(machine);		/* initialize the floppy disk controller */
 	wd17xx_set_density(DEN_MFM_LO);
 }
-
+#endif
 
 
 /*
@@ -874,7 +875,7 @@ void ti99_bwg_reset(running_machine *machine)
         
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
 
-	wd17xx_reset();		/* initialize the floppy disk controller */
+	wd17xx_reset(machine);		/* initialize the floppy disk controller */
 	wd17xx_set_density(DEN_MFM_LO);
 }
 

@@ -699,7 +699,7 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 	else if (is_c65(Machine))
 	{
 		// NPW 8-Feb-2004 - Don't know why I have to do this
-		//c65_bankswitch();
+		//c65_bankswitch(Machine);
 	}
 	else if (!ultimax)
 		c64_bankswitch(Machine, 0);
@@ -965,7 +965,7 @@ MACHINE_START( c64 )
 	c64_common_init_machine (machine);
 
 	c64_rom_recognition ();
-	c64_rom_load();
+	c64_rom_load(machine);
 
 	if (is_c128(machine))
 		c128_bankswitch_64(machine, 1);
@@ -999,7 +999,7 @@ void c64_rom_recognition (void)
     }
 }
 
-void c64_rom_load(void)
+void c64_rom_load(running_machine *machine)
 {
     int i;
 
@@ -1007,25 +1007,25 @@ void c64_rom_load(void)
     c64_game = 1;
     if (cartridge)
     {
-		if (((input_port_read(Machine, "CFG") & 0x1c ) == 0) && (cartridgetype == CartridgeAuto))	// AUTO_MODULE
+		if (((input_port_read(machine, "CFG") & 0x1c ) == 0) && (cartridgetype == CartridgeAuto))	// AUTO_MODULE
 		{
-			logerror("Cartridge type not recognized using Machine type\n");
+			logerror("Cartridge type not recognized using machine type\n");
 		}
 	
-		if (((input_port_read(Machine, "CFG") & 0x1c ) == 8) && (cartridgetype == CartridgeUltimax))// C64_MODULE
+		if (((input_port_read(machine, "CFG") & 0x1c ) == 8) && (cartridgetype == CartridgeUltimax))// C64_MODULE
 		{
 			logerror("Cartridge could be ultimax type!?\n");
 		}
 	
-		if (((input_port_read(Machine, "CFG") & 0x1c ) == 4) && (cartridgetype == CartridgeC64))	// ULTIMAX_MODULE
+		if (((input_port_read(machine, "CFG") & 0x1c ) == 4) && (cartridgetype == CartridgeC64))	// ULTIMAX_MODULE
 		{
 			logerror("Cartridge could be c64 type!?\n");
 		}
 
-		if ((input_port_read(Machine, "CFG") & 0x1c ) == 8)			// C64_MODULE
+		if ((input_port_read(machine, "CFG") & 0x1c ) == 8)			// C64_MODULE
 			cartridgetype = CartridgeC64;
 
-		else if ((input_port_read(Machine, "CFG") & 0x1c ) == 4)	// ULTIMAX_MODULE
+		else if ((input_port_read(machine, "CFG") & 0x1c ) == 4)	// ULTIMAX_MODULE
 			cartridgetype = CartridgeUltimax;
 
 		if ((cbm_c64_exrom!=-1)&&(cbm_c64_game!=-1)) 

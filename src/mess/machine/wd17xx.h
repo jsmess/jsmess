@@ -52,7 +52,7 @@ typedef enum
 ***************************************************************************/
 
 void wd17xx_init(running_machine *machine, wd17xx_type_t type, void (*callback)(running_machine *, wd17xx_state_t, void *), void *param);
-void wd17xx_reset(void);
+void wd17xx_reset(running_machine *machine);
 
 /* the following are not strictly part of the wd179x hardware/emulation
 but will be put here for now until the flopdrv code has been finalised more */

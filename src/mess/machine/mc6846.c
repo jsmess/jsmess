@@ -19,7 +19,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "mc6846.h"
 
 #define VERBOSE 0
@@ -464,7 +463,7 @@ WRITE8_HANDLER ( mc6846_w )
 
 
 
-void mc6846_set_input_cp1 ( int data )
+void mc6846_set_input_cp1 ( running_machine *machine, int data )
 {
 	data = (data != 0 );
 	if ( data == mc6846.cp1 )
@@ -474,11 +473,11 @@ void mc6846_set_input_cp1 ( int data )
 	if (( data &&  (mc6846.pcr & 2)) || (!data && !(mc6846.pcr & 2)))
 	{
 		mc6846.csr |= 2;
-		mc6846_update_irq(Machine);
+		mc6846_update_irq(machine);
 	}
 }
 
-void mc6846_set_input_cp2 ( int data )
+void mc6846_set_input_cp2 ( running_machine *machine, int data )
 {
 	data = (data != 0 );
 	if ( data == mc6846.cp2 )
@@ -490,7 +489,7 @@ void mc6846_set_input_cp2 ( int data )
 		if (( data &&  (mc6846.pcr & 0x10)) || (!data && !(mc6846.pcr & 0x10)))
 		{
 			mc6846.csr |= 4;
-			mc6846_update_irq(Machine);
+			mc6846_update_irq(machine);
 		}
 	}
 }

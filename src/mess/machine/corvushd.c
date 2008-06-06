@@ -64,7 +64,6 @@
 //
 
 #include "driver.h"
-#include "deprecat.h"
 #include "devices/harddriv.h"
 #include "includes/corvushd.h"
 #include <ctype.h>
@@ -544,7 +543,7 @@ static UINT8 parse_hdc_command(UINT8 data) {
 // Returns:
 //		status:	Command status
 //
-static UINT8 corvus_write_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
+static UINT8 corvus_write_sector(running_machine *machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -555,7 +554,7 @@ static UINT8 corvus_write_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int le
 
 	LOG(("corvus_write_sector: Write Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
 
-	if(drv >= device_count(Machine, IO_HARDDISK)) {
+	if(drv >= device_count(machine, IO_HARDDISK)) {
 		logerror("corvus_write_sector: Attempt to write to non-existant drive: %d\n", drv);
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
 	}
@@ -610,7 +609,7 @@ static UINT8 corvus_write_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int le
 // Returns:
 //		status:	Corvus status
 //
-static UINT8 corvus_write_logical_sector(dadr_t *dadr, UINT8 *buffer, int len) {
+static UINT8 corvus_write_logical_sector(running_machine *machine, dadr_t *dadr, UINT8 *buffer, int len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -637,7 +636,7 @@ static UINT8 corvus_write_logical_sector(dadr_t *dadr, UINT8 *buffer, int len) {
 	//
 	sector += (c->tracks_per_cylinder * c->sectors_per_track * 2) + (SPARE_TRACKS * c->sectors_per_track);
 
-	status = corvus_write_sector(drv, sector, buffer, len);
+	status = corvus_write_sector(machine, drv, sector, buffer, len);
 
 	if(status != STAT_SUCCESS)
 		c->xmit_bytes = 1;
@@ -660,7 +659,7 @@ static UINT8 corvus_write_logical_sector(dadr_t *dadr, UINT8 *buffer, int len) {
 // Returns:
 //		status:	Corvus status
 //
-static UINT8 corvus_read_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
+static UINT8 corvus_read_sector(running_machine *machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -671,7 +670,7 @@ static UINT8 corvus_read_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int len
 
 	LOG(("corvus_read_sector: Read Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
 
-	if(drv >= device_count(Machine, IO_HARDDISK)) {
+	if(drv >= device_count(machine, IO_HARDDISK)) {
 		logerror("corvus_read_sector: Attempt to read from non-existant drive: %d\n", drv);
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
 	}
@@ -715,7 +714,7 @@ static UINT8 corvus_read_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int len
 // Returns:
 //		status:	Corvus status
 //
-static UINT8 corvus_read_logical_sector(dadr_t *dadr, UINT8 *buffer, int len) {
+static UINT8 corvus_read_logical_sector(running_machine *machine, dadr_t *dadr, UINT8 *buffer, int len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -742,7 +741,7 @@ static UINT8 corvus_read_logical_sector(dadr_t *dadr, UINT8 *buffer, int len) {
 	//
 	sector += (c->tracks_per_cylinder * c->sectors_per_track * 2) + (SPARE_TRACKS * c->sectors_per_track);
 
-	status = corvus_read_sector(drv, sector, buffer, len);
+	status = corvus_read_sector(machine, drv, sector, buffer, len);
 
 	if(status != STAT_SUCCESS)
 		c->xmit_bytes = 1;
@@ -766,7 +765,7 @@ static UINT8 corvus_read_logical_sector(dadr_t *dadr, UINT8 *buffer, int len) {
 // Side-effects:
 //		Fills in the semaphore result code
 //
-static UINT8 corvus_lock_semaphore(UINT8 *name) {
+static UINT8 corvus_lock_semaphore(running_machine *machine, UINT8 *name) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -780,7 +779,7 @@ static UINT8 corvus_lock_semaphore(UINT8 *name) {
 	//
 	// Read the semaphore table from the drive
 	//
-	status = corvus_read_sector(0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
+	status = corvus_read_sector(machine, 0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
 	if(status != STAT_SUCCESS) {
 		logerror("corvus_lock_semaphore: Error reading semaphore table, status: 0x%2.2x\n", status);
 		c->buffer.semaphore_locking_response.result = SEM_DISK_ERROR;
@@ -814,7 +813,7 @@ static UINT8 corvus_lock_semaphore(UINT8 *name) {
 		} else {
 			c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_NOT_SET;			// It wasn't there already
 			memcpy(&semaphore_table.semaphore_block.semaphore_entry[blank_offset], name, 8);// Stick it into the table
-			status = corvus_write_sector(0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
+			status = corvus_write_sector(machine, 0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
 			if(status != STAT_SUCCESS) {
 				logerror("corvus_lock_semaphore: Error updating semaphore table, status: 0x%2.2x\n", status);
 				c->buffer.semaphore_locking_response.result = SEM_DISK_ERROR;
@@ -844,7 +843,7 @@ static UINT8 corvus_lock_semaphore(UINT8 *name) {
 // Side-effects:
 //		Fills in the semaphore result code
 //
-static UINT8 corvus_unlock_semaphore(UINT8 *name) {
+static UINT8 corvus_unlock_semaphore(running_machine *machine, UINT8 *name) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -857,7 +856,7 @@ static UINT8 corvus_unlock_semaphore(UINT8 *name) {
 	//
 	// Read the semaphore table from the drive
 	//
-	status = corvus_read_sector(0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
+	status = corvus_read_sector(machine, 0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
 	if(status != STAT_SUCCESS) {
 		logerror("corvus_unlock_semaphore: Error reading semaphore table, status: 0x%2.2x\n", status);
 		c->buffer.semaphore_locking_response.result = SEM_DISK_ERROR;
@@ -887,7 +886,7 @@ static UINT8 corvus_unlock_semaphore(UINT8 *name) {
 	} else {
 		c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_SET;					// It was there
 		memcpy(&semaphore_table.semaphore_block.semaphore_entry[offset], "        ", 8);	// Clear it
-		status = corvus_write_sector(0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
+		status = corvus_write_sector(machine, 0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
 		if(status != STAT_SUCCESS) {
 			logerror("corvus_unlock_semaphore: Error updating semaphore table, status: 0x%2.2x\n", status);
 			c->buffer.semaphore_locking_response.result = SEM_DISK_ERROR;
@@ -912,7 +911,7 @@ static UINT8 corvus_unlock_semaphore(UINT8 *name) {
 //		Disk status
 //
 //
-static UINT8 corvus_init_semaphore_table( void ) {
+static UINT8 corvus_init_semaphore_table( running_machine *machine ) {
 
 	semaphore_table_block_t
 			semaphore_table;
@@ -920,7 +919,7 @@ static UINT8 corvus_init_semaphore_table( void ) {
 
 	memset(semaphore_table.semaphore_block.semaphore_table, 0x20, 256);
 
-	status = corvus_write_sector(0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
+	status = corvus_write_sector(machine, 0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
 	if(status != STAT_SUCCESS) {
 		logerror("corvus_init_semaphore_table: Error updating semaphore table, status: 0x%2.2x\n", status);
 		return status;
@@ -942,7 +941,7 @@ static UINT8 corvus_init_semaphore_table( void ) {
 // Returns:
 //		Status of command
 //
-static UINT8 corvus_get_drive_parameters(UINT8 drv) {
+static UINT8 corvus_get_drive_parameters(running_machine *machine, UINT8 drv) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -967,7 +966,7 @@ static UINT8 corvus_get_drive_parameters(UINT8 drv) {
 	//
 	drv -= 1;									// Internally, drives start at 0
 
-	if(drv >= device_count(Machine, IO_HARDDISK)) {
+	if(drv >= device_count(machine, IO_HARDDISK)) {
 		logerror("corvus_get_drive_parameters: Attempt to retrieve parameters from non-existant drive: %d\n", drv);
 		c->xmit_bytes = 1;
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
@@ -976,7 +975,7 @@ static UINT8 corvus_get_drive_parameters(UINT8 drv) {
 	//
 	// Read the Disk Parameter Block (Sector 1) from the drive
 	//
-	status = corvus_read_sector(drv, 1, raw_disk_parameter_block.buffer, 512);
+	status = corvus_read_sector(machine, drv, 1, raw_disk_parameter_block.buffer, 512);
 	if(status != STAT_SUCCESS) {
 		logerror("corvus_get_drive_parameters: Error status returned reading Disk Parameter Block -- status: 0x%2.2x\n", status);
 		c->xmit_bytes = 1;
@@ -986,7 +985,7 @@ static UINT8 corvus_get_drive_parameters(UINT8 drv) {
 	//
 	// Read the Constellation Parameter Block (Sector 3) from the drive
 	//
-	status = corvus_read_sector(drv, 3, raw_constellation_parameter_block.buffer, 512);
+	status = corvus_read_sector(machine, drv, 3, raw_constellation_parameter_block.buffer, 512);
 	if(status != STAT_SUCCESS) {
 		logerror("corvus_get_drive_parameters: Error status returned reading Constellation Parameter Block -- status: 0x%2.2x\n", status);
 		c->xmit_bytes = 1;
@@ -1050,13 +1049,13 @@ static UINT8 corvus_get_drive_parameters(UINT8 drv) {
 // Returns:
 //		status:	Status of read operation
 //
-static UINT8 corvus_read_boot_block(UINT8 block) {
+static UINT8 corvus_read_boot_block(running_machine *machine, UINT8 block) {
 
 	corvus_hdc_t	*c = &corvus_hdc;			// Pick up global controller structure
 
 	LOG(("corvus_read_boot_block: Reading boot block: %d\n", block));
 
-	return corvus_read_sector(0, 25 + block, c->buffer.read_512_response.data, 512);
+	return corvus_read_sector(machine, 0, 25 + block, c->buffer.read_512_response.data, 512);
 
 }
 
@@ -1074,7 +1073,7 @@ static UINT8 corvus_read_boot_block(UINT8 block) {
 // Returns:
 //		Status of command
 //
-static UINT8 corvus_read_firmware_block(UINT8 head, UINT8 sector) {
+static UINT8 corvus_read_firmware_block(running_machine *machine, UINT8 head, UINT8 sector) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;	// Pick up global controller structure
@@ -1086,7 +1085,7 @@ static UINT8 corvus_read_firmware_block(UINT8 head, UINT8 sector) {
 	LOG(("corvus_read_firmware_block: Reading firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
 		head, sector, relative_sector));
 
-	status = corvus_read_sector(0, relative_sector, c->buffer.read_512_response.data, 512);		// TODO: Which drive should Prep Mode talk to ???
+	status = corvus_read_sector(machine, 0, relative_sector, c->buffer.read_512_response.data, 512);		// TODO: Which drive should Prep Mode talk to ???
 	return status;
 }
 
@@ -1105,7 +1104,7 @@ static UINT8 corvus_read_firmware_block(UINT8 head, UINT8 sector) {
 // Returns:
 //		Status of command
 //
-static UINT8 corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 *buffer) {
+static UINT8 corvus_write_firmware_block(running_machine *machine, UINT8 head, UINT8 sector, UINT8 *buffer) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;	// Pick up global controller structure
@@ -1117,7 +1116,7 @@ static UINT8 corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 *buffer
 	LOG(("corvus_write_firmware_block: Writing firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
 		head, sector, relative_sector));
 
-	status = corvus_write_sector(0, relative_sector, buffer, 512);	// TODO: Which drive should Prep Mode talk to ???
+	status = corvus_write_sector(machine, 0, relative_sector, buffer, 512);	// TODO: Which drive should Prep Mode talk to ???
 	return status;
 }
 
@@ -1134,7 +1133,7 @@ static UINT8 corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 *buffer
 // Returns:
 //		Status of command
 //
-static UINT8 corvus_format_drive(UINT8 *pattern, UINT16 len) {
+static UINT8 corvus_format_drive(running_machine *machine, UINT8 *pattern, UINT16 len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -1158,7 +1157,7 @@ static UINT8 corvus_format_drive(UINT8 *pattern, UINT16 len) {
 	LOG_BUFFER(pattern, 512);
 
 	for(sector = 0; sector <= max_sector; sector++) {
-		status = corvus_write_sector(0, sector, pattern, 512);
+		status = corvus_write_sector(machine, 0, sector, pattern, 512);
 		if(status != STAT_SUCCESS) {
 			logerror("corvus_format_drive: Error while formatting drive in corvus_write_sector--sector: 0x%5.5x, status: 0x%x2.2x\n",
 				sector, status);
@@ -1206,7 +1205,7 @@ static hard_disk_file *corvus_hdc_file(int id) {
 // Returns:
 //		Nothing
 //
-static void corvus_process_command_packet(UINT8 invalid_command_flag) {
+static void corvus_process_command_packet(running_machine *machine, UINT8 invalid_command_flag) {
 
 	corvus_hdc_t	*c = &corvus_hdc;
 
@@ -1224,29 +1223,29 @@ static void corvus_process_command_packet(UINT8 invalid_command_flag) {
 				//
 				case READ_CHUNK_128:
 					c->buffer.read_128_response.status =
-						corvus_read_logical_sector(&c->buffer.read_sector_command.dadr, c->buffer.read_128_response.data, 128);
+						corvus_read_logical_sector(machine, &c->buffer.read_sector_command.dadr, c->buffer.read_128_response.data, 128);
 					break;
 				case READ_SECTOR_256:
 				case READ_CHUNK_256:
 					c->buffer.read_256_reponse.status =
-						corvus_read_logical_sector(&c->buffer.read_sector_command.dadr, c->buffer.read_256_reponse.data, 256);
+						corvus_read_logical_sector(machine, &c->buffer.read_sector_command.dadr, c->buffer.read_256_reponse.data, 256);
 					break;
 				case READ_CHUNK_512:
 					c->buffer.read_512_response.status =
-						corvus_read_logical_sector(&c->buffer.read_sector_command.dadr, c->buffer.read_512_response.data, 512);
+						corvus_read_logical_sector(machine, &c->buffer.read_sector_command.dadr, c->buffer.read_512_response.data, 512);
 					break;
 				case WRITE_CHUNK_128:
 					c->buffer.single_byte_response.status =
-						corvus_write_logical_sector(&c->buffer.write_128_command.dadr, c->buffer.write_128_command.data, 128);
+						corvus_write_logical_sector(machine, &c->buffer.write_128_command.dadr, c->buffer.write_128_command.data, 128);
 					break;
 				case WRITE_SECTOR_256:
 				case WRITE_CHUNK_256:
 					c->buffer.single_byte_response.status =
-						corvus_write_logical_sector(&c->buffer.write_256_command.dadr, c->buffer.write_256_command.data, 256);
+						corvus_write_logical_sector(machine, &c->buffer.write_256_command.dadr, c->buffer.write_256_command.data, 256);
 					break;
 				case WRITE_CHUNK_512:
 					c->buffer.single_byte_response.status =
-						corvus_write_logical_sector(&c->buffer.write_512_command.dadr, c->buffer.write_512_command.data, 512);
+						corvus_write_logical_sector(machine, &c->buffer.write_512_command.dadr, c->buffer.write_512_command.data, 512);
 					break;
 				//
 				// Semaphore commands
@@ -1257,18 +1256,18 @@ static void corvus_process_command_packet(UINT8 invalid_command_flag) {
 			//	case SEMAPHORE_STATUS_CODE:
 					switch(c->buffer.command.modifier) {
 						case SEMAPHORE_LOCK_MOD:
-							c->buffer.semaphore_locking_response.status = corvus_lock_semaphore(c->buffer.lock_semaphore_command.name);
+							c->buffer.semaphore_locking_response.status = corvus_lock_semaphore(machine, c->buffer.lock_semaphore_command.name);
 							break;
 						case SEMAPHORE_UNLOCK_MOD:
 							c->buffer.semaphore_locking_response.status =
-								corvus_unlock_semaphore(c->buffer.unlock_semaphore_command.name);
+								corvus_unlock_semaphore(machine, c->buffer.unlock_semaphore_command.name);
 							break;
 						case SEMAPHORE_INIT_MOD:
-							c->buffer.single_byte_response.status = corvus_init_semaphore_table();
+							c->buffer.single_byte_response.status = corvus_init_semaphore_table(machine);
 							break;
 						case SEMAPHORE_STATUS_MOD:
 							c->buffer.semaphore_status_response.status =
-								corvus_read_sector(0, 7, c->buffer.semaphore_status_response.table, 256);
+								corvus_read_sector(machine, 0, 7, c->buffer.semaphore_status_response.table, 256);
 							break;
 						default:
 							invalid_command_flag = TRUE;
@@ -1279,11 +1278,11 @@ static void corvus_process_command_packet(UINT8 invalid_command_flag) {
 				//
 				case BOOT:
 					c->buffer.read_512_response.status =
-						corvus_read_boot_block(c->buffer.old_boot_command.boot_block);
+						corvus_read_boot_block(machine, c->buffer.old_boot_command.boot_block);
 					break;
 				case GET_DRIVE_PARAMETERS:
 					c->buffer.drive_param_response.status =
-						corvus_get_drive_parameters(c->buffer.get_drive_parameters_command.drive);
+						corvus_get_drive_parameters(machine, c->buffer.get_drive_parameters_command.drive);
 					break;
 				case PREP_MODE_SELECT:
 					c->prep_mode = TRUE;
@@ -1307,17 +1306,17 @@ static void corvus_process_command_packet(UINT8 invalid_command_flag) {
 					break;
 				case PREP_READ_FIRMWARE:
 					c->buffer.drive_param_response.status =
-						corvus_read_firmware_block((c->buffer.read_firmware_command.encoded_h_s & 0xe0) >> 5,
+						corvus_read_firmware_block(machine, (c->buffer.read_firmware_command.encoded_h_s & 0xe0) >> 5,
 							c->buffer.read_firmware_command.encoded_h_s & 0x1f);
 					break;
 				case PREP_WRITE_FIRMWARE:
 					c->buffer.drive_param_response.status =
-						corvus_write_firmware_block((c->buffer.write_firmware_command.encoded_h_s & 0xe0) >> 5,
+						corvus_write_firmware_block(machine, (c->buffer.write_firmware_command.encoded_h_s & 0xe0) >> 5,
 							c->buffer.write_firmware_command.encoded_h_s & 0x1f, c->buffer.write_firmware_command.data);
 					break;
 				case PREP_FORMAT_DRIVE:
 					c->buffer.drive_param_response.status =
-						corvus_format_drive(c->buffer.format_drive_revbh_command.pattern, c->offset - 512);
+						corvus_format_drive(machine, c->buffer.format_drive_revbh_command.pattern, c->offset - 512);
 					break;
 				default:
 					c->xmit_bytes = 1;
@@ -1409,7 +1408,7 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 				logerror("corvus_hdc_callback: Exceeded four-second timeout for data from host, resetting communications\n");
 			} else { // if(c->recv_bytes == 0) 				   This was a variable-size command
 				LOG(("corvus_hdc_callback: Executing variable-length command via four-second timeout\n"));
-				corvus_process_command_packet(0);			// Process the command
+				corvus_process_command_packet(machine, 0);			// Process the command
 			}
 			break;
 		default:
@@ -1694,7 +1693,7 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 	// to the user with us Ready for more data and in Host-to-Controller mode.
 	//
 	if(c->offset == c->recv_bytes) {						// We've received enough data to process
-		corvus_process_command_packet(invalid_command_flag);
+		corvus_process_command_packet(machine, invalid_command_flag);
 	} else {
 		//
 		// Reset the four-second timer since we received some data

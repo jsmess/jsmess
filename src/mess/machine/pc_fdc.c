@@ -67,7 +67,7 @@ static const nec765_interface pc_fdc_nec765_interface =
 	pc_fdc_get_image
 };
 
-static void pc_fdc_reset(void)
+static void pc_fdc_reset(running_machine *machine)
 {
 	/* setup reset condition */
 	fdc->data_rate_register = 2;
@@ -76,15 +76,15 @@ static void pc_fdc_reset(void)
 	/* bit 7 is disk change */
 	fdc->digital_input_register = 0x07f;
 
-	nec765_reset(0);
+	nec765_reset(machine, 0);
 
 	/* set FDC at reset */
-	nec765_set_reset_state(1);
+	nec765_set_reset_state(machine, 1);
 }
 
 
 
-void pc_fdc_init(const struct pc_fdc_interface *iface)
+void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 {
 	int i;
 	const device_config *img;
@@ -98,13 +98,13 @@ void pc_fdc_init(const struct pc_fdc_interface *iface)
 		memcpy(&fdc->fdc_interface, iface, sizeof(fdc->fdc_interface));
 
 	/* setup nec765 interface */
-	nec765_init(&pc_fdc_nec765_interface, iface->nec765_type, iface->nec765_rdy_pin);
+	nec765_init(machine, &pc_fdc_nec765_interface, iface->nec765_type, iface->nec765_rdy_pin);
 
 	fdc->watchdog = timer_alloc( watchdog_timeout, NULL );
 
-	pc_fdc_reset();
+	pc_fdc_reset(machine);
 
-	for (i = 0; i < device_count(Machine, IO_FLOPPY); i++)
+	for (i = 0; i < device_count(machine, IO_FLOPPY); i++)
 	{
 		img = image_from_devtype_and_index(IO_FLOPPY, i);
 		floppy_drive_set_geometry(img, FLOPPY_DRIVE_DS_80);
@@ -131,7 +131,7 @@ static const device_config *pc_fdc_get_image(int floppy_index)
 
 
 
-void pc_fdc_set_tc_state(int state)
+void pc_fdc_set_tc_state(running_machine *machine, int state)
 {
 	/* store state */
 	fdc->tc_state = state;
@@ -139,7 +139,7 @@ void pc_fdc_set_tc_state(int state)
 	/* if dma is not enabled, tc's are not acknowledged */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
-		nec765_set_tc_state(state);
+		nec765_set_tc_state(machine, state);
 	}
 }
 
@@ -160,7 +160,7 @@ void pc_fdc_hw_interrupt(int state)
 
 
 
-int	pc_fdc_dack_r(void)
+int	pc_fdc_dack_r(running_machine *machine)
 {
 	int data;
 
@@ -170,7 +170,7 @@ int	pc_fdc_dack_r(void)
 	/* if dma is not enabled, dacks are not acknowledged */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
-		data = nec765_dack_r(Machine, 0);
+		data = nec765_dack_r(machine, 0);
 	}
 
 	return data;
@@ -178,13 +178,13 @@ int	pc_fdc_dack_r(void)
 
 
 
-void pc_fdc_dack_w(int data)
+void pc_fdc_dack_w(running_machine *machine, int data)
 {
 	/* if dma is not enabled, dacks are not issued */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
 		/* dma acknowledge - and send byte to fdc */
-		nec765_dack_w(Machine, 0,data);
+		nec765_dack_w(machine, 0,data);
 	}
 }
 
@@ -205,7 +205,7 @@ void pc_fdc_hw_dma_drq(int state, int read_)
 
 
 
-static void pc_fdc_data_rate_w(UINT8 data)
+static void pc_fdc_data_rate_w(running_machine *machine, UINT8 data)
 {
 	if ((data & 0x080)!=0)
 	{
@@ -213,8 +213,8 @@ static void pc_fdc_data_rate_w(UINT8 data)
 		nec765_set_ready_state(1);
 
 		/* toggle reset state */
-		nec765_set_reset_state(1);
- 		nec765_set_reset_state(0);
+		nec765_set_reset_state(Machine, 1);
+ 		nec765_set_reset_state(Machine, 0);
 
 		/* bit is self-clearing */
 		data &= ~0x080;
@@ -270,7 +270,7 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 	/* changing the DMA enable bit, will affect the terminal count state
 	from reaching the fdc - if dma is enabled this will send it through
 	otherwise it will be ignored */
-	pc_fdc_set_tc_state(fdc->tc_state);
+	pc_fdc_set_tc_state(machine, fdc->tc_state);
 
 	/* changing the DMA enable bit, will affect the dma drq state
 	from reaching us - if dma is enabled this will send it through
@@ -306,14 +306,14 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 			nec765_set_ready_state(1);
 
 		/* set FDC at reset */
-		nec765_set_reset_state(1);
+		nec765_set_reset_state(machine, 1);
 	}
 	else
 	{
-		pc_fdc_set_tc_state(0);
+		pc_fdc_set_tc_state(machine, 0);
 
 		/* release reset on fdc */
-		nec765_set_reset_state(0);
+		nec765_set_reset_state(machine, 0);
 	}
 }
 
@@ -395,14 +395,14 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 			nec765_set_ready_state(1);
 
 		/* set FDC at reset */
-		nec765_set_reset_state(1);
+		nec765_set_reset_state(machine, 1);
 	}
 	else
 	{
-		pc_fdc_set_tc_state(0);
+		pc_fdc_set_tc_state(machine, 0);
 
 		/* release reset on fdc */
-		nec765_set_reset_state(0);
+		nec765_set_reset_state(machine, 0);
 	}
 
 	logerror("pcjr_fdc_dor_w: changing dor from %02x to %02x\n", fdc->digital_output_register, data);
@@ -462,7 +462,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 			/* tape drive select? */
 			break;
 		case 4:
-			pc_fdc_data_rate_w(data);
+			pc_fdc_data_rate_w(machine, data);
 			break;
 		case 5:
 			nec765_data_w(machine, 0, data);

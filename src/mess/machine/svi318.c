@@ -659,7 +659,7 @@ MACHINE_RESET( svi318 )
 	svi.bank_switch = 0xff;
 	svi318_set_banks(machine);
 
-	wd17xx_reset();
+	wd17xx_reset(machine);
 }
 
 INTERRUPT_GEN( svi318_interrupt )

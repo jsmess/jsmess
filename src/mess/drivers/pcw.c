@@ -516,14 +516,14 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* set fdc terminal count */
 		case 5:
 		{
-			nec765_set_tc_state(1);
+			nec765_set_tc_state(machine, 1);
 		}
 		break;
 
 		/* clear fdc terminal count */
 		case 6:
 		{
-			nec765_set_tc_state(0);
+			nec765_set_tc_state(machine, 0);
 		}
 		break;
 
@@ -744,7 +744,7 @@ static TIMER_CALLBACK(setup_beep)
 
 static MACHINE_START( pcw )
 {
-	nec765_init(&pcw_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
+	nec765_init(machine, &pcw_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 	fdc_interrupt_code = 0;
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }

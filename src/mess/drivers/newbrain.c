@@ -245,9 +245,9 @@ static WRITE8_HANDLER( fdc_io2_w )
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), BIT(data, 0));
 	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
 
-	nec765_set_reset_state(BIT(data, 1));
+	nec765_set_reset_state(machine, BIT(data, 1));
 
-	nec765_set_tc_state(BIT(data, 2));
+	nec765_set_tc_state(machine, BIT(data, 2));
 }
 
 static WRITE8_HANDLER( fdc_io_w )
@@ -796,7 +796,7 @@ static MACHINE_START( newbrain )
 
 	/* initialize devices */
 
-	nec765_init(&newbrain_nec765_interface, NEC765A, NEC765_RDY_PIN_NOT_CONNECTED);
+	nec765_init(machine, &newbrain_nec765_interface, NEC765A, NEC765_RDY_PIN_NOT_CONNECTED);
 	acia6850_config(0, &newbrain_acia_intf);
 	z80ctc_init(0, &newbrain_ctc_intf);
 

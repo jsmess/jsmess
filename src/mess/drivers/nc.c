@@ -1362,7 +1362,7 @@ static MACHINE_RESET( nc200 )
 
     nc_common_init_machine(machine);
 
-    nec765_init(&nc200_nec765_interface, NEC765A,NEC765_RDY_PIN_CONNECTED);
+    nec765_init(machine, &nc200_nec765_interface, NEC765A,NEC765_RDY_PIN_CONNECTED);
     /* double sided, 80 track drive */
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 	//floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), nc200_floppy_drive_index_callback);
@@ -1518,7 +1518,7 @@ static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 	floppy_drive_set_motor_state(0,1);
 	floppy_drive_set_ready_state(0,1,1);
 #endif
-	nec765_set_tc_state((data & 0x01));
+	nec765_set_tc_state(machine, (data & 0x01));
 }
 
 /* bit 2: backlight: 1=off, 0=on */

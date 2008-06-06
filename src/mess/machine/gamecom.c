@@ -108,15 +108,15 @@ static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data ) {
 	}
 }
 
-static void handle_stylus_press( UINT8 column ) {
+static void handle_stylus_press( running_machine *machine, UINT8 column ) {
 	static const UINT16 row_data[10] = { 0x3FE, 0x3FD, 0x3FB, 0x3F7, 0x3EF, 0x3DF, 0x3BF, 0x37F, 0x2FF, 0x1FF };
 	static UINT32 stylus_x;
 	static UINT32 stylus_y;
 
 	if ( column == 0 ) {
-		if ( ! ( input_port_read(Machine, "IN2") & 0x04 ) ) {
-			stylus_x = input_port_read(Machine, "IN3") >> 4;
-			stylus_y = input_port_read(Machine, "IN4") >> 4;
+		if ( ! ( input_port_read(machine, "IN2") & 0x04 ) ) {
+			stylus_x = input_port_read(machine, "IN3") >> 4;
+			stylus_y = input_port_read(machine, "IN4") >> 4;
 		} else {
 			stylus_x = 16;
 			stylus_y = 16;
@@ -159,43 +159,43 @@ WRITE8_HANDLER( gamecom_internal_w )
 						/* P0 bit 7 cleared => */
 						/* P1 bit 0 cleared => */
 						/* P1 bit 1 cleared => */
-					handle_stylus_press( 0 );
+					handle_stylus_press( machine, 0 );
 					break;
 				case 0xF7FF:	/* column #1 */
-					handle_stylus_press( 1 );
+					handle_stylus_press( machine, 1 );
 					break;
 				case 0xEFFF:	/* column #2 */
-					handle_stylus_press( 2 );
+					handle_stylus_press( machine, 2 );
 					break;
 				case 0xDFFF:	/* column #3 */
-					handle_stylus_press( 3 );
+					handle_stylus_press( machine, 3 );
 					break;
 				case 0xBFFF:	/* column #4 */
-					handle_stylus_press( 4 );
+					handle_stylus_press( machine, 4 );
 					break;
 				case 0x7FFF:	/* column #5 */
-					handle_stylus_press( 5 );
+					handle_stylus_press( machine, 5 );
 					break;
 				case 0xFFFE:	/* column #6 */
-					handle_stylus_press( 6 );
+					handle_stylus_press( machine, 6 );
 					break;
 				case 0xFFFD:	/* column #7 */
-					handle_stylus_press( 7 );
+					handle_stylus_press( machine, 7 );
 					break;
 				case 0xFFFB:	/* column #8 */
-					handle_stylus_press( 8 );
+					handle_stylus_press( machine, 8 );
 					break;
 				case 0xFFF7:	/* column #9 */
-					handle_stylus_press( 9 );
+					handle_stylus_press( machine, 9 );
 					break;
 				case 0xFFEF:	/* column #10 */
-					handle_stylus_press( 10 );
+					handle_stylus_press( machine, 10 );
 					break;
 				case 0xFFDF:	/* column #11 */
-					handle_stylus_press( 11 );
+					handle_stylus_press( machine, 11 );
 					break;
 				case 0xFFBF:	/* column #12 */
-					handle_stylus_press( 12 );
+					handle_stylus_press( machine, 12 );
 					break;
 				case 0xFF7F:	/* keys #1 */
 						/* P0 bit 0 cleared => 83 (up) */

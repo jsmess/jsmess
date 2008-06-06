@@ -44,9 +44,9 @@ typedef struct nec765_interface
 } nec765_interface;
 
 /* init nec765 interface */
-void nec765_init(const nec765_interface *iface, NEC765_VERSION version, NEC765_RDY_PIN rdy_pin);
+void nec765_init(running_machine *machine, const nec765_interface *iface, NEC765_VERSION version, NEC765_RDY_PIN rdy_pin);
 /* set nec765 terminal count input state */
-void nec765_set_tc_state(int);
+void nec765_set_tc_state(running_machine *machine, int);
 /* set nec765 ready input*/
 void nec765_set_ready_state(int);
 
@@ -65,10 +65,10 @@ WRITE8_HANDLER(nec765_dack_w);
 READ8_HANDLER(nec765_dack_r);
 
 /* reset nec765 */
-void nec765_reset(int);
+void nec765_reset(running_machine *machine, int);
 
 /* reset pin of nec765 */
-void nec765_set_reset_state(int);
+void nec765_set_reset_state(running_machine *machine, int);
 
 /*********************/
 /* STATUS REGISTER 1 */

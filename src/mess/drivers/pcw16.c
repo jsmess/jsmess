@@ -1102,14 +1102,14 @@ static WRITE8_HANDLER(pcw16_system_control_w)
 		/* set terminal count */
 		case 0x05:
 		{
-			pc_fdc_set_tc_state(1);
+			pc_fdc_set_tc_state(machine, 1);
 		}
 		break;
 
 		/* clear terminal count */
 		case 0x06:
 		{
-			pc_fdc_set_tc_state(0);
+			pc_fdc_set_tc_state(machine, 0);
 		}
 		break;
 
@@ -1311,7 +1311,7 @@ static void pcw16_reset(running_machine *machine)
 	/* initialise defaults */
 	pcw16_fdc_int_code = 2;
 	/* clear terminal count */
-	pc_fdc_set_tc_state(0);
+	pc_fdc_set_tc_state(machine, 0);
 	/* select first rom page */
 	pcw16_banks[0] = 0;
 	pcw16_update_memory(machine);
@@ -1357,7 +1357,7 @@ static MACHINE_RESET( pcw16 )
 	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, pcw16_keyboard_timer_callback);
 
 
-	pc_fdc_init(&pcw16_fdc_interface);
+	pc_fdc_init(machine, &pcw16_fdc_interface);
 
 	pc_lpt_config(0, &lpt_config);
 	centronics_config(0, &cent_config);

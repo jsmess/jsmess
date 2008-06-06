@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "image.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
@@ -115,7 +114,7 @@ static WRITE8_HANDLER( sms_input_write ) {
 	}
 }
 
-static void sms_get_inputs(void) {
+static void sms_get_inputs(running_machine *machine) {
 	UINT8 data = 0x00;
 	UINT32 cpu_cycles = activecpu_gettotalcycles();
 
@@ -128,15 +127,15 @@ static void sms_get_inputs(void) {
 	}
 
 	/* Player 1 */
-	switch( input_port_read(Machine, "CTRLSEL") & 0x0F ) {
+	switch( input_port_read(machine, "CTRLSEL") & 0x0F ) {
 	case 0x00:  /* Joystick */
-		data = input_port_read(Machine, "JOY0");
+		data = input_port_read(machine, "JOY0");
 		/* Rapid Fire setting for Button A */
-		if ( input_port_read(Machine, "RFU") & 0x01 ) {
+		if ( input_port_read(machine, "RFU") & 0x01 ) {
 			data = ( data & 0xEF ) | ( rapid_fire_state_1 & 0x10 );
 		}
 		/* Check Rapid Fire setting for Button B */
-		if ( input_port_read(Machine, "RFU") & 0x02 ) {
+		if ( input_port_read(machine, "RFU") & 0x02 ) {
 			data = ( data & 0xDF ) | ( rapid_fire_state_1 & 0x20 );
 		}
 		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | ( data & 0x3F );
@@ -145,12 +144,12 @@ static void sms_get_inputs(void) {
 		break;
 	case 0x02:  /* Paddle Control */
 		/* Get button A state */
-		data = input_port_read(Machine, "PADDLE0");
+		data = input_port_read(machine, "PADDLE0");
 		if ( paddle_read_state ) {
 			data = data >> 4;
 		}
 		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | ( data & 0x0F ) | ( paddle_read_state & 0x20 )
-		                | ( ( input_port_read(Machine, "IN0") & 0x02 ) << 3 );
+		                | ( ( input_port_read(machine, "IN0") & 0x02 ) << 3 );
 		break;
 	case 0x03:	/* Sega Sports Pad */
 		switch( sports_pad_state_1 ) {
@@ -167,20 +166,20 @@ static void sms_get_inputs(void) {
 			data = sports_pad_1_y & 0x0F;
 			break;
 		}
-		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | data | ( ( input_port_read(Machine, "IN0") & 0x0C ) << 2 );
+		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | data | ( ( input_port_read(machine, "IN0") & 0x0C ) << 2 );
 		break;
 	}
 
 	/* Player 2 */
-	switch( input_port_read(Machine, "CTRLSEL") >> 4 ) {
+	switch( input_port_read(machine, "CTRLSEL") >> 4 ) {
 	case 0x00:	/* Joystick */
-		data = input_port_read(Machine, "JOY0");
+		data = input_port_read(machine, "JOY0");
 		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( data & 0xC0 );
-		data = input_port_read(Machine, "JOY1");
-		if ( input_port_read(Machine, "RFU") & 0x04 ) {
+		data = input_port_read(machine, "JOY1");
+		if ( input_port_read(machine, "RFU") & 0x04 ) {
 			data = ( data & 0xFB ) | ( rapid_fire_state_2 & 0x04 );
 		}
-		if ( input_port_read(Machine, "RFU") & 0x08 ) {
+		if ( input_port_read(machine, "RFU") & 0x08 ) {
 			data = ( data & 0xF7 ) | ( rapid_fire_state_2 & 0x08 );
 		}
 		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data & 0x0F );
@@ -189,13 +188,13 @@ static void sms_get_inputs(void) {
 		break;
 	case 0x02:	/* Paddle Control */
 		/* Get button A state */
-		data = input_port_read(Machine, "PADDLE1");
+		data = input_port_read(machine, "PADDLE1");
 		if ( paddle_read_state ) {
 			data = data >> 4;
 		}
 		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
 		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( ( data & 0x0C ) >> 2 ) | ( paddle_read_state & 0x08 )
-		                | ( ( input_port_read(Machine, "IN0") & 0x20 ) >> 3 );
+		                | ( ( input_port_read(machine, "IN0") & 0x20 ) >> 3 );
 		break;
 	case 0x03:	/* Sega Sports Pad */
 		switch( sports_pad_state_2 ) {
@@ -212,7 +211,7 @@ static void sms_get_inputs(void) {
 			break;
 		}
 		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
-		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data >> 2 ) | ( ( input_port_read(Machine, "IN0") & 0xC0 ) >> 4 );
+		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data >> 2 ) | ( ( input_port_read(machine, "IN0") & 0xC0 ) >> 4 );
 		break;
 	}
 }
@@ -230,7 +229,7 @@ READ8_HANDLER(sms_fm_detect_r) {
 		if ( biosPort & IO_CHIP ) {
 			return 0xFF;
 		} else {
-			sms_get_inputs();
+			sms_get_inputs(machine);
 			return sms_input_port0;
 		}
 	}
@@ -248,7 +247,7 @@ WRITE8_HANDLER(sms_version_w) {
 	}
 }
 
- READ8_HANDLER(sms_version_r) {
+READ8_HANDLER(sms_version_r) {
 	UINT8 temp;
 
 	if (biosPort & IO_CHIP) {
@@ -264,7 +263,7 @@ WRITE8_HANDLER(sms_version_w) {
 	}
 
 	/* Merge version data with input port #2 data */
-	sms_get_inputs();
+	sms_get_inputs(machine);
 	temp = (temp & 0xC0) | (sms_input_port1 & 0x3F);
 
 	return (temp);
@@ -293,11 +292,11 @@ void sms_check_pause_button( running_machine *machine ) {
 	}
 }
 
- READ8_HANDLER(sms_input_port_0_r) {
+READ8_HANDLER(sms_input_port_0_r) {
 	if (biosPort & IO_CHIP) {
 		return (0xFF);
 	} else {
-		sms_get_inputs();
+		sms_get_inputs(machine);
 		return sms_input_port0;
 	}
 }

@@ -119,7 +119,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 
 static DMA8237_CHANNEL_READ( pc_dma8237_fdc_dack_r )
 {
-	return pc_fdc_dack_r();
+	return pc_fdc_dack_r(device->machine);
 }
 
 
@@ -131,7 +131,7 @@ static DMA8237_CHANNEL_READ( pc_dma8237_hdc_dack_r )
 
 static DMA8237_CHANNEL_WRITE( pc_dma8237_fdc_dack_w )
 {
-	pc_fdc_dack_w( data );
+	pc_fdc_dack_w( device->machine, data );
 }
 
 
@@ -143,7 +143,7 @@ static DMA8237_CHANNEL_WRITE( pc_dma8237_hdc_dack_w )
 
 static DMA8237_OUT_EOP( pc_dma8237_out_eop )
 {
-	pc_fdc_set_tc_state( state );
+	pc_fdc_set_tc_state( device->machine, state );
 }
 
 
@@ -1006,7 +1006,7 @@ static IRQ_CALLBACK(pc_irq_callback)
 
 MACHINE_START( pc )
 {
-	pc_fdc_init( &fdc_interface_nc );
+	pc_fdc_init( machine, &fdc_interface_nc );
 }
 
 

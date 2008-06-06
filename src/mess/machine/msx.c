@@ -281,9 +281,9 @@ void msx_vdp_interrupt(running_machine *machine, int i)
 	cpunum_set_input_line (machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
-static void msx_ch_reset_core (void)
+static void msx_ch_reset_core (running_machine *machine)
 {
-	msx_memory_reset ();
+	msx_memory_reset (machine);
 	msx_memory_map_all ();
 }
 
@@ -313,13 +313,13 @@ MACHINE_START( msx2 )
 MACHINE_RESET( msx )
 {
 	TMS9928A_reset ();
-	msx_ch_reset_core ();
+	msx_ch_reset_core (machine);
 }
 
 MACHINE_RESET( msx2 )
 {
 	v9938_reset (0);
-	msx_ch_reset_core ();
+	msx_ch_reset_core (machine);
 }
 
 static WRITE8_HANDLER ( msx_ppi_port_a_w );
@@ -877,7 +877,7 @@ void msx_memory_init (running_machine *machine)
 	}
 }
 
-void msx_memory_reset (void)
+void msx_memory_reset (running_machine *machine)
 {
 	slot_state *state, *last_state= (slot_state*)NULL;
 	int prim, sec, page;
@@ -890,7 +890,7 @@ void msx_memory_reset (void)
 			for (page=0; page<4; page++) {
 				state = msx1.all_state[prim][sec][page];
 				if (state && state != last_state) {
-					msx_slot_list[state->type].reset (state);
+					msx_slot_list[state->type].reset (machine, state);
 				}
 				last_state = state;
 			}

@@ -1066,7 +1066,7 @@ static void dgnbeta_reset(running_machine *machine)
 	DMA_NMI_LAST=0x80;			/* start with DMA NMI inactive, as pulled up */
 //	DMA_NMI=CLEAR_LINE;			/* start with DMA NMI inactive */
 
-	wd17xx_reset();
+	wd17xx_reset(machine);
 	wd17xx_set_density(DEN_MFM_LO);
 	wd17xx_set_drive(0);
 

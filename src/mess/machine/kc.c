@@ -203,7 +203,7 @@ WRITE8_HANDLER(kc85_disc_interface_latch_w)
 WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
 {
 	logerror("kc85 disc hw tc w: %02x\n",data);
-	nec765_set_tc_state(data & 0x01);
+	nec765_set_tc_state(machine, data & 0x01);
 }
 
 
@@ -239,7 +239,7 @@ static void kc_disc_interface_init(running_machine *machine)
 {
 	timer_set(attotime_zero, NULL, 0, kc85_disk_reset_timer_callback);
 
-	nec765_init(&kc_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
+	nec765_init(machine, &kc_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 
 	/* reset ctc */
 	z80ctc_reset(1);

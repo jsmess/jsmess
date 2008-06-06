@@ -337,7 +337,7 @@ static void to7_5p14_reset( running_machine *machine )
 	int i;
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	thom_floppy_set_density( DEN_MFM_LO );
-	wd17xx_reset();
+	wd17xx_reset(machine);
 	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );

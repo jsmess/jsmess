@@ -28,8 +28,8 @@ static void inta_callback(running_machine *machine, int state);
 static void intb_callback(running_machine *machine, int state);
 
 static void read_key_if_possible(void);
-static void poll_keyboard(void);
-static void poll_mouse(void);
+static void poll_keyboard(running_machine *machine);
+static void poll_mouse(running_machine *machine);
 
 static void tms9901_interrupt_callback(int intreq, int ic);
 static int R9901_0(int offset);
@@ -331,8 +331,8 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 	if (++line_count == 262)
 	{
 		line_count = 0;
-		poll_keyboard();
-		poll_mouse();
+		poll_keyboard(machine);
+		poll_mouse(machine);
 	}
 }
 
@@ -1030,9 +1030,8 @@ INLINE void post_in_KeyQueue(int keycode)
 	KeyQueueLen++;
 }
 
-static void poll_keyboard(void)
+static void poll_keyboard(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	UINT32 keystate;
 	UINT32 key_transitions;
 	int i, j;
@@ -1270,15 +1269,15 @@ static void poll_keyboard(void)
 	}
 }
 
-static void poll_mouse(void)
+static void poll_mouse(running_machine *machine)
 {
 	static int last_mx = 0, last_my = 0;
 	int new_mx, new_my;
 	int delta_x, delta_y, buttons;
 
-	buttons = input_port_read(Machine, "MOUSE0");
-	new_mx = input_port_read(Machine, "MOUSEX");
-	new_my = input_port_read(Machine, "MOUSEY");
+	buttons = input_port_read(machine, "MOUSE0");
+	new_mx = input_port_read(machine, "MOUSEX");
+	new_my = input_port_read(machine, "MOUSEY");
 
 	/* compute x delta */
 	delta_x = new_mx - last_mx;
@@ -1447,7 +1446,7 @@ static void W9901_KeyboardReset(int offset, int data)
 		KeyAutoRepeatKey = 0;
 	}
 	/*else
-		poll_keyboard();*/
+		poll_keyboard(Machine);*/
 }
 
 /*

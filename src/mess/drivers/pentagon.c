@@ -102,7 +102,7 @@ static MACHINE_RESET( pentagon )
 
 	pentagon_update_memory(machine);	
 		
-	wd17xx_reset();	
+	wd17xx_reset(machine);	
 }
 
 static MACHINE_DRIVER_START( pentagon )

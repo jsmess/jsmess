@@ -863,7 +863,7 @@ MACHINE_RESET( c128 )
 	sndti_reset(SOUND_SID6581, 0);
 
 	c64_rom_recognition ();
-	c64_rom_load();
+	c64_rom_load(machine);
 
 	c64mode = 0;
 	c128_mmu8722_reset (machine);

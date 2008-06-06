@@ -777,7 +777,7 @@ static WRITE8_HANDLER(oric_jasmin_w)
 			break;
 		/* any write will cause wd179x to reset */
 		case 0x09:
-			wd17xx_reset();
+			wd17xx_reset(machine);
 			break;
 		case 0x0a:
 			logerror("jasmin overlay ram w: %02x PC: %04x\n",data,activecpu_get_pc());

@@ -289,20 +289,20 @@ static void compis_keyb_init(void)
 /*-------------------------------------------------------------------------*/
 /*  FDC iSBX-218A                                                          */
 /*-------------------------------------------------------------------------*/
-static void compis_fdc_reset(void)
+static void compis_fdc_reset(running_machine *machine)
 {
-	nec765_reset(0);
+	nec765_reset(machine, 0);
 
 	/* set FDC at reset */
-	nec765_set_reset_state(1);
+	nec765_set_reset_state(machine, 1);
 }
 
-static void compis_fdc_tc(int state)
+static void compis_fdc_tc(running_machine *machine, int state)
 {
 	/* Terminal count if iSBX-218A has DMA enabled */
-  	if (input_port_read(Machine, "DSW1"))
+  	if (input_port_read(machine, "DSW1"))
 	{
-		nec765_set_tc_state(state);
+		nec765_set_tc_state(machine, state);
 	}
 }
 
@@ -443,10 +443,10 @@ static WRITE8_HANDLER ( compis_ppi_port_c_w )
 
 	/* FDC Reset */
 	if (data & 0x40)
-		compis_fdc_reset();
+		compis_fdc_reset(machine);
 
 	/* FDC Terminal count */
-	compis_fdc_tc((data & 0x80)?1:0);
+	compis_fdc_tc(machine, (data & 0x80)?1:0);
 }
 
 const ppi8255_interface compis_ppi_interface =
@@ -1544,8 +1544,8 @@ MACHINE_RESET( compis )
 	compis_cpu_init();
 
 	/* FDC */
-	nec765_init(&compis_fdc_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
-	compis_fdc_reset();
+	nec765_init(machine, &compis_fdc_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
+	compis_fdc_reset(machine);
 
 	/* RTC */
 	mm58274c_init(machine, 0, 0);

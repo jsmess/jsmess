@@ -36,7 +36,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 
@@ -322,11 +321,11 @@ static void wd17xx_set_busy(wd17xx_info *w, attotime duration)
 
 /* BUSY COUNT DOESN'T WORK PROPERLY! */
 
-static void wd17xx_restore(wd17xx_info *w)
+static void wd17xx_restore(running_machine *machine, wd17xx_info *w)
 {
 	UINT8 step_counter;
 
-	if (current_drive >= device_count(Machine, IO_FLOPPY))
+	if (current_drive >= device_count(machine, IO_FLOPPY))
 		return;
 
 	step_counter = 255;
@@ -374,17 +373,17 @@ static TIMER_CALLBACK(wd17xx_read_sector_callback);
 static TIMER_CALLBACK(wd17xx_write_sector_callback);
 static void wd17xx_index_pulse_callback(const device_config *img, int state);
 
-void wd17xx_reset(void)
+void wd17xx_reset(running_machine *machine)
 {
 	int i;
-	for (i = 0; i < device_count(Machine, IO_FLOPPY); i++)
+	for (i = 0; i < device_count(machine, IO_FLOPPY); i++)
 	{
 		const device_config *img = image_from_devtype_and_index(IO_FLOPPY, i);
 		floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
 		floppy_drive_set_rpm( img, 300.);
 	}
 
-	wd17xx_restore(&wd);
+	wd17xx_restore(machine, &wd);
 }
 
 
@@ -405,7 +404,7 @@ void wd17xx_init(running_machine *machine, wd17xx_type_t type, void (*callback)(
 	wd.timer_rs = timer_alloc(wd17xx_read_sector_callback, NULL);
 	wd.timer_ws = timer_alloc(wd17xx_write_sector_callback, NULL);
 	wd17xx_pause_time = 40;
-	wd17xx_reset();
+	wd17xx_reset(machine);
 }
 
 
@@ -1376,7 +1375,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 		if (VERBOSE)
 			logerror("wd17xx_command_w $%02X RESTORE\n", data);
 
-		wd17xx_restore(w);
+		wd17xx_restore(machine, w);
 	}
 
 	if ((data & ~FDC_MASK_TYPE_I) == FDC_SEEK)

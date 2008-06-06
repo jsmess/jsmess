@@ -794,10 +794,10 @@ const ppi8255_interface pc8801_8255_config_1 =
     NULL
 };
 
- READ8_HANDLER(pc8801fd_nec765_tc)
+READ8_HANDLER(pc8801fd_nec765_tc)
 {
-  nec765_set_tc_state(1);
-  nec765_set_tc_state(0);
+  nec765_set_tc_state(machine, 1);
+  nec765_set_tc_state(machine, 0);
   return 0;
 }
 
@@ -825,7 +825,7 @@ static void pc8801_init_5fd(running_machine *machine)
 		cpunum_suspend(1, SUSPEND_REASON_DISABLE, 1);
 	else
 		cpunum_resume(1, SUSPEND_REASON_DISABLE);
-	nec765_init(&pc8801_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
+	nec765_init(machine, &pc8801_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 	cpunum_set_input_line_vector(1,0,0);
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1);
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1);

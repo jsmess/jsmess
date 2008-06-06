@@ -403,7 +403,7 @@ static TIMER_CALLBACK (b2m_callback)
 
 MACHINE_RESET(b2m)
 {
-	wd17xx_reset();
+	wd17xx_reset(machine);
 	msm8251_reset();
 	
 	b2m_side = 0;

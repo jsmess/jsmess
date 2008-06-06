@@ -2188,7 +2188,7 @@ MACHINE_RESET( bbcb )
 		i8271_reset();
 	//	break;
 	//case 4: case 5: case 6:
-	    wd17xx_reset();
+	    wd17xx_reset(machine);
 	//	break;
 	//}
 }
@@ -2226,7 +2226,7 @@ MACHINE_RESET( bbcbp )
 	MC6850_config(&BBC_MC6850_calls);
 
 	previous_wd177x_int_state=1;
-    wd17xx_reset();
+    wd17xx_reset(machine);
 }
 
 
@@ -2263,5 +2263,5 @@ MACHINE_RESET( bbcm )
 	MC6850_config(&BBC_MC6850_calls);
 
 	previous_wd177x_int_state=1;
-    wd17xx_reset();
+    wd17xx_reset(machine);
 }

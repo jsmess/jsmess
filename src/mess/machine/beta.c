@@ -117,7 +117,7 @@ WRITE8_HANDLER(betadisk_param_w)
   		wd17xx_set_density(data & 0x20 ? DEN_MFM_HI : DEN_FM_LO );
   		if ((data & 0x04) == 0) // reset
   		{
-  			wd17xx_reset();	
+  			wd17xx_reset(machine);	
   		}    		
   		betadisk_status = (data & 0x3f) | betadisk_status;
   	}

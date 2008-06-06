@@ -133,8 +133,8 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 
 static WRITE8_HANDLER(fd5_tc_w)
 {
-	nec765_set_tc_state(1);
-	nec765_set_tc_state(0);
+	nec765_set_tc_state(machine, 1);
+	nec765_set_tc_state(machine, 0);
 }
 
 /* 0x020 fd5 writes to this port to communicate with m5 */
@@ -176,16 +176,16 @@ static const struct nec765_interface sord_fd5_nec765_interface=
 	NULL
 };
 
-static void sord_fd5_init(void)
+static void sord_fd5_init(running_machine *machine)
 {
-	nec765_init(&sord_fd5_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
+	nec765_init(machine, &sord_fd5_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 }
 
 static MACHINE_RESET( sord_m5_fd5 )
 {
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
-	sord_fd5_init();
+	sord_fd5_init(machine);
 	MACHINE_RESET_CALL(sord_m5);
 	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
 }

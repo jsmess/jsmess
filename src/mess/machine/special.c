@@ -242,7 +242,7 @@ MACHINE_RESET( specimx )
 {
 	specimx_set_bank(machine, 2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;	
-	wd17xx_reset();
+	wd17xx_reset(machine);
 	wd17xx_set_side(0);
 	timer_set( attotime_zero, NULL, 0, setup_pit8253_gates );
 }
@@ -392,7 +392,7 @@ MACHINE_START( erik )
 
 MACHINE_RESET( erik )
 {
-	wd17xx_reset();		
+	wd17xx_reset(machine);		
 	
 	RR_register = 0x00;	
 	RC_register = 0x00;

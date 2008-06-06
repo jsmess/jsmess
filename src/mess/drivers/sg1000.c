@@ -479,11 +479,11 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), (data & 0x02) ? 0 : 1);
 	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
 
-	nec765_set_tc_state(data & 0x04);
+	nec765_set_tc_state(machine, data & 0x04);
 
 	if (data & 0x08)
 	{
-		nec765_reset(0);
+		nec765_reset(machine, 0);
 	}
 
 	memory_set_bank(1, (data & 0x40) >> 6);
@@ -545,7 +545,7 @@ static const CENTRONICS_CONFIG sf7000_centronics_config[1] = {
 static MACHINE_START( sf7000 )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	nec765_init(&sf7000_nec765_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
+	nec765_init(machine, &sf7000_nec765_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
 	msm8251_init(&sf7000_uart_interface);
 	centronics_config(1, sf7000_centronics_config);

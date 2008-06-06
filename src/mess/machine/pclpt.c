@@ -6,7 +6,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "memconv.h"
 #include "includes/pclpt.h"
 #include "machine/centroni.h"
@@ -56,10 +55,10 @@ void pc_lpt_set_device(int nr, const CENTRONICS_DEVICE *device)
 	This->device=device;
 }
 
-static void pc_LPT_w(int n, int offset, int data)
+static void pc_LPT_w(running_machine *machine, int n, int offset, int data)
 {
 	PC_LPT *This=LPT+n;
-	if ( !(input_port_read(Machine, "DSW1") & (0x08>>n)) ) return;
+	if ( !(input_port_read(machine, "DSW1") & (0x08>>n)) ) return;
 //	if (!This->on) return;
 	switch( offset )
 	{
@@ -90,11 +89,11 @@ static void pc_LPT_w(int n, int offset, int data)
     }
 }
 
-static int pc_LPT_r(int n, int offset)
+static int pc_LPT_r(running_machine *machine, int n, int offset)
 {
 	PC_LPT *This=LPT+n;
     int data = 0xff;
-	if ( !(input_port_read(Machine, "DSW1") & (0x08>>n)) ) return data;
+	if ( !(input_port_read(machine, "DSW1") & (0x08>>n)) ) return data;
 //	if (!This->on) return data;
 	switch( offset )
 	{
@@ -150,12 +149,12 @@ void pc_lpt_handshake_in(int nr, int data, int mask)
 	This->status=neu;
 }
 
-READ8_HANDLER ( pc_parallelport0_r) { return pc_LPT_r(0, offset); }
-READ8_HANDLER ( pc_parallelport1_r) { return pc_LPT_r(1, offset); }
-READ8_HANDLER ( pc_parallelport2_r) { return pc_LPT_r(2, offset); }
-WRITE8_HANDLER ( pc_parallelport0_w ) { pc_LPT_w(0,offset,data); }
-WRITE8_HANDLER ( pc_parallelport1_w ) { pc_LPT_w(1,offset,data); }
-WRITE8_HANDLER ( pc_parallelport2_w ) { pc_LPT_w(2,offset,data); }
+READ8_HANDLER ( pc_parallelport0_r) { return pc_LPT_r(machine, 0, offset); }
+READ8_HANDLER ( pc_parallelport1_r) { return pc_LPT_r(machine, 1, offset); }
+READ8_HANDLER ( pc_parallelport2_r) { return pc_LPT_r(machine, 2, offset); }
+WRITE8_HANDLER ( pc_parallelport0_w ) { pc_LPT_w(machine,0,offset,data); }
+WRITE8_HANDLER ( pc_parallelport1_w ) { pc_LPT_w(machine,1,offset,data); }
+WRITE8_HANDLER ( pc_parallelport2_w ) { pc_LPT_w(machine,2,offset,data); }
 
 READ16_HANDLER ( pc16le_parallelport0_r ) { return read16le_with_read8_handler(pc_parallelport0_r, machine, offset, mem_mask); }
 READ16_HANDLER ( pc16le_parallelport1_r ) { return read16le_with_read8_handler(pc_parallelport1_r, machine, offset, mem_mask); }

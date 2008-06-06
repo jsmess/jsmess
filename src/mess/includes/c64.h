@@ -47,7 +47,7 @@ MACHINE_START( c64 );
 INTERRUPT_GEN( c64_frame_interrupt );
 INTERRUPT_GEN( c128_frame_interrupt );
 
-void c64_rom_load(void);
+void c64_rom_load(running_machine *machine);
 void c64_rom_recognition (void);
 
 /* private area */

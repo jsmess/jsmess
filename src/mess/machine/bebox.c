@@ -728,17 +728,17 @@ static DMA8237_MEM_WRITE( bebox_dma_write_byte )
 
 
 static DMA8237_CHANNEL_READ( bebox_dma8237_fdc_dack_r ) {
-	return pc_fdc_dack_r();
+	return pc_fdc_dack_r(device->machine);
 }
 
 
 static DMA8237_CHANNEL_WRITE( bebox_dma8237_fdc_dack_w ) {
-	pc_fdc_dack_w( data );
+	pc_fdc_dack_w( device->machine, data );
 }
 
 
 static DMA8237_OUT_EOP( bebox_dma8237_out_eop ) {
-	pc_fdc_set_tc_state( state );
+	pc_fdc_set_tc_state( device->machine, state );
 }
 
 
@@ -1084,7 +1084,7 @@ static void bebox_exit(running_machine *machine)
 
 MACHINE_START( bebox )
 {
-	pc_fdc_init(&bebox_fdc_interface);
+	pc_fdc_init(machine, &bebox_fdc_interface);
 	/* SCSI */
 	lsi53c810_init(&scsi53c810_intf);
 	add_exit_callback(machine, bebox_exit);

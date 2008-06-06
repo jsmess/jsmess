@@ -43,7 +43,6 @@
  ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "74145.h"
 
 
@@ -89,9 +88,9 @@ static ttl74145_state ttl74145[MAX_74145];
 
 
 /* Config */
-void ttl74145_config(int which, const ttl74145_interface *intf)
+void ttl74145_config(running_machine *machine, int which, const ttl74145_interface *intf)
 {
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT,
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT,
 		"Can only call ttl74145_config at init time!");
 	assert_always(which < MAX_74145,
 		"'which' exceeds maximum number of configured 74145s!");

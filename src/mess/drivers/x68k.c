@@ -1943,7 +1943,7 @@ static MACHINE_RESET( x68000 )
 	sys.crtc.reg[7] = 552;  // Vertical end
 	sys.crtc.reg[8] = 27;   // Horizontal adjust
 
-	nec765_reset(0);
+	nec765_reset(machine, 0);
 	mfp_init();
 
 	x68k_scanline = video_screen_get_vpos(machine->primary_screen);// = sys.crtc.reg[6];  // Vertical start
@@ -1983,8 +1983,8 @@ static MACHINE_START( x68000 )
 	timer_adjust_periodic(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(1));  // a guess for now
 	sys.mouse.inputtype = 0;
 
-	nec765_init(&fdc_interface,NEC72065,NEC765_RDY_PIN_CONNECTED);
-	nec765_reset(0);
+	nec765_init(machine, &fdc_interface,NEC72065,NEC765_RDY_PIN_CONNECTED);
+	nec765_reset(machine, 0);
 }
 
 static DRIVER_INIT( x68000 )

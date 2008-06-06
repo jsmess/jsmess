@@ -651,7 +651,7 @@ static void thom_centronics_reset( void )
 
 
 
-static void to7_io_reset( void )
+static void to7_io_reset( running_machine *machine )
 {
 	LOG (( "to7_io_reset called\n" ));
 	thom_centronics_reset();
@@ -835,11 +835,11 @@ static UINT8 to7_game_mute;
    This is similar Atari & Amiga mouses.
    Returns: 0 0 0 0 0 0 YB XB YA XA
  */
-static UINT8 to7_get_mouse_signal( void )
+static UINT8 to7_get_mouse_signal( running_machine *machine )
 {
 	UINT8 xa, xb, ya, yb;
-	UINT16 dx = input_port_read(Machine, "mouse_x"); /* x axis */
-	UINT16 dy = input_port_read(Machine, "mouse_y"); /* y axis */
+	UINT16 dx = input_port_read(machine, "mouse_x"); /* x axis */
+	UINT16 dy = input_port_read(machine, "mouse_y"); /* y axis */
 	xa = ((dx + 1) & 3) <= 1;
 	xb = (dx & 3) <= 1;
 	ya = ((dy + 1) & 3) <= 1;
@@ -862,7 +862,7 @@ static READ8_HANDLER ( to7_game_porta_in )
 	if ( input_port_read(machine, "config") & 1 )
 	{
 		/* mouse */
-		data = to7_get_mouse_signal() & 0x0c;             /* XB, YB */
+		data = to7_get_mouse_signal(machine) & 0x0c;             /* XB, YB */
 		data |= input_port_read(machine, "mouse_button") & 3; /* buttons */
 	}
 	else
@@ -903,7 +903,7 @@ static READ8_HANDLER ( to7_game_portb_in )
 	if ( input_port_read(machine, "config") & 1 )
 	{
 		/* mouse */
-		UINT8 mouse =  to7_get_mouse_signal();
+		UINT8 mouse =  to7_get_mouse_signal(machine);
 		data = 0;
 		if ( mouse & 1 )
 			data |= 0x04; /* XA */
@@ -957,7 +957,7 @@ static TIMER_CALLBACK(to7_game_update_cb)
 	if ( input_port_read(machine, "config") & 1 )
 	{
 		/* mouse */
-		UINT8 mouse = to7_get_mouse_signal();
+		UINT8 mouse = to7_get_mouse_signal(machine);
 		pia_set_input_ca1( THOM_PIA_GAME, (mouse & 1) ? 1 : 0 ); /* XA */
 		pia_set_input_ca2( THOM_PIA_GAME, (mouse & 2) ? 1 : 0 ); /* YA */
 	}
@@ -1271,7 +1271,7 @@ MACHINE_RESET ( to7 )
 	mc6846_reset();
 	to7_game_reset();
 	to7_floppy_reset(machine);
-	to7_io_reset();
+	to7_io_reset(machine);
 	to7_modem_reset();
 	to7_midi_reset();
 	to7_rf57932_reset();
@@ -1521,7 +1521,7 @@ MACHINE_RESET( to770 )
 	mc6846_reset();
 	to7_game_reset();
 	to7_floppy_reset(machine);
-	to7_io_reset();
+	to7_io_reset(machine);
 	to7_modem_reset();
 	to7_midi_reset();
 	to7_rf57932_reset();
@@ -1882,7 +1882,7 @@ MACHINE_RESET( mo5 )
 	pia_set_port_a_z_mask( THOM_PIA_SYS, 0x5f );
 	to7_game_reset();
 	to7_floppy_reset(machine);
-	to7_io_reset();
+	to7_io_reset(machine);
 	to7_modem_reset();
 	to7_midi_reset();
 	to7_rf57932_reset();
@@ -2332,7 +2332,7 @@ static emu_timer* to9_kbd_timer;
 
 
 /* quick keyboard scan */
-static int to9_kbd_ktest ( void )
+static int to9_kbd_ktest ( running_machine *machine )
 {
 	int line, bit;
 	UINT8 port;
@@ -2341,7 +2341,7 @@ static int to9_kbd_ktest ( void )
 	for ( line = 0; line < 10; line++ )
 	{
 		sprintf(tag, "keyboard_%d", line);
-		port = input_port_read(Machine, tag);
+		port = input_port_read(machine, tag);
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -2357,7 +2357,7 @@ static int to9_kbd_ktest ( void )
 
 
 
-static void to9_kbd_update_irq ( void )
+static void to9_kbd_update_irq ( running_machine *machine )
 {
 	if ( (to9_kbd_intr & 4) && (to9_kbd_status & ACIA_6850_RDRF) )
 		to9_kbd_status |= ACIA_6850_irq; /* byte received interrupt */
@@ -2368,7 +2368,7 @@ static void to9_kbd_update_irq ( void )
 	if ( (to9_kbd_intr & 3) == 1 && (to9_kbd_status & ACIA_6850_TDRE) )
 		to9_kbd_status |= ACIA_6850_irq; /* ready to transmit interrupt */
 
-	thom_irq_3( Machine, to9_kbd_status & ACIA_6850_irq );
+	thom_irq_3( machine, to9_kbd_status & ACIA_6850_irq );
 }
 
 
@@ -2407,7 +2407,7 @@ READ8_HANDLER ( to9_kbd_r )
 			to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
 		to9_kbd_overrun = 0;
 		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to9_kbd_in ));
-		to9_kbd_update_irq();
+		to9_kbd_update_irq(machine);
 		return to9_kbd_in;
 
 	default:
@@ -2451,15 +2451,15 @@ WRITE8_HANDLER ( to9_kbd_w )
 				  data, to9_kbd_parity, to9_kbd_intr >> 2,
 				  (to9_kbd_intr & 3) ? 1 : 0 ));
 		}
-		to9_kbd_update_irq();
+		to9_kbd_update_irq(machine);
 		break;
 
 	case 1: /* output data */
 		to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_TDRE);
-		to9_kbd_update_irq();
+		to9_kbd_update_irq(machine);
 		/* TODO: 1 ms delay here ? */
 		to9_kbd_status |= ACIA_6850_TDRE; /* data transmit ready again */
-		to9_kbd_update_irq();
+		to9_kbd_update_irq(machine);
 
 		switch ( data )
 		{
@@ -2500,7 +2500,7 @@ WRITE8_HANDLER ( to9_kbd_w )
    note: parity is not used as a checksum but to actually transmit a 9-th bit
    of information!
 */
-static void to9_kbd_send ( UINT8 data, int parity )
+static void to9_kbd_send ( running_machine *machine, UINT8 data, int parity )
 {
 	if ( to9_kbd_status & ACIA_6850_RDRF )
 	{
@@ -2519,7 +2519,7 @@ static void to9_kbd_send ( UINT8 data, int parity )
 			to9_kbd_status |= ACIA_6850_PE;  /* parity error */
 		LOG_KBD(( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", attotime_to_double(timer_get_time()), data, parity, to9_kbd_status ));
 	}
-	to9_kbd_update_irq();
+	to9_kbd_update_irq(machine);
 }
 
 
@@ -2661,14 +2661,14 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 		{
 
 		case 0: /* key */
-			to9_kbd_send( to9_kbd_get_key(), 0 );
+			to9_kbd_send( machine, to9_kbd_get_key(), 0 );
 			break;
 
 		case 1: /* x axis */
 		{
 			int newx = input_port_read(machine, "mouse_x");
 			UINT8 data = ( (newx - to9_mouse_x) & 0xf ) - 8;
-			to9_kbd_send( data, 1 );
+			to9_kbd_send( machine, data, 1 );
 			to9_mouse_x = newx;
 			break;
 		}
@@ -2677,7 +2677,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 		{
 			int newy = input_port_read(machine, "mouse_y");
 			UINT8 data = ( (newy - to9_mouse_y) & 0xf ) - 8;
-			to9_kbd_send( data, 1 );
+			to9_kbd_send( machine, data, 1 );
 			to9_mouse_y = newy;
 			break;
 		}
@@ -2688,7 +2688,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 			UINT8 data = 0;
 			if ( b & 1 ) data |= 1;
 			if ( b & 2 ) data |= 4;
-			to9_kbd_send( data, 1 );
+			to9_kbd_send( machine, data, 1 );
 			break;
 		}
 
@@ -2702,14 +2702,14 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 		int key = to9_kbd_get_key();
 		/* keyboard mode: send a byte only if a key is down */
 		if ( key )
-			to9_kbd_send( key, 0 );
+			to9_kbd_send( machine, key, 0 );
 		timer_adjust_oneshot(to9_kbd_timer, TO9_KBD_POLL_PERIOD, 0);
 	}
 }
 
 
 
-static void to9_kbd_reset ( void )
+static void to9_kbd_reset ( running_machine *machine )
 {
 	LOG(( "to9_kbd_reset called\n" ));
 	to9_kbd_overrun = 0;  /* no byte lost */
@@ -2722,7 +2722,7 @@ static void to9_kbd_reset ( void )
 	thom_set_caps_led( ! to9_kbd_caps );
 	to9_kbd_key_count = 0;
 	to9_kbd_last_key = 0xff;
-	to9_kbd_update_irq();
+	to9_kbd_update_irq(machine);
 	timer_adjust_oneshot(to9_kbd_timer, TO9_KBD_POLL_PERIOD, 0);
 }
 
@@ -2754,7 +2754,7 @@ static void to9_kbd_init ( void )
 
 
 
-static void to9_update_centronics ( void )
+static void to9_update_centronics ( running_machine *machine )
 {
 	UINT8 a = pia_get_output_a( THOM_PIA_SYS );
 	UINT8 b = pia_get_output_b( THOM_PIA_SYS );
@@ -2771,7 +2771,7 @@ static void to9_update_centronics ( void )
 
 static READ8_HANDLER ( to9_sys_porta_in )
 {
-	UINT8 ktest = to9_kbd_ktest();
+	UINT8 ktest = to9_kbd_ktest(machine);
 
 	LOG_KBD(( "to9_sys_porta_in: ktest=%i\n", ktest ));
 
@@ -2782,14 +2782,14 @@ static READ8_HANDLER ( to9_sys_porta_in )
 
 static WRITE8_HANDLER ( to9_sys_porta_out )
 {
-	to9_update_centronics(); /* bits 1-7: printer */
+	to9_update_centronics(machine); /* bits 1-7: printer */
 }
 
 
 
 static WRITE8_HANDLER ( to9_sys_portb_out )
 {
-	to9_update_centronics(); /* bits 0-1: printer */
+	to9_update_centronics(machine); /* bits 0-1: printer */
 	to9_update_ram_bank(machine);
 
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
@@ -2848,7 +2848,7 @@ MACHINE_RESET ( to9 )
 	mc6846_reset();
 	to7_game_reset();
 	to9_floppy_reset(machine);
-	to9_kbd_reset();
+	to9_kbd_reset(machine);
 	thom_centronics_reset();
 	to7_modem_reset();
 	to7_midi_reset();
@@ -2975,19 +2975,19 @@ static emu_timer* to8_kbd_signal;  /* signal from CPU */
 
 
 /* quick keyboard scan */
-static int to8_kbd_ktest ( void )
+static int to8_kbd_ktest ( running_machine *machine )
 {
 	int line, bit;
 	UINT8 port;
 	char tag[12];
 
-	if ( input_port_read(Machine, "config") & 2 )
+	if ( input_port_read(machine, "config") & 2 )
 		return 0; /* disabled */
 
 	for ( line = 0; line < 10; line++ )
 	{
 		sprintf(tag, "keyboard_%d", line);
-		port = input_port_read(Machine, tag);
+		port = input_port_read(machine, tag);
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -3005,21 +3005,21 @@ static int to8_kbd_ktest ( void )
 
 
 /* keyboard scan & return keycode (or -1) */
-static int to8_kbd_get_key( void )
+static int to8_kbd_get_key( running_machine *machine )
 {
-	int control = (input_port_read(Machine, "keyboard_7") & 1) ? 0 : 0x100;
-	int shift   = (input_port_read(Machine, "keyboard_9") & 1) ? 0 : 0x080;
+	int control = (input_port_read(machine, "keyboard_7") & 1) ? 0 : 0x100;
+	int shift   = (input_port_read(machine, "keyboard_9") & 1) ? 0 : 0x080;
 	int key = -1, line, bit;
 	UINT8 port;
 	char tag[12];
 	
-	if ( input_port_read(Machine, "config") & 2 )
+	if ( input_port_read(machine, "config") & 2 )
 		return -1; /* disabled */
 
 	for ( line = 0; line < 10; line++ )
 	{
 		sprintf(tag, "keyboard_%d", line);
-		port = input_port_read(Machine, tag);
+		port = input_port_read(machine, tag);
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -3078,7 +3078,7 @@ static int to8_kbd_get_key( void )
 */
 
 /* keyboard automaton */
-static void to8_kbd_timer_func(void)
+static void to8_kbd_timer_func(running_machine *machine)
 {
 	attotime d;
 
@@ -3087,13 +3087,13 @@ static void to8_kbd_timer_func(void)
 	if( ! to8_kbd_step )
 	{
 		/* key polling */
-		int k = to8_kbd_get_key();
+		int k = to8_kbd_get_key(machine);
 		/* if not in transfer, send pulse from time to time
 		   (helps avoiding CPU lock)
 		*/
 		if ( ! to8_kbd_ack )
-			mc6846_set_input_cp1( 0 );
-		mc6846_set_input_cp1( 1 );
+			mc6846_set_input_cp1( machine, 0 );
+		mc6846_set_input_cp1( machine, 1 );
 
 		if ( k == -1 )
 			d = TO8_KBD_POLL_PERIOD;
@@ -3112,27 +3112,27 @@ static void to8_kbd_timer_func(void)
 		to8_kbd_last_key = 0xff;
 		to8_kbd_key_count = 0;
 		to8_kbd_step = 0;
-		mc6846_set_input_cp1( 1 );
+		mc6846_set_input_cp1( machine, 1 );
 		d = TO8_KBD_POLL_PERIOD;
 	}
 	else if ( to8_kbd_step == 1 )
 	{
 		/* schedule timeout waiting for ack to go down */
-		mc6846_set_input_cp1( 0 );
+		mc6846_set_input_cp1( machine, 0 );
 		to8_kbd_step = 255;
 		d = TO8_KBD_TIMEOUT;
 	}
 	else if ( to8_kbd_step == 117 )
 	{
 		/* schedule timeout  waiting for ack to go up */
-		mc6846_set_input_cp1( 0 );
+		mc6846_set_input_cp1( machine, 0 );
 		to8_kbd_step = 255;
 		d = TO8_KBD_TIMEOUT;
 	}
 	else if ( to8_kbd_step & 1 )
 	{
 		/* send silence between bits */
-		mc6846_set_input_cp1( 0 );
+		mc6846_set_input_cp1( machine, 0 );
 		d = ATTOTIME_IN_USEC( 100 );
 		to8_kbd_step++;
 	}
@@ -3141,7 +3141,7 @@ static void to8_kbd_timer_func(void)
 		/* send bit */
 		int bpos = 8 - ( (to8_kbd_step - 100) / 2);
 		int bit = (to8_kbd_data >> bpos) & 1;
-		mc6846_set_input_cp1( 1 );
+		mc6846_set_input_cp1( machine, 1 );
 		d = ATTOTIME_IN_USEC( bit ? 56 : 38 );
 		to8_kbd_step++;
 	}
@@ -3152,7 +3152,7 @@ static void to8_kbd_timer_func(void)
 
 static TIMER_CALLBACK(to8_kbd_timer_cb)
 {
-	to8_kbd_timer_func();
+	to8_kbd_timer_func(machine);
 }
 
 
@@ -3229,7 +3229,7 @@ static void to8_kbd_set_ack ( int data )
 
 
 
-static void to8_kbd_reset ( void )
+static void to8_kbd_reset ( running_machine *machine )
 {
 	to8_kbd_last_key = 0xff;
 	to8_kbd_key_count = 0;
@@ -3238,7 +3238,7 @@ static void to8_kbd_reset ( void )
 	to8_kbd_ack = 1;
 	to8_kbd_caps = 1;
 	thom_set_caps_led( ! to8_kbd_caps );
-	to8_kbd_timer_func();
+	to8_kbd_timer_func(machine);
 }
 
 
@@ -3699,7 +3699,7 @@ WRITE8_HANDLER ( to8_vreg_w )
 
 static READ8_HANDLER ( to8_sys_porta_in )
 {
-	int ktest = to8_kbd_ktest ();
+	int ktest = to8_kbd_ktest (machine);
 
 	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), ktest ));
 
@@ -3710,7 +3710,7 @@ static READ8_HANDLER ( to8_sys_porta_in )
 
 static WRITE8_HANDLER ( to8_sys_portb_out )
 {
-	to9_update_centronics(); /* bits 0-1: printer */
+	to9_update_centronics(machine); /* bits 0-1: printer */
 	to8_update_ram_bank(machine);
 
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
@@ -3808,7 +3808,7 @@ MACHINE_RESET ( to8 )
 	mc6846_reset();
 	to7_game_reset();
 	to8_floppy_reset(machine);
-	to8_kbd_reset();
+	to8_kbd_reset(machine);
 	thom_centronics_reset();
 	to7_modem_reset();
 	to7_midi_reset();
@@ -3975,7 +3975,7 @@ MACHINE_RESET ( to9p )
 	mc6846_reset();
 	to7_game_reset();
 	to8_floppy_reset(machine);
-	to9_kbd_reset();
+	to9_kbd_reset(machine);
 	thom_centronics_reset();
 	to7_modem_reset();
 	to7_midi_reset();
@@ -4273,7 +4273,7 @@ static TIMER_CALLBACK(mo6_game_update_cb)
 	/* unlike the TO8, CB1 & CB2 are not connected to buttons */
 	if ( input_port_read(machine, "config") & 1 )
 	{
-		UINT8 mouse = to7_get_mouse_signal();
+		UINT8 mouse = to7_get_mouse_signal(machine);
 		pia_set_input_ca1( THOM_PIA_GAME, mouse & 1 ); /* XA */
 		pia_set_input_ca2( THOM_PIA_GAME, mouse & 2 ); /* YA */
 	}

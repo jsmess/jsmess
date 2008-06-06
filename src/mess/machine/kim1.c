@@ -8,7 +8,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/kim1.h"
 #include "sound/dac.h"
@@ -679,10 +678,9 @@ INTERRUPT_GEN( kim1_interrupt )
 	}
 }
 
-INLINE int m6530_r(int chip, int offset)
+INLINE int m6530_r(running_machine *machine, int chip, int offset)
 {
 	int data = 0xff;
-	running_machine *machine = Machine;
 
 	switch (offset)
 	{
@@ -785,13 +783,13 @@ INLINE int m6530_r(int chip, int offset)
 	return data;
 }
 
- READ8_HANDLER ( m6530_003_r )
+READ8_HANDLER ( m6530_003_r )
 {
-	return m6530_r(0, offset);
+	return m6530_r(machine, 0, offset);
 }
- READ8_HANDLER ( m6530_002_r )
+READ8_HANDLER ( m6530_002_r )
 {
-	return m6530_r(1, offset);
+	return m6530_r(machine, 1, offset);
 }
 
 static void m6530_w(int chip, int offset, int data)

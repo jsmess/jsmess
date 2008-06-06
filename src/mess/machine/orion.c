@@ -202,7 +202,7 @@ WRITE8_HANDLER ( orion128_memory_page_w )
 
 MACHINE_RESET ( orion128 ) 
 {		
-	wd17xx_reset();
+	wd17xx_reset(machine);
 	wd17xx_set_density (DEN_FM_HI);	
 	orion_keyboard_mask = 0;
 	orion128_video_page = 0;
@@ -419,7 +419,7 @@ MACHINE_RESET ( orionz80 )
 	memory_set_bankptr(3, mess_ram + 0xf000);		
 	memory_set_bankptr(5, memory_region(REGION_CPU1) + 0xf800);		
 	
-	wd17xx_reset();
+	wd17xx_reset(machine);
 	orion_keyboard_mask = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
@@ -576,7 +576,7 @@ WRITE8_HANDLER ( orionpro_memory_page_w )
 MACHINE_RESET ( orionpro ) 
 {	
 	
-	wd17xx_reset();
+	wd17xx_reset(machine);
 
 	orion_keyboard_mask = 0;
 	orion128_video_page = 0;

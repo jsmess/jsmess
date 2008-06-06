@@ -622,7 +622,7 @@ static void c65_bankswitch_interface(int value)
 	old=value;
 }
 
-void c65_bankswitch (void)
+void c65_bankswitch (running_machine *machine)
 {
 	static int old = -1;
 	int data, loram, hiram, charen;
@@ -683,8 +683,8 @@ void c65_bankswitch (void)
 			memory_set_bankptr (8, c64_colorram+0x400);
 			memory_set_bankptr (9, c64_colorram+0x400);
 		}
-		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, rh8);
-		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, wh9);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, rh8);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, wh9);
 	}
 	else
 	{
@@ -707,8 +707,8 @@ void c65_bankswitch (void)
 			memory_set_bankptr (8, c64_memory + 0xdc00);
 		}
 	}
-	memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, rh4);
-	memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, wh5);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, rh4);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, wh5);
 
 	if (!c64_game && c64_exrom)
 	{
@@ -823,8 +823,8 @@ MACHINE_START( c65 )
 	c64mode = 0;
 
 	c64_rom_recognition ();
-	c64_rom_load();
+	c64_rom_load(machine);
 
 	c65_bankswitch_interface(0xff);
-	c65_bankswitch ();
+	c65_bankswitch (machine);
 }
