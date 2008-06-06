@@ -37,9 +37,6 @@ static INTERRUPT_GEN( bbcbc_interrupt )
     TMS9928A_interrupt(machine);
 }
 
-static INPUT_PORTS_START( bbcbc )
-INPUT_PORTS_END
-
 static const TMS9928a_interface tms9129_interface =
 {
 	TMS9929A,
@@ -103,5 +100,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*   YEAR  NAME  PARENT  COMPAT  MACHINE INPUT  INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
-CONS(1985, bbcbc,     0, 0,      bbcbc,  bbcbc, 0,    bbcbc,  "BBC",   "Bridge Companion", GAME_NOT_WORKING )
+CONS(1985, bbcbc,     0, 0,      bbcbc,  0, 	0,    bbcbc,  "BBC",   "Bridge Companion", GAME_NOT_WORKING )
 

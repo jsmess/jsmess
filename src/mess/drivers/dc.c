@@ -111,9 +111,6 @@ static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( dc )
-INPUT_PORTS_END
-
 static MACHINE_RESET( dc_console )
 {
 	MACHINE_RESET_CALL(dc);
@@ -195,8 +192,8 @@ SYSTEM_CONFIG_START(dc)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
-CONS( 1999, dc, 	dcjp, 	0, 	dc, 	dc, 	0, 	dc, 	"Sega", "Dreamcast (US NTSC)", GAME_NOT_WORKING )
-CONS( 1998, dcjp, 	0, 	0, 	dc, 	dc, 	0, 	dc, 	"Sega", "Dreamcast (Japan NTSC)", GAME_NOT_WORKING )
-CONS( 1999, dceu, 	dcjp, 	0, 	dc, 	dc, 	0, 	dc, 	"Sega", "Dreamcast (European PAL)", GAME_NOT_WORKING )
-CONS( 1998, dcdev, 	dcjp, 	0, 	dc, 	dc, 	0, 	dc, 	"Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
+CONS( 1999, dc, 	dcjp, 	0, 		dc, 	0, 		0, 	dc, 	"Sega", "Dreamcast (US NTSC)", GAME_NOT_WORKING )
+CONS( 1998, dcjp, 	0, 		0, 		dc, 	0, 		0, 	dc, 	"Sega", "Dreamcast (Japan NTSC)", GAME_NOT_WORKING )
+CONS( 1999, dceu, 	dcjp, 	0, 		dc, 	0, 		0, 	dc, 	"Sega", "Dreamcast (European PAL)", GAME_NOT_WORKING )
+CONS( 1998, dcdev, 	dcjp, 	0, 		dc, 	0, 		0, 	dc, 	"Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
 
