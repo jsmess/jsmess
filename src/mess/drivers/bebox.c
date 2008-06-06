@@ -80,29 +80,12 @@ static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
 ADDRESS_MAP_END
 
 
-static const ppc_config bebox_ppc_config =
-{
-	PPC_MODEL_603,	/* 603 "Wart"                   */
-	0x10,		/* Multiplier 1.0, Bus = 66MHz, Core = 66MHz    */
-	BUS_FREQUENCY_66MHZ
-};
-
-static const ppc_config bebox2_ppc_config =
-{
-	PPC_MODEL_603E,	/* 603E "Stretch", version 1.3          */
-	0x19,		/* Multiplier 2.0, Bus = 66MHz, Core = 133MHz   */
-	BUS_FREQUENCY_66MHZ
-};
-
-
 static MACHINE_DRIVER_START( bebox )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("ppc1", PPC603, 66000000)	/* 66 MHz */
-	MDRV_CPU_CONFIG(bebox_ppc_config)
 	MDRV_CPU_PROGRAM_MAP(bebox_mem, 0)
 
 	MDRV_CPU_ADD_TAG("ppc2", PPC603, 66000000)	/* 66 MHz */
-	MDRV_CPU_CONFIG(bebox_ppc_config)
 	MDRV_CPU_PROGRAM_MAP(bebox_mem, 0)
 
 	MDRV_INTERLEAVE(1)
@@ -154,11 +137,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bebox2 )
 	MDRV_IMPORT_FROM( bebox )
-	MDRV_CPU_REPLACE("ppc1", PPC603, 133000000)	/* 133 MHz */
-	MDRV_CPU_CONFIG(bebox2_ppc_config)
-
-	MDRV_CPU_REPLACE("ppc2", PPC603, 133000000)	/* 133 MHz */
-	MDRV_CPU_CONFIG(bebox2_ppc_config)
+	MDRV_CPU_REPLACE("ppc1", PPC603E, 133000000)	/* 133 MHz */
+	MDRV_CPU_REPLACE("ppc2", PPC603E, 133000000)	/* 133 MHz */
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( bebox )

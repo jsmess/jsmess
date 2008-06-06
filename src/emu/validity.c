@@ -28,6 +28,19 @@
 
 
 /***************************************************************************
+    COMPILE-TIME VALIDATION
+***************************************************************************/
+
+/* if the following lines error during compile, your PTR64 switch is set incorrectly in the makefile */
+#ifdef PTR64
+UINT8 your_ptr64_flag_is_wrong[(int)(sizeof(void *) - 7)];
+#else
+UINT8 your_ptr64_flag_is_wrong[(int)(5 - sizeof(void *))];
+#endif
+
+
+
+/***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
@@ -1211,7 +1224,10 @@ static int validate_inputs(int drivnum, const machine_config *config)
 	/* allocate the input ports */
 	portlist = input_port_config_alloc(driver->ipt, errorbuf, sizeof(errorbuf));
 	if (errorbuf[0] != 0)
+	{
 		mame_printf_error("%s: %s has input port errors:\n%s\n", driver->source_file, driver->name, errorbuf);
+		error = TRUE;
+	}
 
 	/* check for duplicate tags */
 	for (port = portlist; port != NULL; port = port->next)

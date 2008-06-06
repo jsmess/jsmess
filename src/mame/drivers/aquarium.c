@@ -86,7 +86,7 @@ static MACHINE_RESET( aquarium )
 static READ16_HANDLER( aquarium_coins_r )
 {
 	int data;
-	data = (input_port_read_indexed(machine,2) & 0x7fff);	/* IN1 */
+	data = (input_port_read(machine, "IN1") & 0x7fff);
 	data |= aquarium_snd_ack;
 	aquarium_snd_ack = 0;
 	return data;
@@ -212,8 +212,8 @@ static INPUT_PORTS_START( aquarium )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x0400, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x0800, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)

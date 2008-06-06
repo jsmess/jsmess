@@ -4437,6 +4437,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ginkun )	/* (c) 1995 Tecmo */
 	DRIVER( deroon )	/* (c) 1996 Tecmo */
 	DRIVER( tkdensho )	/* (c) 1996 Tecmo */
+	DRIVER( tkdensha )	/* (c) 1996 Tecmo */
 
 	/* Konami bitmap games */
 	DRIVER( tutankhm )	/* GX350 (c) 1982 Konami */
@@ -5821,6 +5822,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ddragonb )	/* bootleg */
 	DRIVER( ddragnba )	/* bootleg */
 	DRIVER( ddgn6809 )	/* bootleg */
+	DRIVER( dd6809a )	/* bootleg */
 	DRIVER( spdodgeb )	/* TA-0022 (c) 1987 */
 	DRIVER( nkdodge )	/* TA-0022 (c) 1987 (Japan) */
 	DRIVER( nkdodgeb )	/* TA-0022 (c) 1987 (Japan) */
@@ -6288,6 +6290,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rdft2a )	/* (c) 1997 Seibu Kaihatsu (Metrotainment license) */
 	DRIVER( rdft2a2 )	/* (c) 1997 Seibu Kaihatsu (Dream Island license) */
 	DRIVER( rdft2j )	/* (c) 1997 Seibu Kaihatsu */
+	DRIVER( rdft2t )	/* (c) 1997 Seibu Kaihatsu */
 	DRIVER( rdft2us )	/* (c) 1997 Seibu Kaihatsu (Fabtek license) */
 	DRIVER( rdft22kc )	/* (c) 2000 Seibu Kaihatsu */
 
@@ -6394,6 +6397,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rodlndjb )	/* bootleg */
 	DRIVER( avspirit )	/* (c) 1991 */
 	DRIVER( phantasm )	/* (c) 1991 (Japan) */
+	DRIVER( monkelf )	/* bootleg */
 	DRIVER( edf )		/* (c) 1991 */
 	DRIVER( edfu )		/* (c) 1991 */
 	DRIVER( 64street )	/* (c) 1991 */
@@ -7132,6 +7136,7 @@ Other Sun games
 	DRIVER( sprtmtch )	/* "31" (c) 1989 Dynax + Fabtek license */
 	DRIVER( maya )		/* (c) 1994 Promat */
 	DRIVER( inca )		/* (c) 199? ???? */
+	DRIVER( blktouch )	/* (c) Yang Gi Co Ltd. */
 	DRIVER( mcnpshnt )	/* "33" Mahjong Campus Hunting 1990 Dynax */
 	DRIVER( 7jigen )	/* "37" 7jigen no Youseitachi 1990 Dynax */
 	DRIVER( neruton )	/* "45" Neruton Haikujiradan 1990 Dynax */
@@ -7479,6 +7484,8 @@ Other Sun games
 	DRIVER( crysbios )
 	DRIVER( crysking )	/* 2001 Brezzasoft. Crystal of the kings */
 	DRIVER( evosocc )	/* 2001 Evoga. Evolution Soccer */
+	DRIVER( topbladv )
+	DRIVER( officeye )
 
 	/* Bell Fruit Cobra Hardware */
 	DRIVER( inquiztr )	/* 1989 BFM */
@@ -7911,8 +7918,8 @@ Other Sun games
 	DRIVER( gotya )		/* (c) 1981 Game-A-Tron */
 	DRIVER( sbugger )	/* (c) 1981 Game-A-Tron */
 	DRIVER( sbuggera )	/* (c) 1981 Game-A-Tron */
-	DRIVER( gatcards )	/* (c) 1983 Game-A-Tron */
-	DRIVER( gatslots )	/* (c) 1983 Game-A-Tron */
+	DRIVER( poker41 )	/* (c) 1983 Game-A-Tron */
+	DRIVER( pulltabs )	/* (c) 1983 Game-A-Tron */
 
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */
@@ -8040,6 +8047,7 @@ Other Sun games
 	DRIVER( good )		/* (c) 1983 Kiwako */
 	DRIVER( filetto )
 	DRIVER( quizo )		/* (c) 1985 Seoul Coin Corp. */
+	DRIVER( quizoa )	/* (c) 1985 Seoul Coin Corp. */
 	DRIVER( gstream )	/* (c) 2002, Oriental Soft Japan */
 	DRIVER( miniboy7 )	/* (c) 1983, Bonanza Enterprises */
 	DRIVER( 39in1 )		/* MAME based bootleg */
@@ -8077,6 +8085,26 @@ Other Sun games
 	DRIVER( paranoia )
 	DRIVER( vcombat )   /* (c) 1993 VR8 Inc. */
 	DRIVER( shadfgtr )  /* (c) 1989 Sega? */
+	DRIVER( blackt96 )
+
+	/* H8/3048 italian gambling games */
+	DRIVER( laperla )	/* (c) 2002 Nazionale Elettronica */
+	DRIVER( laperlag )	/* (c) 2001 Nazionale Elettronica */
+	DRIVER( capunc )	/* (c) 2000 Nazionale Elettronica */
+	DRIVER( capcor )	/* (c) 2001 Nazionale Elettronica */
+	DRIVER( euro2k2 )	/* (c) 2001 Nazionale Elettronica */
+	DRIVER( euro2k2a )	/* (c) 2001 Nazionale Elettronica */
+
+	/* H8/3337 italian gambling games */
+	DRIVER( laser2k1 )	/* 200? unknown */
+	DRIVER( mdrink )	/* 200? unknown */
+	DRIVER( ntcash )	/* 200? unknown */
+	DRIVER( wizard )	/* 200? unknown */
+	DRIVER( te0144 )	/* 200? unknown */
+	DRIVER( cmagica )	/* 200? unknown */
+	DRIVER( millsun )	/* 200? unknown */
+	DRIVER( sspac2k1 )	/* 200? unknown */
+	DRIVER( elvis )		/* 200? unknown */
 
 	/* Astro Corp. */
 	DRIVER( showhand )

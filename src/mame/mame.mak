@@ -168,10 +168,13 @@ CPUS += H83002
 CPUS += V810
 CPUS += M37702
 CPUS += M37710
-CPUS += PPC403
+CPUS += PPC403GA
+CPUS += PPC403GCX
 CPUS += PPC601
 CPUS += PPC602
 CPUS += PPC603
+CPUS += PPC603E
+CPUS += PPC603R
 CPUS += MPC8240
 CPUS += SE3208
 CPUS += MC68HC11
@@ -730,6 +733,7 @@ $(MAMEOBJ)/gameplan.a: \
 $(MAMEOBJ)/gametron.a: \
 	$(DRIVERS)/gotya.o $(AUDIO)/gotya.o $(VIDEO)/gotya.o \
 	$(DRIVERS)/sbugger.o $(VIDEO)/sbugger.o \
+	$(DRIVERS)/gatron.o \
 
 $(MAMEOBJ)/gottlieb.a: \
 	$(DRIVERS)/exterm.o $(VIDEO)/exterm.o \
@@ -895,7 +899,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/timeplt.o $(AUDIO)/timeplt.o $(VIDEO)/timeplt.o \
 	$(DRIVERS)/tmnt.o $(VIDEO)/tmnt.o \
 	$(DRIVERS)/tp84.o $(VIDEO)/tp84.o \
-	$(DRIVERS)/trackfld.o $(MACHINE)/konami.o $(AUDIO)/trackfld.o $(VIDEO)/trackfld.o \
+	$(DRIVERS)/trackfld.o $(MACHINE)/konami1.o $(AUDIO)/trackfld.o $(VIDEO)/trackfld.o \
 	$(DRIVERS)/tutankhm.o $(VIDEO)/tutankhm.o \
 	$(DRIVERS)/twin16.o $(VIDEO)/twin16.o \
 	$(DRIVERS)/ultrsprt.o \
@@ -1407,7 +1411,7 @@ $(MAMEOBJ)/tehkan.a: \
 	$(DRIVERS)/tbowl.o $(VIDEO)/tbowl.o \
 	$(DRIVERS)/tecmo.o $(VIDEO)/tecmo.o \
 	$(DRIVERS)/tecmo16.o $(VIDEO)/tecmo16.o \
-	$(DRIVERS)/tecmosys.o \
+	$(DRIVERS)/tecmosys.o $(MACHINE)/tecmosys.o \
 	$(DRIVERS)/tehkanwc.o $(VIDEO)/tehkanwc.o \
 	$(DRIVERS)/wc90.o $(VIDEO)/wc90.o \
 	$(DRIVERS)/wc90b.o $(VIDEO)/wc90b.o \
@@ -1510,6 +1514,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/attckufo.o $(AUDIO)/attckufo.o $(VIDEO)/attckufo.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
 	$(DRIVERS)/beaminv.o \
+	$(DRIVERS)/blackt96.o \
 	$(DRIVERS)/bmcbowl.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
@@ -1543,7 +1548,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/gamecstl.o \
-	$(DRIVERS)/gatron.o \
 	$(DRIVERS)/gtipoker.o \
 	$(DRIVERS)/go2000.o \
 	$(DRIVERS)/good.o \
@@ -1557,6 +1561,8 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/imolagp.o \
 	$(DRIVERS)/intrscti.o \
 	$(DRIVERS)/istellar.o \
+	$(DRIVERS)/itgambl2.o \
+	$(DRIVERS)/itgamble.o \
 	$(DRIVERS)/jackpool.o \
 	$(DRIVERS)/jongkyo.o \
 	$(DRIVERS)/kingpin.o \
@@ -1722,6 +1728,8 @@ $(DRIVERS)/pmpoker.o:	$(LAYOUT)/pmpoker.lh \
 $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
+
+$(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
 
 $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
 

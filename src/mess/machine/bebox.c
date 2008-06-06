@@ -211,10 +211,10 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 		int inputline;
 	} crossproc_map[] =
 	{
-		{ 0x40000000, 0, 1, PPC_INPUT_LINE_SMI },
-		{ 0x20000000, 1, 1, PPC_INPUT_LINE_SMI },
-		{ 0x08000000, 0, 0, PPC_INPUT_LINE_TLBISYNC },
-		{ 0x04000000, 1, 0, PPC_INPUT_LINE_TLBISYNC }
+		{ 0x40000000, 0, 1, 0/*PPC_INPUT_LINE_SMI*/ },
+		{ 0x20000000, 1, 1, 0/*PPC_INPUT_LINE_SMI*/ },
+		{ 0x08000000, 0, 0, 0/*PPC_INPUT_LINE_TLBISYNC*/ },
+		{ 0x04000000, 1, 0, 0/*PPC_INPUT_LINE_TLBISYNC*/ }
 	};
 	int i, line;
 	UINT32 old_crossproc_interrupts = bebox_crossproc_interrupts;
@@ -232,9 +232,11 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 
 			if (LOG_INTERRUPTS)
 			{
+/*
 				logerror("bebox_crossproc_interrupts_w(): CPU #%d %s %s\n",
 					crossproc_map[i].cpunum, line ? "Asserting" : "Clearing",
 					(crossproc_map[i].inputline == PPC_INPUT_LINE_SMI) ? "SMI" : "TLBISYNC");
+					*/
 			}
 
 			cpunum_set_input_line(machine, crossproc_map[i].cpunum, crossproc_map[i].inputline, line);
@@ -947,10 +949,9 @@ static UINT32 scsi53c810_fetch(UINT32 dsp)
 }
 
 
-static void scsi53c810_irq_callback(running_machine *machine)
+static void scsi53c810_irq_callback(running_machine *machine, int value)
 {
-	bebox_set_irq_bit(machine, 21, 1);
-	bebox_set_irq_bit(machine, 21, 0);
+	bebox_set_irq_bit(machine, 21, value);
 }
 
 

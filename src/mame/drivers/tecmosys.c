@@ -1,7 +1,12 @@
 /* Tecmo System
- Driver by Farfetch & David Haywood
+ Driver by Farfetch, David Haywood & Tomasz Slanina
+  Protection simulation by nuapete
 
-can't do anything with this, its protected and expects to read back 68k code :-(
+ ToDo:
+  Dump / Decap MCUs to allow for proper protection emulation.
+  Fix Sound (sound roms should be good, do they need descrambling, or is our sound core bad?
+     some YMZ280B samples sound -terrible-)
+
 
 T.Slanina 20040530 :
  - preliminary gfx decode,
@@ -11,6 +16,15 @@ T.Slanina 20040530 :
  - added hacks to see more gfx (press Z or X)
  - palette (press X in angel eyes to see 'color bar chack'(!))
  - watchdog (?) simulation
+
+ 20080528
+ - Removed ROM patches and debug keypresses
+ - Added protection simulation in machine/tecmosys.c
+ - Fixed inputs
+ - Added watchdog
+
+   To enter test mode, you have to press the test switch before you insert any coins.
+
 */
 
 
@@ -26,30 +40,30 @@ PCB Layout
 
 TECMO SYSTEM BOARD A
 |-------------------------------------------------------------------------|
-|  LM324  UPC452C      16.9MHz        |--------|    |--------|  6264  |
-| TA8205 LM324  YAC513  YMF262 YMZ280B  |TECMO  |    |TECMO  |  6264  |
-|        LM324  M6295  UPC452C          |AA03-8431    |AA02-1927        |
-|                      YAC512          |        |    |        |        |
-|                                        |--------|    |--------|        |
-|        Z80  6264 28MHz 14.31818MHz                  |--------|        |
-|                    16MHz              62256          |TECMO  |        |
-|            TA8030                    62256          |AA02-1927  6264  |
-|                                                      |        |  6264  |
-|J  93C46                              |--------|    |--------|        |
-|A                                      |TECMO  |    |--------|        |
-|M                                      |AA03-8431    |TECMO  |        |
-|M          68000                        |        |    |AA02-1927        |
-|A                                      |--------|    |        |  6264  |
-|                  PAL              6116              |--------|  6264  |
-|                                    6116              |--------|        |
-|  |--------|                                          |TECMO  |        |
-|  |TECMO  |                      PAL                |AA02-1927        |
-|  |AA03-8431  62256                                  |        |  6264  |
-|  |        |  62256                                  |--------|  6264  |
-|  |--------|                                |---------|                |
+|  LM324  UPC452C      16.9MHz          |--------|    |--------|    6264  |
+| TA8205 LM324  YAC513 YMF262 YMZ280B   |TECMO   |    |TECMO   |    6264  |
+|        LM324  M6295  UPC452C          |AA03-8431    |AA02-1927          |
+|                      YAC512           |        |    |        |          |
+|                                       |--------|    |--------|          |
+|        Z80  6264 28MHz 14.31818MHz                  |--------|          |
+|                    16MHz             62256          |TECMO   |          |
+|            TA8030                    62256          |AA02-1927    6264  |
+|                                                     |        |    6264  |
+|J  93C46                               |--------|    |--------|          |
+|A                                      |TECMO   |    |--------|          |
+|M                                      |AA03-8431    |TECMO   |          |
+|M          68000                       |        |    |AA02-1927          |
+|A                                      |--------|    |        |    6264  |
+|                  PAL              6116              |--------|    6264  |
+|                                    6116             |--------|          |
+|  |--------|                                         |TECMO   |          |
+|  |TECMO   |                     PAL                 |AA02-1927          |
+|  |AA03-8431  62256                                  |        |    6264  |
+|  |        |  62256                                  |--------|    6264  |
+|  |--------|                                  |---------|                |
 |                                              |TECMO    |                |
 |                                              |AA03-8431|                |
-|                                              |        |                |
+|                                              |         |                |
 |                                              |---------|          424260|
 |                                              62256 62256          424260|
 |-------------------------------------------------------------------------|
@@ -65,24 +79,25 @@ Game Board
 
 TECMO SYSTEM BOARD B2
 |-------------------------------------------------------------------------|
-|    T201_DIP42_MASK.UBB1                                                |
+|    T201_DIP42_MASK.UBB1                                                 |
 | |----|                                              T202_DIP42_MASK.UBC1|
-| |*  |                                                                  |
+| |*   |                                                                  |
 | |----|                                                                  |
-|                                                                        |
-|  T003_2M_EPROM.UZ1                        T101_SOP44.UAH1            |
-|                                                                        |
-|                                            T301_DIP42_MASK.UBD1        |
-|                                                                        |
-|                                                                        |
-|                                                                        |
-|  T401_DIP42_MASK.UYA1      T104_SOP44.UCL1    T001_4M_EPROM.UPAU1    |
+|                                                                         |
+|  T003_2M_EPROM.UZ1                        T101_SOP44.UAH1               |
+|                                                                         |
+|                                            T301_DIP42_MASK.UBD1         |
+|                                                                         |
+|                                                                         |
+|                                                                         |
+|  T401_DIP42_MASK.UYA1      T104_SOP44.UCL1    T001_4M_EPROM.UPAU1       |
 |                              T103_SOP44.UBL1                            |
-|  T501_DIP32_MASK.UAD1      T102_SOP44.UAL1                            |
+|  T501_DIP32_MASK.UAD1      T102_SOP44.UAL1                              |
 |                                                  T002_4M_EPROM.UPAL1    |
 |-------------------------------------------------------------------------|
 Notes:
-      * - Unknown QFP64 microcontroller marked 'TECMO SC432146FU E23D 185 SSAB9540B'
+      * - QFP64 microcontroller marked 'TECMO SC432146FU E23D 185 SSAB9540B'
+          this is a 68HC11A8 with 8k ROM, 512 bytes EEPROM and 256 bytes on-chip RAM.
           Clocks: pin 33 - 8MHz, pin 31: 8MHz, pin 29 - 2MHz
           GND on pins 49, 23, 24, 27
           Power on pins 55, 25
@@ -100,26 +115,22 @@ TECMO AA03-8431 (208pin PQFP) (x4)
 Others:
 93C46 EEPROM (settings are stored to this)
 
-EPROMs:
-t001upau.bin - Main program (even) (27c4001)
-t002upal.bin - Main program (odd)  (27c4001)
+ROMs:
 
-t003uz1.bin - Sound program (27c2001)
+name            type
+t001.upau1      27c040 dip32 eprom
+t002.upal1      27c040 dip32 eprom
+t003.uz1        27c2001 dip32 eprom
 
-Mask ROMs:
-t101uah1.j66 - Graphics (23c16000 SOP)
-t102ual1.j67 |
-t103ubl1.j08 |
-t104ucl1.j68 /
-
-t201ubb1.w61 - Graphics (23c8000)
-t202ubc1.w62 /
-
-t301ubd1.w63 - Graphics (23c8000)
-
-t401uya1.w16 - YMZ280B Samples (23c16000)
-
-t501uad1.w01 - M6295 Samples (23c4001)
+t101.uah1       23c16000 sop44 maskrom
+t102.ual1       23c16000 sop44 maskrom
+t103.ubl1       23c32000 sop44 maskrom
+t104.ucl1       23c16000 sop44 maskrom
+t201.ubb1       23c8000 dip42 maskrom
+t202.ubc1       23c8000 dip42 maskrom
+t301.ubd1       23c8000 dip42 maskrom
+t401.uya1       23c16000 dip42 maskrom
+t501.uad1       23c4001 dip32 maskrom
 
 */
 
@@ -172,12 +183,88 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 
 #include "driver.h"
 #include "machine/eeprom.h"
+#include "tecmosys.h"
 #include "cpu/m68000/m68k.h"
 #include "sound/okim6295.h"
 #include "sound/262intf.h"
 #include "sound/ymz280b.h"
+#include "deprecat.h"
 
-static int gametype;
+static UINT16* tecmosys_spriteram;
+static UINT16* tilemap_paletteram16;
+static UINT16* bg2tilemap_ram;
+static UINT16* bg1tilemap_ram;
+static UINT16* bg0tilemap_ram;
+static UINT16* fgtilemap_ram;
+static UINT16* bg0tilemap_lineram;
+static UINT16* bg1tilemap_lineram;
+static UINT16* bg2tilemap_lineram;
+
+static UINT16* tecmosys_a80000regs;
+static UINT16* tecmosys_b00000regs;
+
+static UINT16* tecmosys_c00000regs;
+static UINT16* tecmosys_c80000regs;
+static UINT16* tecmosys_880000regs;
+static int tecmosys_spritelist;
+
+static bitmap_t *sprite_bitmap;
+static bitmap_t *tmp_tilemap_composebitmap;
+static bitmap_t *tmp_tilemap_renderbitmap;
+
+
+static MACHINE_RESET( deroon );
+
+static tilemap *bg0tilemap;
+static TILE_GET_INFO( get_bg0tile_info )
+{
+
+	SET_TILE_INFO(
+			1,
+			bg0tilemap_ram[2*tile_index+1],
+			(bg0tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((bg0tilemap_ram[2*tile_index]&0xc0)>>6));
+}
+
+static WRITE16_HANDLER( bg0_tilemap_w )
+{
+	COMBINE_DATA(&bg0tilemap_ram[offset]);
+	tilemap_mark_tile_dirty(bg0tilemap,offset/2);
+}
+
+static tilemap *bg1tilemap;
+static TILE_GET_INFO( get_bg1tile_info )
+{
+
+	SET_TILE_INFO(
+			2,
+			bg1tilemap_ram[2*tile_index+1],
+			(bg1tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((bg1tilemap_ram[2*tile_index]&0xc0)>>6));
+}
+
+static WRITE16_HANDLER( bg1_tilemap_w )
+{
+	COMBINE_DATA(&bg1tilemap_ram[offset]);
+	tilemap_mark_tile_dirty(bg1tilemap,offset/2);
+}
+
+static tilemap *bg2tilemap;
+static TILE_GET_INFO( get_bg2tile_info )
+{
+
+	SET_TILE_INFO(
+			3,
+			bg2tilemap_ram[2*tile_index+1],
+			(bg2tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((bg2tilemap_ram[2*tile_index]&0xc0)>>6));
+}
+
+static WRITE16_HANDLER( bg2_tilemap_w )
+{
+	COMBINE_DATA(&bg2tilemap_ram[offset]);
+	tilemap_mark_tile_dirty(bg2tilemap,offset/2);
+}
 
 static tilemap *txt_tilemap;
 static TILE_GET_INFO( get_tile_info )
@@ -185,129 +272,94 @@ static TILE_GET_INFO( get_tile_info )
 
 	SET_TILE_INFO(
 			0,
-			videoram16[2*tile_index+1],
-			videoram16[2*tile_index]&0xf,
-			0);
+			fgtilemap_ram[2*tile_index+1],
+			(fgtilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((fgtilemap_ram[2*tile_index]&0xc0)>>6));
+}
+
+static WRITE16_HANDLER( fg_tilemap_w )
+{
+	COMBINE_DATA(&fgtilemap_ram[offset]);
+	tilemap_mark_tile_dirty(txt_tilemap,offset/2);
 }
 
 
-
-static UINT16* protram;
-
-static UINT8 device[0x10000];
-static UINT32 device_read_ptr = 0;
-static UINT32 device_write_ptr = 0;
-
-enum DEV_STATUS
+// It looks like this needs a synch between z80 and 68k ??? See z80:006A-0091
+static READ16_HANDLER( sound_r )
 {
-	DS_CMD,
-	DS_WRITE,
-	DS_WRITE_ACK,
-	DS_READ,
-	DS_READ_ACK
-};
-
-static UINT8 device_status = DS_CMD;
-
-static READ16_HANDLER(reg_f80000_r)
-{
-	UINT16 dt;
-	// 0 means ok, no errors. -1 means error
-	if (device_status == DS_CMD)
-		return 0;
-
-	if (device_status == DS_WRITE_ACK)
+	if (ACCESSING_BITS_0_7)
 	{
-		// Notice, this is the maximum. I think the device lets 68k just writes 4/5 bytes,
-		// they contain "LUNA". Then, it starts sending to the 68k a bunch of stuff, including
-		// 68k code.
-		if (device_write_ptr == 0x10000)
-		{
-//          logerror("DEVICE write finished\n");
-			device_status = DS_READ_ACK;
-			device_write_ptr = 0;
-			device_read_ptr = 0;
-		}
-		else
-			device_status = DS_WRITE;
-
-		return 0;
-	}
-
-	if (device_status == DS_WRITE)
-	{
-		logerror("UNEXPECTED read DS_WRITE (write ptr %x)\n", device_write_ptr);
-		return 0;
-	}
-
-
-	if (device_status == DS_READ_ACK)
-	{
-//      logerror("Read ACK\n");
-		device_status = DS_READ;
-		return 0;
-	}
-
-	dt = device[device_read_ptr];
-
-//  logerror("DEVICE read %x: %x (at %x)\n", device_read_ptr, dt, cpunum_get_pc(0));
-
-	device_read_ptr++;
-	device_read_ptr &= 0xFFFF;
-
-	device_status = DS_READ_ACK;
-
-	return dt<<8;
-}
-
-// Write 0x13
-// Read something (acknowledge? If -1, write -1 and restart)
-// Write data
-// Read value (!=1 is ok)
-
-static READ16_HANDLER(reg_b80000_r)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		// Bit 7: 0 = ready to write
-		// Bit 6: 0 = ready to read
-		return 0;
+		return soundlatch2_r( machine,  0 );
 	}
 
 	return 0;
 }
 
-static WRITE16_HANDLER(reg_e80000_w)
+static WRITE16_HANDLER( sound_w )
 {
-	// Only LSB
-	data >>= 8;
-
-	if (device_status == DS_CMD)
+	if (ACCESSING_BITS_0_7)
 	{
-		switch (data)
-		{
-		case 0x13:
-//          logerror("DEVICE mode WRITE (cmd 0x13)\n");
-			device_status = DS_WRITE;
-			device_write_ptr = 0;
-			break;
-		}
-
-		return;
+		soundlatch_w(machine,0x00,data & 0xff);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
-
-	// @@@ Should skip the writes while in read mode?
-	if (device_status == DS_READ || device_status == DS_READ_ACK)
-	{
-//      logerror("EEPROM write %x: %x\n", device_write_ptr, data);
-		return;
-	}
-
-	device[device_write_ptr] = (UINT8)data;
-	device_write_ptr++;
-	device_status = DS_WRITE_ACK;
-
 }
+
+/*
+    880000 and 880002 might be video related,
+    see sub @ 68k:002e5e where they are written if the screen is set to inverted.
+    Also, irq code at 22c4 :
+    - 880000 & 00, execute irq code
+    - 880000 & 01, scroll?
+    - 880000 & 03, crash
+*/
+
+
+static WRITE16_HANDLER( unk880000_w )
+{
+	COMBINE_DATA(&tecmosys_880000regs[offset]);
+
+	switch( offset )
+	{
+		case 0x00/2:
+			break; // global x scroll for sprites?
+
+		case 0x02/2:
+			break; // global y scroll for sprites
+
+		case 0x08/2:
+			tecmosys_spritelist = data & 0x3; // which of the 4 spritelists to use (buffering)
+			break;
+
+		case 0x22/2:
+			watchdog_reset( machine );
+			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, activecpu_get_pc() );
+			break;
+
+		default:
+			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, activecpu_get_pc() );
+			break;
+	}
+}
+
+static READ16_HANDLER( unk880000_r )
+{
+	//UINT16 ret = tecmosys_880000regs[offset];
+
+	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, activecpu_get_pc(), tecmosys_880000regs[offset] );
+
+	/* this code allows scroll regs to be updated, but tkdensho at least resets perodically */
+
+	switch( offset )
+	{
+		case 0:
+			if ( video_screen_get_vpos(machine->primary_screen) >= 240) return 0;
+			else return 1;
+
+		default:
+			return 0;
+	}
+}
+
 
 static READ16_HANDLER( eeprom_r )
 {
@@ -317,22 +369,23 @@ static READ16_HANDLER( eeprom_r )
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x210000, 0x210001) AM_READ(SMH_RAM)
-	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x400000, 0x4013ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x500000, 0x5013ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x700000, 0x703fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x880000, 0x880001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x880002, 0x880007) AM_READ(input_port_1_word_r) /* test */
-	AM_RANGE(0x900000, 0x907fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x980000, 0x980fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xb80000, 0xb80001) AM_READ(reg_b80000_r)
-	AM_RANGE(0xd00000, 0xd80003) AM_READ(SMH_RAM)
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM) // work ram
+	AM_RANGE(0x210000, 0x210001) AM_READ(SMH_NOP) // single byte overflow on stack defined as 0x210000
+	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM) // bg0 ram
+	AM_RANGE(0x400000, 0x4013ff) AM_READ(SMH_RAM) // bg1 ram
+	AM_RANGE(0x500000, 0x5013ff) AM_READ(SMH_RAM) // bg2 ram
+	AM_RANGE(0x700000, 0x703fff) AM_READ(SMH_RAM) // fix ram   (all these names from test screen)
+	AM_RANGE(0x800000, 0x80ffff) AM_READ(SMH_RAM) // obj ram
+	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
+	AM_RANGE(0x900000, 0x907fff) AM_READ(SMH_RAM) // obj pal
+	AM_RANGE(0x980000, 0x9807ff) AM_READ(SMH_RAM) // bg pal
+	AM_RANGE(0x980800, 0x980fff) AM_READ(SMH_RAM) // fix pal
+	AM_RANGE(0xb80000, 0xb80001) AM_READ(prot_status_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xd00002, 0xd00003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
-	AM_RANGE(0xf00000, 0xf00001) AM_READ(SMH_RAM)
-	AM_RANGE(0xf80000, 0xf80001) AM_READ(reg_f80000_r)
-
+	AM_RANGE(0xf00000, 0xf00001) AM_READ( sound_r )
+	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( eeprom_w )
@@ -345,47 +398,109 @@ static WRITE16_HANDLER( eeprom_w )
 	}
 }
 
+
+INLINE void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+{
+	palette_set_color_rgb(Machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+}
+
+
+WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
+{
+	COMBINE_DATA(&tilemap_paletteram16[offset]);
+	set_color_555(offset+0x4000, 5, 10, 0, tilemap_paletteram16[offset]);
+}
+
+static WRITE16_HANDLER( bg0_tilemap_lineram_w )
+{
+	COMBINE_DATA(&bg0tilemap_lineram[offset]);
+	if (data!=0x0000) popmessage("non 0 write to bg0 lineram %04x %04x",offset,data);
+}
+
+static WRITE16_HANDLER( bg1_tilemap_lineram_w )
+{
+	COMBINE_DATA(&bg1tilemap_lineram[offset]);
+	if (data!=0x0000) popmessage("non 0 write to bg1 lineram %04x %04x",offset,data);
+}
+
+static WRITE16_HANDLER( bg2_tilemap_lineram_w )
+{
+	COMBINE_DATA(&bg2tilemap_lineram[offset]);
+	if (data!=0x0000) popmessage("non 0 write to bg2 lineram %04x %04x",offset,data);
+}
+
+
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) AM_BASE(&protram)
-	AM_RANGE(0x300000, 0x3013ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x400000, 0x4013ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x500000, 0x5013ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x700000, 0x703fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram16)
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x900000, 0x907fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x980000, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) // work ram
+	AM_RANGE(0x300000, 0x300fff) AM_WRITE(bg0_tilemap_w) AM_BASE(&bg0tilemap_ram) // bg0 ram
+	AM_RANGE(0x301000, 0x3013ff) AM_WRITE(bg0_tilemap_lineram_w) AM_BASE(&bg0tilemap_lineram)// bg0 linescroll? (guess)
 
-	AM_RANGE(0x880000, 0x88002f) AM_WRITE(SMH_RAM )
+	AM_RANGE(0x400000, 0x400fff) AM_WRITE(bg1_tilemap_w) AM_BASE(&bg1tilemap_ram) // bg1 ram
+	AM_RANGE(0x401000, 0x4013ff) AM_WRITE(bg1_tilemap_lineram_w) AM_BASE(&bg1tilemap_lineram)// bg1 linescroll? (guess)
+
+	AM_RANGE(0x500000, 0x500fff) AM_WRITE(bg2_tilemap_w) AM_BASE(&bg2tilemap_ram) // bg2 ram
+	AM_RANGE(0x501000, 0x5013ff) AM_WRITE(bg2_tilemap_lineram_w) AM_BASE(&bg2tilemap_lineram) // bg2 linescroll? (guess)
+
+	AM_RANGE(0x700000, 0x703fff) AM_WRITE(fg_tilemap_w) AM_BASE(&fgtilemap_ram) // fix ram
+	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_RAM) AM_BASE(&tecmosys_spriteram) // obj ram
+	AM_RANGE(0x900000, 0x907fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // AM_WRITE(SMH_RAM) // obj pal
+
+	//AM_RANGE(0x980000, 0x9807ff) AM_WRITE(SMH_RAM) // bg pal
+	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // fix pal
+	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
+	AM_RANGE(0x980000, 0x980fff) AM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&tilemap_paletteram16)
+
+	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w ) AM_BASE(&tecmosys_880000regs)	// 10 byte dta@88000c, 880022=watchdog?
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w	)
-	AM_RANGE(0xa80000, 0xa80005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xb80000, 0xb80005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xc80000, 0xc80005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_RAM )
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(reg_e80000_w)
+	AM_RANGE(0xa80000, 0xa80005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_a80000regs)	// a80000-3 scroll? a80004 inverted ? 3 : 0
+	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_b00000regs)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
+	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(prot_status_w)
+	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_c00000regs)	// c00000-3 scroll? c00004 inverted ? 13 : 10
+	AM_RANGE(0xc80000, 0xc80005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_c80000regs)	// c80000-3 scrool? c80004 inverted ? 3 : 0
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE( sound_w )
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( deroon )
 	PORT_START
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT(  0x0002, IP_ACTIVE_HIGH,IPT_UNKNOWN )
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )		PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )			PORT_PLAYER(1)
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )			PORT_PLAYER(1)
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )			PORT_PLAYER(1)
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) 		PORT_PLAYER(1)
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )		PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )			PORT_PLAYER(2)
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )			PORT_PLAYER(2)
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )			PORT_PLAYER(2)
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )			PORT_PLAYER(2)
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout gfxlayout =
@@ -413,12 +528,15 @@ static const gfx_layout gfxlayout2 =
 };
 
 
+
+
 static GFXDECODE_START( tecmosys )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout,   0x40*16, 16 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, gfxlayout2,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout,   0x4400, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, gfxlayout2,  0x4000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, gfxlayout2,  0x4000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, gfxlayout2,  0x4000, 0x40 )
+
 GFXDECODE_END
-
-
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
@@ -429,7 +547,6 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xe000, 0xf7ff) AM_READ(SMH_RAM)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -437,14 +554,23 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xf7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-
-
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(YMF262_status_0_r)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	//AM_RANGE(0x60, 0x60) AM_READ(YMZ280B_status_0_r)
+	AM_RANGE(0x60, 0x60) AM_READ(YMZ280B_status_0_r)
 ADDRESS_MAP_END
+
+
+static WRITE8_HANDLER( tecmosys_oki_bank_w )
+{
+	UINT8 upperbank = (data & 0x30) >> 4;
+	UINT8 lowerbank = (data & 0x03) >> 0;
+	UINT8* region = memory_region(REGION_SOUND2);
+
+	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
+	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
+}
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -454,103 +580,292 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(YMF262_data_B_0_w)
 
 	AM_RANGE(0x10, 0x10) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x20, 0x20) AM_NOP
+	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 
 	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)
 
-	//AM_RANGE(0x50, 0x50) AM_WRITE(to_main_cpu_latch_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
 
 	AM_RANGE(0x60, 0x60) AM_WRITE(YMZ280B_register_0_w)
 	AM_RANGE(0x61, 0x61) AM_WRITE(YMZ280B_data_0_w)
 ADDRESS_MAP_END
 
-
-
 static VIDEO_START(deroon)
 {
+	sprite_bitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	fillbitmap(sprite_bitmap, 0x4000, NULL);
+
+	tmp_tilemap_composebitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	tmp_tilemap_renderbitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+
+	fillbitmap(tmp_tilemap_composebitmap, 0x0000, NULL);
+	fillbitmap(tmp_tilemap_renderbitmap, 0x0000, NULL);
+
+
 	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
 	tilemap_set_transparent_pen(txt_tilemap,0);
+
+	bg0tilemap = tilemap_create(get_bg0tile_info,tilemap_scan_rows,16,16,32,32);
+	tilemap_set_transparent_pen(bg0tilemap,0);
+
+	bg1tilemap = tilemap_create(get_bg1tile_info,tilemap_scan_rows,16,16,32,32);
+	tilemap_set_transparent_pen(bg1tilemap,0);
+
+	bg2tilemap = tilemap_create(get_bg2tile_info,tilemap_scan_rows,16,16,32,32);
+	tilemap_set_transparent_pen(bg2tilemap,0);
+
 }
 
+static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
+{
+	UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
+	int i;
+
+	/* render sprites (with priority information) to temp bitmap */
+	fillbitmap(sprite_bitmap, 0x0000, NULL);
+	/* there are multiple spritelists in here, to allow for buffering */
+	for (i=(tecmosys_spritelist*0x4000)/2;i<((tecmosys_spritelist+1)*0x4000)/2;i+=8)
+	{
+		int xcnt,ycnt;
+		int drawx, drawy;
+		UINT16* dstptr;
+
+		int x, y;
+		int address;
+		int xsize = 16;
+		int ysize = 16;
+		int colour;
+		int flipx, flipy;
+		int priority;
+		int zoomx, zoomy;
+
+		x = tecmosys_spriteram[i+0]+386;
+		y = (tecmosys_spriteram[i+1]+1);
+
+		x-= extrax;
+		y-= extray;
+
+		y&=0x1ff;
+		x&=0x3ff;
+
+		if (x&0x200) x-=0x400;
+		if (y&0x100) y-=0x200;
+
+		address =  tecmosys_spriteram[i+5]| ((tecmosys_spriteram[i+4]&0x000f)<<16);
+
+		address<<=8;
+
+		flipx = (tecmosys_spriteram[i+4]&0x0040)>>6;
+		flipy = (tecmosys_spriteram[i+4]&0x0080)>>7; // used by some move effects in tkdensho
 
 
+		zoomx = (tecmosys_spriteram[i+2] & 0x0fff)>>0; // zoom?
+		zoomy = (tecmosys_spriteram[i+3] & 0x0fff)>>0; // zoom?
+
+		if ((!zoomx) || (!zoomy)) continue;
+
+		ysize =  ((tecmosys_spriteram[i+6] & 0x00ff))*16;
+		xsize =  (((tecmosys_spriteram[i+6] & 0xff00)>>8))*16;
+
+		colour =  ((tecmosys_spriteram[i+4] & 0x3f00))>>8;
+
+		priority = ((tecmosys_spriteram[i+4] & 0x0030))>>4;
+
+
+		if (tecmosys_spriteram[i+4] & 0x8000) continue;
+
+		for (ycnt = 0; ycnt < ysize; ycnt++)
+		{
+			int actualycnt = (ycnt * zoomy) >> 8;
+			int actualysize = (ysize * zoomy) >> 8;
+
+			if (flipy) drawy = y + (actualysize-1) - actualycnt;
+			else drawy = y + actualycnt;
+
+
+			for (xcnt = 0; xcnt < xsize; xcnt++)
+			{
+				int actualxcnt = (xcnt * zoomx) >> 8;
+				int actualxsize = (xsize *zoomx) >> 8;
+
+				if (flipx) drawx = x + (actualxsize-1) - actualxcnt;
+				else drawx = x + actualxcnt;
+
+				if ((drawx>=0 && drawx<320) && (drawy>=0 && drawy<240))
+				{
+					UINT8 data;
+
+					dstptr = BITMAP_ADDR16(sprite_bitmap, drawy, drawx);
+
+
+					data =  (gfxsrc[address]);
+
+
+					if(data) dstptr[0] = (data + (colour*0x100)) | (priority << 14);
+				}
+
+
+
+				address++;
+
+			}
+		}
+
+	}
+}
+
+void tecmosys_tilemap_copy_to_compose(UINT16 pri)
+{
+	int y,x;
+	UINT16 *srcptr;
+	UINT16 *dstptr;
+	for (y=0;y<240;y++)
+	{
+		srcptr = BITMAP_ADDR16(tmp_tilemap_renderbitmap, y, 0);
+		dstptr = BITMAP_ADDR16(tmp_tilemap_composebitmap, y, 0);
+		for (x=0;x<320;x++)
+		{
+			if ((srcptr[x]&0xf)!=0x0)
+			    dstptr[x] =  (srcptr[x]&0x7ff) | pri;
+		}
+	}
+}
+
+void tecmosys_do_final_mix(bitmap_t* bitmap)
+{
+	const pen_t *paldata = Machine->pens;
+	int y,x;
+	UINT16 *srcptr;
+	UINT16 *srcptr2;
+	UINT32 *dstptr;
+
+
+	for (y=0;y<240;y++)
+	{
+
+		srcptr = BITMAP_ADDR16(tmp_tilemap_composebitmap, y, 0);
+		srcptr2 = BITMAP_ADDR16(sprite_bitmap, y, 0);
+
+
+		dstptr = BITMAP_ADDR32(bitmap, y, 0);
+		for (x=0;x<320;x++)
+		{
+			UINT16 pri, pri2;
+			UINT16 penvalue;
+			UINT16 penvalue2;
+			UINT32 colour;
+			UINT32 colour2;
+
+			pri = srcptr[x] & 0xc000;
+			pri2 = srcptr2[x] & 0xc000;
+
+			penvalue = tilemap_paletteram16[srcptr[x]&0x7ff];
+			colour =   paldata[(srcptr[x]&0x7ff) | 0x4000];
+
+			if (srcptr2[x]&0x3fff)
+			{
+				penvalue2 = paletteram16[srcptr2[x]&0x3fff];
+				colour2 = paldata[srcptr2[x]&0x3fff];
+			}
+			else
+			{
+				penvalue2 = tilemap_paletteram16[srcptr[x]&0x7ff];
+				colour2 =   paldata[(srcptr[x]&0x7ff) | 0x4000];
+			}
+
+			if ((penvalue & 0x8000) && (penvalue2 & 0x8000)) // blend
+			{
+				int r,g,b;
+				int r2,g2,b2;
+				b = (colour & 0x000000ff) >> 0;
+				g = (colour & 0x0000ff00) >> 8;
+				r = (colour & 0x00ff0000) >> 16;
+
+				b2 = (colour2 & 0x000000ff) >> 0;
+				g2 = (colour2 & 0x0000ff00) >> 8;
+				r2 = (colour2 & 0x00ff0000) >> 16;
+
+				r = (r + r2) >> 1;
+				g = (g + g2) >> 1;
+				b = (b + b2) >> 1;
+
+				dstptr[x] = b | (g<<8) | (r<<16);
+			}
+			else if (pri2 >= pri)
+			{
+				dstptr[x] = colour2;
+			}
+			else
+			{
+				dstptr[x] = colour;
+			}
+		}
+	}
+}
 
 static VIDEO_UPDATE(deroon)
 {
 
+	fillbitmap(bitmap,Machine->pens[0x4000],cliprect);
 
 
-#if 0
-/* simulate sound commands writes here ... to test OPL3 emulator */
-	int j;
-	char buf[64];
-	static int command_data=0;
+	tilemap_set_scrolly( bg0tilemap, 0, tecmosys_c80000regs[1]+16);
+	tilemap_set_scrollx( bg0tilemap, 0, tecmosys_c80000regs[0]+104);
 
-	if (input_code_pressed_once(KEYCODE_Q))
-	{
-		command_data++;
-	}
-	if (input_code_pressed_once(KEYCODE_A))
-	{
-		command_data--;
-	}
-	command_data &= 0xff;
+	tilemap_set_scrolly( bg1tilemap, 0, tecmosys_a80000regs[1]+17);
+	tilemap_set_scrollx( bg1tilemap, 0, tecmosys_a80000regs[0]+106);
 
-	sprintf(buf,"keys: Q,A and C\ncommand code: %2x", command_data);
-	ui_draw_text(buf,10,20);
+	tilemap_set_scrolly( bg2tilemap, 0, tecmosys_b00000regs[1]+17);
+	tilemap_set_scrollx( bg2tilemap, 0, tecmosys_b00000regs[0]+106);
 
-	if (input_code_pressed_once(KEYCODE_C))
-	{
-		soundlatch_w(0,command_data);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-		popmessage("command write=%2x",command_data);
-	}
-#endif
+	fillbitmap(tmp_tilemap_composebitmap,0,cliprect);
 
+	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg0tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(0x0000);
 
+	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg1tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(0x4000);
+
+	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg2tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(0x8000);
+
+	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,txt_tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(0xc000);
 
 
-	// bg color , to see text in deroon
-	if(!gametype)
-			palette_set_color(screen->machine,0x800,MAKE_RGB(0x80,0x80,0x80));
-	else
-			palette_set_color(screen->machine,0x800,MAKE_RGB(0x0,0x0,0x0));
+	tecmosys_do_final_mix(bitmap);
 
-	fillbitmap(bitmap,0x800,cliprect);
+/*
+    popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x",
+        tecmosys_880000regs[0x0],  tecmosys_880000regs[0x1],  tecmosys_880000regs[0x2],  tecmosys_880000regs[0x3],
+        tecmosys_880000regs[0x4],  tecmosys_880000regs[0x5],  tecmosys_880000regs[0x6],  tecmosys_880000regs[0x7],
+        tecmosys_880000regs[0x8],  tecmosys_880000regs[0x9],  tecmosys_880000regs[0xa],  tecmosys_880000regs[0xb],
+        tecmosys_880000regs[0xc],  tecmosys_880000regs[0xd],  tecmosys_880000regs[0xe],  tecmosys_880000regs[0xf],
+        tecmosys_880000regs[0x10], tecmosys_880000regs[0x11], tecmosys_880000regs[0x12], tecmosys_880000regs[0x13],
+        tecmosys_880000regs[0x14], tecmosys_880000regs[0x15], tecmosys_880000regs[0x16], tecmosys_880000regs[0x17]);
+*/
 
-	tilemap_mark_all_tiles_dirty(txt_tilemap);
-	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
+//  popmessage("%04x %04x %04x | %04x %04x %04x",
+//    tecmosys_c00000regs[0],     tecmosys_c00000regs[1],     tecmosys_c00000regs[2],
+//    tecmosys_c80000regs[0],     tecmosys_c80000regs[1],     tecmosys_c80000regs[2]);
+
+//  popmessage("%04x %04x %04x | %04x %04x %04x",
+//    tecmosys_b00000regs[0],     tecmosys_b00000regs[1],     tecmosys_b00000regs[2],
+//    tecmosys_a80000regs[0],     tecmosys_a80000regs[1],     tecmosys_a80000regs[2]);
+
+	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
+	tecmosys_render_sprites_to_bitmap(bitmap, tecmosys_880000regs[0x0], tecmosys_880000regs[0x1]);
 
 
-//hacks
-
-	if(input_code_pressed_once(KEYCODE_Z))
-	{
-		if(!gametype)
-			cpunum_set_reg(0, M68K_PC, 0x23ae8); /* deroon */
-		else
-		{
-			UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
-			ROM[0x3aaa/2] = 0x4e73; // rte (trap 0)
-			cpunum_set_reg(0, M68K_PC, 0x182a0); /* angel eyes */
-		}
-	}
-
-	if(input_code_pressed_once(KEYCODE_X))
-	{
-		if(gametype)
-		{
-			UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
-			ROM[0x3aaa/2] = 0x4e73; // rte (trap 0)
-			cpunum_set_reg(0, M68K_PC, 0x17d2a); /* angel eyes */
-		}
-	}
 	return 0;
 }
 
 /*
->>> Richard wrote:
+>>> R.Belmont wrote:
 > Here's the sound info (I got it playing in M1, I
 > didn't bother "porting" it since the main game doesn't
 > even boot).
@@ -602,13 +917,15 @@ static const struct YMZ280Binterface ymz280b_interface =
 	0	/* irq */
 };
 
+
 static MACHINE_DRIVER_START( deroon )
-	MDRV_CPU_ADD(M68000, 16000000/8) /* the /8 divider is here only for OPL3 testing */
+	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_WATCHDOG_VBLANK_INIT(400) // guess
 
-	MDRV_CPU_ADD(Z80, 16000000/2 )	/* 8 MHz ??? */
 	/* audio CPU */
+	MDRV_CPU_ADD(Z80, 16000000/2 )	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 
@@ -620,14 +937,15 @@ static MACHINE_DRIVER_START( deroon )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(0x800+1)
+	MDRV_PALETTE_LENGTH(0x4000+0x800)
 
 	MDRV_VIDEO_START(deroon)
+	MDRV_MACHINE_RESET(deroon)
 	MDRV_VIDEO_UPDATE(deroon)
 
 	/* sound hardware */
@@ -635,13 +953,13 @@ static MACHINE_DRIVER_START( deroon )
 
 	MDRV_SOUND_ADD(YMF262, 14318180)
 	MDRV_SOUND_CONFIG(ymf262_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
-	MDRV_SOUND_ROUTE(2, "left", 1.0)
-	MDRV_SOUND_ROUTE(3, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "left", 1.00)
+	MDRV_SOUND_ROUTE(1, "right", 1.00)
+	MDRV_SOUND_ROUTE(2, "left", 1.00)
+	MDRV_SOUND_ROUTE(3, "right", 1.00)
 
-	MDRV_SOUND_ADD(OKIM6295, 14318180/2048*132)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, 16000000/8)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
@@ -654,32 +972,44 @@ MACHINE_DRIVER_END
 
 ROM_START( deroon )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 ) // Main Program
-	ROM_LOAD16_BYTE( "t001upau.bin", 0x00000, 0x80000, CRC(14b92c18) SHA1(b47b8c828222a3f7c0fe9271899bd38171d972fb) )
-	ROM_LOAD16_BYTE( "t002upal.bin", 0x00001, 0x80000, CRC(0fb05c68) SHA1(5140592e15414770fb46d5ac9ba8f76e3d4ab323) )
+	ROM_LOAD16_BYTE( "t001.upau1", 0x00000, 0x80000, CRC(14b92c18) SHA1(b47b8c828222a3f7c0fe9271899bd38171d972fb) )
+	ROM_LOAD16_BYTE( "t002.upal1", 0x00001, 0x80000, CRC(0fb05c68) SHA1(5140592e15414770fb46d5ac9ba8f76e3d4ab323) )
 
 	ROM_REGION( 0x048000, REGION_CPU2, 0 ) // Sound Porgram
-	ROM_LOAD( "t003uz1.bin", 0x000000, 0x008000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
-	ROM_CONTINUE(            0x010000, 0x038000 ) /* banked part */
+	ROM_LOAD( "t003.uz1", 0x000000, 0x008000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
+	ROM_CONTINUE(         0x010000, 0x038000 ) /* banked part */
 
-	ROM_REGION( 0x800000, REGION_GFX1, 0 ) // Graphics - mostly (maybe all?) not tile based
-	ROM_LOAD( "t101uah1.j66", 0x000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
-	ROM_LOAD( "t102ual1.j67", 0x200000, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
-	ROM_LOAD( "t103ubl1.j08", 0x400000, 0x200000, CRC(75431ec5) SHA1(c03e724c15e1fe7a0a385332f849e9ac9d149887) )
-	ROM_LOAD( "t104ucl1.j68", 0x600000, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
+	ROM_REGION( 0x2200, REGION_CPU3, 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_LOAD( "deroon_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "deroon_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_ERASE00 ) // Sprites (non-tile based)
+	/* all these roms need verifying, they could be half size */
+
+	ROM_LOAD16_BYTE( "t101.uah1", 0x0000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
+	ROM_LOAD16_BYTE( "t102.ual1", 0x0000001, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
+	/*                            0x8000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
+	ROM_LOAD16_BYTE( "t103.ubl1", 0x0800001, 0x400000, CRC(84e7da88) SHA1(b5c3234f33bb945cc9762b91db087153a0589cfb) )
+	/*                            0x1000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
+	ROM_LOAD16_BYTE( "t104.ucl1", 0x1000001, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
 
 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE ) // 8x8 4bpp tiles
-	ROM_LOAD( "t301ubd1.w63", 0x000000, 0x100000, CRC(8b026177) SHA1(3887856bdaec4d9d3669fe3bc958ef186fbe9adb) )
+	ROM_LOAD( "t301.ubd1", 0x000000, 0x100000, CRC(8b026177) SHA1(3887856bdaec4d9d3669fe3bc958ef186fbe9adb) )
 
-	ROM_REGION( 0x300000, REGION_GFX3, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
-	ROM_LOAD( "t201ubb1.w61", 0x000000, 0x100000, CRC(d5a087ac) SHA1(5098160ce7719d93e3edae05f6edd317d4c61f0d) )
-	ROM_LOAD( "t202ubc1.w62", 0x100000, 0x100000, CRC(f051dae1) SHA1(f5677c07fe644b3838657370f0309fb09244c619) )
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_ERASE00) // 16x16 4bpp tiles
+	/* not used? */
 
+	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_LOAD( "t201.ubb1", 0x000000, 0x100000, CRC(d5a087ac) SHA1(5098160ce7719d93e3edae05f6edd317d4c61f0d) )
+
+	ROM_REGION( 0x100000, REGION_GFX5, ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_LOAD( "t202.ubc1", 0x000000, 0x100000, CRC(f051dae1) SHA1(f5677c07fe644b3838657370f0309fb09244c619) )
 
 	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) // YMZ280B Samples
-	ROM_LOAD( "t401uya1.w16", 0x000000, 0x200000, CRC(92111992) SHA1(ae27e11ae76dec0b9892ad32e1a8bf6ab11f2e6c) )
+	ROM_LOAD( "t401.uya1", 0x000000, 0x200000, CRC(92111992) SHA1(ae27e11ae76dec0b9892ad32e1a8bf6ab11f2e6c) )
 
-	ROM_REGION( 0x080000, REGION_SOUND2, 0 ) // M6295 Samples
-	ROM_LOAD( "t501uad1.w01", 0x000000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 ) // M6295 Samples
+	ROM_LOAD( "t501.uad1", 0x080000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
 ROM_END
 
 ROM_START( tkdensho )
@@ -691,74 +1021,133 @@ ROM_START( tkdensho )
 	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
 	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
 
-	ROM_REGION( 0x1e00000, REGION_GFX1, 0 ) // Graphics - mostly (maybe all?) not tile based
-	ROM_LOAD( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
-	ROM_LOAD( "ae100.al1",     0x0400000, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
-	ROM_LOAD( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
-	ROM_LOAD( "ae101.bl1",     0x0c00000, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
-	ROM_LOAD( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
-	ROM_LOAD( "ae102.cl1",     0x1200000, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
-	ROM_LOAD( "ae104.el1",     0x1400000, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
-	ROM_LOAD( "ae105.fl1",     0x1800000, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
-	ROM_LOAD( "ae106.gl1",     0x1c00000, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
+	ROM_REGION( 0x2200, REGION_CPU3, 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x4000000, REGION_GFX1, ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
+	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
+	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
+	ROM_LOAD16_BYTE( "ae101.bl1",     0x0800001, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
+	ROM_LOAD16_BYTE( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
+	ROM_LOAD16_BYTE( "ae102.cl1",     0x1000001, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
+	ROM_LOAD16_BYTE( "ae104.el1",     0x2000001, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
+	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
+	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
 
 	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
 
-	ROM_REGION( 0x300000, REGION_GFX3, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae200w74.ba1",  0x000000, 0x0100000, CRC(c1645041) SHA1(323670a6aa2a4524eb968cc0b4d688098ffeeb12) )
-	ROM_LOAD( "ae201w75.bb1",  0x100000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
-	ROM_LOAD( "ae202w76.bc1",  0x200000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
 
-	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) // YMZ280B Samples
+	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae201w75.bb1",  0x000000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
+
+	ROM_REGION( 0x100000, REGION_GFX5, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae202w76.bc1",  0x000000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
+
+	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) // YMZ280B Samples
 	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
 	ROM_LOAD( "ae401t24.yb1", 0x200000, 0x200000, CRC(d83f1a73) SHA1(412b7ac9ff09a984c28b7d195330d78c4aac3dc5) )
 
-	ROM_REGION( 0x080000, REGION_SOUND2, 0 ) // M6295 Samples
-	ROM_LOAD( "ae500w07.ad1", 0x000000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 ) // M6295 Samples
+	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
-static TIMER_CALLBACK( reset_callback )
+ROM_START( tkdensha )
+	ROM_REGION( 0x600000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "aeprge.pal", 0x00000, 0x80000, CRC(17a209ff) SHA1(b5dbea9868cbb89d4e27bf19fdb616ac256985b4) )
+	ROM_LOAD16_BYTE( "aeprgo.pau", 0x00001, 0x80000, CRC(d265e6a1) SHA1(f39d8ce115f197a660f5210b2483108854eb12a9) )
+
+	ROM_REGION( 0x038000, REGION_CPU2, 0 ) // Sound Porgram
+	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
+	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
+
+	ROM_REGION( 0x2200, REGION_CPU3, 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x4000000, REGION_GFX1, ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
+	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
+	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
+	ROM_LOAD16_BYTE( "ae101.bl1",     0x0800001, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
+	ROM_LOAD16_BYTE( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
+	ROM_LOAD16_BYTE( "ae102.cl1",     0x1000001, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
+	ROM_LOAD16_BYTE( "ae104.el1",     0x2000001, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
+	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
+	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
+
+	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE ) // 8x8 4bpp tiles
+	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
+
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae200w74.ba1",  0x000000, 0x0100000, CRC(c1645041) SHA1(323670a6aa2a4524eb968cc0b4d688098ffeeb12) )
+
+	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae201w75.bb1",  0x000000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
+
+	ROM_REGION( 0x100000, REGION_GFX5, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae202w76.bc1",  0x000000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
+
+	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) // YMZ280B Samples
+	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
+	ROM_LOAD( "ae401t24.yb1", 0x200000, 0x200000, CRC(d83f1a73) SHA1(412b7ac9ff09a984c28b7d195330d78c4aac3dc5) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 ) // M6295 Samples
+	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
+ROM_END
+
+static MACHINE_RESET( deroon )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	device_read_ptr = 0;
+	device_status = DS_IDLE;
 }
 
+void tecmosys_decramble(void)
+{
+	UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
+	size_t  srcsize = memory_region_length( REGION_GFX1 );
+	int i;
+
+	for (i=0; i < srcsize; i+=4)
+	{
+		UINT8 tmp[4];
+
+		tmp[2] = ((gfxsrc[i+0]&0xf0)>>0) | ((gfxsrc[i+1]&0xf0)>>4); //  0,1,2,3  8,9,10, 11
+		tmp[3] = ((gfxsrc[i+0]&0x0f)<<4) | ((gfxsrc[i+1]&0x0f)<<0); // 4,5,6,7, 12,13,14,15
+		tmp[0] = ((gfxsrc[i+2]&0xf0)>>0) | ((gfxsrc[i+3]&0xf0)>>4);// 16,17,18,19,24,25,26,27
+		tmp[1] = ((gfxsrc[i+2]&0x0f)<<4) | ((gfxsrc[i+3]&0x0f)>>0);// 20,21,22,23, 28,29,30,31
+
+		gfxsrc[i+0] = tmp[0];
+		gfxsrc[i+1] = tmp[1];
+		gfxsrc[i+2] = tmp[2];
+		gfxsrc[i+3] = tmp[3];
+
+	}
+
+}
 
 static DRIVER_INIT( deroon )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
-	ROM[0x39C2/2] = 0x0001;
-	ROM[0x0448/2] = 0x4E71;
-	ROM[0x044A/2] = 0x4E71;
-	ROM[0x04bc/2] = 0x0000;
-	ROM[0x302c/2] = 0x60a4;
-	timer_set(ATTOTIME_IN_SEC(2), NULL,0,reset_callback);
-	gametype=0;
+	tecmosys_decramble();
+	device_data = &deroon_data;
 }
 
 static DRIVER_INIT( tkdensho )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
-	ROM[0x222c/2] = 0x4E71;
-	ROM[0x222c/2] = 0x4E71;
-
-	/* interrupt vector */
-	ROM[0x64/2] = 0x0000;
-	ROM[0x66/2] = 0x22c4;
-
-	/* protection ? */
-	ROM[0x3a3c/2] = 0x4E71;
-	ROM[0x3a84/2] = 0x4E71;
-
-	ROM[0x1759a/2] = 0x4E71; //trap 0
-	ROM[0x04822/2] = 0x4E71;
-	ROM[0x04862/2] = 0x4E71;
-
-	timer_set(ATTOTIME_IN_SEC(2), NULL,0,reset_callback);
-	gametype=1;
-
+	tecmosys_decramble();
+	device_data = &tkdensho_data;
 }
 
-GAME( 1996, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes-", GAME_NOT_WORKING | GAME_NO_SOUND )
+static DRIVER_INIT( tkdensha )
+{
+	tecmosys_decramble();
+	device_data = &tkdensha_data;
+}
+GAME( 1995, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
+GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960614)", 0 )
+GAME( 1996, tkdensha,    tkdensho, deroon, deroon, tkdensha,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960427)", 0 )
 

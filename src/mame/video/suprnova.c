@@ -16,6 +16,9 @@ Tilemap flip flags were reversed
 
 #include "driver.h"
 
+static bitmap_t *sprite_bitmap;
+
+
 #define SUPRNOVA_DECODE_BUFFER_SIZE 0x2000
 
 extern UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;
@@ -32,6 +35,10 @@ static int old_depthB=0, depthB=0;
 static int sprite_kludge_x=0, sprite_kludge_y=0;
 static int use_spc_bright, use_v3_bright;
 static UINT8 bright_spc_b=0x00, bright_spc_g=0x00, bright_spc_r=0x00;
+
+static UINT8 bright_spc_b_trans=0x00, bright_spc_g_trans=0x00, bright_spc_r_trans=0x00;
+
+
 static UINT8 bright_v3_b=0x00,  bright_v3_g=0x00,  bright_v3_r=0x00;
 
 
@@ -56,18 +63,26 @@ WRITE32_HANDLER ( skns_pal_regs_w )
 			bright_spc_g = data&0xff;
 			spc_changed = 1;
 		}
+		bright_spc_g_trans = (data>>8) &0xff;
+
+
 		break;
 	case (0x08/4): // RWRA2
 		if( bright_spc_r != (data&0xff) ) {
 			bright_spc_r = data&0xff;
 			spc_changed = 1;
 		}
+		bright_spc_r_trans = (data>>8) &0xff;
+
 		break;
 	case (0x0C/4): // RWRA3
 		if( bright_spc_b != (data&0xff) ) {
 			bright_spc_b = data&0xff;
 			spc_changed = 1;
 		}
+		bright_spc_b_trans = (data>>8)&0xff;
+
+
 		break;
 
 	case (0x10/4): // RWRB0
@@ -436,7 +451,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 	int disabled = skns_spc_regs[0x04/4] & 0x08; // RWR1
 	int xsize,ysize, size, xpos=0,ypos=0, pri=0, romoffset, colour=0, xflip,yflip, joint;
 	int sx,sy;
-	int endromoffs=0;
+	int endromoffs=0, gfxlen;
 	UINT16 zoomx, zoomy;
 
 
@@ -488,6 +503,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 		sprite_y_scroll += sprite_kludge_y;
 
 
+		gfxlen = memory_region_length (REGION_GFX1);
 		while( source<finish )
 		{
 			xflip = (source[0] & 0x00000200) >> 9;
@@ -575,7 +591,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 			zoomx = source[2] >> 16;
 			zoomy = source[3] >> 16;
 
-			romoffset &= memory_region_length (REGION_GFX1)-1;
+			romoffset &= gfxlen-1;
 
 			endromoffs = skns_rle_decode ( romoffset, size );
 
@@ -760,6 +776,9 @@ VIDEO_START(skns)
 
 	skns_tilemap_B = tilemap_create(get_tilemap_B_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_B,0);
+
+	sprite_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+
 
 	machine->gfx[2]->color_granularity=256;
 	machine->gfx[3]->color_granularity=256;
@@ -962,8 +981,68 @@ VIDEO_UPDATE(skns)
 
 	}
 
+	fillbitmap(sprite_bitmap, 0x0000, cliprect);
+	skns_draw_sprites(screen->machine, sprite_bitmap, cliprect);
 
-	skns_draw_sprites(screen->machine, bitmap, cliprect);
+	{
+		int x,y;
+		const pen_t *paldata = screen->machine->pens;
+
+		for (y=0;y<240;y++)
+		{
+			UINT16* src;
+			UINT32* dst;
+
+			src = BITMAP_ADDR16(sprite_bitmap,y,0);
+			dst = BITMAP_ADDR32(bitmap,y,0);
+
+			for (x=0;x<320;x++)
+			{
+				UINT16 pen = src[x]&0x7fff;
+				UINT16 palvalue = skns_palette_ram[pen];
+
+				if (palvalue&0x8000)
+				{
+					UINT32 srccolour = dst[x];
+					UINT32 dstcolour = paldata[pen];
+
+					int r,g,b;
+					int r2,g2,b2;
+
+					r = (srccolour & 0x000000ff)>> 0;
+					g = (srccolour & 0x0000ff00)>> 8;
+					b = (srccolour & 0x00ff0000)>> 16;
+
+					r2 = (dstcolour & 0x000000ff)>> 0;
+					g2 = (dstcolour & 0x0000ff00)>> 8;
+					b2 = (dstcolour & 0x00ff0000)>> 16;
+
+					r2 = (r2 * bright_spc_r_trans) >> 8;
+					g2 = (g2 * bright_spc_g_trans) >> 8;
+					b2 = (b2 * bright_spc_b_trans) >> 8;
+
+					r = (r+r2);
+					if (r>255) r = 255;
+
+					g = (g+g2);
+					if (g>255) g = 255;
+
+					b = (b+b2);
+					if (b>255) b = 255;
+
+					if (pen) dst[x] = (r << 0) | (g << 8) | (b << 16);
+
+				}
+				else
+				{
+					if (pen) dst[x] = paldata[pen];
+				}
+
+			}
+		}
+
+	}
+
 	return 0;
 }
 
