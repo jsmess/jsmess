@@ -22,6 +22,12 @@
 #define AY31015_SO	0x40
 
 // Reset the device
+void ay51013_init( void );
+
+// Set Control register
+void ay51013_cs( UINT8 data );
+
+// Reset the device
 void ay31015_init( void );
 
 // Set Control register

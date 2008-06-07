@@ -2,7 +2,7 @@
 
 	ay31015.c by Robbbert, May 2008
 
-	Code for the AY3-1015 UART
+	Code for the AY-3-1014A, AY-3-1015(D), AY-5-1013(A) and AY-6-1013 UARTs
 
 	This is cycle-accurate according to the specifications.
 
@@ -13,10 +13,21 @@
 
 	- If you find bugs, please fix them yourself.
 	- If you want to convert it to a DEVICE, please do so.
+	- If you want to add support for multiple instances, please do so.
 
-****************************************************************************/
+*****************************************************************************
 
-/* It is not clear in the documentation as to which settings will reset the device.
+Differences between the chip types:
+- All units have pull-up resistors on the inputs, except for the AY-3-1014A which is CMOS-compatible.
+- AY-3-1014A and AY-3-1015 - 1.5 stop bits mode available.
+- Max baud rate of 30k, except AY-5-1013 which has 20k.
+- AY-5-1013 has extended temperature ratings.
+- AY-5-1013 and AY-6-1013 require a -12 volt supply on pin 2. Pin is not used otherwise.
+- AY-5-1013 and AY-6-1013 do not reset the received data register when XR pin is used.
+
+******************************************************************************
+
+It is not clear in the documentation as to which settings will reset the device.
 	To be safe, we will always reset whenever the control register changes.
 
 	Also, it not clear exactly what happens under various error conditions.
@@ -31,13 +42,15 @@
 
 	The bit order of the status and control registers is set up to suit the
 	Exidy driver. If you wish to use it for some other driver, use the BITSWAP8
-	macro in the driver.
+	macro in your driver.
+
+********************************************************************************
 
 Device Data:
 
 * Common Controls:
 -- Pin 1 - Vcc - 5 volts
--- Pin 2 - not used
+-- Pin 2 - not used (on AY-5-1013 and AY-6-1013 this is Voo = -12 volts)
 -- Pin 3 - Gnd - 0 volts
 -- Pin 21 - XR - External Reset - resets all registers to initial state except for the control register
 -- Pin 35 - NP - No Parity - "1" will kill any parity processing
@@ -150,6 +163,49 @@ static DEVICE_START(ay31015)
 
 
 /*-------------------------------------------------
+    ay51013_xr - the reset pin
+-------------------------------------------------*/
+static void ay51013_xr( void )
+{
+	/* total pulses = 16 * data-bits */
+	UINT8 t1;
+	t1 = (ay.control_reg & 3) + 5;					/* data bits */
+	ay.total_pulses = t1 << 4;					/* total clock pulses to load a byte */
+	ay.second_stop_bit = ((ay.control_reg & AY31015_TSB) ? 16 : 0);		/* 2nd stop bit */
+	ay.status_reg = AY31015_EOC | AY31015_TBMT | AY31015_SO;
+	ay.tx_data = 0;
+	ay.rx_state = PREP_TIME;
+	ay.tx_state = IDLE;
+	ay.si = 1;
+}
+
+
+/*-------------------------------------------------
+    ay51013_init - drivers should call this at
+    machine reset time
+-------------------------------------------------*/
+void ay51013_init( void )
+{
+	ay.control_reg = 0;
+	ay.rx_data = 0;
+	ay51013_xr();
+}
+
+
+/*-------------------------------------------------
+    ay51013_cs - The entire control register is
+    updated at once.
+-------------------------------------------------*/
+void ay51013_cs( UINT8 data )
+{
+	UINT8 t1 = ay.control_reg;
+	ay.control_reg = data;
+	if (ay.control_reg != t1) ay51013_xr();
+}
+
+
+
+/*-------------------------------------------------
     ay31015_xr - the reset pin
 -------------------------------------------------*/
 static void ay31015_xr( void )
@@ -158,7 +214,7 @@ static void ay31015_xr( void )
 	UINT8 t1;
 	t1 = (ay.control_reg & 3) + 5;					/* data bits */
 	ay.total_pulses = t1 << 4;					/* total clock pulses to load a byte */
-	ay.second_stop_bit = ((ay.control_reg & AY31015_TSB) ? 1 : 0) << 4;		/* 2nd stop bit */
+	ay.second_stop_bit = ((ay.control_reg & AY31015_TSB) ? 16 : 0);		/* 2nd stop bit */
 	if ((t1 == 5) && (ay.second_stop_bit == 16))
 		ay.second_stop_bit = 8;				/* 5 data bits and 2 stop bits = 1.5 stop bits */
 	ay.status_reg = AY31015_EOC | AY31015_TBMT | AY31015_SO;
@@ -320,7 +376,7 @@ static TIMER_CALLBACK( ay31015_rx_process )
 //				if (ay.second_stop_bit)
 //				{
 //					ay.rx_state = SECOND_STOP_BIT;
-//					ay.rx_pulses = ay.second_stop_bit - 2;
+//					ay.rx_pulses = ay.second_stop_bit;
 //				}
 //				else
 //					ay.rx_state = PREP_TIME;
