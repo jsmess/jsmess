@@ -387,33 +387,27 @@ ROM_END
 
 ROM_START(specpls3)
 	ROM_REGION(0x20000,REGION_CPU1,0)
-	ROM_LOAD("pl3-0.rom",0x10000,0x4000, CRC(17373da2) SHA1(e319ed08b4d53a5e421a75ea00ea02039ba6555b))
-	ROM_LOAD("pl3-1.rom",0x14000,0x4000, CRC(f1d1d99e) SHA1(c9969fc36095a59787554026a9adc3b87678c794))
-	ROM_LOAD("pl3-2.rom",0x18000,0x4000, CRC(3dbf351d) SHA1(22e50c6ba4157a3f6a821bd9937cd26e292775c6))
-	ROM_LOAD("pl3-3.rom",0x1c000,0x4000, CRC(04448eaa) SHA1(65f031caa8148a5493afe42c41f4929deab26b4e))
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-ROM_START(specp3sp)
-	ROM_REGION(0x20000,REGION_CPU1,0)
-	ROM_LOAD("plus3sp0.rom",0x10000,0x4000, CRC(1f86147a) SHA1(e9b0a60a1a8def511d59090b945d175bdc646346))
-	ROM_LOAD("plus3sp1.rom",0x14000,0x4000, CRC(a8ac4966) SHA1(4e48f196427596c7990c175d135c15a039c274a4))
-	ROM_LOAD("plus3sp2.rom",0x18000,0x4000, CRC(f6bb0296) SHA1(09fc005625589ef5992515957ce7a3167dec24b2))
-	ROM_LOAD("plus3sp3.rom",0x1c000,0x4000, CRC(f6d25389) SHA1(ec8f644a81e2e9bcb58ace974103ea960361bad2))
+	ROM_SYSTEM_BIOS( 0, "en", "English" )
+	ROMX_LOAD("pl3-0.rom",0x10000,0x4000, CRC(17373da2) SHA1(e319ed08b4d53a5e421a75ea00ea02039ba6555b), ROM_BIOS(1))
+	ROMX_LOAD("pl3-1.rom",0x14000,0x4000, CRC(f1d1d99e) SHA1(c9969fc36095a59787554026a9adc3b87678c794), ROM_BIOS(1))
+	ROMX_LOAD("pl3-2.rom",0x18000,0x4000, CRC(3dbf351d) SHA1(22e50c6ba4157a3f6a821bd9937cd26e292775c6), ROM_BIOS(1))
+	ROMX_LOAD("pl3-3.rom",0x1c000,0x4000, CRC(04448eaa) SHA1(65f031caa8148a5493afe42c41f4929deab26b4e), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
+	ROMX_LOAD("plus3sp0.rom",0x10000,0x4000, CRC(1f86147a) SHA1(e9b0a60a1a8def511d59090b945d175bdc646346), ROM_BIOS(2))
+	ROMX_LOAD("plus3sp1.rom",0x14000,0x4000, CRC(a8ac4966) SHA1(4e48f196427596c7990c175d135c15a039c274a4), ROM_BIOS(2))
+	ROMX_LOAD("plus3sp2.rom",0x18000,0x4000, CRC(f6bb0296) SHA1(09fc005625589ef5992515957ce7a3167dec24b2), ROM_BIOS(2))
+	ROMX_LOAD("plus3sp3.rom",0x1c000,0x4000, CRC(f6d25389) SHA1(ec8f644a81e2e9bcb58ace974103ea960361bad2), ROM_BIOS(2))
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(specpl3e)
 	ROM_REGION(0x20000,REGION_CPU1,0)
-	ROM_LOAD("roma-en.rom",0x10000,0x8000, CRC(2d533344) SHA1(5ff2dae32eb745d87e0b54c595d1d20a866f316f))
-	ROM_LOAD("romb-en.rom",0x18000,0x8000, CRC(ef8d5d92) SHA1(983aa53aa76e25a3af123c896016bacf6829b72b))
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-ROM_START(specp3es)
-	ROM_REGION(0x20000,REGION_CPU1,0)
-	ROM_LOAD("roma-es.rom",0x10000,0x8000, CRC(ba694b4b) SHA1(d15d9e43950483cffc79f1cfa89ecb114a88f6c2))
-	ROM_LOAD("romb-es.rom",0x18000,0x8000, CRC(61ed94db) SHA1(935b14c13db75d872de8ad0d591aade0adbbc355))
+	ROM_SYSTEM_BIOS( 0, "en", "English" )
+	ROMX_LOAD("roma-en.rom",0x10000,0x8000, CRC(2d533344) SHA1(5ff2dae32eb745d87e0b54c595d1d20a866f316f), ROM_BIOS(1))
+	ROMX_LOAD("romb-en.rom",0x18000,0x8000, CRC(ef8d5d92) SHA1(983aa53aa76e25a3af123c896016bacf6829b72b), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
+	ROMX_LOAD("roma-es.rom",0x10000,0x8000, CRC(ba694b4b) SHA1(d15d9e43950483cffc79f1cfa89ecb114a88f6c2), ROM_BIOS(2))
+	ROMX_LOAD("romb-es.rom",0x18000,0x8000, CRC(61ed94db) SHA1(935b14c13db75d872de8ad0d591aade0adbbc355), ROM_BIOS(2))
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
@@ -439,6 +433,6 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
 COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +2a" , 0 )
 COMP( 1987, specpls3, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3" , 0 )
-COMP( 1987, specp3sp, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3 (Spain)" , 0 )
+//COMP( 1987, specp3sp, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3 (Spain)" , 0 )
 COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )
-COMP( 2000, specp3es, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e (Spain)" , GAME_COMPUTER_MODIFIED )
+//COMP( 2000, specp3es, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e (Spain)" , GAME_COMPUTER_MODIFIED )

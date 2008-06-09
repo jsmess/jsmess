@@ -427,15 +427,10 @@ TESTDRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
 	DRIVER( uk2086 )	/* 1986 UK2086										*/
 
 	DRIVER( spec128 )	/* 1986 ZX Spectrum 128								*/
-	DRIVER( spec128s )	/* 1985 ZX Spectrum 128 (Spain)						*/
 	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
 	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/
 	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
-	DRIVER( specp2fr )	/* 1986 ZX Spectrum +2 (France)						*/
-	DRIVER( specp2sp )	/* 1986 ZX Spectrum +2 (Spain)						*/
-	DRIVER( specp3sp )	/* 1987 ZX Spectrum +3 (Spain)						*/
 	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
-	DRIVER( specp3es )	/* 2000 ZX Spectrum +3e (Spain)						*/
 	DRIVER( scorpion )
 	DRIVER( pentagon )
 
@@ -857,8 +852,6 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( orionz80 )
 	DRIVER( orionzms )
 	DRIVER( orionpro )
-	DRIVER( orionp20 )
-	DRIVER( orionp21 )
 		
 	/* BK */
 	DRIVER( bk0010 )	
