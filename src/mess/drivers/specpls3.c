@@ -433,6 +433,4 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
 COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +2a" , 0 )
 COMP( 1987, specpls3, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3" , 0 )
-//COMP( 1987, specp3sp, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3 (Spain)" , 0 )
 COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )
-//COMP( 2000, specp3es, spec128,  0,		spectrum_plus3,spectrum,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e (Spain)" , GAME_COMPUTER_MODIFIED )
