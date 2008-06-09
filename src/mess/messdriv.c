@@ -852,12 +852,14 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( specimx )	
 
 	/* Orion */
-	DRIVER( orion128 )		
-	DRIVER( orionms )		
-	DRIVER( orionz80 )	
-	DRIVER( orionzms )	
+	DRIVER( orion128 )
+	DRIVER( orionms )
+	DRIVER( orionz80 )
+	DRIVER( orionzms )
 	DRIVER( orionpro )
-	
+	DRIVER( orionp20 )
+	DRIVER( orionp21 )
+		
 	/* BK */
 	DRIVER( bk0010 )	
 	DRIVER( bk001001 )		

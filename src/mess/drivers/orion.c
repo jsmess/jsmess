@@ -462,6 +462,20 @@ ROM_END
 ROM_START( orionpro )
 	ROM_REGION( 0x52000, REGION_CPU1, ROMREGION_ERASEFF )
     ROM_CART_LOAD(0, "bin",   0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_LOAD( "rom1-100.bin", 0x20000, 0x2000, CRC(4fd6c408) SHA1(b0c2e4fb5be5a74a7efa9bba14b746865122af1d))
+	ROM_LOAD( "rom2-100.bin", 0x22000, 0x8000, CRC(370ffdca) SHA1(169e2acac2d0b382e2d0a144da0af18bfa38db5c))
+ROM_END
+
+ROM_START( orionp20 )
+	ROM_REGION( 0x52000, REGION_CPU1, ROMREGION_ERASEFF )
+    ROM_CART_LOAD(0, "bin",   0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_LOAD( "rom1-200.bin", 0x20000, 0x2000,  CRC(4fbe83cc) SHA1(9884d43770b4c0fbeb519b96618b01957c0b8511))
+	ROM_LOAD( "rom2-200.bin", 0x22000, 0x10000, CRC(618aaeb7) SHA1(3e7e5d3ff9d2c683708928558e69aa62db877811))
+ROM_END
+
+ROM_START( orionp21 )
+	ROM_REGION( 0x52000, REGION_CPU1, ROMREGION_ERASEFF )
+    ROM_CART_LOAD(0, "bin",   0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
     ROM_LOAD( "rom1-210.bin", 0x20000, 0x2000,  CRC(8e1a0c78) SHA1(61c8a5ed596ce7e3fd32da920dcc80dc5375b421) )
 	ROM_LOAD( "rom2-210.bin", 0x22000, 0x10000, CRC(7cb7a49b) SHA1(601f3dd61db323407c4874fd7f23c10dccac0209) )
 ROM_END
@@ -473,4 +487,6 @@ COMP( 1990, orion128, 	 0,  		0,		orion128, 	orion128, 	orion128, orion128,  "",
 COMP( 1990, orionms, 	 orion128, 	0,		orion128, 	ms7007, 	orion128, orion128,  "", 					 "Orion 128 (MS7007)",	 0)
 COMP( 1990, orionz80, 	 orion128, 	0,		orionz80, 	orion128,	orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II",	 0)
 COMP( 1990, orionzms, 	 orion128, 	0,		orionz80, 	ms7007, 	orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II (MS7007)",	 0)
-COMP( 1994, orionpro, 	 orion128, 	0,		orionpro, 	orion128, 	orion128, orionpro,  "", 					 "Orion Pro",	 0)
+COMP( 1996, orionpro, 	 orion128, 	0,		orionpro, 	orion128, 	orion128, orionpro,  "", 					 "Orion Pro 1.0",	 0)
+COMP( 1997, orionp20, 	 orion128, 	0,		orionpro, 	orion128, 	orion128, orionpro,  "", 					 "Orion Pro 2.0",	 0)
+COMP( 2000, orionp21, 	 orion128, 	0,		orionpro, 	orion128, 	orion128, orionpro,  "", 					 "Orion Pro 2.1",	 0)
