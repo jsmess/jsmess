@@ -13,7 +13,7 @@
 #include "devices/cassette.h"
 #include "machine/8255ppi.h"
 
-static int ut88_8255_porta;
+static int ut88_keyboard_mask;
 
 /* Driver initialization */
 DRIVER_INIT(ut88)
@@ -27,17 +27,16 @@ DRIVER_INIT(ut88)
 
 READ8_HANDLER (ut88_8255_portb_r )
 {
-	switch (ut88_8255_porta ^ 0xff) {
-	  	case 0x01 : return input_port_read(machine, "LINE0");break;
-	  	case 0x02 : return input_port_read(machine, "LINE1");break;
-	  	case 0x04 : return input_port_read(machine, "LINE2");break;
-	  	case 0x08 : return input_port_read(machine, "LINE3");break;
-	  	case 0x10 : return input_port_read(machine, "LINE4");break;
-	  	case 0x20 : return input_port_read(machine, "LINE5");break;
-	  	case 0x40 : return input_port_read(machine, "LINE6");break;
-	  	case 0x80 : return input_port_read(machine, "LINE7");break;
-	}	
-	return 0xff;
+	UINT8 key = 0xff;
+	if ((ut88_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
+	if ((ut88_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
+	if ((ut88_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
+	if ((ut88_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
+	if ((ut88_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
+	if ((ut88_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
+	if ((ut88_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
+	if ((ut88_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
+	return key;
 }
 
 READ8_HANDLER (ut88_8255_portc_r )
@@ -47,7 +46,7 @@ READ8_HANDLER (ut88_8255_portc_r )
 
 WRITE8_HANDLER (ut88_8255_porta_w )
 {
-	ut88_8255_porta = data;	
+	ut88_keyboard_mask = data ^ 0xff;	
 }
 
 const ppi8255_interface ut88_ppi8255_interface =
@@ -69,7 +68,7 @@ MACHINE_RESET( ut88 )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, ut88_reset);
 	memory_set_bank(1, 1);	
-	ut88_8255_porta = 0;
+	ut88_keyboard_mask = 0;
 }
 
 
