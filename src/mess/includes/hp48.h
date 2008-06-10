@@ -1,98 +1,89 @@
-/*****************************************************************************
- *
- * includes/hp48.h
- *
- ****************************************************************************/
+/**********************************************************************
 
-#ifndef HP48_H_
-#define HP48_H_
+  Copyright (C) Antoine Mine' 2008
 
+   Hewlett Packard HP48 S/SX & G/GX
 
-#define KEY_A input_port_read_indexed(machine, 0)&0x80
-#define KEY_B input_port_read_indexed(machine, 0)&0x40
-#define KEY_C input_port_read_indexed(machine, 0)&0x20
-#define KEY_D input_port_read_indexed(machine, 0)&0x10
-#define KEY_E input_port_read_indexed(machine, 0)&8
-#define KEY_F input_port_read_indexed(machine, 0)&4
-#define KEY_G input_port_read_indexed(machine, 0)&2
-#define KEY_H input_port_read_indexed(machine, 0)&1
-#define KEY_I input_port_read_indexed(machine, 1)&0x80
-#define KEY_J input_port_read_indexed(machine, 1)&0x40
-#define KEY_K input_port_read_indexed(machine, 1)&0x20
-#define KEY_L input_port_read_indexed(machine, 1)&0x10
-#define KEY_M input_port_read_indexed(machine, 1)&8
-#define KEY_N input_port_read_indexed(machine, 1)&4
-#define KEY_O input_port_read_indexed(machine, 1)&2
-#define KEY_P input_port_read_indexed(machine, 1)&1
-#define KEY_Q input_port_read_indexed(machine, 2)&0x80
-#define KEY_R input_port_read_indexed(machine, 2)&0x40
-#define KEY_S input_port_read_indexed(machine, 2)&0x20
-#define KEY_T input_port_read_indexed(machine, 2)&0x10
-#define KEY_U input_port_read_indexed(machine, 2)&8
-#define KEY_V input_port_read_indexed(machine, 2)&4
-#define KEY_W input_port_read_indexed(machine, 2)&2
-#define KEY_X input_port_read_indexed(machine, 2)&1
-#define KEY_ENTER input_port_read_indexed(machine, 3)&0x80
-#define KEY_Y input_port_read_indexed(machine, 3)&0x40
-#define KEY_Z input_port_read_indexed(machine, 3)&0x20
-#define KEY_DEL input_port_read_indexed(machine, 3)&0x10
-#define KEY_LEFT input_port_read_indexed(machine, 3)&8
-#define KEY_ALPHA input_port_read_indexed(machine, 3)&4
-#define KEY_7 input_port_read_indexed(machine, 3)&2
-#define KEY_8 input_port_read_indexed(machine, 3)&1
-#define KEY_9 input_port_read_indexed(machine, 4)&0x80
-#define KEY_DIVIDE input_port_read_indexed(machine, 4)&0x40
-#define KEY_ORANGE input_port_read_indexed(machine, 4)&0x20
-#define KEY_4 input_port_read_indexed(machine, 4)&0x10
-#define KEY_5 input_port_read_indexed(machine, 4)&8
-#define KEY_6 input_port_read_indexed(machine, 4)&4
-#define KEY_MULTIPLY input_port_read_indexed(machine, 4)&2
-#define KEY_BLUE input_port_read_indexed(machine, 4)&1
-#define KEY_1 input_port_read_indexed(machine, 5)&0x80
-#define KEY_2 input_port_read_indexed(machine, 5)&0x40
-#define KEY_3 input_port_read_indexed(machine, 5)&0x20
-#define KEY_MINUS input_port_read_indexed(machine, 5)&0x10
-#define KEY_ON input_port_read_indexed(machine, 5)&8
-#define KEY_0 input_port_read_indexed(machine, 5)&4
-#define KEY_POINT input_port_read_indexed(machine, 5)&2
-#define KEY_SPC input_port_read_indexed(machine, 5)&1
-#define KEY_PLUS input_port_read_indexed(machine, 6)&0x80
+**********************************************************************/
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+/* read from I/O memory */
+#define HP48_IO_4(x)   (hp48_io[(x)])
+#define HP48_IO_8(x)   (hp48_io[(x)] | (hp48_io[(x)+1] << 4))
+#define HP48_IO_12(x)  (hp48_io[(x)] | (hp48_io[(x)+1] << 4) | (hp48_io[(x)+2] << 8))
+#define HP48_IO_20(x)  (hp48_io[(x)] | (hp48_io[(x)+1] << 4) | (hp48_io[(x)+2] << 8) | \
+	               (hp48_io[(x)+3] << 12) | (hp48_io[(x)+4] << 16))
 
 
-/*----------- defined in machine/hp48.c -----------*/
 
-typedef struct {
-	int data[0x40];
-	UINT16 crc;
-	UINT32 timer2;
-} HP48_HARDWARE;
-extern HP48_HARDWARE hp48_hardware;
+/***************************************************************************
+    GLOBAL VARIABLES & CONSTANTS
+***************************************************************************/
 
-extern UINT8 *hp48_ram, *hp48_card1, *hp48_card2;
-void hp48_mem_reset(running_machine *machine);
-void hp48_mem_config(running_machine *machine, int v);
-void hp48_mem_unconfig(running_machine *machine, int v);
-int hp48_mem_id(running_machine *machine);
-void hp48_crc(running_machine *machine, int adr, int data);
-int hp48_in(running_machine *machine);
-void hp48_out(running_machine *machine, int v);
-
-DRIVER_INIT( hp48s );
-DRIVER_INIT( hp48g );
-MACHINE_RESET( hp48 );
-
-WRITE8_HANDLER( hp48_write );
-READ8_HANDLER( hp48_read );
-
-WRITE8_HANDLER( hp48_mem_w );
-
-/*----------- defined in video/hp48.c -----------*/
-
-extern const unsigned short hp48_colortable[0x20][2];
-
-extern PALETTE_INIT( hp48 );
-extern VIDEO_START( hp48 );
-extern VIDEO_UPDATE( hp48 );
+/* I/O memory */
+extern UINT8 hp48_io[64];
 
 
-#endif /* HP48_H_ */
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+
+/************************ Saturn's I/O *******************************/
+
+/* memory controller */
+void hp48_mem_reset( running_machine* machine );
+void hp48_mem_config( running_machine* machine, int v );
+void hp48_mem_unconfig( running_machine* machine, int v );
+int  hp48_mem_id( running_machine* machine );
+
+/* CRC computation */
+void hp48_mem_crc( running_machine* machine, int addr, int data );
+
+/* IN/OUT registers */
+int  hp48_reg_in( running_machine* machine );
+void hp48_reg_out( running_machine* machine, int v );
+
+/* keybord interrupt system */
+void hp48_rsi( running_machine* machine );
+
+
+/***************************** serial ********************************/
+
+extern void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data );
+
+
+/****************************** video ********************************/
+
+extern VIDEO_UPDATE ( hp48 );
+extern PALETTE_INIT ( hp48 );
+
+
+/****************************** cards ********************************/
+
+struct hp48_port_config;
+
+extern struct hp48_port_config hp48sx_port1_config;
+extern struct hp48_port_config hp48sx_port2_config;
+extern struct hp48_port_config hp48gx_port1_config;
+extern struct hp48_port_config hp48gx_port2_config;
+
+extern DEVICE_GET_INFO( hp48_port );
+
+#define HP48_PORT DEVICE_GET_INFO_NAME( hp48_port )
+
+
+/****************************** machine ******************************/
+
+extern DRIVER_INIT( hp48 );
+
+extern MACHINE_START( hp48s  );
+extern MACHINE_START( hp48sx );
+extern MACHINE_START( hp48g  );
+extern MACHINE_START( hp48gx );
+
+extern MACHINE_RESET( hp48 );

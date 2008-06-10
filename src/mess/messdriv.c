@@ -735,8 +735,10 @@ TESTDRIVER( primob48 )	/* Primo B-48										*/
 TESTDRIVER( comquest )	/* Comquest Plus German								*/
 
 	/* Hewlett Packard */
-TESTDRIVER( hp48s )		/* HP48 S/SX										*/
-TESTDRIVER( hp48g )		/* HP48 G/GX										*/
+	DRIVER( hp48s )		/* HP48 S */
+	DRIVER( hp48sx )	/* HP48 SX */
+	DRIVER( hp48g )		/* HP48 G */
+	DRIVER( hp48gx )	/* HP48 GX */
 
 	/* SpectraVideo */
 	DRIVER( svi318 )	/* SVI-318 (PAL)									*/

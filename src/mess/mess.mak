@@ -996,7 +996,9 @@ $(MESSOBJ)/sharp.a:    \
 $(MESSOBJ)/hp48.a:     \
 	$(MESS_MACHINE)/hp48.o     \
 	$(MESS_VIDEO)/hp48.o     \
-	$(MESS_DRIVERS)/hp48.o
+	$(MESS_DRIVERS)/hp48.o \
+	$(MESS_DEVICES)/xmodem.o \
+	$(MESS_DEVICES)/kermit.o \
 
 $(MESSOBJ)/aquarius.a: \
 	$(MESS_DRIVERS)/aquarius.o	\

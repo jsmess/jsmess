@@ -1,179 +1,210 @@
+/**********************************************************************
+
+  Copyright (C) Antoine Mine' 2008
+
+   Hewlett Packard HP48 S/SX & G/GX
+
+**********************************************************************/
+
 #include "driver.h"
+#include "timer.h"
+#include "state.h"
+#include "device.h"
+
 #include "includes/hp48.h"
 
-static const UINT8 hp48_palette[] =
-{
-	49,70,64,	/* background */
-	40,35,55,	/* symbol color */
-	49,72,73,	/* lcd light */
-	37,42,64	/* lcd dark */
-};
+
+/***************************************************************************
+    DEBUGGING
+***************************************************************************/
 
 
-PALETTE_INIT( hp48 )
+#define VERBOSE       0
+
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES & CONSTANTS
+***************************************************************************/
+
+/* base colors */
+static int hp48_bg_color[3] = { 136, 147, 109 };  /* yellow */
+static int hp48_fg_color[3] = {   0,   0,  64 };  /* dark blue */
+
+/* color mixing */
+#define mix(c1,c2,x) (c1)*(1-(x))+(c2)*(x)
+#define mix2(i,x) mix(hp48_bg_color[i],hp48_fg_color[i],x)
+
+/* screen image averaging */
+#define HP48_NB_SCREENS 3
+static UINT8  hp48_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
+static int    hp48_cur_screen;
+
+
+
+/***************************************************************************
+    FUNCTIONS
+***************************************************************************/
+
+PALETTE_INIT ( hp48 )
 {
 	int i;
-
-	for ( i = 0; i < 4; i++ ) {
-		palette_set_color_rgb( machine, i, hp48_palette[i*3], hp48_palette[i*3+1], hp48_palette[i*3+2] );
+	for ( i = 0; i < 255; i++ )
+	{
+		float c = i/255.;
+		palette_set_color( machine, i, MAKE_ARGB( 0, mix2(0,c), mix2(1,c), mix2(2,c) ) );
 	}
 }
 
 
-VIDEO_START( hp48 )
+
+/* The screen is organised as follows:
+
+
+
+            announciators
+
+        ----------------------      ^       ^
+       |                      |     |       |
+       |                      |     |       |
+       |                      |     |       |
+       |                      |  M lines    |
+       |      main screen     |     |       |
+       |                      |     |       |
+       |                      |     |    64 lines
+       |                      |     |       |
+       |                      |     |       |
+       |----------------------|     -       |
+       |                      |     |       |
+       |        menu          |  m lines    |
+       |                      |     |       |
+        ----------------------      v       v
+
+       <----- 131 columns ---->
+
+
+
+        The LCD is 131x64 pixels and has two components:
+	- a main screen
+	- a menu screen
+
+	The main height (M) and the menu height (m) can be changed with the constraints:
+	- m+M=64
+	- M>=2
+
+	Pixels are 1-bit, packed in memory.
+
+	The start address of both screens can be changed independently
+	(this allows smooth, pixel-precise vertical scrooling of both parts).
+	They must be even addresses (in nibbles).
+
+	The stride (offset in nibbles between two scanlines) can be changed for the main screen.	
+	It must be even.
+	It is fixed to 34 for the menu screen.
+	
+	The bit offset for the first column of the main screen can be changed
+	(this allows smooth, pixel-precise horizontal scrooling).
+	It is always 0 for the menu screen.
+
+	Above the LCD, there are 6 annonciators that can be independently turned
+	on and off (and independetly from the LCD). 
+	They are not handled here, but through output_set_value.
+ */
+
+
+/*
+        In theory, the LCD is monorchrome, with a global adjustable contrast (32 levels).
+	However, by switching between screens at each refresh (64 Hz), one can achieve the
+	illusion of grayscale, with moderate flickering.
+	This technique was very widespread.
+	We emulate it by simply averaging between the last few (HP48_NB_SCREENS) frames.
+	
+	HP48_NB_SCREENS should be a multiple of the period of screen flips to avoid
+	flickering in the emulation.
+ */
+
+
+#define draw_pixel							\
+	hp48_screens[ hp48_cur_screen ][ y ][ xp + 8 ] = (data & 1) ? fg : 0; \
+	xp++;								\
+	data >>= 1
+
+#define draw_quart					\
+	UINT8 data = program_read_byte( addr );	\
+	draw_pixel; draw_pixel; draw_pixel; draw_pixel;
+
+
+VIDEO_UPDATE ( hp48 )
 {
-    videoram_size = 6 * 2 + 24;
-    videoram = (UINT8*) auto_malloc (videoram_size);
-}
+	int x, y, xp, i, addr;
+	int display       = HP48_IO_4(0) >> 3;           /* 1=on, 0=off */
+	int left_margin   = HP48_IO_4(0) & 7;            /* 0..7 pixels for main bitmap */
+	int contrast      = HP48_IO_8(1) & 0x1f;         /* 0..31 */
+	int refresh       = HP48_IO_4(3) >> 3;           /* vertical refresh */
+	int bitmap_start  = HP48_IO_20(0x20) & ~1;       /* main bitmap address */
+	int right_margin  = HP48_IO_12(0x25) & ~1;       /* -2048..2046 nibbles for main bitmap */
+	int last_line     = HP48_IO_8(0x28) & 0x3f;      /* 2..63 lines of main bitmap before menu */
+	int menu_start    = HP48_IO_20(0x30) & ~1;       /* menu bitmap address */
 
+	int fg = contrast + 1;
 
-typedef const char *HP48_FIGURE;
+	LOG(( "%f hp48 video_update called: ", attotime_to_double(timer_get_time()) ));
 
-static void hp48_draw_special(bitmap_t *bitmap,int x, int y, const HP48_FIGURE figure, int color)
-{
-	int j, xi=0;
-	for (j=0; figure[j]; j++) {
-		switch (figure[j]) {
-		case '1':
-			*BITMAP_ADDR16(bitmap, y, x+xi) = color;
-			xi++;
-			break;
-		case ' ':
-			xi++;
-			break;
-		case '\r':
-			xi=0;
-			y++;
-			break;
-		};
-	}
-}
-
-
-#define LCD_LINES (hp48_hardware.data[0x28]|((hp48_hardware.data[0x29]&3)<<4)
-
-
-static const HP48_FIGURE hp48_orange={
-	"11111111111\r"
-	"111 1111111\r"
-	"11  1111111\r"
-	"1         1\r"
-	"11  11111 1\r"
-	"111 11111 1\r"
-	"111111111 1"
-}, hp48_blue= {
-	"11111111111\r"
-	"1111111 111\r"
-	"1111111  11\r"
-	"1         1\r"
-	"1 11111  11\r"
-	"1 11111 111\r"
-	"1 111111111"
-}, hp48_alpha= {
-	"          1\r"
-	"   11111 1\r"
-	"  1     1\r"
-	" 1      1\r"
-	" 1      1\r"
-	" 1     11\r"
-	"  11111  1"
-}, hp48_alarm= {
-	"  1       1\r"
-	" 1  1   1  1\r"
-	"1  1  1  1  1\r"
-	"1  1 111 1  1\r"
-	"1  1  1  1  1\r"
-	" 1  1   1  1\r"
-	"  1       1"
-}, hp48_busy= {
-	"11111111\r"
-	" 1    1\r"
-	"  1  1\r"
-	"   11\r"
-	"  1  1\r"
-	" 1    1\r"
-	"11111111"
-}, hp48_transmit={
-	" 11\r"
-	"1  1   1\r"
-	"    1   1\r"
-	"1111111111\r"
-	"    1   1\r"
-	"1  1   1\r"
-	" 11"
-};
-
-#define DOWN 98
-#define RIGHT 40
-#define LCD_ENABLE (hp48_hardware.data[0]&8)
-#define LCD_VERTICAL_OFFSET (hp48_hardware.data[0]&7)
-#define LCD_MAIN_BASE_ADDRESS (hp48_hardware.data[0x20]|(hp48_hardware.data[0x21]<<4)\
-		|(hp48_hardware.data[0x22]<<8)|(hp48_hardware.data[0x23]<<12)\
-		|(hp48_hardware.data[0x24]<<16))
-#define LCD_MENU_BASE_ADDRESS (hp48_hardware.data[0x30]|(hp48_hardware.data[0x31]<<4)\
-		|(hp48_hardware.data[0x32]<<8)|(hp48_hardware.data[0x33]<<12)\
-		|(hp48_hardware.data[0x34]<<16))
-#define LCD_MAIN_SIZE (hp48_hardware.data[0x28]|(hp48_hardware.data[0x29]<<4))
-
-#define LCD_LINE_OFFSET (hp48_hardware.data[0x25]|(hp48_hardware.data[0x26]<<4)\
-		|(hp48_hardware.data[0x27]<<8))
-
-VIDEO_UPDATE( hp48 )
-{
-	int x, y, i, p, data, max_y;
-//	int contrast=(hp48_hardware.data[1]|((hp48_hardware.data[2]&1)<<4));
-
-	i = LCD_MAIN_BASE_ADDRESS;
-	max_y = MIN(64, LCD_MAIN_SIZE + 1 );
-	if ( max_y < 3 ) {
-		max_y = 64;
+	if ( !display || refresh ) 
+	{ 
+		LOG(( "display off\n" ));
+		bitmap_fill( bitmap, NULL, 0 );
+		return 0;		
 	}
 
-	i = LCD_MAIN_BASE_ADDRESS;
-	for (y=0; y< max_y; y++) {
-		int j = ( LCD_VERTICAL_OFFSET & 4 ? 1 : 0 );
-		p = LCD_VERTICAL_OFFSET & 0x03;
-		data = program_read_byte( i + j );
-		for (x=0; x<131; x++) {
-			*BITMAP_ADDR16(bitmap, DOWN + y, RIGHT + x) = ( ( data << p ) & 0x08 ) ? 3 : 2;
-			p++;
-			if ( p > 3 ) {
-				j++;
-				data = program_read_byte( i + j );
-				p = 0;
-			}
+	/* correcting factors */
+	if ( right_margin & 0x800 ) right_margin -= 0x1000;
+	if ( last_line <= 1 ) last_line = 0x3f;
+
+	LOG(( "on=%i lmargin=%i rmargin=%i contrast=%i start=%05x lline=%i menu=%05x\n", 
+	      display, left_margin, right_margin, contrast, bitmap_start, last_line, menu_start )); 
+
+	/* draw main bitmap */
+	addr = bitmap_start;
+	for ( y = 0; y <= last_line; y++ ) 
+	{
+		xp = -left_margin;
+		for ( x = 0; x < 34; x++, addr++ )
+		{
+			draw_quart;
 		}
-		i += 34 + LCD_LINE_OFFSET;
+		addr += (right_margin + (left_margin / 4) + 1) & ~1;
 	}
 
-	i = LCD_MENU_BASE_ADDRESS;
-	for ( ; y < 64; y++ ) {
-		int j = 0;
-		p = 0;
-		data = program_read_byte( i + j );
-		for ( x = 0; x < 131; x++ ) {
-			*BITMAP_ADDR16(bitmap, DOWN + y, RIGHT + x) = ( ( data << p ) & 0x08 ) ? 3 : 2;
-			p++;
-			if ( p > 3 ) {
-				j++;
-				data = program_read_byte( i + j );
-				p = 0;
-			}
+	/* draw menu bitmap */
+	addr = menu_start;
+	for ( ; y <= 0x3f; y++ ) 
+	{
+		xp = 0;
+		for ( x = 0; x < 34; x++, addr++ )
+		{
+			draw_quart;
 		}
-		i += 34;
 	}
 
-	hp48_draw_special(bitmap,RIGHT+12,DOWN-13,hp48_orange,
-					  hp48_hardware.data[0xb]&1?1:1);
-	hp48_draw_special(bitmap,RIGHT+57,DOWN-13,hp48_blue,
-					  hp48_hardware.data[0xb]&2?1:0);
-	hp48_draw_special(bitmap,RIGHT+102,DOWN-13,hp48_alpha,
-					  hp48_hardware.data[0xb]&4?1:0);
-	hp48_draw_special(bitmap,RIGHT+147,DOWN-13,hp48_alarm,
-					  hp48_hardware.data[0xb]&8?1:0);
-	hp48_draw_special(bitmap,RIGHT+192,DOWN-13,hp48_busy,
-					  hp48_hardware.data[0xc]&1?1:0);
-	hp48_draw_special(bitmap,RIGHT+237,DOWN-13,hp48_transmit,
-					  hp48_hardware.data[0xc]&2?1:0);
+	/* draw averaged frames */
+	for ( y = 0; y < 64; y++ )
+	{
+		for ( x = 0; x < 131; x++ )
+		{
+			int acc = 0;
+			for ( i = 0; i < HP48_NB_SCREENS; i++ )
+			{
+				acc += hp48_screens[ i ][ y ][ x+8 ];
+			}
+			acc = (acc * 255) / (33 * HP48_NB_SCREENS);
+			*BITMAP_ADDR16( bitmap, y, x ) = acc;
+		}		
+	}
+
+	hp48_cur_screen = (hp48_cur_screen + 1) % HP48_NB_SCREENS;
+
 	return 0;
 }
