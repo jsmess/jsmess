@@ -413,7 +413,7 @@ static TIMER_CALLBACK( super80_timer )
 
 	z80pio_p_w(0,1,in_fa);
 
-	if (cassette_input(cassette_device_image()) > +0.03) wave_state+=2;
+	if (cassette_input(cassette_device_image()) > +0.03) wave_state+=6;
 
 	if (wave_state == last_wave_state)
 		wave_length++;
@@ -440,7 +440,7 @@ static READ8_HANDLER( super80_f2_r )
 {
 	UINT8 data = input_port_read(machine, "DSW") & 0xf0;	// dip switches on pcb
 	data |= cass_out;			// bit 0 = output of U1, bit 1 = current wave_state
-	data |= 0x0c;				// bits 2,3 - not used
+	data |= 0x08;				// bits 2,3 - not used
 	return data;
 }
 
