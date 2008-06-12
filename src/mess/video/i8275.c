@@ -331,6 +331,7 @@ void i8275_draw_char_line(const device_config *device)
 	UINT8 vsp = 0;
 	UINT8 lten = 0;
 	UINT8 fifo_read = 0;
+	UINT8 curcol = (i8275->field_attribute_mode==0) ? i8275->cursor_col : i8275->cursor_col-1;
 	for(line=0;line<=i8275->lines_per_row;line++) {
 		// If line counter is 1 then select right values
 		lc = (i8275->line_counter_mode==1) ? (line - 1) % i8275->lines_per_row : line;
@@ -362,7 +363,7 @@ void i8275_draw_char_line(const device_config *device)
 				}				
 			}
 			
-			if ((i8275->current_row == i8275->cursor_row) && (xpos == i8275->cursor_col)) {
+			if ((i8275->current_row == i8275->cursor_row) && (xpos == curcol)) {
 				int vis = 1;
 				if ((i8275->cursor_format & 2)==0) {
 					vis = (i8275->cursor_blink_cnt<16) ? 1 : 0;

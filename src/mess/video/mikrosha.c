@@ -28,7 +28,7 @@ I8275_DISPLAY_PIXELS(mikrosha_display_pixels)
 		pixels ^= 0xff;
 	}
 	for(i=0;i<6;i++) {
-		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1;
+		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 	}
 }
 
