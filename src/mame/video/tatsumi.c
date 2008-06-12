@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "tatsumi.h"
 
 static tilemap *tx_layer;
@@ -12,12 +11,10 @@ UINT16 *cyclwarr_videoram0, *cyclwarr_videoram1;
 UINT16* tatsumi_sprite_control_ram;
 static UINT16* roundup5_vram;
 
-extern UINT16 bigfight_a40000[2];
 static UINT16 bigfight_bank, bigfight_last_bank;
 
 static UINT8 roundupt_crt_selected_reg;
 static UINT8 roundupt_crt_reg[64];
-extern UINT16 debugA,debugB,debugC,debugD;
 
 static UINT8* shadow_pen_array;
 
@@ -237,7 +234,8 @@ VIDEO_START( bigfight )
 
 /********************************************************************/
 
-INLINE void roundupt_drawgfxzoomrotate( bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void roundupt_drawgfxzoomrotate( running_machine *machine,
+		bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,UINT32 ssx,UINT32 ssy,
 		const rectangle *clip, int scalex, int scaley, int rotate, int write_priority_only )
 {
@@ -271,7 +269,7 @@ INLINE void roundupt_drawgfxzoomrotate( bitmap_t *dest_bmp,const gfx_element *gf
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			const UINT8 *shadow_pens = shadow_pen_array + (gfx->color_granularity * (color % gfx->total_colors));
 			int source_base = (code % gfx->total_elements) * gfx->height;
 
@@ -632,12 +630,14 @@ extent_x=extent_y=0;
 
 				for (w=0; w<x_width; w++) {
 					if (rotate)
-						roundupt_drawgfxzoomrotate(temp_bitmap,machine->gfx[0],
+						roundupt_drawgfxzoomrotate(machine,
+								temp_bitmap,machine->gfx[0],
 								base,
 								color,fx,0,x_pos,render_y,
 								cliprect,scale,scale,0,write_priority_only);
 					else
-						roundupt_drawgfxzoomrotate(bitmap,machine->gfx[0],
+						roundupt_drawgfxzoomrotate(machine,
+								bitmap,machine->gfx[0],
 								base,
 								color,fx,0,x_pos,render_y,
 								cliprect,scale,scale,0,write_priority_only);

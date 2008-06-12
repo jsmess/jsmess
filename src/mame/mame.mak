@@ -185,6 +185,7 @@ CPUS += ALPHA8201
 CPUS += ALPHA8301
 CPUS += CDP1802
 CPUS += COP420
+CPUS += COP421
 CPUS += COP410
 CPUS += TLCS90
 CPUS += MB8841
@@ -1274,6 +1275,7 @@ $(MAMEOBJ)/stern.a: \
 $(MAMEOBJ)/subsino.a: \
 	$(DRIVERS)/bishjan.o \
 	$(DRIVERS)/lastfght.o \
+	$(DRIVERS)/subsino.o \
 
 $(MAMEOBJ)/sun.a: \
 	$(DRIVERS)/arabian.o $(VIDEO)/arabian.o \
@@ -1562,6 +1564,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/intrscti.o \
 	$(DRIVERS)/istellar.o \
 	$(DRIVERS)/itgambl2.o \
+	$(DRIVERS)/itgambl3.o \
 	$(DRIVERS)/itgamble.o \
 	$(DRIVERS)/jackpool.o \
 	$(DRIVERS)/jongkyo.o \
@@ -1738,6 +1741,8 @@ $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
 
 $(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
+
+$(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh
 
 $(DRIVERS)/turbo.o:		$(LAYOUT)/turbo.lh \
 						$(LAYOUT)/subroc3d.lh \

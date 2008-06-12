@@ -878,28 +878,28 @@ static READ64_HANDLER( scsi53c810_r )
 	int reg = offset*8;
 	UINT64 r = 0;
 	if (!(mem_mask & U64(0xff00000000000000))) {
-		r |= (UINT64)lsi53c810_reg_r(reg+0) << 56;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+0) << 56;
 	}
 	if (!(mem_mask & U64(0x00ff000000000000))) {
-		r |= (UINT64)lsi53c810_reg_r(reg+1) << 48;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+1) << 48;
 	}
 	if (!(mem_mask & U64(0x0000ff0000000000))) {
-		r |= (UINT64)lsi53c810_reg_r(reg+2) << 40;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+2) << 40;
 	}
 	if (!(mem_mask & U64(0x000000ff00000000))) {
-		r |= (UINT64)lsi53c810_reg_r(reg+3) << 32;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+3) << 32;
 	}
 	if (!(mem_mask & U64(0x00000000ff000000))) {
-		r |= (UINT64)lsi53c810_reg_r(reg+4) << 24;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+4) << 24;
 	}
 	if (!(mem_mask & U64(0x0000000000ff0000))) {
-		r |= (UINT64)lsi53c810_reg_r(reg+5) << 16;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+5) << 16;
 	}
 	if (!(mem_mask & U64(0x000000000000ff00))) {
-		r |= (UINT64)lsi53c810_reg_r(reg+6) << 8;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+6) << 8;
 	}
 	if (!(mem_mask & U64(0x00000000000000ff))) {
-		r |= (UINT64)lsi53c810_reg_r(reg+7) << 0;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+7) << 0;
 	}
 
 	return r;

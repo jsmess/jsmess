@@ -95,7 +95,9 @@ extern UINT32 dc_coin_counts[2];
 
 /*----------- defined in video/dc.c -----------*/
 
-void dc_vblank( void );
+extern UINT64 *dc_texture_ram;
+
+void dc_vblank( running_machine *machine );
 
 READ64_HANDLER( pvr_ctrl_r );
 WRITE64_HANDLER( pvr_ctrl_w );

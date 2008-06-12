@@ -10,11 +10,10 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
-
+#include "includes/bublbobl.h"
 
 
 UINT8 *bublbobl_mcu_sharedram;
-extern int bublbobl_video_enable;
 
 
 WRITE8_HANDLER( bublbobl_bankswitch_w )
@@ -181,7 +180,7 @@ WRITE8_HANDLER( bublbobl_mcu_ddr4_w )
 READ8_HANDLER( bublbobl_mcu_port1_r )
 {
 //logerror("%04x: 6801U4 port 1 read\n",activecpu_get_pc());
-	port1_in = input_port_read_indexed(machine, 0);
+	port1_in = input_port_read(machine, "IN0");
 	return (port1_out & ddr1) | (port1_in & ~ddr1);
 }
 
@@ -217,6 +216,7 @@ READ8_HANDLER( bublbobl_mcu_port2_r )
 WRITE8_HANDLER( bublbobl_mcu_port2_w )
 {
 //logerror("%04x: 6801U4 port 2 write %02x\n",activecpu_get_pc(),data);
+	static const char *portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	// bits 0-3: bits 8-11 of shared RAM address
 
@@ -230,7 +230,7 @@ WRITE8_HANDLER( bublbobl_mcu_port2_w )
 		{
 			// read
 			if ((address & 0x0800) == 0x0000)
-				port3_in = input_port_read_indexed(machine, (address & 3) + 1);
+				port3_in = input_port_read(machine, portnames[address & 3]);
 			else if ((address & 0x0c00) == 0x0c00)
 				port3_in = bublbobl_mcu_sharedram[address & 0x03ff];
 //          logerror("reading %02x from shared RAM %04x\n",port3_in,address);
@@ -430,6 +430,7 @@ static int address,latch;
 WRITE8_HANDLER( bublbobl_68705_portB_w )
 {
 //logerror("%04x: 68705 port B write %02x\n",activecpu_get_pc(),data);
+	static const char *portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	if ((ddrB & 0x01) && (~data & 0x01) && (portB_out & 0x01))
 	{
@@ -451,7 +452,7 @@ WRITE8_HANDLER( bublbobl_68705_portB_w )
 			if ((address & 0x0800) == 0x0000)
 			{
 //logerror("%04x: 68705 read input port %02x\n",activecpu_get_pc(),address);
-				latch = input_port_read_indexed(machine, (address & 3) + 1);
+				latch = input_port_read(machine, portnames[address & 3]);
 			}
 			else if ((address & 0x0c00) == 0x0c00)
 			{

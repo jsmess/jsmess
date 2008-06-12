@@ -5,8 +5,8 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "segaic16.h"
+#include "includes/genesis.h"
 #include "includes/system16.h"
 
 
@@ -37,17 +37,6 @@ static UINT8 vdp_mixing;
 
 /*************************************
  *
- *  Prototypes
- *
- *************************************/
-
-void system18_vdp_start(running_machine *machine);
-void system18_vdp_update(bitmap_t *bitmap, const rectangle *cliprect);
-
-
-
-/*************************************
- *
  *  Video startup
  *
  *************************************/
@@ -55,6 +44,11 @@ void system18_vdp_update(bitmap_t *bitmap, const rectangle *cliprect);
 VIDEO_START( system18 )
 {
 	int width, height;
+
+	tempbitmap = NULL;
+	grayscale_enable = 0;
+	vdp_enable = 0;
+	vdp_mixing = 0;
 
 	/* compute palette info */
 	segaic16_palette_init(0x800);
@@ -82,24 +76,24 @@ VIDEO_START( system18 )
  *
  *************************************/
 
-void system18_set_grayscale(int enable)
+void system18_set_grayscale(running_machine *machine, int enable)
 {
 	enable = (enable != 0);
 	if (enable != grayscale_enable)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 		grayscale_enable = enable;
 //      mame_printf_debug("Grayscale = %02X\n", enable);
 	}
 }
 
 
-void system18_set_vdp_enable(int enable)
+void system18_set_vdp_enable(running_machine *machine, int enable)
 {
 	enable = (enable != 0);
 	if (enable != vdp_enable)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 		vdp_enable = enable;
 #if DEBUG_VDP
 		mame_printf_debug("VDP enable = %02X\n", enable);
@@ -108,11 +102,11 @@ void system18_set_vdp_enable(int enable)
 }
 
 
-void system18_set_vdp_mixing(int mixing)
+void system18_set_vdp_mixing(running_machine *machine, int mixing)
 {
 	if (mixing != vdp_mixing)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 		vdp_mixing = mixing;
 #if DEBUG_VDP
 		mame_printf_debug("VDP mixing = %02X\n", mixing);

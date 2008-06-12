@@ -760,24 +760,24 @@ static READ32_HANDLER( comm0_unk_r )
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM AM_BASE(&workram)		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K037122_reg_r, K037122_reg_w)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K037122_sram_r, K037122_sram_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K037122_char_r, K037122_char_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7d000000, 0x7d00ffff) AM_MIRROR(0x80000000) AM_READ8(sysreg_r, 0xffffffff)
-	AM_RANGE(0x7d010000, 0x7d01ffff) AM_MIRROR(0x80000000) AM_WRITE8(sysreg_w, 0xffffffff)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_MIRROR(0x80000000) AM_READWRITE(timekeeper_0_32be_r, timekeeper_0_32be_w)	/* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_MIRROR(0x80000000) AM_READWRITE(K056800_host_r, K056800_host_w)
-	AM_RANGE(0x7d042000, 0x7d043fff) AM_MIRROR(0x80000000) AM_RAM				/* COMM BOARD 0 */
-	AM_RANGE(0x7d044000, 0x7d044007) AM_MIRROR(0x80000000) AM_READ(comm0_unk_r)
-	AM_RANGE(0x7d048000, 0x7d048003) AM_MIRROR(0x80000000) AM_WRITE(comm1_w)
-	AM_RANGE(0x7d04a000, 0x7d04a003) AM_MIRROR(0x80000000) AM_WRITE(comm_rombank_w)
-	AM_RANGE(0x7d050000, 0x7d05ffff) AM_MIRROR(0x80000000) AM_ROMBANK(1)		/* COMM BOARD 1 */
-	AM_RANGE(0x7e000000, 0x7e7fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER2, 0)		/* Data ROM */
-	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x7fc00000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&workram)		/* Work RAM */
+	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(K037122_reg_r, K037122_reg_w)
+	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(K037122_sram_r, K037122_sram_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(K037122_char_r, K037122_char_w)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
+	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
+	AM_RANGE(0x7d020000, 0x7d021fff) AM_READWRITE(timekeeper_0_32be_r, timekeeper_0_32be_w)	/* M48T58Y RTC/NVRAM */
+	AM_RANGE(0x7d030000, 0x7d030007) AM_READWRITE(K056800_host_r, K056800_host_w)
+	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM				/* COMM BOARD 0 */
+	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
+	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
+	AM_RANGE(0x7d04a000, 0x7d04a003) AM_WRITE(comm_rombank_w)
+	AM_RANGE(0x7d050000, 0x7d05ffff) AM_ROMBANK(1)		/* COMM BOARD 1 */
+	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION(REGION_USER2, 0)		/* Data ROM */
+	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_SHARE(2)
+	AM_RANGE(0x7fc00000, 0x7fffffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -967,8 +967,8 @@ static MACHINE_START( hornet )
 
 	/* configure fast RAM regions for DRC */
 	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x80000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x803fffff);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
 	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
@@ -1076,22 +1076,9 @@ MACHINE_DRIVER_END
 
 static void jamma_jvs_cmd_exec(void);
 
-static UINT8 jvs_rdata[1024];
 static UINT8 jvs_sdata[1024];
 
-static int jvs_rdata_ptr = 0;
 static int jvs_sdata_ptr = 0;
-static int jvs_rdata_count = 0;
-
-static int jamma_jvs_r(UINT8 *data)
-{
-	if (jvs_rdata_ptr < jvs_rdata_count)
-	{
-		*data = jvs_rdata[jvs_rdata_ptr++];
-		return TRUE;
-	}
-	return FALSE;
-}
 
 static void jamma_jvs_w(UINT8 data)
 {
@@ -1104,31 +1091,33 @@ static void jamma_jvs_w(UINT8 data)
 		jamma_jvs_cmd_exec();
 }
 
-static int jvs_encode_data(UINT8 *in, UINT8 *out, int length)
+static int jvs_encode_data(UINT8 *in, int length)
 {
-	int outptr = 0;
 	int inptr = 0;
+	int sum = 0;
 
 	while (inptr < length)
 	{
 		UINT8 b = in[inptr++];
 		if (b == 0xe0)
 		{
-			out[outptr++] = 0xd0;
-			out[outptr++] = 0xdf;
+			sum += 0xd0 + 0xdf;
+			ppc4xx_spu_receive_byte(0, 0xd0);
+			ppc4xx_spu_receive_byte(0, 0xdf);
 		}
 		else if (b == 0xd0)
 		{
-			out[outptr++] = 0xd0;
-			out[outptr++] = 0xcf;
+			sum += 0xd0 + 0xcf;
+			ppc4xx_spu_receive_byte(0, 0xd0);
+			ppc4xx_spu_receive_byte(0, 0xcf);
 		}
 		else
 		{
-			out[outptr++] = b;
+			sum += b;
+			ppc4xx_spu_receive_byte(0, b);
 		}
-	};
-
-	return outptr;
+	}
+	return sum;
 }
 
 static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
@@ -1157,7 +1146,7 @@ static void jamma_jvs_cmd_exec(void)
 {
 	UINT8 sync, node, byte_num;
 	UINT8 data[1024], rdata[1024];
-	int i, length;
+	int length;
 	int rdata_ptr;
 	int sum;
 
@@ -1213,24 +1202,13 @@ static void jamma_jvs_cmd_exec(void)
 	}
 
 	// write jvs return data
-	jvs_rdata[0] = 0xe0;			// sync
-	jvs_rdata[1] = 0x00;			// node
-	jvs_rdata[2] = rdata_ptr+1;		// num of bytes
+	sum = 0x00 + (rdata_ptr+1);
+	ppc4xx_spu_receive_byte(0, 0xe0);			// sync
+	ppc4xx_spu_receive_byte(0, 0x00);			// node
+	ppc4xx_spu_receive_byte(0, rdata_ptr+1);	// num of bytes
+	sum += jvs_encode_data(rdata, rdata_ptr);
+	ppc4xx_spu_receive_byte(0, sum - 1);		// checksum
 
-	length = jvs_encode_data(rdata, &jvs_rdata[3], rdata_ptr);
-
-	// calculate sum
-	sum = 0;
-	for (i=0; i < length+2; i++)
-	{
-		sum += jvs_rdata[1+i];
-	}
-
-	// write sum
-	jvs_rdata[3+length] = (UINT8)(sum-1);
-
-	jvs_rdata_count = length + 4;
-	jvs_rdata_ptr = 0;
 	jvs_sdata_ptr = 0;
 }
 
@@ -1258,8 +1236,7 @@ static void init_hornet(running_machine *machine)
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
-	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
+	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
 }
 
 static void init_hornet_2board(running_machine *machine)
@@ -1276,8 +1253,7 @@ static void init_hornet_2board(running_machine *machine)
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
-	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
+	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
 }
 
 static DRIVER_INIT(gradius4)

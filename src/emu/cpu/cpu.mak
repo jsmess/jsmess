@@ -24,14 +24,12 @@ DRCOBJ = \
 	$(CPUOBJ)/drccache.o \
 	$(CPUOBJ)/drcfe.o \
 	$(CPUOBJ)/drcuml.o \
-	$(CPUOBJ)/drcumld.o \
 
 DRCDEPS = \
 	$(CPUSRC)/drcbeut.h \
 	$(CPUSRC)/drccache.h \
 	$(CPUSRC)/drcfe.h \
 	$(CPUSRC)/drcuml.h \
-	$(CPUSRC)/drcumld.h \
 	$(CPUSRC)/drcumlsh.h \
 
 # fixme - need to make this work for other target architectures (PPC)
@@ -270,6 +268,7 @@ $(CPUOBJ)/cdp1802/cdp1802.o:	$(CPUSRC)/cdp1802/cdp1802.c \
 CPUDEFS += -DHAS_COP410=$(if $(filter COP410,$(CPUS)),1,0)
 CPUDEFS += -DHAS_COP411=$(if $(filter COP411,$(CPUS)),1,0)
 CPUDEFS += -DHAS_COP420=$(if $(filter COP420,$(CPUS)),1,0)
+CPUDEFS += -DHAS_COP421=$(if $(filter COP421,$(CPUS)),1,0)
 
 ifneq ($(filter COP410 COP411,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/cop400
@@ -277,7 +276,7 @@ CPUOBJS += $(CPUOBJ)/cop400/cop410.o
 DBGOBJS += $(CPUOBJ)/cop400/cop410ds.o
 endif
 
-ifneq ($(filter COP420,$(CPUS)),)
+ifneq ($(filter COP420 COP421,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/cop400
 CPUOBJS += $(CPUOBJ)/cop400/cop420.o
 DBGOBJS += $(CPUOBJ)/cop400/cop420ds.o
@@ -837,11 +836,18 @@ CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3fe.o $(CPUOBJ)/mips/mip
 DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
 endif
 
-$(CPUOBJ)/mips/mips3drc.o:	$(CPUSRC)/mips/mips3drc.c \
-							$(CPUSRC)/mips/mips3.h \
-							$(CPUSRC)/mips/mips3com.h \
-							$(CPUSRC)/mips/mips3fe.h \
-							$(DRCDEPS)
+$(CPUOBJ)/powerpc/mips3com.o:	$(CPUSRC)/powerpc/mips3.h \
+								$(CPUSRC)/powerpc/mips3com.h
+
+$(CPUOBJ)/powerpc/mips3fe.o:	$(CPUSRC)/powerpc/mips3.h \
+								$(CPUSRC)/powerpc/mips3com.h \
+								$(CPUSRC)/powerpc/mips3fe.h
+
+$(CPUOBJ)/mips/mips3drc.o:		$(CPUSRC)/mips/mips3drc.c \
+								$(CPUSRC)/mips/mips3.h \
+								$(CPUSRC)/mips/mips3com.h \
+								$(CPUSRC)/mips/mips3fe.h \
+								$(DRCDEPS)
 
 
 
@@ -1134,6 +1140,13 @@ OBJDIRS += $(CPUOBJ)/powerpc
 CPUOBJS += $(CPUOBJ)/powerpc/ppccom.o $(CPUOBJ)/powerpc/ppcfe.o $(CPUOBJ)/powerpc/ppcdrc.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
 endif
+
+$(CPUOBJ)/powerpc/ppccom.o:	$(CPUSRC)/powerpc/ppc.h \
+							$(CPUSRC)/powerpc/ppccom.h
+
+$(CPUOBJ)/powerpc/ppcfe.o:	$(CPUSRC)/powerpc/ppc.h \
+							$(CPUSRC)/powerpc/ppccom.h \
+							$(CPUSRC)/powerpc/ppcfe.h
 
 $(CPUOBJ)/powerpc/ppcdrc.o:	$(CPUSRC)/powerpc/ppcdrc.c \
 							$(CPUSRC)/powerpc/ppc.h \

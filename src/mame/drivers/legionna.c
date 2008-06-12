@@ -77,44 +77,8 @@ Preliminary COP MCU memory map
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "cpu/m68000/m68000.h"
-
-/* machine/seicop.c */
-extern UINT16* cop_mcu_ram;
-extern READ16_HANDLER( legionna_mcu_r );
-extern WRITE16_HANDLER( legionna_mcu_w );
-extern READ16_HANDLER( heatbrl_mcu_r );
-extern WRITE16_HANDLER( heatbrl_mcu_w );
-extern READ16_HANDLER( godzilla_mcu_r );
-extern WRITE16_HANDLER( godzilla_mcu_w );
-extern READ16_HANDLER( denjinmk_mcu_r );
-extern WRITE16_HANDLER( denjinmk_mcu_w );
-extern READ16_HANDLER( sdgndmrb_mcu_r );
-extern WRITE16_HANDLER( sdgndmrb_mcu_w );
-extern READ16_HANDLER( cupsoc_mcu_r );
-extern WRITE16_HANDLER( cupsoc_mcu_w );
-extern READ16_HANDLER( copdxbl_0_r );
-extern WRITE16_HANDLER( copdxbl_0_w );
-
-
-
-
-
-extern WRITE16_HANDLER( legionna_background_w );
-extern WRITE16_HANDLER( legionna_foreground_w );
-extern WRITE16_HANDLER( legionna_midground_w );
-extern WRITE16_HANDLER( legionna_text_w );
-extern WRITE16_HANDLER( legionna_control_w );
-
-extern VIDEO_START( legionna );
-extern VIDEO_START( cupsoc );
-extern VIDEO_START( denjinmk );
-extern VIDEO_UPDATE( legionna );
-extern VIDEO_UPDATE( godzilla );
-extern VIDEO_UPDATE( sdgndmrb );
-
-
-extern UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
-
+#include "machine/seicop.h"
+#include "includes/legionna.h"
 
 /*****************************************************************************/
 
@@ -166,7 +130,7 @@ static ADDRESS_MAP_START( godzilla_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* did they swap the lines, or does the protection device swap the words during the DMA?? */
-WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
+static WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
 {
 	offset^=1;
 	COMBINE_DATA(&paletteram16[offset]);
@@ -990,7 +954,7 @@ static const gfx_layout legionna_new_charlayout =
 };
 
 
-void descramble_legionnaire_gfx(UINT8* src)
+static void descramble_legionnaire_gfx(UINT8* src)
 {
 	UINT8 *buffer;
 	int len = 0x10000;
@@ -2089,7 +2053,7 @@ static DRIVER_INIT( denjinmk )
 	ROM[0x5fe4/2] = 0x4e71;
 }
 
-DRIVER_INIT( legiongfx )
+static DRIVER_INIT( legiongfx )
 {
 	descramble_legionnaire_gfx( memory_region(REGION_GFX5) );
 }

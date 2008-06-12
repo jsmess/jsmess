@@ -719,7 +719,8 @@ const game_driver * const drivers[] =
 	DRIVER( boxyboy )	/* (c) 1990 (US) */
 	DRIVER( soukobdx )	/* (c) 1990 (Japan) */
 	DRIVER( puzlclub )	/* (c) 1990 (Japan) */
-	DRIVER( tankfrce )	/* (c) 1991 (US) */
+	DRIVER( tankfrce )	/* (c) 1991 (US, 2 Player) */
+	DRIVER( tankfrc4 )	/* (c) 1991 (US, 4 Player) */
 	DRIVER( tankfrcj )	/* (c) 1991 (Japan) */
 
 	/* Namco System 2 games */
@@ -5672,7 +5673,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( s1945p )	/* 0254 (c) 1999 Psikyo */
 	DRIVER( preisle2 )	/* 0255 (c) 1999 Yumekobo */
 	DRIVER( mslug3 )	/* 0256 (c) 2000 SNK */
-	DRIVER( mslug3n )	/* 0256 (c) 2000 SNK */
+	DRIVER( mslug3h )	/* 0256 (c) 2000 SNK */
 	DRIVER( mslug3b6 )	/* bootleg */
 	DRIVER( kof2000 )	/* 0257 (c) 2000 SNK */
 	DRIVER( kof2000n )	/* 0257 (c) 2000 SNK */
@@ -6196,6 +6197,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sbagmans )	/* (c) 1984 + Stern license */
 	DRIVER( pickin )	/* (c) 1983 */
 	DRIVER( botanic )	/* (c) 1985 */
+	DRIVER( squaitsa )	/* (c) 1985 */
 	DRIVER( tankbust )	/* (c) 1985 */
 
 	/* Seibu Denshi / Seibu Kaihatsu games */
@@ -7102,7 +7104,9 @@ Other Sun games
 	DRIVER( mchampdx )	/* (c) 1999 ESD */
 	DRIVER( mchampda )	/* (c) 1999 ESD */
 	DRIVER( hedpanic )	/* (c) 2000 ESD */
+	DRIVER( hedpanif )	/* (c) 2000 ESD + Fuuki, Co. Ltd. */
 	DRIVER( tangtang )	/* (c) 2000 ESD */
+	DRIVER( swatpolc )	/* (c) 2001 ESD */
 
 	/* Dyna Electronics / Dynax / Nakanihon games */
 	DRIVER( royalmj )	/* (c) 1982 Nichibutsu */
@@ -7932,6 +7936,7 @@ Other Sun games
 	DRIVER( ampkr2b3 )	/* 1994 bootleg */
 	DRIVER( pkrdewin )	/* 1990 bootleg */
 	DRIVER( ampkr95 )	/* 1995 bootleg */
+	DRIVER( videomat )	/* 1990 bootleg */
 	DRIVER( sigmapkr )	/* (c) 1995 Sigma */
 	DRIVER( sigma2k )	/* (c) 2000 Sigma */
 	DRIVER( lucky8 )	/* (c) 1989 Falcon */
@@ -7963,6 +7968,12 @@ Other Sun games
 	DRIVER( rbmk )		/* (c) 1995 GMS */
 	DRIVER( go2000 )	/* (c) 2000 SA */
 	DRIVER( mirax )		/* (c) 1985 Current Technologies */
+	DRIVER( victor5 )	/* (c) 1990 Subsino */
+	DRIVER( victor21 )	/* (c) 1990 Subsino */
+	DRIVER( sharkpy )	/* (c) 1993 Subsino */
+	DRIVER( sharkpya )	/* (c) 1993 Subsino */
+	DRIVER( smoto20 )	/* (c) 1996 Subsino */
+	DRIVER( smoto16 )	/* (c) 1996 Subsino */
 	DRIVER( lastfght )	/* (c) 2000 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */
 	DRIVER( sliver )	/* (c) 1996 Hollow Corp */
@@ -8011,6 +8022,7 @@ Other Sun games
 	DRIVER( comg183 )	/* (c) 1983 Cal Omega Inc. */
 	DRIVER( comg185 )	/* (c) 1983 Cal Omega Inc. */
 	DRIVER( comg186 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg187 )	/* (c) 1983 Cal Omega Inc. */
 	DRIVER( comg204 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg208 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg227 )	/* (c) 1984 Cal Omega Inc. */
@@ -8069,6 +8081,11 @@ Other Sun games
 	DRIVER( pepp0516 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
 	DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */
+	DRIVER( peps0014 )	/* (c) 1996 IGT - International Gaming Technology */
+    DRIVER( peps0022 )	/* (c) 1996 IGT - International Gaming Technology */
+    DRIVER( peps0043 )	/* (c) 1996 IGT - International Gaming Technology */
+    DRIVER( peps0045 )	/* (c) 1996 IGT - International Gaming Technology */
+    DRIVER( peps0308 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0716 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
@@ -8094,17 +8111,22 @@ Other Sun games
 	DRIVER( capcor )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2 )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2a )	/* (c) 2001 Nazionale Elettronica */
+	DRIVER( mnumber )	/* (c) 200? M.M. - B.R.L. */
 
 	/* H8/3337 italian gambling games */
-	DRIVER( laser2k1 )	/* 200? unknown */
-	DRIVER( mdrink )	/* 200? unknown */
-	DRIVER( ntcash )	/* 200? unknown */
-	DRIVER( wizard )	/* 200? unknown */
-	DRIVER( te0144 )	/* 200? unknown */
+	DRIVER( ntcash )	/* 1999 unknown */
+	DRIVER( wizard )	/* (c) 1999 A.A. */
+	DRIVER( laser2k1 )	/* 2001 unknown */
+	DRIVER( mdrink )	/* 2001 unknown */
+	DRIVER( te0144 )	/* 2001 unknown */
 	DRIVER( cmagica )	/* 200? unknown */
 	DRIVER( millsun )	/* 200? unknown */
 	DRIVER( sspac2k1 )	/* 200? unknown */
 	DRIVER( elvis )		/* 200? unknown */
+
+	/* Mitsubishi/Renesas M16/62A italian gambling games */
+	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */
+	DRIVER( grandprx )	/* (c) 4fun */
 
 	/* Astro Corp. */
 	DRIVER( showhand )

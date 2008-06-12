@@ -11,14 +11,8 @@
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
+#include "includes/beezer.h"
 
-/* from video/beezer.c */
-INTERRUPT_GEN( beezer_interrupt );
-VIDEO_UPDATE( beezer );
-
-/* from machine/beezer.c */
-DRIVER_INIT( beezer );
-WRITE8_HANDLER( beezer_bankswitch_w );
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_RAM)
@@ -66,6 +60,8 @@ static INPUT_PORTS_START( beezer )
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE
 
 	/* Manual says "Dip Switch A" is not used. */
+	PORT_START_TAG("DSWA")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SWB:1,2")

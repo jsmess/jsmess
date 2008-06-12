@@ -10,6 +10,7 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 #include "driver.h"
 #include "deprecat.h"
 #include "video/ppu2c0x.h"
+#include "includes/vsnes.h"
 
 /* Globals */
 static int vsnes_gun_controller;
@@ -223,7 +224,7 @@ MACHINE_RESET( vsnes )
 	input_latch[2] = input_latch[3] = 0;
 
 	/* reset the ppu */
-	ppu2c0x_reset( 0, 1 );
+	ppu2c0x_reset( machine, 0, 1 );
 
 	/* if we need to remap, install the callback */
 	if ( remapped_colortable )
@@ -241,8 +242,8 @@ MACHINE_RESET( vsdual )
 	input_latch[2] = input_latch[3] = 0;
 
 	/* reset the ppu */
-	ppu2c0x_reset( 0,1);
-	ppu2c0x_reset( 1,1 );
+	ppu2c0x_reset( machine,0,1 );
+	ppu2c0x_reset( machine,1,1 );
 
 	/* if we need to remap, install the callback */
 	if ( remapped_colortable )

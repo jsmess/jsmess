@@ -423,7 +423,14 @@ PALETTE_INIT( galaxian )
 	bullet_color[7] = MAKE_RGB(0xff,0xff,0x00);
 }
 
+PALETTE_INIT( moonwar )
+{
+	PALETTE_INIT_CALL(galaxian);
 
+
+	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
+	bullet_color[7] = MAKE_RGB(0xef,0xef,0x97);
+}
 
 /*************************************
  *
@@ -1346,6 +1353,21 @@ void mshuttle_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 
 }
 
 
+/*************************************
+ *
+ *  Calipso extensions
+ *
+ *************************************/
+
+void calipso_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
+{
+	/* same as the others, but no sprite flipping, but instead the bits are used
+       as extra sprite code bits, giving 256 sprite images */
+	/* No flips */
+	*code = base[1];
+	*flipx = 0;
+	*flipy = 0;
+}
 
 /*************************************
  *

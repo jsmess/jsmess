@@ -39,11 +39,13 @@
     DSW = 3 banks (903/904)
     DSW = 1 bank  (905)
 
-    Inputs use 6 lines from 6520 PIA's port, and multiplexed x4 each.
+    Inputs use 6 lines from 6520 PIA's port, and each one is multiplexed x4.
 
     Some games like Keno and Big Game, also have a key encoder peripheral processor
     based on a 8035, and 1x ROM 2516/2532.
 
+    Systems 903/904 PCBs have 3 pots to control R, G, and B independently.
+    However, it seems to be only related to the background color.
 
 
 ***********************************************************************************
@@ -92,7 +94,7 @@
    18.4 | Double Draw-Lebanon      |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
    18.5 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
    18.6 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   18.7 | Amusement Poker (skill)  |  905   | AUG/83  | JKRTWO   | 6300100 | MULTCLR  | 6600070 | Amusement     | No   |      | No
+   18.7 | Amusement Poker (skill)  |  905   | AUG/83  | JKRTWO   | 6300100 | MULTCLR  | 6600070 | Amusement     | Yes  | BD   | Yes
    18.8 | Poker-Lebanon            |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
    18.9 | Pixels (french)          |   ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
    19.0 | Hi-Score Poker           |   ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
@@ -217,20 +219,32 @@
     mentioned game. It was created by Cal Omega in 1981 for Casino Electronics Inc.
     Cal Omega was bought out by CEI (Casino Electronics Inc.), and CEI was bought by UCMC.
 
-    This game was made before the CEI 906iii system.
+    This is the most famous game from Cal Omega 903 System.
 
-    The game use the same GFX set that Jack Potten's poker for cards and have similar
+    The game uses the same GFX set that Jack Potten's Poker for cards and has similar
     layout, but the game is different and the old discrete pitched sounds were replaced
-    with a better set of sounds through a AY8910/12 implementation. The empty socket in
-    the pcb is maybe for future upgrades instead of sound ROM, since sounds are hardcoded.
+    with a better set of sounds through a AY8912 implementation. The empty socket in
+    the PCB is for future upgrades instead of sound ROM, since sounds are hardcoded.
 
     Inputs are multiplexed and selected through PIA1, portB.
 
-    In game, use "Stand" instead of "Deal/Draw" to conserve all cards without discards.
-    To enter to TEST MODE press F2. Press "Discard 1" + "Discard 2" + "Discard 3" to exit.
-    To enter the STATS MODE press "Show Stats". Press "Deal/Draw" to exit.
-    To pass coin and hopper errors press "Hopper SW". Also keep it pressed to see the status.
-    For payout, press "Manual Collect" an then "Payout" for each credit (manual mode).
+
+    Some instructions....
+
+    - Some versions have a STAND button to conserve all cards without discards.
+
+    - To enter to the Input Test Mode press TEST MODE (key 9) and then SERVICE (key 8).
+      Press DISCARD1 (key Z) + DISCARD2 (key X) + DISCARD3 (key C) to exit.
+
+    - To see the last hand played, press SHOW LAST HAND (key 0) and then SERVICE (key 8).
+      Press DEAL/DRAW button to exit.
+
+    - Depending of the game version, TEST MODE & SHOW LAST HAND buttons could work directly.
+
+    - To pass coin and hopper errors press SERVICE (key 8). Also keep it pressed to see the status.
+
+    - For payout, press MANUAL COLLECT an then PAYOUT for each credit (manual mode).
+
 
 
     El Grande - 5 Card Draw:
@@ -247,7 +261,7 @@
 
     There aren't meter and stats modes. Only for amusement, so... no payout.
     To clear credits press F2.
-    To enter to TEST MODE press F2 twice. Press "Hold 1" + "Hold 2" + "Hold 3" to exit.
+    To enter to TEST MODE press F2 twice. Press HOLD 1 + HOLD 2 + HOLD 3 to exit.
 
 
 
@@ -263,7 +277,7 @@
     $0841 - $0841   AY-8912         ; Write.
     $0880 - $0880   CRTC6845        ; MC6845 adressing.
     $0881 - $0881   CRTC6845        ; MC6845 Read/Write.
-    $08C4 - $08C7   PIA0            ; I/O Ports 0, 1, 2, 3.
+    $08C4 - $08C7   PIA0            ; I/O Ports 0 to 3 (multiplexed).
     $08C8 - $08CB   PIA1            ; I/O Port  4.
 
     $1000 - $13FF   VideoRAM
@@ -277,7 +291,7 @@
     $0000 - $07FF   NVRAM           ; All registers and settings.
     $1080 - $1080   CRTC6845        ; MC6845 adressing.
     $1081 - $1081   CRTC6845        ; MC6845 Read/Write.
-    $10C4 - $10C7   PIA0            ; I/O Ports 0, 1, 2, 3.
+    $10C4 - $10C7   PIA0            ; I/O Ports 0 to 3 (multiplexed).
     $10C8 - $10CB   PIA1            ; I/O Port  4, AY-8912.
 
     $2000 - $23FF   VideoRAM
@@ -369,6 +383,20 @@
 
     UPDATES
     -------
+
+
+    [2008-06-11]
+
+    - Improved the input system for some games.
+    - Fixed some wrong color codes.
+    - Updated technical notes.
+
+
+    [2008-06-09]
+
+    - Cleaned up the driver following the MAME Coding Conventions.
+    - Added support to Game 18.7 (Amusement Poker).
+    - Updated technical notes.
 
 
     [2008-02-26]
@@ -539,21 +567,18 @@ static INPUT_PORTS_START( gdrawpkr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cancel Discards") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Stand") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_8)
-//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 3") PORT_CODE(KEYCODE_F)
-//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 4") PORT_CODE(KEYCODE_G)
-//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 5") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08/*0x0c*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2)	/* should be splitted? */
-	PORT_BIT( 0x10/*0x14*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Hopper SW") PORT_CODE(KEYCODE_9)	/* should be splitted? */
-	PORT_BIT( 0x20/*0x24*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Show Stats") PORT_CODE(KEYCODE_0)	/* should be splitted? */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_9)		/* press this one and then SERVICE to Test Mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Show Last Hand") PORT_CODE(KEYCODE_0)	/* press this one and then SERVICE to show the last hand */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Discard 1") PORT_CODE(KEYCODE_Z)
@@ -562,8 +587,8 @@ static INPUT_PORTS_START( gdrawpkr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Discard 4") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Discard 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -572,8 +597,8 @@ static INPUT_PORTS_START( gdrawpkr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Big") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -604,26 +629,23 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( comg076 )
 	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	/* credits */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Manual Collect") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Double Up") PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cancel Discards") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Stand") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )	/* credits */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_8)
-//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 3") PORT_CODE(KEYCODE_F)
-//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 4") PORT_CODE(KEYCODE_G)
-//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 5") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08/*0x0c*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Unk.")   PORT_CODE(KEYCODE_8)	/* should be splitted? */
-	PORT_BIT( 0x10/*0x14*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Hopper SW") PORT_CODE(KEYCODE_9)	/* should be splitted? */
-	PORT_BIT( 0x20/*0x24*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2)	/* should be splitted? */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Discard 1") PORT_CODE(KEYCODE_Z)
@@ -632,8 +654,8 @@ static INPUT_PORTS_START( comg076 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Discard 4") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Discard 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -642,8 +664,8 @@ static INPUT_PORTS_START( comg076 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Big") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -678,8 +700,8 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cancel Discards") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
@@ -688,8 +710,8 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Discard 1") PORT_CODE(KEYCODE_Z)
@@ -698,8 +720,8 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Discard 4") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Discard 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -708,8 +730,8 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Big") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1050,10 +1072,10 @@ static READ8_HANDLER( mux_port_r )
 {
 	switch( mux_data&0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_read_indexed(machine, 0);
-		case 0x20: return input_port_read_indexed(machine, 1);
-		case 0x40: return input_port_read_indexed(machine, 2);
-		case 0x80: return input_port_read_indexed(machine, 3);
+		case 0x10: return input_port_read(machine, "IN0-0");
+		case 0x20: return input_port_read(machine, "IN0-1");
+		case 0x40: return input_port_read(machine, "IN0-2");
+		case 0x80: return input_port_read(machine, "IN0-3");
 	}
 	return 0xff;
 }
@@ -1575,7 +1597,7 @@ ROM_END
 
 ROM_START( comg183 )	/* Cal Omega v18.3 (Pixels) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "18.32", 0xC000, 0x1000, CRC(c793ffc1) SHA1(f2ef82f92a9e18128d28973bcf050d0c3e1819f3) )
+	ROM_LOAD( "18.32", 0xc000, 0x1000, CRC(c793ffc1) SHA1(f2ef82f92a9e18128d28973bcf050d0c3e1819f3) )
 	ROM_LOAD( "18.33", 0xd000, 0x1000, CRC(415a6599) SHA1(648986310a3864652897e5d18b8be06819cce7a8) )
 	ROM_LOAD( "18.34", 0xe000, 0x1000, CRC(fc5d3b89) SHA1(3601401d00d7a0621eac4254da238e9c8929cac4) )
 	ROM_LOAD( "18.35", 0xf000, 0x1000, CRC(6552207f) SHA1(bd8a7546b4dad07d151dc7039028916386aee5e9) )
@@ -1597,7 +1619,7 @@ ROM_END
 
 ROM_START( comg185 )	/* Cal Omega v18.5 (Pixels) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "18.52", 0xC000, 0x1000, CRC(19225f7d) SHA1(73d713ee86886f935d9b2c2ca670d8e00d466b7f) )
+	ROM_LOAD( "18.52", 0xc000, 0x1000, CRC(19225f7d) SHA1(73d713ee86886f935d9b2c2ca670d8e00d466b7f) )
 	ROM_LOAD( "18.53", 0xd000, 0x1000, CRC(797e2b70) SHA1(83f974c6c1886eab5c90782766b72900c73045e1) )
 	ROM_LOAD( "18.54", 0xe000, 0x1000, CRC(6becc802) SHA1(e72783db52bffd3fa2f7d35cd8a004415e37b004) )
 	ROM_LOAD( "18.55", 0xf000, 0x1000, CRC(313db76a) SHA1(d81228bf0badc8a3cf08c77de27b3d973953175c) )
@@ -1619,7 +1641,7 @@ ROM_END
 
 ROM_START( comg186 )	/* Cal Omega v18.6 (Pixels) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "18.62", 0xC000, 0x1000, CRC(025f4268) SHA1(750a5417fe2b077893d8252dd5eafc42fafd965e) )
+	ROM_LOAD( "18.62", 0xc000, 0x1000, CRC(025f4268) SHA1(750a5417fe2b077893d8252dd5eafc42fafd965e) )
 	ROM_LOAD( "18.63", 0xd000, 0x1000, CRC(948a6ef1) SHA1(6aeb244209f3376042a32d9accb38e3f09cb192a) )
 	ROM_LOAD( "18.64", 0xe000, 0x1000, CRC(9fb6e82b) SHA1(db38564e8060f1c67183f3f412a24439b2253e13) )
 	ROM_LOAD( "18.65", 0xf000, 0x1000, CRC(a68be5ef) SHA1(1ab2bc1b070863260fa281970f886d77e2fa7ccd) )
@@ -1634,6 +1656,28 @@ ROM_START( comg186 )	/* Cal Omega v18.6 (Pixels) */
 
 	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "pixclr",		0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
+	ROM_RELOAD(				0x0100, 0x0100 )
+	ROM_RELOAD(				0x0200, 0x0100 )
+	ROM_RELOAD(				0x0300, 0x0100 )
+ROM_END
+
+ROM_START( comg187 )	/* Cal Omega v18.7 (Amusement Poker) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "18.72", 0xc000, 0x1000, BAD_DUMP CRC(1a4bd46a) SHA1(76101271ff9b98c3310e1666dfba34a01a0f0bcd) )	/* 1st half seems to be the 2nd one, and 2nd half is filled of 0xff */
+	ROM_LOAD( "18.73", 0xd000, 0x1000, CRC(ca374ecb) SHA1(113495afa88da97cb7239f645fabba7125ce2b4b) )
+	ROM_LOAD( "18.74", 0xe000, 0x1000, CRC(5bb57ca8) SHA1(22dc6f0e2fee5408fa70e4bc60f1833534ee038f) )
+	ROM_LOAD( "18.75", 0xf000, 0x1000, CRC(70a8ccb3) SHA1(b5b7d6a8262ab6e47a1400681c414fd3edd0d7a8) )
+
+	ROM_REGION( 0x0800, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "jkrtwo.cgo",	 0x0000, 0x0800, CRC(987b3e4d) SHA1(ae4b5dc0e4d1195bbf18b375c1a4dbf880f5f38c) )
+
+	ROM_REGION( 0x1800, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "jkrtwo.cgc",	0x0000, 0x0800, CRC(5b96f5e0) SHA1(4733349798eb059998a4814331f57e7f09e02490) )
+	ROM_LOAD( "jkrtwo.cgb",	0x0800, 0x0800, CRC(d77dda31) SHA1(e11b476cf0b609a8a40981b81b4d83b3c86678dc) )
+	ROM_LOAD( "jkrtwo.cga",	0x1000, 0x0800, CRC(def60756) SHA1(fe71424fc638761d9ff65391261a030a2889ad5e) )
+
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_LOAD( "mltclr",		0x0000, 0x0100, CRC(fefb0fa8) SHA1(66d86aa19d9d37ffd2840d6653fcec667bc716d4) )
 	ROM_RELOAD(				0x0100, 0x0100 )
 	ROM_RELOAD(				0x0200, 0x0100 )
 	ROM_RELOAD(				0x0300, 0x0100 )
@@ -2008,7 +2052,7 @@ static DRIVER_INIT( calomega )
 	int x;
 	UINT8 *BPR = memory_region( REGION_PROMS );
 
-	for (x=0x0000;x<0x0400;x++)
+	for (x = 0x0000; x < 0x0400; x++)
 	{
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x04;	/* blue background */
@@ -2025,7 +2069,7 @@ static DRIVER_INIT( elgrande )
 	UINT8 *BPR = memory_region( REGION_PROMS );
 
 	/* Palette transformed by PLDs? */
-	for (x=0x0000;x<0x0400;x++)
+	for (x = 0x0000; x < 0x0400; x++)
 	{
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x00; /* black background */
@@ -2042,7 +2086,7 @@ static DRIVER_INIT( jjpoker )
 	int x;
 	UINT8 *BPR = memory_region( REGION_PROMS );
 
-	for (x=0x0000;x<0x0400;x++)
+	for (x = 0x0000; x < 0x0400; x++)
 	{
 		if (BPR[x] == 0x02)
 			BPR[x] = 0x00;	/* blue background */
@@ -2059,7 +2103,7 @@ static DRIVER_INIT( standard )
 	int x;
 	UINT8 *BPR = memory_region( REGION_PROMS );
 
-	for (x=0x0000;x<0x0400;x++)
+	for (x = 0x0000; x < 0x0400; x++)
 	{
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x04;	/* blue background */
@@ -2096,6 +2140,7 @@ GAME( 1982, comg181,  0,        sys903,   standard, standard, ROT0, "Cal Omega I
 GAME( 1983, comg183,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                GAME_NOT_WORKING )
 GAME( 1983, comg185,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                GAME_NOT_WORKING )
 GAME( 1983, comg186,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                GAME_NOT_WORKING )
+GAME( 1983, comg187,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",       GAME_NOT_WORKING )
 GAME( 1984, comg204,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",       GAME_NOT_WORKING )
 GAME( 1984, comg208,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",       GAME_NOT_WORKING )
 GAME( 1984, comg227,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",  GAME_NOT_WORKING )

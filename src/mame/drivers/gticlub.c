@@ -65,11 +65,6 @@ READ32_HANDLER(K001604_reg_r);
 
 
 
-VIDEO_START( gticlub );
-VIDEO_UPDATE( gticlub );
-
-
-
 static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
@@ -278,32 +273,19 @@ static int adc1038_sars_r(running_machine *machine)
 	return adc1038_sars;
 }
 
-static READ32_HANDLER( sysreg_r )
+static READ8_HANDLER( sysreg_r )
 {
-	UINT32 r = 0;
-	if (offset == 0)
+	switch (offset)
 	{
-		if (ACCESSING_BITS_24_31)
-		{
-			r |= input_port_read_indexed(machine, 0) << 24;
-		}
-		if (ACCESSING_BITS_16_23)
-		{
-			r |= input_port_read_indexed(machine, 1) << 16;
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			r |= (adc1038_sars_r(machine) << 7) << 8;
-		}
-		if (ACCESSING_BITS_0_7)
-		{
-			r |= input_port_read_indexed(machine, 3) << 0;
-		}
-		return r;
-	}
-	else if (offset == 1)
-	{
-		if (ACCESSING_BITS_24_31 )
+		case 0:
+		case 1:
+		case 3:
+			return input_port_read_indexed(machine, offset);
+
+		case 2:
+			return adc1038_sars_r(machine) << 7;
+
+		case 4:
 		{
 			// 7        0
 			// |?????ae?|
@@ -313,55 +295,46 @@ static READ32_HANDLER( sysreg_r )
 
 			UINT32 eeprom_bit = (eeprom_read_bit() << 1);
 			UINT32 adc_bit = (adc1038_do_r() << 2);
-			r |= (eeprom_bit | adc_bit) << 24;
+			return (eeprom_bit | adc_bit);
 		}
-		else
-		{
-			mame_printf_debug("sysreg_r %d, %08X\n", offset, mem_mask);
-		}
-		return r;
+
+		default:
+			mame_printf_debug("sysreg_r %d\n", offset);
+			break;
 	}
-	return r;
+	return 0;
 }
 
-static WRITE32_HANDLER( sysreg_w )
+static WRITE8_HANDLER( sysreg_w )
 {
-	if (offset == 0)
+	switch (offset)
 	{
-		if( ACCESSING_BITS_24_31 )
-		{
-			gticlub_led_reg0 = (data >> 24) & 0xff;
-		}
-		if( ACCESSING_BITS_16_23 )
-		{
-			gticlub_led_reg1 = (data >> 16) & 0xff;
-		}
-		if( ACCESSING_BITS_0_7 )
-		{
+		case 0:
+			gticlub_led_reg0 = data;
+			break;
+
+		case 1:
+			gticlub_led_reg1 = data;
+			break;
+
+		case 3:
 			eeprom_write_bit((data & 0x01) ? 1 : 0);
 			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-		}
-	}
-	if( offset == 1 )
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			if (data & 0x80000000)	/* CG Board 1 IRQ Ack */
-			{
+			break;
+
+		case 4:
+			if (data & 0x80)	/* CG Board 1 IRQ Ack */
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
-			}
-			if (data & 0x40000000)	/* CG Board 0 IRQ Ack */
-			{
+
+			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
-			}
 
-			adc1038_di_w((data >> 24) & 1);
-			adc1038_clk_w(machine, (data >> 25) & 1);
+			adc1038_di_w((data >> 0) & 1);
+			adc1038_clk_w(machine, (data >> 1) & 1);
 
-			set_cgboard_id((data >> 28) & 0x3);
-		}
-		return;
+			set_cgboard_id((data >> 4) & 0x3);
+			break;
 	}
 }
 
@@ -381,9 +354,9 @@ READ8_HANDLER( K056230_r )
 	return 0;
 }
 
-TIMER_CALLBACK( network_irq_gen )
+TIMER_CALLBACK( network_irq_clear )
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
 }
 
 WRITE8_HANDLER( K056230_w )
@@ -401,12 +374,12 @@ WRITE8_HANDLER( K056230_w )
 				// Thunder Hurricane breaks otherwise...
 				if (mame_stricmp(Machine->gamedrv->name, "thunderh") != 0)
 				{
-//                  timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, network_irq_gen);
-//                  cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+					cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+					timer_set(ATTOTIME_IN_USEC(1), NULL, 0, network_irq_clear);
 				}
 			}
-			else
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
+//          else
+//              cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
 		case 2:		// Sub ID register
@@ -432,25 +405,38 @@ WRITE32_HANDLER( lanc_ram_w )
 
 /******************************************************************/
 
+static MACHINE_START( gticlub )
+{
+	/* set conservative DRC options */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+
+	/* configure fast RAM regions for DRC */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
+	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+}
+
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_reg_r, K001604_reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(paletteram32_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_tile_r, K001604_tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_char_r, K001604_char_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_0_r, K001006_0_w)
-	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_1_r, K001006_1_w)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE(sysreg_r, sysreg_w)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)
-	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)		// Hang Pilot
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)
-	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER2, 0)	/* Data ROM */
-	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x80000000) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x7fe00000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
+	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(K001604_reg_r, K001604_reg_w)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(K001604_tile_r, K001604_tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(K001604_char_r, K001604_char_w)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x78040000, 0x7804000f) AM_READWRITE(K001006_0_r, K001006_0_w)
+	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE(K001006_1_r, K001006_1_w)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_WRITE(K056800_host_w)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_READ(K056800_host_r)		// Hang Pilot
+	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_READ(K056800_host_r)
+	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_REGION(REGION_USER2, 0)	/* Data ROM */
+	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE(2)
+	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
 ADDRESS_MAP_END
 
 /**********************************************************************/
@@ -740,6 +726,7 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_INTERLEAVE(100)
 
 	MDRV_NVRAM_HANDLER(gticlub)
+	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(gticlub)
 
  	/* video hardware */
@@ -788,6 +775,7 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_INTERLEAVE(100)
 
 	MDRV_NVRAM_HANDLER(gticlub)
+	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(hangplt)
 
  	/* video hardware */
@@ -995,9 +983,6 @@ static DRIVER_INIT(hangplt)
 static DRIVER_INIT(slrasslt)
 {
 	DRIVER_INIT_CALL(gticlub);
-
-	// enable self-modifying code checks
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_STRICT_VERIFY);
 }
 
 /*************************************************************************/

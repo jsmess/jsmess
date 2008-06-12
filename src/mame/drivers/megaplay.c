@@ -603,7 +603,7 @@ ADDRESS_MAP_END
 UINT8 segae_vdp_ctrl_r ( UINT8 chip );
 UINT8 segae_vdp_data_r ( UINT8 chip );
 void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data );
-void segae_vdp_data_w ( UINT8 chip, UINT8 data );
+void segae_vdp_data_w ( running_machine *machine, UINT8 chip, UINT8 data );
 
 static READ8_HANDLER (megaplay_bios_port_be_bf_r)
 {
@@ -624,7 +624,7 @@ static WRITE8_HANDLER (megaplay_bios_port_be_bf_w)
 	switch (offset)
 	{
 		case 0: /* port 0xbe, VDP 1 DATA Write */
-			segae_vdp_data_w(0, data); break;
+			segae_vdp_data_w(machine, 0, data); break;
 		case 1: /* port 0xbf, VDP 1 CTRL Write */
 			segae_vdp_ctrl_w(0, data); break;
 	}
@@ -648,10 +648,6 @@ ADDRESS_MAP_END
 /* in video/segasyse.c */
 VIDEO_START( megaplay_normal );
 VIDEO_UPDATE( megaplay_normal );
-
-/* give us access to the megadriv start and update functions so that we can call them */
-VIDEO_START( megadriv );
-VIDEO_UPDATE( megadriv );
 
 static VIDEO_START(megplay)
 {

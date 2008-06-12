@@ -10,6 +10,7 @@
     ---------------+------+-----------+----------+--------------------
     Alligator Hunt | 1994 | GAE1 449  | 940411   | DS5002FP, but unprotected version available
     World Rally 2  | 1995 | GAE1 449  | 950510   | DS5002FP
+    World Rally 2  | 1995 | GAE1 506  | 950510-1 | DS5002FP
     Touch & Go     | 1995 | GAE1 501  | 950906   | DS5002FP
     Touch & Go     | 1995 | GAE1 501  | 950510-1 | DS5002FP
     Maniac Square  | 1996 | Unknown   | ???      | DS5002FP, but unprotected version available
@@ -23,35 +24,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/gaelco.h"
 #include "rendlay.h"
-
-extern UINT16 *gaelco_sndregs;
-extern UINT16 *gaelco2_vregs;
-extern UINT16 *snowboar_protection;
-
-/* from machine/gaelco2.c */
-DRIVER_INIT( alighunt );
-DRIVER_INIT( touchgo );
-DRIVER_INIT( snowboar );
-WRITE16_HANDLER( gaelco2_coin_w );
-WRITE16_HANDLER( gaelco2_coin2_w );
-WRITE16_HANDLER( wrally2_coin_w );
-NVRAM_HANDLER( gaelco2 );
-READ16_HANDLER( gaelco2_eeprom_r );
-WRITE16_HANDLER( gaelco2_eeprom_cs_w );
-WRITE16_HANDLER( gaelco2_eeprom_sk_w );
-WRITE16_HANDLER( gaelco2_eeprom_data_w );
-READ16_HANDLER( snowboar_protection_r );
-WRITE16_HANDLER( snowboar_protection_w );
-
-/* from video/gaelco2.c */
-WRITE16_HANDLER( gaelco2_vram_w );
-WRITE16_HANDLER( gaelco2_palette_w );
-VIDEO_UPDATE( gaelco2 );
-VIDEO_EOF( gaelco2 );
-VIDEO_START( gaelco2 );
-VIDEO_UPDATE( gaelco2_dual );
-VIDEO_START( gaelco2_dual );
-
+#include "includes/gaelco2.h"
 
 #define TILELAYOUT16(NUM) static const gfx_layout tilelayout16_##NUM =				\
 {																					\
@@ -1351,6 +1324,56 @@ CONN1: RGBSync OUT (additional to JAMMA RGBSync)
 CONN2: Right speaker sound OUT (for second cabinat)
 CONN3: For connection of wheel etc
 POT1/2: Volume adjust of left/right channel
+
+PCB Layout:
+
+REF: 950510-1
+
+------------------------------------------------------------------------------
+ |         POT1              TI F20LB         KM428C256J-6 (x4)               |
+ |         POT2                                                               |
+ |                                                                            |
+ |                                                                            |
+ |                                              PROM IC68                     |
+ |---                                           PROM IC69                     |
+    |                                           PROM IC70                     |
+    |                                                                         |
+ |---                                                                         |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            |
+ |                                            |----------|                    |
+ | J                                          |          |                    |
+ |                                            | GAE1 506 |                    |
+ | A                              65764       | (QFP160) |                    |
+ |                                65764       |          |                    |
+ | M                                          |----------|                    |
+ |                                                                            |
+ | M                       |-------------------------|                        |
+ |                         |                         |  34.000MHz     62256   |
+ | A                       |  62256  DS5002  BATT_3V |                62256   |
+ |                         |                         |                        |
+ |                         |-------------------------|                        |
+ |    TLC569   TLC569                                                         |
+ |---                                    62256                                |
+    |                                    62256                                |
+    |  DSW1                                                                   |
+ |---  DSW2                                                                   |
+ |                                                                            |
+ |                                26.000MHz      MC68000P12      WR2.63       |
+ | CONN1                                                         WR2.64       |
+ |                                                                            |
+ | CONN2    CONN3                                                             |
+ -----------------------------------------------------------------------------|
+
+
+Notes
+-----
+Gaelco's PROMs IC70 and IC69 has DIP42 package (many wires are routed to GAE1 506, so I guess that they are a gfx rom)
+Gaelco's PROM IC68 has DIP32 package (may be a sound rom)
+TI F20L8 is a Texas Ins. DIP24 (may be a PAL). Is marked as F 406 XF 21869 F20L8-25CNT
+TLC569 (IC2 and IC7) is a 8-bit serial ADC
+
 */
 
 ROM_START( wrally2 )

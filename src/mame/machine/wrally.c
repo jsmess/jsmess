@@ -10,10 +10,7 @@
 #include "driver.h"
 #include "cpu/ds5002fp/ds5002fp.h"
 #include "gaelcrpt.h"
-
-/* from video/wrally.c */
-extern UINT16 *wrally_videoram;
-extern tilemap *wrally_pant[2];
+#include "includes/wrally.h"
 
 /***************************************************************************
 
@@ -54,7 +51,7 @@ WRITE16_HANDLER( wrally_coin_lockout_w )
 }
 
 /* Converts memory offsets to the format expected by the Dallas */
-READ32_HANDLER( wrally_external_ram_iaddr )
+static READ32_HANDLER( wrally_external_ram_iaddr )
 {
 	return offset ^= 0x0001;
 }

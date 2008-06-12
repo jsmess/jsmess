@@ -90,7 +90,7 @@ static MACHINE_RESET( atarig1 )
 static WRITE16_HANDLER( mo_control_w )
 {
 	if (ACCESSING_BITS_0_7)
-		atarirle_control_w(0, data & 7);
+		atarirle_control_w(machine, 0, data & 7);
 }
 
 
@@ -125,7 +125,7 @@ static WRITE16_HANDLER( a2d_select_w )
 
 static READ16_HANDLER( a2d_data_r )
 {
-	char port[5];
+	static const char *adcnames[] = { "ADC0", "ADC1", "ADC2" };
 
 	/* Pit Fighter has no A2D, just another input port */
 	if (atarig1_pitfight)
@@ -133,10 +133,7 @@ static READ16_HANDLER( a2d_data_r )
 
 	/* otherwise, assume it's hydra */
 	if (which_input < 3)
-	{
-		sprintf(port, "ADC%d", which_input);
-		return input_port_read(machine, port) << 8;
-	}
+		return input_port_read(machine, adcnames[which_input]) << 8;
 
 	return 0;
 }

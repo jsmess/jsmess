@@ -145,6 +145,28 @@ Notes about 'frogg' :
   bit 5 of IN1 is tested if "Cabinet" Dip Switch is set to "Cocktail".
 
 
+Notes about 'calipso' :
+---------------------
+
+  Calipso was apperantly redesigned for two player simultanious play.
+  There is code at $298a to flip the screen, but location $8669 has to be
+  set to 2. It's set to 1 no matter how many players are playing.
+  It's possible that there is a cocktail version of the game.
+
+
+Notes about 'moonwar' :
+---------------------
+
+  Moonwar: 8255 Port C bit 4 was originally designed so when bit4=0, 1P spinner
+  is selected, and when bit4=1, 2P spinner gets selected.  But they forgot to
+  change the 8255 initialization value and Port C was set to input, setting the
+  spinner select bit to HI regardless what was written to it. This bug has been
+  corrected in the newer set, but, to maintain hardware compatibility with
+  older PCB's, they had to reverse to active status of the select bit.  So in the
+  newer set, Bit4=1 selects the 1P spinner and Bit4=0 selects the 2P spinner.
+
+
+
 TO DO :
 -------
 
@@ -196,6 +218,8 @@ static UINT8 protection_result;
 
 static UINT8 konami_sound_control;
 static UINT8 sfx_sample_control;
+
+static UINT8 moonwar_port_select;
 
 static UINT8 irq_enabled;
 static int irq_line;
@@ -1084,6 +1108,51 @@ static READ8_HANDLER( dingoe_3001_r )
 }
 
 
+/*************************************
+ *
+ *  Moon War I/O
+ *
+ *************************************/
+
+static WRITE8_HANDLER( moonwar_port_select_w )
+{
+	moonwar_port_select = data & 0x10;
+}
+
+
+static READ8_HANDLER( moonwar_input_port_0_r )
+{
+	UINT8 sign;
+	UINT8 delta;
+
+	delta = (moonwar_port_select ? input_port_read(machine, "IN3") : input_port_read(machine, "IN4"));
+
+	sign = (delta & 0x80) >> 3;
+	delta &= 0x0f;
+
+	return ((input_port_read(machine, "IN0") & 0xe0) | delta | sign );
+}
+
+
+static const ppi8255_interface moonwar_ppi8255_intf[2] =
+{
+	{
+		moonwar_input_port_0_r,			/* Port A read */
+		konami_portb_0_r,				/* Port B read */
+		konami_portc_0_r,				/* Port C read */
+		NULL,							/* Port A write */
+		NULL,							/* Port B write */
+		moonwar_port_select_w 			/* Port C write */
+	},
+	{
+		NULL,							/* Port A read */
+		NULL,							/* Port B read */
+		konami_portc_1_r,				/* Port C read */
+		soundlatch_w,					/* Port A write */
+		konami_sound_control_w,			/* Port B write */
+		konami_portc_1_w				/* Port C write */
+	}
+};
 
 /*************************************
  *
@@ -1517,18 +1586,18 @@ static const gfx_layout galaxian_spritelayout =
  *
  *************************************/
 
-GFXDECODE_START(galaxian)
+static GFXDECODE_START(galaxian)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_charlayout,   0, 8, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_spritelayout, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
-GFXDECODE_START(gmgalax)
+static GFXDECODE_START(gmgalax)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_charlayout,   0, 16, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_spritelayout, 0, 16, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
 /* separate character and sprite ROMs */
-GFXDECODE_START(pacmanbl)
+static GFXDECODE_START(pacmanbl)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_charlayout,   0, 8, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE(REGION_GFX2, 0x0000, galaxian_spritelayout, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
@@ -2074,6 +2143,21 @@ static MACHINE_DRIVER_START( anteater )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( moonwar )
+
+	/* basic machine hardware */
+	/* same as regular type 1, the only difference is that the bullets are less yellow */
+	MDRV_IMPORT_FROM(scobra)
+
+	/* device config overrides */
+	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( moonwar_ppi8255_intf[0] )
+
+	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( moonwar_ppi8255_intf[1] )
+
+	MDRV_PALETTE_INIT(moonwar)
+MACHINE_DRIVER_END
 
 
 /*************************************
@@ -2245,6 +2329,36 @@ static void decode_losttomb_gfx(void)
 	free(scratch);
 }
 
+
+static void decode_superbon(void)
+{
+	offs_t i;
+	UINT8 *RAM;
+
+	/* Deryption worked out by hand by Chris Hardy. */
+
+	RAM = memory_region(REGION_CPU1);
+
+	for (i = 0;i < 0x1000;i++)
+	{
+		/* Code is encrypted depending on bit 7 and 9 of the address */
+		switch (i & 0x0280)
+		{
+		case 0x0000:
+			RAM[i] ^= 0x92;
+			break;
+		case 0x0080:
+			RAM[i] ^= 0x82;
+			break;
+		case 0x0200:
+			RAM[i] ^= 0x12;
+			break;
+		case 0x0280:
+			RAM[i] ^= 0x10;
+			break;
+		}
+	}
+}
 
 
 /*************************************
@@ -2788,6 +2902,36 @@ static DRIVER_INIT( anteater )
 	/* decode graphics */
 	decode_anteater_gfx();
 }
+
+
+static DRIVER_INIT( superbon )
+{
+
+	/* video extensions */
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+
+	/* decode code */
+	decode_superbon();
+}
+
+
+static DRIVER_INIT( calipso )
+{
+
+	/* video extensions */
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, calipso_extend_sprite_info);
+
+}
+
+
+static DRIVER_INIT( moonwar )
+{
+	/* video extensions */
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+
+	state_save_register_global(moonwar_port_select);
+}
+
 
 
 #include "galdrvr.c"

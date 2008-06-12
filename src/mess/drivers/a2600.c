@@ -1409,7 +1409,7 @@ static MACHINE_START( a2600 )
 	const device_config *screen = video_screen_first(machine->config);
 	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
-	tia_init( &tia_interface );
+	tia_init( machine, &tia_interface );
 	r6532_config( 0, &r6532_interface );
 	r6532_set_clock( 0, MASTER_CLOCK_NTSC / 3 );
 	r6532_reset(0);
@@ -1422,7 +1422,7 @@ static MACHINE_START( a2600p )
 	const device_config *screen = video_screen_first(machine->config);
 	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
-	tia_init( &tia_interface_pal );
+	tia_init( machine, &tia_interface_pal );
 	r6532_config( 0, &r6532_interface );
 	r6532_set_clock( 0, MASTER_CLOCK_PAL / 3 );
 	r6532_reset(0);

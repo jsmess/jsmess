@@ -38,6 +38,7 @@ void forogttn_dummy_function(running_machine *machine)
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800048, 0x800049, 0, 0, forgottn_dial_1_reset_w);
 	memory_install_read16_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x800052, 0x800055, 0, 0, forgottn_dial_0_r);
 	memory_install_read16_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x80005a, 0x80005d, 0, 0, forgottn_dial_1_r);
+	cps1_hack_dsw_r(machine, 0, 0);
 }
 
 /***************************************************************************

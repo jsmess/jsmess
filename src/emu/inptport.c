@@ -2348,7 +2348,7 @@ static int frame_get_digital_field_state(const input_field_config *field)
 	}
 
 	/* skip locked-out coin inputs */
-	if (curstate && field->type >= IPT_COIN1 && field->type <= IPT_COIN8 && coinlockedout[field->type - IPT_COIN1])
+	if (curstate && field->type >= IPT_COIN1 && field->type <= IPT_COIN8 && coinlockedout[field->type - IPT_COIN1] && options_get_bool(mame_options(), OPTION_COIN_LOCKOUT))
 	{
 		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
 		return FALSE;
@@ -3543,7 +3543,7 @@ static int load_game_config(running_machine *machine, xml_data_node *portnode, i
 	const char *tag;
 
 	/* read the mask, index, and defvalue attributes */
-	tag = xml_get_attribute_string(portnode, "port", NULL);
+	tag = xml_get_attribute_string(portnode, "tag", NULL);
 	mask = xml_get_attribute_int(portnode, "mask", 0);
 	defvalue = xml_get_attribute_int(portnode, "defvalue", 0);
 

@@ -1,7 +1,7 @@
 /******************************************************************
 
   Nazionale Elettronica + others (mostly Italian) Gambling games
-  based on H8/3048 + OKI 6295 or similar.
+  mostly based on H8/3048 + OKI 6295 or similar.
 .
   These all use MCUs with internal ROM for their programs,
   they can't be dumped easily, and thus we can't emulate
@@ -48,6 +48,11 @@
 #define MAIN_CLOCK	XTAL_30MHz
 #define SND_CLOCK	XTAL_1MHz
 
+#define MNUMBER_MAIN_CLOCK	XTAL_24MHz
+#define MNUMBER_SND_CLOCK	XTAL_16MHz
+
+#define EJOLLYX5_MAIN_CLOCK	XTAL_16MHz
+
 #include "driver.h"
 #include "cpu/h83002/h83002.h"
 #include "sound/okim6295.h"
@@ -57,11 +62,11 @@
 *     Video Hardware     *
 *************************/
 
-VIDEO_START( itgamble )
+static VIDEO_START( itgamble )
 {
 }
 
-VIDEO_UPDATE( itgamble )
+static VIDEO_UPDATE( itgamble )
 {
 	return 0;
 }
@@ -163,7 +168,7 @@ GFXDECODE_END
 *      Machine Reset      *
 **************************/
 
-MACHINE_RESET( itgamble )
+static MACHINE_RESET( itgamble )
 {
 	/* stop the CPU, we have no code for it anyway */
 	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
@@ -196,9 +201,32 @@ static MACHINE_DRIVER_START( itgamble )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(OKIM6295, SND_CLOCK)	/* 1MHz resonator */
+	MDRV_SOUND_ADD_TAG("oki", OKIM6295, SND_CLOCK)	/* 1MHz resonator */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( mnumber )
+
+	MDRV_IMPORT_FROM(itgamble)
+	MDRV_CPU_REPLACE("main", H83044, MNUMBER_MAIN_CLOCK/2)	/* probably the wrong CPU */
+
+	MDRV_SOUND_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* clock frequency & pin 7 not verified */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( ejollyx5 )
+
+	MDRV_IMPORT_FROM(itgamble)
+	/* wrong CPU. we need a Renesas M16/62A 16bit microcomputer core */
+	MDRV_CPU_REPLACE("main", H83044, EJOLLYX5_MAIN_CLOCK/2)	/* up to 10MHz.*/
+
+	MDRV_SOUND_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* clock frequency & pin 7 not verified */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -469,14 +497,57 @@ ROM_START( euro2k2a )
 	ROM_REGION( 0x1000000, REGION_CPU1, 0 ) /* all the program code is in here */
 	ROM_LOAD( "euro2k2a_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x1c0000, REGION_GFX1, 0 ) /* M6295 samples */
+	ROM_REGION( 0x1c0000, REGION_GFX1, 0 )
 	ROM_LOAD( "4a.ic18", 0x000000, 0x80000, CRC(5decae2d) SHA1(d918aad0e2a1249b18677833f743c92fb678050a) )
 	ROM_LOAD( "5a.ic17", 0x080000, 0x80000, CRC(8f1bbbf3) SHA1(5efcf77674f8737fc1b98881acebacb26b10adc1) )
 	ROM_LOAD( "2a.ic20", 0x100000, 0x40000, CRC(f9bffb07) SHA1(efba175189d99a4548739a72f8a1f03c2782a3d0) )
 	ROM_LOAD( "3a.ic19", 0x140000, 0x80000, CRC(56c8a73d) SHA1(49b44e5604cd8675d8f9770e5fb68dad4394e11d) ) /* identical halves */
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* M6295 samples */
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
+ROM_END
+
+
+/********** DIFFERENT HARDWARE **********/
+
+
+/* Mystery Number
+
+CPU:
+
+1x HD64F3048F16 (main)(u2)
+3x XC9572 (u29,u33,u34)
+1x M6295 (u5)(sound)
+1x oscillator 24.000 MHz.
+1x oscillator 16.000 MHz.
+
+ROMs:
+
+4x M27C4001 (1,2,3,4)(main)
+1x AM27C020 (5)(sound)
+
+Note:
+
+1x JAMMA edge connector
+1x 8 legs jumper (jp1)
+1x battery
+1x 8x2 DIP switches
+1x trimmer (volume)
+
+*/
+
+ROM_START( mnumber )	/* clocks should be changed for this game */
+	ROM_REGION( 0x1000000, REGION_CPU1, 0 )	/* all the program code is in here */
+	ROM_LOAD( "mnumber_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )	/* different encoded gfx */
+	ROM_LOAD( "mysterynumber3.u20", 0x000000, 0x80000, CRC(251f1e11) SHA1(e8c90b289e76cea6a541b701859be6465a381668) )
+	ROM_LOAD( "mysterynumber4.u21", 0x080000, 0x80000, CRC(2b8744e4) SHA1(8a12c6f300818de3738e7c44c7df71c432cb9975) )
+	ROM_LOAD( "mysterynumber1.u22", 0x100000, 0x80000, CRC(d2ce1f61) SHA1(8f30407050fc102191747996258d4b5da3a0d994) )
+	ROM_LOAD( "mysterynumber2.u19", 0x180000, 0x80000, CRC(7b3a3b32) SHA1(9db46aa12077a48951056705491da1cce747c374) ) /* identical halves */
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* M6295 samples */
+	ROM_LOAD( "mysterynumber5.u6", 0x00000, 0x40000, CRC(80aba466) SHA1(e9bf7e1c3d1c6b1b0dba43dd79a71f89e63df814) )
 ROM_END
 
 
@@ -491,3 +562,6 @@ GAME( 2002, laperla,  0,       itgamble, itgamble, 0,   ROT0, "Nazionale Elettro
 GAME( 2001, laperlag, 0,       itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  GAME_NOT_WORKING )
 GAME( 2001, euro2k2,  0,       itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  GAME_NOT_WORKING )
 GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  GAME_NOT_WORKING )
+
+/* different hardware */
+GAME( 200?, mnumber,  0,       mnumber,  itgamble, 0,   ROT0, "M.M. - B.R.L.",         "Mystery Number",                GAME_NOT_WORKING )

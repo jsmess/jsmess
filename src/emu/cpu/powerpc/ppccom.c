@@ -14,7 +14,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define PRINTF_TLB_FILL			(0)
+#define PRINTF_TLB_FILL			(1)
 #define PRINTF_SPU				(0)
 #define PRINTF_DECREMENTER		(0)
 
@@ -102,6 +102,61 @@ INLINE int tlb_entry_allocate(powerpc_state *ppc, int entrynum, offs_t address, 
 	*entry = value;
 
 	return allocated;
+}
+
+
+/*-------------------------------------------------
+    get_cr - return the current CR value
+-------------------------------------------------*/
+
+INLINE UINT32 get_cr(powerpc_state *ppc)
+{
+	return 	((ppc->cr[0] & 0x0f) << 28) |
+			((ppc->cr[1] & 0x0f) << 24) |
+			((ppc->cr[2] & 0x0f) << 20) |
+			((ppc->cr[3] & 0x0f) << 16) |
+			((ppc->cr[4] & 0x0f) << 12) |
+			((ppc->cr[5] & 0x0f) << 8) |
+			((ppc->cr[6] & 0x0f) << 4) |
+			((ppc->cr[7] & 0x0f) << 0);
+}
+
+
+/*-------------------------------------------------
+    set_cr - set the current CR value
+-------------------------------------------------*/
+
+INLINE void set_cr(powerpc_state *ppc, UINT32 value)
+{
+	ppc->cr[0] = value >> 28;
+	ppc->cr[1] = value >> 24;
+	ppc->cr[2] = value >> 20;
+	ppc->cr[3] = value >> 16;
+	ppc->cr[4] = value >> 12;
+	ppc->cr[5] = value >> 8;
+	ppc->cr[6] = value >> 4;
+	ppc->cr[7] = value >> 0;
+}
+
+
+/*-------------------------------------------------
+    get_xer - return the current XER value
+-------------------------------------------------*/
+
+INLINE UINT32 get_xer(powerpc_state *ppc)
+{
+	return ppc->spr[SPR_XER] | (ppc->xerso << 31);
+}
+
+
+/*-------------------------------------------------
+    set_xer - set the current XER value
+-------------------------------------------------*/
+
+INLINE void set_xer(powerpc_state *ppc, UINT32 value)
+{
+	ppc->spr[SPR_XER] = value & ~XER_SO;
+	ppc->xerso = value >> 31;
 }
 
 
@@ -422,14 +477,37 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 	offs_t transaddr = address;
 	UINT32 entryval;
 
-	/* allow for an implementation-specific override */
-	if (ppc->tlb_fill != NULL && (*ppc->tlb_fill)(ppc))
-		return;
+	/* 4xx case: "TLB" really just caches writes and checks compare registers */
+	if (ppc->cap & PPCCAP_4XX)
+	{
+		/* assume success and direct translation */
+		ppc->param0 = 1;
+		transaddr = address & 0x7fffffff;
 
-	/* if we can't translate the address, just return (and fail) */
-	ppc->param0 = ppccom_translate_address_internal(ppc, transtype | transuser, &transaddr);
+		/* we don't support the MMU of the 403GCX */
+		if (ppc->flavor == PPC_MODEL_403GCX && (ppc->msr & MSROEA_DR))
+			fatalerror("MMU enabled but not supported!");
+
+		/* only check if PE is enabled */
+		if (transtype == TRANSLATE_WRITE && (ppc->msr & MSR4XX_PE))
+		{
+			/* are we within one of the protection ranges? */
+			int inrange1 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL1] >> 12) && (address >> 12) < (ppc->spr[SPR4XX_PBU1] >> 12));
+			int inrange2 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL2] >> 12) && (address >> 12) < (ppc->spr[SPR4XX_PBU2] >> 12));
+
+			/* if PX == 1, writes are only allowed OUTSIDE of the bounds */
+			if (((ppc->msr & MSR4XX_PX) && (inrange1 || inrange2)) || (!(ppc->msr & MSR4XX_PX) && (!inrange1 && !inrange2)))
+				ppc->param0 = 2;
+		}
+	}
+
+	/* OEA case: perform an address translation */
+	else
+		ppc->param0 = ppccom_translate_address_internal(ppc, transtype | transuser, &transaddr);
+
+	/* log information and return upon failure */
 	if (PRINTF_TLB_FILL)
-		printf("tlb_fill: %08X (%s%s) -> ", address, (transtype == TRANSLATE_READ) ? "R" : (transtype == TRANSLATE_WRITE) ? "W" : "F", transuser ? " U" : "S");
+		printf("tlb_fill: %08X (%s%s) -> ", address, (transtype == TRANSLATE_READ) ? "R" : (transtype == TRANSLATE_WRITE) ? "W" : "F", transuser ? "U" : "S");
 	if (ppc->param0 > 1)
 	{
 		if (PRINTF_TLB_FILL)
@@ -620,14 +698,22 @@ void ppccom_execute_mfspr(powerpc_state *ppc)
 			/* read-through no-ops */
 			case SPR4XX_EVPR:
 			case SPR4XX_ESR:
-			case SPR4XX_DCCR:
-			case SPR4XX_ICCR:
 			case SPR4XX_SRR0:
 			case SPR4XX_SRR1:
 			case SPR4XX_SRR2:
 			case SPR4XX_SRR3:
 			case SPR4XX_TCR:
 			case SPR4XX_TSR:
+			case SPR4XX_IAC1:
+			case SPR4XX_IAC2:
+			case SPR4XX_DAC1:
+			case SPR4XX_DAC2:
+			case SPR4XX_DCCR:
+			case SPR4XX_ICCR:
+			case SPR4XX_PBL1:
+			case SPR4XX_PBU1:
+			case SPR4XX_PBL2:
+			case SPR4XX_PBU2:
 				ppc->param1 = ppc->spr[ppc->param0];
 				return;
 
@@ -751,6 +837,15 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 				ppc->spr[ppc->param0] = ppc->param1;
 				return;
 
+			/* registers that affect the memory map */
+			case SPR4XX_PBL1:
+			case SPR4XX_PBU1:
+			case SPR4XX_PBL2:
+			case SPR4XX_PBU2:
+				ppc->spr[ppc->param0] = ppc->param1;
+				ppccom_tlb_flush(ppc);
+				return;
+
 			/* timer control register */
 			case SPR4XX_TCR:
 				ppc->spr[SPR4XX_TCR] = ppc->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
@@ -814,18 +909,22 @@ void ppccom_execute_mfdcr(powerpc_state *ppc)
 		case DCR4XX_DMADA0:
 		case DCR4XX_DMASA0:
 		case DCR4XX_DMACC0:
+		case DCR4XX_DMACR0:
 		case DCR4XX_DMACT1:
 		case DCR4XX_DMADA1:
 		case DCR4XX_DMASA1:
 		case DCR4XX_DMACC1:
+		case DCR4XX_DMACR1:
 		case DCR4XX_DMACT2:
 		case DCR4XX_DMADA2:
 		case DCR4XX_DMASA2:
 		case DCR4XX_DMACC2:
+		case DCR4XX_DMACR2:
 		case DCR4XX_DMACT3:
 		case DCR4XX_DMADA3:
 		case DCR4XX_DMASA3:
 		case DCR4XX_DMACC3:
+		case DCR4XX_DMACR3:
 		case DCR4XX_EXIER:
 		case DCR4XX_EXISR:
 		case DCR4XX_IOCR:
@@ -948,10 +1047,10 @@ void ppccom_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + PPC_PC:				ppc->pc = info->i;						break;
 		case CPUINFO_INT_REGISTER + PPC_MSR:			ppc->msr = info->i;						break;
-		case CPUINFO_INT_REGISTER + PPC_CR:				ppc->cr = info->i;						break;
+		case CPUINFO_INT_REGISTER + PPC_CR:				set_cr(ppc, info->i);					break;
 		case CPUINFO_INT_REGISTER + PPC_LR:				ppc->spr[SPR_LR] = info->i;				break;
 		case CPUINFO_INT_REGISTER + PPC_CTR:			ppc->spr[SPR_CTR] = info->i;			break;
-		case CPUINFO_INT_REGISTER + PPC_XER:			ppc->spr[SPR_XER] = info->i; 			break;
+		case CPUINFO_INT_REGISTER + PPC_XER:			set_xer(ppc, info->i);		 			break;
 		case CPUINFO_INT_REGISTER + PPC_SRR0:			ppc->spr[SPROEA_SRR0] = info->i;		break;
 		case CPUINFO_INT_REGISTER + PPC_SRR1:			ppc->spr[SPROEA_SRR1] = info->i;		break;
 		case CPUINFO_INT_REGISTER + PPC_SPRG0:			ppc->spr[SPROEA_SPRG0] = info->i;		break;
@@ -963,6 +1062,9 @@ void ppccom_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + PPC_EXISR:			ppc->dcr[DCR4XX_EXISR] = info->i;		break;
 		case CPUINFO_INT_REGISTER + PPC_EVPR:			ppc->spr[SPR4XX_EVPR] = info->i;		break;
 		case CPUINFO_INT_REGISTER + PPC_IOCR:			ppc->dcr[DCR4XX_IOCR] = info->i;		break;
+		case CPUINFO_INT_REGISTER + PPC_TBL:			set_timebase(ppc, (get_timebase(ppc) & ~U64(0x00ffffff00000000)) | info->i); break;
+		case CPUINFO_INT_REGISTER + PPC_TBH:			set_timebase(ppc, (get_timebase(ppc) & ~U64(0x00000000ffffffff)) | ((UINT64)(ppc->param1 & 0x00ffffff) << 32)); break;
+		case CPUINFO_INT_REGISTER + PPC_DEC:			set_decrementer(ppc, info->i);			break;
 
 		case CPUINFO_INT_REGISTER + PPC_R0:				ppc->r[0] = info->i;					break;
 		case CPUINFO_INT_REGISTER + PPC_R1:				ppc->r[1] = info->i;					break;
@@ -1035,10 +1137,10 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + PPC_PC:				info->i = ppc->pc;						break;
 		case CPUINFO_INT_REGISTER + PPC_MSR:			info->i = ppc->msr;						break;
-		case CPUINFO_INT_REGISTER + PPC_CR:				info->i = ppc->cr;						break;
+		case CPUINFO_INT_REGISTER + PPC_CR:				info->i = get_cr(ppc);					break;
 		case CPUINFO_INT_REGISTER + PPC_LR:				info->i = ppc->spr[SPR_LR];				break;
 		case CPUINFO_INT_REGISTER + PPC_CTR:			info->i = ppc->spr[SPR_CTR];			break;
-		case CPUINFO_INT_REGISTER + PPC_XER:			info->i = ppc->spr[SPR_XER]; 			break;
+		case CPUINFO_INT_REGISTER + PPC_XER:			info->i = get_xer(ppc);					break;
 		case CPUINFO_INT_REGISTER + PPC_SRR0:			info->i = ppc->spr[SPROEA_SRR0];		break;
 		case CPUINFO_INT_REGISTER + PPC_SRR1:			info->i = ppc->spr[SPROEA_SRR1];		break;
 		case CPUINFO_INT_REGISTER + PPC_SPRG0:			info->i = ppc->spr[SPROEA_SPRG0];		break;
@@ -1050,6 +1152,9 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + PPC_EXISR:			info->i = ppc->dcr[DCR4XX_EXISR];		break;
 		case CPUINFO_INT_REGISTER + PPC_EVPR:			info->i = ppc->spr[SPR4XX_EVPR];		break;
 		case CPUINFO_INT_REGISTER + PPC_IOCR:			info->i = ppc->dcr[DCR4XX_IOCR];		break;
+		case CPUINFO_INT_REGISTER + PPC_TBH:			info->i = get_timebase(ppc) >> 32;		break;
+		case CPUINFO_INT_REGISTER + PPC_TBL:			info->i = (UINT32)get_timebase(ppc);	break;
+		case CPUINFO_INT_REGISTER + PPC_DEC:			info->i = get_decrementer(ppc);			break;
 
 		case CPUINFO_INT_REGISTER + PPC_R0:				info->i = ppc->r[0];					break;
 		case CPUINFO_INT_REGISTER + PPC_R1:				info->i = ppc->r[1];					break;
@@ -1108,10 +1213,10 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 
 		case CPUINFO_STR_REGISTER + PPC_PC:				sprintf(info->s, "PC: %08X", ppc->pc);				break;
 		case CPUINFO_STR_REGISTER + PPC_MSR:			sprintf(info->s, "MSR:%08X", ppc->msr);				break;
-		case CPUINFO_STR_REGISTER + PPC_CR:				sprintf(info->s, "CR: %08X", ppc->cr);				break;
+		case CPUINFO_STR_REGISTER + PPC_CR:				sprintf(info->s, "CR: %08X", get_cr(ppc));			break;
 		case CPUINFO_STR_REGISTER + PPC_LR:				sprintf(info->s, "LR: %08X", ppc->spr[SPR_LR]);		break;
 		case CPUINFO_STR_REGISTER + PPC_CTR:			sprintf(info->s, "CTR:%08X", ppc->spr[SPR_CTR]);	break;
-		case CPUINFO_STR_REGISTER + PPC_XER:			sprintf(info->s, "XER:%08X", ppc->spr[SPR_XER]); 	break;
+		case CPUINFO_STR_REGISTER + PPC_XER:			sprintf(info->s, "XER:%08X", get_xer(ppc));		 	break;
 		case CPUINFO_STR_REGISTER + PPC_SRR0:			sprintf(info->s, "SRR0: %08X", ppc->spr[SPROEA_SRR0]);	break;
 		case CPUINFO_STR_REGISTER + PPC_SRR1:			sprintf(info->s, "SRR1: %08X", ppc->spr[SPROEA_SRR1]);	break;
 		case CPUINFO_STR_REGISTER + PPC_SPRG0:			sprintf(info->s, "SPRG0: %08X", ppc->spr[SPROEA_SPRG0]); break;
@@ -1123,6 +1228,9 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + PPC_EXISR:			sprintf(info->s, "EXISR: %08X", ppc->dcr[DCR4XX_EXISR]); break;
 		case CPUINFO_STR_REGISTER + PPC_EVPR:			sprintf(info->s, "EVPR: %08X", ppc->spr[SPR4XX_EVPR]); break;
 		case CPUINFO_STR_REGISTER + PPC_IOCR:			sprintf(info->s, "IOCR: %08X", ppc->dcr[DCR4XX_EXISR]); break;
+		case CPUINFO_STR_REGISTER + PPC_TBH:			sprintf(info->s, "TBH: %08X", (UINT32)(get_timebase(ppc) >> 32)); break;
+		case CPUINFO_STR_REGISTER + PPC_TBL:			sprintf(info->s, "TBL: %08X", (UINT32)get_timebase(ppc)); break;
+		case CPUINFO_STR_REGISTER + PPC_DEC:			sprintf(info->s, "DEC: %08X", get_decrementer(ppc)); break;
 
 		case CPUINFO_STR_REGISTER + PPC_R0:				sprintf(info->s, "R0: %08X", ppc->r[0]); break;
 		case CPUINFO_STR_REGISTER + PPC_R1:				sprintf(info->s, "R1: %08X", ppc->r[1]); break;
@@ -1252,7 +1360,7 @@ static void ppc4xx_dma_update_irq_states(powerpc_state *ppc)
 
 	/* update the IRQ state for each DMA channel */
 	for (dmachan = 0; dmachan < 4; dmachan++)
-		if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & (1 << (27 - dmachan))))
+		if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & (0x11 << (27 - dmachan))))
 			ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), ASSERT_LINE);
 		else
 			ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), CLEAR_LINE);
@@ -1277,7 +1385,8 @@ static int ppc4xx_dma_decrement_count(powerpc_state *ppc, int dmachan)
 		return FALSE;
 
 	/* set the complete bit and handle interrupts */
-	ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
+	ppc->dcr[DCR4XX_DMASR] |= 1 << (31 - dmachan);
+//  ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
 	ppc4xx_dma_update_irq_states(ppc);
 	return TRUE;
 }
@@ -1372,7 +1481,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 
 		/* software initiated memory-to-memory mode DMA */
 		case 2:
-			width = dma_transfer_width[(dmaregs[DCR4XX_DMACR0] >> 26) & 0x3];
+			width = dma_transfer_width[(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_PW_MASK) >> 26];
 			srcinc = (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_SAI) ? width : 0;
 			destinc = (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_DAI) ? width : 0;
 
@@ -1529,7 +1638,16 @@ static void ppc4xx_spu_update_irq_states(powerpc_state *ppc)
 
 static void ppc4xx_spu_rx_data(powerpc_state *ppc, UINT8 data)
 {
-	fatalerror("ppc4xx_spu_rx_data unimplemented\n");
+	UINT32 new_rxin;
+
+	/* fail if we are going to overflow */
+	new_rxin = (ppc->spu.rxin + 1) % ARRAY_LENGTH(ppc->spu.rxbuffer);
+	if (new_rxin == ppc->spu.rxout)
+		fatalerror("ppc4xx_spu_rx_data: buffer overrun!");
+
+	/* store the data and accept the new in index */
+	ppc->spu.rxbuffer[ppc->spu.rxin] = data;
+	ppc->spu.rxin = new_rxin;
 }
 
 
@@ -1551,7 +1669,7 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 		attotime charperiod = attotime_mul(clockperiod, divisor * 16 * bpc);
 		timer_adjust_periodic(ppc->spu.timer, charperiod, 0, charperiod);
 		if (PRINTF_SPU)
-			mame_printf_debug("ppc4xx_spu_timer_reset: baud rate = %.0f\n", ATTOSECONDS_TO_HZ(charperiod.attoseconds) * bpc);
+			printf("ppc4xx_spu_timer_reset: baud rate = %.0f\n", ATTOSECONDS_TO_HZ(charperiod.attoseconds) * bpc);
 	}
 
 	/* otherwise, disable the timer */
@@ -1568,7 +1686,6 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 static TIMER_CALLBACK( ppc4xx_spu_callback )
 {
 	powerpc_state *ppc = ptr;
-	UINT8 rxbyte;
 
 	/* transmit enabled? */
 	if (ppc->spu.regs[SPU4XX_TX_COMMAND] & 0x80)
@@ -1598,9 +1715,14 @@ static TIMER_CALLBACK( ppc4xx_spu_callback )
 
 	/* receive enabled? */
 	if (ppc->spu.regs[SPU4XX_RX_COMMAND] & 0x80)
-		if (ppc->spu.rx_handler != NULL && (*ppc->spu.rx_handler)(&rxbyte))
+		if (ppc->spu.rxout != ppc->spu.rxin)
 		{
 			int operation = (ppc->spu.regs[SPU4XX_RX_COMMAND] >> 5) & 3;
+			UINT8 rxbyte;
+
+			/* consume the byte and advance the out pointer */
+			rxbyte = ppc->spu.rxbuffer[ppc->spu.rxout];
+			ppc->spu.rxout = (ppc->spu.rxout + 1) % ARRAY_LENGTH(ppc->spu.rxbuffer);
 
 			/* if we're not full, copy data to the buffer and update the line status */
 			if (!(ppc->spu.regs[SPU4XX_LINE_STATUS] & 0x80))
@@ -1649,7 +1771,7 @@ static READ8_HANDLER( ppc4xx_spu_r )
 			break;
 	}
 	if (PRINTF_SPU)
-		mame_printf_debug("spu_r(%d) = %02X\n", offset, result);
+		printf("spu_r(%d) = %02X\n", offset, result);
 	return result;
 }
 
@@ -1664,7 +1786,7 @@ static WRITE8_HANDLER( ppc4xx_spu_w )
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)
-		mame_printf_debug("spu_w(%d) = %02X\n", offset, data);
+		printf("spu_w(%d) = %02X\n", offset, data);
 	switch (offset)
 	{
 		/* clear error bits */
@@ -1748,7 +1870,6 @@ void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PPC_RX_DATA:					ppc4xx_spu_rx_data(ppc, info->i);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SPU_RX_HANDLER:				ppc->spu.rx_handler = (ppc4xx_spu_rx_handler)info->f; break;
 		case CPUINFO_PTR_SPU_TX_HANDLER:				ppc->spu.tx_handler = (ppc4xx_spu_tx_handler)info->f; break;
 
 		/* --- everything else is handled generically --- */
@@ -1775,6 +1896,7 @@ void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_4:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT4);		break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 31;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = 0;					break;
 

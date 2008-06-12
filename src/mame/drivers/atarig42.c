@@ -93,10 +93,9 @@ static READ16_HANDLER( special_port2_r )
 
 static WRITE16_HANDLER( a2d_select_w )
 {
-	char port[5];
+	static const char *portnames[] = { "A2D0", "A2D1" };
 
-	sprintf(port, "A2D%d", (offset != 0));
-	analog_data = input_port_read(machine, port);
+	analog_data = input_port_read(machine, portnames[offset != 0]);
 }
 
 
@@ -115,7 +114,7 @@ static WRITE16_HANDLER( io_latch_w )
 		asic65_reset((~data >> 14) & 1);
 
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(0, (data >> 11) & 7);
+		atarirle_control_w(machine, 0, (data >> 11) & 7);
 	}
 
 	/* lower byte */

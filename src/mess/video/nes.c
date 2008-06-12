@@ -25,7 +25,7 @@ static void ppu_nmi(int num, int *ppu_regs)
 
 static void nes_vh_reset(running_machine *machine)
 {
-	ppu2c0x_reset( 0, 1 );
+	ppu2c0x_reset( machine, 0, 1 );
 }
 
 

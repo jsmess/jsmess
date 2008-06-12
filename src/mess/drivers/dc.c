@@ -131,7 +131,7 @@ static const struct AICAinterface aica_interface =
 
 static INTERRUPT_GEN( dc_dispatch_vblank )
 {
-	dc_vblank();
+	dc_vblank(machine);
 }
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };

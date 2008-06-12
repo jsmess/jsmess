@@ -715,7 +715,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( psx )
 {
-	psx_machine_init();
+	psx_machine_init(machine);
 	psx_sio_install_handler( 0, psx_sio0 );
 }
 

@@ -19,22 +19,9 @@ TODO:
 Notes/Tidbits:
 -------------
 
-- Moonwar: 8255 Port C bit 4 was originally designed so when bit4=0, 1P spinner
-  is selected, and when bit4=1, 2P spinner gets selected.  But they forgot to
-  change the 8255 initialization value and Port C was set to input, setting the
-  spinner select bit to HI regardless what was written to it. This bug has been
-  corrected in the newer set, but, to maintain hardware compatibility with
-  older PCB's, they had to reverse to active status of the select bit.  So in the
-  newer set, Bit4=1 selects the 1P spinner and Bit4=0 selects the 2P spinner.
-
 - Armored Car sets Port C as well, but it's input only and the games uses other
   bits for the 2nd player controls.  Maybe the games was meant to use 2 joysticks
   at one time.
-
-- Calipso was apperantly redesigned for two player simultanious play.
-  There is code at $298a to flip the screen, but location $8669 has to be
-  set to 2. It's set to 1 no matter how many players are playing.
-  It's possible that there is a cocktail version of the game.
 
 - Video Hustler and its two bootlegs all have identical code, the only
   differences are the title, copyright removed, different encryptions or
@@ -601,150 +588,7 @@ SCOBRA_IN0
 	PORT_DIPSETTING(    0x00, "A 1/99  B 1/3" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( armorcar )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, "Coin A 1/2 Coin B 2/1" )
-	PORT_DIPSETTING(    0x04, "Coin A 1/3 Coin B 3/1" )
-	PORT_DIPSETTING(    0x06, "Coin A 1/4 Coin B 4/1" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-#define MOONWAR_COMMON\
-	PORT_START_TAG("IN0")\
-	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* the spinner */\
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )\
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )\
-	PORT_START_TAG("IN1")\
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )\
-	PORT_DIPSETTING(    0x00, "3" )\
-	PORT_DIPSETTING(    0x01, "4" )\
-	PORT_DIPSETTING(    0x02, "5" )\
-	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )\
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )\
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )\
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL\
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )\
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-static INPUT_PORTS_START( moonwar )
-	MOONWAR_COMMON
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )	/* output bits */
-
-	PORT_START_TAG("IN3")      /* IN3/4 - dummy ports for the dial */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET
-
-	PORT_START_TAG("IN4")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET PORT_COCKTAIL
-INPUT_PORTS_END
-
-/* same as above, but coinage is different */
-static INPUT_PORTS_START( moonwara )
-	MOONWAR_COMMON
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )	/* output bits */
-
-	PORT_START_TAG("IN3")      /* IN3/4 - dummy ports for the dial */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET
-
-	PORT_START_TAG("IN4")		/* doesn't actually work due to bug in game code */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET PORT_COCKTAIL
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( spdcoin )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START_TAG("IN1")
-	PORT_DIPNAME( 0x01, 0x00, "Freeze" )			/* Dip Sw #2 */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Free_Play ) )	/* Dip Sw #1 */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )		/* Dip Sw #5 - Check code at 0x0569 */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) )	/* Dip Sw #4 */
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )		/* Dip Sw #3 */
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
 
 /* cocktail mode is N/A */
 static INPUT_PORTS_START( darkplnt )
@@ -830,47 +674,6 @@ static INPUT_PORTS_START( tazmania )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* cocktail mode is N/A */
-static INPUT_PORTS_START( calipso )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START_TAG("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x08, 0x08, "Cabinet (Not Supported)" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
 
 /* cocktail mode not working due to bug in game code */
 static INPUT_PORTS_START( anteater )
@@ -1183,64 +986,6 @@ static INPUT_PORTS_START( losttomb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* cocktail mode is N/A */
-static INPUT_PORTS_START( superbon )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START_TAG("IN1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x00, "Invulnerability (Cheat)")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, "A 1/2 B 2/1" )
-	PORT_DIPSETTING(    0x04, "A 1/3 B 3/1" )
-	PORT_DIPSETTING(    0x06, "A 1/4 B 4/1" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( hustler )
 	PORT_START_TAG("IN0")
@@ -1411,51 +1156,6 @@ static MACHINE_DRIVER_START( type1 )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( superbon )
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
-
-	/* device config overrides */
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi8255_intf[1] )
-MACHINE_DRIVER_END
-
-/* same as regular type 1, the only difference that it has long bullets */
-static MACHINE_DRIVER_START( armorcar )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
-
-	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2)	/* 32 for characters, 64 for stars, 2 for bullets */
-
-	MDRV_PALETTE_INIT(galaxold)
-	MDRV_VIDEO_START(theend)
-MACHINE_DRIVER_END
-
-
-/* same as regular type 1, the only difference is that the bullets are less yellow */
-static MACHINE_DRIVER_START( moonwar )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
-
-	/* device config overrides */
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( moonwar_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( moonwar_ppi8255_intf[1] )
-
-	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 1 for bg */
-
-	MDRV_PALETTE_INIT(moonwar)
-MACHINE_DRIVER_END
-
 
 /* Rescue, Minefield and Strategy X have extra colors, and custom video initialise */
 /* routines to set up the graduated color backgound they use */
@@ -1486,18 +1186,6 @@ static MACHINE_DRIVER_START( minefld )
 
 	MDRV_PALETTE_INIT(minefld)
 	MDRV_VIDEO_START(minefld)
-MACHINE_DRIVER_END
-
-
-/* same as the others, but no sprite flipping, but instead the bits are used
-   as extra sprite code bits, giving 256 sprite images */
-static MACHINE_DRIVER_START( calipso )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
-
-	/* video hardware */
-	MDRV_VIDEO_START(calipso)
 MACHINE_DRIVER_END
 
 
@@ -1780,100 +1468,6 @@ ROM_START( stratgys )
 	ROM_LOAD( "strategy.10k", 0x0000, 0x0020, CRC(d95c0318) SHA1(83e5355fdca7b4e1fb5a0e6eeaacfbf9561e2c36) )
 ROM_END
 
-ROM_START( armorcar )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "cpu.2c",       0x0000, 0x1000, CRC(0d7bfdfb) SHA1(47791d4fc298c25d29584dfcddcd92618e3750c5) )
-	ROM_LOAD( "cpu.2e",       0x1000, 0x1000, CRC(76463213) SHA1(86dbbed25325cc8855c1eb39bbb11b0473b7f4b5) )
-	ROM_LOAD( "cpu.2f",       0x2000, 0x1000, CRC(2cc6d5f0) SHA1(94abb33760aed206f0f90f035fe2977c1f2e26cf) )
-	ROM_LOAD( "cpu.2h",       0x3000, 0x1000, CRC(61278dbb) SHA1(e12cd6c499af75f77e549499093fe6d2e8eddb1d) )
-	ROM_LOAD( "cpu.2j",       0x4000, 0x1000, CRC(fb158d8c) SHA1(efa70e92c56678d4a404a96c72cfee317b15648c) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "sound.5c",     0x0000, 0x0800, CRC(54ee7753) SHA1(3ebfa2cadf33acb4d24aa50cfa4713355cc780a3) )
-	ROM_LOAD( "sound.5d",     0x0800, 0x0800, CRC(5218fec0) SHA1(c8f84f1e6aafc544e5acf48b245e8b1edb63211e) )
-
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "cpu.5f",       0x0000, 0x0800, CRC(8a3da4d1) SHA1(4d2ef48aeb9099fdd145e11e2485e0bf8d87290d) )
-	ROM_LOAD( "cpu.5h",       0x0800, 0x0800, CRC(85bdb113) SHA1(f62da0ea0c29feb10d8d1ce8de28fd750a53b40a) )
-
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
-	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
-ROM_END
-
-ROM_START( armorca2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "2c",           0x0000, 0x1000, CRC(e393bd2f) SHA1(6a5079d1f5d724e5f643cbc5352fc43d0b652e05) )
-	ROM_LOAD( "2e",           0x1000, 0x1000, CRC(b7d443af) SHA1(1ce41e11a7fcfd039fbff03c4382ae29b601ed50) )
-	ROM_LOAD( "2g",           0x2000, 0x1000, CRC(e67380a4) SHA1(a9a87e769d1ef223ae26241e9211c97b3d469656) )
-	ROM_LOAD( "2h",           0x3000, 0x1000, CRC(72af7b37) SHA1(c9cd0a0a3e34fc7b12822f75eb511f0850703f55) )
-	ROM_LOAD( "2j",           0x4000, 0x1000, CRC(e6b0dd7f) SHA1(98292fea03bff028ba924a49f0bfa49377018860) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "sound.5c",     0x0000, 0x0800, CRC(54ee7753) SHA1(3ebfa2cadf33acb4d24aa50cfa4713355cc780a3) )
-	ROM_LOAD( "sound.5d",     0x0800, 0x0800, CRC(5218fec0) SHA1(c8f84f1e6aafc544e5acf48b245e8b1edb63211e) )
-
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "cpu.5f",       0x0000, 0x0800, CRC(8a3da4d1) SHA1(4d2ef48aeb9099fdd145e11e2485e0bf8d87290d) )
-	ROM_LOAD( "cpu.5h",       0x0800, 0x0800, CRC(85bdb113) SHA1(f62da0ea0c29feb10d8d1ce8de28fd750a53b40a) )
-
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
-	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
-ROM_END
-
-ROM_START( moonwar )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "mw2.2c",       0x0000, 0x1000, CRC(7c11b4d9) SHA1(a27bdff6ce728647ec811df843ac235c32c293d6) )
-	ROM_LOAD( "mw2.2e",       0x1000, 0x1000, CRC(1b6362be) SHA1(2fbd95869146adcc0c8be1df653251fda8849e8e) )
-	ROM_LOAD( "mw2.2f",       0x2000, 0x1000, CRC(4fd8ba4b) SHA1(3da784267a96d05f66b00626a22cb3f06211d202) )
-	ROM_LOAD( "mw2.2h",       0x3000, 0x1000, CRC(56879f0d) SHA1(d1e9932863aebc5761e71fca8d24f3c400e1250d) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "mw2.5c",       0x0000, 0x0800, CRC(c26231eb) SHA1(5b19edfaefe1a535059311d067ea53405879d627) )
-	ROM_LOAD( "mw2.5d",       0x0800, 0x0800, CRC(bb48a646) SHA1(cf51202d16b03bbed12ff24501be68683f28c992) )
-
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "mw2.5f",       0x0000, 0x0800, CRC(c5fa1aa0) SHA1(6c6b5b2ce5de278ff436d3e7252ece5b086cc41d) )
-	ROM_LOAD( "mw2.5h",       0x0800, 0x0800, CRC(a6ccc652) SHA1(286b3dc1f3a7da3ac66664e774b441ef075745f1) )
-
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
-	ROM_LOAD( "mw2.clr",      0x0000, 0x0020, CRC(99614c6c) SHA1(f068985f3c5e0cd88551a02c32f9baeabfd50241) )
-ROM_END
-
-ROM_START( moonwara )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "2c",           0x0000, 0x1000, CRC(bc20b734) SHA1(c6fe550987d0052979aad43c67aa1b9248049669) )
-	ROM_LOAD( "2e",           0x1000, 0x1000, CRC(db6ffec2) SHA1(0fcd55b1e415e2e7041d10778052a235251f85fe) )
-	ROM_LOAD( "2f",           0x2000, 0x1000, CRC(378931b8) SHA1(663f1eea9b0e8dc38de818df66c5211dac41c33b) )
-	ROM_LOAD( "2h",           0x3000, 0x1000, CRC(031dbc2c) SHA1(5f2ca8b8763398bf161ee0c2c748a12d36cb40ec) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "mw2.5c",       0x0000, 0x0800, CRC(c26231eb) SHA1(5b19edfaefe1a535059311d067ea53405879d627) )
-	ROM_LOAD( "mw2.5d",       0x0800, 0x0800, CRC(bb48a646) SHA1(cf51202d16b03bbed12ff24501be68683f28c992) )
-
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "mw2.5f",       0x0000, 0x0800, CRC(c5fa1aa0) SHA1(6c6b5b2ce5de278ff436d3e7252ece5b086cc41d) )
-	ROM_LOAD( "mw2.5h",       0x0800, 0x0800, CRC(a6ccc652) SHA1(286b3dc1f3a7da3ac66664e774b441ef075745f1) )
-
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
-	ROM_LOAD( "moonwara.clr", 0x0000, 0x0020, CRC(f58d4f58) SHA1(12a80d1edf3c80dafa0e1e3622d2a03224b62f14) )	/* olive, instead of white */
-ROM_END
-
-ROM_START( spdcoin )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "spdcoin.2c",   0x0000, 0x1000, CRC(65cf1e49) SHA1(a4570f0d7868fcdd378de3fd9e5346780afcf427) )
-	ROM_LOAD( "spdcoin.2e",   0x1000, 0x1000, CRC(1ee59232) SHA1(b58c1de69d33cf80432012b9b6d8b1e3d8b00662) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "spdcoin.5c",   0x0000, 0x0800, CRC(b4cf64b7) SHA1(a95d94be2e374b78b4ba49b6931f0c214ff9d033) )
-	ROM_LOAD( "spdcoin.5d",   0x0800, 0x0800, CRC(92304df0) SHA1(01471bf7cbea0090933a253b1b46f80c8f240df5) )
-
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "spdcoin.5f",   0x0000, 0x0800, CRC(dd5f1dbc) SHA1(e7c40972a7530cac19ce04de3272244959d337ab) )
-	ROM_LOAD( "spdcoin.5h",   0x0800, 0x0800, CRC(ab1fe81b) SHA1(98057932cb5faad60d425b547590ab22bfc67ff6) )
-
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
-	ROM_LOAD( "spdcoin.clr",  0x0000, 0x0020, CRC(1a2ccc56) SHA1(58bedaa8b3e21e916295603b38529084b6c0099a) )
-ROM_END
 
 ROM_START( darkplnt )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -1935,27 +1529,6 @@ ROM_START( tazmani2 )
 
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(fce333c7) SHA1(f63a214dc47c5e7c80db000b0b6a261ca8da6629) )
-ROM_END
-
-ROM_START( calipso )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "calipso.2c",   0x0000, 0x1000, CRC(0fcb703c) SHA1(2bb096f114911973afdf3088c860c9566df06f60) )
-	ROM_LOAD( "calipso.2e",   0x1000, 0x1000, CRC(c6622f14) SHA1(475164aed703a97275ff285ecaec9d8fd4fe723b) )
-	ROM_LOAD( "calipso.2f",   0x2000, 0x1000, CRC(7bacbaba) SHA1(d321d6d09c689123eb1e5d758d95ccecec225252) )
-	ROM_LOAD( "calipso.2h",   0x3000, 0x1000, CRC(a3a8111b) SHA1(3d9500c676563ebfc27aebb07716e6a966f00c35) )
-	ROM_LOAD( "calipso.2j",   0x4000, 0x1000, CRC(fcbd7b9e) SHA1(5cc1edcc8b9867bb7849c8d97d1096bb6464f562) )
-	ROM_LOAD( "calipso.2l",   0x5000, 0x1000, CRC(f7630cab) SHA1(482ee91cccd8a7c5768a1d6a9772d797769fe2dc) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for sound code */
-	ROM_LOAD( "calipso.5c",   0x0000, 0x0800, CRC(9cbc65ab) SHA1(b4ce04d18f9536c0ddd2f9c15edda75570e750e5) )
-	ROM_LOAD( "calipso.5d",   0x0800, 0x0800, CRC(a225ee3b) SHA1(dba111f89851c69fb6fce16219cb2b0cb3294c15) )
-
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "calipso.5f",   0x0000, 0x2000, CRC(fd4252e9) SHA1(881b988cdc9b7913f577573f8a15af7a7c7cc67f) )
-	ROM_LOAD( "calipso.5h",   0x2000, 0x2000, CRC(1663a73a) SHA1(95b6ed25b656afdfb70fac35efa2e005185e4343) )
-
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
-	ROM_LOAD( "calipso.clr",  0x0000, 0x0020, CRC(01165832) SHA1(bfef0459492dbd5febf3030916b6438eb6be71de) )
 ROM_END
 
 ROM_START( anteater )
@@ -2124,28 +1697,6 @@ ROM_START( losttmbh )
 	ROM_LOAD( "ltprom",       0x0000, 0x0020, CRC(1108b816) SHA1(49fdb08f8f31fefa2f3dca3d3455318cb21847a3) )
 ROM_END
 
-ROM_START( superbon )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "2d.cpu",       0x0000, 0x1000, CRC(60c0ba18) SHA1(6ad09e01dd3c86c8d9c465916227c9b00f38e025) )
-	ROM_LOAD( "2e.cpu",       0x1000, 0x1000, CRC(ddcf44bf) SHA1(b862622f4aa8af6da568b4f82ef043359ece530f) )
-	ROM_LOAD( "2f.cpu",       0x2000, 0x1000, CRC(bb66c2d5) SHA1(cbb7f4279ae48460790cb8abf976b978ae6a1a25) )
-	ROM_LOAD( "2h.cpu",       0x3000, 0x1000, CRC(74f4f04d) SHA1(d51c5d2c21453ee0dab60253c3124b6112d1f859) )
-	ROM_LOAD( "2j.cpu",       0x4000, 0x1000, CRC(78effb08) SHA1(64f211b34c2f37c25a36200b393f145b39ae67b5) )
-	ROM_LOAD( "2l.cpu",       0x5000, 0x1000, CRC(e9dcecbd) SHA1(ec61cec2b66c041872a2ca29cf724a89c73fc9a3) )
-	ROM_LOAD( "2m.cpu",       0x6000, 0x1000, CRC(3ed0337e) SHA1(975b93aee851867e335614419aa6db16fbf8063f) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "5c",  	      0x0000, 0x0800, CRC(b899be2a) SHA1(9b343a682531255104db61177a43ad933c3af34e) )
-	ROM_LOAD( "5d.snd",       0x0800, 0x0800, CRC(80640a04) SHA1(83f2bafcfa5737441194d3058a76b2582317cfcb) )
-
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "5f.cpu",       0x0000, 0x0800, CRC(5b9d4686) SHA1(c7814aefaccab9c8a3a0b015447d366cd2e43c3a) )
-	ROM_LOAD( "5h.cpu",       0x0800, 0x0800, CRC(58c29927) SHA1(b88515d9c3108d2ad59f30fed5d74877b1636280) )
-
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
-	ROM_LOAD( "superbon.clr", 0x0000, 0x0020, NO_DUMP )
-ROM_END
-
 ROM_START( hustler )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "hustler.1",    0x0000, 0x1000, CRC(94479a3e) SHA1(ea3a1a3f6bee3d35a6a0fb0ba689a25f6b919e5d) )
@@ -2255,18 +1806,13 @@ ROM_END
 
 GAME( 1981, stratgyx, 0,        stratgyx, stratgyx, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
 GAME( 1981, stratgys, stratgyx, stratgyx, stratgyx, stratgyx,     ROT0,   "[Konami] (Stern license)", "Strategy X (Stern)", GAME_SUPPORTS_SAVE )
-GAME( 1981, moonwar,  0,        moonwar,  moonwar,  moonwar,      ROT90,  "Stern", "Moonwar", GAME_SUPPORTS_SAVE )
-GAME( 1981, moonwara, moonwar,  moonwar,  moonwara, moonwar,      ROT90,  "Stern", "Moonwar (older)", GAME_SUPPORTS_SAVE )
-GAME( 1984, spdcoin,  0,        type1,    spdcoin,  scramble_ppi, ROT90,  "Stern", "Speed Coin (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1982, darkplnt, 0,        darkplnt, darkplnt, darkplnt,     ROT180, "Stern", "Dark Planet", GAME_SUPPORTS_SAVE )
 GAME( 1982, tazmani2, tazmania, type2,    tazmania, tazmani2,     ROT90,  "Stern", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, calipso,  0,        calipso,  calipso,  scobra,       ROT90,  "[Stern] (Tago license)", "Calipso", GAME_SUPPORTS_SAVE )
 GAME( 1983, anteatg,  anteater, anteatg,  anteatg,  scramble_ppi, ROT90,  "TV-Tuning (F.E.G. license)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
 GAME( 1983, anteatgb, anteater, anteatgb, anteatgb, scramble_ppi, ROT90,  "Free Enterprise Games", "The Anteater (UK)", GAME_SUPPORTS_SAVE )
 GAME( 1982, rescue,   0,        rescue,   rescue,   rescue,       ROT90,  "Stern", "Rescue", GAME_SUPPORTS_SAVE )
 GAME( 1982, aponow,   rescue,   rescue,   rescue,   rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
 GAME( 1983, minefld,  0,        minefld,  minefld,  minefld,      ROT90,  "Stern", "Minefield", GAME_SUPPORTS_SAVE )
-GAME( 198?, superbon, 0,        type1,    superbon, superbon,     ROT90,  "bootleg", "Super Bond", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1981, hustler,  0,        hustler,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
 GAME( 1981, billiard, hustler,  hustler,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustlerb, hustler,  hustlerb, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )

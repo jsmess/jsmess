@@ -15,8 +15,99 @@ Tilemap flip flags were reversed
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static bitmap_t *sprite_bitmap;
+
+static bitmap_t *tilemap_bitmap_lower;
+static bitmap_t *tilemap_bitmapflags_lower;
+
+static bitmap_t *tilemap_bitmap_higher;
+static bitmap_t *tilemap_bitmapflags_higher;
+
+
+/* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
+static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rectangle *cliprect, tilemap *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
+{
+//  const pen_t *clut = &Machine->pens[0];
+	//bitmap_t *destbitmap = bitmap;
+	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
+	bitmap_t *srcbitmapflags = tilemap_get_flagsmap(tmap);
+	const int xmask = srcbitmap->width-1;
+	const int ymask = srcbitmap->height-1;
+	const int widthshifted = srcbitmap->width << 16;
+	const int heightshifted = srcbitmap->height << 16;
+	UINT32 cx;
+	UINT32 cy;
+	int x;
+	int sx;
+	int sy;
+	int ex;
+	int ey;
+	UINT16 *dest;
+	UINT8* destflags;
+//  UINT8 *pri;
+	//const UINT16 *src;
+	//const UINT8 *maskptr;
+	//int destadvance = destbitmap->bpp / 8;
+
+	/* pre-advance based on the cliprect */
+	startx += cliprect->min_x * incxx + cliprect->min_y * incyx;
+	starty += cliprect->min_x * incxy + cliprect->min_y * incyy;
+
+	/* extract start/end points */
+	sx = cliprect->min_x;
+	sy = cliprect->min_y;
+	ex = cliprect->max_x;
+	ey = cliprect->max_y;
+
+	{
+		/* loop over rows */
+		while (sy <= ey)
+		{
+
+			/* initialize X counters */
+			x = sx;
+			cx = startx;
+			cy = starty;
+
+			/* get dest and priority pointers */
+			dest = BITMAP_ADDR16( bitmap, sy, sx);
+			destflags = BITMAP_ADDR8( bitmapflags, sy, sx);
+
+			/* loop over columns */
+			while (x <= ex)
+			{
+				if ((wraparound) || (cx < widthshifted && cy < heightshifted)) // not sure how this will cope with no wraparound, but row/col scroll..
+				{
+					if (columnscroll)
+					{
+						dest[0] = BITMAP_ADDR16(srcbitmap, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
+						destflags[0] = BITMAP_ADDR8(srcbitmapflags, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
+					}
+					else
+					{
+						dest[0] = BITMAP_ADDR16(srcbitmap, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+						destflags[0] = BITMAP_ADDR8(srcbitmapflags, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+					}
+				}
+
+				/* advance in X */
+				cx += incxx;
+				cy += incxy;
+				x++;
+				dest++;
+				destflags++;
+//              pri++;
+			}
+
+			/* advance in Y */
+			startx += incyx;
+			starty += incyy;
+			sy++;
+		}
+	}
+}
 
 
 #define SUPRNOVA_DECODE_BUFFER_SIZE 0x2000
@@ -33,17 +124,18 @@ static int old_depthA=0, depthA=0;
 static int old_depthB=0, depthB=0;
 
 static int sprite_kludge_x=0, sprite_kludge_y=0;
-static int use_spc_bright, use_v3_bright;
+static int use_spc_bright = 1, use_v3_bright = 1; // makes sarukani rather dark, but should be default..
 static UINT8 bright_spc_b=0x00, bright_spc_g=0x00, bright_spc_r=0x00;
 
 static UINT8 bright_spc_b_trans=0x00, bright_spc_g_trans=0x00, bright_spc_r_trans=0x00;
 
 
 static UINT8 bright_v3_b=0x00,  bright_v3_g=0x00,  bright_v3_r=0x00;
-
+static UINT8 bright_v3_b_trans = 0x00, bright_v3_g_trans = 0x00, bright_v3_r_trans = 0x00;
 
 // This ignores the alpha values atm.
 static int spc_changed=0, v3_changed=0, palette_updated=0;
+int suprnova_alt_enable_background = 1, suprnova_alt_enable_sprites = 1;
 
 WRITE32_HANDLER ( skns_pal_regs_w )
 {
@@ -52,11 +144,16 @@ WRITE32_HANDLER ( skns_pal_regs_w )
 
 	switch ( offset )
 	{
+	/* RWRA regs are for SPRITES */
+
 	case (0x00/4): // RWRA0
 		if( use_spc_bright != (data&1) ) {
 			use_spc_bright = data&1;
 			spc_changed = 1;
 		}
+		suprnova_alt_enable_sprites = (data>>8)&1;
+
+
 		break;
 	case (0x04/4): // RWRA1
 		if( bright_spc_g != (data&0xff) ) {
@@ -85,29 +182,43 @@ WRITE32_HANDLER ( skns_pal_regs_w )
 
 		break;
 
+	/* RWRB regs are for BACKGROUND */
+
 	case (0x10/4): // RWRB0
 		if( use_v3_bright != (data&1) ) {
 			use_v3_bright = data&1;
 			v3_changed = 1;
 		}
+
+		suprnova_alt_enable_background = (data>>8)&1;
+
 		break;
 	case (0x14/4): // RWRB1
 		if( bright_v3_g != (data&0xff) ) {
 			bright_v3_g = data&0xff;
 			v3_changed = 1;
 		}
+
+		bright_v3_g_trans = (data>>8)&0xff;
+
 		break;
 	case (0x18/4): // RWRB2
 		if( bright_v3_r != (data&0xff) ) {
 			bright_v3_r = data&0xff;
 			v3_changed = 1;
 		}
+
+		bright_v3_r_trans = (data>>8)&0xff;
+
 		break;
 	case (0x1C/4): // RWRB3
 		if( bright_v3_b != (data&0xff) ) {
 			bright_v3_b = data&0xff;
 			v3_changed = 1;
 		}
+
+		bright_v3_b_trans = (data>>8)&0xff;
+
 		break;
 	}
 }
@@ -438,7 +549,10 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 
 	/* sprite ram start / end is not really fixed registers change it */
 
-	UINT32 *source = buffered_spriteram32;
+	//printf ("addr %08x\n", (skns_spc_regs[0x14/4]));
+
+
+	UINT32 *source = spriteram32;
 	UINT32 *finish = source + spriteram_size/4;
 
 	int group_x_offset[4];
@@ -452,10 +566,11 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 	int xsize,ysize, size, xpos=0,ypos=0, pri=0, romoffset, colour=0, xflip,yflip, joint;
 	int sx,sy;
 	int endromoffs=0, gfxlen;
+	int grow;
 	UINT16 zoomx, zoomy;
 
 
-	if (!disabled){
+	if ((!disabled) && suprnova_alt_enable_sprites){
 
 		group_enable    = (skns_spc_regs[0x00/4] & 0x0040) >> 6; // RWR0
 
@@ -588,18 +703,41 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 				romoffset = endromoffs;
 			}
 
-			zoomx = source[2] >> 16;
-			zoomy = source[3] >> 16;
+			grow = (source[0]>>23) & 1;
+
+			if (!grow)
+			{
+				zoomx = (source[2] >> 16)&0xfcfc;
+				zoomy = (source[3] >> 16)&0xfcfc;
+			}
+			else
+			{
+				// the bad sprites in sengekis all have this not set..
+				// we need to handle sprite shrink properly
+				zoomx = 0;
+				zoomy = 0;
+			}
+
 
 			romoffset &= gfxlen-1;
 
 			endromoffs = skns_rle_decode ( romoffset, size );
 
+			// in Cyvern
+
+			//  train in tunnel pri = 0x00
+			//  nothing?         = 0x01
+			//  players etc. pri = 0x02
+			//  pickups etc. pri = 0x03
+
 			// PriTest
 //          if(!( (keyboard_pressed(KEYCODE_Q)&&(pri==0)) || (keyboard_pressed(KEYCODE_W)&&(pri==1)) || (keyboard_pressed(KEYCODE_E)&&(pri==2)) || (keyboard_pressed(KEYCODE_D)&&(pri==3)) ))
 //          if( !(keyboard_pressed(KEYCODE_Q) && ((source[0] & 0x00800000)>>24)) )
+
+
+
 			{
-				int NewColour = colour*256;
+				int NewColour = (colour<<8) | (pri << 14);
 
 				if(zoomx || zoomy)
 				{
@@ -703,7 +841,7 @@ static TILE_GET_INFO( get_tilemap_A_tile_info )
 {
 	int code = ((skns_tilemapA_ram[tile_index] & 0x001fffff) >> 0 );
 	int colr = ((skns_tilemapA_ram[tile_index] & 0x3f000000) >> 24 );
-//  int pri  = ((skns_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
+	int pri  = ((skns_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
 	int depth = (skns_v3_regs[0x0c/4] & 0x0001) << 1;
 	int flags = 0;
 
@@ -715,7 +853,9 @@ static TILE_GET_INFO( get_tilemap_A_tile_info )
 			code,
 			0x40+colr,
 			flags);
-//  tileinfo->category = pri;
+	tileinfo->category = pri;
+
+	//if (pri) popmessage("pri A!! %02x\n", pri);
 }
 
 WRITE32_HANDLER ( skns_tilemapA_w )
@@ -728,7 +868,7 @@ static TILE_GET_INFO( get_tilemap_B_tile_info )
 {
 	int code = ((skns_tilemapB_ram[tile_index] & 0x001fffff) >> 0 );
 	int colr = ((skns_tilemapB_ram[tile_index] & 0x3f000000) >> 24 );
-//  int pri  = ((skns_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
+	int pri  = ((skns_tilemapB_ram[tile_index] & 0x00e00000) >> 21 );
 	int depth = (skns_v3_regs[0x0c/4] & 0x0100) >> 7;
 	int flags = 0;
 
@@ -740,7 +880,9 @@ static TILE_GET_INFO( get_tilemap_B_tile_info )
 			code,
 			0x40+colr,
 			flags);
-//  tileinfo->category = pri;
+	tileinfo->category = pri;
+
+	//if (pri) popmessage("pri B!! %02x\n", pri); // 02 on cyvern
 }
 
 WRITE32_HANDLER ( skns_tilemapB_w )
@@ -779,112 +921,66 @@ VIDEO_START(skns)
 
 	sprite_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
 
+	tilemap_bitmap_lower = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	tilemap_bitmapflags_lower = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED8);
+
+	tilemap_bitmap_higher = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	tilemap_bitmapflags_higher = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED8);
 
 	machine->gfx[2]->color_granularity=256;
 	machine->gfx[3]->color_granularity=256;
 }
 
-static void supernova_draw_a( bitmap_t *bitmap, const rectangle *cliprect, int tran )
+static void supernova_draw_a( bitmap_t *bitmap, bitmap_t* bitmap_flags, const rectangle *cliprect, int tran )
 {
-		int enable_a  = (skns_v3_regs[0x10/4] >> 0) & 0x0001;
+	int enable_a  = (skns_v3_regs[0x10/4] >> 0) & 0x0001;
+	int nowrap_a = (skns_v3_regs[0x10/4] >> 0) & 0x0004;
+
+
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
+	int columnscroll;
 
-	if (enable_a)
+	//if(nowrap_a) printf("a\n");
+
+	if (enable_a && suprnova_alt_enable_background)
 	{
 		startx = skns_v3_regs[0x1c/4];
-			incyy  = skns_v3_regs[0x30/4]; // was xx, changed for sarukani
+		incyy  = skns_v3_regs[0x30/4]; // was xx, changed for sarukani
 		incyx  = skns_v3_regs[0x2c/4];
 		starty = skns_v3_regs[0x20/4];
 		incxy  = skns_v3_regs[0x28/4];
-			incxx  = skns_v3_regs[0x24/4]; // was yy, changed for sarukani
+		incxx  = skns_v3_regs[0x24/4]; // was yy, changed for sarukani
 
-		if( (incxx == 1<<8) && !incxy & !incyx && (incyy == 1<<8) ) // No Roz, only scroll.
-		{
-			int columnscroll_a = (skns_v3_regs[0x0c/4] >> 1) & 0x0001;
-			int offs;
+		columnscroll = (skns_v3_regs[0x0c/4] >> 1) & 0x0001;
 
-			startx >>= 8; // Lose Floating point
-			starty >>= 8;
-
-			if(columnscroll_a) {
-				tilemap_set_scroll_rows(skns_tilemap_A,1);
-				tilemap_set_scroll_cols(skns_tilemap_A,0x400);
-
-				tilemap_set_scrollx( skns_tilemap_A, 0, startx );
-				for(offs=0; offs<(0x1000/4); offs++)
-					tilemap_set_scrolly( skns_tilemap_A, offs, starty - (skns_v3slc_ram[offs]&0x3ff) );
-			}
-			else
-			{
-				tilemap_set_scroll_rows(skns_tilemap_A,0x400);
-				tilemap_set_scroll_cols(skns_tilemap_A,1);
-
-				tilemap_set_scrolly( skns_tilemap_A, 0, starty );
-				for(offs=0; offs<(0x1000/4); offs++)
-					tilemap_set_scrollx( skns_tilemap_A, offs, startx - (skns_v3slc_ram[offs]&0x3ff) );
-			}
-				tilemap_draw(bitmap,cliprect,skns_tilemap_A,tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
-		}
-		else
-		{
-			tilemap_draw_roz(bitmap,cliprect,skns_tilemap_A,startx << 8,starty << 8,
-					incxx << 8,incxy << 8,incyx << 8,incyy << 8,
-					1,	/* wraparound */
-						tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
-		}
+		suprnova_draw_roz(bitmap,bitmap_flags,cliprect, skns_tilemap_A, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_a, columnscroll, &skns_v3slc_ram[0]);
+		//tilemap_copy_bitmap(bitmap, tilemap_bitmap_lower, tilemap_bitmapflags_lower);
 	}
 }
 
-static void supernova_draw_b( bitmap_t *bitmap, const rectangle *cliprect, int tran )
+static void supernova_draw_b( bitmap_t *bitmap, bitmap_t* bitmap_flags, const rectangle *cliprect, int tran )
 {
-		int enable_b  = (skns_v3_regs[0x34/4] >> 0) & 0x0001;
+	int enable_b  = (skns_v3_regs[0x34/4] >> 0) & 0x0001;
+	int nowrap_b = (skns_v3_regs[0x34/4] >> 0) & 0x0004;
+
+
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
+	int columnscroll;
 
-	if (enable_b)
+	//if(nowrap_b) printf("b\n");
+
+	if (enable_b && suprnova_alt_enable_background)
 	{
 		startx = skns_v3_regs[0x40/4];
-			incyy  = skns_v3_regs[0x54/4];
+		incyy  = skns_v3_regs[0x54/4];
 		incyx  = skns_v3_regs[0x50/4];
 		starty = skns_v3_regs[0x44/4];
 		incxy  = skns_v3_regs[0x4c/4];
-			incxx  = skns_v3_regs[0x48/4];
-
-		if( (incxx == 1<<8) && !incxy & !incyx && (incyy == 1<<8) ) // No Roz, only scroll.
-		{
-			int columnscroll_b = (skns_v3_regs[0x0c/4] >> 9) & 0x0001;
-			int offs;
-
-			startx >>= 8;
-			starty >>= 8;
-
-			if(columnscroll_b) {
-				tilemap_set_scroll_rows(skns_tilemap_B,1);
-				tilemap_set_scroll_cols(skns_tilemap_B,0x400);
-
-				tilemap_set_scrollx( skns_tilemap_B, 0, startx );
-				for(offs=0; offs<(0x1000/4); offs++)
-					tilemap_set_scrolly( skns_tilemap_B, offs, starty - (skns_v3slc_ram[offs+(0x1000/4)]&0x3ff) );
-			}
-			else
-			{
-				tilemap_set_scroll_rows(skns_tilemap_B,0x400);
-				tilemap_set_scroll_cols(skns_tilemap_B,1);
-
-				tilemap_set_scrolly( skns_tilemap_B, 0, starty );
-				for(offs=0; offs<(0x1000/4); offs++)
-					tilemap_set_scrollx( skns_tilemap_B, offs, startx - (skns_v3slc_ram[offs+(0x1000/4)]&0x3ff) );
-			}
-				tilemap_draw(bitmap,cliprect,skns_tilemap_B,tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
-		}
-		else
-		{
-			tilemap_draw_roz(bitmap,cliprect,skns_tilemap_B,startx << 8,starty << 8,
-					incxx << 8,incxy << 8,incyx << 8,incyy << 8,
-					1,	/* wraparound */
-						tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
-		}
+		incxx  = skns_v3_regs[0x48/4];
+		columnscroll = (skns_v3_regs[0x0c/4] >> 9) & 0x0001; // selects column scroll or rowscroll
+		suprnova_draw_roz(bitmap,bitmap_flags, cliprect, skns_tilemap_B, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_b, columnscroll, &skns_v3slc_ram[0x1000/4]);
 	}
 }
 
@@ -952,101 +1048,182 @@ VIDEO_UPDATE(skns)
 	}
 
 	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	fillbitmap(tilemap_bitmap_lower, 0, NULL);
+	fillbitmap(tilemap_bitmapflags_lower, 0, NULL);
+	fillbitmap(tilemap_bitmap_higher, 0, NULL);
+	fillbitmap(tilemap_bitmapflags_higher, 0, NULL);
 
 	{
 		int supernova_pri_a;
 		int supernova_pri_b;
 		int tran = 0;
 
-		supernova_pri_a = skns_v3_regs[0x10/4] & 0x0002;
-		supernova_pri_b = skns_v3_regs[0x34/4] & 0x0002;
+		supernova_pri_a = (skns_v3_regs[0x10/4] & 0x0002)>>1;
+		supernova_pri_b = (skns_v3_regs[0x34/4] & 0x0002)>>1;
 
+		//popmessage("pri %d %d\n", supernova_pri_a, supernova_pri_b);
 
-		/* needed until we have the per tile priorities sorted out */
-		if (!strcmp(screen->machine->gamedrv->name,"vblokbrk") ||
-			!strcmp(screen->machine->gamedrv->name,"sarukani") ||
-			!strcmp(screen->machine->gamedrv->name,"sengekis") ||
-			!strcmp(screen->machine->gamedrv->name,"sengekij"))
+		/*if (!supernova_pri_b) { */
+		supernova_draw_b(tilemap_bitmap_lower, tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
+		supernova_draw_a(tilemap_bitmap_higher,tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
+
 		{
-			supernova_pri_b = 0;
-			supernova_pri_a = 1;
+			int x,y;
+			UINT8* srcflags, *src2flags;
+			UINT16* src, *src2, *src3;
+			UINT32* dst;
+			UINT16 pri, pri2, pri3;
+			UINT16 bgpri;
+			const pen_t *clut = &Machine->pens[0];
+//          int drawpri;
+
+
+			for (y=0;y<240;y++)
+			{
+				src = BITMAP_ADDR16(tilemap_bitmap_lower, y, 0);
+				srcflags = BITMAP_ADDR8(tilemap_bitmapflags_lower, y, 0);
+
+				src2 = BITMAP_ADDR16(tilemap_bitmap_higher, y, 0);
+				src2flags = BITMAP_ADDR8(tilemap_bitmapflags_higher, y, 0);
+
+				src3 = BITMAP_ADDR16(sprite_bitmap, y, 0);
+
+				dst = BITMAP_ADDR32(bitmap, y, 0);
+
+
+				for (x=0;x<320;x++)
+				{
+					UINT16 pendata  = src[x]&0x7fff;
+					UINT16 pendata2 = src2[x]&0x7fff;
+					UINT16 bgpendata;
+					UINT16 pendata3 = src3[x]&0x3fff;
+
+					UINT32 coldat;
+
+					pri = ((srcflags[x] & 0x07)<<1) | (supernova_pri_b);
+					pri2= ((src2flags[x] & 0x07)<<1) | (supernova_pri_a);
+					pri3 = ((src3[x]&0xc000)>>12)+3;
+
+					// work out which layers bg pixel has the higher priority
+					//  note, can the bg layers be blended?? sarukani uses an alpha pen for
+					//        some of them.. and registers indicate it might be possible..
+
+					// this priority mixing is almost certainly still incorrect
+					// bg colour / prioirty handling is now wrong
+
+					if (pri<=pri2) // <= is good for last level of cyvern.. < seem better for galpanis kaneko logo
+					{
+						if (pendata2&0xff)
+						{
+							bgpendata = pendata2&0x7fff;
+							bgpri = pri2;
+						}
+						else if (pendata&0xff)
+						{
+							bgpendata = pendata&0x7fff;
+							bgpri = pri;
+						}
+						else
+						{
+							bgpendata = 0;
+							bgpri = 0;;
+						}
+					}
+					else
+					{
+						if (pendata&0xff)
+						{
+							bgpendata = pendata&0x7fff;
+							bgpri = pri;
+						}
+						else if (pendata2&0xff)
+						{
+							bgpendata = pendata2&0x7fff;
+							bgpri = pri2;
+						}
+						else
+						{
+							bgpendata = 0;
+							bgpri = 0;;
+						}
+					}
+
+					// if the sprites are higher than the bg pixel
+					if (pri3 > bgpri)
+					{
+
+						if (pendata3&0xff)
+						{
+
+							UINT16 palvalue = skns_palette_ram[pendata3];
+
+							coldat = clut[pendata3];
+
+							if (palvalue&0x8000)
+							{
+								UINT32 srccolour = clut[bgpendata&0x7fff];
+								UINT32 dstcolour = clut[pendata3&0x3fff];
+
+								int r,g,b;
+								int r2,g2,b2;
+
+								r = (srccolour & 0x000000ff)>> 0;
+								g = (srccolour & 0x0000ff00)>> 8;
+								b = (srccolour & 0x00ff0000)>> 16;
+
+								r2 = (dstcolour & 0x000000ff)>> 0;
+								g2 = (dstcolour & 0x0000ff00)>> 8;
+								b2 = (dstcolour & 0x00ff0000)>> 16;
+
+								r2 = (r2 * bright_spc_r_trans) >> 8;
+								g2 = (g2 * bright_spc_g_trans) >> 8;
+								b2 = (b2 * bright_spc_b_trans) >> 8;
+
+								r = (r+r2);
+								if (r>255) r = 255;
+
+								g = (g+g2);
+								if (g>255) g = 255;
+
+								b = (b+b2);
+								if (b>255) b = 255;
+
+								dst[x] = (r << 0) | (g << 8) | (b << 16);
+
+
+							}
+
+							else
+							{
+								coldat = clut[pendata3];
+								dst[x] = coldat;
+							}
+						}
+						else
+						{
+							coldat = clut[bgpendata];
+							dst[x] = coldat;
+						}
+					}
+					else
+					{
+						coldat = clut[bgpendata];
+						dst[x] = coldat;
+					}
+
+				}
+			}
 		}
-
-
-		if (!supernova_pri_a) { supernova_draw_a(bitmap,cliprect,tran); tran = 1;}
-		if (!supernova_pri_b) { supernova_draw_b(bitmap,cliprect,tran); tran = 1;}
-		if (supernova_pri_a) { supernova_draw_a(bitmap,cliprect,tran); tran = 1;}
-		if (supernova_pri_b) { supernova_draw_b(bitmap,cliprect,tran); tran = 1;}
-
-
 	}
 
 	fillbitmap(sprite_bitmap, 0x0000, cliprect);
 	skns_draw_sprites(screen->machine, sprite_bitmap, cliprect);
 
-	{
-		int x,y;
-		const pen_t *paldata = screen->machine->pens;
-
-		for (y=0;y<240;y++)
-		{
-			UINT16* src;
-			UINT32* dst;
-
-			src = BITMAP_ADDR16(sprite_bitmap,y,0);
-			dst = BITMAP_ADDR32(bitmap,y,0);
-
-			for (x=0;x<320;x++)
-			{
-				UINT16 pen = src[x]&0x7fff;
-				UINT16 palvalue = skns_palette_ram[pen];
-
-				if (palvalue&0x8000)
-				{
-					UINT32 srccolour = dst[x];
-					UINT32 dstcolour = paldata[pen];
-
-					int r,g,b;
-					int r2,g2,b2;
-
-					r = (srccolour & 0x000000ff)>> 0;
-					g = (srccolour & 0x0000ff00)>> 8;
-					b = (srccolour & 0x00ff0000)>> 16;
-
-					r2 = (dstcolour & 0x000000ff)>> 0;
-					g2 = (dstcolour & 0x0000ff00)>> 8;
-					b2 = (dstcolour & 0x00ff0000)>> 16;
-
-					r2 = (r2 * bright_spc_r_trans) >> 8;
-					g2 = (g2 * bright_spc_g_trans) >> 8;
-					b2 = (b2 * bright_spc_b_trans) >> 8;
-
-					r = (r+r2);
-					if (r>255) r = 255;
-
-					g = (g+g2);
-					if (g>255) g = 255;
-
-					b = (b+b2);
-					if (b>255) b = 255;
-
-					if (pen) dst[x] = (r << 0) | (g << 8) | (b << 16);
-
-				}
-				else
-				{
-					if (pen) dst[x] = paldata[pen];
-				}
-
-			}
-		}
-
-	}
 
 	return 0;
 }
 
 VIDEO_EOF(skns)
 {
-	buffer_spriteram32_w(machine,0,0,0xffffffff);
+//  buffer_spriteram32_w(machine,0,0,0xffffffff);
 }
