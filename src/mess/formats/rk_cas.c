@@ -221,6 +221,14 @@ static const struct CassetteFormat rkm_cassette_format = {
 	rk22_cassette_load,
 	NULL
 };
+
+static const struct CassetteFormat rkp_cassette_format = {
+	"rkp",
+	rk20_cassette_identify,
+	rk20_cassette_load,
+	NULL
+};
+
 CASSETTE_FORMATLIST_START(rku_cassette_formats)
 	CASSETTE_FORMAT(rku_cassette_format)
 CASSETTE_FORMATLIST_END
@@ -247,4 +255,8 @@ CASSETTE_FORMATLIST_END
 
 CASSETTE_FORMATLIST_START(rkm_cassette_formats)
 	CASSETTE_FORMAT(rkm_cassette_format)
+CASSETTE_FORMATLIST_END
+
+CASSETTE_FORMATLIST_START(rkp_cassette_formats)
+	CASSETTE_FORMAT(rkp_cassette_format)
 CASSETTE_FORMATLIST_END

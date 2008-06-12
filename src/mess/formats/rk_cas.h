@@ -17,6 +17,7 @@ CASSETTE_FORMATLIST_EXTERN(rko_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(rkr_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(rka_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(rkm_cassette_formats);
+CASSETTE_FORMATLIST_EXTERN(rkp_cassette_formats);
 
 #endif /* RK_CAS_H */
 

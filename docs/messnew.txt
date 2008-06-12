@@ -7,6 +7,7 @@ New System Drivers Supported (in no particular order):
 - Grundy NewBrain A/AD/MD (not working) [Curt Coder]
 - Mikrosha [Miodrag Milanovic]
 - OSCOM Nano  [Curt Coder, HobbyLabs]
+- Partner-01.01 [Miodrag Milanovic]
 - Radio-86RK [Miodrag Milanovic]
 
 System Driver Changes:

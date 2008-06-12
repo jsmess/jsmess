@@ -870,6 +870,7 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( spektr01 )
 	DRIVER( apogee )
 	DRIVER( mikrosha )
+	DRIVER( partner )
 
 	/* Bondwell */
 	DRIVER( bw2 )
