@@ -488,18 +488,6 @@ static DRIVER_INIT( bw2 )
 
 static MACHINE_RESET( bw2 )
 {
-	memory_set_bank(1, 7);
-}
-
-static MACHINE_START( bw2 )
-{
-	centronics_config(0, bw2_centronics_config);
-
-	msm8251_init(&bw2_msm8251_interface);
-
-	wd17xx_init(machine, WD_TYPE_2793, bw2_wd17xx_callback, NULL);
-	wd17xx_set_density(DEN_MFM_LO);
-
 	if (input_port_read(machine, "RAMCARD") & 0x01)
 	{
 		// RAMCARD installed
@@ -522,6 +510,18 @@ static MACHINE_START( bw2 )
 		memory_configure_bank(1, 2, 5, mess_ram + 0x8000, 0x8000);
 		memory_configure_bank(1, 7, 1, memory_region(REGION_CPU1), 0);
 	}
+
+	memory_set_bank(1, 7);
+}
+
+static MACHINE_START( bw2 )
+{
+	centronics_config(0, bw2_centronics_config);
+
+	msm8251_init(&bw2_msm8251_interface);
+
+	wd17xx_init(machine, WD_TYPE_2793, bw2_wd17xx_callback, NULL);
+	wd17xx_set_density(DEN_MFM_LO);
 }
 
 static ADDRESS_MAP_START( bw2_mem, ADDRESS_SPACE_PROGRAM, 8 )
