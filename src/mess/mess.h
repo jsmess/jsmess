@@ -54,11 +54,6 @@ UINT32 hash_data_extract_crc32(const char *d);
 
 /***************************************************************************/
 
-#if HAS_WAVE
-int tapecontrol(running_machine *machine, int selected);
-void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config *img, int *curpos, int *endpos);
-#endif
-
 /* IODevice Initialisation return values.  Use these to determine if */
 /* the emulation can continue if IODevice initialisation fails */
 #define INIT_PASS 0

@@ -37,7 +37,7 @@ void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config
 		*endpos = t1;
 }
 
-int tapecontrol(running_machine *machine, int selected)
+static int tapecontrol(running_machine *machine, int selected)
 {
 	static int id = 0;
 	char timepos[32];
@@ -215,4 +215,17 @@ int tapecontrol(running_machine *machine, int selected)
 		sel = -2;
 
 	return sel + 1;
+}
+
+
+/*-------------------------------------------------
+    menu_tape_control - MESS-specific menu
+-------------------------------------------------*/
+
+UINT32 menu_tape_control(running_machine *machine, UINT32 state)
+{
+	int result = tapecontrol(machine, state);
+	if (result == 0)
+		return ui_menu_stack_pop();
+	return result;
 }

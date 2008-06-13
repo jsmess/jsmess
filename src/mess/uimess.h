@@ -21,10 +21,11 @@ int ui_sprintf_image_info(running_machine *machine, char *buf);
 UINT32 ui_menu_image_info(running_machine *machine, UINT32 state);
 
 /* file manager */
-int filemanager(running_machine *machine, int selected);
+UINT32 menu_file_manager(running_machine *machine, UINT32 state);
 
 /* tape control */
-int tapecontrol(running_machine *machine, int selected);
+UINT32 menu_tape_control(running_machine *machine, UINT32 state);
+void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config *img, int *curpos, int *endpos);
 
 /* paste */
 void ui_paste(running_machine *machine);

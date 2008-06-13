@@ -16,6 +16,8 @@
 #include "messres.h"
 #include "window.h"
 #include "winutf8.h"
+#include "uimess.h"
+
 
 //============================================================
 //	STRUCTURES
