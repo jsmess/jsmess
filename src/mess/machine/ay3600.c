@@ -19,6 +19,11 @@
 #include "machine/ay3600.h"
 #include "includes/apple2.h"
 
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #ifdef MAME_DEBUG
 #define VERBOSE 1
 #else
@@ -26,6 +31,10 @@
 #endif /* MAME_DEBUG */
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
+
+
+/**************************************************************************/
 
 static TIMER_CALLBACK(AY3600_poll);
 
@@ -273,8 +282,10 @@ static UINT8 keymodreg;
 #define A2_KEYMOD_COMMAND	0x40
 #define A2_KEYMOD_OPTION	0x80
 
+
+
 /***************************************************************************
-  Helper Functions
+    HELPER FUNCTIONS
 ***************************************************************************/
 
 INLINE int a2_has_keypad(running_machine *machine)
@@ -302,7 +313,6 @@ INLINE int a2_no_ctrl_reset(running_machine *machine)
 	return ((a2_has_repeat(machine) && !a2_has_reset_dip(machine)) ||
 			(a2_has_reset_dip(machine) && !input_port_read(machine, "reset_dip")));
 }
-
 
 
 /***************************************************************************
@@ -365,7 +375,7 @@ static TIMER_CALLBACK(AY3600_poll)
 		time_until_repeat = input_port_read(machine, "keyb_repeat") & 0x01 ? 0 : ~0;
 
 	/* check caps lock and set LED here */
-	if (pressed_specialkey(SPECIALKEY_CAPSLOCK))
+	if (apple2_pressed_specialkey(machine, SPECIALKEY_CAPSLOCK))
 	{
 		caps_lock = 1;
 		set_led_status(1,1);
@@ -381,7 +391,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	switchkey = A2_KEY_NORMAL;
 
 	/* shift key check */
-	if (pressed_specialkey(SPECIALKEY_SHIFT))
+	if (apple2_pressed_specialkey(machine, SPECIALKEY_SHIFT))
 	{
 		switchkey |= A2_KEY_SHIFT;
 		keymodreg |= A2_KEYMOD_SHIFT;
@@ -392,7 +402,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* control key check - only one control key on the left side on the Apple */
-	if (pressed_specialkey(SPECIALKEY_CONTROL))
+	if (apple2_pressed_specialkey(machine, SPECIALKEY_CONTROL))
 	{
 		switchkey |= A2_KEY_CONTROL;
 		keymodreg |= A2_KEYMOD_CONTROL;
@@ -403,7 +413,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* apple key check */
-	if (pressed_specialkey(SPECIALKEY_BUTTON0))
+	if (apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON0))
 	{
 		keymodreg |= A2_KEYMOD_COMMAND;
 	}
@@ -413,7 +423,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* option key check */
-	if (pressed_specialkey(SPECIALKEY_BUTTON1))
+	if (apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON1))
 	{
 		keymodreg |= A2_KEYMOD_OPTION;
 	}
@@ -423,7 +433,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* reset key check */
-	if (pressed_specialkey(SPECIALKEY_RESET) &&
+	if (apple2_pressed_specialkey(machine, SPECIALKEY_RESET) &&
 		(a2_no_ctrl_reset(machine) || switchkey & A2_KEY_CONTROL)) {
 			if (!reset_flag) {
 				reset_flag = 1;

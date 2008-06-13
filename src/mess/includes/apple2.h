@@ -12,9 +12,9 @@
 #include "machine/applefdc.h"
 
 
-/* -----------------------------------------------------------------------
- * Softswitch values
- * ----------------------------------------------------------------------- */
+/***************************************************************************
+    SOFTSWITCH VALUES
+***************************************************************************/
 
 #define VAR_80STORE		0x000001
 #define VAR_RAMRD		0x000002
@@ -39,6 +39,24 @@
 
 #define VAR_DHIRES		VAR_AN3
 
+
+/***************************************************************************
+    SPECIAL KEYS
+***************************************************************************/
+
+#define SPECIALKEY_CAPSLOCK		0x01
+#define SPECIALKEY_SHIFT		0x06
+#define SPECIALKEY_CONTROL		0x08
+#define SPECIALKEY_BUTTON0		0x10	/* open apple */
+#define SPECIALKEY_BUTTON1		0x20	/* closed apple */
+#define SPECIALKEY_BUTTON2		0x40
+#define SPECIALKEY_RESET		0x80
+
+
+/***************************************************************************
+    OTHER
+***************************************************************************/
+
 /*----------- defined in machine/apple2.c -----------*/
 
 extern UINT32 a2;
@@ -58,6 +76,8 @@ INTERRUPT_GEN( apple2_interrupt );
 
 void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask);
 
+int apple2_pressed_specialkey(running_machine *machine, UINT8 key);
+
 
 /*----------- defined in video/apple2.c -----------*/
 
@@ -70,16 +90,6 @@ void apple2_set_fgcolor(int color);
 void apple2_set_bgcolor(int color);
 int apple2_get_fgcolor(void);
 int apple2_get_bgcolor(void);
-
-/* keyboard wrappers */
-#define pressed_specialkey(key)	(input_port_read(machine, "keyb_special") & (key))
-#define SPECIALKEY_CAPSLOCK		0x01
-#define SPECIALKEY_SHIFT		0x06
-#define SPECIALKEY_CONTROL		0x08
-#define SPECIALKEY_BUTTON0		0x10	/* open apple */
-#define SPECIALKEY_BUTTON1		0x20	/* closed apple */
-#define SPECIALKEY_BUTTON2		0x40
-#define SPECIALKEY_RESET		0x80
 
 /* -----------------------------------------------------------------------
  * New Apple II memory manager

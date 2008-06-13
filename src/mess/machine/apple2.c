@@ -1025,15 +1025,15 @@ READ8_HANDLER ( apple2_c06x_r )
 	{
 		case 0x01:
 			/* Open-Apple/Joystick button 0 */
-			result = pressed_specialkey(SPECIALKEY_BUTTON0);
+			result = apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON0);
 			break;
 		case 0x02:
 			/* Closed-Apple/Joystick button 1 */
-			result = pressed_specialkey(SPECIALKEY_BUTTON1);
+			result = apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON1);
 			break;
 		case 0x03:
 			/* Joystick button 2. Later revision motherboards connected this to SHIFT also */
-			result = pressed_specialkey(SPECIALKEY_BUTTON2);
+			result = apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON2);
 			break;
 		case 0x04:
 			/* X Joystick 1 axis */
@@ -1316,4 +1316,12 @@ MACHINE_START( apple2 )
 
 	/* perform initial reset */
 	apple2_reset(machine);
+}
+
+
+
+int apple2_pressed_specialkey(running_machine *machine, UINT8 key)
+{
+	return (input_port_read(machine, "keyb_special") & key)
+		|| (input_port_read(machine, "joystick_buttons") & key);
 }
