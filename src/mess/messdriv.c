@@ -866,6 +866,7 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 
 	/* Radio-86RK */
 	DRIVER( radio86 )
+	DRIVER( radio16 )
 	DRIVER( radio4k )
 	DRIVER( spektr01 )
 	DRIVER( apogee )

@@ -27,6 +27,17 @@ static ADDRESS_MAP_START(radio86_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(radio86_16_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x1000, 0x3fff ) AM_RAM  // RAM
+    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w) AM_MIRROR(0x1ffc)
+    //AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x1ffc)
+    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
+    AM_RANGE( 0xe000, 0xffff ) AM_WRITE(dma8257_0_w)	 // DMA
+    AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
+ADDRESS_MAP_END
+
 /* Input ports */
 INPUT_PORTS_START( radio86 )
 	PORT_START_TAG("LINE0")
@@ -115,7 +126,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( radio86 )
     /* basic machine hardware */
-    MDRV_CPU_ADD(8080, XTAL_16MHz / 9)
+    MDRV_CPU_ADD_TAG("main",8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(radio86_mem, 0)
     MDRV_MACHINE_RESET( radio86 )
 
@@ -143,6 +154,13 @@ static MACHINE_DRIVER_START( radio86 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( radio16 )
+    /* basic machine hardware */
+    MDRV_IMPORT_FROM(radio86)
+    MDRV_CPU_MODIFY("main")
+    MDRV_CPU_PROGRAM_MAP(radio86_16_mem, 0)
 MACHINE_DRIVER_END
 
 static void radio86_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -183,6 +201,14 @@ ROM_START( spektr01 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
+ROM_START( radio16 )
+	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_LOAD( "rk86.16k", 0xf800, 0x0800, CRC(fd8a4caf) SHA1(90d6af571049a7c8748eac03541e921eac3f70c5))
+	ROM_COPY( REGION_CPU1, 0xf800, 0xf000, 0x0800 )
+	ROM_REGION(0x0800, REGION_GFX1,0)
+	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
+ROM_END
+
 SYSTEM_CONFIG_START(radio86)
 	CONFIG_DEVICE(radio86_cassette_getinfo);
 SYSTEM_CONFIG_END
@@ -190,6 +216,7 @@ SYSTEM_CONFIG_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1986, radio86, 0,      0, 	radio86, 	radio86,radio86, radio86,  "", 	"Radio-86RK",	0)
-COMP( 1986, radio4k, radio86, 0, 	radio86, 	radio86,radio86, radio86,  "", 	"Radio-86RK 4k",	0)
+COMP( 1986, radio86, 0,       0, 	radio86, 	radio86,radio86, radio86,  "", 	"Radio-86RK",	0)
+COMP( 1986, radio16, radio86, 0, 	radio16, 	radio86,radio86, radio86,  "", 	"Radio-86RK (16K RAM)",	0)
+COMP( 1986, radio4k, radio86, 0, 	radio86, 	radio86,radio86, radio86,  "", 	"Radio-86RK (4K ROM)",	0)
 COMP( 1986, spektr01,radio86, 0, 	radio86, 	radio86,radio86, radio86,  "", 	"Spektr-001",	0)
