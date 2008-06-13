@@ -160,10 +160,19 @@ static const device_config *printer_fp(void)
 
 static READ8_HANDLER(read_keyboard)
 {
-	char port[6];
+	char port[12];
+	UINT8 value;
 
-	sprintf(port, "LINE%d", offset);
-	return input_port_read(machine, port);
+	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
+	value = input_port_read(machine, port);
+
+	/* hack for port overlapping with joystick */
+	if (value == 5)
+	{
+		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset);
+		value |= input_port_read(machine, port);
+	}
+	return value;
 }
 
 static DEVICE_IMAGE_LOAD( tutor_cart )
@@ -522,6 +531,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)			PORT_CHAR('/') PORT_CHAR('?')
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)		PORT_CHAR(']') PORT_CHAR('}') // this one is 4th line, 4th key after 'M'
 
+	PORT_START_TAG("LINE5_alt")    /* col 5 */
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
