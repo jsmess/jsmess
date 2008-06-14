@@ -386,7 +386,7 @@ static void cassette_motor( running_machine *machine, UINT8 data )
 
 /********************************************* TIMER ************************************************/
 
-static UINT8 wave_length, last_wave_state=0, cass_out;
+static UINT8 cass_data[]={ 0, 0, 0, 0 };
 
 /* this timer runs at 200khz and does 2 jobs:
 	1. Scan the keyboard and present the results to the pio
@@ -401,7 +401,7 @@ Reasons why it is necessary:
 
 static TIMER_CALLBACK( super80_timer )
 {
-	UINT8 wave_state=0, i, mask=1, out_f8=z80pio_p_r(0,0), in_fa=255;
+	UINT8 cass_ws=0, i, mask=1, out_f8=z80pio_p_r(0,0), in_fa=255;
 	char port[6];
 
 	for ( i=0; i < 8;i++)
@@ -413,16 +413,15 @@ static TIMER_CALLBACK( super80_timer )
 
 	z80pio_p_w(0,1,in_fa);
 
-	if (cassette_input(cassette_device_image()) > +0.03) wave_state+=6;
+	cass_data[1]++;
+	cass_ws = (cassette_input(cassette_device_image()) > +0.03) ? 4 : 0;
 
-	if (wave_state == last_wave_state)
-		wave_length++;
-	else
+	if (cass_ws != cass_data[0])
 	{
-		last_wave_state = wave_state;
-		cass_out = wave_state;
-		if (wave_length < 0x40) cass_out++;
-		wave_length = 0;
+		if (cass_ws) cass_data[3] ^= 2;
+		cass_data[0] = cass_ws;
+		cass_data[2] = ((cass_data[1] < 0x40) ? 1 : 0) | cass_ws | cass_data[3];
+		cass_data[1] = 0;
 	}
 }
 
@@ -439,8 +438,8 @@ static READ8_HANDLER( super80v_11_r )
 static READ8_HANDLER( super80_f2_r )
 {
 	UINT8 data = input_port_read(machine, "DSW") & 0xf0;	// dip switches on pcb
-	data |= cass_out;			// bit 0 = output of U1, bit 1 = current wave_state
-	data |= 0x08;				// bits 2,3 - not used
+	data |= cass_data[2];			// bit 0 = output of U1, bit 2 = current wave_state
+	data |= 0x08;				// bit 3 - not used
 	return data;
 }
 
