@@ -716,10 +716,22 @@ UINT8 c64_m6510_port_read(UINT8 direction)
 		data &= ~0x10;
 	/* WP: motor is always marked as on??? */
 	data &= ~0x20;
-	if (is_c128(machine) && (input_port_read(machine, "SPECIAL") & 0x20))	/* Check Caps Lock */
-		data &= ~0x40;
-	if (is_c65(machine) && (input_port_read(machine, "SPECIAL") & 0x20))	/* Check Caps Lock */
-		data &= ~0x40; /*? */
+	if (is_c128(machine)) {
+		if (input_port_read(machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
+		{
+			data &= ~0x40;
+		} else {
+			data |=  0x40;
+		}
+	}
+	if (is_c65(machine)) {
+		if (input_port_read(machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
+		{
+			data &= ~0x40;
+		} else {
+			data |=  0x40;
+		}
+	}
 	return data;
 }
 

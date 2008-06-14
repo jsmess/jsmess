@@ -12,7 +12,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-- [AMIGA] Fixed Keyboard. (bug #1590) [Roberto Zandonà]
+- [AMIGA] Fixed Keyboard. (bug #1590) [Roberto Zandona']
 
 - [AMIGACD / AMIGAFDC] Fixed a couple of regressions introduced in 0.125.
   Still CDTV regression is not fixed. [Fabio Priuli]
@@ -21,7 +21,9 @@ System Driver Changes:
 
 - [BK] Added SHA-1's.  [Fabio Priuli]
 
-- [C64] Joystick fix. (bug #1150) [Roberto Zandonà]
+- [C128] fix for c128 keyboard (bug #1240) [Roberto Zandona']
+
+- [C64] Joystick fix. (bug #1150) [Roberto Zandona']
 
 - [COCO] Changed MUX delay from 16us to 8us to fix a joystick input bug under
   [Nitr]OS-9.  Since this delay was introduced to fix Photon (as per bug #655)
