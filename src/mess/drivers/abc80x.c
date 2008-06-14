@@ -1090,7 +1090,7 @@ static void abc800_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START( abc800 )
+static SYSTEM_CONFIG_START( abc800 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
 	CONFIG_DEVICE(abc800_cassette_getinfo)
@@ -1098,14 +1098,14 @@ SYSTEM_CONFIG_START( abc800 )
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( abc802 )
+static SYSTEM_CONFIG_START( abc802 )
 	CONFIG_RAM_DEFAULT(64 * 1024)
 	CONFIG_DEVICE(abc800_cassette_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( abc806 )
+static SYSTEM_CONFIG_START( abc806 )
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_DEVICE(abc800_cassette_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)

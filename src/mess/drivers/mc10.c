@@ -277,7 +277,7 @@ static void mc10_cassette_getinfo(const mess_device_class *devclass, UINT32 stat
 *****************************************************************************/
 
 
-SYSTEM_CONFIG_START(mc10)
+static SYSTEM_CONFIG_START(mc10)
 	CONFIG_DEVICE( mc10_cassette_getinfo )
 	CONFIG_RAM        (  4 * 1024 )   /* standard */
 	CONFIG_RAM_DEFAULT( 20 * 1024 )   /* with 16K memory expansion */

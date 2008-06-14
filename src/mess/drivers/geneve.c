@@ -635,7 +635,7 @@ static void geneve_memcard_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(geneve)
+static SYSTEM_CONFIG_START(geneve)
 	CONFIG_DEVICE(geneve_floppy_getinfo)
 	CONFIG_DEVICE(geneve_harddisk_getinfo)
 	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)

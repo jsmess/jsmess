@@ -2045,7 +2045,7 @@ static void a2600_cassette_getinfo( const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(a2600)
+static SYSTEM_CONFIG_START(a2600)
 	CONFIG_DEVICE(a2600_cartslot_getinfo)
 	CONFIG_DEVICE(a2600_cassette_getinfo)
 SYSTEM_CONFIG_END

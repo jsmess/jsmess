@@ -400,7 +400,7 @@ ROM_START(ti99_232)
 	ROM_CONTINUE(0x10000,0x2000)
 ROM_END
 
-SYSTEM_CONFIG_START(ti99_2)
+static SYSTEM_CONFIG_START(ti99_2)
 	/* one expansion/cartridge port on the back */
 	/* one cassette unit port */
 	/* Hex-bus disk controller: supports up to 4 floppy disk drives */

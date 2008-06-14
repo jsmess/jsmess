@@ -11,12 +11,12 @@
 #include "devices/cassette.h"
 #include "machine/8255ppi.h"
 
-UINT16 kbd_state;
+static UINT16 kbd_state;
 UINT16 bk_scrool;
-UINT16 key_code;
-UINT16 key_pressed;
-UINT16 key_irq_vector;
-UINT16 bk_drive;
+static UINT16 key_code;
+static UINT16 key_pressed;
+static UINT16 key_irq_vector;
+static UINT16 bk_drive;
 
 static TIMER_CALLBACK(keyboard_callback)
 {

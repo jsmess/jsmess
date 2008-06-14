@@ -870,7 +870,7 @@ static void apexc_punchtape_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(apexc)
+static SYSTEM_CONFIG_START(apexc)
 	CONFIG_DEVICE(apexc_cylinder_getinfo)
 	CONFIG_DEVICE(apexc_punchtape_getinfo)
 SYSTEM_CONFIG_END

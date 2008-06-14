@@ -196,7 +196,7 @@ ROM_END
  *
  *************************************/
 
-SYSTEM_CONFIG_START(astrocde)
+static SYSTEM_CONFIG_START(astrocde)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
@@ -208,7 +208,7 @@ SYSTEM_CONFIG_END
  *
  *************************************/
 
-DRIVER_INIT( astrocde )
+static DRIVER_INIT( astrocde )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
 }

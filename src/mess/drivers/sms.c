@@ -519,7 +519,7 @@ static void sms_cartslot_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(sms)
+static SYSTEM_CONFIG_START(sms)
 	CONFIG_DEVICE(sms_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
@@ -532,7 +532,7 @@ static void sg1000m3_cartslot_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START(sg1000m3)
+static SYSTEM_CONFIG_START(sg1000m3)
 	CONFIG_DEVICE(sg1000m3_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
@@ -544,7 +544,7 @@ static void smssdisp_cartslot_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START(smssdisp)
+static SYSTEM_CONFIG_START(smssdisp)
 	CONFIG_DEVICE(smssdisp_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
@@ -561,7 +561,7 @@ static void gamegear_cartslot_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START(gamegear)
+static SYSTEM_CONFIG_START(gamegear)
 	CONFIG_DEVICE(gamegear_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

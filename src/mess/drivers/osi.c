@@ -487,7 +487,7 @@ static void sb2m600_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(sb2m600)
+static SYSTEM_CONFIG_START(sb2m600)
 	CONFIG_DEVICE(sb2m600_cassette_getinfo)
 	CONFIG_RAM_DEFAULT(4 * 1024)
 	CONFIG_RAM(8 * 1024)

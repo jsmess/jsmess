@@ -492,7 +492,7 @@ static void comx35_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START( comx35 )
+static SYSTEM_CONFIG_START( comx35 )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
 	CONFIG_DEVICE(comx35_cassette_getinfo)
 	CONFIG_DEVICE(comx35_floppy_getinfo)

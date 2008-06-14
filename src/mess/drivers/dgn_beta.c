@@ -361,7 +361,7 @@ ROM_END
 /* to exist was fitted with 256K, so I have made this the default. Also available           */
 /* documentation seems to sugest a maximum of 768K, so I have included configs increasing   */
 /* in blocks of 128K up to this maximum.                                                    */
-SYSTEM_CONFIG_START(dgnbeta)
+static SYSTEM_CONFIG_START(dgnbeta)
 	CONFIG_RAM(128 * 1024)
 	CONFIG_RAM_DEFAULT(RamSize * 1024)
 	CONFIG_RAM(384 * 1024)

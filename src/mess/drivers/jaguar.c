@@ -525,7 +525,7 @@ static QUICKLOAD_LOAD( jaguar )
 	return INIT_PASS;
 }
 
-SYSTEM_CONFIG_START(jaguar)
+static SYSTEM_CONFIG_START(jaguar)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

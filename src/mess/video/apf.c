@@ -76,7 +76,9 @@ VIDEO_START(apf)
 	m6847_init(machine, &cfg);
 }
 
+#ifdef UNUSED_FUNCTION
 VIDEO_UPDATE(apf)
 {
     return VIDEO_UPDATE_CALL(m6847);
 }
+#endif

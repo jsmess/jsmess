@@ -20,7 +20,7 @@
 #include "device.h"
 #include "image.h"
 
-struct hd_state hd;
+static struct hd_state hd;
 
 static TIMER_CALLBACK( req_delay )
 {
@@ -39,7 +39,7 @@ unsigned char SASIReadByte(const device_config* device)
 	return val;
 }
 
-void SASIWriteByte(const device_config* device, unsigned char val)
+static void SASIWriteByte(const device_config* device, unsigned char val)
 {
 	image_fwrite(device,&val,1);
 }
@@ -441,7 +441,7 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 	}
 }
 
-DEVICE_SET_INFO( x68k_hdc )
+static DEVICE_SET_INFO( x68k_hdc )
 {
 	switch (state)
 	{

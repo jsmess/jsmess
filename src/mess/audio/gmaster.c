@@ -55,6 +55,7 @@ void* gmaster_custom_start (int clock, const struct CustomSound_interface *confi
   return (void*)~0;
 }
 
+#ifdef UNUSED_FUNCTION
 /************************************/
 /* Sound handler stop               */
 /************************************/
@@ -65,3 +66,4 @@ void gmaster_custom_stop (void)
 void gmaster_custom_update (void)
 {
 }
+#endif

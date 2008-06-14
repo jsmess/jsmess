@@ -199,7 +199,7 @@ ROM_START(kim1)
 		/* space filled with key icons by kim1_init_driver */
 ROM_END
 
-SYSTEM_CONFIG_START(kim1)
+static SYSTEM_CONFIG_START(kim1)
 	CONFIG_DEVICE(kim1_cassette_getinfo)
 SYSTEM_CONFIG_END
 

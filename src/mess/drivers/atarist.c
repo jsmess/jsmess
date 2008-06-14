@@ -2128,7 +2128,7 @@ static void atarist_cartslot_getinfo( const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START( atarist )
+static SYSTEM_CONFIG_START( atarist )
 	CONFIG_RAM_DEFAULT(1024 * 1024) // 1040ST
 	CONFIG_RAM		  ( 512 * 1024) //  520ST
 	CONFIG_RAM		  ( 256 * 1024) //  260ST
@@ -2138,7 +2138,7 @@ SYSTEM_CONFIG_START( atarist )
 	// MIDI
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( megast )
+static SYSTEM_CONFIG_START( megast )
 	CONFIG_RAM_DEFAULT(4096 * 1024) // Mega ST 4
 	CONFIG_RAM		  (2048 * 1024) // Mega ST 2
 	CONFIG_RAM		  (1024 * 1024) // Mega ST 1
@@ -2148,7 +2148,7 @@ SYSTEM_CONFIG_START( megast )
 	// MIDI
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( atariste )
+static SYSTEM_CONFIG_START( atariste )
 	CONFIG_RAM_DEFAULT(1024 * 1024) // 1040STe
 	CONFIG_RAM		  ( 512 * 1024) //  520STe
 	CONFIG_DEVICE(atarist_floppy_getinfo)
@@ -2157,7 +2157,7 @@ SYSTEM_CONFIG_START( atariste )
 	// MIDI
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( megaste )
+static SYSTEM_CONFIG_START( megaste )
 	CONFIG_RAM_DEFAULT(4096 * 1024) // Mega STe 4
 	CONFIG_RAM		  (2048 * 1024) // Mega STe 2
 	CONFIG_RAM		  (1024 * 1024) // Mega STe 1
@@ -2168,7 +2168,7 @@ SYSTEM_CONFIG_START( megaste )
 	// LAN
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( stbook )
+static SYSTEM_CONFIG_START( stbook )
 	CONFIG_RAM_DEFAULT(4096 * 1024)
 	CONFIG_RAM		  (1024 * 1024)
 	CONFIG_DEVICE(atarist_floppy_getinfo)

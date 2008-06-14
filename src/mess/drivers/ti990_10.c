@@ -329,7 +329,7 @@ static void ti990_10_cassette_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START(ti990_10)
+static SYSTEM_CONFIG_START(ti990_10)
 	CONFIG_DEVICE(ti990_10_harddisk_getinfo)
 	CONFIG_DEVICE(ti990_10_cassette_getinfo)
 SYSTEM_CONFIG_END

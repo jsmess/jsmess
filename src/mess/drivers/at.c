@@ -871,7 +871,7 @@ static void ibmat_harddisk_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(ibmat)
+static SYSTEM_CONFIG_START(ibmat)
 	CONFIG_RAM_DEFAULT( (640+1024) * 1024 )
 	CONFIG_DEVICE(ibmat_floppy_getinfo)
 	CONFIG_DEVICE(ibmat_harddisk_getinfo)

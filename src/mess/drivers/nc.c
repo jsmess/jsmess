@@ -1780,12 +1780,12 @@ static void nc_common_serial_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(nc_common)
+static SYSTEM_CONFIG_START(nc_common)
 	CONFIG_DEVICE(nc_common_cartslot_getinfo)
 	CONFIG_DEVICE(nc_common_serial_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(nc100)
+static SYSTEM_CONFIG_START(nc100)
 	CONFIG_IMPORT_FROM(nc_common)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
@@ -1805,7 +1805,7 @@ static void nc200_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(nc200)
+static SYSTEM_CONFIG_START(nc200)
 	CONFIG_IMPORT_FROM(nc_common)
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_DEVICE(nc200_floppy_getinfo)

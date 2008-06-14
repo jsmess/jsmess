@@ -495,7 +495,7 @@ static void trs80_cassette_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(trs80)
+static SYSTEM_CONFIG_START(trs80)
 	CONFIG_DEVICE(trs80_cassette_getinfo)
 SYSTEM_CONFIG_END
 
@@ -518,7 +518,7 @@ static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(trs8012)
+static SYSTEM_CONFIG_START(trs8012)
 	CONFIG_IMPORT_FROM(trs80)
 	CONFIG_DEVICE(trs8012_floppy_getinfo)
 SYSTEM_CONFIG_END

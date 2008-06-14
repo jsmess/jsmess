@@ -10,7 +10,7 @@
 #include "driver.h"
   
 UINT8 *specialist_video_ram;
-UINT8 erik_page_active;
+//UINT8 erik_page_active;
 UINT8 *erik_video_ram_page_1;
 UINT8 *erik_video_ram_page_2;
 
@@ -115,7 +115,7 @@ VIDEO_UPDATE( specimx )
 	return 0;
 }
 
-const rgb_t erik_palette[8] = {
+static const rgb_t erik_palette[8] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
 	MAKE_RGB(0x00, 0x00, 0xff), // 1
 	MAKE_RGB(0xff, 0x00, 0x00), // 2 

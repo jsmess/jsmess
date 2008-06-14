@@ -459,7 +459,7 @@ static void tx0_magtape_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
-SYSTEM_CONFIG_START(tx0)
+static SYSTEM_CONFIG_START(tx0)
 	CONFIG_DEVICE(tx0_punchtape_getinfo)
 	CONFIG_DEVICE(tx0_magtape_getinfo)
 	CONFIG_DEVICE(tx0_printer_getinfo)

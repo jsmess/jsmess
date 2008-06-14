@@ -134,7 +134,7 @@ INLINE i8275_t *get_safe_token(const device_config *device)
 
 
 /* Register Access */
-UINT8 i8275_get_parameter_light_pen(const device_config *device, offs_t offset)
+static UINT8 i8275_get_parameter_light_pen(const device_config *device, offs_t offset)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	UINT8 val = 0;
@@ -185,7 +185,7 @@ READ8_DEVICE_HANDLER( i8275_r )
 	return val;
 }
 
-void i8275_recompute_parameters(const device_config *device)
+static void i8275_recompute_parameters(const device_config *device)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	int horiz_pix_total = 0;
@@ -207,7 +207,7 @@ void i8275_recompute_parameters(const device_config *device)
 				video_screen_get_frame_period(i8275->screen).attoseconds);
 }
 
-void i8275_set_parameter_reset(const device_config *device, offs_t offset, UINT8 data)
+static void i8275_set_parameter_reset(const device_config *device, offs_t offset, UINT8 data)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	switch(offset) {
@@ -232,7 +232,7 @@ void i8275_set_parameter_reset(const device_config *device, offs_t offset, UINT8
 	}
 }
 
-void i8275_set_parameter_cursor(const device_config *device, offs_t offset, UINT8 data)
+static void i8275_set_parameter_cursor(const device_config *device, offs_t offset, UINT8 data)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	switch(offset) {
@@ -322,7 +322,7 @@ WRITE8_DEVICE_HANDLER( i8275_w )
 }
 
 
-void i8275_draw_char_line(const device_config *device)
+static void i8275_draw_char_line(const device_config *device)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	int xpos = 0;

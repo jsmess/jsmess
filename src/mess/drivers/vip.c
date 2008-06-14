@@ -290,7 +290,7 @@ static void vip_cassette_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START( vip )
+static SYSTEM_CONFIG_START( vip )
 	CONFIG_RAM_DEFAULT	( 2 * 1024)
 	CONFIG_RAM			( 4 * 1024)
 	CONFIG_RAM			(32 * 1024)

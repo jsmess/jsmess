@@ -157,7 +157,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
 
-MACHINE_START( scorpion )
+static MACHINE_START( scorpion )
 {
 	wd17xx_init(machine, WD_TYPE_179X, betadisk_wd179x_callback, NULL);
 }
@@ -341,7 +341,7 @@ ROM_END
 
 SYSTEM_CONFIG_EXTERN(spectrum)
 
-SYSTEM_CONFIG_START(scorpion)
+static SYSTEM_CONFIG_START(scorpion)
 	CONFIG_IMPORT_FROM(spectrum)
 	CONFIG_RAM_DEFAULT(256 * 1024)
 	CONFIG_DEVICE(beta_floppy_getinfo)

@@ -697,21 +697,21 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( to )
+static SYSTEM_CONFIG_START ( to )
      CONFIG_DEVICE ( to7_cartridge_getinfo )
      CONFIG_DEVICE ( to7_cassette_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START ( to7 )
+static SYSTEM_CONFIG_START ( to7 )
      CONFIG_IMPORT_FROM( to )
      CONFIG_RAM_DEFAULT	( 40 * 1024 ) /* with standard 16 KB memory extension */
      CONFIG_RAM ( 24 * 1024 )         /* base */
      CONFIG_RAM ( 48 * 1024 )         /* with standard 16 KB + homebre 8 KB extensions */
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START ( t9000 )
+static SYSTEM_CONFIG_START ( t9000 )
      CONFIG_IMPORT_FROM ( to7 )
 SYSTEM_CONFIG_END
 
@@ -929,13 +929,13 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( to770 )
+static SYSTEM_CONFIG_START ( to770 )
      CONFIG_IMPORT_FROM ( to )
      CONFIG_RAM_DEFAULT	( 128 * 1024 ) /* with 64 KB extension */
      CONFIG_RAM	( 64 * 1024 )          /* base */
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START ( to770a )
+static SYSTEM_CONFIG_START ( to770a )
      CONFIG_IMPORT_FROM ( to770 )
 SYSTEM_CONFIG_END
 
@@ -1121,19 +1121,19 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( mo )
+static SYSTEM_CONFIG_START ( mo )
      CONFIG_DEVICE ( mo5_cartridge_getinfo )
      CONFIG_DEVICE ( mo5_cassette_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START ( mo5 )
+static SYSTEM_CONFIG_START ( mo5 )
      CONFIG_IMPORT_FROM ( mo )
      CONFIG_RAM_DEFAULT	( 112 * 1024 ) /* with 64 KB extension */
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START ( mo5e )
+static SYSTEM_CONFIG_START ( mo5e )
      CONFIG_IMPORT_FROM ( mo5 )
 SYSTEM_CONFIG_END
 
@@ -1478,7 +1478,7 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( to9 )
+static SYSTEM_CONFIG_START ( to9 )
      CONFIG_IMPORT_FROM ( to )
      CONFIG_RAM_DEFAULT	( 192 * 1024 ) /* with 64 KB extension */
      CONFIG_RAM( 128 * 1024 )          /* base */
@@ -1711,13 +1711,13 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( to8 )
+static SYSTEM_CONFIG_START ( to8 )
      CONFIG_IMPORT_FROM ( to )
      CONFIG_RAM_DEFAULT ( 512 * 1024 ) /* with 256 KB extension */
      CONFIG_RAM ( 256 * 1024 )         /* base */
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START ( to8d )
+static SYSTEM_CONFIG_START ( to8d )
      CONFIG_IMPORT_FROM ( to8 )
 SYSTEM_CONFIG_END
 
@@ -1874,7 +1874,7 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( to9p )
+static SYSTEM_CONFIG_START ( to9p )
      CONFIG_IMPORT_FROM ( to )
      CONFIG_RAM_DEFAULT ( 512 * 1024 )
 SYSTEM_CONFIG_END
@@ -2218,12 +2218,12 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( mo6 )
+static SYSTEM_CONFIG_START ( mo6 )
      CONFIG_IMPORT_FROM ( mo )
      CONFIG_RAM_DEFAULT	( 128 * 1024 )
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START ( pro128 )
+static SYSTEM_CONFIG_START ( pro128 )
      CONFIG_IMPORT_FROM ( mo6 )
 SYSTEM_CONFIG_END
 
@@ -2451,7 +2451,7 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( mo5nr )
+static SYSTEM_CONFIG_START ( mo5nr )
      CONFIG_IMPORT_FROM ( mo )
      CONFIG_RAM_DEFAULT	( 128 * 1024 )
 SYSTEM_CONFIG_END

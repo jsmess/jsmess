@@ -898,26 +898,28 @@ static void tmc1800_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START( tmc1800 )
+static SYSTEM_CONFIG_START( tmc1800 )
 	CONFIG_RAM_DEFAULT	( 2 * 1024)
 	CONFIG_RAM			( 4 * 1024)
 	CONFIG_DEVICE(tmc1800_cassette_getinfo)
 SYSTEM_CONFIG_END
 
+#ifdef UNUSED_FUNCTION
 SYSTEM_CONFIG_START( osc1000b )
 	CONFIG_RAM_DEFAULT	( 2 * 1024)
 	CONFIG_RAM			( 4 * 1024)
 	CONFIG_DEVICE(tmc1800_cassette_getinfo)
 SYSTEM_CONFIG_END
+#endif
 
-SYSTEM_CONFIG_START( tmc2000 )
+static SYSTEM_CONFIG_START( tmc2000 )
 	CONFIG_RAM_DEFAULT	( 4 * 1024)
 	CONFIG_RAM			(16 * 1024)
 	CONFIG_RAM			(32 * 1024)
 	CONFIG_DEVICE(tmc1800_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( oscnano )
+static SYSTEM_CONFIG_START( oscnano )
 	CONFIG_RAM_DEFAULT	(4 * 1024)
 	CONFIG_DEVICE(tmc1800_cassette_getinfo)
 SYSTEM_CONFIG_END

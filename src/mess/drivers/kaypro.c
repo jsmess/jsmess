@@ -289,7 +289,7 @@ static void kaypro_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(kaypro)
+static SYSTEM_CONFIG_START(kaypro)
 	CONFIG_DEVICE(kaypro_floppy_getinfo)
 SYSTEM_CONFIG_END
 

@@ -604,7 +604,7 @@ static void samcoupe_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 }
 
 
-SYSTEM_CONFIG_START(samcoupe)
+static SYSTEM_CONFIG_START(samcoupe)
 	CONFIG_RAM(256 * 1024)
 	CONFIG_RAM_DEFAULT(512 * 1024)
 	CONFIG_RAM(256 * 1024 + 1 * 1024 * 1024)

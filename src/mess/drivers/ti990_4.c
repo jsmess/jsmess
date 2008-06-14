@@ -336,7 +336,7 @@ static void ti990_4_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(ti990_4)
+static SYSTEM_CONFIG_START(ti990_4)
 	CONFIG_DEVICE(ti990_4_floppy_getinfo)
 SYSTEM_CONFIG_END
 

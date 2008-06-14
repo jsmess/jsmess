@@ -311,7 +311,7 @@ static void odyssey2_cartslot_device_getinfo(const mess_device_class *devclass, 
 	}
 }
 
-SYSTEM_CONFIG_START(odyssey2)
+static SYSTEM_CONFIG_START(odyssey2)
 	CONFIG_DEVICE(odyssey2_cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

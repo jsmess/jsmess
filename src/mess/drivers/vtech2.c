@@ -532,7 +532,7 @@ static void laser_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(laser)
+static SYSTEM_CONFIG_START(laser)
 	CONFIG_DEVICE(laser_cassette_getinfo)
 	CONFIG_DEVICE(laser_cartslot_getinfo)
 	CONFIG_DEVICE(laser_floppy_getinfo)

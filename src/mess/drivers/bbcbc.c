@@ -89,7 +89,7 @@ ROM_START( bbcbc )
 	ROM_CART_LOAD(0, "bin", 0x4000, 0xBFFF, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-SYSTEM_CONFIG_START( bbcbc )
+static SYSTEM_CONFIG_START( bbcbc )
     CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

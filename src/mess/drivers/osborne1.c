@@ -198,7 +198,7 @@ static void osborne1_floppy_getinfo( const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START( osborne1 )
+static SYSTEM_CONFIG_START( osborne1 )
 	CONFIG_DEVICE( osborne1_floppy_getinfo )
 	CONFIG_RAM_DEFAULT( 68 * 1024 )		/* 64KB Main RAM and 4Kbit video attribute RAM */
 SYSTEM_CONFIG_END

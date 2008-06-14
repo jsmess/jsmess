@@ -136,7 +136,7 @@ static void vectrex_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(vectrex)
+static SYSTEM_CONFIG_START(vectrex)
 	CONFIG_DEVICE(vectrex_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

@@ -30,7 +30,7 @@ ADDRESS_MAP_END
 
 
 /* Input ports */
-INPUT_PORTS_START( orao )
+static INPUT_PORTS_START( orao )
 	PORT_START_TAG("LINE0")
 		PORT_BIT(0x0F, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
@@ -196,7 +196,7 @@ static void orao_cassette_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(orao)
+static SYSTEM_CONFIG_START(orao)
 	CONFIG_DEVICE(orao_cassette_getinfo)
 SYSTEM_CONFIG_END
 /* Driver */

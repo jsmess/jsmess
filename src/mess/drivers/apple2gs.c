@@ -273,7 +273,7 @@ static DRIVER_INIT(apple2gs)
 
 /* ----------------------------------------------------------------------- */
 
-SYSTEM_CONFIG_START(apple2gs)
+static SYSTEM_CONFIG_START(apple2gs)
 	CONFIG_DEVICE(apple2gs_floppy35_getinfo)
 	CONFIG_DEVICE(apple2gs_floppy525_getinfo)
 

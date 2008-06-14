@@ -55,9 +55,11 @@ MESS adaptation by R. Belmont
 #include "../../mame/drivers/megadriv.h"
 #include "cpu/m68000/m68000.h"
 
+#if 0
 static UINT16 squirrel_king_extra = 0;
 static UINT16 lion2_prot1_data, lion2_prot2_data;
 static UINT16 realtek_bank_addr=0, realtek_bank_size=0, realtek_old_bank_addr;
+#endif
 
 static int genesis_last_loaded_image_length = -1;
 
@@ -71,6 +73,7 @@ static int genesis_sram_active;
 static int genesis_sram_readonly;
 
 
+#ifdef UNUSED_FUNCTION
 static READ16_HANDLER( genesis_sram_read )
 {
 	UINT16 retval = 0;
@@ -107,6 +110,7 @@ static WRITE16_HANDLER( genesis_sram_toggle )
         genesis_sram_active = (data & 1) ? 1 : 0;
         genesis_sram_readonly = (data & 2) ? 1 : 0;
 }
+#endif
 
 /* code taken directly from GoodGEN by Cowering */
 static int genesis_isfunkySMD(unsigned char *buf,unsigned int len)
@@ -321,10 +325,11 @@ static void genesis_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(genesis)
+static SYSTEM_CONFIG_START(genesis)
 	CONFIG_DEVICE(genesis_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( genesis_ssf2_bank_w )
 {
 	static int lastoffset = -1,lastdata = -1;
@@ -703,6 +708,7 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
 {
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
 }
+#endif
 
 static void genesis_machine_stop(running_machine *machine)
 {
@@ -736,6 +742,7 @@ static DRIVER_INIT( genjpn )
 	DRIVER_INIT_CALL(megadrij);
 }
 
+#ifdef UNUSED_FUNCTION
 // only looks for == in the compare for LSB systems
 static int allendianmemcmp(const void *s1, const void *s2, size_t n)
 {
@@ -1043,7 +1050,7 @@ void setup_megadriv_custom_mappers(running_machine *machine)
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA14000, 0xA14003, 0, 0, genesis_TMSS_bank_w);
 }
-
+#endif
 
 /***************************************************************************
 

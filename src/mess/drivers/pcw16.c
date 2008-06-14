@@ -1467,7 +1467,7 @@ static void pcw16_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(pcw16)
+static SYSTEM_CONFIG_START(pcw16)
 	CONFIG_RAM_DEFAULT(2048 * 1024)
 	CONFIG_DEVICE(pcw16_floppy_getinfo)
 SYSTEM_CONFIG_END

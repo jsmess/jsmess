@@ -34,7 +34,7 @@ static UINT8 b2m_romdisk_msb;
 static UINT8 b2m_color[4];
 static UINT8 b2m_localmachine;
 
-READ8_HANDLER (b2m_keyboard_r )
+static READ8_HANDLER (b2m_keyboard_r )
 {		
 	UINT8 key = 0x00;
 	if (offset < 0x100) {
@@ -55,7 +55,7 @@ READ8_HANDLER (b2m_keyboard_r )
 }
 
 
-void b2m_set_bank(running_machine *machine,int bank) 
+static void b2m_set_bank(running_machine *machine,int bank) 
 {
 	memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x27ff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, SMH_BANK2);
@@ -180,31 +180,31 @@ const struct pit8253_config b2m_pit8253_intf =
 	}
 };
 
-WRITE8_HANDLER (b2m_8255_porta_w )
+static WRITE8_HANDLER (b2m_8255_porta_w )
 {	
 	b2m_8255_porta = data;
 }
-WRITE8_HANDLER (b2m_8255_portb_w )
+static WRITE8_HANDLER (b2m_8255_portb_w )
 {	
 	b2m_video_scroll = data;
 }
 
-WRITE8_HANDLER (b2m_8255_portc_w )
+static WRITE8_HANDLER (b2m_8255_portc_w )
 {	
 	b2m_8255_portc = data;
 	b2m_set_bank(machine,b2m_8255_portc & 7);
 	b2m_video_page = (b2m_8255_portc >> 7) & 1;
 }
 
-READ8_HANDLER (b2m_8255_porta_r )
+static READ8_HANDLER (b2m_8255_porta_r )
 {
 	return 0xff;
 }
-READ8_HANDLER (b2m_8255_portb_r )
+static READ8_HANDLER (b2m_8255_portb_r )
 {
 	return b2m_video_scroll;
 }
-READ8_HANDLER (b2m_8255_portc_r )
+static READ8_HANDLER (b2m_8255_portc_r )
 {
 	return 0xff;
 }
@@ -219,14 +219,14 @@ const ppi8255_interface b2m_ppi8255_interface_1 =
 };
 
 
-WRITE8_HANDLER (b2m_ext_8255_porta_w )
+static WRITE8_HANDLER (b2m_ext_8255_porta_w )
 {	
 }
-WRITE8_HANDLER (b2m_ext_8255_portb_w )
+static WRITE8_HANDLER (b2m_ext_8255_portb_w )
 {	
 }
 
-WRITE8_HANDLER (b2m_ext_8255_portc_w )
+static WRITE8_HANDLER (b2m_ext_8255_portc_w )
 {		
 	UINT8 drive = ((data >> 1) & 1) ^ 1;
 	UINT8 side  = (data  & 1) ^ 1;
@@ -241,15 +241,15 @@ WRITE8_HANDLER (b2m_ext_8255_portc_w )
 	}
 }
 
-READ8_HANDLER (b2m_ext_8255_porta_r )
+static READ8_HANDLER (b2m_ext_8255_porta_r )
 {
 	return 0xff;
 }
-READ8_HANDLER (b2m_ext_8255_portb_r )
+static READ8_HANDLER (b2m_ext_8255_portb_r )
 {
 	return 0xff;
 }
-READ8_HANDLER (b2m_ext_8255_portc_r )
+static READ8_HANDLER (b2m_ext_8255_portc_r )
 {
 	return 0xff;
 }
@@ -264,18 +264,18 @@ const ppi8255_interface b2m_ppi8255_interface_2 =
 	b2m_ext_8255_portc_w
 };
 
-READ8_HANDLER (b2m_romdisk_porta_r )
+static READ8_HANDLER (b2m_romdisk_porta_r )
 {
 	UINT8 *romdisk = memory_region(REGION_CPU1) + 0x12000;		
 	return romdisk[b2m_romdisk_msb*256+b2m_romdisk_lsb];	
 }
 
-WRITE8_HANDLER (b2m_romdisk_portb_w )
+static WRITE8_HANDLER (b2m_romdisk_portb_w )
 {	
 	b2m_romdisk_lsb = data;
 }
 
-WRITE8_HANDLER (b2m_romdisk_portc_w )
+static WRITE8_HANDLER (b2m_romdisk_portc_w )
 {			
 	b2m_romdisk_msb = data & 0x7f;	
 }
@@ -322,7 +322,7 @@ static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
 {		
 	cpunum_set_input_line(device->machine, 0, 0,interrupt ?  HOLD_LINE : CLEAR_LINE);  
 } 
-UINT8 vblank_state = 0;
+static UINT8 vblank_state = 0;
 
 
 /* Driver initialization */
@@ -378,7 +378,7 @@ MACHINE_START(b2m)
 	msm8251_init(&b2m_msm8251_interface);
 }
 
-IRQ_CALLBACK(b2m_irq_callback)
+static IRQ_CALLBACK(b2m_irq_callback)
 {	
 	return pic8259_acknowledge((device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259"));	
 } 

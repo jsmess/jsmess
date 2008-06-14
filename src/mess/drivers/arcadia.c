@@ -447,7 +447,7 @@ static void arcadia_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(arcadia)
+static SYSTEM_CONFIG_START(arcadia)
 	CONFIG_DEVICE(arcadia_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

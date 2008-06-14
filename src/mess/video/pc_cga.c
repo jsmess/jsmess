@@ -260,7 +260,7 @@ static struct
  *
  ***************************************************************************/
 
-struct ntsc_decoder
+static struct ntsc_decoder
 {
 	int period;
 

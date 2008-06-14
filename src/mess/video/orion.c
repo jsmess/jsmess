@@ -90,7 +90,7 @@ VIDEO_UPDATE( orion128 )
 	return 0;
 }
 
-const rgb_t orion128_palette[18] = {
+static const rgb_t orion128_palette[18] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
 	MAKE_RGB(0x00, 0x00, 0xc0), // 1
 	MAKE_RGB(0x00, 0xc0, 0x00), // 2 

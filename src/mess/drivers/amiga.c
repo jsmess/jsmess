@@ -516,12 +516,12 @@ ROM_END
   System config
 ***************************************************************************/
 
-SYSTEM_CONFIG_START(amiga)
+static SYSTEM_CONFIG_START(amiga)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(amiga_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(a1000)
+static SYSTEM_CONFIG_START(a1000)
 	CONFIG_DEVICE(amiga_floppy_getinfo)
 SYSTEM_CONFIG_END
 
@@ -537,7 +537,7 @@ static void cdtv_cd_getinfo(const mess_device_class *devclass, UINT32 state, uni
 	}
 }
 
-SYSTEM_CONFIG_START(cdtv)
+static SYSTEM_CONFIG_START(cdtv)
 	CONFIG_DEVICE(cdtv_cd_getinfo)
 SYSTEM_CONFIG_END
 

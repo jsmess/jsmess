@@ -163,7 +163,7 @@ static void sym1_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START( sym1 )
+static SYSTEM_CONFIG_START( sym1 )
 	CONFIG_DEVICE(sym1_cbmcartslot_getinfo)
 	CONFIG_RAM_DEFAULT(4 * 1024) /* 4KB RAM */
 	CONFIG_RAM        (3 * 1024) /* 3KB RAM */

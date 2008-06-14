@@ -662,7 +662,7 @@ static void tutor_parallel_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(tutor)
+static SYSTEM_CONFIG_START(tutor)
 
 	/* cartridge port is not emulated */
 	CONFIG_DEVICE(tutor_cartslot_getinfo)

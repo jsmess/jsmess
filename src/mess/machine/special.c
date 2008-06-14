@@ -17,7 +17,7 @@
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
 
-UINT8 specimx_color;
+static UINT8 specimx_color;
 UINT8 *specimx_colorram;
 
 static int specialist_8255_porta;
@@ -34,7 +34,7 @@ DRIVER_INIT(special)
 	memory_configure_bank(1, 0, 2, RAM, 0xc000);	
 }
 
-READ8_HANDLER (specialist_8255_porta_r )
+static READ8_HANDLER (specialist_8255_porta_r )
 {
 	if (input_port_read(machine, "LINE0")!=0xff) return 0xfe;
 	if (input_port_read(machine, "LINE1")!=0xff) return 0xfd;
@@ -47,7 +47,7 @@ READ8_HANDLER (specialist_8255_porta_r )
 	return 0xff;
 }
 
-READ8_HANDLER (specialist_8255_portb_r )
+static READ8_HANDLER (specialist_8255_portb_r )
 {
 	
 	int dat = 0;
@@ -76,7 +76,7 @@ READ8_HANDLER (specialist_8255_portb_r )
 	return dat & 0xff;
 }
 
-READ8_HANDLER (specialist_8255_portc_r )
+static READ8_HANDLER (specialist_8255_portc_r )
 {
 	if (input_port_read(machine, "LINE8")!=0xff) return 0x0e;
 	if (input_port_read(machine, "LINE9")!=0xff) return 0x0d;
@@ -85,16 +85,16 @@ READ8_HANDLER (specialist_8255_portc_r )
 	return 0x0f;
 }
 
-WRITE8_HANDLER (specialist_8255_porta_w )
+static WRITE8_HANDLER (specialist_8255_porta_w )
 {	
 	specialist_8255_porta = data;
 }
 
-WRITE8_HANDLER (specialist_8255_portb_w )
+static WRITE8_HANDLER (specialist_8255_portb_w )
 {	
 	specialist_8255_portb = data;
 }
-WRITE8_HANDLER (specialist_8255_portc_w )
+static WRITE8_HANDLER (specialist_8255_portc_w )
 {		
 	specialist_8255_portc = data;
 	
@@ -141,7 +141,7 @@ WRITE8_HANDLER( specialist_keyboard_w )
 	 Specialist MX
 */
 
-WRITE8_HANDLER( video_memory_w )
+static WRITE8_HANDLER( video_memory_w )
 {
 	mess_ram[0x9000 + offset] = data;
 	specimx_colorram[offset]  = specimx_color;

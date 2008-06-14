@@ -556,7 +556,7 @@ static void abc80_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START( abc80 )
+static SYSTEM_CONFIG_START( abc80 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
 //  CONFIG_DEVICE(abc80_cassette_getinfo)

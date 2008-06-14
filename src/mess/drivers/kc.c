@@ -335,7 +335,7 @@ static void kc85_cassette_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(kc85)
+static SYSTEM_CONFIG_START(kc85)
 	CONFIG_RAM_DEFAULT		(64 * 1024)
 	CONFIG_DEVICE(kc85_cassette_getinfo)
 SYSTEM_CONFIG_END
@@ -358,7 +358,7 @@ static void kc85d_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(kc85d)
+static SYSTEM_CONFIG_START(kc85d)
 	CONFIG_IMPORT_FROM(kc85)
 	CONFIG_DEVICE(kc85d_floppy_getinfo)
 SYSTEM_CONFIG_END

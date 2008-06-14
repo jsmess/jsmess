@@ -90,6 +90,8 @@ void osd_mess_options_init(core_options *options)
 {
 }
 
+#ifdef UNUSED_FUNCTION
 void osd_paste(running_machine *machine)
 {
 }
+#endif

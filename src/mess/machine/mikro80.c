@@ -24,7 +24,7 @@ DRIVER_INIT(mikro80)
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
 }
 
-READ8_HANDLER (mikro80_8255_portb_r )
+static READ8_HANDLER (mikro80_8255_portb_r )
 {
 	UINT8 key = 0xff;
 	if ((mikro80_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
@@ -38,12 +38,12 @@ READ8_HANDLER (mikro80_8255_portb_r )
 	return key;
 }
 
-READ8_HANDLER (mikro80_8255_portc_r )
+static READ8_HANDLER (mikro80_8255_portc_r )
 {
 	return input_port_read(machine, "LINE8");
 }
 
-WRITE8_HANDLER (mikro80_8255_porta_w )
+static WRITE8_HANDLER (mikro80_8255_porta_w )
 {
 	mikro80_keyboard_mask = data ^ 0xff;
 }

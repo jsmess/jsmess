@@ -16,7 +16,7 @@
 #define MDA_LOG(N,M,A) \
 	if(VERBOSE_MDA>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 
-const unsigned char mda_palette[4][3] =
+static const unsigned char mda_palette[4][3] =
 {
 	{ 0x00,0x00,0x00 },
 	{ 0x00,0x55,0x00 },
@@ -41,7 +41,7 @@ static struct
 } mda;
 
 /* Initialise the mda palette */
-PALETTE_INIT( pc_mda )
+static PALETTE_INIT( pc_mda )
 {
 	int i;
 	for(i = 0; i < (sizeof(mda_palette) / 3); i++)

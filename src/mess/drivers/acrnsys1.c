@@ -209,7 +209,7 @@ ROM_END
 ******************************************************************************/
 
 
-SYSTEM_CONFIG_START( acrnsys1 )
+static SYSTEM_CONFIG_START( acrnsys1 )
 SYSTEM_CONFIG_END
 
 

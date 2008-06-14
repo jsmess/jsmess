@@ -254,7 +254,7 @@ static void pce_chdcd_getinfo(const mess_device_class *devclass, UINT32 state, u
 	}
 }
 
-SYSTEM_CONFIG_START(pce)
+static SYSTEM_CONFIG_START(pce)
 	CONFIG_DEVICE(pce_cartslot_getinfo)
 	CONFIG_DEVICE(pce_chdcd_getinfo)
 SYSTEM_CONFIG_END

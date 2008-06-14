@@ -46,7 +46,7 @@ void printer_output(const device_config *printer, UINT8 data)
     DEVICE_START(printer)
 -------------------------------------------------*/
 
-DEVICE_START(printer)
+static DEVICE_START(printer)
 {
 }
 

@@ -75,7 +75,7 @@ static const gfx_layout jupiter_charlayout =
 	8*8 	/* each character takes 8 consecutive bytes */
 };
 
-PALETTE_INIT( jupiter )
+static PALETTE_INIT( jupiter )
 {
 	palette_set_color(machine,0,RGB_BLACK); /* black */
 	palette_set_color(machine,1,RGB_WHITE); /* white */
@@ -236,7 +236,7 @@ static void jupiter_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(jupiter)
+static SYSTEM_CONFIG_START(jupiter)
 	CONFIG_DEVICE(jupiter_cartslot_getinfo)
 	CONFIG_DEVICE(jupiter_cassette_getinfo)
 SYSTEM_CONFIG_END

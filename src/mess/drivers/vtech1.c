@@ -497,7 +497,7 @@ static void vtech1_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
    between Laser 110/210/310 computers, though it could be relativly
    easily modified to work on another model. */
 
-SYSTEM_CONFIG_START(vtech1)
+static SYSTEM_CONFIG_START(vtech1)
     CONFIG_DEVICE(cartslot_device_getinfo)
     CONFIG_DEVICE(vtech1_cassette_getinfo)
     CONFIG_DEVICE(vtech1_floppy_getinfo)
@@ -505,19 +505,19 @@ SYSTEM_CONFIG_START(vtech1)
 	CONFIG_RAM         (4098 * 1024) /* with 4MB memory expansion */
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(laser110)
+static SYSTEM_CONFIG_START(laser110)
 	CONFIG_IMPORT_FROM (vtech1)
 	CONFIG_RAM         ( 2 * 1024)   /* standard */
 	CONFIG_RAM         (18 * 1024)   /* with 16K memory expansion */
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(laser210)
+static SYSTEM_CONFIG_START(laser210)
 	CONFIG_IMPORT_FROM (vtech1)
 	CONFIG_RAM         ( 6 * 1024)   /* standard */
 	CONFIG_RAM         (22 * 1024)   /* with 16K memory expansion */
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(laser310)
+static SYSTEM_CONFIG_START(laser310)
 	CONFIG_IMPORT_FROM (vtech1)
 	CONFIG_RAM         (16 * 1024)   /* standard */
 	CONFIG_RAM         (32 * 1024)   /* with 16K memory expansion */

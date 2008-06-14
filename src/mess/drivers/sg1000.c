@@ -871,16 +871,16 @@ static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START( sg1000 )
+static SYSTEM_CONFIG_START( sg1000 )
 	CONFIG_DEVICE(sg1000_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( sc3000 )
+static SYSTEM_CONFIG_START( sc3000 )
 	CONFIG_DEVICE(sc3000_cartslot_getinfo)
 	CONFIG_DEVICE(sc3000_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( sf7000 )
+static SYSTEM_CONFIG_START( sf7000 )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 	CONFIG_DEVICE(sc3000_cassette_getinfo)
 	CONFIG_DEVICE(sf7000_floppy_getinfo)

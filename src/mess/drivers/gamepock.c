@@ -91,7 +91,7 @@ static void gamepock_cartslot_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START(gamepock)
+static SYSTEM_CONFIG_START(gamepock)
 	CONFIG_DEVICE(gamepock_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

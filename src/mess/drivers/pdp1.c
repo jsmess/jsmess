@@ -564,7 +564,7 @@ static void pdp1_cylinder_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(pdp1)
+static SYSTEM_CONFIG_START(pdp1)
 	/*CONFIG_RAM_DEFAULT(4 * 1024)
     CONFIG_RAM(32 * 1024)
     CONFIG_RAM(64 * 1024)*/

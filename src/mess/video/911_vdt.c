@@ -64,14 +64,14 @@ GFXDECODE_START( vdt911 )
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_frenchWP_chr_offset, fontlayout_7bit, 0, 4 )
 GFXDECODE_END
 
-const unsigned char vdt911_colors[] =
+static const unsigned char vdt911_colors[] =
 {
 	0x00,0x00,0x00,	/* black */
 	0xC0,0xC0,0xC0,	/* low intensity */
 	0xFF,0xFF,0xFF	/* high intensity */
 };
 
-const unsigned short vdt911_palette[] =
+static const unsigned short vdt911_palette[] =
 {
 	0, 2,	/* high intensity */
 	0, 1,	/* low intensity */

@@ -696,7 +696,7 @@ static void c16cart_device_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(c16)
+static SYSTEM_CONFIG_START(c16)
 	CONFIG_DEVICE(c16cart_device_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
@@ -705,7 +705,7 @@ SYSTEM_CONFIG_START(c16)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(c16c)
+static SYSTEM_CONFIG_START(c16c)
 	CONFIG_DEVICE(c16cart_device_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
 	CONFIG_DEVICE(c1551_device_getinfo)
@@ -714,7 +714,7 @@ SYSTEM_CONFIG_START(c16c)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(c16v)
+static SYSTEM_CONFIG_START(c16v)
 	CONFIG_DEVICE(c16cart_device_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
@@ -723,21 +723,21 @@ SYSTEM_CONFIG_START(c16v)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(plus)
+static SYSTEM_CONFIG_START(plus)
 	CONFIG_DEVICE(c16cart_device_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(plusc)
+static SYSTEM_CONFIG_START(plusc)
 	CONFIG_DEVICE(c16cart_device_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
 	CONFIG_DEVICE(c1551_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(plusv)
+static SYSTEM_CONFIG_START(plusv)
 	CONFIG_DEVICE(c16cart_device_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)

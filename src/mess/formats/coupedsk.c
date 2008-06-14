@@ -44,7 +44,7 @@ struct sdf_tag
 */
 
 
-FLOPPY_CONSTRUCT( coupe_mgt_construct )
+static FLOPPY_CONSTRUCT( coupe_mgt_construct )
 {
 	struct basicdsk_geometry geometry;
 
@@ -76,7 +76,7 @@ FLOPPY_CONSTRUCT( coupe_mgt_construct )
 }
 
 
-FLOPPY_IDENTIFY( coupe_mgt_identify )
+static FLOPPY_IDENTIFY( coupe_mgt_identify )
 {
 	UINT64 size;
 
@@ -136,7 +136,7 @@ static void coupe_sad_interpret_header(floppy_image *floppy,
 }
 
 
-FLOPPY_CONSTRUCT( coupe_sad_construct )
+static FLOPPY_CONSTRUCT( coupe_sad_construct )
 {
 	struct basicdsk_geometry geometry;
 	int heads, tracks, sectors, sector_length;
@@ -184,7 +184,7 @@ FLOPPY_CONSTRUCT( coupe_sad_construct )
 }
 
 
-FLOPPY_IDENTIFY( coupe_sad_identify )
+static FLOPPY_IDENTIFY( coupe_sad_identify )
 {
 	int heads, tracks, sectors, sector_size;
 	UINT64 size, calculated_size;
@@ -430,7 +430,7 @@ static void coupe_sdf_interpret_header(floppy_image *floppy, int *heads, int *tr
 }
 
 
-FLOPPY_CONSTRUCT( coupe_sdf_construct )
+static FLOPPY_CONSTRUCT( coupe_sdf_construct )
 {
 	struct FloppyCallbacks *callbacks;
 	struct sdf_tag *tag;
@@ -470,7 +470,7 @@ FLOPPY_CONSTRUCT( coupe_sdf_construct )
 }
 
 
-FLOPPY_IDENTIFY( coupe_sdf_identify )
+static FLOPPY_IDENTIFY( coupe_sdf_identify )
 {
 	int heads, tracks;
 

@@ -143,7 +143,7 @@ static void gamecom_cartslot_getinfo( const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START( gamecom )
+static SYSTEM_CONFIG_START( gamecom )
 	CONFIG_DEVICE( gamecom_cartslot_getinfo )
 SYSTEM_CONFIG_END
 

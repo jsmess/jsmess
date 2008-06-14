@@ -204,7 +204,7 @@ static void electron_cassette_getinfo( const mess_device_class *devclass, UINT32
 	}
 }
 
-SYSTEM_CONFIG_START(electron)
+static SYSTEM_CONFIG_START(electron)
 	CONFIG_DEVICE(electron_cassette_getinfo)
 SYSTEM_CONFIG_END
 

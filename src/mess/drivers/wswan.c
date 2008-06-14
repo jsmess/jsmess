@@ -191,7 +191,7 @@ static void wswan_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(wswan)
+static SYSTEM_CONFIG_START(wswan)
 	CONFIG_DEVICE(wswan_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

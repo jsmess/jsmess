@@ -22,7 +22,7 @@
 
 static UINT8 zx_tape_bit = 0x80;
 
-WRITE8_HANDLER( zx_ram_w )
+static WRITE8_HANDLER( zx_ram_w )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 

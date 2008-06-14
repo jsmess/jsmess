@@ -351,7 +351,7 @@ static void tmc2000e_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START( tmc2000e )
+static SYSTEM_CONFIG_START( tmc2000e )
 	CONFIG_RAM_DEFAULT	( 8 * 1024)
 	CONFIG_RAM			(40 * 1024)
 	CONFIG_DEVICE(tmc2000e_cassette_getinfo)

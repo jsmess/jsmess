@@ -151,7 +151,7 @@ WRITE8_HANDLER(betadisk_data_w)
 	}	
 }
 
-DEVICE_IMAGE_LOAD( beta_floppy )
+static DEVICE_IMAGE_LOAD( beta_floppy )
 {
 	UINT8 data[1];
 	int heads;

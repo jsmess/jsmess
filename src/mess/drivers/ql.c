@@ -815,7 +815,7 @@ static void ql_cartslot_getinfo( const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START( ql )
+static SYSTEM_CONFIG_START( ql )
 	CONFIG_RAM_DEFAULT	(128 * 1024)
 	CONFIG_RAM			(640 * 1024)
 	CONFIG_DEVICE(ql_serial_getinfo)

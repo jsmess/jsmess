@@ -29,7 +29,7 @@ DRIVER_INIT(apogee)
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
 }
 
-READ8_HANDLER (apogee_8255_portb_r2 )
+static READ8_HANDLER (apogee_8255_portb_r2 )
 {
 	UINT8 key = 0xff;
 	if ((apogee_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
@@ -43,7 +43,7 @@ READ8_HANDLER (apogee_8255_portb_r2 )
 	return key;
 }
 
-READ8_HANDLER (apogee_8255_portc_r2 )
+static READ8_HANDLER (apogee_8255_portc_r2 )
 {
 	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
 	UINT8 dat = input_port_read(machine,"LINE8");
@@ -53,7 +53,7 @@ READ8_HANDLER (apogee_8255_portc_r2 )
 	return dat;
 }
 
-WRITE8_HANDLER (apogee_8255_porta_w2 )
+static WRITE8_HANDLER (apogee_8255_porta_w2 )
 {
 	apogee_keyboard_mask = data ^ 0xff;
 }
@@ -68,7 +68,7 @@ const ppi8255_interface apogee_ppi8255_interface_1 =
 	NULL,
 };
 
-I8275_DMA_REQUEST(apogee_video_dma_request) {
+static I8275_DMA_REQUEST(apogee_video_dma_request) {
 	dma8257_drq_write(0, 2, state);
 }
 

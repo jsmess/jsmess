@@ -712,7 +712,7 @@ static void adam_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
-SYSTEM_CONFIG_START(adam)
+static SYSTEM_CONFIG_START(adam)
 	CONFIG_DEVICE(adam_cartslot_getinfo)
 	CONFIG_DEVICE(adam_floppy_getinfo)
 SYSTEM_CONFIG_END

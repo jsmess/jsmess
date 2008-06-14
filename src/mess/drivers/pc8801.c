@@ -599,7 +599,7 @@ static void pc88_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
-SYSTEM_CONFIG_START(pc88)
+static SYSTEM_CONFIG_START(pc88)
 	CONFIG_DEVICE(pc88_floppy_getinfo)
 SYSTEM_CONFIG_END
 

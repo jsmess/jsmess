@@ -462,7 +462,7 @@ static void intv_cartslot_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(intv)
+static SYSTEM_CONFIG_START(intv)
 	CONFIG_DEVICE(intv_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
@@ -504,7 +504,7 @@ static void intvkbd_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 }
 #endif
 
-SYSTEM_CONFIG_START(intvkbd)
+static SYSTEM_CONFIG_START(intvkbd)
 	CONFIG_DEVICE(intvkbd_cartslot_getinfo)
 #if 0
 	CONFIG_DEVICE(intvkbd_cassette_getinfo)

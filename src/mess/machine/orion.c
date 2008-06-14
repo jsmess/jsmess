@@ -22,36 +22,36 @@
 #define SCREEN_WIDTH_480 60
 #define SCREEN_WIDTH_512 64
 
-UINT8 romdisk_lsb,romdisk_msb;
-UINT8 orion_keyboard_mask;
+static UINT8 romdisk_lsb,romdisk_msb;
+static UINT8 orion_keyboard_mask;
 UINT8 orion128_video_mode;
 UINT8 orion128_video_page;
-UINT8 orion128_memory_page;
+static UINT8 orion128_memory_page;
 
 UINT8 orion128_video_width;
 
-UINT8 orionz80_memory_page;
-UINT8 orionz80_dispatcher;
+static UINT8 orionz80_memory_page;
+static UINT8 orionz80_dispatcher;
 
 UINT8 orion_video_mode_mask;
 
-READ8_HANDLER (orion_romdisk_porta_r )
+static READ8_HANDLER (orion_romdisk_porta_r )
 {
 	UINT8 *romdisk = memory_region(REGION_CPU1) + 0x10000;		
 	return romdisk[romdisk_msb*256+romdisk_lsb];	
 }
 
-WRITE8_HANDLER (orion_romdisk_portb_w )
+static WRITE8_HANDLER (orion_romdisk_portb_w )
 {	
 	romdisk_lsb = data;
 }
 
-WRITE8_HANDLER (orion_romdisk_portc_w )
+static WRITE8_HANDLER (orion_romdisk_portc_w )
 {		
 	romdisk_msb = data;	
 }
 
-READ8_HANDLER (orion_keyboard_portb_r )
+static READ8_HANDLER (orion_keyboard_portb_r )
 {		
 	UINT8 key = 0xff;
 	if ((orion_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
@@ -66,7 +66,7 @@ READ8_HANDLER (orion_keyboard_portb_r )
 	
 }
 
-READ8_HANDLER (orion_keyboard_portc_r )
+static READ8_HANDLER (orion_keyboard_portc_r )
 {
 	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
 	UINT8 dat = input_port_read(machine, "LINE8");
@@ -76,12 +76,12 @@ READ8_HANDLER (orion_keyboard_portc_r )
 	return dat;		
 }
 
-WRITE8_HANDLER (orion_keyboard_porta_w )
+static WRITE8_HANDLER (orion_keyboard_porta_w )
 {	
 	orion_keyboard_mask = data ^ 0xff;
 }
 
-WRITE8_HANDLER (orion_cassette_portc_w )
+static WRITE8_HANDLER (orion_cassette_portc_w )
 {
 	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x01 ? 1 : -1);	
 }
@@ -140,7 +140,7 @@ WRITE8_HANDLER ( orion128_romdisk_w )
 	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data);	
 }
 
-void orion_set_video_mode(running_machine *machine, int width) {
+static void orion_set_video_mode(running_machine *machine, int width) {
 		rectangle visarea;
 		
 		visarea.min_x = 0;
@@ -247,7 +247,7 @@ DEVICE_IMAGE_LOAD( orion_floppy )
 	return INIT_PASS;
 }
 
-WRITE8_HANDLER ( orion_disk_control_w )
+static WRITE8_HANDLER ( orion_disk_control_w )
 {
 	wd17xx_set_side(((data & 0x10) >> 4) ^ 1);
  	wd17xx_set_drive(data & 3);				
@@ -284,7 +284,7 @@ WRITE8_HANDLER ( orion128_floppy_w )
 		case 0x20 : orion_disk_control_w(machine, offset, data);break;
 	}
 }
-READ8_HANDLER ( orionz80_floppy_rtc_r )
+static READ8_HANDLER ( orionz80_floppy_rtc_r )
 {	
 	if ((offset >= 0x60) && (offset <= 0x6f)) {
 		return mc146818_port_r(machine,offset-0x60);
@@ -293,7 +293,7 @@ READ8_HANDLER ( orionz80_floppy_rtc_r )
 	}	
 }
 
-WRITE8_HANDLER ( orionz80_floppy_rtc_w )
+static WRITE8_HANDLER ( orionz80_floppy_rtc_w )
 {		
 	if ((offset >= 0x60) && (offset <= 0x6f)) {
 		return mc146818_port_w(machine,offset-0x60,data);
@@ -317,7 +317,7 @@ MACHINE_START( orionz80 )
 	orion_video_mode_mask = 7;
 }
 
-UINT8 orion_speaker;
+static UINT8 orion_speaker;
 WRITE8_HANDLER ( orionz80_sound_w )
 {	
 	if (orion_speaker==0) {
@@ -329,7 +329,7 @@ WRITE8_HANDLER ( orionz80_sound_w )
 		
 }
 
-WRITE8_HANDLER ( orionz80_sound_fe_w )
+static WRITE8_HANDLER ( orionz80_sound_fe_w )
 {	
 	speaker_level_w(0,(data>>4) & 0x01);
 }
@@ -462,15 +462,15 @@ WRITE8_HANDLER ( orionz80_io_w ) {
 	}
 }
 
-UINT8 orionpro_ram0_segment;
-UINT8 orionpro_ram1_segment;
-UINT8 orionpro_ram2_segment;
+static UINT8 orionpro_ram0_segment;
+static UINT8 orionpro_ram1_segment;
+static UINT8 orionpro_ram2_segment;
 
-UINT8 orionpro_page;
-UINT8 orionpro_128_page;
-UINT8 orionpro_rom2_segment;
+static UINT8 orionpro_page;
+static UINT8 orionpro_128_page;
+static UINT8 orionpro_rom2_segment;
 
-UINT8 orionpro_dispatcher;
+static UINT8 orionpro_dispatcher;
 UINT8 orionpro_pseudo_color;
 
 DRIVER_INIT( orionpro )
@@ -485,9 +485,9 @@ MACHINE_START( orionpro )
 	wd17xx_set_density (DEN_FM_HI);
 }
 
-WRITE8_HANDLER ( orionpro_memory_page_w );
+static WRITE8_HANDLER ( orionpro_memory_page_w );
 
-void orionpro_bank_switch(running_machine *machine)
+static void orionpro_bank_switch(running_machine *machine)
 {
 	int page = orionpro_page & 7; // we have only 8 pages	
 	int is128 = (orionpro_dispatcher & 0x80) ? 1 : 0;
@@ -567,7 +567,7 @@ void orionpro_bank_switch(running_machine *machine)
 	}	
 }
 
-WRITE8_HANDLER ( orionpro_memory_page_w )
+static WRITE8_HANDLER ( orionpro_memory_page_w )
 {	
 	orionpro_128_page = data;
 	orionpro_bank_switch(machine);

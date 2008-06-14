@@ -3176,26 +3176,26 @@ static void aleste_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 }
 
 
-SYSTEM_CONFIG_START( cpc6128 )
+static SYSTEM_CONFIG_START( cpc6128 )
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_DEVICE(cpc6128_floppy_getinfo)
 	CONFIG_DEVICE(cpc6128_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 
-SYSTEM_CONFIG_START( cpcplus )
+static SYSTEM_CONFIG_START( cpcplus )
 	CONFIG_IMPORT_FROM(cpc6128)
 	CONFIG_DEVICE(cpcplus_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 
-SYSTEM_CONFIG_START( gx4000 )
+static SYSTEM_CONFIG_START( gx4000 )
 	CONFIG_RAM_DEFAULT(64 * 1024)  // has 64k RAM
 	CONFIG_DEVICE(cpcplus_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 
-SYSTEM_CONFIG_START( aleste )
+static SYSTEM_CONFIG_START( aleste )
 	CONFIG_DEVICE(aleste_floppy_getinfo)
 	CONFIG_DEVICE(cpc6128_cassette_getinfo)
 	CONFIG_RAM_DEFAULT(2048 * 1024)  // has 2048k RAM

@@ -514,7 +514,7 @@ static void cbmvc20_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(vc20)
+static SYSTEM_CONFIG_START(vc20)
 	CONFIG_DEVICE(cbmvc20_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
@@ -525,7 +525,7 @@ SYSTEM_CONFIG_START(vc20)
 	CONFIG_RAM(32 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(vc20v)
+static SYSTEM_CONFIG_START(vc20v)
 	CONFIG_DEVICE(cbmvc20_cartslot_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)

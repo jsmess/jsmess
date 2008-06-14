@@ -11,7 +11,7 @@
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
 
-MACHINE_START( pentagon )
+static MACHINE_START( pentagon )
 {
 	wd17xx_init(machine, WD_TYPE_179X, betadisk_wd179x_callback, NULL);
 }
@@ -132,7 +132,7 @@ ROM_END
 
 SYSTEM_CONFIG_EXTERN(spectrum)
 
-SYSTEM_CONFIG_START(pentagon)
+static SYSTEM_CONFIG_START(pentagon)
 	CONFIG_IMPORT_FROM(spectrum)
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_DEVICE(beta_floppy_getinfo)

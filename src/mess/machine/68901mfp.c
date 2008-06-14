@@ -293,7 +293,7 @@ struct _mc68901_t
 	emu_timer *tx_timer;				/* transmit timer */
 
 	emu_timer *poll_timer;				/* general purpose I/O poll timer */
-} mfp_68901;
+};
 
 INLINE mc68901_t *get_safe_token(const device_config *device)
 {
@@ -1504,6 +1504,7 @@ DEVICE_GET_INFO( mc68901 )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 DEVICE_GET_INFO( mk68901 )
 {
 	switch (state)
@@ -1527,3 +1528,4 @@ DEVICE_GET_INFO( mk68901 )
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team"; 		break;
 	}
 }
+#endif

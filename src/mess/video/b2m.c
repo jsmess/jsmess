@@ -44,7 +44,7 @@ VIDEO_UPDATE( b2m )
 	return 0;
 }
 
-const rgb_t b2m_palette[4] = {
+static const rgb_t b2m_palette[4] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
 	MAKE_RGB(0x00, 0x00, 0x00), // 1
 	MAKE_RGB(0x00, 0x00, 0x00), // 2 

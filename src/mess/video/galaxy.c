@@ -43,7 +43,7 @@ PALETTE_INIT( galaxy )
 UINT32 gal_cnt = 0;
 static UINT8 code = 0;
 static UINT8 first = 0;
-UINT32 start_addr = 0;
+static UINT32 start_addr = 0;
 emu_timer *gal_video_timer = NULL;
 
 TIMER_CALLBACK( gal_video )

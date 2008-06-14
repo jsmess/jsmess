@@ -280,7 +280,7 @@ static void microtan_cassette_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START( microtan )
+static SYSTEM_CONFIG_START( microtan )
 	CONFIG_DEVICE(microtan_cassette_getinfo)
 SYSTEM_CONFIG_END
 

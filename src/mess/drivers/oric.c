@@ -450,7 +450,7 @@ static void oric_common_cassette_getinfo(const mess_device_class *devclass, UINT
 	}
 }
 
-SYSTEM_CONFIG_START(oric_common)
+static SYSTEM_CONFIG_START(oric_common)
 	CONFIG_DEVICE(oric_common_cassette_getinfo)
 SYSTEM_CONFIG_END
 
@@ -475,7 +475,7 @@ static void oric1_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(oric1)
+static SYSTEM_CONFIG_START(oric1)
 	CONFIG_IMPORT_FROM(oric_common)
 	CONFIG_DEVICE(oric1_floppy_getinfo)
 SYSTEM_CONFIG_END
@@ -495,7 +495,7 @@ static void prav8_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(prav8)
+static SYSTEM_CONFIG_START(prav8)
 	CONFIG_IMPORT_FROM(oric_common)
 	CONFIG_DEVICE(prav8_floppy_getinfo)
 SYSTEM_CONFIG_END

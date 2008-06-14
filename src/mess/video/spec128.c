@@ -85,7 +85,7 @@ VIDEO_UPDATE( spectrum_128 )
 
 
 
-const rgb_t spectrum_128_palette[16] = {
+static const rgb_t spectrum_128_palette[16] = {
 	MAKE_RGB(0x00, 0x00, 0x00),
 	MAKE_RGB(0x00, 0x00, 0xbf),
 	MAKE_RGB(0xbf, 0x00, 0x00), 

@@ -525,7 +525,7 @@ static void zx80_cassette_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(zx80)
+static SYSTEM_CONFIG_START(zx80)
 	CONFIG_DEVICE(zx80_cassette_getinfo)
 	CONFIG_RAM_DEFAULT(1 * 1024)
 	CONFIG_RAM(16 * 1024)
@@ -550,13 +550,13 @@ static void zx81_cassette_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(zx81)
+static SYSTEM_CONFIG_START(zx81)
 	CONFIG_DEVICE(zx81_cassette_getinfo)
 	CONFIG_RAM_DEFAULT(1 * 1024)
 	CONFIG_RAM(16 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(pc8300)
+static SYSTEM_CONFIG_START(pc8300)
 	CONFIG_DEVICE(zx81_cassette_getinfo)
 	CONFIG_RAM_DEFAULT(16 * 1024)
 SYSTEM_CONFIG_END

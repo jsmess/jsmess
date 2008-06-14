@@ -876,13 +876,13 @@ static void exidy_cassette_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(exidy)
+static SYSTEM_CONFIG_START(exidy)
 	CONFIG_DEVICE(exidy_floppy_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(exidy_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(exidyd)
+static SYSTEM_CONFIG_START(exidyd)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(exidy_cassette_getinfo)
 SYSTEM_CONFIG_END

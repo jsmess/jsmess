@@ -574,7 +574,7 @@ ROM_START(exeltel)
 	ROM_LOAD("exeltelin.bin", 0xf006, 0x0ffa, CRC(c12f24b5))      /* internal ROM */
 ROM_END
 
-SYSTEM_CONFIG_START(exelv)
+static SYSTEM_CONFIG_START(exelv)
 
 	/* cartridge port is not emulated */
 

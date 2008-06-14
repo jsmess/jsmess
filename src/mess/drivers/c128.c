@@ -913,12 +913,12 @@ static void c128_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(c128)
+static SYSTEM_CONFIG_START(c128)
 	CONFIG_DEVICE(c128_cbmcartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(c128d)
+static SYSTEM_CONFIG_START(c128d)
 	CONFIG_DEVICE(c1571_device_getinfo)
 SYSTEM_CONFIG_END
 

@@ -77,7 +77,7 @@ static ADDRESS_MAP_START(specimx_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( special )
+static INPUT_PORTS_START( special )
 	PORT_START_TAG("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE)
@@ -191,7 +191,7 @@ INPUT_PORTS_START( special )
 		PORT_BIT(0xFE, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( specimx )
+static INPUT_PORTS_START( specimx )
 	PORT_START_TAG("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE)
@@ -476,17 +476,17 @@ static void specimx_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
 }
-SYSTEM_CONFIG_START(special)
+static SYSTEM_CONFIG_START(special)
 	CONFIG_DEVICE(special_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(specimx)
+static SYSTEM_CONFIG_START(specimx)
  	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_DEVICE(special_cassette_getinfo)
 	CONFIG_DEVICE(specimx_floppy_getinfo);
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(erik)
+static SYSTEM_CONFIG_START(erik)
  	CONFIG_RAM_DEFAULT(192 * 1024)
 	CONFIG_DEVICE(special_cassette_getinfo)
 	CONFIG_DEVICE(specimx_floppy_getinfo);

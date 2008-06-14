@@ -393,7 +393,7 @@ static void tmc600_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START( tmc600 )
+static SYSTEM_CONFIG_START( tmc600 )
 	CONFIG_RAM_DEFAULT	( 8 * 1024)
 	CONFIG_RAM			(16 * 1024)
 	CONFIG_RAM			(24 * 1024)

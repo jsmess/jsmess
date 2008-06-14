@@ -1793,7 +1793,7 @@ static void einstein_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(einstein)
+static SYSTEM_CONFIG_START(einstein)
 	CONFIG_RAM_DEFAULT(65536)
 	CONFIG_DEVICE(einstein_floppy_getinfo)
 SYSTEM_CONFIG_END

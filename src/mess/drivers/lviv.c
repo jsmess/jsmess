@@ -487,7 +487,7 @@ ROM_START(lviv)
 	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(3))
 ROM_END
 
-SYSTEM_CONFIG_START(lviv)
+static SYSTEM_CONFIG_START(lviv)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 	/* 9-Oct-2003 - Changed to lvt because lv? is an invalid file extension */
 	CONFIG_DEVICE(lviv_cassette_getinfo)

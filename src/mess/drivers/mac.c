@@ -350,17 +350,17 @@ static void mac_harddisk_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(mac128k)
+static SYSTEM_CONFIG_START(mac128k)
 	CONFIG_DEVICE(mac128512_floppy_getinfo)
 	CONFIG_RAM_DEFAULT(0x020000)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(mac512k)
+static SYSTEM_CONFIG_START(mac512k)
 	CONFIG_DEVICE(mac128512_floppy_getinfo)
 	CONFIG_RAM_DEFAULT(0x080000)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(macplus)
+static SYSTEM_CONFIG_START(macplus)
 	CONFIG_DEVICE(mac_floppy_getinfo)
 	CONFIG_DEVICE(mac_harddisk_getinfo)
 	CONFIG_RAM			(0x080000)
@@ -370,7 +370,7 @@ SYSTEM_CONFIG_START(macplus)
 	CONFIG_RAM			(0x400000)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(macse)
+static SYSTEM_CONFIG_START(macse)
 	CONFIG_DEVICE(mac_floppy_getinfo)
 	CONFIG_DEVICE(mac_harddisk_getinfo)
 	CONFIG_RAM_DEFAULT	(0x100000)

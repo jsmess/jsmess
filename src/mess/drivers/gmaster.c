@@ -289,7 +289,7 @@ static int gmaster_load_rom(int id)
 }
 #endif
 
-SYSTEM_CONFIG_START(gmaster)
+static SYSTEM_CONFIG_START(gmaster)
      CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

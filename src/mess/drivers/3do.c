@@ -199,7 +199,7 @@ static void chdcd_3do_getinfo( const mess_device_class *devclass, UINT32 state, 
 	}
 }
 
-SYSTEM_CONFIG_START( 3do )
+static SYSTEM_CONFIG_START( 3do )
 	CONFIG_DEVICE( chdcd_3do_getinfo )
 SYSTEM_CONFIG_END
 

@@ -347,7 +347,7 @@ static void atom_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
-SYSTEM_CONFIG_START(atom)
+static SYSTEM_CONFIG_START(atom)
 	CONFIG_DEVICE(atom_cassette_getinfo)
 	CONFIG_DEVICE(atom_floppy_getinfo)
 SYSTEM_CONFIG_END

@@ -2224,7 +2224,7 @@ static void msx_cassette_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(msx)
+static SYSTEM_CONFIG_START(msx)
 	CONFIG_DEVICE(msx_floppy_getinfo)
 	CONFIG_DEVICE(msx_cartslot_getinfo)
 	CONFIG_DEVICE(msx_cassette_getinfo)

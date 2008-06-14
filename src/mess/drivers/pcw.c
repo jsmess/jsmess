@@ -1048,16 +1048,16 @@ static void generic_pcw_floppy_getinfo(const mess_device_class *devclass, UINT32
 	}
 }
 
-SYSTEM_CONFIG_START(generic_pcw)
+static SYSTEM_CONFIG_START(generic_pcw)
 	CONFIG_DEVICE(generic_pcw_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(pcw_256k)
+static SYSTEM_CONFIG_START(pcw_256k)
 	CONFIG_IMPORT_FROM(generic_pcw)
 	CONFIG_RAM_DEFAULT(256 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(pcw_512k)
+static SYSTEM_CONFIG_START(pcw_512k)
 	CONFIG_IMPORT_FROM(generic_pcw)
 	CONFIG_RAM_DEFAULT(512 * 1024)
 SYSTEM_CONFIG_END

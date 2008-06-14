@@ -616,7 +616,7 @@ static void ep128_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 }
 #endif
 
-SYSTEM_CONFIG_START(ep128)
+static SYSTEM_CONFIG_START(ep128)
 	CONFIG_RAM_DEFAULT((128*1024)+32768)
 	CONFIG_DEVICE(ep128_floppy_getinfo)
 #if 0

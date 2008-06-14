@@ -865,7 +865,7 @@ static void atari_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(atari)
+static SYSTEM_CONFIG_START(atari)
 	CONFIG_DEVICE(atari_floppy_getinfo)
 SYSTEM_CONFIG_END
 
@@ -888,7 +888,7 @@ static void a400_cartslot_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(a400)
+static SYSTEM_CONFIG_START(a400)
 	CONFIG_IMPORT_FROM(atari)
 	CONFIG_RAM_DEFAULT(40 * 1024)
 	CONFIG_DEVICE(a400_cartslot_getinfo)
@@ -913,7 +913,7 @@ static void a800_cartslot_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(a800)
+static SYSTEM_CONFIG_START(a800)
 	CONFIG_IMPORT_FROM(atari)
 	CONFIG_RAM_DEFAULT(40 * 1024)
 	CONFIG_DEVICE(a800_cartslot_getinfo)
@@ -938,7 +938,7 @@ static void a5200_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(a5200)
+static SYSTEM_CONFIG_START(a5200)
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_DEVICE(a5200_cartslot_getinfo)
 SYSTEM_CONFIG_END

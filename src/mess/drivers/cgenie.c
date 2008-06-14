@@ -483,7 +483,7 @@ static void cgenie_cassette_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(cgenie)
+static SYSTEM_CONFIG_START(cgenie)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(cgenie_floppy_getinfo)
 	CONFIG_DEVICE(cgenie_cassette_getinfo)

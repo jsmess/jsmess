@@ -185,7 +185,7 @@ static void n64_cartslot_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(n64)
+static SYSTEM_CONFIG_START(n64)
 	CONFIG_DEVICE(n64_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

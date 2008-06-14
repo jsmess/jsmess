@@ -63,7 +63,7 @@ static TIMER_CALLBACK( vg230_timer )
   }
 }
 
-void vg230_reset(running_machine *machine)
+static void vg230_reset(running_machine *machine)
 {
   mame_system_time systime;
 
@@ -82,7 +82,7 @@ void vg230_reset(running_machine *machine)
   vg230.bios_timer.data=0x7200; // HACK
 }
 
-void vg230_init(running_machine *machine)
+static void vg230_init(running_machine *machine)
 {
   vg230_reset(machine);
 }
@@ -171,7 +171,7 @@ static WRITE8_HANDLER( vg230_io_w )
     }
 }
 
-struct {
+static struct {
   UINT8 data;
   int index;
   struct {
@@ -519,7 +519,7 @@ static void pasogo_cartslot_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(pasogo)
+static SYSTEM_CONFIG_START(pasogo)
      CONFIG_DEVICE(pasogo_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

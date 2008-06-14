@@ -357,7 +357,7 @@ static void a7800_ntsc_cartslot_getinfo(const mess_device_class *devclass, UINT3
 	}
 }
 
-SYSTEM_CONFIG_START(a7800_ntsc)
+static SYSTEM_CONFIG_START(a7800_ntsc)
 	CONFIG_DEVICE(a7800_ntsc_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
@@ -372,7 +372,7 @@ static void a7800_pal_cartslot_getinfo(const mess_device_class *devclass, UINT32
 	}
 }
 
-SYSTEM_CONFIG_START(a7800_pal)
+static SYSTEM_CONFIG_START(a7800_pal)
 	CONFIG_DEVICE(a7800_pal_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

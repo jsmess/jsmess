@@ -197,7 +197,7 @@ const gfx_layout spectrum_charlayout =
 #define ZX_COL_E	MAKE_RGB(0xff, 0xff, 0x00)
 #define ZX_COL_F	MAKE_RGB(0xff, 0xff, 0xff)
 
-const rgb_t spectrum_palette[256 + 16] = {
+static const rgb_t spectrum_palette[256 + 16] = {
 	ZX_COL_0,ZX_COL_1,ZX_COL_2,ZX_COL_3,ZX_COL_4,ZX_COL_5,ZX_COL_6,ZX_COL_7,ZX_COL_8,ZX_COL_9,ZX_COL_A,ZX_COL_B,ZX_COL_C,ZX_COL_D,ZX_COL_E,ZX_COL_F,
 	
 	ZX_COL_0,ZX_COL_0,ZX_COL_0,ZX_COL_1,ZX_COL_0,ZX_COL_2,ZX_COL_0,ZX_COL_3,ZX_COL_0,ZX_COL_4,ZX_COL_0,ZX_COL_5,ZX_COL_0,ZX_COL_6,ZX_COL_0,ZX_COL_7,

@@ -656,15 +656,15 @@ static void gameboy_cartslot_getinfo_gb(const mess_device_class *devclass, UINT3
 	}
 }
 
-SYSTEM_CONFIG_START(gameboy)
+static SYSTEM_CONFIG_START(gameboy)
 	CONFIG_DEVICE(gameboy_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(gameboy_gb)
+static SYSTEM_CONFIG_START(gameboy_gb)
 	CONFIG_DEVICE(gameboy_cartslot_getinfo_gb)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(gb_cgb)
+static SYSTEM_CONFIG_START(gb_cgb)
 	CONFIG_DEVICE(gameboy_cartslot_getinfo)
 	CONFIG_RAM_DEFAULT(2 * 8 * 1024 + 8 * 4 * 1024)	/* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 SYSTEM_CONFIG_END
@@ -720,7 +720,7 @@ static void megaduck_cartslot_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START(megaduck)
+static SYSTEM_CONFIG_START(megaduck)
 	CONFIG_DEVICE(megaduck_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

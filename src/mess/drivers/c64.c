@@ -593,13 +593,13 @@ static void c64_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(c64)
+static SYSTEM_CONFIG_START(c64)
 	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(sx64)
+static SYSTEM_CONFIG_START(sx64)
 	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 SYSTEM_CONFIG_END
@@ -618,12 +618,12 @@ static void ultimax_cbmcartslot_getinfo(const mess_device_class *devclass, UINT3
 	}
 }
 
-SYSTEM_CONFIG_START(ultimax)
+static SYSTEM_CONFIG_START(ultimax)
 	CONFIG_DEVICE(ultimax_cbmcartslot_getinfo)
 	CONFIG_DEVICE(vc20tape_device_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(c64gs)
+static SYSTEM_CONFIG_START(c64gs)
 	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
 SYSTEM_CONFIG_END
 

@@ -498,7 +498,7 @@ static void ti85_serial_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
-SYSTEM_CONFIG_START(ti85)
+static SYSTEM_CONFIG_START(ti85)
 	CONFIG_DEVICE(ti85_serial_getinfo)
 SYSTEM_CONFIG_END
 
@@ -524,7 +524,7 @@ static void ti86_serial_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
-SYSTEM_CONFIG_START(ti86)
+static SYSTEM_CONFIG_START(ti86)
 	CONFIG_DEVICE(ti86_serial_getinfo)
 SYSTEM_CONFIG_END
 

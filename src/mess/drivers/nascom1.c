@@ -368,7 +368,7 @@ static void nascom2_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 }
 
 
-SYSTEM_CONFIG_START( nascom1 )
+static SYSTEM_CONFIG_START( nascom1 )
 	CONFIG_RAM(1 * 1024)
 	CONFIG_RAM(16 * 1024)
 	CONFIG_RAM(32 * 1024)
@@ -377,7 +377,7 @@ SYSTEM_CONFIG_START( nascom1 )
 SYSTEM_CONFIG_END
 
 
-SYSTEM_CONFIG_START( nascom2 )
+static SYSTEM_CONFIG_START( nascom2 )
 	CONFIG_IMPORT_FROM(nascom1)
 	CONFIG_DEVICE(nascom2_floppy_getinfo)
 SYSTEM_CONFIG_END

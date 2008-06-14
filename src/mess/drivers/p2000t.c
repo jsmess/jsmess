@@ -78,7 +78,7 @@ static const gfx_layout p2000m_charlayout =
 	8 * 10
 };
 
-PALETTE_INIT( p2000m )
+static PALETTE_INIT( p2000m )
 {
 	palette_set_color(machine,0,RGB_WHITE); /* white */
 	palette_set_color(machine,1,RGB_BLACK); /* black */

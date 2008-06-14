@@ -821,11 +821,11 @@ static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(apple2_common)
+static SYSTEM_CONFIG_START(apple2_common)
 	CONFIG_DEVICE(apple2_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(apple2)
+static SYSTEM_CONFIG_START(apple2)
 	CONFIG_IMPORT_FROM( apple2_common )
 	CONFIG_RAM				(4  * 1024)
 	CONFIG_RAM				(8  * 1024)
@@ -841,7 +841,7 @@ SYSTEM_CONFIG_START(apple2)
 										/* with less memory, provided that the language card is installed           */
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(apple2p)
+static SYSTEM_CONFIG_START(apple2p)
 	CONFIG_IMPORT_FROM( apple2_common )
 	CONFIG_RAM				(16 * 1024)
 	CONFIG_RAM				(32 * 1024)
@@ -851,7 +851,7 @@ SYSTEM_CONFIG_START(apple2p)
 										/* with less memory, provided that the language card is installed           */
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(apple2e)
+static SYSTEM_CONFIG_START(apple2e)
 	CONFIG_IMPORT_FROM( apple2_common )
 	CONFIG_RAM				(64  * 1024)
 	CONFIG_RAM_DEFAULT		(128 * 1024)

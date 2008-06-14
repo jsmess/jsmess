@@ -284,7 +284,7 @@ static void coleco_cartslot_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(coleco)
+static SYSTEM_CONFIG_START(coleco)
 	CONFIG_DEVICE(coleco_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

@@ -49,7 +49,7 @@ INTERRUPT_GEN( galaxy_interrupt )
 	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
-IRQ_CALLBACK ( galaxy_irq_callback )
+static IRQ_CALLBACK ( galaxy_irq_callback )
 {
 	gal_cnt = 0;
 	galaxy_interrupts_enabled = TRUE;

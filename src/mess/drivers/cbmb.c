@@ -621,11 +621,11 @@ static void cbmb_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 s
 }
 
 
-SYSTEM_CONFIG_START(cbmb)
+static SYSTEM_CONFIG_START(cbmb)
 	CONFIG_DEVICE(cbmb_cbmcartslot_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(cbm500)
+static SYSTEM_CONFIG_START(cbm500)
 	CONFIG_DEVICE(cbmb_cbmcartslot_getinfo)
 SYSTEM_CONFIG_END
 

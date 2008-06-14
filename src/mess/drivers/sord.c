@@ -719,7 +719,7 @@ static void sordm5_cassette_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(sordm5)
+static SYSTEM_CONFIG_START(sordm5)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 	CONFIG_DEVICE(sordm5_cassette_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
@@ -740,7 +740,7 @@ static void srdm5fd5_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(srdm5fd5)
+static SYSTEM_CONFIG_START(srdm5fd5)
 	CONFIG_IMPORT_FROM(sordm5)
 	CONFIG_DEVICE(srdm5fd5_floppy_getinfo)
 SYSTEM_CONFIG_END

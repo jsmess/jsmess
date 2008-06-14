@@ -928,7 +928,7 @@ static void ti99_4_memcard_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(ti99_4)
+static SYSTEM_CONFIG_START(ti99_4)
 	CONFIG_DEVICE(ti99_4_cassette_getinfo)
 	CONFIG_DEVICE(ti99_4_cartslot_getinfo)
 	CONFIG_DEVICE(ti99_4_floppy_getinfo)

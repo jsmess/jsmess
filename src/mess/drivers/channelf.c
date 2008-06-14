@@ -268,7 +268,7 @@ ROM_START( channelf )
 	ROM_CART_LOAD(0, "bin", 0x0800, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-SYSTEM_CONFIG_START( channelf )
+static SYSTEM_CONFIG_START( channelf )
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

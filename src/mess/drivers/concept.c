@@ -326,7 +326,7 @@ static void concept_harddisk_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(concept)
+static SYSTEM_CONFIG_START(concept)
 	/* The concept should eventually support floppies, hard disks, etc. */
 	CONFIG_DEVICE(concept_floppy_getinfo)
 	CONFIG_DEVICE(concept_harddisk_getinfo)

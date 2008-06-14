@@ -490,7 +490,7 @@ static void studio2_cartslot_getinfo( const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START( studio2 )
+static SYSTEM_CONFIG_START( studio2 )
 	CONFIG_DEVICE( studio2_cartslot_getinfo )
 SYSTEM_CONFIG_END
 

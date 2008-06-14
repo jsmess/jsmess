@@ -241,7 +241,7 @@ static void mekd2_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(mekd2)
+static SYSTEM_CONFIG_START(mekd2)
 	CONFIG_DEVICE(mekd2_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

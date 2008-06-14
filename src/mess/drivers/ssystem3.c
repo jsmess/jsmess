@@ -40,7 +40,7 @@ backup of playfield rom and picture/description of its board
 #include "cpu/m6502/m6502.h"
 //#include "attotime.h"
 
-struct {
+static struct {
   UINT8 porta;
 } ssystem3;
 
@@ -134,13 +134,13 @@ static void ssystem3_playfield_read(running_machine *machine, int *on, int *read
 	*ready=FALSE;
 }
 
-void ssystem3_via_write_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+static void ssystem3_via_write_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
 {
   ssystem3.porta=data;
   //  logerror("%.4x via port a write %02x\n",(int)activecpu_get_pc(), data);
 }
 
-UINT8 ssystem3_via_read_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset)
+static UINT8 ssystem3_via_read_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset)
 {
   UINT8 data=0xff;
 #if 1 // time switch
@@ -204,7 +204,7 @@ UINT8 ssystem3_via_read_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs
    bit 5: input low x/$37 4 (else 1)
 
  */
-UINT8 ssystem3_via_read_b(running_machine *machine, ATTR_UNUSED offs_t offset)
+static UINT8 ssystem3_via_read_b(running_machine *machine, ATTR_UNUSED offs_t offset)
 {
   UINT8 data=0xff;
   int on, ready;
@@ -214,7 +214,7 @@ UINT8 ssystem3_via_read_b(running_machine *machine, ATTR_UNUSED offs_t offset)
   return data;
 }
 
-void ssystem3_via_write_b(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+static void ssystem3_via_write_b(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
 {
   UINT8 d;
   ssystem3_playfield_write(data&1, data&8);

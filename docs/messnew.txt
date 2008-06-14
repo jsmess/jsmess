@@ -133,6 +133,8 @@ Source Changes:
 
 - Fixed performance problems with -triplebuffer.  (bug #1539) [Justin Kerk]
 
+- Code cleanups.  [Atari Ace]
+
 
 
 0.125

@@ -267,7 +267,7 @@ static void apple1_cassette_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(apple1)
+static SYSTEM_CONFIG_START(apple1)
 	CONFIG_DEVICE(apple1_cassette_getinfo)
 	/* Note that because we always include 4K of RAM at $E000-$EFFF,
        the RAM amounts listed here will be 4K below the actual RAM

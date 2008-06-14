@@ -717,12 +717,12 @@ static void apfimag_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 }
 
 
-SYSTEM_CONFIG_START( apfimag )
+static SYSTEM_CONFIG_START( apfimag )
 	CONFIG_DEVICE(apfimag_cassette_getinfo)
 	CONFIG_DEVICE(apfimag_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(apfm1000)
+static SYSTEM_CONFIG_START(apfm1000)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

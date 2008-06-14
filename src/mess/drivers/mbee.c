@@ -568,12 +568,12 @@ static void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 }
 
 
-SYSTEM_CONFIG_START(mbee)
+static SYSTEM_CONFIG_START(mbee)
 	CONFIG_DEVICE(mbee_cassette_getinfo)
 	CONFIG_DEVICE(mbee_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(mbeeic)
+static SYSTEM_CONFIG_START(mbeeic)
 	CONFIG_DEVICE(mbee_cassette_getinfo)
 	CONFIG_DEVICE(mbee_cartslot_getinfo)
 	CONFIG_DEVICE(mbee_floppy_getinfo)

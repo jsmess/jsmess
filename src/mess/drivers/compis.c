@@ -294,7 +294,7 @@ static void compis_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(compis)
+static SYSTEM_CONFIG_START(compis)
 	CONFIG_DEVICE(compis_floppy_getinfo)
 SYSTEM_CONFIG_END
 

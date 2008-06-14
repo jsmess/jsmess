@@ -18,7 +18,7 @@ struct _comxpl80_state
 
 /* Read/Write Handlers */
 
-WRITE8_HANDLER( pl80_port_a_w )
+static WRITE8_HANDLER( pl80_port_a_w )
 {
 	/*
 
@@ -67,7 +67,7 @@ WRITE8_HANDLER( pl80_port_a_w )
 	}
 }
 
-WRITE8_HANDLER( pl80_port_b_w )
+static WRITE8_HANDLER( pl80_port_b_w )
 {
 	/*
 
@@ -91,7 +91,7 @@ WRITE8_HANDLER( pl80_port_b_w )
 	state->font_addr = (state->font_addr & 0x10ff) | (data << 4);
 }
 
-WRITE8_HANDLER( pl80_port_c_w )
+static WRITE8_HANDLER( pl80_port_c_w )
 {
 	/*
 
@@ -118,7 +118,7 @@ WRITE8_HANDLER( pl80_port_c_w )
 	state->plotter_online = BIT(data, 5);
 }
 
-READ8_HANDLER( pl80_port_d_r )
+static READ8_HANDLER( pl80_port_d_r )
 {
 	/*
 

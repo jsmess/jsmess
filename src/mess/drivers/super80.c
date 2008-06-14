@@ -815,7 +815,7 @@ static TIMER_CALLBACK( super80_reset )
 	memory_set_bank(1, 0);
 }
 
-MACHINE_RESET( super80 )
+static MACHINE_RESET( super80 )
 {
 	z80pio_init(0, &pio_intf);
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
@@ -1049,7 +1049,7 @@ static void super80_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(super80)
+static SYSTEM_CONFIG_START(super80)
 	CONFIG_DEVICE(super80_cassette_getinfo)
 	CONFIG_DEVICE(super80_cartslot_getinfo)
 SYSTEM_CONFIG_END

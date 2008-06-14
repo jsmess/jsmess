@@ -686,7 +686,7 @@ static void pmd85_cassette_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(pmd85)
+static SYSTEM_CONFIG_START(pmd85)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 	CONFIG_DEVICE(pmd85_cassette_getinfo)
 SYSTEM_CONFIG_END

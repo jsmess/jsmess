@@ -542,12 +542,12 @@ static void crvision_cassette_getinfo(const mess_device_class *devclass, UINT32 
 	}
 }
 
-SYSTEM_CONFIG_START( crvision )
+static SYSTEM_CONFIG_START( crvision )
 	CONFIG_DEVICE(crvision_cartslot_getinfo)
 	CONFIG_DEVICE(crvision_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( fnvision )
+static SYSTEM_CONFIG_START( fnvision )
 	CONFIG_DEVICE(crvision_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

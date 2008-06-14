@@ -230,7 +230,7 @@ ROM_END
 ******************************************************************************/
 
 
-SYSTEM_CONFIG_START( aim65 )
+static SYSTEM_CONFIG_START( aim65 )
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_RAM_DEFAULT(4 * 1024) /* 4KB RAM */
 	CONFIG_RAM        (3 * 1024) /* 3KB RAM */

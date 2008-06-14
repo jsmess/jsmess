@@ -553,7 +553,7 @@ ROM_END
 #define rom_svisionp rom_svision
 #define rom_tvlinkp rom_svision
 
-SYSTEM_CONFIG_START(svision)
+static SYSTEM_CONFIG_START(svision)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

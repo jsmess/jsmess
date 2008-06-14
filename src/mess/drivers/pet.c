@@ -733,7 +733,7 @@ static void pet_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START(pet)
+static SYSTEM_CONFIG_START(pet)
 	CONFIG_DEVICE(pet_cbmcartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
@@ -742,7 +742,7 @@ SYSTEM_CONFIG_START(pet)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(pet2)
+static SYSTEM_CONFIG_START(pet2)
 	CONFIG_DEVICE(pet_cbmcartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
@@ -762,7 +762,7 @@ static void pet4_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(pet4)
+static SYSTEM_CONFIG_START(pet4)
 	CONFIG_DEVICE(pet4_cbmcartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
@@ -771,7 +771,7 @@ SYSTEM_CONFIG_START(pet4)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(pet4_32)
+static SYSTEM_CONFIG_START(pet4_32)
 	CONFIG_DEVICE(pet4_cbmcartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM_DEFAULT(32 * 1024)

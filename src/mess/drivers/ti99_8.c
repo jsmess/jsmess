@@ -630,7 +630,7 @@ static void ti99_8_memcard_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(ti99_8)
+static SYSTEM_CONFIG_START(ti99_8)
 	/* one cartridge port */
 	/* one cassette unit port */
 	/* Hex-bus disk controller: supports up to 4 floppy disk drives */

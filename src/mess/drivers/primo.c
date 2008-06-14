@@ -387,12 +387,12 @@ static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START( primoa )
+static SYSTEM_CONFIG_START( primoa )
 	CONFIG_DEVICE(primo_cassette_getinfo)
 	CONFIG_DEVICE(primo_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( primob )
+static SYSTEM_CONFIG_START( primob )
 	CONFIG_IMPORT_FROM( primoa )
 	//CONFIG_DEVICE(primo_floppy_getinfo)
 SYSTEM_CONFIG_END

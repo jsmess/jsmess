@@ -15,7 +15,7 @@
 #include "formats/rk_cas.h"
 
 
-GFXDECODE_START( mikro80 )
+static GFXDECODE_START( mikro80 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, mikro80_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -35,7 +35,7 @@ static ADDRESS_MAP_START( mikro80_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( mikro80 )
+static INPUT_PORTS_START( mikro80 )
 	PORT_START_TAG("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
@@ -164,7 +164,7 @@ static void mikro80_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(mikro80)
+static SYSTEM_CONFIG_START(mikro80)
 	CONFIG_DEVICE(mikro80_cassette_getinfo)
 SYSTEM_CONFIG_END
 

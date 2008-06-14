@@ -245,7 +245,7 @@ static void dai_cassette_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START(dai)
+static SYSTEM_CONFIG_START(dai)
 	CONFIG_RAM_DEFAULT(48 * 1024)
 	CONFIG_DEVICE(dai_cassette_getinfo)
 SYSTEM_CONFIG_END

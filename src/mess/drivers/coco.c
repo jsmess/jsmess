@@ -1104,19 +1104,19 @@ static void coco3_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
  *************************************/
 
 
-SYSTEM_CONFIG_START( generic_coco )
+static SYSTEM_CONFIG_START( generic_coco )
 	CONFIG_DEVICE( coco_cassette_getinfo )
 	CONFIG_DEVICE( coco_floppy_getinfo )
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( generic_coco12 )
+static SYSTEM_CONFIG_START( generic_coco12 )
 	CONFIG_IMPORT_FROM( generic_coco )
 	CONFIG_DEVICE( coco_cartslot_getinfo )
 SYSTEM_CONFIG_END
 
 /* These have to be split up, as the CoCo has a bitbanger */
 /* where the Dragon has a paralell printer port */
-SYSTEM_CONFIG_START( generic_dragon )
+static SYSTEM_CONFIG_START( generic_dragon )
 	CONFIG_DEVICE( coco_cassette_getinfo )
 	CONFIG_DEVICE( coco_floppy_getinfo )
 	CONFIG_DEVICE( coco_cartslot_getinfo )
@@ -1129,7 +1129,7 @@ SYSTEM_CONFIG_END
 /* use 64K rams, and will boot with 4k, if this is selected, so I have     */
 /* split these to avoid confusion -- PHS                                   */
 
-SYSTEM_CONFIG_START( coco )
+static SYSTEM_CONFIG_START( coco )
 	CONFIG_IMPORT_FROM	( generic_coco12 )
 	CONFIG_RAM		(4 * 1024)
 	CONFIG_RAM_DEFAULT	(16 * 1024)
@@ -1137,7 +1137,7 @@ SYSTEM_CONFIG_START( coco )
 	CONFIG_RAM		(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( cocoe )
+static SYSTEM_CONFIG_START( cocoe )
 	CONFIG_IMPORT_FROM	( generic_coco12 )
 	CONFIG_RAM		(4 * 1024)
 	CONFIG_RAM		(16 * 1024)
@@ -1145,13 +1145,13 @@ SYSTEM_CONFIG_START( cocoe )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(coco2)
+static SYSTEM_CONFIG_START(coco2)
 	CONFIG_IMPORT_FROM	( generic_coco12 )
 	CONFIG_RAM			(16 * 1024)
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(coco3)
+static SYSTEM_CONFIG_START(coco3)
 	CONFIG_IMPORT_FROM	( generic_coco )
 	CONFIG_DEVICE( coco3_cartslot_getinfo )
 	CONFIG_RAM			(128 * 1024)
@@ -1160,28 +1160,28 @@ SYSTEM_CONFIG_START(coco3)
 	CONFIG_RAM			(8192 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(dragon32)
+static SYSTEM_CONFIG_START(dragon32)
 	CONFIG_IMPORT_FROM	( generic_dragon )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
 	CONFIG_RAM		(64 * 1024)		// Since a fair number of users did this upgrade - phs
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(dragon64)
+static SYSTEM_CONFIG_START(dragon64)
 	CONFIG_IMPORT_FROM	( generic_dragon )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(d64plus)
+static SYSTEM_CONFIG_START(d64plus)
 	CONFIG_IMPORT_FROM	( generic_dragon )
 	CONFIG_RAM_DEFAULT	(128 * 1024)		// 64K normal RAM + 64K on plus board.
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(tanodr64)
+static SYSTEM_CONFIG_START(tanodr64)
 	CONFIG_IMPORT_FROM	( generic_dragon )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(dgnalpha)
+static SYSTEM_CONFIG_START(dgnalpha)
 	CONFIG_IMPORT_FROM	( generic_dragon )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END

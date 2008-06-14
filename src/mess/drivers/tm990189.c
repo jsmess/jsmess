@@ -1019,7 +1019,7 @@ static void tm990_189_serial_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-SYSTEM_CONFIG_START(tm990_189)
+static SYSTEM_CONFIG_START(tm990_189)
 	/* a tape interface and a rs232 interface... */
 	CONFIG_DEVICE(tm990_189_cassette_getinfo)
 	CONFIG_DEVICE(tm990_189_serial_getinfo)

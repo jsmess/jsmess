@@ -190,7 +190,7 @@ WRITE8_HANDLER( nascom1_port_01_w )
  *
  *************************************/
 
-int	nascom1_read_cassette(void)
+static int	nascom1_read_cassette(void)
 {
 	if (nascom1_tape_image && (nascom1_tape_index < nascom1_tape_size))
 		return (nascom1_tape_image[nascom1_tape_index++]);

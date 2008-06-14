@@ -167,7 +167,7 @@ static void apple3_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(apple3)
+static SYSTEM_CONFIG_START(apple3)
 	CONFIG_RAM_DEFAULT(0x80000)
 	CONFIG_DEVICE(apple3_floppy_getinfo)
 SYSTEM_CONFIG_END

@@ -365,7 +365,7 @@ static void mz700_cassette_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-SYSTEM_CONFIG_START(mz700)
+static SYSTEM_CONFIG_START(mz700)
 	CONFIG_DEVICE(mz700_cassette_getinfo)
 SYSTEM_CONFIG_END
 

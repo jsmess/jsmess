@@ -153,7 +153,7 @@ ROM_END
  *
  *************************************/
 
-SYSTEM_CONFIG_START( advision )
+static SYSTEM_CONFIG_START( advision )
 	CONFIG_DEVICE( cartslot_device_getinfo )
 SYSTEM_CONFIG_END
 

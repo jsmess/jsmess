@@ -248,7 +248,7 @@ static void galaxy_common_cassette_getinfo(const mess_device_class *devclass, UI
 	}
 }
 
-SYSTEM_CONFIG_START(galaxy)
+static SYSTEM_CONFIG_START(galaxy)
 	CONFIG_RAM(2 * 1024)
 	CONFIG_RAM_DEFAULT(6 * 1024)
 	CONFIG_RAM((6+16) * 1024)
@@ -257,7 +257,7 @@ SYSTEM_CONFIG_START(galaxy)
 	CONFIG_DEVICE(galaxy_common_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(galaxyp)
+static SYSTEM_CONFIG_START(galaxyp)
 	CONFIG_RAM_DEFAULT((6+32) * 1024)
 	CONFIG_DEVICE(galaxy_common_cassette_getinfo)
 SYSTEM_CONFIG_END

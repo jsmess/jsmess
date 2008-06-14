@@ -114,7 +114,7 @@ static void pokemini_cartslot_getinfo( const mess_device_class *devclass, UINT32
 }
 
 
-SYSTEM_CONFIG_START( pokemini )
+static SYSTEM_CONFIG_START( pokemini )
 	CONFIG_DEVICE( pokemini_cartslot_getinfo )
 SYSTEM_CONFIG_END
 

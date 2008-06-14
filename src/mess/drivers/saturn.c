@@ -2404,7 +2404,7 @@ static void saturn_chdcd_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-SYSTEM_CONFIG_START( saturn )
+static SYSTEM_CONFIG_START( saturn )
 	CONFIG_DEVICE(saturn_chdcd_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END

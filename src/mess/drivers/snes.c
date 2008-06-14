@@ -498,7 +498,7 @@ static void snes_cartslot_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(snes)
+static SYSTEM_CONFIG_START(snes)
 	CONFIG_DEVICE(snes_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

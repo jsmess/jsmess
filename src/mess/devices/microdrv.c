@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "microdrv.h"
 
-DEVICE_START(microdrv)
+static DEVICE_START(microdrv)
 {
 }
 

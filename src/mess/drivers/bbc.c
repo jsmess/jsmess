@@ -848,12 +848,12 @@ static void bbc_cassette_getinfo( const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-SYSTEM_CONFIG_START(bbca)
+static SYSTEM_CONFIG_START(bbca)
 	CONFIG_DEVICE(bbc_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 
-SYSTEM_CONFIG_START(bbc)
+static SYSTEM_CONFIG_START(bbc)
 	CONFIG_DEVICE(bbc_cartslot_getinfo)
 	CONFIG_DEVICE(bbc_floppy_getinfo)
 	CONFIG_DEVICE(bbc_cassette_getinfo)

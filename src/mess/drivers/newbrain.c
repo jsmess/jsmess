@@ -1009,7 +1009,7 @@ static void newbrain_serial_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-SYSTEM_CONFIG_START( newbrain )
+static SYSTEM_CONFIG_START( newbrain )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
 	CONFIG_DEVICE(newbrain_cassette_getinfo)
 	CONFIG_DEVICE(newbrain_floppy_getinfo)

@@ -329,12 +329,12 @@ static void lisa_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
-SYSTEM_CONFIG_START(lisa)
+static SYSTEM_CONFIG_START(lisa)
 	/* Lisa should eventually support floppies, hard disks, etc. */
 	CONFIG_DEVICE(lisa_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START(lisa210)
+static SYSTEM_CONFIG_START(lisa210)
 	CONFIG_IMPORT_FROM(lisa)
 	/* actually, there is an additionnal 10 meg HD, but it is not implemented... */
 SYSTEM_CONFIG_END
