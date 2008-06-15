@@ -166,12 +166,13 @@ static READ8_HANDLER(read_keyboard)
 	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
 	value = input_port_read(machine, port);
 
-	/* hack for port overlapping with joystick */
-	if (value == 5)
+	/* hack for ports overlapping with joystick */
+	if (offset == 4 || offset == 5)
 	{
 		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset);
 		value |= input_port_read(machine, port);
 	}
+
 	return value;
 }
 
@@ -513,6 +514,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) 			PORT_CHAR(',') PORT_CHAR('<')
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) 			PORT_CHAR('.') PORT_CHAR('>')
 
+	PORT_START_TAG("LINE4_alt")    /* col 4 */
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_CODE(KEYCODE_2_PAD)
