@@ -319,7 +319,7 @@ static const struct CassetteFormat csw_cassette_format = {
 	NULL
 };
 
-extern struct CassetteFormat uef_cassette_format;
+extern const struct CassetteFormat uef_cassette_format;
 
 CASSETTE_FORMATLIST_START(csw_cassette_formats)
 	CASSETTE_FORMAT(csw_cassette_format)

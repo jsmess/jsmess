@@ -41,8 +41,6 @@ WRITE8_HANDLER( mz800_ramdisk_w );
 WRITE8_HANDLER( mz800_ramaddr_w );
 WRITE8_HANDLER( mz800_palette_w );
 
-WRITE8_HANDLER( pcgram_w );
-
 DRIVER_INIT( mz800 );
 
 

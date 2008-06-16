@@ -7,12 +7,11 @@ atom.c
 
 #include "driver.h"
 #include "video/m6847.h"
+#include "includes/atom.h"
 
 
 static ATTR_CONST UINT8 atom_get_attributes(UINT8 c)
 {
-	extern UINT8 atom_8255_porta;
-	extern UINT8 atom_8255_portc;
 	UINT8 result = 0x00;
 	if (c & 0x40)				result |= M6847_AS | M6847_INTEXT;
 	if (c & 0x80)				result |= M6847_INV;

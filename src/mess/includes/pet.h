@@ -20,10 +20,10 @@ MC6845_UPDATE_ROW( pet40_update_row );
 MC6845_UPDATE_ROW( pet80_update_row );
 MC6845_ON_DE_CHANGED( pet_display_enable_changed );
 
-extern int pet_font;
-
 
 /*----------- defined in machine/pet.c -----------*/
+
+extern int pet_font;
 
 extern UINT8 *pet_memory;
 extern UINT8 *pet_videoram;

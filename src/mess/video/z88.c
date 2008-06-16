@@ -42,8 +42,6 @@ PALETTE_INIT( z88 )
 	palette_set_colors(machine, 0, z88_palette, ARRAY_LENGTH(z88_palette));
 }
 
-extern struct blink_hw blink;
-
 /* temp - change to gfxelement structure */
 
 static void z88_vh_render_8x8(bitmap_t *bitmap, int x, int y, int pen0, int pen1, unsigned char *pData)

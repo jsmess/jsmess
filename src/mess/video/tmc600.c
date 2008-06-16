@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "video/cdp1869.h"
+#include "includes/tmc600.h"
 
 #define SCREEN_TAG	"main"
 #define CDP1869_TAG	"cdp1869"

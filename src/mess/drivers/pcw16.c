@@ -110,8 +110,6 @@ TODO:
 
 // interrupt counter
 static unsigned long pcw16_interrupt_counter;
-// video control
-extern int pcw16_video_control;
 /* controls which bank of 2mb address space is paged into memory */
 static int pcw16_banks[4];
 
@@ -167,8 +165,6 @@ static ADDRESS_MAP_START(pcw16_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK8)
 ADDRESS_MAP_END
 
-
-extern int pcw16_colour_palette[16];
 
 static WRITE8_HANDLER(pcw16_palette_w)
 {

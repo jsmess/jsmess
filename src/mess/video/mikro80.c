@@ -8,6 +8,7 @@
 
 
 #include "driver.h"
+#include "includes/mikro80.h"
   
 UINT8 *mikro80_video_ram;
 UINT8 *mikro80_cursor_ram;

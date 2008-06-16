@@ -664,7 +664,7 @@ void vc1541_reset (void)
 }
 
 /* delivers status for displaying */
-extern void vc1541_drive_status (char *text, int size)
+void vc1541_drive_status (char *text, int size)
 {
 #if 1||VERBOSE_DBG
 	if (vc1541->type==TypeVC1541) {

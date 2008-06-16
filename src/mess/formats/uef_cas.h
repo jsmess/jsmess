@@ -9,6 +9,8 @@
 
 #include "formats/cassimg.h"
 
+extern const struct CassetteFormat uef_cassette_format;
+
 CASSETTE_FORMATLIST_EXTERN(uef_cassette_formats);
 
 #endif /* UEF_CAS_H */

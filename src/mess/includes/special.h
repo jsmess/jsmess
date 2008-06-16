@@ -8,9 +8,11 @@
 #define SPECIAL_H_
 
 #include "machine/8255ppi.h"
+#include "machine/pit8253.h"
 
 /*----------- defined in machine/special.c -----------*/
 
+extern UINT8 *specimx_colorram;
 extern const struct pit8253_config specimx_pit8253_intf;
 extern const ppi8255_interface specialist_ppi8255_interface;
 
@@ -46,8 +48,11 @@ extern WRITE8_HANDLER( erik_disk_reg_w );
 
 /*----------- defined in video/special.c -----------*/
 
+extern UINT8 erik_color_1;
+extern UINT8 erik_color_2;
+extern UINT8 erik_background;
+
 extern UINT8 *specialist_video_ram;
-extern UINT8 *specimx_colorram;
 
 extern UINT8 *erik_video_ram_page_1;
 extern UINT8 *erik_video_ram_page_2;
@@ -66,7 +71,7 @@ extern VIDEO_UPDATE( erik );
 extern PALETTE_INIT( erik );
 
 extern PALETTE_INIT( specimx );
-extern rgb_t specimx_palette;
+extern const rgb_t specimx_palette[16];
 
 /*----------- defined in audio/special.c -----------*/
 

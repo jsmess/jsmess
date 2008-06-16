@@ -7,6 +7,7 @@
 #ifndef MIKRO80_H_
 #define MIKRO80_H_
 
+#include "machine/8255ppi.h"
 
 /*----------- defined in machine/mikro80.c -----------*/
 

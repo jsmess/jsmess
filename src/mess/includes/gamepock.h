@@ -1,6 +1,8 @@
 #ifndef _GAMEPOCK_H_
 #define _GAMEPOCK_H_
 
+/*----------- defined in machine/gamepock.c -----------*/
+
 MACHINE_RESET( gamepock );
 
 VIDEO_UPDATE( gamepock );

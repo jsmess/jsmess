@@ -16,6 +16,9 @@ struct SystemConfigurationParamBlock;
 #include "image.h"
 #include "artworkx.h"
 #include "memory.h"
+#include "compcfg.h"
+#include "configms.h"
+#include "messopts.h"
 
 
 
@@ -44,8 +47,6 @@ struct SystemConfigurationParamBlock;
 
 /***************************************************************************/
 
-void mess_options_init(core_options *opts);
-
 extern const char mess_disclaimer[];
 
 UINT32 hash_data_extract_crc32(const char *d);
@@ -67,8 +68,6 @@ int mess_validitychecks(void);
 /* these are called from mame.c */
 void mess_predevice_init(running_machine *machine);
 void mess_postdevice_init(running_machine *machine);
-
-void mess_config_init(running_machine *machine);
 
 enum
 {
@@ -93,18 +92,8 @@ extern UINT32 mess_ram_size;
 extern UINT8 *mess_ram;
 extern UINT8 mess_ram_default_value;
 
-/* RAM parsing options */
 #define RAM_STRING_BUFLEN 16
-UINT32		ram_option(const game_driver *gamedrv, unsigned int i);
-int			ram_option_count(const game_driver *gamedrv);
-int			ram_is_valid_option(const game_driver *gamedrv, UINT32 ram);
-UINT32		ram_default(const game_driver *gamedrv);
-UINT32		ram_parse_string(const char *s);
-const char *ram_string(char *buffer, UINT32 ram);
-int			ram_validate_option(void);
 void		ram_dump(const char *filename);
-
-UINT8 *memory_install_ram8_handler(running_machine *machine, int cpunum, int spacenum, offs_t start, offs_t end, offs_t ram_offset, int bank);
 
 /* --------------------------------------------------------------------------------------------- */
 

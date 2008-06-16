@@ -129,7 +129,9 @@ extern PALETTE_INIT( nick );
 int Nick_vh_start(void);
 void Nick_DoScreen(bitmap_t *bm);
 
+#if 0
 int Nick_reg_r(int);
+#endif
 WRITE8_HANDLER ( Nick_reg_w );
 
 

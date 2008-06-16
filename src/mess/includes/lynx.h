@@ -18,8 +18,6 @@ void lynx_partialhash(char *dest, const unsigned char *data,
 extern int lynx_rotate;
 
 
-/*----------- defined in video/lynx.c -----------*/
-
 extern UINT32 lynx_palette[0x10];
 
 void lynx_draw_lines(running_machine *machine, int newline);

@@ -8,6 +8,8 @@
 #define SSYSTEM3_H_
 
 
+/*----------- defined in drivers/ssystem3.c -----------*/
+
 void ssystem3_playfield_getfigure(int x, int y, int *figure, int *black);
 
 /*----------- defined in video/ssystem3.c -----------*/

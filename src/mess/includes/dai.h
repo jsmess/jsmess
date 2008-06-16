@@ -30,7 +30,7 @@ extern UINT8 dai_osc_volume[3];
 /*----------- defined in video/dai.c -----------*/
 
 extern const unsigned char dai_palette[16*3];
-extern const unsigned short dai_colortable[1][16];
+
 VIDEO_START( dai );
 VIDEO_UPDATE( dai );
 PALETTE_INIT( dai );

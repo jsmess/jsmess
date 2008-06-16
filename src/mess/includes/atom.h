@@ -13,6 +13,9 @@
 
 /*----------- defined in machine/atom.c -----------*/
 
+extern UINT8 atom_8255_porta;
+extern UINT8 atom_8255_portc;
+
 extern const ppi8255_interface atom_8255_int;
 
 MACHINE_RESET( atom );

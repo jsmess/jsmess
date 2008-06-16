@@ -86,9 +86,6 @@ extern int PreviousFE;
 /*----------- defined in drivers/spec128.c -----------*/
 MACHINE_DRIVER_EXTERN( spectrum_128 );
 
-extern READ8_HANDLER(spectrum_128_port_fffd_r);
-extern WRITE8_HANDLER(spectrum_128_port_bffd_w);
-extern WRITE8_HANDLER(spectrum_128_port_fffd_w);
 extern unsigned char *spectrum_128_screen_location;
 extern void spectrum_128_update_memory(running_machine *machine);
 extern int spectrum_128_port_7ffd_data;
@@ -97,7 +94,7 @@ extern int spectrum_128_port_7ffd_data;
 extern int spectrum_plus3_port_1ffd_data;
 extern void spectrum_plus3_update_memory(running_machine *machine);
 
-/*----------- defined in drivers/spec128.c -----------*/
+/*----------- defined in drivers/timex.c -----------*/
 extern void ts2068_update_memory(running_machine *machine);
 extern int ts2068_port_ff_data;
 extern int ts2068_port_f4_data;

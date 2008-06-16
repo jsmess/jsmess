@@ -76,6 +76,10 @@ struct blink_hw
 };
 
 
+/*----------- defined in drivers/z88.c -----------*/
+
+extern struct blink_hw blink;
+
 /*----------- defined in video/z88.c -----------*/
 
 extern PALETTE_INIT( z88 );

@@ -10,6 +10,10 @@
 
 /*----------- defined in video/apf.c -----------*/
 
+extern unsigned char *apf_video_ram;
+
+extern unsigned char apf_ints;
+
 VIDEO_START(apf);
 extern UINT8 apf_m6847_attr;
 

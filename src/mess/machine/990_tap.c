@@ -183,13 +183,6 @@ void ti990_tpc_init(void (*interrupt_callback)(int state))
 }
 
 /*
-	Clean-up the tape controller core
-*/
-/*void ti990_tpc_exit(void)
-{
-}*/
-
-/*
 	Parse the tape select lines, and return the corresponding tape unit.
 	(-1 if none)
 */

@@ -4,6 +4,7 @@
 
 #include "mame.h"
 #include "driver.h"
+#include "compcfg.h"
 
 #define MAX_RAM_OPTIONS	16
 

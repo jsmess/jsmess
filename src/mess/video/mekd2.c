@@ -9,6 +9,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "includes/mekd2.h"
 
 PALETTE_INIT( mekd2 )
 {

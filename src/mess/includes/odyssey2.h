@@ -30,8 +30,6 @@
 
 /*----------- defined in video/odyssey2.c -----------*/
 
-extern int odyssey2_vh_hpos;
-
 extern const UINT8 odyssey2_colors[];
 
 VIDEO_START( odyssey2 );
@@ -45,6 +43,9 @@ WRITE8_HANDLER ( odyssey2_lum_w );
 void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length );
 
 extern const struct CustomSound_interface odyssey2_sound_interface;
+
+void ef9341_w( int command, int b, UINT8 data );
+UINT8 ef9341_r( int command, int b );
 
 /*----------- defined in machine/odyssey2.c -----------*/
 
@@ -69,8 +70,6 @@ void the_voice_lrq_callback( int state );
 
 READ8_HANDLER ( g7400_bus_r );
 WRITE8_HANDLER ( g7400_bus_w );
-void ef9341_w( int command, int b, UINT8 data );
-UINT8 ef9341_r( int command, int b );
 
 int odyssey2_cart_verify(const UINT8 *cartdata, size_t size);
 

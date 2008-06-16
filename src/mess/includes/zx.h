@@ -35,7 +35,7 @@ extern int ula_irq_active;
 extern int ula_nmi_active;
 extern int ula_frame_vsync;
 extern int ula_scanline_count;
-extern int ula_scancode_count;
+//extern int ula_scancode_count;
 
 
 #endif /* ZX_H_ */

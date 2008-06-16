@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "devices/cassette.h"
 #include "machine/8255ppi.h"
+#include "includes/bk.h"
 
 static UINT16 kbd_state;
 UINT16 bk_scrool;

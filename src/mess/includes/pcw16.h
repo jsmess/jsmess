@@ -20,6 +20,9 @@
 
 /*----------- defined in video/pcw16.c -----------*/
 
+extern int pcw16_colour_palette[16];
+extern int pcw16_video_control;
+
 extern PALETTE_INIT( pcw16 );
 extern VIDEO_START( pcw16 );
 extern VIDEO_UPDATE( pcw16 );

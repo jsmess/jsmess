@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "video/i8275.h"
+#include "includes/radio86.h"
 
 I8275_DISPLAY_PIXELS(radio86_display_pixels) 
 {

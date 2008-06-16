@@ -16,6 +16,7 @@
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
+#include "includes/special.h"
 
 static UINT8 specimx_color;
 UINT8 *specimx_colorram;
@@ -372,10 +373,6 @@ static void erik_set_bank(running_machine *machine) {
 						break;
 	}
 }
-
-extern UINT8 erik_color_1;
-extern UINT8 erik_color_2;
-extern UINT8 erik_background;
 
 DRIVER_INIT(erik)
 {	

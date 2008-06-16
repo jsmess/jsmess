@@ -9,18 +9,13 @@
 
 
 #include "driver.h"
+#include "includes/orion.h"
   
 
 VIDEO_START( orion128 )
 {
 }
  
-extern UINT8 orion128_video_mode;
-extern UINT8 orion128_video_page;
-extern UINT8 orion128_video_width;  
-extern UINT8 orion_video_mode_mask ;
-extern UINT8 orionpro_pseudo_color;
-
 VIDEO_UPDATE( orion128 )
 {
 	UINT8 code1,code2,code3,code4,color,val;

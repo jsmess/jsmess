@@ -22,10 +22,6 @@ VIDEO_START( pcw )
 {
 }
 
-extern unsigned int roller_ram_addr;
-extern unsigned short roller_ram_offset;
-extern unsigned char pcw_vdu_video_control_register;
-
 /* two colours */
 static const unsigned short pcw_colour_table[PCW_NUM_COLOURS] =
 {

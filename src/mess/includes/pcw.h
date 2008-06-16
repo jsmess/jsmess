@@ -18,6 +18,12 @@
 #define PCW_SCREEN_HEIGHT	(PCW_DISPLAY_HEIGHT  + (PCW_BORDER_HEIGHT<<1))
 
 
+/*----------- defined in drivers/pcw.c -----------*/
+
+extern unsigned int roller_ram_addr;
+extern unsigned short roller_ram_offset;
+extern unsigned char pcw_vdu_video_control_register;
+
 /*----------- defined in video/pcw.c -----------*/
 
 extern VIDEO_START( pcw );

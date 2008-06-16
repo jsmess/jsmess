@@ -80,6 +80,7 @@
 #include "video/pc_cga.h"
 #include "video/mc6845.h"
 #include "video/pc_video.h"
+#include "video/cgapal.h"
 #include "memconv.h"
 
 #define VERBOSE_CGA 0		/* CGA (Color Graphics Adapter) */
@@ -96,10 +97,6 @@
 
 static VIDEO_START( pc_cga );
 static PALETTE_INIT( pc_cga );
-
-
-/* In cgapal.c; it's quite big */
-extern const unsigned char cga_palette[16 * CGA_PALETTE_SETS][3];
 
 
 INPUT_PORTS_START( pcvideo_cga )

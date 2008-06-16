@@ -19,6 +19,7 @@
 #include "machine/msm8251.h"
 #include "sound/custom.h"
 #include "streams.h"
+#include "includes/b2m.h"
 
 static int b2m_8255_porta;
 UINT16 b2m_video_scroll;

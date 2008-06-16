@@ -20,37 +20,15 @@
 static m6845_state amstrad_vidhrdw_6845_state;
 int prev_reg;
 
-extern int amstrad_plus_asic_enabled;
-extern int amstrad_plus_pri;
-extern int amstrad_system_type;
-extern int amstrad_plus_irq_cause;
-extern int amstrad_plus_scroll_x;
-extern int amstrad_plus_scroll_y;
-extern int amstrad_plus_scroll_border;
-
-extern int amstrad_plus_dma_status;
-extern int amstrad_plus_dma_0_addr;   // DMA channel address
-extern int amstrad_plus_dma_1_addr;
-extern int amstrad_plus_dma_2_addr;
-extern int amstrad_plus_dma_prescaler[3];  // DMA channel prescaler
-
 static int amstrad_plus_dma_repeat[3];  // marks the location of the channels' last repeat
 static int amstrad_plus_dma_pause[3];  // pause count
 static int amstrad_plus_dma_loopcount[3]; // counts loops taken on this channel
-
-extern unsigned char *amstrad_plus_asic_ram;
 
 static int amstrad_plus_split_scanline;  // ASIC split screen
 static int amstrad_plus_split_address;
 static int amstrad_screen_width;  // width in bytes
 
 static void amstrad_plus_handle_dma(running_machine *machine);
-
-extern int aleste_mode;
-
-#ifdef MAME_DEBUG
-extern int amstrad_plus_lower_enabled;
-#endif
 
 /***************************************************************************
   Start the video hardware emulation.

@@ -148,7 +148,7 @@ DEVICE_IMAGE_UNLOAD( trs80_cas )
 	cas_size = 0;
 }
 
-extern QUICKLOAD_LOAD( trs80_cmd )
+QUICKLOAD_LOAD( trs80_cmd )
 {
 	UINT16 entry = 0, block_ofs = 0, block_len = 0;
 	unsigned offs = 0;

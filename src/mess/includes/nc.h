@@ -36,6 +36,14 @@ void nc200_video_set_backlight(int state);
 
 /*----------- defined in drivers/nc.c -----------*/
 
+/* pointer to loaded data */
+extern unsigned char *nc_card_ram;
+/* mask used to stop access over end of card ram area */
+extern int nc_membank_card_ram_mask;
+
+extern unsigned long nc_display_memory_start;
+extern UINT8 nc_type;
+
 void nc_set_card_present_state(int);
 
 

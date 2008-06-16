@@ -10,6 +10,8 @@
 
 /*----------- defined in machine/coleco.c -----------*/
 
+extern int JoyStat[2];
+
 int coleco_cart_verify(const UINT8 *buf, size_t size);
 
  READ8_HANDLER  ( coleco_paddle_r );

@@ -8,9 +8,8 @@
 
 
 #include "driver.h"
+#include "includes/b2m.h"
   
-extern UINT8 b2m_video_page;  
-extern UINT16 b2m_video_scroll;
 VIDEO_START( b2m )
 {
 }

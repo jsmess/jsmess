@@ -26,8 +26,6 @@
 #include "sound/2413intf.h"
 #include "sound/dac.h"
 
-extern MSX msx1;
-
 static void msx_cpu_setbank (running_machine *machine, int page, UINT8 *mem)
 {
 	switch (page) {

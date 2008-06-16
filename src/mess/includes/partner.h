@@ -7,6 +7,8 @@
 #ifndef partner_H_
 #define partner_H_
 
+#include "machine/8255ppi.h"
+#include "video/i8275.h"
 
 /*----------- defined in machine/partner.c -----------*/
 

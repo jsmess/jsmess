@@ -9,6 +9,7 @@
 
 
 #include "driver.h"
+#include "includes/galeb.h"
   
 #define GALEB_VIDEO_MEMORY		0xB000  
     

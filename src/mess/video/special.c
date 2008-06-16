@@ -8,6 +8,7 @@
 
 
 #include "driver.h"
+#include "includes/special.h"
   
 UINT8 *specialist_video_ram;
 //UINT8 erik_page_active;
@@ -85,8 +86,6 @@ PALETTE_INIT( specimx )
 	palette_set_colors(machine, 0, specimx_palette, ARRAY_LENGTH(specimx_palette));
 }
 
-
-extern UINT8 *specimx_colorram;
 
 VIDEO_START( specimx )
 {	

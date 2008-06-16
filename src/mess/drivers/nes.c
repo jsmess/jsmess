@@ -12,6 +12,7 @@
 
 #include "driver.h"
 #include "video/ppu2c0x.h"
+#include "machine/nes_mmc.h"
 #include "includes/nes.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"

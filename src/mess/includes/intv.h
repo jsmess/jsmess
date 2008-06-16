@@ -11,7 +11,6 @@
 /*----------- defined in video/intv.c -----------*/
 
 extern VIDEO_START( intv );
-extern VIDEO_UPDATE( intv );
 extern VIDEO_UPDATE( intvkbd );
 
 void stic_screenrefresh(running_machine *machine);

@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "video/i8275.h"
+#include "includes/apogee.h"
 
 I8275_DISPLAY_PIXELS(apogee_display_pixels)
 {

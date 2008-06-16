@@ -26,7 +26,6 @@ extern UINT8 *c128_internal_function;
 extern UINT8 *c128_external_function;
 extern UINT8 *c128_vdcram;
 
-READ8_HANDLER(c128_m6510_port_r);
 WRITE8_HANDLER(c128_mmu8722_port_w);
 READ8_HANDLER(c128_mmu8722_port_r);
 WRITE8_HANDLER(c128_mmu8722_ff00_w);

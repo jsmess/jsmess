@@ -11,6 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
 #include "machine/8255ppi.h"
+#include "includes/mikro80.h"
 
 static int mikro80_keyboard_mask;
 

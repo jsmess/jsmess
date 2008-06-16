@@ -17,6 +17,7 @@
 #include "machine/wd17xx.h"
 #include "sound/speaker.h"
 #include "sound/ay8910.h"
+#include "includes/orion.h"
 
 #define SCREEN_WIDTH_384 48
 #define SCREEN_WIDTH_480 60

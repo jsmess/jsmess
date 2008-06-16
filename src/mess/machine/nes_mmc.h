@@ -31,6 +31,9 @@ extern write8_machine_func mmc_write;
 
 int mapper_reset (int mapperNum);
 
+WRITE8_HANDLER( nes_low_mapper_w );
+READ8_HANDLER ( nes_low_mapper_r );
+READ8_HANDLER ( nes_mid_mapper_r );
 WRITE8_HANDLER ( nes_mid_mapper_w );
 WRITE8_HANDLER ( nes_mapper_w );
 

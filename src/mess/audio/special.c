@@ -13,6 +13,7 @@
 #include "includes/dai.h"
 #include "streams.h"
 #include "deprecat.h"
+#include "includes/special.h"
 
 static void *specimx_sh_start(int clock, const struct CustomSound_interface *config);
 static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);

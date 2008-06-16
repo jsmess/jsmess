@@ -14,7 +14,6 @@ MACHINE_RESET( mbee );
 MACHINE_START( mbee );
 
 extern UINT8 *mbee_workram;
-READ8_HANDLER( mbee_lowram_r );
 
 INTERRUPT_GEN( mbee_interrupt );
 
@@ -29,7 +28,6 @@ WRITE8_HANDLER ( mbee_fdc_motor_w );
 
 /*----------- defined in video/mbee.c -----------*/
 
-extern char mbee_frame_message[128+1];
 extern int mbee_frame_counter;
 extern UINT8 *pcgram;
 

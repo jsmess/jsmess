@@ -12,6 +12,7 @@
 #include "sound/dac.h"
 #include "devices/cassette.h"
 #include "machine/8255ppi.h"
+#include "includes/ut88.h"
 
 static int ut88_keyboard_mask;
 

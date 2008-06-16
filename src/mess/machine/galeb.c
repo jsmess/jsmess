@@ -10,6 +10,7 @@
 
 #include "driver.h"
 #include "sound/dac.h"
+#include "includes/galeb.h"
   
   
 /* Driver initialization */

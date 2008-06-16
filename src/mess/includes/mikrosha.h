@@ -7,6 +7,8 @@
 #ifndef MIKROSHA_H_
 #define MIKROSHA_H_
 
+#include "machine/8255ppi.h"
+#include "video/i8275.h"
 
 /*----------- defined in machine/mikrosha.c -----------*/
 

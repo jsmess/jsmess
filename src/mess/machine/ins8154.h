@@ -37,8 +37,6 @@ WRITE8_DEVICE_HANDLER( ins8154_w );
 
 /******************* 8-bit A/B port interfaces ******************************/
 
-READ8_DEVICE_HANDLER( ins8154_porta_r );
-READ8_DEVICE_HANDLER( ins8154_portb_r );
 WRITE8_DEVICE_HANDLER( ins8154_porta_w );
 WRITE8_DEVICE_HANDLER( ins8154_portb_w );
 

@@ -13,6 +13,7 @@
 #include "info.h"
 #include "hash.h"
 #include "xmlfile.h"
+#include "infomess.h"
 
 /*************************************
  *

@@ -7,8 +7,14 @@
 #ifndef b2m_H_
 #define b2m_H_
 
+#include "machine/8255ppi.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
 
 /*----------- defined in machine/b2m.c -----------*/
+
+extern UINT8 b2m_video_page;
+extern UINT16 b2m_video_scroll;
 
 extern const struct pit8253_config b2m_pit8253_intf;
 
@@ -25,8 +31,6 @@ extern DRIVER_INIT( b2m );
 extern MACHINE_START( b2m );
 extern MACHINE_RESET( b2m );
 extern INTERRUPT_GEN( b2m_vblank_interrupt );
-extern READ8_HANDLER( b2m_disk_r );
-extern WRITE8_HANDLER( b2m_disk_w );
 extern READ8_HANDLER( b2m_8255_0_r );
 extern WRITE8_HANDLER( b2m_8255_0_w );
 extern READ8_HANDLER( b2m_8255_1_r );
@@ -38,8 +42,12 @@ extern WRITE8_HANDLER( b2m_palette_w );
 extern READ8_HANDLER( b2m_localmachine_r );
 extern WRITE8_HANDLER( b2m_localmachine_w );
 extern DEVICE_IMAGE_LOAD( b2m_floppy );
+
+
 /*----------- defined in video/b2m.c -----------*/
+
 extern VIDEO_START( b2m );
 extern VIDEO_UPDATE( b2m );
 extern PALETTE_INIT( b2m );
+
 #endif

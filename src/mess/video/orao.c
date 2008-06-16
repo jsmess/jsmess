@@ -8,6 +8,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "includes/orao.h"
 
 #define ORAO_VIDEO_MEMORY		0x6000
   

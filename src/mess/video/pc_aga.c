@@ -13,6 +13,7 @@
 #include "includes/amstr_pc.h"
 #include "video/mc6845.h"
 #include "video/pc_video.h"
+#include "video/cgapal.h"
 
 
 #define CGA_MONITOR		(input_port_read(machine, "VIDEO") & 0x1C)

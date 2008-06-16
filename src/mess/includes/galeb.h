@@ -20,7 +20,6 @@ extern WRITE8_HANDLER( galeb_speaker_w );
 
 extern const gfx_layout galeb_charlayout;
 
-extern PALETTE_INIT( galeb );
 extern VIDEO_START( galeb );
 extern VIDEO_UPDATE( galeb );
 

@@ -105,7 +105,6 @@ extern	WRITE8_HANDLER (	cgenie_register_w );
 extern	int 	cgenie_get_register(int indx);
 
 extern	void	cgenie_mode_select(int graphics);
-extern	void	cgenie_invalidate_range(int l, int h);
 
 
 #endif /* CGENIE_H_ */

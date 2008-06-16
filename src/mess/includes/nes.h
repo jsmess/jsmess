@@ -86,17 +86,9 @@ void nes_partialhash(char *dest, const unsigned char *data,
 	unsigned long length, unsigned int functions);
 
 
-/*----------- defined in machine/nes_mmc.c -----------*/
-
-WRITE8_HANDLER( nes_low_mapper_w );
-READ8_HANDLER ( nes_low_mapper_r );
-WRITE8_HANDLER( nes_mid_mapper_w );
-READ8_HANDLER ( nes_mid_mapper_r );
-WRITE8_HANDLER( nes_mapper_w );
-
-
 /*----------- defined in video/nes.c -----------*/
 
+extern bitmap_t *nes_zapper_hack;
 extern int nes_vram_sprite[8];
 
 PALETTE_INIT( nes );

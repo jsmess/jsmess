@@ -23,7 +23,6 @@ extern WRITE8_HANDLER( orao_io_w );
 
 /*----------- defined in video/orao.c -----------*/
 
-extern PALETTE_INIT( orao );
 extern VIDEO_START( orao );
 extern VIDEO_UPDATE( orao );
 

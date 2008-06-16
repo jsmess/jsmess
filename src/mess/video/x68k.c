@@ -29,12 +29,6 @@
 #include "includes/x68k.h"
 #include "machine/68901mfp.h"
 
-extern struct x68k_system sys;
-
-extern emu_timer* scanline_timer;
-extern emu_timer* raster_irq;
-extern emu_timer* vblank_irq;
-
 UINT16* gvram;  // Graphic VRAM
 UINT16* tvram;  // Text VRAM
 UINT16* x68k_spriteram;  // sprite/background RAM
@@ -54,7 +48,6 @@ static tilemap* x68k_bg1_8;
 static tilemap* x68k_bg0_16;  // two 64x64 tilemaps, 16x16 characters
 static tilemap* x68k_bg1_16;
 
-extern unsigned int x68k_scanline;
 static int sprite_shift;
 
 static void x68k_render_video_word(int offset);

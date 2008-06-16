@@ -144,9 +144,6 @@ int amstrad_plus_dma_2_addr;
 int amstrad_plus_dma_prescaler[3];  // DMA channel prescaler
 static int amstrad_plus_dma_clear;  // set if DMA interrupts are to be cleared automatically
 
-extern int amstrad_scanline;
-extern int prev_reg;
-
 static void amstrad_plus_seqcheck(int data);
 static WRITE8_HANDLER( amstrad_plus_asic_4000_w );
 static WRITE8_HANDLER( amstrad_plus_asic_6000_w );
@@ -201,8 +198,7 @@ static int amstrad_GateArray_PenSelected = 0;
 static int amstrad_GateArray_ModeAndRomConfiguration = 0;
 /* Ram configuration */
 static int amstrad_GateArray_RamConfiguration = 0;
-/* The gate array counts CRTC HSYNC pulses. (It has a internal 6-bit counter). */
-extern int amstrad_CRTC_HS_Counter;
+
 /*-------------
   - MULTIFACE -
   -------------*/

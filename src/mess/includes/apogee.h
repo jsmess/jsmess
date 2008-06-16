@@ -7,6 +7,8 @@
 #ifndef APOGEE_H_
 #define APOGEE_H_
 
+#include "machine/8255ppi.h"
+#include "video/i8275.h"
 
 /*----------- defined in machine/apogee.c -----------*/
 

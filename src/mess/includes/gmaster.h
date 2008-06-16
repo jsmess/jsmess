@@ -3,6 +3,8 @@
 
 #include "sound/custom.h"
 
+/*----------- defined in audio/gmaster.c -----------*/
+
 int gmaster_io_callback(int ioline, int state);
 void* gmaster_custom_start (int clock, const struct CustomSound_interface *config);
 //extern void gmaster_custom_stop (void);

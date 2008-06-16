@@ -23,7 +23,6 @@ WRITE8_HANDLER( jupiter_port_fe_w);
 
 /*----------- defined in video/jupiter.c -----------*/
 
-VIDEO_START( jupiter );
 VIDEO_UPDATE( jupiter );
 WRITE8_HANDLER( jupiter_vh_charram_w );
 extern unsigned char *jupiter_charram;

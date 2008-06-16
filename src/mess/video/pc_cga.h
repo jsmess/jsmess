@@ -8,8 +8,6 @@
 #define CGA_SCREEN_NAME	"cga_screen"
 #define CGA_MC6845_NAME	"mc6845_cga"
 
-extern const unsigned char cga_palette[CGA_PALETTE_SETS * 16][3];
-
 MACHINE_DRIVER_EXTERN( pcvideo_cga );
 INPUT_PORTS_EXTERN( pcvideo_cga );
 INPUT_PORTS_EXTERN( pcvideo_cga_at );

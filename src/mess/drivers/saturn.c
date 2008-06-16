@@ -169,12 +169,8 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 #include "sound/scsp.h"
 #include "devices/chd_cd.h"
 #include "devices/cartslot.h"
+#include "includes/stv.h"
 
-
-extern UINT32* stv_vdp2_regs;
-extern UINT32* stv_vdp2_vram;
-extern UINT32* stv_vdp2_cram;
-extern UINT32* stv_vdp1_vram;
 
 #define USE_SLAVE 1
 
@@ -199,17 +195,16 @@ extern UINT32* stv_vdp1_vram;
 static UINT8 *smpc_ram;
 //static void stv_dump_ram(void);
 
-static UINT32* stv_workram_l;
-static UINT32* stv_workram_h;
+UINT32* stv_workram_l;
+UINT32* stv_workram_h;
 //UINT32* stv_backupram;
-extern UINT32* stv_scu;
 static UINT16* scsp_regs;
 static UINT16* sound_ram;
 
 static int saturn_region;
 
 int stv_vblank,stv_hblank;
-static int stv_enable_slave_sh2;
+int stv_enable_slave_sh2;
 /*SMPC stuff*/
 static UINT8 NMI_reset;
 static void system_reset(void);
@@ -242,8 +237,8 @@ static void dma_indirect_lv1(running_machine *machine); /*DMA level 1 indirect t
 static void dma_indirect_lv2(running_machine *machine); /*DMA level 2 indirect transfer function*/
 
 
-static int minit_boost,sinit_boost;
-static double minit_boost_timeslice, sinit_boost_timeslice;
+int minit_boost,sinit_boost;
+attotime minit_boost_timeslice, sinit_boost_timeslice;
 
 static int scanline;
 
@@ -1866,7 +1861,7 @@ static WRITE32_HANDLER( stv_scsp_regs_w32 )
 static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
-	cpu_boost_interleave(double_to_attotime(minit_boost_timeslice), ATTOTIME_IN_USEC(minit_boost));
+	cpu_boost_interleave(minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpu_trigger(machine, 1000);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
@@ -1874,32 +1869,9 @@ static WRITE32_HANDLER( minit_w )
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu #%d (PC=%08X) SINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
-	cpu_boost_interleave(double_to_attotime(sinit_boost_timeslice), ATTOTIME_IN_USEC(sinit_boost));
+	cpu_boost_interleave(sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
-
-extern WRITE32_HANDLER ( stv_vdp2_vram_w );
-extern READ32_HANDLER ( stv_vdp2_vram_r );
-
-extern WRITE32_HANDLER ( stv_vdp2_cram_w );
-extern READ32_HANDLER ( stv_vdp2_cram_r );
-
-extern WRITE32_HANDLER ( stv_vdp2_regs_w );
-extern READ32_HANDLER ( stv_vdp2_regs_r );
-
-extern VIDEO_START ( stv_vdp2 );
-extern VIDEO_UPDATE( stv_vdp2 );
-
-extern READ32_HANDLER( stv_vdp1_regs_r );
-extern WRITE32_HANDLER( stv_vdp1_regs_w );
-extern READ32_HANDLER ( stv_vdp1_vram_r );
-extern WRITE32_HANDLER ( stv_vdp1_vram_w );
-
-extern WRITE32_HANDLER ( stv_vdp1_framebuffer0_w );
-extern READ32_HANDLER ( stv_vdp1_framebuffer0_r );
-
-extern WRITE32_HANDLER ( stv_vdp1_framebuffer1_w );
-extern READ32_HANDLER ( stv_vdp1_framebuffer1_r );
 
 static UINT32 backup[64*1024/4];
 
@@ -2072,8 +2044,8 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	minit_boost = 400;
 	sinit_boost = 400;
-	minit_boost_timeslice = 0;
-	sinit_boost_timeslice = 0;
+	minit_boost_timeslice = attotime_zero;
+	sinit_boost_timeslice = attotime_zero;
 
 	smpc_ram = auto_malloc (0x80);
 	stv_scu = auto_malloc (0x100);

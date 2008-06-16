@@ -18,6 +18,7 @@
 	               (hp48_io[(x)+3] << 12) | (hp48_io[(x)+4] << 16))
 
 
+/*----------- defined in machine/hp48.c -----------*/
 
 /***************************************************************************
     GLOBAL VARIABLES & CONSTANTS
@@ -57,12 +58,6 @@ void hp48_rsi( running_machine* machine );
 extern void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data );
 
 
-/****************************** video ********************************/
-
-extern VIDEO_UPDATE ( hp48 );
-extern PALETTE_INIT ( hp48 );
-
-
 /****************************** cards ********************************/
 
 struct hp48_port_config;
@@ -87,3 +82,12 @@ extern MACHINE_START( hp48g  );
 extern MACHINE_START( hp48gx );
 
 extern MACHINE_RESET( hp48 );
+
+/*----------- defined in video/hp48.c -----------*/
+
+/****************************** video ********************************/
+
+extern VIDEO_UPDATE ( hp48 );
+extern PALETTE_INIT ( hp48 );
+
+

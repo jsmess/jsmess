@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "video/i8275.h"
+#include "includes/partner.h"
 
 I8275_DISPLAY_PIXELS(partner_display_pixels)
 {

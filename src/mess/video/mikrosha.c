@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "video/i8275.h"
+#include "includes/mikrosha.h"
 
 UINT8 mikrosha_font_page;
 

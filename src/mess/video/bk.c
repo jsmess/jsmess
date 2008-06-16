@@ -8,9 +8,9 @@
 
 
 #include "driver.h"
+#include "includes/bk.h"
 
 UINT16 *bk0010_video_ram;
-extern UINT16 bk_scrool;
 
 VIDEO_START( bk0010 )
 {

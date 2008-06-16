@@ -10,6 +10,8 @@
 
 /*----------- defined in machine/bk.c -----------*/
 
+extern UINT16 bk_scrool;
+
 extern DRIVER_INIT( bk0010 );
 extern MACHINE_RESET( bk0010 );
 

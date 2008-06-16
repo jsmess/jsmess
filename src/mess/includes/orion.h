@@ -7,8 +7,15 @@
 #ifndef ORION_H_
 #define ORION_H_
 
+#include "machine/8255ppi.h"
 
 /*----------- defined in machine/orion.c -----------*/
+
+extern UINT8 orion128_video_mode;
+extern UINT8 orion128_video_page;
+extern UINT8 orion128_video_width;  
+extern UINT8 orion_video_mode_mask ;
+extern UINT8 orionpro_pseudo_color;
 
 extern const ppi8255_interface orion128_ppi8255_interface_1;
 extern const ppi8255_interface orion128_ppi8255_interface_2;

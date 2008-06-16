@@ -110,7 +110,9 @@ int m6845_vertical_sync_r(int offset);
 int m6845_display_enabled_r(int offset);
 int m6845_cursor_enabled_r(int offset);
 
+#if 0
 void m6845_recalc(int offset, int cycles);
+#endif
 
 void m6845_set_state(int offset, m6845_state *state);
 void m6845_get_state(int offset, m6845_state *state);

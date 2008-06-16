@@ -7,6 +7,8 @@
 #ifndef radio86_H_
 #define radio86_H_
 
+#include "machine/8255ppi.h"
+#include "video/i8275.h"
 
 /*----------- defined in machine/radio86.c -----------*/
 

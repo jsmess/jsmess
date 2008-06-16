@@ -65,11 +65,6 @@ READ8_HANDLER( comx35_io_r );
 READ8_HANDLER( comx35_io2_r );
 WRITE8_HANDLER( comx35_io_w );
 
-WRITE8_HANDLER( pl80_port_a_w );
-WRITE8_HANDLER( pl80_port_c_w );
-WRITE8_HANDLER( pl80_port_d_w );
-READ8_HANDLER( pl80_port_d_r );
-
 MACHINE_START( comx35p );
 MACHINE_START( comx35n );
 MACHINE_RESET( comx35 );

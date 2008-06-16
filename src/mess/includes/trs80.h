@@ -49,7 +49,6 @@ READ8_HANDLER( trs80_keyboard_r );
 
 /*----------- defined in video/trs80.c -----------*/
 
-VIDEO_START( trs80 );
 VIDEO_UPDATE( trs80 );
 
 WRITE8_HANDLER( trs80_videoram_w );

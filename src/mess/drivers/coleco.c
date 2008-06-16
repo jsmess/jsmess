@@ -172,8 +172,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-extern int JoyStat[2];
-
 static INTERRUPT_GEN( coleco_interrupt )
 {
     TMS9928A_interrupt(machine);

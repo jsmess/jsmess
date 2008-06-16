@@ -10,6 +10,8 @@
 #define _THOMSON_H_
 
 
+/*----------- defined in machine/thomson.c -----------*/
+
 /*************************** common ********************************/
 
 /* 6821 PIAs */
@@ -181,6 +183,8 @@ extern WRITE8_HANDLER ( mo5nr_prn_w );
 extern MACHINE_START ( mo5nr );
 extern MACHINE_RESET ( mo5nr );
 
+
+/*----------- defined in video/thomson.c -----------*/
 
 /*
    TO7 video:

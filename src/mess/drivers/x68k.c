@@ -141,31 +141,13 @@
 
 struct x68k_system sys;
 
-extern UINT16* gvram;  // Graphic VRAM
-extern UINT16* tvram;  // Text VRAM
 static UINT16* sram;   // SRAM
-extern UINT16* x68k_spriteram;  // sprite/background RAM
-extern UINT16* x68k_spritereg;  // sprite/background registers
 static UINT8 ppi_port[3];
 static int current_vector[8];
 static UINT8 current_irq_line;
 static unsigned int x68k_scanline;
 
 static UINT8 mfp_key;
-
-extern bitmap_t* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
-extern bitmap_t* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
-extern bitmap_t* x68k_gfx_1_bitmap_16;
-extern bitmap_t* x68k_gfx_2_bitmap_16;
-extern bitmap_t* x68k_gfx_3_bitmap_16;
-extern bitmap_t* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
-extern bitmap_t* x68k_gfx_1_bitmap_256;
-extern bitmap_t* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
-
-extern tilemap* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
-extern tilemap* x68k_bg1_8;
-extern tilemap* x68k_bg0_16;  // two 64x64 tilemaps, 16x16 characters
-extern tilemap* x68k_bg1_16;
 
 static emu_timer* kb_timer;
 //emu_timer* mfp_timer[4];
@@ -177,7 +159,8 @@ static emu_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
 
 // MFP is clocked at 4MHz, so at /4 prescaler the timer is triggered after 1us (4 cycles)
 // No longer necessary with the new MFP core
-/*static attotime prescale(int val)
+#ifdef UNUSED_FUNCTION
+static attotime prescale(int val)
 {
     switch(val)
     {
@@ -192,7 +175,8 @@ static emu_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
         default:
             fatalerror("out of range");
     }
-}*/
+}
+#endif
 
 static void mfp_init(void);
 //static TIMER_CALLBACK(mfp_update_irq);
@@ -212,7 +196,8 @@ static void mfp_init()
     timer_adjust_periodic(mfp_irq, attotime_zero, 0, ATTOTIME_IN_USEC(32));
 */
 }
-/*
+
+#ifdef UNUSED_FUNCTION
 TIMER_CALLBACK(mfp_update_irq)
 {
     int x;
@@ -339,7 +324,7 @@ void mfp_set_timer(int timer, unsigned char data)
     logerror("MFP: Timer #%i set to %2.1fus\n",timer, attotime_to_double(prescale(data & 0x07)) * 1000000);
 
 }
-*/
+#endif
 
 // 4 channel DMA controller (Hitachi HD63450)
 static WRITE16_HANDLER( x68k_dmac_w )
@@ -971,7 +956,7 @@ static READ16_HANDLER( x68k_mfp_r )
 	return mc68901_register_r(x68k_mfp, offset);
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER( x68k_mfp_r )
 {
     int ret;
@@ -1033,7 +1018,7 @@ READ16_HANDLER( x68k_mfp_r )
         return 0xff;
     }
 }
-*/
+#endif
 
 static WRITE16_HANDLER( x68k_mfp_w )
 {

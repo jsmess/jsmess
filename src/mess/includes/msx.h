@@ -46,6 +46,7 @@ typedef struct {
 
 /*----------- defined in machine/msx.c -----------*/
 
+extern MSX msx1;
 extern const ppi8255_interface msx_ppi8255_interface;
 
 /* start/stop functions */

@@ -87,7 +87,6 @@ WRITE16_HANDLER( atarist_blitter_dst_w );
 WRITE16_HANDLER( atarist_blitter_count_x_w );
 WRITE16_HANDLER( atarist_blitter_count_y_w );
 WRITE16_HANDLER( atarist_blitter_op_w );
-WRITE16_HANDLER( atarist_blitter_op_w );
 WRITE16_HANDLER( atarist_blitter_ctrl_w );
 
 /* Video */

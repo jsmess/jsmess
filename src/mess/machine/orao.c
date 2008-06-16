@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "sound/dac.h"
 #include "devices/cassette.h"
+#include "includes/orao.h"
 
 UINT8 *orao_memory;
 

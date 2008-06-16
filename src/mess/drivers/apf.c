@@ -320,8 +320,6 @@ static const pia6821_interface apf_imagination_pia_interface=
 };
 
 
-extern unsigned char *apf_video_ram;
-
 static void apf_common_init(void)
 {
 	apf_ints = 0;

@@ -37,7 +37,6 @@ WRITE8_HANDLER ( adam_paddle_toggle_off );
 WRITE8_HANDLER ( adam_paddle_toggle_on );
 WRITE8_HANDLER ( adam_memory_map_controller_w );
 READ8_HANDLER ( adam_memory_map_controller_r );
-READ8_HANDLER ( adam_mem_r );
 READ8_HANDLER ( adam_video_r );
 WRITE8_HANDLER ( adam_video_w );
 WRITE8_HANDLER ( common_writes_w );

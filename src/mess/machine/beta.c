@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
+#include "machine/beta.h"
 
 static int betadisk_status;
 static int betadisk_active;

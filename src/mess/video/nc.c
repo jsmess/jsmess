@@ -39,9 +39,6 @@ PALETTE_INIT( nc )
 	palette_set_colors(machine, 0, nc_palette, ARRAY_LENGTH(nc_palette));
 }
 
-extern int nc_display_memory_start;
-extern UINT8 nc_type;
-
 static int nc200_backlight = 0;
 
 void nc200_video_set_backlight(int state)

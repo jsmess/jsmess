@@ -33,7 +33,6 @@ static UINT8 apf_get_character(int character, int line)
 
 static void apf_vsync_int(int line)
 {
-	extern unsigned int apf_ints;
 	if (line)
 		apf_ints |= 0x10;
 	else

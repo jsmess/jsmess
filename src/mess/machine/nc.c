@@ -17,10 +17,6 @@
 
 /* stores size of actual file on filesystem */
 static int nc_card_size;
-/* pointer to loaded data */
-extern unsigned char *nc_card_ram;
-/* mask used to stop access over end of card ram area */
-extern int nc_membank_card_ram_mask;
 
 /* save card data back */
 static void	nc_card_save(const device_config *image)
