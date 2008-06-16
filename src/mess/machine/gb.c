@@ -38,7 +38,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "includes/gb.h"
-#include "cpu/z80gb/z80gb.h"
+#include "cpu/lr35902/lr35902.h"
 #include "image.h"
 
 /* Memory bank controller types */
@@ -810,7 +810,7 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
-		cpunum_set_reg( 0, Z80GB_IF, data );
+		cpunum_set_reg( 0, LR35902_IF, data );
 		break;
 	}
 
@@ -1350,12 +1350,12 @@ WRITE8_HANDLER ( sgb_io_w )
 /* Interrupt Enable register */
 READ8_HANDLER( gb_ie_r )
 {
-	return cpunum_get_reg( 0, Z80GB_IE );
+	return cpunum_get_reg( 0, LR35902_IE );
 }
 
 WRITE8_HANDLER ( gb_ie_w )
 {
-	cpunum_set_reg( 0, Z80GB_IE, data & 0x1F );
+	cpunum_set_reg( 0, LR35902_IE, data & 0x1F );
 }
 
 /* IO read */
@@ -1375,7 +1375,7 @@ READ8_HANDLER ( gb_io_r )
 			return gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
-			return 0xE0 | cpunum_get_reg( 0, Z80GB_IF );
+			return 0xE0 | cpunum_get_reg( 0, LR35902_IF );
 		default:
 			/* It seems unsupported registers return 0xFF */
 			return 0xFF;
@@ -1869,7 +1869,7 @@ WRITE8_HANDLER ( gbc_io2_w )
 {
 	switch( offset ) {
 		case 0x0D:	/* KEY1 - Prepare speed switch */
-			cpunum_set_reg( 0, Z80GB_SPEED, data );
+			cpunum_set_reg( 0, LR35902_SPEED, data );
 			return;
 		case 0x16:	/* RP - Infrared port */
 			break;
@@ -1886,7 +1886,7 @@ WRITE8_HANDLER ( gbc_io2_w )
 READ8_HANDLER( gbc_io2_r ) {
 	switch( offset ) {
 	case 0x0D:	/* KEY1 */
-		return cpunum_get_reg( 0, Z80GB_SPEED );
+		return cpunum_get_reg( 0, LR35902_SPEED );
 	case 0x16:	/* RP - Infrared port */
 		break;
 	default:

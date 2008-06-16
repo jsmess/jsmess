@@ -13,7 +13,7 @@
 
 #include "driver.h"
 #include "includes/gb.h"
-#include "cpu/z80gb/z80gb.h"
+#include "cpu/lr35902/lr35902.h"
 #include "profiler.h"
 
 
@@ -1626,7 +1626,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
             /* Check for HBLANK DMA */
 			if( gb_lcd.hdma_enabled ) {
 				gbc_hdma(0x10);
-//				cpunum_set_reg( 0, Z80GB_DMA_CYCLES, 36 );
+//				cpunum_set_reg( 0, LR35902_DMA_CYCLES, 36 );
 			} else {
 				gb_lcd.hdma_possible = 1;
 			}
@@ -2114,7 +2114,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 			{
 				/* General DMA */
 				gbc_hdma( ((data & 0x7F) + 1) * 0x10 );
-//				cpunum_set_reg( 0, Z80GB_DMA_CYCLES, 4 + ( ( ( data & 0x7F ) + 1 ) * 32 ) );
+//				cpunum_set_reg( 0, LR35902_DMA_CYCLES, 4 + ( ( ( data & 0x7F ) + 1 ) * 32 ) );
 				data = 0xff;
 			}
 		}
@@ -2127,7 +2127,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 			/* Check if HDMA should be immediately performed */
 			if ( gb_lcd.hdma_possible ) {
 				gbc_hdma( 0x10 );
-//				cpunum_set_reg( 0, Z80GB_DMA_CYCLES, 36 );
+//				cpunum_set_reg( 0, LR35902_DMA_CYCLES, 36 );
 				gb_lcd.hdma_possible = 0;
 			}
 		}

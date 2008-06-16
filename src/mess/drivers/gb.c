@@ -437,7 +437,7 @@ space. This mapper uses 32KB sized banks.
 
 #include "driver.h"
 #include "includes/gb.h"
-#include "cpu/z80gb/z80gb.h"
+#include "cpu/lr35902/lr35902.h"
 #include "devices/cartslot.h"
 #include "rendlay.h"
 #include "gb.lh"
@@ -449,11 +449,11 @@ static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 
 static const UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Color  / Game Boy Advance */
 static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };	/* Megaduck */
 
-static const Z80GB_CONFIG dmg_cpu_reset = { NULL, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
-static const Z80GB_CONFIG sgb_cpu_reset = { sgb_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
-static const Z80GB_CONFIG mgb_cpu_reset = { mgb_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
-static const Z80GB_CONFIG cgb_cpu_reset = { cgb_cpu_regs, 0, gb_timer_callback };
-static const Z80GB_CONFIG megaduck_cpu_reset = { megaduck_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
+static const LR35902_CONFIG dmg_cpu_reset = { NULL, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
+static const LR35902_CONFIG sgb_cpu_reset = { sgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
+static const LR35902_CONFIG mgb_cpu_reset = { mgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
+static const LR35902_CONFIG cgb_cpu_reset = { cgb_cpu_regs, 0, gb_timer_callback };
+static const LR35902_CONFIG megaduck_cpu_reset = { megaduck_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
 
 static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -553,7 +553,7 @@ static const struct CustomSound_interface gameboy_sound_interface =
 
 static MACHINE_DRIVER_START( gameboy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80GB, 4194304)			/* 4.194304 Mhz */
+	MDRV_CPU_ADD_TAG("main", LR35902, 4194304)			/* 4.194304 Mhz */
 	MDRV_CPU_PROGRAM_MAP(gb_map, 0)
 	MDRV_CPU_CONFIG(dmg_cpu_reset)
 	MDRV_CPU_VBLANK_INT("main", gb_scanline_interrupt)	/* 1 dummy int each frame */
@@ -588,7 +588,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supergb )
 	MDRV_IMPORT_FROM(gameboy)
-	MDRV_CPU_REPLACE("main", Z80GB, 4295454)	/* 4.295454 Mhz */
+	MDRV_CPU_REPLACE("main", LR35902, 4295454)	/* 4.295454 Mhz */
 	MDRV_CPU_PROGRAM_MAP(sgb_map, 0)
 
 	MDRV_CPU_MODIFY("main")
@@ -671,7 +671,7 @@ SYSTEM_CONFIG_END
 
 static MACHINE_DRIVER_START( megaduck )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80GB, 4194304)			/* 4.194304 Mhz */
+	MDRV_CPU_ADD_TAG("main", LR35902, 4194304)			/* 4.194304 Mhz */
 	MDRV_CPU_PROGRAM_MAP( megaduck_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", gb_scanline_interrupt)	/* 1 int each scanline ! */
 	MDRV_CPU_CONFIG(megaduck_cpu_reset)
