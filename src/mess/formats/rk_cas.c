@@ -71,6 +71,11 @@ static int rk60_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_60;	
 }
 
+static int gam_cas_to_wav_size( const UINT8 *casdata, int caslen ) {	
+	data_size = caslen;
+	return  (RK_HEADER_LEN  * 8 * 2 +  caslen * 8 * 2) * RK_SIZE_20;	
+}
+
 static int rk20_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
 	int i;
 	INT16 * p = buffer;
@@ -119,6 +124,20 @@ static int rk60_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	return p - buffer;
 }
 
+static int gam_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
+	int i;
+	INT16 * p = buffer;
+	
+	for (i=0; i<RK_HEADER_LEN; i++) {
+		p = rk_output_byte (p, 0x00, RK_SIZE_20 );	
+	}
+	
+	for (i=0; i<data_size; i++)
+		p = rk_output_byte (p, bytes[i], RK_SIZE_20);
+
+	return p - buffer;
+}
+
 static const struct CassetteLegacyWaveFiller rk20_legacy_fill_wave = {
 	rk20_cas_fill_wave,			/* fill_wave */
 	-1,					/* chunk_size */
@@ -153,6 +172,24 @@ static casserr_t rk22_cassette_identify( cassette_image *cassette, struct Casset
 
 static casserr_t rk22_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &rk22_legacy_fill_wave );
+}
+
+static const struct CassetteLegacyWaveFiller gam_legacy_fill_wave = {
+	gam_cas_fill_wave,			/* fill_wave */
+	-1,					/* chunk_size */
+	0,					/* chunk_samples */
+	gam_cas_to_wav_size,			/* chunk_sample_calc */
+	RK_WAV_FREQUENCY,			/* sample_frequency */
+	0,					/* header_samples */
+	0					/* trailer_samples */
+};
+
+static casserr_t gam_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+	return cassette_legacy_identify( cassette, opts, &gam_legacy_fill_wave );
+}
+
+static casserr_t gam_cassette_load( cassette_image *cassette ) {
+	return cassette_legacy_construct( cassette, &gam_legacy_fill_wave );
 }
 
 static const struct CassetteLegacyWaveFiller rk60_legacy_fill_wave = {
@@ -202,7 +239,7 @@ static const struct CassetteFormat rko_cassette_format = {
 };
 
 static const struct CassetteFormat rkr_cassette_format = {
-	"rkr",
+	"rk,rkr",
 	rk20_cassette_identify,
 	rk20_cassette_load,
 	NULL
@@ -229,6 +266,13 @@ static const struct CassetteFormat rkp_cassette_format = {
 	NULL
 };
 
+static const struct CassetteFormat gam_cassette_format = {
+	"gam,g16",
+	gam_cassette_identify,
+	gam_cassette_load,
+	NULL
+};
+
 CASSETTE_FORMATLIST_START(rku_cassette_formats)
 	CASSETTE_FORMAT(rku_cassette_format)
 CASSETTE_FORMATLIST_END
@@ -247,6 +291,7 @@ CASSETTE_FORMATLIST_END
 
 CASSETTE_FORMATLIST_START(rkr_cassette_formats)
 	CASSETTE_FORMAT(rkr_cassette_format)
+	CASSETTE_FORMAT(gam_cassette_format)
 CASSETTE_FORMATLIST_END
 
 CASSETTE_FORMATLIST_START(rka_cassette_formats)
@@ -259,4 +304,8 @@ CASSETTE_FORMATLIST_END
 
 CASSETTE_FORMATLIST_START(rkp_cassette_formats)
 	CASSETTE_FORMAT(rkp_cassette_format)
+CASSETTE_FORMATLIST_END
+
+CASSETTE_FORMATLIST_START(gam_cassette_formats)
+	CASSETTE_FORMAT(gam_cassette_format)
 CASSETTE_FORMATLIST_END
