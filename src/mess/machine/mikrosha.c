@@ -90,6 +90,7 @@ static I8275_DMA_REQUEST(mikrosha_video_dma_request) {
 const i8275_interface mikrosha_i8275_interface = {
 	"main",
 	6,
+	0,
 	mikrosha_video_dma_request,
 	NULL,
 	mikrosha_display_pixels

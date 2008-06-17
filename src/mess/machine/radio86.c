@@ -75,6 +75,7 @@ static I8275_DMA_REQUEST(radio86_video_dma_request) {
 const i8275_interface radio86_i8275_interface = {
 	"main",
 	6,
+	0,
 	radio86_video_dma_request,
 	NULL,
 	radio86_display_pixels

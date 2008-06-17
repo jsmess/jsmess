@@ -75,6 +75,7 @@ static I8275_DMA_REQUEST(apogee_video_dma_request) {
 const i8275_interface apogee_i8275_interface = {
 	"main",
 	6,
+	0,
 	apogee_video_dma_request,
 	NULL,
 	apogee_display_pixels

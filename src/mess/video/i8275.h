@@ -28,8 +28,8 @@ typedef struct _i8275_interface i8275_interface;
 struct _i8275_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	int width;					/* char width in pixels*/
-
+	int width;					/* char width in pixels */
+	int char_delay;				/* delay of display char */
 	i8275_dma_request_func dma_request;
 
 	i8275_int_request_func int_request;

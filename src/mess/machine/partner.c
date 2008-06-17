@@ -74,6 +74,7 @@ static I8275_DMA_REQUEST(partner_video_dma_request) {
 const i8275_interface partner_i8275_interface = {
 	"main",
 	6,
+	1,
 	partner_video_dma_request,
 	NULL,
 	partner_display_pixels
