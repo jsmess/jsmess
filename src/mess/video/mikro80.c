@@ -46,7 +46,7 @@ VIDEO_UPDATE( mikro80 )
 	{
 		for(x = 0; x < 64; x++ )
 		{
-			int code = mikro80_cursor_ram[x + y*64];		
+			int code = mikro80_cursor_ram[(x+1) + y*64];		
 			if (code == 0x80 ) {
 				drawgfx(bitmap, screen->machine->gfx[0],  0xff , 0, 0,0, x*8,y*8,
 					NULL, TRANSPARENCY_NONE, 0);

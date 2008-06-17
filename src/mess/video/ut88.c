@@ -35,11 +35,12 @@ VIDEO_UPDATE( ut88 )
 	{
 		for(x = 0; x < 64; x++ )
 		{
-			int code = ut88_video_ram[ x + y*64 ];		
-			drawgfx(bitmap, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8,
+			int code = ut88_video_ram[ x + y*64 ] & 0x7f;		
+			int attr = ut88_video_ram[ x+1 + y*64 ] & 0x80;
+			drawgfx(bitmap, screen->machine->gfx[0],  code | attr, 0, 0,0, x*8,y*8,
 				NULL, TRANSPARENCY_NONE, 0);
 		}
-	}
+	}	
 	return 0;
 }
 
