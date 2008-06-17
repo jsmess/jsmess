@@ -24,6 +24,14 @@ const gfx_layout mikro80_charlayout =
 	8*8					/* size of one char */
 };
 
+PALETTE_INIT( mikro80 )
+{
+	palette_set_color(machine,0,RGB_BLACK); /* black */	
+	palette_set_color(machine,1,RGB_WHITE); /* white */
+	palette_set_color(machine,2,RGB_WHITE); /* white */	
+	palette_set_color(machine,3,RGB_BLACK); /* black */
+}
+
 VIDEO_START( mikro80 )
 {
 }
@@ -36,23 +44,11 @@ VIDEO_UPDATE( mikro80 )
 	{
 		for(x = 0; x < 64; x++ )
 		{
-			int code = mikro80_video_ram[x + y*64];		
-			drawgfx(bitmap, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8,
+			UINT8 code = mikro80_video_ram [x + y*64 ];
+			UINT8 attr = mikro80_cursor_ram[x+1 + y*64 ] & 0x80 ? 1 : 0;
+			drawgfx(bitmap, screen->machine->gfx[0],  code, attr, 0,0, x*8,y*8,
 				NULL, TRANSPARENCY_NONE, 0);
 		}
 	}
-
-	for(y = 0; y < 32; y++ )
-	{
-		for(x = 0; x < 64; x++ )
-		{
-			int code = mikro80_cursor_ram[(x+1) + y*64];		
-			if (code == 0x80 ) {
-				drawgfx(bitmap, screen->machine->gfx[0],  0xff , 0, 0,0, x*8,y*8,
-					NULL, TRANSPARENCY_NONE, 0);
-			}
-		}
-	}
-	
 	return 0;
 }
