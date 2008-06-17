@@ -52,10 +52,6 @@ static ADDRESS_MAP_START (galaxyp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf000, 0xffff) AM_ROM // ROM D
 ADDRESS_MAP_END
 
-static GFXDECODE_START( galaxy )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, galaxy_charlayout, 0, 2 )
-GFXDECODE_END
-
 /* 2008-05 FP:
 Small note about natural keyboard support. Currently:
 - "List" is mapped to 'ESC'
@@ -170,9 +166,8 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 212)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
-	MDRV_GFXDECODE( galaxy )
-	MDRV_PALETTE_LENGTH(sizeof (galaxy_palette) / 3)
-	MDRV_PALETTE_INIT( galaxy )
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT( black_and_white )
 
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( galaxy )
@@ -200,9 +195,8 @@ static MACHINE_DRIVER_START( galaxyp )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 208)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
-	MDRV_GFXDECODE( galaxy )
-	MDRV_PALETTE_LENGTH(sizeof (galaxy_palette) / 3)
-	MDRV_PALETTE_INIT( galaxy )
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT( black_and_white )
 
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( galaxy )

@@ -12,34 +12,6 @@
 #include "includes/galaxy.h"
 #include "cpu/z80/z80.h"
 
-const gfx_layout galaxy_charlayout =
-{
-	8, 13,				/* 8x8 characters */
-	128,				/* 128 characters */
-	1,				/* 1 bits per pixel */
-	{0},				/* no bitplanes; 1 bit per pixel */
-	{7, 6, 5, 4, 3, 2, 1, 0},
-	{0*128*8, 1*128*8,  2*128*8,  3*128*8,
-	 4*128*8, 5*128*8,  6*128*8,  7*128*8,
-	 8*128*8, 9*128*8, 10*8*128, 11*128*8, 12*128*8},
-	8 				/* each character takes 1 consecutive byte */
-};
-
-const unsigned char galaxy_palette[2*3] =
-{
-	0xff, 0xff, 0xff,		/* White */
-	0x00, 0x00, 0x00		/* Black */
-};
-
-PALETTE_INIT( galaxy )
-{
-	int i;
-
-	for ( i = 0; i < sizeof(galaxy_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, galaxy_palette[i*3], galaxy_palette[i*3+1], galaxy_palette[i*3+2]);
-	}
-}
-
 UINT32 gal_cnt = 0;
 static UINT8 code = 0;
 static UINT8 first = 0;
@@ -52,7 +24,7 @@ TIMER_CALLBACK( gal_video )
 	if (galaxy_interrupts_enabled==TRUE) {
 		UINT8 *gfx = memory_region(REGION_GFX1);
 		UINT8 dat = (gal_latch_value & 0x3c) >> 2;
-		if ((gal_cnt > 48 * 2) && (gal_cnt < 48 * 210)) { // display on screen just first 208 lines
+		if ((gal_cnt >= 48 * 2) && (gal_cnt < 48 * 210)) { // display on screen just first 208 lines
 			UINT8 mode = (gal_latch_value >> 1) & 1; // bit 2 latch represents mode
 			UINT16 addr = (cpunum_get_reg(0, Z80_I) << 8) | cpunum_get_reg(0, Z80_R) | ((gal_latch_value & 0x80) ^ 0x80);
   			if (mode == 0){
@@ -61,12 +33,12 @@ TIMER_CALLBACK( gal_video )
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of double
 		  			// first char in each row
-		  			code = 0xff;
+		  			code = 0x00;
 		  			first = 1;
 				} else {
 					code = program_read_byte(addr) & 0xbf;
 					code += (code & 0x80) >> 1;
-					code = gfx[(code & 0x7f) +(dat << 7 )];
+					code = gfx[(code & 0x7f) +(dat << 7 )] ^ 0xff;
 					first = 0;
 				}
 				y = gal_cnt / 48 - 2;
@@ -87,10 +59,10 @@ TIMER_CALLBACK( gal_video )
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of 4 times
 		  			// first char in each row
-		  			code = 0xff;
+		  			code = 0x00;
 		  			first++;
 				} else {
-					code = program_read_byte(addr);
+					code = program_read_byte(addr) ^ 0xff;
 					first = 0;
 				}
 				y = gal_cnt / 48 - 2;
@@ -101,9 +73,9 @@ TIMER_CALLBACK( gal_video )
 					start_addr = addr;
 				}
 				if ((x/8 >=11) && (x/8<44)) {
-					code = program_read_byte(start_addr + y * 32 + (gal_cnt % 48)-11);
+					code = program_read_byte(start_addr + y * 32 + (gal_cnt % 48)-11) ^ 0xff;
 				} else {
-					code = 0xff;
+					code = 0x00;
 				}
 				/* end of hack */
 				
@@ -121,17 +93,12 @@ TIMER_CALLBACK( gal_video )
 	}	
 }
 
-VIDEO_START ( galaxy )
-{
-	VIDEO_START_CALL ( generic_bitmapped );
-}
-
 VIDEO_UPDATE( galaxy )
 {
 	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, attotime_never);
 	if (galaxy_interrupts_enabled == FALSE) {
 		rectangle black_area = {0,384-1,0,208-1};
-		fillbitmap(tmpbitmap, 1, &black_area);
+		fillbitmap(tmpbitmap, 0, &black_area);
 	}
 	galaxy_interrupts_enabled = FALSE;
 	return VIDEO_UPDATE_CALL ( generic_bitmapped );

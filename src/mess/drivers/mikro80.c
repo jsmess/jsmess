@@ -14,11 +14,6 @@
 #include "devices/cassette.h"
 #include "formats/rk_cas.h"
 
-
-static GFXDECODE_START( mikro80 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, mikro80_charlayout, 0, 2 )
-GFXDECODE_END
-
 /* Address maps */
 static ADDRESS_MAP_START(mikro80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK(1) // First bank
@@ -137,9 +132,8 @@ static MACHINE_DRIVER_START( mikro80 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_PALETTE_INIT(mikro80)
-	MDRV_GFXDECODE( mikro80 )
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(mikro80)
     MDRV_VIDEO_UPDATE(mikro80)

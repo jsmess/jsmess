@@ -30,11 +30,6 @@ extern DRIVER_INIT( galaxyp );
 /*----------- defined in video/galaxy.c -----------*/
 
 extern UINT32 gal_cnt;
-extern const gfx_layout galaxy_charlayout;
-extern const unsigned char galaxy_palette[2*3];
-extern PALETTE_INIT( galaxy );
-
-extern VIDEO_START( galaxy );
 extern VIDEO_UPDATE( galaxy );
 extern TIMER_CALLBACK( gal_video );
 

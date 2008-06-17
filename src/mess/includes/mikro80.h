@@ -24,9 +24,6 @@ extern WRITE8_HANDLER( mikro80_tape_w );
 extern UINT8 *mikro80_video_ram;
 extern UINT8 *mikro80_cursor_ram;
 
-extern PALETTE_INIT( mikro80 );
-extern const gfx_layout mikro80_charlayout;
-
 extern VIDEO_START( mikro80 );
 extern VIDEO_UPDATE( mikro80 );
 
