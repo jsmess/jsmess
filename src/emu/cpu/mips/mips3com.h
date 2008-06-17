@@ -11,6 +11,7 @@
 
 #include "cpuintrf.h"
 #include "mips3.h"
+#include "cpu/vtlb.h"
 
 
 /***************************************************************************
@@ -186,7 +187,7 @@ struct _mips3_state
 	/* COP registers */
 	UINT64			cpr[3][32];
 	UINT64			ccr[3][32];
-	UINT8			cf[3][8];
+	UINT32			llbit;
 
 	/* internal stuff */
 	mips3_flavor	flavor;
@@ -201,14 +202,12 @@ struct _mips3_state
 	data_accessors	memory;
 
 	/* cache memory */
-	UINT32 *		icache;
-	UINT32 *		dcache;
 	size_t			icache_size;
 	size_t			dcache_size;
 
 	/* MMU */
+	vtlb_state *	vtlb;
 	mips3_tlb_entry tlb[MIPS3_TLB_ENTRIES];
-	UINT32 *		tlb_table;
 
 	/* for use by specific implementations */
 	mips3imp_state *impstate;
@@ -220,16 +219,18 @@ struct _mips3_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int), void *memory);
+void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int));
+void mips3com_exit(mips3_state *mips);
+
 void mips3com_reset(mips3_state *mips);
 #ifdef ENABLE_DEBUGGER
 offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 void mips3com_update_cycle_counting(mips3_state *mips);
 
+void mips3com_map_tlb_entry(mips3_state *mips, int tlbindex);
 void mips3com_map_tlb_entries(mips3_state *mips);
-void mips3com_unmap_tlb_entries(mips3_state *mips);
-void mips3com_recompute_tlb_table(mips3_state *mips);
+void mips3com_asid_changed(mips3_state *mips);
 int mips3com_translate_address(mips3_state *mips, int space, int intention, offs_t *address);
 void mips3com_tlbr(mips3_state *mips);
 void mips3com_tlbwi(mips3_state *mips);

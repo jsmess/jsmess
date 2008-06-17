@@ -807,8 +807,9 @@ static void pc_set_keyb_int(int state) {
 	pc_set_irq_line( 1, state );
 }
 
-void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int)) {
-	init_pc_common(flags, set_keyb_int_func);
+void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int))
+{
+	init_pc_common(Machine, flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
 	if ( mess_ram )

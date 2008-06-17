@@ -17,6 +17,8 @@
 #include "window.h"
 #include "winutf8.h"
 #include "uimess.h"
+#include "device.h"
+
 
 
 //============================================================

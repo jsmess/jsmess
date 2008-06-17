@@ -109,7 +109,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/intelfsh.h"
 #include "machine/scsicd.h"
@@ -679,15 +678,15 @@ static READ32_HANDLER(input_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (input_port_read_indexed(machine, 0) & 0xff) << 24;
+		r |= (input_port_read(machine, "IN0") & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (input_port_read_indexed(machine, 1) & 0xff) << 8;
+		r |= (input_port_read(machine, "IN1") & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (input_port_read_indexed(machine, 2) & 0xff);
+		r |= (input_port_read(machine, "IN2") & 0xff);
 	}
 
 	return r;
@@ -697,11 +696,11 @@ static READ32_HANDLER( sensor_r )
 {
 	if (offset == 0)
 	{
-		return input_port_read_indexed(machine, 3) | 0x01000100;
+		return input_port_read(machine, "SENSOR1") | 0x01000100;
 	}
 	else
 	{
-		return input_port_read_indexed(machine, 4) | 0x01000100;
+		return input_port_read(machine, "SENSOR2") | 0x01000100;
 	}
 }
 
@@ -855,14 +854,14 @@ static UINT8  atapi_scsi_packet[32*1024];
 static int atapi_data_ptr, atapi_xferlen, atapi_xfermod, atapi_cdata_wait;
 static int atapi_drivesel;
 
-static void atapi_cause_irq(void)
+static void atapi_cause_irq(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ4, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ4, ASSERT_LINE);
 }
 
-static void atapi_clear_irq(void)
+static void atapi_clear_irq(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ4, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ4, CLEAR_LINE);
 }
 
 static void atapi_exit(running_machine* machine)
@@ -905,7 +904,7 @@ static void atapi_reset(void)
 
 
 
-static UINT16 atapi_command_reg_r(int reg)
+static UINT16 atapi_command_reg_r(running_machine *machine, int reg)
 {
 	int i, data;
 	static UINT8 temp_data[64*1024];
@@ -918,7 +917,7 @@ static UINT16 atapi_command_reg_r(int reg)
 		if (atapi_data_ptr == 0)
 		{
 			//printf("ATAPI: dropping DRQ\n");
-			atapi_cause_irq();
+			atapi_cause_irq(machine);
 			atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
 			// get the data from the device
@@ -938,7 +937,7 @@ static UINT16 atapi_command_reg_r(int reg)
 		if (atapi_xfermod && atapi_data_ptr == (atapi_xferlen/2))
 		{
 			//printf("ATAPI: DRQ interrupt\n");
-			atapi_cause_irq();
+			atapi_cause_irq(machine);
 			atapi_regs[ATAPI_REG_CMDSTATUS] |= ATAPI_STAT_DRQ;
 			atapi_data_ptr = 0;
 
@@ -963,12 +962,12 @@ static UINT16 atapi_command_reg_r(int reg)
 	else
 	{
 		if (reg == ATAPI_REG_CMDSTATUS)
-			atapi_clear_irq();
+			atapi_clear_irq(machine);
 		return atapi_regs[reg];
 	}
 }
 
-static void atapi_command_reg_w(int reg, UINT16 data)
+static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 {
 	int i;
 
@@ -994,7 +993,7 @@ static void atapi_command_reg_w(int reg, UINT16 data)
 				SCSIWriteData( atapi_device_data[atapi_drivesel], atapi_scsi_packet, atapi_cdata_wait );
 
 				// assert IRQ
-				atapi_cause_irq();
+				atapi_cause_irq(machine);
 
 				// not sure here, but clear DRQ at least?
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
@@ -1011,7 +1010,7 @@ static void atapi_command_reg_w(int reg, UINT16 data)
 			atapi_regs[ATAPI_REG_CMDSTATUS] |= ATAPI_STAT_BSY;
 
 			// assert IRQ
-			atapi_cause_irq();
+			atapi_cause_irq(machine);
 
 			// decompose SCSI packet into proper byte order
 			for (i = 0; i < 16; i += 2)
@@ -1173,12 +1172,12 @@ static READ32_HANDLER( atapi_command_r )
 //  printf("atapi_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = atapi_command_reg_r(offset*2);
+		r = atapi_command_reg_r(machine, offset*2);
 		return ATAPI_ENDIAN(r) << 16;
 	}
 	else
 	{
-		r = atapi_command_reg_r((offset*2) + 1);
+		r = atapi_command_reg_r(machine, (offset*2) + 1);
 		return ATAPI_ENDIAN(r) << 0;
 	}
 }
@@ -1189,11 +1188,11 @@ static WRITE32_HANDLER( atapi_command_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		atapi_command_reg_w(offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
+		atapi_command_reg_w(machine, offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
 	}
 	else
 	{
-		atapi_command_reg_w((offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
+		atapi_command_reg_w(machine, (offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
 	}
 }
 
@@ -1395,11 +1394,11 @@ static READ32_HANDLER( keyboard_wheel_r )
 {
 	if (offset == 0)		// Keyboard Wheel (P1)
 	{
-		return input_port_read_indexed(machine, 3) << 24;
+		return input_port_read(machine, "WHEEL_P1") << 24;
 	}
 	else if (offset == 2)	// Keyboard Wheel (P2)
 	{
-		return input_port_read_indexed(machine, 4) << 24;
+		return input_port_read(machine, "WHEEL_P2") << 24;
 	}
 
 	return 0;
@@ -1482,12 +1481,13 @@ static const int keyboard_notes[24] =
 static TIMER_CALLBACK( keyboard_timer_callback )
 {
 	static const int kb_uart_channel[2] = { 1, 0 };
+	static const char *keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
 	int keyboard;
 	int i;
 
 	for (keyboard=0; keyboard < 2; keyboard++)
 	{
-		UINT32 kbstate = input_port_read_indexed(machine, 5 + keyboard);
+		UINT32 kbstate = input_port_read(machine, keynames[keyboard]);
 		int uart_channel = kb_uart_channel[keyboard];
 
 		if (kbstate != keyboard_state[keyboard])

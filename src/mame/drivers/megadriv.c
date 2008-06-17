@@ -370,7 +370,7 @@ static void vdp_vsram_write(UINT16 data)
 	megadrive_vdp_address &=0xffff;
 }
 
-static void write_cram_value(int offset, int data)
+static void write_cram_value(running_machine *machine, int offset, int data)
 {
 	megadrive_vdp_cram[offset] = data;
 
@@ -381,7 +381,7 @@ static void write_cram_value(int offset, int data)
 	  	r = ((data >> 1)&0x07);
 		g = ((data >> 5)&0x07);
 		b = ((data >> 9)&0x07);
-		palette_set_color_rgb(Machine,offset,pal3bit(r),pal3bit(g),pal3bit(b));
+		palette_set_color_rgb(machine,offset,pal3bit(r),pal3bit(g),pal3bit(b));
 		megadrive_vdp_palette_lookup[offset] = (b<<2) | (g<<7) | (r<<12);
 		megadrive_vdp_palette_lookup_shadow[offset] = (b<<1) | (g<<6) | (r<<11);
 		megadrive_vdp_palette_lookup_highlight[offset] = ((b|0x08)<<1) | ((g|0x08)<<6) | ((r|0x08)<<11);
@@ -389,12 +389,12 @@ static void write_cram_value(int offset, int data)
 	}
 }
 
-static void vdp_cram_write(UINT16 data)
+static void vdp_cram_write(running_machine *machine, UINT16 data)
 {
 	int offset;
 	offset = (megadrive_vdp_address&0x7e)>>1;
 
-	write_cram_value(offset,data);
+	write_cram_value(machine, offset,data);
 
 	megadrive_vdp_address+=MEGADRIVE_REG0F_AUTO_INC;
 
@@ -402,7 +402,7 @@ static void vdp_cram_write(UINT16 data)
 }
 
 
-static void megadriv_vdp_data_port_w(int data)
+static void megadriv_vdp_data_port_w(running_machine *machine, int data)
 {
 	megadrive_vdp_command_pending = 0;
 
@@ -471,7 +471,7 @@ static void megadriv_vdp_data_port_w(int data)
 				break;
 
 			case 0x0003:
-				vdp_cram_write(data);
+				vdp_cram_write(machine, data);
 				break;
 
 			case 0x0004:
@@ -498,7 +498,7 @@ static void megadriv_vdp_data_port_w(int data)
 
 
 
-static void megadrive_vdp_set_register(int regnum, UINT8 value)
+static void megadrive_vdp_set_register(running_machine *machine, int regnum, UINT8 value)
 {
 	megadrive_vdp_register[regnum] = value;
 
@@ -513,9 +513,9 @@ static void megadrive_vdp_set_register(int regnum, UINT8 value)
 		if (megadrive_irq4_pending)
 		{
 			if (MEGADRIVE_REG0_IRQ4_ENABLE)
-				cpunum_set_input_line(Machine, 0,4,HOLD_LINE);
+				cpunum_set_input_line(machine, 0,4,HOLD_LINE);
 			else
-				cpunum_set_input_line(Machine, 0,4,CLEAR_LINE);
+				cpunum_set_input_line(machine, 0,4,CLEAR_LINE);
 		}
 
 		/* ??? Fatal Rewind needs this but I'm not sure it's accurate behavior
@@ -530,9 +530,9 @@ static void megadrive_vdp_set_register(int regnum, UINT8 value)
 		if (megadrive_irq6_pending)
 		{
 			if (MEGADRIVE_REG01_IRQ6_ENABLE)
-				cpunum_set_input_line(Machine, 0,6,HOLD_LINE);
+				cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 			else
-				cpunum_set_input_line(Machine, 0,6,CLEAR_LINE);
+				cpunum_set_input_line(machine, 0,6,CLEAR_LINE);
 		}
 
 		/* ??? */
@@ -660,7 +660,7 @@ static void megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length)
 }
 
 
-static void megadrive_do_insta_68k_to_cram_dma(UINT32 source,UINT16 length)
+static void megadrive_do_insta_68k_to_cram_dma(running_machine *machine,UINT32 source,UINT16 length)
 {
 	int count;
 
@@ -670,7 +670,7 @@ static void megadrive_do_insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 	{
 		//if (megadrive_vdp_address>=0x80) return; // abandon
 
-		write_cram_value((megadrive_vdp_address&0x7e)>>1, vdp_get_word_from_68k_mem(source));
+		write_cram_value(machine, (megadrive_vdp_address&0x7e)>>1, vdp_get_word_from_68k_mem(source));
 		source+=2;
 
 		if (source>0xffffff) source = 0xfe0000;
@@ -716,7 +716,7 @@ static void megadrive_do_insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
 }
 
 /* This can be simplified quite a lot.. */
-static void handle_dma_bits(void)
+static void handle_dma_bits(running_machine *machine)
 {
 
 	if (megadrive_vdp_code&0x20)
@@ -778,7 +778,7 @@ static void handle_dma_bits(void)
 
 			/* The 68k is frozen during this transfer, it should be safe to throw a few cycles away and do 'instant' DMA because the 68k can't detect it being in progress (can the z80?) */
 			//mame_printf_debug("68k->CRAM DMA transfer source %06x length %04x dest %04x enabled %01x\n", source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE);
-			if (MEGADRIVE_REG01_DMA_ENABLE) megadrive_do_insta_68k_to_cram_dma(source,length);
+			if (MEGADRIVE_REG01_DMA_ENABLE) megadrive_do_insta_68k_to_cram_dma(machine,source,length);
 		}
 		else if (MEGADRIVE_REG17_DMATYPE==0x2)
 		{
@@ -848,7 +848,7 @@ static void handle_dma_bits(void)
 	}
 }
 
-static void megadriv_vdp_ctrl_port_w(int data)
+static void megadriv_vdp_ctrl_port_w(running_machine *machine, int data)
 {
 //  logerror("write to vdp control port %04x\n",data);
 	megadrive_vram_fill_pending = 0; // ??
@@ -860,7 +860,7 @@ static void megadriv_vdp_ctrl_port_w(int data)
 		megadrive_vdp_command_part2 = data;
 
 		update_megadrive_vdp_code_and_address();
-		handle_dma_bits();
+		handle_dma_bits(machine);
 
 		//logerror("VDP Write Part 2 setting Code %02x Address %04x\n",megadrive_vdp_code, megadrive_vdp_address);
 
@@ -874,7 +874,7 @@ static void megadriv_vdp_ctrl_port_w(int data)
 
 			if (regnum &0x20) mame_printf_debug("reg error\n");
 
-			megadrive_vdp_set_register(regnum&0x1f,value);
+			megadrive_vdp_set_register(machine, regnum&0x1f,value);
 			megadrive_vdp_code = 0;
 			megadrive_vdp_address = 0;
 		}
@@ -905,13 +905,13 @@ static WRITE16_HANDLER( megadriv_vdp_w )
 				data = (data&0xff00) | data>>8;
 			//  mame_printf_debug("8-bit write VDP data port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
 			}
-			megadriv_vdp_data_port_w(data);
+			megadriv_vdp_data_port_w(machine, data);
 			break;
 
 		case 0x04:
 		case 0x06:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit write VDP control port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
-			megadriv_vdp_ctrl_port_w(data);
+			megadriv_vdp_ctrl_port_w(machine, data);
 			break;
 
 		case 0x08:
@@ -950,11 +950,11 @@ static UINT16 vdp_cram_r(void)
 	return megadrive_vdp_cram[(megadrive_vdp_address&0x7e)>>1];
 }
 
-static UINT16 megadriv_vdp_data_port_r(void)
+static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 {
 	UINT16 retdata=0;
 
-	//return mame_rand(Machine);
+	//return mame_rand(machine);
 
 	megadrive_vdp_command_pending = 0;
 
@@ -968,12 +968,12 @@ static UINT16 megadriv_vdp_data_port_r(void)
 
 		case 0x0001:
 			logerror("Attempting to READ from DATA PORT in VRAM WRITE MODE\n");
-			retdata = mame_rand(Machine);
+			retdata = mame_rand(machine);
 			break;
 
 		case 0x0003:
 			logerror("Attempting to READ from DATA PORT in CRAM WRITE MODE\n");
-			retdata = mame_rand(Machine);
+			retdata = mame_rand(machine);
 			break;
 
 		case 0x0004:
@@ -994,7 +994,7 @@ static UINT16 megadriv_vdp_data_port_r(void)
 
 		default:
 			logerror("Attempting to READ from DATA PORT in #UNDEFINED# MODE\n");
-			retdata = mame_rand(Machine);
+			retdata = mame_rand(machine);
 			break;
 	}
 
@@ -1294,7 +1294,7 @@ static READ16_HANDLER( megadriv_vdp_r )
 		case 0x00:
 		case 0x02:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read data port access, offset %04x mem_mask %04x\n",offset,mem_mask);
-			retvalue = megadriv_vdp_data_port_r();
+			retvalue = megadriv_vdp_data_port_r(machine);
 			break;
 
 		case 0x04:
@@ -1438,8 +1438,9 @@ static void init_megadri6_io(void)
 /* pointers to our io data read/write functions */
 static UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
 static void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
+
 INPUT_PORTS_START( megadri6 )
-	PORT_START /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD1")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1454,7 +1455,7 @@ INPUT_PORTS_START( megadri6 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 MODE") // mode
 
 
-	PORT_START /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD2")		/* Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1468,12 +1469,12 @@ INPUT_PORTS_START( megadri6 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Z") // z
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 MODE") // mode
 
-	PORT_START /* 3rd I/O port */
+	PORT_START_TAG("IN0")		/* 3rd I/O port */
 
-	PORT_START_TAG("RESET") /* Buttons on Genesis Console */
+	PORT_START_TAG("RESET")		/* Buttons on Genesis Console */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-	PORT_START_TAG("REGION") /* Buttons on Genesis Console */
+	PORT_START_TAG("REGION")	/* Buttons on Genesis Console */
 	/* Region setting for Console */
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1486,7 +1487,7 @@ INPUT_PORTS_END
 
 
 INPUT_PORTS_START( ssf2ghw )
-	PORT_START /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD1")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1501,7 +1502,7 @@ INPUT_PORTS_START( ssf2ghw )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
 
-	PORT_START /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD2")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1515,14 +1516,14 @@ INPUT_PORTS_START( ssf2ghw )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START /* 3rd I/O port */
+	PORT_START_TAG("IN0")		/* 3rd I/O port */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 
-//  PORT_START_TAG("RESET") /* Buttons on Genesis Console */
+//  PORT_START_TAG("RESET")     /* Buttons on Genesis Console */
 //  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-//  PORT_START_TAG("REGION") /* Buttons on Genesis Console */
+//  PORT_START_TAG("REGION")    /* Buttons on Genesis Console */
 //  /* Region setting for Console */
 //  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 //  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1616,7 +1617,7 @@ INPUT_PORTS_END
 */
 
 INPUT_PORTS_START( megadriv )
-	PORT_START /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1626,7 +1627,7 @@ INPUT_PORTS_START( megadriv )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") // c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 START") // start
 
-	PORT_START /* Joypad 2 (3 button + start) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1636,12 +1637,12 @@ INPUT_PORTS_START( megadriv )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") // c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 START") // start
 
-	PORT_START /* 3rd I/O port */
+	PORT_START_TAG("IN0")		/* 3rd I/O port */
 
-	PORT_START_TAG("RESET") /* Buttons on Genesis Console */
+	PORT_START_TAG("RESET")		/* Buttons on Genesis Console */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-	PORT_START_TAG("REGION") /* Region setting for Console */
+	PORT_START_TAG("REGION")	/* Region setting for Console */
 	/* Region setting for Console */
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1652,7 +1653,7 @@ INPUT_PORTS_END
 
 
 INPUT_PORTS_START( aladbl )
-	PORT_START /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1662,7 +1663,7 @@ INPUT_PORTS_START( aladbl )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump") // c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
 
-	PORT_START /* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
+	PORT_START_TAG("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
 //  PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 //  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 //  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1672,12 +1673,12 @@ INPUT_PORTS_START( aladbl )
 //  PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Jump") // c
 //  PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) // start
 
-	PORT_START /* 3rd I/O port */
+	PORT_START_TAG("IN0")		/* 3rd I/O port */
 
-//  PORT_START_TAG("RESET") /* Buttons on Genesis Console */
+//  PORT_START_TAG("RESET")     /* Buttons on Genesis Console */
 //  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-//  PORT_START_TAG("REGION") /* Region setting for Console */
+//  PORT_START_TAG("REGION")    /* Region setting for Console */
 //  /* Region setting for Console */
 //  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 //  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1707,22 +1708,20 @@ INPUT_PORTS_START( aladbl )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)     /* needed to avoid credits getting mad */
 INPUT_PORTS_END
 
-
-#define MODE_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x800) >> 11 )
-#define Z_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x400) >> 10 )
-#define Y_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x200) >> 9 )
-#define X_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x100) >> 8 )
-
+#define MODE_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x800) >> 11 )
+#define Z_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x400) >> 10 )
+#define Y_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x200) >> 9 )
+#define X_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x100) >> 8 )
 
 #define START_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x80) >> 7 )
-#define C_BUTTON(player)     ( (input_port_read_indexed(Machine, player) & 0x40) >> 6 )
-#define B_BUTTON(player)     ( (input_port_read_indexed(Machine, player) & 0x20) >> 5 )
-#define A_BUTTON(player)     ( (input_port_read_indexed(Machine, player) & 0x10) >> 4 )
+#define C_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x40) >> 6 )
+#define B_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x20) >> 5 )
+#define A_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x10) >> 4 )
 #define RIGHT_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x08) >> 3 )
-#define LEFT_BUTTON(player)  ( (input_port_read_indexed(Machine, player) & 0x04) >> 2 )
-#define DOWN_BUTTON(player)  ( (input_port_read_indexed(Machine, player) & 0x02) >> 1 )
-#define UP_BUTTON(player)    ( (input_port_read_indexed(Machine, player) & 0x01) >> 0 )
-#define MD_RESET_BUTTON      ( (input_port_read_safe(Machine, "RESET",0x00)      & 0x01) >> 0 )
+#define LEFT_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x04) >> 2 )
+#define DOWN_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x02) >> 1 )
+#define UP_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x01) >> 0 )
+#define MD_RESET_BUTTON		 ( (input_port_read_safe(Machine, "RESET", 0x00) & 0x01) >> 0 )
 
 static UINT8 megadrive_io_data_regs[3];
 static UINT8 megadrive_io_ctrl_regs[3];
@@ -4755,7 +4754,7 @@ MACHINE_RESET( megadriv )
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
 
-	switch (input_port_read_safe(machine, "REGION",0x00))
+	switch (input_port_read_safe(machine, "REGION", 0x00))
 	{
 
 		case 1: // US

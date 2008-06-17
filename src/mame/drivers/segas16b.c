@@ -930,7 +930,7 @@ static const UINT8 *i8751_initial_config;
  *************************************/
 
 extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
+extern void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
 
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
@@ -1062,7 +1062,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	segaic16_memory_mapper_init(machine, 0, region_info_list[rom_board], sound_w, NULL);
 
 	/* init the FD1094 */
-	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
+	fd1094_driver_init(machine, segaic16_memory_mapper_set_decrypted);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;
@@ -5585,9 +5585,9 @@ ROM_END
     ROM Board: 171-5704
 */
 ROM_START( tetris2 )
-	ROM_REGION( 0x020000, REGION_CPU1, 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr12193.rom", 0x000000, 0x10000, CRC(9ce15ac9) SHA1(0fdbd3ca37e4c0efa7c66415714bfc10637ced6c) )
-	ROM_LOAD16_BYTE( "epr12192.rom", 0x000001, 0x10000, CRC(98d590ca) SHA1(4d18409c0b5734d0adcea5646d13f65b687dd05d) )
+	ROM_REGION( 0x040000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr12193.a7", 0x000000, 0x20000, CRC(44466ed4) SHA1(ddb4f0310987e54ce4cd9ffa2813e2d1309aeaaa) )
+	ROM_LOAD16_BYTE( "epr12192.a5", 0x000001, 0x20000, CRC(a1c8af00) SHA1(a8e4b289eb3939d6798bb78df1b4ae51c8ccc2d6) )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 )	/* decryption key */
 	ROM_LOAD( "317-0092.key", 0x0000, 0x2000, CRC(d10e1ad9) SHA1(26e81b5f62d96ea50bf203f66dc3643f29dd1596) )

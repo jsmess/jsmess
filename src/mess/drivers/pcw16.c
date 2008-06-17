@@ -1364,7 +1364,7 @@ static MACHINE_RESET( pcw16 )
 	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, NS16550, "ns16550_0" ) );
 
 	/* initialise keyboard */
-	at_keyboard_init(AT_KEYBOARD_TYPE_AT);
+	at_keyboard_init(machine, AT_KEYBOARD_TYPE_AT);
 	at_keyboard_set_scan_code_set(3);
 
 	pcw16_reset(machine);

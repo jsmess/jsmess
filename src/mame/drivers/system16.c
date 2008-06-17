@@ -169,9 +169,6 @@ DIP locations verified from manual for:
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
 
-void fd1094_machine_init(void);
-void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
-
 static void sys16_video_config(void (*update)(void), int sprxoffs, const int *bank)
 {
 	static const int bank_default[16] =
@@ -2633,6 +2630,8 @@ ROM_START( passht4b )
 	ROM_LOAD( "pas4p.1",  0x00000, 0x08000, CRC(e60fb017) SHA1(21298036eab55c74427f1c2e3a9623d41bca4849) )
 	ROM_LOAD( "pas4p.2",  0x10000, 0x10000, CRC(092e016e) SHA1(713638749efa9dce19c547b84308236110bc85fe) )
 ROM_END
+
+/* Passing Shot Bootleg is a decrypted version of Passing Shot Japanese (passshtj). It has been heavily modified */
 
 ROM_START( passshtb )
 	ROM_REGION( 0x020000, REGION_CPU1, 0 ) /* 68000 code */

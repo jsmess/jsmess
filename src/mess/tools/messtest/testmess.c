@@ -235,7 +235,7 @@ static void dump_screenshot(running_machine *machine, int write_file)
 			/* did we find a live screen? */
 			if (screen != NULL)
 			{
-				video_screen_save_snapshot(screen, fp);
+				video_screen_save_snapshot(screen->machine, screen, fp);
 				report_message(MSG_INFO, "Saved screenshot as %s", buf);
 			}
 			else

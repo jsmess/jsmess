@@ -13,7 +13,6 @@
 #define __MACHINE_SNES_C
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/snes.h"
 #include "cpu/g65816/g65816.h"
 #ifdef MESS
@@ -62,10 +61,10 @@ static struct
 } joypad[4];
 
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
-static void snes_latch_counters(void)
+static void snes_latch_counters(running_machine *machine)
 {
-	snes_ppu.beam.current_horz = video_screen_get_hpos(Machine->primary_screen) / snes_htmult;
-	snes_ppu.beam.latch_vert = video_screen_get_vpos(Machine->primary_screen);
+	snes_ppu.beam.current_horz = video_screen_get_hpos(machine->primary_screen) / snes_htmult;
+	snes_ppu.beam.latch_vert = video_screen_get_vpos(machine->primary_screen);
 	snes_ppu.beam.latch_horz = snes_ppu.beam.current_horz;
 	snes_ram[STAT78] |= 0x40;	// indicate we latched
 	read_ophct = read_opvct = 0;	// clear read flags
@@ -82,13 +81,13 @@ static TIMER_CALLBACK( snes_nmi_tick )
 	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
 }
 
-static void snes_hirq_tick(void)
+static void snes_hirq_tick(running_machine *machine)
 {
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
-	snes_latch_counters();
+	snes_latch_counters(machine);
 	snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
-	cpunum_set_input_line(Machine, 0, G65816_LINE_IRQ, HOLD_LINE );
+	cpunum_set_input_line(machine, 0, G65816_LINE_IRQ, HOLD_LINE );
 
 	// don't happen again
 	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
@@ -96,7 +95,7 @@ static void snes_hirq_tick(void)
 
 static TIMER_CALLBACK( snes_hirq_tick_callback )
 {
-	snes_hirq_tick();
+	snes_hirq_tick(machine);
 }
 
 static TIMER_CALLBACK( snes_scanline_tick )
@@ -117,7 +116,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		{
 			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
 			// IRQ latches the counters, do it now
-			snes_latch_counters();
+			snes_latch_counters(machine);
 			cpunum_set_input_line(machine, 0, G65816_LINE_IRQ, HOLD_LINE );
 		}
 	}
@@ -141,7 +140,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 //          printf("HIRQ @ %d, %d\n", pixel*snes_htmult, snes_ppu.beam.current_vert);
 			if (pixel == 0)
 			{
-				snes_hirq_tick();
+				snes_hirq_tick(machine);
 			}
 			else
 			{
@@ -176,14 +175,14 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	{
 		int i;
 
-		joypad[0].low = input_port_read_indexed(machine,  0 );
-		joypad[0].high = input_port_read_indexed(machine,  1 );
-		joypad[1].low = input_port_read_indexed(machine,  2 );
-		joypad[1].high = input_port_read_indexed(machine,  3 );
-		joypad[2].low = input_port_read_indexed(machine,  4 );
-		joypad[2].high = input_port_read_indexed(machine,  5 );
-		joypad[3].low = input_port_read_indexed(machine,  6 );
-		joypad[3].high = input_port_read_indexed(machine,  7 );
+		joypad[0].low  = input_port_read(machine, "PAD1L");
+		joypad[0].high = input_port_read(machine, "PAD1H");
+		joypad[1].low  = input_port_read(machine, "PAD2L");
+		joypad[1].high = input_port_read(machine, "PAD2H");
+		joypad[2].low  = input_port_read(machine, "PAD3L");
+		joypad[2].high = input_port_read(machine, "PAD3H");
+		joypad[3].low  = input_port_read(machine, "PAD4L");
+		joypad[3].high = input_port_read(machine, "PAD4H");
 
 		// avoid sending signals that could crash games
 		for (i = 0; i < 4; i++)
@@ -729,7 +728,7 @@ READ8_HANDLER( snes_r_io )
 				return snes_ram[offset];
 			}
 		case SLHV:		/* Software latch for H/V counter */
-			snes_latch_counters();
+			snes_latch_counters(machine);
 			return 0x0;		/* Return value is meaningless */
 		case ROAMDATA:	/* Read data from OAM (DR) */
 			{
@@ -953,9 +952,9 @@ READ8_HANDLER( snes_r_io )
 #ifndef MESS
 		case 0x4100:		/* NSS Dip-Switches */
 #ifdef MAME_DEBUG
-			return input_port_read_indexed(machine, 12);
+			return input_port_read_safe(machine, "DEBUG1", 0);
 #else
-			return input_port_read_indexed(machine, 9);
+			return input_port_read(machine, "DSW");
 #endif	/* MAME_DEBUG */
 //      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr
 //      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc
@@ -1384,7 +1383,7 @@ WRITE8_HANDLER( snes_w_io )
 			if (!(snes_ram[WRIO] & 0x80) && (data & 0x80))
 			{
 				// external latch
-				snes_latch_counters();
+				snes_latch_counters(machine);
 			}
 		case WRMPYA:	/* Multiplier A */
 			break;

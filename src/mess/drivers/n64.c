@@ -71,12 +71,12 @@ static const mips3_config config =
 
 static INTERRUPT_GEN( n64_vblank )
 {
-	signal_rcp_interrupt(VI_INTERRUPT);
+	signal_rcp_interrupt(machine, VI_INTERRUPT);
 }
 
 static MACHINE_RESET( n64 )
 {
-	n64_machine_reset();
+	n64_machine_reset(machine);
 }
 
 static MACHINE_DRIVER_START( n64 )
