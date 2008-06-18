@@ -30,7 +30,7 @@ DEVICE_GET_INFO(microdrv)
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(microdrv); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Sinclair QL Microdrive"; break;
+		case DEVINFO_STR_NAME:							info->s = "Microdrive"; break;
 		case DEVINFO_STR_FAMILY:						info->s = "Microdrive"; break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__; break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "mdv"; break;
