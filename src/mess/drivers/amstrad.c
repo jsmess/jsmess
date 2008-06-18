@@ -2086,7 +2086,8 @@ static MACHINE_RESET( amstrad )
 	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0x018000];
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
-
+	amstrad_init_palette(machine);
+	
 	multiface_init();
 
 }
@@ -2921,7 +2922,7 @@ static MACHINE_DRIVER_START( amstrad )
 	/* Amstrad Monitor Visible AREA : 768x272 */
 	MDRV_SCREEN_VISIBLE_AREA(0, ((AMSTRAD_SCREEN_WIDTH-32) - 1), 0, ((AMSTRAD_SCREEN_HEIGHT-40) - 1))
 	MDRV_PALETTE_LENGTH(32)
-	MDRV_PALETTE_INIT(amstrad_cpc)
+//	MDRV_PALETTE_INIT(amstrad_cpc)
 
 	MDRV_VIDEO_START(amstrad)
 	MDRV_VIDEO_UPDATE(amstrad)

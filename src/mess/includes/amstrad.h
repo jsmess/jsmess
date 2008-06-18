@@ -50,6 +50,7 @@ void amstrad_setUpperRom(running_machine *machine);
 
 void AmstradCPC_SetUpperRom(running_machine *machine, int);
 void AmstradCPC_PALWrite(running_machine *machine, int);
+void amstrad_init_palette(running_machine* machine);
 
 
 /*----------- defined in machine/amstrad.c -----------*/
