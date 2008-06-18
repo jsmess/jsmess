@@ -12,6 +12,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [ABC80] Fixed graphics mode and lower case natural input. [Curt Coder]
+
 - [AMIGA] Fixed Keyboard. (bug #1590) [Roberto Zandona']
 
 - [AMIGACD / AMIGAFDC] Fixed a couple of regressions introduced in 0.125.
@@ -20,6 +22,8 @@ System Driver Changes:
 - [B2M] Added SHA-1's.  [Fabio Priuli]
 
 - [BK] Added SHA-1's.  [Fabio Priuli]
+
+- [BW2] System is now working. [Curt Coder]
 
 - [C128] fix for c128 keyboard (bug #1240) [Roberto Zandona']
 
@@ -81,6 +85,8 @@ System Driver Changes:
 
 - [PRAV8DD] Merged prav8dda.  [Fabio Priuli]
 
+- [QL] Fixed lower case natural input. [Curt Coder]
+
 - [TI99] Fixed disk controller.  [Michael Zapf]
 
 - [SATURN] Fixed mem_mask regressions.  [R. Belmont]
@@ -90,6 +96,8 @@ System Driver Changes:
 - [SCORPION] Added SHA-1's.  [Fabio Priuli]
 
 - [SG1000] Added .bin extension.  [Fabio Priuli]
+
+- [SF7000] Fixed lower case natural input. [Curt Coder]
 
 - [SMS] Added .bin extension.  [Fabio Priuli]
 
