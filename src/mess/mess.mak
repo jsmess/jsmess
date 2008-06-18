@@ -172,7 +172,7 @@ CPUS += PENTIUM
 #CPUS += MEDIAGX
 #CPUS += I960
 #CPUS += H83002
-#CPUS += V810
+CPUS += V810
 #CPUS += M37702
 #CPUS += M37710
 #CPUS += PPC403GA
@@ -853,7 +853,8 @@ $(MESSOBJ)/veb.a:      \
 $(MESSOBJ)/nec.a:	   \
 	$(MAME_VIDEO)/vdc.o	 \
 	$(MESS_MACHINE)/pce.o	 \
-	$(MESS_DRIVERS)/pce.o
+	$(MESS_DRIVERS)/pce.o	\
+	$(MESS_DRIVERS)/pcfx.o
 
 $(MESSOBJ)/necpc.a:	   \
 	$(MESS_DRIVERS)/pc8801.o	 \
