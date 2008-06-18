@@ -20,14 +20,10 @@
 
   http://www2.okisemi.com/site/productscatalog/displaydrivers/availabledocuments/Intro-7090.html
 
-  TODO:
 
-	- fix floppy (the wd17xx code doesn't send any DRQ_SET events, so loading is impossible)
+	TODO:
 
-		1. CPU is set to HALT state
-		2. FDC triggers DRQ, which triggers NMI to the CPU
-		3. CPU reads byte from FDC in NMI handler
-		4. FDC clears DRQ
+	- modem card
 
 ***************************************************************************/
 
@@ -288,11 +284,16 @@ static DEVICE_IMAGE_LOAD( bw2_floppy )
 		return INIT_FAIL;
 	}
 
-	if (image_length(image) == 80*1*18*256)
+	if (device_load_basicdsk_floppy(image) == INIT_PASS)
 	{
-		if (device_load_basicdsk_floppy(image) == INIT_PASS)
+		switch (image_length(image))
 		{
-			basicdsk_set_geometry(image, 80, 1, 18, 256, 1, 0, FALSE);
+		case 80*1*17*256: // 340K
+			basicdsk_set_geometry(image, 80, 1, 17, 256, 0, 0, FALSE);
+			return INIT_PASS;
+
+		case 80*1*18*256: // 360K
+			basicdsk_set_geometry(image, 80, 1, 18, 256, 0, 0, FALSE);
 			return INIT_PASS;
 		}
 	}
@@ -488,7 +489,7 @@ static READ8_HANDLER( bw2_ppi8255_c_r )
 
 	data |= bw2_mfdbk << 5;
 	
-	data |= floppy_drive_get_flag_state(get_floppy_image(selected_drive), FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0x80 : 0x00;
+	data |= floppy_drive_get_flag_state(get_floppy_image(selected_drive), FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0x00 : 0x80;
 
 	return data;
 }
@@ -949,4 +950,4 @@ SYSTEM_CONFIG_START( bw2 )
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   INIT    CONFIG  COMPANY      FULLNAME  FLAGS */
-COMP( 1985, bw2,    0,      0,      bw2,      bw2,    bw2,    bw2,    "Bondwell",  "BW 2",   GAME_NOT_WORKING )
+COMP( 1985, bw2,    0,      0,      bw2,      bw2,    bw2,    bw2,    "Bondwell",  "BW 2",   0 )
