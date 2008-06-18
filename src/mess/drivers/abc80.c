@@ -61,8 +61,13 @@ Notes:
 
     TODO:
 
-    - keyboard scanning is awkwardly slow
-    - cassette interface
+	- proper keyboard controller emulation
+	- hook up PIO correctly using port A read and irq callback
+	- get BASIC v1 dump
+	- MyAB 80-column card
+	- GeJo 80-column card
+	- Mikrodatorn 64K expansion
+    - cassette
     - floppy
     - printer
     - IEC
@@ -85,8 +90,12 @@ Notes:
 #include "devices/cassette.h"
 #include "devices/printer.h"
 
-
 static emu_timer *abc80_keyboard_timer;
+
+static const device_config *cassette_device_image(void)
+{
+	return image_from_devtype_and_index(IO_CASSETTE, 0);
+}
 
 /* Read/Write Handlers */
 
@@ -256,7 +265,7 @@ static ADDRESS_MAP_START( abc80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x73ff) AM_ROM
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM	// Expanded
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -288,49 +297,49 @@ static INPUT_PORTS_START( abc80 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xC3\x89") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x00C9)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("< >") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('<') PORT_CHAR('>')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x00E9) PORT_CHAR(0x00C9)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('<') PORT_CHAR('>')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 
 	PORT_START_TAG("ROW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xC3\x85") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00C5)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
 
 	PORT_START_TAG("ROW3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xC3\x9C") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00DC)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00FC) PORT_CHAR(0x00DC)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 
 	PORT_START_TAG("ROW4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xC3\x96") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00D6)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xC3\x84") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00C4)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\'') PORT_CHAR('*')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 
 	PORT_START_TAG("ROW5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
 
@@ -347,7 +356,7 @@ static INPUT_PORTS_START( abc80 )
 	PORT_START_TAG("ROW7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UPPER CASE") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UPPER CASE") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -371,7 +380,7 @@ static const gfx_layout charlayout_abc80 =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( abc80 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc80, 0, 2 )	// normal characters
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc80, 0, 2 )		// normal characters
 	GFXDECODE_ENTRY( REGION_GFX1, 0x500, charlayout_abc80, 0, 2 )	// graphics characters
 GFXDECODE_END
 
@@ -406,44 +415,126 @@ static INTERRUPT_GEN( abc80_nmi_interrupt )
 
 /* Machine Initialization */
 
-/*
-    PIO Channel A
-
-    0  R    Keyboard Data
-    1  R    Keyboard Data
-    2  R    Keyboard Data
-    3  R    Keyboard Data
-    4  R    Keyboard Data
-    5  R    Keyboard Data
-    6  R    Keyboard Data
-    7  R    Keyboard Strobe
-
-    PIO Channel B
-
-    0  R    RS-232C RxD
-    1  R    RS-232C _CTS
-    2  R    RS-232C _DCD
-    3  W    RS-232C TxD
-    4  W    RS-232C _RTS
-    5  W    Cassette Motor
-    6  W    Cassette Data
-    7  R    Cassette Data
-*/
-
 static const struct z80_irq_daisy_chain abc80_daisy_chain[] =
 {
 	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0 },
 	{ 0, 0, 0, 0, -1 }
 };
 
-static TIMER_CALLBACK(abc80_keyboard_tick)
+static TIMER_CALLBACK( abc80_keyboard_tick )
 {
 	abc80_keyboard_scan(machine);
 }
 
+#ifdef UNUSED_FUNCTION
+static void abc80_pio_interrupt(running_machine *machine, int state)
+{
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, state);
+}
+
+static READ8_HANDLER( abc80_pio_port_a_r )
+{
+	/*
+
+		PIO Channel A
+
+		0  R    Keyboard Data
+		1  R    Keyboard Data
+		2  R    Keyboard Data
+		3  R    Keyboard Data
+		4  R    Keyboard Data
+		5  R    Keyboard Data
+		6  R    Keyboard Data
+		7  R    Keyboard Strobe
+
+	*/
+
+	return keylatch;
+}
+#endif
+
+static READ8_HANDLER( abc80_pio_port_b_r )
+{
+	/*
+
+		PIO Channel B
+
+		0  R    RS-232C RxD
+		1  R    RS-232C _CTS
+		2  R    RS-232C _DCD
+		3  W    RS-232C TxD
+		4  W    RS-232C _RTS
+		5  W    Cassette Motor
+		6  W    Cassette Data
+		7  R    Cassette Data
+
+	*/
+
+	UINT8 data = (cassette_input(cassette_device_image()) > +1.0) ? 0x80 : 0;
+
+	return data;
+};
+
+static WRITE8_HANDLER( abc80_pio_port_b_w )
+{
+	/*
+
+		PIO Channel B
+
+		0  R    RS-232C RxD
+		1  R    RS-232C _CTS
+		2  R    RS-232C _DCD
+		3  W    RS-232C TxD
+		4  W    RS-232C _RTS
+		5  W    Cassette Motor
+		6  W    Cassette Data
+		7  R    Cassette Data
+
+	*/
+
+	cassette_change_state(cassette_device_image(), BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
+	cassette_output(cassette_device_image(), BIT(data, 7) ? -1.0 : +1.0);
+};
+
+static const z80pio_interface abc80_pio_intf =
+{
+	NULL,						/* callback when change interrupt status */
+	NULL,						/* port A read callback */
+	abc80_pio_port_b_r,			/* port B read callback */
+	NULL,						/* port A write callback */
+	abc80_pio_port_b_w,			/* port B write callback */
+	NULL,						/* portA ready active callback */
+	NULL						/* portB ready active callback */
+};
+
 static MACHINE_START( abc80 )
 {
+	/* configure RAM expansion */
+
+	memory_configure_bank(1, 0, 1, mess_ram, 0);
+	memory_set_bank(1, 0);
+
+	switch (mess_ram_size)
+	{
+	case 16*1024:
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+
+	case 32*1024:
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		break;
+	}
+
+	/* register for state saving */
+
 	state_save_register_global(keylatch);
+
+	/* initialize the PIO */
+
+	z80pio_init(0, &abc80_pio_intf);
+
+	/* allocate the keyboard scan timer */
 
 	abc80_keyboard_timer = timer_alloc(abc80_keyboard_tick, NULL);
 	timer_adjust_periodic(abc80_keyboard_timer, attotime_zero, 0, ATTOTIME_IN_USEC(2500));
@@ -512,16 +603,15 @@ ROM_START( abc80 )
 	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) )
 
 	ROM_REGION( 0x400, REGION_PROMS, 0 )
-	ROM_LOAD( "abc8011.k5", 0x0000, 0x0080, NO_DUMP ) // 82S129 256x4 horizontal sync
-	ROM_LOAD( "abc8012.j3", 0x0080, 0x0080, NO_DUMP ) // 82S129 256x4 chargen 74S263 column address
-	ROM_LOAD( "abc8013.e7", 0x0100, 0x0080, NO_DUMP ) // 82S129 256x4 address decoder
-	ROM_LOAD( "abc8021.k2", 0x0180, 0x0100, NO_DUMP ) // 82S131 512x4 vertical sync, videoram
-	ROM_LOAD( "abc8022.k1", 0x0280, 0x0100, NO_DUMP ) // 82S131 512x4 chargen 74S263 row address
+	ROM_LOAD( "abc80_13.e7", 0x0000, 0x0080, NO_DUMP ) // 82S129 256x4 address decoder
+	ROM_LOAD( "abc80_11.k5", 0x0080, 0x0080, NO_DUMP ) // 82S129 256x4 horizontal sync
+	ROM_LOAD( "abc80_12.j3", 0x0100, 0x0080, NO_DUMP ) // 82S129 256x4 chargen 74S263 column address
+	ROM_LOAD( "abc80_21.k2", 0x0180, 0x0100, NO_DUMP ) // 82S131 512x4 vertical sync, videoram
+	ROM_LOAD( "abc80_22.k1", 0x0280, 0x0100, NO_DUMP ) // 82S131 512x4 chargen 74S263 row address
 ROM_END
 
 /* System Configuration */
 
-#if 0
 static void abc80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	// cassette
@@ -530,13 +620,9 @@ static void abc80_cassette_getinfo(const mess_device_class *devclass, UINT32 sta
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) abc80_cassette_formats; break;
-
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
 }
-#endif
 
 static void abc80_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -559,7 +645,7 @@ static void abc80_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 static SYSTEM_CONFIG_START( abc80 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
-//  CONFIG_DEVICE(abc80_cassette_getinfo)
+	CONFIG_DEVICE(abc80_cassette_getinfo)
 	CONFIG_DEVICE(abc80_floppy_getinfo)
 SYSTEM_CONFIG_END
 

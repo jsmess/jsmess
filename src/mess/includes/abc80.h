@@ -4,9 +4,8 @@
  *
  ****************************************************************************/
 
-#ifndef ABC80_H_
-#define ABC80_H_
-
+#ifndef __ABC80__
+#define __ABC80__
 
 #define ABC80_XTAL		11980800.0
 
@@ -20,9 +19,8 @@
 #define ABC80_HDSTART	36 // unverified
 #define ABC80_VDSTART	23 // unverified
 
-#define ABC80_MODE_TEXT	135
-#define ABC80_MODE_GFX	151
-
+#define ABC80_MODE_TEXT	0x07
+#define ABC80_MODE_GFX	0x17
 
 /*----------- defined in video/abc80.c -----------*/
 
