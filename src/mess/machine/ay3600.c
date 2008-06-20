@@ -41,7 +41,7 @@ static TIMER_CALLBACK(AY3600_poll);
 static int AY3600_keyboard_queue_chars(const unicode_char *text, size_t text_len);
 static int AY3600_keyboard_accept_char(unicode_char ch);
 
-static const unsigned char ay3600_key_remap_2[7*8][4] =
+static const unsigned char ay3600_key_remap_2[9*8][4] =
 {
 /*		  norm ctrl shft both */
 		{ 0x7f,0x7f,0x7f,0x7f },	/* UNUSED		*/
