@@ -1003,8 +1003,8 @@ static void hp48_fill_port( const device_config* image )
 	hp48_port_data[conf->port] = malloc( 2 * size );
 	memset( hp48_port_data[conf->port], 0, 2 * size );
 	hp48_modules[conf->module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
-	hp48_modules[conf->module].read     = SMH_BANK(conf->module);
-	hp48_modules[conf->module].write    = hp48_port_write[conf->port] ? (void*)SMH_BANK(conf->module) : SMH_NOP;
+	hp48_modules[conf->module].read     = SMH_BANK((FPTR)conf->module);
+	hp48_modules[conf->module].write    = hp48_port_write[conf->port] ? (void*)SMH_BANK((FPTR)conf->module) : SMH_NOP;
 	hp48_modules[conf->module].data     = hp48_port_data[conf->port];
 	hp48_apply_modules( image->machine, NULL );
 }
