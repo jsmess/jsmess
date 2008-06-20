@@ -202,6 +202,22 @@ char *osd_dirname(const char *filename);
 char *osd_basename(char *filename);
 
 
+/*-----------------------------------------------------------------------------
+    osd_get_full_path: retrieves the full path
+
+    Parameters:
+
+		path - the path in question
+		dst - pointer to receive new path; the returned string needs to be free()-ed!
+
+    Return value:
+
+        file error
+
+-----------------------------------------------------------------------------*/
+file_error osd_get_full_path(char **dst, const char *path);
+
+
 
 /***************************************************************************
     UNCATEGORIZED INTERFACES

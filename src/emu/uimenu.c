@@ -815,7 +815,7 @@ do { \
 	ADD_MENU("Image Information", ui_menu_image_info, 0);
 
   	/* add image info menu */
-	ADD_MENU("File Manager", menu_file_manager, 1);
+	ADD_MENU("File Manager", menu_file_manager, 0);
 
 #if HAS_WAVE
   	/* add tape control menu */

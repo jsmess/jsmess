@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <ctype.h>
 #include <tchar.h>
+#include <shlwapi.h>
 
 #include "osdmess.h"
 #include "utils.h"
@@ -197,6 +198,48 @@ char *osd_basename(char *filename)
 
 	// otherwise, return the whole thing
 	return filename;
+}
+
+
+//============================================================
+//	osd_get_full_path
+//============================================================
+
+file_error osd_get_full_path(char **dst, const char *path)
+{
+	file_error err;
+	TCHAR *t_path;
+	TCHAR buffer[MAX_PATH];
+
+	// convert the path to TCHARs
+	t_path = tstring_from_utf8(path);
+	if (t_path == NULL)
+	{
+		err = FILERR_OUT_OF_MEMORY;
+		goto done;
+	}
+
+	// cannonicalize the path
+	if (!GetFullPathName(path, ARRAY_LENGTH(buffer), buffer, NULL))
+	{
+		err = win_error_to_mame_file_error(GetLastError());
+		goto done;
+	}
+
+	// convert the result back to UTF-8
+	*dst = utf8_from_tstring(buffer);
+	if (!*dst)
+	{
+		err = FILERR_OUT_OF_MEMORY;
+		goto done;
+	}
+
+	err = FILERR_NONE;
+
+done:
+	if (t_path != NULL)
+		free(t_path);
+	return err;
 }
 
 

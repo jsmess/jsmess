@@ -94,5 +94,6 @@ EMUOBJS += \
 	$(MESSOBJ)/opresolv.o	\
 	$(MESSOBJ)/infomess.o	\
 	$(MESSOBJ)/climess.o	\
+	$(MESSOBJ)/zippath.o	\
 
 $(LIBEMU): $(EMUOBJS)
