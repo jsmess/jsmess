@@ -220,7 +220,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 	}
 
 	// cannonicalize the path
-	if (!GetFullPathName(path, ARRAY_LENGTH(buffer), buffer, NULL))
+	if (!GetFullPathName(t_path, ARRAY_LENGTH(buffer), buffer, NULL))
 	{
 		err = win_error_to_mame_file_error(GetLastError());
 		goto done;
