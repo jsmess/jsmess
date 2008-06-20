@@ -36,7 +36,7 @@ file_error osd_getcurdir(char *buffer, size_t buffer_len)
 {
 	file_error filerr = FILERR_NONE;
 
-	if (getcwd(buffer, buffer_len) == 0)
+	if (getcwd(buffer, buffer_len) == NULL)
 	{
 		filerr = FILERR_FAILURE;
 	}
@@ -51,6 +51,34 @@ file_error osd_getcurdir(char *buffer, size_t buffer_len)
 
 	return filerr;
 }
+
+//============================================================
+//	osd_get_full_path
+//============================================================
+
+file_error osd_get_full_path(char **dst, const char *path)
+{
+	file_error err;
+	char path_buffer[512];
+
+	err = FILERR_NONE;
+
+	if (getcwd(path_buffer, 511) == NULL)
+	{
+		printf("osd_get_full_path: failed!\n");
+		err = FILERR_FAILURE;
+	}
+	else
+	{
+		*dst = (char *)malloc(strlen(path_buffer)+strlen(path)+3);
+
+		sprintf(*dst, "%s%s%s", path_buffer, PATH_SEPARATOR, path);
+		printf("osd_get_full_path: cwd [%s] path [%s] out [%s]\n", path_buffer, path, *dst);
+	}
+
+	return err;
+}
+
 //============================================================
 //	osd_setcurdir
 //============================================================

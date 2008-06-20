@@ -21,6 +21,7 @@
 #include "osdcomm.h"
 #include "render.h"
 #include "options.h"
+#include "driver.h"
 #include "deprecat.h"
 
 // standard SDL headers

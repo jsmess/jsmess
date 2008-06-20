@@ -31,6 +31,7 @@
 #include "osdcomm.h"
 #include "osdepend.h"
 #include "options.h"
+#include "driver.h"
 #include "ui.h"
 
 // OSD headers
@@ -1091,76 +1092,17 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 
 static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view)
 {
-	int viewindex = -1;
+	const char *defview = options_get_string(mame_options(), SDLOPTION_VIEW( ));
+	int viewindex;
 
 	ASSERT_MAIN_THREAD();
 
-	// NULL is the same as auto
-	if (view == NULL)
-		view = SDLOPTVAL_AUTO;
+	// choose non-auto over auto
+	if (strcmp(view, "auto") == 0 && strcmp(defview, "auto") != 0)
+		view = defview;
 
-	// auto view just selects the nth view
-
-	if (strcmp(view, SDLOPTVAL_AUTO) != 0)
-	{
-		// scan for a matching view name
-		for (viewindex = 0; ; viewindex++)
-		{
-			const char *name = render_target_get_view_name(window->target, viewindex);
-
-			// stop scanning if we hit NULL
-			if (name == NULL)
-			{
-				viewindex = -1;
-				break;
-			}
-			if (mame_strnicmp(name, view, strlen(view)) == 0)
-				break;
-		}
-	}
-
-	// if we don't have a match, default to the nth view
-	if (viewindex == -1)
-	{
-		int scrcount;
-
-		// count the number of screens
-		scrcount = video_screen_count(machine->config);
-		
-		// if we have enough screens to be one per monitor, assign in order
-		if (video_config.numscreens >= scrcount)
-		{
-			// find the first view with this screen and this screen only
-			for (viewindex = 0; ; viewindex++)
-			{
-				UINT32 viewscreens = render_target_get_view_screens(window->target, viewindex);
-				if (viewscreens == (1 << index))
-					break;
-				if (viewscreens == 0)
-				{
-					viewindex = -1;
-					break;
-				}
-			}
-		}
-
-		// otherwise, find the first view that has all the screens
-		if (viewindex == -1)
-		{
-			for (viewindex = 0; ; viewindex++)
-			{
-				UINT32 viewscreens = render_target_get_view_screens(window->target, viewindex);
-				if (viewscreens == (1 << scrcount) - 1)
-					break;
-				if (viewscreens == 0)
-					break;
-			}
-		}
-	}
-
-	// make sure it's a valid view
-	if (render_target_get_view_name(window->target, viewindex) == NULL)
-		viewindex = 0;
+	// query the video system to help us pick a view
+	viewindex = video_get_view_for_target(machine, window->target, view, index, video_config.numscreens);
 
 	// set the view
 	render_target_set_view(window->target, viewindex);

@@ -19,6 +19,8 @@
 
 // MAME headers
 #include "osdepend.h"
+#include "driver.h"
+#include "ui.h"
 
 // MAMEOS headers
 #include "window.h"
