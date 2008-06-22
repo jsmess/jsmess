@@ -37,6 +37,7 @@ Emulated:
 	  SNUG's BwG and HFDC fdcs).
 	* Hard disk (HFDC and IDE).
 	* Mechatronics mouse.
+	* save minimemory contents 
 
 	Compatibility looks quite good.
 
@@ -47,7 +48,6 @@ TODO:
 	* support for other peripherals and DSRs as documentation permits
 	* implement the EVPC palette chip
 	* finish 99/4p support: ROM6, HSGPL (implemented, but not fully debugged)
-	* save minimemory contents
 */
 
 #include <math.h>
@@ -548,21 +548,42 @@ DEVICE_IMAGE_LOAD( ti99_cart )
 
 	case SLOT_MINIMEM:
 		cartridge_minimemory = TRUE;
+		/* Load the NVRAM. Need to BIG_ENDIANIZE it.
+		   MiniMemory has only one cartridge page. */
+		image_battery_load(image, cartridge_pages[0]+0x800,0x1000);
+		for (i = 0x800; i < 0x1000; i++)
+			cartridge_pages[0][i] = BIG_ENDIANIZE_INT16(cartridge_pages[0][i]);
+		break;
 	case SLOT_MBX:
-		if (type == SLOT_MBX)
-			cartridge_mbx = TRUE;
+		cartridge_mbx = TRUE;
+		break;
 	case SLOT_CROM:
 		if (ti99_model == model_99_8)
 		{
-			image_fread(image, cartridge_pages_8[0], 0x2000);
+			if (cartridge_minimemory) 
+				/* Only load 4K so we don't overwrite the NVRAM. */
+				image_fread(image, cartridge_pages_8[0], 0x1000);
+			else 
+				image_fread(image, cartridge_pages_8[0], 0x2000);
 			current_page_ptr_8 = cartridge_pages_8[0];
 		}
 		else
 		{
+		    if (cartridge_minimemory) 
+		    {
+			/* Only load 4K so we don't overwrite the NVRAM that
+			   has been loaded already. */
+			image_fread(image, cartridge_pages[0], 0x1000);
+			for (i = 0; i < 0x0800; i++)
+				cartridge_pages[0][i] = BIG_ENDIANIZE_INT16(cartridge_pages[0][i]);
+		    }
+		    else 
+		    {
 			image_fread(image, cartridge_pages[0], 0x2000);
 			for (i = 0; i < 0x1000; i++)
 				cartridge_pages[0][i] = BIG_ENDIANIZE_INT16(cartridge_pages[0][i]);
-			current_page_ptr = cartridge_pages[0];
+		    }
+		    current_page_ptr = cartridge_pages[0];
 		}
 		break;
 
@@ -588,6 +609,7 @@ DEVICE_IMAGE_LOAD( ti99_cart )
 
 DEVICE_IMAGE_UNLOAD( ti99_cart )
 {
+	int i;
 	int id = image_index_in_device(image);
 
 	/* There is a circuitry in TI99/4(a) that resets the console when a
@@ -611,19 +633,41 @@ DEVICE_IMAGE_UNLOAD( ti99_cart )
 
 	case SLOT_MINIMEM:
 		cartridge_minimemory = FALSE;
-		/* we should insert some code to save the minimem contents... */
+		if (ti99_model == model_99_8) 
+		{
+			image_battery_save(image, cartridge_pages_8[0] + 0x1000, 0x1000);
+			memset(cartridge_pages_8[0] + 0x1000, 0, 0x1000);
+		}
+		else 
+		{
+			/* We BIG_ENDIANIZE before saving. This is consistent
+			   with the cartridge save format. */
+			for (i = 0x800; i < 0x1000; i++)
+				cartridge_pages[0][i] = BIG_ENDIANIZE_INT16(cartridge_pages[0][i]);
+			image_battery_save(image, cartridge_pages[0] + 0x800, 0x1000);
+			memset(cartridge_pages[0] + 0x800, 0, 0x1000);
+		}
+		break;
 	case SLOT_MBX:
 		if (slot_type[id] == SLOT_MBX)
 			cartridge_mbx = FALSE;
 			/* maybe we should insert some code to save the memory contents... */
+                break;
 	case SLOT_CROM:
 		if (ti99_model == model_99_8)
 		{
-			memset(cartridge_pages_8[0], 0, 0x2000);
+			if (cartridge_minimemory) 
+				/* Don't wipe the RAM before it is saved. */
+				memset(cartridge_pages_8[0], 0, 0x1000);
+			else
+				memset(cartridge_pages_8[0], 0, 0x2000);
 		}
 		else
 		{
-			memset(cartridge_pages[0], 0, 0x2000);
+			if (cartridge_minimemory) 
+				memset(cartridge_pages[0], 0, 0x1000);
+			else
+				memset(cartridge_pages[0], 0, 0x2000);
 		}
 		break;
 
@@ -983,7 +1027,6 @@ void set_hsgpl_crdena(int data)
 	Memory handlers.
 
 	TODO:
-	* save minimem RAM when quitting
 	* actually implement GRAM support and GPL port support
 */
 

@@ -105,6 +105,9 @@ System Driver Changes:
 
 - [UT88] Added SHA-1's.  [Fabio Priuli]
 
+- [TI99] Implemented loading and saving of the battery-backed RAM of the
+  MiniMemory cartridge.  [Michael Zapf]
+
 - [X68000] Added basic SASI hard disk support [Barry Rodewald]:
   Currently supported SASI commands:
   * Rezero Unit
