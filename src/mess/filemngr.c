@@ -494,16 +494,9 @@ UINT32 menu_file_manager(running_machine *machine, UINT32 state)
 	{
 		if (selected_absolute_index >= 0)
 		{
-			file_error err;
-			char *full_path;
-
-			err = osd_get_full_path(&full_path, image_filename(selected_device));
-			if (err != FILERR_NONE)
-				return state;
-
-			current_directory = zippath_parent(astring_alloc(), full_path);
-			current_file = astring_cpyc(astring_alloc(), image_basename(selected_device));
-			free(full_path);
+			current_directory = astring_cpyc(astring_alloc(), image_working_directory(selected_device));
+			current_file = astring_cpyc(astring_alloc(),
+				image_exists(selected_device) ? image_basename(selected_device) : "");
 
 			memset(&fs_state, 0, sizeof(fs_state));
 			return ui_menu_stack_push(menu_file_selector, fs_state.i);
