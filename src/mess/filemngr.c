@@ -25,6 +25,15 @@
 
 
 /***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define SLOT_EMPTY		"[empty slot]"
+#define SLOT_CREATE		"[create]"
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -52,50 +61,8 @@ static astring *current_file;
 
 
 /***************************************************************************
-    IMPLEMENTATION
+    MENU HELPERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    alloc_directory_entry - allocates a struct
-	of type osd_directory_entry
--------------------------------------------------*/
-
-static osd_directory_entry *alloc_directory_entry(const char *name, osd_dir_entry_type type, UINT64 size)
-{
-	char *name_dupe = NULL;
-	osd_directory_entry *new_entry;
-	size_t name_length;
-	
-	/* allocate the new entry */
-	name_length = (name != NULL) ? strlen(name) + 1 : 0;
-	new_entry = malloc_or_die(sizeof(*new_entry) + name_length);
-
-	/* copy the name, if specified */
-	if (name != NULL)
-	{
-		name_dupe = ((char *) new_entry) + sizeof(*new_entry);
-		strcpy(name_dupe, name);
-	}
-
-	new_entry->name = name_dupe;
-	new_entry->type = type;
-	new_entry->size = size;
-	return new_entry;
-}
-
-
-
-/*-------------------------------------------------
-    dupe_directory_entry - duplicates a struct
-	of type osd_directory_entry
--------------------------------------------------*/
-
-static osd_directory_entry *dupe_directory_entry(const osd_directory_entry *entry)
-{
-	return alloc_directory_entry(entry->name, entry->type, entry->size);
-}
-
-
 
 /*-------------------------------------------------
     extra_text_draw_box - generically adds header
@@ -161,6 +128,68 @@ static void extra_text_render(const menu_extra *extra, float origx1, float origy
 
 
 
+/***************************************************************************
+    FILE CREATE MENU
+***************************************************************************/
+
+/*-------------------------------------------------
+    menu_file_create - file creator menu
+-------------------------------------------------*/
+
+static UINT32 menu_file_create(running_machine *machine, UINT32 state)
+{
+	fatalerror("NYI");
+	return 0;
+}
+
+
+
+/***************************************************************************
+    FILE SELECTOR MENU
+***************************************************************************/
+
+/*-------------------------------------------------
+    alloc_directory_entry - allocates a struct
+	of type osd_directory_entry
+-------------------------------------------------*/
+
+static osd_directory_entry *alloc_directory_entry(const char *name, osd_dir_entry_type type, UINT64 size)
+{
+	char *name_dupe = NULL;
+	osd_directory_entry *new_entry;
+	size_t name_length;
+	
+	/* allocate the new entry */
+	name_length = (name != NULL) ? strlen(name) + 1 : 0;
+	new_entry = malloc_or_die(sizeof(*new_entry) + name_length);
+
+	/* copy the name, if specified */
+	if (name != NULL)
+	{
+		name_dupe = ((char *) new_entry) + sizeof(*new_entry);
+		strcpy(name_dupe, name);
+	}
+
+	new_entry->name = name_dupe;
+	new_entry->type = type;
+	new_entry->size = size;
+	return new_entry;
+}
+
+
+
+/*-------------------------------------------------
+    dupe_directory_entry - duplicates a struct
+	of type osd_directory_entry
+-------------------------------------------------*/
+
+static osd_directory_entry *dupe_directory_entry(const osd_directory_entry *entry)
+{
+	return alloc_directory_entry(entry->name, entry->type, entry->size);
+}
+
+
+
 /*-------------------------------------------------
     file_selector_render_extra - perform our
     special rendering
@@ -178,8 +207,8 @@ static void file_selector_render_extra(const menu_extra *extra, float origx1, fl
 	allocates all menu items for a directory
 -------------------------------------------------*/
 
-static file_error build_file_selector_menu_items(const char *path, ui_menu_item *item_list,
-	size_t item_list_length, int *menu_items, int *selected)
+static file_error build_file_selector_menu_items(const device_config *device, const char *path,
+	ui_menu_item *item_list, size_t item_list_length, int *menu_items, int *selected)
 {
 	zippath_directory *directory = NULL;
 	file_error err = FILERR_NONE;
@@ -187,6 +216,7 @@ static file_error build_file_selector_menu_items(const char *path, ui_menu_item 
 	osd_directory_entry *dirent_dupe;
 	const char *subtext;
 	int count, i;
+	image_device_info info;
 
 	/* reset count */
 	*menu_items = 0;
@@ -194,9 +224,19 @@ static file_error build_file_selector_menu_items(const char *path, ui_menu_item 
 
 	/* add the "[empty slot]" entry */
 	memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
-	item_list[*menu_items].text = "[empty slot]";
+	item_list[*menu_items].text = SLOT_EMPTY;
 	item_list[*menu_items].ref = alloc_directory_entry(NULL, ENTTYPE_FILE, 0);
 	(*menu_items)++;
+
+	info = image_device_getinfo(device->machine->config, device);
+	if (0 && info.creatable)	/* NYI */
+	{
+		/* add the "[create]" entry */
+		memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
+		item_list[*menu_items].text = SLOT_CREATE;
+		item_list[*menu_items].ref = alloc_directory_entry(NULL, ENTTYPE_FILE, 0);
+		(*menu_items)++;
+	}
 
 	/* add the drives */
 	count = osd_num_devices();
@@ -280,7 +320,7 @@ static file_error check_path(const char *path)
 
 
 /*-------------------------------------------------
-    menu_file_selector - MESS-specific menu
+    menu_file_selector - file selector menu
 -------------------------------------------------*/
 
 static UINT32 menu_file_selector(running_machine *machine, UINT32 state)
@@ -304,8 +344,8 @@ static UINT32 menu_file_selector(running_machine *machine, UINT32 state)
 	/* do we have to build the menu? */
 	if (!menu_is_built)
 	{
-		err = build_file_selector_menu_items(astring_c(current_directory), item_list, ARRAY_LENGTH(item_list),
-			&menu_items, &selected);
+		err = build_file_selector_menu_items(selected_device, astring_c(current_directory),
+			item_list, ARRAY_LENGTH(item_list), &menu_items, &selected);
 		if (err != FILERR_NONE)
 		{
 			/* if we error here, we must pop out */
@@ -358,13 +398,24 @@ static UINT32 menu_file_selector(running_machine *machine, UINT32 state)
 			case ENTTYPE_FILE:
 				if (dirent->name != NULL)
 				{
+					/* specified a file */
 					new_path = zippath_combine(astring_alloc(), astring_c(current_directory), dirent->name);
 					image_load(selected_device, astring_c(new_path));
 					astring_free(new_path);
 				}
+				else if (!strcmp(item_list[selected].text, SLOT_EMPTY))
+				{
+					/* empty slot - unload */
+					image_unload(selected_device);
+				}
+				else if (!strcmp(item_list[selected].text, SLOT_CREATE))
+				{
+					/* create */
+					fs_state.i = ui_menu_stack_push(menu_file_create, 0);
+				}
 				else
 				{
-					image_unload(selected_device);
+					fatalerror("Should not reach here");
 				}
 				fs_state.i = ui_menu_stack_pop();
 				goto done;
@@ -398,6 +449,10 @@ done:
 
 
 
+/***************************************************************************
+    FILE MANAGER
+***************************************************************************/
+
 /*-------------------------------------------------
     file_manager_render_extra - perform our
     special rendering
@@ -412,7 +467,7 @@ static void file_manager_render_extra(const menu_extra *extra, float origx1, flo
 
 
 /*-------------------------------------------------
-    menu_file_manager - MESS-specific menu
+    menu_file_manager - main file manager menu
 -------------------------------------------------*/
 
 UINT32 menu_file_manager(running_machine *machine, UINT32 state)
@@ -494,9 +549,18 @@ UINT32 menu_file_manager(running_machine *machine, UINT32 state)
 	{
 		if (selected_absolute_index >= 0)
 		{
-			current_directory = astring_cpyc(astring_alloc(), image_working_directory(selected_device));
-			current_file = astring_cpyc(astring_alloc(),
-				image_exists(selected_device) ? image_basename(selected_device) : "");
+			/* set up current_directory and current_file - depends on whether we have an image */
+			if (image_exists(selected_device))
+			{
+				/* note that we _should_ be able to use image_working_directory(); please fix */
+				current_directory = zippath_parent(astring_alloc(), image_filename(selected_device));
+				current_file = astring_cpyc(astring_alloc(), image_basename(selected_device));
+			}
+			else
+			{
+				current_directory = astring_cpyc(astring_alloc(), image_working_directory(selected_device));
+				current_file = astring_cpyc(astring_alloc(), "");
+			}
 
 			memset(&fs_state, 0, sizeof(fs_state));
 			return ui_menu_stack_push(menu_file_selector, fs_state.i);
