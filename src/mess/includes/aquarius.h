@@ -4,25 +4,16 @@
  *
  ****************************************************************************/
 
-#ifndef AQUARIUS_H_
-#define AQUARIUS_H_
-
-
-/*----------- defined in machine/aquarius.c -----------*/
-
-extern MACHINE_RESET( aquarius );
-extern  READ8_HANDLER( aquarius_port_ff_r );
-extern  READ8_HANDLER( aquarius_port_fe_r );
-extern WRITE8_HANDLER( aquarius_port_fc_w );
-extern WRITE8_HANDLER( aquarius_port_fe_w );
-extern WRITE8_HANDLER( aquarius_port_ff_w );
-
+#ifndef __AQUARIUS__
+#define __AQUARIUS__
 
 /*----------- defined in video/aquarius.c -----------*/
 
-extern VIDEO_START( aquarius );
-extern VIDEO_UPDATE( aquarius );
-extern WRITE8_HANDLER( aquarius_videoram_w );
+WRITE8_HANDLER( aquarius_videoram_w );
+WRITE8_HANDLER( aquarius_colorram_w );
 
+PALETTE_INIT( aquarius );
+VIDEO_START( aquarius );
+VIDEO_UPDATE( aquarius );
 
 #endif /* AQUARIUS_H_ */

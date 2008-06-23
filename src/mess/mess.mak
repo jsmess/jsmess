@@ -1005,7 +1005,6 @@ $(MESSOBJ)/hp48.a:     \
 $(MESSOBJ)/aquarius.a: \
 	$(MESS_DRIVERS)/aquarius.o	\
 	$(MESS_VIDEO)/aquarius.o \
-	$(MESS_MACHINE)/aquarius.o \
 
 $(MESSOBJ)/exidy.a:    \
 	$(MESS_MACHINE)/ay31015.o   \

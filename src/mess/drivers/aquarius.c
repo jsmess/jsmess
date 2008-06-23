@@ -1,57 +1,314 @@
-/************************************************************************
-Aquarius Memory map
+/*
 
-    CPU: z80
+	TODO:
 
-    Memory map
-        0000 1fff   BASIC
-        2000 2fff   expansion?
-        3000 33ff   screen ram
-        3400 37ff   colour ram
-        3800 3fff   RAM (standard)
-        4000 7fff   RAM (expansion)
-        8000 ffff   RAM (emulator only)
+	- vsync
+	- hand controllers
+	- scramble RAM also
+	- CAQ tape support
+	- memory mapper
+	- proper video timings
+	- PAL mode
 
-    Ports: Out
-        fc          Buzzer, bit 0.
-        fe          Printer.
+	- floppy support
+	- modem
+	- "old" version of BASIC ROM
+	- Aquarius II
 
-    Ports: In
-        fc          Tape in, bit 1.
-        fe          Printer.
-        ff          Keyboard, Bit set in .B selects keyboard matrix
-                    line. Return bit 0 - 5 low for pressed key.
-
-************************************************************************/
+*/
 
 #include "driver.h"
 #include "includes/aquarius.h"
 #include "cpu/z80/z80.h"
+#include "devices/basicdsk.h"
+#include "devices/cartslot.h"
+#include "devices/cassette.h"
+#include "devices/printer.h"
+#include "sound/ay8910.h"
+#include "sound/speaker.h"
 
+static const device_config *cassette_device_image(void)
+{
+	return image_from_devtype_and_index(IO_CASSETTE, 0);
+}
 
-/* Memory w/r functions */
+/* Read/Write Handlers */
+
+static UINT8 *decrypt_rom;
+static UINT8 scrambler;
+
+static READ8_HANDLER( cassette_r )
+{
+	/*
+
+		To read stored data from cassette the program should look at bit zero of 
+		the cassette input port and measure the time difference between leading 
+		edges or trailing edges. This is to prevent DC level shifting from altering 
+		pulse width of data. The program should then look for sync bytes for data 
+		synchronisation before data block transfer. If there is any task that must
+		be performed during cassette loading, the maximum allowable time to do the 
+		job after one byte from cassette, must be less than 80% of the period of a 
+		mark cycle. Control must be returned at that time to the cassette routine 
+		in order to maintain data integrity.
+	
+	*/
+
+	return (cassette_input(cassette_device_image()) < +0.0) ? 0 : 1;
+}
+
+static WRITE8_HANDLER( cassette_w )
+{
+	/*
+
+		Sound and cassette port use a common pin. Therefore the signal to cassette
+		will appear on audio output. Sound port is a simple one bit I/O and therefore
+		it must be toggled at a specific rate under software control.
+
+	*/
+
+	speaker_level_w(0, data & 0x01);
+
+	cassette_output(cassette_device_image(), (data & 0x01) ? +1.0 : -1.0);
+}
+
+static READ8_HANDLER( vsync_r )
+{
+	/*
+
+		The current state of the vertical sync will appear on bit 0 during a read of 
+		this port. The waveform and timing spec is shown as follows:
+
+			|<-    Active scan period   ->|V.sync |<-
+			|      12.8 ms                |3.6 ms (PAL)
+			|                             |2.8 ms (NTSC)
+			+++++++++++++++++++++++++++++++       ++++++++++++
+			+                             +       +
+			+                             +       +
+		+++++                             +++++++++
+
+	*/
+
+	return 0;
+}
+
+static WRITE8_HANDLER( mapper_w )
+{
+	/*
+
+		Bit D0 of this port controls the swapping of the lower 16K block in the memory 
+		map with the upper 16K. A 1 in this bit indicates swapping. This bit is reset 
+		after power up initialization.
+
+	*/
+}
+
+static READ8_HANDLER( printer_r )
+{
+	/*
+
+		Printer handshaking port (read) Port 0xFE when read, presents the clear 
+		to send status from PRNHASK pin at bit D0. A 1 indicates printer is ready, 
+		0 means not ready.
+
+	*/
+
+	return 1; // ready
+}
+
+static WRITE8_HANDLER( printer_w )
+{
+	/*
+
+		This is a single bit I/O at D0, it will perform as a serial output 
+		port under software control. Since timing is done by software the 
+		baudrate is variable. In BASIC this is a 1200 baud printer port for 
+		the 40 column thermal printer.
+
+	*/
+}
+
+static READ8_HANDLER( keyboard_r )
+{
+	/*
+
+		This port is 6 bits wide, when read, it returns the row data from the 
+		keyboard matrix. The keyboard is usually scanned in the following manner:
+
+		The keyboard is a 6 row by 8 column matrix. The column is connected to
+		the higher order address bus A15-A8. When Z80 executes its input 
+		instruction sets, either the current content of the accumulator (A) or 
+		the content of register (B) will go to the higher order address bus. 
+		Therefore the keyboard can be scanned by placing a specific scanning 
+		pattern in (A) or (B) and reading the result returned on rows. 
+
+	*/
+
+	UINT8 keylatch = offset >> 8;
+	int row;
+
+	if (keylatch == 0) return 0;
+
+	for (row = 0; row < 8; row++)
+	{
+		if (!BIT(keylatch, row))
+		{
+			char port[5];
+			sprintf(port, "ROW%d", row);
+		
+			return input_port_read(machine, port);
+		}
+	}
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( scrambler_w )
+{
+	/*
+
+		Software lock: Writing this port with an 8 bit value will set the software 
+		scrambler pattern. The data that appears on the output side will be the 
+		result of the input bus EX-ORed with this pattern, bit by bit. The software 
+		lock is a scrambler built between the CPU and external interface. The 
+		scrambling pattern is contained in port 0xFF and is not readable. CPU data 
+		output to external bus will be XORed with this pattern in a bit by bit 
+		fashion to generate the real data on external bus. By the same mechanism, 
+		data from external bus is also XORed with this pattern and read by CPU. 
+
+		Therefore it the external device is RAM, the software lock simply has no 
+		effect as long as the scrambling pattern remains unchanged. For I/O 
+		operation the pattern is gated to 0 and thus scrambling action is nullified.
+
+		In BASIC operation the scrambling pattern is generated by a random number 
+		routine. For game cartridge the lock pattern is generated from data in the
+		game cartridge itself.
+
+	*/
+
+	UINT8 *ROM = memory_region(REGION_CPU1) + 0xc000;
+	UINT16 addr;
+
+	scrambler = data;
+
+	for (addr = 0; addr < 16*1024; addr++)
+	{
+		decrypt_rom[addr] = ROM[addr] ^ scrambler;
+	}
+}
+
+/* Memory Maps */
 
 static ADDRESS_MAP_START( aquarius_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2fff) AM_NOP
-	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(SMH_RAM, aquarius_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_WRITE(aquarius_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3400, 0x37ff) AM_RAM AM_WRITE(aquarius_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0xffff) AM_NOP
+	AM_RANGE(0x4000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(2)
 ADDRESS_MAP_END
-
-
-/* port i/o functions */
 
 static ADDRESS_MAP_START( aquarius_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(aquarius_port_fc_w)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(aquarius_port_fe_r, aquarius_port_fe_w)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(aquarius_port_ff_r, aquarius_port_ff_w)
+//	AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
+//	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_READWRITE(floppy_r, floppy_w)
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
+	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE(cassette_r, cassette_w)
+	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE(vsync_r, mapper_w)
+	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE(printer_r, printer_w)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(keyboard_r, scrambler_w)
 ADDRESS_MAP_END
 
+/* Input Ports */
 
-/* graphics output */
+static INPUT_CHANGED( aquarius_reset )
+{
+	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_RESET, (input_port_read(field->port->machine, "RESET") ? CLEAR_LINE : ASSERT_LINE));
+}
+
+static INPUT_PORTS_START(aquarius)
+	PORT_START_TAG("ROW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("= +\tNEXT") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90 \\") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR('\\')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(": *\tPEEK") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RTN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("; @\tPOKE") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('@')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(". >\tVAL") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("- _\tFOR") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("/ ^") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('/') PORT_CHAR('^')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0 ?") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('?')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(16)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("L\tPOINT") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(12)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(", <\tSTR$") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("ROW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("9 )\tCOPY") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(15)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("K\tPRESET") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(11)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR(13)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("N\tRIGHT$") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(14)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("J\tPSET") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR(10)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("ROW3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("8 (\tRETURN") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') PORT_CHAR(9)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("7 '\tGOSUB") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U') PORT_CHAR(21)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR(8)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("B\tMID$") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("ROW4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("6 &\tON") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y') PORT_CHAR(25)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("G\tBELL") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR(7)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("V\tLEFT$") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(22)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C\tSTOP") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F\tDATA") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR(6)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("ROW5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("5 %\tGOTO") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("T\tINPUT") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR(20)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("4 $\tTHEN") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R\tRETYP") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR(18)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D\tREAD") PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') PORT_CHAR(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("X\tDELINE") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(24)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("ROW6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("3 #\tIF") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("E\tDIM") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E') PORT_CHAR(5)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("S\tSTPLST") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S') PORT_CHAR(19)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Z\tCLOAD") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(26)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE\tCHR$") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(32)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A\tCSAVE") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHAR(1)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("ROW7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("2 \"\tLIST") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("W\tREM") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR(23)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1 !\tRUN") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q') PORT_CHAR(17)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_F10) PORT_CHANGED(aquarius_reset, 0)
+
+	PORT_START_TAG("LEFT")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("RIGHT")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+/* Character Layout */
 
 static const gfx_layout aquarius_charlayout =
 {
@@ -65,167 +322,92 @@ static const gfx_layout aquarius_charlayout =
 	8 * 8
 };
 
+/* Graphics Decode Information */
+
 static GFXDECODE_START( aquarius )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, aquarius_charlayout, 0, 256 )
 GFXDECODE_END
 
-static const rgb_t aquarius_colors[] =
-{
-	RGB_BLACK,					/* Black */
-	MAKE_RGB(0xff, 0x00, 0x00),	/* Red */
-	MAKE_RGB(0x00, 0xff, 0x00),	/* Green */
-	MAKE_RGB(0xff, 0xff, 0x00),	/* Yellow */
-	MAKE_RGB(0x00, 0x00, 0xff),	/* Blue */
-	MAKE_RGB(0x7f, 0x00, 0x7f),	/* Violet */
-	MAKE_RGB(0x7f, 0xff, 0xff),	/* Light Blue-Green */
-	RGB_WHITE,					/* White */
-	MAKE_RGB(0xc0, 0xc0, 0xc0),	/* Light Gray */
-	MAKE_RGB(0x00, 0xff, 0xff),	/* Blue-Green */
-	MAKE_RGB(0xff, 0x00, 0xff),	/* Magenta */
-	MAKE_RGB(0x00, 0x00, 0x7f),	/* Dark Blue */
-	MAKE_RGB(0xff, 0xff, 0x7f),	/* Light Yellow */
-	MAKE_RGB(0x7f, 0xff, 0x7f),	/* Light Green */
-	MAKE_RGB(0xff, 0x7f, 0x00),	/* Orange */
-	MAKE_RGB(0x7f, 0x7f, 0x7f)	/* Dark Gray */
-};
-
-static const unsigned short aquarius_palette[] =
-{
-    0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0,10, 0,11, 0,12, 0,13, 0,14, 0,15, 0,
-    0, 1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1, 8, 1, 9, 1,10, 1,11, 1,12, 1,13, 1,14, 1,15, 1,
-    0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6, 2, 7, 2, 8, 2, 9, 2,10, 2,11, 2,12, 2,13, 2,14, 2,15, 2,
-    0, 3, 1, 3, 2, 3, 3, 3, 4, 3, 5, 3, 6, 3, 7, 3, 8, 3, 9, 3,10, 3,11, 3,12, 3,13, 3,14, 3,15, 3,
-    0, 4, 1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4, 8, 4, 9, 4,10, 4,11, 4,12, 4,13, 4,14, 4,15, 4,
-    0, 5, 1, 5, 2, 5, 3, 5, 4, 5, 5, 5, 6, 5, 7, 5, 8, 5, 9, 5,10, 5,11, 5,12, 5,13, 5,14, 5,15, 5,
-    0, 6, 1, 6, 2, 6, 3, 6, 4, 6, 5, 6, 6, 6, 7, 6, 8, 6, 9, 6,10, 6,11, 6,12, 6,13, 6,14, 6,15, 6,
-    0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7, 7, 7, 8, 7, 9, 7,10, 7,11, 7,12, 7,13, 7,14, 7,15, 7,
-    0, 8, 1, 8, 2, 8, 3, 8, 4, 8, 5, 8, 6, 8, 7, 8, 8, 8, 9, 8,10, 8,11, 8,12, 8,13, 8,14, 8,15, 8,
-    0, 9, 1, 9, 2, 9, 3, 9, 4, 9, 5, 9, 6, 9, 7, 9, 8, 9, 9, 9,10, 9,11, 9,12, 9,13, 9,14, 9,15, 9,
-    0,10, 1,10, 2,10, 3,10, 4,10, 5,10, 6,10, 7,10, 8,10, 9,10,10,10,11,10,12,10,13,10,14,10,15,10,
-    0,11, 1,11, 2,11, 3,11, 4,11, 5,11, 6,11, 7,11, 8,11, 9,11,10,11,11,11,12,11,13,11,14,11,15,11,
-    0,12, 1,12, 2,12, 3,12, 4,12, 5,12, 6,12, 7,12, 8,12, 9,12,10,12,11,12,12,12,13,12,14,12,15,12,
-    0,13, 1,13, 2,13, 3,13, 4,13, 5,13, 6,13, 7,13, 8,13, 9,13,10,13,11,13,12,13,13,13,14,13,15,13,
-    0,14, 1,14, 2,14, 3,14, 4,14, 5,14, 6,14, 7,14, 8,14, 9,14,10,14,11,14,12,14,13,14,14,14,15,14,
-    0,15, 1,15, 2,15, 3,15, 4,15, 5,15, 6,15, 7,15, 8,15, 9,15,10,15,11,15,12,15,13,15,14,15,15,15,
-};
-
-static PALETTE_INIT( aquarius )
-{
-	int i;
-
-	machine->colortable = colortable_alloc(machine, 16);
-
-	for ( i = 0; i < 16; i++ )
-		colortable_palette_set_color(machine->colortable, i, aquarius_colors[i]);
-
-	for (i=0; i < 512; i++)
-		colortable_entry_set_value(machine->colortable, i, aquarius_palette[i]);
-}
-
-/* Keyboard input */
-
-static INPUT_PORTS_START(aquarius)
-	PORT_START_TAG("KEY0")	/* count = 0 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=       +   NEXT")   PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del     \\")         PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(8)   PORT_CHAR('\\')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":       *   PEEK")   PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rtn")                PORT_CODE(KEYCODE_SLASH)      PORT_CHAR(13)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";       @   POKE")   PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('@')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".       >   VAL")    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START_TAG("KEY1")	/* count = 1 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-       _   FOR")    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/       ^")          PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('/') PORT_CHAR('^')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0       ?")          PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR('?')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p       P")          PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')  PORT_CHAR(16)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l       L   POINT")  PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')  PORT_CHAR(12)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",       <   STR$")   PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START_TAG("KEY2")	/* count = 2 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9       )   COPY")   PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o       O")          PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')  PORT_CHAR(15)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k       K   PRESET") PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')  PORT_CHAR(11)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m       M   Rtn")    PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')  PORT_CHAR(13)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n       N   RIGHT$") PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')  PORT_CHAR(14)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j       J   PSET")   PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')  PORT_CHAR(10)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START_TAG("KEY3")	/* count = 3 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8       (   RETURN") PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i       I")          PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')  PORT_CHAR(9)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7       '   GOSUB")  PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u       U")          PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')  PORT_CHAR(21)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h       H")          PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')  PORT_CHAR(8)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b       B   MID$")   PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')  PORT_CHAR(2)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START_TAG("KEY4")	/* count = 4 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6       &   ON")     PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y       Y")          PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')  PORT_CHAR(25)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g       G   Bell")   PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')  PORT_CHAR(7)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v       V   LEFT$")  PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')  PORT_CHAR(22)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c       C   Stop")   PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')  PORT_CHAR(3)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f       F   DATA")   PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')  PORT_CHAR(6)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START_TAG("KEY5")	/* count = 5 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5       %   GOTO")   PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t       T   INPUT")  PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')  PORT_CHAR(20)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4       $   THEN")   PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r       R   Retyp")  PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')  PORT_CHAR(18)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d       D   READ")   PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')  PORT_CHAR(4)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x       X   Deline") PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')  PORT_CHAR(24)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START_TAG("KEY6")	/* count = 6 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3       #   IF")     PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e       E   DIM")    PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')  PORT_CHAR(5)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s       S   Stplst") PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')  PORT_CHAR(19)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z       Z   CLOAD")  PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')  PORT_CHAR(26)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space       CHR$")   PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(32)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a       A   CSAVE")  PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')  PORT_CHAR(1)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START_TAG("KEY7")	/* count = 7 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2       \"   LIST")  PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w       W   REM")    PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')  PORT_CHAR(23)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1       !   RUN")    PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q       Q")          PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')  PORT_CHAR(17)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift")              PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctl")                PORT_CODE(KEYCODE_TAB)        PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-//  The reset key labelled "Rst" is not currently emulated
-
-// This is a hack: it should be managed via -ramsize switch!!!
-	PORT_START_TAG("RAM")	/* Machine config */
-	PORT_CONFNAME(0x03, 3, "RAM Size")
-	PORT_CONFSETTING(0, "4 Kb")
-	PORT_CONFSETTING(1, "20 Kb")
-	PORT_CONFSETTING(2, "56 Kb")
-
-// Aquarius supports a pair of controllers: each one has a 16-position disc pad and six buttons
-
-INPUT_PORTS_END
-
-/* Sound output */
+/* Interrupt Generator */
 
 static INTERRUPT_GEN( aquarius_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-/* Machine definition */
+/* Sound Interface */
+
+static READ8_HANDLER( aquarius_ay8910_port_a_r )
+{
+	return input_port_read(machine, "RIGHT");
+}
+
+static READ8_HANDLER( aquarius_ay8910_port_b_r )
+{
+	return input_port_read(machine, "LEFT");
+}
+
+static const struct AY8910interface ay8910_interface =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	aquarius_ay8910_port_a_r,
+	aquarius_ay8910_port_b_r,
+	NULL,
+	NULL
+};
+
+/* Machine Initialization */
+
+static MACHINE_START( aquarius )
+{
+	decrypt_rom = auto_malloc(16*1024);
+}
+
+static MACHINE_RESET( aquarius )
+{
+	/* RAM expansion */
+
+	switch (mess_ram_size)
+	{
+	case 4 * 1024:
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+
+	case 8 * 1024: // 4K expansion
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+
+	case 20 * 1024: // 16K expansion
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+
+	case 36 * 1024: // 32K expansion (prototype)
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		break;
+	}
+
+	memory_configure_bank(1, 0, 1, mess_ram, 0);
+	memory_set_bank(1, 0);
+
+	/* cartridge */
+
+	memory_configure_bank(2, 0, 1, decrypt_rom, 0);
+	memory_set_bank(2, 0);
+}
+
+/* Machine Driver */
+
 static MACHINE_DRIVER_START( aquarius )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3500000)
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_3_579545MHz) // ???
 	MDRV_CPU_PROGRAM_MAP(aquarius_mem, 0)
 	MDRV_CPU_IO_MAP(aquarius_io, 0)
 	MDRV_CPU_VBLANK_INT("main", aquarius_interrupt)
-	MDRV_INTERLEAVE(1)
 
+	MDRV_MACHINE_START( aquarius )
 	MDRV_MACHINE_RESET( aquarius )
 
     /* video hardware */
@@ -236,7 +418,7 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_SCREEN_SIZE(40 * 8, 24 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 24 * 8 - 1)
 	MDRV_GFXDECODE( aquarius )
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(aquarius_palette))
+	MDRV_PALETTE_LENGTH(512)
 	MDRV_PALETTE_INIT( aquarius )
 
 	MDRV_VIDEO_START( aquarius )
@@ -246,15 +428,116 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_SOUND_ADD(AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914
+	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 MACHINE_DRIVER_END
 
+/* ROMs */
 
-ROM_START(aquarius)
-	ROM_REGION(0x10000, REGION_CPU1,0)
-	ROM_LOAD("aq2.rom", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6))
-	ROM_REGION(0x0800, REGION_GFX1,0)
-	ROM_LOAD("aq2.chr", 0x0000, 0x0800, BAD_DUMP CRC(0b3edeed) SHA1(d2509839386b852caddcaa89cd376be647ba1492))
+ROM_START( aquarius )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+//	ROM_LOAD( "aquarius.u2", 0x0000, 0x2000, CRC(5cfa5b42) SHA1(02c8ee11e911d1aa346812492d14284b6870cb3e) )
+	ROM_LOAD( "aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6) )
+	
+	ROM_REGION( 0x0800, REGION_GFX1, 0 )
+	ROM_LOAD( "aq2.u5", 0x0000, 0x0800, BAD_DUMP CRC(0b3edeed) SHA1(d2509839386b852caddcaa89cd376be647ba1492) )
 ROM_END
 
-/*      YEAR    NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP(	1983,	aquarius,	0,		0,		aquarius,	aquarius,	0,		NULL,		"Mattel",	"Aquarius" , 0)
+/* System Configuration */
+
+static DEVICE_IMAGE_LOAD( aquarius_cart )
+{
+	int size = image_length(image);
+	UINT8 *ptr = memory_region(REGION_CPU1) + 0xc000;
+
+	if (image_fread(image, ptr, size) != size)
+	{
+		return INIT_FAIL;
+	}
+
+	switch (size)
+	{
+	case 8 * 1024:
+		memory_install_readwrite8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0x2000, SMH_BANK2, SMH_UNMAP);
+		break;
+
+	case 16 * 1024:
+		memory_install_readwrite8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_UNMAP);
+		break;
+	}
+
+	return INIT_PASS;
+}
+
+static void aquarius_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
+{
+	switch( state )
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(aquarius_cart); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "bin"); break;
+
+		default:										cartslot_device_getinfo( devclass, state, info ); break;
+	}
+}
+
+static void aquarius_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	// cassette
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED; break;
+
+		default:										cassette_device_getinfo(devclass, state, info); break;
+	}
+}
+
+static DEVICE_IMAGE_LOAD( aquarius_floppy )
+{
+	// 128K images, 64K/side
+	return INIT_FAIL;
+}
+
+static void aquarius_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(aquarius_floppy); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "dsk"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}
+}
+
+static SYSTEM_CONFIG_START( aquarius )
+	CONFIG_RAM_DEFAULT( 4 * 1024)
+	CONFIG_RAM		  ( 8 * 1024)
+	CONFIG_RAM		  (20 * 1024)
+	CONFIG_RAM		  (36 * 1024)
+	CONFIG_DEVICE(aquarius_cartslot_getinfo)
+	CONFIG_DEVICE(aquarius_cassette_getinfo)
+	CONFIG_DEVICE(aquarius_floppy_getinfo)
+SYSTEM_CONFIG_END
+
+/*      YEAR    NAME        PARENT		COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME			FLAGS */
+COMP(	1983,	aquarius,	0,			0,		aquarius,	aquarius,	0,		aquarius,	"Mattel",	"Aquarius (NTSC)",	0 )
+//COMP(	1984,	aquariu2,	aquarius,	0,		aquarius,	aquarius,	0,		aquarius,	"Mattel",	"Aquarius II",	GAME_NOT_WORKING )
