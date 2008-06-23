@@ -19,6 +19,9 @@ System Driver Changes:
 - [AMIGACD / AMIGAFDC] Fixed a couple of regressions introduced in 0.125.
   Still CDTV regression is not fixed. [Fabio Priuli]
 
+- [AQUARIUS] Added support for cartridges and .wav tape images (bug #158).
+  Fixed tilemap and added AY-3-8910 sound. [Curt Coder]
+
 - [B2M] Added SHA-1's.  [Fabio Priuli]
 
 - [BK] Added SHA-1's.  [Fabio Priuli]
