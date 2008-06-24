@@ -222,6 +222,11 @@ static file_error build_file_selector_menu_items(const device_config *device, co
 	*menu_items = 0;
 	*selected = 0;
 
+	/* open the directory */
+	err = zippath_opendir(path, &directory);
+	if (err != FILERR_NONE)
+		goto done;
+
 	/* add the "[empty slot]" entry */
 	memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
 	item_list[*menu_items].text = SLOT_EMPTY;
@@ -229,7 +234,7 @@ static file_error build_file_selector_menu_items(const device_config *device, co
 	(*menu_items)++;
 
 	info = image_device_getinfo(device->machine->config, device);
-	if (0 && info.creatable)	/* NYI */
+	if (0 && info.creatable && !zippath_is_zip(directory))	/* NYI */
 	{
 		/* add the "[create]" entry */
 		memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
@@ -248,11 +253,6 @@ static file_error build_file_selector_menu_items(const device_config *device, co
 		item_list[*menu_items].ref = alloc_directory_entry(item_list[*menu_items].text, ENTTYPE_DIR, 0);
 		(*menu_items)++;
 	}
-
-	/* open the directory */
-	err = zippath_opendir(path, &directory);
-	if (err != FILERR_NONE)
-		goto done;
 
 	/* build the menu for each item */
 	while((dirent = zippath_readdir(directory)) != NULL)
@@ -412,6 +412,7 @@ static UINT32 menu_file_selector(running_machine *machine, UINT32 state)
 				{
 					/* create */
 					fs_state.i = ui_menu_stack_push(menu_file_create, 0);
+					goto done;
 				}
 				else
 				{
