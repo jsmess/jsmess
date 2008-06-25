@@ -16,8 +16,9 @@ extern DRIVER_INIT( radio86 );
 extern MACHINE_RESET( radio86 );
 
 extern const ppi8255_interface radio86_ppi8255_interface_1;
+extern const ppi8255_interface radio86_ppi8255_interface_2;
 extern const i8275_interface radio86_i8275_interface;
-
+extern WRITE8_HANDLER ( radio86_pagesel );
 /*----------- defined in video/radio86.c -----------*/
 
 extern I8275_DISPLAY_PIXELS(radio86_display_pixels);

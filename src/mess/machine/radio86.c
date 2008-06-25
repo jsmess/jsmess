@@ -18,6 +18,7 @@
 
 static int radio86_keyboard_mask;
 
+static UINT8 radio_ram_disk[0x10000];
 
 /* Driver initialization */
 DRIVER_INIT(radio86)
@@ -26,7 +27,9 @@ DRIVER_INIT(radio86)
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
   	memory_configure_bank(1, 1, 2, RAM, 0x0000);
-	memory_configure_bank(1, 0, 2, RAM, 0xf000);
+	memory_configure_bank(1, 0, 2, RAM, 0xf800);
+	
+	memset(radio_ram_disk,0,0x10000);
 }
 
 static READ8_HANDLER (radio86_8255_portb_r2 )
@@ -113,13 +116,52 @@ static TIMER_CALLBACK( radio86_reset )
 	memory_set_bank(1, 0);
 }
 
+static UINT8 romdisk_lsb,romdisk_msb, disk_sel;
+
 MACHINE_RESET( radio86 )
 {
-	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, radio86_reset);
+	timer_set(ATTOTIME_IN_USEC(1000), NULL, 0, radio86_reset);
 	memory_set_bank(1, 1);
 
 	radio86_keyboard_mask = 0;
 	dma8257_init(1);
 	dma8257_config(0, &radio86_dma);
 	dma8257_reset();
+	disk_sel = 0;
 }
+
+
+WRITE8_HANDLER ( radio86_pagesel ) 
+{
+	disk_sel = data;
+}
+
+static READ8_HANDLER (radio86_romdisk_porta_r )
+{
+	UINT8 *romdisk = memory_region(REGION_CPU1) + 0x10000;	
+	if ((disk_sel & 0x0f) ==0) {
+		return romdisk[romdisk_msb*256+romdisk_lsb];	
+	} else {
+		return radio_ram_disk[romdisk_msb*256+romdisk_lsb];
+	}
+}
+
+static WRITE8_HANDLER (radio86_romdisk_portb_w )
+{	
+	romdisk_lsb = data;
+}
+
+static WRITE8_HANDLER (radio86_romdisk_portc_w )
+{		
+	romdisk_msb = data;	
+}
+
+const ppi8255_interface radio86_ppi8255_interface_2 =
+{
+	radio86_romdisk_porta_r,
+	NULL,
+	NULL,
+	NULL,
+	radio86_romdisk_portb_w,
+	radio86_romdisk_portc_w
+};

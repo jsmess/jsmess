@@ -27,6 +27,29 @@ static ADDRESS_MAP_START(radio86_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(radio86rom_mem, ADDRESS_SPACE_PROGRAM, 8)
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
+    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w) AM_MIRROR(0x1ffc)
+    AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x1ffc)
+    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
+    AM_RANGE( 0xe000, 0xffff ) AM_WRITE(dma8257_0_w)	 // DMA
+    AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(radio86ram_mem, ADDRESS_SPACE_PROGRAM, 8)
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x1000, 0xdfff ) AM_RAM  // RAM
+    AM_RANGE( 0xe000, 0xe7ff ) AM_ROM  // System ROM page 2
+    AM_RANGE( 0xe800, 0xf5ff ) AM_RAM  // RAM
+    AM_RANGE( 0xf700, 0xf703 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+    AM_RANGE( 0xf780, 0xf7bf ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) // video
+    AM_RANGE( 0xf684, 0xf687 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0xf688, 0xf688 ) AM_WRITE( radio86_pagesel )
+    AM_RANGE( 0xf800, 0xffff ) AM_WRITE(dma8257_0_w)	 // DMA
+    AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM page 1
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(radio86_16_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
@@ -133,9 +156,6 @@ static MACHINE_DRIVER_START( radio86 )
 	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
 	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_1 )
 
-	//MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	//MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_2 )
-
 	MDRV_DEVICE_ADD( "i8275", I8275 )
 	MDRV_DEVICE_CONFIG(radio86_i8275_interface)
     /* video hardware */
@@ -161,6 +181,26 @@ static MACHINE_DRIVER_START( radio16 )
     MDRV_IMPORT_FROM(radio86)
     MDRV_CPU_MODIFY("main")
     MDRV_CPU_PROGRAM_MAP(radio86_16_mem, 0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( radiorom )
+    /* basic machine hardware */
+    MDRV_IMPORT_FROM(radio86)
+    MDRV_CPU_MODIFY("main")
+    MDRV_CPU_PROGRAM_MAP(radio86rom_mem, 0)
+    
+	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
+	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_2 )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( radioram )
+    /* basic machine hardware */
+    MDRV_IMPORT_FROM(radio86)
+    MDRV_CPU_MODIFY("main")
+    MDRV_CPU_PROGRAM_MAP(radio86ram_mem, 0)
+
+	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
+	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_2 )
 MACHINE_DRIVER_END
 
 static void radio86_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -209,6 +249,24 @@ ROM_START( radio16 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
+ROM_START( radiorom )
+	ROM_REGION( 0x18000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(B5CDEAB7))
+	ROM_COPY( REGION_CPU1, 0xf800, 0xf000, 0x0800 )
+	ROM_LOAD( "romdisk.rk", 0x10000, 0x8000, CRC(6B16FC04))
+	ROM_REGION(0x0800, REGION_GFX1,0)
+	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
+ROM_END
+
+ROM_START( radioram )
+	ROM_REGION( 0x20000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_LOAD( "r86-1.bin", 0xf800, 0x0800, CRC(7E7AB7CB))
+	ROM_LOAD( "r86-2.bin", 0xe000, 0x0800, CRC(955F0616))
+	ROM_LOAD( "romdisk.bin", 0x10000, 0x10000, CRC(43C0279B))
+	ROM_REGION(0x0800, REGION_GFX1,0)
+	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
+ROM_END
+
 static SYSTEM_CONFIG_START(radio86)
 	CONFIG_DEVICE(radio86_cassette_getinfo);
 SYSTEM_CONFIG_END
@@ -219,4 +277,7 @@ SYSTEM_CONFIG_END
 COMP( 1986, radio86, 0,       0, 	radio86, 	radio86,radio86, radio86,  "", 	"Radio-86RK",	0)
 COMP( 1986, radio16, radio86, 0, 	radio16, 	radio86,radio86, radio86,  "", 	"Radio-86RK (16K RAM)",	0)
 COMP( 1986, radio4k, radio86, 0, 	radio86, 	radio86,radio86, radio86,  "", 	"Radio-86RK (4K ROM)",	0)
+COMP( 1986, radiorom,radio86, 0, 	radiorom, 	radio86,radio86, radio86,  "", 	"Radio-86RK (ROM-Disk)",	0)
+COMP( 1986, radioram, radio86, 0, 	radioram, 	radio86,radio86, radio86,  "", 	"Radio-86RK (ROM/RAM Disk)",	0)
 COMP( 1986, spektr01,radio86, 0, 	radio86, 	radio86,radio86, radio86,  "", 	"Spektr-001",	0)
+
