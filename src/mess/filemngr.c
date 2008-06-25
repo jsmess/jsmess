@@ -28,6 +28,8 @@
     CONSTANTS
 ***************************************************************************/
 
+#define ENABLE_CREATE	0
+
 #define SLOT_EMPTY		"[empty slot]"
 #define SLOT_CREATE		"[create]"
 
@@ -37,6 +39,21 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/* state of the file creator menu */
+typedef union _filecreator_state filecreator_state;
+union _filecreator_state
+{
+	UINT32 i;
+	struct
+	{
+		int selected : 16;
+		unsigned int is_built : 1;
+	} s;
+};
+
+
+
+/* state of the file selector menu */
 typedef union _fileselector_state fileselector_state;
 union _fileselector_state
 {
@@ -54,6 +71,8 @@ union _fileselector_state
     LOCAL VARIABLES
 ***************************************************************************/
 
+
+
 static const device_config *selected_device;
 static astring *current_directory;
 static astring *current_file;
@@ -63,6 +82,141 @@ static astring *current_file;
 /***************************************************************************
     MENU HELPERS
 ***************************************************************************/
+
+/*-------------------------------------------------
+    code_to_ascii - converts an input_code to its
+	ASCII equivalent
+-------------------------------------------------*/
+
+static char code_to_ascii(input_code code)
+{
+	/* code, lower case (w/o shift), upper case (with shift), control */
+	static const struct
+	{
+		input_code code;
+		char ch;
+		char shift_ch;
+		char ctrl_ch;
+	} code_to_char_table[] =
+	{
+		{ KEYCODE_0, '0', ')', 0},
+		{ KEYCODE_1, '1', '!', 0},
+		{ KEYCODE_2, '2', '"', 0},
+		{ KEYCODE_3, '3', '#', 0},
+		{ KEYCODE_4, '4', '$', 0},
+		{ KEYCODE_5, '5', '%', 0},
+		{ KEYCODE_6, '6', '^', 0},
+		{ KEYCODE_7, '7', '&', 0},
+		{ KEYCODE_8, '8', '*', 0},
+		{ KEYCODE_9, '9', '(', 0},
+		{ KEYCODE_A, 'a', 'A', 1},
+		{ KEYCODE_B, 'b', 'B', 2},
+		{ KEYCODE_C, 'c', 'C', 3},
+		{ KEYCODE_D, 'd', 'D', 4},
+		{ KEYCODE_E, 'e', 'E', 5},
+		{ KEYCODE_F, 'f', 'F', 6},
+		{ KEYCODE_G, 'g', 'G', 7},
+		{ KEYCODE_H, 'h', 'H', 8},
+		{ KEYCODE_I, 'i', 'I', 9},
+		{ KEYCODE_J, 'j', 'J', 10},
+		{ KEYCODE_K, 'k', 'K', 11},
+		{ KEYCODE_L, 'l', 'L', 12},
+		{ KEYCODE_M, 'm', 'M', 13},
+		{ KEYCODE_N, 'n', 'N', 14},
+		{ KEYCODE_O, 'o', 'O', 15},
+		{ KEYCODE_P, 'p', 'P', 16},
+		{ KEYCODE_Q, 'q', 'Q', 17},
+		{ KEYCODE_R, 'r', 'R', 18},
+		{ KEYCODE_S, 's', 'S', 19},
+		{ KEYCODE_T, 't', 'T', 20},
+		{ KEYCODE_U, 'u', 'U', 21},
+		{ KEYCODE_V, 'v', 'V', 22},
+		{ KEYCODE_W, 'w', 'W', 23},
+		{ KEYCODE_X, 'x', 'X', 24},
+		{ KEYCODE_Y, 'y', 'Y', 25},
+		{ KEYCODE_Z, 'z', 'Z', 26},
+		{ KEYCODE_OPENBRACE, '[', '{', 27},
+		{ KEYCODE_BACKSLASH, '\\', '|', 28},
+		{ KEYCODE_CLOSEBRACE, ']', '}', 29},
+		{ KEYCODE_TILDE, '^', '~', 30},
+		{ KEYCODE_BACKSPACE, 127, 127, 31},
+		{ KEYCODE_COLON, ':', ';', 0},
+		{ KEYCODE_EQUALS, '=', '+', 0},
+		{ KEYCODE_MINUS, '-', '_', 0},
+		{ KEYCODE_STOP, '.', '<', 0},
+		{ KEYCODE_COMMA, ',', '>', 0},
+		{ KEYCODE_SLASH, '/', '?', 0},
+		{ KEYCODE_ENTER, 13, 13, 13},
+		{ KEYCODE_ESC, 27, 27, 27 }
+	};
+
+	int i;
+	char result = 0;
+
+	for (i = 0; i < ARRAY_LENGTH(code_to_char_table); i++)
+	{
+		if (code_to_char_table[i].code == code)
+		{
+			if (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
+				result = code_to_char_table[i].ctrl_ch;
+			else if (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
+				result = code_to_char_table[i].shift_ch;
+			else
+				result = code_to_char_table[i].ch;
+			break;
+		}
+	}
+	return result;
+}
+
+
+
+/*-------------------------------------------------
+    poll_keyboard - polls the keyboard and appends
+	the result to the specified buffer
+-------------------------------------------------*/
+
+static void poll_keyboard(char *buffer, size_t buffer_length, int (*filter)(unicode_char))
+{
+	input_code code;
+	char ascii_char;
+	int length;
+
+	/* poll keyboard */
+	code = input_code_poll_switches(FALSE);
+	if (code != INPUT_CODE_INVALID)
+	{
+		ascii_char = code_to_ascii(code);
+
+		switch (ascii_char)
+		{
+			case 0:		/* NUL */
+			case 13:	/* return */
+			case 27:	/* escape */
+				break;
+
+			case 25:	/* Ctrl-Y (clear line) */
+				buffer[0] = '\0';
+				break;
+
+			case 127:	/* delete */
+				length = strlen(buffer);
+				if (length > 0)
+					buffer[length - 1] = '\0';
+				break;
+
+			default:
+				if ((filter == NULL) || (*filter)(ascii_char))
+				{
+					/* got a char - add to string */
+					snprintf(buffer + strlen(buffer), buffer_length - strlen(buffer), "%c", ascii_char);
+				}
+				break;
+		}
+	}
+}
+
+
 
 /*-------------------------------------------------
     extra_text_draw_box - generically adds header
@@ -133,13 +287,108 @@ static void extra_text_render(const menu_extra *extra, float origx1, float origy
 ***************************************************************************/
 
 /*-------------------------------------------------
+    is_valid_filename_char - tests to see if a
+	character is valid in a filename 
+-------------------------------------------------*/
+
+static int is_valid_filename_char(unicode_char ch)
+{
+	/* this should really be in the OSD layer */
+	static const char valid_filename_char[] =
+	{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 	/* 00-0f */
+		0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 	/* 10-1f */
+		1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 	/*	!"#$%&'()*+,-./ */
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 	/* 0123456789:;<=>? */
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 	/* @ABCDEFGHIJKLMNO */
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 	/* PQRSTUVWXYZ[\]^_ */
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 	/* `abcdefghijklmno */
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 	/* pqrstuvwxyz{|}~	*/
+	};
+	return (ch < ARRAY_LENGTH(valid_filename_char)) && valid_filename_char[ch];
+}
+
+
+
+/*-------------------------------------------------
+    file_creator_render_extra - perform our
+    special rendering
+-------------------------------------------------*/
+
+static void file_creator_render_extra(const menu_extra *extra, float origx1, float origy1, float origx2, float origy2)
+{
+	extra_text_render(extra, origx1, origy1, origx2, origy2, astring_c(current_directory), NULL);
+}
+
+
+
+/*-------------------------------------------------
     menu_file_create - file creator menu
 -------------------------------------------------*/
 
 static UINT32 menu_file_create(running_machine *machine, UINT32 state)
 {
-	fatalerror("NYI");
-	return 0;
+	static char filename_buffer[1024];
+
+	ui_menu_item item_list[200];
+	int menu_items = 0;
+	filecreator_state fc_state;
+	UINT32 selected;
+	int visible_items;
+	int underscore_pos;
+	menu_extra extra;
+
+	/* disassemble state */
+	fc_state.i = state;
+	selected = fc_state.s.selected;
+
+	/* is this the first time that we've been called? */
+	if (!fc_state.s.is_built)
+	{
+		filename_buffer[0] = '\0';
+		fc_state.s.is_built = TRUE;
+	}
+	
+	/* add the "[empty slot]" entry */
+	memset(&item_list[menu_items], 0, sizeof(item_list[menu_items]));
+	item_list[menu_items].text = "New Image Name:";
+	item_list[menu_items].subtext = filename_buffer;
+	menu_items++;
+
+	/* add an item for the return */
+	memset(&item_list[menu_items], 0, sizeof(item_list[menu_items]));
+	item_list[menu_items].text = "Return to Prior Menu";
+	menu_items++;
+
+	/* compute extras */
+	memset(&extra, 0, sizeof(extra));
+	extra.top = ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	extra.render = file_creator_render_extra;
+
+	/* if we're selecting the file name, poll the keyboard */
+	if (selected == 0)
+		poll_keyboard(filename_buffer, ARRAY_LENGTH(filename_buffer), is_valid_filename_char);
+
+	/* put the underscore in the menu */
+	underscore_pos = strlen(filename_buffer);
+	snprintf(filename_buffer + underscore_pos, ARRAY_LENGTH(filename_buffer) - underscore_pos, "_");
+
+	/* draw the menu */
+	visible_items = ui_menu_draw(item_list, menu_items, selected, &extra);
+
+	/* remove the underscore */
+	filename_buffer[underscore_pos] = '\0';
+
+	/* handle the keys */
+	if (ui_menu_generic_keys(machine, &selected, menu_items, visible_items))
+		goto done;
+
+	if (input_ui_pressed(machine, IPT_UI_SELECT))
+		fatalerror("NYI");
+
+done:
+	fc_state.s.selected = selected;
+	return fc_state.i;
 }
 
 
@@ -234,7 +483,7 @@ static file_error build_file_selector_menu_items(const device_config *device, co
 	(*menu_items)++;
 
 	info = image_device_getinfo(device->machine->config, device);
-	if (0 && info.creatable && !zippath_is_zip(directory))	/* NYI */
+	if (ENABLE_CREATE && info.creatable && !zippath_is_zip(directory))
 	{
 		/* add the "[create]" entry */
 		memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
