@@ -23,7 +23,7 @@ enum resolution_entry_state
 
 struct option_resolution_entry
 {
-	const struct OptionGuide *guide_entry;
+	const option_guide *guide_entry;
 	enum resolution_entry_state state;
 	union
 	{
@@ -191,7 +191,7 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 
 
 
-static const char *lookup_in_specification(const char *specification, const struct OptionGuide *option)
+static const char *lookup_in_specification(const char *specification, const option_guide *option)
 {
 	const char *s;
 	s = strchr(specification, option->parameter);
@@ -200,10 +200,10 @@ static const char *lookup_in_specification(const char *specification, const stru
 
 
 
-option_resolution *option_resolution_create(const struct OptionGuide *guide, const char *specification)
+option_resolution *option_resolution_create(const option_guide *guide, const char *specification)
 {
 	option_resolution *resolution = NULL;
-	const struct OptionGuide *guide_entry;
+	const option_guide *guide_entry;
 	int option_count;
 	int opt = -1;
 	object_pool *pool;
@@ -452,7 +452,7 @@ const char *option_resolution_specification(option_resolution *resolution)
 
 
 
-const struct OptionGuide *option_resolution_find_option(option_resolution *resolution, int option_char)
+const option_guide *option_resolution_find_option(option_resolution *resolution, int option_char)
 {
 	const struct option_resolution_entry *entry;
 	entry = option_resolution_lookup_entry(resolution, option_char);
@@ -461,7 +461,7 @@ const struct OptionGuide *option_resolution_find_option(option_resolution *resol
 
 
 
-const struct OptionGuide *option_resolution_index_option(option_resolution *resolution, int indx)
+const option_guide *option_resolution_index_option(option_resolution *resolution, int indx)
 {
 	if ((indx < 0) || (indx >= resolution->option_count))
 		return NULL;
@@ -470,7 +470,7 @@ const struct OptionGuide *option_resolution_index_option(option_resolution *reso
 
 
 
-int option_resolution_countoptions(const struct OptionGuide *guide, const char *specification)
+int option_resolution_countoptions(const option_guide *guide, const char *specification)
 {
 	int option_count = 0;
 

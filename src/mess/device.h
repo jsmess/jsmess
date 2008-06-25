@@ -181,7 +181,8 @@ INLINE char *device_temp_str(void)
  *
  *************************************/
 
-struct CreateImageOptions
+typedef struct _create_image_options create_image_options;
+struct _create_image_options
 {
 	const char *name;
 	const char *description;
@@ -215,8 +216,8 @@ struct IODevice
 	device_stop_func stop;
 
 	/* image creation options */
-	const struct OptionGuide *createimage_optguide;
-	const struct CreateImageOptions *createimage_options;
+	const option_guide *createimage_optguide;
+	const create_image_options *createimage_options;
 };
 
 /* interoperability with MAME devices */

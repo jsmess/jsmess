@@ -11,5 +11,5 @@ UINT_PTR CALLBACK win_new_dialog_hook(HWND dlgwnd, UINT message,
 	WPARAM wparam, LPARAM lparam);
 
 imgtoolerr_t win_show_option_dialog(HWND parent, struct transfer_suggestion_info *suggestion_info,
-	const struct OptionGuide *guide, const char *optspec, option_resolution **result, BOOL *cancel);
+	const option_guide *guide, const char *optspec, option_resolution **result, BOOL *cancel);
 

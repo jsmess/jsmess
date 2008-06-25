@@ -25,7 +25,7 @@ static HFONT get_window_font(HWND window)
 
 
 static int create_option_controls(HWND dialog, HFONT font, int margin, int *y,
-	struct transfer_suggestion_info *suggestion_info, const struct OptionGuide *guide, const char *optspec)
+	struct transfer_suggestion_info *suggestion_info, const option_guide *guide, const char *optspec)
 {
 	int label_width = 100;
 	int control_height = 20;
@@ -216,7 +216,7 @@ static UINT_PTR new_dialog_typechange(HWND dlgwnd, int filter_index)
 {
 	struct new_dialog_info *info;
 	int y;
-	const struct OptionGuide *guide;
+	const option_guide *guide;
 	LONG_PTR l;
 	HWND more_button;
 	HWND control, next_control;
@@ -374,7 +374,7 @@ struct putfileopt_info
 {
 	struct transfer_suggestion_info *suggestion_info;
 	option_resolution *resolution;
-	const struct OptionGuide *guide;
+	const option_guide *guide;
 	const char *optspec;
 	int control_count;
 };
@@ -437,7 +437,7 @@ static INT_PTR CALLBACK putfileopt_dialogproc(HWND dialog, UINT message,
 
 
 imgtoolerr_t win_show_option_dialog(HWND parent, struct transfer_suggestion_info *suggestion_info,
-	const struct OptionGuide *guide, const char *optspec,
+	const option_guide *guide, const char *optspec,
 	option_resolution **result, BOOL *cancel)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;

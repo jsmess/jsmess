@@ -67,7 +67,7 @@ struct _imgtool_partition
 	imgtoolerr_t	(*suggest_transfer)(imgtool_partition *partition, const char *path, imgtool_transfer_suggestion *suggestions, size_t suggestions_length);
 	imgtoolerr_t	(*get_chain)	(imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size);
 
-	const struct OptionGuide *writefile_optguide;
+	const option_guide *writefile_optguide;
 	const char *writefile_optspec;
 };
 
@@ -744,7 +744,7 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	p->get_iconinfo					= (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_iconinfo *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_ICON_INFO);
 	p->suggest_transfer				= (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_transfer_suggestion *, size_t))  imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SUGGEST_TRANSFER);
 	p->get_chain					= (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_chainent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_CHAIN);
-	p->writefile_optguide			= (const struct OptionGuide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
+	p->writefile_optguide			= (const option_guide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 	p->writefile_optspec			= pool_strdup_allow_null(p->pool, imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC));
 
 	/* mask out if writing is untested */
@@ -875,7 +875,7 @@ int imgtool_validitychecks(void)
 	int val;
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	const imgtool_module *module = NULL;
-	const struct OptionGuide *guide_entry;
+	const option_guide *guide_entry;
 	imgtool_module_features features;
 	int created_library = FALSE;
 

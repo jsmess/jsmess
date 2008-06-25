@@ -35,7 +35,7 @@ struct _mess_device_config
 {
 	struct IODevice io_device;
 	char string_buffer[1024];
-	struct CreateImageOptions createimage_options[MESS_DEVINFO_CREATE_OPTMAX + 1];
+	create_image_options createimage_options[MESS_DEVINFO_CREATE_OPTMAX + 1];
 };
 
 
@@ -373,7 +373,7 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		mess_device->io_device.start				= (device_start_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_START);
 		mess_device->io_device.stop					= (device_stop_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_STOP);
 
-		mess_device->io_device.createimage_optguide	= (const struct OptionGuide *) mess_device_get_info_ptr(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE_OPTGUIDE);
+		mess_device->io_device.createimage_optguide	= (const option_guide *) mess_device_get_info_ptr(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE_OPTGUIDE);
 
 		createimage_optcount = (int) mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_CREATE_OPTCOUNT);
 		if (createimage_optcount > 0)

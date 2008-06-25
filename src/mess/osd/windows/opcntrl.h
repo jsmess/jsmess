@@ -11,7 +11,7 @@
 #include <windows.h>
 #include "opresolv.h"
 
-BOOL win_prepare_option_control(HWND control, const struct OptionGuide *guide,
+BOOL win_prepare_option_control(HWND control, const option_guide *guide,
 	const char *optspec);
 BOOL win_check_option_control(HWND control);
 BOOL win_adjust_option_control(HWND control, int delta);

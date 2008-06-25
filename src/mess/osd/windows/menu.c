@@ -585,7 +585,7 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 	int format_combo_val;
 	const device_config *dev;
 	const struct IODevice *iodev;
-	const struct OptionGuide *guide;
+	const option_guide *guide;
 	const char *optspec;
 	struct file_dialog_params *params;
 	int has_option;
@@ -650,7 +650,7 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 struct storeval_optres_params
 {
 	struct file_dialog_params *fdparams;
-	const struct OptionGuide *guide_entry;
+	const option_guide *guide_entry;
 };
 
 static void storeval_option_resolution(void *storeval_param, int val)
@@ -688,7 +688,7 @@ static void storeval_option_resolution(void *storeval_param, int val)
 static dialog_box *build_option_dialog(const device_config *dev, char *filter, size_t filter_len, int *create_format, option_resolution **create_args)
 {
 	dialog_box *dialog;
-	const struct OptionGuide *guide_entry;
+	const option_guide *guide_entry;
 	int found, i, pos;
 	char buf[256];
 	struct file_dialog_params *params;

@@ -1167,7 +1167,7 @@ static void menu_insert(HWND window)
 	int use_suggestion_info;
 	imgtool_stream *stream = NULL;
 	filter_getinfoproc filter = NULL;
-	const struct OptionGuide *writefile_optguide;
+	const option_guide *writefile_optguide;
 	const char *writefile_optspec;
 
 	info = get_wimgtool_info(window);
@@ -1197,7 +1197,7 @@ static void menu_insert(HWND window)
 		sizeof(suggestion_info.suggestions) / sizeof(suggestion_info.suggestions[0]));
 
 	/* do we need to show an option dialog? */
-	writefile_optguide = (const struct OptionGuide *) imgtool_partition_get_info_ptr(info->partition, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
+	writefile_optguide = (const option_guide *) imgtool_partition_get_info_ptr(info->partition, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 	writefile_optspec = imgtool_partition_get_info_string(info->partition, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
 	if (suggestion_info.suggestions[0].viability || (writefile_optguide && writefile_optspec))
 	{

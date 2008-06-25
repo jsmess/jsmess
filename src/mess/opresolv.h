@@ -36,8 +36,8 @@
 
 ****************************************************************************/
 
-#ifndef RANGEOPT_H
-#define RANGEOPT_H
+#ifndef __OPRESOLV_H__
+#define __OPRESOLV_H__
 
 #include <stdlib.h>
 
@@ -57,7 +57,8 @@ enum option_type
 	OPTIONTYPE_ENUM_VALUE
 };
 
-struct OptionGuide
+typedef struct _option_guide option_guide;
+struct _option_guide
 {
 	enum option_type option_type;
 	int parameter;
@@ -65,16 +66,16 @@ struct OptionGuide
 	const char *display_name;
 };
 
-#define OPTION_GUIDE_START(option_guide)									\
-	const struct OptionGuide option_guide[] =								\
+#define OPTION_GUIDE_START(option_guide_)									\
+	const option_guide option_guide_[] =								\
 	{																		\
 
 #define OPTION_GUIDE_END													\
 		{ OPTIONTYPE_END }													\
 	};																		\
 
-#define OPTION_GUIDE_EXTERN(option_guide)									\
-	extern const struct OptionGuide option_guide[]							\
+#define OPTION_GUIDE_EXTERN(option_guide_)									\
+	extern const option_guide option_guide_[]							\
 
 #define OPTION_INT(option_char, identifier, display_name)					\
 		{ OPTIONTYPE_INT, (option_char), (identifier), (display_name) },	\
@@ -108,7 +109,7 @@ typedef enum
 
 struct OptionResolutionError
 {
-	const struct OptionGuide *option;
+	const option_guide *option;
 	optreserr_t error;
 };
 
@@ -130,7 +131,7 @@ struct OptionRange
 ***************************************************************************/
 
 /* processing options with option_resolution objects */
-option_resolution *option_resolution_create(const struct OptionGuide *guide, const char *specification);
+option_resolution *option_resolution_create(const option_guide *guide, const char *specification);
 optreserr_t option_resolution_add_param(option_resolution *resolution, const char *param, const char *value);
 optreserr_t option_resolution_finish(option_resolution *resolution);
 void option_resolution_close(option_resolution *resolution);
@@ -139,11 +140,11 @@ const char *option_resolution_lookup_string(option_resolution *resolution, int o
 
 /* option resolution accessors */
 const char *option_resolution_specification(option_resolution *resolution);
-const struct OptionGuide *option_resolution_find_option(option_resolution *resolution, int option_char);
-const struct OptionGuide *option_resolution_index_option(option_resolution *resolution, int indx);
+const option_guide *option_resolution_find_option(option_resolution *resolution, int option_char);
+const option_guide *option_resolution_index_option(option_resolution *resolution, int indx);
 
 /* processing option guides */
-int option_resolution_countoptions(const struct OptionGuide *guide, const char *specification);
+int option_resolution_countoptions(const option_guide *guide, const char *specification);
 
 /* processing option specifications */
 optreserr_t option_resolution_listranges(const char *specification, int option_char,
@@ -155,5 +156,5 @@ int option_resolution_contains(const char *specification, int option_char);
 /* misc */
 const char *option_resolution_error_string(optreserr_t err);
 
-#endif /* RANGEOPT_H */
+#endif /* __OPRESOLV_H__ */
 

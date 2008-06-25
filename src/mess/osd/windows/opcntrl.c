@@ -25,7 +25,7 @@ static const TCHAR value_prop[] = TEXT("opcntrl_value");
 
 
 
-static int get_option_count(const struct OptionGuide *guide,
+static int get_option_count(const option_guide *guide,
 	const char *optspec)
 {
 	struct OptionRange ranges[128];
@@ -41,7 +41,7 @@ static int get_option_count(const struct OptionGuide *guide,
 
 
 
-static BOOL prepare_combobox(HWND control, const struct OptionGuide *guide,
+static BOOL prepare_combobox(HWND control, const option_guide *guide,
 	const char *optspec)
 {
 	struct OptionRange ranges[128];
@@ -136,7 +136,7 @@ static BOOL check_combobox(HWND control)
 
 
 
-static BOOL prepare_editbox(HWND control, const struct OptionGuide *guide,
+static BOOL prepare_editbox(HWND control, const option_guide *guide,
 	const char *optspec)
 {
 	optreserr_t err = OPTIONRESOLUTION_ERROR_SUCCESS;
@@ -185,13 +185,13 @@ done:
 static BOOL check_editbox(HWND control)
 {
 	char buf[256];
-	const struct OptionGuide *guide;
+	const option_guide *guide;
 	const char *optspec;
 	optreserr_t err;
 	HANDLE h;
 	FPTR val;
 
-	guide = (const struct OptionGuide *) GetProp(control, guide_prop);
+	guide = (const option_guide *) GetProp(control, guide_prop);
 	optspec = (const char *) GetProp(control, spec_prop);
 
 	win_get_window_text_utf8(control, buf, sizeof(buf) / sizeof(buf[0]));
@@ -226,7 +226,7 @@ done:
 
 
 
-BOOL win_prepare_option_control(HWND control, const struct OptionGuide *guide,
+BOOL win_prepare_option_control(HWND control, const option_guide *guide,
 	const char *optspec)
 {
 	BOOL rc = FALSE;
@@ -267,14 +267,14 @@ BOOL win_check_option_control(HWND control)
 
 BOOL win_adjust_option_control(HWND control, int delta)
 {
-	const struct OptionGuide *guide;
+	const option_guide *guide;
 	const char *optspec;
 	struct OptionRange ranges[128];
 	char buf[64];
 	int val, original_val, i;
 	BOOL changed = FALSE;
 
-	guide = (const struct OptionGuide *) GetProp(control, guide_prop);
+	guide = (const option_guide *) GetProp(control, guide_prop);
 	optspec = (const char *) GetProp(control, spec_prop);
 
 	assert(guide->option_type == OPTIONTYPE_INT);
@@ -316,7 +316,7 @@ BOOL win_adjust_option_control(HWND control, int delta)
 
 optreserr_t win_add_resolution_parameter(HWND control, option_resolution *resolution)
 {
-	const struct OptionGuide *guide;
+	const option_guide *guide;
 	char buf[256];
 	optreserr_t err;
 	const char *text;
@@ -330,7 +330,7 @@ optreserr_t win_add_resolution_parameter(HWND control, option_resolution *resolu
 	}
 	text = buf;
 
-	guide = (const struct OptionGuide *) GetProp(control, guide_prop);
+	guide = (const option_guide *) GetProp(control, guide_prop);
 	if (!guide)
 	{
 		err = OPTIONRESOLTUION_ERROR_INTERNAL;

@@ -316,7 +316,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	char **filename_list;
 	int filename_count;
 	int partition_index = 0;
-	const struct OptionGuide *writefile_optguide;
+	const option_guide *writefile_optguide;
 	const char *writefile_optspec;
 
 	module = imgtool_find_module(argv[0]);
@@ -341,7 +341,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 		if (err)
 			goto done;
 
-		writefile_optguide = (const struct OptionGuide *) imgtool_partition_get_info_ptr(partition, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
+		writefile_optguide = (const option_guide *) imgtool_partition_get_info_ptr(partition, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 		writefile_optspec = imgtool_partition_get_info_ptr(partition, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
 
 		if (writefile_optguide && writefile_optspec)
@@ -749,7 +749,7 @@ static int cmd_listfilters(const struct command *c, int argc, char *argv[])
 	return 0;
 }
 
-static void listoptions(const struct OptionGuide *opt_guide, const char *opt_spec)
+static void listoptions(const option_guide *opt_guide, const char *opt_spec)
 {
 	char opt_name[32];
 	const char *opt_desc;
@@ -828,7 +828,7 @@ static void listoptions(const struct OptionGuide *opt_guide, const char *opt_spe
 static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[])
 {
 	const imgtool_module *mod;
-	const struct OptionGuide *opt_guide;
+	const option_guide *opt_guide;
 	const char *opt_spec;
 
 	mod = imgtool_find_module(argv[0]);
@@ -838,7 +838,7 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 	fprintf(stdout, "Driver specific options for module '%s':\n\n", argv[0]);
 
 	/* list write options */
-	opt_guide = (const struct OptionGuide *) imgtool_get_info_ptr(&mod->imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
+	opt_guide = (const option_guide *) imgtool_get_info_ptr(&mod->imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 	opt_spec = imgtool_get_info_string(&mod->imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
 	if (opt_guide)
 	{
