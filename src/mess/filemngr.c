@@ -5,10 +5,7 @@
 	MESS's clunky built-in file manager
 
 	TODO
-		- Support image creation; the old file manager did not do this
-		  well.
-			- Should only allow image creation if the device allows
-			- Also support creation arguments
+		- Support image creation arguments
 		- Restrict directory listing by file extension
 		- Support file manager invocation from the main menu for
 		  required images
@@ -27,8 +24,6 @@
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-#define ENABLE_CREATE	0
 
 #define SLOT_EMPTY		"[empty slot]"
 #define SLOT_CREATE		"[create]"
@@ -330,12 +325,13 @@ static UINT32 menu_file_create(running_machine *machine, UINT32 state)
 {
 	static char filename_buffer[1024];
 
+	astring *new_path;
 	ui_menu_item item_list[200];
 	int menu_items = 0;
 	filecreator_state fc_state;
 	UINT32 selected;
 	int visible_items;
-	int underscore_pos;
+	int underscore_pos = -1;
 	menu_extra extra;
 
 	/* disassemble state */
@@ -365,29 +361,48 @@ static UINT32 menu_file_create(running_machine *machine, UINT32 state)
 	extra.top = ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	extra.render = file_creator_render_extra;
 
-	/* if we're selecting the file name, poll the keyboard */
+	/* features that are only enabled when selecting the file name */
 	if (selected == 0)
+	{
+		/* poll the keyboard */
 		poll_keyboard(filename_buffer, ARRAY_LENGTH(filename_buffer), is_valid_filename_char);
 
-	/* put the underscore in the menu */
-	underscore_pos = strlen(filename_buffer);
-	snprintf(filename_buffer + underscore_pos, ARRAY_LENGTH(filename_buffer) - underscore_pos, "_");
+		/* put the underscore in the menu */
+		underscore_pos = strlen(filename_buffer);
+		snprintf(filename_buffer + underscore_pos, ARRAY_LENGTH(filename_buffer) - underscore_pos, "_");
+	}
 
 	/* draw the menu */
 	visible_items = ui_menu_draw(item_list, menu_items, selected, &extra);
 
-	/* remove the underscore */
-	filename_buffer[underscore_pos] = '\0';
+	/* remove the underscore, if present */
+	if (underscore_pos >= 0)
+		filename_buffer[underscore_pos] = '\0';
 
 	/* handle the keys */
 	if (ui_menu_generic_keys(machine, &selected, menu_items, visible_items))
 		goto done;
 
 	if (input_ui_pressed(machine, IPT_UI_SELECT))
-		fatalerror("NYI");
+	{
+		switch(selected)
+		{
+			case 0:
+				/* create the image */
+				new_path = zippath_combine(astring_alloc(), astring_c(current_directory), filename_buffer);
+				image_create(selected_device, astring_c(new_path), 0, NULL);
+				astring_free(new_path);
+
+				/* pop ourselves out */
+				ui_menu_stack_pop();
+				fc_state.i = ui_menu_stack_pop();
+				goto done;
+		}
+	}
+
+	fc_state.s.selected = selected;
 
 done:
-	fc_state.s.selected = selected;
 	return fc_state.i;
 }
 
@@ -483,7 +498,7 @@ static file_error build_file_selector_menu_items(const device_config *device, co
 	(*menu_items)++;
 
 	info = image_device_getinfo(device->machine->config, device);
-	if (ENABLE_CREATE && info.creatable && !zippath_is_zip(directory))
+	if (info.creatable && !zippath_is_zip(directory))
 	{
 		/* add the "[create]" entry */
 		memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
