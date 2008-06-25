@@ -126,7 +126,7 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-- File manager rewrite.  [Nate Woods]
+- File manager rewrite.  (bug #1277) [Nate Woods]
 
 - Tape Control cleanups.  [Nate Woods]
 
