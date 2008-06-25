@@ -1703,8 +1703,8 @@ void image_set_working_directory(const device_config *image, const char *working
 {
 	image_slot_data *slot = find_image_slot(image);
 
-	char *new_working_directory = mame_strdup(working_directory);
-	if (slot->working_directory)
+	char *new_working_directory = (working_directory != NULL) ? mame_strdup(working_directory) : NULL;
+	if (slot->working_directory != NULL)
 		free(slot->working_directory);
 	slot->working_directory = new_working_directory;
 }

@@ -719,6 +719,30 @@ done:
 ***************************************************************************/
 
 /*-------------------------------------------------
+    fix_working_directory - checks the working
+	directory for this device to ensure that it
+	"makes sense"
+-------------------------------------------------*/
+
+static void fix_working_directory(const device_config *device)
+{
+	/* if the image exists, set the working directory to the parent directory */
+	if (image_exists(device))
+	{
+		astring *astr = astring_alloc();
+		zippath_parent(astr, image_filename(selected_device));
+		image_set_working_directory(device, astring_c(astr));
+		astring_free(astr);
+	}
+
+	/* check to see if the path exists; if not clear it */
+	if (check_path(image_working_directory(device)) != FILERR_NONE)
+		image_set_working_directory(device, NULL);
+}
+
+
+
+/*-------------------------------------------------
     file_manager_render_extra - perform our
     special rendering
 -------------------------------------------------*/
@@ -814,18 +838,13 @@ UINT32 menu_file_manager(running_machine *machine, UINT32 state)
 	{
 		if (selected_absolute_index >= 0)
 		{
+			/* ensure that the working directory for this device exists */
+			fix_working_directory(selected_device);
+
 			/* set up current_directory and current_file - depends on whether we have an image */
-			if (image_exists(selected_device))
-			{
-				/* note that we _should_ be able to use image_working_directory(); please fix */
-				current_directory = zippath_parent(astring_alloc(), image_filename(selected_device));
-				current_file = astring_cpyc(astring_alloc(), image_basename(selected_device));
-			}
-			else
-			{
-				current_directory = astring_cpyc(astring_alloc(), image_working_directory(selected_device));
-				current_file = astring_cpyc(astring_alloc(), "");
-			}
+			current_directory = astring_cpyc(astring_alloc(), image_working_directory(selected_device));
+			current_file = astring_cpyc(astring_alloc(),
+				image_exists(selected_device) ? image_basename(selected_device) : "");
 
 			memset(&fs_state, 0, sizeof(fs_state));
 			return ui_menu_stack_push(menu_file_selector, fs_state.i);
