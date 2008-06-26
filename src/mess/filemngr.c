@@ -630,7 +630,10 @@ static UINT32 menu_file_selector(running_machine *machine, UINT32 state)
 
 	/* handle the keys */
 	if (ui_menu_generic_keys(machine, (UINT32 *) &selected, menu_items, visible_items))
+	{
+		menu_is_built = FALSE;
 		goto done;
+	}
 
 	if (input_ui_pressed(machine, IPT_UI_SELECT))
 	{

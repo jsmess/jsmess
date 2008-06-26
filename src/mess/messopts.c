@@ -78,7 +78,7 @@ static void mess_enumerate_devices(core_options *opts, const machine_config *con
 	/* loop on each device instance */
 	for (device = image_device_first(config); device != NULL; device = image_device_next(device))
 	{
-		proc(opts, gamedrv, config, device, index++);
+		(*proc)(opts, gamedrv, config, device, index++);
 	}
 }
 
