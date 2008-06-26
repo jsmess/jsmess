@@ -3,16 +3,20 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Apogee BK-01 [Miodrag Milanovic]
+- Chuang Zao Zhe 50 / Dina / Personal Arcade [Curt Coder]
 - Galaksija Plus [Miodrag Milanovic]
 - Grundy NewBrain A/AD/MD (not working) [Curt Coder]
 - Mikrosha [Miodrag Milanovic]
 - OSCOM Nano  [Curt Coder, HobbyLabs]
 - Partner-01.01 [Miodrag Milanovic]
 - Radio-86RK [Miodrag Milanovic]
+- Sega SC-3000H [Curt Coder]
 
 System Driver Changes:
 ----------------------
 - [ABC80] Fixed graphics mode and lower case natural input. [Curt Coder]
+
+- [ABC80X] Fixed lower case natural input. [Curt Coder]
 
 - [AMIGA] Fixed Keyboard. (bug #1590) [Roberto Zandona']
 
@@ -96,9 +100,13 @@ System Driver Changes:
 
 - [SATURN] Added ROM cartridge support. [R. Belmont]
 
+- [SC3000] Added tape support. [Curt Coder]
+
 - [SCORPION] Added SHA-1's.  [Fabio Priuli]
 
 - [SG1000] Added .bin extension.  [Fabio Priuli]
+
+- [SG1000] Added pause/reset buttons. [Curt Coder]
 
 - [SF7000] Fixed lower case natural input. [Curt Coder]
 
@@ -110,6 +118,8 @@ System Driver Changes:
 
 - [TI99] Implemented loading and saving of the battery-backed RAM of the
   MiniMemory cartridge.  [Michael Zapf]
+
+- [TMC600] Added tape support. [Curt Coder]
 
 - [X68000] Added basic SASI hard disk support [Barry Rodewald]:
   Currently supported SASI commands:
