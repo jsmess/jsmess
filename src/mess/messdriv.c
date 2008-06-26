@@ -97,6 +97,7 @@ const game_driver *const test_drivers[] =
 	DRIVER( sg1000 )	/* Sega SG-1000 (Japan)								*/
 	DRIVER( sg1000m2 )	/* Sega SG-1000 Mark II (Japan)						*/
 	DRIVER( sc3000 )	/* Sega SC-3000 (Japan)								*/
+	DRIVER( sc3000h )	/* Sega SC-3000H (Japan)							*/
 	DRIVER( sf7000 )	/* Sega SC-3000 w/ SF-7000 (Japan)					*/
 
 	DRIVER( gamegear )	/* Sega GameGear									*/

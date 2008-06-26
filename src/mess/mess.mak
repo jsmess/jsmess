@@ -514,7 +514,6 @@ $(MESSOBJ)/neocd.a:						\
 	$(EMU_MACHINE)/pd4990a.o		\
 
 $(MESSOBJ)/coleco.a:   \
-	$(MESS_MACHINE)/coleco.o	\
 	$(MESS_DRIVERS)/coleco.o	\
 	$(MESS_MACHINE)/adam.o		\
 	$(MESS_DRIVERS)/adam.o		\

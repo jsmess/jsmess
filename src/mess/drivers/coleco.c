@@ -54,36 +54,164 @@
 
 ***************************************************************************/
 
+/*
+
+	TODO:
+
+	- Dina SG-1000 mode
+
+*/
+
 #include "driver.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-#include "includes/coleco.h"
 #include "devices/cartslot.h"
 
-READ8_HANDLER(coleco_video_r)
+static int joy_mode;
+static int joy_status[2];
+
+/* Read/Write Handlers */
+
+static READ8_HANDLER( paddle_1_r )
 {
-    return ((offset & 0x01) ? TMS9928A_register_r(machine, 1) : TMS9928A_vram_r(machine, 0));
+	UINT8 inport6 = input_port_read_safe(machine, "IN6", 0);
+
+	/* Keypad and fire 1 (SAC Yellow Button) */
+	if (joy_mode==0)
+	{
+		UINT8 inport0 = input_port_read(machine, "IN0");
+		UINT8 inport1 = input_port_read(machine, "IN1");
+
+		/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
+		than one, a real ColecoVision think that it is a third button, so we are going to emulate
+		the right behaviour */
+
+		UINT8 data = 0x0F;	/* No key pressed by default */
+
+		if (!(inport6 & 0x01)) /* If Driving Controller enabled -> no keypad 1*/
+		{
+		    if (!(inport0 & 0x01)) data &= 0x0A; /* 0 */
+		    if (!(inport0 & 0x02)) data &= 0x0D; /* 1 */
+		    if (!(inport0 & 0x04)) data &= 0x07; /* 2 */
+		    if (!(inport0 & 0x08)) data &= 0x0C; /* 3 */
+		    if (!(inport0 & 0x10)) data &= 0x02; /* 4 */
+		    if (!(inport0 & 0x20)) data &= 0x03; /* 5 */
+		    if (!(inport0 & 0x40)) data &= 0x0E; /* 6 */
+		    if (!(inport0 & 0x80)) data &= 0x05; /* 7 */
+		    if (!(inport1 & 0x01)) data &= 0x01; /* 8 */
+		    if (!(inport1 & 0x02)) data &= 0x0B; /* 9 */
+		    if (!(inport1 & 0x04)) data &= 0x06; /* # */
+		    if (!(inport1 & 0x08)) data &= 0x09; /* . */
+		}
+		return (inport1 & 0x70) | (data);
+	}
+	/* Joystick and fire 2 (SAC Red Button) */
+	else
+	{
+		UINT8 data = input_port_read(machine, "IN2") & 0xCF;
+
+		if (inport6 & 0x07) /* If Extra Contollers enabled */
+		{
+		    if (joy_status[0] == 0) data |= 0x30; /* Spinner Move Left*/
+		    else if (joy_status[0] == 1) data |= 0x20; /* Spinner Move Right */
+		}
+
+		return data | 0x80;
+	}
 }
 
-WRITE8_HANDLER(coleco_video_w)
+static READ8_HANDLER( paddle_2_r )
 {
-    (offset & 0x01) ? TMS9928A_register_w(machine, 1, data) : TMS9928A_vram_w(machine, 0, data);
+	/* Keypad and fire 1 */
+	if (joy_mode == 0)
+	{
+		UINT8 inport3 = input_port_read(machine, "IN3");
+		UINT8 inport4 = input_port_read(machine, "IN4");
+
+		/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
+		than one, a real ColecoVision think that it is a third button, so we are going to emulate
+		the right behaviour */
+
+		UINT8 data = 0x0F;	/* No key pressed by default */
+
+		if (!(inport3 & 0x01)) data &= 0x0A; /* 0 */
+		if (!(inport3 & 0x02)) data &= 0x0D; /* 1 */
+		if (!(inport3 & 0x04)) data &= 0x07; /* 2 */
+		if (!(inport3 & 0x08)) data &= 0x0C; /* 3 */
+		if (!(inport3 & 0x10)) data &= 0x02; /* 4 */
+		if (!(inport3 & 0x20)) data &= 0x03; /* 5 */
+		if (!(inport3 & 0x40)) data &= 0x0E; /* 6 */
+		if (!(inport3 & 0x80)) data &= 0x05; /* 7 */
+		if (!(inport4 & 0x01)) data &= 0x01; /* 8 */
+		if (!(inport4 & 0x02)) data &= 0x0B; /* 9 */
+		if (!(inport4 & 0x04)) data &= 0x06; /* # */
+		if (!(inport4 & 0x08)) data &= 0x09; /* . */
+
+		return (inport4 & 0x70) | (data);
+	}
+	/* Joystick and fire 2*/
+	else
+	{
+		UINT8 data = input_port_read(machine, "IN5") & 0xCF;
+		UINT8 inport6 = input_port_read_safe(machine, "IN6", 0);
+
+		if (inport6 & 0x02) /* If Roller Controller enabled */
+		{
+		    if (joy_status[1] == 0) data |= 0x30;
+		    else if (joy_status[1] == 1) data |= 0x20;
+		}
+
+		return data | 0x80;
+	}
 }
+
+static WRITE8_HANDLER( paddle_off_w )
+{
+	joy_mode = 0;
+}
+
+static WRITE8_HANDLER( paddle_on_w )
+{
+	joy_mode = 1;
+}
+
+/* Memory Maps */
 
 static ADDRESS_MAP_START( coleco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x5fff) AM_NOP
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coleco_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x9f) AM_WRITE(coleco_paddle_toggle_off)
-	AM_RANGE(0xa0, 0xbf) AM_READWRITE(coleco_video_r, coleco_video_w)
-	AM_RANGE(0xc0, 0xdf) AM_WRITE(coleco_paddle_toggle_on)
-	AM_RANGE(0xe0, 0xff) AM_READWRITE(coleco_paddle_r, SN76496_0_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(paddle_on_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_WRITE(SN76496_0_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(paddle_1_r)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(paddle_2_r)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( czz50_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( czz50_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(paddle_on_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_WRITE(SN76496_0_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(paddle_1_r)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(paddle_2_r)
+ADDRESS_MAP_END
+
+/* Input Ports */
 
 static INPUT_PORTS_START( coleco )
     PORT_START_TAG("IN0")
@@ -156,7 +284,49 @@ static INPUT_PORTS_START( coleco )
     PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( czz50 )
+    PORT_START_TAG("IN0")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 
+    PORT_START_TAG("IN1")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("#") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('#')
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(".") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('.')
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		PORT_PLAYER(1)
+    PORT_BIT( 0xb0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+    PORT_START_TAG("IN2")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_PLAYER(1)
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(1)
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_PLAYER(1)
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_PLAYER(1)
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )		PORT_PLAYER(1)
+    PORT_BIT( 0xb0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+    PORT_START_TAG("IN3")
+    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+    PORT_START_TAG("IN4")
+    PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		PORT_PLAYER(2)
+    PORT_BIT( 0xb0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+    PORT_START_TAG("IN5")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_PLAYER(2)
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(2)
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_PLAYER(2)
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_PLAYER(2)
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )		PORT_PLAYER(2)
+    PORT_BIT( 0xb0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 /***************************************************************************
 
@@ -177,7 +347,7 @@ static INTERRUPT_GEN( coleco_interrupt )
     TMS9928A_interrupt(machine);
 }
 
-static void coleco_vdp_interrupt (running_machine *machine, int state)
+static void coleco_vdp_interrupt(running_machine *machine, int state)
 {
 	static int last_state = 0;
 
@@ -186,28 +356,30 @@ static void coleco_vdp_interrupt (running_machine *machine, int state)
 	last_state = state;
 }
 
-static TIMER_CALLBACK(paddle_callback)
+static TIMER_CALLBACK( paddle_callback )
 {
-    int port7 = input_port_read(machine, "IN7");
-    int port8 = input_port_read(machine, "IN8");
+    int port7 = input_port_read_safe(machine, "IN7", 0);
+    int port8 = input_port_read_safe(machine, "IN8", 0);
 
     if (port7 == 0)
-		JoyStat[0] = 0;
+		joy_status[0] = 0;
     else if (port7 & 0x08)
-		JoyStat[0] = -1;
+		joy_status[0] = -1;
     else
-		JoyStat[0] = 1;
+		joy_status[0] = 1;
 
     if (port8 == 0)
-		JoyStat[1] = 0;
+		joy_status[1] = 0;
     else if (port8 & 0x08)
-		JoyStat[1] = -1;
+		joy_status[1] = -1;
     else
-		JoyStat[1] = 1;
+		joy_status[1] = 1;
 
-    if (JoyStat[0] || JoyStat[1])
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+    if (joy_status[0] || joy_status[1])
+		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
 }
+
+/* Machine Initialization */
 
 static const TMS9928a_interface tms9928a_interface =
 {
@@ -222,16 +394,18 @@ static MACHINE_START( coleco )
 	TMS9928A_configure(&tms9928a_interface);
 }
 
-static MACHINE_RESET(coleco)
+static MACHINE_RESET( coleco )
 {
-    cpunum_set_input_line_vector(0, 0, 0xff);
+    cpunum_set_input_line_vector(0, INPUT_LINE_IRQ0, 0xff);
 	memset(&memory_region(REGION_CPU1)[0x6000], 0xff, 0x400);	// initialize RAM
     timer_pulse(ATTOTIME_IN_MSEC(20), NULL, 0, paddle_callback);
 }
 
+/* Machine Drivers */
+
 static MACHINE_DRIVER_START( coleco )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, 7159090/2)	// 3.579545 MHz
+	MDRV_CPU_ADD(Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
 	MDRV_CPU_PROGRAM_MAP(coleco_map, 0)
 	MDRV_CPU_IO_MAP(coleco_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", coleco_interrupt)
@@ -242,14 +416,44 @@ static MACHINE_DRIVER_START( coleco )
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SN76489A, 7159090/2)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD(SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( czz50 )
+	// basic machine hardware
+	MDRV_CPU_ADD(Z80, XTAL_7_15909MHz/2)	// ???
+	MDRV_CPU_PROGRAM_MAP(czz50_map, 0)
+	MDRV_CPU_IO_MAP(czz50_io_map, 0)
+	MDRV_CPU_VBLANK_INT("main", coleco_interrupt)
+
+	MDRV_MACHINE_START(coleco)
+	MDRV_MACHINE_RESET(coleco)
+
+    // video hardware
+	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SN76489A, XTAL_7_15909MHz/2)	// ???
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( dina )
+	MDRV_IMPORT_FROM(czz50)
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
+MACHINE_DRIVER_END
+
+/* ROMs */
 
 ROM_START (coleco)
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -270,23 +474,81 @@ ROM_START (colecob)
 	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START( czz50 )
+    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_LOAD( "czz50.rom", 0x0000, 0x2000, CRC(4999abc6) SHA1(96aecec3712c94517103d894405bc98a7dafa440) )
+    ROM_CONTINUE(		  0x8000, 0x2000 )
+ROM_END
+
+#define rom_dina rom_czz50
+#define rom_prsarcde rom_czz50
+
+/* System Configuration */
+
+static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
+{
+	int retval = IMAGE_VERIFY_FAIL;
+
+	/* Verify the file is in Colecovision format */
+	if ((cartdata[0] == 0xAA) && (cartdata[1] == 0x55)) /* Production Cartridge */
+		retval = IMAGE_VERIFY_PASS;
+	if ((cartdata[0] == 0x55) && (cartdata[1] == 0xAA)) /* "Test" Cartridge. Some games use this method to skip ColecoVision title screen and delay */
+		retval = IMAGE_VERIFY_PASS;
+
+	return retval;
+}
+
 static void coleco_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_VERIFY:						info->imgverify = coleco_cart_verify; break;
+		case MESS_DEVINFO_PTR_VERIFY:					info->imgverify = coleco_cart_verify; break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
 }
 
-static SYSTEM_CONFIG_START(coleco)
+static SYSTEM_CONFIG_START( coleco )
 	CONFIG_DEVICE(coleco_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY   FULLNAME
-CONS( 1982, coleco,   0,		0,	coleco,   coleco,   0,		coleco,	"Coleco", "ColecoVision" , 0)
-CONS( 1982, colecoa,  coleco,	0,		coleco,   coleco,   0,		coleco,	"Coleco", "ColecoVision (Thick Characters)" , 0)
-CONS( 1983, colecob,  coleco,	0,		coleco,   coleco,   0,		coleco,	"Spectravideo", "SVI-603 Coleco Game Adapter" , 0)
+static DEVICE_IMAGE_LOAD( czz50_cart )
+{
+	int size = image_length(image);
+	UINT8 *ptr = memory_region(REGION_CPU1) + 0x8000;
+
+	if (image_fread(image, ptr, size ) != size)
+	{
+		return INIT_FAIL;
+	}
+
+	return INIT_PASS;
+}
+
+static void czz50_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
+{
+	switch( state )
+	{
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(czz50_cart); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "rom,col,bin"); break;
+
+		default:										cartslot_device_getinfo( devclass, state, info ); break;
+	}
+}
+
+static SYSTEM_CONFIG_START( czz50 )
+	CONFIG_DEVICE(czz50_cartslot_getinfo)
+SYSTEM_CONFIG_END
+
+/* System Drivers */
+
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY				FULLNAME							FLAGS
+CONS( 1982, coleco,   0,		0,		coleco,   coleco,   0,		coleco,	"Coleco",			"ColecoVision",						0 )
+CONS( 1982, colecoa,  coleco,	0,		coleco,   coleco,   0,		coleco,	"Coleco",			"ColecoVision (Thick Characters)",	0 )
+CONS( 1983, colecob,  coleco,	0,		coleco,   coleco,   0,		coleco,	"Spectravideo",		"SVI-603 Coleco Game Adapter",		0 )
+CONS( 1986, czz50,	  0,		0,		czz50,	  czz50,	0,		czz50,	"Bit Corporation",	"Chuang Zao Zhe 50",				0 )
+CONS( 1988, dina,	  czz50,	0,		dina,	  czz50,	0,		czz50,	"Telegames",		"Dina",								0 )
+CONS( 1988, prsarcde, czz50,	0,		czz50,	  czz50,	0,		czz50,	"Telegames",		"Personal Arcade",					0 )
