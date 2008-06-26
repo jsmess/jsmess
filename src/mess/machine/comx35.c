@@ -537,10 +537,6 @@ MACHINE_START( comx35p )
 
 	wd17xx_init(machine, WD_TYPE_1770, comx35_fdc_callback, NULL);
 
-	// external flag 4
-
-	state->cdp1802_ef4 = 1;
-
 	// register save states
 
 	state_save_register_postload(machine, comx35_state_save_postload, NULL);
@@ -580,6 +576,7 @@ MACHINE_RESET( comx35 )
 
 	state->cdp1802_mode = CDP1802_MODE_RESET;
 	state->iden = 1;
+	state->cdp1802_ef4 = 1;
 
 	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_MSEC(t), 0);
 }

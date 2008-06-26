@@ -240,7 +240,7 @@ static CDP1802_EF_READ( comx35_ef_r )
 	if (!state->cdp1871_efxa) flags -= EF3;
 
 	// cassette input, expansion device flag
-	if (!state->cdp1802_ef4 || cassette_input(cassette_device_image()) < -0.9) flags -= EF4;
+	if ((cassette_input(cassette_device_image()) < +0.0) || !state->cdp1802_ef4) flags -= EF4;
 
 	return flags;
 }
@@ -297,7 +297,7 @@ static CDP1802_Q_WRITE( comx35_q_w )
 	}
 
 	// cassette output
-	cassette_output(cassette_device_image(), level ? -1.0 : +1.0);
+	cassette_output(cassette_device_image(), level ? +1.0 : -1.0);
 }
 
 static CDP1802_INTERFACE( comx35_cdp1802_config )
