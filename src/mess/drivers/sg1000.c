@@ -15,13 +15,16 @@
 
     TODO:
 
-    - SG-1000 pause button
-    - SC-3000 reset key
-    - SC-3000 cassette
-    - SF-7000 serial comms
     - SP-400 serial printer
+	- SH-400 racing controller
+    - SF-7000 serial comms
 
 */
+
+static const device_config *cassette_device_image(void)
+{
+	return image_from_devtype_and_index(IO_CASSETTE, 0);
+}
 
 /* Terebi Oekaki (TV Draw) */
 
@@ -87,8 +90,8 @@ static ADDRESS_MAP_START( sg1000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdc) AM_READ(input_port_0_r)
-	AM_RANGE(0xdd, 0xdd) AM_READ(input_port_1_r)
+	AM_RANGE(0xdc, 0xdc) AM_READ_PORT("PA7")
+	AM_RANGE(0xdd, 0xdd) AM_READ_PORT("PB7")
 	AM_RANGE(0xde, 0xde) AM_READ(sg1000_joysel_r) AM_WRITENOP
 	AM_RANGE(0xdf, 0xdf) AM_NOP
 ADDRESS_MAP_END
@@ -106,7 +109,7 @@ static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE( PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 // SF-7000
@@ -121,15 +124,20 @@ static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE( PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe0, 0xe0) AM_READ(nec765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(nec765_data_r, nec765_data_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE( PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xe9, 0xe9) AM_READWRITE(msm8251_status_r, msm8251_control_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
+
+static INPUT_CHANGED( trigger_nmi )
+{
+	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, (input_port_read(field->port->machine, "NMI") ? CLEAR_LINE : ASSERT_LINE));
+}
 
 static INPUT_PORTS_START( tvdraw )
 	PORT_START_TAG("TVDRAW_X")
@@ -160,8 +168,8 @@ static INPUT_PORTS_START( sg1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("PAUSE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE")
+	PORT_START_TAG("NMI")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_P) PORT_CHANGED(trigger_nmi, 0)
 
 	PORT_INCLUDE( tvdraw )
 INPUT_PORTS_END
@@ -203,7 +211,7 @@ static INPUT_PORTS_START( sk1100 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INS DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PI") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xcf\x80") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x03c0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR('`')
 
@@ -213,7 +221,7 @@ static INPUT_PORTS_START( sk1100 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x93") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
 
@@ -223,7 +231,7 @@ static INPUT_PORTS_START( sk1100 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CR") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -233,8 +241,8 @@ static INPUT_PORTS_START( sk1100 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("UP") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("PA7")
@@ -268,7 +276,7 @@ static INPUT_PORTS_START( sk1100 )
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("PB5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("YEN") PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xc2\xa5") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0x00a5)
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FUNC") PORT_CODE(KEYCODE_TAB)
 
@@ -284,8 +292,8 @@ static INPUT_PORTS_START( sk1100 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START_TAG("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10)
+	PORT_START_TAG("NMI")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED(trigger_nmi, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc3000 )
@@ -375,8 +383,26 @@ static READ8_HANDLER( sc3000_ppi8255_b_r )
         PB7     Cassette tape input
     */
 
+	UINT8 data = 0;
+
+	/* keyboard */
+
 	sprintf(port, "PB%d", keylatch);
-	return ( input_port_read(machine, port) | 0x70 );
+	data = input_port_read(machine, port);
+
+	/* cartridge contact */
+
+	data |= 0x10;
+	
+	/* printer */
+	
+	data |= 0x60;
+
+	/* cassette */
+
+	if (cassette_input(cassette_device_image()) > +0.0) data |= 0x80;
+
+	return data;
 }
 
 static WRITE8_HANDLER( sc3000_ppi8255_c_w )
@@ -394,7 +420,15 @@ static WRITE8_HANDLER( sc3000_ppi8255_c_w )
         PC7     /FEED to printer
     */
 
+	/* keyboard */
+	
 	keylatch = data & 0x07;
+
+	/* cassette */
+
+	cassette_output(cassette_device_image(), BIT(data, 4) ? +1.0 : -1.0);
+
+	/* printer */
 }
 
 static const ppi8255_interface sc3000_ppi8255_intf =
@@ -575,7 +609,7 @@ static MACHINE_DRIVER_START( sg1000 )
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
+	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	// sound hardware
@@ -599,7 +633,7 @@ static MACHINE_DRIVER_START( sc3000 )
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
+	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	// sound hardware
@@ -630,7 +664,7 @@ static MACHINE_DRIVER_START( sf7000 )
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
+	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	// sound hardware
@@ -657,6 +691,8 @@ ROM_START( sc3000 )
     ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00 )
 ROM_END
 
+#define rom_sc3000h rom_sc3000
+
 ROM_START( sf7000 )
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(d76810b8) SHA1(77339a6db2593aadc638bed77b8e9bed5d9d87e3) )
@@ -668,15 +704,13 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 {
 	if (size == 40 * 1024)
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_UNMAP);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_UNMAP);
 		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
 		memory_set_bank(1, 0);
 	}
 	else if (size == 48 * 1024)
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
 		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
 		memory_set_bank(1, 0);
 	}
@@ -693,8 +727,7 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 	{
 		// The Castle
 
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
 	}
 }
 
@@ -710,8 +743,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 
 	sg1000_map_cartridge_memory(image->machine, ptr, size);
 
-	memory_install_read8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc3ff, 0, 0x3c00, SMH_BANK2);
-	memory_install_write8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc3ff, 0, 0x3c00, SMH_BANK2);
+	memory_install_readwrite8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc3ff, 0, 0x3c00, SMH_BANK2, SMH_BANK2);
 
 	return INIT_PASS;
 }
@@ -720,10 +752,10 @@ static void sg1000_cartslot_getinfo( const mess_device_class *devclass, UINT32 s
 {
 	switch( state )
 	{
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sg1000_cart); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg,bin"); break;
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:			info->i = 1; break;
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(sg1000_cart); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "sg,bin"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
 	}
@@ -735,28 +767,21 @@ static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr)
 	{
 		// SC-3000 BASIC Level III
 
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK1);
-
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
 	}
 	else if (!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
 	{
 		// Sega SC-3000 Music Editor
 
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1);
-
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2, SMH_BANK2);
 	}
 	else
 	{
 		// regular cartridges
 
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2, SMH_BANK2);
 	}
 }
 
@@ -833,7 +858,7 @@ static void sf7000_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 static DEVICE_IMAGE_LOAD( sf7000_serial )
 {
 	/* filename specified */
-	if (device_load_serial_device(image)==INIT_PASS)
+	if (device_load_serial_device(image) == INIT_PASS)
 	{
 		/* setup transmit parameters */
 		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
@@ -891,7 +916,8 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY   FULLNAME */
 CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"SG-1000", 0 )
+CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		sg1000,		"Sega",	"SG-1000 II", 0 )
+//CONS( 1983,	omv,        sg1000, 0,      omv,        omv,        0,      omv,        "Tsukuda Original", "Othello Multivision", GAME_NOT_WORKING )
 COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", 0 )
+COMP( 1983,	sc3000h,	sc3000,	0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000H", 0 )
 COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sf7000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", 0 )
-CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		sg1000,		"Sega",	"SG-1000 Mark II", 0 )
-//COMP( 1983,   omv,        sg1000, 0,      omv,        omv,        0,      omv,        "Tsukuda Original", "Othello Multivision", GAME_NOT_WORKING )
