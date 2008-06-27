@@ -16,6 +16,7 @@
 #include "includes/radio86.h"
 
 static int radio86_keyboard_mask;
+UINT8 radio86_tape_value;
 
 static UINT8 radio_ram_disk[0x10000];
 
@@ -29,6 +30,7 @@ DRIVER_INIT(radio86)
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
 	
 	memset(radio_ram_disk,0,0x10000);
+	radio86_tape_value = 0x10;
 }
 
 static READ8_HANDLER (radio86_8255_portb_r2 )
@@ -50,7 +52,7 @@ static READ8_HANDLER (radio86_8255_portc_r2 )
 	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
 	UINT8 dat = input_port_read(machine,"LINE8");
 	if (level <  0) { 
-		dat ^= 0x10;
+		dat ^= radio86_tape_value;
  	}	
 	return dat;	
 }
@@ -70,19 +72,21 @@ const ppi8255_interface radio86_ppi8255_interface_1 =
 	NULL,
 };
 
+const ppi8255_interface mikrosha_ppi8255_interface_1 =
+{
+	radio86_8255_portb_r2,
+	NULL,
+	radio86_8255_portc_r2,
+	NULL,
+	radio86_8255_porta_w2,
+	NULL,
+};
+
+
 static I8275_DMA_REQUEST(radio86_video_dma_request) {
-	const device_config *dma8257 = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, "dma8257");
+	const device_config *dma8257 = device_list_find_by_tag(device->machine->config->devicelist, DMA8257, "dma8257");
 	dma8257_drq_w(dma8257, 2, state);
 }
-
-const i8275_interface radio86_i8275_interface = {
-	"main",
-	6,
-	0,
-	radio86_video_dma_request,
-	NULL,
-	radio86_display_pixels
-};
 
 static READ8_HANDLER(radio86_dma_read_byte)
 {
@@ -120,7 +124,7 @@ static UINT8 romdisk_lsb,romdisk_msb, disk_sel;
 
 MACHINE_RESET( radio86 )
 {
-	timer_set(ATTOTIME_IN_USEC(1000), NULL, 0, radio86_reset);
+	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, radio86_reset);
 	memory_set_bank(1, 1);
 
 	radio86_keyboard_mask = 0;
@@ -161,4 +165,55 @@ const ppi8255_interface radio86_ppi8255_interface_2 =
 	NULL,
 	radio86_romdisk_portb_w,
 	radio86_romdisk_portc_w
+};
+
+static WRITE8_HANDLER (mikrosha_8255_font_page_w )
+{
+	mikrosha_font_page = (data  > 7) & 1;
+}
+
+const ppi8255_interface mikrosha_ppi8255_interface_2 =
+{
+	NULL,
+	NULL,
+	NULL,
+	NULL,	
+	mikrosha_8255_font_page_w,
+	NULL
+};
+
+const i8275_interface radio86_i8275_interface = {
+	"main",
+	6,
+	0,
+	radio86_video_dma_request,
+	NULL,
+	radio86_display_pixels
+};
+
+const i8275_interface mikrosha_i8275_interface = {
+	"main",
+	6,
+	0,
+	radio86_video_dma_request,
+	NULL,
+	mikrosha_display_pixels
+};
+
+const i8275_interface apogee_i8275_interface = {
+	"main",
+	6,
+	0,
+	radio86_video_dma_request,
+	NULL,
+	apogee_display_pixels
+};
+
+const i8275_interface partner_i8275_interface = {
+	"main",
+	6,
+	1,
+	radio86_video_dma_request,
+	NULL,
+	partner_display_pixels
 };

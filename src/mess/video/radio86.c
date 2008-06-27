@@ -31,6 +31,68 @@ I8275_DISPLAY_PIXELS(radio86_display_pixels)
 	}
 }
 
+UINT8 mikrosha_font_page;
+
+I8275_DISPLAY_PIXELS(mikrosha_display_pixels)
+{
+	int i;
+	bitmap_t *bitmap = tmpbitmap;
+	UINT8 *charmap = memory_region(device->machine, REGION_GFX1) + (mikrosha_font_page & 1) * 0x400;
+	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	if (vsp) {
+		pixels = 0;
+	}
+	if (lten) {
+		pixels = 0xff;
+	}
+	if (rvv) {
+		pixels ^= 0xff;
+	}
+	for(i=0;i<6;i++) {
+		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+	}
+}
+
+I8275_DISPLAY_PIXELS(apogee_display_pixels)
+{
+	int i;
+	bitmap_t *bitmap = tmpbitmap;
+	UINT8 *charmap = memory_region(device->machine, REGION_GFX1) + (gpa & 1) * 0x400;
+	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	if (vsp) {
+		pixels = 0;
+	}
+	if (lten) {
+		pixels = 0xff;
+	}
+	if (rvv) {
+		pixels ^= 0xff;
+	}
+	for(i=0;i<6;i++) {
+		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+	}
+}
+
+I8275_DISPLAY_PIXELS(partner_display_pixels)
+{
+	int i;
+	bitmap_t *bitmap = tmpbitmap;
+	UINT8 *charmap = memory_region(device->machine, REGION_GFX1) + 0x400 * (gpa * 2 + hlgt);
+	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	if (vsp) {
+		pixels = 0;
+	}
+	if (lten) {
+		pixels = 0xff;
+	}
+	if (rvv) {
+		pixels ^= 0xff;
+	}
+	for(i=0;i<6;i++) {
+		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1;
+	}
+}
+
 VIDEO_UPDATE( radio86 )
 {
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, I8275, "i8275");

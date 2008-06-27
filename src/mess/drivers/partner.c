@@ -14,6 +14,7 @@
 #include "video/i8275.h"
 #include "devices/cassette.h"
 #include "formats/rk_cas.h"
+#include "includes/radio86.h"
 #include "includes/partner.h"
 
 /* Address maps */
@@ -127,7 +128,7 @@ static MACHINE_DRIVER_START( partner )
     MDRV_MACHINE_RESET( partner )
 
 	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( partner_ppi8255_interface_1 )
+	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_1 )
 
 	MDRV_DEVICE_ADD( "i8275", I8275 )
 	MDRV_DEVICE_CONFIG(partner_i8275_interface)
@@ -139,17 +140,17 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_SCREEN_SIZE(78*6, 30*10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 	MDRV_PALETTE_LENGTH(3)
-	MDRV_PALETTE_INIT(partner)
+	MDRV_PALETTE_INIT(radio86)
 
 	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(partner)
+	MDRV_VIDEO_UPDATE(radio86)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_DEVICE_ADD("dma8257", DMA8257)
-	MDRV_DEVICE_CONFIG(partner_dma)
+	MDRV_DEVICE_CONFIG(radio86_dma)
 MACHINE_DRIVER_END
 
 static void partner_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

@@ -1261,14 +1261,9 @@ $(MESSOBJ)/radio.a:      \
 	$(MESS_MACHINE)/radio86.o \
 	$(MESS_VIDEO)/radio86.o \
 	$(MESS_DRIVERS)/apogee.o \
-	$(MESS_MACHINE)/apogee.o \
-	$(MESS_VIDEO)/apogee.o \
 	$(MESS_DRIVERS)/partner.o \
 	$(MESS_MACHINE)/partner.o \
-	$(MESS_VIDEO)/partner.o \
 	$(MESS_DRIVERS)/mikrosha.o \
-	$(MESS_MACHINE)/mikrosha.o \
-	$(MESS_VIDEO)/mikrosha.o \
 	$(MESS_VIDEO)/i8275.o \
 
 $(MESSOBJ)/comx.a:				\

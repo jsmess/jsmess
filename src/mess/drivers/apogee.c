@@ -14,7 +14,7 @@
 #include "video/i8275.h"
 #include "devices/cassette.h"
 #include "formats/rk_cas.h"
-#include "includes/apogee.h"
+#include "includes/radio86.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(apogee_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -118,10 +118,10 @@ static MACHINE_DRIVER_START( apogee )
     /* basic machine hardware */
     MDRV_CPU_ADD(8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(apogee_mem, 0)
-    MDRV_MACHINE_RESET( apogee )
+    MDRV_MACHINE_RESET( radio86 )
 
 	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( apogee_ppi8255_interface_1 )
+	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_1 )
 
 	//MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
 	//MDRV_DEVICE_CONFIG( apogee_ppi8255_interface_2 )
@@ -136,17 +136,17 @@ static MACHINE_DRIVER_START( apogee )
 	MDRV_SCREEN_SIZE(78*6, 30*10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 	MDRV_PALETTE_LENGTH(3)
-	MDRV_PALETTE_INIT(apogee)
+	MDRV_PALETTE_INIT(radio86)
 
 	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(apogee)
+	MDRV_VIDEO_UPDATE(radio86)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_DEVICE_ADD("dma8257", DMA8257)
-	MDRV_DEVICE_CONFIG(apogee_dma)
+	MDRV_DEVICE_CONFIG(radio86_dma)
 MACHINE_DRIVER_END
 
 static void apogee_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -178,4 +178,4 @@ SYSTEM_CONFIG_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1989, apogee, radio86,0, 		 apogee, 	apogee,apogee, apogee,  "Zavod BRA", 	"Apogee BK-01",	0)
+COMP( 1989, apogee, radio86,0, 		 apogee, 	apogee,radio86, apogee,  "Zavod BRA", 	"Apogee BK-01",	0)

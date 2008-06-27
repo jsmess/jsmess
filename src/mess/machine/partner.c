@@ -13,9 +13,8 @@
 #include "machine/8255ppi.h"
 #include "machine/8257dma.h"
 #include "video/i8275.h"
+#include "includes/radio86.h"
 #include "includes/partner.h"
-
-static int partner_keyboard_mask;
 
 static UINT8 partner_mem_page;
 static UINT8 partner_win_mem_page;
@@ -24,88 +23,9 @@ static UINT8 partner_win_mem_page;
 DRIVER_INIT(partner)
 {
 	memset(mess_ram,0,64*1024);
+	radio86_tape_value = 0x80;
 }
 
-static READ8_HANDLER (partner_8255_portb_r2 )
-{
-	UINT8 key = 0xff;
-	if ((partner_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
-	if ((partner_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
-	if ((partner_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
-	if ((partner_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
-	if ((partner_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
-	if ((partner_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
-	if ((partner_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
-	if ((partner_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
-	return key;
-}
-
-static READ8_HANDLER (partner_8255_portc_r2 )
-{
-	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
-	UINT8 dat = input_port_read(machine,"LINE8");
-	if (level <  0) {
-		dat ^= 0x80;
- 	}
-	return dat;
-}
-
-static WRITE8_HANDLER (partner_8255_porta_w2 )
-{
-	partner_keyboard_mask = data ^ 0xff;
-}
-
-const ppi8255_interface partner_ppi8255_interface_1 =
-{
-	NULL,
-	partner_8255_portb_r2,
-	partner_8255_portc_r2,
-	partner_8255_porta_w2,
-	NULL,
-	NULL,
-};
-
-
-static I8275_DMA_REQUEST(partner_video_dma_request) {
-	const device_config *dma8257 = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, "dma8257");
-	dma8257_drq_w(dma8257, 2, state);
-}
-
-const i8275_interface partner_i8275_interface = {
-	"main",
-	6,
-	1,
-	partner_video_dma_request,
-	NULL,
-	partner_display_pixels
-};
-
-static READ8_HANDLER( partner_dma_read_byte )
-{
-	UINT8 result;
-	cpuintrf_push_context(0);
-	result = program_read_byte(offset);
-	cpuintrf_pop_context();
-	return result;
-}
-
-static WRITE8_HANDLER( partner_write_video )
-{
-	i8275_dack_set_data((device_config*)device_list_find_by_tag( machine->config->devicelist, I8275, "i8275" ),data);
-}
-
-const dma8257_interface partner_dma =
-{
-	0,
-	XTAL_16MHz / 9,
-
-	partner_dma_read_byte,
-	0,
-
-	{ 0, 0, 0, 0 },
-	{ 0, 0, partner_write_video, 0 },
-	{ 0, 0, 0, 0 }
-};
 
 static void partner_bank_switch(running_machine *machine)
 {
@@ -268,7 +188,6 @@ WRITE8_HANDLER (partner_mem_page_w )
 
 MACHINE_RESET( partner )
 {
-	partner_keyboard_mask = 0;
 	partner_mem_page = 0;
 	partner_bank_switch(machine);
 }

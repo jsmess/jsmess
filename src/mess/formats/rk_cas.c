@@ -267,7 +267,7 @@ static const struct CassetteFormat rkp_cassette_format = {
 };
 
 static const struct CassetteFormat gam_cassette_format = {
-	"gam,g16",
+	"gam,g16,pki",
 	gam_cassette_identify,
 	gam_cassette_load,
 	NULL

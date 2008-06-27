@@ -14,7 +14,7 @@
 #include "video/i8275.h"
 #include "devices/cassette.h"
 #include "formats/rk_cas.h"
-#include "includes/mikrosha.h"
+#include "includes/radio86.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -24,7 +24,7 @@ static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
     AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
     //AM_RANGE( 0xd800, 0xd603 ) AM_MIRROR(0x07fc) // Timer
-	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
+	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
@@ -118,7 +118,7 @@ static MACHINE_DRIVER_START( mikrosha )
     /* basic machine hardware */
     MDRV_CPU_ADD(8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
-    MDRV_MACHINE_RESET( mikrosha )
+    MDRV_MACHINE_RESET( radio86 )
 
 	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
 	MDRV_DEVICE_CONFIG( mikrosha_ppi8255_interface_1 )
@@ -136,17 +136,17 @@ static MACHINE_DRIVER_START( mikrosha )
 	MDRV_SCREEN_SIZE(78*6, 30*10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 	MDRV_PALETTE_LENGTH(3)
-	MDRV_PALETTE_INIT(mikrosha)
+	MDRV_PALETTE_INIT(radio86)
 
 	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(mikrosha)
+	MDRV_VIDEO_UPDATE(radio86)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_DEVICE_ADD("dma8257", DMA8257)
-	MDRV_DEVICE_CONFIG(mikrosha_dma)
+	MDRV_DEVICE_CONFIG(radio86_dma)
 MACHINE_DRIVER_END
 
 static void mikrosha_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -178,4 +178,4 @@ SYSTEM_CONFIG_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT    MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME        FLAGS */
-COMP( 1987, mikrosha, radio86,0, 		mikrosha, 	mikrosha,	mikrosha,	mikrosha,  	"Lianozovo Electromechanical Factory", 		"Mikrosha",		0)
+COMP( 1987, mikrosha, radio86,0, 		mikrosha, 	mikrosha,	radio86,	mikrosha,  	"Lianozovo Electromechanical Factory", 		"Mikrosha",		0)
