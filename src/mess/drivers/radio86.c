@@ -254,18 +254,18 @@ ROM_END
 
 ROM_START( radiorom )
 	ROM_REGION( 0x18000, REGION_CPU1, ROMREGION_ERASEFF )
-	ROM_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(B5CDEAB7))
+	ROM_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(B5CDEAB7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8))
 	ROM_COPY( REGION_CPU1, 0xf800, 0xf000, 0x0800 )
-	ROM_LOAD( "romdisk.rk", 0x10000, 0x8000, CRC(6B16FC04))
+	ROM_LOAD( "romdisk.rk", 0x10000, 0x8000, CRC(6B16FC04) SHA1(8c09322ae184f4d900f1032d20b5cf3eb2f1a24b))
 	ROM_REGION(0x0800, REGION_GFX1,0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( radioram )
 	ROM_REGION( 0x20000, REGION_CPU1, ROMREGION_ERASEFF )
-	ROM_LOAD( "r86-1.bin", 0xf800, 0x0800, CRC(7E7AB7CB))
-	ROM_LOAD( "r86-2.bin", 0xe000, 0x0800, CRC(955F0616))
-	ROM_LOAD( "romdisk.bin", 0x10000, 0x10000, CRC(43C0279B))
+	ROM_LOAD( "r86-1.bin", 0xf800, 0x0800, CRC(7E7AB7CB) SHA1(fedb00b6b8fbe1167faba3e4611b483f800e6934))
+	ROM_LOAD( "r86-2.bin", 0xe000, 0x0800, CRC(955F0616) SHA1(d2b9f960558bdcb60074091fc79d1ad56c313586))
+	ROM_LOAD( "romdisk.bin", 0x10000, 0x10000, CRC(43C0279B) SHA1(bc1dfd9bdbce39460616e2158f5d96279d0af3cf))
 	ROM_REGION(0x0800, REGION_GFX1,0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
@@ -281,6 +281,6 @@ COMP( 1986, radio86, 0,       0, 	radio86, 	radio86,radio86, radio86,  "", 	"Rad
 COMP( 1986, radio16, radio86, 0, 	radio16, 	radio86,radio86, radio86,  "", 	"Radio-86RK (16K RAM)",	0)
 COMP( 1986, radio4k, radio86, 0, 	radio86, 	radio86,radio86, radio86,  "", 	"Radio-86RK (4K ROM)",	0)
 COMP( 1986, radiorom,radio86, 0, 	radiorom, 	radio86,radio86, radio86,  "", 	"Radio-86RK (ROM-Disk)",	0)
-COMP( 1986, radioram, radio86, 0, 	radioram, 	radio86,radio86, radio86,  "", 	"Radio-86RK (ROM/RAM Disk)",	0)
+COMP( 1986, radioram, radio86, 0, 	radioram, 	radio86,radioram, radio86,  "", "Radio-86RK (ROM/RAM Disk)",	0)
 COMP( 1986, spektr01,radio86, 0, 	radio86, 	radio86,radio86, radio86,  "", 	"Spektr-001",	0)
 

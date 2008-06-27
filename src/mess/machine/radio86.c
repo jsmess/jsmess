@@ -18,7 +18,7 @@
 static int radio86_keyboard_mask;
 UINT8 radio86_tape_value;
 
-static UINT8 radio_ram_disk[0x10000];
+static UINT8* radio_ram_disk;
 
 /* Driver initialization */
 DRIVER_INIT(radio86)
@@ -28,11 +28,15 @@ DRIVER_INIT(radio86)
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
   	memory_configure_bank(1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
-	
-	memset(radio_ram_disk,0,0x10000);
 	radio86_tape_value = 0x10;
 }
 
+DRIVER_INIT(radioram)
+{
+	DRIVER_INIT_CALL(radio86);
+	radio_ram_disk = auto_malloc(0x20000);
+	memset(radio_ram_disk,0,0x20000);
+}
 static READ8_HANDLER (radio86_8255_portb_r2 )
 {
 	UINT8 key = 0xff;
@@ -115,7 +119,7 @@ const dma8257_interface radio86_dma =
 	{ 0, 0, 0, 0 }
 };
 
-static TIMER_CALLBACK( radio86_reset )
+static TIMER_CALLBACK( radio86_reset )	
 {
 	memory_set_bank(1, 0);
 }
@@ -143,7 +147,11 @@ static READ8_HANDLER (radio86_romdisk_porta_r )
 	if ((disk_sel & 0x0f) ==0) {
 		return romdisk[romdisk_msb*256+romdisk_lsb];	
 	} else {
-		return radio_ram_disk[romdisk_msb*256+romdisk_lsb];
+		if (disk_sel==0xdf) {
+			return radio_ram_disk[romdisk_msb*256+romdisk_lsb + 0x10000];
+		} else {
+			return radio_ram_disk[romdisk_msb*256+romdisk_lsb];
+		}
 	}
 }
 

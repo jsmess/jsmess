@@ -14,6 +14,7 @@
 /*----------- defined in machine/radio86.c -----------*/
 
 extern DRIVER_INIT( radio86 );
+extern DRIVER_INIT( radioram );
 extern MACHINE_RESET( radio86 );
 
 extern const ppi8255_interface radio86_ppi8255_interface_1;
