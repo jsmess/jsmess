@@ -32,6 +32,7 @@
 #include "debug/debugvw.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debugger.h"
 
 // MAMEOS headers
 #include "debugwin.h"
@@ -459,8 +460,6 @@ void debugwin_show(int type)
 
 void debugwin_update_during_game(void)
 {
-	int execution_state = debug_get_execution_state();
-
 	{
 		static int osx_inited_debugger = 0;
 
@@ -476,7 +475,7 @@ void debugwin_update_during_game(void)
 	}
 
 	// if we're running live, do some checks
-	if (execution_state != EXECUTION_STATE_STOPPED)
+	if ( ! debug_cpu_is_stopped(Machine) )
 	{
 		// see if the interrupt key is pressed and break if it is
 		temporarily_fake_that_we_are_not_visible = TRUE;
@@ -490,7 +489,7 @@ void debugwin_update_during_game(void)
 				focuswnd = NULL;
 			}
 			
-			debug_halt_on_next_instruction();
+			debugger_break(Machine);
 			debug_console_printf("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
@@ -543,15 +542,15 @@ static debugwin_info *debug_window_create(const char *title, void *unused)
 
 	debugwin_info *info = NULL;
 	Rect work_bounds;
-	
+
 	(void)unused;
-	
+
 	// allocate memory
 	info = malloc(sizeof(*info));
 	if (!info)
 		return NULL;
 	memset(info, 0, sizeof(*info));
-	
+
 	info->wnd = NULL;
 
 	// create the window
@@ -560,7 +559,7 @@ static debugwin_info *debug_window_create(const char *title, void *unused)
 
 	if ( CreateNewWindow(kDocumentWindowClass, DEBUG_WINDOW_STYLE, &work_bounds, &info->wnd) != noErr )
 		goto cleanup;
-	
+
 	// install keyboard handler
 	if ( keyEventHandler == NULL )
 	{
@@ -1977,7 +1976,7 @@ static void memory_determine_combo_items(void)
 	// then add all the memory regions
 	for (rgnnum = 0; rgnnum < MAX_MEMORY_REGIONS; rgnnum++)
 	{
-		UINT8 *base = memory_region(rgnnum);
+		UINT8 *base = memory_region(Machine, rgnnum);
 		UINT32 type = memory_region_type(Machine, rgnnum);
 		if (base != NULL && type > REGION_INVALID && (type - REGION_INVALID) < ARRAY_LENGTH(memory_region_names))
 		{
@@ -1986,7 +1985,7 @@ static void memory_determine_combo_items(void)
 			UINT8 width, little_endian;
 			memset(ci, 0, sizeof(*ci));
 			ci->base = base;
-			ci->length = memory_region_length(rgnnum);
+			ci->length = memory_region_length(Machine, rgnnum);
 			width = 1 << (flags & ROMREGION_WIDTHMASK);
 			little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
 			if (type >= REGION_CPU1 && type <= REGION_CPU8)
@@ -2871,7 +2870,7 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent)
 				cpu_num = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
 				cpuinfo = (debug_cpu_info*)debug_get_cpu_info(cpu_num);
 
-				for (bp = cpuinfo->first_bp; bp; bp = bp->next)
+				for (bp = cpuinfo->bplist; bp; bp = bp->next)
 				{
 					if (BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM) == bp->address)
 					{
@@ -2965,7 +2964,7 @@ static int disasm_handle_key(debugwin_info *info, EventRef inEvent)
 					cpu_num = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
 					cpuinfo = (debug_cpu_info*)debug_get_cpu_info(cpu_num);
 
-					for (bp = cpuinfo->first_bp; bp; bp = bp->next)
+					for (bp = cpuinfo->bplist; bp; bp = bp->next)
 					{
 						if (BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM) == bp->address)
 						{
@@ -3042,6 +3041,8 @@ void console_create_window(void)
 	CGDirectDisplayID	mainID = CGMainDisplayID();
 	MenuItemIndex	menuIndex;
 	ControlButtonContentInfo	content;
+
+	debugwin_init_windows();
 
 	// create the window
 	info = debug_window_create("Debug", NULL);
