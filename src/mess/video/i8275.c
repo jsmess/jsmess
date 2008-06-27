@@ -362,7 +362,9 @@ static void i8275_draw_char_line(const device_config *device)
 					vsp = 1;
 				}				
 			}
-			
+			if (vsp==0 && i8275->blink) {
+				vsp = (i8275->char_blink_cnt < 32)  ? 1: 0;
+			}			
 			if ((i8275->current_row == i8275->cursor_row) && (xpos ==  i8275->cursor_col - i8275->intf->char_delay)) {
 				int vis = 1;
 				if ((i8275->cursor_format & 2)==0) {
