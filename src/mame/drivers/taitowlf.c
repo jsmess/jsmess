@@ -142,7 +142,7 @@ static void mxtc_config_w(int function, int reg, UINT8 data)
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(1, memory_region(REGION_USER1) + 0x30000);
+				memory_set_bankptr(1, memory_region(Machine, REGION_USER1) + 0x30000);
 			}
 			break;
 		}
@@ -536,7 +536,7 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_RESET(taitowlf)
 {
-	memory_set_bankptr(1, memory_region(REGION_USER1) + 0x30000);
+	memory_set_bankptr(1, memory_region(machine, REGION_USER1) + 0x30000);
 
 	cpunum_set_irq_callback(0, irq_callback);
 
@@ -693,7 +693,7 @@ static DRIVER_INIT( taitowlf )
 	bios_ram = auto_malloc(0x10000);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, taitowlf_set_keyb_int);
-	mc146818_init(MC146818_STANDARD);
+	mc146818_init(machine, MC146818_STANDARD);
 
 	intel82439tx_init();
 

@@ -2007,7 +2007,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 	DeleteMenu(menu_bar, ID_OPTIONS_PROFILER, MF_BYCOMMAND);
 #endif
 
-	if (!HAS_DEBUGGER || !machine->debug_mode)
+	if (!HAS_DEBUGGER || ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0))
 		DeleteMenu(menu_bar, ID_OPTIONS_DEBUGGER, MF_BYCOMMAND);
 
 #if !HAS_TOGGLEFULLSCREEN

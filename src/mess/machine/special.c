@@ -29,7 +29,7 @@ static int specialist_8255_portc;
 DRIVER_INIT(special)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = memory_region(REGION_CPU1);	
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);	
 	memset(RAM,0x0000,0x3000); // make frist page empty by default
 	memory_configure_bank(1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(1, 0, 2, RAM, 0xc000);	
@@ -184,8 +184,8 @@ static void specimx_set_bank(running_machine *machine, int i,int data)
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_UNMAP);
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
 			
-				memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000);
-				memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x19000);
+				memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000);
+				memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0x19000);
 			  if (data & 0x80) {
 					memory_set_bankptr(3, mess_ram + 0x1c000);					
 				} else {
@@ -330,7 +330,7 @@ static void erik_set_bank(running_machine *machine) {
 						break;		
 		case 	0: 
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000);	
+						memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000);	
 						break;
 	}
 	switch(bank2) {
@@ -341,7 +341,7 @@ static void erik_set_bank(running_machine *machine) {
 						break;		
 		case 	0: 
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x14000);	
+						memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0x14000);	
 						break;
 	}
 	switch(bank3) {
@@ -352,7 +352,7 @@ static void erik_set_bank(running_machine *machine) {
 						break;		
 		case 	0: 
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x19000);	
+						memory_set_bankptr(3, memory_region(machine, REGION_CPU1) + 0x19000);	
 						break;
 	}
 	switch(bank4) {
@@ -365,7 +365,7 @@ static void erik_set_bank(running_machine *machine) {
 						break;		
 		case 	0: 
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(4, memory_region(REGION_CPU1) + 0x1c000);	
+						memory_set_bankptr(4, memory_region(machine, REGION_CPU1) + 0x1c000);	
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_UNMAP);
 						memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_NOP);
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_w);

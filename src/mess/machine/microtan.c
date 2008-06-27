@@ -324,9 +324,9 @@ static TIMER_CALLBACK(microtan_read_cassette)
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)
-		via_set_input_cb2(0,0);
+		via_set_input_cb2(machine, 0,0);
 	else if (level > +0.07)
-		via_set_input_cb2(0,1);
+		via_set_input_cb2(machine, 0,1);
 }
 
 READ8_HANDLER( microtan_sound_r )
@@ -693,7 +693,7 @@ static void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
 
 static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
 {
-    UINT8 *RAM = memory_region(REGION_CPU1);
+    UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
     /* check for .DMP file format */
     if (snapshot_size == 8263)
@@ -843,7 +843,7 @@ QUICKLOAD_LOAD( microtan_hexfile )
 
 DRIVER_INIT( microtan )
 {
-    UINT8 *dst = memory_region(REGION_GFX2);
+    UINT8 *dst = memory_region(machine, REGION_GFX2);
     int i;
 
     for (i = 0; i < 256; i++)

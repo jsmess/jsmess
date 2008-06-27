@@ -627,7 +627,7 @@ static VIDEO_START( pc_ega )
 	memset( &ega, 0, sizeof( ega ) );
 
 	/* Install 256KB Video ram on our EGA card */
-	ega.videoram = memory_region( REGION_GFX2 );
+	ega.videoram = memory_region(machine,  REGION_GFX2 );
 
 	memset( ega.videoram + 256 * 1024, 0xFF, 64 * 1024 );
 

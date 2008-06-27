@@ -388,11 +388,11 @@ static DRIVER_INIT( amiga )
 		0                                        /* flags */
 	};
 
-	amiga_machine_config(&amiga_intf);
+	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
 
 	/* initialize cartridge (if present) */
 	amiga_cart_init(machine);
@@ -421,11 +421,11 @@ static DRIVER_INIT( amiga_ecs )
 		0                                        /* flags */
 	};
 
-	amiga_machine_config(&amiga_intf);
+	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
 
 	/* initialize Action Replay (if present) */
 	amiga_cart_init(machine);
@@ -454,11 +454,11 @@ static DRIVER_INIT( cdtv )
 		0                                        /* flags */
 	};
 
-	amiga_machine_config(&amiga_intf);
+	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
 
 	/* initialize the cdrom controller */
 	amigacd_init();

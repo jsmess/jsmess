@@ -179,9 +179,6 @@ static UINT32 n7751_rom_address;
  *
  *************************************/
 
-extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
-
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
 
@@ -409,7 +406,7 @@ static WRITE8_HANDLER( n7751_command_w )
         D1    = /CS for ROM 0
         D0    = A14 line to ROMs
     */
-	int numroms = memory_region_length(REGION_SOUND1) / 0x8000;
+	int numroms = memory_region_length(machine, REGION_SOUND1) / 0x8000;
 	n7751_rom_address &= 0x3fff;
 	n7751_rom_address |= (data & 0x01) << 14;
 	if (!(data & 0x02) && numroms >= 1) n7751_rom_address |= 0x00000;
@@ -449,7 +446,7 @@ static WRITE8_HANDLER( n7751_rom_offset_w )
 static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
-	return memory_region(REGION_SOUND1)[n7751_rom_address];
+	return memory_region(machine, REGION_SOUND1)[n7751_rom_address];
 }
 
 
@@ -3108,27 +3105,27 @@ static DRIVER_INIT( aceattaa )
 static DRIVER_INIT( afighter )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0018();
+	fd1089_decrypt_0018(machine);
 }
 
 
 static DRIVER_INIT( alexkid1 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0021();
+	fd1089_decrypt_0021(machine);
 }
 
 
 static DRIVER_INIT( aliensy1 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0033();
+	fd1089_decrypt_0033(machine);
 }
 
 static DRIVER_INIT( aliensy5 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0037();
+	fd1089_decrypt_0037(machine);
 }
 
 static DRIVER_INIT( bodyslam )
@@ -3160,7 +3157,7 @@ static DRIVER_INIT( quartet )
 static DRIVER_INIT( sdi )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0027();
+	fd1089_decrypt_0027(machine);
 	custom_io_r = sdi_custom_io_r;
 }
 
@@ -3168,7 +3165,7 @@ static DRIVER_INIT( sdi )
 static DRIVER_INIT( sjryukoa )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_5021();
+	fd1089_decrypt_5021(machine);
 	custom_io_r = sjryuko_custom_io_r;
 	lamp_changed_w = sjryuko_lamp_changed_w;
 }
@@ -3177,13 +3174,13 @@ static DRIVER_INIT( sjryukoa )
 static DRIVER_INIT( timesca1 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0024();
+	fd1089_decrypt_0024(machine);
 }
 
 static DRIVER_INIT( wb35 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_wb35();
+	fd1089_decrypt_wb35(machine);
 }
 
 /*************************************
@@ -3206,7 +3203,7 @@ GAME( 1987, aliensy5, aliensyn, system16a,        aliensyn, aliensy5,    ROT0,  
 GAME( 1987, aliensy2, aliensyn, system16a,        aliensyn, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", 0 )
 GAME( 1987, aliensy1, aliensyn, system16a,        aliensy1, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 1, System 16A, FD1089A 317-0033)", 0 )
 GAME( 1988, aceattaa, aceattac, system16a       , aceattaa, aceattaa,    ROT270, "Sega",           "Ace Attacker (Japan, System 16A, FD1094 317-0060)", 0 )
-GAME( 1986, afighter, 0,        system16a_no7751, afighter, afighter,    ROT270, "Sega",           "Action Fighter, FD1089A 317-0018", 0 )
+GAME( 1986, afighter, 0,        system16a_no7751, afighter, afighter,    ROT270, "Sega",           "Action Fighter (FD1089A 317-0018)", 0 )
 GAME( 1986, alexkidd, 0,        system16a,        alexkidd, generic_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 2, unprotected)", 0 )
 GAME( 1986, alexkid1, alexkidd, system16a,        alexkidd, alexkid1,    ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", 0 )
 GAME( 1986, fantzone, 0,        system16a_no7751, fantzone, generic_16a, ROT0,   "Sega",           "Fantasy Zone (set 2, unprotected)", 0 )

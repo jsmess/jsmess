@@ -325,7 +325,7 @@ static void c64_irq (running_machine *machine, int level)
 
 WRITE8_HANDLER(c64_tape_read)
 {
-	cia_issue_index(0);
+	cia_issue_index(machine, 0);
 }
 
 static void c64_cia0_interrupt (running_machine *machine, int level)
@@ -843,12 +843,12 @@ static void c64_common_driver_init (running_machine *machine)
 
 	/*    memset(c64_memory, 0, 0xfd00); */
 	if (!ultimax) {
-		c64_basic=memory_region(REGION_CPU1)+0x10000;
-		c64_kernal=memory_region(REGION_CPU1)+0x12000;
-		c64_chargen=memory_region(REGION_CPU1)+0x14000;
-		c64_colorram=memory_region(REGION_CPU1)+0x15000;
-		c64_roml=memory_region(REGION_CPU1)+0x15400;
-		c64_romh=memory_region(REGION_CPU1)+0x17400;
+		c64_basic=memory_region(machine, REGION_CPU1)+0x10000;
+		c64_kernal=memory_region(machine, REGION_CPU1)+0x12000;
+		c64_chargen=memory_region(machine, REGION_CPU1)+0x14000;
+		c64_colorram=memory_region(machine, REGION_CPU1)+0x15000;
+		c64_roml=memory_region(machine, REGION_CPU1)+0x15400;
+		c64_romh=memory_region(machine, REGION_CPU1)+0x17400;
 #if 0
 	{0x10000, 0x11fff, SMH_ROM, &c64_basic},	/* basic at 0xa000 */
 	{0x12000, 0x13fff, SMH_ROM, &c64_kernal},	/* kernal at 0xe000 */
@@ -866,13 +866,13 @@ static void c64_common_driver_init (running_machine *machine)
 
 		cia_intf[0] = c64_cia0;
 		cia_intf[0].tod_clock = c64_pal ? 50 : 60;
-		cia_config(0, &cia_intf[0]);
+		cia_config(machine, 0, &cia_intf[0]);
 
 		if (c64_cia1_on)
 		{
 			cia_intf[1] = c64_cia1;
 			cia_intf[1].tod_clock = c64_pal ? 50 : 60;
-			cia_config(1, &cia_intf[1]);
+			cia_config(machine, 1, &cia_intf[1]);
 		}
 	}
 

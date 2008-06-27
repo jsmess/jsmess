@@ -883,14 +883,14 @@ static void setup_cart_banks( void ) {
 }
 
 static void setup_banks( running_machine *machine ) {
-	sms_banking_bios[1] = sms_banking_cart[1] = sms_banking_none[1] = memory_region(REGION_CPU1);
-	sms_banking_bios[2] = sms_banking_cart[2] = sms_banking_none[2] = memory_region(REGION_CPU1);
-	sms_banking_bios[3] = sms_banking_cart[3] = sms_banking_none[3] = memory_region(REGION_CPU1);
-	sms_banking_bios[4] = sms_banking_cart[4] = sms_banking_none[4] = memory_region(REGION_CPU1);
+	sms_banking_bios[1] = sms_banking_cart[1] = sms_banking_none[1] = memory_region(machine, REGION_CPU1);
+	sms_banking_bios[2] = sms_banking_cart[2] = sms_banking_none[2] = memory_region(machine, REGION_CPU1);
+	sms_banking_bios[3] = sms_banking_cart[3] = sms_banking_none[3] = memory_region(machine, REGION_CPU1);
+	sms_banking_bios[4] = sms_banking_cart[4] = sms_banking_none[4] = memory_region(machine, REGION_CPU1);
 
-	BIOS = memory_region(REGION_USER1);
+	BIOS = memory_region(machine, REGION_USER1);
 
-	smsBiosPageCount = ( BIOS ? memory_region_length(REGION_USER1) / 0x4000 : 0 );
+	smsBiosPageCount = ( BIOS ? memory_region_length(machine, REGION_USER1) / 0x4000 : 0 );
 
 	setup_cart_banks();
 

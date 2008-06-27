@@ -338,7 +338,7 @@ static void maria_draw_scanline(void)
 INTERRUPT_GEN( a7800_interrupt )
 {
 	int frame_scanline;
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	maria_scanline++;
 
@@ -457,7 +457,7 @@ VIDEO_UPDATE( a7800 )
 
  READ8_HANDLER( a7800_MARIA_r )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	switch (offset)
 	{
 		case 0x08:
@@ -471,7 +471,7 @@ VIDEO_UPDATE( a7800 )
 
 WRITE8_HANDLER( a7800_MARIA_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	switch (offset)
 	{
 		case 0x00:

@@ -444,7 +444,7 @@ static int internal_pc_cga_video_start(running_machine *machine, int personality
 	memset(&cga, 0, sizeof(cga));
 	cga.update_row = NULL;
 
-	cga.chr_gen = memory_region( REGION_GFX1 ) + 0x1000;
+	cga.chr_gen = memory_region(machine,  REGION_GFX1 ) + 0x1000;
 
 	state_save_register_item("pccga", 0, cga.mode_control);
 	state_save_register_item("pccga", 0, cga.color_select);
@@ -517,10 +517,10 @@ static VIDEO_UPDATE( mc6845_cga )
 	switch ( CGA_FONT & 0x01 )
 	{
 	case 0:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x1800;
+		cga.chr_gen = memory_region(screen->machine, REGION_GFX1) + 0x1800;
 		break;
 	case 1:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x1000;
+		cga.chr_gen = memory_region(screen->machine, REGION_GFX1) + 0x1000;
 		break;
 	}
 	return 0;
@@ -1641,16 +1641,16 @@ static VIDEO_UPDATE( mc6845_pc1512 )
 	switch ( CGA_FONT & 0x03 )
 	{
 	case 0:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x0000;
+		cga.chr_gen = memory_region(screen->machine, REGION_GFX1) + 0x0000;
 		break;
 	case 1:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x0800;
+		cga.chr_gen = memory_region(screen->machine, REGION_GFX1) + 0x0800;
 		break;
 	case 2:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x1000;
+		cga.chr_gen = memory_region(screen->machine, REGION_GFX1) + 0x1000;
 		break;
 	case 3:
-		cga.chr_gen = memory_region(REGION_GFX1) + 0x1800;
+		cga.chr_gen = memory_region(screen->machine, REGION_GFX1) + 0x1800;
 		break;
 	}
 

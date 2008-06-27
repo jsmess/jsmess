@@ -24,10 +24,10 @@ merged Street Fighter Zero for MESS
 
 #include "drivers/cps1.c"
 
-void wof_decode(void)      { }
-void dino_decode(void)     { }
-void punisher_decode(void) { }
-void slammast_decode(void) { }
+void wof_decode(running_machine *machine)      { }
+void dino_decode(running_machine *machine)     { }
+void punisher_decode(running_machine *machine) { }
+void slammast_decode(running_machine *machine) { }
 
 void forogttn_dummy_function(running_machine *machine)
 {

@@ -152,7 +152,7 @@ static INPUT_PORTS_START( skyfox )
 
 	PORT_START_TAG("IN2")	// Coins, DSW + Vblank
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_VBLANK  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN1   )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNUSED   )			// was IPT_COIN1, but does not trigger coin
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit  2C/1C" )	// coin A & B
 	PORT_DIPSETTING(    0x04, "1 Coin/2 Credits 3C/1C" )
@@ -415,8 +415,8 @@ ROM_END
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
 static DRIVER_INIT( skyfox )
 {
-	UINT8 *RAM = memory_region(REGION_GFX1);
-	UINT8 *end = RAM + memory_region_length(REGION_GFX1);
+	UINT8 *RAM = memory_region(machine, REGION_GFX1);
+	UINT8 *end = RAM + memory_region_length(machine, REGION_GFX1);
 	UINT8 buf[32*32];
 
 	while (RAM < end)

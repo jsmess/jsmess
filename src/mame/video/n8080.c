@@ -157,6 +157,7 @@ VIDEO_UPDATE( spacefev )
 	int y;
 
 	const UINT8* pRAM = videoram;
+	const UINT8* pPROM = memory_region(screen->machine, REGION_PROMS);
 
 	for (y = 0; y < 256; y++)
 	{
@@ -174,7 +175,7 @@ VIDEO_UPDATE( spacefev )
 			}
 			else
 			{
-				UINT8 val = memory_region(REGION_PROMS)[x >> 3];
+				UINT8 val = pPROM[x >> 3];
 
 				if ((x >> 3) == 0x06)
 				{
@@ -223,7 +224,7 @@ VIDEO_UPDATE( sheriff )
 {
 	UINT8 mask = flip_screen_get() ? 0xff : 0x00;
 
-	const UINT8* pPROM = memory_region(REGION_PROMS);
+	const UINT8* pPROM = memory_region(screen->machine, REGION_PROMS);
 
 	int x;
 	int y;
@@ -269,8 +270,8 @@ VIDEO_UPDATE( sheriff )
 
 VIDEO_UPDATE( helifire )
 {
-	int SUN_BRIGHTNESS = input_port_read_indexed(screen->machine, 4);
-	int SEA_BRIGHTNESS = input_port_read_indexed(screen->machine, 5);
+	int SUN_BRIGHTNESS = input_port_read(screen->machine, "POT0");
+	int SEA_BRIGHTNESS = input_port_read(screen->machine, "POT1");
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 

@@ -249,7 +249,7 @@ void spectrum_plus3_update_memory(running_machine *machine)
 
 			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
 
-			ChosenROM = memory_region(REGION_CPU1) + 0x010000 + (ROMSelection<<14);
+			ChosenROM = memory_region(machine, REGION_CPU1) + 0x010000 + (ROMSelection<<14);
 
 			memory_set_bankptr(1, ChosenROM);
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);

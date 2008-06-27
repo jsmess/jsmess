@@ -104,9 +104,9 @@ static const device_config *cdrom_device_image( void ) {
 }
 
 static WRITE8_HANDLER( pce_sf2_banking_w ) {
-	memory_set_bankptr( 2, memory_region(REGION_USER1) + offset * 0x080000 + 0x080000 );
-	memory_set_bankptr( 3, memory_region(REGION_USER1) + offset * 0x080000 + 0x088000 );
-	memory_set_bankptr( 4, memory_region(REGION_USER1) + offset * 0x080000 + 0x0D0000 );
+	memory_set_bankptr( 2, memory_region(machine, REGION_USER1) + offset * 0x080000 + 0x080000 );
+	memory_set_bankptr( 3, memory_region(machine, REGION_USER1) + offset * 0x080000 + 0x088000 );
+	memory_set_bankptr( 4, memory_region(machine, REGION_USER1) + offset * 0x080000 + 0x0D0000 );
 }
 
 static WRITE8_HANDLER( pce_cartridge_ram_w ) {
@@ -122,7 +122,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : %s\n", image_filename(image));
 
 	/* open file to get size */
-	ROM = memory_region(REGION_USER1);
+	ROM = memory_region(image->machine, REGION_USER1);
 
 	size = image_length( image );
 

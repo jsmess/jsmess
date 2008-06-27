@@ -861,8 +861,8 @@ static void command_verify_memory(running_machine *machine)
 	if (region)
 	{
 		/* we're validating a conventional memory region */
-		target_data = memory_region(region);
-		target_data_size = memory_region_length(region);
+		target_data = memory_region(machine, region);
+		target_data_size = memory_region_length(machine, region);
 	}
 	else
 	{

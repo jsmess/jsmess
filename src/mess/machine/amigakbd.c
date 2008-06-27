@@ -19,16 +19,16 @@ static int key_buf_pos = 0;
 static int key_cur_pos = 0;
 static emu_timer *kbd_timer;
 
-static void kbd_sendscancode( UINT8 scancode )
+static void kbd_sendscancode( running_machine *machine, UINT8 scancode )
 {
 	int j;
 
 	/* send over to the cia A */
 	for( j = 0; j < 8; j++ )
 	{
-		cia_set_input_cnt( 0, 0 );	/* lower cnt */
+		cia_set_input_cnt( machine, 0, 0 );	/* lower cnt */
 		cia_set_input_sp( 0, ( scancode >> j ) & 1 ); /* set the serial data */
-		cia_set_input_cnt( 0, 1 );	/* raise cnt */
+		cia_set_input_cnt( machine, 0, 1 );	/* raise cnt */
 	}
 }
 
@@ -46,7 +46,7 @@ static TIMER_CALLBACK( kbd_update_callback )
 	/* fetch the next scan code and send it to the Amiga */
 	scancode = key_buf[key_cur_pos++];
 	key_cur_pos %= KEYBOARD_BUFFER_SIZE;
-	kbd_sendscancode( scancode );
+	kbd_sendscancode( machine, scancode );
 
 	/* if we still have more data, schedule another update */
 	if ( key_buf_pos != key_cur_pos )

@@ -133,7 +133,7 @@ static void render_sprites(running_machine *machine)
     INT32 xInc;
     INT32 i, j;
 
-    UINT8* memory = memory_region(REGION_CPU1);
+    UINT8* memory = memory_region(machine, REGION_CPU1);
 
     for (i = 0; i < 8; i++) {
 		struct intv_sprite_type* s = &intv_sprite[i];
@@ -302,7 +302,7 @@ static void render_color_stack_mode(running_machine *machine, bitmap_t *bitmap)
             isGrom = !(nextCard & 0x0800);
             if (isGrom) {
                 memoryLocation = 0x3000 + (nextCard & 0x07F8);
-                memory = memory_region(REGION_CPU1);
+                memory = memory_region(machine, REGION_CPU1);
                 for (j = 0; j < 16; j+=2)
                     render_line(machine, bitmap, memory[(memoryLocation<<1)+j],
                             nextx, nexty+j, fgcolor, bgcolor);
@@ -338,7 +338,7 @@ static void render_fg_bg_mode(running_machine *machine, bitmap_t *bitmap)
         isGrom = !(nextCard & 0x0800);
         if (isGrom) {
             memoryLocation = 0x3000 + (nextCard & 0x01F8);
-            memory = memory_region(REGION_CPU1);
+            memory = memory_region(machine, REGION_CPU1);
             for (j = 0; j < 16; j+=2)
                 render_line(machine, bitmap, memory[(memoryLocation<<1)+j],
                         nextx, nexty+j, fgcolor, bgcolor);

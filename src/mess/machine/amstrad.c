@@ -214,7 +214,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	int ramblock;  // 16k RAM block chunk is to be loaded in to
 	int result;
 	unsigned int bytes_to_read;  // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
-	unsigned char* mem = memory_region(REGION_CPU1);
+	unsigned char* mem = memory_region(image->machine, REGION_CPU1);
 
 	logerror("IMG: loading CPC+ cartridge file\n");
 	// load RIFF chunk

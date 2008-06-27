@@ -76,10 +76,10 @@ static DRIVER_INIT( tx0 )
 	};
 
 	/* set up memory regions */
-	tx0_memory = (UINT32 *) memory_region(REGION_CPU1);
+	tx0_memory = (UINT32 *) memory_region(machine, REGION_CPU1);
 
 	/* set up our font */
-	dst = memory_region(REGION_GFX1);
+	dst = memory_region(machine, REGION_GFX1);
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }

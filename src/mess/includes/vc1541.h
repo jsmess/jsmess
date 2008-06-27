@@ -155,7 +155,7 @@ MACHINE_DRIVER_EXTERN( cpu_c1571 );
 #ifdef VC1541
 #define cbm_serial_reset_write(level)   vc1541_serial_reset_write(0,level)
 #define cbm_serial_atn_read()           vc1541_serial_atn_read(0)
-#define cbm_serial_atn_write(level)     vc1541_serial_atn_write(0,level)
+#define cbm_serial_atn_write(level)     vc1541_serial_atn_write(Machine, 0,level)
 #define cbm_serial_data_read()          vc1541_serial_data_read(0)
 #define cbm_serial_data_write(level)    vc1541_serial_data_write(0,level)
 #define cbm_serial_clock_read()         vc1541_serial_clock_read(0)
@@ -166,7 +166,7 @@ MACHINE_DRIVER_EXTERN( cpu_c1571 );
 
 void vc1541_serial_reset_write(int which,int level);
 int vc1541_serial_atn_read(int which);
-void vc1541_serial_atn_write(int which,int level);
+void vc1541_serial_atn_write(running_machine *machine, int which,int level);
 int vc1541_serial_data_read(int which);
 void vc1541_serial_data_write(int which,int level);
 int vc1541_serial_clock_read(int which);

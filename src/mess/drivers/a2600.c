@@ -14,7 +14,7 @@
 #include "video/tia.h"
 
 
-#define CART memory_region(REGION_USER1)
+#define CART memory_region(machine, REGION_USER1)
 
 #define MASTER_CLOCK_NTSC	3579545
 #define MASTER_CLOCK_PAL	3546894
@@ -531,6 +531,7 @@ static DEVICE_START( a2600_cart )
 
 static DEVICE_IMAGE_LOAD( a2600_cart )
 {
+	running_machine *machine = image->machine;
 	const struct _extrainfo_banking_def *eibd;
 	const char	*extrainfo;
 
@@ -747,12 +748,12 @@ static READ8_HANDLER(modeSS_r)
 		switch ( modeSS_byte & 0x1C ) {
 		case 0x00:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, REGION_CPU1) + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x04:
 			bank_base[1] = extra_RAM;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, REGION_CPU1) + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x08:
@@ -767,12 +768,12 @@ static READ8_HANDLER(modeSS_r)
 			break;
 		case 0x10:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, REGION_CPU1) + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x14:
 			bank_base[1] = extra_RAM + 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, REGION_CPU1) + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x18:
@@ -1169,7 +1170,7 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, 0, 0, handler[i]);
 
-		bank_base[i + 1] = memory_region(REGION_USER1) + init;
+		bank_base[i + 1] = memory_region(machine, REGION_USER1) + init;
 		memory_set_bankptr(i + 1, bank_base[i + 1]);
 	}
 }
@@ -1410,9 +1411,9 @@ static MACHINE_START( a2600 )
 	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface );
-	r6532_config( 0, &r6532_interface );
+	r6532_config( machine, 0, &r6532_interface );
 	r6532_set_clock( 0, MASTER_CLOCK_NTSC / 3 );
-	r6532_reset(0);
+	r6532_reset( machine, 0 );
 	memset( riot_ram, 0x00, 0x80 );
 	current_reset_bank_counter = 0xFF;
 }
@@ -1423,9 +1424,9 @@ static MACHINE_START( a2600p )
 	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface_pal );
-	r6532_config( 0, &r6532_interface );
+	r6532_config( machine, 0, &r6532_interface );
 	r6532_set_clock( 0, MASTER_CLOCK_PAL / 3 );
-	r6532_reset(0);
+	r6532_reset( machine, 0 );
 	memset( riot_ram, 0x00, 0x80 );
 	current_reset_bank_counter = 0xFF;
 }

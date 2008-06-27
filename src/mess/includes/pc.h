@@ -22,7 +22,7 @@ extern const ins8250_interface ibmpc_com_interface[4];
 extern const ppi8255_interface pc_ppi8255_interface;
 extern const ppi8255_interface pcjr_ppi8255_interface;
 
-void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int));
+void mess_init_pc_common( running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int));
 
 WRITE8_HANDLER( pc_nmi_enable_w );
 READ8_HANDLER( pcjr_nmi_enable_r );

@@ -280,15 +280,15 @@ static READ16_HANDLER( sound_status_r )
 	return soundlatch3_r(machine, 0);
 }
 
-static void reset_sound_region(void)
+static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(2, memory_region(REGION_CPU2) + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(2, memory_region(machine, REGION_CPU2) + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	cur_sound_region = data & 7;
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static void ym_set_mixing(double left, double right)
@@ -476,7 +476,8 @@ static MACHINE_DRIVER_START( xexex )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_REFRESH_RATE(8000000/512/288)
+	MDRV_SCREEN_RAW_PARAMS(8000000, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -611,7 +612,7 @@ static MACHINE_RESET( xexex )
 static STATE_POSTLOAD( xexex_postload )
 {
 	parse_control2();
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static MACHINE_START( xexex )
@@ -631,8 +632,8 @@ static DRIVER_INIT( xexex )
 	if (!strcmp(machine->gamedrv->name, "xexex"))
 	{
 		// Invulnerability
-//      *(UINT16 *)(memory_region(REGION_CPU1) + 0x648d4) = 0x4a79;
-//      *(UINT16 *)(memory_region(REGION_CPU1) + 0x00008) = 0x5500;
+//      *(UINT16 *)(memory_region(machine, REGION_CPU1) + 0x648d4) = 0x4a79;
+//      *(UINT16 *)(memory_region(machine, REGION_CPU1) + 0x00008) = 0x5500;
 		xexex_strip0x1a = 1;
 	}
 

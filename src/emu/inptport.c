@@ -98,7 +98,6 @@
 #include "profiler.h"
 #include "inputseq.h"
 #include "ui.h"
-#include "deprecat.h"
 #include <ctype.h>
 #include <time.h>
 #include <stdarg.h>
@@ -689,8 +688,6 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 		machine->portconfig = input_port_config_alloc(tokens, errorbuf, sizeof(errorbuf));
 		if (errorbuf[0] != 0)
 			mame_printf_error("Input port errors:\n%s", errorbuf);
-		if (machine->portconfig == NULL)
-			fatalerror("Unable to construct input ports!");
 		init_port_state(machine);
 	}
 

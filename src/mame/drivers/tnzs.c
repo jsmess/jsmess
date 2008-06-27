@@ -246,6 +246,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8x41/i8x41.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
@@ -270,9 +271,9 @@ static void kageki_init_samples(void)
 	int start, size;
 	int i, n;
 
+	src = memory_region(Machine, REGION_SOUND1) + 0x0090;
 	for (i = 0; i < MAX_SAMPLES; i++)
 	{
-		src = memory_region(REGION_SOUND1) + 0x0090;
 		start = (src[(i * 2) + 1] * 256) + src[(i * 2)];
 		scan = &src[start];
 		size = 0;
@@ -362,7 +363,7 @@ static WRITE8_HANDLER( kabukiz_sound_bank_w )
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
 	{
-		UINT8 *ROM = memory_region(REGION_CPU3);
+		UINT8 *ROM = memory_region(machine, REGION_CPU3);
 		memory_set_bankptr(3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
 	}
 }
@@ -524,7 +525,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8742_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0800, 0x08ff) AM_READ(SMH_RAM)	/* Internal i8742 RAM */
+	AM_RANGE(0x0800, 0x08ff) AM_RAM				/* Internal i8742 RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8742_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -533,8 +534,8 @@ static ADDRESS_MAP_START( i8742_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8742_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(tnzs_port1_r)
-	AM_RANGE(0x02, 0x02) AM_READ(tnzs_port2_r)
+	AM_RANGE(I8X41_p1, I8X41_p1) AM_READ(tnzs_port1_r)
+	AM_RANGE(I8X41_p2, I8X41_p2) AM_READ(tnzs_port2_r)
 	AM_RANGE(I8X41_t0, I8X41_t0) AM_READ(input_port_5_r)
 	AM_RANGE(I8X41_t1, I8X41_t1) AM_READ(input_port_6_r)
 ADDRESS_MAP_END
@@ -589,7 +590,7 @@ READ8_HANDLER( bbb_r )
 
 static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 	/* bits 0-1 select ROM bank */
 	memory_set_bankptr (2, &RAM[0x10000 + 0x2000 * (data & 3)]);
@@ -1554,6 +1555,9 @@ static MACHINE_DRIVER_START( drtoppel )
 MACHINE_DRIVER_END
 
 
+static const i8x41_config i8042_config = { TYPE_I8X42 };
+
+
 static MACHINE_DRIVER_START( tnzs )
 
 	/* basic machine hardware */
@@ -1568,6 +1572,7 @@ static MACHINE_DRIVER_START( tnzs )
 	MDRV_CPU_ADD(I8X41,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(i8742_readmem,i8742_writemem)
 	MDRV_CPU_IO_MAP(i8742_readport,i8742_writeport)
+	MDRV_CPU_CONFIG( i8042_config )
 
 	MDRV_INTERLEAVE(100)
 

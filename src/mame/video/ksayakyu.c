@@ -33,11 +33,13 @@ WRITE8_HANDLER(ksayakyu_videoctrl_w)
 PALETTE_INIT( ksayakyu )
 {
 	int i,j,b1,b2;
+	const UINT8 *prom = memory_region(machine, REGION_PROMS);
+
 	for(j=0;j<16;j++)
 		for(i=0;i<8;i++)
 		{
-			b1=memory_region(REGION_PROMS)[j*16+i];
-			b2=memory_region(REGION_PROMS)[j*16+i+8];
+			b1=prom[j*16+i];
+			b2=prom[j*16+i+8];
 
 			b1=b2|(b1<<8);
 			palette_set_color_rgb(machine,j*8+i,pal5bit(b1 >> 10),pal5bit(b1 >> 0),pal5bit(b1 >> 5));
@@ -46,8 +48,8 @@ PALETTE_INIT( ksayakyu )
 
 static TILE_GET_INFO( get_ksayakyu_tile_info )
 {
-	int code = memory_region(REGION_USER1)[tile_index];
-	int attr = memory_region(REGION_USER1)[tile_index+0x2000];
+	int code = memory_region(machine, REGION_USER1)[tile_index];
+	int attr = memory_region(machine, REGION_USER1)[tile_index+0x2000];
 	code+=(attr&3)<<8;
 	SET_TILE_INFO(1,code,((attr>>2)&0x07)*2,(attr&0x80) ? TILE_FLIPX : 0);
 }

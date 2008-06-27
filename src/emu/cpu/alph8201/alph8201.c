@@ -285,7 +285,7 @@ INLINE void M_UNDEFINED(void)
 	mame_printf_debug("ALPHA8201:  PC = %03x,  Unimplemented opcode = %02x\n", PC-1, M_RDMEM(PC-1));
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	DEBUGGER_BREAK;
+	debugger_break(Machine);
 #endif
 }
 
@@ -298,13 +298,14 @@ INLINE void M_UNDEFINED2(void)
 	mame_printf_debug("ALPHA8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", PC-2, op,imm);
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	DEBUGGER_BREAK;
+	debugger_break(Machine);
 #endif
 }
 
 static void undefined(void)	{ M_UNDEFINED(); }
 static void undefined2(void)	{ M_UNDEFINED2(); }
 
+#if (HAS_ALPHA8301)
 static void need_verify(const char *s)
 {
 	UINT8 op  = M_RDOP(PC-1);
@@ -313,9 +314,10 @@ static void need_verify(const char *s)
 	mame_printf_debug("ALPHA8201:  PC = %03x, unknown opcode = %02x is '%s' ??\n",PC-1, op,s);
 #endif
 #if BREAK_ON_UNCERTAIN_OPCODE
-	DEBUGGER_BREAK;
+	debugger_break(Machine);
 #endif
 }
+#endif
 
 #if 0
 static void need_verify2(const char *s)
@@ -327,7 +329,7 @@ static void need_verify2(const char *s)
 	mame_printf_debug("ALPHA8201:  PC = %03x, unknown opcode = %02x %02x is '%s' ??\n",PC-2, op1, op2, s);
 #endif
 #if BREAK_ON_UNCERTAIN_OPCODE
-	DEBUGGER_BREAK;
+	debugger_break(Machine);
 #endif
 }
 #endif
@@ -790,7 +792,7 @@ mame_printf_debug("ALPHA8201 START ENTRY=%02X PC=%03X\n",pcptr,PC);
 
 		/* run */
 		R.PREVPC = PC;
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 		opcode =M_RDOP(PC);
 #if TRACE_PC
 mame_printf_debug("ALPHA8201:  PC = %03x,  opcode = %02x\n", PC, opcode);
@@ -954,9 +956,7 @@ static void alpha8xxx_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = ALPHA8201_reset;			break;
 		case CPUINFO_PTR_EXIT:							info->exit = ALPHA8201_exit;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ALPHA8201_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ALPHA8201_ICount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

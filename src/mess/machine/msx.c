@@ -828,8 +828,8 @@ void msx_memory_init (running_machine *machine)
 					/* Check whether the optional FM-PAC rom is present */
 					option = 0x10000;
 					size = 0x10000;
-					mem = memory_region(REGION_CPU1) + option;
-					if (memory_region_length(REGION_CPU1) > size && mem[0] == 'A' && mem[1] == 'B') {
+					mem = memory_region(machine, REGION_CPU1) + option;
+					if (memory_region_length(machine, REGION_CPU1) > size && mem[0] == 'A' && mem[1] == 'B') {
 						slot = &msx_slot_list[SLOT_FMPAC];
 					}
 					else {
@@ -843,7 +843,7 @@ void msx_memory_init (running_machine *machine)
 
 				case MSX_MEM_HANDLER:
 				case MSX_MEM_ROM:
-					mem = memory_region(REGION_CPU1) + option;
+					mem = memory_region(machine, REGION_CPU1) + option;
 					break;
 				case MSX_MEM_RAM:
 					mem = NULL;
@@ -868,7 +868,7 @@ void msx_memory_init (running_machine *machine)
 			}
 			break;
 		case MSX_LAYOUT_KANJI_ENTRY:
-			msx1.kanji_mem = memory_region(REGION_CPU1) + layout->option;
+			msx1.kanji_mem = memory_region(machine, REGION_CPU1) + layout->option;
 			break;
 		case MSX_LAYOUT_RAMIO_SET_BITS_ENTRY:
 			msx1.ramio_set_bits = (UINT8)layout->option;

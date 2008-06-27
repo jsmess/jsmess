@@ -807,9 +807,9 @@ static void pc_set_keyb_int(int state) {
 	pc_set_irq_line( 1, state );
 }
 
-void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int))
+void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int)) 
 {
-	init_pc_common(Machine, flags, set_keyb_int_func);
+	init_pc_common(machine, flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
 	if ( mess_ram )
@@ -834,25 +834,25 @@ void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int), void (*se
 
 DRIVER_INIT( pccga )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	pc_rtc_init();
 }
 
 DRIVER_INIT( bondwell )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pcmda )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 DRIVER_INIT( europc )
 {
-	UINT8 *gfx = &memory_region(REGION_GFX1)[0x8000];
-	UINT8 *rom = &memory_region(REGION_CPU1)[0];
+	UINT8 *gfx = &memory_region(machine, REGION_GFX1)[0x8000];
+	UINT8 *rom = &memory_region(machine, REGION_CPU1)[0];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -870,7 +870,7 @@ DRIVER_INIT( europc )
 		rom[0xfffff]=256-a;
 	}
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
 	europc_rtc_init();
 //	europc_rtc_set_time(machine);
@@ -878,13 +878,13 @@ DRIVER_INIT( europc )
 
 DRIVER_INIT( t1000hx )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pc200 )
 {
-	UINT8 *gfx = &memory_region(REGION_GFX1)[0x8000];
+	UINT8 *gfx = &memory_region(machine, REGION_GFX1)[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -894,15 +894,15 @@ DRIVER_INIT( pc200 )
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
 	videoram_size=0x10000;
-	videoram=memory_region(REGION_CPU1)+0xb0000;
+	videoram=memory_region(machine, REGION_CPU1)+0xb0000;
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc200_16le_port378_r );
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 DRIVER_INIT( pc1512 )
 {
-	UINT8 *gfx = &memory_region(REGION_GFX1)[0x8000];
+	UINT8 *gfx = &memory_region(machine, REGION_GFX1)[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -918,14 +918,14 @@ DRIVER_INIT( pc1512 )
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc16le_parallelport2_r );
 
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	mc146818_init(MC146818_IGNORE_CENTURY);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }
 
 
 DRIVER_INIT( pcjr )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
 }
 
 
@@ -987,14 +987,14 @@ DRIVER_INIT( pc1640 )
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );
 
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
-	mc146818_init(MC146818_IGNORE_CENTURY);
+	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }
 
 DRIVER_INIT( pc_vga )
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
 	pc_vga_init(machine, &vga_interface, NULL);
 }
@@ -1066,7 +1066,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 	}
 
 	/* Read the cartridge contents */
-	if ( ( size - 0x200 ) != image_fread( image, memory_region(REGION_CPU1) + address, size - 0x200 ) )
+	if ( ( size - 0x200 ) != image_fread( image, memory_region(image->machine, REGION_CPU1) + address, size - 0x200 ) )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 		return 1;

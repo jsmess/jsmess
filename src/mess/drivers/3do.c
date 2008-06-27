@@ -120,11 +120,11 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( 3do )
 {
-	memory_set_bankptr(2,memory_region(REGION_USER1));
+	memory_set_bankptr(2,memory_region(machine, REGION_USER1));
 
 	/* configure overlay */
 	memory_configure_bank(1, 0, 1, dram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
 
 	/* start with overlay enabled */
 	memory_set_bank(1, 1);

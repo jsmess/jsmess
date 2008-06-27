@@ -22,6 +22,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "sound/sn76496.h"
 #include "sound/okim6295.h"
@@ -78,7 +79,7 @@ static void *mjkjidai_adpcm_start (int clock, const struct CustomSound_interface
 	struct mjkjidai_adpcm_state *state = &mjkjidai_adpcm;
 	state->playing = 0;
 	state->stream = stream_create(0, 1, clock, state, mjkjidai_adpcm_callback);
-	state->base = memory_region(REGION_SOUND1);
+	state->base = memory_region(Machine, REGION_SOUND1);
 	reset_adpcm(&state->adpcm);
 	return state;
 }
@@ -103,19 +104,20 @@ static int keyb,nvram_init_count;
 static READ8_HANDLER( keyboard_r )
 {
 	int res = 0x3f,i;
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEY10", "KEY11" };
 
-//  logerror("%04x: keyboard_r\n",activecpu_get_pc());
+//  logerror("%04x: keyboard_r\n", activecpu_get_pc());
 
-	for (i = 0;i < 12;i++)
+	for (i = 0; i < 12; i++)
 	{
 		if (~keyb & (1 << i))
 		{
-			res = input_port_read_indexed(machine, 4+i) & 0x3f;
+			res = input_port_read(machine, keynames[i]) & 0x3f;
 			break;
 		}
 	}
 
-	res |= (input_port_read_indexed(machine, 3) & 0xc0);
+	res |= (input_port_read(machine, "IN3") & 0xc0);
 
 	if (nvram_init_count)
 	{
@@ -175,9 +177,9 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(keyboard_r)
 	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP)	// ???
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_0_r)
-	AM_RANGE(0x12, 0x12) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
@@ -192,7 +194,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( mjkjidai )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -216,7 +218,7 @@ static INPUT_PORTS_START( mjkjidai )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -242,7 +244,7 @@ static INPUT_PORTS_START( mjkjidai )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -254,56 +256,56 @@ static INPUT_PORTS_START( mjkjidai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )	// reinitialize NVRAM and reset the game
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	/* player 2 inputs (same as player 1) */
-	PORT_START
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START
+	PORT_START_TAG("KEY5")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY11")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C )

@@ -138,7 +138,7 @@ void zx_ula_r(running_machine *machine, int offs, int region)
 {
 	const device_config *screen = video_screen_first(machine->config);
 	int offs0 = offs & 0x7fff;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8 chr = rom[offs0];
 
 	if ((!ula_irq_active) && (chr == 0x76))
@@ -148,7 +148,7 @@ void zx_ula_r(running_machine *machine, int offs, int region)
 		UINT16 ireg = cpunum_get_reg(0, Z80_I) << 8;
 		UINT8 creg = cpunum_get_reg(0, Z80_C);
 		UINT8 data, *chrgen;
-		chrgen = memory_region(region);
+		chrgen = memory_region(machine, region);
 
 		if ((++ula_scanline_count == video_screen_get_height(screen)) || (creg == 32))
 		{

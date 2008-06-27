@@ -1102,8 +1102,8 @@ DRIVER_INIT( bebox )
 		pci_add_device(0, 12, &scsi53c810_callbacks);
 
 	/* set up boot and flash ROM */
-	memory_set_bankptr(2, memory_region(REGION_USER2));
-	intelflash_init(0, FLASH_FUJITSU_29F016A, memory_region(REGION_USER1));
+	memory_set_bankptr(2, memory_region(machine, REGION_USER2));
+	intelflash_init(0, FLASH_FUJITSU_29F016A, memory_region(machine, REGION_USER1));
 
 	/* install MESS managed RAM */
 	for (cpu = 0; cpu < 2; cpu++)
@@ -1113,7 +1113,7 @@ DRIVER_INIT( bebox )
 	}
 	memory_set_bankptr(3, mess_ram);
 
-	mc146818_init(MC146818_STANDARD);
+	mc146818_init(machine, MC146818_STANDARD);
 	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
 	kbdc8042_init(&bebox_8042_interface);
 

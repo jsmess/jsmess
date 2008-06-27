@@ -502,23 +502,24 @@ static WRITE32_HANDLER( io20_w )
 static READ32_HANDLER( parallel_port_r )
 {
 	UINT32 r = 0;
+//  static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 nibble = parallel_latched;//(input_port_read_indexed(machine, parallel_pointer / 3) >> (4 * (parallel_pointer % 3))) & 15;
+		UINT8 nibble = parallel_latched;//(input_port_read(machine, portnames[parallel_pointer / 3]) >> (4 * (parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
 		logerror("%08X:parallel_port_r()\n", activecpu_get_pc());
 /*      if (controls_data == 0x18)
         {
-            r |= input_port_read_indexed(machine, 0) << 8;
+            r |= input_port_read(machine, "IN0") << 8;
         }
         else if (controls_data == 0x60)
         {
-            r |= input_port_read_indexed(machine, 1) << 8;
+            r |= input_port_read(machine, "IN1") << 8;
         }
         else if (controls_data == 0xff ||  controls_data == 0x50)
         {
-            r |= input_port_read_indexed(machine, 2) << 8;
+            r |= input_port_read(machine, "IN2") << 8;
         }
 
         //r |= control_read << 8;*/
@@ -957,7 +958,7 @@ static MACHINE_START(mediagx)
 
 static MACHINE_RESET(mediagx)
 {
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_USER1);
 
 	cpunum_set_irq_callback(0, irq_callback);
 
@@ -1120,7 +1121,7 @@ static void mediagx_set_keyb_int(int state) {
 static void init_mediagx(running_machine *machine)
 {
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
-	mc146818_init(MC146818_STANDARD);
+	mc146818_init(machine, MC146818_STANDARD);
 
 	pci_init();
 	pci_add_device(0, 18, &cx5510);

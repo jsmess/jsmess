@@ -482,7 +482,7 @@ static MACHINE_RESET( sord_m5 )
 	z80ctc_reset(0);
 
 	/* should be done in a special callback to work properly! */
-	memory_set_bankptr(1, memory_region(REGION_USER1));
+	memory_set_bankptr(1, memory_region(machine, REGION_USER1));
 
 	centronics_config(0, sordm5_cent_config);
 	/* assumption: select is tied low */

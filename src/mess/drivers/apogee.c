@@ -24,7 +24,7 @@ static ADDRESS_MAP_START(apogee_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xed00, 0xed03 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w) AM_MIRROR(0x00fc)
     //AM_RANGE( 0xee00, 0xee03 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x00fc)
     AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) AM_MIRROR(0x00fe) // video
-    AM_RANGE( 0xf000, 0xf0ff ) AM_WRITE(dma8257_0_w)	 // DMA
+    AM_RANGE( 0xf000, 0xf0ff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
@@ -144,6 +144,9 @@ static MACHINE_DRIVER_START( apogee )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_DEVICE_ADD("dma8257", DMA8257)
+	MDRV_DEVICE_CONFIG(apogee_dma)
 MACHINE_DRIVER_END
 
 static void apogee_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

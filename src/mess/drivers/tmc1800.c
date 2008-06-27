@@ -635,7 +635,7 @@ static MACHINE_START( tmc2000 )
 
 	// RAM banking
 
-	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0x8000, 0);
 	memory_configure_bank(1, 1, 1, &mess_ram, 0);
 
 	switch (mess_ram_size)
@@ -664,7 +664,7 @@ static MACHINE_START( tmc2000 )
 
 	state->colorram = auto_malloc(0x200);
 
-	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
+	memory_configure_bank(2, 0, 1, memory_region(machine, REGION_CPU1) + 0x8000, 0);
 	memory_configure_bank(2, 1, 1, state->colorram, 0);
 
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
@@ -700,7 +700,7 @@ static MACHINE_START( oscnano )
 
 	// RAM banking
 
-	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0x8000, 0);
 	memory_configure_bank(1, 1, 1, &mess_ram, 0);
 }
 

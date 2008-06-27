@@ -403,7 +403,7 @@ static READ32_HANDLER( psh_eeprom_r )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return ((eeprom_read_bit() << 28) | (input_port_read_indexed(machine, 4) << 24)); /* EEPROM | Region */
+		return ((eeprom_read_bit() << 28) | (input_port_read(machine, "IN4") << 24)); /* EEPROM | Region */
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -418,7 +418,7 @@ static INTERRUPT_GEN(psikyosh_interrupt)
 
 static READ32_HANDLER(io32_r)
 {
-	return ((input_port_read_indexed(machine, 0) << 24) | (input_port_read_indexed(machine, 1) << 16) | (input_port_read_indexed(machine, 2) << 8) | (input_port_read_indexed(machine, 3) << 0));
+	return ((input_port_read(machine, "IN0") << 24) | (input_port_read(machine, "IN1") << 16) | (input_port_read(machine, "IN2") << 8) | (input_port_read(machine, "IN3") << 0));
 }
 
 static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
@@ -442,7 +442,7 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
-			UINT8 *ROM = memory_region(REGION_GFX1);
+			UINT8 *ROM = memory_region(machine, REGION_GFX1);
 			memory_set_bankptr(2,&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
 		}
 	}
@@ -454,7 +454,7 @@ static UINT32 sample_offs = 0;
 
 static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 {
-	UINT8 *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(machine, REGION_SOUND1);
 
 	return ROM[sample_offs++]<<16;
 }
@@ -693,7 +693,7 @@ static INPUT_PORTS_START( s1945ii )
 	UNUSED_PORT
 	PORT_COIN( 0x40 )
 
-	PORT_START_TAG("IN4") /* jumper pads on the PCB */
+	PORT_START_TAG("IN4")	/* jumper pads on the PCB */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( World ) )
@@ -708,7 +708,7 @@ static INPUT_PORTS_START( soldivid )
 	UNUSED_PORT
 	PORT_COIN( 0x40 )
 
-	PORT_START_TAG("IN4")/* jumper pads on the PCB */
+	PORT_START_TAG("IN4")	/* jumper pads on the PCB */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( World ) )
@@ -732,7 +732,7 @@ static INPUT_PORTS_START( daraku )
 
 	PORT_COIN( 0x40 )
 
-	PORT_START_TAG("IN4")/* jumper pads on the PCB */
+	PORT_START_TAG("IN4")	/* jumper pads on the PCB */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( World ) ) /* Title screen is different, English is default now */
@@ -747,7 +747,7 @@ static INPUT_PORTS_START( sbomberb )
 	UNUSED_PORT
 	PORT_COIN( 0x40 ) /* If HIGH then you can perform rom test, but EEPROM resets? */
 
-	PORT_START_TAG("IN4")/* jumper pads on the PCB */
+	PORT_START_TAG("IN4")	/* jumper pads on the PCB */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( World ) )
@@ -762,7 +762,7 @@ static INPUT_PORTS_START( gunbird2 ) /* Different Region */
 	UNUSED_PORT
 	PORT_COIN( 0x40 ) /* If HIGH then you can perform rom test, but EEPROM resets */
 
-	PORT_START_TAG("IN4")/* jumper pads on the PCB */
+	PORT_START_TAG("IN4")	/* jumper pads on the PCB */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, "International Ver A." )
@@ -778,7 +778,7 @@ static INPUT_PORTS_START( s1945iii ) /* Different Region again */
 	UNUSED_PORT
 	PORT_COIN( 0x40 ) /* If HIGH then you can perform rom test, EEPROM doesn't reset */
 
-	PORT_START_TAG("IN4")/* IN4 jumper pads on the PCB */
+	PORT_START_TAG("IN4")	/* IN4 jumper pads on the PCB */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x02, "International Ver A." )
@@ -795,7 +795,7 @@ static INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
 
 	PORT_COIN( 0 ) /* Must be HIGH (Or Security Error), so can perform test */
 
-	PORT_START_TAG("IN4")/* jumper pads on the PCB */
+	PORT_START_TAG("IN4")	/* jumper pads on the PCB */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x02, "International Ver A." )
@@ -827,7 +827,7 @@ static INPUT_PORTS_START( mjgtaste ) /* This will need the Mahjong inputs */
 	UNUSED_PORT
 	PORT_COIN( 0x40 )
 
-	PORT_START_TAG("IN4")/* jumper pads on the PCB */
+	PORT_START_TAG("IN4")	/* jumper pads on the PCB */
 //  PORT_DIPNAME( 0x03, 0x01, DEF_STR( Region ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x02, "International Ver A." )
@@ -1241,7 +1241,7 @@ static DRIVER_INIT( s1945ii )
 
 static DRIVER_INIT( daraku )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, daraku_speedup_r );
 	use_factory_eeprom=eeprom_DARAKU;
@@ -1255,7 +1255,7 @@ static DRIVER_INIT( sbomberb )
 
 static DRIVER_INIT( gunbird2 )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x604000c, 0x604000f, 0, 0, gunbird2_speedup_r );
 	use_factory_eeprom=eeprom_DEFAULT;
@@ -1263,7 +1263,7 @@ static DRIVER_INIT( gunbird2 )
 
 static DRIVER_INIT( s1945iii )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, s1945iii_speedup_r );
 	use_factory_eeprom=eeprom_S1945III;

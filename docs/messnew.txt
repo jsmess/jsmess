@@ -12,6 +12,8 @@ New System Drivers Supported (in no particular order):
 - Radio-86RK [Miodrag Milanovic]
 - Sega SC-3000H [Curt Coder]
 
+
+
 System Driver Changes:
 ----------------------
 - [ABC80] Fixed graphics mode and lower case natural input. [Curt Coder]
@@ -156,7 +158,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.125u6.  This incorporates all features of the
+- The core is based on MAME 0.125u7.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Fixed performance problems with -triplebuffer.  (bug #1539) [Justin Kerk]

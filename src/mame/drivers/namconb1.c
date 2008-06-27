@@ -443,56 +443,56 @@ static NVRAM_HANDLER( namconb1 )
 
 static DRIVER_INIT( nebulray )
 {
-	UINT8 *pMem = (UINT8 *)memory_region(NAMCONB1_TILEMASKREGION);
+	UINT8 *pMem = (UINT8 *)memory_region(machine, NAMCONB1_TILEMASKREGION);
 	size_t numBytes = (0xfe7-0xe6f)*8;
 	memset( &pMem[0xe6f*8], 0, numBytes );
 
 	namcos2_gametype = NAMCONB1_NEBULRAY;
 
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* nebulray */
 
 static DRIVER_INIT( gslgr94u )
 {
 	namcos2_gametype = NAMCONB1_GSLGR94U;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* gslgr94u */
 
 static DRIVER_INIT( sws95 )
 {
 	namcos2_gametype = NAMCONB1_SWS95;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* sws95 */
 
 static DRIVER_INIT( sws96 )
 {
 	namcos2_gametype = NAMCONB1_SWS96;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* sws96 */
 
 static DRIVER_INIT( sws97 )
 {
 	namcos2_gametype = NAMCONB1_SWS97;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* sws97 */
 
 static DRIVER_INIT( gunbulet )
 {
 	namcos2_gametype = NAMCONB1_GUNBULET;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* gunbulet */
 
 static DRIVER_INIT( vshoot )
 {
 	namcos2_gametype = NAMCONB1_VSHOOT;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* vshoot */
 
 static void
-ShuffleDataROMs( void )
+ShuffleDataROMs( running_machine *machine )
 {
-	size_t len = memory_region_length(REGION_USER1)/4;
-	UINT8 *pMem8 = (UINT8 *)memory_region( REGION_USER1 );
+	size_t len = memory_region_length(machine, REGION_USER1)/4;
+	UINT8 *pMem8 = (UINT8 *)memory_region( machine, REGION_USER1 );
 	UINT32 *pMem32 = (UINT32 *)pMem8;
 	int i;
 
@@ -507,15 +507,15 @@ ShuffleDataROMs( void )
 static DRIVER_INIT( machbrkr )
 {
 	namcos2_gametype = NAMCONB2_MACH_BREAKERS;
-	ShuffleDataROMs();
-	namcoc7x_on_driver_init();
+	ShuffleDataROMs(machine);
+	namcoc7x_on_driver_init(machine);
 }
 
 static DRIVER_INIT( outfxies )
 {
 	namcos2_gametype = NAMCONB2_OUTFOXIES;
-	ShuffleDataROMs();
-	namcoc7x_on_driver_init();
+	ShuffleDataROMs(machine);
+	namcoc7x_on_driver_init(machine);
 }
 
 static READ32_HANDLER( custom_key_r )
@@ -664,10 +664,10 @@ static READ32_HANDLER( gunbulet_gun_r )
 
 	switch( offset )
 	{
-	case 0: case 1: result = (UINT8)(0x0f+input_port_read_indexed(machine, 7)*224/255); break; /* Y (p2) */
-	case 2: case 3: result = (UINT8)(0x26+input_port_read_indexed(machine, 6)*288/314); break; /* X (p2) */
-	case 4: case 5: result = (UINT8)(0x0f+input_port_read_indexed(machine, 5)*224/255); break; /* Y (p1) */
-	case 6: case 7: result = (UINT8)(0x26+input_port_read_indexed(machine, 4)*288/314); break; /* X (p1) */
+	case 0: case 1: result = (UINT8)(0x0f + input_port_read(machine, "LIGHT1_Y") * 224/255); break; /* Y (p2) */
+	case 2: case 3: result = (UINT8)(0x26 + input_port_read(machine, "LIGHT1_X") * 288/314); break; /* X (p2) */
+	case 4: case 5: result = (UINT8)(0x0f + input_port_read(machine, "LIGHT0_Y") * 224/255); break; /* Y (p1) */
+	case 6: case 7: result = (UINT8)(0x26 + input_port_read(machine, "LIGHT0_X") * 288/314); break; /* X (p1) */
 	}
 	return result<<24;
 } /* gunbulet_gun_r */
@@ -1218,11 +1218,11 @@ ROM_END
 /***************************************************************/
 
 static INPUT_PORTS_START( gunbulet )
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "DSW2 (Unused)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1232,31 +1232,31 @@ static INPUT_PORTS_START( gunbulet )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) /* C75 status */
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("LIGHT0_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
-	PORT_START
+	PORT_START_TAG("LIGHT0_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
-	PORT_START
+	PORT_START_TAG("LIGHT1_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_PLAYER(2)
-	PORT_START
+	PORT_START_TAG("LIGHT1_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 #ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( machbrkr )
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "Freeze Screen" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1278,25 +1278,25 @@ static INPUT_PORTS_START( machbrkr )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) /* C75 status */
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // self test: up
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // self test: enter
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // self test: down
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("P3")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START3 )
 
-	PORT_START
+	PORT_START_TAG("P4")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(4)
@@ -1305,11 +1305,11 @@ INPUT_PORTS_END
 #endif
 
 static INPUT_PORTS_START( outfxies )
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "Freeze Screen" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1331,7 +1331,7 @@ static INPUT_PORTS_START( outfxies )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) /* C75 status */
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -1341,7 +1341,7 @@ static INPUT_PORTS_START( outfxies )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -1353,11 +1353,11 @@ static INPUT_PORTS_START( outfxies )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( namconb1 )
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "DSW2 (Unused)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1379,7 +1379,7 @@ static INPUT_PORTS_START( namconb1 )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) /* C75 status */
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -1389,7 +1389,7 @@ static INPUT_PORTS_START( namconb1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)

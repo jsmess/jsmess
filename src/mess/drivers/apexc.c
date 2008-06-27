@@ -52,13 +52,13 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 	if (apexc_cylinder.fd)
 	{	/* load RAM contents */
 
-		image_fread(apexc_cylinder.fd, memory_region(REGION_CPU1), /*0x8000*/0x1000);
+		image_fread(apexc_cylinder.fd, memory_region(image->machine, REGION_CPU1), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 		{	/* fix endianness */
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) memory_region(REGION_CPU1);
+			RAM = (UINT32 *) memory_region(image->machine, REGION_CPU1);
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -83,14 +83,14 @@ static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) memory_region(REGION_CPU1);
+			RAM = (UINT32 *) memory_region(image->machine, REGION_CPU1);
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		image_fwrite(apexc_cylinder.fd, memory_region(REGION_CPU1), /*0x8000*/0x1000);
+		image_fwrite(apexc_cylinder.fd, memory_region(image->machine, REGION_CPU1), /*0x8000*/0x1000);
 	}
 }
 
@@ -753,7 +753,7 @@ static DRIVER_INIT(apexc)
 		0x00
 	};
 
-	dst = memory_region(REGION_GFX1);
+	dst = memory_region(machine, REGION_GFX1);
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }

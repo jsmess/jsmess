@@ -96,8 +96,8 @@ static TIMER_CALLBACK(lightpen_trigger)
 {
 	if (vectrex_lightpen_port & 1)
 	{
-		via_set_input_ca1(0, 1);
-		via_set_input_ca1(0, 0);
+		via_set_input_ca1(machine, 0, 1);
+		via_set_input_ca1(machine, 0, 0);
 	}
 
 	if (vectrex_lightpen_port & 2)
@@ -175,7 +175,7 @@ WRITE8_HANDLER(vectrex_via_w)
 								  period);
 		break;
 	}
-	via_write(0, offset, data); 
+	via_write(machine, 0, offset, data); 
 }
 
 

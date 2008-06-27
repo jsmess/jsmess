@@ -42,7 +42,7 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
 	offset = ROM_GETOFFSET(roment);
 	length = ROM_GETLENGTH(roment);
 	flags = ROM_GETFLAGS(roment);
-	ptr = ((UINT8 *) memory_region(region)) + offset;
+	ptr = ((UINT8 *) memory_region(machine, region)) + offset;
 
 	if (image)
 	{

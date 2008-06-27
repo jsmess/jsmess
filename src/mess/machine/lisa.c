@@ -333,7 +333,7 @@ static struct
 
 
 
-INLINE void COPS_send_data_if_possible(void)
+INLINE void COPS_send_data_if_possible(running_machine *machine)
 {
 	if ((! hold_COPS_data) && fifo_size && (! COPS_Ready))
 	{
@@ -344,13 +344,13 @@ INLINE void COPS_send_data_if_possible(void)
 			mouse_data_offset = -1;	/* we just phased out the mouse data in buffer */
 		fifo_head = (fifo_head+1) & 0x7;
 		fifo_size--;
-		via_set_input_ca1(0, 1);		/* pulse ca1 so that VIA reads it */
-		via_set_input_ca1(0, 0);		/* BTW, I have no idea how a real COPS does it ! */
+		via_set_input_ca1(machine, 0, 1);		/* pulse ca1 so that VIA reads it */
+		via_set_input_ca1(machine, 0, 0);		/* BTW, I have no idea how a real COPS does it ! */
 	}
 }
 
 /* send data (queue it into the FIFO if needed) */
-static void COPS_queue_data(const UINT8 *data, int len)
+static void COPS_queue_data(running_machine *machine, const UINT8 *data, int len)
 {
 #if 0
 	if (fifo_size + len <= 8)
@@ -376,7 +376,7 @@ static void COPS_queue_data(const UINT8 *data, int len)
 		}
 
 		/*logerror("COPS_queue_data : trying to send data to VIA\n");*/
-		COPS_send_data_if_possible();
+		COPS_send_data_if_possible(machine);
 	}
 }
 
@@ -427,7 +427,7 @@ static void scan_keyboard(running_machine *machine)
 							cpunum_set_input_line_vector(0, M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif
-						COPS_queue_data(& keycode, 1);
+						COPS_queue_data(machine, & keycode, 1);
 					}
 				}
 			}
@@ -509,7 +509,7 @@ static TIMER_CALLBACK(handle_mouse)
 				fifo_size += 3;
 
 				/*logerror("handle_mouse : trying to send data to VIA\n");*/
-				COPS_send_data_if_possible();
+				COPS_send_data_if_possible(machine);
 			}
 			/* else, mouse data is lost forever (correct ??) */
 		}
@@ -524,10 +524,10 @@ static TIMER_CALLBACK(read_COPS_command)
 	COPS_Ready = 0;
 
 	/*logerror("read_COPS_command : trying to send data to VIA\n");*/
-	COPS_send_data_if_possible();
+	COPS_send_data_if_possible(machine);
 
 	/* some pull-ups allow the COPS to read 1s when the VIA port is not set as output */
-	command = (COPS_command | (~ via_read(0, VIA_DDRA))) & 0xff;
+	command = (COPS_command | (~ via_read(machine, 0, VIA_DDRA))) & 0xff;
 
 	if (command & 0x80)
 		return;	/* NOP */
@@ -679,7 +679,7 @@ static TIMER_CALLBACK(read_COPS_command)
 				reply[5] = (clock_regs.minutes2 << 4) | clock_regs.seconds1;
 				reply[6] = (clock_regs.seconds2 << 4) | clock_regs.tenths;
 
-				COPS_queue_data(reply, 7);
+				COPS_queue_data(machine, reply, 7);
 			}
 			break;
 		}
@@ -710,7 +710,7 @@ static void reset_COPS(void)
 	timer_reset(mouse_timer, attotime_never);
 }
 
-static void unplug_keyboard(void)
+static void unplug_keyboard(running_machine *machine)
 {
 	static const UINT8 cmd[2] =
 	{
@@ -718,11 +718,11 @@ static void unplug_keyboard(void)
 		0xFD	/* keyboard unplugged */
 	};
 
-	COPS_queue_data(cmd, 2);
+	COPS_queue_data(machine, cmd, 2);
 }
 
 
-static void plug_keyboard(void)
+static void plug_keyboard(running_machine *machine)
 {
 	/*
 		possible keyboard IDs according to Lisa Hardware Manual and boot ROM source code
@@ -746,7 +746,7 @@ static void plug_keyboard(void)
 		0x3f	/* keyboard ID - US for now */
 	};
 
-	COPS_queue_data(cmd, 2);
+	COPS_queue_data(machine, cmd, 2);
 }
 
 
@@ -782,7 +782,7 @@ static WRITE8_HANDLER(COPS_via_out_ca2)
 	/*logerror("COPS CA2 line state : %d\n", val);*/
 
 	/*logerror("COPS_via_out_ca2 : trying to send data to VIA\n");*/
-	COPS_send_data_if_possible();
+	COPS_send_data_if_possible(machine);
 }
 
 /*
@@ -815,14 +815,14 @@ static  READ8_HANDLER(COPS_via_in_b)
 static WRITE8_HANDLER(COPS_via_out_b)
 {
 	/* pull-up */
-	data |= (~ via_read(0, VIA_DDRA)) & 0x01;
+	data |= (~ via_read(machine, 0, VIA_DDRA)) & 0x01;
 
 	if (data & 0x01)
 	{
 		if (COPS_force_unplug)
 		{
 			COPS_force_unplug = 0;
-			plug_keyboard();
+			plug_keyboard(machine);
 		}
 	}
 	else
@@ -830,7 +830,7 @@ static WRITE8_HANDLER(COPS_via_out_b)
 		if (! COPS_force_unplug)
 		{
 			COPS_force_unplug = 1;
-			unplug_keyboard();
+			unplug_keyboard(machine);
 			//reset_COPS();
 		}
 	}
@@ -1121,10 +1121,10 @@ MACHINE_RESET( lisa )
 {
 	mouse_timer = timer_alloc(handle_mouse, NULL);
 
-	lisa_ram_ptr = memory_region(REGION_CPU1) + RAM_OFFSET;
-	lisa_rom_ptr = memory_region(REGION_CPU1) + ROM_OFFSET;
+	lisa_ram_ptr = memory_region(machine, REGION_CPU1) + RAM_OFFSET;
+	lisa_rom_ptr = memory_region(machine, REGION_CPU1) + ROM_OFFSET;
 
-	videoROM_ptr = memory_region(REGION_GFX1);
+	videoROM_ptr = memory_region(machine, REGION_GFX1);
 
 	memory_set_opbase_handler(0, lisa_OPbaseoverride);
 	memory_set_opbase_handler(1, lisa_fdc_OPbaseoverride);
@@ -1197,7 +1197,7 @@ INTERRUPT_GEN( lisa_interrupt )
 							0x80,	/* RESET code */
 							0xFC	/* timer time-out */
 						};
-						COPS_queue_data(cmd, 2);
+						COPS_queue_data(machine, cmd, 2);
 
 						clock_regs.alarm = 0xfffffL;
 					}
@@ -1944,13 +1944,13 @@ static READ16_HANDLER ( lisa_IO_r )
 			case 2:	/* parallel port */
 				/* 1 VIA located at 0xD901 */
 				if (ACCESSING_BITS_0_7)
-					return via_read(1, (offset >> 2) & 0xf);
+					return via_read(machine, 1, (offset >> 2) & 0xf);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				/* 1 VIA located at 0xDD81 */
 				if (ACCESSING_BITS_0_7)
-					return via_read(0, offset & 0xf);
+					return via_read(machine, 0, offset & 0xf);
 				break;
 			}
 		}
@@ -2066,12 +2066,12 @@ static WRITE16_HANDLER ( lisa_IO_w )
 
 			case 2:	/* paralel port */
 				if (ACCESSING_BITS_0_7)
-					via_write(1, (offset >> 2) & 0xf, data & 0xff);
+					via_write(machine, 1, (offset >> 2) & 0xf, data & 0xff);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				if (ACCESSING_BITS_0_7)
-					via_write(0, offset & 0xf, data & 0xff);
+					via_write(machine, 0, offset & 0xf, data & 0xff);
 				break;
 			}
 		}

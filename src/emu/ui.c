@@ -324,7 +324,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 
 	/* disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
        or if we are debugging */
-	if (!first_time || (str > 0 && str < 60*5) || machine->gamedrv == &driver_empty || machine->debug_mode)
+	if (!first_time || (str > 0 && str < 60*5) || machine->gamedrv == &driver_empty || (machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 
 	/* initialize the on-screen display system */
@@ -1242,7 +1242,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 
 	/* let the cheat engine display its stuff */
 	if (options_get_bool(mame_options(), OPTION_CHEAT))
-		cheat_display_watches();
+		cheat_display_watches(machine);
 
 	/* display any popup messages */
 	if (osd_ticks() < popup_text_end)
@@ -1271,7 +1271,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 		return ui_set_handler(ui_menu_ui_handler, 0);
 
 	/* if the on-screen display isn't up and the user has toggled it, turn it on */
-	if (!machine->debug_mode && input_ui_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED)  == 0 && input_ui_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
 		return ui_set_handler(handler_slider, 0);
 
 	/* handle a reset request */

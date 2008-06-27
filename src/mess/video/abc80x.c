@@ -430,7 +430,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	{
 		int bit;
 
-		UINT8 *charrom = memory_region(REGION_GFX1);
+		UINT8 *charrom = memory_region(device->machine, REGION_GFX1);
 		UINT16 address = (videoram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
 		UINT8 data = (charrom[address & 0x7ff] & 0x3f);
 
@@ -470,7 +470,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 	{
 		int bit;
 
-		UINT8 *charrom = memory_region(REGION_GFX1);
+		UINT8 *charrom = memory_region(device->machine, REGION_GFX1);
 		UINT8 code = videoram[(ma + column) & 0x7ff];
 		UINT16 address = ((code & 0x80) << 5) | ((code & 0x7f) << 4);
 		UINT8 ra_latch = ra;
@@ -568,7 +568,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	{
 		int bit;
 
-		UINT8 *charrom = memory_region(REGION_GFX1);
+		UINT8 *charrom = memory_region(device->machine, REGION_GFX1);
 		UINT8 code = videoram[(ma + column) & 0x7ff];
 		UINT8 attr = abc806_colorram[(ma + column) & 0x7ff];
 		UINT16 address = ((code & 0x80) << 5) | ((code & 0x7f) << 4);

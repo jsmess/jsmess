@@ -63,11 +63,11 @@ static MACHINE_DRIVER_START( gamepock )
 MACHINE_DRIVER_END
 
 static DEVICE_START(gamepock_cart) {
-	memory_set_bankptr( 1, memory_region( REGION_USER1 ) );
+	memory_set_bankptr( 1, memory_region(device->machine,  REGION_USER1 ) );
 }
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {
-	UINT8 *cart = memory_region( REGION_USER1 );
+	UINT8 *cart = memory_region(image->machine,  REGION_USER1 );
 	int size = image_length( image );
 
 	if ( image_fread( image, cart, size ) != size ) {
@@ -75,7 +75,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 		return INIT_FAIL;
 	}
 
-	memory_set_bankptr( 1, memory_region( REGION_USER1 ) );
+	memory_set_bankptr( 1, memory_region(image->machine,  REGION_USER1 ) );
 
 	return INIT_PASS;
 }

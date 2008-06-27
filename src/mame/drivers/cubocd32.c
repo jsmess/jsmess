@@ -339,11 +339,11 @@ static DRIVER_INIT( cd32 )
 	};
 
 	/* configure our Amiga setup */
-	amiga_machine_config(&cubocd32_intf);
+	amiga_machine_config(machine, &cubocd32_intf);
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram32, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
 
 	/* intialize akiko */
 	amiga_akiko_init(machine);

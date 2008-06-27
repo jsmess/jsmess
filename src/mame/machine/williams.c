@@ -40,9 +40,7 @@ static WRITE8_HANDLER( playball_snd_cmd_w );
 /* input port mapping */
 static UINT8 port_select;
 static WRITE8_HANDLER( williams_port_select_w );
-static READ8_HANDLER( williams_input_port_0_3_r );
 static READ8_HANDLER( williams_input_port_49way_0_5_r );
-static READ8_HANDLER( williams_input_port_1_4_r );
 static READ8_HANDLER( williams_49way_port_0_r );
 
 /* newer-Williams routines */
@@ -79,17 +77,11 @@ const pia6821_interface williams_pia_0_intf =
 };
 
 /* Generic muxing PIA 0, maps to input ports 0/3 and 1; port select is CB2 */
+/* Generic dual muxing PIA 0, maps to input ports 0/3 and 1/4; port select is CB2 */
+/* muxing done in williams_mux_r */
 const pia6821_interface williams_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ williams_input_port_0_3_r, input_port_1_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, williams_port_select_w,
-	/*irqs   : A/B             */ 0, 0
-};
-
-/* Generic dual muxing PIA 0, maps to input ports 0/3 and 1/4; port select is CB2 */
-const pia6821_interface williams_dual_muxed_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ williams_input_port_0_3_r, williams_input_port_1_4_r, 0, 0, 0, 0,
+	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, input_port_1_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, 0, williams_port_select_w,
 	/*irqs   : A/B             */ 0, 0
 };
@@ -177,7 +169,7 @@ const pia6821_interface spdball_pia_3_intf =
 /* Generic muxing PIA 0, maps to input ports 0/3 and 1; port select is CA2 */
 const pia6821_interface williams2_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ williams_input_port_0_3_r, input_port_1_r, 0, 0, 0, 0,
+	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, input_port_1_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, williams_port_select_w, 0,
 	/*irqs   : A/B             */ 0, 0
 };
@@ -379,7 +371,7 @@ MACHINE_RESET( williams )
 
 	/* configure the memory bank */
 	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_CPU1) + 0x10000, 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_CPU1) + 0x10000, 0);
 }
 
 
@@ -445,7 +437,7 @@ MACHINE_RESET( williams2 )
 
 	/* configure memory banks */
 	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 4, memory_region(REGION_CPU1) + 0x10000, 0x10000);
+	memory_configure_bank(1, 1, 4, memory_region(machine, REGION_CPU1) + 0x10000, 0x10000);
 
 	/* make sure our banking is reset */
 	williams2_bank_select_w(machine, 0, 0);
@@ -563,18 +555,15 @@ WRITE8_HANDLER( williams_port_select_w )
 	port_select = data;
 }
 
-
-READ8_HANDLER( williams_input_port_0_3_r )
+CUSTOM_INPUT( williams_mux_r )
 {
-	return input_port_read_indexed(machine, port_select ? 3 : 0);
+	const char *tag = param;
+
+	if (port_select != 0)
+		tag += strlen(tag) + 1;
+
+	return input_port_read(field->port->machine, tag);
 }
-
-
-READ8_HANDLER( williams_input_port_1_4_r )
-{
-	return input_port_read_indexed(machine, port_select ? 4 : 1);
-}
-
 
 /*
  *  Williams 49-way joystick
@@ -720,7 +709,7 @@ MACHINE_RESET( defender )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	memory_configure_bank(1, 0, 9, &memory_region(REGION_CPU1)[0x10000], 0x1000);
+	memory_configure_bank(1, 0, 9, &memory_region(machine, REGION_CPU1)[0x10000], 0x1000);
 	defender_bank_select_w(machine, 0, 0);
 
 	state_save_register_postload(machine, defender_postload, NULL);
@@ -815,10 +804,10 @@ MACHINE_RESET( blaster )
 
 	/* banking is different for blaster */
 	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 16, memory_region(REGION_CPU1) + 0x18000, 0x4000);
+	memory_configure_bank(1, 1, 16, memory_region(machine, REGION_CPU1) + 0x18000, 0x4000);
 
 	memory_configure_bank(2, 0, 1, williams_videoram + 0x4000, 0);
-	memory_configure_bank(2, 1, 16, memory_region(REGION_CPU1) + 0x10000, 0x0000);
+	memory_configure_bank(2, 1, 16, memory_region(machine, REGION_CPU1) + 0x10000, 0x0000);
 
 	state_save_register_global(blaster_bank);
 }
@@ -876,9 +865,11 @@ static READ8_HANDLER( lottofun_input_port_0_r )
 static READ8_HANDLER( tshoot_input_port_0_3_r )
 {
 	/* merge in the gun inputs with the standard data */
-	int data = williams_input_port_0_3_r(machine, offset);
+	int data = input_port_0_r(machine, offset);
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
+
+	return 0;
 }
 
 

@@ -929,9 +929,6 @@ static const UINT8 *i8751_initial_config;
  *
  *************************************/
 
-extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
-
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
 static WRITE16_HANDLER( rom_5704_bank_w );
@@ -1273,7 +1270,7 @@ static WRITE16_HANDLER( unknown_rgn2_w )
 
 static WRITE8_HANDLER( upd7759_control_w )
 {
-	int size = memory_region_length(REGION_CPU2) - 0x10000;
+	int size = memory_region_length(machine, REGION_CPU2) - 0x10000;
 	if (size > 0)
 	{
 		int bankoffs = 0;
@@ -1330,7 +1327,7 @@ static WRITE8_HANDLER( upd7759_control_w )
 				bankoffs += (data & 0x07) * 0x04000;
 				break;
 		}
-		memory_set_bankptr(1, memory_region(REGION_CPU2) + 0x10000 + (bankoffs % size));
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU2) + 0x10000 + (bankoffs % size));
 	}
 }
 
@@ -5365,6 +5362,7 @@ ROM_END
     Shinobi, Sega System 16B
     CPU: 68000 + MC8123B (317-0054)
     ROM Board: 171-5358
+ Game Nunmber: 834-6496-04
 */
 ROM_START( shinobi3 )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */
@@ -6129,7 +6127,7 @@ static DRIVER_INIT( generic_5797 )
 static DRIVER_INIT( aliensy3_5358 )
 {
 	DRIVER_INIT_CALL(generic_5358);
-	fd1089_decrypt_0033();
+	fd1089_decrypt_0033(machine);
 }
 
 
@@ -6157,21 +6155,21 @@ static DRIVER_INIT( altbeas5_5521 )
 static DRIVER_INIT( altbeas4_5521 )
 {
 	DRIVER_INIT_CALL(generic_5521);
-	mc8123_decrypt_rom(1, memory_region(REGION_USER2), 0, 0);
+	mc8123_decrypt_rom(machine, 1, memory_region(machine, REGION_USER2), 0, 0);
 }
 
 
 static DRIVER_INIT( aurail1_5704 )
 {
 	DRIVER_INIT_CALL(generic_5704);
-	fd1089_decrypt_0168();
+	fd1089_decrypt_0168(machine);
 }
 
 
 static DRIVER_INIT( aurailj_5704 )
 {
 	DRIVER_INIT_CALL(generic_5704);
-	fd1089_decrypt_0167();
+	fd1089_decrypt_0167(machine);
 }
 
 
@@ -6185,7 +6183,7 @@ static DRIVER_INIT( ddux_5704 )
 static DRIVER_INIT( dunkshot_5358 )
 {
 	DRIVER_INIT_CALL(generic_5358);
-	fd1089_decrypt_0022();
+	fd1089_decrypt_0022(machine);
 	custom_io_r = dunkshot_custom_io_r;
 }
 
@@ -6230,7 +6228,7 @@ static DRIVER_INIT( sdi_5358 )
 static DRIVER_INIT( defense_5358 )
 {
 	DRIVER_INIT_CALL(generic_5358);
-	fd1089_decrypt_0028();
+	fd1089_decrypt_0028(machine);
 	custom_io_r = sdi_custom_io_r;
 }
 
@@ -6238,21 +6236,21 @@ static DRIVER_INIT( defense_5358 )
 static DRIVER_INIT( shinobi4_5521 )
 {
 	DRIVER_INIT_CALL(generic_5521);
-	mc8123_decrypt_rom(1, memory_region(REGION_USER2), 0, 0);
+	mc8123_decrypt_rom(machine, 1, memory_region(machine, REGION_USER2), 0, 0);
 }
 
 
 static DRIVER_INIT( shinobi3_5358 )
 {
 	DRIVER_INIT_CALL(generic_5358);
-	mc8123_decrypt_rom(1, memory_region(REGION_USER2), 0, 0);
+	mc8123_decrypt_rom(machine, 1, memory_region(machine, REGION_USER2), 0, 0);
 }
 
 
 static DRIVER_INIT( sjryuko_5358 )
 {
 	DRIVER_INIT_CALL(generic_5358);
-	fd1089_decrypt_5021();
+	fd1089_decrypt_5021(machine);
 	custom_io_r = sjryuko_custom_io_r;
 	custom_io_w = sjryuko_custom_io_w;
 }

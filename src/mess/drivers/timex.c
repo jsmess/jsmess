@@ -216,7 +216,7 @@ void ts2068_update_memory(running_machine *machine)
 
 	DOCK = timex_cart_data;
 
-	ExROM = memory_region(REGION_CPU1) + 0x014000;
+	ExROM = memory_region(machine, REGION_CPU1) + 0x014000;
 
 	if (ts2068_port_f4_data & 0x01)
 	{
@@ -248,7 +248,7 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		ChosenROM = memory_region(REGION_CPU1) + 0x010000;
+		ChosenROM = memory_region(machine, REGION_CPU1) + 0x010000;
 		memory_set_bankptr(1, ChosenROM);
 		rh = SMH_BANK1;
 		wh = SMH_UNMAP;
@@ -287,7 +287,7 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		ChosenROM = memory_region(REGION_CPU1) + 0x012000;
+		ChosenROM = memory_region(machine, REGION_CPU1) + 0x012000;
 		memory_set_bankptr(2, ChosenROM);
 		rh = SMH_BANK2;
 		wh = SMH_UNMAP;

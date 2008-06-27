@@ -170,7 +170,7 @@ static READ16_HANDLER( pirates_in1_r )
 		bit = 1;
 
 	/* bit 4 is EEPROM data, bit 7 is protection */
-	return input_port_read_indexed(machine,1) | (eeprom_read_bit() << 4) | (bit << 7);
+	return input_port_read(machine, "IN1") | (eeprom_read_bit() << 4) | (bit << 7);
 }
 
 
@@ -180,7 +180,7 @@ static READ16_HANDLER( pirates_in1_r )
 static ADDRESS_MAP_START( pirates_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x300000, 0x300001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
 	AM_RANGE(0x400000, 0x400001) AM_READ(pirates_in1_r)
 //  AM_RANGE(0x500000, 0x5007ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM)
@@ -210,7 +210,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( pirates )
-	PORT_START	// IN0 - 0x300000.w
+	PORT_START_TAG("IN0")	/* IN0 - 0x300000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -228,7 +228,7 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	// IN1 - 0x400000.w
+	PORT_START_TAG("IN1")	/* IN1 - 0x400000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -362,17 +362,17 @@ ROM_END
 
 /* Init */
 
-static void pirates_decrypt_68k(void)
+static void pirates_decrypt_68k(running_machine *machine)
 {
     int rom_size;
     UINT16 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(REGION_CPU1);
+    rom_size = memory_region_length(machine, REGION_CPU1);
 
     buf = malloc_or_die(rom_size);
 
-    rom = (UINT16 *)memory_region(REGION_CPU1);
+    rom = (UINT16 *)memory_region(machine, REGION_CPU1);
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/2; i++)
@@ -391,17 +391,17 @@ static void pirates_decrypt_68k(void)
     free (buf);
 }
 
-static void pirates_decrypt_p(void)
+static void pirates_decrypt_p(running_machine *machine)
 {
     int rom_size;
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(REGION_GFX1);
+    rom_size = memory_region_length(machine, REGION_GFX1);
 
     buf = malloc_or_die(rom_size);
 
-    rom = memory_region(REGION_GFX1);
+    rom = memory_region(machine, REGION_GFX1);
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/4; i++)
@@ -415,17 +415,17 @@ static void pirates_decrypt_p(void)
     free (buf);
 }
 
-static void pirates_decrypt_s(void)
+static void pirates_decrypt_s(running_machine *machine)
 {
     int rom_size;
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(REGION_GFX2);
+    rom_size = memory_region_length(machine, REGION_GFX2);
 
     buf = malloc_or_die(rom_size);
 
-    rom = memory_region(REGION_GFX2);
+    rom = memory_region(machine, REGION_GFX2);
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/4; i++)
@@ -440,17 +440,17 @@ static void pirates_decrypt_s(void)
 }
 
 
-static void pirates_decrypt_oki(void)
+static void pirates_decrypt_oki(running_machine *machine)
 {
     int rom_size;
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(REGION_SOUND1);
+    rom_size = memory_region_length(machine, REGION_SOUND1);
 
     buf = malloc_or_die(rom_size);
 
-    rom = memory_region(REGION_SOUND1);
+    rom = memory_region(machine, REGION_SOUND1);
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size; i++)
@@ -464,12 +464,12 @@ static void pirates_decrypt_oki(void)
 
 static DRIVER_INIT( pirates )
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 
-	pirates_decrypt_68k();
-	pirates_decrypt_p();
-	pirates_decrypt_s();
-	pirates_decrypt_oki();
+	pirates_decrypt_68k(machine);
+	pirates_decrypt_p(machine);
+	pirates_decrypt_s(machine);
+	pirates_decrypt_oki(machine);
 
 	/* patch out protection check */
 	rom[0x62c0/2] = 0x6006; // beq -> bra
@@ -479,10 +479,10 @@ static READ16_HANDLER( genix_prot_r ) {	if(!offset)	return 0x0004; else	return 0
 
 static DRIVER_INIT( genix )
 {
-	pirates_decrypt_68k();
-	pirates_decrypt_p();
-	pirates_decrypt_s();
-	pirates_decrypt_oki();
+	pirates_decrypt_68k(machine);
+	pirates_decrypt_p(machine);
+	pirates_decrypt_s(machine);
+	pirates_decrypt_oki(machine);
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */

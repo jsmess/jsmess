@@ -462,7 +462,7 @@ static DEVICE_IMAGE_LOAD( studio2_cart )
 	}
 	filesize -= ST2_HEADER_SIZE;
 	/* Read ST2 cartridge contents */
-	ptr = ((UINT8 *)memory_region( REGION_CPU1 ) ) + 0x0400;
+	ptr = ((UINT8 *)memory_region(image->machine,  REGION_CPU1 ) ) + 0x0400;
 	if ( image_fread(image, ptr, filesize ) != filesize ) {
 		logerror( "Error loading cartridge: Unable to read contents from file: %s.\n", image_filename( image ) );
 		return INIT_FAIL;

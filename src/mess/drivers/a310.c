@@ -233,7 +233,7 @@ static READ32_HANDLER(logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)memory_region(REGION_CPU1);
+		rom = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 		return rom[offset & 0x1fffff];
 	}
@@ -300,7 +300,7 @@ static OPBASE_HANDLER( a310_setopbase )
 		opbase->mask = 0x1fffff;
 		opbase->mem_min = 0;
 		opbase->mem_max = 0x1fffff;
-		opbase->rom = opbase->ram = memory_region(REGION_CPU1);
+		opbase->rom = opbase->ram = memory_region(machine, REGION_CPU1);
 	}
 	else	// executing from logical memory
 	{

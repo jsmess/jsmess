@@ -164,11 +164,11 @@ static WRITE32_HANDLER( namcofl_sysreg_w )
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
 			memory_set_bankptr( 1, namcofl_workram );
-			memory_set_bankptr( 2, memory_region(REGION_CPU1) );
+			memory_set_bankptr( 2, memory_region(machine, REGION_CPU1) );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			memory_set_bankptr( 1, memory_region(REGION_CPU1) );
+			memory_set_bankptr( 1, memory_region(machine, REGION_CPU1) );
 			memory_set_bankptr( 2, namcofl_workram );
 		}
 	}
@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( namcofl_mem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( namcofl )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
@@ -219,7 +219,7 @@ static INPUT_PORTS_START( namcofl )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// C75 status
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -229,7 +229,7 @@ static INPUT_PORTS_START( namcofl )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )	// button B
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -239,7 +239,7 @@ static INPUT_PORTS_START( namcofl )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -249,13 +249,13 @@ static INPUT_PORTS_START( namcofl )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("ACCEL")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START
+	PORT_START_TAG("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START
+	PORT_START_TAG("WHEEL")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -529,26 +529,26 @@ ROM_START( finalapr )
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
 ROM_END
 
-static void namcofl_common_init(void)
+static void namcofl_common_init(running_machine *machine)
 {
 	namcofl_workram = auto_malloc(0x100000);
 
-	memory_set_bankptr( 1, memory_region(REGION_CPU1) );
+	memory_set_bankptr( 1, memory_region(machine, REGION_CPU1) );
 	memory_set_bankptr( 2, namcofl_workram );
 
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 	namcoc7x_set_host_ram(namcofl_mcuram);
 }
 
 static DRIVER_INIT(speedrcr)
 {
-	namcofl_common_init();
+	namcofl_common_init(machine);
 	namcos2_gametype = NAMCOFL_SPEED_RACER;
 }
 
 static DRIVER_INIT(finalapr)
 {
-	namcofl_common_init();
+	namcofl_common_init(machine);
 	namcos2_gametype = NAMCOFL_FINAL_LAP_R;
 }
 

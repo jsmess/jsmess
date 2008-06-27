@@ -568,13 +568,11 @@ struct _powerpc_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int clock, const powerpc_config *config, int (*irqcallback)(int));
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int index, int clock, const powerpc_config *config, int (*irqcallback)(int));
 void ppccom_exit(powerpc_state *ppc);
 
 void ppccom_reset(powerpc_state *ppc);
-#ifdef ENABLE_DEBUGGER
 offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 void ppccom_update_cycle_counting(powerpc_state *ppc);
 
 int ppccom_translate_address(powerpc_state *ppc, int space, int intention, offs_t *address);

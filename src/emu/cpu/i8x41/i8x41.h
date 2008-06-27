@@ -38,6 +38,14 @@
  * I8X41_STAT is A0 = 1 and R only
  */
 
+typedef enum {
+	TYPE_I8X41,
+	TYPE_I8X42
+} i8x41_type;
+
+typedef struct {
+	i8x41_type	type;
+} i8x41_config;
 
 /****************************************************************************
  *  Interrupt constants
@@ -54,6 +62,8 @@
  *    { I8X41_ps,   I8X41_ps,   i8041_port_strobe_w },
  */
 
+#define I8X41_p1		0x01
+#define I8X41_p2		0x02
 #define I8X41_t0		0x80	/* TEST0 input port handle */
 #define I8X41_t1		0x81	/* TEST1 input port handle */
 #define I8X41_ps		0x82	/* Prog pin strobe for expanded port sync */
@@ -81,8 +91,6 @@ enum {
 
 extern void i8x41_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef ENABLE_DEBUGGER
 extern offs_t i8x41_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif /* _I8X41_H */

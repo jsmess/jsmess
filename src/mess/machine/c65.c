@@ -767,7 +767,7 @@ static int c65_dma_read_color (int offset)
 	return c64_colorram[offset & 0x7ff];
 }
 
-static void c65_common_driver_init (void)
+static void c65_common_driver_init (running_machine *machine)
 {
 	c64_memory = auto_malloc(0x10000);
 	memset(c64_memory, 0, 0x10000);
@@ -787,8 +787,8 @@ static void c65_common_driver_init (void)
 		cia_intf[0].tod_clock = c64_pal ? 50 : 60;
 		cia_intf[1].tod_clock = c64_pal ? 50 : 60;
 
-		cia_config(0, &cia_intf[0]);
-		cia_config(1, &cia_intf[1]);
+		cia_config(machine, 0, &cia_intf[0]);
+		cia_config(machine, 1, &cia_intf[1]);
 	}
 
 	vic4567_init (c64_pal, c65_dma_read, c65_dma_read_color,
@@ -798,7 +798,7 @@ static void c65_common_driver_init (void)
 DRIVER_INIT( c65 )
 {
 	dma.version=2;
-	c65_common_driver_init ();
+	c65_common_driver_init (machine);
 
 }
 
@@ -806,7 +806,7 @@ DRIVER_INIT( c65pal )
 {
 	dma.version=1;
 	c64_pal = 1;
-	c65_common_driver_init ();
+	c65_common_driver_init (machine);
 }
 
 MACHINE_START( c65 )

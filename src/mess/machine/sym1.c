@@ -284,9 +284,9 @@ DRIVER_INIT( sym1 )
 	via_config(0, &via0);
 	via_config(1, &via1);
 	via_config(2, &via2);
-	r6532_config(0, &r6532_interface);
+	r6532_config(machine, 0, &r6532_interface);
 	r6532_set_clock(0, SYM1_CLOCK);
-	r6532_reset(0);
+	r6532_reset(machine, 0);
 
 	/* configure 74145 */
 	ttl74145_config(machine, 0, &ttl74145_intf);
@@ -299,7 +299,7 @@ DRIVER_INIT( sym1 )
 MACHINE_RESET( sym1 )
 {
 	via_reset();
-	r6532_reset(0);
+	r6532_reset(machine, 0);
 	ttl74145_reset(0);
 
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM

@@ -845,12 +845,12 @@ CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3fe.o $(CPUOBJ)/mips/mip
 DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
 endif
 
-$(CPUOBJ)/powerpc/mips3com.o:	$(CPUSRC)/powerpc/mips3.h \
-								$(CPUSRC)/powerpc/mips3com.h
+$(CPUOBJ)/mips/mips3com.o:	$(CPUSRC)/mips/mips3.h \
+								$(CPUSRC)/mips/mips3com.h
 
-$(CPUOBJ)/powerpc/mips3fe.o:	$(CPUSRC)/powerpc/mips3.h \
-								$(CPUSRC)/powerpc/mips3com.h \
-								$(CPUSRC)/powerpc/mips3fe.h
+$(CPUOBJ)/mips/mips3fe.o:	$(CPUSRC)/mips/mips3.h \
+								$(CPUSRC)/mips/mips3com.h \
+								$(CPUSRC)/mips/mips3fe.h
 
 $(CPUOBJ)/mips/mips3drc.o:		$(CPUSRC)/mips/mips3drc.c \
 								$(CPUSRC)/mips/mips3.h \
@@ -1066,12 +1066,12 @@ M68KMAKE = $(BUILDOUT)/m68kmake$(BUILD_EXE)
 endif
 
 # when we compile source files we need to include generated files from the OBJ directory
-$(CPUOBJ)/m68000/%.o: $(CPUSRC)/m68000/%.c
+$(CPUOBJ)/m68000/%.o: $(CPUSRC)/m68000/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -I$(CPUOBJ)/m68000 -c $< -o $@
 
 # when we compile generated files we need to include stuff from the src directory
-$(CPUOBJ)/m68000/%.o: $(CPUOBJ)/m68000/%.c
+$(CPUOBJ)/m68000/%.o: $(CPUOBJ)/m68000/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -I$(CPUSRC)/m68000 -c $< -o $@
 

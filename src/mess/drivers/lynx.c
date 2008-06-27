@@ -329,7 +329,7 @@ static void lynx_crc_keyword(const device_config *image)
 
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(image->machine, REGION_USER1);
 	int size;
 	UINT8 header[0x40];
 /* 64 byte header
@@ -372,7 +372,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 
 static QUICKLOAD_LOAD( lynx )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(image->machine, REGION_CPU1);
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	// maybe the first 2 bytes must be used to identify the endianess of the file
 	UINT16 start;

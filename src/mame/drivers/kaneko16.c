@@ -598,10 +598,20 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( gtmr_wheel_r )
 {
-	if ( (input_port_read(machine, "DSW1") & 0x1800) == 0x10)	// DSW setting
-		return	input_port_read(machine, "WHEEL0")<<8;			// 360' Wheel
-	else
-		return	input_port_read(machine, "WHEEL0");				// 270' Wheel
+	// check 'Controls' dip switch
+	switch (input_port_read(machine, "DSW1") & 0x1000)
+	{
+		case 0x0000:	// 'Both Sides' = 270deg Wheel
+			return	(input_port_read(machine, "WHEEL0"));
+			break;
+
+		case 0x1000:	// '1P Side' = 360' Wheel
+			return	(input_port_read(machine, "WHEEL1"));
+			break;
+		default:
+			return	(0);
+			break;
+		}
 }
 
 static WRITE16_HANDLER( gtmr_oki_0_bank_w )
@@ -842,7 +852,7 @@ ADDRESS_MAP_END
 #if 0
 static WRITE8_HANDLER( blazeon_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int bank = data & 7;
 	memory_set_bankptr(15, &RAM[bank * 0x10000 + 0x1000]);
 }
@@ -1339,8 +1349,11 @@ static INPUT_PORTS_START( gtmr )
 	PORT_DIPSETTING(      0x4000, "Flag Only" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
 
-	PORT_START_TAG("WHEEL0")	// IN5 - Wheel - 100015.b <- ffffe.b
-	PORT_BIT ( 0x00ff, 0x0080, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1)
+	PORT_START_TAG("WHEEL0")	// IN5 - Wheel (270deg) - 100015.b <- ffffe.b
+	PORT_BIT ( 0x00ff, 0x0080, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(25)
+
+	PORT_START_TAG("WHEEL1")	// IN6 - Wheel (360deg)
+	PORT_BIT ( 0x00ff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(25) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -1403,12 +1416,12 @@ static INPUT_PORTS_START( gtmr2 )
     */
 	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x1800, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(      0x0800, "Wheel (360)" )			// Not working correctly in race
-	PORT_DIPSETTING(      0x1000, "Wheel (270D)" )			// Not working correctly !
-	PORT_DIPSETTING(      0x0000, "Wheel (270A)" )			// Not working correctly in race
+	PORT_DIPSETTING(      0x0800, "Wheel (360)" )			// Not working correctly in race }
+	PORT_DIPSETTING(      0x1000, "Wheel (270D)" )			// Not working correctly !   } seems to work ok to me! (minwah)
+	PORT_DIPSETTING(      0x0000, "Wheel (270A)" )			// Not working correctly in race }
 	PORT_DIPNAME( 0x2000, 0x2000, "Optional Mode Of Pedal Function" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x2000, "Microswitch" )			// "This mode also corresponds to the two buttons used with joystick."
-	PORT_DIPSETTING(      0x0000, "Potentiometer" )         // Not implemented yet
+	PORT_DIPSETTING(      0x0000, "Potentiometer" )         	// Not implemented yet
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On )  )
@@ -2043,10 +2056,10 @@ MACHINE_DRIVER_END
  have the even and odd pixels swapped. So we use this function to untangle
  them and have one single gfxlayout for both tiles and sprites.
 */
-static void kaneko16_unscramble_tiles(int region)
+static void kaneko16_unscramble_tiles(running_machine *machine, int region)
 {
-	UINT8 *RAM	=	memory_region(region);
-	int size			=	memory_region_length(region);
+	UINT8 *RAM	=	memory_region(machine, region);
+	int size			=	memory_region_length(machine, region);
 	int i;
 
 	if (RAM == NULL)	return;
@@ -2057,7 +2070,7 @@ static void kaneko16_unscramble_tiles(int region)
 	}
 }
 
-static void kaneko16_expand_sample_banks(int region)
+static void kaneko16_expand_sample_banks(running_machine *machine, int region)
 {
 	/* The sample data for the first OKI has an address translator/
        banking register in it that munges the addresses as follows:
@@ -2069,14 +2082,15 @@ static void kaneko16_expand_sample_banks(int region)
        possible combinations of these and swap between them.
     */
 	int bank;
+	UINT8 *src0;
 
-	if (memory_region_length(region) < 0x40000 * 16)
+	if (memory_region_length(machine, region) < 0x40000 * 16)
 		fatalerror("gtmr SOUND1 region too small");
 
 	/* bank 0 maps to itself, so we just leave it alone */
+	src0 = memory_region(machine, region);
 	for (bank = 15; bank > 0; bank--)
 	{
-		UINT8 *src0 = memory_region(region);
 		UINT8 *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);
 		UINT8 *dst = src0 + 0x40000 * bank;
 
@@ -2087,20 +2101,20 @@ static void kaneko16_expand_sample_banks(int region)
 
 static DRIVER_INIT( kaneko16 )
 {
-	kaneko16_unscramble_tiles(REGION_GFX2);
-	kaneko16_unscramble_tiles(REGION_GFX3);
+	kaneko16_unscramble_tiles(machine, REGION_GFX2);
+	kaneko16_unscramble_tiles(machine, REGION_GFX3);
 }
 
 static DRIVER_INIT( berlwall )
 {
-	kaneko16_unscramble_tiles(REGION_GFX2);
+	kaneko16_unscramble_tiles(machine, REGION_GFX2);
 }
 
 static DRIVER_INIT( samplebank )
 {
-	kaneko16_unscramble_tiles(REGION_GFX2);
-	kaneko16_unscramble_tiles(REGION_GFX3);
-	kaneko16_expand_sample_banks(REGION_SOUND1);
+	kaneko16_unscramble_tiles(machine, REGION_GFX2);
+	kaneko16_unscramble_tiles(machine, REGION_GFX3);
+	kaneko16_expand_sample_banks(machine, REGION_SOUND1);
 }
 
 

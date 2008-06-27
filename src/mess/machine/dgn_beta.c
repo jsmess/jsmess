@@ -1032,7 +1032,7 @@ void dgn_beta_line_interrupt (int data)
 
 static void dgnbeta_reset(running_machine *machine)
 {
-	system_rom = memory_region(REGION_CPU1);
+	system_rom = memory_region(machine, REGION_CPU1);
 
 	/* Make sure CPU 1 is started out halted ! */
 	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);

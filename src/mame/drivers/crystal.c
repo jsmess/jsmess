@@ -230,9 +230,9 @@ static WRITE32_HANDLER(Banksw_w)
 {
 	Bank=(data>>1)&7;
 	if(Bank<=2)
-		memory_set_bankptr(1,memory_region(REGION_USER1)+Bank*0x1000000);
+		memory_set_bankptr(1,memory_region(machine, REGION_USER1)+Bank*0x1000000);
 	else
-		memory_set_bankptr(1,memory_region(REGION_USER2));
+		memory_set_bankptr(1,memory_region(machine, REGION_USER2));
 }
 
 static TIMER_CALLBACK( Timer0cb )
@@ -353,7 +353,7 @@ static READ32_HANDLER(FlashCmd_r)
 	{
 		if(Bank<=2)
 		{
-			UINT32 *ptr=(UINT32*)(memory_region(REGION_USER1)+Bank*0x1000000);
+			UINT32 *ptr=(UINT32*)(memory_region(machine, REGION_USER1)+Bank*0x1000000);
 			return ptr[0];
 		}
 		else
@@ -387,7 +387,7 @@ static WRITE32_HANDLER(PIO_w)
 
 	DS1302_RST(RST?1:0);
 	DS1302_DAT(DAT?1:0);
-	DS1302_CLK(CLK?1:0);
+	DS1302_CLK(machine, CLK?1:0);
 
 	if(DS1302_RD())
 		program_write_dword_32le(0x01802008,program_read_dword_32le(0x01802008)|0x10000000);
@@ -580,7 +580,7 @@ static MACHINE_RESET(crystal)
 	IntHigh=0;
 	cpunum_set_irq_callback(0,icallback);
 	Bank=0;
-	memory_set_bankptr(1,memory_region(REGION_USER1)+0);
+	memory_set_bankptr(1,memory_region(machine, REGION_USER1)+0);
 	FlashCmd=0xff;
 	OldPort4=0;
 
@@ -904,7 +904,7 @@ ROM_END
 
 static DRIVER_INIT(crysking)
 {
-	UINT16 *Rom=(UINT16*) memory_region(REGION_USER1);
+	UINT16 *Rom=(UINT16*) memory_region(machine, REGION_USER1);
 
 	//patch the data feed by the protection
 
@@ -923,7 +923,7 @@ static DRIVER_INIT(crysking)
 
 static DRIVER_INIT(evosocc)
 {
-	UINT16 *Rom=(UINT16*) memory_region(REGION_USER1);
+	UINT16 *Rom=(UINT16*) memory_region(machine, REGION_USER1);
 	Rom+=0x1000000*2/2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)]=0x90FC;	//PUSH R2..R7
@@ -941,7 +941,7 @@ static DRIVER_INIT(evosocc)
 
 static DRIVER_INIT(topbladv)
 {
-	UINT16 *Rom=(UINT16*) memory_region(REGION_USER1);
+	UINT16 *Rom=(UINT16*) memory_region(machine, REGION_USER1);
 
 	Rom[WORD_XOR_LE(0x12d7a/2)]=0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
 	Rom[WORD_XOR_LE(0x12d7c/2)]=0x9001;	//PUSH R0
@@ -959,7 +959,7 @@ static DRIVER_INIT(topbladv)
 
 static DRIVER_INIT(officeye)
 {
-	UINT16 *Rom=(UINT16*) memory_region(REGION_USER1);
+	UINT16 *Rom=(UINT16*) memory_region(machine, REGION_USER1);
 
 	Rom[WORD_XOR_LE(0x9c9e/2)]=0x901C;	//PUSH R4-R3-R2
 	Rom[WORD_XOR_LE(0x9ca0/2)]=0x9001;	//PUSH R0

@@ -397,7 +397,7 @@ static MACHINE_START( coleco )
 static MACHINE_RESET( coleco )
 {
     cpunum_set_input_line_vector(0, INPUT_LINE_IRQ0, 0xff);
-	memset(&memory_region(REGION_CPU1)[0x6000], 0xff, 0x400);	// initialize RAM
+	memset(&memory_region(machine, REGION_CPU1)[0x6000], 0xff, 0x400);	// initialize RAM
     timer_pulse(ATTOTIME_IN_MSEC(20), NULL, 0, paddle_callback);
 }
 
@@ -517,7 +517,7 @@ SYSTEM_CONFIG_END
 static DEVICE_IMAGE_LOAD( czz50_cart )
 {
 	int size = image_length(image);
-	UINT8 *ptr = memory_region(REGION_CPU1) + 0x8000;
+	UINT8 *ptr = memory_region(image->machine, REGION_CPU1) + 0x8000;
 
 	if (image_fread(image, ptr, size ) != size)
 	{

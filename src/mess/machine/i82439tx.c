@@ -108,7 +108,7 @@ static void intel82439tx_configure_memory(running_machine *machine, UINT8 val, o
 	if (val & 0x01)
 		memory_set_bankptr(read_bank, i82439tx->bios_ram + (begin - 0xC0000) / 4);
 	else
-		memory_set_bankptr(read_bank, memory_region(REGION_USER1) + (begin - 0xC0000));
+		memory_set_bankptr(read_bank, memory_region(machine, REGION_USER1) + (begin - 0xC0000));
 
 	if (val & 0x02)
 		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, wh);
@@ -201,10 +201,10 @@ static void intel82439tx_pci_write(int function, int offset, UINT32 data, UINT32
 	/* hack to compensate for weird issue (maybe the Pentium core needs to support caching? */
 	if ((cpunum_get_reg(0, REG_PC) == 0xFCB01) && !strcmp(machine->gamedrv->name, "at586"))
 	{
-		memory_region(REGION_USER1)[0x3CB01] = 0xF3;
-		memory_region(REGION_USER1)[0x3CB02] = 0xA4;
-		memory_region(REGION_USER1)[0x3CB03] = 0x58;
-		memory_region(REGION_USER1)[0x3CB04] = 0xEE;
+		memory_region(machine, REGION_USER1)[0x3CB01] = 0xF3;
+		memory_region(machine, REGION_USER1)[0x3CB02] = 0xA4;
+		memory_region(machine, REGION_USER1)[0x3CB03] = 0x58;
+		memory_region(machine, REGION_USER1)[0x3CB04] = 0xEE;
 	}
 }
 

@@ -542,7 +542,7 @@ DRIVER_INIT( pet40 )
 DRIVER_INIT( cbm80 )
 {
 	cbm8096 = 1;
-	pet_memory = memory_region(REGION_CPU1);
+	pet_memory = memory_region(machine, REGION_CPU1);
 
 	pet_common_driver_init(machine);
 	pia_config(0, &petb_pia0);

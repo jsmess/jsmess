@@ -24,7 +24,7 @@ static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
     AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
     //AM_RANGE( 0xd800, 0xd603 ) AM_MIRROR(0x07fc) // Timer
-    AM_RANGE( 0xf800, 0xffff ) AM_WRITE(dma8257_0_w)	 // DMA
+	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
@@ -144,6 +144,9 @@ static MACHINE_DRIVER_START( mikrosha )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_DEVICE_ADD("dma8257", DMA8257)
+	MDRV_DEVICE_CONFIG(mikrosha_dma)
 MACHINE_DRIVER_END
 
 static void mikrosha_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

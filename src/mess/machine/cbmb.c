@@ -258,10 +258,10 @@ static void cbmb_change_font(running_machine *machine, int level)
 
 static void cbmb_common_driver_init(running_machine *machine)
 {
-	cbmb_chargen=memory_region(REGION_CPU1)+0x100000;
+	cbmb_chargen=memory_region(machine, REGION_CPU1)+0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
-	cia_config(0, &cbmb_cia);
+	cia_config(machine, 0, &cbmb_cia);
 
 	tpi6525[0].a.read=cbmb_tpi0_port_a_r;
 	tpi6525[0].a.output=cbmb_tpi0_port_a_w;

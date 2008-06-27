@@ -928,14 +928,14 @@ static READ32_HANDLER( gx6bppspr_r )
 
 static READ32_HANDLER( type1_roz_r1 )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_GFX3);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_GFX3);
 
 	return ROM[offset];
 }
 
 static READ32_HANDLER( type1_roz_r2 )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_GFX3);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_GFX3);
 
 	ROM += (0x600000/2);
 
@@ -1329,12 +1329,9 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-//  MDRV_SCREEN_RAW_PARAMS(6000000, 288+17+32+49, 0, 287, 224+17+8+16, 0, 223)
-	/* These parameters should be correct according to developer manual,
-    but sound and graphics of tbyahhoo's attract mode doesn't sync correctly.
-    (better than previous 60Hz, though) Setting refresh rate to 58Hz fixes this.
-    We have to check actual value written to the CCU. */
-	MDRV_SCREEN_REFRESH_RATE(58)
+	MDRV_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
+	/* These parameters are actual value written to the CCU.
+    tbyahhoo attract mode desync is caused by another matter. */
 
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1386,6 +1383,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( opengolf )
 	MDRV_IMPORT_FROM(konamigx)
 	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MDRV_GFXDECODE(opengolf)
 	MDRV_VIDEO_START(opengolf)
@@ -1397,6 +1395,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( racinfrc )
 	MDRV_IMPORT_FROM(konamigx)
 	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MDRV_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
 	MDRV_GFXDECODE(racinfrc)
 	MDRV_VIDEO_START(racinfrc)
@@ -3201,7 +3200,7 @@ static DRIVER_INIT(konamigx)
 
 				case 2:	// tkmmpzdm hack
 	{
-		UINT32 *rom = (UINT32*)memory_region(REGION_CPU1);
+		UINT32 *rom = (UINT32*)memory_region(machine, REGION_CPU1);
 
 		// The display is initialized after POST but the copyright screen disabled
 		// planes B,C,D and didn't bother restoring them. I've spent a good

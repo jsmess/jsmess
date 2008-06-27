@@ -1014,7 +1014,7 @@ MACHINE_DRIVER_END
 
 static void driver_init_common( running_machine *machine )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xc000);
 	timer_pulse(ATTOTIME_IN_HZ(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
 }
@@ -1027,7 +1027,7 @@ static DRIVER_INIT( super80 )
 
 static DRIVER_INIT( super80d )
 {
-	UINT8 *RAM = memory_region(REGION_GFX1);
+	UINT8 *RAM = memory_region(machine, REGION_GFX1);
 	UINT16 i;	/* create inverse characters */
 	for (i = 0x0800; i < 0x1000; i++) RAM[i] = ~RAM[i];
 	DRIVER_INIT_CALL( super80 );
@@ -1035,9 +1035,9 @@ static DRIVER_INIT( super80d )
 
 static DRIVER_INIT( super80v )
 {
-	pcgram = memory_region(REGION_CPU1)+0xf000;
-	videoram = memory_region(REGION_CPU1)+0x18000;
-	colorram = memory_region(REGION_CPU1)+0x1C000;
+	pcgram = memory_region(machine, REGION_CPU1)+0xf000;
+	videoram = memory_region(machine, REGION_CPU1)+0x18000;
+	colorram = memory_region(machine, REGION_CPU1)+0x1C000;
 	driver_init_common(machine);
 }
 
@@ -1118,7 +1118,7 @@ ROM_END
 
 static DEVICE_IMAGE_LOAD( super80_cart )
 {
-	image_fread(image, memory_region(REGION_CPU1) + 0xc000, 0x3000);
+	image_fread(image, memory_region(image->machine, REGION_CPU1) + 0xc000, 0x3000);
 
 	return INIT_PASS;
 }

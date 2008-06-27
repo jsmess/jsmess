@@ -408,7 +408,7 @@ ADDRESS_MAP_END
 
 static void mac2_init_machine( void )
 {
-	memset(memory_region(REGION_CPU1), 0, 0x800000);
+	memset(memory_region(machine, REGION_CPU1), 0, 0x800000);
 }
 
 

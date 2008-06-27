@@ -17,7 +17,7 @@ WRITE16_HANDLER ( intvkbd_dualport16_w )
 	COMBINE_DATA(&intvkbd_dualport_ram[offset]);
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = memory_region(REGION_CPU2);
+	RAM	 = memory_region(machine, REGION_CPU2);
 	RAM[offset] = (UINT8) (data >> 0);
 }
 
@@ -34,7 +34,7 @@ WRITE8_HANDLER ( intvkbd_dualport8_lsb_w )
 	intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = memory_region(REGION_CPU2);
+	RAM	 = memory_region(machine, REGION_CPU2);
 	RAM[offset] = data;
 }
 
@@ -331,7 +331,7 @@ static int intv_load_rom_file(const device_config *image, int required)
 	UINT8 high_byte;
 	UINT8 low_byte;
 
-	UINT8 *memory = memory_region(REGION_CPU1);
+	UINT8 *memory = memory_region(image->machine, REGION_CPU1);
 
 	image_fread(image, &temp,1);			/* header */
 	if (temp != 0xa8)
@@ -379,7 +379,7 @@ DEVICE_START( intv_cart )
 {
 	/* First, initialize these as empty so that the intellivision
 	 * will think that the playcable and keyboard are not attached */
-	UINT8 *memory = memory_region(REGION_CPU1);
+	UINT8 *memory = memory_region(device->machine, REGION_CPU1);
 
 	/* assume playcable is absent */
 	memory[0x4800<<1] = 0xff;
@@ -394,7 +394,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 {
 	/* First, initialize these as empty so that the intellivision
 	 * will think that the playcable and keyboard are not attached */
-	UINT8 *memory = memory_region(REGION_CPU1);
+	UINT8 *memory = memory_region(image->machine, REGION_CPU1);
 
 	/* assume playcable is absent */
 	memory[0x4800<<1] = 0xff;
@@ -492,7 +492,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 	{
 		/* First, initialize these as empty so that the intellivision
 		 * will think that the playcable is not attached */
-		UINT8 *memory = memory_region(REGION_CPU1);
+		UINT8 *memory = memory_region(image->machine, REGION_CPU1);
 
 		/* assume playcable is absent */
 		memory[0x4800<<1] = 0xff;
@@ -503,7 +503,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 
 	if (id == 1) /* Keyboard component cartridge slot */
 	{
-		UINT8 *memory = memory_region(REGION_CPU2);
+		UINT8 *memory = memory_region(image->machine, REGION_CPU2);
 
 		/* Assume an 8K cart, like BASIC */
 		image_fread(image,&memory[0xe000],0x2000);

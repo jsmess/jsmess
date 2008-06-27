@@ -336,7 +336,7 @@ static READ8_HANDLER( psychic5_bankselect_r )
 
 static WRITE8_HANDLER( psychic5_bankselect_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int bankaddress;
 
 	if (data != psychic5_bank_latch)
@@ -431,7 +431,7 @@ static INPUT_PORTS_START( psychic5 )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-    PORT_START_TAG("IN1")		/* player 1 controls */
+    PORT_START_TAG("P1")		/* player 1 controls */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -441,7 +441,7 @@ static INPUT_PORTS_START( psychic5 )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-    PORT_START_TAG("IN2")		/* player 2 controls */
+    PORT_START_TAG("P2")		/* player 2 controls */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL

@@ -143,7 +143,7 @@ static WRITE8_HANDLER(svision_w)
 			break;
 		case 0x26: /* bits 5,6 memory management for a000? */
 			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time()),offset,data);
-			memory_set_bankptr(1, memory_region(REGION_USER1) + ((svision_reg[0x26] & 0xe0) << 9));
+			memory_set_bankptr(1, memory_region(machine, REGION_USER1) + ((svision_reg[0x26] & 0xe0) << 9));
 			svision_irq( machine );
 			break;
 		case 0x23: /* delta hero irq routine write */
@@ -443,13 +443,13 @@ static DRIVER_INIT( svision )
 {
 	svision.timer1 = timer_alloc(svision_timer, NULL);
 	svision_pet.on = FALSE;
-	memory_set_bankptr(2, memory_region(REGION_USER1) + 0x1c000);
+	memory_set_bankptr(2, memory_region(machine, REGION_USER1) + 0x1c000);
 }
 
 static DRIVER_INIT( svisions )
 {
 	svision.timer1 = timer_alloc(svision_timer, NULL);
-	memory_set_bankptr(2, memory_region(REGION_USER1) + 0x1c000);
+	memory_set_bankptr(2, memory_region(machine, REGION_USER1) + 0x1c000);
 	svision.timer1 = timer_alloc(svision_timer, NULL);
 	svision_pet.on = TRUE;
 	svision_pet.timer = timer_alloc(svision_pet_timer, NULL);
@@ -460,7 +460,7 @@ static MACHINE_RESET( svision )
 {
 	svision.timer_shot = FALSE;
 	svision_dma.finished = FALSE;
-	memory_set_bankptr(1, memory_region(REGION_USER1));
+	memory_set_bankptr(1, memory_region(machine, REGION_USER1));
 }
 
 
@@ -468,7 +468,7 @@ static MACHINE_RESET( tvlink )
 {
 	svision.timer_shot = FALSE;
 	svision_dma.finished = FALSE;
-	memory_set_bankptr(1, memory_region(REGION_USER1));
+	memory_set_bankptr(1, memory_region(machine, REGION_USER1));
 	tvlink.palette_on = FALSE;
 
 	memset(svision_reg + 0x800, 0xff, 0x40); // normally done from tvlink microcontroller

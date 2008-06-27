@@ -51,7 +51,7 @@ static WRITE8_HANDLER( pl80_port_a_w )
 		// read data from font ROM
 		int font_rom = (input_port_read(machine, "FONT") & 0x03) * 0x2000;
 
-		state->plotter_data = memory_region(REGION_GFX2)[font_rom | state->font_addr];
+		state->plotter_data = memory_region(machine, REGION_GFX2)[font_rom | state->font_addr];
 	}
 	
 	if (!BIT(data, 6))

@@ -385,7 +385,7 @@ READ16_HANDLER(concept_io_r)
 		case 3:
 			/* NVIA versatile system interface */
 			LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
-			return via_read(0, offset & 0xf);
+			return via_read(machine, 0, offset & 0xf);
 			break;
 
 		case 4:
@@ -495,7 +495,7 @@ WRITE16_HANDLER(concept_io_w)
 
 		case 3:
 			/* NVIA versatile system interface */
-			via_write(0, offset & 0xf, data);
+			via_write(machine, 0, offset & 0xf, data);
 			break;
 
 		case 4:

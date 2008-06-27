@@ -135,8 +135,8 @@ static INT16 *samplebuf;
 
 static void pbillian_sh_start(void)
 {
-	UINT8 *src = memory_region(REGION_SOUND1);
-	int i, len = memory_region_length(REGION_SOUND1);
+	UINT8 *src = memory_region(Machine, REGION_SOUND1);
+	int i, len = memory_region_length(Machine, REGION_SOUND1);
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
 	samplebuf = auto_malloc(len * 2);
@@ -510,7 +510,7 @@ static void machine_init_common(void)
 static MACHINE_START( superqix )
 {
 	/* configure the banks */
-	memory_configure_bank(1, 0, 4, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 4, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 
 	machine_init_common();
 }
@@ -518,7 +518,7 @@ static MACHINE_START( superqix )
 static MACHINE_START( pbillian )
 {
 	/* configure the banks */
-	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 
 	machine_init_common();
 }
@@ -1056,7 +1056,7 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(sqix_port_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,3)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
 
 	MDRV_CPU_ADD(I8751, 12000000/3)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
@@ -1099,7 +1099,7 @@ static MACHINE_DRIVER_START( sqixbl )
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(bootleg_port_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,3)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,6)	/* ??? */
 
 	MDRV_MACHINE_START(superqix)
 
@@ -1304,8 +1304,8 @@ static DRIVER_INIT( perestro )
 	int i,j;
 
 	/* decrypt program code; the address lines are shuffled around in a non-trivial way */
-	src = memory_region(REGION_CPU1);
-	len = memory_region_length(REGION_CPU1);
+	src = memory_region(machine, REGION_CPU1);
+	len = memory_region_length(machine, REGION_CPU1);
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1324,8 +1324,8 @@ static DRIVER_INIT( perestro )
 	}
 
 	/* decrypt gfx ROMs; simple bit swap on the address lines */
-	src = memory_region(REGION_GFX1);
-	len = memory_region_length(REGION_GFX1);
+	src = memory_region(machine, REGION_GFX1);
+	len = memory_region_length(machine, REGION_GFX1);
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1335,8 +1335,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = memory_region(REGION_GFX2);
-	len = memory_region_length(REGION_GFX2);
+	src = memory_region(machine, REGION_GFX2);
+	len = memory_region_length(machine, REGION_GFX2);
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1346,8 +1346,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = memory_region(REGION_GFX3);
-	len = memory_region_length(REGION_GFX3);
+	src = memory_region(machine, REGION_GFX3);
+	len = memory_region_length(machine, REGION_GFX3);
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);

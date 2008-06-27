@@ -534,7 +534,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int clock, const powerpc_config *config, int (*irqcallback)(int))
+static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int index, int clock, const powerpc_config *config, int (*irqcallback)(int))
 {
 	drcfe_config feconfig =
 	{
@@ -558,7 +558,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int cl
 	memset(ppc, 0, sizeof(*ppc));
 
 	/* initialize the core */
-	ppccom_init(ppc, flavor, cap, tb_divisor, clock, config, irqcallback);
+	ppccom_init(ppc, flavor, cap, tb_divisor, index, clock, config, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	ppc->impstate = drccache_memory_alloc_near(cache, sizeof(*ppc->impstate));
@@ -770,12 +770,10 @@ static int ppcdrc_translate(int space, int intention, offs_t *address)
     ppcdrc_dasm - disassemble an instruction
 -------------------------------------------------*/
 
-#ifdef ENABLE_DEBUGGER
 static offs_t ppcdrc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return ppccom_dasm(ppc, buffer, pc, oprom, opram);
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 /*-------------------------------------------------
@@ -830,9 +828,7 @@ static void ppcdrc_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = ppcdrc_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = ppcdrc_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = ppcdrc_execute;			break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ppcdrc_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_TRANSLATE:						info->translate = ppcdrc_translate;		break;
 		case CPUINFO_PTR_CONTEXT:						info->p = ppc;							break;
 
@@ -1511,94 +1507,95 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 		UML_AND(block, IREG(0), IREG(0), IMM(0x7fffffff));									// and     i0,i0,0x7fffffff
 	UML_XOR(block, IREG(0), IREG(0), IMM((mode & MODE_LITTLE_ENDIAN) ? (8 - size) : 0));	// xor     i0,i0,8-size
 
-	for (ramnum = 0; ramnum < PPC_MAX_FASTRAM; ramnum++)
-		if (!Machine->debug_mode && ppc->impstate->fastram[ramnum].base != NULL && (!iswrite || !ppc->impstate->fastram[ramnum].readonly))
-		{
-			void *fastbase = (UINT8 *)ppc->impstate->fastram[ramnum].base - ppc->impstate->fastram[ramnum].start;
-			UINT32 skip = label++;
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		for (ramnum = 0; ramnum < PPC_MAX_FASTRAM; ramnum++)
+			if (ppc->impstate->fastram[ramnum].base != NULL && (!iswrite || !ppc->impstate->fastram[ramnum].readonly))
+			{
+				void *fastbase = (UINT8 *)ppc->impstate->fastram[ramnum].base - ppc->impstate->fastram[ramnum].start;
+				UINT32 skip = label++;
 
-			if (ppc->impstate->fastram[ramnum].end != 0xffffffff)
-			{
-				UML_CMP(block, IREG(0), IMM(ppc->impstate->fastram[ramnum].end));			// cmp     i0,end
-				UML_JMPc(block, IF_A, skip);												// ja      skip
-			}
-			if (ppc->impstate->fastram[ramnum].start != 0x00000000)
-			{
-				UML_CMP(block, IREG(0), IMM(ppc->impstate->fastram[ramnum].start));			// cmp     i0,fastram_start
-				UML_JMPc(block, IF_B, skip);												// jb      skip
-			}
+				if (ppc->impstate->fastram[ramnum].end != 0xffffffff)
+				{
+					UML_CMP(block, IREG(0), IMM(ppc->impstate->fastram[ramnum].end));			// cmp     i0,end
+					UML_JMPc(block, IF_A, skip);												// ja      skip
+				}
+				if (ppc->impstate->fastram[ramnum].start != 0x00000000)
+				{
+					UML_CMP(block, IREG(0), IMM(ppc->impstate->fastram[ramnum].start));			// cmp     i0,fastram_start
+					UML_JMPc(block, IF_B, skip);												// jb      skip
+				}
 
-			if (!iswrite)
-			{
-				if (size == 1)
+				if (!iswrite)
 				{
-					UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 0));					// xor     i0,i0,fastxor >> 0
-					UML_LOAD(block, IREG(0), fastbase, IREG(0), BYTE);						// load    i0,fastbase,i0,byte
-				}
-				else if (size == 2)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
-					UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 1));					// xor     i0,i0,fastxor >> 1
-					UML_LOAD(block, IREG(0), fastbase, IREG(0), WORD);						// load    i0,fastbase,i0,word
-				}
-				else if (size == 4)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(2));								// shr     i0,i0,2
-					UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 2));					// xor     i0,i0,fastxor >> 2
-					UML_LOAD(block, IREG(0), fastbase, IREG(0), DWORD);						// load    i0,fastbase,i0,dword
-				}
-				else if (size == 8)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(3));								// shr     i0,i0,3
-					UML_DLOAD(block, IREG(0), fastbase, IREG(0), QWORD);					// dload   i0,fastbase,i0,qword
-				}
-				UML_RET(block);																// ret
-			}
-			else
-			{
-				if (size == 1)
-				{
-					UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 0));					// xor     i0,i0,fastxor >> 0
-					UML_STORE(block, fastbase, IREG(0), IREG(1), BYTE);						// store   fastbase,i0,i1,byte
-				}
-				else if (size == 2)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
-					UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 1));					// xor     i0,i0,fastxor >> 1
-					UML_STORE(block, fastbase, IREG(0), IREG(1), WORD);						// store   fastbase,i0,i1,word
-				}
-				else if (size == 4)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(2));								// shr     i0,i0,2
-					UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 2));					// xor     i0,i0,fastxor >> 2
-					if (ismasked)
+					if (size == 1)
 					{
-						UML_LOAD(block, IREG(3), fastbase, IREG(0), DWORD);					// load    i3,fastbase,i0,dword
-						UML_AND(block, IREG(1), IREG(1), IREG(2));							// and     i1,i1,i2
-						UML_XOR(block, IREG(2), IREG(2), IMM(0xffffffff));					// xor     i2,i2,0xfffffffff
-						UML_AND(block, IREG(3), IREG(3), IREG(2));							// and     i3,i3,i2
-						UML_OR(block, IREG(1), IREG(1), IREG(3));							// or      i1,i1,i3
+						UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 0));					// xor     i0,i0,fastxor >> 0
+						UML_LOAD(block, IREG(0), fastbase, IREG(0), BYTE);						// load    i0,fastbase,i0,byte
 					}
-					UML_STORE(block, fastbase, IREG(0), IREG(1), DWORD);					// store   fastbase,i0,i1,dword
-				}
-				else if (size == 8)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(3));								// shr     i0,i0,3
-					if (ismasked)
+					else if (size == 2)
 					{
-						UML_DLOAD(block, IREG(3), fastbase, IREG(0), QWORD);				// dload   i3,fastbase,i0,qword
-						UML_DAND(block, IREG(1), IREG(1), IREG(2));							// dand    i1,i1,i2
-						UML_DXOR(block, IREG(2), IREG(2), IMM(U64(0xffffffffffffffff)));	// dxor    i2,i2,0xfffffffffffffffff
-						UML_DAND(block, IREG(3), IREG(3), IREG(2));							// dand    i3,i3,i2
-						UML_DOR(block, IREG(1), IREG(1), IREG(3));							// dor     i1,i1,i3
+						UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
+						UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 1));					// xor     i0,i0,fastxor >> 1
+						UML_LOAD(block, IREG(0), fastbase, IREG(0), WORD);						// load    i0,fastbase,i0,word
 					}
-					UML_DSTORE(block, fastbase, IREG(0), IREG(1), QWORD);					// dstore  fastbase,i0,i1,qword
+					else if (size == 4)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(2));								// shr     i0,i0,2
+						UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 2));					// xor     i0,i0,fastxor >> 2
+						UML_LOAD(block, IREG(0), fastbase, IREG(0), DWORD);						// load    i0,fastbase,i0,dword
+					}
+					else if (size == 8)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(3));								// shr     i0,i0,3
+						UML_DLOAD(block, IREG(0), fastbase, IREG(0), QWORD);					// dload   i0,fastbase,i0,qword
+					}
+					UML_RET(block);																// ret
 				}
-				UML_RET(block);																// ret
-			}
+				else
+				{
+					if (size == 1)
+					{
+						UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 0));					// xor     i0,i0,fastxor >> 0
+						UML_STORE(block, fastbase, IREG(0), IREG(1), BYTE);						// store   fastbase,i0,i1,byte
+					}
+					else if (size == 2)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
+						UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 1));					// xor     i0,i0,fastxor >> 1
+						UML_STORE(block, fastbase, IREG(0), IREG(1), WORD);						// store   fastbase,i0,i1,word
+					}
+					else if (size == 4)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(2));								// shr     i0,i0,2
+						UML_XOR(block, IREG(0), IREG(0), IMM(fastxor >> 2));					// xor     i0,i0,fastxor >> 2
+						if (ismasked)
+						{
+							UML_LOAD(block, IREG(3), fastbase, IREG(0), DWORD);					// load    i3,fastbase,i0,dword
+							UML_AND(block, IREG(1), IREG(1), IREG(2));							// and     i1,i1,i2
+							UML_XOR(block, IREG(2), IREG(2), IMM(0xffffffff));					// xor     i2,i2,0xfffffffff
+							UML_AND(block, IREG(3), IREG(3), IREG(2));							// and     i3,i3,i2
+							UML_OR(block, IREG(1), IREG(1), IREG(3));							// or      i1,i1,i3
+						}
+						UML_STORE(block, fastbase, IREG(0), IREG(1), DWORD);					// store   fastbase,i0,i1,dword
+					}
+					else if (size == 8)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(3));								// shr     i0,i0,3
+						if (ismasked)
+						{
+							UML_DLOAD(block, IREG(3), fastbase, IREG(0), QWORD);				// dload   i3,fastbase,i0,qword
+							UML_DAND(block, IREG(1), IREG(1), IREG(2));							// dand    i1,i1,i2
+							UML_DXOR(block, IREG(2), IREG(2), IMM(U64(0xffffffffffffffff)));	// dxor    i2,i2,0xfffffffffffffffff
+							UML_DAND(block, IREG(3), IREG(3), IREG(2));							// dand    i3,i3,i2
+							UML_DOR(block, IREG(1), IREG(1), IREG(3));							// dor     i1,i1,i3
+						}
+						UML_DSTORE(block, fastbase, IREG(0), IREG(1), QWORD);					// dstore  fastbase,i0,i1,qword
+					}
+					UML_RET(block);																// ret
+				}
 
-			UML_LABEL(block, skip);														// skip:
-		}
+				UML_LABEL(block, skip);														// skip:
+			}
 
 	switch (size)
 	{
@@ -2136,7 +2133,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 		UML_CALLC(block, cfunc_printf_probe, desc->pc);										// callc   cfunc_printf_probe,desc->pc
 
 	/* if we are debugging, call the debugger */
-	if (Machine->debug_mode)
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		UML_MOV(block, MEM(&ppc->pc), IMM(desc->pc));										// mov     [pc],desc->pc
 		save_fast_iregs(block);																// <save fastregs>
@@ -4220,7 +4217,7 @@ static void ppcdrc4xx_set_info(UINT32 state, cpuinfo *info)
 
 static void ppc403ga_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, index, clock, config, irqcallback);
 }
 
 
@@ -4259,7 +4256,7 @@ void ppc403ga_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc403gcx_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, index, clock, config, irqcallback);
 }
 
 
@@ -4303,7 +4300,7 @@ void ppc403gcx_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc601_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, index, clock, config, irqcallback);
 }
 
 
@@ -4341,7 +4338,7 @@ void ppc601_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc602_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 1/* unknown */, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 1/* unknown */, index, clock, config, irqcallback);
 }
 
 
@@ -4379,7 +4376,7 @@ void ppc602_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc603_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
 }
 
 
@@ -4417,7 +4414,7 @@ void ppc603_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc603e_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
 }
 
 
@@ -4455,7 +4452,7 @@ void ppc603e_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc603r_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
 }
 
 
@@ -4493,7 +4490,7 @@ void ppc603r_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc604_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, index, clock, config, irqcallback);
 }
 
 
@@ -4536,7 +4533,7 @@ void ppc604_get_info(UINT32 state, cpuinfo *info)
 
 static void mpc8240_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, index, clock, config, irqcallback);
 }
 
 

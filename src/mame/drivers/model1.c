@@ -625,7 +625,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "system16.h"
 #include "video/segaic24.h"
@@ -642,12 +641,17 @@ static int to_68k[FIFO_SIZE], fifo_wptr, fifo_rptr;
 
 static READ16_HANDLER( io_r )
 {
+	static const char *analognames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
+	static const char *inputnames[] = { "IN0", "IN1", "IN2" };
+
 	if(offset < 0x8)
-		return input_port_read_indexed(machine, offset);
-	if(offset < 0x10) {
+		return input_port_read(machine, analognames[offset]);
+
+	if(offset < 0x10)
+	{
 		offset -= 0x8;
 		if(offset < 3)
-			return input_port_read_indexed(machine, offset+8) | 0xff00;
+			return input_port_read(machine, inputnames[offset]) | 0xff00;
 		return 0xff;
 	}
 
@@ -665,7 +669,7 @@ static WRITE16_HANDLER( bank_w )
 	if(ACCESSING_BITS_0_7) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
-			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
@@ -731,7 +735,7 @@ static INTERRUPT_GEN(model1_interrupt)
 
 static MACHINE_RESET(model1)
 {
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x1000000);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x1000000);
 	irq_init(machine);
 	model1_tgp_reset(!strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwara"));
 	if (!strcmp(machine->gamedrv->name, "swa"))
@@ -750,7 +754,7 @@ static MACHINE_RESET(model1)
 
 static MACHINE_RESET(model1_vr)
 {
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x1000000);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x1000000);
 	irq_init(machine);
 	model1_vr_tgp_reset();
 	model1_sound_irq = 3;

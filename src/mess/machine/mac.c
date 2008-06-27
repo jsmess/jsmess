@@ -211,8 +211,8 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		if (overlay)
 		{
 			/* ROM mirror */
-			memory_size = memory_region_length(REGION_USER1);
-			memory_data = memory_region(REGION_USER1);
+			memory_size = memory_region_length(machine, REGION_USER1);
+			memory_data = memory_region(machine, REGION_USER1);
 			is_rom = TRUE;
 
 			/* HACK! - copy in the initial reset/stack */
@@ -424,10 +424,10 @@ static TIMER_CALLBACK(kbd_clock)
 		{
 			/* Put data on CB2 if we are sending*/
 			if (kbd_receive == FALSE)
-				via_set_input_cb2(0, kbd_shift_reg&0x80?1:0);
+				via_set_input_cb2(machine, 0, kbd_shift_reg&0x80?1:0);
 			kbd_shift_reg <<= 1;
-			via_set_input_cb1(0, 0);
-			via_set_input_cb1(0, 1);
+			via_set_input_cb1(machine, 0, 0);
+			via_set_input_cb1(machine, 0, 1);
 		}
 		if (kbd_receive == TRUE)
 		{
@@ -1347,7 +1347,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 
 	/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
 	mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
-		memory_region_length(REGION_USER1), memory_region(REGION_USER1), TRUE, 3);
+		memory_region_length(machine, REGION_USER1), memory_region(machine, REGION_USER1), TRUE, 3);
 
 	set_memory_overlay(machine, 1);
 
@@ -1436,7 +1436,7 @@ static void mac_vblank_irq(running_machine *machine)
 
 	/* signal VBlank on CA1 input on the VIA */
 	ca1_data ^= 1;
-	via_set_input_ca1(0, ca1_data);
+	via_set_input_ca1(machine, 0, ca1_data);
 
 	if (++irq_count == 60)
 	{
@@ -1444,7 +1444,7 @@ static void mac_vblank_irq(running_machine *machine)
 
 		ca2_data ^= 1;
 		/* signal 1 Hz irq on CA2 input on the VIA */
-		via_set_input_ca2(0, ca2_data);
+		via_set_input_ca2(machine, 0, ca2_data);
 
 		rtc_incticks();
 	}

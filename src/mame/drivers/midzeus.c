@@ -91,14 +91,14 @@ static MACHINE_START( midzeus )
 
 static MACHINE_START( midzeus2 )
 {
-	timekeeper_init(0, TIMEKEEPER_MIDZEUS2, NULL);
+	timekeeper_init(machine, 0, TIMEKEEPER_MIDZEUS2, NULL);
 	MACHINE_START_CALL(midzeus);
 }
 
 
 static MACHINE_RESET( midzeus )
 {
-	memcpy(ram_base, memory_region(REGION_USER1), 0x40000*4);
+	memcpy(ram_base, memory_region(machine, REGION_USER1), 0x40000*4);
 	*ram_base <<= 1;
 
 	cmos_protected = TRUE;
@@ -664,7 +664,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( mk4 )
-	PORT_START	    /* DS1 */
+	PORT_START_TAG("DIPS")		/* DS1 */
 	PORT_DIPNAME( 0x0001, 0x0001, "Coinage Source" )
 	PORT_DIPSETTING(      0x0001, "Dipswitch" )
 	PORT_DIPSETTING(      0x0000, "CMOS" )
@@ -718,7 +718,7 @@ static INPUT_PORTS_START( mk4 )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -735,7 +735,7 @@ static INPUT_PORTS_START( mk4 )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )	/* Bill */
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY
@@ -753,7 +753,7 @@ static INPUT_PORTS_START( mk4 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -766,7 +766,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( invasn )
-	PORT_START	    /* DS1 */
+	PORT_START_TAG("DIPS")		/* DS1 */
 	PORT_DIPNAME( 0x0001, 0x0001, "Coinage Source" )
 	PORT_DIPSETTING(      0x0001, "Dipswitch" )
 	PORT_DIPSETTING(      0x0000, "CMOS" )
@@ -823,7 +823,7 @@ static INPUT_PORTS_START( invasn )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -840,7 +840,7 @@ static INPUT_PORTS_START( invasn )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )	/* Bill */
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -848,7 +848,7 @@ static INPUT_PORTS_START( invasn )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("GUNX1")		/* fake analog X */
@@ -866,7 +866,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( crusnexo )
-	PORT_START	    /* DS1 */
+	PORT_START_TAG("DIPS")		/* DS1 */
  	PORT_DIPNAME( 0x001f, 0x001f, "Country Code" )
  	PORT_DIPSETTING(      0x001f, DEF_STR( USA ) )
  	PORT_DIPSETTING(      0x001e, "Germany" )
@@ -920,7 +920,7 @@ static INPUT_PORTS_START( crusnexo )
  	PORT_DIPSETTING(      0x4000, "Slave #3" )
  	PORT_DIPSETTING(      0x0000, "Slave #4" )
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -937,7 +937,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )
 
-	PORT_START /* Listed "names" are via the manual's "JAMMA" pinout sheet" */
+	PORT_START_TAG("IN1")	/* Listed "names" are via the manual's "JAMMA" pinout sheet" */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* Radio Switch */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
@@ -955,7 +955,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM( keypad_r, "KEYPAD" )
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -988,7 +988,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( thegrid )
-	PORT_START	    /* DS1 */
+	PORT_START_TAG("DIPS")		/* DS1 */
  	PORT_DIPNAME( 0x0001, 0x0001, "Show Blood" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
@@ -1056,7 +1056,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -1073,7 +1073,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )	/* Bill */
 
-	PORT_START /* Listed "names" are via the manual's "JAMMA" pinout sheet" */
+	PORT_START_TAG("IN1")	/* Listed "names" are via the manual's "JAMMA" pinout sheet" */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
@@ -1091,7 +1091,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* No Connection */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(custom_49way_r, "49WAYX\0" "49WAYY")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1343,7 +1343,7 @@ static DRIVER_INIT( crusnexo )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
-	memory_configure_bank(1, 0, 3, memory_region(REGION_USER2), 0x400000*4);
+	memory_configure_bank(1, 0, 3, memory_region(machine, REGION_USER2), 0x400000*4);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
 	memory_install_write32_handler    (machine, 0, ADDRESS_SPACE_PROGRAM, 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
@@ -1354,7 +1354,7 @@ static DRIVER_INIT( thegrid )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
-	memory_configure_bank(1, 0, 3, memory_region(REGION_USER2), 0x400000*4);
+	memory_configure_bank(1, 0, 3, memory_region(machine, REGION_USER2), 0x400000*4);
 }
 
 

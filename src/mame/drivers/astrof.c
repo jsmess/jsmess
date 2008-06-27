@@ -198,26 +198,28 @@ static rgb_t make_pen(UINT8 data)
 }
 
 
-static void astrof_get_pens(pen_t *pens)
+static void astrof_get_pens(running_machine *machine, pen_t *pens)
 {
 	offs_t i;
+	UINT8 *prom = memory_region(machine, REGION_PROMS);
 
 	for (i = 0; i < ASTROF_NUM_PENS; i++)
 	{
-		UINT8 data = memory_region(REGION_PROMS)[(astrof_palette_bank ? 0x10 : 0x00) | i];
+		UINT8 data = prom[(astrof_palette_bank ? 0x10 : 0x00) | i];
 
 		pens[i] = make_pen(data);
 	}
 }
 
 
-static void tomahawk_get_pens(pen_t *pens)
+static void tomahawk_get_pens(running_machine *machine, pen_t *pens)
 {
 	offs_t i;
+	UINT8 *prom = memory_region(machine, REGION_PROMS);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{
-		UINT8 data = memory_region(REGION_PROMS)[i];
+		UINT8 data = prom[i];
 
 		pens[i] = make_pen(data);
 	}
@@ -356,7 +358,7 @@ static VIDEO_UPDATE( astrof )
 {
 	pen_t pens[ASTROF_NUM_PENS];
 
-	astrof_get_pens(pens);
+	astrof_get_pens(screen->machine, pens);
 
 	video_update_common(bitmap, cliprect, pens);
 
@@ -368,7 +370,7 @@ static VIDEO_UPDATE( tomahawk )
 {
 	pen_t pens[TOMAHAWK_NUM_PENS];
 
-	tomahawk_get_pens(pens);
+	tomahawk_get_pens(screen->machine, pens);
 
 	video_update_common(bitmap, cliprect, pens);
 
@@ -1175,8 +1177,8 @@ ROM_END
 static DRIVER_INIT( abattle )
 {
 	/* use the protection PROM to decrypt the ROMs */
-	UINT8 *rom = memory_region(REGION_CPU1);
-	UINT8 *prom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *prom = memory_region(machine, REGION_USER1);
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1190,7 +1192,7 @@ static DRIVER_INIT( abattle )
 
 static DRIVER_INIT( afire )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1204,7 +1206,7 @@ static DRIVER_INIT( afire )
 
 static DRIVER_INIT( sstarbtl )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)

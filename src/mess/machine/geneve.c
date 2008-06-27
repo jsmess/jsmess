@@ -224,9 +224,9 @@ MACHINE_RESET( geneve )
 	memset(page_lookup, 0, sizeof(page_lookup));
 
 	/* set up RAM pointers */
-	ROM_ptr = memory_region(REGION_CPU1) + offset_rom_geneve;
-	SRAM_ptr = memory_region(REGION_CPU1) + offset_sram_geneve;
-	DRAM_ptr = memory_region(REGION_CPU1) + offset_dram_geneve;
+	ROM_ptr = memory_region(machine, REGION_CPU1) + offset_rom_geneve;
+	SRAM_ptr = memory_region(machine, REGION_CPU1) + offset_sram_geneve;
+	DRAM_ptr = memory_region(machine, REGION_CPU1) + offset_dram_geneve;
 
 	/* Initialize GROMs */
 	memset(& GPL_port, 0, sizeof(GPL_port));
@@ -293,7 +293,7 @@ MACHINE_RESET( geneve )
 	if (has_ide)
 	{
 		ti99_ide_reset(machine, TRUE);
-		ti99_ide_load_memcard();
+		ti99_ide_load_memcard(machine);
 	}
 
 	if (has_rs232)

@@ -27,6 +27,7 @@ static VIDEO_UPDATE( missb2 )
 	int offs;
 	int sx,sy,xc,yc;
 	int gfx_num,gfx_attr,gfx_offs;
+	const UINT8 *prom;
 	const UINT8 *prom_line;
 	UINT16 bg_offs;
 
@@ -53,8 +54,9 @@ static VIDEO_UPDATE( missb2 )
 
 	sx = 0;
 
+	prom = memory_region(screen->machine, REGION_PROMS);
 	for (offs = 0;offs < bublbobl_objectram_size;offs += 4)
-    {
+	{
 		/* skip empty sprites */
 		/* this is dword aligned so the UINT32 * cast shouldn't give problems */
 		/* on any architecture */
@@ -63,7 +65,7 @@ static VIDEO_UPDATE( missb2 )
 
 		gfx_num = bublbobl_objectram[offs + 1];
 		gfx_attr = bublbobl_objectram[offs + 3];
-		prom_line = memory_region(REGION_PROMS) + 0x80 + ((gfx_num & 0xe0) >> 1);
+		prom_line = prom + 0x80 + ((gfx_num & 0xe0) >> 1);
 
 		gfx_offs = ((gfx_num & 0x1f) * 0x80);
 		if ((gfx_num & 0xa0) == 0xa0)
@@ -130,7 +132,7 @@ static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
 static WRITE8_HANDLER( missb2_bg_bank_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 	// I don't know how this is really connected,bit 1 is always high afaik...
 	bankaddress = ((data & 2) ? 0x1000 : 0x0000) | ((data & 1) ? 0x4000 : 0x0000) | (0x8000);
@@ -433,7 +435,7 @@ ROM_END
 
 static DRIVER_INIT( missb2 )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	/* in Bubble Bobble, bank 0 has code falling from 7fff to 8000,
        so I have to copy it there because bank switching wouldn't catch it */

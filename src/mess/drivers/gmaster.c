@@ -31,7 +31,7 @@ static READ8_HANDLER( gmaster_io_r )
 {
     UINT8 data=0;
     if (gmaster.ports[2]&1) {
-	data=memory_region(REGION_CPU1)[0x4000+offset];
+	data=memory_region(machine, REGION_CPU1)[0x4000+offset];
 	logerror("%.4x external memory %.4x read %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC), 0x4000+offset,data);
     } else {
 	switch (offset) {
@@ -53,7 +53,7 @@ static READ8_HANDLER( gmaster_io_r )
 static WRITE8_HANDLER( gmaster_io_w )
 {
     if (gmaster.ports[2]&1) {
-	memory_region(REGION_CPU1)[0x4000+offset]=data;
+	memory_region(machine, REGION_CPU1)[0x4000+offset]=data;
 	logerror("%.4x external memory %.4x written %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC), 0x4000+offset, data);
     } else {
 	switch (offset) {
@@ -258,7 +258,7 @@ static DRIVER_INIT( gmaster )
 static int gmaster_load_rom(int id)
 {
 	FILE *cartfile;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int size;
 
 	if (device_filename(IO_CARTSLOT, id) == NULL)

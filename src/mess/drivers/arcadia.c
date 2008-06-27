@@ -369,14 +369,14 @@ ROM_END
 
 static DEVICE_IMAGE_LOAD( arcadia_cart )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(image->machine, REGION_CPU1);
 	int size;
 
 	memset(rom, 0, 0x8000);
 	size = image_length(image);
 
-	if (size > memory_region_length(REGION_CPU1))
-		size = memory_region_length(REGION_CPU1);
+	if (size > memory_region_length(image->machine, REGION_CPU1))
+		size = memory_region_length(image->machine, REGION_CPU1);
 
 	if (image_fread(image, rom, size) != size)
 		return INIT_FAIL;
@@ -460,13 +460,13 @@ SYSTEM_CONFIG_END
 static DRIVER_INIT( arcadia )
 {
 	int i;
-	UINT8 *gfx=memory_region(REGION_GFX1);
+	UINT8 *gfx=memory_region(machine, REGION_GFX1);
 	for (i=0; i<256; i++) gfx[i]=i;
 #if 0
 	// this is here to allow developement of some simple testroutines
 	// for a real console
 	{
-	    UINT8 *rom=memory_region(REGION_CPU1);
+	    UINT8 *rom=memory_region(machine, REGION_CPU1);
 	    /* this is a simple routine to display all rom characters
            on the display for a snapshot */
 	    static const UINT8 prog[]={ // address 0 of course

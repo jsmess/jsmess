@@ -815,7 +815,7 @@ do { \
 	ADD_MENU("Image Information", ui_menu_image_info, 0);
 
   	/* add image info menu */
-	ADD_MENU("File Manager", menu_file_manager, 0);
+	ADD_MENU("File Manager", menu_file_manager, 1);
 
 #if HAS_WAVE
   	/* add tape control menu */
@@ -1368,7 +1368,7 @@ static UINT32 menu_memory_card(running_machine *machine, UINT32 state)
 		/* handle load */
 		if (selected == insertindex)
 		{
-			if (memcard_insert(cardnum) == 0)
+			if (memcard_insert(machine, cardnum) == 0)
 			{
 				popmessage("Memory card loaded");
 				ui_menu_stack_reset();
@@ -1388,7 +1388,7 @@ static UINT32 menu_memory_card(running_machine *machine, UINT32 state)
 		/* handle create */
 		else if (selected == createindex)
 		{
-			if (memcard_create(cardnum, FALSE) == 0)
+			if (memcard_create(machine, cardnum, FALSE) == 0)
 				popmessage("Memory card created");
 			else
 				popmessage("Error creating memory card\n(Card may already exist)");

@@ -99,8 +99,8 @@ static void clk_interrupt_callback(int state)
 */
 void ti99_ide_init(running_machine *machine)
 {
-	rtc65271_init(memory_region(region_dsr) + offset_ide_ram2, clk_interrupt_callback);
-	ti99_ide_RAM = memory_region(region_dsr) + offset_ide_ram;
+	rtc65271_init(memory_region(machine, region_dsr) + offset_ide_ram2, clk_interrupt_callback);
+	ti99_ide_RAM = memory_region(machine, region_dsr) + offset_ide_ram;
 }
 
 /*
@@ -117,7 +117,7 @@ void ti99_ide_reset(running_machine *machine, int in_tms9995_mode)
 	tms9995_mode = in_tms9995_mode;
 }
 
-int ti99_ide_load_memcard(void)
+int ti99_ide_load_memcard(running_machine *machine)
 {
 	file_error filerr;
 	mame_file *file;
@@ -125,7 +125,7 @@ int ti99_ide_load_memcard(void)
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, "ide.nv", OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 		return /*1*/0;
-	if (rtc65271_file_load(file))
+	if (rtc65271_file_load(machine, file))
 	{
 		mame_fclose(file);
 		return 1;

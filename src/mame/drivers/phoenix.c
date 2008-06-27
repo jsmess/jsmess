@@ -18,14 +18,6 @@ To Do:
 
 Survival:
 
-- Protection.  There is a 14 pin part connected to the 8910 Port B D0 labeled DL57S22.
-  There is a loop at $2002 that reads the player controls -- the game sits in this
-  loop as long as Port B changes.  Also, Port B seems to invert the input bits, and
-  the game checks for this at $2f32.  The game also uses the RIM instruction a lot,
-  that's purpose is unclear, as the result doesn't seem to be used (even when it's
-  stored, the result is never read again.)  I would think that this advances the
-  protection chip somehow, but isn't RIM a read only operation?
-
 - Check background visibile area.  When the background scrolls up, it
   currently shows below the top and bottom of the border of the play area.
 
@@ -39,6 +31,7 @@ Pleiads:
 
 #include "driver.h"
 #include "sound/tms36xx.h"
+#include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "sound/custom.h"
 #include "phoenix.h"
@@ -333,18 +326,18 @@ static INPUT_PORTS_START( survival )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 
 	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL )	/* comes from IN0 0-2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN     ) PORT_COCKTAIL
 
     PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
@@ -440,7 +433,7 @@ static const struct AY8910interface survival_ay8910_interface =
 
 static MACHINE_RESET( phoenix )
 {
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x4000);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x4000);
 }
 
 
@@ -1027,10 +1020,7 @@ static DRIVER_INIT( condor )
 
 static DRIVER_INIT( survival )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
-
-	rom[0x0157] = 0x21;	/* ROM check */
-	rom[0x02e8] = 0x21; /* crash due to protection, it still locks up somewhere else */
+	cpunum_set_info_fct(0, CPUINFO_PTR_I8085_SID_CALLBACK, (void*)survival_sid_callback);
 }
 
 
@@ -1058,4 +1048,4 @@ GAME( 1981, pleiadbl, pleiads,  pleiads,  pleiads,  0,        ROT90, "bootleg", 
 GAME( 1981, pleiadce, pleiads,  pleiads,  pleiadce, 0,        ROT90, "Tehkan (Centuri license)", "Pleiads (Centuri)", GAME_IMPERFECT_COLORS )
 GAME( 1981, capitol,  pleiads,  phoenix,  capitol,  0,        ROT90, "Universal Video Spiel", "Capitol", GAME_IMPERFECT_COLORS )
 
-GAME( 1982, survival, 0,        survival, survival, survival, ROT90, "Rock-ola", "Survival", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1982, survival, 0,        survival, survival, survival, ROT90, "Rock-ola", "Survival", GAME_IMPERFECT_COLORS )

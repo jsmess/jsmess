@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "mips3com.h"
+#include "deprecat.h"
 
 
 /***************************************************************************
@@ -70,6 +71,8 @@ INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
 
 void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int))
 {
+	int tlbindex;
+
 	/* initialize based on the config */
 	memset(mips, 0, sizeof(*mips));
 	mips->flavor = flavor;
@@ -91,6 +94,20 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int in
 
 	/* reset the state */
 	mips3com_reset(mips);
+
+	/* register for save states */
+	state_save_register_item("mips3", index, mips->pc);
+	state_save_register_item_array("mips3", index, mips->r);
+	state_save_register_item_2d_array("mips3", index, mips->cpr);
+	state_save_register_item_2d_array("mips3", index, mips->ccr);
+	state_save_register_item("mips3", index, mips->llbit);
+	state_save_register_item("mips3", index, mips->count_zero_time);
+	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
+	{
+		state_save_register_item("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].page_mask);
+		state_save_register_item("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_hi);
+		state_save_register_item_array("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_lo);
+	}
 }
 
 
@@ -147,7 +164,6 @@ void mips3com_reset(mips3_state *mips)
     CPU
 -------------------------------------------------*/
 
-#ifdef ENABLE_DEBUGGER
 offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	extern unsigned dasmmips3(char *, unsigned, UINT32);
@@ -158,8 +174,6 @@ offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *op
 		op = LITTLE_ENDIANIZE_INT32(op);
 	return dasmmips3(buffer, pc, op);
 }
-#endif /* ENABLE_DEBUGGER */
-
 
 
 /*-------------------------------------------------
@@ -170,16 +184,14 @@ offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *op
 void mips3com_update_cycle_counting(mips3_state *mips)
 {
 	/* modify the timer to go off */
-	if ((mips->cpr[0][COP0_Status] & SR_IMEX5) && mips->cpr[0][COP0_Compare] != 0xffffffff)
+	if (mips->cpr[0][COP0_Status] & SR_IMEX5)
 	{
 		UINT32 count = (activecpu_gettotalcycles() - mips->count_zero_time) / 2;
 		UINT32 compare = mips->cpr[0][COP0_Compare];
-		if (compare > count)
-		{
-			attotime newtime = ATTOTIME_IN_CYCLES(((INT64)(compare - count) * 2), cpu_getactivecpu());
-			timer_adjust_oneshot(mips->compare_int_timer, newtime, cpu_getactivecpu());
-			return;
-		}
+		UINT32 delta = compare - count;
+		attotime newtime = ATTOTIME_IN_CYCLES(((UINT64)delta * 2), cpu_getactivecpu());
+		timer_adjust_oneshot(mips->compare_int_timer, newtime, cpu_getactivecpu());
+		return;
 	}
 	timer_adjust_oneshot(mips->compare_int_timer, attotime_never, cpu_getactivecpu());
 }

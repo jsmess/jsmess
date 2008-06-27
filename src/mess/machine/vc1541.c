@@ -468,7 +468,7 @@ static WRITE8_HANDLER( vc1541_via0_write_portb )
 	{
 		vc1541_serial_clock_write (1, vc1541->drive.serial.serial_clock = !(data & 8));
 	}
-	vc1541_serial_atn_write (1, vc1541->drive.serial.serial_atn = 1);
+	vc1541_serial_atn_write (machine, 1, vc1541->drive.serial.serial_atn = 1);
 }
 
 /*
@@ -701,7 +701,7 @@ int vc1541_serial_atn_read (int which)
 	return serial.atn[0];
 }
 
-void vc1541_serial_atn_write (int which, int level)
+void vc1541_serial_atn_write (running_machine *machine, int which, int level)
 {
 #if 0
 	int value;
@@ -721,7 +721,7 @@ void vc1541_serial_atn_write (int which, int level)
 									 cpu_getactivecpu (),
 									 activecpu_get_pc(),
 									 serial.atn[0]?"ATN":"atn"));
-				via_set_input_ca1 (2, !level);
+				via_set_input_ca1 (machine, 2, !level);
 #if 0
 				value=vc1541->drive.serial.data;
 				if (vc1541->drive.serial.acka!=!level) value=0;

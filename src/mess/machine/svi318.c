@@ -513,7 +513,7 @@ static void svi318_80col_init(running_machine *machine)
 	svi.svi806_ram = new_memory_region( machine, REGION_GFX2, 0x1000, 0 );
 	memset( svi.svi806_ram, 0x00, 0x800 );
 	memset( svi.svi806_ram + 0x800, 0xFF, 0x800 );
-	svi.svi806_gfx = memory_region(REGION_GFX1);
+	svi.svi806_gfx = memory_region(machine, REGION_GFX1);
 
 	timer_set( attotime_zero, NULL, 0, svi318_80col_init_registers );
 }
@@ -723,7 +723,7 @@ static void svi318_set_banks(running_machine *machine)
 
 	switch( svi.bankLow ) {
 	case SVI_INTERNAL:
-		svi.bankLow_ptr = memory_region(REGION_CPU1);
+		svi.bankLow_ptr = memory_region(machine, REGION_CPU1);
 		break;
 	case SVI_CART:
 		if ( pcart ) {

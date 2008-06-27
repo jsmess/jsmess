@@ -1012,13 +1012,13 @@ static MACHINE_START(model3_21)
 static void model3_init(running_machine *machine, int step)
 {
 	model3_step = step;
-	memory_set_bankptr( 1, memory_region( REGION_USER1 ) + 0x800000 ); /* banked CROM */
+	memory_set_bankptr( 1, memory_region( machine, REGION_USER1 ) + 0x800000 ); /* banked CROM */
 
-	memory_set_bankptr(4, memory_region(REGION_SOUND1) + 0x200000);
-	memory_set_bankptr(5, memory_region(REGION_SOUND1) + 0x600000);
+	memory_set_bankptr(4, memory_region(machine, REGION_SOUND1) + 0x200000);
+	memory_set_bankptr(5, memory_region(machine, REGION_SOUND1) + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(model3_soundram, memory_region(REGION_CPU2)+0x80000, 16);
+	memcpy(model3_soundram, memory_region(machine, REGION_CPU2)+0x80000, 16);
 
 	model3_machine_init(step);	// step 1.5
 	model3_tap_reset();
@@ -1067,10 +1067,10 @@ static READ64_HANDLER( model3_ctrl_r )
 			{
 				if(model3_controls_bank & 0x1) {
 					eeprom_bit = eeprom_read_bit() << 5;
-					return ((input_port_read_indexed(machine, 1) & ~0x20) | eeprom_bit) << 24;
+					return ((input_port_read(machine, "IN1") & ~0x20) | eeprom_bit) << 24;
 				}
 				else {
-					return (input_port_read_indexed(machine, 0)) << 24;
+					return (input_port_read(machine, "IN0")) << 24;
 				}
 			}
 			break;
@@ -1078,11 +1078,11 @@ static READ64_HANDLER( model3_ctrl_r )
 		case 1:
 			if (ACCESSING_BITS_56_63)
 			{
-				return (UINT64)input_port_read_indexed(machine, 2) << 56;
+				return (UINT64)input_port_read(machine, "IN2") << 56;
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				return input_port_read_indexed(machine, 3) << 24;
+				return input_port_read(machine, "IN3") << 24;
 			}
 			break;
 
@@ -1116,7 +1116,8 @@ static READ64_HANDLER( model3_ctrl_r )
 		case 7:
 			if (ACCESSING_BITS_24_31)		/* ADC Data read */
 			{
-				UINT8 adc_data = input_port_read_indexed(machine, 5 + adc_channel);
+				static const char *adcnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
+				UINT8 adc_data = input_port_read_safe(machine, adcnames[adc_channel], 0);
 				adc_channel++;
 				adc_channel &= 0x7;
 				return (UINT64)adc_data << 24;
@@ -1168,32 +1169,32 @@ static WRITE64_HANDLER( model3_ctrl_w )
 						switch(lightgun_reg_sel)		/* read lightrun register */
 						{
 							case 0:		/* player 1 gun X-position, lower 8-bits */
-								model3_serial_fifo2 = input_port_read_indexed(machine, 6) & 0xff;
+								model3_serial_fifo2 = input_port_read(machine, "LIGHT0_Y") & 0xff;
 								break;
 							case 1:		/* player 1 gun X-position, upper 2-bits */
-								model3_serial_fifo2 = (input_port_read_indexed(machine, 6) >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read(machine, "LIGHT0_Y") >> 8) & 0x3;
 								break;
 							case 2:		/* player 1 gun Y-position, lower 8-bits */
-								model3_serial_fifo2 = input_port_read_indexed(machine, 5) & 0xff;
+								model3_serial_fifo2 = input_port_read(machine, "LIGHT0_X") & 0xff;
 								break;
 							case 3:		/* player 1 gun Y-position, upper 2-bits */
-								model3_serial_fifo2 = (input_port_read_indexed(machine, 5) >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read(machine, "LIGHT0_X") >> 8) & 0x3;
 								break;
 							case 4:		/* player 2 gun X-position, lower 8-bits */
-								model3_serial_fifo2 = input_port_read_indexed(machine, 8) & 0xff;
+								model3_serial_fifo2 = input_port_read(machine, "LIGHT1_Y") & 0xff;
 								break;
 							case 5:		/* player 2 gun X-position, upper 2-bits */
-								model3_serial_fifo2 = (input_port_read_indexed(machine, 8) >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read(machine, "LIGHT1_Y") >> 8) & 0x3;
 								break;
 							case 6:		/* player 2 gun Y-position, lower 8-bits */
-								model3_serial_fifo2 = input_port_read_indexed(machine, 7) & 0xff;
+								model3_serial_fifo2 = input_port_read(machine, "LIGHT1_X") & 0xff;
 								break;
 							case 7:		/* player 2 gun Y-position, upper 2-bits */
-								model3_serial_fifo2 = (input_port_read_indexed(machine, 7) >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read(machine, "LIGHT1_X") >> 8) & 0x3;
 								break;
 							case 8:		/* gun offscreen (bit set = gun offscreen, bit clear = gun on screen) */
 								model3_serial_fifo2 = 0;	/* bit 0 = player 1, bit 1 = player 2 */
-								if(input_port_read_indexed(machine, 9) & 0x1) {
+								if(input_port_read(machine, "OFFSCREEN") & 0x1) {
 									model3_serial_fifo2 |= 0x01;
 								}
 								break;
@@ -1276,7 +1277,7 @@ static WRITE64_HANDLER( model3_sys_w )
 
 				data >>= 56;
 				data = (~data) & 0xf;
-				memory_set_bankptr( 1, memory_region( REGION_USER1 ) + 0x800000 + (data * 0x800000)); /* banked CROM */
+				memory_set_bankptr( 1, memory_region( machine, REGION_USER1 ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -1495,7 +1496,7 @@ static WRITE64_HANDLER(daytona2_rombank_w)
 	{
 		data >>= 56;
 		data = (~data) & 0xf;
-		memory_set_bankptr( 1, memory_region( REGION_USER1 ) + 0x800000 + (data * 0x800000)); /* banked CROM */
+		memory_set_bankptr( 1, memory_region( machine, REGION_USER1 ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
 
@@ -1551,7 +1552,7 @@ static INPUT_PORTS_START( model3 )
 	MODEL3_SYSTEM_CONTROLS_1
 	MODEL3_SYSTEM_CONTROLS_2
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -1561,10 +1562,10 @@ static INPUT_PORTS_START( model3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		/* Dip switches */
 INPUT_PORTS_END
 
@@ -1572,29 +1573,29 @@ static INPUT_PORTS_START( lostwsga )
 	MODEL3_SYSTEM_CONTROLS_1
 	MODEL3_SYSTEM_CONTROLS_2
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		/* Dip switches */
 
-	PORT_START	// lightgun X-axis
+	PORT_START_TAG("LIGHT0_X")	// lightgun X-axis
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// lightgun Y-axis
+	PORT_START_TAG("LIGHT0_Y")	// lightgun Y-axis
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// lightgun X-axis
+	PORT_START_TAG("LIGHT1_X")	// lightgun X-axis
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START	// lightgun Y-axis
+	PORT_START_TAG("LIGHT1_Y")	// lightgun Y-axis
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START	// fake button to shoot offscreen
+	PORT_START_TAG("OFFSCREEN")	// fake button to shoot offscreen
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -1602,7 +1603,7 @@ static INPUT_PORTS_START( scud )
 	MODEL3_SYSTEM_CONTROLS_1
 	MODEL3_SYSTEM_CONTROLS_2
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* View Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* View Button 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* View Button 3 */
@@ -1612,19 +1613,19 @@ static INPUT_PORTS_START( scud )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )	/* Shift 3 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 )	/* Shift 4 */
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		/* Dip switches */
 
-	PORT_START	// steering
+	PORT_START_TAG("AN0")	// steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// accelerator
+	PORT_START_TAG("AN1")	// accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// brake
+	PORT_START_TAG("AN2")	// brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -1632,33 +1633,33 @@ static INPUT_PORTS_START( bass )
 	MODEL3_SYSTEM_CONTROLS_1
 	MODEL3_SYSTEM_CONTROLS_2
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		/* Cast */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		/* Select */
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		/* Dip switches */
 
-	PORT_START		/* Rod Y */
+	PORT_START_TAG("AN0")		/* Rod Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START		/* Rod X */
+	PORT_START_TAG("AN1")		/* Rod X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("AN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START		/* Reel */
+	PORT_START_TAG("AN3")		/* Reel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START		/* Stick Y */
+	PORT_START_TAG("AN4")		/* Stick Y */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START		/* Stick X */
+	PORT_START_TAG("AN5")		/* Stick X */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -1666,29 +1667,29 @@ static INPUT_PORTS_START( harley )
 	MODEL3_SYSTEM_CONTROLS_1
 	MODEL3_SYSTEM_CONTROLS_2
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* View Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* View Button 2 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* Shift down */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )	/* Shift up */
 	PORT_BIT( 0xcc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		/* Dip switches */
 
-	PORT_START	// steering
+	PORT_START_TAG("AN0")	// steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// accelerator
+	PORT_START_TAG("AN1")	// accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// front brake
+	PORT_START_TAG("AN2")	// front brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// back brake
+	PORT_START_TAG("AN3")	// back brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -1696,7 +1697,7 @@ static INPUT_PORTS_START( daytona2 )
 	MODEL3_SYSTEM_CONTROLS_1
 	MODEL3_SYSTEM_CONTROLS_2
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* View Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* View Button 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* View Button 3 */
@@ -1706,10 +1707,10 @@ static INPUT_PORTS_START( daytona2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )	/* Shift 3 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 )	/* Shift 4 */
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		/* Dip switches */
 
 	PORT_START	// steering
@@ -1726,21 +1727,21 @@ static INPUT_PORTS_START( swtrilgy )
 	MODEL3_SYSTEM_CONTROLS_1
 	MODEL3_SYSTEM_CONTROLS_2
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xde, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		/* Dip switches */
 
-	PORT_START		/* Analog Stick Y */
+	PORT_START_TAG("AN0")		/* Analog Stick Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
-	PORT_START		/* Analog Stick X */
+	PORT_START_TAG("AN1")		/* Analog Stick X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 INPUT_PORTS_END
@@ -1749,30 +1750,30 @@ static INPUT_PORTS_START( eca )
 	MODEL3_SYSTEM_CONTROLS_1
 	MODEL3_SYSTEM_CONTROLS_2
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* View Change */
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* Shift Up */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* Shift Down */
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		/* Dip switches */
 
-	PORT_START	// steering
+	PORT_START_TAG("AN0")	// steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// accelerator
+	PORT_START_TAG("AN1")	// accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// brake
+	PORT_START_TAG("AN2")	// brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skichamp )
-	PORT_START_TAG("IN0") \
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) /* Test Button A */
@@ -1782,25 +1783,25 @@ static INPUT_PORTS_START( skichamp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )		/* Select 1 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )		/* Select 2 */
 
-	PORT_START_TAG("IN1") \
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* Pole Right */
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Foot sensor */
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		/* Dip switches */
 
-	PORT_START	// inclining
+	PORT_START_TAG("AN0")	// inclining
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// swing
+	PORT_START_TAG("AN1")	// swing
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 INPUT_PORTS_END
@@ -3998,9 +3999,9 @@ ROM_END
 static WRITE16_HANDLER( model3snd_ctrl )
 {
 	// handle sample banking
-	if (memory_region_length(REGION_SOUND1) > 0x800000)
+	if (memory_region_length(machine, REGION_SOUND1) > 0x800000)
 	{
-		UINT8 *snd = memory_region(REGION_SOUND1);
+		UINT8 *snd = memory_region(machine, REGION_SOUND1);
 		if (data & 0x20)
 		{
 	  		memory_set_bankptr(4, snd + 0x200000);
@@ -4244,13 +4245,13 @@ static MACHINE_DRIVER_START( model3_21 )
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
 
-static void interleave_vroms(void)
+static void interleave_vroms(running_machine *machine)
 {
 	int start;
 	int i,j,x;
-	UINT16 *vrom1 = (UINT16*)memory_region(REGION_USER3);
-	UINT16 *vrom2 = (UINT16*)memory_region(REGION_USER4);
-	int vrom_length = memory_region_length(REGION_USER3);
+	UINT16 *vrom1 = (UINT16*)memory_region(machine, REGION_USER3);
+	UINT16 *vrom2 = (UINT16*)memory_region(machine, REGION_USER4);
+	int vrom_length = memory_region_length(machine, REGION_USER3);
 	UINT16 *vrom;
 
 	model3_vrom = auto_malloc(0x4000000);
@@ -4276,7 +4277,7 @@ static void interleave_vroms(void)
 
 static DRIVER_INIT( model3_10 )
 {
-	interleave_vroms();
+	interleave_vroms(machine);
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc0000000, 0xc00000ff, 0, 0, scsi_r, scsi_w );
 
@@ -4289,7 +4290,7 @@ static DRIVER_INIT( model3_10 )
 
 static DRIVER_INIT( model3_15 )
 {
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
@@ -4299,7 +4300,7 @@ static DRIVER_INIT( model3_15 )
 
 static DRIVER_INIT( model3_20 )
 {
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc2000000, 0xc20000ff, 0, 0, real3d_dma_r, real3d_dma_w );
@@ -4311,7 +4312,7 @@ static DRIVER_INIT( model3_20 )
 
 static DRIVER_INIT( lostwsga )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: there's an M68K device at 0xC0000000 - FF, maybe lightgun controls ? */
@@ -4322,7 +4323,7 @@ static DRIVER_INIT( lostwsga )
 
 static DRIVER_INIT( scud )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
@@ -4334,7 +4335,7 @@ static DRIVER_INIT( scud )
 
 static DRIVER_INIT( scudp )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
@@ -4351,7 +4352,7 @@ static DRIVER_INIT( scudp )
 
 static DRIVER_INIT( lemans24 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_15);
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
@@ -4365,7 +4366,7 @@ static DRIVER_INIT( lemans24 )
 
 static DRIVER_INIT( vf3 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_10);
 
@@ -4378,13 +4379,13 @@ static DRIVER_INIT( vf3 )
 
 static DRIVER_INIT( vs215 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	rom[(0x70dde0^4)/4] = 0x60000000;
 	rom[(0x70e6f0^4)/4] = 0x60000000;
 	rom[(0x70e710^4)/4] = 0x60000000;
 
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
@@ -4398,12 +4399,12 @@ static DRIVER_INIT( vs215 )
 
 static DRIVER_INIT( vs29815 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	rom[(0x6028ec^4)/4] = 0x60000000;
 	rom[(0x60290c^4)/4] = 0x60000000;
 
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
@@ -4417,12 +4418,12 @@ static DRIVER_INIT( vs29815 )
 
 static DRIVER_INIT( bass )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	rom[(0x7999a8^4)/4] = 0x60000000;
 	rom[(0x7999c8^4)/4] = 0x60000000;
 
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
@@ -4436,7 +4437,7 @@ static DRIVER_INIT( bass )
 
 static DRIVER_INIT( getbass )
 {
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
@@ -4448,7 +4449,7 @@ static DRIVER_INIT( getbass )
 
 static DRIVER_INIT( vs2 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -4458,7 +4459,7 @@ static DRIVER_INIT( vs2 )
 
 static DRIVER_INIT( vs298 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -4469,7 +4470,7 @@ static DRIVER_INIT( vs298 )
 
 static DRIVER_INIT( vs2v991 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -4479,7 +4480,7 @@ static DRIVER_INIT( vs2v991 )
 
 static DRIVER_INIT( vs299 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -4489,7 +4490,7 @@ static DRIVER_INIT( vs299 )
 
 static DRIVER_INIT( harley )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc0000000, 0xc00fffff, 0, 0, network_r, network_w );
@@ -4503,7 +4504,7 @@ static DRIVER_INIT( harley )
 
 static DRIVER_INIT( srally2 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x7c0c4^4)/4] = 0x60000000;
@@ -4513,7 +4514,7 @@ static DRIVER_INIT( srally2 )
 
 static DRIVER_INIT( swtrilgy )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0xf0e48^4)/4] = 0x60000000;
@@ -4524,7 +4525,7 @@ static DRIVER_INIT( swtrilgy )
 
 static DRIVER_INIT( swtrilga )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0xf6dd0^4)/4] = 0x60000000;
@@ -4532,7 +4533,7 @@ static DRIVER_INIT( swtrilga )
 
 static DRIVER_INIT( von2 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x189168^4)/4] = 0x60000000;
@@ -4544,7 +4545,7 @@ static DRIVER_INIT( von2 )
 
 static DRIVER_INIT( dirtdvls )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x0600a0^4)/4] = 0x60000000;
@@ -4557,7 +4558,7 @@ static DRIVER_INIT( dirtdvls )
 
 static DRIVER_INIT( daytona2 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	memory_install_write64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
@@ -4570,7 +4571,7 @@ static DRIVER_INIT( daytona2 )
 
 static DRIVER_INIT( dayto2pe )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	memory_install_write64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
@@ -4584,7 +4585,7 @@ static DRIVER_INIT( dayto2pe )
 
 static DRIVER_INIT( spikeout )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
@@ -4593,7 +4594,7 @@ static DRIVER_INIT( spikeout )
 
 static DRIVER_INIT( spikeofe )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
@@ -4602,7 +4603,7 @@ static DRIVER_INIT( spikeofe )
 
 static DRIVER_INIT( eca )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x535580^4)/4] = 0x60000000;
@@ -4612,7 +4613,7 @@ static DRIVER_INIT( eca )
 
 static DRIVER_INIT( skichamp )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x5263c8^4)/4] = 0x60000000;

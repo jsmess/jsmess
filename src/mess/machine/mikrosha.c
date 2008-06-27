@@ -8,7 +8,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
 #include "machine/8255ppi.h"
@@ -23,7 +22,7 @@ static int mikrosha_keyboard_mask;
 DRIVER_INIT(mikrosha)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
   	memory_configure_bank(1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
@@ -84,7 +83,8 @@ const ppi8255_interface mikrosha_ppi8255_interface_2 =
 };
 
 static I8275_DMA_REQUEST(mikrosha_video_dma_request) {
-	dma8257_drq_write(0, 2, state);
+	const device_config *dma8257 = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, "dma8257");
+	dma8257_drq_w(dma8257, 2, state);
 }
 
 const i8275_interface mikrosha_i8275_interface = {
@@ -96,7 +96,7 @@ const i8275_interface mikrosha_i8275_interface = {
 	mikrosha_display_pixels
 };
 
-static UINT8 mikrosha_dma_read_byte(int channel, offs_t offset)
+static READ8_HANDLER( mikrosha_dma_read_byte )
 {
 	UINT8 result;
 	cpuintrf_push_context(0);
@@ -105,12 +105,12 @@ static UINT8 mikrosha_dma_read_byte(int channel, offs_t offset)
 	return result;
 }
 
-static void mikrosha_write_video(UINT8 data)
+static WRITE8_HANDLER( mikrosha_write_video )
 {
-	i8275_dack_set_data((device_config*)device_list_find_by_tag( Machine->config->devicelist, I8275, "i8275" ),data);
+	i8275_dack_set_data((device_config*)device_list_find_by_tag( machine->config->devicelist, I8275, "i8275" ),data);
 }
 
-static const struct dma8257_interface mikrosha_dma =
+const dma8257_interface mikrosha_dma =
 {
 	0,
 	XTAL_16MHz / 9,
@@ -134,7 +134,4 @@ MACHINE_RESET( mikrosha )
 	memory_set_bank(1, 1);
 
 	mikrosha_keyboard_mask = 0;
-	dma8257_init(1);
-	dma8257_config(0, &mikrosha_dma);
-	dma8257_reset();
 }

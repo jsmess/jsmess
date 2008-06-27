@@ -325,8 +325,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( astron )
 {
-	discinfo = laserdisc_init(LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-	return;
+	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
 }
 
 static INTERRUPT_GEN( vblank_callback_astron )
@@ -554,7 +553,7 @@ ROM_END
 
 static DRIVER_INIT( astron )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &ROM[0x8000], 0x4000);
 }
 

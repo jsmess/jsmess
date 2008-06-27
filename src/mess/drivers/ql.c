@@ -783,7 +783,7 @@ static void ql_serial_getinfo(const mess_device_class *devclass, UINT32 state, u
 
 static DEVICE_IMAGE_LOAD( ql_cart )
 {
-	UINT8 *ptr = memory_region(REGION_CPU1) + 0x00c000;
+	UINT8 *ptr = memory_region(image->machine, REGION_CPU1) + 0x00c000;
 	int	filesize = image_length(image);
 
 	if (filesize <= 16 * 1024)

@@ -105,8 +105,6 @@
 
 ***************************************************************************/
 
-#ifdef ENABLE_DEBUGGER
-
 #include "driver.h"
 #include "deprecat.h"
 #include "machine/fd1094.h"
@@ -485,11 +483,11 @@ void fd1094_init_debugging(running_machine *machine, int cpureg, int keyreg, int
 	key_changed = changed;
 
 	/* set up the regions */
-	coderegion = (UINT16 *)memory_region(cpureg);
-	coderegion_words = memory_region_length(cpureg) / 2;
-	keyregion = (UINT8 *)memory_region(keyreg);
-	keystatus = (UINT16 *)memory_region(statreg);
-	keystatus_words = memory_region_length(statreg) / 2;
+	coderegion = (UINT16 *)memory_region(machine, cpureg);
+	coderegion_words = memory_region_length(machine, cpureg) / 2;
+	keyregion = (UINT8 *)memory_region(machine, keyreg);
+	keystatus = (UINT16 *)memory_region(machine, statreg);
+	keystatus_words = memory_region_length(machine, statreg) / 2;
 	assert(coderegion_words == keystatus_words);
 
 	/* allocate memory for the ignore table */
@@ -539,7 +537,7 @@ void fd1094_init_debugging(running_machine *machine, int cpureg, int keyreg, int
 	debug_console_register_command("fdcsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdcsearch);
 
 	/* set up the instruction hook */
-	debug_set_instruction_hook(0, instruction_hook);
+	debug_cpu_set_instruction_hook(0, instruction_hook);
 
 	/* regenerate the key */
 	if (keydirty)
@@ -2425,5 +2423,3 @@ static int validate_opcode(UINT32 pc, const UINT8 *opdata, int maxwords)
 	assert(offset == oplength);
 	return iffy ? -oplength : oplength;
 }
-
-#endif

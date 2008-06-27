@@ -273,7 +273,7 @@ struct _drcbe_state
 	x86code *				exit;					/* exit point */
 	x86code *				nocode;					/* nocode handler */
 
-	x86code *				mame_debug_hook;		/* debugger callback */
+	x86code *				debug_cpu_instruction_hook;/* debugger callback */
 	x86code *				debug_log_hashjmp;		/* hashjmp debugging */
 	x86code *				drcmap_get_value;		/* map lookup helper */
 	data_accessors			accessors[ADDRESS_SPACES];/* memory accessors */
@@ -713,9 +713,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, UINT32
 	drcbe->absmask64[0] = drcbe->absmask64[1] = U64(0x7fffffffffffffff);
 
 	/* get pointers to C functions we need to call */
-#ifdef ENABLE_DEBUGGER
-	drcbe->mame_debug_hook = (x86code *)mame_debug_hook;
-#endif
+	drcbe->debug_cpu_instruction_hook = (x86code *)debug_cpu_instruction_hook;
 #if LOG_HASHJMPS
 	drcbe->debug_log_hashjmp = (x86code *)debug_log_hashjmp;
 #endif
@@ -3083,24 +3081,32 @@ static x86code *op_nop(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
+	emit_link skip = { 0 };
+
 	/* validate instruction */
 	assert(inst->size == 4);
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-#ifdef ENABLE_DEBUGGER
-	if (Machine->debug_mode)
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		drcuml_parameter pcp;
 
 		/* normalize parameters */
 		param_normalize_1(drcbe, inst, &pcp, PTYPE_MRI);
 
+		/* test and branch */
+		emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)Machine);							// mov   param1,pcp
+		emit_test_m32_imm(&dst, MBD(REG_PARAM1, offsetof(running_machine, debug_flags)), DEBUG_FLAG_CALL_HOOK);
+																						// test  [Machine->debug_flags],DEBUG_FLAG_CALL_HOOK
+		emit_jcc_short_link(&dst, COND_Z, &skip);										// jz    skip
+
 		/* push the parameter */
-		emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &pcp);								// mov   param1,pcp
-		emit_smart_call_m64(drcbe, &dst, &drcbe->mame_debug_hook);						// call  mame_debug_hook
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &pcp);								// mov   param1,pcp
+		emit_smart_call_m64(drcbe, &dst, &drcbe->debug_cpu_instruction_hook);			// call  debug_cpu_instruction_hook
+
+		resolve_link(&dst, &skip);													// skip:
 	}
-#endif
 
 	return dst;
 }
@@ -4230,13 +4236,13 @@ static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 		emit_mov_r64_p64(drcbe, &dst, REG_PARAM3, &maskp);								// mov    param3,maskp
 	}
 	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
-		emit_call(&dst, (x86code *)drcbe->accessors[spacesizep.value / 16].write_word_masked);
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_word_masked);
 																						// call   write_word_masked
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
-		emit_call(&dst, (x86code *)drcbe->accessors[spacesizep.value / 16].write_dword_masked);
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_dword_masked);
 																						// call   write_dword_masked
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
-		emit_call(&dst, (x86code *)drcbe->accessors[spacesizep.value / 16].write_qword_masked);
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_qword_masked);
 																						// call   write_qword_masked
 	return dst;
 }
@@ -5620,7 +5626,7 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_Z | DRCUML_FLAG_S*/0);
+	assert_flags(inst, DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
@@ -5632,9 +5638,10 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	if (inst->size == 4)
 	{
 		emit_mov_r32_p32(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
-		emit_mov_r32_imm(&dst, REG_ECX, 32);											// mov   ecx,32
+		emit_mov_r32_imm(&dst, REG_ECX, 32 ^ 31);										// mov   ecx,32 ^ 31
 		emit_bsr_r32_r32(&dst, dstreg, dstreg);											// bsr   dstreg,dstreg
 		emit_cmovcc_r32_r32(&dst, COND_Z, dstreg, REG_ECX);								// cmovz dstreg,ecx
+		emit_xor_r32_imm(&dst, dstreg, 31);												// xor   dstreg,31
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 
@@ -5642,9 +5649,10 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	else if (inst->size == 8)
 	{
 		emit_mov_r64_p64(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
-		emit_mov_r64_imm(&dst, REG_RCX, 64);											// mov   rcx,64
+		emit_mov_r64_imm(&dst, REG_RCX, 64 ^ 63);										// mov   rcx,64 ^ 63
 		emit_bsr_r64_r64(&dst, dstreg, dstreg);											// bsr   dstreg,dstreg
 		emit_cmovcc_r64_r64(&dst, COND_Z, dstreg, REG_RCX);								// cmovz dstreg,rcx
+		emit_xor_r32_imm(&dst, dstreg, 63);												// xor   dstreg,63
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 	return dst;
@@ -5663,7 +5671,7 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_Z | DRCUML_FLAG_S*/0);
+	assert_flags(inst, DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
@@ -5676,6 +5684,8 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	{
 		emit_mov_r32_p32(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
 		emit_bswap_r32(&dst, dstreg);													// bswap dstreg
+		if (inst->flags != 0)
+			emit_test_r32_r32(&dst, dstreg, dstreg);									// test  dstreg,dstreg
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 
@@ -5684,6 +5694,8 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	{
 		emit_mov_r64_p64(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
 		emit_bswap_r64(&dst, dstreg);													// bswap dstreg
+		if (inst->flags != 0)
+			emit_test_r64_r64(&dst, dstreg, dstreg);									// test  dstreg,dstreg
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 	return dst;

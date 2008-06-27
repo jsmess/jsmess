@@ -34,7 +34,7 @@ WRITE8_HANDLER(pc1403_asic_write)
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
     case 2/*0x3c00*/:
-	memory_set_bankptr(1, memory_region(REGION_USER1)+((data&7)<<14));
+	memory_set_bankptr(1, memory_region(machine, REGION_USER1)+((data&7)<<14));
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
     case 3/*0x3e00*/: break;
@@ -147,7 +147,7 @@ int pc1403_reset(void)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1403 )
 {
-	UINT8 *ram=memory_region(REGION_CPU1)+0x8000,
+	UINT8 *ram=memory_region(machine, REGION_CPU1)+0x8000,
 		*cpu=sc61860_internal_ram();
 
 	if (read_or_write)
@@ -175,13 +175,13 @@ static TIMER_CALLBACK(pc1403_power_up)
 DRIVER_INIT( pc1403 )
 {
 	int i;
-	UINT8 *gfx=memory_region(REGION_GFX1);
+	UINT8 *gfx=memory_region(machine, REGION_GFX1);
 
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
 
-	memory_set_bankptr(1, memory_region(REGION_USER1));
+	memory_set_bankptr(1, memory_region(machine, REGION_USER1));
 	if ((input_port_read(machine, "DSW0") & 0x80) == 0x80)
 	{
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_RAM);

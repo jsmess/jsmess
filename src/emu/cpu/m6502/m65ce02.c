@@ -88,10 +88,13 @@ static m65ce02_Regs m65ce02;
 
 #include "t65ce02.c"
 
+static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
+static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
+
 static void m65ce02_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	m65ce02.rdmem_id = program_read_byte_8le;
-	m65ce02.wrmem_id = program_write_byte_8le;
+	m65ce02.rdmem_id = default_rdmem_id;
+	m65ce02.wrmem_id = default_wdmem_id;
 	m65ce02.irq_callback = irqcallback;
 }
 
@@ -168,7 +171,7 @@ static int m65ce02_execute(int cycles)
 		UINT8 op;
 		PPC = PCD;
 
-		CALL_DEBUGGER(PCD);
+		debugger_instruction_hook(Machine, PCD);
 
 		/* if an irq is pending, take it now */
 		if( m65ce02.pending_irq )
@@ -323,9 +326,7 @@ void m65ce02_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = m65ce02_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = m65ce02_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m65ce02_dasm;			break;
-#endif
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m65ce02_ICount;			break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m65ce02.rdmem_id;		break;
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m65ce02.wrmem_id;		break;

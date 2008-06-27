@@ -293,7 +293,7 @@ MACHINE_RESET( trs80 )
 
 DRIVER_INIT( trs80 )
 {
-	UINT8 *FNT = memory_region(REGION_GFX1);
+	UINT8 *FNT = memory_region(machine, REGION_GFX1);
 	int i, y;
 
 	for( i = 0x000; i < 0x080; i++ )
@@ -324,7 +324,7 @@ DRIVER_INIT( trs80 )
 
 DRIVER_INIT( lnw80 )
 {
-	UINT8 y, *FNT = memory_region(REGION_GFX1);
+	UINT8 y, *FNT = memory_region(machine, REGION_GFX1);
 	UINT16 i, rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
 
 	for( i = 0; i < 0x80; i++ )
@@ -461,7 +461,7 @@ static void tape_get_byte(running_machine *machine)
 static void tape_get_open(running_machine *machine)
 {
 	/* TODO: remove this */
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	unsigned char *RAM = memory_region(machine, REGION_CPU1);
 
 	if (!tape_get_file)
 	{

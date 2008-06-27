@@ -477,7 +477,7 @@ Lineal virtual memory map:
 0x3A000, 0x41fff -> Used to Write Protect ROMs
 */
 	UINT8 *BankBase;
-	BankBase = &memory_region(REGION_CPU1)[0x00000];
+	BankBase = &memory_region(machine, REGION_CPU1)[0x00000];
 
 	switch (adam_lower_memory)
 	{
@@ -576,10 +576,10 @@ Lineal virtual memory map:
 void adam_reset_pcb(running_machine *machine)
 {
     int i;
-    memory_region(REGION_CPU1)[adam_pcb] = 0x01;
+    memory_region(machine, REGION_CPU1)[adam_pcb] = 0x01;
 
 	for (i = 0; i < 15; i++)
-		memory_region(REGION_CPU1)[(adam_pcb+4+i*21)&0xFFFF]=i+1;
+		memory_region(machine, REGION_CPU1)[(adam_pcb+4+i*21)&0xFFFF]=i+1;
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -615,7 +615,7 @@ static MACHINE_RESET( adam )
 	adam_pcb=0xFEC0;
 	adam_clear_keyboard_buffer();
 
-	memset(&memory_region(REGION_CPU1)[0x0000], 0xFF, 0x20000); /* Initializing RAM */
+	memset(&memory_region(machine, REGION_CPU1)[0x0000], 0xFF, 0x20000); /* Initializing RAM */
 	timer_pulse(ATTOTIME_IN_MSEC(20), NULL, 0, adam_paddle_callback);
 }
 

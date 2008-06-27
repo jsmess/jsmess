@@ -297,6 +297,7 @@ SOUNDS += PSXSPU
 SOUNDS += CDDA
 SOUNDS += ICS2115
 SOUNDS += ST0016
+SOUNDS += NILE
 SOUNDS += C352
 SOUNDS += VRENDER0
 #SOUNDS += VOTRAX
@@ -1052,8 +1053,6 @@ $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/punchout.o $(VIDEO)/punchout.o \
 	$(DRIVERS)/spacefb.o $(AUDIO)/spacefb.o  $(VIDEO)/spacefb.o \
 	$(DRIVERS)/vsnes.o $(MACHINE)/vsnes.o $(VIDEO)/vsnes.o \
-	$(MACHINE)/drakton.o \
-	$(MACHINE)/strtheat.o \
 	$(VIDEO)/ppu2c0x.o \
 
 $(MAMEOBJ)/nix.a: \

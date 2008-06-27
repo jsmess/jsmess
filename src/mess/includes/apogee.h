@@ -8,6 +8,7 @@
 #define APOGEE_H_
 
 #include "machine/8255ppi.h"
+#include "machine/8257dma.h"
 #include "video/i8275.h"
 
 /*----------- defined in machine/apogee.c -----------*/
@@ -17,6 +18,7 @@ extern MACHINE_RESET( apogee );
 
 extern const ppi8255_interface apogee_ppi8255_interface_1;
 extern const i8275_interface apogee_i8275_interface;
+extern const dma8257_interface apogee_dma;
 
 /*----------- defined in video/apogee.c -----------*/
 

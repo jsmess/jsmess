@@ -229,7 +229,7 @@ static int Einstein_scr_y = 0;
 static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
 	/* TODO: Verify implementation */
-	unsigned char *data = memory_region(REGION_CPU1) + 0x012000;
+	unsigned char *data = memory_region(device->machine, REGION_CPU1) + 0x012000;
 	unsigned char data_byte;
 	int char_code;
 	int i, x;
@@ -801,7 +801,7 @@ static void einstein_page_rom(running_machine *machine)
 {
 	if (einstein_rom_enabled)
 	{
-		memory_set_bankptr(1, memory_region(REGION_CPU1)+0x010000);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU1)+0x010000);
 	}
 	else
 	{
@@ -1640,7 +1640,7 @@ static const struct AY8910interface einstein_ay_interface =
 //  if (Einstein_DE)
 //  {
 //
-//      unsigned char *data = memory_region(REGION_CPU1)+0x012000;
+//      unsigned char *data = memory_region(machine, REGION_CPU1)+0x012000;
 //      unsigned char data_byte;
 //      int char_code;
 //

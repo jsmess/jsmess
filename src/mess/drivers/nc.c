@@ -360,7 +360,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			mem_bank = mem_bank & nc_membank_rom_mask;
 
-			addr = (memory_region(REGION_CPU1)+0x010000) + (mem_bank<<14);
+			addr = (memory_region(Machine, REGION_CPU1)+0x010000) + (mem_bank<<14);
 
 			memory_set_bankptr(bank+1, addr);
 
@@ -1367,7 +1367,7 @@ static MACHINE_RESET( nc200 )
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 	//floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), nc200_floppy_drive_index_callback);
 
-	mc146818_init(MC146818_STANDARD);
+	mc146818_init(machine, MC146818_STANDARD);
 
 	nc200_uart_interrupt_irq = 0;
 	msm8251_init(&nc200_uart_interface);

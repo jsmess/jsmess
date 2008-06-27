@@ -265,9 +265,9 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 
 INTERRUPT_GEN( apple3_interrupt )
 {
-	via_set_input_ca2(1, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
-	via_set_input_cb1(1, video_screen_get_vblank(machine->primary_screen));
-	via_set_input_cb2(1, video_screen_get_vblank(machine->primary_screen));
+	via_set_input_ca2(machine, 1, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
+	via_set_input_cb1(machine, 1, video_screen_get_vblank(machine->primary_screen));
+	via_set_input_cb2(machine, 1, video_screen_get_vblank(machine->primary_screen));
 }
 
 
@@ -452,7 +452,7 @@ static void apple3_update_memory(running_machine *machine)
 	else
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xF000, 0xFFFF, 0, 0, SMH_BANK7);
 	if (via_0_a & 0x01)
-		memory_set_bankptr(7, memory_region(REGION_CPU1));
+		memory_set_bankptr(7, memory_region(machine, REGION_CPU1));
 	else
 		apple3_setbank(7, ~0, 0x7000);
 
@@ -621,7 +621,7 @@ static READ8_HANDLER( apple3_indexed_read )
 	else if (addr != (UINT8 *) ~0)
 		result = *addr;
 	else
-		result = memory_region(REGION_CPU1)[offset % memory_region_length(REGION_CPU1)];
+		result = memory_region(machine, REGION_CPU1)[offset % memory_region_length(machine, REGION_CPU1)];
 	return result;
 }
 
@@ -707,7 +707,7 @@ const applefdc_interface apple3_fdc_interface =
 DRIVER_INIT( apple3 )
 {
 	/* hack to get around VIA problem */
-	memory_region(REGION_CPU1)[0x0685] = 0x00;
+	memory_region(machine, REGION_CPU1)[0x0685] = 0x00;
 
 	apple3_enable_mask = 0;
 	apple3_update_drives();

@@ -49,7 +49,7 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
+//#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"
@@ -366,11 +366,11 @@ static MACHINE_RESET(model2o)
 
 static MACHINE_RESET(model2_scsp)
 {
-	memory_set_bankptr(4, memory_region(REGION_SOUND1) + 0x200000);
-	memory_set_bankptr(5, memory_region(REGION_SOUND1) + 0x600000);
+	memory_set_bankptr(4, memory_region(machine, REGION_SOUND1) + 0x200000);
+	memory_set_bankptr(5, memory_region(machine, REGION_SOUND1) + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(model2_soundram, memory_region(REGION_CPU2)+0x80000, 16);
+	memcpy(model2_soundram, memory_region(machine, REGION_CPU2)+0x80000, 16);
 }
 
 static MACHINE_RESET(model2)
@@ -433,7 +433,7 @@ static WRITE32_HANDLER(ctrl0_w)
 
 static READ32_HANDLER(ctrl0_r)
 {
-	UINT32 ret = input_port_read_indexed(machine, 0);
+	UINT32 ret = input_port_read(machine, "IN0");
 	ret <<= 16;
 	if(model2_ctrlmode==0)
 	{
@@ -447,25 +447,25 @@ static READ32_HANDLER(ctrl0_r)
 }
 static READ32_HANDLER(ctrl1_r)
 {
-	return input_port_read_indexed(machine, 1) | input_port_read_indexed(machine, 2)<<16;
+	return input_port_read(machine, "IN1") | input_port_read(machine, "IN2")<<16;
 }
 
 static READ32_HANDLER(ctrl10_r)
 {
-	return input_port_read_indexed(machine, 0) | input_port_read_indexed(machine, 1)<<16;
+	return input_port_read(machine, "IN0") | input_port_read(machine, "IN1")<<16;
 }
 
 static READ32_HANDLER(ctrl14_r)
 {
-	return input_port_read_indexed(machine, 2);
+	return input_port_read(machine, "IN2");
 }
 
 static READ32_HANDLER(analog_r)
 {
 	if (offset)
-		return input_port_read_indexed(machine, 5);
+		return input_port_read_safe(machine, "BRAKE", 0);
 
-	return input_port_read_indexed(machine, 3) | input_port_read_indexed(machine, 4)<<16;
+	return input_port_read_safe(machine, "STEER", 0) | input_port_read_safe(machine, "ACCEL", 0)<<16;
 }
 
 static READ32_HANDLER(fifoctl_r)
@@ -1080,7 +1080,7 @@ static int model2_maxxstate = 0;
 
 static READ32_HANDLER( maxx_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	if (offset <= 0x1f/4)
 	{
@@ -1422,7 +1422,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(_n_)
 
 static INPUT_PORTS_START( model2 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
@@ -1432,15 +1432,15 @@ static INPUT_PORTS_START( model2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1P Push Switch") PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2P Push Switch") PORT_CODE(KEYCODE_8)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	MODEL2_PLAYER_INPUTS(1, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	MODEL2_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( desert )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
@@ -1450,28 +1450,28 @@ static INPUT_PORTS_START( desert )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) // VR 2 (Green)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) // VR 3 (Red)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // shift
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)  // machine gun
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)  // cannon
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	MODEL2_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 
-	PORT_START	// steer
+	PORT_START_TAG("STEER")	// steer
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// accel
+	PORT_START_TAG("ACCEL")	// accel
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// brake
+	PORT_START_TAG("BRAKE")	// brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daytona )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
@@ -1481,7 +1481,7 @@ static INPUT_PORTS_START( daytona )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) // VR 2 (Blue)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) // VR 3 (Yellow)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) // VR 4 (Green)
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // shift 3
@@ -1489,21 +1489,21 @@ static INPUT_PORTS_START( daytona )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	MODEL2_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 
-	PORT_START	// steer
+	PORT_START_TAG("STEER")	// steer
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// accel
+	PORT_START_TAG("ACCEL")	// accel
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START	// brake
+	PORT_START_TAG("BREAK")	// brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bel )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1513,10 +1513,10 @@ static INPUT_PORTS_START( bel )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1P Push Switch") PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2P Push Switch") PORT_CODE(KEYCODE_8)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	MODEL2_PLAYER_INPUTS(1, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	MODEL2_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 INPUT_PORTS_END
 
@@ -1660,9 +1660,9 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( model2snd_ctrl )
 {
 	// handle sample banking
-	if (memory_region_length(REGION_SOUND1) > 0x800000)
+	if (memory_region_length(machine, REGION_SOUND1) > 0x800000)
 	{
-		UINT8 *snd = memory_region(REGION_SOUND1);
+		UINT8 *snd = memory_region(machine, REGION_SOUND1);
 		if (data & 0x20)
 		{
 	  		memory_set_bankptr(4, snd + 0x200000);
@@ -4028,7 +4028,7 @@ static DRIVER_INIT( genprot )
 
 static DRIVER_INIT( pltkids )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4039,7 +4039,7 @@ static DRIVER_INIT( pltkids )
 
 static DRIVER_INIT( zerogun )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4055,7 +4055,7 @@ static DRIVER_INIT( daytonam )
 
 static DRIVER_INIT( sgt24h )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4066,7 +4066,7 @@ static DRIVER_INIT( sgt24h )
 
 static DRIVER_INIT( doa )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;

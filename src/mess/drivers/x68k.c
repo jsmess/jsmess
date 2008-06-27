@@ -1898,7 +1898,7 @@ static MACHINE_RESET( x68000 )
        more or less do the same job */
 
 	int drive;
-	UINT8* romdata = memory_region(REGION_USER2);
+	UINT8* romdata = memory_region(machine, REGION_USER2);
 	attotime irq_time;
 
 	memset(mess_ram,0,mess_ram_size);
@@ -1947,7 +1947,7 @@ static MACHINE_RESET( x68000 )
 static MACHINE_START( x68000 )
 {
 	/*  Install RAM handlers  */
-	x68k_spriteram = (UINT16*)memory_region(REGION_USER1);
+	x68k_spriteram = (UINT16*)memory_region(machine, REGION_USER1);
 	memory_install_read16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_machine_func)1);
 	memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_machine_func)1);
 	memory_set_bankptr(1,mess_ram);
@@ -1974,8 +1974,8 @@ static MACHINE_START( x68000 )
 
 static DRIVER_INIT( x68000 )
 {
-	unsigned char* rom = memory_region(REGION_CPU1);
-	unsigned char* user2 = memory_region(REGION_USER2);
+	unsigned char* rom = memory_region(machine, REGION_CPU1);
+	unsigned char* user2 = memory_region(machine, REGION_USER2);
 	gvram = auto_malloc(0x200000);
 	memset(gvram,0,0x200000);
 	tvram = auto_malloc(0x080000);
@@ -1988,7 +1988,7 @@ static DRIVER_INIT( x68000 )
 
 #ifdef USE_PREDEFINED_SRAM
 	{
-		unsigned char* ramptr = memory_region(REGION_USER3);
+		unsigned char* ramptr = memory_region(machine, REGION_USER3);
 		memcpy(sram,ramptr,0x4000);
 	}
 #endif

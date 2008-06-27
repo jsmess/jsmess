@@ -147,8 +147,8 @@ static void apple2_text_draw(running_machine *machine, bitmap_t *bitmap, const r
 	int row, col;
 	UINT32 start_address = (page ? 0x0800 : 0x0400);
 	UINT32 address;
-	const UINT8 *textgfx_data = memory_region(REGION_GFX1);
-	UINT32 textgfx_datalen = memory_region_length(REGION_GFX1);
+	const UINT8 *textgfx_data = memory_region(machine, REGION_GFX1);
+	UINT32 textgfx_datalen = memory_region_length(machine, REGION_GFX1);
 	UINT32 my_a2 = effective_a2();
 
 	/* perform adjustments */
@@ -377,8 +377,8 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 	fgcolor = 15;
 	bgcolor = 0;
 	flash = 0;
-	apple2_font = memory_region(REGION_GFX1);
-	alt_charset_value = memory_region_length(REGION_GFX1) / 16;
+	apple2_font = memory_region(machine, REGION_GFX1);
+	alt_charset_value = memory_region_length(machine, REGION_GFX1) / 16;
 	a2_videoram = vram;
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
@@ -417,7 +417,7 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 		|| !strcmp(machine->gamedrv->name, "ace100")
 		|| !strcmp(machine->gamedrv->name, "apple2jp"))
 	{
-		for (i = 0; i < memory_region_length(REGION_GFX1); i++)
+		for (i = 0; i < memory_region_length(machine, REGION_GFX1); i++)
 		{
 			apple2_font[i] = BITSWAP8(apple2_font[i], 7, 0, 1, 2, 3, 4, 5, 6);
 		}

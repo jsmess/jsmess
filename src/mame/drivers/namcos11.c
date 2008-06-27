@@ -801,7 +801,7 @@ static DRIVER_INIT( namcos11 )
 	timer_adjust_periodic( timer, ATTOTIME_IN_HZ( 600 ), 0, ATTOTIME_IN_HZ( 600 ) );
 
 	psx_driver_init(machine);
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 	namcoc7x_set_host_ram(namcos11_sharedram);
 
 	n_game = 0;
@@ -816,6 +816,8 @@ static DRIVER_INIT( namcos11 )
 			if( namcos11_config_table[ n_game ].n_daughterboard != 0 )
 			{
 				int bank;
+				UINT32 len = memory_region_length( machine, REGION_USER2 );
+				UINT8 *rgn = memory_region( machine, REGION_USER2 );
 
 				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f0fffff, 0, 0, SMH_BANK1 );
 				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f100000, 0x1f1fffff, 0, 0, SMH_BANK2 );
@@ -828,7 +830,7 @@ static DRIVER_INIT( namcos11 )
 
 				for( bank = 0; bank < 8; bank++ )
 				{
-					memory_configure_bank( bank + 1, 0, memory_region_length( REGION_USER2 ) / ( 1024 * 1024 ), memory_region( REGION_USER2 ), 1024 * 1024 );
+					memory_configure_bank( bank + 1, 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
 					memory_set_bank( bank + 1, 0 );
 				}
 

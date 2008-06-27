@@ -158,8 +158,8 @@ void cage_init(running_machine *machine, int boot_region, offs_t speedup)
 
 	cage_irqhandler = NULL;
 
-	memory_set_bankptr(10, memory_region(boot_region));
-	memory_set_bankptr(11, memory_region(boot_region + 1));
+	memory_set_bankptr(10, memory_region(machine, boot_region));
+	memory_set_bankptr(11, memory_region(machine, boot_region + 1));
 
 	cage_cpu = mame_find_cpu_index(machine, "cage");
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpunum_get_clock(cage_cpu));
@@ -171,6 +171,16 @@ void cage_init(running_machine *machine, int boot_region, offs_t speedup)
 
 	if (speedup)
 		speedup_ram = memory_install_write32_handler(machine, cage_cpu, ADDRESS_SPACE_PROGRAM, speedup, speedup, 0, 0, speedup_w);
+
+	state_save_register_global(cpu_to_cage_ready);
+	state_save_register_global(cage_to_cpu_ready);
+	state_save_register_global(serial_period_per_word.seconds);
+	state_save_register_global(serial_period_per_word.attoseconds);
+	state_save_register_global(dma_enabled);
+	state_save_register_global(dma_timer_enabled);
+	state_save_register_global_array(cage_timer_enabled);
+	state_save_register_global(cage_from_main);
+	state_save_register_global(cage_control);
 }
 
 

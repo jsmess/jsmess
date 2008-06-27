@@ -121,7 +121,7 @@ static const char keyboard[8][10][8] = {
 
 DRIVER_INIT( kaypro )
 {
-	UINT8 * gfx = memory_region(REGION_GFX1);
+	UINT8 * gfx = memory_region(machine, REGION_GFX1);
 	int i;
 
 	/* copy font, but add underline in last line */

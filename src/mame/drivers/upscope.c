@@ -375,7 +375,7 @@ static DRIVER_INIT( upscope )
 		NULL,
 		0
 	};
-	amiga_machine_config(&upscope_intf);
+	amiga_machine_config(machine, &upscope_intf);
 
 	/* allocate NVRAM */
 	generic_nvram_size = 0x100;
@@ -383,7 +383,7 @@ static DRIVER_INIT( upscope )
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
 }
 
 

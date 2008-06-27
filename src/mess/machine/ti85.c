@@ -132,7 +132,7 @@ static TIMER_CALLBACK(ti85_timer_callback)
 
 static void update_ti85_memory (running_machine *machine)
 {
-	memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x010000 + 0x004000*ti85_memory_page_0x4000);
+	memory_set_bankptr(2,memory_region(machine, REGION_CPU1) + 0x010000 + 0x004000*ti85_memory_page_0x4000);
 }
 
 static void update_ti86_memory (running_machine *machine)
@@ -147,7 +147,7 @@ static void update_ti86_memory (running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x010000 + 0x004000*(ti85_memory_page_0x4000&0x0f));
+		memory_set_bankptr(2,memory_region(machine, REGION_CPU1) + 0x010000 + 0x004000*(ti85_memory_page_0x4000&0x0f));
 		wh = SMH_UNMAP;
 	}
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, wh);
@@ -160,7 +160,7 @@ static void update_ti86_memory (running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(3,memory_region(REGION_CPU1) + 0x010000 + 0x004000*(ti86_memory_page_0x8000&0x0f));
+		memory_set_bankptr(3,memory_region(machine, REGION_CPU1) + 0x010000 + 0x004000*(ti86_memory_page_0x8000&0x0f));
 		wh = SMH_UNMAP;
 	}
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, wh);
@@ -189,7 +189,7 @@ MACHINE_START( ti81 )
 	ti81_port_7_data = 0;
 
 	if (ti_calculator_model == TI_81)
-		memset(memory_region(REGION_CPU1)+0x8000, 0, sizeof(unsigned char)*0x8000);
+		memset(memory_region(machine, REGION_CPU1)+0x8000, 0, sizeof(unsigned char)*0x8000);
 
 	ti_calculator_model = TI_81;
 
@@ -197,8 +197,8 @@ MACHINE_START( ti81 )
 
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
-	memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x010000);
+	memory_set_bankptr(2,memory_region(machine, REGION_CPU1) + 0x014000);
 }
 
 MACHINE_START( ti85 )
@@ -219,7 +219,7 @@ MACHINE_START( ti85 )
 	ti85_port4_bit0 = 0;
 
 	if (ti_calculator_model == TI_85)
-		memset(memory_region(REGION_CPU1)+0x8000, 0, sizeof(unsigned char)*0x8000);
+		memset(memory_region(machine, REGION_CPU1)+0x8000, 0, sizeof(unsigned char)*0x8000);
 
 	ti_calculator_model = TI_85;
 
@@ -227,8 +227,8 @@ MACHINE_START( ti85 )
 
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
-	memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x010000);
+	memory_set_bankptr(2,memory_region(machine, REGION_CPU1) + 0x014000);
 
 	add_reset_callback(machine, ti85_reset_serial);
 	add_exit_callback(machine, ti85_free_serial_data_memory);
@@ -256,8 +256,8 @@ MACHINE_START( ti86 )
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
+		memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr(2,memory_region(machine, REGION_CPU1) + 0x014000);
 
 		memory_set_bankptr(4, ti86_ram);
 		memory_set_bankptr(8, ti86_ram);
@@ -430,32 +430,32 @@ WRITE8_HANDLER ( ti86_port_0006_w )
 NVRAM_HANDLER( ti81 )
 {
 	if (read_or_write)
-		mame_fwrite(file, memory_region(REGION_CPU1)+0x8000, sizeof(unsigned char)*0x8000);
+		mame_fwrite(file, memory_region(machine, REGION_CPU1)+0x8000, sizeof(unsigned char)*0x8000);
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, memory_region(REGION_CPU1)+0x8000, sizeof(unsigned char)*0x8000);
+			mame_fread(file, memory_region(machine, REGION_CPU1)+0x8000, sizeof(unsigned char)*0x8000);
 			cpunum_set_reg(0, Z80_PC,0x0239);
 		}
 		else
-			memset(memory_region(REGION_CPU1)+0x8000, 0, sizeof(unsigned char)*0x8000);
+			memset(memory_region(machine, REGION_CPU1)+0x8000, 0, sizeof(unsigned char)*0x8000);
 	}
 }
 
 NVRAM_HANDLER( ti85 )
 {
 	if (read_or_write)
-		mame_fwrite(file, memory_region(REGION_CPU1)+0x8000, sizeof(unsigned char)*0x8000);
+		mame_fwrite(file, memory_region(machine, REGION_CPU1)+0x8000, sizeof(unsigned char)*0x8000);
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, memory_region(REGION_CPU1)+0x8000, sizeof(unsigned char)*0x8000);
+			mame_fread(file, memory_region(machine, REGION_CPU1)+0x8000, sizeof(unsigned char)*0x8000);
 			cpunum_set_reg(0, Z80_PC,0x0b5f);
 		}
 		else
-			memset(memory_region(REGION_CPU1)+0x8000, 0, sizeof(unsigned char)*0x8000);
+			memset(memory_region(machine, REGION_CPU1)+0x8000, 0, sizeof(unsigned char)*0x8000);
 	}
 }
 

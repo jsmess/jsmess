@@ -440,7 +440,7 @@ static const ti99_peb_card_handlers_t fdc_handlers =
 */
 void ti99_fdc_reset(running_machine *machine)
 {
-	ti99_disk_DSR = memory_region(region_dsr) + offset_fdc_dsr;
+	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_fdc_dsr;
 	DSEL = 0;
 	DSKnum = -1;
 	DSKside = 0;
@@ -647,7 +647,7 @@ static const ti99_peb_card_handlers_t ccfdc_handlers =
 #if HAS_99CCFDC
 void ti99_ccfdc_reset(running_machine *machine)
 {
-	ti99_disk_DSR = memory_region(region_dsr) + offset_ccfdc_dsr;
+	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_ccfdc_dsr;
 	DSEL = 0;
 	DSKnum = -1;
 	DSKside = 0;
@@ -858,8 +858,8 @@ static UINT8 *bwg_ram;
 */
 void ti99_bwg_reset(running_machine *machine)
 {
-	ti99_disk_DSR = memory_region(region_dsr) + offset_bwg_dsr;
-        bwg_ram = memory_region(region_dsr) + offset_bwg_ram;
+	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_bwg_dsr;
+        bwg_ram = memory_region(machine, region_dsr) + offset_bwg_ram;
 	bwg_ram_offset = 0;
 	bwg_rom_offset = 0;
 	bwg_rtc_enable = 0;
@@ -1230,8 +1230,8 @@ static void hfdc_int_callback(int which, int state)
 */
 void ti99_hfdc_reset(running_machine *machine)
 {
-	ti99_disk_DSR = memory_region(region_dsr) + offset_hfdc_dsr;
-	hfdc_ram = memory_region(region_dsr) + offset_hfdc_ram;
+	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_hfdc_dsr;
+	hfdc_ram = memory_region(machine, region_dsr) + offset_hfdc_ram;
 	hfdc_ram_offset[0] = hfdc_ram_offset[1] = hfdc_ram_offset[2] = 0;
 	hfdc_rom_offset = 0;
 	hfdc_rtc_enable = 0;

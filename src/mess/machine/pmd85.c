@@ -45,12 +45,12 @@ static void pmd851_update_memory(running_machine *machine)
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_NOP);
 
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x010000);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr(3, memory_region(machine, REGION_CPU1) + 0x010000);
 		memory_set_bankptr(5, mess_ram + 0xc000);
 
-		memory_set_bankptr(6, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr(7, memory_region(REGION_CPU1) + 0x010000);
+		memory_set_bankptr(6, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x010000);
 		memory_set_bankptr(8, mess_ram + 0xc000);
 	}
 	else
@@ -80,14 +80,14 @@ static void pmd852a_update_memory(running_machine *machine)
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x010000);
 		memory_set_bankptr(2, mess_ram + 0x9000);
-		memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x010000);
+		memory_set_bankptr(3, memory_region(machine, REGION_CPU1) + 0x010000);
 		memory_set_bankptr(4, mess_ram + 0xb000);
 		memory_set_bankptr(5, mess_ram + 0xc000);
-		memory_set_bankptr(6, memory_region(REGION_CPU1) + 0x010000);
+		memory_set_bankptr(6, memory_region(machine, REGION_CPU1) + 0x010000);
 		memory_set_bankptr(7, mess_ram + 0x9000);
-		memory_set_bankptr(8, memory_region(REGION_CPU1) + 0x010000);
+		memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x010000);
 		memory_set_bankptr(9, mess_ram + 0xb000);
 		memory_set_bankptr(10, mess_ram + 0xc000);
 
@@ -109,14 +109,14 @@ static void pmd853_update_memory(running_machine *machine)
 {
 	if (pmd85_startup_mem_map)
 	{
-		memory_set_bankptr( 1, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr( 2, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr( 3, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr( 4, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr( 5, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr( 6, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr( 7, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr( 8, memory_region(REGION_CPU1) + 0x010000);
+		memory_set_bankptr( 1, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr( 2, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr( 3, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr( 4, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr( 5, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr( 6, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr( 7, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr( 8, memory_region(machine, REGION_CPU1) + 0x010000);
 		memory_set_bankptr( 9, mess_ram);
 		memory_set_bankptr(10, mess_ram + 0x2000);
 		memory_set_bankptr(11, mess_ram + 0x4000);
@@ -135,7 +135,7 @@ static void pmd853_update_memory(running_machine *machine)
 		memory_set_bankptr( 5, mess_ram + 0x8000);
 		memory_set_bankptr( 6, mess_ram + 0xa000);
 		memory_set_bankptr( 7, mess_ram + 0xc000);
-		memory_set_bankptr( 8, pmd853_memory_mapping ? memory_region(REGION_CPU1) + 0x010000 : mess_ram + 0xe000);
+		memory_set_bankptr( 8, pmd853_memory_mapping ? memory_region(machine, REGION_CPU1) + 0x010000 : mess_ram + 0xe000);
 	}
 }
 
@@ -147,11 +147,11 @@ static void alfa_update_memory(running_machine *machine)
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x33ff, 0, 0, SMH_UNMAP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3400, 0x3fff, 0, 0, SMH_NOP);
 
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x011000);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0x011000);
 		memory_set_bankptr(4, mess_ram + 0xc000);
-		memory_set_bankptr(5, memory_region(REGION_CPU1) + 0x010000);
-		memory_set_bankptr(6, memory_region(REGION_CPU1) + 0x011000);
+		memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0x010000);
+		memory_set_bankptr(6, memory_region(machine, REGION_CPU1) + 0x011000);
 		memory_set_bankptr(7, mess_ram + 0xc000);
 	}
 	else
@@ -173,9 +173,9 @@ static void mato_update_memory(running_machine *machine)
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x010000);
 		memory_set_bankptr(2, mess_ram + 0xc000);
-		memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x010000);
+		memory_set_bankptr(3, memory_region(machine, REGION_CPU1) + 0x010000);
 		memory_set_bankptr(4, mess_ram + 0xc000);
 	}
 	else
@@ -411,7 +411,7 @@ const struct pit8253_config pmd85_pit8253_interface =
 
 static  READ8_HANDLER ( pmd85_ppi_3_porta_r )
 {
-	return memory_region(REGION_USER1)[pmd85_ppi_port_outputs[3][1]|(pmd85_ppi_port_outputs[3][2]<<8)];
+	return memory_region(machine, REGION_USER1)[pmd85_ppi_port_outputs[3][1]|(pmd85_ppi_port_outputs[3][2]<<8)];
 }
 
 static  READ8_HANDLER ( pmd85_ppi_3_portb_r )

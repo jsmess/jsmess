@@ -611,11 +611,11 @@ static MACHINE_RESET( bw2 )
 		
 		memory_configure_bank(1, BANK_RAM1, 1, mess_ram, 0);
 		memory_configure_bank(1, BANK_VRAM, 1, videoram, 0);
-		memory_configure_bank(1, BANK_RAMCARD_ROM, 1, memory_region(REGION_USER1), 0);
+		memory_configure_bank(1, BANK_RAMCARD_ROM, 1, memory_region(machine, REGION_USER1), 0);
 		memory_configure_bank(1, BANK_RAM3, 2, mess_ram + 0x8000, 0x8000);
 		memory_configure_bank(1, BANK_RAMCARD_RAM, 1, ramcard_ram, 0);
 		memory_configure_bank(1, BANK_RAM6, 1, mess_ram + 0x18000, 0);
-		memory_configure_bank(1, BANK_ROM, 1, memory_region(REGION_CPU1), 0);
+		memory_configure_bank(1, BANK_ROM, 1, memory_region(machine, REGION_CPU1), 0);
 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x30, 0x30, 0, 0x0f, &ramcard_bank_w);
 	}
@@ -626,7 +626,7 @@ static MACHINE_RESET( bw2 )
 		memory_configure_bank(1, BANK_RAM1, 1, mess_ram, 0);
 		memory_configure_bank(1, BANK_VRAM, 1, videoram, 0);
 		memory_configure_bank(1, BANK_RAM2, 5, mess_ram + 0x8000, 0x8000);
-		memory_configure_bank(1, BANK_ROM, 1, memory_region(REGION_CPU1), 0);
+		memory_configure_bank(1, BANK_ROM, 1, memory_region(machine, REGION_CPU1), 0);
 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x30, 0x30, 0, 0x0f, SMH_UNMAP);
 	}

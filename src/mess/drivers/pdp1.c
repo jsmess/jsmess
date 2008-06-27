@@ -138,7 +138,7 @@ static DRIVER_INIT( pdp1 )
 	};
 
 	/* set up our font */
-	dst = memory_region(REGION_GFX1);
+	dst = memory_region(machine, REGION_GFX1);
 
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 }

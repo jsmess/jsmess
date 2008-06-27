@@ -91,20 +91,20 @@ handle_mcu( running_machine *machine )
 	{
 	UINT8 *IORAM = (UINT8 *)namcofl_mcuram;
 	static int toggle;
-	int new_coin_state = input_port_read_indexed(machine, 3)&0x30;
-	unsigned p1 = input_port_read_indexed(machine, 0);
-	unsigned p2 = input_port_read_indexed(machine, 2);
-	unsigned p3 = input_port_read_indexed(machine, 1);
-	unsigned p4 = input_port_read_indexed(machine, 3);
+	int new_coin_state = input_port_read(machine, "IN3") & 0x30;
+	unsigned p1 = input_port_read(machine, "IN0");
+	unsigned p2 = input_port_read(machine, "IN2");
+	unsigned p3 = input_port_read(machine, "IN1");
+	unsigned p4 = input_port_read(machine, "IN3");
 
 	IORAM[BYTE4_XOR_LE(0x6000)] = p1;
 	IORAM[BYTE4_XOR_LE(0x6003)] = p2;
 	IORAM[BYTE4_XOR_LE(0x6005)] = p3;
 	IORAM[BYTE4_XOR_LE(0x60b8)] = p4;
 
-	IORAM[BYTE4_XOR_LE(0x6014)] = input_port_read_indexed(machine, 6)-1;	// handle
-	IORAM[BYTE4_XOR_LE(0x6016)] = input_port_read_indexed(machine, 5);	// brake
-	IORAM[BYTE4_XOR_LE(0x6018)] = input_port_read_indexed(machine, 4);	// accelerator
+	IORAM[BYTE4_XOR_LE(0x6014)] = input_port_read(machine, "WHEEL") - 1;	// handle
+	IORAM[BYTE4_XOR_LE(0x6016)] = input_port_read(machine, "BRAKE");		// brake
+	IORAM[BYTE4_XOR_LE(0x6018)] = input_port_read(machine, "ACCEL");		// accelerator
 
 	if (!(new_coin_state & 0x20) && (old_coin_state & 0x20))
 	{
@@ -180,9 +180,10 @@ static int FLobjcode2tile( int code )
 VIDEO_START( namcofl )
 {
 	credits1 = credits2 = 0;
-	old_coin_state = input_port_read_indexed(machine, 3)&0x30;
+	old_coin_state = 0x00;
+	//input_port_read_indexed(machine, 3)&0x30;
 
-	namco_tilemap_init( NAMCONB1_TILEGFX, memory_region(NAMCONB1_TILEMASKREGION), TilemapCB );
+	namco_tilemap_init( NAMCONB1_TILEGFX, memory_region(machine, NAMCONB1_TILEMASKREGION), TilemapCB );
 	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);
 	namco_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
 } /* namcofl_vh_start */

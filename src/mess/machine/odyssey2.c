@@ -22,17 +22,17 @@ static void odyssey2_switch_banks(running_machine *machine)
 	switch ( cart_size ) {
 	case 12288:
 		/* 12KB cart support (for instance, KTAA as released) */
-		memory_set_bankptr( 1, memory_region(REGION_USER1) + (p1 & 0x03) * 0xC00 );
-		memory_set_bankptr( 2, memory_region(REGION_USER1) + (p1 & 0x03) * 0xC00 + 0x800 );
+		memory_set_bankptr( 1, memory_region(machine, REGION_USER1) + (p1 & 0x03) * 0xC00 );
+		memory_set_bankptr( 2, memory_region(machine, REGION_USER1) + (p1 & 0x03) * 0xC00 + 0x800 );
 		break;
 	case 16384:
 		/* 16KB cart support (for instance, full sized version KTAA) */
-		memory_set_bankptr( 1, memory_region(REGION_USER1) + (p1 & 0x03) * 0x1000 + 0x400 );
-		memory_set_bankptr( 2, memory_region(REGION_USER1) + (p1 & 0x03) * 0x1000 + 0xC00 );
+		memory_set_bankptr( 1, memory_region(machine, REGION_USER1) + (p1 & 0x03) * 0x1000 + 0x400 );
+		memory_set_bankptr( 2, memory_region(machine, REGION_USER1) + (p1 & 0x03) * 0x1000 + 0xC00 );
 		break;
 	default:
-		memory_set_bankptr(1, memory_region(REGION_USER1) + (p1 & 0x03) * 0x800);
-		memory_set_bankptr(2, memory_region(REGION_USER1) + (p1 & 0x03) * 0x800 );
+		memory_set_bankptr(1, memory_region(machine, REGION_USER1) + (p1 & 0x03) * 0x800);
+		memory_set_bankptr(2, memory_region(machine, REGION_USER1) + (p1 & 0x03) * 0x800 );
 		break;
 	}
 }
@@ -48,7 +48,7 @@ READ8_HANDLER( odyssey2_t0_r ) {
 DRIVER_INIT( odyssey2 )
 {
 	int i;
-	UINT8 *gfx = memory_region(REGION_GFX1);
+	UINT8 *gfx = memory_region(machine, REGION_GFX1);
 	ram        = auto_malloc(256);
 
 	for (i = 0; i < 256; i++)

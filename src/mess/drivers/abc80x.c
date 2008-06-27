@@ -695,12 +695,12 @@ static const struct z80_irq_daisy_chain abc800_daisy_chain[] =
 
 static TIMER_CALLBACK(abc800_ctc_tick)
 {
-	z80ctc_trg_w(0, 0, 1);
-	z80ctc_trg_w(0, 0, 0);
-	z80ctc_trg_w(0, 1, 1);
-	z80ctc_trg_w(0, 1, 0);
-	z80ctc_trg_w(0, 2, 1);
-	z80ctc_trg_w(0, 2, 0);
+	z80ctc_trg_w(machine, 0, 0, 1);
+	z80ctc_trg_w(machine, 0, 0, 0);
+	z80ctc_trg_w(machine, 0, 1, 1);
+	z80ctc_trg_w(machine, 0, 1, 0);
+	z80ctc_trg_w(machine, 0, 2, 1);
+	z80ctc_trg_w(machine, 0, 2, 0);
 }
 
 static MACHINE_START( abc800 )
@@ -722,7 +722,7 @@ static MACHINE_START( abc802 )
 
 	z80dart_init(0, &abc802_dart_intf);
 
-	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
 }
 
@@ -765,7 +765,7 @@ static MACHINE_START( abc806 )
 	{
 		if (bank != 8)
 		{
-			memory_configure_bank(bank, 0, 1, memory_region(REGION_CPU1) + ((bank - 1) * 0x1000), 0);
+			memory_configure_bank(bank, 0, 1, memory_region(machine, REGION_CPU1) + ((bank - 1) * 0x1000), 0);
 			memory_configure_bank(bank, 1, 32, mess_ram, 0x1000);
 
 			memory_set_bank(bank, 0);
@@ -1118,7 +1118,7 @@ static OPBASE_HANDLER( abc800_opbase_handler )
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		opbase->rom = opbase->ram = memory_region(REGION_CPU1);
+		opbase->rom = opbase->ram = memory_region(machine, REGION_CPU1);
 		return ~0;
 	}
 

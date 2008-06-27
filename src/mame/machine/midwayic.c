@@ -250,13 +250,6 @@ INLINE UINT8 make_bcd(UINT8 data)
 }
 
 
-#ifdef UNUSED_FUNCTON
-INLINE UINT8 unmake_bcd(UINT8 data)
-{
-	return ((data & 0xf0) >> 4) * 10 + (data & 0x0f);
-}
-#endif
-
 static TIMER_CALLBACK( reset_timer )
 {
 	pic.time_just_written = 0;
@@ -376,7 +369,7 @@ void midway_serial_pic2_w(running_machine *machine, UINT8 data)
 					memcpy(pic.buffer, serial.data, 16);
 					pic.total = 16;
 					pic.index = 0;
-					DEBUGGER_BREAK;
+					debugger_break(machine);
 				}
 				break;
 
@@ -870,7 +863,7 @@ READ32_HANDLER( midway_ioasic_r )
 	switch (offset)
 	{
 		case IOASIC_PORT0:
-			result = input_port_read_indexed(machine, 0);
+			result = input_port_read(machine, "DIPS");
 			/* bit 0 seems to be a ready flag before shuffling happens */
 			if (!ioasic.shuffle_active)
 			{
@@ -882,15 +875,15 @@ READ32_HANDLER( midway_ioasic_r )
 			break;
 
 		case IOASIC_PORT1:
-			result = input_port_read_indexed(machine, 1);
+			result = input_port_read(machine, "SYSTEM");
 			break;
 
 		case IOASIC_PORT2:
-			result = input_port_read_indexed(machine, 2);
+			result = input_port_read(machine, "IN1");
 			break;
 
 		case IOASIC_PORT3:
-			result = input_port_read_indexed(machine, 3);
+			result = input_port_read(machine, "IN2");
 			break;
 
 		case IOASIC_UARTIN:

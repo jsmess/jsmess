@@ -163,7 +163,7 @@ DEVICE_IMAGE_UNLOAD( ti99_4_rs232 )
 */
 void ti99_rs232_init(running_machine *machine)
 {
-	rs232_DSR = memory_region(region_dsr) + offset_rs232_dsr;
+	rs232_DSR = memory_region(machine, region_dsr) + offset_rs232_dsr;
 	tms9902_init(0, &tms9902_params);
 	tms9902_init(1, &tms9902_params);
 	
@@ -175,7 +175,7 @@ void ti99_rs232_init(running_machine *machine)
 */
 void ti99_rs232_reset(running_machine *machine)
 {
-	rs232_DSR = memory_region(region_dsr) + offset_rs232_dsr;
+	rs232_DSR = memory_region(machine, region_dsr) + offset_rs232_dsr;
 
 	ti99_peb_set_card_handlers(0x1300, & rs232_handlers);
 

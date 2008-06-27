@@ -257,7 +257,7 @@ static READ8_HANDLER( cosmicg_port_0_r )
 
 static READ8_HANDLER( magspot_coinage_dip_r )
 {
-	return (input_port_read(machine, "DSW") & (1 << (7 - offset))) ? 0 : 1;
+	return (input_port_read_safe(machine, "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
@@ -1463,8 +1463,8 @@ static DRIVER_INIT( cosmicg )
 	offs_t offs, len;
 	UINT8 *rom;
 
-    len = memory_region_length(REGION_CPU1);
-    rom = memory_region(REGION_CPU1);
+    len = memory_region_length(machine, REGION_CPU1);
+    rom = memory_region(machine, REGION_CPU1);
     for (offs =0; offs < len; offs++)
     {
         UINT8 scrambled = rom[offs];

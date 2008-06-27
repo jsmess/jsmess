@@ -596,7 +596,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 	int time;
 
 	/* Issue a index pulse when a disk revolution completes */
-	cia_issue_index(1);
+	cia_issue_index(machine, 1);
 
 	timer_adjust_oneshot(fdc_status[drive].rev_timer, ATTOTIME_IN_MSEC( ONE_REV_TIME ), drive);
 	fdc_status[drive].rev_timer_started = 1;

@@ -74,10 +74,10 @@ static int vectrex_verify_cart (char *data)
 
 DEVICE_IMAGE_LOAD( vectrex_cart )
 {
-	image_fread(image, memory_region(REGION_CPU1), 0x8000);
+	image_fread(image, memory_region(image->machine, REGION_CPU1), 0x8000);
 
 	/* check image! */
-	if (vectrex_verify_cart((char*)memory_region(REGION_CPU1)) == IMAGE_VERIFY_FAIL)
+	if (vectrex_verify_cart((char*)memory_region(image->machine, REGION_CPU1)) == IMAGE_VERIFY_FAIL)
 	{
 		logerror("Invalid image!\n");
 		return INIT_FAIL;
@@ -93,17 +93,17 @@ DEVICE_IMAGE_LOAD( vectrex_cart )
 	/* slightly prettier than having to hardcode CRCs */
 
 	/* handle 3D Narrow Escape but skip the 2-d hack of it from Fred Taft */
-	if (!memcmp(memory_region(REGION_CPU1)+0x11,"NARROW",6) && (((char*)memory_region(REGION_CPU1))[0x39] == 0x0c))
+	if (!memcmp(memory_region(image->machine, REGION_CPU1)+0x11,"NARROW",6) && (((char*)memory_region(image->machine, REGION_CPU1))[0x39] == 0x0c))
 	{
 		vectrex_imager_angles = narrow_escape_angles;
 	}
 
-	if (!memcmp(memory_region(REGION_CPU1)+0x11,"CRAZY COASTER",13))
+	if (!memcmp(memory_region(image->machine, REGION_CPU1)+0x11,"CRAZY COASTER",13))
 	{
 		vectrex_imager_angles = crazy_coaster_angles;
 	}
 
-	if (!memcmp(memory_region(REGION_CPU1)+0x11,"3D MINE STORM",13))
+	if (!memcmp(memory_region(image->machine, REGION_CPU1)+0x11,"3D MINE STORM",13))
 	{
 		vectrex_imager_angles = minestorm_3d_angles;
 
@@ -298,8 +298,8 @@ TIMER_CALLBACK(vectrex_imager_eye)
 			timer_set (double_to_attotime(rtime * 0.50), NULL, 1, vectrex_imager_eye);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
-			via_set_input_ca1(0, 1);
-			via_set_input_ca1(0, 0);
+			via_set_input_ca1(machine, 0, 1);
+			via_set_input_ca1(machine, 0, 0);
 			vectrex_imager_pinlevel |= 0x80;
 			timer_set (double_to_attotime(rtime / 360.0), &vectrex_imager_pinlevel, 0, update_level);
 		}

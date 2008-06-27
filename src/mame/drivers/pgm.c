@@ -917,7 +917,7 @@ static INPUT_PORTS_START( orld105k )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sango )
-	PORT_START	/* DSW */
+	PORT_START_TAG("P1P2")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -935,7 +935,7 @@ static INPUT_PORTS_START( sango )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("P3P4")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -952,7 +952,8 @@ static INPUT_PORTS_START( sango )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_START	/* DSW */
+
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -972,7 +973,7 @@ static INPUT_PORTS_START( sango )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -996,7 +997,7 @@ static INPUT_PORTS_START( sango )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "China" )
 	PORT_DIPSETTING(      0x0001, "Taiwan" )
@@ -1007,7 +1008,7 @@ static INPUT_PORTS_START( sango )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( olds )
-	PORT_START	/* DSW */
+	PORT_START_TAG("P1P2")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -1025,7 +1026,7 @@ static INPUT_PORTS_START( olds )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("P3P4")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -1042,7 +1043,8 @@ static INPUT_PORTS_START( olds )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_START	/* DSW */
+
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1062,7 +1064,7 @@ static INPUT_PORTS_START( olds )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1086,7 +1088,7 @@ static INPUT_PORTS_START( olds )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x000f, 0x0006, DEF_STR( Region ) )
 	// includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
 	PORT_DIPSETTING(      0x0001, "Taiwan" )
@@ -1098,7 +1100,7 @@ static INPUT_PORTS_START( olds )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( killbld )
-	PORT_START	/* DSW */
+	PORT_START_TAG("P1P2")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -1116,7 +1118,7 @@ static INPUT_PORTS_START( killbld )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("P3P4")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -1134,7 +1136,7 @@ static INPUT_PORTS_START( killbld )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1154,7 +1156,7 @@ static INPUT_PORTS_START( killbld )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1178,7 +1180,7 @@ static INPUT_PORTS_START( killbld )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x00ff, 0x0021, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0016, "Taiwan" )
 	PORT_DIPSETTING(      0x0017, "China" )
@@ -1195,7 +1197,7 @@ static INPUT_PORTS_START( killbld )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( photoy2k )
-	PORT_START	/* DSW */
+	PORT_START_TAG("P1P2")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -1213,7 +1215,7 @@ static INPUT_PORTS_START( photoy2k )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("P3P4")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -1230,7 +1232,8 @@ static INPUT_PORTS_START( photoy2k )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_START	/* DSW */
+
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1250,7 +1253,7 @@ static INPUT_PORTS_START( photoy2k )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1274,7 +1277,7 @@ static INPUT_PORTS_START( photoy2k )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x000f, 0x0003, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Taiwan" )
 	PORT_DIPSETTING(      0x0001, "China" )
@@ -1285,7 +1288,7 @@ static INPUT_PORTS_START( photoy2k )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ddp2 )
-	PORT_START	/* P1 */
+	PORT_START_TAG("P1P2")	/* P1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -1303,7 +1306,7 @@ static INPUT_PORTS_START( ddp2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* P2 */
+	PORT_START_TAG("P3P4")	/* P2 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -1321,7 +1324,7 @@ static INPUT_PORTS_START( ddp2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1341,7 +1344,7 @@ static INPUT_PORTS_START( ddp2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1366,7 +1369,7 @@ static INPUT_PORTS_START( ddp2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 /* probably not dsw related anyway
-    PORT_START
+    PORT_START_TAG("UNK0")
     PORT_DIPNAME( 0x0001, 0x0001, "4" )
     PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1416,7 +1419,7 @@ static INPUT_PORTS_START( ddp2 )
     PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-    PORT_START
+    PORT_START_TAG("UNK1")
     PORT_DIPNAME( 0x0001, 0x0001, "5" )
     PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1466,7 +1469,7 @@ static INPUT_PORTS_START( ddp2 )
     PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 */
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "China" )
 	PORT_DIPSETTING(      0x0001, "Taiwan" )
@@ -1638,11 +1641,11 @@ MACHINE_DRIVER_END
 /* This function expands the 32x32 5-bit data into a format which is easier to
    decode in MAME */
 
-static void expand_32x32x5bpp(void)
+static void expand_32x32x5bpp(running_machine *machine)
 {
-	UINT8 *src    = memory_region       ( REGION_GFX1 );
-	UINT8 *dst    = memory_region       ( REGION_GFX2 );
-	size_t  srcsize = memory_region_length( REGION_GFX1 );
+	UINT8 *src    = memory_region       ( machine, REGION_GFX1 );
+	UINT8 *dst    = memory_region       ( machine, REGION_GFX2 );
+	size_t  srcsize = memory_region_length( machine, REGION_GFX1 );
 	int cnt, pix;
 
 	for (cnt = 0; cnt < srcsize/5 ; cnt ++)
@@ -1664,10 +1667,10 @@ static void expand_32x32x5bpp(void)
 UINT8 *pgm_sprite_a_region;
 size_t	pgm_sprite_a_region_allocate;
 
-static void expand_colourdata(void)
+static void expand_colourdata(running_machine *machine)
 {
-	UINT8 *src    = memory_region       ( REGION_GFX3 );
-	size_t  srcsize = memory_region_length( REGION_GFX3 );
+	UINT8 *src    = memory_region       ( machine, REGION_GFX3 );
+	size_t  srcsize = memory_region_length( machine, REGION_GFX3 );
 	int cnt;
 	size_t	needed = srcsize / 2 * 3;
 
@@ -1691,25 +1694,25 @@ static void expand_colourdata(void)
 	}
 }
 
-static void pgm_basic_init(void)
+static void pgm_basic_init(running_machine *machine)
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&ROM[0x100000]);
 
-	expand_32x32x5bpp();
-	expand_colourdata();
+	expand_32x32x5bpp(machine);
+	expand_colourdata(machine);
 }
 
 static DRIVER_INIT( pgm )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 }
 
 /* Oriental Legend INIT */
 
 static DRIVER_INIT( orlegend )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_r, pgm_asic3_w);
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC04000, 0xC04001, 0, 0, pgm_asic3_reg_w);
@@ -1717,8 +1720,8 @@ static DRIVER_INIT( orlegend )
 
 static void drgwld2_common_init(running_machine *machine)
 {
-	pgm_basic_init();
-	pgm_dw2_decrypt();
+	pgm_basic_init(machine);
+	pgm_dw2_decrypt(machine);
 	/*
     Info from Elsemi
     Here is how to "bypass" the dw2 hang protection, it fixes the mode
@@ -1730,7 +1733,7 @@ static void drgwld2_common_init(running_machine *machine)
 
 static DRIVER_INIT( drgw2 )
 {	/* incomplete? */
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -1742,7 +1745,7 @@ static DRIVER_INIT( drgw2 )
 
 static DRIVER_INIT( drgw2c )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -1754,7 +1757,7 @@ static DRIVER_INIT( drgw2c )
 
 static DRIVER_INIT( drgw2j )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -1766,7 +1769,7 @@ static DRIVER_INIT( drgw2j )
 
 static DRIVER_INIT( kov )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
@@ -1774,26 +1777,26 @@ static DRIVER_INIT( kov )
       the protection device provides the region code */
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
- 	pgm_kov_decrypt();
+ 	pgm_kov_decrypt(machine);
 }
 
 static DRIVER_INIT( kov2 )
 {
-	pgm_basic_init();
-	pgm_kov2_decrypt();
+	pgm_basic_init(machine);
+	pgm_kov2_decrypt(machine);
 }
 
 static DRIVER_INIT( martmast )
 {
-	pgm_basic_init();
-	pgm_mm_decrypt();
+	pgm_basic_init(machine);
+	pgm_mm_decrypt(machine);
 }
 
 
 static DRIVER_INIT( pstar )
 {
-	pgm_basic_init();
- 	pgm_pstar_decrypt();
+	pgm_basic_init(machine);
+ 	pgm_pstar_decrypt(machine);
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4f0025, 0, 0, PSTARS_protram_r);
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, PSTARS_r16);
@@ -1804,7 +1807,7 @@ static DRIVER_INIT( pstar )
 
 static DRIVER_INIT( kovsh )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 //  memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
@@ -1812,12 +1815,12 @@ static DRIVER_INIT( kovsh )
       the protection device provides the region code */
 //  memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
- 	pgm_kovsh_decrypt();
+ 	pgm_kovsh_decrypt(machine);
 }
 
 static DRIVER_INIT( djlzz )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
@@ -1825,16 +1828,16 @@ static DRIVER_INIT( djlzz )
       the protection device provides the region code */
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
- 	pgm_djlzz_decrypt();
+ 	pgm_djlzz_decrypt(machine);
 }
 
 static DRIVER_INIT( dw3 )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 //  memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xda0000, 0xdaffff, 0, 0, dw3_prot_r, dw3_prot_w);
 
- 	pgm_dw3_decrypt();
+ 	pgm_dw3_decrypt(machine);
 }
 
 
@@ -1935,9 +1938,9 @@ static WRITE16_HANDLER( killbld_prot_w )
 						/* for now, cheat -- the scramble isn't understood, it might
                            be state based */
 						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(machine, REGION_USER2);
 						for (x=0;x<size;x++)
 						{
-							UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
 							UINT16 dat;
 
 							dat = RAMDUMP[dst+x];
@@ -1948,10 +1951,10 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 5 seems to be a straight copy */
 						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(machine, REGION_USER2);
+						UINT16 *PROTROM = (UINT16*)memory_region(machine, REGION_USER1);
 						for (x=0;x<size;x++)
 						{
-							UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
-							UINT16 *PROTROM = (UINT16*)memory_region(REGION_USER1);
 							UINT16 dat;
 							dat = PROTROM[src+x];
 
@@ -1965,10 +1968,10 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 6 seems to swap bytes and nibbles */
 						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(machine, REGION_USER2);
+						UINT16 *PROTROM = (UINT16*)memory_region(machine, REGION_USER1);
 						for (x=0;x<size;x++)
 						{
-							UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
-							UINT16 *PROTROM = (UINT16*)memory_region(REGION_USER1);
 							UINT16 dat;
 							dat = PROTROM[src+x];
 
@@ -2028,7 +2031,7 @@ static READ16_HANDLER( killbld_prot_r )
 		else if(kb_cmd==5)
 		{
 			UINT32 protvalue;
-			protvalue = 0x89911400|input_port_read_indexed(machine, 4); // region
+			protvalue = 0x89911400|input_port_read(machine, "Region");
 			res=(protvalue>>(8*(ptr-1)))&0xff;
 
 		}
@@ -2052,10 +2055,10 @@ static MACHINE_RESET( killbld )
 
 static DRIVER_INIT( killbld )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 
-	pgm_basic_init();
- 	pgm_killbld_decrypt();
+	pgm_basic_init(machine);
+ 	pgm_killbld_decrypt(machine);
 
 
 
@@ -2106,7 +2109,7 @@ static READ16_HANDLER(ddp2_protram_r)
 {
 	if (PGMLOGERROR) logerror("prot_r %04x, %04x\n", offset,ddp2_protram[offset]);
 
-	if (offset == 0x02/2) return input_port_read_indexed(machine, 4);
+	if (offset == 0x02/2) return input_port_read(machine, "Region");
 
 	if (offset == 0x1f00/2) return 0;
 
@@ -2124,7 +2127,7 @@ static WRITE16_HANDLER(ddp2_protram_w)
 
 static DRIVER_INIT( ddp2 )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	/* some kind of busy / counter */
 	/* the actual protection is an arm cpu with internal rom */
@@ -2142,9 +2145,9 @@ static DRIVER_INIT( puzzli2 )
      it uses an arm with no external rom
      an acts in a similar way to kov etc. */
 
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
@@ -2152,7 +2155,7 @@ static DRIVER_INIT( puzzli2 )
       the protection device provides the region code */
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
- 	pgm_puzzli2_decrypt();
+ 	pgm_puzzli2_decrypt(machine);
 
 	/* protection related? */
 	mem16[0x1548ec/2]=0x4e71;
@@ -2174,8 +2177,8 @@ static DRIVER_INIT( puzzli2 )
 
 static MACHINE_RESET( olds )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_USER2);
-//  UINT16 *mem16_a = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_USER2);
+//  UINT16 *mem16_a = (UINT16 *)memory_region(machine, REGION_CPU1);
 	int i;
 
 	MACHINE_RESET_CALL(pgm);
@@ -2201,22 +2204,22 @@ static UINT16 olds_bs,olds_cmd3;
 //UINT16 olds_r16(UINT32 addr)
 static READ16_HANDLER( olds_r16 )
 {
-//  int offset=addr&0xf;
+//  int offset = addr&0xf;
 	UINT16 res ;
-	res=0;
+	res = 0;
 
-	if(offset==1)
+	if(offset == 1)
 	{
-		if(kb_cmd==1)
-			res=reg&0x7f;
-		if(kb_cmd==2)
-			res=olds_bs|0x80;
-		if(kb_cmd==3)
-			res=olds_cmd3;
-		else if(kb_cmd==5)
+		if(kb_cmd == 1)
+			res = reg&0x7f;
+		if(kb_cmd == 2)
+			res = olds_bs|0x80;
+		if(kb_cmd == 3)
+			res = olds_cmd3;
+		else if(kb_cmd == 5)
 		{
-			UINT32 protvalue = 0x900000|input_port_read_indexed(machine, 4); // region from protection device.
-			res=(protvalue>>(8*(ptr-1)))&0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
+			UINT32 protvalue = 0x900000 | input_port_read(machine, "Region"); // region from protection device.
+			res = (protvalue>>(8 * (ptr-1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
 
 		}
 	}
@@ -2277,9 +2280,9 @@ static WRITE16_HANDLER( olds_w16 )
 
 static DRIVER_INIT( olds )
 {
-//  UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+//  UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xdcb400, 0xdcb403, 0, 0, olds_r16, olds_w16);
 

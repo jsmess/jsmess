@@ -37,7 +37,7 @@ WRITE8_HANDLER( momoko_bg_priority_w);
 
 static WRITE8_HANDLER( momoko_bg_read_bank_w )
 {
-	UINT8 *BG_MAP = memory_region(REGION_USER1);
+	UINT8 *BG_MAP = memory_region(machine, REGION_USER1);
 	int bank_address = (data & 0x1f) * 0x1000;
 	memory_set_bankptr(1, &BG_MAP[bank_address]);
 }
@@ -50,10 +50,10 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xd064, 0xd0ff) AM_READ(SMH_RAM) /* sprite ram */
 
-	AM_RANGE(0xd400, 0xd400) AM_READ(input_port_0_r)
-	AM_RANGE(0xd402, 0xd402) AM_READ(input_port_1_r)
-	AM_RANGE(0xd406, 0xd406) AM_READ(input_port_2_r)
-	AM_RANGE(0xd407, 0xd407) AM_READ(input_port_3_r)
+	AM_RANGE(0xd400, 0xd400) AM_READ_PORT("IN0")
+	AM_RANGE(0xd402, 0xd402) AM_READ_PORT("IN1")
+	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0")
+	AM_RANGE(0xd407, 0xd407) AM_READ_PORT("DSW1")
 
 	AM_RANGE(0xd800, 0xdbff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe3ff) AM_READ(SMH_RAM) /* text */

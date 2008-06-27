@@ -116,9 +116,7 @@
 #include "driver.h"
 #include "profiler.h"
 #include "deprecat.h"
-#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
-#endif
 
 
 /***************************************************************************
@@ -195,13 +193,8 @@ typedef enum _read_or_write read_or_write;
 
 #define SUBTABLE_PTR(tabledata, entry) (&(tabledata)->table[(1 << LEVEL1_BITS) + (((entry) - SUBTABLE_BASE) << LEVEL2_BITS)])
 
-#ifdef ENABLE_DEBUGGER
 #define DEBUG_HOOK_READ(spacenum,address,mem_mask) if (debug_hook_read) (*debug_hook_read)(spacenum,address,mem_mask)
 #define DEBUG_HOOK_WRITE(spacenum,address,data,mem_mask) if (debug_hook_write) (*debug_hook_write)(spacenum,address,data,mem_mask)
-#else
-#define DEBUG_HOOK_READ(spacenum,address,mem_mask)
-#define DEBUG_HOOK_WRITE(spacenum,address,data,mem_mask)
-#endif
 
 
 
@@ -326,10 +319,8 @@ static UINT8				log_unmap[ADDRESS_SPACES];		/* log unmapped memory accesses */
 static cpu_data				cpudata[MAX_CPU];				/* data gathered for each CPU */
 static bank_info 			bankdata[STATIC_COUNT];			/* data gathered for each bank */
 
-#ifdef ENABLE_DEBUGGER
 static debug_hook_read_func	debug_hook_read;				/* pointer to debugger callback for memory reads */
 static debug_hook_write_func debug_hook_write;				/* pointer to debugger callback for memory writes */
-#endif
 
 #define ACCESSOR_GROUP(type, width) \
 { \
@@ -579,15 +570,13 @@ void memory_set_context(int activecpu)
 
 	opbase_handler = cpudata[activecpu].opbase_handler;
 
-#ifdef ENABLE_DEBUGGER
-	if (activecpu != -1 && Machine->debug_mode)
-		debug_get_memory_hooks(activecpu, &debug_hook_read, &debug_hook_write);
+	if (activecpu != -1 && (Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_get_memory_hooks(activecpu, &debug_hook_read, &debug_hook_write);
 	else
 	{
 		debug_hook_read = NULL;
 		debug_hook_write = NULL;
 	}
-#endif
 }
 
 
@@ -1368,8 +1357,8 @@ static void memory_init_cpudata(const machine_config *config)
 		cpu_data *cpu = &cpudata[cpunum];
 
 		/* get pointers to the CPU's memory region */
-		cpu->region = memory_region(REGION_CPU1 + cpunum);
-		cpu->regionsize = memory_region_length(REGION_CPU1 + cpunum);
+		cpu->region = memory_region(Machine, REGION_CPU1 + cpunum);
+		cpu->regionsize = memory_region_length(Machine, REGION_CPU1 + cpunum);
 
 		/* initialize each address space, and build up a mask of spaces */
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
@@ -1417,10 +1406,10 @@ static void memory_init_cpudata(const machine_config *config)
 		}
 
 		/* set the RAM/ROM base */
-		cpu->opbase.ram = cpu->opbase.rom = memory_region(REGION_CPU1 + cpunum);
+		cpu->opbase.ram = cpu->opbase.rom = memory_region(Machine, REGION_CPU1 + cpunum);
 		cpu->opbase.mask = cpu->space[ADDRESS_SPACE_PROGRAM].bytemask;
 		cpu->opbase.mem_min = 0;
-		cpu->opbase.mem_max = memory_region_length(REGION_CPU1 + cpunum);
+		cpu->opbase.mem_max = memory_region_length(Machine, REGION_CPU1 + cpunum);
 		cpu->opbase.entry = STATIC_UNMAP;
 		cpu->opbase_handler = NULL;
 	}
@@ -1488,8 +1477,8 @@ static void memory_init_preflight(const machine_config *config)
 					/* validate adjusted addresses against implicit regions */
 					if (entry->region != 0 && entry->share == 0 && entry->baseptr == NULL)
 					{
-						UINT8 *base = memory_region(entry->region);
-						offs_t length = memory_region_length(entry->region);
+						UINT8 *base = memory_region(Machine, entry->region);
+						offs_t length = memory_region_length(Machine, entry->region);
 
 						/* validate the region */
 						if (base == NULL)
@@ -1500,7 +1489,7 @@ static void memory_init_preflight(const machine_config *config)
 
 					/* convert any region-relative entries to their memory pointers */
 					if (entry->region != 0)
-						entry->memory = memory_region(entry->region) + entry->region_offs;
+						entry->memory = memory_region(Machine, entry->region) + entry->region_offs;
 
 					/* assign static banks for explicitly specified entries */
 					if (HANDLER_IS_BANK(entry->read.generic))
@@ -2204,7 +2193,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 	{
 		if (handler != STATIC_INVALID &&
 			(handler < STATIC_BANK1 || handler > STATIC_BANK1 + MAX_BANKS - 1) &&
-			(handler != STATIC_ROM || spacenum != ADDRESS_SPACE_PROGRAM || entry->addrstart >= memory_region_length(REGION_CPU1 + cpunum)) &&
+			(handler != STATIC_ROM || spacenum != ADDRESS_SPACE_PROGRAM || entry->addrstart >= memory_region_length(Machine, REGION_CPU1 + cpunum)) &&
 			handler != STATIC_NOP &&
 			handler != STATIC_UNMAP)
 			return 1;
@@ -2325,8 +2314,8 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, o
 	/* register for saving, but only if we're not part of a memory region */
 	for (region = 0; region < MAX_MEMORY_REGIONS; region++)
 	{
-		UINT8 *region_base = memory_region(region);
-		UINT32 region_length = memory_region_length(region);
+		UINT8 *region_base = memory_region(Machine, region);
+		UINT32 region_length = memory_region_length(Machine, region);
 		if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (byteend - bytestart + 1)) < region_base + region_length)
 		{
 			VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));

@@ -138,8 +138,8 @@ static MC6845_UPDATE_ROW( comx35_update_row )
 	{
 		int bit;
 
-		UINT8 *charrom = memory_region(REGION_GFX1);
-		UINT8 code = memory_region(REGION_USER1)[((ma + column) & 0x7ff) + 0xd000];
+		UINT8 *charrom = memory_region(device->machine, REGION_GFX1);
+		UINT8 code = memory_region(device->machine, REGION_USER1)[((ma + column) & 0x7ff) + 0xd000];
 		UINT8 addr = (code << 4) | ra;
 		UINT8 data = charrom[addr & 0x7ff];
 

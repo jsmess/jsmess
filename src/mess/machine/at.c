@@ -123,8 +123,8 @@ static void at_set_keyb_int(int state) {
 
 static void init_at_common(running_machine *machine, const struct kbdc8042_interface *at8042)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_AT, at_set_keyb_int, at_set_irq_line);
-	mc146818_init(MC146818_STANDARD);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_AT, at_set_keyb_int, at_set_irq_line);
+	mc146818_init(machine, MC146818_STANDARD);
 	soundblaster_config(&soundblaster);
 	kbdc8042_init(at8042);
 
@@ -396,8 +396,8 @@ DRIVER_INIT( atega )
 	{
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
-	UINT8	*dst = memory_region( REGION_CPU1 ) + 0xc0000;
-	UINT8	*src = memory_region( REGION_USER1 ) + 0x3fff;
+	UINT8	*dst = memory_region(machine,  REGION_CPU1 ) + 0xc0000;
+	UINT8	*src = memory_region(machine,  REGION_USER1 ) + 0x3fff;
 	int		i;
 
 	init_at_common(machine, &at8042);

@@ -231,10 +231,10 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	switch (size)
 	{
 	case 0x0800: // 2K
-		image_fread(image, memory_region(REGION_CPU1) + 0x0000, 0x0800);
+		image_fread(image, memory_region(machine, REGION_CPU1) + 0x0000, 0x0800);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x0000);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x0000);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
 		memory_set_bankptr(2, mess_ram);
@@ -242,13 +242,13 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 		break;
 
 	case 0x1000: // 4K
-		image_fread(image, memory_region(REGION_CPU1) + 0x0000, 0x1000);
+		image_fread(image, memory_region(machine, REGION_CPU1) + 0x0000, 0x1000);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x0000);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x0000);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
-		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x0800);
+		memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0x0800);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, SMH_BANK7);
 		memory_set_bankptr(3, mess_ram);
@@ -256,16 +256,16 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 		break;
 
 	case 0x1800: // 6K
-		image_fread(image, memory_region(REGION_CPU1) + 0x0000, 0x15FF);
+		image_fread(image, memory_region(machine, REGION_CPU1) + 0x0000, 0x15FF);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x0000);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x0000);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
-		memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x0800);
+		memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0x0800);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x15FF, 0, 0, SMH_BANK7);
-		memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x1000);
+		memory_set_bankptr(3, memory_region(machine, REGION_CPU1) + 0x1000);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1BFF, 0, 0, SMH_BANK4); 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1BFF, 0, 0, SMH_BANK8);
 		memory_set_bankptr(4, mess_ram);

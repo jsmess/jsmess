@@ -769,7 +769,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( exidy )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xe000);
 }
 

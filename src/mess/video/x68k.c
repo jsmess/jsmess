@@ -890,13 +890,13 @@ VIDEO_START( x68000 )
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[gfx_index] = allocgfx(&x68k_pcg_8);
-	decodegfx(machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
+	decodegfx(machine->gfx[gfx_index] , memory_region(machine, REGION_USER1), 0, 256);
 	machine->gfx[gfx_index]->total_colors = 32;
 
 	gfx_index++;
 
 	machine->gfx[gfx_index] = allocgfx(&x68k_pcg_16);
-	decodegfx(machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
+	decodegfx(machine->gfx[gfx_index] , memory_region(machine, REGION_USER1), 0, 256);
 	machine->gfx[gfx_index]->total_colors = 32;
 
 	/* Tilemaps */
@@ -953,12 +953,12 @@ VIDEO_UPDATE( x68000 )
 	{
 		if(sys.video.tile16_dirty[x] != 0)
 		{
-			decodechar(screen->machine->gfx[1], x,memory_region(REGION_USER1));
+			decodechar(screen->machine->gfx[1], x,memory_region(screen->machine, REGION_USER1));
 			sys.video.tile16_dirty[x] = 0;
 		}
 		if(sys.video.tile8_dirty[x] != 0)
 		{
-			decodechar(screen->machine->gfx[0], x,memory_region(REGION_USER1));
+			decodechar(screen->machine->gfx[0], x,memory_region(screen->machine, REGION_USER1));
 			sys.video.tile8_dirty[x] = 0;
 		}
 	}

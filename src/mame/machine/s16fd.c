@@ -9,9 +9,10 @@ make more configurable (select caches per game?)
 */
 
 #include "driver.h"
-
+#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
+#include "includes/system16.h"
 
 
 #define CACHE_ENTRIES	8
@@ -28,7 +29,7 @@ static int fd1094_current_cacheposition; // current position in cache array
 static int fd1094_state;
 static int fd1094_selected_state;
 
-static void (*fd1094_set_decrypted)(UINT8 *);
+static void (*fd1094_set_decrypted)(running_machine *, UINT8 *);
 
 void *fd1094_get_decrypted_base(void)
 {
@@ -40,7 +41,7 @@ void *fd1094_get_decrypted_base(void)
 static void set_decrypted_region(void)
 {
 	if (fd1094_set_decrypted != NULL)
-		(*fd1094_set_decrypted)((UINT8 *)fd1094_userregion);
+		(*fd1094_set_decrypted)(Machine, (UINT8 *)fd1094_userregion);
 	else
 		memory_set_decrypted_region(0, 0, fd1094_cpuregionsize - 1, fd1094_userregion);
 }
@@ -169,7 +170,6 @@ static STATE_POSTLOAD( fd1094_postload )
 }
 
 
-#ifdef ENABLE_DEBUGGER
 static void key_changed(void)
 {
 	int addr;
@@ -190,17 +190,16 @@ static void key_changed(void)
 	/* flush the prefetch queue */
 	cpunum_set_info_int(0, CPUINFO_INT_REGISTER + M68K_PREF_ADDR, 0x0010);
 }
-#endif
 
 
 /* startup function, to be called from DRIVER_INIT (once on startup) */
-void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *))
+void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_machine *, UINT8 *))
 {
 	int i;
 
-	fd1094_cpuregion = (UINT16*)memory_region(REGION_CPU1);
-	fd1094_cpuregionsize = memory_region_length(REGION_CPU1);
-	fd1094_key = memory_region(REGION_USER1);
+	fd1094_cpuregion = (UINT16*)memory_region(machine, REGION_CPU1);
+	fd1094_cpuregionsize = memory_region_length(machine, REGION_CPU1);
+	fd1094_key = memory_region(machine, REGION_USER1);
 	fd1094_set_decrypted = set_decrypted;
 
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
@@ -215,14 +214,12 @@ void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *)
   	fd1094_current_cacheposition = 0;
 	fd1094_state = -1;
 
-#ifdef ENABLE_DEBUGGER
 	/* key debugging */
-	if (machine->debug_mode && memory_region(REGION_USER2) != NULL)
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0 && memory_region(machine, REGION_USER2) != NULL)
 	{
 		void fd1094_init_debugging(running_machine *, int, int, int, void (*changed)(void));
 		fd1094_init_debugging(machine, REGION_CPU1, REGION_USER1, REGION_USER2, key_changed);
 	}
-#endif
 
 	state_save_register_global(fd1094_selected_state);
 	state_save_register_global(fd1094_state);

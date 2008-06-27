@@ -74,8 +74,8 @@ static UINT8 protection_data[5];
 
 READ8_HANDLER( zwackery_port_2_r )
 {
-	int result = input_port_read_indexed(machine, 2);
-	int wheel = input_port_read_indexed(machine, 5);
+	int result = input_port_read(machine, "IN2");
+	int wheel = input_port_read(machine, "IN5");
 
 	return result | ((wheel >> 2) & 0x3e);
 }
@@ -135,9 +135,11 @@ static WRITE16_HANDLER( blasted_control_w )
 
 static READ16_HANDLER( spyhunt2_port_0_r )
 {
+	static const char *portnames[] = { "AN1", "AN2", "AN3", "AN4" };
 	int result = input_port_read(machine, "IN0");
 	int which = (control_word >> 3) & 3;
-	int analog = input_port_read_indexed(machine, 3 + which);
+	int analog = input_port_read(machine, portnames[which]);
+
 	return result | ((soundsgood_status_r(machine, 0) & 1) << 5) | (analog << 8);
 }
 
@@ -312,9 +314,9 @@ static ADDRESS_MAP_START( mcr68_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x090000, 0x09007f) AM_WRITE(mcr68_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0a0000, 0x0a000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
 	AM_RANGE(0x0b0000, 0x0bffff) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0d0000, 0x0dffff) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x0e0000, 0x0effff) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x0d0000, 0x0dffff) AM_READ_PORT("IN0")
+	AM_RANGE(0x0e0000, 0x0effff) AM_READ_PORT("IN1")
+	AM_RANGE(0x0f0000, 0x0fffff) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
 
@@ -361,7 +363,7 @@ static ADDRESS_MAP_START( pigskin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
-	AM_RANGE(0x1e0000, 0x1effff) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
 
@@ -377,7 +379,7 @@ static ADDRESS_MAP_START( trisport_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(trisport_port_1_r)
-	AM_RANGE(0x0a0000, 0x0affff) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x0a0000, 0x0affff) AM_READ_PORT("DSW")
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x120000, 0x12007f) AM_WRITE(mcr68_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
@@ -385,7 +387,7 @@ static ADDRESS_MAP_START( trisport_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x1e0000, 0x1effff) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
 
@@ -542,7 +544,7 @@ static INPUT_PORTS_START( spyhunt2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME ("P1 R Trigger")/* Right Trigger */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME ("P1 R Button")/* Right Button */
 
-	PORT_START_TAG("IN3")	/* dipswitches */
+	PORT_START_TAG("DSW")	/* dipswitches */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
@@ -607,7 +609,7 @@ static INPUT_PORTS_START( blasted )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
@@ -1366,9 +1368,9 @@ ROM_END
  *
  *************************************/
 
-static void mcr68_common_init(int sound_board, int clip, int xoffset)
+static void mcr68_common_init(running_machine *machine, int sound_board, int clip, int xoffset)
 {
-	mcr_sound_init(sound_board);
+	mcr_sound_init(machine, sound_board);
 
 	mcr68_sprite_clip = clip;
 	mcr68_sprite_xoffset = xoffset;
@@ -1379,7 +1381,7 @@ static void mcr68_common_init(int sound_board, int clip, int xoffset)
 
 static DRIVER_INIT( zwackery )
 {
-	mcr68_common_init(MCR_CHIP_SQUEAK_DELUXE, 0, 0);
+	mcr68_common_init(machine, MCR_CHIP_SQUEAK_DELUXE, 0, 0);
 
 	/* Zwackery doesn't care too much about this value; currently taken from Blasted */
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
@@ -1388,7 +1390,7 @@ static DRIVER_INIT( zwackery )
 
 static DRIVER_INIT( xenophob )
 {
-	mcr68_common_init(MCR_SOUNDS_GOOD, 0, -4);
+	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, -4);
 
 	/* Xenophobe doesn't care too much about this value; currently taken from Blasted */
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
@@ -1400,7 +1402,7 @@ static DRIVER_INIT( xenophob )
 
 static DRIVER_INIT( spyhunt2 )
 {
-	mcr68_common_init(MCR_TURBO_CHIP_SQUEAK | MCR_SOUNDS_GOOD, 0, -6);
+	mcr68_common_init(machine, MCR_TURBO_CHIP_SQUEAK | MCR_SOUNDS_GOOD, 0, -6);
 
 	/* Spy Hunter 2 doesn't care too much about this value; currently taken from Blasted */
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
@@ -1414,7 +1416,7 @@ static DRIVER_INIT( spyhunt2 )
 
 static DRIVER_INIT( blasted )
 {
-	mcr68_common_init(MCR_SOUNDS_GOOD, 0, 0);
+	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, 0);
 
 	/* Blasted checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 220-256 E clocks (i.e., 2200-2560 CPU clocks) */
@@ -1431,7 +1433,7 @@ static DRIVER_INIT( blasted )
 
 static DRIVER_INIT( archrivl )
 {
-	mcr68_common_init(MCR_WILLIAMS_SOUND, 16, 0);
+	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 16, 0);
 
 	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
@@ -1449,7 +1451,7 @@ static DRIVER_INIT( archrivl )
 
 static DRIVER_INIT( pigskin )
 {
-	mcr68_common_init(MCR_WILLIAMS_SOUND, 16, 0);
+	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 16, 0);
 
 	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * 115);
@@ -1460,7 +1462,7 @@ static DRIVER_INIT( pigskin )
 
 static DRIVER_INIT( trisport )
 {
-	mcr68_common_init(MCR_WILLIAMS_SOUND, 0, 0);
+	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 0, 0);
 
 	/* Tri-Sports checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 87-119 E clocks (i.e., 870-1190 CPU clocks) */

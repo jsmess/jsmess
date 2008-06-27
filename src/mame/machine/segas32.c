@@ -33,10 +33,10 @@ static const UINT8 ga2_v25_opcode_table[256] = {
 
 #undef xxxx
 
-static void nec_v25_cpu_decrypt(void)
+static void nec_v25_cpu_decrypt(running_machine *machine)
 {
 	int i;
-	UINT8 *rom = memory_region(REGION_CPU3);
+	UINT8 *rom = memory_region(machine, REGION_CPU3);
 	UINT8* decrypted = auto_malloc(0x100000);
 	UINT8* temp = malloc_or_die(0x100000);
 
@@ -63,9 +63,9 @@ static void nec_v25_cpu_decrypt(void)
 	free(temp);
 }
 
-void decrypt_ga2_protrom(void)
+void decrypt_ga2_protrom(running_machine *machine)
 {
-	nec_v25_cpu_decrypt();
+	nec_v25_cpu_decrypt(machine);
 }
 
 
@@ -133,8 +133,9 @@ WRITE16_HANDLER(sonic_level_load_protection)
 		}
 		else
 		{
-			level =  *((memory_region(REGION_CPU1) + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
-			level |= *((memory_region(REGION_CPU1) + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
+			const UINT8 *ROM = memory_region(machine, REGION_CPU1);
+			level =  *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
+			level |= *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
 		system32_workram[CURRENT_LEVEL / 2] = level;
 
@@ -183,7 +184,7 @@ WRITE16_HANDLER(brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	switch (offset)
 	{

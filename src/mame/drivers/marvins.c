@@ -132,7 +132,7 @@ static READ8_HANDLER( sound_nmi_ack_r )
 /* this input port has one of its bits mapped to sound CPU status */
 static READ8_HANDLER( marvins_port_0_r )
 {
-	return(input_port_read_indexed(machine, 0) | sound_cpu_busy);
+	return(input_port_read(machine, "IN0") | sound_cpu_busy);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -758,7 +758,7 @@ static DRIVER_INIT( madcrash )
     because of bit rot, so the rest of the test mode (what little there
     is) can be explored.
 
-    UINT8 *mem = memory_region(REGION_CPU1);
+    UINT8 *mem = memory_region(machine, REGION_CPU1);
     mem[0x3a5d] = 0; mem[0x3a5e] = 0; mem[0x3a5f] = 0;
 */
 	init_sound( 0x20 );

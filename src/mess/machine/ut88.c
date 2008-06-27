@@ -20,7 +20,7 @@ static int ut88_keyboard_mask;
 DRIVER_INIT(ut88)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = memory_region(REGION_CPU1);	
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);	
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
   	memory_configure_bank(1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
@@ -103,8 +103,8 @@ READ8_HANDLER( ut88_tape_r )
 READ8_HANDLER( ut88mini_keyboard_r )
 {
 	// This is real keyboard implementation
-	UINT8 *keyrom1 = memory_region(REGION_CPU1)+ 0x10000;
-	UINT8 *keyrom2 = memory_region(REGION_CPU1)+ 0x10100;
+	UINT8 *keyrom1 = memory_region(machine, REGION_CPU1)+ 0x10000;
+	UINT8 *keyrom2 = memory_region(machine, REGION_CPU1)+ 0x10100;
 	
 	UINT8 key = keyrom2[input_port_read(machine, "LINE1")];
 	// if keyboard 2nd part returned 0 on 4th bit output from 

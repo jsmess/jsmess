@@ -470,7 +470,7 @@ void amstrad_setLowerRom(running_machine *machine)
 	if(amstrad_system_type == SYSTEM_CPC)
 	{
 		if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<2)) == 0) {
-			BankBase = &memory_region(REGION_CPU1)[0x010000];
+			BankBase = &memory_region(machine, REGION_CPU1)[0x010000];
 		} else 
 		{
 			if(aleste_mode & 0x04)
@@ -506,7 +506,7 @@ void amstrad_setLowerRom(running_machine *machine)
 		if(amstrad_plus_lower_enabled == 1)
 		{  // ASIC secondary lower ROM selection (bit 5: 1 = enabled)
 //          logerror("L-ROM: Lower ROM enabled, cart bank %i\n",amstrad_plus_lower);
-			BankBase = &memory_region(REGION_CPU1)[0x4000 * amstrad_plus_lower];
+			BankBase = &memory_region(machine, REGION_CPU1)[0x4000 * amstrad_plus_lower];
 			if(BankBase != NULL)
 			{
 				switch(amstrad_plus_lower_addr)
@@ -1655,7 +1655,7 @@ static void multiface_rethink_memory(running_machine *machine)
 	if (!multiface_hardware_enabled(machine))
 		return;
 
-	multiface_rom = &memory_region(REGION_CPU1)[0x01C000];
+	multiface_rom = &memory_region(machine, REGION_CPU1)[0x01C000];
 
 	if (
 		((multiface_flags & MULTIFACE_RAM_ROM_ENABLED)!=0) &&
@@ -2080,10 +2080,10 @@ static MACHINE_RESET( amstrad )
 
 	for (i=0; i<256; i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[0x014000];
+		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x014000];
 	}
 
-	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0x018000];
+	Amstrad_ROM_Table[7] = &memory_region(machine, REGION_CPU1)[0x018000];
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 	amstrad_init_palette(machine);
@@ -2100,13 +2100,13 @@ static MACHINE_RESET( plus )
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
-		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[0x4000];  // BASIC in system cart
+		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x4000];  // BASIC in system cart
 	}
 	for(i=128;i<160;i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[(i-128)*0x4000];
+		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[(i-128)*0x4000];
 	}
-	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0xc000];  // AMSDOS in system cart
+	Amstrad_ROM_Table[7] = &memory_region(machine, REGION_CPU1)[0xc000];  // AMSDOS in system cart
 
 	amstrad_plus_lower = 0;  // cart bank 0
 	amstrad_plus_lower_addr = 0;  // at 0x0000, reg page disabled by default
@@ -2138,7 +2138,7 @@ static MACHINE_RESET( plus )
 
 static MACHINE_START( plus )
 {
-	amstrad_plus_asic_ram = memory_region(REGION_USER1);  // 16kB RAM for ASIC, memory-mapped registers.
+	amstrad_plus_asic_ram = memory_region(machine, REGION_USER1);  // 16kB RAM for ASIC, memory-mapped registers.
 }
 
 static MACHINE_RESET( gx4000 )
@@ -2149,13 +2149,13 @@ static MACHINE_RESET( gx4000 )
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
-		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[0x4000];
+		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x4000];
 	}
 	for(i=128;i<160;i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[(i-128)*0x4000];
+		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[(i-128)*0x4000];
 	}
-	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0xc000];
+	Amstrad_ROM_Table[7] = &memory_region(machine, REGION_CPU1)[0xc000];
 
 	amstrad_plus_lower = 0;  // cart bank 0
 	amstrad_plus_lower_addr = 0;  // at 0x0000, reg page disabled by default
@@ -2193,7 +2193,7 @@ static MACHINE_RESET( kccomp )
 
 	for (i=0; i<256; i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[0x014000];
+		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x014000];
 	}
 
 	amstrad_common_init(machine);
@@ -2210,7 +2210,7 @@ static MACHINE_RESET( kccomp )
 
 static DRIVER_INIT( aleste )
 {
-	mc146818_init(MC146818_IGNORE_CENTURY);
+	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }
 
 static MACHINE_RESET( aleste )
@@ -2221,11 +2221,11 @@ static MACHINE_RESET( aleste )
 
 	for (i=0; i<256; i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[0x014000];
+		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x014000];
 	}
 
-	Amstrad_ROM_Table[3] = &memory_region(REGION_CPU1)[0x01c000];  // MSX-DOS / BIOS
-	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0x018000];  // AMSDOS
+	Amstrad_ROM_Table[3] = &memory_region(machine, REGION_CPU1)[0x01c000];  // MSX-DOS / BIOS
+	Amstrad_ROM_Table[7] = &memory_region(machine, REGION_CPU1)[0x018000];  // AMSDOS
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 

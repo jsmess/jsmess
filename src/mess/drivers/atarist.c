@@ -62,7 +62,7 @@ static struct FDC
 
 static void atarist_fdc_dma_transfer(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	if ((fdc.mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
 	{
@@ -486,7 +486,7 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 
 		for (i = 0; i < 8; i++)
 		{
-			dmasound.fifo[i] = memory_region(REGION_CPU1)[dmasound.cntr];
+			dmasound.fifo[i] = memory_region(machine, REGION_CPU1)[dmasound.cntr];
 			dmasound.cntr++;
 			dmasound.samples++;
 
@@ -1431,15 +1431,15 @@ static void atarist_configure_memory(running_machine *machine)
 		break;
 	}
 
-	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x000008, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0x000008, 0);
 	memory_set_bank(1, 0);
 
-	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x200000, 0);
+	memory_configure_bank(2, 0, 1, memory_region(machine, REGION_CPU1) + 0x200000, 0);
 	memory_set_bank(2, 0);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
-	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0xfa0000, 0);
+	memory_configure_bank(3, 0, 1, memory_region(machine, REGION_CPU1) + 0xfa0000, 0);
 	memory_set_bank(3, 0);
 }
 
@@ -1597,15 +1597,15 @@ static void stbook_configure_memory(running_machine *machine)
 		break;
 	}
 
-	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x000008, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0x000008, 0);
 	memory_set_bank(1, 0);
 
-	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x200000, 0);
+	memory_configure_bank(2, 0, 1, memory_region(machine, REGION_CPU1) + 0x200000, 0);
 	memory_set_bank(2, 0);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
-	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0xfa0000, 0);
+	memory_configure_bank(3, 0, 1, memory_region(machine, REGION_CPU1) + 0xfa0000, 0);
 	memory_set_bank(3, 0);
 }
 
@@ -2093,7 +2093,7 @@ static void megaste_serial_getinfo(const mess_device_class *devclass, UINT32 sta
 
 static DEVICE_IMAGE_LOAD( atarist_cart )
 {
-	UINT8 *ptr = ((UINT8 *)memory_region(REGION_CPU1)) + 0xfa0000;
+	UINT8 *ptr = ((UINT8 *)memory_region(image->machine, REGION_CPU1)) + 0xfa0000;
 	int	filesize = image_length(image);
 
 	if (filesize <= 128 * 1024)

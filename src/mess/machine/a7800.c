@@ -76,18 +76,18 @@ static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 {
 	if (ispal)
 	{
-		r6532_config(0, &r6532_interface_pal),
+		r6532_config(machine, 0, &r6532_interface_pal),
 		r6532_set_clock(0, 3546894/3);
-		r6532_reset(0);
+		r6532_reset(machine, 0);
 	}
 	else
 	{
-		r6532_config(0, &r6532_interface),
+		r6532_config(machine, 0, &r6532_interface),
 		r6532_set_clock(0, 3579545/3);
-		r6532_reset(0);
+		r6532_reset(machine, 0);
 	}
 
-	ROM = memory_region(REGION_CPU1);
+	ROM = memory_region(machine, REGION_CPU1);
 	a7800_ispal = ispal;
 	a7800_lines = lines;
 
@@ -99,10 +99,10 @@ static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 	/* Brutal hack put in as a consequence of new memory system; fix this */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
-	memory_set_bankptr(10, memory_region(REGION_CPU1) + 0x0480);
+	memory_set_bankptr(10, memory_region(machine, REGION_CPU1) + 0x0480);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
-	memory_set_bankptr(11, memory_region(REGION_CPU1) + 0x1800);
+	memory_set_bankptr(11, memory_region(machine, REGION_CPU1) + 0x1800);
 }
 
 
@@ -130,7 +130,7 @@ MACHINE_RESET( a7800 )
 	maria_flag = 0;
 
 	/* set banks to default states */
-	memory = memory_region(REGION_CPU1);
+	memory = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr( 1, memory + 0x4000 );
 	memory_set_bankptr( 2, memory + 0x8000 );
 	memory_set_bankptr( 3, memory + 0xA000 );
@@ -212,7 +212,7 @@ DEVICE_START( a7800_cart )
 {
 	UINT8	*memory;
 
-	memory = memory_region(REGION_CPU1);
+	memory = memory_region(device->machine, REGION_CPU1);
 	a7800_bios_bkup = NULL;
 	a7800_cart_bkup = NULL;
 
@@ -234,7 +234,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 	unsigned char header[128];
 	UINT8 *memory;
 
-	memory = memory_region(REGION_CPU1);
+	memory = memory_region(image->machine, REGION_CPU1);
 
 	/* Load and decode the header */
 	image_fread( image, header, 128 );
@@ -434,8 +434,8 @@ WRITE8_HANDLER( a7800_cart_w )
 		{
 			data &= 0x07;
 		}
-		memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x10000 + (data << 14));
-		memory_set_bankptr(3,memory_region(REGION_CPU1) + 0x12000 + (data << 14));
+		memory_set_bankptr(2,memory_region(machine, REGION_CPU1) + 0x10000 + (data << 14));
+		memory_set_bankptr(3,memory_region(machine, REGION_CPU1) + 0x12000 + (data << 14));
 	/*	logerror("BANK SEL: %d\n",data); */
 	}
 	else if(( a7800_cart_type == MBANK_TYPE_ABSOLUTE ) &&( offset == 0x4000 ) )
@@ -444,11 +444,11 @@ WRITE8_HANDLER( a7800_cart_w )
 		/*logerror( "F18 BANK SEL: %d\n", data );*/
 		if( data & 1 )
 		{
-			memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x10000 );
+			memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x10000 );
 		}
 		else if( data & 2 )
 		{
-			memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x14000 );
+			memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x14000 );
 		}
 	}
 	else if(( a7800_cart_type == MBANK_TYPE_ACTIVISION ) &&( offset >= 0xBF80 ) )
@@ -458,8 +458,8 @@ WRITE8_HANDLER( a7800_cart_w )
 
 		/*logerror( "Activision BANK SEL: %d\n", data );*/
 
-		memory_set_bankptr( 3, memory_region( REGION_CPU1 ) + 0x10000 + ( data << 14 ) );
-		memory_set_bankptr( 4, memory_region( REGION_CPU1 ) + 0x12000 + ( data << 14 ) );
+		memory_set_bankptr( 3, memory_region(machine,  REGION_CPU1 ) + 0x10000 + ( data << 14 ) );
+		memory_set_bankptr( 4, memory_region(machine,  REGION_CPU1 ) + 0x12000 + ( data << 14 ) );
 	}
 }
 

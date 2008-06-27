@@ -24,12 +24,9 @@ int osd_keyboard_disabled(void)
 	return 0;
 }
 
-#ifdef ENABLE_DEBUGGER
 void osd_wait_for_debugger(void)
 {
-	debug_cpu_go(~0);
 }
-#endif // ENABLE_DEBUGGER
 
 void osd_break_into_debugger(const char *message)
 {

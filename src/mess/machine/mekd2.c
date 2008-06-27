@@ -486,8 +486,8 @@ DRIVER_INIT( mekd2 )
 		".bbbbbbbbbbbbbbbbbbbbbb." \
 		"........................"};
 
-	dst = memory_region(REGION_GFX1);
-	memset(dst, 0, memory_region_length(REGION_GFX1));
+	dst = memory_region(machine, REGION_GFX1);
+	memset(dst, 0, memory_region_length(machine, REGION_GFX1));
 	for (i = 0; i < 128; i++)
 	{
 		for (y = 0; y < 24; y++)
@@ -532,8 +532,8 @@ DRIVER_INIT( mekd2 )
 		}
 	}
 
-	dst = memory_region(REGION_GFX2);
-	memset(dst, 0, memory_region_length(REGION_GFX2));
+	dst = memory_region(machine, REGION_GFX2);
+	memset(dst, 0, memory_region_length(machine, REGION_GFX2));
 	for (i = 0; (i < 24)&&(keys[i]); i++) // only 23 keys inited!
 	{
 		for (y = 0; y < 18; y++)
@@ -564,7 +564,7 @@ DEVICE_IMAGE_LOAD( mekd2_cart )
 	const char magic[] = "MEK6800D2";
 	char buff[9];
 	UINT16 addr, size;
-	UINT8 ident, *RAM = memory_region(REGION_CPU1);
+	UINT8 ident, *RAM = memory_region(image->machine, REGION_CPU1);
 
 	image_fread(image, buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))

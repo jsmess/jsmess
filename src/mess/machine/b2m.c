@@ -73,7 +73,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_set_bankptr(2, mess_ram + 0x2800);
 						memory_set_bankptr(3, mess_ram + 0x3000);
 						memory_set_bankptr(4, mess_ram + 0x7000);
-						memory_set_bankptr(5, memory_region(REGION_CPU1) + 0x10000);						
+						memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0x10000);						
 						break;
 /*		case 1 :
 						memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x6fff, 0, 0, SMH_UNMAP);
@@ -81,9 +81,9 @@ static void b2m_set_bank(running_machine *machine,int bank)
 
 						memory_set_bankptr(1, mess_ram);
 						memory_set_bankptr(2, mess_ram + 0x2800);
-						memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x12000);
-						memory_set_bankptr(4, memory_region(REGION_CPU1) + 0x16000);
-						memory_set_bankptr(5, memory_region(REGION_CPU1) + 0x10000);						
+						memory_set_bankptr(3, memory_region(machine, REGION_CPU1) + 0x12000);
+						memory_set_bankptr(4, memory_region(machine, REGION_CPU1) + 0x16000);
+						memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0x10000);						
 						break;*/
 		case 2 :
 						memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);			
@@ -93,7 +93,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_install_read8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);			
 						memory_set_bankptr(3, mess_ram + 0x10000);
 						memory_set_bankptr(4, mess_ram + 0x7000);
-						memory_set_bankptr(5, memory_region(REGION_CPU1) + 0x10000);						
+						memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0x10000);						
 						break;
 		case 3 :
 						memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);			
@@ -103,7 +103,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_install_read8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);			
 						memory_set_bankptr(3, mess_ram + 0x14000);
 						memory_set_bankptr(4, mess_ram + 0x7000);
-						memory_set_bankptr(5, memory_region(REGION_CPU1) + 0x10000);						
+						memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0x10000);						
 						break;
 		case 4 :
 						memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);			
@@ -113,7 +113,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_install_read8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);			
 						memory_set_bankptr(3, mess_ram + 0x18000);
 						memory_set_bankptr(4, mess_ram + 0x7000);
-						memory_set_bankptr(5, memory_region(REGION_CPU1) + 0x10000);						
+						memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0x10000);						
 					
 						break;
 		case 5 :
@@ -124,7 +124,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_install_read8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);			
 						memory_set_bankptr(3, mess_ram + 0x1c000);
 						memory_set_bankptr(4, mess_ram + 0x7000);
-						memory_set_bankptr(5, memory_region(REGION_CPU1) + 0x10000);						
+						memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0x10000);						
 					
 						break;
 		case 6 :
@@ -141,11 +141,11 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x7000, 0xdfff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 						
-						memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000);	
-						memory_set_bankptr(2, memory_region(REGION_CPU1) + 0x10000);	
-						memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x10000);	
-						memory_set_bankptr(4, memory_region(REGION_CPU1) + 0x10000);	
-						memory_set_bankptr(5, memory_region(REGION_CPU1) + 0x10000);						
+						memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000);	
+						memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0x10000);	
+						memory_set_bankptr(3, memory_region(machine, REGION_CPU1) + 0x10000);	
+						memory_set_bankptr(4, memory_region(machine, REGION_CPU1) + 0x10000);	
+						memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0x10000);						
 						break;
 	}
 }
@@ -267,7 +267,7 @@ const ppi8255_interface b2m_ppi8255_interface_2 =
 
 static READ8_HANDLER (b2m_romdisk_porta_r )
 {
-	UINT8 *romdisk = memory_region(REGION_CPU1) + 0x12000;		
+	UINT8 *romdisk = memory_region(machine, REGION_CPU1) + 0x12000;		
 	return romdisk[b2m_romdisk_msb*256+b2m_romdisk_lsb];	
 }
 

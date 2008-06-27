@@ -92,7 +92,7 @@ static CDP1869_CHAR_RAM_READ(tmc600_charram_r)
 	UINT8 column = pageram[pageaddr];
 	UINT8 color = tmc600_get_color(pageaddr);
 	UINT16 charaddr = ((cma & 0x08) << 8) | (column << 3) | (cma & 0x07);
-	UINT8 *charrom = memory_region(REGION_GFX1);
+	UINT8 *charrom = memory_region(device->machine, REGION_GFX1);
 	UINT8 cdb = charrom[charaddr] & 0x3f;
 
 	int ccb0 = BIT(color, 2);

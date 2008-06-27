@@ -371,7 +371,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( tmc600 )
 {
-	image_fread(image, memory_region(REGION_CPU1) + 0x6300, 0x9500);
+	image_fread(image, memory_region(image->machine, REGION_CPU1) + 0x6300, 0x9500);
 
 	return INIT_PASS;
 }

@@ -15,7 +15,7 @@ I8275_DISPLAY_PIXELS(radio86_display_pixels)
 {
 	int i;
 	bitmap_t *bitmap = tmpbitmap;
-	UINT8 *charmap = memory_region(REGION_GFX1);
+	UINT8 *charmap = memory_region(device->machine, REGION_GFX1);
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;
