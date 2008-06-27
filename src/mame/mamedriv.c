@@ -7205,6 +7205,7 @@ Other Sun games
 	DRIVER( mjelctrn )	/* "???" Mahjong Electron Base parts 2 & 4 */
 	DRIVER( mjelct3 )	/* "???" Mahjong Electron Base parts 2 & 3 */
 	DRIVER( mjelct3a )	/* "???" Mahjong Electron Base parts 2 & 3 */
+	DRIVER( mjelctrb )	/* (c) 1993 Dynax Mahjong Electron Base parts  4 */
 	DRIVER( majxtal7 )	/* "???" */
 
 	/* Sigma games */
@@ -7677,8 +7678,8 @@ Other Sun games
 	DRIVER( fitfight )	/* bootleg of Art of Fighting */
 	DRIVER( histryma )	/* bootleg of Fighter's History */
 	DRIVER( bbprot )	/* unfinished prototype */
-	DRIVER( flower )	/* (c) 1986 Komax */
-	DRIVER( flowerbl )	/* bootleg but (c) 1986 Sega/Alpha */
+	DRIVER( flower )	/* (c) 1986 Sega/Alpha */
+	DRIVER( flowerk )	/* (c) 1986 Komax */
 	DRIVER( beaminv )	/* Tekunon Kougyou */
 	DRIVER( beaminva )	/* Tekunon Kougyou */
 	DRIVER( mcatadv )	/* (c) 1993 Wintechno */
