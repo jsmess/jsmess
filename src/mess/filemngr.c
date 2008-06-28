@@ -443,18 +443,6 @@ static osd_directory_entry *alloc_directory_entry(const char *name, osd_dir_entr
 
 
 /*-------------------------------------------------
-    dupe_directory_entry - duplicates a struct
-	of type osd_directory_entry
--------------------------------------------------*/
-
-static osd_directory_entry *dupe_directory_entry(const osd_directory_entry *entry)
-{
-	return alloc_directory_entry(entry->name, entry->type, entry->size);
-}
-
-
-
-/*-------------------------------------------------
     file_selector_render_extra - perform our
     special rendering
 -------------------------------------------------*/
@@ -467,17 +455,53 @@ static void file_selector_render_extra(const menu_extra *extra, float origx1, fl
 
 
 /*-------------------------------------------------
+    append_menu_item - appends a single menu item
+-------------------------------------------------*/
+
+static void append_menu_item(ui_menu_item **item_list, int *menu_items,
+	const char *text, const char *subtext,
+	const char *dirent_name, osd_dir_entry_type dirent_type, UINT64 dirent_size)
+{
+	int realloc_increment = 64;
+	int new_item_count;
+	ui_menu_item *new_item_list;
+	osd_directory_entry *new_dirent = NULL;
+
+	new_item_count = *menu_items - (*menu_items % realloc_increment) + realloc_increment;
+	new_item_list = realloc(*item_list, sizeof(**item_list) * new_item_count);
+	assert_always(new_item_list != NULL, "Out of memory");
+
+	*item_list = new_item_list;
+
+	if (dirent_size != ~0)
+	{
+		new_dirent = alloc_directory_entry(dirent_name, dirent_type, dirent_size);
+
+		/* silly hack */
+		if (text == dirent_name)
+			text = new_dirent->name;
+	}
+
+	memset(&new_item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
+	new_item_list[*menu_items].text = text;
+	new_item_list[*menu_items].subtext = subtext;
+	new_item_list[*menu_items].ref = new_dirent;
+	(*menu_items)++;
+}
+
+
+
+/*-------------------------------------------------
     build_file_selector_menu_items - creates and
 	allocates all menu items for a directory
 -------------------------------------------------*/
 
 static file_error build_file_selector_menu_items(const device_config *device, const char *path,
-	ui_menu_item *item_list, size_t item_list_length, int *menu_items, int *selected)
+	ui_menu_item **item_list, int *menu_items, int *selected)
 {
 	zippath_directory *directory = NULL;
 	file_error err = FILERR_NONE;
 	const osd_directory_entry *dirent;
-	osd_directory_entry *dirent_dupe;
 	const char *subtext;
 	int count, i;
 	image_device_info info;
@@ -492,39 +516,30 @@ static file_error build_file_selector_menu_items(const device_config *device, co
 		goto done;
 
 	/* add the "[empty slot]" entry */
-	memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
-	item_list[*menu_items].text = SLOT_EMPTY;
-	item_list[*menu_items].ref = alloc_directory_entry(NULL, ENTTYPE_FILE, 0);
-	(*menu_items)++;
+	append_menu_item(item_list, menu_items, SLOT_EMPTY, NULL, NULL, ENTTYPE_FILE, 0);
 
 	info = image_device_getinfo(device->machine->config, device);
 	if (info.creatable && !zippath_is_zip(directory))
 	{
 		/* add the "[create]" entry */
-		memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
-		item_list[*menu_items].text = SLOT_CREATE;
-		item_list[*menu_items].ref = alloc_directory_entry(NULL, ENTTYPE_FILE, 0);
-		(*menu_items)++;
+		append_menu_item(item_list, menu_items, SLOT_CREATE, NULL, NULL, ENTTYPE_FILE, 0);
 	}
 
 	/* add the drives */
 	count = osd_num_devices();
 	for (i = 0; i < count; i++)
 	{
-		memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
-		item_list[*menu_items].text = osd_get_device_name(i);
-		item_list[*menu_items].subtext = "[DRIVE]";
-		item_list[*menu_items].ref = alloc_directory_entry(item_list[*menu_items].text, ENTTYPE_DIR, 0);
-		(*menu_items)++;
+		append_menu_item(item_list, menu_items,
+			osd_get_device_name(i),
+			"[DRIVE]",
+			osd_get_device_name(i),
+			ENTTYPE_DIR,
+			0);
 	}
 
 	/* build the menu for each item */
 	while((dirent = zippath_readdir(directory)) != NULL)
 	{
-		/* if there are too many entries... */
-		if (*menu_items >= item_list_length - 10)
-			break;
-
 		/* set the selected item to be the first non-parent directory or file */
 		if ((*selected == 0) && strcmp(dirent->name, ".."))
 			*selected = *menu_items;
@@ -543,25 +558,16 @@ static file_error build_file_selector_menu_items(const device_config *device, co
 				break;
 		}
 
-		/* dupe the menu item */
-		dirent_dupe = dupe_directory_entry(dirent);
-
 		/* do we have to select this file? */
-		if (!mame_stricmp(astring_c(current_file), dirent_dupe->name))
+		if (!mame_stricmp(astring_c(current_file), dirent->name))
 			*selected = *menu_items;
 
 		/* record the menu item */
-		memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
-		item_list[*menu_items].text = dirent_dupe->name;
-		item_list[*menu_items].subtext = subtext;
-		item_list[*menu_items].ref = dirent_dupe;
-		(*menu_items)++;
+		append_menu_item(item_list, menu_items, dirent->name, subtext, dirent->name, dirent->type, dirent->size);
 	}
 
 	/* add an item for the return */
-	memset(&item_list[*menu_items], 0, sizeof(item_list[*menu_items]));
-	item_list[*menu_items].text = "Return to Prior Menu";
-	(*menu_items)++;
+	append_menu_item(item_list, menu_items, "Return to Prior Menu", NULL, NULL, 0, ~0);
 
 done:
 	if (directory != NULL)
@@ -589,7 +595,7 @@ static file_error check_path(const char *path)
 
 static UINT32 menu_file_selector(running_machine *machine, UINT32 state)
 {
-	static ui_menu_item item_list[200];
+	static ui_menu_item *item_list;
 	static int menu_items;
 
 	file_error err;
@@ -609,7 +615,7 @@ static UINT32 menu_file_selector(running_machine *machine, UINT32 state)
 	if (!menu_is_built)
 	{
 		err = build_file_selector_menu_items(selected_device, astring_c(current_directory),
-			item_list, ARRAY_LENGTH(item_list), &menu_items, &selected);
+			&item_list, &menu_items, &selected);
 		if (err != FILERR_NONE)
 		{
 			/* if we error here, we must pop out */
@@ -699,7 +705,7 @@ static UINT32 menu_file_selector(running_machine *machine, UINT32 state)
 	fs_state.s.menu_is_built = menu_is_built;
 
 done:
-	if (!menu_is_built)
+	if (!menu_is_built && (item_list != NULL))
 	{
 		/* time to tear down the menus */
 		for (i = 0; i < menu_items; i++)
@@ -710,6 +716,8 @@ done:
 				item_list[i].ref = NULL;
 			}
 		}
+		free(item_list);
+		item_list = NULL;
 	}
 
 	return fs_state.i;
