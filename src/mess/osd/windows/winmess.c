@@ -109,10 +109,20 @@ osd_directory_entry *osd_stat(const char *path)
 	if (t_path == NULL)
 		goto done;
 
-	// attempt to find the first file
-	find = FindFirstFile(t_path, &find_data);
-	if (find == INVALID_HANDLE_VALUE)
-		goto done;
+	// is this path a root directory (e.g. - C:)?
+	if (isalpha(path[0]) && (path[1] == ':') && (path[2] == '\0'))
+	{
+		// need to do special logic for root directories
+		memset(&find_data, 0, sizeof(find_data));
+		find_data.dwFileAttributes = GetFileAttributes(t_path);
+	}
+	else
+	{
+		// attempt to find the first file
+		find = FindFirstFile(t_path, &find_data);
+		if (find == INVALID_HANDLE_VALUE)
+			goto done;
+	}
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
@@ -125,7 +135,7 @@ osd_directory_entry *osd_stat(const char *path)
 	result->size = find_data.nFileSizeLow | ((UINT64) find_data.nFileSizeHigh << 32);
 
 done:
-	if (t_path)
+	if (t_path != NULL)
 		free(t_path);
 	return result;
 }
