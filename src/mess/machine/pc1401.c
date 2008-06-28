@@ -249,11 +249,12 @@ DRIVER_INIT( pc1401 )
 
 	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1401_power_up);
 
-	if ((input_port_read(machine, "DSW0") & 0xc0) == 0x80)
+	/* NPW 28-Jun-2006 - Input ports can't be read at init time! Even then, this should use mess_ram */
+	if (0 && (input_port_read(machine, "DSW0") & 0xc0) == 0x80)
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_RAM);
 	}
-	else if ((input_port_read(machine, "DSW0") & 0xc0) == 0x40)
+	else if (0 && (input_port_read(machine, "DSW0") & 0xc0) == 0x40)
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x37ff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0x3800, 0x3fff, 0, 0, SMH_RAM);

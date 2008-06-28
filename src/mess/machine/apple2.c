@@ -1323,5 +1323,5 @@ MACHINE_START( apple2 )
 int apple2_pressed_specialkey(running_machine *machine, UINT8 key)
 {
 	return (input_port_read(machine, "keyb_special") & key)
-		|| (input_port_read(machine, "joystick_buttons") & key);
+		|| (input_port_read_safe(machine, "joystick_buttons", 0x00) & key);
 }

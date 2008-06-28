@@ -182,7 +182,8 @@ DRIVER_INIT( pc1403 )
 	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
 
 	memory_set_bankptr(1, memory_region(machine, REGION_USER1));
-	if ((input_port_read(machine, "DSW0") & 0x80) == 0x80)
+	/* NPW 28-Jun-2006 - Input ports can't be read at init time! Even then, this should use mess_ram */
+	if (0 && (input_port_read(machine, "DSW0") & 0x80) == 0x80)
 	{
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_RAM);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xdfff, 0, 0, SMH_RAM);
