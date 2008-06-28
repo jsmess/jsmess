@@ -502,7 +502,7 @@ static floperr_t apple35_read_sector_td(floppy_image *floppy, int head, int trac
 static floperr_t apple35_write_sector_td(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen)
 {
 	floperr_t err;
-	UINT32 tag_offset;
+	UINT32 tag_offset = 0;
 
 	assert(buflen == 524);
 
