@@ -128,6 +128,9 @@ enum
 	ID_1_BYTE_CHUNKS,
 	ID_2_BYTE_CHUNKS,
 	ID_4_BYTE_CHUNKS,
+	ID_8_BYTE_CHUNKS,
+	ID_LOGICAL_ADDRESSES,
+	ID_PHYSICAL_ADDRESSES,
 	ID_REVERSE_VIEW,
 	ID_INCREASE_MEM_WIDTH,
 	ID_DECREASE_MEM_WIDTH,
@@ -237,10 +240,13 @@ static int temporarily_fake_that_we_are_not_visible;
 
 static EventHandlerRef keyEventHandler = NULL;
 
+static int osx_inited_debugger = 0;
+
 //============================================================
 //  PROTOTYPES
 //============================================================
 
+static int debugwin_init_windows(void);
 static debugwin_info *debug_window_create(const char * title, void *unused);
 static void debug_window_free(debugwin_info *info);
 static OSStatus debug_window_proc(EventHandlerCallRef inHandler, EventRef inEvent, void * inUserData);
@@ -291,6 +297,20 @@ static void smart_show_all(int show);
 //  OSX stubs
 //============================================================
 
+INLINE void osx_init_debugger( void )
+{
+	if ( osx_inited_debugger == 0 )
+	{
+		if ( debugwin_init_windows() != 0 )
+		{
+			mame_printf_error( "Could not init debugger\n" );
+			exit( -1 );
+		}
+		osx_inited_debugger = 1;
+	}
+}
+
+
 static void osx_SetFocus( HIViewRef inView )
 {
 	HIViewRef	focus;
@@ -333,7 +353,7 @@ static void osx_ViewToGlobalPoint( HIViewRef inView, const HIPoint * inViewPoint
 	outGlobalPoint->y += windBounds.top;
 }
 
-void osx_RectToHIRect( const Rect *inRect, HIRect *outRect )
+INLINE void osx_RectToHIRect( const Rect *inRect, HIRect *outRect )
 {
 	outRect->origin.x = inRect->left;
 	outRect->origin.y = inRect->top;
@@ -349,6 +369,8 @@ void osd_wait_for_debugger(void)
 {
 	EventRef		message;
 	EventTargetRef	target = GetEventDispatcherTarget();
+
+	osx_init_debugger();
 
 	// create a console window
 	if (!main_console)
@@ -460,19 +482,7 @@ void debugwin_show(int type)
 
 void debugwin_update_during_game(void)
 {
-	{
-		static int osx_inited_debugger = 0;
-
-		if ( osx_inited_debugger == 0 )
-		{
-			if ( debugwin_init_windows() != 0 )
-			{
-				mame_printf_error( "Could not init debugger\n" );
-				exit( -1 );
-			}
-			osx_inited_debugger = 1;
-		}
-	}
+	osx_init_debugger();
 
 	// if we're running live, do some checks
 	if ( ! debug_cpu_is_stopped(Machine) )
@@ -1829,7 +1839,7 @@ static void generic_create_window(int type)
 	Rect	bounds;
 
 	// create the window
-	sprintf(title, "Debug: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
 	info = debug_window_create(title, NULL);
 	if (!info || !debug_view_create(info, 0, type))
 		return;
@@ -1905,7 +1915,7 @@ static void log_create_window(void)
 	Rect bounds;
 
 	// create the window
-	sprintf(title, "Errorlog: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
+	snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
 	info = debug_window_create(title, NULL);
 	if (!info || !debug_view_create(info, 0, DVT_LOG))
 		return;
@@ -2105,6 +2115,13 @@ static void memory_create_window(void)
 	SetMenuItemCommandKey(optionsmenu, menuIndex, FALSE, '2');
 	AppendMenuItemTextWithCFString( optionsmenu, CFSTR("4-byte chunks"), 0, ID_4_BYTE_CHUNKS, &menuIndex );
 	SetMenuItemCommandKey(optionsmenu, menuIndex, FALSE, '4');
+	AppendMenuItemTextWithCFString( optionsmenu, CFSTR("8-byte chunks"), 0, ID_8_BYTE_CHUNKS, &menuIndex );
+	SetMenuItemCommandKey(optionsmenu, menuIndex, FALSE, '8');
+	AppendMenuItemTextWithCFString( optionsmenu, CFSTR("-"), kMenuItemAttrSeparator, 0, NULL );
+	AppendMenuItemTextWithCFString( optionsmenu, CFSTR("Logical Addresses"), 0, ID_LOGICAL_ADDRESSES, &menuIndex );
+	SetMenuItemCommandKey(optionsmenu, menuIndex, FALSE, 'L');
+	AppendMenuItemTextWithCFString( optionsmenu, CFSTR("Physical Addresses"), 0, ID_PHYSICAL_ADDRESSES, &menuIndex );
+	SetMenuItemCommandKey(optionsmenu, menuIndex, FALSE, 'Y');
 	AppendMenuItemTextWithCFString( optionsmenu, CFSTR("-"), kMenuItemAttrSeparator, 0, NULL );
 	AppendMenuItemTextWithCFString( optionsmenu, CFSTR("Reverse View"), 0, ID_REVERSE_VIEW, &menuIndex );
 	SetMenuItemCommandKey(optionsmenu, menuIndex, FALSE, 'R');
@@ -2324,6 +2341,12 @@ static void memory_update_checkmarks(debugwin_info *info)
 		CheckMenuItem(info->contextualMenu, menuindex, (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK) == 2));
 		GetIndMenuItemWithCommandID( info->contextualMenu, ID_4_BYTE_CHUNKS, 1, NULL, &menuindex);
 		CheckMenuItem(info->contextualMenu, menuindex, (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK) == 4));
+		GetIndMenuItemWithCommandID( info->contextualMenu, ID_8_BYTE_CHUNKS, 1, NULL, &menuindex);
+		CheckMenuItem(info->contextualMenu, menuindex, (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK) == 8));
+		GetIndMenuItemWithCommandID( info->contextualMenu, ID_LOGICAL_ADDRESSES, 1, NULL, &menuindex);
+		CheckMenuItem(info->contextualMenu, menuindex, (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION) == 0));
+		GetIndMenuItemWithCommandID( info->contextualMenu, ID_PHYSICAL_ADDRESSES, 1, NULL, &menuindex);
+		CheckMenuItem(info->contextualMenu, menuindex, (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION) != 0));
 		GetIndMenuItemWithCommandID( info->contextualMenu, ID_REVERSE_VIEW, 1, NULL, &menuindex);
 		CheckMenuItem(info->contextualMenu, menuindex, (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_REVERSE_VIEW)));
 	}
@@ -2386,6 +2409,27 @@ static int memory_handle_command(debugwin_info *info, EventRef inEvent)
 		case ID_4_BYTE_CHUNKS:
 			debug_view_begin_update(info->view[0].view);
 			debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK, 4);
+			debug_view_end_update(info->view[0].view);
+			memory_update_checkmarks(info);
+			return 1;
+
+		case ID_8_BYTE_CHUNKS:
+			debug_view_begin_update(info->view[0].view);
+			debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK, 8);
+			debug_view_end_update(info->view[0].view);
+			memory_update_checkmarks(info);
+			return 1;
+
+		case ID_LOGICAL_ADDRESSES:
+			debug_view_begin_update(info->view[0].view);
+			debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION, FALSE);
+			debug_view_end_update(info->view[0].view);
+			memory_update_checkmarks(info);
+			return 1;
+
+		case ID_PHYSICAL_ADDRESSES:
+			debug_view_begin_update(info->view[0].view);
+			debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION, TRUE);
 			debug_view_end_update(info->view[0].view);
 			memory_update_checkmarks(info);
 			return 1;
@@ -2459,6 +2503,29 @@ static int memory_handle_key(debugwin_info *info, EventRef inEvent)
 				case '4':
 					debug_view_begin_update(info->view[0].view);
 					debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK, 4);
+					debug_view_end_update(info->view[0].view);
+					memory_update_checkmarks(info);
+					return 1;
+
+				case '8':
+					debug_view_begin_update(info->view[0].view);
+					debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK, 8);
+					debug_view_end_update(info->view[0].view);
+					memory_update_checkmarks(info);
+					return 1;
+
+				case 'l':
+				case 'L':
+					debug_view_begin_update(info->view[0].view);
+					debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION, FALSE);
+					debug_view_end_update(info->view[0].view);
+					memory_update_checkmarks(info);
+					return 1;
+
+				case 'y':
+				case 'Y':
+					debug_view_begin_update(info->view[0].view);
+					debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION, TRUE);
 					debug_view_end_update(info->view[0].view);
 					memory_update_checkmarks(info);
 					return 1;
@@ -2549,7 +2616,7 @@ static void disasm_create_window(void)
 	AppendMenuItemTextWithCFString( optionsmenu, CFSTR("Encrypted opcodes"), 0, ID_SHOW_ENCRYPTED, &menuIndex );
 	SetMenuItemCommandKey(optionsmenu, menuIndex, FALSE, 'E');
 	AppendMenuItemTextWithCFString( optionsmenu, CFSTR("Comments"), 0, ID_SHOW_COMMENTS, &menuIndex );
-	SetMenuItemCommandKey(optionsmenu, menuIndex, FALSE, 'C');
+	SetMenuItemCommandKey(optionsmenu, menuIndex, FALSE, 'N');
 	info->contextualMenu = optionsmenu;
 	disasm_update_checkmarks(info);
 
@@ -2613,7 +2680,7 @@ static void disasm_create_window(void)
 				char			name[100];
 				UInt16			item;
 
-				sprintf(name, "CPU #%d (%s)", cpunum, cpunum_name(cpunum));
+				snprintf(name, ARRAY_LENGTH(name), "CPU #%d (%s)", cpunum, cpunum_name(cpunum));
 				
 				cfName = CFStringCreateWithCString( NULL, name, CFStringGetSystemEncoding() );
 				AppendMenuItemTextWithCFString( popupmenu, cfName, 0, 0, &item );
@@ -2926,8 +2993,8 @@ static int disasm_handle_key(debugwin_info *info, EventRef inEvent)
 					(*info->recompute_children)(info);
 					return 1;
 				
-				case 'c':
-				case 'C':
+				case 'n':
+				case 'N':
 					debug_view_begin_update(info->view[0].view);
 					debug_view_set_property_UINT32(info->view[0].view, DVP_DASM_RIGHT_COLUMN, DVP_DASM_RIGHTCOL_COMMENTS);
 					debug_view_end_update(info->view[0].view);
@@ -3012,7 +3079,7 @@ static void disasm_update_caption(debugwin_info *info)
 	cpunum = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
 
 	// then update the caption
-	sprintf(title, "Disassembly: %s (%d)", cpunum_name(cpunum), cpunum);
+	snprintf(title, ARRAY_LENGTH(title), "Disassembly: %s (%d)", cpunum_name(cpunum), cpunum);
 
 	cftitle = CFStringCreateWithCString( NULL, title, CFStringGetSystemEncoding() );
 	
@@ -3041,8 +3108,6 @@ void console_create_window(void)
 	CGDirectDisplayID	mainID = CGMainDisplayID();
 	MenuItemIndex	menuIndex;
 	ControlButtonContentInfo	content;
-
-	debugwin_init_windows();
 
 	// create the window
 	info = debug_window_create("Debug", NULL);
@@ -3324,7 +3389,7 @@ static void console_set_cpunum(int cpunum)
 		debug_view_set_property_UINT32(main_console->view[1].view, DVP_REGS_CPUNUM, cpunum);
 
 	// then update the caption
-	sprintf(title, "Debug: %s - CPU %d (%s)", Machine->gamedrv->name, cpu_getactivecpu(), activecpu_name());
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU %d (%s)", Machine->gamedrv->name, cpu_getactivecpu(), activecpu_name());
 	
 	cftitle = CFStringCreateWithCString( NULL, title, CFStringGetSystemEncoding() );
 	
