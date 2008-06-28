@@ -28,6 +28,37 @@ struct _key_lookup_table
 	const char *name;
 };
 
+#if (SDL_VERSION_ATLEAST(1,3,0))
+#define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
+#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
+#define KE7(A, B, C, D, E, F, G) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G)
+#define KE5(A, B, C, D, E) KE(A) KE(B) KE(C) KE(D) KE(E)
+#define KE3(A, B, C) KE(A) KE(B) KE(C) 
+
+static key_lookup_table sdl_lookup[] =
+{
+	KE7(UNKNOWN,	BACKSPACE,	TAB,		CLEAR,		RETURN,		PAUSE,		ESCAPE		)
+	KE(SPACE)
+	KE5(COMMA,		MINUS,		PERIOD,		SLASH,		0			)
+	KE8(1,			2,			3,				4,			5,			6,			7,			8			)
+	KE3(9,			SEMICOLON,		EQUALS)
+	KE5(LEFTBRACKET,BACKSLASH,	RIGHTBRACKET,	A,			B			)
+	KE8(C,			D,			E,				F,			G,			H,			I,			J			)
+	KE8(K,			L,			M,				N,			O,			P,			Q,			R			)
+	KE8(S,			T,			U,				V,			W,			X,			Y,			Z			)
+	KE8(DELETE,		KP_0,		KP_1,			KP_2,		KP_3,		KP_4,		KP_5,		KP_6		)
+	KE8(KP_7,		KP_8,		KP_9,			KP_PERIOD,	KP_DIVIDE,	KP_MULTIPLY,KP_MINUS,	KP_PLUS		)
+	KE8(KP_ENTER,	KP_EQUALS,	UP,				DOWN,		RIGHT,		LEFT,		INSERT,		HOME		)
+	KE8(END,		PAGEUP,		PAGEDOWN,		F1,			F2,			F3,			F4,			F5			)
+	KE8(F6,			F7,			F8,				F9,			F10,		F11,		F12,		F13			)
+	KE8(F14,		F15,		NUMLOCKCLEAR,	CAPSLOCK,	SCROLLLOCK,	RSHIFT,		LSHIFT,		RCTRL		)
+	KE5(LCTRL,		RALT,		LALT,			LGUI,		RGUI)
+	KE(PRINTSCREEN)
+	KE(MENU)
+	KE(UNDO)
+	{-1, ""}
+};
+#else
 #define KE(x) { SDLK_ ## x, "SDLK_" #x },
 #define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
 
@@ -42,10 +73,6 @@ static key_lookup_table sdl_lookup[] =
 	KE8(c,			d,			e,				f,			g,			h,			i,			j			)
 	KE8(k,			l,			m,				n,			o,			p,			q,			r			)
 	KE8(s,			t,			u,				v,			w,			x,			y,			z			)
-//FIXME: SDL 1.3 Definitions are gone
-#if (SDL_VERSION_ATLEAST(1,3,0))
-	KE8(DELETE,		KP0,		KP1,			KP2,		KP3,		KP4,		KP5,		KP6			)
-#else
 	KE8(DELETE,		WORLD_0,	WORLD_1,		WORLD_2,	WORLD_3,	WORLD_4,	WORLD_5,	WORLD_6		)
 	KE8(WORLD_7,	WORLD_8,	WORLD_9,		WORLD_10,	WORLD_11,	WORLD_12,	WORLD_13,	WORLD_14	)
 	KE8(WORLD_15,	WORLD_16,	WORLD_17,		WORLD_18,	WORLD_19,	WORLD_20,	WORLD_21,	WORLD_22	)
@@ -59,7 +86,6 @@ static key_lookup_table sdl_lookup[] =
 	KE8(WORLD_79,	WORLD_80,	WORLD_81,		WORLD_82,	WORLD_83,	WORLD_84,	WORLD_85,	WORLD_86	)
 	KE8(WORLD_87,	WORLD_88,	WORLD_89,		WORLD_90,	WORLD_91,	WORLD_92,	WORLD_93,	WORLD_94	)
 	KE8(WORLD_95,	KP0,		KP1,			KP2,		KP3,		KP4,		KP5,		KP6			)
-#endif
 	KE8(KP7,		KP8,		KP9,			KP_PERIOD,	KP_DIVIDE,	KP_MULTIPLY,KP_MINUS,	KP_PLUS		)
 	KE8(KP_ENTER,	KP_EQUALS,	UP,				DOWN,		RIGHT,		LEFT,		INSERT,		HOME		)
 	KE8(END,		PAGEUP,		PAGEDOWN,		F1,			F2,			F3,			F4,			F5			)
@@ -71,6 +97,7 @@ static key_lookup_table sdl_lookup[] =
 	KE(LAST)		
 	{-1, ""}
 };
+#endif
 
 static const char * lookup_key_name(const key_lookup_table *kt, int kc)
 {
@@ -114,10 +141,14 @@ int main(int argc, char *argv[])
 				memset(buf, 0, 19);
 				utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
 				printf("ITEM_ID_XY %s 0x%x 0x%x %s \n",
-					lookup_key_name(sdl_lookup, event.key.keysym.sym),
-					(int) event.key.keysym.scancode, 
-					(int) event.key.keysym.unicode, 
-					buf);
+#if (SDL_VERSION_ATLEAST(1,3,0))
+						lookup_key_name(sdl_lookup, event.key.keysym.scancode),
+#else
+						lookup_key_name(sdl_lookup, event.key.keysym.sym),
+#endif
+						(int) event.key.keysym.scancode, 
+						(int) event.key.keysym.unicode, 
+						buf);
 			}
 			break;
 		}

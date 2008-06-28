@@ -358,9 +358,8 @@ void osd_update(running_machine *machine, int skip_redraw)
 	sdlinput_poll(machine);
 	check_osd_inputs(machine);
 
-#ifdef ENABLE_DEBUGGER
-	debugwin_update_during_game();
-#endif
+	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+		debugwin_update_during_game();
 }
 
 //============================================================
@@ -578,11 +577,9 @@ static void extract_video_config(running_machine *machine)
 	#endif
 
 
-#ifdef ENABLE_DEBUGGER
-	// if we are in debug mode, never go full screen
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		video_config.windowed = TRUE;
-#endif
+
 	stemp = options_get_string(mame_options(), SDLOPTION_EFFECT);
 	if (stemp != NULL && strcmp(stemp, "none") != 0)
 		load_effect_overlay(machine, stemp);

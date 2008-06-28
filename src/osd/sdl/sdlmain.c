@@ -17,6 +17,7 @@
 #include "osdepend.h"
 #include "mame.h"
 #include "clifront.h"
+#include "emuopts.h"
 
 // OSD headers
 #include "video.h"
@@ -390,7 +391,6 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(PTR64);
 	MACRO_VERBOSE(MAME_DEBUG);
 	MACRO_VERBOSE(NDEBUG);
-	MACRO_VERBOSE(ENABLE_DEBUGGER);
 	MACRO_VERBOSE(VODOO_DRC);
 	mame_printf_verbose("\n");
 	mame_printf_verbose("SDL/OpenGL defines: ");
@@ -430,6 +430,15 @@ void osd_init(running_machine *machine)
 	add_exit_callback(machine, osd_exit);
 
 	defines_verbose();
+
+#ifdef SDLMAME_NO_X11
+	if (options_get_bool(mame_options(), OPTION_DEBUG))
+	{
+		osd_exit(machine);
+		ShowError("sdlmame", "-debug not supported on X11-less build\n\n");
+		exit(-1);		
+	}
+#endif
 	
 	if (sdlvideo_init(machine))
 	{

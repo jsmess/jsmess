@@ -4,7 +4,7 @@
 #
 #   SDL-specific makefile
 #
-#   Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+#   Copyright (c) 1996-2008, Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
 #
 #   SDLMAME by Olivier Galibert and R. Belmont 
@@ -219,12 +219,15 @@ LIBS += -lX11 -lXinerama
 endif
 
 # the new debugger relies on GTK+ in addition to the base SDLMAME needs
-ifdef DEBUGGER
-OSDOBJS += $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
+# Non-X11 builds can not use the debugger
+ifndef NO_X11
+OSDCOREOBJS += $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 CFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
 CFLAGS += -DGTK_DISABLE_DEPRECATED
-endif # DEBUGGER
+else
+OSDCOREOBJS += $(SDLOBJ)/debugwin.o
+endif # NO_X11
 
 # make sure we can find X headers
 CFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
@@ -269,10 +272,8 @@ endif
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 
 # the new debugger relies on GTK+ in addition to the base SDLMAME needs
-ifdef DEBUGGER
 OSDOBJS += $(SDLOBJ)/debugosx.o
 LIBS += -framework Carbon
-endif	# DEBUGGER
 endif	# Mac OS X
 
 # OS2: add the necessary libraries

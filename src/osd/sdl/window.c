@@ -573,11 +573,9 @@ static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
 
 	ASSERT_WINDOW_THREAD();
 
-#ifdef ENABLE_DEBUGGER
 	// if we are in debug mode, never go full screen
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		return NULL;
-#endif
 
 	// If we are going fullscreen (leaving windowed) remember our windowed size
 	if (!window->fullscreen)
@@ -763,9 +761,7 @@ static void sdlwindow_update_cursor_state(void)
 {
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	#ifdef ENABLE_DEBUGGER
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
-	#endif
 	{
 		if (video_config.windowed && !sdlinput_should_hide_mouse())
 		{

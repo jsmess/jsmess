@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_NO_X11) 
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -115,7 +115,7 @@ static void debugwin_show(int show)
 //  memory_determine_combo_items
 //============================================================
 
-static void memory_determine_combo_items(void)
+static void memory_determine_combo_items(running_machine *machine)
 {
 	memorycombo_item **tail = &memorycombo;
 	UINT32 cpunum, spacenum;
@@ -143,16 +143,16 @@ static void memory_determine_combo_items(void)
 	// then add all the memory regions
 	for (rgnnum = 0; rgnnum < MAX_MEMORY_REGIONS; rgnnum++)
 	{
-		UINT8 *base = memory_region(rgnnum);
-		UINT32 type = memory_region_type(Machine, rgnnum);
+		UINT8 *base = memory_region(machine, rgnnum);
+		UINT32 type = memory_region_type(machine, rgnnum);
 		if (base != NULL && type > REGION_INVALID && (type - REGION_INVALID) < ARRAY_LENGTH(memory_region_names))
 		{
 			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-			UINT32 flags = memory_region_flags(Machine, rgnnum);
+			UINT32 flags = memory_region_flags(machine, rgnnum);
 			UINT8 width, little_endian;
 			memset(ci, 0, sizeof(*ci));
 			ci->base = base;
-			ci->length = memory_region_length(rgnnum);
+			ci->length = memory_region_length(machine, rgnnum);
 			width = 1 << (flags & ROMREGION_WIDTHMASK);
 			little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
 			if (type >= REGION_CPU1 && type <= REGION_CPU8)
@@ -368,7 +368,7 @@ void debugmain_comments_activate(GtkMenuItem *item, gpointer user_data)
 	}
 }
 
-static void debugmain_set_cpunum(int cpunum)
+static void debugmain_set_cpunum(running_machine *machine, int cpunum)
 {
 	if(cpunum != dmain->cpu) {
 		char title[256];
@@ -379,7 +379,7 @@ static void debugmain_set_cpunum(int cpunum)
 		debug_view_set_property_UINT32(dmain->registers, DVP_REGS_CPUNUM, cpunum);
 
 		// then update the caption
-		sprintf(title, "Debug: %s - CPU %d (%s)", Machine->gamedrv->name, cpunum, cpunum_name(cpunum));
+		sprintf(title, "Debug: %s - CPU %d (%s)", machine->gamedrv->name, cpunum, cpunum_name(cpunum));
 		gtk_window_set_title(GTK_WINDOW(dmain->win), title);
 		debugmain_update_checks(dmain);
 	}
@@ -398,7 +398,7 @@ void osd_wait_for_debugger(void)
 	}
 
 	// update the views in the console to reflect the current CPU
-	debugmain_set_cpunum(cpu_getactivecpu());
+	debugmain_set_cpunum(Machine, cpu_getactivecpu());
 
 	debugwin_show(1);
 	gtk_main_iteration();
@@ -512,7 +512,7 @@ static void memorywin_destroy(GtkObject *obj, gpointer user_data)
 	free(mem);
 }
 
-static void memorywin_new(void)
+static void memorywin_new(running_machine *machine)
 {
 	memorywin_i *mem;
 	int item, cursel, curcpu = cpu_getactivecpu();
@@ -541,7 +541,7 @@ static void memorywin_new(void)
 
 	// populate the combobox
 	if (!memorycombo)
-		memory_determine_combo_items();
+		memory_determine_combo_items(machine);
 	item = 0;
 	cursel = 0;
 	for (ci = memorycombo; ci; ci = ci->next)
@@ -759,7 +759,7 @@ static void logwin_new(void)
 
 void on_new_mem_activate(GtkMenuItem *item, gpointer user_data)
 {
-	memorywin_new();
+	memorywin_new(Machine);
 }
 
 void on_new_disasm_activate(GtkMenuItem *item, gpointer user_data)
