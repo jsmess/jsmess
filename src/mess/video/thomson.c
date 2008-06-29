@@ -1163,8 +1163,6 @@ VIDEO_START ( thom )
 	thom_init_cb = NULL;
 	thom_init_timer = timer_alloc( thom_set_init , NULL);
 
-	VIDEO_EOF_CALL(thom);
-
 	state_save_register_global( thom_bwidth );
 	state_save_register_global( thom_bheight );
 	state_save_register_global( thom_hires );
