@@ -19,6 +19,7 @@ extern MACHINE_RESET( radio86 );
 
 extern const ppi8255_interface radio86_ppi8255_interface_1;
 extern const ppi8255_interface radio86_ppi8255_interface_2;
+extern const ppi8255_interface rk7007_ppi8255_interface;
 
 extern const ppi8255_interface mikrosha_ppi8255_interface_1;
 extern const ppi8255_interface mikrosha_ppi8255_interface_2;
@@ -34,6 +35,7 @@ extern const dma8257_interface radio86_dma;
 
 extern UINT8 radio86_tape_value;
 
+extern void radio86_init_keyboard(void);
 /*----------- defined in video/radio86.c -----------*/
 extern UINT8 mikrosha_font_page;
 

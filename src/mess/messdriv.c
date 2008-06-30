@@ -870,6 +870,8 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( radio86 )
 	DRIVER( radio16 )
 	DRIVER( radio4k )
+	DRIVER( rk7007 )
+	DRIVER( rk700716 )
 	DRIVER( radiorom )
 	DRIVER( radioram )
 	DRIVER( spektr01 )

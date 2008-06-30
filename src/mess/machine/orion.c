@@ -18,13 +18,13 @@
 #include "sound/speaker.h"
 #include "sound/ay8910.h"
 #include "includes/orion.h"
+#include "includes/radio86.h"
 
 #define SCREEN_WIDTH_384 48
 #define SCREEN_WIDTH_480 60
 #define SCREEN_WIDTH_512 64
 
 static UINT8 romdisk_lsb,romdisk_msb;
-static UINT8 orion_keyboard_mask;
 UINT8 orion128_video_mode;
 UINT8 orion128_video_page;
 static UINT8 orion128_memory_page;
@@ -52,41 +52,6 @@ static WRITE8_HANDLER (orion_romdisk_portc_w )
 	romdisk_msb = data;	
 }
 
-static READ8_HANDLER (orion_keyboard_portb_r )
-{		
-	UINT8 key = 0xff;
-	if ((orion_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
-	if ((orion_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
-	if ((orion_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
-	if ((orion_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
-	if ((orion_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
-	if ((orion_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
-	if ((orion_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
-	if ((orion_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
-	return key;
-	
-}
-
-static READ8_HANDLER (orion_keyboard_portc_r )
-{
-	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
-	UINT8 dat = input_port_read(machine, "LINE8");
-	if (level <  0) { 
-		dat ^= 0x10;
- 	}	
-	return dat;		
-}
-
-static WRITE8_HANDLER (orion_keyboard_porta_w )
-{	
-	orion_keyboard_mask = data ^ 0xff;
-}
-
-static WRITE8_HANDLER (orion_cassette_portc_w )
-{
-	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x01 ? 1 : -1);	
-}
-
 const ppi8255_interface orion128_ppi8255_interface_1 =
 {
 	orion_romdisk_porta_r,
@@ -95,16 +60,6 @@ const ppi8255_interface orion128_ppi8255_interface_1 =
 	NULL,
 	orion_romdisk_portb_w,
 	orion_romdisk_portc_w
-};
-
-const ppi8255_interface orion128_ppi8255_interface_2 =
-{
-	NULL,
-	orion_keyboard_portb_r,
-	orion_keyboard_portc_r,
-	orion_keyboard_porta_w,
-	NULL,
-	orion_cassette_portc_w
 };
 
 /* Driver initialization */
@@ -205,7 +160,6 @@ MACHINE_RESET ( orion128 )
 {		
 	wd17xx_reset(machine);
 	wd17xx_set_density (DEN_FM_HI);	
-	orion_keyboard_mask = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orion128_memory_page = -1;
@@ -213,6 +167,7 @@ MACHINE_RESET ( orion128 )
 	memory_set_bankptr(2, mess_ram + 0xf000);
 	orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
+	radio86_init_keyboard();
 }
 
 
@@ -421,7 +376,6 @@ MACHINE_RESET ( orionz80 )
 	memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0xf800);		
 	
 	wd17xx_reset(machine);
-	orion_keyboard_mask = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orionz80_memory_page = 0;
@@ -429,6 +383,7 @@ MACHINE_RESET ( orionz80 )
 	orion_speaker = 0;
 	orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
+	radio86_init_keyboard();
 }
 
 INTERRUPT_GEN( orionz80_interrupt ) 
@@ -576,10 +531,10 @@ static WRITE8_HANDLER ( orionpro_memory_page_w )
 
 MACHINE_RESET ( orionpro ) 
 {	
+	radio86_init_keyboard();	
 	
 	wd17xx_reset(machine);
 
-	orion_keyboard_mask = 0;
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orionpro_ram0_segment = 0;

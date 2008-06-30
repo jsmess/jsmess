@@ -20,6 +20,12 @@ UINT8 radio86_tape_value;
 
 static UINT8* radio_ram_disk;
 
+void radio86_init_keyboard() 
+{
+	radio86_keyboard_mask = 0;
+	radio86_tape_value = 0x10;
+}
+
 /* Driver initialization */
 DRIVER_INIT(radio86)
 {
@@ -28,7 +34,7 @@ DRIVER_INIT(radio86)
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
   	memory_configure_bank(1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
-	radio86_tape_value = 0x10;
+	radio86_init_keyboard();
 }
 
 DRIVER_INIT(radioram)
@@ -66,6 +72,12 @@ static WRITE8_HANDLER (radio86_8255_porta_w2 )
 	radio86_keyboard_mask = data ^ 0xff;
 }
 
+static WRITE8_HANDLER (radio86_8255_portc_w2 )
+{
+	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x01 ? 1 : -1);	
+}
+
+
 const ppi8255_interface radio86_ppi8255_interface_1 =
 {
 	NULL,
@@ -73,7 +85,7 @@ const ppi8255_interface radio86_ppi8255_interface_1 =
 	radio86_8255_portc_r2,
 	radio86_8255_porta_w2,
 	NULL,
-	NULL,
+	radio86_8255_portc_w2,
 };
 
 const ppi8255_interface mikrosha_ppi8255_interface_1 =
@@ -86,6 +98,36 @@ const ppi8255_interface mikrosha_ppi8255_interface_1 =
 	NULL,
 };
 
+
+
+static READ8_HANDLER (rk7007_8255_portc_r )
+{
+	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	UINT8 key = 0xff;
+	if ((radio86_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"CLINE0"); }
+	if ((radio86_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"CLINE1"); }
+	if ((radio86_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"CLINE2"); }
+	if ((radio86_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"CLINE3"); }
+	if ((radio86_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"CLINE4"); }
+	if ((radio86_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"CLINE5"); }
+	if ((radio86_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"CLINE6"); }
+	if ((radio86_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"CLINE7"); }
+	key &= 0xe0;
+	if (level <  0) { 
+		key ^= radio86_tape_value;
+ 	}	
+	return key;	
+}
+
+const ppi8255_interface rk7007_ppi8255_interface =
+{
+	NULL,
+	radio86_8255_portb_r2,
+	rk7007_8255_portc_r,
+	radio86_8255_porta_w2,
+	NULL,
+	radio86_8255_portc_w2,
+};
 
 static I8275_DMA_REQUEST(radio86_video_dma_request) {
 	const device_config *dma8257 = device_list_find_by_tag(device->machine->config->devicelist, DMA8257, "dma8257");
