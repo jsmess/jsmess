@@ -178,12 +178,14 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 	CHOOSECOLOR cc;
 	COLORREF choice_colors[16];
 	TCHAR tmp[4];
-	int i;
+	int i = 0;
 	BOOL bRedrawList = FALSE;
 	int nCurSelection = 0;
 	int nHistoryTab = 0;
-	int nCount = 0;
-	int value;
+	int nTabCount = 0;
+	int nPatternCount = 0;
+	int value = 0;
+	const char* snapname = NULL;
 
 	switch (Msg)
 	{
@@ -193,7 +195,6 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 		Button_SetCheck(GetDlgItem(hDlg,IDC_KEY_GUI),GetKeyGUI());
 		Button_SetCheck(GetDlgItem(hDlg,IDC_BROADCAST),GetBroadcast());
 		Button_SetCheck(GetDlgItem(hDlg,IDC_RANDOM_BG),GetRandomBackground());
-		Button_SetCheck(GetDlgItem(hDlg,IDC_GAME_CAPTION),GetGameCaption());
 		
 		Button_SetCheck(GetDlgItem(hDlg,IDC_HIDE_MOUSE),GetHideMouseOnStartup());
 
@@ -213,27 +214,57 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 		Button_SetCheck(GetDlgItem(hDlg,IDC_NOOFFSET_CLONES),
 						GetOffsetClones());
 		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Snapshot"));
-		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_SCREENSHOT);
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nTabCount++, TAB_SCREENSHOT);
 		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Flyer"));
-		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_FLYER);
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nTabCount++, TAB_FLYER);
 		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Cabinet"));
-		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_CABINET);
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nTabCount++, TAB_CABINET);
 		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Marquee"));
-		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_MARQUEE);
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nTabCount++, TAB_MARQUEE);
 		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Title"));
-		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_TITLE);
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nTabCount++, TAB_TITLE);
 		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Control Panel"));
-		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_CONTROL_PANEL);
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nTabCount++, TAB_CONTROL_PANEL);
 		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("PCB"));
-		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_PCB);
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nTabCount++, TAB_PCB);
 		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("All"));
-		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_ALL);
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nTabCount++, TAB_ALL);
 		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("None"));
-		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_NONE);
-		if( GetHistoryTab() < MAX_TAB_TYPES )
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nTabCount++, TAB_NONE);
+		if (GetHistoryTab() < MAX_TAB_TYPES) {
 			(void)ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_HISTORY_TAB), GetHistoryTab());
-		else
+		}
+		else {
 			(void)ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_HISTORY_TAB), GetHistoryTab()-TAB_SUBTRACT);
+		}
+		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_SNAPNAME), TEXT("Gamename"));
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_SNAPNAME), nPatternCount++, "%g");
+		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_SNAPNAME), TEXT("Gamename + Increment"));
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_SNAPNAME), nPatternCount++, "%g%i");
+		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_SNAPNAME), TEXT("Gamename/Gamename"));
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_SNAPNAME), nPatternCount++, "%g/%g");
+		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_SNAPNAME), TEXT("Gamename/Gamename + Increment"));
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_SNAPNAME), nPatternCount++, "%g/%g%i");
+		(void)ComboBox_AddString(GetDlgItem(hDlg, IDC_SNAPNAME), TEXT("Gamename/Increment"));
+		(void)ComboBox_SetItemData(GetDlgItem(hDlg, IDC_SNAPNAME), nPatternCount, "%g/%i");
+		//Default to this setting
+		(void)ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_SNAPNAME), nPatternCount++);
+		snapname = GetSnapName();
+		if (core_stricmp(snapname,"%g" )==0) {
+			(void)ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_SNAPNAME), 0);
+		}
+		if (core_stricmp(snapname,"%g%i" )==0) {
+			(void)ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_SNAPNAME), 1);
+		}
+		if (core_stricmp(snapname,"%g/%g" )==0) {
+			(void)ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_SNAPNAME), 2);
+		}
+		if (core_stricmp(snapname,"%g/%g%i" )==0) {
+			(void)ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_SNAPNAME), 3);
+		}
+		if (core_stricmp(snapname,"%g/%i" )==0) {
+			(void)ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_SNAPNAME), 4);
+		}
 
 		SendDlgItemMessage(hDlg, IDC_SCREENSHOT_BORDERSIZE, TBM_SETRANGE,
 					(WPARAM)FALSE,
@@ -287,7 +318,6 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 			SetKeyGUI(Button_GetCheck(GetDlgItem(hDlg, IDC_KEY_GUI)));
 			SetBroadcast(Button_GetCheck(GetDlgItem(hDlg, IDC_BROADCAST)));
 			SetRandomBackground(Button_GetCheck(GetDlgItem(hDlg, IDC_RANDOM_BG)));
-			SetGameCaption(Button_GetCheck(GetDlgItem(hDlg, IDC_GAME_CAPTION)));
 			
 			SetHideMouseOnStartup(Button_GetCheck(GetDlgItem(hDlg,IDC_HIDE_MOUSE)));
 
@@ -333,6 +363,15 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 				// LineUpIcons does just a ResetListView(), which is what we want here
 				PostMessage(GetMainWindow(),WM_COMMAND, MAKEWPARAM(ID_VIEW_LINEUPICONS, FALSE),(LPARAM)NULL);
  			}
+			nCurSelection = ComboBox_GetCurSel(GetDlgItem(hDlg,IDC_SNAPNAME));
+			if (nCurSelection != CB_ERR) {
+				const char* snapname = (const char*)ComboBox_GetItemData(GetDlgItem(hDlg,IDC_SNAPNAME), nCurSelection);
+				if (snapname) {
+					SetSnapName(snapname);
+				}
+			}
+			EndDialog(hDlg, 0);
+
 			nCurSelection = ComboBox_GetCurSel(GetDlgItem(hDlg,IDC_HISTORY_TAB));
 			if (nCurSelection != CB_ERR)
 				nHistoryTab = ComboBox_GetItemData(GetDlgItem(hDlg,IDC_HISTORY_TAB), nCurSelection);

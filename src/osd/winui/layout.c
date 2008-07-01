@@ -101,7 +101,7 @@ DIRECTORYINFO g_directoryInfo[] =
 	{ "Ini Files",             GetIniDir,       SetIniDir,       FALSE, DIRDLG_INI },
 	{ "Config",                GetCfgDir,       SetCfgDir,       FALSE, DIRDLG_CFG },
 	{ "Snapshots",             GetImgDir,       SetImgDir,       FALSE, DIRDLG_IMG },
-	{ "Input files (*.inp)",   GetInpDir,       SetInpDir,       FALSE, DIRDLG_INP },
+	{ "Input files",           GetInpDir,       SetInpDir,       FALSE, DIRDLG_INP },
 	{ "State",                 GetStateDir,     SetStateDir,     FALSE, 0 },
 	{ "Artwork",               GetArtDir,       SetArtDir,       FALSE, 0 },
 	{ "Memory Card",           GetMemcardDir,   SetMemcardDir,   FALSE, 0 },
@@ -110,13 +110,14 @@ DIRECTORYINFO g_directoryInfo[] =
 	{ "Marquees",              GetMarqueeDir,   SetMarqueeDir,   FALSE, 0 },
 	{ "Titles",                GetTitlesDir,    SetTitlesDir,    FALSE, 0 },
 	{ "Control Panels",        GetControlPanelDir,SetControlPanelDir, FALSE, 0 },
-	{ "PCBs",                   GetPcbDir,       SetPcbDir,       FALSE, 0 },
+	{ "PCBs",                  GetPcbDir,       SetPcbDir,       FALSE, 0 },
 	{ "NVRAM",                 GetNvramDir,     SetNvramDir,     FALSE, 0 },
 	{ "Controller Files",      GetCtrlrDir,     SetCtrlrDir,     FALSE, DIRDLG_CTRLR },
 	{ "Hard Drive Difference", GetDiffDir,      SetDiffDir,      FALSE, 0 },
 	{ "Icons",                 GetIconsDir,     SetIconsDir,     FALSE, 0 },
 	{ "Background Images",     GetBgDir,        SetBgDir,        FALSE, 0 },
-	{ "Comment Files",      GetCommentDir,     SetCommentDir,     FALSE, DIRDLG_COMMENT },
+	{ "Comment Files",         GetCommentDir,   SetCommentDir,   FALSE, DIRDLG_COMMENT },
+	{ "Fonts",                 GetFontDir,      SetFontDir,      FALSE, 0 },
 	{ NULL }
 };
 

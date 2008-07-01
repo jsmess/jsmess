@@ -108,7 +108,6 @@ static void remove_all_source_options(void);
 #define MUIOPTION_SCREENSHOT_BORDER_COLOR		"screenshot_bordercolor"
 #define MUIOPTION_INHERIT_FILTER				"inherit_filter"
 #define MUIOPTION_OFFSET_CLONES					"offset_clones"
-#define MUIOPTION_GAME_CAPTION					"game_caption"
 #define MUIOPTION_BROADCAST_GAME_NAME			"broadcast_game_name"
 #define MUIOPTION_RANDOM_BACKGROUND				"random_background"
 #define MUIOPTION_DEFAULT_FOLDER_ID				"default_folder_id"
@@ -291,14 +290,13 @@ static const options_entry regSettings[] =
 	{ NULL,									NULL,       OPTION_HEADER,     "INTERFACE OPTIONS" },
 	{ MUIOPTION_LANGUAGE,					"english",  0,                 NULL },
 	{ MUIOPTION_CHECK_GAME,					"1",        OPTION_BOOLEAN,    NULL },
-	{ MUIOPTION_JOYSTICK_IN_INTERFACE,		"0",        OPTION_BOOLEAN,    NULL },
+	{ MUIOPTION_JOYSTICK_IN_INTERFACE,		"1",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_KEYBOARD_IN_INTERFACE,		"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_RANDOM_BACKGROUND,			"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_BROADCAST_GAME_NAME,		"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_HIDE_MOUSE,					"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_INHERIT_FILTER,				"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_OFFSET_CLONES,				"0",        OPTION_BOOLEAN,    NULL },
-	{ MUIOPTION_GAME_CAPTION,				"1",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_STRETCH_SCREENSHOT_LARGER,	"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_CYCLE_SCREENSHOT,			"0",        0,                 NULL },
  	{ MUIOPTION_SCREENSHOT_BORDER_SIZE,		"11",       0,                 NULL },
@@ -818,16 +816,6 @@ void SetOffsetClones(BOOL offset)
 BOOL GetOffsetClones(void)
 {
 	return options_get_bool(settings, MUIOPTION_OFFSET_CLONES);
-}
-
-void SetGameCaption(BOOL caption)
-{
-	options_set_bool(settings, MUIOPTION_GAME_CAPTION, caption, OPTION_PRIORITY_CMDLINE);
-}
-
-BOOL GetGameCaption(void)
-{
-	return options_get_bool(settings, MUIOPTION_GAME_CAPTION);
 }
 
 void SetBroadcast(BOOL broadcast)
@@ -1390,6 +1378,16 @@ void SetMemcardDir(const char* path)
 	options_set_string(global, OPTION_MEMCARD_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
+const char* GetFontDir(void)
+{
+	return options_get_string(global, OPTION_FONTPATH);
+}
+
+void SetFontDir(const char* paths)
+{
+	options_set_string(global, OPTION_FONTPATH, paths, OPTION_PRIORITY_CMDLINE);
+}
+
 const char* GetFlyerDir(void)
 {
 	return options_get_string(settings, MUIOPTION_FLYER_DIRECTORY);
@@ -1519,6 +1517,16 @@ const char* GetMAMEInfoFileName(void)
 void SetMAMEInfoFileName(const char* path)
 {
 	options_set_string(settings, MUIOPTION_MAMEINFO_FILE, path, OPTION_PRIORITY_CMDLINE);
+}
+
+const char* GetSnapName(void)
+{
+	return options_get_string(global, OPTION_SNAPNAME);
+}
+
+void SetSnapName(const char* pattern)
+{
+	options_set_string(global, OPTION_SNAPNAME, pattern, OPTION_PRIORITY_CMDLINE);
 }
 
 void ResetGameOptions(int driver_index)

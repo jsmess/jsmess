@@ -1,4 +1,4 @@
-// Microsoft Visual C++ generated resource script.
+//Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
 
@@ -37,7 +37,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Menu
 //
 
-IDR_MAIN_MENU MENU 
+IDR_MAIN_MENU MENU DISCARDABLE 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -53,7 +53,7 @@ BEGIN
     END
 END
 
-IDR_UI_MENU MENU 
+IDR_UI_MENU MENU DISCARDABLE 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -66,7 +66,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Play and Record &MNG Output...", ID_FILE_PLAY_RECORD_MNG
         MENUITEM SEPARATOR
-        MENUITEM "Play and Record &uncompressed AVI Output...", ID_FILE_PLAY_RECORD_AVI
+        MENUITEM "Play and Record &uncompressed AVI Output...", 
+                                                ID_FILE_PLAY_RECORD_AVI
         MENUITEM SEPARATOR
         MENUITEM "Loa&d Savestate...",          ID_FILE_LOADSTATE
         MENUITEM SEPARATOR
@@ -111,8 +112,8 @@ BEGIN
             MENUITEM "&Marquee",                    ID_TOGGLE_TAB_MARQUEE
             MENUITEM "&Title",                      ID_TOGGLE_TAB_TITLE
             MENUITEM "Control &Panel",              ID_TOGGLE_TAB_CONTROL_PANEL
-            MENUITEM "PC&B",                        ID_TOGGLE_TAB_PCB
 
+            MENUITEM "PC&B",                        ID_TOGGLE_TAB_PCB
             MENUITEM "&History",                    ID_TOGGLE_TAB_HISTORY
         END
         MENUITEM SEPARATOR
@@ -171,7 +172,7 @@ BEGIN
     END
 END
 
-IDR_CONTEXT_MENU MENU 
+IDR_CONTEXT_MENU MENU DISCARDABLE 
 BEGIN
     POPUP "Context Menu"
     BEGIN
@@ -200,7 +201,7 @@ BEGIN
     END
 END
 
-IDR_CONTEXT_HEADER MENU 
+IDR_CONTEXT_HEADER MENU DISCARDABLE 
 BEGIN
     POPUP "Header Context Menu"
     BEGIN
@@ -211,7 +212,7 @@ BEGIN
     END
 END
 
-IDR_CONTEXT_TREE MENU 
+IDR_CONTEXT_TREE MENU DISCARDABLE 
 BEGIN
     POPUP "Context Menu Tree"
     BEGIN
@@ -230,7 +231,7 @@ BEGIN
     END
 END
 
-IDR_CONTEXT_SCREENSHOT MENU 
+IDR_CONTEXT_SCREENSHOT MENU DISCARDABLE 
 BEGIN
     POPUP "Context Screen Shot"
     BEGIN
@@ -244,8 +245,8 @@ BEGIN
             MENUITEM "&Marquee",                    ID_TOGGLE_TAB_MARQUEE
             MENUITEM "&Title",                      ID_TOGGLE_TAB_TITLE
             MENUITEM "Control &Panel",              ID_TOGGLE_TAB_CONTROL_PANEL
-            MENUITEM "PC&B",                        ID_TOGGLE_TAB_PCB
 
+            MENUITEM "PC&B",                        ID_TOGGLE_TAB_PCB
             MENUITEM "&History",                    ID_TOGGLE_TAB_HISTORY
         END
         MENUITEM SEPARATOR
@@ -267,12 +268,12 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "#define NOWINRES\r\n"
     "#include ""windows.h""\r\n"
@@ -280,7 +281,7 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "#include ""mamevers.rc"" // Version block\r\n"
     "\r\n"
@@ -300,37 +301,37 @@ END
 #ifdef MESS
 IDI_MAMEUI_ICON         ICON                    "res/mess.ico"
 #else
-IDI_MAMEUI_ICON         ICON                    "res\\mameui.ico"
+IDI_MAMEUI_ICON         ICON    DISCARDABLE     "res\\mameui.ico"
 #endif
-IDI_WIN_ROMS            ICON                    "res\\win_roms.ico"
-IDI_WIN_NOROMS          ICON                    "res\\win_noro.ico"
-IDI_WIN_UNKNOWN         ICON                    "res\\win_unkn.ico"
-IDI_WIN_CLONE           ICON                    "res\\win_clone.ico"
-IDI_WIN_REDX            ICON                    "res\\win_redx.ico"
-IDI_FOLDER_AVAILABLE    ICON                    "res\\foldavail.ico"
-IDI_FOLDER              ICON                    "res\\folder.ico"
-IDI_FOLDER_MANUFACTURER ICON                    "res\\foldmanu.ico"
-IDI_FOLDER_OPEN         ICON                    "res\\foldopen.ico"
-IDI_FOLDER_UNAVAILABLE  ICON                    "res\\foldunav.ico"
-IDI_FOLDER_HORIZONTAL   ICON                    "res\\horz.ico"
-IDI_FOLDER_VERTICAL     ICON                    "res\\vert.ico"
-IDI_MANUFACTURER        ICON                    "res\\manufact.ico"
-IDI_FOLDER_YEAR         ICON                    "res\\foldyear.ico"
-IDI_FOLDER_SOURCE       ICON                    "res\\foldsrc.ico"
-IDI_WORKING             ICON                    "res\\working.ico"
-IDI_NONWORKING          ICON                    "res\\nonwork.ico"
-IDI_YEAR                ICON                    "res\\year.ico"
-IDI_KEYBOARD            ICON                    "res\\keyboard.ico"
-IDI_JOYSTICK            ICON                    "res\\joystick.ico"
-IDI_CPU                 ICON                    "res\\cpu.ico"
-IDI_SOUND               ICON                    "res\\samples.ico"
-IDI_SOUNDTAB            ICON                    "res\\sound.ico"
-IDI_SOURCE              ICON                    "res\\source.ico"
-IDI_HARDDISK            ICON                    "res\\harddisk.ico"
-IDI_DISPLAY             ICON                    "res\\display.ico"
-IDI_CHECKMARK           ICON                    "res\\checkmark.ico"
-IDI_HEADER_UP           ICON                    "res\\header_up.ico"
-IDI_HEADER_DOWN         ICON                    "res\\header_down.ico"
+IDI_WIN_ROMS            ICON    DISCARDABLE     "res\\win_roms.ico"
+IDI_WIN_NOROMS          ICON    DISCARDABLE     "res\\win_noro.ico"
+IDI_WIN_UNKNOWN         ICON    DISCARDABLE     "res\\win_unkn.ico"
+IDI_WIN_CLONE           ICON    DISCARDABLE     "res\\win_clone.ico"
+IDI_WIN_REDX            ICON    DISCARDABLE     "res\\win_redx.ico"
+IDI_FOLDER_AVAILABLE    ICON    DISCARDABLE     "res\\foldavail.ico"
+IDI_FOLDER              ICON    DISCARDABLE     "res\\folder.ico"
+IDI_FOLDER_MANUFACTURER ICON    DISCARDABLE     "res\\foldmanu.ico"
+IDI_FOLDER_OPEN         ICON    DISCARDABLE     "res\\foldopen.ico"
+IDI_FOLDER_UNAVAILABLE  ICON    DISCARDABLE     "res\\foldunav.ico"
+IDI_FOLDER_HORIZONTAL   ICON    DISCARDABLE     "res\\horz.ico"
+IDI_FOLDER_VERTICAL     ICON    DISCARDABLE     "res\\vert.ico"
+IDI_MANUFACTURER        ICON    DISCARDABLE     "res\\manufact.ico"
+IDI_FOLDER_YEAR         ICON    DISCARDABLE     "res\\foldyear.ico"
+IDI_FOLDER_SOURCE       ICON    DISCARDABLE     "res\\foldsrc.ico"
+IDI_WORKING             ICON    DISCARDABLE     "res\\working.ico"
+IDI_NONWORKING          ICON    DISCARDABLE     "res\\nonwork.ico"
+IDI_YEAR                ICON    DISCARDABLE     "res\\year.ico"
+IDI_KEYBOARD            ICON    DISCARDABLE     "res\\keyboard.ico"
+IDI_JOYSTICK            ICON    DISCARDABLE     "res\\joystick.ico"
+IDI_CPU                 ICON    DISCARDABLE     "res\\cpu.ico"
+IDI_SOUND               ICON    DISCARDABLE     "res\\samples.ico"
+IDI_SOUNDTAB            ICON    DISCARDABLE     "res\\sound.ico"
+IDI_SOURCE              ICON    DISCARDABLE     "res\\source.ico"
+IDI_HARDDISK            ICON    DISCARDABLE     "res\\harddisk.ico"
+IDI_DISPLAY             ICON    DISCARDABLE     "res\\display.ico"
+IDI_CHECKMARK           ICON    DISCARDABLE     "res\\checkmark.ico"
+IDI_HEADER_UP           ICON    DISCARDABLE     "res\\header_up.ico"
+IDI_HEADER_DOWN         ICON    DISCARDABLE     "res\\header_down.ico"
 
 #ifdef MESS
 IDI_WIN_NOROMSNEEDED    ICON                    "res/win_nrnd.ico"
@@ -351,8 +352,8 @@ IDI_WIN_PCRD            ICON        			"res/win_pcrd.ico"
 // Dialog
 //
 
-IDD_ABOUT DIALOG  0, 0, 296, 129
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_ABOUT DIALOG DISCARDABLE  0, 0, 296, 129
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 #ifdef MESS
 CAPTION "About MESS"
 #else
@@ -379,17 +380,18 @@ BEGIN
                     WS_GROUP
 #endif
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,147,44,142,1
-    CTEXT           "Christopher Kirmse and the MAMEUI team",IDC_STATIC,
-                    147,62,142,9,NOT WS_GROUP
+    CTEXT           "Christopher Kirmse and the MAMEUI team",IDC_STATIC,147,
+                    62,142,9,NOT WS_GROUP
     CTEXT           "Additional MAMEUI code by",IDC_STATIC,147,74,142,9
     CTEXT           "Mike Haaland, Andrew Kirmse, Jeff Miller",IDC_STATIC,
                     147,85,142,9
-    CTEXT           "John Hardy IV and Michael Soderstrom",IDC_STATIC,147,96,142,9
+    CTEXT           "John Hardy IV and Michael Soderstrom",IDC_STATIC,147,96,
+                    142,9
     CONTROL         "",IDC_ABOUT,"Static",SS_BITMAP | SS_SUNKEN,7,7,16,14
 END
 
-IDD_DIRECTX DIALOG  0, 0, 236, 69
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DIRECTX DIALOG DISCARDABLE  0, 0, 236, 69
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 #ifdef MESS
 CAPTION "MESS"
 #else
@@ -403,8 +405,8 @@ BEGIN
                     ES_AUTOHSCROLL | ES_READONLY
 END
 
-IDD_AUDIT DIALOG  0, 0, 283, 188
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_AUDIT DIALOG DISCARDABLE  0, 0, 283, 188
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "File Audit"
 FONT 8, "MS Shell Dlg"
 BEGIN
@@ -413,7 +415,7 @@ BEGIN
     GROUPBOX        "ROMs",IDC_STATIC,6,4,132,65
     LTEXT           "Correct:",IDC_STATIC,51,28,32,8
     CONTROL         "Progress1",IDC_ROMS_PROGRESS,"msctls_progress32",
-                    WS_BORDER | 0x1,14,16,116,8
+                    PBS_SMOOTH | WS_BORDER,14,16,116,8
     LTEXT           "Incorrect:",IDC_STATIC,51,42,32,8
     LTEXT           "Total:",IDC_STATIC,51,56,32,8
     LTEXT           "0",IDC_ROMS_CORRECT,87,28,20,8
@@ -421,7 +423,7 @@ BEGIN
     LTEXT           "0",IDC_ROMS_TOTAL,87,56,20,8
     GROUPBOX        "Samples",IDC_STATIC,145,4,132,65
     CONTROL         "Progress1",IDC_SAMPLES_PROGRESS,"msctls_progress32",
-                    WS_BORDER | 0x1,153,16,116,8
+                    PBS_SMOOTH | WS_BORDER,153,16,116,8
     LTEXT           "Correct:",IDC_STATIC,191,28,33,8
     LTEXT           "Incorrect:",IDC_STATIC,191,42,33,8
     LTEXT           "Total:",IDC_STATIC,191,56,33,8
@@ -434,8 +436,8 @@ BEGIN
                     NOT WS_TABSTOP
 END
 
-IDD_DIRECTORIES DIALOG  0, 0, 230, 107
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DIRECTORIES DIALOG DISCARDABLE  0, 0, 230, 107
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Directories"
 FONT 8, "MS Shell Dlg"
 BEGIN
@@ -454,8 +456,8 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DIR_DELETE,173,87,50,14
 END
 
-IDD_COLUMNS DIALOG  0, 0, 302, 145
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_COLUMNS DIALOG DISCARDABLE  0, 0, 302, 145
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Customize Fields"
 FONT 8, "MS Shell Dlg"
 BEGIN
@@ -478,7 +480,7 @@ BEGIN
 END
 
 IDD_PROP_CONTROLLER DIALOGEX 0, 0, 220, 240
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
+STYLE DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Controller Mapping"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -515,7 +517,7 @@ BEGIN
 END
 
 IDD_PROP_SCREEN DIALOGEX 0, 0, 220, 240
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Screen"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -562,8 +564,8 @@ BEGIN
                     0,0,HIDC_USE_DEFAULT
 END
 
-IDD_PROP_GAME DIALOG  0, 0, 220, 240
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_GAME DIALOG DISCARDABLE  0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "General"
 FONT 8, "MS Shell Dlg"
 BEGIN
@@ -594,8 +596,8 @@ BEGIN
     LTEXT           "Static",IDC_PROP_SOURCE,75,208,139,8
 END
 
-IDD_PROP_AUDIT DIALOG  0, 0, 220, 240
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_AUDIT DIALOG DISCARDABLE  0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Audit"
 FONT 8, "MS Shell Dlg"
 BEGIN
@@ -613,7 +615,7 @@ BEGIN
 END
 
 IDD_PROP_DISPLAY DIALOGEX 0, 0, 220, 240
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Display"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -682,7 +684,7 @@ BEGIN
 END
 
 IDD_PROP_SOUND DIALOGEX 0, 0, 220, 240
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Sound"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -714,7 +716,7 @@ BEGIN
 END
 
 IDD_PROP_ADVANCED DIALOGEX 0, 0, 220, 240
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CAPTION
+STYLE DS_FIXEDSYS | WS_CHILD | WS_CAPTION
 CAPTION "Advanced"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -772,7 +774,7 @@ BEGIN
 END
 
 IDD_PROP_INPUT DIALOGEX 0, 0, 220, 240
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CAPTION
+STYLE DS_FIXEDSYS | WS_CHILD | WS_CAPTION
 CAPTION "Controllers"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -822,7 +824,7 @@ BEGIN
 END
 
 IDD_PROP_MISC DIALOGEX 0, 0, 220, 240
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CAPTION
+STYLE DS_FIXEDSYS | WS_CHILD | WS_CAPTION
 CAPTION "Miscellaneous"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -856,13 +858,15 @@ BEGIN
     CONTROL         "Multi-threaded rendering",IDC_MULTITHREAD_RENDERING,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,112,96,10,0,
                     HIDC_MULTITHREAD_RENDERING
-    GROUPBOX        "Thread Priority",IDC_HIGH_PRIORITY_TEXT,4,124,103,34
+    CONTROL         "Coin lockout",IDC_COINLOCKOUT,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,124,96,10,0,HIDC_COINLOCKOUT
+    GROUPBOX        "Thread Priority",IDC_HIGH_PRIORITY_TEXT,7,136,103,34
     CONTROL         "Slider1",IDC_HIGH_PRIORITY,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,10,135,75,10,0,
+                    TBS_NOTICKS | WS_TABSTOP,13,146,75,10,0,
                     HIDC_HIGH_PRIORITY
-    LTEXT           "idle",IDC_STATIC,13,144,12,8
-    RTEXT           "-15",IDC_HIGH_PRIORITYTXT,84,134,14,10,SS_CENTERIMAGE
-    RTEXT           "real-time",IDC_STATIC,53,144,28,8
+    LTEXT           "idle",IDC_STATIC,17,156,12,8
+    RTEXT           "-15",IDC_HIGH_PRIORITYTXT,87,146,14,10,SS_CENTERIMAGE
+    RTEXT           "real-time",IDC_STATIC,57,156,28,8
     GROUPBOX        "Artwork options",IDC_STATIC,113,40,102,61
     CONTROL         "Backdrops",IDC_BACKDROPS,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,119,50,86,10,0,HIDC_BACKDROPS
@@ -887,7 +891,7 @@ BEGIN
 END
 
 IDD_PROP_VECTOR DIALOGEX 0, 0, 220, 240
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Vector"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -916,8 +920,8 @@ IDD_MAIN DIALOGEX 0, 0, 364, 206
 #else
 IDD_MAIN DIALOGEX 0, 0, 304, 206
 #endif
-STYLE DS_SETFONT | DS_3DLOOK | DS_NOFAILCREATE | WS_MINIMIZEBOX | 
-    WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+STYLE DS_3DLOOK | DS_NOFAILCREATE | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | 
+    WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_CONTROLPARENT
 CAPTION "MAMEUI - overwritten at runtime"
 CLASS "MainClass"
@@ -966,8 +970,7 @@ EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "System Filters"
 #else
 IDD_FILTERS DIALOGEX 0, 0, 190, 182
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Game Filters"
 #endif
@@ -1031,8 +1034,7 @@ BEGIN
 END
 
 IDD_RESET DIALOGEX 0, 0, 190, 122
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Reset Options"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
@@ -1062,13 +1064,12 @@ BEGIN
 END
 
 IDD_LOAD_PROGRESS DIALOGEX 0, 0, 260, 187
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "Progress1",IDC_LOAD_PROGRESS,"msctls_progress32",
-                    WS_BORDER | 0x1,6,7,248,12
+                    PBS_SMOOTH | WS_BORDER,6,7,248,12
     CTEXT           "",IDC_LOAD_ROMNAME,6,21,248,10,SS_CENTERIMAGE | NOT 
                     WS_GROUP
     EDITTEXT        IDC_LOAD_STATUS,6,32,248,116,ES_MULTILINE | ES_READONLY | 
@@ -1080,8 +1081,7 @@ BEGIN
 END
 
 IDD_INTERFACE_OPTIONS DIALOGEX 0, 0, 378, 225
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Interface Options"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
@@ -1120,14 +1120,7 @@ BEGIN
     GROUPBOX        "Show History on Tab",IDC_STATIC,14,128,173,28
     COMBOBOX        IDC_HISTORY_TAB,57,138,88,50,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Emulation",IDC_STATIC,202,4,170,28
-#ifdef MESS
-    CONTROL         "Show System Ca&ption",IDC_GAME_CAPTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,210,16,81,10
-#else
-    CONTROL         "Show Game Ca&ption",IDC_GAME_CAPTION,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,210,16,80,10,0,
-                    HIDC_GAME_CAPTION
-#endif
+    GROUPBOX        "Snapshot Pattern",IDC_STATIC,202,4,170,28
     GROUPBOX        "Bookkeeping",IDC_STATIC,202,36,170,43
     CONTROL         "Reset all Playcounts",IDC_RESET_PLAYCOUNT,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,210,48,80,10
@@ -1153,11 +1146,12 @@ BEGIN
                     210,176,154,14
     DEFPUSHBUTTON   "&OK",IDOK,136,204,50,14
     PUSHBUTTON      "&Cancel",IDCANCEL,192,204,50,14
+    COMBOBOX        IDC_SNAPNAME,209,14,155,60,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP,0,HIDC_SNAPNAME
 END
 
 IDD_LANGUAGE DIALOGEX 0, 0, 190, 66
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Language"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
@@ -1173,8 +1167,8 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,98,45,50,14
 END
 
-IDD_CUSTOM_FILE DIALOG  0, 0, 190, 135
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_CUSTOM_FILE DIALOG DISCARDABLE  0, 0, 190, 135
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Add Game To Custom Folder"
 FONT 8, "MS Shell Dlg"
 BEGIN
@@ -1194,7 +1188,7 @@ END
 // Accelerator
 //
 
-IDA_TAB_KEYS ACCELERATORS 
+IDA_TAB_KEYS ACCELERATORS MOVEABLE PURE 
 BEGIN
     "1",            ID_VIEW_TAB_SCREENSHOT, VIRTKEY, ALT, NOINVERT
     "2",            ID_VIEW_TAB_FLYER,      VIRTKEY, ALT, NOINVERT
@@ -1228,7 +1222,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO MOVEABLE PURE 
 BEGIN
     IDD_ABOUT, DIALOG
     BEGIN
@@ -1392,37 +1386,37 @@ END
 #ifdef MESS
 IDB_ABOUT               BITMAP                  "res\\logo_mess.bmp"
 #else
-IDB_ABOUT               BITMAP                  "res\\about.bmp"
+IDB_ABOUT               BITMAP  MOVEABLE PURE   "res\\about.bmp"
 #endif
-IDB_TOOLBAR             BITMAP                  "res\\toolbar.bmp"
+IDB_TOOLBAR             BITMAP  MOVEABLE PURE   "res\\toolbar.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Cursor
 //
 
-IDC_CURSOR_HSPLIT       CURSOR                  "res\\splith.cur"
+IDC_CURSOR_HSPLIT       CURSOR  DISCARDABLE     "res\\splith.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// RT_MANIFEST
+// 24
 //
 
-1                       RT_MANIFEST             "res\\mameui.manifest"
+1                       24      MOVEABLE PURE   "res\\mameui.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_UI_FILE             "Contains commands for working with the selected items"
     IDS_UI_VIEW             "Contains commands for manipulating the view"
     IDS_UI_OPTIONS          "Contains commands for user interface options"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_UI_HELP             "Contains commands for displaying help"
     IDS_VIEW_TOOLBAR        "Show or hide the toolbar"
@@ -1437,7 +1431,7 @@ BEGIN
     IDS_VIEW_SPACER3        "Spacer"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_VIEW_LARGEICONS     "Display items by using large icons."
     IDS_VIEW_SMALLICONS     "Display items by using small icons."
@@ -1454,7 +1448,7 @@ BEGIN
                             "Customize which columns are used in the game list"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_FILE_EXIT            "Exit the application"
 #ifdef MESS
@@ -1480,7 +1474,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_OPTIONS_RESET_DEFAULTS "Allow restoring options to 'sane' values."
     ID_OPTIONS_INTERFACE    "Customize interface options."
@@ -1514,7 +1508,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_CONTEXT_RESET_PLAYTIME "Reset time played for selected item"
     ID_CONTEXT_RESET_PLAYCOUNT "Reset number of plays for selected item"
@@ -1527,7 +1521,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_VIEW_TAB_CABINET     "Select Cabinet tab"
     ID_VIEW_TAB_MARQUEE     "Select Marquee tab"
@@ -1546,7 +1540,7 @@ BEGIN
     ID_VIEW_FULLSCREEN      "Toggle Fullscreen mode"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
 #ifdef MESS
     ID_CUSTOMIZE_FIELDS     "Customize which columns are used in the system list"
@@ -1577,7 +1571,7 @@ BEGIN
     ID_VIEW_TAB_FLYER       "Select Flyer tab"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
 #ifdef MESS
     ID_VIEW_BYGAME          "Sort items by system"
@@ -1599,14 +1593,14 @@ BEGIN
     ID_SORT_DESCENDING      "Sort column in descending (Z-A) order"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_FOLDER_SOURCEPROPERTIES 
                             "Display properties for all games in this source file"
     ID_FOLDER_VECTORPROPERTIES "Display properties for all vector based games"
 END
 
-#endif    // English (U.S.) resources
+#endif    // Englisch (USA) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

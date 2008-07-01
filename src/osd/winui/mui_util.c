@@ -433,7 +433,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			if (gamedrv->ipt != NULL)
 			{
 				const input_port_config *port;
-				input_ports = input_port_config_alloc(gamedrv->ipt, NULL, 0);
+				input_ports = input_port_config_alloc(gamedrv->ipt,NULL,0);
 				
 				for (port = input_ports; port != NULL; port = port->next)
 				{

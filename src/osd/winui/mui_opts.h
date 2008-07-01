@@ -197,9 +197,6 @@ BOOL GetFilterInherit(void);
 void SetOffsetClones(BOOL offset);
 BOOL GetOffsetClones(void);
 
-void SetGameCaption(BOOL caption);
-BOOL GetGameCaption(void);
-
 void SetBroadcast(BOOL broadcast);
 BOOL GetBroadcast(void);
 
@@ -217,7 +214,6 @@ BOOL GetShowFolderList(void);
 
 BOOL GetShowFolder(int folder);
 void SetShowFolder(int folder,BOOL show);
-
 
 void SetShowStatusBar(BOOL val);
 BOOL GetShowStatusBar(void);
@@ -348,6 +344,9 @@ void SetCommentDir(const char* path);
 const char* GetFolderDir(void);
 void SetFolderDir(const char* path);
 
+const char* GetFontDir(void);
+void  SetFontDir(const char* paths);
+
 const char* GetCheatFileName(void);
 void SetCheatFileName(const char* path);
 
@@ -356,6 +355,9 @@ void SetHistoryFileName(const char* path);
 
 const char* GetMAMEInfoFileName(void);
 void SetMAMEInfoFileName(const char* path);
+
+const char* GetSnapName(void);
+void SetSnapName(const char* pattern);
 
 void ResetGameOptions(int driver_index);
 

@@ -1012,9 +1012,6 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			ShowWindow(GetDlgItem(hDlg, IDC_USE_DEFAULT), SW_HIDE);
 		else
 			EnableWindow(GetDlgItem(hDlg, IDC_USE_DEFAULT), (g_bUseDefaults) ? FALSE : TRUE);
-#ifndef _DEBUG
-		ShowWindow(GetDlgItem(hDlg, IDC_DEBUG), SW_HIDE);
-#endif
 		EnableWindow(GetDlgItem(hDlg, IDC_PROP_RESET), g_bReset);
 		ShowWindow(hDlg, SW_SHOW);
     
@@ -2148,6 +2145,7 @@ static void BuildDataMap(void)
 	datamap_add(properties_datamap, IDC_VOLUMEDISP,				DM_INT,		OPTION_VOLUME);
 
 	// core input options 
+	datamap_add(properties_datamap, IDC_COINLOCKOUT,			DM_BOOL,	OPTION_COIN_LOCKOUT);
 	datamap_add(properties_datamap, IDC_DEFAULT_INPUT,			DM_STRING,	OPTION_CTRLR);
 	datamap_add(properties_datamap, IDC_USE_MOUSE,				DM_BOOL,	OPTION_MOUSE);
 	datamap_add(properties_datamap, IDC_JOYSTICK,				DM_BOOL,	OPTION_JOYSTICK);
@@ -2174,9 +2172,7 @@ static void BuildDataMap(void)
 
 	// core debugging options
 	datamap_add(properties_datamap, IDC_LOG,					DM_BOOL,	OPTION_LOG);
-#ifdef _DEBUG
 	datamap_add(properties_datamap, IDC_DEBUG,					DM_BOOL,	OPTION_DEBUG);
-#endif
 
 	// core misc options
 	datamap_add(properties_datamap, IDC_BIOS,					DM_STRING,	OPTION_BIOS);

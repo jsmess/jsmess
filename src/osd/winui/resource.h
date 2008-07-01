@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
+// Microsoft Developer Studio generated include file.
 // Used by mameui.rc
 //
 #define IDPAUSE                         3
@@ -300,7 +300,6 @@
 #define IDC_NOOFFSET_CLONES             1200
 #define IDC_BIOS                        1201
 #define IDC_HISTORY_TAB                 1202
-#define IDC_GAME_CAPTION                1203
 #define IDC_SCREENSHOT_BORDERSIZE       1204
 #define IDC_SCREENSHOT_BORDERCOLOR      1205
 #define IDC_CYCLETIMESECTXT             1206
@@ -333,6 +332,8 @@
 #define IDC_SPEED                       1234
 #define IDC_SPEEDDISP                   1235
 #define IDC_FILTER_VERTICAL             1236
+#define IDC_SNAPNAME                    1237
+#define IDC_COINLOCKOUT                 1238
 #define ID_CONTEXT_SHOW_FOLDER_START    39000
 #define ID_CONTEXT_SHOW_FOLDER_END      39200
 #define ID_FILE_EXIT                    40001
@@ -433,7 +434,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        188
 #define _APS_NEXT_COMMAND_VALUE         40099
-#define _APS_NEXT_CONTROL_VALUE         1237
+#define _APS_NEXT_CONTROL_VALUE         1238
 #define _APS_NEXT_SYMED_VALUE           93
 #endif
 #endif

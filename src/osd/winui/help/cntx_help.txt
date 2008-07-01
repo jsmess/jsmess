@@ -28,6 +28,8 @@ Selects the brightness level of the screen [but not artwork or UI].
 Enables programmatically broadcasting the game being played to attached devices.
 .topic HIDC_CHEAT
 Enables cheat capability using the in-game [tab] menu.
+.topic HIDC_COINLOCKOUT
+Enables arcade operator coin lockout behaviour.
 .topic HIDC_CONTRAST
 Selects the contrast level of the screen [but not artwork or UI].
 .topic HIDC_CYCLETIMESEC

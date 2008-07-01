@@ -308,28 +308,45 @@ BOOL LoadDIB(const char *filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 			// in case a non-image tab gets here, which can happen
 			return FALSE;
 	}
-
+	//Add handling for the displaying of all the different supported snapshot patterntypes
+	//%g
 	fname = astring_assemble_2(astring_alloc(), filename, ".png");
 	filerr = OpenDIBFile(dir_name, zip_name, astring_c(fname), &file, &buffer);
 	astring_free(fname);
-
-	if (filerr != FILERR_NONE)
-	{
+	if (filerr != FILERR_NONE) {
+		//%g/%i
 		fname = astring_assemble_3(astring_alloc(), filename, PATH_SEPARATOR, "0000.png");
 		filerr = OpenDIBFile(dir_name, zip_name, astring_c(fname), &file, &buffer);
 		astring_free(fname);
 	}
+	if (filerr != FILERR_NONE) {
+		//%g%i
+		fname = astring_assemble_2(astring_alloc(), filename, "0000.png");
+		filerr = OpenDIBFile(dir_name, zip_name, astring_c(fname), &file, &buffer);
+		astring_free(fname);
+	}
+	if (filerr != FILERR_NONE) {
+		//%g/%g
+		fname = astring_assemble_4(astring_alloc(), filename, PATH_SEPARATOR, filename, ".png");
+		filerr = OpenDIBFile(dir_name, zip_name, astring_c(fname), &file, &buffer);
+		astring_free(fname);
+	}
+	if (filerr != FILERR_NONE) {
+		//%g/%g%i
+		fname = astring_assemble_4(astring_alloc(), filename, PATH_SEPARATOR, filename, "0000.png");
+		filerr = OpenDIBFile(dir_name, zip_name, astring_c(fname), &file, &buffer);
+		astring_free(fname);
+	}
 
-	if (filerr == FILERR_NONE)
-	{
+	if (filerr == FILERR_NONE) {
 		success = png_read_bitmap_gui(file, phDIB, pPal);
 		core_fclose(file);
 	}
 
 	// free the buffer if we have to
-	if (buffer != NULL)
+	if (buffer != NULL) {
 		free(buffer);
-
+	}
 	return success;
 }
 
