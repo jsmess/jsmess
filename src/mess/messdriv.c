@@ -841,7 +841,8 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( ut88mini )			
 
 	/* Mikro-80 */
-	DRIVER( mikro80 )	
+	DRIVER( mikro80 )
+	DRIVER( radio99 )
 
 	/* Specialist */	
 	DRIVER( special )	

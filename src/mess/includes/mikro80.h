@@ -14,12 +14,17 @@
 extern const ppi8255_interface mikro80_ppi8255_interface;
 
 extern DRIVER_INIT( mikro80 );
+extern DRIVER_INIT( radio99 );
 extern MACHINE_RESET( mikro80 );
 extern READ8_DEVICE_HANDLER( mikro80_keyboard_r );
 extern WRITE8_DEVICE_HANDLER( mikro80_keyboard_w );
 extern READ8_HANDLER( mikro80_tape_r );
 extern WRITE8_HANDLER( mikro80_tape_w );
 
+extern READ8_HANDLER (mikro80_8255_portb_r );
+extern READ8_HANDLER (mikro80_8255_portc_r );
+extern WRITE8_HANDLER (mikro80_8255_porta_w );
+extern WRITE8_HANDLER (mikro80_8255_portc_w );
 /*----------- defined in video/mikro80.c -----------*/
 extern UINT8 *mikro80_video_ram;
 extern UINT8 *mikro80_cursor_ram;

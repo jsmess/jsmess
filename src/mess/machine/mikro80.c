@@ -14,7 +14,7 @@
 #include "includes/mikro80.h"
 
 static int mikro80_keyboard_mask;
-
+static int mikro80_key_mask;
 /* Driver initialization */
 DRIVER_INIT(mikro80)
 {
@@ -23,9 +23,16 @@ DRIVER_INIT(mikro80)
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
   	memory_configure_bank(1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
+	mikro80_key_mask = 0x7f;
 }
 
-static READ8_HANDLER (mikro80_8255_portb_r )
+DRIVER_INIT(radio99)
+{
+	DRIVER_INIT_CALL(mikro80);
+	mikro80_key_mask = 0xff;
+}
+
+READ8_HANDLER (mikro80_8255_portb_r )
 {
 	UINT8 key = 0xff;
 	if ((mikro80_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
@@ -36,17 +43,21 @@ static READ8_HANDLER (mikro80_8255_portb_r )
 	if ((mikro80_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
 	if ((mikro80_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
 	if ((mikro80_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
-	return key;
+	return key & mikro80_key_mask;
 }
 
-static READ8_HANDLER (mikro80_8255_portc_r )
+READ8_HANDLER (mikro80_8255_portc_r )
 {
 	return input_port_read(machine, "LINE8");
 }
 
-static WRITE8_HANDLER (mikro80_8255_porta_w )
+WRITE8_HANDLER (mikro80_8255_porta_w )
 {
 	mikro80_keyboard_mask = data ^ 0xff;
+}
+
+WRITE8_HANDLER (mikro80_8255_portc_w )
+{
 }
 
 const ppi8255_interface mikro80_ppi8255_interface =
@@ -58,6 +69,7 @@ const ppi8255_interface mikro80_ppi8255_interface =
 	NULL,
 	NULL,
 };
+
 
 static TIMER_CALLBACK( mikro80_reset )
 {
