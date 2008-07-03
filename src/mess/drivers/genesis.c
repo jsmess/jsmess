@@ -1050,6 +1050,29 @@ void setup_megadriv_custom_mappers(running_machine *machine)
 }
 //#endif
 
+
+static MACHINE_RESET( ms_megadriv )
+{
+	MACHINE_RESET_CALL( megadriv );
+
+	setup_megadriv_custom_mappers(machine);
+}
+
+
+static MACHINE_DRIVER_START( ms_megadriv )
+	MDRV_IMPORT_FROM(megadriv)
+
+	MDRV_MACHINE_RESET( ms_megadriv )
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( ms_megdsvp )
+	MDRV_IMPORT_FROM(megdsvp)
+
+	MDRV_MACHINE_RESET( ms_megadriv )
+MACHINE_DRIVER_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -1057,7 +1080,7 @@ void setup_megadriv_custom_mappers(running_machine *machine)
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     INIT  		CONFIG   COMPANY   FULLNAME */
-CONS( 1989, genesis,  0,		0,      megadriv,  megadri6, genusa,	genesis, "Sega",   "Genesis (USA, NTSC)", 0)
-CONS( 1993, gensvp,   genesis,	0,      megdsvp,   megdsvp,  megadsvp,	genesis, "Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
-CONS( 1990, megadriv, genesis,	0,      megadriv,  megadri6, geneur,	genesis, "Sega",   "Mega Drive (Europe, PAL)", 0)
-CONS( 1988, megadrij, genesis,	0,      megadriv,  megadri6, genjpn,	genesis, "Sega",   "Mega Drive (Japan, NTSC)", 0)
+CONS( 1989, genesis,  0,		0,      ms_megadriv,  megadri6, genusa,		genesis, "Sega",   "Genesis (USA, NTSC)", 0)
+CONS( 1993, gensvp,   genesis,	0,      ms_megdsvp,   megdsvp,  megadsvp,	genesis, "Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
+CONS( 1990, megadriv, genesis,	0,      ms_megadriv,  megadri6, geneur,		genesis, "Sega",   "Mega Drive (Europe, PAL)", 0)
+CONS( 1988, megadrij, genesis,	0,      ms_megadriv,  megadri6, genjpn,		genesis, "Sega",   "Mega Drive (Japan, NTSC)", 0)
