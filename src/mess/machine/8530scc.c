@@ -11,113 +11,221 @@
 #include "8530scc.h"
 
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define LOG_SCC	0
 
-static const struct scc8530_interface *scc_intf;
-static int scc_mode;
-static int scc_reg;
-static int scc_status;
-
-static unsigned char scc_reg_val_a[16];
-static unsigned char scc_reg_val_b[16];
 
 
-void scc_init(const struct scc8530_interface *intf)
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _scc8530_t scc8530_t;
+struct _scc8530_t
 {
-	scc_intf = intf;
-	scc_mode = 0;
-	scc_reg = 0;
-	scc_status = 0;
+	int mode;
+	int reg;
+	int status;
+
+	UINT8 reg_val_a[16];
+	UINT8 reg_val_b[16];
+};
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE scc8530_t *get_token(const device_config *device)
+{
+	assert(device->type == SCC8530);
+	return (scc8530_t *) device->token;
+}
+
+
+INLINE scc8530_interface *get_interface(const device_config *device)
+{
+	assert(device->type == SCC8530);
+	return (scc8530_interface *) device->static_config;
+}
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    DEVICE_START( scc8530 )
+-------------------------------------------------*/
+
+static DEVICE_START( scc8530 )
+{
+	scc8530_t *scc = get_token(device);
+	memset(scc, 0, sizeof(*scc));
 }
 
 
 
-void scc_set_status(int status)
+/*-------------------------------------------------
+    scc_set_status
+-------------------------------------------------*/
+
+void scc_set_status(const device_config *device, int status)
 {
-	scc_status = status;
+	scc8530_t *scc = get_token(device);
+	scc->status = status;
 }
 
 
 
-static int scc_getareg(void)
+/*-------------------------------------------------
+    scc_acknowledge
+-------------------------------------------------*/
+
+static void scc_acknowledge(const device_config *device)
 {
+	scc8530_interface *intf = get_interface(device);
+	if ((intf != NULL) && (intf->acknowledge != NULL))
+		(*intf->acknowledge)(device);
+}
+
+
+
+/*-------------------------------------------------
+    scc_getareg
+-------------------------------------------------*/
+
+static int scc_getareg(const device_config *device)
+{
+	scc8530_t *scc = get_token(device);
+
 	/* Not yet implemented */
-	logerror("SCC: port A reg %i read 0x%02x\n",scc_reg,scc_reg_val_a[scc_reg]);
-	return scc_reg_val_a[scc_reg];
+	logerror("SCC: port A reg %i read 0x%02x\n", scc->reg, scc->reg_val_a[scc->reg]);
+	return scc->reg_val_a[scc->reg];
 }
 
 
 
-static int scc_getbreg(void)
+/*-------------------------------------------------
+    scc_getareg
+-------------------------------------------------*/
+
+static int scc_getbreg(const device_config *device)
 {
-	logerror("SCC: port B reg %i read 0x%02x\n",scc_reg,scc_reg_val_b[scc_reg]);
+	scc8530_t *scc = get_token(device);
 
-	if (scc_reg == 2)
+	logerror("SCC: port B reg %i read 0x%02x\n", scc->reg, scc->reg_val_b[scc->reg]);
+
+	if (scc->reg == 2)
 	{
-		// HACK! but lets the Mac Plus mouse move again.  Needs further investigation.
-		if (scc_intf && scc_intf->acknowledge)
-			scc_intf->acknowledge();
+		/* HACK! but lets the Mac Plus mouse move again.  Needs further investigation. */
+		scc_acknowledge(device);
 
-		return scc_status;
+		return scc->status;
 	}
 
-	return scc_reg_val_b[scc_reg];
+	return scc->reg_val_b[scc->reg];
 }
 
 
 
-static void scc_putareg(int data)
+/*-------------------------------------------------
+    scc_putareg
+-------------------------------------------------*/
+
+static void scc_putareg(const device_config *device, int data)
 {
-	if (scc_reg == 0)
-	{
-		if (data & 0x10)
-		{
-			if (scc_intf && scc_intf->acknowledge)
-				scc_intf->acknowledge();
-		}
-	}
-	scc_reg_val_a[scc_reg] = data;
-	logerror("SCC: port A reg %i write 0x%02x\n",scc_reg,data);
-}
+	scc8530_t *scc = get_token(device);
 
-
-
-static void scc_putbreg(int data)
-{
-	if (scc_reg == 0)
+	if (scc->reg == 0)
 	{
 		if (data & 0x10)
-		{
-			if (scc_intf && scc_intf->acknowledge)
-				scc_intf->acknowledge();
-		}
+			scc_acknowledge(device);
 	}
-	scc_reg_val_b[scc_reg] = data;
-	logerror("SCC: port B reg %i write 0x%02x\n",scc_reg,data);
+	scc->reg_val_a[scc->reg] = data;
+	logerror("SCC: port A reg %i write 0x%02x\n", scc->reg, data);
 }
 
-unsigned char scc_get_reg_a(int reg)
+
+
+/*-------------------------------------------------
+    scc_putbreg
+-------------------------------------------------*/
+
+static void scc_putbreg(const device_config *device, int data)
 {
-	return scc_reg_val_a[reg];
+	scc8530_t *scc = get_token(device);
+
+	if (scc->reg == 0)
+	{
+		if (data & 0x10)
+			scc_acknowledge(device);
+	}
+	scc->reg_val_b[scc->reg] = data;
+	logerror("SCC: port B reg %i write 0x%02x\n", scc->reg, data);
 }
 
-unsigned char scc_get_reg_b(int reg)
+
+
+/*-------------------------------------------------
+    scc_get_reg_a
+-------------------------------------------------*/
+
+UINT8 scc_get_reg_a(const device_config *device, int reg)
 {
-	return scc_reg_val_b[reg];
+	scc8530_t *scc = get_token(device);
+	return scc->reg_val_a[reg];
 }
 
-void scc_set_reg_a(int reg, unsigned char data)
+
+
+/*-------------------------------------------------
+    scc_get_reg_b
+-------------------------------------------------*/
+
+UINT8 scc_get_reg_b(const device_config *device, int reg)
 {
-	scc_reg_val_a[reg] = data;
+	scc8530_t *scc = get_token(device);
+	return scc->reg_val_b[reg];
 }
 
-void scc_set_reg_b(int reg, unsigned char data)
+
+
+/*-------------------------------------------------
+    scc_set_reg_a
+-------------------------------------------------*/
+
+void scc_set_reg_a(const device_config *device, int reg, UINT8 data)
 {
-	scc_reg_val_b[reg] = data;
+	scc8530_t *scc = get_token(device);
+	scc->reg_val_a[reg] = data;
 }
 
-READ8_HANDLER(scc_r)
+
+
+/*-------------------------------------------------
+    scc_set_reg_a
+-------------------------------------------------*/
+
+void scc_set_reg_b(const device_config *device, int reg, UINT8 data)
 {
+	scc8530_t *scc = get_token(device);
+	scc->reg_val_b[reg] = data;
+}
+
+
+
+/*-------------------------------------------------
+    scc_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER(scc_r)
+{
+	scc8530_t *scc = get_token(device);
 	UINT8 result = 0;
 
 	offset %= 4;
@@ -129,22 +237,22 @@ READ8_HANDLER(scc_r)
 	{
 		case 0:
 			/* Channel B (Printer Port) Control */
-			if (scc_mode == 1)
-				scc_mode = 0;
+			if (scc->mode == 1)
+				scc->mode = 0;
 			else
-				scc_reg = 0;
+				scc->reg = 0;
 
-			result = scc_getbreg();
+			result = scc_getbreg(device);
 			break;
 
 		case 1:
 			/* Channel A (Modem Port) Control */
-			if (scc_mode == 1)
-				scc_mode = 0;
+			if (scc->mode == 1)
+				scc->mode = 0;
 			else
-				scc_reg = 0;
+				scc->reg = 0;
 
-			result = scc_getareg();
+			result = scc_getareg(device);
 			break;
 
 		case 2:
@@ -162,47 +270,53 @@ READ8_HANDLER(scc_r)
 
 
 
-WRITE8_HANDLER(scc_w)
+/*-------------------------------------------------
+    scc_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(scc_w)
 {
+	scc8530_t *scc = get_token(device);
+
 	offset &= 3;
 
 	switch(offset)
 	{
 		case 0:
 			/* Channel B (Printer Port) Control */
-			if (scc_mode == 0)
+			if (scc->mode == 0)
 			{
 				if((data & 0xf0) == 0)  // not a reset command
 				{
-					scc_mode = 1;
-					scc_reg = data & 0x0f;
-					logerror("SCC: Port B Reg select - %i\n",scc_reg);
-//					scc_putbreg(data & 0xf0);
+					scc->mode = 1;
+					scc->reg = data & 0x0f;
+					logerror("SCC: Port B Reg select - %i\n",scc->reg);
+//					scc_putbreg(device, data & 0xf0);
 				}
 			}
 			else
 			{
-				scc_mode = 0;
-				scc_putbreg(data);
+				scc->mode = 0;
+				scc_putbreg(device, data);
 			}
 			break;
 
 		case 1:
 			/* Channel A (Modem Port) Control */
-			if (scc_mode == 0)
+			if (scc->mode == 0)
 			{
 				if((data & 0xf0) == 0)  // not a reset command
 				{
-					scc_mode = 1;
-					scc_reg = data & 0x0f;
-					logerror("SCC: Port A Reg select - %i\n",scc_reg);
-//					scc_putareg(data & 0xf0);
+					scc->mode = 1;
+					scc->reg = data & 0x0f;
+					logerror("SCC: Port A Reg select - %i\n", scc->reg);
+//					scc_putareg(device, data & 0xf0);
 				}
 			}
 			else
 			{
-				scc_mode = 0;
-				scc_putareg(data);
+				scc->mode = 0;
+				scc_putareg(device, data);
 			}
 			break;
 
@@ -218,3 +332,46 @@ WRITE8_HANDLER(scc_w)
 	}
 }
 
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( scc8530 )
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( scc8530 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( scc8530 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( scc8530 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(scc8530_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(scc8530); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(scc8530);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Zilog 8530 SCC";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "Zilog 8530 SCC";					break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
+}

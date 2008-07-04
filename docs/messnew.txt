@@ -165,6 +165,9 @@ Source Changes:
 
 - Code cleanups.  [Atari Ace]
 
+- Changed the 8530 SCC chip implementation to use MAME's device system.  [Nate
+  Woods]
+
 
 
 0.125

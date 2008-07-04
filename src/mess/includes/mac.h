@@ -10,6 +10,7 @@
 #define MAC_H_
 
 #include "sound/custom.h"
+#include "machine/8530scc.h"
 
 
 // video parameters
@@ -20,6 +21,8 @@
 
 
 /*----------- defined in machine/mac.c -----------*/
+
+extern const scc8530_interface mac_scc8530_interface;
 
 MACHINE_START( macscsi );
 MACHINE_RESET( mac );

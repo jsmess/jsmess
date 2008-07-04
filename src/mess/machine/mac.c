@@ -39,7 +39,6 @@
 #include <time.h>
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
 #include "cpu/m68000/m68000.h"
@@ -717,32 +716,33 @@ WRITE16_HANDLER ( macplus_scsi_w )
  * Serial Control Chip
  * *************************************************************************/
 
-static void mac_scc_ack(void)
+static void mac_scc_ack(const device_config *device)
 {
-	set_scc_interrupt(Machine, 0);
+	set_scc_interrupt(device->machine, 0);
 }
 
 
 
 void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 {
+	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
 	static int last_was_x = 0;
 
 	if (x && y)
 	{
 		if (last_was_x)
-			scc_set_status(0x0a);
+			scc_set_status(scc, 0x0a);
 		else
-			scc_set_status(0x02);
+			scc_set_status(scc, 0x02);
 
 		last_was_x ^= 1;
 	}
 	else
 	{
 		if (x)
-			scc_set_status(0x0a);
+			scc_set_status(scc, 0x0a);
 		else
-			scc_set_status(0x02);
+			scc_set_status(scc, 0x02);
 	}
 
 	//cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
@@ -753,8 +753,10 @@ void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 
 READ16_HANDLER ( mac_scc_r )
 {
+	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
 	UINT16 result;
-	result = scc_r(machine, offset);
+
+	result = scc_r(scc, offset);
 	return (result << 8) | result;
 }
 
@@ -762,12 +764,13 @@ READ16_HANDLER ( mac_scc_r )
 
 WRITE16_HANDLER ( mac_scc_w )
 {
-	scc_w(machine, offset, (UINT8) data);
+	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+	scc_w(scc, offset, (UINT8) data);
 }
 
 
 
-static const struct scc8530_interface mac_scc8530_interface =
+const scc8530_interface mac_scc8530_interface =
 {
 	mac_scc_ack
 };
@@ -1303,9 +1306,6 @@ MACHINE_RESET(mac)
 {
 	/* initialize real-time clock */
 	rtc_init();
-
-	/* initialize serial */
-	scc_init(&mac_scc8530_interface);
 
 	/* setup the memory overlay */
 	set_memory_overlay(machine, 1);

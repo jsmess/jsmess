@@ -958,6 +958,7 @@ static int apple2gs_get_vpos(running_machine *machine)
 static READ8_HANDLER( apple2gs_c0xx_r )
 {
 	UINT8 result;
+	const device_config *scc;
 
 	offset &= 0xFF;
 
@@ -1045,7 +1046,8 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			result = scc_r(machine, offset & 0x03);
+			scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+			result = scc_r(scc, offset & 0x03);
 			break;
 
 		case 0x3C:	/* C03C - SOUNDCTL */
@@ -1099,6 +1101,8 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 
 static WRITE8_HANDLER( apple2gs_c0xx_w )
 {
+	const device_config *scc;
+
 	offset &= 0xFF;
 
 	if (LOG_C0XX)
@@ -1182,7 +1186,8 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc_w(machine, offset & 0x03, data);
+			scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+			scc_w(scc, offset & 0x03, data);
 			break;
 
 		case 0x3C:	/* C03C - SOUNDCTL */
@@ -1782,7 +1787,6 @@ MACHINE_START( apple2gs )
 	sndglu_dummy_read = 0;
 
 	/* init the various subsystems */
-	scc_init(NULL);
 	apple2gs_setup_memory(machine);
 
 	/* save state stuff.  note that the driver takes care of docram. */

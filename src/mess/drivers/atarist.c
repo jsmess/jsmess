@@ -964,7 +964,7 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
 //  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
-	AM_RANGE(0xff8c80, 0xff8c87) AM_READWRITE8(scc_r, scc_w, 0xff00)
+	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8(SCC8530, "scc", scc_r, scc_w, 0xff00)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE8(acia6850_0_stat_r, acia6850_0_ctrl_w, 0xff00)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE8(acia6850_0_data_r, acia6850_0_data_w, 0xff00)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE8(acia6850_1_stat_r, acia6850_1_ctrl_w, 0xff00)
@@ -1726,9 +1726,9 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_MACHINE_START(atarist)
 
 	// device hardware
-
 	MDRV_DEVICE_ADD(MC68901_TAG, MC68901)
 	MDRV_DEVICE_CONFIG(mfp_intf)
+	MDRV_DEVICE_ADD("scc", SCC8530)
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1772,9 +1772,9 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_MACHINE_START(atariste)
 
 	// device hardware
-
 	MDRV_DEVICE_ADD(MC68901_TAG, MC68901)
 	MDRV_DEVICE_CONFIG(atariste_mfp_intf)
+	MDRV_DEVICE_ADD("scc", SCC8530)
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1825,9 +1825,9 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_MACHINE_START(stbook)
 
 	// device hardware
-
 	MDRV_DEVICE_ADD(MC68901_TAG, MC68901)
 	MDRV_DEVICE_CONFIG(stbook_mfp_intf)
+	MDRV_DEVICE_ADD("scc", SCC8530)
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", LCD)

@@ -531,11 +531,12 @@ static int x68k_read_mouse(running_machine *machine)
 	sys.mouse.inputtype++;
 	if(sys.mouse.inputtype > 2)
 	{
-		int val = scc_get_reg_b(0);
+		const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+		int val = scc_get_reg_b(scc, 0);
 		sys.mouse.inputtype = 0;
 		sys.mouse.bufferempty = 1;
 		val &= ~0x01;
-		scc_set_reg_b(0,val);
+		scc_set_reg_b(scc, 0, val);
 		logerror("SCC: mouse buffer empty\n");
 	}
 
@@ -550,17 +551,18 @@ static int x68k_read_mouse(running_machine *machine)
 */
 static READ16_HANDLER( x68k_scc_r )
 {
+	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
 	offset %= 4;
 	switch(offset)
 	{
 	case 0:
-		return scc_r(machine, 0);
+		return scc_r(scc, 0);
 	case 1:
 		return x68k_read_mouse(machine);
 	case 2:
-		return scc_r(machine, 1);
+		return scc_r(scc, 1);
 	case 3:
-		return scc_r(machine, 3);
+		return scc_r(scc, 3);
 	default:
 		return 0xff;
 	}
@@ -568,39 +570,41 @@ static READ16_HANDLER( x68k_scc_r )
 
 static WRITE16_HANDLER( x68k_scc_w )
 {
+	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
 	static unsigned char prev;
 	offset %= 4;
 
 	switch(offset)
 	{
 	case 0:
-		scc_w(machine, 0,(UINT8)data);
-		if((scc_get_reg_b(5) & 0x02) != prev)
+		scc_w(scc, 0,(UINT8)data);
+		if((scc_get_reg_b(scc, 5) & 0x02) != prev)
 		{
-			if(scc_get_reg_b(5) & 0x02)  // Request to Send
+			if(scc_get_reg_b(scc, 5) & 0x02)  // Request to Send
 			{
-				int val = scc_get_reg_b(0);
+				int val = scc_get_reg_b(scc, 0);
 				sys.mouse.bufferempty = 0;
 				val |= 0x01;
-				scc_set_reg_b(0,val);
+				scc_set_reg_b(scc, 0,val);
 			}
 		}
 		break;
 	case 1:
-		scc_w(machine, 2,(UINT8)data);
+		scc_w(scc, 2,(UINT8)data);
 		break;
 	case 2:
-		scc_w(machine, 1,(UINT8)data);
+		scc_w(scc, 1,(UINT8)data);
 		break;
 	case 3:
-		scc_w(machine, 3,(UINT8)data);
+		scc_w(scc, 3,(UINT8)data);
 		break;
 	}
-	prev = scc_get_reg_b(5) & 0x02;
+	prev = scc_get_reg_b(scc, 5) & 0x02;
 }
 
 static TIMER_CALLBACK(x68k_scc_ack)
 {
+	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
 	if(sys.mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
@@ -608,11 +612,11 @@ static TIMER_CALLBACK(x68k_scc_ack)
 		return;
 
 	// hard-code the IRQ vector for now, until the SCC code is more complete
-	if((scc_get_reg_a(9) & 0x08) || (scc_get_reg_b(9) & 0x08))  // SCC reg WR9 is the same for both channels
+	if((scc_get_reg_a(scc, 9) & 0x08) || (scc_get_reg_b(scc, 9) & 0x08))  // SCC reg WR9 is the same for both channels
 	{
-		if((scc_get_reg_b(1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
+		if((scc_get_reg_b(scc, 1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
 		{
-			if(scc_get_reg_b(5) & 0x02)  // RTS signal
+			if(scc_get_reg_b(scc, 5) & 0x02)  // RTS signal
 			{
 				sys.mouse.irqactive = 1;
 				current_vector[5] = 0x54;
@@ -1601,11 +1605,6 @@ static const struct YM2151interface ym2151_interface =
 	x68k_ct_w  // CT1, CT2 from YM2151 port 0x1b
 };
 
-static const struct scc8530_interface scc_interface =
-{
-	NULL//x68k_scc_ack
-};
-
 static const struct rp5c15_interface rtc_intf =
 {
 	x68k_rtc_alarm_irq
@@ -1999,7 +1998,6 @@ static DRIVER_INIT( x68000 )
 	memset(&sys,0,sizeof(sys));
 
 	mfp_init();
-	scc_init(&scc_interface);
 	rp5c15_init(machine, &rtc_intf);
 
 	cpunum_set_irq_callback(0, x68k_int_ack);
@@ -2036,6 +2034,8 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_DEVICE_CONFIG( dmac_interface )
 
 	MDRV_DEVICE_ADD( "x68k_hdc", X68KHDC )
+
+	MDRV_DEVICE_ADD( "scc", SCC8530 )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

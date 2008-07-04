@@ -110,6 +110,8 @@ static UINT32 nHPC_SCSI0Descriptor, nHPC_SCSI0DMACtrl;
 
 static READ32_HANDLER( hpc_r )
 {
+	const device_config *scc;
+
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
 	{
@@ -182,7 +184,8 @@ static READ32_HANDLER( hpc_r )
 	case 0x0d04:
 		verboselog( 2, "HPC DUART0 Channel B Data Read\n" );
 //      return 0;
-		return scc_r(machine, 2);
+		scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+		return scc_r(scc, 2);
 		break;
 	case 0x0d08:
 		verboselog( 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask	 );
@@ -192,7 +195,8 @@ static READ32_HANDLER( hpc_r )
 	case 0x0d0c:
 		verboselog( 2, "HPC DUART0 Channel A Data Read\n" );
 //      return 0;
-		return scc_r(machine, 3);
+		scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+		return scc_r(scc, 3);
 		break;
 	case 0x0d10:
 //      verboselog( 2, "HPC DUART1 Channel B Control Read\n" );
@@ -249,6 +253,8 @@ static READ32_HANDLER( hpc_r )
 
 static WRITE32_HANDLER( hpc_w )
 {
+	const device_config *scc;
+
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
 	{
@@ -383,19 +389,23 @@ static WRITE32_HANDLER( hpc_w )
 		break;
 	case 0x0d00:
 		verboselog( 2, "HPC DUART0 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
-		scc_w(machine, 0, data);
+		scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+		scc_w(scc, 0, data);
 		break;
 	case 0x0d04:
 		verboselog( 2, "HPC DUART0 Channel B Data Write: %08x (%08x)\n", data, mem_mask );
-		scc_w(machine, 2, data);
+		scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+		scc_w(scc, 2, data);
 		break;
 	case 0x0d08:
 		verboselog( 2, "HPC DUART0 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
-		scc_w(machine, 1, data);
+		scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+		scc_w(scc, 1, data);
 		break;
 	case 0x0d0c:
 		verboselog( 2, "HPC DUART0 Channel A Data Write: %08x (%08x)\n", data, mem_mask );
-		scc_w(machine, 3, data);
+		scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+		scc_w(scc, 3, data);
 		break;
 	case 0x0d10:
 		if( ( data & 0x000000ff ) >= 0x00000020 )
@@ -582,7 +592,6 @@ static void ip204415_exit(running_machine *machine)
 
 static DRIVER_INIT( ip204415 )
 {
-	scc_init(NULL);
 	wd33c93_init(&scsi_intf);
 	add_exit_callback(machine, ip204415_exit);
 }
@@ -635,6 +644,8 @@ static MACHINE_DRIVER_START( ip204415 )
 
 	MDRV_SOUND_ADD( CDDA, 0 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_DEVICE_ADD("scc", SCC8530)
 MACHINE_DRIVER_END
 
 ROM_START( ip204415 )

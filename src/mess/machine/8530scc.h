@@ -6,25 +6,44 @@
 
 *********************************************************************/
 
-#ifndef _8630SCC_H
-#define _8630SCC_H
+#ifndef __8630SCC_H__
+#define __8630SCC_H__
 
 
-struct scc8530_interface
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+#define SCC8530			DEVICE_GET_INFO_NAME(scc8530)
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _scc8530_interface scc8530_interface;
+struct _scc8530_interface
 {
-	void (*acknowledge)(void);
+	void (*acknowledge)(const device_config *device);
 };
 
 
-void scc_init(const struct scc8530_interface *intf);
-void scc_set_status(int status);
 
-unsigned char scc_get_reg_a(int reg);
-unsigned char scc_get_reg_b(int reg);
-void scc_set_reg_a(int reg, unsigned char data);
-void scc_set_reg_b(int reg, unsigned char data);
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
-READ8_HANDLER(scc_r);
-WRITE8_HANDLER(scc_w);
+void scc_set_status(const device_config *device, int status);
 
-#endif /* _8630SCC_H */
+UINT8 scc_get_reg_a(const device_config *device, int reg);
+UINT8 scc_get_reg_b(const device_config *device, int reg);
+void scc_set_reg_a(const device_config *device, int reg, UINT8 data);
+void scc_set_reg_b(const device_config *device, int reg, UINT8 data);
+
+DEVICE_GET_INFO(scc8530);
+
+READ8_DEVICE_HANDLER(scc_r);
+WRITE8_DEVICE_HANDLER(scc_w);
+
+#endif /* __8630SCC_H__ */
