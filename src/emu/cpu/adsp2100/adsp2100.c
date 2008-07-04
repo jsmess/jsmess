@@ -97,6 +97,7 @@
 
 #include "debugger.h"
 #include "adsp2100.h"
+#include <stddef.h>
 
 
 /***************************************************************************
@@ -239,7 +240,6 @@ typedef struct
 	UINT16		ifc;
     UINT8    	irq_state[9];
     UINT8    	irq_latch[9];
-    INT32		interrupt_cycles;
     int			(*irq_callback)(int irqline);
 
     /* other callbacks */
@@ -726,7 +726,6 @@ static void adsp2100_init(int index, int clock, const void *config, int (*irqcal
 	state_save_register_item("adsp2100", index, adsp2100.ifc);
 	state_save_register_item_array("adsp2100", index, adsp2100.irq_state);
 	state_save_register_item_array("adsp2100", index, adsp2100.irq_latch);
-	state_save_register_item("adsp2100", index, adsp2100.interrupt_cycles);
 }
 
 
@@ -797,7 +796,6 @@ static void adsp2100_reset(void)
 	adsp2100.imask = 0;
 	for (irq = 0; irq < 8; irq++)
 		adsp2100.irq_state[irq] = adsp2100.irq_latch[irq] = CLEAR_LINE;
-	adsp2100.interrupt_cycles = 0;
 }
 
 
@@ -933,24 +931,25 @@ static void adsp2100_exit(void)
 /* execute instructions on this CPU until icount expires */
 static int adsp2100_execute(int cycles)
 {
+	int check_debugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+
 	/* reset the core */
 	set_mstat(adsp2100.mstat);
 
 	/* count cycles and interrupt cycles */
 	adsp2100_icount = cycles;
-	adsp2100_icount -= adsp2100.interrupt_cycles;
-	adsp2100.interrupt_cycles = 0;
 
 	CHANGEPC();
 
-	/* core execution loop */
 	do
 	{
-		UINT32 op, temp;
+		UINT32 temp;
+		UINT32 op;
 
 		/* debugging */
 		adsp2100.ppc = adsp2100.pc;	/* copy PC to previous PC */
-		debugger_instruction_hook(Machine, adsp2100.pc);
+		if (check_debugger)
+			debugger_instruction_hook(Machine, adsp2100.pc);
 
 #if TRACK_HOTSPOTS
 		pcbucket[adsp2100.pc & 0x3fff]++;
@@ -1214,10 +1213,10 @@ static int adsp2100_execute(int cycles)
 				{
 					adsp2100.pc = (op >> 4) & 0x3fff;
 					CHANGEPC();
+					/* check for a busy loop */
+					if (adsp2100.pc == adsp2100.ppc)
+						adsp2100_icount = 0;
 				}
-				/* check for a busy loop */
-				if (adsp2100.pc == adsp2100.ppc)
-					adsp2100_icount = 0;
 				break;
 			case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 				/* 000111xx xxxxxxxx xxxxxxxx  conditional call (immediate addr) */
@@ -1675,11 +1674,7 @@ static int adsp2100_execute(int cycles)
 		}
 
 		adsp2100_icount--;
-
 	} while (adsp2100_icount > 0);
-
-	adsp2100_icount -= adsp2100.interrupt_cycles;
-	adsp2100.interrupt_cycles = 0;
 
 	return cycles - adsp2100_icount;
 }

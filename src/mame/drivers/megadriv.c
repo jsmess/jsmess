@@ -4817,6 +4817,7 @@ MACHINE_RESET( megadriv )
 
 	memset(megadrive_ram,0x00,0x10000);
 
+
 }
 
 void megadriv_stop_scanline_timer(void)

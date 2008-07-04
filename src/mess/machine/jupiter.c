@@ -36,6 +36,23 @@ static int jupiter_data_type = JUPITER_NONE;
 
 static void jupiter_machine_stop(running_machine *machine);
 
+static UINT8 read_cfg(running_machine *machine)
+{
+	UINT8 result;
+	switch(mame_get_phase(machine))
+	{
+		case MAME_PHASE_RESET:
+		case MAME_PHASE_RUNNING:
+			result = input_port_read(machine, "CFG");
+			break;
+
+		default:
+			result = 0x00;
+			break;
+	}
+	return result;
+}
+
 /* only gets called at the start of a cpu time slice */
 
 OPBASE_HANDLER( jupiter_opbaseoverride )
@@ -90,9 +107,9 @@ MACHINE_START( jupiter )
 	logerror("jupiter_init\r\n");
 	logerror("data: %p\n", jupiter_data);
 
-	if (input_port_read(machine, "CFG") != jupiter_ramsize)
+	if (read_cfg(machine) != jupiter_ramsize)
 	{
-		jupiter_ramsize = input_port_read(machine, "CFG");
+		jupiter_ramsize = read_cfg(machine);
 		switch (jupiter_ramsize)
 		{
 			case 03:

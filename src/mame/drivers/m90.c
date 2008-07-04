@@ -669,12 +669,12 @@ static INPUT_PORTS_START( riskchal )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Game Title" )	 PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
-	PORT_DIPSETTING(      0x0010, "Bomber Man World" )
-	PORT_DIPSETTING(      0x0000, "New Dyna Blaster Global Quest" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6") /* Manual says "NOT USE" */
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -683,11 +683,12 @@ static INPUT_PORTS_START( riskchal )
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0600, 0x0600, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2,3")
-	PORT_DIPSETTING(      0x0400, "2 Player" )
-	PORT_DIPSETTING(      0x0600, "4 Player Seprate Coins" )		/* Each player has a seperate Coin Slot */
-	PORT_DIPSETTING(      0x0200, "4 Player Shared Coins" )		/* All 4 players Share coin 1&2 */
-	PORT_DIPSETTING(      0x0000, "4 Player 1&2 3&4 Share Coins" )	/* Players 1&2 share coin 1&2, Players 3&4 share coin 3&4 */
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2") /* Manual says "NOT USE" */
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Slots" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0400, "Common" )
+	PORT_DIPSETTING(      0x0000, "Separate" )
 	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
@@ -695,8 +696,6 @@ static INPUT_PORTS_START( riskchal )
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
 //  IREM_COIN_MODE_2
-
-	IREM_JOYSTICKS_3_4
 INPUT_PORTS_END
 
 /*****************************************************************************/

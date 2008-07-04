@@ -1,6 +1,6 @@
 <tests>
 
-<test name="coupe_000" driver="coupe">
+<test name="samcoupe_000" driver="samcoupe">
 	<wait time="5"/>
 	<checkblank/>
 </test>

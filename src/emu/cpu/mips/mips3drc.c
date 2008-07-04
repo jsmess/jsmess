@@ -117,8 +117,8 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 #define CPR264(reg)				MEM(&mips3->cpr[2][reg])
 #define CCR264(reg)				MEM(&mips3->ccr[2][reg])
 
-#define FCCMASK(which)			((UINT32)(1 << fcc_shift[(mips3->flavor < MIPS3_TYPE_MIPS_IV) ? 0 : ((which) & 7)]))
 #define FCCSHIFT(which)			fcc_shift[(mips3->flavor < MIPS3_TYPE_MIPS_IV) ? 0 : ((which) & 7)]
+#define FCCMASK(which)			((UINT32)(1 << FCCSHIFT(which)))
 
 
 
@@ -169,6 +169,7 @@ struct _mips3imp_state
 
 	/* internal stuff */
 	UINT8				cache_dirty;				/* true if we need to flush the cache */
+	UINT32				jmpdest;					/* destination jump target */
 
 	/* parameters for subroutines */
 	UINT64				numcycles;					/* return value from gettotalcycles */
@@ -1634,13 +1635,17 @@ static void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *
 	compiler_state compiler_temp = *compiler;
 	UINT32 op = *desc->opptr.l;
 
-	/* set the link if needed */
-	if (linkreg != 0)
-		UML_DMOV(block, R64(linkreg), IMM((INT32)(desc->pc + 8)));					// dmov    <linkreg>,desc->pc + 8
+	/* fetch the target register if dynamic, in case it is modified by the delay slot */
+	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
+		UML_MOV(block, MEM(&mips3->impstate->jmpdest), R32(RSREG));					// mov     [jmpdest],<rsreg>
 
 	/* compile the delay slot using temporary compiler state */
 	assert(desc->delay != NULL);
 	generate_sequence_instruction(block, &compiler_temp, desc->delay);				// <next instruction>
+
+	/* set the link if needed -- after the delay slot */
+	if (linkreg != 0)
+		UML_DMOV(block, R64(linkreg), IMM((INT32)(desc->pc + 8)));					// dmov    <linkreg>,desc->pc + 8
 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
@@ -1654,16 +1659,17 @@ static void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *
 	}
 	else
 	{
-		generate_update_cycles(block, &compiler_temp, R32(RSREG), TRUE);
+		generate_update_cycles(block, &compiler_temp, MEM(&mips3->impstate->jmpdest), TRUE);
 																					// <subtract cycles>
-		UML_HASHJMP(block, IMM(mips3->impstate->mode), R32(RSREG), mips3->impstate->nocode);
+		UML_HASHJMP(block, IMM(mips3->impstate->mode), MEM(&mips3->impstate->jmpdest), mips3->impstate->nocode);
 																					// hashjmp <mode>,<rsreg>,nocode
 	}
 
 	/* update the label */
 	compiler->labelnum = compiler_temp.labelnum;
 
-	/* reset the mapvar to the current cycles */
+	/* reset the mapvar to the current cycles and account for skipped slots */
+	compiler->cycles += desc->skipslots;
 	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);								// mapvar  CYCLES,compiler->cycles
 }
 
@@ -2510,7 +2516,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_DCMP(block, R64(RTREG), IMM(0));								// dcmp    <rtreg>,0
-				UML_DMOVc(block, IF_Z, R64(RDREG), R64(RSREG));						// mov     <rdreg>,<rsreg>,Z
+				UML_DMOVc(block, IF_Z, R64(RDREG), R64(RSREG));						// dmov    <rdreg>,<rsreg>,Z
 			}
 			return TRUE;
 
@@ -2518,7 +2524,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_DCMP(block, R64(RTREG), IMM(0));								// dcmp    <rtreg>,0
-				UML_DMOVc(block, IF_NZ, R64(RDREG), R64(RSREG));					// mov     <rdreg>,<rsreg>,NZ
+				UML_DMOVc(block, IF_NZ, R64(RDREG), R64(RSREG));					// dmov    <rdreg>,<rsreg>,NZ
 			}
 			return TRUE;
 
@@ -2527,7 +2533,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			{
 				UML_TEST(block, CCR132(31), IMM(FCCMASK(op >> 18)));				// test    ccr31,fcc_mask[x]
 				UML_DMOVc(block, ((op >> 16) & 1) ? IF_NZ : IF_Z, R64(RDREG), R64(RSREG));
-																					// mov     <rdreg>,<rsreg>,NZ/Z
+																					// dmov    <rdreg>,<rsreg>,NZ/Z
 			}
 			return TRUE;
 
@@ -2539,7 +2545,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			return TRUE;
 
 		case 0x09:	/* JALR - MIPS I */
-			generate_delay_slot_and_branch(block, compiler, desc, 31);				// <next instruction + hashjmp>
+			generate_delay_slot_and_branch(block, compiler, desc, RDREG);			// <next instruction + hashjmp>
 			return TRUE;
 
 
@@ -2756,6 +2762,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 			return TRUE;
 
 		case COP0_Compare:
+			UML_MOV(block, MEM(&mips3->compare_armed), IMM(1));						// mov     [compare_armed],1
 			generate_update_cycles(block, compiler, IMM(desc->pc), !in_delay_slot);	// <subtract cycles>
 			UML_MOV(block, CPR032(COP0_Compare), IREG(0));							// mov     [Compare],i0
 			UML_AND(block, CPR032(COP0_Cause), CPR032(COP0_Cause), IMM(~0x8000));	// and     [Cause],[Cause],~0x8000
@@ -3250,6 +3257,8 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 					else				/* C.EQ.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
 					UML_SETc(block, IF_E, IREG(0));									// set     i0,e
+					UML_SETc(block, IF_NU, IREG(1));								// set     i1,nu
+					UML_AND(block, IREG(0), IREG(0), IREG(1));						// and     i0,i0,i1
 					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
 																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
@@ -3274,6 +3283,8 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 					else				/* C.OLT.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
 					UML_SETc(block, IF_B, IREG(0));									// set     i0,b
+					UML_SETc(block, IF_NU, IREG(1));								// set     i1,nu
+					UML_AND(block, IREG(0), IREG(0), IREG(1));						// and     i0,i0,i1
 					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
 																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
@@ -3298,6 +3309,8 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 					else				/* C.OLE.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
 					UML_SETc(block, IF_BE, IREG(0));								// set     i0,be
+					UML_SETc(block, IF_NU, IREG(1));								// set     i1,nu
+					UML_AND(block, IREG(0), IREG(0), IREG(1));						// and     i0,i0,i1
 					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
 																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
@@ -3346,7 +3359,7 @@ static int generate_cop1x(drcuml_block *block, compiler_state *compiler, const o
 		case 0x00:		/* LWXC1 - MIPS IV */
 			UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));						// add     i0,<rsreg>,<rtreg>
 			UML_CALLH(block, mips3->impstate->read32[mips3->impstate->mode >> 1]);	// callh   read32
-			UML_MOV(block, FPR32(RDREG), IREG(0));									// mov     <cpr1_rd>,i0
+			UML_MOV(block, FPR32(FDREG), IREG(0));									// mov     <cpr1_fd>,i0
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -3354,14 +3367,14 @@ static int generate_cop1x(drcuml_block *block, compiler_state *compiler, const o
 		case 0x01:		/* LDXC1 - MIPS IV */
 			UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));						// add     i0,<rsreg>,<rtreg>
 			UML_CALLH(block, mips3->impstate->read64[mips3->impstate->mode >> 1]);	// callh   read64
-			UML_DMOV(block, FPR64(RDREG), IREG(0));									// dmov    <cpr1_rd>,i0
+			UML_DMOV(block, FPR64(FDREG), IREG(0));									// dmov    <cpr1_fd>,i0
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
 
 		case 0x08:		/* SWXC1 - MIPS IV */
 			UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));						// add     i0,<rsreg>,<rtreg>
-			UML_MOV(block, IREG(1), FPR32(RTREG));									// mov     i1,<cpr1_rt>
+			UML_MOV(block, IREG(1), FPR32(FSREG));									// mov     i1,<cpr1_fs>
 			UML_CALLH(block, mips3->impstate->write32[mips3->impstate->mode >> 1]);	// callh   write32
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -3369,7 +3382,7 @@ static int generate_cop1x(drcuml_block *block, compiler_state *compiler, const o
 
 		case 0x09:		/* SDXC1 - MIPS IV */
 			UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));						// add     i0,<rsreg>,<rtreg>
-			UML_DMOV(block, IREG(1), FPR64(RTREG));									// dmov    i1,<cpr1_rt>
+			UML_DMOV(block, IREG(1), FPR64(FSREG));									// dmov    i1,<cpr1_fs>
 			UML_CALLH(block, mips3->impstate->write64[mips3->impstate->mode >> 1]);	// callh   write64
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);

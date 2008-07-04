@@ -768,6 +768,7 @@ $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/m57.o $(VIDEO)/m57.o \
 	$(DRIVERS)/m58.o $(VIDEO)/m58.o \
 	$(DRIVERS)/m62.o $(VIDEO)/m62.o \
+	$(DRIVERS)/m63.o \
 	$(DRIVERS)/m72.o $(AUDIO)/m72.o $(VIDEO)/m72.o \
 	$(DRIVERS)/m90.o $(VIDEO)/m90.o \
 	$(DRIVERS)/m92.o $(VIDEO)/m92.o \
@@ -777,7 +778,6 @@ $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/shisen.o $(VIDEO)/shisen.o \
 	$(DRIVERS)/travrusa.o $(VIDEO)/travrusa.o \
 	$(DRIVERS)/vigilant.o $(VIDEO)/vigilant.o \
-	$(DRIVERS)/wilytowr.o \
 	$(MACHINE)/irem_cpu.o \
 	$(AUDIO)/fghtbskt.o \
 	$(AUDIO)/irem.o \
@@ -1309,6 +1309,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/exzisus.o $(VIDEO)/exzisus.o \
 	$(DRIVERS)/fgoal.o $(VIDEO)/fgoal.o \
 	$(DRIVERS)/flstory.o $(MACHINE)/flstory.o $(VIDEO)/flstory.o \
+	$(DRIVERS)/galastrm.o $(VIDEO)/galastrm.o \
 	$(DRIVERS)/gladiatr.o $(VIDEO)/gladiatr.o \
 	$(DRIVERS)/grchamp.o $(AUDIO)/grchamp.o $(VIDEO)/grchamp.o \
 	$(DRIVERS)/groundfx.o $(VIDEO)/groundfx.o \
@@ -1517,6 +1518,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/blackt96.o \
 	$(DRIVERS)/bmcbowl.o \
+	$(DRIVERS)/koftball.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \

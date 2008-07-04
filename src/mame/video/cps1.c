@@ -1228,6 +1228,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"captcomm", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcomu", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcomj", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"captcomb", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"knights",  CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu", CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj", CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
@@ -1262,9 +1263,14 @@ static const struct CPS1config cps1_config_table[]=
 	{"dino",     CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinou",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinoj",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
+	{"dinopic",  CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
+	{"dinopic2", CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"punisher", CPS_B_21_QS3, mapper_PS63B },
 	{"punishru", CPS_B_21_QS3, mapper_PS63B },
 	{"punishrj", CPS_B_21_QS3, mapper_PS63B },
+	{"punipic",  CPS_B_21_QS3, mapper_PS63B },
+	{"punipic2", CPS_B_21_QS3, mapper_PS63B },
+	{"punipic3", CPS_B_21_QS3, mapper_PS63B },
 	{"slammast", CPS_B_21_QS4, mapper_MB63B },
 	{"slammasu", CPS_B_21_QS4, mapper_MB63B },
 	{"mbomberj", CPS_B_21_QS4, mapper_MB63B },

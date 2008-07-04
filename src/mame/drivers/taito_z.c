@@ -1135,26 +1135,16 @@ logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n",activecpu
 	return 0xff;
 }
 
-static const UINT8 nightstr_stick[128]=
-{
-	0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,
-	0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7,
-	0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf,0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,
-	0xe8,0x00,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,0x20,0x21,0x22,0x23,0x24,0x25,
-	0x26,0x27,0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,0x30,0x31,0x32,0x33,0x34,0x35,
-	0x36,0x37,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x40,0x41,0x42,0x43,0x44,0x45,
-	0x46,0x47,0x48,0x49,0xb8
-};
 
 static READ16_HANDLER( nightstr_stick_r )
 {
 	switch (offset)
 	{
 		case 0x00:
-			return nightstr_stick[(input_port_read_indexed(machine,5) * 0x64) / 0x100];
+			return input_port_read_indexed(machine,5);
 
 		case 0x01:
-			return nightstr_stick[(input_port_read_indexed(machine,6) * 0x64) / 0x100];
+			return input_port_read_indexed(machine,6);
 
 		case 0x02:
 			return input_port_read_indexed(machine,7);
@@ -1940,44 +1930,303 @@ ADDRESS_MAP_END
                    INPUT PORTS, DIPs
 ***********************************************************/
 
+#define TAITO_Z_ANALOG_ADJUST( str ) \
+	PORT_DIPNAME( 0xff, 0x80, str ) \
+	PORT_DIPSETTING(    0x00, "-80" ) \
+	PORT_DIPSETTING(    0x01, "-7F" ) \
+	PORT_DIPSETTING(    0x02, "-7E" ) \
+	PORT_DIPSETTING(    0x03, "-7D" ) \
+	PORT_DIPSETTING(    0x04, "-7C" ) \
+	PORT_DIPSETTING(    0x05, "-7B" ) \
+	PORT_DIPSETTING(    0x06, "-7A" ) \
+	PORT_DIPSETTING(    0x07, "-79" ) \
+	PORT_DIPSETTING(    0x08, "-78" ) \
+	PORT_DIPSETTING(    0x09, "-77" ) \
+	PORT_DIPSETTING(    0x0a, "-76" ) \
+	PORT_DIPSETTING(    0x0b, "-75" ) \
+	PORT_DIPSETTING(    0x0c, "-74" ) \
+	PORT_DIPSETTING(    0x0d, "-73" ) \
+	PORT_DIPSETTING(    0x0e, "-72" ) \
+	PORT_DIPSETTING(    0x0f, "-71" ) \
+	PORT_DIPSETTING(    0x10, "-70" ) \
+	PORT_DIPSETTING(    0x11, "-6F" ) \
+	PORT_DIPSETTING(    0x12, "-6E" ) \
+	PORT_DIPSETTING(    0x13, "-6D" ) \
+	PORT_DIPSETTING(    0x14, "-6C" ) \
+	PORT_DIPSETTING(    0x15, "-6B" ) \
+	PORT_DIPSETTING(    0x16, "-6A" ) \
+	PORT_DIPSETTING(    0x17, "-69" ) \
+	PORT_DIPSETTING(    0x18, "-68" ) \
+	PORT_DIPSETTING(    0x19, "-67" ) \
+	PORT_DIPSETTING(    0x1a, "-66" ) \
+	PORT_DIPSETTING(    0x1b, "-65" ) \
+	PORT_DIPSETTING(    0x1c, "-64" ) \
+	PORT_DIPSETTING(    0x1d, "-63" ) \
+	PORT_DIPSETTING(    0x1e, "-62" ) \
+	PORT_DIPSETTING(    0x1f, "-61" ) \
+	PORT_DIPSETTING(    0x20, "-60" ) \
+	PORT_DIPSETTING(    0x21, "-5F" ) \
+	PORT_DIPSETTING(    0x22, "-5E" ) \
+	PORT_DIPSETTING(    0x23, "-5D" ) \
+	PORT_DIPSETTING(    0x24, "-5C" ) \
+	PORT_DIPSETTING(    0x25, "-5B" ) \
+	PORT_DIPSETTING(    0x26, "-5A" ) \
+	PORT_DIPSETTING(    0x27, "-59" ) \
+	PORT_DIPSETTING(    0x28, "-58" ) \
+	PORT_DIPSETTING(    0x29, "-57" ) \
+	PORT_DIPSETTING(    0x2a, "-56" ) \
+	PORT_DIPSETTING(    0x2b, "-55" ) \
+	PORT_DIPSETTING(    0x2c, "-54" ) \
+	PORT_DIPSETTING(    0x2d, "-53" ) \
+	PORT_DIPSETTING(    0x2e, "-52" ) \
+	PORT_DIPSETTING(    0x2f, "-51" ) \
+	PORT_DIPSETTING(    0x30, "-50" ) \
+	PORT_DIPSETTING(    0x31, "-4F" ) \
+	PORT_DIPSETTING(    0x32, "-4E" ) \
+	PORT_DIPSETTING(    0x33, "-4D" ) \
+	PORT_DIPSETTING(    0x34, "-4C" ) \
+	PORT_DIPSETTING(    0x35, "-4B" ) \
+	PORT_DIPSETTING(    0x36, "-4A" ) \
+	PORT_DIPSETTING(    0x37, "-49" ) \
+	PORT_DIPSETTING(    0x38, "-48" ) \
+	PORT_DIPSETTING(    0x39, "-47" ) \
+	PORT_DIPSETTING(    0x3a, "-46" ) \
+	PORT_DIPSETTING(    0x3b, "-45" ) \
+	PORT_DIPSETTING(    0x3c, "-44" ) \
+	PORT_DIPSETTING(    0x3d, "-43" ) \
+	PORT_DIPSETTING(    0x3e, "-42" ) \
+	PORT_DIPSETTING(    0x3f, "-41" ) \
+	PORT_DIPSETTING(    0x40, "-40" ) \
+	PORT_DIPSETTING(    0x41, "-3F" ) \
+	PORT_DIPSETTING(    0x42, "-3E" ) \
+	PORT_DIPSETTING(    0x43, "-3D" ) \
+	PORT_DIPSETTING(    0x44, "-3C" ) \
+	PORT_DIPSETTING(    0x45, "-3B" ) \
+	PORT_DIPSETTING(    0x46, "-3A" ) \
+	PORT_DIPSETTING(    0x47, "-39" ) \
+	PORT_DIPSETTING(    0x48, "-38" ) \
+	PORT_DIPSETTING(    0x49, "-37" ) \
+	PORT_DIPSETTING(    0x4a, "-36" ) \
+	PORT_DIPSETTING(    0x4b, "-35" ) \
+	PORT_DIPSETTING(    0x4c, "-34" ) \
+	PORT_DIPSETTING(    0x4d, "-33" ) \
+	PORT_DIPSETTING(    0x4e, "-32" ) \
+	PORT_DIPSETTING(    0x4f, "-31" ) \
+	PORT_DIPSETTING(    0x50, "-30" ) \
+	PORT_DIPSETTING(    0x51, "-2F" ) \
+	PORT_DIPSETTING(    0x52, "-2E" ) \
+	PORT_DIPSETTING(    0x53, "-2D" ) \
+	PORT_DIPSETTING(    0x54, "-2C" ) \
+	PORT_DIPSETTING(    0x55, "-2B" ) \
+	PORT_DIPSETTING(    0x56, "-2A" ) \
+	PORT_DIPSETTING(    0x57, "-29" ) \
+	PORT_DIPSETTING(    0x58, "-28" ) \
+	PORT_DIPSETTING(    0x59, "-27" ) \
+	PORT_DIPSETTING(    0x5a, "-26" ) \
+	PORT_DIPSETTING(    0x5b, "-25" ) \
+	PORT_DIPSETTING(    0x5c, "-24" ) \
+	PORT_DIPSETTING(    0x5d, "-23" ) \
+	PORT_DIPSETTING(    0x5e, "-22" ) \
+	PORT_DIPSETTING(    0x5f, "-21" ) \
+	PORT_DIPSETTING(    0x60, "-20" ) \
+	PORT_DIPSETTING(    0x61, "-1F" ) \
+	PORT_DIPSETTING(    0x62, "-1E" ) \
+	PORT_DIPSETTING(    0x63, "-1D" ) \
+	PORT_DIPSETTING(    0x64, "-1C" ) \
+	PORT_DIPSETTING(    0x65, "-1B" ) \
+	PORT_DIPSETTING(    0x66, "-1A" ) \
+	PORT_DIPSETTING(    0x67, "-19" ) \
+	PORT_DIPSETTING(    0x68, "-18" ) \
+	PORT_DIPSETTING(    0x69, "-17" ) \
+	PORT_DIPSETTING(    0x6a, "-16" ) \
+	PORT_DIPSETTING(    0x6b, "-15" ) \
+	PORT_DIPSETTING(    0x6c, "-14" ) \
+	PORT_DIPSETTING(    0x6d, "-13" ) \
+	PORT_DIPSETTING(    0x6e, "-12" ) \
+	PORT_DIPSETTING(    0x6f, "-11" ) \
+	PORT_DIPSETTING(    0x70, "-10" ) \
+	PORT_DIPSETTING(    0x71, "-0F" ) \
+	PORT_DIPSETTING(    0x72, "-0E" ) \
+	PORT_DIPSETTING(    0x73, "-0D" ) \
+	PORT_DIPSETTING(    0x74, "-0C" ) \
+	PORT_DIPSETTING(    0x75, "-0B" ) \
+	PORT_DIPSETTING(    0x76, "-0A" ) \
+	PORT_DIPSETTING(    0x77, "-09" ) \
+	PORT_DIPSETTING(    0x78, "-08" ) \
+	PORT_DIPSETTING(    0x79, "-07" ) \
+	PORT_DIPSETTING(    0x7a, "-06" ) \
+	PORT_DIPSETTING(    0x7b, "-05" ) \
+	PORT_DIPSETTING(    0x7c, "-04" ) \
+	PORT_DIPSETTING(    0x7d, "-03" ) \
+	PORT_DIPSETTING(    0x7e, "-02" ) \
+	PORT_DIPSETTING(    0x7f, "-01" ) \
+	PORT_DIPSETTING(    0x80, "+-00" ) \
+	PORT_DIPSETTING(    0x81, "+01" ) \
+	PORT_DIPSETTING(    0x82, "+02" ) \
+	PORT_DIPSETTING(    0x83, "+03" ) \
+	PORT_DIPSETTING(    0x84, "+04" ) \
+	PORT_DIPSETTING(    0x85, "+05" ) \
+	PORT_DIPSETTING(    0x86, "+06" ) \
+	PORT_DIPSETTING(    0x87, "+07" ) \
+	PORT_DIPSETTING(    0x88, "+08" ) \
+	PORT_DIPSETTING(    0x89, "+09" ) \
+	PORT_DIPSETTING(    0x8a, "+0A" ) \
+	PORT_DIPSETTING(    0x8b, "+0B" ) \
+	PORT_DIPSETTING(    0x8c, "+0C" ) \
+	PORT_DIPSETTING(    0x8d, "+0D" ) \
+	PORT_DIPSETTING(    0x8e, "+0E" ) \
+	PORT_DIPSETTING(    0x8f, "+0F" ) \
+	PORT_DIPSETTING(    0x90, "+10" ) \
+	PORT_DIPSETTING(    0x91, "+11" ) \
+	PORT_DIPSETTING(    0x92, "+12" ) \
+	PORT_DIPSETTING(    0x93, "+13" ) \
+	PORT_DIPSETTING(    0x94, "+14" ) \
+	PORT_DIPSETTING(    0x95, "+15" ) \
+	PORT_DIPSETTING(    0x96, "+16" ) \
+	PORT_DIPSETTING(    0x97, "+17" ) \
+	PORT_DIPSETTING(    0x98, "+18" ) \
+	PORT_DIPSETTING(    0x99, "+19" ) \
+	PORT_DIPSETTING(    0x9a, "+1A" ) \
+	PORT_DIPSETTING(    0x9b, "+1B" ) \
+	PORT_DIPSETTING(    0x9c, "+1C" ) \
+	PORT_DIPSETTING(    0x9d, "+1D" ) \
+	PORT_DIPSETTING(    0x9e, "+1E" ) \
+	PORT_DIPSETTING(    0x9f, "+1F" ) \
+	PORT_DIPSETTING(    0xa0, "+20" ) \
+	PORT_DIPSETTING(    0xa1, "+21" ) \
+	PORT_DIPSETTING(    0xa2, "+22" ) \
+	PORT_DIPSETTING(    0xa3, "+23" ) \
+	PORT_DIPSETTING(    0xa4, "+24" ) \
+	PORT_DIPSETTING(    0xa5, "+25" ) \
+	PORT_DIPSETTING(    0xa6, "+26" ) \
+	PORT_DIPSETTING(    0xa7, "+27" ) \
+	PORT_DIPSETTING(    0xa8, "+28" ) \
+	PORT_DIPSETTING(    0xa9, "+29" ) \
+	PORT_DIPSETTING(    0xaa, "+2A" ) \
+	PORT_DIPSETTING(    0xab, "+2B" ) \
+	PORT_DIPSETTING(    0xac, "+2C" ) \
+	PORT_DIPSETTING(    0xad, "+2D" ) \
+	PORT_DIPSETTING(    0xae, "+2E" ) \
+	PORT_DIPSETTING(    0xaf, "+2F" ) \
+	PORT_DIPSETTING(    0xb0, "+30" ) \
+	PORT_DIPSETTING(    0xb1, "+31" ) \
+	PORT_DIPSETTING(    0xb2, "+32" ) \
+	PORT_DIPSETTING(    0xb3, "+33" ) \
+	PORT_DIPSETTING(    0xb4, "+34" ) \
+	PORT_DIPSETTING(    0xb5, "+35" ) \
+	PORT_DIPSETTING(    0xb6, "+36" ) \
+	PORT_DIPSETTING(    0xb7, "+37" ) \
+	PORT_DIPSETTING(    0xb8, "+38" ) \
+	PORT_DIPSETTING(    0xb9, "+39" ) \
+	PORT_DIPSETTING(    0xba, "+3A" ) \
+	PORT_DIPSETTING(    0xbb, "+3B" ) \
+	PORT_DIPSETTING(    0xbc, "+3C" ) \
+	PORT_DIPSETTING(    0xbd, "+3D" ) \
+	PORT_DIPSETTING(    0xbe, "+3E" ) \
+	PORT_DIPSETTING(    0xbf, "+3F" ) \
+	PORT_DIPSETTING(    0xc0, "+40" ) \
+	PORT_DIPSETTING(    0xc1, "+41" ) \
+	PORT_DIPSETTING(    0xc2, "+42" ) \
+	PORT_DIPSETTING(    0xc3, "+43" ) \
+	PORT_DIPSETTING(    0xc4, "+44" ) \
+	PORT_DIPSETTING(    0xc5, "+45" ) \
+	PORT_DIPSETTING(    0xc6, "+46" ) \
+	PORT_DIPSETTING(    0xc7, "+47" ) \
+	PORT_DIPSETTING(    0xc8, "+48" ) \
+	PORT_DIPSETTING(    0xc9, "+49" ) \
+	PORT_DIPSETTING(    0xca, "+4A" ) \
+	PORT_DIPSETTING(    0xcb, "+4B" ) \
+	PORT_DIPSETTING(    0xcc, "+4C" ) \
+	PORT_DIPSETTING(    0xcd, "+4D" ) \
+	PORT_DIPSETTING(    0xce, "+4E" ) \
+	PORT_DIPSETTING(    0xcf, "+4F" ) \
+	PORT_DIPSETTING(    0xd0, "+50" ) \
+	PORT_DIPSETTING(    0xd1, "+51" ) \
+	PORT_DIPSETTING(    0xd2, "+52" ) \
+	PORT_DIPSETTING(    0xd3, "+53" ) \
+	PORT_DIPSETTING(    0xd4, "+54" ) \
+	PORT_DIPSETTING(    0xd5, "+55" ) \
+	PORT_DIPSETTING(    0xd6, "+56" ) \
+	PORT_DIPSETTING(    0xd7, "+57" ) \
+	PORT_DIPSETTING(    0xd8, "+58" ) \
+	PORT_DIPSETTING(    0xd9, "+59" ) \
+	PORT_DIPSETTING(    0xda, "+5A" ) \
+	PORT_DIPSETTING(    0xdb, "+5B" ) \
+	PORT_DIPSETTING(    0xdc, "+5C" ) \
+	PORT_DIPSETTING(    0xdd, "+5D" ) \
+	PORT_DIPSETTING(    0xde, "+5E" ) \
+	PORT_DIPSETTING(    0xdf, "+5F" ) \
+	PORT_DIPSETTING(    0xe0, "+60" ) \
+	PORT_DIPSETTING(    0xe1, "+61" ) \
+	PORT_DIPSETTING(    0xe2, "+62" ) \
+	PORT_DIPSETTING(    0xe3, "+63" ) \
+	PORT_DIPSETTING(    0xe4, "+64" ) \
+	PORT_DIPSETTING(    0xe5, "+65" ) \
+	PORT_DIPSETTING(    0xe6, "+66" ) \
+	PORT_DIPSETTING(    0xe7, "+67" ) \
+	PORT_DIPSETTING(    0xe8, "+68" ) \
+	PORT_DIPSETTING(    0xe9, "+69" ) \
+	PORT_DIPSETTING(    0xea, "+6A" ) \
+	PORT_DIPSETTING(    0xeb, "+6B" ) \
+	PORT_DIPSETTING(    0xec, "+6C" ) \
+	PORT_DIPSETTING(    0xed, "+6D" ) \
+	PORT_DIPSETTING(    0xee, "+6E" ) \
+	PORT_DIPSETTING(    0xef, "+6F" ) \
+	PORT_DIPSETTING(    0xf0, "+70" ) \
+	PORT_DIPSETTING(    0xf1, "+71" ) \
+	PORT_DIPSETTING(    0xf2, "+72" ) \
+	PORT_DIPSETTING(    0xf3, "+73" ) \
+	PORT_DIPSETTING(    0xf4, "+74" ) \
+	PORT_DIPSETTING(    0xf5, "+75" ) \
+	PORT_DIPSETTING(    0xf6, "+76" ) \
+	PORT_DIPSETTING(    0xf7, "+77" ) \
+	PORT_DIPSETTING(    0xf8, "+78" ) \
+	PORT_DIPSETTING(    0xf9, "+79" ) \
+	PORT_DIPSETTING(    0xfa, "+7A" ) \
+	PORT_DIPSETTING(    0xfb, "+7B" ) \
+	PORT_DIPSETTING(    0xfc, "+7C" ) \
+	PORT_DIPSETTING(    0xfd, "+7D" ) \
+	PORT_DIPSETTING(    0xfe, "+7E" ) \
+	PORT_DIPSETTING(    0xff, "+7F" )
+
 #define TAITO_Z_COINAGE_JAPAN_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:5,6") \
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:7,8") \
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 #define TAITO_Z_COINAGE_WORLD_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:5,6") \
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:7,8") \
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 
 #define TAITO_Z_COINAGE_US_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) \
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW A:5,6") \
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" ) \
+	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" ) PORT_DIPLOCATION("SW A:7,8") \
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) \
 	PORT_DIPSETTING(    0xc0, "Same as Start" )
 
 #define TAITO_Z_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) \
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:1,2")\
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) ) \
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
@@ -1986,41 +2235,37 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( contcirc )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, "Cockpit" )	// analogue accelerator pedal
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_WORLD_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty 1 (time/speed)" )
+	PORT_DIPNAME( 0x03, 0x03, "Difficulty 1 (time/speed)" ) PORT_DIPLOCATION("SW B:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Difficulty 2 (other cars)" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Difficulty 2 (other cars)" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, "Steering wheel" )	//not sure what effect this has
+	PORT_DIPNAME( 0x10, 0x10, "Steering wheel" ) PORT_DIPLOCATION("SW B:5")	//not sure what effect this has
 	PORT_DIPSETTING(    0x10, "Free" )
 	PORT_DIPSETTING(    0x00, "Locked" )
-	PORT_DIPNAME( 0x20, 0x00, "Enable 3d alternate frames" )
+	PORT_DIPNAME( 0x20, 0x00, "Enable 3d alternate frames" ) PORT_DIPLOCATION("SW B:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2064,34 +2309,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )	/* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1,2")	/* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
 	PORT_DIPSETTING(    0x03, "Upright / Steering Lock" )
 	PORT_DIPSETTING(    0x02, "Upright / No Steering Lock" )
 	PORT_DIPSETTING(    0x01, "Full Throttle Convert, Cockpit" )
 	PORT_DIPSETTING(    0x00, "Full Throttle Convert, Deluxe" )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_WORLD_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
 	PORT_DIPSETTING(    0x04, "65 Seconds" )
 	PORT_DIPSETTING(    0x0c, "60 Seconds" )
 	PORT_DIPSETTING(    0x00, "55 Seconds" )
-	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" )
+	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Discounted Continue Play" )	/* Full coin price to start, 1 coin to continue */
+	PORT_DIPNAME( 0x20, 0x20, "Discounted Continue Play" ) PORT_DIPLOCATION("SW B:6")	/* Full coin price to start, 1 coin to continue */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" )
+	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -2177,38 +2422,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( enforce )
 	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" )
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )	// Says SHIFT HI in test mode !?
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )		// Says SHIFT LO in test mode !?
 	TAITO_Z_COINAGE_JAPAN_8
 
 	PORT_START /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Background scenery" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW B:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW B:4" )
+	PORT_DIPNAME( 0x10, 0x00, "Background scenery" ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "Crazy scrolling" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2233,37 +2464,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bshark )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, "Mirror screen" )	// manual says first two must be off
+	PORT_DIPNAME( 0x01, 0x01, "Mirror screen" ) PORT_DIPLOCATION("SW A:1")	// manual says it must be off
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" )	// manual says it must be off
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_US_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x04, "Speed of Sight" )
+	PORT_DIPNAME( 0x0c, 0x04, "Speed of Sight" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x0c, "Slow" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x04, "Fast" )
 	PORT_DIPSETTING(    0x00, "Fastest" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	// manual says all these must be off
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW B:5" )	// manual says all these must be off
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2290,14 +2511,14 @@ static INPUT_PORTS_START( bshark )
 	PORT_START	/* values chosen to match allowed crosshair area */
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xcc,0x35) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START	/* "X adjust" */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START	/* "X adjust" */  /* declare as DIP SWITCH instead of VARIABLE REGISTER */
+	TAITO_Z_ANALOG_ADJUST( "Adjust Stick H (VARIABLE REGISTER)" )
 
 	PORT_START	/* values chosen to match allowed crosshair area */
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_MINMAX(0xd5,0x32) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_PLAYER(1)
 
-	PORT_START	/* "Y adjust" */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START	/* "Y adjust" */  /* declare as DIP SWITCH instead of VARIABLE REGISTER */
+	TAITO_Z_ANALOG_ADJUST( "Adjust Stick V (VARIABLE REGISTER)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bsharkj )
@@ -2309,35 +2530,33 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sci )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) /* Manual states "MUST REMAIN OFF" */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" ) /* Manual states "MUST REMAIN OFF" */
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_WORLD_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
 	PORT_DIPSETTING(    0x04, "65 Seconds" )
 	PORT_DIPSETTING(    0x0c, "60 Seconds" )
 	PORT_DIPSETTING(    0x00, "55 Seconds" )
-	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" )
+	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Steering Radius" )
+	PORT_DIPNAME( 0x20, 0x20, "Steering Radius" ) PORT_DIPLOCATION("SW B:6")
 	PORT_DIPSETTING(    0x00, "270 Degree" )
 	PORT_DIPSETTING(    0x20, "360 Degree" )
-	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" )
+	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Siren Volume" )
+	PORT_DIPNAME( 0x80, 0x80, "Siren Volume" ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
 
@@ -2389,35 +2608,33 @@ static INPUT_PORTS_START( scij )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nightstr )
-	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_START_TAG("DSW1") /* DSW A */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) /* Shown only as "OFF" in the manual */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" )	// manual says it must be off
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_Z_COINAGE_US_8
+	TAITO_Z_COINAGE_WORLD_8
 
-	PORT_START /* DSW B */
+	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Shields" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Shields" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, "Shields" )
+	PORT_DIPNAME( 0x30, 0x30, "Shields" ) PORT_DIPLOCATION("SW B:5,6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x30, "5" )
 	PORT_DIPSETTING(    0x20, "6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Trigger Turbo" )
+	PORT_DIPNAME( 0x80, 0x80, "Trigger Turbo" ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x80, "7 Shots / Second" )
 	PORT_DIPSETTING(    0x00, "10 Shots / Second" )
 
@@ -2449,58 +2666,73 @@ static INPUT_PORTS_START( nightstr )
 	PORT_START
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(60) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START	/* X offset */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START	/* X offset */  /* declare as DIP SWITCH instead of VARIABLE REGISTER */
+	TAITO_Z_ANALOG_ADJUST( "Adjust Stick H (VARIABLE REGISTER)" )
 
-	PORT_START	/* Y offset */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START	/* Y offset */  /* declare as DIP SWITCH instead of VARIABLE REGISTER */
+	TAITO_Z_ANALOG_ADJUST( "Adjust Stick V (VARIABLE REGISTER)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nghtstrj )
+	PORT_INCLUDE( nightstr )
+
+	PORT_MODIFY("DSW1")
+	TAITO_Z_COINAGE_JAPAN_8
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nghtstru )
+	PORT_INCLUDE( nightstr )
+
+	PORT_MODIFY("DSW1")
+	TAITO_Z_COINAGE_US_8
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aquajack )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x80, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) /* Dip 2 shown as "Must Remain in "Off" Position" in manual */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW A:2" ) /* Dip 2 shown as "Must Remain in "Off" Position" in manual */
+	PORT_SERVICE_DIPLOC( 0x20, 0x20, "SW A:3" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:6,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )	/* The Romstar (US version) manual list this as "Continue Pricing" */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:8,7")	/* The Romstar (US version) manual list this as "Continue Pricing" */
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )	/* Same pricing as Coin A */
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )	/* 1 Coin to Continue  */
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )	/* 2 Coins to Continue */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )	/* 3 Coins to Continue */
 
 	PORT_START_TAG("DSW2") /* DSW B */
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:2,1")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW B:4,3")
 	PORT_DIPSETTING(    0x00, "30k" )
 	PORT_DIPSETTING(    0x30, "50k" )
 	PORT_DIPSETTING(    0x10, "80k" )
 	PORT_DIPSETTING(    0x20, "100k" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW B:6,5")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) /* Dips 7 & 8 shown as "Do Not Touch" in non US manuals */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) /* The Romstar (US version) manual list this as "Endless Game" - Has no effect on "World" version */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )    /* Normal Game  */
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )     /* Endless Game */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW B:7" ) /* Dip 7 shown as "Do Not Touch" in manuals */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW B:8" ) /* Dip 8 */
+	/* The previous taito_z.c said ---
+        The Romstar (US version) manual list this as "Endless Game" - Has no effect on "World" version
+       --- , and declared it as unused switch.
+    */
+	/* PORT_DIPNAME( 0x01, 0x01, "Endless Game" ) PORT_DIPLOCATION("SW B:8") */
+	/* PORT_DIPSETTING(    0x01, "Normal Game" ) */
+	/* PORT_DIPSETTING(    0x00, "Endless Game" ) */
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2530,12 +2762,12 @@ static INPUT_PORTS_START( aquajckj )
 	PORT_INCLUDE(aquajack)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:6,5")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:8,7")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
@@ -2544,36 +2776,26 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacegun )
 	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )	// Manual says Always Off
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Always have gunsight power up" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )	// Manual says Always Off
+	PORT_DIPNAME( 0x02, 0x02, "Always have gunsight power up" ) PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_WORLD_8
 
 	PORT_START /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )	// Manual lists dips 3 through 6 and 8 as Always off
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW B:3" )	// Manual lists dips 3 through 6 and 8 as Always off
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW B:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW B:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Disable Pedal (?)" )
+	PORT_DIPNAME( 0x80, 0x80, "Disable Pedal (?)" ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -2614,38 +2836,30 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dblaxle )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Gear shift" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )
+	PORT_DIPNAME( 0x02, 0x02, "Gear shift" ) PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Inverted" )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_US_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x00, "Multi-machine hookup ?" )	// doesn't boot if on
+	PORT_DIPNAME( 0x04, 0x00, "Multi-machine hookup ?" ) PORT_DIPLOCATION("SW B:3")	// doesn't boot if on
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Player Truck" )
+	PORT_DIPNAME( 0x08, 0x08, "Player Truck" ) PORT_DIPLOCATION("SW B:4")
 	PORT_DIPSETTING(    0x08, "Red" )
 	PORT_DIPSETTING(    0x00, "Blue" )
-	PORT_DIPNAME( 0x10, 0x10, "Back button" )
+	PORT_DIPNAME( 0x10, 0x10, "Back button" ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Inverted" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	// causes "Root CPU Error" on "Icy Road" (Tourniquet)
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" )	// causes "Root CPU Error" on "Icy Road" (Tourniquet)
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3751,10 +3965,10 @@ ROM_END
 
 ROM_START( bshark )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 512K for 68000 code (CPU A) */
-	ROM_LOAD16_BYTE( "c34_71.98",    0x00000, 0x20000, CRC(df1fa629) SHA1(6cb207e577fac85da654f3dc56e2f9f25c38a76d) )
-	ROM_LOAD16_BYTE( "c34_69.75",    0x00001, 0x20000, CRC(a54c137a) SHA1(632bf2d65f54035de2ecb87648dafa877c45e428) )
-	ROM_LOAD16_BYTE( "c34_70.97",    0x40000, 0x20000, CRC(d77d81e2) SHA1(d60e586cefd9001e87cae583ca25bf5a8a461d8d) )
-	ROM_LOAD16_BYTE( "bshark67.bin", 0x40001, 0x20000, CRC(39307c74) SHA1(65d1cb6b0baee29c1439180b8b4c6907e20b2921) )
+	ROM_LOAD16_BYTE( "c34_71.98", 0x00000, 0x20000, CRC(df1fa629) SHA1(6cb207e577fac85da654f3dc56e2f9f25c38a76d) )
+	ROM_LOAD16_BYTE( "c34_69.75", 0x00001, 0x20000, CRC(a54c137a) SHA1(632bf2d65f54035de2ecb87648dafa877c45e428) )
+	ROM_LOAD16_BYTE( "c34_70.97", 0x40000, 0x20000, CRC(d77d81e2) SHA1(d60e586cefd9001e87cae583ca25bf5a8a461d8d) )
+	ROM_LOAD16_BYTE( "c34_67.64", 0x40001, 0x20000, CRC(39307c74) SHA1(65d1cb6b0baee29c1439180b8b4c6907e20b2921) )
 
 	ROM_REGION( 0x80000, REGION_CPU2, 0 )	/* 512K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "c34_74.128", 0x00000, 0x20000, CRC(6869fa99) SHA1(16221f25c865a81ca4f6a987b6de02a3ccf3208c) )
@@ -4019,8 +4233,114 @@ ROM_START( nightstr )
 	ROM_LOAD16_BYTE( "b91-45.bin", 0x00000, 0x20000, CRC(7ad63421) SHA1(4ecfc3c8cd691d878e5d9212ccff0d225bb06bd9) )
 	ROM_LOAD16_BYTE( "b91-44.bin", 0x00001, 0x20000, CRC(4bc30adf) SHA1(531d6ee9c8ff0d4ed07c15465ec7cb78cf976115) )
 	ROM_LOAD16_BYTE( "b91-43.bin", 0x40000, 0x20000, CRC(3e6f727a) SHA1(ae837131a4c0c9bc5deba155c2a5b7ae72f1d070) )
+	ROM_LOAD16_BYTE( "b91-47.bin", 0x40001, 0x20000, CRC(9f778e03) SHA1(37888c3f4c52b5a714678f0f1e39f6a4f19beef9) )
+	ROM_REGION( 0x40000, REGION_CPU3, 0 )	/* 256K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "b91-39.bin", 0x00000, 0x20000, CRC(725b23ae) SHA1(d4b4335863d32b9a81f7461240e960bf345c9835) )
+	ROM_LOAD16_BYTE( "b91-40.bin", 0x00001, 0x20000, CRC(81fb364d) SHA1(f02733509039cde2c1de616e0a7969e31de1007a) )
+
+	ROM_REGION( 0x2c000, REGION_CPU2, 0 )	/* Z80 sound cpu */
+	ROM_LOAD( "b91-41.bin",   0x00000, 0x04000, CRC(2694bb42) SHA1(ee770472655ac0ef55eeff04037457dbf6744e4f) )
+	ROM_CONTINUE(             0x10000, 0x1c000 )	/* banked stuff */
+
+	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "b91-11.bin", 0x00000, 0x80000, CRC(fff8ce31) SHA1(fc729de92937a805d79379228d7a30041594c0df) )	/* SCR 8x8 */
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "b91-04.bin", 0x000000, 0x080000, CRC(8ca1970d) SHA1(d8504298a38a95f1d8f3a2fba479ec75fe4d5de7) )	/* OBJ A 16x16 */
+	ROM_LOAD32_BYTE( "b91-03.bin", 0x000001, 0x080000, CRC(cd5fed39) SHA1(c16c67cc998889288e6e96535fd8e61afc93bc78) )
+	ROM_LOAD32_BYTE( "b91-02.bin", 0x000002, 0x080000, CRC(457c64b8) SHA1(443f13d56d53ca6a7750ec974da675bad3f34a38) )
+	ROM_LOAD32_BYTE( "b91-01.bin", 0x000003, 0x080000, CRC(3731d94f) SHA1(2978d3eb1f44595681e84f3aa8dc03d34a191455) )
+
+	ROM_REGION( 0x80000, REGION_GFX3, 0 )	/* don't dispose */
+	ROM_LOAD( "b91-10.bin", 0x00000, 0x80000, CRC(1d8f05b4) SHA1(04caa6a0887b90860c426a973dc3c3270e996818) )	/* ROD, road lines */
+
+	ROM_REGION( 0x200000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "b91-08.bin", 0x000000, 0x080000, CRC(66f35c34) SHA1(9040390fa9c626a54076a9461e0e198f059e2cb1) )	/* OBJ B 16x16 */
+	ROM_LOAD32_BYTE( "b91-07.bin", 0x000001, 0x080000, CRC(4d8ec6cf) SHA1(2b7c10b459dc45313c4c90899a73c42c55b6c5c9) )
+	ROM_LOAD32_BYTE( "b91-06.bin", 0x000002, 0x080000, CRC(a34dc839) SHA1(e1fcb763dbc562a62e862297458bde66d691606c) )
+	ROM_LOAD32_BYTE( "b91-05.bin", 0x000003, 0x080000, CRC(5e72ac90) SHA1(c28c2718e873be5a254992ef8db256a394ca03ff) )
+
+	ROM_REGION16_LE( 0x80000, REGION_USER1, 0 )
+	ROM_LOAD16_WORD( "b91-09.bin", 0x00000, 0x80000, CRC(5f247ca2) SHA1(3b89e5d035f27f62a14c5c7a976c804f9bb5c04d) )	/* STY spritemap */
+
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_LOAD( "b91-13.bin", 0x00000, 0x80000, CRC(8c7bf0f5) SHA1(6e18531991225c24a9722c9fbe1af6ae6e9b866b) )
+	ROM_LOAD( "b91-12.bin", 0x80000, 0x80000, CRC(da77c7af) SHA1(49662a69b83739e2e0209cabff83995a951383f4) )
+
+	ROM_REGION( 0x80000, REGION_SOUND2, 0 )	/* Delta-T samples */
+	ROM_LOAD( "b91-14.bin", 0x00000, 0x80000, CRC(6bc314d3) SHA1(ae3e9c6b853bab4ec81a6bd951b39a4bc883f456) )
+
+	ROM_REGION( 0x10000, REGION_USER2, 0 )	/* unused ROMs */
+	ROM_LOAD( "b91-26.bin", 0x00000, 0x0400,  CRC(77682a4f) SHA1(da2b3143f1c8688a22d8ec47bbb73b2f2e578480) )
+	ROM_LOAD( "b91-27.bin", 0x00000, 0x0400,  CRC(a3f8490d) SHA1(349b8c9ba914603f72f800a3fc8e8277d756deb1) )
+	ROM_LOAD( "b91-28.bin", 0x00000, 0x0400,  CRC(fa2f840e) SHA1(dd61ee6833bd43bbf619d36ec46f2bfa00880f40) )
+	ROM_LOAD( "b91-29.bin", 0x00000, 0x2000,  CRC(ad685be8) SHA1(e7681d76fa216c124c54544393c4f6a08fd7d74d) )
+	ROM_LOAD( "b91-30.bin", 0x00000, 0x10000, CRC(30cc1f79) SHA1(3b0e3e6e8bce7a7d04a5b0103e2ce4e18e52a68e) )
+	ROM_LOAD( "b91-31.bin", 0x00000, 0x10000, CRC(c189781c) SHA1(af3904ce51f715970965d110313491dbacf188b8) )
+	ROM_LOAD( "b91-32.bin", 0x00000, 0x0100,  CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) )	// road A/B internal priority
+	ROM_LOAD( "b91-33.bin", 0x00000, 0x0100,  CRC(89719d17) SHA1(50181b8172b0fc08b149db18caf10659be9c517f) )	// road/sprite priority and palette select
+ROM_END
+
+ROM_START( nghtstru )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 512K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE( "b91-45.bin", 0x00000, 0x20000, CRC(7ad63421) SHA1(4ecfc3c8cd691d878e5d9212ccff0d225bb06bd9) )
+	ROM_LOAD16_BYTE( "b91-44.bin", 0x00001, 0x20000, CRC(4bc30adf) SHA1(531d6ee9c8ff0d4ed07c15465ec7cb78cf976115) )
+	ROM_LOAD16_BYTE( "b91-43.bin", 0x40000, 0x20000, CRC(3e6f727a) SHA1(ae837131a4c0c9bc5deba155c2a5b7ae72f1d070) )
 	ROM_LOAD16_BYTE( "b91-46.bin", 0x40001, 0x20000, CRC(e870be95) SHA1(9a83df2c88a029bc40f5ce074143778ea555a2ba) )
 
+	ROM_REGION( 0x40000, REGION_CPU3, 0 )	/* 256K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "b91-39.bin", 0x00000, 0x20000, CRC(725b23ae) SHA1(d4b4335863d32b9a81f7461240e960bf345c9835) )
+	ROM_LOAD16_BYTE( "b91-40.bin", 0x00001, 0x20000, CRC(81fb364d) SHA1(f02733509039cde2c1de616e0a7969e31de1007a) )
+
+	ROM_REGION( 0x2c000, REGION_CPU2, 0 )	/* Z80 sound cpu */
+	ROM_LOAD( "b91-41.bin",   0x00000, 0x04000, CRC(2694bb42) SHA1(ee770472655ac0ef55eeff04037457dbf6744e4f) )
+	ROM_CONTINUE(             0x10000, 0x1c000 )	/* banked stuff */
+
+	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "b91-11.bin", 0x00000, 0x80000, CRC(fff8ce31) SHA1(fc729de92937a805d79379228d7a30041594c0df) )	/* SCR 8x8 */
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "b91-04.bin", 0x000000, 0x080000, CRC(8ca1970d) SHA1(d8504298a38a95f1d8f3a2fba479ec75fe4d5de7) )	/* OBJ A 16x16 */
+	ROM_LOAD32_BYTE( "b91-03.bin", 0x000001, 0x080000, CRC(cd5fed39) SHA1(c16c67cc998889288e6e96535fd8e61afc93bc78) )
+	ROM_LOAD32_BYTE( "b91-02.bin", 0x000002, 0x080000, CRC(457c64b8) SHA1(443f13d56d53ca6a7750ec974da675bad3f34a38) )
+	ROM_LOAD32_BYTE( "b91-01.bin", 0x000003, 0x080000, CRC(3731d94f) SHA1(2978d3eb1f44595681e84f3aa8dc03d34a191455) )
+
+	ROM_REGION( 0x80000, REGION_GFX3, 0 )	/* don't dispose */
+	ROM_LOAD( "b91-10.bin", 0x00000, 0x80000, CRC(1d8f05b4) SHA1(04caa6a0887b90860c426a973dc3c3270e996818) )	/* ROD, road lines */
+
+	ROM_REGION( 0x200000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "b91-08.bin", 0x000000, 0x080000, CRC(66f35c34) SHA1(9040390fa9c626a54076a9461e0e198f059e2cb1) )	/* OBJ B 16x16 */
+	ROM_LOAD32_BYTE( "b91-07.bin", 0x000001, 0x080000, CRC(4d8ec6cf) SHA1(2b7c10b459dc45313c4c90899a73c42c55b6c5c9) )
+	ROM_LOAD32_BYTE( "b91-06.bin", 0x000002, 0x080000, CRC(a34dc839) SHA1(e1fcb763dbc562a62e862297458bde66d691606c) )
+	ROM_LOAD32_BYTE( "b91-05.bin", 0x000003, 0x080000, CRC(5e72ac90) SHA1(c28c2718e873be5a254992ef8db256a394ca03ff) )
+
+	ROM_REGION16_LE( 0x80000, REGION_USER1, 0 )
+	ROM_LOAD16_WORD( "b91-09.bin", 0x00000, 0x80000, CRC(5f247ca2) SHA1(3b89e5d035f27f62a14c5c7a976c804f9bb5c04d) )	/* STY spritemap */
+
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_LOAD( "b91-13.bin", 0x00000, 0x80000, CRC(8c7bf0f5) SHA1(6e18531991225c24a9722c9fbe1af6ae6e9b866b) )
+	ROM_LOAD( "b91-12.bin", 0x80000, 0x80000, CRC(da77c7af) SHA1(49662a69b83739e2e0209cabff83995a951383f4) )
+
+	ROM_REGION( 0x80000, REGION_SOUND2, 0 )	/* Delta-T samples */
+	ROM_LOAD( "b91-14.bin", 0x00000, 0x80000, CRC(6bc314d3) SHA1(ae3e9c6b853bab4ec81a6bd951b39a4bc883f456) )
+
+	ROM_REGION( 0x10000, REGION_USER2, 0 )	/* unused ROMs */
+	ROM_LOAD( "b91-26.bin", 0x00000, 0x0400,  CRC(77682a4f) SHA1(da2b3143f1c8688a22d8ec47bbb73b2f2e578480) )
+	ROM_LOAD( "b91-27.bin", 0x00000, 0x0400,  CRC(a3f8490d) SHA1(349b8c9ba914603f72f800a3fc8e8277d756deb1) )
+	ROM_LOAD( "b91-28.bin", 0x00000, 0x0400,  CRC(fa2f840e) SHA1(dd61ee6833bd43bbf619d36ec46f2bfa00880f40) )
+	ROM_LOAD( "b91-29.bin", 0x00000, 0x2000,  CRC(ad685be8) SHA1(e7681d76fa216c124c54544393c4f6a08fd7d74d) )
+	ROM_LOAD( "b91-30.bin", 0x00000, 0x10000, CRC(30cc1f79) SHA1(3b0e3e6e8bce7a7d04a5b0103e2ce4e18e52a68e) )
+	ROM_LOAD( "b91-31.bin", 0x00000, 0x10000, CRC(c189781c) SHA1(af3904ce51f715970965d110313491dbacf188b8) )
+	ROM_LOAD( "b91-32.bin", 0x00000, 0x0100,  CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) )	// road A/B internal priority
+	ROM_LOAD( "b91-33.bin", 0x00000, 0x0100,  CRC(89719d17) SHA1(50181b8172b0fc08b149db18caf10659be9c517f) )	// road/sprite priority and palette select
+ROM_END
+
+ROM_START( nghtstrj )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 512K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE( "b91-45.bin", 0x00000, 0x20000, CRC(7ad63421) SHA1(4ecfc3c8cd691d878e5d9212ccff0d225bb06bd9) )
+	ROM_LOAD16_BYTE( "b91-44.bin", 0x00001, 0x20000, CRC(4bc30adf) SHA1(531d6ee9c8ff0d4ed07c15465ec7cb78cf976115) )
+	ROM_LOAD16_BYTE( "b91-43.bin", 0x40000, 0x20000, CRC(3e6f727a) SHA1(ae837131a4c0c9bc5deba155c2a5b7ae72f1d070) )
+	ROM_LOAD16_BYTE( "b91-42.bin", 0x40001, 0x20000, CRC(7179ef2f) SHA1(4c45f0c4dfcf16665d7eca4fdcd6a959d9b6fc01) )
 	ROM_REGION( 0x40000, REGION_CPU3, 0 )	/* 256K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "b91-39.bin", 0x00000, 0x20000, CRC(725b23ae) SHA1(d4b4335863d32b9a81f7461240e960bf345c9835) )
 	ROM_LOAD16_BYTE( "b91-40.bin", 0x00001, 0x20000, CRC(81fb364d) SHA1(f02733509039cde2c1de616e0a7969e31de1007a) )
@@ -4364,7 +4684,9 @@ GAME( 1989, sci,      0,        sci,      sci,      taitoz,   ROT0,             
 GAME( 1989, scia,     sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (World set 2)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, scij,     sci,      sci,      scij,     taitoz,   ROT0,               "Taito Corporation", "Special Criminal Investigation (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, sciu,     sci,      sci,      sciu,     taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, nightstr, 0,        nightstr, nightstr, taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, nightstr, 0,        nightstr, nightstr, taitoz,   ROT0,               "Taito Corporation Japan", "Night Striker (World)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, nghtstrj, nightstr, nightstr, nghtstrj, taitoz,   ROT0,               "Taito Corporation", "Night Striker (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, nghtstru, nightstr, nightstr, nghtstru, taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, aquajack, 0,        aquajack, aquajack, taitoz,   ROT0,               "Taito Corporation Japan", "Aqua Jack (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, aquajckj, aquajack, aquajack, aquajckj, taitoz,   ROT0,               "Taito Corporation", "Aqua Jack (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, spacegun, 0,        spacegun, spacegun, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan", "Space Gun (World)", 0 )

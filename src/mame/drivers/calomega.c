@@ -450,6 +450,14 @@
     --------------
 
 
+    [2008-07-01]
+
+    - Unified MACHINE_RESET for systems 903/904/905.
+    - Created a new handler to manage the first 4 bits of system 905's PIA1 portB as input mux selector.
+      (905 is still not working)
+    - Updated technical notes.
+
+
     [2008-06-23]
 
     - Lots of improvements on the input system.
@@ -655,11 +663,11 @@ static READ8_HANDLER( dipsw_3_r )
 	return input_port_read(machine, "SW3");
 }
 
-static int mux_data = 0;
+static int s903_mux_data = 0;
 
-static READ8_HANDLER( mux_port_r )
+static READ8_HANDLER( s903_mux_port_r )
 {
-	switch( mux_data & 0xf0 )	/* bits 4-7 */
+	switch( s903_mux_data & 0xf0 )	/* bits 4-7 */
 	{
 		case 0x10: return input_port_read(machine, "IN0-0");
 		case 0x20: return input_port_read(machine, "IN0-1");
@@ -669,9 +677,29 @@ static READ8_HANDLER( mux_port_r )
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mux_w )
+static WRITE8_HANDLER( s903_mux_w )
 {
-	mux_data = data ^ 0xff;	/* inverted */
+	s903_mux_data = data ^ 0xff;	/* inverted */
+}
+
+
+static int s905_mux_data = 0;
+
+static READ8_HANDLER( s905_mux_port_r )
+{
+	switch( s905_mux_data & 0x0f )	/* bits 0-3 */
+	{
+		case 0x01: return input_port_read(machine, "IN0-0");
+		case 0x02: return input_port_read(machine, "IN0-1");
+		case 0x04: return input_port_read(machine, "IN0-2");
+		case 0x08: return input_port_read(machine, "IN0-3");
+	}
+	return 0xff;
+}
+
+static WRITE8_HANDLER( s905_mux_w )
+{
+	s905_mux_data = data ^ 0xff;	/* inverted */
 }
 
 
@@ -740,20 +768,6 @@ static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x1040, 0x1040) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x1041, 0x1041) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x10c4, 0x10c7) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x10c8, 0x10cb) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2800, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( s903mod_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
@@ -766,6 +780,20 @@ static ADDRESS_MAP_START( s903mod_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1800, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x1040, 0x1040) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x1041, 0x1041) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x10c4, 0x10c7) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0x10c8, 0x10cb) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -844,7 +872,6 @@ static INPUT_PORTS_START( stand903 )
 	PORT_DIPSETTING(    0x08, "2400" )
 	PORT_DIPSETTING(    0x10, "4800" )
 	PORT_DIPSETTING(    0x20, "9600" )
-//  PORT_DIPSETTING(    0x00, "No Conn" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -950,7 +977,6 @@ static INPUT_PORTS_START( stand904 )
 	PORT_DIPSETTING(    0x08, "2400" )
 	PORT_DIPSETTING(    0x10, "4800" )
 	PORT_DIPSETTING(    0x20, "9600" )
-//  PORT_DIPSETTING(    0x00, "No Conn" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1098,7 +1124,6 @@ static INPUT_PORTS_START( gdrawpkr )
 	PORT_DIPSETTING(    0x08, "2400" )
 	PORT_DIPSETTING(    0x10, "4800" )
 	PORT_DIPSETTING(    0x20, "9600" )
-//  PORT_DIPSETTING(    0x00, "No Conn" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1202,7 +1227,6 @@ static INPUT_PORTS_START( comg076 )
 	PORT_DIPSETTING(    0x08, "2400" )
 	PORT_DIPSETTING(    0x10, "4800" )
 	PORT_DIPSETTING(    0x20, "9600" )
-//  PORT_DIPSETTING(    0x00, "No Conn" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1307,7 +1331,6 @@ static INPUT_PORTS_START( comg128 )
 	PORT_DIPSETTING(    0x08, "2400" )
 	PORT_DIPSETTING(    0x10, "4800" )
 	PORT_DIPSETTING(    0x20, "9600" )
-//  PORT_DIPSETTING(    0x00, "No Conn" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1631,7 +1654,7 @@ GFXDECODE_END
 static const pia6821_interface sys903_pia0_intf =
 {
 	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	mux_port_r, 0, 0, 0, 0, 0,
+	s903_mux_port_r, 0, 0, 0, 0, 0,
 
 	/* PIA outputs: A, B, CA2, CB2 */
 	0, lamps_a_w, 0, 0,
@@ -1692,7 +1715,7 @@ static const pia6821_interface sys903_pia1_intf =
 	dipsw_1_r, 0, 0, 0, 0, 0,
 
 	/* PIA outputs: A, B, CA2, CB2 */
-	lamps_b_w, mux_w, 0, 0,
+	lamps_b_w, s903_mux_w, 0, 0,
 
 	/* PIA IRQs: A, B */
 	0, 0
@@ -1747,7 +1770,7 @@ static const pia6821_interface sys903_pia1_intf =
 static const pia6821_interface sys905_pia0_intf =
 {
 	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	mux_port_r, 0, 0, 0, 0, 0,
+	s905_mux_port_r, 0, 0, 0, 0, 0,
 
 	/* PIA outputs: A, B, CA2, CB2 */
 	0, lamps_a_w, 0, 0,
@@ -1808,7 +1831,7 @@ static const pia6821_interface sys905_pia1_intf =
 	dipsw_1_r, 0, 0, 0, 0, 0,
 
 	/* PIA outputs: A, B, CA2, CB2 */
-	lamps_b_w, mux_w, 0, 0,
+	lamps_b_w, s905_mux_w, 0, 0,
 
 	/* PIA IRQs: A, B */
 	0, 0
@@ -1843,18 +1866,13 @@ static MACHINE_START( sys903 )
 	acia6850_config(0, &acia6850_intf);
 }
 
-static MACHINE_RESET( sys903 )
-{
-	pia_reset();
-}
-
 static MACHINE_START( sys905 )
 {
 	pia_config(0, &sys905_pia0_intf);
 	pia_config(1, &sys905_pia1_intf);
 }
 
-static MACHINE_RESET( sys905 )
+static MACHINE_RESET( calomega )
 {
 	pia_reset();
 }
@@ -1898,7 +1916,7 @@ static MACHINE_DRIVER_START( sys903 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_MACHINE_START(sys903)
-	MDRV_MACHINE_RESET(sys903)
+	MDRV_MACHINE_RESET(calomega)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1932,7 +1950,6 @@ static MACHINE_DRIVER_START( sys905 )
 	MDRV_CPU_PROGRAM_MAP(sys905_map, 0)
 
 	MDRV_MACHINE_START(sys905)
-	MDRV_MACHINE_RESET(sys905)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("ay8912")
@@ -1946,9 +1963,6 @@ static MACHINE_DRIVER_START( s903mod )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(s903mod_map, 0)
-
-	MDRV_MACHINE_START(sys903)
-	MDRV_MACHINE_RESET(sys903)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("ay8912")
