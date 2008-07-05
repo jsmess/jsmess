@@ -26,6 +26,23 @@ enum
 	COMX_TYPE_DATA
 };
 
+static UINT8 read_expansion(running_machine *machine)
+{
+	UINT8 result;
+	switch(mame_get_phase(machine))
+	{
+		case MAME_PHASE_RESET:
+		case MAME_PHASE_RUNNING:
+			result = input_port_read(machine, "EXPANSION");
+			break;
+
+		default:
+			result = 0x00;
+			break;
+	}
+	return result;
+}
+
 static const device_config *printer_device(running_machine *machine)
 {
 	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
@@ -46,7 +63,7 @@ static int dos_card_active(running_machine *machine)
 	}
 	else
 	{
-		return input_port_read(machine, "EXPANSION") == BANK_FLOPPY;
+		return read_expansion(machine) == BANK_FLOPPY;
 	}
 }
 
@@ -298,7 +315,7 @@ static void get_active_bank(running_machine *machine, UINT8 data)
 	{
 		// no expansion box
 
-		state->bank = input_port_read(machine, "EXPANSION");
+		state->bank = read_expansion(machine);
 	}
 
 	// RAM expansion bank
@@ -524,7 +541,7 @@ MACHINE_START( comx35p )
 
 	if (!expansion_box_installed(machine))
 	{
-		state->bank = input_port_read(machine, "EXPANSION");
+		state->bank = read_expansion(machine);
 	}
 
 	// allocate reset timer
