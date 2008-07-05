@@ -134,6 +134,23 @@ static const char keyboard[8][9][8] = {
     },
 };
 
+static UINT8 read_dsw(running_machine *machine)
+{
+	UINT8 result;
+	switch(mame_get_phase(machine))
+	{
+		case MAME_PHASE_RESET:
+		case MAME_PHASE_RUNNING:
+			result = input_port_read(machine, "DSW");
+			break;
+
+		default:
+			result = 0x00;
+			break;
+	}
+	return result;
+}
+
 static void microtan_set_irq_line(running_machine *machine)
 {
     /* The 6502 IRQ line is active low and probably driven
@@ -882,7 +899,7 @@ DRIVER_INIT( microtan )
         dst += 4;
     }
 
-    switch (input_port_read(machine, "DSW") & 3)
+    switch (read_dsw(machine) & 3)
     {
         case 0:  // 1K only :)
             memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_NOP);
