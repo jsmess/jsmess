@@ -96,6 +96,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static COP400_INTERFACE( advision_cop411_interface )
+{
+	1
+};
+
 static MACHINE_DRIVER_START( advision )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", I8048, MAIN_CLOCK/15)
@@ -103,6 +108,7 @@ static MACHINE_DRIVER_START( advision )
 	MDRV_CPU_IO_MAP(advision_ports, 0)
 
 	MDRV_CPU_ADD(COP411, 52631)
+	MDRV_CPU_CONFIG(advision_cop411_interface)
 	MDRV_CPU_PROGRAM_MAP(advision_sound_mem, 0)
 	MDRV_CPU_IO_MAP(advision_sound_ports, 0)
 
