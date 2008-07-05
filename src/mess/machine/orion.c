@@ -252,9 +252,9 @@ static READ8_HANDLER ( orionz80_floppy_rtc_r )
 static WRITE8_HANDLER ( orionz80_floppy_rtc_w )
 {		
 	if ((offset >= 0x60) && (offset <= 0x6f)) {
-		return mc146818_port_w(machine,offset-0x60,data);
+		mc146818_port_w(machine,offset-0x60,data);
 	} else { 
-		return orion128_floppy_w(machine,offset,data);
+		orion128_floppy_w(machine,offset,data);
 	}	
 }
 

@@ -1882,7 +1882,7 @@ ROM_START( ibm5150 )
 	ROMX_LOAD("basic10.u30", 0xf8000, 0x2000, CRC(bfff99b8) SHA1(ca2f126ba69c1613b7b5a4137d8d8cf1db36a8e6), ROM_BIOS(2))		/* ROM Basic 1.0 F8000-F9FFF */
 	ROMX_LOAD("basic10.u31", 0xfa000, 0x2000, CRC(9fe4ec11) SHA1(89af8138185938c3da3386f97d3b0549a51de5ef), ROM_BIOS(2))		/* ROM Basic 1.0 FA000-FBFFF */
 	ROMX_LOAD("basic10.u32", 0xfc000, 0x2000, CRC(ea2794e6) SHA1(22fe58bc853ffd393d5e2f98defda7456924b04f), ROM_BIOS(2))		/* ROM Basic 1.0 FC000-FDFFF */
-	ROMX_LOAD("pc022481.bin", 0xfe000, 0x2000, CRC(), ROM_BIOS(2))
+	ROMX_LOAD("pc022481.bin", 0xfe000, 0x2000, NO_DUMP, ROM_BIOS(2))
 
 	/* IBM PC 5150 (rev 2: 10/19/81) 2-screw case w/MDA Card, ROM Basic 1.0 (this could be wrong, it may use 1.0)*/
 	ROM_SYSTEM_BIOS( 2, "rev2", "IBM PC 5150 5700671 10/19/81" )
