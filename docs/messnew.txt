@@ -65,6 +65,8 @@ System Driver Changes:
 
 - [COMX35] System is now working.  [Curt Coder, Marcel van Tongeren]
 
+- [DRAGON] Fixed timing regression introduced in 0.122u7.  (bug #1631)
+
 - [GALAXY] Added real video emulation [Miodrag Milanovic]
 
 - [GALAXY] GTP file support [Miodrag Milanovic]
