@@ -525,93 +525,95 @@ If you have the source listing or the Rom dump, please send us.
 	UINT8 kbcode;
 	static const UINT8 interleave[8] = {0,5,2,7,4,1,6,3};
 	const device_config *image;
+	UINT8 *ram;
 
+	ram = memory_region(machine, REGION_CPU1);
 	if (offset == adam_pcb)
 	{
 		switch (data)
 		{
 			case 1: /* Request to synchronize the Z80 clock */
-				memory_region(machine, REGION_CPU1)[offset] = 0x81;
+				ram[offset] = 0x81;
 				//logerror("Synchronizing the Z80 clock\n");
 				break;
 			case 2: /* Request to synchronize the Master 6801 clock */
-				memory_region(machine, REGION_CPU1)[offset] = 0x82;
+				ram[offset] = 0x82;
 				//logerror("Synchronizing the Master 6801 clock\n");
 				break;
 			case 3: /* Request to relocate adam_pcb */
-				memory_region(machine, REGION_CPU1)[offset] = 0x83; /* Must return 0x83 if success */
-				//memory_region(machine, REGION_CPU1)[offset] = 0x9B; /* Time Out */
-				logerror("Request to relocate adam_pcb from %04Xh to %04Xh... not implemented... but returns OK\n", adam_pcb, (memory_region(machine, REGION_CPU1)[adam_pcb+1]&memory_region(machine, REGION_CPU1)[adam_pcb+2]<<8));
+				ram[offset] = 0x83; /* Must return 0x83 if success */
+				//ram[offset] = 0x9B; /* Time Out */
+				logerror("Request to relocate adam_pcb from %04Xh to %04Xh... not implemented... but returns OK\n", adam_pcb, (ram[adam_pcb+1]|ram[adam_pcb+2]<<8));
 				break;
 		}
 	}
 
-	for(DCB_Num=1;DCB_Num<=memory_region(machine, REGION_CPU1)[adam_pcb+3];DCB_Num++) /* Test status of each DCB in adam_pcb table */
+	for(DCB_Num=1;DCB_Num<=ram[adam_pcb+3];DCB_Num++) /* Test status of each DCB in adam_pcb table */
 	{
 		statusDCB = (adam_pcb+4)+(DCB_Num-1)*21;
 		if (offset==statusDCB)
 		{
 			//logerror("Accesing DCB %02Xh\n", DCB_Num);
-			deviceNum = (memory_region(machine, REGION_CPU1)[statusDCB+0x10]&0x0F)+(memory_region(machine, REGION_CPU1)[statusDCB+0x09]<<4);
-			buffer=(memory_region(machine, REGION_CPU1)[statusDCB+0x01])+(memory_region(machine, REGION_CPU1)[statusDCB+0x02]<<8);
-			byteCount=(memory_region(machine, REGION_CPU1)[statusDCB+0x03])+(memory_region(machine, REGION_CPU1)[statusDCB+0x04]<<8);
+			deviceNum = (ram[statusDCB+0x10]&0x0F)+(ram[statusDCB+0x09]<<4);
+			buffer=(ram[statusDCB+0x01])+(ram[statusDCB+0x02]<<8);
+			byteCount=(ram[statusDCB+0x03])+(ram[statusDCB+0x04]<<8);
 
 			if (deviceNum>=4 && deviceNum<=7)
 			{
 				image = image_from_devtype_and_index(IO_FLOPPY, deviceNum - 4);
 				if (image_exists(image))
-					memory_region(machine, REGION_CPU1)[statusDCB+20] = (memory_region(machine, REGION_CPU1)[statusDCB+20]&0xF0); /* Inserted Media */
+					ram[statusDCB+20] = (ram[statusDCB+20]&0xF0); /* Inserted Media */
 				else
-					memory_region(machine, REGION_CPU1)[statusDCB+20] = (memory_region(machine, REGION_CPU1)[statusDCB+20]&0xF0)|0x03; /* No Media on Drive*/
+					ram[statusDCB+20] = (ram[statusDCB+20]&0xF0)|0x03; /* No Media on Drive*/
 			}
 			switch (data)
 			{
 				case 0: /* Initialize Drive */
 					if (deviceNum>=4 && deviceNum<=7)
 					{
-						memory_region(machine, REGION_CPU1)[statusDCB] = 0x80;
+						ram[statusDCB] = 0x80;
 					}
 					break;
 				case 1: /* Return current status */
 					if (deviceNum==1||deviceNum==2)
 					{
-						memory_region(machine, REGION_CPU1)[statusDCB] = 0x80; /* Device Found (1=Keyboard, 2=Printer) */
-						memory_region(machine, REGION_CPU1)[statusDCB+0x13] = 0x01; /* Character device */
+						ram[statusDCB] = 0x80; /* Device Found (1=Keyboard, 2=Printer) */
+						ram[statusDCB+0x13] = 0x01; /* Character device */
 					}
 					else if (deviceNum>=4 && deviceNum<=7)
 					{
 						image = image_from_devtype_and_index(IO_FLOPPY, deviceNum - 4);
 						if (image_exists(image))
 						{
-							memory_region(machine, REGION_CPU1)[statusDCB] = 0x80;
-							memory_region(machine, REGION_CPU1)[statusDCB+17] = 1024&255;
-							memory_region(machine, REGION_CPU1)[statusDCB+18] = 1024>>8;
+							ram[statusDCB] = 0x80;
+							ram[statusDCB+17] = 1024&255;
+							ram[statusDCB+18] = 1024>>8;
 						}
 						else
 						{
-							memory_region(machine, REGION_CPU1)[statusDCB] = 0x83; /* Device Found but No Disk in Drive*/
+							ram[statusDCB] = 0x83; /* Device Found but No Disk in Drive*/
 						}
 					}
 					else
 					{
-						memory_region(machine, REGION_CPU1)[statusDCB] = 0x9B; /* Time Out - No Device Found*/
+						ram[statusDCB] = 0x9B; /* Time Out - No Device Found*/
 					}
-					//logerror("   Requesting Status Device %02d=%02Xh\n", deviceNum, memory_region(machine, REGION_CPU1)[statusDCB]);
+					//logerror("   Requesting Status Device %02d=%02Xh\n", deviceNum, ram[statusDCB]);
 					break;
 				case 2: /* Soft reset */
-					memory_region(machine, REGION_CPU1)[statusDCB] = 0x80;
+					ram[statusDCB] = 0x80;
 					//logerror("   Reseting Device %02d\n", deviceNum);
 					break;
 				case 3: /* Write Data */
 					//logerror("   Requesting Write to Device %02d\n", deviceNum);
 					if (deviceNum==2)
 					{
-						memory_region(machine, REGION_CPU1)[statusDCB] = 0x80; /* Ok, char sent to printer... no really */
+						ram[statusDCB] = 0x80; /* Ok, char sent to printer... no really */
 						//logerror("   Requesting Write %2d bytes on buffer [%04xh] to Device %02d\n", byteCount, buffer,deviceNum);
 					}
 					else
 					{
-						memory_region(machine, REGION_CPU1)[statusDCB] = 0x85; /* Write Protected Media */
+						ram[statusDCB] = 0x85; /* Write Protected Media */
 					}
 					break;
 				case 4: /* Read Data */
@@ -631,12 +633,12 @@ If you have the source listing or the Rom dump, please send us.
 						kbcode=getKeyFromBuffer();
 						if (kbcode>0)
 						{
-							memory_region(machine, REGION_CPU1)[buffer] = kbcode; /* Key pressed  */
-							memory_region(machine, REGION_CPU1)[statusDCB] = 0x80;
+							ram[buffer] = kbcode; /* Key pressed  */
+							ram[statusDCB] = 0x80;
 						}
 						else
 						{
-							memory_region(machine, REGION_CPU1)[statusDCB] = 0x8C; /* No key pressed */
+							ram[statusDCB] = 0x8C; /* No key pressed */
 						}
 					}
 					else if (deviceNum>=4 && deviceNum<=7)
@@ -644,7 +646,7 @@ If you have the source listing or the Rom dump, please send us.
 						image = image_from_devtype_and_index(IO_FLOPPY, deviceNum - 4);
 						if (image_exists(image))
 						{
-							sectorNmbr = ((memory_region(machine, REGION_CPU1)[statusDCB+5])+(memory_region(machine, REGION_CPU1)[statusDCB+6]<<8)+(memory_region(machine, REGION_CPU1)[statusDCB+7]<<16)+(memory_region(machine, REGION_CPU1)[statusDCB+8]<<24))<<1;
+							sectorNmbr = ((ram[statusDCB+5])+(ram[statusDCB+6]<<8)+(ram[statusDCB+7]<<16)+(ram[statusDCB+8]<<24))<<1;
 							sectorCount = (byteCount/512)+(byteCount%512==0)? 0:1;
 							for(i=0;i<=1;i++)
 							{
@@ -659,21 +661,21 @@ If you have the source listing or the Rom dump, please send us.
 									floppy_drive_seek(image, 1);
 									currentSector++;
 								}
-								floppy_drive_read_sector_data(image, 0, interleave[(sectorNmbr+i)&0x07], &memory_region(machine, REGION_CPU1)[buffer+(512*i)],512);
+								floppy_drive_read_sector_data(image, 0, interleave[(sectorNmbr+i)&0x07], &ram[buffer+(512*i)],512);
 							}
-							memory_region(machine, REGION_CPU1)[statusDCB+20] |= 6;
-							memory_region(machine, REGION_CPU1)[statusDCB] = 0x80;
+							ram[statusDCB+20] |= 6;
+							ram[statusDCB] = 0x80;
 						}
 
 					}
 					else
 					{
-						memory_region(machine, REGION_CPU1)[statusDCB] = 0x9B;
+						ram[statusDCB] = 0x9B;
 					}
 					//logerror("   Requesting Read %2d bytes on buffer [%04xh] from Device %02d\n", byteCount, buffer,deviceNum);
 					break;
 				default:
-					memory_region(machine, REGION_CPU1)[statusDCB] = 0x9B; /* Other */
+					ram[statusDCB] = 0x9B; /* Other */
 					break;
 			}
 		}

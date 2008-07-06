@@ -268,6 +268,8 @@ static void render_color_stack_mode(running_machine *machine, bitmap_t *bitmap)
 {
     UINT8 h, csPtr = 0, nexty = 0;
     UINT16 nextCard, nextx = 0;
+    UINT8 *ram = memory_region(machine, REGION_CPU1);
+
     for (h = 0; h < 240; h++) {
         nextCard = intv_ram16[h];
 
@@ -302,7 +304,7 @@ static void render_color_stack_mode(running_machine *machine, bitmap_t *bitmap)
             isGrom = !(nextCard & 0x0800);
             if (isGrom) {
                 memoryLocation = 0x3000 + (nextCard & 0x07F8);
-                memory = memory_region(machine, REGION_CPU1);
+                memory = ram;
                 for (j = 0; j < 16; j+=2)
                     render_line(machine, bitmap, memory[(memoryLocation<<1)+j],
                             nextx, nexty+j, fgcolor, bgcolor);
@@ -328,6 +330,7 @@ static void render_fg_bg_mode(running_machine *machine, bitmap_t *bitmap)
     UINT8 i, j, isGrom, fgcolor, bgcolor, nexty = 0;
     UINT16 nextCard, memoryLocation, nextx = 0;
     UINT8* memory;
+    UINT8* ram = memory_region(machine, REGION_CPU1);
 
     for (i = 0; i < 240; i++) {
         nextCard = intv_ram16[i];
@@ -338,7 +341,7 @@ static void render_fg_bg_mode(running_machine *machine, bitmap_t *bitmap)
         isGrom = !(nextCard & 0x0800);
         if (isGrom) {
             memoryLocation = 0x3000 + (nextCard & 0x01F8);
-            memory = memory_region(machine, REGION_CPU1);
+            memory = ram;
             for (j = 0; j < 16; j+=2)
                 render_line(machine, bitmap, memory[(memoryLocation<<1)+j],
                         nextx, nexty+j, fgcolor, bgcolor);

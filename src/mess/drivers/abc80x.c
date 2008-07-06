@@ -738,6 +738,7 @@ static const e0516_interface abc806_e0516_intf =
 
 static MACHINE_START( abc806 )
 {
+	UINT8 *mem;
 	int bank;
 
 	MACHINE_START_CALL(abc800);
@@ -761,11 +762,12 @@ static MACHINE_START( abc806 )
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_BANK15, SMH_BANK15);
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, SMH_BANK16, SMH_BANK16);
 
+	mem = memory_region(machine, REGION_CPU1);
 	for (bank = 1; bank < 17; bank++)
 	{
 		if (bank != 8)
 		{
-			memory_configure_bank(bank, 0, 1, memory_region(machine, REGION_CPU1) + ((bank - 1) * 0x1000), 0);
+			memory_configure_bank(bank, 0, 1, mem + ((bank - 1) * 0x1000), 0);
 			memory_configure_bank(bank, 1, 32, mess_ram, 0x1000);
 
 			memory_set_bank(bank, 0);

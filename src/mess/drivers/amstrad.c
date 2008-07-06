@@ -2075,15 +2075,16 @@ The Gate-Array fetches two bytes for each address*/
 static MACHINE_RESET( amstrad )
 {
 	int i;
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	amstrad_system_type = SYSTEM_CPC;
 
 	for (i=0; i<256; i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x014000];
+		Amstrad_ROM_Table[i] = &rom[0x014000];
 	}
 
-	Amstrad_ROM_Table[7] = &memory_region(machine, REGION_CPU1)[0x018000];
+	Amstrad_ROM_Table[7] = &rom[0x018000];
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 	amstrad_init_palette(machine);
@@ -2095,18 +2096,19 @@ static MACHINE_RESET( amstrad )
 static MACHINE_RESET( plus )
 {
 	int i;
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	amstrad_system_type = SYSTEM_PLUS;
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
-		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x4000];  // BASIC in system cart
+		Amstrad_ROM_Table[i] = &rom[0x4000];  // BASIC in system cart
 	}
 	for(i=128;i<160;i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[(i-128)*0x4000];
+		Amstrad_ROM_Table[i] = &rom[(i-128)*0x4000];
 	}
-	Amstrad_ROM_Table[7] = &memory_region(machine, REGION_CPU1)[0xc000];  // AMSDOS in system cart
+	Amstrad_ROM_Table[7] = &rom[0xc000];  // AMSDOS in system cart
 
 	amstrad_plus_lower = 0;  // cart bank 0
 	amstrad_plus_lower_addr = 0;  // at 0x0000, reg page disabled by default
@@ -2144,18 +2146,19 @@ static MACHINE_START( plus )
 static MACHINE_RESET( gx4000 )
 {
 	int i;
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	amstrad_system_type = SYSTEM_GX4000;
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
-		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x4000];
+		Amstrad_ROM_Table[i] = &rom[0x4000];
 	}
 	for(i=128;i<160;i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[(i-128)*0x4000];
+		Amstrad_ROM_Table[i] = &rom[(i-128)*0x4000];
 	}
-	Amstrad_ROM_Table[7] = &memory_region(machine, REGION_CPU1)[0xc000];
+	Amstrad_ROM_Table[7] = &rom[0xc000];
 
 	amstrad_plus_lower = 0;  // cart bank 0
 	amstrad_plus_lower_addr = 0;  // at 0x0000, reg page disabled by default
@@ -2188,12 +2191,13 @@ static MACHINE_RESET( gx4000 )
 static MACHINE_RESET( kccomp )
 {
 	int i;
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	amstrad_system_type = SYSTEM_CPC;
 
 	for (i=0; i<256; i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x014000];
+		Amstrad_ROM_Table[i] = &rom[0x014000];
 	}
 
 	amstrad_common_init(machine);
@@ -2216,16 +2220,17 @@ static DRIVER_INIT( aleste )
 static MACHINE_RESET( aleste )
 {
 	int i;
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	amstrad_system_type = SYSTEM_CPC;
 
 	for (i=0; i<256; i++)
 	{
-		Amstrad_ROM_Table[i] = &memory_region(machine, REGION_CPU1)[0x014000];
+		Amstrad_ROM_Table[i] = &rom[0x014000];
 	}
 
-	Amstrad_ROM_Table[3] = &memory_region(machine, REGION_CPU1)[0x01c000];  // MSX-DOS / BIOS
-	Amstrad_ROM_Table[7] = &memory_region(machine, REGION_CPU1)[0x018000];  // AMSDOS
+	Amstrad_ROM_Table[3] = &rom[0x01c000];  // MSX-DOS / BIOS
+	Amstrad_ROM_Table[7] = &rom[0x018000];  // AMSDOS
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 

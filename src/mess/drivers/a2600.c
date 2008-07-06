@@ -149,6 +149,7 @@ static unsigned long detect_2600controllers(running_machine *machine)
 
 	unsigned int left,right;
 	int i,j,foundkeypad = 0;
+	UINT8 *cart;
 	static const unsigned char signatures[][5] =  {
 									{ 0x55, 0xa5, 0x3c, 0x29, 0}, // star raiders
 									{ 0xf9, 0xff, 0xa5, 0x80, 1}, // sentinel
@@ -179,11 +180,12 @@ static unsigned long detect_2600controllers(running_machine *machine)
 	// default for bad dumps and roms too large to have special controllers
 	if ((cart_size > 0x4000) || (cart_size & 0x7ff)) return (left << 16) + right;
 
+	cart = CART;
 	for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 	{
 		for (j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
 		{
-			if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0] - 1))
+			if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0] - 1))
 			{
 				int k = signatures[j][4];
 				if (k == 0) return (JOYS << 16) + KEYP;
@@ -213,9 +215,10 @@ static int detect_modeDC(running_machine *machine)
 	static const unsigned char signature[3] = { 0x8d, 0xf0, 0xff };
 	if (cart_size == 0x10000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], signature,sizeof signature))
+			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
 				numfound = 1;
 			}
@@ -231,9 +234,10 @@ static int detect_modef6(running_machine *machine)
 	static const unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
 	if (cart_size == 0x4000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], signature,sizeof signature))
+			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
 				numfound = 1;
 			}
@@ -253,9 +257,10 @@ static int detect_mode3E(running_machine *machine)
 	static const unsigned char signature[3] = { 0x84, 0x3e, 0x9d };
 	if (cart_size == 0x0800 || cart_size == 0x1000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], signature,sizeof signature))
+			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
 				numfound = 1;
 			}
@@ -271,9 +276,10 @@ static int detect_modeSS(running_machine *machine)
 	static const unsigned char signature[5] = { 0xbd, 0xe5, 0xff, 0x95, 0x81 };
 	if (cart_size == 0x0800 || cart_size == 0x1000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], signature,sizeof signature))
+			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
 				numfound = 1;
 			}
@@ -293,11 +299,12 @@ static int detect_modeFE(running_machine *machine)
 									{ 0x20, 0x00, 0xf0, 0x84, 0xd6 }};
 	if (cart_size == 0x2000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
-				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
 				{
 					numfound = 1;
 				}
@@ -320,11 +327,12 @@ static int detect_modeE0(running_machine *machine)
 									{ 0xad, 0xf3, 0xbf }};
 	if (cart_size == 0x2000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
-				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
 				{
 					numfound = 1;
 				}
@@ -343,11 +351,12 @@ static int detect_modeCV(running_machine *machine)
 									{ 0x99, 0x00, 0xf4 }};
 	if (cart_size == 0x0800 || cart_size == 0x1000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
-				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
 				{
 					numfound = 1;
 				}
@@ -365,11 +374,12 @@ static int detect_modeFV(running_machine *machine)
 									{ 0x2c, 0xd0, 0xff }};
 	if (cart_size == 0x2000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
-				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
 				{
 					numfound = 1;
 				}
@@ -389,11 +399,12 @@ static int detect_modeJVP(running_machine *machine)
 									{ 0x8d, 0xa0, 0x0f, 0xf0 }};
 	if (cart_size == 0x4000 || cart_size == 0x2000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
-				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
 				{
 					numfound = 1;
 				}
@@ -412,11 +423,12 @@ static int detect_modeE7(running_machine *machine)
 									{ 0x8d, 0xe7, 0xff }};
 	if (cart_size == 0x2000 || cart_size == 0x4000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
-				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
 				{
 					numfound = 1;
 				}
@@ -433,9 +445,10 @@ static int detect_modeUA(running_machine *machine)
 	static const unsigned char signature[3] = { 0x8d, 0x40, 0x02 };
 	if (cart_size == 0x2000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], signature,sizeof signature))
+			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
 				numfound = 1;
 			}
@@ -453,13 +466,14 @@ static int detect_8K_mode3F(running_machine *machine)
 	// have to look for two signatures because 'not boulderdash' gives false positive otherwise
 	if (cart_size == 0x2000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - sizeof signature1; i++)
 		{
-			if (!memcmp(&CART[i], signature1,sizeof signature1))
+			if (!memcmp(&cart[i], signature1,sizeof signature1))
 			{
 				numfound |= 0x01;
 			}
-			if (!memcmp(&CART[i], signature2,sizeof signature2))
+			if (!memcmp(&cart[i], signature2,sizeof signature2))
 			{
 				numfound |= 0x02;
 			}
@@ -475,9 +489,10 @@ static int detect_32K_mode3F(running_machine *machine)
 	static const unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
 	if (cart_size >= 0x8000)
 	{
+		UINT8 *cart = CART;
 		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], signature,sizeof signature))
+			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
 				numfound++;
 			}
@@ -490,6 +505,7 @@ static int detect_32K_mode3F(running_machine *machine)
 static int detect_super_chip(running_machine *machine)
 {
 	int i,j;
+	UINT8 *cart = CART;
 	static const unsigned char signatures[][5] = {
 									{ 0xa2, 0x7f, 0x9d, 0x00, 0xf0 }, // dig dug
 									{ 0xae, 0xf6, 0xff, 0x4c, 0x00 }}; // off the wall
@@ -500,7 +516,7 @@ static int detect_super_chip(running_machine *machine)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
 			{
-				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
 				{
 					return 1;
 				}
@@ -509,13 +525,13 @@ static int detect_super_chip(running_machine *machine)
 	}
 	for (i = 0x1000; i < cart_size; i += 0x1000)
 	{
-		if (memcmp(CART, CART + i, 0x100))
+		if (memcmp(cart, cart + i, 0x100))
 		{
 			return 0;
 		}
 	}
 	/* Check the reset vector does not point into the super chip RAM area */
-	i = ( CART[0x0FFD] << 8 ) | CART[0x0FFC];
+	i = ( cart[0x0FFD] << 8 ) | cart[0x0FFC];
 	if ( ( i & 0x0FFF ) < 0x0100 ) {
 		return 0;
 	}
@@ -533,6 +549,7 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 {
 	running_machine *machine = image->machine;
 	const struct _extrainfo_banking_def *eibd;
+	UINT8 *cart = CART;
 	const char	*extrainfo;
 
 	cart_size = image_length(image);
@@ -558,11 +575,11 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 
 	current_bank = 0;
 
-	image_fread(image, CART, cart_size);
+	image_fread(image, cart, cart_size);
 
 	if (!(cart_size == 0x4000 && detect_modef6(image->machine))) {
 		while (cart_size > 0x00800) {
-			if (!memcmp(CART, &CART[cart_size/2],cart_size/2)) cart_size /= 2;
+			if (!memcmp(cart, &cart[cart_size/2],cart_size/2)) cart_size /= 2;
 			else break;
 		}
 	}
@@ -1155,6 +1172,7 @@ static const struct riot6532_interface r6532_interface =
 static void install_banks(running_machine *machine, int count, unsigned init)
 {
 	int i;
+	UINT8 *cart = CART;
 
 	for (i = 0; i < count; i++)
 	{
@@ -1170,7 +1188,7 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, 0, 0, handler[i]);
 
-		bank_base[i + 1] = memory_region(machine, REGION_USER1) + init;
+		bank_base[i + 1] = cart + init;
 		memory_set_bankptr(i + 1, bank_base[i + 1]);
 	}
 }

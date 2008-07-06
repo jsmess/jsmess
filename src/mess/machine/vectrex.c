@@ -74,10 +74,11 @@ static int vectrex_verify_cart (char *data)
 
 DEVICE_IMAGE_LOAD( vectrex_cart )
 {
-	image_fread(image, memory_region(image->machine, REGION_CPU1), 0x8000);
+	UINT8 *mem = memory_region(image->machine, REGION_CPU1);
+	image_fread(image, mem, 0x8000);
 
 	/* check image! */
-	if (vectrex_verify_cart((char*)memory_region(image->machine, REGION_CPU1)) == IMAGE_VERIFY_FAIL)
+	if (vectrex_verify_cart((char*)mem) == IMAGE_VERIFY_FAIL)
 	{
 		logerror("Invalid image!\n");
 		return INIT_FAIL;
@@ -93,17 +94,17 @@ DEVICE_IMAGE_LOAD( vectrex_cart )
 	/* slightly prettier than having to hardcode CRCs */
 
 	/* handle 3D Narrow Escape but skip the 2-d hack of it from Fred Taft */
-	if (!memcmp(memory_region(image->machine, REGION_CPU1)+0x11,"NARROW",6) && (((char*)memory_region(image->machine, REGION_CPU1))[0x39] == 0x0c))
+	if (!memcmp(mem+0x11,"NARROW",6) && (((char*)mem)[0x39] == 0x0c))
 	{
 		vectrex_imager_angles = narrow_escape_angles;
 	}
 
-	if (!memcmp(memory_region(image->machine, REGION_CPU1)+0x11,"CRAZY COASTER",13))
+	if (!memcmp(mem+0x11,"CRAZY COASTER",13))
 	{
 		vectrex_imager_angles = crazy_coaster_angles;
 	}
 
-	if (!memcmp(memory_region(image->machine, REGION_CPU1)+0x11,"3D MINE STORM",13))
+	if (!memcmp(mem+0x11,"3D MINE STORM",13))
 	{
 		vectrex_imager_angles = minestorm_3d_angles;
 

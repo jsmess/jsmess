@@ -145,43 +145,44 @@ UINT8 c16_m7501_port_read(void)
 
 static void c16_bankswitch (running_machine *machine)
 {
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(9, mess_ram);
 
 	switch (lowrom)
 	{
 	case 0:
-		memory_set_bankptr (2, memory_region(machine, REGION_CPU1) + 0x10000);
+		memory_set_bankptr (2, rom + 0x10000);
 		break;
 	case 1:
-		memory_set_bankptr (2, memory_region(machine, REGION_CPU1) + 0x18000);
+		memory_set_bankptr (2, rom + 0x18000);
 		break;
 	case 2:
-		memory_set_bankptr (2, memory_region(machine, REGION_CPU1) + 0x20000);
+		memory_set_bankptr (2, rom + 0x20000);
 		break;
 	case 3:
-		memory_set_bankptr (2, memory_region(machine, REGION_CPU1) + 0x28000);
+		memory_set_bankptr (2, rom + 0x28000);
 		break;
 	}
 	switch (highrom)
 	{
 	case 0:
-		memory_set_bankptr (3, memory_region(machine, REGION_CPU1) + 0x14000);
-		memory_set_bankptr (8, memory_region(machine, REGION_CPU1) + 0x17f20);
+		memory_set_bankptr (3, rom + 0x14000);
+		memory_set_bankptr (8, rom + 0x17f20);
 		break;
 	case 1:
-		memory_set_bankptr (3, memory_region(machine, REGION_CPU1) + 0x1c000);
-		memory_set_bankptr (8, memory_region(machine, REGION_CPU1) + 0x1ff20);
+		memory_set_bankptr (3, rom + 0x1c000);
+		memory_set_bankptr (8, rom + 0x1ff20);
 		break;
 	case 2:
-		memory_set_bankptr (3, memory_region(machine, REGION_CPU1) + 0x24000);
-		memory_set_bankptr (8, memory_region(machine, REGION_CPU1) + 0x27f20);
+		memory_set_bankptr (3, rom + 0x24000);
+		memory_set_bankptr (8, rom + 0x27f20);
 		break;
 	case 3:
-		memory_set_bankptr (3, memory_region(machine, REGION_CPU1) + 0x2c000);
-		memory_set_bankptr (8, memory_region(machine, REGION_CPU1) + 0x2ff20);
+		memory_set_bankptr (3, rom + 0x2c000);
+		memory_set_bankptr (8, rom + 0x2ff20);
 		break;
 	}
-	memory_set_bankptr (4, memory_region(machine, REGION_CPU1) + 0x17c00);
+	memory_set_bankptr (4, rom + 0x17c00);
 }
 
 WRITE8_HANDLER(c16_switch_to_rom)
@@ -419,6 +420,7 @@ static void c16_common_driver_init (running_machine *machine)
 	VC1541_CONFIG vc1541= { 1, 8 };
 #endif
 	C1551_CONFIG config= { 1 };
+	UINT8 *rom;
 
 	/* configure the M7501 port */
 	cpunum_set_info_fct(0, CPUINFO_PTR_M6510_PORTREAD, (genf *) c16_m7501_port_read);
@@ -450,14 +452,15 @@ static void c16_common_driver_init (running_machine *machine)
 	tpi6525[3].c.read=c1551_1_read_handshake;
 	tpi6525[3].c.output=c1551_1_write_handshake;
 
-	c16_memory_10000 = memory_region(machine, REGION_CPU1) + 0x10000;
-	c16_memory_14000 = memory_region(machine, REGION_CPU1) + 0x14000;
-	c16_memory_18000 = memory_region(machine, REGION_CPU1) + 0x18000;
-	c16_memory_1c000 = memory_region(machine, REGION_CPU1) + 0x1c000;
-	c16_memory_20000 = memory_region(machine, REGION_CPU1) + 0x20000;
-	c16_memory_24000 = memory_region(machine, REGION_CPU1) + 0x24000;
-	c16_memory_28000 = memory_region(machine, REGION_CPU1) + 0x28000;
-	c16_memory_2c000 = memory_region(machine, REGION_CPU1) + 0x2c000;
+	rom = memory_region(machine, REGION_CPU1);
+	c16_memory_10000 = rom + 0x10000;
+	c16_memory_14000 = rom + 0x14000;
+	c16_memory_18000 = rom + 0x18000;
+	c16_memory_1c000 = rom + 0x1c000;
+	c16_memory_20000 = rom + 0x20000;
+	c16_memory_24000 = rom + 0x24000;
+	c16_memory_28000 = rom + 0x28000;
+	c16_memory_2c000 = rom + 0x2c000;
 
 	/* need to recognice non available tia6523's (iec8/9) */
 	memset(mess_ram + (0xfdc0 % mess_ram_size), 0xff, 0x40);

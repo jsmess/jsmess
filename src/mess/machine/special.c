@@ -314,7 +314,8 @@ static void erik_set_bank(running_machine *machine) {
 	UINT8 bank2 = ((RR_register >> 2) & 3);
 	UINT8 bank3 = ((RR_register >> 4) & 3);
 	UINT8 bank4 = ((RR_register >> 6) & 3);
-	
+	UINT8 *mem = memory_region(machine, REGION_CPU1);
+
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_BANK2);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_BANK3);
@@ -330,7 +331,7 @@ static void erik_set_bank(running_machine *machine) {
 						break;		
 		case 	0: 
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000);	
+						memory_set_bankptr(1, mem + 0x10000);	
 						break;
 	}
 	switch(bank2) {
@@ -341,7 +342,7 @@ static void erik_set_bank(running_machine *machine) {
 						break;		
 		case 	0: 
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0x14000);	
+						memory_set_bankptr(2, mem + 0x14000);	
 						break;
 	}
 	switch(bank3) {
@@ -352,7 +353,7 @@ static void erik_set_bank(running_machine *machine) {
 						break;		
 		case 	0: 
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(3, memory_region(machine, REGION_CPU1) + 0x19000);	
+						memory_set_bankptr(3, mem + 0x19000);	
 						break;
 	}
 	switch(bank4) {
@@ -365,7 +366,7 @@ static void erik_set_bank(running_machine *machine) {
 						break;		
 		case 	0: 
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(4, memory_region(machine, REGION_CPU1) + 0x1c000);	
+						memory_set_bankptr(4, mem + 0x1c000);	
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_UNMAP);
 						memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_NOP);
 						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_w);

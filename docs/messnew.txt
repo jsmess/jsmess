@@ -167,6 +167,9 @@ Source Changes:
 
 - Code cleanups.  [Atari Ace]
 
+- Cut down on the amount of time memory_region() is invoked in a loop.  [Atari
+  Ace]
+
 - Changed the 8530 SCC chip implementation to use MAME's device system.  [Nate
   Woods]
 

@@ -99,10 +99,10 @@ static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 	/* Brutal hack put in as a consequence of new memory system; fix this */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
-	memory_set_bankptr(10, memory_region(machine, REGION_CPU1) + 0x0480);
+	memory_set_bankptr(10, ROM + 0x0480);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
-	memory_set_bankptr(11, memory_region(machine, REGION_CPU1) + 0x1800);
+	memory_set_bankptr(11, ROM + 0x1800);
 }
 
 
@@ -407,6 +407,8 @@ WRITE8_HANDLER( a7800_RAM0_w )
 
 WRITE8_HANDLER( a7800_cart_w )
 {
+	UINT8 *memory = memory_region(machine, REGION_CPU1);
+
 	if(offset < 0x4000)
 	{
 		if(a7800_cart_type & 0x04)
@@ -434,8 +436,8 @@ WRITE8_HANDLER( a7800_cart_w )
 		{
 			data &= 0x07;
 		}
-		memory_set_bankptr(2,memory_region(machine, REGION_CPU1) + 0x10000 + (data << 14));
-		memory_set_bankptr(3,memory_region(machine, REGION_CPU1) + 0x12000 + (data << 14));
+		memory_set_bankptr(2,memory + 0x10000 + (data << 14));
+		memory_set_bankptr(3,memory + 0x12000 + (data << 14));
 	/*	logerror("BANK SEL: %d\n",data); */
 	}
 	else if(( a7800_cart_type == MBANK_TYPE_ABSOLUTE ) &&( offset == 0x4000 ) )
@@ -444,11 +446,11 @@ WRITE8_HANDLER( a7800_cart_w )
 		/*logerror( "F18 BANK SEL: %d\n", data );*/
 		if( data & 1 )
 		{
-			memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x10000 );
+			memory_set_bankptr(1,memory + 0x10000 );
 		}
 		else if( data & 2 )
 		{
-			memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x14000 );
+			memory_set_bankptr(1,memory + 0x14000 );
 		}
 	}
 	else if(( a7800_cart_type == MBANK_TYPE_ACTIVISION ) &&( offset >= 0xBF80 ) )
@@ -458,8 +460,8 @@ WRITE8_HANDLER( a7800_cart_w )
 
 		/*logerror( "Activision BANK SEL: %d\n", data );*/
 
-		memory_set_bankptr( 3, memory_region(machine,  REGION_CPU1 ) + 0x10000 + ( data << 14 ) );
-		memory_set_bankptr( 4, memory_region(machine,  REGION_CPU1 ) + 0x12000 + ( data << 14 ) );
+		memory_set_bankptr( 3, memory + 0x10000 + ( data << 14 ) );
+		memory_set_bankptr( 4, memory + 0x12000 + ( data << 14 ) );
 	}
 }
 

@@ -428,31 +428,33 @@ DRIVER_INIT( ti99_4a )
 
 DRIVER_INIT( ti99_4ev )
 {
+	UINT8 *mem = memory_region(machine, REGION_CPU1);
 	ti99_model = model_99_4a;
 	has_evpc = TRUE;
 
 	/* set up memory pointers */
-	xRAM_ptr = (UINT16 *) (memory_region(machine, REGION_CPU1) + offset_xram);
-	cartridge_pages[0] = (UINT16 *) (memory_region(machine, REGION_CPU1)+offset_cart);
-	cartridge_pages[1] = (UINT16 *) (memory_region(machine, REGION_CPU1)+offset_cart + 0x2000);
+	xRAM_ptr = (UINT16 *) (mem + offset_xram);
+	cartridge_pages[0] = (UINT16 *) (mem+offset_cart);
+	cartridge_pages[1] = (UINT16 *) (mem+offset_cart + 0x2000);
 	console_GROMs.data_ptr = memory_region(machine, region_grom);
 }
 
 DRIVER_INIT( ti99_8 )
 {
+	UINT8 *mem = memory_region(machine, REGION_CPU1);
 	ti99_model = model_99_8;
 	has_evpc = FALSE;
 
 	/* set up memory pointers */
-	xRAM_ptr_8 = memory_region(machine, REGION_CPU1) + offset_xram_8;
-	ROM0_ptr_8 = memory_region(machine, REGION_CPU1) + offset_rom0_8;
+	xRAM_ptr_8 = mem + offset_xram_8;
+	ROM0_ptr_8 = mem + offset_rom0_8;
 	ROM1_ptr_8 = ROM0_ptr_8 + 0x2000;
 	ROM2_ptr_8 = ROM1_ptr_8 + 0x2000;
 	ROM3_ptr_8 = ROM2_ptr_8 + 0x2000;
-	sRAM_ptr_8 = memory_region(machine, REGION_CPU1) + offset_sram_8;
+	sRAM_ptr_8 = mem + offset_sram_8;
 
-	cartridge_pages_8[0] = memory_region(machine, REGION_CPU1)+offset_cart_8;
-	cartridge_pages_8[1] = memory_region(machine, REGION_CPU1)+offset_cart_8 + 0x2000;
+	cartridge_pages_8[0] = mem+offset_cart_8;
+	cartridge_pages_8[1] = mem+offset_cart_8 + 0x2000;
 	console_GROMs.data_ptr = memory_region(machine, region_grom);
 }
 
@@ -794,10 +796,12 @@ MACHINE_RESET( ti99 )
 	}
 	else if (ti99_model == model_99_4p)
 	{
+		UINT8* mem = memory_region(machine, REGION_CPU1);
+
 		/* set up system ROM and scratch pad pointers */
-		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + offset_rom0_4p);	/* system ROM */
-		memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + offset_sram_4p);	/* scratch pad */
-		memory_set_bankptr(11, memory_region(machine, REGION_CPU1) + offset_dram_4p);	/* extra RAM for debugger */
+		memory_set_bankptr(1, mem + offset_rom0_4p);	/* system ROM */
+		memory_set_bankptr(2, mem + offset_sram_4p);	/* scratch pad */
+		memory_set_bankptr(11, mem + offset_dram_4p);	/* extra RAM for debugger */
 	}
 	else
 	{
@@ -2607,8 +2611,10 @@ static UINT16 *ti99_4p_internal_DSR;
 /* set up handlers, and set initial state */
 static void ti99_4p_internal_dsr_reset(running_machine *machine)
 {
-	ti99_4p_internal_DSR = (UINT16 *) (memory_region(machine, REGION_CPU1) + offset_rom4_4p);
-	ti99_4p_internal_ROM6 = (UINT16 *) (memory_region(machine, REGION_CPU1) + offset_rom6_4p);
+	UINT8* mem = memory_region(machine, REGION_CPU1);
+
+	ti99_4p_internal_DSR = (UINT16 *) (mem + offset_rom4_4p);
+	ti99_4p_internal_ROM6 = (UINT16 *) (mem + offset_rom6_4p);
 
 	ti99_peb_set_16bit_card_handlers(0x0f00, & ti99_4p_internal_dsr_handlers);
 

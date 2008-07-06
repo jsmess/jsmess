@@ -796,26 +796,27 @@ static int c128_dma_read_color (int offset)
 static void c128_common_driver_init(running_machine *machine)
 {
 	UINT8 *gfx=memory_region(machine, REGION_GFX1);
+	UINT8 *ram = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* configure the M6510 port */
 	cpunum_set_info_fct(1, CPUINFO_PTR_M6510_PORTREAD, (genf *) c64_m6510_port_read);
 	cpunum_set_info_fct(1, CPUINFO_PTR_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
 
-	c64_memory = memory_region(machine, REGION_CPU1);
+	c64_memory = ram;
 
-	c128_basic = memory_region(machine, REGION_CPU1)+0x100000;
-	c64_basic = memory_region(machine, REGION_CPU1)+0x108000;
-	c64_kernal = memory_region(machine, REGION_CPU1)+0x10a000;
-	c128_editor = memory_region(machine, REGION_CPU1)+0x10c000;
-	c128_z80 = memory_region(machine, REGION_CPU1)+0x10d000;
-	c128_kernal = memory_region(machine, REGION_CPU1)+0x10e000;
-	c128_internal_function = memory_region(machine, REGION_CPU1)+0x110000;
-	c128_external_function = memory_region(machine, REGION_CPU1)+0x118000;
-	c64_chargen = memory_region(machine, REGION_CPU1)+0x120000;
-	c128_chargen = memory_region(machine, REGION_CPU1)+0x121000;
-	c64_colorram = memory_region(machine, REGION_CPU1)+0x122000;
-	c128_vdcram = memory_region(machine, REGION_CPU1)+0x122800;
+	c128_basic = ram+0x100000;
+	c64_basic = ram+0x108000;
+	c64_kernal = ram+0x10a000;
+	c128_editor = ram+0x10c000;
+	c128_z80 = ram+0x10d000;
+	c128_kernal = ram+0x10e000;
+	c128_internal_function = ram+0x110000;
+	c128_external_function = ram+0x118000;
+	c64_chargen = ram+0x120000;
+	c128_chargen = ram+0x121000;
+	c64_colorram = ram+0x122000;
+	c128_vdcram = ram+0x122800;
 
 	for (i=0; i<0x100; i++)
 		gfx[i]=i;

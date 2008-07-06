@@ -417,7 +417,8 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 		|| !strcmp(machine->gamedrv->name, "ace100")
 		|| !strcmp(machine->gamedrv->name, "apple2jp"))
 	{
-		for (i = 0; i < memory_region_length(machine, REGION_GFX1); i++)
+		int len = memory_region_length(machine, REGION_GFX1);
+		for (i = 0; i < len; i++)
 		{
 			apple2_font[i] = BITSWAP8(apple2_font[i], 7, 0, 1, 2, 3, 4, 5, 6);
 		}

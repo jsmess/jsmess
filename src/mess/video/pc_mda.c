@@ -112,7 +112,7 @@ VIDEO_START( pc_mda )
 
 	memset( &mda, 0, sizeof(mda));
 	mda.update_row = NULL;
-	mda.chr_gen = memory_region(machine,  REGION_GFX1 );
+	mda.chr_gen = memory_region( machine, REGION_GFX1 );
 
 	videoram_size = 0x1000;	/* This is actually 0x1000 in reality */
 	videoram = auto_malloc(videoram_size);
@@ -461,7 +461,7 @@ static VIDEO_START( pc_hercules )
 
 	memset( &mda, 0, sizeof(mda));
 	mda.update_row = NULL;
-	mda.chr_gen = memory_region(machine,  REGION_GFX1 );
+	mda.chr_gen = memory_region( machine, REGION_GFX1 );
 
 	videoram_size = 0x10000;
 	videoram = auto_malloc(videoram_size);

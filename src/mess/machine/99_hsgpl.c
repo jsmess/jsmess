@@ -137,6 +137,7 @@ enum
 static int ti99_hsgpl_file_load(running_machine *machine, mame_file *file)
 {
 	UINT8 version;
+	UINT8 *rgn;
 
 
 	/* version flag */
@@ -145,23 +146,25 @@ static int ti99_hsgpl_file_load(running_machine *machine, mame_file *file)
 	if (version != 0)
 		return 1;
 
+	rgn = memory_region(machine, region_hsgpl);
+
 	/* read DSR */
-	at29c040a_init_data_ptr(feeprom_dsr, memory_region(machine, region_hsgpl) + offset_hsgpl_dsr);
+	at29c040a_init_data_ptr(feeprom_dsr, rgn + offset_hsgpl_dsr);
 	if (at29c040a_file_load(feeprom_dsr, file))
 		return 1;
 
 	/* read GROM 0 */
-	at29c040a_init_data_ptr(feeprom_grom0, memory_region(machine, region_hsgpl) + offset_hsgpl_grom);
+	at29c040a_init_data_ptr(feeprom_grom0, rgn + offset_hsgpl_grom);
 	if (at29c040a_file_load(feeprom_grom0, file))
 		return 1;
 
 	/* read GROM 1 */
-	at29c040a_init_data_ptr(feeprom_grom1, memory_region(machine, region_hsgpl) + offset_hsgpl_grom + 0x80000);
+	at29c040a_init_data_ptr(feeprom_grom1, rgn + offset_hsgpl_grom + 0x80000);
 	if (at29c040a_file_load(feeprom_grom1, file))
 		return 1;
 
 	/* read ROM6 */
-	at29c040a_init_data_ptr(feeprom_rom6, memory_region(machine, region_hsgpl) + offset_hsgpl_rom6);
+	at29c040a_init_data_ptr(feeprom_rom6, rgn + offset_hsgpl_rom6);
 	if (at29c040a_file_load(feeprom_rom6, file))
 		return 1;
 
@@ -252,16 +255,17 @@ int ti99_hsgpl_save_memcard(running_machine *machine)
 */
 void ti99_hsgpl_init(running_machine *machine)
 {
-	hsgpl.GRAM_ptr = memory_region(machine, region_hsgpl) + offset_hsgpl_gram;
-	hsgpl.RAM6_ptr = memory_region(machine, region_hsgpl) + offset_hsgpl_ram6;
+	UINT8 *rgn = memory_region(machine, region_hsgpl);
+	hsgpl.GRAM_ptr = rgn + offset_hsgpl_gram;
+	hsgpl.RAM6_ptr = rgn + offset_hsgpl_ram6;
 
-	at29c040a_init_data_ptr(feeprom_grom0, memory_region(machine, region_hsgpl) + offset_hsgpl_grom);
+	at29c040a_init_data_ptr(feeprom_grom0, rgn + offset_hsgpl_grom);
 	at29c040a_init(feeprom_grom0);
-	at29c040a_init_data_ptr(feeprom_grom1, memory_region(machine, region_hsgpl) + offset_hsgpl_grom + 0x80000);
+	at29c040a_init_data_ptr(feeprom_grom1, rgn + offset_hsgpl_grom + 0x80000);
 	at29c040a_init(feeprom_grom1);
-	at29c040a_init_data_ptr(feeprom_rom6, memory_region(machine, region_hsgpl) + offset_hsgpl_rom6);
+	at29c040a_init_data_ptr(feeprom_rom6, rgn + offset_hsgpl_rom6);
 	at29c040a_init(feeprom_rom6);
-	at29c040a_init_data_ptr(feeprom_dsr, memory_region(machine, region_hsgpl) + offset_hsgpl_dsr);
+	at29c040a_init_data_ptr(feeprom_dsr, rgn + offset_hsgpl_dsr);
 	at29c040a_init(feeprom_dsr);
 }
 

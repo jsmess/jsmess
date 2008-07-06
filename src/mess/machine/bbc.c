@@ -222,18 +222,19 @@ WRITE8_HANDLER ( memorybp1_w )
 
 static OPBASE_HANDLER( bbcbp_opbase_handler )
 {
+	UINT8 *ram = memory_region(machine, REGION_CPU1);
 	if (vdusel==0)
 	{
 		// not in shadow ram mode so just read normal ram
-		memory_set_bankptr(2, memory_region(machine, REGION_CPU1)+0x3000);
+		memory_set_bankptr(2, ram+0x3000);
 	} else {
 		if (vdudriverset())
 		{
 			// if VDUDriver set then read from shadow ram
-			memory_set_bankptr(2, memory_region(machine, REGION_CPU1)+0xb000);
+			memory_set_bankptr(2, ram+0xb000);
 		} else {
 			// else read from normal ram
-			memory_set_bankptr(2, memory_region(machine, REGION_CPU1)+0x3000);
+			memory_set_bankptr(2, ram+0x3000);
 		}
 	}
 	return address;
@@ -242,20 +243,21 @@ static OPBASE_HANDLER( bbcbp_opbase_handler )
 
 WRITE8_HANDLER ( memorybp2_w )
 {
+	UINT8 *ram = memory_region(machine, REGION_CPU1);
 	if (vdusel==0)
 	{
 		// not in shadow ram mode so just write to normal ram
-		memory_region(machine, REGION_CPU1)[offset+0x3000]=data;
+		ram[offset+0x3000]=data;
 		vidmem[offset+0x3000]=1;
 	} else {
 		if (vdudriverset())
 		{
 			// if VDUDriver set then write to shadow ram
-			memory_region(machine, REGION_CPU1)[offset+0xb000]=data;
+			ram[offset+0xb000]=data;
 			vidmem[offset+0xb000]=1;
 		} else {
 			// else write to normal ram
-			memory_region(machine, REGION_CPU1)[offset+0x3000]=data;
+			ram[offset+0x3000]=data;
 			vidmem[offset+0x3000]=1;
 		}
 	}
@@ -411,9 +413,9 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 
 	if (ACCCON_X)
 	{
-		memory_set_bankptr( 2, memory_region(machine,  REGION_CPU1 ) + 0xb000 );
+		memory_set_bankptr( 2, memory_region( machine, REGION_CPU1 ) + 0xb000 );
 	} else {
-		memory_set_bankptr( 2, memory_region(machine,  REGION_CPU1 ) + 0x3000 );
+		memory_set_bankptr( 2, memory_region( machine, REGION_CPU1 ) + 0x3000 );
 	}
 
 }
@@ -455,13 +457,13 @@ static OPBASE_HANDLER( bbcm_opbase_handler )
 {
 	if (ACCCON_X)
 	{
-		memory_set_bankptr( 2, memory_region(machine,  REGION_CPU1 ) + 0xb000 );
+		memory_set_bankptr( 2, memory_region( machine, REGION_CPU1 ) + 0xb000 );
 	} else {
 		if (ACCCON_E && bbcm_vdudriverset())
 		{
-			memory_set_bankptr( 2, memory_region(machine,  REGION_CPU1 ) + 0xb000 );
+			memory_set_bankptr( 2, memory_region( machine, REGION_CPU1 ) + 0xb000 );
 		} else {
-			memory_set_bankptr( 2, memory_region(machine,  REGION_CPU1 ) + 0x3000 );
+			memory_set_bankptr( 2, memory_region( machine, REGION_CPU1 ) + 0x3000 );
 		}
 	}
 
@@ -472,17 +474,18 @@ static OPBASE_HANDLER( bbcm_opbase_handler )
 
 WRITE8_HANDLER ( memorybm2_w )
 {
+	UINT8 *ram = memory_region(machine, REGION_CPU1);
 	if (ACCCON_X)
 	{
-		memory_region(machine, REGION_CPU1)[offset+0xb000]=data;
+		ram[offset+0xb000]=data;
 		vidmem[offset+0xb000]=1;
 	} else {
 		if (ACCCON_E && bbcm_vdudriverset())
 		{
-			memory_region(machine, REGION_CPU1)[offset+0xb000]=data;
+			ram[offset+0xb000]=data;
 			vidmem[offset+0xb000]=1;
 		} else {
-			memory_region(machine, REGION_CPU1)[offset+0x3000]=data;
+			ram[offset+0x3000]=data;
 			vidmem[offset+0x3000]=1;
 		}
 	}
@@ -2113,8 +2116,9 @@ MACHINE_START( bbca )
 
 MACHINE_RESET( bbca )
 {
-	memory_set_bankptr(1,memory_region(machine, REGION_CPU1));
-	memory_set_bankptr(3,memory_region(machine, REGION_CPU1));
+	UINT8 *ram = memory_region(machine, REGION_CPU1);
+	memory_set_bankptr(1,ram);
+	memory_set_bankptr(3,ram);
 
 	memory_set_bankptr(4,memory_region(machine, REGION_USER1));          /* bank 4 is the paged ROMs     from 8000 to bfff */
 	memory_set_bankptr(7,memory_region(machine, REGION_USER1)+0x10000);  /* bank 7 points at the OS rom  from c000 to ffff */
@@ -2155,19 +2159,20 @@ MACHINE_START( bbcb )
 
 MACHINE_RESET( bbcb )
 {
+	UINT8 *ram = memory_region(machine, REGION_CPU1);
 	bbc_DFSType=  (input_port_read(machine, "BBCCONFIG")>>0)&0x07;
 	bbc_SWRAMtype=(input_port_read(machine, "BBCCONFIG")>>3)&0x03;
 	bbc_RAMSize=  (input_port_read(machine, "BBCCONFIG")>>5)&0x01;
 
-	memory_set_bankptr(1,memory_region(machine, REGION_CPU1));
+	memory_set_bankptr(1,ram);
 	if (bbc_RAMSize)
 	{
 		/* 32K Model B */
-		memory_set_bankptr(3,memory_region(machine, REGION_CPU1)+0x4000);
+		memory_set_bankptr(3,ram+0x4000);
 		set_video_memory_lookups(32);
 	} else {
 		/* 16K just repeat the lower 16K*/
-		memory_set_bankptr(3,memory_region(machine, REGION_CPU1));
+		memory_set_bankptr(3,ram);
 		set_video_memory_lookups(16);
 	}
 

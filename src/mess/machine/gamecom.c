@@ -71,10 +71,11 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 
 MACHINE_RESET( gamecom )
 {
-	memory_set_bankptr( 1, memory_region(machine, REGION_USER1) );
-	memory_set_bankptr( 2, memory_region(machine, REGION_USER1) );
-	memory_set_bankptr( 3, memory_region(machine, REGION_USER1) );
-	memory_set_bankptr( 4, memory_region(machine, REGION_USER1) );
+	UINT8 *rom = memory_region(machine, REGION_USER1);
+	memory_set_bankptr( 1, rom );
+	memory_set_bankptr( 2, rom );
+	memory_set_bankptr( 3, rom );
+	memory_set_bankptr( 4, rom );
 
 	/* should possibly go in a DRIVER_INIT piece? */
 	gamecom_clock_timer = timer_alloc( gamecom_clock_timer_callback , NULL);

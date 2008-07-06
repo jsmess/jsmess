@@ -36,7 +36,7 @@ static int amiga_cart_type;
 
 static int check_kickstart_12_13( const char *cart_name )
 {
-	UINT16 * ksmem = (UINT16 *)memory_region(Machine,  REGION_USER1 );
+	UINT16 * ksmem = (UINT16 *)memory_region( Machine, REGION_USER1 );
 
 	if ( ksmem[2] == 0x00FC )
 		return 1;
@@ -219,7 +219,7 @@ static WRITE16_HANDLER( amiga_ar23_mode_w )
 
 static READ16_HANDLER( amiga_ar23_mode_r )
 {
-	UINT16 *mem = (UINT16 *)memory_region(machine,  REGION_USER2 );
+	UINT16 *mem = (UINT16 *)memory_region( machine, REGION_USER2 );
 
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -398,7 +398,7 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 void amiga_cart_init( running_machine *machine )
 {
 	/* see what is there */
-	UINT16 *mem = (UINT16 *)memory_region(Machine,  REGION_USER2 );
+	UINT16 *mem = (UINT16 *)memory_region( Machine, REGION_USER2 );
 
 	amiga_cart_type = -1;
 

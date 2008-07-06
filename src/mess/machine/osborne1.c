@@ -435,7 +435,7 @@ MACHINE_RESET( osborne1 ) {
 	osborne1.pia_0_irq_state = FALSE;
 	osborne1.pia_1_irq_state = FALSE;
 
-	osborne1.charrom = memory_region(machine,  REGION_GFX1 );
+	osborne1.charrom = memory_region( machine, REGION_GFX1 );
 
 	memset( mess_ram + 0x10000, 0xFF, 0x1000 );
 

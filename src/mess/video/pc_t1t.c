@@ -669,6 +669,7 @@ static void pc_t1t_bank_w(running_machine *machine, int data)
 {
 	if (pcjr.bank != data)
 	{
+		UINT8 *ram = memory_region(machine, REGION_CPU1);
 		int dram, vram;
 		pcjr.bank = data;
 	/* it seems the video ram is mapped to the last 128K of main memory */
@@ -687,8 +688,8 @@ static void pc_t1t_bank_w(running_machine *machine, int data)
 		dram = (data & 0x07) << 14;
 		vram = (data & 0x38) << (14-3);
 #endif
-		videoram = &memory_region(machine, REGION_CPU1)[vram];
-		pcjr.displayram = &memory_region(machine, REGION_CPU1)[dram];
+		videoram = &ram[vram];
+		pcjr.displayram = &ram[dram];
 	}
 	pc_t1t_mode_switch();
 }

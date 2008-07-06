@@ -287,7 +287,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 	new_memory_region(machine, REGION_CPU1, 0x1000000,0);
 
-	snes_ram = memory_region(machine,  REGION_CPU1 );
+	snes_ram = memory_region( machine, REGION_CPU1 );
 	memset( snes_ram, 0, 0x1000000 );
 
 	/* Check for a header (512 bytes) */

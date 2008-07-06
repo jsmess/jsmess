@@ -446,15 +446,17 @@ static void mc6845_screen_configure(running_machine *machine)
 
 VIDEO_START( mbee )
 {
-	videoram = memory_region(machine, REGION_CPU1)+0x15000;
-	pcgram = memory_region(machine, REGION_CPU1)+0x11000;
+	UINT8 *ram = memory_region(machine, REGION_CPU1);
+	videoram = ram+0x15000;
+	pcgram = ram+0x11000;
 }
 
 VIDEO_START( mbeeic )
 {
-	videoram = memory_region(machine, REGION_CPU1)+0x15000;
-	colorram = memory_region(machine, REGION_CPU1)+0x15800;
-	pcgram = memory_region(machine, REGION_CPU1)+0x11000;
+	UINT8 *ram = memory_region(machine, REGION_CPU1);
+	videoram = ram+0x15000;
+	colorram = ram+0x15800;
+	pcgram = ram+0x11000;
 }
 
 VIDEO_UPDATE( mbee )

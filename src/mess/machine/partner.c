@@ -29,6 +29,8 @@ DRIVER_INIT(partner)
 
 static void partner_bank_switch(running_machine *machine)
 {
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
+
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07ff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x7fff, 0, 0, SMH_BANK2);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK3);
@@ -41,7 +43,7 @@ static void partner_bank_switch(running_machine *machine)
 	switch(	partner_mem_page ) {
 		case 0 :
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000);
+				memory_set_bankptr(1, rom + 0x10000);
 				memory_set_bankptr(2, mess_ram + 0x0800);
 				memory_set_bankptr(3, mess_ram + 0x8000);
 				memory_set_bankptr(4, mess_ram + 0xa000);
@@ -49,10 +51,10 @@ static void partner_bank_switch(running_machine *machine)
 				memory_set_bankptr(6, mess_ram + 0xc800);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x10000);
+				memory_set_bankptr(7, rom + 0x10000);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xffff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x10800);
+				memory_set_bankptr(8, rom + 0x10800);
 				break;
 		case 1 :
 				memory_set_bankptr(1, mess_ram + 0x0000);
@@ -63,10 +65,10 @@ static void partner_bank_switch(running_machine *machine)
 				memory_set_bankptr(6, mess_ram + 0xc800);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x10000);
+				memory_set_bankptr(7, rom + 0x10000);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xffff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x10800);
+				memory_set_bankptr(8, rom + 0x10800);
 		case 2 :
 				memory_set_bankptr(1, mess_ram + 0x0000);
 				memory_set_bankptr(2, mess_ram + 0x0800);
@@ -76,10 +78,10 @@ static void partner_bank_switch(running_machine *machine)
 				memory_set_bankptr(6, mess_ram + 0xc800);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x10000); // BIOS
+				memory_set_bankptr(7, rom + 0x10000); // BIOS
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xffff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x10800); // BIOS + 0x800
+				memory_set_bankptr(8, rom + 0x10800); // BIOS + 0x800
 				break;
 		case 3 :
 				memory_set_bankptr(1, mess_ram + 0x0000);
@@ -90,10 +92,10 @@ static void partner_bank_switch(running_machine *machine)
 				memory_set_bankptr(6, mess_ram + 0xc800);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x10000);
+				memory_set_bankptr(7, rom + 0x10000);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xffff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x10800);
+				memory_set_bankptr(8, rom + 0x10800);
 				break;
 		case 4 :
 				memory_set_bankptr(1, mess_ram + 0x0000);
@@ -104,10 +106,10 @@ static void partner_bank_switch(running_machine *machine)
 				memory_set_bankptr(6, mess_ram + 0xc800);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x10000);
+				memory_set_bankptr(7, rom + 0x10000);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xffff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x10800);
+				memory_set_bankptr(8, rom + 0x10800);
 				break;
 		case 5 :
 				memory_set_bankptr(1, mess_ram + 0x0000);
@@ -118,10 +120,10 @@ static void partner_bank_switch(running_machine *machine)
 				memory_set_bankptr(6, mess_ram + 0xc800);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x10000);
+				memory_set_bankptr(7, rom + 0x10000);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xffff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x10800);
+				memory_set_bankptr(8, rom + 0x10800);
 				break;
 		case 6 :
 				memory_set_bankptr(1, mess_ram + 0x0000);
@@ -132,10 +134,10 @@ static void partner_bank_switch(running_machine *machine)
 				memory_set_bankptr(6, mess_ram + 0xc800);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x10000);
+				memory_set_bankptr(7, rom + 0x10000);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xffff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x10800);
+				memory_set_bankptr(8, rom + 0x10800);
 				break;
 		case 7 :
 				memory_set_bankptr(1, mess_ram + 0x0000);
@@ -146,27 +148,27 @@ static void partner_bank_switch(running_machine *machine)
 				memory_set_bankptr(6, mess_ram + 0xc800);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x10000);
+				memory_set_bankptr(7, rom + 0x10000);
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xffff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x10800);
+				memory_set_bankptr(8, rom + 0x10800);
 				break;
 		case 8 :
 				memory_set_bankptr(1, mess_ram + 0x0000);
 				memory_set_bankptr(2, mess_ram + 0x0800);
 				memory_set_bankptr(3, mess_ram + 0x8000);
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(4, memory_region(machine, REGION_CPU1) + 0x12000); // BASIC
+				memory_set_bankptr(4, rom + 0x12000); // BASIC
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0x10000); // BIOS
+				memory_set_bankptr(5, rom + 0x10000); // BIOS
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(6, memory_region(machine, REGION_CPU1) + 0x10000); // BIOS
+				memory_set_bankptr(6, rom + 0x10000); // BIOS
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(7, memory_region(machine, REGION_CPU1) + 0x10000); // BIOS
+				memory_set_bankptr(7, rom + 0x10000); // BIOS
 
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xffff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(8, memory_region(machine, REGION_CPU1) + 0x10800); // BIOS + 0x800
+				memory_set_bankptr(8, rom + 0x10800); // BIOS + 0x800
 				break;
 
 	}
