@@ -1251,6 +1251,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2m7",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2yyc",   CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2koryu", CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2mdt",   CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"varth",    CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthr1",  CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthu",   CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
@@ -1260,6 +1261,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"wofa",     CPS_B_21_DEF, mapper_TK263B },	/* bootleg? */
 	{"wofu",     CPS_B_21_QS1, mapper_TK263B },
 	{"wofj",     CPS_B_21_QS1, mapper_TK263B },
+	{"wofhfh",   CPS_B_21_DEF, mapper_TK263B }, /* Chinese bootleg */
 	{"dino",     CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinou",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinoj",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */

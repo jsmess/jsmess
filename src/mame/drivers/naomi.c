@@ -849,6 +849,17 @@ EPR-21330 & EPR-21331 differ by 7 bytes:
 0x1ffffa-0x1fffff is the BIOS checksum
 
 
+Ferrari F355 specific Naomi BIOS roms:
+
+EPR-22850 - NAOMI BOOT ROM 1999 08/30  1.35 (USA)
+EPR-22851 - NAOMI BOOT ROM 1999 08/30  1.35 (Export)
+
+EPR-22850 & EPR-22851 differ by 7 bytes:
+
+0x52F08 is the region byte (only one region byte)
+0x1ffffa-0x1fffff is the BIOS checksum
+
+
 Region byte encoding is as follows:
 
 0x00 = Japan
@@ -883,15 +894,36 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21576b.bin",  0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
 	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21576 (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21576.bin",   0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
-	ROM_SYSTEM_BIOS( 10, "bios10", "Ferrari F355" ) \
+	ROM_SYSTEM_BIOS( 10, "bios10", "Ferrari F355 (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 10,  "epr-22851.bin", 0x000000, 0x200000, CRC(62483677) SHA1(3e3bcacf5f972c376b569f45307ee7fd0b5031b7) ) \
-	ROM_SYSTEM_BIOS( 11, "bios11", "HOTD2 (US)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11,  "epr-21330.bin", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
-	ROM_SYSTEM_BIOS( 12, "bios12", "HOTD2 (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12,  "epr-21331.bin", 0x000000, 0x200000, CRC(065f8500) SHA1(49a3881e8d76f952ef5e887200d77b4a415d47fe) ) \
-	ROM_SYSTEM_BIOS( 13, "bios13", "Naomi Dev BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
+	ROM_SYSTEM_BIOS( 11, "bios11", "Ferrari F355 (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11,  "epr-22850.bin", 0x000000, 0x200000, CRC(28aa539d) SHA1(14485368656af80504b212da620179c49f84c1a2) ) \
+	ROM_SYSTEM_BIOS( 12, "bios12", "HOTD2 (US)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12,  "epr-21330.bin", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
+	ROM_SYSTEM_BIOS( 13, "bios13", "HOTD2 (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13,  "epr-21331.bin", 0x000000, 0x200000, CRC(065f8500) SHA1(49a3881e8d76f952ef5e887200d77b4a415d47fe) ) \
+	ROM_SYSTEM_BIOS( 14, "bios14", "Naomi Dev BIOS" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 14,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
 
+/* only revisions d and higher support the GDROM, and there is an additional bios (and SH4!) on the DIMM board for the CD Controller */
+#define NAOMIGD_BIOS \
+	ROM_REGION( 0x200000, REGION_CPU1, 0) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21578e (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21578d (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21578d.bin",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
+	ROM_SYSTEM_BIOS( 2, "bios3", "epr-21577e (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21577e.bin",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
+	ROM_SYSTEM_BIOS( 3, "bios4", "epr-21577d (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21577d.bin",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
+	ROM_SYSTEM_BIOS( 4, "bios5", "epr-21576g (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
+	ROM_SYSTEM_BIOS( 5, "bios6", "epr-21576e (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
+	ROM_SYSTEM_BIOS( 6, "bios7", "epr-21576d (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
+	ROM_REGION( 0x200000, REGION_USER2, 0) \
+	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) ) \
 
 /* NAOMI2 BIOS:
 
@@ -948,6 +980,13 @@ ROM_START( naomi )
 
 	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
 ROM_END
+
+ROM_START( naomigd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+ROM_END
+
 
 ROM_START( naomi2 )
 	ROM_REGION( 0x200000, REGION_CPU1, 0)
@@ -2273,6 +2312,30 @@ ROM_START( dybbnao )
 	ROM_LOAD("ic21",0xa000000, 0x0800000, NO_DUMP )
 ROM_END
 
+/* GD-ROM titles - a PIC supplies a decryption key
+
+(information based on forum post)
+The PIC supplies an 8 byte key, this gets written to a hardware register.
+DES keys are 56-bit, not 64-bit. Each byte of the key provided by the PIC contains
+a parity byte for verification (8*7 = 56, 8*8 = 64)
+
+*/
+
+ROM_START( sfz3ugd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+
+	/* GD-ROM dump, this will be replaced once an appropriate CHD format has been decided upon for the GD images*/
+	ROM_REGION( 0x3d8ab000, REGION_USER3, ROMREGION_ERASE)
+	ROM_LOAD("track.txt",  0x0000000, 0x000000ad, CRC(bf017e1d) SHA1(0345310b6982f818a07dec8739efe1709281f1e6) )
+	ROM_LOAD("track01.iso",0x0000000, 0x000e1000, CRC(8af2e370) SHA1(0f359d423f72055e6a5c81e7075df1ffd3ccfa5c) )
+	ROM_LOAD("track02.raw",0x0000000, 0x004c8cf0, CRC(c5628df6) SHA1(0d1a24e6271c3b0ef92c55ec9d63e2326892f1d8) )
+	ROM_LOAD("track03.iso",0x0000000, 0x3d8ab000, CRC(195f0d93) SHA1(183412704bd90750355e7af019b78541328fe633) )
+
+ROM_END
+
+
 
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
@@ -2327,6 +2390,9 @@ GAME( 1998, dybbnao,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            
 
 
 /* No GD-Rom Sets Supported */
+GAME( 2001, naomigd,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, sfz3ugd,   naomigd,  naomi,    naomi,    0, ROT0, "Capcom",          "Street Fighter Zero 3 Upper", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+
 
 /* Naomi 2 & Naomi 2 GD-ROM */
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )

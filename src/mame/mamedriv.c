@@ -1968,6 +1968,7 @@ const game_driver * const drivers[] =
 	DRIVER( bubsympe )	/* D90 (c) 1994 Taito Corporation Japan (Europe) */
 	DRIVER( bubsympu )	/* D90 (c) 1994 Taito America Corporation (US) */
 	DRIVER( bubsymph )	/* D90 (c) 1994 Taito Corporation (Japan) */
+	DRIVER( bubsympb )	/* bootleg */
 	DRIVER( spcinvdj )	/* D93 (c) 1994 Taito Corporation (Japan) */
 	DRIVER( pwrgoal )	/* D94 (c) 1995 Taito Corporation Japan (World) */
 	DRIVER( hthero95 )	/* D94 (c) 1995 Taito Corporation (Japan) */
@@ -2466,6 +2467,7 @@ V-V                           TP-027
 	DRIVER( sf2m7 )		/* hack */
 	DRIVER( sf2yyc )	/* hack */
 	DRIVER( sf2koryu )	/* hack */
+	DRIVER( sf2mdt )	/* bootleg */
 	DRIVER( varth )		/* 14/07/1992 (c) 1992 (World) */
 	DRIVER( varthr1 )	/* 12/06/1992 (c) 1992 (World) */
 	DRIVER( varthu )	/* 12/06/1992 (c) 1992 (US) */
@@ -2475,6 +2477,7 @@ V-V                           TP-027
 	DRIVER( wofa )		/* 05/10/1992 (c) 1992 (Asia)  (CPS1 + QSound) */
 	DRIVER( wofu )		/* 31/10/1992 (c) 1992 (US) (CPS1 + QSound) */
 	DRIVER( wofj )		/* 31/10/1992 (c) 1992 (Japan) (CPS1 + QSound) */
+	DRIVER( wofhfh )	/* bootleg */
 	DRIVER( sf2hf )		/* 09/12/1992 (c) 1992 (World) */
 	DRIVER( sf2t )		/* 09/12/1992 (c) 1992 (US)    */
 	DRIVER( sf2tj )		/* 09/12/1992 (c) 1992 (Japan) */
@@ -3814,6 +3817,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( dynmcopb )	/* 1998 */
 	DRIVER( dyndek2b )	/* 1998 */
 	DRIVER( pltkids )	/* 1998 */
+	DRIVER( waverunr )	/* 199? */
 
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
 	DRIVER( skisuprg )	/* 1996 */
@@ -3828,6 +3832,7 @@ Sep.1994 Quiz Ghost Hunter
 
 	/* Step 1.0 */
 	DRIVER( vf3 )		/* 1996 */
+	DRIVER( vf3a )		/* 1996 */
 	DRIVER( vf3tb )		/* 1996 */
 	DRIVER( bass )		/* 1997 */
 	DRIVER( getbass )	/* 1997 */
@@ -3864,6 +3869,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( spikeout )	/* 1998 */
 	DRIVER( spikeofe )	/* 1998 */
 	DRIVER( eca )		/* 1999 */
+	DRIVER( ecax )		/* 1999 */
 
 
 	/* Deniam games */
@@ -4050,10 +4056,19 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( doa2m )
 	DRIVER( dybbnao )
 
+	DRIVER( naomigd )
+	DRIVER( sfz3ugd )
+
 	DRIVER( naomi2 )
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
+
+	/* Hikaru */
+	DRIVER( hikaru ) 	/* BIOS (c)2000 */
+	DRIVER( airtrix )	/* (c) 2000 */
+	DRIVER( pharrier )	/* (c) 2001 */
+	DRIVER( podrace )	/* (c) 2001 */
 
 	DRIVER( hshavoc )	/* (c) 1993 Data East */
 
@@ -7256,6 +7271,7 @@ Other Sun games
 	DRIVER( vbowlj )	/* (c) 1996 */
 	DRIVER( drgnwrld )	/* (c) 1997 */
 	DRIVER( drgwrld3 )	/* (c) 1995 */
+	DRIVER( chindrac )	/* (c) 1995 */
 
 	DRIVER( lordgun )	/* (c) 1994 */
 	DRIVER( hfh )		/* (c) 199? */
@@ -8127,6 +8143,8 @@ Other Sun games
 	DRIVER( vcombat )	/* (c) 1993 VR8 Inc. */
 	DRIVER( shadfgtr )	/* (c) 1989 Sega? */
 	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
+	DRIVER( lucky74s )	/* (c) 1988 Wing */
+	DRIVER( lucky74b )	/* (c) 1988 Wing */
 
 	/* H8/3048 italian gambling games */
 	DRIVER( laperla )	/* (c) 2002 Nazionale Elettronica */

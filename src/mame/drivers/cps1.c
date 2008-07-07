@@ -10,6 +10,9 @@
 
   68000 clock speeds are unknown for all games (except where commented)
 
+  todo: move the bootleg sets with modified hardware into their own
+        drivers, like fcrash.c
+
 
 Stephh's notes (based on the games M68000 code and some tests) :
 
@@ -157,6 +160,8 @@ Stephh's log (2006.09.20) :
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
+#include "sound/msm5205.h"
+
 
 #include "cps1.h"       /* External CPS1 definitions */
 
@@ -3467,6 +3472,77 @@ static INPUT_PORTS_START( rockmanj )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(B):7" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wofhfh )
+	PORT_INCLUDE( wof )
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW(A):1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x07, 0x04, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING(    0x07, "Extra Easy" )
+	PORT_DIPSETTING(    0x06, DEF_STR( Very_Easy) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Easy) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hard) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Very_Hard) )
+	PORT_DIPSETTING(    0x01, "Extra Hard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest) )
+	PORT_DIPNAME( 0x70, 0x60, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW(B):4,5,6")
+	PORT_DIPSETTING(    0x00, "Start 4 Continue 5" )
+	PORT_DIPSETTING(    0x10, "Start 3 Continue 4" )
+	PORT_DIPSETTING(    0x20, "Start 2 Continue 3" )
+	PORT_DIPSETTING(    0x30, "Start 1 Continue 2" )
+	PORT_DIPSETTING(    0x40, "Start 4 Continue 4" )
+	PORT_DIPSETTING(    0x50, "Start 3 Continue 3" )
+	PORT_DIPSETTING(    0x60, "Start 2 Continue 2" )
+	PORT_DIPSETTING(    0x70, "Start 1 Continue 1" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSWC")
+	PORT_DIPNAME( 0x03, 0x03, "Coin Slots" )			PORT_DIPLOCATION("SW(C):1,2")
+//  PORT_DIPSETTING(    0x00, "2 Players 1 Shooter" )
+	PORT_DIPSETTING(    0x01, "2 Players 1 Shooter" )
+	PORT_DIPSETTING(    0x02, "3 Players 1 Shooter" )
+	PORT_DIPSETTING(    0x03, "3 Players 3 Shooters" )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN2")      /* Player 3 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
+INPUT_PORTS_END
+
+
 /*
 A Final Fight board with mismatched USA and Japan GFX proves that the columns
 of the 8x8 tilemap alternate between sides of the 16x16 tile resulting
@@ -3644,6 +3720,92 @@ static MACHINE_DRIVER_START( cpspicb )
 	MDRV_SOUND_ADD_TAG("okim", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( wofhfh )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(cps1_12MHz)
+
+	MDRV_NVRAM_HANDLER(qsound)
+MACHINE_DRIVER_END
+
+/* incomplete */
+static ADDRESS_MAP_START( sf2mdt_z80map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xcfff) AM_ROM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM
+ADDRESS_MAP_END
+
+static void m5205_int1(running_machine *machine, int data)
+{
+//  MSM5205_data_w(0, sample_buffer1 & 0x0F);
+//  sample_buffer1 >>= 4;
+//  sample_select1 ^= 1;
+//  if (sample_select1 == 0)
+//      cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static void m5205_int2(running_machine *machine, int data)
+{
+//  MSM5205_data_w(1, sample_buffer2 & 0x0F);
+//  sample_buffer2 >>= 4;
+//  sample_select2 ^= 1;
+}
+
+static const struct MSM5205interface msm5205_interface1 =
+{
+	m5205_int1,	/* interrupt function */
+	MSM5205_S96_4B		/* 4KHz 4-bit */
+};
+
+static const struct MSM5205interface msm5205_interface2 =
+{
+	m5205_int2,	/* interrupt function */
+	MSM5205_S96_4B		/* 4KHz 4-bit */
+};
+
+static MACHINE_DRIVER_START( sf2mdt )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
+
+	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+	/* audio CPU */
+	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map,0)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+
+	MDRV_GFXDECODE(cps1)
+	MDRV_PALETTE_LENGTH(0xc00)
+
+	MDRV_VIDEO_START(cps1)
+	MDRV_VIDEO_EOF(cps1)
+	MDRV_VIDEO_UPDATE(cps1)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD_TAG("2151", YM2151, 3579545)
+	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_ROUTE(0, "mono", 0.35)
+	MDRV_SOUND_ROUTE(1, "mono", 0.35)
+
+	/* has 2x MSM5205 instead of OKI6295 */
+	MDRV_SOUND_ADD(MSM5205, 24000000/64)	/* ? */
+	MDRV_SOUND_CONFIG(msm5205_interface1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD(MSM5205, 24000000/64)	/* ? */
+	MDRV_SOUND_CONFIG(msm5205_interface2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 #endif
@@ -5945,31 +6107,64 @@ ROM_START( kodj )
 	ROM_LOAD( "kd19.bin",      0x20000, 0x20000, CRC(92941b80) SHA1(5fa7c2793e6febee54a83042d118ddd4f2b7d127) )
 ROM_END
 
+/*
+CPU
+
+1x TS68000CP12 (main)
+1x TPC1020AFN-084C
+1x Z8400BB1-Z80CPU (sound)
+1x YM2151 (sound)
+1x YM3012A (sound)
+1x OKI-M6295 (sound)
+2x LM324N (sound)
+1x TDA2003 (sound)
+1x oscillator 10.0 MHz
+1x oscillator 22.1184 MHz
+
+ROMs
+
+1x AM27C512 (1)(sound)
+1x AM27C020 (2)(sound)
+2x AM27C040 (3,4)(main)
+1x Am27C040 (bp)(gfx)
+7x maskrom (ai,bi,ci,di,ap,cp,dp)(gfx)
+1x GAL20V8A (not dumped)
+3x GAL16V8A (not dumped)
+1x PALCE20V8H (not dumped)
+1x GAL20V8S (not dumped)
+
+Note
+
+1x JAMMA edge connector
+1x trimmer (volume)
+3x 8 switches dip
+
+*/
+
 ROM_START( kodb )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "kod.17",    0x00000, 0x080000, CRC(036dd74c) SHA1(489344e56863429e86b4c362b82d89819c1d6afb) )
-	ROM_LOAD16_BYTE( "kod.18",    0x00001, 0x080000, CRC(3e4b7295) SHA1(3245640bae7d141238051dfe5c7683d05c6d3848) )
+	ROM_LOAD16_BYTE( "3.ic172",    0x00000, 0x080000, CRC(036dd74c) SHA1(489344e56863429e86b4c362b82d89819c1d6afb) )
+	ROM_LOAD16_BYTE( "4.ic171",    0x00001, 0x080000, CRC(3e4b7295) SHA1(3245640bae7d141238051dfe5c7683d05c6d3848) )
 
 	ROM_REGION( 0x400000, REGION_GFX1, 0 )
-	ROMX_LOAD( "kod02.rom",    0x000000, 0x80000, CRC(e45b8701) SHA1(604e39e455e81695ee4f899f102d0bcd789cedd0) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "kod04.rom",    0x000002, 0x80000, CRC(a7750322) SHA1(3c583496a53cd64edf377db35f7f40f02b59b7e7) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "kod01.rom",    0x000004, 0x80000, CRC(5f74bf78) SHA1(b7c43eea9bf77a0fb571dcd53f8be719e6655fd9) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "kod03.rom",    0x000006, 0x80000, CRC(5e5303bf) SHA1(d9f90b898ffdf4398b2bbeb48247f06f728e7c00) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "kod11.rom",    0x200000, 0x80000, CRC(113358f3) SHA1(9d98eafa74a046f65bf3847fe1d88ea1b0c82b0c) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "kod13.rom",    0x200002, 0x80000, CRC(38853c44) SHA1(a6e552fb0138a76a7878b90d202904e2b44ae7ec) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "kod10.rom",    0x200004, 0x80000, CRC(9ef36604) SHA1(b42ca0a910b65e1e7bb6e7d734e853ce67e821bf) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "kod12.rom",    0x200006, 0x80000, CRC(402b9b4f) SHA1(4c11976976eadf1ad293b31b0a4d047d05032b06) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "cp.ic90",   0x000000, 0x80000, CRC(e3b8589e) SHA1(775f97e43cb995b93da40063a1f1e4d73b34437c), ROM_SKIP(7) )
+	ROMX_LOAD( "dp.ic89",   0x000001, 0x80000, CRC(3eec9580) SHA1(3d8d0cfbeae077544e514a5eb96cc83f716e494f), ROM_SKIP(7) )
+	ROMX_LOAD( "ap.ic88",   0x000002, 0x80000, CRC(fdf5f163) SHA1(271ee96886c958accaca9a82484ab80fe32bd38e), ROM_SKIP(7) )
+	ROMX_LOAD( "bp.ic87",   0x000003, 0x80000, CRC(4e1c52b7) SHA1(74570e7d577c999c62203c97b3d449e3b61a678a), ROM_SKIP(7) )
+	ROMX_LOAD( "ci.ic91",   0x000004, 0x80000, CRC(22228bc5) SHA1(d48a09ee284d9e4b986f5c3c1c865930f76986e2), ROM_SKIP(7) )
+	ROMX_LOAD( "di.ic92",   0x000005, 0x80000, CRC(ab031763) SHA1(5bcd89b1debf029b779aa1bb73b3a572d27154ec), ROM_SKIP(7) )
+	ROMX_LOAD( "ai.ic93",   0x000006, 0x80000, CRC(cffbf4be) SHA1(f805bafc855d4a656c055a76eaeb26e36835541e), ROM_SKIP(7) )
+	ROMX_LOAD( "bi.ic94",   0x000007, 0x80000, CRC(4a1b43fe) SHA1(7957f45b2862825c9509043c63c7da7108bd251b), ROM_SKIP(7) )
 
 	ROM_REGION( 0x8000, REGION_GFX2, 0 )
 	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
 
 	ROM_REGION( 0x18000, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "kod.15",        0x00000, 0x08000, CRC(01cae60c) SHA1(b2cdd883fd859f0b701230831aca1f1a74ad6087) )
+	ROM_LOAD( "1.ic28",        0x00000, 0x08000, CRC(01cae60c) SHA1(b2cdd883fd859f0b701230831aca1f1a74ad6087) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "kd18.bin",      0x00000, 0x20000, CRC(4c63181d) SHA1(270f27534a95cb0be3ff3f9ca71c502320d8090b) )
-	ROM_LOAD( "kd19.bin",      0x20000, 0x20000, CRC(92941b80) SHA1(5fa7c2793e6febee54a83042d118ddd4f2b7d127) )
+	ROM_LOAD( "2.ic19",      0x00000, 0x40000, CRC(a2db1575) SHA1(1a4a29e4b045af50700adf1665697feab12cc234) )
 ROM_END
 
 /* B-Board 91635B */
@@ -6834,6 +7029,63 @@ ROM_START( sf2koryu )
 	ROM_LOAD( "s92_19.bin",    0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
 ROM_END
 
+/*
+CPU
+
+1x MC68000P12 (main)
+1x TPC1020AFN-084C (main)
+1x Z0840006PSC-Z80CPU (sound)
+1x YM2151 (sound)
+1x YM3012 (sound)
+2x M5205 (sound)
+2x LM324N (sound)
+1x TDA2003 (sound)
+1x oscillator 24.000000MHz
+1x oscillator 30.000MHz
+ROMs
+
+14x AM27C040 (1,3,6,7,8,9,10,11,12,13,14,15,16,17)
+3x TMS27C010A (2,4,5)
+3x PAL 16S20 (ic7,ic72, ic80) (read protected, not dumped)
+3x GAL20V8A (ic120, ic121, ic169) (read protected, not dumped)
+
+Note
+
+1x JAMMA edge connector
+1x trimmer (volume)
+3x 8x2 switches dip
+
+*/
+
+ROM_START( sf2mdt )
+	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "3.ic172",   0x000000, 0x80000, CRC(5301b41f) SHA1(6855a57b21e8c5d74e5cb18f9ce6af650d7fb422) )
+	ROM_LOAD16_BYTE( "1.ic171",   0x000001, 0x80000, CRC(c1c803f6) SHA1(9fe18ae2553a63d8e4dcc20bafd5a4634f8b93c4) )
+	ROM_LOAD16_BYTE( "4.ic176",   0x100000, 0x20000, CRC(1073b7b6) SHA1(81ca1eab65ceac69520584bb23a684ccb9d92f89) )
+	ROM_LOAD16_BYTE( "2.ic175",   0x100001, 0x20000, CRC(924c6ce2) SHA1(676a912652bd75da5087f0c7eae047b7681a993c) )
+
+	ROM_REGION( 0x600000, REGION_GFX1, 0 ) /* rearranged in init */
+	ROMX_LOAD( "7.ic90",    0x000000, 0x80000, CRC(896eaf48) SHA1(5a13ae8b554e05eed3d5749aaf5845d499bce45b) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "10.ic88",   0x000002, 0x80000, CRC(ef3f5be8) SHA1(d4e1de7d7caf6977e48544d6701618ae70c717f9) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "13.ic89",   0x000004, 0x80000, CRC(305dd72a) SHA1(c373b517c23f3b019abb06e21f6b9ab6e1e47909) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "16.ic87",   0x000006, 0x80000, CRC(e57f6db9) SHA1(b37f95737804002ec0e237472eaacf0bc1e868e8) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "6.ic91",    0x200000, 0x80000, CRC(054cd5c4) SHA1(07f275e118c141a84ca15a2e9edc81694af37cf2) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "9.ic93",    0x200002, 0x80000, CRC(818ca33d) SHA1(dfb707e17c83216f8a62e905f8c7cd6d406b417b) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "12.ic92",   0x200004, 0x80000, CRC(87e069e8) SHA1(cddd3be84f8379134590bfbbb080518f28120e49) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "15.ic94",   0x200006, 0x80000, CRC(5dfb44d1) SHA1(08e44b8efc84f9cfc829aabf704155ddc700de76) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "8.ic86",    0x400000, 0x80000, CRC(34bbb3fa) SHA1(7794e89258f12b17d38c3d302dc15c502a8c8eb6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "11.ic84",   0x400002, 0x80000, CRC(cea6d1d6) SHA1(9c953db42f0d877e43c0c239f69a00df39a18295) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "14.ic85",   0x400004, 0x80000, CRC(7d9f1a67) SHA1(6deb7fff867c42b13a32bb11eda798cfdb4cbaa8) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "17.ic83",   0x400006, 0x80000, CRC(91a9a05d) SHA1(5266ceddd2df925e79b4200843dec2f7aa9297b3) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 )
+	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
+
+	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* Sound program + samples  */
+	ROM_LOAD( "5.ic26",    0x00000, 0x08000, CRC(17d5ba8a) SHA1(6ff3b8860d7e1fdee3561846f645eb4d3a8965ec) )
+	ROM_CONTINUE(              0x10000, 0x18000 )
+ROM_END
+
 /* B-Board 89624B */
 ROM_START( varth )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
@@ -7109,6 +7361,36 @@ ROM_START( wofj )
 	ROM_LOAD( "tk2_q3.rom",     0x100000, 0x80000, CRC(bfcf6f52) SHA1(2a85ff3fc89b4cbabd20779ec12da2e116333c7c) )
 	ROM_LOAD( "tk2_q4.rom",     0x180000, 0x80000, CRC(36642e88) SHA1(8ab25b19e2b67215a5cb1f3aa81b9d26009cfeb8) )
 ROM_END
+
+/* Chinese bootleg board without QSound */
+ROM_START( wofhfh )
+	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "23",       0x000000, 0x80000, CRC(6ae4b312) SHA1(fa39f69385d180d90bccd8c5dc9262edd04a6457) )
+	ROM_LOAD16_WORD_SWAP( "22",       0x080000, 0x80000, CRC(94e8d01a) SHA1(875763f6b22734c1a5a890e6c8063515c134045b) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, 0 )
+	ROMX_LOAD( "1",   0x000000, 0x80000, CRC(0d9cb9bf) SHA1(cc7140e9a01a14b252cb1090bcea32b0de461928) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "2",   0x000002, 0x80000, CRC(45227027) SHA1(b21afc593f0d4d8909dfa621d659cbb40507d1b2) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "3",   0x000004, 0x80000, CRC(c5ca2460) SHA1(cbe14867f7b94b638ca80db7c8e0c60881183469) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "4",   0x000006, 0x80000, CRC(e349551c) SHA1(1d977bdf256accf750ad9930ec4a0a19bbf86964) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "5",   0x200000, 0x80000, CRC(34949d7b) SHA1(90925a77b08c97cfdbf0dbfbdaa359d1b33b6ae4) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "6",   0x200002, 0x80000, CRC(dfa70971) SHA1(477b99687de38220f0aec9fbba44db03f72cb62a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "7",   0x200004, 0x80000, CRC(073686a6) SHA1(b774a8d4c6cdbedb123ac01455f718305f23b619) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "8",   0x200006, 0x80000, CRC(5300f8db) SHA1(b23a19910f680d60ff8afcbc15c471e74ee3569a) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 )
+	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
+
+	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* 128k for the audio CPU (+banks) */
+	ROM_LOAD( "9",              0x00000, 0x08000, CRC(86fe8a97) SHA1(cab82bcd0f49bcb40201b439cfdd10266f46752a) )
+	ROM_CONTINUE(               0x10000, 0x18000 )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* samples */
+	ROM_LOAD( "18",             0x00000, 0x20000, CRC(c04be720) SHA1(2e544e0a0358b6afbdf826d35d9c4c59e4787a93) )
+	ROM_LOAD( "19",             0x20000, 0x20000, CRC(fbb8d8c1) SHA1(8a7689bb7ed56243333133cbacf01a0ae825201e) )
+ROM_END
+
+
 
 ROM_START( sf2hf )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
@@ -8208,6 +8490,36 @@ static DRIVER_INIT( pang3j )
 }
 #endif
 
+static READ16_HANDLER( sf2mdt_r )
+{
+	return 0xffff;
+}
+
+static DRIVER_INIT( sf2mdt )
+{
+	int i;
+	UINT32 gfx_size = memory_region_length( machine, REGION_GFX1 );
+	UINT8 *rom = memory_region( machine, REGION_GFX1 );
+	UINT8 tmp;
+
+	for( i = 0; i < gfx_size; i += 8 )
+	{
+		tmp = rom[i+1];
+		rom[i+1] = rom[i+4];
+		rom[i+4] = tmp;
+		tmp = rom[i+3];
+		rom[i+3] = rom[i+6];
+		rom[i+6] = tmp;
+	}
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70c01a, 0x70c01b, 0, 0, sf2mdt_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70c01c, 0x70c01d, 0, 0, sf2mdt_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70c01e, 0x70c01f, 0, 0, sf2mdt_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70c010, 0x70c011, 0, 0, sf2mdt_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70c018, 0x70c019, 0, 0, sf2mdt_r);
+
+	driver_init_cps1(machine);
+}
+
 
 GAME( 1988, forgottn, 0,        cps1_10MHz, forgottn, forgottn, ROT0,   "Capcom", "Forgotten Worlds (US)", 0 )
 GAME( 1988, forgott1, forgottn, cps1_10MHz, forgottn, forgottn, ROT0,   "Capcom", "Forgotten Worlds (World?)", GAME_NOT_WORKING )
@@ -8283,20 +8595,21 @@ GAME( 1992, sf2ceua,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom"
 GAME( 1992, sf2ceub,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920513)", 0 )
 GAME( 1992, sf2ceuc,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920803)", 0 )
 GAME( 1992, sf2cej,   sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (Japan 920513)", 0 )
-GAME( 1992, sf2rb,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Rainbow set 1)" , 0)	// 920322 - based on World version
-GAME( 1992, sf2rb2,   sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Rainbow set 2)" , 0)	// 920322 - based on World version
-GAME( 1992, sf2red,   sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Red Wave)" , 0)		// 920313 - based on World version
-GAME( 1992, sf2v004,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II! - Champion Edition (V004)", 0 )			// "102092" !!! - based on (heavily modified) World version
-GAME( 1992, sf2accp2, sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Accelerator Pt.II)" , 0)  // 920313 - based on USA version
-GAME( 1992, sf2m1,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M1)", GAME_NOT_WORKING )
-GAME( 1992, sf2m2,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M2)", GAME_NOT_WORKING )
-GAME( 1992, sf2m3,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M3)", GAME_NOT_WORKING )
-GAME( 1992, sf2m4,    sf2ce,    cps1_12MHz, sf2j,     sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M4)", 0 )
-GAME( 1992, sf2m5,    sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M5)", 0 )
-GAME( 1992, sf2m6,    sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M6)", 0 )
-GAME( 1992, sf2m7,    sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M7)", 0 )
-GAME( 1992, sf2yyc,   sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (YYC)", 0 )
-GAME( 1992, sf2koryu, sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (Kouryu)", 0 )
+GAME( 1992, sf2rb,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Rainbow set 1, bootleg)" , 0)	// 920322 - based on World version
+GAME( 1992, sf2rb2,   sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Rainbow set 2, bootleg)" , 0)	// 920322 - based on World version
+GAME( 1992, sf2red,   sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Red Wave, bootleg)" , 0)		// 920313 - based on World version
+GAME( 1992, sf2v004,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II! - Champion Edition (V004, bootleg)", 0 )			// "102092" !!! - based on (heavily modified) World version
+GAME( 1992, sf2accp2, sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (Accelerator Pt.II, bootleg)" , 0)  // 920313 - based on USA version
+GAME( 1992, sf2m1,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M1, bootleg)", GAME_NOT_WORKING )
+GAME( 1992, sf2m2,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M2, bootleg)", GAME_NOT_WORKING )
+GAME( 1992, sf2m3,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "bootleg","Street Fighter II' - Champion Edition (M3, bootleg)", GAME_NOT_WORKING )
+GAME( 1992, sf2m4,    sf2ce,    cps1_12MHz, sf2j,     sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M4, bootleg)", 0 )
+GAME( 1992, sf2m5,    sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M5, bootleg)", 0 )
+GAME( 1992, sf2m6,    sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M6, bootleg)", 0 )
+GAME( 1992, sf2m7,    sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (M7, bootleg)", 0 )
+GAME( 1992, sf2yyc,   sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (YYC, bootleg)", 0 )
+GAME( 1992, sf2koryu, sf2ce,    cps1_12MHz, sf2,      sf2hack,  ROT0,   "bootleg","Street Fighter II' - Champion Edition (Xiang Long, Chinese bootleg)", 0 )
+GAME( 1992, sf2mdt,   sf2ce,    sf2mdt,     sf2,      sf2mdt,   ROT0,   "bootleg","Street Fighter II' - Champion Edition (Magic Delta Turbo, bootleg)", GAME_NOT_WORKING|GAME_NO_SOUND ); // heavily modified, different sound & gfx hardware
 GAME( 1992, varth,    0,        cps1_12MHz, varth,    cps1,     ROT270, "Capcom", "Varth - Operation Thunderstorm (World 920714)" , 0)		// "ETC"    12MHz not verified but game slows down at 10MHz
 GAME( 1992, varthr1,  varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom", "Varth - Operation Thunderstorm (World 920612)" , 0)		// "ETC"
 GAME( 1992, varthu,   varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom (Romstar license)", "Varth - Operation Thunderstorm (US 920612)", 0 )
@@ -8310,11 +8623,11 @@ GAME( 1994, qadj,     qad,      cps1_12MHz, qadj,     cps1,     ROT0,   "Capcom"
 GAME( 1995, qtono2,   0,        cps1_12MHz, qtono2,   cps1,     ROT0,   "Capcom", "Quiz Tonosama no Yabou 2 Zenkoku-ban (Japan 950123)", 0 )
 GAME( 1995, megaman,  0,        cps1_12MHz, megaman,  cps1,     ROT0,   "Capcom", "Mega Man - The Power Battle (CPS1 Asia 951006)", 0 )
 GAME( 1995, rockmanj, megaman,  cps1_12MHz, rockmanj, cps1,     ROT0,   "Capcom", "Rockman - The Power Battle (CPS1 Japan 950922)", 0 )
-
 GAME( 1992, wof,      0,        qsound,     wof,      wof,      ROT0,   "Capcom", "Warriors of Fate (World 921002)" , 0)				// "ETC"
 GAME( 1992, wofa,     wof,      qsound,     wof,      wof,      ROT0,   "Capcom", "Sangokushi II (Asia 921005)" , 0)					// World "warning"
 GAME( 1992, wofu,     wof,      qsound,     wof,      wof,      ROT0,   "Capcom", "Warriors of Fate (US 921031)" , 0)					// World "warning"
 GAME( 1992, wofj,     wof,      qsound,     wof,      wof,      ROT0,   "Capcom", "Tenchi wo Kurau II - Sekiheki no Tatakai (Japan 921031)", 0 )
+GAME( 1999, wofhfh,   wof,      wofhfh,     wofhfh,   cps1,     ROT0,   "bootleg","Sangokushi II: Huo Fenghuang (Chinese bootleg)", 0 )
 GAME( 1993, dino,     0,        qsound,     dino,     dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (World 930201)" , 0)			// "ETC"
 GAME( 1993, dinou,    dino,     qsound,     dino,     dino ,    ROT0,   "Capcom", "Cadillacs and Dinosaurs (US 930201)", 0 )
 GAME( 1993, dinoj,    dino,     qsound,     dino,     dino ,    ROT0,   "Capcom", "Cadillacs Kyouryuu-Shinseiki (Japan 930201)", 0 )
