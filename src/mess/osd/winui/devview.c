@@ -299,6 +299,7 @@ static void DevView_ButtonClick(HWND hwndDevView, struct DevViewEntry *pEnt, HWN
 	int rc;
 	BOOL b;
 	TCHAR szPath[MAX_PATH];
+	image_device_info info;
 
 	pDevViewInfo = GetDevViewInfo(hwndDevView);
 
@@ -307,7 +308,8 @@ static void DevView_ButtonClick(HWND hwndDevView, struct DevViewEntry *pEnt, HWN
 	if (pDevViewInfo->pCallbacks->pfnGetOpenFileName)
 		AppendMenu(hMenu, MF_STRING, 1, TEXT("Mount..."));
 
-	if (mess_device_from_core_device(pEnt->dev)->creatable)
+	info = image_device_getinfo(pDevViewInfo->config->mconfig, pEnt->dev);
+	if (info.creatable)
 	{
 		if (pDevViewInfo->pCallbacks->pfnGetCreateFileName)
 			AppendMenu(hMenu, MF_STRING, 2, TEXT("Create..."));

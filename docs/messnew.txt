@@ -147,6 +147,9 @@ User Interface Changes:
 - Fixed default key naming of keyboard inputs for non-ASCII characters.  [Nate
   Woods]
 
+- [Windows GUI] Fixed crash in Device View panel when browsing to images on
+  certain devices.  (bug #1632) [Nate Woods]
+
 
 
 Imgtool Changes:
