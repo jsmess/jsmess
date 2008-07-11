@@ -204,23 +204,41 @@ DRIVER_INIT(specimx)
 	memset(mess_ram,0,128*1024);
 }
 
+static PIT8253_OUTPUT_CHANGED(specimx_pit8253_out0_changed)
+{
+	specimx_set_input( 0, state );
+}
+
+
+
+static PIT8253_OUTPUT_CHANGED(specimx_pit8253_out1_changed)
+{
+	specimx_set_input( 1, state );
+}
+
+
+
+static PIT8253_OUTPUT_CHANGED(specimx_pit8253_out2_changed)
+{
+	specimx_set_input( 2, state );
+}
+
+
+
 const struct pit8253_config specimx_pit8253_intf =
 {
 	{
 		{
 			2000000,
-			NULL,
-			NULL
+			specimx_pit8253_out0_changed
 		},
 		{
 			2000000,
-			NULL,
-			NULL
+			specimx_pit8253_out1_changed
 		},
 		{
 			2000000,
-			NULL,
-			NULL
+			specimx_pit8253_out2_changed
 		}
 	}
 };

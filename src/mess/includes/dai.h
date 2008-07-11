@@ -39,7 +39,7 @@ PALETTE_INIT( dai );
 /*----------- defined in audio/dai.c -----------*/
 
 extern const struct CustomSound_interface dai_sound_interface;
-void dai_sh_change_clock(const device_config *,double);
+void dai_set_input(int index, int state);
 
 
 #endif /* DAI_H_ */

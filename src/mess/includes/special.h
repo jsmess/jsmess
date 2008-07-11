@@ -76,6 +76,6 @@ extern const rgb_t specimx_palette[16];
 /*----------- defined in audio/special.c -----------*/
 
 extern const struct CustomSound_interface specimx_sound_interface;
-extern void specimx_sh_change_clock(double);
+void specimx_set_input(int index, int state);
 
 #endif /* SPECIAL_H_ */

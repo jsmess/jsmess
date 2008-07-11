@@ -413,16 +413,13 @@ static const struct pit8253_config pc_pit8254_config =
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
+			pc_timer0_w
 		}, {
 			4772720/4,				/* dram refresh */
-			NULL,
 			NULL
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL,
-			//		pc_sh_speaker_change_clock
+			NULL
 		}
 	}
 };

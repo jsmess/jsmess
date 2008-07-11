@@ -12,15 +12,20 @@
 
 /*----------- defined in machine/pc.c -----------*/
 
-extern const struct dma8237_interface pc_dma8237_config;
-extern const struct pit8253_config pc_pit8253_config;
+extern const struct dma8237_interface ibm5150_dma8237_config;
+extern const struct pit8253_config ibm5150_pit8253_config;
 extern const struct pit8253_config pcjr_pit8253_config;
-extern const struct pic8259_interface pc_pic8259_master_config;
-extern const struct pic8259_interface pc_pic8259_slave_config;
+extern const struct pic8259_interface ibm5150_pic8259_master_config;
+extern const struct pic8259_interface ibm5150_pic8259_slave_config;
 extern const struct pic8259_interface pcjr_pic8259_master_config;
-extern const ins8250_interface ibmpc_com_interface[4];
-extern const ppi8255_interface pc_ppi8255_interface;
+extern const ins8250_interface ibm5150_com_interface[4];
+extern const ppi8255_interface ibm5150_ppi8255_interface;
+extern const ppi8255_interface ibm5160_ppi8255_interface;
 extern const ppi8255_interface pcjr_ppi8255_interface;
+
+UINT8 pc_speaker_get_spk(void);
+void pc_speaker_set_spkrdata(UINT8 data);
+void pc_speaker_set_input(UINT8 data);
 
 void mess_init_pc_common( running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int));
 

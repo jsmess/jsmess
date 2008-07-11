@@ -8,6 +8,7 @@
 #include "deprecat.h"
 
 #include "cpu/i386/i386.h"
+#include "cpu/i8x41/i8x41.h"
 
 #include "machine/pic8259.h"
 #include "machine/8237dma.h"
@@ -23,7 +24,7 @@
 #include "includes/pc.h"
 #include "includes/at.h"
 #include "machine/pckeybrd.h"
-#include "audio/pc.h"
+#include "sound/speaker.h"
 #include "audio/sblaster.h"
 #include "machine/i82439tx.h"
 
@@ -31,13 +32,17 @@
 #include "machine/pc_hdc.h"
 #include "includes/pc_mouse.h"
 
-#define LOG_PORT80 1
+#include "cpu/i8051/i8051.h"
+
+#define LOG_PORT80	0
+#define LOG_KBDC	0
 
 static struct {
 	const device_config	*pic8259_master;
 	const device_config	*pic8259_slave;
 	const device_config	*dma8237_1;
 	const device_config	*dma8237_2;
+	const device_config	*pit8254;
 } at_devices;
 
 static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };
@@ -70,17 +75,53 @@ const struct pic8259_interface at_pic8259_slave_config = {
 
 
 
+/*************************************************************************
+ *
+ *      PC Speaker related
+ *
+ *************************************************************************/
+
+static UINT8 at_spkrdata = 0;
+static UINT8 at_speaker_input = 0;
+
+static UINT8 at_speaker_get_spk(void)
+{
+	return at_spkrdata & at_speaker_input;
+}
+
+
+static void at_speaker_set_spkrdata(UINT8 data)
+{
+	at_spkrdata = data ? 1 : 0;
+	speaker_level_w( 0, at_speaker_get_spk() );
+}
+
+
+static void at_speaker_set_input(UINT8 data)
+{
+	at_speaker_input = data ? 1 : 0;
+	speaker_level_w( 0, at_speaker_get_spk() );
+}
+
+
+
 /*************************************************************
  *
  * pit8254 configuration
  *
  *************************************************************/
 
-static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+static PIT8253_OUTPUT_CHANGED( at_pit8254_out0_changed )
 {
 	if ( at_devices.pic8259_master ) {
 		pic8259_set_irq_line(at_devices.pic8259_master, 0, state);
 	}
+}
+
+
+static PIT8253_OUTPUT_CHANGED( at_pit8254_out2_changed )
+{
+	at_speaker_set_input( state ? 1 : 0 );
 }
 
 
@@ -89,16 +130,13 @@ const struct pit8253_config at_pit8254_config =
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
+			at_pit8254_out0_changed
 		}, {
 			4772720/4,				/* dram refresh */
-			NULL,
 			NULL
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL,
-			pc_sh_speaker_change_clock
+			at_pit8254_out2_changed
 		}
 	}
 };
@@ -183,7 +221,9 @@ WRITE8_HANDLER(at_page8_w)
 	at_pages[offset % 0x10] = data;
 
 	if (LOG_PORT80 && (offset == 0))
+	{
 		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, (unsigned) activecpu_get_reg(REG_PC));
+	}
 
 	switch(offset % 8) {
 	case 1:
@@ -266,14 +306,14 @@ const struct dma8237_interface at_dma8237_1_config =
 };
 
 
-/* TODO: How is still hooked up in the actual machine? */
+/* TODO: How is this hooked up in the actual machine? */
 const struct dma8237_interface at_dma8237_2_config =
 {
 	0, 
 	1.0e-6, // 1us 
 
-	NULL,
-	NULL,
+	pc_dma_read_byte,
+	pc_dma_write_byte,
 
 	{ NULL, NULL, NULL, NULL },
 	{ NULL, NULL, NULL, NULL },
@@ -358,26 +398,311 @@ const ins8250_interface ibm5170_com_interface[4]=
 static void at_fdc_interrupt(int state)
 {
 	pic8259_set_irq_line(at_devices.pic8259_master, 6, state);
+//if ( mess_ram[0x0490] == 0x74 )
+//	mess_ram[0x0490] = 0x54;
 }
 
 
 static void at_fdc_dma_drq(int state, int read_)
 {
-	dma8237_drq_write((device_config*)device_list_find_by_tag( Machine->config->devicelist, DMA8237, "dma8237_1" ), FDC_DMA, state);
+	dma8237_drq_write( at_devices.dma8237_1, FDC_DMA, state);
 }
 
 static const struct pc_fdc_interface fdc_interface =
 {
 	NEC765A,
-	NEC765_RDY_PIN_CONNECTED,
+	NEC765_RDY_PIN_NOT_CONNECTED,
 	at_fdc_interrupt,
 	at_fdc_dma_drq,
 };
 
 
 static int at_get_out2(running_machine *machine) {
-	return pit8253_get_output((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "at_pit8254" ), 2 );
+	return pit8253_get_output(at_devices.pit8254, 2 );
 }
+
+
+/**********************************************************
+ *
+ * 8042 keyboard controller interface
+ *
+ * Things connected to the 8042 I/O ports:
+ *
+ *  AT compatible
+ *  =============
+ *
+ *  Port 1 (Input port)
+ *  0 - P10 - Undefined
+ *  1 - P11 - Undefined
+ *  2 - P12 - Undefined
+ *  3 - P13 - Undefined
+ *  4 - P14 - External RAM ( 1 = Enable external RAM, 0 = Disable external RAM )
+ *  5 - P15 - Manufacturing setting ( 1 = Setting enabled, 0 = Setting disabled )
+ *  6 - P16 - Display type switch ( 1 = Color display, 0 = Monochrome display )
+ *  7 - P17 - Keyboard inhibit switch ( 1 = Keyboard enabled, 0 = Keyboard inhibited )
+ *
+ *  Port 2 (Output port)
+ *  0 - P20 - System Reset ( 1 = Normal, 0 = Reset comupter )
+ *  1 - P21 - Gate A20
+ *  2 - P22 - Undefined
+ *  3 - P23 - Undefined
+ *  4 - P24 - Input Buffer Full
+ *  5 - P25 - Output Buffer Empty
+ *  6 - P26 - Keyboard Clock ( 1 = Pull Clock low, 0 = High-Z )
+ *  7 - P27 - Keyboard Data ( 1 = Pull Data low, 0 = High-Z )
+ *
+ *  Test Pins (input)
+ *  0 - T0 - Keyboard Clock input
+ *  1 - T1 - Keyboard Data input
+ *
+ **********************************************************/
+
+static UINT8	kbdc8042_speaker;
+static UINT8	kbdc8042_offset1 = 0xFF;
+static UINT8	keyboard_clock;
+static UINT8	keyboard_data;
+
+
+static READ8_HANDLER( at_kbdc8042_p1_r )
+{
+	logerror("%04x: reading P1\n", activecpu_get_pc() );
+	return 0xFF;
+}
+
+
+static READ8_HANDLER( at_kbdc8042_p2_r )
+{
+	return 0xFF;
+}
+
+
+static WRITE8_HANDLER( at_kbdc8042_p2_w )
+{
+	logerror("%04x: writing $%02x to P2\n", activecpu_get_pc(), data );
+
+	at_set_gate_a20( ( data & 0x02 ) ? 1 : 0 );
+	
+	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+
+	keyboard_clock = ( data & 0x40 ) ? 1 : 0;
+	cpunum_set_input_line( machine, 2, I8051_INT0_LINE, (data & 0x40 ) ? HOLD_LINE : CLEAR_LINE );
+
+	keyboard_data = ( data & 0x80 ) ? 1 : 0;
+	cpunum_set_input_line( machine, 2, I8051_T0_LINE, ( data & 0x80 ) ? HOLD_LINE : CLEAR_LINE );
+}
+
+
+static READ8_HANDLER( at_kbdc8042_t0_r )
+{
+	return keyboard_clock;
+}
+
+
+static READ8_HANDLER( at_kbdc8042_t1_r )
+{
+	return keyboard_data;
+}
+
+
+static ADDRESS_MAP_START( kbdc8042_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x07FF )  AM_ROM
+	AM_RANGE( 0x0800, 0x08FF )  AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( kbdc8042_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( I8X41_t0, I8X41_t0 )	AM_READ( at_kbdc8042_t0_r )
+	AM_RANGE( I8X41_t1, I8X41_t1 )	AM_READ( at_kbdc8042_t1_r )
+	AM_RANGE( I8X41_p1, I8X41_p1 )  AM_READ( at_kbdc8042_p1_r )
+	AM_RANGE( I8X41_p2, I8X41_p2 )  AM_READWRITE( at_kbdc8042_p2_r, at_kbdc8042_p2_w )
+ADDRESS_MAP_END
+
+
+static const i8x41_config i8042_config = { TYPE_I8X42 };
+
+
+MACHINE_DRIVER_START( at_kbdc8042 )
+	MDRV_CPU_ADD_TAG("kbdc8042", I8X41, 4772720 )   /* Frequency is a wild guess */
+	MDRV_CPU_PROGRAM_MAP( kbdc8042_mem, 0 )
+	MDRV_CPU_IO_MAP( kbdc8042_io, 0 )
+	MDRV_CPU_CONFIG( i8042_config )
+MACHINE_DRIVER_END
+
+
+READ8_HANDLER(at_kbdc8042_r)
+{
+	static int poll_delay = 4;
+    UINT8 data = 0;
+
+	switch ( offset )
+	{
+	case 0:
+		data = cpunum_get_reg( 1, I8X41_DATA );
+		break;
+
+	case 1:
+		data = kbdc8042_speaker;
+		data &= ~0xc0; /* AT BIOS don't likes this being set */
+
+		/* This needs fixing/updating not sure what this is meant to fix */
+		if ( --poll_delay < 0 )
+		{
+			poll_delay = 3;
+			kbdc8042_offset1 ^= 0x10;
+		}
+		data = (data & ~0x10) | ( kbdc8042_offset1 & 0x10 );
+
+		if ( pit8253_get_output(at_devices.pit8254, 2 ) )
+			data |= 0x20;
+		else
+			data &= ~0x20; /* ps2m30 wants this */
+		break;
+
+	case 2:
+		if (at_get_out2(machine))
+			data |= 0x20;
+		else
+			data &= ~0x20;
+		break;
+
+	case 4:
+		data = cpunum_get_reg( 1, I8X41_STAT );
+		break;
+	}
+
+	if (LOG_KBDC)
+		logerror("kbdc8042_8_r(): offset=%d data=0x%02x\n", offset, (unsigned) data);
+	return data;
+}
+
+
+WRITE8_HANDLER(at_kbdc8042_w)
+{
+	if (LOG_KBDC)
+		logerror("kbdc8042_8_w(): ofset=%d data=0x%02x\n", offset, data);
+
+	switch (offset) {
+	case 0:
+		cpunum_set_reg( 1, I8X41_DATA, data );
+		break;
+
+	case 1:
+		kbdc8042_speaker = data;
+		pit8253_gate_w( at_devices.pit8254, 2, data & 1);
+		at_speaker_set_spkrdata( data & 0x02 );
+		break;
+
+	case 4:
+		cpunum_set_reg( 1, I8X41_CMND, data );
+		break;
+    }
+}
+
+
+/**********************************************************
+ *
+ * Keytronic keyboard interface
+ *
+ **********************************************************/
+
+
+static UINT8	keytronic_p1;
+static UINT8	keytronic_p2;
+static UINT8	keytronic_p3;
+
+
+static READ8_HANDLER( keytronic_p1_r )
+{
+	UINT8 data = keytronic_p1;
+
+	return data;
+}
+
+
+static WRITE8_HANDLER( keytronic_p1_w )
+{
+	logerror("keytronic_p1_w(): write %02x\n", data );
+
+	keytronic_p1 = data;
+}
+
+
+static READ8_HANDLER( keytronic_p2_r )
+{
+	UINT8 data = keytronic_p2;
+
+	return data;
+}
+
+
+static WRITE8_HANDLER( keytronic_p2_w )
+{
+	logerror("keytronic_p2_w(): write %02x\n", data );
+
+	keytronic_p2 = data;
+}
+
+
+static READ8_HANDLER( keytronic_p3_r )
+{
+	UINT8 data = keytronic_p3;
+
+	return data;
+}
+
+
+static WRITE8_HANDLER( keytronic_p3_w )
+{
+	logerror("keytronic_p3_w(): write %02x\n", data );
+
+	keytronic_p3 = data;
+}
+
+
+static READ8_HANDLER( keytronic_data_r )
+{
+	logerror("keytronic_data_r(): read from %04x\n", offset );
+	return 0xFF;
+}
+
+
+static WRITE8_HANDLER( keytronic_data_w )
+{
+	keyboard_data = ( offset & 0x0100 ) ? 1 : 0;
+	keyboard_clock = ( offset & 0x0200 ) ? 1 : 0;
+}
+
+
+static ADDRESS_MAP_START( keytronic_program, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x0FFF )	AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( keytronic_data, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE( 0x0000, 0xFFFF ) AM_READWRITE( keytronic_data_r, keytronic_data_w )
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( keytronic_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( 0x01, 0x01 )	AM_READWRITE( keytronic_p1_r, keytronic_p1_w )
+	AM_RANGE( 0x02, 0x02 )	AM_READWRITE( keytronic_p2_r, keytronic_p2_w )
+	AM_RANGE( 0x03, 0x03 )	AM_READWRITE( keytronic_p3_r, keytronic_p3_w )
+ADDRESS_MAP_END
+
+
+MACHINE_DRIVER_START( keytronic_keyboard )
+	MDRV_CPU_ADD_TAG( "keytronic_keyboard", I8051, 11060250 )
+	MDRV_CPU_PROGRAM_MAP( keytronic_program, 0 )
+	MDRV_CPU_DATA_MAP( keytronic_data, 0 )
+	MDRV_CPU_IO_MAP( keytronic_io, 0 )
+MACHINE_DRIVER_END
+
+
+/**********************************************************
+ *
+ * Init functions
+ *
+ **********************************************************/
 
 
 DRIVER_INIT( atcga )
@@ -505,10 +830,11 @@ MACHINE_START( at )
 
 MACHINE_RESET( at )
 {
-	at_devices.pic8259_master = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
-	at_devices.pic8259_slave = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
-	at_devices.dma8237_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
-	at_devices.dma8237_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	at_devices.pic8259_master = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
+	at_devices.pic8259_slave = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
+	at_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
+	at_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	at_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
 	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, NS16450, "ns16450_0" ) );
 }
 

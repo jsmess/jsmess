@@ -3,8 +3,8 @@
 #include "machine/pckeybrd.h"
 
 #include "machine/pcshare.h"
+#include "includes/pc.h"
 #include "machine/pit8253.h"
-#include "audio/pc.h"
 #include "includes/tandy1t.h"
 
 
@@ -185,7 +185,7 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	case 1:
 		tandy_ppi.portb = data;
 		pit8253_gate_w( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
-		pc_sh_speaker(machine, data&3);
+		pc_speaker_set_spkrdata( data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		if ( data & 0x80 ) {
 			pc_keyb_clear();

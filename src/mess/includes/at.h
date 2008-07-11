@@ -23,6 +23,12 @@ extern const ins8250_interface ibm5170_com_interface[4];
 READ8_HANDLER( at_page8_r );
 WRITE8_HANDLER( at_page8_w );
 
+MACHINE_DRIVER_EXTERN( at_kbdc8042 );
+MACHINE_DRIVER_EXTERN( keytronic_keyboard );
+
+READ8_HANDLER(at_kbdc8042_r);
+WRITE8_HANDLER(at_kbdc8042_w);
+
 DRIVER_INIT( atcga );
 DRIVER_INIT( atega );
 DRIVER_INIT( at386 );
@@ -33,6 +39,5 @@ DRIVER_INIT( ps2m30286 );
 
 MACHINE_START( at );
 MACHINE_RESET( at );
-
 
 #endif /* AT_H_ */

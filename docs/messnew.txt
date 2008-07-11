@@ -2,13 +2,14 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- IBM PC/XT-286 [Wilbert Pol]
 
 
 
 System Driver Changes:
 ----------------------
-(none)
+- [IBM5170] Added support for the 8042 keybaord controller dumped
+  by Kevtris.  [Wilbert Pol]
 
 
 

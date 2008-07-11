@@ -135,11 +135,11 @@ void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 	AmstradCPC_SetUpperRom(machine, pSnapshot[0x055]);
 
 	/* PPI */
-	ppi8255_w(0,3,pSnapshot[0x059] & 0x0ff);
+	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ),3,pSnapshot[0x059] & 0x0ff);
 
-	ppi8255_w(0,0,pSnapshot[0x056] & 0x0ff);
-	ppi8255_w(0,1,pSnapshot[0x057] & 0x0ff);
-	ppi8255_w(0,2,pSnapshot[0x058] & 0x0ff);
+	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ),0,pSnapshot[0x056] & 0x0ff);
+	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ),1,pSnapshot[0x057] & 0x0ff);
+	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ),2,pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)

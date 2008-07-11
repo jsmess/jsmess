@@ -34,7 +34,6 @@
 #include "includes/ps2.h"
 
 #include "machine/pcshare.h"
-#include "audio/pc.h"
 
 #include "devices/mflopimg.h"
 #include "devices/harddriv.h"
@@ -46,7 +45,6 @@
 /* window resizing with dirtybuffering traping in xmess window */
 
 #define ym3812_StdClock 3579545
-#define AT_PIT8254	"at_pit8254"
 
 /*
   adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
@@ -77,6 +75,7 @@ static ADDRESS_MAP_START( at16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c8000, 0x0cffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0effff) AM_RAM
 	AM_RANGE(0x0f0000, 0x0fffff) AM_ROM
+	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION(REGION_CPU1, 0x0f0000)
 ADDRESS_MAP_END
 
 
@@ -133,8 +132,8 @@ static WRITE8_HANDLER(at_adlib_w)
 static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, AT_PIT8254, pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE8(kbdc8042_8_r,             kbdc8042_8_w, 0xffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, "pit8254", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x0060, 0x006f) AM_READWRITE8(at_kbdc8042_r,            at_kbdc8042_w, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(mc146818_port_r,          mc146818_port_w, 0xffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,               at_page8_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8(PIC8259, "pic8259_slave", pic8259_r, pic8259_w, 0xffff)
@@ -145,8 +144,8 @@ static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE8(pc_parallelport2_r,       pc_parallelport2_w, 0xffff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(NS16450, "ns16450_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(NS16450, "ns16450_1", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,                pc_HDC1_w, 0xffff)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,                pc_HDC2_w, 0xffff)
+//	AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,                pc_HDC1_w, 0xffff)
+//	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,                pc_HDC2_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_parallelport1_r,       pc_parallelport1_w, 0xffff)
 #ifdef ADLIB
 	AM_RANGE(0x0388, 0x0389) AM_READWRITE8(at_adlib_r,               at_adlib_w, 0xffff)
@@ -161,7 +160,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, AT_PIT8254, pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, "pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
@@ -183,7 +182,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, AT_PIT8254, pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, "pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
@@ -417,9 +416,11 @@ static const struct YM3812interface ym3812_interface =
 
 static MACHINE_DRIVER_START( ibm5170 )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at16, at16, I80286, 12000000 /*6000000*/)
+	MDRV_CPU_ATPC(at16, at16, I80286, 6000000 /*6000000*/)
 
-	MDRV_DEVICE_ADD( AT_PIT8254, PIT8254 )
+	MDRV_INTERLEAVE(1)
+
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
 	MDRV_DEVICE_CONFIG( at_pit8254_config )
 
 	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
@@ -453,8 +454,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -467,6 +467,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_SOUND_ADD(SAA1099, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
+	MDRV_IMPORT_FROM( at_kbdc8042 )
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -482,11 +483,68 @@ static MACHINE_DRIVER_START( ibm5170a )
 	MDRV_CPU_REPLACE("main", I80286, 8000000)
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( ibm5162 )
+	/* basic machine hardware */
+	MDRV_CPU_ATPC(at16, at16, I80286, 6000000 /*6000000*/)
+
+	MDRV_INTERLEAVE(1)
+
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
+	MDRV_DEVICE_CONFIG( at_pit8254_config )
+
+	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
+	MDRV_DEVICE_CONFIG( at_dma8237_1_config )
+
+	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
+	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibm5170_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibm5170_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibm5170_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
+	MDRV_DEVICE_CONFIG( ibm5170_com_interface[3] )
+
+	MDRV_MACHINE_START( at )
+	MDRV_MACHINE_RESET( at )
+
+	MDRV_IMPORT_FROM( pcvideo_cga )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_IMPORT_FROM( at_kbdc8042 )
+
+	MDRV_IMPORT_FROM( keytronic_keyboard )
+
+	MDRV_NVRAM_HANDLER( mc146818 )
+
+	/* printers */
+	MDRV_DEVICE_ADD("printer1", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( ps2m30286 )
 	/* basic machine hardware */
 	MDRV_CPU_ATPC(at16, at16, I80286, 12000000)
 
-	MDRV_DEVICE_ADD( AT_PIT8254, PIT8254 )
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
 	MDRV_DEVICE_CONFIG( at_pit8254_config )
 
 	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
@@ -524,8 +582,7 @@ static MACHINE_DRIVER_START( ps2m30286 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -552,7 +609,7 @@ static MACHINE_DRIVER_START( atvga )
 	/* basic machine hardware */
 	MDRV_CPU_ATPC(at16, at16, I80286, 12000000)
 
-	MDRV_DEVICE_ADD( AT_PIT8254, PIT8254 )
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
 	MDRV_DEVICE_CONFIG( at_pit8254_config )
 
 	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
@@ -590,8 +647,7 @@ static MACHINE_DRIVER_START( atvga )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -624,7 +680,7 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
 
-	MDRV_DEVICE_ADD( AT_PIT8254, PIT8254 )
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
 	MDRV_DEVICE_CONFIG( at_pit8254_config )
 
 	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
@@ -655,8 +711,7 @@ static MACHINE_DRIVER_START( at386 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -727,19 +782,19 @@ MACHINE_DRIVER_END
 #endif
 
 ROM_START( ibm5170 )
-	ROM_REGION(0x1000000,REGION_CPU1, 0)
+	ROM_REGION(0x100000,REGION_CPU1, 0)
 
 	ROM_SYSTEM_BIOS( 0, "rev1", "IBM PC/AT 5170 01/10/84")
 	ROMX_LOAD("t6181028.u27", 0xf0000, 0x8000, CRC(f6573f2a) SHA1(3e52cfa6a6a62b4e8576f4fe076c858c220e6c1a), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("t6181028.u27", 0xff0000, 0x8000, CRC(f6573f2a) SHA1(3e52cfa6a6a62b4e8576f4fe076c858c220e6c1a), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("t6181029.u47", 0xf0001, 0x8000, CRC(7075fbb2) SHA1(a7b885cfd38710c9bc509da1e3ba9b543a2760be), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("t6181029.u47", 0xff0001, 0x8000, CRC(7075fbb2) SHA1(a7b885cfd38710c9bc509da1e3ba9b543a2760be), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS( 1, "rev2", "IBM PC/AT 5170 06/10/85")	/* Another verifaction of these crcs would be nice */
 	ROMX_LOAD("6480090.u27", 0xf0000, 0x8000, CRC(99703aa9) SHA1(18022e93a0412c8477e58f8c61a87718a0b9ab0e), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("6480090.u27", 0xff0000, 0x8000, CRC(99703aa9) SHA1(18022e93a0412c8477e58f8c61a87718a0b9ab0e), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("6480091.u47", 0xf0001, 0x8000, CRC(013ef44b) SHA1(bfa15d2180a1902cb6d38c6eed3740f5617afd16), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("6480091.u47", 0xff0001, 0x8000, CRC(013ef44b) SHA1(bfa15d2180a1902cb6d38c6eed3740f5617afd16), ROM_SKIP(1) | ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS( 2, "atdiag", "IBM PC/AT 5170 w/Super Diagnostics")
+	ROMX_LOAD("atdiage.bin", 0xf8000, 0x4000, CRC(e8855d0c) SHA1(c9d53e61c08da0a64f43d691bf6cadae5393843a), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("atdiago.bin", 0xf8001, 0x4000, CRC(606fa71d) SHA1(165e45bae7ae2da274f1e645c763c5bfcbde027b), ROM_SKIP(1) | ROM_BIOS(3))
 
 	ROM_REGION(0x08100, REGION_GFX1, 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
@@ -749,22 +804,49 @@ ROM_START( ibm5170 )
 	/* This region holds the original EGA Video bios */
 	ROM_REGION(0x4000, REGION_USER1, 0)
 	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
+
+	/* 8042 keyboard controller */
+	ROM_REGION( 0x0800, REGION_CPU2, 0 )
+	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
 ROM_START( ibm5170a )
-	ROM_REGION(0x1000000,REGION_CPU1, 0)
+	ROM_REGION(0x100000,REGION_CPU1, 0)
 //    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	ROM_LOAD16_BYTE("at111585.0", 0xf0000, 0x8000, CRC(4995be7a) SHA1(8e8e5c863ae3b8c55fd394e345d8cca48b6e575c))
-	ROM_RELOAD(0xff0000,0x8000)
 	ROM_LOAD16_BYTE("at111585.1", 0xf0001, 0x8000, CRC(c32713e4) SHA1(22ed4e2be9f948682891e2fd056a97dbea01203c))
-	ROM_RELOAD(0xff0001,0x8000)
 	ROM_REGION(0x08100, REGION_GFX1, 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	/* This region holds the original EGA Video bios */
 	ROM_REGION(0x4000, REGION_USER1, 0)
 	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
+
+	/* 8042 keyboard controller */
+	ROM_REGION( 0x0800, REGION_CPU2, 0 )
+	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
+ROM_END
+
+
+ROM_START( ibm5162 )
+	ROM_REGION16_LE(0x1000000,REGION_CPU1, 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+
+	ROM_LOAD16_BYTE("78x7460.u34", 0xf0000, 0x8000, CRC(1db4bd8f) SHA1(7be669fbb998d8b4626fefa7cd1208d3b2a88c31))
+	ROM_LOAD16_BYTE("78x7461.u35", 0xf0001, 0x8000, CRC(be14b453) SHA1(ec7c10087dbd53f9c6d1174e8f14212e2aec1818))
+
+	/* Character rom */
+	ROM_REGION(0x2000,REGION_GFX1, 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
+
+	/* 8042 keyboard controller */
+	ROM_REGION( 0x0800, REGION_CPU2, 0 )
+	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
+
+	/* 8051 keytronic keyboard controller */
+	ROM_REGION( 0x2000, REGION_CPU3, 0 )
+	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -788,6 +870,10 @@ ROM_START( at )
 	ROM_RELOAD(0xff0000,0x8000)
 	ROM_REGION(0x08100, REGION_GFX1, 0)
     ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+
+	/* 8042 keyboard controller */
+	ROM_REGION( 0x0800, REGION_CPU2, 0 )
+	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -893,6 +979,7 @@ SYSTEM_CONFIG_END
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT        CONFIG   COMPANY     FULLNAME */
 COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,		atega,	    ibmat,   "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
 COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,      atega,      ibmat,   "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
+COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,      atcga,      ibmat,   "International Business Machines",  "IBM PC/XT 5162", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,		ps2m30286,	ibmat,   "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5170a,  atcga,		atcga,	    ibmat,   "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       ibm5170a,  atcga,		atcga,	    ibmat,   "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )

@@ -2,6 +2,8 @@
 
     drivers/pc.c
 
+Driver file for IBM PC, IBM PC XT, and related machines.
+
     PC-XT memory map
 
     00000-9FFFF   RAM
@@ -15,6 +17,14 @@
     F0000-FDFFF   NOP       or ROM Basic + other Extensions
     FE000-FFFFF   ROM
 
+IBM PC 5150
+===========
+
+IBM PC-JR
+=========
+
+IBM PC-XT 5160
+==============
 
 Tandy 1000 (8086/8088) variations:
 1000				128KB-640KB RAM		4.77 MHz		v01.00.00, v01.01.00
@@ -76,7 +86,6 @@ TODO: Which clock signals are available in a PC Jr?
 #include "includes/ibmpc.h"
 
 #include "machine/pcshare.h"
-#include "audio/pc.h"
 #include "includes/pc.h"
 
 #include "machine/pc_hdc.h"
@@ -1196,39 +1205,38 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
 
 	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_mda )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -1260,39 +1268,38 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
 
 	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_hercules )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -1320,39 +1327,38 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
 
 	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -1381,39 +1387,38 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
 
 	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_aga )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -1438,39 +1443,38 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
 
 	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -1499,39 +1503,38 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
 
 	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc200 )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
@@ -1549,39 +1552,38 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
 
 	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc1512 )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
@@ -1601,31 +1603,31 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
 
 	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(pcvideo_pc1640)
@@ -1635,8 +1637,7 @@ static MACHINE_DRIVER_START( pc1640 )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
@@ -1656,31 +1657,31 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[2] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
 
 	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[3] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )
@@ -1690,8 +1691,7 @@ static MACHINE_DRIVER_START( xtvga )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD(YM3812, ym3812_StdClock)
@@ -1715,33 +1715,32 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_MACHINE_RESET(pc)
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_master_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000 )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD(SN76496, 2386360)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1766,30 +1765,29 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_DEVICE_CONFIG( pcjr_pit8253_config )
 
 	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( pc_dma8237_config )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
 
 	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
 	MDRV_DEVICE_CONFIG( pcjr_pic8259_master_config )
 
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( pc_pic8259_slave_config )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pcjr_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[0] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
 
 	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibmpc_com_interface[1] )
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pcjr )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pc_sound_interface)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD(SN76496, 2386360)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -2095,17 +2093,18 @@ ROM_START( ibm5160 )
 	ROMX_LOAD("68x4370.u19", 0xf0000, 0x8000, CRC(758ff036) SHA1(045e27a70407d89b7956ecae4d275bd2f6b0f8e2), ROM_BIOS(4))
 	ROMX_LOAD("62x0890.u18", 0xf8000, 0x8000, CRC(4f417635) SHA1(daa61762d3afdd7262e34edf1a3d2df9a05bcebb), ROM_BIOS(4))
 
-//	ROM_SYSTEM_BIOS( 4, "xtdiag", "IBM XT 5160 w/Supersoft Diagnostics" )    /* ROMs marked as BAD_DUMP for now. We expect the data to be in a different ROM chip layout */
-//	ROMX_LOAD("basicc11.f6", 0xf6000, 0x2000, BAD_DUMP CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9), ROM_BIOS(5) )
-//	ROMX_LOAD("basicc11.f8", 0xf8000, 0x2000, BAD_DUMP CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731), ROM_BIOS(5) )
-//	ROMX_LOAD("basicc11.fa", 0xfa000, 0x2000, BAD_DUMP CRC(aac3fc37) SHA1(c9e0529470edf04da093bb8c8ae2536c688c1a74), ROM_BIOS(5) )
-//	ROMX_LOAD("basicc11.fc", 0xfc000, 0x2000, BAD_DUMP CRC(3062b3fc) SHA1(5134dd64721cbf093d059ee5d3fd09c7f86604c7), ROM_BIOS(5) )
-//	ROMX_LOAD("xtdiag.bin", 0xfe000, 0x2000, CRC(4e89a4d8) SHA1(39a28fb2fe9f1aeea24ed2c0255cebca76e37ed7), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 4, "xtdiag", "IBM XT 5160 w/Supersoft Diagnostics" )    /* ROMs marked as BAD_DUMP for now. We expect the data to be in a different ROM chip layout */
+	ROMX_LOAD("basicc11.f6", 0xf6000, 0x2000, BAD_DUMP CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9), ROM_BIOS(5) )
+	ROMX_LOAD("basicc11.f8", 0xf8000, 0x2000, BAD_DUMP CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731), ROM_BIOS(5) )
+	ROMX_LOAD("basicc11.fa", 0xfa000, 0x2000, BAD_DUMP CRC(aac3fc37) SHA1(c9e0529470edf04da093bb8c8ae2536c688c1a74), ROM_BIOS(5) )
+	ROMX_LOAD("basicc11.fc", 0xfc000, 0x2000, BAD_DUMP CRC(3062b3fc) SHA1(5134dd64721cbf093d059ee5d3fd09c7f86604c7), ROM_BIOS(5) )
+	ROMX_LOAD("xtdiag.bin", 0xfe000, 0x2000, CRC(4e89a4d8) SHA1(39a28fb2fe9f1aeea24ed2c0255cebca76e37ed7), ROM_BIOS(5) )
 
 	/* Character rom */
 	ROM_REGION(0x2000,REGION_GFX1, 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
 ROM_END
+
 
 ROM_START( xtvga )
     ROM_REGION(0x100000,REGION_CPU1, 0)
@@ -2269,6 +2268,14 @@ static SYSTEM_CONFIG_START(ibmpc)
 	CONFIG_DEVICE(ibmpc_harddisk_getinfo)
 SYSTEM_CONFIG_END
 
+
+static SYSTEM_CONFIG_START(ibm5160)
+	CONFIG_RAM_DEFAULT( 640 * 1024 )
+	CONFIG_DEVICE(ibmpc_floppy_getinfo)
+	CONFIG_DEVICE(ibmpc_harddisk_getinfo)
+SYSTEM_CONFIG_END
+
+
 static SYSTEM_CONFIG_START(pcjr)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
 	CONFIG_DEVICE(ibmpc_cassette_getinfo)
@@ -2295,7 +2302,7 @@ COMP(  1987,	t1000hx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy
 COMP(  1987,	t1000sx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
 
 // xt class (pc but 8086)
-COMP(  1982,	ibm5160,	ibm5150,	0,		ibm5160,    xtcga,		pccga,		ibmpc,   "International Business Machines",  "IBM XT 5160" , 0)
+COMP(  1982,	ibm5160,	ibm5150,	0,		ibm5160,    xtcga,		pccga,		ibm5160,   "International Business Machines",  "IBM XT 5160" , 0)
 COMP(  1988,	pc200,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
 COMP(  1988,	pc20,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
 COMP(  1987,	ppc512,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PPC512", 0)

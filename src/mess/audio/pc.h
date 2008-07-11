@@ -19,6 +19,6 @@ extern const struct CustomSound_interface pc_sound_interface;
 void pc_sh_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 void pc_sh_speaker(running_machine *machine, int mode);
 
-void pc_sh_speaker_change_clock(const device_config *device, double pc_clock);
+void pc_sh_speaker_set_input(const device_config *device, int state);
 
 #endif /* __AUDIO_PC_H__ */

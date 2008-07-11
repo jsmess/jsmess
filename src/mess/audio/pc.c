@@ -30,7 +30,7 @@ const struct CustomSound_interface pc_sound_interface =
 
 static sound_stream *channel;
 static int speaker_gate = 0;
-static int baseclock;
+static int input_state;
 
 
 
@@ -43,8 +43,9 @@ static int baseclock;
 static int pc_sh_start(void)
 {
 	logerror("pc_sh_start\n");
+	speaker_gate = 0;
+	input_state = 0;
 	channel = stream_create(0, 1, Machine->sample_rate, 0, pc_sh_update);
-	baseclock = 4772720/4;
     return 0;
 }
 
@@ -91,12 +92,12 @@ void pc_sh_speaker(running_machine *machine, int data)
     }
 }
 
-void pc_sh_speaker_change_clock(const device_config *device, double pc_clock)
-{
-    stream_update(channel);
-	baseclock = pit8253_get_frequency( device, 2 );
-}
 
+void pc_sh_speaker_set_input(const device_config *device, int state)
+{
+	stream_update(channel);
+	input_state = state;
+}
 
 
 /*************************************
@@ -107,11 +108,9 @@ void pc_sh_speaker_change_clock(const device_config *device, double pc_clock)
 
 void pc_sh_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
 {
-	static INT16 signal = 0x7fff;
+	INT16 signal = input_state ? 0x7fff : -0x7fff;
 	stream_sample_t *buffer = outputs[0];
-	static int incr = 0;
 	stream_sample_t *sample = buffer;
-	int rate = Machine->sample_rate / 2;
 
 	switch( speaker_gate ) {
 	case 0:
@@ -127,26 +126,8 @@ void pc_sh_update(void *param, stream_sample_t **inputs, stream_sample_t **outpu
 		break;
 
 	case 2:
-		/* speaker gate tone from PIT channel #2 */
-		if (baseclock > rate)
-		{
-			/* if the tone is too high to play, don't play it */
-			while( length-- > 0 )
-				*sample++ = 0;
-		}
-		else
-		{
-			while( length-- > 0 )
-			{
-				*sample++ = signal;
-				incr -= baseclock;
-				while( incr < 0 )
-				{
-					incr += rate;
-					signal = -signal;
-				}
-			}
-		}
+		while( length-- > 0 )
+			*sample++ = signal;
 		break;
 	}
 }

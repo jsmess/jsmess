@@ -395,6 +395,7 @@ TESTDRIVER( t1000sx )	/* 1987 Tandy 1000SX (similiar to PCJr)				*/
 
 	/* xt */
 	DRIVER( ibm5160 )	/* 1982	IBM XT 5160									*/
+	DRIVER( ibm5162 )	/* 1986 IBM XT 5162 (XT w/80286)					*/
 	DRIVER( pc200 )		/* 1988 Sinclair PC200								*/
 	DRIVER( pc20 )		/* 1988 Amstrad PC20								*/
 TESTDRIVER( ppc512 )	/* 1987 Amstrad PPC512								*/

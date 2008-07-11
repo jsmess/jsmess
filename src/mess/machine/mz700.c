@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
-#include "sound/beep.h"
+#include "sound/speaker.h"
 
 #include "includes/mz700.h"
 
@@ -57,17 +57,17 @@ const ppi8255_interface mz700_ppi8255_interface = {
 static int pio_port_a_output;
 static int pio_port_c_output;
 
-static PIT8253_FREQUENCY_CHANGED( pit_clk_0 );
-static PIT8253_FREQUENCY_CHANGED( pit_clk_1 );
+static PIT8253_OUTPUT_CHANGED( pit_out0_changed );
+static PIT8253_OUTPUT_CHANGED( pit_out1_changed );
 static PIT8253_OUTPUT_CHANGED( pit_irq_2 );
 
 const struct pit8253_config mz700_pit8253_config =
 {
 	{
-		/* clockin	  irq callback	 clock change callback */
-		{ 1108800.0,  NULL, 		 pit_clk_0	 },
-		{	15611.0,  NULL, 		 pit_clk_1	 },
-		{		1.0,  pit_irq_2,	 NULL		 },
+		/* clockin	  irq callback	  */
+		{ 1108800.0,  pit_out0_changed },
+		{	15611.0,  pit_out1_changed },
+		{		  0,  pit_irq_2        },
 	}
 };
 
@@ -103,18 +103,19 @@ MACHINE_RESET( mz700 )
 
 /************************ PIT ************************************************/
 
-/* timer 0 is the clock for the speaker output */
-static PIT8253_FREQUENCY_CHANGED( pit_clk_0 )
+/* Timer 0 is the clock for the speaker output */
+static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 {
-	beep_set_state(0, 1);
-    beep_set_frequency(0, frequency);
+	speaker_level_w( 0, state ? 1 : 0 );
 }
 
-/* timer 1 is the clock for timer 2 clock input */
-static PIT8253_FREQUENCY_CHANGED( pit_clk_1 )
+
+/* Timer 1 is the clock for timer 2 clock input */
+static PIT8253_OUTPUT_CHANGED( pit_out1_changed )
 {
-	pit8253_set_clockin(0, 2, frequency);
+	pit8253_set_clock_signal( device, 2, state );
 }
+
 
 /* timer 2 is the AM/PM (12 hour) interrupt */
 static PIT8253_OUTPUT_CHANGED( pit_irq_2 )

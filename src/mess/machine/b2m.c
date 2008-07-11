@@ -35,6 +35,10 @@ static UINT8 b2m_romdisk_msb;
 static UINT8 b2m_color[4];
 static UINT8 b2m_localmachine;
 
+static int	b2m_sound_input;
+static sound_stream *mixer_channel;
+
+
 static READ8_HANDLER (b2m_keyboard_r )
 {		
 	UINT8 key = 0x00;
@@ -153,14 +157,24 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						break;
 	}
 }
-static PIT8253_FREQUENCY_CHANGED(bm2_pit_clk)
-{
-	pit8253_set_clockin((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIT8253, "pit8253"), 0, frequency);
-}
+
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_irq)
 {
 	pic8259_set_irq_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIC8259, "pic8259"),1,state);	
+}
+
+
+static PIT8253_OUTPUT_CHANGED(bm2_pit_out1)
+{
+	stream_update( mixer_channel );
+	b2m_sound_input = state;
+}
+
+
+static PIT8253_OUTPUT_CHANGED(bm2_pit_out2)
+{
+	pit8253_set_clock_signal((device_config*)device_list_find_by_tag(device->machine->config->devicelist, PIT8253, "pit8253"),0,state);
 }
 
 
@@ -169,18 +183,15 @@ const struct pit8253_config b2m_pit8253_intf =
 	{
 		{
 			2000000,
-			bm2_pit_irq,
-			NULL
+			bm2_pit_irq
 		},
 		{
 			2000000,
-			NULL,
-			NULL
+			bm2_pit_out1
 		},
 		{
 			2000000,
-			NULL,
-			bm2_pit_clk
+			bm2_pit_out2
 		}
 	}
 };
@@ -448,7 +459,6 @@ DEVICE_IMAGE_LOAD( b2m_floppy )
 	return INIT_PASS;
 }
 
-static sound_stream *mixer_channel;
 static void *b2m_sh_start(int clock, const struct CustomSound_interface *config);
 static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
 
@@ -461,26 +471,19 @@ const struct CustomSound_interface b2m_sound_interface =
 
 static void *b2m_sh_start(int clock, const struct CustomSound_interface *config)
 {
+	b2m_sound_input = 0;
 	mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, b2m_sh_update);
 	return (void *) ~0;
 }
 
 static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
 {
-	device_config *pit8253 = (device_config*)device_list_find_by_tag( Machine->config->devicelist, PIT8253, "pit8253" );
 	INT16 channel_1_signal;
-	static int channel_1_incr = 0;
-	int channel_1_baseclock;
-
-	int rate = Machine->sample_rate / 2;
 
 	stream_sample_t *sample_left = buffer[0];
 	stream_sample_t *sample_right = buffer[1];
 
-	channel_1_baseclock = pit8253_get_frequency(pit8253, 1);
-
-	channel_1_signal = pit8253_get_output (pit8253,1) ? 3000 : -3000;
-
+	channel_1_signal = b2m_sound_input ? 3000 : -3000;
 
 	while (length--)
 	{
@@ -490,13 +493,6 @@ static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t 
 		/* music channel 1 */
 
 		*sample_left = channel_1_signal;
-		channel_1_incr -= channel_1_baseclock;
-		while( channel_1_incr < 0 )
-		{
-			channel_1_incr += rate;
-			channel_1_signal = -channel_1_signal;
-		}
-
 		
 		sample_left++;
 		sample_right++;

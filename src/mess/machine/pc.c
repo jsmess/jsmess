@@ -44,7 +44,7 @@
 #include "includes/ibmpc.h"
 #include "machine/pcshare.h"
 #include "devices/cassette.h"
-#include "audio/pc.h"
+#include "sound/speaker.h"
 
 #include "machine/8237dma.h"
 
@@ -58,6 +58,7 @@ static struct {
 	const device_config	*pic8259_master;
 	const device_config	*pic8259_slave;
 	const device_config	*dma8237;
+	const device_config	*pit8253;
 } pc_devices;
 
 /*************************************************************************
@@ -147,7 +148,7 @@ static DMA8237_OUT_EOP( pc_dma8237_out_eop )
 }
 
 
-const struct dma8237_interface pc_dma8237_config =
+const struct dma8237_interface ibm5150_dma8237_config =
 {
 	0,
 	1.0e-6, // 1us
@@ -179,13 +180,13 @@ static PIC8259_SET_INT_LINE( pc_pic8259_slave_set_int_line )
 }
 
 
-const struct pic8259_interface pc_pic8259_master_config =
+const struct pic8259_interface ibm5150_pic8259_master_config =
 {
 	pc_pic8259_master_set_int_line
 };
 
 
-const struct pic8259_interface pc_pic8259_slave_config =
+const struct pic8259_interface ibm5150_pic8259_slave_config =
 {
 	pc_pic8259_slave_set_int_line
 };
@@ -234,33 +235,71 @@ const struct pic8259_interface pcjr_pic8259_master_config =
 };
 
 
+/*************************************************************************
+ *
+ *      PC Speaker related
+ *
+ *************************************************************************/
+
+static UINT8 pc_spkrdata = 0;
+static UINT8 pc_input = 0;
+
+UINT8 pc_speaker_get_spk(void) 
+{
+	return pc_spkrdata & pc_input;
+}
+
+
+void pc_speaker_set_spkrdata(UINT8 data)
+{
+	pc_spkrdata = data ? 1 : 0;
+	speaker_level_w( 0, pc_speaker_get_spk() );
+}
+
+
+void pc_speaker_set_input(UINT8 data)
+{
+	pc_input = data ? 1 : 0;
+	speaker_level_w( 0, pc_speaker_get_spk() );
+}
+
+
 /*************************************************************
  *
  * pit8253 configuration
  *
  *************************************************************/
 
-static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+static PIT8253_OUTPUT_CHANGED( ibm5150_timer0_w )
 {
 	pic8259_set_irq_line(pc_devices.pic8259_master, 0, state);
 }
  
 
-const struct pit8253_config pc_pit8253_config =
+static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out1_changed )
+{
+	/* Trigger DMA channel #0 */
+}
+
+
+static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out2_changed )
+{
+	pc_speaker_set_input( state );
+}
+
+
+const struct pit8253_config ibm5150_pit8253_config =
 {
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
+			ibm5150_timer0_w
 		}, {
 			4772720/4,				/* dram refresh */
-			NULL,
-			NULL
+			ibm5150_pit8253_out1_changed
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL,
-			pc_sh_speaker_change_clock
+			ibm5150_pit8253_out2_changed
 		}
 	}
 };
@@ -277,16 +316,13 @@ const struct pit8253_config pcjr_pit8253_config =
 	{
 		{
 			4772720/4,              /* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
+			ibm5150_timer0_w
 		}, {
 			4772720/4,              /* dram refresh */
-			NULL,
 			NULL
 		}, {
 			4772720/4,              /* pio port c pin 4, and speaker polling enough */
-			NULL,
-			NULL					/* TIMER AUDIO signal */
+			ibm5150_pit8253_out2_changed
 		}
 	}
 };
@@ -324,7 +360,7 @@ static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_3 ) { pc_com_refresh_connecte
 
 /* PC interface to PC-com hardware. Done this way because PCW16 also
 uses PC-com hardware and doesn't have the same setup! */
-const ins8250_interface ibmpc_com_interface[4]=
+const ins8250_interface ibm5150_com_interface[4]=
 {
 	{
 		1843200,
@@ -544,6 +580,32 @@ static void pcjr_keyb_init(void)
  *
  * PPI8255 interface
  *
+ *
+ * PORT A (input)
+ *
+ * Directly attached to shift register which stores data
+ * received from the keyboard.
+ *
+ * PORT B (output)
+ * 0 - PB0 - TIM2GATESPK - Enable/disable counting on timer 2 of the 8253
+ * 1 - PB1 - SPKRDATA    - Speaker data
+ * 2 - PB2 -             - Enable receiving data from the keyboard when keyboard is not locked.
+ * 3 - PB3 -             - Dipsswitch set selector
+ * 4 - PB4 - ENBRAMPCK   - Enable ram parity check
+ * 5 - PB5 - ENABLEI/OCK - Enable expansion I/O check
+ * 6 - PB6 -             - Connected to keyboard clock signal
+ * 7 - PB7 -             - Clear/disable shift register and IRQ1 line
+ *
+ * PORT C
+ * 0 - PC0 -         - Dipswitch 0/4
+ * 1 - PC1 -         - Dipswitch 1/5
+ * 2 - PC2 -         - Dipswitch 2/6
+ * 3 - PC3 -         - Dipswitch 3/7
+ * 4 - PC4 - SPK     - Speaker/cassette data
+ * 5 - PC5 - I/OCHCK - Expansion I/O check result
+ * 6 - PC6 - T/C2OUT - Output of 8253 timer 2
+ * 7 - PC7 - PCK     - Parity check result
+ *
  **********************************************************/
 
 static struct {
@@ -597,7 +659,7 @@ static READ8_HANDLER (pc_ppi_portb_r )
 
 static READ8_HANDLER ( pc_ppi_portc_r )
 {
-	int timer2_output = pit8253_get_output( device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2 );
+	int timer2_output = pit8253_get_output( pc_devices.pit8253, 2 );
 	int data=0xff;
 
 	data&=~0x80; // no parity error
@@ -657,8 +719,8 @@ static WRITE8_HANDLER ( pc_ppi_portb_w )
 	pc_ppi.portc_switch_high = data & 0x08;
 	pc_ppi.keyboard_disabled = data & 0x80;
 	pc_ppi.keyb_clock = data & 0x40;
-	pit8253_gate_w( device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
-	pc_sh_speaker(machine, data & 0x03);
+	pit8253_gate_w( pc_devices.pit8253, 2, data & 1);
+	pc_speaker_set_spkrdata( data & 0x02 );
 	pc_keyb_set_clock( pc_ppi.keyb_clock );
 
 	cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
@@ -675,9 +737,9 @@ static WRITE8_HANDLER ( pc_ppi_portc_w )
 }
 
 
-/* PC-XT has a 8255 which is connected to keyboard and other
+/* IBM PC has a 8255 which is connected to keyboard and other
 status information */
-const ppi8255_interface pc_ppi8255_interface =
+const ppi8255_interface ibm5150_ppi8255_interface =
 {
 	pc_ppi_porta_r,
 	pc_ppi_portb_r,
@@ -688,13 +750,71 @@ const ppi8255_interface pc_ppi8255_interface =
 };
 
 
+static READ8_HANDLER ( ibm5160_ppi_portc_r )
+{
+	int timer2_output = pit8253_get_output( pc_devices.pit8253, 2 );
+	int data=0xff;
+
+	data&=~0x80; // no parity error
+	data&=~0x40; // no error on expansion board
+	/* KB port C: equipment flags */
+//	if (pc_port[0x61] & 0x08)
+	if (pc_ppi.portc_switch_high)
+	{
+		/* read hi nibble of S2 */
+		data = (data & 0xf0) | ((input_port_read(machine, "DSW0") >> 4) & 0x0f);
+		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
+	}
+	else
+	{
+		/* read lo nibble of S2 */
+		data = (data & 0xf0) | (input_port_read(machine, "DSW0") & 0x0f);
+		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
+	}
+
+	if ( pc_ppi.portb & 0x01 )
+	{
+		data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
+	}
+	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+
+	return data;
+}
+
+
+static WRITE8_HANDLER( ibm5160_ppi_portb_w )
+{
+	pc_ppi.portb = data;
+	pc_ppi.portc_switch_high = data & 0x08;
+	pc_ppi.keyboard_disabled = data & 0x80;
+	pc_ppi.keyb_clock = data & 0x40;
+	pit8253_gate_w( pc_devices.pit8253, 2, data & 0x01 );
+	pc_speaker_set_spkrdata( data & 0x02 );
+	pc_keyb_set_clock( pc_ppi.keyb_clock );
+
+	if ( data & 0x80 )
+		pc_keyb_clear();
+}
+
+
+const ppi8255_interface ibm5160_ppi8255_interface =
+{
+	pc_ppi_porta_r,
+	pc_ppi_portb_r,
+	ibm5160_ppi_portc_r,
+	pc_ppi_porta_w,
+	ibm5160_ppi_portb_w,
+	pc_ppi_portc_w
+};
+
+
 static WRITE8_HANDLER ( pcjr_ppi_portb_w )
 {
 	/* KB controller port B */
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
 	pit8253_gate_w( device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
-	pc_sh_speaker(machine, data & 0x03);
+	pc_speaker_set_spkrdata( data & 0x02 );
 
 	cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
@@ -806,6 +926,13 @@ static void pc_set_irq_line(int irq, int state) {
 static void pc_set_keyb_int(int state) {
 	pc_set_irq_line( 1, state );
 }
+
+
+/**********************************************************
+ *
+ * Initialization code
+ *
+ **********************************************************/
 
 void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int)) 
 {
@@ -1018,8 +1145,10 @@ MACHINE_RESET( pc )
 	pc_devices.pic8259_master = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
 	pc_devices.pic8259_slave = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
 	pc_devices.dma8237 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237" );
+	pc_devices.pit8253 = device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
 	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ) );
 	pc_hdc_set_dma8237_device( pc_devices.dma8237 );
+	speaker_level_w( 0, 0 );
 }
 
 

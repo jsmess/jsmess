@@ -19,6 +19,7 @@ static void *specimx_sh_start(int clock, const struct CustomSound_interface *con
 static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
 
 static sound_stream *mixer_channel;
+static int specimx_input[3];
 
 const struct CustomSound_interface specimx_sound_interface =
 {
@@ -29,36 +30,23 @@ const struct CustomSound_interface specimx_sound_interface =
 
 static void *specimx_sh_start(int clock, const struct CustomSound_interface *config)
 {
+	specimx_input[0] = specimx_input[1] = specimx_input[2] = 0;
 	mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, specimx_sh_update);
 	return (void *) ~0;
 }
 
 static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
 {
-	device_config *pit8253 = (device_config*)device_list_find_by_tag( Machine->config->devicelist, PIT8253, "pit8253" );
 	INT16 channel_0_signal;
 	INT16 channel_1_signal;
 	INT16 channel_2_signal;
-	static int channel_0_incr = 0;
-	static int channel_1_incr = 0;
-	static int channel_2_incr = 0;
-	int channel_0_baseclock;
-	int channel_1_baseclock;
-	int channel_2_baseclock;
-
-	int rate = Machine->sample_rate / 2;
 
 	stream_sample_t *sample_left = buffer[0];
 	stream_sample_t *sample_right = buffer[1];
 
-	channel_0_baseclock = pit8253_get_frequency(pit8253, 0);
-	channel_1_baseclock = pit8253_get_frequency(pit8253, 1);
-	channel_2_baseclock = pit8253_get_frequency(pit8253, 2);
-
-	channel_0_signal = pit8253_get_output (pit8253,0) ? 3000 : -3000;
-	channel_1_signal = pit8253_get_output (pit8253,1) ? 3000 : -3000;
-	channel_2_signal = pit8253_get_output (pit8253,2) ? 3000 : -3000;
-
+	channel_0_signal = specimx_input[0] ? 3000 : -3000;
+	channel_1_signal = specimx_input[1] ? 3000 : -3000;
+	channel_2_signal = specimx_input[2] ? 3000 : -3000;
 
 	while (length--)
 	{
@@ -66,42 +54,23 @@ static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sampl
 		*sample_right = 0;
 
 		/* music channel 0 */
-
 		*sample_left += channel_0_signal;
-		channel_0_incr -= channel_0_baseclock;
-		while( channel_0_incr < 0 )
-		{
-			channel_0_incr += rate;
-			channel_0_signal = -channel_0_signal;
-		}
-
 
 		/* music channel 1 */
-
 		*sample_left += channel_1_signal;
-		channel_1_incr -= channel_1_baseclock;
-		while( channel_1_incr < 0 )
-		{
-			channel_1_incr += rate;
-			channel_1_signal = -channel_1_signal;
-		}
 
 		/* music channel 2 */
-
 		*sample_left += channel_2_signal;
-		channel_2_incr -= channel_2_baseclock;
-		while( channel_2_incr < 0 )
-		{
-			channel_2_incr += rate;
-			channel_2_signal = -channel_2_signal;
-		}
-		
+
 		sample_left++;
 		sample_right++;
 	}
 }
 
-void specimx_sh_change_clock(double clock)
+void specimx_set_input(int index, int state)
 {
-	stream_update(mixer_channel);
+	stream_update( mixer_channel );
+	specimx_input[index] = state;
 }
+
+

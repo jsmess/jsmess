@@ -106,23 +106,38 @@ const ppi8255_interface dai_ppi82555_intf =
 	NULL	/* Port C write */
 };
 
+static PIT8253_OUTPUT_CHANGED(dai_pit_out0)
+{
+	dai_set_input(0, state);
+}
+
+
+static PIT8253_OUTPUT_CHANGED(dai_pit_out1)
+{
+	dai_set_input(1, state);
+}
+
+
+static PIT8253_OUTPUT_CHANGED(dai_pit_out2)
+{
+	dai_set_input(2, state);
+}
+
+
 const struct pit8253_config dai_pit8253_intf =
 {
 	{
 		{
 			2000000,
-			NULL,
-			dai_sh_change_clock
+			dai_pit_out0
 		},
 		{
 			2000000,
-			NULL,
-			dai_sh_change_clock
+			dai_pit_out1
 		},
 		{
 			2000000,
-			NULL,
-			dai_sh_change_clock
+			dai_pit_out2
 		}
 	}
 };

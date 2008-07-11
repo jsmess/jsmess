@@ -394,9 +394,9 @@ static const struct msm8251_interface pmd85_msm8251_interface =
 const struct pit8253_config pmd85_pit8253_interface =
 {
 	{
-		{ 0,		NULL,	NULL },
-		{ 2000000,	NULL,	NULL },
-		{ 1,		NULL,	NULL }
+		{ 0,		NULL },
+		{ 2000000,	NULL },
+		{ 1,		NULL }
 	}
 };
 
