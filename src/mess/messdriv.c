@@ -72,10 +72,13 @@ const game_driver *const test_drivers[] =
 	DRIVER( megast )	/* Atari Mega ST									*/
 //	DRIVER( stacy )		/* Atari STacy										*/
 	DRIVER( atariste )	/* Atari STe										*/
-	DRIVER( megaste )	/* Atari Mega STe									*/
 	DRIVER( stbook )	/* Atari STBook										*/
+	DRIVER( megaste )	/* Atari Mega STe									*/
+//	DRIVER( stpad )		/* Atari STPad (prototype)							*/
 //	DRIVER( tt030 )		/* Atari TT030										*/
+//	DRIVER( fx1 )		/* Atari FX-1 (prototype)							*/
 //	DRIVER( falcon )	/* Atari Falcon030									*/
+//	DRIVER( falcon40 )	/* Atari Falcon040 (prototype)						*/
 
 	/* NINTENDO */
 	DRIVER( nes )		/* Nintendo Entertainment System					*/
@@ -96,6 +99,7 @@ const game_driver *const test_drivers[] =
 	/* SEGA */
 	DRIVER( sg1000 )	/* Sega SG-1000 (Japan)								*/
 	DRIVER( sg1000m2 )	/* Sega SG-1000 Mark II (Japan)						*/
+//	DRIVER( omv )		/* Tsukuda Original Othello Multivision				*/
 	DRIVER( sc3000 )	/* Sega SC-3000 (Japan)								*/
 	DRIVER( sc3000h )	/* Sega SC-3000H (Japan)							*/
 	DRIVER( sf7000 )	/* Sega SC-3000 w/ SF-7000 (Japan)					*/
@@ -113,7 +117,7 @@ const game_driver *const test_drivers[] =
 
 	DRIVER( megadrij )	/* 1988 Sega Mega Drive (Japan)						*/
 	DRIVER( genesis )	/* 1989 Sega Genesis (USA)							*/
-	DRIVER( gensvp )	/* 1993 Sega Genesis (USA w/SVP chip)					*/
+	DRIVER( gensvp )	/* 1993 Sega Genesis (USA w/SVP chip)				*/
 	DRIVER( megadriv )	/* 1990 Sega Mega Drive (Europe)					*/
 
 	DRIVER( saturnjp )	/* 1994 Sega Saturn (Japan)							*/
@@ -125,7 +129,7 @@ const game_driver *const test_drivers[] =
 	DRIVER( dcjp )		/* 1998 Sega Dreamcast (Japan) */
 	DRIVER( dc )		/* 1999 Sega Dreamcast (USA) */
 	DRIVER( dceu )		/* 1999 Sega Dreamcast (Europe) */
-	DRIVER( dcdev )		/* 1998 Sega HKT-0120 Sega Dreamcast Development Box 					*/
+	DRIVER( dcdev )		/* 1998 Sega HKT-0120 Sega Dreamcast Development Box */
 
 	/* BALLY */
 	DRIVER( astrocde )	/* Bally Astrocade									*/
@@ -143,6 +147,9 @@ TESTDRIVER( m9016tc )	/* 1978 Mustang 9016 Telespiel Computer				*/
 	DRIVER( coleco )	/* ColecoVision (Original BIOS)						*/
 	DRIVER( colecoa )	/* ColecoVision (Thick Characters)					*/
 	DRIVER( colecob )	/* Spectravideo SVI-603 Coleco Game Adapter			*/
+	DRIVER( czz50 )		/* Bit Corporation Chuang Zao Zhe 50				*/
+	DRIVER( dina )		/* Telegames Dina									*/
+	DRIVER( prsarcde )	/* Telegames Personal Arcade						*/
 	DRIVER( adam )		/* Coleco Adam										*/
 
 	/* NEC */
@@ -173,7 +180,7 @@ TESTDRIVER( vcg )		/* Palladium Video-Computer-Game					*/
 	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
 
 	/* Hartung, Watara, ...*/
-	DRIVER( gmaster )	/* Hartung Gamemaster */
+	DRIVER( gmaster )	/* Hartung Gamemaster 								*/
 
 	/* WATARA */
 	DRIVER( svision )	/* Supervision Handheld								*/
@@ -193,12 +200,12 @@ TESTDRIVER( vcg )		/* Palladium Video-Computer-Game					*/
 	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
 
 	/* KOEI */
-	DRIVER( pasogo )	/* KOEI PasoGo */
+	DRIVER( pasogo )	/* KOEI PasoGo										*/
 
 
 /****************COMPUTERS***************************************************/
     /* ACORN */
-	DRIVER( acrnsys1 )  /* 1979 Acorn System 1 (Microcomputer Kit)          */
+	DRIVER( acrnsys1 )	/* 1979 Acorn System 1 (Microcomputer Kit)			*/
 	DRIVER( atom )		/* 1979 Acorn Atom									*/
 	DRIVER( atomeb )	/* 1979 Acorn Atom									*/
 	DRIVER( bbca )		/* 1981 BBC Micro Model A							*/
@@ -220,9 +227,9 @@ TESTDRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 	DRIVER( cpc6128f )	/* Amstrad (Schneider in Germany) 1985 (AZERTY)		*/
 	DRIVER( cpc464p )	/* Amstrad CPC464  Plus - 1990						*/
 	DRIVER( cpc6128p )	/* Amstrad CPC6128 Plus - 1990						*/
-	DRIVER( gx4000 )    /* Amstrad GX4000 - 1990                            */
+	DRIVER( gx4000 )	/* Amstrad GX4000 - 1990							*/
 	DRIVER( kccomp )	/* VEB KC compact									*/
-	DRIVER( al520ex )   /* Patisonic Aleste 520EX (1993)                    */
+	DRIVER( al520ex )	/* Patisonic Aleste 520EX (1993)					*/
 	DRIVER( pcw8256 )	/* 198? PCW8256										*/
 	DRIVER( pcw8512 )	/* 198? PCW8512										*/
 	DRIVER( pcw9256 )	/* 198? PCW9256										*/
@@ -376,7 +383,7 @@ TESTDRIVER( c128dita )	/* Commodore 128D - PAL (italian) cost reduced set	*/
 	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/
 	DRIVER( dgone )		/* 1984 Data General/One */
 	DRIVER( pcmda )		/* 1987 PC with MDA									*/
-	DRIVER( pcherc )    /* 1987 PC with Hercules (for testing hercules)		*/
+	DRIVER( pcherc )	/* 1987 PC with Hercules (for testing hercules)		*/
 	DRIVER( pc )		/* 1987 PC with CGA									*/
 TESTDRIVER( bondwell )	/* 1985	Bondwell (CGA)								*/
 	DRIVER( europc )	/* 1988	Schneider Euro PC (CGA or Hercules)			*/
@@ -457,9 +464,9 @@ TESTDRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
 
 	DRIVER( mz700 )		/* 1982 Sharp MZ700									*/
 	DRIVER( mz700j )	/* 1982 Sharp MZ700 Japan							*/
-TESTDRIVER( mz800  )	/* 1982 Sharp MZ800									*/
+TESTDRIVER( mz800 )		/* 1982 Sharp MZ800									*/
 
-	DRIVER( x68000 )    /* Sharp X68000 (1987)								*/
+	DRIVER( x68000 )	/* Sharp X68000 (1987)								*/
 
 	/* SILICON GRAPHICS */
 	DRIVER( ip204415 )	/* IP20 Indigo2										*/
@@ -497,6 +504,9 @@ TESTDRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 	DRIVER( ti83 )		/* 1996 TI-83 (Z80 6 MHz)							*/
 	DRIVER( ti86 )		/* 1997 TI-86 (Z80 6 MHz)							*/
 	DRIVER( ti83p )		/* 1999 TI-83 Plus (Z80 6 MHz)						*/
+//TESTDRIVER( ti83pse )	/* 2001 TI-83 Plus Silver Edition					*/
+//TESTDRIVER( ti84p )	/* 2004 TI-84 Plus									*/
+//TESTDRIVER( ti84pse )	/* 2004 TI-84 Plus Silver Edition					*/
 
 	/* NEC */
 	DRIVER( pc88srl )	/* PC-8801mkIISR(Low res display, VSYNC 15KHz)		*/
@@ -530,7 +540,7 @@ TESTDRIVER( einstei2 )
 TESTDRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 
 	/* MICROBEE SYSTEMS */
-	DRIVER( mbee )		/* Microbee 16 Standard or Plus								*/
+	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
 	DRIVER( mbeeic )	/* Microbee 32 IC									*/
 	DRIVER( mbeepc )	/* Microbee 32 PC									*/
 	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
@@ -624,8 +634,8 @@ TESTDRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
 	DRIVER( svi738 )	/* 1985 MSX											*/
 	DRIVER( hotbit11 )	/* 1985 MSX Brazil									*/
 	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
-	DRIVER( hx10 )		/* 1984 MSX										*/
-	DRIVER( vg8020 )	/* 1985 MSX										*/
+	DRIVER( hx10 )		/* 1984 MSX											*/
+	DRIVER( vg8020 )	/* 1985 MSX											*/
 	DRIVER( expert10 )	/* 1983 MSX Brazil									*/
 	DRIVER( expert11 )	/* 1984 MSX Brazil									*/
 	DRIVER( expertdp )	/* 1985 MSX Brazil									*/
@@ -682,7 +692,7 @@ TESTDRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
 
 
 	/* MILES GORDON TECHNOLOGY */
-	DRIVER( samcoupe )		/* 1989 Sam Coupe									*/
+	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
 
 	/* MOTOROLA */
 TESTDRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
@@ -692,13 +702,14 @@ TESTDRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
 
 	/* MEMOTECH */
 	DRIVER( mtx512 )	/* 1983 Memotech MTX 512							*/
-	DRIVER( mtx500 )    /* 1983 Memotech MTX 500                            */
-	DRIVER( rs128 )     /* 1984 Memotech RS 128                             */
+	DRIVER( mtx500 )	/* 1983 Memotech MTX 500							*/
+	DRIVER( rs128 )		/* 1984 Memotech RS 128								*/
 
 	/* MATTEL */
 	DRIVER( intvkbd )	/* 1981 - Mattel Intellivision Keyboard Component	*/
 						/* (Test marketed, later recalled)					*/
 	DRIVER( aquarius )	/* 1983 Aquarius									*/
+//	DRIVER( aquariu2 )	/* 1984 Aquarius II									*/
 
 	/*EXIDY INC */
 	DRIVER( exidy )		/* Sorcerer											*/
@@ -751,7 +762,8 @@ TESTDRIVER( comquest )	/* Comquest Plus German								*/
 	DRIVER( sv328n80 )	/* SVI-328 (NTSC) + SVI-806 80 column card			*/
 
 	/* Andrew Donald Booth (this is the name of the designer, not a company) */
-	DRIVER( apexc )		/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */
+//	DRIVER( apexc53 )	/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */
+	DRIVER( apexc )		/* 1955(?) APEXC: All-Purpose Electronic X-ray Computer */
 
 	/* Sony */
 	DRIVER( psj )		/* 1994 Sony PlayStation (Japan)					*/
@@ -837,19 +849,19 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( orao103 )
 		
 	/* UT-88 */
-	DRIVER( ut88 )	
-	DRIVER( ut88mini )			
+	DRIVER( ut88 )
+	DRIVER( ut88mini )
 
 	/* Mikro-80 */
 	DRIVER( mikro80 )
 	DRIVER( radio99 )
 
-	/* Specialist */	
-	DRIVER( special )	
+	/* Specialist */
+	DRIVER( special )
 	DRIVER( specialp )
-	DRIVER( lik )	
-	DRIVER( erik )	
-	DRIVER( specimx )	
+	DRIVER( lik )
+	DRIVER( erik )
+	DRIVER( specimx )
 
 	/* Orion */
 	DRIVER( orion128 )
@@ -859,13 +871,13 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( orionpro )
 		
 	/* BK */
-	DRIVER( bk0010 )	
-	DRIVER( bk001001 )		
-	DRIVER( bk0010fd )	
+	DRIVER( bk0010 )
+	DRIVER( bk001001 )
+	DRIVER( bk0010fd )
 		
 	/* Bashkiria-2M */
-	DRIVER( b2m )	
-	DRIVER( b2mrom )		
+	DRIVER( b2m )
+	DRIVER( b2mrom )
 
 	/* Radio-86RK */
 	DRIVER( radio86 )
@@ -884,7 +896,8 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( bw2 )
 
 	/* Exeltel */
-TESTDRIVER( exeltel )	
+//TESTDRIVER( exl100 )
+TESTDRIVER( exeltel )
 
 	/* Comx World Operations Ltd */
 	DRIVER( comx35p )
@@ -902,24 +915,23 @@ TESTDRIVER( comxpl80 )
 	/* Quelle International */
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
 	/* Novag */
-        DRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
+	DRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
 	/* Hegener & Glaser Munich */
-	DRIVER( mm4 )		/* Mephisto 4								*/
-	/* Hegener & Glaser Munich */
-	DRIVER( mm5 )		/* Mephisto 5.1 ROM								*/
-	DRIVER( mm50 )		/* Mephisto 5.0 ROM								*/
-	/* Hegener & Glaser Munich */
-	DRIVER( rebel5 )		/* Mephisto 5								*/
-	DRIVER( glasgow )		/* Glasgow						*/
-	DRIVER( amsterd )		/* Amsterdam							*/
-	DRIVER( dallas )		/* Dallas							*/
-	DRIVER( dallas16 )		/* Dallas							*/
-	DRIVER( dallas32 )		/* Dallas							*/
-TESTDRIVER( roma )			/* Roma							*/
-	DRIVER( roma32 )		/* Roma							*/
+//	DRIVER( mephisto )	/* Mephisto											*/
+	DRIVER( mm4 )		/* Mephisto 4										*/
+	DRIVER( mm5 )		/* Mephisto 5.1 ROM									*/
+	DRIVER( mm50 )		/* Mephisto 5.0 ROM									*/
+	DRIVER( rebel5 )		/* Mephisto 5									*/
+	DRIVER( glasgow )		/* Glasgow										*/
+	DRIVER( amsterd )		/* Amsterdam									*/
+	DRIVER( dallas )		/* Dallas										*/
+	DRIVER( dallas16 )		/* Dallas										*/
+	DRIVER( dallas32 )		/* Dallas										*/
+TESTDRIVER( roma )			/* Roma											*/
+	DRIVER( roma32 )		/* Roma											*/
 
-/*********** Misc **********************************************************/
+/*********** Misc ***********************************************************/
 TESTDRIVER( ex800 )
 
 #endif /* DRIVER_RECURSIVE */
