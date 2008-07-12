@@ -180,10 +180,6 @@
 #include "machine/8042kbdc.h"
 #include "machine/pcshare.h"
 
-#ifdef MESS
-#include "audio/pc.h"
-#endif /* MESS */
-
 
 
 /***************************************************************************
@@ -495,9 +491,6 @@ WRITE8_HANDLER(kbdc8042_8_w)
 
 	case 1:
 		kbdc8042.speaker = data;
-#ifdef MESS
-		pc_sh_speaker(machine, data&3);
-#endif /* MESS */
 		break;
 
 	case 4:
