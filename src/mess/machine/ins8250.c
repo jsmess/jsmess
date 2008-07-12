@@ -404,7 +404,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 			}
 			else
 			{
-				data = ins8250->ier;
+				data = ins8250->ier & 0x0f;
 				COM_LOG(2,"COM_ier_r",("COM \"%s\" $%02x\n", device->tag, data));
             }
             break;
