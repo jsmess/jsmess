@@ -41,6 +41,7 @@
 
 #include "machine/8237dma.h"
 #include "machine/pci.h"
+#include "machine/kb_keytro.h"
 
 /* window resizing with dirtybuffering traping in xmess window */
 
@@ -469,7 +470,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 #endif
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( keytronic_keyboard )
+	MDRV_IMPORT_FROM( kb_keytronic )
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -531,7 +532,7 @@ static MACHINE_DRIVER_START( ibm5162 )
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( keytronic_keyboard )
+	MDRV_IMPORT_FROM( kb_keytronic )
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -600,7 +601,7 @@ static MACHINE_DRIVER_START( ps2m30286 )
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( keytronic_keyboard )
+	MDRV_IMPORT_FROM( kb_keytronic )
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -671,7 +672,7 @@ static MACHINE_DRIVER_START( atvga )
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( keytronic_keyboard )
+	MDRV_IMPORT_FROM( kb_keytronic )
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -739,7 +740,7 @@ static MACHINE_DRIVER_START( at386 )
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( keytronic_keyboard )
+	MDRV_IMPORT_FROM( kb_keytronic )
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 

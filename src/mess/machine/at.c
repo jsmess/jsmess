@@ -484,9 +484,11 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	
 	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
+	/* TODO: Remove hardcoded cpu#2 signals */
 	keyboard_clock = ( data & 0x40 ) ? 1 : 0;
 	cpunum_set_input_line( machine, 2, I8051_INT0_LINE, (data & 0x40 ) ? HOLD_LINE : CLEAR_LINE );
 
+	/* TODO: Remove hardcoded cpu#2 signals */
 	keyboard_data = ( data & 0x80 ) ? 1 : 0;
 	cpunum_set_input_line( machine, 2, I8051_T0_LINE, ( data & 0x80 ) ? HOLD_LINE : CLEAR_LINE );
 }
@@ -597,105 +599,6 @@ WRITE8_HANDLER(at_kbdc8042_w)
 		break;
     }
 }
-
-
-/**********************************************************
- *
- * Keytronic keyboard interface
- *
- **********************************************************/
-
-
-static UINT8	keytronic_p1;
-static UINT8	keytronic_p2;
-static UINT8	keytronic_p3;
-
-
-static READ8_HANDLER( keytronic_p1_r )
-{
-	UINT8 data = keytronic_p1;
-
-	return data;
-}
-
-
-static WRITE8_HANDLER( keytronic_p1_w )
-{
-	logerror("keytronic_p1_w(): write %02x\n", data );
-
-	keytronic_p1 = data;
-}
-
-
-static READ8_HANDLER( keytronic_p2_r )
-{
-	UINT8 data = keytronic_p2;
-
-	return data;
-}
-
-
-static WRITE8_HANDLER( keytronic_p2_w )
-{
-	logerror("keytronic_p2_w(): write %02x\n", data );
-
-	keytronic_p2 = data;
-}
-
-
-static READ8_HANDLER( keytronic_p3_r )
-{
-	UINT8 data = keytronic_p3;
-
-	return data;
-}
-
-
-static WRITE8_HANDLER( keytronic_p3_w )
-{
-	logerror("keytronic_p3_w(): write %02x\n", data );
-
-	keytronic_p3 = data;
-}
-
-
-static READ8_HANDLER( keytronic_data_r )
-{
-	logerror("keytronic_data_r(): read from %04x\n", offset );
-	return 0xFF;
-}
-
-
-static WRITE8_HANDLER( keytronic_data_w )
-{
-	keyboard_data = ( offset & 0x0100 ) ? 1 : 0;
-	keyboard_clock = ( offset & 0x0200 ) ? 1 : 0;
-}
-
-
-static ADDRESS_MAP_START( keytronic_program, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x0FFF )	AM_ROM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( keytronic_data, ADDRESS_SPACE_DATA, 8 )
-	AM_RANGE( 0x0000, 0xFFFF ) AM_READWRITE( keytronic_data_r, keytronic_data_w )
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( keytronic_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE( 0x01, 0x01 )	AM_READWRITE( keytronic_p1_r, keytronic_p1_w )
-	AM_RANGE( 0x02, 0x02 )	AM_READWRITE( keytronic_p2_r, keytronic_p2_w )
-	AM_RANGE( 0x03, 0x03 )	AM_READWRITE( keytronic_p3_r, keytronic_p3_w )
-ADDRESS_MAP_END
-
-
-MACHINE_DRIVER_START( keytronic_keyboard )
-	MDRV_CPU_ADD_TAG( "keytronic_keyboard", I8051, 11060250 )
-	MDRV_CPU_PROGRAM_MAP( keytronic_program, 0 )
-	MDRV_CPU_DATA_MAP( keytronic_data, 0 )
-	MDRV_CPU_IO_MAP( keytronic_io, 0 )
-MACHINE_DRIVER_END
 
 
 /**********************************************************

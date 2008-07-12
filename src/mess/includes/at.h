@@ -24,7 +24,6 @@ READ8_HANDLER( at_page8_r );
 WRITE8_HANDLER( at_page8_w );
 
 MACHINE_DRIVER_EXTERN( at_kbdc8042 );
-MACHINE_DRIVER_EXTERN( keytronic_keyboard );
 
 READ8_HANDLER(at_kbdc8042_r);
 WRITE8_HANDLER(at_kbdc8042_w);
