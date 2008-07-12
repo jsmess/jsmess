@@ -8,32 +8,45 @@ desired protocol can be selected by a switch on the keybaord.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/i8051/i8051.h"
 
-
-static UINT8	kb_keytronic_p1;
-static UINT8	kb_keytronic_p2;
-static UINT8	kb_keytronic_p3;
-static UINT8	kb_clock_signal;
-static UINT8	kb_data_signal;
+static struct {
+	UINT8					p1;
+	UINT8					p2;
+	UINT8					p3;
+	UINT8					clock_signal;
+	UINT8					data_signal;
+	write8_machine_func		clock_callback;
+	write8_machine_func		data_callback;
+} kb_keytronic;
 
 
 /* Write handler which is called when the clock signal may have changed */
-WRITE8_HANDLER( kb_keytronic_set_clock )
+WRITE8_HANDLER( kb_keytronic_set_clock_signal )
 {
-	kb_clock_signal = data;
+	kb_keytronic.clock_signal = data;
+	cpunum_set_input_line( machine, 2, I8051_INT0_LINE, (data & 0x40 ) ? HOLD_LINE : CLEAR_LINE );
 }
 
 
 /* Write handler which is called when the data signal may have changed */
-WRITE8_HANDLER( kb_keytronic_set_data )
+WRITE8_HANDLER( kb_keytronic_set_data_signal )
 {
-	kb_data_signal = data;
+	kb_keytronic.data_signal = data;
+	cpunum_set_input_line( machine, 2, I8051_T0_LINE, ( data & 0x80 ) ? HOLD_LINE : CLEAR_LINE );
+}
+
+
+void kb_keytronic_set_host_interface( write8_machine_func clock_cb, write8_machine_func data_cb )
+{
+	kb_keytronic.clock_callback = clock_cb;
+	kb_keytronic.data_callback = data_cb;
 }
 
 
 static READ8_HANDLER( kb_keytronic_p1_r )
 {
-	UINT8 data = kb_keytronic_p1;
+	UINT8 data = kb_keytronic.p1;
 
 	return data;
 }
@@ -43,13 +56,13 @@ static WRITE8_HANDLER( kb_keytronic_p1_w )
 {
 	logerror("kb_keytronic_p1_w(): write %02x\n", data );
 
-	kb_keytronic_p1 = data;
+	kb_keytronic.p1 = data;
 }
 
 
 static READ8_HANDLER( kb_keytronic_p2_r )
 {
-	UINT8 data = kb_keytronic_p2;
+	UINT8 data = kb_keytronic.p2;
 
 	return data;
 }
@@ -59,13 +72,13 @@ static WRITE8_HANDLER( kb_keytronic_p2_w )
 {
 	logerror("kb_keytronic_p2_w(): write %02x\n", data );
 
-	kb_keytronic_p2 = data;
+	kb_keytronic.p2 = data;
 }
 
 
 static READ8_HANDLER( kb_keytronic_p3_r )
 {
-	UINT8 data = kb_keytronic_p3;
+	UINT8 data = kb_keytronic.p3;
 
 	return data;
 }
@@ -75,7 +88,7 @@ static WRITE8_HANDLER( kb_keytronic_p3_w )
 {
 	logerror("kb_keytronic_p3_w(): write %02x\n", data );
 
-	kb_keytronic_p3 = data;
+	kb_keytronic.p3 = data;
 }
 
 
@@ -88,8 +101,11 @@ static READ8_HANDLER( kb_keytronic_data_r )
 
 static WRITE8_HANDLER( kb_keytronic_data_w )
 {
-	kb_data_signal = ( offset & 0x0100 ) ? 1 : 0;
-	kb_clock_signal = ( offset & 0x0200 ) ? 1 : 0;
+	kb_keytronic.data_signal = ( offset & 0x0100 ) ? 1 : 0;
+	kb_keytronic.clock_signal = ( offset & 0x0200 ) ? 1 : 0;
+
+	kb_keytronic.data_callback( machine, 0, kb_keytronic.data_signal );
+	kb_keytronic.clock_callback( machine, 0, kb_keytronic.clock_signal );
 }
 
 

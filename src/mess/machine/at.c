@@ -32,7 +32,7 @@
 #include "machine/pc_hdc.h"
 #include "includes/pc_mouse.h"
 
-#include "cpu/i8051/i8051.h"
+#include "machine/kb_keytro.h"
 
 #define LOG_PORT80	0
 #define LOG_KBDC	0
@@ -457,10 +457,14 @@ static int at_get_out2(running_machine *machine) {
  *
  **********************************************************/
 
-static UINT8	kbdc8042_speaker;
-static UINT8	kbdc8042_offset1 = 0xFF;
-static UINT8	keyboard_clock;
-static UINT8	keyboard_data;
+static struct {
+	UINT8					speaker;
+	UINT8					offset1;
+	UINT8					clock_signal;
+	UINT8					data_signal;
+	write8_machine_func		clock_callback;
+	write8_machine_func		data_callback;
+} at_kbdc8042;
 
 
 static READ8_HANDLER( at_kbdc8042_p1_r )
@@ -484,25 +488,43 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	
 	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
-	/* TODO: Remove hardcoded cpu#2 signals */
-	keyboard_clock = ( data & 0x40 ) ? 1 : 0;
-	cpunum_set_input_line( machine, 2, I8051_INT0_LINE, (data & 0x40 ) ? HOLD_LINE : CLEAR_LINE );
+	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 1 : 0;
+	at_kbdc8042.data_signal = ( data & 0x80 ) ? 1 : 0;
 
-	/* TODO: Remove hardcoded cpu#2 signals */
-	keyboard_data = ( data & 0x80 ) ? 1 : 0;
-	cpunum_set_input_line( machine, 2, I8051_T0_LINE, ( data & 0x80 ) ? HOLD_LINE : CLEAR_LINE );
+	at_kbdc8042.data_callback( machine, 0, at_kbdc8042.data_signal );
+	at_kbdc8042.clock_callback( machine, 0, at_kbdc8042.clock_signal );
 }
 
 
 static READ8_HANDLER( at_kbdc8042_t0_r )
 {
-	return keyboard_clock;
+	return at_kbdc8042.clock_signal;
 }
 
 
 static READ8_HANDLER( at_kbdc8042_t1_r )
 {
-	return keyboard_data;
+	return at_kbdc8042.data_signal;
+}
+
+
+static WRITE8_HANDLER( at_kbdc8042_set_clock_signal )
+{
+	at_kbdc8042.clock_signal = data;
+}
+
+
+static WRITE8_HANDLER( at_kbdc8042_set_data_signal )
+{
+	at_kbdc8042.data_signal = data;
+}
+
+
+static void at_kbdc8042_set_keyboard_interface( write8_machine_func clock_cb, write8_machine_func data_cb )
+{
+	at_kbdc8042.offset1 = 0xFF;
+	at_kbdc8042.clock_callback = clock_cb;
+	at_kbdc8042.data_callback = data_cb;
 }
 
 
@@ -543,16 +565,16 @@ READ8_HANDLER(at_kbdc8042_r)
 		break;
 
 	case 1:
-		data = kbdc8042_speaker;
+		data = at_kbdc8042.speaker;
 		data &= ~0xc0; /* AT BIOS don't likes this being set */
 
 		/* This needs fixing/updating not sure what this is meant to fix */
 		if ( --poll_delay < 0 )
 		{
 			poll_delay = 3;
-			kbdc8042_offset1 ^= 0x10;
+			at_kbdc8042.offset1 ^= 0x10;
 		}
-		data = (data & ~0x10) | ( kbdc8042_offset1 & 0x10 );
+		data = (data & ~0x10) | ( at_kbdc8042.offset1 & 0x10 );
 
 		if ( pit8253_get_output(at_devices.pit8254, 2 ) )
 			data |= 0x20;
@@ -589,7 +611,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 		break;
 
 	case 1:
-		kbdc8042_speaker = data;
+		at_kbdc8042.speaker = data;
 		pit8253_gate_w( at_devices.pit8254, 2, data & 1);
 		at_speaker_set_spkrdata( data & 0x02 );
 		break;
@@ -615,6 +637,10 @@ DRIVER_INIT( atcga )
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(machine, &at8042);
+
+	/* Attach keyboard to the keyboard controller */
+	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
+	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
@@ -635,6 +661,10 @@ DRIVER_INIT( atega )
 	{
 		*dst++ = *src--;
 	}
+
+	/* Attach keyboard to the keyboard controller */
+	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
+	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
@@ -646,6 +676,10 @@ DRIVER_INIT( at386 )
 		KBDC8042_AT386, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(machine, &at8042);
+
+	/* Attach keyboard to the keyboard controller */
+	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
+	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
@@ -699,6 +733,10 @@ DRIVER_INIT( at_vga )
 	init_at_common(machine, &at8042);
 	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
+
+	/* Attach keyboard to the keyboard controller */
+	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
+	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
@@ -712,6 +750,10 @@ DRIVER_INIT( ps2m30286 )
 	init_at_common(machine, &at8042);
 	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
+
+	/* Attach keyboard to the keyboard controller */
+	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
+	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
