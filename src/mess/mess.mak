@@ -795,7 +795,6 @@ $(MESSOBJ)/bally.a:    \
 $(MESSOBJ)/pcshare.a:					\
 	$(MAME_MACHINE)/pcshare.o	\
 	$(MESS_MACHINE)/pc_turbo.o	\
-	$(MESS_AUDIO)/pc.o		\
 	$(MESS_AUDIO)/sblaster.o	\
 	$(MESS_MACHINE)/pc_fdc.o	\
 	$(MESS_MACHINE)/pc_hdc.o	\
