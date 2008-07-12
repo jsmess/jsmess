@@ -8,7 +8,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-- [IBM5170] Added support for the 8042 keybaord controller dumped
+- [IBM5170] Added support for the 8042 keyboard controller dumped
   by Kevtris.  [Wilbert Pol]
 
 
