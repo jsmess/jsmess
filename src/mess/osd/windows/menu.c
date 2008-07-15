@@ -81,11 +81,6 @@ enum
 	DEVOPTION_MAX
 };
 
-#ifdef ENABLE_DEBUGGER
-#define HAS_DEBUGGER	1
-#else
-#define HAS_DEBUGGER	0
-#endif
 #ifdef MAME_PROFILER
 #define HAS_PROFILER	1
 #else
@@ -1771,11 +1766,9 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			break;
 #endif // HAS_PROFILER
 
-#if HAS_DEBUGGER
 		case ID_OPTIONS_DEBUGGER:
-			debug_halt_on_next_instruction();
+			debug_cpu_halt_on_next_instruction(machine);
 			break;
-#endif // HAS_DEBUGGER
 
 		case ID_OPTIONS_CONFIGURATION:
 			customize_configuration(machine, wnd);
@@ -2007,7 +2000,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 	DeleteMenu(menu_bar, ID_OPTIONS_PROFILER, MF_BYCOMMAND);
 #endif
 
-	if (!HAS_DEBUGGER || ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0))
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 		DeleteMenu(menu_bar, ID_OPTIONS_DEBUGGER, MF_BYCOMMAND);
 
 #if !HAS_TOGGLEFULLSCREEN

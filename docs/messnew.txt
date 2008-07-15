@@ -15,7 +15,8 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-(none)
+- [Windows] Ensured that the "Debugger..." menu item is always present when
+  the debugger is enabled in the New UI.  (bug #1636) [Nate Woods]
 
 
 
