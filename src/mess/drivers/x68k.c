@@ -84,7 +84,7 @@
 
     PPI : Joystick controls work okay.
 
-    HDC/HDD : SASI and SCSI are not implemented, not a requirement at this point.
+    HDC/HDD : SCSI is not implemented, not a requirement at this point.
 
     RTC : Seems to work. (Tested using SX-Window's Timer application)
 
@@ -375,13 +375,19 @@ static void x68k_keyboard_ctrl_w(int data)
 
 	if(data & 0x80)  // LED status
 	{
-		// do nothing for now
+		output_set_value("key_led_kana",data & 0x01);
+		output_set_value("key_led_romaji",data & 0x02);
+		output_set_value("key_led_code",data & 0x04);
+		output_set_value("key_led_caps",data & 0x08);
+		output_set_value("key_led_insert",data & 0x10);
+		output_set_value("key_led_hiragana",data & 0x20);
+		output_set_value("key_led_fullsize",data & 0x40);
 		logerror("KB: LED status set to %02x\n",data & 0x7f);
 	}
 
 	if((data & 0xc0) == 0)  // TV control
 	{
-		// again, nothing for now
+		// nothing for now
 	}
 
 	if((data & 0xf8) == 0x48)  // Keyboard enable
@@ -703,6 +709,8 @@ static WRITE16_HANDLER( x68k_fdc_w )
 			{
 				sys.fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
 				sys.fdc.led_eject[drive] = data & 0x40;  // eject button LED
+				output_set_indexed_value("ctrl_drv",drive,data & 0x80);
+				output_set_indexed_value("eject_drv",drive,data & 0x40);
 				if(data & 0x20)  // ejects disk
 				{
 					image_unload(image_from_devtype_and_index(IO_FLOPPY, drive));
@@ -717,6 +725,8 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		sys.fdc.media_density[data & 0x03] = data & 0x10;
 		sys.fdc.motor[data & 0x03] = data & 0x80;
 		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, data & 0x03), (data & 0x80));
+		/* set drive access LED outputs */
+		output_set_indexed_value("access_drv",data & 0x03,data & 0x80);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0),1,1);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1),1,1);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 2),1,1);
@@ -1872,6 +1882,15 @@ static void x68k_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 {
 	switch(state)
 	{
+	case MESS_DEVINFO_INT_READABLE:
+		info->i = 1;
+		break;
+	case MESS_DEVINFO_INT_WRITEABLE:
+		info->i = 1;
+		break;
+	case MESS_DEVINFO_INT_CREATABLE:
+		info->i = 0;
+		break;
 	case MESS_DEVINFO_INT_COUNT:
 		info->i = 4;
 		break;
