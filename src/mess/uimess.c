@@ -12,8 +12,18 @@
 #include "uimess.h"
 #include "input.h"
 
-//int mess_pause_for_ui = 0;
+
+/***************************************************************************
+    LOCAL VARIABLES
+***************************************************************************/
+
 static int ui_active = 0;
+
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 int mess_ui_active(void)
 {
@@ -160,6 +170,11 @@ int ui_sprintf_image_info(running_machine *machine, char *buf)
 
 
 
+/*-------------------------------------------------
+    ui_menu_image_info - menu that shows info on
+	all loaded images
+-------------------------------------------------*/
+
 UINT32 ui_menu_image_info(running_machine *machine, UINT32 state)
 {
 	char buf[2048];
@@ -182,6 +197,11 @@ UINT32 ui_menu_image_info(running_machine *machine, UINT32 state)
 
 
 
+/*-------------------------------------------------
+    mess_use_new_ui - determines if the "new ui"
+	is in use
+-------------------------------------------------*/
+
 int mess_use_new_ui(void)
 {
 #if (defined(WIN32) || defined(_MSC_VER)) && !defined(SDLMAME_WIN32)
@@ -192,6 +212,11 @@ int mess_use_new_ui(void)
 }
 
 
+
+/*-------------------------------------------------
+    mess_disable_builtin_ui - function to determine
+	if the builtin UI should be disabled
+-------------------------------------------------*/
 
 int mess_disable_builtin_ui(running_machine *machine)
 {

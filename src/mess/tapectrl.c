@@ -19,28 +19,37 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config *img, int *curpos, int *endpos)
+/*-------------------------------------------------
+    tapecontrol_gettime - returns a textual
+	representation of the time
+-------------------------------------------------*/
+
+astring *tapecontrol_gettime(astring *dest, const device_config *device, int *curpos, int *endpos)
 {
 	double t0, t1;
 
-	t0 = cassette_get_position(img);
-	t1 = cassette_get_length(img);
+	t0 = cassette_get_position(device);
+	t1 = cassette_get_length(device);
 
 	if (t1)
-		snprintf(timepos, timepos_size, "%04d/%04d", (int) t0, (int) t1);
+		astring_printf(dest, "%04d/%04d", (int) t0, (int) t1);
 	else
-		snprintf(timepos, timepos_size, "%04d/%04d", 0, (int) t1);
+		astring_printf(dest, "%04d/%04d", 0, (int) t1);
 
-	if (curpos)
+	if (curpos != NULL)
 		*curpos = t0;
-	if (endpos)
+	if (endpos != NULL)
 		*endpos = t1;
+
+	return dest;
 }
+
+
 
 static int tapecontrol(running_machine *machine, int selected)
 {
 	static int id = 0;
-	char timepos[32];
+	astring *timepos = astring_alloc();
 	ui_menu_item menu_item[40];
 	char name[64];
 	const device_config *img;
@@ -78,7 +87,7 @@ static int tapecontrol(running_machine *machine, int selected)
 	menu_item[total].flags = 0;
 	total++;
 
-	tapecontrol_gettime(timepos, sizeof(timepos) / sizeof(timepos[0]), img, NULL, NULL);
+	tapecontrol_gettime(timepos, img, NULL, NULL);
 
 	state = cassette_get_state(img);
 	menu_item[total].text =
@@ -90,7 +99,7 @@ static int tapecontrol(running_machine *machine, int selected)
 					: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? UI_recording : UI_recording_inhibited)
 					));
 
-	menu_item[total].subtext = timepos;
+	menu_item[total].subtext = astring_c(timepos);
 	menu_item[total].flags = 0;
 	total++;
 
@@ -214,12 +223,13 @@ static int tapecontrol(running_machine *machine, int selected)
 	if (input_ui_pressed(machine, IPT_UI_CONFIGURE))
 		sel = -2;
 
+	astring_free(timepos);
 	return sel + 1;
 }
 
 
 /*-------------------------------------------------
-    menu_tape_control - MESS-specific menu
+    menu_tape_control - main tape control menu
 -------------------------------------------------*/
 
 UINT32 menu_tape_control(running_machine *machine, UINT32 state)

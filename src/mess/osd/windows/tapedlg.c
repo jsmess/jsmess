@@ -60,7 +60,7 @@ static void CALLBACK tapedialog_timerproc(HWND dialog, UINT msg, UINT_PTR ideven
 	struct tape_dialog *dlg;
 	int id;
 	int curpos, endpos;
-	char tapestatus[32];
+	astring *tapestatus = astring_alloc();
 	const device_config *img;
 
 	dlg = get_tapedialog(dialog);
@@ -68,14 +68,15 @@ static void CALLBACK tapedialog_timerproc(HWND dialog, UINT msg, UINT_PTR ideven
 
 	img = image_from_devtype_and_index(IO_CASSETTE, id);
 
-	tapecontrol_gettime(tapestatus, sizeof(tapestatus) / sizeof(tapestatus[0]),
-		img, &curpos, &endpos);
+	tapecontrol_gettime(tapestatus, img, &curpos, &endpos);
 
 	SendMessage(dlg->slider, TBM_SETRANGEMIN, FALSE, 0);
 	SendMessage(dlg->slider, TBM_SETRANGEMAX, FALSE, endpos);
 	SendMessage(dlg->slider, TBM_SETPOS, TRUE, curpos);
 
-	win_set_window_text_utf8(dlg->status, tapestatus);
+	win_set_window_text_utf8(dlg->status, astring_c(tapestatus));
+
+	astring_free(tapestatus);
 }
 
 //============================================================

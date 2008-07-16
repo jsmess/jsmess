@@ -10,6 +10,7 @@
 #define UIMESS_H
 
 #include "ui.h"
+#include "uimenu.h"
 
 int mess_ui_active(void);
 void mess_ui_update(running_machine *machine);
@@ -25,7 +26,7 @@ UINT32 menu_file_manager(running_machine *machine, UINT32 state);
 
 /* tape control */
 UINT32 menu_tape_control(running_machine *machine, UINT32 state);
-void tapecontrol_gettime(char *timepos, size_t timepos_size, const device_config *img, int *curpos, int *endpos);
+astring *tapecontrol_gettime(astring *dest, const device_config *device, int *curpos, int *endpos);
 
 /* paste */
 void ui_paste(running_machine *machine);
