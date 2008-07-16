@@ -19,9 +19,7 @@
 #include "render.h"
 #include "messopts.h"
 
-#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
-#endif /* ENABLE_DEBUGGER */
 
 
 /***************************************************************************
@@ -971,7 +969,6 @@ static void command_verify_image(running_machine *machine)
 
 static void command_trace(running_machine *machine)
 {
-#ifdef ENABLE_DEBUGGER
 	int cpunum;
 	FILE *file;
 	char filename[256];
@@ -991,10 +988,6 @@ static void command_trace(running_machine *machine)
 			fclose(file);
 		}
 	}
-#else
-	state = STATE_ABORTED;
-	report_message(MSG_FAILURE, "Cannot trace; debugger not present");
-#endif
 }
 
 

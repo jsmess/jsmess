@@ -69,6 +69,9 @@
 #include "machine/wd17xx.h"
 #include "includes/crtc6845.h"
 
+#include "debug/debugcpu.h"
+#include "debug/debugcon.h"
+
 static UINT8 *system_rom;
 
 #define VERBOSE 0
@@ -85,19 +88,13 @@ static UINT8 *system_rom;
 #define LOG_INTS(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-
-#ifdef ENABLE_DEBUGGER
-#include "debug/debugcpu.h"
-#include "debug/debugcon.h"
-#endif /* ENABLE_DEBUGGER */
-
-#ifdef ENABLE_DEBUGGER
+/* Debugging commands and handlers. */
 static offs_t dgnbeta_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 static void ToggleDatLog(int ref, int params, const char *param[]);
 static void DumpKeys(int ref, int params, const char *param[]);
 
+/* Debugging variables */
 static int LogDatWrites;
-#endif /* ENABLE_DEBUGGER */
 
 static READ8_HANDLER(d_pia0_pa_r);
 static WRITE8_HANDLER(d_pia0_pa_w);
@@ -262,10 +259,8 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 			if (!IsIOPage(Page))
 			{
 				readbank = &mess_ram[MapPage*RamPageSize];
-#ifdef ENABLE_DEBUGGER
 				if(LogDatWrites)
 					debug_console_printf("Mapping page %X, pageno=%X, mess_ram[%X]\n",Page,MapPage,(MapPage*RamPageSize));
-#endif
 			}
 			else
 			{
@@ -308,9 +303,7 @@ static void SetDefaultTask(running_machine *machine)
 	int		Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
-#ifdef ENABLE_DEBUGGER
 	if (VERBOSE) debug_console_printf("Set Default task\n");
-#endif
 
 	TaskReg=NoPagingTask;
 
@@ -627,9 +620,7 @@ static WRITE8_HANDLER(d_pia0_cb2_w)
 		RowShifter = (RowShifter<<1) | ((d_pia0_pb_last & KOutDat)>>4);
 		RowShifter &= 0x3FF;
 		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",RowShifter,Keyrow));
-#ifdef ENABLE_DEBUGGER
 		if (VERBOSE) debug_console_printf("rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",RowShifter,RowNo,Keyrow);
-#endif
 	}
 
 	d_pia0_cb2_last=data;
@@ -1083,21 +1074,17 @@ MACHINE_START( dgnbeta )
 	init_video(machine);
 
 	wd17xx_init(machine, WD_TYPE_179X,dgnbeta_fdc_callback, NULL);
-#ifdef ENABLE_DEBUGGER
 	cpuintrf_set_dasm_override(0,dgnbeta_dasm_override);
-#endif /* ENABLE_DEBUGGER */
 
 	add_reset_callback(machine, dgnbeta_reset);
 	dgnbeta_reset(machine);
-#ifdef ENABLE_DEBUGGER
 	/* setup debug commands */
-	if (machine->debug_mode)
+	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debug_console_register_command("beta_dat_log", CMDFLAG_NONE, 0, 0, 0,ToggleDatLog);
 		debug_console_register_command("beta_key_dump", CMDFLAG_NONE, 0, 0, 0,DumpKeys);
 	}
 	LogDatWrites=0;
-#endif	/* ENABLE_DEBUGGER */
 }
 
 
@@ -1106,7 +1093,6 @@ MACHINE_START( dgnbeta )
   OS9 Syscalls for disassembly
 ****************************************************************************/
 
-#ifdef ENABLE_DEBUGGER
 
 static const char *const os9syscalls[] =
 {
@@ -1275,7 +1261,6 @@ static offs_t dgnbeta_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom,
 	return result;
 }
 
-#ifdef ENABLE_DEBUGGER
 static void ToggleDatLog(int ref, int params, const char *param[])
 {
 	LogDatWrites=!LogDatWrites;
@@ -1292,6 +1277,3 @@ static void DumpKeys(int ref, int params, const char *param[])
 		debug_console_printf("KeyRow[%d]=%2X\n",Idx,Keyboard[Idx]);
 	}
 }
-#endif
-
-#endif /* ENABLE_DEBUGGER */

@@ -6,11 +6,6 @@
 #include <windows.h>
 #endif
 
-#ifdef ENABLE_DEBUGGER
-#include "cpuintrf.h"
-#include "debug/debugcpu.h"
-#endif /* ENABLE_DEBUGGER */
-
 void osd_set_mastervolume(int attenuation)
 {
 }

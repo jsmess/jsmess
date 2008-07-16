@@ -13,10 +13,8 @@
 #include "inptport.h"
 #include "mame.h"
 
-#ifdef ENABLE_DEBUGGER
 #include "deprecat.h"
 #include "debug/debugcon.h"
-#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -635,11 +633,9 @@ static attotime current_rate;
 static TIMER_CALLBACK(inputx_timerproc);
 
 
-
-#ifdef ENABLE_DEBUGGER
+/*  Debugging commands and handlers. */
 static void execute_input(int ref, int params, const char *param[]);
 static void execute_dumpkbd(int ref, int params, const char *param[]);
-#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -671,13 +667,11 @@ void inputx_init(running_machine *machine)
 	charqueue_empty = NULL;
 	keybuffer = NULL;
 
-#ifdef ENABLE_DEBUGGER
-	if (machine->debug_mode)
+	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debug_console_register_command("input", CMDFLAG_NONE, 0, 1, 1, execute_input);
 		debug_console_register_command("dumpkbd", CMDFLAG_NONE, 0, 0, 1, execute_dumpkbd);
 	}
-#endif /* ENABLE_DEBUGGER */
 
 	/* posting keys directly only makes sense for a computer */
 	if (machine->gamedrv->flags & GAME_COMPUTER)
@@ -1512,12 +1506,10 @@ int input_category_active(running_machine *machine, int category)
 	natural keyboard input
 -------------------------------------------------*/
 
-#ifdef ENABLE_DEBUGGER
 static void execute_input(int ref, int params, const char *param[])
 {
 	inputx_post_coded(Machine, param[0]);
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -1526,7 +1518,6 @@ static void execute_input(int ref, int params, const char *param[])
 	keyboard codes
 -------------------------------------------------*/
 
-#ifdef ENABLE_DEBUGGER
 static void execute_dumpkbd(int ref, int params, const char *param[])
 {
 	const char *filename;
@@ -1593,4 +1584,3 @@ static void execute_dumpkbd(int ref, int params, const char *param[])
 		fclose(file);
 
 }
-#endif /* ENABLE_DEBUGGER */

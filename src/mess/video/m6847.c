@@ -66,10 +66,8 @@
 #include "driver.h"
 #include "m6847.h"
 
-#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
-#endif
 
 
 #define LOG_FS			0
@@ -1456,7 +1454,6 @@ static int get_scanline(void)
 }
 
 
-#ifdef ENABLE_DEBUGGER
 static int get_beamx(void)
 {
 	attotime scanline_time;
@@ -1490,7 +1487,6 @@ static int get_beamx(void)
 	}
 	return result;
 }
-#endif
 
 
 INLINE void prepare_scanline(int xpos)
@@ -1676,7 +1672,6 @@ static TIMER_CALLBACK(fs_rise)
  *
  *************************************/
 
-#ifdef ENABLE_DEBUGGER
 
 static void execute_dumpscanline(int ref, int params, const char **param)
 {
@@ -1702,7 +1697,6 @@ static void execute_dumpscanline(int ref, int params, const char **param)
 	}
 }
 
-#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -1919,11 +1913,9 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 		logerror("\n");
 	}
 
-#ifdef ENABLE_DEBUGGER
 	/* setup debug commands */
-	if (machine->debug_mode)
+	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 		debug_console_register_command("m6847_dumpscanline", CMDFLAG_NONE, 0, 0, 0, execute_dumpscanline);
-#endif /* ENABLE_DEBUGGER */
 }
 
 
