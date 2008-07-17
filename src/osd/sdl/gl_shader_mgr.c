@@ -137,12 +137,12 @@ GLhandleARB glsl_shader_get_program_scrn(int idx)
 	return glsl_scrn_programs[idx];
 }
 
-int glsl_shader_init(sdl_info *sdl)
+glsl_shader_info *glsl_shader_init(void)
 {
 	int i,j, err;
 
         err = gl_shader_loadExtention((PFNGLGETPROCADDRESSOS)SDL_GL_GetProcAddress);
-	if(err) return err;
+	if(err) return NULL;
 	
 	for (i=0; !err && i<GLSL_VERTEX_SHADER_INT_NUMBER; i++)
 	{
@@ -157,7 +157,7 @@ int glsl_shader_init(sdl_info *sdl)
 	#endif
 	}
 
-	if(err) return err;
+	if(err) return NULL;
 
 	for (i=0; !err && i<GLSL_SHADER_TYPE_NUMBER; i++)
 	{
@@ -178,10 +178,11 @@ int glsl_shader_init(sdl_info *sdl)
 		#endif
 		}
 	}
-	return err;
+	if (err) return NULL;
+	return malloc(sizeof(glsl_shader_info *));
 }
 
-int glsl_shader_free(sdl_info *sdl)
+int glsl_shader_free(glsl_shader_info *shinfo)
 {
 	int i,j;
 
@@ -222,10 +223,11 @@ int glsl_shader_free(sdl_info *sdl)
 			(void) gl_delete_shader( &glsl_scrn_programs[i], NULL, NULL);
 	}
 
+	free(shinfo);
 	return 0;
 }
 
-int glsl_shader_add_mamebm(sdl_info *sdl, const char * custShaderPrefix, int idx)
+int glsl_shader_add_mamebm(glsl_shader_info *shinfo, const char * custShaderPrefix, int idx)
 {
 	int i, err;
 	static char fname[8192];
@@ -258,7 +260,7 @@ int glsl_shader_add_mamebm(sdl_info *sdl, const char * custShaderPrefix, int idx
 	return err;
 }
 
-int glsl_shader_add_scrn(sdl_info *sdl, const char * custShaderPrefix, int idx)
+int glsl_shader_add_scrn(glsl_shader_info *shinfo, const char * custShaderPrefix, int idx)
 {
 	int err;
 	static char fname[8192];

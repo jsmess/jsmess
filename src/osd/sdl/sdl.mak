@@ -44,7 +44,7 @@ USE_DISPATCH_GL = 1
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
-# SDL_INSTALL_ROOT = /usr/local/sdl13
+#SDL_INSTALL_ROOT = /usr/local/sdl13
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -243,9 +243,7 @@ OSDCOREOBJS += $(SDLOBJ)/main.o
 SDLMAIN = $(SDLOBJ)/main.o
 
 # at least compile some stubs to link it
-ifdef DEBUG
-OSDOBJS += $(SDLOBJ)/debugwin.o
-endif
+OSDCOREOBJS += $(SDLOBJ)/debugwin.o
 
 LIBS += -lmingw32 -lSDL -lopengl32
 endif	# Win32

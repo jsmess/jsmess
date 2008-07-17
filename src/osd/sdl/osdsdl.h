@@ -93,6 +93,24 @@
 */
 
 //============================================================
+//	System dependent defines
+//============================================================
+
+// Process events in worker thread
+#if defined(SDLMAME_WIN32) || (SDL_VERSION_ATLEAST(1,3,0))
+#define SDLMAME_EVENTS_IN_WORKER_THREAD	(1)
+#else
+#define SDLMAME_EVENTS_IN_WORKER_THREAD	(0)
+#endif
+
+#if defined(SDLMAME_WIN32)
+#define SDLMAME_INIT_IN_WORKER_THREAD	(1)
+#else
+#define SDLMAME_INIT_IN_WORKER_THREAD	(0)
+#endif
+
+
+//============================================================
 //	Defines
 //============================================================
 

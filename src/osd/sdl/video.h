@@ -21,8 +21,6 @@
 #define VIDEO_MODE_SOFT				(0)
 #define VIDEO_MODE_OPENGL			(1)
 
-#define SDL_MULTIMON				(0)
-
 #define VIDEO_YUV_MODE_NONE			(0)
 #define VIDEO_YUV_MODE_YV12			(1)
 #define VIDEO_YUV_MODE_YV12X2		(2)

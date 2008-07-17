@@ -33,6 +33,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debugger.h"
+#include "uiinput.h"
 
 // MAMEOS headers
 #include "debugwin.h"
@@ -489,7 +490,7 @@ void debugwin_update_during_game(void)
 	{
 		// see if the interrupt key is pressed and break if it is
 		temporarily_fake_that_we_are_not_visible = TRUE;
-		if (input_ui_pressed(Machine, IPT_UI_DEBUG_BREAK))
+		if (ui_input_pressed(Machine, IPT_UI_DEBUG_BREAK))
 		{
 			debugwin_info *info;
 			HIViewRef	focuswnd;
@@ -1201,19 +1202,31 @@ static void debug_view_update(debug_view *view)
 		// fill out the scroll info struct for the vertical scrollbar
 		if ( show_vscroll )
 		{
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 			HIViewSetMinimum(info->vscroll,0);
 			HIViewSetMaximum(info->vscroll,total_rows-visible_rows);
 			HIViewSetValue(info->vscroll,top_row);
 			HIViewSetViewSize(info->vscroll,visible_rows);
+#else // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+			SetControl32BitMinimum(info->vscroll,0);
+			SetControl32BitMaximum(info->vscroll,total_rows-visible_rows);
+			SetControl32BitValue(info->vscroll,top_row);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 		}
 		
 		// fill out the scroll info struct for the horizontal scrollbar
 		if ( show_hscroll )
 		{
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 			HIViewSetMinimum(info->hscroll,0);
 			HIViewSetMaximum(info->hscroll,total_cols-visible_cols);
 			HIViewSetValue(info->hscroll,left_col);
 			HIViewSetViewSize(info->hscroll,visible_cols);
+#else // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+			SetControl32BitMinimum(info->hscroll,0);
+			SetControl32BitMaximum(info->hscroll,total_cols-visible_cols);
+			SetControl32BitValue(info->hscroll,left_col);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 		}
 
 		// update window info
@@ -1300,8 +1313,13 @@ static void debug_view_process_scroll(HIViewRef inView, ControlPartCode partCode
 	
 	isHorz = (inView == info->hscroll) ? 1 : 0;
 		
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 	maxval = HIViewGetMaximum(inView);
 	result = HIViewGetValue(inView);
+#else // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+	maxval = GetControl32BitMaximum(inView);
+	result = GetControl32BitValue(inView);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 	
 	switch( partCode )
 	{
@@ -1563,13 +1581,23 @@ static OSStatus debug_view_proc(EventHandlerCallRef inHandler, EventRef inEvent,
 				
 				if ( axis == kEventMouseWheelAxisX && info->hscroll != NULL )
 				{
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 					maxval = HIViewGetMaximum(info->hscroll);
 					result = HIViewGetValue(info->hscroll);
+#else // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+					maxval = GetControl32BitMaximum(info->hscroll);
+					result = GetControl32BitValue(info->hscroll);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 				}
 				else if ( axis == kEventMouseWheelAxisY && info->vscroll != NULL )
 				{
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 					maxval = HIViewGetMaximum(info->vscroll);
 					result = HIViewGetValue(info->vscroll);
+#else // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+					maxval = GetControl32BitMaximum(info->vscroll);
+					result = GetControl32BitValue(info->vscroll);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 				}
 				
 				result -= delta;
@@ -2198,9 +2226,15 @@ static void memory_create_window(void)
 	}
 	
 	SetControlData(info->otherwnd[0], kControlEntireControl, kControlPopupButtonOwnedMenuRefTag, sizeof(popupmenu),&popupmenu);
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 	HIViewSetMinimum(info->otherwnd[0], 1);
 	HIViewSetMaximum(info->otherwnd[0], CountMenuItems(popupmenu));
 	HIViewSetValue(info->otherwnd[0],cursel);
+#else // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+	SetControl32BitMinimum(info->otherwnd[0], 1);
+	SetControl32BitMaximum(info->otherwnd[0], CountMenuItems(popupmenu));
+	SetControl32BitValue(info->otherwnd[0],cursel);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 
 	// set the child functions
 	info->recompute_children = memory_recompute_children;
@@ -2370,7 +2404,11 @@ static int memory_handle_command(debugwin_info *info, EventRef inEvent)
 	{
 		case OSX_POPUP_COMMAND:
 		{
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 			int	sel = HIViewGetValue(info->otherwnd[0]);
+#else // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+			int	sel = GetControl32BitValue(info->otherwnd[0]);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 			
 			if ( sel > 0 )
 			{
@@ -2692,9 +2730,15 @@ static void disasm_create_window(void)
 	}
 	
 	SetControlData(info->otherwnd[0], kControlEntireControl, kControlPopupButtonOwnedMenuRefTag, sizeof(popupmenu),&popupmenu);
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 	HIViewSetMinimum(info->otherwnd[0], 1);
 	HIViewSetMaximum(info->otherwnd[0], CountMenuItems(popupmenu));
 	HIViewSetValue(info->otherwnd[0],cursel);
+#else // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+	SetControl32BitMinimum(info->otherwnd[0], 1);
+	SetControl32BitMaximum(info->otherwnd[0], CountMenuItems(popupmenu));
+	SetControl32BitValue(info->otherwnd[0],cursel);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 	
 	// set the child functions
 	info->recompute_children = disasm_recompute_children;
@@ -2861,7 +2905,11 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent)
 	{
 		case OSX_POPUP_COMMAND:
 		{
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 			int	sel = HIViewGetValue(info->otherwnd[0]);
+#else // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+			int	sel = GetControl32BitValue(info->otherwnd[0]);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
 			
 			if ( sel > 0 )
 			{
@@ -3537,7 +3585,7 @@ static int global_handle_key(debugwin_info *info, EventRef inEvent)
 	int ignoreme;
 
 	/* ignore any keys that are received while the debug key is down */
-	ignoreme = input_ui_pressed(Machine, IPT_UI_DEBUG_BREAK);
+	ignoreme = ui_input_pressed(Machine, IPT_UI_DEBUG_BREAK);
 	if (ignoreme)
 		return 1;
 

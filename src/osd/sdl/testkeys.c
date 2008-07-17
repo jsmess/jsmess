@@ -20,6 +20,13 @@
 
 #include "unicode.h"
 
+// Check whether SDL has compat interface
+#if defined(SDL_AllocSurface) || (!SDL_VERSION_ATLEAST(1,3,0))
+#define SDL_HAS_COMPAT 		1
+#else
+#define SDL_HAS_COMPAT 		0
+#endif
+
 typedef struct _key_lookup_table key_lookup_table;
 
 struct _key_lookup_table 
@@ -28,12 +35,14 @@ struct _key_lookup_table
 	const char *name;
 };
 
+#if SDL_HAS_COMPAT
 #if (SDL_VERSION_ATLEAST(1,3,0))
 #define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
 #define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
 #define KE7(A, B, C, D, E, F, G) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G)
 #define KE5(A, B, C, D, E) KE(A) KE(B) KE(C) KE(D) KE(E)
 #define KE3(A, B, C) KE(A) KE(B) KE(C) 
+
 
 static key_lookup_table sdl_lookup[] =
 {
@@ -110,6 +119,7 @@ static const char * lookup_key_name(const key_lookup_table *kt, int kc)
 	}
 	return NULL;
 }
+#endif // SDL_HAS_COMPAT
 
 #ifdef SDLMAME_WIN32
 int utf8_main(int argc, char *argv[])
@@ -117,6 +127,7 @@ int utf8_main(int argc, char *argv[])
 int main(int argc, char *argv[])
 #endif
 {
+#if SDL_HAS_COMPAT
 	SDL_Event event;
 	int quit = 0;
 	char buf[20];
@@ -160,5 +171,9 @@ int main(int argc, char *argv[])
 	}
 	SDL_Quit();
 	return(0);
+#else
+	printf("This SDL Version does not support 1.2 compatibility interface.\n");
+	return(1);
+#endif
 }
 

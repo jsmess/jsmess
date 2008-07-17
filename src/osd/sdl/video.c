@@ -54,6 +54,8 @@
 
 #include "osd_opengl.h"
 
+#include "uiinput.h"
+
 #ifdef MESS
 #include "menu.h"
 #endif
@@ -186,10 +188,19 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	#if defined(SDLMAME_WIN32)	// Win32 version
 	MONITORINFOEX info;
 	info.cbSize = sizeof(info);	
-        GetMonitorInfo((HMONITOR)monitor->handle, (LPMONITORINFO)&info);
+    GetMonitorInfo((HMONITOR)monitor->handle, (LPMONITORINFO)&info);
 	monitor->center_width = monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
 	monitor->center_height = monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
 	strcpy(monitor->monitor_device, info.szDevice);
+	#elif (SDL_VERSION_ATLEAST(1,3,0))
+	SDL_DisplayMode dmode;
+	
+	SDL_SelectVideoDisplay(monitor->handle);
+	SDL_GetDesktopDisplayMode(&dmode);
+	monitor->monitor_width = dmode.w;
+	monitor->monitor_height = dmode.h;
+	monitor->center_width = dmode.w;
+	monitor->center_height = dmode.h;
 	#elif defined(SDLMAME_MACOSX)	// Mac OS X Core Imaging version
 	CGDirectDisplayID primary;
 	CGRect dbounds;
@@ -204,8 +215,6 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
     #elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
 	{
 		#if defined(SDLMAME_X11)
-		//FIXME: The code below fails for SDL1.3
-		#if (!SDL_VERSION_ATLEAST(1,3,0))
 		// X11 version
 		int screen;
 		SDL_SysWMinfo info;
@@ -237,8 +246,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			}
 		}
  		else
-		#endif
- 		#endif
+		#endif // defined(SDLMAME_X11)
 		{
 			static int first_call=0;
 			static int cw, ch;
@@ -251,14 +259,8 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 				
 				sdl_vi = SDL_GetVideoInfo();
 				#if (SDL_VERSION_ATLEAST(1,2,10))
-				//FIXME: File a bug for SDL 1.3
-				#if (SDL_VERSION_ATLEAST(1,3,0))
-				cw = 0;
-				ch = 0;
-				#else
 				cw = sdl_vi->current_w;
 				ch = sdl_vi->current_h;
-				#endif
 				#endif
 				first_call=1;
 				if ((cw==0) || (ch==0))
@@ -293,6 +295,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	#endif
 
 	{
+		//FIXME: Code not really suitable for multiple monitors
 		static int info_shown=0;
 		if (!info_shown) 
 		{
@@ -350,7 +353,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 	{
 		profiler_mark(PROFILER_BLIT);
 		for (window = sdl_window_list; window != NULL; window = window->next)
-			sdlwindow_video_window_update(window);
+			sdlwindow_video_window_update(machine, window);
 		profiler_mark(PROFILER_END);
 	}
 
@@ -365,7 +368,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 //============================================================
 //  add_primary_monitor
 //============================================================
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32) && !(SDL_VERSION_ATLEAST(1,3,0))
 static void add_primary_monitor(void *data)
 {
 	sdl_monitor_info ***tailptr = (sdl_monitor_info ***)data;
@@ -448,6 +451,40 @@ static void init_monitors(void)
 
 	#ifdef SDLMAME_WIN32
 	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)&tailptr);
+	#elif (SDL_VERSION_ATLEAST(1,3,0))
+	{
+		int i;
+
+		for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
+		{
+			sdl_monitor_info *monitor;
+	 		SDL_DisplayMode dmode;
+
+			// allocate a new monitor info
+			monitor = malloc_or_die(sizeof(*monitor));
+			memset(monitor, 0, sizeof(*monitor));
+
+			snprintf(monitor->monitor_device, sizeof(monitor->monitor_device)-1, "%s%d", SDLOPTION_SCREEN(""),i);
+	 	
+			SDL_GetDesktopDisplayMode(&dmode);
+			monitor->monitor_width = dmode.w;
+			monitor->monitor_height = dmode.h;
+			monitor->center_width = dmode.w;
+			monitor->center_height = dmode.h;
+	        monitor->handle = i;
+	        // guess the aspect ratio assuming square pixels
+	        monitor->aspect = (float)(dmode.w) / (float)(dmode.h);
+	        mame_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->monitor_device, dmode.w, dmode.h);
+	        
+	        // save the primary monitor handle
+	        if (i == 0)
+	        	primary_monitor = monitor;
+
+			// hook us into the list
+			*tailptr = monitor;
+			tailptr = &monitor->next;
+		}
+	}
 	#else
 	add_primary_monitor((void *)&tailptr);
 	#endif
@@ -457,31 +494,27 @@ static void init_monitors(void)
 //  pick_monitor
 //============================================================
 
+#if (SDL_VERSION_ATLEAST(1,3,0)) || defined(SDLMAME_WIN32)
 static sdl_monitor_info *pick_monitor(int index)
 {
 	sdl_monitor_info *monitor;
-	#if SDL_MULTIMON || defined(SDLMAME_WIN32)
 	const char *scrname;
 	int moncount = 0;
-	#endif
 	char option[20];
 	float aspect;
 
 	// get the screen option
-	#if SDL_MULTIMON || defined(SDLMAME_WIN32)
 	sprintf(option, SDLOPTION_SCREEN("%d"), index);
 	scrname = options_get_string(mame_options(), option);
-	#endif
 
 	// get the aspect ratio
 	sprintf(option, SDLOPTION_ASPECT("%d"), index);
 	aspect = get_aspect(option, TRUE);
 
 	// look for a match in the name first
-	#if SDL_MULTIMON || defined(SDLMAME_WIN32)
 	if (scrname != NULL)
-                for (monitor = sdl_monitor_list; monitor != NULL; monitor = monitor->next)
-		{
+		for (monitor = sdl_monitor_list; monitor != NULL; monitor = monitor->next)
+		{	
 			moncount++;
 			if (strcmp(scrname, monitor->monitor_device) == 0)
 				goto finishit;
@@ -489,23 +522,41 @@ static sdl_monitor_info *pick_monitor(int index)
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-        for (monitor = sdl_monitor_list; monitor != NULL; monitor = monitor->next)
+    for (monitor = sdl_monitor_list; monitor != NULL; monitor = monitor->next)
 		if (index-- == 0)
 			goto finishit;
-	#endif
 
 	// return the primary just in case all else fails
 	monitor = primary_monitor;
 
-#if SDL_MULTIMON || defined(SDLMAME_WIN32)
 finishit:
-#endif
 	if (aspect != 0)
 	{
 		monitor->aspect = aspect;
 	}
 	return monitor;
 }
+#else
+static sdl_monitor_info *pick_monitor(int index)
+{
+	sdl_monitor_info *monitor;
+	char option[20];
+	float aspect;
+
+	// get the aspect ratio
+	sprintf(option, SDLOPTION_ASPECT("%d"), index);
+	aspect = get_aspect(option, TRUE);
+
+	// return the primary just in case all else fails
+	monitor = primary_monitor;
+
+	if (aspect != 0)
+	{
+		monitor->aspect = aspect;
+	}
+	return monitor;
+}
+#endif
 
 //============================================================
 //  check_osd_inputs
@@ -513,46 +564,47 @@ finishit:
 
 static void check_osd_inputs(running_machine *machine)
 {
-	sdl_window_info *window = sdl_window_list;
+	sdl_window_info *window = sdlinput_get_focus_window(machine);
 
 	// check for toggling fullscreen mode
-	if (input_ui_pressed(machine, IPT_OSD_1))
-		sdlwindow_toggle_full_screen(window);
+	if (ui_input_pressed(machine, IPT_OSD_1))
+		sdlwindow_toggle_full_screen(machine, window);
 	
-	if (input_ui_pressed(machine, IPT_OSD_2))
+	if (ui_input_pressed(machine, IPT_OSD_2))
 	{
 		video_config.fullstretch = !video_config.fullstretch;
 		ui_popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
 	}
 	
-	if (input_ui_pressed(machine, IPT_OSD_4))
+	if (ui_input_pressed(machine, IPT_OSD_4))
 	{
 		video_config.keepaspect = !video_config.keepaspect;
 		ui_popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
 	
-#if USE_OPENGL
-	if (input_ui_pressed(machine, IPT_OSD_5))
+	if (USE_OPENGL)
 	{
-		video_config.filter = !video_config.filter;
-		ui_popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
+		if (ui_input_pressed(machine, IPT_OSD_5))
+		{
+			video_config.filter = !video_config.filter;
+			ui_popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
+		}
 	}
-#endif
 
-	if (input_ui_pressed(machine, IPT_OSD_6))
-		sdlwindow_modify_prescale(window, -1);
+	if (ui_input_pressed(machine, IPT_OSD_6))
+		sdlwindow_modify_prescale(machine, window, -1);
 
-	if (input_ui_pressed(machine, IPT_OSD_7))
-		sdlwindow_modify_prescale(window, 1);
+	if (ui_input_pressed(machine, IPT_OSD_7))
+		sdlwindow_modify_prescale(machine, window, 1);
 
-	if (input_ui_pressed(machine, IPT_OSD_8))
-		sdlwindow_modify_effect(window, -1);
+	if (ui_input_pressed(machine, IPT_OSD_8))
+		sdlwindow_modify_effect(machine, window, -1);
 
-	if (input_ui_pressed(machine, IPT_OSD_9))
-		sdlwindow_modify_effect(window, 1);
+	if (ui_input_pressed(machine, IPT_OSD_9))
+		sdlwindow_modify_effect(machine, window, 1);
 
-	if (input_ui_pressed(machine, IPT_OSD_10))
-		sdlwindow_toggle_draw(window);
+	if (ui_input_pressed(machine, IPT_OSD_10))
+		sdlwindow_toggle_draw(machine, window);
 }
 
 
@@ -605,15 +657,13 @@ static void extract_video_config(running_machine *machine)
 		if (options_get_int(mame_options(), OPTION_SECONDS_TO_RUN) == 0)
 			mame_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
-#if USE_OPENGL
-	else if (strcmp(stemp, SDLOPTVAL_OPENGL) == 0)
+	else if (USE_OPENGL && (strcmp(stemp, SDLOPTVAL_OPENGL) == 0))
 		video_config.mode = VIDEO_MODE_OPENGL;
-	else if (strcmp(stemp, SDLOPTVAL_OPENGL16) == 0)
+	else if (USE_OPENGL && (strcmp(stemp, SDLOPTVAL_OPENGL16) == 0))
 	{
  		video_config.mode = VIDEO_MODE_OPENGL;
  		video_config.prefer16bpp_tex = 1;
 	}
-#endif
 	else
 	{
 		mame_printf_warning("Invalid video value %s; reverting to software\n", stemp);
@@ -717,12 +767,19 @@ static void extract_video_config(running_machine *machine)
 	// misc options: sanity check values
 
 	// global options: sanity check values
+#if (!SDL_VERSION_ATLEAST(1,3,0))
 	if (video_config.numscreens < 1 || video_config.numscreens > 1) //MAX_VIDEO_WINDOWS)
 	{
 		mame_printf_warning("Invalid numscreens value %d; reverting to 1\n", video_config.numscreens);
 		video_config.numscreens = 1;
 	}
-
+#else
+	if (video_config.numscreens < 1 || video_config.numscreens > MAX_VIDEO_WINDOWS)
+	{
+		mame_printf_warning("Invalid numscreens value %d; reverting to 1\n", video_config.numscreens);
+		video_config.numscreens = 1;
+	}
+#endif
 	// yuv settings ...
 	stemp = options_get_string(mame_options(), SDLOPTION_YUVMODE);
 	if (strcmp(stemp, SDLOPTVAL_NONE) == 0)

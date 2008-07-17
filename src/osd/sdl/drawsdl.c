@@ -38,6 +38,32 @@
 //  MACROS
 //============================================================
 
+
+//============================================================
+//  TYPES
+//============================================================
+
+/* sdl_info is the information about SDL for the current screen */
+typedef struct _sdl_info sdl_info;
+struct _sdl_info
+{
+	INT32 				blittimer;
+
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	SDL_TextureID		texture_id;
+#else
+	// SDL surface
+	SDL_Surface 		*sdlsurf;
+	SDL_Overlay 		*yuvsurf;
+#endif
+
+	// YUV overlay
+	UINT32 				*yuv_lookup;
+	UINT16				*yuv_bitmap;
+	int					yuv_ovl_width;
+	int					yuv_ovl_height;
+};
+
 //============================================================
 //  INLINES
 //============================================================
@@ -48,11 +74,16 @@
 
 // core functions
 static void drawsdl_exit(void);
-static int drawsdl_window_init(sdl_window_info *window);
+static int drawsdl_window_create(sdl_window_info *window, int width, int height);
+static void drawsdl_window_resize(sdl_window_info *window, int width, int height);
 static void drawsdl_window_destroy(sdl_window_info *window);
 static const render_primitive_list *drawsdl_window_get_primitives(sdl_window_info *window);
 static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update);
 static void drawsdl_destroy_all_textures(sdl_window_info *window);
+static void drawsdl_window_clear(sdl_window_info *window);
+#if (SDL_VERSION_ATLEAST(1,3,0))
+static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight);
+#endif
 
 // soft rendering
 static void drawsdl_rgb888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
@@ -62,12 +93,18 @@ static void drawsdl_rgb555_draw_primitives(const render_primitive *primlist, voi
 
 // YUV overlays
 
-static void drawsdl_yuv_init(sdl_window_info *window);
-static void yuv_RGB_to_YV12(UINT16 *bitmap, int bw, sdl_window_info *window);
-static void yuv_RGB_to_YV12X2(UINT16 *bitmap, int bw, sdl_window_info *window);
-static void yuv_RGB_to_YUY2(UINT16 *bitmap, int bw, sdl_window_info *window);
-static void yuv_RGB_to_YUY2X2(UINT16 *bitmap, int bw, sdl_window_info *window);
+static void drawsdl_yuv_init(sdl_info *sdl);
+static void yuv_RGB_to_YV12(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch);
+static void yuv_RGB_to_YV12X2(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch);
+static void yuv_RGB_to_YUY2(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch);
+static void yuv_RGB_to_YUY2X2(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch);
 
+// Static declarations
+
+#if (!SDL_VERSION_ATLEAST(1,3,0))
+static int shown_video_info = 0;
+static const char *yuv_mode_names[] = { "none", "yv12", "yv12x2", "yuy2", "yuy2x2" };
+#endif
 
 //============================================================
 //  drawsdl_init
@@ -77,13 +114,15 @@ int drawsdl_init(sdl_draw_callbacks *callbacks)
 {
 	// fill in the callbacks
 	callbacks->exit = drawsdl_exit;
-	callbacks->window_init = drawsdl_window_init;
+	callbacks->window_create = drawsdl_window_create;
+	callbacks->window_resize = drawsdl_window_resize;
 	callbacks->window_get_primitives = drawsdl_window_get_primitives;
 	callbacks->window_draw = drawsdl_window_draw;
 	callbacks->window_destroy = drawsdl_window_destroy;
 	callbacks->window_destroy_all_textures = drawsdl_destroy_all_textures;
+	callbacks->window_clear = drawsdl_window_clear;
 
-	#if SDL_MULTIMON
+	#if SDL_VERSION_ATLEAST(1,3,0)
 	mame_printf_verbose("Using SDL multi-window soft driver (SDL 1.3+)\n");
 	#else
 	mame_printf_verbose("Using SDL single-window soft driver (SDL 1.2)\n");
@@ -109,25 +148,214 @@ static void drawsdl_destroy_all_textures(sdl_window_info *window)
 }
 
 //============================================================
-//  drawsdl_window_init
+//  setup_texture for window
 //============================================================
 
-static int drawsdl_window_init(sdl_window_info *window)
+#if (SDL_VERSION_ATLEAST(1,3,0))
+static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight)
 {
-	sdl_info *sdl;
+	sdl_info *	sdl = window->dxdata;
+	// Determine preferred pixelformat and set up yuv if necessary
+	
+	if (sdl->yuv_bitmap)
+	{
+		free(sdl->yuv_bitmap);
+		sdl->yuv_bitmap = NULL;	
+	}
+	
+	switch (video_config.yuv_mode)
+	{
+		case VIDEO_YUV_MODE_NONE:
+			sdl->texture_id = SDL_CreateTexture(SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, 
+					tempwidth, tempheight);
+			SDL_SetTextureScaleMode(sdl->texture_id, SDL_TEXTURESCALEMODE_NONE);
+			break;
+		case VIDEO_YUV_MODE_YV12: 
+			render_target_get_minimum_size(window->target, &sdl->yuv_ovl_width, &sdl->yuv_ovl_height);
+			sdl->yuv_bitmap = malloc_or_die(sdl->yuv_ovl_width * sdl->yuv_ovl_height * sizeof(UINT16));
+			sdl->texture_id = SDL_CreateTexture(SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, 
+					sdl->yuv_ovl_width, sdl->yuv_ovl_height);
+			//SDL_SetTextureScaleMode(sdl->sdltex, SDL_TEXTURESCALEMODE_FAST);
+			break;
+		case VIDEO_YUV_MODE_YV12X2: 
+			render_target_get_minimum_size(window->target, &sdl->yuv_ovl_width, &sdl->yuv_ovl_height);
+			sdl->yuv_bitmap = malloc_or_die(sdl->yuv_ovl_width * sdl->yuv_ovl_height * sizeof(UINT16));
+			sdl->texture_id = SDL_CreateTexture(SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, 
+					sdl->yuv_ovl_width * 2, sdl->yuv_ovl_height * 2);
+			break;
+		case VIDEO_YUV_MODE_YUY2: 
+			render_target_get_minimum_size(window->target, &sdl->yuv_ovl_width, &sdl->yuv_ovl_height);
+			sdl->yuv_bitmap = malloc_or_die(sdl->yuv_ovl_width * sdl->yuv_ovl_height * sizeof(UINT16));
+			sdl->texture_id = SDL_CreateTexture(SDL_PIXELFORMAT_YUY2, SDL_TEXTUREACCESS_STREAMING, 
+					sdl->yuv_ovl_width, sdl->yuv_ovl_height);
+			break;
+		case VIDEO_YUV_MODE_YUY2X2: 
+			render_target_get_minimum_size(window->target, &sdl->yuv_ovl_width, &sdl->yuv_ovl_height);
+			sdl->yuv_bitmap = malloc_or_die(sdl->yuv_ovl_width * sdl->yuv_ovl_height * sizeof(UINT16));
+			sdl->texture_id = SDL_CreateTexture(SDL_PIXELFORMAT_YUY2, SDL_TEXTUREACCESS_STREAMING, 
+					sdl->yuv_ovl_width * 2, sdl->yuv_ovl_height);
+			break;
+	}
+}
+#endif
+
+//============================================================
+//  yuv_overlay_init
+//============================================================
+
+#if (!SDL_VERSION_ATLEAST(1,3,0))
+static void yuv_overlay_init(sdl_window_info *window)
+{
+	sdl_info *sdl = window->dxdata;
+	int minimum_width, minimum_height;
+
+	render_target_get_minimum_size(window->target, &minimum_width, &minimum_height);
+	if (sdl->yuvsurf != NULL)
+		SDL_FreeYUVOverlay(sdl->yuvsurf);
+	if (sdl->yuv_bitmap != NULL)
+	{
+		free(sdl->yuv_bitmap);	
+	}
+	sdl->yuv_bitmap = malloc_or_die(minimum_width*minimum_height*sizeof(UINT16));
+
+	mame_printf_verbose("SDL: Creating YUV-Overlay ...\n");
+	switch (video_config.yuv_mode)
+	{
+		case VIDEO_YUV_MODE_YV12: 
+			sdl->yuvsurf = SDL_CreateYUVOverlay(minimum_width, minimum_height,
+        			SDL_YV12_OVERLAY, sdl->sdlsurf);
+			break;
+		case VIDEO_YUV_MODE_YV12X2: 
+			sdl->yuvsurf = SDL_CreateYUVOverlay(minimum_width*2, minimum_height*2,
+	      			SDL_YV12_OVERLAY, sdl->sdlsurf);
+			break;
+		case VIDEO_YUV_MODE_YUY2: 
+			sdl->yuvsurf = SDL_CreateYUVOverlay(minimum_width, minimum_height,
+	      			SDL_YUY2_OVERLAY, sdl->sdlsurf);
+			break;
+		case VIDEO_YUV_MODE_YUY2X2: 
+			sdl->yuvsurf = SDL_CreateYUVOverlay(minimum_width*2, minimum_height,
+	      			SDL_YUY2_OVERLAY, sdl->sdlsurf);
+			break;
+	}
+	if ( sdl->yuvsurf == NULL ) {
+		mame_printf_error("SDL: Couldn't create SDL_yuv_overlay: %s\n", SDL_GetError());
+		//return 1;
+	}
+	sdl->yuv_ovl_width = minimum_width;
+	sdl->yuv_ovl_height = minimum_height;
+
+	if (!shown_video_info)
+	{
+		mame_printf_verbose("YUV Mode         : %s\n", yuv_mode_names[video_config.yuv_mode]);
+		mame_printf_verbose("YUV Overlay Size : %d x %d\n", minimum_width, minimum_height);
+		mame_printf_verbose("YUV Acceleration : %s\n", sdl->yuvsurf->hw_overlay ? "Hardware" : "Software");
+		shown_video_info = 1;
+	}
+}
+#endif
+
+//============================================================
+//  drawsdl_window_create
+//============================================================
+
+static int drawsdl_window_create(sdl_window_info *window, int width, int height)
+{
+	sdl_info *sdl = window->dxdata;
 
 	// allocate memory for our structures
 	sdl = malloc(sizeof(*sdl));
 	memset(sdl, 0, sizeof(*sdl));
-	window->dxdata = sdl;
-	window->yuv_lookup = NULL;
-	window->yuv_bitmap = NULL;
-	window->initialized = 0;
-	sdl->totalColors = window->totalColors;
 
-	drawsdl_yuv_init(window);
+	window->dxdata = sdl;
+	
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	window->extra_flags = (window->fullscreen ?  
+			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS : SDL_WINDOW_RESIZABLE);
+	//FIXME: OpenGL in Software
+	/* the following is a workaround for a bug in SDL 1.3
+	 * where creating a renderer will loose keyboard focus
+	 * This happens only if one window is present.
+	 */
+	window->extra_flags |= SDL_WINDOW_OPENGL;
+
+	SDL_SelectVideoDisplay(window->monitor->handle);
+	SDL_SetFullscreenDisplayMode(NULL);	// Use desktop
+	window->window_id = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+			width, height, window->extra_flags);
+	SDL_ShowWindow(window->window_id);
+	SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
+	SDL_RaiseWindow(window->window_id);
+	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
+	
+	// create a texture
+	SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_SINGLEBUFFER | SDL_RENDERER_PRESENTDISCARD);
+    SDL_SelectRenderer(window->window_id);
+	setup_texture(window, width, height);
+#else
+	window->extra_flags = (window->fullscreen ?  SDL_FULLSCREEN : SDL_RESIZABLE);
+	// create the SDL surface (which creates the window in windowed mode)
+	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
+		window->extra_flags |= SDL_DOUBLEBUF;
+
+	sdl->sdlsurf = SDL_SetVideoMode(width, height, 
+				   0, SDL_SWSURFACE | SDL_ANYFORMAT | window->extra_flags);
+
+	if (!sdl->sdlsurf)
+		return 1;
+
+	window->width = sdl->sdlsurf->w;
+	window->height = sdl->sdlsurf->h;
+	
+	if (video_config.yuv_mode != VIDEO_YUV_MODE_NONE)
+	{
+		yuv_overlay_init(window);
+	}
+
+	// set the window title
+	SDL_WM_SetCaption(window->title, "SDLMAME");
+#endif
+	sdl->yuv_lookup = NULL;
+	sdl->blittimer = 0;
+	
+	drawsdl_yuv_init(sdl);
 	return 0;
 }
+
+//============================================================
+//  drawsdl_window_resize
+//============================================================
+
+static void drawsdl_window_resize(sdl_window_info *window, int width, int height)
+{
+	sdl_info *sdl = window->dxdata;
+
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	SDL_SetWindowSize(window->window_id, width, height);
+	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
+
+	// create a texture
+	SDL_SelectRenderer(window->window_id);
+	SDL_DestroyTexture(sdl->texture_id);
+
+	setup_texture(window, window->width, window->height);
+#else
+	SDL_FreeSurface(sdl->sdlsurf);
+	//printf("SetVideoMode %d %d\n", wp->resize_new_width, wp->resize_new_height);
+
+	sdl->sdlsurf = SDL_SetVideoMode(width, height, 0, 
+			SDL_SWSURFACE | SDL_ANYFORMAT | window->extra_flags);
+	window->width = sdl->sdlsurf->w;
+	window->height = sdl->sdlsurf->h;
+
+	if (video_config.yuv_mode != VIDEO_YUV_MODE_NONE)
+	{
+		yuv_overlay_init(window);
+	}
+	
+#endif
+}
+
 
 //============================================================
 //  drawsdl_window_destroy
@@ -141,20 +369,43 @@ static void drawsdl_window_destroy(sdl_window_info *window)
 	if (sdl == NULL)
 		return;
 
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	SDL_SelectRenderer(window->window_id);
+	SDL_DestroyTexture(sdl->texture_id);
+	//SDL_DestroyRenderer(window->window_id);
+	SDL_DestroyWindow(window->window_id);
+#else
+	if (sdl->sdlsurf)
+	{
+		SDL_FreeSurface(sdl->sdlsurf);
+		sdl->sdlsurf = NULL;
+	}
+#endif
 	// free the memory in the window
 
-	free(sdl);
+	if (sdl->yuv_lookup != NULL)
+	{
+		free(sdl->yuv_lookup); 
+		sdl->yuv_lookup = NULL;
+	}
+	if (sdl->yuv_bitmap != NULL)
+	{
+		free(sdl->yuv_bitmap);	
+		sdl->yuv_bitmap = NULL;
+	}
 	window->dxdata = NULL;
-	if (window->yuv_lookup != NULL)
-	{
-		free(window->yuv_lookup); 
-		window->yuv_lookup = NULL;
-	}
-	if (window->yuv_bitmap != NULL)
-	{
-		free(window->yuv_bitmap);	
-		window->yuv_bitmap = NULL;
-	}
+	free(sdl);
+}
+
+//============================================================
+//  drawsdl_window_clear
+//============================================================
+
+static void drawsdl_window_clear(sdl_window_info *window)
+{
+	sdl_info *sdl = window->dxdata;
+	
+	sdl->blittimer = 3;
 }
 
 //============================================================
@@ -164,18 +415,18 @@ static void drawsdl_window_destroy(sdl_window_info *window)
 static const render_primitive_list *drawsdl_window_get_primitives(sdl_window_info *window)
 {
 	sdl_info *sdl = window->dxdata;
-	if ((video_config.windowed) || (video_config.switchres))
+	if ((!window->fullscreen) || (video_config.switchres))
 	{
-		sdlwindow_blit_surface_size(window, window->sdlsurf->w, window->sdlsurf->h);
+		sdlwindow_blit_surface_size(window, window->width, window->height);
 	}
 	else
 	{
 		sdlwindow_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
 	}
 	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
-		render_target_set_bounds(window->target, sdl->blitwidth, sdl->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
+		render_target_set_bounds(window->target, window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
 	else
-		render_target_set_bounds(window->target, window->yuv_ovl_width, window->yuv_ovl_height, 0);
+		render_target_set_bounds(window->target, sdl->yuv_ovl_width, sdl->yuv_ovl_height, 0);
 	return render_target_get_primitives(window->target);
 }
 
@@ -187,8 +438,10 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 {
 	sdl_info *sdl = window->dxdata;
 	UINT8 *surfptr;
+	INT32 pitch;
+	int bpp;
+	Uint32 rmask, gmask, bmask, amask;
 	INT32 vofs, hofs, blitwidth, blitheight, ch, cw;
-	SDL_Rect r;
 
 	if (video_config.novideo)
 	{
@@ -200,31 +453,71 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		return 1;
 
 	// lock it if we need it
-	if (SDL_MUSTLOCK(window->sdlsurf)) SDL_LockSurface(window->sdlsurf);
+#if (!SDL_VERSION_ATLEAST(1,3,0))
+
+	pitch = sdl->sdlsurf->pitch;
+	bpp = sdl->sdlsurf->format->BytesPerPixel;
+	rmask = sdl->sdlsurf->format->Rmask;
+	gmask = sdl->sdlsurf->format->Gmask;
+	bmask = sdl->sdlsurf->format->Bmask;
+	amask = sdl->sdlsurf->format->Amask;
+	
+	if (SDL_MUSTLOCK(sdl->sdlsurf)) SDL_LockSurface(sdl->sdlsurf);
+	// Clear if necessary
+
+	if (sdl->blittimer > 0)
+	{
+		memset(sdl->sdlsurf->pixels, 0, window->height * sdl->sdlsurf->pitch);
+		sdl->blittimer--;
+	}
+
+	
 	if (video_config.yuv_mode != VIDEO_YUV_MODE_NONE)
 	{
-		SDL_LockYUVOverlay(window->yuvsurf);
-		surfptr = (UINT8 *) window->yuv_bitmap;
+		SDL_LockYUVOverlay(sdl->yuvsurf);
+		surfptr = sdl->yuvsurf->pixels[0]; // (UINT8 *) sdl->yuv_bitmap;
+		pitch = sdl->yuvsurf->pitches[0]; // (UINT8 *) sdl->yuv_bitmap;
 	}
 	else
-		surfptr = (UINT8 *)window->sdlsurf->pixels;
+		surfptr = (UINT8 *)sdl->sdlsurf->pixels;
+#else
+	SDL_SelectRenderer(window->window_id);
+	{
+        Uint32 format;
+        int access, w, h;
+		
+        SDL_QueryTexture(sdl->texture_id, &format, &access, &w, &h);
+		SDL_PixelFormatEnumToMasks(format, &bpp, &rmask, &gmask, &bmask, &amask);
+		bpp = bpp / 8; /* convert to bytes per pixels */
+	}
+
+	SDL_LockTexture(sdl->texture_id, NULL, 1, (void **) &surfptr, &pitch);
+	// Clear if necessary
+	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
+		if (sdl->blittimer > 0)
+		{	
+			memset(surfptr, 0, window->height * pitch);
+			sdl->blittimer--;
+		}
+
+#endif
 	// get ready to center the image
 	vofs = hofs = 0;
-	blitwidth = sdl->blitwidth;
-	blitheight = sdl->blitheight;
+	blitwidth = window->blitwidth;
+	blitheight = window->blitheight;
 
 	// figure out what coordinate system to use for centering - in window mode it's always the
 	// SDL surface size.  in fullscreen the surface covers all monitors, so center according to
 	// the first one only
-	if ((!video_config.windowed) && (!video_config.switchres))
+	if ((window->fullscreen) && (!video_config.switchres))
 	{
 		ch = window->monitor->center_height;
 		cw = window->monitor->center_width;
 	}
 	else
 	{
-		ch = window->sdlsurf->h;
-		cw = window->sdlsurf->w;
+		ch = window->height;
+		cw = window->width;
 	}
 
 	// do not crash if the window's smaller than the blit area
@@ -234,7 +527,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	}
 	else if (video_config.centerv)
 	{
-		vofs = (ch - sdl->blitheight) / 2;
+		vofs = (ch - window->blitheight) / 2;
 	}
 
 	if (blitwidth > cw)
@@ -243,7 +536,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	}
 	else if (video_config.centerh)
 	{
-		hofs = (cw - sdl->blitwidth) / 2;
+		hofs = (cw - window->blitwidth) / 2;
 	}
 
 	osd_lock_acquire(window->primlist->lock);
@@ -251,68 +544,94 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	// render to it
 	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
 	{
-		surfptr += ((vofs * window->sdlsurf->pitch) + (hofs * window->sdlsurf->format->BytesPerPixel));
-		switch (window->sdlsurf->format->Rmask)
+		surfptr += ((vofs * pitch) + (hofs * bpp));
+		switch (rmask)
 		{
 			case 0x00ff0000:
-				drawsdl_rgb888_draw_primitives(window->primlist->head, surfptr, blitwidth, blitheight, window->sdlsurf->pitch / 4);
+				drawsdl_rgb888_draw_primitives(window->primlist->head, surfptr, blitwidth, blitheight, pitch / 4);
 				break;
 
 			case 0x000000ff:
-				drawsdl_bgr888_draw_primitives(window->primlist->head, surfptr, blitwidth, blitheight, window->sdlsurf->pitch / 4);
+				drawsdl_bgr888_draw_primitives(window->primlist->head, surfptr, blitwidth, blitheight, pitch / 4);
 				break;
 
 			case 0xf800:
-				drawsdl_rgb565_draw_primitives(window->primlist->head, surfptr, blitwidth, blitheight, window->sdlsurf->pitch / 2);
+				drawsdl_rgb565_draw_primitives(window->primlist->head, surfptr, blitwidth, blitheight, pitch / 2);
 				break;
 
 			case 0x7c00:
-				drawsdl_rgb555_draw_primitives(window->primlist->head, surfptr, blitwidth, blitheight, window->sdlsurf->pitch / 2);
+				drawsdl_rgb555_draw_primitives(window->primlist->head, surfptr, blitwidth, blitheight, pitch / 2);
 				break;
 
 			default:
-				mame_printf_error("SDL: ERROR! Unknown video mode: R=%08X G=%08X B=%08X\n", window->sdlsurf->format->Rmask, window->sdlsurf->format->Gmask, window->sdlsurf->format->Bmask);
+				mame_printf_error("SDL: ERROR! Unknown video mode: R=%08X G=%08X B=%08X\n", rmask, gmask, bmask);
 				break;
 		}
 	} 
 	else
 	{
-		drawsdl_rgb555_draw_primitives(window->primlist->head, surfptr, window->yuv_ovl_width, window->yuv_ovl_height, window->yuv_ovl_width);
+		assert (sdl->yuv_bitmap != NULL);
+		assert (surfptr != NULL);
+		drawsdl_rgb555_draw_primitives(window->primlist->head, sdl->yuv_bitmap, sdl->yuv_ovl_width, sdl->yuv_ovl_height, sdl->yuv_ovl_width);
 		switch (video_config.yuv_mode)
 		{
 			case VIDEO_YUV_MODE_YV12: 
-				yuv_RGB_to_YV12((UINT16 *)surfptr, window->yuv_ovl_width, window);
+				yuv_RGB_to_YV12((UINT16 *)sdl->yuv_bitmap, sdl, surfptr, pitch);
 				break;
 			case VIDEO_YUV_MODE_YV12X2: 
-				yuv_RGB_to_YV12X2((UINT16 *)surfptr, window->yuv_ovl_width, window);
+				yuv_RGB_to_YV12X2((UINT16 *)sdl->yuv_bitmap, sdl, surfptr, pitch);
 				break;
 			case VIDEO_YUV_MODE_YUY2: 
-				yuv_RGB_to_YUY2((UINT16 *)surfptr, window->yuv_ovl_width, window);
+				yuv_RGB_to_YUY2((UINT16 *)sdl->yuv_bitmap, sdl, surfptr, pitch);
 				break;
 			case VIDEO_YUV_MODE_YUY2X2: 
-				yuv_RGB_to_YUY2X2((UINT16 *)surfptr, window->yuv_ovl_width, window);
+				yuv_RGB_to_YUY2X2((UINT16 *)sdl->yuv_bitmap, sdl, surfptr, pitch);
 				break;
 		}
 	}
+
 	osd_lock_release(window->primlist->lock);
 
 	// unlock and flip
-	if (SDL_MUSTLOCK(window->sdlsurf)) SDL_UnlockSurface(window->sdlsurf);
-
+#if (!SDL_VERSION_ATLEAST(1,3,0))
+	if (SDL_MUSTLOCK(sdl->sdlsurf)) SDL_UnlockSurface(sdl->sdlsurf);
 	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
-		SDL_Flip(window->sdlsurf);
+	{
+		SDL_Flip(sdl->sdlsurf);
+	}
 	else
 	{
-		SDL_UnlockYUVOverlay(window->yuvsurf);
+		SDL_Rect r;
+
+		SDL_UnlockYUVOverlay(sdl->yuvsurf);
 		r.x=hofs;
 		r.y=vofs;
 		r.w=blitwidth;
 		r.h=blitheight;
-		SDL_DisplayYUVOverlay(window->yuvsurf, &r);
+		SDL_DisplayYUVOverlay(sdl->yuvsurf, &r);
 	}
+#else
+	SDL_UnlockTexture(sdl->texture_id);
+	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
+	{
+		//SDL_UpdateTexture(sdl->sdltex, NULL, sdl->sdlsurf->pixels, pitch);
+		SDL_RenderCopy(sdl->texture_id, NULL, NULL);
+		SDL_RenderPresent();
+	}
+	else
+	{
+		SDL_Rect r;
+		r.x=hofs;
+		r.y=vofs;
+		r.w=blitwidth;
+		r.h=blitheight;
+		//SDL_UpdateTexture(sdl->sdltex, NULL, sdl->sdlsurf->pixels, pitch);
+		SDL_RenderCopy(sdl->texture_id, NULL, &r);
+		SDL_RenderPresent();
+	}
+#endif
 	return 0;
 }
-
 
 //============================================================
 //  SOFTWARE RENDERING
@@ -403,7 +722,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 #define YMASK  (Y1MASK|Y2MASK)
 #define UVMASK (UMASK|VMASK)
 
-static void yuv_lookup_set(sdl_window_info *window, unsigned int pen, unsigned char red, 
+static void yuv_lookup_set(sdl_info *sdl, unsigned int pen, unsigned char red, 
 			unsigned char green, unsigned char blue)
 {
 	UINT32 y,u,v;
@@ -412,27 +731,27 @@ static void yuv_lookup_set(sdl_window_info *window, unsigned int pen, unsigned c
 
 	/* Storing this data in YUYV order simplifies using the data for
 	   YUY2, both with and without smoothing... */
-	window->yuv_lookup[pen]=(y<<Y1SHIFT)|(u<<USHIFT)|(y<<Y2SHIFT)|(v<<VSHIFT);
+	sdl->yuv_lookup[pen]=(y<<Y1SHIFT)|(u<<USHIFT)|(y<<Y2SHIFT)|(v<<VSHIFT);
 }
 
-static void drawsdl_yuv_init(sdl_window_info *window)
+static void drawsdl_yuv_init(sdl_info *sdl)
 {
 	unsigned char r,g,b;
-	if (window->yuv_lookup == NULL)
-		window->yuv_lookup = malloc_or_die(65536*sizeof(UINT32));
+	if (sdl->yuv_lookup == NULL)
+		sdl->yuv_lookup = malloc_or_die(65536*sizeof(UINT32));
 	for (r = 0; r < 32; r++)
 		for (g = 0; g < 32; g++)
 			for (b = 0; b < 32; b++)
 			{
 				int idx = (r << 10) | (g << 5) | b;
-				yuv_lookup_set(window, idx, 
+				yuv_lookup_set(sdl, idx, 
 					(r << 3) | (r >> 2),
 					(g << 3) | (g >> 2),
 					(b << 3) | (b >> 2));
 			}
 }
 
-static void yuv_RGB_to_YV12(UINT16 *bitmap, int bw, sdl_window_info *window)
+static void yuv_RGB_to_YV12(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch)
 {
 	int x, y;
 	UINT8 *dest_y;
@@ -440,20 +759,24 @@ static void yuv_RGB_to_YV12(UINT16 *bitmap, int bw, sdl_window_info *window)
 	UINT8 *dest_v;
 	UINT16 *src; 
 	UINT16 *src2;
-	UINT32 *lookup = window->yuv_lookup;
-	int yuv_pitch = window->yuvsurf->pitches[0];
+	UINT32 *lookup = sdl->yuv_lookup;
+	UINT8 *pixels[3];
 	int u1,v1,y1,u2,v2,y2,u3,v3,y3,u4,v4,y4;	  /* 12 */
-     
-	for(y=0;y<window->yuv_ovl_height;y+=2)
+    
+	pixels[0] = ptr;
+	pixels[1] = ptr + pitch * sdl->yuv_ovl_height;
+	pixels[2] = pixels[1] + pitch * sdl->yuv_ovl_height / 4;
+		
+	for(y=0;y<sdl->yuv_ovl_height;y+=2)
 	{
-		src=bitmap + (y * bw) ;
-		src2=src + bw;
+		src=bitmap + (y * sdl->yuv_ovl_width) ;
+		src2=src + sdl->yuv_ovl_width;
 
-		dest_y = window->yuvsurf->pixels[0] + y * window->yuvsurf->pitches[0];
-		dest_v = window->yuvsurf->pixels[1] + (y>>1) * window->yuvsurf->pitches[1];
-		dest_u = window->yuvsurf->pixels[2] + (y>>1) * window->yuvsurf->pitches[2];
+		dest_y = pixels[0] + y * pitch;
+		dest_v = pixels[1] + (y>>1) * pitch / 2;
+		dest_u = pixels[2] + (y>>1) * pitch / 2;
 
-		for(x=0;x<window->yuv_ovl_width;x+=2)
+		for(x=0;x<sdl->yuv_ovl_width;x+=2)
 		{
 			v1 = lookup[src[x]];
 			y1 = (v1>>Y1SHIFT) & 0xff;
@@ -476,9 +799,9 @@ static void yuv_RGB_to_YV12(UINT16 *bitmap, int bw, sdl_window_info *window)
 			v4 = (v4>>VSHIFT)  & 0xff;
 
 			dest_y[x] = y1;
-			dest_y[x+yuv_pitch] = y3;
+			dest_y[x+pitch] = y3;
 			dest_y[x+1] = y2;
-			dest_y[x+yuv_pitch+1] = y4;
+			dest_y[x+pitch+1] = y4;
 
 			dest_u[x>>1] = (u1+u2+u3+u4)/4;
 			dest_v[x>>1] = (v1+v2+v3+v4)/4;
@@ -487,7 +810,7 @@ static void yuv_RGB_to_YV12(UINT16 *bitmap, int bw, sdl_window_info *window)
 	}
 }
 
-static void yuv_RGB_to_YV12X2(UINT16 *bitmap, int bw, sdl_window_info *window)
+static void yuv_RGB_to_YV12X2(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch)
 {		
 	/* this one is used when scale==2 */
 	unsigned int x,y;
@@ -495,32 +818,36 @@ static void yuv_RGB_to_YV12X2(UINT16 *bitmap, int bw, sdl_window_info *window)
 	UINT8 *dest_u;
 	UINT8 *dest_v;
 	UINT16 *src;
-	int yuv_pitch = window->yuvsurf->pitches[0];
 	int u1,v1,y1;
+	UINT8 *pixels[3];
 
-	for(y=0;y<window->yuv_ovl_height;y++)
+	pixels[0] = ptr;
+	pixels[1] = ptr + pitch * sdl->yuv_ovl_height * 2;
+	pixels[2] = pixels[1] + pitch * sdl->yuv_ovl_height / 2;
+
+	for(y=0;y<sdl->yuv_ovl_height;y++)
 	{
-		src=bitmap + (y * bw) ;
+		src = bitmap + (y * sdl->yuv_ovl_width) ;
 
-		dest_y = (UINT16 *)(window->yuvsurf->pixels[0] + 2*y * window->yuvsurf->pitches[0]);
-		dest_v = window->yuvsurf->pixels[1] + y * window->yuvsurf->pitches[1];
-		dest_u = window->yuvsurf->pixels[2] + y * window->yuvsurf->pitches[2];
-		for(x=0;x<window->yuv_ovl_width;x++)
+		dest_y = (UINT16 *)(pixels[0] + 2 * y * pitch);
+		dest_v = pixels[1] + y * pitch / 2;
+		dest_u = pixels[2] + y * pitch / 2;
+		for(x=0;x<sdl->yuv_ovl_width;x++)
 		{
-			v1 = window->yuv_lookup[src[x]];
-			y1 = (v1>>Y1SHIFT) & 0xff;
-			u1 = (v1>>USHIFT)  & 0xff;
-			v1 = (v1>>VSHIFT)  & 0xff;
+			v1 = sdl->yuv_lookup[src[x]];
+			y1 = (v1 >> Y1SHIFT) & 0xff;
+			u1 = (v1 >> USHIFT)  & 0xff;
+			v1 = (v1 >> VSHIFT)  & 0xff;
 
-			dest_y[x+yuv_pitch/2]=y1<<8|y1;
-			dest_y[x]=y1<<8|y1;
+			dest_y[x + pitch/2] = y1 << 8 | y1;
+			dest_y[x] = y1 << 8 | y1;
 			dest_u[x] = u1;
 			dest_v[x] = v1;
 		}
 	}
 }
 
-static void yuv_RGB_to_YUY2(UINT16 *bitmap, int bw, sdl_window_info *window)
+static void yuv_RGB_to_YUY2(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch)
 {		
 	/* this one is used when scale==2 */
 	unsigned int y;
@@ -528,15 +855,15 @@ static void yuv_RGB_to_YUY2(UINT16 *bitmap, int bw, sdl_window_info *window)
 	UINT16 *src;
 	UINT16 *end;
 	UINT32 p1,p2,uv;
-	UINT32 *lookup = window->yuv_lookup;
-	int yuv_pitch = window->yuvsurf->pitches[0]/4;
+	UINT32 *lookup = sdl->yuv_lookup;
+	int yuv_pitch = pitch/4;
 
-	for(y=0;y<window->yuv_ovl_height;y++)
+	for(y=0;y<sdl->yuv_ovl_height;y++)
 	{
-		src=bitmap + (y * bw) ;
-		end=src+window->yuv_ovl_width;
+		src=bitmap + (y * sdl->yuv_ovl_width) ;
+		end=src+sdl->yuv_ovl_width;
 
-		dest = (UINT32 *) window->yuvsurf->pixels[0];
+		dest = (UINT32 *) ptr;
 		dest += y * yuv_pitch;
 		for(; src<end; src+=2)
 		{
@@ -549,22 +876,22 @@ static void yuv_RGB_to_YUY2(UINT16 *bitmap, int bw, sdl_window_info *window)
 	}
 }
 
-static void yuv_RGB_to_YUY2X2(UINT16 *bitmap, int bw, sdl_window_info *window)
+static void yuv_RGB_to_YUY2X2(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch)
 {		
 	/* this one is used when scale==2 */
 	unsigned int y;
 	UINT32 *dest;
 	UINT16 *src;
 	UINT16 *end;
-	UINT32 *lookup = window->yuv_lookup;
-	int yuv_pitch = window->yuvsurf->pitches[0]/4;
+	UINT32 *lookup = sdl->yuv_lookup;
+	int yuv_pitch = pitch / 4;
 
-	for(y=0;y<window->yuv_ovl_height;y++)
+	for(y=0;y<sdl->yuv_ovl_height;y++)
 	{
-		src=bitmap + (y * bw) ;
-		end=src+window->yuv_ovl_width;
+		src=bitmap + (y * sdl->yuv_ovl_width) ;
+		end=src+sdl->yuv_ovl_width;
 
-		dest = (UINT32 *) window->yuvsurf->pixels[0];
+		dest = (UINT32 *) ptr;
 		dest += (y * yuv_pitch);
 		for(; src<end; src++)
 		{

@@ -4,13 +4,16 @@
 #include "output.h"
 #include "osdsdl.h"
 
-#if defined(SDLMAME_X11)
+// FIXME: LED support for SDL >= 1.3
+#define LED_SUPPORTED	(defined(SDLMAME_X11) && (!SDL_VERSION_ATLEAST(1,3,0)))	
+
+#if LED_SUPPORTED
 static void led_change_notify(const char *outname, INT32 value, void *param);
 #endif
 
 void sdlled_init(void)
 {
-	#if defined(SDLMAME_X11)
+	#if LED_SUPPORTED
 	SDL_SysWMinfo info;
 	SDL_VERSION(&info.version);
 		
@@ -24,7 +27,7 @@ void sdlled_init(void)
 	#endif
 }
 
-#if defined(SDLMAME_X11)
+#if LED_SUPPORTED
 static void led_change_notify(const char *outname, INT32 value, void *param)
 {
 	XKeyboardControl values;

@@ -64,9 +64,8 @@ static int				buffer_underflows;
 static int				buffer_overflows;
 
 // debugging
-#if LOG_SOUND
-#define sound_log stderr
-#endif
+static FILE *sound_log;
+
 
 // sound enable
 static int snd_enabled;
@@ -89,9 +88,8 @@ static void			sdl_callback(void *userdata, Uint8 *stream, int len);
 //============================================================
 void sdlaudio_init(running_machine *machine)
 {
-#if LOG_SOUND
-	sound_log = fopen(SDL_SOUND_LOG, "w");
-#endif
+	if (LOG_SOUND)
+		sound_log = fopen(SDL_SOUND_LOG, "w");
 
 	// skip if sound disabled
 	if (machine->sample_rate != 0)
@@ -127,11 +125,11 @@ static void sdl_cleanup_audio(running_machine *machine)
 	if (buffer_overflows || buffer_underflows)
 		mame_printf_verbose("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
 
-#if LOG_SOUND
-	if (sound_log)
+	if (LOG_SOUND)
+	{
 		fprintf(sound_log, "Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
-	fclose(sound_log);
-#endif
+		fclose(sound_log);
+	}
 }
 
 //============================================================
@@ -152,12 +150,6 @@ static int lock_buffer(long offset, long size, void **buffer1, long *length1, vo
 			while (((pstart >= lstart) && (pstart <= lend)) ||
 			       ((pend >= lstart) && (pend <= lend)))
 			{
-/*				#ifdef SDLMAME_WIN32
-				Sleep(0);
-				#else
-				sleep(0);
-				#endif*/
-
 				pstart = stream_playpos;
 				pend = pstart + sdl_xfer_samples;
 			}
@@ -185,10 +177,9 @@ static int lock_buffer(long offset, long size, void **buffer1, long *length1, vo
 		*buffer1 = &stream_buffer[offset];
 	}
 
-#if LOG_SOUND
-	fprintf(sound_log, "locking %ld bytes at offset %ld (total %d, playpos %d): len1 %ld len2 %ld\n",
+	if (LOG_SOUND)
+		fprintf(sound_log, "locking %ld bytes at offset %ld (total %d, playpos %d): len1 %ld len2 %ld\n",
 	        size, offset, stream_buffer_size, stream_playpos, *length1, *length2);
-#endif
 
 	return 0;
 }
@@ -202,9 +193,9 @@ static void unlock_buffer(void)
 	if (!buf_locked)
 		SDL_UnlockAudio();
 
-#if LOG_SOUND
-	fprintf(sound_log, "unlocking\n");
-#endif
+	if (LOG_SOUND)
+		fprintf(sound_log, "unlocking\n");
+
 }
 
 //============================================================
@@ -246,9 +237,9 @@ static void copy_sample_data(INT16 *data, int bytes_to_copy)
 	{
 		stream_buffer_in -= stream_buffer_size;
 		stream_loop = 1;
-#if LOG_SOUND
-		fprintf(sound_log, "stream_loop set to 1 (stream_buffer_in looped)\n");
-#endif
+
+		if (LOG_SOUND)
+			fprintf(sound_log, "stream_loop set to 1 (stream_buffer_in looped)\n");
 	}
 
 	// copy the first chunk
@@ -282,26 +273,23 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 	{
 		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
 		int play_position, write_position, stream_in;
-#if LOG_SOUND
-		int orig_write;
-#endif
+		int orig_write; // used in LOG
+		
 		play_position = stream_playpos;
 
 		write_position = stream_playpos + ((machine->sample_rate / 50) * sizeof(INT16) * 2);
-#if LOG_SOUND
 		orig_write = write_position;
-#endif
 
 		if (!stream_in_initialized)
 		{
 			stream_in = stream_buffer_in = (write_position + stream_buffer_size) / 2;
 
-#if LOG_SOUND
-			fprintf(sound_log, "stream_in = %d\n", (int)stream_in);
-			fprintf(sound_log, "stream_playpos = %d\n", (int)stream_playpos);
-			fprintf(sound_log, "write_position = %d\n", (int)write_position);
-#endif
-
+			if (LOG_SOUND)
+			{
+				fprintf(sound_log, "stream_in = %d\n", (int)stream_in);
+				fprintf(sound_log, "stream_playpos = %d\n", (int)stream_playpos);
+				fprintf(sound_log, "write_position = %d\n", (int)write_position);
+			}
 			// start playing
 			SDL_PauseAudio(0);
 
@@ -320,9 +308,9 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 			// if we're between play and write positions, then bump forward, but only in full chunks
 			while (stream_in < write_position)
 			{
-#if LOG_SOUND
-				fprintf(sound_log, "Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
-#endif
+				if (LOG_SOUND)
+					fprintf(sound_log, "Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
+
 				buffer_underflows++;
 				stream_in += samples_this_frame;
 			}
@@ -330,9 +318,9 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 			// if we're going to overlap the play position, just skip this chunk
 			if (stream_in + bytes_this_frame > play_position + stream_buffer_size)
 			{
-#if LOG_SOUND
-				fprintf(sound_log, "Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
-#endif
+				if (LOG_SOUND)
+					fprintf(sound_log, "Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
+
 				buffer_overflows++;
 				return;
 			}
@@ -342,9 +330,10 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 		{
 			stream_in -= stream_buffer_size;
 			stream_loop = 1;
-#if LOG_SOUND
-			fprintf(sound_log, "stream_loop set to 1 (stream_in looped)\n");
-#endif
+			
+			if (LOG_SOUND)
+				fprintf(sound_log, "stream_loop set to 1 (stream_in looped)\n");
+
 		}
 
 		// now we know where to copy; let's do it
@@ -383,9 +372,9 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 
 	if (sb_in < (stream_playpos+len))
 	{
-#if LOG_SOUND
-		fprintf(sound_log, "Underflow at sdl_callback: SPP=%d SBI=%d(%d) Len=%d\n", (int)stream_playpos, (int)sb_in, (int)stream_buffer_in, (int)len);
-#endif
+		if (LOG_SOUND)
+			fprintf(sound_log, "Underflow at sdl_callback: SPP=%d SBI=%d(%d) Len=%d\n", (int)stream_playpos, (int)sb_in, (int)stream_buffer_in, (int)len);
+
 		return;
 	}
 	else if ((stream_playpos+len) > stream_buffer_size)
@@ -421,15 +410,14 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 	{
 		stream_playpos -= stream_buffer_size;
 		stream_loop = 0;
-#if LOG_SOUND
-		fprintf(sound_log, "stream_loop set to 0 (stream_playpos looped)\n");
-#endif
+		
+		if (LOG_SOUND)
+			fprintf(sound_log, "stream_loop set to 0 (stream_playpos looped)\n");
 	}
 
-#if LOG_SOUND
-	fprintf(sound_log, "callback: xfer len1 %d len2 %d, playpos %d\n",
-	        len1, len2, stream_playpos);
-#endif
+	if (LOG_SOUND)
+		fprintf(sound_log, "callback: xfer len1 %d len2 %d, playpos %d\n",
+				len1, len2, stream_playpos);
 }
 
 
@@ -468,7 +456,11 @@ static int sdl_init(running_machine *machine)
 	initialized_audio = 1;
 	snd_enabled = 1;
 
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
+#else
 	SDL_AudioDriverName(audio_driver, sizeof(audio_driver));
+#endif
 	mame_printf_verbose("Audio initialized - driver: %s, frequency: %d, "
 	                    "channels: %d, samples: %d\n", audio_driver,
 	                    obtained.freq, obtained.channels, obtained.samples);

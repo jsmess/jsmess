@@ -32,6 +32,8 @@
 #include "inputx.h"
 #endif
 
+#include "uiinput.h"
+
 // winnt.h defines this
 #ifdef DELETE
 #undef DELETE
@@ -129,26 +131,28 @@ struct _device_info
 static osd_lock *			input_lock;
 static UINT8				input_paused;
 
-#ifdef SDLMAME_WIN32
+static sdl_window_info *	focus_window = NULL;
+
+#if SDLMAME_EVENTS_IN_WORKER_THREAD
 // input buffer
-#define MAX_BUF_EVENTS 			(100)
+#define MAX_BUF_EVENTS 		(100)
 static SDL_Event			event_buf[MAX_BUF_EVENTS];
-static int				event_buf_count;
+static int					event_buf_count;
 #endif
 
 // keyboard states
-static device_info *			keyboard_list;
+static device_info *		keyboard_list;
 
 // mouse states
 static UINT8				mouse_enabled;
-static device_info *			mouse_list;
+static device_info *		mouse_list;
 
 // lightgun states
 static UINT8				lightgun_enabled;
-static device_info *			lightgun_list;
+static device_info *		lightgun_list;
 
 // joystick states
-static device_info *			joystick_list;
+static device_info *		joystick_list;
 
 // joystick mapper
 static struct 
@@ -895,6 +899,9 @@ void sdlinput_init(running_machine *machine)
 	kt_table *key_trans_table;
 	kt_table *ktt_alloc = NULL;
 
+	// we want unicode keyboard characters
+	SDL_EnableUNICODE(1);
+
 	keyboard_list = NULL;
 	joystick_list = NULL;
 	mouse_list = NULL;
@@ -1057,12 +1064,42 @@ static void sdlinput_exit(running_machine *machine)
 
 
 //============================================================
+//  sdlinput_get_focus_window
+//============================================================
+
+sdl_window_info *sdlinput_get_focus_window(running_machine *machine)
+{
+	if (focus_window)  // only be set on SDL >= 1.3
+		return focus_window;
+	else
+		return sdl_window_list;
+}
+
+//============================================================
 //  sdlinput_poll
 //============================================================
 
-#ifdef SDLMAME_WIN32
-void sdlinput_process_events_buf(void)
+#if (SDL_VERSION_ATLEAST(1,3,0))
+INLINE sdl_window_info * window_from_id(SDL_WindowID windowID)
 {
+	sdl_window_info *w;
+	
+	for (w = sdl_window_list; w != NULL; w = w->next)
+	{
+		if (w->window_id == windowID)
+		{
+			return w;
+		}
+	}
+	// deliberately crash
+	printf("Window %d not found\n", windowID);
+	return NULL;
+}
+#endif
+
+void sdlinput_process_events_buf(running_machine *machine)
+{
+#if SDLMAME_EVENTS_IN_WORKER_THREAD
 	SDL_Event event;
 
 	osd_lock_acquire(input_lock);
@@ -1074,14 +1111,14 @@ void sdlinput_process_events_buf(void)
 			mame_printf_warning("Event Buffer Overflow!\n");	
 	}
 	osd_lock_release(input_lock);
-}
 #endif
+}
 
 void sdlinput_poll(running_machine *machine)
 {
 	device_info *devinfo;
 	SDL_Event event;
-#ifdef SDLMAME_WIN32
+#if SDLMAME_EVENTS_IN_WORKER_THREAD
 	SDL_Event			loc_event_buf[MAX_BUF_EVENTS];
 	int					loc_event_buf_count;
 	int bufp;
@@ -1091,7 +1128,7 @@ void sdlinput_poll(running_machine *machine)
 	devinfo->mouse.lX = 0;
 	devinfo->mouse.lY = 0;
 
-#ifdef SDLMAME_WIN32
+#if SDLMAME_EVENTS_IN_WORKER_THREAD
 	osd_lock_acquire(input_lock);
 	memcpy(loc_event_buf, event_buf, sizeof(event_buf));
 	loc_event_buf_count = event_buf_count;
@@ -1111,9 +1148,6 @@ void sdlinput_poll(running_machine *machine)
 			event.type = SDL_KEYDOWN;
 		}
 		switch(event.type) {
-		case SDL_QUIT:
-			mame_schedule_exit(machine);
-			break;
 		case SDL_KEYDOWN:
 			#ifdef MESS
 			if (win_use_natural_keyboard)
@@ -1134,6 +1168,12 @@ void sdlinput_poll(running_machine *machine)
 					inputx_postc(machine, event.key.keysym.unicode);
 				}
 			}
+			#endif
+
+			#if (SDL_VERSION_ATLEAST(1,3,0))
+			ui_input_push_char_event(machine, window_from_id(event.window.windowID)->target, (unicode_char)event.key.keysym.unicode);
+			#else
+			ui_input_push_char_event(machine, sdl_window_list->target, (unicode_char)event.key.keysym.unicode);
 			#endif
 
 			devinfo = keyboard_list;
@@ -1223,6 +1263,13 @@ void sdlinput_poll(running_machine *machine)
 		case SDL_MOUSEBUTTONDOWN:
 			devinfo = mouse_list;
 			devinfo->mouse.buttons[event.button.button-1] = 0x80; 
+
+			#if (SDL_VERSION_ATLEAST(1,3,0))
+			ui_input_push_mouse_click_event(machine, window_from_id(event.window.windowID)->target, event.button.x, event.button.y);
+			#else
+			ui_input_push_mouse_click_event(machine, sdl_window_list->target, event.button.x, event.button.y);
+			#endif
+
 			break;
 		case SDL_MOUSEBUTTONUP:
 			devinfo = mouse_list;
@@ -1232,10 +1279,40 @@ void sdlinput_poll(running_machine *machine)
 			devinfo = mouse_list;
 			devinfo->mouse.lX = event.motion.xrel * INPUT_RELATIVE_PER_PIXEL; 
 			devinfo->mouse.lY = event.motion.yrel * INPUT_RELATIVE_PER_PIXEL; 
+
+			#if (SDL_VERSION_ATLEAST(1,3,0))
+			ui_input_push_mouse_move_event(machine, window_from_id(event.window.windowID)->target, event.motion.xrel * INPUT_RELATIVE_PER_PIXEL, event.motion.yrel * INPUT_RELATIVE_PER_PIXEL);
+			#else
+			ui_input_push_mouse_move_event(machine, sdl_window_list->target, event.motion.xrel * INPUT_RELATIVE_PER_PIXEL, event.motion.yrel * INPUT_RELATIVE_PER_PIXEL);
+			#endif
+			break;
+#if (!SDL_VERSION_ATLEAST(1,3,0))
+		case SDL_QUIT:
+			mame_schedule_exit(machine);
 			break;
 		case SDL_VIDEORESIZE:
 			sdlwindow_resize(sdl_window_list, event.resize.w, event.resize.h);
 			break;
+#else
+		case SDL_WINDOWEVENT:
+			switch (event.window.event)
+			{
+			case SDL_WINDOWEVENT_CLOSE:
+				mame_schedule_exit(machine);
+				break;
+			case SDL_WINDOWEVENT_RESIZED:
+				sdlwindow_resize(window_from_id(event.window.windowID), event.window.data1, event.window.data2);
+				/* fall through break; */
+			case SDL_WINDOWEVENT_FOCUS_GAINED:
+			case SDL_WINDOWEVENT_ENTER:
+			case SDL_WINDOWEVENT_EXPOSED:
+			case SDL_WINDOWEVENT_MAXIMIZED:  
+			case SDL_WINDOWEVENT_RESTORED:
+				focus_window = window_from_id(event.window.windowID);
+				break;
+			}
+			break;
+#endif
 		}
 	}
 }
@@ -1245,7 +1322,7 @@ void sdlinput_poll(running_machine *machine)
 //  sdlinput_should_hide_mouse
 //============================================================
 
-int sdlinput_should_hide_mouse(void)
+int sdlinput_should_hide_mouse(running_machine *machine)
 {
 	// if we are paused, no
 	if (input_paused)

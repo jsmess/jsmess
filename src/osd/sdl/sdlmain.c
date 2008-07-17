@@ -352,9 +352,8 @@ static void output_oslog(running_machine *machine, const char *buffer)
 static void osd_exit(running_machine *machine)
 {
 
-	#ifndef SDLMAME_WIN32
-	SDL_Quit();
-	#endif
+	if (!SDLMAME_INIT_IN_WORKER_THREAD)
+		SDL_Quit();
 }
 
 //============================================================
@@ -419,23 +418,24 @@ static void defines_verbose(void)
 //============================================================
 void osd_init(running_machine *machine)
 {
-	#ifndef SDLMAME_WIN32
-	if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
-		/* mame_printf_* not fully initialized yet */
-		ShowError("Could not initialize SDL: %s.\n", SDL_GetError());
-		exit(-1);
+	if (!SDLMAME_INIT_IN_WORKER_THREAD)
+	{
+		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+			/* mame_printf_* not fully initialized yet */
+			ShowError("Could not initialize SDL: %s.\n", SDL_GetError());
+			exit(-1);
+		}
 	}
-	#endif
 	// must be before sdlvideo_init!
 	add_exit_callback(machine, osd_exit);
 
 	defines_verbose();
 
-#ifdef SDLMAME_NO_X11
+#if defined(SDLMAME_NO_X11) || defined(SDLMAME_WIN32)
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 	{
 		osd_exit(machine);
-		ShowError("sdlmame", "-debug not supported on X11-less build\n\n");
+		ShowError("sdlmame", "-debug not supported on X11-less builds\n\n");
 		exit(-1);		
 	}
 #endif
