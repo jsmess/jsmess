@@ -31,7 +31,7 @@ const struct CustomSound_interface specimx_sound_interface =
 static void *specimx_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	specimx_input[0] = specimx_input[1] = specimx_input[2] = 0;
-	mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, specimx_sh_update);
+	mixer_channel = stream_create(0, 1, Machine->sample_rate, 0, specimx_sh_update);
 	return (void *) ~0;
 }
 
@@ -42,7 +42,6 @@ static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sampl
 	INT16 channel_2_signal;
 
 	stream_sample_t *sample_left = buffer[0];
-	stream_sample_t *sample_right = buffer[1];
 
 	channel_0_signal = specimx_input[0] ? 3000 : -3000;
 	channel_1_signal = specimx_input[1] ? 3000 : -3000;
@@ -51,7 +50,6 @@ static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sampl
 	while (length--)
 	{
 		*sample_left = 0;
-		*sample_right = 0;
 
 		/* music channel 0 */
 		*sample_left += channel_0_signal;
@@ -63,13 +61,14 @@ static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sampl
 		*sample_left += channel_2_signal;
 
 		sample_left++;
-		sample_right++;
 	}
 }
 
 void specimx_set_input(int index, int state)
 {
-	stream_update( mixer_channel );
+	if (mixer_channel!=NULL) {
+		stream_update( mixer_channel );
+	}
 	specimx_input[index] = state;
 }
 

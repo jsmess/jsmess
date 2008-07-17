@@ -167,7 +167,9 @@ static PIT8253_OUTPUT_CHANGED(bm2_pit_irq)
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_out1)
 {
-	stream_update( mixer_channel );
+	if (mixer_channel!=NULL) {
+		stream_update( mixer_channel );
+	}
 	b2m_sound_input = state;
 }
 
@@ -472,7 +474,7 @@ const struct CustomSound_interface b2m_sound_interface =
 static void *b2m_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	b2m_sound_input = 0;
-	mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, b2m_sh_update);
+	mixer_channel = stream_create(0, 1, Machine->sample_rate, 0, b2m_sh_update);
 	return (void *) ~0;
 }
 
@@ -481,25 +483,19 @@ static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t 
 	INT16 channel_1_signal;
 
 	stream_sample_t *sample_left = buffer[0];
-	stream_sample_t *sample_right = buffer[1];
 
 	channel_1_signal = b2m_sound_input ? 3000 : -3000;
 
 	while (length--)
 	{
-		*sample_left = 0;
-		*sample_right = 0;
-
-		/* music channel 1 */
-
-		*sample_left = channel_1_signal;
-		
+		*sample_left = channel_1_signal;		
 		sample_left++;
-		sample_right++;
 	}
 }
 
 void b2m_sh_change_clock(double clock)
 {
-	stream_update(mixer_channel);
+	if (mixer_channel!=NULL) {
+		stream_update(mixer_channel);
+	}
 }
