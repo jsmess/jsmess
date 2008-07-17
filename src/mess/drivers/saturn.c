@@ -176,7 +176,7 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 
 #ifdef MAME_DEBUG
 #define LOG_CDB  0
-#define LOG_SMPC 0
+#define LOG_SMPC 1
 #define LOG_SCU  0
 #define LOG_IRQ  0
 #else
@@ -473,7 +473,7 @@ static void smpc_intbackhelper(running_machine *machine)
 	sprintf(port, "JOY%d", intback_stage-1);	// intback_stage will be 2 or 3, 2 = player 1, 3 = player 2
 	pad = input_port_read(machine, port);
 
-//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+//	if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	smpc_ram[33] = 0xf1;	// no tap, direct connect
 	smpc_ram[35] = 0x02;	// saturn pad
 	smpc_ram[37] = pad>>8;
@@ -501,14 +501,48 @@ static UINT8 stv_SMPC_r8 (int offset)
 		return_data = smpcSR;
 
 	if (offset == 0x75)//PDR1 read
-		return_data = 0xff; //input_port_read(machine, "PDR1");
+	{
+		if (IOSEL1)
+		{
+			int hshake;
+
+			hshake = (PDR1>>5) & 3;
+
+			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
+
+			return_data = 0x9f;
+			
+			switch (hshake)
+			{
+				case 0:
+					return_data = 0x90;
+//					return_data = 0xf0 | ((input_port_read(Machine, "JOY1")>>4) & 0xf);
+					break;
+
+				case 1:
+//					return_data = 0xf0 | ((input_port_read(Machine, "JOY1")>>12) & 0xf); 
+					break;
+
+				case 2:
+//					return_data = 0xf0 | ((input_port_read(Machine, "JOY1")>>8) & 0xf);
+					break;
+
+				case 3:
+					return_data = 0x94;
+//					return_data = 0xf0 | (input_port_read(Machine, "JOY1")&0x8) | 0x4;
+					break;
+			}
+		}
+	}
 
 	if (offset == 0x77)//PDR2 read
-		return_data=  0xff; // | EEPROM_read_bit());
+	{
+		return_data =  0xff; // | EEPROM_read_bit());
+	}
 
 	if (offset == 0x33) return_data = saturn_region;
 
-//  if (LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, offset>>1, return_data);
+	if (LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, offset>>1, return_data);
 
 
 	return return_data;
@@ -522,7 +556,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 	/* get the current date/time from the core */
 	mame_get_current_datetime(machine, &systime);
 
-//  if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
+  if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
 
 //  if (offset == 0x7d) printf("IOSEL2 %d IOSEL1 %d\n", (data>>1)&1, data&1);
 
@@ -530,7 +564,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 
 	if ((intback_stage > 0) && (offset == 1) && (((data ^ 0x80)&0x80) == (last&0x80)))
 	{
-//      if (LOG_SMPC) logerror("SMPC: CONTINUE request, stage %d\n", intback_stage);
+      if (LOG_SMPC) logerror("SMPC: CONTINUE request, stage %d\n", intback_stage);
 		if (intback_stage != 3)
 		{
 			intback_stage = 2;
@@ -541,21 +575,20 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 
 	if ((offset == 1) && (data & 0x40))
 	{
-//      if (LOG_SMPC) logerror("SMPC: BREAK request\n");
+      if (LOG_SMPC) logerror("SMPC: BREAK request\n");
 		intback_stage = 0;
 	}
 
 	smpc_ram[offset] = data;
 
-	if(offset == 0x75)
+	if (offset == 0x75)	// PDR1
 	{
-		PDR1 = (data & 0x60);
+		PDR1 = (data & smpc_ram[0x79]);	
 	}
 
-	if(offset == 0x77)
+	if (offset == 0x77)	// PDR2
 	{
-		//if(LOG_SMPC) logerror("SMPC: ram [0x77] = %02x\n",smpc_ram[0x77]);
-		PDR2 = (data & 0x60);
+		PDR2 = (data & smpc_ram[0x7b]);
 	}
 
 	if(offset == 0x7d)
@@ -646,7 +679,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
-//              if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
+		                if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
 				smpc_ram[0x5f]=0x10;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 			  	smpc_ram[0x23] = DectoBCD(systime.local_time.year / 100);
@@ -1916,14 +1949,14 @@ static NVRAM_HANDLER(saturn)
 }
 
 static ADDRESS_MAP_START( saturn_mem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM   // bios
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE(6)  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE(stv_SMPC_r32, stv_SMPC_w32)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(satram_r, satram_w)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE(2) AM_BASE(&stv_workram_l)
 	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(minit_w)
 	AM_RANGE(0x01406f40, 0x01406f43) AM_WRITE(minit_w) // prikura seems to write here ..
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(sinit_w)
-	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION(REGION_CPU1, 0x80000)	// cartridge space
+	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE(7) AM_REGION(REGION_CPU1, 0x80000)	// cartridge space
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE(stv_sh2_soundram_r, stv_sh2_soundram_w)
@@ -1941,7 +1974,9 @@ static ADDRESS_MAP_START( saturn_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(stv_vdp2_regs_r, stv_vdp2_regs_w)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(stv_scu_r32, stv_scu_w32)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE(3) AM_BASE(&stv_workram_h)
-ADDRESS_MAP_END
+	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE(6)  // bios mirror
+	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE(7)  // cart mirror
+ADDRESS_MAP_END					     
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION(REGION_CPU3, 0) AM_BASE(&sound_ram)
@@ -2393,3 +2428,5 @@ CONS( 1994, saturnjp,   saturn, 0,      saturn, saturn, saturnjp,   saturn, "Seg
 CONS( 1994, saturneu,   saturn, 0,      saturn, saturn, saturneu,   saturn, "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
 CONS( 1995, vsaturn,    saturn, 0,      saturn, saturn, saturnjp,   saturn, "JVC",      "V-Saturn",         GAME_NOT_WORKING )
 CONS( 1995, hisaturn,   saturn, 0,      saturn, saturn, saturnjp,   saturn, "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )
+
+
