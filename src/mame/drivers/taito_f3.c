@@ -56,28 +56,28 @@ static READ32_HANDLER( f3_control_r )
 	switch (offset)
 	{
 		case 0x0: /* MSW: Test switch, coins, eeprom access, LSW: Player Buttons, Start, Tilt, Service */
-			e=eeprom_read_bit();
-			e=e|(e<<8);
-			return ((e | input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2)<<8))<<16) /* top byte may be mirror of bottom byte??  see bubblem */
-					| input_port_read_indexed(machine, 1);
+			e = eeprom_read_bit();
+			e = e | (e<<8);
+			return ((e | input_port_read(machine, "EEPROM") | (input_port_read(machine, "EEPROM")<<8))<<16)		/* top byte may be mirror of bottom byte??  see bubblem */
+					| input_port_read(machine, "IN1");
 
 		case 0x1: /* MSW: Coin counters/lockouts are readable, LSW: Joysticks (Player 1 & 2) */
-			return (coin_word[0]<<16) | input_port_read_indexed(machine, 0) | 0xff00;
+			return (coin_word[0]<<16) | input_port_read(machine, "IN0") | 0xff00;
 
 		case 0x2: /* Analog control 1 */
-			return ((input_port_read_indexed(machine, 3)&0xf)<<12) | ((input_port_read_indexed(machine, 3)&0xff0)>>4);
+			return ((input_port_read(machine, "DIAL1") & 0xf)<<12) | ((input_port_read(machine, "DIAL1") & 0xff0)>>4);
 
 		case 0x3: /* Analog control 2 */
-			return ((input_port_read_indexed(machine, 4)&0xf)<<12) | ((input_port_read_indexed(machine, 4)&0xff0)>>4);
+			return ((input_port_read(machine, "DIAL2") & 0xf)<<12) | ((input_port_read(machine, "DIAL2") & 0xff0)>>4);
 
 		case 0x4: /* Player 3 & 4 fire buttons (Player 2 top fire buttons in Kaiser Knuckle) */
-			return input_port_read_indexed(machine, 5)<<8;
+			return input_port_read(machine, "IN2")<<8;
 
 		case 0x5: /* Player 3 & 4 joysticks (Player 1 top fire buttons in Kaiser Knuckle) */
-			return (coin_word[1]<<16) | input_port_read_indexed(machine, 6);
+			return (coin_word[1]<<16) | input_port_read(machine, "IN3");
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", activecpu_get_pc(), offset);
 	return 0xffffffff;
 }
 
@@ -88,8 +88,10 @@ static WRITE32_HANDLER( f3_control_w )
 		case 0x00: /* Watchdog */
 			watchdog_reset(machine);
 			return;
+
 		case 0x01: /* Coin counters & lockouts */
-			if (ACCESSING_BITS_24_31) {
+			if (ACCESSING_BITS_24_31)
+			{
 				coin_lockout_w(0,~data & 0x01000000);
 				coin_lockout_w(1,~data & 0x02000000);
 				coin_counter_w(0, data & 0x04000000);
@@ -97,15 +99,19 @@ static WRITE32_HANDLER( f3_control_w )
 				coin_word[0]=(data>>16)&0xffff;
 			}
 			return;
+
 		case 0x04: /* Eeprom */
-			if (ACCESSING_BITS_0_7) {
+			if (ACCESSING_BITS_0_7)
+			{
 				eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom_write_bit(data & 0x04);
 				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			}
 			return;
+
 		case 0x05:	/* Player 3 & 4 coin counters */
-			if (ACCESSING_BITS_24_31) {
+			if (ACCESSING_BITS_24_31)
+			{
 				coin_lockout_w(2,~data & 0x01000000);
 				coin_lockout_w(3,~data & 0x02000000);
 				coin_counter_w(2, data & 0x04000000);
@@ -189,7 +195,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( f3 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -199,7 +205,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -217,7 +223,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START4 )
 
-	PORT_START
+	PORT_START_TAG("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Eprom data bit */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -227,13 +233,13 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 )
 
-	PORT_START
+	PORT_START_TAG("DIAL1")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("DIAL2")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -243,7 +249,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -255,57 +261,15 @@ static INPUT_PORTS_START( f3 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kn )
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_INCLUDE( f3 )
 
-	PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 ) /* Service */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE2 ) /* Only on some games */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_MODIFY("IN2")
+  	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+  	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+  	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+  	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Eprom data bit */
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* Another service mode */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 )
-
-	PORT_START
-	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
-
-	PORT_START
-	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
-
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -348,7 +312,7 @@ static const gfx_layout spriteram_layout =
 {
 	16,16,
 	RGN_FRAC(1,2),
-	6,
+	6,	/* Palettes have 4 bpp indexes despite up to 6 bpp data */
 	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+1, 0, 1, 2, 3 },
 	{
 	4, 0, 12, 8,
@@ -364,7 +328,7 @@ static const gfx_layout tile_layout =
 {
 	16,16,
 	RGN_FRAC(1,2),
-	6,
+	6,	/* Palettes have 4 bpp indexes despite up to 6 bpp data */
 	{ RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+3, 0, 1, 2, 3 },
 	{
 	4, 0, 16+4, 16+0,
@@ -378,10 +342,10 @@ static const gfx_layout tile_layout =
 };
 
 static GFXDECODE_START( taito_f3 )
-	GFXDECODE_ENTRY( 0,           0x000000, charlayout,          0,  64 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, tile_layout, 	       0, 512 ) /* Tiles area */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, spriteram_layout, 4096, 256 ) /* Sprites area */
-	GFXDECODE_ENTRY( 0,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( 0,           0x000000, charlayout,       0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, tile_layout, 	    0x0000, 0x2000>>4 ) /* Tiles area */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
+	GFXDECODE_ENTRY( 0,           0x000000, pivotlayout,      0x0000,  0x400>>4 ) /* Dynamically modified */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -462,7 +426,7 @@ static MACHINE_DRIVER_START( f3 )
 	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
 
 	MDRV_GFXDECODE(taito_f3)
-	MDRV_PALETTE_LENGTH(8192)
+	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(f3)
 	MDRV_VIDEO_EOF(f3)
@@ -3251,13 +3215,13 @@ ROM_END
 
 /******************************************************************************/
 
-static void tile_decode(running_machine *machine, int uses_5bpp_tiles)
+static void tile_decode(running_machine *machine)
 {
 	UINT8 lsb,msb;
 	UINT32 offset,i;
 	UINT8 *gfx = memory_region(machine, REGION_GFX2);
 	int size=memory_region_length(machine, REGION_GFX2);
-	int half=size/2,data;
+	int data;
 
 	/* Setup ROM formats:
 
@@ -3266,10 +3230,12 @@ static void tile_decode(running_machine *machine, int uses_5bpp_tiles)
         are tied low on the game board if unused.  This is backed up by the fact the palette
         indices are always related to 4 bpp data, even in 6 bpp games.
 
+        Most (all?) games with 5bpp tiles have the sixth bit set. Also, in Arabian Magic
+        sprites 1200-120f contain 6bpp data which is probably bogus.
+        VIDEO_START( f3 ) clears the fifth and sixth bit of the decoded graphics according
+        to the bit depth specified in f3_config_table.
+
     */
-	if (uses_5bpp_tiles)
-		for (i=half; i<size; i+=2)
-			gfx[i+1]=0;
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i+=2)
@@ -3368,54 +3334,54 @@ F3_IRQ_SPEEDUP_2_R(kirameki, 0x12fc6,  0x0414/4, 0x0000ff00 )
 static DRIVER_INIT( ringrage )
 {
 	f3_game=RINGRAGE;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( arabianm )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408124, 0x408127, 0, 0, irq_speedup_r_arabianm );
 	f3_game=ARABIANM;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( ridingf )
 {
 	f3_game=RIDINGF;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( gseeker )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40ad94, 0x40ad97, 0, 0, irq_speedup_r_gseeker );
 	f3_game=GSEEKER;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( gunlock )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400007, 0, 0, irq_speedup_r_gunlock );
 	f3_game=GUNLOCK;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( elvactr )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4007a0, 0x4007a3, 0, 0, irq_speedup_r_eaction2 );
 	f3_game=EACTION2;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( cupfinal )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_cupfinal );
 	f3_game=SCFINALS;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( trstaroj )
 {
 	f3_game=TRSTAR;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( scfinals )
@@ -3430,69 +3396,69 @@ static DRIVER_INIT( scfinals )
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_scfinals );
 	f3_game=SCFINALS;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( lightbr )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400130, 0x400133, 0, 0, irq_speedup_r_lightbr );
 	f3_game=LIGHTBR;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( kaiserkn )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408110, 0x408113, 0, 0, irq_speedup_r_kaiserkn );
 	f3_game=KAISERKN;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( dariusg )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x406ba8, 0x406bab, 0, 0, irq_speedup_r_dariusg );
 	f3_game=DARIUSG;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( spcinvdj )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400230, 0x400233, 0, 0, irq_speedup_r_spcinvdj );
 	f3_game=SPCINVDX;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( qtheater )
 {
 	f3_game=QTHEATER;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( spcinv95 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_spcinv95 );
 	f3_game=SPCINV95;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( gekirido )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x406bb0, 0x406bb3, 0, 0, irq_speedup_r_gekirido );
 	f3_game=GEKIRIDO;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( ktiger2 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400570, 0x400573, 0, 0, irq_speedup_r_ktiger2 );
 	f3_game=KTIGER2;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( bubsymph )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
 	f3_game=BUBSYMPH;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 
@@ -3523,7 +3489,7 @@ static DRIVER_INIT( bubsympb )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
 	f3_game=BUBSYMPH;
-	//tile_decode(machine, 1);
+	//tile_decode(machine);
 
 	/* expand gfx rom */
 	{
@@ -3553,28 +3519,28 @@ static DRIVER_INIT( bubblem )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubblem );
 	f3_game=BUBBLEM;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( cleopatr )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_cleopatr );
 	f3_game=CLEOPATR;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( popnpop )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x401cf8, 0x401cfb, 0, 0, irq_speedup_r_popnpop );
 	f3_game=POPNPOP;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( landmakr )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400824, 0x400827, 0, 0, irq_speedup_r_landmakr );
 	f3_game=LANDMAKR;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( landmkrp )
@@ -3590,94 +3556,94 @@ static DRIVER_INIT( landmkrp )
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400824, 0x400827, 0, 0, irq_speedup_r_landmakr );
 	f3_game=LANDMAKR;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobble3 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x405af4, 0x405af7, 0, 0, irq_speedup_r_pbobble3 );
 	f3_game=PBOBBLE3;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobble4 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4058f4, 0x4058f7, 0, 0, irq_speedup_r_pbobble4 );
 	f3_game=PBOBBLE4;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( quizhuhu )
 {
 	f3_game=QUIZHUHU;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobble2 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x404a50, 0x404a53, 0, 0, irq_speedup_r_pbobble2 );
 	f3_game=PBOBBLE2;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobbl2x )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x405c58, 0x405c5b, 0, 0, irq_speedup_r_pbobbl2x );
 	f3_game=PBOBBLE2;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( hthero95 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_pwrgoal );
 	f3_game=HTHERO95;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( kirameki )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400414, 0x400417, 0, 0, irq_speedup_r_kirameki );
 	f3_game=KIRAMEKI;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( puchicar )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4024d8, 0x4024db, 0, 0, irq_speedup_r_puchicar );
 	f3_game=PUCHICAR;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( twinqix )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_twinqix );
 	f3_game=TWINQIX;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( arkretrn )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x402154, 0x402157, 0, 0, irq_speedup_r_arkretrn );
 	f3_game=ARKRETRN;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( intcup94 )
 {
 	f3_game=SCFINALS;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( recalh )
 {
 	f3_game=RECALH;
-	tile_decode(machine, 0);
+	tile_decode(machine);
 }
 
 static DRIVER_INIT( commandw )
 {
 	f3_game=COMMANDW;
-	tile_decode(machine, 1);
+	tile_decode(machine);
 }
 
 /******************************************************************************/

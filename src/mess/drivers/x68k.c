@@ -920,13 +920,13 @@ static READ16_HANDLER( x68k_ioc_r )
 */
 static WRITE16_HANDLER( x68k_sysport_w )
 {
-	render_container* container;
+	//render_container* container;
 	switch(offset)
 	{
 	case 0x00:
 		sys.sysport.contrast = data & 0x0f;  // often used for screen fades / blanking
-		container = render_container_get_screen(machine->primary_screen);
-		render_container_set_brightness(container,(float)(sys.sysport.contrast) / 14.0);
+		//container = render_container_get_screen(machine->primary_screen);
+		//render_container_set_brightness(container,(float)(sys.sysport.contrast) / 14.0);
 		break;
 	case 0x01:
 		sys.sysport.monitor = data & 0x08;

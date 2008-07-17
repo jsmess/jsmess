@@ -816,6 +816,7 @@ F355 has it's own BIOS (3 screen version) and different JVS I/O Board
 
 Info from roms starting at 0x1ffd60
 
+EPR-21576h - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
 EPR-21576g - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
 EPR-21576e - NAOMI BOOT ROM 2000 08/25  1.50 (Japan)
 EPR-21576d - NAOMI BOOT ROM 1999 06/04  1.40 (Japan)
@@ -872,6 +873,7 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
   NOTE: this doesn't work for the HOTD2 or multi screen boot roms
 
 */
+// game specific bios roms quite clearly don't belong in here.
 
 #define NAOMI_BIOS \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21578e (Export)" ) \
@@ -884,26 +886,32 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21577e.bin",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
 	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21577d (USA)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21577d.bin",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
-	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21576g (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
-	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21576e (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
-	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21576d (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
-	ROM_SYSTEM_BIOS( 8, "bios8", "epr-21576b (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21576b.bin",  0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
-	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21576 (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21576.bin",   0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
-	ROM_SYSTEM_BIOS( 10, "bios10", "Ferrari F355 (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 10,  "epr-22851.bin", 0x000000, 0x200000, CRC(62483677) SHA1(3e3bcacf5f972c376b569f45307ee7fd0b5031b7) ) \
-	ROM_SYSTEM_BIOS( 11, "bios11", "Ferrari F355 (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11,  "epr-22850.bin", 0x000000, 0x200000, CRC(28aa539d) SHA1(14485368656af80504b212da620179c49f84c1a2) ) \
-	ROM_SYSTEM_BIOS( 12, "bios12", "HOTD2 (US)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12,  "epr-21330.bin", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
-	ROM_SYSTEM_BIOS( 13, "bios13", "HOTD2 (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13,  "epr-21331.bin", 0x000000, 0x200000, CRC(065f8500) SHA1(49a3881e8d76f952ef5e887200d77b4a415d47fe) ) \
-	ROM_SYSTEM_BIOS( 14, "bios14", "Naomi Dev BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 14,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
+	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21576h (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576h.bin",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
+	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21576g (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
+	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21576e (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
+	ROM_SYSTEM_BIOS( 8, "bios8", "epr-21576d (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
+	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21576b (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21576b.bin",  0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
+	ROM_SYSTEM_BIOS( 10, "bios10", "epr-21576 (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10,  "epr-21576.bin", 0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
+	ROM_SYSTEM_BIOS( 11, "bios11", "Ferrari F355 (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11,  "epr-22851.bin", 0x000000, 0x200000, CRC(62483677) SHA1(3e3bcacf5f972c376b569f45307ee7fd0b5031b7) ) \
+	ROM_SYSTEM_BIOS( 12, "bios12", "Ferrari F355 (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12,  "epr-22850.bin", 0x000000, 0x200000, CRC(28aa539d) SHA1(14485368656af80504b212da620179c49f84c1a2) ) \
+	ROM_SYSTEM_BIOS( 13, "bios13", "Naomi Dev BIOS" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
+
+// bios for House of the Dead 2
+#define HOTD2_BIOS \
+	ROM_SYSTEM_BIOS( 0, "bios0", "HOTD2 (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-21331.bin", 0x000000, 0x200000, CRC(065f8500) SHA1(49a3881e8d76f952ef5e887200d77b4a415d47fe) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "HOTD2 (US)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-21330.bin", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
+
 
 /* only revisions d and higher support the GDROM, and there is an additional bios (and SH4!) on the DIMM board for the CD Controller */
 #define NAOMIGD_BIOS \
@@ -912,16 +920,18 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21578d (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21578d.bin",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
-	ROM_SYSTEM_BIOS( 2, "bios3", "epr-21577e (USA)" ) \
+	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21577e (USA)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21577e.bin",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
-	ROM_SYSTEM_BIOS( 3, "bios4", "epr-21577d (USA)" ) \
+	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21577d (USA)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21577d.bin",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
-	ROM_SYSTEM_BIOS( 4, "bios5", "epr-21576g (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
-	ROM_SYSTEM_BIOS( 5, "bios6", "epr-21576e (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
-	ROM_SYSTEM_BIOS( 6, "bios7", "epr-21576d (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
+	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21576h (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21576h.bin",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
+	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21576g (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
+	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21576e (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
+	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21576d (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
 	ROM_REGION( 0x200000, REGION_USER2, 0) \
 	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) ) \
 
@@ -987,6 +997,12 @@ ROM_START( naomigd )
 	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
 ROM_END
 
+ROM_START( hod2bios )
+	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	HOTD2_BIOS
+
+	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+ROM_END
 
 ROM_START( naomi2 )
 	ROM_REGION( 0x200000, REGION_CPU1, 0)
@@ -2324,7 +2340,8 @@ a parity byte for verification (8*7 = 56, 8*8 = 64)
 ROM_START( sfz3ugd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+	ROM_REGION( 0xac00000, REGION_USER1, ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD_OPTIONAL("zero3rom.bin", 0x0000000, 0xac00000, CRC(4eabda58) SHA1(e70db0e93c821838c77510fd47c91f0c4cfb09c9) )
 
 	/* GD-ROM dump, this will be replaced once an appropriate CHD format has been decided upon for the GD images*/
 	ROM_REGION( 0x3d8ab000, REGION_USER3, ROMREGION_ERASE)
@@ -2333,6 +2350,30 @@ ROM_START( sfz3ugd )
 	ROM_LOAD("track02.raw",0x0000000, 0x004c8cf0, CRC(c5628df6) SHA1(0d1a24e6271c3b0ef92c55ec9d63e2326892f1d8) )
 	ROM_LOAD("track03.iso",0x0000000, 0x3d8ab000, CRC(195f0d93) SHA1(183412704bd90750355e7af019b78541328fe633) )
 
+ROM_END
+
+extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
+
+DRIVER_INIT( cvs2gd )
+{
+	// move key to game.key file?
+	naomi_game_decrypt( 0x2f3226165b9e407cULL, memory_region(machine,REGION_USER1), memory_region_length(machine,REGION_USER1));
+}
+
+
+ROM_START( cvs2gd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x9800000, REGION_USER1, ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("snkgd_sl.bin", 0x0000000, 0x9800000,  CRC(f153421d) SHA1(0c2b935ae3cfb6c85410a209fec4eab497066d84) )
+
+	/* GD-ROM dump, this will be replaced once an appropriate CHD format has been decided upon for the GD images*/
+	ROM_REGION( 0x26ad4620, REGION_USER3, ROMREGION_ERASE)
+	ROM_LOAD("capcom_vs_snk2.txt",  0x0000000, 0x00000141, CRC(0db478be) SHA1(a18f87b76139e4a845ecc1456b6195574110e30c) )
+	ROM_LOAD("track01.bin",0x0000000, 0x00ac440,  CRC(d48bd072) SHA1(2fc840586c655dee2686ee3b520c7760bd3b8dcb) )
+	ROM_LOAD("track02.raw",0x0000000, 0x004c8cf0, CRC(3b3a2e7b) SHA1(fd8e5cac5bd387229f4ffbe05d1bf2fabf7ea3f9) )
+	ROM_LOAD("track03.bin",0x0000000, 0x26ad4620, CRC(670d2182) SHA1(a99ceb7bb74e4a0fe6ae80b33cd2963465ae9d14) )
+	ROM_CONTINUE(0x0000000, 0x20000000)
 ROM_END
 
 
@@ -2387,11 +2428,15 @@ GAME( 1999, doa2,     naomi,    naomi,    naomi,    0, ROT0, "Tecmo",           
 GAME( 2000, doa2m,    doa2,     naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1998, dybbnao,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Dynamite Baseball NAOMI (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
+/* Games with game specific bios sets */
+GAME( 2001, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi House of the Dead 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+/* HOTD2 isn't dumped */
 
 
 /* No GD-Rom Sets Supported */
 GAME( 2001, naomigd,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2001, sfz3ugd,   naomigd,  naomi,    naomi,    0, ROT0, "Capcom",          "Street Fighter Zero 3 Upper", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, sfz3ugd,   naomigd,  naomi,    naomi,    0, ROT0, "Capcom",          "Street Fighter Zero 3 Upper", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvs2gd,    naomigd,  naomi,    naomi,    cvs2gd, ROT0, "Capcom",          "Capcom Vs. SNK 2", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /* Naomi 2 & Naomi 2 GD-ROM */

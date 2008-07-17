@@ -1135,10 +1135,13 @@ static READ16_HANDLER( standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
-			return input_port_read_indexed(machine, offset & 3);
+		{
+			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
+			return input_port_read(machine, sysports[offset & 3]);
+		}
 
 		case 0x2000/2:
-			return input_port_read_indexed(machine, 4 + (offset & 1));
+			return input_port_read(machine, (offset & 1) ? "DSW2" : "DSW1");
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(machine,0,mem_mask);
@@ -1394,7 +1397,7 @@ static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs
 	}
 
 	/* read inputs */
-	workram[inputoffs] = ~input_port_read_indexed(machine, 0) << 8;
+	workram[inputoffs] = ~input_port_read(machine, "SERVICE") << 8;
 }
 
 static void altbeasj_i8751_sim(running_machine *machine)
@@ -1473,8 +1476,8 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 	}
 
 	/* read inputs */
-	workram[0x2cd0/2] = (input_port_read_indexed(machine, 1) << 8) | input_port_read_indexed(machine, 3);
-	workram[0x2c96/2] = input_port_read_indexed(machine, 0) << 8;
+	workram[0x2cd0/2] = (input_port_read(machine, "P1") << 8) | input_port_read(machine, "P2");
+	workram[0x2c96/2] = input_port_read(machine, "SERVICE") << 8;
 }
 
 
@@ -1494,9 +1497,9 @@ static void tturf_i8751_sim(running_machine *machine)
 	}
 
 	/* read inputs */
-	workram[0x01e6/2] = input_port_read_indexed(machine, 0) << 8;
-	workram[0x01e8/2] = input_port_read_indexed(machine, 1) << 8;
-	workram[0x01ea/2] = input_port_read_indexed(machine, 3) << 8;
+	workram[0x01e6/2] = input_port_read(machine, "SERVICE") << 8;
+	workram[0x01e8/2] = input_port_read(machine, "P1") << 8;
+	workram[0x01ea/2] = input_port_read(machine, "P2") << 8;
 }
 
 
@@ -1533,7 +1536,7 @@ static void wrestwar_i8751_sim(running_machine *machine)
 	}
 
 	/* read inputs */
-	workram[0x2082/2] = input_port_read_indexed(machine, 0);
+	workram[0x2082/2] = input_port_read(machine, "SERVICE");
 }
 
 
@@ -3056,8 +3059,9 @@ static INPUT_PORTS_START( wrestwar )
 INPUT_PORTS_END
 
 
+/* we use common sys16b tags to simplify port reads */
 static INPUT_PORTS_START( atomicp )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("SERVICE")	/* P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -3067,7 +3071,7 @@ static INPUT_PORTS_START( atomicp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P1")	/* P2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -3077,7 +3081,7 @@ static INPUT_PORTS_START( atomicp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("DSW1")
+	PORT_START_TAG("UNUSED")	/* DSW1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
@@ -3102,7 +3106,7 @@ static INPUT_PORTS_START( atomicp )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_START_TAG("DSW2")
+	PORT_START_TAG("P2")	/* DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -3125,14 +3129,15 @@ static INPUT_PORTS_START( atomicp )
 	PORT_DIPSETTING(    0x00, "Atomic Point" )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:8" )
 
-	PORT_START_TAG("DUMMY1")
+	PORT_START_TAG("DSW2")	/* DUMMY */
 
-	PORT_START_TAG("DUMMY2")
+	PORT_START_TAG("DSW1")	/* DUMMY */
 INPUT_PORTS_END
 
 
+/* we use common sys16b tags to simplify port reads */
 static INPUT_PORTS_START( snapper )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("SERVICE")	/* P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -3142,12 +3147,12 @@ static INPUT_PORTS_START( snapper )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P1")	/* SYSTEM */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("DSW0")
+	PORT_START_TAG("UNUSED")	/* DSW0 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW0:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
@@ -3172,7 +3177,7 @@ static INPUT_PORTS_START( snapper )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_START_TAG("DSW1")
+	PORT_START_TAG("P2")	/* DSW1 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3196,9 +3201,9 @@ static INPUT_PORTS_START( snapper )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 
-	PORT_START_TAG("DUMMY1")
+	PORT_START_TAG("DSW2")	/* DUMMY */
 
-	PORT_START_TAG("DUMMY2")
+	PORT_START_TAG("DSW1")	/* DUMMY */
 INPUT_PORTS_END
 
 

@@ -236,7 +236,10 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( aliens )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)		/* ? */
+
+	/* external clock should be 12MHz probably, CPU internal divider and precise cycle timings */
+	/* are unknown though. 3MHz is too low, sprites flicker in the pseudo-3D levels */
+	MDRV_CPU_ADD(KONAMI, 6000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(aliens_map,0)
 	MDRV_CPU_VBLANK_INT("main", aliens_interrupt)
 
@@ -507,13 +510,15 @@ static DRIVER_INIT( aliens )
 {
 	konami_rom_deinterleave_2(REGION_GFX1);
 	konami_rom_deinterleave_2(REGION_GFX2);
+
+	state_save_register_global(palette_selected);
 }
 
 
 
-GAME( 1990, aliens,   0,      aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 1)", 0 )
-GAME( 1990, aliens2,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 2)", 0 )
-GAME( 1990, aliens3,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 3)", 0 )
-GAME( 1990, aliensu,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (US)", 0 )
-GAME( 1990, aliensj,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 1)", 0 )
-GAME( 1990, aliensj2, aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 2)", 0 )
+GAME( 1990, aliens,   0,      aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliens2,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliens3,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliensu,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliensj,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliensj2, aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 2)", GAME_SUPPORTS_SAVE )

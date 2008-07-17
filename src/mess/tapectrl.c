@@ -16,6 +16,32 @@
 
 
 /***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+enum _tape_control_command
+{
+	TAPECMD_NULL = 0,
+	TAPECMD_STOP,
+	TAPECMD_PLAY,
+	TAPECMD_RECORD,
+	TAPECMD_REWIND,
+	TAPECMD_FAST_FORWARD
+};
+typedef enum _tape_control_command tape_control_command;
+
+
+
+typedef struct _tape_control_menu_state tape_control_menu_state;
+struct _tape_control_menu_state
+{
+	int index;
+	const device_config *device;
+};
+
+
+
+/***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
@@ -46,185 +72,59 @@ astring *tapecontrol_gettime(astring *dest, const device_config *device, int *cu
 
 
 
-static int tapecontrol(running_machine *machine, int selected)
-{
-	static int id = 0;
-	astring *timepos = astring_alloc();
-	ui_menu_item menu_item[40];
-	char name[64];
-	const device_config *img;
+/*-------------------------------------------------
+    menu_tape_control_populate - populates the
+	main tape control menu
+-------------------------------------------------*/
 
-	int sel;
-	int total;
-	int arrowize;
+static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, tape_control_menu_state *menustate)
+{
+	astring *timepos = astring_alloc();
 	cassette_state state;
 
-	total = 0;
-	sel = selected - 1;
-
-	img = image_from_devtype_and_index(IO_CASSETTE, id);
-	if ( !image_filename(img) )
+	if (image_exists(menustate->device))
 	{
-		sprintf(name, "\t%s\n\n\t", ui_getstring(UI_notapeimageloaded) );
-		strcat(name, ui_getstring(UI_lefthilight));
-		strcat(name, " ");
-		strcat(name, ui_getstring(UI_returntomain));
-		strcat(name, " ");
-		strcat(name, ui_getstring(UI_righthilight));
-		ui_draw_message_window(name);
+		/* name of tape */
+		ui_menu_item_append(menu, image_typename_id(menustate->device), image_filename(menustate->device), 0, NULL);
 
-		if (input_ui_pressed(machine, IPT_UI_SELECT) || input_ui_pressed(machine, IPT_UI_CANCEL))
-			sel = -1;
-		if (input_ui_pressed(machine, IPT_UI_CONFIGURE))
-			sel = -2;
-
-		return sel + 1;
-	}
-
-	strcpy( name, image_typename_id(img) );
-	menu_item[total].text = name;
-	menu_item[total].subtext = image_filename(img);
-	menu_item[total].flags = 0;
-	total++;
-
-	tapecontrol_gettime(timepos, img, NULL, NULL);
-
-	state = cassette_get_state(img);
-	menu_item[total].text =
-		ui_getstring(
-			(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
+		/* state */
+		tapecontrol_gettime(timepos, menustate->device, NULL, NULL);
+		state = cassette_get_state(menustate->device);
+		ui_menu_item_append(
+			menu,
+			ui_getstring((state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
 				?	UI_stopped
 				:	((state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY
 					? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? UI_playing : UI_playing_inhibited)
 					: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? UI_recording : UI_recording_inhibited)
-					));
+					)),
+			astring_c(timepos),
+			0,
+			NULL);
 
-	menu_item[total].subtext = astring_c(timepos);
-	menu_item[total].flags = 0;
-	total++;
+		/* pause or stop */
+		ui_menu_item_append(menu, ui_getstring(UI_pauseorstop), NULL, 0, (void *) TAPECMD_STOP);
 
-	menu_item[total].text = ui_getstring(UI_pauseorstop);
-	menu_item[total].subtext = 0;
-	menu_item[total].flags = 0;
-	total++;
+		/* play */
+		ui_menu_item_append(menu, ui_getstring(UI_play), NULL, 0, (void *) TAPECMD_PLAY);
 
-	menu_item[total].text = ui_getstring(UI_play);
-	menu_item[total].subtext = 0;
-	menu_item[total].flags = 0;
-	total++;
+		/* record */
+		ui_menu_item_append(menu, ui_getstring(UI_record), NULL, 0, (void *) TAPECMD_RECORD);
 
-	menu_item[total].text = ui_getstring(UI_record);
-	menu_item[total].subtext = 0;
-	menu_item[total].flags = 0;
-	total++;
+		/* rewind */
+		ui_menu_item_append(menu, ui_getstring(UI_rewind), NULL, 0, (void *) TAPECMD_REWIND);
 
-	menu_item[total].text = ui_getstring(UI_rewind);
-	menu_item[total].subtext = 0;
-	menu_item[total].flags = 0;
-	total++;
-
-	menu_item[total].text = ui_getstring(UI_fastforward);
-	menu_item[total].subtext = 0;
-	menu_item[total].flags = 0;
-	total++;
-
-	menu_item[total].text = ui_getstring(UI_returntomain);
-	menu_item[total].subtext = 0;
-	menu_item[total].flags = 0;
-	total++;
-
-	arrowize = 0;
-	if (sel < total - 1)
-		arrowize = 2;
-
-	if (sel > 255)  /* are we waiting for a new key? */
+		/* fast forward */
+		ui_menu_item_append(menu, ui_getstring(UI_fastforward), NULL, 0, (void *) TAPECMD_FAST_FORWARD);
+	}
+	else
 	{
-		/* display the menu */
-		ui_menu_draw(menu_item, total, sel & 0xff, NULL);
-		return sel + 1;
+		/* no tape loaded */
+		ui_menu_item_append(menu, ui_getstring(UI_notapeimageloaded), NULL, 0, NULL);
 	}
 
-	ui_menu_draw(menu_item, total, sel, NULL);
-
-	if (input_ui_pressed_repeat(machine, IPT_UI_DOWN,8))
-	{
-		if (sel < total - 1) sel++;
-		else sel = 0;
-	}
-
-	if (input_ui_pressed_repeat(machine, IPT_UI_UP,8))
-	{
-		if (sel > 0) sel--;
-		else sel = total - 1;
-	}
-
-
-	if (input_ui_pressed(machine, IPT_UI_LEFT))
-	{
-		switch (sel)
-		{
-		case 0:
-			id--;
-			if (id < 0) id = device_count(machine, IO_CASSETTE)-1;
-			break;
-		}
-	}
-
-	if (input_ui_pressed(machine, IPT_UI_RIGHT))
-	{
-		switch (sel)
-		{
-		case 0:
-			id++;
-			if (id > device_count(machine, IO_CASSETTE)-1) id = 0;
-			break;
-		}
-	}
-
-	if (input_ui_pressed(machine, IPT_UI_SELECT))
-	{
-		if (sel == total - 1)
-			sel = -1;
-		else
-		{
-			img = image_from_devtype_and_index(IO_CASSETTE, id);
-			switch (sel)
-			{
-			case 0:
-				id = (id + 1) % device_count(machine, IO_CASSETTE);
-				break;
-			case 2:
-				/* Pause/stop */
-				cassette_change_state(img, CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
-				break;
-			case 3:
-				/* Play */
-				cassette_change_state(img, CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
-				break;
-			case 4:
-				/* Record */
-				cassette_change_state(img, CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
-				break;
-			case 5:
-				/* Rewind */
-				cassette_seek(img, -1, SEEK_CUR);
-				break;
-			case 6:
-				/* Fast forward */
-				cassette_seek(img, +1, SEEK_CUR);
-				break;
-			}
-		}
-	}
-
-	if (input_ui_pressed(machine, IPT_UI_CANCEL))
-		sel = -1;
-
-	if (input_ui_pressed(machine, IPT_UI_CONFIGURE))
-		sel = -2;
-
-	astring_free(timepos);
-	return sel + 1;
+	if (timepos != NULL)
+		astring_free(timepos);
 }
 
 
@@ -232,10 +132,78 @@ static int tapecontrol(running_machine *machine, int selected)
     menu_tape_control - main tape control menu
 -------------------------------------------------*/
 
-UINT32 menu_tape_control(running_machine *machine, UINT32 state)
+void menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	int result = tapecontrol(machine, state);
-	if (result == 0)
-		return ui_menu_stack_pop();
-	return result;
+	tape_control_menu_state *menustate;
+	const ui_menu_event *event;
+
+	/* if no state, allocate some */
+	if (state == NULL)
+		state = ui_menu_alloc_state(menu, sizeof(*menustate));
+	menustate = (tape_control_menu_state *) state;
+
+	/* do we have to load the device? */
+	if (menustate->device == NULL)
+	{
+		menustate->device = image_from_devtype_and_index(IO_CASSETTE, menustate->index);
+		ui_menu_reset(menu, 0);
+	}
+
+	/* if the menu isn't built, populate now */
+	if (!ui_menu_populated(menu))
+		menu_tape_control_populate(machine, menu, state);
+
+	/* process the menu */
+	event = ui_menu_process(menu, 0);
+	if (event != NULL)
+	{
+		switch(event->iptkey)
+		{
+			case IPT_UI_LEFT:
+				/* left arrow - rotate left through cassette devices */
+				if (menustate->index > 0)
+					menustate->index--;
+				else
+					menustate->index = device_count(machine, IO_CASSETTE) - 1;
+				menustate->device = NULL;
+				break;
+
+			case IPT_UI_RIGHT:
+				/* right arrow - rotate right through cassette devices */
+				if (menustate->index < device_count(machine, IO_CASSETTE) - 1)
+					menustate->index++;
+				else
+					menustate->index = 0;
+				menustate->device = NULL;
+				break;
+
+			case IPT_UI_SELECT:
+				switch((tape_control_command) event->itemref)
+				{
+					case TAPECMD_NULL:
+						break;
+
+					case TAPECMD_STOP:
+						cassette_change_state(menustate->device, CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+						break;
+
+					case TAPECMD_PLAY:
+						cassette_change_state(menustate->device, CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+						break;
+
+					case TAPECMD_RECORD:
+						cassette_change_state(menustate->device, CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
+						break;
+
+					case TAPECMD_REWIND:
+						cassette_seek(menustate->device, -1, SEEK_CUR);
+						break;
+
+					case TAPECMD_FAST_FORWARD:
+						cassette_seek(menustate->device, +1, SEEK_CUR);
+						break;
+				}
+				break;
+		}
+	}
 }

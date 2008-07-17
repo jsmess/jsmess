@@ -2029,10 +2029,10 @@ const game_driver * const drivers[] =
 	DRIVER( perfrman )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( perfrmau )	/* (c) 1985 Data East USA (US) */
 	DRIVER( tigerh )	/* A47 (c) 1985 Taito America  Corporation   GX-551 [not a Konami board!] */
-	DRIVER( tigerh2 )	/* A47 (c) 1985 Taito Corporation   GX-551 [not a Konami board!] */
 	DRIVER( tigerhj )	/* A47 (c) 1985 Taito Corporation   GX-551 [not a Konami board!] */
 	DRIVER( tigerhb1 )	/* bootleg but (c) 1985 Taito Corporation */
 	DRIVER( tigerhb2 )	/* bootleg but (c) 1985 Taito Corporation */
+	DRIVER( tigerhb3 )	/* bootleg but (c) 1985 Taito Corporation */
 	DRIVER( slapfigh )	/* A76 / TP-??? */
 	DRIVER( slapfiga )	/* A76 / TP-??? */
 	DRIVER( slapbtjp )	/* bootleg but (c) 1986 Taito Corporation */
@@ -2041,8 +2041,8 @@ const game_driver * const drivers[] =
 	DRIVER( alcon )		/* A76 / TP-??? */
 	DRIVER( getstar )	/* A68 (c) 1986 Taito Corporation */
 	DRIVER( getstarj )	/* A68 (c) 1986 Taito Corporation */
-	DRIVER( getstarb )	/* GX-006 bootleg but (c) 1986 Taito Corporation */
-	DRIVER( gtstarba )	/* GX-006 bootleg but (c) 1986 Taito Corporation */
+	DRIVER( gtstarb1 )	/* GX-006 bootleg but (c) 1986 Taito Corporation */
+	DRIVER( gtstarb2 )	/* GX-006 bootleg but (c) 1986 Taito Corporation */
 	DRIVER( mjsister )	/* (c) 1986 Toaplan */
 
 	DRIVER( fshark )	/* B02 / TP-007 (c) 1987 Taito Corporation (World) */
@@ -3109,6 +3109,7 @@ V-V                           TP-027
 	DRIVER( wcbowl )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl165 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl161 )	/* (c) 1995 Incredible Technologies */
+	DRIVER( wcbwl16 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl140 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl15 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl13 )	/* (c) 1995 Incredible Technologies */
@@ -3777,6 +3778,7 @@ Sep.1994 Quiz Ghost Hunter
 
 	/* Model 2 (TGPs, Model 1 sound board) */
 	DRIVER( daytona )	/* 1993 */
+	DRIVER( dayton93 )	/* 1993 */
 	DRIVER( daytonas )	/* 1993 */
 	DRIVER( daytonat )	/* 1993, hack */
 	DRIVER( daytonam )	/* 1993, hack */
@@ -3789,6 +3791,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( srallyc )	/* 1995 */
 	DRIVER( vf2 )		/* 1995 */
 	DRIVER( vf2b )		/* 1995 */
+	DRIVER( vf2a )		/* 1995 */
 	DRIVER( vf2o )		/* 1995 */
 	DRIVER( vcop2 )		/* 1995 */
 	DRIVER( doaa )		/* 1996 */
@@ -4058,6 +4061,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	DRIVER( naomigd )
 	DRIVER( sfz3ugd )
+	DRIVER( cvs2gd )
+
+	DRIVER( hod2bios )
 
 	DRIVER( naomi2 )
 
@@ -5472,7 +5478,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( legofair )	/* A7003 'KK' (c) 1988 */
 	DRIVER( fsoccer )	/* A6006 'FS' (c) 1988 */
 	DRIVER( fsoccerj )	/* A6006 'FS' (c) 1988 */
-
 	DRIVER( fsoccerb )	/*            (c) 1988 */
 	DRIVER( tdfever )	/* A6006 'TD' (c) 1987 */
 	DRIVER( tdfeverj )	/* A6006 'TD' (c) 1987 */

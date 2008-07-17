@@ -78,10 +78,10 @@ static NVRAM_HANDLER(93C56)
 		}
 		else
 		{
-			int length;
-			UINT8 *dat;
+			UINT32 length;
+			void *dat;
 
-			dat = eeprom_get_data_pointer(&length);
+			dat = eeprom_get_data_pointer(&length, NULL);
 			memset(dat, 0, length);
 		}
 	}

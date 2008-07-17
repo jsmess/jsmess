@@ -244,6 +244,10 @@ static const render_quad_texuv oriented_texcoords[8] =
 	{ { 1,1 }, { 1,0 }, { 0,1 }, { 0,0 } }		/* ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y */
 };
 
+/* layer orders */
+static const int layer_order_standard[] = { ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BACKDROP, ITEM_LAYER_BEZEL };
+static const int layer_order_alternate[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BEZEL };
+
 
 
 /***************************************************************************
@@ -461,6 +465,45 @@ INLINE void free_render_ref(render_ref *ref)
 
 
 /*-------------------------------------------------
+    get_layer_and_blendmode - return the
+    appropriate layer index and blendmode
+-------------------------------------------------*/
+
+INLINE int get_layer_and_blendmode(const layout_view *view, int index, int *blendmode)
+{
+    const int *layer_order = layer_order_standard;
+    int layer;
+
+	/*
+        if we have multiple backdrop pieces and no overlays, render:
+            backdrop (add) + screens (add) + bezels (alpha)
+        else render:
+            screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha)
+    */
+	if (view->itemlist[ITEM_LAYER_BACKDROP] != NULL && view->itemlist[ITEM_LAYER_BACKDROP]->next != NULL && view->itemlist[ITEM_LAYER_OVERLAY] == NULL)
+		layer_order = layer_order_alternate;
+
+	/* select the layer */
+	layer = layer_order[index];
+
+	/* if we want the blendmode as well, compute it */
+	if (blendmode != NULL)
+	{
+		/* pick a blendmode */
+		if (layer == ITEM_LAYER_SCREEN && layer_order == layer_order_standard)
+			*blendmode = -1;
+		else if (layer == ITEM_LAYER_SCREEN || (layer == ITEM_LAYER_BACKDROP && layer_order == layer_order_standard))
+			*blendmode = BLENDMODE_ADD;
+		else if (layer == ITEM_LAYER_OVERLAY)
+			*blendmode = BLENDMODE_RGB_MULTIPLY;
+		else
+			*blendmode = BLENDMODE_ALPHA;
+	}
+	return layer;
+}
+
+
+/*-------------------------------------------------
     get_screen_container_by_index - get the
     screen container for this screen index
 -------------------------------------------------*/
@@ -521,11 +564,16 @@ void render_init(running_machine *machine)
 	{
 		render_container *screen_container = render_container_alloc();
 		render_container **temp = &screen_container->next;
+		render_container_user_settings settings;
 
-		render_container_set_orientation(screen_container, machine->gamedrv->flags & ORIENTATION_MASK);
-		render_container_set_brightness(screen_container, options_get_float(mame_options(), OPTION_BRIGHTNESS));
-		render_container_set_contrast(screen_container, options_get_float(mame_options(), OPTION_CONTRAST));
-		render_container_set_gamma(screen_container, options_get_float(mame_options(), OPTION_GAMMA));
+		/* set the initial orientation and brightness/contrast/gamma */
+		render_container_get_user_settings(screen_container, &settings);
+		settings.orientation = machine->gamedrv->flags & ORIENTATION_MASK;
+		settings.brightness = options_get_float(mame_options(), OPTION_BRIGHTNESS);
+		settings.contrast = options_get_float(mame_options(), OPTION_CONTRAST);
+		settings.gamma = options_get_float(mame_options(), OPTION_GAMMA);
+		render_container_set_user_settings(screen_container, &settings);
+
 		screen_container->screen = screen;
 
 		/* link it up */
@@ -703,7 +751,13 @@ static void render_load(running_machine *machine, int config_type, xml_data_node
 
 				/* apply the opposite orientation to the UI */
 				if (target == render_get_ui_target())
-					render_container_set_orientation(ui_container, orientation_add(orientation_reverse(tmpint), ui_container->orientation));
+				{
+					render_container_user_settings settings;
+
+					render_container_get_user_settings(ui_container, &settings);
+					settings.orientation = orientation_add(orientation_reverse(tmpint), settings.orientation);
+					render_container_set_user_settings(ui_container, &settings);
+				}
 			}
 		}
 	}
@@ -713,17 +767,24 @@ static void render_load(running_machine *machine, int config_type, xml_data_node
 	{
 		int index = xml_get_attribute_int(screennode, "index", -1);
 		render_container *container = get_screen_container_by_index(index);
+		render_container_user_settings settings;
+
+		/* fetch current settings */
+		render_container_get_user_settings(container, &settings);
 
 		/* fetch color controls */
-		render_container_set_brightness(container, xml_get_attribute_float(screennode, "brightness", container->brightness));
-		render_container_set_contrast(container, xml_get_attribute_float(screennode, "contrast", container->contrast));
-		render_container_set_gamma(container, xml_get_attribute_float(screennode, "gamma", container->gamma));
+		settings.brightness = xml_get_attribute_float(screennode, "brightness", settings.brightness);
+		settings.contrast = xml_get_attribute_float(screennode, "contrast", settings.contrast);
+		settings.gamma = xml_get_attribute_float(screennode, "gamma", settings.gamma);
 
 		/* fetch positioning controls */
-		render_container_set_xoffset(container, xml_get_attribute_float(screennode, "hoffset", container->xoffset));
-		render_container_set_xscale(container, xml_get_attribute_float(screennode, "hstretch", container->xscale));
-		render_container_set_yoffset(container, xml_get_attribute_float(screennode, "voffset", container->yoffset));
-		render_container_set_yscale(container, xml_get_attribute_float(screennode, "vstretch", container->yscale));
+		settings.xoffset = xml_get_attribute_float(screennode, "hoffset", settings.xoffset);
+		settings.xscale = xml_get_attribute_float(screennode, "hstretch", settings.xscale);
+		settings.yoffset = xml_get_attribute_float(screennode, "voffset", settings.yoffset);
+		settings.yscale = xml_get_attribute_float(screennode, "vstretch", settings.yscale);
+
+		/* set the new values */
+		render_container_set_user_settings(container, &settings);
 	}
 }
 
@@ -1479,11 +1540,8 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 
 const render_primitive_list *render_target_get_primitives(render_target *target)
 {
-	static const int standard_order[] = { ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BACKDROP, ITEM_LAYER_BEZEL };
-	static const int alternate_order[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BEZEL };
 	object_transform root_xform, ui_xform;
 	int itemcount[ITEM_LAYER_MAX];
-	const int *layer_order;
 	INT32 viswidth, visheight;
 	int layernum, listnum;
 
@@ -1510,35 +1568,16 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 	root_xform.color.r = root_xform.color.g = root_xform.color.b = root_xform.color.a = 1.0f;
 	root_xform.orientation = target->orientation;
 
-	/*
-        if we have multiple backdrop pieces and no overlays, render:
-            backdrop (add) + screens (add) + bezels (alpha)
-        else render:
-            screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha)
-    */
-	layer_order = standard_order;
-	if (target->curview->itemlist[ITEM_LAYER_BACKDROP] != NULL &&
-		target->curview->itemlist[ITEM_LAYER_BACKDROP]->next != NULL &&
-		target->curview->itemlist[ITEM_LAYER_OVERLAY] == NULL)
-		layer_order = alternate_order;
-
 	/* iterate over layers back-to-front, but only if we're running */
 	if (mame_get_phase(Machine) >= MAME_PHASE_RESET)
 		for (layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
 		{
-			int layer = layer_order[layernum];
+			int blendmode;
+			int layer = get_layer_and_blendmode(target->curview, layernum, &blendmode);
+
 			if (target->curview->layenabled[layer])
 			{
-				int blendmode = BLENDMODE_ALPHA;
 				view_item *item;
-
-				/* pick a blendmode */
-				if (layer == ITEM_LAYER_SCREEN && layer_order == standard_order)
-					blendmode = -1;
-				else if (layer == ITEM_LAYER_SCREEN || (layer == ITEM_LAYER_BACKDROP && layer_order == standard_order))
-					blendmode = BLENDMODE_ADD;
-				else if (layer == ITEM_LAYER_OVERLAY)
-					blendmode = BLENDMODE_RGB_MULTIPLY;
 
 				/* iterate over items in the layer */
 				itemcount[layer] = 0;
@@ -1566,7 +1605,10 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 					/* if there is no associated element, it must be a screen element */
 					if (item->element != NULL)
 					{
-						int state = (item->name[0] == 0) ? 0 : output_get_value(item->name);
+						int state = 0;
+						if (item->name[0] != '\0')
+							state = output_get_value(item->name);
+
 						add_element_primitives(target, &target->primlist[listnum], &item_xform, item->element, state, blendmode);
 					}
 					else
@@ -1623,6 +1665,94 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 	add_clear_and_optimize_primitive_list(target, &target->primlist[listnum]);
 	osd_lock_release(target->primlist[listnum].lock);
 	return &target->primlist[listnum];
+}
+
+
+/*-------------------------------------------------
+    render_target_map_point_internal - internal
+    logic for mapping points
+-------------------------------------------------*/
+
+static int render_target_map_point_internal(render_target *target, INT32 target_x, INT32 target_y,
+	render_container *container, const char *input_tag, UINT32 input_mask, float *mapped_x, float *mapped_y)
+{
+	int layernum;
+	view_item *item;
+	float target_fx, target_fy;
+	float dummy;
+	int hit;
+
+	/* sanity check */
+	if (mapped_x == NULL)
+		mapped_x = &dummy;
+	if (mapped_y == NULL)
+		mapped_y = &dummy;
+
+	/* convert target coordinates to float */
+	target_fx = (float)target_x / target->width;
+	target_fy = (float)target_y / target->height;
+
+	if (container != NULL && container == ui_container)
+	{
+		/* this hit test went against the UI container */
+		if (target_fx >= 0.0 && target_fx < 1.0 && target_fy >= 0.0 && target_fy < 1.0)
+		{
+			/* this point was successfully mapped */
+			*mapped_x = target_fx;
+			*mapped_y = target_fy;
+			return TRUE;
+		}
+	}
+	else
+	{
+		/* loop through each layer */
+		for (layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
+		{
+			int layer = get_layer_and_blendmode(target->curview, layernum, NULL);
+			if (target->curview->layenabled[layer])
+			{
+				/* iterate over items in the layer */
+				for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
+				{
+					/* perform the hit test */
+					if (item->element == NULL && container != NULL)
+						hit = (container == get_screen_container_by_index(item->index));
+					else
+						hit = FALSE;
+
+					/* is this item the container in which we are interested? */
+					if (hit)
+					{
+						/* this target contains the specified container; now check the point */
+						if (target_fx >= item->bounds.x0 && target_fx < item->bounds.x1 && target_fy >= item->bounds.y0 && target_fy < item->bounds.y1)
+						{
+							/* point successfully mapped */
+							*mapped_x = (target_fx - item->bounds.x0) / (item->bounds.x1 - item->bounds.x0);
+							*mapped_y = (target_fy - item->bounds.y0) / (item->bounds.y1 - item->bounds.y0);
+							return TRUE;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/* point not mapped */
+	*mapped_x = -1.0;
+	*mapped_y = -1.0;
+	return FALSE;
+}
+
+
+/*-------------------------------------------------
+    render_target_map_point_container - attempts to
+    map a point on the specified render_target to
+    the specified container, if possible
+-------------------------------------------------*/
+
+int render_target_map_point_container(render_target *target, INT32 target_x, INT32 target_y, render_container *container, float *container_x, float *container_y)
+{
+	return render_target_map_point_internal(target, target_x, target_y, container, NULL, 0, container_x, container_y);
 }
 
 
@@ -2579,181 +2709,39 @@ int render_container_is_empty(render_container *container)
 
 
 /*-------------------------------------------------
-    render_container_get_orientation - return the
-    orientation of a container
+    render_container_get_user_settings - get the
+    current user settings for a container
 -------------------------------------------------*/
 
-int render_container_get_orientation(render_container *container)
+void render_container_get_user_settings(render_container *container, render_container_user_settings *settings)
 {
-	return container->orientation;
+	settings->orientation = container->orientation;
+	settings->brightness = container->brightness;
+	settings->contrast = container->contrast;
+	settings->gamma = container->gamma;
+	settings->xscale = container->xscale;
+	settings->yscale = container->yscale;
+	settings->xoffset = container->xoffset;
+	settings->yoffset = container->yoffset;
 }
 
 
 /*-------------------------------------------------
-    render_container_set_orientation - set the
-    orientation of a container
+    render_container_set_user_settings - set the
+    current user settings for a container
 -------------------------------------------------*/
 
-void render_container_set_orientation(render_container *container, int orientation)
+void render_container_set_user_settings(render_container *container, const render_container_user_settings *settings)
 {
-	container->orientation = orientation;
-}
-
-
-/*-------------------------------------------------
-    render_container_get_brightness - return the
-    brightness of a container
--------------------------------------------------*/
-
-float render_container_get_brightness(render_container *container)
-{
-	return container->brightness;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_brightness - set the
-    brightness of a container
--------------------------------------------------*/
-
-void render_container_set_brightness(render_container *container, float brightness)
-{
-	container->brightness = brightness;
+	container->orientation = settings->orientation;
+	container->brightness = settings->brightness;
+	container->contrast = settings->contrast;
+	container->gamma = settings->gamma;
+	container->xscale = settings->xscale;
+	container->yscale = settings->yscale;
+	container->xoffset = settings->xoffset;
+	container->yoffset = settings->yoffset;
 	render_container_recompute_lookups(container);
-}
-
-
-/*-------------------------------------------------
-    render_container_get_contrast - return the
-    contrast of a container
--------------------------------------------------*/
-
-float render_container_get_contrast(render_container *container)
-{
-	return container->contrast;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_contrast - set the
-    contrast of a container
--------------------------------------------------*/
-
-void render_container_set_contrast(render_container *container, float contrast)
-{
-	container->contrast = contrast;
-	render_container_recompute_lookups(container);
-}
-
-
-/*-------------------------------------------------
-    render_container_get_gamma - return the
-    gamma of a container
--------------------------------------------------*/
-
-float render_container_get_gamma(render_container *container)
-{
-	return container->gamma;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_gamma - set the
-    gamma of a container
--------------------------------------------------*/
-
-void render_container_set_gamma(render_container *container, float gamma)
-{
-	container->gamma = gamma;
-	render_container_recompute_lookups(container);
-}
-
-
-/*-------------------------------------------------
-    render_container_get_xscale - return the
-    X scale of a container
--------------------------------------------------*/
-
-float render_container_get_xscale(render_container *container)
-{
-	return container->xscale;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_xscale - set the
-    X scale of a container
--------------------------------------------------*/
-
-void render_container_set_xscale(render_container *container, float xscale)
-{
-	container->xscale = xscale;
-}
-
-
-/*-------------------------------------------------
-    render_container_get_yscale - return the
-    X scale of a container
--------------------------------------------------*/
-
-float render_container_get_yscale(render_container *container)
-{
-	return container->yscale;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_yscale - set the
-    X scale of a container
--------------------------------------------------*/
-
-void render_container_set_yscale(render_container *container, float yscale)
-{
-	container->yscale = yscale;
-}
-
-
-/*-------------------------------------------------
-    render_container_get_xoffset - return the
-    X offset of a container
--------------------------------------------------*/
-
-float render_container_get_xoffset(render_container *container)
-{
-	return container->xoffset;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_xoffset - set the
-    X offset of a container
--------------------------------------------------*/
-
-void render_container_set_xoffset(render_container *container, float xoffset)
-{
-	container->xoffset = xoffset;
-}
-
-
-/*-------------------------------------------------
-    render_container_get_yoffset - return the
-    X offset of a container
--------------------------------------------------*/
-
-float render_container_get_yoffset(render_container *container)
-{
-	return container->yoffset;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_yoffset - set the
-    X offset of a container
--------------------------------------------------*/
-
-void render_container_set_yoffset(render_container *container, float yoffset)
-{
-	container->yoffset = yoffset;
 }
 
 

@@ -18,14 +18,13 @@ int mess_use_new_ui(void);
 int mess_disable_builtin_ui(running_machine *machine);
 
 /* image info screen */
-int ui_sprintf_image_info(running_machine *machine, char *buf);
-UINT32 ui_menu_image_info(running_machine *machine, UINT32 state);
+void ui_menu_image_info(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 
 /* file manager */
-UINT32 menu_file_manager(running_machine *machine, UINT32 state);
+void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 
 /* tape control */
-UINT32 menu_tape_control(running_machine *machine, UINT32 state);
+void menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 astring *tapecontrol_gettime(astring *dest, const device_config *device, int *curpos, int *endpos);
 
 /* paste */

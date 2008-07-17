@@ -17,7 +17,7 @@
          1   = internal flags:
                 bit 0 = previous field is the same frame
                 bit 1 = next field is the same frame
-         2   = white flag
+         2   = white flag (from line 11)
         3-5  = line 16 Philips code
         6-8  = line 17 Philips code
         9-11 = line 18 Philips code
@@ -28,6 +28,7 @@
 #include <ctype.h>
 #include "aviio.h"
 #include "bitmap.h"
+#include "vbiparse.h"
 
 
 
@@ -60,98 +61,19 @@ struct _pattern_data
 ***************************************************************************/
 
 /*-------------------------------------------------
-    parse_line - parse a Philips code from a
-    line of video data
--------------------------------------------------*/
-
-static int parse_line(bitmap_t *bitmap, int line, int expected_bits, UINT8 *result)
-{
-	const UINT16 *source = BITMAP_ADDR16(bitmap, line, 0);
-	int x, edges = 0, bits = 0;
-	int minwidth = 1000;
-	UINT8 bit[720];
-	int edge[720];
-	int error = 0;
-
-	/* clamp expected bits */
-	expected_bits *= 2;
-	if (expected_bits > ARRAY_LENGTH(edge) - 1)
-		expected_bits = ARRAY_LENGTH(edge) - 1;
-
-	/* find the edges in the line */
-	for (x = 1; x < bitmap->width && edges < ARRAY_LENGTH(edge); x++)
-		if (source[x] >= 0xc000 && source[x - 1] < 0xc000)
-			edge[edges++] = x;
-		else if (source[x] <= 0x4000 && source[x - 1] > 0x4000)
-			edge[edges++] = x;
-
-	/* find the minimum width */
-	for (x = 1; x < edges; x++)
-	{
-		int width = edge[x] - edge[x - 1];
-		if (width > 3 && width < minwidth)
-			minwidth = edge[x] - edge[x - 1];
-	}
-
-	/* now generate the bits */
-	for (x = 1; x < edges; x++)
-	{
-		int width = edge[x] - edge[x - 1];
-		if (width > 3)
-		{
-			int count = (width > 3 * minwidth / 2) ? 2 : 1;
-			while (count--)
-				bit[bits++] = (source[edge[x - 1]] >= 0x8000) ? 1 : 0;
-		}
-	}
-
-	/* look for improperly paired bits in the sequence */
-	if (bits < expected_bits)
-	{
-		/* look for two bits in a row of the same type on an even boundary */
-		for (x = 0; x < bits; x += 2)
-			if (bit[x] == bit[x + 1])
-				break;
-
-		/* if we got something wrong, assume we're missing an opening 0 bit */
-		if (x < bits)
-		{
-			memmove(&bit[1], &bit[0], bits);
-			bit[0] = 0;
-			bits++;
-		}
-	}
-
-	/* trailing bits are 0 */
-	while (bits < expected_bits)
-		bit[bits++] = 0;
-
-	/* output */
-	for (x = 0; x < MIN(bits, expected_bits); x += 2)
-	{
-		static const UINT8 trans[4] = { 0x80, 1, 0, 0xff };
-		result[x/2] = trans[(bit[x] << 1) | bit[x + 1]];
-		if (result[x/2] > 1)
-			error++;
-	}
-	return error ? -(bits / 2) : (bits / 2);
-}
-
-
-/*-------------------------------------------------
     output_meta - output a line of metadata
 -------------------------------------------------*/
 
-static void output_meta(UINT8 flags, UINT8 white, UINT32 line12, UINT32 line13, UINT32 line14, UINT32 framenum, UINT32 chapternum)
+static void output_meta(UINT8 flags, UINT8 white, UINT32 line16, UINT32 line17, UINT32 line18, UINT32 framenum, UINT32 chapternum)
 {
 	/* start with the raw metadata, followed by a comment */
 	printf("02%02X%02X%06X%06X%06X   ; ",
-		flags, white, line12, line13, line14);
+		flags, white, line16, line17, line18);
 
 	/* separate comments for leadin/leadout */
-	if (line13 == 0x88ffff)
+	if (line17 == 0x88ffff)
 		printf("leadin\n");
-	else if (line13 == 0x80eeee)
+	else if (line17 == 0x80eeee)
 		printf("leadout\n");
 
 	/* otherwise, display the frame and chapter, and indicate white flag/stop code */
@@ -160,7 +82,7 @@ static void output_meta(UINT8 flags, UINT8 white, UINT32 line12, UINT32 line13, 
 		printf("frame %05x ch %02x", framenum, chapternum);
 		if (white)
 			printf(" (white)");
-		if (line12 == 0x82cfff)
+		if (line16 == 0x82cfff)
 			printf(" (stop)");
 		printf("\n");
 	}
@@ -174,7 +96,7 @@ static void output_meta(UINT8 flags, UINT8 white, UINT32 line12, UINT32 line13, 
 
 static int generate_from_avi(const char *aviname)
 {
-	UINT32 line12 = 0, line13 = 0, line14 = 0, framenum = 0, chapternum = 0;
+	UINT32 line16 = 0, line17 = 0, line18 = 0, framenum = 0, chapternum = 0;
 	const avi_movie_info *info;
 	bitmap_t *bitmap;
 	avi_error avierr;
@@ -193,9 +115,9 @@ static int generate_from_avi(const char *aviname)
 	/* extract movie info */
 	info = avi_get_movie_info(avi);
 	fprintf(stderr, "%dx%d - %d frames total\n", info->video_width, info->video_height, info->video_numsamples);
-	if (info->video_height != 39)
+	if (info->video_height < 22*2)
 	{
-		fprintf(stderr, "Unknown VANC capture format: expected 39 rows\n");
+		fprintf(stderr, "Unknown VBI capture format: expected at least 44 rows\n");
 		return 1;
 	}
 
@@ -227,10 +149,8 @@ static int generate_from_avi(const char *aviname)
 			int prevwhite = white;
 			int i;
 
-			/* line 7 contains the white flag */
-			white = 0;
-			if (*BITMAP_ADDR16(bitmap, 20 * field + 7, bitmap->width / 2) > 0x8000)
-				white = 1;
+			/* line 11 contains the white flag */
+			white = vbi_parse_white_flag(BITMAP_ADDR16(bitmap, 11*2 + field, 0), bitmap->width, 8);
 
 			/* output metadata for *previous* field */
 			if (frame > 0 || field > 0)
@@ -239,35 +159,35 @@ static int generate_from_avi(const char *aviname)
 
 				if (!prevwhite) flags |= 0x01;
 				if (!white) flags |= 0x02;
-				output_meta(flags, prevwhite, line12, line13, line14, framenum, chapternum);
+				output_meta(flags, prevwhite, line16, line17, line18, framenum, chapternum);
 			}
 
-			/* line 12 contains stop code and other interesting bits */
-			line12 = 0;
-			if (parse_line(bitmap, 20 * field + 12, 24, bits) == 24)
+			/* line 16 contains stop code and other interesting bits */
+			line16 = 0;
+			if (vbi_parse_manchester_code(BITMAP_ADDR16(bitmap, 16*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
 				for (i = 0; i < 24; i++)
-					line12 = (line12 << 1) | bits[i];
+					line16 = (line16 << 1) | bits[i];
 
-			/* line 13 and 14 contain frame/chapter/lead in/out encodings */
-			line13 = 0;
-			if (parse_line(bitmap, 20 * field + 13, 24, bits) == 24)
+			/* line 17 and 18 contain frame/chapter/lead in/out encodings */
+			line17 = 0;
+			if (vbi_parse_manchester_code(BITMAP_ADDR16(bitmap, 17*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
 				for (i = 0; i < 24; i++)
-					line13 = (line13 << 1) | bits[i];
+					line17 = (line17 << 1) | bits[i];
 
-			line14 = 0;
-			if (parse_line(bitmap, 20 * field + 14, 24, bits) == 24)
+			line18 = 0;
+			if (vbi_parse_manchester_code(BITMAP_ADDR16(bitmap, 18*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
 				for (i = 0; i < 24; i++)
-					line14 = (line14 << 1) | bits[i];
+					line18 = (line18 << 1) | bits[i];
 
 			/* the two lines must match */
-//          if (line13 != 0 && line14 != 0 && line13 != line14)
-//              line13 = line14 = 0;
+//          if (line17 != 0 && line18 != 0 && line17 != line18)
+//              line17 = line18 = 0;
 
 			/* is this a frame number? */
-			if ((line13 & 0xf00000) == 0xf00000)
-				framenum = line13 & 0x7ffff;
-			if ((line13 & 0xf00fff) == 0x800ddd)
-				chapternum = (line13 >> 12) & 0x7f;
+			if ((line17 & 0xf00000) == 0xf00000)
+				framenum = line17 & 0x7ffff;
+			if ((line17 & 0xf00fff) == 0x800ddd)
+				chapternum = (line17 >> 12) & 0x7f;
 		}
 	}
 
@@ -276,7 +196,7 @@ static int generate_from_avi(const char *aviname)
 		int flags = 0;
 
 		if (!white) flags |= 0x01;
-		output_meta(flags, white, line12, line13, line14, framenum, chapternum);
+		output_meta(flags, white, line16, line17, line18, framenum, chapternum);
 	}
 
 	bitmap_free(bitmap);

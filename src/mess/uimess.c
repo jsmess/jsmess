@@ -10,6 +10,7 @@
 #include "mslegacy.h"
 #include "uimenu.h"
 #include "uimess.h"
+#include "uiinput.h"
 #include "input.h"
 
 
@@ -40,7 +41,7 @@ void mess_ui_update(running_machine *machine)
 	/* traditional MESS interface */
 	if (machine->gamedrv->flags & GAME_COMPUTER)
 	{
-		if( input_ui_pressed(machine, IPT_UI_TOGGLE_UI) )
+		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI) )
 		{
 			if( !ui_toggle_key )
 			{
@@ -102,29 +103,27 @@ void mess_ui_update(running_machine *machine)
 
 
 
-/*************************************
- *
- *  Image info
- *
- *************************************/
+/*-------------------------------------------------
+    image_info_astring - populate an allocated
+    string with the image info text
+-------------------------------------------------*/
 
-int ui_sprintf_image_info(running_machine *machine, char *buf)
+static astring *image_info_astring(running_machine *machine, astring *string)
 {
-	char *dst = buf;
 	const device_config *img;
 
-	dst += sprintf(dst, "%s\n\n", machine->gamedrv->description);
+	astring_printf(string, "%s\n\n", machine->gamedrv->description);
 
 	if (mess_ram_size > 0)
 	{
 		char buf2[RAM_STRING_BUFLEN];
-		dst += sprintf(dst, "RAM: %s\n\n", ram_string(buf2, mess_ram_size));
+		astring_catprintf(string, "RAM: %s\n\n", ram_string(buf2, mess_ram_size));
 	}
 
 	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
 	{
 		const char *name = image_filename(img);
-		if( name )
+		if (name != NULL)
 		{
 			const char *base_filename;
 			const char *info;
@@ -134,38 +133,38 @@ int ui_sprintf_image_info(running_machine *machine, char *buf)
 			base_filename_noextension = strip_extension(base_filename);
 
 			/* display device type and filename */
-			dst += sprintf(dst,"%s: %s\n", image_typename_id(img), base_filename);
+			astring_catprintf(string, "%s: %s\n", image_typename_id(img), base_filename);
 
 			/* display long filename, if present and doesn't correspond to name */
 			info = image_longname(img);
 			if (info && (!base_filename_noextension || mame_stricmp(info, base_filename_noextension)))
-				dst += sprintf(dst,"%s\n", info);
+				astring_catprintf(string, "%s\n", info);
 
 			/* display manufacturer, if available */
 			info = image_manufacturer(img);
-			if (info)
+			if (info != NULL)
 			{
-				dst += sprintf(dst,"%s", info);
+				astring_catprintf(string, "%s", info);
 				info = stripspace(image_year(img));
 				if (info && *info)
-					dst += sprintf(dst,", %s", info);
-				dst += sprintf(dst,"\n");
+					astring_catprintf(string, ", %s", info);
+				astring_catprintf(string,"\n");
 			}
 
 			/* display playable information, if available */
 			info = image_playable(img);
-			if (info)
-				dst += sprintf(dst,"%s\n", info);
+			if (info != NULL)
+				astring_catprintf(string, "%s\n", info);
 
-			if (base_filename_noextension)
+			if (base_filename_noextension != NULL)
 				free(base_filename_noextension);
 		}
 		else
 		{
-			dst += sprintf(dst,"%s: ---\n", image_typename_id(img));
+			astring_catprintf(string, "%s: ---\n", image_typename_id(img));
 		}
 	}
-	return dst - buf;
+	return string;
 }
 
 
@@ -175,27 +174,26 @@ int ui_sprintf_image_info(running_machine *machine, char *buf)
 	all loaded images
 -------------------------------------------------*/
 
-UINT32 ui_menu_image_info(running_machine *machine, UINT32 state)
+void ui_menu_image_info(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	char buf[2048];
-	char *bufptr = buf;
-	UINT32 selected = 0;
+	/* if the menu isn't built, populate now */
+	if (!ui_menu_populated(menu))
+	{
+		astring *tempstring = image_info_astring(machine, astring_alloc());
+		ui_menu_item_append(menu, astring_c(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
+		astring_free(tempstring);
+	}
 
-	/* add the game info */
-	bufptr += ui_sprintf_image_info(machine, bufptr);
-
-	/* make it look like a menu */
-	bufptr += sprintf(bufptr, "\n\t%s %s %s", ui_getstring(UI_lefthilight), ui_getstring(UI_returntomain), ui_getstring(UI_righthilight));
-
-	/* draw the text */
-	ui_draw_message_window(buf);
-
-	/* handle the keys */
-	ui_menu_generic_keys(machine, &selected, 1, 0);
-	return selected;
+	/* process the menu */
+	ui_menu_process(menu, 0);
 }
 
 
+
+/*-------------------------------------------------
+    mess_use_new_ui - determines if the "new ui"
+	is in use
+-------------------------------------------------*/
 
 /*-------------------------------------------------
     mess_use_new_ui - determines if the "new ui"

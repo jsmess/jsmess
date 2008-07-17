@@ -446,7 +446,6 @@ $(MAMEOBJ)/alpha.a: \
 	$(DRIVERS)/alpha68k.o $(VIDEO)/alpha68k.o \
 	$(DRIVERS)/champbas.o $(VIDEO)/champbas.o \
 	$(DRIVERS)/equites.o $(VIDEO)/equites.o \
-	$(DRIVERS)/exctsccr.o $(VIDEO)/exctsccr.o \
 	$(DRIVERS)/meijinsn.o \
 	$(DRIVERS)/shougi.o \
 
@@ -1159,7 +1158,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/model1.o $(MACHINE)/model1.o $(VIDEO)/model1.o \
 	$(DRIVERS)/model2.o $(VIDEO)/model2.o \
 	$(DRIVERS)/model3.o $(VIDEO)/model3.o $(MACHINE)/model3.o \
-	$(DRIVERS)/naomi.o $(MACHINE)/dc.o $(VIDEO)/dc.o \
+	$(DRIVERS)/naomi.o $(MACHINE)/dc.o $(VIDEO)/dc.o $(MACHINE)/gdcrypt.o \
 	$(DRIVERS)/puckpkmn.o \
 	$(DRIVERS)/segac2.o \
 	$(DRIVERS)/segag80r.o $(MACHINE)/segag80.o $(AUDIO)/segag80r.o $(VIDEO)/segag80r.o \
