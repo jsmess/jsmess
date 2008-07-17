@@ -25,10 +25,9 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SLOT_EMPTY				"[empty slot]"
-#define SLOT_CREATE				"[create]"
-
 #define ITEMREF_NEW_IMAGE_NAME	((void *) 0x0001)
+#define ITEMREF_EMPTY_SLOT		((void *) 0x0002)
+#define ITEMREF_CREATE			((void *) 0x0003)
 
 
 
@@ -491,13 +490,13 @@ static file_error menu_file_selector_populate(running_machine *machine, ui_menu 
 		goto done;
 
 	/* add the "[empty slot]" entry */
-	append_menu_item(menu, menustate, SLOT_EMPTY, NULL, NULL, ENTTYPE_FILE, 0, FALSE);
+	ui_menu_item_append(menu, "[empty slot]", NULL, 0, ITEMREF_EMPTY_SLOT);
 
 	info = image_device_getinfo(device->machine->config, device);
 	if (info.creatable && !zippath_is_zip(directory))
 	{
 		/* add the "[create]" entry */
-		append_menu_item(menu, menustate, SLOT_CREATE, NULL, NULL, ENTTYPE_FILE, 0, FALSE);
+		ui_menu_item_append(menu, "[create]", NULL, 0, ITEMREF_CREATE);
 	}
 
 	/* add the drives */
@@ -603,62 +602,59 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 		/* handle selections */
 		if (event->iptkey == IPT_UI_SELECT)
 		{
-			dirent = (const osd_directory_entry *) event->itemref;
-			ui_menu_reset(menu, 0);
-
-			switch(dirent->type)
+			if (event->itemref == ITEMREF_EMPTY_SLOT)
 			{
-				case ENTTYPE_DIR:
-					/* prepare the selection in the new directory */
-					selected = 1;
-					if (!strcmp(dirent->name, ".."))
-						zippath_parent_basename(menustate->manager_menustate->current_file, astring_c(menustate->manager_menustate->current_directory));
+				/* empty slot - unload */
+				image_unload(menustate->manager_menustate->selected_device);
+				ui_menu_stack_pop(machine);
+			}
+			else if (event->itemref == ITEMREF_CREATE)
+			{
+				/* create */
+				child_menu = ui_menu_alloc(machine, menu_file_create, NULL);
+				child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate));
+				child_menustate->manager_menustate = menustate->manager_menustate;
+				ui_menu_stack_push(child_menu);
+			}
+			else
+			{
+				dirent = (const osd_directory_entry *) event->itemref;
+				ui_menu_reset(menu, 0);
 
-					/* change the directory */
-					new_path = zippath_combine(astring_alloc(), astring_c(menustate->manager_menustate->current_directory), dirent->name);
-					err = check_path(astring_c(new_path));
-					if (err != FILERR_NONE)
-					{
-						/* this path is problematic; present the user with an error and bail */
-						ui_popup_time(1, "Error accessing %s", astring_c(new_path));
-						astring_free(new_path);
+				switch(dirent->type)
+				{
+					case ENTTYPE_DIR:
+						/* prepare the selection in the new directory */
+						selected = 1;
+						if (!strcmp(dirent->name, ".."))
+							zippath_parent_basename(menustate->manager_menustate->current_file, astring_c(menustate->manager_menustate->current_directory));
+
+						/* change the directory */
+						new_path = zippath_combine(astring_alloc(), astring_c(menustate->manager_menustate->current_directory), dirent->name);
+						err = check_path(astring_c(new_path));
+						if (err != FILERR_NONE)
+						{
+							/* this path is problematic; present the user with an error and bail */
+							ui_popup_time(1, "Error accessing %s", astring_c(new_path));
+							astring_free(new_path);
+							break;
+						}
+						astring_free(menustate->manager_menustate->current_directory);
+						menustate->manager_menustate->current_directory = new_path;
 						break;
-					}
-					astring_free(menustate->manager_menustate->current_directory);
-					menustate->manager_menustate->current_directory = new_path;
-					break;
 
-				case ENTTYPE_FILE:
-					if (dirent->name != NULL)
-					{
+					case ENTTYPE_FILE:
 						/* specified a file */
 						new_path = zippath_combine(astring_alloc(), astring_c(menustate->manager_menustate->current_directory), dirent->name);
 						image_load(menustate->manager_menustate->selected_device, astring_c(new_path));
 						astring_free(new_path);
-					}
-					else if (!strcmp(dirent->name, SLOT_EMPTY))
-					{
-						/* empty slot - unload */
-						image_unload(menustate->manager_menustate->selected_device);
-					}
-					else if (!strcmp(dirent->name, SLOT_CREATE))
-					{
-						/* create */
-						child_menu = ui_menu_alloc(machine, menu_file_create, NULL);
-						child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate));
-						child_menustate->manager_menustate = menustate->manager_menustate;
-						ui_menu_stack_push(child_menu);
-					}
-					else
-					{
-						fatalerror("Should not reach here");
-					}
-					ui_menu_stack_pop(machine);
-					break;
+						ui_menu_stack_pop(machine);
+						break;
 
-				default:
-					/* do nothing */
-					break;
+					default:
+						/* do nothing */
+						break;
+				}
 			}
 		}
 	}
