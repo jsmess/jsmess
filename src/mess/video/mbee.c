@@ -99,13 +99,14 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 
 static int keyboard_matrix_r(running_machine *machine, int offs)
 {
-	char portname[6];
 	int port = (offs >> 7) & 7;
 	int bit = (offs >> 4) & 7;
 	int extra = input_port_read(machine, "EXTRA");
 	int data = 0;
-	sprintf(portname, "LINE%d", port);
-	data = (input_port_read(machine, portname) >> bit) & 1;
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+
+
+	data = (input_port_read(machine, keynames[port]) >> bit) & 1;
 
 	if( extra & 0x01 )	/* extra: cursor up */
 	{

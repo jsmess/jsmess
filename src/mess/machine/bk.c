@@ -21,34 +21,45 @@ static UINT16 bk_drive;
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	UINT8 code,i,j;
+	UINT8 code, i, j;
+	static const char *keynames[] = { "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", 
+										"LINE7", "LINE8", "LINE9", "LINE10", "LINE11" };
 
-	for(i=1;i<12;i++) {
-		char port[7];
-		sprintf(port,"LINE%d",i);
-		code = 	input_port_read(machine, port);
-		if (code!=0) {
-			for(j=0;j<8;j++) {
-				if (code == (1 << j)) {
+	for(i = 1; i < 12; i++) 
+	{
+		code = 	input_port_read(machine, keynames[i]);
+		if (code != 0) 
+		{
+			for(j = 0; j < 8; j++) 
+			{
+				if (code == (1 << j)) 
+				{
 					key_code = j + i*8;
 					break;
 				}
 			}
-			if ((input_port_read(machine,"LINE0") & 4) ==4) {
-				if (i==6 || i==7) {
+			if ((input_port_read(machine, "LINE0") & 4) == 4) 
+			{
+				if (i==6 || i==7) 
+				{
 					key_code -= 16;
 				}
 
 			}
-			if ((input_port_read(machine,"LINE0") & 4) ==4) {
-				if (i>=8 && i<=11) {
+			if ((input_port_read(machine, "LINE0") & 4) == 4) 
+			{
+				if (i>=8 && i<=11) 
+				{
 					key_code += 32;
 				}
 			}
 			key_pressed = 0x40;
-			if ((input_port_read(machine,"LINE0") & 2) ==0) {
+			if ((input_port_read(machine, "LINE0") & 2) == 0) 
+			{
 				key_irq_vector = 0x30;
-			} else {
+			} 
+			else 
+			{
 				key_irq_vector = 0xBC;
 			}
 			cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);

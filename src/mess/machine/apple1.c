@@ -288,6 +288,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	int port, bit;
 	int key_pressed;
 	UINT32 shiftkeys, ctrlkeys;
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	/* This holds the values of all the input ports for ordinary keys
 	   seen during the last scan. */
@@ -345,10 +346,8 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	for (port = 0; port < 4; port++)
 	{
 		UINT32 portval, newkeys;
-		char tag[6];
 		
-		sprintf(tag, "KEY%d", port);
-		portval = input_port_read(machine, tag);
+		portval = input_port_read(machine, keynames[port]);
 		newkeys = portval & ~(kbd_last_scan[port]);
 
 		if (newkeys)

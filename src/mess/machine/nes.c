@@ -300,7 +300,7 @@ static int zapper_hit_pixel(running_machine *machine, const nes_input *input)
 static void nes_read_input_device(running_machine *machine, int cfg, nes_input *vals, int pad_port,
 	int supports_zapper, int paddle_port)
 {
-	char port[5];
+	static const char *padnames[] = { "PAD1", "PAD2", "PAD3", "PAD4" };
 
 	vals->i0 = 0;
 	vals->i1 = 0;
@@ -310,10 +310,7 @@ static void nes_read_input_device(running_machine *machine, int cfg, nes_input *
 	{
 		case 0x01:	/* gamepad */
 			if (pad_port >= 0)
-			{
-				sprintf(port, "PAD%d", pad_port+1);
-				vals->i0 = input_port_read(machine, port);
-			}
+				vals->i0 = input_port_read(machine, padnames[pad_port]);
 			break;
 
 		case 0x02:	/* zapper 1 */

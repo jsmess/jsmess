@@ -192,14 +192,13 @@ static READ8_HANDLER ( svi318_ppi_port_a_r )
 static  READ8_HANDLER ( svi318_ppi_port_b_r )
 {
 	int row;
-	char port[7];
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", 
+										"LINE6", "LINE7", "LINE8", "LINE9", "LINE10" };
 
 	row = svi.keyboard_row;
 	if (row <= 10)
-	{
-		sprintf(port, "LINE%d", row);
-		return input_port_read(machine, port);
-	}
+		return input_port_read(machine, keynames[row]);
+
 	return 0xff;
 }
 

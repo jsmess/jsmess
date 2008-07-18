@@ -248,12 +248,10 @@ static WRITE8_HANDLER(apf_imagination_pia_out_b_func)
 	/* bit 7 = ??? */
 
 	int keyboard_line;
-	char port[5];
+	static const char *keynames[] = { "key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7" };
 
 	keyboard_line = data & 0x07;
-
-	sprintf(port, "key%d", keyboard_line);
-	keyboard_data = input_port_read(machine, port);
+	keyboard_data = input_port_read(machine, keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
 	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),

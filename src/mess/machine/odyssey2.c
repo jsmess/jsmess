@@ -148,14 +148,13 @@ READ8_HANDLER( odyssey2_getp2 )
 {
     UINT8 h = 0xFF;
     int i, j;
-	char port[6];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
     if (!(p1 & P1_KEYBOARD_SCAN_ENABLE))
 	{
 		if ((p2 & P2_KEYBOARD_SELECT_MASK) <= 5)  /* read keyboard */
 		{
-			sprintf(port, "KEY%d", (p2 & P2_KEYBOARD_SELECT_MASK));
-			h &= input_port_read(machine, port);
+			h &= input_port_read(machine, keynames[p2 & P2_KEYBOARD_SELECT_MASK]);
 		}
 
 		for (i= 0x80, j = 0; i > 0; i >>= 1, j++)

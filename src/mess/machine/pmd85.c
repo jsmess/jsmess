@@ -211,10 +211,10 @@ static  READ8_HANDLER ( pmd85_ppi_0_porta_r )
 
 static  READ8_HANDLER ( pmd85_ppi_0_portb_r )
 {
-	char port[7];
-	
-	sprintf(port, "KEY%d", (pmd85_ppi_port_outputs[0][0] & 0x0f));
-	return input_port_read(machine, port) & input_port_read(machine, "KEY15");
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
+										"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15" };
+
+	return input_port_read(machine, keynames[(pmd85_ppi_port_outputs[0][0] & 0x0f)]) & input_port_read(machine, "KEY15");
 }
 
 static  READ8_HANDLER ( pmd85_ppi_0_portc_r )
@@ -251,15 +251,12 @@ static  READ8_HANDLER ( mato_ppi_0_portb_r )
 {
 	int i;
 	UINT8 data = 0xff;
-	char port[6];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	for (i = 0; i < 8; i++)
 	{
 		if (!(pmd85_ppi_port_outputs[0][0] & (1 << i)))
-		{
-			sprintf(port, "KEY%d", i);
-			data &= input_port_read(machine, port);
-		}
+			data &= input_port_read(machine, keynames[i]);
 	}
 	return data;
 }

@@ -316,14 +316,11 @@ static z80ctc_interface	sord_m5_ctc_intf =
 
 static READ8_HANDLER ( sord_keyboard_r )
 {
-	char port[7];
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
+										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15",
+										"RESET"};
 
-	if (offset == 16)
-		sprintf(port, "%s", "RESET");
-	else
-		sprintf(port, "LINE%d", offset);
-
-	return input_port_read(machine, port);
+	return input_port_read(machine, keynames[offset]);
 }
 
 static ADDRESS_MAP_START( sord_m5_mem , ADDRESS_SPACE_PROGRAM, 8)

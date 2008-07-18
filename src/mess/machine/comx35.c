@@ -287,12 +287,12 @@ static void printer_w(running_machine *machine, UINT8 data)
 static void get_active_bank(running_machine *machine, UINT8 data)
 {
 	comx35_state *state = machine->driver_data;
+	static const char *slotnames[] = { "SLOT1", "SLOT2", "SLOT3", "SLOT4" };
 
 	if (expansion_box_installed(machine))
 	{
 		// expansion box
 
-		char port[6];
 		int i;
 
 		for (i = 1; i < 5; i++)
@@ -305,11 +305,7 @@ static void get_active_bank(running_machine *machine, UINT8 data)
 		}
 
 		if (state->slot > 0)
-		{
-			sprintf(port, "SLOT%d", state->slot);
-
-			state->bank = input_port_read(machine, port);
-		}
+			state->bank = input_port_read(machine, slotnames[state->slot]);
 	}
 	else
 	{

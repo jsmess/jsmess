@@ -731,7 +731,7 @@ DRIVER_INIT( at_vga )
 	};
 
 	init_at_common(machine, &at8042);
-	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
+	pc_turbo_setup(0, "DSW2", 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 
 	/* Attach keyboard to the keyboard controller */
@@ -748,7 +748,7 @@ DRIVER_INIT( ps2m30286 )
 		KBDC8042_PS2, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(machine, &at8042);
-	pc_turbo_setup(0, 2, 0x02, 4.77/12, 1);
+	pc_turbo_setup(0, "DSW2", 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 
 	/* Attach keyboard to the keyboard controller */

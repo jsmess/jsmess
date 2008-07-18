@@ -337,14 +337,13 @@ static void einstein_scan_keyboard(running_machine *machine)
 {
 	unsigned char data = 0x0ff;
 	int i;
-	char port[6];
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	for (i=0; i<8; i++)
 	{
-		if ((einstein_keyboard_line & (1<<i))==0)
+		if ((einstein_keyboard_line & (1<<i)) == 0)
 		{
-			sprintf(port, "LINE%d", i);
-			data &= input_port_read(machine, port);
+			data &= input_port_read(machine, keynames[i]);
 		}
 	}
 

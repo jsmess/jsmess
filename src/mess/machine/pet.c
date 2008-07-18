@@ -78,12 +78,12 @@ static WRITE8_HANDLER ( pet_pia0_port_a_write )
 static  READ8_HANDLER ( pet_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
-	char port[6];
+	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
+										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 	
 	if ( pet_keyline_select < 10 ) 
 	{
-		sprintf(port, "ROW%d", pet_keyline_select);
-		data = input_port_read(machine, port);
+		data = input_port_read(machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
 		if ( pet_keyline_select == 8 && ( input_port_read(machine, "SPECIAL") & 0x80 ) ) 
 		{
@@ -97,12 +97,12 @@ static  READ8_HANDLER ( pet_pia0_port_b_read )
 static READ8_HANDLER( petb_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
-	char port[6];
+	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
+										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 	
 	if ( pet_keyline_select < 10 ) 
 	{
-		sprintf(port, "ROW%d", pet_keyline_select);
-		data = input_port_read(machine, port);
+		data = input_port_read(machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
 		/* 2008-05 FP: For some reason, superpet read it in the opposite way!! */
 		/* While waiting for confirmation from docs, we add a workaround here. */

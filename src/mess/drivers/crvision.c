@@ -244,12 +244,17 @@ static UINT8 read_keyboard(running_machine *machine, int pa)
 {
 	int i;
 	UINT8 value;
-	char portname[10];
+	static const char *const keynames[4][8] =
+			{
+				{ "PA0-0", "PA0-1", "PA0-2", "PA0-3", "PA0-4", "PA0-5", "PA0-6", "PA0-7" },
+				{ "PA1-0", "PA1-1", "PA1-2", "PA1-3", "PA1-4", "PA1-5", "PA1-6", "PA1-7" },
+				{ "PA2-0", "PA2-1", "PA2-2", "PA2-3", "PA2-4", "PA2-5", "PA2-6", "PA2-7" },
+				{ "PA3-0", "PA3-1", "PA3-2", "PA3-3", "PA3-4", "PA3-5", "PA3-6", "PA3-7" }
+			};
 
 	for (i = 0; i < 8; i++)
 	{
-		sprintf(portname, "PA%u-%u", pa, i);
-		value = input_port_read(machine, portname);
+		value = input_port_read(machine, keynames[pa][i]);
 
 		if (value != 0xff)
 		{

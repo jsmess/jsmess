@@ -96,7 +96,7 @@ static	char *oric_ram_0x0c000 = NULL;
 
 
 /* index of keyboard line to scan */
-static char oric_keyboard_line;
+int oric_keyboard_line;
 /* sense result */
 static char oric_key_sense_bit;
 /* mask to read keys */
@@ -119,16 +119,15 @@ static void oric_keyboard_sense_refresh(running_machine *machine)
 
 	/* what if data is 0, can it sense if any of the keys on a line are pressed? */
 	int input_port_data;
-	char port[6];
+	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
-	sprintf(port, "ROW%d", oric_keyboard_line);
- 	input_port_data = input_port_read(machine, port);
+ 	input_port_data = input_port_read(machine, keynames[oric_keyboard_line]);
 
 	/* go through all bits in line */
 	for (i=0; i<8; i++)
 	{
 		/* sense this bit? */
-		if (((~oric_keyboard_mask) & (1<<i))!=0)
+		if (((~oric_keyboard_mask) & (1<<i)) != 0)
 		{
 			/* is key pressed? */
 			if (input_port_data & (1<<i))

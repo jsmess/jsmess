@@ -143,11 +143,9 @@ static void clock_scan_counters(const device_config *device)
 static void detect_keypress(const device_config *device)
 {
 	cdp1871_t *cdp1871 = get_safe_token(device);
-	char port[3];
+	static const char *keynames[] = { "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11" };
 
-	sprintf(port, "D%d", cdp1871->drive + 1);
-	
-	if (input_port_read(device->machine, port) == (1 << cdp1871->sense))
+	if (input_port_read(device->machine, keynames[cdp1871->drive]) == (1 << cdp1871->sense))
 	{
 		if (!cdp1871->inhibit)
 		{

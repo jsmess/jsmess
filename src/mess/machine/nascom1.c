@@ -149,13 +149,10 @@ DEVICE_IMAGE_LOAD( nascom2_floppy )
 
 READ8_HANDLER ( nascom1_port_00_r )
 {
-	char port[6];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8" };
 
 	if (nascom1_portstat.stat_count < 9)
-	{
-		sprintf(port, "KEY%d", nascom1_portstat.stat_count);
-		return (input_port_read(machine, port) | ~0x7f);
-	}
+		return (input_port_read(machine, keynames[nascom1_portstat.stat_count]) | ~0x7f);
 	
 	return (0xff);
 }

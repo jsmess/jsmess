@@ -1867,13 +1867,10 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 	UINT32 key_buf;
 	UINT8 current_key;
 	int i;
-	char port1[5], port2[5];
-
+	static const char *keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
 
 	/* read current key state */
-	sprintf(port1, "KP%d", num);
-	sprintf(port2, "KP%d", num+1);
-	key_buf = ( input_port_read(machine, port1) | (input_port_read(machine, port2) << 16) ) >> (4*num);
+	key_buf = ( input_port_read(machine, keynames[num]) | (input_port_read(machine, keynames[num + 1]) << 16) ) >> (4*num);
 
 	/* If a key was previously pressed, this key was not shift, and this key is
 	still down, then don't change the current key press. */
@@ -1949,13 +1946,15 @@ static int ti99_handset_poll_joystick(running_machine *machine, int num)
 	UINT8 current_joy;
 	int current_joy_x, current_joy_y;
 	int message;
-	char port1[6], port2[6];
+	static const char *const joynames[2][4] =
+			{
+				{ "JOY0", "JOY2", "JOY4", "JOY6" },		// X axis
+				{ "JOY1", "JOY3", "JOY5", "JOY7" }		// Y axis
+			};
 
 	/* read joystick position */
-	sprintf(port1, "JOY%d", 2*num);
-	sprintf(port2, "JOY%d", 2*num+1);
-	current_joy_x = input_port_read(machine, port1);
-	current_joy_y = input_port_read(machine, port2);
+	current_joy_x = input_port_read(machine, joynames[0][num]);
+	current_joy_y = input_port_read(machine, joynames[1][num]);
 	/* compare with last saved position */
 	current_joy = current_joy_x | (current_joy_y << 4);
 	if (current_joy != previous_joy[num])
@@ -2272,7 +2271,7 @@ static int ti99_R9901_0(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
-	char port[7];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	if ((ti99_model == model_99_4) && (KeyCol == 7))
 		answer = (ti99_handset_poll_bus() << 3) | 0x80;
@@ -2291,8 +2290,7 @@ static int ti99_R9901_0(int offset)
 	}
 	else
 	{
-		sprintf(port, "KEY%d", (KeyCol >> 1));
-		answer = ((input_port_read(machine, port) >> ((KeyCol & 1) * 8)) << 3) & 0xF8;
+		answer = ((input_port_read(machine, keynames[KeyCol >> 1]) >> ((KeyCol & 1) * 8)) << 3) & 0xF8;
 	}
 	
 	if ((ti99_model == model_99_4a) || (ti99_model == model_99_4p))
@@ -2317,14 +2315,13 @@ static int ti99_R9901_1(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
-	char port[7];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	if (/*(ti99_model == model_99_4) &&*/ (KeyCol == 7))
 		answer = 0x07;
 	else
 	{
-		sprintf(port, "KEY%d", (KeyCol >> 1));
-		answer = ((input_port_read(machine, port) >> ((KeyCol & 1) * 8)) >> 5) & 0x07;
+		answer = ((input_port_read(machine, keynames[KeyCol >> 1]) >> ((KeyCol & 1) * 8)) >> 5) & 0x07;
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
@@ -2405,7 +2402,8 @@ static int ti99_8_R9901_0(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
-	char port[7];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
+										"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15" };
 
 	if (has_mecmouse && (KeyCol == 15))
 	{
@@ -2419,8 +2417,7 @@ static int ti99_8_R9901_0(int offset)
 	}
 	else
 	{
-		sprintf(port, "KEY%d", KeyCol);
-		answer = (input_port_read(machine, port) << 6) & 0xC0;
+		answer = (input_port_read(machine, keynames[KeyCol]) << 6) & 0xC0;
 	}
 	
 	return answer;
@@ -2439,7 +2436,8 @@ static int ti99_8_R9901_1(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
-	char port[7];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
+										"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15" };
 
 	if (has_mecmouse && (KeyCol == 15))
 	{
@@ -2453,8 +2451,7 @@ static int ti99_8_R9901_1(int offset)
 	}
 	else
 	{
-		sprintf(port, "KEY%d", KeyCol);
-		answer = (input_port_read(machine, port) >> 2) & 0x07;
+		answer = (input_port_read(machine, keynames[KeyCol]) >> 2) & 0x07;
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */

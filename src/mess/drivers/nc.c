@@ -682,7 +682,8 @@ static READ8_HANDLER(nc_irq_status_r)
 
 static READ8_HANDLER(nc_key_data_in_r)
 {
-	char port[6];
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", 
+										"LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 
 	if (offset==9)
 	{
@@ -694,8 +695,8 @@ static READ8_HANDLER(nc_key_data_in_r)
 
 		nc_update_interrupts(machine);
 	}
-	sprintf(port, "LINE%d", offset);
-	return input_port_read(machine, port);
+
+	return input_port_read(machine, keynames[offset]);
 }
 
 

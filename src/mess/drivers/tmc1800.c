@@ -352,7 +352,7 @@ static CDP1802_EF_READ( tmc1800_ef_r )
 	tmc1800_state *state = machine->driver_data;
 
 	UINT8 flags = 0x0f;
-	char port[4];
+	static const char *keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	/*
         EF1     CDP1861
@@ -371,8 +371,7 @@ static CDP1802_EF_READ( tmc1800_ef_r )
 
 	// keyboard
 
-	sprintf(port, "IN%d", state->keylatch / 8);
-	if (~input_port_read(machine, port) & (1 << (state->keylatch % 8))) flags -= EF3;
+	if (~input_port_read(machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) flags -= EF3;
 
 	return flags;
 }
@@ -439,7 +438,7 @@ static CDP1802_EF_READ( tmc2000_ef_r )
 	tmc2000_state *state = machine->driver_data;
 
 	int flags = 0x0f;
-	char port[4];
+	static const char *keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	/*
         EF1     CDP1864
@@ -458,8 +457,7 @@ static CDP1802_EF_READ( tmc2000_ef_r )
 
 	// keyboard
 
-	sprintf(port, "IN%d", state->keylatch / 8);
-	if (~input_port_read(machine, port) & (1 << (state->keylatch % 8))) flags -= EF3;
+	if (~input_port_read(machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) flags -= EF3;
 
 	return flags;
 }
@@ -535,7 +533,7 @@ static CDP1802_EF_READ( oscnano_ef_r )
 	tmc2000_state *state = machine->driver_data;
 
 	int flags = 0x0f;
-	char port[4];
+	static const char *keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	/*
         EF1     CDP1864
@@ -554,8 +552,7 @@ static CDP1802_EF_READ( oscnano_ef_r )
 
 	// keyboard
 
-	sprintf(port, "IN%d", state->keylatch / 8);
-	if (~input_port_read(machine, port) & (1 << (state->keylatch % 8))) flags -= EF3;
+	if (~input_port_read(machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) flags -= EF3;
 
 	// monitor
 

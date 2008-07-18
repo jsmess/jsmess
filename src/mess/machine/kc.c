@@ -901,7 +901,7 @@ static void kc_keyboard_add_pulse_to_transmit_buffer(int pulse_state)
 static void kc_keyboard_init(running_machine *machine)
 {
 	int i;
-	char port[6];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	/* head and tail of list is at beginning */
 	keyboard_data.head = (keyboard_data.tail = 0);
@@ -925,9 +925,8 @@ static void kc_keyboard_init(running_machine *machine)
 
 	for (i=0; i<KC_KEYBOARD_NUM_LINES-1; i++)
 	{
-		sprintf(port, "KEY%d", i);
 		/* read input port */
-		kc_previous_keyboard[i] = input_port_read(machine, port);
+		kc_previous_keyboard[i] = input_port_read(machine, keynames[i]);
 	}
 }
 
@@ -1043,6 +1042,7 @@ static void kc_keyboard_attempt_transmit(running_machine *machine)
 static TIMER_CALLBACK(kc_keyboard_update)
 {
 	int i;
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	/* scan all lines (excluding shift) */
 	for (i=0; i<KC_KEYBOARD_NUM_LINES-1; i++)
@@ -1051,11 +1051,9 @@ static TIMER_CALLBACK(kc_keyboard_update)
 		int keyboard_line_data;
 		int changed_keys;
 		int mask = 0x001;
-		char port[6];
 
-		sprintf(port, "KEY%d", i);
 		/* read input port */
-		keyboard_line_data = input_port_read(machine, port);
+		keyboard_line_data = input_port_read(machine, keynames[i]);
 		/* identify keys that have changed */
 		changed_keys = keyboard_line_data ^ kc_previous_keyboard[i];
 		/* store input port for next time */

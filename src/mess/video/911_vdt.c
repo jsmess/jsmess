@@ -575,18 +575,18 @@ void vdt911_keyboard(running_machine *machine, int unit)
 	int i, j;
 	modifier_state_t modifier_state;
 	int repeat_mode;
-	char port[6];
+
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
 	/* read current key state */
-	for (i=0; i<6; i++)
+	for (i = 0; i < 6; i++)
 	{
-		sprintf(port, "KEY%d", i);
-		key_buf[i] = input_port_read(machine, port);
+		key_buf[i] = input_port_read(machine, keynames[i]);
 	}
 
 	/* parse modifier keys */
 	if ((USES_8BIT_CHARCODES(unit))
-		&& ((key_buf[5] & 0x0400) || ((! (key_buf[5] & 0x0100)) && foreign_mode)))
+		&& ((key_buf[5] & 0x0400) || ((!(key_buf[5] & 0x0100)) && foreign_mode)))
 	{	/* we are in katakana/arabic mode */
 		foreign_mode = TRUE;
 

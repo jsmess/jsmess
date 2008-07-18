@@ -748,38 +748,39 @@ static int via_system_porta;
 
 
 // this is a counter on the keyboard
-static int column=0;
+static int column = 0;
 
 
 INTERRUPT_GEN( bbcb_keyscan )
 {
-	char port[6];
+	static const char *colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4", 
+										"COL5", "COL6", "COL7", "COL8", "COL9" };
 	
   	/* only do auto scan if keyboard is not enabled */
-	if (b3_keyboard==1)
+	if (b3_keyboard == 1)
 	{
-
   		/* KBD IC1 4 bit addressable counter */
   		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
-		column=(column+1)%16;
-		if (column<10)
+		column = (column + 1) % 16;
+		if (column < 10)
 		{
-
   			/* KBD IC4 8 input NAND gate */
   			/* set the value of via_system ca2, by checking for any keys
     			 being pressed on the selected column */
-
-			sprintf(port, "COL%d", column);
-			if ((input_port_read(machine, port) | 0x01) != 0xff)
+			if ((input_port_read(machine, colnames[column]) | 0x01) != 0xff)
 			{
-				via_0_ca2_w(machine, 0,1);
-			} else {
-				via_0_ca2_w(machine, 0,0);
+				via_0_ca2_w(machine, 0, 1);
+			} 
+			else 
+			{
+				via_0_ca2_w(machine, 0, 0);
 			}
 
-		} else {
-			via_0_ca2_w(machine, 0,0);
+		} 
+		else 
+		{
+			via_0_ca2_w(machine, 0, 0);
 		}
 	}
 }
@@ -787,34 +788,32 @@ INTERRUPT_GEN( bbcb_keyscan )
 
 INTERRUPT_GEN( bbcm_keyscan )
 {
-	char port[6];
+	static const char *colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4", 
+										"COL5", "COL6", "COL7", "COL8", "COL9" };
 
   	/* only do auto scan if keyboard is not enabled */
-	if (b3_keyboard==1)
+	if (b3_keyboard == 1)
 	{
-
   		/* KBD IC1 4 bit addressable counter */
   		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
-		column=(column+1)%16;
+		column = (column + 1) % 16;
 
 		/* this IF should be removed as soon as the dip switches (keyboard keys) are set for the master */
-		if (column<10)
+		if (column < 10)
 			{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
 				 being pressed on the selected column */
-
-			sprintf(port, "COL%d", column);
-			if ((input_port_read(machine, port) | 0x01)!=0xff)
+			if ((input_port_read(machine, colnames[column]) | 0x01) != 0xff)
 			{
-				via_0_ca2_w(machine, 0,1);
+				via_0_ca2_w(machine, 0, 1);
 			} else {
-				via_0_ca2_w(machine, 0,0);
+				via_0_ca2_w(machine, 0, 0);
 			}
 
 		} else {
-			via_0_ca2_w(machine, 0,0);
+			via_0_ca2_w(machine, 0, 0);
 		}
 	}
 }
@@ -826,28 +825,36 @@ static int bbc_keyboard(running_machine *machine, int data)
 	int bit;
 	int row;
 	int res;
-	char port[6];
-	column=data & 0x0f;
-	row=(data>>4) & 0x07;
+	static const char *colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4", 
+										"COL5", "COL6", "COL7", "COL8", "COL9" };
 
-	bit=0;
+	column = data & 0x0f;
+	row = (data>>4) & 0x07;
 
-	if (column<10) {
-		sprintf(port, "COL%d", column);
-		res=input_port_read(machine, port);
-	} else {
-		res=0xff;
+	bit = 0;
+
+	if (column < 10) 
+	{
+		res = input_port_read(machine, colnames[column]);
+	} 
+	else 
+	{
+		res = 0xff;
 	}
 
 	/* Normal keyboard result */
-	if ((res&(1<<row))==0)
-		{ bit=1; }
+	if ((res & (1<<row)) == 0)
+	{ 
+		bit = 1; 
+	}
 
-	if ((res|1)!=0xff)
+	if ((res | 1) != 0xff)
 	{
-		via_0_ca2_w(machine, 0,1);
-	} else {
-		via_0_ca2_w(machine, 0,0);
+		via_0_ca2_w(machine, 0, 1);
+	} 
+	else 
+	{
+		via_0_ca2_w(machine, 0, 0);
 	}
 
 	return (data & 0x7f) | (bit<<7);

@@ -79,7 +79,7 @@ static void primo_update_memory(running_machine *machine)
 READ8_HANDLER( primo_be_1_r )
 {
 	UINT8 data = 0x00;
-	char port[5];
+	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	// bit 7, 6 - not used
 
@@ -97,8 +97,7 @@ READ8_HANDLER( primo_be_1_r )
 	data |= (input_port_read(machine, "RESET")) ? 0x02 : 0x00;
 
 	// bit 0 - keyboard
-	sprintf(port, "IN%d", (offset & 0x0030) >> 4);
-	data |= (input_port_read(machine, port) >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
+	data |= (input_port_read(machine, portnames[(offset & 0x0030) >> 4]) >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
 
 	return data;
 }

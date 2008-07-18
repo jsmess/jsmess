@@ -290,7 +290,7 @@ static int scan_keyboard(running_machine *machine)
 	int i, j;
 	int keybuf;
 	int keycode;
-	char port[6];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
 
 	if (keycode_buf_index)
 	{
@@ -299,8 +299,7 @@ static int scan_keyboard(running_machine *machine)
 
 	for (i=0; i<7; i++)
 	{
-		sprintf(port, "KEY%d", i);
-		keybuf = input_port_read(machine, port);
+		keybuf = input_port_read(machine, keynames[i]);
 
 		if (keybuf != key_matrix[i])
 		{

@@ -1037,7 +1037,7 @@ static void poll_keyboard(running_machine *machine)
 	int i, j;
 	int keycode;
 	int pressed;
-	char port1[6], port2[6];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	static const UINT8 keyboard_mf1_code[0xe] =
 	{
@@ -1072,16 +1072,13 @@ static void poll_keyboard(running_machine *machine)
 		return;
 
 	/* Poll keyboard */
-	for (i=0; (i<4) && (KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
+	for (i = 0; (i < 4) && (KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
 	{
-		sprintf(port1, "KEY%d", 2*i);
-		sprintf(port2, "KEY%d", 2*i+1);
-
-		keystate = input_port_read(machine, port1) | (input_port_read(machine, port2) << 16);
+		keystate = input_port_read(machine, keynames[2*i]) | (input_port_read(machine, keynames[2*i + 1]) << 16);
 		key_transitions = keystate ^ KeyStateSave[i];
 		if (key_transitions)
 		{
-			for (j=0; (j<32) && (KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); j++)
+			for (j = 0; (j < 32) && (KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); j++)
 			{
 				if ((key_transitions >> j) & 1)
 				{

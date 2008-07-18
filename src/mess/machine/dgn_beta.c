@@ -121,7 +121,7 @@ static void cpu0_recalc_firq(running_machine *machine, int state);
 
 static void cpu1_recalc_firq(running_machine *machine, int state);
 
-static	int Keyboard[NoKeyrows];		/* Keyboard bit array */
+static int Keyboard[NoKeyrows];		/* Keyboard bit array */
 static int RowShifter;				/* shift register to select row */
 static int Keyrow;				/* Keyboard row being shifted out */
 static int d_pia0_pb_last;			/* Last byte output to pia0 port b */
@@ -539,40 +539,40 @@ static READ8_HANDLER(d_pia0_pb_r)
 	int RetVal;
 	int Idx;
 	int Selected;
-	char port[6];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", 
+										"KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 	
 	LOG_KEYBOARD(("PB Read\n"));
 
-	KAny_next=0;
+	KAny_next = 0;
 
-	Selected=SelectedKeyrow(RowShifter);
+	Selected = SelectedKeyrow(RowShifter);
 
 	/* Scan the whole keyboard, if output shifter is all low */
 	/* This actually scans in the keyboard */
-	if(RowShifter==0x00)
+	if(RowShifter == 0x00)
 	{
 		for(Idx=0; Idx<NoKeyrows; Idx++)
 		{
-			sprintf(port, "KEY%d", Idx);
-			Keyboard[Idx] = input_port_read(machine, port);
+			Keyboard[Idx] = input_port_read(machine, keynames[Idx]);
 
-			if(Keyboard[Idx]!=0x7F)
+			if(Keyboard[Idx] != 0x7F)
 			{
-				KAny_next=1;
+				KAny_next = 1;
 			}
 		}
 	}
 	else	/* Just scan current row, from previously read values */
 	{
-		if(GetKeyRow(Selected)!=NO_KEY_PRESSED)
+		if(GetKeyRow(Selected) != NO_KEY_PRESSED)
 		{
-			KAny_next=1;
+			KAny_next = 1;
 		}
 	}
 
 	RetVal = (KInDat_next<<5) | (KAny_next<<2);
 
-	LOG_KEYBOARD(("FC22=$%02X KAny=%d\n",RetVal,KAny_next));
+	LOG_KEYBOARD(("FC22=$%02X KAny=%d\n", RetVal, KAny_next));
 
 	return RetVal;
 }
@@ -964,24 +964,23 @@ static void ScanInKeyboard(void)
 #if 0
 	int	Idx;
 	int	Row;
-	char port[6];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", 
+										"KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 	
 	LOG_KEYBOARD(("Scanning Host keyboard\n"));
 
 	for(Idx=0; Idx<NoKeyrows; Idx++)
 	{
 		if (Idx < 10)
-		{
-			sprintf(port, "KEY%d", Idx);
-			Row = input_port_read(machine, port);
-		}
+			Row = input_port_read(machine, keynames[Idx]);
+
 		else
 			Row = 0x7f;
 
 		Keyboard[Idx]=Row;
 		LOG_KEYBOARD(("Keyboard[%d]=$%02X\n",Idx,Row));
 
-		if (Row!=0x7F)
+		if (Row != 0x7F)
 		{
 			LOG_KEYBOARD(("Found Pressed Key\n"));
 		}

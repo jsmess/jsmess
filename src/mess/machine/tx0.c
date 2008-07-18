@@ -1117,12 +1117,11 @@ static void tx0_keyboard(running_machine *machine)
 
 	int typewriter_transitions;
 	int charcode, lr;
-	char port[5];
+	static const char *twrnames[] = { "TWR0", "TWR1", "TWR2", "TWR3" };
 
 	for (i=0; i<4; i++)
 	{
-		sprintf(port, "TWR%d", i);
-		typewriter_keys[i] = input_port_read(machine, port);
+		typewriter_keys[i] = input_port_read(machine, twrnames[i]);
 	}
 	
 	for (i=0; i<4; i++)

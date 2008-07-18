@@ -513,15 +513,15 @@ static READ8_HANDLER(exidy_fe_port_r)
      - not emulated
      - tied high, allowing PARIN and PAROUT bios routines to run */
 
-	UINT8 data=0xc0;
-	char port[7];
+	UINT8 data = 0xc0;
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", 
+										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15" };
 
 	/* bit 5 - vsync (inverted) */
 	data |= (((~input_port_read(machine, "VS")) & 0x01)<<5);
 
 	/* bits 4..0 - keyboard data */
-	sprintf(port, "LINE%d", exidy_keyboard_line);
-	data |= (input_port_read(machine, port) & 0x1f);
+	data |= (input_port_read(machine, keynames[exidy_keyboard_line]) & 0x1f);
 
 	return data;
 }

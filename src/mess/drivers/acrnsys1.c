@@ -24,10 +24,11 @@ static UINT8 key_digit;
 
 static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 {
-	char port[11];
 	UINT8 data;
-	sprintf(port, "keyboard_%d", key_digit);
-	data = input_port_read(device->machine, port);
+	static const char *keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
+										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
+
+	data = input_port_read(device->machine, keynames[key_digit]);
 	logerror("Reading %02x from row %d\n", data, key_digit);
 	return data;
 }

@@ -56,6 +56,7 @@ VIDEO_UPDATE( kim1 )
 	int x, y;
 	static const int layout[6][4] = { {19, 21, 22, 23}, {16, 17, 20, 18}, {12, 13, 14, 15},
 					{ 8,  9, 10, 11}, { 4,  5,  6,  7}, { 0,  1,  2,  3} };
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
 
 	fillbitmap(bitmap, get_black_pen(screen->machine), NULL);
 
@@ -78,10 +79,8 @@ VIDEO_UPDATE( kim1 )
 			int sx = width - 182 + x * 37;
 			int code = layout[y][x];
 			int color = 0;
-			char port[6];
 
-			sprintf(port, "LINE%d", code / 7);
-			color = (input_port_read(screen->machine, port) & (0x40 >> (code % 7))) ? 0 : 1;
+			color = (input_port_read(screen->machine, keynames[code / 7]) & (0x40 >> (code % 7))) ? 0 : 1;
 			videoram[6 * 2 + code] = color;
 			drawgfx (bitmap, screen->machine->gfx[1], layout[y][x], color, 0, 0, sx, sy, NULL, TRANSPARENCY_NONE, 0);
 		}

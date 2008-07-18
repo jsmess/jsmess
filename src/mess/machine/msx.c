@@ -410,12 +410,10 @@ INTERRUPT_GEN( msx2_interrupt )
 INTERRUPT_GEN( msx_interrupt )
 {
 	int i;
-	char port[7];
 	
-	for (i=0;i<2;i++)
+	for (i=0; i<2; i++)
 	{
-		sprintf(port, "MOUSE%d", i);
-		msx1.mouse[i] = input_port_read(machine, port);
+		msx1.mouse[i] = input_port_read(machine, i ? "MOUSE1" : "MOUSE0");
 		msx1.mouse_stat[i] = -1;
 	}
 
@@ -732,13 +730,12 @@ static READ8_HANDLER( msx_ppi_port_b_r )
 {
 	UINT8 result = 0xff;
 	int row, data;
-	char port[5];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
 	row = ppi8255_r( (device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 2) & 0x0f;
 	if (row <= 10)
 	{
-		sprintf(port, "KEY%d", row/2);
-		data = input_port_read(machine, port);
+		data = input_port_read(machine, keynames[row / 2]);
 
 		if (row & 1)
 			data >>= 8;

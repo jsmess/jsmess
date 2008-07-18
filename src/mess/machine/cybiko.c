@@ -418,7 +418,7 @@ static READ8_HANDLER( cybiko_key_r_byte )
 {
 	UINT8 data = 0xFF;
 	int i;
-	char port[4];
+	static const char *keynames[] = { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9" };
 	
 	_logerror( 2, ("cybiko_key_r_byte (%08X)\n", offset));
 	// A11
@@ -426,11 +426,10 @@ static READ8_HANDLER( cybiko_key_r_byte )
 		data &= 0xFE;
 	// A1 .. A9
 	for (i=1; i<10; i++) 
+	{
 		if (!(offset & (1 << i))) 
-		{
-			sprintf(port, "A%d", i);
-			data &= input_port_read(machine, port);
-		}
+			data &= input_port_read(machine, keynames[i]);
+	}
 	// A0
 	if (!(offset & (1 <<  0))) 
 		data |= 0xFF;

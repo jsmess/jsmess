@@ -176,6 +176,7 @@ static void abc80_keyboard_scan(running_machine *machine)
 	UINT8 keycode = 0;
 	UINT8 data;
 	int table = 0, row, col;
+	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
 
 	// shift, upper case
 	if (input_port_read(machine, "ROW7") & 0x07)
@@ -191,10 +192,7 @@ static void abc80_keyboard_scan(running_machine *machine)
 
 	for (row = 0; row < 7; row++)
 	{
-		char port[5];
-		sprintf(port, "ROW%d", row);
-
-		data = input_port_read(machine, port);
+		data = input_port_read(machine, keynames[row]);
 
 		if (data != 0)
 		{

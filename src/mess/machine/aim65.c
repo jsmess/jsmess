@@ -134,14 +134,15 @@ void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit 
 
 static READ8_HANDLER( aim65_riot_b_r )
 {
-	char portname[11];
+	static const char *keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
+										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 	int row, data = 0xff;
 
 	/* scan keyboard rows */
-	for (row = 0; row < 8; row++) {
-		sprintf(portname, "keyboard_%d", row);
+	for (row = 0; row < 8; row++) 
+	{
 		if (!(riot_port_a & (1 << row)))
-			data &= input_port_read(machine, portname);
+			data &= input_port_read(machine, keynames[row]);
 	}
 
 	return data;

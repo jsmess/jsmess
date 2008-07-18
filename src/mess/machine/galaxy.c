@@ -18,13 +18,16 @@
 
 READ8_HANDLER( galaxy_keyboard_r )
 {
-	if (offset == 0) {
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+
+	if (offset == 0) 
+	{
 		double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
 		return (level >  0) ? 0xfe : 0xff;
-	} else {
-		char port[6];
-		sprintf(port,"LINE%d",(offset>>3)&0x07);
-		return input_port_read(machine, port) & (0x01<<(offset&0x07)) ? 0xfe : 0xff;
+	} 
+	else 
+	{
+		return input_port_read(machine, keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 	}
 }
 

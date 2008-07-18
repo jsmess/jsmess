@@ -462,7 +462,7 @@ static void system_reset()
 static void smpc_intbackhelper(running_machine *machine)
 {
 	int pad;
-	char port[5];
+	static const char *padnames[] = { "JOY1", "JOY2" };
 
 	if (intback_stage == 1)
 	{
@@ -470,8 +470,7 @@ static void smpc_intbackhelper(running_machine *machine)
 		return;
 	}
 
-	sprintf(port, "JOY%d", intback_stage-1);	// intback_stage will be 2 or 3, 2 = player 1, 3 = player 2
-	pad = input_port_read(machine, port);
+	pad = input_port_read(machine, padnames[intback_stage-2]);
 
 //	if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	smpc_ram[33] = 0xf1;	// no tap, direct connect

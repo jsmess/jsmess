@@ -120,17 +120,16 @@ static void enterprise_dave_reg_write(int RegIndex, int Data)
 
 static void enterprise_dave_reg_read(int RegIndex)
 {
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", 
+										"LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	running_machine *machine = Machine;
 
 	switch (RegIndex)
 	{
 	case 0x015:
 		{
-		char port[6];
-
 		/* read keyboard line */
-		sprintf(port, "LINE%d", Enterprise_KeyboardLine);
-		Dave_setreg(machine, 0x015, input_port_read(machine, port));
+		Dave_setreg(machine, 0x015, input_port_read(machine, keynames[Enterprise_KeyboardLine]));
 		}
 		break;
 

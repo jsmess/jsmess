@@ -243,7 +243,7 @@ static CDP1802_MODE_READ( tmc600_mode_r )
 static CDP1802_EF_READ( tmc600_ef_r )
 {
 	int flags = 0x0f;
-	char port[4];
+	static const char *keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	/*
         EF1     ?
@@ -257,8 +257,8 @@ static CDP1802_EF_READ( tmc600_ef_r )
 	if (cassette_input(cassette_device_image()) < +0.0) flags -= EF2;
 
 	// keyboard
-	sprintf(port, "IN%d", keylatch / 8);
-	flags -= (~input_port_read(machine, port) & (1 << (keylatch % 8))) ? EF3 : 0;
+
+	flags -= (~input_port_read(machine, keynames[keylatch / 8]) & (1 << (keylatch % 8))) ? EF3 : 0;
 
 	return flags;
 }

@@ -347,7 +347,7 @@ static int keylatch;
 
 static READ8_HANDLER( sc3000_ppi8255_a_r )
 {
-	char port[4];
+	static const char *keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
 
 	/*
         Signal  Description
@@ -362,13 +362,12 @@ static READ8_HANDLER( sc3000_ppi8255_a_r )
         PA7     Keyboard input
     */
 
-	sprintf(port, "PA%d", keylatch);
-	return input_port_read(machine, port);
+	return input_port_read(machine, keynames[keylatch]);
 }
 
 static READ8_HANDLER( sc3000_ppi8255_b_r )
 {
-	char port[4];
+	static const char *keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
 
 	/*
         Signal  Description
@@ -387,8 +386,7 @@ static READ8_HANDLER( sc3000_ppi8255_b_r )
 
 	/* keyboard */
 
-	sprintf(port, "PB%d", keylatch);
-	data = input_port_read(machine, port);
+	data = input_port_read(machine, keynames[keylatch]);
 
 	/* cartridge contact */
 

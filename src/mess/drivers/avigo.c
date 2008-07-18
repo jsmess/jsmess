@@ -179,12 +179,11 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 	static int ox = 0, oy = 0;
 	int nx,ny;
 	int dx, dy;
-	char port[6];
+	static const char *linenames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
 
-	for (i=0; i<4; i++)
+	for (i = 0; i < 4; i++)
 	{
-		sprintf(port, "LINE%d", i);
-		current_input_port_data[i] = input_port_read(machine, port);
+		current_input_port_data[i] = input_port_read(machine, linenames[i]);
 	}
 
 	changed = current_input_port_data[3]^previous_input_port_data[3];
@@ -403,7 +402,7 @@ static MACHINE_RESET( avigo )
 {
 	int i;
 	unsigned char *addr;
-	char port[6];
+	static const char *linenames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
 
 	memset(avigo_banked_opbase, 0, sizeof(avigo_banked_opbase));
 
@@ -419,10 +418,9 @@ static MACHINE_RESET( avigo )
 	avigo_vh_set_stylus_marker_position(stylus_marker_x, stylus_marker_y);
 
 	/* initialise settings for port data */
-	for (i=0; i<4; i++)
+	for (i = 0; i < 4; i++)
 	{
-		sprintf(port, "LINE%d", i);
-		previous_input_port_data[i] = input_port_read(machine, port);
+		previous_input_port_data[i] = input_port_read(machine, linenames[i]);
 	}
 
 	avigo_irq = 0;

@@ -608,7 +608,7 @@ INTERRUPT_GEN( microtan_interrupt )
 {
     int mod, row, col, chg, new;
     static int lastrow = 0, mask = 0x00, key = 0x00, repeat = 0, repeater = 0;
-	char port[6];
+	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
     if( repeat )
     {
@@ -627,8 +627,7 @@ INTERRUPT_GEN( microtan_interrupt )
 
 	while ( !chg && row > 0)
 	{
-		sprintf(port, "ROW%d", row - 1);
-		new = input_port_read(machine, port); 
+		new = input_port_read(machine, keynames[row - 1]); 
 		chg = keyrows[--row] ^ new; 
 	}
     if (!chg) 
@@ -922,12 +921,11 @@ DRIVER_INIT( microtan )
 MACHINE_RESET( microtan )
 {
     int i;
-	char port[6];
+	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 	
-    for (i = 1; i < 10;  i++)
+	for (i = 1; i < 10;  i++)
 	{
-		sprintf(port, "ROW%d", i-1);
-        keyrows[i] = input_port_read(machine, port);
+        keyrows[i] = input_port_read(machine, keynames[i-1]);
 	}
     set_led_status(1, (keyrows[3] & 0x80) ? 0 : 1);
 

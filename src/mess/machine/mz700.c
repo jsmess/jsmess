@@ -138,11 +138,11 @@ static  READ8_HANDLER ( pio_port_a_r )
 static  READ8_HANDLER ( pio_port_b_r )
 {
 	UINT8 demux_LS145, data = 0xff;
-	char port[6];
+	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", 
+										"ROW6", "ROW7", "ROW8", "ROW9", "ROW10" };
 
     demux_LS145 = pio_port_a_output & 15;
-	sprintf(port, "ROW%d", demux_LS145);
-    data = input_port_read(machine, port);
+    data = input_port_read(machine, keynames[demux_LS145]);
 	LOG(2,"mz700_pio_port_b_r",("%02X\n", data));
 
     return data;

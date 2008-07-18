@@ -145,18 +145,14 @@ static READ8_HANDLER( keyboard_r )
 
 	UINT8 keylatch = offset >> 8;
 	int row;
+	static const char *rownames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
 	if (keylatch == 0) return 0;
 
 	for (row = 0; row < 8; row++)
 	{
 		if (!BIT(keylatch, row))
-		{
-			char port[5];
-			sprintf(port, "ROW%d", row);
-		
-			return input_port_read(machine, port);
-		}
+			return input_port_read(machine, rownames[row]);
 	}
 
 	return 0xff;

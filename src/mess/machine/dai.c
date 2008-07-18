@@ -62,15 +62,12 @@ static UINT8 dai_keyboard_read (void)
 {
 	UINT8 data = 0x00;
 	int i;
-	char port[5];
+	static const char *keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	for (i = 0; i < 8; i++)
 	{
 		if (dai_keyboard_scan_mask & (1 << i))
-		{
-			sprintf(port, "IN%d", i);
-			data |= input_port_read(Machine, port);
-		}
+			data |= input_port_read(Machine, keynames[i]);
 	}
 	return data;
 }

@@ -395,13 +395,12 @@ static void scan_keyboard(running_machine *machine)
 	int i, j;
 	int keybuf;
 	UINT8 keycode;
-	char port[6];
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	if (! COPS_force_unplug)
 		for (i=0; i<8; i++)
 		{
-			sprintf(port, "LINE%d", i);
-			keybuf = input_port_read(machine, port);
+			keybuf = input_port_read(machine, keynames[i]);
 
 			if (keybuf != key_matrix[i])
 			{	/* if state has changed, find first bit which has changed */

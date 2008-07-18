@@ -274,10 +274,9 @@ static READ8_HANDLER( abc77_clock_r )
 
 static READ8_HANDLER( abc77_data_r )
 {
-	char port[4];
-	sprintf(port, "X%d", abc77_keylatch);
+	static const char *keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11" };
 
-	return input_port_read(machine, port);
+	return input_port_read(machine, keynames[abc77_keylatch]);
 }
 
 static WRITE8_HANDLER( abc77_data_w )

@@ -356,13 +356,13 @@ DEVICE_IMAGE_LOAD( atom_floppy )
  READ8_HANDLER ( atom_8255_portb_r )
 {
 	int row;
-	char port[6];
+	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", 
+										"KEY6", "KEY7", "KEY8", "KEY9", "KEY10", "KEY11" };
 	
 	row = atom_8255_porta & 0x0f;
-	sprintf(port, "KEY%d", row);
 	/* logerror("8255: Read port b: %02X %02X\n", input_port_read(machine, port), 
 									input_port_read(machine, "KEY10") & 0xc0); */
-	return ((input_port_read(machine, port) & 0x3f) | (input_port_read(machine, "KEY10") & 0xc0));
+	return ((input_port_read(machine, keynames[row]) & 0x3f) | (input_port_read(machine, "KEY10") & 0xc0));
 }
 
 READ8_HANDLER ( atom_8255_portc_r )

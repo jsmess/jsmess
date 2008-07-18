@@ -230,15 +230,14 @@ static void compis_keyb_update(running_machine *machine)
 	UINT8 icol;
 	UINT16 data;
 	UINT16 ibit;
-	char port[6];
+	static const char *rownames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5" };
 	
 	key_code = 0;
 	key_status = 0x80;
 
 	for (irow = 0; irow < 6; irow++)
 	{
-		sprintf(port, "ROW%d", irow);
-		data = input_port_read(machine, port);
+		data = input_port_read(machine, rownames[irow]);
 		if (data != 0)
 		{
 			ibit = 1;

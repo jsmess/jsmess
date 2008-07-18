@@ -360,13 +360,15 @@ static TIMER_CALLBACK(AY3600_poll)
 	int caps_lock = 0;
 	int curkey;
 	int curkey_unmodified;
-	char ipt[11];
 
 	static int reset_flag = 0;
 	static int last_key = 0xff; 	/* necessary for special repeat key behaviour */
 	static int last_key_unmodified = 0xff; 	/* necessary for special repeat key behaviour */
 
 	static unsigned int time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
+
+	static const char *portnames[] = { "keyb_0", "keyb_1", "keyb_2", "keyb_3", "keyb_4", "keyb_5", "keyb_6", 
+										"keypad_1", "keypad_2" };
 
 	/* check for these special cases because they affect the emulated key codes */
 
@@ -456,8 +458,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	for (port = 0; port < num_ports; port++)
 	{
-		sprintf(ipt, "%s%d", (port < 7) ? "keyb_" : "keypad_" , (port < 7) ? port : port - 6);
-		data = input_port_read(machine, ipt);
+		data = input_port_read(machine, portnames[port]);
 
 		for (bit = 0; bit < 8; bit++)
 		{

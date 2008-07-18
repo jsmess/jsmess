@@ -139,6 +139,8 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 	*/
 
 	newbrain_state *state = machine->driver_data;
+	static const char *keynames[] = { "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
+										"D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15" };
 
 	/* keyboard row reset */
 
@@ -158,8 +160,6 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 
 	if (!BIT(data, 2))
 	{
-		char port[4];
-
 		state->keylatch++;
 		
 		if (state->keylatch == 16)
@@ -167,9 +167,7 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 			state->keylatch = 0;
 		}
 
-		sprintf(port, "D%d", state->keylatch);
-		
-		state->keydata = input_port_read(machine, port);
+		state->keydata = input_port_read(machine, keynames[state->keylatch]);
 
 		output_set_digit_value(state->keylatch, state->segment_data[state->keylatch]);
 	}

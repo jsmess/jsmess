@@ -1115,7 +1115,8 @@ INTERRUPT_GEN( c64_frame_interrupt )
 {
 	static int monitor=-1;
 	int value, i;
-	char port[6], port2[5];
+	static const char *c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
+	static const char *c128ports[] = { "KP0", "KP1", "KP2" };
 
 	c64_nmi(machine);
 
@@ -1140,11 +1141,10 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	}
 
 	/* Lines 0-7 : common keyboard */
-	for (i=0; i<8; i++)
+	for (i = 0; i < 8; i++)
 	{
 		value = 0xff;
-		sprintf(port, "ROW%d", i);
-		value &= ~input_port_read(machine, port);
+		value &= ~input_port_read(machine, c64ports[i]);
 		c64_keyline[i] = value;
 	}
 
@@ -1193,11 +1193,10 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	/* C128 only : keypad input ports */
 	if (is_c128(machine)) 
 	{
-		for (i=0; i<3; i++)
+		for (i = 0; i < 3; i++)
 		{
 			value = 0xff;
-			sprintf(port2, "KP%d", i);
-			value &= ~input_port_read(machine, port2);
+			value &= ~input_port_read(machine, c128ports[i]);
 			c128_keyline[i] = value;
 		}
 	}

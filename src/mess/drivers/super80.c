@@ -402,12 +402,11 @@ Reasons why it is necessary:
 static TIMER_CALLBACK( super80_timer )
 {
 	UINT8 cass_ws=0, i, mask=1, out_f8=z80pio_p_r(0,0), in_fa=255;
-	char port[6];
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	for ( i=0; i < 8;i++)
 	{
-		sprintf(port, "LINE%d", i);
-		if (!(out_f8 & mask)) in_fa &= input_port_read(machine, port);
+		if (!(out_f8 & mask)) in_fa &= input_port_read(machine, keynames[i]);
 		mask<<=1;
 	}
 

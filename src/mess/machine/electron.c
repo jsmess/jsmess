@@ -98,16 +98,15 @@ static READ8_HANDLER( electron_read_keyboard )
 {
 	UINT8 data = 0;
 	int i;
-	char port[7];
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", 
+										"LINE7", "LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13" };
 	
 	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );
 	for( i = 0; i < 14; i++ ) 
 	{
-		if ( ! ( offset & 1 ) ) 
-		{
-			sprintf(port, "LINE%d", i);
-			data |= input_port_read(machine, port) & 0x0f;
-		}
+		if( !(offset & 1) ) 
+			data |= input_port_read(machine, keynames[i]) & 0x0f;
+
 		offset = offset >> 1;
 	}
 	//logerror( ", data: %02x\n", data );

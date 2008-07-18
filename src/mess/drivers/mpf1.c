@@ -392,7 +392,7 @@ static const z80pio_interface pio_intf =
 
 static  READ8_HANDLER( mpf1_porta_r )
 {
-	char port[6];
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5" };
 
 	UINT8 retval;
 	for(keycol = 0; keycol < 6; keycol++)
@@ -403,8 +403,7 @@ static  READ8_HANDLER( mpf1_porta_r )
 	verboselog( 0, "Key column for kbd read: %02x\n", keycol );
 	if( keycol != 6 )
 	{
-		sprintf(port, "LINE%d", keycol);
-		retval = input_port_read(machine, port);
+		retval = input_port_read(machine, keynames[keycol]);
 	}
 	else
 	{

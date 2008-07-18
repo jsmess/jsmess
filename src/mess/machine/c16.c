@@ -657,14 +657,13 @@ static int c16_rom_load(const device_config *image)
 INTERRUPT_GEN( c16_frame_interrupt )
 {
 	int value, i;
-	char port[6];
+	static const char *c16ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
 	/* Lines 0-7 : common keyboard */
-	for (i=0; i<8; i++)
+	for (i = 0; i < 8; i++)
 	{
 		value = 0xff;
-		sprintf(port, "ROW%d", i);
-		value &= ~input_port_read(machine, port);
+		value &= ~input_port_read(machine, c16ports[i]);
 		keyline[i] = value;
 	}
 

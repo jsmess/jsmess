@@ -13,7 +13,7 @@
 struct pc_turbo_info
 {
 	int cpunum;
-	int port;
+	const char *port;
 	int mask;
 	int cur_val;
 	double off_speed;
@@ -26,10 +26,8 @@ static TIMER_CALLBACK(pc_turbo_callback)
 {
 	struct pc_turbo_info *ti = (struct pc_turbo_info *) ptr;
 	int val;
-	char ipt[6];
 
-	sprintf(ipt, "DSW%d", ti->port);
-	val = input_port_read(machine, ipt) & ti->mask;
+	val = input_port_read(machine, ti->port) & ti->mask;
 
 	if (val != ti->cur_val)
 	{
@@ -40,7 +38,7 @@ static TIMER_CALLBACK(pc_turbo_callback)
 
 
 
-int pc_turbo_setup(int cpunum, int port, int mask, double off_speed, double on_speed)
+int pc_turbo_setup(int cpunum, const char *port, int mask, double off_speed, double on_speed)
 {
 	struct pc_turbo_info *ti;
 

@@ -483,14 +483,15 @@ READ8_HANDLER(vtech1_keyboard_r)
 {
 	static int cassette_bit = 0;
 	int row, data = 0xff;
-	char portname[11];
 	double level;
+	static const char *keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
+										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 
 	/* scan keyboard rows */
-	for (row = 0; row < 8; row++) {
-		sprintf(portname, "keyboard_%d", row);
+	for (row = 0; row < 8; row++) 
+	{
 		if (!(offset & (1 << row)))
-			data &= input_port_read(machine, portname);
+			data &= input_port_read(machine, keynames[row]);
 	}
 
 	if (video_screen_get_vblank(machine->primary_screen))

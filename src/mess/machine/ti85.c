@@ -292,7 +292,7 @@ READ8_HANDLER ( ti85_port_0000_r )
 	int data = 0xff;
 	int port;
 	int bit;
-	char tag[6];
+	static const char *bitnames[] = { "BIT0", "BIT1", "BIT2", "BIT3", "BIT4", "BIT5", "BIT6", "BIT7" };
 
 	if (ti85_keypad_mask == 0x7f) return data;
 
@@ -300,8 +300,7 @@ READ8_HANDLER ( ti85_port_0000_r )
 		if (~ti85_keypad_mask&(0x01<<bit))
 			for (port = 0; port < 8; port++)
 				{
-				sprintf(tag, "BIT%d", port);
-				data ^= input_port_read(machine, tag) & (0x01<<bit) ? 0x01<<port : 0x00;
+					data ^= input_port_read(machine, bitnames[port]) & (0x01<<bit) ? 0x01<<port : 0x00;
 				}
 	return data;
 }
