@@ -176,7 +176,7 @@ static const struct CassetteOptions dai_cassette_options = {
 /* machine definition */
 static MACHINE_DRIVER_START( dai )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(8080, 2000000)
+	MDRV_CPU_ADD_TAG("main", 8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(dai_mem, 0)
 	MDRV_CPU_IO_MAP(dai_io, 0)
 	MDRV_INTERLEAVE(1)

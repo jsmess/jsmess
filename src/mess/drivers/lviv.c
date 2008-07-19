@@ -420,7 +420,7 @@ INPUT_PORTS_END
 /* machine definition */
 static MACHINE_DRIVER_START( lviv )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(8080, 2500000)
+	MDRV_CPU_ADD_TAG("main", 8080, 2500000)
 	MDRV_CPU_PROGRAM_MAP(lviv_mem, 0)
 	MDRV_CPU_IO_MAP(lviv_readport, lviv_writeport)
 	MDRV_INTERLEAVE(1)

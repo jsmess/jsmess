@@ -195,7 +195,7 @@ static const ti990_10reset_param reset_params =
 static MACHINE_DRIVER_START(ti990_10)
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	MDRV_CPU_ADD(TI990_10, 4000000)
+	MDRV_CPU_ADD_TAG("main", TI990_10, 4000000)
 	MDRV_CPU_CONFIG(reset_params)
 	MDRV_CPU_PROGRAM_MAP(ti990_10_memmap, 0)
 	MDRV_CPU_IO_MAP(ti990_10_readcru, ti990_10_writecru)

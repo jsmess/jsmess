@@ -791,13 +791,13 @@ static MACHINE_RESET( abc806 )
 
 static MACHINE_DRIVER_START( abc800m )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, ABC800_X01/2/2)	// 3 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, ABC800_X01/2/2)	// 3 MHz
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc800m_map, 0)
 	MDRV_CPU_IO_MAP(abc800m_io_map, 0)
 
 	// ABC77 keyboard
-	MDRV_CPU_ADD(I8035, 4608000)
+	MDRV_CPU_ADD_TAG("keyboard", I8035, 4608000)
 	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 
@@ -810,13 +810,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc800c )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, ABC800_X01/2/2)	// 3 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, ABC800_X01/2/2)	// 3 MHz
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc800c_map, 0)
 	MDRV_CPU_IO_MAP(abc800c_io_map, 0)
 
 	// ABC77 keyboard
-	MDRV_CPU_ADD(I8035, 4608000)
+	MDRV_CPU_ADD_TAG("keyboard", I8035, 4608000)
 	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 
@@ -829,13 +829,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc802 )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, ABC800_X01/2/2)	// 3 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, ABC800_X01/2/2)	// 3 MHz
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc802_map, 0)
 	MDRV_CPU_IO_MAP(abc802_io_map, 0)
 
 	// ABC77 keyboard
-	MDRV_CPU_ADD(I8035, 4608000)
+	MDRV_CPU_ADD_TAG("keyboard", I8035, 4608000)
 	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 
@@ -849,13 +849,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, ABC800_X01/2/2)	// 3 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, ABC800_X01/2/2)	// 3 MHz
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc806_map, 0)
 	MDRV_CPU_IO_MAP(abc806_io_map, 0)
 
 	// ABC77 keyboard
-	MDRV_CPU_ADD(I8035, 4608000)
+	MDRV_CPU_ADD_TAG("keyboard", I8035, 4608000)
 	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 

@@ -401,7 +401,7 @@ static MACHINE_DRIVER_START( intvkbd )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(intvkbd_mem, 0)
 
-	MDRV_CPU_ADD(M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
+	MDRV_CPU_ADD_TAG("keyboard", M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(intv2_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", intv_interrupt2)
 

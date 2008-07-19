@@ -572,10 +572,10 @@ static MACHINE_START( ql )
 
 static MACHINE_DRIVER_START( ql )
 	// basic machine hardware
-	MDRV_CPU_ADD(M68008, X1/2)
+	MDRV_CPU_ADD_TAG("main", M68008, X1/2)
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
 
-	MDRV_CPU_ADD(I8749, X4)
+	MDRV_CPU_ADD_TAG("ipc", I8749, X4)
 	MDRV_CPU_PROGRAM_MAP(ipc_map, 0)
 	MDRV_CPU_IO_MAP(ipc_io_map, 0)
 

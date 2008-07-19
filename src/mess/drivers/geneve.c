@@ -449,7 +449,7 @@ static const struct TMS5220interface tms5220interface =
 static MACHINE_DRIVER_START(geneve_60hz)
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
-	MDRV_CPU_ADD(TMS9995, 12000000)
+	MDRV_CPU_ADD_TAG("main", TMS9995, 12000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
 	MDRV_CPU_VBLANK_INT_HACK(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */

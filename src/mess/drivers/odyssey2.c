@@ -165,7 +165,7 @@ static const struct sp0256_interface the_voice_sp0256 = {
 
 static MACHINE_DRIVER_START( odyssey2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
+	MDRV_CPU_ADD_TAG("main", I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem, 0)
 	MDRV_CPU_IO_MAP(odyssey2_io, 0)
 	MDRV_INTERLEAVE(1)
@@ -198,7 +198,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( videopac )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8048, ( XTAL_17_73447MHz / 3 ) )
+	MDRV_CPU_ADD_TAG("main", I8048, ( XTAL_17_73447MHz / 3 ) )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem, 0)
 	MDRV_CPU_IO_MAP(odyssey2_io, 0)
 	MDRV_INTERLEAVE(1)
@@ -230,7 +230,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( g7400 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8048, 5911000 )
+	MDRV_CPU_ADD_TAG("main", I8048, 5911000 )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem, 0)
 	MDRV_CPU_IO_MAP(g7400_io, 0)
 	MDRV_INTERLEAVE(1)

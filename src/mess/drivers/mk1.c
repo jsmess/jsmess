@@ -165,7 +165,7 @@ static MACHINE_START( mk1 )
 
 static MACHINE_DRIVER_START( mk1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( F8, MAIN_CLOCK )        /* MK3850 */
+	MDRV_CPU_ADD_TAG( "main", F8, MAIN_CLOCK )        /* MK3850 */
 	MDRV_CPU_PROGRAM_MAP( mk1_mem, 0 )
 	MDRV_CPU_IO_MAP( mk1_io, 0 )
 	MDRV_INTERLEAVE( 1 )

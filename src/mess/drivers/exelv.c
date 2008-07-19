@@ -543,7 +543,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START(exelv)
 	/* basic machine hardware */
 	/* TMS7020 CPU @ 4.91(?) MHz */
-	MDRV_CPU_ADD(TMS7000_EXL, 4910000)
+	MDRV_CPU_ADD_TAG("main", TMS7000_EXL, 4910000)
 	MDRV_CPU_PROGRAM_MAP(exelv_memmap, 0)
 	MDRV_CPU_IO_MAP(exelv_portmap, 0)
 	MDRV_CPU_VBLANK_INT_HACK(exelv_hblank_interrupt, 363)

@@ -2289,16 +2289,16 @@ static const struct SCSPinterface scsp_interface =
 static MACHINE_DRIVER_START( saturn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MDRV_CPU_ADD_TAG("main", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MDRV_CPU_PROGRAM_MAP(saturn_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(stv_interrupt, 264)/*264 lines,224 display lines*/
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
-	MDRV_CPU_ADD(SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MDRV_CPU_ADD_TAG("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MDRV_CPU_PROGRAM_MAP(saturn_mem, 0)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
-	MDRV_CPU_ADD(M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MDRV_CPU_ADD_TAG("sound", M68000, MASTER_CLOCK_352/5) //11.46 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_mem, 0)
 
 	MDRV_SCREEN_ADD("main", RASTER)

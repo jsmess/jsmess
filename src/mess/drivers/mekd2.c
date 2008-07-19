@@ -188,7 +188,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( mekd2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800, 614400)        /* 614.4 kHz */
+	MDRV_CPU_ADD_TAG("main", M6800, 614400)        /* 614.4 kHz */
 	MDRV_CPU_PROGRAM_MAP(mekd2_mem, 0)
 	MDRV_INTERLEAVE(1)
 

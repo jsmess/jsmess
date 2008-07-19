@@ -376,7 +376,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( erik )
     /* basic machine hardware */
-    MDRV_CPU_ADD(Z80, 4000000)
+    MDRV_CPU_ADD_TAG("main", Z80, 4000000)
     MDRV_CPU_PROGRAM_MAP(erik_mem, 0)
     MDRV_CPU_IO_MAP(erik_io_map, 0)
 

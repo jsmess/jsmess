@@ -626,7 +626,7 @@ static MACHINE_DRIVER_START( adam )
 	MDRV_CPU_IO_MAP(adam_io, 0)
 
     /* Master M6801 AdamNet controller */
-	//MDRV_CPU_ADD(M6800, 4000000)       /* 4.0 Mhz */
+	//MDRV_CPU_ADD_TAG("adamnet", M6800, 4000000)       /* 4.0 Mhz */
 	//MDRV_CPU_PROGRAM_MAP(master6801_mem, 0)
 
 	MDRV_CPU_VBLANK_INT("main", adam_interrupt)

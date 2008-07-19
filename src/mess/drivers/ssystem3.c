@@ -323,7 +323,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( ssystem3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 1000000)
+	MDRV_CPU_ADD_TAG("main", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(ssystem3_map, 0)
 	MDRV_INTERLEAVE(1)
 

@@ -33,7 +33,7 @@ extern PALETTE_INIT( apple2 );
 
 static MACHINE_DRIVER_START( apple3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 2000000)        /* 2 Mhz */
+	MDRV_CPU_ADD_TAG("main", M6502, 2000000)        /* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(apple3_map, 0)
 	MDRV_CPU_PERIODIC_INT(apple3_interrupt, 192)
 	MDRV_INTERLEAVE(1)

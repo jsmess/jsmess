@@ -277,7 +277,7 @@ static MACHINE_RESET( tmc2000e )
 static MACHINE_DRIVER_START( tmc2000e )
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD_TAG("main", CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc2000e_map, 0)
 	MDRV_CPU_IO_MAP(tmc2000e_io_map, 0)
 	MDRV_CPU_CONFIG(tmc2000e_config)

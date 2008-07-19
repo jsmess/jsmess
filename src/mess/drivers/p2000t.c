@@ -214,7 +214,7 @@ static INTERRUPT_GEN( p2000_interrupt )
 /* Machine definition */
 static MACHINE_DRIVER_START( p2000t )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 2500000)
+	MDRV_CPU_ADD_TAG("main", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000t_mem, 0)
 	MDRV_CPU_IO_MAP(p2000t_io, 0)
 	MDRV_CPU_VBLANK_INT("main", p2000_interrupt)
@@ -232,7 +232,7 @@ MACHINE_DRIVER_END
 /* Machine definition */
 static MACHINE_DRIVER_START( p2000m )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 2500000)
+	MDRV_CPU_ADD_TAG("main", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000m_mem, 0)
 	MDRV_CPU_IO_MAP(p2000t_io, 0)
 	MDRV_CPU_VBLANK_INT("main", p2000_interrupt)

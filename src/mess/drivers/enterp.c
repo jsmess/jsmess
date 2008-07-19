@@ -537,7 +537,7 @@ static const struct CustomSound_interface dave_custom_sound =
 
 static MACHINE_DRIVER_START( ep128 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(enterprise_mem, 0)
 	MDRV_CPU_IO_MAP(enterprise_io, 0)
 	MDRV_INTERLEAVE(1)

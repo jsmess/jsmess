@@ -233,7 +233,7 @@ static const struct z80_irq_daisy_chain mtx_daisy_chain[] =
 
 static MACHINE_DRIVER_START( mtx512 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MTX_SYSTEM_CLOCK)
+	MDRV_CPU_ADD_TAG("main", Z80, MTX_SYSTEM_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mtx_mem, 0)
 	MDRV_CPU_IO_MAP(mtx_io, 0)
 	MDRV_CPU_VBLANK_INT("main", mtx_interrupt)

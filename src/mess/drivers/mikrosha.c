@@ -116,7 +116,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( mikrosha )
     /* basic machine hardware */
-    MDRV_CPU_ADD(8080, XTAL_16MHz / 9)
+    MDRV_CPU_ADD_TAG("main", 8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
     MDRV_MACHINE_RESET( radio86 )
 

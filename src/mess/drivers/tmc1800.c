@@ -718,7 +718,7 @@ static MACHINE_DRIVER_START( tmc1800 )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD_TAG("main", CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc1800_map, 0)
 	MDRV_CPU_IO_MAP(tmc1800_io_map, 0)
 	MDRV_CPU_CONFIG(tmc1800_config)
@@ -740,7 +740,7 @@ static MACHINE_DRIVER_START( osc1000b )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD_TAG("main", CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(osc1000b_map, 0)
 	MDRV_CPU_IO_MAP(osc1000b_io_map, 0)
 	MDRV_CPU_CONFIG(osc1000b_config)
@@ -762,7 +762,7 @@ static MACHINE_DRIVER_START( tmc2000 )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD_TAG("main", CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc2000_map, 0)
 	MDRV_CPU_IO_MAP(tmc2000_io_map, 0)
 	MDRV_CPU_CONFIG(tmc2000_config)
@@ -791,7 +791,7 @@ static MACHINE_DRIVER_START( oscnano )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD_TAG("main", CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(oscnano_map, 0)
 	MDRV_CPU_IO_MAP(oscnano_io_map, 0)
 	MDRV_CPU_CONFIG(oscnano_config)

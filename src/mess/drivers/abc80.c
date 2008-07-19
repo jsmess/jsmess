@@ -544,7 +544,7 @@ static MACHINE_DRIVER_START( abc80 )
 
 	// basic machine hardware
 
-	MDRV_CPU_ADD(Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
 	MDRV_CPU_CONFIG(abc80_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc80_map, 0)
 	MDRV_CPU_IO_MAP(abc80_io_map, 0)

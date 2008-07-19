@@ -107,7 +107,7 @@ static MACHINE_DRIVER_START( advision )
 	MDRV_CPU_PROGRAM_MAP(advision_mem, 0)
 	MDRV_CPU_IO_MAP(advision_ports, 0)
 
-	MDRV_CPU_ADD(COP411, 52631)
+	MDRV_CPU_ADD_TAG("sound", COP411, 52631)
 	MDRV_CPU_CONFIG(advision_cop411_interface)
 	MDRV_CPU_PROGRAM_MAP(advision_sound_mem, 0)
 	MDRV_CPU_IO_MAP(advision_sound_ports, 0)

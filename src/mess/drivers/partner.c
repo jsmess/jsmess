@@ -128,7 +128,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( partner )
     /* basic machine hardware */
-    MDRV_CPU_ADD(8080, XTAL_16MHz / 9)
+    MDRV_CPU_ADD_TAG("main", 8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(partner_mem, 0)
     
     MDRV_MACHINE_START( partner )

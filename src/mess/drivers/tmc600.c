@@ -315,7 +315,7 @@ static MACHINE_RESET( tmc600 )
 static MACHINE_DRIVER_START( tmc600 )
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, 3579545)	// ???
+	MDRV_CPU_ADD_TAG("main", CDP1802, 3579545)	// ???
 	MDRV_CPU_PROGRAM_MAP(tmc600_map, 0)
 	MDRV_CPU_IO_MAP(tmc600_io_map, 0)
 	MDRV_CPU_CONFIG(tmc600_cdp1802_config)

@@ -660,7 +660,7 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_CPU_REPLACE("main", Z80, 3800000)
 	MDRV_CPU_IO_MAP(srdm5fd5_io, 0)
 
-	MDRV_CPU_ADD(Z80, 3800000)
+	MDRV_CPU_ADD_TAG("floppy", Z80, 3800000)
 	MDRV_CPU_PROGRAM_MAP(sord_fd5_mem, 0)
 	MDRV_CPU_IO_MAP(readport_sord_fd5,writeport_sord_fd5)
 

@@ -502,7 +502,7 @@ static const struct TMS5220interface tms5220interface =
 static MACHINE_DRIVER_START(ti99_4_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	MDRV_CPU_ADD(TMS9900, 3000000)
+	MDRV_CPU_ADD_TAG("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
 	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
@@ -535,7 +535,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(ti99_4_50hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	MDRV_CPU_ADD(TMS9900, 3000000)
+	MDRV_CPU_ADD_TAG("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
 	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
@@ -566,7 +566,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(ti99_4a_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	MDRV_CPU_ADD(TMS9900, 3000000)
+	MDRV_CPU_ADD_TAG("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
 	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
@@ -598,7 +598,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(ti99_4a_50hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	MDRV_CPU_ADD(TMS9900, 3000000)
+	MDRV_CPU_ADD_TAG("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
 	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
@@ -630,7 +630,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	MDRV_CPU_ADD(TMS9900, 3000000)
+	MDRV_CPU_ADD_TAG("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap_4ev, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
 	MDRV_CPU_VBLANK_INT_HACK(ti99_4ev_hblank_interrupt, 263)	/* 262.5 in 60Hz, 312.5 in 50Hz */

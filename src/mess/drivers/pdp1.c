@@ -469,7 +469,7 @@ static MACHINE_DRIVER_START(pdp1)
 
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
-	MDRV_CPU_ADD(PDP1, 1000000/*the CPU core uses microsecond counts*/)
+	MDRV_CPU_ADD_TAG("main", PDP1, 1000000/*the CPU core uses microsecond counts*/)
 	MDRV_CPU_CONFIG(pdp1_reset_param)
 	MDRV_CPU_PROGRAM_MAP(pdp1_map, 0)
 	MDRV_CPU_VBLANK_INT("main", pdp1_interrupt)	/* dummy interrupt: handles input */

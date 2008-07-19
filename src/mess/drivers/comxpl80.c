@@ -196,7 +196,7 @@ static MACHINE_DRIVER_START( comxpl80 )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
+	MDRV_CPU_ADD_TAG("main", M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
 	MDRV_CPU_PROGRAM_MAP(pl80_map, 0)
 	MDRV_CPU_IO_MAP(pl80_io_map, 0)
 MACHINE_DRIVER_END

@@ -225,7 +225,7 @@ static MACHINE_RESET( vip )
 
 static MACHINE_DRIVER_START( vip )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802, XTAL/2)
+	MDRV_CPU_ADD_TAG("main", CDP1802, XTAL/2)
 	MDRV_CPU_PROGRAM_MAP(vip_map, 0)
 	MDRV_CPU_IO_MAP(vip_io_map, 0)
 	MDRV_CPU_CONFIG(vip_config)

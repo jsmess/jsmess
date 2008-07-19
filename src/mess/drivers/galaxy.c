@@ -154,7 +154,7 @@ static const struct AY8910interface galaxy_ay_interface =
 
 static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL / 2)
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -182,7 +182,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( galaxyp )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL / 2)
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxyp_mem, 0)
 	MDRV_CPU_IO_MAP(galaxyp_io, 0)
 	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)

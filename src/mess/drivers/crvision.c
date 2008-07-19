@@ -412,7 +412,7 @@ static MACHINE_RESET( crvision )
 
 static MACHINE_DRIVER_START( crvision )
 	// basic machine hardware
-	MDRV_CPU_ADD(M6502, 2000000)
+	MDRV_CPU_ADD_TAG("main", M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(crvision_map, 0)
 	MDRV_CPU_VBLANK_INT("main", crvision_int)
 

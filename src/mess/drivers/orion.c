@@ -130,7 +130,7 @@ static const struct AY8910interface orionz80_ay_interface =
 };
 
 static MACHINE_DRIVER_START( orionz80 )
-    MDRV_CPU_ADD(Z80, 2500000)
+    MDRV_CPU_ADD_TAG("main", Z80, 2500000)
     MDRV_CPU_PROGRAM_MAP(orionz80_mem, 0)
     MDRV_CPU_IO_MAP(orionz80_io, 0)
     MDRV_CPU_VBLANK_INT("main",orionz80_interrupt)
@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( orionz80ms )
 MACHINE_DRIVER_END	
 
 static MACHINE_DRIVER_START( orionpro )
-    MDRV_CPU_ADD(Z80, 5000000)
+    MDRV_CPU_ADD_TAG("main", Z80, 5000000)
     MDRV_CPU_PROGRAM_MAP(orionpro_mem, 0)
     MDRV_CPU_IO_MAP(orionpro_io, 0)
 

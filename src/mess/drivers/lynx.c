@@ -213,7 +213,7 @@ static const struct CustomSound_interface lynx2_sound_interface =
 
 static MACHINE_DRIVER_START( lynx )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
+	MDRV_CPU_ADD_TAG("main", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MDRV_CPU_PROGRAM_MAP(lynx_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", lynx_frame_int)
 	MDRV_INTERLEAVE(1)
