@@ -39,7 +39,6 @@
 typedef struct _file_manager_menu_state file_manager_menu_state;
 struct _file_manager_menu_state
 {
-	object_pool *pool;
 	const device_config *selected_device;
 	astring *current_directory;
 	astring *current_file;
@@ -69,17 +68,6 @@ struct _file_create_menu_state
 /***************************************************************************
     MENU HELPERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    memory_error - report a memory error
--------------------------------------------------*/
-
-static void memory_error(const char *message)
-{
-	fatalerror("%s", message);
-}
-
-
 
 /*-------------------------------------------------
     code_to_ascii - converts an input_code to its
@@ -398,7 +386,7 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
 	of type osd_directory_entry
 -------------------------------------------------*/
 
-static osd_directory_entry *alloc_directory_entry(object_pool *pool, const char *name, osd_dir_entry_type type, UINT64 size)
+static osd_directory_entry *alloc_directory_entry(ui_menu *menu, const char *name, osd_dir_entry_type type, UINT64 size)
 {
 	char *name_dupe = NULL;
 	osd_directory_entry *new_entry;
@@ -406,7 +394,7 @@ static osd_directory_entry *alloc_directory_entry(object_pool *pool, const char 
 	
 	/* allocate the new entry */
 	name_length = (name != NULL) ? strlen(name) + 1 : 0;
-	new_entry = pool_malloc(pool, sizeof(*new_entry) + name_length);
+	new_entry = ui_menu_pool_alloc(menu, sizeof(*new_entry) + name_length);
 
 	/* copy the name, if specified */
 	if (name != NULL)
@@ -452,7 +440,7 @@ static void append_menu_item(ui_menu *menu, file_selector_menu_state *menustate,
 
 	if (dirent_size != ~0)
 	{
-		new_dirent = alloc_directory_entry(menustate->manager_menustate->pool, dirent_name, dirent_type, dirent_size);
+		new_dirent = alloc_directory_entry(menu, dirent_name, dirent_type, dirent_size);
 
 		/* silly hack */
 		if (text == dirent_name)
@@ -764,11 +752,6 @@ void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter,
 		astring_free(menustate->current_file);
 		menustate->current_file = NULL;
 	}
-	if (menustate->pool != NULL)
-	{
-		pool_free(menustate->pool);
-		menustate->pool = NULL;
-	}
 
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
@@ -788,9 +771,6 @@ void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter,
 			menustate->current_directory = astring_cpyc(astring_alloc(), image_working_directory(menustate->selected_device));
 			menustate->current_file = astring_cpyc(astring_alloc(),
 				image_exists(menustate->selected_device) ? image_basename(menustate->selected_device) : "");
-
-			/* create a memory pool */
-			menustate->pool = pool_alloc(memory_error);
 
 			/* push the menu */
 			child_menu = ui_menu_alloc(machine, menu_file_selector, NULL);
