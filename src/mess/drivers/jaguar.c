@@ -479,9 +479,9 @@ static MACHINE_DRIVER_START( jaguar )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD_TAG("dac.l", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD_TAG("dac.r", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
 	/* quickload */

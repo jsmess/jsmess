@@ -969,7 +969,7 @@ static MACHINE_DRIVER_START ( hp48_common )
      
         /* sound */
         MDRV_SPEAKER_STANDARD_MONO( "mono" )
-        MDRV_SOUND_ADD ( DAC, 0 )
+        MDRV_SOUND_ADD_TAG( "dac",  DAC, 0 )
         MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit beeper */
 
 MACHINE_DRIVER_END

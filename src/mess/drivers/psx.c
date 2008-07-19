@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START( psxntsc )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD( PSXSPU, 0 )
+	MDRV_SOUND_ADD_TAG( "psxspu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
@@ -830,7 +830,7 @@ static MACHINE_DRIVER_START( psxpal )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD( PSXSPU, 0 )
+	MDRV_SOUND_ADD_TAG( "psxspu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )

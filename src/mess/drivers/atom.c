@@ -271,7 +271,7 @@ static MACHINE_DRIVER_START( atom )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */

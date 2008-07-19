@@ -750,7 +750,7 @@ static MACHINE_DRIVER_START( pc1401 )
 	MDRV_VIDEO_UPDATE( pc1401 )
 
 	/* sound hardware */
-	/*MDRV_SOUND_ADD(DAC, pocketc_sound_interface)*/
+	/*MDRV_SOUND_ADD_TAG("dac", DAC, pocketc_sound_interface)*/
 MACHINE_DRIVER_END
 
 

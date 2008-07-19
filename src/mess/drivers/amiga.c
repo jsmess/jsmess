@@ -229,7 +229,7 @@ static MACHINE_DRIVER_START( ntsc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(CUSTOM, 3579545)
+	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 3579545)
 	MDRV_SOUND_CONFIG(amiga_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
@@ -244,7 +244,7 @@ static MACHINE_DRIVER_START( cdtv )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_SOUND_ADD( CDDA, 0 )
+	MDRV_SOUND_ADD_TAG( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
 MACHINE_DRIVER_END

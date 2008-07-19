@@ -459,7 +459,7 @@ MDRV_CPU_VBLANK_INT("main", pasogo_interrupt)
      MDRV_PALETTE_INIT(pasogo)
 #if 0
      MDRV_SPEAKER_STANDARD_MONO("gmaster")
-     MDRV_SOUND_ADD(CUSTOM, 0)
+     MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
      MDRV_SOUND_CONFIG(gmaster_sound_interface)
      MDRV_SOUND_ROUTE(0, "gmaster", 0.50)
 #endif

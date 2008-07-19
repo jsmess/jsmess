@@ -743,11 +743,11 @@ static MACHINE_DRIVER_START( exidy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ADD_TAG("cass1", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
-	MDRV_SOUND_ADD(WAVE, 1)
+	MDRV_SOUND_ADD_TAG("cass2", WAVE, 1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
-	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	// speaker on parallel port
 
 	/* printer */

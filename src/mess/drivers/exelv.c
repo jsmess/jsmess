@@ -559,7 +559,7 @@ static MACHINE_DRIVER_START(exelv)
 	MDRV_VIDEO_START(exelv)
 
 	/* sound */
-	/*MDRV_SOUND_ADD(TMS5220, tms5220interface)*/
+	/*MDRV_SOUND_ADD_TAG("tms5220", TMS5220, tms5220interface)*/
 MACHINE_DRIVER_END
 
 

@@ -748,11 +748,11 @@ static MACHINE_DRIVER_START ( to7 )
 
 /* sound */
      MDRV_SPEAKER_STANDARD_MONO("mono")
-     MDRV_SOUND_ADD ( DAC, 0 )
+     MDRV_SOUND_ADD_TAG ( "buzzer", DAC, 0 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit buzzer */
-     MDRV_SOUND_ADD ( DAC, 0 )
+     MDRV_SOUND_ADD_TAG ( "dac", DAC, 0 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 6-bit game extention DAC */
-     MDRV_SOUND_ADD ( DAC, 0 )
+     MDRV_SOUND_ADD_TAG ( "speech", DAC, 0 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
 	 /* printer */

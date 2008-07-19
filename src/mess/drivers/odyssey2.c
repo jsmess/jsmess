@@ -186,11 +186,11 @@ static MACHINE_DRIVER_START( odyssey2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, XTAL_7_15909MHz/2)
+	MDRV_SOUND_ADD_TAG("custom", CUSTOM, XTAL_7_15909MHz/2)
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(SP0256, 3120000)
+	MDRV_SOUND_ADD_TAG("sp0256", SP0256, 3120000)
 	MDRV_SOUND_CONFIG(the_voice_sp0256)
 	/* The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -219,11 +219,11 @@ static MACHINE_DRIVER_START( videopac )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, XTAL_17_73447MHz/5)
+	MDRV_SOUND_ADD_TAG("custom", CUSTOM, XTAL_17_73447MHz/5)
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(SP0256, 3120000)
+	MDRV_SOUND_ADD_TAG("sp0256", SP0256, 3120000)
 	MDRV_SOUND_CONFIG(the_voice_sp0256)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
@@ -251,7 +251,7 @@ static MACHINE_DRIVER_START( g7400 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 3547000)
+	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 3547000)
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
