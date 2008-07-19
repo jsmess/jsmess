@@ -134,7 +134,7 @@ static I8275_DMA_REQUEST(radio86_video_dma_request) {
 	dma8257_drq_w(dma8257, 2, state);
 }
 
-static READ8_HANDLER(radio86_dma_read_byte)
+READ8_HANDLER(radio86_dma_read_byte)
 {
 	UINT8 result;
 	cpuintrf_push_context(0);
@@ -143,7 +143,7 @@ static READ8_HANDLER(radio86_dma_read_byte)
 	return result;
 }
 
-static WRITE8_HANDLER(radio86_write_video)
+WRITE8_HANDLER(radio86_write_video)
 {
 	i8275_dack_set_data((device_config*)device_list_find_by_tag( machine->config->devicelist, I8275, "i8275" ),data);
 }

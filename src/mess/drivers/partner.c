@@ -13,6 +13,7 @@
 #include "machine/8257dma.h"
 #include "video/i8275.h"
 #include "devices/cassette.h"
+#include "devices/basicdsk.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
 #include "includes/partner.h"
@@ -20,19 +21,23 @@
 /* Address maps */
 static ADDRESS_MAP_START(partner_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK(1)
-	AM_RANGE( 0x0800, 0x7fff ) AM_RAMBANK(2)
-	AM_RANGE( 0x8000, 0x9fff ) AM_RAMBANK(3)
-	AM_RANGE( 0xa000, 0xbfff ) AM_RAMBANK(4)
-	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK(5)
-	AM_RANGE( 0xc800, 0xd7ff ) AM_RAMBANK(6)
+	AM_RANGE( 0x0800, 0x3fff ) AM_RAMBANK(2)
+	AM_RANGE( 0x4000, 0x5fff ) AM_RAMBANK(3)
+	AM_RANGE( 0x6000, 0x7fff ) AM_RAMBANK(4)
+	AM_RANGE( 0x8000, 0x9fff ) AM_RAMBANK(5)
+	AM_RANGE( 0xa000, 0xb7ff ) AM_RAMBANK(6)	
+	AM_RANGE( 0xb800, 0xbfff ) AM_RAMBANK(7)
+	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK(8)
+	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK(9)		
+	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK(10)
 	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w)  // video
 	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
 	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
-	//AM_RANGE( 0xdc00, 0xddff ) iomap
+	AM_RANGE( 0xdc00, 0xddff ) AM_RAMBANK(11)
 	AM_RANGE( 0xde00, 0xdeff ) AM_WRITE(partner_win_memory_page_w)
-	AM_RANGE( 0xe000, 0xe7ff ) AM_RAMBANK(7)
-	AM_RANGE( 0xe800, 0xffff ) AM_RAMBANK(8)
+	AM_RANGE( 0xe000, 0xe7ff ) AM_RAMBANK(12)
+	AM_RANGE( 0xe800, 0xffff ) AM_RAMBANK(13)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -125,6 +130,8 @@ static MACHINE_DRIVER_START( partner )
     /* basic machine hardware */
     MDRV_CPU_ADD(8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(partner_mem, 0)
+    
+    MDRV_MACHINE_START( partner )
     MDRV_MACHINE_RESET( partner )
 
 	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
@@ -150,7 +157,7 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_DEVICE_ADD("dma8257", DMA8257)
-	MDRV_DEVICE_CONFIG(radio86_dma)
+	MDRV_DEVICE_CONFIG(partner_dma)
 MACHINE_DRIVER_END
 
 static void partner_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -167,14 +174,32 @@ static void partner_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
+static void partner_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(partner_floppy); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cpm"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}
+}
+
 /* ROM definition */
 ROM_START( partner )
-	ROM_REGION( 0x17000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x1A000, REGION_CPU1, ROMREGION_ERASEFF )
 	ROM_LOAD( "bios.rom", 0x10000, 0x2000, CRC(be1eaa10) SHA1(f9658d8055bf434240ec020d7892ea98cb5cbb76))
 	ROM_LOAD( "basic.rom",0x12000, 0x2000, CRC(1e9be0ec) SHA1(2c431f487cffddaac8413efddfc0527ad595f03b))
 	ROM_LOAD( "mcpg.rom", 0x14000, 0x0800, CRC(3401225c) SHA1(6c252393ee73ed1a53d3e583547d86ab6718a533))
-	ROM_LOAD( "fdd.rom",  0x14800, 0x0800, CRC(8ca350b5) SHA1(76fc92298726fb2840f4c19d7edc860d1ed86356))
-	ROM_LOAD( "font.rom", 0x15000, 0x2000, CRC(dc4f1723) SHA1(6b8d5efb403cf0aeb3fd3197a0529d23c8e2f93c))
+	ROM_LOAD( "fdd.rom",  0x16000, 0x0800, CRC(8ca350b5) SHA1(76fc92298726fb2840f4c19d7edc860d1ed86356))
+	ROM_LOAD( "font.rom", 0x18000, 0x2000, CRC(dc4f1723) SHA1(6b8d5efb403cf0aeb3fd3197a0529d23c8e2f93c))
 	ROM_REGION(0x2000, REGION_GFX1,0)
 	ROM_LOAD ("partner.fnt", 0x0000, 0x2000, CRC(2705F726) SHA1(3d7b33901ef098a405d7ddad924ba9677f6a9b15))
 ROM_END
@@ -182,6 +207,7 @@ ROM_END
 static SYSTEM_CONFIG_START(partner)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 	CONFIG_DEVICE(partner_cassette_getinfo);
+	CONFIG_DEVICE(partner_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 /* Driver */
