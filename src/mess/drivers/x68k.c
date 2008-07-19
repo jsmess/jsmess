@@ -123,7 +123,6 @@
 */
 
 #include "driver.h"
-#include "render.h"
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
@@ -138,6 +137,7 @@
 #include "devices/harddriv.h"
 #include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
+#include "x68000.lh"
 
 struct x68k_system sys;
 
@@ -146,6 +146,7 @@ static UINT8 ppi_port[3];
 static int current_vector[8];
 static UINT8 current_irq_line;
 static unsigned int x68k_scanline;
+static int led_state;
 
 static UINT8 mfp_key;
 
@@ -156,6 +157,7 @@ emu_timer* scanline_timer;
 emu_timer* raster_irq;
 emu_timer* vblank_irq;
 static emu_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
+static emu_timer* led_timer;  // to make disk drive control LEDs blink
 
 // MFP is clocked at 4MHz, so at /4 prescaler the timer is triggered after 1us (4 cycles)
 // No longer necessary with the new MFP core
@@ -326,6 +328,27 @@ void mfp_set_timer(int timer, unsigned char data)
 }
 #endif
 
+// LED timer callback
+static TIMER_CALLBACK( x68k_led_callback )
+{
+	int drive;
+	if(led_state == 0)
+		led_state = 1;
+	else
+		led_state = 0;
+	if(led_state == 1)
+	{
+		for(drive=0;drive<4;drive++)
+			output_set_indexed_value("ctrl_drv",drive,sys.fdc.led_ctrl[drive] ? 0 : 1);
+	}
+	else
+	{
+		for(drive=0;drive<4;drive++)
+			output_set_indexed_value("ctrl_drv",drive,1);
+	}
+
+}
+
 // 4 channel DMA controller (Hitachi HD63450)
 static WRITE16_HANDLER( x68k_dmac_w )
 {
@@ -375,13 +398,13 @@ static void x68k_keyboard_ctrl_w(int data)
 
 	if(data & 0x80)  // LED status
 	{
-		output_set_value("key_led_kana",data & 0x01);
-		output_set_value("key_led_romaji",data & 0x02);
-		output_set_value("key_led_code",data & 0x04);
-		output_set_value("key_led_caps",data & 0x08);
-		output_set_value("key_led_insert",data & 0x10);
-		output_set_value("key_led_hiragana",data & 0x20);
-		output_set_value("key_led_fullsize",data & 0x40);
+		output_set_value("key_led_kana",(data & 0x01) ? 0 : 1);
+		output_set_value("key_led_romaji",(data & 0x02) ? 0 : 1);
+		output_set_value("key_led_code",(data & 0x04) ? 0 : 1);
+		output_set_value("key_led_caps",(data & 0x08) ? 0 : 1);
+		output_set_value("key_led_insert",(data & 0x10) ? 0 : 1);
+		output_set_value("key_led_hiragana",(data & 0x20) ? 0 : 1);
+		output_set_value("key_led_fullsize",(data & 0x40) ? 0 : 1);
 		logerror("KB: LED status set to %02x\n",data & 0x7f);
 	}
 
@@ -705,9 +728,8 @@ static WRITE16_HANDLER( x68k_fdc_w )
 			if(x & (1 << drive))
 			{
 				sys.fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
-				sys.fdc.led_eject[drive] = data & 0x40;  // eject button LED
-				output_set_indexed_value("ctrl_drv",drive,data & 0x80);
-				output_set_indexed_value("eject_drv",drive,data & 0x40);
+				sys.fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
+				output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 				if(data & 0x20)  // ejects disk
 				{
 					image_unload(image_from_devtype_and_index(IO_FLOPPY, drive));
@@ -722,12 +744,32 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		sys.fdc.media_density[data & 0x03] = data & 0x10;
 		sys.fdc.motor[data & 0x03] = data & 0x80;
 		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, data & 0x03), (data & 0x80));
-		/* set drive access LED outputs */
-		output_set_indexed_value("access_drv",data & 0x03,data & 0x80);
+		if(data & 0x80)
+		{
+			for(drive=0;drive<4;drive++) // enable motor for this drive, disable all the others.
+			{
+				if(drive == (data & 0x03))
+					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, drive), 1);
+				else
+					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, drive), 0);
+			}
+		}
+		else    // BIOS code suggests that setting bit 7 of this port to 0 disables the motor of all floppy drives
+		{
+			for(drive=0;drive<4;drive++)
+				floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, drive), 0);
+		}
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0),1,1);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1),1,1);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 2),1,1);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 3),1,1);
+		for(drive=0;drive<4;drive++)
+		{
+			if(floppy_drive_get_flag_state(image_from_devtype_and_index(IO_FLOPPY, drive),FLOPPY_DRIVE_MOTOR_ON))
+				output_set_indexed_value("access_drv",drive,0);
+			else
+				output_set_indexed_value("access_drv",drive,1);
+		}
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
 	default:
@@ -917,13 +959,11 @@ static READ16_HANDLER( x68k_ioc_r )
 */
 static WRITE16_HANDLER( x68k_sysport_w )
 {
-	//render_container* container;
 	switch(offset)
 	{
 	case 0x00:
 		sys.sysport.contrast = data & 0x0f;  // often used for screen fades / blanking
-		//container = render_container_get_screen(machine->primary_screen);
-		//render_container_set_brightness(container,(float)(sys.sysport.contrast) / 14.0);
+		// TODO: implement a decent, not slow, brightness control
 		break;
 	case 0x01:
 		sys.sysport.monitor = data & 0x08;
@@ -1957,6 +1997,21 @@ static MACHINE_RESET( x68000 )
 	timer_adjust_oneshot(scanline_timer, video_screen_get_scan_period(machine->primary_screen), 1);
 
 	sys.mfp.gpio = 0xfb;
+
+	// reset output values
+	output_set_value("key_led_kana",1);
+	output_set_value("key_led_romaji",1);
+	output_set_value("key_led_code",1);
+	output_set_value("key_led_caps",1);
+	output_set_value("key_led_insert",1);
+	output_set_value("key_led_hiragana",1);
+	output_set_value("key_led_fullsize",1);
+	for(drive=0;drive<4;drive++)
+	{
+		output_set_indexed_value("eject_drv",drive,1);
+		output_set_indexed_value("ctrl_drv",drive,1);
+		output_set_indexed_value("access_drv",drive,1);
+	}
 }
 
 static MACHINE_START( x68000 )
@@ -1982,6 +2037,9 @@ static MACHINE_START( x68000 )
 	// start mouse timer
 	timer_adjust_periodic(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(1));  // a guess for now
 	sys.mouse.inputtype = 0;
+
+	// start LED timer
+	timer_adjust_periodic(led_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(400));
 
 	nec765_init(machine, &fdc_interface,NEC72065,NEC765_RDY_PIN_CONNECTED);
 	nec765_reset(machine, 0);
@@ -2026,6 +2084,7 @@ static DRIVER_INIT( x68000 )
 	raster_irq = timer_alloc(x68k_crtc_raster_irq,NULL);
 	vblank_irq = timer_alloc(x68k_crtc_vblank_irq,NULL);
 	mouse_timer = timer_alloc(x68k_scc_ack,NULL);
+	led_timer = timer_alloc(x68k_led_callback,NULL);
 }
 
 
@@ -2066,6 +2125,8 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_VIDEO_START( x68000 )
 	MDRV_VIDEO_UPDATE( x68000 )
+
+	MDRV_DEFAULT_LAYOUT( layout_x68000 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
