@@ -787,9 +787,13 @@ static void fix_working_directory(const device_config *device)
 
 static void file_manager_render_extra(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-//	const char *path = (selected_device != NULL) ? image_filename(selected_device) : NULL;
-//	extra_text_render(machine, menu, state, selectedref, top, bottom,
-//		origx1, origy1, origx2, origy2, NULL, path);
+	file_manager_menu_state *menustate = (file_manager_menu_state *) state;
+	const char *path;
+	
+	/* access the path */
+	path = (menustate->selected_device != NULL) ? image_filename(menustate->selected_device) : NULL;
+	extra_text_render(machine, menu, state, selectedref, top, bottom,
+		origx1, origy1, origx2, origy2, NULL, path);
 }
 
 
@@ -843,7 +847,6 @@ void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter,
 	menustate = (file_manager_menu_state *) state;
 
 	/* possible cleanups from the file selector - ugly global variable usage */
-	menustate->selected_device = NULL;
 	if (menustate->current_directory != NULL)
 	{
 		astring_free(menustate->current_directory);
@@ -854,6 +857,9 @@ void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter,
 		astring_free(menustate->current_file);
 		menustate->current_file = NULL;
 	}
+
+	/* update the selected device */
+	menustate->selected_device = (const device_config *) ui_menu_get_selection(menu);
 
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
