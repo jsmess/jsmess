@@ -26,14 +26,38 @@
 ***************************************************************************/
 
 #define ITEMREF_NEW_IMAGE_NAME	((void *) 0x0001)
-#define ITEMREF_EMPTY_SLOT		((void *) 0x0002)
-#define ITEMREF_CREATE			((void *) 0x0003)
 
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+/* menu item type in the file selector */
+enum _file_selector_entry_type
+{
+	SELECTOR_ENTRY_TYPE_EMPTY,
+	SELECTOR_ENTRY_TYPE_CREATE,
+	SELECTOR_ENTRY_TYPE_DRIVE,
+	SELECTOR_ENTRY_TYPE_DIRECTORY,
+	SELECTOR_ENTRY_TYPE_FILE
+};
+typedef enum _file_selector_entry_type file_selector_entry_type;
+
+
+
+/* an entry within the file manager */
+typedef struct _file_selector_entry file_selector_entry;
+struct _file_selector_entry
+{
+	file_selector_entry *next;
+
+	file_selector_entry_type type;
+	const char *basename;
+	const char *fullpath;
+};
+
+
 
 /* state of the file manager */
 typedef struct _file_manager_menu_state file_manager_menu_state;
@@ -51,6 +75,7 @@ typedef struct _file_selector_menu_state file_selector_menu_state;
 struct _file_selector_menu_state
 {
 	file_manager_menu_state *manager_menustate;
+	file_selector_entry *entrylist;
 };
 
 
@@ -382,36 +407,6 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
 ***************************************************************************/
 
 /*-------------------------------------------------
-    alloc_directory_entry - allocates a struct
-	of type osd_directory_entry
--------------------------------------------------*/
-
-static osd_directory_entry *alloc_directory_entry(ui_menu *menu, const char *name, osd_dir_entry_type type, UINT64 size)
-{
-	char *name_dupe = NULL;
-	osd_directory_entry *new_entry;
-	size_t name_length;
-	
-	/* allocate the new entry */
-	name_length = (name != NULL) ? strlen(name) + 1 : 0;
-	new_entry = ui_menu_pool_alloc(menu, sizeof(*new_entry) + name_length);
-
-	/* copy the name, if specified */
-	if (name != NULL)
-	{
-		name_dupe = ((char *) new_entry) + sizeof(*new_entry);
-		strcpy(name_dupe, name);
-	}
-
-	new_entry->name = name_dupe;
-	new_entry->type = type;
-	new_entry->size = size;
-	return new_entry;
-}
-
-
-
-/*-------------------------------------------------
     file_selector_render_extra - perform our
     special rendering
 -------------------------------------------------*/
@@ -429,28 +424,159 @@ static void file_selector_render_extra(running_machine *machine, ui_menu *menu, 
 
 
 /*-------------------------------------------------
-    append_menu_item - appends a single menu item
+    compare_file_selector_entries - sorting proc
+	for file selector entries
 -------------------------------------------------*/
 
-static void append_menu_item(ui_menu *menu, file_selector_menu_state *menustate,
-	const char *text, const char *subtext,
-	const char *dirent_name, osd_dir_entry_type dirent_type, UINT64 dirent_size, int is_selected)
+static int compare_file_selector_entries(const file_selector_entry *e1, const file_selector_entry *e2)
 {
-	osd_directory_entry *new_dirent = NULL;
+	int result;
+	const char *e1_basename = (e1->basename != NULL) ? e1->basename : "";
+	const char *e2_basename = (e2->basename != NULL) ? e2->basename : "";
 
-	if (dirent_size != ~0)
+	if (e1->type < e2->type)
 	{
-		new_dirent = alloc_directory_entry(menu, dirent_name, dirent_type, dirent_size);
-
-		/* silly hack */
-		if (text == dirent_name)
-			text = new_dirent->name;
+		result = -1;
+	}
+	else if (e1->type > e2->type)
+	{
+		result = 1;
+	}
+	else
+	{
+		result = mame_stricmp(e1_basename, e2_basename);
+		if (result == 0)
+		{
+			result = strcmp(e1_basename, e2_basename);
+			if (result == 0)
+			{
+				if (e1 < e2)
+					result = -1;
+				else if (e1 > e2)
+					result = 1;
+			}
+		}
 	}
 
-	ui_menu_item_append(menu, text, subtext, 0, new_dirent);
+	return result;
+}
 
-	if (is_selected)
-		ui_menu_set_selection(menu, new_dirent);
+
+
+/*-------------------------------------------------
+    append_file_selector_entry - appends a new
+	file selector entry to an entry list
+-------------------------------------------------*/
+
+static file_selector_entry *append_file_selector_entry(ui_menu *menu, file_selector_menu_state *menustate,
+	file_selector_entry_type entry_type, const char *entry_basename, const char *entry_fullpath)
+{
+	file_selector_entry *entry;
+	file_selector_entry **entryptr;
+
+	/* allocate a new entry */
+	entry = (file_selector_entry *) ui_menu_pool_alloc(menu, sizeof(*entry));
+	memset(entry, 0, sizeof(*entry));
+	entry->type = entry_type;
+	entry->basename = (entry_basename != NULL) ? ui_menu_pool_strdup(menu, entry_basename) : entry_basename;
+	entry->fullpath = (entry_fullpath != NULL) ? ui_menu_pool_strdup(menu, entry_fullpath) : entry_fullpath;
+
+	/* find the end of the list */
+	entryptr = &menustate->entrylist;
+	while ((*entryptr != NULL) && (compare_file_selector_entries(entry, *entryptr) >= 0))
+		entryptr = &(*entryptr)->next;
+
+	/* insert the entry */
+	entry->next = *entryptr;
+	*entryptr = entry;
+	return entry;
+}
+
+
+
+/*-------------------------------------------------
+    append_file_selector_entry_menu_item - appends
+	a menu item for a file selector entry
+-------------------------------------------------*/
+
+static file_selector_entry *append_dirent_file_selector_entry(ui_menu *menu, file_selector_menu_state *menustate,
+	const osd_directory_entry *dirent)
+{
+	astring *buffer;
+	file_selector_entry_type entry_type;
+	file_selector_entry *entry;
+
+	switch(dirent->type)
+	{
+		case ENTTYPE_FILE:
+			entry_type = SELECTOR_ENTRY_TYPE_FILE;
+			break;
+
+		case ENTTYPE_DIR:
+			entry_type = SELECTOR_ENTRY_TYPE_DIRECTORY;
+			break;
+
+		default:
+			/* exceptional case; do not add a menu item */
+			return NULL;
+	}
+
+	/* determine the full path */
+	buffer = zippath_combine(
+		astring_alloc(),
+		astring_c(menustate->manager_menustate->current_directory),
+		dirent->name);
+
+	/* create the file selector entry */
+	entry = append_file_selector_entry(
+		menu,
+		menustate,
+		entry_type,
+		dirent->name,
+		astring_c(buffer));
+
+	astring_free(buffer);
+	return entry;
+}
+
+
+
+/*-------------------------------------------------
+    append_file_selector_entry_menu_item - appends
+	a menu item for a file selector entry
+-------------------------------------------------*/
+
+static void append_file_selector_entry_menu_item(ui_menu *menu, const file_selector_entry *entry)
+{
+	const char *text = NULL;
+	const char *subtext = NULL;
+
+	switch(entry->type)
+	{
+		case SELECTOR_ENTRY_TYPE_EMPTY:
+			text = "[empty slot]";
+			break;
+
+		case SELECTOR_ENTRY_TYPE_CREATE:
+			text = "[create]";
+			break;
+
+		case SELECTOR_ENTRY_TYPE_DRIVE:
+			text = entry->basename;
+			subtext = "[DRIVE]";
+			break;
+
+		case SELECTOR_ENTRY_TYPE_DIRECTORY:
+			text = entry->basename;
+			subtext = "[DIR]";
+			break;
+
+		case SELECTOR_ENTRY_TYPE_FILE:
+			text = entry->basename;
+			subtext = "[FILE]";
+			break;
+	}
+	ui_menu_item_append(menu, text, subtext, 0, (void *) entry);
 }
 
 
@@ -465,69 +591,64 @@ static file_error menu_file_selector_populate(running_machine *machine, ui_menu 
 	zippath_directory *directory = NULL;
 	file_error err = FILERR_NONE;
 	const osd_directory_entry *dirent;
-	const char *subtext;
+	const file_selector_entry *entry;
+	const file_selector_entry *selected_entry = NULL;
 	int count, i;
 	image_device_info info;
 	const device_config *device = menustate->manager_menustate->selected_device;
 	const char *path = astring_c(menustate->manager_menustate->current_directory);
-	int is_selected;
 
 	/* open the directory */
 	err = zippath_opendir(path, &directory);
 	if (err != FILERR_NONE)
 		goto done;
 
+	/* clear out the menu entries */
+	menustate->entrylist = NULL;
+
 	/* add the "[empty slot]" entry */
-	ui_menu_item_append(menu, "[empty slot]", NULL, 0, ITEMREF_EMPTY_SLOT);
+	append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_EMPTY, NULL, NULL);
 
 	info = image_device_getinfo(device->machine->config, device);
 	if (info.creatable && !zippath_is_zip(directory))
 	{
 		/* add the "[create]" entry */
-		ui_menu_item_append(menu, "[create]", NULL, 0, ITEMREF_CREATE);
+		append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_CREATE, NULL, NULL);
 	}
 
 	/* add the drives */
 	count = osd_num_devices();
 	for (i = 0; i < count; i++)
 	{
-		append_menu_item(menu,
-			menustate,
-			osd_get_device_name(i),
-			"[DRIVE]",
-			osd_get_device_name(i),
-			ENTTYPE_DIR,
-			0,
-			FALSE);
+		append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_DRIVE,
+			osd_get_device_name(i), osd_get_device_name(i));
 	}
 
 	/* build the menu for each item */
 	while((dirent = zippath_readdir(directory)) != NULL)
 	{
-		/* set the selected item to be the first non-parent directory or file */
-		is_selected = (ui_menu_get_selection(menu) == NULL) && strcmp(dirent->name, "..");
+		/* append a dirent entry */
+		entry = append_dirent_file_selector_entry(menu, menustate, dirent);
 
-		/* choose text for the entry type */
-		switch(dirent->type)
+		if (entry != NULL)
 		{
-			case ENTTYPE_FILE:
-				subtext = "[FILE]";
-				break;
-			case ENTTYPE_DIR:
-				subtext = "[DIR]";
-				break;
-			default:
-				subtext = "[UNK]";
-				break;
+			/* set the selected item to be the first non-parent directory or file */
+			if ((selected_entry == NULL) && strcmp(dirent->name, ".."))
+				selected_entry = entry;
+
+			/* do we have to select this file? */
+			if (!mame_stricmp(astring_c(menustate->manager_menustate->current_file), dirent->name))
+				selected_entry = entry;
 		}
-
-		/* do we have to select this file? */
-		if (!mame_stricmp(astring_c(menustate->manager_menustate->current_file), dirent->name))
-			is_selected = TRUE;
-
-		/* record the menu item */
-		append_menu_item(menu, menustate, dirent->name, subtext, dirent->name, dirent->type, dirent->size, is_selected);
 	}
+
+	/* append all of the menu entries */
+	for (entry = menustate->entrylist; entry != NULL; entry = entry->next)
+		append_file_selector_entry_menu_item(menu, entry);
+
+	/* set the selection (if we have one) */
+	if (selected_entry != NULL)
+		ui_menu_set_selection(menu, (void *) selected_entry);
 
 	/* set up custom render proc */
 	ui_menu_set_custom_render(menu, file_selector_render_extra, ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER, 0);
@@ -559,13 +680,11 @@ static file_error check_path(const char *path)
 static void menu_file_selector(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
 	file_error err;
-	const osd_directory_entry *dirent;
-	int selected;
-	astring *new_path;
 	const ui_menu_event *event;
 	ui_menu *child_menu;
 	file_selector_menu_state *menustate;
 	file_create_menu_state *child_menustate;
+	const file_selector_entry *entry;
 
 	/* get menu state */
 	menustate = (file_selector_menu_state *) state;
@@ -590,59 +709,42 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 		/* handle selections */
 		if (event->iptkey == IPT_UI_SELECT)
 		{
-			if (event->itemref == ITEMREF_EMPTY_SLOT)
+			entry = (const file_selector_entry *) event->itemref;
+			switch(entry->type)
 			{
-				/* empty slot - unload */
-				image_unload(menustate->manager_menustate->selected_device);
-				ui_menu_stack_pop(machine);
-			}
-			else if (event->itemref == ITEMREF_CREATE)
-			{
-				/* create */
-				child_menu = ui_menu_alloc(machine, menu_file_create, NULL);
-				child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate));
-				child_menustate->manager_menustate = menustate->manager_menustate;
-				ui_menu_stack_push(child_menu);
-			}
-			else
-			{
-				dirent = (const osd_directory_entry *) event->itemref;
-				ui_menu_reset(menu, 0);
+				case SELECTOR_ENTRY_TYPE_EMPTY:
+					/* empty slot - unload */
+					image_unload(menustate->manager_menustate->selected_device);
+					ui_menu_stack_pop(machine);
+					break;
 
-				switch(dirent->type)
-				{
-					case ENTTYPE_DIR:
-						/* prepare the selection in the new directory */
-						selected = 1;
-						if (!strcmp(dirent->name, ".."))
-							zippath_parent_basename(menustate->manager_menustate->current_file, astring_c(menustate->manager_menustate->current_directory));
+				case SELECTOR_ENTRY_TYPE_CREATE:
+					/* create */
+					child_menu = ui_menu_alloc(machine, menu_file_create, NULL);
+					child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate));
+					child_menustate->manager_menustate = menustate->manager_menustate;
+					ui_menu_stack_push(child_menu);
+					break;
 
-						/* change the directory */
-						new_path = zippath_combine(astring_alloc(), astring_c(menustate->manager_menustate->current_directory), dirent->name);
-						err = check_path(astring_c(new_path));
-						if (err != FILERR_NONE)
-						{
-							/* this path is problematic; present the user with an error and bail */
-							ui_popup_time(1, "Error accessing %s", astring_c(new_path));
-							astring_free(new_path);
-							break;
-						}
-						astring_free(menustate->manager_menustate->current_directory);
-						menustate->manager_menustate->current_directory = new_path;
+				case SELECTOR_ENTRY_TYPE_DRIVE:
+				case SELECTOR_ENTRY_TYPE_DIRECTORY:
+					/* drive/directory - first check the path */
+					err = check_path(entry->fullpath);
+					if (err != FILERR_NONE)
+					{
+						/* this path is problematic; present the user with an error and bail */
+						ui_popup_time(1, "Error accessing %s", entry->fullpath);
 						break;
+					}
+					astring_cpyc(menustate->manager_menustate->current_directory, entry->fullpath);
+					ui_menu_reset(menu, 0);
+					break;
 
-					case ENTTYPE_FILE:
-						/* specified a file */
-						new_path = zippath_combine(astring_alloc(), astring_c(menustate->manager_menustate->current_directory), dirent->name);
-						image_load(menustate->manager_menustate->selected_device, astring_c(new_path));
-						astring_free(new_path);
-						ui_menu_stack_pop(machine);
-						break;
-
-					default:
-						/* do nothing */
-						break;
-				}
+				case SELECTOR_ENTRY_TYPE_FILE:
+					/* file */
+					image_load(menustate->manager_menustate->selected_device, entry->fullpath);
+					ui_menu_stack_pop(machine);
+					break;
 			}
 		}
 	}
@@ -771,6 +873,9 @@ void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter,
 			menustate->current_directory = astring_cpyc(astring_alloc(), image_working_directory(menustate->selected_device));
 			menustate->current_file = astring_cpyc(astring_alloc(),
 				image_exists(menustate->selected_device) ? image_basename(menustate->selected_device) : "");
+
+			/* reset the existing menu */
+			ui_menu_reset(menu, 0);
 
 			/* push the menu */
 			child_menu = ui_menu_alloc(machine, menu_file_selector, NULL);
