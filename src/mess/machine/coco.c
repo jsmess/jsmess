@@ -1143,9 +1143,9 @@ static const device_config *bitbanger_image(running_machine *machine)
 	return device_list_find_by_tag(machine->config->devicelist, BITBANGER, "bitbanger");
 }
 
-static const device_config *printer_image(void)
+static const device_config *printer_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_PRINTER, 0);
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
 }
 
 static int get_soundmux_status(void)
@@ -1465,7 +1465,7 @@ static void printer_out_dragon(int data)
 	/* If strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
 	{
-		printer_output(printer_image(), pia_get_output_b(0));
+		printer_output(printer_image(Machine), pia_get_output_b(0));
 	}
 }
 

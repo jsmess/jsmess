@@ -8,6 +8,9 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [DRAGON] Fixed crash that could occur when accessing the printer.  (bug
+  #1643)  [Nate Woods]
+
 - [IBM5170] Added support for the 8042 keyboard controller dumped
   by Kevtris.  [Wilbert Pol]
 
