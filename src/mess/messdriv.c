@@ -366,7 +366,7 @@ TESTDRIVER( plus4v )	/* Commodore +4										*/
 	DRIVER( c128fra )	/* Commodore 128 - PAL (french)						*/
 	DRIVER( c128ita )	/* Commodore 128 - PAL (italian)					*/
 	DRIVER( c128swe )	/* Commodore 128 - PAL (swedish)					*/
-TESTDRIVER( c128nor )	/* Commodore 128 - PAL (norwegian)					*/
+	DRIVER( c128nor )	/* Commodore 128 - PAL (norwegian)					*/
 TESTDRIVER( c128d )		/* Commodore 128D - NTSC							*/
 TESTDRIVER( c128dita )	/* Commodore 128D - PAL (italian) cost reduced set	*/
 
