@@ -71,7 +71,7 @@ static MACHINE_RESET( exelv )
 {
 	tms3556_reset();
 	io_reset();
-	memory_set_bankptr( 1, memory_region(machine, REGION_USER1) );
+	memory_set_bankptr( 1, memory_region(machine, REGION_USER1) + 0x0200 );
 }
 
 static INTERRUPT_GEN( exelv_hblank_interrupt )
