@@ -63,6 +63,7 @@ static void io_reset(void);
 */
 static VIDEO_START( exelv )
 {
+	VIDEO_START_CALL( generic_bitmapped );
 	tms3556_init(/*0x8000*/0x10000);	/* tms3556 with 32 kb of video RAM */
 }
 
@@ -520,7 +521,7 @@ static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_NOP, SMH_NOP)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(SMH_RAM, SMH_RAM)		/* CPU RAM */
 	AM_RANGE(0xc800, /*0xf7ff*/0xefff) AM_READWRITE(SMH_NOP, SMH_NOP)
-	AM_RANGE(/*0xf800*/0xf000, 0xffff) AM_READWRITE(SMH_ROM, SMH_ROM)/* tms7020 internal ROM */
+	AM_RANGE(/*0xf800*/0xf800, 0xffff) AM_ROM	/* tms7020 internal ROM */
 
 ADDRESS_MAP_END
 
@@ -552,7 +553,8 @@ static MACHINE_DRIVER_START(exelv)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms3556)
-	MDRV_SCREEN_ADD("main", RASTER)
+
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -575,9 +577,7 @@ ROM_START(exeltel)
 ROM_END
 
 static SYSTEM_CONFIG_START(exelv)
-
 	/* cartridge port is not emulated */
-
 SYSTEM_CONFIG_END
 
 /*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY         FULLNAME */
