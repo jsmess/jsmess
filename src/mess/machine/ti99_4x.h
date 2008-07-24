@@ -5,7 +5,7 @@
 
 /* defines */
 
-#define HAS_99CCFDC defined(MESS_DEBUG)
+#define HAS_99CCFDC 0
 
 /* region identifiers */
 enum
