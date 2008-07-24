@@ -569,14 +569,21 @@ MACHINE_DRIVER_END
 /*
   ROM loading
 */
+ROM_START(exl100)
+	ROM_REGION(0x10000, REGION_CPU1, 0)
+	ROM_LOAD("exl100in.bin", 0xf800, 0x0800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))		/* TMS7020 ROM, needs verification */
+
+	ROM_REGION(0x10000, REGION_USER1, ROMREGION_ERASEFF)			/* cartridge area */
+ROM_END
+
+
 ROM_START(exeltel)
 	/*CPU memory space*/
 	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("guppy.bin", 0x6000, 0x2000, CRC(c3a3e6d9))          /* cartridge (test) */
 	ROM_LOAD("exeltelin.bin", 0xf006, 0x0ffa, CRC(c12f24b5))      /* internal ROM */
 
 	ROM_REGION(0x10000,REGION_USER1,0)
-	ROM_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89))		/* system ROM */
+	ROM_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89))	/* system ROM */
 ROM_END
 
 static SYSTEM_CONFIG_START(exelv)
@@ -584,5 +591,5 @@ static SYSTEM_CONFIG_START(exelv)
 SYSTEM_CONFIG_END
 
 /*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY         FULLNAME */
-/*COMP( 1984,   exl100, 0,          0,      exelv,      exelv,  NULL,   exelv,      "Exelvision",   "exl 100" , 0)*/
-COMP(	1986,	exeltel,0/*exl100*/,0,		exelv,		exelv,	0,	exelv,		"Exelvision",	"exeltel" , 0)
+COMP(	1984,	exl100, 0,          0,      exelv,      exelv,  0,		exelv,      "Exelvision",   "EXL 100" , 0)
+COMP(	1986,	exeltel,exl100,     0,		exelv,		exelv,	0,		exelv,		"Exelvision",	"Exeltel" , 0)
