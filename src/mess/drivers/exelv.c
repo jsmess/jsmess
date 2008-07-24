@@ -71,6 +71,7 @@ static MACHINE_RESET( exelv )
 {
 	tms3556_reset();
 	io_reset();
+	memory_set_bankptr( 1, memory_region(machine, REGION_USER1) );
 }
 
 static INTERRUPT_GEN( exelv_hblank_interrupt )
@@ -511,17 +512,17 @@ static WRITE8_HANDLER(exelv_portb_w)
 static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
 
 	//AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7020 internal RAM */
-	AM_RANGE(0x0080, 0x00ff) AM_READWRITE(SMH_NOP, SMH_NOP)		/* reserved */
+	AM_RANGE(0x0080, 0x00ff) AM_NOP
 	//AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
 	//AM_RANGE(0x010c, 0x01ff) AM_READWRITE(SMH_NOP, SMH_NOP)     /* external I/O ports */
 	AM_RANGE(0x012d, 0x0012d) AM_READWRITE(tms3556_reg_r/*right???*/, tms3556_reg_w)
 	AM_RANGE(0x012e, 0x0012e) AM_READWRITE(tms3556_vram_r/*right???*/, tms3556_vram_w)
 	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_r, mailbox_w)
-	AM_RANGE(0x0200, 0x7fff) AM_READWRITE(SMH_ROM, SMH_ROM)		/* system ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_NOP, SMH_NOP)
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(SMH_RAM, SMH_RAM)		/* CPU RAM */
-	AM_RANGE(0xc800, /*0xf7ff*/0xefff) AM_READWRITE(SMH_NOP, SMH_NOP)
-	AM_RANGE(/*0xf800*/0xf800, 0xffff) AM_ROM	/* tms7020 internal ROM */
+	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK(1)						/* system ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_NOP
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM								/* CPU RAM */
+	AM_RANGE(0xc800, 0xf7ff) AM_NOP
+	AM_RANGE(0xf800, 0xffff) AM_ROM								/* tms7020 internal ROM */
 
 ADDRESS_MAP_END
 
@@ -571,9 +572,11 @@ MACHINE_DRIVER_END
 ROM_START(exeltel)
 	/*CPU memory space*/
 	ROM_REGION(0x10000,REGION_CPU1,0)
-//  ROM_LOAD("exeltel14.bin", 0x0000, 0x8000, CRC(52a80dd4))      /* system ROM */
 	ROM_LOAD("guppy.bin", 0x6000, 0x2000, CRC(c3a3e6d9))          /* cartridge (test) */
 	ROM_LOAD("exeltelin.bin", 0xf006, 0x0ffa, CRC(c12f24b5))      /* internal ROM */
+
+	ROM_REGION(0x10000,REGION_USER1,0)
+	ROM_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89))		/* system ROM */
 ROM_END
 
 static SYSTEM_CONFIG_START(exelv)
