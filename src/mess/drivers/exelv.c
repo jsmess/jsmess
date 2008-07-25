@@ -518,11 +518,11 @@ static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x012d, 0x0012d) AM_READWRITE(tms3556_reg_r/*right???*/, tms3556_reg_w)
 	AM_RANGE(0x012e, 0x0012e) AM_READWRITE(tms3556_vram_r/*right???*/, tms3556_vram_w)
 	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_r, mailbox_w)
-	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK(1)						/* system ROM */
+	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK(1)								/* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM								/* CPU RAM */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM										/* CPU RAM */
 	AM_RANGE(0xc800, 0xf7ff) AM_NOP
-	AM_RANGE(0xf800, 0xffff) AM_ROM								/* tms7020 internal ROM */
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(REGION_CPU1,0x0000)		/* tms7020 internal ROM */
 
 ADDRESS_MAP_END
 
@@ -531,6 +531,15 @@ static ADDRESS_MAP_START(exelv_portmap, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(exelv_porta_r)
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(exelv_portb_w)
 
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START(exelv_tms7040_map, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(REGION_CPU2,0x0000)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START(exelv_tms7040_port, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
@@ -549,6 +558,12 @@ static MACHINE_DRIVER_START(exelv)
 	MDRV_CPU_PROGRAM_MAP(exelv_memmap, 0)
 	MDRV_CPU_IO_MAP(exelv_portmap, 0)
 	MDRV_CPU_VBLANK_INT_HACK(exelv_hblank_interrupt, 363)
+
+	MDRV_CPU_ADD("tms7040", TMS7000, 4910000)
+	MDRV_CPU_PROGRAM_MAP(exelv_tms7040_map, 0)
+	MDRV_CPU_IO_MAP(exelv_tms7040_port, 0)
+
+	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( exelv )
 
@@ -570,8 +585,11 @@ MACHINE_DRIVER_END
   ROM loading
 */
 ROM_START(exl100)
-	ROM_REGION(0x10000, REGION_CPU1, 0)
-	ROM_LOAD("exl100in.bin", 0xf800, 0x0800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))		/* TMS7020 ROM, needs verification */
+	ROM_REGION(0x800, REGION_CPU1, 0)
+	ROM_LOAD("exl100in.bin", 0x0000, 0x0800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))		/* TMS7020 ROM, needs verification */
+
+	ROM_REGION(0x1000, REGION_CPU2, 0)
+	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, NO_DUMP)			/* TMS7041 internal ROM. Max 4KB rom, could also be 2KB */
 
 	ROM_REGION(0x10000, REGION_USER1, ROMREGION_ERASEFF)			/* cartridge area */
 ROM_END
@@ -579,8 +597,11 @@ ROM_END
 
 ROM_START(exeltel)
 	/*CPU memory space*/
-	ROM_REGION(0x10000,REGION_CPU1,0)
-	ROM_LOAD("exeltelin.bin", 0xf006, 0x0ffa, CRC(c12f24b5))      /* internal ROM */
+	ROM_REGION(0x1000, REGION_CPU1, 0)
+	ROM_LOAD("exeltelin.bin", 0x0006, 0x0ffa, CRC(c12f24b5))		/* TMS7020 internal ROM */
+
+	ROM_REGION(0x1000, REGION_CPU2, 0)
+	ROM_LOAD("exeltel_7041.bin", 0x0000, 0x1000, NO_DUMP)			/* TMS7041 internal ROM. Max 4KB ROM, could also be 2KB */
 
 	ROM_REGION(0x10000,REGION_USER1,0)
 	ROM_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89))	/* system ROM */
