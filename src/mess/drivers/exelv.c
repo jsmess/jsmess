@@ -586,7 +586,7 @@ MACHINE_DRIVER_END
 */
 ROM_START(exl100)
 	ROM_REGION(0x800, REGION_CPU1, 0)
-	ROM_LOAD("exl100in.bin", 0x0000, 0x0800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))		/* TMS7020 ROM, needs verification */
+	ROM_LOAD("exl100in.bin", 0x0000, 0x0800, BAD_DUMP CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))		/* TMS7020 ROM, needs verification */
 
 	ROM_REGION(0x1000, REGION_CPU2, 0)
 	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, NO_DUMP)			/* TMS7041 internal ROM. Max 4KB rom, could also be 2KB */
@@ -598,7 +598,7 @@ ROM_END
 ROM_START(exeltel)
 	/*CPU memory space*/
 	ROM_REGION(0x1000, REGION_CPU1, 0)
-	ROM_LOAD("exeltelin.bin", 0x0006, 0x0ffa, CRC(c12f24b5))		/* TMS7020 internal ROM */
+	ROM_LOAD("exeltelin.bin", 0x0006, 0x0ffa, BAD_DUMP CRC(c12f24b5))		/* TMS7020 internal ROM */
 
 	ROM_REGION(0x1000, REGION_CPU2, 0)
 	ROM_LOAD("exeltel_7041.bin", 0x0000, 0x1000, NO_DUMP)			/* TMS7041 internal ROM. Max 4KB ROM, could also be 2KB */
@@ -612,5 +612,5 @@ static SYSTEM_CONFIG_START(exelv)
 SYSTEM_CONFIG_END
 
 /*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY         FULLNAME */
-COMP(	1984,	exl100, 0,          0,      exelv,      exelv,  0,		exelv,      "Exelvision",   "EXL 100" , 0)
-COMP(	1986,	exeltel,exl100,     0,		exelv,		exelv,	0,		exelv,		"Exelvision",	"Exeltel" , 0)
+COMP(	1984,	exl100, 0,          0,      exelv,      exelv,  0,		exelv,      "Exelvision",   "EXL 100" , GAME_NOT_WORKING)
+COMP(	1986,	exeltel,exl100,     0,		exelv,		exelv,	0,		exelv,		"Exelvision",	"Exeltel" , GAME_NOT_WORKING)

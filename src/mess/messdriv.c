@@ -897,7 +897,7 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( bw2 )
 
 	/* Exeltel */
-TESTDRIVER( exl100 )
+	DRIVER( exl100 )
 TESTDRIVER( exeltel )
 
 	/* Comx World Operations Ltd */
