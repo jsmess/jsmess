@@ -1673,7 +1673,7 @@ static const struct AY8910interface ay8910_intf =
 
 static MACHINE_DRIVER_START( funworld )
     /* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_ADD("main", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(funworld_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
@@ -1702,7 +1702,7 @@ static MACHINE_DRIVER_START( funworld )
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_SOUND_CONFIG(ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
 MACHINE_DRIVER_END

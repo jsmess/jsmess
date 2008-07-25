@@ -775,7 +775,7 @@ static const struct PSXSPUinterface psxspu_interface =
 
 static MACHINE_DRIVER_START( psxntsc )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( "main", PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( psx_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START( psxntsc )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD_TAG( "psxspu", PSXSPU, 0 )
+	MDRV_SOUND_ADD( "psxspu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
@@ -808,7 +808,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psxpal )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( "main", PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( psx_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -830,7 +830,7 @@ static MACHINE_DRIVER_START( psxpal )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD_TAG( "psxspu", PSXSPU, 0 )
+	MDRV_SOUND_ADD( "psxspu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )

@@ -352,7 +352,7 @@ static INPUT_PORTS_START( cyberb2p )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 
-	JSA_II_PORT		/* audio board port */
+	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
 INPUT_PORTS_END
 
 
@@ -433,18 +433,18 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( cyberbal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD(M6502, ATARI_CLOCK_14MHz/8)
+	MDRV_CPU_ADD("audio", M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_14MHz/4/4/16/16/14)
 
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(extra_map,0)
 	MDRV_CPU_VBLANK_INT("left", atarigen_video_int_gen)	/* or is it "right?" */
 
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_68k_map,0)
 	MDRV_CPU_PERIODIC_INT(cyberbal_sound_68k_irq_gen, 10000)
 
@@ -476,15 +476,15 @@ static MACHINE_DRIVER_START( cyberbal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, ATARI_CLOCK_14MHz/4)
+	MDRV_SOUND_ADD("ym", YM2151, ATARI_CLOCK_14MHz/4)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 MACHINE_DRIVER_END
 
@@ -492,7 +492,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cyberb2p )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(cyberb2p_map,0)
 	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 

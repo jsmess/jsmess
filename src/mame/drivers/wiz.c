@@ -184,9 +184,10 @@ VIDEO_UPDATE( kungfut );
 #define STINGER_BOOM_EN1	NODE_03
 #define STINGER_BOOM_EN2	NODE_04
 
+static int dsc0, dsc1;
+
 static WRITE8_HANDLER( sound_command_w )
 {
-	static int dsc0=1, dsc1=1;
 	switch (offset)
 	{
 		// 0x90 triggers a jump to non-existant address(development system?) and must be filtered
@@ -689,17 +690,23 @@ DISCRETE_SOUND_END
 //* ANALOG SOUND ENDS
 
 
+static MACHINE_RESET( wiz )
+{
+	dsc0 = dsc1 = 1;
+}
+
 static MACHINE_DRIVER_START( wiz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz ??? */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80, 14318000/8)	/* ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 14318000/8)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)	/* ??? */
+
+	MDRV_MACHINE_RESET( wiz )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -719,13 +726,13 @@ static MACHINE_DRIVER_START( wiz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("8910.1", AY8910, 18432000/12)
+	MDRV_SOUND_ADD("8910.1", AY8910, 18432000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD_TAG("8910.2", AY8910, 18432000/12)
+	MDRV_SOUND_ADD("8910.2", AY8910, 18432000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD_TAG("8910.3", AY8910, 18432000/12)
+	MDRV_SOUND_ADD("8910.3", AY8910, 18432000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
@@ -748,7 +755,7 @@ static MACHINE_DRIVER_START( stinger )
 
 	MDRV_SOUND_REMOVE("8910.3")
 
-	MDRV_SOUND_ADD(DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(stinger)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

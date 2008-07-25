@@ -316,9 +316,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0xfe0000, 0xfe1fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE(atarigen_video_int_ack_w)
-	AM_RANGE(0xfe4000, 0xfe5fff) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xfe6000, 0xfe6001) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfe6002, 0xfe6003) AM_READ(input_port_2_word_r)
+	AM_RANGE(0xfe4000, 0xfe5fff) AM_READ_PORT("FE4000")
+	AM_RANGE(0xfe6000, 0xfe6001) AM_READ_PORT("FE6000")
+	AM_RANGE(0xfe6002, 0xfe6003) AM_READ_PORT("FE6002")
 	AM_RANGE(0xfe6004, 0xfe6005) AM_READ(pedal_0_r)
 	AM_RANGE(0xfe6006, 0xfe6007) AM_READ(pedal_1_r)
 	AM_RANGE(0xfe8000, 0xfe9fff) AM_WRITE(atarigen_sound_upper_w)
@@ -436,11 +436,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( badlands )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
-	MDRV_CPU_ADD(M6502, ATARI_CLOCK_14MHz/8)
+	MDRV_CPU_ADD("audio", M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_MACHINE_RESET(badlands)
@@ -463,7 +463,7 @@ static MACHINE_DRIVER_START( badlands )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, ATARI_CLOCK_14MHz/4)
+	MDRV_SOUND_ADD("ym", YM2151, ATARI_CLOCK_14MHz/4)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -652,11 +652,11 @@ static MACHINE_RESET( badlandb )
 static MACHINE_DRIVER_START( badlandb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 2800000/2)
+	MDRV_CPU_ADD("main", M68000, 2800000/2)
 	MDRV_CPU_PROGRAM_MAP(bootleg_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
-//  MDRV_CPU_ADD(Z80, 2800000/8)
+//  MDRV_CPU_ADD("audio", Z80, 2800000/8)
 //  MDRV_CPU_PROGRAM_MAP(bootleg_soundmap,0)
 
 	MDRV_MACHINE_RESET(badlandb)
@@ -679,7 +679,7 @@ static MACHINE_DRIVER_START( badlandb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 2800000/4)
+	MDRV_SOUND_ADD("ym", YM2151, 2800000/4)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
 MACHINE_DRIVER_END

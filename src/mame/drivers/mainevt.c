@@ -707,12 +707,11 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( mainevt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 3000000*4)	/* ?? */
+	MDRV_CPU_ADD("main", HD6309, 3000000*4)	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", mainevt_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,8)	/* ??? */
 
@@ -734,12 +733,12 @@ static MACHINE_DRIVER_START( mainevt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 
-	MDRV_SOUND_ADD(UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -748,12 +747,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( devstors )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 3000000*4)	/* ?? */
+	MDRV_CPU_ADD("main", HD6309, 3000000*4)	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(dv_readmem,dv_writemem)
 	MDRV_CPU_VBLANK_INT("main", dv_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(dv_sound_readmem,dv_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
@@ -775,11 +773,11 @@ static MACHINE_DRIVER_START( devstors )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)

@@ -302,13 +302,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( speedspn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,6000000)		 /* 6 MHz */
+	MDRV_CPU_ADD("main",Z80,6000000)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport, writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,6000000)		 /* 6 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,6000000)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
 
 	/* video hardware */
@@ -328,7 +327,7 @@ static MACHINE_DRIVER_START( speedspn )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1122000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1122000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

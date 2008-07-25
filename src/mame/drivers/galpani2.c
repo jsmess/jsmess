@@ -460,11 +460,11 @@ static INTERRUPT_GEN( galpani2_interrupt2 )
 static MACHINE_DRIVER_START( galpani2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16MHz */
+	MDRV_CPU_ADD("main", M68000, 16000000)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(galpani2_mem1, 0)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt,GALPANI2_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16MHz */
+	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(galpani2_mem2, 0)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
 
@@ -489,11 +489,11 @@ static MACHINE_DRIVER_START( galpani2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 1584000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1584000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1584000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 1584000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END

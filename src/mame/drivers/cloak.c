@@ -325,11 +325,11 @@ static const struct POKEYinterface pokey_interface_2 =
 static MACHINE_DRIVER_START( cloak )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,1000000)		/* 1 MHz ???? */
+	MDRV_CPU_ADD("main", M6502,1000000)		/* 1 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(master_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
-	MDRV_CPU_ADD(M6502,1250000)		/* 1.25 MHz ???? */
+	MDRV_CPU_ADD("slave", M6502,1250000)		/* 1.25 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(slave_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -354,11 +354,11 @@ static MACHINE_DRIVER_START( cloak )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(POKEY, 1500000)
+	MDRV_SOUND_ADD("pokey1", POKEY, 1500000)
 	MDRV_SOUND_CONFIG(pokey_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(POKEY, 1500000)
+	MDRV_SOUND_ADD("pokey2", POKEY, 1500000)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

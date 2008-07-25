@@ -358,7 +358,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( epos )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 11000000/4)	/* 2.75 MHz (see notes) */
+	MDRV_CPU_ADD("main", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -375,14 +375,14 @@ static MACHINE_DRIVER_START( epos )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, 11000000/4)
+	MDRV_SOUND_ADD("ay", AY8910, 11000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( dealer )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 11000000/4)	/* 2.75 MHz (see notes) */
+	MDRV_CPU_ADD("main", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
 	MDRV_CPU_PROGRAM_MAP(dealer_readmem,dealer_writemem)
 	MDRV_CPU_IO_MAP(dealer_readport,dealer_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -404,7 +404,7 @@ static MACHINE_DRIVER_START( dealer )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, 11000000/4)
+	MDRV_SOUND_ADD("ay", AY8910, 11000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -347,15 +347,15 @@ static const struct VLM5030interface vlm5030_interface =
 static MACHINE_DRIVER_START( ddribble )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("main", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu0,writemem_cpu0)
 	MDRV_CPU_VBLANK_INT("main", ddrible_interrupt_0)
 
-	MDRV_CPU_ADD(M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("cpu1", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
 	MDRV_CPU_VBLANK_INT("main", ddrible_interrupt_1)
 
-	MDRV_CPU_ADD(M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
 
 	MDRV_INTERLEAVE(100)	/* we need heavy synch */
@@ -380,22 +380,22 @@ static MACHINE_DRIVER_START( ddribble )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "filter1", 0.25)
 	MDRV_SOUND_ROUTE(1, "filter2", 0.25)
 	MDRV_SOUND_ROUTE(2, "filter3", 0.25)
 	MDRV_SOUND_ROUTE(3, "mono", 0.25)
 
-	MDRV_SOUND_ADD(VLM5030, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD_TAG("filter1", FILTER_RC, 0)
+	MDRV_SOUND_ADD("filter1", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter2", FILTER_RC, 0)
+	MDRV_SOUND_ADD("filter2", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter3", FILTER_RC, 0)
+	MDRV_SOUND_ADD("filter3", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

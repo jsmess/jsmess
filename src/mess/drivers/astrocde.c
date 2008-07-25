@@ -147,7 +147,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( astrocde )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, ASTROCADE_CLOCK/4)        /* 1.789 Mhz */
+	MDRV_CPU_ADD("main", Z80, ASTROCADE_CLOCK/4)        /* 1.789 Mhz */
 	MDRV_CPU_PROGRAM_MAP(astrocade_mem, 0)
 	MDRV_CPU_IO_MAP(astrocade_io, 0)
 
@@ -164,7 +164,7 @@ static MACHINE_DRIVER_START( astrocde )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("astrocade", ASTROCADE, ASTROCADE_CLOCK/4)
+	MDRV_SOUND_ADD("astrocade", ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

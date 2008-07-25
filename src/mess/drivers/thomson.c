@@ -724,7 +724,7 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_MACHINE_RESET ( to7 )
 
 /* cpu */
-     MDRV_CPU_ADD_TAG ( "main", M6809, 1000000 )
+     MDRV_CPU_ADD ( "main", M6809, 1000000 )
      MDRV_CPU_PROGRAM_MAP ( to7, 0 )
 
 /* video */
@@ -748,11 +748,11 @@ static MACHINE_DRIVER_START ( to7 )
 
 /* sound */
      MDRV_SPEAKER_STANDARD_MONO("mono")
-     MDRV_SOUND_ADD_TAG ( "buzzer", DAC, 0 )
+     MDRV_SOUND_ADD ( "buzzer", DAC, 0 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit buzzer */
-     MDRV_SOUND_ADD_TAG ( "dac", DAC, 0 )
+     MDRV_SOUND_ADD ( "dac", DAC, 0 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 6-bit game extention DAC */
-     MDRV_SOUND_ADD_TAG ( "speech", DAC, 0 )
+     MDRV_SOUND_ADD ( "speech", DAC, 0 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
 	 /* printer */

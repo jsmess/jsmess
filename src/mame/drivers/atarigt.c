@@ -103,15 +103,9 @@ static void cage_irq_callback(running_machine *machine, int reason)
  *
  *************************************/
 
-static READ32_HANDLER( inputs_01_r )
-{
-	return (input_port_read(machine, "IN0") << 16) | input_port_read(machine, "IN1");
-}
-
-
 static READ32_HANDLER( special_port2_r )
 {
-	int temp = input_port_read(machine, "IN2");
+	int temp = input_port_read(machine, "SERVICE");
 	temp ^= 0x0001;		/* /A2DRDY always high for now */
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
 	return (temp << 16) | temp;
@@ -120,7 +114,7 @@ static READ32_HANDLER( special_port2_r )
 
 static READ32_HANDLER( special_port3_r )
 {
-	int temp = input_port_read(machine, "IN3");
+	int temp = input_port_read(machine, "COIN");
 	if (atarigen_video_int_state) temp ^= 0x0001;
 	if (atarigen_scanline_int_state) temp ^= 0x0002;
 	return (temp << 16) | temp;
@@ -167,7 +161,7 @@ static READ32_HANDLER( analog_port0_r )
 	compute_fake_pots(pots);
 	return (pots[0] << 24) | (pots[3] << 8);
 #else
-	return (input_port_read(machine, "IN4") << 24) | (input_port_read(machine, "IN5") << 8);
+	return (input_port_read(machine, "AN1") << 24) | (input_port_read(machine, "AN2") << 8);
 #endif
 }
 
@@ -179,7 +173,7 @@ static READ32_HANDLER( analog_port1_r )
 	compute_fake_pots(pots);
 	return (pots[2] << 24) | (pots[1] << 8);
 #else
-	return (input_port_read(machine, "IN6") << 24) | (input_port_read(machine, "IN7") << 8);
+	return (input_port_read(machine, "AN3") << 24) | (input_port_read(machine, "AN4") << 8);
 #endif
 }
 
@@ -292,9 +286,7 @@ static void tmek_update_mode(offs_t offset)
 
 static void tmek_protection_w(offs_t offset, UINT16 data)
 {
-#if LOG_PROTECTION
-	logerror("%06X:Protection W@%06X = %04X\n", activecpu_get_previouspc(), offset, data);
-#endif
+	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", activecpu_get_previouspc(), offset, data);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -309,9 +301,7 @@ static void tmek_protection_w(offs_t offset, UINT16 data)
 
 static void tmek_protection_r(offs_t offset, UINT16 *data)
 {
-#if LOG_PROTECTION
-	logerror("%06X:Protection R@%06X\n", activecpu_get_previouspc(), offset);
-#endif
+	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", activecpu_get_previouspc(), offset);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -353,21 +343,21 @@ static void primage_update_mode(offs_t offset)
 		/* this is from the code at $20f90 */
 		if (protaddr[1] == 0xdcc7c4 && protaddr[2] == 0xdcc7c4 && protaddr[3] == 0xdc4010)
 		{
-//          logerror("prot:Entering mode 1\n");
+			if (LOG_PROTECTION) logerror("prot:Entering mode 1\n");
 			protmode = 1;
 		}
 
 		/* this is from the code at $27592 */
 		if (protaddr[0] == 0xdcc7ca && protaddr[1] == 0xdcc7ca && protaddr[2] == 0xdcc7c6 && protaddr[3] == 0xdc4022)
 		{
-//          logerror("prot:Entering mode 2\n");
+			if (LOG_PROTECTION) logerror("prot:Entering mode 2\n");
 			protmode = 2;
 		}
 
 		/* this is from the code at $3d8dc */
 		if (protaddr[0] == 0xdcc7c0 && protaddr[1] == 0xdcc7c0 && protaddr[2] == 0xdc80f2 && protaddr[3] == 0xdc7af2)
 		{
-//          logerror("prot:Entering mode 3\n");
+			if (LOG_PROTECTION) logerror("prot:Entering mode 3\n");
 			protmode = 3;
 		}
 	}
@@ -377,8 +367,8 @@ static void primage_update_mode(offs_t offset)
 
 static void primrage_protection_w(offs_t offset, UINT16 data)
 {
-#if LOG_PROTECTION
-{
+	if (LOG_PROTECTION)
+	{
 	UINT32 pc = activecpu_get_previouspc();
 	switch (pc)
 	{
@@ -415,8 +405,7 @@ static void primrage_protection_w(offs_t offset, UINT16 data)
 			logerror("%06X:Unknown protection W@%06X = %04X\n", activecpu_get_previouspc(), offset, data);
 			break;
 	}
-}
-#endif
+	}
 
 /* mask = 0x78fff */
 
@@ -430,7 +419,7 @@ static void primrage_protection_w(offs_t offset, UINT16 data)
 	if (protmode == 2)
 	{
 		int temp = (offset - 0xdc7800) / 2;
-//      logerror("prot:mode 2 param = %04X\n", temp);
+		if (LOG_PROTECTION) logerror("prot:mode 2 param = %04X\n", temp);
 		protresult = temp * 0x6915 + 0x6915;
 	}
 
@@ -438,7 +427,7 @@ static void primrage_protection_w(offs_t offset, UINT16 data)
 	{
 		if (offset == 0xdc4700)
 		{
-//          logerror("prot:Clearing mode 3\n");
+			if (LOG_PROTECTION) logerror("prot:Clearing mode 3\n");
 			protmode = 0;
 		}
 	}
@@ -451,7 +440,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 	/* track accesses */
 	primage_update_mode(offset);
 
-#if LOG_PROTECTION
+if (LOG_PROTECTION)
 {
 	UINT32 pc = activecpu_get_previouspc();
 	UINT32 p1, p2, a6;
@@ -474,8 +463,8 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 			break;
 		case 0x275cc:
 			a6 = activecpu_get_reg(M68K_A6);
-			p1 = (cpu_readmem24bedw_word(a6+8) << 16) | cpu_readmem24bedw_word(a6+10);
-			p2 = (cpu_readmem24bedw_word(a6+12) << 16) | cpu_readmem24bedw_word(a6+14);
+			p1 = (program_read_word(a6+8) << 16) | program_read_word(a6+10);
+			p2 = (program_read_word(a6+12) << 16) | program_read_word(a6+14);
 			logerror("Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
 			break;
 		case 0x275d2:
@@ -492,7 +481,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 		/* protection code from 3d8dc - 3d95a */
 		case 0x3d8f4:
 			a6 = activecpu_get_reg(M68K_A6);
-			p1 = (cpu_readmem24bedw_word(a6+12) << 16) | cpu_readmem24bedw_word(a6+14);
+			p1 = (program_read_word(a6+12) << 16) | program_read_word(a6+14);
 			logerror("Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x3d8fa:
@@ -503,7 +492,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 		/* protection code from 437fa - 43860 */
 		case 0x43814:
 			a6 = activecpu_get_reg(M68K_A6);
-			p1 = cpu_readmem24bedw(a6+15);
+			p1 = program_read_dword(a6+14) & 0xffffff;
 			logerror("Known Protection @ 43814(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x4381c:
@@ -520,7 +509,6 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 			break;
 	}
 }
-#endif
 
 	/* handle specific reads */
 	switch (offset)
@@ -539,7 +527,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 			{
 				*data = protresult;
 				protmode = 0;
-//              logerror("prot:Clearing mode 2\n");
+			if (LOG_PROTECTION) logerror("prot:Clearing mode 2\n");
 			}
 			break;
 
@@ -547,7 +535,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 			if (protmode == 1)
 			{
 				protmode = 0;
-//              logerror("prot:Clearing mode 1\n");
+			if (LOG_PROTECTION) logerror("prot:Clearing mode 1\n");
 			}
 			break;
 	}
@@ -628,7 +616,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xe0a000, 0xe0a003) AM_WRITE(atarigen_scanline_int_ack32_w)
 	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE(atarigen_video_int_ack32_w)
 	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITE(SMH_NOP)//watchdog_reset_w },
-	AM_RANGE(0xe80000, 0xe80003) AM_READ(inputs_01_r)
+	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
 	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)
 	AM_RANGE(0xf80000, 0xffffff) AM_RAM
@@ -642,32 +630,29 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-#define COMMON_IN0\
-	PORT_START_TAG("IN0")\
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )\
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )\
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)\
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)\
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)\
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)\
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)\
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)\
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-
-#define COMMON_IN1\
-	PORT_START_TAG("IN1")\
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )\
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )\
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)\
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)\
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)\
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)\
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)\
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)\
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+#define COMMON_IN01\
+	PORT_START_TAG("P1_P2")\
+	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNUSED )\
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_START2 )\
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)\
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)\
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)\
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)\
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)\
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)\
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)\
+	PORT_BIT( 0x00ff0000, IP_ACTIVE_LOW, IPT_UNUSED )\
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_START1 )\
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)\
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)\
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)\
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)\
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)\
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)\
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 #define COMMON_IN2\
-	PORT_START_TAG("IN2")      /* 68.STATUS (A2=0) */ \
+	PORT_START_TAG("SERVICE")      /* 68.STATUS (A2=0) */ \
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /A2DRDY */ \
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_TILT )		/* TILT */ \
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /XIRQ23 */ \
@@ -678,7 +663,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 #define COMMON_IN3\
-	PORT_START_TAG("IN3")      /* 68.STATUS (A2=1) */ \
+	PORT_START_TAG("COIN")      /* 68.STATUS (A2=1) */ \
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /VBIRQ */ \
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /4MSIRQ */ \
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /XIRQ0 */ \
@@ -690,9 +675,8 @@ ADDRESS_MAP_END
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 static INPUT_PORTS_START( tmek )
-	COMMON_IN0		/* 68.SW (A1=0) */
-
-	COMMON_IN1		/* 68.SW (A1=1) */
+	COMMON_IN01		/* 68.SW (A1=0) */
+					/* 68.SW (A1=1) */
 
 	COMMON_IN2
 
@@ -705,16 +689,16 @@ static INPUT_PORTS_START( tmek )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 #else
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("AN1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("AN2")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN6")
+	PORT_START_TAG("AN3")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN7")
+	PORT_START_TAG("AN4")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 #endif
 
@@ -722,24 +706,23 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( primrage )
-	COMMON_IN0		/* 68.SW (A1=0) */
-
-	COMMON_IN1		/* 68.SW (A1=1) bit 0x0008 does something */
+	COMMON_IN01		/* 68.SW (A1=0) */
+					/* 68.SW (A1=1) bit 0x0008 does something */
 
 	COMMON_IN2      /* 68.STATUS (A2=0) */
 
 	COMMON_IN3      /* 68.STATUS (A2=1) */
 
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("AN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("AN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN6")
+	PORT_START_TAG("AN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN7")
+	PORT_START_TAG("AN4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -804,7 +787,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( atarigt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, ATARI_CLOCK_50MHz/2)
+	MDRV_CPU_ADD("main", M68EC020, ATARI_CLOCK_50MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 	MDRV_CPU_PERIODIC_INT(atarigen_scanline_int_gen, 250)

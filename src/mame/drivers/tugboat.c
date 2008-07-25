@@ -303,7 +303,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( tugboat )
-	MDRV_CPU_ADD_TAG("main", M6502, 2000000)	/* 2 MHz ???? */
+	MDRV_CPU_ADD("main", M6502, 2000000)	/* 2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
@@ -326,7 +326,7 @@ static MACHINE_DRIVER_START( tugboat )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD("ay", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_DRIVER_END
 

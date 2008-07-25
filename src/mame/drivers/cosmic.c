@@ -987,7 +987,7 @@ static const struct Samplesinterface cosmicg_samples_interface =
 static MACHINE_DRIVER_START( cosmic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,10816000/6)	/* 1.802 MHz*/
+	MDRV_CPU_ADD("main", Z80,10816000/6)	/* 1.802 MHz*/
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1017,11 +1017,11 @@ static MACHINE_DRIVER_START( panic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(panic_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1047,7 +1047,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cosmicg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS9980, 1228500)
+	MDRV_CPU_ADD("main", TMS9980, 1228500)
 			/* 9.828 MHz Crystal */
 			/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
             fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
@@ -1071,11 +1071,11 @@ static MACHINE_DRIVER_START( cosmicg )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(cosmicg_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1099,7 +1099,7 @@ static MACHINE_DRIVER_START( magspot )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1133,7 +1133,7 @@ static MACHINE_DRIVER_START( nomnlnd )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

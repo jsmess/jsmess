@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( sym1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_RAMBANK(4) AM_BASE(&sym1_ram_3k)
 	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_BASE(&sym1_monitor)       /* U20 Monitor ROM */
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(via_0_r, via_0_w)      /* U25 VIA #1 */
-	AM_RANGE(0xa400, 0xa40f) AM_READWRITE(r6532_0_r, r6532_0_w)  /* U27 RIOT */
+	AM_RANGE(0xa400, 0xa40f) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)  /* U27 RIOT */
 	AM_RANGE(0xa600, 0xa67f) AM_RAM AM_RAMBANK(5) AM_BASE(&sym1_riot_ram)  /* U27 RIOT RAM */
 	AM_RANGE(0xa800, 0xa80f) AM_READWRITE(via_1_r, via_1_w)      /* U28 VIA #2 */
 	AM_RANGE(0xac00, 0xac0f) AM_READWRITE(via_2_r, via_2_w)      /* U29 VIA #3 */
@@ -120,7 +120,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( sym1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, SYM1_CLOCK)  /* 1 MHz */
+	MDRV_CPU_ADD("main", M6502, SYM1_CLOCK)  /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(sym1_map, 0)
 	MDRV_MACHINE_RESET(sym1)
 
@@ -128,8 +128,11 @@ static MACHINE_DRIVER_START( sym1 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* devices */
+	MDRV_RIOT6532_ADD("riot", SYM1_CLOCK, sym1_r6532_interface)
 MACHINE_DRIVER_END
 
 

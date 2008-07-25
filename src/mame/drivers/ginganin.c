@@ -349,12 +349,11 @@ static const struct Y8950interface y8950_interface =
 static MACHINE_DRIVER_START( ginganin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 6000000)	/* ? */
+	MDRV_CPU_ADD("main", M68000, 6000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
-	MDRV_CPU_ADD(M6809, 1000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6809, 1000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(ginganin_sound_interrupt,60)	/* Takahiro Nogi. 1999/09/27 (1 -> 60) */
 
@@ -375,10 +374,10 @@ static MACHINE_DRIVER_START( ginganin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 3579545 / 2)
+	MDRV_SOUND_ADD("ay", AY8910, 3579545 / 2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD(Y8950, 3579545)
+	MDRV_SOUND_ADD("ym", Y8950, 3579545)
 	MDRV_SOUND_CONFIG(y8950_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -342,12 +342,12 @@ static INTERRUPT_GEN( quasar_interrupt )
 
 static MACHINE_DRIVER_START( quasar )
 
-	MDRV_CPU_ADD_TAG("main", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */
+	MDRV_CPU_ADD("main", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */
 	MDRV_CPU_PROGRAM_MAP(quasar,0)
 	MDRV_CPU_IO_MAP(quasar_io,0)
 	MDRV_CPU_VBLANK_INT("main", quasar_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
+	MDRV_CPU_ADD("sound",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
@@ -374,7 +374,7 @@ static MACHINE_DRIVER_START( quasar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -237,7 +237,7 @@ static const struct POKEYinterface pokey_interface_2 =
 static MACHINE_DRIVER_START( quantum )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, MASTER_CLOCK / 2)
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 2)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, (double)MASTER_CLOCK / 4096 / 12)
 
@@ -255,11 +255,11 @@ static MACHINE_DRIVER_START( quantum )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(POKEY, 600000)
+	MDRV_SOUND_ADD("pokey1", POKEY, 600000)
 	MDRV_SOUND_CONFIG(pokey_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(POKEY, 600000)
+	MDRV_SOUND_ADD("pokey2", POKEY, 600000)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

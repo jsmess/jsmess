@@ -418,16 +418,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tp84 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
+	MDRV_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tp84_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(M6809, XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	/* audio CPU */
-	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -450,20 +449,20 @@ static MACHINE_DRIVER_START( tp84 )
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("sn1", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)
 
-	MDRV_SOUND_ADD(SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("sn2", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 0.75)
 
-	MDRV_SOUND_ADD(SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("sn3", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 0.75)
 
-	MDRV_SOUND_ADD_TAG("filter1", FILTER_RC, 0)
+	MDRV_SOUND_ADD("filter1", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter2", FILTER_RC, 0)
+	MDRV_SOUND_ADD("filter2", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter3", FILTER_RC, 0)
+	MDRV_SOUND_ADD("filter3", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

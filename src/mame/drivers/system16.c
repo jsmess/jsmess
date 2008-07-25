@@ -443,10 +443,10 @@ static WRITE16_HANDLER( sys16_coinctrl_w )
 static MACHINE_DRIVER_START( system16 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_VBLANK_INT("main", sys16_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
+	MDRV_CPU_ADD("sound", Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
@@ -468,7 +468,7 @@ static MACHINE_DRIVER_START( system16 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("2151", YM2151, 4000000)
+	MDRV_SOUND_ADD("2151", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "left", 0.32)
 	MDRV_SOUND_ROUTE(1, "right", 0.32)
 MACHINE_DRIVER_END
@@ -484,7 +484,7 @@ static MACHINE_DRIVER_START( system16_7759 )
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport_7759)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD_TAG("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(sys16_upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.48)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.48)
@@ -2026,7 +2026,7 @@ static MACHINE_DRIVER_START( tturfbl )
 	MDRV_CPU_IO_MAP(tturfbl_sound_readport,tturfbl_sound_writeport)
 
 	MDRV_SOUND_REMOVE("7759")
-	MDRV_SOUND_ADD_TAG("5205", MSM5205, 220000)
+	MDRV_SOUND_ADD("5205", MSM5205, 220000)
 	MDRV_SOUND_CONFIG(tturfbl_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)

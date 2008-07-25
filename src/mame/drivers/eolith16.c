@@ -164,7 +164,7 @@ static PALETTE_INIT( eolith16 )
 
 
 static MACHINE_DRIVER_START( eolith16 )
-	MDRV_CPU_ADD(E116T, 60000000)		/* no internal multiplier */
+	MDRV_CPU_ADD("main", E116T, 60000000)		/* no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(eolith16_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
@@ -186,7 +186,7 @@ static MACHINE_DRIVER_START( eolith16 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)

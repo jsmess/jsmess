@@ -38,11 +38,6 @@ Notes:
   fixed by this (earlier notes in this driver talked about "sprite flickerings
   and pop-ups" but I don't know where they happened).
 
-TODO:
------
-- Number of raster lines unknown. Currently set to 264 which gives a 59.19Hz
-  refresh rate.
-
 ***************************************************************************/
 
 #include "driver.h"
@@ -604,18 +599,21 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( pow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_18MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_18MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pow_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, XTAL_8MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("sound", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)	// inaccurate
+	// the screen parameters are guessed but should be accurate. They
+	// give a theoretical refresh rate of 59.1856Hz while the measured
+	// rate on a SAR board is 59.16Hz.
+	MDRV_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
 
 	MDRV_GFXDECODE(pow)
 	MDRV_PALETTE_LENGTH(0x800)
@@ -626,11 +624,11 @@ static MACHINE_DRIVER_START( pow )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, XTAL_8MHz/2) /* verified on pcb  */
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_8MHz/2) /* verified on pcb  */
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

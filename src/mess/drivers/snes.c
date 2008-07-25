@@ -442,10 +442,10 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 static MACHINE_DRIVER_START( snes )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", G65816, MCLK_NTSC/6)	/* 2.68Mhz, also 3.58Mhz */
+	MDRV_CPU_ADD("main", G65816, MCLK_NTSC/6)	/* 2.68Mhz, also 3.58Mhz */
 	MDRV_CPU_PROGRAM_MAP(snes_map, 0)
 
-	MDRV_CPU_ADD_TAG("sound", SPC700, 1024000)	/* 1.024 Mhz */
+	MDRV_CPU_ADD("sound", SPC700, 1024000)	/* 1.024 Mhz */
 	MDRV_CPU_PROGRAM_MAP(spc_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(NULL, 0)
 
@@ -465,7 +465,7 @@ static MACHINE_DRIVER_START( snes )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(snes_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)

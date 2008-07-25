@@ -329,7 +329,7 @@ INPUT_PORTS_END
 /* machine definition */
 static MACHINE_DRIVER_START( ti81 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("main", Z80, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(ti81_mem, 0)
 	MDRV_CPU_IO_MAP(ti81_io, 0)
 	MDRV_SCREEN_ADD("main", LCD)
@@ -367,7 +367,7 @@ static MACHINE_DRIVER_START( ti85 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_NVRAM_HANDLER( ti85 )

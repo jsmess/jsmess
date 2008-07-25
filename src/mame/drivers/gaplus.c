@@ -540,15 +540,15 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( gaplus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,	24576000/16)	/* 1.536 MHz */
+	MDRV_CPU_ADD("main", M6809,	24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
 	MDRV_CPU_VBLANK_INT("main", gaplus_interrupt_1)
 
-	MDRV_CPU_ADD(M6809,	24576000/16)	/* 1.536 MHz */
+	MDRV_CPU_ADD("sub", M6809,	24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(M6809, 24576000/16)	/* 1.536 MHz */
+	MDRV_CPU_ADD("sub2", M6809, 24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu3,writemem_cpu3)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
@@ -574,11 +574,11 @@ static MACHINE_DRIVER_START( gaplus )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(NAMCO_15XX, 24576000/1024)
+	MDRV_SOUND_ADD("namco", NAMCO_15XX, 24576000/1024)
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END

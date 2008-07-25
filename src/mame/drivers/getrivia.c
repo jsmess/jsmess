@@ -468,7 +468,7 @@ static MACHINE_RESET( gselect )
 }
 
 static MACHINE_DRIVER_START( getrivia )
-	MDRV_CPU_ADD_TAG("cpu",Z80,4000000) /* 4 MHz */
+	MDRV_CPU_ADD("cpu",Z80,4000000) /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(getrivia_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
@@ -497,7 +497,7 @@ static MACHINE_DRIVER_START( getrivia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

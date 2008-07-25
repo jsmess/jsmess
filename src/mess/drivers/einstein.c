@@ -1718,7 +1718,7 @@ static VIDEO_UPDATE( einstein2 )
 
 static MACHINE_DRIVER_START( einstein )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, EINSTEIN_SYSTEM_CLOCK)
+	MDRV_CPU_ADD("main", Z80, EINSTEIN_SYSTEM_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(einstein_mem, 0)
 	MDRV_CPU_IO_MAP(einstein_io, 0)
 	MDRV_CPU_CONFIG(einstein_daisy_chain)
@@ -1735,7 +1735,7 @@ static MACHINE_DRIVER_START( einstein )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, 2000000)
+	MDRV_SOUND_ADD("ay8910", AY8910, 2000000)
 	MDRV_SOUND_CONFIG(einstein_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 

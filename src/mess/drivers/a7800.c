@@ -29,7 +29,7 @@ static ADDRESS_MAP_START(a7800_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0140, 0x01FF) AM_READWRITE(SMH_BANK6, SMH_BANK6)		/* RAM1 */
 	AM_RANGE(0x0200, 0x021F) AM_READWRITE(a7800_TIA_r, a7800_TIA_w)
 	AM_RANGE(0x0220, 0x023F) AM_READWRITE(a7800_MARIA_r, a7800_MARIA_w)
-	AM_RANGE(0x0280, 0x029F) AM_READWRITE(r6532_0_r, r6532_0_w)
+	AM_RANGE(0x0280, 0x029F) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x0300, 0x031F) AM_READWRITE(a7800_TIA_r, a7800_TIA_w)
 	AM_RANGE(0x0320, 0x033F) AM_READWRITE(a7800_MARIA_r, a7800_MARIA_w)
 	AM_RANGE(0x0480, 0x04FF) AM_RAM										/* RIOT RAM */
@@ -260,9 +260,9 @@ static PALETTE_INIT(a7800p)
 
 
 
-static MACHINE_DRIVER_START( a7800_ntsc )
+static MACHINE_DRIVER_START( a7800 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, CLK_NTSC)	/* 1.79Mhz (note: The clock switches to 1.19Mhz
+	MDRV_CPU_ADD("main", M6502, CLK_NTSC)	/* 1.79Mhz (note: The clock switches to 1.19Mhz
                                                  * when the TIA or RIOT are accessed) */
 	MDRV_CPU_PROGRAM_MAP(a7800_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a7800_interrupt, 262)
@@ -286,16 +286,28 @@ static MACHINE_DRIVER_START( a7800_ntsc )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("tia", TIA, 31400)
+	MDRV_SOUND_ADD("tia", TIA, 31400)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD_TAG("pokey", POKEY, CLK_NTSC)
+	MDRV_SOUND_ADD("pokey", POKEY, CLK_NTSC)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 
 
+static MACHINE_DRIVER_START( a7800_ntsc )
+	MDRV_IMPORT_FROM( a7800 )
+
+	/* devices */
+	MDRV_RIOT6532_ADD("riot", 3579545/3, r6532_interface_ntsc)
+MACHINE_DRIVER_END
+
+
+
 static MACHINE_DRIVER_START( a7800_pal )
-	MDRV_IMPORT_FROM( a7800_ntsc )
+	MDRV_IMPORT_FROM( a7800 )
+
+	/* devices */
+	MDRV_RIOT6532_ADD("riot", 3546894/3, r6532_interface_pal)
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("main", M6502, CLK_PAL)	/* 1.79Mhz (note: The clock switches to 1.19Mhz

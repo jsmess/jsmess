@@ -616,7 +616,7 @@ ROM_END
 
 static MACHINE_DRIVER_START( pet_general )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 7833600)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M6502, 7833600)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(pet_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", pet_frame_interrupt)
 	MDRV_INTERLEAVE(0)
@@ -704,7 +704,7 @@ static MACHINE_DRIVER_START( superpet )
 	MDRV_CPU_PROGRAM_MAP( superpet_mem, 0 )
 
 	/* m6809 cpu */
-	MDRV_CPU_ADD_TAG("main", M6809, 1000000)
+	MDRV_CPU_ADD("main", M6809, 1000000)
 	MDRV_CPU_PROGRAM_MAP(superpet_m6809_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", pet_frame_interrupt)
 

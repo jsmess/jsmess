@@ -440,7 +440,7 @@ static MACHINE_RESET( phoenix )
 static MACHINE_DRIVER_START( phoenix )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8085A, CPU_CLOCK)	/* 2.75 MHz */
+	MDRV_CPU_ADD("main", 8085A, CPU_CLOCK)	/* 2.75 MHz */
 	MDRV_CPU_PROGRAM_MAP(phoenix_memory_map, 0)
 
 	MDRV_MACHINE_RESET(phoenix)
@@ -462,15 +462,15 @@ static MACHINE_DRIVER_START( phoenix )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("tms",  TMS36XX, 372)
+	MDRV_SOUND_ADD("tms",  TMS36XX, 372)
 	MDRV_SOUND_CONFIG(phoenix_tms36xx_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD_TAG("cust", CUSTOM, 0)
+	MDRV_SOUND_ADD("cust", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(phoenix_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 120000)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 120000)
 	MDRV_SOUND_CONFIG_DISCRETE(phoenix)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_DRIVER_END
@@ -506,7 +506,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( survival )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8085A, CPU_CLOCK)	/* 5.50 MHz */
+	MDRV_CPU_ADD("main", 8085A, CPU_CLOCK)	/* 5.50 MHz */
 	MDRV_CPU_PROGRAM_MAP(survival_memory_map, 0)
 
 	MDRV_MACHINE_RESET(phoenix)
@@ -531,7 +531,7 @@ static MACHINE_DRIVER_START( survival )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* FIXME: check clock */
-	MDRV_SOUND_ADD(AY8910, 11000000/4)
+	MDRV_SOUND_ADD("ay", AY8910, 11000000/4)
 	MDRV_SOUND_CONFIG(survival_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

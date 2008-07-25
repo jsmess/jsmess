@@ -1412,7 +1412,8 @@ const game_driver * const drivers[] =
 	DRIVER( dbreed72 )	/* (c) 1989 */
 	DRIVER( rtype2 )	/* (c) 1989 */
 	DRIVER( rtype2j )	/* (c) 1989 (Japan) */
-	DRIVER( majtitle )	/* (c) 1990 (Japan) */
+	DRIVER( majtitle )	/* (c) 1990 (World) */
+	DRIVER( majtitlj )	/* (c) 1990 (Japan) */
 	DRIVER( hharry )	/* (c) 1990 (World) */
 	DRIVER( hharryu )	/* (c) 1990 Irem America (US) */
 	DRIVER( dkgensan )	/* (c) 1990 (Japan) */
@@ -2068,6 +2069,7 @@ const game_driver * const drivers[] =
 	DRIVER( demonwl1 )	/* TP-016 (c) 1989 Toaplan + Taito license */
 	DRIVER( demonwl2 )	/* TP-016 (c) 1989 Toaplan */
 	DRIVER( demonwl3 )	/* TP-016 (c) 1989 Toaplan */
+	DRIVER( demonwl4 )	/* TP-016 (c) 1989 Toaplan */
 	DRIVER( fireshrk )	/* TP-017 (c) 1990 Toaplan */
 	DRIVER( samesame )	/* TP-017 (c) 1989 Toaplan */
 	DRIVER( samesam2 )	/* TP-017 (c) 1989 Toaplan */
@@ -3821,6 +3823,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( dyndek2b )	/* 1998 */
 	DRIVER( pltkids )	/* 1998 */
 	DRIVER( waverunr )	/* 199? */
+	DRIVER( rchase2 )	/* 199? */
 
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
 	DRIVER( skisuprg )	/* 1996 */
@@ -4021,7 +4024,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mp_bio )	/* 06 */
 	DRIVER( mp_soni2 )	/* 07 */
 				/* 08 */
-				/* 09 */
+	DRIVER( mp_shnb3 )	/* 09 */
 				/* 10 */
 	DRIVER( mp_mazin )	/* 11 */
 	DRIVER( mp_col3 )	/* ?? */
@@ -4898,6 +4901,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( thrilld )	/* GX713 (c)1998 */
 	DRIVER( midnrun )	/* GX??? (c)1995 */
 	DRIVER( windheat )	/* GX677 (c)1996 */
+	DRIVER( windheau )	/* GX677 (c)1996 */
 	DRIVER( jetwave )	/* GX??? (c)1996 */
 
 	/* Konami M2 games */
@@ -8133,6 +8137,7 @@ Other Sun games
 	DRIVER( peps0308 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0716 )	/* (c) 1996 IGT - International Gaming Technology */
+	DRIVER( pex2069p )	/* (c) 1995 IGT - International Gaming Technology */
 	DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
 	DRIVER( pexp0112 )	/* (c) 1995 IGT - International Gaming Technology */
 	DRIVER( pexs0006 )	/* (c) 1997 IGT - International Gaming Technology */

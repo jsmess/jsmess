@@ -546,7 +546,7 @@ static const i8x41_config i8042_config = { TYPE_I8X42 };
 
 
 MACHINE_DRIVER_START( at_kbdc8042 )
-	MDRV_CPU_ADD_TAG("kbdc8042", I8X41, 4772720 )   /* Frequency is a wild guess */
+	MDRV_CPU_ADD("kbdc8042", I8X41, 4772720 )   /* Frequency is a wild guess */
 	MDRV_CPU_PROGRAM_MAP( kbdc8042_mem, 0 )
 	MDRV_CPU_IO_MAP( kbdc8042_io, 0 )
 	MDRV_CPU_CONFIG( i8042_config )

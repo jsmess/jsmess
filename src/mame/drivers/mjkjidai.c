@@ -355,7 +355,7 @@ static const struct CustomSound_interface adpcm_interface =
 static MACHINE_DRIVER_START( mjkjidai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,10000000/2)	/* 5 MHz ??? */
+	MDRV_CPU_ADD("main", Z80,10000000/2)	/* 5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
@@ -380,13 +380,13 @@ static MACHINE_DRIVER_START( mjkjidai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76489, 10000000/4)
+	MDRV_SOUND_ADD("sn1", SN76489, 10000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SN76489, 10000000/4)
+	MDRV_SOUND_ADD("sn2", SN76489, 10000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(CUSTOM, 6000)
+	MDRV_SOUND_ADD("adpcm", CUSTOM, 6000)
 	MDRV_SOUND_CONFIG(adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

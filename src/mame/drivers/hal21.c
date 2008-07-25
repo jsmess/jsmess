@@ -61,6 +61,8 @@ AT08XX03:
 static UINT8 *hal21_vreg, *hal21_sndfifo;
 static UINT8 *textram;
 static UINT8 *aso_scroll_sync;
+static int color[2];
+
 
 /**************************************************************************/
 // Test Handlers
@@ -179,10 +181,16 @@ static VIDEO_START( aso )
 }
 
 
+static VIDEO_RESET( aso )
+{
+	color[0] = 8;
+	color[1] = 8;
+}
+
+
 static void hal21_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly, int attrs,
 								const gfx_element *gfx )
 {
-	static int color[2] = {8, 8};
 	int bankbase, c, x, y, offsx, offsy, dx, dy, sx, sy, offs, tile_number;
 
 	bankbase = attrs<<3 & 0x100;
@@ -697,16 +705,15 @@ static MACHINE_RESET( aso )
 static MACHINE_DRIVER_START( aso )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(aso_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(aso_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(aso_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -729,28 +736,28 @@ static MACHINE_DRIVER_START( aso )
 
 	MDRV_PALETTE_INIT(aso)
 	MDRV_VIDEO_START(aso)
+	MDRV_VIDEO_RESET(aso)
 	MDRV_VIDEO_UPDATE(aso)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3526, 4000000)
+	MDRV_SOUND_ADD("ym", YM3526, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hal21 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(hal21_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(hal21_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(hal21_sound_map,0)
 	MDRV_CPU_IO_MAP(hal21_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", hal21_sound_interrupt)
@@ -775,15 +782,16 @@ static MACHINE_DRIVER_START( hal21 )
 
 	MDRV_PALETTE_INIT(aso)
 	MDRV_VIDEO_START(aso)
+	MDRV_VIDEO_RESET(aso)
 	MDRV_VIDEO_UPDATE(aso)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 

@@ -250,7 +250,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( drtomy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* ? MHz */
+	MDRV_CPU_ADD("main", M68000,24000000/2)			/* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(drtomy_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -271,7 +271,7 @@ static MACHINE_DRIVER_START( drtomy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 26000000/16)
+	MDRV_SOUND_ADD("oki", OKIM6295, 26000000/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_DRIVER_END

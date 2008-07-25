@@ -275,13 +275,12 @@ static const struct YM3812interface ym3812_interface =
 
 static MACHINE_DRIVER_START( onetwo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("main", Z80,4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 	MDRV_CPU_IO_MAP(sound_cpu_io,0)
 
@@ -302,11 +301,11 @@ static MACHINE_DRIVER_START( onetwo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 4000000)
+	MDRV_SOUND_ADD("ym", YM3812, 4000000)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000*2)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000*2)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

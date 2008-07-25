@@ -146,7 +146,7 @@ static MACHINE_RESET( nitedrvr )
 
 static MACHINE_DRIVER_START( nitedrvr )
 	// basic machine hardware
-	MDRV_CPU_ADD(M6502, 12096000/12) // 1 MHz
+	MDRV_CPU_ADD("main", M6502, 12096000/12) // 1 MHz
 	MDRV_CPU_PROGRAM_MAP(nitedrvr_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(3)
@@ -172,7 +172,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(nitedrvr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

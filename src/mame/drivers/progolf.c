@@ -189,11 +189,11 @@ static INTERRUPT_GEN( progolf_interrupt )
 
 static MACHINE_DRIVER_START( progolf )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 2000000)		 /* ? */
+	MDRV_CPU_ADD("main", M6502, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 //  MDRV_CPU_VBLANK_INT("main", progolf_interrupt)
 
-//  MDRV_CPU_ADD(M6502, 500000)
+//  MDRV_CPU_ADD("audio", M6502, 500000)
 //  MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 //  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
@@ -216,10 +216,10 @@ static MACHINE_DRIVER_START( progolf )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_DRIVER_END
 

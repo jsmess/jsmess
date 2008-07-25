@@ -488,7 +488,7 @@ static const struct CustomSound_interface svision_sound_interface =
 
 static MACHINE_DRIVER_START( svision )
 	/* basic machine hardware */
-	 MDRV_CPU_ADD_TAG("main", M65C02, 4000000)        /* ? stz used! speed? */
+	 MDRV_CPU_ADD("main", M65C02, 4000000)        /* ? stz used! speed? */
 	MDRV_CPU_PROGRAM_MAP(svision_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", svision_frame_int)
 
@@ -508,7 +508,7 @@ static MACHINE_DRIVER_START( svision )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(svision_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)

@@ -816,7 +816,7 @@ static const msm6255_interface bw2_msm6255_intf =
 
 static MACHINE_DRIVER_START( bw2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( Z80_TAG, Z80, XTAL_16MHz/4 )
+	MDRV_CPU_ADD( Z80_TAG, Z80, XTAL_16MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( bw2_mem, 0 )
 	MDRV_CPU_IO_MAP( bw2_io, 0 )
 

@@ -271,7 +271,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( good )
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000 /2)
+	MDRV_CPU_ADD("main", M68000, 16000000 /2)
 	MDRV_CPU_PROGRAM_MAP(good_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -292,7 +292,7 @@ static MACHINE_DRIVER_START( good )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)

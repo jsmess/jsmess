@@ -248,12 +248,11 @@ static GFXDECODE_START( portrait )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( portrait )
-	MDRV_CPU_ADD(Z80, 4000000)     /* 4 MHz ? */
+	MDRV_CPU_ADD("main", Z80, 4000000)     /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(portrait_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(I8039, 3120000)  /* ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", I8039, 3120000)  /* ? */
 	MDRV_CPU_PROGRAM_MAP(portrait_sound_map,0)
 
 
@@ -276,7 +275,7 @@ static MACHINE_DRIVER_START( portrait )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(TMS5200, 640000)
+	MDRV_SOUND_ADD("tms", TMS5200, 640000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

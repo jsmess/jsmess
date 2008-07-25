@@ -154,7 +154,7 @@ static const struct AY8910interface galaxy_ay_interface =
 
 static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL / 2)
+	MDRV_CPU_ADD("main", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -176,13 +176,13 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( galaxyp )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL / 2)
+	MDRV_CPU_ADD("main", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxyp_mem, 0)
 	MDRV_CPU_IO_MAP(galaxyp_io, 0)
 	MDRV_CPU_VBLANK_INT("main", galaxy_interrupt)
@@ -206,9 +206,9 @@ static MACHINE_DRIVER_START( galaxyp )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, XTAL/4)
+	MDRV_SOUND_ADD("ay8910", AY8910, XTAL/4)
 	MDRV_SOUND_CONFIG(galaxy_ay_interface)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

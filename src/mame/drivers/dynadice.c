@@ -196,12 +196,11 @@ static PALETTE_INIT( dynadice )
 }
 
 static MACHINE_DRIVER_START( dynadice )
-	MDRV_CPU_ADD(8080,18432000/8)
+	MDRV_CPU_ADD("main", 8080,18432000/8)
 	MDRV_CPU_PROGRAM_MAP(dynadice_map,0)
 	MDRV_CPU_IO_MAP(dynadice_io_map,0)
 
-	MDRV_CPU_ADD(Z80,18432000/6)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,18432000/6)
 	MDRV_CPU_PROGRAM_MAP(dynadice_sound_map,0)
 	MDRV_CPU_IO_MAP(dynadice_sound_io_map,0)
 
@@ -224,7 +223,7 @@ static MACHINE_DRIVER_START( dynadice )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD("ay", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

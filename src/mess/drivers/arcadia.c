@@ -329,7 +329,7 @@ static PALETTE_INIT( arcadia )
 
 static MACHINE_DRIVER_START( arcadia )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", S2650, 3580000/3)        /* 1.796 Mhz */
+	MDRV_CPU_ADD("main", S2650, 3580000/3)        /* 1.796 Mhz */
 	MDRV_CPU_PROGRAM_MAP(arcadia_mem, 0)
 	MDRV_CPU_IO_MAP(arcadia_io, 0)
 	MDRV_CPU_PERIODIC_INT(arcadia_video_line, 262*60)
@@ -351,7 +351,7 @@ static MACHINE_DRIVER_START( arcadia )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(arcadia_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END

@@ -400,7 +400,7 @@ static INTERRUPT_GEN( vtech2_interrupt )
 
 static MACHINE_DRIVER_START( laser350 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3694700)        /* 3.694700 Mhz */
+	MDRV_CPU_ADD("main", Z80, 3694700)        /* 3.694700 Mhz */
 	MDRV_CPU_PROGRAM_MAP(vtech2_mem, 0)
 	MDRV_CPU_IO_MAP(vtech2_io, 0)
 	MDRV_CPU_VBLANK_INT("main", vtech2_interrupt)
@@ -424,9 +424,9 @@ static MACHINE_DRIVER_START( laser350 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 

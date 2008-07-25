@@ -965,11 +965,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bigtwin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(bigtwin_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
+	MDRV_CPU_ADD("mcu", PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -990,7 +990,7 @@ static MACHINE_DRIVER_START( bigtwin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -999,11 +999,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wbeachvl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(wbeachvl_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-//  MDRV_CPU_ADD(PIC16C57, 12000000)   /* 3MHz */
+//  MDRV_CPU_ADD("mcu", PIC16C57, 12000000)   /* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1026,7 +1026,7 @@ static MACHINE_DRIVER_START( wbeachvl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1034,11 +1034,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( excelsr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(excelsr_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
+	MDRV_CPU_ADD("mcu", PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1059,7 +1059,7 @@ static MACHINE_DRIVER_START( excelsr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1067,11 +1067,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hotmind )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hotmind_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(PIC16C57, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("mcu", PIC16C57, XTAL_24MHz/2)	/* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1094,7 +1094,7 @@ static MACHINE_DRIVER_START( hotmind )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_1MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1102,11 +1102,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hrdtimes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hrdtimes_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-//  MDRV_CPU_ADD(PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
+//  MDRV_CPU_ADD("mcu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1127,7 +1127,7 @@ static MACHINE_DRIVER_START( hrdtimes )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_1MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

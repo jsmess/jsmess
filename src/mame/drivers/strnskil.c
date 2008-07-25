@@ -335,11 +335,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( strnskil )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000/2) /* 4.000MHz */
+	MDRV_CPU_ADD("main", Z80,8000000/2) /* 4.000MHz */
 	MDRV_CPU_PROGRAM_MAP(strnskil_readmem1,strnskil_writemem1)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_CPU_ADD(Z80,8000000/2) /* 4.000MHz */
+	MDRV_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
 	MDRV_CPU_PROGRAM_MAP(strnskil_readmem2,strnskil_writemem2)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -363,10 +363,10 @@ static MACHINE_DRIVER_START( strnskil )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76496, 8000000/4)
+	MDRV_SOUND_ADD("sn1", SN76496, 8000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD(SN76496, 8000000/2)
+	MDRV_SOUND_ADD("sn2", SN76496, 8000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 

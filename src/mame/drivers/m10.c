@@ -750,7 +750,7 @@ static MACHINE_DRIVER_START( m10 )
 	MDRV_DRIVER_DATA(m10_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502,IREMM10_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6502,IREMM10_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(m10_main,0)
 
 	MDRV_MACHINE_RESET(irem)
@@ -772,7 +772,7 @@ static MACHINE_DRIVER_START( m10 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(m10_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START( m15 )
 	MDRV_DRIVER_DATA(m10_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502,IREMM15_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6502,IREMM15_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(m15_main,0)
 
 	MDRV_MACHINE_RESET(irem)
@@ -818,7 +818,7 @@ static MACHINE_DRIVER_START( m15 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(m10_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

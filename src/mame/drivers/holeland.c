@@ -305,7 +305,7 @@ static const struct AY8910interface ay8910_interface_2 =
 static MACHINE_DRIVER_START( holeland )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)        /* 4 MHz ? */
+	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -328,11 +328,11 @@ static MACHINE_DRIVER_START( holeland )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1818182)
+	MDRV_SOUND_ADD("ay1", AY8910, 1818182)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 1818182)
+	MDRV_SOUND_ADD("ay2", AY8910, 1818182)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -374,7 +374,7 @@ Notes:
 static MACHINE_DRIVER_START( crzrally )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 20000000/4)        /* 5 MHz */
+	MDRV_CPU_ADD("main", Z80, 20000000/4)        /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(crzrally_readmem,crzrally_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -397,11 +397,11 @@ static MACHINE_DRIVER_START( crzrally )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 20000000/16)
+	MDRV_SOUND_ADD("ay1", AY8910, 20000000/16)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 20000000/16)
+	MDRV_SOUND_ADD("ay2", AY8910, 20000000/16)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

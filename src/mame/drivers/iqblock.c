@@ -296,7 +296,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( iqblock )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)	/* 6 MHz */
+	MDRV_CPU_ADD("main", Z80,12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
@@ -321,14 +321,14 @@ static MACHINE_DRIVER_START( iqblock )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ADD("ym", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cabaret )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z180,12000000/2)	/* 6 MHz , appears to use Z180 instructions */
+	MDRV_CPU_ADD("main", Z180,12000000/2)	/* 6 MHz , appears to use Z180 instructions */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
@@ -353,14 +353,14 @@ static MACHINE_DRIVER_START( cabaret )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ADD("ym", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pokerigs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z180,12000000/2)	/* 6 MHz */
+	MDRV_CPU_ADD("main", Z180,12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(pokerigs_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
@@ -385,7 +385,7 @@ static MACHINE_DRIVER_START( pokerigs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ADD("ym", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

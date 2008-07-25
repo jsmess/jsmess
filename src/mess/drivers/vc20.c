@@ -414,7 +414,7 @@ ROM_END
 
 static MACHINE_DRIVER_START( vic20 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, VIC6560_CLOCK)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M6502, VIC6560_CLOCK)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(vc20_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", vc20_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic656x_raster_interrupt, VIC656X_HRETRACERATE)
@@ -437,10 +437,10 @@ static MACHINE_DRIVER_START( vic20 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(vic6560_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */

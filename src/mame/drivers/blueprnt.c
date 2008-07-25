@@ -103,8 +103,8 @@ static ADDRESS_MAP_START( blueprnt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_MIRROR(0x400) AM_WRITE(blueprnt_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE(&blueprnt_scrollram)
 	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(input_port_0_r, blueprnt_coin_counter_w)
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1") AM_WRITE(blueprnt_coin_counter_w)
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ(blueprnt_sh_dipsw_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(blueprnt_sound_command_w)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, blueprnt_flipscreen_w)
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( blueprnt )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
@@ -136,7 +136,7 @@ static INPUT_PORTS_START( blueprnt )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
@@ -189,10 +189,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( saturn )
 	PORT_INCLUDE( blueprnt )
 
-	PORT_MODIFY("IN0")
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 
-	PORT_MODIFY("IN1")
+	PORT_MODIFY("P2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 
 	PORT_MODIFY("DILSW1")
@@ -272,11 +272,11 @@ static const struct AY8910interface ay8910_interface_2 =
 
 static MACHINE_DRIVER_START( blueprnt )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, 7000000/2)	// 3.5 MHz
+	MDRV_CPU_ADD("main", Z80, 7000000/2)	// 3.5 MHz
 	MDRV_CPU_PROGRAM_MAP(blueprnt_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 10000000/2/2/2)	// 1.25 MHz (2H)
+	MDRV_CPU_ADD("audio", Z80, 10000000/2/2/2)	// 1.25 MHz (2H)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)	// IRQs connected to 32V
 											// NMIs are caused by the main CPU
@@ -299,11 +299,11 @@ static MACHINE_DRIVER_START( blueprnt )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 10000000/2/2/2)
+	MDRV_SOUND_ADD("ay1", AY8910, 10000000/2/2/2)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 10000000/2/2/2/2)
+	MDRV_SOUND_ADD("ay2", AY8910, 10000000/2/2/2/2)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

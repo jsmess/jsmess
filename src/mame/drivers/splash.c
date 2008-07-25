@@ -433,12 +433,11 @@ static const struct MSM5205interface splash_msm5205_interface =
 static MACHINE_DRIVER_START( splash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz (24/2) */
+	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12 MHz (24/2) */
 	MDRV_CPU_PROGRAM_MAP(splash_readmem,splash_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80,30000000/8)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,30000000/8)
 	MDRV_CPU_PROGRAM_MAP(splash_readmem_sound,splash_writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,64)	/* needed for the msm5205 to play the samples */
 
@@ -459,10 +458,10 @@ static MACHINE_DRIVER_START( splash )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 3000000)
+	MDRV_SOUND_ADD("ym", YM3812, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(splash_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -485,12 +484,11 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( roldfrog )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz - verified */
+	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12 MHz - verified */
 	MDRV_CPU_PROGRAM_MAP(roldfrog_readmem,roldfrog_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80,3000000)			/* 3 MHz - verified */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,3000000)			/* 3 MHz - verified */
 	MDRV_CPU_PROGRAM_MAP(roldf_sound_map,0)
 	MDRV_CPU_IO_MAP(roldf_sound_io_map,0)
 //  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,64)  /* needed for the msm5205 to play the samples */
@@ -512,7 +510,7 @@ static MACHINE_DRIVER_START( roldfrog )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD("ym", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
@@ -524,12 +522,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( funystrp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz (24/2) */
+	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12 MHz (24/2) */
 	MDRV_CPU_PROGRAM_MAP(funystrp_readmem,funystrp_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-//  MDRV_CPU_ADD(Z80,30000000/8)
-//  /* audio CPU */
+//  MDRV_CPU_ADD("audio", Z80,30000000/8)
 //  MDRV_CPU_PROGRAM_MAP(splash_readmem_sound,splash_writemem_sound)
 //  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,64)  /* needed for the msm5205 to play the samples */
 
@@ -550,10 +547,10 @@ static MACHINE_DRIVER_START( funystrp )
 	/* sound hardware */
 //  MDRV_SPEAKER_STANDARD_MONO("mono")
 
-//  MDRV_SOUND_ADD(YM3812, 3000000)
+//  MDRV_SOUND_ADD("ym", YM3812, 3000000)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-//  MDRV_SOUND_ADD(MSM5205, 384000)
+//  MDRV_SOUND_ADD("msm", MSM5205, 384000)
 //  MDRV_SOUND_CONFIG(msm5205_interface)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END

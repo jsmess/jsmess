@@ -379,7 +379,7 @@ static const struct TMS36XXinterface tms3615_interface =
 static MACHINE_DRIVER_START( naughtyb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MDRV_CPU_ADD("main", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", naughtyb_interrupt)
 
@@ -402,11 +402,11 @@ static MACHINE_DRIVER_START( naughtyb )
 	/* uses the TMS3615NS for sound */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(TMS36XX, 350)
+	MDRV_SOUND_ADD("tms", TMS36XX, 350)
 	MDRV_SOUND_CONFIG(tms3615_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("naughtyb", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(naughtyb_custom_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 MACHINE_DRIVER_END
@@ -416,7 +416,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( popflame )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MDRV_CPU_ADD("main", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,popflame_writemem)
 	MDRV_CPU_VBLANK_INT("main", naughtyb_interrupt)
 
@@ -438,11 +438,11 @@ static MACHINE_DRIVER_START( popflame )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(TMS36XX, 350)
+	MDRV_SOUND_ADD("tms", TMS36XX, 350)
 	MDRV_SOUND_CONFIG(tms3615_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("popflame", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(popflame_custom_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 MACHINE_DRIVER_END

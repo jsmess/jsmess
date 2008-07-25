@@ -852,21 +852,18 @@ static INTERRUPT_GEN( bssoccer_interrupt )
 static MACHINE_DRIVER_START( bssoccer )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)	/* ? */
+	MDRV_CPU_ADD("main", M68000, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_readmem,bssoccer_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 3579545)		/* Z80B */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3579545)		/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_sound_readmem,bssoccer_sound_writemem)
 
-	MDRV_CPU_ADD(Z80, 5000000)		/* Z80B */
-	/* audio CPU */
+	MDRV_CPU_ADD("pcm1", Z80, 5000000)		/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_readmem,bssoccer_pcm_1_writemem)
 	MDRV_CPU_IO_MAP(bssoccer_pcm_1_readport,bssoccer_pcm_1_writeport)
 
-	MDRV_CPU_ADD(Z80, 5000000)		/* Z80B */
-	/* audio CPU */
+	MDRV_CPU_ADD("pcm2", Z80, 5000000)		/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_2_readmem,bssoccer_pcm_2_writemem)
 	MDRV_CPU_IO_MAP(bssoccer_pcm_2_readport,bssoccer_pcm_2_writeport)
 
@@ -889,20 +886,20 @@ static MACHINE_DRIVER_START( bssoccer )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(1, "right", 0.20)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac3", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac4", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
 MACHINE_DRIVER_END
 
@@ -915,16 +912,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( uballoon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(uballoon_readmem,uballoon_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* ? */
+	MDRV_CPU_ADD("audio", Z80, 3579545)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(uballoon_sound_readmem,uballoon_sound_writemem)
 
-	MDRV_CPU_ADD(Z80, 5000000)
-	/* audio CPU */	/* ? */
+	MDRV_CPU_ADD("pcm", Z80, 5000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(uballoon_pcm_1_readmem,uballoon_pcm_1_writemem)
 	MDRV_CPU_IO_MAP(uballoon_pcm_1_readport,uballoon_pcm_1_writeport)
 
@@ -951,14 +946,14 @@ static MACHINE_DRIVER_START( uballoon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
 
@@ -968,17 +963,14 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sunaq )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 24000000/4)
+	MDRV_CPU_ADD("main", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(sunaq_readmem,sunaq_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 14318000/4)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sunaq_sound_readmem,sunaq_sound_writemem)
 
-
-	MDRV_CPU_ADD(Z80, 24000000/4)		/* Z80B */
-	/* audio CPU */
+	MDRV_CPU_ADD("pcm", Z80, 24000000/4)		/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_readmem,bssoccer_pcm_1_writemem)
 	MDRV_CPU_IO_MAP(bssoccer_pcm_1_readport,bssoccer_pcm_1_writeport)
 
@@ -1003,14 +995,14 @@ static MACHINE_DRIVER_START( sunaq )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 14318000/4)
+	MDRV_SOUND_ADD("ym", YM2151, 14318000/4)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
 
@@ -1043,14 +1035,14 @@ static const struct AY8910interface bestbest_ay8910_interface =
 
 static MACHINE_DRIVER_START( bestbest )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 24000000/4)
+	MDRV_CPU_ADD("main", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(bestbest_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 24000000/4)
+	MDRV_CPU_ADD("audio", Z80, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(bestbest_sound_map,0)
 
-	MDRV_CPU_ADD(Z80, 24000000/4)
+	MDRV_CPU_ADD("pcm", Z80, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(bestbest_pcm_1_map,0)
 	MDRV_CPU_IO_MAP(bestbest_pcm_1_iomap,0)
 
@@ -1075,26 +1067,26 @@ static MACHINE_DRIVER_START( bestbest )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(AY8910, 24000000/16)
+	MDRV_SOUND_ADD("ay", AY8910, 24000000/16)
 	MDRV_SOUND_CONFIG(bestbest_ay8910_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(YM3526, 24000000/8)
+	MDRV_SOUND_ADD("ym", YM3526, 24000000/8)
 	MDRV_SOUND_CONFIG(bestbest_ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac3", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac4", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
 MACHINE_DRIVER_END
 

@@ -412,7 +412,7 @@ static MACHINE_RESET( crvision )
 
 static MACHINE_DRIVER_START( crvision )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M6502, 2000000)
+	MDRV_CPU_ADD("main", M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(crvision_map, 0)
 	MDRV_CPU_VBLANK_INT("main", crvision_int)
 
@@ -427,7 +427,7 @@ static MACHINE_DRIVER_START( crvision )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76489", SN76489, 2000000)
+	MDRV_SOUND_ADD("sn76489", SN76489, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

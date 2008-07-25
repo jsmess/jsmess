@@ -2018,7 +2018,7 @@ static MACHINE_RESET( firebeat )
 static MACHINE_DRIVER_START(firebeat)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403GCX, 66000000)
+	MDRV_CPU_ADD("main", PPC403GCX, 66000000)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
 	MDRV_CPU_VBLANK_INT("main", firebeat_interrupt)
 
@@ -2043,12 +2043,12 @@ static MACHINE_DRIVER_START(firebeat)
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(CDDA, 0)
+	MDRV_SOUND_ADD("cdda", CDDA, 0)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
@@ -2057,7 +2057,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(firebeat2)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403GCX, 66000000)
+	MDRV_CPU_ADD("main", PPC403GCX, 66000000)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
 	MDRV_CPU_VBLANK_INT("left", firebeat_interrupt)
 
@@ -2088,12 +2088,12 @@ static MACHINE_DRIVER_START(firebeat2)
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(CDDA, 0)
+	MDRV_SOUND_ADD("cdda", CDDA, 0)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -2102,7 +2102,7 @@ static MACHINE_DRIVER_START(firebeat_spu)
 
 	MDRV_IMPORT_FROM(firebeat)
 
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD("audio", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(spu_map, 0)
 
 MACHINE_DRIVER_END

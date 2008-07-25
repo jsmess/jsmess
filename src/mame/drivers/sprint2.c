@@ -501,7 +501,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( sprint2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 12096000 / 16)
+	MDRV_CPU_ADD("main", M6502, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_VBLANK_INT("main", sprint2)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
@@ -524,7 +524,7 @@ static MACHINE_DRIVER_START( sprint2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(sprint2)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

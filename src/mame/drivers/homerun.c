@@ -186,7 +186,7 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( homerun )
-	MDRV_CPU_ADD(Z80, 5000000)
+	MDRV_CPU_ADD("main", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(homerun_memmap, 0)
 	MDRV_CPU_IO_MAP(homerun_iomap, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -212,7 +212,7 @@ static MACHINE_DRIVER_START( homerun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 6000000/2)
+	MDRV_SOUND_ADD("ym", YM2203, 6000000/2)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

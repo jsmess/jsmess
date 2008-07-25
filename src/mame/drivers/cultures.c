@@ -357,7 +357,7 @@ static INTERRUPT_GEN( cultures_interrupt )
 static MACHINE_DRIVER_START( cultures )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MCLK/2) /* 8.000 MHz */
+	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 8.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(cultures_map,0)
 	MDRV_CPU_IO_MAP(cultures_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", cultures_interrupt)
@@ -381,7 +381,7 @@ static MACHINE_DRIVER_START( cultures )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, (MCLK/1024)*132)
+	MDRV_SOUND_ADD("oki", OKIM6295, (MCLK/1024)*132)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

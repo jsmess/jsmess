@@ -407,7 +407,7 @@ static MACHINE_START(f3)
 static MACHINE_DRIVER_START( f3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(f3_readmem,f3_writemem)
 	MDRV_CPU_VBLANK_INT("main", f3_interrupt2)
 
@@ -492,7 +492,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( bubsympb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(f3_readmem,f3_writemem)
 	MDRV_CPU_VBLANK_INT("main", f3_interrupt2)
 
@@ -518,7 +518,7 @@ static MACHINE_DRIVER_START( bubsympb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000 ) // not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000 ) // not verified
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

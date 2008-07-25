@@ -189,7 +189,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( hotblock )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8088, 10000000)
+	MDRV_CPU_ADD("main", I8088, 10000000)
 	MDRV_CPU_PROGRAM_MAP(hotblock_map, 0)
 	MDRV_CPU_IO_MAP(hotblock_io,0)
 	MDRV_CPU_VBLANK_INT("main", hotblocks_irq)
@@ -210,7 +210,7 @@ static MACHINE_DRIVER_START( hotblock )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1000000)
+	MDRV_SOUND_ADD("ay", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

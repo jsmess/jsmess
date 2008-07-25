@@ -694,15 +694,15 @@ static INPUT_PORTS_START( racedrvc )
 	PORT_START_TAG("8BADC7")		/* b00000 - 8 bit ADC 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("400000")		/* 400000 - steering wheel */
+	PORT_START_TAG("12BADC0")		/* 400000 - steering wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
 	/* dummy ADC ports to end up with the same number as the full version */
-	PORT_START_TAG("12BADCX")
+	PORT_START_TAG("12BADC1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START_TAG("12BADCY")
+	PORT_START_TAG("12BADC2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START_TAG("12BADCZ")
+	PORT_START_TAG("12BADC3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -761,7 +761,11 @@ static INPUT_PORTS_START( stunrun )
 	PORT_START_TAG("12BADC3")		/* b80000 - 12 bit ADC 3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_II_PORT		/* audio port */
+	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
+	/* stunrun has its own coins */
+	PORT_MODIFY("JSAII")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -820,7 +824,11 @@ static INPUT_PORTS_START( steeltal )
 	PORT_START_TAG("12BADC3")		/* b80000 - 12 bit ADC 3 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)	/* rudder */
 
-	JSA_III_PORT	/* audio port */
+	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
+	/* steeltal has its own coins */
+	PORT_MODIFY("JSAIII")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -937,15 +945,15 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_START_TAG("8BADC7")		/* b00000 - 8 bit ADC 7 - seat adjust */
 	PORT_BIT( 0xff, 0X80, IPT_UNUSED )
 
-	PORT_START_TAG("400000")		/* 400000 - steering wheel */
+	PORT_START_TAG("12BADC0")		/* 400000 - steering wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_REVERSE
 
 	/* dummy ADC ports to end up with the same number as the full version */
-	PORT_START_TAG("12BADCX")
+	PORT_START_TAG("12BADC1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START_TAG("12BADCY")
+	PORT_START_TAG("12BADC2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START_TAG("12BADCZ")
+	PORT_START_TAG("12BADC3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -961,12 +969,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( driver_nomsp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68010, 32000000/4)
+	MDRV_CPU_ADD("main", M68010, 32000000/4)
 	MDRV_CPU_PROGRAM_MAP(driver_68k_map,0)
 	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 	MDRV_CPU_PERIODIC_INT(hd68k_irq_gen, (double)32000000/16/16/16/16/2)
 
-	MDRV_CPU_ADD_TAG("gsp", TMS34010, 48000000)
+	MDRV_CPU_ADD("gsp", TMS34010, 48000000)
 	MDRV_CPU_PROGRAM_MAP(driver_gsp_map,0)
 	MDRV_CPU_CONFIG(gsp_config_driver)
 
@@ -994,7 +1002,7 @@ static MACHINE_DRIVER_START( driver_msp )
 	MDRV_IMPORT_FROM(driver_nomsp)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("msp", TMS34010, 50000000)
+	MDRV_CPU_ADD("msp", TMS34010, 50000000)
 	MDRV_CPU_PROGRAM_MAP(driver_msp_map,0)
 	MDRV_CPU_CONFIG(msp_config)
 MACHINE_DRIVER_END
@@ -1023,7 +1031,7 @@ static MACHINE_DRIVER_START( multisync_msp )
 	MDRV_IMPORT_FROM(multisync_nomsp)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("msp", TMS34010, 50000000)
+	MDRV_CPU_ADD("msp", TMS34010, 50000000)
 	MDRV_CPU_PROGRAM_MAP(driver_msp_map,0)
 	MDRV_CPU_CONFIG(msp_config)
 MACHINE_DRIVER_END
@@ -1053,7 +1061,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( adsp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("adsp", ADSP2100, 8000000)
+	MDRV_CPU_ADD("adsp", ADSP2100, 8000000)
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map,0)
 	MDRV_CPU_DATA_MAP(adsp_data_map,0)
 MACHINE_DRIVER_END
@@ -1063,7 +1071,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ds3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("adsp", ADSP2101, 12000000)
+	MDRV_CPU_ADD("adsp", ADSP2101, 12000000)
 	MDRV_CPU_PROGRAM_MAP(ds3_program_map,0)
 	MDRV_CPU_DATA_MAP(ds3_data_map,0)
 
@@ -1075,24 +1083,24 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ds4 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("adsp", ADSP2101, 12000000)
+	MDRV_CPU_ADD("adsp", ADSP2101, 12000000)
 	MDRV_CPU_PROGRAM_MAP(ds3_program_map,0)
 	MDRV_CPU_DATA_MAP(ds3_data_map,0)
 
-//  MDRV_CPU_ADD_TAG("sound", ADSP2105, 10000000)
+//  MDRV_CPU_ADD("sound", ADSP2105, 10000000)
 //  /* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map,0)
 
-//  MDRV_CPU_ADD_TAG("sounddsp", ADSP2105, 10000000)
+//  MDRV_CPU_ADD("sounddsp", ADSP2105, 10000000)
 //  /* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map,0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
@@ -1108,7 +1116,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dsk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("dsp32", DSP32C, 40000000)
+	MDRV_CPU_ADD("dsp32", DSP32C, 40000000)
 	MDRV_CPU_CONFIG(dsp32c_config)
 	MDRV_CPU_PROGRAM_MAP(dsk_dsp32_map,0)
 
@@ -1121,7 +1129,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dsk2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("dsp32", DSP32C, 40000000)
+	MDRV_CPU_ADD("dsp32", DSP32C, 40000000)
 	MDRV_CPU_CONFIG(dsp32c_config)
 	MDRV_CPU_PROGRAM_MAP(dsk2_dsp32_map,0)
 
@@ -1140,10 +1148,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( driversnd )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", M68000, 16000000/2)
+	MDRV_CPU_ADD("sound", M68000, 16000000/2)
 	MDRV_CPU_PROGRAM_MAP(driversnd_68k_map,0)
 
-	MDRV_CPU_ADD_TAG("sounddsp", TMS32010, 20000000)
+	MDRV_CPU_ADD("sounddsp", TMS32010, 20000000)
 	MDRV_CPU_PROGRAM_MAP(driversnd_dsp_program_map,0)
 	/* Data Map is internal to the CPU */
 	MDRV_CPU_IO_MAP(driversnd_dsp_io_map,0)
@@ -1151,7 +1159,7 @@ static MACHINE_DRIVER_START( driversnd )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

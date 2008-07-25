@@ -887,7 +887,7 @@ static const struct POKEYinterface pokey_interface =
 static MACHINE_DRIVER_START( missile )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, MASTER_CLOCK/8)
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_START(missile)
@@ -906,7 +906,7 @@ static MACHINE_DRIVER_START( missile )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(POKEY, MASTER_CLOCK/8)
+	MDRV_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

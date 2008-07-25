@@ -3066,7 +3066,7 @@ static const struct namco_interface namco_interface =
 static MACHINE_DRIVER_START( pacman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/6)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(pacman_map,0)
 	MDRV_CPU_IO_MAP(0,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(pacman_interrupt,2)
@@ -3087,7 +3087,7 @@ static MACHINE_DRIVER_START( pacman )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("namco", NAMCO, MASTER_CLOCK/6/32)
+	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3206,7 +3206,7 @@ static MACHINE_DRIVER_START( vanvan )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("namco", SN76496, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD(SN76496, 1789750)
+	MDRV_SOUND_ADD("sn", SN76496, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
@@ -3232,7 +3232,7 @@ static MACHINE_DRIVER_START( s2650games )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_REMOVE("main")
-	MDRV_CPU_ADD_TAG("main", S2650, MASTER_CLOCK/6/2)	/* 2H */
+	MDRV_CPU_ADD("main", S2650, MASTER_CLOCK/6/2)	/* 2H */
 	MDRV_CPU_PROGRAM_MAP(s2650games_map,0)
 	MDRV_CPU_VBLANK_INT("main", s2650_interrupt)
 

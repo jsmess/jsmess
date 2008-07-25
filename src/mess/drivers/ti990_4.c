@@ -217,7 +217,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START(ti990_4)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	MDRV_CPU_ADD_TAG("main", TMS9900, 3000000)
+	MDRV_CPU_ADD("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(ti990_4_memmap, 0)
 	MDRV_CPU_IO_MAP(ti990_4_readcru, ti990_4_writecru)
 	MDRV_CPU_PERIODIC_INT(ti990_4_line_interrupt, 120/*or TIME_IN_HZ(100) in Europe*/)
@@ -257,7 +257,7 @@ static MACHINE_DRIVER_START(ti990_4)
 #if VIDEO_911
 	/* 911 VDT has a beep tone generator */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("beep", BEEP, 0)
+	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 

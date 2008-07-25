@@ -1399,12 +1399,11 @@ static MACHINE_RESET( ms32 )
 static MACHINE_DRIVER_START( ms32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V70, 20000000) // 20MHz
+	MDRV_CPU_ADD("main", V70, 20000000) // 20MHz
 	MDRV_CPU_PROGRAM_MAP(ms32_readmem,ms32_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(ms32_interrupt,32)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(ms32_snd_readmem, ms32_snd_writemem)
 
 	MDRV_INTERLEAVE(1000)
@@ -1428,7 +1427,7 @@ static MACHINE_DRIVER_START( ms32 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMF271, 16934400)
+	MDRV_SOUND_ADD("ymf", YMF271, 16934400)
 	MDRV_SOUND_CONFIG(ymf271_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

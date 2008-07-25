@@ -722,7 +722,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( exidy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 12638000/6)
+	MDRV_CPU_ADD("main", Z80, 12638000/6)
 	MDRV_CPU_PROGRAM_MAP(exidy_mem, 0)
 	MDRV_CPU_IO_MAP(exidy_io, 0)
 
@@ -743,11 +743,11 @@ static MACHINE_DRIVER_START( exidy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("cass1", WAVE, 0)
+	MDRV_SOUND_ADD("cass1", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
-	MDRV_SOUND_ADD_TAG("cass2", WAVE, 1)
+	MDRV_SOUND_ADD("cass2", WAVE, 1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	// speaker on parallel port
 
 	/* printer */

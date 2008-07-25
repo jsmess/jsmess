@@ -291,7 +291,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( orbit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800, MASTER_CLOCK / 16)
+	MDRV_CPU_ADD("main", M6800, MASTER_CLOCK / 16)
 	MDRV_CPU_PROGRAM_MAP(orbit_map, 0)
 	MDRV_CPU_VBLANK_INT("main", orbit_interrupt)
 
@@ -313,7 +313,7 @@ static MACHINE_DRIVER_START( orbit )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(orbit)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

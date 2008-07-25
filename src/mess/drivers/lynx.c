@@ -213,7 +213,7 @@ static const struct CustomSound_interface lynx2_sound_interface =
 
 static MACHINE_DRIVER_START( lynx )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
+	MDRV_CPU_ADD("main", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MDRV_CPU_PROGRAM_MAP(lynx_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", lynx_frame_int)
 	MDRV_INTERLEAVE(1)
@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( lynx )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-        MDRV_SOUND_ADD_TAG("lynx", CUSTOM, 0)
+        MDRV_SOUND_ADD("lynx", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(lynx_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -252,7 +252,7 @@ static MACHINE_DRIVER_START( lynx2 )
         MDRV_SPEAKER_REMOVE("mono")
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
         MDRV_SOUND_REMOVE("lynx")
-        MDRV_SOUND_ADD_TAG("lynx2", CUSTOM, 0)
+        MDRV_SOUND_ADD("lynx2", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(lynx2_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)

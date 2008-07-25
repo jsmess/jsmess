@@ -345,7 +345,7 @@ static const struct AY8910interface oric_ay_interface =
 
 static MACHINE_DRIVER_START( oric )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 1000000)
+	MDRV_CPU_ADD("main", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(oric_mem, 0)
 	MDRV_INTERLEAVE(1)
 
@@ -367,9 +367,9 @@ static MACHINE_DRIVER_START( oric )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("ay8912", AY8912, 1000000)
+	MDRV_SOUND_ADD("ay8912", AY8912, 1000000)
 	MDRV_SOUND_CONFIG(oric_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

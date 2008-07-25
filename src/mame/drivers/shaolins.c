@@ -218,7 +218,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( shaolins )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, XTAL_18_432MHz/12)        /* verified on pcb */
+	MDRV_CPU_ADD("main", M6809, XTAL_18_432MHz/12)        /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(shaolins_interrupt,16)	/* 1 IRQ + 8 NMI */
 
@@ -240,10 +240,10 @@ static MACHINE_DRIVER_START( shaolins )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76496, XTAL_18_432MHz/12)        /* verified on pcb */
+	MDRV_SOUND_ADD("sn1", SN76496, XTAL_18_432MHz/12)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(SN76496, XTAL_18_432MHz/6)        /* verified on pcb */
+	MDRV_SOUND_ADD("sn2", SN76496, XTAL_18_432MHz/6)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

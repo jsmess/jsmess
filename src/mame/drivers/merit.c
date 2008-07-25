@@ -799,7 +799,7 @@ static const struct AY8910interface merit_ay8912_interface =
 
 
 static MACHINE_DRIVER_START( pitboss )
-	MDRV_CPU_ADD_TAG("main",Z80,2500000)		 /* ?? */
+	MDRV_CPU_ADD("main",Z80,2500000)		 /* ?? */
 	MDRV_CPU_PROGRAM_MAP(pitboss_map,0)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -829,7 +829,7 @@ static MACHINE_DRIVER_START( pitboss )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2500000)
+	MDRV_SOUND_ADD("ay", AY8910, 2500000)
 	MDRV_SOUND_CONFIG(merit_ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END

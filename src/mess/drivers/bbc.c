@@ -702,7 +702,7 @@ static INTERRUPT_GEN( bbcb_vsync )
 
 static MACHINE_DRIVER_START( bbca )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 2000000)        /* 2.00Mhz */
+	MDRV_CPU_ADD("main", M6502, 2000000)        /* 2.00Mhz */
 	MDRV_CPU_PROGRAM_MAP( bbca_mem, 0 )
 	MDRV_CPU_VBLANK_INT("main", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
@@ -726,9 +726,9 @@ static MACHINE_DRIVER_START( bbca )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76489", SN76489, 4000000)	/* 4 MHz */
+	MDRV_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-//  MDRV_SOUND_ADD_TAG("tms5220", TMS5220, tms5220_interface)
+//  MDRV_SOUND_ADD("tms5220", TMS5220, tms5220_interface)
 MACHINE_DRIVER_END
 
 
@@ -765,7 +765,7 @@ MACHINE_DRIVER_END
 /****BBC MASTER */
 static MACHINE_DRIVER_START( bbcm )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M65SC02, 2000000)        /* 2.00Mhz */
+	MDRV_CPU_ADD("main", M65SC02, 2000000)        /* 2.00Mhz */
 	MDRV_CPU_PROGRAM_MAP( bbcm_mem, 0 )
 	MDRV_CPU_VBLANK_INT("main", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */
@@ -789,7 +789,7 @@ static MACHINE_DRIVER_START( bbcm )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76489", SN76489, 4000000)	/* 4 MHz */
+	MDRV_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( mc146818 )

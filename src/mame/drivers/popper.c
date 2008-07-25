@@ -310,12 +310,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( popper )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,18432000/6)
+	MDRV_CPU_ADD("main", Z80,18432000/6)
 	MDRV_CPU_PROGRAM_MAP(popper_readmem,popper_writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80,18432000/12)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,18432000/12)
 	MDRV_CPU_PROGRAM_MAP(popper_sound_readmem,popper_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		//NMIs caused by the main CPU
 
@@ -339,10 +338,10 @@ static MACHINE_DRIVER_START( popper )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 18432000/12)
+	MDRV_SOUND_ADD("ay1", AY8910, 18432000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 18432000/12)
+	MDRV_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

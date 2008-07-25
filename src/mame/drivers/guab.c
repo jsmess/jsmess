@@ -32,12 +32,7 @@
  *************************************/
 
 #define LOG_FDC_COMMANDS	0
-
-#if LOG_FDC_COMMANDS
-	#define FDC_LOG(x)		mame_printf_debug x
-#else
-	#define FDC_LOG(x)
-#endif
+#define FDC_LOG(x) do { if (LOG_FDC_COMMANDS) mame_printf_debug x; } while(0)
 
 
 enum
@@ -750,7 +745,7 @@ static MACHINE_RESET( guab )
 
 static MACHINE_DRIVER_START( guab )
 	/* TODO: Verify clock */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(guab_map, 0)
 
 	MDRV_MACHINE_START(guab)
@@ -772,7 +767,7 @@ static MACHINE_DRIVER_START( guab )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* TODO: Verify clock */
-	MDRV_SOUND_ADD(SN76489, 2000000)
+	MDRV_SOUND_ADD("sn", SN76489, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

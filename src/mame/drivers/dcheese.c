@@ -396,11 +396,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( dcheese )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, MAIN_OSC)
+	MDRV_CPU_ADD("main", M68000, MAIN_OSC)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", dcheese_vblank)
 
-	MDRV_CPU_ADD(M6809, SOUND_OSC/16)
+	MDRV_CPU_ADD("audio", M6809, SOUND_OSC/16)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map,0)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 480)	/* accurate for fredmem */
 
@@ -424,7 +424,7 @@ static MACHINE_DRIVER_START( dcheese )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(BSMT2000, SOUND_OSC)
+	MDRV_SOUND_ADD("bsmt", BSMT2000, SOUND_OSC)
 	MDRV_SOUND_CONFIG(bsmt2000_interface_region_1)
 	MDRV_SOUND_ROUTE(0, "left", 1.2)
 	MDRV_SOUND_ROUTE(1, "right", 1.2)

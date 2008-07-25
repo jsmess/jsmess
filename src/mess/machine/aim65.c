@@ -132,7 +132,7 @@ void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit 
 ******************************************************************************/
 
 
-static READ8_HANDLER( aim65_riot_b_r )
+static UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata)
 {
 	static const char *keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
@@ -142,26 +142,26 @@ static READ8_HANDLER( aim65_riot_b_r )
 	for (row = 0; row < 8; row++) 
 	{
 		if (!(riot_port_a & (1 << row)))
-			data &= input_port_read(machine, keynames[row]);
+			data &= input_port_read(device->machine, keynames[row]);
 	}
 
 	return data;
 }
 
 
-static WRITE8_HANDLER(aim65_riot_a_w)
+static void aim65_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata)
 {
 	riot_port_a = data;
 }
 
 
-static void aim65_riot_irq(running_machine *machine, int state)
+static void aim65_riot_irq(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(device->machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
-static const struct riot6532_interface r6532_interface =
+const riot6532_interface aim65_r6532_interface =
 {
 	NULL,
 	aim65_riot_b_r,
@@ -236,10 +236,6 @@ DRIVER_INIT( aim65 )
 			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 
 	pia_config(0, &pia);
-
-	r6532_config(machine, 0, &r6532_interface);
-	r6532_set_clock(0, AIM65_CLOCK);
-	r6532_reset(machine, 0);
 
 	via_config(0, &via0);
 	via_0_cb1_w(machine, 1, 1);

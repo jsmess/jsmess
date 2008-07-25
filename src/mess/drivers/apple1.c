@@ -214,7 +214,7 @@ static MACHINE_DRIVER_START( apple1 )
 	/* basic machine hardware */
 	/* Actual CPU speed is 1.023 MHz, but RAM refresh effectively
        slows it to 960 kHz. */
-	MDRV_CPU_ADD_TAG("main", M6502, 960000)        /* 1.023 Mhz */
+	MDRV_CPU_ADD("main", M6502, 960000)        /* 1.023 Mhz */
 	MDRV_CPU_PROGRAM_MAP(apple1_map, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

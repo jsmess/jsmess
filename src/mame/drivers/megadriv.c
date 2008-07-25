@@ -56,12 +56,12 @@ Known Non-Issues (confirmed on Real Genesis)
 /* the same on all systems? */
 #define MASTER_CLOCK		53693100
 /* timing details */
-static int megadriv_framerate = 60;
-static int megadrive_total_scanlines = 262;
-static int megadrive_visible_scanlines = 224;
-static int megadrive_irq6_scanline = 224;
+static int megadriv_framerate;
+static int megadrive_total_scanlines;
+static int megadrive_visible_scanlines;
+static int megadrive_irq6_scanline;
 //int megadrive_irq6_hpos = 320;
-static int megadrive_z80irq_scanline = 226;
+static int megadrive_z80irq_scanline;
 //int megadrive_z80irq_hpos = 320;
 static int megadrive_imode = 0;
 static int megadrive_imode_odd_frame = 0;
@@ -77,7 +77,6 @@ static UINT16* video_renderline;
 static UINT16* megadrive_vdp_palette_lookup;
 static UINT16* megadrive_vdp_palette_lookup_shadow;
 static UINT16* megadrive_vdp_palette_lookup_highlight;
-static UINT8 oldscreenwidth = 3;
 UINT16* megadrive_ram;
 static UINT8 megadrive_vram_fill_pending = 0;
 static UINT16 megadrive_vram_fill_length = 0;
@@ -2956,7 +2955,7 @@ INPUT_PORTS_END
 MACHINE_DRIVER_START( megdsvp )
 	MDRV_IMPORT_FROM(megadriv)
 
-	MDRV_CPU_ADD(SSP1601, MASTER_CLOCK / 7 * 3) /* ~23 MHz (guessed) */
+	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK / 7 * 3) /* ~23 MHz (guessed) */
 	MDRV_CPU_PROGRAM_MAP(svp_ssp_map, 0)
 	MDRV_CPU_IO_MAP(svp_ext_map, 0)
 	/* IRQs are not used by this CPU */
@@ -2996,8 +2995,6 @@ VIDEO_START(megadriv)
 	sprite_renderline = auto_malloc(1024);
 	highpri_renderline = auto_malloc(320);
 	video_renderline = auto_malloc(320*2);
-
-	oldscreenwidth = -1; // 40 cell mode
 
 	megadrive_vdp_palette_lookup = auto_malloc(0x40*2);
 	megadrive_vdp_palette_lookup_shadow = auto_malloc(0x40*2);
@@ -4630,7 +4627,7 @@ INLINE UINT16 get_hposition(void)
      ---------- cycles 127840, 003b363e ba41aaaa (End of frame / start of next)
 */
 
-static int irq4counter = -1;
+static int irq4counter;
 
 static emu_timer* render_timer;
 
@@ -4818,6 +4815,11 @@ MACHINE_RESET( megadriv )
 	memset(megadrive_ram,0x00,0x10000);
 
 
+	irq4counter = -1;
+	megadrive_total_scanlines = 262;
+	megadrive_visible_scanlines = 224;
+	megadrive_irq6_scanline = 224;
+	megadrive_z80irq_scanline = 226;
 }
 
 void megadriv_stop_scanline_timer(void)
@@ -5015,11 +5017,11 @@ static NVRAM_HANDLER( megadriv )
 
 
 MACHINE_DRIVER_START( megadriv )
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK / 7) /* 7.67 MHz */
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
 	/* IRQs are handled via the timers */
 
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK / 15) /* 3.58 MHz */
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK / 15) /* 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 	MDRV_CPU_IO_MAP(z80_portmap,0)
 	/* IRQ handled via the timers */
@@ -5048,22 +5050,22 @@ MACHINE_DRIVER_START( megadriv )
 #if 0
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2612, MASTER_CLOCK/7) /* 7.67 MHz */
+	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK/7) /* 7.67 MHz */
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(SN76496, MASTER_CLOCK/15)
+	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* 3.58 MHz */
 #else
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2612, MASTER_CLOCK/7) /* 7.67 MHz */
+	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK/7) /* 7.67 MHz */
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(SN76496, MASTER_CLOCK/15)
+	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25) /* 3.58 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right",0.25) /* 3.58 MHz */
 #endif
@@ -5082,10 +5084,10 @@ MACHINE_DRIVER_START( _32x )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(_32x_readmem,_32x_writemem)
 
-	MDRV_CPU_ADD_TAG("SH2main", SH2, 10000000 )
+	MDRV_CPU_ADD("SH2main", SH2, 10000000 )
 	MDRV_CPU_PROGRAM_MAP(sh2main_readmem,sh2main_writemem)
 
-	MDRV_CPU_ADD_TAG("SH2slave", SH2, 10000000 )
+	MDRV_CPU_ADD("SH2slave", SH2, 10000000 )
 	MDRV_CPU_PROGRAM_MAP(sh2slave_readmem,sh2slave_writemem)
 MACHINE_DRIVER_END
 

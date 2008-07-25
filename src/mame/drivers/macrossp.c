@@ -531,12 +531,11 @@ static const struct ES5506interface es5506_interface =
 
 static MACHINE_DRIVER_START( macrossp )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 50000000/2)	/* 25 MHz */
+	MDRV_CPU_ADD("main", M68EC020, 50000000/2)	/* 25 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq3_line_hold) // there are others ...
 
-	MDRV_CPU_ADD(M68000, 32000000/2)	/* 16 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M68000, 32000000/2)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -557,7 +556,7 @@ static MACHINE_DRIVER_START( macrossp )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(ES5506, 16000000)
+	MDRV_SOUND_ADD("es", ES5506, 16000000)
 	MDRV_SOUND_CONFIG(es5506_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

@@ -697,12 +697,11 @@ static const struct K007232_interface k007232_interface =
 static MACHINE_DRIVER_START( scontra )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)	/* 052001 */
+	MDRV_CPU_ADD("main", KONAMI, 3000000)	/* 052001 */
 	MDRV_CPU_PROGRAM_MAP(scontra_readmem,scontra_writemem)
 	MDRV_CPU_VBLANK_INT("main", scontra_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */		/* ? */
+	MDRV_CPU_ADD("audio", Z80, 3579545)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(scontra_readmem_sound,scontra_writemem_sound)
 
 	MDRV_MACHINE_RESET(scontra)
@@ -725,11 +724,11 @@ static MACHINE_DRIVER_START( scontra )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -739,12 +738,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( thunderx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)		/* ? */
+	MDRV_CPU_ADD("main", KONAMI, 3000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(thunderx_readmem,thunderx_writemem)
 	MDRV_CPU_VBLANK_INT("main", scontra_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */		/* ? */
+	MDRV_CPU_ADD("audio", Z80, 3579545)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(thunderx_readmem_sound,thunderx_writemem_sound)
 
 	MDRV_MACHINE_RESET(thunderx)
@@ -767,7 +765,7 @@ static MACHINE_DRIVER_START( thunderx )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -80,6 +80,7 @@ static int irq_on = 0;
 static int irq1_on = 0;
 static int irq2_on = 0;
 static int irq4_on = 0;
+static UINT8 a;
 
 
 static MACHINE_RESET( nemesis )
@@ -88,6 +89,7 @@ static MACHINE_RESET( nemesis )
 	irq1_on = 0;
 	irq2_on = 0;
 	irq4_on = 0;
+	a = 1;
 }
 
 
@@ -743,7 +745,6 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( wd_r )
 {
-	static int a=1;
 	a^= 1;
 	return a;
 }
@@ -2149,13 +2150,12 @@ static const struct K007232_interface k007232_interface =
 static MACHINE_DRIVER_START( nemesis )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 //          14318180/2, /* From schematics, should be accurate */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", nemesis_interrupt)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */ /* From schematics, should be accurate */
+	MDRV_CPU_ADD("audio", Z80,14318180/4) /* From schematics, should be accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)	/* fixed */
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2177,19 +2177,19 @@ static MACHINE_DRIVER_START( nemesis )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)	/* verified with OST */
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)	/* fixed */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	/* verified with OST */
 
-	MDRV_SOUND_ADD(K005289, 3579545/2)
+	MDRV_SOUND_ADD("konami", K005289, 3579545/2)
 	MDRV_SOUND_CONFIG(k005289_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)	/* verified with OST */
 
-	MDRV_SOUND_ADD(VLM5030, 3579545)
+	MDRV_SOUND_ADD("vlm", VLM5030, 3579545)
 	MDRV_SOUND_CONFIG(vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)	/* unused */
 MACHINE_DRIVER_END
@@ -2198,12 +2198,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konamigt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(konamigt_readmem,konamigt_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(konamigt_interrupt,2)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2225,15 +2224,15 @@ static MACHINE_DRIVER_START( konamigt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(K005289, 3579545/2)
+	MDRV_SOUND_ADD("konami", K005289, 3579545/2)
 	MDRV_SOUND_CONFIG(k005289_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
@@ -2242,12 +2241,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( salamand )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,18432000/2)       /* 9.216MHz */
+	MDRV_CPU_ADD("main", M68000,18432000/2)       /* 9.216MHz */
 	MDRV_CPU_PROGRAM_MAP(salamand_readmem,salamand_writemem)
 	MDRV_CPU_VBLANK_INT("main", salamand_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)         /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sal_sound_readmem,sal_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2271,19 +2269,19 @@ static MACHINE_DRIVER_START( salamand )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(VLM5030, 3579545)
+	MDRV_SOUND_ADD("vlm", VLM5030, 3579545)
 	MDRV_SOUND_CONFIG(vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(0, "right", 0.10)
 	MDRV_SOUND_ROUTE(1, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2293,12 +2291,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blkpnthr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(blkpnthr_readmem,blkpnthr_writemem)
 	MDRV_CPU_VBLANK_INT("main", blkpnthr_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sal_sound_readmem,sal_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2322,14 +2319,14 @@ static MACHINE_DRIVER_START( blkpnthr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(0, "right", 0.10)
 	MDRV_SOUND_ROUTE(1, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2339,12 +2336,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( citybomb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(citybomb_readmem,citybomb_writemem)
 	MDRV_CPU_VBLANK_INT("main", salamand_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(city_sound_readmem,city_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2368,19 +2364,19 @@ static MACHINE_DRIVER_START( citybomb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami1", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(0, "right", 0.30)
 	MDRV_SOUND_ROUTE(1, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 
-	MDRV_SOUND_ADD(YM3812, 3579545)
+	MDRV_SOUND_ADD("ym", YM3812, 3579545)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD(K051649, 3579545/2)
+	MDRV_SOUND_ADD("konami2", K051649, 3579545/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.38)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.38)
 MACHINE_DRIVER_END
@@ -2389,12 +2385,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nyanpani )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(nyanpani_readmem,nyanpani_writemem)
 	MDRV_CPU_VBLANK_INT("main", salamand_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(city_sound_readmem,city_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2418,19 +2413,19 @@ static MACHINE_DRIVER_START( nyanpani )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami1", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(0, "right", 0.30)
 	MDRV_SOUND_ROUTE(1, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 
-	MDRV_SOUND_ADD(YM3812, 3579545)
+	MDRV_SOUND_ADD("ym", YM3812, 3579545)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD(K051649, 3579545/2)
+	MDRV_SOUND_ADD("konami2", K051649, 3579545/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.38)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.38)
 MACHINE_DRIVER_END
@@ -2439,11 +2434,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gx400 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,18432000/2)     /* 9.216MHz */
+	MDRV_CPU_ADD("main", M68000,18432000/2)     /* 9.216MHz */
 	MDRV_CPU_PROGRAM_MAP(gx400_readmem,gx400_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(gx400_interrupt,3)
 
-	MDRV_CPU_ADD(Z80,14318180/4)        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(gx400_sound_readmem,gx400_sound_writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
@@ -2466,19 +2461,19 @@ static MACHINE_DRIVER_START( gx400 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)	/* verified with OST */
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	/* verified with OST */
 
-	MDRV_SOUND_ADD(K005289, 3579545/2)
+	MDRV_SOUND_ADD("konami", K005289, 3579545/2)
 	MDRV_SOUND_CONFIG(k005289_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)	/* verified with OST */
 
-	MDRV_SOUND_ADD(VLM5030, 3579545)
+	MDRV_SOUND_ADD("vlm", VLM5030, 3579545)
 	MDRV_SOUND_CONFIG(vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)	/* unused */
 MACHINE_DRIVER_END
@@ -2487,12 +2482,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rf2_gx400 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,18432000/2)     /* 9.216MHz */
+	MDRV_CPU_ADD("main", M68000,18432000/2)     /* 9.216MHz */
 	MDRV_CPU_PROGRAM_MAP(rf2_gx400_readmem,rf2_gx400_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(gx400_interrupt,3)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(gx400_sound_readmem,gx400_sound_writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
@@ -2515,19 +2509,19 @@ static MACHINE_DRIVER_START( rf2_gx400 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(K005289, 3579545/2)
+	MDRV_SOUND_ADD("konami", K005289, 3579545/2)
 	MDRV_SOUND_CONFIG(k005289_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD(VLM5030, 3579545)
+	MDRV_SOUND_ADD("vlm", VLM5030, 3579545)
 	MDRV_SOUND_CONFIG(vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
@@ -2535,12 +2529,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hcrash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,18432000/3)         /* 6.144MHz */
+	MDRV_CPU_ADD("main", M68000,18432000/3)         /* 6.144MHz */
 	MDRV_CPU_PROGRAM_MAP(hcrash_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(konamigt_interrupt,2)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)       /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sal_sound_readmem,sal_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2562,19 +2555,19 @@ static MACHINE_DRIVER_START( hcrash )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(VLM5030, 3579545)
+	MDRV_SOUND_ADD("vlm", VLM5030, 3579545)
 	MDRV_SOUND_CONFIG(vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(0, "right", 0.10)
 	MDRV_SOUND_ROUTE(1, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

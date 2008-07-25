@@ -358,11 +358,11 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( drgnmst )
-	MDRV_CPU_ADD(M68000, 12000000) /* Confirmed */
+	MDRV_CPU_ADD("main", M68000, 12000000) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(PIC16C55, 32000000/8)	/* Confirmed */
+	MDRV_CPU_ADD("audio", PIC16C55, 32000000/8)	/* Confirmed */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(drgnmst_sound_io_map, 0)
 
@@ -384,12 +384,12 @@ static MACHINE_DRIVER_START( drgnmst )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 32000000/32)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 32000000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
-	MDRV_SOUND_ADD(OKIM6295, 32000000/32)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 32000000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)

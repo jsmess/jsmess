@@ -262,9 +262,9 @@ static MACHINE_DRIVER_START( chaknpop )
 
 	/* basic machine hardware */
 	/* the real board is 3.072MHz, but it is faster for MAME */
-	//MDRV_CPU_ADD(Z80, 18432000 / 6)   /* 3.072 MHz */
-	MDRV_CPU_ADD(Z80, 2350000)
-	//MDRV_CPU_ADD(Z80, 2760000)
+	//MDRV_CPU_ADD("main", Z80, 18432000 / 6)   /* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 2350000)
+	//MDRV_CPU_ADD("main", Z80, 2760000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -288,11 +288,11 @@ static MACHINE_DRIVER_START( chaknpop )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 18432000 / 12)
+	MDRV_SOUND_ADD("ay1", AY8910, 18432000 / 12)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 18432000 / 12)
+	MDRV_SOUND_ADD("ay2", AY8910, 18432000 / 12)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END

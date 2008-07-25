@@ -226,6 +226,8 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 
 static UINT8 *devram;
 static int soundlatch_status, soundlatch2_status;
+static int master_addr;
+static int slave_addr;
 
 extern UINT8 *airbustr_videoram2, *airbustr_colorram2;
 
@@ -400,9 +402,9 @@ static ADDRESS_MAP_START( slave_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READWRITE(soundcommand2_r, soundcommand_w)
 	AM_RANGE(0x04, 0x0c) AM_WRITE(airbustr_scrollregs_w)
 	AM_RANGE(0x0e, 0x0e) AM_READ(soundcommand_status_r)
-	AM_RANGE(0x20, 0x20) AM_READ(input_port_0_r)
-	AM_RANGE(0x22, 0x22) AM_READ(input_port_1_r)
-	AM_RANGE(0x24, 0x24) AM_READ(input_port_2_r)
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
+	AM_RANGE(0x22, 0x22) AM_READ_PORT("P2")
+	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x28, 0x28) AM_WRITE(airbustr_coin_counter_w)
 	AM_RANGE(0x38, 0x38) AM_WRITENOP // ???
 ADDRESS_MAP_END
@@ -425,27 +427,27 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( airbustr )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY
+	PORT_START_TAG("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(2)
+	PORT_START_TAG("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -575,18 +577,14 @@ static const struct YM2203interface ym2203_interface =
 
 static INTERRUPT_GEN( master_interrupt )
 {
-	static int addr = 0xff;
-
-	addr ^= 0x02;
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, addr);
+	master_addr ^= 0x02;
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, master_addr);
 }
 
 static INTERRUPT_GEN( slave_interrupt )
 {
-	static int addr = 0xfd;
-
-	addr ^= 0x02;
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, addr);
+	slave_addr ^= 0x02;
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, slave_addr);
 }
 
 /* Machine Initialization */
@@ -594,6 +592,8 @@ static INTERRUPT_GEN( slave_interrupt )
 static MACHINE_RESET( airbustr )
 {
 	soundlatch_status = soundlatch2_status = 0;
+	master_addr = 0xff;
+	slave_addr = 0xfd;
 	master_bankswitch_w(machine, 0, 0x02);
 	slave_bankswitch_w(machine, 0, 0x02);
 	sound_bankswitch_w(machine, 0, 0x02);
@@ -603,17 +603,17 @@ static MACHINE_RESET( airbustr )
 
 static MACHINE_DRIVER_START( airbustr )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, 6000000)	// ???
+	MDRV_CPU_ADD("master", Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_IO_MAP(master_io_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(master_interrupt, 2)	// nmi caused by sub cpu?, ?
 
-	MDRV_CPU_ADD(Z80, 6000000)	// ???
+	MDRV_CPU_ADD("slave", Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 	MDRV_CPU_IO_MAP(slave_io_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(slave_interrupt, 2)		// nmi caused by main cpu, ?
 
-	MDRV_CPU_ADD(Z80, 6000000)	// ???
+	MDRV_CPU_ADD("audio", Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_IO_MAP(sound_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
@@ -641,14 +641,14 @@ static MACHINE_DRIVER_START( airbustr )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD("ym", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 0.25)
 	MDRV_SOUND_ROUTE(2, "mono", 0.25)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(OKIM6295, 12000000/4)
+	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/4)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END

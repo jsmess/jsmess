@@ -746,11 +746,11 @@ static const struct YMZ280Binterface ymz280b_intf =
 
 static MACHINE_DRIVER_START( jchan )
 
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_main,0)
 	MDRV_CPU_VBLANK_INT_HACK(jchan_vblank, 2)
 
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD("sub", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_sub,0)
 
 	MDRV_GFXDECODE(jchan)
@@ -771,7 +771,7 @@ static MACHINE_DRIVER_START( jchan )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16000000)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16000000)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

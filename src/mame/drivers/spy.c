@@ -536,12 +536,11 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( spy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 3000000) /* ? */
+	MDRV_CPU_ADD("main", M6809, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(spy_readmem,spy_writemem)
 	MDRV_CPU_VBLANK_INT("main", spy_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(spy_sound_readmem,spy_sound_writemem)
 								/* nmi by the sound chip */
 
@@ -563,16 +562,16 @@ static MACHINE_DRIVER_START( spy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 3579545)
+	MDRV_SOUND_ADD("ym", YM3812, 3579545)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami1", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface_1)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami2", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface_2)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)

@@ -412,6 +412,9 @@ static INPUT_PORTS_START( syvalion )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START_TAG(P1TRACKX_PORT_TAG)
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
@@ -580,11 +583,11 @@ static MACHINE_START( taitoh )
 static MACHINE_DRIVER_START( syvalion )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(syvalion_readmem,syvalion_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000 / 2)		/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80,8000000 / 2)		/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(taitoh)
@@ -608,7 +611,7 @@ static MACHINE_DRIVER_START( syvalion )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(syvalion_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -619,11 +622,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( recordbr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(recordbr_readmem,recordbr_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000 / 2)		/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80,8000000 / 2)		/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(taitoh)
@@ -647,7 +650,7 @@ static MACHINE_DRIVER_START( recordbr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(syvalion_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -658,11 +661,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dleague )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(dleague_readmem,dleague_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000 / 2)		/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80,8000000 / 2)		/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(taitoh)
@@ -686,7 +689,7 @@ static MACHINE_DRIVER_START( dleague )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(dleague_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)

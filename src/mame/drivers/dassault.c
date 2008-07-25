@@ -553,16 +553,15 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( dassault )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14000000) /* Accurate */
+	MDRV_CPU_ADD("main", M68000, 14000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(dassault_readmem,dassault_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(M68000, 14000000) /* Accurate */
+	MDRV_CPU_ADD("sub", M68000, 14000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(dassault_sub_readmem,dassault_sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(H6280,32220000/8)
-	/* audio CPU */	/* Accurate */
+	MDRV_CPU_ADD("audio", H6280,32220000/8)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_INTERLEAVE(140) /* 140 CPU slices per frame */
@@ -586,21 +585,21 @@ static MACHINE_DRIVER_START( dassault )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 32220000/8)
+	MDRV_SOUND_ADD("ym1", YM2203, 32220000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
 
-	MDRV_SOUND_ADD(YM2151, 32220000/9)
+	MDRV_SOUND_ADD("ym2", YM2151, 32220000/9)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 1023924)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1023924)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
-	MDRV_SOUND_ADD(OKIM6295, 2047848)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 2047848)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.25)

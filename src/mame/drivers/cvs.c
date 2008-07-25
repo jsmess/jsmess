@@ -1012,16 +1012,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( cvs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650, 894886.25)
+	MDRV_CPU_ADD("main", S2650, 894886.25)
 	MDRV_CPU_PROGRAM_MAP(cvs_main_cpu_map,0)
 	MDRV_CPU_IO_MAP(cvs_main_cpu_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", cvs_main_cpu_interrupt)
 
-	MDRV_CPU_ADD(S2650, 894886.25)
+	MDRV_CPU_ADD("audio", S2650, 894886.25)
 	MDRV_CPU_PROGRAM_MAP(cvs_dac_cpu_map,0)
 	MDRV_CPU_IO_MAP(cvs_dac_cpu_io_map,0)
 
-	MDRV_CPU_ADD(S2650, 894886.25)
+	MDRV_CPU_ADD("speech", S2650, 894886.25)
 	MDRV_CPU_PROGRAM_MAP(cvs_speech_cpu_map,0)
 	MDRV_CPU_IO_MAP(cvs_speech_cpu_io_map,0)
 
@@ -1046,13 +1046,13 @@ static MACHINE_DRIVER_START( cvs )
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(TMS5100, 640000)
+	MDRV_SOUND_ADD("tms", TMS5100, 640000)
 	MDRV_SOUND_CONFIG(tms5100_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

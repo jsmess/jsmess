@@ -267,7 +267,7 @@ static GFXDECODE_START( speedatk )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( speedatk )
-	MDRV_CPU_ADD(Z80,12000000/2)
+	MDRV_CPU_ADD("main", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -290,7 +290,7 @@ static MACHINE_DRIVER_START( speedatk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 4000000)
+	MDRV_SOUND_ADD("ay", AY8910, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -252,7 +252,7 @@ static NVRAM_HANDLER( showhand )
 
 static MACHINE_DRIVER_START( astrocorp )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_25_601712MHz / 2)
+	MDRV_CPU_ADD("main", M68000, XTAL_25_601712MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(astrocorp_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -274,7 +274,7 @@ static MACHINE_DRIVER_START( astrocorp )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_20MHz/16)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

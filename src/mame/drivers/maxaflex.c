@@ -429,11 +429,11 @@ static const struct POKEYinterface pokey_interface = {
 
 static MACHINE_DRIVER_START( a600xl )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, FREQ_17_EXACT)
+	MDRV_CPU_ADD("main", M6502, FREQ_17_EXACT)
 	MDRV_CPU_PROGRAM_MAP(a600xl_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
 
-	MDRV_CPU_ADD(M68705, 3579545)
+	MDRV_CPU_ADD("mcu", M68705, 3579545)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem,0)
 
 	/* video hardware */
@@ -454,11 +454,11 @@ static MACHINE_DRIVER_START( a600xl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(POKEY, FREQ_17_EXACT)
+	MDRV_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
 	MDRV_SOUND_CONFIG(pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_MACHINE_START( a600xl )

@@ -1536,17 +1536,17 @@ static MACHINE_RESET ( pgm )
 static MACHINE_DRIVER_START( pgm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 20000000) /* 20 mhz! verified on real board */
+	MDRV_CPU_ADD("main", M68000, 20000000) /* 20 mhz! verified on real board */
 	MDRV_CPU_PROGRAM_MAP(pgm_mem,0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 8468000)
+	MDRV_CPU_ADD("sound", Z80, 8468000)
 	MDRV_CPU_PROGRAM_MAP(z80_mem, 0)
 	MDRV_CPU_IO_MAP(z80_io, 0)
 	/* audio CPU */
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(ICS2115, 0)
+	MDRV_SOUND_ADD("ics", ICS2115, 0)
 	MDRV_SOUND_CONFIG(pgm_ics2115_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 
@@ -1607,7 +1607,7 @@ static MACHINE_DRIVER_START( kov2 )
 	MDRV_CPU_PROGRAM_MAP(kov2_mem,0)
 
 	/* protection CPU */
-	MDRV_CPU_ADD_TAG("prot", ARM7, 20000000)	// ???
+	MDRV_CPU_ADD("prot", ARM7, 20000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(arm7_map, 0)
 MACHINE_DRIVER_END
 
@@ -1618,7 +1618,7 @@ static MACHINE_DRIVER_START( kovsh )
 	MDRV_CPU_PROGRAM_MAP(kovsh_mem,0)
 
 	/* protection CPU */
-	MDRV_CPU_ADD_TAG("prot", ARM7, 20000000)	// ???
+	MDRV_CPU_ADD("prot", ARM7, 20000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(kovsh_arm7_map, 0)
 MACHINE_DRIVER_END
 
@@ -1630,7 +1630,7 @@ static MACHINE_DRIVER_START( cavepgm )
 	MDRV_CPU_PROGRAM_MAP(cavepgm_mem,0)
 
 	/* protection CPU */
-//  MDRV_CPU_ADD_TAG("prot", ARM7, 20000000)    // ???
+//  MDRV_CPU_ADD("prot", ARM7, 20000000)    // ???
 //  MDRV_CPU_PROGRAM_MAP(arm7_map, 0)
 MACHINE_DRIVER_END
 #endif

@@ -299,12 +299,11 @@ static const struct K007232_interface k007232_interface =
 static MACHINE_DRIVER_START( gbusters )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)	/* Konami custom 052526 */
+	MDRV_CPU_ADD("main", KONAMI, 3000000)	/* Konami custom 052526 */
 	MDRV_CPU_PROGRAM_MAP(gbusters_readmem,gbusters_writemem)
 	MDRV_CPU_VBLANK_INT("main", gbusters_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */		/* ? */
+	MDRV_CPU_ADD("audio", Z80, 3579545)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(gbusters_readmem_sound,gbusters_writemem_sound)
 
 	MDRV_MACHINE_RESET(gbusters)
@@ -327,11 +326,11 @@ static MACHINE_DRIVER_START( gbusters )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)

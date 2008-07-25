@@ -293,12 +293,12 @@ static DRIVER_INIT( namcond1 )
 static MACHINE_DRIVER_START( namcond1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12288000)
+	MDRV_CPU_ADD("main", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(namcond1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 	MDRV_CPU_PERIODIC_INT(ygv608_timed_interrupt, 1000)
 
-	MDRV_CPU_ADD(H83002, 16384000 )
+	MDRV_CPU_ADD("mcu", H83002, 16384000 )
 	MDRV_CPU_PROGRAM_MAP( nd1h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( nd1h8iomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", mcu_interrupt)
@@ -326,7 +326,7 @@ static MACHINE_DRIVER_START( namcond1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(C352, 16384000)
+	MDRV_SOUND_ADD("namco", C352, 16384000)
 	MDRV_SOUND_CONFIG(c352_interface)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)

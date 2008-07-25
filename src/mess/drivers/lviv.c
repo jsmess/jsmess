@@ -420,7 +420,7 @@ INPUT_PORTS_END
 /* machine definition */
 static MACHINE_DRIVER_START( lviv )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080, 2500000)
+	MDRV_CPU_ADD("main", 8080, 2500000)
 	MDRV_CPU_PROGRAM_MAP(lviv_mem, 0)
 	MDRV_CPU_IO_MAP(lviv_readport, lviv_writeport)
 	MDRV_INTERLEAVE(1)
@@ -449,9 +449,9 @@ static MACHINE_DRIVER_START( lviv )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot */

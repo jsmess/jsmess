@@ -237,12 +237,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( rollrace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,XTAL_24MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80,XTAL_24MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80,XTAL_24MHz/16) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_snd,writemem_snd)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
@@ -263,13 +262,13 @@ static MACHINE_DRIVER_START( rollrace )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.10)
 
-	MDRV_SOUND_ADD(AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.10)
 
-	MDRV_SOUND_ADD(AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MDRV_SOUND_ADD("ay3", AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.10)
 MACHINE_DRIVER_END
 

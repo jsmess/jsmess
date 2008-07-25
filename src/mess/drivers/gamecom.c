@@ -90,7 +90,7 @@ static PALETTE_INIT( gamecom )
 
 static MACHINE_DRIVER_START( gamecom )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( "main", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	MDRV_CPU_ADD( "main", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map, 0 )
 	MDRV_CPU_CONFIG( gamecom_cpu_config )
 	MDRV_CPU_VBLANK_INT_HACK(gamecom_scanline, 200)
@@ -116,7 +116,7 @@ static MACHINE_DRIVER_START( gamecom )
 	/* sound hardware */
 #if 0	
 	MDRV_SPEAKER_STANDARD_STEREO( "left", "right" )
-	/* MDRV_SOUND_ADD_TAG( "custom", CUSTOM, 0 ) */
+	/* MDRV_SOUND_ADD( "custom", CUSTOM, 0 ) */
 	/* MDRV_SOUND_CONFIG */
 	MDRV_SOUND_ROUTE( 0, "left", 0.50 )
 	MDRV_SOUND_ROUTE( 1, "right", 0.50 )

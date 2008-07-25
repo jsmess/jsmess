@@ -604,10 +604,10 @@ static const struct YMF262interface ymf262_interface =
 static MACHINE_DRIVER_START( fuuki32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, CPU_CLOCK) /* 20MHz verified */
+	MDRV_CPU_ADD("main", M68EC020, CPU_CLOCK) /* 20MHz verified */
 	MDRV_CPU_PROGRAM_MAP(fuuki32_readmem,fuuki32_writemem)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
+	MDRV_CPU_ADD("sound", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
 	MDRV_CPU_PROGRAM_MAP(fuuki32_sound_readmem,fuuki32_sound_writemem)
 	MDRV_CPU_IO_MAP(fuuki32_sound_readport,fuuki32_sound_writeport)
 
@@ -633,14 +633,14 @@ static MACHINE_DRIVER_START( fuuki32 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMF262, FM_SOUND_CLOCK) /* 33.8688MHz OSC divided by 2 is 16.9344MHz */
+	MDRV_SOUND_ADD("ymf1", YMF262, FM_SOUND_CLOCK) /* 33.8688MHz OSC divided by 2 is 16.9344MHz */
 	MDRV_SOUND_CONFIG(ymf262_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "left", 0.50)
 	MDRV_SOUND_ROUTE(3, "right", 0.50)
 
-	MDRV_SOUND_ADD(YMF278B, YMF278B_STD_CLOCK) /* YMF278B_STD_CLOCK = OSC 33.8688MHz */
+	MDRV_SOUND_ADD("ymf2", YMF278B, YMF278B_STD_CLOCK) /* YMF278B_STD_CLOCK = OSC 33.8688MHz */
 	MDRV_SOUND_CONFIG(ymf278b_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)

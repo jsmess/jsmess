@@ -647,11 +647,11 @@ static const struct Samplesinterface senjyo_samples_interface =
 static MACHINE_DRIVER_START( senjyo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz? */
+	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", senjyo_interrupt)
 
-	MDRV_CPU_ADD_TAG("sub", Z80, 2000000)
+	MDRV_CPU_ADD("sub", Z80, 2000000)
 	MDRV_CPU_CONFIG(daisy_chain)
 	/* audio CPU */	/* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -676,16 +676,16 @@ static MACHINE_DRIVER_START( senjyo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76496, 2000000)
+	MDRV_SOUND_ADD("sn1", SN76496, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SN76496, 2000000)
+	MDRV_SOUND_ADD("sn2", SN76496, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SN76496, 2000000)
+	MDRV_SOUND_ADD("sn3", SN76496, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(senjyo_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_DRIVER_END

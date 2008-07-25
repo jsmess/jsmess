@@ -1057,11 +1057,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( nekkyoku )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_main,nekkyoku_writemem_main)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_sub,nekkyoku_writemem_sub)
 	MDRV_CPU_IO_MAP(nekkyoku_readport_sub,nekkyoku_writeport_sub)
 
@@ -1083,10 +1083,10 @@ static MACHINE_DRIVER_START( nekkyoku )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 12000000/6)
+	MDRV_SOUND_ADD("ay", AY8910, 12000000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -1095,11 +1095,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( idolmj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
 	MDRV_CPU_IO_MAP(fromance_readport_sub,idolmj_writeport_sub)
 
@@ -1121,10 +1121,10 @@ static MACHINE_DRIVER_START( idolmj )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 12000000/6)
+	MDRV_SOUND_ADD("ay", AY8910, 12000000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -1133,11 +1133,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fromance )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
 	MDRV_CPU_IO_MAP(fromance_readport_sub,fromance_writeport_sub)
 
@@ -1159,10 +1159,10 @@ static MACHINE_DRIVER_START( fromance )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ADD("ym", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END

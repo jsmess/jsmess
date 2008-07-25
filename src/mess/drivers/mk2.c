@@ -105,7 +105,7 @@ static MACHINE_RESET( mk2 )
 
 static MACHINE_DRIVER_START( mk2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 1000000)        /* 6504 */
+	MDRV_CPU_ADD("main", M6502, 1000000)        /* 6504 */
 	MDRV_CPU_PROGRAM_MAP(mk2_mem, 0)
 	MDRV_INTERLEAVE(1)
 
@@ -118,7 +118,7 @@ static MACHINE_DRIVER_START( mk2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

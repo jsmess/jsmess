@@ -1810,7 +1810,7 @@ static const struct x1_010_interface x1_010_sound_intf =
 static MACHINE_DRIVER_START( mj4simai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
+	MDRV_CPU_ADD("main",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
 	MDRV_CPU_PROGRAM_MAP(mj4simai_readmem,mj4simai_writemem)
 	MDRV_CPU_VBLANK_INT("main", seta2_interrupt)
 
@@ -1834,7 +1834,7 @@ static MACHINE_DRIVER_START( mj4simai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 50000000/3)
+	MDRV_SOUND_ADD("x1", X1_010, 50000000/3)
 	MDRV_SOUND_CONFIG(x1_010_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

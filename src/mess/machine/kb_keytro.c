@@ -127,7 +127,7 @@ ADDRESS_MAP_END
 
 
 MACHINE_DRIVER_START( kb_keytronic )
-	MDRV_CPU_ADD_TAG( "kb_keytronic_", I8051, 11060250 )
+	MDRV_CPU_ADD( "kb_keytronic_", I8051, 11060250 )
 	MDRV_CPU_PROGRAM_MAP( kb_keytronic_program, 0 )
 	MDRV_CPU_DATA_MAP( kb_keytronic_data, 0 )
 	MDRV_CPU_IO_MAP( kb_keytronic_io, 0 )

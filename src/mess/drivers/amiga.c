@@ -203,7 +203,7 @@ static const struct CustomSound_interface amiga_custom_interface =
 
 static MACHINE_DRIVER_START( ntsc )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, AMIGA_68000_NTSC_CLOCK)
+	MDRV_CPU_ADD("main", M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(amiga_mem, 0)
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -229,7 +229,7 @@ static MACHINE_DRIVER_START( ntsc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 3579545)
+	MDRV_SOUND_ADD("custom", CUSTOM, 3579545)
 	MDRV_SOUND_CONFIG(amiga_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
@@ -244,7 +244,7 @@ static MACHINE_DRIVER_START( cdtv )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_SOUND_ADD_TAG( "cdda", CDDA, 0 )
+	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
 MACHINE_DRIVER_END

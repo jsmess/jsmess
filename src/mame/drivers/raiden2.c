@@ -987,7 +987,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( raiden2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,XTAL_32MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", V30,XTAL_32MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(raiden2_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", raiden2_interrupt)
 
@@ -2126,7 +2126,7 @@ static INTERRUPT_GEN( rdx_v33_interrupt )
 static MACHINE_DRIVER_START( rdx_v33 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V33, 32000000/2 ) // ?
+	MDRV_CPU_ADD("main", V33, 32000000/2 ) // ?
 	MDRV_CPU_PROGRAM_MAP(rdx_v33_map, 0)
 	MDRV_CPU_VBLANK_INT("main", rdx_v33_interrupt)
 
@@ -2149,7 +2149,7 @@ static MACHINE_DRIVER_START( rdx_v33 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

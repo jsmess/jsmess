@@ -403,12 +403,11 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( crospang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14318180/2)
+	MDRV_CPU_ADD("main", M68000, 14318180/2)
 	MDRV_CPU_PROGRAM_MAP(crospang_readmem,crospang_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80, 14318180/4)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 14318180/4)
 	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
 	MDRV_CPU_IO_MAP(crospang_sound_readport,crospang_sound_writeport)
 
@@ -429,11 +428,11 @@ static MACHINE_DRIVER_START( crospang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 14318180/4)
+	MDRV_SOUND_ADD("ym", YM3812, 14318180/4)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -441,12 +440,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bestri )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14318180/2)
+	MDRV_CPU_ADD("main", M68000, 14318180/2)
 	MDRV_CPU_PROGRAM_MAP(bestri_readmem,bestri_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80, 14318180/4)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 14318180/4)
 	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
 	MDRV_CPU_IO_MAP(crospang_sound_readport,crospang_sound_writeport)
 
@@ -467,11 +465,11 @@ static MACHINE_DRIVER_START( bestri )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 14318180/4)
+	MDRV_SOUND_ADD("ym", YM3812, 14318180/4)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

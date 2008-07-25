@@ -800,12 +800,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( trackfld )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 2048000)        /* 1.400 MHz ??? */
+	MDRV_CPU_ADD("main", M6809, 2048000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */	/* Z80 Clock is derived from a 14.31818 MHz crystal */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)	/* Z80 Clock is derived from a 14.31818 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_NVRAM_HANDLER(trackfld)
@@ -828,13 +827,13 @@ static MACHINE_DRIVER_START( trackfld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(SN76496, 14318180/8)
+	MDRV_SOUND_ADD("sn", SN76496, 14318180/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(VLM5030, 3580000)
+	MDRV_SOUND_ADD("vlm", VLM5030, 3580000)
 	MDRV_SOUND_CONFIG(trackfld_vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -844,12 +843,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hyprolyb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 2048000)        /* 1.400 MHz ??? */
+	MDRV_CPU_ADD("main", M6809, 2048000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */	/* Z80 Clock is derived from a 14.31818 MHz crystal */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)	/* Z80 Clock is derived from a 14.31818 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_readmem,hyprolyb_sound_writemem)
 
 	MDRV_NVRAM_HANDLER(trackfld)
@@ -872,13 +870,13 @@ static MACHINE_DRIVER_START( hyprolyb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(SN76496, 14318180/8)
+	MDRV_SOUND_ADD("sn", SN76496, 14318180/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

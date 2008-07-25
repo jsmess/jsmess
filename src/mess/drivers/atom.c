@@ -251,7 +251,7 @@ INPUT_PORTS_END
 /* machine definition */
 static MACHINE_DRIVER_START( atom )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M65C02, 1000000)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M65C02, 1000000)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(atom_mem, 0)
 
 	MDRV_MACHINE_RESET( atom )
@@ -271,7 +271,7 @@ static MACHINE_DRIVER_START( atom )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */

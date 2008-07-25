@@ -214,12 +214,11 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( citycon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 2048000)        /* 2.048 MHz ??? */
+	MDRV_CPU_ADD("main", M6809, 2048000)        /* 2.048 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(M6809, 640000)
-	/* audio CPU */        /* 0.640 MHz ??? */
+	MDRV_CPU_ADD("audio", M6809, 640000)       /* 0.640 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -240,10 +239,10 @@ static MACHINE_DRIVER_START( citycon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1250000)
+	MDRV_SOUND_ADD("ay", AY8910, 1250000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(YM2203, 1250000)
+	MDRV_SOUND_ADD("ym", YM2203, 1250000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)

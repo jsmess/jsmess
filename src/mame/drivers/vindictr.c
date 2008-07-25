@@ -64,7 +64,7 @@ static MACHINE_RESET( vindictr )
 
 static READ16_HANDLER( port1_r )
 {
-	int result = input_port_read_indexed(machine, 1);
+	int result = input_port_read(machine, "260010");
 	if (atarigen_sound_to_cpu_ready) result ^= 0x0004;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0008;
 	result ^= 0x0010;
@@ -85,9 +85,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0x260000, 0x26000f) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(port1_r)
-	AM_RANGE(0x260020, 0x26002f) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x260020, 0x26002f) AM_READ_PORT("260020")
 	AM_RANGE(0x260030, 0x260031) AM_READ(atarigen_sound_r)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(atarigen_scanline_int_ack_w)
@@ -144,7 +144,7 @@ static INPUT_PORTS_START( vindictr )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_I_PORT		/* audio port */
+	PORT_INCLUDE( atarijsa_i )		/* audio port */
 INPUT_PORTS_END
 
 
@@ -195,7 +195,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( vindictr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68010, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68010, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_RESET(vindictr)

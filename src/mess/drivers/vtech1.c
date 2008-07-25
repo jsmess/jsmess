@@ -303,7 +303,7 @@ static const struct Speaker_interface speaker_interface =
 
 static MACHINE_DRIVER_START(laser110)
     /* basic machine hardware */
-    MDRV_CPU_ADD_TAG("main", Z80, VTECH1_CLK)  /* 3.57950 Mhz */
+    MDRV_CPU_ADD("main", Z80, VTECH1_CLK)  /* 3.57950 Mhz */
     MDRV_CPU_PROGRAM_MAP(laser110_mem, 0)
     MDRV_CPU_IO_MAP(vtech1_io, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -321,9 +321,9 @@ static MACHINE_DRIVER_START(laser110)
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_CONFIG(speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 

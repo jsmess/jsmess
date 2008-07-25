@@ -179,7 +179,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mrjong )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,15468000/6)	/* 2.578 MHz?? */
+	MDRV_CPU_ADD("main", Z80,15468000/6)	/* 2.578 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
@@ -202,10 +202,10 @@ static MACHINE_DRIVER_START( mrjong )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-   MDRV_SOUND_ADD(SN76489, 15468000/6)
+   MDRV_SOUND_ADD("sn1", SN76489, 15468000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-   MDRV_SOUND_ADD(SN76489, 15468000/6)
+   MDRV_SOUND_ADD("sn2", SN76489, 15468000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

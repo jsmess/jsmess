@@ -149,7 +149,7 @@ static INPUT_PORTS_START( mosaicf2 )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( mosaicf2 )
-	MDRV_CPU_ADD_TAG("main", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MDRV_CPU_ADD("main", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(common_map,0)
 	MDRV_CPU_IO_MAP(mosaicf2_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -172,11 +172,11 @@ static MACHINE_DRIVER_START( mosaicf2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 14318180/4)
+	MDRV_SOUND_ADD("ym", YM2151, 14318180/4)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1789772.5)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1789772.5)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)

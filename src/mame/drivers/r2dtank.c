@@ -536,11 +536,11 @@ INPUT_PORTS_END
  *************************************/
 
 static MACHINE_DRIVER_START( r2dtank )
-	MDRV_CPU_ADD(M6809,3000000)		 /* ?? too fast ? */
+	MDRV_CPU_ADD("main", M6809,3000000)		 /* ?? too fast ? */
 	MDRV_CPU_PROGRAM_MAP(r2dtank_main_map,0)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(M6802,3000000)			/* ?? */
+	MDRV_CPU_ADD("audio", M6802,3000000)			/* ?? */
 	MDRV_CPU_PROGRAM_MAP(r2dtank_audio_map,0)
 
 	MDRV_MACHINE_START(r2dtank)
@@ -560,11 +560,11 @@ static MACHINE_DRIVER_START( r2dtank )
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, (4000000 / 4))
+	MDRV_SOUND_ADD("ay1", AY8910, (4000000 / 4))
 	MDRV_SOUND_CONFIG(ay8910_1_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, (4000000 / 4))
+	MDRV_SOUND_ADD("ay2", AY8910, (4000000 / 4))
 	MDRV_SOUND_CONFIG(ay8910_2_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

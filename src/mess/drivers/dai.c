@@ -176,7 +176,7 @@ static const struct CassetteOptions dai_cassette_options = {
 /* machine definition */
 static MACHINE_DRIVER_START( dai )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080, 2000000)
+	MDRV_CPU_ADD("main", 8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(dai_mem, 0)
 	MDRV_CPU_IO_MAP(dai_io, 0)
 	MDRV_INTERLEAVE(1)
@@ -204,10 +204,10 @@ static MACHINE_DRIVER_START( dai )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(dai_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)

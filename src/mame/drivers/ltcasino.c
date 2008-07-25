@@ -647,7 +647,7 @@ static VIDEO_UPDATE(ltcasino)
 
 static MACHINE_DRIVER_START( ltcasino )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,2000000)		 /* ? MHz */
+	MDRV_CPU_ADD("main", M6502,2000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -668,7 +668,7 @@ static MACHINE_DRIVER_START( ltcasino )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1000000)
+	MDRV_SOUND_ADD("ay", AY8910, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_DRIVER_END
 

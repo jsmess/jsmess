@@ -223,10 +223,10 @@ Thrill Drive 713A13  -       713A14  -
 #include "video/voodoo.h"
 #include "machine/timekpr.h"
 
-static UINT8 led_reg0 = 0x7f, led_reg1 = 0x7f;
+static UINT8 led_reg0, led_reg1;
 
 static UINT32 *work_ram;
-static UINT8 backup_ram[0x2000];
+static UINT8 *backup_ram;
 
 
 static WRITE32_HANDLER( paletteram32_w )
@@ -251,7 +251,7 @@ static int K001604_tilemap_offset;
 static tilemap *K001604_layer_roz[MAX_K001604_CHIPS][2];
 static int K001604_roz_size[MAX_K001604_CHIPS];
 
-static UINT32 K001604_reg[MAX_K001604_CHIPS][256];
+static UINT32 *K001604_reg[MAX_K001604_CHIPS];
 
 static int K001604_layer_size;
 
@@ -426,6 +426,7 @@ int K001604_vh_start(running_machine *machine, int chip)
 	K001604_dirty_map[chip][0] = auto_malloc(K001604_NUM_TILES_LAYER0);
 	K001604_dirty_map[chip][1] = auto_malloc(K001604_NUM_TILES_LAYER1);
 
+	K001604_reg[chip] = auto_malloc(0x400);
 
 	if (chip == 0)
 	{
@@ -455,6 +456,7 @@ int K001604_vh_start(running_machine *machine, int chip)
 	memset(K001604_tile_ram[chip], 0, 0x10000);
 	memset(K001604_dirty_map[chip][0], 0, K001604_NUM_TILES_LAYER0);
 	memset(K001604_dirty_map[chip][1], 0, K001604_NUM_TILES_LAYER1);
+	memset(K001604_reg[chip], 0, 0x400);
 
 
 	machine->gfx[K001604_gfx_index[chip][0]] = allocgfx(&K001604_char_layout_layer_8x8);
@@ -826,7 +828,15 @@ static WRITE32_HANDLER( sysreg_w )
 static int fpga_uploaded = 0;
 static int lanc2_ram_r = 0;
 static int lanc2_ram_w = 0;
-static UINT8 lanc2_ram[0x8000];
+static UINT8 *lanc2_ram;
+
+static void lanc2_init(void)
+{
+	fpga_uploaded = 0;
+	lanc2_ram_r = 0;
+	lanc2_ram_w = 0;
+	lanc2_ram = auto_malloc(0x8000);
+}
 
 static READ32_HANDLER( lanc1_r )
 {
@@ -1089,13 +1099,13 @@ static MACHINE_RESET( nwktr )
 static MACHINE_DRIVER_START( nwktr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MDRV_CPU_ADD("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(nwktr_map, 0)
 
-	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
+	MDRV_CPU_ADD("audio", M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
 
-	MDRV_CPU_ADD(ADSP21062, 36000000)
+	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 
@@ -1124,7 +1134,7 @@ static MACHINE_DRIVER_START( nwktr )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(RF5C400, 64000000/4)
+	MDRV_SOUND_ADD("rf", RF5C400, 64000000/4)
 	MDRV_SOUND_CONFIG(rf5c400_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1141,12 +1151,13 @@ static void sound_irq_callback(running_machine *machine, int irq)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
-static DRIVER_INIT( nwktr )
+static void init_nwktr(running_machine *machine)
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_NWKTR);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
 
 	sharc_dataram = auto_malloc(0x100000);
+	led_reg0 = led_reg1 = 0x7f;
 	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	K056800_init(sound_irq_callback);
@@ -1156,12 +1167,16 @@ static DRIVER_INIT( nwktr )
 //  cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
 
 	adc1213x_init(0, adc12138_input_callback);
+	lanc2_init();
 }
 
 static DRIVER_INIT(thrilld)
 {
 	int i;
 	UINT16 checksum;
+
+	backup_ram = auto_malloc(0x2000);
+	memset(backup_ram, 0, 0x2000);
 
 	/* RTC data */
 	backup_ram[0x00] = 0x47;	// 'G'
@@ -1190,13 +1205,16 @@ static DRIVER_INIT(thrilld)
 	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	DRIVER_INIT_CALL(nwktr);
+	init_nwktr(machine);
 }
 
 static DRIVER_INIT(racingj)
 {
 	int i;
 	UINT32 checksum;
+
+	backup_ram = auto_malloc(0x2000);
+	memset(backup_ram, 0, 0x2000);
 
 	/* RTC data */
 	backup_ram[0x00] = 0x47;	// 'G'
@@ -1215,22 +1233,25 @@ static DRIVER_INIT(racingj)
 	backup_ram[0x0d] = 0x00;	//
 
 	checksum = 0;
-    for (i=0; i < 14; i+=2)
-    {
+	for (i=0; i < 14; i+=2)
+	{
 		checksum += (backup_ram[i] << 8) | (backup_ram[i+1]);
-        checksum &= 0xffff;
-    }
+		checksum &= 0xffff;
+	}
 	checksum = -1 - checksum;
 	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	DRIVER_INIT_CALL(nwktr);
+	init_nwktr(machine);
 }
 
 static DRIVER_INIT(racingj2)
 {
 	int i;
 	UINT32 checksum;
+
+	backup_ram = auto_malloc(0x2000);
+	memset(backup_ram, 0, 0x2000);
 
 	/* RTC data */
 	backup_ram[0x00] = 0x47;	// 'G'
@@ -1258,7 +1279,7 @@ static DRIVER_INIT(racingj2)
 	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	DRIVER_INIT_CALL(nwktr);
+	init_nwktr(machine);
 }
 
 

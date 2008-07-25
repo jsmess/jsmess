@@ -282,7 +282,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( mayumi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MCLK/2) /* 5.000 MHz ? */
+	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 5.000 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", mayumi_interrupt)
@@ -307,7 +307,7 @@ static MACHINE_DRIVER_START( mayumi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, MCLK/4)
+	MDRV_SOUND_ADD("ym", YM2203, MCLK/4)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)

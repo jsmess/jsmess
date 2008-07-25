@@ -260,7 +260,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( usg32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 2000000) /* ?? */
+	MDRV_CPU_ADD("main", M6809, 2000000) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(usgames_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,5) /* ?? */
 
@@ -286,7 +286,7 @@ static MACHINE_DRIVER_START( usg32 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD("ay", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

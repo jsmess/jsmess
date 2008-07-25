@@ -383,9 +383,10 @@ static ADDRESS_MAP_START( gekitsui_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static int newdata[5];
+
 static WRITE8_HANDLER(scrivi)
 {
-	static int newdata[5] = {-1,-1,-1,-1,-1};
 	if(offset == 0)
 	{
 		scrolly = data;
@@ -716,16 +717,15 @@ static MACHINE_RESET( zerotrgt )
 
 
 static MACHINE_DRIVER_START( cntsteer )
-	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("main", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("sub", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
 //  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
-//  MDRV_CPU_ADD(M6502, 1500000)        /* ? */
-//  /* audio CPU */
+//  MDRV_CPU_ADD("audio", M6502, 1500000)        /* ? */
 //  MDRV_CPU_PROGRAM_MAP(sound_map,0)
 //  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16) /* ? */ // should be interrupt, 16?
 
@@ -747,20 +747,19 @@ static MACHINE_DRIVER_START( cntsteer )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-//  MDRV_SOUND_ADD(YM2203, ym2203_interface)
+//  MDRV_SOUND_ADD("ym", YM2203, ym2203_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zerotrgt )
-	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("main", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("sub", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
 //  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD(M6502, 1500000)		/* ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_pulse,16) /* ? */ // should be interrupt, 16?
 	MDRV_CPU_PERIODIC_INT(sound_interrupt, 1000)
@@ -786,10 +785,10 @@ static MACHINE_DRIVER_START( zerotrgt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -960,6 +959,10 @@ static void init_cntsteer(void)
 
 static DRIVER_INIT( zerotrgt )
 {
+	int i;
+	for (i=0; i<ARRAY_LENGTH(newdata); i++)
+		newdata[i] = -1;
+
 	zerotrgt_rearrange_gfx(0x02000, 0x10000);
 }
 

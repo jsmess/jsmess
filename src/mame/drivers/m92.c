@@ -959,11 +959,11 @@ void m92_sprite_interrupt(running_machine *machine)
 static MACHINE_DRIVER_START( m92 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",V33,18000000/2)	/* NEC V33, 18 MHz clock */
+	MDRV_CPU_ADD("main",V33,18000000/2)	/* NEC V33, 18 MHz clock */
 	MDRV_CPU_PROGRAM_MAP(m92_map,0)
 	MDRV_CPU_IO_MAP(m92_portmap,0)
 
-	MDRV_CPU_ADD_TAG("sound" ,V30, 14318180/2)	/* 14.31818 MHz */
+	MDRV_CPU_ADD("sound" ,V30, 14318180/2)	/* 14.31818 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_START(m92)
@@ -988,12 +988,12 @@ static MACHINE_DRIVER_START( m92 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 14318180/4)
+	MDRV_SOUND_ADD("ym", YM2151, 14318180/4)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 
-	MDRV_SOUND_ADD(IREMGA20, 14318180/4)
+	MDRV_SOUND_ADD("irem", IREMGA20, 14318180/4)
 	MDRV_SOUND_CONFIG(iremGA20_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -181,7 +181,7 @@ static DRIVER_INIT(dambustr)
 
 static MACHINE_DRIVER_START( dambustr )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(dambustr_readmem, dambustr_writemem)
 
 	MDRV_MACHINE_RESET(galaxold)
@@ -204,7 +204,7 @@ static MACHINE_DRIVER_START( dambustr )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(galaxian_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

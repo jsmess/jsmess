@@ -233,12 +233,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ssozumo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 1200000)	/* 1.2 MHz ???? */
+	MDRV_CPU_ADD("main", M6502, 1200000)	/* 1.2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", ssozumo_interrupt)
 
-	MDRV_CPU_ADD(M6502, 975000)
-	/* audio CPU */ 		/* 975 kHz ?? */
+	MDRV_CPU_ADD("audio", M6502, 975000) 		/* 975 kHz ?? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)	/* IRQs are triggered by the main CPU */
 
@@ -260,13 +259,13 @@ static MACHINE_DRIVER_START( ssozumo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

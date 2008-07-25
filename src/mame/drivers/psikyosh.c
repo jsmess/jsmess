@@ -595,7 +595,7 @@ static const struct YMF278B_interface ymf278b_interface =
 
 static MACHINE_DRIVER_START( psikyo3v1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SH2, MASTER_CLOCK/2)
+	MDRV_CPU_ADD("main", SH2, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(ps3v1_readmem,ps3v1_writemem)
 	MDRV_CPU_VBLANK_INT("main", psikyosh_interrupt)
 
@@ -621,7 +621,7 @@ static MACHINE_DRIVER_START( psikyo3v1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMF278B, MASTER_CLOCK/2)
+	MDRV_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
 	MDRV_SOUND_CONFIG(ymf278b_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)

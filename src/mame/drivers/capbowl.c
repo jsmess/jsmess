@@ -353,12 +353,12 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( capbowl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, MASTER_CLOCK)
+	MDRV_CPU_ADD("main", M6809E, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(capbowl_map,0)
 	MDRV_CPU_VBLANK_INT("main", capbowl_interrupt)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(M6809E, MASTER_CLOCK)
+	MDRV_CPU_ADD("audio", M6809E, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(capbowl)
@@ -377,14 +377,14 @@ static MACHINE_DRIVER_START( capbowl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, MASTER_CLOCK/2)
+	MDRV_SOUND_ADD("ym", YM2203, MASTER_CLOCK/2)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.07)
 	MDRV_SOUND_ROUTE(1, "mono", 0.07)
 	MDRV_SOUND_ROUTE(2, "mono", 0.07)
 	MDRV_SOUND_ROUTE(3, "mono", 0.75)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

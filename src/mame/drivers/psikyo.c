@@ -876,7 +876,7 @@ static INPUT_PORTS_START( btlkroad )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK  )	// vblank   ACTIVE_HIGH fixes slowdowns, but is it right?
 
 	// This DSW is used for debugging the game
 	PORT_DIPNAME( 0x0100, 0x0100, "Unknown 3-0" )	// tested!
@@ -1562,12 +1562,11 @@ static const struct YM2610interface sngkace_ym2610_interface =
 static MACHINE_DRIVER_START( sngkace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* ? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sngkace_sound_readmem,sngkace_sound_writemem)
 	MDRV_CPU_IO_MAP(sngkace_sound_readport,sngkace_sound_writeport)
 
@@ -1591,7 +1590,7 @@ static MACHINE_DRIVER_START( sngkace )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(sngkace_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  1.2)
 	MDRV_SOUND_ROUTE(0, "right", 1.2)
@@ -1616,12 +1615,11 @@ static const struct YM2610interface gunbird_ym2610_interface =
 static MACHINE_DRIVER_START( gunbird )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	MDRV_CPU_PROGRAM_MAP(gunbird_sound_readmem,gunbird_sound_writemem)
 	MDRV_CPU_IO_MAP(gunbird_sound_readport,gunbird_sound_writeport)
 
@@ -1645,7 +1643,7 @@ static MACHINE_DRIVER_START( gunbird )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(gunbird_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  1.2)
 	MDRV_SOUND_ROUTE(0, "right", 1.2)
@@ -1678,12 +1676,11 @@ static const struct YMF278B_interface ymf278b_interface =
 static MACHINE_DRIVER_START( s1945 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	MDRV_CPU_PROGRAM_MAP(gunbird_sound_readmem,gunbird_sound_writemem)
 	MDRV_CPU_IO_MAP(s1945_sound_readport,s1945_sound_writeport)
 
@@ -1709,7 +1706,7 @@ static MACHINE_DRIVER_START( s1945 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMF278B, YMF278B_STD_CLOCK)
+	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
 	MDRV_SOUND_CONFIG(ymf278b_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

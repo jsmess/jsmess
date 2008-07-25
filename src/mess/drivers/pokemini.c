@@ -63,7 +63,7 @@ static const struct Speaker_interface speaker_interface =
 
 static MACHINE_DRIVER_START( pokemini )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( "main", MINX, 4000000 )
+	MDRV_CPU_ADD( "main", MINX, 4000000 )
 	MDRV_CPU_PROGRAM_MAP( pokemini_mem_map, 0 )
 
 	MDRV_INTERLEAVE(1)
@@ -88,7 +88,7 @@ static MACHINE_DRIVER_START( pokemini )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_CONFIG(speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

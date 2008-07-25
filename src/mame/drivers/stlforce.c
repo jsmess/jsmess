@@ -240,7 +240,7 @@ static NVRAM_HANDLER( stlforce )
 
 static MACHINE_DRIVER_START( stlforce )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("cpu", M68000, 15000000)
+	MDRV_CPU_ADD("cpu", M68000, 15000000)
 	MDRV_CPU_PROGRAM_MAP(stlforce_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( stlforce )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 937500 )
+	MDRV_SOUND_ADD("oki", OKIM6295, 937500 )
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

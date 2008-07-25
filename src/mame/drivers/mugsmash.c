@@ -427,12 +427,11 @@ static const struct YM2151interface ym2151_interface =
 };
 
 static MACHINE_DRIVER_START( mugsmash )
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mugsmash_readmem,mugsmash_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* Guess */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* Guess */
 	MDRV_CPU_PROGRAM_MAP(snd_readmem,snd_writemem)
 
 	MDRV_GFXDECODE(mugsmash)
@@ -452,12 +451,12 @@ static MACHINE_DRIVER_START( mugsmash )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)	/* music */
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
 
-	MDRV_SOUND_ADD(OKIM6295, 1122000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1122000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)	/* sound fx */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)

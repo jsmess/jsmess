@@ -707,8 +707,8 @@ static WRITE16_HANDLER( mcu_command_w )
  */
 static READ16_HANDLER( custom_key_r )
 {
-	static UINT8 keyseq;
 	static UINT16 count;
+	static UINT32 keyval;
 	int old_count;
 
 	old_count = count;
@@ -763,17 +763,18 @@ static READ16_HANDLER( custom_key_r )
 
 	case NAMCO_TINKLPIT:
 		if( offset==7 ) return 0x016f;
-		if( offset==4 ) keyseq = 0;
+		if( offset==4 ) keyval = 0;
 		if( offset==3 )
 		{
-			static const UINT16 data[] =
-			{
-				0x0000,0x2000,0x2100,0x2104,0x0106,0x0007,0x4003,0x6021,
-				0x61a0,0x31a4,0x9186,0x9047,0xc443,0x6471,0x6db0,0x39bc,
-				0x9b8e,0x924f,0xc643,0x6471,0x6db0,0x19bc,0xba8e,0xb34b,
-				0xe745,0x4576,0x0cb7,0x789b,0xdb29,0xc2ec,0x16e2,0xb491
-			};
-			return data[(keyseq++)&0x1f];
+			UINT16 res;
+			res = BITSWAP16(keyval, 22,26,31,23,18,20,16,30,24,21,25,19,17,29,28,27);
+
+			keyval >>= 1;
+printf("popcount(%08X) = %d\n", keyval & 0x58000c00, popcount(keyval & 0x58000c00));
+			if((!keyval) || (popcount(keyval & 0x58000c00) & 1))
+				keyval ^= 0x80000000;
+
+			return res;
 		}
 		break;
 
@@ -1281,11 +1282,11 @@ static const struct C140interface C140_interface_typeA =
 /* cropped at sides */
 static MACHINE_DRIVER_START( namcona1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 50113000/4)
+	MDRV_CPU_ADD("main", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
 
-	MDRV_CPU_ADD(M37710, 50113000/4)
+	MDRV_CPU_ADD("mcu", M37710, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_mcu_map, 0)
 	MDRV_CPU_IO_MAP( namcona1_mcu_io_map, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(mcu_interrupt, 2)
@@ -1313,7 +1314,7 @@ static MACHINE_DRIVER_START( namcona1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(C140, 44100)
+	MDRV_SOUND_ADD("namco", C140, 44100)
 	MDRV_SOUND_CONFIG(C140_interface_typeA)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)
@@ -1375,7 +1376,7 @@ static struct NAMCONAinterface NAMCONA_interface =
 
 static MACHINE_DRIVER_START( namcona2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 50113000/4)
+	MDRV_CPU_ADD("main", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona2_readmem,namcona2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
 
@@ -1400,7 +1401,7 @@ static MACHINE_DRIVER_START( namcona2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(NAMCONA, 4*8000)
+	MDRV_SOUND_ADD("namco", NAMCONA, 4*8000)
 	MDRV_SOUND_CONFIG(NAMCONA_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

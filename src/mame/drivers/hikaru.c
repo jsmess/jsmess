@@ -283,7 +283,7 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( hikaru )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SH4, CPU_CLOCK)
+	MDRV_CPU_ADD("main", SH4, CPU_CLOCK)
 //  MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(hikaru_map,0)
 //  MDRV_CPU_IO_MAP(hikaru_port,0)
@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( hikaru )
 	MDRV_VIDEO_UPDATE(hikaru)
 
 //  MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-//  MDRV_SOUND_ADD(AICA, 0)
+//  MDRV_SOUND_ADD("aica", AICA, 0)
 //  MDRV_SOUND_CONFIG(aica_interface)
 //  MDRV_SOUND_ROUTE(0, "left", 2.0)
 //  MDRV_SOUND_ROUTE(0, "right", 2.0)

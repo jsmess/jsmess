@@ -124,11 +124,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bking_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking_xld1_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking_yld1_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking_xld2_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_3_r, bking_yld2_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, bking_xld3_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(bking_xld1_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(bking_yld1_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSWA") AM_WRITE(bking_xld2_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWB") AM_WRITE(bking_yld2_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWC") AM_WRITE(bking_xld3_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(bking_input_port_5_r, bking_yld3_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(bking_input_port_6_r, bking_msk_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(watchdog_reset_w)
@@ -143,11 +143,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bking3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking_xld1_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking_yld1_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking_xld2_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_3_r, bking_yld2_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, bking_xld3_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(bking_xld1_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(bking_yld1_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSWA") AM_WRITE(bking_xld2_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWB") AM_WRITE(bking_yld2_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWC") AM_WRITE(bking_xld3_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(bking_input_port_5_r, bking_yld3_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(bking_input_port_6_r, bking_msk_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(watchdog_reset_w)
@@ -445,13 +445,12 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( bking )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
+	MDRV_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(bking_map,0)
 	MDRV_CPU_IO_MAP(bking_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_6MHz/2)	/* 3 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_6MHz/2)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(bking_audio_map,0)
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
@@ -477,14 +476,14 @@ static MACHINE_DRIVER_START( bking )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4)
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4)
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -494,7 +493,7 @@ static MACHINE_DRIVER_START( bking3 )
 	MDRV_CPU_MODIFY("main_cpu")
 	MDRV_CPU_IO_MAP(bking3_io_map,0)
 
-	MDRV_CPU_ADD(M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
+	MDRV_CPU_ADD("mcu", M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
 
 	MDRV_MACHINE_RESET(buggychl)

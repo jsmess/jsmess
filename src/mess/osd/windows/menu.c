@@ -1772,7 +1772,7 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 #endif // HAS_PROFILER
 
 		case ID_OPTIONS_DEBUGGER:
-			debug_cpu_halt_on_next_instruction(machine);
+			debug_cpu_halt_on_next_instruction(machine, "User-initiated break\n");
 			break;
 
 		case ID_OPTIONS_CONFIGURATION:

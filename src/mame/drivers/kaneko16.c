@@ -1692,7 +1692,7 @@ static const struct AY8910interface ay8910_intf_eeprom =
 static MACHINE_DRIVER_START( berlwall )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12 */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* MC68000P12 */
 	MDRV_CPU_PROGRAM_MAP(berlwall,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1718,14 +1718,14 @@ static MACHINE_DRIVER_START( berlwall )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(AY8910, 1000000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8910_intf_dsw)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 
-	MDRV_SOUND_ADD(AY8910, 1000000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 12000000/6)
+	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/6)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -1739,7 +1739,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bakubrkr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bakubrkr,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1765,14 +1765,14 @@ static MACHINE_DRIVER_START( bakubrkr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1795,11 +1795,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blazeon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,12000000)	/* TMP68HC000-12 */
+	MDRV_CPU_ADD("main", M68000,12000000)	/* TMP68HC000-12 */
 	MDRV_CPU_PROGRAM_MAP(blazeon,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD(Z80,4000000)	/* D780C-2 */
+	MDRV_CPU_ADD("audio", Z80,4000000)	/* D780C-2 */
 	MDRV_CPU_PROGRAM_MAP(blazeon_soundmem,0)
 	MDRV_CPU_IO_MAP(blazeon_soundport,0)
 
@@ -1824,7 +1824,7 @@ static MACHINE_DRIVER_START( blazeon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -1848,7 +1848,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gtmr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("gtmr", M68000, XTAL_16MHz)	/* verified on pcb */
+	MDRV_CPU_ADD("gtmr", M68000, XTAL_16MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gtmr_readmem,gtmr_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1873,11 +1873,11 @@ static MACHINE_DRIVER_START( gtmr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
@@ -1940,7 +1940,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mgcrystl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mgcrystl,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1966,14 +1966,14 @@ static MACHINE_DRIVER_START( mgcrystl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -2010,7 +2010,7 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 static MACHINE_DRIVER_START( shogwarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(shogwarr,0)
 	MDRV_CPU_VBLANK_INT_HACK(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
 
@@ -2033,11 +2033,11 @@ static MACHINE_DRIVER_START( shogwarr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1980000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1980000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1980000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 1980000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

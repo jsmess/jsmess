@@ -457,11 +457,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( zodiack )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)        /* 4.00 MHz??? */
+	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 14318000/8)	/* 1.78975 MHz??? */
+	MDRV_CPU_ADD("audio", Z80, 14318000/8)	/* 1.78975 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
@@ -486,7 +486,7 @@ static MACHINE_DRIVER_START( zodiack )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1789750)
+	MDRV_SOUND_ADD("ay", AY8910, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

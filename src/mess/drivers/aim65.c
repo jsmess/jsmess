@@ -40,7 +40,7 @@ static ADDRESS_MAP_START( aim65_mem , ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x1000, 0x9fff ) AM_NOP /* User available expansions */
 	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_READWRITE( via_1_r, via_1_w ) /* User VIA */
 	AM_RANGE( 0xa400, 0xa47f ) AM_RAM /* RIOT RAM */
-	AM_RANGE( 0xa480, 0xa497 ) AM_READWRITE( r6532_0_r, r6532_0_w )
+	AM_RANGE( 0xa480, 0xa497 ) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
 	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_READWRITE( via_0_r, via_0_w )
 	AM_RANGE( 0xac00, 0xac03 ) AM_READWRITE( pia_0_r, pia_0_w )
@@ -166,7 +166,7 @@ static const dl1416_interface dl1416_ds5 = { DL1416T, aim65_update_ds5 };
 
 static MACHINE_DRIVER_START( aim65 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, AIM65_CLOCK) /* 1 MHz */
+	MDRV_CPU_ADD("main", M6502, AIM65_CLOCK) /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(aim65_mem, 0)
 
 	MDRV_DEFAULT_LAYOUT(layout_aim65)
@@ -183,6 +183,9 @@ static MACHINE_DRIVER_START( aim65 )
 	MDRV_DEVICE_CONFIG(dl1416_ds5)
 
 	MDRV_VIDEO_START(aim65)
+
+	/* devices */
+	MDRV_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_r6532_interface)
 MACHINE_DRIVER_END
 
 

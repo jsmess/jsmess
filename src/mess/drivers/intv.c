@@ -367,7 +367,7 @@ static INTERRUPT_GEN( intv_interrupt2 )
 
 static MACHINE_DRIVER_START( intv )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
+	MDRV_CPU_ADD("main", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MDRV_CPU_PROGRAM_MAP(intv_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", intv_interrupt)
 	MDRV_INTERLEAVE(1)
@@ -390,7 +390,7 @@ static MACHINE_DRIVER_START( intv )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, XTAL_3_579545MHz/2)
+	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
@@ -401,7 +401,7 @@ static MACHINE_DRIVER_START( intvkbd )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(intvkbd_mem, 0)
 
-	MDRV_CPU_ADD_TAG("keyboard", M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
+	MDRV_CPU_ADD("keyboard", M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(intv2_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", intv_interrupt2)
 

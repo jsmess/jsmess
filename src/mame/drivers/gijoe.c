@@ -341,12 +341,11 @@ static const struct K054539interface k054539_interface =
 static MACHINE_DRIVER_START( gijoe )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* Confirmed */
+	MDRV_CPU_ADD("main", M68000, 16000000)	/* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_VBLANK_INT("main", gijoe_interrupt)
 
-	MDRV_CPU_ADD(Z80, 8000000)
-	/* audio CPU */	/* Amuse & confirmed. z80e */
+	MDRV_CPU_ADD("audio", Z80, 8000000)	/* Amuse & confirmed. z80e */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(gijoe)
@@ -370,11 +369,11 @@ static MACHINE_DRIVER_START( gijoe )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
-	MDRV_SOUND_ADD(K054539, 48000)
+	MDRV_SOUND_ADD("konami", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

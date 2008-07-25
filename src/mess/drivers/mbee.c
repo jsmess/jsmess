@@ -290,7 +290,7 @@ static const struct z80_irq_daisy_chain mbee_daisy_chain[] =
 
 static MACHINE_DRIVER_START( mbee )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz / 6)         /* 2 Mhz */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz / 6)         /* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mbee_mem, 0)
 	MDRV_CPU_IO_MAP(mbee_ports, 0)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
@@ -313,9 +313,9 @@ static MACHINE_DRIVER_START( mbee )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -326,7 +326,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbeeic )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3375000)         /* 3.37500 Mhz */
+	MDRV_CPU_ADD("main", Z80, 3375000)         /* 3.37500 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mbeeic_mem, 0)
 	MDRV_CPU_IO_MAP(mbeeic_ports, 0)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
@@ -350,9 +350,9 @@ static MACHINE_DRIVER_START( mbeeic )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */

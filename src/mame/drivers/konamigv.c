@@ -342,7 +342,7 @@ static const struct PSXSPUinterface konamigv_psxspu_interface =
 
 static MACHINE_DRIVER_START( konamigv )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD("main",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigv_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -366,12 +366,12 @@ static MACHINE_DRIVER_START( konamigv )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD( PSXSPU, 0 )
+	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( konamigv_psxspu_interface )
 	MDRV_SOUND_ROUTE( 0, "left", 0.75 )
 	MDRV_SOUND_ROUTE( 1, "right", 0.75 )
 
-	MDRV_SOUND_ADD( CDDA, 0 )
+	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
 MACHINE_DRIVER_END

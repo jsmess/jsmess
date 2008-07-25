@@ -45,22 +45,6 @@ static UINT8 *actfancr_ram;
 
 /******************************************************************************/
 
-static READ8_HANDLER( actfan_control_0_r )
-{
-	return input_port_read(machine, "IN2"); /* VBL */
-}
-
-static READ8_HANDLER( actfan_control_1_r )
-{
-	switch (offset) {
-		case 0: return input_port_read(machine, "IN0"); /* Player 1 */
-		case 1: return input_port_read(machine, "IN1"); /* Player 2 */
-		case 2: return input_port_read(machine, "DSW1"); /* Dip 1 */
-		case 3: return input_port_read(machine, "DSW2"); /* Dip 2 */
-	}
-	return 0xff;
-}
-
 static int trio_control_select;
 
 static WRITE8_HANDLER( triothep_control_select_w )
@@ -70,12 +54,13 @@ static WRITE8_HANDLER( triothep_control_select_w )
 
 static READ8_HANDLER( triothep_control_r )
 {
-	switch (trio_control_select) {
-		case 0: return input_port_read(machine, "IN0"); /* Player 1 */
-		case 1: return input_port_read(machine, "IN1"); /* Player 2 */
-		case 2: return input_port_read(machine, "DSW1"); /* Dip 1 */
-		case 3: return input_port_read(machine, "DSW2"); /* Dip 2 */
-		case 4: return input_port_read(machine, "IN2"); /* VBL */
+	switch (trio_control_select)
+	{
+		case 0: return input_port_read(machine, "P1");
+		case 1: return input_port_read(machine, "P2");
+		case 2: return input_port_read(machine, "DSW1");
+		case 3: return input_port_read(machine, "DSW2");
+		case 4: return input_port_read(machine, "SYSTEM");	/* VBL */
 	}
 
 	return 0xff;
@@ -98,8 +83,11 @@ static ADDRESS_MAP_START( actfan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0x130000, 0x130003) AM_READ(actfan_control_1_r)
-	AM_RANGE(0x140000, 0x140001) AM_READ(actfan_control_0_r)
+	AM_RANGE(0x130000, 0x130000) AM_READ_PORT("P1")
+	AM_RANGE(0x130001, 0x130001) AM_READ_PORT("P2")
+	AM_RANGE(0x130002, 0x130002) AM_READ_PORT("DSW1")
+	AM_RANGE(0x130003, 0x130003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("SYSTEM")	/* VBL */
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE(&actfancr_ram) /* Main ram */
 ADDRESS_MAP_END
@@ -138,7 +126,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( actfancr )
-	PORT_START_TAG("IN0")	/* Player 1 controls */
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -148,7 +136,7 @@ static INPUT_PORTS_START( actfancr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN1")	/* Player 2 controls */
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -158,7 +146,7 @@ static INPUT_PORTS_START( actfancr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN2")	/* start buttons */
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -210,59 +198,15 @@ static INPUT_PORTS_START( actfancr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( triothep )
-	PORT_START_TAG("IN0")	/* Player 1 controls */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_INCLUDE( actfancr )
+
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN1")	/* Player 2 controls */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_MODIFY("P2")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN2")	/* start buttons */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
-
-	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:5" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-
-	PORT_START_TAG("DSW2")
+	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x01, "10" )
@@ -277,8 +221,6 @@ static INPUT_PORTS_START( triothep )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as "Unused" */
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -349,12 +291,11 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( actfancr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(H6280,21477200/3) /* Should be accurate */
+	MDRV_CPU_ADD("main",H6280,21477200/3) /* Should be accurate */
 	MDRV_CPU_PROGRAM_MAP(actfan_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* VBL */
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */ /* Should be accurate */
+	MDRV_CPU_ADD("audio",M6502, 1500000) /* Should be accurate */
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
 
 	/* video hardware */
@@ -375,17 +316,17 @@ static MACHINE_DRIVER_START( actfancr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM3812, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MDRV_SOUND_ADD(OKIM6295, 1024188)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1024188)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_DRIVER_END
@@ -393,12 +334,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( triothep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
+	MDRV_CPU_ADD("main",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(triothep_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* VBL */
 
-	MDRV_CPU_ADD(M6502, XTAL_12MHz/8) /* verified on pcb */
-	/* audio CPU */ /* Should be accurate */
+	MDRV_CPU_ADD("audio",M6502, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
 
 	/* video hardware */
@@ -419,17 +359,17 @@ static MACHINE_DRIVER_START( triothep )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM3812, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym2", YM3812, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_1_056MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1_056MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_DRIVER_END

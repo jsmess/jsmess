@@ -582,7 +582,7 @@ static const struct tms9995reset_param tutor_processor_config =
 static MACHINE_DRIVER_START(tutor)
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
-	MDRV_CPU_ADD_TAG("main", TMS9995, 10700000)
+	MDRV_CPU_ADD("main", TMS9995, 10700000)
 	MDRV_CPU_CONFIG(tutor_processor_config)
 	MDRV_CPU_PROGRAM_MAP(tutor_memmap, 0)
 	MDRV_CPU_IO_MAP(tutor_readcru, /*tutor_writecru*/0)
@@ -599,9 +599,9 @@ static MACHINE_DRIVER_START(tutor)
 
 	/* sound */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 

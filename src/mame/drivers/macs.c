@@ -347,7 +347,7 @@ static const struct ST0016interface st0016_interface =
 
 static MACHINE_DRIVER_START( macs )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,8000000) /* 8 MHz ? */
+	MDRV_CPU_ADD("main",Z80,8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macs_mem,0)
 	MDRV_CPU_IO_MAP(macs_io,0)
 
@@ -371,7 +371,7 @@ static MACHINE_DRIVER_START( macs )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(ST0016, 0)
+	MDRV_SOUND_ADD("st", ST0016, 0)
 	MDRV_SOUND_CONFIG(st0016_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

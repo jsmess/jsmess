@@ -550,9 +550,10 @@ static WRITE32_HANDLER ( rabbit_rombank_w )
 
 static WRITE32_HANDLER( rabbit_audio_w )
 {
-#if VERBOSE_AUDIO_LOG
 	int reg, voice, base, i;
 
+if (VERBOSE_AUDIO_LOG)
+{
 	if (mem_mask == 0xffff0000)
 	{
 		reg = offset*2;
@@ -602,7 +603,7 @@ static WRITE32_HANDLER( rabbit_audio_w )
 			logerror("Unknown write %04x to global reg %d\n", data, reg);
 		}
 	}
-#endif
+}
 }
 
 #define BLITCMDLOG 0
@@ -1066,7 +1067,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 }
 
 static MACHINE_DRIVER_START( rabbit )
-	MDRV_CPU_ADD_TAG("main",M68EC020,24000000) /* 24 MHz */
+	MDRV_CPU_ADD("main",M68EC020,24000000) /* 24 MHz */
 	MDRV_CPU_PROGRAM_MAP(rabbit_readmem,rabbit_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(rabbit_interrupts,262)
 	/* (rabbit) */

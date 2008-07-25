@@ -266,7 +266,7 @@ static const TMS9928a_interface tms9928a_interface =
  *************************************/
 
 static MACHINE_DRIVER_START( sg1000a )
-	MDRV_CPU_ADD(Z80, 3579545)       /* 3.579545 Mhz */
+	MDRV_CPU_ADD("main", Z80, 3579545)       /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", sg100a_interrupt)
@@ -280,7 +280,7 @@ static MACHINE_DRIVER_START( sg1000a )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76489, 3579545)
+	MDRV_SOUND_ADD("sn", SN76489, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

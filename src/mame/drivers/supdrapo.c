@@ -262,7 +262,7 @@ static VIDEO_UPDATE( supdrapo )
 }
 
 static MACHINE_DRIVER_START( supdrapo )
-	MDRV_CPU_ADD(Z80,8000000/2)		 /* ??? */
+	MDRV_CPU_ADD("main", Z80,8000000/2)		 /* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -282,7 +282,7 @@ static MACHINE_DRIVER_START( supdrapo )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 8000000/2)
+	MDRV_SOUND_ADD("ay", AY8910, 8000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

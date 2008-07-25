@@ -172,7 +172,7 @@ MACHINE_RESET( itgambl3 )
 static MACHINE_DRIVER_START( itgambl3 )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a M16C core ATM */
+	MDRV_CPU_ADD("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a M16C core ATM */
 	MDRV_CPU_PROGRAM_MAP(itgambl3_map,0)
 
     /* video hardware */
@@ -191,7 +191,7 @@ static MACHINE_DRIVER_START( itgambl3 )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("oki", OKIM6295, MAIN_CLOCK/16)	/* 1MHz */
+	MDRV_SOUND_ADD("oki", OKIM6295, MAIN_CLOCK/16)	/* 1MHz */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

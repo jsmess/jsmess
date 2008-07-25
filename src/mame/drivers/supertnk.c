@@ -410,7 +410,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( supertnk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS9980, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
+	MDRV_CPU_ADD("main", TMS9980, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
 	MDRV_CPU_PROGRAM_MAP(supertnk_map,0)
 	MDRV_CPU_IO_MAP(supertnk_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", supertnk_interrupt)
@@ -431,7 +431,7 @@ static MACHINE_DRIVER_START( supertnk )
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD("ay", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

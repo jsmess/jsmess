@@ -110,7 +110,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 static MACHINE_DRIVER_START( tcl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/4)
+	MDRV_CPU_ADD("main", Z80,12000000/4)
 	MDRV_CPU_PROGRAM_MAP(tcl_map,0)
 
 	/* video hardware */
@@ -136,7 +136,7 @@ static MACHINE_DRIVER_START( tcl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 12000000/6)
+	MDRV_SOUND_ADD("ay", AY8910, 12000000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

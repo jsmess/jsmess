@@ -474,12 +474,12 @@ static const struct MSM5205interface discoboy_msm5205_interface =
 
 static MACHINE_DRIVER_START( discoboy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)		 /* 6 MHz? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		 /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,10000000/2)		 /* 5 MHz? */
+	MDRV_CPU_ADD("audio", Z80,10000000/2)		 /* 5 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -502,11 +502,11 @@ static MACHINE_DRIVER_START( discoboy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 2500000)
+	MDRV_SOUND_ADD("ym", YM3812, 2500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 
-	MDRV_SOUND_ADD(MSM5205, 384000) // ???? unknown
+	MDRV_SOUND_ADD("msm", MSM5205, 384000) // ???? unknown
 	MDRV_SOUND_CONFIG(discoboy_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

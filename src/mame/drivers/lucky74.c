@@ -833,7 +833,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( lucky74 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/8)	/* guess */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/8)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lucky74_map, 0)
 	MDRV_CPU_IO_MAP(lucky74_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_interrupt)
@@ -873,7 +873,7 @@ static MACHINE_DRIVER_START( lucky74 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, MASTER_CLOCK/8)	/* YM2149F */
+	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/8)	/* YM2149F */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

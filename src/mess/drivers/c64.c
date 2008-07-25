@@ -504,7 +504,7 @@ static const SID6581_interface c64_sound_interface =
 
 static MACHINE_DRIVER_START( c64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6510, VIC6567_CLOCK)
+	MDRV_CPU_ADD("main", M6510, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", c64_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC2_HRETRACERATE)
@@ -520,10 +520,10 @@ static MACHINE_DRIVER_START( c64 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sid", SID6581, VIC6567_CLOCK)
+	MDRV_SOUND_ADD("sid", SID6581, VIC6567_CLOCK)
 	MDRV_SOUND_CONFIG(c64_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */

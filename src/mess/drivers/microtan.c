@@ -213,7 +213,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( microtan )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M6502, 750000)	// 750 kHz
+	MDRV_CPU_ADD("main", M6502, 750000)	// 750 kHz
 	MDRV_CPU_PROGRAM_MAP(microtan_map, 0)
 	MDRV_CPU_VBLANK_INT("main", microtan_interrupt)
 
@@ -235,14 +235,14 @@ static MACHINE_DRIVER_START( microtan )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("ay8910.1", AY8910, 1000000)
+	MDRV_SOUND_ADD("ay8910.1", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("ay8910.2", AY8910, 1000000)
+	MDRV_SOUND_ADD("ay8910.2", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

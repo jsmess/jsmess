@@ -329,7 +329,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tank8 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800, 11055000 / 10) /* ? */
+	MDRV_CPU_ADD("main", M6800, 11055000 / 10) /* ? */
 	MDRV_CPU_PROGRAM_MAP(tank8_cpu_map, 0)
 
 	MDRV_MACHINE_RESET(tank8)
@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( tank8 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(tank8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END

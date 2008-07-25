@@ -461,7 +461,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( chinsan )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,10000000/2)		 /* ? MHz */
+	MDRV_CPU_ADD("main", Z80,10000000/2)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(chinsan_map,0)
 	MDRV_CPU_IO_MAP(chinsan_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -485,7 +485,7 @@ static MACHINE_DRIVER_START( chinsan )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000) /* ? Mhz */
+	MDRV_SOUND_ADD("ym", YM2203, 1500000) /* ? Mhz */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)

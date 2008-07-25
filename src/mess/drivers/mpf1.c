@@ -540,7 +540,7 @@ static MACHINE_RESET( mpf1 )
 
 static MACHINE_DRIVER_START( mpf1 )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, 3579500/2)	// 1.79 MHz
+	MDRV_CPU_ADD("main", Z80, 3579500/2)	// 1.79 MHz
 	MDRV_CPU_PROGRAM_MAP(mpf1_map, 0)
 	MDRV_CPU_IO_MAP(mpf1_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -565,7 +565,7 @@ static MACHINE_DRIVER_START( mpf1 )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END

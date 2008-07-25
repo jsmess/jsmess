@@ -33,7 +33,7 @@ Notes:  Support is complete with the exception of the noise generator.
 #include "sound/samples.h"
 #include "sound/discrete.h"
 
-/* #define BLOCKADE_LOG 1 */
+#define BLOCKADE_LOG 0
 
 /* These are used to simulate coin latch circuitry */
 
@@ -86,9 +86,7 @@ static WRITE8_HANDLER( blockade_coin_latch_w )
 {
     if (data & 0x80)
     {
-    #ifdef BLOCKADE_LOG
-        mame_printf_debug("Reset Coin Latch\n");
-    #endif
+        if (BLOCKADE_LOG) mame_printf_debug("Reset Coin Latch\n");
         if (just_been_reset)
         {
             just_been_reset = 0;
@@ -100,15 +98,11 @@ static WRITE8_HANDLER( blockade_coin_latch_w )
 
     if (data & 0x20)
     {
-    #ifdef BLOCKADE_LOG
-        mame_printf_debug("Pin 19 High\n");
-    #endif
+        if (BLOCKADE_LOG) mame_printf_debug("Pin 19 High\n");
     }
     else
     {
-    #ifdef BLOCKADE_LOG
-        mame_printf_debug("Pin 19 Low\n");
-    #endif
+        if (BLOCKADE_LOG) mame_printf_debug("Pin 19 Low\n");
     }
 
     return;
@@ -455,7 +449,7 @@ static PALETTE_INIT( bw )
 static MACHINE_DRIVER_START( blockade )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(8080, 2079000)
+	MDRV_CPU_ADD("main", 8080, 2079000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", blockade_interrupt)
@@ -478,11 +472,11 @@ static MACHINE_DRIVER_START( blockade )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(blockade_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(blockade)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

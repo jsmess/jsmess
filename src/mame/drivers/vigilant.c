@@ -23,6 +23,7 @@ Buccaneers has a 5.6888 Mhz and a 18.432 Mhz OSC
 
 /* video/vigilant.c */
 VIDEO_START( vigilant );
+VIDEO_RESET( vigilant );
 WRITE8_HANDLER( vigilant_paletteram_w );
 WRITE8_HANDLER( vigilant_sprite_paletteram_w );
 WRITE8_HANDLER( vigilant_horiz_scroll_w );
@@ -528,13 +529,12 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( vigilant )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579645)		   /* 3.579645 MHz */
+	MDRV_CPU_ADD("main", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(vigilant_map,0)
 	MDRV_CPU_IO_MAP(vigilant_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3579645)
-	/* audio CPU */		   /* 3.579645 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1 */
@@ -553,17 +553,18 @@ static MACHINE_DRIVER_START( vigilant )
 	MDRV_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
 
 	MDRV_VIDEO_START(vigilant)
+	MDRV_VIDEO_RESET(vigilant)
 	MDRV_VIDEO_UPDATE(vigilant)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579645)
+	MDRV_SOUND_ADD("ym", YM2151, 3579645)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.55)
 	MDRV_SOUND_ROUTE(1, "right", 0.55)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
@@ -571,13 +572,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( buccanrs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 5688800)		   /* 5.688800 MHz */
+	MDRV_CPU_ADD("main", Z80, 5688800)		   /* 5.688800 MHz */
 	MDRV_CPU_PROGRAM_MAP(vigilant_map,0)
 	MDRV_CPU_IO_MAP(vigilant_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)
-	/* audio CPU */		   /* 3.072000 MHz */
+	MDRV_CPU_ADD("audio", Z80, 18432000/6)		   /* 3.072000 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(buccanrs_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1 */
@@ -596,12 +596,13 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
 
 	MDRV_VIDEO_START(vigilant)
+	MDRV_VIDEO_RESET(vigilant)
 	MDRV_VIDEO_UPDATE(vigilant)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 18432000/6)
+	MDRV_SOUND_ADD("ym1", YM2203, 18432000/6)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.35)
 	MDRV_SOUND_ROUTE(0, "right", 0.35)
@@ -612,7 +613,7 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_SOUND_ROUTE(3, "left",  0.50)
 	MDRV_SOUND_ROUTE(3, "right", 0.50)
 
-	MDRV_SOUND_ADD(YM2203, 18432000/6)
+	MDRV_SOUND_ADD("ym2", YM2203, 18432000/6)
 	MDRV_SOUND_ROUTE(0, "left",  0.35)
 	MDRV_SOUND_ROUTE(0, "right", 0.35)
 	MDRV_SOUND_ROUTE(1, "left",  0.35)
@@ -622,7 +623,7 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_SOUND_ROUTE(3, "left",  0.50)
 	MDRV_SOUND_ROUTE(3, "right", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.35)
 MACHINE_DRIVER_END
@@ -630,13 +631,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kikcubic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579645)		   /* 3.579645 MHz */
+	MDRV_CPU_ADD("main", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(kikcubic_map,0)
 	MDRV_CPU_IO_MAP(kikcubic_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3579645)
-	/* audio CPU */		   /* 3.579645 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1 */
@@ -655,17 +655,18 @@ static MACHINE_DRIVER_START( kikcubic )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(vigilant)
+	MDRV_VIDEO_RESET(vigilant)
 	MDRV_VIDEO_UPDATE(kikcubic)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579645)
+	MDRV_SOUND_ADD("ym", YM2151, 3579645)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.55)
 	MDRV_SOUND_ROUTE(1, "right", 0.55)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END

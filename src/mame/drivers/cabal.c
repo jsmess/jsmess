@@ -38,6 +38,10 @@ VRAM (Sprites)
 COLORRAM (Colors)
 0xe0000 - 0xe07ff  (1024 colors, ----BBBBGGGGRRRR)
 
+
+2008-07
+Dip locations verified with Fabtek manual for the trackball version
+
 ******************************************************************/
 
 #include "driver.h"
@@ -84,7 +88,7 @@ static int last[4];
 static WRITE16_HANDLER( track_reset_w )
 {
 	int i;
-	static const char *track_names[] = { "IN2", "IN3", "IN4", "IN5" };
+	static const char *track_names[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	for (i = 0; i < 4; i++)
 		last[i] = input_port_read(machine, track_names[i]);
@@ -95,10 +99,10 @@ static READ16_HANDLER( track_r )
 	switch (offset)
 	{
 		default:
-		case 0:	return (( input_port_read(machine, "IN2") - last[0]) & 0x00ff)		 | (((input_port_read(machine, "IN4") - last[2]) & 0x00ff) << 8);	/* X lo */
-		case 1:	return (((input_port_read(machine, "IN2") - last[0]) & 0xff00) >> 8) | (( input_port_read(machine, "IN4") - last[2]) & 0xff00);			/* X hi */
-		case 2:	return (( input_port_read(machine, "IN3") - last[1]) & 0x00ff)		 | (((input_port_read(machine, "IN5") - last[3]) & 0x00ff) << 8);	/* Y lo */
-		case 3:	return (((input_port_read(machine, "IN3") - last[1]) & 0xff00) >> 8) | (( input_port_read(machine, "IN5") - last[3]) & 0xff00);			/* Y hi */
+		case 0:	return (( input_port_read(machine, "IN0") - last[0]) & 0x00ff)		 | (((input_port_read(machine, "IN2") - last[2]) & 0x00ff) << 8);	/* X lo */
+		case 1:	return (((input_port_read(machine, "IN0") - last[0]) & 0xff00) >> 8) | (( input_port_read(machine, "IN2") - last[2]) & 0xff00);			/* X hi */
+		case 2:	return (( input_port_read(machine, "IN1") - last[1]) & 0x00ff)		 | (((input_port_read(machine, "IN3") - last[3]) & 0x00ff) << 8);	/* Y lo */
+		case 3:	return (((input_port_read(machine, "IN1") - last[1]) & 0xff00) >> 8) | (( input_port_read(machine, "IN3") - last[3]) & 0xff00);			/* Y hi */
 	}
 }
 
@@ -126,9 +130,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE(&colorram16)
 	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
 	AM_RANGE(0x80200, 0x803ff) AM_RAM_WRITE(SMH_RAM)
-	AM_RANGE(0xa0000, 0xa0001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa000f) AM_READ(track_r)
-	AM_RANGE(0xa0010, 0xa0011) AM_READ(input_port_1_word_r)
+	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(track_reset_w)
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITE(SMH_NOP) /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
@@ -145,9 +149,9 @@ static ADDRESS_MAP_START( cabalbl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE(&colorram16)
 	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
-	AM_RANGE(0xa0000, 0xa0001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xa0008, 0xa0009) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xa0010, 0xa0011) AM_READ(input_port_2_word_r)
+	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
+	AM_RANGE(0xa0008, 0xa0009) AM_READ_PORT("JOY")
+	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITE(SMH_NOP) /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
@@ -188,7 +192,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4009, 0x4009) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ(input_port_2_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
 	AM_RANGE(0x401a, 0x401a) AM_WRITE(seibu_adpcm_ctl_1_w)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
@@ -203,7 +207,7 @@ static ADDRESS_MAP_START( cabalbl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(soundlatch4_w)
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(cabalbl_coin_w)
-	AM_RANGE(0x4006, 0x4006) AM_READ(input_port_3_r)
+	AM_RANGE(0x4006, 0x4006) AM_READ_PORT("COIN")
 	AM_RANGE(0x4008, 0x4008) AM_READ(cabalbl_snd2_r)
 	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
 	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_w)
@@ -255,74 +259,76 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-#define CABALDSW\
-	PORT_START_TAG("DSW")\
-/* Coin Mode 1 doesn't seem quite right, all 'fractional' coinage values seem to be 4C_1C, but it could be me */\
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x000a, DEF_STR( 6C_1C ) )  	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x000b, DEF_STR( 5C_1C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x000c, DEF_STR( 4C_1C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x000d, DEF_STR( 3C_1C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0001, DEF_STR( 8C_3C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x000e, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0002, DEF_STR( 5C_3C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0003, DEF_STR( 3C_2C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_3C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0009, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_5C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )PORT_CONDITION("DSW",0x0010,PORTCOND_NOTEQUALS,0x00)\
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ))  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B ))  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_5C ) )  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )  PORT_CONDITION("DSW",0x0010,PORTCOND_EQUALS,0x00)\
-	PORT_DIPNAME( 0x0010, 0x0010, "Coin Mode" )\
-	PORT_DIPSETTING(      0x0010, "Mode 1" )\
-	PORT_DIPSETTING(      0x0000, "Mode 2" )\
-	PORT_DIPNAME( 0x0020, 0x0020, "Invert Buttons" )\
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )\
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )\
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )\
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )\
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )\
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Trackball ) )\
-	PORT_DIPSETTING(      0x0080, "Small" )\
-	PORT_DIPSETTING(      0x0000, "Large" )\
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )\
-	PORT_DIPSETTING(      0x0200, "2" )\
-	PORT_DIPSETTING(      0x0300, "3" )\
-	PORT_DIPSETTING(      0x0100, "5" )\
-	PORT_DIPSETTING(      0x0000, "121 (Cheat)")\
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) )\
-	PORT_DIPSETTING(      0x0c00, "20k 50k" )\
-	PORT_DIPSETTING(      0x0800, "30k 100k" )\
-	PORT_DIPSETTING(      0x0400, "50k 150k" )\
-	PORT_DIPSETTING(      0x0000, "70K" )\
-	PORT_DIPNAME( 0x3000, 0x2000, DEF_STR( Difficulty ) )\
-	PORT_DIPSETTING(      0x3000, DEF_STR( Easy ) )\
-	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )\
-	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )\
-	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )\
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )\
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )\
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )\
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) )\
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )\
+static INPUT_PORTS_START( common )
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(      0x000a, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x000b, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x000d, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 8C_3C ) )
+	PORT_DIPSETTING(      0x000e, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0009, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:1,2") PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B )) PORT_DIPLOCATION("SW1:3,4") PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Coin Mode" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x0010, "Mode 1" )
+	PORT_DIPSETTING(      0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x0020, 0x0020, "Invert Buttons" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Trackball ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, "Small" )
+	PORT_DIPSETTING(      0x0000, "Large" )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0200, "2" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPSETTING(      0x0000, "121 (Cheat)")
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(      0x0c00, "20k 50k" )
+	PORT_DIPSETTING(      0x0800, "30k 100k" )
+	PORT_DIPSETTING(      0x0400, "50k 150k" )
+	PORT_DIPSETTING(      0x0000, "70K" )
+	PORT_DIPNAME( 0x3000, 0x2000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(      0x3000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW2:7" )	/* Left blank in the manual */
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
-static INPUT_PORTS_START( cabalt )
-	CABALDSW
+	PORT_START_TAG("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)	/* read through sound cpu */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)	/* read through sound cpu */
+INPUT_PORTS_END
 
-	PORT_START_TAG("IN0")
+static INPUT_PORTS_START( cabalt )
+	PORT_INCLUDE( common )
+
+	PORT_START_TAG("INPUTS")
   	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
   	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
   	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -333,27 +339,26 @@ static INPUT_PORTS_START( cabalt )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)	/* read through sound cpu */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)	/* read through sound cpu */
-
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
 
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
 
 static INPUT_PORTS_START( cabalj )
-	CABALDSW
+	PORT_INCLUDE( common )
+
+	PORT_MODIFY("COIN")
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Since the Trackball version was produced first, and it doesn't use
        the third button,  Pin 24 of the JAMMA connector ('JAMMA button 3')
@@ -361,7 +366,7 @@ static INPUT_PORTS_START( cabalj )
        manufacturer had to use pin 15 which is usually the test / service
        button
     */
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("INPUTS")
   	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
   	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
   	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -372,20 +377,15 @@ static INPUT_PORTS_START( cabalj )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)	/* read through sound cpu */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)	/* read through sound cpu */
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	/* The joystick version has a PCB marked "Joystick sub" containing a 74ls245. It plugs in the
        sockets of the two D4701AC */
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START_TAG("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -395,25 +395,14 @@ static INPUT_PORTS_START( cabalj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("IN3")
   	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cabalbl )
-	CABALDSW
+	PORT_INCLUDE( common )
 
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -425,9 +414,16 @@ static INPUT_PORTS_START( cabalbl )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)	/* read through sound cpu */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)	/* read through sound cpu */
+	PORT_START_TAG("JOY")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static const gfx_layout text_layout =
@@ -501,12 +497,11 @@ static const struct MSM5205interface msm5205_interface_2 =
 static MACHINE_DRIVER_START( cabal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(seibu_sound_1)
@@ -528,15 +523,15 @@ static MACHINE_DRIVER_START( cabal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(seibu_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-	MDRV_SOUND_ADD(CUSTOM, 8000) /* it should use the msm5205 */
+	MDRV_SOUND_ADD("adpcm1", CUSTOM, 8000) /* it should use the msm5205 */
 	MDRV_SOUND_CONFIG(seibu_adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 
-	MDRV_SOUND_ADD(CUSTOM, 8000) /* it should use the msm5205 */
+	MDRV_SOUND_ADD("adpcm2", CUSTOM, 8000) /* it should use the msm5205 */
 	MDRV_SOUND_CONFIG(seibu_adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 MACHINE_DRIVER_END
@@ -546,20 +541,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cabalbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_sound_map,0)
 
 	/* there are 2x z80s for the ADPCM */
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("adpcm1", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_talk1_map,0)
 	MDRV_CPU_IO_MAP(cabalbl_talk1_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("adpcm2", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_talk2_map,0)
 	MDRV_CPU_IO_MAP(cabalbl_talk2_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
@@ -585,15 +580,15 @@ static MACHINE_DRIVER_START( cabalbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(cabalbl_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator) */
+	MDRV_SOUND_ADD("msm1", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator) */
 	MDRV_SOUND_CONFIG(msm5205_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator)*/
+	MDRV_SOUND_ADD("msm2", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator)*/
 	MDRV_SOUND_CONFIG(msm5205_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

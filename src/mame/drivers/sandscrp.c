@@ -436,11 +436,11 @@ static const struct YM2203interface ym2203_intf_sandscrp =
 static MACHINE_DRIVER_START( sandscrp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,12000000)	/* TMP68HC000N-12 */
+	MDRV_CPU_ADD("main", M68000,12000000)	/* TMP68HC000N-12 */
 	MDRV_CPU_PROGRAM_MAP(sandscrp,0)
 	MDRV_CPU_VBLANK_INT("main", sandscrp_interrupt)
 
-	MDRV_CPU_ADD(Z80,4000000)	/* Z8400AB1, Reads the DSWs: it can't be disabled */
+	MDRV_CPU_ADD("audio", Z80,4000000)	/* Z8400AB1, Reads the DSWs: it can't be disabled */
 	MDRV_CPU_PROGRAM_MAP(sandscrp_soundmem,0)
 	MDRV_CPU_IO_MAP(sandscrp_soundport,0)
 
@@ -466,12 +466,12 @@ static MACHINE_DRIVER_START( sandscrp )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 12000000/6)
+	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/6)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.25)
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD("ym", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_intf_sandscrp)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.25)

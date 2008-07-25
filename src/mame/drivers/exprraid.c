@@ -302,11 +302,11 @@ static INTERRUPT_GEN( exprraid_interrupt )
 static MACHINE_DRIVER_START( exprraid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 4000000)        /* 4 MHz ??? */
+	MDRV_CPU_ADD("main", M6502, 4000000)        /* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_VBLANK_INT("main", exprraid_interrupt)
 
-	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz ??? */
+	MDRV_CPU_ADD("slave", M6809, 2000000)        /* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 								/* IRQs are caused by the YM3526 */
 
@@ -328,10 +328,10 @@ static MACHINE_DRIVER_START( exprraid )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(YM3526, 3600000)
+	MDRV_SOUND_ADD("ym2", YM3526, 3600000)
 	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

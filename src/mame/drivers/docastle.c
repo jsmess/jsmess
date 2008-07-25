@@ -650,17 +650,17 @@ static const struct MSM5205interface msm5205_interface =
 
 static MACHINE_DRIVER_START( docastle )
 	// basic machine hardware
-//  MDRV_CPU_ADD_TAG("main", Z80, 4000000)  // 4 MHz
-	MDRV_CPU_ADD_TAG("main", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunru2 attract sequence
+//  MDRV_CPU_ADD("main", Z80, 4000000)  // 4 MHz
+	MDRV_CPU_ADD("main", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunru2 attract sequence
 	MDRV_CPU_PROGRAM_MAP(docastle_map, 0)
 	MDRV_CPU_IO_MAP(docastle_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("slave", Z80, 4000000)	// 4 MHz
+	MDRV_CPU_ADD("slave", Z80, 4000000)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(docastle_map2, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 8)
 
-	MDRV_CPU_ADD(Z80, 4000000)	// 4 MHz
+	MDRV_CPU_ADD("cpu3", Z80, 4000000)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(docastle_map3, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
@@ -683,16 +683,16 @@ static MACHINE_DRIVER_START( docastle )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-   MDRV_SOUND_ADD(SN76489, 4000000)
+   MDRV_SOUND_ADD("sn1", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-   MDRV_SOUND_ADD(SN76489, 4000000)
+   MDRV_SOUND_ADD("sn2", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-   MDRV_SOUND_ADD(SN76489, 4000000)
+   MDRV_SOUND_ADD("sn3", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-   MDRV_SOUND_ADD(SN76489, 4000000)
+   MDRV_SOUND_ADD("sn4", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -724,7 +724,7 @@ static MACHINE_DRIVER_START( idsoccer )
 	MDRV_VIDEO_START(dorunrun)
 
 	// sound hardware
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END

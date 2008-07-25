@@ -627,15 +627,15 @@ static const struct AY8910interface ay8912_interface =
 
 static MACHINE_DRIVER_START( coco_sound )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
@@ -661,7 +661,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
 
 	MDRV_MACHINE_START( dragon64 )
@@ -687,7 +687,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(d64_plus_map, 0)
 
 	MDRV_MACHINE_START( dragon64 )
@@ -713,7 +713,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(dgnalpha_map, 0)
 
 	MDRV_MACHINE_START( dgnalpha )
@@ -729,7 +729,7 @@ static MACHINE_DRIVER_START( dgnalpha )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
-	MDRV_SOUND_ADD_TAG("ay8912", AY8912, 1000000)
+	MDRV_SOUND_ADD("ay8912", AY8912, 1000000)
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -742,7 +742,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
 
 	MDRV_MACHINE_START( tanodr64 )
@@ -768,7 +768,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco )
@@ -798,7 +798,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco2 )
@@ -828,7 +828,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco2 )
@@ -858,7 +858,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coco3_map, 0)
 
 	MDRV_MACHINE_START( coco3 )

@@ -225,7 +225,7 @@ static const unsigned i86_address_mask = 0x000fffff;
 
 static MACHINE_DRIVER_START( compis )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", I80186, 8000000)	/* 8 MHz */
+	MDRV_CPU_ADD("main", I80186, 8000000)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(compis_mem, 0)
 	MDRV_CPU_IO_MAP(compis_io, 0)
 	MDRV_CPU_VBLANK_INT("main", compis_vblank_int)

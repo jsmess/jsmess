@@ -586,7 +586,7 @@ static const struct MSM5205interface msm5205_interface =
 
 static MACHINE_DRIVER_START( hnayayoi )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 20000000/4 )        /* 5 MHz ???? */
+	MDRV_CPU_ADD("main", Z80, 20000000/4 )        /* 5 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(hnayayoi_readmem,hnayayoi_writemem)
 	MDRV_CPU_IO_MAP(hnayayoi_readport,hnayayoi_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -613,14 +613,14 @@ static MACHINE_DRIVER_START( hnayayoi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 20000000/8)
+	MDRV_SOUND_ADD("ym", YM2203, 20000000/8)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 0.25)
 	MDRV_SOUND_ROUTE(2, "mono", 0.25)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

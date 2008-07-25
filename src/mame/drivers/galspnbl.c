@@ -278,12 +278,11 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( galspnbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)	/* 10 MHz ??? */
+	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)/* also has vector for 6, but it does nothing */
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 								/* NMI is caused by the main CPU */
 
@@ -304,11 +303,11 @@ static MACHINE_DRIVER_START( galspnbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 3579545)
+	MDRV_SOUND_ADD("ym", YM3812, 3579545)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

@@ -544,7 +544,7 @@ static MACHINE_DRIVER_START( abc80 )
 
 	// basic machine hardware
 
-	MDRV_CPU_ADD_TAG("main", Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
+	MDRV_CPU_ADD("main", Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
 	MDRV_CPU_CONFIG(abc80_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc80_map, 0)
 	MDRV_CPU_IO_MAP(abc80_io_map, 0)
@@ -568,7 +568,7 @@ static MACHINE_DRIVER_START( abc80 )
 	// sound hardware
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76477", SN76477, 0)
+	MDRV_SOUND_ADD("sn76477", SN76477, 0)
 	MDRV_SOUND_CONFIG(sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

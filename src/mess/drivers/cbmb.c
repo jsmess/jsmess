@@ -531,7 +531,7 @@ static const mc6845_interface cbm700_crtc = {
 
 static MACHINE_DRIVER_START( cbm600 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6509, 7833600)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M6509, 7833600)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cbmb_readmem, cbmb_writemem)
 	MDRV_INTERLEAVE(0)
 
@@ -556,7 +556,7 @@ static MACHINE_DRIVER_START( cbm600 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sid6581", SID6581, 1000000)
+	MDRV_SOUND_ADD("sid6581", SID6581, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
@@ -587,7 +587,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cbm500 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6509, VIC6567_CLOCK)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M6509, VIC6567_CLOCK)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cbm500_readmem, cbm500_writemem)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC2_HRETRACERATE)
 	MDRV_INTERLEAVE(0)
@@ -602,7 +602,7 @@ static MACHINE_DRIVER_START( cbm500 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sid6581", SID6581, 1000000)
+	MDRV_SOUND_ADD("sid6581", SID6581, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */

@@ -1090,10 +1090,10 @@ static DRIVER_INIT( astormbl ){
 static MACHINE_DRIVER_START( system18 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
+	MDRV_CPU_ADD("sound", Z80, 8000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_18,sound_writemem_18)
 	MDRV_CPU_IO_MAP(sound_readport_18,sound_writeport_18)
@@ -1115,19 +1115,19 @@ static MACHINE_DRIVER_START( system18 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("3438.0", YM3438, 8000000)
+	MDRV_SOUND_ADD("3438.0", YM3438, 8000000)
 	MDRV_SOUND_ROUTE(0, "left", 0.40)
 	MDRV_SOUND_ROUTE(1, "right", 0.40)
 	MDRV_SOUND_ROUTE(2, "left", 0.40)
 	MDRV_SOUND_ROUTE(3, "right", 0.40)
 
-	MDRV_SOUND_ADD_TAG("3438.1", YM3438, 8000000)
+	MDRV_SOUND_ADD("3438.1", YM3438, 8000000)
 	MDRV_SOUND_ROUTE(0, "left", 0.40)
 	MDRV_SOUND_ROUTE(1, "right", 0.40)
 	MDRV_SOUND_ROUTE(2, "left", 0.40)
 	MDRV_SOUND_ROUTE(3, "right", 0.40)
 
-	MDRV_SOUND_ADD_TAG("5c68", RF5C68, 8000000)
+	MDRV_SOUND_ADD("5c68", RF5C68, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
@@ -1168,7 +1168,7 @@ static MACHINE_DRIVER_START( shdancbl )
 	MDRV_CPU_IO_MAP(shdancbl_sound_readport,shdancbl_sound_writeport)
 	MDRV_SOUND_REMOVE("5c68")
 
-	MDRV_SOUND_ADD_TAG("5205", MSM5205, 200000)
+	MDRV_SOUND_ADD("5205", MSM5205, 200000)
 	MDRV_SOUND_CONFIG(shdancbl_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)

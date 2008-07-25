@@ -167,7 +167,7 @@ ROM_START(electron)
 ROM_END
 
 static MACHINE_DRIVER_START( electron )
-	MDRV_CPU_ADD_TAG( "main", M6502, 2000000 )
+	MDRV_CPU_ADD( "main", M6502, 2000000 )
 	MDRV_CPU_PROGRAM_MAP( electron_mem, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(electron_scanline_interrupt, 312) /* scanline interrupt */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -186,7 +186,7 @@ static MACHINE_DRIVER_START( electron )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD_TAG( "beep", BEEP, 0 )
+	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_DRIVER_END
 

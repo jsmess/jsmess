@@ -150,7 +150,7 @@ static const struct t11_setup t11_data =
 /* Machine driver */
 static MACHINE_DRIVER_START( bk0010 )
     /* basic machine hardware */
-    MDRV_CPU_ADD_TAG("main", T11, 3000000)
+    MDRV_CPU_ADD("main", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)
     MDRV_CPU_PROGRAM_MAP(bk0010_mem, 0)
     MDRV_MACHINE_RESET( bk0010 )
@@ -169,13 +169,13 @@ static MACHINE_DRIVER_START( bk0010 )
     MDRV_VIDEO_UPDATE(bk0010)
 
  	MDRV_SPEAKER_STANDARD_MONO("mono")
-   	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+   	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bk0010fd )
     /* basic machine hardware */
-    MDRV_CPU_ADD_TAG("main", T11, 3000000)
+    MDRV_CPU_ADD("main", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)
     MDRV_CPU_PROGRAM_MAP(bk0010fd_mem, 0)
     MDRV_MACHINE_RESET( bk0010 )
@@ -194,7 +194,7 @@ static MACHINE_DRIVER_START( bk0010fd )
     MDRV_VIDEO_UPDATE(bk0010)
 
  	MDRV_SPEAKER_STANDARD_MONO("mono")
-   	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+   	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

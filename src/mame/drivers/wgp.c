@@ -547,12 +547,12 @@ static WRITE16_HANDLER( rotate_port_w )
 static READ16_HANDLER( wgp_adinput_r )
 {
 	int steer = 0x40;
-	int fake = input_port_read_safe(machine, FAKE_PORT_TAG,0x00);
+	int fake = input_port_read_safe(machine, FAKE_PORT_TAG, 0x00);
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* Reduce span to 0x80 */
-		steer = (input_port_read_safe(machine, STEER_PORT_TAG,0x00) * 0x80) / 0x100;
+		steer = (input_port_read_safe(machine, STEER_PORT_TAG, 0x00) * 0x80) / 0x100;
 	}
 	else	/* Digital steer */
 	{
@@ -597,7 +597,7 @@ static READ16_HANDLER( wgp_adinput_r )
 		}
 
 		case 0x05:
-			return input_port_read_safe(machine, UNKNOWN_PORT_TAG,0x00);	/* unknown */
+			return input_port_read_safe(machine, UNKNOWN_PORT_TAG, 0x00);	/* unknown */
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",activecpu_get_pc(),offset);
@@ -950,15 +950,14 @@ static MACHINE_START( wgp )
 static MACHINE_DRIVER_START( wgp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4 MHz ??? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 16000000/4)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
 
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", wgp_cpub_interrupt)
 
@@ -983,7 +982,7 @@ static MACHINE_DRIVER_START( wgp )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 16000000/2)
+	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)

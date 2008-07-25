@@ -20,8 +20,8 @@ struct _gameplan_state
 {
 	/* machine state */
 	UINT8   current_port;
-	UINT8   audio_cmd;
 	UINT8  *trvquest_question;
+	const device_config *riot;
 
 	/* video state */
 	UINT8  *videoram;

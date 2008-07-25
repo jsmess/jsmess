@@ -846,17 +846,17 @@ static MACHINE_DRIVER_START( newbrain )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_16MHz/8)
+	MDRV_CPU_ADD("main", Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", newbrain_interrupt)
 
-	MDRV_CPU_ADD_TAG("cop", COP420, XTAL_16MHz/8)
+	MDRV_CPU_ADD("cop", COP420, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
 
-	MDRV_CPU_ADD_TAG("fdc", Z80, XTAL_4MHz)
+	MDRV_CPU_ADD("fdc", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(newbrain_fdc_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_fdc_io_map, 0)
 

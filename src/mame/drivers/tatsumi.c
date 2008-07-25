@@ -833,17 +833,17 @@ static INTERRUPT_GEN( roundup5_interrupt )
 static MACHINE_DRIVER_START( apache3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD("main", V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(apache3_v30_map,0)
 	MDRV_CPU_VBLANK_INT("main", roundup5_interrupt)
 
-	MDRV_CPU_ADD(M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD("sub", M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(apache3_68000_map,0)
 
-	MDRV_CPU_ADD(V20, 8000000) //???
+	MDRV_CPU_ADD("audio", V20, 8000000) //???
 	MDRV_CPU_PROGRAM_MAP(apache3_v20_map,0)
 
-	MDRV_CPU_ADD(Z80, 8000000) //???
+	MDRV_CPU_ADD("sub2", Z80, 8000000) //???
 	MDRV_CPU_PROGRAM_MAP(apache3_z80_map,0)
 
 	MDRV_INTERLEAVE(100)
@@ -865,12 +865,12 @@ static MACHINE_DRIVER_START( apache3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/4/2)
+	MDRV_SOUND_ADD("oki", OKIM6295, 16000000/4/2)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
@@ -879,14 +879,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( roundup5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD("main", V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(roundup5_v30_map,0)
 	MDRV_CPU_VBLANK_INT("main", roundup5_interrupt)
 
-	MDRV_CPU_ADD(M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD("sub", M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(roundup5_68000_map,0)
 
-	MDRV_CPU_ADD(Z80, 4000000) //???
+	MDRV_CPU_ADD("audio", Z80, 4000000) //???
 	MDRV_CPU_PROGRAM_MAP(roundup5_z80_map,0)
 
 	MDRV_INTERLEAVE(100)
@@ -908,12 +908,12 @@ static MACHINE_DRIVER_START( roundup5 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/4/2)
+	MDRV_SOUND_ADD("oki", OKIM6295, 16000000/4/2)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
@@ -922,15 +922,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cyclwarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
+	MDRV_CPU_ADD("main", M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000a_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
+	MDRV_CPU_ADD("sub", M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000b_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80, 16000000 / 4) /* Confirmed */
+	MDRV_CPU_ADD("audio", Z80, 16000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
 
 	MDRV_INTERLEAVE(200)
@@ -952,12 +952,12 @@ static MACHINE_DRIVER_START( cyclwarr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/8)
+	MDRV_SOUND_ADD("oki", OKIM6295, 16000000/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
@@ -966,15 +966,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bigfight )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
+	MDRV_CPU_ADD("main", M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(bigfight_68000a_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
+	MDRV_CPU_ADD("sub", M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(bigfight_68000b_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80, 16000000 / 4) /* Confirmed */
+	MDRV_CPU_ADD("audio", Z80, 16000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
 
 	MDRV_INTERLEAVE(200)
@@ -996,12 +996,12 @@ static MACHINE_DRIVER_START( bigfight )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/8/2)    // Measured value of 2MHz seems too fast
+	MDRV_SOUND_ADD("oki", OKIM6295, 16000000/8/2)    // Measured value of 2MHz seems too fast
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)

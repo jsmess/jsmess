@@ -19,7 +19,7 @@ int osd_keyboard_disabled(void)
 	return 0;
 }
 
-void osd_wait_for_debugger(void)
+void osd_wait_for_debugger(running_machine *machine, int firststop)
 {
 }
 

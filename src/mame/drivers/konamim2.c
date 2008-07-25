@@ -283,7 +283,7 @@ static READ64_HANDLER(unk2_r)
 }
 #endif
 
-static UINT64 unk3 = -1;
+static UINT64 unk3;
 static READ64_HANDLER(unk3_r)
 {
 	//return U64(0xffffffffffffffff);
@@ -1133,12 +1133,12 @@ static INTERRUPT_GEN(m2)
 static MACHINE_DRIVER_START( m2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC602, 33000000)	/* actually PPC602, 66MHz */
+	MDRV_CPU_ADD("main", PPC602, 33000000)	/* actually PPC602, 66MHz */
 	MDRV_CPU_CONFIG(ppc602_config)
 	MDRV_CPU_PROGRAM_MAP(m2_main, 0)
 	MDRV_CPU_VBLANK_INT("main", m2)
 
-	MDRV_CPU_ADD(PPC602, 33000000)	/* actually PPC602, 66MHz */
+	MDRV_CPU_ADD("sub", PPC602, 33000000)	/* actually PPC602, 66MHz */
 	MDRV_CPU_CONFIG(ppc602_config)
 	MDRV_CPU_PROGRAM_MAP(m2_main, 0)
 
@@ -1223,6 +1223,8 @@ ROM_END
 
 static DRIVER_INIT( m2 )
 {
+	unk3 = U64(0xffffffffffffffff);
+	unk20004 = 0;
 	cde_init();
 }
 

@@ -720,7 +720,7 @@ static const SC61860_CONFIG config={
 
 static MACHINE_DRIVER_START( pc1401 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SC61860, 192000)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", SC61860, 192000)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(pc1401_mem, 0)
 	MDRV_CPU_CONFIG(config)
 
@@ -750,7 +750,7 @@ static MACHINE_DRIVER_START( pc1401 )
 	MDRV_VIDEO_UPDATE( pc1401 )
 
 	/* sound hardware */
-	/*MDRV_SOUND_ADD_TAG("dac", DAC, pocketc_sound_interface)*/
+	/*MDRV_SOUND_ADD("dac", DAC, pocketc_sound_interface)*/
 MACHINE_DRIVER_END
 
 

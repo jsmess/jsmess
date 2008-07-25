@@ -625,12 +625,12 @@ static void snd_irq(running_machine *machine, int num)
 static MACHINE_DRIVER_START( m63 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
+	MDRV_CPU_ADD("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(m63_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* audio CPU */
-	MDRV_CPU_ADD_TAG("soundcpu",I8039,XTAL_12MHz/4)	/* ????? */
+	MDRV_CPU_ADD("soundcpu",I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60)
@@ -654,10 +654,10 @@ static MACHINE_DRIVER_START( m63 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono") /* ????? */
 
-	MDRV_SOUND_ADD(AY8910, 3579545/4)
+	MDRV_SOUND_ADD("ay1", AY8910, 3579545/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(AY8910, 3579545/4) /* ????? */
+	MDRV_SOUND_ADD("ay2", AY8910, 3579545/4) /* ????? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
@@ -670,12 +670,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fghtbskt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/4)     /* 3 MHz */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(fghtbskt_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I8039,XTAL_12MHz/4)	/* ????? */
+	MDRV_CPU_ADD("audio", I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60/2)
@@ -698,10 +698,10 @@ static MACHINE_DRIVER_START( fghtbskt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 12000000/4/2)
+	MDRV_SOUND_ADD("ay", AY8910, 12000000/4/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(fghtbskt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

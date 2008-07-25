@@ -297,12 +297,11 @@ static const struct K053260_interface k053260_interface =
 static MACHINE_DRIVER_START( parodius )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)		/* 053248 */
+	MDRV_CPU_ADD("main", KONAMI, 3000000)		/* 053248 */
 	MDRV_CPU_PROGRAM_MAP(parodius_readmem,parodius_writemem)
 	MDRV_CPU_VBLANK_INT("main", parodius_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(parodius_readmem_sound,parodius_writemem_sound)
 								/* NMIs are triggered by the 053260 */
 
@@ -326,11 +325,11 @@ static MACHINE_DRIVER_START( parodius )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(K053260, 3579545)
+	MDRV_SOUND_ADD("konami", K053260, 3579545)
 	MDRV_SOUND_CONFIG(k053260_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.70)
 	MDRV_SOUND_ROUTE(1, "right", 0.70)

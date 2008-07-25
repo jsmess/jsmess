@@ -354,7 +354,7 @@ static const struct Speaker_interface speaker_interface =
 
 static MACHINE_DRIVER_START( level1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 1796000)        /* 1.796 Mhz */
+	MDRV_CPU_ADD("main", Z80, 1796000)        /* 1.796 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mem_level1, 0)
 	MDRV_CPU_IO_MAP(io_level1, 0)
 	MDRV_CPU_VBLANK_INT("main", trs80_frame_interrupt)
@@ -379,7 +379,7 @@ static MACHINE_DRIVER_START( level1 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_CONFIG(speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

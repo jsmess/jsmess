@@ -808,12 +808,12 @@ static INTERRUPT_GEN( fantland_sound_irq )
 
 static MACHINE_DRIVER_START( fantland )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8086, 8000000)        // ?
+	MDRV_CPU_ADD("main", I8086, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I8088, 8000000)        // ?
+	MDRV_CPU_ADD("audio", I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_sound_map, 0)
 	MDRV_CPU_IO_MAP(fantland_sound_iomap, 0)
 	MDRV_CPU_PERIODIC_INT(fantland_sound_irq, 8000)
@@ -839,11 +839,11 @@ static MACHINE_DRIVER_START( fantland )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3000000)
+	MDRV_SOUND_ADD("ym", YM2151, 3000000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.35)
 	MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -860,12 +860,12 @@ static const struct YM2151interface galaxygn_ym2151_interface =
 
 static MACHINE_DRIVER_START( galaxygn )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8088, 8000000)        // ?
+	MDRV_CPU_ADD("main", I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(galaxygn_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I8088, 8000000)        // ?
+	MDRV_CPU_ADD("audio", I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_sound_map, 0)
 	MDRV_CPU_IO_MAP(fantland_sound_iomap, 0)
 	// IRQ by YM2151, NMI when soundlatch is written
@@ -888,7 +888,7 @@ static MACHINE_DRIVER_START( galaxygn )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3000000)
+	MDRV_SOUND_ADD("ym", YM2151, 3000000)
 	MDRV_SOUND_CONFIG(galaxygn_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -914,12 +914,12 @@ static MACHINE_RESET( borntofi )
 
 static MACHINE_DRIVER_START( borntofi )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
+	MDRV_CPU_ADD("main", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
 	MDRV_CPU_PROGRAM_MAP(borntofi_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
+	MDRV_CPU_ADD("audio", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	MDRV_CPU_PROGRAM_MAP(borntofi_sound_map, 0)
 
 	MDRV_MACHINE_RESET(borntofi)
@@ -940,10 +940,10 @@ static MACHINE_DRIVER_START( borntofi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD(MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD(MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD(MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm1", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm2", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm3", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm4", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -960,12 +960,12 @@ static const struct YM3526interface wheelrun_ym3526_interface =
 
 static MACHINE_DRIVER_START( wheelrun )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V20, XTAL_18MHz/2)		// D701080C-8 (V20)
+	MDRV_CPU_ADD("main", V20, XTAL_18MHz/2)		// D701080C-8 (V20)
 	MDRV_CPU_PROGRAM_MAP(wheelrun_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(Z80, XTAL_18MHz/2)		// Z8400BB1 (Z80B)
+	MDRV_CPU_ADD("audio", Z80, XTAL_18MHz/2)		// Z8400BB1 (Z80B)
 	MDRV_CPU_PROGRAM_MAP(wheelrun_sound_map, 0)
 	// IRQ by YM3526, NMI when soundlatch is written
 
@@ -987,7 +987,7 @@ static MACHINE_DRIVER_START( wheelrun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3526, XTAL_14MHz/4)
+	MDRV_SOUND_ADD("ym", YM3526, XTAL_14MHz/4)
 	MDRV_SOUND_CONFIG(wheelrun_ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -340,7 +340,7 @@ static const struct SN76477interface sn76477_intf =
 static MACHINE_DRIVER_START( malzak )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", S2650, 3800000/4)
+	MDRV_CPU_ADD("main", S2650, 3800000/4)
 	MDRV_CPU_PROGRAM_MAP(malzak_map,0)
 	MDRV_CPU_IO_MAP(malzak_io_map,0)
 
@@ -364,11 +364,11 @@ static MACHINE_DRIVER_START( malzak )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76477, 0)
+	MDRV_SOUND_ADD("sn1", SN76477, 0)
 	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(SN76477, 0)
+	MDRV_SOUND_ADD("sn2", SN76477, 0)
 	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

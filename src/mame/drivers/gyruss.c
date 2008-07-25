@@ -517,21 +517,19 @@ DISCRETE_SOUND_END
 static MACHINE_DRIVER_START( gyruss )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(main_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz ??? */
+	MDRV_CPU_ADD("syb", M6809, 2000000)        /* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_cpu1_map,0)
 	MDRV_CPU_IO_MAP(audio_cpu1_io_map,0)
 
-	MDRV_CPU_ADD(I8039,8000000)
-	/* audio CPU */	/* 8MHz crystal */
+	MDRV_CPU_ADD("audio2", I8039,8000000)	/* 8MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(audio_cpu2_map,0)
 	MDRV_CPU_IO_MAP(audio_cpu2_io_map,0)
 
@@ -555,37 +553,37 @@ static MACHINE_DRIVER_START( gyruss )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
 	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
 	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
 	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
 	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay3", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_3)
 	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 6)
 	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 7)
 	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 8)
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay4", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_4)
 	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 9)
 	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 10)
 	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 11)
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD("ay5", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_5)
 	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 12)
 	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 13)
 	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 14)
 
-	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
+	MDRV_SOUND_ADD("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(gyruss_sound)
 	MDRV_SOUND_ROUTE(0, "right", 1.0)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

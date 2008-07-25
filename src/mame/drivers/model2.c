@@ -77,6 +77,7 @@ static UINT32 model2_timervals[4], model2_timerorig[4];
 static int      model2_timerrun[4];
 static emu_timer *model2_timers[4];
 static int model2_ctrlmode;
+static int analog_channel;
 
 static UINT32 *tgp_program;
 
@@ -192,6 +193,8 @@ static UINT32 copro_fifoout_pop(void)
 
 	copro_fifoout_num--;
 
+//  logerror("COPRO FIFOOUT POP %08X, %f, %d\n", r, *(float*)&r,copro_fifoout_num);
+
 	// set SHARC flag 1: 0 if space available, 1 if FIFO full
 	if (dsp_type == DSP_TYPE_SHARC)
 	{
@@ -221,7 +224,7 @@ static void copro_fifoout_push(UINT32 data)
 		return;
 	}
 
-	//mame_printf_debug("COPRO FIFOOUT %08X, %f\n", data, *(float*)&data);
+//  logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,copro_fifoout_num);
 
 	copro_fifoout_data[copro_fifoout_wpos++] = data;
 	if (copro_fifoout_wpos == COPRO_FIFOOUT_SIZE)
@@ -335,6 +338,7 @@ static MACHINE_RESET(model2_common)
 	model2_geoctl = 0;
 	model2_geocnt = 0;
 	model2_ctrlmode = 0;
+	analog_channel = 0;
 
 	model2_timervals[0] = 0xfffff;
 	model2_timervals[1] = 0xfffff;
@@ -442,7 +446,7 @@ static READ32_HANDLER(ctrl0_r)
 	else
 	{
 		ret &= ~0x00300000;
-		return ret | 0x00100000 | (eeprom_read_bit() << 21);
+		return ret | 0x00d00000 | (eeprom_read_bit() << 21);
 	}
 }
 static READ32_HANDLER(ctrl1_r)
@@ -467,6 +471,24 @@ static READ32_HANDLER(analog_r)
 
 	return input_port_read_safe(machine, "STEER", 0) | input_port_read_safe(machine, "ACCEL", 0)<<16;
 }
+
+static READ32_HANDLER(analog_2b_r)
+{
+	UINT32 iptval=0x00ff;
+	if(analog_channel<4)
+	{
+		static const char *ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
+		iptval=input_port_read_safe(machine, ports[analog_channel], 0);
+		++analog_channel;
+	}
+	return (iptval<<16)|0x0000001a;
+}
+
+static WRITE32_HANDLER(analog_2b_w)
+{
+	analog_channel=(data>>16)&7;
+}
+
 
 static READ32_HANDLER(fifoctl_r)
 {
@@ -494,10 +516,6 @@ static READ32_HANDLER(videoctl_r)
 
 static READ32_HANDLER(copro_prg_r)
 {
-	if ((strcmp(machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(machine->gamedrv->name, "srallyc" ) == 0))
-	{
-		return 8;
-	}
 
 	return 0xffffffff;
 }
@@ -550,15 +568,8 @@ static WRITE32_HANDLER(copro_function_port_w)
 
 static READ32_HANDLER(copro_fifo_r)
 {
-	if ((strcmp(machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(machine->gamedrv->name, "srallyc" ) == 0))
-	{
-		return 8;
-	}
-	else
-	{
-		//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
-		return copro_fifoout_pop();
-	}
+	//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
+	return copro_fifoout_pop();
 }
 
 static WRITE32_HANDLER(copro_fifo_w)
@@ -849,11 +860,11 @@ static READ32_HANDLER(hotd_unk_r)
 	return 0x000c0000;
 }
 
-static READ32_HANDLER(sonic_unk_r)
+/*static READ32_HANDLER(sonic_unk_r)
 {
-	return 0x001a0000;
+    return 0x001a0000;
 }
-
+*/
 static READ32_HANDLER(daytona_unk_r)
 {
 	return 0x00400000;
@@ -1347,8 +1358,7 @@ static ADDRESS_MAP_START( model2a_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ(ctrl10_r)
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ(ctrl14_r)
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ( hotd_unk_r )
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ( sonic_unk_r )
-	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_BASE( &model2_backup2 )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ( analog_2b_r ) AM_WRITE( analog_2b_w )
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE( model2_serial_r, model2_serial_w )
 ADDRESS_MAP_END
 
@@ -1381,7 +1391,7 @@ static ADDRESS_MAP_START( model2b_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ(ctrl10_r)
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ(ctrl14_r)
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ( hotd_unk_r )
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ( sonic_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ( analog_2b_r ) AM_WRITE( analog_2b_w )
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE( model2_serial_r, model2_serial_w )
 ADDRESS_MAP_END
 
@@ -1405,7 +1415,7 @@ static ADDRESS_MAP_START( model2c_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ(ctrl10_r)
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ(ctrl14_r)
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ( hotd_unk_r )
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ( sonic_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ( analog_2b_r ) AM_WRITE( analog_2b_w )
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE( model2_serial_r, model2_serial_w )
 ADDRESS_MAP_END
 
@@ -1501,6 +1511,33 @@ static INPUT_PORTS_START( daytona )
 	PORT_START_TAG("BREAK")	// brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( srallyc)
+	PORT_START_TAG("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) // VR
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x90, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN1")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN2")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("ANA0")	// steer
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START_TAG("ANA1")	// accel
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START_TAG("ANA2")	// brake
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( bel )
 	PORT_START_TAG("IN0")
@@ -1782,20 +1819,21 @@ static const struct mb86233_config tgp_config =
 {
 	copro_fifoin_pop,
 	copro_fifoout_push,
+	REGION_USER5,
 };
 
 
 
 /* original Model 2 */
 static MACHINE_DRIVER_START( model2o )
-	MDRV_CPU_ADD(I960, 25000000)
+	MDRV_CPU_ADD("main", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2o_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("audio", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
 
-	MDRV_CPU_ADD(MB86233, 16000000)
+	MDRV_CPU_ADD("tgp", MB86233, 16000000)
 	MDRV_CPU_CONFIG(tgp_config)
 	MDRV_CPU_PROGRAM_MAP(copro_tgp_map, 0)
 
@@ -1818,16 +1856,16 @@ static MACHINE_DRIVER_START( model2o )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM3438, 8000000)
+	MDRV_SOUND_ADD("ym", YM3438, 8000000)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 
-	MDRV_SOUND_ADD(MULTIPCM, 8000000)
+	MDRV_SOUND_ADD("sega1", MULTIPCM, 8000000)
 	MDRV_SOUND_CONFIG(m1_multipcm_interface_1)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(MULTIPCM, 8000000)
+	MDRV_SOUND_ADD("sega2", MULTIPCM, 8000000)
 	MDRV_SOUND_CONFIG(m1_multipcm_interface_2)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1835,14 +1873,14 @@ MACHINE_DRIVER_END
 
 /* 2A-CRX */
 static MACHINE_DRIVER_START( model2a )
-	MDRV_CPU_ADD(I960, 25000000)
+	MDRV_CPU_ADD("main", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2a_crx_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("audio", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
 
-	MDRV_CPU_ADD(MB86233, 16000000)
+	MDRV_CPU_ADD("tgp", MB86233, 16000000)
 	MDRV_CPU_CONFIG(tgp_config)
 	MDRV_CPU_PROGRAM_MAP(copro_tgp_map, 0)
 
@@ -1865,7 +1903,7 @@ static MACHINE_DRIVER_START( model2a )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(SCSP, 0)
+	MDRV_SOUND_ADD("scsp", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
@@ -1879,18 +1917,18 @@ static const sharc_config sharc_cfg =
 
 /* 2B-CRX */
 static MACHINE_DRIVER_START( model2b )
-	MDRV_CPU_ADD(I960, 25000000)
+	MDRV_CPU_ADD("main", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2b_crx_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("audio", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
 
-	MDRV_CPU_ADD(ADSP21062, 40000000)
+	MDRV_CPU_ADD("dsp", ADSP21062, 40000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(copro_sharc_map, 0)
 
-	//MDRV_CPU_ADD(ADSP21062, 40000000)
+	//MDRV_CPU_ADD("dsp2", ADSP21062, 40000000)
 	//MDRV_CPU_CONFIG(sharc_cfg)
 	//MDRV_CPU_DATA_MAP(geo_sharc_map, 0)
 
@@ -1915,7 +1953,7 @@ static MACHINE_DRIVER_START( model2b )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(SCSP, 0)
+	MDRV_SOUND_ADD("scsp", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
@@ -1923,11 +1961,11 @@ MACHINE_DRIVER_END
 
 /* 2C-CRX */
 static MACHINE_DRIVER_START( model2c )
-	MDRV_CPU_ADD(I960, 25000000)
+	MDRV_CPU_ADD("main", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2c_crx_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
 
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("audio", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
 
 	MDRV_MACHINE_RESET(model2c)
@@ -1949,7 +1987,7 @@ static MACHINE_DRIVER_START( model2c )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(SCSP, 0)
+	MDRV_SOUND_ADD("scsp", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
@@ -1972,8 +2010,8 @@ OPR-14747    /  Linked to 315-5679B
 
 #define MODEL2_CPU_BOARD \
 	ROM_REGION( 0xc0000, REGION_USER5, 0 ) \
-	ROM_LOAD("opr-14742a.45",  0x000000,  0x20000, CRC(90c6b117) SHA1(f46429fffcee17d056f56d5fe035a33f1fd6c27e) ) \
-	ROM_LOAD("opr-14743a.46",  0x020000,  0x20000, CRC(ae7f446b) SHA1(5b9f1fc47caf21e061e930c0d72804e4ec8c7bca) ) \
+	ROM_LOAD32_WORD("opr-14742a.45",  0x000000,  0x20000, CRC(90c6b117) SHA1(f46429fffcee17d056f56d5fe035a33f1fd6c27e) ) \
+	ROM_LOAD32_WORD("opr-14743a.46",  0x000002,  0x20000, CRC(ae7f446b) SHA1(5b9f1fc47caf21e061e930c0d72804e4ec8c7bca) ) \
 	ROM_LOAD("opr-14744.58",   0x040000,  0x20000, CRC(730ea9e0) SHA1(651f1db4089a400d073b19ada299b4b08b08f372) ) \
 	ROM_LOAD("opr-14745.59",   0x060000,  0x20000, CRC(4c934d96) SHA1(e3349ece0e47f684d61ad11bfea4a90602287350) ) \
 	ROM_LOAD("opr-14746.62",   0x080000,  0x20000, CRC(2a266cbd) SHA1(34e047a93459406c22acf4c25089d1a4955f94ca) ) \
@@ -2526,7 +2564,7 @@ ROM_START( vcop2 )
 
 	ROM_REGION( 0x2000000, REGION_USER2, 0 ) // Models
 	ROM_LOAD32_WORD( "mpr-18513.16", 0x000000, 0x200000, CRC(777a3633) SHA1(edc2798c4d88975ce67b54fc0db008e7d24db6ef) )
-	ROM_LOAD32_WORD( "mpr-18510.20", 0x000002, 0x200000, CRC(083f5186) SHA1(0f9d5c6e18bf3ae5d6bc195f513668286aa23478) )
+	ROM_LOAD32_WORD( "mpr-18510.20", 0x000002, 0x200000, CRC(e83de997) SHA1(8a8597aa31609663869e584cc5fad6e4b84f7dbe) )
 
 	ROM_REGION( 0x1000000, REGION_USER3, 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-18511.24", 0x000000, 0x200000, CRC(cae77a4f) SHA1(f21474486f0dc4092cbad4566deea8a952862ab7) )
@@ -3262,6 +3300,45 @@ ROM_START( waverunr )
 	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) // Samples
 	ROM_LOAD("mpr-19295.32", 0x0000000, 0x400000, CRC(b14eeb09) SHA1(2a6d1b14ea3c031cad9905e4b9b6973755689ee1) )
 	ROM_LOAD("mpr-19296.34", 0x0400000, 0x400000, CRC(b4b9faff) SHA1(3a258e0f7c642d043cbab5f94dfe69fac8561e93) )
+ROM_END
+
+/* Rail Chase 2 */
+ROM_START( rchase2 )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // i960 program
+	ROM_LOAD32_WORD("epr-18045a.15", 0x000000, 0x080000, CRC(bfca0314) SHA1(9eb0f2cdab8c10fda9edc0ddc439263af3903cdc) )
+	ROM_LOAD32_WORD("epr-18046a.16", 0x000002, 0x080000, CRC(0b8d3074) SHA1(fee8436399fb97ad5b8357b81e69bd5c27af1dde) )
+	ROM_LOAD32_WORD("epr-18074a.13", 0x100000, 0x080000, CRC(ca4b58df) SHA1(d41cb8efd9fd65eea9e7aefadebfd0a27ef145fb) )
+	ROM_LOAD32_WORD("epr-18075a.14", 0x100002, 0x080000, CRC(b82672e4) SHA1(519fdb5a978b6e82989b9841c6b59819f0d417cb) )
+
+	ROM_REGION32_LE( 0x2000000, REGION_USER1, 0 ) // Data
+	ROM_LOAD32_WORD("mpr-18037.11",    0x0000000, 0x200000, CRC(dea8f896) SHA1(8eb45e46bd14a2ffbdaac47d381a1ea9b9a03ca2) )
+	ROM_LOAD32_WORD("mpr-18038.12",    0x0000002, 0x200000, CRC(441f7709) SHA1(cbfa687839b6cad6a5ace45b44b95c45e4cfab0d) )
+	ROM_LOAD32_WORD("mpr-18039.9",     0x0800000, 0x200000, CRC(b98c6f06) SHA1(dd1ff9c682778de1c6c09e7a5cbc95a8149488c4) )
+	ROM_LOAD32_WORD("mpr-18040.10",    0x0800002, 0x200000, CRC(0d872667) SHA1(33e56486ec6b953341552b6bc21dc66f6f8aaf74) )
+	ROM_LOAD32_WORD("mpr-18041.7",     0x1000000, 0x200000, CRC(e511ab0a) SHA1(c6ea14b3bdefdc59603bd2fc152ac0421fae4d6f) )
+	ROM_LOAD32_WORD("mpr-18042.8",     0x1000002, 0x200000, CRC(e9a04159) SHA1(0204ba86af2707bc9e277cac68dd9ef759189c23) )
+	ROM_LOAD32_WORD("mpr-18043.5",     0x1800000, 0x200000, CRC(ff84dfd6) SHA1(82833bf4cb1f367aea5fec6cffb7023cbbd3c8cb) )
+	ROM_LOAD32_WORD("mpr-18044.6",     0x1800002, 0x200000, CRC(ab9b406d) SHA1(62e95ceea6f71eedbebae59e188aac03e6129e62) )
+
+	ROM_REGION( 0x800000, REGION_USER5, ROMREGION_ERASEFF ) // Coprocessor Data ROM
+	/* empty?? */
+
+	ROM_REGION( 0x2000000, REGION_USER2, 0 ) // Models
+	ROM_LOAD32_WORD("mpr-18031.17", 0x0000000, 0x200000, CRC(25d0deae) SHA1(2d0339dd7eeb2625f78e2fbe4ebdc976967175a4) )
+	ROM_LOAD32_WORD("mpr-18032.21", 0x0000002, 0x200000, CRC(dbae35c2) SHA1(9510104975192a0ef1750251636daff7f089feb9) )
+	ROM_LOAD32_WORD("mpr-18033.18", 0x0800000, 0x200000, CRC(1e75946c) SHA1(7dee991f0c43de9bfe17ae44767f65f12e83c811) )
+	ROM_LOAD32_WORD("mpr-18034.22", 0x0800002, 0x200000, CRC(215235ad) SHA1(48227544209412fca3035e85a00d33ea654dc7b5) )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) // Textures
+	ROM_LOAD32_WORD("mpr-18035.27", 0x000000, 0x200000, CRC(4423f66e) SHA1(c1f8dda4781dea00bd97dbf9ecfbb626dadd2c35) )
+	ROM_LOAD32_WORD("mpr-18036.25", 0x000002, 0x200000, CRC(69221cf5) SHA1(e39644a08aa631dbdcfc7c0dc356e73f6a4412a9) )
+
+	ROM_REGION( 0x100000, REGION_CPU2, 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18047.31", 0x080000,  0x80000, CRC(4c31d459) SHA1(424d5e5a7787d0d4c68aa919ba7d575babfd1ce0) )
+
+	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) // Samples
+	ROM_LOAD("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
+	ROM_LOAD("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
 ROM_END
 
 
@@ -4272,7 +4349,7 @@ GAME( 1994, vcop,            0, model2o, daytona, 0,        ROT0, "Sega", "Virtu
 // Model 2A-CRX (TGPs, SCSP sound board)
 GAME( 1995, manxtt,          0, model2a, model2, 0,       ROT0, "Sega", "Manx TT Superbike (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, motoraid,        0, model2a, model2, 0,       ROT0, "Sega", "Motoraid", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, srallyc,         0, model2a, model2, 0,       ROT0, "Sega", "Sega Rally Championship", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, srallyc,         0, model2a, srallyc,0,       ROT0, "Sega", "Sega Rally Championship", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2,             0, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (ver 2.1)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2b,          vf2, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2a,          vf2, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
@@ -4305,6 +4382,7 @@ GAME( 1998, dynmcopb, dynamcop, model2b, model2, genprot, ROT0, "Sega", "Dynamit
 GAME( 1998, dyndek2b, dynamcop, model2b, model2, genprot, ROT0, "Sega", "Dynamite Deka 2 (Japan, Model 2B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkids,         0, model2b, model2, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2B) (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 199?, waverunr,        0, model2b, model2, 0,       ROT0, "Sega", "Wave Runner (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 199?, rchase2,         0, model2b, model2, 0,       ROT0, "Sega", "Rail Chase 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 GAME( 1996, skisuprg,        0, model2c, model2, 0, ROT0, "Sega", "Sega Ski Super G", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

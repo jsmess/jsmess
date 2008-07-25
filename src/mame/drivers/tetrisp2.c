@@ -1250,7 +1250,7 @@ static DRIVER_INIT( rockn3 )
 static MACHINE_DRIVER_START( tetrisp2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(tetrisp2_readmem,tetrisp2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1273,7 +1273,7 @@ static MACHINE_DRIVER_START( tetrisp2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1283,7 +1283,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nndmseal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_12MHz)
+	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(nndmseal_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1306,7 +1306,7 @@ static MACHINE_DRIVER_START( nndmseal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_2MHz)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_2MHz)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1315,7 +1315,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rockn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rockn1_readmem,rockn1_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1338,7 +1338,7 @@ static MACHINE_DRIVER_START( rockn )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1348,7 +1348,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rockn2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rockn2_readmem,rockn2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1371,7 +1371,7 @@ static MACHINE_DRIVER_START( rockn2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1381,11 +1381,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rocknms )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rocknms_main_readmem,rocknms_main_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq2_line_hold)
 
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("sub", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rocknms_sub_readmem,rocknms_sub_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq2_line_hold)
 
@@ -1418,7 +1418,7 @@ static MACHINE_DRIVER_START( rocknms )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

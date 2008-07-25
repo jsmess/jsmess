@@ -484,11 +484,11 @@ static INTERRUPT_GEN( ddragon3_cpu_interrupt ) { /* 6:0x177e - 5:0x176a */
 
 static MACHINE_DRIVER_START( ddragon3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000) // Guess
+	MDRV_CPU_ADD("main", M68000, 12000000) // Guess
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_VBLANK_INT_HACK(ddragon3_cpu_interrupt, 2)
 
-	MDRV_CPU_ADD_TAG("audio", Z80, 3579545) // Guess (confirmed on bootleg)
+	MDRV_CPU_ADD("audio", Z80, 3579545) // Guess (confirmed on bootleg)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound, writemem_sound)
 
@@ -509,12 +509,12 @@ static MACHINE_DRIVER_START( ddragon3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("ym2151", YM2151, 3579545)	/* music */
+	MDRV_SOUND_ADD("ym2151", YM2151, 3579545)	/* music */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
-	MDRV_SOUND_ADD_TAG("oki", OKIM6295, 1000000)	/* sound fx */
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)	/* sound fx */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.50)

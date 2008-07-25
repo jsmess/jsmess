@@ -335,16 +335,14 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( junofrst )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 1500000)			/* 1.5 MHz ??? */
+	MDRV_CPU_ADD("main", M6809, 1500000)			/* 1.5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318000/8)
-	/* audio CPU */	/* 1.78975 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
-	MDRV_CPU_ADD(I8039,8000000)
-	/* audio CPU */	/* 8MHz crystal */
+	MDRV_CPU_ADD("mcu", I8039,8000000)	/* 8MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 
@@ -362,20 +360,20 @@ static MACHINE_DRIVER_START( junofrst )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 14318000/8)
+	MDRV_SOUND_ADD("ay", AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(0, "filter.0.0", 0.30)
 	MDRV_SOUND_ROUTE(1, "filter.0.1", 0.30)
 	MDRV_SOUND_ROUTE(2, "filter.0.2", 0.30)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD_TAG("filter.0.0", FILTER_RC, 0)
+	MDRV_SOUND_ADD("filter.0.0", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.0.1", FILTER_RC, 0)
+	MDRV_SOUND_ADD("filter.0.1", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.0.2", FILTER_RC, 0)
+	MDRV_SOUND_ADD("filter.0.2", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

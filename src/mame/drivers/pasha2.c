@@ -387,7 +387,7 @@ static VIDEO_UPDATE( pasha2 )
 }
 
 static MACHINE_DRIVER_START( pasha2 )
-	MDRV_CPU_ADD(E116XT, 20000000*4)		/* 4x internal multiplier */
+	MDRV_CPU_ADD("main", E116XT, 20000000*4)		/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(pasha2_map,0)
 	MDRV_CPU_IO_MAP(pasha2_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -410,11 +410,11 @@ static MACHINE_DRIVER_START( pasha2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

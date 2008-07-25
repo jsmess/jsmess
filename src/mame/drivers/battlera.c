@@ -245,12 +245,12 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( battlera )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(H6280,21477200/3)
+	MDRV_CPU_ADD("main", H6280,21477200/3)
 	MDRV_CPU_PROGRAM_MAP(battlera_map,0)
 	MDRV_CPU_IO_MAP(battlera_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
 
-	MDRV_CPU_ADD(H6280,21477200/3)
+	MDRV_CPU_ADD("audio", H6280,21477200/3)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
@@ -269,16 +269,16 @@ static MACHINE_DRIVER_START( battlera )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 12000000 / 8)
+	MDRV_SOUND_ADD("ym", YM2203, 12000000 / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.85)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.85)
 
-	MDRV_SOUND_ADD(C6280, 21477270/6)
+	MDRV_SOUND_ADD("huc", C6280, 21477270/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 MACHINE_DRIVER_END

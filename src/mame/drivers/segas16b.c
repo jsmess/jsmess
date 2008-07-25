@@ -1141,7 +1141,7 @@ static READ16_HANDLER( standard_io_r )
 		}
 
 		case 0x2000/2:
-			return input_port_read(machine, (offset & 1) ? "DSW2" : "DSW1");
+			return input_port_read(machine, (offset & 1) ? "DSW1" : "DSW2");
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(machine,0,mem_mask);
@@ -3243,11 +3243,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( system16b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK_10MHz)
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK_10MHz)
 	MDRV_CPU_PROGRAM_MAP(system16b_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK_10MHz/2)
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK_10MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -3268,10 +3268,10 @@ static MACHINE_DRIVER_START( system16b )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2151", YM2151, MASTER_CLOCK_8MHz/2)
+	MDRV_SOUND_ADD("2151", YM2151, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
-	MDRV_SOUND_ADD_TAG("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_DRIVER_END
@@ -3282,7 +3282,7 @@ static MACHINE_DRIVER_START( system16b_8751 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_VBLANK_INT("main", i8751_main_cpu_vblank)
 
-	MDRV_CPU_ADD_TAG("mcu", I8751, MASTER_CLOCK_8MHz)
+	MDRV_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_DATA_MAP(mcu_data_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)

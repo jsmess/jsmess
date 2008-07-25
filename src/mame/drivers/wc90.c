@@ -320,16 +320,15 @@ static const struct YM2608interface ym2608_interface =
 static MACHINE_DRIVER_START( wc90 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
+	MDRV_CPU_ADD("main", Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90_map_1,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
+	MDRV_CPU_ADD("sub", Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90_map_2,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	/* audio CPU */	/* 4 MHz ???? */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	/* NMIs are triggered by the main CPU */
 
@@ -350,7 +349,7 @@ static MACHINE_DRIVER_START( wc90 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2608, 8000000)
+	MDRV_SOUND_ADD("ym", YM2608, 8000000)
 	MDRV_SOUND_CONFIG(ym2608_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)

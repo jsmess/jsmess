@@ -7,6 +7,7 @@
 #ifndef A7800_H_
 #define A7800_H_
 
+#include "machine/6532riot.h"
 
 /*----------- defined in video/a7800.c -----------*/
 
@@ -18,6 +19,9 @@ WRITE8_HANDLER ( a7800_MARIA_w );
 
 
 /*----------- defined in machine/a7800.c -----------*/
+
+extern const riot6532_interface r6532_interface_ntsc;
+extern const riot6532_interface r6532_interface_pal;
 
 extern int a7800_lines;
 extern int a7800_ispal;

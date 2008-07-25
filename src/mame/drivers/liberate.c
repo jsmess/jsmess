@@ -520,12 +520,12 @@ static INTERRUPT_GEN( deco16_interrupt )
 static MACHINE_DRIVER_START( liberate )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",DECO16, 2000000)
+	MDRV_CPU_ADD("main",DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
 	MDRV_CPU_IO_MAP(deco16_readport,deco16_writeport)
 	MDRV_CPU_VBLANK_INT("main", deco16_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound",M6502, 1500000)
+	MDRV_CPU_ADD("sound",M6502, 1500000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
@@ -550,17 +550,17 @@ static MACHINE_DRIVER_START( liberate )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( liberatb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 2000000)
+	MDRV_CPU_ADD("main", M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(liberatb_readmem,liberatb_writemem)
 	MDRV_CPU_VBLANK_INT("main", deco16_interrupt)
 
@@ -578,7 +578,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( prosoccr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(DECO16, 3000000)
+	MDRV_CPU_ADD("main", DECO16, 3000000)
 	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
 	MDRV_CPU_IO_MAP(deco16_readport,deco16_writeport)
 
@@ -592,12 +592,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( prosport )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(DECO16, 2000000)
+	MDRV_CPU_ADD("main", DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(prosport_readmem,prosport_writemem)
 	MDRV_CPU_IO_MAP(deco16_readport,deco16_writeport)
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
@@ -620,10 +619,10 @@ static MACHINE_DRIVER_START( prosport )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

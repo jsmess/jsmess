@@ -148,7 +148,7 @@ static PALETTE_INIT( osborne1 ) {
 }
 
 static MACHINE_DRIVER_START( osborne1 )
-	MDRV_CPU_ADD_TAG( "main", Z80, MAIN_CLOCK/4 )
+	MDRV_CPU_ADD( "main", Z80, MAIN_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP( osborne1_mem, 0 )
 	MDRV_CPU_IO_MAP( osborne1_io, 0 )
 	MDRV_CPU_CONFIG( osborne1_daisy_chain )
@@ -165,7 +165,7 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_PALETTE_INIT( osborne1 )
 
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD_TAG( "beep", BEEP, 0 )
+	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_DRIVER_END
 

@@ -684,11 +684,11 @@ static const tms34010_config tms_config_coolpool =
 static MACHINE_DRIVER_START( amerdart )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, 40000000)
+	MDRV_CPU_ADD("main", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config_amerdart)
 	MDRV_CPU_PROGRAM_MAP(amerdart_map,0)
 
-	MDRV_CPU_ADD(TMS32010, 15000000/2)
+	MDRV_CPU_ADD("dsp", TMS32010, 15000000/2)
 	MDRV_CPU_FLAGS(CPU_DISABLE)
 	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_map,0)
 
@@ -705,7 +705,7 @@ static MACHINE_DRIVER_START( amerdart )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -713,11 +713,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coolpool )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000)
+	MDRV_CPU_ADD("main", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config_coolpool)
 	MDRV_CPU_PROGRAM_MAP(coolpool_map,0)
 
-	MDRV_CPU_ADD(TMS32026,40000000)
+	MDRV_CPU_ADD("dsp", TMS32026,40000000)
 	MDRV_CPU_PROGRAM_MAP(dsp_program_map,0)
 	MDRV_CPU_IO_MAP(dsp_io_map,0)
 
@@ -734,7 +734,7 @@ static MACHINE_DRIVER_START( coolpool )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

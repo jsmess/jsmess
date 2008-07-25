@@ -361,18 +361,18 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( mlanding )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000 )		/* 12 MHz ??? (guess) */
+	MDRV_CPU_ADD("main", M68000, 12000000 )		/* 12 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000 )		/* 4 MHz ??? (guess) */
+	MDRV_CPU_ADD("z80", Z80, 4000000 )		/* 4 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_z80_mem,0)
 
-	MDRV_CPU_ADD(M68000, 12000000 )		/* 12 MHz ??? (guess) */
+	MDRV_CPU_ADD("sub", M68000, 12000000 )		/* 12 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_sub_mem,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq6_line_hold,7)
 
-	MDRV_CPU_ADD(Z80, 4000000 )		/* 4 MHz ??? (guess) */
+	MDRV_CPU_ADD("z80sub", Z80, 4000000 )		/* 4 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_z80_sub_mem,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -393,12 +393,12 @@ static MACHINE_DRIVER_START( mlanding )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

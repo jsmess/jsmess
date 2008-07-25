@@ -625,7 +625,7 @@ static INTERRUPT_GEN( sord_interrupt )
 
 static MACHINE_DRIVER_START( sord_m5 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3800000)
+	MDRV_CPU_ADD("main", Z80, 3800000)
 	MDRV_CPU_PROGRAM_MAP(sord_m5_mem, 0)
 	MDRV_CPU_IO_MAP(sord_m5_io, 0)
 	MDRV_CPU_VBLANK_INT("main", sord_interrupt)
@@ -646,7 +646,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
@@ -660,7 +660,7 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_CPU_REPLACE("main", Z80, 3800000)
 	MDRV_CPU_IO_MAP(srdm5fd5_io, 0)
 
-	MDRV_CPU_ADD_TAG("floppy", Z80, 3800000)
+	MDRV_CPU_ADD("floppy", Z80, 3800000)
 	MDRV_CPU_PROGRAM_MAP(sord_fd5_mem, 0)
 	MDRV_CPU_IO_MAP(readport_sord_fd5,writeport_sord_fd5)
 

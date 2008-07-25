@@ -200,14 +200,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mouser )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ? */
+	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", mouser_nmi_interrupt) /* NMI is masked externally */
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* ??? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
 	MDRV_CPU_IO_MAP(readport2,writeport2)
-	/* audio CPU */
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4) /* ??? This controls the sound tempo */
 
 	/* video hardware */
@@ -227,10 +226,10 @@ static MACHINE_DRIVER_START( mouser )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 4000000/2)
+	MDRV_SOUND_ADD("ay1", AY8910, 4000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(AY8910, 4000000/2)
+	MDRV_SOUND_ADD("ay2", AY8910, 4000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

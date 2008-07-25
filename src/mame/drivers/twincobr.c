@@ -648,15 +648,15 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( twincobr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,28000000/4)			/* 7.0MHz - Main board Crystal is 28MHz */
+	MDRV_CPU_ADD("main", M68000,28000000/4)			/* 7.0MHz - Main board Crystal is 28MHz */
 	MDRV_CPU_PROGRAM_MAP(main_program_map, 0)
 	MDRV_CPU_VBLANK_INT("main", twincobr_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)			/* 3.5MHz */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)			/* 3.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_program_map, 0)
 	MDRV_CPU_IO_MAP(sound_io_map, 0)
 
-	MDRV_CPU_ADD(TMS32010,28000000/2)	/* 14MHz CLKin */
+	MDRV_CPU_ADD("dsp", TMS32010,28000000/2)	/* 14MHz CLKin */
 	MDRV_CPU_PROGRAM_MAP(DSP_program_map, 0)
 	/* Data Map is internal to the CPU */
 	MDRV_CPU_IO_MAP(DSP_io_map, 0)
@@ -685,7 +685,7 @@ static MACHINE_DRIVER_START( twincobr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, 28000000/8)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

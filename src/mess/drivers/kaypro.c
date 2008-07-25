@@ -236,7 +236,7 @@ static PALETTE_INIT( kaypro )
 
 static MACHINE_DRIVER_START( kaypro )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)        /* 4 Mhz */
+	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 Mhz */
 	MDRV_CPU_PROGRAM_MAP(kaypro_mem, 0)
 	MDRV_CPU_IO_MAP(kaypro_io, 0)
 	MDRV_CPU_VBLANK_INT("main", kaypro_interrupt)

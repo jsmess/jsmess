@@ -916,15 +916,15 @@ static const struct tms32031_config tms_config =
 static MACHINE_DRIVER_START( gaelco3d )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 15000000)
+	MDRV_CPU_ADD("main", M68000, 15000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_gen)
 
-	MDRV_CPU_ADD_TAG("tms", TMS32031, 60000000)
+	MDRV_CPU_ADD("tms", TMS32031, 60000000)
 	MDRV_CPU_PROGRAM_MAP(tms_map,0)
 	MDRV_CPU_CONFIG(tms_config)
 
-	MDRV_CPU_ADD_TAG("adsp", ADSP2115, 16000000)
+	MDRV_CPU_ADD("adsp", ADSP2115, 16000000)
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map,0)
 	MDRV_CPU_DATA_MAP(adsp_data_map, 0)
 
@@ -950,16 +950,16 @@ static MACHINE_DRIVER_START( gaelco3d )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DMADAC, 0)
+	MDRV_SOUND_ADD("dac1", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: front mono */
 
-	MDRV_SOUND_ADD(DMADAC, 0)
+	MDRV_SOUND_ADD("dac2", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: left rear */
 
-	MDRV_SOUND_ADD(DMADAC, 0)
+	MDRV_SOUND_ADD("dac3", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: right rear */
 
-	MDRV_SOUND_ADD(DMADAC, 0)
+	MDRV_SOUND_ADD("dac4", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: seat speaker */
 MACHINE_DRIVER_END
 

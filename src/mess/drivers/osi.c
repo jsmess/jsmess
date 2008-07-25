@@ -365,7 +365,7 @@ static MACHINE_START( uk101 )
 
 static MACHINE_DRIVER_START( sb2m600 )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M6502, X1/4) // .98304 MHz
+	MDRV_CPU_ADD("main", M6502, X1/4) // .98304 MHz
 	MDRV_CPU_PROGRAM_MAP(sb2m600_mem, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(X1/256/256) // 60 Hz
@@ -385,7 +385,7 @@ static MACHINE_DRIVER_START( sb2m600 )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(sb2m600_discrete_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
@@ -394,7 +394,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( uk101 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, UK101_X1/8) /* 1 MHz */
+	MDRV_CPU_ADD("main", M6502, UK101_X1/8) /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(uk101_mem, 0)
 
 	MDRV_MACHINE_START(uk101)

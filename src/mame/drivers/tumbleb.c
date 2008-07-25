@@ -2144,7 +2144,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tumblepb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14000000)
+	MDRV_CPU_ADD("main", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(tumblepopb_readmem,tumblepopb_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -2165,7 +2165,7 @@ static MACHINE_DRIVER_START( tumblepb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295,  8000000/10)
+	MDRV_SOUND_ADD("oki", OKIM6295,  8000000/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
@@ -2174,7 +2174,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tumbleb2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14000000)
+	MDRV_CPU_ADD("main", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(tumblepopb_readmem,tumblepopb_writemem)
 	MDRV_CPU_VBLANK_INT("main", tumbleb2_interrupt)
 
@@ -2195,7 +2195,7 @@ static MACHINE_DRIVER_START( tumbleb2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295,  8000000/10)
+	MDRV_SOUND_ADD("oki", OKIM6295,  8000000/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
@@ -2203,12 +2203,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jumpkids )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(jumpkids_readmem,jumpkids_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* z80? */
-	MDRV_CPU_ADD( Z80, 8000000/2)
+	MDRV_CPU_ADD("audio", Z80, 8000000/2)
 	MDRV_CPU_PROGRAM_MAP(jumpkids_sound_map,0)
 
 	/* video hardware */
@@ -2228,14 +2228,14 @@ static MACHINE_DRIVER_START( jumpkids )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 8000000/8)
+	MDRV_SOUND_ADD("oki", OKIM6295, 8000000/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fncywld )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(fncywld_readmem,fncywld_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -2256,11 +2256,11 @@ static MACHINE_DRIVER_START( fncywld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 32220000/9)
+	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(1, "right", 0.20)
 
-	MDRV_SOUND_ADD(OKIM6295, 1023924)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -2293,13 +2293,11 @@ static MACHINE_RESET (htchctch)
 
 static MACHINE_DRIVER_START( htchctch )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 15000000) /* verified */
+	MDRV_CPU_ADD("main", M68000, 15000000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(htchctch_readmem,htchctch_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD( Z80, 15000000/4) /* verified on dquizgo */
-
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 15000000/4) /* verified on dquizgo */
 	MDRV_CPU_PROGRAM_MAP(semicom_sound_readmem,semicom_sound_writemem)
 
 	MDRV_MACHINE_RESET ( htchctch )
@@ -2321,12 +2319,12 @@ static MACHINE_DRIVER_START( htchctch )
 	/* sound hardware - same as hyperpac */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("ym2151", YM2151, 3427190)
+	MDRV_SOUND_ADD("ym2151", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
-	MDRV_SOUND_ADD(OKIM6295, 1024000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1024000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -2370,12 +2368,11 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jumppop )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jumppop_readmem,jumppop_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3500000) /* verified */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3500000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(jumppop_sound_map, 0)
 	MDRV_CPU_IO_MAP(jumppop_sound_io_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1953)	/* measured */
@@ -2396,11 +2393,11 @@ static MACHINE_DRIVER_START( jumppop )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM3812, 3500000)
+	MDRV_SOUND_ADD("ym", YM3812, 3500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.70)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.70)
 
-	MDRV_SOUND_ADD(OKIM6295, 875000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 875000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
@@ -2409,12 +2406,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( suprtrio )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
+	MDRV_CPU_ADD("main", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
 	MDRV_CPU_PROGRAM_MAP(suprtrio_main_cpu,0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80, 8000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(semicom_sound_readmem,semicom_sound_writemem)
 
 	/* video hardware */
@@ -2434,7 +2430,7 @@ static MACHINE_DRIVER_START( suprtrio )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 875000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 875000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
@@ -2443,7 +2439,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pangpang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14000000)
+	MDRV_CPU_ADD("main", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(pangpang_readmem,pangpang_writemem)
 	MDRV_CPU_VBLANK_INT("main", tumbleb2_interrupt)
 
@@ -2464,7 +2460,7 @@ static MACHINE_DRIVER_START( pangpang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 8000000/10)
+	MDRV_SOUND_ADD("oki", OKIM6295, 8000000/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END

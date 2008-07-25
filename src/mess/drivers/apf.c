@@ -627,8 +627,8 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( apf_imagination )
 	/* basic machine hardware */
-	//	MDRV_CPU_ADD_TAG("main", M6800, 3750000)        /* 7.8336 Mhz, only 6800p type used 1mhz max*/
-	MDRV_CPU_ADD_TAG("main", M6800, 1000000 )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
+	//	MDRV_CPU_ADD("main", M6800, 3750000)        /* 7.8336 Mhz, only 6800p type used 1mhz max*/
+	MDRV_CPU_ADD("main", M6800, 1000000 )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
 	MDRV_CPU_PROGRAM_MAP(apf_imagination_map, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
@@ -646,7 +646,7 @@ static MACHINE_DRIVER_START( apf_imagination )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

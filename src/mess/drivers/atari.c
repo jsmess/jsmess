@@ -687,7 +687,7 @@ static const struct POKEYinterface pokey_interface =
 
 static MACHINE_DRIVER_START( atari_common_nodac )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6510, FREQ_17_EXACT)
+	MDRV_CPU_ADD("main", M6510, FREQ_17_EXACT)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -702,7 +702,7 @@ static MACHINE_DRIVER_START( atari_common_nodac )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("pokey", POKEY, FREQ_17_EXACT)
+	MDRV_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
 	MDRV_SOUND_CONFIG(pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
@@ -710,7 +710,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atari_common )
 	MDRV_IMPORT_FROM( atari_common_nodac )
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

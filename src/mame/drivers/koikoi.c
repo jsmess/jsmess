@@ -258,7 +258,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( koikoi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,KOIKOI_CRYSTAL/4)	/* ?? */
+	MDRV_CPU_ADD("main", Z80,KOIKOI_CRYSTAL/4)	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem, 0)
 	MDRV_CPU_IO_MAP(readport, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
@@ -281,7 +281,7 @@ static MACHINE_DRIVER_START( koikoi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, KOIKOI_CRYSTAL/8)
+	MDRV_SOUND_ADD("ay", AY8910, KOIKOI_CRYSTAL/8)
 	MDRV_SOUND_CONFIG(ay8910_interface)
   MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 

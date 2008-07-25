@@ -274,12 +274,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( gotcha )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,14318180)	/* 14.31818 MHz */
+	MDRV_CPU_ADD("main", M68000,14318180)	/* 14.31818 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80,6000000)	/* 6 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,6000000)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 //  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
@@ -300,12 +299,12 @@ static MACHINE_DRIVER_START( gotcha )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 14318180/4)
+	MDRV_SOUND_ADD("ym", YM2151, 14318180/4)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.80)
 	MDRV_SOUND_ROUTE(1, "mono", 0.80)
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

@@ -700,13 +700,12 @@ static const struct VLM5030interface vlm5030_interface =
 static MACHINE_DRIVER_START( punchout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 8000000/2)	/* 4 MHz */
+	MDRV_CPU_ADD("main", Z80, 8000000/2)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(punchout_map,0)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
-	MDRV_CPU_ADD(N2A03, N2A03_DEFAULTCLOCK)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", N2A03, N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
@@ -737,11 +736,11 @@ static MACHINE_DRIVER_START( punchout )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(NES, N2A03_DEFAULTCLOCK)
+	MDRV_SOUND_ADD("nes", NES, N2A03_DEFAULTCLOCK)
 	MDRV_SOUND_CONFIG(nes_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(VLM5030, 3580000)
+	MDRV_SOUND_ADD("vlm", VLM5030, 3580000)
 	MDRV_SOUND_CONFIG(vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

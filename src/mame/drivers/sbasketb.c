@@ -236,12 +236,11 @@ static const struct VLM5030interface sbasketb_vlm5030_interface =
 static MACHINE_DRIVER_START( sbasketb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 1400000)        /* 1.400 MHz ??? */
+	MDRV_CPU_ADD("main", M6809, 1400000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318000/4)
-	/* audio CPU */	/* 3.5795 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318000/4)	/* 3.5795 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -262,13 +261,13 @@ static MACHINE_DRIVER_START( sbasketb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(SN76496, 14318180/8)
+	MDRV_SOUND_ADD("sn", SN76496, 14318180/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(VLM5030, 3580000)
+	MDRV_SOUND_ADD("vlm", VLM5030, 3580000)
 	MDRV_SOUND_CONFIG(sbasketb_vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

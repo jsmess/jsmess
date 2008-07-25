@@ -527,7 +527,7 @@ INPUT_PORTS_END
 /* machine definition */
 static MACHINE_DRIVER_START( pmd85 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080, 2000000)		/* 2.048MHz ??? */
+	MDRV_CPU_ADD("main", 8080, 2000000)		/* 2.048MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(pmd85_mem, 0)
 	MDRV_CPU_IO_MAP(pmd85_readport, pmd85_writeport)
 	MDRV_INTERLEAVE(1)
@@ -552,7 +552,7 @@ static MACHINE_DRIVER_START( pmd85 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

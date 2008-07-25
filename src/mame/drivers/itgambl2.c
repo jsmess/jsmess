@@ -193,7 +193,7 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( itgambl2 )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a H8/3337 core ATM */
+	MDRV_CPU_ADD("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a H8/3337 core ATM */
 	MDRV_CPU_PROGRAM_MAP(itgambl2_map,0)
 
     /* video hardware */
@@ -212,7 +212,7 @@ static MACHINE_DRIVER_START( itgambl2 )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

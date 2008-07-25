@@ -138,7 +138,11 @@ static INPUT_PORTS_START( xybots )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_VBLANK )	/* VBLANK */
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_I_PORT_SWAPPED	/* audio port */
+	PORT_INCLUDE( atarijsa_i )		/* audio port */
+	/* Xybots uses a swapped version */
+	PORT_MODIFY("JSAI")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 
@@ -190,7 +194,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( xybots )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 

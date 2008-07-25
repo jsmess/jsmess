@@ -702,7 +702,7 @@ static const struct AY8910interface pkunwar_ay8910_interface_2 =
 static MACHINE_DRIVER_START( nova2001 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz verified on schematics
+	MDRV_CPU_ADD("main", Z80, MAIN_CLOCK/4)	// 3 MHz verified on schematics
 	MDRV_CPU_PROGRAM_MAP(nova2001_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -723,11 +723,11 @@ static MACHINE_DRIVER_START( nova2001 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, MAIN_CLOCK/6)	// 2 MHz verified on schematics
+	MDRV_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/6)	// 2 MHz verified on schematics
 	MDRV_SOUND_CONFIG(nova2001_ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, MAIN_CLOCK/6)
+	MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/6)
 	MDRV_SOUND_CONFIG(nova2001_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -735,11 +735,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ninjakun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_CPU_ADD("main", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(ninjakun_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_CPU_ADD("sub", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(ninjakun_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4) /* ? */
 
@@ -764,11 +764,11 @@ static MACHINE_DRIVER_START( ninjakun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_SOUND_CONFIG(nova2001_ay8910_interface_2)	// note swapped order wrt nova2001
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(AY8910, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_SOUND_CONFIG(nova2001_ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
@@ -776,7 +776,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pkunwar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_CPU_ADD("main", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(pkunwar_map,0)
 	MDRV_CPU_IO_MAP(pkunwar_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -798,11 +798,11 @@ static MACHINE_DRIVER_START( pkunwar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, MAIN_CLOCK/8)	// 1.5MHz (correct?)
+	MDRV_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8)	// 1.5MHz (correct?)
 	MDRV_SOUND_CONFIG(pkunwar_ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, MAIN_CLOCK/8)
+	MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/8)
 	MDRV_SOUND_CONFIG(pkunwar_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -810,12 +810,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( raiders5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_CPU_ADD("main", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(raiders5_cpu1_map,0)
 	MDRV_CPU_IO_MAP(raiders5_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_CPU_ADD("sub", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(raiders5_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* ? */
 
@@ -837,11 +837,11 @@ static MACHINE_DRIVER_START( raiders5 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, MAIN_CLOCK/8)	// 1.5MHz
+	MDRV_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8)	// 1.5MHz
 	MDRV_SOUND_CONFIG(pkunwar_ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, MAIN_CLOCK/8)
+	MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/8)
 	MDRV_SOUND_CONFIG(pkunwar_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

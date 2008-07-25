@@ -1820,12 +1820,12 @@ static const struct AY8910interface ay8910_interface_4 =
 static MACHINE_DRIVER_START( nomcu )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,8000000/2)      /* 4 MHz */
+	MDRV_CPU_ADD("main",Z80,8000000/2)      /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(taitosj_main_nomcu_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* audio CPU */      /* 3 MHz */
-	MDRV_CPU_ADD(Z80,6000000/2)
+	MDRV_CPU_ADD("audio", Z80,6000000/2)
 	MDRV_CPU_PROGRAM_MAP(taitosj_audio_map,0)
 			/* interrupts: */
 			/* - no interrupts synced with vblank */
@@ -1853,23 +1853,23 @@ static MACHINE_DRIVER_START( nomcu )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 6000000/4)
+	MDRV_SOUND_ADD("ay1", AY8910, 6000000/4)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 6000000/4)
+	MDRV_SOUND_ADD("ay2", AY8910, 6000000/4)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 6000000/4)
+	MDRV_SOUND_ADD("ay3", AY8910, 6000000/4)
 	MDRV_SOUND_CONFIG(ay8910_interface_3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 6000000/4)
+	MDRV_SOUND_ADD("ay4", AY8910, 6000000/4)
 	MDRV_SOUND_CONFIG(ay8910_interface_4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
@@ -1882,7 +1882,7 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(taitosj_main_mcu_map,0)
 
-	MDRV_CPU_ADD(M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
+	MDRV_CPU_ADD("mcu", M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(taitosj_mcu_map,0)
 MACHINE_DRIVER_END
 

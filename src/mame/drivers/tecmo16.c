@@ -440,12 +440,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( fstarfrc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12MHz */
+	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(fstarfrc_readmem,fstarfrc_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */			/* 4MHz */
+	MDRV_CPU_ADD("audio", Z80,8000000/2)			/* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main CPU */
 	MDRV_INTERLEAVE(10)
@@ -467,12 +466,12 @@ static MACHINE_DRIVER_START( fstarfrc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 8000000/2)
+	MDRV_SOUND_ADD("ym", YM2151, 8000000/2)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 
-	MDRV_SOUND_ADD(OKIM6295, 999900)
+	MDRV_SOUND_ADD("oki", OKIM6295, 999900)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
@@ -481,12 +480,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ginkun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12MHz */
+	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(ginkun_readmem,ginkun_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */			/* 4MHz */
+	MDRV_CPU_ADD("audio", Z80,8000000/2)			/* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main CPU */
 	MDRV_INTERLEAVE(10)
@@ -508,12 +506,12 @@ static MACHINE_DRIVER_START( ginkun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 8000000/2)
+	MDRV_SOUND_ADD("ym", YM2151, 8000000/2)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 
-	MDRV_SOUND_ADD(OKIM6295, 999900)
+	MDRV_SOUND_ADD("oki", OKIM6295, 999900)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)

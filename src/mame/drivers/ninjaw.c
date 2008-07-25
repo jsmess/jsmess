@@ -622,15 +622,14 @@ Darius2: arbitrary interleaving of 10 to keep cpus synced.
 static MACHINE_DRIVER_START( ninjaw )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD("main", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(ninjaw_readmem,ninjaw_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80,16000000/4)
-	/* audio CPU */	/* 16/4 MHz ? */
+	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 16/4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
-	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(ninjaw_cpub_readmem,ninjaw_cpub_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
@@ -671,7 +670,7 @@ static MACHINE_DRIVER_START( ninjaw )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 16000000/2)
+	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
@@ -680,31 +679,30 @@ static MACHINE_DRIVER_START( ninjaw )
 	MDRV_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MDRV_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("2610.1.l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("2610.1.r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("2610.2.r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-//  MDRV_SOUND_ADD(CUSTOM, subwoofer_interface)
+//  MDRV_SOUND_ADD("subwoofer", CUSTOM, subwoofer_interface)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( darius2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD("main", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius2_readmem,darius2_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80,16000000/4)
-	/* audio CPU */	/* 4 MHz ? */
+	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
-	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius2_cpub_readmem,darius2_cpub_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
@@ -745,7 +743,7 @@ static MACHINE_DRIVER_START( darius2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 16000000/2)
+	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
@@ -754,16 +752,16 @@ static MACHINE_DRIVER_START( darius2 )
 	MDRV_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MDRV_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("2610.1.l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("2610.1.r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("2610.2.r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-//  MDRV_SOUND_ADD(CUSTOM, subwoofer_interface)
+//  MDRV_SOUND_ADD("subwoofer", CUSTOM, subwoofer_interface)
 MACHINE_DRIVER_END
 
 

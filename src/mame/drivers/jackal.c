@@ -301,11 +301,11 @@ static INTERRUPT_GEN( jackal_interrupt )
 
 static MACHINE_DRIVER_START( jackal )
 	// basic machine hardware
-	MDRV_CPU_ADD(M6809, MASTER_CLOCK/12) // verified on pcb
+	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/12) // verified on pcb
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_VBLANK_INT("main", jackal_interrupt)
 
-	MDRV_CPU_ADD(M6809, MASTER_CLOCK/12) // verified on pcb
+	MDRV_CPU_ADD("slave", M6809, MASTER_CLOCK/12) // verified on pcb
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 
 	MDRV_INTERLEAVE(100)
@@ -331,7 +331,7 @@ static MACHINE_DRIVER_START( jackal )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, SOUND_CLOCK) // verified on pcb
+	MDRV_SOUND_ADD("ym", YM2151, SOUND_CLOCK) // verified on pcb
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 MACHINE_DRIVER_END

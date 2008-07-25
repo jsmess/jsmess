@@ -682,7 +682,7 @@ static const struct NiLe_interface nile_interface =
 };
 
 static MACHINE_DRIVER_START( srmp6 )
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(srmp6,0)
 	MDRV_CPU_VBLANK_INT_HACK(srmp6_interrupt,2)
 
@@ -702,7 +702,7 @@ static MACHINE_DRIVER_START( srmp6 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(NILE, 0)
+	MDRV_SOUND_ADD("nile", NILE, 0)
 	MDRV_SOUND_CONFIG(nile_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

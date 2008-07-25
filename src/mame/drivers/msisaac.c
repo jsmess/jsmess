@@ -518,17 +518,16 @@ static const struct MSM5232interface msm5232_interface =
 static MACHINE_DRIVER_START( msisaac )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* source of IRQs is unknown */
 
 #ifdef USE_MCU
-	MDRV_CPU_ADD(M68705,8000000/2)  /* 4 MHz */
+	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 #endif
 
@@ -551,13 +550,13 @@ static MACHINE_DRIVER_START( msisaac )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD("ay1", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(MSM5232, 2000000)
+	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
 	MDRV_SOUND_CONFIG(msm5232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1

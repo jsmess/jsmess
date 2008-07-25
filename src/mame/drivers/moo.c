@@ -574,11 +574,11 @@ static MACHINE_RESET( moo )
 static MACHINE_DRIVER_START( moo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", moo_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
+	MDRV_CPU_ADD("sound", Z80, 8000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
@@ -605,11 +605,11 @@ static MACHINE_DRIVER_START( moo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
-	MDRV_SOUND_ADD(K054539, 48000)
+	MDRV_SOUND_ADD("konami", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.75)
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
@@ -618,7 +618,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( moobl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16100000)
+	MDRV_CPU_ADD("main", M68000, 16100000)
 	MDRV_CPU_PROGRAM_MAP(readmembl,writemembl)
 	MDRV_CPU_VBLANK_INT("main", moobl_interrupt)
 
@@ -644,7 +644,7 @@ static MACHINE_DRIVER_START( moobl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)

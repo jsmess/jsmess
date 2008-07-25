@@ -961,16 +961,16 @@ static const struct SEGAPCMinterface segapcm_interface =
 static MACHINE_DRIVER_START( yboard )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD_TAG("subx", M68000, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("subx", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(subx_map,0)
 
-	MDRV_CPU_ADD_TAG("suby", M68000, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("suby", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(suby_map,0)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, SOUND_CLOCK/8)
+	MDRV_CPU_ADD("sound", Z80, SOUND_CLOCK/8)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
@@ -994,12 +994,12 @@ static MACHINE_DRIVER_START( yboard )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("2151", YM2151, SOUND_CLOCK/8)
+	MDRV_SOUND_ADD("2151", YM2151, SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.43)
 	MDRV_SOUND_ROUTE(1, "right", 0.43)
 
-	MDRV_SOUND_ADD_TAG("pcm", SEGAPCM, SOUND_CLOCK/8)
+	MDRV_SOUND_ADD("pcm", SEGAPCM, SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(segapcm_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

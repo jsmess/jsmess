@@ -436,7 +436,7 @@ static const struct pic8259_interface pasogo_pic8259_config = {
 
 
 static MACHINE_DRIVER_START( pasogo )
-     MDRV_CPU_ADD_TAG("main", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
+     MDRV_CPU_ADD("main", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
 MDRV_CPU_PROGRAM_MAP(pasogo_mem, 0)
 MDRV_CPU_IO_MAP( pasogo_io, 0 )
 MDRV_CPU_VBLANK_INT("main", pasogo_interrupt)
@@ -459,7 +459,7 @@ MDRV_CPU_VBLANK_INT("main", pasogo_interrupt)
      MDRV_PALETTE_INIT(pasogo)
 #if 0
      MDRV_SPEAKER_STANDARD_MONO("gmaster")
-     MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+     MDRV_SOUND_ADD("custom", CUSTOM, 0)
      MDRV_SOUND_CONFIG(gmaster_sound_interface)
      MDRV_SOUND_ROUTE(0, "gmaster", 0.50)
 #endif

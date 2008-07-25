@@ -840,20 +840,20 @@ static const struct CustomSound_interface custom_interface =
 static MACHINE_DRIVER_START( polepos )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_map,0)
 	MDRV_CPU_IO_MAP(z80_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
 
-	MDRV_CPU_ADD(Z8000, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z8000, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z8000, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z8000, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -883,24 +883,24 @@ static MACHINE_DRIVER_START( polepos )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(NAMCO, 24576000/512)
+	MDRV_SOUND_ADD("namco1", NAMCO, 24576000/512)
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
-	MDRV_SOUND_ADD(NAMCO_52XX, 24576000/16)	/* 1.536 MHz */
+	MDRV_SOUND_ADD("namco2", NAMCO_52XX, 24576000/16)	/* 1.536 MHz */
 	MDRV_SOUND_CONFIG(namco_52xx_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
 
 	/* discrete circuit on the 54XX outputs */
-	MDRV_SOUND_ADD(DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(polepos)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.90)
 
 	/* engine sound */
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("polepos", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.90 * 0.77)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.90 * 0.77)

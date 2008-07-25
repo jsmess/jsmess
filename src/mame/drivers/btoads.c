@@ -337,11 +337,11 @@ static const tms34010_config tms_config =
 
 static MACHINE_DRIVER_START( btoads )
 
-	MDRV_CPU_ADD(TMS34020, CPU_CLOCK/2)
+	MDRV_CPU_ADD("main", TMS34020, CPU_CLOCK/2)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD(Z80, SOUND_CLOCK/4)
+	MDRV_CPU_ADD("audio", Z80, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, 183)
@@ -361,7 +361,7 @@ static MACHINE_DRIVER_START( btoads )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(BSMT2000, SOUND_CLOCK)
+	MDRV_SOUND_ADD("bsmt", BSMT2000, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(bsmt2000_interface_region_1)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

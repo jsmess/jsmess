@@ -346,7 +346,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mirage )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 28000000/2)
+	MDRV_CPU_ADD("main", M68000, 28000000/2)
 	MDRV_CPU_PROGRAM_MAP(mirage_readmem,mirage_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -367,11 +367,11 @@ static MACHINE_DRIVER_START( mirage )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

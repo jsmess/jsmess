@@ -313,11 +313,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( espial )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3072000)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(espial_readmem,espial_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 3072000)	/* 2 MHz?????? */
+	MDRV_CPU_ADD("audio", Z80, 3072000)	/* 2 MHz?????? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(0,sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,4)
@@ -341,7 +341,7 @@ static MACHINE_DRIVER_START( espial )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

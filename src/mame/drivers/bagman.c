@@ -56,6 +56,7 @@ I/O C  ;AY-3-8910 Data Read Reg.
 
 DIP locations verified for:
     - bagman (manual)
+    - squaitsa (manual)
 
 ***************************************************************************/
 
@@ -195,7 +196,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0xa800, 0xa805) AM_WRITE(bagman_ls259_w) /* TMS5110 driving state machine */
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r) /* DSW */
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READNOP
 	AM_RANGE(0xc000, 0xffff) AM_ROM		/* Super Bagman only */
 
@@ -221,7 +222,7 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(SMH_RAM) AM_BASE(&bagman_video_enable)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
-	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_2_r)
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW")
 
 
 	AM_RANGE(0xa005, 0xa005) AM_WRITE(SMH_NOP)	/* ???? */
@@ -244,7 +245,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( bagman )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -254,7 +255,7 @@ static INPUT_PORTS_START( bagman )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -301,10 +302,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sbagman )
 	PORT_INCLUDE( bagman )
 
-	PORT_MODIFY("IN0")
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* double-function button, start and shoot */
 
-	PORT_MODIFY("IN1")
+	PORT_MODIFY("P2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL /* double-function button, start and shoot */
 INPUT_PORTS_END
 
@@ -344,7 +345,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( squaitsa )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1")
  	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
  	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
  	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -354,7 +355,7 @@ static INPUT_PORTS_START( squaitsa )
  	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY // ^
  	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
- 	PORT_START_TAG("IN1")
+ 	PORT_START_TAG("P2")
  	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
  	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
  	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -365,28 +366,26 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START_TAG("DSW")
-    PORT_DIPNAME(    0x01, 0x01, DEF_STR( Unknown ) )
-    PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-    PORT_DIPNAME(    0x02, 0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-    PORT_DIPNAME(    0x04, 0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-    PORT_DIPNAME(    0x08, 0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-    PORT_DIPNAME(    0x10, 0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-    PORT_DIPNAME(    0x20, 0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-    PORT_DIPNAME(    0x40, 0x40, DEF_STR( Unknown ) )
+    PORT_DIPNAME(    0x01, 0x01, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:1")
+    PORT_DIPSETTING( 0x00, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING( 0x01, DEF_STR( 1C_1C ) )
+    PORT_DIPNAME(    0x06, 0x06, "Max Points" ) PORT_DIPLOCATION("SW:2,3")
+    PORT_DIPSETTING( 0x06, "7" )
+    PORT_DIPSETTING( 0x04, "11" )
+    PORT_DIPSETTING( 0x02, "15" )
+    PORT_DIPSETTING( 0x00, "21" )
+    PORT_DIPNAME(    0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:4,5")
+    PORT_DIPSETTING( 0x00, "Level 1" )
+    PORT_DIPSETTING( 0x08, "Level 2" )
+    PORT_DIPSETTING( 0x10, "Level 3" )
+    PORT_DIPSETTING( 0x18, "Level 4" )
+    PORT_DIPNAME(    0x20, 0x20, DEF_STR( Language ) ) PORT_DIPLOCATION("SW:6")
+    PORT_DIPSETTING( 0x20, DEF_STR( Spanish ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( English ) )
+    PORT_DIPNAME(    0x40, 0x40, "Body Fault" ) PORT_DIPLOCATION("SW:7")
     PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
     PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-    PORT_DIPNAME(    0x80, 0x00, "Protection?" )
+    PORT_DIPNAME(    0x80, 0x00, "Protection?" )	/* Left empty in the dips scan */
     PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
     PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -459,7 +458,7 @@ static const struct TMS5110interface tms5110_interface =
 static MACHINE_DRIVER_START( bagman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -483,11 +482,11 @@ static MACHINE_DRIVER_START( bagman )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD(TMS5110A, 640000)
+	MDRV_SOUND_ADD("tms", TMS5110A, 640000)
 	MDRV_SOUND_CONFIG(tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -495,7 +494,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pickin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(pickin_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -519,12 +518,12 @@ static MACHINE_DRIVER_START( pickin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* maybe */
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
@@ -550,7 +549,7 @@ z80
 static MACHINE_DRIVER_START( botanic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(pickin_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -574,11 +573,11 @@ static MACHINE_DRIVER_START( botanic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END

@@ -237,7 +237,7 @@ static INTERRUPT_GEN( ettrivia_interrupt )
 }
 
 static MACHINE_DRIVER_START( ettrivia )
-	MDRV_CPU_ADD(Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
+	MDRV_CPU_ADD("main", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", ettrivia_interrupt)
@@ -262,14 +262,14 @@ static MACHINE_DRIVER_START( ettrivia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8912_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay3", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8912_interface_3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

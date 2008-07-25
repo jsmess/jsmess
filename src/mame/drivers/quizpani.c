@@ -247,7 +247,7 @@ static MACHINE_RESET( quizpani )
 }
 
 static MACHINE_DRIVER_START( quizpani )
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(quizpani_readmem,quizpani_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,164) // music tempo
@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( quizpani )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
+	MDRV_SOUND_ADD("oki", OKIM6295, 16000000/4)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

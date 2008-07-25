@@ -128,7 +128,7 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( attckufo )
-	MDRV_CPU_ADD_TAG("main", M6502, 14318181/14)
+	MDRV_CPU_ADD("main", M6502, 14318181/14)
 	MDRV_CPU_PROGRAM_MAP(cpu_map, 0)
 	MDRV_CPU_PERIODIC_INT(attckufo_raster_interrupt, 15625)
 
@@ -148,7 +148,7 @@ static MACHINE_DRIVER_START( attckufo )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("attckufo", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(attckufo_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

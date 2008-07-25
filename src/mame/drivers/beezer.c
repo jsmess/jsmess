@@ -89,11 +89,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( beezer )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 1000000)        /* 1 MHz */
+	MDRV_CPU_ADD("main", M6809, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(beezer_interrupt,128)
 
-	MDRV_CPU_ADD(M6809, 1000000)        /* 1 MHz */
+	MDRV_CPU_ADD("audio", M6809, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 
 	/* video hardware */
@@ -110,7 +110,7 @@ static MACHINE_DRIVER_START( beezer )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

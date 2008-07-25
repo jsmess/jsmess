@@ -789,7 +789,7 @@ static tms9980areset_param reset_params =
 static MACHINE_DRIVER_START(tm990_189)
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
-	MDRV_CPU_ADD_TAG("main", TMS9980, 2000000)
+	MDRV_CPU_ADD("main", TMS9980, 2000000)
 	MDRV_CPU_CONFIG(reset_params)
 	MDRV_CPU_PROGRAM_MAP(tm990_189_memmap, 0)
 	MDRV_CPU_IO_MAP(tm990_189_readcru, tm990_189_writecru)
@@ -815,9 +815,9 @@ static MACHINE_DRIVER_START(tm990_189)
 	/* sound hardware */
 	/* one two-level buzzer */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -829,7 +829,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(tm990_189_v)
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
-	MDRV_CPU_ADD_TAG("main", TMS9980, 2000000)
+	MDRV_CPU_ADD("main", TMS9980, 2000000)
 	MDRV_CPU_CONFIG(reset_params)
 	MDRV_CPU_PROGRAM_MAP(tm990_189_v_memmap, 0)
 	MDRV_CPU_IO_MAP(tm990_189_readcru, tm990_189_writecru)
@@ -851,9 +851,9 @@ static MACHINE_DRIVER_START(tm990_189_v)
 	/* sound hardware */
 	/* one two-level buzzer */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

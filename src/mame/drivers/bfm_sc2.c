@@ -2226,7 +2226,7 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_MACHINE_RESET( init )							// main scorpion2 board initialisation
 	MDRV_INTERLEAVE(16)									// needed for serial communication !!
-	MDRV_CPU_ADD_TAG("main", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
+	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap_vid,0)					// setup scorpion2 board memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
 
@@ -2247,16 +2247,16 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_PALETTE_INIT(adder2)
 	MDRV_GFXDECODE(adder2)
 
-	MDRV_CPU_ADD_TAG("adder2", M6809, MASTER_CLOCK/4 )	// adder2 board 6809 CPU at 2 Mhz
+	MDRV_CPU_ADD("adder2", M6809, MASTER_CLOCK/4 )	// adder2 board 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(adder2_memmap,0)				// setup adder2 board memorymap
 	MDRV_CPU_VBLANK_INT("ADDER", adder2_vbl)			// board has a VBL IRQ
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM2413, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("ym", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

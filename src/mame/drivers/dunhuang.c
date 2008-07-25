@@ -674,7 +674,7 @@ static const struct AY8910interface dunhuang_ay8910_interface =
 
 static MACHINE_DRIVER_START( dunhuang )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)
+	MDRV_CPU_ADD("main", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(dunhuang_map,0)
 	MDRV_CPU_IO_MAP(dunhuang_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -698,14 +698,14 @@ static MACHINE_DRIVER_START( dunhuang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ADD("ym", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, 12000000/8)
+	MDRV_SOUND_ADD("ay8910", AY8910, 12000000/8)
 	MDRV_SOUND_CONFIG(dunhuang_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(OKIM6295, 12000000/8)
+	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END

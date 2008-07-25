@@ -189,7 +189,7 @@ static PALETTE_INIT( vc4000 )
 
 static MACHINE_DRIVER_START( vc4000 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+	MDRV_CPU_ADD("main", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
 	MDRV_CPU_PROGRAM_MAP(vc4000_mem, 0)
 	MDRV_CPU_IO_MAP(vc4000_io, 0)
 	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*50)
@@ -209,7 +209,7 @@ static MACHINE_DRIVER_START( vc4000 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(vc4000_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

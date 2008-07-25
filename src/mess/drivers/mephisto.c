@@ -199,7 +199,7 @@ static MACHINE_RESET( mephisto )
 
 static MACHINE_DRIVER_START( mephisto )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M65C02,4915200)        /* 65C02 */
+	MDRV_CPU_ADD("main",M65C02,4915200)        /* 65C02 */
 	MDRV_CPU_PROGRAM_MAP(mephisto_mem, 0)
 	MDRV_INTERLEAVE(1)
 	MDRV_MACHINE_START( mephisto )
@@ -210,7 +210,7 @@ static MACHINE_DRIVER_START( mephisto )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("beep", BEEP, 0)
+	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

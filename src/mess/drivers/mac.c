@@ -98,7 +98,7 @@ static const applefdc_interface mac_iwm_interface =
 
 static MACHINE_DRIVER_START( mac512ke )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 7833600)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M68000, 7833600)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mac512ke_map, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.15)
@@ -120,7 +120,7 @@ static MACHINE_DRIVER_START( mac512ke )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

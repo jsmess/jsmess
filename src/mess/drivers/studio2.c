@@ -363,7 +363,7 @@ static MACHINE_RESET( mpt02 )
 static MACHINE_DRIVER_START( studio2 )
 	// basic machine hardware
 
-	MDRV_CPU_ADD_TAG("main", CDP1802, 3579545/2) // the real clock is derived from an oscillator circuit
+	MDRV_CPU_ADD("main", CDP1802, 3579545/2) // the real clock is derived from an oscillator circuit
 	MDRV_CPU_PROGRAM_MAP(studio2_map, 0)
 	MDRV_CPU_IO_MAP(studio2_io_map, 0)
 	MDRV_CPU_CONFIG(studio2_config)
@@ -387,14 +387,14 @@ static MACHINE_DRIVER_START( studio2 )
 	// sound hardware
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("beep", BEEP, 0)
+	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mpt02 )
 	// basic machine hardware
 
-	MDRV_CPU_ADD_TAG("main", CDP1802, CDP1864_CLK_FREQ)
+	MDRV_CPU_ADD("main", CDP1802, CDP1864_CLK_FREQ)
 	MDRV_CPU_PROGRAM_MAP(mpt02_map, 0)
 	MDRV_CPU_IO_MAP(mpt02_io_map, 0)
 	MDRV_CPU_CONFIG(mpt02_config)
@@ -417,7 +417,7 @@ static MACHINE_DRIVER_START( mpt02 )
 	// sound hardware
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("beep", BEEP, 0)
+	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

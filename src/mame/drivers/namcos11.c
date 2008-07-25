@@ -41,7 +41,6 @@ ptblnk2a   Point Blank 2 (GNB3/VER.A)              COH-100 / COH-110   SYSTEM11 
 
 Not Dumped Yet
 --------------
-Don Bear Near           (C) Namco, 1996
 Point Blank 3           (C) Namco, 2001
 Soul Edge Ver. III      (C) Namco, 1996
 Tekken Ver.C            (C) Namco, 1995
@@ -876,7 +875,7 @@ NAMCO_C7X_HARDWARE
 
 static MACHINE_DRIVER_START( coh100 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD("main",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos11_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", namcos11_vblank)
 

@@ -344,12 +344,12 @@ static VIDEO_UPDATE( ppmast93 )
 
 static MACHINE_DRIVER_START( ppmast93 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,5000000)		 /* 5 MHz */
+	MDRV_CPU_ADD("main", Z80,5000000)		 /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(ppmast93_cpu1_map,0)
 	MDRV_CPU_IO_MAP(ppmast93_cpu1_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,5000000)		 /* 5 MHz */
+	MDRV_CPU_ADD("sub", Z80,5000000)		 /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(ppmast93_cpu2_map,0)
 	MDRV_CPU_IO_MAP(ppmast93_cpu2_io,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
@@ -372,10 +372,10 @@ static MACHINE_DRIVER_START( ppmast93 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2413, 5000000/2)
+	MDRV_SOUND_ADD("ym", YM2413, 5000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 MACHINE_DRIVER_END

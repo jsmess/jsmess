@@ -228,12 +228,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( sonson )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,12000000/6)	/* 2 MHz ??? */
+	MDRV_CPU_ADD("main", M6809,12000000/6)	/* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(M6809,12000000/6)
-	/* audio CPU */	/* 2 MHz ??? */
+	MDRV_CPU_ADD("audio", M6809,12000000/6)	/* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* FIRQs are triggered by the main CPU */
 
@@ -255,10 +254,10 @@ static MACHINE_DRIVER_START( sonson )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 12000000/8)
+	MDRV_SOUND_ADD("ay1", AY8910, 12000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, 12000000/8)
+	MDRV_SOUND_ADD("ay2", AY8910, 12000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

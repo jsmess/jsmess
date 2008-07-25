@@ -226,7 +226,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 
 static MACHINE_DRIVER_START( smstrv )
-	MDRV_CPU_ADD(I8088,24000000/2)
+	MDRV_CPU_ADD("main", I8088,24000000/2)
 	MDRV_CPU_PROGRAM_MAP(smstrv_map,0)
 //  MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
@@ -256,7 +256,7 @@ static MACHINE_DRIVER_START( smstrv )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

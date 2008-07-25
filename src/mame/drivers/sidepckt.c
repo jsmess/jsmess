@@ -292,12 +292,11 @@ static const struct YM3526interface ym3526_interface =
 static MACHINE_DRIVER_START( sidepckt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("main", M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */        /* 1.5 MHz */
+	MDRV_CPU_ADD("audio", M6502, 1500000)        /* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main cpu */
 
@@ -319,10 +318,10 @@ static MACHINE_DRIVER_START( sidepckt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(YM3526, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -331,12 +330,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sidepctj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("main", M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,j_writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */        /* 1.5 MHz */
+	MDRV_CPU_ADD("audio", M6502, 1500000)        /* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main cpu */
 
@@ -358,10 +356,10 @@ static MACHINE_DRIVER_START( sidepctj )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(YM3526, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

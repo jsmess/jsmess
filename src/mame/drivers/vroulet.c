@@ -258,7 +258,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static MACHINE_DRIVER_START( vroulet )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, 4000000)	//???
+	MDRV_CPU_ADD("main", Z80, 4000000)	//???
 	MDRV_CPU_PROGRAM_MAP(vroulet_map, 0)
 	MDRV_CPU_IO_MAP(vroulet_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -289,7 +289,7 @@ static MACHINE_DRIVER_START( vroulet )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD("ay", AY8910, 2000000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

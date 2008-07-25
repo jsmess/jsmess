@@ -987,7 +987,7 @@ static const struct YM2203interface sh_ym2203_interface =
 static MACHINE_DRIVER_START( shanghai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,16000000/2)	/* ? */
+	MDRV_CPU_ADD("main", V30,16000000/2)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(shanghai_map,0)
 	MDRV_CPU_IO_MAP(shanghai_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", shanghai_interrupt)
@@ -1008,7 +1008,7 @@ static MACHINE_DRIVER_START( shanghai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2203, 16000000/4)
 	MDRV_SOUND_CONFIG(sh_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
@@ -1020,7 +1020,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( shangha2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,16000000/2)	/* ? */
+	MDRV_CPU_ADD("main", V30,16000000/2)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(shangha2_map,0)
 	MDRV_CPU_IO_MAP(shangha2_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", shanghai_interrupt)
@@ -1040,7 +1040,7 @@ static MACHINE_DRIVER_START( shangha2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2203, 16000000/4)
 	MDRV_SOUND_CONFIG(sh_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
@@ -1052,7 +1052,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kothello )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,16000000/2)	/* ? */
+	MDRV_CPU_ADD("main", V30,16000000/2)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(kothello_map, 0)
 	MDRV_CPU_VBLANK_INT("main", shanghai_interrupt)
 

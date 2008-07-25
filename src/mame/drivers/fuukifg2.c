@@ -562,11 +562,10 @@ static MACHINE_RESET( fuuki16 )
 static MACHINE_DRIVER_START( fuuki16 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(fuuki16_readmem,fuuki16_writemem)
 
-	MDRV_CPU_ADD(Z80, 3000000)
-	/* audio CPU */	/* ? */
+	MDRV_CPU_ADD("audio", Z80, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(fuuki16_sound_readmem,fuuki16_sound_writemem)
 	MDRV_CPU_IO_MAP(fuuki16_sound_readport,fuuki16_sound_writeport)
 
@@ -589,16 +588,16 @@ static MACHINE_DRIVER_START( fuuki16 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.15)
 
-	MDRV_SOUND_ADD(YM3812, 4000000)
+	MDRV_SOUND_ADD("ym2", YM3812, 4000000)
 	MDRV_SOUND_CONFIG(fuuki16_ym3812_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.85)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.85)

@@ -344,7 +344,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( wldarrow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(8080, 2000000)
+	MDRV_CPU_ADD("main", 8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(wldarrow_map,0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -361,7 +361,7 @@ static MACHINE_DRIVER_START( wldarrow )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END

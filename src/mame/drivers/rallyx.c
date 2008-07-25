@@ -839,7 +839,7 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( rallyx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(rallyx_map,0)
 	MDRV_CPU_IO_MAP(0,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
@@ -864,11 +864,11 @@ static MACHINE_DRIVER_START( rallyx )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(NAMCO, 18432000/6/32)
+	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -877,7 +877,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jungler )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(jungler_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

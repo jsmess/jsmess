@@ -233,7 +233,7 @@ static const struct CustomSound_interface channelf_sound_interface =
 
 static MACHINE_DRIVER_START( channelf )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", F8, 3579545/2)        /* Colorburst/2 */
+	MDRV_CPU_ADD("main", F8, 3579545/2)        /* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
 	MDRV_CPU_IO_MAP(channelf_io, 0)
 	MDRV_INTERLEAVE(1)
@@ -253,7 +253,7 @@ static MACHINE_DRIVER_START( channelf )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(channelf_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END

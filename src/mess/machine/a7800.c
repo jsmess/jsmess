@@ -52,18 +52,28 @@ static UINT8 *ROM;
 
 /* TODO: Convert the definitions into a syntax accepting input_port_read */
 
-static const struct riot6532_interface r6532_interface =
+static UINT8 riot_input_port_0_r(const device_config *device, UINT8 olddata)
 {
-	input_port_0_r,
-	input_port_3_r,
+	return input_port_0_r(device->machine, 0);
+}
+
+static UINT8 riot_input_port_3_r(const device_config *device, UINT8 olddata)
+{
+	return input_port_3_r(device->machine, 0);
+}
+
+const riot6532_interface r6532_interface_ntsc =
+{
+	riot_input_port_0_r,
+	riot_input_port_3_r,
 	NULL,
 	NULL
 };
 
-static const struct riot6532_interface r6532_interface_pal =
+const riot6532_interface r6532_interface_pal =
 {
-	input_port_0_r,
-	input_port_3_r,
+	riot_input_port_0_r,
+	riot_input_port_3_r,
 	NULL,
 	NULL
 };
@@ -74,19 +84,6 @@ static const struct riot6532_interface r6532_interface_pal =
 
 static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 {
-	if (ispal)
-	{
-		r6532_config(machine, 0, &r6532_interface_pal),
-		r6532_set_clock(0, 3546894/3);
-		r6532_reset(machine, 0);
-	}
-	else
-	{
-		r6532_config(machine, 0, &r6532_interface),
-		r6532_set_clock(0, 3579545/3);
-		r6532_reset(machine, 0);
-	}
-
 	ROM = memory_region(machine, REGION_CPU1);
 	a7800_ispal = ispal;
 	a7800_lines = lines;

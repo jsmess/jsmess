@@ -165,7 +165,7 @@ static const struct gaelcosnd_interface maniacsq_snd_interface =
 
 static MACHINE_DRIVER_START( maniacsq )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 26000000/2)		/* 13 MHz? */
+	MDRV_CPU_ADD("main", M68000, 26000000/2)		/* 13 MHz? */
 	MDRV_CPU_PROGRAM_MAP(maniacsq_readmem, maniacsq_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -189,7 +189,7 @@ static MACHINE_DRIVER_START( maniacsq )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(GAELCO_GAE1, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(maniacsq_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -292,7 +292,7 @@ static const struct gaelcosnd_interface bang_snd_interface =
 
 static MACHINE_DRIVER_START( bang )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 30000000/2)			/* 15 MHz */
+	MDRV_CPU_ADD("main", M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(bang_readmem, bang_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bang_interrupt, 6)
 
@@ -318,7 +318,7 @@ static MACHINE_DRIVER_START( bang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(GAELCO_CG1V, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_CG1V, 0)
 	MDRV_SOUND_CONFIG(bang_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -497,7 +497,7 @@ static const struct gaelcosnd_interface alighunt_snd_interface =
 
 static MACHINE_DRIVER_START( alighunt )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 24000000/2)			/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(alighunt_readmem, alighunt_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -521,7 +521,7 @@ static MACHINE_DRIVER_START( alighunt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(GAELCO_GAE1, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(alighunt_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -750,7 +750,7 @@ static const struct gaelcosnd_interface touchgo_snd_interface =
 
 static MACHINE_DRIVER_START( touchgo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 32000000/2)			/* 16 MHz */
+	MDRV_CPU_ADD("main", M68000, 32000000/2)			/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(touchgo_readmem, touchgo_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq6_line_hold)
 
@@ -782,7 +782,7 @@ static MACHINE_DRIVER_START( touchgo )
 	/* the chip is stereo, but the game sound is mono because the right channel
        output is for cabinet 1 and the left channel output is for cabinet 2 */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD(GAELCO_GAE1, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(touchgo_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -953,7 +953,7 @@ static const struct gaelcosnd_interface snowboar_snd_interface =
 
 static MACHINE_DRIVER_START( snowboar )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 30000000/2)			/* 15 MHz */
+	MDRV_CPU_ADD("main", M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(snowboar_readmem, snowboar_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -979,7 +979,7 @@ static MACHINE_DRIVER_START( snowboar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(GAELCO_CG1V, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_CG1V, 0)
 	MDRV_SOUND_CONFIG(snowboar_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1205,7 +1205,7 @@ static const struct gaelcosnd_interface wrally2_snd_interface =
 
 static MACHINE_DRIVER_START( wrally2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 26000000/2)			/* 13 MHz */
+	MDRV_CPU_ADD("main", M68000, 26000000/2)			/* 13 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrally2_readmem, wrally2_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq6_line_hold)
 
@@ -1240,7 +1240,7 @@ static MACHINE_DRIVER_START( wrally2 )
 	/* the chip is stereo, but the game sound is mono because the right channel
        output is for cabinet 1 and the left channel output is for cabinet 2 */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD(GAELCO_GAE1, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(wrally2_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

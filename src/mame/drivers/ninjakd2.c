@@ -931,11 +931,11 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( ninjakd2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MAIN_CLOCK_12/2)		/* verified */
+	MDRV_CPU_ADD("main", Z80, MAIN_CLOCK_12/2)		/* verified */
 	MDRV_CPU_PROGRAM_MAP(ninjakd2_main_cpu,0)
 	MDRV_CPU_VBLANK_INT("main", ninjakd2_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, MAIN_CLOCK_5)		/* verified */
+	MDRV_CPU_ADD("sound", Z80, MAIN_CLOCK_5)		/* verified */
 	MDRV_CPU_PROGRAM_MAP(ninjakd2_sound_cpu,0)
 	MDRV_CPU_IO_MAP(ninjakd2_sound_io,0)
 
@@ -958,20 +958,20 @@ static MACHINE_DRIVER_START( ninjakd2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2203.1", YM2203, MAIN_CLOCK_12/8)		/* verified */
+	MDRV_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)		/* verified */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD_TAG("2203.2", YM2203, MAIN_CLOCK_12/8)		/* verified */
+	MDRV_SOUND_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)		/* verified */
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD_TAG("PCM", SAMPLES, 0)
+	MDRV_SOUND_ADD("PCM", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END

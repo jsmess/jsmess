@@ -246,8 +246,8 @@ static void sio_dip_handler( int n_data )
 	{
 		if( m_b_lastclock )
 		{
-			verboselog( 2, "read dip %02x -> %02x\n", n_data, ( ( input_port_read_indexed(Machine,  7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
-			psx_sio_input( Machine, 0, PSX_SIO_IN_DATA, ( ( input_port_read_indexed(Machine,  7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
+			verboselog( 2, "read dip %02x -> %02x\n", n_data, ( ( input_port_read(Machine, "DSW") >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( Machine, 0, PSX_SIO_IN_DATA, ( ( input_port_read(Machine, "DSW") >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
 			m_n_dip_bit++;
 			m_n_dip_bit &= 7;
 		}
@@ -356,12 +356,12 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE(psx_spu_r, psx_spu_w)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ(input_port_0_dword_r)
-	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ(input_port_1_dword_r)
-	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ(input_port_2_dword_r)
-	AM_RANGE(0x1fa00300, 0x1fa00303) AM_READ(input_port_3_dword_r)
-	AM_RANGE(0x1fa10000, 0x1fa10003) AM_READ(input_port_4_dword_r)
-	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ(input_port_5_dword_r)
+	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
+	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
+	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x1fa00300, 0x1fa00303) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1fa10000, 0x1fa10003) AM_READ_PORT("EXTRA1")
+	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ_PORT("EXTRA2")
 	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ(boardconfig_r)
 	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE(znsecsel_r, znsecsel_w)
 	AM_RANGE(0x1fa20000, 0x1fa20003) AM_WRITE(coin_w)
@@ -421,7 +421,7 @@ static void zn_machine_init( running_machine *machine )
 
 static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( "MAIN", PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "MAIN", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -442,7 +442,7 @@ static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD( PSXSPU, 0 )
+	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
 	MDRV_SOUND_ROUTE(0, "left", 0.35)
 	MDRV_SOUND_ROUTE(1, "right", 0.35)
@@ -457,7 +457,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zn2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( "MAIN", PSXCPU, XTAL_100MHz )
+	MDRV_CPU_ADD( "MAIN", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -478,7 +478,7 @@ static MACHINE_DRIVER_START( zn2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD( PSXSPU, 0 )
+	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
 	MDRV_SOUND_ROUTE(0, "left", 0.35)
 	MDRV_SOUND_ROUTE(1, "right", 0.35)
@@ -679,8 +679,7 @@ static const struct QSound_interface qsound_interface =
 static MACHINE_DRIVER_START( coh1000c )
 	MDRV_IMPORT_FROM( zn1_1mb_vram )
 
-	MDRV_CPU_ADD( Z80, 8000000 )
-	/* audio CPU */  /* 8MHz ?? */
+	MDRV_CPU_ADD("audio",  Z80, 8000000 )  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_map, 0 )
 	MDRV_CPU_IO_MAP( qsound_portmap, 0 )
 	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
@@ -688,7 +687,7 @@ static MACHINE_DRIVER_START( coh1000c )
 	MDRV_MACHINE_RESET( coh1000c )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
 
-	MDRV_SOUND_ADD( QSOUND, QSOUND_CLOCK )
+	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
 	MDRV_SOUND_CONFIG( qsound_interface )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -697,8 +696,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coh1002c )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
-	MDRV_CPU_ADD( Z80, 8000000 )
-	/* audio CPU */  /* 8MHz ?? */
+	MDRV_CPU_ADD("audio",  Z80, 8000000 )  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_map, 0 )
 	MDRV_CPU_IO_MAP( qsound_portmap, 0 )
 	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
@@ -706,7 +704,7 @@ static MACHINE_DRIVER_START( coh1002c )
 	MDRV_MACHINE_RESET( coh1000c )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
 
-	MDRV_SOUND_ADD( QSOUND, QSOUND_CLOCK )
+	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
 	MDRV_SOUND_CONFIG( qsound_interface )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -881,8 +879,7 @@ static MACHINE_RESET( coh3002c )
 static MACHINE_DRIVER_START( coh3002c )
 	MDRV_IMPORT_FROM( zn2 )
 
-	/* audio CPU */  /* 8MHz ?? */
-	MDRV_CPU_ADD( Z80, 8000000 )
+	MDRV_CPU_ADD("audio", Z80, 8000000 )	/* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_map, 0 )
 	MDRV_CPU_IO_MAP( qsound_portmap, 0 )
 	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
@@ -890,7 +887,7 @@ static MACHINE_DRIVER_START( coh3002c )
 	MDRV_MACHINE_RESET( coh3002c )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
 
-	MDRV_SOUND_ADD( QSOUND, QSOUND_CLOCK )
+	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
 	MDRV_SOUND_CONFIG( qsound_interface )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1287,13 +1284,12 @@ static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_CPU_MODIFY( "MAIN" )
 	MDRV_CPU_VBLANK_INT("main", coh1000t_vblank)
 
-	MDRV_CPU_ADD( Z80, 16000000 / 4 )
-	/* audio CPU */	/* 4 MHz */
+	MDRV_CPU_ADD("audio", Z80, 16000000 / 4 )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP( fx1a_sound_map, 0 )
 	MDRV_MACHINE_RESET( coh1000ta )
 	MDRV_NVRAM_HANDLER( coh1000ta )
 
-	MDRV_SOUND_ADD(YM2610B, 16000000/2)
+	MDRV_SOUND_ADD("ym", YM2610B, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
@@ -1931,13 +1927,13 @@ static MACHINE_DRIVER_START( coh1002e )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	/* audio CPU */
-	MDRV_CPU_ADD( M68000, 12000000 )
+	MDRV_CPU_ADD("audio", M68000, 12000000 )
 	MDRV_CPU_PROGRAM_MAP( psarc_snd_map, 0 )
 
 	MDRV_MACHINE_RESET( coh1002e )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
 
-	MDRV_SOUND_ADD( YMF271, 16934400 )
+	MDRV_SOUND_ADD( "ymf", YMF271, 16934400 )
 	MDRV_SOUND_CONFIG( ymf271_interface )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2394,13 +2390,13 @@ static MACHINE_DRIVER_START( coh1001l )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 //  /* audio CPU */
-//  MDRV_CPU_ADD( M68000, 10000000 )
+//  MDRV_CPU_ADD("audio", M68000, 10000000 )
 //  MDRV_CPU_PROGRAM_MAP( atlus_snd_map, 0 )
 
 	MDRV_MACHINE_RESET( coh1001l )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
 
-//  MDRV_SOUND_ADD( YMZ280B, ymz280b_intf )
+//  MDRV_SOUND_ADD( "ymz", wYMZ280B, ymz280b_intf )
 MACHINE_DRIVER_END
 
 /*
@@ -2711,14 +2707,14 @@ static MACHINE_DRIVER_START( coh1002msnd )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	/* audio CPU */
-	MDRV_CPU_ADD( Z80, 32000000/8 )
+	MDRV_CPU_ADD("audio", Z80, 32000000/8 )
 	MDRV_CPU_PROGRAM_MAP( cbaj_z80_map, 0 )
 	MDRV_CPU_IO_MAP( cbaj_z80_port_map, 0 )
 
 	MDRV_MACHINE_RESET( coh1002m )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2727,7 +2723,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coh1002ml )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
-	MDRV_CPU_ADD( Z80, 8000000 )
+	MDRV_CPU_ADD("link", Z80, 8000000 )
 	MDRV_CPU_PROGRAM_MAP( link_map, 0 )
 
 	MDRV_MACHINE_RESET( coh1002m )
@@ -2735,7 +2731,7 @@ static MACHINE_DRIVER_START( coh1002ml )
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( zn )
-	PORT_START		/* IN0 */
+	PORT_START_TAG("P1")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -2745,7 +2741,7 @@ static INPUT_PORTS_START( zn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START		/* IN1 */
+	PORT_START_TAG("P2")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -2755,35 +2751,35 @@ static INPUT_PORTS_START( zn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START		/* IN2 */
+	PORT_START_TAG("SERVICE")	/* IN2 */
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START		/* IN3 */
+	PORT_START_TAG("SYSTEM")	/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xcc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START		/* IN4 */
+	PORT_START_TAG("EXTRA1")	/* IN4 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 )
 	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START		/* IN5 */
+	PORT_START_TAG("EXTRA2")	/* IN5 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START		/* IN6 */
+	PORT_START_TAG("UNK")	/* IN6 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START		/* IN7 */
+	PORT_START_TAG("DSW")	/* IN7 */
 	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4324,8 +4320,8 @@ GAME( 1999, tondemo,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tondemo 
 GAME( 1999, glpracr3, tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 3 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, flamegun, tps,      coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, flameguj, flamegun, coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, tblkkuzu, tps,	coh1002m, zn, coh1002m, ROT0, "Tamsoft/D3 Publisher", "The Block Kuzushi (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, 1on1gov,  tps,	coh1002m, zn, coh1002m, ROT0, "Tecmo", "1 on 1 Government (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, tblkkuzu, tps,      coh1002m, zn, coh1002m, ROT0, "Tamsoft/D3 Publisher", "The Block Kuzushi (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, 1on1gov,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "1 on 1 Government (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, tecmowcm, tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tecmo World Cup Millennium (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2001, mfjump,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Monster Farm Jump (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 

@@ -289,7 +289,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( polyplay )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 9830400/4)
+	MDRV_CPU_ADD("main", Z80, 9830400/4)
 	MDRV_CPU_PROGRAM_MAP(polyplay_map,0)
 	MDRV_CPU_IO_MAP(polyplay_io_map,0)
 	MDRV_CPU_PERIODIC_INT(periodic_interrupt,75)
@@ -313,7 +313,7 @@ static MACHINE_DRIVER_START( polyplay )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(polyplay_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

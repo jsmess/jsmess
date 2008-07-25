@@ -1670,7 +1670,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( nc100 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
+	MDRV_CPU_ADD("main", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MDRV_CPU_PROGRAM_MAP(nc_map, 0)
 	MDRV_CPU_IO_MAP(nc100_io, 0)
 	MDRV_INTERLEAVE(1)
@@ -1693,9 +1693,9 @@ static MACHINE_DRIVER_START( nc100 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("beep.1", BEEP, 0)
+	MDRV_SOUND_ADD("beep.1", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("beep.2", BEEP, 0)
+	MDRV_SOUND_ADD("beep.2", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */

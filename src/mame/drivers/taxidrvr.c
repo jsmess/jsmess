@@ -360,15 +360,15 @@ static const struct AY8910interface ay8910_interface_2 =
 static MACHINE_DRIVER_START( taxidrvr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("main", Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("sub", Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
-	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
 	MDRV_CPU_IO_MAP(cpu3_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
@@ -407,11 +407,11 @@ static MACHINE_DRIVER_START( taxidrvr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1250000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 1250000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

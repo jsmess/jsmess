@@ -1260,7 +1260,7 @@ static const struct z80_irq_daisy_chain tenpin_daisy_chain[] =
 static MACHINE_DRIVER_START( astrocade_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, ASTROCADE_CLOCK/4)
+	MDRV_CPU_ADD("main", Z80, ASTROCADE_CLOCK/4)
 	/* each game has its own map */
 
 	MDRV_MACHINE_START(astrocde)
@@ -1299,7 +1299,7 @@ static MACHINE_DRIVER_START( astrocade_mono_sound )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
+	MDRV_SOUND_ADD("astrocade",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1309,10 +1309,10 @@ static MACHINE_DRIVER_START( astrocade_stereo_sound )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
+	MDRV_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 
-	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
+	MDRV_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
@@ -1335,7 +1335,7 @@ static MACHINE_DRIVER_START( seawolf2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(seawolf2_samples_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.25)
 	MDRV_SOUND_ROUTE(1, "left", 0.25)
@@ -1389,7 +1389,7 @@ static MACHINE_DRIVER_START( wow )
 	/* sound hardware */
 	MDRV_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(wow_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
 MACHINE_DRIVER_END
@@ -1411,13 +1411,13 @@ static MACHINE_DRIVER_START( gorf )
 	MDRV_SPEAKER_ADD("upper", 0.0, 0.0, 1.0)
 	MDRV_SPEAKER_ADD("lower", 0.0, -0.5, 1.0)
 
-	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
+	MDRV_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 1.0)
 
-	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
+	MDRV_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gorf_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
 MACHINE_DRIVER_END
@@ -1465,7 +1465,7 @@ static MACHINE_DRIVER_START( tenpindx )
 	MDRV_CPU_PROGRAM_MAP(profpac_map,0)
 	MDRV_CPU_IO_MAP(port_map_16col_pattern_nosound,0)
 
-	MDRV_CPU_ADD(Z80, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MDRV_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4)	/* real clock unknown */
 	MDRV_CPU_CONFIG(tenpin_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(tenpin_sub_map,0)
 	MDRV_CPU_IO_MAP(tenpin_sub_io_map,0)
@@ -1474,7 +1474,7 @@ static MACHINE_DRIVER_START( tenpindx )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MDRV_SOUND_ADD("ay", AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END

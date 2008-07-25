@@ -302,11 +302,11 @@ static const struct YM2203interface ym2203_interface_2 =
 static MACHINE_DRIVER_START( xxmissio )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/4)	/* 3.0MHz */
+	MDRV_CPU_ADD("main", Z80,12000000/4)	/* 3.0MHz */
 	MDRV_CPU_PROGRAM_MAP(map1,0)
 	MDRV_CPU_VBLANK_INT("main", xxmissio_interrupt_m)
 
-	MDRV_CPU_ADD(Z80,12000000/4)	/* 3.0MHz */
+	MDRV_CPU_ADD("sub", Z80,12000000/4)	/* 3.0MHz */
 	MDRV_CPU_PROGRAM_MAP(map2,0)
 	MDRV_CPU_VBLANK_INT_HACK(xxmissio_interrupt_s,2)
 
@@ -331,14 +331,14 @@ static MACHINE_DRIVER_START( xxmissio )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 12000000/8)
+	MDRV_SOUND_ADD("ym1", YM2203, 12000000/8)
 	MDRV_SOUND_CONFIG(ym2203_interface_1)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
-	MDRV_SOUND_ADD(YM2203, 12000000/8)
+	MDRV_SOUND_ADD("ym2", YM2203, 12000000/8)
 	MDRV_SOUND_CONFIG(ym2203_interface_2)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)

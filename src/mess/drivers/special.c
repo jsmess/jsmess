@@ -308,7 +308,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( special )
     /* basic machine hardware */
-    MDRV_CPU_ADD_TAG("main", 8080, 2000000)
+    MDRV_CPU_ADD("main", 8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(specialist_mem, 0)
     MDRV_MACHINE_RESET( special )
 
@@ -333,9 +333,9 @@ static MACHINE_DRIVER_START( special )
 
     /* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
@@ -369,14 +369,14 @@ static MACHINE_DRIVER_START( specimx )
    	MDRV_VIDEO_UPDATE(specimx)
 
     /* audio hardware */
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(specimx_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( erik )
     /* basic machine hardware */
-    MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+    MDRV_CPU_ADD("main", Z80, 4000000)
     MDRV_CPU_PROGRAM_MAP(erik_mem, 0)
     MDRV_CPU_IO_MAP(erik_io_map, 0)
 
@@ -400,9 +400,9 @@ static MACHINE_DRIVER_START( erik )
     MDRV_VIDEO_UPDATE(erik)
     /* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

@@ -859,7 +859,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( avigo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(avigo_mem, 0)
 	MDRV_CPU_IO_MAP(avigo_io, 0)
 	MDRV_INTERLEAVE(1)
@@ -886,7 +886,7 @@ static MACHINE_DRIVER_START( avigo )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

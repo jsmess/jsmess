@@ -173,7 +173,7 @@ static INPUT_PORTS_START( toobin )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_I_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_i )		/* audio port */
 INPUT_PORTS_END
 
 
@@ -237,7 +237,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( toobin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68010, ATARI_CLOCK_32MHz/4)
+	MDRV_CPU_ADD("main", M68010, ATARI_CLOCK_32MHz/4)
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
 
 	MDRV_MACHINE_RESET(toobin)

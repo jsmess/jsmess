@@ -217,12 +217,11 @@ GFXDECODEINFO(0x100000,64)
 static MACHINE_DRIVER_START( bigkarnk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)	/* MC68000P10, 10 MHz */
+	MDRV_CPU_ADD("main", M68000, 10000000)	/* MC68000P10, 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(bigkarnk_readmem,bigkarnk_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(M6809, 8867000/4)	/* 68B09, 2.21675 MHz? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6809, 8867000/4)	/* 68B09, 2.21675 MHz? */
 	MDRV_CPU_PROGRAM_MAP(bigkarnk_readmem_snd,bigkarnk_writemem_snd)
 
 	MDRV_INTERLEAVE(10)
@@ -244,10 +243,10 @@ static MACHINE_DRIVER_START( bigkarnk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 3580000)
+	MDRV_SOUND_ADD("ym", YM3812, 3580000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -472,7 +471,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( maniacsq )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(maniacsq_readmem,maniacsq_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -493,7 +492,7 @@ static MACHINE_DRIVER_START( maniacsq )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -725,7 +724,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( squash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12, 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,squash_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -748,7 +747,7 @@ static MACHINE_DRIVER_START( squash )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -893,7 +892,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( thoop )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12, 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,thoop_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -916,7 +915,7 @@ static MACHINE_DRIVER_START( thoop )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

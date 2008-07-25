@@ -719,12 +719,11 @@ static const struct YM2151interface whizz_ym2151_interface =
 static MACHINE_DRIVER_START( sidearms )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (?) */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -747,14 +746,14 @@ static MACHINE_DRIVER_START( sidearms )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.25)
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD("ym2", YM2203, 4000000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
@@ -765,12 +764,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( turtship )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(turtship_readmem,turtship_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (?) */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -793,14 +791,14 @@ static MACHINE_DRIVER_START( turtship )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.25)
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD("ym2", YM2203, 4000000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
@@ -810,12 +808,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( whizz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)        /* 4 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(whizz_readmem,whizz_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(whizz_sound_readmem,whizz_sound_writemem)
 	MDRV_CPU_IO_MAP(whizz_readport,whizz_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -842,7 +839,7 @@ static MACHINE_DRIVER_START( whizz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(whizz_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)

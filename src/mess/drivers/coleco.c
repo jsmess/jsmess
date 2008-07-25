@@ -405,7 +405,7 @@ static MACHINE_RESET( coleco )
 
 static MACHINE_DRIVER_START( coleco )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
+	MDRV_CPU_ADD("main", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
 	MDRV_CPU_PROGRAM_MAP(coleco_map, 0)
 	MDRV_CPU_IO_MAP(coleco_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", coleco_interrupt)
@@ -421,13 +421,13 @@ static MACHINE_DRIVER_START( coleco )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( czz50 )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_7_15909MHz/2)	// ???
+	MDRV_CPU_ADD("main", Z80, XTAL_7_15909MHz/2)	// ???
 	MDRV_CPU_PROGRAM_MAP(czz50_map, 0)
 	MDRV_CPU_IO_MAP(czz50_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", coleco_interrupt)
@@ -443,7 +443,7 @@ static MACHINE_DRIVER_START( czz50 )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76489a", SN76489A, XTAL_7_15909MHz/2)	// ???
+	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	// ???
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

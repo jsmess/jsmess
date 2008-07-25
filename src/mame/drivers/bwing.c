@@ -389,16 +389,15 @@ static MACHINE_RESET( bwing )
 static MACHINE_DRIVER_START( bwing )
 
 	// basic machine hardware
-	MDRV_CPU_ADD(M6809, 2000000)
+	MDRV_CPU_ADD("main", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp1_readmem, bwp1_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bwp1_interrupt, 3)
 
-	MDRV_CPU_ADD(M6809, 2000000)
+	MDRV_CPU_ADD("sub", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp2_readmem, bwp2_writemem)
 //  MDRV_CPU_VBLANK_INT("main", irq1_line_assert) // vblank triggers FIRQ on CPU2 by design (unused)
 
-	MDRV_CPU_ADD(DECO16, 2000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp3_readmem, bwp3_writemem)
 	MDRV_CPU_IO_MAP(bwp3_readport, bwp3_writeport)
 	MDRV_CPU_PERIODIC_INT(bwp3_interrupt, 1000)
@@ -426,13 +425,13 @@ static MACHINE_DRIVER_START( bwing )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 

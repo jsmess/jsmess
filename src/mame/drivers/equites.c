@@ -1153,7 +1153,7 @@ static const struct Samplesinterface alphamc07_samples_interface =
 // the sound board is the same in all games
 static MACHINE_DRIVER_START( common_sound )
 
-	MDRV_CPU_ADD(8085A, XTAL_6_144MHz)	/* verified on pcb */
+	MDRV_CPU_ADD("audio", 8085A, XTAL_6_144MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -1162,7 +1162,7 @@ static MACHINE_DRIVER_START( common_sound )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(MSM5232, MSM5232_MAX_CLOCK)	// will be adjusted at runtime through PORT_ADJUSTER
+	MDRV_SOUND_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)	// will be adjusted at runtime through PORT_ADJUSTER
 	MDRV_SOUND_CONFIG(equites_5232intf)
 	MDRV_SOUND_ROUTE(0, "mono", MSM5232_BASE_VOLUME/2.2)	// pin 28  2'-1 : 22k resistor
 	MDRV_SOUND_ROUTE(1, "mono", MSM5232_BASE_VOLUME/1.5)	// pin 29  4'-1 : 15k resistor
@@ -1176,17 +1176,17 @@ static MACHINE_DRIVER_START( common_sound )
 	MDRV_SOUND_ROUTE(9, "mono", 1.0)		// pin 2 SOLO 16' (this actually feeds an analog section)
 	MDRV_SOUND_ROUTE(10,"mono", 0.12)		// pin 22 Noise Output (this actually feeds an analog section)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_6_144MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay", AY8910, XTAL_6_144MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(equites_8910intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(alphamc07_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1196,13 +1196,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( equites )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(equites_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
 
 	MDRV_IMPORT_FROM(common_sound)
 
-	MDRV_CPU_ADD(ALPHA8301, 4000000/8)
+	MDRV_CPU_ADD("mcu", ALPHA8301, 4000000/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	/* video hardware */
@@ -1234,13 +1234,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( splndrbt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(splndrbt_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
 
 	MDRV_IMPORT_FROM(common_sound)
 
-	MDRV_CPU_ADD(ALPHA8301, 4000000/8)
+	MDRV_CPU_ADD("mcu", ALPHA8301, 4000000/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	/* video hardware */

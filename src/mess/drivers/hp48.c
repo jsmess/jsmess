@@ -948,7 +948,7 @@ static MACHINE_DRIVER_START ( hp48_common )
 	MDRV_MACHINE_RESET ( hp48 )
 
 	/* cpu */
-        MDRV_CPU_ADD_TAG ( "main", SATURN, 3937007 ) /* almost 4 MHz */
+        MDRV_CPU_ADD ( "main", SATURN, 3937007 ) /* almost 4 MHz */
         MDRV_CPU_PROGRAM_MAP ( hp48, 0 )
         MDRV_CPU_CONFIG( hp48_config )
  
@@ -969,7 +969,7 @@ static MACHINE_DRIVER_START ( hp48_common )
      
         /* sound */
         MDRV_SPEAKER_STANDARD_MONO( "mono" )
-        MDRV_SOUND_ADD_TAG( "dac",  DAC, 0 )
+        MDRV_SOUND_ADD( "dac",  DAC, 0 )
         MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit beeper */
 
 MACHINE_DRIVER_END

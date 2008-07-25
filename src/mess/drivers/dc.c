@@ -138,13 +138,13 @@ static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,
 
 static MACHINE_DRIVER_START( dc )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SH4, CPU_CLOCK)
+	MDRV_CPU_ADD("main", SH4, CPU_CLOCK)
 	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(dc_map,0)
 	MDRV_CPU_IO_MAP(dc_port,0)
 	MDRV_CPU_VBLANK_INT("main", dc_dispatch_vblank)
 
-	MDRV_CPU_ADD_TAG("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MDRV_CPU_ADD("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
 
 	MDRV_MACHINE_RESET( dc_console )
@@ -158,7 +158,7 @@ static MACHINE_DRIVER_START( dc )
 	MDRV_VIDEO_UPDATE(dc)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD_TAG("aica", AICA, 0)
+	MDRV_SOUND_ADD("aica", AICA, 0)
 	MDRV_SOUND_CONFIG(aica_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)

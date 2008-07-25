@@ -244,12 +244,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( mikie )
 	// basic machine hardware
-	MDRV_CPU_ADD(M6809, 1250000)	// ??? MC68A09E
+	MDRV_CPU_ADD("main", M6809, 1250000)	// ??? MC68A09E
 	MDRV_CPU_PROGRAM_MAP(mikie_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, CLK)	// 3.58 MHz
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, CLK)	// 3.58 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
 	// video hardware
@@ -271,10 +270,10 @@ static MACHINE_DRIVER_START( mikie )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76496, XTAL/8)
+	MDRV_SOUND_ADD("sn1", SN76496, XTAL/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD(SN76496, CLK)
+	MDRV_SOUND_ADD("sn2", SN76496, CLK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 

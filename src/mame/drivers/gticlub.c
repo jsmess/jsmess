@@ -232,8 +232,8 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 
 static UINT32 *work_ram;
 
-UINT8 gticlub_led_reg0 = 0x7f;
-UINT8 gticlub_led_reg1 = 0x7f;
+UINT8 gticlub_led_reg0;
+UINT8 gticlub_led_reg1;
 
 int K001604_vh_start(running_machine *machine, int chip);
 void K001604_tile_update(running_machine *machine, int chip);
@@ -361,8 +361,21 @@ static int adc1038_adr;
 static int adc1038_data_in;
 static int adc1038_data_out;
 static int adc1038_adc_data;
-static int adc1038_sars = 1;
-static int adc1038_gticlub_hack = 0;
+static int adc1038_sars;
+static int adc1038_gticlub_hack;
+
+static void adc1038_init(running_machine *machine)
+{
+	adc1038_cycle = 0;
+	adc1038_clk = 0;
+	adc1038_adr = 0;
+	adc1038_data_in = 0;
+	adc1038_data_out = 0;
+	adc1038_adc_data = 0;
+	adc1038_sars = 1;
+	adc1038_gticlub_hack = (mame_stricmp(machine->gamedrv->name, "gticlub") == 0 ||
+		mame_stricmp(machine->gamedrv->name, "gticlubj") == 0) ? 1 : 0;
+}
 
 static int adc1038_do_r(void)
 {
@@ -450,7 +463,7 @@ static int adc1038_sars_r(running_machine *machine)
 
 static READ8_HANDLER( sysreg_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	switch (offset)
 	{
@@ -567,7 +580,7 @@ WRITE8_HANDLER( K056230_w )
 //  mame_printf_debug("K056230_w: %d, %02X at %08X\n", offset, data, activecpu_get_pc());
 }
 
-static UINT32 lanc_ram[0x2000/4];
+UINT32 *lanc_ram;
 READ32_HANDLER( lanc_ram_r )
 {
 //  mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
@@ -607,7 +620,7 @@ static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)
-	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w)
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w) AM_BASE(&lanc_ram)
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_READ(K056800_host_r)		// Hang Pilot
 	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_READ(K056800_host_r)
@@ -905,14 +918,14 @@ static MACHINE_RESET( gticlub )
 static MACHINE_DRIVER_START( gticlub )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MDRV_CPU_ADD("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(gticlub_map, 0)
 	MDRV_CPU_VBLANK_INT("main", gticlub_vblank)
 
-	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
+	MDRV_CPU_ADD("audio", M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
 
-	MDRV_CPU_ADD(ADSP21062, 36000000)
+	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 
@@ -936,7 +949,7 @@ static MACHINE_DRIVER_START( gticlub )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(RF5C400, 64000000/4)
+	MDRV_SOUND_ADD("rf", RF5C400, 64000000/4)
 	MDRV_SOUND_CONFIG(rf5c400_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -951,17 +964,17 @@ static MACHINE_RESET( hangplt )
 static MACHINE_DRIVER_START( hangplt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MDRV_CPU_ADD("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(gticlub_map, 0)
 
-	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
+	MDRV_CPU_ADD("audio", M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
 
-	MDRV_CPU_ADD(ADSP21062, 36000000)
+	MDRV_CPU_ADD("dsp1", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(hangplt_sharc0_map, 0)
 
-	MDRV_CPU_ADD(ADSP21062, 36000000)
+	MDRV_CPU_ADD("dsp2", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(hangplt_sharc1_map, 0)
 
@@ -1001,7 +1014,7 @@ static MACHINE_DRIVER_START( hangplt )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(RF5C400, 64000000/4)
+	MDRV_SOUND_ADD("rf", RF5C400, 64000000/4)
 	MDRV_SOUND_CONFIG(rf5c400_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1156,18 +1169,15 @@ static void sound_irq_callback(running_machine *machine, int irq)
 static DRIVER_INIT(gticlub)
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_GTICLUB);
+
 	sharc_dataram_0 = auto_malloc(0x100000);
+	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
 	K001005_preprocess_texture_data(memory_region(machine, REGION_GFX1), memory_region_length(machine, REGION_GFX1), 1);
 
 	K056800_init(sound_irq_callback);
 
-	// we'll need this for now
-	if (mame_stricmp(machine->gamedrv->name, "gticlub") == 0 ||
-		mame_stricmp(machine->gamedrv->name, "gticlubj") == 0)
-	{
-		adc1038_gticlub_hack = 1;
-	}
+	adc1038_init(machine);
 }
 
 static DRIVER_INIT(hangplt)
@@ -1178,14 +1188,12 @@ static DRIVER_INIT(hangplt)
 
 	sharc_dataram_0 = auto_malloc(0x100000);
 	sharc_dataram_1 = auto_malloc(0x100000);
+	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
 	K056800_init(sound_irq_callback);
 	K033906_init();
-}
 
-static DRIVER_INIT(slrasslt)
-{
-	DRIVER_INIT_CALL(gticlub);
+	adc1038_init(machine);
 }
 
 /*************************************************************************/
@@ -1193,5 +1201,5 @@ static DRIVER_INIT(slrasslt)
 GAME( 1996, gticlub,	0,		 gticlub, gticlub,  gticlub,  ROT0,	"Konami",	"GTI Club (ver AAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1996, gticlubj,	gticlub, gticlub, gticlub,  gticlub,  ROT0,	"Konami",	"GTI Club (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1996, thunderh,	0,		 gticlub, thunderh, gticlub,  ROT0,	"Konami",	"Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1997, slrasslt,	0,		 gticlub, slrasslt, slrasslt, ROT0,	"Konami",	"Solar Assault (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, slrasslt,	0,		 gticlub, slrasslt, gticlub,  ROT0,	"Konami",	"Solar Assault (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAMEL( 1997, hangplt,	0,		 hangplt, hangplt,  hangplt,  ROT0,	"Konami",	"Hang Pilot", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND, layout_dualhovu )

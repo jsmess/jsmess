@@ -82,36 +82,36 @@ static void sym1_74145_output_6_w(int state)
 }
 
 
-static READ8_HANDLER( sym1_riot_a_r )
+static UINT8 sym1_riot_a_r(const device_config *device, UINT8 olddata)
 {
 	int data = 0x7f;
 
 	/* scan keypad rows */
-	if (!(riot_port_a & 0x80)) data &= input_port_read(machine, "ROW-0");
-	if (!(riot_port_b & 0x01)) data &= input_port_read(machine, "ROW-1");
-	if (!(riot_port_b & 0x02)) data &= input_port_read(machine, "ROW-2");
-	if (!(riot_port_b & 0x04)) data &= input_port_read(machine, "ROW-3");
+	if (!(riot_port_a & 0x80)) data &= input_port_read(device->machine, "ROW-0");
+	if (!(riot_port_b & 0x01)) data &= input_port_read(device->machine, "ROW-1");
+	if (!(riot_port_b & 0x02)) data &= input_port_read(device->machine, "ROW-2");
+	if (!(riot_port_b & 0x04)) data &= input_port_read(device->machine, "ROW-3");
 
 	/* determine column */
-	if ( ((riot_port_a ^ 0xff) & (input_port_read(machine, "ROW-0") ^ 0xff)) & 0x7f )
+	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-0") ^ 0xff)) & 0x7f )
 		data &= ~0x80;
 
 	return data;
 }
 
 
-static READ8_HANDLER( sym1_riot_b_r )
+static UINT8 sym1_riot_b_r(const device_config *device, UINT8 olddata)
 {
 	int data = 0xff;
 
 	/* determine column */
-	if ( ((riot_port_a ^ 0xff) & (input_port_read(machine, "ROW-1") ^ 0xff)) & 0x7f )
+	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-1") ^ 0xff)) & 0x7f )
 		data &= ~1;
 
-	if ( ((riot_port_a ^ 0xff) & (input_port_read(machine, "ROW-2") ^ 0xff)) & 0x3f )
+	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-2") ^ 0xff)) & 0x3f )
 		data &= ~2;
 
-	if ( ((riot_port_a ^ 0xff) & (input_port_read(machine, "ROW-3") ^ 0xff)) & 0x1f )
+	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-3") ^ 0xff)) & 0x1f )
 		data &= ~4;
 
 	data &= ~0x80; // else hangs 8b02
@@ -120,7 +120,7 @@ static READ8_HANDLER( sym1_riot_b_r )
 }
 
 
-static WRITE8_HANDLER( sym1_riot_a_w )
+static void sym1_riot_a_w(const device_config *device, UINT8 newdata, UINT8 data)
 {
 	logerror("%x: riot_a_w 0x%02x\n", activecpu_get_pc(), data);
 
@@ -129,7 +129,7 @@ static WRITE8_HANDLER( sym1_riot_a_w )
 }
 
 
-static WRITE8_HANDLER( sym1_riot_b_w )
+static void sym1_riot_b_w(const device_config *device, UINT8 newdata, UINT8 data)
 {
 	logerror("%x: riot_b_w 0x%02x\n", activecpu_get_pc(), data);
 
@@ -137,11 +137,11 @@ static WRITE8_HANDLER( sym1_riot_b_w )
 	riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	ttl74145_0_w(machine, 0, data & 0x0f);
+	ttl74145_0_w(device->machine, 0, data & 0x0f);
 }
 
 
-static const struct riot6532_interface r6532_interface =
+const riot6532_interface sym1_r6532_interface =
 {
 	sym1_riot_a_r,
 	sym1_riot_b_r,
@@ -284,9 +284,6 @@ DRIVER_INIT( sym1 )
 	via_config(0, &via0);
 	via_config(1, &via1);
 	via_config(2, &via2);
-	r6532_config(machine, 0, &r6532_interface);
-	r6532_set_clock(0, SYM1_CLOCK);
-	r6532_reset(machine, 0);
 
 	/* configure 74145 */
 	ttl74145_config(machine, 0, &ttl74145_intf);
@@ -299,7 +296,6 @@ DRIVER_INIT( sym1 )
 MACHINE_RESET( sym1 )
 {
 	via_reset();
-	r6532_reset(machine, 0);
 	ttl74145_reset(0);
 
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM

@@ -192,7 +192,7 @@ static const struct YM2610interface ym2610_interface =
 };
 
 static MACHINE_DRIVER_START( drill )
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000 )
+	MDRV_CPU_ADD("main", M68000, 16000000 )
 	MDRV_CPU_PROGRAM_MAP(drill_map,0)
 	MDRV_CPU_VBLANK_INT("main", drill_interrupt)
 	MDRV_GFXDECODE(2mindril)
@@ -210,7 +210,7 @@ static MACHINE_DRIVER_START( drill )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 16000000/2)
+	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)

@@ -271,7 +271,7 @@ static INTERRUPT_GEN( ripcord_interrupt )
 static MACHINE_DRIVER_START( circus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,11289000/16) /* 705.562kHz */
+	MDRV_CPU_ADD("main", M6502,11289000/16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -293,11 +293,11 @@ static MACHINE_DRIVER_START( circus )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(circus_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(circus)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -306,7 +306,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( robotbwl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,11289000/16) /* 705.562kHz */
+	MDRV_CPU_ADD("main", M6502,11289000/16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -328,11 +328,11 @@ static MACHINE_DRIVER_START( robotbwl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(robotbwl_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(robotbwl)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -340,7 +340,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( crash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,11289000/16) /* 705.562kHz */
+	MDRV_CPU_ADD("main", M6502,11289000/16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -362,11 +362,11 @@ static MACHINE_DRIVER_START( crash )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(crash_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(crash)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -374,7 +374,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ripcord )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 705562)        /* 11.289MHz / 16 */
+	MDRV_CPU_ADD("main", M6502, 705562)        /* 11.289MHz / 16 */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	//MDRV_CPU_VBLANK_INT("main", ripcord_interrupt) //AT
 
@@ -396,11 +396,11 @@ static MACHINE_DRIVER_START( ripcord )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(ripcord_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(circus)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

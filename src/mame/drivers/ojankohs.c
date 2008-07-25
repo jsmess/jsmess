@@ -875,7 +875,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( ojankohs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 MHz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankohs,writemem_ojankohs)
 	MDRV_CPU_IO_MAP(readport_ojankohs,writeport_ojankohs)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -900,11 +900,11 @@ static MACHINE_DRIVER_START( ojankohs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 12000000/6)
+	MDRV_SOUND_ADD("ay", AY8910, 12000000/6)
 	MDRV_SOUND_CONFIG(ojankohs_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -912,7 +912,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ojankoy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 MHz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankoy,writemem_ojankoy)
 	MDRV_CPU_IO_MAP(readport_ojankohs,writeport_ojankoy)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -938,11 +938,11 @@ static MACHINE_DRIVER_START( ojankoy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 12000000/8)
+	MDRV_SOUND_ADD("ay", AY8910, 12000000/8)
 	MDRV_SOUND_CONFIG(ojankoy_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -950,7 +950,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ccasino )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 MHz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankoy,writemem_ojankoy)
 	MDRV_CPU_IO_MAP(readport_ccasino,writeport_ccasino)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -975,11 +975,11 @@ static MACHINE_DRIVER_START( ccasino )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 12000000/8)
+	MDRV_SOUND_ADD("ay", AY8910, 12000000/8)
 	MDRV_SOUND_CONFIG(ojankoy_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -987,7 +987,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ojankoc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000/2)			/* 4.00 MHz */
+	MDRV_CPU_ADD("main", Z80,8000000/2)			/* 4.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankoc,writemem_ojankoc)
 	MDRV_CPU_IO_MAP(readport_ojankoc,writeport_ojankoc)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -1011,11 +1011,11 @@ static MACHINE_DRIVER_START( ojankoc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 8000000/4)
+	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ojankoc_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(MSM5205, 8000000/22)
+	MDRV_SOUND_ADD("msm", MSM5205, 8000000/22)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

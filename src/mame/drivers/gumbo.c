@@ -307,7 +307,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( gumbo )
-	MDRV_CPU_ADD_TAG("main", M68000, 14318180 /2)	 // or 10mhz? ?
+	MDRV_CPU_ADD("main", M68000, 14318180 /2)	 // or 10mhz? ?
 	MDRV_CPU_PROGRAM_MAP(gumbo_readmem,gumbo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) // all the same
 
@@ -328,7 +328,7 @@ static MACHINE_DRIVER_START( gumbo )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 1122000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1122000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)

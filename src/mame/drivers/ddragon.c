@@ -971,13 +971,13 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( ddragon )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD_TAG("main", HD6309, MAIN_CLOCK)	/* 12MHz / 4 internally */
+ 	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK)	/* 12MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(ddragon_map,0)
 
-	MDRV_CPU_ADD_TAG("sub", HD63701, MAIN_CLOCK/2)	/* 6Mhz / 4 internally */
+	MDRV_CPU_ADD("sub", HD63701, MAIN_CLOCK/2)	/* 6Mhz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
- 	MDRV_CPU_ADD_TAG("sound", M6809, MAIN_CLOCK/2)	/* 6MHz / 4 internally */
+ 	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK/2)	/* 6MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_INTERLEAVE(1000) /* heavy interleaving to sync up sprite<->main cpu's */
@@ -999,16 +999,16 @@ static MACHINE_DRIVER_START( ddragon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("fm", YM2151, SOUND_CLOCK)
+	MDRV_SOUND_ADD("fm", YM2151, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD_TAG("oki1", MSM5205, MAIN_CLOCK/32)
+	MDRV_SOUND_ADD("oki1", MSM5205, MAIN_CLOCK/32)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD_TAG("oki2", MSM5205, MAIN_CLOCK/32)
+	MDRV_SOUND_ADD("oki2", MSM5205, MAIN_CLOCK/32)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -1036,13 +1036,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ddgn6809 )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD_TAG("main", M6809, MAIN_CLOCK)	/* 12MHz / 4 internally */
+ 	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK)	/* 12MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(ddragon_map,0)
 
-	MDRV_CPU_ADD_TAG("sub", M6809, MAIN_CLOCK/2)	/* 6Mhz / 4 internally */
+	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK/2)	/* 6Mhz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
- 	MDRV_CPU_ADD_TAG("sound", M6809, MAIN_CLOCK/2)	/* 6MHz / 4 internally */
+ 	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK/2)	/* 6MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_INTERLEAVE(1000) /* heavy interleaving to sync up sprite<->main cpu's */
@@ -1064,16 +1064,16 @@ static MACHINE_DRIVER_START( ddgn6809 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("fm", YM2151, SOUND_CLOCK)
+	MDRV_SOUND_ADD("fm", YM2151, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD_TAG("oki1", MSM5205, MAIN_CLOCK/32)
+	MDRV_SOUND_ADD("oki1", MSM5205, MAIN_CLOCK/32)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD_TAG("oki2", MSM5205, MAIN_CLOCK/32)
+	MDRV_SOUND_ADD("oki2", MSM5205, MAIN_CLOCK/32)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -1082,13 +1082,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ddragon2 )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD_TAG("main", HD6309, MAIN_CLOCK)	/* 12MHz / 4 internally */
+ 	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK)	/* 12MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(dd2_map,0)
 
-	MDRV_CPU_ADD_TAG("sub", Z80, MAIN_CLOCK / 3)	/* 4 MHz */
+	MDRV_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(dd2_sub_map,0)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+	MDRV_CPU_ADD("sound", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(dd2_sound_map,0)
 
 	MDRV_INTERLEAVE(1000) /* heavy interleaving to sync up sprite<->main cpu's */
@@ -1110,12 +1110,12 @@ static MACHINE_DRIVER_START( ddragon2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, SOUND_CLOCK)
+	MDRV_SOUND_ADD("ym", YM2151, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
@@ -1125,7 +1125,7 @@ static MACHINE_DRIVER_START( darktowr )
 	MDRV_IMPORT_FROM(ddragon)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68705,XTAL_4MHz)
+	MDRV_CPU_ADD("mcu", M68705,XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	/* video hardware */

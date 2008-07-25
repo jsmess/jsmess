@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( llander_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_READ(llander_IN0_r)		/* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
-	AM_RANGE(0x2c00, 0x2c00) AM_READ(input_port_3_r)	/* IN3 */
+	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(llander_led_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
@@ -374,7 +374,7 @@ static INPUT_PORTS_START( asterock )
 	/* Bit 0 is VG_HALT, handled in the machine dependent part */
 	/* Bit 2 is the 3 KHz source */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)		/* hyperspace */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)	/* fire */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)		/* fire */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -540,7 +540,7 @@ static INPUT_PORTS_START( llander )
 	/* The way the DAC/counter circuit always trys to self center at the voltage derived from the thrust control, */
 	/* I don't think it ever expected to get to 0xff. We can not emulate the external DAC circuit exactly, */
 	/* so changing the range to 0xfe seems to solve the problem. */
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("PADDLE")
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,254) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -585,7 +585,7 @@ static const struct POKEYinterface pokey_interface =
 static MACHINE_DRIVER_START( asteroid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK/8)
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(asteroid_map,0)
 	MDRV_CPU_PERIODIC_INT(asteroid_interrupt, (double)MASTER_CLOCK/4096/12)
 
@@ -603,7 +603,7 @@ static MACHINE_DRIVER_START( asteroid )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("disc", DISCRETE, 0)
+	MDRV_SOUND_ADD("disc", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(asteroid)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 MACHINE_DRIVER_END
@@ -631,7 +631,7 @@ static MACHINE_DRIVER_START( astdelux )
 	MDRV_SOUND_CONFIG_DISCRETE(astdelux)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(POKEY, MASTER_CLOCK/8)
+	MDRV_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

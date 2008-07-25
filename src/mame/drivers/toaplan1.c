@@ -1237,11 +1237,11 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( rallybik )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(rallybik_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(rallybik_sound_io_map, 0)
 
@@ -1268,7 +1268,7 @@ static MACHINE_DRIVER_START( rallybik )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, 28000000/8)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1277,11 +1277,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( truxton )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(truxton_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(truxton_sound_io_map, 0)
 
@@ -1308,7 +1308,7 @@ static MACHINE_DRIVER_START( truxton )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, 28000000/8)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1317,11 +1317,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hellfire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(hellfire_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(hellfire_sound_io_map, 0)
 
@@ -1348,7 +1348,7 @@ static MACHINE_DRIVER_START( hellfire )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, 28000000/8)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1357,11 +1357,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( zerowing )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(zerowing_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(zerowing_sound_io_map, 0)
 
@@ -1388,7 +1388,7 @@ static MACHINE_DRIVER_START( zerowing )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, 28000000/8)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1397,15 +1397,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( demonwld )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(demonwld_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(demonwld_sound_io_map, 0)
 
-	MDRV_CPU_ADD(TMS32010,28000000/2)	/* 14MHz CLKin */
+	MDRV_CPU_ADD("dsp", TMS32010,28000000/2)	/* 14MHz CLKin */
 	MDRV_CPU_PROGRAM_MAP(DSP_program_map,0)
 	MDRV_CPU_IO_MAP(DSP_io_map,0)
 
@@ -1432,7 +1432,7 @@ static MACHINE_DRIVER_START( demonwld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, 28000000/8)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1441,7 +1441,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( samesame )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(samesame_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1466,7 +1466,7 @@ static MACHINE_DRIVER_START( samesame )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, 28000000/8)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1475,11 +1475,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( outzone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(outzone_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(outzone_sound_io_map, 0)
 
@@ -1506,7 +1506,7 @@ static MACHINE_DRIVER_START( outzone )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, 28000000/8)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1515,7 +1515,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vimana )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_10MHz) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_10MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vimana_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1540,7 +1540,7 @@ static MACHINE_DRIVER_START( vimana )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, XTAL_28MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_28MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1828,6 +1828,35 @@ ROM_START( demonwl3 )
 	ROM_REGION( 0x040000, REGION_CPU1, 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10.bin", 0x000000, 0x20000, CRC(6f7468e0) SHA1(87ef7733fd0d00d0d375dbf30332cf0614480dc2) )
 	ROM_LOAD16_BYTE( "o16-09.bin", 0x000001, 0x20000, CRC(a572f5f7) SHA1(3d6a443cecd46734c7e1b761130909482c7a9914) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* Sound Z80 code */
+	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
+
+	ROM_REGION( 0x2000, REGION_CPU3, 0 )	/* Co-Processor TMS320C10 MCU code */
+	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
+	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
+	ROM_LOAD( "rom07",  0x20000, 0x20000, CRC(a3a0d993) SHA1(50311b9447eb04271b17b212ca31d083ab5b2414) )
+	ROM_LOAD( "rom06",  0x40000, 0x20000, CRC(4fc5e5f3) SHA1(725d4b009d575ff8ffbe1c00df352ccf235465d7) )
+	ROM_LOAD( "rom08",  0x60000, 0x20000, CRC(eb53ab09) SHA1(d98195cc1b65b76335b5b24adb31deae1b313f3a) )
+
+	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "rom01",  0x00000, 0x20000, CRC(1b3724e9) SHA1(3dbb0450ab1e40e6df2b7c7356352419cd3f113d) )
+	ROM_LOAD( "rom02",  0x20000, 0x20000, CRC(7b20a44d) SHA1(4dc1a2fa2058077b112c73492808ee9381060ec7) )
+	ROM_LOAD( "rom03",  0x40000, 0x20000, CRC(2cacdcd0) SHA1(92216d1c6859e05d39363c30e0beb45bc0ae4e1c) )
+	ROM_LOAD( "rom04",  0x60000, 0x20000, CRC(76fd3201) SHA1(7a12737bf90bd9760074132edeb22f3fd3e16b4f) )
+
+	ROM_REGION( 0x40, REGION_PROMS, 0 )		/* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+ROM_END
+
+ROM_START( demonwl4 )
+	ROM_REGION( 0x040000, REGION_CPU1, 0 )	/* Main 68K code */
+	ROM_LOAD16_BYTE( "o16_10ii", 0x000000, 0x20000, CRC(84EE5218) SHA1(DC2B017EE630330163BE320008D8A0D761CB0CFB) )
+	ROM_LOAD16_BYTE( "o16_09ii", 0x000001, 0x20000, CRC(CF474CB2) SHA1(5C049082B8D7118E0D2E50C6AE07F9D3D0110498) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* Sound Z80 code */
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
@@ -2158,10 +2187,11 @@ GAME( 1989, hellfir1, hellfire, hellfire, hellfir1, toaplan1, ROT0,   "Toaplan (
 GAME( 1989, hellfir2, hellfire, hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver., first edition)", 0 )
 GAME( 1989, zerowing, 0,        zerowing, zerowing, toaplan1, ROT0,   "Toaplan", "Zero Wing", 0 )
 GAME( 1989, zerowng2, zerowing, zerowing, zerowng2, toaplan1, ROT0,   "[Toaplan] Williams Electronics Games, Inc", "Zero Wing (2 player simultaneous ver.)", 0 )
-GAME( 1990, demonwld, 0,        demonwld, demonwld, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story", 0 )
-GAME( 1989, demonwl1, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan (Taito license)", "Demon's World / Horror Story (Taito license)", 0 )
-GAME( 1989, demonwl2, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (early edition)", 0 )
-GAME( 1989, demonwl3, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (first edition)", 0 )
+GAME( 1990, demonwld, 0,        demonwld, demonwld, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
+GAME( 1989, demonwl1, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (Taito license, set 2)", 0 )
+GAME( 1989, demonwl2, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
+GAME( 1989, demonwl3, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 4)", 0 )
+GAME( 1989, demonwl4, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 5)", 0 )
 GAME( 1990, fireshrk, 0,        samesame, fireshrk, toaplan1, ROT270, "Toaplan", "Fire Shark", GAME_NO_SOUND )
 GAME( 1989, samesame, fireshrk, samesame, samesame, toaplan1, ROT270, "Toaplan", "Same! Same! Same!", GAME_NO_SOUND )
 GAME( 1989, samesam2, fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan", "Same! Same! Same! (2P Ver.)", GAME_NO_SOUND )

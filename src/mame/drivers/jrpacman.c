@@ -265,7 +265,7 @@ static const struct namco_interface namco_interface =
 static MACHINE_DRIVER_START( jrpacman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -288,7 +288,7 @@ static MACHINE_DRIVER_START( jrpacman )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(NAMCO, 3072000/32)
+	MDRV_SOUND_ADD("namco", NAMCO, 3072000/32)
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

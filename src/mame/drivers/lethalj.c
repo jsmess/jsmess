@@ -519,7 +519,7 @@ static const tms34010_config tms_config_lethalj =
 static MACHINE_DRIVER_START( gameroom )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, MASTER_CLOCK)
+	MDRV_CPU_ADD("main", TMS34010, MASTER_CLOCK)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(lethalj_map,0)
 
@@ -537,15 +537,15 @@ static MACHINE_DRIVER_START( gameroom )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, SOUND_CLOCK)
+	MDRV_SOUND_ADD("oki1", OKIM6295, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.26)
 
-	MDRV_SOUND_ADD(OKIM6295, SOUND_CLOCK)
+	MDRV_SOUND_ADD("oki2", OKIM6295, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.26)
 
-	MDRV_SOUND_ADD(OKIM6295, SOUND_CLOCK)
+	MDRV_SOUND_ADD("oki3", OKIM6295, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_3_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.26)
 MACHINE_DRIVER_END

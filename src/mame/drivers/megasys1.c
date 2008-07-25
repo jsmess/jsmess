@@ -616,11 +616,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( system_A )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
+	MDRV_CPU_ADD("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
 	MDRV_CPU_PROGRAM_MAP(readmem_A,writemem_A)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
-	MDRV_CPU_ADD_TAG("sound", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
+	MDRV_CPU_ADD("sound", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_A,sound_writemem_A)
 
@@ -646,17 +646,17 @@ static MACHINE_DRIVER_START( system_A )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
+	MDRV_SOUND_ADD("ym", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
-	MDRV_SOUND_ADD_TAG("OKI1",OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
+	MDRV_SOUND_ADD("OKI1",OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
 
-	MDRV_SOUND_ADD_TAG("OKI2",OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
+	MDRV_SOUND_ADD("OKI2",OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
@@ -726,7 +726,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( system_D )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
+	MDRV_CPU_ADD("main", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_D,writemem_D)
 	MDRV_CPU_VBLANK_INT("main", interrupt_D)
 
@@ -750,7 +750,7 @@ static MACHINE_DRIVER_START( system_D )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("OKI1",OKIM6295, SYS_D_CPU_CLOCK/4)	/* 2MHz (8MHz / 4) */
+	MDRV_SOUND_ADD("OKI1",OKIM6295, SYS_D_CPU_CLOCK/4)	/* 2MHz (8MHz / 4) */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -788,12 +788,11 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( system_Z )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
+	MDRV_CPU_ADD("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
 	MDRV_CPU_PROGRAM_MAP(readmem_A,writemem_A)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
-	MDRV_CPU_ADD(Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_z80,sound_writemem_z80)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 
@@ -814,7 +813,7 @@ static MACHINE_DRIVER_START( system_Z )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD("ym", YM2203, 1500000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

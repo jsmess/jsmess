@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( megatech )
 	MDRV_IMPORT_FROM(megadriv)
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
-	MDRV_CPU_ADD_TAG("megatech_bios", Z80, MASTER_CLOCK / 15) /* ?? */
+	MDRV_CPU_ADD("megatech_bios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(megatech_bios_map, 0)
 	MDRV_CPU_IO_MAP(megatech_bios_portmap,0)
 
@@ -632,7 +632,7 @@ static MACHINE_DRIVER_START( megatech )
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(SN76496, MASTER_CLOCK/15)
+	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 MACHINE_DRIVER_END

@@ -564,7 +564,7 @@ ROM_END
 
 static MACHINE_DRIVER_START( c16 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M7501, 1400000)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M7501, 1400000)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(c16_readmem, c16_writemem)
 	MDRV_CPU_VBLANK_INT("main", c16_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(ted7360_raster_interrupt, TED7360_HRETRACERATE)
@@ -587,10 +587,10 @@ static MACHINE_DRIVER_START( c16 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("ted7360", CUSTOM, 0)
+	MDRV_SOUND_ADD("ted7360", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(ted7360_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("sid", SID8580, TED7360PAL_CLOCK/4)
+	MDRV_SOUND_ADD("sid", SID8580, TED7360PAL_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */

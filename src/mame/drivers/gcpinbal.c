@@ -379,7 +379,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( gcpinbal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)	/* 16 MHz ? */
+	MDRV_CPU_ADD("main", M68000, 32000000/2)	/* 16 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(gcpinbal_readmem,gcpinbal_writemem)
 	MDRV_CPU_VBLANK_INT("main", gcpinbal_interrupt)
 
@@ -400,11 +400,11 @@ static MACHINE_DRIVER_START( gcpinbal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

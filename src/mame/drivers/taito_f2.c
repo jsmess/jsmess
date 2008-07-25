@@ -3736,11 +3736,10 @@ static MACHINE_RESET( qcrayon )
 static MACHINE_DRIVER_START( taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 24000000/2)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 24000000/2)	/* 12 MHz */
 	MDRV_CPU_VBLANK_INT("main", taitof2_interrupt)
 
-	MDRV_CPU_ADD(Z80, 24000000/6)	/* 4 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 24000000/6)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(f2)
@@ -3763,7 +3762,7 @@ static MACHINE_DRIVER_START( taito_f2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 24000000/3) /* Was 16000000/2, but only a 24Mhz OSC */
+	MDRV_SOUND_ADD("ym", YM2610, 24000000/3) /* Was 16000000/2, but only a 24Mhz OSC */
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
@@ -4189,12 +4188,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( camltrya )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)	/* verified on pcb  */
+	MDRV_CPU_ADD("main", M68000,24000000/2)	/* verified on pcb  */
 	MDRV_CPU_PROGRAM_MAP(cameltry_readmem,cameltry_writemem)
 	MDRV_CPU_VBLANK_INT("main", taitof2_interrupt)
 
-	MDRV_CPU_ADD(Z80,24000000/4)	/* verifed on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,24000000/4)	/* verifed on pcb */
 	MDRV_CPU_PROGRAM_MAP(camltrya_sound_readmem,camltrya_sound_writemem)
 
 	/* video hardware */
@@ -4215,14 +4213,14 @@ static MACHINE_DRIVER_START( camltrya )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 24000000/8) /* verified on pcb  */
+	MDRV_SOUND_ADD("ym", YM2203, 24000000/8) /* verified on pcb  */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.60)
 
-	MDRV_SOUND_ADD(OKIM6295, 4224000/4) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, 4224000/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
@@ -4231,12 +4229,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( driveout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000,24000000/2)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(driveout_readmem,driveout_writemem)
 	MDRV_CPU_VBLANK_INT("main", taitof2_interrupt)
 
-	MDRV_CPU_ADD(Z80,24000000/6)	/* 4 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,24000000/6)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(driveout_sound_readmem,driveout_sound_writemem)
 
 	/* video hardware */
@@ -4257,7 +4254,7 @@ static MACHINE_DRIVER_START( driveout )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")   /* does it ? */
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)

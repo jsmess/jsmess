@@ -214,7 +214,7 @@ static PALETTE_INIT( poolshrk )
 static MACHINE_DRIVER_START( poolshrk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800, 11055000 / 8) /* ? */
+	MDRV_CPU_ADD("main", M6800, 11055000 / 8) /* ? */
 	MDRV_CPU_PROGRAM_MAP(poolshrk_cpu_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
@@ -234,7 +234,7 @@ static MACHINE_DRIVER_START( poolshrk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(poolshrk)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

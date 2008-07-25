@@ -414,11 +414,11 @@ static const struct namco_interface namco_interface =
 static MACHINE_DRIVER_START( pacland )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 49152000/32)	/* 1.536 MHz */
+	MDRV_CPU_ADD("main", M6809, 49152000/32)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(HD63701, 49152000/8)	/* 1.536 MHz? */
+	MDRV_CPU_ADD("mcu", HD63701, 49152000/8)	/* 1.536 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
@@ -443,7 +443,7 @@ static MACHINE_DRIVER_START( pacland )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(NAMCO_CUS30, 49152000/2/1024)
+	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2/1024)
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

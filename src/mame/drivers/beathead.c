@@ -395,7 +395,7 @@ static INPUT_PORTS_START( beathead )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_III_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 INPUT_PORTS_END
 
 
@@ -409,7 +409,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( beathead )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(ASAP, ATARI_CLOCK_14MHz)
+	MDRV_CPU_ADD("main", ASAP, ATARI_CLOCK_14MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_RESET(beathead)

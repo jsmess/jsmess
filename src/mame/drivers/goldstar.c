@@ -286,7 +286,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( goldstar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579545)//(4000000?)
+	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -308,11 +308,11 @@ static MACHINE_DRIVER_START( goldstar )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
-	MDRV_SOUND_ADD(AY8910,1500000)//1 AY8910, at clock 150000Hz
+	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
 	MDRV_SOUND_CONFIG(ay8910_interface)//read extra data from interface
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)//clock
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified //REGION_SOUND1
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 
@@ -322,7 +322,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( goldstbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579545)//(4000000?)
+	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -344,11 +344,11 @@ static MACHINE_DRIVER_START( goldstbl )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
-	MDRV_SOUND_ADD(AY8910,1500000)//1 AY8910, at clock 150000Hz
+	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
 	MDRV_SOUND_CONFIG(ay8910_interface)//read extra data from interface
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)//clock
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified //REGION_SOUND1
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 MACHINE_DRIVER_END
@@ -357,7 +357,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( moonlght )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579545)//(4000000?)
+	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -379,11 +379,11 @@ static MACHINE_DRIVER_START( moonlght )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
-	MDRV_SOUND_ADD(AY8910,1500000)//1 AY8910, at clock 150000Hz
+	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
 	MDRV_SOUND_CONFIG(ay8910_interface)//read extra data from interface
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)//clock
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)// clock frequency & pin 7 not verified //REGION_SOUND1
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 MACHINE_DRIVER_END

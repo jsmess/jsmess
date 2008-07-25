@@ -559,7 +559,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( apple2_common )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
+	MDRV_CPU_ADD("main", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 	MDRV_CPU_PROGRAM_MAP(apple2_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
 	MDRV_INTERLEAVE(1)
@@ -580,12 +580,12 @@ static MACHINE_DRIVER_START( apple2_common )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("A2DAC", DAC, 0)
+	MDRV_SOUND_ADD("A2DAC", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD_TAG("ay8913.1", AY8913, 1022727)
+	MDRV_SOUND_ADD("ay8913.1", AY8913, 1022727)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD_TAG("ay8913.2", AY8913, 1022727)
+	MDRV_SOUND_ADD("ay8913.2", AY8913, 1022727)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

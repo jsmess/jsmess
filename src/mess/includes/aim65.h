@@ -9,6 +9,7 @@
 #ifndef AIM65_H_
 #define AIM65_H_
 
+#include "machine/6532riot.h"
 
 /** R6502 Clock.
  *
@@ -29,6 +30,7 @@ void aim65_update_ds5(int digit, int data);
 
 DRIVER_INIT( aim65 );
 
+extern const riot6532_interface aim65_r6532_interface;
 
 /*----------- defined in video/aim65.c -----------*/
 

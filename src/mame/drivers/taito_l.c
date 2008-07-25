@@ -2170,15 +2170,15 @@ static const struct YM2203interface ym2203_interface_single =
 static MACHINE_DRIVER_START( fhawk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("cpu1", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("cpu1", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(fhawk_readmem,fhawk_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)	/* verified on pcb */
+	MDRV_CPU_ADD("sound", Z80, 4000000)	/* verified on pcb */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(fhawk_3_readmem,fhawk_3_writemem)
 
-	MDRV_CPU_ADD_TAG("cpu2", Z80, 12000000/3) 	/* verified on pcb */
+	MDRV_CPU_ADD("cpu2", Z80, 12000000/3) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fhawk_2_readmem,fhawk_2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
@@ -2204,7 +2204,7 @@ static MACHINE_DRIVER_START( fhawk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2203", YM2203, 3000000) /* verified on pcb */
+	MDRV_SOUND_ADD("2203", YM2203, 3000000) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface_triple)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2236,7 +2236,7 @@ static MACHINE_DRIVER_START( champwr )
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -2270,11 +2270,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kurikint )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(kurikint_readmem,kurikint_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD( Z80, 12000000/3) 	/* verified on pcb */
+	MDRV_CPU_ADD("audio",  Z80, 12000000/3) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kurikint_2_readmem,kurikint_2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -2300,7 +2300,7 @@ static MACHINE_DRIVER_START( kurikint )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2203", YM2203, 3000000) /* verified on pcb */
+	MDRV_SOUND_ADD("2203", YM2203, 3000000) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
@@ -2321,7 +2321,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(plotting_readmem,plotting_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
@@ -2345,7 +2345,7 @@ static MACHINE_DRIVER_START( plotting )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2203", YM2203, 3330000) /* verified on pcb */
+	MDRV_SOUND_ADD("2203", YM2203, 3330000) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface_single)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2410,11 +2410,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( evilston )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 13330560/2) 	/* not verfied */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* not verfied */
 	MDRV_CPU_PROGRAM_MAP(evilston_readmem,evilston_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD(Z80, 12000000/3) 	/* not verified */
+	MDRV_CPU_ADD("audio", Z80, 12000000/3) 	/* not verified */
 	MDRV_CPU_PROGRAM_MAP(evilston_2_readmem,evilston_2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -2440,7 +2440,7 @@ static MACHINE_DRIVER_START( evilston )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2203", YM2203, 12000000/4) /* not verified */
+	MDRV_SOUND_ADD("2203", YM2203, 12000000/4) /* not verified */
 	MDRV_SOUND_ROUTE(0, "mono", 0.00)
 	MDRV_SOUND_ROUTE(1, "mono", 0.00)
 	MDRV_SOUND_ROUTE(2, "mono", 0.00)
@@ -2742,6 +2742,9 @@ ROM_START( plotting ) /* Likely B96-10 or higher by Taito's rom numbering system
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b96-07.ic9", 0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
 	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
+
+	ROM_REGION( 0x0200, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
 ROM_END
 
 
@@ -2753,6 +2756,9 @@ ROM_START( plottina ) /* B96-09 or higher by Taito's rom numbering system, demo 
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+
+	ROM_REGION( 0x0200, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
 ROM_END
 
 ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom numbering system, demo mode is 2 players */
@@ -2763,6 +2769,9 @@ ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom num
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+
+	ROM_REGION( 0x0200, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
 ROM_END
 
 ROM_START( plottinu ) /* The demo mode is 2 players */
@@ -2773,6 +2782,9 @@ ROM_START( plottinu ) /* The demo mode is 2 players */
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+
+	ROM_REGION( 0x0200, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
 ROM_END
 
 ROM_START( flipull ) /* The demo mode is 1 player */

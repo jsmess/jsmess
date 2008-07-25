@@ -429,7 +429,7 @@ static INTERRUPT_GEN( skylncr_vblank_interrupt )
 static MACHINE_DRIVER_START( skylncr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 12000000/4)
+	MDRV_CPU_ADD("main", Z80, 12000000/4)
 	MDRV_CPU_PROGRAM_MAP(mem_map_skylncr,0)
 	MDRV_CPU_IO_MAP(io_map_skylncr,0)
 	MDRV_CPU_VBLANK_INT("main", skylncr_vblank_interrupt)
@@ -450,7 +450,7 @@ static MACHINE_DRIVER_START( skylncr )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, 12000000/8)
+	MDRV_SOUND_ADD("ay", AY8910, 12000000/8)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

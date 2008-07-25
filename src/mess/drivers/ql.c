@@ -572,10 +572,10 @@ static MACHINE_START( ql )
 
 static MACHINE_DRIVER_START( ql )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M68008, X1/2)
+	MDRV_CPU_ADD("main", M68008, X1/2)
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
 
-	MDRV_CPU_ADD_TAG("ipc", I8749, X4)
+	MDRV_CPU_ADD("ipc", I8749, X4)
 	MDRV_CPU_PROGRAM_MAP(ipc_map, 0)
 	MDRV_CPU_IO_MAP(ipc_io_map, 0)
 
@@ -605,7 +605,7 @@ static MACHINE_DRIVER_START( ql )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

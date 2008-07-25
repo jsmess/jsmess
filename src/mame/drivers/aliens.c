@@ -90,18 +90,18 @@ static WRITE8_HANDLER( aliens_snd_bankswitch_w )
 
 
 static ADDRESS_MAP_START( aliens_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)			/* palette + work RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)		/* palette + work RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)						/* banked ROM */
-	AM_RANGE(0x5f80, 0x5f80) AM_READ(input_port_2_r)			/* DIPSW #3 */
-	AM_RANGE(0x5f81, 0x5f81) AM_READ(input_port_3_r)			/* Player 1 inputs */
-	AM_RANGE(0x5f82, 0x5f82) AM_READ(input_port_4_r)			/* Player 2 inputs */
-	AM_RANGE(0x5f83, 0x5f83) AM_READ(input_port_1_r)			/* DIPSW #2 */
-	AM_RANGE(0x5f84, 0x5f84) AM_READ(input_port_0_r)			/* DIPSW #1 */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)												/* banked ROM */
+	AM_RANGE(0x5f80, 0x5f80) AM_READ_PORT("DSW3")
+	AM_RANGE(0x5f81, 0x5f81) AM_READ_PORT("P1")
+	AM_RANGE(0x5f82, 0x5f82) AM_READ_PORT("P2")
+	AM_RANGE(0x5f83, 0x5f83) AM_READ_PORT("DSW2")
+	AM_RANGE(0x5f84, 0x5f84) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f88, 0x5f88) AM_READWRITE(watchdog_reset_r, aliens_coin_counter_w)		/* coin counters */
-	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(aliens_sh_irqtrigger_w)		/* cause interrupt on audio CPU */
+	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(aliens_sh_irqtrigger_w)							/* cause interrupt on audio CPU */
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM e24_j02.bin */
+	AM_RANGE(0x8000, 0xffff) AM_ROM														/* ROM e24_j02.bin */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aliens_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( aliens_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)			/* soundlatch_r */
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)				/* soundlatch_r */
 	AM_RANGE(0xe000, 0xe00d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)
 ADDRESS_MAP_END
 
@@ -187,7 +187,7 @@ static INPUT_PORTS_START( aliens )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -197,7 +197,7 @@ static INPUT_PORTS_START( aliens )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -239,11 +239,11 @@ static MACHINE_DRIVER_START( aliens )
 
 	/* external clock should be 12MHz probably, CPU internal divider and precise cycle timings */
 	/* are unknown though. 3MHz is too low, sprites flicker in the pseudo-3D levels */
-	MDRV_CPU_ADD(KONAMI, 6000000)		/* ? */
+	MDRV_CPU_ADD("main", KONAMI, 6000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(aliens_map,0)
 	MDRV_CPU_VBLANK_INT("main", aliens_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(aliens_sound_map,0)
 
 	MDRV_MACHINE_RESET(aliens)
@@ -266,12 +266,12 @@ static MACHINE_DRIVER_START( aliens )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)

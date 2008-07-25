@@ -3607,11 +3607,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( cps1_10MHz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+	MDRV_CPU_ADD("sound", Z80, 3579545)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
@@ -3633,12 +3633,12 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2151", YM2151, 3579545)
+	MDRV_SOUND_ADD("2151", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.35)
 	MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
-	MDRV_SOUND_ADD_TAG("okim", OKIM6295, 1000000)
+	MDRV_SOUND_ADD("okim", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // pin 7 can be changed by the game code, see f006 on z80
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -3692,11 +3692,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cpspicb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_qsound_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", PIC16C57, 12000000)
+	MDRV_CPU_ADD("sound", PIC16C57, 12000000)
 	MDRV_CPU_FLAGS(CPU_DISABLE) /* no valid dumps .. */
 
 	/* video hardware */
@@ -3717,7 +3717,7 @@ static MACHINE_DRIVER_START( cpspicb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("okim", OKIM6295, 1000000)
+	MDRV_SOUND_ADD("okim", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -3767,11 +3767,11 @@ static const struct MSM5205interface msm5205_interface2 =
 static MACHINE_DRIVER_START( sf2mdt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+	MDRV_CPU_ADD("sound", Z80, 3579545)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map,0)
 
@@ -3793,17 +3793,17 @@ static MACHINE_DRIVER_START( sf2mdt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2151", YM2151, 3579545)
+	MDRV_SOUND_ADD("2151", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.35)
 	MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* has 2x MSM5205 instead of OKI6295 */
-	MDRV_SOUND_ADD(MSM5205, 24000000/64)	/* ? */
+	MDRV_SOUND_ADD("msm1", MSM5205, 24000000/64)	/* ? */
 	MDRV_SOUND_CONFIG(msm5205_interface1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(MSM5205, 24000000/64)	/* ? */
+	MDRV_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
 	MDRV_SOUND_CONFIG(msm5205_interface2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

@@ -316,11 +316,11 @@ static PALETTE_INIT( dgnbeta )
 
 static MACHINE_DRIVER_START( dgnbeta )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 Mhz */
+	MDRV_CPU_ADD("main", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(dgnbeta_map,0)
 
 	/* both cpus in the beta share the same address/data busses */
-	MDRV_CPU_ADD_TAG("dma", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 Mhz */
+	MDRV_CPU_ADD("dma", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(dgnbeta_map,0)
 
 	MDRV_SCREEN_ADD("main", RASTER)

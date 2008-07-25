@@ -453,14 +453,14 @@ static const struct jaguar_config dsp_config =
 static MACHINE_DRIVER_START( jaguar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, M68K_CLOCK/2)
+	MDRV_CPU_ADD("main", M68EC020, M68K_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(jaguar_map,0)
 
-	MDRV_CPU_ADD_TAG("gpu", JAGUARGPU, JAGUAR_CLOCK/2)
+	MDRV_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(gpu_config)
 	MDRV_CPU_PROGRAM_MAP(gpu_map,0)
 
-	MDRV_CPU_ADD_TAG("dsp", JAGUARDSP, JAGUAR_CLOCK/2)
+	MDRV_CPU_ADD("dsp", JAGUARDSP, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(dsp_config)
 	MDRV_CPU_PROGRAM_MAP(dsp_map,0)
 
@@ -479,9 +479,9 @@ static MACHINE_DRIVER_START( jaguar )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD_TAG("dac.l", DAC, 0)
+	MDRV_SOUND_ADD("dac.l", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD_TAG("dac.r", DAC, 0)
+	MDRV_SOUND_ADD("dac.r", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
 	/* quickload */

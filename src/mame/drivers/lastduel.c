@@ -266,12 +266,11 @@ static INTERRUPT_GEN( madgear_interrupt )
 static MACHINE_DRIVER_START( lastduel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000) /* Could be 8 MHz */
+	MDRV_CPU_ADD("main", M68000, 10000000) /* Could be 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(lastduel_readmem,lastduel_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(lastduel_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */ /* Accurate */
+	MDRV_CPU_ADD("audio", Z80, 3579545) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -294,11 +293,11 @@ static MACHINE_DRIVER_START( lastduel )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3579545)
+	MDRV_SOUND_ADD("ym1", YM2203, 3579545)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(YM2203, 3579545)
+	MDRV_SOUND_ADD("ym2", YM2203, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
@@ -306,12 +305,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( madgear )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000) /* Accurate */
+	MDRV_CPU_ADD("main", M68000, 10000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(madgear_readmem,madgear_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(madgear_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mg_sound_readmem,mg_sound_writemem)
 
 	/* video hardware */
@@ -334,14 +332,14 @@ static MACHINE_DRIVER_START( madgear )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_10MHz/10)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_10MHz/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
 MACHINE_DRIVER_END

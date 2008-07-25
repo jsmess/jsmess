@@ -918,13 +918,13 @@ static const struct YMZ280Binterface ymz280b_interface =
 
 
 static MACHINE_DRIVER_START( deroon )
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(400) // guess
 
 	/* audio CPU */
-	MDRV_CPU_ADD(Z80, 16000000/2 )	/* 8 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 16000000/2 )	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 
@@ -950,19 +950,19 @@ static MACHINE_DRIVER_START( deroon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMF262, 14318180)
+	MDRV_SOUND_ADD("ymf", YMF262, 14318180)
 	MDRV_SOUND_CONFIG(ymf262_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
 	MDRV_SOUND_ROUTE(2, "left", 1.00)
 	MDRV_SOUND_ROUTE(3, "right", 1.00)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/8)
+	MDRV_SOUND_ADD("oki", OKIM6295, 16000000/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
-	MDRV_SOUND_ADD(YMZ280B, 16900000)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16900000)
 	MDRV_SOUND_CONFIG(ymz280b_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)

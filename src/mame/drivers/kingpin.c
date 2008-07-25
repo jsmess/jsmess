@@ -145,13 +145,13 @@ static const TMS9928a_interface tms9928a_interface =
 
 static MACHINE_DRIVER_START( kingpin )
 /*  MAIN CPU */
-	MDRV_CPU_ADD(Z80, 3579545)
+	MDRV_CPU_ADD("main", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_program_map,0)
 	MDRV_CPU_IO_MAP(kingpin_readport,kingpin_writeport)
 	MDRV_CPU_VBLANK_INT("main", kingpin_video_interrupt)
 
 /*  SOUND CPU */
-	MDRV_CPU_ADD(Z80, 3579545)
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_sound_map,0)
 	/*MDRV_CPU_IO_MAP(readport2,writeport2)*/
 
@@ -169,7 +169,7 @@ static MACHINE_DRIVER_START( kingpin )
 /*
     MDRV_SPEAKER_STANDARD_MONO("mono")
 
-    MDRV_SOUND_ADD(AY8912, 1500000)
+    MDRV_SOUND_ADD("ay", AY8912, 1500000)
     MDRV_SOUND_CONFIG(ay8912_interface)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 */

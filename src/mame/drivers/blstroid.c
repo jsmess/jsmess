@@ -101,8 +101,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE(blstroid_halt_until_hblank_0_w)
 	AM_RANGE(0xff9400, 0xff9401) AM_MIRROR(0x7f83fe) AM_READ(atarigen_sound_r)
-	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x7f83f8) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xff9804, 0xff9805) AM_MIRROR(0x7f83f8) AM_READ(input_port_1_word_r)
+	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL0")
+	AM_RANGE(0xff9804, 0xff9805) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL1")
 	AM_RANGE(0xff9c00, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ(inputs_r)
 	AM_RANGE(0xffa000, 0xffa3ff) AM_MIRROR(0x7f8c00) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( blstroid )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_I_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_i )		/* audio port */
 INPUT_PORTS_END
 
 
@@ -202,7 +202,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( blstroid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 

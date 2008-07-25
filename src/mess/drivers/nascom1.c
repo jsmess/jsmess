@@ -248,7 +248,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( nascom1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 1000000)
+	MDRV_CPU_ADD("main", Z80, 1000000)
 	MDRV_CPU_PROGRAM_MAP(nascom1_mem, 0)
 	MDRV_CPU_IO_MAP(nascom1_io, 0)
 

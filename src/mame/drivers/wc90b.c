@@ -384,15 +384,15 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( wc90b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_14MHz/2)
+	MDRV_CPU_ADD("main", Z80, XTAL_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map1,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_14MHz/2)
+	MDRV_CPU_ADD("sub", Z80, XTAL_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map2,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_19_6608MHz/8)
+	MDRV_CPU_ADD("audio", Z80, XTAL_19_6608MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 	/* IRQs are triggered by the main CPU */
 
@@ -413,11 +413,11 @@ static MACHINE_DRIVER_START( wc90b )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 2510000/2)
+	MDRV_SOUND_ADD("ym", YM2203, 2510000/2)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

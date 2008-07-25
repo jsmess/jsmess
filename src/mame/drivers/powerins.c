@@ -350,11 +350,11 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( powerins )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(powerins_readmem,powerins_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 6000000) /* 6 MHz */
+	MDRV_CPU_ADD("sound", Z80, 6000000) /* 6 MHz */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_snd,writemem_snd)
 	MDRV_CPU_IO_MAP(powerins_io_snd,0)
@@ -378,15 +378,15 @@ static MACHINE_DRIVER_START( powerins )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("oki1", OKIM6295, 4000000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 4000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD_TAG("oki2", OKIM6295, 4000000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 4000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD_TAG("ym2203", YM2203, 12000000 / 8)
+	MDRV_SOUND_ADD("ym2203", YM2203, 12000000 / 8)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END

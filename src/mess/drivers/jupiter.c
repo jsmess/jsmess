@@ -163,7 +163,7 @@ static INTERRUPT_GEN( jupiter_interrupt )
 /* machine definition */
 static MACHINE_DRIVER_START( jupiter )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3250000)        /* 3.25 Mhz */
+	MDRV_CPU_ADD("main", Z80, 3250000)        /* 3.25 Mhz */
 	MDRV_CPU_PROGRAM_MAP(jupiter_mem, 0)
 	MDRV_CPU_IO_MAP(jupiter_io, 0)
 	MDRV_CPU_VBLANK_INT("main", jupiter_interrupt)
@@ -186,7 +186,7 @@ static MACHINE_DRIVER_START( jupiter )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

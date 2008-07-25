@@ -3626,7 +3626,7 @@ static const struct MSM5205interface hanamai_msm5205_interface =
 static MACHINE_DRIVER_START( hanamai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(hanamai_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -3652,17 +3652,17 @@ static MACHINE_DRIVER_START( hanamai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 22000000 / 8)
+	MDRV_SOUND_ADD("ay", AY8910, 22000000 / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(YM2203, 22000000 / 8)
+	MDRV_SOUND_ADD("ym", YM2203, 22000000 / 8)
 	MDRV_SOUND_CONFIG(hanamai_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3683,7 +3683,7 @@ static const struct AY8910interface hnoridur_ay8910_interface =
 static MACHINE_DRIVER_START( hnoridur )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(hnoridur_mem_map,0)
 	MDRV_CPU_IO_MAP(hnoridur_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -3708,14 +3708,14 @@ static MACHINE_DRIVER_START( hnoridur )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 22000000 / 16)
+	MDRV_SOUND_ADD("ay", AY8910, 22000000 / 16)
 	MDRV_SOUND_CONFIG(hnoridur_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ADD("ym", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3741,7 +3741,7 @@ static const struct YM2203interface sprtmtch_ym2203_interface =
 static MACHINE_DRIVER_START( sprtmtch )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("main", Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(sprtmtch_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -3765,7 +3765,7 @@ static MACHINE_DRIVER_START( sprtmtch )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 22000000 / 8)
+	MDRV_SOUND_ADD("ym", YM2203, 22000000 / 8)
 	MDRV_SOUND_CONFIG(sprtmtch_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -3781,7 +3781,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mjfriday )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,24000000/4)	/* 6 MHz? */
+	MDRV_CPU_ADD("main",Z80,24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(mjfriday_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -3805,7 +3805,7 @@ static MACHINE_DRIVER_START( mjfriday )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2413, 24000000/6)
+	MDRV_SOUND_ADD("ym", YM2413, 24000000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3921,12 +3921,12 @@ static const struct MSM5205interface jantouki_msm5205_interface =
 static MACHINE_DRIVER_START( jantouki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_io_map,0)
 	MDRV_CPU_VBLANK_INT("top", jantouki_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_CPU_ADD_TAG("sound",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("sound",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_sound_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("top", jantouki_sound_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -3960,17 +3960,17 @@ static MACHINE_DRIVER_START( jantouki )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 22000000 / 8)
+	MDRV_SOUND_ADD("ay", AY8910, 22000000 / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(YM2203, 22000000 / 8)
+	MDRV_SOUND_ADD("ym", YM2203, 22000000 / 8)
 	MDRV_SOUND_CONFIG(jantouki_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(jantouki_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -4089,7 +4089,7 @@ static const struct AY8910interface htengoku_ay8910_interface =
 static MACHINE_DRIVER_START( htengoku )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,20000000 / 4)
+	MDRV_CPU_ADD("main",Z80,20000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map,0)
 	MDRV_CPU_IO_MAP(htengoku_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -4114,11 +4114,11 @@ static MACHINE_DRIVER_START( htengoku )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 20000000 / 16)
+	MDRV_SOUND_ADD("ay", AY8910, 20000000 / 16)
 	MDRV_SOUND_CONFIG(htengoku_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ADD("ym", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
@@ -4152,7 +4152,7 @@ static const struct AY8910interface tenkai_ay8910_interface =
 static MACHINE_DRIVER_START( tenkai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",TMP91640, 21472700 / 2)
+	MDRV_CPU_ADD("main",TMP91640, 21472700 / 2)
 	MDRV_CPU_PROGRAM_MAP(tenkai_map,0)
 	MDRV_CPU_IO_MAP(tenkai_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)
@@ -4175,11 +4175,11 @@ static MACHINE_DRIVER_START( tenkai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 22000000 / 16)
+	MDRV_SOUND_ADD("ay", AY8910, 22000000 / 16)
 	MDRV_SOUND_CONFIG(tenkai_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ADD("ym", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */

@@ -286,12 +286,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( darkseal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,12000000) /* Custom chip 59 */
+	MDRV_CPU_ADD("main", M68000,12000000) /* Custom chip 59 */
 	MDRV_CPU_PROGRAM_MAP(darkseal_readmem,darkseal_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
-	MDRV_CPU_ADD(H6280, 32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", H6280, 32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -313,19 +312,19 @@ static MACHINE_DRIVER_START( darkseal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 32220000/8)
+	MDRV_SOUND_ADD("ym1", YM2203, 32220000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MDRV_SOUND_ADD(YM2151, 32220000/9)
+	MDRV_SOUND_ADD("ym2", YM2151, 32220000/9)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.55)
 	MDRV_SOUND_ROUTE(1, "mono", 0.55)
 
-	MDRV_SOUND_ADD(OKIM6295, 32220000/32)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 32220000/16)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

@@ -213,9 +213,9 @@ static const UINT32 amask= 0xffff;
 
 static MACHINE_DRIVER_START( comquest )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6805, 4000000)		/* 4000000? */
-	/*MDRV_CPU_ADD_TAG("main", HD63705, 4000000)    instruction set looks like m6805/m6808 */
-	/*MDRV_CPU_ADD_TAG("main", M68705, 4000000) instruction set looks like m6805/m6808 */
+	MDRV_CPU_ADD("main", M6805, 4000000)		/* 4000000? */
+	/*MDRV_CPU_ADD("main", HD63705, 4000000)    instruction set looks like m6805/m6808 */
+	/*MDRV_CPU_ADD("main", M68705, 4000000) instruction set looks like m6805/m6808 */
 
 /*
     8 bit bus, integrated io, serial io?,

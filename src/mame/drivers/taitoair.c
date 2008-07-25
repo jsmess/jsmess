@@ -467,6 +467,9 @@ static INPUT_PORTS_START( topland )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
+
 	/* The range of these sticks reflects the range test mode displays.
        Eventually we want standard 0-0xff input range and a scale-up later
        in the stick_r routines.  And fake DSW with self-centering option
@@ -528,6 +531,9 @@ static INPUT_PORTS_START( ainferno )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* pedal l */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	/* The range of these sticks reflects the range test mode displays.
        Eventually we want standard 0-0xff input range and a scale-up later
@@ -594,14 +600,14 @@ static const struct YM2610interface airsys_ym2610_interface =
 static MACHINE_DRIVER_START( airsys )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz ??? */
+	MDRV_CPU_ADD("main", M68000,24000000 / 2)		/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(airsys_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000 / 2)			/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80,8000000 / 2)			/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
-	MDRV_CPU_ADD(TMS32025,24000000)			/* 24 MHz ??? *///
+	MDRV_CPU_ADD("dsp", TMS32025,24000000)			/* 24 MHz ??? *///
 	MDRV_CPU_PROGRAM_MAP(DSP_map_program, 0)
 	MDRV_CPU_DATA_MAP(DSP_map_data, 0)
 	MDRV_CPU_IO_MAP(DSP_map_io, 0)
@@ -627,7 +633,7 @@ static MACHINE_DRIVER_START( airsys )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(airsys_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)

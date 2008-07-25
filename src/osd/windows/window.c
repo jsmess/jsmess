@@ -183,6 +183,7 @@ static void mtlog_dump(void)
 }
 #else
 void mtlog_add(const char *event) { }
+static void mtlog_dump(void) { }
 #endif
 
 
@@ -286,9 +287,7 @@ static void winwindow_exit(running_machine *machine)
 		PostThreadMessage(window_threadid, WM_USER_SELF_TERMINATE, 0, 0);
 		WaitForSingleObject(window_thread, INFINITE);
 
-#if (LOG_THREADS)
 		mtlog_dump();
-#endif
 	}
 
 	// kill the UI pause event
@@ -354,7 +353,7 @@ void winwindow_process_events(running_machine *machine, int ingame)
 
 	// if we're running, disable some parts of the debugger
 	if (ingame && (machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debugwin_update_during_game();
+		debugwin_update_during_game(machine);
 
 	// remember the last time we did this
 	last_event_check = GetTickCount();

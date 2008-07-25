@@ -103,11 +103,11 @@ static COP400_INTERFACE( advision_cop411_interface )
 
 static MACHINE_DRIVER_START( advision )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", I8048, MAIN_CLOCK/15)
+	MDRV_CPU_ADD("main", I8048, MAIN_CLOCK/15)
 	MDRV_CPU_PROGRAM_MAP(advision_mem, 0)
 	MDRV_CPU_IO_MAP(advision_ports, 0)
 
-	MDRV_CPU_ADD_TAG("sound", COP411, 52631)
+	MDRV_CPU_ADD("sound", COP411, 52631)
 	MDRV_CPU_CONFIG(advision_cop411_interface)
 	MDRV_CPU_PROGRAM_MAP(advision_sound_mem, 0)
 	MDRV_CPU_IO_MAP(advision_sound_ports, 0)
@@ -131,7 +131,7 @@ static MACHINE_DRIVER_START( advision )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

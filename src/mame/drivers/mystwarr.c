@@ -934,11 +934,11 @@ static MACHINE_RESET(gaiapols)
 static MACHINE_DRIVER_START( mystwarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz (confirmed) */
+	MDRV_CPU_ADD("main", M68000, 16000000)	/* 16 MHz (confirmed) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(mystwarr_interrupt, 3)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
+	MDRV_CPU_ADD("sound", Z80, 8000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 480)
@@ -968,12 +968,12 @@ static MACHINE_DRIVER_START( mystwarr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(K054539, 48000)
+	MDRV_SOUND_ADD("konami1", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_interface)
 	MDRV_SOUND_ROUTE(0, "right", 1.0)	/* stereo channels are inverted */
 	MDRV_SOUND_ROUTE(1, "left", 1.0)
 
-	MDRV_SOUND_ADD(K054539, 48000)
+	MDRV_SOUND_ADD("konami2", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_interface)
 	MDRV_SOUND_ROUTE(0, "right", 1.0)	/* stereo channels are inverted */
 	MDRV_SOUND_ROUTE(1, "left", 1.0)

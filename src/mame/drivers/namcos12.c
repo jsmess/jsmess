@@ -1472,11 +1472,11 @@ static DRIVER_INIT( ghlpanic )
 
 static MACHINE_DRIVER_START( coh700 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( CXD8661R, XTAL_100MHz )
+	MDRV_CPU_ADD("main",  CXD8661R, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos12_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
-	MDRV_CPU_ADD(H83002, 14745600 )	/* verified 14.7456 MHz */
+	MDRV_CPU_ADD("sub", H83002, 14745600 )	/* verified 14.7456 MHz */
 	MDRV_CPU_PROGRAM_MAP( s12h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s12h8iomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
@@ -1501,7 +1501,7 @@ static MACHINE_DRIVER_START( coh700 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(C352, 14745600)
+	MDRV_SOUND_ADD("namco", C352, 14745600)
 	MDRV_SOUND_CONFIG(c352_interface)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)

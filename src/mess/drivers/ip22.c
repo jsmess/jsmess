@@ -1576,7 +1576,7 @@ static void ip22_harddisk_getinfo(const mess_device_class *devclass, UINT32 stat
 #endif
 
 static MACHINE_DRIVER_START( ip225015 )
-	MDRV_CPU_ADD_TAG( "main", R5000BE, 50000000*3 )
+	MDRV_CPU_ADD( "main", R5000BE, 50000000*3 )
 	MDRV_CPU_CONFIG( config )
 	MDRV_CPU_PROGRAM_MAP( ip225015_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", ip22_vbl)
@@ -1603,9 +1603,9 @@ static MACHINE_DRIVER_START( ip225015 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG( "dmadac", DMADAC, 0)
+	MDRV_SOUND_ADD( "dmadac", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG( "cdda",  CDDA, 0 )
+	MDRV_SOUND_ADD( "cdda",  CDDA, 0 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

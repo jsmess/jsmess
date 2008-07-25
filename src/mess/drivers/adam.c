@@ -621,12 +621,12 @@ static MACHINE_RESET( adam )
 
 static MACHINE_DRIVER_START( adam )
 	/* Machine hardware */
-	MDRV_CPU_ADD_TAG("Main", Z80, 3579545)       /* 3.579545 Mhz */
+	MDRV_CPU_ADD("Main", Z80, 3579545)       /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(adam_mem, 0)
 	MDRV_CPU_IO_MAP(adam_io, 0)
 
     /* Master M6801 AdamNet controller */
-	//MDRV_CPU_ADD_TAG("adamnet", M6800, 4000000)       /* 4.0 Mhz */
+	//MDRV_CPU_ADD("adamnet", M6800, 4000000)       /* 4.0 Mhz */
 	//MDRV_CPU_PROGRAM_MAP(master6801_mem, 0)
 
 	MDRV_CPU_VBLANK_INT("main", adam_interrupt)
@@ -641,7 +641,7 @@ static MACHINE_DRIVER_START( adam )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

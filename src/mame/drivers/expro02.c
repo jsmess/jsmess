@@ -308,7 +308,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( galsnew )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(galsnew,0)
 	MDRV_CPU_VBLANK_INT_HACK(galsnew_interrupt,3)
 
@@ -336,7 +336,7 @@ static MACHINE_DRIVER_START( galsnew )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("oki", OKIM6295, 12000000/6)
+	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/6)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

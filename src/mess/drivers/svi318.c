@@ -262,7 +262,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( svi318 )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD_TAG( "main", Z80, 3579545 )	/* 3.579545 Mhz */
+	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP( svi318_mem, 0 )
 	MDRV_CPU_IO_MAP( svi318_io, 0 )
 	MDRV_CPU_VBLANK_INT("main", svi318_interrupt)
@@ -282,11 +282,11 @@ static MACHINE_DRIVER_START( svi318 )
 
 	/* Sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, 1789773)
+	MDRV_SOUND_ADD("ay8910", AY8910, 1789773)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -319,7 +319,7 @@ static const mc6845_interface svi806_crtc6845_interface =
 
 static MACHINE_DRIVER_START( svi328_806 )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD_TAG( "main", Z80, 3579545 )	/* 3.579545 Mhz */
+	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP( svi328_806_mem, 0 )
 	MDRV_CPU_IO_MAP( svi328_806_io, 0 )
 	MDRV_CPU_VBLANK_INT("main", svi318_interrupt)
@@ -361,11 +361,11 @@ static MACHINE_DRIVER_START( svi328_806 )
 
 	/* Sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, 1789773)
+	MDRV_SOUND_ADD("ay8910", AY8910, 1789773)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 

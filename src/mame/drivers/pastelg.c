@@ -195,7 +195,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( pastelg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 19968000/8)	/* 2.496 MHz ? */
+	MDRV_CPU_ADD("main", Z80, 19968000/8)	/* 2.496 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_pastelg, writemem_pastelg)
 	MDRV_CPU_IO_MAP(readport_pastelg, writeport_pastelg)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt,96)  // nmiclock not written, chip is 1411M1 instead of 1413M3
@@ -221,11 +221,11 @@ static MACHINE_DRIVER_START( pastelg )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1250000)
+	MDRV_SOUND_ADD("ay", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

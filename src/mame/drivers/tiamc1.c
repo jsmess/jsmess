@@ -275,7 +275,7 @@ static const struct CustomSound_interface tiamc1_custom_interface =
 
 static MACHINE_DRIVER_START( tiamc1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(8080,16000000/9)		 /* 16 MHz */
+	MDRV_CPU_ADD("main", 8080,16000000/9)		 /* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(tiamc1_readmem,tiamc1_writemem)
 	MDRV_CPU_IO_MAP(tiamc1_readport,tiamc1_writeport)
 
@@ -301,7 +301,7 @@ static MACHINE_DRIVER_START( tiamc1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2 x 8253", CUSTOM, 16000000/9)
+	MDRV_SOUND_ADD("2 x 8253", CUSTOM, 16000000/9)
 	MDRV_SOUND_CONFIG(tiamc1_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

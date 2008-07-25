@@ -398,7 +398,7 @@ static MACHINE_RESET( aquarius )
 
 static MACHINE_DRIVER_START( aquarius )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_3_579545MHz) // ???
+	MDRV_CPU_ADD("main", Z80, XTAL_3_579545MHz) // ???
 	MDRV_CPU_PROGRAM_MAP(aquarius_mem, 0)
 	MDRV_CPU_IO_MAP(aquarius_io, 0)
 	MDRV_CPU_VBLANK_INT("main", aquarius_interrupt)
@@ -422,10 +422,10 @@ static MACHINE_DRIVER_START( aquarius )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914
+	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

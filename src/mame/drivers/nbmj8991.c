@@ -1591,7 +1591,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( nbmjdrv1 )	// galkoku
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 25000000/5)		/* 5.00 MHz ? */
+	MDRV_CPU_ADD("main", Z80, 25000000/5)		/* 5.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_galkoku, writemem_galkoku)
 	MDRV_CPU_IO_MAP(readport_galkoku, writeport_galkoku)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
@@ -1614,10 +1614,10 @@ static MACHINE_DRIVER_START( nbmjdrv1 )	// galkoku
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("3812", YM3812, 25000000/10)
+	MDRV_SOUND_ADD("3812", YM3812, 25000000/10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1625,13 +1625,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nbmjdrv2 )	// pstadium
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000/2)	/* 3.00 MHz */
+	MDRV_CPU_ADD("main", Z80, 6000000/2)	/* 3.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_pstadium, writemem_pstadium)
 	MDRV_CPU_IO_MAP(readport_pstadium, writeport_pstadium)
 	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3900000)					/* 4.00 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3900000)					/* 4.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_nbmj8991, sound_writemem_nbmj8991)
 	MDRV_CPU_IO_MAP(sound_readport_nbmj8991, sound_writeport_nbmj8991)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 128)
@@ -1654,13 +1653,13 @@ static MACHINE_DRIVER_START( nbmjdrv2 )	// pstadium
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 25000000/6.25)
+	MDRV_SOUND_ADD("ym", YM3812, 25000000/6.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

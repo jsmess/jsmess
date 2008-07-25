@@ -401,12 +401,12 @@ static struct MSM5205interface msm_interface =
 static MACHINE_DRIVER_START( dacholer )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* ? */
+	MDRV_CPU_ADD("main", Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* ? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(snd_map, 0)
 	MDRV_CPU_IO_MAP(snd_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main",sound_irq)
@@ -428,16 +428,16 @@ static MACHINE_DRIVER_START( dacholer )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay3", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(MSM5205, 375000)
+	MDRV_SOUND_ADD("msm", MSM5205, 375000)
 	MDRV_SOUND_CONFIG(msm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 

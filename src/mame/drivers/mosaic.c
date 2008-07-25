@@ -290,7 +290,7 @@ static const struct YM2203interface ym2203_interface =
 
 
 static MACHINE_DRIVER_START( mosaic )
-	MDRV_CPU_ADD_TAG("main", Z180, 7000000)	/* ??? */
+	MDRV_CPU_ADD("main", Z180, 7000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -312,7 +312,7 @@ static MACHINE_DRIVER_START( mosaic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD("ym", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

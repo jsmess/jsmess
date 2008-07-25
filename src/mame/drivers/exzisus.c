@@ -325,18 +325,18 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( exzisus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)			/* 6 MHz ??? */
+	MDRV_CPU_ADD("main", Z80, 6000000)			/* 6 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpua_readmem,cpua_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)			/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)			/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_CPU_ADD(Z80, 6000000)			/* 6 MHz ??? */
+	MDRV_CPU_ADD("cpub", Z80, 6000000)			/* 6 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpub_readmem,cpub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 6000000)			/* 6 MHz ??? */
+	MDRV_CPU_ADD("cpuc", Z80, 6000000)			/* 6 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpuc_readmem,cpuc_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -359,7 +359,7 @@ static MACHINE_DRIVER_START( exzisus )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)

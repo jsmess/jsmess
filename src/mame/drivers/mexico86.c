@@ -370,18 +370,18 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( mexico86 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
+	MDRV_CPU_ADD("main",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
-	MDRV_CPU_ADD(Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
+	MDRV_CPU_ADD("audio", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
+	MDRV_CPU_ADD("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(mexico86_m68705_interrupt,2)
 
-	MDRV_CPU_ADD_TAG("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
+	MDRV_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
 	MDRV_CPU_PROGRAM_MAP(sub_cpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -405,7 +405,7 @@ static MACHINE_DRIVER_START( mexico86 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD("ym", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)

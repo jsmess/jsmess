@@ -399,7 +399,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( toratora )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800,500000)	/* ?????? game speed is entirely controlled by this */
+	MDRV_CPU_ADD("main", M6800,500000)	/* ?????? game speed is entirely controlled by this */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_PERIODIC_INT(toratora_timer,16)	/* timer counting at 16 Hz */
 
@@ -419,11 +419,11 @@ static MACHINE_DRIVER_START( toratora )
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76477, 0)
+	MDRV_SOUND_ADD("sn1", SN76477, 0)
 	MDRV_SOUND_CONFIG(sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SN76477, 0)
+	MDRV_SOUND_ADD("sn2", SN76477, 0)
 	MDRV_SOUND_CONFIG(sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

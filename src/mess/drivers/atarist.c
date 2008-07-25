@@ -1721,10 +1721,10 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_DRIVER_DATA(atarist_state)
 
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
+	MDRV_CPU_ADD("main", M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(st_map, 0)
 
-	MDRV_CPU_ADD_TAG("keyboard", HD63701, XTAL_4MHz)  /* HD6301 */
+	MDRV_CPU_ADD("keyboard", HD63701, XTAL_4MHz)  /* HD6301 */
 	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
 	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
@@ -1746,7 +1746,7 @@ static MACHINE_DRIVER_START( atarist )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("ym2149", YM2149, Y2/16)
+	MDRV_SOUND_ADD("ym2149", YM2149, Y2/16)
 	MDRV_SOUND_CONFIG(ym2149_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1767,10 +1767,10 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_DRIVER_DATA(atarist_state)
 
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
+	MDRV_CPU_ADD("main", M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(ste_map, 0)
 
-	MDRV_CPU_ADD_TAG("keyboard", HD63701, XTAL_4MHz)  /* HD6301 */
+	MDRV_CPU_ADD("keyboard", HD63701, XTAL_4MHz)  /* HD6301 */
 	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
 	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
@@ -1793,12 +1793,12 @@ static MACHINE_DRIVER_START( atariste )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("ym2149", YM2149, Y2/16)
+	MDRV_SOUND_ADD("ym2149", YM2149, Y2/16)
 	MDRV_SOUND_CONFIG(ym2149_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(0, "right", 0.50)
 /*
-    MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0) // DAC
+    MDRV_SOUND_ADD("custom", CUSTOM, 0) // DAC
     MDRV_SOUND_ROUTE(0, "right", 0.50)
     MDRV_SOUND_ROUTE(1, "left", 0.50)
 */
@@ -1822,10 +1822,10 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_DRIVER_DATA(atarist_state)
 
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M68000, U517/2)
+	MDRV_CPU_ADD("main", M68000, U517/2)
 	MDRV_CPU_PROGRAM_MAP(stbook_map, 0)
 
-	//MDRV_CPU_ADD_TAG("cop888", COP888, Y700)
+	//MDRV_CPU_ADD("cop888", COP888, Y700)
 
 	MDRV_MACHINE_START(stbook)
 
@@ -1848,7 +1848,7 @@ static MACHINE_DRIVER_START( stbook )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("ym3439", YM3439, U517/8)
+	MDRV_SOUND_ADD("ym3439", YM3439, U517/8)
 	MDRV_SOUND_CONFIG(stbook_ym2149_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

@@ -246,12 +246,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( contra )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD(M6809, 1500000)
+ 	MDRV_CPU_ADD("main", M6809, 1500000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
- 	MDRV_CPU_ADD(M6809, 2000000)
-	/* audio CPU */
+ 	MDRV_CPU_ADD("audio", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -274,7 +273,7 @@ static MACHINE_DRIVER_START( contra )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3582071)
+	MDRV_SOUND_ADD("ym", YM2151, 3582071)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 MACHINE_DRIVER_END

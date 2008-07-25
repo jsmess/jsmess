@@ -363,25 +363,25 @@ static MACHINE_DRIVER_START( irem_audio_base )
 	MDRV_SOUND_START(irem_audio)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_IO_MAP(irem_sound_portmap,0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_384kHz) /* verified on pcb */
+	MDRV_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_msm5205_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_384kHz) /* verified on pcb */
+	MDRV_SOUND_ADD("msm2", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_msm5205_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -391,26 +391,26 @@ MACHINE_DRIVER_START( m52_sound_c_audio )
 	MDRV_SOUND_START(irem_audio)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_IO_MAP(irem_sound_portmap,0)
 	MDRV_CPU_PROGRAM_MAP(m52_small_sound_map,0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("ay8910.0", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay8910.0", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
 
-	MDRV_SOUND_ADD_TAG("ay8910.0", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay8910.1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_2)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
 
-	MDRV_SOUND_ADD_TAG("msm5250", MSM5205, XTAL_384kHz) /* verified on pcb */
+	MDRV_SOUND_ADD("msm5250", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_msm5205_interface_1)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
 
-	MDRV_SOUND_ADD_TAG("filtermix", DISCRETE, 0)
+	MDRV_SOUND_ADD("filtermix", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(m52_sound_c)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

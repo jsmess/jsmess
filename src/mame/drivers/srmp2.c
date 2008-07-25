@@ -1066,7 +1066,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( srmp2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,16000000/2)				/* 8.00 MHz */
+	MDRV_CPU_ADD("main", M68000,16000000/2)				/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(srmp2_readmem,srmp2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
@@ -1090,11 +1090,11 @@ static MACHINE_DRIVER_START( srmp2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 20000000/16)
+	MDRV_SOUND_ADD("ay", AY8910, 20000000/16)
 	MDRV_SOUND_CONFIG(srmp2_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
@@ -1104,7 +1104,7 @@ static MACHINE_DRIVER_START( srmp3 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD(Z80, 3500000)		/* 3.50 MHz ? */
+	MDRV_CPU_ADD("main", Z80, 3500000)		/* 3.50 MHz ? */
 	//      4000000,                /* 4.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(srmp3_readmem,srmp3_writemem)
 	MDRV_CPU_IO_MAP(srmp3_readport,srmp3_writeport)
@@ -1130,11 +1130,11 @@ static MACHINE_DRIVER_START( srmp3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 16000000/16)
+	MDRV_SOUND_ADD("ay", AY8910, 16000000/16)
 	MDRV_SOUND_CONFIG(srmp2_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
@@ -1143,7 +1143,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mjyuugi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,16000000/2)				/* 8.00 MHz */
+	MDRV_CPU_ADD("main", M68000,16000000/2)				/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(mjyuugi_readmem,mjyuugi_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
@@ -1166,11 +1166,11 @@ static MACHINE_DRIVER_START( mjyuugi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 16000000/16)
+	MDRV_SOUND_ADD("ay", AY8910, 16000000/16)
 	MDRV_SOUND_CONFIG(srmp2_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END

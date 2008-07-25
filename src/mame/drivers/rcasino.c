@@ -295,7 +295,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( rcasino )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, 8000000/2)	// ???
+	MDRV_CPU_ADD("main", Z80, 8000000/2)	// ???
 	MDRV_CPU_PROGRAM_MAP(rcasino_map, 0)
 	MDRV_CPU_IO_MAP(rcasino_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -319,7 +319,7 @@ static MACHINE_DRIVER_START( rcasino )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 18432000/12)
+	MDRV_SOUND_ADD("ay", AY8910, 18432000/12)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

@@ -247,11 +247,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( wrally )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,XTAL_24MHz/2)		/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000,XTAL_24MHz/2)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(wrally_readmem, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_CONFIG(dallas_config)
 	MDRV_CPU_PROGRAM_MAP(dallas_rom, 0)
 	MDRV_CPU_DATA_MAP(dallas_ram, 0)
@@ -276,7 +276,7 @@ static MACHINE_DRIVER_START( wrally )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_1MHz) 					/* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1MHz) 					/* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

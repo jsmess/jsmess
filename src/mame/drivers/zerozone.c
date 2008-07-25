@@ -41,13 +41,13 @@ static READ16_HANDLER( zerozone_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read_indexed(machine, 0); /* IN0 */
+			return input_port_read(machine, "SYSTEM");
 		case 0x01:
-			return (input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 2) << 8)); /* IN1 & IN2 */
+			return (input_port_read(machine, "P1") | (input_port_read(machine, "P2") << 8));
 		case 0x04:
-			return (input_port_read_indexed(machine, 4) << 8);
+			return (input_port_read(machine, "DSWB") << 8);
 		case 0x05:
-			return input_port_read_indexed(machine, 3);
+			return input_port_read(machine, "DSWA");
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",activecpu_get_pc(),0x800000+offset);
@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( zerozone )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -96,7 +96,7 @@ static INPUT_PORTS_START( zerozone )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -106,7 +106,7 @@ static INPUT_PORTS_START( zerozone )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Score Line (Cheat)")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
@@ -176,12 +176,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( zerozone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)	/* 10 MHz */
+	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 1000000)
-	/* audio CPU */	/* 1 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 1000000)	/* 1 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_INTERLEAVE(10)
@@ -203,7 +202,7 @@ static MACHINE_DRIVER_START( zerozone )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

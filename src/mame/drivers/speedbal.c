@@ -228,12 +228,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( speedbal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map,0)
 	MDRV_CPU_IO_MAP(main_cpu_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 2660000)	/* 2.66 MHz ???  Maybe yes */
+	MDRV_CPU_ADD("audio", Z80, 2660000)	/* 2.66 MHz ???  Maybe yes */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map,0)
 	MDRV_CPU_IO_MAP(sound_cpu_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
@@ -255,7 +255,7 @@ static MACHINE_DRIVER_START( speedbal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 3600000)
+	MDRV_SOUND_ADD("ym", YM3812, 3600000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

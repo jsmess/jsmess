@@ -254,12 +254,11 @@ static INTERRUPT_GEN( skyfox_interrupt )
 static MACHINE_DRIVER_START( skyfox )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(skyfox_readmem,skyfox_writemem)
 	MDRV_CPU_VBLANK_INT("main", skyfox_interrupt)		/* NMI caused by coin insertion */
 
-	MDRV_CPU_ADD(Z80, 1748000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 1748000)
 	MDRV_CPU_PROGRAM_MAP(skyfox_sound_readmem,skyfox_sound_writemem)
 
 	/* video hardware */
@@ -279,10 +278,10 @@ static MACHINE_DRIVER_START( skyfox )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1748000)
+	MDRV_SOUND_ADD("ym1", YM2203, 1748000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(YM2203, 1748000)
+	MDRV_SOUND_ADD("ym2", YM2203, 1748000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

@@ -229,7 +229,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( drmicro )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,MCLK/6)	/* 3.072MHz? */
+	MDRV_CPU_ADD("main", Z80,MCLK/6)	/* 3.072MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", drmicro_interrupt)
@@ -254,16 +254,16 @@ static MACHINE_DRIVER_START( drmicro )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76496, MCLK/4)
+	MDRV_SOUND_ADD("sn1", SN76496, MCLK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SN76496, MCLK/4)
+	MDRV_SOUND_ADD("sn2", SN76496, MCLK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SN76496, MCLK/4)
+	MDRV_SOUND_ADD("sn3", SN76496, MCLK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END

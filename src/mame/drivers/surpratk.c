@@ -237,7 +237,7 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( surpratk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)	/* 053248 */
+	MDRV_CPU_ADD("main", KONAMI, 3000000)	/* 053248 */
 	MDRV_CPU_PROGRAM_MAP(surpratk_readmem,surpratk_writemem)
 	MDRV_CPU_VBLANK_INT("main", surpratk_interrupt)
 
@@ -261,7 +261,7 @@ static MACHINE_DRIVER_START( surpratk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

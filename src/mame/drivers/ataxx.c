@@ -307,15 +307,15 @@ static const struct CustomSound_interface i80186_custom_interface =
 static MACHINE_DRIVER_START( ataxx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("master", Z80, 6000000)
+	MDRV_CPU_ADD("master", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(master_map_program,0)
 	MDRV_CPU_IO_MAP(master_map_io,0)
 
-	MDRV_CPU_ADD_TAG("slave", Z80, 6000000)
+	MDRV_CPU_ADD("slave", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(slave_map_program,0)
 	MDRV_CPU_IO_MAP(slave_map_io,0)
 
-	MDRV_CPU_ADD_TAG("sound", I80186, XTAL_16MHz)
+	MDRV_CPU_ADD("sound", I80186, XTAL_16MHz)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program,0)
 	MDRV_CPU_IO_MAP(ataxx_80186_map_io,0)
@@ -330,7 +330,7 @@ static MACHINE_DRIVER_START( ataxx )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("leland", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(i80186_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( wsf )
 	MDRV_IMPORT_FROM(ataxx)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_DRIVER_END

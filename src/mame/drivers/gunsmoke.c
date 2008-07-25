@@ -286,12 +286,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( gunsmoke )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, 4000000)	// 4 MHz
+	MDRV_CPU_ADD("main", Z80, 4000000)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(gunsmoke_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3000000)	// 3 MHz
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3000000)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
@@ -314,13 +313,13 @@ static MACHINE_DRIVER_START( gunsmoke )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.22)
 	MDRV_SOUND_ROUTE(1, "mono", 0.22)
 	MDRV_SOUND_ROUTE(2, "mono", 0.22)
 	MDRV_SOUND_ROUTE(3, "mono", 0.14)
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD("ym2", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.22)
 	MDRV_SOUND_ROUTE(1, "mono", 0.22)
 	MDRV_SOUND_ROUTE(2, "mono", 0.22)

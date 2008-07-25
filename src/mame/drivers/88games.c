@@ -130,13 +130,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5f88, 0x5f88) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x5f90, 0x5f90) AM_WRITE(k88games_sh_irqtrigger_w)
-	AM_RANGE(0x5f94, 0x5f94) AM_READ(input_port_0_r)
-//  AM_RANGE(0x5f95, 0x5f95) AM_READ(input_port_1_r)
-//  AM_RANGE(0x5f96, 0x5f96) AM_READ(input_port_2_r)
+	AM_RANGE(0x5f94, 0x5f94) AM_READ_PORT("IN0")
+//  AM_RANGE(0x5f95, 0x5f95) AM_READ_PORT("IN1")
+//  AM_RANGE(0x5f96, 0x5f96) AM_READ_PORT("IN2")
 	AM_RANGE(0x5f95, 0x5f95) AM_READ(cheat1_r)	/* P1 and P2 IO and handle fake button for cheating */
 	AM_RANGE(0x5f96, 0x5f96) AM_READ(cheat2_r)	/* P3 and P4 IO and handle fake button for cheating */
-	AM_RANGE(0x5f97, 0x5f97) AM_READ(input_port_3_r)
-	AM_RANGE(0x5f9b, 0x5f9b) AM_READ(input_port_4_r)
+	AM_RANGE(0x5f97, 0x5f97) AM_READ_PORT("DSW1")
+	AM_RANGE(0x5f9b, 0x5f9b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x5fc0, 0x5fcf) AM_WRITE(K051316_ctrl_0_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -271,11 +271,11 @@ static const struct upd7759_interface upd7759_interface_2 =
 static MACHINE_DRIVER_START( 88games )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000) /* ? */
+	MDRV_CPU_ADD("main", KONAMI, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", k88games_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(88games)
@@ -298,15 +298,15 @@ static MACHINE_DRIVER_START( 88games )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.75)
 	MDRV_SOUND_ROUTE(1, "mono", 0.75)
 
-	MDRV_SOUND_ADD(UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ADD("upd1", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(upd7759_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ADD("upd2", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(upd7759_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

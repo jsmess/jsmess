@@ -506,13 +506,12 @@ static const struct MSM5205interface yunsung8_msm5205_interface =
 static MACHINE_DRIVER_START( yunsung8 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 8000000)			/* Z80B */
+	MDRV_CPU_ADD("main", Z80, 8000000)			/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* No nmi routine */
 
-	MDRV_CPU_ADD(Z80, 4000000)			/* ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)			/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMI caused by the MSM5205? */
 
@@ -535,11 +534,11 @@ static MACHINE_DRIVER_START( yunsung8 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM3812, 4000000)
+	MDRV_SOUND_ADD("ym", YM3812, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(yunsung8_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)

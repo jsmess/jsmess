@@ -1081,12 +1081,14 @@ static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_BASE(&riot_ram)
-	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_READWRITE(r6532_0_r, r6532_0_w)
+	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK(1)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( switch_A_w )
+static void switch_A_w(const device_config *device, UINT8 olddata, UINT8 data)
 {
+	running_machine *machine = device->machine;
+
 	/* Left controller port */
 	if ( input_port_read(machine, "CONTROLLERS") / CATEGORY_SELECT == 0x03 ) {
 		keypad_left_column = data / 16;
@@ -1103,9 +1105,10 @@ static WRITE8_HANDLER( switch_A_w )
 	}
 }
 
-static  READ8_HANDLER( switch_A_r )
+static UINT8 switch_A_r(const device_config *device, UINT8 data)
 {
 	static const UINT8 driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
+	running_machine *machine = device->machine;
 	UINT8 val = 0;
 
 	/* Left controller port PINs 1-4 ( 4321 ) */
@@ -1153,16 +1156,23 @@ static  READ8_HANDLER( switch_A_r )
 	return val;
 }
 
-static WRITE8_HANDLER( switch_B_w ) {
+static void switch_B_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
 }
 
-static void irq_callback(running_machine *machine, int state) {
+static void irq_callback(const device_config *device, int state)
+{
 }
 
-static const struct riot6532_interface r6532_interface =
+static UINT8 riot_input_port_8_r(const device_config *device, UINT8 olddata)
+{
+	return input_port_8_r(device->machine, 0);
+}
+
+static const riot6532_interface r6532_interface =
 {
 	switch_A_r,
-	input_port_8_r,
+	riot_input_port_8_r,
 	switch_A_w,
 	switch_B_w,
 	irq_callback
@@ -1429,9 +1439,6 @@ static MACHINE_START( a2600 )
 	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface );
-	r6532_config( machine, 0, &r6532_interface );
-	r6532_set_clock( 0, MASTER_CLOCK_NTSC / 3 );
-	r6532_reset( machine, 0 );
 	memset( riot_ram, 0x00, 0x80 );
 	current_reset_bank_counter = 0xFF;
 }
@@ -1442,9 +1449,6 @@ static MACHINE_START( a2600p )
 	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface_pal );
-	r6532_config( machine, 0, &r6532_interface );
-	r6532_set_clock( 0, MASTER_CLOCK_PAL / 3 );
-	r6532_reset( machine, 0 );
 	memset( riot_ram, 0x00, 0x80 );
 	current_reset_bank_counter = 0xFF;
 }
@@ -1961,7 +1965,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( a2600 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK_NTSC / 3)	/* actually M6507 */
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK_NTSC / 3)	/* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(a2600_mem, 0)
 
 	MDRV_MACHINE_START(a2600)
@@ -1979,15 +1983,18 @@ static MACHINE_DRIVER_START( a2600 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("tia", TIA, MASTER_CLOCK_NTSC/114)
+	MDRV_SOUND_ADD("tia", TIA, MASTER_CLOCK_NTSC/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+
+	/* devices */
+	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a2600p )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(a2600_mem, 0)
 
 	MDRV_MACHINE_START(a2600p)
@@ -2005,10 +2012,13 @@ static MACHINE_DRIVER_START( a2600p )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("tia", TIA, MASTER_CLOCK_PAL/114)
+	MDRV_SOUND_ADD("tia", TIA, MASTER_CLOCK_PAL/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+
+	/* devices */
+	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
 MACHINE_DRIVER_END
 
 

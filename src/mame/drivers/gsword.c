@@ -694,18 +694,17 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( gsword )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_18MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 	MDRV_CPU_IO_MAP(cpu1_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_18MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(cpu2_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(gsword_snd_interrupt,4)
 
-	MDRV_CPU_ADD(Z80, XTAL_18MHz/6) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
 
 	MDRV_INTERLEAVE(200) /* Allow time for 2nd cpu to interleave*/
@@ -735,14 +734,14 @@ static MACHINE_DRIVER_START( gsword )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_18MHz/12) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_18MHz/12) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_400kHz) /* verified on pcb */
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
@@ -750,13 +749,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( josvolly )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18000000/6) /* ? */
+	MDRV_CPU_ADD("main", Z80, 18000000/6) /* ? */
 	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 	MDRV_CPU_IO_MAP(josvolly_cpu1_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_CPU_ADD(Z80, 12000000/4) /* ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 12000000/4) /* ? */
 	MDRV_CPU_PROGRAM_MAP(josvolly_cpu2_map,0)
 	MDRV_CPU_IO_MAP(josvolly_cpu2_io_map,0)
 //  MDRV_CPU_VBLANK_INT("main", gsword_snd_interrupt)
@@ -782,15 +780,15 @@ static MACHINE_DRIVER_START( josvolly )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 #if 0
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 #endif

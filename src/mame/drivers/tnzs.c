@@ -1380,11 +1380,11 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( arknoid2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", arknoid2_interrupt)
 
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1410,7 +1410,7 @@ static MACHINE_DRIVER_START( arknoid2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1419,11 +1419,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( drtoppel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD("main", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", arknoid2_interrupt)
 
-	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD("sub", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1449,7 +1449,7 @@ static MACHINE_DRIVER_START( drtoppel )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4)
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1461,15 +1461,15 @@ static const i8x41_config i8042_config = { TYPE_I8X42 };
 static MACHINE_DRIVER_START( tnzs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD("main", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD("sub", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(I8X41,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD("mcu", I8X41,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(i8742_readmem,i8742_writemem)
 	MDRV_CPU_IO_MAP(i8742_readport,i8742_writeport)
 	MDRV_CPU_CONFIG( i8042_config )
@@ -1495,7 +1495,7 @@ static MACHINE_DRIVER_START( tnzs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4)
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1504,11 +1504,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( insectx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1533,7 +1533,7 @@ static MACHINE_DRIVER_START( insectx )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1542,11 +1542,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kageki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kageki_sub_readmem,kageki_sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1571,14 +1571,14 @@ static MACHINE_DRIVER_START( kageki )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(kageki_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1587,15 +1587,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tnzsb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("cpu0", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("cpu0", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu0_type2,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("cpu1", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("cpu1", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("cpu2", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("cpu2", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map,0)
 	MDRV_CPU_IO_MAP(tnzsb_readport,tnzsb_writeport)
 
@@ -1620,7 +1620,7 @@ static MACHINE_DRIVER_START( tnzsb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("ym2203", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym2203", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203b_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -1647,7 +1647,7 @@ static MACHINE_DRIVER_START( kabukiz )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 	MDRV_SOUND_ROUTE(3, "mono", 2.0)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1655,11 +1655,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jpopnics )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,XTAL_12MHz/2) /* Not verified - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD("main", Z80,XTAL_12MHz/2) /* Not verified - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(jpopnics_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)	/* Not verified - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD("sub", Z80,XTAL_12MHz/2)	/* Not verified - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(jpopnics_sub_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1682,7 +1682,7 @@ static MACHINE_DRIVER_START( jpopnics )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

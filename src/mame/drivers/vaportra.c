@@ -5,7 +5,7 @@
   Kuhga (Japanese version)     (c) 1989 Data East Corporation
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
- added pal & prom-maps - Highwayman.
+  added pal & prom-maps - Highwayman.
 ***************************************************************************/
 
 #include "driver.h"
@@ -37,11 +37,11 @@ static READ16_HANDLER( vaportra_control_r )
 	switch (offset<<1)
 	{
 		case 4: /* Dip Switches */
-			return (input_port_read_indexed(machine, 4) + (input_port_read_indexed(machine, 3) << 8));
+			return (input_port_read(machine, "DSW2") + (input_port_read(machine, "DSW1") << 8));
 		case 2: /* Credits */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "COINS");
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
+			return (input_port_read(machine, "P1") + (input_port_read(machine, "P2") << 8));
 	}
 
 	logerror("Unknown control read at %d\n",offset);
@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( vaportra )
-	PORT_START	/* Player 1 controls */
+	PORT_START_TAG("P1")	/* Player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -127,7 +127,7 @@ static INPUT_PORTS_START( vaportra )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* Player 2 controls */
+	PORT_START_TAG("P2")	/* Player 2 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -137,7 +137,7 @@ static INPUT_PORTS_START( vaportra )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* Credits */
+	PORT_START_TAG("COINS")	/* Credits */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -147,7 +147,7 @@ static INPUT_PORTS_START( vaportra )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* Dip switch bank 1 */
+	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -171,7 +171,7 @@ static INPUT_PORTS_START( vaportra )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* Dip switch bank 2 */
+	PORT_START_TAG("DSW2")	/* Dip switch bank 2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -245,12 +245,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( vaportra )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,12000000) /* Custom chip 59 */
+	MDRV_CPU_ADD("main", M68000,12000000) /* Custom chip 59 */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(H6280, 32220000/4) /* Custom chip 45; Audio section crystal is 32.220 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", H6280, 32220000/4) /* Custom chip 45; Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
@@ -271,19 +270,19 @@ static MACHINE_DRIVER_START( vaportra )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 32220000/8)
+	MDRV_SOUND_ADD("ym1", YM2203, 32220000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD(YM2151, 32220000/9)
+	MDRV_SOUND_ADD("ym2", YM2151, 32220000/9)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD(OKIM6295, 32220000/32)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD(OKIM6295, 32220000/16)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

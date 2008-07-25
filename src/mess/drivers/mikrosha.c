@@ -116,7 +116,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( mikrosha )
     /* basic machine hardware */
-    MDRV_CPU_ADD_TAG("main", 8080, XTAL_16MHz / 9)
+    MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
     MDRV_MACHINE_RESET( radio86 )
 
@@ -142,7 +142,7 @@ static MACHINE_DRIVER_START( mikrosha )
 	MDRV_VIDEO_UPDATE(radio86)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_DEVICE_ADD("dma8257", DMA8257)

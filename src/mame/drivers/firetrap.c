@@ -576,12 +576,11 @@ static INTERRUPT_GEN( bootleg )
 static MACHINE_DRIVER_START( firetrap )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz */
+	MDRV_CPU_ADD("main", Z80, 6000000)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(firetrap,2)
 
-	MDRV_CPU_ADD(M6502,3072000/2)
-	/* audio CPU */	/* 1.536 MHz? */
+	MDRV_CPU_ADD("audio", M6502,3072000/2)	/* 1.536 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
@@ -605,10 +604,10 @@ static MACHINE_DRIVER_START( firetrap )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3526, 3000000)
+	MDRV_SOUND_ADD("ym", YM3526, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -616,12 +615,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( firetpbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz */
+	MDRV_CPU_ADD("main", Z80, 6000000)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_bootleg,writemem_bootleg)
 	MDRV_CPU_VBLANK_INT("main", bootleg)
 
-	MDRV_CPU_ADD(M6502,3072000/2)
-	/* audio CPU */	/* 1.536 MHz? */
+	MDRV_CPU_ADD("audio", M6502,3072000/2) /* 1.536 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
@@ -644,10 +642,10 @@ static MACHINE_DRIVER_START( firetpbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3526, 3000000)
+	MDRV_SOUND_ADD("ym", YM3526, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

@@ -1037,7 +1037,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( legionna )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2) 	/* ??? */
+	MDRV_CPU_ADD("main", M68000,20000000/2) 	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(legionna_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 
@@ -1069,7 +1069,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( heatbrl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2) 	/* ??? */
+	MDRV_CPU_ADD("main", M68000,20000000/2) 	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(heatbrl_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 
@@ -1100,7 +1100,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( godzilla )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 20000000/2)
+	MDRV_CPU_ADD("main", M68000, 20000000/2)
 	MDRV_CPU_PROGRAM_MAP(godzilla_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -1131,7 +1131,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( denjinmk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 20000000/2)
+	MDRV_CPU_ADD("main", M68000, 20000000/2)
 	MDRV_CPU_PROGRAM_MAP(denjinmk_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -1162,7 +1162,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sdgndmrb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 20000000/2)
+	MDRV_CPU_ADD("main", M68000, 20000000/2)
 	MDRV_CPU_PROGRAM_MAP(sdgndmrb_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -1194,7 +1194,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cupsoc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2)
+	MDRV_CPU_ADD("main", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(cupsoc_mem,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 
@@ -1226,13 +1226,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cupsocbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,12000000)
+	MDRV_CPU_ADD("main", M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(cupsocbl_mem,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold) /* VBL */
 
 	/*Different Sound hardware*/
 	//SEIBU_SOUND_SYSTEM_CPU(14318180/4)
-	MDRV_CPU_ADD(Z80,14318180/4)
+	MDRV_CPU_ADD("audio", Z80,14318180/4)
 	MDRV_CPU_PROGRAM_MAP(cupsocbl_sound_mem,0)
 	//MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
@@ -1257,11 +1257,11 @@ static MACHINE_DRIVER_START( cupsocbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

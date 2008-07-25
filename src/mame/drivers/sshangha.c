@@ -344,12 +344,11 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( sshangha )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 28000000/2)
+	MDRV_CPU_ADD("main", M68000, 28000000/2)
 	MDRV_CPU_PROGRAM_MAP(sshangha_readmem,sshangha_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80, 16000000/4)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 16000000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(sshangha)	/* init machine */
@@ -373,12 +372,12 @@ static MACHINE_DRIVER_START( sshangha )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2203, 16000000/4)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.33)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.33)
 
-	MDRV_SOUND_ADD(OKIM6295, 1023924)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.27)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.27)

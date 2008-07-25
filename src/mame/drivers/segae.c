@@ -2040,7 +2040,7 @@ static VIDEO_UPDATE(systeme)
 
 
 static MACHINE_DRIVER_START( systeme )
-	MDRV_CPU_ADD_TAG("z80", Z80, 10738600/2) /* correct for hangonjr, and astroflash/transformer at least  */
+	MDRV_CPU_ADD("z80", Z80, 10738600/2) /* correct for hangonjr, and astroflash/transformer at least  */
 	MDRV_CPU_PROGRAM_MAP(systeme_readmem,systeme_writemem)
 	MDRV_CPU_IO_MAP(sms_readport,sms_writeport)
 
@@ -2066,10 +2066,10 @@ static MACHINE_DRIVER_START( systeme )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76496, 3579540)
+	MDRV_SOUND_ADD("sn1", SN76496, 3579540)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SN76496, 3579540)
+	MDRV_SOUND_ADD("sn2", SN76496, 3579540)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

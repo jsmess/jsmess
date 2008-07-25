@@ -281,12 +281,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( munchmo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3750000) /* ? */
+	MDRV_CPU_ADD("main", Z80, 3750000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(mnchmobl_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 3750000) /* ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3750000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_assert)
 
@@ -308,10 +307,10 @@ static MACHINE_DRIVER_START( munchmo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

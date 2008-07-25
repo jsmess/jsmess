@@ -1225,12 +1225,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mrokumei )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD("main", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mrokumei_readmem,mrokumei_writemem)
 	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
-	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4MHz ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mrokumei_sound_readmem,mrokumei_sound_writemem)
 	MDRV_CPU_IO_MAP(mrokumei_sound_readport,mrokumei_sound_writeport)
 
@@ -1254,10 +1253,10 @@ static MACHINE_DRIVER_START( mrokumei )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76489A, 16000000/4)     // SN76489AN actually
+	MDRV_SOUND_ADD("sn", SN76489A, 16000000/4)     // SN76489AN actually
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1289,11 +1288,11 @@ static const UPD7810_CONFIG upd_config =
 static MACHINE_DRIVER_START( reikaids )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD("main", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(reikaids_readmem,reikaids_writemem)
 	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
-	MDRV_CPU_ADD(UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
+	MDRV_CPU_ADD("audio", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_readmem,reikaids_upd7807_writemem)
 	MDRV_CPU_IO_MAP(reikaids_upd7807_readport,reikaids_upd7807_writeport)
@@ -1322,14 +1321,14 @@ static MACHINE_DRIVER_START( reikaids )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD("ym", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 0.25)
 	MDRV_SOUND_ROUTE(2, "mono", 0.25)
 	MDRV_SOUND_ROUTE(3, "mono", 1.0)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
@@ -1339,11 +1338,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pteacher )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD("main", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(pteacher_readmem,pteacher_writemem)
 	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
-	MDRV_CPU_ADD_TAG("sound", UPD7807, 9000000)	/* 9MHz ? */
+	MDRV_CPU_ADD("sound", UPD7807, 9000000)	/* 9MHz ? */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_readmem,pteacher_upd7807_writemem)
 	MDRV_CPU_IO_MAP(pteacher_upd7807_readport,pteacher_upd7807_writeport)
@@ -1373,10 +1372,10 @@ static MACHINE_DRIVER_START( pteacher )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76489A, 16000000/4)     // SN76489AN actually
+	MDRV_SOUND_ADD("sn", SN76489A, 16000000/4)     // SN76489AN actually
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

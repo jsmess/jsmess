@@ -440,7 +440,7 @@ static const struct YMZ280Binterface ymz280b_interface =
 static MACHINE_DRIVER_START( livequiz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 24000000 / 2)
+	MDRV_CPU_ADD("main", M68000, 24000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(mem_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -462,7 +462,7 @@ static MACHINE_DRIVER_START( livequiz )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)

@@ -174,10 +174,12 @@ static READ16_HANDLER( thunderj_atarivc_r )
        memory (which is what it does if this interrupt test fails -- see the code
        at $1E56 to see!) */
 
-	/* Use these lines to detect when things go south:
+	/* Use these lines to detect when things go south: */
 
-    if (cpu_readmem24bew_word(0x163482) > 0xfff)
-        mame_printf_debug("You're screwed!");*/
+#if 0
+	if (program_read_word(0x163482) > 0xfff)
+		mame_printf_debug("You're screwed!");
+#endif
 
 	return atarivc_r(machine->primary_screen, offset);
 }
@@ -280,7 +282,7 @@ static INPUT_PORTS_START( thunderj )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	JSA_II_PORT		/* audio board port */
+	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
 INPUT_PORTS_END
 
 
@@ -332,10 +334,10 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( thunderj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(extra_map,0)
 
 	MDRV_MACHINE_RESET(thunderj)

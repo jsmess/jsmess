@@ -285,7 +285,7 @@ GFXDECODE_END
 /* Machine Driver + Related bits */
 
 static MACHINE_DRIVER_START( pirates )
-	MDRV_CPU_ADD(M68000, 16000000) /* 16mhz */
+	MDRV_CPU_ADD("main", M68000, 16000000) /* 16mhz */
 	MDRV_CPU_PROGRAM_MAP(pirates_readmem,pirates_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( pirates )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1333333)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1333333)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -97,13 +97,13 @@ logerror("%06x: hacked_controls_r %04x %04x\n",activecpu_get_pc(),offset,bionicc
 
 static WRITE16_HANDLER( bionicc_mpu_trigger_w )
 {
-	data = input_port_read(machine, "IN0") >> 12;
+	data = input_port_read(machine, "SYSTEM") >> 12;
 	bionicc_inp[0] = data ^ 0x0f;
 
-	data = input_port_read(machine, "IN2");		/* player 2 controls */
+	data = input_port_read(machine, "P2");
 	bionicc_inp[1] = data ^ 0xff;
 
-	data = input_port_read(machine, "IN1");		/* player 1 controls */
+	data = input_port_read(machine, "P1");
 	bionicc_inp[2] = data ^ 0xff;
 }
 
@@ -144,58 +144,38 @@ static INTERRUPT_GEN( bionicc_interrupt )
 		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)                /* 68000 ROM */
-	AM_RANGE(0xfe0000, 0xfe07ff) AM_READ(SMH_RAM)                /* RAM? */
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_READ(SMH_RAM)                /* sprites */
-	AM_RANGE(0xfe0d00, 0xfe3fff) AM_READ(SMH_RAM)                /* RAM? */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xfe4002, 0xfe4003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfec000, 0xfecfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xff0000, 0xff3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xff4000, 0xff7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xff8000, 0xff87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xffc000, 0xfffff7) AM_READ(SMH_RAM)                /* working RAM */
-	AM_RANGE(0xfffff8, 0xfffff9) AM_READ(hacked_soundcommand_r)      /* hack */
-	AM_RANGE(0xfffffa, 0xffffff) AM_READ(hacked_controls_r)      /* hack */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xfe0000, 0xfe07ff) AM_WRITE(SMH_RAM)	/* RAM? */
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xfe0d00, 0xfe3fff) AM_WRITE(SMH_RAM)              /* RAM? */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0xfe0000, 0xfe07ff) AM_RAM	/* RAM? */
+	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xfe0d00, 0xfe3fff) AM_RAM              /* RAM? */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(bionicc_gfxctrl_w)	/* + coin counters */
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("DSW")
 	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(bionicc_scroll_w)
 	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(bionicc_mpu_trigger_w)	/* ??? not sure, but looks like it */
-	AM_RANGE(0xfec000, 0xfecfff) AM_WRITE(bionicc_txvideoram_w) AM_BASE(&bionicc_txvideoram)
-	AM_RANGE(0xff0000, 0xff3fff) AM_WRITE(bionicc_fgvideoram_w) AM_BASE(&bionicc_fgvideoram)
-	AM_RANGE(0xff4000, 0xff7fff) AM_WRITE(bionicc_bgvideoram_w) AM_BASE(&bionicc_bgvideoram)
-	AM_RANGE(0xff8000, 0xff87ff) AM_WRITE(bionicc_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xffc000, 0xfffff7) AM_WRITE(SMH_RAM)	/* working RAM */
-	AM_RANGE(0xfffff8, 0xfffff9) AM_WRITE(hacked_soundcommand_w)      /* hack */
-	AM_RANGE(0xfffffa, 0xffffff) AM_WRITE(hacked_controls_w)	/* hack */
+	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(bionicc_txvideoram_w) AM_BASE(&bionicc_txvideoram)
+	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(bionicc_fgvideoram_w) AM_BASE(&bionicc_fgvideoram)
+	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bionicc_bgvideoram_w) AM_BASE(&bionicc_bgvideoram)
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(bionicc_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffc000, 0xfffff7) AM_RAM	/* working RAM */
+	AM_RANGE(0xfffff8, 0xfffff9) AM_READWRITE(hacked_soundcommand_r, hacked_soundcommand_w)      /* hack */
+	AM_RANGE(0xfffffa, 0xffffff) AM_READWRITE(hacked_controls_r, hacked_controls_w)	/* hack */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8001, 0x8001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
 
 
 static INPUT_PORTS_START( bionicc )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )
@@ -247,7 +227,7 @@ static INPUT_PORTS_START( bionicc )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -257,7 +237,7 @@ static INPUT_PORTS_START( bionicc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -346,13 +326,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bionicc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(bionicc_interrupt,8)
 
-	/* audio CPU */
-	MDRV_CPU_ADD(Z80, EXO3_F0_CLK / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_ADD("audio", Z80, EXO3_F0_CLK / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	/* FIXME: interrupt timing
      * schematics indicate that nmi_line is set on  M680000 access with AB1=1
      * and IOCS=0 (active low), see pages A-1/10, A-4/10 in schematics
@@ -377,7 +356,7 @@ static MACHINE_DRIVER_START( bionicc )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 MACHINE_DRIVER_END

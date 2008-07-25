@@ -286,7 +286,7 @@ static MACHINE_RESET( pkscramble)
 
 static MACHINE_DRIVER_START( pkscramble )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000 )
+	MDRV_CPU_ADD("main", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(pkscramble_map,0)
 	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold) /* only valid irq */
 
@@ -311,7 +311,7 @@ static MACHINE_DRIVER_START( pkscramble )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 12000000/4)
+	MDRV_SOUND_ADD("ym", YM2203, 12000000/4)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

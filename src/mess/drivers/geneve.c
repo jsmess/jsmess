@@ -449,7 +449,7 @@ static const struct TMS5220interface tms5220interface =
 static MACHINE_DRIVER_START(geneve_60hz)
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
-	MDRV_CPU_ADD_TAG("main", TMS9995, 12000000)
+	MDRV_CPU_ADD("main", TMS9995, 12000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
 	MDRV_CPU_VBLANK_INT_HACK(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
@@ -473,9 +473,9 @@ static MACHINE_DRIVER_START(geneve_60hz)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD_TAG("tms5220", TMS5220, 680000L)
+	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

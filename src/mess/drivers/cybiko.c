@@ -258,7 +258,7 @@ SYSTEM_CONFIG_END
 
 static MACHINE_DRIVER_START( cybikov1 )
 	// cpu
-	//MDRV_CPU_ADD_TAG( "main", H8S2241, 11059200)
+	//MDRV_CPU_ADD( "main", H8S2241, 11059200)
 	MDRV_CPU_PROGRAM_MAP( cybikov1_mem, 0)
 	MDRV_CPU_IO_MAP( cybikov1_io, 0)
 	// screen
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( cybikov1 )
 	MDRV_DEFAULT_LAYOUT( layout_cybiko)
 	// sound
 	MDRV_SPEAKER_STANDARD_MONO( "mono")
-	MDRV_SOUND_ADD_TAG( "speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD( "speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00)
 	// machine
 	MDRV_MACHINE_START( cybikov1)

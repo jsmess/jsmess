@@ -392,7 +392,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( cgenie )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 2216800)        /* 2,2168 Mhz */
+	MDRV_CPU_ADD("main", Z80, 2216800)        /* 2,2168 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cgenie_mem, 0)
 	MDRV_CPU_IO_MAP(cgenie_io, 0)
 	MDRV_CPU_VBLANK_INT("main", cgenie_frame_interrupt)
@@ -418,9 +418,9 @@ static MACHINE_DRIVER_START( cgenie )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, 2000000)
+	MDRV_SOUND_ADD("ay8910", AY8910, 2000000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END

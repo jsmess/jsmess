@@ -301,12 +301,12 @@ static MACHINE_START( sprcros2 )
 static MACHINE_DRIVER_START( sprcros2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,10000000/2)
+	MDRV_CPU_ADD("main", Z80,10000000/2)
 	MDRV_CPU_PROGRAM_MAP(sprcros2_m_readmem,sprcros2_m_writemem)
 	MDRV_CPU_IO_MAP(sprcros2_m_readport,sprcros2_m_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_m_interrupt,2)	//1 nmi + 1 irq
 
-	MDRV_CPU_ADD(Z80,10000000/2)
+	MDRV_CPU_ADD("audio", Z80,10000000/2)
 	MDRV_CPU_PROGRAM_MAP(sprcros2_s_readmem,sprcros2_s_writemem)
 	MDRV_CPU_IO_MAP(0,sprcros2_s_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_s_interrupt,2)	//2 nmis
@@ -331,13 +331,13 @@ static MACHINE_DRIVER_START( sprcros2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76489, 10000000/4)
+	MDRV_SOUND_ADD("sn1", SN76489, 10000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SN76489, 10000000/4)
+	MDRV_SOUND_ADD("sn2", SN76489, 10000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SN76489, 10000000/4)
+	MDRV_SOUND_ADD("sn3", SN76489, 10000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

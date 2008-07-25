@@ -192,12 +192,11 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( diverboy )
-	MDRV_CPU_ADD(M68000, 12000000) /* guess */
+	MDRV_CPU_ADD("main", M68000, 12000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(diverboy_readmem,diverboy_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(snd_readmem,snd_writemem)
 
 	MDRV_GFXDECODE(diverboy)
@@ -217,7 +216,7 @@ static MACHINE_DRIVER_START( diverboy )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1320000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1320000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

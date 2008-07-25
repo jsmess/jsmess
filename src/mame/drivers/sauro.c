@@ -362,7 +362,7 @@ static INTERRUPT_GEN( sauro_interrupt )
 
 static MACHINE_DRIVER_START( tecfri )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)        // 4 MHz???
+	MDRV_CPU_ADD("main", Z80, 4000000)        // 4 MHz???
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -379,7 +379,7 @@ static MACHINE_DRIVER_START( tecfri )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 3600000)
+	MDRV_SOUND_ADD("ym", YM3812, 3600000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
@@ -403,8 +403,7 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_CPU_PROGRAM_MAP(sauro_readmem, sauro_writemem)
 	MDRV_CPU_IO_MAP(sauro_readport, sauro_writeport)
 
-	MDRV_CPU_ADD(Z80, 4000000)	// 4 MHz?
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	// 4 MHz?
 	MDRV_CPU_PROGRAM_MAP(sauro_sound_readmem, sauro_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(sauro_interrupt, 8) // ?
 
@@ -413,7 +412,7 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_VIDEO_START(sauro)
 	MDRV_VIDEO_UPDATE(sauro)
 
-	MDRV_SOUND_ADD(SP0256, 3120000)
+	MDRV_SOUND_ADD("sp", SP0256, 3120000)
 	MDRV_SOUND_CONFIG(sauro_sp256)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

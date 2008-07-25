@@ -173,7 +173,7 @@ static INTERRUPT_GEN( jackpool_interrupt )
 
 
 static MACHINE_DRIVER_START( jackpool )
-	MDRV_CPU_ADD(M68000, 12000000) // ?
+	MDRV_CPU_ADD("main", M68000, 12000000) // ?
 	MDRV_CPU_PROGRAM_MAP(jackpool_readmem,jackpool_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(jackpool_interrupt,3)  // ?
 
@@ -194,7 +194,7 @@ static MACHINE_DRIVER_START( jackpool )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

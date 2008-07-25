@@ -370,7 +370,7 @@ static const struct YMZ280Binterface ymz280b_intf =
 };
 
 static MACHINE_DRIVER_START( galpani3 )
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	 // ? (from which clock?)
+	MDRV_CPU_ADD("main", M68000, 16000000)	 // ? (from which clock?)
 	MDRV_CPU_PROGRAM_MAP(galpani3_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(galpani3_vblank, 3)
 
@@ -390,7 +390,7 @@ static MACHINE_DRIVER_START( galpani3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YMZ280B, 28636400 / 2)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 28636400 / 2)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)

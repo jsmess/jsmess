@@ -38,7 +38,7 @@ INPUT_PORTS_END
 static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, gamepock_io_callback };
 
 static MACHINE_DRIVER_START( gamepock )
-	MDRV_CPU_ADD_TAG("main", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
+	MDRV_CPU_ADD("main", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
 	MDRV_CPU_PROGRAM_MAP( gamepock_mem, 0 )
 	MDRV_CPU_IO_MAP( gamepock_io, 0 )
 	MDRV_CPU_CONFIG( gamepock_cpu_config )
@@ -58,7 +58,7 @@ static MACHINE_DRIVER_START( gamepock )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

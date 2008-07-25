@@ -144,7 +144,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( orao )
     /* basic machine hardware */
-    MDRV_CPU_ADD_TAG("main", M6502, 1000000)
+    MDRV_CPU_ADD("main", M6502, 1000000)
     MDRV_CPU_PROGRAM_MAP(orao_mem, 0)
     MDRV_MACHINE_RESET( orao )
 
@@ -163,9 +163,9 @@ static MACHINE_DRIVER_START( orao )
 
     /* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 8.00)
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

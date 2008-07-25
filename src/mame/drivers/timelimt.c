@@ -263,13 +263,12 @@ static INTERRUPT_GEN( timelimt_irq ) {
 static MACHINE_DRIVER_START( timelimt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 5000000)	/* 5.000 MHz */
+	MDRV_CPU_ADD("main", Z80, 5000000)	/* 5.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", timelimt_irq)
 
-	MDRV_CPU_ADD(Z80,18432000/6)
-	/* audio CPU */	/* 3.072 MHz */
+	MDRV_CPU_ADD("audio", Z80,18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* ? */
@@ -297,10 +296,10 @@ static MACHINE_DRIVER_START( timelimt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 18432000/12)
+	MDRV_SOUND_ADD("ay1", AY8910, 18432000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 18432000/12)
+	MDRV_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

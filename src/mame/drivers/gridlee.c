@@ -434,7 +434,7 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( gridlee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, BALSENTE_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6809, BALSENTE_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
 
 	MDRV_MACHINE_RESET(gridlee)
@@ -454,11 +454,11 @@ static MACHINE_DRIVER_START( gridlee )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("gridlee", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END

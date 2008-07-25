@@ -681,7 +681,7 @@ static INTERRUPT_GEN( realbrk_interrupt )
 static MACHINE_DRIVER_START( realbrk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000,32000000 / 2)			/* !! TMP68301 !! */
+	MDRV_CPU_ADD("main",M68000,32000000 / 2)			/* !! TMP68301 !! */
 	MDRV_CPU_PROGRAM_MAP(realbrk_mem,base_mem)
 	MDRV_CPU_VBLANK_INT("main", realbrk_interrupt)
 
@@ -704,12 +704,12 @@ static MACHINE_DRIVER_START( realbrk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 33868800 / 2)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 33868800 / 2)
 	MDRV_SOUND_CONFIG(realbrk_ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
-	MDRV_SOUND_ADD(YM2413, 3579000)
+	MDRV_SOUND_ADD("ym", YM2413, 3579000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END

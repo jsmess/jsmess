@@ -281,12 +281,11 @@ static GFXDECODE_START( ladyfrog )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( ladyfrog )
-	MDRV_CPU_ADD(Z80,8000000/2)
+	MDRV_CPU_ADD("main", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -314,11 +313,11 @@ static MACHINE_DRIVER_START( ladyfrog )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 8000000/4)
+	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(MSM5232, 2000000)
+	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
 	MDRV_SOUND_CONFIG(msm5232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1

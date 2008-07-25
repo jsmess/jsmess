@@ -1610,7 +1610,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct AY8910interface frogger_ay8910_interface =
+static const struct AY8910interface frogger_ay8910_interface =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -1620,7 +1620,7 @@ static struct AY8910interface frogger_ay8910_interface =
 	NULL
 };
 
-static struct AY8910interface konami_ay8910_interface_1 =
+static const struct AY8910interface konami_ay8910_interface_1 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -1630,7 +1630,7 @@ static struct AY8910interface konami_ay8910_interface_1 =
 	NULL
 };
 
-static struct AY8910interface konami_ay8910_interface_2 =
+static const struct AY8910interface konami_ay8910_interface_2 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -1640,7 +1640,7 @@ static struct AY8910interface konami_ay8910_interface_2 =
 	NULL
 };
 
-static struct AY8910interface explorer_ay8910_interface_1 =
+static const struct AY8910interface explorer_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1650,7 +1650,7 @@ static struct AY8910interface explorer_ay8910_interface_1 =
 	NULL
 };
 
-static struct AY8910interface explorer_ay8910_interface_2 =
+static const struct AY8910interface explorer_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1660,7 +1660,7 @@ static struct AY8910interface explorer_ay8910_interface_2 =
 	NULL
 };
 
-static struct AY8910interface sfx_ay8910_interface =
+static const struct AY8910interface sfx_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1670,7 +1670,7 @@ static struct AY8910interface sfx_ay8910_interface =
 	sfx_sample_control_w
 };
 
-static struct AY8910interface scorpion_ay8910_interface =
+static const struct AY8910interface scorpion_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1680,7 +1680,7 @@ static struct AY8910interface scorpion_ay8910_interface =
 	scorpion_sound_control_w,
 };
 
-static struct AY8910interface checkmaj_ay8910_interface =
+static const struct AY8910interface checkmaj_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1748,7 +1748,7 @@ DISCRETE_SOUND_END
 static MACHINE_DRIVER_START( galaxian_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
+	MDRV_CPU_ADD("main", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
 	MDRV_CPU_PROGRAM_MAP(galaxian_map,0)
 	MDRV_CPU_VBLANK_INT("main", interrupt_gen)
 
@@ -1777,7 +1777,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( galaxian_sound )
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(galaxian_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1797,18 +1797,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD_TAG("sound", Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("sound", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(frogger_sound_map,0)
 	MDRV_CPU_IO_MAP(frogger_sound_portmap,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD_TAG("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
+	MDRV_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(frogger_ay8910_interface)
 	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
 	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
 	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
 
-	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
+	MDRV_SOUND_ADD("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
@@ -1817,24 +1817,24 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD_TAG("sound", Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("sound", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(konami_sound_map,0)
 	MDRV_CPU_IO_MAP(konami_sound_portmap,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD_TAG("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
+	MDRV_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(konami_ay8910_interface_1)
 	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
 	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
 	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
 
-	MDRV_SOUND_ADD_TAG("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
+	MDRV_SOUND_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(konami_ay8910_interface_2)
 	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
 	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
 	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
 
-	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
+	MDRV_SOUND_ADD("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 MACHINE_DRIVER_END
@@ -1868,7 +1868,7 @@ static MACHINE_DRIVER_START( zigzag )
 	MDRV_GFXDECODE(pacmanbl)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(AY8910, 1789750)
+	MDRV_SOUND_ADD("ay", AY8910, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1901,7 +1901,7 @@ static MACHINE_DRIVER_START( jumpbug )
 	MDRV_CPU_PROGRAM_MAP(jumpbug_map,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(AY8910, 1789750)
+	MDRV_SOUND_ADD("ay", AY8910, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1910,13 +1910,13 @@ static MACHINE_DRIVER_START( checkman )
 	MDRV_IMPORT_FROM(mooncrst)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1620000)	/* 1.62 MHz */
+	MDRV_CPU_ADD("audio", Z80, 1620000)	/* 1.62 MHz */
 	MDRV_CPU_PROGRAM_MAP(checkman_sound_map,0)
 	MDRV_CPU_IO_MAP(checkman_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMIs are triggered by the main CPU */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(AY8910, 1789750)
+	MDRV_SOUND_ADD("ay", AY8910, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1925,13 +1925,13 @@ static MACHINE_DRIVER_START( checkmaj )
 	MDRV_IMPORT_FROM(galaxian)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1620000)
+	MDRV_CPU_ADD("audio", Z80, 1620000)
 	MDRV_CPU_PROGRAM_MAP(checkmaj_sound_map,0)
 
 	MDRV_TIMER_ADD_SCANLINE("irq0", checkmaj_irq0_gen, "main", 0, 8)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(AY8910, 1620000)
+	MDRV_SOUND_ADD("ay", AY8910, 1620000)
 	MDRV_SOUND_CONFIG(checkmaj_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -1946,11 +1946,11 @@ static MACHINE_DRIVER_START( mshuttle )
 	MDRV_CPU_IO_MAP(mshuttle_portmap,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(AY8910, GALAXIAN_PIXEL_CLOCK/3/4)
+	MDRV_SOUND_ADD("ay", AY8910, GALAXIAN_PIXEL_CLOCK/3/4)
 	MDRV_SOUND_CONFIG(cclimber_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(cclimber_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
@@ -1960,12 +1960,12 @@ static MACHINE_DRIVER_START( kingball )
 	MDRV_IMPORT_FROM(mooncrst)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,5000000/2)
+	MDRV_CPU_ADD("audio", Z80,5000000/2)
 	MDRV_CPU_PROGRAM_MAP(kingball_sound_map,0)
 	MDRV_CPU_IO_MAP(kingball_sound_portmap,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -2060,16 +2060,16 @@ static MACHINE_DRIVER_START( explorer )
 	MDRV_CPU_PROGRAM_MAP(theend_map,0)
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD(Z80,KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audio", Z80,KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(konami_sound_map,0)
 	MDRV_CPU_IO_MAP(konami_sound_portmap,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD_TAG("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
+	MDRV_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(explorer_ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD_TAG("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
+	MDRV_SOUND_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(explorer_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -2085,7 +2085,7 @@ static MACHINE_DRIVER_START( scorpion )
 	MDRV_DEVICE_CONFIG( scorpion_ppi8255_intf[1] )
 
 	/* extra AY8910 with I/O ports */
-	MDRV_SOUND_ADD_TAG("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
+	MDRV_SOUND_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(scorpion_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -2102,7 +2102,7 @@ static MACHINE_DRIVER_START( sfx )
 	MDRV_CPU_PROGRAM_MAP(sfx_map,0)
 
 	/* 3rd CPU for the sample player */
-	MDRV_CPU_ADD(Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audio", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(sfx_sample_map,0)
 	MDRV_CPU_IO_MAP(sfx_sample_portmap,0)
 
@@ -2120,7 +2120,7 @@ static MACHINE_DRIVER_START( sfx )
 	MDRV_SOUND_CONFIG(sfx_ay8910_interface)
 
 	/* DAC for the sample player */
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

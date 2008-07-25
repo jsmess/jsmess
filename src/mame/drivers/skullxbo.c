@@ -190,7 +190,7 @@ static INPUT_PORTS_START( skullxbo )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	JSA_II_PORT		/* audio board port */
+	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
 INPUT_PORTS_END
 
 
@@ -255,7 +255,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( skullxbo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 

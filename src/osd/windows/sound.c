@@ -35,6 +35,7 @@
 
 #define LOG_SOUND				0
 
+#define LOG(x) do { if (LOG_SOUND) logerror x; } while(0)
 
 
 //============================================================
@@ -61,12 +62,6 @@ static WAVEFORMATEX			stream_format;
 static int					buffer_underflows;
 static int					buffer_overflows;
 
-// debugging
-#if LOG_SOUND
-static FILE *				sound_log;
-#endif
-
-
 
 //============================================================
 //  PROTOTYPES
@@ -86,10 +81,6 @@ static void			dsound_destroy_buffers(void);
 
 void winsound_init(running_machine *machine)
 {
-#if LOG_SOUND
-	sound_log = fopen("sound.log", "w");
-#endif
-
 	// if no sound, don't create anything
 	if (!options_get_bool(mame_options(), OPTION_SOUND))
 		return;
@@ -117,11 +108,7 @@ static void sound_exit(running_machine *machine)
 	if (buffer_overflows || buffer_underflows)
 		mame_printf_verbose("Sound: buffer overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
 
-#if LOG_SOUND
-	if (sound_log)
-		fprintf(sound_log, "Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
-	fclose(sound_log);
-#endif
+	LOG(("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows));
 }
 
 
@@ -205,15 +192,15 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 		// if we're between play and write positions, then bump forward, but only in full chunks
 		while (stream_in < write_position)
 		{
-//logerror("Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
+//printf("Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
 			buffer_underflows++;
-			stream_in += samples_this_frame;
+			stream_in += bytes_this_frame;
 		}
 
 		// if we're going to overlap the play position, just skip this chunk
 		if (stream_in + bytes_this_frame > play_position + stream_buffer_size)
 		{
-//logerror("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
+//printf("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
 			buffer_overflows++;
 			return;
 		}
@@ -289,9 +276,8 @@ static HRESULT dsound_init(running_machine *machine)
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;
-#if LOG_SOUND
-	fprintf(sound_log, "stream_buffer_size = %d\n", stream_buffer_size);
-#endif
+
+	LOG(("stream_buffer_size = %d\n", stream_buffer_size));
 
 	// create the buffers
 	result = dsound_create_buffers();

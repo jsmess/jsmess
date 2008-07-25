@@ -175,11 +175,11 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( madalien )
 
 	/* main CPU */
-	MDRV_CPU_ADD(M6502, MADALIEN_MAIN_CLOCK / 8)    /* 1324kHz */
+	MDRV_CPU_ADD("main", M6502, MADALIEN_MAIN_CLOCK / 8)    /* 1324kHz */
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(M6502, SOUND_CLOCK / 8)   /* 512kHz */
+	MDRV_CPU_ADD("audio", M6502, SOUND_CLOCK / 8)   /* 512kHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 800)    /* unknown due to incomplete schematics */
 
@@ -189,7 +189,7 @@ static MACHINE_DRIVER_START( madalien )
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, SOUND_CLOCK / 4)
+	MDRV_SOUND_ADD("ay", AY8910, SOUND_CLOCK / 4)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_DRIVER_END

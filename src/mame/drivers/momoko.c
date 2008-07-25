@@ -259,12 +259,11 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( momoko )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 5000000)	/* 5.0MHz */
+	MDRV_CPU_ADD("main", Z80, 5000000)	/* 5.0MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 2500000)
-	/* audio CPU */	/* 2.5MHz */
+	MDRV_CPU_ADD("audio", Z80, 2500000)	/* 2.5MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 
 	/* video hardware */
@@ -283,13 +282,13 @@ static MACHINE_DRIVER_START( momoko )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1250000)
+	MDRV_SOUND_ADD("ym1", YM2203, 1250000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
-	MDRV_SOUND_ADD(YM2203, 1250000)
+	MDRV_SOUND_ADD("ym2", YM2203, 1250000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)

@@ -565,16 +565,15 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( f1gp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000,XTAL_20MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("main",M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(f1gp_readmem1,f1gp_writemem1)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(M68000,XTAL_20MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("sub", M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80,XTAL_20MHz/4)	/* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,XTAL_20MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 
@@ -596,7 +595,7 @@ static MACHINE_DRIVER_START( f1gp )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, XTAL_8MHz)
+	MDRV_SOUND_ADD("ym", YM2610, XTAL_8MHz)
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
@@ -608,11 +607,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( f1gpb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000,10000000)	/* 10 MHz ??? */
+	MDRV_CPU_ADD("main",M68000,10000000)	/* 10 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(M68000,10000000)	/* 10 MHz ??? */
+	MDRV_CPU_ADD("sub", M68000,10000000)	/* 10 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -635,7 +634,7 @@ static MACHINE_DRIVER_START( f1gpb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)

@@ -337,7 +337,7 @@ static WRITE8_HANDLER( gladiatr_irq_patch_w )
 
 
 
-static int data1,data2,flag1=1,flag2=1;
+static int data1,data2,flag1,flag2;
 
 static WRITE8_HANDLER(qx0_w)
 {
@@ -379,6 +379,12 @@ static READ8_HANDLER(qx1_r)
 		return data2;
 	else
 		return flag1;
+}
+
+static MACHINE_RESET( ppking )
+{
+	data1 = data2 = 0;
+	flag1 = flag2 = 1;
 }
 
 static ADDRESS_MAP_START( ppking_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -684,22 +690,22 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( ppking )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ppking_cpu1_map,0)
 	MDRV_CPU_IO_MAP(ppking_cpu1_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(ppking_cpu2_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(M6809, XTAL_12MHz/16) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ppking_cpu3_map,0)
 
 	MDRV_INTERLEAVE(100)
 
+	MDRV_MACHINE_RESET(ppking)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
@@ -719,14 +725,14 @@ static MACHINE_DRIVER_START( ppking )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ppking_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 	MDRV_SOUND_ROUTE(2, "mono", 0.60)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_455kHz) /* verified on pcb */
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
@@ -734,17 +740,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gladiatr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu1_map,0)
 	MDRV_CPU_IO_MAP(gladiatr_cpu1_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(gladiatr_cpu2_io,0)
 
-	MDRV_CPU_ADD(M6809, XTAL_12MHz/16) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu3_map,0)
 
 	MDRV_INTERLEAVE(10)
@@ -769,14 +774,14 @@ static MACHINE_DRIVER_START( gladiatr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(gladiatr_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 	MDRV_SOUND_ROUTE(2, "mono", 0.60)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_455kHz) /* verified on pcb */
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

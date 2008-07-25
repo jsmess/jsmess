@@ -234,7 +234,7 @@ static ADDRESS_MAP_START(kc85_disc_hw_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( cpu_kc_disc )
-	MDRV_CPU_ADD_TAG("disc", Z80, 4000000)
+	MDRV_CPU_ADD("disc", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem, 0)
 	MDRV_CPU_IO_MAP(kc85_disc_hw_io, 0)
 MACHINE_DRIVER_END
@@ -243,7 +243,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kc85_3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, KC85_3_CLOCK)
+	MDRV_CPU_ADD("main", Z80, KC85_3_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(kc85_3_mem, 0)
 	MDRV_CPU_IO_MAP(kc85_3_io, 0)
 	MDRV_CPU_CONFIG(kc85_daisy_chain)
@@ -266,9 +266,9 @@ static MACHINE_DRIVER_START( kc85_3 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("wave", WAVE, 0)
+	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */

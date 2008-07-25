@@ -593,7 +593,7 @@ static INTERRUPT_GEN( darkhors )
 }
 
 static MACHINE_DRIVER_START( darkhors )
-	MDRV_CPU_ADD(M68EC020, 12000000) // 36MHz/3 ??
+	MDRV_CPU_ADD("main", M68EC020, 12000000) // 36MHz/3 ??
 	MDRV_CPU_PROGRAM_MAP(darkhors_readmem,darkhors_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
 
@@ -616,7 +616,7 @@ static MACHINE_DRIVER_START( darkhors )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 528000)	// ??
+	MDRV_SOUND_ADD("oki", OKIM6295, 528000)	// ??
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

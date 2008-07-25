@@ -58,13 +58,13 @@ static MACHINE_RESET( wolfpack )
 
 static READ8_HANDLER( wolfpack_input_r )
 {
-	UINT8 val = input_port_read_indexed(machine, 0);
+	UINT8 val = input_port_read(machine, "INPUTS");
 
-	if (((input_port_read_indexed(machine, 2) + 0) / 2) & 1)
+	if (((input_port_read(machine, "DIAL") + 0) / 2) & 1)
 	{
 		val |= 1;
 	}
-	if (((input_port_read_indexed(machine, 2) + 1) / 2) & 1)
+	if (((input_port_read(machine, "DIAL") + 1) / 2) & 1)
 	{
 		val |= 2;
 	}
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x200d, 0x200d) AM_WRITE(wolfpack_attract_w)
 	AM_RANGE(0x200e, 0x200e) AM_WRITE(wolfpack_pt_pos_select_w)
 	AM_RANGE(0x200f, 0x200f) AM_WRITE(wolfpack_warning_light_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_1_r)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(wolfpack_audamp_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(wolfpack_pt_horz_w)
 	AM_RANGE(0x3003, 0x3003) AM_WRITE(wolfpack_pt_pic_w)
@@ -183,8 +183,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( wolfpack )
-
-	PORT_START
+	PORT_START_TAG("INPUTS")
 	PORT_BIT ( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED ) /* dial connects here */
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -193,7 +192,7 @@ static INPUT_PORTS_START( wolfpack )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -216,7 +215,7 @@ static INPUT_PORTS_START( wolfpack )
 	PORT_DIPSETTING(    0x80, "16000" )
 	PORT_DIPSETTING(    0xc0, "20000" )
 
-	PORT_START
+	PORT_START_TAG("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
@@ -323,7 +322,7 @@ static MACHINE_DRIVER_START(wolfpack)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 12096000 / 16)
+	MDRV_CPU_ADD("main", M6502, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */
@@ -344,7 +343,7 @@ static MACHINE_DRIVER_START(wolfpack)
 	MDRV_VIDEO_EOF(wolfpack)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
+	MDRV_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
 	MDRV_SOUND_CONFIG(wolfpack_s14001a_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

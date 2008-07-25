@@ -68,7 +68,7 @@ static MACHINE_RESET( bbcbc )
 
 
 static MACHINE_DRIVER_START( bbcbc )
-	MDRV_CPU_ADD_TAG( "main", Z80, 4000000 )
+	MDRV_CPU_ADD( "main", Z80, 4000000 )
 	MDRV_CPU_PROGRAM_MAP( bbcbc_prg, 0 )
 	MDRV_CPU_IO_MAP( bbcbc_io, 0 )
 

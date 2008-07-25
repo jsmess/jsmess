@@ -166,7 +166,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( b2m )
     /* basic machine hardware */
-    MDRV_CPU_ADD_TAG("main", 8080, 2000000)
+    MDRV_CPU_ADD("main", 8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(b2m_mem, 0) 
     MDRV_CPU_IO_MAP(b2m_io, 0)
     MDRV_CPU_VBLANK_INT("main", b2m_vblank_interrupt)
@@ -203,7 +203,7 @@ static MACHINE_DRIVER_START( b2m )
     MDRV_VIDEO_UPDATE(b2m)    	
     
     MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("custom", CUSTOM, 0)
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(b2m_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
 MACHINE_DRIVER_END

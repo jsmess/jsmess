@@ -410,7 +410,7 @@ static const struct YM3812interface ym3812_interface =
 
 
 #define MDRV_CPU_ATPC(mem, port, type, clock)	\
-	MDRV_CPU_ADD_TAG("main", type, clock)					\
+	MDRV_CPU_ADD("main", type, clock)					\
 	MDRV_CPU_PROGRAM_MAP(mem##_map, 0)				\
 	MDRV_CPU_IO_MAP(port##_io, 0)					\
 	MDRV_CPU_CONFIG(i286_address_mask)
@@ -455,17 +455,17 @@ static MACHINE_DRIVER_START( ibm5170 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
-	MDRV_SOUND_ADD_TAG("ym3813", YM3812, ym3812_StdClock)
+	MDRV_SOUND_ADD("ym3813", YM3812, ym3812_StdClock)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
-	MDRV_SOUND_ADD_TAG("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
+	MDRV_SOUND_ADD("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("saa1099.2", SAA1099, 8000000)
+	MDRV_SOUND_ADD("saa1099.2", SAA1099, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 	MDRV_IMPORT_FROM( at_kbdc8042 )
@@ -527,7 +527,7 @@ static MACHINE_DRIVER_START( ibm5162 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
@@ -585,17 +585,17 @@ static MACHINE_DRIVER_START( ps2m30286 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
-	MDRV_SOUND_ADD_TAG("ym3812", YM3812, ym3812_StdClock)
+	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
-	MDRV_SOUND_ADD_TAG("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
+	MDRV_SOUND_ADD("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("saa1099.2", SAA1099, 8000000)
+	MDRV_SOUND_ADD("saa1099.2", SAA1099, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 
@@ -654,20 +654,20 @@ static MACHINE_DRIVER_START( atvga )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
-	MDRV_SOUND_ADD_TAG("ym3812", YM3812, ym3812_StdClock)
+	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
-	MDRV_SOUND_ADD_TAG("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
+	MDRV_SOUND_ADD("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("saa1099.2", SAA1099, 8000000)
+	MDRV_SOUND_ADD("saa1099.2", SAA1099, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
@@ -722,20 +722,20 @@ static MACHINE_DRIVER_START( at386 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
-	MDRV_SOUND_ADD_TAG("ym3812", YM3812, ym3812_StdClock)
+	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
-	MDRV_SOUND_ADD_TAG("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
+	MDRV_SOUND_ADD("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("saa1099.2", SAA1099, 8000000)
+	MDRV_SOUND_ADD("saa1099.2", SAA1099, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )

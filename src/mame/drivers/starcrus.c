@@ -170,7 +170,7 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( starcrus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(8080,9750000/9)  /* 8224 chip is a divide by 9 */
+	MDRV_CPU_ADD("main", 8080,9750000/9)  /* 8224 chip is a divide by 9 */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -193,7 +193,7 @@ static MACHINE_DRIVER_START( starcrus )
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -212,7 +212,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( mogura )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,3000000)		 /* 3 MHz */
+	MDRV_CPU_ADD("main", Z80,3000000)		 /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -236,10 +236,10 @@ static MACHINE_DRIVER_START( mogura )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
 

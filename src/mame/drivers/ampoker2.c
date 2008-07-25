@@ -576,14 +576,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0f) AM_WRITENOP				/* inexistent in the real hardware */
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_0_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_1_r)
-	AM_RANGE(0x12, 0x12) AM_READ(input_port_2_r)
-	AM_RANGE(0x13, 0x13) AM_READ(input_port_3_r)
-	AM_RANGE(0x14, 0x14) AM_READ(input_port_4_r)
-	AM_RANGE(0x15, 0x15) AM_READ(input_port_5_r)
-	AM_RANGE(0x16, 0x16) AM_READ(input_port_6_r)
-	AM_RANGE(0x17, 0x17) AM_READ(input_port_7_r)
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
+	AM_RANGE(0x13, 0x13) AM_READ_PORT("IN3")
+	AM_RANGE(0x14, 0x14) AM_READ_PORT("IN4")
+	AM_RANGE(0x15, 0x15) AM_READ_PORT("IN5")
+	AM_RANGE(0x16, 0x16) AM_READ_PORT("IN6")
+	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
 //  AM_RANGE(0x21, 0x21) AM_WRITENOP                    /* undocumented, write 0x1a after each reset */
 	AM_RANGE(0x30, 0x30) AM_WRITE (ampoker2_port30_w)	/* see write handlers */
 	AM_RANGE(0x31, 0x31) AM_WRITE (ampoker2_port31_w)	/* see write handlers */
@@ -1016,7 +1016,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( ampoker2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MASTER_CLOCK/2)		/* 3 MHz */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/2)		/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(ampoker2_map, 0)
 	MDRV_CPU_IO_MAP(ampoker2_io_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
@@ -1043,7 +1043,7 @@ static MACHINE_DRIVER_START( ampoker2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, measured */
+	MDRV_SOUND_ADD("ay", AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, measured */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

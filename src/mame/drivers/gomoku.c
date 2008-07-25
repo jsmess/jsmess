@@ -168,7 +168,7 @@ static const struct CustomSound_interface custom_interface =
 
 static MACHINE_DRIVER_START( gomoku )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/12)		 /* 1.536 MHz ? */
+	MDRV_CPU_ADD("main", Z80, 18432000/12)		 /* 1.536 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_gomoku, writemem_gomoku)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -190,7 +190,7 @@ static MACHINE_DRIVER_START( gomoku )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("gomoku", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

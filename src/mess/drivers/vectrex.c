@@ -95,7 +95,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( vectrex )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, XTAL_6MHz/4)
+	MDRV_CPU_ADD("main", M6809, XTAL_6MHz/4)
 	MDRV_CPU_PROGRAM_MAP(vectrex_map, 0)
 
 	MDRV_SCREEN_ADD("main", VECTOR)
@@ -111,9 +111,9 @@ static MACHINE_DRIVER_START( vectrex )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("ay8912", AY8912, 1500000)
+	MDRV_SOUND_ADD("ay8912", AY8912, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END

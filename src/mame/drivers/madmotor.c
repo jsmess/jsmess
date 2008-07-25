@@ -284,12 +284,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( madmotor )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
+	MDRV_CPU_ADD("main", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(madmotor_readmem,madmotor_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
-	MDRV_CPU_ADD(H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -311,19 +310,19 @@ static MACHINE_DRIVER_START( madmotor )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 21470000/6)
+	MDRV_SOUND_ADD("ym1", YM2203, 21470000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(YM2151, 21470000/6)
+	MDRV_SOUND_ADD("ym2", YM2151, 21470000/6)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.45)
 	MDRV_SOUND_ROUTE(1, "mono", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 1023924)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1023924)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(OKIM6295, 2047848)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 2047848)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

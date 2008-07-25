@@ -498,7 +498,7 @@ static PALETTE_INIT( samcoupe )
 
 static MACHINE_DRIVER_START( samcoupe )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, SAMCOUPE_XTAL_X1/4) /* 6 Mhz */
+	MDRV_CPU_ADD("main", Z80, SAMCOUPE_XTAL_X1/4) /* 6 Mhz */
 	MDRV_CPU_PROGRAM_MAP(samcoupe_mem, 0)
 	MDRV_CPU_IO_MAP(samcoupe_io, 0)
 	MDRV_CPU_VBLANK_INT("main", samcoupe_frame_interrupt)
@@ -521,9 +521,9 @@ static MACHINE_DRIVER_START( samcoupe )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD_TAG("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
+	MDRV_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

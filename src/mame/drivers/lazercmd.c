@@ -614,7 +614,7 @@ static PALETTE_INIT( lazercmd )
 static MACHINE_DRIVER_START( lazercmd )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650,8064000/12)				/* 672 kHz? */
+	MDRV_CPU_ADD("main", S2650,8064000/12)				/* 672 kHz? */
 /*          Main Clock is 8MHz divided by 12
             but memory and IO access is only possible
             within the line and frame blanking period
@@ -641,7 +641,7 @@ static MACHINE_DRIVER_START( lazercmd )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -649,7 +649,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( medlanes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650,8064000/12)				/* 672 kHz? */
+	MDRV_CPU_ADD("main", S2650,8064000/12)				/* 672 kHz? */
 /*          Main Clock is 8MHz divided by 12
             but memory and IO access is only possible
             within the line and frame blanking period
@@ -676,7 +676,7 @@ static MACHINE_DRIVER_START( medlanes )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -684,7 +684,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbonk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650,8064000/12)				/* 672 kHz? */
+	MDRV_CPU_ADD("main", S2650,8064000/12)				/* 672 kHz? */
 /*          Main Clock is 8MHz divided by 12
             but memory and IO access is only possible
             within the line and frame blanking period
@@ -711,7 +711,7 @@ static MACHINE_DRIVER_START( bbonk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

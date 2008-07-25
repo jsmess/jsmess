@@ -213,8 +213,8 @@ static WRITE8_HANDLER( custom_cocktail_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ(input_port_0_r)
-	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ(input_port_1_r)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
+	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd000, 0xd7ef) AM_RAM AM_BASE(&custom_cpu_ram)
 	AM_RANGE(0xd7f0, 0xd7ff) AM_READWRITE(custom_cpu_r, SMH_RAM)
 	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_BASE(&arabian_blitter)
@@ -352,7 +352,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( arabian )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MAIN_OSC/4)
+	MDRV_CPU_ADD("main", Z80, MAIN_OSC/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -373,7 +373,7 @@ static MACHINE_DRIVER_START( arabian )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, MAIN_OSC/4/2)
+	MDRV_SOUND_ADD("ay", AY8910, MAIN_OSC/4/2)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

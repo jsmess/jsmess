@@ -851,7 +851,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START(glasgow )
     /* basic machine hardware */
-    MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+    MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(glasgow_mem, 0)
 	MDRV_MACHINE_START(glasgow)
 	MDRV_MACHINE_RESET(glasgow)
@@ -871,7 +871,7 @@ static MACHINE_DRIVER_START(glasgow )
     MDRV_DEFAULT_LAYOUT(layout_glasgow)
     
     MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("beep", BEEP, 0)
+	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

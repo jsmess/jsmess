@@ -163,7 +163,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( kim1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 1000000)        /* 1 MHz */
+	MDRV_CPU_ADD("main", M6502, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(kim1_map, 0)
 	MDRV_CPU_VBLANK_INT("main", kim1_interrupt)
 	MDRV_INTERLEAVE(1)
@@ -187,7 +187,7 @@ static MACHINE_DRIVER_START( kim1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

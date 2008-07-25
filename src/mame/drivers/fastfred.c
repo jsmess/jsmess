@@ -557,11 +557,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( fastfred )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, CLOCK/6)     /* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, CLOCK/6)     /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(fastfred_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD_TAG("audio", Z80, CLOCK/12)
+	MDRV_CPU_ADD("audio", Z80, CLOCK/12)
 	/* audio CPU */    /* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
@@ -584,10 +584,10 @@ static MACHINE_DRIVER_START( fastfred )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("ay8910.1", AY8910, CLOCK/12)
+	MDRV_SOUND_ADD("ay8910.1", AY8910, CLOCK/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD_TAG("ay8910.2", AY8910, CLOCK/12)
+	MDRV_SOUND_ADD("ay8910.2", AY8910, CLOCK/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

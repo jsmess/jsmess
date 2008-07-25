@@ -369,7 +369,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( skydiver )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800,3000000/4)	   /* ???? */
+	MDRV_CPU_ADD("main", M6800,3000000/4)	   /* ???? */
 	MDRV_CPU_PROGRAM_MAP(skydiver_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(skydiver_interrupt, 5)
 	MDRV_WATCHDOG_VBLANK_INIT(8)	// 128V clocks the same as VBLANK
@@ -394,7 +394,7 @@ static MACHINE_DRIVER_START( skydiver )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(skydiver)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

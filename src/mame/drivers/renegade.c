@@ -791,12 +791,11 @@ static MACHINE_RESET( renegade )
 static MACHINE_DRIVER_START( renegade )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 12000000/8)	/* 1.5 MHz (measured) */
+	MDRV_CPU_ADD("main", M6502, 12000000/8)	/* 1.5 MHz (measured) */
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(renegade_interrupt,2)
 
-	MDRV_CPU_ADD(M6809, 12000000/8)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6809, 12000000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* IRQs are caused by the main CPU */
 	MDRV_MACHINE_START(renegade)
@@ -819,11 +818,11 @@ static MACHINE_DRIVER_START( renegade )
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3526, 12000000/4)
+	MDRV_SOUND_ADD("ym", YM3526, 12000000/4)
 	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(CUSTOM, 8000)
+	MDRV_SOUND_ADD("adpcm", CUSTOM, 8000)
 	MDRV_SOUND_CONFIG(adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

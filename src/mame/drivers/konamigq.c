@@ -368,11 +368,11 @@ static MACHINE_RESET( konamigq )
 
 static MACHINE_DRIVER_START( konamigq )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD("main",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigq_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
-	MDRV_CPU_ADD_TAG( "sound", M68000, 8000000 )
+	MDRV_CPU_ADD( "sound", M68000, 8000000 )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP( sndreadmem, sndwritemem )
 	MDRV_CPU_PERIODIC_INT( irq2_line_hold, 480 )
@@ -398,12 +398,12 @@ static MACHINE_DRIVER_START( konamigq )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(K054539, 48000)
+	MDRV_SOUND_ADD("konami1", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(K054539, 48000)
+	MDRV_SOUND_ADD("konami2", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

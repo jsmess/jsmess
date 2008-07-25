@@ -291,7 +291,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( suprgolf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,4000000)
+	MDRV_CPU_ADD("main", Z80,4000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -315,7 +315,7 @@ static MACHINE_DRIVER_START( suprgolf )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD("ym", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

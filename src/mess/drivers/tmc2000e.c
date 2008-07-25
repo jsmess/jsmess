@@ -277,7 +277,7 @@ static MACHINE_RESET( tmc2000e )
 static MACHINE_DRIVER_START( tmc2000e )
 	// basic system hardware
 
-	MDRV_CPU_ADD_TAG("main", CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD("main", CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc2000e_map, 0)
 	MDRV_CPU_IO_MAP(tmc2000e_io_map, 0)
 	MDRV_CPU_CONFIG(tmc2000e_config)
@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START( tmc2000e )
 	// sound hardware
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("beep", BEEP, 0)
+	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
