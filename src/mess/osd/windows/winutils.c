@@ -21,6 +21,12 @@
 #include "strconv.h"
 #include "glob.h"
 
+// stupid hack; not sure why this is needed
+#ifdef const
+#undef const
+#endif // const
+
+
 
 //============================================================
 //	win_get_file_name_dialog - sanitize all of the ugliness
