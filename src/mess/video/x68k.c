@@ -197,20 +197,82 @@ TIMER_CALLBACK(x68k_hsync)
 	attotime hsync_time;
 
 	sys.crtc.hblank = state;
-	if(state == 1)
+	if(sys.crtc.vmultiple == 2) // 256-line (doublescan)
 	{
-		int scan = video_screen_get_vpos(machine->primary_screen);
-		if(scan > sys.crtc.vend)
-			scan = 0;
-		hsync_time = video_screen_get_time_until_pos(machine->primary_screen,scan+1,sys.crtc.hsync_end);
-		timer_adjust_oneshot(scanline_timer, hsync_time, 0);
+		static int oddscanline;
+		if(state == 1)
+		{
+			if(oddscanline == 1)
+			{
+				int scan = video_screen_get_vpos(machine->primary_screen);
+				if(scan > sys.crtc.vend)
+					scan = 0;
+				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hend);
+				timer_adjust_oneshot(scanline_timer, hsync_time, 0);
+				if(scan != 0)
+				{
+					if((input_port_read(machine, "options") & 0x04))
+					{
+						video_screen_update_partial(machine->primary_screen,scan);
+					}
+				}
+			}
+			else
+			{
+				int scan = video_screen_get_vpos(machine->primary_screen);
+				if(scan > sys.crtc.vend)
+					scan = 0;
+				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hend / 2);
+				timer_adjust_oneshot(scanline_timer, hsync_time, 0);
+				if(scan != 0)
+				{
+					if((input_port_read(machine, "options") & 0x04))
+					{
+						video_screen_update_partial(machine->primary_screen,scan);
+					}
+				}
+			}
+		}
+		if(state == 0)
+		{
+			if(oddscanline == 1)
+			{
+				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,video_screen_get_vpos(machine->primary_screen)+1,sys.crtc.hbegin);
+				timer_adjust_oneshot(scanline_timer, hsync_time, 1);
+				oddscanline = 0;
+			}
+			else
+			{
+				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,video_screen_get_vpos(machine->primary_screen),sys.crtc.hbegin + (sys.crtc.hend / 2));
+				timer_adjust_oneshot(scanline_timer, hsync_time, 1);
+				oddscanline = 1;
+			}
+		}
 	}
-	if(state == 0)
+	else  // 512-line
 	{
-		hsync_time = video_screen_get_time_until_pos(machine->primary_screen,video_screen_get_vpos(machine->primary_screen),sys.crtc.hend);
-		timer_adjust_oneshot(scanline_timer, hsync_time, 1);
-//		if(!(sys.mfp.gpio & 0x40))  // if GPIP6 is active, clear it
-//			sys.mfp.gpio |= 0x40;
+		if(state == 1)
+		{
+			int scan = video_screen_get_vpos(machine->primary_screen);
+			if(scan > sys.crtc.vend)
+				scan = 0;
+			hsync_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hend);
+			timer_adjust_oneshot(scanline_timer, hsync_time, 0);
+			if(scan != 0)
+			{
+				if((input_port_read(machine, "options") & 0x04))
+				{
+					video_screen_update_partial(machine->primary_screen,scan);
+				}
+			}
+		}
+		if(state == 0)
+		{
+			hsync_time = video_screen_get_time_until_pos(machine->primary_screen,video_screen_get_vpos(machine->primary_screen)+1,sys.crtc.hbegin);
+			timer_adjust_oneshot(scanline_timer, hsync_time, 1);
+	//		if(!(sys.mfp.gpio & 0x40))  // if GPIP6 is active, clear it
+	//			sys.mfp.gpio |= 0x40;
+		}
 	}
 }
 
@@ -341,7 +403,6 @@ WRITE16_HANDLER( x68k_crtc_w )
 
 			if(attotime_to_double(irq_time) > 0)
 				timer_adjust_oneshot(raster_irq, irq_time, (data - 1) / sys.crtc.vmultiple);
-			logerror("CRTC: Time until next raster IRQ = %f\n",attotime_to_double(irq_time));
 		}
 		else
 		{

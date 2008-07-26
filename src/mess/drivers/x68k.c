@@ -1265,7 +1265,7 @@ static READ16_HANDLER( x68k_sram_r )
 static WRITE16_HANDLER( x68k_vid_w )
 {
 	int val;
-	if(offset < 0x100)
+	if(offset < 0x100)  // Graphic layer palette
 	{
 		COMBINE_DATA(sys.video.gfx_pal+offset);
 		val = sys.video.gfx_pal[offset];
@@ -1273,7 +1273,7 @@ static WRITE16_HANDLER( x68k_vid_w )
 		return;
 	}
 
-	if(offset >= 0x100 && offset < 0x200)
+	if(offset >= 0x100 && offset < 0x200)  // Text / Sprites / Tilemap palette
 	{
 		COMBINE_DATA(sys.video.text_pal+(offset-0x100));
 		val = sys.video.text_pal[offset-0x100];
@@ -1799,12 +1799,15 @@ static INPUT_PORTS_START( x68000 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Opt. 2")  PORT_CODE(KEYCODE_PAUSE)  /* Opt2 */
 
 	PORT_START_TAG("options")
-	PORT_CONFNAME( 0x01, 0x01, "Enable partial updates")
+	PORT_CONFNAME( 0x01, 0x01, "Enable partial updates on raster IRQ")
 	PORT_CONFSETTING(	0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(	0x01, DEF_STR( On ))
 	PORT_CONFNAME( 0x02, 0x02, "Enable fake bus errors")
 	PORT_CONFSETTING(	0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(	0x02, DEF_STR( On ))
+	PORT_CONFNAME( 0x04, 0x04, "Enable partial updates on each HSync")
+	PORT_CONFSETTING(	0x00, DEF_STR( Off ))
+	PORT_CONFSETTING(	0x04, DEF_STR( On ))
 
 	PORT_START_TAG("mouse1")  // mouse buttons
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
