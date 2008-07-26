@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( sb2m600_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(osi470_floppy_control_w)
 	AM_RANGE(0xc010, 0xc010) AM_READWRITE(acia6850_1_stat_r, acia6850_1_ctrl_w)
 	AM_RANGE(0xc011, 0xc011) AM_READWRITE(acia6850_1_data_r, acia6850_1_data_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(osi_keyboard_r, sb2m600b_keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0xf001, 0xf001) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
@@ -168,7 +168,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uk101_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xdf00, 0xdf00) AM_MIRROR(0x03ff) AM_READWRITE(osi_keyboard_r, uk101_keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)

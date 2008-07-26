@@ -36,13 +36,13 @@ static UINT8 *sym1_riot_ram;
 
 static ADDRESS_MAP_START( sym1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM                              /* U12/U13 RAM */
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_RAMBANK(2) AM_BASE(&sym1_ram_1k)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_RAMBANK(3) AM_BASE(&sym1_ram_2k)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_RAMBANK(4) AM_BASE(&sym1_ram_3k)
+	AM_RANGE(0x0400, 0x07ff) AM_RAMBANK(2) AM_BASE(&sym1_ram_1k)
+	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK(3) AM_BASE(&sym1_ram_2k)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK(4) AM_BASE(&sym1_ram_3k)
 	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_BASE(&sym1_monitor)       /* U20 Monitor ROM */
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(via_0_r, via_0_w)      /* U25 VIA #1 */
 	AM_RANGE(0xa400, 0xa40f) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)  /* U27 RIOT */
-	AM_RANGE(0xa600, 0xa67f) AM_RAM AM_RAMBANK(5) AM_BASE(&sym1_riot_ram)  /* U27 RIOT RAM */
+	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK(5) AM_BASE(&sym1_riot_ram)  /* U27 RIOT RAM */
 	AM_RANGE(0xa800, 0xa80f) AM_READWRITE(via_1_r, via_1_w)      /* U28 VIA #2 */
 	AM_RANGE(0xac00, 0xac0f) AM_READWRITE(via_2_r, via_2_w)      /* U29 VIA #3 */
 ADDRESS_MAP_END
