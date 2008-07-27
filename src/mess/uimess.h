@@ -6,11 +6,16 @@
 
 *********************************************************************/
 
-#ifndef UIMESS_H
-#define UIMESS_H
+#ifndef __UIMESS_H__
+#define __UIMESS_H__
 
 #include "ui.h"
 #include "uimenu.h"
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 int mess_ui_active(void);
 void mess_ui_update(running_machine *machine);
@@ -30,4 +35,4 @@ astring *tapecontrol_gettime(astring *dest, const device_config *device, int *cu
 /* paste */
 void ui_paste(running_machine *machine);
 
-#endif /* UIMESS_H */
+#endif /* __UIMESS_H__ */
