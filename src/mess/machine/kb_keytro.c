@@ -299,51 +299,51 @@ static WRITE8_HANDLER( kb_keytronic_p1_w )
 	switch( data )
 	{
 	case 0x0b:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_0b" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_0b" );
 		kb_keytronic.p1_data = 0xFF;
 		break;
 	case 0x0e:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_0e" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_0e" );
 		kb_keytronic.p1_data = 0xFE;
 		break;
 	case 0x0f:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_0f" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_0f" );
 		break;
 	case 0x30:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_30" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_30" );
 		break;
 	case 0x31:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_31" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_31" );
 		break;
 	case 0x32:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_32" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_32" );
 		break;
 	case 0x33:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_33" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_33" );
 		break;
 	case 0x34:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_34" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_34" );
 		break;
 	case 0x35:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_35" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_35" );
 		break;
 	case 0x36:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_36" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_36" );
 		break;
 	case 0x37:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_37" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_37" );
 		break;
 	case 0x38:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_38" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_38" );
 		break;
 	case 0x39:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_39" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_39" );
 		break;
 	case 0x3a:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_3a" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_3a" );
 		break;
 	case 0x3b:
-		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_3b" );
+//		kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_3b" );
 		break;
 	}
 	kb_keytronic.p1 = data;
