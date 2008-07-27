@@ -640,7 +640,7 @@ DRIVER_INIT( atcga )
 
 	/* Attach keyboard to the keyboard controller */
 	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
@@ -664,7 +664,7 @@ DRIVER_INIT( atega )
 
 	/* Attach keyboard to the keyboard controller */
 	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
@@ -679,7 +679,7 @@ DRIVER_INIT( at386 )
 
 	/* Attach keyboard to the keyboard controller */
 	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
@@ -736,7 +736,7 @@ DRIVER_INIT( at_vga )
 
 	/* Attach keyboard to the keyboard controller */
 	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
@@ -753,7 +753,7 @@ DRIVER_INIT( ps2m30286 )
 
 	/* Attach keyboard to the keyboard controller */
 	at_kbdc8042_set_keyboard_interface( kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
 }
 
 
