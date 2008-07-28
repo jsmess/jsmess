@@ -216,10 +216,6 @@ static const options_entry mame_sdl_options[] =
 	{ NULL }
 };
 
-#ifdef MESS
-void sdl_mess_options_parse(void);
-#endif
-
 //============================================================
 //	main
 //============================================================
@@ -488,10 +484,6 @@ void osd_init(running_machine *machine)
 	}
 	if (sdl_use_unsupported())
 		sdlled_init();
-
-	#ifdef MESS
-	sdl_mess_options_parse();
-	#endif
 
 	sdlinput_init(machine);
 	

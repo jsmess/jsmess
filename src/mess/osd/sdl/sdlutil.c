@@ -18,8 +18,6 @@
 //	GLOBAL VARIABLES
 //============================================================
 
-extern int win_use_natural_keyboard;
-
 //============================================================
 //	LOCAL VARIABLES
 //============================================================
@@ -30,6 +28,7 @@ extern int win_use_natural_keyboard;
 
 int osd_keyboard_disabled(void)
 {
-	return win_use_natural_keyboard;
+	return 0;
 }
+
 

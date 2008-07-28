@@ -22,7 +22,6 @@ static const options_entry win_mess_opts[] =
 {
 	{ NULL,							NULL,   OPTION_HEADER,		"SDL MESS SPECIFIC OPTIONS" },
 //	{ "newui;nu",                   "1",    OPTION_BOOLEAN,		"use the new MESS UI" },
-	{ "natural;nat",				"0",	OPTION_BOOLEAN,		"specifies whether to use a natural keyboard or not" },
 	#if defined(__APPLE__) && defined(__MACH__)
 	{ "uimodekey;umk",        "ITEM_ID_INSERT", 0,    "specifies the key used to toggle between full and partial UI mode" },
 	#else
@@ -31,7 +30,6 @@ static const options_entry win_mess_opts[] =
 	{ NULL }
 };
 
-int win_use_natural_keyboard;
 extern char *osd_get_startup_cwd(void);
 
 //============================================================
@@ -39,12 +37,6 @@ extern char *osd_get_startup_cwd(void);
 void osd_mess_options_init(core_options *opts)
 {
 	options_add_entries(opts, win_mess_opts);
-}
-
-
-void sdl_mess_options_parse(void)
-{
-	win_use_natural_keyboard = options_get_bool(mame_options(), "natural");
 }
 
 void osd_get_emulator_directory(char *dir, size_t dir_size)

@@ -27,11 +27,6 @@
 #include "input.h"
 #include "osdsdl.h"
 
-#ifdef MESS
-#include "uimess.h"
-#include "inputx.h"
-#endif
-
 #include "uiinput.h"
 
 // winnt.h defines this
@@ -527,55 +522,6 @@ static key_lookup_table sdl_lookup_table[] =
 	KE(UNDO)
 	KE(LAST)		
 	{-1, ""}
-};
-#endif
-
-#ifdef MESS
-extern int win_use_natural_keyboard;
-static const INT32 mess_keytrans[][2] =
-{
-	{ SDLK_ESCAPE,	UCHAR_MAMEKEY(ESC) },
-	{ SDLK_F1,		UCHAR_MAMEKEY(F1) },
-	{ SDLK_F2,		UCHAR_MAMEKEY(F2) },
-	{ SDLK_F3,		UCHAR_MAMEKEY(F3) },
-	{ SDLK_F4,		UCHAR_MAMEKEY(F4) },
-	{ SDLK_F5,		UCHAR_MAMEKEY(F5) },
-	{ SDLK_F6,		UCHAR_MAMEKEY(F6) },
-	{ SDLK_F7,		UCHAR_MAMEKEY(F7) },
-	{ SDLK_F8,		UCHAR_MAMEKEY(F8) },
-	{ SDLK_F9,		UCHAR_MAMEKEY(F9) },
-	{ SDLK_F10,		UCHAR_MAMEKEY(F10) },
-	{ SDLK_F11,		UCHAR_MAMEKEY(F11) },
-	{ SDLK_F12,		UCHAR_MAMEKEY(F12) },
-	{ SDLK_LCTRL,	        UCHAR_MAMEKEY(LCONTROL) },
-	{ SDLK_RCTRL,	        UCHAR_MAMEKEY(RCONTROL) },
-	{ SDLK_NUMLOCK,	        UCHAR_MAMEKEY(NUMLOCK) },
-	{ SDLK_CAPSLOCK,	UCHAR_MAMEKEY(CAPSLOCK) },
-	{ SDLK_SCROLLOCK,	UCHAR_MAMEKEY(SCRLOCK) },
-	{ SDLK_KP0,	UCHAR_MAMEKEY(0_PAD) },
-	{ SDLK_KP1,	UCHAR_MAMEKEY(1_PAD) },
-	{ SDLK_KP2,	UCHAR_MAMEKEY(2_PAD) },
-	{ SDLK_KP3,	UCHAR_MAMEKEY(3_PAD) },
-	{ SDLK_KP4,	UCHAR_MAMEKEY(4_PAD) },
-	{ SDLK_KP5,	UCHAR_MAMEKEY(5_PAD) },
-	{ SDLK_KP6,	UCHAR_MAMEKEY(6_PAD) },
-	{ SDLK_KP7,	UCHAR_MAMEKEY(7_PAD) },
-	{ SDLK_KP8,	UCHAR_MAMEKEY(8_PAD) },
-	{ SDLK_KP9,	UCHAR_MAMEKEY(9_PAD) },
-	{ SDLK_KP_PERIOD,	UCHAR_MAMEKEY(DEL_PAD) },
-	{ SDLK_KP_PLUS,		UCHAR_MAMEKEY(PLUS_PAD) },
-	{ SDLK_KP_MINUS,	UCHAR_MAMEKEY(MINUS_PAD) },
-	{ SDLK_INSERT,	UCHAR_MAMEKEY(INSERT) },
-	{ SDLK_DELETE,	UCHAR_MAMEKEY(DEL) },
-	{ SDLK_HOME,		UCHAR_MAMEKEY(HOME) },
-	{ SDLK_END,		UCHAR_MAMEKEY(END) },
-	{ SDLK_PAGEUP,		UCHAR_MAMEKEY(PGUP) },
-	{ SDLK_PAGEDOWN, 	UCHAR_MAMEKEY(PGDN) },
-	{ SDLK_UP,		UCHAR_MAMEKEY(UP) },
-	{ SDLK_DOWN,		UCHAR_MAMEKEY(DOWN) },
-	{ SDLK_LEFT,		UCHAR_MAMEKEY(LEFT) },
-	{ SDLK_RIGHT,		UCHAR_MAMEKEY(RIGHT) },
-	{ SDLK_PAUSE,		UCHAR_MAMEKEY(PAUSE) },
 };
 #endif
 
@@ -1131,27 +1077,6 @@ void sdlinput_poll(running_machine *machine)
 		}
 		switch(event.type) {
 		case SDL_KEYDOWN:
-			#ifdef MESS
-			if (win_use_natural_keyboard)
-			{
-				int translated = 0, i;
-
-				for (i = 0; i < sizeof(mess_keytrans) / sizeof(mess_keytrans[0]); i++)
-				{
-					if (event.key.keysym.sym == mess_keytrans[i][0])
-					{
-						translated = 1;
-						inputx_postc(machine, mess_keytrans[i][1]);
-					}
-				}
-
-				if (!translated)
-				{
-					inputx_postc(machine, event.key.keysym.unicode);
-				}
-			}
-			#endif
-
 			devinfo = keyboard_list;
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
 #if (!SDL_VERSION_ATLEAST(1,3,0))
