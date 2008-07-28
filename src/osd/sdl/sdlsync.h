@@ -9,15 +9,15 @@
 //
 //============================================================
 
-#ifndef __SDL_SYNC__
-#define __SDL_SYNC__
+#ifndef __SDLSYNC__
+#define __SDLSYNC__
 
 #ifndef SDLMAME_WIN32
 
 #ifndef SDLMAME_OS2
 
 #if (defined SDLMAME_MACOSX) || (defined SDLMAME_FREEBSD)
-#define THREAD_COOPERATIVE              (0)
+#define THREAD_COOPERATIVE      (0)
 #else
 #define THREAD_COOPERATIVE		(1)
 #endif
@@ -195,4 +195,4 @@ int osd_num_processors(void);
 
 #endif	/* SDLMAME_WIN32 */
 
-#endif	/* __SDL_SYNC__ */
+#endif	/* __SDLSYNC__ */

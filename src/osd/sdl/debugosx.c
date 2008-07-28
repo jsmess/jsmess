@@ -281,10 +281,10 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent);
 static int disasm_handle_key(debugwin_info *info, EventRef inEvent);
 static void disasm_update_caption(debugwin_info *info);
 
-static void console_create_window(void);
+static void console_create_window(running_machine *machine);
 static void console_recompute_children(debugwin_info *info);
 static void console_process_string(debugwin_info *info, const char *string);
-static void console_set_cpunum(int cpunum);
+static void console_set_cpunum(running_machine *machine, int cpunum);
 
 static MenuRef create_standard_menubar(void);
 static int global_handle_command(debugwin_info *info, EventRef inEvent);
@@ -366,7 +366,7 @@ INLINE void osx_RectToHIRect( const Rect *inRect, HIRect *outRect )
 //  osd_wait_for_debugger
 //============================================================
 
-void osd_wait_for_debugger(void)
+void osd_wait_for_debugger(running_machine *machine, int firststop)
 {
 	EventRef		message;
 	EventTargetRef	target = GetEventDispatcherTarget();
@@ -375,11 +375,11 @@ void osd_wait_for_debugger(void)
 
 	// create a console window
 	if (!main_console)
-		console_create_window();
+		console_create_window(machine);
 
 	// update the views in the console to reflect the current CPU
 	if (main_console)
-		console_set_cpunum(cpu_getactivecpu());
+		console_set_cpunum(machine, cpu_getactivecpu());
 
 	// make sure the debug windows are visible
 	waiting_for_debugger = TRUE;
@@ -3144,7 +3144,7 @@ static void disasm_update_caption(debugwin_info *info)
 //  console_create_window
 //============================================================
 
-void console_create_window(void)
+void console_create_window(running_machine *machine)
 {
 	debugwin_info *info;
 	int bestwidth, bestheight;
@@ -3162,7 +3162,7 @@ void console_create_window(void)
 	if (!info)
 		return;
 	main_console = info;
-	console_set_cpunum(0);
+	console_set_cpunum(Machine, 0);
 
 	// create the views
 	if (!debug_view_create(info, 0, DVT_DISASSEMBLY))
@@ -3425,7 +3425,7 @@ static void console_process_string(debugwin_info *info, const char *string)
 //  console_set_cpunum
 //============================================================
 
-static void console_set_cpunum(int cpunum)
+static void console_set_cpunum(running_machine *machine, int cpunum)
 {
 	char title[256];
 	CFStringRef		cftitle;
@@ -3437,7 +3437,7 @@ static void console_set_cpunum(int cpunum)
 		debug_view_set_property_UINT32(main_console->view[1].view, DVP_REGS_CPUNUM, cpunum);
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU %d (%s)", Machine->gamedrv->name, cpu_getactivecpu(), activecpu_name());
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU %d (%s)", machine->gamedrv->name, cpu_getactivecpu(), activecpu_name());
 	
 	cftitle = CFStringCreateWithCString( NULL, title, CFStringGetSystemEncoding() );
 	

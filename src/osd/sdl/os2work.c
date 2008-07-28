@@ -673,7 +673,7 @@ static int effective_num_processors(void)
     ULONG numprocs = 0;
 
     // if the OSDPROCESSORS environment variable is set, use that value if valid
-    procsoverride = getenv("OSDPROCESSORS");
+    procsoverride = getenv(SDLENV_PROCESSORS);
     if (procsoverride != NULL && sscanf(procsoverride, "%lu", &numprocs) == 1 && numprocs > 0)
         return numprocs;
 

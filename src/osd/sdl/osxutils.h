@@ -9,8 +9,8 @@
 //
 //============================================================
 
-#ifndef __SDL_OSXUTILS__
-#define __SDL_OSXUTILS__
+#ifndef __SDLOSXUTILS__
+#define __SDLOSXUTILS__
 
 //============================================================
 //  PROTOTYPES

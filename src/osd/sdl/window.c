@@ -52,11 +52,11 @@
 #define WINDOW_DECORATION_WIDTH	(8)	// should be more than plenty
 #define WINDOW_DECORATION_HEIGHT (48)	// title bar + bottom drag region
 
-#if 1
+#ifdef MAME_DEBUG
 #define ASSERT_USE(x)	assert_always(SDL_ThreadID() == x, "Wrong Thread")
-//#define ASSERT_USE(x)
 #else
-#define ASSERT_USE(x)	assert(SDL_ThreadID() == x)
+#define ASSERT_USE(x)	do {} while (0)
+//#define ASSERT_USE(x)	assert(SDL_ThreadID() == x)
 #endif
 
 #define ASSERT_REDRAW_THREAD() 	ASSERT_USE(window_threadid)
@@ -79,6 +79,7 @@
 #define WMSZ_RIGHT		(7)
 #endif
 
+
 //============================================================
 //  GLOBAL VARIABLES
 //============================================================
@@ -98,12 +99,13 @@ static osd_work_queue *work_queue;
 static int main_threadid;
 static int window_threadid;
 
-static const char *yuv_mode_names[] = { "none", "yv12", "yv12x2", "yuy2", "yuy2x2" };
+static const char *scale_mode_names[] = { "none", "hwblit", "yv12", "yv12x2", "yuy2", "yuy2x2" };
+
 
 // debugger
 //static int in_background;
 
-static sdl_draw_callbacks draw;
+static sdl_draw_info draw;
 
 typedef struct _worker_param worker_param;
 struct _worker_param {
@@ -148,9 +150,11 @@ INLINE void clear_worker_param(worker_param *wp)
 	wp->resize_new_height=0;
 }
 
+
 //============================================================
 //  execute_async
 //============================================================
+
 
 INLINE void execute_async(osd_work_callback callback, worker_param *wp)
 {
@@ -168,6 +172,7 @@ INLINE void execute_async(osd_work_callback callback, worker_param *wp)
 		callback((void *) wp_temp, 0);
 }
 
+
 //============================================================
 //  execute_async_wait
 //============================================================
@@ -177,6 +182,7 @@ INLINE void execute_async_wait(osd_work_callback callback, worker_param *wp)
 	execute_async(callback, wp);
 	sdlwindow_sync();
 }
+
 
 //============================================================
 //  sdlwindow_thread_id
@@ -197,6 +203,7 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 	}
 	return NULL;
 }
+
 
 //============================================================
 //  win_init_window
@@ -267,6 +274,7 @@ static void sdlwindow_sync(void)
 	}
 }
 
+
 //============================================================
 //  sdlwindow_exit
 //  (main thread)
@@ -280,6 +288,7 @@ static OSDWORK_CALLBACK( sdlwindow_exit_wt )
 	free(param);
 	return NULL;
 }
+
 
 static void sdlwindow_exit(running_machine *machine)
 {
@@ -312,6 +321,7 @@ static void sdlwindow_exit(running_machine *machine)
 
 }
 
+
 //============================================================
 //  sdlwindow_blit_surface_size
 //============================================================
@@ -343,8 +353,8 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 		desired_aspect = (float)target_width / (float)target_height;
 	}
 
-        // non-integer scaling - often gives more pleasing results in full screen 
-        if (!video_config.fullstretch)
+    // non-integer scaling - often gives more pleasing results in full screen 
+    if (!video_config.fullstretch)
 	{
 		// compute maximum integral scaling to fit the window
 		xscale = (target_width + 2) / newwidth;
@@ -391,7 +401,7 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 	}
 
 	if ((render_target_get_layer_config(window->target) & LAYER_CONFIG_ZOOM_TO_SCREEN)
-		&& video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
+		&& (window->scale_mode == VIDEO_SCALE_MODE_NONE || (!SDL_VERSION_ATLEAST(1,3,0) && !IS_YUV_MODE(window->scale_mode))))
 		newwidth = window_width;
 
 	if ((window->blitwidth != newwidth) || (window->blitheight != newheight))
@@ -414,8 +424,8 @@ static OSDWORK_CALLBACK( sdlwindow_resize_wt )
 
 	ASSERT_WINDOW_THREAD();
 	
-	draw.window_destroy_all_textures(window);
-	draw.window_resize(window, wp->resize_new_width, wp->resize_new_height);
+	window->destroy_all_textures(window);
+	window->resize(window, wp->resize_new_width, wp->resize_new_height);
 
 	sdlwindow_blit_surface_size(window, wp->resize_new_width, wp->resize_new_height);
 	
@@ -442,6 +452,7 @@ void sdlwindow_resize(sdl_window_info *window, INT32 width, INT32 height)
 	execute_async_wait(&sdlwindow_resize_wt, &wp);
 }
 
+
 //============================================================
 //  sdlwindow_clear_surface
 //  (window thread)
@@ -454,7 +465,7 @@ static OSDWORK_CALLBACK( sdlwindow_clear_surface_wt )
 
 	ASSERT_WINDOW_THREAD();
 
-	draw.window_clear(window);
+	window->clear(window);
 	free(wp);
 	return NULL;
 }
@@ -474,6 +485,7 @@ static void sdlwindow_clear_surface(sdl_window_info *window)
 	else 
 		sdlwindow_clear_surface_wt( (void *) wp, 0);
 }
+
 
 //============================================================
 //  sdlwindow_toggle_full_screen
@@ -498,7 +510,7 @@ static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
 		window->windowed_height = window->height;
 	}
 
-	(*draw.window_destroy)(window);
+	window->destroy(window);
 
 	// toggle the window mode
 	window->fullscreen = !window->fullscreen;	
@@ -517,31 +529,35 @@ void sdlwindow_toggle_full_screen(running_machine *machine, sdl_window_info *win
 	clear_worker_param(&wp);
 	wp.window = window;
 	
+	//FIMXE: Reset Key state ....
 	execute_async_wait(&sdlwindow_toggle_full_screen_wt, &wp);
 }
 
-static void sdlwindow_modify_yuv(running_machine *machine, int dir)
+static void sdlwindow_modify_yuv(running_machine *machine, sdl_window_info *window, int dir)
 {
-	int new_yuv_mode = video_config.yuv_mode;
-	sdl_window_info *window = sdlinput_get_focus_window(machine);
+	int new_scale_mode = window->scale_mode;
 
-	if (dir > 0 && video_config.yuv_mode < VIDEO_YUV_MODE_MAX)
-		new_yuv_mode = video_config.yuv_mode + 1;
-	if (dir < 0 && video_config.yuv_mode > VIDEO_YUV_MODE_MIN)
-		new_yuv_mode = video_config.yuv_mode - 1;
+	if (dir > 0 && window->scale_mode < VIDEO_SCALE_MODE_MAX)
+		new_scale_mode = window->scale_mode + 1;
+	if (dir < 0 && window->scale_mode > VIDEO_SCALE_MODE_MIN)
+		new_scale_mode = window->scale_mode - 1;
 	
-	if (new_yuv_mode != video_config.yuv_mode)
+	// FIXME: Changing to yv12 mode from video_mode none does not work
+	if (new_scale_mode != window->scale_mode)
 	{
 		worker_param wp;
 
 		clear_worker_param(&wp);
 		wp.window = window;
+		sdlwindow_sync();
 		execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 			
-		video_config.yuv_mode = new_yuv_mode;
+		window->scale_mode = new_scale_mode;
 		execute_async_wait(&complete_create_wt, &wp);
+		sdlwindow_sync();
 
-		ui_popup_time(1, "YUV mode %s", yuv_mode_names[video_config.yuv_mode]);
+		ui_popup_time(1, "YUV mode %s", scale_mode_names[window->scale_mode]);
+		mame_printf_verbose("YUV mode %s\n", scale_mode_names[window->scale_mode]);
 	}
 }
 
@@ -551,7 +567,7 @@ static OSDWORK_CALLBACK( destroy_all_textures_wt )
 
 	sdl_window_info *window = wp->window;
 
-	draw.window_destroy_all_textures(window);
+	window->destroy_all_textures(window);
 
 	free(wp);
 	return NULL;
@@ -560,24 +576,24 @@ static OSDWORK_CALLBACK( destroy_all_textures_wt )
 void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window, int dir)
 {
 	worker_param wp;
-	int new_prescale = video_config.prescale;
+	int new_prescale = window->prescale;
 
 	clear_worker_param(&wp);
 
 	wp.window = window;
 
-	if (dir > 0 && video_config.prescale < 3)
-		new_prescale = video_config.prescale + 1;
-	if (dir < 0 && video_config.prescale > 1)
-		new_prescale = video_config.prescale - 1;
+	if (dir > 0 && window->prescale < 3)
+		new_prescale = window->prescale + 1;
+	if (dir < 0 && window->prescale > 1)
+		new_prescale = window->prescale - 1;
 	
-	if (new_prescale != video_config.prescale)
+	if (new_prescale != window->prescale)
 	{
 		if (window->fullscreen && video_config.switchres)
 		{
 			execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 			
-			video_config.prescale = new_prescale;
+			window->prescale = new_prescale;
 
 			execute_async_wait(&complete_create_wt, &wp);
 
@@ -585,9 +601,9 @@ void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window
 		else
 		{
 			execute_async_wait(destroy_all_textures_wt, &wp);
-			video_config.prescale = new_prescale;
+			window->prescale = new_prescale;
 		}
-		ui_popup_time(1, "Prescale %d", video_config.prescale);
+		ui_popup_time(1, "Prescale %d", window->prescale);
 	}
 }
 
@@ -596,21 +612,20 @@ void sdlwindow_modify_effect(running_machine *machine, sdl_window_info *window, 
 
 	if (video_config.mode == VIDEO_MODE_SOFT) 
 	{
-		sdlwindow_modify_yuv(machine, dir);
+		sdlwindow_modify_yuv(machine, window, dir);
 		return;
 	}
-#if USE_OPENGL
-	else
+	else if (USE_OPENGL)
 	{
-		int new_prescale_effect = video_config.prescale_effect;
+		int new_prescale_effect = window->prescale_effect;
 		const char *effect_names[] = { "none", "scale2x" };
 
-		if (dir > 0 && video_config.prescale_effect < 1)
-			new_prescale_effect = video_config.prescale_effect + 1;
-		if (dir < 0 && video_config.prescale_effect > 0)
-			new_prescale_effect = video_config.prescale_effect - 1;
+		if (dir > 0 && window->prescale_effect < 1)
+			new_prescale_effect = window->prescale_effect + 1;
+		if (dir < 0 && window->prescale_effect > 0)
+			new_prescale_effect = window->prescale_effect - 1;
 		
-		if (new_prescale_effect != video_config.prescale_effect)
+		if (new_prescale_effect != window->prescale_effect)
 		{
 			worker_param wp;
 
@@ -618,11 +633,10 @@ void sdlwindow_modify_effect(running_machine *machine, sdl_window_info *window, 
 			wp.window = window;
 			execute_async_wait(destroy_all_textures_wt, &wp);
 
-			video_config.prescale_effect = new_prescale_effect;
-			ui_popup_time(1, "Effect: %s", effect_names[video_config.prescale_effect]);
+			window->prescale_effect = new_prescale_effect;
+			ui_popup_time(1, "Effect: %s", effect_names[window->prescale_effect]);
 		}
 	}
-#endif
 }
 
 void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window)
@@ -642,7 +656,7 @@ void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window)
 	wp.window = window;
 	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 
-	video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
+	window->scale_mode = VIDEO_SCALE_MODE_NONE;
 
 	if (video_config.mode == VIDEO_MODE_OPENGL)
 	{
@@ -661,6 +675,7 @@ void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window)
 #endif
 }
 
+
 //============================================================
 //  sdlwindow_update_cursor_state
 //  (main or window thread)
@@ -669,6 +684,7 @@ void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window)
 static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_info *window)
 {
 #if (SDL_VERSION_ATLEAST(1,3,0))
+	// FIXME: belongs into callback
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
@@ -735,9 +751,15 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->depth = config->depth;
 	window->refresh = config->refresh;
 	window->monitor = monitor;
+	
+	//FIXME: these should be per_window in config->
 	window->fullscreen = !video_config.windowed;
+	window->prescale = video_config.prescale;
+	window->prescale_effect = video_config.prescale_effect;
+	window->scale_mode = video_config.scale_mode;
 
 	// set the initial maximized state
+	// FIXME: Does not belong here
 	window->startmaximized = options_get_bool(mame_options(), SDLOPTION_MAXIMIZE);
 
 	if (!window->fullscreen)
@@ -751,6 +773,8 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	*last_window_ptr = window;
 	last_window_ptr = &window->next;
 
+	draw.attach(&draw, window);
+	
 	// create a lock that we can use to skip blitting
 	window->render_lock = osd_lock_alloc();
 
@@ -806,7 +830,7 @@ static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt )
 	ASSERT_WINDOW_THREAD();
 
 	// free the textures etc
-	(*draw.window_destroy)(window);
+	window->destroy(window);
 
 	free(wp);
 	return NULL;
@@ -849,6 +873,7 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 	free(window);
 }
 
+
 //============================================================
 //  pick_best_mode
 //============================================================
@@ -856,16 +881,16 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 {
 	int minimum_width, minimum_height, target_width, target_height;
-	SDL_Rect **modes;
 	int i;
 	float size_score, best_score = 0.0f;
+	SDL_Rect **modes;
 
 	// determine the minimum width/height for the selected target
 	render_target_get_minimum_size(window->target, &minimum_width, &minimum_height);
 
 	// use those as the target for now
-	target_width = minimum_width * MAX(1, video_config.prescale);
-	target_height = minimum_height * MAX(1, video_config.prescale);
+	target_width = minimum_width * MAX(1, window->prescale);
+	target_height = minimum_height * MAX(1, window->prescale);
 
 	// if we're not stretching, allow some slop on the minimum since we can handle it
 	{
@@ -873,12 +898,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 		minimum_height -= 4;
 	}
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
-	// FIXME: Mode switching not supported!
-	modes = NULL;
-#else
-	modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
-#endif
+	modes = window->monitor->modes;
 	
 	if (modes == (SDL_Rect **)0)
 	{
@@ -961,18 +981,7 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 			}
 		}
 		
-// this: 'osd_lock_acquire', just to 'see' if rendering was still happening
-// is invalid.
-// 'osd_lock_acquire' puts us to the waiting queue and we will miss to be in sync with real-time
-// but throttle actually means to be in real time, i.e. to not render a few frames,
-// while rendering is still in progress is all fine ..
-#if 0
-		// only block if we're throttled
-		if (video_config.throttle) 
-			osd_lock_acquire(window->render_lock);
-		else
-#endif
-			got_lock = osd_lock_try(window->render_lock);
+		got_lock = osd_lock_try(window->render_lock);
 
 		// only render if we were able to get the lock
 		if (got_lock)
@@ -986,7 +995,7 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 			osd_lock_release(window->render_lock);
 
 			// ensure the target bounds are up-to-date, and then get the primitives
-			primlist = draw.window_get_primitives(window);
+			primlist = window->get_primitives(window);
 
 			// and redraw now
 
@@ -1023,6 +1032,7 @@ static void set_starting_view(running_machine *machine, int index, sdl_window_in
 	render_target_set_view(window->target, viewindex);
 	window->start_viewscreen=viewindex;
 }
+
 
 //============================================================
 //  complete_create
@@ -1077,11 +1087,12 @@ static OSDWORK_CALLBACK( complete_create_wt )
 	}
 
 	// initialize the drawing backend
-	if ((*draw.window_create)(window, tempwidth, tempheight))
+	if (window->create(window, tempwidth, tempheight))
 		return (void *) &result[1];
 
 	return (void *) &result[0];
 }
+
 
 //============================================================
 //  draw_video_contents
@@ -1114,7 +1125,7 @@ static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
 	
 	t0 = getusecs();
 
-	(*draw.window_draw)(window, dc, update);
+	window->draw(window, dc, update);
 
 	frames++;
 	currentTime = getusecs();
@@ -1143,7 +1154,7 @@ static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
 #else
 static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
 {
-	(*draw.window_draw)(window, dc, update);
+	window->draw(window, dc, update);
 }
 #endif
 
@@ -1172,13 +1183,14 @@ static OSDWORK_CALLBACK( draw_video_contents_wt )
 		if( video_config.perftest )
 			measure_fps(window, dc, update);
 		else 
-			(*draw.window_draw)(window, dc, update);
+			window->draw(window, dc, update);
 	}
 	osd_lock_release(window->render_lock);
 	free(wp);
 	
 	return NULL;
 }
+
 
 //============================================================
 //  constrain_to_aspect_ratio
@@ -1264,6 +1276,7 @@ static void constrain_to_aspect_ratio(sdl_window_info *window, int *window_width
 	*window_height = visheight;
 }
 
+
 //============================================================
 //  get_min_bounds
 //  (window thread)
@@ -1312,6 +1325,7 @@ static void get_min_bounds(sdl_window_info *window, int *window_width, int *wind
 	*window_width = minwidth;
 	*window_height = minheight;
 }
+
 
 //============================================================
 //  get_max_bounds

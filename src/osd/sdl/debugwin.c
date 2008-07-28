@@ -388,7 +388,7 @@ static void debugmain_set_cpunum(running_machine *machine, int cpunum)
 
 // The entry point
 
-void osd_wait_for_debugger(void)
+void osd_wait_for_debugger(running_machine *machine, int firststop)
 {
 	// create a console window
 	if(!dmain) {
@@ -398,7 +398,7 @@ void osd_wait_for_debugger(void)
 	}
 
 	// update the views in the console to reflect the current CPU
-	debugmain_set_cpunum(Machine, cpu_getactivecpu());
+	debugmain_set_cpunum(machine, cpu_getactivecpu());
 
 	debugwin_show(1);
 	gtk_main_iteration();

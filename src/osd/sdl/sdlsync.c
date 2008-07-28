@@ -593,6 +593,7 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
     
 	if (pthread_setaffinity_np(lthread, sizeof(cmask), &cmask) <0)
 	{
+		// Not available during link in all targets
 		fprintf(stderr, "error %d setting cpu affinity to mask %08x", errno, mask);
 		return FALSE;
 	}

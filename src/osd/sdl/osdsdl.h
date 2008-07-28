@@ -3,6 +3,28 @@
 
 /* Notes
 
+	- working ui mouse inputs for SDL1.2 and SDL1.3 incl. yuv modes
+	- added blitmode "hwblit" (SDL1.3) for rgb hardware scaling
+	- rename "-yuvmode" option to "-scalemode"
+	- rename yuv_mode and derivatives to scale_mode
+	- moved extra_flags into sdl_info
+	- moved callbacks indow sdl_window_info
+	- made a number of flags (e.g. yuvmode) window relative
+         - changing of yuvmodes and opengl scale effects is working with SDL 1.3
+	- improved fullscreen handling
+	- removed HAS_WINDOW_MENU - this has no effect nowhere
+	- removed underscores in header defines, e.g. __SDL_SYNC__ ==> __SDLSYNC__
+	- added SDLMAME_HAS_DEBUGGER define
+	- removed #if 0 inw window.c
+	- added option "-audiodriver" to specify the SDL audio driver
+	- added option "-videodriver" to specify the SDL video driver
+	- added option "-renderdriver" to specify the SDL renderer driver
+	- changed environment SDLMAME_GL_LIB into option -gl_lib
+	- added some more SDL_ENV defines
+	- move keymap reading into separate function
+	- SDL_EnableUNICODE for all builds (not only MESS)
+	- SDL1.3 : Mouse & text input for ui
+
 	- removed  osd_event_wait_multiple from sdlsync.h
 	- removed some includes not needed
 	- reorganized texcopy/scale2x
@@ -109,6 +131,11 @@
 #define SDLMAME_INIT_IN_WORKER_THREAD	(0)
 #endif
 
+#if defined(SDLMAME_NO_X11) || defined(SDLMAME_WIN32)
+#define SDLMAME_HAS_DEBUGGER 			(0)
+#else
+#define SDLMAME_HAS_DEBUGGER 			(1)
+#endif
 
 //============================================================
 //	Defines
@@ -126,7 +153,7 @@
 #define SDLOPTION_NUMSCREENS			"numscreens"
 #define SDLOPTION_UNEVENSTRETCH			"unevenstretch"
 #define SDLOPTION_USEALLHEADS			"useallheads"
-#define SDLOPTION_MAXIMIZE			"maximize"
+#define SDLOPTION_MAXIMIZE				"maximize"
 #define SDLOPTION_EFFECT				"effect"
 #define SDLOPTION_VIDEO					"video"
 #define SDLOPTION_SWITCHRES				"switchres"
@@ -135,7 +162,7 @@
 #define SDLOPTION_CENTERV				"centerv"
 #define SDLOPTION_PRESCALE				"prescale"
 #define SDLOPTION_PRESCALE_EFFECT		"prescale_effect"
-#define SDLOPTION_YUVMODE				"yuvmode"
+#define SDLOPTION_SCALEMODE				"scalemode"
 #define SDLOPTION_MULTITHREADING		"multithreading"
 #define SDLOPTION_WAITVSYNC				"waitvsync"
 #define SDLOPTION_KEYMAP				"keymap"
@@ -156,6 +183,11 @@
 #define SDLOPTION_GL_FORCEPOW2TEXTURE	"gl_forcepow2texture"
 #define SDLOPTION_GL_GLSL_VID_ATTR		"gl_glsl_vid_attr"
 
+#define SDLOPTION_AUDIODRIVER			"audiodriver"
+#define SDLOPTION_VIDEODRIVER			"videodriver"
+#define SDLOPTION_RENDERDRIVER			"renderdriver"
+#define SDLOPTION_GL_LIB				"gl_lib"
+
 #define SDLOPTVAL_NONE					"none"
 #define SDLOPTVAL_AUTO					"auto"
 
@@ -163,6 +195,7 @@
 #define SDLOPTVAL_OPENGL16				"opengl16"
 #define SDLOPTVAL_SOFT					"soft"
 
+#define SDLOPTVAL_HWBLIT				"hwblit"
 #define SDLOPTVAL_YV12					"yv12"
 #define SDLOPTVAL_YV12x2				"yv12x2"
 #define SDLOPTVAL_YUY2					"yuy2"
@@ -170,14 +203,29 @@
 
 #define SDL_LED(x)						"led" #x
 
-#define SDLENV_IDENTIFIER				"SDL_VIDEO_X11_VISUALID"
+// read by sdlmame
+
 #define SDLENV_DESKTOPDIM				"SDLMAME_DESKTOPDIM"
-#define SDLENV_GL_LIB					"SDLMAME_GL_LIB"
 #define SDLENV_VMWARE					"SDLMAME_VMWARE"
 
 #define sdl_use_unsupported()			(getenv("SDLMAME_UNSUPPORTED") != NULL)
 
+// set by sdlmame
+
+#define SDLENV_VISUALID					"SDL_VIDEO_X11_VISUALID"
+#define SDLENV_VIDEODRIVER				"SDL_VIDEODRIVER"
+#define SDLENV_AUDIODRIVER				"SDL_AUDIODRIVER"
+#define SDLENV_RENDERDRIVER				"SDL_VIDEO_RENDERER"
+
 #define SDL_SOUND_LOG					"sound.log"
+
+#ifdef SDLMAME_MACOSX
+/* Vas Crabb: Default GL-lib for MACOSX */
+#define SDLOPTVAL_GLLIB					"/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib"
+#else
+#define SDLOPTVAL_GLLIB					SDLOPTVAL_AUTO
+#endif
+
 
 //============================================================
 //	sound.c

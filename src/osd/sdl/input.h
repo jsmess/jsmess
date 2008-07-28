@@ -9,8 +9,8 @@
 //
 //============================================================
 
-#ifndef __INPUT_H
-#define __INPUT_H
+#ifndef __SDLINPUT_H__
+#define __SDLINPUT_H__
 
 #include "window.h"
 
@@ -26,4 +26,4 @@ sdl_window_info *sdlinput_get_focus_window(running_machine *machine);
 
 void  sdlinput_process_events_buf(running_machine *machine);
 
-#endif /* __INPUT_H */
+#endif /* __SDLINPUT_H__ */

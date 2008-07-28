@@ -135,7 +135,7 @@ static sdl_window_info *	focus_window = NULL;
 
 #if SDLMAME_EVENTS_IN_WORKER_THREAD
 // input buffer
-#define MAX_BUF_EVENTS 		(100)
+#define MAX_BUF_EVENTS 		(500)		/* 100 not enough for SDL 1.3 */
 static SDL_Event			event_buf[MAX_BUF_EVENTS];
 static int					event_buf_count;
 #endif
@@ -203,6 +203,8 @@ struct _kt_table {
 #if (SDL_VERSION_ATLEAST(1,3,0))
 
 #define OSD_SDL_INDEX(x) (x)
+#define OSD_SDL_INDEX_KEYSYM(keysym) ((keysym)->scancode)
+#define GET_WINDOW(ev) window_from_id((ev)->windowID)
 
 #define KTT_ENTRY0(MAME, SDL, VK, AS, UI) { ITEM_ID_ ## MAME, SDL_SCANCODE_ ## SDL, "ITEM_ID_" #MAME, (char *) UI }
 #define KTT_ENTRY1(MAME, SDL) KTT_ENTRY0(MAME, SDL, MAME, MAME, #MAME)
@@ -325,6 +327,8 @@ static kt_table sdl_key_trans_table[] =
 #else
 
 #define OSD_SDL_INDEX(x) (SDLK_INDEX(x)-SDLK_FIRST)
+#define OSD_SDL_INDEX_KEYSYM(keysym) (OSD_SDL_INDEX((keysym)->sym))
+#define GET_WINDOW(ev) sdl_window_list
 
 #define KTT_ENTRY0(MAME, SDL, VK, AS, UI) { ITEM_ID_ ## MAME, SDLK_ ## SDL, "ITEM_ID_" #MAME, (char *) UI }
 #define KTT_ENTRY1(MAME, SDL) KTT_ENTRY0(MAME, SDL, MAME, MAME, #MAME)
@@ -578,30 +582,7 @@ static const INT32 mess_keytrans[][2] =
 //============================================================
 //  INLINE FUNCTIONS
 //============================================================
-#if 0
-INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
-{
-	INT32 center = (rawmax + rawmin) / 2;
 
-	// make sure we have valid data
-	if (rawmin >= rawmax)
-		return raw;
-	
-	// above center
-	if (raw >= center)
-	{
-		INT32 result = (INT64)(raw - center) * (INT64)INPUT_ABSOLUTE_MAX / (INT64)(rawmax - center);
-		return MIN(result, INPUT_ABSOLUTE_MAX);
-	}
-	
-	// below center
-	else
-	{
-		INT32 result = -((INT64)(center - raw) * (INT64)-INPUT_ABSOLUTE_MIN / (INT64)(center - rawmin));
-		return MAX(result, INPUT_ABSOLUTE_MIN);
-	}
-}
-#endif
 static int joy_map_leastfree(void)
 {
 	int i;
@@ -888,6 +869,72 @@ static int lookup_mame_code(const char *scode)
 #endif
 
 //============================================================
+//  sdlinput_read_keymap
+//============================================================
+
+static kt_table * sdlinput_read_keymap(char *keymap_filename)
+{
+	kt_table *key_trans_table;
+	FILE *keymap_file;
+	int line = 1;
+	int index,i, sk, vk, ak;
+	char buf[256];
+	char mks[21];
+	char sks[21];
+	char kns[21];
+
+	mame_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
+
+	keymap_file = fopen(keymap_filename, "r");
+	if (keymap_file == NULL)
+	{
+		mame_printf_warning( "Keymap: Unable to open keymap %s, using default\n", keymap_filename);
+		return sdl_key_trans_table;
+	}
+
+	key_trans_table = auto_malloc(sizeof(sdl_key_trans_table));
+	memcpy((void *) key_trans_table, sdl_key_trans_table, sizeof(sdl_key_trans_table));
+	
+	while (!feof(keymap_file))
+	{
+		fgets(buf, 255, keymap_file);
+		if (*buf && buf[0] && buf[0] != '#')
+		{
+			buf[255]=0;
+			i=strlen(buf);
+			if (i && buf[i-1] == '\n')
+				buf[i-1] = 0;
+			mks[0]=0;
+			sks[0]=0;
+			memset(kns, 0, 21);
+			sscanf(buf, "%20s %20s %x %x %20c\n",
+					mks, sks, &vk, &ak, kns);
+			
+			index=lookup_mame_index(mks);
+			sk = lookup_sdl_code(sks);
+
+			if ( sk >= 0 && index >=0) 
+			{
+				key_trans_table[index].sdl_key = sk;
+				// vk and ak are not really needed
+				//key_trans_table[index][VIRTUAL_KEY] = vk;
+				//key_trans_table[index][ASCII_KEY] = ak;
+				key_trans_table[index].ui_name = auto_malloc(strlen(kns)+1);
+				strcpy(key_trans_table[index].ui_name, kns);
+				mame_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
+			}
+			else
+				mame_printf_warning("Keymap: Error on line %d - %s key not found: %s\n", line, (sk<0) ? "sdl" : "mame", buf);
+		}
+		line++;
+	}
+	fclose(keymap_file);
+	mame_printf_verbose("Keymap: Processed %d lines\n", line);
+	
+	return key_trans_table;
+}
+
+//============================================================
 //  sdlinput_init
 //============================================================
 
@@ -897,10 +944,6 @@ void sdlinput_init(running_machine *machine)
 	int keynum, button;
 	char defname[20];
 	kt_table *key_trans_table;
-	kt_table *ktt_alloc = NULL;
-
-	// we want unicode keyboard characters
-	SDL_EnableUNICODE(1);
 
 	keyboard_list = NULL;
 	joystick_list = NULL;
@@ -917,66 +960,10 @@ void sdlinput_init(running_machine *machine)
 	if (options_get_bool(mame_options(), SDLOPTION_KEYMAP))
 	{
 		char *keymap_filename;
-		FILE *keymap_file;
-		int line = 1;
 
 		keymap_filename = (char *)options_get_string(mame_options(), SDLOPTION_KEYMAP_FILE);
-		mame_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
-		keymap_file = fopen(keymap_filename, "r");
-
-		if (keymap_file == NULL)
-		{
-			mame_printf_warning( "Keymap: Unable to open keymap %s, using default\n", keymap_filename);
-			key_trans_table = sdl_key_trans_table;
-		}
-		else
-		{
-			int index,i, sk, vk, ak;
-			char buf[256];
-			char mks[21];
-			char sks[21];
-			char kns[21];
-			
-			ktt_alloc = malloc_or_die(sizeof(sdl_key_trans_table));
-			key_trans_table = ktt_alloc;
-			memcpy((void *) key_trans_table, sdl_key_trans_table, sizeof(sdl_key_trans_table));
-			while (!feof(keymap_file))
-			{
-				fgets(buf, 255, keymap_file);
-				if (*buf && buf[0] && buf[0] != '#')
-				{
-					buf[255]=0;
-					i=strlen(buf);
-					if (i && buf[i-1] == '\n')
-						buf[i-1] = 0;
-					mks[0]=0;
-					sks[0]=0;
-					memset(kns, 0, 21);
-					sscanf(buf, "%20s %20s %x %x %20c\n",
-							mks, sks, &vk, &ak, kns);
-					
-					index=lookup_mame_index(mks);
-					sk = lookup_sdl_code(sks);
-
-					if ( sk >= 0 && index >=0) 
-					{
-						key_trans_table[index].sdl_key = sk;
-						// vk and ak are not really needed
-						//key_trans_table[index][VIRTUAL_KEY] = vk;
-						//key_trans_table[index][ASCII_KEY] = ak;
-						key_trans_table[index].ui_name = auto_malloc(strlen(kns)+1);
-						strcpy(key_trans_table[index].ui_name, kns);
-						mame_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
-					}
-					else
-						mame_printf_warning("Keymap: Error on line %d - %s key not found: %s\n", line, (sk<0) ? "sdl" : "mame", buf);
-				}
-				line++;
-			}
-			fclose(keymap_file);
-			mame_printf_verbose("Keymap: Processed %d lines\n", line);
-		}
+		key_trans_table = sdlinput_read_keymap(keymap_filename);
 	}
 	else
 	{
@@ -1030,9 +1017,6 @@ void sdlinput_init(running_machine *machine)
 	device_list_reset_devices(mouse_list);
 	device_list_reset_devices(joystick_list);
 	
-	// clean up
-	if (ktt_alloc)
-		free(ktt_alloc);
 }
 
 
@@ -1091,8 +1075,6 @@ INLINE sdl_window_info * window_from_id(SDL_WindowID windowID)
 			return w;
 		}
 	}
-	// deliberately crash
-	printf("Window %d not found\n", windowID);
 	return NULL;
 }
 #endif
@@ -1170,26 +1152,15 @@ void sdlinput_poll(running_machine *machine)
 			}
 			#endif
 
-			#if (SDL_VERSION_ATLEAST(1,3,0))
-			ui_input_push_char_event(machine, window_from_id(event.window.windowID)->target, (unicode_char)event.key.keysym.unicode);
-			#else
-			ui_input_push_char_event(machine, sdl_window_list->target, (unicode_char)event.key.keysym.unicode);
-			#endif
-
 			devinfo = keyboard_list;
-#if (SDL_VERSION_ATLEAST(1,3,0))
-			devinfo->keyboard.state[OSD_SDL_INDEX(event.key.keysym.scancode)] = 0x80;
-#else
-			devinfo->keyboard.state[OSD_SDL_INDEX(event.key.keysym.sym)] = 0x80;
+			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
+#if (!SDL_VERSION_ATLEAST(1,3,0))
+			ui_input_push_char_event(machine, sdl_window_list->target, (unicode_char) event.key.keysym.unicode);
 #endif
 			break;
 		case SDL_KEYUP:
 			devinfo = keyboard_list;
-#if (SDL_VERSION_ATLEAST(1,3,0))
-			devinfo->keyboard.state[OSD_SDL_INDEX(event.key.keysym.scancode)] = 0x0;
-#else
-			devinfo->keyboard.state[OSD_SDL_INDEX(event.key.keysym.sym)] = 0x0;
-#endif
+			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x00;
 			break;
 		case SDL_JOYAXISMOTION:
 			devinfo = generic_device_find_index(joystick_list, joy_logical[event.jaxis.which]);
@@ -1263,13 +1234,35 @@ void sdlinput_poll(running_machine *machine)
 		case SDL_MOUSEBUTTONDOWN:
 			devinfo = mouse_list;
 			devinfo->mouse.buttons[event.button.button-1] = 0x80; 
-
-			#if (SDL_VERSION_ATLEAST(1,3,0))
-			ui_input_push_mouse_click_event(machine, window_from_id(event.window.windowID)->target, event.button.x, event.button.y);
-			#else
-			ui_input_push_mouse_click_event(machine, sdl_window_list->target, event.button.x, event.button.y);
-			#endif
-
+			if (event.button.button == 1)
+			{
+				// FIXME Move static declaration
+				static osd_ticks_t last_click = 0;
+				static int last_x = 0;
+				static int last_y = 0;
+				int cx, cy;
+				osd_ticks_t click = osd_ticks() * 1000 / osd_ticks_per_second();
+				sdl_window_info *window = GET_WINDOW(&event.button);
+				
+				if (window != NULL && window->xy_to_render_target(window, event.button.x,event.button.y, &cx, &cy) )
+				{
+					ui_input_push_mouse_click_event(machine, window->target, cx, cy); 
+					// FIXME Parameter ?
+					if ((click-last_click < 250) 
+							&& (cx >= last_x - 4 && cx <= last_x  + 4)
+							&& (cy >= last_y - 4 && cy <= last_y  + 4) )
+					{
+						last_click = 0;
+						ui_input_push_mouse_double_click_event(machine, window->target, cx, cy);
+					}
+					else
+					{
+						last_click = click;
+						last_x = cx;
+						last_y = cy;
+					}
+				}
+			}
 			break;
 		case SDL_MOUSEBUTTONUP:
 			devinfo = mouse_list;
@@ -1279,12 +1272,13 @@ void sdlinput_poll(running_machine *machine)
 			devinfo = mouse_list;
 			devinfo->mouse.lX = event.motion.xrel * INPUT_RELATIVE_PER_PIXEL; 
 			devinfo->mouse.lY = event.motion.yrel * INPUT_RELATIVE_PER_PIXEL; 
-
-			#if (SDL_VERSION_ATLEAST(1,3,0))
-			ui_input_push_mouse_move_event(machine, window_from_id(event.window.windowID)->target, event.motion.xrel * INPUT_RELATIVE_PER_PIXEL, event.motion.yrel * INPUT_RELATIVE_PER_PIXEL);
-			#else
-			ui_input_push_mouse_move_event(machine, sdl_window_list->target, event.motion.xrel * INPUT_RELATIVE_PER_PIXEL, event.motion.yrel * INPUT_RELATIVE_PER_PIXEL);
-			#endif
+			{
+				int cx=-1, cy=-1;
+				sdl_window_info *window = GET_WINDOW(&event.motion);
+				
+				if (window != NULL && window->xy_to_render_target(window, event.motion.x, event.motion.y, &cx, &cy) )
+					ui_input_push_mouse_move_event(machine, window->target, cx, cy); 
+			}
 			break;
 #if (!SDL_VERSION_ATLEAST(1,3,0))
 		case SDL_QUIT:
@@ -1294,24 +1288,46 @@ void sdlinput_poll(running_machine *machine)
 			sdlwindow_resize(sdl_window_list, event.resize.w, event.resize.h);
 			break;
 #else
+		case SDL_TEXTINPUT:
+			if (*event.text.text)
+			{
+				sdl_window_info *w = GET_WINDOW(&event.text);
+				unicode_char result;
+				osd_uchar_from_osdchar(&result, event.text.text, 1);
+				ui_input_push_char_event(machine, w->target, result);
+			}
+			break;
 		case SDL_WINDOWEVENT:
+		{
+			sdl_window_info *window = GET_WINDOW(&event.window);
+			
+			if (window == NULL)
+				break;
+			
 			switch (event.window.event)
 			{
 			case SDL_WINDOWEVENT_CLOSE:
 				mame_schedule_exit(machine);
 				break;
+			case  SDL_WINDOWEVENT_LEAVE:
+			{
+				ui_input_push_mouse_leave_event(machine, window->target);
+				break;
+				
+			}
 			case SDL_WINDOWEVENT_RESIZED:
-				sdlwindow_resize(window_from_id(event.window.windowID), event.window.data1, event.window.data2);
+				sdlwindow_resize(window, event.window.data1, event.window.data2);
 				/* fall through break; */
 			case SDL_WINDOWEVENT_FOCUS_GAINED:
 			case SDL_WINDOWEVENT_ENTER:
 			case SDL_WINDOWEVENT_EXPOSED:
 			case SDL_WINDOWEVENT_MAXIMIZED:  
 			case SDL_WINDOWEVENT_RESTORED:
-				focus_window = window_from_id(event.window.windowID);
+				focus_window = window;
 				break;
 			}
 			break;
+		}
 #endif
 		}
 	}

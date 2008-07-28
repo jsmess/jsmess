@@ -49,12 +49,11 @@
 #include "video.h"
 #include "window.h"
 #include "input.h"
+#include "uiinput.h"
 
 #include "osdsdl.h"
 
 #include "osd_opengl.h"
-
-#include "uiinput.h"
 
 #ifdef MESS
 #include "menu.h"
@@ -63,9 +62,6 @@
 //============================================================
 //  CONSTANTS
 //============================================================
-
-// refresh rate while paused
-#define PAUSED_REFRESH_RATE			(60)
 
 
 //============================================================
@@ -178,6 +174,55 @@ static void video_exit(running_machine *machine)
 }
 
 
+//============================================================
+//  get_modes - code take from SDL_Compat
+//============================================================
+
+#if (SDL_VERSION_ATLEAST(1,3,0))
+static SDL_Rect **get_current_display_modes(void)
+{
+	/* Get modes for current select display */
+    int i, nmodes;
+    SDL_Rect **modes;
+
+    /* Memory leak, but this is a compatibility function, who cares? */
+    nmodes = 0;
+    modes = NULL;
+    for (i = 0; i < SDL_GetNumDisplayModes(); ++i) {
+        SDL_DisplayMode mode;
+        SDL_GetDisplayMode(i, &mode);
+        if (!mode.w || !mode.h) {
+            return (SDL_Rect **) (NULL);
+        }
+        // FIXME: refresh rates
+        if (nmodes > 0 && modes[nmodes - 1]->w == mode.w
+            && modes[nmodes - 1]->h == mode.h) {
+            continue;
+        }
+
+        modes = SDL_realloc(modes, (nmodes + 2) * sizeof(*modes));
+        if (!modes) {
+            return NULL;
+        }
+        modes[nmodes] = (SDL_Rect *) SDL_malloc(sizeof(SDL_Rect));
+        if (!modes[nmodes]) {
+            return NULL;
+        }
+        modes[nmodes]->x = 0;
+        modes[nmodes]->y = 0;
+        modes[nmodes]->w = mode.w;
+        modes[nmodes]->h = mode.h;
+        mame_printf_verbose("Display mode #%d - %d x %d\n", nmodes, mode.w, mode.h);
+        ++nmodes;
+    }
+    if (modes) {
+        modes[nmodes] = NULL;
+    }
+    return modes;
+}
+#endif
+
+
 
 //============================================================
 //  sdlvideo_monitor_refresh
@@ -185,14 +230,7 @@ static void video_exit(running_machine *machine)
 
 void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 {
-	#if defined(SDLMAME_WIN32)	// Win32 version
-	MONITORINFOEX info;
-	info.cbSize = sizeof(info);	
-    GetMonitorInfo((HMONITOR)monitor->handle, (LPMONITORINFO)&info);
-	monitor->center_width = monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
-	monitor->center_height = monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
-	strcpy(monitor->monitor_device, info.szDevice);
-	#elif (SDL_VERSION_ATLEAST(1,3,0))
+	#if (SDL_VERSION_ATLEAST(1,3,0))
 	SDL_DisplayMode dmode;
 	
 	SDL_SelectVideoDisplay(monitor->handle);
@@ -201,6 +239,14 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	monitor->monitor_height = dmode.h;
 	monitor->center_width = dmode.w;
 	monitor->center_height = dmode.h;
+	#else
+	#if defined(SDLMAME_WIN32)	// Win32 version
+	MONITORINFOEX info;
+	info.cbSize = sizeof(info);	
+    GetMonitorInfo((HMONITOR)monitor->handle, (LPMONITORINFO)&info);
+	monitor->center_width = monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
+	monitor->center_height = monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
+	strcpy(monitor->monitor_device, info.szDevice);
 	#elif defined(SDLMAME_MACOSX)	// Mac OS X Core Imaging version
 	CGDirectDisplayID primary;
 	CGRect dbounds;
@@ -295,7 +341,6 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	#endif
 
 	{
-		//FIXME: Code not really suitable for multiple monitors
 		static int info_shown=0;
 		if (!info_shown) 
 		{
@@ -304,6 +349,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			info_shown = 1;
 		}
 	}
+	#endif //  (SDL_VERSION_ATLEAST(1,3,0))
 }
 
 
@@ -340,6 +386,7 @@ sdl_monitor_info *sdlvideo_monitor_from_handle(UINT32 hmonitor)
 	return NULL;
 }
 
+
 //============================================================
 //  osd_update
 //============================================================
@@ -365,9 +412,11 @@ void osd_update(running_machine *machine, int skip_redraw)
 		debugwin_update_during_game();
 }
 
+
 //============================================================
 //  add_primary_monitor
 //============================================================
+
 #if !defined(SDLMAME_WIN32) && !(SDL_VERSION_ATLEAST(1,3,0))
 static void add_primary_monitor(void *data)
 {
@@ -395,9 +444,11 @@ static void add_primary_monitor(void *data)
 } 
 #endif
 
+
 //============================================================
 //  monitor_enum_callback
 //============================================================
+
 #ifdef SDLMAME_WIN32
 static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
 {
@@ -437,6 +488,7 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 }
 #endif
 
+
 //============================================================
 //  init_monitors
 //============================================================
@@ -451,9 +503,12 @@ static void init_monitors(void)
 
 	#ifdef SDLMAME_WIN32
 	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)&tailptr);
+	monitor->modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
 	#elif (SDL_VERSION_ATLEAST(1,3,0))
 	{
-		int i;
+		int i, temp;
+
+		temp = SDL_GetCurrentVideoDisplay();
 
 		for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
 		{
@@ -466,6 +521,7 @@ static void init_monitors(void)
 
 			snprintf(monitor->monitor_device, sizeof(monitor->monitor_device)-1, "%s%d", SDLOPTION_SCREEN(""),i);
 	 	
+			SDL_SelectVideoDisplay(i);
 			SDL_GetDesktopDisplayMode(&dmode);
 			monitor->monitor_width = dmode.w;
 			monitor->monitor_height = dmode.h;
@@ -475,6 +531,8 @@ static void init_monitors(void)
 	        // guess the aspect ratio assuming square pixels
 	        monitor->aspect = (float)(dmode.w) / (float)(dmode.h);
 	        mame_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->monitor_device, dmode.w, dmode.h);
+
+	        monitor->modes = get_current_display_modes();
 	        
 	        // save the primary monitor handle
 	        if (i == 0)
@@ -484,11 +542,14 @@ static void init_monitors(void)
 			*tailptr = monitor;
 			tailptr = &monitor->next;
 		}
+		SDL_SelectVideoDisplay(temp);
 	}
 	#else
 	add_primary_monitor((void *)&tailptr);
+	sdl_monitor_list->modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
 	#endif
 }
+
 
 //============================================================
 //  pick_monitor
@@ -558,6 +619,7 @@ static sdl_monitor_info *pick_monitor(int index)
 }
 #endif
 
+
 //============================================================
 //  check_osd_inputs
 //============================================================
@@ -572,18 +634,21 @@ static void check_osd_inputs(running_machine *machine)
 	
 	if (ui_input_pressed(machine, IPT_OSD_2))
 	{
+		//FIXME: on a per window basis
 		video_config.fullstretch = !video_config.fullstretch;
 		ui_popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
 	}
 	
 	if (ui_input_pressed(machine, IPT_OSD_4))
 	{
+		//FIXME: on a per window basis
 		video_config.keepaspect = !video_config.keepaspect;
 		ui_popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
 	
 	if (USE_OPENGL)
 	{
+		//FIXME: on a per window basis
 		if (ui_input_pressed(machine, IPT_OSD_5))
 		{
 			video_config.filter = !video_config.filter;
@@ -606,7 +671,6 @@ static void check_osd_inputs(running_machine *machine)
 	if (ui_input_pressed(machine, IPT_OSD_10))
 		sdlwindow_toggle_draw(machine, window);
 }
-
 
 
 //============================================================
@@ -674,96 +738,97 @@ static void extract_video_config(running_machine *machine)
 	video_config.centerh       = options_get_bool(mame_options(), SDLOPTION_CENTERH);
 	video_config.centerv       = options_get_bool(mame_options(), SDLOPTION_CENTERV);
 
-#if USE_OPENGL
-	video_config.prescale      = options_get_int(mame_options(), SDLOPTION_PRESCALE);
-	if (video_config.prescale < 1 || video_config.prescale > 3)
+	if (USE_OPENGL)
 	{
-		mame_printf_warning("Invalid prescale option, reverting to '1'\n");
-		video_config.prescale = 1;
-	}
-	// default to working video please
-	video_config.prefer16bpp_tex = 0;
-	video_config.filter        = options_get_bool(mame_options(), SDLOPTION_FILTER);
-	video_config.forcepow2texture = options_get_bool(mame_options(), SDLOPTION_GL_FORCEPOW2TEXTURE)==1;
-	video_config.allowtexturerect = options_get_bool(mame_options(), SDLOPTION_GL_NOTEXTURERECT)==0;
-	video_config.vbo         = options_get_bool(mame_options(), SDLOPTION_GL_VBO);
-	video_config.pbo         = options_get_bool(mame_options(), SDLOPTION_GL_PBO);
-	video_config.glsl        = options_get_bool(mame_options(), SDLOPTION_GL_GLSL);
-	if ( video_config.glsl )
-	{
-		int i;
-		static char buffer[20]; // gl_glsl_filter[0..9]?
-
-		video_config.glsl_filter = options_get_int (mame_options(), SDLOPTION_GLSL_FILTER);
-
-		video_config.glsl_shader_mamebm_num=0;
-
-		for(i=0; i<GLSL_SHADER_MAX; i++)
+		video_config.prescale      = options_get_int(mame_options(), SDLOPTION_PRESCALE);
+		if (video_config.prescale < 1 || video_config.prescale > 3)
 		{
-			snprintf(buffer, 18, SDLOPTION_SHADER_MAME("%d"), i); buffer[17]=0;
-
-			stemp = options_get_string(mame_options(), buffer);
-			if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
+			mame_printf_warning("Invalid prescale option, reverting to '1'\n");
+			video_config.prescale = 1;
+		}
+		// default to working video please
+		video_config.prefer16bpp_tex = 0;
+		video_config.filter        = options_get_bool(mame_options(), SDLOPTION_FILTER);
+		video_config.forcepow2texture = options_get_bool(mame_options(), SDLOPTION_GL_FORCEPOW2TEXTURE)==1;
+		video_config.allowtexturerect = options_get_bool(mame_options(), SDLOPTION_GL_NOTEXTURERECT)==0;
+		video_config.vbo         = options_get_bool(mame_options(), SDLOPTION_GL_VBO);
+		video_config.pbo         = options_get_bool(mame_options(), SDLOPTION_GL_PBO);
+		video_config.glsl        = options_get_bool(mame_options(), SDLOPTION_GL_GLSL);
+		if ( video_config.glsl )
+		{
+			int i;
+			static char buffer[20]; // gl_glsl_filter[0..9]?
+	
+			video_config.glsl_filter = options_get_int (mame_options(), SDLOPTION_GLSL_FILTER);
+	
+			video_config.glsl_shader_mamebm_num=0;
+	
+			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
-				strcpy(video_config.glsl_shader_mamebm[i], stemp);
-				video_config.glsl_shader_mamebm_num++;
-			} else {
+				snprintf(buffer, 18, SDLOPTION_SHADER_MAME("%d"), i); buffer[17]=0;
+	
+				stemp = options_get_string(mame_options(), buffer);
+				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
+				{
+					video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
+					strcpy(video_config.glsl_shader_mamebm[i], stemp);
+					video_config.glsl_shader_mamebm_num++;
+				} else {
+					video_config.glsl_shader_mamebm[i] = NULL;
+				}
+			}
+	
+			video_config.glsl_shader_scrn_num=0;
+	
+			for(i=0; i<GLSL_SHADER_MAX; i++)
+			{
+				snprintf(buffer, 20, SDLOPTION_SHADER_SCREEN("%d"), i); buffer[19]=0;
+	
+				stemp = options_get_string(mame_options(), buffer);
+				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
+				{
+					video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
+					strcpy(video_config.glsl_shader_scrn[i], stemp);
+					video_config.glsl_shader_scrn_num++;
+				} else {
+					video_config.glsl_shader_scrn[i] = NULL;
+				}
+			}
+	
+			video_config.glsl_vid_attributes = options_get_int (mame_options(), SDLOPTION_GL_GLSL_VID_ATTR);
+			{
+				// Disable feature: glsl_vid_attributes, as long we have the gamma calculation
+				// disabled within the direct shaders .. -> too slow.
+				// IMHO the gamma setting should be done global anyways, and for the whole system,
+				// not just MAME ..
+				float gamma = options_get_float(mame_options(), OPTION_GAMMA);
+				if (gamma != 1.0 && video_config.glsl_vid_attributes && video_config.glsl)
+				{
+					video_config.glsl_vid_attributes = FALSE;
+					mame_printf_warning("OpenGL: GLSL - disable handling of brightness and contrast, gamma is set to %f\n", gamma);
+				}
+			}
+		} else {
+			int i;
+			video_config.glsl_filter = 0;
+			video_config.glsl_shader_mamebm_num=0;
+			for(i=0; i<GLSL_SHADER_MAX; i++)
+			{
 				video_config.glsl_shader_mamebm[i] = NULL;
 			}
-		}
-
-		video_config.glsl_shader_scrn_num=0;
-
-		for(i=0; i<GLSL_SHADER_MAX; i++)
-		{
-			snprintf(buffer, 20, SDLOPTION_SHADER_SCREEN("%d"), i); buffer[19]=0;
-
-			stemp = options_get_string(mame_options(), buffer);
-			if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
+			video_config.glsl_shader_scrn_num=0;
+			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
-				strcpy(video_config.glsl_shader_scrn[i], stemp);
-				video_config.glsl_shader_scrn_num++;
-			} else {
 				video_config.glsl_shader_scrn[i] = NULL;
 			}
+			video_config.glsl_vid_attributes = 0;
 		}
-
-		video_config.glsl_vid_attributes = options_get_int (mame_options(), SDLOPTION_GL_GLSL_VID_ATTR);
-		{
-			// Disable feature: glsl_vid_attributes, as long we have the gamma calculation
-			// disabled within the direct shaders .. -> too slow.
-			// IMHO the gamma setting should be done global anyways, and for the whole system,
-			// not just MAME ..
-			float gamma = options_get_float(mame_options(), OPTION_GAMMA);
-			if (gamma != 1.0 && video_config.glsl_vid_attributes && video_config.glsl)
-			{
-				video_config.glsl_vid_attributes = FALSE;
-				mame_printf_warning("OpenGL: GLSL - disable handling of brightness and contrast, gamma is set to %f\n", gamma);
-			}
-		}
-	} else {
-		int i;
-		video_config.glsl_filter = 0;
-		video_config.glsl_shader_mamebm_num=0;
-		for(i=0; i<GLSL_SHADER_MAX; i++)
-		{
-			video_config.glsl_shader_mamebm[i] = NULL;
-		}
-		video_config.glsl_shader_scrn_num=0;
-		for(i=0; i<GLSL_SHADER_MAX; i++)
-		{
-			video_config.glsl_shader_scrn[i] = NULL;
-		}
-		video_config.glsl_vid_attributes = 0;
+	
+		if (sdl_use_unsupported())
+			video_config.prescale_effect = options_get_int(mame_options(), SDLOPTION_PRESCALE_EFFECT);
+		else
+			video_config.prescale_effect = 0;
 	}
-
-	if (sdl_use_unsupported())
-		video_config.prescale_effect = options_get_int(mame_options(), SDLOPTION_PRESCALE_EFFECT);
-	else
-		video_config.prescale_effect = 0;
-#endif
 	// misc options: sanity check values
 
 	// global options: sanity check values
@@ -781,26 +846,32 @@ static void extract_video_config(running_machine *machine)
 	}
 #endif
 	// yuv settings ...
-	stemp = options_get_string(mame_options(), SDLOPTION_YUVMODE);
+	stemp = options_get_string(mame_options(), SDLOPTION_SCALEMODE);
 	if (strcmp(stemp, SDLOPTVAL_NONE) == 0)
-		video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
+		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
+	else if (strcmp(stemp, SDLOPTVAL_HWBLIT) == 0)
+		video_config.scale_mode = VIDEO_SCALE_MODE_HWBLIT;
 	else if (strcmp(stemp, SDLOPTVAL_YV12) == 0)
-		video_config.yuv_mode = VIDEO_YUV_MODE_YV12;
+		video_config.scale_mode = VIDEO_SCALE_MODE_YV12;
 	else if (strcmp(stemp, SDLOPTVAL_YV12x2) == 0)
-		video_config.yuv_mode = VIDEO_YUV_MODE_YV12X2;
+		video_config.scale_mode = VIDEO_SCALE_MODE_YV12X2;
 	else if (strcmp(stemp, SDLOPTVAL_YUY2) == 0)
-		video_config.yuv_mode = VIDEO_YUV_MODE_YUY2;
+		video_config.scale_mode = VIDEO_SCALE_MODE_YUY2;
 	else if (strcmp(stemp, SDLOPTVAL_YUY2x2) == 0)
-		video_config.yuv_mode = VIDEO_YUV_MODE_YUY2X2;
+		video_config.scale_mode = VIDEO_SCALE_MODE_YUY2X2;
 	else
 	{
 		mame_printf_warning("Invalid yuvmode value %s; reverting to none\n", stemp);
-		video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
+		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
 	}
-	if ( (video_config.mode != VIDEO_MODE_SOFT) && (video_config.yuv_mode != VIDEO_YUV_MODE_NONE) )
+	if ( (video_config.mode != VIDEO_MODE_SOFT) && (video_config.scale_mode != VIDEO_SCALE_MODE_NONE) )
 	{
-		mame_printf_warning("yuvmode is only for -video soft, overriding\n");
-		video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
+		mame_printf_warning("scalemode is only for -video soft, overriding\n");
+		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
+	}
+	if ( !SDL_VERSION_ATLEAST(1,3,0) && (video_config.mode == VIDEO_MODE_SOFT) && (video_config.scale_mode == VIDEO_SCALE_MODE_HWBLIT) )
+	{
+		mame_printf_warning("scalemode 'hwblit' treated like 'none' in SDL1.2\n");
 	}
 }
 
@@ -859,7 +930,6 @@ static float get_aspect(const char *name, int report_error)
 		mame_printf_error("Illegal aspect ratio value for %s = %s\n", name, data);
 	return (float)num / (float)den;
 }
-
 
 
 //============================================================

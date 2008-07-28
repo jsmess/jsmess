@@ -110,8 +110,7 @@ static const options_entry mame_sdl_options[] =
 	#if (SDL_VERSION_ATLEAST(1,2,10))
 	{ SDLOPTION_WAITVSYNC,                    "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	#endif
-	{ SDLOPTION_YUVMODE ";ym",           SDLOPTVAL_NONE,  0,                 "YUV mode: none, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
-
+	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  0,                 "Scale mode: none, hwblit, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 #if USE_OPENGL
 	// OpenGL specific options
 	{ NULL,                                   NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
@@ -201,6 +200,19 @@ static const options_entry mame_sdl_options[] =
 	{ SDLOPTION_JOYMAP,                      "0",    OPTION_BOOLEAN,    "enable physical to logical joystick mapping" },
 	{ SDLOPTION_JOYMAP_FILE,                "joymap.dat", 0,            "joymap filename" },
 	{ SDLOPTION_SIXAXIS,			        "0",	 OPTION_BOOLEAN,    "Use special handling for PS3 Sixaxis controllers" },
+
+	// SDL low level driver options
+	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL LOWLEVEL DRIVER OPTIONS" },
+	{ SDLOPTION_VIDEODRIVER ";vd",       SDLOPTVAL_AUTO,   0,           "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	{ SDLOPTION_RENDERDRIVER ";rd",      SDLOPTVAL_AUTO,   0,           "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
+#endif
+	{ SDLOPTION_AUDIODRIVER ";ad",       SDLOPTVAL_AUTO,   0,           "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
+#if USE_OPENGL
+ 	{ SDLOPTION_GL_LIB,                   SDLOPTVAL_GLLIB, 0,           "alternative libGL.so to use; 'auto' for system default" },
+#endif
+
+	// End of list
 	{ NULL }
 };
 
@@ -308,7 +320,7 @@ int SDL_main(int argc, char **argv)
 			char buf[130];
 			if (XMatchVisualInfo(display, DefaultScreen(display), 24, TrueColor, &vi)) {
 				snprintf(buf, sizeof(buf), "0x%lx", vi.visualid);
-				setenv(SDLENV_IDENTIFIER, buf, 0);
+				setenv(SDLENV_VISUALID, buf, 0);
 			}
 		}
 		if (display)
@@ -418,11 +430,38 @@ static void defines_verbose(void)
 //============================================================
 void osd_init(running_machine *machine)
 {
+	const char *stemp;
+
+	// Some driver options - must be before audio init!
+	stemp = options_get_string(mame_options(), SDLOPTION_AUDIODRIVER);
+	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+	{
+		mame_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
+		setenv(SDLENV_AUDIODRIVER, stemp, 1);
+	}
+
+	stemp = options_get_string(mame_options(), SDLOPTION_VIDEODRIVER);
+	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+	{
+		mame_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
+		setenv(SDLENV_VIDEODRIVER, stemp, 1);
+	}
+
+	if (SDL_VERSION_ATLEAST(1,3,0))
+	{
+		stemp = options_get_string(mame_options(), SDLOPTION_RENDERDRIVER);
+		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+		{
+			mame_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
+			setenv(SDLENV_RENDERDRIVER, stemp, 1);
+		}
+	}
+
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
 		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 			/* mame_printf_* not fully initialized yet */
-			ShowError("Could not initialize SDL: %s.\n", SDL_GetError());
+			ShowError("Could not initialize SDL", SDL_GetError());
 			exit(-1);
 		}
 	}
@@ -431,14 +470,13 @@ void osd_init(running_machine *machine)
 
 	defines_verbose();
 
-#if defined(SDLMAME_NO_X11) || defined(SDLMAME_WIN32)
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
-	{
-		osd_exit(machine);
-		ShowError("sdlmame", "-debug not supported on X11-less builds\n\n");
-		exit(-1);		
-	}
-#endif
+	if (!SDLMAME_HAS_DEBUGGER)
+		if (options_get_bool(mame_options(), OPTION_DEBUG))
+		{
+			osd_exit(machine);
+			ShowError("sdlmame", "-debug not supported on X11-less builds\n\n");
+			exit(-1);		
+		}
 	
 	if (sdlvideo_init(machine))
 	{
@@ -456,14 +494,17 @@ void osd_init(running_machine *machine)
 	#endif
 
 	sdlinput_init(machine);
+	
 	sdlaudio_init(machine);
 
 	if (options_get_bool(mame_options(), SDLOPTION_OSLOG))
 		add_logerror_callback(machine, output_oslog);
 
-	#ifdef MESS
-	SDL_EnableUNICODE(1);
-	#endif
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	SDL_EventState(SDL_TEXTINPUT, SDL_TRUE);
+#else
+	SDL_EnableUNICODE(SDL_TRUE);
+#endif
 }
 
 #ifdef MESS

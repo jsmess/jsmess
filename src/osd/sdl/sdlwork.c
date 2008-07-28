@@ -34,11 +34,12 @@
 
 #define KEEP_STATISTICS			(0)
 
-
-
 //============================================================
 //  PARAMETERS
 //============================================================
+
+#define SDLENV_PROCESSORS				"OSDPROCESSORS"
+#define SDLENV_CPUMASKS					"OSDCPUMASKS"
 
 #define INFINITE				(osd_ticks_per_second() *  (osd_ticks_t) 10000)
 #if THREAD_COOPERATIVE
@@ -709,7 +710,7 @@ static int effective_num_processors(void)
 	int numprocs = 0;
 
 	// if the OSDPROCESSORS environment variable is set, use that value if valid
-	procsoverride = getenv("OSDPROCESSORS");
+	procsoverride = getenv(SDLENV_PROCESSORS);
 	if (procsoverride != NULL && sscanf(procsoverride, "%d", &numprocs) == 1 && numprocs > 0)
 		return numprocs;
 
@@ -728,7 +729,7 @@ static UINT32 effective_cpu_mask(int index)
 	char	buf[5];
 	UINT32	mask = 0xFFFF;
 
-	s = getenv("OSDCPUMASKS");
+	s = getenv(SDLENV_CPUMASKS);
 	if (s != NULL && strcmp(s,"none"))
 	{
 		if (!strcmp(s,"auto"))

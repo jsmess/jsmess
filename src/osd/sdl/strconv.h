@@ -7,8 +7,8 @@
 //
 //============================================================
 
-#ifndef __SDL_STRCONV__
-#define __SDL_STRCONV__
+#ifndef __SDLSTRCONV__
+#define __SDLSTRCONV__
 
 #include "mamecore.h"
 
@@ -32,5 +32,5 @@ char *utf8_from_wstring(const WCHAR *s) ATTR_MALLOC;
 
 
 
-#endif // __SDL_STRCONV__
+#endif // __SDLSTRCONV__
 

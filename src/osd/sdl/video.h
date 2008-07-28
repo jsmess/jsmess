@@ -9,8 +9,10 @@
 //
 //============================================================
 
-#ifndef __SDL_VIDEO__
-#define __SDL_VIDEO__
+#ifndef __SDLVIDEO__
+#define __SDLVIDEO__
+
+#include <SDL/SDL.h>
 
 //============================================================
 //  CONSTANTS
@@ -21,14 +23,16 @@
 #define VIDEO_MODE_SOFT				(0)
 #define VIDEO_MODE_OPENGL			(1)
 
-#define VIDEO_YUV_MODE_NONE			(0)
-#define VIDEO_YUV_MODE_YV12			(1)
-#define VIDEO_YUV_MODE_YV12X2		(2)
-#define VIDEO_YUV_MODE_YUY2			(3)
-#define VIDEO_YUV_MODE_YUY2X2		(4)
-#define VIDEO_YUV_MODE_MAX			VIDEO_YUV_MODE_YUY2X2
-#define VIDEO_YUV_MODE_MIN			VIDEO_YUV_MODE_NONE
+#define VIDEO_SCALE_MODE_NONE		(0)
+#define VIDEO_SCALE_MODE_HWBLIT		(1)
+#define VIDEO_SCALE_MODE_YV12		(2)
+#define VIDEO_SCALE_MODE_YV12X2		(3)
+#define VIDEO_SCALE_MODE_YUY2		(4)
+#define VIDEO_SCALE_MODE_YUY2X2		(5)
+#define VIDEO_SCALE_MODE_MAX		VIDEO_SCALE_MODE_YUY2X2
+#define VIDEO_SCALE_MODE_MIN		VIDEO_SCALE_MODE_NONE
 
+#define IS_YUV_MODE(_m)				((_m) >= VIDEO_SCALE_MODE_YV12 && (_m) <= VIDEO_SCALE_MODE_YUY2X2)
 
 // texture formats
 // This used to be an enum, but these are now defines so we can use them as
@@ -61,15 +65,17 @@ typedef struct _sdl_monitor_info sdl_monitor_info;
 struct _sdl_monitor_info
 {
 	sdl_monitor_info  *	next;					// pointer to next monitor in list
-	UINT32			handle;					// handle to the monitor
-	int			monitor_width;
-	int			monitor_height;
-	char			monitor_device[64];
-	float			aspect;					// computed/configured aspect ratio of the physical device
-	int			reqwidth;				// requested width for this monitor
-	int			reqheight;				// requested height for this monitor
-	int			center_width;				// width of first physical screen for centering
-	int			center_height;				// height of first physical screen for centering
+	UINT32				handle;					// handle to the monitor
+	int					monitor_width;
+	int					monitor_height;
+	char				monitor_device[64];
+	float				aspect;					// computed/configured aspect ratio of the physical device
+	int					reqwidth;				// requested width for this monitor
+	int					reqheight;				// requested height for this monitor
+	int					center_width;			// width of first physical screen for centering
+	int					center_height;			// height of first physical screen for centering
+	//FIXME: This should not be a SDL-type
+	SDL_Rect **modes;							// supported modes
 };
 
 
@@ -112,35 +118,34 @@ struct _sdl_video_config
 
 	int					fullstretch;
 
-#if USE_OPENGL	
+	// vector options
+	int					isvector;		// 1 if vector, 0 if raster
+	float				beamwidth;		// beam width
+
 	// OpenGL options
 	int					filter;			// enable filtering, disabled if glsl_filter>0
 	int					prescale_effect;
 	int					prefer16bpp_tex;
 	int					glsl;
 	int					glsl_filter;		// glsl filtering, >0 disables filter
-	char *                                  glsl_shader_mamebm[GLSL_SHADER_MAX]; // custom glsl shader set, mame bitmap
+	char *              glsl_shader_mamebm[GLSL_SHADER_MAX]; // custom glsl shader set, mame bitmap
 	int					glsl_shader_mamebm_num; // custom glsl shader set number, mame bitmap
-	char *                                  glsl_shader_scrn[GLSL_SHADER_MAX]; // custom glsl shader set, screen bitmap
+	char *              glsl_shader_scrn[GLSL_SHADER_MAX]; // custom glsl shader set, screen bitmap
 	int					glsl_shader_scrn_num; // custom glsl shader number, screen bitmap
 	int					glsl_vid_attributes;	// glsl brightness, contrast and gamma for RGB bitmaps
 	int					pbo;
 	int					vbo;
 	int					allowtexturerect;	// allow GL_ARB_texture_rectangle, default: no
 	int					forcepow2texture;	// force power of two textures, default: no
-#endif
 
+	// perftest
 	int					perftest;		// print out real video fps
-
-	// vector options
-	int					isvector;		// 1 if vector, 0 if raster
-	float				beamwidth;		// beam width
 
 	// X11 options
 	int					restrictonemonitor;	// in fullscreen, confine to Xinerama monitor 0
 
 	// YUV options	
-	int					yuv_mode;
+	int					scale_mode;
 };
 
 //============================================================
