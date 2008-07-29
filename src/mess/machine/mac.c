@@ -1393,9 +1393,16 @@ static const struct NCR5380interface macplus_5380intf =
 	NULL		// IRQ (unconnected on the Mac Plus)
 };
 
+static void macscsi_exit(running_machine *machine)
+{
+	ncr5380_exit(&macplus_5380intf);
+}
+
 MACHINE_START( macscsi )
 {
 	ncr5380_init(&macplus_5380intf);
+	
+	add_exit_callback(machine, macscsi_exit);
 }
 
 DRIVER_INIT(macplus)
