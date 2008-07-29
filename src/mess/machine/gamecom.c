@@ -84,7 +84,7 @@ MACHINE_RESET( gamecom )
 	if ( dummy_bank == NULL ) {
 		dummy_bank = auto_malloc( 8 * 1024 );
 	}
-	memset( dummy_bank, 0xff, sizeof( dummy_bank ) );
+	memset( dummy_bank, 0xff, 8 * 1024 );
 	cartridge = NULL;
 	/* disable DMA and timer */
 	gamecom_dma.enabled = 0;

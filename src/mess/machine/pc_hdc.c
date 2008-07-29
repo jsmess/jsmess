@@ -677,7 +677,7 @@ static void pc_hdc_reset_w(int n, int data)
 	sector[n] = 0;
 	csb[n] = 0;
 	status[n] = STA_COMMAND | STA_READY;
-	memset(buffer, 0, sizeof(buffer));
+	memset(buffer, 0, 17*4*512);
 	buffer_ptr = buffer;
 	data_cnt = 0;
 }
