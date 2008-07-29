@@ -23,11 +23,11 @@ static TIMER_CALLBACK(keyboard_callback)
 {
 	UINT8 code, i, j;
 	static const char *keynames[] = { "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", 
-										"LINE7", "LINE8", "LINE9", "LINE10", "LINE11", "" };
+										"LINE7", "LINE8", "LINE9", "LINE10", "LINE11" };
 
 	for(i = 1; i < 12; i++) 
 	{
-		code = 	input_port_read(machine, keynames[i]);
+		code = 	input_port_read(machine, keynames[i-1]);
 		if (code != 0) 
 		{
 			for(j = 0; j < 8; j++) 
