@@ -580,7 +580,6 @@ $(MESSOBJ)/nintendo.a:					\
 	$(MAME_VIDEO)/n64.o			\
 	$(MESS_MACHINE)/pokemini.o	\
 	$(MESS_DRIVERS)/pokemini.o	\
-	$(MESS_DRIVERS)/gba.o	\
 
 $(MESSOBJ)/amiga.a: \
 	$(MAME_VIDEO)/amiga.o			\
