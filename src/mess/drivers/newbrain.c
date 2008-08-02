@@ -785,7 +785,7 @@ static MACHINE_START( newbrain )
 
 	/* memory banking */
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0xa000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "main") + 0xa000, 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
 
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0x6000, SMH_BANK1, SMH_UNMAP);

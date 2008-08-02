@@ -219,7 +219,7 @@ void spectrum_128_update_memory(running_machine *machine)
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 
-	ChosenROM = memory_region(machine, "|main|") + 0x010000 + (ROMSelection<<14);
+	ChosenROM = memory_region(machine, "main") + 0x010000 + (ROMSelection<<14);
 
 	memory_set_bankptr(1, ChosenROM);
 

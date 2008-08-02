@@ -456,7 +456,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 {
 	int size = image_length(image);
 	running_machine *machine = image->machine;
-	UINT8 *mem = memory_region(machine, "|main|");
+	UINT8 *mem = memory_region(machine, "main");
 
 	switch (size)
 	{

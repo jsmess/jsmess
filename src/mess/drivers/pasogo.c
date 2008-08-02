@@ -131,7 +131,7 @@ static READ8_HANDLER( vg230_io_r )
       }
       if (log)
 	logerror("%.5x vg230 %02x read %.2x\n",(int)activecpu_get_pc(),vg230.index,data);
-      //	data=memory_region(machine, "|main|")[0x4000+offset];
+      //	data=memory_region(machine, "main")[0x4000+offset];
     } else {      
       data=vg230.index;
     }
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( vg230_io_w )
 {
   int log=TRUE;
     if (offset&1) {
-      //	memory_region(machine, "|main|")[0x4000+offset]=data;
+      //	memory_region(machine, "main")[0x4000+offset]=data;
       vg230.data[vg230.index]=data;
       switch (vg230.index) {
       case 0x09: break;
@@ -239,7 +239,7 @@ static WRITE8_HANDLER( ems_w )
     switch (ems.mapper[ems.index].type) {
     case 0: /*external*/ 
     case 1: /*ram*/
-      memory_set_bankptr( ems.index+1, memory_region(machine, "|main|") + (ems.mapper[ems.index].address&0xfffff) );
+      memory_set_bankptr( ems.index+1, memory_region(machine, "main") + (ems.mapper[ems.index].address&0xfffff) );
       break;
     case 3: /* rom 1 */
     case 4: /* pc card a */
@@ -334,7 +334,7 @@ static PALETTE_INIT( pasogo )
 static VIDEO_UPDATE( pasogo )
 {
   static int width=-1, height=-1;
-  UINT8 *rom = memory_region(screen->machine, "|main|")+0xb8000;
+  UINT8 *rom = memory_region(screen->machine, "main")+0xb8000;
   UINT16 c[]={ 3, 0 };
     int x,y;
 //    plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0);
@@ -479,7 +479,7 @@ static DRIVER_INIT( pasogo )
 	vg230_init(machine);
 	memset(&ems, 0, sizeof(ems));
 	memory_set_bankptr( 27, memory_region(machine, "user1") + 0x00000 );
-	memory_set_bankptr( 28, memory_region(machine, "|main|") + 0xb8000/*?*/ );
+	memory_set_bankptr( 28, memory_region(machine, "main") + 0xb8000/*?*/ );
 }
 
 

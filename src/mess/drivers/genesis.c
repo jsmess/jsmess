@@ -194,7 +194,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
 
-	rawROM = memory_region(image->machine, "|main|");
+	rawROM = memory_region(image->machine, "main");
 	ROM = rawROM /*+ 512 */;
 
 	length = image_fread(image, rawROM + 0x2000, 0x600000);
@@ -251,7 +251,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		genesis_last_loaded_image_length = length; // this will be -1 for MD and SMD so can't map those roms to custom mappers (yet)
 
 
-		ROM = memory_region(image->machine, "|main|");	/* 68000 ROM region */
+		ROM = memory_region(image->machine, "main");	/* 68000 ROM region */
 
  		for (ptr = 0; ptr < 0x502000; ptr += 2)		/* mangle bytes for littleendian machines */
 		{
@@ -331,7 +331,7 @@ SYSTEM_CONFIG_END
 static WRITE16_HANDLER( genesis_ssf2_bank_w )
 {
 	static int lastoffset = -1,lastdata = -1;
-	UINT8 *ROM = memory_region(machine, "|main|");
+	UINT8 *ROM = memory_region(machine, "main");
 
 	if ((lastoffset != offset) || (lastdata != data)) {
 		lastoffset = offset; lastdata = data;
@@ -377,7 +377,7 @@ static WRITE16_HANDLER( realtec_400000_w )
 {
 	int bankdata = (data >> 9) & 0x7;
 
-	UINT8 *ROM = memory_region(machine, "|main|");
+	UINT8 *ROM = memory_region(machine, "main");
 
 	realtek_old_bank_addr = realtek_bank_addr;
 	realtek_bank_addr = (realtek_bank_addr & 0x7) | bankdata<<3;
@@ -389,7 +389,7 @@ static WRITE16_HANDLER( realtec_400000_w )
 static WRITE16_HANDLER( realtec_404000_w )
 {
 	int bankdata = (data >> 8) & 0x3;
-	UINT8 *ROM = memory_region(machine, "|main|");
+	UINT8 *ROM = memory_region(machine, "main");
 
 	realtek_old_bank_addr = realtek_bank_addr;
 	realtek_bank_addr = (realtek_bank_addr & 0xf8)|bankdata;
@@ -403,7 +403,7 @@ static WRITE16_HANDLER( realtec_404000_w )
 
 static WRITE16_HANDLER( g_chifi3_bank_w )
 {
-	UINT8 *ROM = memory_region(machine, "|main|");
+	UINT8 *ROM = memory_region(machine, "main");
 
 	if (data==0xf100) // *hit player
 	{
@@ -504,14 +504,14 @@ static READ16_HANDLER( g_chifi3_prot_r )
 
 static WRITE16_HANDLER( s19in1_bank )
 {
-	UINT8 *ROM = memory_region(machine, "|main|");
+	UINT8 *ROM = memory_region(machine, "main");
 	memcpy(ROM + 0x000000, ROM + 0x400000+((offset << 1)*0x10000), 0x80000);
 }
 
 // Kaiju? (Pokemon Stadium) handler from HazeMD
 static WRITE16_HANDLER( g_kaiju_bank_w )
 {
-	UINT8 *ROM = memory_region(machine, "|main|");
+	UINT8 *ROM = memory_region(machine, "main");
 	memcpy(ROM + 0x000000, ROM + 0x400000+(data&0x7f)*0x8000, 0x8000);
 }
 
@@ -598,7 +598,7 @@ static READ16_HANDLER( kof99_0xA13000_r )
 static READ16_HANDLER( radica_bank_select )
 {
 	int bank = offset&0x3f;
-	UINT8 *ROM = memory_region(machine, "|main|");
+	UINT8 *ROM = memory_region(machine, "main");
 	memcpy(ROM, ROM +  (bank*0x10000)+0x400000, 0x400000);
 	return 0;
 }
@@ -768,7 +768,7 @@ void setup_megadriv_custom_mappers(running_machine *machine)
 	unsigned char *ROM;
 	UINT32 mirroraddr;
 
-	ROM = memory_region(machine, "|main|");
+	ROM = memory_region(machine, "main");
 
 	if (genesis_last_loaded_image_length == 0x500000 && !allendianmemcmp((char *)&ROM[0x0120+relocate], "SUPER STREET FIGHTER2 ", 22))
 	{

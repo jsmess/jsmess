@@ -433,7 +433,7 @@ ROM_START( studio2 )
 ROM_END
 
 ROM_START( m9016tc )
-	ROM_REGION( 0x10000, "|main|", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "86676.ic13",  0x0000, 0x0400, NO_DUMP )
 	ROM_LOAD( "86677b.ic14", 0x0400, 0x0400, NO_DUMP )
 	ROM_LOAD( "87201.ic12",  0x0a00, 0x0400, NO_DUMP )
@@ -462,7 +462,7 @@ static DEVICE_IMAGE_LOAD( studio2_cart )
 	}
 	filesize -= ST2_HEADER_SIZE;
 	/* Read ST2 cartridge contents */
-	ptr = ((UINT8 *)memory_region(image->machine,  "|main|" ) ) + 0x0400;
+	ptr = ((UINT8 *)memory_region(image->machine,  "main" ) ) + 0x0400;
 	if ( image_fread(image, ptr, filesize ) != filesize ) {
 		logerror( "Error loading cartridge: Unable to read contents from file: %s.\n", image_filename( image ) );
 		return INIT_FAIL;

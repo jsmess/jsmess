@@ -600,7 +600,7 @@ ROM_START(exeltel)
 	ROM_REGION(0x1000, "main", 0)
 	ROM_LOAD("exeltelin.bin", 0x0006, 0x0ffa, BAD_DUMP CRC(c12f24b5))		/* TMS7020 internal ROM */
 
-	ROM_REGION(0x1000, "|tms7040|", 0)
+	ROM_REGION(0x1000, "tms7040", 0)
 	ROM_LOAD("exeltel_7041.bin", 0x0000, 0x1000, NO_DUMP)			/* TMS7041 internal ROM. Max 4KB ROM, could also be 2KB */
 
 	ROM_REGION(0x10000,"user1",0)

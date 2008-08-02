@@ -229,7 +229,7 @@ static int Einstein_scr_y = 0;
 static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
 	/* TODO: Verify implementation */
-	unsigned char *data = memory_region(device->machine, "|main|") + 0x012000;
+	unsigned char *data = memory_region(device->machine, "main") + 0x012000;
 	unsigned char data_byte;
 	int char_code;
 	int i, x;
@@ -800,7 +800,7 @@ static void einstein_page_rom(running_machine *machine)
 {
 	if (einstein_rom_enabled)
 	{
-		memory_set_bankptr(1, memory_region(machine, "|main|")+0x010000);
+		memory_set_bankptr(1, memory_region(machine, "main")+0x010000);
 	}
 	else
 	{
@@ -1639,7 +1639,7 @@ static const struct AY8910interface einstein_ay_interface =
 //  if (Einstein_DE)
 //  {
 //
-//      unsigned char *data = memory_region(machine, "|main|")+0x012000;
+//      unsigned char *data = memory_region(machine, "main")+0x012000;
 //      unsigned char data_byte;
 //      int char_code;
 //
@@ -1775,7 +1775,7 @@ ROM_START(einstein)
 ROM_END
 
 ROM_START(einstei2)
-	ROM_REGION(0x010000+0x02000+0x0800, "|main|",0)
+	ROM_REGION(0x010000+0x02000+0x0800, "main",0)
 	ROM_LOAD("einstein.rom",0x10000, 0x02000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77))
 	ROM_LOAD("charrom.rom",0x012000, 0x0800, NO_DUMP)
 ROM_END

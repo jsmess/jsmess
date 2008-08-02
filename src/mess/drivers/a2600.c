@@ -765,12 +765,12 @@ static READ8_HANDLER(modeSS_r)
 		switch ( modeSS_byte & 0x1C ) {
 		case 0x00:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "|main|") + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "main") + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x04:
 			bank_base[1] = extra_RAM;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "|main|") + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "main") + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x08:
@@ -785,12 +785,12 @@ static READ8_HANDLER(modeSS_r)
 			break;
 		case 0x10:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "|main|") + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "main") + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x14:
 			bank_base[1] = extra_RAM + 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "|main|") + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "main") + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x18:

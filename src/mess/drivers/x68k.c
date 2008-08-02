@@ -2050,7 +2050,7 @@ static MACHINE_START( x68000 )
 
 static DRIVER_INIT( x68000 )
 {
-	unsigned char* rom = memory_region(machine, "|main|");
+	unsigned char* rom = memory_region(machine, "main");
 	unsigned char* user2 = memory_region(machine, "user2");
 	gvram = auto_malloc(0x200000);
 	memset(gvram,0,0x200000);

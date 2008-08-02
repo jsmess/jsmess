@@ -470,7 +470,7 @@ void amstrad_setLowerRom(running_machine *machine)
 	if(amstrad_system_type == SYSTEM_CPC)
 	{
 		if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<2)) == 0) {
-			BankBase = &memory_region(machine, "|main|")[0x010000];
+			BankBase = &memory_region(machine, "main")[0x010000];
 		} else 
 		{
 			if(aleste_mode & 0x04)
@@ -506,7 +506,7 @@ void amstrad_setLowerRom(running_machine *machine)
 		if(amstrad_plus_lower_enabled == 1)
 		{  // ASIC secondary lower ROM selection (bit 5: 1 = enabled)
 //          logerror("L-ROM: Lower ROM enabled, cart bank %i\n",amstrad_plus_lower);
-			BankBase = &memory_region(machine, "|main|")[0x4000 * amstrad_plus_lower];
+			BankBase = &memory_region(machine, "main")[0x4000 * amstrad_plus_lower];
 			if(BankBase != NULL)
 			{
 				switch(amstrad_plus_lower_addr)
@@ -1655,7 +1655,7 @@ static void multiface_rethink_memory(running_machine *machine)
 	if (!multiface_hardware_enabled(machine))
 		return;
 
-	multiface_rom = &memory_region(machine, "|main|")[0x01C000];
+	multiface_rom = &memory_region(machine, "main")[0x01C000];
 
 	if (
 		((multiface_flags & MULTIFACE_RAM_ROM_ENABLED)!=0) &&
@@ -2075,7 +2075,7 @@ The Gate-Array fetches two bytes for each address*/
 static MACHINE_RESET( amstrad )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "|main|");
+	UINT8 *rom = memory_region(machine, "main");
 
 	amstrad_system_type = SYSTEM_CPC;
 
@@ -2096,7 +2096,7 @@ static MACHINE_RESET( amstrad )
 static MACHINE_RESET( plus )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "|main|");
+	UINT8 *rom = memory_region(machine, "main");
 
 	amstrad_system_type = SYSTEM_PLUS;
 
@@ -2146,7 +2146,7 @@ static MACHINE_START( plus )
 static MACHINE_RESET( gx4000 )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "|main|");
+	UINT8 *rom = memory_region(machine, "main");
 
 	amstrad_system_type = SYSTEM_GX4000;
 
@@ -2191,7 +2191,7 @@ static MACHINE_RESET( gx4000 )
 static MACHINE_RESET( kccomp )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "|main|");
+	UINT8 *rom = memory_region(machine, "main");
 
 	amstrad_system_type = SYSTEM_CPC;
 
@@ -2220,7 +2220,7 @@ static DRIVER_INIT( aleste )
 static MACHINE_RESET( aleste )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "|main|");
+	UINT8 *rom = memory_region(machine, "main");
 
 	amstrad_system_type = SYSTEM_CPC;
 

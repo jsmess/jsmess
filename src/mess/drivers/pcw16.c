@@ -431,7 +431,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 		{
 			/* lower 4 banks are write protected. Use the rom
             loaded */
-			mem_ptr = &memory_region(machine, "|main|")[0x010000];
+			mem_ptr = &memory_region(machine, "main")[0x010000];
 		}
 		else
 		{

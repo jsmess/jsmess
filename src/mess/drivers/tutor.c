@@ -104,8 +104,8 @@ static DRIVER_INIT(tutor)
 {
 	tape_interrupt_timer = timer_alloc(tape_interrupt_handler, NULL);
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + basic_base, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "|main|") + cartridge_base, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "main") + basic_base, 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "main") + cartridge_base, 0);
 	memory_set_bank(1, 0);
 }
 
@@ -178,13 +178,13 @@ static READ8_HANDLER(read_keyboard)
 
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
-	image_fread(image, memory_region(image->machine, "|main|") + cartridge_base, 0x6000);
+	image_fread(image, memory_region(image->machine, "main") + cartridge_base, 0x6000);
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( tutor_cart )
 {
-	memset(memory_region(image->machine, "|main|") + cartridge_base, 0, 0x6000);
+	memset(memory_region(image->machine, "main") + cartridge_base, 0, 0x6000);
 }
 
 /*
@@ -569,7 +569,7 @@ INPUT_PORTS_END
 static const struct tms9995reset_param tutor_processor_config =
 {
 #if 0
-	"|main|",/* region for processor RAM */
+	"main",/* region for processor RAM */
 	0xf000,     /* offset : this area is unused in our region, and matches the processor address */
 	0xf0fc,		/* offset for the LOAD vector */
 	1,          /* use fast IDLE */

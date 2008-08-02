@@ -362,7 +362,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 	{
 		unsigned char *FakeROM;
 
-		FakeROM = &memory_region(Machine, "|")[0x010000];
+		FakeROM = &memory_region(Machine, "main")[0x010000];
 
 		memory_set_bankptr(1, FakeROM);
 	}
@@ -1026,7 +1026,7 @@ is banked. */
 // for now all models use the same rom
 #define ROM_PCW(model)												\
 	ROM_START(model)												\
-		ROM_REGION(0x014000, "|",0)							\
+		ROM_REGION(0x014000, "main",0)							\
 		ROM_LOAD("pcwboot.bin", 0x010000, 608, BAD_DUMP CRC(679b0287) SHA1(5dde974304e3376ace00850d6b4c8ec3b674199e))	\
 	ROM_END															\
 

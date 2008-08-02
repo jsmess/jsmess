@@ -372,7 +372,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 
 static QUICKLOAD_LOAD( lynx )
 {
-	UINT8 *rom = memory_region(image->machine, "|main|");
+	UINT8 *rom = memory_region(image->machine, "main");
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	// maybe the first 2 bytes must be used to identify the endianess of the file
 	UINT16 start;

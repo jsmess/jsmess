@@ -215,7 +215,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(mekd2)
-	ROM_REGION(0x10000,"|",0)
+	ROM_REGION(0x10000,"main",0)
 		ROM_LOAD("jbug.rom",    0xe000, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
 	ROM_REGION(128 * 24 * 3,"gfx1",ROMREGION_ERASEFF)
 		/* space filled with 7segement graphics by mekd2_init_driver */

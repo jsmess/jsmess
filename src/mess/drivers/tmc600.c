@@ -344,7 +344,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( tmc600s1 )
-	ROM_REGION( 0x5000, "|main|", 0 )
+	ROM_REGION( 0x5000, "main", 0 )
 	ROM_LOAD( "sb20",		0x0000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb21",		0x1000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb22",		0x2000, 0x1000, NO_DUMP )
@@ -371,7 +371,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( tmc600 )
 {
-	image_fread(image, memory_region(image->machine, "|main|") + 0x6300, 0x9500);
+	image_fread(image, memory_region(image->machine, "main") + 0x6300, 0x9500);
 
 	return INIT_PASS;
 }

@@ -62,7 +62,7 @@ static struct FDC
 
 static void atarist_fdc_dma_transfer(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "|main|");
+	UINT8 *RAM = memory_region(machine, "main");
 
 	if ((fdc.mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
 	{
@@ -483,7 +483,7 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 	if (dmasound.samples == 0)
 	{
 		int i;
-		UINT8 *RAM = memory_region(machine, "|main|");
+		UINT8 *RAM = memory_region(machine, "main");
 
 		for (i = 0; i < 8; i++)
 		{
@@ -1408,7 +1408,7 @@ static const CENTRONICS_CONFIG atarist_centronics_config[1] =
 
 static void atarist_configure_memory(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "|main|");
+	UINT8 *RAM = memory_region(machine, "main");
 
 	switch (mess_ram_size)
 	{
@@ -1588,7 +1588,7 @@ static MACHINE_START( megaste )
 
 static void stbook_configure_memory(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "|main|");
+	UINT8 *RAM = memory_region(machine, "main");
 
 	switch (mess_ram_size)
 	{
@@ -1895,12 +1895,12 @@ ROM_START( megast )
 ROM_END
 
 ROM_START( stacy )
-	ROM_REGION16_BE( 0x1000000, "|main|", 0 )
+	ROM_REGION16_BE( 0x1000000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.img", 0xfc0000, 0x030000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
-	ROM_COPY( "|main|", 0xfc0000, 0x000000, 0x000008 )
+	ROM_COPY( "main", 0xfc0000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "|keyboard|", 0 )
+	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
@@ -1941,38 +1941,38 @@ ROM_START( stbook )
 ROM_END
 
 ROM_START( stpad )
-	ROM_REGION16_BE( 0x1000000, "|main|", 0 )
+	ROM_REGION16_BE( 0x1000000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05" )
 	ROMX_LOAD( "tos205.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
-	ROM_COPY( "|main|", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
 ROM_END
 
 ROM_START( tt030 )
-	ROM_REGION32_BE( 0x4000000, "|main|", 0 )
+	ROM_REGION32_BE( 0x4000000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306.img", 0xe00000, 0x080000, BAD_DUMP CRC(75dda215) SHA1(6325bdfd83f1b4d3afddb2b470a19428ca79478b), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos305", "TOS 3.05 (TT TOS)" )
 	ROMX_LOAD( "tos305.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos301", "TOS 3.01 (TT TOS)" )
 	ROMX_LOAD( "tos301.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(3) )
-	ROM_COPY( "|main|", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "|keyboard|", 0 )
+	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( fx1 )
-	ROM_REGION16_BE( 0x1000000, "|main|", 0 )
+	ROM_REGION16_BE( 0x1000000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0, "tos207", "TOS 2.07" )
 	ROMX_LOAD( "tos207.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
-	ROM_COPY( "|main|", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "|keyboard|", 0 )
+	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( falcon )
-	ROM_REGION32_BE( 0x4000000, "|main|", 0 )
+	ROM_REGION32_BE( 0x4000000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "TOS 4.04" )
 	ROMX_LOAD( "tos404.img", 0xe00000, 0x080000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos402", "TOS 4.02" )
@@ -1981,14 +1981,14 @@ ROM_START( falcon )
 	ROMX_LOAD( "tos401.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "tos400", "TOS 4.00" )
 	ROMX_LOAD( "tos400.img", 0xe00000, 0x080000, BAD_DUMP CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(4) )
-	ROM_COPY( "|main|", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "|keyboard|", 0 )
+	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( falcon40 )
-	ROM_REGION32_BE( 0x4000000, "|main|", 0 )
+	ROM_REGION32_BE( 0x4000000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0, "tos492", "TOS 4.92" )
 	ROMX_LOAD( "tos492.img", 0xe00000, 0x080000, BAD_DUMP CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(2) )
 ROM_END
@@ -2098,7 +2098,7 @@ static void megaste_serial_getinfo(const mess_device_class *devclass, UINT32 sta
 
 static DEVICE_IMAGE_LOAD( atarist_cart )
 {
-	UINT8 *RAM = memory_region(image->machine, "|main|");
+	UINT8 *RAM = memory_region(image->machine, "main");
 	UINT8 *ptr = RAM + 0xfa0000;
 	int	filesize = image_length(image);
 

@@ -285,7 +285,7 @@ MACHINE_DRIVER_END
 
 ROM_START(ti99_4p)
 	/*CPU memory space*/
-	ROM_REGION16_BE(region_cpu1_len_4p, "|", 0)
+	ROM_REGION16_BE(region_cpu1_len_4p, "main", 0)
 	ROM_LOAD16_BYTE("sgcpu_hb.bin", 0x0000, 0x8000, CRC(aa100730) SHA1(35e585b2dcd3f2a0005bebb15ede6c5b8c787366) ) /* system ROMs */
 	ROM_LOAD16_BYTE("sgcpu_lb.bin", 0x0001, 0x8000, CRC(2a5dc818) SHA1(dec141fe2eea0b930859cbe1ebd715ac29fa8ecb) ) /* system ROMs */
 

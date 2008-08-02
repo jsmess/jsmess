@@ -410,7 +410,7 @@ ADDRESS_MAP_END
 
 static void mac2_init_machine( void )
 {
-	memset(memory_region(machine, "|main|"), 0, 0x800000);
+	memset(memory_region(machine, "main"), 0, 0x800000);
 }
 
 
@@ -460,7 +460,7 @@ static INPUT_PORTS_START( mac2 )
 INPUT_PORTS_END
 
 ROM_START( mac2 )
-	ROM_REGION(0x00900000,"|main|",0) /* for ram, etc */
+	ROM_REGION(0x00900000,"main",0) /* for ram, etc */
 	ROM_LOAD_WIDE( "256k.rom",  0x800000, 0x40000, NO_DUMP)
 ROM_END
 

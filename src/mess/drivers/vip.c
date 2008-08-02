@@ -190,7 +190,7 @@ static CDP1802_INTERFACE( vip_config )
 
 static MACHINE_START( vip )
 {
-	UINT8 *ram = memory_region(machine, "|main|");
+	UINT8 *ram = memory_region(machine, "main");
 	UINT16 addr;
 
 	state_save_register_global(keylatch);
@@ -211,7 +211,7 @@ static MACHINE_START( vip )
 		ram[addr] = mame_rand(machine) & 0xff;
 	}
 
-	memory_configure_bank(1, 0, 2, memory_region(machine, "|main|"), 0x8000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, "main"), 0x8000);
 }
 
 static MACHINE_RESET( vip )
@@ -269,7 +269,7 @@ static QUICKLOAD_LOAD( vip )
 
 	if (size < 0x8000)
 	{
-		if (image_fread(image, memory_region(image->machine, "|main|"), size) != size)
+		if (image_fread(image, memory_region(image->machine, "main"), size) != size)
 		{
 			return INIT_FAIL;
 		}

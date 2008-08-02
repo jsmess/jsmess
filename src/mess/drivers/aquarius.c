@@ -181,7 +181,7 @@ static WRITE8_HANDLER( scrambler_w )
 
 	*/
 
-	UINT8 *ROM = memory_region(machine, "|main|") + 0xc000;
+	UINT8 *ROM = memory_region(machine, "main") + 0xc000;
 	UINT16 addr;
 
 	scrambler = data;
@@ -449,7 +449,7 @@ ROM_END
 static DEVICE_IMAGE_LOAD( aquarius_cart )
 {
 	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, "|main|") + 0xc000;
+	UINT8 *ptr = memory_region(image->machine, "main") + 0xc000;
 
 	if (image_fread(image, ptr, size) != size)
 	{

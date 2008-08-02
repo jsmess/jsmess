@@ -183,7 +183,7 @@ static void z88_install_memory_handler_pair(running_machine *machine, offs_t sta
 
 	/* special case */
 	if (read_addr == NULL)
-		read_addr = &memory_region(machine, "|main|")[start];
+		read_addr = &memory_region(machine, "main")[start];
 
 	/* determine the proper pointers to use */
 	read_handler  = (read_addr != NULL)  ? (read8_machine_func)  (STATIC_BANK1 + (FPTR)(bank_base - 1 + 0)) : SMH_UNMAP;
@@ -253,7 +253,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		}
 		else
 		{
-			read_addr = memory_region(machine, "|main|") + 0x010000 + (block << 14);
+			read_addr = memory_region(machine, "main") + 0x010000 + (block << 14);
 			write_addr = NULL;
 		}
 	}
@@ -269,7 +269,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		if ((blink.com & (1<<2))==0)
 		{
 			/* yes */
-			read_addr = memory_region(machine, "|main|") + 0x010000;
+			read_addr = memory_region(machine, "main") + 0x010000;
 			write_addr = NULL;
 		}
 		else

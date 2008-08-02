@@ -931,7 +931,7 @@ ROM_START( dallas16 )
 ROM_END
 
 ROM_START( roma )
-    ROM_REGION16_BE( 0x1000000, "|main|", 0 )
+    ROM_REGION16_BE( 0x1000000, "main", 0 )
     ROM_LOAD("roma32.bin", 0x000000, 0x10000, CRC(587d03bf) SHA1(504e9ff958084700076d633f9c306fc7baf64ffd))
 ROM_END
 

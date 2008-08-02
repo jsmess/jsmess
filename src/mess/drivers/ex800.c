@@ -312,7 +312,7 @@ static WRITE8_HANDLER(ex800_gate7a_w)
 
 
 static ADDRESS_MAP_START( ex800_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("|", 0)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("main", 0)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM /* external RAM */
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_READWRITE(ex800_devsel_r, ex800_devsel_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(ex800_gate5a_r, ex800_gate5a_w)

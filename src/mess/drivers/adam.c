@@ -477,7 +477,7 @@ Lineal virtual memory map:
 0x3A000, 0x41fff -> Used to Write Protect ROMs
 */
 	UINT8 *BankBase;
-	BankBase = &memory_region(machine, "|Main|")[0x00000];
+	BankBase = &memory_region(machine, "main")[0x00000];
 
 	switch (adam_lower_memory)
 	{
@@ -576,10 +576,10 @@ Lineal virtual memory map:
 void adam_reset_pcb(running_machine *machine)
 {
     int i;
-    memory_region(machine, "|Main|")[adam_pcb] = 0x01;
+    memory_region(machine, "main")[adam_pcb] = 0x01;
 
 	for (i = 0; i < 15; i++)
-		memory_region(machine, "|Main|")[(adam_pcb+4+i*21)&0xFFFF]=i+1;
+		memory_region(machine, "main")[(adam_pcb+4+i*21)&0xFFFF]=i+1;
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -615,13 +615,13 @@ static MACHINE_RESET( adam )
 	adam_pcb=0xFEC0;
 	adam_clear_keyboard_buffer();
 
-	memset(&memory_region(machine, "|Main|")[0x0000], 0xFF, 0x20000); /* Initializing RAM */
+	memset(&memory_region(machine, "main")[0x0000], 0xFF, 0x20000); /* Initializing RAM */
 	timer_pulse(ATTOTIME_IN_MSEC(20), NULL, 0, adam_paddle_callback);
 }
 
 static MACHINE_DRIVER_START( adam )
 	/* Machine hardware */
-	MDRV_CPU_ADD("Main", Z80, 3579545)       /* 3.579545 Mhz */
+	MDRV_CPU_ADD("main", Z80, 3579545)       /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(adam_mem, 0)
 	MDRV_CPU_IO_MAP(adam_io, 0)
 
@@ -674,7 +674,7 @@ Lineal virtual memory map:
 0x42000, 0x47fff -> Low unused EOS ROM
 */
 ROM_START (adam)
-	ROM_REGION( 0x42000, "Main", 0)
+	ROM_REGION( 0x42000, "main", 0)
 	ROM_LOAD ("wp.rom", 0x20000, 0x8000, CRC(58d86a2a) SHA1(d4aec4efe1431e56fe52d83baf9118542c525255))
 	ROM_LOAD ("os7.rom", 0x30000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92))
 	ROM_LOAD ("eos.rom", 0x38000, 0x2000, CRC(05a37a34) SHA1(ad3c20ef444f10af7ae8eb75c81e500d9b1bba3d))

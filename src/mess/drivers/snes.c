@@ -285,9 +285,9 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		"UNKNOWN"
 	};
 
-	memory_region_alloc(machine, "|main|", 0x1000000,0);
+	memory_region_alloc(machine, "main", 0x1000000,0);
 
-	snes_ram = memory_region( machine, "|main|" );
+	snes_ram = memory_region( machine, "main" );
 	memset( snes_ram, 0, 0x1000000 );
 
 	/* Check for a header (512 bytes) */

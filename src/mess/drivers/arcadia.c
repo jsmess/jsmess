@@ -363,20 +363,20 @@ ROM_START(arcadia)
 ROM_END
 
 ROM_START(vcg)
-	ROM_REGION(0x8000,"|main|", ROMREGION_ERASEFF)
+	ROM_REGION(0x8000,"main", ROMREGION_ERASEFF)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
 
 static DEVICE_IMAGE_LOAD( arcadia_cart )
 {
-	UINT8 *rom = memory_region(image->machine, "|main|");
+	UINT8 *rom = memory_region(image->machine, "main");
 	int size;
 
 	memset(rom, 0, 0x8000);
 	size = image_length(image);
 
-	if (size > memory_region_length(image->machine, "|main|"))
-		size = memory_region_length(image->machine, "|main|");
+	if (size > memory_region_length(image->machine, "main"))
+		size = memory_region_length(image->machine, "main");
 
 	if (image_fread(image, rom, size) != size)
 		return INIT_FAIL;
@@ -466,7 +466,7 @@ static DRIVER_INIT( arcadia )
 	// this is here to allow developement of some simple testroutines
 	// for a real console
 	{
-	    UINT8 *rom=memory_region(machine, "|main|");
+	    UINT8 *rom=memory_region(machine, "main");
 	    /* this is a simple routine to display all rom characters
            on the display for a snapshot */
 	    static const UINT8 prog[]={ // address 0 of course

@@ -582,7 +582,7 @@ static MACHINE_START( sf7000 )
 	msm8251_init(&sf7000_uart_interface);
 	centronics_config(1, sf7000_centronics_config);
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|"), 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "main"), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
 	memory_configure_bank(2, 0, 1, mess_ram, 0);
 }

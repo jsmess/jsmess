@@ -76,7 +76,7 @@ static DRIVER_INIT( tx0 )
 	};
 
 	/* set up memory regions */
-	tx0_memory = (UINT32 *) memory_region(machine, "|main|");
+	tx0_memory = (UINT32 *) memory_region(machine, "main");
 
 	/* set up our font */
 	dst = memory_region(machine, "gfx1");

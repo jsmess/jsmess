@@ -293,7 +293,7 @@ ROM_START (videopac)
 ROM_END
 
 ROM_START (g7400)
-	ROM_REGION(0x10000,"|main|",0)    /* safer for the memory handler/bankswitching??? */
+	ROM_REGION(0x10000,"main",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_LOAD ("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 

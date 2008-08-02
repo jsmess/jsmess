@@ -452,7 +452,7 @@ static void apple3_update_memory(running_machine *machine)
 	else
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xF000, 0xFFFF, 0, 0, SMH_BANK7);
 	if (via_0_a & 0x01)
-		memory_set_bankptr(7, memory_region(machine, "|"));
+		memory_set_bankptr(7, memory_region(machine, "main"));
 	else
 		apple3_setbank(7, ~0, 0x7000);
 
@@ -621,7 +621,7 @@ static READ8_HANDLER( apple3_indexed_read )
 	else if (addr != (UINT8 *) ~0)
 		result = *addr;
 	else
-		result = memory_region(machine, "|")[offset % memory_region_length(machine, "|")];
+		result = memory_region(machine, "main")[offset % memory_region_length(machine, "main")];
 	return result;
 }
 
@@ -707,7 +707,7 @@ const applefdc_interface apple3_fdc_interface =
 DRIVER_INIT( apple3 )
 {
 	/* hack to get around VIA problem */
-	memory_region(machine, "|")[0x0685] = 0x00;
+	memory_region(machine, "main")[0x0685] = 0x00;
 
 	apple3_enable_mask = 0;
 	apple3_update_drives();

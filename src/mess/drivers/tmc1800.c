@@ -632,7 +632,7 @@ static MACHINE_START( tmc2000 )
 
 	// RAM banking
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
 	memory_configure_bank(1, 1, 1, &mess_ram, 0);
 
 	switch (mess_ram_size)
@@ -661,7 +661,7 @@ static MACHINE_START( tmc2000 )
 
 	state->colorram = auto_malloc(0x200);
 
-	memory_configure_bank(2, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
+	memory_configure_bank(2, 0, 1, memory_region(machine, "main") + 0x8000, 0);
 	memory_configure_bank(2, 1, 1, state->colorram, 0);
 
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
@@ -697,7 +697,7 @@ static MACHINE_START( oscnano )
 
 	// RAM banking
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
 	memory_configure_bank(1, 1, 1, &mess_ram, 0);
 }
 
@@ -818,12 +818,12 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( tmc1800 )
-	ROM_REGION( 0x10000, "|main|", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "mmi6341-1.ic2", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
 ROM_END
 
 ROM_START( osc1000b )
-	ROM_REGION( 0x10000, "|main|", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "mmi6341-1.ic2", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
 
 	ROM_REGION( 0x400, "gfx1", ROMREGION_DISPOSE )
