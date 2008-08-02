@@ -1978,7 +1978,7 @@ static ADDRESS_MAP_START( saturn_mem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END					     
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("|sound|", 0) AM_BASE(&sound_ram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&sound_ram)
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SCSP_0_r, SCSP_0_w)
 ADDRESS_MAP_END
 
@@ -2241,16 +2241,16 @@ static const gfx_layout tiles16x16x8_layout =
 
 
 static GFXDECODE_START( saturn )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout, 0x00, (0x80*(2+1)) )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x00, (0x80*(2+1)) )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x8_layout, 0x00, (0x08*(2+1)) )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x8_layout, 0x00, (0x08*(2+1)) )
+	GFXDECODE_ENTRY( NULL, 0, tiles8x8x4_layout, 0x00, (0x80*(2+1)) )
+	GFXDECODE_ENTRY( NULL, 0, tiles16x16x4_layout, 0x00, (0x80*(2+1)) )
+	GFXDECODE_ENTRY( NULL, 0, tiles8x8x8_layout, 0x00, (0x08*(2+1)) )
+	GFXDECODE_ENTRY( NULL, 0, tiles16x16x8_layout, 0x00, (0x08*(2+1)) )
 
 	/* vdp1 .. pointless for drawing but can help us debug */
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x4_layout, 0x00, 0x100 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x00, 0x100 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x8_layout, 0x00, 0x20 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x8_layout, 0x00, 0x20 )
+	GFXDECODE_ENTRY( NULL, 0, tiles8x8x4_layout, 0x00, 0x100 )
+	GFXDECODE_ENTRY( NULL, 0, tiles16x16x4_layout, 0x00, 0x100 )
+	GFXDECODE_ENTRY( NULL, 0, tiles8x8x8_layout, 0x00, 0x20 )
+	GFXDECODE_ENTRY( NULL, 0, tiles16x16x8_layout, 0x00, 0x20 )
 GFXDECODE_END
 
 static const struct sh2_config sh2_conf_master = { 0 };
@@ -2297,7 +2297,7 @@ static MACHINE_DRIVER_START( saturn )
 	MDRV_CPU_PROGRAM_MAP(saturn_mem, 0)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
-	MDRV_CPU_ADD("sound", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MDRV_CPU_ADD("audio", M68000, MASTER_CLOCK_352/5) //11.46 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_mem, 0)
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2340,9 +2340,6 @@ ROM_START(saturnjp)
 	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
-	ROM_REGION( 0x100000, "sound", ROMREGION_ERASE00 ) /* 68000 code */
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 ) /* VDP2 GFX */
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 ) /* VDP1 GFX */
 ROM_END
 
 /* Overseas Saturn */
@@ -2355,9 +2352,6 @@ ROM_START(saturn)
 	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
-	ROM_REGION( 0x100000, "sound", ROMREGION_ERASE00 ) /* 68000 code */
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 ) /* VDP2 GFX */
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 ) /* VDP1 GFX */
 ROM_END
 
 ROM_START(saturneu)
@@ -2369,9 +2363,6 @@ ROM_START(saturneu)
 	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
-	ROM_REGION( 0x100000, "sound", ROMREGION_ERASE00 ) /* 68000 code */
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 ) /* VDP2 GFX */
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 ) /* VDP1 GFX */
 ROM_END
 
 ROM_START(vsaturn)
@@ -2380,9 +2371,6 @@ ROM_START(vsaturn)
 	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
-	ROM_REGION( 0x100000, "sound", ROMREGION_ERASE00 ) /* 68000 code */
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 ) /* VDP2 GFX */
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 ) /* VDP1 GFX */
 ROM_END
 
 ROM_START(hisaturn)
@@ -2391,9 +2379,6 @@ ROM_START(hisaturn)
 	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
-	ROM_REGION( 0x100000, "sound", ROMREGION_ERASE00 ) /* 68000 code */
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 ) /* VDP2 GFX */
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 ) /* VDP1 GFX */
 ROM_END
 
 
