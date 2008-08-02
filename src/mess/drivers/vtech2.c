@@ -38,7 +38,7 @@
     0000|-------|
 
 
-    Bank "|main|"       Contents
+    Bank "main"       Contents
     0    0x00000 - 0x03fff ROM 1st half
     1    0x04000 - 0x07fff ROM 2nd half
     2           n/a        I/O 2KB area (mirrored 8 times?)

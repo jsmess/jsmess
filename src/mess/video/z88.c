@@ -131,7 +131,7 @@ static unsigned char *z88_convert_address(running_machine *machine, unsigned lon
 	else
 	{
 		offset = offset & 0x01FFFF;
-		return memory_region(machine, "|") + 0x010000 + offset;
+		return memory_region(machine, "main") + 0x010000 + offset;
 	}
 }
 

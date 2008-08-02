@@ -132,7 +132,7 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 
 INLINE void atarist_shifter_load(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "|") + shifter.ofs;
+	UINT8 *RAM = memory_region(machine, "main") + shifter.ofs;
 
 	shifter.ir[shifter.bitplane] = (RAM[1] << 8) | RAM[0];
 	shifter.bitplane++;
@@ -402,7 +402,7 @@ static struct BLITTER
 
 static void atarist_blitter_source(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "|") + blitter.src;
+	UINT8 *RAM = memory_region(machine, "main") + blitter.src;
 
 	if (blitter.src_inc_x < 0)
 	{
@@ -441,7 +441,7 @@ static UINT16 atarist_blitter_hop(void)
 
 static void atarist_blitter_op(running_machine *machine, UINT16 s, UINT32 dstaddr, UINT16 mask)
 {
-	UINT8 *dst = memory_region(machine, "|") + dstaddr;
+	UINT8 *dst = memory_region(machine, "main") + dstaddr;
 	UINT16 d = (dst[1] << 8) + dst[0];
 	UINT16 result = 0;
 

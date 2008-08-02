@@ -12,7 +12,7 @@
 
 /* defines */
 
-/* offsets for "|" */
+/* offsets for "main" */
 enum
 {
 	offset_rom_geneve = 0x0000,			/* boot ROM (16 kbytes) */

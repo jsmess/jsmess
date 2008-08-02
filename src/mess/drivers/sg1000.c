@@ -703,13 +703,13 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 	if (size == 40 * 1024)
 	{
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
+		memory_configure_bank(1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
 		memory_set_bank(1, 0);
 	}
 	else if (size == 48 * 1024)
 	{
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
+		memory_configure_bank(1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
 		memory_set_bank(1, 0);
 	}
 	else if (!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
@@ -732,7 +732,7 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
 	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, "|main|");
+	UINT8 *ptr = memory_region(image->machine, "main");
 
 	if (image_fread(image, ptr, size ) != size)
 	{
@@ -786,7 +786,7 @@ static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr)
 static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
 	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, "|main|");
+	UINT8 *ptr = memory_region(image->machine, "main");
 
 	if (image_fread(image, ptr, size ) != size)
 	{

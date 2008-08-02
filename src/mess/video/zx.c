@@ -138,7 +138,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region)
 {
 	const device_config *screen = video_screen_first(machine->config);
 	int offs0 = offs & 0x7fff;
-	UINT8 *rom = memory_region(machine, "|");
+	UINT8 *rom = memory_region(machine, "main");
 	UINT8 chr = rom[offs0];
 
 	if ((!ula_irq_active) && (chr == 0x76))

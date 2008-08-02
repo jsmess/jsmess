@@ -133,7 +133,7 @@ static void render_sprites(running_machine *machine)
     INT32 xInc;
     INT32 i, j;
 
-    UINT8* memory = memory_region(machine, "|");
+    UINT8* memory = memory_region(machine, "main");
 
     for (i = 0; i < 8; i++) {
 		struct intv_sprite_type* s = &intv_sprite[i];

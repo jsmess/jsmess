@@ -1914,7 +1914,7 @@ ROM_START( ibmpca )
 ROM_END
 
 ROM_START( bondwell )
-	ROM_REGION(0x100000,"|main|", 0)
+	ROM_REGION(0x100000,"main", 0)
     ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) // taken from other machine
 	ROM_LOAD("bondwell.bin", 0xfe000, 0x2000, CRC(d435a405) SHA1(a57c705d1144c7b61940b6f5c05d785c272fc9bb))
 
@@ -1969,7 +1969,7 @@ ROM_START( ibmpcjr )
 ROM_END
 
 ROM_START( t1000 )
-	ROM_REGION(0x100000,"|main|", 0)
+	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -1983,7 +1983,7 @@ ROM_START( t1000 )
 ROM_END
 
 ROM_START( t1000a )
-	ROM_REGION(0x100000,"|main|", 0)
+	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -1994,7 +1994,7 @@ ROM_START( t1000a )
 ROM_END
 
 ROM_START( t1000ex )
-	ROM_REGION(0x100000,"|main|", 0)
+	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2016,7 +2016,7 @@ ROM_START( t1000hx )
 ROM_END
 
 ROM_START( t1000sl )
-	ROM_REGION(0x100000,"|main|", 0)
+	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2034,7 +2034,7 @@ ROM_START( t1000sl )
 ROM_END
 
 ROM_START( t1000sl2 )
-	ROM_REGION(0x100000,"|main|", 0)
+	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2045,7 +2045,7 @@ ROM_START( t1000sl2 )
 ROM_END
 
 ROM_START( t1000sx )
-	ROM_REGION(0x100000,"|main|", 0)
+	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2056,7 +2056,7 @@ ROM_START( t1000sx )
 ROM_END
 
 ROM_START( t1000rl )
-	ROM_REGION(0x100000,"|main|", 0)
+	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2142,8 +2142,8 @@ ROM_START( pc20 )
 ROM_END
 
 ROM_START( ppc512 )
-//    ROM_REGION(0x100000,"|main|", 0)
-    ROM_REGION16_LE(0x100000,"|main|", 0)
+//    ROM_REGION(0x100000,"main", 0)
+    ROM_REGION16_LE(0x100000,"main", 0)
     ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	// special bios at 0xe0000 !?
     ROM_LOAD16_BYTE("40107.v1", 0xfc001, 0x2000, CRC(4e37e769) SHA1(88be3d3375ec3b0a7041dbcea225b197e50d4bfe)) // v1.9
@@ -2154,8 +2154,8 @@ ROM_START( ppc512 )
 ROM_END
 
 ROM_START( ppc640 )
-//    ROM_REGION(0x100000,"|main|", 0)
-    ROM_REGION16_LE(0x100000,"|main|", 0)
+//    ROM_REGION(0x100000,"main", 0)
+    ROM_REGION16_LE(0x100000,"main", 0)
     ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	// special bios at 0xe0000 !?
     ROM_LOAD16_BYTE("40107.v2", 0xfc001, 0x2000, CRC(0785b63e) SHA1(4dbde6b9e9500298bb6241a8daefd85927f1ad28)) // v2.1
