@@ -136,12 +136,12 @@ static const gfx_layout intvkbd_charlayout =
 };
 
 static GFXDECODE_START( intv )
-	GFXDECODE_ENTRY( "|main|", 0x3000<<1, intv_gromlayout, 0, 256 )
+	GFXDECODE_ENTRY( "main", 0x3000<<1, intv_gromlayout, 0, 256 )
 	GFXDECODE_ENTRY( 0, 0, intv_gramlayout, 0, 256 )    /* Dynamically decoded from RAM */
 GFXDECODE_END
 
 static GFXDECODE_START( intvkbd )
-	GFXDECODE_ENTRY( "|main|", 0x3000<<1, intv_gromlayout, 0, 256 )
+	GFXDECODE_ENTRY( "main", 0x3000<<1, intv_gromlayout, 0, 256 )
 	GFXDECODE_ENTRY( 0, 0, intv_gramlayout, 0, 256 )    /* Dynamically decoded from RAM */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, intvkbd_charlayout, 0, 256 )
 GFXDECODE_END
@@ -332,8 +332,8 @@ static ADDRESS_MAP_START( intv_mem , ADDRESS_SPACE_PROGRAM, 16)
     AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
     AM_RANGE(0x01f0, 0x01ff) AM_READWRITE( AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
  	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
-	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("|main|", 0x1000<<1)	/* Exec ROM, 10-bits wide */
-	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("|main|", 0x3000<<1)	/* GROM,     8-bits wide */
+	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("main", 0x1000<<1)	/* Exec ROM, 10-bits wide */
+	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("main", 0x3000<<1)	/* GROM,     8-bits wide */
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )		/* GRAM,     8-bits wide */
 	AM_RANGE(0x4800, 0x7fff) AM_ROM		/* Cartridges? */
 ADDRESS_MAP_END
@@ -343,11 +343,11 @@ static ADDRESS_MAP_START( intvkbd_mem , ADDRESS_SPACE_PROGRAM, 16)
     AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
     AM_RANGE(0x01f0, 0x01ff) AM_READWRITE( AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
  	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
-	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("|main|", 0x1000<<1)	/* Exec ROM, 10-bits wide */
-	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("|main|", 0x3000<<1)	/* GROM,     8-bits wide */
+	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("main", 0x1000<<1)	/* Exec ROM, 10-bits wide */
+	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("main", 0x3000<<1)	/* GROM,     8-bits wide */
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )	/* GRAM,     8-bits wide */
 	AM_RANGE(0x4800, 0x6fff) AM_ROM		/* Cartridges? */
-	AM_RANGE(0x7000, 0x7fff) AM_ROM	AM_REGION("|main|", 0x7000<<1)	/* Keyboard ROM */
+	AM_RANGE(0x7000, 0x7fff) AM_ROM	AM_REGION("main", 0x7000<<1)	/* Keyboard ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( SMH_RAM, intvkbd_dualport16_w ) AM_BASE(&intvkbd_dualport_ram)	/* Dual-port RAM */
 ADDRESS_MAP_END
 
